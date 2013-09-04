@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -71,10 +71,10 @@ class CRM_Contribute_Form_ContributionCharts extends CRM_Core_Form {
   public function buildQuickForm() {
     //p3 = Three dimensional pie chart.
     //bvg = Vertical bar chart
-    $this->addElement('select', 'chart_type', ts('Chart Style'), array('bvg' => ts('Bar'),
+    $this->addElement('select', 'chart_type', ts('Chart Style'), array(
+        'bvg' => ts('Bar'),
         'p3' => ts('Pie'),
-      ),
-      array('onchange' => "getChart();")
+      )
     );
     $defaultValues['chart_type'] = $this->_chartType;
     $this->setDefaults($defaultValues);
@@ -92,9 +92,7 @@ class CRM_Contribute_Form_ContributionCharts extends CRM_Core_Form {
       }
     }
 
-    $this->addElement('select', 'select_year', ts('Select Year (for monthly breakdown)'),
-      $years, array('onchange' => "getChart();")
-    );
+    $this->addElement('select', 'select_year', ts('Select Year (for monthly breakdown)'), $years);
     $this->setDefaults(array(
       'select_year' => ($this->_year) ? $this->_year : $currentYear,
       ));

@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -149,16 +149,16 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Core_Form {
     // duplicate handling options
     $duplicateOptions = array();
     $duplicateOptions[] = $this->createElement('radio',
-      NULL, NULL, ts('Skip'), CRM_Contact_Import_Parser::DUPLICATE_SKIP
+      NULL, NULL, ts('Skip'), CRM_Import_Parser::DUPLICATE_SKIP
     );
     $duplicateOptions[] = $this->createElement('radio',
-      NULL, NULL, ts('Update'), CRM_Contact_Import_Parser::DUPLICATE_UPDATE
+      NULL, NULL, ts('Update'), CRM_Import_Parser::DUPLICATE_UPDATE
     );
     $duplicateOptions[] = $this->createElement('radio',
-      NULL, NULL, ts('Fill'), CRM_Contact_Import_Parser::DUPLICATE_FILL
+      NULL, NULL, ts('Fill'), CRM_Import_Parser::DUPLICATE_FILL
     );
     $duplicateOptions[] = $this->createElement('radio',
-      NULL, NULL, ts('No Duplicate Checking'), CRM_Contact_Import_Parser::DUPLICATE_NOCHECK
+      NULL, NULL, ts('No Duplicate Checking'), CRM_Import_Parser::DUPLICATE_NOCHECK
     );
 
     $this->addGroup($duplicateOptions, 'onDuplicate',
@@ -179,17 +179,17 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Core_Form {
     $contactOptions = array();
     if (CRM_Contact_BAO_ContactType::isActive('Individual')) {
       $contactOptions[] = $this->createElement('radio',
-        NULL, NULL, ts('Individual'), CRM_Contact_Import_Parser::CONTACT_INDIVIDUAL, $js
+        NULL, NULL, ts('Individual'), CRM_Import_Parser::CONTACT_INDIVIDUAL, $js
       );
     }
     if (CRM_Contact_BAO_ContactType::isActive('Household')) {
       $contactOptions[] = $this->createElement('radio',
-        NULL, NULL, ts('Household'), CRM_Contact_Import_Parser::CONTACT_HOUSEHOLD, $js
+        NULL, NULL, ts('Household'), CRM_Import_Parser::CONTACT_HOUSEHOLD, $js
       );
     }
     if (CRM_Contact_BAO_ContactType::isActive('Organization')) {
       $contactOptions[] = $this->createElement('radio',
-        NULL, NULL, ts('Organization'), CRM_Contact_Import_Parser::CONTACT_ORGANIZATION, $js
+        NULL, NULL, ts('Organization'), CRM_Import_Parser::CONTACT_ORGANIZATION, $js
       );
     }
 
@@ -231,8 +231,8 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Core_Form {
     $config = CRM_Core_Config::singleton();
     $defaults = array(
       'dataSource' => 'CRM_Import_DataSource_CSV',
-      'onDuplicate' => CRM_Contact_Import_Parser::DUPLICATE_SKIP,
-      'contactType' => CRM_Contact_Import_Parser::CONTACT_INDIVIDUAL,
+      'onDuplicate' => CRM_Import_Parser::DUPLICATE_SKIP,
+      'contactType' => CRM_Import_Parser::CONTACT_INDIVIDUAL,
       'fieldSeparator' => $config->fieldSeparator,
     );
 
@@ -328,11 +328,11 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Core_Form {
       $parser->setMaxLinesToProcess(100);
       $parser->run($importTableName,
         $mapper,
-        CRM_Contact_Import_Parser::MODE_MAPFIELD,
+        CRM_Import_Parser::MODE_MAPFIELD,
         $contactType,
         $fieldNames['pk'],
         $fieldNames['status'],
-        CRM_Contact_Import_Parser::DUPLICATE_SKIP,
+        CRM_Import_Parser::DUPLICATE_SKIP,
         NULL, NULL, FALSE,
         CRM_Contact_Import_Parser::DEFAULT_TIMEOUT,
         $contactSubType,

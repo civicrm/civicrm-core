@@ -1,45 +1,53 @@
 <?php
-
-/*
- 
+/**
+ * Test Generated example of using tag get API
+ * *
  */
 function tag_get_example(){
-$params = array( 
-  'id' => 6,
-  'name' => 'New Tag31473',
-  'version' => 3,
+$params = array(
+  'id' => '7',
+  'name' => 'New Tag3',
 );
 
-  $result = civicrm_api( 'tag','get',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('tag', 'get', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function tag_get_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
-  'id' => 6,
-  'values' => array( 
-      '6' => array( 
-          'id' => '6',
-          'name' => 'New Tag31473',
-          'description' => 'This is description for New Tag 29030',
+  'id' => 7,
+  'values' => array(
+      '7' => array(
+          'id' => '7',
+          'name' => 'New Tag3',
+          'description' => 'This is description for Our New Tag ',
           'is_selectable' => '1',
           'is_reserved' => 0,
           'is_tagset' => 0,
           'used_for' => 'civicrm_contact',
-          'created_date' => '2013-02-04 22:45:40',
+          'created_date' => '2013-07-28 08:49:19',
         ),
     ),
 );
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 

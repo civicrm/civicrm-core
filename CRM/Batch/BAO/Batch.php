@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -177,19 +177,6 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
   }
 
   /**
-   * function to get cachekey for batch
-   *
-   * @param int $batchId batch id
-   *
-   * @retun string $cacheString
-   * @static
-   * @access public
-   */
-  static function getCacheKeyForBatch($batchId) {
-    return "batch-entry-{$batchId}";
-  }
-
-  /**
    * This function is a wrapper for ajax batch selector
    *
    * @param  array   $params associated array for params record id.
@@ -353,7 +340,7 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
    * @param  array   $params associated array for params
    * @access public
    */
-  static function getBatchCount(&$params) {
+  public static function getBatchCount(&$params) {
     $args = array();
     $whereClause = self::whereClause($params, $args);
     $query = " SELECT COUNT(*) FROM civicrm_batch batch
@@ -368,7 +355,7 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
    * @param  array   $params associated array for params
    * @access public
    */
-  function whereClause($params) {
+  public static function whereClause($params) {
     $clauses = array();
     // Exclude data-entry batches
     if (empty($params['status_id'])) {
@@ -596,7 +583,7 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
   }
 
   static function closeReOpen($batchIds = array(), $status) {
-    $batchStatus = CRM_Core_PseudoConstant::get('CRM_Financial_DAO_FinancialItem', 'status_id');
+    $batchStatus = CRM_Core_PseudoConstant::get('CRM_Batch_DAO_Batch', 'status_id');
     $params['status_id'] = CRM_Utils_Array::key( $status, $batchStatus );
     $session = CRM_Core_Session::singleton( );
     $params['modified_date'] = date('YmdHis');

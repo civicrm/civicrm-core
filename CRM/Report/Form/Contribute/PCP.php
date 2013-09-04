@@ -2,7 +2,7 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -50,6 +50,14 @@ class CRM_Report_Form_Contribute_PCP extends CRM_Report_Form {
           array(
             'required' => TRUE,
             'no_display' => TRUE,
+          ),
+          'contact_type' =>
+          array(
+            'title' => ts('Supporter Contact Type'),
+          ),
+          'contact_sub_type' =>
+          array(
+            'title' => ts('Supporter Contact SubType'),
           ),
         ),
         'filters' =>

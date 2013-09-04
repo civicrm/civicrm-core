@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -206,20 +206,18 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
 
         // check for permissions
         $session = CRM_Core_Session::singleton();
-        if ($session->get('userID') != $this->_contactId &&
-          !CRM_Contact_BAO_Contact_Permission::allow($this->_contactId, CRM_Core_Permission::EDIT)
-        ) {
+        if (!CRM_Contact_BAO_Contact_Permission::allow($this->_contactId, CRM_Core_Permission::EDIT)) {
           CRM_Core_Error::statusBounce(ts('You do not have the necessary permission to edit this contact.'));
         }
 
         $displayName = CRM_Contact_BAO_Contact::displayName($this->_contactId);
         $displayName = ts('Edit %1', array(1 => $displayName));
-        
+
         // Check if this is default domain contact CRM-10482
         if (CRM_Contact_BAO_Contact::checkDomainContact($this->_contactId)) {
           $displayName .= ' (' . ts('default organization') . ')';
         }
-        
+
         // omitting contactImage from title for now since the summary overlay css doesn't work outside of our crm-container
         CRM_Utils_System::setTitle($displayName);
         $context = CRM_Utils_Request::retrieve('context', 'String', $this);
@@ -404,7 +402,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
       if (array_key_exists('TagsAndGroups', $this->_editOptions)) {
         // set group and tag defaults if any
         if ($this->_gid) {
-          $defaults['group'][$this->_gid] = 1;
+          $defaults['group'][] = $this->_gid;
         }
         if ($this->_tid) {
           $defaults['tag'][$this->_tid] = 1;
@@ -799,9 +797,16 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
         $this->_blocks['Address'] = $this->_editOptions['Address'];
         continue;
       }
+      if ($name == 'TagsAndGroups') {
+        continue;
+      }
       $className = 'CRM_Contact_Form_Edit_' . $name;
       $className::buildQuickForm($this);
     }
+
+    // build tags and groups
+    CRM_Contact_Form_Edit_TagsAndGroups::buildQuickForm($this, 0, CRM_Contact_Form_Edit_TagsAndGroups::ALL,
+      FALSE, NULL, 'Group(s)', 'Tag(s)', NULL, 'crmasmSelect');
 
     // build location blocks.
     CRM_Contact_Form_Edit_Lock::buildQuickForm($this);
@@ -870,6 +875,14 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
 
     //get the submitted values in an array
     $params = $this->controller->exportValues($this->_name);
+
+    $group = CRM_Utils_Array::value('group', $params);
+    if ($group && is_array($group)) {
+      unset($params['group']);
+      foreach ($group as $key => $value) {
+        $params['group'][$value] = 1;
+      }
+    }
 
     CRM_Contact_BAO_Contact_Optimizer::edit( $params, $this->_preEditValues );
 
@@ -959,15 +972,13 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
 
     if (CRM_Utils_Array::value('contact_id', $params) && ($this->_action & CRM_Core_Action::UPDATE)) {
       // figure out which all groups are intended to be removed
-      if (!empty($params['group'])) {
-        $contactGroupList = CRM_Contact_BAO_GroupContact::getContactGroup($params['contact_id'], 'Added');
-        if (is_array($contactGroupList)) {
-          foreach ($contactGroupList as $key) {
-            if ($params['group'][$key['group_id']] != 1 &&
-              !CRM_Utils_Array::value('is_hidden', $key)
-            ) {
-              $params['group'][$key['group_id']] = -1;
-            }
+      $contactGroupList = CRM_Contact_BAO_GroupContact::getContactGroup($params['contact_id'], 'Added');
+      if (is_array($contactGroupList)) {
+        foreach ($contactGroupList as $key) {
+          if ((!array_key_exists($key['group_id'], $params['group']) || $params['group'][$key['group_id']] != 1)
+            && !CRM_Utils_Array::value('is_hidden', $key)
+          ) {
+            $params['group'][$key['group_id']] = -1;
           }
         }
       }

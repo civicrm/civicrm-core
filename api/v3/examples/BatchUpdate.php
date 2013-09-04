@@ -1,44 +1,52 @@
 <?php
-
-/*
- 
+/**
+ * Test Generated example of using batch update API
+ * *
  */
 function batch_update_example(){
-$params = array( 
+$params = array(
   'name' => 'New_Batch_04',
   'title' => 'New Batch 04',
   'description' => 'This is description for New Batch 04',
   'total' => '400.44',
   'item_count' => 4,
-  'version' => 3,
-  'id' => 3,
+  'id' => 1,
 );
 
-  $result = civicrm_api( 'batch','update',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('batch', 'update', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function batch_update_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
-  'id' => 3,
-  'values' => array( 
-      '3' => array( 
-          'id' => '3',
+  'id' => 1,
+  'values' => array(
+      '1' => array(
+          'id' => '1',
           'name' => 'New_Batch_04',
           'title' => 'New Batch 04',
           'description' => 'This is description for New Batch 04',
           'created_id' => '',
           'created_date' => '',
           'modified_id' => '',
-          'modified_date' => '2012-11-14 16:02:35',
+          'modified_date' => '',
           'saved_search_id' => '',
           'status_id' => '',
           'type_id' => '',
@@ -51,7 +59,7 @@ function batch_update_expectedresult(){
     ),
 );
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 

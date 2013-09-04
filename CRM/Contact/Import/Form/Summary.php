@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -36,7 +36,7 @@
 /**
  * This class summarizes the import results
  */
-class CRM_Contact_Import_Form_Summary extends CRM_Core_Form {
+class CRM_Contact_Import_Form_Summary extends CRM_Import_Form_Summary {
 
   /**
    * Function to set variables up before form is built
@@ -59,11 +59,11 @@ class CRM_Contact_Import_Form_Summary extends CRM_Core_Form {
     $mismatchCount = $this->get('unMatchCount');
     $unparsedAddressCount = $this->get('unparsedAddressCount');
     if ($duplicateRowCount > 0) {
-      $urlParams = 'type=' . CRM_Contact_Import_Parser::DUPLICATE . '&parser=CRM_Contact_Import_Parser';
+      $urlParams = 'type=' . CRM_Import_Parser::DUPLICATE . '&parser=CRM_Contact_Import_Parser';
       $this->set('downloadDuplicateRecordsUrl', CRM_Utils_System::url('civicrm/export', $urlParams));
     }
     elseif ($mismatchCount) {
-      $urlParams = 'type=' . CRM_Contact_Import_Parser::NO_MATCH . '&parser=CRM_Contact_Import_Parser';
+      $urlParams = 'type=' . CRM_Import_Parser::NO_MATCH . '&parser=CRM_Contact_Import_Parser';
       $this->set('downloadMismatchRecordsUrl', CRM_Utils_System::url('civicrm/export', $urlParams));
     }
     else {
@@ -71,20 +71,20 @@ class CRM_Contact_Import_Form_Summary extends CRM_Core_Form {
       $this->set('duplicateRowCount', $duplicateRowCount);
     }
     if ($unparsedAddressCount) {
-      $urlParams = 'type=' . CRM_Contact_Import_Parser::UNPARSED_ADDRESS_WARNING . '&parser=CRM_Contact_Import_Parser';
+      $urlParams = 'type=' . CRM_Import_Parser::UNPARSED_ADDRESS_WARNING . '&parser=CRM_Contact_Import_Parser';
       $this->assign('downloadAddressRecordsUrl', CRM_Utils_System::url('civicrm/export', $urlParams));
       $unparsedStreetAddressString = ts('Records imported successfully but unable to parse some of the street addresses');
       $this->assign('unparsedStreetAddressString', $unparsedStreetAddressString);
     }
     $this->assign('dupeError', FALSE);
 
-    if ($onDuplicate == CRM_Contact_Import_Parser::DUPLICATE_UPDATE) {
+    if ($onDuplicate == CRM_Import_Parser::DUPLICATE_UPDATE) {
       $dupeActionString = ts('These records have been updated with the imported data.');
     }
-    elseif ($onDuplicate == CRM_Contact_Import_Parser::DUPLICATE_REPLACE) {
+    elseif ($onDuplicate == CRM_Import_Parser::DUPLICATE_REPLACE) {
       $dupeActionString = ts('These records have been replaced with the imported data.');
     }
-    elseif ($onDuplicate == CRM_Contact_Import_Parser::DUPLICATE_FILL) {
+    elseif ($onDuplicate == CRM_Import_Parser::DUPLICATE_FILL) {
       $dupeActionString = ts('These records have been filled in with the imported data.');
     }
     else {
@@ -111,23 +111,6 @@ class CRM_Contact_Import_Form_Summary extends CRM_Core_Form {
   }
 
   /**
-   * Function to actually build the form
-   *
-   * @return None
-   * @access public
-   */
-  public function buildQuickForm() {
-    $this->addButtons(array(
-        array(
-          'type' => 'next',
-          'name' => ts('Done'),
-          'isDefault' => TRUE,
-        ),
-      )
-    );
-  }
-
-  /**
    * Clean up the import table we used
    *
    * @return None
@@ -145,14 +128,5 @@ class CRM_Contact_Import_Form_Summary extends CRM_Core_Form {
     }
   }
 
-  /**
-   * Return a descriptive name for the page, used in wizard header
-   *
-   * @return string
-   * @access public
-   */
-  public function getTitle() {
-    return ts('Summary');
-  }
 }
 

@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -60,7 +60,7 @@ class CRM_Utils_Address_BatchUpdate {
     $processGeocode = FALSE;
     if (empty($config->geocodeMethod)) {
       if ($this->geocoding == 'true') {
-        $this->returnMessages[] = ts('Error: You need to set a mapping provider under Global Settings');
+        $this->returnMessages[] = ts('Error: You need to set a mapping provider under Administer > System Settings > Mapping and Geocoding');
         $this->returnError = 1;
         $this->returnResult();
       }
@@ -84,7 +84,7 @@ class CRM_Utils_Address_BatchUpdate {
     $parseStreetAddress = FALSE;
     if (!$parseAddress) {
       if ($this->parse == 'true') {
-        $this->returnMessages[] = ts('Error: You need to enable Street Address Parsing under Global Settings >> Address Settings.');
+        $this->returnMessages[] = ts('Error: You need to enable Street Address Parsing under Administer > Localization > Address Settings.');
         $this->returnError = 1;
         return $this->returnResult();
       }
@@ -191,6 +191,8 @@ class CRM_Utils_Address_BatchUpdate {
           $totalGeocoded++;
           $addressParams['geo_code_1'] = $params['geo_code_1'];
           $addressParams['geo_code_2'] = $params['geo_code_2'];
+          $addressParams['postal_code'] = $params['postal_code'];
+          $addressParams['postal_code_suffix'] = $params['postal_code_suffix'];
         }
       }
 

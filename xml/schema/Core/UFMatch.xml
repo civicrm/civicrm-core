@@ -30,7 +30,7 @@
        <table>civicrm_domain</table>
        <key>id</key>
        <add>3.0</add>
-  </foreignKey>  
+  </foreignKey>
   <field>
        <name>uf_id</name>
        <type>int unsigned</type>

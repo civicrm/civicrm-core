@@ -1,11 +1,10 @@
 <?php
-
-/*
- 
+/**
+ * Test Generated example of using price_field_value create API
+ * *
  */
 function price_field_value_create_example(){
-$params = array( 
-  'version' => 3,
+$params = array(
   'price_field_id' => 13,
   'membership_type_id' => 5,
   'name' => 'memType1',
@@ -16,23 +15,32 @@ $params = array(
   'financial_type_id' => 2,
 );
 
-  $result = civicrm_api( 'price_field_value','create',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('price_field_value', 'create', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function price_field_value_create_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
   'id' => 10,
-  'values' => array( 
-      '10' => array( 
+  'values' => array(
+      '10' => array(
           'id' => '10',
           'price_field_id' => '13',
           'name' => 'memType1',
@@ -48,11 +56,12 @@ function price_field_value_create_expectedresult(){
           'is_active' => '1',
           'financial_type_id' => '2',
           'deductible_amount' => '',
+          'contribution_type_id' => '2',
         ),
     ),
 );
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 

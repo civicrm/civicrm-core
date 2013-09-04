@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright Tech To The People http:tttp.eu (c) 2008                 |
  +--------------------------------------------------------------------+
@@ -298,6 +298,13 @@ class civicrm_cli_csv_exporter extends civicrm_cli {
         fputcsv($out, $columns, $this->separator, '"');
         $first = false;
       }
+      //handle values returned as arrays (i.e. custom fields that allow multiple selections) by inserting a control character
+      foreach ($row as &$field) {
+        if(is_array($field)) {
+          //convert to string
+          $field = implode($field,CRM_Core_DAO::VALUE_SEPARATOR) . CRM_Core_DAO::VALUE_SEPARATOR;
+        }
+      }
       fputcsv($out, $row, $this->separator, '"');
     }
     fclose($out);
@@ -359,6 +366,11 @@ class civicrm_cli_csv_file extends civicrm_cli {
   function convertLine($data) {
     $params = array();
     foreach ($this->header as $i => $field) {
+      //split any multiselect data, denoted with CRM_Core_DAO::VALUE_SEPARATOR 
+      if (strpos($data[$i], CRM_Core_DAO::VALUE_SEPARATOR) !== FALSE) {
+        $data[$i] = explode(CRM_Core_DAO::VALUE_SEPARATOR,$data[$i]);
+        $data[$i] = array_combine($data[$i], $data[$i]);
+      }
       $params[$field] = $data[$i];
     }
     $params['version'] = 3;

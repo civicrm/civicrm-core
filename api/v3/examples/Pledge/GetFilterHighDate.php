@@ -1,31 +1,39 @@
 <?php
-
-/*
- demonstrates high date filter
+/**
+ * Test Generated example of using pledge get API
+ * demonstrates high date filter *
  */
 function pledge_get_example(){
-$params = array( 
-  'version' => 3,
-  'pledge_start_date_high' => '20130202223950',
+$params = array(
+  'pledge_start_date_high' => '20130801213843',
 );
 
-  $result = civicrm_api( 'pledge','get',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('pledge', 'get', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function pledge_get_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
   'id' => 2,
-  'values' => array( 
-      '2' => array( 
+  'values' => array(
+      '2' => array(
           'contact_id' => '8',
           'contact_type' => 'Individual',
           'contact_sub_type' => '',
@@ -33,7 +41,7 @@ function pledge_get_expectedresult(){
           'display_name' => 'Mr. Anthony Anderson II',
           'pledge_id' => '2',
           'pledge_amount' => '100.00',
-          'pledge_create_date' => '2013-02-04 00:00:00',
+          'pledge_create_date' => '2013-08-03 00:00:00',
           'pledge_status' => 'Overdue',
           'pledge_total_paid' => '',
           'pledge_next_pay_date' => '2012-03-02 00:00:00',
@@ -51,7 +59,7 @@ function pledge_get_expectedresult(){
     ),
 );
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 

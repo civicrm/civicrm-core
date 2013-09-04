@@ -63,5 +63,3 @@ cj(function($) {
     return false;
   });
 });
-
-

@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -246,12 +246,23 @@ class CRM_Utils_PDF_Label extends TCPDF {
       'times' => ts('Times New Roman'),
       'dejavusans' => ts('Deja Vu Sans (UTF-8)'),
     );
+
+
+    // Check to see if we have any additional fonts to add. You can specify more fonts in
+    // civicrm.settings.php via: $config['CiviCRM Preferences']['additional_fonts']
+    // CRM-13307
+    $additionalFonts = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'additional_fonts');
+    if (is_array($additionalFonts)) {
+      $fontLabel = array_merge($fontLabel, $additionalFonts);
+    }
+
     $tcpdfFonts = $this->fontlist;
     foreach ($tcpdfFonts as $fontName) {
       if (array_key_exists($fontName, $fontLabel)) {
         $list[$fontName] = $fontLabel[$fontName];
       }
     }
+
     return $list;
   }
 }

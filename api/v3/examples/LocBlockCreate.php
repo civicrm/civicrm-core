@@ -1,22 +1,30 @@
 <?php
-
-/*
- 
+/**
+ * Test Generated example of using loc_block create API
+ * *
  */
 function loc_block_create_example(){
 $params = array(
-  'version' => 3,
   'address_id' => 2,
   'phone_id' => 2,
   'email_id' => 3,
 );
 
-  $result = civicrm_api( 'loc_block','create',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('loc_block', 'create', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function loc_block_create_expectedresult(){
@@ -41,7 +49,7 @@ function loc_block_create_expectedresult(){
     ),
 );
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 

@@ -1,34 +1,42 @@
 <?php
-
-/*
- 
+/**
+ * Test Generated example of using contribution_page create API
+ * *
  */
 function contribution_page_create_example(){
-$params = array( 
-  'version' => 3,
+$params = array(
   'title' => 'Test Contribution Page',
   'financial_type_id' => 1,
   'currency' => 'NZD',
   'goal_amount' => 34567,
 );
 
-  $result = civicrm_api( 'contribution_page','create',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('contribution_page', 'create', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function contribution_page_create_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
   'id' => 1,
-  'values' => array( 
-      '1' => array( 
+  'values' => array(
+      '1' => array(
           'id' => '1',
           'title' => 'Test Contribution Page',
           'intro_text' => '',
@@ -81,7 +89,7 @@ function contribution_page_create_expectedresult(){
     ),
 );
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 

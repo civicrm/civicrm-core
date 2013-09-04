@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -1454,39 +1454,28 @@ ORDER BY civicrm_custom_group.weight,
   /**
    * generic function to build all the form elements for a specific group tree
    *
-   * @param CRM_Core_Form $form      the form object
-   * @param array         $groupTree the group tree object
-   * @param string        $showName
-   * @param string        $hideName
+   * @param object    $form             the form object
+   * @param array     $groupTree        the group tree object
+   * @param boolean   $inactiveNeeded   return inactive custom groups
+   * @param string    $prefix           prefix for custom grouptree assigned to template
    *
    * @return void
    * @access public
    * @static
    */
-  static function buildQuickForm(&$form,
-    &$groupTree,
-    $inactiveNeeded = FALSE,
-    $groupCount     = 1,
-    $prefix         = ''
-  ) {
-
+  static function buildQuickForm(&$form, &$groupTree, $inactiveNeeded = FALSE, $prefix = '' ) {
     $form->assign_by_ref("{$prefix}groupTree", $groupTree);
-    $sBlocks = array();
-    $hBlocks = array();
 
     // this is fix for date field
     $form->assign('currentYear', date('Y'));
 
     foreach ($groupTree as $id => $group) {
-
       CRM_Core_ShowHideBlocks::links($form, $group['title'], '', '');
-
-      $groupId = CRM_Utils_Array::value('id', $group);
       foreach ($group['fields'] as $field) {
         $required = CRM_Utils_Array::value('is_required', $field);
         //fix for CRM-1620
         if ($field['data_type'] == 'File') {
-          if (isset($field['customValue']['data'])) {
+          if (!empty($field['element_value']['data'])) {
             $required = 0;
           }
         }
@@ -1525,7 +1514,7 @@ ORDER BY civicrm_custom_group.weight,
       }
       foreach ($group['fields'] as $key => $field) {
         $fieldName = 'custom_' . $key;
-        $value = CRM_Utils_Request::retrieve($fieldName, 'String', $form);
+        $value = CRM_Utils_Request::retrieve($fieldName, 'String', $form, FALSE, NULL, 'GET');
 
         if ($value) {
           $valid = FALSE;
@@ -1574,7 +1563,7 @@ ORDER BY civicrm_custom_group.weight,
             if (!empty($value)) {
               $time = NULL;
               if (CRM_Utils_Array::value('time_format', $field)) {
-                $time = CRM_Utils_Request::retrieve($fieldName . '_time', 'String', $form);
+                $time = CRM_Utils_Request::retrieve($fieldName . '_time', 'String', $form, FALSE, NULL, 'GET');
               }
               list($value, $time) = CRM_Utils_Date::setDateDefaults($value . ' ' . $time);
               if (CRM_Utils_Array::value('time_format', $field)) {
@@ -1770,6 +1759,8 @@ SELECT IF( EXISTS(SELECT name FROM civicrm_contact_type WHERE name like %1), 1, 
    *  @param boolean $returnCount true if customValue count needs to be returned
    */
   static function buildCustomDataView(&$form, &$groupTree, $returnCount = FALSE, $gID = NULL, $prefix = NULL) {
+    $details = array();
+
     foreach ($groupTree as $key => $group) {
       if ($key === 'info') {
         continue;
@@ -1826,6 +1817,7 @@ SELECT IF( EXISTS(SELECT name FROM civicrm_contact_type WHERE name like %1), 1, 
         return count($details[$gID]);
       }
       else {
+        $countValue = array();
         foreach( $details as $key => $value ) {
           $countValue[$key] = count($details[$key]);
         }

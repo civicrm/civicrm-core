@@ -1,42 +1,40 @@
 <?php
-
-/*
- 
+/**
+ * Test Generated example of using relationship delete API
+ * *
  */
 function relationship_delete_example(){
-$params = array( 
-  'contact_id_a' => 51,
-  'contact_id_b' => 52,
-  'relationship_type_id' => 26,
-  'start_date' => '2008-12-20',
-  'is_active' => 1,
-  'version' => 3,
+$params = array(
+  'id' => 1,
 );
 
-  $result = civicrm_api( 'relationship','delete',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('relationship', 'delete', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function relationship_delete_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
-  'id' => 1,
-  'values' => array( 
-      '1' => array( 
-          'id' => '1',
-          'moreIDs' => '1',
-        ),
-    ),
+  'values' => 'Deleted relationship successfully',
 );
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 

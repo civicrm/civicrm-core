@@ -1,26 +1,34 @@
 <?php
-
-/*
- demonstrates use of return is_full 
+/**
+ * Test Generated example of using event getsingle API
+ * demonstrates use of return is_full  *
  */
 function event_getsingle_example(){
-$params = array( 
+$params = array(
   'id' => 1,
-  'version' => 3,
   'return.is_full' => 1,
 );
 
-  $result = civicrm_api( 'event','getsingle',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('event', 'getsingle', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function event_getsingle_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'id' => '1',
   'title' => 'Annual CiviCRM meet',
   'event_title' => 'Annual CiviCRM meet',
@@ -42,13 +50,13 @@ function event_getsingle_expectedresult(){
   'is_multiple_registrations' => 0,
   'allow_same_participant_emails' => 0,
   'is_template' => 0,
-  'created_date' => '2013-02-04 22:31:24',
+  'created_date' => '2013-08-03 21:23:22',
   'is_share' => '1',
   'available_places' => 0,
   'is_full' => '1',
 );
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 

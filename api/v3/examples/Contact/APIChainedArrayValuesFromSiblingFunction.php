@@ -1,41 +1,49 @@
 <?php
-
-/*
- /*this demonstrates the usage of chained api functions.  Specifically it has one 'parent function' &
-    2 child functions - one receives values from the parent (Contact) and the other child (Tag). 
+/**
+ * Test Generated example of using contact create API
+ * /*this demonstrates the usage of chained api functions.  Specifically it has one 'parent function' &
+    2 child functions - one receives values from the parent (Contact) and the other child (Tag).  *
  */
 function contact_create_example(){
-$params = array( 
-  'version' => 3,
+$params = array(
   'display_name' => 'batman',
   'contact_type' => 'Individual',
-  'api.tag.create' => array( 
+  'api.tag.create' => array(
       'name' => '$value.id',
       'description' => '$value.display_name',
       'format.only_id' => 1,
     ),
-  'api.entity_tag.create' => array( 
+  'api.entity_tag.create' => array(
       'tag_id' => '$value.api.tag.create',
     ),
 );
 
-  $result = civicrm_api( 'contact','create',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('contact', 'create', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function contact_create_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
   'id' => 1,
-  'values' => array( 
-      '1' => array( 
+  'values' => array(
+      '1' => array(
           'id' => '1',
           'contact_type' => 'Individual',
           'contact_sub_type' => '',
@@ -81,10 +89,10 @@ function contact_create_expectedresult(){
           'organization_name' => '',
           'sic_code' => '',
           'user_unique_id' => '',
-          'created_date' => '2013-02-15 17:06:45',
+          'created_date' => '2013-07-28 08:49:19',
           'modified_date' => '2012-11-14 16:02:35',
           'api.tag.create' => 6,
-          'api.entity_tag.create' => array( 
+          'api.entity_tag.create' => array(
               'is_error' => 0,
               'not_added' => 1,
               'added' => 1,
@@ -94,7 +102,7 @@ function contact_create_expectedresult(){
     ),
 );
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 

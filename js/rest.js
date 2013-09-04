@@ -1,6 +1,6 @@
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -86,8 +86,7 @@ var CRM = CRM || {};
    */
   CRM.api = function(entity, action, params, options) {
     // Default settings
-    var json = false,
-    settings = {
+    var settings = {
       context: null,
       success: function(result, settings) {
         return true;
@@ -102,7 +101,7 @@ var CRM = CRM || {};
         }
         return settings.success.call(this, result, settings);
       },
-      ajaxURL: 'civicrm/ajax/rest',
+      ajaxURL: 'civicrm/ajax/rest'
     };
     action = action.toLowerCase();
     // Default success handler
@@ -122,24 +121,11 @@ var CRM = CRM || {};
           return true;
         };
     }
-    for (var i in params) {
-      if (i.slice(0, 4) == 'api.' || typeof(params[i]) == 'Object') {
-        json = true;
-        break;
-      }
-    }
-    if (json) {
-      params = {
-        entity: entity,
-        action: action,
-        json: JSON.stringify(params)
-      };
-    }
-    else {
-      params.entity = entity;
-      params.action = action;
-      params.json = 1;
-    }
+    params = {
+      entity: entity,
+      action: action,
+      json: JSON.stringify(params)
+    };
     // Pass copy of settings into closure to preserve its value during multiple requests
     (function(stg) {
       $.ajax({
@@ -160,6 +146,15 @@ var CRM = CRM || {};
     return CRM.api.call(this, entity, action, params, options);
   };
 
+  /**
+   * FIXME: This function is not documented, is not used anywhere in the codebase, and doesn't
+   * clearly differentiate field elements which store the "contact id" versus the "contact label".
+   * My guess is that it's designed more for "quick-search" and less for "CRUD forms".
+   *
+   * @param params
+   * @param options
+   * @return {*}
+   */
   $.fn.crmAutocomplete = function (params, options) {
     if (typeof params == 'undefined') params = {};
     if (typeof options == 'undefined') options = {};

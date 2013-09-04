@@ -68,7 +68,7 @@
   </field>
   <field>
        <name>start_action_unit</name>
-       <type>enum</type> 
+       <type>enum</type>
        <values>hour,day,week,month,year</values>
        <comment>Time units for reminder.</comment>
        <add>3.4</add>
@@ -96,7 +96,7 @@
   </field>
   <field>
        <name>repetition_frequency_unit</name>
-       <type>enum</type> 
+       <type>enum</type>
        <values>hour,day,week,month,year</values>
        <comment>Time units for repetition of reminder.</comment>
        <add>3.4</add>
@@ -109,7 +109,7 @@
   </field>
   <field>
        <name>end_frequency_unit</name>
-       <type>enum</type> 
+       <type>enum</type>
        <values>hour,day,week,month,year</values>
        <comment>Time units till repetition of reminder.</comment>
        <add>3.4</add>
@@ -141,21 +141,21 @@
        <comment>Is this option active?</comment>
        <add>3.4</add>
   </field>
- <field> 
-      <name>recipient_manual</name> 
+ <field>
+      <name>recipient_manual</name>
       <title>Recipient Manual</title>
-      <type>varchar</type>  
-      <length>128</length> 
-      <comment>Contact IDs to which reminder should be sent.</comment> 
-      <add>3.4</add> 
+      <type>varchar</type>
+      <length>128</length>
+      <comment>Contact IDs to which reminder should be sent.</comment>
+      <add>3.4</add>
   </field>
-  <field> 
-      <name>recipient_listing</name> 
+  <field>
+      <name>recipient_listing</name>
       <title>Recipient Listing</title>
-      <type>varchar</type>  
-      <length>128</length> 
-      <comment>listing based on recipient field.</comment> 
-      <add>4.1</add> 
+      <type>varchar</type>
+      <length>128</length>
+      <comment>listing based on recipient field.</comment>
+      <add>4.1</add>
   </field>
   <field>
        <name>body_text</name>
@@ -194,7 +194,7 @@
        <table>civicrm_action_mapping</table>
        <key>id</key>
        <onDelete>SET NULL</onDelete>
-  </foreignKey> 
+  </foreignKey>
   <field>
     <name>group_id</name>
     <type>int unsigned</type>

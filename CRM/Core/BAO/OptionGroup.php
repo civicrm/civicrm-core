@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -89,7 +89,11 @@ class CRM_Core_BAO_OptionGroup extends CRM_Core_DAO_OptionGroup {
    *
    * @return object
    */
-  static function add(&$params, &$ids) {
+  static function add(&$params, $ids = array()) {
+    if(empty($params['id'])){
+      $params['id'] = CRM_Utils_Array::value('optionGroup', $ids);
+    }
+
     $params['is_active'] = CRM_Utils_Array::value('is_active', $params, FALSE);
     $params['is_default'] = CRM_Utils_Array::value('is_default', $params, FALSE);
 
@@ -102,7 +106,6 @@ class CRM_Core_BAO_OptionGroup extends CRM_Core_DAO_OptionGroup {
       CRM_Core_DAO::executeQuery($query);
     }
 
-    $optionGroup->id = CRM_Utils_Array::value('optionGroup', $ids);
     $optionGroup->save();
     return $optionGroup;
   }

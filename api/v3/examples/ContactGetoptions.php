@@ -1,20 +1,28 @@
 <?php
-
-/*
- Demonstrates retrieving options for a custom field
+/**
+ * Test Generated example of using contact getoptions API
+ * Demonstrates retrieving options for a custom field *
  */
 function contact_getoptions_example(){
 $params = array(
   'field' => 'custom_1',
-  'version' => 3,
 );
 
-  $result = civicrm_api( 'contact','getoptions',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('contact', 'getoptions', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function contact_getoptions_expectedresult(){
@@ -22,19 +30,14 @@ function contact_getoptions_expectedresult(){
   $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
-  'count' => 3,
+  'count' => 2,
   'values' => array(
-      'attributes' => array(
-          'label' => 'Country',
-          'data_type' => 'String',
-          'html_type' => 'Select',
-        ),
       '1' => 'Label1',
       '2' => 'Label2',
     ),
 );
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 

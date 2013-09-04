@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -73,6 +73,14 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
           array(
             'no_display' => TRUE,
             'required' => TRUE,
+          ),
+          'contact_type' =>
+          array(
+            'title' => ts('Contact Type'),
+          ),
+          'contact_sub_type' =>
+          array(
+            'title' => ts('Contact SubType'),
           ),
         ),
         'filters' =>
@@ -192,6 +200,8 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
           'source' => array('title' => ts('Source'),
           ),
           'payment_instrument_id' => array('title' => ts('Payment Type'),
+          ),
+          'check_number' => array('title' => ts('Check Number'),
           ),
           'currency' =>
           array('required' => TRUE,
@@ -367,8 +377,6 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
   }
 
   function select() {
-    $select = array();
-
     $this->_columnHeaders = array();
     foreach ($this->_columns as $tableName => $table) {
       if (array_key_exists('fields', $table)) {
@@ -376,66 +384,34 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
           if (CRM_Utils_Array::value('required', $field) ||
             CRM_Utils_Array::value($fieldName, $this->_params['fields'])
           ) {
-            if ($tableName == 'civicrm_address') {
-              $this->_addressField = TRUE;
-            }
-            if ($tableName == 'civicrm_email') {
-              $this->_emailField = TRUE;
-            }
-            elseif ($tableName == 'civicrm_email_honor') {
+            if ($tableName == 'civicrm_email_honor') {
               $this->_emailFieldHonor = TRUE;
             }
-
             if ($tableName == 'civicrm_contact_honor') {
               $this->_nameFieldHonor = TRUE;
-            }
-
-            // only include statistics columns if set
-            if (CRM_Utils_Array::value('statistics', $field)) {
-              foreach ($field['statistics'] as $stat => $label) {
-                switch (strtolower($stat)) {
-                  case 'sum':
-                    $select[] = "SUM({$field['dbAlias']}) as {$tableName}_{$fieldName}_{$stat}";
-                    $this->_columnHeaders["{$tableName}_{$fieldName}_{$stat}"]['title'] = $label;
-                    $this->_columnHeaders["{$tableName}_{$fieldName}_{$stat}"]['type'] = $field['type'];
-                    $this->_statFields[] = "{$tableName}_{$fieldName}_{$stat}";
-                    $this->_selectAliases[] = "{$tableName}_{$fieldName}_{$stat}";
-                    break;
-
-                  case 'count':
-                    $select[] = "COUNT({$field['dbAlias']}) as {$tableName}_{$fieldName}_{$stat}";
-                    $this->_columnHeaders["{$tableName}_{$fieldName}_{$stat}"]['title'] = $label;
-                    $this->_statFields[] = "{$tableName}_{$fieldName}_{$stat}";
-                    $this->_selectAliases[] = "{$tableName}_{$fieldName}_{$stat}";
-                    break;
-
-                  case 'avg':
-                    $select[] = "ROUND(AVG({$field['dbAlias']}),2) as {$tableName}_{$fieldName}_{$stat}";
-                    $this->_columnHeaders["{$tableName}_{$fieldName}_{$stat}"]['type'] = $field['type'];
-                    $this->_columnHeaders["{$tableName}_{$fieldName}_{$stat}"]['title'] = $label;
-                    $this->_statFields[] = "{$tableName}_{$fieldName}_{$stat}";
-                    $this->_selectAliases[] = "{$tableName}_{$fieldName}_{$stat}";
-                    break;
-                }
-              }
-            }
-            else {
-              $select[] = "{$field['dbAlias']} as {$tableName}_{$fieldName}";
-              $this->_columnHeaders["{$tableName}_{$fieldName}"]['title'] = CRM_Utils_Array::value('title', $field);
-              $this->_columnHeaders["{$tableName}_{$fieldName}"]['type'] = CRM_Utils_Array::value('type', $field);
-              $this->_selectAliases[] = "{$tableName}_{$fieldName}";
             }
           }
         }
       }
     }
 
-    $this->_select = "SELECT " . implode(', ', $select) . " ";
+    parent::select();
+  }
+
+  function orderBy() {
+    parent::orderBy();
+
+    // please note this will just add the order-by columns to select query, and not display in column-headers.
+    // This is a solution to not throw fatal errors when there is a column in order-by, not present in select/display columns.
+    foreach ($this->_orderByFields as $orderBy) {
+      if (!array_key_exists($orderBy['name'], $this->_params['fields'])
+        && !CRM_Utils_Array::value('section', $orderBy)) {
+        $this->_select .= ", {$orderBy['dbAlias']} as {$orderBy['tplField']}";
+      }
+    }
   }
 
   function from($softcredit = false) {
-
-    $this->_from = NULL;
     $this->_from = "
         FROM  civicrm_contact      {$this->_aliases['civicrm_contact']} {$this->_aclFrom}
               INNER JOIN civicrm_contribution {$this->_aliases['civicrm_contribution']}
@@ -590,8 +566,6 @@ GROUP BY {$this->_aliases['civicrm_contribution']}.currency";
   }
 
   function postProcess() {
-    $temp3 = false;
-
     // get the acl clauses built before we assemble the query
     $this->buildACLClause($this->_aliases['civicrm_contact']);
 
@@ -904,7 +878,7 @@ WHERE  civicrm_contribution_contribution_id={$row['civicrm_contribution_contribu
         foreach ($totals as $key => $total) {
           $totalandsum[$key] = ts("%1 %2: %3", array(
             1 => $total,
-            2 => $title, 
+            2 => $title,
             3 => CRM_Utils_Money::format($sumcontribs[$key])
           ));
         }

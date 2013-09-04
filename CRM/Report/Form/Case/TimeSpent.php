@@ -2,7 +2,7 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -142,7 +142,7 @@ class CRM_Report_Form_Case_TimeSpent extends CRM_Report_Form {
             ),
           ),
         'grouping' => 'activity-fields',
-      ), 
+      ),
       'civicrm_case_activity' =>
       array(
         'dao' => 'CRM_Case_DAO_CaseActivity',

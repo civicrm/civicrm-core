@@ -1,43 +1,51 @@
 <?php
-
-/*
- 
+/**
+ * Test Generated example of using group get API
+ * *
  */
 function group_get_example(){
-$params = array( 
-  'version' => 3,
-  'name' => 'Test Group 1_6',
+$params = array(
+  'name' => 'Test Group 1_4',
 );
 
-  $result = civicrm_api( 'group','get',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('group', 'get', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function group_get_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
-  'id' => 6,
-  'values' => array( 
-      '6' => array( 
-          'id' => '6',
-          'name' => 'Test Group 1_6',
+  'id' => 4,
+  'values' => array(
+      '4' => array(
+          'id' => '4',
+          'name' => 'Test Group 1_4',
           'title' => 'New Test Group Created',
           'description' => 'New Test Group Created',
           'source' => '',
           'saved_search_id' => '',
           'is_active' => '1',
           'visibility' => 'Public Pages',
-          'where_clause' => ' ( `civicrm_group_contact-6`.group_id IN ( 6 ) AND `civicrm_group_contact-6`.status IN ("Added") ) ',
-          'select_tables' => 'a:12:{s:15:"civicrm_contact";i:1;s:15:"civicrm_address";i:1;s:22:"civicrm_state_province";i:1;s:15:"civicrm_country";i:1;s:13:"civicrm_email";i:1;s:13:"civicrm_phone";i:1;s:10:"civicrm_im";i:1;s:19:"civicrm_worldregion";i:1;s:25:"`civicrm_group_contact-6`";s:114:" LEFT JOIN civicrm_group_contact `civicrm_group_contact-6` ON contact_a.id = `civicrm_group_contact-6`.contact_id ";s:6:"gender";i:1;s:17:"individual_prefix";i:1;s:17:"individual_suffix";i:1;}',
-          'where_tables' => 'a:2:{s:15:"civicrm_contact";i:1;s:25:"`civicrm_group_contact-6`";s:114:" LEFT JOIN civicrm_group_contact `civicrm_group_contact-6` ON contact_a.id = `civicrm_group_contact-6`.contact_id ";}',
-          'group_type' => array( 
+          'where_clause' => ' ( `civicrm_group_contact-4`.group_id IN ( 4 ) AND `civicrm_group_contact-4`.status IN ("Added") ) ',
+          'select_tables' => 'a:8:{s:15:"civicrm_contact";i:1;s:15:"civicrm_address";i:1;s:15:"civicrm_country";i:1;s:13:"civicrm_email";i:1;s:13:"civicrm_phone";i:1;s:10:"civicrm_im";i:1;s:19:"civicrm_worldregion";i:1;s:25:"`civicrm_group_contact-4`";s:114:" LEFT JOIN civicrm_group_contact `civicrm_group_contact-4` ON contact_a.id = `civicrm_group_contact-4`.contact_id ";}',
+          'where_tables' => 'a:2:{s:15:"civicrm_contact";i:1;s:25:"`civicrm_group_contact-4`";s:114:" LEFT JOIN civicrm_group_contact `civicrm_group_contact-4` ON contact_a.id = `civicrm_group_contact-4`.contact_id ";}',
+          'group_type' => array(
               '0' => '1',
               '1' => '2',
             ),
@@ -52,7 +60,7 @@ function group_get_expectedresult(){
     ),
 );
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 

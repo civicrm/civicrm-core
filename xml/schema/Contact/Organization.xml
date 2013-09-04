@@ -44,7 +44,7 @@
   </field>
   <index>
       <name>index_organization_name</name>
-      <fieldName>organization_name</fieldName>      
+      <fieldName>organization_name</fieldName>
       <add>1.8</add>
   </index>
   <field>

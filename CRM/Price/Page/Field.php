@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -93,13 +93,13 @@ class CRM_Price_Page_Field extends CRM_Core_Page {
         ),
         CRM_Core_Action::DISABLE => array(
           'name' => ts('Disable'),
-          'extra' => 'onclick = "enableDisable( %%fid%%,\'' . 'CRM_Price_BAO_Field' . '\',\'' . 'enable-disable' . '\' );"',
+          'extra' => 'onclick = "enableDisable( %%fid%%,\'' . 'CRM_Price_BAO_PriceField' . '\',\'' . 'enable-disable' . '\' );"',
           'ref' => 'disable-action',
           'title' => ts('Disable Price'),
         ),
         CRM_Core_Action::ENABLE => array(
           'name' => ts('Enable'),
-          'extra' => 'onclick = "enableDisable( %%fid%%,\'' . 'CRM_Price_BAO_Field' . '\',\'' . 'disable-enable' . '\' );"',
+          'extra' => 'onclick = "enableDisable( %%fid%%,\'' . 'CRM_Price_BAO_PriceField' . '\',\'' . 'disable-enable' . '\' );"',
           'ref' => 'enable-action',
           'title' => ts('Enable Price'),
         ),
@@ -125,7 +125,7 @@ class CRM_Price_Page_Field extends CRM_Core_Page {
    */
   function browse() {
     $priceField    = array();
-    $priceFieldBAO = new CRM_Price_BAO_Field();
+    $priceFieldBAO = new CRM_Price_BAO_PriceField();
 
     // fkey is sid
     $priceFieldBAO->price_set_id = $this->_sid;
@@ -141,7 +141,7 @@ class CRM_Price_Page_Field extends CRM_Core_Page {
         $optionValues = array();
         $params = array('price_field_id' => $priceFieldBAO->id);
 
-        CRM_Price_BAO_FieldValue::retrieve($params, $optionValues);
+        CRM_Price_BAO_PriceFieldValue::retrieve($params, $optionValues);
 
         $priceField[$priceFieldBAO->id]['price'] = CRM_Utils_Array::value('amount', $optionValues);
       }
@@ -169,7 +169,7 @@ class CRM_Price_Page_Field extends CRM_Core_Page {
       }
 
       // need to translate html types from the db
-      $htmlTypes = CRM_Price_BAO_Field::htmlTypes();
+      $htmlTypes = CRM_Price_BAO_PriceField::htmlTypes();
       $priceField[$priceFieldBAO->id]['html_type'] = $htmlTypes[$priceField[$priceFieldBAO->id]['html_type']];
       $priceField[$priceFieldBAO->id]['order'] = $priceField[$priceFieldBAO->id]['weight'];
       $priceField[$priceFieldBAO->id]['action'] = CRM_Core_Action::formLink(self::actionLinks(), $action,
@@ -182,7 +182,7 @@ class CRM_Price_Page_Field extends CRM_Core_Page {
 
     $returnURL = CRM_Utils_System::url('civicrm/admin/price/field', "reset=1&action=browse&sid={$this->_sid}");
     $filter = "price_set_id = {$this->_sid}";
-    CRM_Utils_Weight::addOrder($priceField, 'CRM_Price_DAO_Field',
+    CRM_Utils_Weight::addOrder($priceField, 'CRM_Price_DAO_PriceField',
       'id', $returnURL, $filter
     );
     $this->assign('priceField', $priceField);
@@ -239,12 +239,12 @@ class CRM_Price_Page_Field extends CRM_Core_Page {
     );
 
     if ($this->_sid) {
-      $usedBy = CRM_Price_BAO_Set::getUsedBy($this->_sid);
+      $usedBy = CRM_Price_BAO_PriceSet::getUsedBy($this->_sid);
       $this->assign('usedBy', $usedBy);
-      $this->_isSetReserved= CRM_Core_DAO::getFieldValue('CRM_Price_DAO_Set', $this->_sid, 'is_reserved');
+      $this->_isSetReserved= CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $this->_sid, 'is_reserved');
       $this->assign('isReserved', $this->_isSetReserved);
 
-      CRM_Price_BAO_Set::checkPermission($this->_sid);
+      CRM_Price_BAO_PriceSet::checkPermission($this->_sid);
       $comps = array(
         'Event' => 'civicrm_event',
         'Contribution' => 'civicrm_contribution_page',
@@ -276,12 +276,12 @@ class CRM_Price_Page_Field extends CRM_Core_Page {
         CRM_Utils_System::appendBreadCrumb(ts('Price'),
           $url
         );
-        $this->assign('usedPriceSetTitle', CRM_Price_BAO_Field::getTitle($fid));
+        $this->assign('usedPriceSetTitle', CRM_Price_BAO_PriceField::getTitle($fid));
       }
     }
 
     if ($this->_sid) {
-      $groupTitle = CRM_Price_BAO_Set::getTitle($this->_sid);
+      $groupTitle = CRM_Price_BAO_PriceSet::getTitle($this->_sid);
       $this->assign('sid', $this->_sid);
       $this->assign('groupTitle', $groupTitle);
       CRM_Utils_System::setTitle(ts('%1 - Price Fields', array(1 => $groupTitle)));

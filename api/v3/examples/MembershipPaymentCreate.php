@@ -1,32 +1,40 @@
 <?php
-
-/*
- 
+/**
+ * Test Generated example of using membership_payment create API
+ * *
  */
 function membership_payment_create_example(){
-$params = array( 
+$params = array(
   'contribution_id' => 1,
   'membership_id' => 1,
-  'version' => 3,
 );
 
-  $result = civicrm_api( 'membership_payment','create',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('membership_payment', 'create', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function membership_payment_create_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
   'id' => 1,
-  'values' => array( 
-      '1' => array( 
+  'values' => array(
+      '1' => array(
           'id' => '1',
           'membership_id' => '1',
           'contribution_id' => '1',
@@ -34,7 +42,7 @@ function membership_payment_create_expectedresult(){
     ),
 );
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 

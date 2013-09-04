@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -34,7 +34,7 @@
  */
 
 /**
- * Dummy page for details of address 
+ * Dummy page for details of address
  *
  */
 class CRM_Contact_Page_Inline_Address extends CRM_Core_Page {
@@ -68,8 +68,8 @@ class CRM_Contact_Page_Inline_Address extends CRM_Core_Page {
     }
 
     // we just need current address block
-    $currentAddressBlock['address'][$locBlockNo] = array_pop( $address ); 
-    
+    $currentAddressBlock['address'][$locBlockNo] = array_pop( $address );
+
     if ( !empty( $currentAddressBlock['address'][$locBlockNo] ) ) {
       // get contact name of shared contact names
       $sharedAddresses = array();
@@ -93,7 +93,7 @@ class CRM_Contact_Page_Inline_Address extends CRM_Core_Page {
       // we setting the prefix to dnc_ below so that we don't overwrite smarty's grouptree var.
       $currentAddressBlock['address'][$locBlockNo]['custom'] = CRM_Core_BAO_CustomGroup::buildCustomDataView( $this, $groupTree, FALSE, NULL, "dnc_");
       $this->assign("dnc_viewCustomData", NULL);
-    
+
       $this->assign('add', $currentAddressBlock['address'][$locBlockNo]);
       $this->assign('sharedAddresses', $sharedAddresses);
     }
@@ -111,11 +111,11 @@ class CRM_Contact_Page_Inline_Address extends CRM_Core_Page {
     $this->assign('locationIndex', $locBlockNo);
     $this->assign('addressId', $addressId);
     $this->assign('privacy', $privacy);
-    
+
     // check logged in user permission
     CRM_Contact_Page_View::checkUserPermission($this, $contactId);
 
-    // finally call parent 
+    // finally call parent
     parent::run();
   }
 }

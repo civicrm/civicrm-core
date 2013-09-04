@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -74,6 +74,10 @@ cj("input,#priceset select,#priceset").each(function () {
       }
       display( totalfee );
     });
+    cj('#additional_participants').change( function( ) {
+      display( totalfee );
+    });
+
     display( totalfee );
     break;
 
@@ -100,6 +104,11 @@ cj("input,#priceset select,#priceset").each(function () {
 
       display( totalfee );
     });
+
+    cj('#additional_participants').change( function( ) {
+      display( totalfee );
+    });
+
     display( totalfee );
     break;
 
@@ -126,6 +135,11 @@ cj("input,#priceset select,#priceset").each(function () {
     cj(this).bind( 'keyup', function() { calculateText( this );
     }).bind( 'blur' , function() { calculateText( this );
     });
+
+    cj('#additional_participants').change( function( ) {
+      display( totalfee );
+    });
+
     display( totalfee );
     break;
 
@@ -171,6 +185,11 @@ cj("input,#priceset select,#priceset").each(function () {
       }
       display( totalfee );
     });
+
+    cj('#additional_participants').change( function( ) {
+      display( totalfee );
+    });
+
     display( totalfee );
     break;
     }
@@ -200,7 +219,18 @@ function calculateText( object ) {
 
 //display calculated amount
 function display( totalfee ) {
-    var totalEventFee  = formatMoney( totalfee, 2, seperator, thousandMarker);
+    num_participants = cj('#additional_participants').val()
+
+    if(!num_participants) {
+      num_participants = 0
+    }
+    // The value of this field is the number of *additional* participants
+    // What is displayed to the user is 1 + the value, because it is including
+    // the "yourself". Since we want to give a total, including "yourself" we have
+    // to add one to the value of #additional_participants.
+    num_participants++;
+
+    var totalEventFee  = formatMoney( totalfee * num_participants, 2, seperator, thousandMarker);
     document.getElementById('pricevalue').innerHTML = "<b>"+symbol+"</b> "+totalEventFee;
     scriptfee   = totalfee;
     scriptarray = price;

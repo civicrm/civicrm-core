@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -138,7 +138,7 @@ class CRM_Contact_Page_View_UserDashBoard extends CRM_Core_Page {
       ) {
 
         $userDashboard = $component->getUserDashboardObject();
-        $dashboardElements[] = array('templatePath' => $userDashboard->getTemplateFileName(),
+        $dashboardElements[] = array('templatePath' => $userDashboard->getHookedTemplateFileName(),
           'sectionTitle' => $elem['title'],
           'weight' => $elem['weight'],
         );

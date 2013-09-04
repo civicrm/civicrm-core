@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -47,7 +47,7 @@
          <tr class="crm-map-form-block-geoAPIKey">
              <td>{$form.geoAPIKey.label}</td>
              <td>{$form.geoAPIKey.html|crmAddClass:huge}<br />
-             <span class="description">{ts}Enter the API key or Application ID associated with your geocoding provider.{/ts}</span></td>
+             <span class="description">{ts}Enter the API key or Application ID associated with your geocoding provider (not required for Yahoo).{/ts}</span></td>
          </tr>
     </table>
     <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>

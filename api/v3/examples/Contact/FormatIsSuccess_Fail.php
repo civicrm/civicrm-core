@@ -1,29 +1,37 @@
 <?php
-
-/*
- This demonstrates use of the 'format.is_success' param.
-    This param causes only the success or otherwise of the function to be returned as BOOLEAN
+/**
+ * Test Generated example of using contact create API
+ * This demonstrates use of the 'format.is_success' param.
+    This param causes only the success or otherwise of the function to be returned as BOOLEAN *
  */
 function contact_create_example(){
-$params = array( 
-  'version' => 3,
+$params = array(
   'id' => 500,
   'format.is_success' => 1,
 );
 
-  $result = civicrm_api( 'contact','create',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('contact', 'create', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function contact_create_expectedresult(){
 
   $expectedResult = 0;
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 

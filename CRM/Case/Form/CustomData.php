@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -99,7 +99,7 @@ class CRM_Case_Form_CustomData extends CRM_Core_Form {
     CRM_Core_BAO_CustomGroup::setDefaults($groupTree, $this->_defaults);
     $this->setDefaults($this->_defaults);
 
-    CRM_Core_BAO_CustomGroup::buildQuickForm($this, $groupTree, FALSE, 1);
+    CRM_Core_BAO_CustomGroup::buildQuickForm($this, $groupTree);
 
     //need to assign custom data type and subtype to the template
     $this->assign('entityID', $this->_entityID);

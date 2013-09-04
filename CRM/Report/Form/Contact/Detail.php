@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -53,14 +53,24 @@ class CRM_Report_Form_Contact_Detail extends CRM_Report_Form {
             'required' => TRUE,
             'no_repeat' => TRUE,
           ),
-      'first_name' => array('title' => ts('First Name'),
+          'first_name' => array(
+            'title' => ts('First Name'),
           ),
-      'last_name' => array('title' => ts('Last Name'),
+          'last_name' => array(
+            'title' => ts('Last Name'),
           ),
           'id' =>
           array(
             'no_display' => TRUE,
             'required' => TRUE,
+          ),
+          'contact_type' =>
+          array(
+            'title' => ts('Contact Type'),
+          ),
+          'contact_sub_type' =>
+          array(
+            'title' => ts('Contact SubType'),
           ),
         ),
         'filters' =>
@@ -330,7 +340,7 @@ class CRM_Report_Form_Contact_Detail extends CRM_Report_Form {
             ),
           ),
         'grouping' => 'activity-fields',
-      ), 
+      ),
       'civicrm_group' =>
       array(
         'dao' => 'CRM_Contact_DAO_Group',
@@ -499,7 +509,7 @@ class CRM_Report_Form_Contact_Detail extends CRM_Report_Form {
                             {$this->_aliases['civicrm_activity']}.id = civicrm_activity_assignment.activity_id AND                                                                      civicrm_activity_assignment.record_type_id = {$assigneeID}
                         LEFT JOIN civicrm_activity_contact civicrm_activity_source
                             ON {$this->_aliases['civicrm_activity']}.id = civicrm_activity_source.activity_id AND
-                            civicrm_activity_source.record_type_id = {$sourceID} 
+                            civicrm_activity_source.record_type_id = {$sourceID}
                         LEFT JOIN civicrm_contact {$this->_aliases['civicrm_activity_target']} ON
                             civicrm_activity_target.contact_id = {$this->_aliases['civicrm_activity_target']}.id
 
@@ -538,8 +548,15 @@ class CRM_Report_Form_Contact_Detail extends CRM_Report_Form {
       if (array_key_exists('filters', $table)) {
         foreach ($table['filters'] as $fieldName => $field) {
           $clause = NULL;
-          $op = CRM_Utils_Array::value("{$fieldName}_op", $this->_params);
-          if ($op) {
+          if (CRM_Utils_Array::value('operatorType', $field) & CRM_Report_Form::OP_DATE) {
+            $relative = CRM_Utils_Array::value("{$fieldName}_relative", $this->_params);
+            $from     = CRM_Utils_Array::value("{$fieldName}_from", $this->_params);
+            $to       = CRM_Utils_Array::value("{$fieldName}_to", $this->_params);
+
+            $clause = $this->dateClause($field['dbAlias'], $relative, $from, $to);
+          }
+          else {
+            $op = CRM_Utils_Array::value("{$fieldName}_op", $this->_params);
             $clause = $this->whereClause($field,
               $op,
               CRM_Utils_Array::value("{$fieldName}_value", $this->_params),

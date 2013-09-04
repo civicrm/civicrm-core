@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -600,6 +600,16 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
+   * A wrapper for getTemplateFileName that includes calling the hook to
+   * prevent us from having to copy & paste the logic of calling the hook
+   */
+  function getHookedTemplateFileName() {
+    $pageTemplateFile = $this->getTemplateFileName();
+    CRM_Utils_Hook::alterTemplateFile(get_class($this), $this, 'page', $pageTemplateFile);
+    return $pageTemplateFile;
+  }
+
+  /**
    * Default extra tpl file basically just replaces .tpl with .extra.tpl
    * i.e. we dont override
    *
@@ -953,10 +963,10 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       $this->addRule("{$locationName}[$locationId][address][street_address]", ts("Please enter the Street Address for %1.", array(1 => $title)), 'required');
     }
 
-    $location[$locationId]['address']['supplemental_address_1'] = $this->addElement('text', "{$locationName}[$locationId][address][supplemental_address_1]", ts('Additional Address 1'),
+    $location[$locationId]['address']['supplemental_address_1'] = $this->addElement('text', "{$locationName}[$locationId][address][supplemental_address_1]", ts('Supplemental Address 1'),
       $attributes['supplemental_address_1']
     );
-    $location[$locationId]['address']['supplemental_address_2'] = $this->addElement('text', "{$locationName}[$locationId][address][supplemental_address_2]", ts('Additional Address 2'),
+    $location[$locationId]['address']['supplemental_address_2'] = $this->addElement('text', "{$locationName}[$locationId][address][supplemental_address_2]", ts('Supplemental Address 2'),
       $attributes['supplemental_address_2']
     );
 
@@ -1292,6 +1302,156 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       if (!empty($fld['is_required']) && CRM_Utils_System::isNull(CRM_Utils_Array::value($name, $values))) {
         $errors[$name] = ts('%1 is a required field.', array(1 => $fld['title']));
       }
+    }
+  }
+
+/**
+ * Get contact if for a form object. Prioritise
+ *  - cid in URL if 0 (on behalf on someoneelse)
+ *      (@todo consider setting a variable if onbehalf for clarity of downstream 'if's
+ *  - logged in user id if it matches the one in the cid in the URL
+ *  - contact id validated from a checksum from a checksum
+ *  - cid from the url if the caller has ACL permission to view
+ *  - fallback is logged in user (or ? NULL if no logged in user) (@todo wouldn't 0 be more intuitive?)
+ *
+ * @return Ambigous <mixed, NULL, value, unknown, array, number>|unknown
+ */
+  function getContactID() {
+    $tempID = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
+    if(isset($this->_params) && isset($this->_params['select_contact_id'])) {
+      $tempID = $this->_params['select_contact_id'];
+    }
+    if(isset($this->_params, $this->_params[0]) && !empty($this->_params[0]['select_contact_id'])) {
+      // event form stores as an indexed array, contribution form not so much...
+      $tempID = $this->_params[0]['select_contact_id'];
+    }
+    // force to ignore the authenticated user
+    if ($tempID === '0') {
+      return $tempID;
+    }
+
+    $userID = $this->getLoggedInUserContactID();
+
+    if ($tempID == $userID) {
+      return $userID;
+    }
+
+    //check if this is a checksum authentication
+    $userChecksum = CRM_Utils_Request::retrieve('cs', 'String', $this);
+    if ($userChecksum) {
+      //check for anonymous user.
+      $validUser = CRM_Contact_BAO_Contact_Utils::validChecksum($tempID, $userChecksum);
+      if ($validUser) {
+        return $tempID;
+      }
+    }
+    // check if user has permission, CRM-12062
+    else if ($tempID && CRM_Contact_BAO_Contact_Permission::allow($tempID)) {
+      return $tempID;
+    }
+
+    return $userID;
+  }
+
+ /**
+  * Get the contact id of the logged in user
+  */
+  function getLoggedInUserContactID() {
+    // check if the user is logged in and has a contact ID
+    $session = CRM_Core_Session::singleton();
+    return $session->get('userID');
+  }
+
+  /**
+   * add autoselector field -if user has permission to view contacts
+   * If adding this to a form you also need to add to the tpl e.g
+   *
+   * {if !empty($selectable)}
+   * <div class="crm-summary-row">
+   *   <div class="crm-label">{$form.select_contact.label}</div>
+   *   <div class="crm-content">
+   *     {$form.select_contact.html}
+   *   </div>
+   * </div>
+   * {/if}
+   * @param array $profiles ids of profiles that are on the form (to be autofilled)
+   * @param array $field metadata of field to use as selector including
+   *  - name_field
+   *  - id_field
+   *  - url (for ajax lookup)
+   *
+   *  @todo add data attributes so we can deal with multiple instances on a form
+   */
+  function addAutoSelector($profiles = array(), $autoCompleteField = array()) {
+    $autoCompleteField = array_merge(array(
+        'name_field' => 'select_contact',
+        'id_field' => 'select_contact_id',
+        'field_text' => ts('Select Contact'),
+        'show_hide' => TRUE,
+        'show_text' => ts('to select someone already in our database.'),
+        'hide_text' => ts('to clear this person\'s information, and fill the form in for someone else'),
+        'url' => array('civicrm/ajax/rest', 'className=CRM_Contact_Page_AJAX&fnName=getContactList&json=1'),
+        'max' => civicrm_api3('setting', 'getvalue', array(
+        'name' => 'search_autocomplete_count',
+        'group' => 'Search Preferences',
+        ))
+      ), $autoCompleteField);
+
+    if(0 < (civicrm_api3('contact', 'getcount', array('check_permissions' => 1)))) {
+      $this->addElement('text', $autoCompleteField['name_field'] , $autoCompleteField['field_text']);
+      $this->addElement('hidden',  $autoCompleteField['id_field'], '', array('id' => $autoCompleteField['id_field']));
+      $this->assign('selectable', $autoCompleteField['id_field']);
+
+      CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'js/AutoComplete.js')
+      ->addSetting(array(
+      'form' => array('autocompletes' => $autoCompleteField),
+      'ids' => array('profile' => $profiles),
+      ));
+    }
+  }
+
+  /**
+   * Add the options appropriate to cid = zero - ie. autocomplete
+   *
+   * @todo there is considerable code duplication between the contribution forms & event forms. It is apparent
+   * that small pieces of duplication are not being refactored into separate functions because their only shared parent
+   * is this form. Inserting a class FrontEndForm.php between the contribution & event & this class would allow functions like this
+   * and a dozen other small ones to be refactored into a shared parent with the reduction of much code duplication
+   */
+  function addCIDZeroOptions($onlinePaymentProcessorEnabled) {
+    $this->assign('nocid', TRUE);
+    $profiles = array();
+    if($this->_values['custom_pre_id']) {
+      $profiles[] = $this->_values['custom_pre_id'];
+    }
+    if($this->_values['custom_post_id']) {
+      $profiles[] = $this->_values['custom_post_id'];
+    }
+    if($onlinePaymentProcessorEnabled) {
+      $profiles[] = 'billing';
+    }
+    if(!empty($this->_values)) {
+      $this->addAutoSelector($profiles);
+    }
+  }
+
+  /**
+   * Set default values on form for given contact (or no contact defaults)
+   * @param mixed $profile_id (can be id, or profile name)
+   * @param integer $contactID
+   */
+  function getProfileDefaults($profile_id = 'Billing', $contactID = NULL) {
+    try{
+      $defaults = civicrm_api3('profile', 'getsingle', array(
+        'profile_id' => (array) $profile_id,
+        'contact_id' => $contactID,
+      ));
+      return $defaults;
+    }
+    catch (Exception $e) {
+      // the try catch block gives us silent failure -not 100% sure this is a good idea
+      // as silent failures are often worse than noisy ones
+      return array();
     }
   }
 }

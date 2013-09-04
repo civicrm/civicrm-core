@@ -1,23 +1,31 @@
 <?php
-
-/*
- Demonstrate retrieving custom field options
+/**
+ * Test Generated example of using contact GetFields API
+ * Demonstrate retrieving metadata with custom field options *
  */
 function contact_getfields_example(){
 $params = array(
   'options' => array(
       'get_options' => 'custom_1',
     ),
-  'version' => 3,
   'action' => 'create',
 );
 
-  $result = civicrm_api( 'contact','GetFields',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('contact', 'GetFields', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function contact_getfields_expectedresult(){
@@ -247,11 +255,6 @@ function contact_getfields_expectedresult(){
           'export' => true,
           'default' => 'Both',
           'enumValues' => 'Text, HTML, Both',
-          'options' => array(
-              '0' => 'Text',
-              '1' => 'HTML',
-              '2' => 'Both',
-            ),
         ),
       'hash' => array(
           'name' => 'hash',
@@ -318,7 +321,8 @@ function contact_getfields_expectedresult(){
               'optionGroupName' => 'individual_prefix',
             ),
           'api.aliases' => array(
-              '0' => 'prefix',
+              '0' => 'individual_prefix',
+              '1' => 'individual_prefix_id',
             ),
         ),
       'suffix_id' => array(
@@ -334,7 +338,8 @@ function contact_getfields_expectedresult(){
               'optionGroupName' => 'individual_suffix',
             ),
           'api.aliases' => array(
-              '0' => 'suffix',
+              '0' => 'individual_suffix',
+              '1' => 'individual_suffix_id',
             ),
         ),
       'email_greeting_id' => array(
@@ -422,9 +427,6 @@ function contact_getfields_expectedresult(){
           'export' => true,
           'pseudoconstant' => array(
               'optionGroupName' => 'gender',
-            ),
-          'api.aliases' => array(
-              '0' => 'gender',
             ),
         ),
       'birth_date' => array(
@@ -558,6 +560,7 @@ function contact_getfields_expectedresult(){
           'groupTitle' => 'select_test_g',
           'data_type' => 'String',
           'html_type' => 'Select',
+          'default_value' => '',
           'text_length' => '',
           'options_per_line' => '',
           'custom_group_id' => '1',
@@ -567,9 +570,11 @@ function contact_getfields_expectedresult(){
           'extends_entity_column_id' => '',
           'is_view' => 0,
           'is_multiple' => 0,
-          'option_group_id' => '97',
+          'option_group_id' => '99',
           'date_format' => '',
           'time_format' => '',
+          'name' => 'custom_1',
+          'type' => 2,
           'options' => array(
               '1' => 'Label1',
               '2' => 'Label2',
@@ -578,6 +583,7 @@ function contact_getfields_expectedresult(){
       'current_employer' => array(
           'title' => 'Current Employer',
           'description' => 'Name of Current Employer',
+          'type' => 2,
         ),
       'dupe_check' => array(
           'title' => 'Check for Duplicates',
@@ -586,7 +592,7 @@ function contact_getfields_expectedresult(){
     ),
 );
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 

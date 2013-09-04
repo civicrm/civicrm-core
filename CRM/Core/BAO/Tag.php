@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -297,13 +297,14 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
    * pairs
    *
    * @param array  $params         (reference) an assoc array of name/value pairs
-   * @param array  $ids            (reference) the array that holds all the db ids
+   * @param array  $ids  (optional)  the array that holds all the db ids - we are moving away from this in bao
+   * signatures
    *
    * @return object    CRM_Core_DAO_Tag object on success, otherwise null
    * @access public
    * @static
    */
-  static function add(&$params, &$ids) {
+  static function add(&$params, $ids = array()) {
     if (!self::dataExists($params)) {
       return NULL;
     }
@@ -317,15 +318,9 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
     }
 
     $tag->copyValues($params);
-    $tag->id = CRM_Utils_Array::value('tag', $ids);
-
-    $edit = ($tag->id) ? TRUE : FALSE;
-    if ($edit) {
-      CRM_Utils_Hook::pre('edit', 'Tag', $tag->id, $tag);
-    }
-    else {
-      CRM_Utils_Hook::pre('create', 'Tag', NULL, $tag);
-    }
+    $tag->id = CRM_Utils_Array::value('id', $params, CRM_Utils_Array::value('tag', $ids));
+    $hook = empty($params['id']) ? 'create' : 'edit';
+    CRM_Utils_Hook::pre($hook, 'Tag', $tag->id, $params);
 
     // save creator id and time
     if (!$tag->id) {
@@ -335,13 +330,7 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
     }
 
     $tag->save();
-
-    if ($edit) {
-      CRM_Utils_Hook::post('edit', 'Tag', $tag->id, $tag);
-    }
-    else {
-      CRM_Utils_Hook::post('create', 'Tag', NULL, $tag);
-    }
+    CRM_Utils_Hook::post($hook, 'Tag', $tag->id, $tag);
 
     // if we modify parent tag, then we need to update all children
     if ($tag->parent_id === 'null') {

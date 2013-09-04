@@ -1,32 +1,40 @@
 <?php
-
-/*
- 
+/**
+ * Test Generated example of using group_organization get API
+ * *
  */
 function group_organization_get_example(){
-$params = array( 
+$params = array(
   'organization_id' => 1,
-  'version' => 3,
 );
 
-  $result = civicrm_api( 'group_organization','get',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('group_organization', 'get', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function group_organization_get_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 0,
   'values' => array(),
 );
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 

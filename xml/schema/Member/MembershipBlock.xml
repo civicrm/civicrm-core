@@ -32,9 +32,9 @@
       <comment>FK to civicrm_contribution_page.id</comment>
       <add>1.5</add>
   </field>
-  <foreignKey> 
-      <name>entity_id</name> 
-      <table>civicrm_contribution_page</table> 
+  <foreignKey>
+      <name>entity_id</name>
+      <table>civicrm_contribution_page</table>
       <key>id</key>
       <add>1.5</add>
   </foreignKey>
@@ -42,79 +42,79 @@
        <name>membership_types</name>
        <type>varchar</type>
        <length>255</length>
-       <comment>Membership types to be exposed by this block</comment>  
+       <comment>Membership types to be exposed by this block</comment>
        <add>1.5</add>
   </field>
-  <field>  
-      <name>membership_type_default</name>  
+  <field>
+      <name>membership_type_default</name>
       <type>int unsigned</type>
-      <comment>Optional foreign key to membership_type</comment>  
-      <add>1.5</add>  
+      <comment>Optional foreign key to membership_type</comment>
+      <add>1.5</add>
   </field>
- <foreignKey> 
-      <name>membership_type_default</name> 
-      <table>civicrm_membership_type</table> 
+ <foreignKey>
+      <name>membership_type_default</name>
+      <table>civicrm_membership_type</table>
       <key>id</key>
       <add>1.5</add>
   </foreignKey>
-  <field> 
-      <name>display_min_fee</name>  
-      <type>boolean</type> 
-      <default>1</default>           
-      <comment>Display minimum membership fee</comment>  
-      <add>1.5</add>  
-  </field> 
-  <field>  
-      <name>is_separate_payment</name>     
+  <field>
+      <name>display_min_fee</name>
       <type>boolean</type>
       <default>1</default>
-      <comment>Should membership transactions be processed separately</comment>                
-      <add>1.5</add>  
-  </field> 
-  <field>  
+      <comment>Display minimum membership fee</comment>
+      <add>1.5</add>
+  </field>
+  <field>
+      <name>is_separate_payment</name>
+      <type>boolean</type>
+      <default>1</default>
+      <comment>Should membership transactions be processed separately</comment>
+      <add>1.5</add>
+  </field>
+  <field>
       <name>new_title</name>
       <type>varchar</type>
       <length>255</length>
       <localizable>true</localizable>
-      <comment>Title to display at top of block</comment>  
-      <add>1.5</add>  
-  </field> 
-  <field>  
+      <comment>Title to display at top of block</comment>
+      <add>1.5</add>
+  </field>
+  <field>
       <name>new_text</name>
       <type>text</type>
       <localizable>true</localizable>
-      <comment>Text to display below title</comment>  
-      <add>1.5</add>     
-  </field> 
-<field>  
+      <comment>Text to display below title</comment>
+      <add>1.5</add>
+  </field>
+<field>
       <name>renewal_title</name>
       <type>varchar</type>
       <length>255</length>
       <localizable>true</localizable>
-      <comment>Title for renewal</comment>  
-      <add>1.5</add>  
+      <comment>Title for renewal</comment>
+      <add>1.5</add>
   </field>
-<field>  
+<field>
       <name>renewal_text</name>
       <type>text</type>
       <localizable>true</localizable>
-      <comment>Text to display for member renewal</comment>  
-      <add>1.5</add>  
-  </field>  
- <field>  
-      <name>is_required</name>     
+      <comment>Text to display for member renewal</comment>
+      <add>1.5</add>
+  </field>
+ <field>
+      <name>is_required</name>
       <title>Is Required</title>
       <type>boolean</type>
       <default>0</default>
-      <comment>Is membership sign up optional</comment>                
-      <add>1.5</add>  
-  </field>  
-  <field>  
-      <name>is_active</name>     
+      <comment>Is membership sign up optional</comment>
+      <add>1.5</add>
+  </field>
+  <field>
+      <name>is_active</name>
       <title>Is Active</title>
       <type>boolean</type>
       <default>1</default>
-      <comment>Is this membership_block enabled</comment>                
-      <add>1.5</add>  
-  </field> 
+      <comment>Is this membership_block enabled</comment>
+      <add>1.5</add>
+  </field>
 </table>

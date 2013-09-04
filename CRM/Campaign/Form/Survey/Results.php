@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -189,7 +189,7 @@ class CRM_Campaign_Form_Survey_Results extends CRM_Campaign_Form_Survey {
 
     $this->addElement('checkbox', 'create_report', ts('Create Report'));
     $this->addElement('text', 'report_title', ts('Report Title'));
-   
+
     if( $this->_reportId){
       $this->freeze('create_report');
       $this->freeze('report_title');
@@ -206,8 +206,8 @@ class CRM_Campaign_Form_Survey_Results extends CRM_Campaign_Form_Survey {
    */
   static function formRule($fields, $files, $form) {
     $errors = array();
-
-    if (CRM_Utils_Array::value('option_label', $fields) &&
+    if (
+      CRM_Utils_Array::value('option_label', $fields) &&
       CRM_Utils_Array::value('option_value', $fields) &&
       (count(array_filter($fields['option_label'])) == 0) &&
       (count(array_filter($fields['option_value'])) == 0)
@@ -215,13 +215,15 @@ class CRM_Campaign_Form_Survey_Results extends CRM_Campaign_Form_Survey {
       $errors['option_label[1]'] = ts('Enter at least one result option.');
       return $errors;
     }
-    elseif (!CRM_Utils_Array::value('option_label', $fields) &&
+    elseif (
+      !CRM_Utils_Array::value('option_label', $fields) &&
       !CRM_Utils_Array::value('option_value', $fields)
     ) {
       return $errors;
     }
 
-    if ($fields['option_type'] == 2 &&
+    if (
+      $fields['option_type'] == 2 &&
       !CRM_Utils_Array::value('option_group_id', $fields)
     ) {
       $errors['option_group_id'] = ts("Please select a Survey Result Set.");
@@ -402,12 +404,12 @@ class CRM_Campaign_Form_Survey_Results extends CRM_Campaign_Form_Survey {
     if ( !$this->_reportId && $survey->id && CRM_Utils_Array::value('create_report', $params) ) {
       $activityStatus = CRM_Core_PseudoConstant::activityStatus('name');
       $activityStatus = array_flip($activityStatus);
-      $this->_params = 
+      $this->_params =
         array( 'name'  => "survey_{$survey->id}",
-               'title' => $params['report_title'] ? $params['report_title'] : $this->_values['title'], 
+               'title' => $params['report_title'] ? $params['report_title'] : $this->_values['title'],
                'status_id_op'    => 'eq',
                'status_id_value' => $activityStatus['Scheduled'], // reserved status
-               'survey_id_value' => array($survey->id), 
+               'survey_id_value' => array($survey->id),
                'description'     => ts('Detailed report for canvassing, phone-banking, walk lists or other surveys.'),
                );
       //Default value of order by
@@ -449,22 +451,22 @@ class CRM_Campaign_Form_Survey_Results extends CRM_Campaign_Form_Survey {
       elseif ( CRM_Core_OptionGroup::getValue('activity_type','PhoneBank') == $this->_values['activity_type_id'] ) {
         array_push($displayFields, 'phone');
       }
-      elseif ((CRM_Core_OptionGroup::getValue('activity_type','Survey')  == $this->_values['activity_type_id']) || 
+      elseif ((CRM_Core_OptionGroup::getValue('activity_type','Survey')  == $this->_values['activity_type_id']) ||
               (CRM_Core_OptionGroup::getValue('activity_type','Canvass') == $this->_values['activity_type_id']) ) {
         array_push($displayFields, 'phone','city','state_province_id','postal_code','email');
       }
       foreach($displayFields as $key){
         $this->_params['fields'][$key] = 1;
-      } 
+      }
       $this->_createNew = TRUE;
       $this->_id = CRM_Report_Utils_Report::getInstanceIDForValue('survey/detail');
       CRM_Report_Form_Instance::postProcess($this, FALSE);
-      
+
       $query = "SELECT MAX(id) FROM civicrm_report_instance WHERE name = %1";
       $reportID = CRM_Core_DAO::singleValueQuery($query, array(1 => array("survey_{$survey->id}",'String')));
       if ($reportID) {
         $url = CRM_Utils_System::url("civicrm/report/instance/{$reportID}",'reset=1');
-        $status = ts("A Survey Detail Report <a href='%1'>%2</a> has been created.", 
+        $status = ts("A Survey Detail Report <a href='%1'>%2</a> has been created.",
                      array(1 => $url, 2 => $this->_params['title']));
       }
     }

@@ -1,29 +1,36 @@
 <?php
-
-/*
- Demonstrate return from getfields - see subfolder for variants
+/**
+ * Test Generated example of using setting getfields API
+ * Demonstrate return from getfields - see subfolder for variants *
  */
 function setting_getfields_example(){
-$params = array( 
-  'version' => 3,
-);
+$params = array();
 
-  $result = civicrm_api( 'setting','getfields',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('setting', 'getfields', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function setting_getfields_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
-  'count' => 73,
-  'values' => array( 
-      'address_standardization_provider' => array( 
+  'count' => 78,
+  'values' => array(
+      'address_standardization_provider' => array(
           'group_name' => 'Address Preferences',
           'group' => 'address',
           'name' => 'address_standardization_provider',
@@ -37,7 +44,7 @@ function setting_getfields_expectedresult(){
           'description' => '',
           'help_text' => 'CiviCRM includes an optional plugin for interfacing with the United States Postal Services (USPS) Address Standardization web service. You must register to use the USPS service at https://www.usps.com/business/webtools-address-information.htm. If you are approved, they will provide you with a User ID and the URL for the service. Plugins for other address standardization services may be available from 3rd party developers. If installed, they will be included in the drop-down below. ',
         ),
-      'address_standardization_userid' => array( 
+      'address_standardization_userid' => array(
           'group_name' => 'Address Preferences',
           'group' => 'address',
           'name' => 'address_standardization_userid',
@@ -51,7 +58,7 @@ function setting_getfields_expectedresult(){
           'description' => '',
           'help_text' => '',
         ),
-      'address_standardization_url' => array( 
+      'address_standardization_url' => array(
           'group_name' => 'Address Preferences',
           'group' => 'address',
           'name' => 'address_standardization_url',
@@ -66,7 +73,7 @@ function setting_getfields_expectedresult(){
           'help_text' => 'Web service URL.',
           'validate_callback' => 'CRM_Utils_Rule::url',
         ),
-      'tag_unconfirmed' => array( 
+      'tag_unconfirmed' => array(
           'group_name' => 'Campaign Preferences',
           'group' => 'campaign',
           'name' => 'tag_unconfirmed',
@@ -80,7 +87,7 @@ function setting_getfields_expectedresult(){
           'description' => '',
           'help_text' => 'If set, new contacts that are created when signing a petition are assigned a tag of this name.',
         ),
-      'petition_contacts' => array( 
+      'petition_contacts' => array(
           'group_name' => 'Campaign Preferences',
           'group' => 'campaign',
           'name' => 'petition_contacts',
@@ -94,7 +101,7 @@ function setting_getfields_expectedresult(){
           'description' => '',
           'help_text' => 'If set, new contacts that are created when signing a petition are assigned a tag of this name.',
         ),
-      'cvv_backoffice_required' => array( 
+      'cvv_backoffice_required' => array(
           'group_name' => 'Contribute Preferences',
           'group' => 'contribute',
           'name' => 'cvv_backoffice_required',
@@ -108,16 +115,16 @@ function setting_getfields_expectedresult(){
           'description' => 'Is the CVV code required for back office credit card transactions',
           'help_text' => 'If set it back-office credit card transactions will required a cvv code. Leave as required unless you have a very strong reason to change',
         ),
-      'contact_view_options' => array( 
+      'contact_view_options' => array(
           'group_name' => 'CiviCRM Preferences',
           'group' => 'core',
           'name' => 'contact_view_options',
           'type' => 'String',
           'html_type' => 'checkboxes',
-          'pseudoconstant' => array( 
+          'pseudoconstant' => array(
               'optionGroupName' => 'contact_view_options',
             ),
-          'default' => array( 
+          'default' => array(
               '0' => '1',
               '1' => '2',
               '2' => '3',
@@ -138,16 +145,16 @@ function setting_getfields_expectedresult(){
           'description' => '',
           'help_text' => '',
         ),
-      'contact_edit_options' => array( 
+      'contact_edit_options' => array(
           'group_name' => 'CiviCRM Preferences',
           'group' => 'core',
           'name' => 'contact_edit_options',
           'type' => 'String',
           'html_type' => 'checkboxes',
-          'pseudoconstant' => array( 
+          'pseudoconstant' => array(
               'optionGroupName' => 'contact_edit_options',
             ),
-          'default' => array( 
+          'default' => array(
               '0' => '1',
               '1' => '2',
               '2' => '3',
@@ -167,15 +174,15 @@ function setting_getfields_expectedresult(){
           'description' => '',
           'help_text' => '',
         ),
-      'advanced_search_options' => array( 
+      'advanced_search_options' => array(
           'group_name' => 'CiviCRM Preferences',
           'name' => 'advanced_search_options',
           'type' => 'String',
           'html_type' => 'checkboxes',
-          'pseudoconstant' => array( 
+          'pseudoconstant' => array(
               'optionGroupName' => 'advanced_search_options',
             ),
-          'default' => array( 
+          'default' => array(
               '0' => '1',
               '1' => '2',
               '2' => '3',
@@ -201,16 +208,16 @@ function setting_getfields_expectedresult(){
           'description' => '',
           'help_text' => '',
         ),
-      'user_dashboard_options' => array( 
+      'user_dashboard_options' => array(
           'group_name' => 'CiviCRM Preferences',
           'group' => 'core',
           'name' => 'user_dashboard_options',
           'type' => 'String',
           'html_type' => 'checkboxes',
-          'pseudoconstant' => array( 
+          'pseudoconstant' => array(
               'optionGroupName' => 'user_dashboard_options',
             ),
-          'default' => array( 
+          'default' => array(
               '0' => '1',
               '1' => '2',
               '2' => '3',
@@ -227,16 +234,16 @@ function setting_getfields_expectedresult(){
           'description' => '',
           'help_text' => '',
         ),
-      'address_options' => array( 
+      'address_options' => array(
           'group_name' => 'CiviCRM Preferences',
           'group' => 'core',
           'name' => 'address_options',
           'type' => 'String',
           'html_type' => 'Text',
-          'pseudoconstant' => array( 
+          'pseudoconstant' => array(
               'optionGroupName' => 'address_options',
             ),
-          'default' => array( 
+          'default' => array(
               '0' => '1',
               '1' => '2',
               '2' => '4',
@@ -253,7 +260,7 @@ function setting_getfields_expectedresult(){
           'description' => '',
           'help_text' => '',
         ),
-      'address_format' => array( 
+      'address_format' => array(
           'group_name' => 'CiviCRM Preferences',
           'group' => 'core',
           'name' => 'address_format',
@@ -272,7 +279,7 @@ function setting_getfields_expectedresult(){
           'description' => '',
           'help_text' => '',
         ),
-      'mailing_format' => array( 
+      'mailing_format' => array(
           'group_name' => 'CiviCRM Preferences',
           'group' => 'core',
           'name' => 'mailing_format',
@@ -291,7 +298,7 @@ function setting_getfields_expectedresult(){
           'description' => '',
           'help_text' => '',
         ),
-      'display_name_format' => array( 
+      'display_name_format' => array(
           'group_name' => 'CiviCRM Preferences',
           'group' => 'core',
           'name' => 'display_name_format',
@@ -305,7 +312,7 @@ function setting_getfields_expectedresult(){
           'description' => '',
           'help_text' => '',
         ),
-      'sort_name_format' => array( 
+      'sort_name_format' => array(
           'group_name' => 'CiviCRM Preferences',
           'group' => 'core',
           'name' => 'sort_name_format',
@@ -319,7 +326,7 @@ function setting_getfields_expectedresult(){
           'description' => '',
           'help_text' => '',
         ),
-      'editor_id' => array( 
+      'editor_id' => array(
           'group_name' => 'CiviCRM Preferences',
           'group' => 'core',
           'name' => 'editor_id',
@@ -333,7 +340,7 @@ function setting_getfields_expectedresult(){
           'description' => '',
           'help_text' => '',
         ),
-      'contact_ajax_check_similar' => array( 
+      'contact_ajax_check_similar' => array(
           'group_name' => 'CiviCRM Preferences',
           'group' => 'core',
           'name' => 'contact_ajax_check_similar',
@@ -347,7 +354,7 @@ function setting_getfields_expectedresult(){
           'description' => '',
           'help_text' => '',
         ),
-      'activity_assignee_notification' => array( 
+      'activity_assignee_notification' => array(
           'group_name' => 'CiviCRM Preferences',
           'group' => 'core',
           'name' => 'activity_assignee_notification',
@@ -361,7 +368,7 @@ function setting_getfields_expectedresult(){
           'description' => '',
           'help_text' => '',
         ),
-      'activity_assignee_notification_ics' => array( 
+      'activity_assignee_notification_ics' => array(
           'group_name' => 'CiviCRM Preferences',
           'group' => 'core',
           'name' => 'activity_assignee_notification_ics',
@@ -375,16 +382,16 @@ function setting_getfields_expectedresult(){
           'description' => '',
           'help_text' => '',
         ),
-      'contact_autocomplete_options' => array( 
+      'contact_autocomplete_options' => array(
           'group_name' => 'CiviCRM Preferences',
           'group' => 'core',
           'name' => 'contact_autocomplete_options',
           'type' => 'String',
           'html_type' => 'checkboxes',
-          'pseudoconstant' => array( 
+          'pseudoconstant' => array(
               'optionGroupName' => 'contact_autocomplete_options',
             ),
-          'default' => array( 
+          'default' => array(
               '0' => '1',
               '1' => '2',
               '2' => '3',
@@ -400,16 +407,16 @@ function setting_getfields_expectedresult(){
           'description' => '',
           'help_text' => '',
         ),
-      'contact_reference_options' => array( 
+      'contact_reference_options' => array(
           'group_name' => 'CiviCRM Preferences',
           'group' => 'core',
           'name' => 'contact_reference_options',
           'type' => 'String',
           'html_type' => 'checkboxes',
-          'pseudoconstant' => array( 
+          'pseudoconstant' => array(
               'optionGroupName' => 'contact_reference_options',
             ),
-          'default' => array( 
+          'default' => array(
               '0' => '1',
               '1' => '2',
               '2' => '3',
@@ -425,7 +432,7 @@ function setting_getfields_expectedresult(){
           'description' => '',
           'help_text' => '',
         ),
-      'max_attachments' => array( 
+      'max_attachments' => array(
           'group_name' => 'CiviCRM Preferences',
           'group' => 'core',
           'name' => 'max_attachments',
@@ -434,7 +441,7 @@ function setting_getfields_expectedresult(){
           'type' => 'Integer',
           'quick_form_type' => 'Element',
           'html_type' => 'text',
-          'html_attributes' => array( 
+          'html_attributes' => array(
               'size' => 2,
               'maxlength' => 8,
             ),
@@ -446,7 +453,7 @@ function setting_getfields_expectedresult(){
           'description' => 'Maximum number of files (documents, images, etc.) which can attached to emails or activities.',
           'help_text' => '',
         ),
-      'maxFileSize' => array( 
+      'maxFileSize' => array(
           'group_name' => 'CiviCRM Preferences',
           'group' => 'core',
           'name' => 'maxFileSize',
@@ -455,7 +462,7 @@ function setting_getfields_expectedresult(){
           'type' => 'Integer',
           'quick_form_type' => 'Element',
           'html_type' => 'text',
-          'html_attributes' => array( 
+          'html_attributes' => array(
               'size' => 2,
               'maxlength' => 8,
             ),
@@ -467,7 +474,7 @@ function setting_getfields_expectedresult(){
           'description' => 'Maximum Size of file (documents, images, etc.) which can attached to emails or activities.<br />Note: php.ini should support this file size.',
           'help_text' => '',
         ),
-      'contact_undelete' => array( 
+      'contact_undelete' => array(
           'group_name' => 'CiviCRM Preferences',
           'group' => 'core',
           'name' => 'contact_undelete',
@@ -481,7 +488,35 @@ function setting_getfields_expectedresult(){
           'description' => 'If enabled, deleted contacts will be moved to trash (instead of being destroyed). Users with the proper permission are able to search for the deleted contacts and restore them (or delete permanently).',
           'help_text' => '',
         ),
-      'versionCheck' => array( 
+      'allowPermDeleteFinancial' => array(
+          'group_name' => 'CiviCRM Preferences',
+          'group' => 'core',
+          'name' => 'allowPermDeleteFinancial',
+          'type' => 'Boolean',
+          'quick_form_type' => 'YesNo',
+          'default' => '',
+          'add' => '4.3',
+          'title' => 'Contact Permanent Delete',
+          'is_domain' => 1,
+          'is_contact' => 0,
+          'description' => 'Allow Permanent Delete for contacts who are linked to live financial transactions',
+          'help_text' => '',
+        ),
+      'versionAlert' => array(
+          'group_name' => 'CiviCRM Preferences',
+          'group' => 'core',
+          'name' => 'versionAlert',
+          'type' => 'Boolean',
+          'quick_form_type' => 'YesNo',
+          'default' => 1,
+          'add' => '4.3',
+          'title' => 'New Version Alerts',
+          'is_domain' => 1,
+          'is_contact' => 0,
+          'description' => 'Displays an on-screen alert to users with "Administer CiviCRM" permissions when a new version of CiviCRM is available. This setting will only work if the "Version Check & Statistics Reporting" setting is enabled.',
+          'help_text' => '',
+        ),
+      'versionCheck' => array(
           'group_name' => 'CiviCRM Preferences',
           'group' => 'core',
           'name' => 'versionCheck',
@@ -498,7 +533,7 @@ function setting_getfields_expectedresult(){
 When enabled, statistics about your CiviCRM installation are reported anonymously to the CiviCRM team to assist in prioritizing ongoing development efforts. The following information is gathered: CiviCRM version, versions of PHP, MySQL and framework (Drupal/Joomla/standalone), and default language. Counts (but no actual data) of the following record types are reported: contacts, activities, cases, relationships, contributions, contribution pages, contribution products, contribution widgets, discounts, price sets, profiles, events, participants, tell-a-friend pages, grants, mailings, memberships, membership blocks, pledges, pledge blocks and active payment processor types.',
           'help_text' => '',
         ),
-      'doNotAttachPDFReceipt' => array( 
+      'doNotAttachPDFReceipt' => array(
           'group_name' => 'CiviCRM Preferences',
           'group' => 'core',
           'name' => 'doNotAttachPDFReceipt',
@@ -514,7 +549,7 @@ When enabled, statistics about your CiviCRM installation are reported anonymousl
           'description' => 'If enabled, CiviCRM sends PDF receipt as an attachment during event signup or online contribution.',
           'help_text' => '',
         ),
-      'wkhtmltopdfPath' => array( 
+      'wkhtmltopdfPath' => array(
           'group_name' => 'CiviCRM Preferences',
           'group' => 'core',
           'name' => 'wkhtmltopdfPath',
@@ -523,7 +558,7 @@ When enabled, statistics about your CiviCRM installation are reported anonymousl
           'type' => 'String',
           'quick_form_type' => 'Element',
           'html_type' => 'Text',
-          'html_attributes' => array( 
+          'html_attributes' => array(
               'size' => 64,
               'maxlength' => 256,
             ),
@@ -535,7 +570,7 @@ When enabled, statistics about your CiviCRM installation are reported anonymousl
           'description' => '',
           'help_text' => '',
         ),
-      'recaptchaPublicKey' => array( 
+      'recaptchaPublicKey' => array(
           'group_name' => 'CiviCRM Preferences',
           'group' => 'core',
           'name' => 'recaptchaPublicKey',
@@ -544,7 +579,7 @@ When enabled, statistics about your CiviCRM installation are reported anonymousl
           'type' => 'String',
           'quick_form_type' => 'Element',
           'html_type' => 'Text',
-          'html_attributes' => array( 
+          'html_attributes' => array(
               'size' => 64,
               'maxlength' => 64,
             ),
@@ -556,7 +591,7 @@ When enabled, statistics about your CiviCRM installation are reported anonymousl
           'description' => '',
           'help_text' => '',
         ),
-      'recaptchaPrivateKey' => array( 
+      'recaptchaPrivateKey' => array(
           'group_name' => 'CiviCRM Preferences',
           'group' => 'core',
           'name' => 'recaptchaPrivateKey',
@@ -565,7 +600,7 @@ When enabled, statistics about your CiviCRM installation are reported anonymousl
           'type' => 'String',
           'quick_form_type' => 'Element',
           'html_type' => 'Text',
-          'html_attributes' => array( 
+          'html_attributes' => array(
               'size' => 64,
               'maxlength' => 64,
             ),
@@ -577,7 +612,7 @@ When enabled, statistics about your CiviCRM installation are reported anonymousl
           'description' => '',
           'help_text' => '',
         ),
-      'dashboardCacheTimeout' => array( 
+      'dashboardCacheTimeout' => array(
           'group_name' => 'CiviCRM Preferences',
           'group' => 'core',
           'name' => 'dashboardCacheTimeout',
@@ -586,7 +621,7 @@ When enabled, statistics about your CiviCRM installation are reported anonymousl
           'type' => 'Integer',
           'quick_form_type' => 'Element',
           'html_type' => 'Text',
-          'html_attributes' => array( 
+          'html_attributes' => array(
               'size' => 3,
               'maxlength' => 5,
             ),
@@ -598,7 +633,7 @@ When enabled, statistics about your CiviCRM installation are reported anonymousl
           'description' => '',
           'help_text' => '',
         ),
-      'checksumTimeout' => array( 
+      'checksumTimeout' => array(
           'group_name' => 'CiviCRM Preferences',
           'group' => 'core',
           'name' => 'checksumTimeout',
@@ -607,19 +642,19 @@ When enabled, statistics about your CiviCRM installation are reported anonymousl
           'type' => 'Integer',
           'quick_form_type' => 'Element',
           'html_type' => 'Text',
-          'html_attributes' => array( 
+          'html_attributes' => array(
               'size' => 2,
               'maxlength' => 8,
             ),
           'default' => 7,
           'add' => '4.3',
-          'title' => 'Dashboard cache timeout',
+          'title' => 'Checksum Lifespan',
           'is_domain' => 1,
           'is_contact' => 0,
           'description' => '',
           'help_text' => '',
         ),
-      'communityMessagesUrl' => array( 
+      'communityMessagesUrl' => array(
           'group_name' => 'CiviCRM Preferences',
           'group' => 'core',
           'name' => 'communityMessagesUrl',
@@ -628,7 +663,7 @@ When enabled, statistics about your CiviCRM installation are reported anonymousl
           'type' => 'String',
           'quick_form_type' => 'Element',
           'html_type' => 'Text',
-          'html_attributes' => array( 
+          'html_attributes' => array(
               'size' => 64,
               'maxlength' => 128,
             ),
@@ -640,7 +675,7 @@ When enabled, statistics about your CiviCRM installation are reported anonymousl
           'description' => 'Service providing CiviCRM community messages',
           'help_text' => 'Use "*default*" for the system default or override with a custom URL',
         ),
-      'resCacheCode' => array( 
+      'resCacheCode' => array(
           'group_name' => 'CiviCRM Preferences',
           'group' => 'core',
           'name' => 'resCacheCode',
@@ -649,7 +684,7 @@ When enabled, statistics about your CiviCRM installation are reported anonymousl
           'type' => 'String',
           'quick_form_type' => 'Element',
           'html_type' => 'Text',
-          'html_attributes' => array( 
+          'html_attributes' => array(
               'size' => 16,
               'maxlength' => 16,
             ),
@@ -661,7 +696,7 @@ When enabled, statistics about your CiviCRM installation are reported anonymousl
           'description' => 'Code appended to resource URLs (JS/CSS) to coerce HTTP caching',
           'help_text' => '',
         ),
-      'verifySSL' => array( 
+      'verifySSL' => array(
           'group_name' => 'CiviCRM Preferences',
           'group' => 'core',
           'name' => 'verifySSL',
@@ -675,7 +710,66 @@ When enabled, statistics about your CiviCRM installation are reported anonymousl
           'description' => 'If disabled, backend HTTPS services will allow unverified, insecure connections',
           'help_text' => 'Unless you are absolutely unable to configure your server to check the SSL certificate of the remote server you should leave this set to Yes',
         ),
-      'debug_enabled' => array( 
+      'wpBasePage' => array(
+          'group_name' => 'CiviCRM Preferences',
+          'group' => 'core',
+          'name' => 'wpBasePage',
+          'type' => 'String',
+          'html_type' => 'text',
+          'quick_form_type' => 'Element',
+          'prefetch' => 1,
+          'default' => '',
+          'add' => '4.3',
+          'title' => 'WordPress Base Page',
+          'is_domain' => 1,
+          'is_contact' => 0,
+          'description' => 'If set, CiviCRM will use this setting as the base url.',
+          'help_text' => 'By default, CiviCRM will generate front-facing pages using the home page at http://wp/ as its base. If you want to use a different template for CiviCRM pages, set the path here.',
+        ),
+      'secondDegRelPermissions' => array(
+          'group_name' => 'CiviCRM Preferences',
+          'group' => 'core',
+          'name' => 'secondDegRelPermissions',
+          'prefetch' => 1,
+          'config_only' => 1,
+          'type' => 'Boolean',
+          'quick_form_type' => 'YesNo',
+          'default' => 0,
+          'add' => '4.3',
+          'title' => 'Allow second-degree relationship permissions',
+          'is_domain' => 1,
+          'is_contact' => 0,
+          'description' => 'If enabled, contacts with the permission to edit a related contact will inherit that contact's permission to edit other related contacts',
+          'help_text' => '',
+        ),
+      'enable_components' => array(
+          'group_name' => 'CiviCRM Preferences',
+          'group' => 'core',
+          'name' => 'enable_components',
+          'type' => 'Array',
+          'quick_form_type' => 'Element',
+          'html_type' => 'advmultiselect',
+          'html_attributes' => array(
+              'size' => 5,
+              'style' => 'width:150px',
+              'class' => 'advmultiselect',
+            ),
+          'default' => array(
+              '0' => 'CiviEvent',
+              '1' => 'CiviContribute',
+              '2' => 'CiviMember',
+              '3' => 'CiviMail',
+              '4' => 'CiviReport',
+              '5' => 'CiviPledge',
+            ),
+          'add' => '4.4',
+          'title' => 'Enable Components',
+          'is_domain' => '1',
+          'is_contact' => 0,
+          'description' => '',
+          'help_text' => '',
+        ),
+      'debug_enabled' => array(
           'group_name' => 'Developer Preferences',
           'group' => 'developer',
           'name' => 'debug_enabled',
@@ -688,11 +782,11 @@ When enabled, statistics about your CiviCRM installation are reported anonymousl
           'title' => 'Enable Debugging',
           'is_domain' => 1,
           'is_contact' => 0,
-          'description' => 'Set this value to Yes if you want to use one of CiviCRM\'s debugging tools. This feature should NOT be enabled for production sites',
+          'description' => 'Set this value to Yes if you want to use one of CiviCRM's debugging tools. This feature should NOT be enabled for production sites',
           'prefetch' => 1,
           'help_text' => 'Do not turn this on on production sites',
         ),
-      'userFrameworkLogging' => array( 
+      'userFrameworkLogging' => array(
           'group_name' => 'Developer Preferences',
           'group' => 'developer',
           'name' => 'userFrameworkLogging',
@@ -706,10 +800,10 @@ When enabled, statistics about your CiviCRM installation are reported anonymousl
           'is_contact' => 0,
           'description' => 'Set this value to Yes if you want CiviCRM error/debugging messages to also appear in Drupal error logs',
           'prefetch' => 1,
-          'help_text' => 'Set this value to Yes if you want CiviCRM error/debugging messages the appear in your CMS\' error log.
-In the case of Drupal, this will cause all CiviCRM error messages to appear in the watchdog (assuming you have Drupal\'s watchdog enabled)',
+          'help_text' => 'Set this value to Yes if you want CiviCRM error/debugging messages the appear in your CMS' error log.
+In the case of Drupal, this will cause all CiviCRM error messages to appear in the watchdog (assuming you have Drupal's watchdog enabled)',
         ),
-      'backtrace' => array( 
+      'backtrace' => array(
           'group_name' => 'Developer Preferences',
           'group' => 'developer',
           'name' => 'backtrace',
@@ -724,7 +818,7 @@ In the case of Drupal, this will cause all CiviCRM error messages to appear in t
           'description' => 'Set this value to Yes if you want to display a backtrace listing when a fatal error is encountered. This feature should NOT be enabled for production sites',
           'prefetch' => 1,
         ),
-      'fatalErrorTemplate' => array( 
+      'fatalErrorTemplate' => array(
           'group_name' => 'Developer Preferences',
           'group' => 'developer',
           'name' => 'fatalErrorTemplate',
@@ -739,7 +833,7 @@ In the case of Drupal, this will cause all CiviCRM error messages to appear in t
           'description' => 'Enter the path and filename for a custom Smarty template if you want to define your own screen for displaying fatal errors.',
           'prefetch' => 1,
         ),
-      'fatalErrorHandler' => array( 
+      'fatalErrorHandler' => array(
           'group_name' => 'Developer Preferences',
           'group' => 'developer',
           'name' => 'fatalErrorHandler',
@@ -754,7 +848,7 @@ In the case of Drupal, this will cause all CiviCRM error messages to appear in t
           'description' => 'Enter the path and class for a custom PHP error-handling function if you want to override built-in CiviCRM error handling for your site.',
           'prefetch' => 1,
         ),
-      'uploadDir' => array( 
+      'uploadDir' => array(
           'group_name' => 'Directory Preferences',
           'group' => 'directory',
           'name' => 'uploadDir',
@@ -769,7 +863,7 @@ In the case of Drupal, this will cause all CiviCRM error messages to appear in t
           'description' => '',
           'help_text' => 'If set, new contacts that are created when signing a petition are assigned a tag of this name.',
         ),
-      'imageUploadDir' => array( 
+      'imageUploadDir' => array(
           'group_name' => 'Directory Preferences',
           'group' => 'directory',
           'name' => 'imageUploadDir',
@@ -784,7 +878,7 @@ In the case of Drupal, this will cause all CiviCRM error messages to appear in t
           'description' => '',
           'help_text' => '',
         ),
-      'customFileUploadDir' => array( 
+      'customFileUploadDir' => array(
           'group_name' => 'Directory Preferences',
           'group' => 'directory',
           'name' => 'customFileUploadDir',
@@ -799,7 +893,7 @@ In the case of Drupal, this will cause all CiviCRM error messages to appear in t
           'description' => '',
           'help_text' => '',
         ),
-      'customTemplateDir' => array( 
+      'customTemplateDir' => array(
           'group_name' => 'Directory Preferences',
           'group' => 'directory',
           'name' => 'customTemplateDir',
@@ -814,7 +908,7 @@ In the case of Drupal, this will cause all CiviCRM error messages to appear in t
           'description' => '',
           'help_text' => '',
         ),
-      'customPHPPathDir' => array( 
+      'customPHPPathDir' => array(
           'group_name' => 'Directory Preferences',
           'group' => 'directory',
           'name' => 'customPHPPathDir',
@@ -829,7 +923,7 @@ In the case of Drupal, this will cause all CiviCRM error messages to appear in t
           'description' => '',
           'help_text' => '',
         ),
-      'extensionsDir' => array( 
+      'extensionsDir' => array(
           'group_name' => 'Directory Preferences',
           'group' => 'directory',
           'name' => 'extensionsDir',
@@ -844,7 +938,7 @@ In the case of Drupal, this will cause all CiviCRM error messages to appear in t
           'description' => '',
           'help_text' => '',
         ),
-      'event_enable_cart' => array( 
+      'event_enable_cart' => array(
           'name' => 'enable_cart',
           'group_name' => 'Event Preferences',
           'group' => 'event',
@@ -858,7 +952,7 @@ In the case of Drupal, this will cause all CiviCRM error messages to appear in t
           'description' => 'WRITE ME',
           'help_text' => 'WRITE ME',
         ),
-      'monetaryThousandSeparator' => array( 
+      'monetaryThousandSeparator' => array(
           'group_name' => 'Localization Preferences',
           'group' => 'localization',
           'name' => 'monetaryThousandSeparator',
@@ -867,7 +961,7 @@ In the case of Drupal, this will cause all CiviCRM error messages to appear in t
           'type' => 'String',
           'quick_form_type' => 'Element',
           'html_type' => 'text',
-          'html_attributes' => array( 
+          'html_attributes' => array(
               'size' => 2,
             ),
           'default' => ',',
@@ -878,7 +972,7 @@ In the case of Drupal, this will cause all CiviCRM error messages to appear in t
           'description' => '',
           'help_text' => '',
         ),
-      'monetaryDecimalPoint' => array( 
+      'monetaryDecimalPoint' => array(
           'group_name' => 'Localization Preferences',
           'group' => 'localization',
           'name' => 'monetaryDecimalPoint',
@@ -887,7 +981,7 @@ In the case of Drupal, this will cause all CiviCRM error messages to appear in t
           'type' => 'String',
           'quick_form_type' => 'Element',
           'html_type' => 'text',
-          'html_attributes' => array( 
+          'html_attributes' => array(
               'size' => 2,
             ),
           'default' => '.',
@@ -898,7 +992,7 @@ In the case of Drupal, this will cause all CiviCRM error messages to appear in t
           'description' => '',
           'help_text' => '',
         ),
-      'moneyformat' => array( 
+      'moneyformat' => array(
           'group_name' => 'Localization Preferences',
           'group' => 'localization',
           'name' => 'moneyformat',
@@ -915,7 +1009,7 @@ In the case of Drupal, this will cause all CiviCRM error messages to appear in t
           'description' => '',
           'help_text' => '',
         ),
-      'moneyvalueformat' => array( 
+      'moneyvalueformat' => array(
           'group_name' => 'Localization Preferences',
           'group' => 'localization',
           'name' => 'moneyvalueformat',
@@ -932,7 +1026,7 @@ In the case of Drupal, this will cause all CiviCRM error messages to appear in t
           'description' => '',
           'help_text' => '',
         ),
-      'defaultCurrency' => array( 
+      'defaultCurrency' => array(
           'group_name' => 'Localization Preferences',
           'group' => 'localization',
           'name' => 'defaultCurrency',
@@ -941,7 +1035,7 @@ In the case of Drupal, this will cause all CiviCRM error messages to appear in t
           'type' => 'String',
           'quick_form_type' => 'Element',
           'html_type' => 'text',
-          'html_attributes' => array( 
+          'html_attributes' => array(
               'size' => 2,
             ),
           'default' => 'USD',
@@ -952,7 +1046,7 @@ In the case of Drupal, this will cause all CiviCRM error messages to appear in t
           'description' => 'Default currency assigned to contributions and other monetary transactions.',
           'help_text' => '',
         ),
-      'countryLimit' => array( 
+      'countryLimit' => array(
           'group_name' => 'Localization Preferences',
           'group' => 'localization',
           'name' => 'countryLimit',
@@ -961,7 +1055,7 @@ In the case of Drupal, this will cause all CiviCRM error messages to appear in t
           'type' => 'Array',
           'quick_form_type' => 'Element',
           'html_type' => 'advmultiselect',
-          'html_attributes' => array( 
+          'html_attributes' => array(
               'size' => 5,
               'style' => 'width:150px',
               'class' => 'advmultiselect',
@@ -974,7 +1068,7 @@ In the case of Drupal, this will cause all CiviCRM error messages to appear in t
           'description' => '',
           'help_text' => '',
         ),
-      'provinceLimit' => array( 
+      'provinceLimit' => array(
           'group_name' => 'Localization Preferences',
           'group' => 'localization',
           'name' => 'provinceLimit',
@@ -983,7 +1077,7 @@ In the case of Drupal, this will cause all CiviCRM error messages to appear in t
           'type' => 'Array',
           'quick_form_type' => 'Element',
           'html_type' => 'advmultiselect',
-          'html_attributes' => array( 
+          'html_attributes' => array(
               'size' => 5,
               'style' => 'width:150px',
               'class' => 'advmultiselect',
@@ -996,7 +1090,7 @@ In the case of Drupal, this will cause all CiviCRM error messages to appear in t
           'description' => '',
           'help_text' => '',
         ),
-      'inheritLocale' => array( 
+      'inheritLocale' => array(
           'group_name' => 'Localization Preferences',
           'group' => 'localization',
           'name' => 'inheritLocale',
@@ -1012,7 +1106,7 @@ In the case of Drupal, this will cause all CiviCRM error messages to appear in t
           'description' => '',
           'help_text' => '',
         ),
-      'dateformatDatetime' => array( 
+      'dateformatDatetime' => array(
           'group_name' => 'Localization Preferences',
           'group' => 'localization',
           'name' => 'dateformatDatetime',
@@ -1027,7 +1121,7 @@ In the case of Drupal, this will cause all CiviCRM error messages to appear in t
           'description' => '',
           'help_text' => '',
         ),
-      'dateformatFull' => array( 
+      'dateformatFull' => array(
           'group_name' => 'Localization Preferences',
           'group' => 'localization',
           'name' => 'dateformatFull',
@@ -1042,7 +1136,7 @@ In the case of Drupal, this will cause all CiviCRM error messages to appear in t
           'description' => '',
           'help_text' => '',
         ),
-      'dateformatPartial' => array( 
+      'dateformatPartial' => array(
           'group_name' => 'Localization Preferences',
           'group' => 'localization',
           'name' => 'dateformatPartial',
@@ -1057,7 +1151,7 @@ In the case of Drupal, this will cause all CiviCRM error messages to appear in t
           'description' => '',
           'help_text' => '',
         ),
-      'lcMessages' => array( 
+      'lcMessages' => array(
           'group_name' => 'Localization Preferences',
           'group' => 'localization',
           'name' => 'lcMessages',
@@ -1072,7 +1166,7 @@ In the case of Drupal, this will cause all CiviCRM error messages to appear in t
           'description' => '',
           'help_text' => '',
         ),
-      'profile_double_optin' => array( 
+      'profile_double_optin' => array(
           'group_name' => 'Mailing Preferences',
           'group' => 'mailing',
           'name' => 'profile_double_optin',
@@ -1086,7 +1180,7 @@ In the case of Drupal, this will cause all CiviCRM error messages to appear in t
           'description' => 'When CiviMail is enabled, users who "subscribe" to a group from a profile Group(s) checkbox will receive a confirmation email. They must respond (opt-in) before they are added to the group.',
           'help_text' => '',
         ),
-      'track_civimail_replies' => array( 
+      'track_civimail_replies' => array(
           'group_name' => 'Mailing Preferences',
           'group' => 'mailing',
           'name' => 'track_civimail_replies',
@@ -1101,7 +1195,7 @@ In the case of Drupal, this will cause all CiviCRM error messages to appear in t
           'help_text' => '',
           'validate_callback' => 'CRM_Core_BAO_Setting::validateBoolSetting',
         ),
-      'civimail_workflow' => array( 
+      'civimail_workflow' => array(
           'group_name' => 'Mailing Preferences',
           'group' => 'mailing',
           'name' => 'civimail_workflow',
@@ -1115,7 +1209,7 @@ In the case of Drupal, this will cause all CiviCRM error messages to appear in t
           'description' => 'When CiviMail is enabled, users who "subscribe" to a group from a profile Group(s) checkbox will receive a confirmation email. They must respond (opt-in) before they are added to the group.',
           'help_text' => '',
         ),
-      'civimail_server_wide_lock' => array( 
+      'civimail_server_wide_lock' => array(
           'group_name' => 'Mailing Preferences',
           'group' => 'mailing',
           'name' => 'civimail_server_wide_lock',
@@ -1129,7 +1223,7 @@ In the case of Drupal, this will cause all CiviCRM error messages to appear in t
           'description' => '',
           'help_text' => '',
         ),
-      'mailing_backend' => array( 
+      'mailing_backend' => array(
           'group_name' => 'Mailing Preferences',
           'group' => 'mailing',
           'name' => 'mailing_backend',
@@ -1143,7 +1237,7 @@ In the case of Drupal, this will cause all CiviCRM error messages to appear in t
           'description' => '',
           'help_text' => '',
         ),
-      'profile_add_to_group_double_optin' => array( 
+      'profile_add_to_group_double_optin' => array(
           'group_name' => 'Mailing Preferences',
           'group' => 'mailing',
           'name' => 'profile_add_to_group_double_optin',
@@ -1157,14 +1251,14 @@ In the case of Drupal, this will cause all CiviCRM error messages to appear in t
           'description' => 'When CiviMail is enabled, users who "subscribe" to a group from a profile Group(s) checkbox will receive a confirmation email. They must respond (opt-in) before they are added to the group.',
           'help_text' => '',
         ),
-      'default_renewal_contribution_page' => array( 
+      'default_renewal_contribution_page' => array(
           'group_name' => 'Member Preferences',
           'group' => 'member',
           'name' => 'default_renewal_contribution_page',
           'type' => 'Integer',
           'html_type' => 'Select',
           'default' => '',
-          'pseudoconstant' => array( 
+          'pseudoconstant' => array(
               'name' => 'contributionPage',
             ),
           'add' => '4.1',
@@ -1174,7 +1268,7 @@ In the case of Drupal, this will cause all CiviCRM error messages to appear in t
           'description' => 'If you select a default online contribution page for self-service membership renewals, a "renew" link pointing to that page will be displayed on the Contact Dashboard for memberships which were entered offline. You will need to ensure that the membership block for the selected online contribution page includes any currently available memberships.',
           'help_text' => '',
         ),
-      'is_enabled' => array( 
+      'is_enabled' => array(
           'group_name' => 'Multi Site Preferences',
           'group' => 'multisite',
           'name' => 'is_enabled',
@@ -1186,7 +1280,7 @@ In the case of Drupal, this will cause all CiviCRM error messages to appear in t
           'description' => 'Multisite is enabled',
           'help_text' => '',
         ),
-      'domain_group_id' => array( 
+      'domain_group_id' => array(
           'group_name' => 'Multi Site Preferences',
           'group' => 'multisite',
           'name' => 'domain_group_id',
@@ -1198,7 +1292,7 @@ In the case of Drupal, this will cause all CiviCRM error messages to appear in t
           'description' => '',
           'help_text' => '',
         ),
-      'event_price_set_domain_id' => array( 
+      'event_price_set_domain_id' => array(
           'group_name' => 'Multi Site Preferences',
           'group' => 'multisite',
           'name' => 'event_price_set_domain_id',
@@ -1210,7 +1304,7 @@ In the case of Drupal, this will cause all CiviCRM error messages to appear in t
           'description' => '',
           'help_text' => '',
         ),
-      'uniq_email_per_site' => array( 
+      'uniq_email_per_site' => array(
           'group_name' => 'Multi Site Preferences',
           'group' => 'multisite',
           'name' => 'uniq_email_per_site',
@@ -1222,7 +1316,7 @@ In the case of Drupal, this will cause all CiviCRM error messages to appear in t
           'description' => '',
           'help_text' => '',
         ),
-      'search_autocomplete_count' => array( 
+      'search_autocomplete_count' => array(
           'group_name' => 'Search Preferences',
           'group' => 'Search Preferences',
           'name' => 'search_autocomplete_count',
@@ -1230,7 +1324,7 @@ In the case of Drupal, this will cause all CiviCRM error messages to appear in t
           'type' => 'Integer',
           'quick_form_type' => 'Element',
           'html_type' => 'text',
-          'html_attributes' => array( 
+          'html_attributes' => array(
               'size' => 2,
               'maxlength' => 2,
             ),
@@ -1242,7 +1336,7 @@ In the case of Drupal, this will cause all CiviCRM error messages to appear in t
           'description' => 'The maximum number of contacts to show at a time when typing in an autocomplete field.',
           'help_text' => '',
         ),
-      'userFrameworkResourceURL' => array( 
+      'userFrameworkResourceURL' => array(
           'group' => 'UrlPreferences',
           'group_name' => 'url',
           'name' => 'userFrameworkResourceURL',
@@ -1256,7 +1350,7 @@ In the case of Drupal, this will cause all CiviCRM error messages to appear in t
           'help_text' => '',
           'validate_callback' => 'CRM_Utils_Rule::url',
         ),
-      'imageUploadURL' => array( 
+      'imageUploadURL' => array(
           'group' => 'UrlPreferences',
           'group_name' => 'url',
           'name' => 'imageUploadURL',
@@ -1270,7 +1364,7 @@ In the case of Drupal, this will cause all CiviCRM error messages to appear in t
           'help_text' => '',
           'validate_callback' => 'CRM_Utils_Rule::url',
         ),
-      'customCSSURL' => array( 
+      'customCSSURL' => array(
           'group' => 'UrlPreferences',
           'group_name' => 'url',
           'name' => 'customCSSURL',
@@ -1287,7 +1381,7 @@ In the case of Drupal, this will cause all CiviCRM error messages to appear in t
     ),
 );
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 

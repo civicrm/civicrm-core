@@ -2,7 +2,7 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -39,15 +39,15 @@ class WebTest_Contribute_OfflineContributionTest extends CiviSeleniumTestCase {
     // Create a contact to be used as soft creditor
     $softCreditFname = substr(sha1(rand()), 0, 7);
     $softCreditLname = substr(sha1(rand()), 0, 7);
-    $this->webtestAddContact( $softCreditFname, $softCreditLname, false );
+    $this->webtestAddContact($softCreditFname, $softCreditLname, FALSE);
 
     //financial account for check
     $this->openCiviPage("admin/options/payment_instrument", "group=payment_instrument&reset=1");
     $financialAccount = $this->getText("xpath=//div[@id='payment_instrument']/div[2]/table/tbody//tr/td[1][text()='Check']/../td[3]");
 
     // Add new Financial Account
-    $orgName = 'Alberta '.substr(sha1(rand()), 0, 7);
-    $financialAccountTitle = 'Financial Account '.substr(sha1(rand()), 0, 4);
+    $orgName = 'Alberta ' . substr(sha1(rand()), 0, 7);
+    $financialAccountTitle = 'Financial Account ' . substr(sha1(rand()), 0, 4);
     $financialAccountDescription = "{$financialAccountTitle} Description";
     $accountingCode = 1033;
     $financialAccountType = 'Asset';
@@ -58,7 +58,7 @@ class WebTest_Contribute_OfflineContributionTest extends CiviSeleniumTestCase {
     $isDefault = FALSE;
 
     //Add new organisation
-    if($orgName) {
+    if ($orgName) {
       $this->webtestAddOrganization($orgName);
     }
 
@@ -74,8 +74,8 @@ class WebTest_Contribute_OfflineContributionTest extends CiviSeleniumTestCase {
       $isDefault
     );
 
-    $firstName = 'John'.substr(sha1(rand()), 0, 7);
-    $lastName = 'Dsouza'.substr(sha1(rand()), 0, 7);
+    $firstName = 'John' . substr(sha1(rand()), 0, 7);
+    $lastName = 'Dsouza' . substr(sha1(rand()), 0, 7);
     $this->webtestAddContact($firstName, $lastName);
 
     $this->waitForElementPresent("css=li#tab_contribute a");
@@ -104,27 +104,19 @@ class WebTest_Contribute_OfflineContributionTest extends CiviSeleniumTestCase {
     $this->type("trxn_id", "P20901X1" . rand(100, 10000));
 
     // create first soft credit
-    $this->click("soft_credit_contact_1");
-    $this->type("soft_credit_contact_1", $softCreditFname);
-    $this->typeKeys("soft_credit_contact_1", $softCreditFname);
-    $this->waitForElementPresent("soft_credit_amount_1");
-    $this->verifyText("soft_credit_amount_1","100");
+    $this->webtestFillAutocomplete("{$softCreditLname}, {$softCreditFname}", 'soft_credit_contact_1');
     $this->type("soft_credit_amount_1", "50");
-   
+
     // add second soft credit field
     $this->click("addMoreSoftCredit");
     $this->waitForElementPresent("soft_credit_amount_2");
     // create new individual via soft credit 
     $softCreditSecondFname = substr(sha1(rand()), 0, 7);
-    $softCreditSecondLname = substr(sha1(rand()), 0, 7); 
-    $this->webtestNewDialogContact($softCreditSecondFname,$softCreditSecondLname, null, 4, 'soft_credit_profiles_2','soft_credit_1');
+    $softCreditSecondLname = substr(sha1(rand()), 0, 7);
+    $this->webtestNewDialogContact($softCreditSecondFname, $softCreditSecondLname, NULL, 4, 'soft_credit_profiles_2', 'soft_credit_1');
     // enter the second soft credit
-    $this->verifyText("soft_credit_amount_2","");  // it should be blank cause first soft credit != total_amount
-    $this->type("soft_credit_amount_2","100"); //the sum of the soft credit amounts can exceed total_amount
-     
-    
-    $this->waitForElementPresent("css=div.ac_results-inner li");
-    $this->click("css=div.ac_results-inner li");
+    $this->verifyText("soft_credit_amount_2", ""); // it should be blank cause first soft credit != total_amount
+    $this->type("soft_credit_amount_2", "100"); //the sum of the soft credit amounts can exceed total_amount
 
     //Custom Data
     // $this->click('CIVICRM_QFID_3_6');
@@ -165,31 +157,40 @@ class WebTest_Contribute_OfflineContributionTest extends CiviSeleniumTestCase {
     //$this->assertTrue($this->isTextPresent("The contribution record has been saved."), "Status message didn't show up after saving!");
 
     // verify if Contribution is created
-    $this->waitForElementPresent( "xpath=//div[@id='Contributions']//table//tbody/tr[1]/td[8]/span/a[text()='View']" );
+    $this->waitForElementPresent("xpath=//div[@id='Contributions']//table//tbody/tr[1]/td[8]/span/a[text()='View']");
 
     //click through to the Contribution view screen
-    $this->click( "xpath=//div[@id='Contributions']//table/tbody/tr[1]/td[8]/span/a[text()='View']" );
+    $this->click("xpath=//div[@id='Contributions']//table/tbody/tr[1]/td[8]/span/a[text()='View']");
     $this->waitForElementPresent("_qf_ContributionView_cancel-bottom");
 
-    $expected = array('Financial Type'   => 'Donation',
-
-      'Total Amount'        => '100.00',
+    $expected = array(
+      'Financial Type' => 'Donation',
+      'Total Amount' => '100.00',
       'Contribution Status' => 'Completed',
-      'Paid By'             => 'Check',
-      'Check Number'        => 'check #1041',
+      'Paid By' => 'Check',
+      'Check Number' => 'check #1041',
       'Non-deductible Amount' => '10.00',
-      'Received Into'       => $financialAccount,
-      'Soft Credit To'      => "{$softCreditFname} {$softCreditLname}",
-      'Soft Credit To'      => "{$softCreditSecondFname} {$softCreditSecondLname}",
-      'Amount'      => '50.00',
-      'Amount'      => '100.00',
+      'Received Into' => $financialAccount,
     );
-    foreach($expected as $label => $value) {
+
+    foreach ($expected as $value) {
       $this->verifyText("xpath=/html/body/div[3]/div/div[2]/div/div[3]/div/div[2]/div/div/div/form/div[2]", preg_quote($value));
     }
 
-    // go to soft creditor contact view page
-    $this->click("view_contact");
+    // verify if soft credit was created successfully
+    $expected = array(
+      'Soft Credit To 1' => "{$softCreditFname} {$softCreditLname}",
+      'Soft Credit To 2' => "{$softCreditSecondFname} {$softCreditSecondLname}",
+      'Amount' => '50.00',
+      'Amount' => '100.00',
+    );
+
+    foreach ($expected as $value) {
+      $this->verifyText("css=table.crm-soft-credit-listing", preg_quote($value));
+    }
+
+    // go to first soft creditor contact view page
+    $this->click("css=table.crm-soft-credit-listing tbody tr td a");
 
     // go to contribution tab
     $this->waitForElementPresent("css=li#tab_contribute a");
@@ -197,13 +198,13 @@ class WebTest_Contribute_OfflineContributionTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent("link=Record Contribution (Check, Cash, EFT ...)");
 
     // verify soft credit details
-    $expected = array( 3  => 'Donation',
-
-      2  => '50.00',
-      5  => 'Completed',
-      1  => "{$firstName} {$lastName}"
+    $expected = array(
+      3 => 'Donation',
+      2 => '50.00',
+      5 => 'Completed',
+      1 => "{$firstName} {$lastName}"
     );
-    foreach($expected as $value => $label) {
+    foreach ($expected as $value => $label) {
       $this->verifyText("xpath=id('Search')/div[2]/table[2]/tbody/tr[2]/td[$value]", preg_quote($label));
     }
   }
@@ -219,15 +220,16 @@ class WebTest_Contribute_OfflineContributionTest extends CiviSeleniumTestCase {
     $premiumName = 'test Premium' . substr(sha1(rand()), 0, 7);
     $this->addPremium($premiumName, 'SKU', 3, 12, NULL, NULL);
 
-    $firstName = 'John'.substr(sha1(rand()), 0, 7);
-    $lastName = 'Dsouza'.substr(sha1(rand()), 0, 7);
+    $firstName = 'John' . substr(sha1(rand()), 0, 7);
+    $lastName = 'Dsouza' . substr(sha1(rand()), 0, 7);
     $this->webtestAddContact($firstName, $lastName);
 
     //scenario 1 : is_deductible = 0 and non deductible amount is entered
     $scenario1 = array(
       'financial_type' => 'Campaign Contribution',
       'total_amount' => 111,
-      'non_deductible_amount' => 15
+      'non_deductible_amount' => 15,
+      'sort_name' => "$lastName, $firstName",
     );
     $this->_doOfflineContribution($scenario1, $firstName, $lastName, $processorName);
 
@@ -235,7 +237,8 @@ class WebTest_Contribute_OfflineContributionTest extends CiviSeleniumTestCase {
       'From' => "{$firstName} {$lastName}",
       'Financial Type' => 'Campaign Contribution',
       'Total Amount' => 111,
-      'Non-deductible Amount' => 15
+      'Non-deductible Amount' => 15,
+      'sort_name' => "$lastName, $firstName",
     );
     $this->_verifyAmounts($checkScenario1);
 
@@ -243,7 +246,8 @@ class WebTest_Contribute_OfflineContributionTest extends CiviSeleniumTestCase {
     $scenario2 = array(
       'financial_type' => 'Donation',
       'total_amount' => 10,
-      'premium' => "{$premiumName} ( SKU )"
+      'premium' => "{$premiumName} ( SKU )",
+      'sort_name' => "$lastName, $firstName",
     );
     $this->_doOfflineContribution($scenario2, $firstName, $lastName, $processorName);
 
@@ -251,7 +255,8 @@ class WebTest_Contribute_OfflineContributionTest extends CiviSeleniumTestCase {
       'From' => "{$firstName} {$lastName}",
       'Financial Type' => 'Donation',
       'Total Amount' => 10,
-      'Non-deductible Amount' => 10
+      'Non-deductible Amount' => 10,
+      'sort_name' => "$lastName, $firstName",
     );
     $this->_verifyAmounts($checkScenario2);
 
@@ -259,7 +264,8 @@ class WebTest_Contribute_OfflineContributionTest extends CiviSeleniumTestCase {
     $scenario3 = array(
       'financial_type' => 'Donation',
       'total_amount' => 123,
-      'premium' => "{$premiumName} ( SKU )"
+      'premium' => "{$premiumName} ( SKU )",
+      'sort_name' => "$lastName, $firstName",
     );
     $this->_doOfflineContribution($scenario3, $firstName, $lastName, $processorName);
 
@@ -267,7 +273,8 @@ class WebTest_Contribute_OfflineContributionTest extends CiviSeleniumTestCase {
       'From' => "{$firstName} {$lastName}",
       'Financial Type' => 'Donation',
       'Total Amount' => 123,
-      'Non-deductible Amount' => 12
+      'Non-deductible Amount' => 12,
+      'sort_name' => "$lastName, $firstName",
     );
     $this->_verifyAmounts($checkScenario3);
 
@@ -275,6 +282,7 @@ class WebTest_Contribute_OfflineContributionTest extends CiviSeleniumTestCase {
     $scenario4 = array(
       'financial_type' => 'Donation',
       'total_amount' => 123,
+      'sort_name' => "$lastName, $firstName",
     );
     $this->_doOfflineContribution($scenario4, $firstName, $lastName, $processorName);
 
@@ -282,7 +290,8 @@ class WebTest_Contribute_OfflineContributionTest extends CiviSeleniumTestCase {
       'From' => "{$firstName} {$lastName}",
       'Financial Type' => 'Donation',
       'Total Amount' => 123,
-      'Non-deductible Amount' => '0.00'
+      'Non-deductible Amount' => '0.00',
+      'sort_name' => "$lastName, $firstName",
     );
     $this->_verifyAmounts($checkScenario4);
 
@@ -290,6 +299,7 @@ class WebTest_Contribute_OfflineContributionTest extends CiviSeleniumTestCase {
     $scenario5 = array(
       'financial_type' => 'Campaign Contribution',
       'total_amount' => 555,
+      'sort_name' => "$lastName, $firstName",
     );
     $this->_doOfflineContribution($scenario5, $firstName, $lastName, $processorName);
 
@@ -297,7 +307,8 @@ class WebTest_Contribute_OfflineContributionTest extends CiviSeleniumTestCase {
       'From' => "{$firstName} {$lastName}",
       'Financial Type' => 'Campaign Contribution',
       'Total Amount' => 555,
-      'Non-deductible Amount' => 555
+      'Non-deductible Amount' => 555,
+      'sort_name' => "$lastName, $firstName",
     );
     $this->_verifyAmounts($checkScenario5);
   }
@@ -356,17 +367,68 @@ class WebTest_Contribute_OfflineContributionTest extends CiviSeleniumTestCase {
 
   //common function for verifing total_amount, and non_deductible_amount
   function _verifyAmounts($verifyData) {
-    $this->waitForElementPresent( "xpath=//div[@id='Contributions']//table//tbody/tr[1]/td[8]/span/a[text()='View']" );
-    $this->click( "xpath=//div[@id='Contributions']//table/tbody/tr[1]/td[8]/span/a[text()='View']" );
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    // since we are doing test contributions we need to search for test contribution and select first contribution
+    // record for the contact
+    $this->openCiviPage("contribute/search", "reset=1", "contribution_date_low");
+    $this->type("sort_name", $verifyData['sort_name']);
+
+    // select show test contributions
+    $this->click("contribution_test", "value=1");
+    $this->clickLink("_qf_Search_refresh", "xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']");
+    $this->clickLink("xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']", "_qf_ContributionView_cancel-bottom");
 
     foreach ($verifyData as $label => $value) {
+      if ( $label == 'sort_name' ) {
+        continue;
+      }
       $this->verifyText("xpath=//form[@id='ContributionView']//table/tbody/tr/td[text()='{$label}']/following-sibling::td",
         preg_quote($value)
       );
     }
 
-    $this->click("_qf_ContributionView_cancel-top");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    // now find contact and go back to contact summary
+    $this->openCiviPage("contact/search", "reset=1", "sort_name");
+    $this->type("sort_name", $verifyData['sort_name']);
+    $this->clickLink("_qf_Basic_refresh",
+      "xpath=//form[@id='Basic']/div[3]/div[1]/div[2]/table/tbody/tr[1]/td[11]/span/a[text()='View']");
+
+    $this->clickLink("xpath=//form[@id='Basic']/div[3]/div[1]/div[2]/table/tbody/tr[1]/td[11]/span/a[text()='View']",
+    'crm-contact-actions-link');
+  }
+
+  function testOnlineContributionWithZeroAmount() {
+    $this->webtestLogin();
+
+    // Create a contact to be used as soft creditor
+    $firstName = 'John' . substr(sha1(rand()), 0, 7);
+    $lastName = 'Peterson' . substr(sha1(rand()), 0, 7);
+    $this->webtestAddContact($firstName, $lastName);
+    $this->waitForElementPresent("css=li#tab_contribute a");
+    $this->click("css=li#tab_contribute a");
+    $this->waitForElementPresent("link=Record Contribution (Check, Cash, EFT ...)");
+    $this->clickLink("link=Record Contribution (Check, Cash, EFT ...)");
+
+    // select financial type
+    $this->select("financial_type_id", "value=1");
+
+    // total amount
+    $this->type("total_amount", "0.00");
+
+    // select payment instrument
+    $this->select("payment_instrument_id", "value=1");
+
+    $this->type("trxn_id", "X20901X1" . rand(100, 10000));
+    $this->clickLink('_qf_Contribution_upload-bottom');
+    $this->waitForText("crm-notification-container", "The contribution record has been saved.");
+
+    $this->waitForElementPresent("xpath=//div[@id='Contributions']//table//tbody/tr[1]/td[8]/span/a[text()='View']");
+    $this->clickLink("xpath=//div[@id='Contributions']//table/tbody/tr[1]/td[8]/span/a[text()='View']");
+    $expected = array(
+      'Financial Type' => 'Donation',
+      'Total Amount' => '0.00',
+      'Contribution Status' => 'Completed',
+      'Paid By' => 'Credit Card'
+    );
+    $this->webtestVerifyTabularData($expected);
   }
 }

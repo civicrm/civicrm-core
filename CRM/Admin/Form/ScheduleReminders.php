@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright (C) 2011 Marty Wright                                    |
  | Licensed to CiviCRM under the Academic Free License version 3.0.   |
@@ -177,7 +177,7 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
 
     $limitOptions = array(1 => ts('Limit to'), 0 => ts('Addition to'));
     $this->add('select', 'limit_to', ts('Limit Options'), $limitOptions);
-    
+
     $this->add('select', 'recipient', ts('Recipients'), $sel5[$recipient],
       FALSE, array('onClick' => "showHideByValue('recipient','manual','recipientManual','table-row','select',false); showHideByValue('recipient','group','recipientGroup','table-row','select',false);")
     );

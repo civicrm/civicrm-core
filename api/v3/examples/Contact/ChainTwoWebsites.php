@@ -1,16 +1,15 @@
 <?php
-
-/*
- test demonstrates the syntax to create 2 chained entities
+/**
+ * Test Generated example of using contact create API
+ * test demonstrates the syntax to create 2 chained entities *
  */
 function contact_create_example(){
-$params = array( 
+$params = array(
   'first_name' => 'abc3',
   'last_name' => 'xyz3',
   'contact_type' => 'Individual',
   'email' => 'man3@yahoo.com',
-  'version' => 3,
-  'api.contribution.create' => array( 
+  'api.contribution.create' => array(
       'receive_date' => '2010-01-01',
       'total_amount' => '100',
       'financial_type_id' => 1,
@@ -23,31 +22,40 @@ $params = array(
       'source' => 'SSF',
       'contribution_status_id' => 1,
     ),
-  'api.website.create' => array( 
+  'api.website.create' => array(
       'url' => 'http://civicrm.org',
     ),
-  'api.website.create.2' => array( 
+  'api.website.create.2' => array(
       'url' => 'http://chained.org',
     ),
 );
 
-  $result = civicrm_api( 'contact','create',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('contact', 'create', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function contact_create_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
   'id' => 1,
-  'values' => array( 
-      '1' => array( 
+  'values' => array(
+      '1' => array(
           'id' => '1',
           'contact_type' => 'Individual',
           'contact_sub_type' => '',
@@ -93,15 +101,15 @@ function contact_create_expectedresult(){
           'organization_name' => '',
           'sic_code' => '',
           'user_unique_id' => '',
-          'created_date' => '2013-02-15 16:59:33',
+          'created_date' => '2013-07-28 08:49:19',
           'modified_date' => '2012-11-14 16:02:35',
-          'api.contribution.create' => array( 
+          'api.contribution.create' => array(
               'is_error' => 0,
               'version' => 3,
               'count' => 1,
               'id' => 1,
-              'values' => array( 
-                  '0' => array( 
+              'values' => array(
+                  '0' => array(
                       'id' => '1',
                       'contact_id' => '1',
                       'financial_type_id' => '1',
@@ -128,18 +136,19 @@ function contact_create_expectedresult(){
                       'contribution_status_id' => '1',
                       'honor_type_id' => '',
                       'address_id' => '',
-                      'check_number' => 'null',
+                      'check_number' => '',
                       'campaign_id' => '',
+                      'contribution_type_id' => '1',
                     ),
                 ),
             ),
-          'api.website.create' => array( 
+          'api.website.create' => array(
               'is_error' => 0,
               'version' => 3,
               'count' => 1,
               'id' => 1,
-              'values' => array( 
-                  '0' => array( 
+              'values' => array(
+                  '0' => array(
                       'id' => '1',
                       'contact_id' => '1',
                       'url' => 'http://civicrm.org',
@@ -147,13 +156,13 @@ function contact_create_expectedresult(){
                     ),
                 ),
             ),
-          'api.website.create.2' => array( 
+          'api.website.create.2' => array(
               'is_error' => 0,
               'version' => 3,
               'count' => 1,
               'id' => 2,
-              'values' => array( 
-                  '0' => array( 
+              'values' => array(
+                  '0' => array(
                       'id' => '2',
                       'contact_id' => '1',
                       'url' => 'http://chained.org',
@@ -165,7 +174,7 @@ function contact_create_expectedresult(){
     ),
 );
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 

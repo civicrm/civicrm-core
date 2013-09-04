@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -131,14 +131,14 @@ class CRM_Core_BAO_Note extends CRM_Core_DAO_Note {
    * note object. the params array could contain additional unused name/value
    * pairs
    *
-   * @param array $params  (reference ) an assoc array of name/value pairs
-   * @param array $ids  associated array with note id
+   * @param array $params  (reference) an assoc array of name/value pairs
+   * @param array $ids (deprecated) associated array with note id - preferably set $params['id']
    *
    * @return object $note CRM_Core_BAO_Note object
    * @access public
    * @static
    */
-  static function &add(&$params, $ids) {
+  static function &add(&$params, $ids = array()) {
     $dataExists = self::dataExists($params);
     if (!$dataExists) {
       return CRM_Core_DAO::$_nullObject;
@@ -160,9 +160,9 @@ class CRM_Core_BAO_Note extends CRM_Core_DAO_Note {
         $note->contact_id = $params['entity_id'];
       }
     }
-
-    if (CRM_Utils_Array::value('id', $ids)) {
-      $note->id = CRM_Utils_Array::value('id', $ids);
+    $id = CRM_Utils_Array::value('id', $params, CRM_Utils_Array::value('id', $ids));
+    if ($id) {
+      $note->id = $id;
     }
 
     $note->save();

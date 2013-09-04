@@ -20,7 +20,7 @@
     result._collection = this.collection;
     result._options = this.options;
     return result;
-  }
+  };
 
   /**
    * Display a dialog window with an editable form for a UFGroupModel

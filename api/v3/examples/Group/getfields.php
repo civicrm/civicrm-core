@@ -1,43 +1,54 @@
 <?php
-
-/*
- demonstrate use of getfields to interogate api
+/**
+ * Test Generated example of using group getfields API
+ * demonstrate use of getfields to interogate api *
  */
 function group_getfields_example(){
-$params = array( 
-  'version' => 3,
+$params = array(
   'action' => 'create',
 );
 
-  $result = civicrm_api( 'group','getfields',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('group', 'getfields', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function group_getfields_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 19,
-  'values' => array( 
-      'id' => array( 
+  'values' => array(
+      'id' => array(
           'name' => 'id',
           'type' => 1,
           'title' => 'Group ID',
           'required' => true,
+          'api.aliases' => array(
+              '0' => 'group_id',
+            ),
         ),
-      'name' => array( 
+      'name' => array(
           'name' => 'name',
           'type' => 2,
           'title' => 'Group Name',
           'maxlength' => 64,
           'size' => 30,
         ),
-      'title' => array( 
+      'title' => array(
           'name' => 'title',
           'type' => 2,
           'title' => 'Group Title',
@@ -45,96 +56,92 @@ function group_getfields_expectedresult(){
           'size' => 30,
           'api.required' => 1,
         ),
-      'description' => array( 
+      'description' => array(
           'name' => 'description',
           'type' => 32,
           'title' => 'Group Description',
           'rows' => 2,
           'cols' => 60,
         ),
-      'source' => array( 
+      'source' => array(
           'name' => 'source',
           'type' => 2,
           'title' => 'Group Source',
           'maxlength' => 64,
           'size' => 30,
         ),
-      'saved_search_id' => array( 
+      'saved_search_id' => array(
           'name' => 'saved_search_id',
           'type' => 1,
           'title' => 'Saved Search ID',
           'FKClassName' => 'CRM_Contact_DAO_SavedSearch',
         ),
-      'is_active' => array( 
+      'is_active' => array(
           'name' => 'is_active',
           'type' => 16,
           'title' => 'Group Enabled',
           'api.default' => 1,
         ),
-      'visibility' => array( 
+      'visibility' => array(
           'name' => 'visibility',
           'type' => 2,
           'title' => 'Group Visibility Setting',
           'default' => 'User and User Admin Only',
           'enumValues' => 'User and User Admin Only,Public Pages',
-          'options' => array( 
-              '0' => 'User and User Admin Only',
-              '1' => 'Public Pages',
-            ),
         ),
-      'where_clause' => array( 
+      'where_clause' => array(
           'name' => 'where_clause',
           'type' => 32,
           'title' => 'Group Where Clause',
         ),
-      'select_tables' => array( 
+      'select_tables' => array(
           'name' => 'select_tables',
           'type' => 32,
           'title' => 'Tables For Select Clause',
         ),
-      'where_tables' => array( 
+      'where_tables' => array(
           'name' => 'where_tables',
           'type' => 32,
           'title' => 'Tables For Where Clause',
         ),
-      'group_type' => array( 
+      'group_type' => array(
           'name' => 'group_type',
           'type' => 2,
           'title' => 'Group Type',
           'maxlength' => 128,
           'size' => 45,
         ),
-      'cache_date' => array( 
+      'cache_date' => array(
           'name' => 'cache_date',
           'type' => 12,
           'title' => 'Group Cache Date',
         ),
-      'refresh_date' => array( 
+      'refresh_date' => array(
           'name' => 'refresh_date',
           'type' => 12,
           'title' => 'Next Group Refresh Time',
         ),
-      'parents' => array( 
+      'parents' => array(
           'name' => 'parents',
           'type' => 32,
           'title' => 'Group Parents',
         ),
-      'children' => array( 
+      'children' => array(
           'name' => 'children',
           'type' => 32,
           'title' => 'Group Children',
         ),
-      'is_hidden' => array( 
+      'is_hidden' => array(
           'name' => 'is_hidden',
           'type' => 16,
           'title' => 'Group is Hidden',
         ),
-      'is_reserved' => array( 
+      'is_reserved' => array(
           'name' => 'is_reserved',
           'type' => 16,
           'title' => 'Group is Reserved',
         ),
-      'created_id' => array( 
+      'created_id' => array(
           'name' => 'created_id',
           'type' => 1,
           'title' => 'Group Created By',
@@ -143,7 +150,7 @@ function group_getfields_expectedresult(){
     ),
 );
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 

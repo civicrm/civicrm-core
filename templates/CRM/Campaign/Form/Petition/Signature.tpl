@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -55,6 +55,10 @@ Please check your email inbox for the confirmation email. If you don't find it, 
   <div class="crm-section crm-petition-activity-profile">
     {include file="CRM/Campaign/Form/Petition/Block.tpl" fields=$petitionActivityProfile}
   </div>
+
+  {if $isCaptcha}
+      {include file='CRM/common/ReCAPTCHA.tpl'}
+  {/if}
 
   <div class="crm-submit-buttons">
     {include file="CRM/common/formButtons.tpl" location="bottom"}

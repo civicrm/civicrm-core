@@ -67,7 +67,7 @@
   <item>
      <path>civicrm/admin/options/case_type</path>
      <title>Case Types</title>
-     <desc>List of types which can be assigned to Cases. (Enable the Cases tab from Global Settings - Site Preferences if you want to track cases.)</desc>
+     <desc>List of types which can be assigned to Cases. (Enable the Cases tab from System Settings - Enable Components if you want to track cases.)</desc>
      <path_arguments>group=case_type</path_arguments>
      <access_arguments>administer CiviCase</access_arguments>
      <page_callback>CRM_Admin_Page_Options</page_callback>

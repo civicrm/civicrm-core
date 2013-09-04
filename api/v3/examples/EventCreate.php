@@ -1,10 +1,10 @@
 <?php
-
-/*
- 
+/**
+ * Test Generated example of using event create API
+ * *
  */
 function event_create_example(){
-$params = array( 
+$params = array(
   'title' => 'Annual CiviCRM meet',
   'summary' => 'If you have any CiviCRM realted issues or want to track where CiviCRM is heading, Sign up now',
   'description' => 'This event is intended to give brief idea about progess of CiviCRM and giving solutions to common user issues',
@@ -20,26 +20,34 @@ $params = array(
   'is_monetary' => 0,
   'is_active' => 1,
   'is_show_location' => 0,
-  'version' => 3,
 );
 
-  $result = civicrm_api( 'event','create',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('event', 'create', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function event_create_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
   'id' => 3,
-  'values' => array( 
-      '3' => array( 
+  'values' => array(
+      '3' => array(
           'id' => '3',
           'title' => 'Annual CiviCRM meet',
           'summary' => 'If you have any CiviCRM realted issues or want to track where CiviCRM is heading, Sign up now',
@@ -47,8 +55,8 @@ function event_create_expectedresult(){
           'event_type_id' => '1',
           'participant_listing_id' => '',
           'is_public' => '1',
-          'start_date' => '20081021000000',
-          'end_date' => '20081023000000',
+          'start_date' => '2013-07-29 00:00:00',
+          'end_date' => '2013-08-04 00:00:00',
           'is_online_registration' => '1',
           'registration_link_text' => '',
           'registration_start_date' => '20080601000000',
@@ -97,7 +105,7 @@ function event_create_expectedresult(){
           'is_template' => 0,
           'template_title' => '',
           'created_id' => '',
-          'created_date' => '20130204223127',
+          'created_date' => '2013-07-28 08:49:19',
           'currency' => '',
           'campaign_id' => '',
           'is_share' => '',
@@ -107,7 +115,7 @@ function event_create_expectedresult(){
     ),
 );
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 

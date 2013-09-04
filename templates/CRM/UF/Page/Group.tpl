@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -72,6 +72,8 @@
              <thead>
               <tr>
                 <th id="sortable">{ts}Profile Title{/ts}</th>
+                <th>{ts}Created By{/ts}</th>
+                <th>{ts}Description{/ts}</th>
                 <th>{ts}Type{/ts}</th>
                 <th>{ts}ID{/ts}</th>
                 <th id="nosort">{ts}Used For{/ts}</th>
@@ -83,6 +85,12 @@
             {if !$row.is_reserved }
               <tr id="UFGroup-{$row.id}"class="crm-entity {$row.class}{if NOT $row.is_active} disabled{/if}">
                 <td><span class="crmf-title crm-editable">{$row.title}</span></td>
+                <td>
+                  {if $row.created_id && $row.created_by}
+                    <a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=`$row.created_id`"}">{ts}{$row.created_by}{/ts}</a>
+                  {/if}
+                </td>
+                <td>{$row.description}</td>
                 <td>{$row.group_type}</td>
                 <td>{$row.id}</td>
                 <td>{$row.module}</td>
@@ -107,6 +115,8 @@
              <thead>
               <tr>
                 <th id="sortable">{ts}Profile Title{/ts}</th>
+                <th>{ts}Created By{/ts}</th>
+                <th>{ts}Description{/ts}</th>
                 <th>{ts}Type{/ts}</th>
                 <th>{ts}ID{/ts}</th>
                 <th id="nosort">{ts}Used For{/ts}</th>
@@ -118,6 +128,12 @@
             {if $row.is_reserved}
               <tr id="row_{$row.id}"class="{$row.class}{if NOT $row.is_active} disabled{/if}">
                 <td>{$row.title}</td>
+                <td>
+                  {if $row.created_id && $row.created_by}
+                    <a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=`$row.created_id`"}">{ts}{$row.created_by}{/ts}</a>
+                  {/if}
+                </td>
+                <td>{$row.description}</td>
                 <td>{$row.group_type}</td>
                 <td>{$row.id}</td>
                 <td>{$row.module}</td>

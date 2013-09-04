@@ -1,40 +1,48 @@
 <?php
-
-/*
- 
+/**
+ * Test Generated example of using batch get API
+ * *
  */
 function batch_get_example(){
-$params = array( 
+$params = array(
   'id' => 1,
-  'version' => 3,
 );
 
-  $result = civicrm_api( 'batch','get',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('batch', 'get', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function batch_get_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
   'id' => 1,
-  'values' => array( 
-      '1' => array( 
+  'values' => array(
+      '1' => array(
           'id' => '1',
-          'name' => 'Batch_985446',
-          'title' => 'Batch_985446',
+          'name' => 'Batch_433397',
+          'title' => 'Batch_433397',
           'status_id' => '1',
         ),
     ),
 );
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 

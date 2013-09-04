@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -41,33 +41,34 @@
 
   <div class="crm-actions-ribbon">
       <ul id="actions">
-          {assign var='urlParams' value="reset=1"}
-          {if $searchKey}
-              {assign var='urlParams' value=$urlParams|cat:"&key=$searchKey"}
-              {/if}
-          {if $context}
-              {assign var='urlParams' value=$urlParams|cat:"&context=$context"}
-          {/if}
+        {assign var='urlParams' value="reset=1"}
+        {if $searchKey}
+          {assign var='urlParams' value=$urlParams|cat:"&key=$searchKey"}
+        {/if}
+        {if $context}
+          {assign var='urlParams' value=$urlParams|cat:"&context=$context"}
+        {/if}
 
-        {* Include the Actions and Edit buttons if user has 'edit' permission and contact is NOT in trash. *}
-          {if $permission EQ 'edit' and !$isDeleted}
-	      {if call_user_func(array('CRM_Core_Permission','check'), 'access CiviCRM')}
-              <li class="crm-contact-activity crm-summary-block">
-                  {include file="CRM/Contact/Page/Inline/Actions.tpl"}
-              </li>
-	      {/if}
-	      {if call_user_func(array('CRM_Core_Permission','check'), 'edit my contact')}
-              <li>
-                  {assign var='editParams' value=$urlParams|cat:"&action=update&cid=$contactId"}
-                  <a href="{crmURL p='civicrm/contact/add' q=$editParams}" class="edit button" title="{ts}Edit{/ts}">
-                  <span><div class="icon edit-icon"></div>{ts}Edit{/ts}</span>
-                  </a>
-              </li>
-	      {/if}
+        {* CRM-12735 - Conditionally include the Actions and Edit buttons if contact is NOT in trash.*}
+        {if !$isDeleted}
+          {if call_user_func(array('CRM_Core_Permission','check'), 'access CiviCRM')}
+            <li class="crm-contact-activity crm-summary-block">
+              {include file="CRM/Contact/Page/Inline/Actions.tpl"}
+            </li>
           {/if}
+          {* Include Edit button if contact has 'edit contacts' permission OR user is viewing their own contact AND has 'edit my contact' permission. *}
+          {if $permission EQ 'edit' && call_user_func(array('CRM_Core_Permission','check'), 'edit my contact')}
+            <li>
+              {assign var='editParams' value=$urlParams|cat:"&action=update&cid=$contactId"}
+              <a href="{crmURL p='civicrm/contact/add' q=$editParams}" class="edit button" title="{ts}Edit{/ts}">
+              <span><div class="icon edit-icon"></div>{ts}Edit{/ts}</span>
+              </a>
+            </li>
+          {/if}
+        {/if}
 
-          {* Check for permissions to provide Restore and Delete Permanently buttons for contacts that are in the trash. *}
-          {if (call_user_func(array('CRM_Core_Permission','check'), 'access deleted contacts') and
+        {* Check for permissions to provide Restore and Delete Permanently buttons for contacts that are in the trash. *}
+        {if (call_user_func(array('CRM_Core_Permission','check'), 'access deleted contacts') and
           $is_deleted)}
               <li class="crm-contact-restore">
                   <a href="{crmURL p='civicrm/contact/view/delete' q="reset=1&cid=$contactId&restore=1"}" class="delete button" title="{ts}Restore{/ts}">
@@ -345,6 +346,12 @@ cj(document).ready(function($) {
     ignoreLabel: "{/literal}{ts escape='js'}Ignore{/ts}{literal}",
     saveAnywayLabel: "{/literal}{ts escape='js'}Save Anyway{/ts}{literal}",
     reloadLabel: "{/literal}{ts escape='js'}Reload Page{/ts}{literal}"
+  });
+	//Enhance styling of "View Contact" tabs to indicate empty/non-empty tags
+  $('div#mainTabContainer ul').find('li').each(function(n){
+    if($(this).find('em').html()==0){
+      $(this).addClass("disabled");
+    }
   });
 });
 </script>

@@ -1,8 +1,7 @@
 <?php
-
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -38,7 +37,7 @@ class api_v3_APITest extends CiviUnitTestCase {
   public $DBResetRequired = FALSE;
   public $_eNoticeCompliant = TRUE;
 
-  protected $_apiversion;
+  protected $_apiversion =3;
 
   /**
    * Sets up the fixture, for example, opens a network connection.
@@ -48,7 +47,6 @@ class api_v3_APITest extends CiviUnitTestCase {
    */
   protected function setUp() {
     parent::setUp();
-    $this->_apiversion = 3;
   }
 
   /**
@@ -95,40 +93,26 @@ class api_v3_APITest extends CiviUnitTestCase {
   function testAPIWrapperIncludeNoFile() {
 
 
-    $result = civicrm_api('RandomFile', 'get', array('version' => 3));
-    $this->assertEquals($result['is_error'], 1);
-    $this->assertEquals($result['error_message'], 'API (RandomFile,get) does not exist (join the API team and implement it!)');
+    $result = $this->callAPIFailure('RandomFile', 'get', array(), 'API (RandomFile,get) does not exist (join the API team and implement it!)');
   }
 
   function testAPIWrapperCamelCaseFunction() {
-    $result = civicrm_api('OptionGroup', 'Get', array(
-      'version' => 3,
-      ));
-    $this->assertEquals(0, $result['is_error']);
+    $result = $this->callAPISuccess('OptionGroup', 'Get', array());
   }
 
   function testAPIWrapperLcaseFunction() {
-    $result = civicrm_api('OptionGroup', 'get', array(
-      'version' => 3,
-      ));
-    $this->assertEquals(0, $result['is_error']);
+    $result = $this->callAPISuccess('OptionGroup', 'get', array());
   }
 
   function testAPIResolver() {
     $oldpath = get_include_path();
     set_include_path($oldpath . PATH_SEPARATOR . dirname(__FILE__) . '/dataset/resolver');
 
-    $result = civicrm_api('contact', 'example_action1', array(
-        'version' => 3,
-      ));
+    $result = $this->callAPISuccess('contact', 'example_action1', array());
     $this->assertEquals($result['values'][0], 'civicrm_api3_generic_example_action1 is ok');
-    $result = civicrm_api('contact', 'example_action2', array(
-        'version' => 3,
-      ));
+    $result = $this->callAPISuccess('contact', 'example_action2', array());
     $this->assertEquals($result['values'][0], 'civicrm_api3_contact_example_action2 is ok');
-    $result = civicrm_api('test_entity', 'example_action3', array(
-        'version' => 3,
-      ));
+    $result = $this->callAPISuccess('test_entity', 'example_action3', array());
     $this->assertEquals($result['values'][0], 'civicrm_api3_test_entity_example_action3 is ok');
 
     set_include_path($oldpath);
@@ -167,5 +151,68 @@ class api_v3_APITest extends CiviUnitTestCase {
       $this->assertEquals($expected, $actual, sprintf('input=%s expected=%s actual=%s', $input, $expected, $actual));
     }
   }
+/**
+ * Test that calling via wrapper works
+ */
+  function testv3Wrapper() {
+    try{
+      $result = civicrm_api3('contact', 'get', array());
+    }
+    catch (CRM_Exception $e){
+      $this->fail("This should have been a success test");
+    }
+    $this->assertTrue(is_array($result));
+    $this->assertAPISuccess($result);
+  }
+
+  /**
+   * test exception is thrown
+   */
+  function testv3WrapperException(){
+    try{
+      $result = civicrm_api3('contact', 'create', array('debug' => 1));
+    }
+    catch (CiviCRM_API3_Exception $e){
+      $this->assertEquals('mandatory_missing', $e->getErrorCode());
+      $this->assertEquals('Mandatory key(s) missing from params array: contact_type', $e->getMessage());
+      $extra = $e->getExtraParams();
+      $this->assertArrayHasKey('trace', $extra);
+      return;
+    }
+    $this->fail('Exception was expected');
+  }
+
+  public function testCreate_NoStringNullResult() {
+    // create an example contact
+    // $contact = CRM_Core_DAO::createTestObject('CRM_Contribute_DAO_ContributionPage')->toArray();
+    $result = $this->callAPISuccess('ContributionPage', 'create', array(
+      'title' => "Test Contribution Page",
+      'financial_type_id' => 1,
+      'currency' => 'USD',
+      'goal_amount' => 100,
+    ));
+    $contact = array_shift($result['values']);
+
+    $this->assertTrue(is_numeric($contact['id']));
+    $this->assertNotEmpty($contact['title']);
+    // preferred_mail_format preferred_communication_method preferred_language gender_id
+    // currency
+    $this->assertNotEmpty($contact['currency']);
+
+    // update the contact
+    $result = $this->callAPISuccess('ContributionPage', 'create', array(
+      'id' => $contact['id'],
+      'title' => 'New title',
+      'currency' => '',
+    ));
+
+    // check return format
+    $this->assertEquals(1, $result['count']);
+    foreach ($result['values'] as $resultValue) {
+      $this->assertEquals('New title', $resultValue['title']);
+      $this->assertEquals('', $resultValue['currency']); // BUG: $resultValue['location'] === 'null'
+    }
+  }
+
 }
 

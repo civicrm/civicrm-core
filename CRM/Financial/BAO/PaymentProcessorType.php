@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -219,7 +219,7 @@ WHERE pp.payment_processor_type_id = ppt.id AND ppt.id = %1";
    * @see CRM_Core_DAO::buildOptions
    *
    * @param String $fieldName
-   * @param String $context: e.g. "search" "edit" "create" "view"
+   * @param String $context: @see CRM_Core_DAO::buildOptionsContext
    * @param Array  $props: whatever is known about this dao object
    */
   public static function buildOptions($fieldName, $context = NULL, $props = array()) {

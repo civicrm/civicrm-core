@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -196,7 +196,7 @@ class WebTest_Contact_AdvanceSearchPaneTest extends CiviSeleniumTestCase {
         'activity' =>
         array(
           'headerLocator' => 'div#activity',
-          'bodyLocator' => 'input#activity_contact_name',
+          'bodyLocator' => 'input#activity_subject',
           'title' => 'Activities',
           'fields' =>
           array(

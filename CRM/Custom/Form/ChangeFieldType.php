@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -61,7 +61,7 @@ class CRM_Custom_Form_ChangeFieldType extends CRM_Core_Form {
    *
    * @return void
    * @acess protected
-   */ 
+   */
   function preProcess() {
     $this->_id = CRM_Utils_Request::retrieve('id', 'Positive',
       $this, TRUE

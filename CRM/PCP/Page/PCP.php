@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -177,9 +177,7 @@ class CRM_PCP_Page_PCP extends CRM_Core_Page_Basic {
     }
 
 
-    $status = CRM_PCP_PseudoConstant::pcpstatus();
-    $cpages = CRM_Contribute_PseudoConstant::contributionPage();
-    $epages = CRM_Event_PseudoConstant::event();
+    $status = CRM_PCP_BAO_PCP::buildOptions('status_id', 'create');
 
     $pcpSummary = $params = array();
     $whereClause = NULL;

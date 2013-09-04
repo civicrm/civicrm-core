@@ -1,28 +1,36 @@
 <?php
-
-/*
- Demonstrates getvalue action - intended for runtime use as better caching than get
+/**
+ * Test Generated example of using setting getvalue API
+ * Demonstrates getvalue action - intended for runtime use as better caching than get *
  */
 function setting_getvalue_example(){
-$params = array( 
-  'version' => 3,
+$params = array(
   'name' => 'petition_contacts',
   'group' => 'Campaign Preferences',
 );
 
-  $result = civicrm_api( 'setting','getvalue',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('setting', 'getvalue', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function setting_getvalue_expectedresult(){
 
   $expectedResult = 'Petition Contacts';
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 

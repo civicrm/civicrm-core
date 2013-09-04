@@ -1,40 +1,40 @@
 <?php
-
-/*
- 
+/**
+ * Test Generated example of using address delete API
+ * *
  */
 function address_delete_example(){
-$params = array( 
-  'contact_id' => 8,
-  'location_type_id' => 11,
-  'street_name' => 'Ambachtstraat',
-  'street_number' => '23',
-  'street_address' => 'Ambachtstraat 23',
-  'postal_code' => '6971 BN',
-  'country_id' => '1152',
-  'city' => 'Brummen',
-  'is_primary' => 1,
-  'version' => 3,
+$params = array(
+  'id' => 6,
 );
 
-  $result = civicrm_api( 'address','delete',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('address', 'delete', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function address_delete_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
-  'values' => 1,
+  'values' => true,
 );
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 

@@ -2,7 +2,7 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -36,16 +36,13 @@ require_once 'CiviTest/CiviUnitTestCase.php';
  */
 
 class api_v3_ACLCachingTest extends CiviUnitTestCase {
-  protected $_apiversion;
+  protected $_apiversion = 3;
   protected $_params;
-
   public $_eNoticeCompliant = TRUE;
+  public $DBResetRequired = FALSE;
 
   function setUp() {
-    $this->_apiversion = 3;
-
     parent::setUp();
-
   }
 /**
  * (non-PHPdoc)
@@ -59,12 +56,12 @@ class api_v3_ACLCachingTest extends CiviUnitTestCase {
   }
 
   function testActivityCreateCustomBefore() {
-    $values = civicrm_api('custom_field', 'getoptions', array('field' => 'custom_group_id', 'version' => 3));
+    $values = $this->callAPISuccess('custom_field', 'getoptions', array('field' => 'custom_group_id',));
     $this->assertTrue($values['count'] == 0);
-    $this->CustomGroupCreate('Activity', 'cachingtest');
-    $groupCount = civicrm_api('custom_group', 'getcount', array('version' => 3, 'extends' => 'activity'));
+    $this->CustomGroupCreate(array('extends' => 'Activity'));
+    $groupCount = $this->callAPISuccess('custom_group', 'getcount', array('extends' => 'activity'));
     $this->assertEquals($groupCount, 1, 'one group should now exist');
-    $values = civicrm_api('custom_field', 'getoptions', array('field' => 'custom_group_id', 'version' => 3));
+    $values = $this->callAPISuccess('custom_field', 'getoptions', array('field' => 'custom_group_id'));
     $this->assertTrue($values['count'] == 1, 'check that cached value is not retained for custom_group_id');
   }
 }

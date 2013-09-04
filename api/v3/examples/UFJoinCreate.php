@@ -1,37 +1,45 @@
 <?php
-
-/*
- 
+/**
+ * Test Generated example of using uf_join create API
+ * *
  */
 function uf_join_create_example(){
-$params = array( 
+$params = array(
   'module' => 'CiviContribute',
   'entity_table' => 'civicrm_contribution_page',
   'entity_id' => 1,
   'weight' => 1,
   'uf_group_id' => 11,
   'is_active' => 1,
-  'version' => 3,
   'sequential' => 1,
 );
 
-  $result = civicrm_api( 'uf_join','create',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('uf_join', 'create', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function uf_join_create_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
   'id' => 0,
-  'values' => array( 
-      '0' => array( 
+  'values' => array(
+      '0' => array(
           'id' => '1',
           'is_active' => '1',
           'module' => 'CiviContribute',
@@ -43,7 +51,7 @@ function uf_join_create_expectedresult(){
     ),
 );
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 

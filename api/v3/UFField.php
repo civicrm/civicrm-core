@@ -2,7 +2,7 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -54,7 +54,7 @@ function civicrm_api3_uf_field_create($params) {
   civicrm_api3_verify_one_mandatory($params, NULL, array('field_name', 'uf_group_id'));
   $groupId = CRM_Utils_Array::value('uf_group_id', $params);
   if ((int) $groupId < 1) {
-    return civicrm_api3_create_error('Params must be a field_name-carrying array and a positive integer.');
+    throw new API_Exception('Params must be a field_name-carrying array and a positive integer.');
   }
 
   $field_type       = CRM_Utils_Array::value('field_type', $params);
@@ -63,7 +63,7 @@ function civicrm_api3_uf_field_create($params) {
   $phone_type       = CRM_Utils_Array::value('phone_type_id', $params, CRM_Utils_Array::value('phone_type', $params));
 
   if (! CRM_Core_BAO_UFField::isValidFieldName($field_name)) {
-    return civicrm_api3_create_error('The field_name is not valid');
+    throw new API_Exception('The field_name is not valid');
   }
   $params['field_name'] = array($field_type, $field_name, $location_type_id, $phone_type);
 
@@ -86,13 +86,13 @@ function civicrm_api3_uf_field_create($params) {
       }
     }
     else {
-      return civicrm_api3_create_error("there is no field for this fieldId");
+      throw new API_Exception("there is no field for this fieldId");
     }
     $ids['uf_field'] = $fieldId;
   }
 
   if (CRM_Core_BAO_UFField::duplicateField($params, $ids)) {
-    return civicrm_api3_create_error("The field was not added. It already exists in this profile.");
+    throw new API_Exception("The field was not added. It already exists in this profile.");
   }
   if (CRM_Utils_Array::value('option.autoweight', $params, TRUE)) {
     $params['weight'] = CRM_Core_BAO_UFField::autoWeight($params);
@@ -114,7 +114,7 @@ function civicrm_api3_uf_field_create($params) {
 function _civicrm_api3_uf_field_create_spec(&$params) {
   $params['option.autoweight'] = array(
     'title' => "Automatically adjust weights in UFGroup to align with UFField",
-    'type' => CRM_Utils_Type::T_BOOL
+    'type' => CRM_Utils_Type::T_BOOLEAN
   );
 }
 
@@ -150,7 +150,7 @@ function civicrm_api3_uf_field_delete($params) {
 
   $ufGroupId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_UFField', $fieldId, 'uf_group_id');
   if (!$ufGroupId) {
-    return civicrm_api3_create_error('Invalid value for field_id.');
+    throw new API_Exception('Invalid value for field_id.');
   }
 
   $result = CRM_Core_BAO_UFField::del($fieldId);

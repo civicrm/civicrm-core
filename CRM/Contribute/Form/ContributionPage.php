@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -267,7 +267,7 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
       // get price set of type contributions
       //this is the value for stored in db if price set extends contribution
       $usedFor = 2;
-      $this->_priceSetID = CRM_Price_BAO_Set::getFor('civicrm_contribution_page', $this->_id, $usedFor, 1);
+      $this->_priceSetID = CRM_Price_BAO_PriceSet::getFor('civicrm_contribution_page', $this->_id, $usedFor, 1);
       if ($this->_priceSetID) {
         $defaults['price_set_id'] = $this->_priceSetID;
       }

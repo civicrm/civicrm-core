@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -23,6 +23,10 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
+
+<div class="crm-profile-name-{$ufGroupName}">
+{crmRegion name=profile-search-`$ufGroupName`}
+
 {* make sure there are some fields in the selector *}
 {if ! empty( $columnHeaders ) || $isReset }
 
@@ -69,8 +73,12 @@
       {counter start=0 skip=1 print=false}
       {foreach from=$rows item=row name=listings}
       <tr id="row-{$smarty.foreach.listings.iteration}" class="{cycle values="odd-row,even-row"}">
-      {foreach from=$row item=value}
-        <td>{$value}</td>
+      {foreach from=$row key=index item=value}
+        {if $columnHeaders.$index.field_name}
+          <td class="crm-{$columnHeaders.$index.field_name}">{$value}</td>
+        {else}
+          <td>{$value}</td>
+        {/if}
       {/foreach}
       </tr>
       {/foreach}
@@ -90,3 +98,6 @@
     </div>
 {/if}
 </div>
+
+{/crmRegion}
+</div>{* crm-profile-name-NAME *}

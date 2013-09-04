@@ -2,7 +2,7 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -548,7 +548,7 @@ SELECT COUNT({$this->_aliases['civicrm_grant']}.id) as count ,
       return;
     }
 
-    $currencies = CRM_Core_PseudoConstant::get('CRM_Grant_DAO_Grant', 'currency');
+    $currencies = CRM_Core_PseudoConstant::get('CRM_Grant_DAO_Grant', 'currency', array('labelColumn' => 'symbol'));
     $currency = $currencies[$values['civicrm_grant_currency']];
 
     if (!$customData) {

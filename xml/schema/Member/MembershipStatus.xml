@@ -40,83 +40,83 @@
        <name>start_event</name>
        <type>enum</type>
        <values>start_date, end_date, join_date</values>
-       <comment>Event when this status starts.</comment>  
+       <comment>Event when this status starts.</comment>
        <add>1.5</add>
   </field>
-  <field>  
-      <name>start_event_adjust_unit</name>  
+  <field>
+      <name>start_event_adjust_unit</name>
       <type>enum</type>
       <values>day, month, year</values>
-      <comment>Unit used for adjusting from start_event.</comment>  
-      <add>1.5</add>  
+      <comment>Unit used for adjusting from start_event.</comment>
+      <add>1.5</add>
   </field>
-  <field> 
-      <name>start_event_adjust_interval</name>  
-      <type>int</type>                  
-      <comment>Status range begins this many units from start_event.</comment>  
-      <add>1.5</add>  
-  </field> 
-  <field>  
+  <field>
+      <name>start_event_adjust_interval</name>
+      <type>int</type>
+      <comment>Status range begins this many units from start_event.</comment>
+      <add>1.5</add>
+  </field>
+  <field>
       <name>end_event</name>
       <type>enum</type>
       <values>start_date, end_date, join_date</values>
-      <comment>Event after which this status ends.</comment>  
-      <add>1.5</add>  
-  </field> 
-  <field>  
+      <comment>Event after which this status ends.</comment>
+      <add>1.5</add>
+  </field>
+  <field>
       <name>end_event_adjust_unit</name>
       <type>enum</type>
-      <values>day, month, year</values>      
-      <comment>Unit used for adjusting from the ending event.</comment>  
-      <add>1.5</add>     
-  </field> 
- <field>  
-      <name>end_event_adjust_interval</name>  
-      <type>int</type>                  
-      <comment>Status range ends this many units from end_event.</comment>  
-      <add>1.5</add>  
-  </field> 
-  <field>  
-      <name>is_current_member</name>     
+      <values>day, month, year</values>
+      <comment>Unit used for adjusting from the ending event.</comment>
+      <add>1.5</add>
+  </field>
+ <field>
+      <name>end_event_adjust_interval</name>
+      <type>int</type>
+      <comment>Status range ends this many units from end_event.</comment>
+      <add>1.5</add>
+  </field>
+  <field>
+      <name>is_current_member</name>
       <title>Current Membership?</title>
       <type>boolean</type>
       <comment>Does this status aggregate to current members (e.g. New, Renewed, Grace might all be TRUE... while Unrenewed, Lapsed, Inactive would be FALSE).</comment>
-      <add>1.5</add>  
-  </field> 
-  <field>  
-      <name>is_admin</name>     
+      <add>1.5</add>
+  </field>
+  <field>
+      <name>is_admin</name>
       <title>Admin Assigned Only?</title>
       <type>boolean</type>
       <comment>Is this status for admin/manual assignment only.</comment>
-      <add>1.5</add>  
-  </field> 
-  <field>  
-      <name>weight</name>     
+      <add>1.5</add>
+  </field>
+  <field>
+      <name>weight</name>
       <title>Weight</title>
       <type>int</type>
-      <add>1.5</add>  
-  </field> 
-  <field>  
-      <name>is_default</name>     
+      <add>1.5</add>
+  </field>
+  <field>
+      <name>is_default</name>
       <title>Default Status?</title>
       <type>boolean</type>
       <comment>Assign this status to a membership record if no other status match is found.</comment>
-      <add>1.5</add>  
-  </field> 
-  <field>  
-      <name>is_active</name>     
+      <add>1.5</add>
+  </field>
+  <field>
+      <name>is_active</name>
       <title>Is Active</title>
       <type>boolean</type>
       <default>1</default>
       <comment>Is this membership_status enabled.</comment>
-      <add>1.5</add>  
-  </field> 
- <field>  
-      <name>is_reserved</name>     
+      <add>1.5</add>
+  </field>
+ <field>
+      <name>is_reserved</name>
       <title>Is Reserved</title>
       <type>boolean</type>
       <default>0</default>
       <comment>Is this membership_status reserved.</comment>
-      <add>2.1</add>  
-  </field> 
+      <add>2.1</add>
+  </field>
 </table>

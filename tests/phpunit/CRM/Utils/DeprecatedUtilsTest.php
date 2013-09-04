@@ -4,6 +4,10 @@ require_once 'CiviTest/CiviUnitTestCase.php';
 require_once 'CRM/Utils/DeprecatedUtils.php';
 
 class CRM_Utils_DeprecatedUtilsTest extends CiviUnitTestCase {
+  //@todo make BAO enotice compliant  & remove the line below
+  // WARNING - NEVER COPY & PASTE $_eNoticeCompliant = FALSE
+  // new test classes should be compliant.
+  public $_eNoticeCompliant = FALSE;
 
   function get_info() {
     return array(
@@ -26,7 +30,6 @@ class CRM_Utils_DeprecatedUtilsTest extends CiviUnitTestCase {
     );
 
     $this->quickCleanup($tablesToTruncate);
-    $this->contributionTypeDelete();
   }
   /**
    *  Test civicrm_contact_check_params with no contact type

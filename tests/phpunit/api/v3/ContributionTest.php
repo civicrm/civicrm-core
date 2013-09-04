@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -43,7 +43,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    */
   protected $_individualId;
   protected $_contribution;
-  protected $_contributionTypeId = 1;
+  protected $_financialTypeId = 1;
   protected $_apiversion;
   protected $_entity = 'Contribution';
   public $debug = 0;
@@ -59,13 +59,12 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'contact_id' => $this->_individualId,
       'receive_date' => '20120511',
       'total_amount' => 100.00,
-      'financial_type_id'   => $this->_contributionTypeId,
+      'financial_type_id'   => $this->_financialTypeId,
       'non_deductible_amount' => 10.00,
       'fee_amount' => 5.00,
       'net_amount' => 95.00,
       'source' => 'SSF',
       'contribution_status_id' => 1,
-      'version' => $this->_apiversion,
     );
     $this->_processorParams = array(
       'domain_id' => 1,
@@ -79,7 +78,6 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'billing_mode' => 1,
     );
     $this->_pageParams = array(
-      'version' => 3,
       'title' => 'Test Contribution Page',
       'financial_type_id' => 1,
       'currency' => 'USD',
@@ -93,8 +91,6 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   }
 
   function tearDown() {
-
-    $this->contributionTypeDelete();
     $this->quickCleanup(array(
       'civicrm_contribution',
       'civicrm_contribution_soft',
@@ -110,27 +106,12 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     ));
   }
 
-  ///////////////// civicrm_contribution_get methods
-  function testGetEmptyParamsContribution() {
-    $params = array();
-    $contribution = civicrm_api('contribution', 'get', $params);
-    $this->assertAPIFailure($contribution);
-    $this->assertEquals($contribution['error_message'], 'Mandatory key(s) missing from params array: version');
-  }
-
-  function testGetParamsNotArrayContribution() {
-    $params = 'contact_id= 1';
-    $contribution = civicrm_api('contribution', 'get', $params);
-    $this->assertAPIFailure($contribution);
-    $this->assertEquals($contribution['error_message'], 'Input variable `params` is not an array');
-  }
-
   function testGetContribution() {
     $p = array(
       'contact_id' => $this->_individualId,
       'receive_date' => '2010-01-20',
       'total_amount' => 100.00,
-      'financial_type_id' => $this->_contributionTypeId,
+      'financial_type_id' => $this->_financialTypeId,
       'non_deductible_amount' => 10.00,
       'fee_amount' => 5.00,
       'net_amount' => 95.00,
@@ -138,22 +119,18 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'invoice_id' => 78910,
       'source' => 'SSF',
       'contribution_status_id' => 1,
-      'version' => $this->_apiversion,
     );
-    $this->_contribution = civicrm_api('contribution', 'create', $p);
-    $this->assertAPISuccess($this->_contribution, 0, 'In line ' . __LINE__);
+    $this->_contribution = $this->callAPISuccess('contribution', 'create', $p);
 
     $params = array(
       'contribution_id' => $this->_contribution['id'],
-      'version' => $this->_apiversion,
     );
-    $contribution = civicrm_api('contribution', 'get', $params);
-    $financialParams['id'] = $this->_contributionTypeId;
+    $contribution = $this->callAPIAndDocument('contribution', 'get', $params, __FUNCTION__, __FILE__);
+    $financialParams['id'] = $this->_financialTypeId;
     $default = null;
     $financialType  =  CRM_Financial_BAO_FinancialType::retrieve($financialParams,$default);
-    $this->assertAPISuccess($contribution, 'In line ' . __LINE__);
+
     $this->assertEquals(1,$contribution['count']);
-    $this->documentMe($params, $contribution, __FUNCTION__, __FILE__);
     $this->assertEquals($contribution['values'][$contribution['id']]['contact_id'], $this->_individualId, 'In line ' . __LINE__);
     // note there was an assertion converting financial_type_id to 'Donation' which wasn't working.
     // passing back a string rather than an id seems like an error / cruft - & if it is to be introduced we should discuss
@@ -170,54 +147,39 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $p['trxn_id'] = '3847';
     $p['invoice_id'] = '3847';
 
-    $contribution2 = civicrm_api('contribution', 'create', $p);
-    $this->assertAPISuccess($contribution2, 'In line ' . __LINE__);
+    $contribution2 = $this->callAPISuccess('contribution', 'create', $p);
 
-    $params = array(
-      'version' => $this->_apiversion,
-    );
     // now we have 2 - test getcount
-    $contribution = civicrm_api('contribution', 'getcount', array(
-      'version' => $this->_apiversion,
-      ));
+    $contribution = $this->callAPISuccess('contribution', 'getcount', array());
     $this->assertEquals(2, $contribution);
     //test id only format
-    $contribution = civicrm_api('contribution', 'get', array
-      ('version' => $this->_apiversion,
-        'id' => $this->_contribution['id'],
-        'format.only_id' => 1,
-      )
-    );
+    $contribution = $this->callAPISuccess('contribution', 'get', array(
+      'id' => $this->_contribution['id'],
+      'format.only_id' => 1,
+    ));
     $this->assertEquals($this->_contribution['id'], $contribution, print_r($contribution,true) . " in line " . __LINE__);
     //test id only format
-    $contribution = civicrm_api('contribution', 'get', array
-      ('version' => $this->_apiversion,
-        'id' => $contribution2['id'],
-        'format.only_id' => 1,
-      )
-    );
+    $contribution = $this->callAPISuccess('contribution', 'get', array(
+      'id' => $contribution2['id'],
+      'format.only_id' => 1,
+    ));
     $this->assertEquals($contribution2['id'], $contribution);
-    $contribution = civicrm_api('contribution', 'get', array(
-      'version' => $this->_apiversion,
-        'id' => $this->_contribution['id'],
-      ));
     //test id as field
-    $this->assertAPISuccess($contribution, 'In line ' . __LINE__);
+    $contribution = $this->callAPISuccess('contribution', 'get', array(
+      'id' => $this->_contribution['id'],
+    ));
     $this->assertEquals(1, $contribution['count'], 'In line ' . __LINE__);
-    // $this->assertEquals($this->_contribution['id'], $contribution['id'] )  ;
+
     //test get by contact id works
-    $contribution = civicrm_api('contribution', 'get', array('version' => $this->_apiversion, 'contact_id' => $this->_individualId));
-    $this->assertAPISuccess($contribution, 'In line ' . __LINE__ . "get with contact_id" . print_r(array('version' => $this->_apiversion, 'contact_id' => $this->_individualId), TRUE));
+    $contribution = $this->callAPISuccess('contribution', 'get', array('contact_id' => $this->_individualId));
 
     $this->assertEquals(2, $contribution['count'], 'In line ' . __LINE__);
-    civicrm_api('Contribution', 'Delete', array(
+    $this->callAPISuccess('Contribution', 'Delete', array(
       'id' => $this->_contribution['id'],
-        'version' => $this->_apiversion,
-      ));
-    civicrm_api('Contribution', 'Delete', array(
+    ));
+    $this->callAPISuccess('Contribution', 'Delete', array(
       'id' => $contribution2['id'],
-        'version' => $this->_apiversion,
-      ));
+    ));
   }
 
 /**
@@ -228,7 +190,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'contact_id' => $this->_individualId,
       'receive_date' => '2010-01-20',
       'total_amount' => 100.00,
-      'contribution_type_id' => $this->_contributionTypeId,
+      'contribution_type_id' => $this->_financialTypeId,
       'non_deductible_amount' => 10.00,
       'fee_amount' => 5.00,
       'net_amount' => 95.00,
@@ -236,25 +198,21 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'invoice_id' => 78910,
       'source' => 'SSF',
       'contribution_status_id' => 1,
-      'version' => $this->_apiversion,
     );
-    $this->_contribution = civicrm_api('contribution', 'create', $p);
-    $this->assertAPISuccess($this->_contribution, 'In line ' . __LINE__);
+    $this->_contribution = $this->callAPISuccess('contribution', 'create', $p);
 
     $params = array(
       'contribution_id' => $this->_contribution['id'],
-      'version' => $this->_apiversion,
     );
-    $contribution = civicrm_api('contribution', 'get', $params);
-    $financialParams['id'] = $this->_contributionTypeId;
+    $contribution = $this->callAPIAndDocument('contribution', 'get', $params, __FUNCTION__, __FILE__);
+    $financialParams['id'] = $this->_financialTypeId;
     $default = null;
     $financialType  =  CRM_Financial_BAO_FinancialType::retrieve($financialParams,$default);
-    $this->assertAPISuccess($contribution, 'In line ' . __LINE__);
+
     $this->assertEquals(1,$contribution['count']);
-    $this->documentMe($params, $contribution, __FUNCTION__, __FILE__);
     $this->assertEquals($contribution['values'][$contribution['id']]['contact_id'], $this->_individualId, 'In line ' . __LINE__);
-    $this->assertEquals($contribution['values'][$contribution['id']]['financial_type_id'], $this->_contributionTypeId);
-    $this->assertEquals($contribution['values'][$contribution['id']]['contribution_type_id'], $this->_contributionTypeId);
+    $this->assertEquals($contribution['values'][$contribution['id']]['financial_type_id'], $this->_financialTypeId);
+    $this->assertEquals($contribution['values'][$contribution['id']]['contribution_type_id'], $this->_financialTypeId);
     $this->assertEquals($contribution['values'][$contribution['id']]['total_amount'], 100.00, 'In line ' . __LINE__);
     $this->assertEquals($contribution['values'][$contribution['id']]['non_deductible_amount'], 10.00, 'In line ' . __LINE__);
     $this->assertEquals($contribution['values'][$contribution['id']]['fee_amount'], 5.00, 'In line ' . __LINE__);
@@ -267,53 +225,38 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $p['trxn_id'] = '3847';
     $p['invoice_id'] = '3847';
 
-    $contribution2 = civicrm_api('contribution', 'create', $p);
-    $this->assertAPISuccess($contribution2, 'In line ' . __LINE__);
+    $contribution2 = $this->callAPISuccess('contribution', 'create', $p);
 
-    $params = array(
-      'version' => $this->_apiversion,
-    );
     // now we have 2 - test getcount
-    $contribution = civicrm_api('contribution', 'getcount', array(
-      'version' => $this->_apiversion,
-    ));
+    $contribution = $this->callAPISuccess('contribution', 'getcount', array());
     $this->assertEquals(2, $contribution);
     //test id only format
-    $contribution = civicrm_api('contribution', 'get', array
-      ('version' => $this->_apiversion,
-        'id' => $this->_contribution['id'],
-        'format.only_id' => 1,
-      )
-    );
+    $contribution = $this->callAPISuccess('contribution', 'get', array(
+      'id' => $this->_contribution['id'],
+      'format.only_id' => 1,
+    ));
     $this->assertEquals($this->_contribution['id'], $contribution, print_r($contribution,true) . " in line " . __LINE__);
     //test id only format
-    $contribution = civicrm_api('contribution', 'get', array
-      ('version' => $this->_apiversion,
-        'id' => $contribution2['id'],
-        'format.only_id' => 1,
-      )
-    );
+    $contribution = $this->callAPISuccess('contribution', 'get', array(
+      'id' => $contribution2['id'],
+      'format.only_id' => 1,
+    ));
     $this->assertEquals($contribution2['id'], $contribution);
-    $contribution = civicrm_api('contribution', 'get', array(
-      'version' => $this->_apiversion,
+    $contribution = $this->callAPISuccess('contribution', 'get', array(
       'id' => $this->_contribution['id'],
     ));
     //test id as field
-    $this->assertAPISuccess($contribution, 'In line ' . __LINE__);
     $this->assertEquals(1, $contribution['count'], 'In line ' . __LINE__);
     // $this->assertEquals($this->_contribution['id'], $contribution['id'] )  ;
     //test get by contact id works
-    $contribution = civicrm_api('contribution', 'get', array('version' => $this->_apiversion, 'contact_id' => $this->_individualId));
-    $this->assertAPISuccess($contribution, 'In line ' . __LINE__ . "get with contact_id" . print_r(array('version' => $this->_apiversion, 'contact_id' => $this->_individualId), TRUE));
+    $contribution = $this->callAPISuccess('contribution', 'get', array('contact_id' => $this->_individualId));
 
     $this->assertEquals(2, $contribution['count'], 'In line ' . __LINE__);
-    civicrm_api('Contribution', 'Delete', array(
+    $this->callAPISuccess('Contribution', 'Delete', array(
     'id' => $this->_contribution['id'],
-    'version' => $this->_apiversion,
     ));
-    civicrm_api('Contribution', 'Delete', array(
+    $this->callAPISuccess('Contribution', 'Delete', array(
     'id' => $contribution2['id'],
-    'version' => $this->_apiversion,
     ));
   }
   ///////////////// civicrm_contribution_
@@ -322,13 +265,11 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'contribution_id' => FALSE,
       'contact_id' => 1,
       'total_amount' => 1,
-      'version' => 3,
       'check_permissions' => false,
       'financial_type_id' => 'Donation',
     );
-    $contribution = civicrm_api('contribution', 'create', $params);
-    $this->assertAPISuccess($contribution, 'In line ' . __LINE__);
-  }
+    $contribution = $this->callAPISuccess('contribution', 'create', $params);
+ }
   /*
    * ensure we continue to support contribution_type_id as part of the api commitment to
    * stability
@@ -339,39 +280,12 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'contribution_id' => FALSE,
       'contact_id' => 1,
       'total_amount' => 1,
-      'version' => 3,
       'check_permissions' => false,
       'contribution_type_id' => 3,
     );
-    $contribution = civicrm_api('contribution', 'create', $params);
-    $this->assertAPISuccess($contribution, 'In line ' . __LINE__);
-    $contribution = civicrm_api('contribution', 'getsingle', array('version' => $this->_apiversion, 'id' => $contribution['id']));
+    $contribution = $this->callAPISuccess('contribution', 'create', $params);
+    $contribution = $this->callAPISuccess('contribution', 'getsingle', array( 'id' => $contribution['id']));
     $this->assertEquals(3, $contribution['financial_type_id']);
-  }
-
-  ///////////////// civicrm_contribution_
-  function testCreateEmptyParamsContribution() {
-
-
-    $params = array('version' => $this->_apiversion);
-    $contribution = civicrm_api('contribution', 'create', $params);
-    $this->assertAPIFailure($contribution);
-    $this->assertEquals($contribution['error_message'], 'Mandatory key(s) missing from params array: financial_type_id, total_amount, contact_id', 'In line ' . __LINE__);
-  }
-
-  function testCreateParamsNotArrayContribution() {
-
-    $params = 'contact_id= 1';
-    $contribution = civicrm_api('contribution', 'create', $params);
-    $this->assertAPIFailure($contribution);
-    $this->assertEquals($contribution['error_message'], 'Input variable `params` is not an array');
-  }
-
-  function testCreateParamsWithoutRequiredKeys() {
-    $params = array('version' => 3);
-    $contribution = civicrm_api('contribution', 'create', $params);
-    $this->assertAPIFailure($contribution);
-    $this->assertEquals($contribution['error_message'], 'Mandatory key(s) missing from params array: financial_type_id, total_amount, contact_id');
   }
 
   /**
@@ -386,16 +300,12 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $params = $this->_params;
     $params['custom_' . $ids['custom_field_id']] = "custom string";
 
-    $result = civicrm_api($this->_entity, 'create', $params);
+    $result = $this->callAPIAndDocument($this->_entity, 'create', $params,  __FUNCTION__, __FILE__);
     $this->assertEquals($result['id'], $result['values'][$result['id']]['id']);
-    $this->documentMe($params, $result, __FUNCTION__, __FILE__);
-    $this->assertAPISuccess($result, ' in line ' . __LINE__);
-    $check = civicrm_api($this->_entity, 'get', array(
-        'return.custom_' . $ids['custom_field_id'] => 1,
-        'version' => 3,
-        'id' => $result['id'],
-      )
-    );
+    $check = $this->callAPISuccess($this->_entity, 'get', array(
+      'return.custom_' . $ids['custom_field_id'] => 1,
+      'id' => $result['id'],
+    ));
     $this->customFieldDelete($ids['custom_field_id']);
     $this->customGroupDelete($ids['custom_group_id']);
     $this->assertEquals("custom string", $check['values'][$check['id']]['custom_' . $ids['custom_field_id']], ' in line ' . __LINE__);
@@ -410,7 +320,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   function testCreateGetFieldsWithCustom() {
     $ids        = $this->entityCustomGroupWithSingleFieldCreate(__FUNCTION__, __FILE__);
     $idsContact = $this->entityCustomGroupWithSingleFieldCreate(__FUNCTION__, 'ContactTest.php');
-    $result     = civicrm_api('Contribution', 'getfields', array('version' => 3));
+    $result     = $this->callAPISuccess('Contribution', 'getfields', array());
     $this->assertArrayHasKey('custom_' . $ids['custom_field_id'], $result['values']);
     $this->assertArrayNotHasKey('custom_' . $idsContact['custom_field_id'], $result['values']);
     $this->customFieldDelete($ids['custom_field_id']);
@@ -425,7 +335,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'contact_id' => $this->_individualId,
       'receive_date' => '20120511',
       'total_amount' => 100.00,
-      'financial_type_id'      => $this->_contributionTypeId,
+      'financial_type_id'      => $this->_financialTypeId,
       'payment_instrument_id' => 1,
       'non_deductible_amount' => 10.00,
       'fee_amount' => 50.00,
@@ -434,13 +344,11 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'invoice_id' => 67890,
       'source' => 'SSF',
       'contribution_status_id' => 1,
-      'version' => $this->_apiversion,
       'skipLineItem' => 1,
     );
 
-    $contribution = civicrm_api('contribution', 'create', $params);
-    $lineItems = civicrm_api('line_item','get',array(
-      'version' => $this->_apiversion,
+    $contribution = $this->callAPISuccess('contribution', 'create', $params);
+    $lineItems = $this->callAPISuccess('line_item','get',array(
       'entity_id' => $contribution['id'],
       'entity_table' => 'civicrm_contribution',
       'sequential' => 1,
@@ -456,7 +364,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'contact_id' => $this->_individualId,
       'receive_date' => '20120511',
       'total_amount' => 100.00,
-      'financial_type_id' => $this->_contributionTypeId,
+      'financial_type_id' => $this->_financialTypeId,
       'payment_instrument_id' => 1,
       'non_deductible_amount' => 10.00,
       'fee_amount' => 50.00,
@@ -465,7 +373,6 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'invoice_id' => 67890,
       'source' => 'SSF',
       'contribution_status_id' => 1,
-      'version' => $this->_apiversion,
       'skipLineItem' => 1,
       'api.line_item.create' => array(
         array(
@@ -483,13 +390,11 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       ),
     );
 
-    $contribution = civicrm_api('contribution', 'create', $params);
     $description = "Create Contribution with Nested Line Items";
     $subfile = "CreateWithNestedLineItems";
-    $this->documentMe($params, $contribution, __FUNCTION__,__FILE__, $description, $subfile);
-    $this->assertAPISuccess($contribution, 'In line ' . __LINE__);
-    $lineItems = civicrm_api('line_item','get',array(
-      'version' => $this->_apiversion,
+    $contribution = $this->callAPIAndDocument('contribution', 'create', $params, __FUNCTION__,__FILE__, $description, $subfile);
+
+    $lineItems = $this->callAPISuccess('line_item','get',array(
       'entity_id' => $contribution['id'],
       'entity_table' => 'civicrm_contribution',
       'sequential' => 1,
@@ -507,11 +412,9 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'invoice_id' => 67890,
       'source' => 'SSF',
       'contribution_status_id' => 1,
-      'version' => $this->_apiversion,
     );
 
-    $contribution = civicrm_api('contribution', 'create', $params);
-    $this->documentMe($params, $contribution, __FUNCTION__, __FILE__);
+    $contribution = $this->callAPIAndDocument('contribution', 'create', $params, __FUNCTION__, __FILE__);
     $this->assertEquals($contribution['values'][$contribution['id']]['contact_id'], $this->_individualId, 'In line ' . __LINE__);
     $this->assertEquals($contribution['values'][$contribution['id']]['total_amount'], 100.00, 'In line ' . __LINE__);
     $this->assertEquals($contribution['values'][$contribution['id']]['financial_type_id'],1, 'In line ' . __LINE__ );
@@ -519,8 +422,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->assertEquals($contribution['values'][$contribution['id']]['invoice_id'], 67890, 'In line ' . __LINE__);
     $this->assertEquals($contribution['values'][$contribution['id']]['source'], 'SSF', 'In line ' . __LINE__);
     $this->assertEquals($contribution['values'][$contribution['id']]['contribution_status_id'], 1, 'In line ' . __LINE__);
-    $lineItems = civicrm_api('line_item','get',array(
-      'version' => $this->_apiversion,
+    $lineItems = $this->callAPISuccess('line_item','get',array(
       'entity_id' => $contribution['id'],
       'entity_table' => 'civicrm_contribution',
       'sequential' => 1,
@@ -528,57 +430,60 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->assertEquals(1, $lineItems['count']);
     $this->assertEquals($contribution['id'], $lineItems['values'][0]['entity_id']);
     $this->assertEquals($contribution['id'], $lineItems['values'][0]['entity_id']);
-    $lineItems = civicrm_api('line_item','get',array(
-        'version' => $this->_apiversion,
-        'entity_id' => $contribution['id'],
-        'entity_table' => 'civicrm_contribution',
-        'sequential' => 1,
+    $lineItems = $this->callAPISuccess('line_item','get',array(
+      'entity_id' => $contribution['id'],
+      'entity_table' => 'civicrm_contribution',
+      'sequential' => 1,
     ));
     $this->assertEquals(1, $lineItems['count']);
     $this->_checkFinancialRecords($contribution, 'offline');
     $this->contributionGetnCheck($params, $contribution['id']);
   }
-  /*
-   *
+  /**
+   * test create with valid payment instument
    */
   function testCreateContributionWithPaymentInstrument() {
     $params = $this->_params + array('payment_instrument' => 'EFT');
-    $contribution =  civicrm_api('contribution','create',$params);
-    $contribution = civicrm_api('contribution','get',array('version'=> 3, 'sequential' => 1, 'id' => $contribution['id']));
+    $contribution = $this->callAPISuccess('contribution', 'create', $params);
+    $contribution = $this->callAPISuccess('contribution','get', array(
+      'sequential' => 1,
+      'id' => $contribution['id']
+    ));
     $this->assertArrayHasKey('payment_instrument', $contribution['values'][0]);
-    $eftTypeId = CRM_Core_OptionGroup::getValue('payment_instrument', 'EFT');
-    $this->assertEquals('EFT',$contribution['values'][0]['payment_instrument']);
-    $contribution = civicrm_api('contribution', 'update', array('id' => $contribution['id'], 'version' => $this->_apiversion, 'payment_instrument' => 'Credit Card'));
-    $this->assertAPISuccess($contribution);
+    $this->assertEquals('EFT', $contribution['values'][0]['payment_instrument']);
+
+    $this->callAPISuccess('contribution', 'create', array('id' => $contribution['id'], 'payment_instrument' => 'Credit Card'));
+    $contribution = $this->callAPISuccess('contribution','get', array(
+      'sequential' => 1,
+      'id' => $contribution['id']
+    ));
+    $this->assertArrayHasKey('payment_instrument', $contribution['values'][0]);
+    $this->assertEquals('Credit Card', $contribution['values'][0]['payment_instrument']);
   }
 
   function testGetContributionByPaymentInstrument() {
-    $eftTypeId = CRM_Core_OptionGroup::getValue('payment_instrument', 'EFT');
-    $cashTypeId = CRM_Core_OptionGroup::getValue('payment_instrument', 'Cash');
     $params = $this->_params + array('payment_instrument' => 'EFT');
-    $params2 = $this->_params + array('payment_instrument' => 'Cash',);
-    civicrm_api('contribution','create',$params);
-    $contribution = civicrm_api('contribution','create',$params2);
-    $this->assertAPISuccess($contribution);
-    $contribution = civicrm_api('contribution','get',array('version'=> 3, 'sequential' => 1, 'contribution_payment_instrument_id' => 'Cash'));
+    $params2 = $this->_params + array('payment_instrument' => 'Cash');
+    $this->callAPISuccess('contribution','create',$params);
+    $this->callAPISuccess('contribution','create',$params2);
+    $contribution = $this->callAPISuccess('contribution','get',array( 'sequential' => 1, 'contribution_payment_instrument_id' => 'Cash'));
     $this->assertArrayHasKey('payment_instrument', $contribution['values'][0]);
     $this->assertEquals('Cash',$contribution['values'][0]['payment_instrument']);
     $this->assertEquals(1,$contribution['count']);
-    $contribution = civicrm_api('contribution','get',array('version'=> 3, 'sequential' => 1, 'payment_instrument_id' => 'EFT'));
+    $contribution = $this->callAPISuccess('contribution','get',array('sequential' => 1, 'payment_instrument_id' => 'EFT'));
     $this->assertArrayHasKey('payment_instrument', $contribution['values'][0]);
     $this->assertEquals('EFT',$contribution['values'][0]['payment_instrument']);
     $this->assertEquals(1, $contribution['count']);
-    $contribution = civicrm_api('contribution','get',array('version'=> 3, 'sequential' => 1, 'payment_instrument_id' => 5));
+    $contribution = $this->callAPISuccess('contribution','get',array( 'sequential' => 1, 'payment_instrument_id' => 5));
     $this->assertArrayHasKey('payment_instrument', $contribution['values'][0]);
     $this->assertEquals('EFT',$contribution['values'][0]['payment_instrument']);
     $this->assertEquals(1,$contribution['count']);
-    $contribution = civicrm_api('contribution','get',array('version'=> 3, 'sequential' => 1, 'payment_instrument' => 'EFT'));
+    $contribution = $this->callAPISuccess('contribution','get',array( 'sequential' => 1, 'payment_instrument' => 'EFT'));
     $this->assertArrayHasKey('payment_instrument', $contribution['values'][0]);
-    $this->assertEquals('EFT',$contribution['values'][0]['payment_instrument']);
-    $this->assertEquals(1,$contribution['count']);
-    $contribution = civicrm_api('contribution', 'update', array('id' => $contribution['id'], 'version' => $this->_apiversion, 'payment_instrument' => 'Credit Card'));
-    $this->assertAPISuccess($contribution);
-    $contribution = civicrm_api('contribution','get',array('version'=> 3, 'sequential' => 1, 'id' => $contribution['id'], ));
+    $this->assertEquals('EFT', $contribution['values'][0]['payment_instrument']);
+    $this->assertEquals(1, $contribution['count']);
+    $contribution = $this->callAPISuccess('contribution', 'update', array('id' => $contribution['id'], 'payment_instrument' => 'Credit Card'));
+    $contribution = $this->callAPISuccess('contribution','get',array( 'sequential' => 1, 'id' => $contribution['id'], ));
     $this->assertArrayHasKey('payment_instrument', $contribution['values'][0]);
     $this->assertEquals('Credit Card',$contribution['values'][0]['payment_instrument']);
     $this->assertEquals(1,$contribution['count']);
@@ -593,7 +498,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'contact_id' => $this->_individualId,
       'receive_date' => date('Ymd'),
       'total_amount' => 100.00,
-      'financial_type_id' => $this->_contributionTypeId,
+      'financial_type_id' => $this->_financialTypeId,
       'payment_instrument_id' => 1,
       'non_deductible_amount' => 10.00,
       'fee_amount' => 50.00,
@@ -602,12 +507,9 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'invoice_id' => 67890,
       'contribution_source' => 'SSF',
       'contribution_status_id' => 1,
-      'version' => $this->_apiversion,
     );
 
-    $contribution = civicrm_api('contribution', 'create', $params);
-
-    $this->assertAPISuccess($contribution, 'In line ' . __LINE__);
+    $contribution = $this->callAPISuccess('contribution', 'create', $params);
     $this->assertEquals($contribution['values'][$contribution['id']]['total_amount'], 100.00, 'In line ' . __LINE__);
     $this->assertEquals($contribution['values'][$contribution['id']]['source'], 'SSF', 'In line ' . __LINE__);
   }
@@ -620,7 +522,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'contact_id' => 999,
       'receive_date' => date('Ymd'),
       'total_amount' => 100.00,
-      'financial_type_id' => $this->_contributionTypeId,
+      'financial_type_id' => $this->_financialTypeId,
       'payment_instrument_id' => 1,
       'non_deductible_amount' => 10.00,
       'fee_amount' => 50.00,
@@ -629,11 +531,10 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'invoice_id' => 67890,
       'contribution_source' => 'SSF',
       'contribution_status_id' => 1,
-      'version' => $this->_apiversion,
     );
 
-    $contribution = civicrm_api('contribution', 'create', $params);
-    $this->assertEquals($contribution['error_message'], 'contact_id is not valid : 999', 'In line ' . __LINE__);
+    $contribution = $this->callAPIFailure('contribution', 'create', $params,
+      'contact_id is not valid : 999');
   }
 
   function testCreateContributionSourceInvalidContContac() {
@@ -642,7 +543,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'contribution_contact_id' => 999,
       'receive_date' => date('Ymd'),
       'total_amount' => 100.00,
-      'financial_type_id' => $this->_contributionTypeId,
+      'financial_type_id' => $this->_financialTypeId,
       'payment_instrument_id' => 1,
       'non_deductible_amount' => 10.00,
       'fee_amount' => 50.00,
@@ -651,11 +552,10 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'invoice_id' => 67890,
       'contribution_source' => 'SSF',
       'contribution_status_id' => 1,
-      'version' => $this->_apiversion,
     );
 
-    $contribution = civicrm_api('contribution', 'create', $params);
-    $this->assertEquals($contribution['error_message'], 'contact_id is not valid : 999', 'In line ' . __LINE__);
+    $contribution = $this->callAPIFailure('contribution', 'create', $params,
+      'contact_id is not valid : 999', 'In line ' . __LINE__);
   }
 
   function testCreateContributionWithNote() {
@@ -665,7 +565,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'contact_id' => $this->_individualId,
       'receive_date' => '2012-01-01',
       'total_amount' => 100.00,
-      'financial_type_id' => $this->_contributionTypeId,
+      'financial_type_id' => $this->_financialTypeId,
       'payment_instrument_id' => 1,
       'non_deductible_amount' => 10.00,
       'fee_amount' => 50.00,
@@ -674,16 +574,13 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'invoice_id' => 67890,
       'source' => 'SSF',
       'contribution_status_id' => 1,
-      'version' => $this->_apiversion,
       'note' => 'my contribution note',
     );
 
-    $contribution = civicrm_api('contribution', 'create', $params);
-    $this->documentMe($params, $contribution, __FUNCTION__, __FILE__, $description, $subfile);
-    $result = civicrm_api('note', 'get', array('version' => 3, 'entity_table' => 'civicrm_contribution', 'entity_id' => $contribution['id'], 'sequential' => 1));
-    $this->assertAPISuccess($result);
+    $contribution = $this->callAPIAndDocument('contribution', 'create', $params, __FUNCTION__, __FILE__, $description, $subfile);
+    $result = $this->callAPISuccess('note', 'get', array('entity_table' => 'civicrm_contribution', 'entity_id' => $contribution['id'], 'sequential' => 1));
     $this->assertEquals('my contribution note', $result['values'][0]['note']);
-    civicrm_api('contribution', 'delete', array('version' => 3, 'id' => $contribution['id']));
+    $this->callAPISuccess('contribution', 'delete', array('id' => $contribution['id']));
   }
 
   function testCreateContributionWithNoteUniqueNameAliases() {
@@ -691,7 +588,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'contact_id' => $this->_individualId,
       'receive_date' => '2012-01-01',
       'total_amount' => 100.00,
-      'financial_type_id' => $this->_contributionTypeId,
+      'financial_type_id' => $this->_financialTypeId,
       'payment_instrument_id' => 1,
       'non_deductible_amount' => 10.00,
       'fee_amount' => 50.00,
@@ -700,15 +597,13 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'invoice_id' => 67890,
       'source' => 'SSF',
       'contribution_status_id' => 1,
-      'version' => $this->_apiversion,
       'contribution_note' => 'my contribution note',
     );
 
-    $contribution = civicrm_api('contribution', 'create', $params);
-    $result = civicrm_api('note', 'get', array('version' => 3, 'entity_table' => 'civicrm_contribution', 'entity_id' => $contribution['id'], 'sequential' => 1));
-    $this->assertAPISuccess($result);
+    $contribution = $this->callAPISuccess('contribution', 'create', $params);
+    $result = $this->callAPISuccess('note', 'get', array('entity_table' => 'civicrm_contribution', 'entity_id' => $contribution['id'], 'sequential' => 1));
     $this->assertEquals('my contribution note', $result['values'][0]['note']);
-    civicrm_api('contribution', 'delete', array('version' => 3, 'id' => $contribution['id']));
+    $this->callAPISuccess('contribution', 'delete', array('id' => $contribution['id']));
   }
   /*
      * This is the test for creating soft credits - however a 'get' is not yet possible via API
@@ -718,17 +613,14 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   function testCreateContributionWithSoftCredt() {
     $description = "Demonstrates creating contribution with SoftCredit";
     $subfile     = "ContributionCreateWithSoftCredit";
-    $contact2    = civicrm_api('Contact', 'create', array('version' => 3, 'display_name' => 'superman', 'version' => 3, 'contact_type' => 'Individual'));
+    $contact2    = $this->callAPISuccess('Contact', 'create', array('display_name' => 'superman', 'contact_type' => 'Individual'));
     $params      = $this->_params + array(
       'soft_credit_to' => $contact2['id'],
 
     );
 
-    $contribution = civicrm_api('contribution', 'create', $params);
-    $this->assertAPISuccess($contribution);
-    $this->documentMe($params, $contribution, __FUNCTION__, __FILE__, $description, $subfile);
-    //     $result = civicrm_api('contribution','get', array('version' => 3,'return'=> 'soft_credit_to', 'sequential' => 1));
-    //     $this->assertAPISuccess($result);
+    $contribution = $this->callAPIAndDocument('contribution', 'create', $params, __FUNCTION__, __FILE__, $description, $subfile);
+    //     $result = $this->callAPISuccess('contribution','get', array('return'=> 'soft_credit_to', 'sequential' => 1));
     //     $this->assertEquals($contact2['id'], $result['values'][$result['id']]['soft_credit_to']) ;
     //    well - the above doesn't work yet so lets do SQL
     $query = "SELECT count(*) FROM civicrm_contribution_soft WHERE contact_id = " . $contact2['id'];
@@ -736,8 +628,8 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $count = CRM_Core_DAO::singleValueQuery($query);
     $this->assertEquals(1, $count);
 
-    civicrm_api('contribution', 'delete', array('version' => 3, 'id' => $contribution['id']));
-    civicrm_api('contact', 'delete', array('version' => 3, 'id' => $contact2['id']));
+    $this->callAPISuccess('contribution', 'delete', array('id' => $contribution['id']));
+    $this->callAPISuccess('contact', 'delete', array('id' => $contact2['id']));
   }
 
   /**
@@ -745,7 +637,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    */
   function testContributionCreateExample() {
     //make sure at least on page exists since there is a truncate in tear down
-    $page = civicrm_api('contribution_page', 'create', $this->_pageParams);
+    $page = $this->callAPISuccess('contribution_page', 'create', $this->_pageParams);
     $this->assertAPISuccess($page);
     require_once 'api/v3/examples/ContributionCreate.php';
     $result         = contribution_create_example();
@@ -770,11 +662,9 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'invoice_id' => 67890,
       'source' => 'SSF',
       'contribution_status_id' => 1,
-      'version' => $this->_apiversion,
     );
 
-    $contribution = civicrm_api('contribution', 'create', $params);
-    $this->documentMe($params, $contribution, __FUNCTION__, __FILE__);
+    $contribution = $this->callAPIAndDocument('contribution', 'create', $params, __FUNCTION__, __FILE__);
     $this->assertEquals($contribution['values'][$contribution['id']]['contact_id'], $this->_individualId, 'In line ' . __LINE__);
     $this->assertEquals($contribution['values'][$contribution['id']]['total_amount'], 100.00, 'In line ' . __LINE__);
     $this->assertEquals($contribution['values'][$contribution['id']]['financial_type_id'],1, 'In line ' . __LINE__ );
@@ -782,8 +672,8 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->assertEquals($contribution['values'][$contribution['id']]['invoice_id'], 67890, 'In line ' . __LINE__);
     $this->assertEquals($contribution['values'][$contribution['id']]['source'], 'SSF', 'In line ' . __LINE__);
     $this->assertEquals($contribution['values'][$contribution['id']]['contribution_status_id'], 1, 'In line ' . __LINE__);
-    $lineItems = civicrm_api('line_item','get',array(
-      'version' => $this->_apiversion,
+    $lineItems = $this->callAPISuccess('line_item','get',array(
+
       'entity_id' => $contribution['id'],
       'entity_table' => 'civicrm_contribution',
       'sequential' => 1,
@@ -791,8 +681,8 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->assertEquals(1, $lineItems['count']);
     $this->assertEquals($contribution['id'], $lineItems['values'][0]['entity_id']);
     $this->assertEquals($contribution['id'], $lineItems['values'][0]['entity_id']);
-    $lineItems = civicrm_api('line_item','get',array(
-        'version' => $this->_apiversion,
+    $lineItems = $this->callAPISuccess('line_item','get',array(
+
         'entity_id' => $contribution['id'],
         'entity_table' => 'civicrm_contribution',
         'sequential' => 1,
@@ -802,12 +692,12 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   }
 
 
-  /*
+  /**
    * Function tests that additional financial records are created when online contribution is created
    */
   function testCreateContributionOnline() {
     $paymentProcessor = CRM_Financial_BAO_PaymentProcessor::create($this->_processorParams);
-    $contributionPage = civicrm_api( 'contribution_page','create',  $this->_pageParams );
+    $contributionPage = $this->callAPISuccess( 'contribution_page','create',  $this->_pageParams );
     $this->assertAPISuccess($contributionPage);
     $params = array(
       'contact_id' => $this->_individualId,
@@ -820,11 +710,10 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'invoice_id' => 67890,
       'source' => 'SSF',
       'contribution_status_id' => 1,
-      'version' => $this->_apiversion,
+
     );
 
-    $contribution = civicrm_api('contribution', 'create', $params);
-    $this->documentMe($params, $contribution, __FUNCTION__, __FILE__);
+    $contribution = $this->callAPIAndDocument('contribution', 'create', $params, __FUNCTION__, __FILE__);
     $this->assertEquals($contribution['values'][$contribution['id']]['contact_id'], $this->_individualId, 'In line ' . __LINE__);
     $this->assertEquals($contribution['values'][$contribution['id']]['total_amount'], 100.00, 'In line ' . __LINE__);
     $this->assertEquals($contribution['values'][$contribution['id']]['financial_type_id'],1, 'In line ' . __LINE__ );
@@ -835,14 +724,34 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->_checkFinancialRecords($contribution, 'online');
   }
 
-  /*
+  /**
+   * in the interests of removing financial type / contribution type checks from
+   * legacy format function lets test that the api is doing this for us
+   */
+  function testCreateInvalidFinancialType() {
+    $params = $this->_params;
+    $params['financial_type_id'] = 99999;
+    $result = $this->callAPIFailure($this->_entity, 'create', $params, "'99999' is not a valid option for field financial_type_id");
+  }
+
+  /**
+   * in the interests of removing financial type / contribution type checks from
+   * legacy format function lets test that the api is doing this for us
+   */
+  function testValidNamedFinancialType() {
+    $params = $this->_params;
+    $params['financial_type_id'] = 'Donation';
+    $result = $this->callAPISuccess($this->_entity, 'create', $params);
+  }
+
+  /**
    * Function tests that additional financial records are created when online contribution with pay later option
    * is created
    */
   function testCreateContributionPayLaterOnline() {
     $paymentProcessor = CRM_Financial_BAO_PaymentProcessor::create($this->_processorParams);
     $this->_pageParams['is_pay_later'] = 1;
-    $contributionPage = civicrm_api( 'contribution_page','create',$this->_pageParams );
+    $contributionPage = $this->callAPISuccess( 'contribution_page','create',$this->_pageParams );
     $this->assertAPISuccess($contributionPage);
     $params = array(
       'contact_id' => $this->_individualId,
@@ -855,11 +764,10 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'invoice_id' => 67890,
       'source' => 'SSF',
       'contribution_status_id' => 2,
-      'version' => $this->_apiversion,
+
     );
 
-    $contribution = civicrm_api('contribution', 'create', $params);
-    $this->documentMe($params, $contribution, __FUNCTION__, __FILE__);
+    $contribution = $this->callAPIAndDocument('contribution', 'create', $params, __FUNCTION__, __FILE__);
     $this->assertEquals($contribution['values'][$contribution['id']]['contact_id'], $this->_individualId, 'In line ' . __LINE__);
     $this->assertEquals($contribution['values'][$contribution['id']]['total_amount'], 100.00, 'In line ' . __LINE__);
     $this->assertEquals($contribution['values'][$contribution['id']]['financial_type_id'],1, 'In line ' . __LINE__ );
@@ -876,7 +784,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    */
   function testCreateContributionPendingOnline() {
     $paymentProcessor = CRM_Financial_BAO_PaymentProcessor::create($this->_processorParams);
-    $contributionPage = civicrm_api( 'contribution_page', 'create', $this->_pageParams );
+    $contributionPage = $this->callAPISuccess( 'contribution_page', 'create', $this->_pageParams );
     $this->assertAPISuccess($contributionPage);
     $params = array(
       'contact_id' => $this->_individualId,
@@ -888,11 +796,9 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'invoice_id' => 67890,
       'source' => 'SSF',
       'contribution_status_id' => 2,
-      'version' => $this->_apiversion,
     );
 
-    $contribution = civicrm_api('contribution', 'create', $params);
-    $this->documentMe($params, $contribution, __FUNCTION__, __FILE__);
+    $contribution = $this->callAPIAndDocument('contribution', 'create', $params, __FUNCTION__, __FILE__);
     $this->assertEquals($contribution['values'][$contribution['id']]['contact_id'], $this->_individualId, 'In line ' . __LINE__);
     $this->assertEquals($contribution['values'][$contribution['id']]['total_amount'], 100.00, 'In line ' . __LINE__);
     $this->assertEquals($contribution['values'][$contribution['id']]['financial_type_id'],1, 'In line ' . __LINE__ );
@@ -907,9 +813,9 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    * Function tests that line items, financial records are updated when contribution amount is changed
    */
   function testCreateUpdateContributionChangeTotal() {
-    $contribution = civicrm_api('contribution', 'create', $this->_params);
-    $lineItems = civicrm_api('line_item','getvalue', array(
-      'version' => $this->_apiversion,
+    $contribution = $this->callAPISuccess('contribution', 'create', $this->_params);
+    $lineItems = $this->callAPISuccess('line_item','getvalue', array(
+
       'entity_id' => $contribution['id'],
       'entity_table' => 'civicrm_contribution',
       'sequential' => 1,
@@ -920,13 +826,13 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     // Financial trxn SUM = 100 + 5 (fee)
     $this->assertEquals('105.00', $trxnAmount);
     $newParams = array(
-      'version' => $this->_apiversion,
+
       'id' => $contribution['id'],
       'total_amount' => '125');
-    $contribution = civicrm_api('contribution', 'update', $newParams);
+    $contribution = $this->callAPISuccess('contribution', 'update', $newParams);
 
-    $lineItems = civicrm_api('line_item','getvalue',array(
-        'version' => $this->_apiversion,
+    $lineItems = $this->callAPISuccess('line_item','getvalue',array(
+
         'entity_id' => $contribution['id'],
         'entity_table' => 'civicrm_contribution',
         'sequential' => 1,
@@ -949,19 +855,19 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'contact_id' => $this->_individualId,
       'receive_date' => '2012-01-01',
       'total_amount' => 100.00,
-      'financial_type_id' => $this->_contributionTypeId,
+      'financial_type_id' => $this->_financialTypeId,
       'payment_instrument_id' => 1,
       'contribution_status_id' => 2,
       'is_pay_later' => 1,
-      'version' => $this->_apiversion,
+
     );
-    $contribution = civicrm_api('contribution', 'create', $contribParams);
+    $contribution = $this->callAPISuccess('contribution', 'create', $contribParams);
 
     $newParams = array_merge($contribParams, array(
       'id' => $contribution['id'],
       'contribution_status_id' => 1,)
     );
-    $contribution = civicrm_api('contribution', 'update', $newParams);
+    $contribution = $this->callAPISuccess('contribution', 'update', $newParams);
     $contribution = $contribution['values'][$contribution['id']];
     $this->assertEquals($contribution['contribution_status_id'],'1');
     $this->_checkFinancialItem($contribution['id'], 'paylater');
@@ -976,18 +882,18 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $contribParams = array(
       'contact_id' => $this->_individualId,
       'total_amount' => 100.00,
-      'financial_type_id' => $this->_contributionTypeId,
+      'financial_type_id' => $this->_financialTypeId,
       'payment_instrument_id' => 4,
       'contribution_status_id' => 1,
-      'version' => $this->_apiversion,
+
     );
-    $contribution = civicrm_api('contribution', 'create', $contribParams);
+    $contribution = $this->callAPISuccess('contribution', 'create', $contribParams);
 
     $newParams = array_merge($contribParams, array(
      'id' => $contribution['id'],
      'payment_instrument_id' => $instrumentId,)
     );
-    $contribution = civicrm_api('contribution', 'update', $newParams);
+    $contribution = $this->callAPISuccess('contribution', 'update', $newParams);
     $this->assertAPISuccess($contribution);
     $this->_checkFinancialTrxn($contribution, 'paymentInstrument');
   }
@@ -1000,19 +906,19 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'contact_id' => $this->_individualId,
       'receive_date' => '2012-01-01',
       'total_amount' => 100.00,
-      'financial_type_id' => $this->_contributionTypeId,
+      'financial_type_id' => $this->_financialTypeId,
       'payment_instrument_id' => 4,
       'contribution_status_id' => 1,
-      'version' => $this->_apiversion,
+
     );
-    $contribution = civicrm_api('contribution', 'create', $contribParams);
+    $contribution = $this->callAPISuccess('contribution', 'create', $contribParams);
     $newParams = array_merge($contribParams, array(
      'id' => $contribution['id'],
      'contribution_status_id' => 7,
       )
     );
 
-    $contribution = civicrm_api('contribution', 'update', $newParams);
+    $contribution = $this->callAPISuccess('contribution', 'update', $newParams);
     $this->_checkFinancialTrxn($contribution, 'refund');
     $this->_checkFinancialItem($contribution['id'], 'refund');
   }
@@ -1028,17 +934,16 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'financial_type_id' => 1,
       'payment_instrument_id' => 1,
       'contribution_status_id' => 1,
-      'version' => 3,
     );
-    $contribution = civicrm_api('contribution', 'create', $contribParams);
+    $contribution = $this->callAPISuccess('contribution', 'create', $contribParams);
     $newParams = array_merge($contribParams, array(
      'id' => $contribution['id'],
      'contribution_status_id' => 2,
       )
     );
-    $contribution = civicrm_api('contribution', 'update', $newParams);
-    $this->assertAPIFailure($contribution);
-    $this->assertEquals($contribution['error_message'], ts('Cannot change contribution status from Completed to Pending.'), 'In line ' . __LINE__);
+    $contribution = $this->callAPIFailure('contribution', 'update', $newParams,
+      ts('Cannot change contribution status from Completed to Pending.')
+    );
 
   }
 
@@ -1050,19 +955,19 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'contact_id' => $this->_individualId,
       'receive_date' => '2012-01-01',
       'total_amount' => 100.00,
-      'financial_type_id' => $this->_contributionTypeId,
+      'financial_type_id' => $this->_financialTypeId,
       'payment_instrument_id' => 1,
       'contribution_status_id' => 2,
       'is_pay_later' => 1,
-      'version' => $this->_apiversion,
+
     );
-    $contribution = civicrm_api('contribution', 'create', $contribParams);
+    $contribution = $this->callAPISuccess('contribution', 'create', $contribParams);
     $newParams = array_merge($contribParams, array(
      'id' => $contribution['id'],
      'contribution_status_id' => 3,
       )
     );
-    $contribution = civicrm_api('contribution', 'update', $newParams);
+    $contribution = $this->callAPISuccess('contribution', 'update', $newParams);
     $this->_checkFinancialTrxn($contribution, 'cancelPending');
     $this->_checkFinancialItem($contribution['id'], 'cancelPending');
   }
@@ -1078,15 +983,15 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'financial_type_id' => 1,
       'payment_instrument_id' => 1,
       'contribution_status_id' => 1,
-      'version' => $this->_apiversion,
+
     );
-    $contribution = civicrm_api('contribution', 'create', $contribParams);
+    $contribution = $this->callAPISuccess('contribution', 'create', $contribParams);
     $newParams = array_merge($contribParams, array(
      'id' => $contribution['id'],
      'financial_type_id' => 3,
       )
     );
-    $contribution = civicrm_api('contribution', 'update', $newParams);
+    $contribution = $this->callAPISuccess('contribution', 'update', $newParams);
     $this->_checkFinancialTrxn($contribution, 'changeFinancial');
     $this->_checkFinancialItem($contribution['id'], 'changeFinancial');
   }
@@ -1095,12 +1000,12 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   //CHANGE: we require the API to do an incremental update
   function testCreateUpdateContribution() {
 
-    $contributionID = $this->contributionCreate($this->_individualId, $this->_contributionTypeId, 'idofsh', 212355);
+    $contributionID = $this->contributionCreate($this->_individualId, $this->_financialTypeId, 'idofsh', 212355);
     $old_params = array(
       'contribution_id' => $contributionID,
-      'version' => $this->_apiversion,
+
     );
-    $original = civicrm_api('contribution', 'get', $old_params);
+    $original = $this->callAPISuccess('contribution', 'get', $old_params);
     //Make sure it came back
     $this->assertAPISuccess($original, 'In line ' . __LINE__);
     $this->assertEquals($original['id'], $contributionID, 'In line ' . __LINE__);
@@ -1129,25 +1034,25 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'id' => $contributionID,
       'contact_id' => $this->_individualId,
       'total_amount' => 110.00,
-      'financial_type_id' => $this->_contributionTypeId,
+      'financial_type_id' => $this->_financialTypeId,
       'non_deductible_amount' => 10.00,
       'net_amount' => 100.00,
       'contribution_status_id' => 1,
       'note' => 'Donating for Nobel Cause',
-      'version' => $this->_apiversion,
+
     );
 
-    $contribution = civicrm_api('contribution', 'create', $params);
+    $contribution = $this->callAPISuccess('contribution', 'create', $params);
 
     $new_params = array(
       'contribution_id' => $contribution['id'],
-      'version' => $this->_apiversion,
+
     );
-    $contribution = civicrm_api('contribution', 'get', $new_params);
+    $contribution = $this->callAPISuccess('contribution', 'get', $new_params);
 
     $this->assertEquals($contribution['values'][$contributionID]['contact_id'], $this->_individualId, 'In line ' . __LINE__);
     $this->assertEquals($contribution['values'][$contributionID]['total_amount'], 110.00, 'In line ' . __LINE__);
-        $this->assertEquals($contribution['values'][$contributionID]['financial_type_id'],$this->_contributionTypeId, 'In line ' . __LINE__ );
+        $this->assertEquals($contribution['values'][$contributionID]['financial_type_id'],$this->_financialTypeId, 'In line ' . __LINE__ );
     $this->assertEquals($contribution['values'][$contributionID]['instrument_id'], $old_payment_instrument, 'In line ' . __LINE__);
     $this->assertEquals($contribution['values'][$contributionID]['non_deductible_amount'], 10.00, 'In line ' . __LINE__);
     $this->assertEquals($contribution['values'][$contributionID]['fee_amount'], $old_fee_amount, 'In line ' . __LINE__);
@@ -1158,45 +1063,39 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->assertEquals($contribution['values'][$contributionID]['contribution_status'], 'Completed', 'In line ' . __LINE__);
     $params = array(
       'contribution_id' => $contributionID,
-      'version' => $this->_apiversion,
+
     );
-    $result = civicrm_api('contribution', 'delete', $params);
+    $result = $this->callAPISuccess('contribution', 'delete', $params);
     $this->assertAPISuccess($result, 'in line' . __LINE__);
   }
 
   ///////////////// civicrm_contribution_delete methods
   function testDeleteEmptyParamsContribution() {
-    $params = array('version' => $this->_apiversion);
-    $contribution = civicrm_api('contribution', 'delete', $params);
-    $this->assertAPIFailure($contribution);
+    $params = array();
+    $contribution = $this->callAPIFailure('contribution', 'delete', $params);
   }
 
   function testDeleteParamsNotArrayContribution() {
     $params = 'contribution_id= 1';
-    $contribution = civicrm_api('contribution', 'delete', $params);
-    $this->assertAPIFailure($contribution);
+    $contribution = $this->callAPIFailure('contribution', 'delete', $params);
     $this->assertEquals($contribution['error_message'], 'Input variable `params` is not an array');
   }
 
   function testDeleteWrongParamContribution() {
     $params = array(
       'contribution_source' => 'SSF',
-      'version' => $this->_apiversion,
+
     );
-    $contribution = civicrm_api('contribution', 'delete', $params);
-    $this->assertAPIFailure($contribution);
+    $contribution = $this->callAPIFailure('contribution', 'delete', $params);
   }
 
   function testDeleteContribution() {
 
-    $contributionID = $this->contributionCreate($this->_individualId, $this->_contributionTypeId, 'dfsdf', 12389);
+    $contributionID = $this->contributionCreate($this->_individualId, $this->_financialTypeId, 'dfsdf', 12389);
     $params = array(
       'id' => $contributionID,
-      'version' => $this->_apiversion,
     );
-    $result = civicrm_api('contribution', 'delete', $params);
-    $this->documentMe($params, $result, __FUNCTION__, __FILE__);
-    $this->assertAPISuccess($result, 0, 'In line ' . __LINE__);
+    $this->callAPIAndDocument('contribution', 'delete', $params, __FUNCTION__, __FILE__);
   }
 
   /**
@@ -1204,13 +1103,13 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    *  All available contributions expected.
    */
   function testSearchEmptyParams() {
-    $params = array('version' => $this->_apiversion);
+    $params = array();
 
     $p = array(
       'contact_id' => $this->_individualId,
       'receive_date' => date('Ymd'),
       'total_amount' => 100.00,
-      'financial_type_id' => $this->_contributionTypeId,
+      'financial_type_id' => $this->_financialTypeId,
       'non_deductible_amount' => 10.00,
       'fee_amount' => 5.00,
       'net_amount' => 95.00,
@@ -1218,11 +1117,11 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'invoice_id' => 78910,
       'source' => 'SSF',
       'contribution_status_id' => 1,
-      'version' => $this->_apiversion,
-    );
-    $contribution = civicrm_api('contribution', 'create', $p);
 
-    $result = civicrm_api('contribution', 'get', $params);
+    );
+    $contribution = $this->callAPISuccess('contribution', 'create', $p);
+
+    $result = $this->callAPISuccess('contribution', 'get', $params);
     // We're taking the first element.
     $res = $result['values'][$contribution['id']];
 
@@ -1249,33 +1148,33 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'contact_id' => $this->_individualId,
       'receive_date' => date('Ymd'),
       'total_amount' => 100.00,
-      'financial_type_id' => $this->_contributionTypeId,
+      'financial_type_id' => $this->_financialTypeId,
       'non_deductible_amount' => 10.00,
       'contribution_status_id' => 1,
-      'version' => $this->_apiversion,
+
     );
-    $contribution1 = civicrm_api('contribution', 'create', $p1);
+    $contribution1 = $this->callAPISuccess('contribution', 'create', $p1);
 
     $p2 = array(
       'contact_id' => $this->_individualId,
       'receive_date' => date('Ymd'),
       'total_amount' => 200.00,
-      'financial_type_id' => $this->_contributionTypeId,
+      'financial_type_id' => $this->_financialTypeId,
       'non_deductible_amount' => 20.00,
       'trxn_id' => 5454565,
       'invoice_id' => 1212124,
       'fee_amount' => 50.00,
       'net_amount' => 60.00,
       'contribution_status_id' => 2,
-      'version' => $this->_apiversion,
+
     );
-    $contribution2 = civicrm_api('contribution', 'create', $p2);
+    $contribution2 = $this->callAPISuccess('contribution', 'create', $p2);
 
     $params = array(
       'contribution_id' => $contribution2['id'],
-      'version' => $this->_apiversion,
+
     );
-    $result = civicrm_api('contribution', 'get', $params);
+    $result = $this->callAPISuccess('contribution', 'get', $params);
     $res = $result['values'][$contribution2['id']];
 
     $this->assertEquals($p2['contact_id'], $res['contact_id'], 'In line ' . __LINE__);
@@ -1292,20 +1191,69 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->contributionDelete($contribution1['id']);
     $this->contributionDelete($contribution2['id']);
   }
-  /*
+
+  /**
+   * Test completing a transaction via the API
+   *
+   * Note that we are creating a logged in user because email goes out from
+   * that person
+   */
+  function testCompleteTransaction() {
+    $mut = new CiviMailUtils( $this, true );
+    $this->createLoggedInUser();
+    $params = array_merge($this->_params, array('contribution_status_id' => 1,));
+    $contribution = $this->callAPISuccess('contribution','create', $params);
+    $apiResult = $this->callAPISuccess('contribution', 'completetransaction', array(
+      'id' => $contribution['id'],
+    )
+    );
+    $contribution = $this->callAPISuccess('contribution', 'get', array('id' => $contribution['id'], 'sequential' => 1,));
+    $this->assertEquals('Completed', $contribution['values'][0]['contribution_status']);
+    $mut->checkMailLog(array(
+      'Receipt - Contribution',
+      'Please print this confirmation for your records.',
+    ));
+    $mut->stop();
+  }
+
+  /**
+   * Test completing a transaction with an event via the API
+   *
+   * Note that we are creating a logged in user because email goes out from
+   * that person
+   */
+  function testCompleteTransactionWithParticipantRecord() {
+    $mut = new CiviMailUtils( $this, true );
+    $mut->clearMessages();
+    $this->createLoggedInUser();
+    $contributionID = $this->createPendingParticipantContribution();
+    $apiResult = $this->callAPISuccess('contribution', 'completetransaction', array(
+      'id' => $contributionID,
+    )
+    );
+    $participantStatus = $this->callAPISuccessGetValue('participant', array('id' => $this->ids['participant'], 'return' => 'participant_status_id'));
+    $this->assertEquals(1, $participantStatus);
+    $mut->checkMailLog(array(
+      'Annual CiviCRM meet',
+      'Event',
+      'This letter is a confirmation that your registration has been received and your status has been updated to registered for the following',
+    ));
+  $mut->stop();
+
+  }
+
+  /**
    * Test sending a mail via the API
    */
   function testSendMail() {
     $mut = new CiviMailUtils( $this, true );
-    $contribution = civicrm_api('contribution','create',$this->_params);
-    $this->assertAPISuccess($contribution);
-    $apiResult = civicrm_api('contribution', 'sendconfirmation', array(
-      'version' => $this->_apiversion,
+    $contribution = $this->callAPISuccess('contribution','create',$this->_params);
+    $apiResult = $this->callAPISuccess('contribution', 'sendconfirmation', array(
+
       'id' => $contribution['id'],
       'receipt_from_email' => 'api@civicrm.org',
       )
     );
-    $this->assertAPISuccess($apiResult);
     $mut->checkMailLog(array(
         '$ 100.00',
         'Contribution Information',
@@ -1317,13 +1265,13 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $mut->stop();
   }
 
-  /*
+  /**
    * Test sending a mail via the API
    */
   function testSendMailEvent() {
     $mut = new CiviMailUtils( $this, true );
-    $contribution = civicrm_api('contribution','create',$this->_params);
-    $event          = $this->eventCreate(array(
+    $contribution = $this->callAPISuccess('contribution','create',$this->_params);
+    $event = $this->eventCreate(array(
       'is_email_confirm' => 1,
       'confirm_from_email' => 'test@civicrm.org',
     ));
@@ -1336,23 +1284,20 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       // to ensure it matches later on
       'register_date' => '2007-07-21 00:00:00',
       'source' => 'Online Event Registration: API Testing',
-      'version' => $this->_apiversion,
+
     );
-    $participant = civicrm_api('participant', 'create', $participantParams);
-    $this->assertAPISuccess($participant, "participant created in line " . __LINE__);
-    $this->assertAPISuccess(civicrm_api('participant_payment', 'create', array(
-      'version' => 3,
+    $participant = $this->callAPISuccess('participant', 'create', $participantParams);
+    $this->callAPISuccess('participant_payment', 'create', array(
       'participant_id' => $participant['id'],
       'contribution_id' => $contribution['id'],
-    )), " in line " . __LINE__);
-    $apiResult = civicrm_api('contribution', 'sendconfirmation', array(
-      'version' => $this->_apiversion,
+    ));
+    $apiResult = $this->callAPISuccess('contribution', 'sendconfirmation', array(
+
       'id' => $contribution['id'],
       'receipt_from_email' => 'api@civicrm.org',
       )
     );
 
-    $this->assertAPISuccess($apiResult);
     $mut->checkMailLog(array(
         'Annual CiviCRM meet',
         'Event',
@@ -1364,41 +1309,19 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $mut->stop();
   }
 
-  ///////////////  _civicrm_contribute_format_params for $create
-  function testFormatParams() {
-    require_once 'CRM/Contribute/DAO/Contribution.php';
-    $params = array(
-      'contact_id' => $this->_individualId,
-      'receive_date' => date('Ymd'),
-      'total_amount' => 100.00,
-      'financial_type_id' => $this->_contributionTypeId,
-      'contribution_status_id' => 1,
-      'financial_type' => null,
-      'note' => 'note',
-      'contribution_source' => 'test',
-    );
-
-    $values = array();
-    $result = _civicrm_api3_contribute_format_params($params, $values, TRUE);
-    $this->assertEquals($values['total_amount'], 100.00, 'In line ' . __LINE__);
-    $this->assertEquals($values['contribution_status_id'], 1, 'In line ' . __LINE__);
-  }
-  /*
-     * This function does a GET & compares the result against the $params
-     * Use as a double check on Creates
-     */
+  /**
+  * This function does a GET & compares the result against the $params
+  * Use as a double check on Creates
+  */
   function contributionGetnCheck($params, $id, $delete = 1) {
 
-    $contribution = civicrm_api('Contribution', 'Get', array(
+    $contribution = $this->callAPISuccess('Contribution', 'Get', array(
       'id' => $id,
-        'version' => $this->_apiversion,
+
       ));
 
     if ($delete) {
-      civicrm_api('contribution', 'delete', array(
-        'id' => $id,
-          'version' => $this->_apiversion,
-        ));
+      $this->callAPISuccess('contribution', 'delete', array('id' => $id));
     }
     $this->assertAPISuccess($contribution, 0, 'In line ' . __LINE__);
     $values = $contribution['values'][$contribution['id']];
@@ -1408,11 +1331,30 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $params['contribution_source'] = $params['source'];
     unset($params['source']);
     foreach ($params as $key => $value) {
-      if ($key == 'version') {
-        continue;
-      }
       $this->assertEquals($value, $values[$key], $key . " value: $value doesn't match " . print_r($values, TRUE) . 'in line' . __LINE__);
     }
+  }
+
+  /**
+   * Create a pending contribution & linked pending participant record
+   * (along with an event)
+   */
+  function createPendingParticipantContribution(){
+    $event = $this->eventCreate(array('is_email_confirm' => 1, 'confirm_from_email' => 'test@civicrm.org',));
+    $participantID = $this->participantCreate(array('event_id' => $event['id'], 'status_id' => 6));
+    $this->ids['participant']  = $participantID;
+    $params = array_merge($this->_params, array('contribution_status_id' => 2, 'financial_type_id' => 'Event Fee'));
+    $contribution = $this->callAPISuccess('contribution','create', $params);
+    $this->callAPISuccess('participant_payment', 'create', array('contribution_id' => $contribution['id'], 'participant_id' => $participantID));
+    $lineItem = $this->callAPISuccess('line_item', 'get', array(
+      'entity_id' => $contribution['id'],
+      'entity_table' => 'civicrm_contribution',
+      'api.line_item.create' => array(
+        'entity_id' => $participantID,
+        'entity_table' => 'civicrm_participant',
+      ),
+    ));
+    return $contribution['id'];
   }
 
  function _getFinancialTrxnAmount($contId) {
@@ -1573,9 +1515,8 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
      'value' => '6',
      'weight' => '6',
      'is_active' => 1,
-     'version' => 3,
 );
-   $optionValue = civicrm_api('option_value', 'create', $optionParams);
+   $optionValue = $this->callAPISuccess('option_value', 'create', $optionParams);
    $relationTypeId = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Asset Account is' "));
    $financialParams = array(
      'entity_table' => 'civicrm_option_value',

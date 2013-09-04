@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -106,11 +106,7 @@ class WebTest_Contribute_UpdatePendingContributionTest extends CiviSeleniumTestC
     $this->type("trxn_id", "P20901X1" . rand(100, 10000));
 
     // soft credit
-    $this->type("soft_credit_to", $softCreditFname);
-    $this->fireEvent("soft_credit_to", "focus");
-    $this->click('soft_credit_to');
-    $this->waitForElementPresent("css=div.ac_results-inner li");
-    $this->click("css=div.ac_results-inner li");
+    $this->webtestFillAutocomplete("{$softCreditLname}, {$softCreditFname}", 'soft_credit_contact_1');
 
     //Custom Data
     //$this->click('CIVICRM_QFID_3_6');
@@ -164,12 +160,11 @@ class WebTest_Contribute_UpdatePendingContributionTest extends CiviSeleniumTestC
       'Contribution Status' => 'Pending',
       'Paid By' => 'Check',
       'Check Number' => 'check #1041',
-      'Soft Credit To' => "{$softCreditFname} {$softCreditLname}",
     );
     $this->webtestVerifyTabularData($expected);
 
-    // go to soft creditor contact view page
-    $this->click("xpath=id('ContributionView')/div[2]/table[1]/tbody//tr/td[1][text()='Soft Credit To']/../td[2]/a[text()='{$softCreditFname} {$softCreditLname}']");
+    // go to soft creditor contact view page - this also does the soft credit check
+    $this->click("xpath=id('ContributionView')/div[2]/div/div[1][contains(text(), 'Soft Credit')]/../div[2]/table[1]/tbody//tr/td[1]/a[contains(text(), '{$softCreditFname} {$softCreditLname}')]");
 
     // go to contribution tab
     $this->waitForElementPresent("css=li#tab_contribute a");

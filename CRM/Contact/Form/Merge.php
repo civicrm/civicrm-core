@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -51,8 +51,8 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
   // see HTML_QuickForm_advcheckbox::setValues() - but patching that doesn't
   // help, as QF doesn't put the 0-value elements in exportValues() anyway...
   // to side-step this, we use the below UUID as a (re)placeholder
-  var $_qfZeroBug = 'e8cddb72-a257-11dc-b9cc-0016d3330ee9'; 
-  
+  var $_qfZeroBug = 'e8cddb72-a257-11dc-b9cc-0016d3330ee9';
+
   function preProcess() {
     if (!CRM_Core_Permission::check('merge duplicate contacts')) {
       CRM_Core_Error::fatal(ts('You do not have access to this page'));
@@ -77,7 +77,7 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
     $cacheKey .= $rgid ? "_{$rgid}" : '_0';
     $cacheKey .= $gid ? "_{$gid}" : '_0';
 
-    $join = "LEFT JOIN civicrm_dedupe_exception de ON ( pn.entity_id1 = de.contact_id1 AND 
+    $join = "LEFT JOIN civicrm_dedupe_exception de ON ( pn.entity_id1 = de.contact_id1 AND
                                                              pn.entity_id2 = de.contact_id2 )";
     $where = "de.id IS NULL";
 
@@ -296,7 +296,7 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
 
   public function postProcess() {
     $formValues = $this->exportValues();
- 
+
     // reset all selected contact ids from session
     // when we came from search context, CRM-3526
     $session = CRM_Core_Session::singleton();
@@ -332,7 +332,7 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
       $cacheKey .= $this->_rgid ? "_{$this->_rgid}" : '_0';
       $cacheKey .= $this->_gid ? "_{$this->_gid}" : '_0';
 
-      $join = "LEFT JOIN civicrm_dedupe_exception de ON ( pn.entity_id1 = de.contact_id1 AND 
+      $join = "LEFT JOIN civicrm_dedupe_exception de ON ( pn.entity_id1 = de.contact_id1 AND
                                                                  pn.entity_id2 = de.contact_id2 )";
       $where = "de.id IS NULL";
 

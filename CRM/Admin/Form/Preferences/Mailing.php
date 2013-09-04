@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -98,6 +98,13 @@ class CRM_Admin_Form_Preferences_Mailing extends CRM_Admin_Form_Preferences {
           'title' => ts('Enable CiviMail to create activities on delivery'),
           'weight' => 8,
           'description' => NULL,
+        ),
+        'disable_mandatory_tokens_check' =>
+        array(
+          'html_type' => 'checkbox',
+          'title' => ts('Disable check for mandatory tokens'),
+          'weight' => 9,
+          'description' => ts('Don\'t check for presence of mandatory tokens (domain address; unsubscribe/opt-out) before sending mailings. WARNING: Mandatory tokens are a safe-guard which facilitate compliance with the US CAN-SPAM Act. They should only be disabled if your organization adopts other mechanisms for compliance or if your organization is not subject to CAN-SPAM.'),
         ),
       ),
     );

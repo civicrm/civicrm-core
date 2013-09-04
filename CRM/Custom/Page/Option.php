@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -277,6 +277,10 @@ ORDER BY weight, label
     $this->_gid = CRM_Utils_Request::retrieve('gid', 'Positive',
       $this, FALSE, 0
     );
+
+    if ($isReserved = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $this->_gid, 'is_reserved', 'id')) {
+      CRM_Core_Error::fatal("You cannot add or edit muliple choice options in a reserved custom field-set.");
+    }
 
     //as url contain $gid so append breadcrumb dynamically.
     $breadcrumb = array(array('title' => ts('Custom Data Fields'),

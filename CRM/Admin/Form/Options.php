@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -192,8 +192,8 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
     if ($this->_gName == 'payment_instrument') {
       $accountType = CRM_Core_PseudoConstant::accountOptionValues('financial_account_type', NULL, " AND v.name = 'Asset' ");
       $financialAccount = CRM_Contribute_PseudoConstant::financialAccount(NULL, key($accountType));
-      
-      $this->add('select', 'financial_account_id', ts('Financial Account'), 
+
+      $this->add('select', 'financial_account_id', ts('Financial Account'),
         array('' => ts('- select -')) + $financialAccount
       );
     }
@@ -255,7 +255,7 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
       (($this->_action & CRM_Core_Action::ADD) || !$isReserved)
     ) {
       $caseID = CRM_Core_Component::getComponentID('CiviCase');
-      $components = array('' => ts('Contact'), $caseID => 'CiviCase');
+      $components = array('' => ts('Contacts OR Cases'), $caseID => ts('Cases Only'));
       $this->add('select',
         'component_id',
         ts('Component'),
@@ -402,7 +402,7 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
 
       $groupParams = array('name' => ($this->_gName));
       $optionValue = CRM_Core_OptionValue::addOptionValue($params, $groupParams, $this->_action, $this->_id);
-      
+
       // CRM-11516
       if (CRM_Utils_Array::value('financial_account_id', $params)) {
         $relationTypeId = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Asset Account is' "));

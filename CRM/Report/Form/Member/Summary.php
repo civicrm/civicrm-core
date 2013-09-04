@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -95,6 +95,11 @@ class CRM_Report_Form_Member_Summary extends CRM_Report_Form {
             'type' => CRM_Utils_Type::T_DATE,
             'operatorType' => CRM_Report_Form::OP_DATE,
           ),
+          'owner_membership_id' =>
+          array('title' => ts('Membership Owner ID'),
+            'type' => CRM_Utils_Type::T_INT,
+            'operatorType' => CRM_Report_Form::OP_INT,
+          ),
           'membership_type_id' =>
           array('title' => ts('Membership Type'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
@@ -131,6 +136,14 @@ class CRM_Report_Form_Member_Summary extends CRM_Report_Form {
           'contact_id' =>
           array(
             'no_display' => TRUE,
+          ),
+          'contact_type' =>
+          array(
+            'title' => ts('Contact Type'),
+          ),
+          'contact_sub_type' =>
+          array(
+            'title' => ts('Contact SubType'),
           ),
         ),
       ),
@@ -337,45 +350,8 @@ class CRM_Report_Form_Member_Summary extends CRM_Report_Form {
   // end of from
 
   function where() {
-    $clauses = array();
-    foreach ($this->_columns as $tableName => $table) {
-      if (array_key_exists('filters', $table)) {
-        foreach ($table['filters'] as $fieldName => $field) {
-          $clause = NULL;
-
-          if ($field['operatorType'] & CRM_Utils_Type::T_DATE) {
-            $relative = CRM_Utils_Array::value("{$fieldName}_relative", $this->_params);
-            $from     = CRM_Utils_Array::value("{$fieldName}_from", $this->_params);
-            $to       = CRM_Utils_Array::value("{$fieldName}_to", $this->_params);
-
-            if ($relative || $from || $to) {
-              $clause = $this->dateClause($field['name'], $relative, $from, $to, $field['type']);
-            }
-          }
-          else {
-            $op = CRM_Utils_Array::value("{$fieldName}_op", $this->_params);
-            if ($op) {
-              $clause = $this->whereClause($field,
-                $op,
-                CRM_Utils_Array::value("{$fieldName}_value", $this->_params),
-                CRM_Utils_Array::value("{$fieldName}_min", $this->_params),
-                CRM_Utils_Array::value("{$fieldName}_max", $this->_params)
-              );
-            }
-          }
-          if (!empty($clause)) {
-            $clauses[$fieldName] = $clause;
-          }
-        }
-      }
-    }
-
-    if (!empty($clauses)) {
-      $this->_where = "WHERE {$this->_aliases['civicrm_membership']}.is_test = 0 AND " . implode(' AND ', $clauses);
-    }
-    else {
-      $this->_where = "WHERE {$this->_aliases['civicrm_membership']}.is_test = 0";
-    }
+    $this->_whereClauses[] = "{$this->_aliases['civicrm_membership']}.is_test = 0";
+    parent::where();
   }
 
   function groupBy() {

@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -249,6 +249,7 @@ class CRM_Campaign_Selector_Search extends CRM_Core_Selector_Base implements CRM
     $rows = array();
 
     While ($result->fetch()) {
+      $this->_query->convertToPseudoNames($result);
       $row = array();
       // the columns we are interested in
       foreach (self::$_properties as $property) {

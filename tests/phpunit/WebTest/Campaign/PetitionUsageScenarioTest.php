@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -26,10 +26,6 @@
 
 require_once 'CiviTest/CiviSeleniumTestCase.php';
 class WebTest_Campaign_PetitionUsageScenarioTest extends CiviSeleniumTestCase {
-
-  protected $captureScreenshotOnFailure = TRUE;
-  protected $screenshotPath = '/tmp/';
-  protected $screenshotUrl = 'http://api.dev.civicrm.org/sc/';
 
   protected function setUp() {
     parent::setUp();
@@ -171,7 +167,7 @@ class WebTest_Campaign_PetitionUsageScenarioTest extends CiviSeleniumTestCase {
     $expected = array(
       2 => 'Petition',
       3 => "$title Petition",
-      4 => "$firstName $lastName",
+      4 => "$lastName, $firstName",
       5 => "$lastName, $firstName",
       8 => 'Scheduled',
     );
@@ -264,14 +260,14 @@ class WebTest_Campaign_PetitionUsageScenarioTest extends CiviSeleniumTestCase {
     $expected = array(
       2 => 'Petition',
       3 => "$title Petition",
-      4 => "$firstName $lastName",
+      4 => "$lastName, $firstName",
       5 => "$lastName, $firstName",
       8 => 'Completed',
     );
 
     foreach ($expected as $column => $value) {
       $this->verifyText("xpath=//table[@class='selector']/tbody/tr[2]/td[$column]", preg_quote($value));
+    }
   }
-}
 }
 

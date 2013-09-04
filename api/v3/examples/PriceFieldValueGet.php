@@ -1,31 +1,39 @@
 <?php
-
-/*
- 
+/**
+ * Test Generated example of using price_field_value get API
+ * *
  */
 function price_field_value_get_example(){
-$params = array( 
-  'version' => 3,
+$params = array(
   'name' => 'contribution_amount',
 );
 
-  $result = civicrm_api( 'price_field_value','get',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('price_field_value', 'get', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function price_field_value_get_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
   'id' => 1,
-  'values' => array( 
-      '1' => array( 
+  'values' => array(
+      '1' => array(
           'id' => '1',
           'price_field_id' => '1',
           'name' => 'contribution_amount',
@@ -40,7 +48,7 @@ function price_field_value_get_expectedresult(){
     ),
 );
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 

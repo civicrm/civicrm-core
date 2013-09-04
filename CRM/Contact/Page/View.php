@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -203,9 +203,7 @@ class CRM_Contact_Page_View extends CRM_Core_Page {
       'isDeleted' => $isDeleted,
     );
 
-    if (($session->get('userID') == $this->_contactId) ||
-      CRM_Contact_BAO_Contact_Permission::allow($this->_contactId, CRM_Core_Permission::EDIT)
-    ) {
+    if (CRM_Contact_BAO_Contact_Permission::allow($this->_contactId, CRM_Core_Permission::EDIT)) {
       $recentOther['editUrl'] = CRM_Utils_System::url('civicrm/contact/add', "reset=1&action=update&cid={$this->_contactId}");
     }
 
@@ -286,7 +284,7 @@ class CRM_Contact_Page_View extends CRM_Core_Page {
     // things easier in dashboard
     $session = CRM_Core_Session::singleton();
 
-    if ($session->get('userID') == $contactID) {
+    if ($session->get('userID') == $contactID && CRM_Core_Permission::check('edit my contact')) {
       $page->assign('permission', 'edit');
       $page->_permission = CRM_Core_Permission::EDIT;
       // deleted contacts’ stuff should be (at best) only viewable
@@ -345,6 +343,7 @@ class CRM_Contact_Page_View extends CRM_Core_Page {
     $config = CRM_Core_Config::singleton();
     $session = CRM_Core_Session::singleton();
     $uid = CRM_Core_BAO_UFMatch::getUFId($cid);
+    $userRecordUrl = NULL;
     if ($uid) {
       if ($config->userSystem->is_drupal == '1' &&
         ($session->get('userID') == $cid || CRM_Core_Permission::checkAnyPerm(array('cms:administer users', 'cms:view user account')))
@@ -361,8 +360,11 @@ class CRM_Contact_Page_View extends CRM_Core_Page {
           $userRecordUrl = $config->userFrameworkBaseURL . "index.php?option=com_admin&view=profile&layout=edit&id=" . $uid;
         }
       }
-      else {
-        $userRecordUrl = NULL;
+      // For WordPress, provide link to user profile is contact belongs to logged in user OR user has administrator role
+      elseif ($config->userFramework == 'WordPress' &&
+        ($session->get('userID') == $cid || CRM_Core_Permission::checkAnyPerm(array('cms:administer users')))
+        ) {
+          $userRecordUrl = $config->userFrameworkBaseURL . "wp-admin/user-edit.php?user_id=" . $uid;
       }
       $obj->assign('userRecordUrl', $userRecordUrl);
       $obj->assign('userRecordId', $uid);

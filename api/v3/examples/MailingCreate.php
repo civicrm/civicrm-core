@@ -1,38 +1,46 @@
 <?php
-
-/*
- 
+/**
+ * Test Generated example of using mailing create API
+ * *
  */
 function mailing_create_example(){
-$params = array( 
+$params = array(
   'subject' => 'maild',
   'body_text' => 'bdkfhdskfhduew',
-  'version' => 3,
   'name' => 'mailing name',
   'created_id' => 1,
 );
 
-  $result = civicrm_api( 'mailing','create',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('mailing', 'create', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function mailing_create_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
   'id' => 1,
-  'values' => array( 
-      '1' => array( 
+  'values' => array(
+      '1' => array(
           'id' => '1',
           'domain_id' => '1',
-          'header_id' => 'null',
-          'footer_id' => 'null',
+          'header_id' => '',
+          'footer_id' => '',
           'reply_id' => '',
           'unsubscribe_id' => '',
           'resubscribe_id' => '',
@@ -52,11 +60,11 @@ function mailing_create_expectedresult(){
           'msg_template_id' => '',
           'override_verp' => '1',
           'created_id' => '1',
-          'created_date' => '20130204223402',
+          'created_date' => '2013-07-28 08:49:19',
           'scheduled_id' => '',
-          'scheduled_date' => '20130204223402',
+          'scheduled_date' => '20130728085413',
           'approver_id' => '1',
-          'approval_date' => '20130204223402',
+          'approval_date' => '20130728085413',
           'approval_status_id' => '',
           'approval_note' => '',
           'is_archived' => '',
@@ -64,16 +72,16 @@ function mailing_create_expectedresult(){
           'campaign_id' => '',
           'dedupe_email' => '',
           'sms_provider_id' => '',
-          'api.mailing_job.create' => array( 
+          'api.mailing_job.create' => array(
               'is_error' => 0,
               'version' => 3,
               'count' => 1,
               'id' => 1,
-              'values' => array( 
-                  '0' => array( 
+              'values' => array(
+                  '0' => array(
                       'id' => '1',
                       'mailing_id' => '1',
-                      'scheduled_date' => '20130204223402',
+                      'scheduled_date' => '20130728085413',
                       'start_date' => '',
                       'end_date' => '',
                       'status' => 'Scheduled',
@@ -89,7 +97,7 @@ function mailing_create_expectedresult(){
     ),
 );
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 

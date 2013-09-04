@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -283,6 +283,9 @@ class CRM_Campaign_Form_Petition_Signature extends CRM_Core_Form {
     }
 
     $this->setDefaults($this->_defaults);
+
+    // add in all state country selectors for enabled countries
+    CRM_Core_BAO_Address::fixAllStateSelects($this, $this->_defaults);
   }
 
   public function buildQuickForm() {
@@ -550,6 +553,7 @@ class CRM_Campaign_Form_Petition_Signature extends CRM_Core_Form {
           unset($tag_params);
           $tag_params['contact_id'] = $this->_contactId;
           $tag_params['tag_id'] = $this->_tagId;
+          $tag_params['version'] = 3;
           $tag_value = civicrm_api('entity_tag', 'create', $tag_params);
         }
         break;
@@ -558,9 +562,10 @@ class CRM_Campaign_Form_Petition_Signature extends CRM_Core_Form {
     //send email
     $params['activityId'] = $result->id;
     $params['tagId'] = $this->_tagId;
-    $this->bao->sendEmail($params, $this->_sendEmailMode);
 
     $transaction->commit();
+
+    $this->bao->sendEmail($params, $this->_sendEmailMode);
 
     if ($result) {
       // call the hook before we redirect
@@ -583,6 +588,9 @@ class CRM_Campaign_Form_Petition_Signature extends CRM_Core_Form {
    * @access public
    */
   function buildCustom($id, $name, $viewOnly = FALSE) {
+
+    // create state country map array to hold selectors
+    $stateCountryMap = array();
 
     if ($id) {
       $session = CRM_Core_Session::singleton();
@@ -625,17 +633,27 @@ class CRM_Campaign_Form_Petition_Signature extends CRM_Core_Form {
             continue;
           }
 
+          // if state or country in the profile, create map
+          list($prefixName, $index) = CRM_Utils_System::explode('-', $key, 2);
+          if ($prefixName == 'state_province' || $prefixName == 'country' || $prefixName == 'county') {
+            if (!array_key_exists($index, $stateCountryMap)) {
+              $stateCountryMap[$index] = array();
+            }
+            $stateCountryMap[$index][$prefixName] = $key;
+          }
 
           CRM_Core_BAO_UFGroup::buildProfile($this, $field, CRM_Profile_Form::MODE_CREATE, $contactID, TRUE);
           $this->_fields[$key] = $field;
-          if ($field['add_captcha']) {
+          // CRM-11316 Is ReCAPTCHA enabled for this profile AND is this an anonymous visitor
+          if ($field['add_captcha'] && !$this->_contactId) {
             $addCaptcha = TRUE;
           }
         }
 
-        if ($addCaptcha &&
-          !$viewOnly
-        ) {
+        // initialize the state country map
+        CRM_Core_BAO_Address::addStateCountryMap($stateCountryMap);
+
+        if ($addCaptcha && !$viewOnly) {
           $captcha = CRM_Utils_ReCAPTCHA::singleton();
           $captcha->add($this);
           $this->assign("isCaptcha", TRUE);

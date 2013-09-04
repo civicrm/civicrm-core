@@ -1,48 +1,56 @@
 <?php
-
-/*
- single function to create contact w partipation & contribution. Note that in the
-      case of 'contribution' the 'create' is implied (api.contribution.create)
+/**
+ * Test Generated example of using participant create API
+ * single function to create contact w partipation & contribution. Note that in the
+      case of 'contribution' the 'create' is implied (api.contribution.create) *
  */
 function participant_create_example(){
-$params = array( 
+$params = array(
   'contact_type' => 'Individual',
   'display_name' => 'dlobo',
-  'version' => 3,
-  'api.participant' => array( 
-      'event_id' => 38,
+  'api.participant' => array(
+      'event_id' => 39,
       'status_id' => 1,
       'role_id' => 1,
       'format.only_id' => 1,
     ),
-  'api.contribution.create' => array( 
+  'api.contribution.create' => array(
       'financial_type_id' => 1,
       'total_amount' => 100,
       'format.only_id' => 1,
     ),
-  'api.participant_payment.create' => array( 
+  'api.participant_payment.create' => array(
       'contribution_id' => '$value.api.contribution.create',
       'participant_id' => '$value.api.participant',
     ),
 );
 
-  $result = civicrm_api( 'participant','create',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('participant', 'create', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function participant_create_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
   'id' => 5,
-  'values' => array( 
-      '5' => array( 
+  'values' => array(
+      '5' => array(
           'id' => '5',
           'contact_type' => 'Individual',
           'contact_sub_type' => '',
@@ -88,17 +96,17 @@ function participant_create_expectedresult(){
           'organization_name' => '',
           'sic_code' => '',
           'user_unique_id' => '',
-          'created_date' => '2013-02-05 11:38:34',
+          'created_date' => '2013-07-28 08:49:19',
           'modified_date' => '2012-11-14 16:02:35',
           'api.participant' => 4,
           'api.contribution.create' => 1,
-          'api.participant_payment.create' => array( 
+          'api.participant_payment.create' => array(
               'is_error' => 0,
               'version' => 3,
               'count' => 1,
               'id' => 1,
-              'values' => array( 
-                  '0' => array( 
+              'values' => array(
+                  '0' => array(
                       'id' => '1',
                       'participant_id' => '4',
                       'contribution_id' => '1',
@@ -109,7 +117,7 @@ function participant_create_expectedresult(){
     ),
 );
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 

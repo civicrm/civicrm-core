@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -242,7 +242,7 @@ class CRM_Contact_Form_Search_Custom_ActivitySearch implements CRM_Contact_Form_
             JOIN civicrm_option_value ov2
                  ON activity.status_id = ov2.value AND ov2.option_group_id = {$this->_groupId}
             LEFT JOIN civicrm_activity_contact sourceContact
-                 ON activity.id = sourceContact.activity_id AND sourceContact.record_type_id = {$sourceID} 
+                 ON activity.id = sourceContact.activity_id AND sourceContact.record_type_id = {$sourceID}
             JOIN civicrm_contact contact_b
                  ON sourceContact.contact_id = contact_b.id
             LEFT JOIN civicrm_case_activity cca

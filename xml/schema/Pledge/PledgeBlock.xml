@@ -26,7 +26,7 @@
   </field>
   <field>
       <name>entity_id</name>
-      <title>Entity Id</title> 
+      <title>Entity Id</title>
       <type>int unsigned</type>
       <required>true</required>
       <comment>FK to entity table specified in entity_table column.</comment>
@@ -51,8 +51,8 @@
        <comment>Delimited list of supported frequency units</comment>
        <add>2.1</add>
   </field>
-  <field>     
-      <name>is_pledge_interval</name>  
+  <field>
+      <name>is_pledge_interval</name>
       <type>boolean</type>
       <default>0</default>
       <comment>Is frequency interval exposed on the contribution form.</comment>

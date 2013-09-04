@@ -11,7 +11,7 @@
       <type>int unsigned</type>
       <uniqueName>case_id</uniqueName>
       <required>true</required>
-      <import>true</import> 
+      <import>true</import>
       <title>Case ID</title>
       <comment>Unique Case ID</comment>
        <add>1.8</add>
@@ -34,9 +34,9 @@
        <table>civicrm_contact</table>
        <key>id</key>
        <add>1.8</add>
-       <drop>2.1</drop>       
+       <drop>2.1</drop>
        <onDelete>CASCADE</onDelete>
-  </foreignKey>  
+  </foreignKey>
   <field>
        <name>case_type_id</name>
        <type>varchar</type>
@@ -78,7 +78,7 @@
        <required>true</required>
        <comment>Id of second case category.</comment>
        <add>1.8</add>
-       <drop>2.0</drop>       
+       <drop>2.0</drop>
   </field>
   <index>
        <name>index_casetag2_id</name>
@@ -124,7 +124,7 @@
      <name>end_date</name>
      <uniqueName>case_end_date</uniqueName>
      <title>Case End Date</title>
-     <import>true</import>    
+     <import>true</import>
      <type>date</type>
      <comment>Date on which given case ends.</comment>
      <add>1.8</add>
@@ -166,5 +166,5 @@
        <name>index_is_deleted</name>
        <fieldName>is_deleted</fieldName>
        <add>2.2</add>
-  </index> 
+  </index>
 </table>

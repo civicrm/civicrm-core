@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -105,6 +105,10 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
 
     //custom group id
     $this->_gid = CRM_Utils_Request::retrieve('gid', 'Positive', $this);
+
+    if ($isReserved = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $this->_gid, 'is_reserved', 'id')) {
+      CRM_Core_Error::fatal("You cannot add or edit fields in a reserved custom field-set.");
+    }
 
     if ($this->_gid) {
       $url = CRM_Utils_System::url('civicrm/admin/custom/group/field',
@@ -559,7 +563,7 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
     $title  = $fields['label'];
     $name   = CRM_Utils_String::munge($title, '_', 64);
     $gId    = $self->_gid;  // CRM-7564
-    $query  = 'select count(*) from civicrm_custom_field where ( name like %1 OR label like %2 ) and id != %3 and custom_group_id = %4';    
+    $query  = 'select count(*) from civicrm_custom_field where ( name like %1 OR label like %2 ) and id != %3 and custom_group_id = %4';
     $fldCnt = CRM_Core_DAO::singleValueQuery($query, array(1 => array($name, 'String'),
         2 => array($title, 'String'),
         3 => array((int)$self->_id, 'Integer'),
@@ -640,7 +644,7 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
         case 'StateProvince':
           if (!empty($default)) {
             $query = "
-SELECT count(*) 
+SELECT count(*)
   FROM civicrm_state_province
  WHERE name = %1
     OR abbreviation = %1";
@@ -941,8 +945,8 @@ AND    option_group_id = %2";
           $fieldStateProvince = $strtolower($params['default_value']);
           $query = "
 SELECT id
-  FROM civicrm_state_province 
- WHERE LOWER(name) = '$fieldStateProvince' 
+  FROM civicrm_state_province
+ WHERE LOWER(name) = '$fieldStateProvince'
     OR abbreviation = '$fieldStateProvince'";
           $dao = CRM_Core_DAO::executeQuery($query, CRM_Core_DAO::$_nullArray);
           if ($dao->fetch()) {
@@ -955,7 +959,7 @@ SELECT id
           $query = "
 SELECT id
   FROM civicrm_country
- WHERE LOWER(name) = '$fieldCountry' 
+ WHERE LOWER(name) = '$fieldCountry'
     OR iso_code = '$fieldCountry'";
           $dao = CRM_Core_DAO::executeQuery($query, CRM_Core_DAO::$_nullArray);
           if ($dao->fetch()) {

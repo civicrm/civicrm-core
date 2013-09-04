@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -104,6 +104,13 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
    * @static
    */
   private static $pcpStatus;
+
+  /**
+   * contribution / financial batches
+   * @var array
+   * @static
+   */
+  private static $batch;
 
   /**
    * DEPRECATED. Please use the buildOptions() method in the appropriate BAO object.
@@ -405,6 +412,35 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
     }
 
     return self::$financialTypeAccount[$financialTypeId];
+  }
+
+  /**
+   * Get all batches
+   *
+   * @access public
+   *
+   * @return array - array reference of all batches if any
+   * @static
+   */
+  public static function &batch($id = NULL) {
+    if (!self::$batch) {
+      $orderBy = " id DESC ";
+      CRM_Core_PseudoConstant::populate(
+        self::$batch,
+        'CRM_Batch_DAO_Batch',
+        TRUE,
+        'title',
+        NULL,
+        NULL,
+        $orderBy
+      );
+    }
+
+    if ($id) {
+      $result = CRM_Utils_Array::value($id, self::$batch);
+      return $result;
+    }
+    return self::$batch;
   }
 }
 

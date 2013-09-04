@@ -208,10 +208,11 @@ class CRM_UF_Page_ProfileEditor extends CRM_Core_Page {
       $sectionName = 'cg_' . $customGroup->id;
       $section = array(
         'title' => ts('%1: %2', array(1 => $title, 2 => $customGroup->title)),
-        'is_addable' => TRUE,
+        'is_addable' => $customGroup->is_reserved ? FALSE : TRUE,
         'custom_group_id' => $customGroup->id,
         'extends_entity_column_id' => $customGroup->extends_entity_column_id,
         'extends_entity_column_value' => CRM_Utils_Array::explodePadded($customGroup->extends_entity_column_value),
+        'is_reserved' => $customGroup->is_reserved ? TRUE : FALSE,
       );
       $result['sections'][$sectionName] = $section;
     }

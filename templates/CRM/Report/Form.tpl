@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -23,7 +23,9 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
-{include file="CRM/common/crmeditable.tpl"}
+{if $outputMode neq 'print'}
+  {include file="CRM/common/crmeditable.tpl"}
+{/if} 
 {* this div is being used to apply special css *}
     {if $section eq 1}
     <div class="crm-block crm-content-block crm-report-layoutGraph-form-block">

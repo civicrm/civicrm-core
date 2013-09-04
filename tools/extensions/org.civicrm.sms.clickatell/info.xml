@@ -6,7 +6,7 @@
   <description>Clickatell integration allows delivering short message service (SMS) messages through its Clickatell Gateway to mobile phone users.</description>
   <urls>
     <url desc="Main Extension Page">http://civicrm.org</url>
-    <url desc="Documentation">http://wiki.civicrm.org/confluence/display/CRMDOC43/Setting+up+a+SMS+Provider+for+CiviSMS</url>
+    <url desc="Documentation">http://wiki.civicrm.org/confluence/display/CRMDOC/Setting+up+a+SMS+Provider+for+CiviSMS</url>
     <url desc="Support">http://forum.civicrm.org</url>
     <url desc="Licensing">http://civicrm.org/licensing</url>
   </urls>

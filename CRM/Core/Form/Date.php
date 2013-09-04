@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -51,7 +51,7 @@ Class CRM_Core_Form_Date {
 
     $dateOptions = array();
 
-    if (CRM_Utils_System::getClassName($form) == 'CRM_Activity_Import_Form_UploadFile') {
+    if (CRM_Utils_System::getClassName($form) == 'CRM_Activity_Import_Form_DataSource') {
       $dateText = ts('yyyy-mm-dd OR yyyy-mm-dd HH:mm OR yyyymmdd OR yyyymmdd HH:mm (1998-12-25 OR 1998-12-25 15:33 OR 19981225 OR 19981225 10:30 OR ( 2008-9-1 OR 2008-9-1 15:33 OR 20080901 15:33)');
     }
     else {
@@ -171,6 +171,8 @@ Class CRM_Core_Form_Date {
         'current.quarter' => ts('Current Quarter to-date'),
         'current.month' => ts('Current Month to-date'),
         'current.week' => ts('Current Week to-date'),
+        'ending_3.year' => ts('Last 3 Years'),
+        'ending_2.year' => ts('Last 2 Years'),
         'ending.year' => ts('Last 12 Months'),
         'ending.quarter' => ts('Last 3 Months'),
         'ending.month' => ts('Last Month'),

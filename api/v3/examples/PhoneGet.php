@@ -1,44 +1,53 @@
 <?php
-
-/*
- 
+/**
+ * Test Generated example of using phone get API
+ * *
  */
 function phone_get_example(){
-$params = array( 
-  'contact_id' => '',
+$params = array(
+  'contact_id' => 7,
   'phone' => '(123) 456-7890',
-  'version' => 3,
 );
 
-  $result = civicrm_api( 'phone','get',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('phone', 'get', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function phone_get_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
   'id' => 1,
-  'values' => array( 
-      '1' => array( 
+  'values' => array(
+      '1' => array(
           'id' => '1',
-          'contact_id' => '8',
-          'location_type_id' => '11',
+          'contact_id' => '7',
+          'location_type_id' => '10',
           'is_primary' => '1',
           'is_billing' => 0,
           'phone' => '(123) 456-7890',
           'phone_numeric' => '1234567890',
+          'phone_type_id' => '1',
         ),
     ),
 );
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 

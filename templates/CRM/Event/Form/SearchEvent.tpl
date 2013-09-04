@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -71,7 +71,7 @@
 {literal} 
 <script type="text/javascript">
 if ( document.getElementsByName('eventsByDates')[1].checked ) {
-   show( 'id_fromToDates', 'block' );
+  cj('#id_fromToDates').show();
 }
 </script>
 {/literal} 

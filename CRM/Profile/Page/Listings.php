@@ -2,7 +2,7 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -283,6 +283,7 @@ class CRM_Profile_Page_Listings extends CRM_Core_Page {
     $this->preProcess();
 
     $this->assign('recentlyViewed', FALSE);
+    $this->assign('ufGroupName', 'unknown'); // override later (if possible)
 
     if ($this->_gid) {
       $ufgroupDAO = new CRM_Core_DAO_UFGroup();
@@ -296,6 +297,9 @@ class CRM_Profile_Page_Listings extends CRM_Core_Page {
       // set the title of the page
       if ($ufgroupDAO->title) {
         CRM_Utils_System::setTitle($ufgroupDAO->title);
+      }
+      if ($ufgroupDAO->name) {
+        $this->assign('ufGroupName', $ufgroupDAO->name);
       }
     }
 
@@ -318,7 +322,7 @@ class CRM_Profile_Page_Listings extends CRM_Core_Page {
     }
 
     // also get the search tpl name
-    $this->assign('searchTPL', $formController->getTemplateFileName());
+    $this->assign('searchTPL', $formController->getHookedTemplateFileName());
 
     $this->assign('search', $this->_search);
 

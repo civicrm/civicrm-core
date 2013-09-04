@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -95,7 +95,7 @@ class CRM_Admin_Page_Admin extends CRM_Core_Page {
     $this->_showHide = new CRM_Core_ShowHideBlocks();
     foreach ($groups as $group => $title) {
       $groupId = str_replace(' ', '_', $group);
-      
+
       $this->_showHide->addShow("id_{$groupId}_show");
       $this->_showHide->addHide("id_{$groupId}");
       $v = CRM_Core_ShowHideBlocks::links($this, $groupId, '', '', FALSE);

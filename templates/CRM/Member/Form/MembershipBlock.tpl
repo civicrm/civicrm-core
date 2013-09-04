@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -49,7 +49,9 @@
               <span class="description">{ts}Membership section title - for new member signups.{/ts}</span></td>
           </tr>
           <tr class="crm-member-membershipblock-form-block-new_text">
-              <td class="label">{$form.new_text.label}</td>
+              <td class="label">{$form.new_text.label}
+              {if $action == 2}<br />{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_membership_block' field='new_text' id=$membershipBlockId}{/if}
+              </td>
               <td>{$form.new_text.html}<br />
               <span class="description">{ts}Membership section introductory text - for new member signups.{/ts}<br /></span><br /></td>
           </tr>
@@ -59,7 +61,9 @@
               <span class="description">{ts}Membership section title - displayed to renewing members.{/ts}</span></td>
           </tr>
           <tr class="crm-member-membershipblock-form-block-renewal_text">
-              <td class="label">{$form.renewal_text.label}</td>
+              <td class="label">{$form.renewal_text.label}
+                {if $action == 2}<br />{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_membership_block' field='renewal_text' id=$membershipBlockId}{/if}
+              </td>
               <td>{$form.renewal_text.html}<br />
               <span class="description">{ts}Membership section introductory text - displayed to renewing members.{/ts}</span><br /></td>
           </tr>

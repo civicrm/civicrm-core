@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -148,6 +148,8 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
     if (CRM_Core_Permission::access('CiviEvent')) {
       $this->_fields = array_merge(CRM_Event_BAO_Query::getParticipantFields(), $this->_fields);
     }
+
+    $this->_fields = array_merge($this->_fields, CRM_Contact_BAO_Query_Hook::singleton()->getFields());
 
     $this->_selectFields = array();
     foreach ($this->_fields as $name => $field) {
@@ -531,7 +533,7 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
 
 
     $name = NULL;
-    if (isset($params['field_name'][1])) {
+    if (isset($params['field_name'][1]) && isset($this->_selectFields[$params['field_name'][1]])) {
       // we dont get a name for a html formatting element
       $name = $this->_selectFields[$params['field_name'][1]];
     }

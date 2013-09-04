@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -332,8 +332,8 @@ class CRM_Activity_Page_AJAX {
     $mainActivity->free();
 
     /* Mark previous activity as deleted. If it was a non-case activity
-         * then just change the subject.
-         */
+     * then just change the subject.
+     */
 
     if (in_array($params['mode'], array(
       'move', 'file'))) {
@@ -345,7 +345,8 @@ class CRM_Activity_Page_AJAX {
       }
       else {
         $otherActivity->subject = ts('(Filed on case %1)', array(
-          1 => $params['caseID'])) . ' ' . $otherActivity->subject;
+            1 => $params['caseID']
+          )) . ' ' . $otherActivity->subject;
       }
       $otherActivity->activity_date_time = $actDateTime;
       $otherActivity->save();
@@ -363,6 +364,14 @@ class CRM_Activity_Page_AJAX {
     $sourceID = CRM_Utils_Array::key('Activity Source', $activityContacts);
     $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
     $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
+
+    $sourceContactID = CRM_Activity_BAO_Activity::getSourceContactID($params['activityID']);
+    $src_params = array(
+      'activity_id' => $mainActivityId,
+      'contact_id' => $sourceContactID,
+      'record_type_id' => $sourceID
+    );
+    CRM_Activity_BAO_ActivityContact::create($src_params);
 
     foreach ($targetContacts as $key => $value) {
       $targ_params = array(

@@ -1,30 +1,37 @@
 <?php
-
-/*
- 
+/**
+ * Test Generated example of using custom_group get API
+ * *
  */
 function custom_group_get_example(){
-$params = array( 
-  'version' => 3,
-);
+$params = array();
 
-  $result = civicrm_api( 'custom_group','get',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('custom_group', 'get', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function custom_group_get_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
   'id' => 1,
-  'values' => array( 
-      '1' => array( 
+  'values' => array(
+      '1' => array(
           'id' => '1',
           'name' => 'test_group_1',
           'title' => 'Test_Group_1',
@@ -38,11 +45,12 @@ function custom_group_get_expectedresult(){
           'table_name' => 'civicrm_value_test_group_1_1',
           'is_multiple' => 0,
           'collapse_adv_display' => 0,
+          'is_reserved' => 0,
         ),
     ),
 );
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 

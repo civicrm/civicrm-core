@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -193,15 +193,16 @@ class CRM_Contact_Form_Search_Basic extends CRM_Contact_Form_Search {
     // we dont want to store the sortByCharacter in the formValue, it is more like
     // a filter on the result set
     // this filter is reset if we click on the search button
-    if ($this->_sortByCharacter !== NULL
-      && empty($_POST)
-    ) {
+    if ($this->_sortByCharacter !== NULL && empty($_POST)) {
       if (strtolower($this->_sortByCharacter) == 'all') {
         $this->_formValues['sortByCharacter'] = NULL;
       }
       else {
         $this->_formValues['sortByCharacter'] = $this->_sortByCharacter;
       }
+    }
+    else {
+      $this->_sortByCharacter = NULL;
     }
 
     $this->_params = CRM_Contact_BAO_Query::convertFormValues($this->_formValues);

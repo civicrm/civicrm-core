@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -122,7 +122,7 @@
                 {if $context eq 'search'}
                   {$form.buttons.html}
                 {else}
-                  <a class="searchCampaign button" style="float:left;" href="#" title={ts}Search{/ts}
+                  <a class="searchCampaign button" style="float:left;" href="#" title="{ts}Search{/ts}"
                      onClick="searchCampaigns( '{$qfKey}' );return false;">{ts}Search{/ts}</a>
                 {/if}
               </td>

@@ -1,8 +1,7 @@
 <?php
-
 /*
  +--------------------------------------------------------------------+
-| CiviCRM version 4.3                                                |
+| CiviCRM version 4.4                                                |
 +--------------------------------------------------------------------+
 | Copyright CiviCRM LLC (c) 2004-2013                                |
 +--------------------------------------------------------------------+
@@ -37,25 +36,24 @@ class api_v3_LineItemTest extends CiviUnitTestCase {
   protected $contribution_result = null;
   public $_eNoticeCompliant = TRUE;
   public $DBResetRequired = TRUE;
+  protected $_financialTypeId = 1;
+
   public function setUp() {
     parent::setUp();
-    $this->_contributionTypeId = $this->contributionTypeCreate();
     $this->_individualId = $this->individualCreate();
     $contributionParams = array(
       'contact_id' => $this->_individualId,
       'receive_date' => '20120511',
       'total_amount' => 100.00,
-      'financial_type_id' => $this->_contributionTypeId,
+      'financial_type_id' => $this->_financialTypeId,
       'non_deductible_amount' => 10.00,
       'fee_amount' => 51.00,
       'net_amount' => 91.00,
       'source' => 'SSF',
       'contribution_status_id' => 1,
-      'version' => $this->_apiversion,
     );
-    $contribution = civicrm_api('contribution','create', $contributionParams);
+    $contribution = $this->callAPISuccess('contribution','create', $contributionParams);
     $this->params = array(
-      'version' => $this->_apiversion,
       'price_field_value_id' => 1,
       'price_field_id' => 1,
       'entity_table' => 'civicrm_contribution',
@@ -69,7 +67,7 @@ class api_v3_LineItemTest extends CiviUnitTestCase {
   function tearDown() {
 
     foreach ($this->contactIds as $id) {
-      civicrm_api('contact', 'delete', array('version' => $this->_apiversion, 'id' => $id));
+      $this->callAPISuccess('contact', 'delete', array('id' => $id));
     }
     $this->quickCleanup(
         array(
@@ -78,7 +76,6 @@ class api_v3_LineItemTest extends CiviUnitTestCase {
             'civicrm_line_item',
         )
     );
-    $this->contributionTypeDelete();
   }
 
   public function testCreateLineItem() {
@@ -87,10 +84,7 @@ class api_v3_LineItemTest extends CiviUnitTestCase {
             'civicrm_line_item',
         )
     );
-    $result = civicrm_api($this->_entity, 'create', $this->params + array('debug' => 1));
-    $this->id = $result['id'];
-    $this->documentMe($this->params, $result, __FUNCTION__, __FILE__);
-    $this->assertAPISuccess($result, 'In line ' . __LINE__);
+    $result = $this->callAPIAndDocument($this->_entity, 'create', $this->params + array('debug' => 1), __FUNCTION__, __FILE__);
     $this->assertEquals(1, $result['count'], 'In line ' . __LINE__);
     $this->assertNotNull($result['values'][$result['id']]['id'], 'In line ' . __LINE__);
     $this->getAndCheck($this->params, $result['id'], $this->_entity);
@@ -98,34 +92,24 @@ class api_v3_LineItemTest extends CiviUnitTestCase {
 
   public function testGetBasicLineItem() {
     $getParams = array(
-      'version' => $this->_apiversion,
       'entity_table' => 'civicrm_contribution',
     );
-    $getResult = civicrm_api($this->_entity, 'get', $getParams);
-    $this->documentMe($getParams, $getResult, __FUNCTION__, __FILE__);
-    $this->assertAPISuccess($getResult, 'In line ' . __LINE__);
+    $getResult = $this->callAPIAndDocument($this->_entity, 'get', $getParams, __FUNCTION__, __FILE__);
     $this->assertEquals(1, $getResult['count'], 'In line ' . __LINE__);
   }
 
   public function testDeleteLineItem() {
-    $getParams = array(
-        'version' => $this->_apiversion,
-        'entity_table' => 'civicrm_contribution',
+    $getParams = array(        'entity_table' => 'civicrm_contribution',
     );
-    $getResult = civicrm_api($this->_entity, 'get', $getParams);
-    $deleteParams = array('version' => $this->_apiversion, 'id' => $getResult['id']);
-    $deleteResult = civicrm_api($this->_entity, 'delete', $deleteParams);
-    $this->documentMe($deleteParams, $deleteResult, __FUNCTION__, __FILE__);
-    $this->assertAPISuccess($deleteResult, 'In line ' . __LINE__);
-    $checkDeleted = civicrm_api($this->_entity, 'get', array(
-      'version' => $this->_apiversion,
-      ));
+    $getResult = $this->callAPISuccess($this->_entity, 'get', $getParams);
+    $deleteParams = array('id' => $getResult['id']);
+    $deleteResult = $this->callAPIAndDocument($this->_entity, 'delete', $deleteParams, __FUNCTION__, __FILE__);
+    $checkDeleted = $this->callAPISuccess($this->_entity, 'get', array());
     $this->assertEquals(0, $checkDeleted['count'], 'In line ' . __LINE__);
   }
 
   public function testGetFieldsLineItem() {
-    $result = civicrm_api($this->_entity, 'getfields', array('action' => 'create', 'version' => $this->_apiversion, 'action' => 'create'));
-    $this->assertAPISuccess($result, 'In line ' . __LINE__);
+    $result = $this->callAPISuccess($this->_entity, 'getfields', array('action' => 'create', 'action' => 'create'));
     $this->assertEquals(1, $result['values']['entity_id']['api.required']);
   }
 

@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -121,8 +121,8 @@ class CRM_Contribute_Import_Field {
 
     switch ($this->_name) {
       case 'contact_id':
-        // note: we validate extistence of the contact in API, upon
-        // insert (it would be too costlty to do a db call here)
+        // note: we validate existence of the contact in API, upon
+        // insert (it would be too costly to do a db call here)
         return CRM_Utils_Rule::integer($this->_value);
 
       case 'receive_date':

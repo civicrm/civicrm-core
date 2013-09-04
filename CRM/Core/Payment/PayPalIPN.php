@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -173,8 +173,16 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
     }
 
     if (!$first) {
-      // create a contribution and then get it processed
+      //check if this contribution transaction is already processed
+      //if not create a contribution and then get it processed
       $contribution = new CRM_Contribute_BAO_Contribution();
+      $contribution->trxn_id = $input['trxn_id'];
+      if ($contribution->trxn_id && $contribution->find()) {
+        CRM_Core_Error::debug_log_message("returning since contribution has already been handled");
+        echo "Success: Contribution has already been handled<p>";
+        return TRUE;
+      }
+
       $contribution->contact_id = $ids['contact'];
       $contribution->financial_type_id  = $objects['contributionType']->id;
       $contribution->contribution_page_id = $ids['contributionPage'];
@@ -226,11 +234,6 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
 
     $transaction = new CRM_Core_Transaction();
 
-    // fix for CRM-2842
-    //  if ( ! $this->createContact( $input, $ids, $objects ) ) {
-    //       return false;
-    //  }
-
     $participant = &$objects['participant'];
     $membership = &$objects['membership'];
 
@@ -259,12 +262,13 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
     $this->completeTransaction($input, $ids, $objects, $transaction, $recur);
   }
 
-  function main($component = 'contribute') {
+  function main() {
     // CRM_Core_Error::debug_var( 'GET' , $_GET , true, true );
     // CRM_Core_Error::debug_var( 'POST', $_POST, true, true );
-
+   //@todo - this could be refactored like PayPalProIPN & a test could be added
 
     $objects = $ids = $input = array();
+    $component = CRM_Utils_Array::value('module', $_GET);
     $input['component'] = $component;
 
     // get the contribution and contact ids from the GET params

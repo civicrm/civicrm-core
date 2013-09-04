@@ -1,31 +1,39 @@
 <?php
-
-/*
- 
+/**
+ * Test Generated example of using contribution get API
+ * *
  */
 function contribution_get_example(){
-$params = array( 
+$params = array(
   'contribution_id' => 1,
-  'version' => 3,
 );
 
-  $result = civicrm_api( 'contribution','get',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('contribution', 'get', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function contribution_get_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
   'id' => 1,
-  'values' => array( 
-      '1' => array( 
+  'values' => array(
+      '1' => array(
           'contact_id' => '1',
           'contact_type' => 'Individual',
           'contact_sub_type' => '',
@@ -77,7 +85,7 @@ function contribution_get_expectedresult(){
     ),
 );
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 

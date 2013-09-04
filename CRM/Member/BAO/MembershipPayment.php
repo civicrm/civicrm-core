@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -57,6 +57,7 @@ class CRM_Member_BAO_MembershipPayment extends CRM_Member_DAO_MembershipPayment 
     $dao = new CRM_Member_DAO_MembershipPayment();
     $dao->copyValues($params);
     $dao->id = CRM_Utils_Array::value('id', $params);
+    $dao->save();
     CRM_Utils_Hook::post($hook, 'MembershipPayment', $dao->id, $dao);
     return $dao;
   }

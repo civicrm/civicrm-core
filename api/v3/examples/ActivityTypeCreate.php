@@ -1,40 +1,48 @@
 <?php
-
-/*
- 
+/**
+ * Test Generated example of using activity_type create API
+ * *
  */
 function activity_type_create_example(){
-$params = array( 
+$params = array(
   'weight' => '2',
   'label' => 'send out letters',
-  'version' => 3,
   'filter' => 0,
   'is_active' => 1,
   'is_optgroup' => 1,
   'is_default' => 0,
 );
 
-  $result = civicrm_api( 'activity_type','create',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('activity_type', 'create', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function activity_type_create_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
-  'id' => 723,
-  'values' => array( 
-      '723' => array( 
-          'id' => '723',
+  'id' => 722,
+  'values' => array(
+      '722' => array(
+          'id' => '722',
           'option_group_id' => '2',
           'label' => 'send out letters',
-          'value' => '44',
+          'value' => '46',
           'name' => 'send out letters',
           'grouping' => '',
           'filter' => 0,
@@ -51,7 +59,7 @@ function activity_type_create_expectedresult(){
     ),
 );
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 

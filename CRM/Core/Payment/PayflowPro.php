@@ -1,7 +1,7 @@
 <?php
 /*
    +----------------------------------------------------------------------------+
-   | PayflowPro Core Payment Module for CiviCRM version 4.3                     |
+   | PayflowPro Core Payment Module for CiviCRM version 4.4                     |
    +----------------------------------------------------------------------------+
    | Licensed to CiviCRM under the Academic Free License version 3.0            |
    |                                                                            |
@@ -161,78 +161,78 @@ class CRM_Core_Payment_PayflowPro extends CRM_Core_Payment {
 
       switch ($params['frequency_unit']) {
         case '1 week':
-          $params['next_sched_contribution'] = mktime(0, 0, 0, date("m"), date("d") + 7,
+          $params['next_sched_contribution_date'] = mktime(0, 0, 0, date("m"), date("d") + 7,
             date("Y")
           );
           $params['end_date'] = mktime(0, 0, 0, date("m"), date("d") + (7 * $payflow_query_array['TERM']),
             date("Y")
           );
-          $payflow_query_array['START'] = date('mdY', $params['next_sched_contribution']);
+          $payflow_query_array['START'] = date('mdY', $params['next_sched_contribution_date']);
           $payflow_query_array['PAYPERIOD'] = "WEEK";
           $params['frequency_unit'] = "week";
           $params['frequency_interval'] = 1;
           break;
 
         case '2 weeks':
-          $params['next_sched_contribution'] = mktime(0, 0, 0, date("m"), date("d") + 14, date("Y"));
+          $params['next_sched_contribution_date'] = mktime(0, 0, 0, date("m"), date("d") + 14, date("Y"));
           $params['end_date'] = mktime(0, 0, 0, date("m"), date("d") + (14 * $payflow_query_array['TERM'])
             , date("Y ")
           );
-          $payflow_query_array['START'] = date('mdY', $params['next_sched_contribution']);
+          $payflow_query_array['START'] = date('mdY', $params['next_sched_contribution_date']);
           $payflow_query_array['PAYPERIOD'] = "BIWK";
           $params['frequency_unit'] = "week";
           $params['frequency_interval'] = 2;
           break;
 
         case '4 weeks':
-          $params['next_sched_contribution'] = mktime(0, 0, 0, date("m"), date("d") + 28, date("Y")
+          $params['next_sched_contribution_date'] = mktime(0, 0, 0, date("m"), date("d") + 28, date("Y")
           );
           $params['end_date'] = mktime(0, 0, 0, date("m"), date("d") + (28 * $payflow_query_array['TERM'])
             , date("Y")
           );
-          $payflow_query_array['START'] = date('mdY', $params['next_sched_contribution']);
+          $payflow_query_array['START'] = date('mdY', $params['next_sched_contribution_date']);
           $payflow_query_array['PAYPERIOD'] = "FRWK";
           $params['frequency_unit'] = "week";
           $params['frequency_interval'] = 4;
           break;
 
         case '1 month':
-          $params['next_sched_contribution'] = mktime(0, 0, 0, date("m") + 1,
+          $params['next_sched_contribution_date'] = mktime(0, 0, 0, date("m") + 1,
             date("d"), date("Y")
           );
           $params['end_date'] = mktime(0, 0, 0, date("m") +
             (1 * $payflow_query_array['TERM']),
             date("d"), date("Y")
           );
-          $payflow_query_array['START'] = date('mdY', $params['next_sched_contribution']);
+          $payflow_query_array['START'] = date('mdY', $params['next_sched_contribution_date']);
           $payflow_query_array['PAYPERIOD'] = "MONT";
           $params['frequency_unit'] = "month";
           $params['frequency_interval'] = 1;
           break;
 
         case '3 months':
-          $params['next_sched_contribution'] = mktime(0, 0, 0, date("m") + 3, date("d")
+          $params['next_sched_contribution_date'] = mktime(0, 0, 0, date("m") + 3, date("d")
             , date("Y")
           );
           $params['end_date'] = mktime(0, 0, 0, date("m") +
             (3 * $payflow_query_array['TERM']),
             date("d"), date("Y")
           );
-          $payflow_query_array['START'] = date('mdY', $params['next_sched_contribution']);
+          $payflow_query_array['START'] = date('mdY', $params['next_sched_contribution_date']);
           $payflow_query_array['PAYPERIOD'] = "QTER";
           $params['frequency_unit'] = "month";
           $params['frequency_interval'] = 3;
           break;
 
         case '6 months':
-          $params['next_sched_contribution'] = mktime(0, 0, 0, date("m") + 6, date("d"),
+          $params['next_sched_contribution_date'] = mktime(0, 0, 0, date("m") + 6, date("d"),
             date("Y")
           );
           $params['end_date'] = mktime(0, 0, 0, date("m") +
             (6 * $payflow_query_array['TERM']),
             date("d"), date("Y")
           );
-          $payflow_query_array['START'] = date('mdY', $params['next_sched_contribution'
+          $payflow_query_array['START'] = date('mdY', $params['next_sched_contribution_date'
             ]
           );
           $payflow_query_array['PAYPERIOD'] = "SMYR";
@@ -241,14 +241,14 @@ class CRM_Core_Payment_PayflowPro extends CRM_Core_Payment {
           break;
 
         case '1 year':
-          $params['next_sched_contribution'] = mktime(0, 0, 0, date("m"), date("d"),
+          $params['next_sched_contribution_date'] = mktime(0, 0, 0, date("m"), date("d"),
             date("Y") + 1
           );
           $params['end_date'] = mktime(0, 0, 0, date("m"), date("d"),
             date("Y") +
             (1 * $payflow_query_array['TEM'])
           );
-          $payflow_query_array['START'] = date('mdY', $params['next_sched_contribution']);
+          $payflow_query_array['START'] = date('mdY', $params['next_sched_contribution_date']);
           $payflow_query_array['PAYPERIOD'] = "YEAR";
           $params['frequency_unit'] = "year";
           $params['frequency_interval'] = 1;
@@ -489,7 +489,7 @@ class CRM_Core_Payment_PayflowPro extends CRM_Core_Payment {
     // this line makes it work under https
     curl_setopt($ch, CURLOPT_POSTFIELDS, $payflow_query);
     //adding POST data
-    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 2);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'verifySSL') ? 2 : 0);
     //verifies ssl certificate
     curl_setopt($ch, CURLOPT_FORBID_REUSE, TRUE);
     //forces closure of connection when done

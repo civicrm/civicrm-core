@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -262,7 +262,7 @@ class CRM_Contact_Import_ImportJob {
     );
 
     $this->_parser->run($this->_tableName, $mapperFields,
-      CRM_Contact_Import_Parser::MODE_IMPORT,
+      CRM_Import_Parser::MODE_IMPORT,
       $this->_contactType,
       $this->_primaryKeyName,
       $this->_statusFieldName,
@@ -308,7 +308,7 @@ class CRM_Contact_Import_ImportJob {
   }
 
   public function setFormVariables($form) {
-    $this->_parser->set($form, CRM_Contact_Import_Parser::MODE_IMPORT);
+    $this->_parser->set($form, CRM_Import_Parser::MODE_IMPORT);
   }
 
   private function _addImportedContactsToNewGroup($contactIds,

@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -194,7 +194,7 @@ class CRM_Case_PseudoConstant extends CRM_Core_PseudoConstant {
                      civicrm_option_group g
               WHERE  v.option_group_id = g.id
                      AND  g.name         = 'activity_type'
-                     AND  v.is_active    = 1 
+                     AND  v.is_active    = 1
                      AND  g.is_active    = 1";
 
       if (!$all) {

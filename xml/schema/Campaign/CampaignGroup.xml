@@ -5,7 +5,7 @@
   <name>civicrm_campaign_group</name>
   <comment>Campaign Group Details.</comment>
   <add>3.3</add>
-  
+
   <field>
     <name>id</name>
     <type>int unsigned</type>
@@ -17,7 +17,7 @@
     <name>id</name>
     <autoincrement>true</autoincrement>
   </primaryKey>
-  
+
   <field>
     <name>campaign_id</name>
     <type>int unsigned</type>
@@ -41,10 +41,10 @@
     <comment>Type of Group.</comment>
   </field>
 
-  <field> 
+  <field>
     <name>entity_table</name>
     <type>varchar</type>
-    <length>64</length> 
+    <length>64</length>
     <default>NULL</default>
     <comment>Name of table where item being referenced is stored.</comment>
     <add>3.3</add>

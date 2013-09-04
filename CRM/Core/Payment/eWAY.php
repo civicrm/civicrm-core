@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -26,7 +26,7 @@
 
 /*
  +--------------------------------------------------------------------+
- | eWAY Core Payment Module for CiviCRM version 4.3 & 1.9             |
+ | eWAY Core Payment Module for CiviCRM version 4.4 & 1.9             |
  +--------------------------------------------------------------------+
  | Licensed to CiviCRM under the Academic Free License version 3.0    |
  |                                                                    |
@@ -143,7 +143,7 @@ class CRM_Core_Payment_eWAY extends CRM_Core_Payment {
    * eWAY payment process
    **********************************************************/
   function doDirectPayment(&$params) {
-    if ($params['is_recur'] == TRUE) {
+    if (CRM_Utils_Array::value('is_recur', $params) == TRUE) {
       CRM_Core_Error::fatal(ts('eWAY - recurring payments not implemented'));
     }
 
@@ -353,7 +353,7 @@ class CRM_Core_Payment_eWAY extends CRM_Core_Payment {
     //----------------------------------------------------------------------------------------------------
     if (self::isError($eWAYResponse)) {
       $eWayTrxnError = $eWAYResponse->Error();
-
+      CRM_Core_Error::debug_var('eWay Error', $eWayTrxnError, TRUE, TRUE);
       if (substr($eWayTrxnError, 0, 6) == "Error:") {
         return self::errorExit(9008, $eWayTrxnError);
       }

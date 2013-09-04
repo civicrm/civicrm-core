@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -49,7 +49,7 @@ class CRM_Contact_Form_DedupeRules extends CRM_Admin_Form {
    *
    * @return None
    * @access public
-   */ 
+   */
   function preProcess() {
     // Ensure user has permission to be here
     if (!CRM_Core_Permission::check('administer dedupe rules')) {
@@ -185,16 +185,16 @@ class CRM_Contact_Form_DedupeRules extends CRM_Admin_Form {
    */
   public function postProcess() {
     $values = $this->exportValues();
-    
+
     //FIXME: Handle logic to replace is_default column by usage
     $used = CRM_Utils_Array::value('used', $values, FALSE);
     // reset used column to General (since there can only
     // be one 'Supervised' or 'Unsupervised' rule)
     if ($this->_options[$used] != 'General') {
       $query = "
-UPDATE civicrm_dedupe_rule_group 
+UPDATE civicrm_dedupe_rule_group
    SET used = 'General'
- WHERE contact_type = %1 
+ WHERE contact_type = %1
    AND used = %2";
       $queryParams = array(1 => array($this->_contactType, 'String'),
         2 => array($this->_options[$used], 'String'),

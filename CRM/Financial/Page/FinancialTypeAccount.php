@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -51,7 +51,7 @@ class CRM_Financial_Page_FinancialTypeAccount extends CRM_Core_Page {
    * @var array
    * @static
    */
-  static $_aid = null;
+  protected $_aid = null;
 
   /**
    * Get BAO Name
@@ -169,7 +169,7 @@ class CRM_Financial_Page_FinancialTypeAccount extends CRM_Core_Page {
         // form all action links
         $action = array_sum(array_keys($this->links()));
         $links = self::links();
-        
+
         //CRM-12492
         if ($dao->account_relationship == $relationTypeId) {
           unset($links[CRM_Core_Action::DELETE]);

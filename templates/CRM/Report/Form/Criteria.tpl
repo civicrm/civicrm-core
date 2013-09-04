@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -71,7 +71,7 @@
             <tr class="crm-report crm-report-criteria-groupby">
                 {foreach from=$groupByElements item=gbElem key=dnc}
                     {assign var="count" value=`$count+1`}
-                    <td width="25%" {if $form.fields.$gbElem} onClick="selectGroupByFields('{$gbElem}');"{/if}>
+                    <td width="25%" {if $form.fields.$gbElem}"{/if}>
                         {$form.group_bys[$gbElem].html}
                         {if $form.group_bys_freq[$gbElem].html}:<br>
                             &nbsp;&nbsp;{$form.group_bys_freq[$gbElem].label}&nbsp;{$form.group_bys_freq[$gbElem].html}
@@ -254,16 +254,16 @@
             }
         }
 
-  function selectGroupByFields(id) {
-      var field = 'fields_'+ id;
-      var group = 'group_bys_'+ id;
-      var groups = document.getElementById( group ).checked;
-      if ( groups == 1 ) {
-          document.getElementById( field ).checked = true;
-      } else {
-          document.getElementById( field ).checked = false;
-      }
-  }
+    cj(document).ready(function(){
+      cj('.crm-report-criteria-groupby input:checkbox').click(function() {
+        cj('#fields_' + this.id.substr(10)).prop('checked', this.checked);
+      });
+      {/literal}{if $displayToggleGroupByFields}{literal}
+      cj('.crm-report-criteria-field input:checkbox').click(function() {
+        cj('#group_bys_' + this.id.substr(7)).prop('checked', this.checked);
+      });
+      {/literal}{/if}{literal}
+    });
     </script>
     {/literal}
 

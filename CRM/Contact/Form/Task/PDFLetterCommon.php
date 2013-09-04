@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -190,7 +190,17 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
       }
     }
     else {
-      $form->addDefaultButtons(ts('Make PDF Letters'));
+      $form->addButtons(array(
+        array(
+          'type' => 'submit',
+          'name' => ts('Make PDF Letters'),
+          'isDefault' => TRUE,
+        ),
+        array(
+          'type' => 'cancel',
+          'name' => ts('Done'),
+        ),
+      ));
     }
 
     $form->addFormRule(array('CRM_Contact_Form_Task_PDFLetterCommon', 'formRule'), $form);
@@ -376,7 +386,7 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
     );
     $activityParams = array(
       'subject' => $formValues['subject'],
-      'campaign_id' => $formValues['campaign_id'],
+      'campaign_id' => CRM_Utils_Array::value('campaign_id', $formValues),
       'source_contact_id' => $userID,
       'activity_type_id' => $activityTypeID,
       'activity_date_time' => date('YmdHis'),
@@ -399,7 +409,7 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
 
     $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
     $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
- 
+
     foreach ($form->_contactIds as $contactId) {
       $activityTargetParams = array(
         'activity_id' => empty($activity->id) ? $activityIds[$contactId] : $activity->id,

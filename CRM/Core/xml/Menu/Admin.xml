@@ -481,7 +481,7 @@
   </item>
   <item>
      <path>civicrm/admin/setting/misc</path>
-     <title>Undelete, Logging and ReCAPTCHA</title>
+     <title>Misc (Undelete, PDFs, Limits, Logging, Captcha, etc.)</title>
    <desc>Enable undelete/move to trash feature, detailed change logging, ReCAPTCHA to protect forms.</desc>
      <page_callback>CRM_Admin_Form_Setting_Miscellaneous</page_callback>
      <adminGroup>System Settings</adminGroup>
@@ -620,7 +620,7 @@
   <item>
      <path>civicrm/admin/options/grant_type</path>
      <title>Grant Types</title>
-     <desc>List of types which can be assigned to Grants. (Enable CiviGrant from Global Settings - Enable Components if you want to track grants.)</desc>
+     <desc>List of types which can be assigned to Grants. (Enable CiviGrant from Administer > Systme Settings > Enable Components if you want to track grants.)</desc>
      <path_arguments>group=grant_type</path_arguments>
      <page_callback>CRM_Admin_Page_Options</page_callback>
      <adminGroup>Option Lists</adminGroup>
@@ -762,5 +762,16 @@
      <path>civicrm/sms/callback</path>
      <page_callback>CRM_SMS_Page_Callback</page_callback>
      <access_callback>1</access_callback>
+  </item>
+  <item>
+    <path>civicrm/admin/badgelayout</path>
+    <title>Badge Layout</title>
+    <page_callback>CRM_Badge_Page_Layout</page_callback>
+    <access_arguments>administer CiviCRM</access_arguments>
+  </item>
+  <item>
+    <path>civicrm/admin/badgelayout/add</path>
+    <page_callback>CRM_Badge_Form_Layout</page_callback>
+    <access_arguments>administer CiviCRM</access_arguments>
   </item>
 </menu>

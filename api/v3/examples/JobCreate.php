@@ -1,11 +1,10 @@
 <?php
-
-/*
- 
+/**
+ * Test Generated example of using job create API
+ * *
  */
 function job_create_example(){
-$params = array( 
-  'version' => 3,
+$params = array(
   'sequential' => 1,
   'name' => 'API_Test_Job',
   'description' => 'A long description written by hand in cursive',
@@ -16,23 +15,32 @@ $params = array(
   'is_active' => 1,
 );
 
-  $result = civicrm_api( 'job','create',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('job', 'create', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function job_create_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
   'id' => 1,
-  'values' => array( 
-      '0' => array( 
+  'values' => array(
+      '0' => array(
           'id' => '1',
           'domain_id' => '1',
           'run_frequency' => 'Daily',
@@ -47,7 +55,7 @@ function job_create_expectedresult(){
     ),
 );
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 

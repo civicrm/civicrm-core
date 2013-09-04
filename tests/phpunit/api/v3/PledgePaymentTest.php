@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -40,26 +40,18 @@ class api_v3_PledgePaymentTest extends CiviUnitTestCase {
    */
   protected $_individualId;
   protected $_pledgeID;
-  protected $_apiversion;
+  protected $_apiversion = 3;
   protected $_contributionID;
-  protected $_contributionTypeId;
+  protected $_financialTypeId = 1;
   protected $_entity = 'PledgePayment';
-
+  public $_eNoticeCompliant = FALSE;
   public $DBResetRequired = TRUE;
 
   function setUp() {
-    $this->_apiversion = 3;
     parent::setUp();
-    $tablesToTruncate = array(
-      'civicrm_contribution',
-      'civicrm_contact', 'civicrm_pledge',
-    );
-
-    $this->quickCleanup($tablesToTruncate);
-    $this->_contributionTypeId = $this->contributionTypeCreate();
-    $this->_individualId = $this->individualCreate(NULL);
+    $this->_individualId = $this->individualCreate();
     $this->_pledgeID = $this->pledgeCreate($this->_individualId);
-    $this->_contributionID = $this->contributionCreate($this->_individualId, $this->_contributionTypeId);
+    $this->_contributionID = $this->contributionCreate($this->_individualId);
   }
 
   function tearDown() {
@@ -72,16 +64,11 @@ class api_v3_PledgePaymentTest extends CiviUnitTestCase {
     );
 
     $this->quickCleanup($tablesToTruncate);
-    $this->contributionTypeDelete();
   }
 
   function testGetPledgePayment() {
-    $params = array(
-      'version' => $this->_apiversion,
-    );
-    $result = civicrm_api('pledge_payment', 'get', $params);
-    $this->documentMe($params, $result, __FUNCTION__, __FILE__);
-    $this->assertEquals(0, $result['is_error'], " in line " . __LINE__);
+    $params = array();
+    $result = $this->callAPIAndDocument('pledge_payment', 'get', $params, __FUNCTION__, __FILE__);
     $this->assertEquals(5, $result['count'], " in line " . __LINE__);
   }
 
@@ -95,17 +82,13 @@ class api_v3_PledgePaymentTest extends CiviUnitTestCase {
       'contact_id' => $this->_individualId,
       'pledge_id' => $this->_pledgeID,
       'contribution_id' => $this->_contributionID,
-      'version' => $this->_apiversion,
       'status_id' => 1,
     );
-    $createResult = civicrm_api('pledge_payment', 'create', $createparams);
-    $this->assertEquals(0, $createResult['is_error'], " in line " . __LINE__);
+    $createResult = $this->callAPISuccess('pledge_payment', 'create', $createparams);
     $params = array(
-      'version' => $this->_apiversion,
       'contribution_id' => $this->_contributionID,
     );
-    $result = civicrm_api('pledge_payment', 'get', $params);
-    $this->assertEquals(0, $result['is_error'], " in line " . __LINE__);
+    $result = $this->callAPISuccess('pledge_payment', 'get', $params);
     $this->assertEquals(1, $result['count'], " in line " . __LINE__);
   }
 
@@ -119,18 +102,14 @@ class api_v3_PledgePaymentTest extends CiviUnitTestCase {
       'contact_id' => $this->_individualId,
       'pledge_id' => $this->_pledgeID,
       'contribution_id' => $this->_contributionID,
-      'version' => $this->_apiversion,
       'status_id' => 1,
     );
-    $createResult = civicrm_api('pledge_payment', 'create', $createparams);
-    $this->assertEquals(0, $createResult['is_error'], " in line " . __LINE__);
+    $createResult = $this->callAPISuccess('pledge_payment', 'create', $createparams);
     $params = array(
-      'version' => $this->_apiversion,
       'status_id' => 1,
     );
 
-    $result = civicrm_api('pledge_payment', 'get', $params);
-    $this->assertEquals(0, $result['is_error'], " in line " . __LINE__);
+    $result = $this->callAPISuccess('pledge_payment', 'get', $params);
     $this->assertEquals(1, $result['count'], " in line " . __LINE__);
   }
 
@@ -139,11 +118,7 @@ class api_v3_PledgePaymentTest extends CiviUnitTestCase {
  */
   function testCreatePledgePayment() {
     //check that 5 pledge payments exist at the start
-    $getParams = array(
-      'version' => $this->_apiversion,
-    );
-    $beforeAdd = civicrm_api('pledge_payment', 'get', $getParams);
-    $this->assertEquals(0, $beforeAdd['is_error'], " in line " . __LINE__);
+    $beforeAdd = $this->callAPISuccess('pledge_payment', 'get', array());
     $this->assertEquals(5, $beforeAdd['count'], " in line " . __LINE__);
 
     //test the pledge_payment_create function
@@ -151,44 +126,35 @@ class api_v3_PledgePaymentTest extends CiviUnitTestCase {
       'contact_id' => $this->_individualId,
       'pledge_id' => $this->_pledgeID,
       'contribution_id' => $this->_contributionID,
-      'version' => $this->_apiversion,
       'status_id' => 1,
       'actual_amount' => 20,
     );
-    $result = civicrm_api('pledge_payment', 'create', $params);
-    $this->documentMe($params, $result, __FUNCTION__, __FILE__);
-    $this->assertEquals(0, $result['is_error'], " in line " . __LINE__);
+    $result = $this->callAPIAndDocument('pledge_payment', 'create', $params, __FUNCTION__, __FILE__);
 
     //check existing updated not new one created - 'create' means add contribution_id in this context
-    $afterAdd = civicrm_api('pledge_payment', 'get', $getParams);
-    $this->assertEquals(0, $beforeAdd['is_error'], " in line " . __LINE__);
+    $afterAdd = $this->callAPISuccess('pledge_payment', 'get', array());
     $this->assertEquals(5, $afterAdd['count'], " in line " . __LINE__);
 
     //get the created payment & check it out
     $getParams['id'] = $result['id'];
-    $getIndPayment = civicrm_api('pledge_payment', 'get', $getParams);
+    $getIndPayment = $this->callAPISuccess('pledge_payment', 'get', $getParams);
     $this->assertEquals(1, $getIndPayment['count'], " in line " . __LINE__);
     $this->assertEquals(20, $getIndPayment['values'][$result['id']]['actual_amount'], " in line " . __LINE__);
 
     //create a second pledge payment - need a contribution first &can't use the CiviUnitTest case function as invoice is hard-coded
     $contributionParams = array(
-      'version' => 3,
       'total_amount' => 20,
       'contact_id' => $this->_individualId,
-      'financial_type_id' => $this->_contributionTypeId,
+      'financial_type_id' => $this->_financialTypeId,
     );
-    $contribution = civicrm_api('contribution', 'create', $contributionParams);
-
-    $this->assertEquals(0, $contribution['is_error'], " in line " . __LINE__);
-
+    $contribution = $this->callAPISuccess('contribution', 'create', $contributionParams);
     $params['contribution_id'] = $contribution['id'];
 
 
-    $resultCont2 = civicrm_api('pledge_payment', 'create', $params);
-    $this->assertEquals(0, $resultCont2['is_error'], " in line " . __LINE__);
+    $resultCont2 = $this->callAPISuccess('pledge_payment', 'create', $params);
     //make sure original is untouched & has not been updated
     $this->assertGreaterThan($result['id'], $resultCont2['id'], " in line " . __LINE__);
-    $getIndPaymentAgain = civicrm_api('pledge_payment', 'get', $getParams);
+    $getIndPaymentAgain = $this->callAPISuccess('pledge_payment', 'get', $getParams);
     $this->assertEquals(1, $getIndPaymentAgain['count'], " in line " . __LINE__);
     $this->assertEquals($this->_contributionID, $getIndPaymentAgain['values'][$result['id']]['contribution_id'], " in line " . __LINE__);
   }
@@ -198,7 +164,6 @@ class api_v3_PledgePaymentTest extends CiviUnitTestCase {
      */
   function testCreatePledgePaymentAllCreated() {
     $params = array(
-      'version' => 3,
       'pledge_id' => $this->_pledgeID,
       'status_id' => 1,
     );
@@ -206,38 +171,30 @@ class api_v3_PledgePaymentTest extends CiviUnitTestCase {
     $i = 0;
     while ($i <= 5) {
       $contributionParams = array(
-        'version' => 3,
         'total_amount' => 20,
         'contact_id' => $this->_individualId,
-        'financial_type_id' => $this->_contributionTypeId,
+        'financial_type_id' => $this->_financialTypeId,
       );
-      $contribution = civicrm_api('contribution', 'create', $contributionParams);
-
-      $this->assertEquals(0, $contribution['is_error'], " in line " . __LINE__);
+      $contribution = $this->callAPISuccess('contribution', 'create', $contributionParams);
 
       $params['contribution_id'] = $contribution['id'];
-      $resultCont2 = civicrm_api('pledge_payment', 'create', $params);
+
+      $resultCont2 = civicrm_api('pledge_payment', 'create', $params + array('version' => $this->_apiversion));
       $i++;
     }
     // check that only 5 exist & we got an error setting the 6th
-    $result = civicrm_api('PledgePayment', 'Get', array(
-      'version' => 3,
+    $result = $this->callAPISuccess('PledgePayment', 'Get', array(
       'pledge_id' => $this->_pledgeID,
     ));
-
-    $this->assertEquals(5, $result['count']);
-    $this->assertEquals(1, $resultCont2['is_error']);
+    // the last one above should result in an error
     $this->assertEquals("There are no unmatched payment on this pledge. Pass in the pledge_payment id to specify one or 'option.create_new' to create one", $resultCont2['error_message']);
+    $this->assertEquals(5, $result['count']);
 
     $params['option.create_new'] = 1;
     $params['scheduled_amount'] = 20;
     $params['scheduled_date'] = '20131212';
-    $resultcreatenew = civicrm_api('pledge_payment', 'create', $params);
-    $this->assertAPISuccess($resultcreatenew);
-
-    $this->assertEquals(0, $resultcreatenew['is_error'], "in line " . __LINE__);
-    $result = civicrm_api('PledgePayment', 'Get', array(
-      'version' => 3,
+    $resultcreatenew = $this->callAPISuccess('pledge_payment', 'create', $params);
+    $result = $this->callAPISuccess('PledgePayment', 'Get', array(
         'pledge_id' => $this->_pledgeID,
       ));
 
@@ -263,29 +220,24 @@ class api_v3_PledgePaymentTest extends CiviUnitTestCase {
       'frequency_day' => 15,
       'installments' => 1,
       'sequential' => 1,
-      'version' => $this->_apiversion,
     );
 
-    $contributionID = $this->contributionCreate($this->_individualId, $this->_contributionTypeId, 45, 45);
-    $pledge = civicrm_api('Pledge', 'Create', $pledgeParams);
-    $this->assertEquals(0, $pledge['is_error'], " in line " . __LINE__);
+    $contributionID = $this->contributionCreate($this->_individualId, $this->_financialTypeId, 45, 45);
+    $pledge = $this->callAPISuccess('Pledge', 'Create', $pledgeParams);
 
     //test the pledge_payment_create function
     $params = array(
       'contact_id' => $this->_individualId,
       'pledge_id' => $pledge['id'],
       'contribution_id' => $contributionID,
-      'version' => $this->_apiversion,
       'status_id' => 1,
       'actual_amount' => 20,
     );
-    $result = civicrm_api('pledge_payment', 'create', $params);
-
-    $this->assertEquals(0, $result['is_error'], " in line " . __LINE__);
+    $result = $this->callAPISuccess('pledge_payment', 'create', $params);
 
     //check existing updated not new one created - 'create' means add contribution_id in this context
-    $afterAdd = civicrm_api('pledge_payment', 'get', array(
-      'version' => 3, 'contribution_id' => $contributionID,
+    $afterAdd = $this->callAPISuccess('pledge_payment', 'get', array(
+      'contribution_id' => $contributionID,
       ));
     $this->assertEquals(1, $afterAdd['count'], " in line " . __LINE__);
   }
@@ -294,20 +246,16 @@ class api_v3_PledgePaymentTest extends CiviUnitTestCase {
     $params = array(
       'pledge_id' => $this->_pledgeID,
       'contribution_id' => $this->_contributionID,
-      'version' => $this->_apiversion,
       'status_id' => 2,
       'actual_amount' => 20,
     );
-    $result = civicrm_api('pledge_payment', 'create', $params);
+    $result = $this->callAPISuccess('pledge_payment', 'create', $params);
     $updateparams = array(
       'id' => $result['id'],
       'status_id' => 1,
-      'version' => $this->_apiversion,
     );
 
-    $result = civicrm_api('pledge_payment', 'update', $updateparams);
-    $this->documentMe($params, $result, __FUNCTION__, __FILE__);
-    $this->assertAPISuccess($result, ' in line ' . __LINE__);
+    $result = $this->callAPIAndDocument('pledge_payment', 'update', $updateparams, __FUNCTION__, __FILE__);
     $this->getAndCheck(array_merge($params,$updateparams), $result['id'], $this->_entity);
   }
 
@@ -316,24 +264,20 @@ class api_v3_PledgePaymentTest extends CiviUnitTestCase {
       'contact_id' => $this->_individualId,
       'pledge_id' => $this->_pledgeID,
       'contribution_id' => $this->_contributionID,
-      'version' => $this->_apiversion,
       'status_id' => 1,
       'sequential' => 1,
       'actual_amount' => 20,
     );
-    $pledgePayment = civicrm_api('pledge_payment', 'create', $params);
+    $pledgePayment = $this->callAPISuccess('pledge_payment', 'create', $params);
 
     $deleteParams = array(
       'id' => $pledgePayment['id'],
-      'version' => $this->_apiversion,
     );
-    $result = civicrm_api('pledge_payment', 'delete', $deleteParams);
-    $this->documentMe($deleteParams, $result, __FUNCTION__, __FILE__);
-    $this->assertEquals(0, $result['is_error'], " in line " . __LINE__);
+    $result = $this->callAPIAndDocument('pledge_payment', 'delete', $deleteParams, __FUNCTION__, __FILE__);
   }
 
   function testGetFields() {
-    $result = civicrm_api('PledgePayment', 'GetFields', array());
+    $result = $this->callAPISuccess('PledgePayment', 'GetFields', array());
     $this->assertType('array', $result);
   }
 }

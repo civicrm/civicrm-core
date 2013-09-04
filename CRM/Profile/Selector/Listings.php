@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -306,6 +306,7 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
           'name' => ts('Name'),
           'sort' => 'sort_name',
           'direction' => CRM_Utils_Sort::ASCENDING,
+          'field_name' => 'sort_name',
         ),
       );
 
@@ -357,6 +358,7 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
             'name' => $field['title'],
             'sort' => $name,
             'direction' => $direction,
+            'field_name' => CRM_Core_BAO_UFField::isValidFieldName($name) ? $name : $fieldName,
           );
 
           $direction = CRM_Utils_Sort::DONTCARE;
@@ -569,6 +571,8 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
     $showProfileOverlay = CRM_Core_BAO_UFGroup::showOverlayProfile();
 
     while ($result->fetch()) {
+      $this->_query->convertToPseudoNames($result);
+
       if (isset($result->country)) {
         // the query returns the untranslated country name
         $i18n = CRM_Core_I18n::singleton();
@@ -583,7 +587,7 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
         $showProfileOverlay
       );
       if ($result->sort_name) {
-        $row['sort_name'] = $result->sort_name;
+        $row[] = $result->sort_name;
         $empty = FALSE;
       }
       else {
@@ -603,7 +607,7 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
         ) {
           $url      = CRM_Utils_System::fixURL($result->$name);
           $typeId   = substr($name, 0, -4) . "-website_type_id";
-          $typeName = CRM_Core_PseudoConstant::getValue('CRM_Core_DAO_Website', 'website_type_id', $result->$typeId);
+          $typeName = CRM_Core_PseudoConstant::getLabel('CRM_Core_DAO_Website', 'website_type_id', $result->$typeId);
           if ($typeName) {
             $row[] = "<a href=\"$url\">{$result->$name} (${typeName})</a>";
           }
@@ -612,34 +616,21 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
           }
         }
         elseif ($name == 'preferred_language') {
-          $row[] = CRM_Core_PseudoConstant::getValue('CRM_Contact_DAO_Contact', 'preferred_language', $result->$name);
+          $row[] = CRM_Core_PseudoConstant::getLabel('CRM_Contact_DAO_Contact', 'preferred_language', $result->$name);
         }
         elseif ($multipleSelectFields &&
           array_key_exists($name, $multipleSelectFields)
         ) {
-          // FIXME: Code related to the old CRM_Quest - should be removed
-          $key = $name;
-          $paramsNew = array($key => $result->$name);
-          if ($key == 'test_tutoring') {
-            $name = array($key => array('newName' => $key, 'groupName' => 'test'));
-            // for  readers group
-          }
-          elseif (substr($key, 0, 4) == 'cmr_') {
-            $name = array(
-              $key => array('newName' => $key,
-                'groupName' => substr($key, 0, -3),
-              ));
-          }
-          else {
-            $name = array($key => array('newName' => $key, 'groupName' => $key));
-          }
+          $paramsNew = array($name => $result->$name);
+          $name = array($name => array('newName' => $name, 'groupName' => $name));
+
           CRM_Core_OptionGroup::lookupValues($paramsNew, $name, FALSE);
           $row[] = $paramsNew[$key];
         }
         elseif (strpos($name, '-im')) {
           if (!empty($result->$name)) {
             $providerId   = $name . "-provider_id";
-            $providerName = CRM_Core_PseudoConstant::getValue('CRM_Core_DAO_IM', 'provider_id', $result->$providerId);
+            $providerName = CRM_Core_PseudoConstant::getLabel('CRM_Core_DAO_IM', 'provider_id', $result->$providerId);
             $row[]        = $result->$name . " ({$providerName})";
           }
           else {

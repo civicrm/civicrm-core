@@ -44,7 +44,7 @@
   </index>
   <field>
     <name>option_group_id</name>
-    <uniqueName>participant_discount_name</uniqueName> 
+    <uniqueName>participant_discount_name</uniqueName>
     <title>Discount Name</title>
     <type>int unsigned</type>
     <required>true</required>

@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -28,6 +28,10 @@
 
 require_once 'CiviTest/CiviUnitTestCase.php';
 class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
+  //@todo make BAO enotice compliant  & remove the line below
+  // WARNING - NEVER COPY & PASTE $_eNoticeCompliant = FALSE
+  // new test classes should be compliant.
+  public $_eNoticeCompliant = FALSE;
   protected $_contributionTypeId;
   protected $_contributionParams;
   protected $_contactId;
@@ -83,7 +87,7 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
     $this->_contributionParams = array(
       'contact_id' => $this->_contactId,
       'version' => 3,
-                                     'financial_type_id'   => $this->_contributionTypeId,
+      'financial_type_id'   => $this->_contributionTypeId,
       'recieve_date' => date('Ymd'),
       'total_amount' => 150.00,
       'invoice_id' => 'c8acb91e080ad7bd8a2adc119c192885',
@@ -481,7 +485,7 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
      */
   function _setUpMembershipObjects() {
     try {
-      $this->_membershipTypeID = $this->membershipTypeCreate($this->_contactId);
+      $this->_membershipTypeID = $this->membershipTypeCreate();
       $this->_membershipStatusID = $this->membershipStatusCreate('test status');
     }
     catch(Exception$e) {
@@ -501,8 +505,7 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
       'version' => 3,
     );
 
-    $membership = civicrm_api('membership', 'create', $this->_membershipParams);
-    $this->assertAPISuccess($membership, 'line ' . __LINE__ . ' set-up of membership');
+    $membership = $this->callAPISuccess('membership', 'create', $this->_membershipParams);
 
     $this->_membershipId = $membership['id'];
     //we'll create membership payment here because to make setup more re-usable

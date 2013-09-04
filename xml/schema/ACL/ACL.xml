@@ -8,6 +8,7 @@
     <add>1.6</add>
     <field>
         <name>id</name>
+        <title>ACL ID</title>
         <type>int unsigned</type>
         <required>true</required>
         <comment>Unique table ID</comment>
@@ -88,7 +89,7 @@
     </field>
     <index>
        <name>index_acl_id</name>
-       <fieldName>acl_id</fieldName>       
+       <fieldName>acl_id</fieldName>
        <add>1.6</add>
     </index>
     <field>

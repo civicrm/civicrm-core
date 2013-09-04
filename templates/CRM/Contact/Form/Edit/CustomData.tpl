@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -25,19 +25,17 @@
 *}
 
 <script type="text/javascript">var showTab = Array();</script>
-
 {foreach from=$groupTree item=cd_edit key=group_id}
-
-{if $cd_edit.is_multiple eq 1}
-  {assign var=tableID value=$cd_edit.table_id}
-  {assign var=divName value=$group_id|cat:"_$tableID"}
-  <div></div>
-  <div id="{$cd_edit.name|cat:'_$divName'}"
-       class="crm-accordion-wrapper crm-custom-accordion {if $cd_edit.collapse_display and !$skipTitle}collapsed{/if}">
-{else}
-  <div id="{$cd_edit.name}"
+  {if $cd_edit.is_multiple eq 1}
+    {assign var=tableID value=$cd_edit.table_id}
+    {assign var=divName value=$group_id|cat:"_$tableID"}
+    <div></div>
+    <div id="{$cd_edit.name|cat:'_$divName'}"
+     class="crm-accordion-wrapper crm-custom-accordion {if $cd_edit.collapse_display and !$skipTitle}collapsed{/if}">
+  {else}
+    <div id="{$cd_edit.name}"
        class="crm-accordion-wrapper crm-custom-accordion {if $cd_edit.collapse_display}collapsed{/if}">
-{/if}
+  {/if}
     <div class="crm-accordion-header">
       {$cd_edit.title}
     </div>
@@ -103,4 +101,3 @@
   </script>
 
   {include file="CRM/Form/attachmentjs.tpl"}
-

@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -42,11 +42,10 @@ class CRM_Contribute_BAO_ContributionPageTest extends CiviUnitTestCase {
 
   function setUp() {
     parent::setUp();
-    $this->_contributionTypeID = $this->contributionTypeCreate();
+    $this->_financialTypeID = 1;
   }
 
   function tearDown() {
-    $this->contributionTypeDelete();
   }
 
   /**
@@ -57,7 +56,7 @@ class CRM_Contribute_BAO_ContributionPageTest extends CiviUnitTestCase {
     $params = array(
       'qfkey' => '9a3ef3c08879ad4c8c109b21c583400e',
       'title' => 'Test Contribution Page',
-      'financial_type_id' => $this->_contributionTypeID,
+      'financial_type_id' => $this->_financialTypeID,
       'intro_text' => '',
       'footer_text' => 'Thanks',
       'is_for_organization' => 0,
@@ -88,7 +87,7 @@ class CRM_Contribute_BAO_ContributionPageTest extends CiviUnitTestCase {
 
     $params = array(
       'title' => 'Test Contribution Page',
-      'financial_type_id' => $this->_contributionTypeID,
+      'financial_type_id' => $this->_financialTypeID,
       'is_active' => 1,
     );
 
@@ -107,7 +106,7 @@ class CRM_Contribute_BAO_ContributionPageTest extends CiviUnitTestCase {
 
     $params = array(
       'title' => 'Test Contribution Page',
-      'financial_type_id' => $this->_contributionTypeID,
+      'financial_type_id' => $this->_financialTypeID,
       'is_active' => 1,
     );
 
@@ -118,7 +117,7 @@ class CRM_Contribute_BAO_ContributionPageTest extends CiviUnitTestCase {
     $setValues = CRM_Contribute_BAO_ContributionPage::setValues($id, $values);
 
     $this->assertEquals($params['title'], $values['title'], 'Verify contribution title.');
-    $this->assertEquals($this->_contributionTypeID, $values['financial_type_id'], 'Verify financial types id.');
+    $this->assertEquals($this->_financialTypeID, $values['financial_type_id'], 'Verify financial types id.');
     $this->assertEquals(1, $values['is_active'], 'Verify contribution is_active value.');
     ContributionPage::delete($contributionpage->id);
   }
@@ -130,7 +129,7 @@ class CRM_Contribute_BAO_ContributionPageTest extends CiviUnitTestCase {
     $params = array(
       'qfkey' => '9a3ef3c08879ad4c8c109b21c583400e',
       'title' => 'Test Contribution Page',
-      'financial_type_id' => $this->_contributionTypeID,
+      'financial_type_id' => $this->_financialTypeID,
       'intro_text' => '',
       'footer_text' => 'Thanks',
       'is_for_organization' => 0,
@@ -149,7 +148,7 @@ class CRM_Contribute_BAO_ContributionPageTest extends CiviUnitTestCase {
 
     $contributionpage = CRM_Contribute_BAO_ContributionPage::create($params);
     $copycontributionpage = CRM_Contribute_BAO_ContributionPage::copy($contributionpage->id);
-    $this->assertEquals($copycontributionpage->financial_type_id, $this->_contributionTypeID, 'Check for Financial type id.');
+    $this->assertEquals($copycontributionpage->financial_type_id, $this->_financialTypeID, 'Check for Financial type id.');
     $this->assertEquals($copycontributionpage->goal_amount, 400, 'Check for goal amount.');
     ContributionPage::delete($contributionpage->id);
     ContributionPage::delete($copycontributionpage->id);
@@ -159,10 +158,12 @@ class CRM_Contribute_BAO_ContributionPageTest extends CiviUnitTestCase {
    * test checkRecurPaymentProcessor() method
    */
   function testcheckRecurPaymentProcessor() {
+    //@todo paypalpro create seems to fail silently without causing this class to fail
+    // $this->paymentProcessorCreate may be a better option
     $paymentProcessor = PaypalPro::create();
     $params = array(
       'title' => 'Test Contribution Page',
-      'financial_type_id' => $this->_contributionTypeID,
+      'financial_type_id' => $this->_financialTypeID,
       'is_active' => 1,
       'payment_processor_id' => $paymentProcessor,
     );

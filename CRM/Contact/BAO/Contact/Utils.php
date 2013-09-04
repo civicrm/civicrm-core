@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -259,7 +259,7 @@ UNION
    * @access public
    * @static
    */
-  static function createCurrentEmployerRelationship($contactID, $organization) {
+  static function createCurrentEmployerRelationship($contactID, $organization, $previousEmployerID = NULL) {
     $organizationId = NULL;
 
     // if organization id is passed.
@@ -291,7 +291,7 @@ UNION
           'contact_type' => 'Organization',
           'organization_name' => trim($orgName[0]),
         );
-        $org = CRM_Contact_BAO_Contact::add($newOrg);
+        $org = CRM_Contact_BAO_Contact::create($newOrg);
         $organizationId = $org->id;
       }
     }
@@ -317,7 +317,9 @@ UNION
 
 
       // In case we change employer, clean prveovious employer related records.
-      $previousEmployerID = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $contactID, 'employer_id');
+      if (!$previousEmployerID) {
+        $previousEmployerID = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $contactID, 'employer_id');
+      }
       if ($previousEmployerID &&
         $previousEmployerID != $organizationId
       ) {
@@ -329,7 +331,7 @@ UNION
 
       $relationshipParams['relationship_ids'] = $relationshipIds;
       // handle related meberships. CRM-3792
-      self::currentEmployerRelatedMembership($contactID, $organizationId, $relationshipParams, $duplicate);
+      self::currentEmployerRelatedMembership($contactID, $organizationId, $relationshipParams, $duplicate, $previousEmployerID);
     }
   }
 
@@ -344,7 +346,7 @@ UNION
    * @access public
    * @static
    */
-  static function currentEmployerRelatedMembership($contactID, $employerID, $relationshipParams, $duplicate = FALSE) {
+  static function currentEmployerRelatedMembership($contactID, $employerID, $relationshipParams, $duplicate = FALSE, $previousEmpID = NULL) {
     $ids = array();
     $action = CRM_Core_Action::ADD;
 
@@ -365,7 +367,9 @@ UNION
     }
 
     //need to handle related meberships. CRM-3792
-    CRM_Contact_BAO_Relationship::relatedMemberships($contactID, $relationshipParams, $ids, $action);
+    if ($previousEmpID != $employerID) {
+      CRM_Contact_BAO_Relationship::relatedMemberships($contactID, $relationshipParams, $ids, $action);
+    }
   }
 
   /**
@@ -510,11 +514,7 @@ WHERE id={$contactId}; ";
           $form->assign('relatedOrganizationFound', TRUE);
         }
 
-        $isRequired = FALSE;
-        if (CRM_Utils_Array::value('is_for_organization', $form->_values) == 2) {
-          $isRequired = TRUE;
-        }
-        $form->add('text', 'organization_name', ts('Organization Name'), $attributes['organization_name'], $isRequired);
+        $form->add('text', 'organization_name', ts('Organization Name'), $attributes['organization_name'], TRUE);
         break;
 
       case 'Household':

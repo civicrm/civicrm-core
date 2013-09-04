@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -42,16 +42,12 @@ class CRM_Batch_Page_AJAX {
    * Save record
    */
   function batchSave() {
-    // save in cache table
+    // save the entered information in 'data' column
     $batchId = CRM_Utils_Type::escape($_POST['batch_id'], 'Positive');
 
-    $cacheKeyString = CRM_Batch_BAO_Batch::getCacheKeyForBatch($batchId);
-
-    // check if we can retrieve from database cache
     unset($_POST['qfKey']);
-    CRM_Core_BAO_Cache::setItem($_POST, 'batch entry', $cacheKeyString);
+    CRM_Core_DAO::setFieldValue('CRM_Batch_DAO_Batch', $batchId, 'data', json_encode(array('values' => $_POST)));
 
-    // return true if saved correctly
     CRM_Utils_System::civiExit();
   }
 

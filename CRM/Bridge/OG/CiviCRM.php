@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -85,7 +85,7 @@ class CRM_Bridge_OG_CiviCRM {
   static function groupContact($groupID, $contactIDs, $op) {
     $config = CRM_Core_Config::singleton();
     $ogID = CRM_Bridge_OG_Utils::ogID($groupID, FALSE);
-    
+
     if (!$ogID) {
       return;
     }

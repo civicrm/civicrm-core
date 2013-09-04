@@ -1,30 +1,37 @@
 <?php
-
-/*
- 
+/**
+ * Test Generated example of using uf_field get API
+ * *
  */
 function uf_field_get_example(){
-$params = array( 
-  'version' => 3,
-);
+$params = array();
 
-  $result = civicrm_api( 'uf_field','get',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('uf_field', 'get', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function uf_field_get_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
   'id' => 1,
-  'values' => array( 
-      '1' => array( 
+  'values' => array(
+      '1' => array(
           'id' => '1',
           'uf_group_id' => '11',
           'field_name' => 'phone',
@@ -44,7 +51,7 @@ function uf_field_get_expectedresult(){
     ),
 );
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 

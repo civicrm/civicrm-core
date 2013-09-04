@@ -42,6 +42,7 @@ div.crm-container label {
   margin: 0em 0em 1em;
   border-collapse: collapse;
   width: 100%;
+  font-size: 12px;
 }
 
 .crm-container table.criteria-group {
@@ -1254,7 +1255,7 @@ div.crm-container label {
   height: auto;
   margin: 0 1px;
   padding: 2px 5px;
-  font-family: Arial, Helvetica, sans-serif; 
+  font-family: Arial, Helvetica, sans-serif;
 }
 
 .crm-container #alpha-filter a {
@@ -2830,7 +2831,6 @@ div.crm-accordion-header a.helpicon {
 
 div a.helpicon:hover,
 div a.helpicon:focus {
-  background-image: url(../i/icons/jquery-ui-91CE00.png);
   opacity: 1;
 }
 
@@ -2985,6 +2985,11 @@ div#crm-container form {
   background: #484e4c url("../packages/jquery/jquery-ui-1.9.0/css/smoothness/images/ui-bg_flat_0_aaaaaa_40x100.png") 50% 50% repeat-x;
   font-weight: normal;
   color: #f5f6f1;
+}
+
+/* add border to jQuery ui-dialog box CRM-13177 */
+div.ui-dialog {
+  border: 1px solid black;
 }
 
 #Tag .tree .collapsable .hit,
@@ -3409,7 +3414,7 @@ div.m ul#civicrm-menu,
 }
 
 /* table row highlightng */
-#crm-container table.row-highlight tr:hover {
+.crm-container table.row-highlight tr:hover {
   background-color: #FFFFCC !important;
 }
 #crm-container .civicrm-drupal-wysiwyg .collapsed {
@@ -3677,14 +3682,14 @@ div.m ul#civicrm-menu,
 }
 
 /* Notifications */
-#crm-container .ui-notify {
+#crm-notification-container {
   width: 350px;
   position: fixed;
   top: 45px;
   right: 15px;
   z-index: 999999;
 }
-#crm-container div.ui-notify-message {
+.crm-container div.ui-notify-message {
   padding: 10px;
   margin-bottom: 15px;
   color: #fff;
@@ -3694,14 +3699,14 @@ div.m ul#civicrm-menu,
   max-height: 600px;
   overflow: auto;
 }
-#crm-container div.ui-notify-message h1 {
+.crm-container div.ui-notify-message h1 {
   font-size: 14px;
   margin: 0;
   padding: 4px;
   font-weight: bold;
   color: #fff;
 }
-#crm-container div.ui-notify-message p {
+.crm-container div.ui-notify-message p {
   margin: 3px 0;
   padding: 0;
   line-height: 18px;
@@ -3728,7 +3733,7 @@ div.m ul#civicrm-menu,
 .crm-container div.ui-notify-message .ui-notify-close {
   cursor: pointer;
 }
-#crm-container div.ui-notify-message a.ui-notify-cross {
+.crm-container div.ui-notify-message a.ui-notify-cross {
   margin-top: -4px;
   float: right;
   text-decoration: none;
@@ -3738,29 +3743,29 @@ div.m ul#civicrm-menu,
   padding: 2px;
   color: #FDFDFD;
 }
-#crm-container div.ui-notify-message .ui-notify-cross:hover,
-#crm-container div.ui-notify-message .ui-notify-cross:focus {
+.crm-container div.ui-notify-message .ui-notify-cross:hover,
+.crm-container div.ui-notify-message .ui-notify-cross:focus {
   color: #ffffab;
 }
-#crm-container div.ui-notify-message table,
-#crm-container div.ui-notify-message tbody,
-#crm-container div.ui-notify-message tr {
+.crm-container div.ui-notify-message table,
+.crm-container div.ui-notify-message tbody,
+.crm-container div.ui-notify-message tr {
   border: 0 none;
   font-size: 11px;
 }
-#crm-container div.ui-notify-message td {
+.crm-container div.ui-notify-message td {
   background: rgba(255,255,255,0.1);
   border: 1px solid #111;
   font-size: 11px;
 }
-#crm-container div.ui-notify-message th {
+.crm-container div.ui-notify-message th {
   background: rgba(200,200,200,0.2);
   border: 1px solid #111;
   color: #eee;
   font-size: 11px;
 }
-#crm-container div.ui-notify-message ul,
-#crm-container div.ui-notify-message ol {
+.crm-container div.ui-notify-message ul,
+.crm-container div.ui-notify-message ol {
   margin: 0.5em 0 1em;
   padding: 0 0 0 0.5em;
 }
@@ -3961,7 +3966,7 @@ span.crm-status-icon {
 }
 
 /* Styles for credit card payment logos */
-#crm-container .credit_card_type-section .crm-credit_card_type-icons a {
+.crm-container .credit_card_type-section .crm-credit_card_type-icons a {
   display: block;
   float: left;
   width: 50px;
@@ -3974,31 +3979,31 @@ span.crm-status-icon {
   border: 1px solid #FFFFFF;
 }
 
-#crm-container .credit_card_type-section .crm-credit_card_type-icons .crm-credit_card_type-icon-visa {
+.crm-container .credit_card_type-section .crm-credit_card_type-icons .crm-credit_card_type-icon-visa {
   background-position: -50px 0;
 }
 
-#crm-container .credit_card_type-section .crm-credit_card_type-icons .crm-credit_card_type-icon-mastercard {
+.crm-container .credit_card_type-section .crm-credit_card_type-icons .crm-credit_card_type-icon-mastercard {
   background-position: -100px 0;
 }
 
-#crm-container .credit_card_type-section .crm-credit_card_type-icons .crm-credit_card_type-icon-amex {
+.crm-container .credit_card_type-section .crm-credit_card_type-icons .crm-credit_card_type-icon-amex {
   background-position: -150px 0;
 }
 
-#crm-container .credit_card_type-section .crm-credit_card_type-icons .crm-credit_card_type-icon-discover {
+.crm-container .credit_card_type-section .crm-credit_card_type-icons .crm-credit_card_type-icon-discover {
   background-position: -200px 0;
 }
 
-#crm-container .credit_card_type-section .crm-credit_card_type-icons .crm-credit_card_type-icon-jcb {
+.crm-container .credit_card_type-section .crm-credit_card_type-icons .crm-credit_card_type-icon-jcb {
   background-position: -250px 0;
 }
 
-#crm-container .credit_card_type-section .crm-credit_card_type-icons .crm-credit_card_type-icon-unionpay {
+.crm-container .credit_card_type-section .crm-credit_card_type-icons .crm-credit_card_type-icon-unionpay {
   background-position: -300px 0;
 }
 
-#crm-container .cvv2-icon {
+.crm-container .cvv2-icon {
   display: inline-block;
   width: 50px;
   height: 30px;

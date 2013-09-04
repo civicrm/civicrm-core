@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -169,7 +169,7 @@ AND     ( g.cache_date IS NULL OR
 
     if (!empty($refreshGroupIDs)) {
       $refreshGroupIDString = CRM_Core_DAO::escapeString(implode(', ', $refreshGroupIDs));
-      $time  = CRM_Utils_Date::getUTCTime($smartGroupCacheTimeout * 60);
+      $time  = CRM_Utils_Date::getUTCTime(self::smartGroupCacheTimeout() * 60);
       $query = "
 UPDATE civicrm_group g
 SET    g.refresh_date = $time
@@ -249,6 +249,21 @@ WHERE  id IN ( $groupIDs )
     CRM_Core_DAO::executeQuery($sql);
   }
 
+  /**
+   * Removes all the cache entries pertaining to a specific group
+   * If no groupID is passed in, removes cache entries for all groups
+   * Has an optimization to bypass repeated invocations of this function.
+   * Note that this function is an advisory, i.e. the removal respects the
+   * cache date, i.e. the removal is not done if the group was recently
+   * loaded into the cache.
+   *
+   * @param $groupID  int the groupID to delete cache entries, NULL for all groups
+   * @param $onceOnly boolean run the function exactly once for all groups.
+   *
+   * @public
+   * @return void
+   * @static
+   */
   static function remove($groupID = NULL, $onceOnly = TRUE) {
     static $invoked = FALSE;
 
@@ -385,7 +400,7 @@ WHERE  id = %1
     // done
     // we allow hidden groups here since we dont know if the caller wants to evaluate an
     // hidden group
-    if (!$force && !self::shouldGroupBeRefreshed($groupID, FALSE, TRUE)) {
+    if (!$force && !self::shouldGroupBeRefreshed($groupID, TRUE)) {
       $lock->release();
       return;
     }

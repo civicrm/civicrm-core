@@ -2,7 +2,7 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -67,12 +67,23 @@ function _civicrm_api3_mailing_create_spec(&$params) {
 }
 
 /**
+ * Handle a create event.
+ *
+ * @param array $params
+ * @return array API Success Array
+ */
+function civicrm_api3_mailing_delete($params, $ids = array()) {
+  return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);
+}
+
+
+/**
  * Handle a get event.
  *
  * @param array $params
  * @return array
  */
-function civicrm_api3_mailing_get($params, $ids = array()) {
+function civicrm_api3_mailing_get($params) {
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 
@@ -161,7 +172,7 @@ function _civicrm_api3_mailing_event_reply_spec(&$params) {
   $params['job_id']['api.required'] = 1;
   $params['event_queue_id']['api.required'] = 1;
   $params['hash']['api.required'] = 1;
-  $params['replyTo']['api.required'] = 1;
+  $params['replyTo']['api.required'] = 0;
 }
 
 /**

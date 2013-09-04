@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -82,7 +82,8 @@ class CRM_Contribute_Info extends CRM_Core_Component_Info {
 
   // docs inherited from interface
   public function registerAdvancedSearchPane() {
-    return array('title' => ts('Contributions'),
+    return array(
+      'title' => ts('Contributions'),
       'weight' => 20,
     );
   }

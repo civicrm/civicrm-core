@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -105,7 +105,7 @@ class CRM_Campaign_Form_Survey_Delete extends CRM_Core_Form {
       CRM_Core_Session::setStatus('', ts("'%1' survey has been deleted.", array(1 => $this->_surveyTitle)), 'success');
       CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/campaign', 'reset=1&subPage=survey'));
     } else {
-      CRM_Core_Error::fatal(ts('Delete action is missing expected survey ID.'));      
+      CRM_Core_Error::fatal(ts('Delete action is missing expected survey ID.'));
     }
   }
 }

@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -65,7 +65,7 @@ class CRM_Contact_Form_Domain extends CRM_Core_Form {
    * @var int
    * @const
    */
-  CONST LOCATION_BLOCKS = 1; 
+  CONST LOCATION_BLOCKS = 1;
 
   function preProcess() {
     CRM_Utils_System::setTitle(ts('Organization Address and Contact Info'));
@@ -121,7 +121,7 @@ class CRM_Contact_Form_Domain extends CRM_Core_Form {
       if (!isset($defaults['address'][1]['country_id'])) {
         $defaults['address'][1]['country_id'] = $config->defaultContactCountry;
       }
-      
+
       if (!isset($defaults['address'][1]['state_province_id'])) {
         $defaults['address'][1]['state_province_id'] = $config->defaultContactStateProvince;
       }
@@ -251,7 +251,7 @@ class CRM_Contact_Form_Domain extends CRM_Core_Form {
       'display_name' => $domain->name,
       'legal_name'   => $domain->name,
       'organization_name' => $domain->name,
-      'contact_id' => $this->_contactId,              
+      'contact_id' => $this->_contactId,
     );
     CRM_Contact_BAO_Contact::add($contactParams);
     $location = CRM_Core_BAO_Location::create($params, TRUE);

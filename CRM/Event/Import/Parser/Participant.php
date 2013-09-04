@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -132,7 +132,7 @@ class CRM_Event_Import_Parser_Participant extends CRM_Event_Import_Parser {
    * @access public
    */
   function mapField(&$values) {
-    return CRM_Event_Import_Parser::VALID;
+    return CRM_Import_Parser::VALID;
   }
 
   /**
@@ -164,7 +164,7 @@ class CRM_Event_Import_Parser_Participant extends CRM_Event_Import_Parser {
 
     if ($this->_eventIndex > -1 && $this->_eventTitleIndex > -1) {
       array_unshift($values, ts('Select either EventID OR Event Title'));
-      return CRM_Event_Import_Parser::ERROR;
+      return CRM_Import_Parser::ERROR;
     }
     elseif ($this->_eventTitleIndex > -1) {
       $index = $this->_eventTitleIndex;
@@ -196,7 +196,7 @@ class CRM_Event_Import_Parser_Participant extends CRM_Event_Import_Parser {
 
     if ($errorRequired) {
       array_unshift($values, ts('Missing required field(s) :') . $missingField);
-      return CRM_Event_Import_Parser::ERROR;
+      return CRM_Import_Parser::ERROR;
     }
 
     $errorMessage = NULL;
@@ -258,9 +258,9 @@ class CRM_Event_Import_Parser_Participant extends CRM_Event_Import_Parser {
       $tempMsg = "Invalid value for field(s) : $errorMessage";
       array_unshift($values, $tempMsg);
       $errorMessage = NULL;
-      return CRM_Contact_Import_Parser::ERROR;
+      return CRM_Import_Parser::ERROR;
     }
-    return CRM_Event_Import_Parser::VALID;
+    return CRM_Import_Parser::VALID;
   }
 
   /**
@@ -276,7 +276,7 @@ class CRM_Event_Import_Parser_Participant extends CRM_Event_Import_Parser {
 
     // first make sure this is a valid line
     $response = $this->summary($values);
-    if ($response != CRM_Event_Import_Parser::VALID) {
+    if ($response != CRM_Import_Parser::VALID) {
       return $response;
     }
     $params       = &$this->getActiveFieldParams();
@@ -335,15 +335,15 @@ class CRM_Event_Import_Parser_Participant extends CRM_Event_Import_Parser {
 
     if ($formatError) {
       array_unshift($values, $formatError['error_message']);
-      return CRM_Event_Import_Parser::ERROR;
+      return CRM_Import_Parser::ERROR;
     }
 
     if (!CRM_Utils_Rule::integer($formatted['event_id'])) {
       array_unshift($values, ts('Invalid value for Event ID'));
-      return CRM_Event_Import_Parser::ERROR;
+      return CRM_Import_Parser::ERROR;
     }
 
-    if ($onDuplicate != CRM_Event_Import_Parser::DUPLICATE_UPDATE) {
+    if ($onDuplicate != CRM_Import_Parser::DUPLICATE_UPDATE) {
       $formatted['custom'] = CRM_Core_BAO_CustomField::postProcess($formatted,
         CRM_Core_DAO::$_nullObject,
         NULL,
@@ -370,7 +370,7 @@ class CRM_Event_Import_Parser_Participant extends CRM_Event_Import_Parser {
           $newParticipant = _civicrm_api3_deprecated_participant_check_params($formatted, $participantValues, FALSE);
           if ($newParticipant['error_message']) {
             array_unshift($values, $newParticipant['error_message']);
-            return CRM_Event_Import_Parser::ERROR;
+            return CRM_Import_Parser::ERROR;
           }
           $newParticipant = CRM_Event_BAO_Participant::create($formatted, $ids);
           if( CRM_Utils_Array::value('fee_level', $formatted)) {
@@ -382,11 +382,11 @@ class CRM_Event_Import_Parser_Participant extends CRM_Event_Import_Parser {
           }
 
           $this->_newParticipant[] = $newParticipant->id;
-          return CRM_Event_Import_Parser::VALID;
+          return CRM_Import_Parser::VALID;
         }
         else {
           array_unshift($values, 'Matching Participant record not found for Participant ID ' . $formatValues['participant_id'] . '. Row was skipped.');
-          return CRM_Event_Import_Parser::ERROR;
+          return CRM_Import_Parser::ERROR;
         }
       }
     }
@@ -439,7 +439,7 @@ class CRM_Event_Import_Parser_Participant extends CRM_Event_Import_Parser {
         }
 
         array_unshift($values, 'No matching Contact found for (' . $disp . ')');
-        return CRM_Event_Import_Parser::ERROR;
+        return CRM_Import_Parser::ERROR;
       }
     }
     else {
@@ -449,7 +449,7 @@ class CRM_Event_Import_Parser_Participant extends CRM_Event_Import_Parser {
         $checkCid->find(TRUE);
         if ($checkCid->id != $formatted['contact_id']) {
           array_unshift($values, 'Mismatch of External identifier :' . $formatValues['external_identifier'] . ' and Contact Id:' . $formatted['contact_id']);
-          return CRM_Event_Import_Parser::ERROR;
+          return CRM_Import_Parser::ERROR;
         }
       }
 
@@ -457,7 +457,7 @@ class CRM_Event_Import_Parser_Participant extends CRM_Event_Import_Parser {
     }
 
     if (is_array($newParticipant) && civicrm_error($newParticipant)) {
-      if ($onDuplicate == CRM_Event_Import_Parser::DUPLICATE_SKIP) {
+      if ($onDuplicate == CRM_Import_Parser::DUPLICATE_SKIP) {
 
         $contactID     = CRM_Utils_Array::value('contactID', $newParticipant);
         $participantID = CRM_Utils_Array::value('participantID', $newParticipant);
@@ -468,13 +468,13 @@ class CRM_Event_Import_Parser_Participant extends CRM_Event_Import_Parser {
           ($participantID == $newParticipant['error_message']['params'][0])
         ) {
           array_unshift($values, $url);
-          return CRM_Event_Import_Parser::DUPLICATE;
+          return CRM_Import_Parser::DUPLICATE;
         }
         elseif ($newParticipant['error_message']) {
           array_unshift($values, $newParticipant['error_message']);
-          return CRM_Event_Import_Parser::ERROR;
+          return CRM_Import_Parser::ERROR;
         }
-        return CRM_Event_Import_Parser::ERROR;
+        return CRM_Import_Parser::ERROR;
       }
     }
 
@@ -482,7 +482,7 @@ class CRM_Event_Import_Parser_Participant extends CRM_Event_Import_Parser {
       $this->_newParticipants[] = CRM_Utils_Array::value('id', $newParticipant);
     }
 
-    return CRM_Event_Import_Parser::VALID;
+    return CRM_Import_Parser::VALID;
   }
 
   /**

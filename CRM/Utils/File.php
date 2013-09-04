@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -529,9 +529,12 @@ HTACCESS;
     $result = array();
     while (!empty($todos)) {
       $subdir = array_shift($todos);
-      foreach (glob("$subdir/$pattern") as $match) {
-        if (!is_dir($match)) {
-          $result[] = $match;
+      $matches = glob("$subdir/$pattern");
+      if (is_array($matches)) {
+        foreach ($matches as $match) {
+          if (!is_dir($match)) {
+            $result[] = $match;
+          }
         }
       }
       $dh = opendir($subdir);

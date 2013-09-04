@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -70,7 +70,7 @@ class CRM_Core_Permission {
    */
   public static function getPermission() {
     $config = CRM_Core_Config::singleton();
-    return $config->userPermissionClass->getPermission( );
+    return $config->userPermissionClass->getPermission();
   }
 
   /**
@@ -84,7 +84,7 @@ class CRM_Core_Permission {
    */
   static function check($str) {
     $config = CRM_Core_Config::singleton();
-    return $config->userPermissionClass->check( $str );
+    return $config->userPermissionClass->check($str);
   }
 
   /**
@@ -113,7 +113,7 @@ class CRM_Core_Permission {
    */
   static function checkGroupRole($array) {
     $config = CRM_Core_Config::singleton();
-    return $config->userPermissionClass->checkGroupRole( $array );
+    return $config->userPermissionClass->checkGroupRole($array);
   }
 
   /**
@@ -128,7 +128,7 @@ class CRM_Core_Permission {
    */
   public static function getPermissionedStaticGroupClause($type, &$tables, &$whereTables) {
     $config = CRM_Core_Config::singleton();
-    return $config->userPermissionClass->getPermissionedStaticGroupClause( $type, $tables, $whereTables );
+    return $config->userPermissionClass->getPermissionedStaticGroupClause($type, $tables, $whereTables);
   }
 
   /**
@@ -146,7 +146,7 @@ class CRM_Core_Permission {
    */
   public static function group($groupType, $excludeHidden = TRUE) {
     $config = CRM_Core_Config::singleton();
-    return $config->userPermissionClass->group( $groupType, $excludeHidden );
+    return $config->userPermissionClass->group($groupType, $excludeHidden);
   }
 
   public static function customGroupAdmin() {
@@ -173,7 +173,8 @@ class CRM_Core_Permission {
   }
 
   public static function customGroup($type = CRM_Core_Permission::VIEW, $reset = FALSE) {
-    $customGroups = CRM_Core_PseudoConstant::get('CRM_Core_DAO_CustomField', 'custom_group_id', array('fresh' => $reset));
+    $customGroups = CRM_Core_PseudoConstant::get('CRM_Core_DAO_CustomField', 'custom_group_id',
+      array('fresh' => $reset));
     $defaultGroups = array();
 
     // check if user has all powerful permission
@@ -279,7 +280,12 @@ class CRM_Core_Permission {
     if (!$eventID) {
       return $permissionedEvents;
     }
-    return array_search($eventID, $permissionedEvents) === FALSE ? NULL : $eventID;
+    if (!empty($permissionedEvents)) {
+      return array_search($eventID, $permissionedEvents) === FALSE ? NULL : $eventID;
+    }
+    else {
+      return $eventID;
+    }
   }
 
   static function eventClause($type = CRM_Core_Permission::VIEW, $prefix = NULL) {
@@ -314,7 +320,7 @@ class CRM_Core_Permission {
   /**
    * check permissions for delete and edit actions
    *
-   * @param string  $module component name.
+   * @param string $module component name.
    * @param $action action to be check across component
    *
    **/
@@ -518,8 +524,9 @@ class CRM_Core_Permission {
     $aclPermission = self::getPermission();
     if (in_array($aclPermission, array(
       CRM_Core_Permission::EDIT,
-          CRM_Core_Permission::VIEW,
-        ))) {
+      CRM_Core_Permission::VIEW,
+    ))
+    ) {
       return TRUE;
     }
 
@@ -538,7 +545,7 @@ class CRM_Core_Permission {
   /**
    * Function to get component name from given permission.
    *
-   * @param string  $permission
+   * @param string $permission
    *
    * return string $componentName the name of component.
    * @static
@@ -580,7 +587,7 @@ class CRM_Core_Permission {
    */
   public static function permissionEmails($permissionName) {
     $config = CRM_Core_Config::singleton();
-    return $config->userPermissionClass->permissionEmails( $permissionName );
+    return $config->userPermissionClass->permissionEmails($permissionName);
   }
 
   /**
@@ -592,7 +599,7 @@ class CRM_Core_Permission {
    */
   public static function roleEmails($roleName) {
     $config = CRM_Core_Config::singleton();
-    return $config->userRoleClass->roleEmails( $roleName );
+    return $config->userRoleClass->roleEmails($roleName);
   }
 
   static function isMultisiteEnabled() {
@@ -601,4 +608,3 @@ class CRM_Core_Permission {
     ) ? TRUE : FALSE;
   }
 }
-

@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -121,7 +121,7 @@ class CRM_Financial_BAO_FinancialTypeAccount extends CRM_Financial_DAO_EntityFin
       array('Contribute', 'Contribution'),
       array('Contribute', 'ContributionPage'),
       array('Member', 'MembershipType'),
-      array('Price', 'FieldValue'),
+      array('Price', 'PriceFieldValue'),
       array('Grant', 'Grant'),
       array('Contribute', 'PremiumsProduct'),
       array('Contribute', 'Product'),
@@ -143,7 +143,8 @@ class CRM_Financial_BAO_FinancialTypeAccount extends CRM_Financial_DAO_EntityFin
         CRM_Core_Session::setStatus(ts('You cannot remove an account with a %1 relationship while the Financial Type is used for a Premium.', array(1 => $relationValues[$financialTypeAccountId])));
       }
       else {
-        CRM_Core_Session::setStatus(ts('You cannot remove an account with a %1 relationship because it is being referenced by one or more of the following types of records: Contributions, Contribution Pages, or Membership Types. Consider disabling this type instead if you no longer want it used.', array(1 => $relationValues[$financialTypeAccountId])));
+        $accountRelationShipId = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_EntityFinancialAccount', $financialTypeAccountId, 'account_relationship');
+        CRM_Core_Session::setStatus(ts('You cannot remove an account with a %1 relationship because it is being referenced by one or more of the following types of records: Contributions, Contribution Pages, or Membership Types. Consider disabling this type instead if you no longer want it used.', array(1 => $relationValues[$accountRelationShipId])));
       }
       return CRM_Utils_System::redirect( CRM_Utils_System::url( 'civicrm/admin/financial/financialType/accounts', "reset=1&action=browse&aid={$accountId}" ));
     }
@@ -214,10 +215,10 @@ WHERE cog.name = 'payment_instrument' ";
   /**
    * Function to create default entity financial accounts
    * for financial type
-   * CRM-12470 
+   * CRM-12470
    *
    * @param int $financialTypeId financial type id
-   * 
+   *
    * @static
    */
   static function createDefaultFinancialAccounts($financialType) {
@@ -250,7 +251,7 @@ WHERE cog.name = 'payment_instrument' ";
           $titles[] = 'Accounts Receivable';
         }
         else {
-          $query = "SELECT financial_account_id, name FROM civicrm_entity_financial_account 
+          $query = "SELECT financial_account_id, name FROM civicrm_entity_financial_account
             LEFT JOIN civicrm_financial_account ON civicrm_financial_account.id = civicrm_entity_financial_account.financial_account_id
             WHERE account_relationship = {$key} AND entity_table = 'civicrm_financial_type' LIMIT 1";
           $dao = CRM_Core_DAO::executeQuery($query);
@@ -270,7 +271,7 @@ WHERE cog.name = 'payment_instrument' ";
         $titles[] = $dao->name;
       }
       $params['account_relationship'] = $key;
-      self::add($params);      
+      self::add($params);
     }
     return $titles;
   }

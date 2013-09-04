@@ -25,7 +25,7 @@
     .crm-contribute-widget .crm-amounts {
         height:1em;
         margin:.8em 0px;
-        fon-size:13px;
+        font-size:13px;
     }
     .crm-contribute-widget .crm-amount-low {
         float:left;

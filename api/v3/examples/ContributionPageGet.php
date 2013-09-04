@@ -1,33 +1,41 @@
 <?php
-
-/*
- 
+/**
+ * Test Generated example of using contribution_page get API
+ * *
  */
 function contribution_page_get_example(){
-$params = array( 
-  'version' => 3,
+$params = array(
   'amount' => '34567',
   'currency' => 'NZD',
   'financial_type_id' => 1,
 );
 
-  $result = civicrm_api( 'contribution_page','get',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('contribution_page', 'get', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function contribution_page_get_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
   'id' => 3,
-  'values' => array( 
-      '3' => array( 
+  'values' => array(
+      '3' => array(
           'id' => '3',
           'title' => 'Test Contribution Page',
           'financial_type_id' => '1',
@@ -50,7 +58,7 @@ function contribution_page_get_expectedresult(){
     ),
 );
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 

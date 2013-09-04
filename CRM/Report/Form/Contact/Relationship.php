@@ -2,7 +2,7 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -62,6 +62,16 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
             'no_display' => TRUE,
             'required' => TRUE,
           ),
+          'contact_type_a' =>
+          array(
+            'title' => ts('Contact Type (Contact A)'),
+            'name' => 'contact_type',
+          ),
+          'contact_sub_type_a' =>
+          array(
+            'title' => ts('Contact SubType (Contact A)'),
+            'name' => 'contact_sub_type',
+          ),
         ),
         'filters' =>
         array(
@@ -89,6 +99,16 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
           array(
             'no_display' => TRUE,
             'required' => TRUE,
+          ),
+          'contact_type_b' =>
+          array(
+            'title' => ts('Contact Type (Contact B)'),
+            'name' => 'contact_type',
+          ),
+          'contact_sub_type_b' =>
+          array(
+            'title' => ts('Contact SubType (Contact B)'),
+            'name' => 'contact_sub_type',
           ),
         ),
         'filters' =>

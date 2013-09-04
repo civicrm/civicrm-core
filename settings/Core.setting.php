@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -323,6 +323,20 @@ return array (
     'description' => 'If enabled, deleted contacts will be moved to trash (instead of being destroyed). Users with the proper permission are able to search for the deleted contacts and restore them (or delete permanently).',
     'help_text' => null,
   ),
+  'allowPermDeleteFinancial' => array(
+    'group_name' => 'CiviCRM Preferences',
+    'group' => 'core',
+    'name' => 'allowPermDeleteFinancial',
+    'type' => 'Boolean',
+    'quick_form_type' => 'YesNo',
+    'default' => FALSE,
+    'add' => '4.3',
+    'title' => 'Contact Permanent Delete',
+    'is_domain' => 1,
+    'is_contact' => 0,
+    'description' => 'Allow Permanent Delete for contacts who are linked to live financial transactions',
+    'help_text' => null,
+  ),
   'versionAlert' => array(
     'group_name' => 'CiviCRM Preferences',
     'group' => 'core',
@@ -496,7 +510,7 @@ When enabled, statistics about your CiviCRM installation are reported anonymousl
     'html_type' => 'Text',
     'default' => 7,
     'add' => '4.3',
-    'title' => 'Dashboard cache timeout',
+    'title' => 'Checksum Lifespan',
     'is_domain' => 1,
     'is_contact' => 0,
     'description' => null,
@@ -575,5 +589,42 @@ When enabled, statistics about your CiviCRM installation are reported anonymousl
     'is_contact' => 0,
     'description' => 'If set, CiviCRM will use this setting as the base url.',
     'help_text' => 'By default, CiviCRM will generate front-facing pages using the home page at http://wp/ as its base. If you want to use a different template for CiviCRM pages, set the path here.',
+  ),
+  'secondDegRelPermissions' => array(
+    'group_name' => 'CiviCRM Preferences',
+    'group' => 'core',
+    'name' => 'secondDegRelPermissions',
+    'prefetch' => 1,
+    'config_only'=> 1,
+    'type' => 'Boolean',
+    'quick_form_type' => 'YesNo',
+    'default' => 0,
+    'add' => '4.3',
+    'title' => 'Allow second-degree relationship permissions',
+    'is_domain' => 1,
+    'is_contact' => 0,
+    'description' => "If enabled, contacts with the permission to edit a related contact will inherit that contact's permission to edit other related contacts",
+    'help_text' => null,
+  ),
+
+  'enable_components' => array(
+    'group_name' => 'CiviCRM Preferences',
+    'group' => 'core',
+    'name'  => 'enable_components',
+    'type' => 'Array',
+    'quick_form_type' => 'Element',
+    'html_type' => 'advmultiselect',
+    'html_attributes' => array(
+      'size' => 5,
+      'style' => 'width:150px',
+      'class' => 'advmultiselect',
+    ),
+    'default' => array('CiviEvent', 'CiviContribute', 'CiviMember', 'CiviMail', 'CiviReport', 'CiviPledge'),
+    'add'   => '4.4',
+    'title' => 'Enable Components',
+    'is_domain' => '1',
+    'is_contact' => 0,
+    'description' => null,
+    'help_text'   => null,
   ),
 );

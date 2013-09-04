@@ -49,13 +49,13 @@
       <add>1.6</add>
       <!-- type changed from TEXT to LONGTEXT in 4.3 -->
   </field>
-  <field> 
-      <name>is_active</name>     
+  <field>
+      <name>is_active</name>
       <title>Is Active</title>
       <type>boolean</type>
       <default>1</default>
-      <add>1.6</add>  
-  </field> 
+      <add>1.6</add>
+  </field>
   <field>
       <name>workflow_id</name>
       <type>int unsigned</type>

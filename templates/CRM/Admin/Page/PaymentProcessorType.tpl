@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -24,7 +24,7 @@
  +--------------------------------------------------------------------+
 *}
 <div id="help">
-    {ts}Payment Processor configurations for all payment processors that can be used in this install of CiviCRM.{/ts}
+    {ts}Payment Processor configurations for all payment processors that can be used in this installation of CiviCRM.{/ts}
 </div>
 
 {if $action eq 1 or $action eq 2 or $action eq 8}

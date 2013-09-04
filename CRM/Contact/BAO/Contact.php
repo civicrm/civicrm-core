@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -231,7 +231,7 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
       // create current employer
       if (isset($params['employer_id'])) {
         CRM_Contact_BAO_Contact_Utils::createCurrentEmployerRelationship($contact->id,
-          $params['employer_id']
+          $params['employer_id'], $employerId
         );
       }
       elseif ($params['current_employer']) {
@@ -324,16 +324,15 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
       if (CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::MULTISITE_PREFERENCES_NAME,
         'is_enabled'
       )) {
-        // in order to make sure that every contact must be added to a group (CRM-4613) -
+        // Enabling multisite causes the contact to be added to the domain group
         $domainGroupID = CRM_Core_BAO_Domain::getGroupId();
-        if (CRM_Utils_Array::value('group', $params) && is_array($params['group'])) {
-          $grpFlp = array_flip($params['group']);
-          if (!array_key_exists(1, $grpFlp)) {
+        if(!empty($domainGroupID)){
+          if (CRM_Utils_Array::value('group', $params) && is_array($params['group'])) {
             $params['group'][$domainGroupID] = 1;
           }
-        }
-        else {
-          $params['group'] = array($domainGroupID => 1);
+          else {
+            $params['group'] = array($domainGroupID => 1);
+          }
         }
       }
 
@@ -722,6 +721,13 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
     if (($skipUndelete && !CRM_Core_Permission::check('delete contacts')) ||
       ($restore && !CRM_Core_Permission::check('access deleted contacts'))
     ) {
+      return FALSE;
+    }
+
+    // CRM-12929
+    // Restrict contact to be delete if contact has financial trxns
+    $error = NULL;
+    if ($skipUndelete && CRM_Financial_BAO_FinancialItem::checkContactPresent(array($id), $error)) {
       return FALSE;
     }
 
@@ -1171,16 +1177,41 @@ WHERE id={$id}; ";
         //unset the fields, which are not related to their
         //contact type.
         $commonValues = array(
-          'Individual' => array('household_name', 'legal_name', 'sic_code', 'organization_name'),
+          'Individual' => array(
+            'household_name',
+            'legal_name',
+            'sic_code',
+            'organization_name'
+          ),
           'Household' => array(
-            'first_name', 'middle_name', 'last_name', 'job_title',
-            'gender_id', 'birth_date', 'organization_name', 'legal_name',
-            'legal_identifier', 'sic_code', 'home_URL', 'is_deceased',
+            'first_name',
+            'middle_name',
+            'last_name',
+            'job_title',
+            'gender',
+            'individual_prefix',
+            'individual_suffix',
+            'birth_date',
+            'organization_name',
+            'legal_name',
+            'legal_identifier',
+            'sic_code',
+            'home_URL',
+            'is_deceased',
             'deceased_date',
           ),
           'Organization' => array(
-            'first_name', 'middle_name', 'last_name', 'job_title',
-            'gender_id', 'birth_date', 'household_name', 'is_deceased', 'deceased_date',
+            'first_name',
+            'middle_name',
+            'last_name',
+            'job_title',
+            'gender',
+            'individual_prefix',
+            'individual_suffix',
+            'birth_date',
+            'household_name',
+            'is_deceased',
+            'deceased_date',
           ),
         );
         foreach ($commonValues[$contactType] as $value) {
@@ -1203,16 +1234,20 @@ WHERE id={$id}; ";
       }
 
       if ($isProfile) {
-        $fields = array_merge($fields, array('group' => array('title' => ts('Group(s)'),
-              'name' => 'group',
-            ),
-            'tag' => array('title' => ts('Tag(s)'),
-              'name' => 'tag',
-            ),
-            'note' => array('title' => ts('Note(s)'),
-              'name' => 'note',
-            ),
-          ));
+        $fields = array_merge($fields, array(
+          'group' => array(
+            'title' => ts('Group(s)'),
+            'name' => 'group',
+          ),
+          'tag' => array(
+            'title' => ts('Tag(s)'),
+            'name' => 'tag',
+          ),
+          'note' => array(
+            'title' => ts('Note(s)'),
+            'name' => 'note',
+          ),
+        ));
       }
 
       //Sorting fields in alphabetical order(CRM-1507)
@@ -1271,7 +1306,6 @@ WHERE id={$id}; ";
       $fields = CRM_Core_BAO_Cache::getItem('contact fields', $cacheKeyString);
 
       if (!$fields) {
-        $fields = array();
         $fields = CRM_Contact_DAO_Contact::export();
 
         // the fields are meant for contact types
@@ -1293,13 +1327,15 @@ WHERE id={$id}; ";
           ));
 
         $locationType = array(
-          'location_type' => array('name' => 'location_type',
+          'location_type' => array(
+            'name' => 'location_type',
             'where' => 'civicrm_location_type.name',
             'title' => ts('Location Type'),
           ));
 
         $IMProvider = array(
-          'im_provider' => array('name' => 'im_provider',
+          'im_provider' => array(
+            'name' => 'im_provider',
             'where' => 'civicrm_im.provider_id',
             'title' => ts('IM Provider'),
           ));
@@ -1352,28 +1388,36 @@ WHERE id={$id}; ";
 
         //fix for CRM-791
         if ($export) {
-          $fields = array_merge($fields, array('groups' => array('title' => ts('Group(s)'),
-                'name' => 'groups',
-              ),
-              'tags' => array('title' => ts('Tag(s)'),
-                'name' => 'tags',
-              ),
-              'notes' => array('title' => ts('Note(s)'),
-                'name' => 'notes',
-              ),
-            ));
+          $fields = array_merge($fields, array(
+            'groups' => array(
+              'title' => ts('Group(s)'),
+              'name' => 'groups',
+            ),
+            'tags' => array(
+              'title' => ts('Tag(s)'),
+              'name' => 'tags',
+            ),
+            'notes' => array(
+              'title' => ts('Note(s)'),
+              'name' => 'notes',
+            ),
+          ));
         }
         else {
-          $fields = array_merge($fields, array('group' => array('title' => ts('Group(s)'),
-                'name' => 'group',
-              ),
-              'tag' => array('title' => ts('Tag(s)'),
-                'name' => 'tag',
-              ),
-              'note' => array('title' => ts('Note(s)'),
-                'name' => 'note',
-              ),
-            ));
+          $fields = array_merge($fields, array(
+            'group' => array(
+              'title' => ts('Group(s)'),
+              'name' => 'group',
+            ),
+            'tag' => array(
+              'title' => ts('Tag(s)'),
+              'name' => 'tag',
+            ),
+            'note' => array(
+              'title' => ts('Note(s)'),
+              'name' => 'note',
+            ),
+          ));
         }
 
         //Sorting fields in alphabetical order(CRM-1507)
@@ -1385,25 +1429,57 @@ WHERE id={$id}; ";
         //unset the field which are not related to their contact type.
         if ($contactType != 'All') {
           $commonValues = array(
-            'Individual' => array('household_name', 'legal_name', 'sic_code', 'organization_name',
-              'email_greeting_custom', 'postal_greeting_custom',
+            'Individual' => array(
+              'household_name',
+              'legal_name',
+              'sic_code',
+              'organization_name',
+              'email_greeting_custom',
+              'postal_greeting_custom',
               'addressee_custom',
             ),
             'Household' => array(
-              'first_name', 'middle_name', 'last_name', 'job_title',
-              'gender_id', 'birth_date', 'organization_name', 'legal_name',
-              'legal_identifier', 'sic_code', 'home_URL', 'is_deceased',
-              'deceased_date', 'current_employer', 'email_greeting_custom',
-              'postal_greeting_custom', 'addressee_custom',
-              'prefix_id', 'suffix_id'
+              'first_name',
+              'middle_name',
+              'last_name',
+              'job_title',
+              'gender',
+              'individual_prefix',
+              'individual_suffix',
+              'birth_date',
+              'organization_name',
+              'legal_name',
+              'legal_identifier',
+              'sic_code',
+              'home_URL',
+              'is_deceased',
+              'deceased_date',
+              'current_employer',
+              'email_greeting_custom',
+              'postal_greeting_custom',
+              'addressee_custom',
+              'prefix_id',
+              'suffix_id'
             ),
             'Organization' => array(
-              'first_name', 'middle_name', 'last_name', 'job_title',
-              'gender_id', 'birth_date', 'household_name',
+              'first_name',
+              'middle_name',
+              'last_name',
+              'job_title',
+              'gender',
+              'individual_prefix',
+              'individual_suffix',
+              'birth_date',
+              'household_name',
               'email_greeting_custom',
-              'postal_greeting_custom', 'prefix_id',
-              'suffix_id', 'gender_id', 'addressee_custom',
-              'is_deceased', 'deceased_date', 'current_employer',
+              'postal_greeting_custom',
+              'prefix_id',
+              'suffix_id',
+              'gender_id',
+              'addressee_custom',
+              'is_deceased',
+              'deceased_date',
+              'current_employer',
             ),
           );
           foreach ($commonValues[$contactType] as $value) {
@@ -1976,17 +2052,8 @@ ORDER BY civicrm_email.is_primary DESC";
             $data['website'][$websiteField[1]]['url'] = $value;
           }
         }
-        elseif ($key === 'individual_suffix') {
-          $data['suffix_id'] = $value;
-        }
-        elseif ($key === 'individual_prefix') {
-          $data['prefix_id'] = $value;
-        }
-        elseif ($key === 'gender') {
-          $data['gender_id'] = $value;
-        }
-        //save email/postal greeting and addressee values if any, CRM-4575
         elseif (in_array($key, self::$_greetingTypes, TRUE)) {
+          //save email/postal greeting and addressee values if any, CRM-4575
           $data[$key . '_id'] = $value;
         }
         elseif (!$skipCustom && ($customFieldId = CRM_Core_BAO_CustomField::getKeyID($key))) {
@@ -2070,9 +2137,12 @@ ORDER BY civicrm_email.is_primary DESC";
     $privacy = CRM_Core_SelectValues::privacy();
     foreach ($privacy as $key => $value) {
       if (array_key_exists($key, $fields)) {
+        // do not reset values for existing contacts, if fields are added to a profile
         if (array_key_exists($key, $params)) {
           $data[$key] = $params[$key];
-          // dont reset it for existing contacts
+          if (empty($params[$key])) {
+            $data[$key] = 0;
+          }
         }
         elseif (!$contactID) {
           $data[$key] = 0;
@@ -2285,7 +2355,7 @@ AND       civicrm_openid.is_primary = 1";
 
       // get preferred languages
       if (!empty($contact->preferred_language)) {
-        $values['preferred_language'] = CRM_Core_PseudoConstant::getValue('CRM_Contact_DAO_Contact', 'preferred_language', $contact->preferred_language);
+        $values['preferred_language'] = CRM_Core_PseudoConstant::getLabel('CRM_Contact_DAO_Contact', 'preferred_language', $contact->preferred_language);
       }
 
       // Calculating Year difference
@@ -2377,10 +2447,7 @@ AND       civicrm_openid.is_primary = 1";
         return CRM_Activity_BAO_Activity::getActivitiesCount($input);
 
       case 'mailing':
-        $params = array(
-          'contact_id' => $contactId,
-          'admin' => FALSE,
-        );
+        $params = array('contact_id' => $contactId);
         return CRM_Mailing_BAO_Mailing::getContactMailingsCount($params);
 
       default:
@@ -2998,7 +3065,7 @@ LEFT JOIN civicrm_address add2 ON ( add1.master_id = add2.id )
    * TODO: In context of chainselect, what to return if e.g. a country has no states?
    *
    * @param String $fieldName
-   * @param String $context: e.g. "search" "edit" "create" "view"
+   * @param String $context: @see CRM_Core_DAO::buildOptionsContext
    * @param Array  $props: whatever is known about this dao object
    */
   public static function buildOptions($fieldName, $context = NULL, $props = array()) {

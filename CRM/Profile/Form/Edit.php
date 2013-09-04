@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -61,6 +61,9 @@ class CRM_Profile_Form_Edit extends CRM_Profile_Form {
    */
   function preProcess() {
     $this->_mode = CRM_Profile_Form::MODE_CREATE;
+
+    $this->_onPopupClose = CRM_Utils_Request::retrieve('onPopupClose', 'String', $this);
+    $this->assign('onPopupClose', $this->_onPopupClose);
 
     //set the context for the profile
     $this->_context = CRM_Utils_Request::retrieve('context', 'String', $this);
@@ -212,7 +215,14 @@ SELECT module
 
         //passing the post url to template so the popup form does
         //proper redirection and proccess form errors if any
-        $popupRedirect = CRM_Utils_System::url('civicrm/profile/edit', $urlParams, FALSE, NULL, FALSE);
+        if (!isset($this->_onPopupClose) || $this->_onPopupClose == 'redirectToProfile') {
+          $popupRedirect = CRM_Utils_System::url('civicrm/profile/edit', $urlParams, FALSE, NULL, FALSE);
+        }
+        elseif ($this->_onPopupClose == 'redirectToTab') {
+          $popupRedirect = CRM_Utils_System::url('civicrm/contact/view',
+            "reset=1&cid={$this->_id}&selectedChild=custom_{$this->_customGroupId}", FALSE, NULL, FALSE);
+        }
+
         $this->assign('urlParams', $urlParams);
         $this->assign('postUrl', $popupRedirect);
       }
@@ -300,9 +310,11 @@ SELECT module
 
     // this is special case when we create contact using Dialog box
     if ($this->_context == 'dialog') {
+      $displayName = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $this->_id, 'display_name');
       $sortName = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $this->_id, 'sort_name');
       $returnArray = array(
         'contactID' => $this->_id,
+        'displayName' => $displayName,
         'sortName' => $sortName,
         'newContactSuccess' => TRUE,
       );

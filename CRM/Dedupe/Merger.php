@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -193,7 +193,6 @@ class CRM_Dedupe_Merger {
       // foreign keys referencing civicrm_contact(id)
       $cidRefs = array(
         'civicrm_acl_cache' => array('contact_id'),
-        'civicrm_activity' => array('source_contact_id'),
         'civicrm_activity_contact' => array('contact_id'),
         'civicrm_case_contact' => array('contact_id'),
         'civicrm_contact' => array('primary_contact_id'),
@@ -388,6 +387,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     $eidRefs = self::eidRefs();
     $cpTables = self::cpTables();
     $paymentTables = self::paymentTables();
+    $membershipMerge = FALSE; // CRM-12695
 
     $affected = array_merge(array_keys($cidRefs), array_keys($eidRefs));
     if ($tables !== FALSE) {
@@ -402,6 +402,21 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
         $handled = array_merge($handled, $params['tables']);
       }
       $affected = array_diff($affected, $handled);
+      /**
+       * CRM-12695
+       * Set $membershipMerge flag only once
+       * while doing contact related migration
+       * to call addMembershipToRealtedContacts()
+       * function only once.
+       * Since the current function (moveContactBelongings) is called twice
+       * with & without parameters $tables & $tableOperations
+       */
+      // retrieve main contact's related table(s)
+      $activeMainRelTables = CRM_Dedupe_Merger::getActiveRelTables($mainId);
+      // check if membership table exists in main contact's related table(s)
+      if (in_array('rel_table_memberships', $activeMainRelTables)) {
+        $membershipMerge = TRUE; // set membership flag - CRM-12695
+      }
     }
 
     $mainId = (int) $mainId;
@@ -453,6 +468,11 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     $transaction = new CRM_Core_Transaction();
     foreach ($sqls as $sql) {
       CRM_Core_DAO::executeQuery($sql, array(), TRUE, NULL, TRUE);
+    }
+    // CRM-12695
+    if ($membershipMerge) {
+      // call to function adding membership to related contacts
+      CRM_Dedupe_Merger::addMembershipToRealtedContacts($mainId);
     }
     $transaction->commit();
   }
@@ -1478,6 +1498,39 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     unset($contactFields['id']);
 
     return array_keys($contactFields);
+  }
+
+  /**
+   * Added for CRM-12695
+   * Based on the contactId provided
+   * add/update membership(s) to related contacts
+   *
+   * @param contactId
+   */
+  static function addMembershipToRealtedContacts($contactID) {
+    $dao = new CRM_Member_DAO_Membership();
+    $dao->contact_id = $contactID;
+    $dao->is_test = 0;
+    $dao->find();
+
+    //checks membership of contact itself
+    while ($dao->fetch()) {
+      $relationshipTypeId = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType', $dao->membership_type_id, 'relationship_type_id', 'id');
+      if ($relationshipTypeId) {
+        $membershipParams = array(
+          'id' => $dao->id,
+          'contact_id' => $dao->contact_id,
+          'membership_type_id' => $dao->membership_type_id,
+          'join_date' => CRM_Utils_Date::isoToMysql($dao->join_date),
+          'start_date' => CRM_Utils_Date::isoToMysql($dao->start_date),
+          'end_date' => CRM_Utils_Date::isoToMysql($dao->end_date),
+          'source' => $dao->source,
+          'status_id' => $dao->status_id
+        );
+        // create/update membership(s) for related contact(s)
+        CRM_Member_BAO_Membership::createRelatedMemberships($membershipParams, $dao);
+      } // end of if relationshipTypeId
+    }
   }
 }
 

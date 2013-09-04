@@ -1,32 +1,40 @@
 <?php
-
-/*
- 
+/**
+ * Test Generated example of using address get API
+ * *
  */
 function address_get_example(){
-$params = array( 
+$params = array(
   'contact_id' => 9,
   'street_name' => 'Ambachtstraat',
-  'version' => 3,
 );
 
-  $result = civicrm_api( 'address','get',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('address', 'get', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function address_get_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
   'id' => 7,
-  'values' => array( 
-      '7' => array( 
+  'values' => array(
+      '7' => array(
           'id' => '7',
           'contact_id' => '9',
           'location_type_id' => '12',
@@ -43,7 +51,7 @@ function address_get_expectedresult(){
     ),
 );
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 

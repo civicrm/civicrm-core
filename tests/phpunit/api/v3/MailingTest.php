@@ -1,5 +1,5 @@
 <?php
-/**
+/*
  *  File for the TestMailing class
  *
  *  (PHP 5)
@@ -34,7 +34,10 @@ require_once 'CiviTest/CiviUnitTestCase.php';
 class api_v3_MailingTest extends CiviUnitTestCase {
   protected $_groupID;
   protected $_email;
-  protected $_apiversion;
+  protected $_apiversion = 3;
+  protected $_params = array();
+  protected $_entity = 'Mailing';
+  public $_eNoticeCompliant = TRUE;
 
   function get_info() {
     return array(
@@ -46,9 +49,14 @@ class api_v3_MailingTest extends CiviUnitTestCase {
 
   function setUp() {
     parent::setUp();
-    $this->_apiversion = 3;
-    $this->_groupID    = $this->groupCreate(NULL);
-    $this->_email      = 'test@test.test';
+    $this->_groupID = $this->groupCreate(NULL);
+    $this->_email = 'test@test.test';
+    $this->_params = array(
+      'subject' => 'maild',
+      'body_text' => 'bdkfhdskfhduew',
+      'name' => 'mailing name',
+      'created_id' => 1,
+    );
   }
 
   function tearDown() {
@@ -59,23 +67,21 @@ class api_v3_MailingTest extends CiviUnitTestCase {
    * Test civicrm_mailing_create
    */
   public function testMailerCreateSuccess() {
-    $params = array(
-      'subject' => 'maild',
-      'body_text' => 'bdkfhdskfhduew',
-      'version' => 3,
-      'name' => 'mailing name',
-      'created_id' => 1,
-    );
-    $result = civicrm_api('mailing', 'create', $params);
-    $this->documentMe($params, $result, __FUNCTION__, __FILE__);
-    $jobs = civicrm_api('mailing_job', 'get', array('version' =>3, 'mailing_id' => $result['id']));
-    $this->assertAPISuccess($jobs);
+    $result = $this->callAPIAndDocument('mailing', 'create', $this->_params, __FUNCTION__, __FILE__);
+    $jobs = $this->callAPISuccess('mailing_job', 'get', array('mailing_id' => $result['id']));
     $this->assertEquals(1, $jobs['count']);
-    $this->assertAPISuccess($result, 'In line ' . __LINE__);
-    unset($params['created_id']);// return isn't working on this in getAndCheck so lets not check it for now
-    $this->getAndCheck($params, $result['id'], 'mailing');
+    unset($this->_params['created_id']); // return isn't working on this in getAndCheck so lets not check it for now
+    $this->getAndCheck($this->_params, $result['id'], 'mailing');
   }
 
+  /**
+   * Test civicrm_mailing_delete
+   */
+  public function testMailerDeleteSuccess() {
+    $result = $this->callAPISuccess($this->_entity, 'create', $this->_params);
+    $jobs = $this->callAPIAndDocument($this->_entity, 'delete', array('id' => $result['id']), __FUNCTION__, __FILE__);
+    $this->assertAPIDeleted($this->_entity, $result['id']);
+  }
 
   //@ todo tests below here are all failure tests which are not hugely useful - need success tests
 
@@ -83,6 +89,9 @@ class api_v3_MailingTest extends CiviUnitTestCase {
 
   /**
    * Test civicrm_mailing_event_bounce with wrong params.
+   * Note that tests like this are slightly better than no test but an
+   * api function cannot be considered supported  / 'part of the api' without a
+   * success test
    */
   public function testMailerBounceWrongParams() {
     $params = array(
@@ -90,18 +99,20 @@ class api_v3_MailingTest extends CiviUnitTestCase {
       'event_queue_id' => 'Wrong ID',
       'hash' => 'Wrong Hash',
       'body' => 'Body...',
-      'version' => '3',
       'time_stamp' => '20111109212100',
     );
-    $result = civicrm_api('mailing_event', 'bounce', $params);
-    $this->assertEquals($result['is_error'], 1, 'In line ' . __LINE__);
-    $this->assertEquals($result['error_message'], 'Queue event could not be found', 'In line ' . __LINE__);
+    $result = $this->callAPIFailure('mailing_event', 'bounce', $params,
+      'Queue event could not be found'
+    );
   }
 
   //----------- civicrm_mailing_event_confirm methods -----------
 
   /**
    * Test civicrm_mailing_event_confirm with wrong params.
+   * Note that tests like this are slightly better than no test but an
+   * api function cannot be considered supported  / 'part of the api' without a
+   * success test
    */
   public function testMailerConfirmWrongParams() {
     $params = array(
@@ -110,17 +121,20 @@ class api_v3_MailingTest extends CiviUnitTestCase {
       'hash' => 'Wrong Hash',
       'event_subscribe_id' => '123',
       'time_stamp' => '20111111010101',
-      'version' => 3,
     );
-    $result = civicrm_api('mailing_event', 'confirm', $params);
-    $this->assertEquals($result['is_error'], 1, 'In line ' . __LINE__);
-    $this->assertEquals($result['error_message'], 'Confirmation failed', 'In line ' . __LINE__);
+    $result = $this->callAPIFailure('mailing_event', 'confirm', $params,
+      'Confirmation failed'
+    );
   }
 
   //---------- civicrm_mailing_event_reply methods -----------
 
   /**
    * Test civicrm_mailing_event_reply with wrong params.
+   *
+   * Note that tests like this are slightly better than no test but an
+   * api function cannot be considered supported  / 'part of the api' without a
+   * success test
    */
   public function testMailerReplyWrongParams() {
     $params = array(
@@ -130,11 +144,10 @@ class api_v3_MailingTest extends CiviUnitTestCase {
       'bodyTxt' => 'Body...',
       'replyTo' => $this->_email,
       'time_stamp' => '20111111010101',
-      'version' => 3,
     );
-    $result = civicrm_api('mailing_event', 'reply', $params);
-    $this->assertEquals($result['is_error'], 1, 'In line ' . __LINE__);
-    $this->assertEquals($result['error_message'], 'Queue event could not be found', 'In line ' . __LINE__);
+    $result = $this->callAPIFailure('mailing_event', 'reply', $params,
+      'Queue event could not be found'
+    );
   }
 
 
@@ -142,6 +155,9 @@ class api_v3_MailingTest extends CiviUnitTestCase {
 
   /**
    * Test civicrm_mailing_event_forward with wrong params.
+   * Note that tests like this are slightly better than no test but an
+   * api function cannot be considered supported  / 'part of the api' without a
+   * success test
    */
   public function testMailerForwardWrongParams() {
     $params = array(
@@ -150,13 +166,11 @@ class api_v3_MailingTest extends CiviUnitTestCase {
       'hash' => 'Wrong Hash',
       'email' => $this->_email,
       'time_stamp' => '20111111010101',
-      'version' => 3,
     );
-    $result = civicrm_api('mailing_event', 'forward', $params);
-    $this->assertEquals($result['is_error'], 1, 'In line ' . __LINE__);
-    $this->assertEquals($result['error_message'], 'Queue event could not be found', 'In line ' . __LINE__);
+    $result = $this->callAPIFailure('mailing_event', 'forward', $params,
+      'Queue event could not be found'
+    );
   }
-
 
 //----------- civicrm_mailing_create ----------
 

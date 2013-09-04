@@ -107,6 +107,17 @@ abstract class CRM_Utils_System_Base {
   public abstract function getLoginURL($destination = '');
 
   /**
+   * Determine the native ID of the CMS user
+   *
+   * @param $username
+   * @return int|NULL
+   */
+  function getUfId($username) {
+    $className = get_class($this);
+    throw new CRM_Core_Exception("Not implemented: {$className}->getUfId");
+  }
+
+  /**
    * Set a init session with user object
    *
    * @param array $data  array with user specific data
@@ -127,17 +138,30 @@ abstract class CRM_Utils_System_Base {
   function flush() {
     // nullop by default
   }
-    /**
+
+  /**
    * Return default Site Settings
    * @return array array
    * - $url, (Joomla - non admin url)
    * - $siteName,
    * - $siteRoot
    */
-  function getDefaultSiteSettings($dir){
+  function getDefaultSiteSettings($dir) {
     $config = CRM_Core_Config::singleton();
     $url = $config->userFrameworkBaseURL;
     return array($url, NULL, NULL);
+  }
+
+  /**
+   * Perform any post login activities required by the CMS -
+   * e.g. for drupal: records a watchdog message about the new session, saves the login timestamp,
+   * calls hook_user op 'login' and generates a new session.
+   *
+   * @param array params
+   *
+   * FIXME: Document values accepted/required by $params
+   */
+  function userLoginFinalize($params = array()){
   }
 }
 

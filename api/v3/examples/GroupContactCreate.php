@@ -1,27 +1,35 @@
 <?php
-
-/*
- 
+/**
+ * Test Generated example of using group_contact create API
+ * *
  */
 function group_contact_create_example(){
-$params = array( 
+$params = array(
   'contact_id' => 1,
   'contact_id.2' => 2,
   'group_id' => 1,
-  'version' => 3,
 );
 
-  $result = civicrm_api( 'group_contact','create',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('group_contact', 'create', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function group_contact_create_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
@@ -31,7 +39,7 @@ function group_contact_create_expectedresult(){
   'not_added' => 1,
 );
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 

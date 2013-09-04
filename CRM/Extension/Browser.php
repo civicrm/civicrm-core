@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -39,7 +39,7 @@ class CRM_Extension_Browser {
   /**
    * An URL for public extensions repository
    */
-  const DEFAULT_EXTENSIONS_REPOSITORY = 'http://civicrm.org/extdir/ver={ver}|cms={uf}';
+  const DEFAULT_EXTENSIONS_REPOSITORY = 'https://civicrm.org/extdir/ver={ver}|cms={uf}';
 
   /**
    * @param string $repoUrl URL of the remote repository
@@ -217,30 +217,29 @@ class CRM_Extension_Browser {
       return array();
     }
 
-    $extdir = file_get_contents($this->getRepositoryUrl() . $this->indexPath);
-
-    if ($extdir === FALSE) {
+    $exts = array();
+    list ($status, $extdir) = CRM_Utils_HttpClient::singleton()->get($this->getRepositoryUrl() . $this->indexPath);
+    if ($extdir === FALSE || $status !== CRM_Utils_HttpClient::STATUS_OK) {
       CRM_Core_Session::setStatus(ts('The CiviCRM public extensions directory at %1 could not be contacted - please check your webserver can make external HTTP requests or contact CiviCRM team on <a href="http://forum.civicrm.org/">CiviCRM forum</a>.<br />', array(1 => $this->getRepositoryUrl())), ts('Connection Error'), 'error');
-    }
+    } else {
+      $lines = explode("\n", $extdir);
 
-    $lines = explode("\n", $extdir);
-
-    foreach ($lines as $ln) {
-      if (preg_match("@\<li\>(.*)\</li\>@i", $ln, $out)) {
-        // success
-        $extsRaw[] = $out;
-        $key = strip_tags($out[1]);
-        if (substr($key, -4) == '.xml') {
-          $exts[] = array('key' => substr($key, 0, -4));
+      foreach ($lines as $ln) {
+        if (preg_match("@\<li\>(.*)\</li\>@i", $ln, $out)) {
+          // success
+          $extsRaw[] = $out;
+          $key = strip_tags($out[1]);
+          if (substr($key, -4) == '.xml') {
+            $exts[] = array('key' => substr($key, 0, -4));
+          }
         }
       }
     }
 
+    // CRM-13141 There may not be any compatible extensions available for the requested CiviCRM version + CMS. If so, $extdir is empty so just return a notification.
     if (empty($exts)) {
-      if ($extdir !== FALSE) {
-        CRM_Core_Session::setStatus(ts('Could not retrieve a list of extensions from the CiviCRM public directory at %1 - please contact CiviCRM team on <a href="http://forum.civicrm.org/">CiviCRM forum</a>.<br />', array(1 => $this->getRepositoryUrl())), ts('Failed Fetching List'), 'error');
-      }
-      $exts = array();
+      $config = CRM_Core_Config::singleton();
+      CRM_Core_Session::setStatus(ts('There are currently no extensions on the CiviCRM public extension directory which are compatible with version %2 (<a href="%1">requested extensions from here</a>). If you want to install an extension which is not marked as compatible, you may be able to <a href="%3">download and install extensions manually</a> (depending on access to your web server).<br />', array(1 => $this->getRepositoryUrl(), 2 => $config->civiVersion, 3 => 'http://wiki.civicrm.org/confluence/display/CRMDOC/Extensions')), ts('No Extensions Available for this Version'), 'info');
     }
 
     ini_restore('allow_url_fopen');
@@ -267,7 +266,10 @@ class CRM_Extension_Browser {
     $url      = $this->getRepositoryUrl() . '/' . $key . '.xml';
 
     if (!$cached || !file_exists($filename)) {
-      file_put_contents($filename, file_get_contents($url));
+      $fetchStatus = CRM_Utils_HttpClient::singleton()->fetch($url, $filename);
+      if ($fetchStatus != CRM_Utils_HttpClient::STATUS_OK) {
+        return NULL;
+      }
     }
 
     if (file_exists($filename)) {

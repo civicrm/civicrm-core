@@ -171,6 +171,11 @@ function do_update() {
   read new_ver
   if [ -n "$new_ver" ]; then
     cd $workdir/$version/export
+    # create sql upgrade file
+    tpl="CRM/Upgrade/Incremental/sql/$new_ver.mysql.tpl"
+    if [ ! -f $tpl ]; then
+      echo "{* file to handle db changes in $new_ver during upgrade *}" > $tpl
+    fi
     # escape regex special chars
     arg=`echo "$version" | sed 's:[]\[\^\$\.\*\/]:\\\\&:g'`
     for file in xml/version.xml sql/civicrm_generated.mysql; do
@@ -186,7 +191,7 @@ function do_update() {
     read input
     if [ "$input" = "y" ]; then
       set -ex
-      git add  xml/version.xml sql/civicrm_generated.mysql
+      git add  xml/version.xml sql/civicrm_generated.mysql $tpl
       git commit -m "Update version to $new_ver"
       git push origin "$start_point"
       set +x

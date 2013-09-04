@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -136,7 +136,7 @@ class WebTest_Generic_CheckDashboardTest extends CiviSeleniumTestCase {
     }
     else {
       // click 'Delete Activity' link
-      $this->click("//table[@id='contact-activity-selector-dashlet']/tbody/tr[1]/td[9]/span//a[text()='Delete']");
+      $this->click("//table[@id='contact-activity-selector-dashlet']/tbody/tr[1]/td[8]/span//a[text()='Delete']");
     }
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->waitForElementPresent("_qf_Activity_next-bottom");

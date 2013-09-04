@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -152,6 +152,13 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
    */
   public $_pcpInfo;
 
+  /**
+   * The contact id of the person for whom membership is being added or renewed based on the cid in the url,
+   * checksum, or session
+   * @var unknown_type
+   */
+  protected $_contactID;
+
   protected $_userID;
 
   /**
@@ -204,10 +211,12 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
     else {
       $session->set('pastContributionID', $this->_id);
     }
-
+    // this was used prior to the cleverer this_>getContactID - unsure now
     $this->_userID = $session->get('userID');
+
+    $this->_contactID = $this->_membershipContactID = $this->getContactID();
     $this->_mid = NULL;
-    if ($this->_userID) {
+    if ($this->_contactID) {
       $this->_mid = CRM_Utils_Request::retrieve('mid', 'Positive', $this);
       if ($this->_mid) {
         $membership = new CRM_Member_DAO_Membership();
@@ -215,7 +224,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
 
         if ($membership->find(TRUE)) {
           $this->_defaultMemTypeId = $membership->membership_type_id;
-          if ($membership->contact_id != $this->_userID) {
+          if ($membership->contact_id != $this->_contactID) {
             $employers = CRM_Contact_BAO_Relationship::getPermissionedEmployer($this->_userID);
             if (array_key_exists($membership->contact_id, $employers)) {
               $this->_membershipContactID = $membership->contact_id;
@@ -330,7 +339,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
 
       // get price info
       // CRM-5095
-      CRM_Price_BAO_Set::initSet($this, $this->_id, 'civicrm_contribution_page');
+      CRM_Price_BAO_PriceSet::initSet($this, $this->_id, 'civicrm_contribution_page');
 
       // this avoids getting E_NOTICE errors in php
       $setNullFields = array(
@@ -537,12 +546,15 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
     }
 
     foreach ($vars as $v) {
-      if (CRM_Utils_Array::value($v, $this->_params)) {
+      if (isset($this->_params[$v])) {
         if ($v == 'frequency_unit' || $v == 'pledge_frequency_unit') {
           $frequencyUnits = CRM_Core_OptionGroup::values('recur_frequency_units');
           if (array_key_exists($this->_params[$v], $frequencyUnits)) {
             $this->_params[$v] = $frequencyUnits[$this->_params[$v]];
           }
+        }
+        if ($v == "amount" && $this->_params[$v] === 0) {
+          $this->_params[$v] = CRM_Utils_Money::format($this->_params[$v], NULL, NULL, TRUE);
         }
         $this->assign($v, $this->_params[$v]);
       }
@@ -623,7 +635,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
     $stateCountryMap = array();
 
     if ($id) {
-      $contactID = $this->_userID;
+      $contactID = $this->getContactID();
 
       // we don't allow conflicting fields to be
       // configured via profile - CRM 2100
@@ -713,7 +725,8 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
             );
             $this->_fields[$key] = $field;
           }
-          if ($field['add_captcha']) {
+          // CRM-11316 Is ReCAPTCHA enabled for this profile AND is this an anonymous visitor
+          if ($field['add_captcha'] && !$this->_userID) {
             $addCaptcha = TRUE;
           }
         }

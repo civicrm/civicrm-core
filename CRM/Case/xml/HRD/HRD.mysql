@@ -13,8 +13,8 @@
 SELECT @option_group_id_case_type        := max(id) from civicrm_option_group where name = 'case_type';
 SELECT @caseCompId := id FROM `civicrm_component` where `name` like 'CiviCase';
 
-INSERT INTO 
-   `civicrm_option_value` (`option_group_id`, `label`, `value`, `name`, `grouping`, `filter`, `is_default`, `weight`, `description`, `is_optgroup`, `is_reserved`, `is_active`) 
+INSERT INTO
+   `civicrm_option_value` (`option_group_id`, `label`, `value`, `name`, `grouping`, `filter`, `is_default`, `weight`, `description`, `is_optgroup`, `is_reserved`, `is_active`)
 VALUES
 (@option_group_id_case_type, 'Civil and Political'          ,  1, 'Civil and Political'          , NULL, 0, 1,  1, NULL, 0, 1, 1),
 (@option_group_id_case_type, 'Economic, Social and Cultural',  2, 'Economic, Social and Cultural', NULL, 0, 0,  2, NULL, 0, 1, 1),
@@ -30,8 +30,8 @@ SELECT @option_group_id_activity_type        := max(id) from civicrm_option_grou
 
 SELECT @max_val := MAX(ROUND(op.value)) FROM civicrm_option_value op WHERE op.option_group_id  = @option_group_id_activity_type;
 
-INSERT INTO 
-   `civicrm_option_value` (`option_group_id`, `label`, `value`, `name`, `grouping`, `filter`, `is_default`, `weight`, `description`, `is_optgroup`, `is_reserved`, `is_active`, `component_id` ) 
+INSERT INTO
+   `civicrm_option_value` (`option_group_id`, `label`, `value`, `name`, `grouping`, `filter`, `is_default`, `weight`, `description`, `is_optgroup`, `is_reserved`, `is_active`, `component_id` )
 VALUES
     (@option_group_id_activity_type, 'Source(incoming)', (SELECT @max_val := @max_val+1), 'Source(incoming)',  NULL, 0,  0, (SELECT @max_val := @max_val+1), '', 0, 0, 1, @caseCompId ),
     (@option_group_id_activity_type, 'Incoming correspondence', (SELECT @max_val := @max_val+1), 'Incoming correspondence',  NULL, 0,  0, (SELECT @max_val := @max_val+1), '', 0, 0, 1, @caseCompId ),

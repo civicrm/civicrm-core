@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -63,8 +63,8 @@ class CRM_Batch_Form_Batch extends CRM_Admin_Form {
     $attributes = CRM_Core_DAO::getAttribute('CRM_Batch_DAO_Batch');
     $this->add('text', 'title', ts('Batch Name'), $attributes['name'], TRUE);
 
-    $batchTypes = CRM_Core_PseudoConstant::get('CRM_Batch_DAO_Batch', 'type_id');
-    
+    $batchTypes = CRM_Batch_BAO_Batch::buildOptions('type_id');
+
     // unset non-related types
     unset($batchTypes[3]);
     unset($batchTypes[4]);
@@ -96,8 +96,6 @@ class CRM_Batch_Form_Batch extends CRM_Admin_Form {
     else {
       $defaults = $this->_values;
     }
-
-
     return $defaults;
   }
 
@@ -124,9 +122,9 @@ class CRM_Batch_Form_Batch extends CRM_Admin_Form {
       $params['created_id'] = $session->get('userID');
       $params['created_date'] = CRM_Utils_Date::processDate( date( "Y-m-d" ), date( "H:i:s" ) );
     }
-    
+
     // always create with data entry status
-    $params['status_id'] = 3; 
+    $params['status_id'] = 3;
     $batch = CRM_Batch_BAO_Batch::create($params);
 
     // redirect to batch entry page.

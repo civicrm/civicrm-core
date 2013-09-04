@@ -1,26 +1,34 @@
 <?php
-
-/*
- 
+/**
+ * Test Generated example of using group_contact delete API
+ * *
  */
 function group_contact_delete_example(){
-$params = array( 
+$params = array(
   'contact_id' => 1,
   'group_id' => 1,
-  'version' => 3,
 );
 
-  $result = civicrm_api( 'group_contact','delete',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('group_contact', 'delete', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function group_contact_delete_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
@@ -30,7 +38,7 @@ function group_contact_delete_expectedresult(){
   'not_removed' => 0,
 );
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 

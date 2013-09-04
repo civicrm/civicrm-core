@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -164,5 +164,10 @@ class CRM_Contact_Form_Search_Custom_Base {
   function whereClause(&$where, &$params) {
     return CRM_Core_DAO::composeQuery($where, $params, TRUE);
   }
-}
 
+  // override this method to define the contact query object
+  // used for creating $sql
+  function getQueryObj() {
+    return NULL;
+  }
+}

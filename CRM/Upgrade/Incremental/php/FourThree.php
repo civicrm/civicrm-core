@@ -2,7 +2,7 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -190,6 +190,10 @@ WHERE     ceft.entity_id IS NULL;
       $postUpgradeMessage .= '<br />' . ts('System Administrator Alert: If you are running scheduled jobs using CLI.php, you will need to reconfigure cron tasks to include a password. Scheduled jobs will no longer run if the password is not provided (<a href="%1" target="_blank">learn more</a>).',
       array( 1 => 'http://wiki.civicrm.org/confluence/display/CRMDOC/Managing+Scheduled+Jobs'));
     }
+    if ($rev == '4.3.5') {
+      $postUpgradeMessage .= '<br />' . ts('Default versions of the following System Workflow Message Templates have been modified to handle new functionality: <ul><li>Events - Registration Confirmation and Receipt (on-line)</li><li>Events - Registration Confirmation and Receipt (off-line)</li></ul> If you have modified these templates, please review the new default versions and implement updates as needed to your copies (Administer > Communications > Message Templates > System Workflow Messages).');
+    }
+
   }
 
   function upgrade_4_3_alpha1($rev) {
@@ -296,12 +300,49 @@ ADD COLUMN   premiums_nothankyou_label varchar(255) COLLATE utf8_unicode_ci DEFA
     $this->addTask(ts('Upgrade DB to 4.3.4: SQL'), 'task_4_3_x_runSql', $rev);
   }
 
+  function upgrade_4_3_5($rev) {
+    // CRM-12156
+    $config = CRM_Core_Config::singleton();
+    $dbname  = DB::parseDSN($config->dsn);
+    $sql = "SELECT DELETE_RULE
+FROM information_schema.REFERENTIAL_CONSTRAINTS
+WHERE CONSTRAINT_NAME = 'FK_civicrm_financial_item_contact_id'
+AND CONSTRAINT_SCHEMA = %1";
+    $params = array(1 => array($dbname['database'], 'String'));
+    $onDelete = CRM_Core_DAO::singleValueQuery($sql, $params, TRUE, FALSE);
+
+    if ($onDelete != 'CASCADE') {
+      $query = "ALTER TABLE `civicrm_financial_item`
+DROP FOREIGN KEY FK_civicrm_financial_item_contact_id,
+DROP INDEX FK_civicrm_financial_item_contact_id;";
+      CRM_Core_DAO::executeQuery($query, array(), TRUE, NULL, FALSE, FALSE);
+      $query = "
+ALTER TABLE `civicrm_financial_item`
+ADD CONSTRAINT `FK_civicrm_financial_item_contact_id` FOREIGN KEY (`contact_id`) REFERENCES `civicrm_contact` (`id`) ON DELETE CASCADE;
+";
+      CRM_Core_DAO::executeQuery($query, array(), TRUE, NULL, FALSE, FALSE);
+    }
+    $this->addTask(ts('Upgrade DB to 4.3.5: SQL'), 'task_4_3_x_runSql', $rev);
+  }
+
+  function upgrade_4_3_6($rev) {
+    //CRM-13094
+    $this->addTask(ts('Add mising contraints'), 'addMissingConstraints', $rev);
+    //CRM-13088
+    $this->addTask(ts('Add ON DELETE Options for constraints'), 'task_4_3_x_checkConstraints', $rev);
+    $this->addTask(ts('Upgrade DB to 4.3.6: SQL'), 'task_4_3_x_runSql', $rev);
+    // CRM-12844
+    // update line_item, financial_trxn and financial_item table for recurring contributions
+    $this->addTask(ts('Update financial_account_id in financial_trxn table'), 'updateFinancialTrxnData', $rev);
+    $this->addTask(ts('Update Line Item Data'), 'updateLineItemData', $rev);
+  }
+  
   //CRM-11636
   function assignFinancialTypeToPriceRecords() {
     $upgrade = new CRM_Upgrade_Form();
     //here we update price set entries
     $sqlFinancialIds = "
-SELECT id, name
+SELECT id, LCASE(name) name
 FROM   civicrm_financial_type
 WHERE name IN ('Donation', 'Event Fee', 'Member Dues');
 ";
@@ -313,9 +354,9 @@ WHERE name IN ('Donation', 'Event Fee', 'Member Dues');
 UPDATE civicrm_price_set ps
 SET    ps.financial_type_id =
   CASE
-    WHEN ps.extends LIKE '%1%' THEN {$financialIds['Event Fee']}
-    WHEN ps.extends LIKE '2' THEN {$financialIds['Donation']}
-    WHEN ps.extends LIKE '3' THEN {$financialIds['Member Dues']}
+    WHEN ps.extends LIKE '%1%' THEN {$financialIds['event fee']}
+    WHEN ps.extends LIKE '2' THEN {$financialIds['donation']}
+    WHEN ps.extends LIKE '3' THEN {$financialIds['member dues']}
   END
 WHERE  financial_type_id IS NULL
 ";
@@ -832,6 +873,163 @@ ALTER TABLE civicrm_financial_account
 
     return TRUE;
   }
+  
+  /**
+   * change index and add missing constraints for civicrm_contribution_recur
+   */
+  function addMissingConstraints(CRM_Queue_TaskContext $ctx) {
+    $query = "SHOW KEYS FROM `civicrm_contribution_recur` WHERE key_name = 'UI_contrib_payment_instrument_id'";
+    $dao = CRM_Core_DAO::executeQuery($query);
+    if ($dao->N) {
+      CRM_Core_DAO::executeQuery('ALTER TABLE civicrm_contribution_recur DROP INDEX UI_contrib_payment_instrument_id');
+      CRM_Core_DAO::executeQuery('ALTER TABLE civicrm_contribution_recur ADD INDEX UI_contribution_recur_payment_instrument_id (payment_instrument_id)');
+    }
+    $constraintArray = array(
+      'contact_id' => " ADD CONSTRAINT `FK_civicrm_contribution_recur_contact_id` FOREIGN KEY (`contact_id`) REFERENCES `civicrm_contact` (`id`) ON DELETE CASCADE ", 
+      'payment_processor_id' => " ADD CONSTRAINT `FK_civicrm_contribution_recur_payment_processor_id` FOREIGN KEY (`payment_processor_id`) REFERENCES `civicrm_payment_processor` (`id`) ON DELETE SET NULL ", 
+      'financial_type_id' => " ADD CONSTRAINT `FK_civicrm_contribution_recur_financial_type_id` FOREIGN KEY (`financial_type_id`) REFERENCES `civicrm_financial_type` (`id`) ON DELETE SET NULL ", 
+      'campaign_id' => " ADD CONSTRAINT `FK_civicrm_contribution_recur_campaign_id` FOREIGN KEY (`campaign_id`) REFERENCES `civicrm_campaign` (`id`) ON DELETE SET NULL ",
+    );
+    $constraint = array();
+    foreach ($constraintArray as $constraintKey => $value) {
+      $foreignKeyExists = CRM_Core_DAO::checkFKConstraintInFormat('civicrm_contribution_recur', $constraintKey);
+      if (!$foreignKeyExists) {
+        $constraint[] = $value;
+      }
+    }
+    if (!empty($constraint)) {
+      $query = "ALTER TABLE civicrm_contribution_recur " . implode(' , ', $constraint);
+      CRM_Core_DAO::executeQuery($query);
+    }
+    return TRUE;    
+  }
+
+  /**
+   * Update financial_account_id for bad data in financial_trxn table
+   * CRM-12844
+   * 
+   */
+  function updateFinancialTrxnData(CRM_Queue_TaskContext $ctx) {
+    $upgrade = new CRM_Upgrade_Form();
+    $sql = "SELECT cc.id contribution_id, cc.contribution_recur_id, cft.payment_processor_id, 
+cft.id financial_trxn_id, cfi.entity_table, cft.from_financial_account_id, cft.to_financial_account_id
+
+FROM `civicrm_contribution` cc
+LEFT JOIN civicrm_entity_financial_trxn ceft ON ceft.entity_id = cc.id
+LEFT JOIN civicrm_financial_trxn cft ON cft.id = ceft.financial_trxn_id
+LEFT JOIN civicrm_entity_financial_trxn ceft1 ON ceft1.financial_trxn_id = ceft.financial_trxn_id 
+LEFT JOIN civicrm_financial_item cfi ON cfi.id = ceft1.entity_id
+WHERE ceft.entity_table = 'civicrm_contribution'  AND cc.contribution_recur_id IS NOT NULL
+AND ceft1.entity_table = 'civicrm_financial_item' AND cft.id IS NOT NULL AND cft.payment_instrument_id = %1
+
+ORDER BY cft.id ";
+    $paymentInstrument = CRM_Contribute_PseudoConstant::paymentInstrument('name');
+    $param = array(1 => array(array_search('Credit Card', $paymentInstrument), 'Integer'));
+    $dao = CRM_Core_DAO::executeQuery($sql, $param);
+    $financialTrxn = array();
+    $subsequentPayments = array();
+    while ($dao->fetch()) {
+      if (!array_key_exists($dao->contribution_recur_id, $financialTrxn)) {
+        $financialTrxn[$dao->contribution_recur_id] = array(
+           'from_financial_account_id' => $dao->to_financial_account_id,
+           'payment_processor_id' => $dao->payment_processor_id,
+           $dao->contribution_id => 1,
+        );
+        if (!is_null($dao->from_financial_account_id)) {
+          $sql = 'UPDATE civicrm_financial_trxn SET from_financial_account_id = NULL WHERE id = %1';
+          $params = array(1 => array($dao->financial_trxn_id, 'Integer'));
+          CRM_Core_DAO::executeQuery($sql, $params);
+        }
+      }
+      elseif (!array_key_exists($dao->contribution_id, $financialTrxn[$dao->contribution_recur_id])) {
+        if (($dao->entity_table == 'civicrm_line_item' && $dao->to_financial_account_id == $financialTrxn[$dao->contribution_recur_id]['from_financial_account_id']) 
+          || ($dao->entity_table == 'civicrm_financial_trxn' && $dao->from_financial_account_id == $financialTrxn[$dao->contribution_recur_id]['from_financial_account_id'])) {
+          continue;
+        }
+          $subsequentPayments[$dao->contribution_recur_id][$dao->entity_table][] = $dao->financial_trxn_id;
+      }
+    }
+    foreach ($subsequentPayments as $key => $value) {
+      foreach ($value as $table => $val) {
+        if ($table == 'civicrm_financial_trxn') {
+          $field = 'from_financial_account_id';
+        }
+        else {
+          $field = 'to_financial_account_id';
+        }
+        $sql = "UPDATE civicrm_financial_trxn SET $field = " . $financialTrxn[$dao->contribution_recur_id]['from_financial_account_id'] . ', 
+payment_processor_id = ' . $financialTrxn[$dao->contribution_recur_id]['payment_processor_id'] . ' WHERE  
+id IN (' . implode(',', $val) . ')';
+        CRM_Core_DAO::executeQuery($sql);
+      }
+    }
+    return TRUE;
+  }
+
+  /**
+   * Update financial_account_id for bad data in financial_trxn table
+   * CRM-12844
+   * 
+   */
+  function updateLineItemData(CRM_Queue_TaskContext $ctx) {
+    $sql = "SELECT cc.id contribution_id, cc.contribution_recur_id,
+cc.financial_type_id contribution_financial_type, 
+cli.financial_type_id line_financial_type_id,
+cli.price_field_id, cli.price_field_value_id, cli.label, cli.id line_item_id,
+cfi.financial_account_id
+FROM `civicrm_line_item` cli
+LEFT JOIN civicrm_contribution cc ON cc.id =  cli.entity_id
+LEFT JOIN civicrm_financial_item cfi ON cfi.entity_id = cli.id
+LEFT JOIN civicrm_price_field cpf ON cpf.id = cli.price_field_id
+LEFT JOIN civicrm_price_set cps ON cps.id = cpf.price_set_id
+LEFT JOIN civicrm_price_field_value cpfv ON cpfv.id = cli.price_field_value_id
+WHERE cfi.entity_table = 'civicrm_line_item' 
+AND cli.entity_table = 'civicrm_contribution'
+AND cps.is_quick_config = 1 AND cc.contribution_recur_id IS NOT NULL 
+ORDER BY cli.id";
+    $dao = CRM_Core_DAO::executeQuery($sql);
+    $financialTrxn = $subsequentPayments = array();
+    while ($dao->fetch()) {
+      if (!array_key_exists($dao->contribution_recur_id, $financialTrxn)) {
+        $financialTrxn[$dao->contribution_recur_id] = array(
+           'price_field_id' => $dao->price_field_id,
+           'price_field_value_id' => $dao->price_field_value_id,
+           'label' => $dao->label,
+           'financial_account_id' => $dao->financial_account_id,
+           $dao->contribution_id => 1,
+        );
+      }
+      else {
+        if ($dao->price_field_value_id == $financialTrxn[$dao->contribution_recur_id]['price_field_value_id']) {
+          continue;
+        }
+         $subsequentPayments[$dao->contribution_recur_id][] = $dao->line_item_id;
+      }
+    }
+    foreach ($subsequentPayments as $key => $value) {
+      $sql = "UPDATE civicrm_line_item cli
+LEFT JOIN civicrm_financial_item cfi ON cli.id = cfi.entity_id
+SET 
+cli.label = %1,
+cli.price_field_id = %2,
+cli.price_field_value_id = %3,
+cfi.financial_account_id = %4,
+cfi.description = %5,
+cli.financial_type_id = %6
+WHERE cfi.entity_table = 'civicrm_line_item' 
+AND cli.entity_table = 'civicrm_contribution' AND cli.id IN (" . implode(',', $value). ');';
+      $params =  array(
+        1 => array($financialTrxn[$key]['label'], 'String'),
+        2 => array($financialTrxn[$key]['price_field_id'], 'Integer'),
+        3 => array($financialTrxn[$key]['price_field_value_id'], 'Integer'),
+        4 => array($financialTrxn[$key]['financial_account_id'], 'Integer'),
+        5 => array($financialTrxn[$key]['label'], 'String'),
+        6 => array($dao->contribution_financial_type, 'Integer'),
+      );
+      CRM_Core_DAO::executeQuery($sql, $params);
+    }
+    return TRUE;
+  }
 
   /**
    * replace contribution_type to financial_type in table
@@ -874,7 +1072,7 @@ ALTER TABLE civicrm_financial_account
         $saveDao = new CRM_Contact_DAO_SavedSearch();
       }
       else {
-        $saveDao = new CRM_Report_DAO_Instance();
+        $saveDao = new CRM_Report_DAO_ReportInstance();
       }
       $saveDao->id = $dao->id;
 
@@ -905,6 +1103,63 @@ ALTER TABLE civicrm_financial_account
       $saveDao->form_values = serialize($formValues);
 
       $saveDao->save();
+    }
+    return TRUE;
+  }
+
+  /**
+   * Add ON DELETE options for constraint if not present
+   * CRM-13088 && CRM-12156
+   *
+   * @return bool TRUE for success
+   */
+  function task_4_3_x_checkConstraints(CRM_Queue_TaskContext $ctx) {
+    $config = CRM_Core_Config::singleton();
+    $dbname  = DB::parseDSN($config->dsn);
+    $constraintArray = array(
+      "'FK_civicrm_financial_account_contact_id'",
+      "'FK_civicrm_financial_item_contact_id'",
+      "'FK_civicrm_contribution_recur_financial_type_id'",
+      "'FK_civicrm_line_item_financial_type_id'",
+      "'FK_civicrm_product_financial_type_id'",
+      "'FK_civicrm_premiums_product_financial_type_id'",
+      "'FK_civicrm_price_field_value_financial_type_id'",
+      "'FK_civicrm_contribution_product_financial_type_id'",
+      "'FK_civicrm_price_set_financial_type_id'",
+      "'FK_civicrm_grant_financial_type_id'",
+    );
+
+    $sql = "SELECT DELETE_RULE, TABLE_NAME, CONSTRAINT_NAME 
+FROM information_schema.REFERENTIAL_CONSTRAINTS
+WHERE CONSTRAINT_NAME IN (" . implode(',', $constraintArray) . ")
+AND CONSTRAINT_SCHEMA = %1";
+    $params = array(1 => array($dbname['database'], 'String'));
+    $onDelete = CRM_Core_DAO::executeQuery($sql, $params, TRUE, FALSE);
+    while ($onDelete->fetch()) {
+      if (($onDelete->TABLE_NAME != 'civicrm_financial_item' && $onDelete->DELETE_RULE != 'SET NULL') || 
+        ($onDelete->TABLE_NAME == 'civicrm_financial_item' && $onDelete->DELETE_RULE != 'CASCADE')) {
+        $tableName = 'civicrm_financial_type';
+        $onDeleteOption = ' SET NULL ';
+        $columnName = 'financial_type_id';
+        if (preg_match('/contact_id/', $onDelete->CONSTRAINT_NAME)) {
+          $tableName = 'civicrm_contact';
+          $columnName = 'contact_id';
+          if ($onDelete->TABLE_NAME == 'civicrm_financial_item') {
+            $onDeleteOption = 'CASCADE';
+          }
+        }
+      }
+      else {
+        continue;
+      }
+      $query = "ALTER TABLE {$onDelete->TABLE_NAME}
+        DROP FOREIGN KEY {$onDelete->CONSTRAINT_NAME},
+        DROP INDEX {$onDelete->CONSTRAINT_NAME};";
+      CRM_Core_DAO::executeQuery($query, array(), TRUE, NULL, FALSE, FALSE);
+      $query = " ALTER TABLE  {$onDelete->TABLE_NAME}
+        ADD CONSTRAINT  {$onDelete->CONSTRAINT_NAME} FOREIGN KEY (`" . $columnName . "`) REFERENCES {$tableName} (`id`) ON DELETE {$onDeleteOption};
+        ";
+      CRM_Core_DAO::executeQuery($query, array(), TRUE, NULL, FALSE, FALSE);
     }
     return TRUE;
   }

@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -751,13 +751,14 @@ SELECT civicrm_custom_group.name as name,
     if ( $this->_eID ) {
       $eventEndDate = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $this->_eID,'end_date');
     }
-    $this->assign('past', FALSE);
+    $this->assign('past', 0);
     if ($this->_action & CRM_Core_Action::UPDATE) {
-      $events = CRM_Event_BAO_Event::getEvents(TRUE, FALSE, FALSE);
+      $events = CRM_Event_BAO_Event::getEvents(1, FALSE, FALSE);
     }
     elseif ($this->getElementValue('past_event') || (isset($eventEndDate) && (CRM_Utils_Date::currentDBDate() > CRM_Utils_Date::processDate($eventEndDate)))) {
-      $events = CRM_Event_BAO_Event::getEvents(TRUE);
-      $this->assign('past', TRUE);
+      $pastval = $this->getElementValue('past_event');
+      $events = CRM_Event_BAO_Event::getEvents($pastval);
+      $this->assign('past', $pastval);
     }
     else {
       $events = CRM_Event_BAO_Event::getEvents();
@@ -1007,7 +1008,7 @@ loadCampaign( {$this->_eID}, {$eventCampaigns} );
       ($self->_id && !$self->_paymentId && isset($self->_values['line_items']) && is_array($self->_values['line_items']))
     ) {
       if ($priceSetId = CRM_Utils_Array::value('priceSetId', $values)) {
-        CRM_Price_BAO_Field::priceSetValidation($priceSetId, $values, $errorMsg, TRUE);
+        CRM_Price_BAO_PriceField::priceSetValidation($priceSetId, $values, $errorMsg, TRUE);
       }
     }
     return CRM_Utils_Array::crmIsEmptyArray($errorMsg) ? TRUE : $errorMsg;
@@ -1046,7 +1047,7 @@ loadCampaign( {$this->_eID}, {$eventCampaigns} );
     if (CRM_Utils_Array::value('contact_select_id', $params)) {
       $this->_contactId = $params['contact_select_id'][1];
     }
-    if ($this->_priceSetId && $isQuickConfig = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_Set', $this->_priceSetId, 'is_quick_config')) {
+    if ($this->_priceSetId && $isQuickConfig = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $this->_priceSetId, 'is_quick_config')) {
       $this->_quickConfig = $isQuickConfig;
     }
 
@@ -1094,7 +1095,7 @@ loadCampaign( {$this->_eID}, {$eventCampaigns} );
 
         //lets carry currency, CRM-4453
         $params['fee_currency'] = $config->defaultCurrency;
-        CRM_Price_BAO_Set::processAmount($this->_values['fee'],
+        CRM_Price_BAO_PriceSet::processAmount($this->_values['fee'],
           $params, $lineItem[0]
         );
         //CRM-11529 for quick config backoffice transactions

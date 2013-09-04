@@ -2,7 +2,7 @@
 
 /*
   +--------------------------------------------------------------------+
-  | CiviCRM version 4.3                                                |
+  | CiviCRM version 4.4                                                |
   +--------------------------------------------------------------------+
   | Copyright CiviCRM LLC (c) 2004-2013                                |
   +--------------------------------------------------------------------+
@@ -75,6 +75,11 @@ class CRM_Report_Form_Member_ContributionDetail extends CRM_Report_Form {
           ),
           'contact_type' =>
           array('title' => ts('Contact Type'),
+            'no_repeat' => TRUE,
+          ),
+          'contact_sub_type' =>
+          array(
+            'title' => ts('Contact SubType'),
             'no_repeat' => TRUE,
           ),
           'do_not_email' =>

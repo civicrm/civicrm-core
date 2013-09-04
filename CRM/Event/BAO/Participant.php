@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -469,7 +469,7 @@ SELECT  event.event_full_text,
       return ($returnEmptySeats) ? (int) $eventMaxSeats : FALSE;
     }
 
-    return $evenFullText;
+    return $eventFullText;
   }
 
   /**
@@ -1738,7 +1738,7 @@ WHERE    civicrm_participant.contact_id = {$contactID} AND
     $checkDiscount = CRM_Core_BAO_Discount::findSet($eventID,'civicrm_event');
     if (!empty($checkDiscount)) {
       $feeLevel = current($feeLevel);
-      $priceSetId = CRM_Price_BAO_Set::getFor('civicrm_event', $eventID, NULL);
+      $priceSetId = CRM_Price_BAO_PriceSet::getFor('civicrm_event', $eventID, NULL);
       $query = "SELECT cpfv.amount FROM `civicrm_price_field_value` cpfv
 LEFT JOIN civicrm_price_field cpf ON cpfv.price_field_id = cpf.id
 WHERE cpf.price_set_id = %1 AND cpfv.label LIKE %2";

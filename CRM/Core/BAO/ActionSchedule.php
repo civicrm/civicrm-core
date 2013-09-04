@@ -1,7 +1,7 @@
 <?php
 /*
   +--------------------------------------------------------------------+
-  | CiviCRM version 4.3                                                |
+  | CiviCRM version 4.4                                                |
   +--------------------------------------------------------------------+
   | Copyright (C) 2011 Marty Wright                                    |
   | Licensed to CiviCRM under the Academic Free License version 3.0.   |
@@ -214,7 +214,6 @@ class CRM_Core_BAO_ActionSchedule extends CRM_Core_DAO_ActionSchedule {
 
       }
     }
-
     return array(
       'sel1' => $sel1,
       'sel2' => $sel2,
@@ -583,7 +582,7 @@ WHERE   cas.entity_value = $id AND
     $session = CRM_Core_Session::singleton();
 
     while ($actionSchedule->fetch()) {
-      $extraSelect = $extraJoin = $extraWhere = '';
+      $extraSelect = $extraJoin = $extraWhere = $extraOn = '';
 
       if ($actionSchedule->record_activity) {
         if ($mapping->entity == 'civicrm_membership') {
@@ -603,9 +602,15 @@ WHERE   cas.entity_value = $id AND
         $tokenEntity = 'activity';
         $tokenFields = array('activity_id', 'activity_type', 'subject', 'details', 'activity_date_time');
         $extraSelect = ', ov.label as activity_type, e.id as activity_id';
-        $extraJoin   = "INNER JOIN civicrm_option_group og ON og.name = 'activity_type'
+        $extraJoin   = "
+INNER JOIN civicrm_option_group og ON og.name = 'activity_type'
 INNER JOIN civicrm_option_value ov ON e.activity_type_id = ov.value AND ov.option_group_id = og.id";
-        $extraWhere = 'AND e.is_current_revision = 1 AND e.is_deleted = 0';
+        $extraOn = ' AND e.is_current_revision = 1 AND e.is_deleted = 0 ';
+        if ($actionSchedule->limit_to == 0) {
+          $extraJoin   = "
+LEFT JOIN civicrm_option_group og ON og.name = 'activity_type'
+LEFT JOIN civicrm_option_value ov ON e.activity_type_id = ov.value AND ov.option_group_id = og.id";
+        }
       }
 
       if ($mapping->entity == 'civicrm_participant') {
@@ -622,6 +627,17 @@ LEFT  JOIN civicrm_address address ON address.id = lb.address_id
 LEFT  JOIN civicrm_email email ON email.id = lb.email_id
 LEFT  JOIN civicrm_phone phone ON phone.id = lb.phone_id
 ";
+        if ($actionSchedule->limit_to == 0) {
+          $extraJoin   = "
+LEFT JOIN civicrm_event ev ON e.event_id = ev.id
+LEFT JOIN civicrm_option_group og ON og.name = 'event_type'
+LEFT JOIN civicrm_option_value ov ON ev.event_type_id = ov.value AND ov.option_group_id = og.id
+LEFT JOIN civicrm_loc_block lb ON lb.id = ev.loc_block_id
+LEFT JOIN civicrm_address address ON address.id = lb.address_id
+LEFT JOIN civicrm_email email ON email.id = lb.email_id
+LEFT JOIN civicrm_phone phone ON phone.id = lb.phone_id
+";
+        }
       }
 
       if ($mapping->entity == 'civicrm_membership') {
@@ -631,12 +647,25 @@ LEFT  JOIN civicrm_phone phone ON phone.id = lb.phone_id
         $extraJoin   = '
  INNER JOIN civicrm_membership_type mt ON e.membership_type_id = mt.id
  INNER JOIN civicrm_membership_status ms ON e.status_id = ms.id';
+
+        if ($actionSchedule->limit_to == 0) {
+          $extraJoin   = '
+ LEFT JOIN civicrm_membership_type mt ON e.membership_type_id = mt.id
+ LEFT JOIN civicrm_membership_status ms ON e.status_id = ms.id';
+        }
       }
 
+      $entityJoinClause = "INNER JOIN {$mapping->entity} e ON e.id = reminder.entity_id";
+      if ($actionSchedule->limit_to == 0) {
+        $entityJoinClause = "LEFT JOIN {$mapping->entity} e ON e.id = reminder.entity_id";
+        $extraWhere .= " AND (e.id = reminder.entity_id OR reminder.entity_table = 'civicrm_contact')";
+      }
+      $entityJoinClause .= $extraOn;
+
       $query = "
-SELECT reminder.id as reminderID, reminder.*, e.id as entityID, e.* {$extraSelect}
+SELECT reminder.id as reminderID, reminder.contact_id as contactID, reminder.*, e.id as entityID, e.* {$extraSelect}
 FROM  civicrm_action_log reminder
-INNER JOIN {$mapping->entity} e ON e.id = reminder.entity_id
+{$entityJoinClause}
 {$extraJoin}
 WHERE reminder.action_schedule_id = %1 AND reminder.action_date_time IS NULL
 {$extraWhere}";
@@ -673,11 +702,11 @@ WHERE reminder.action_schedule_id = %1 AND reminder.action_date_time IS NULL
 
         $isError  = 0;
         $errorMsg = '';
-        $toEmail  = CRM_Contact_BAO_Contact::getPrimaryEmail($dao->contact_id);
+        $toEmail  = CRM_Contact_BAO_Contact::getPrimaryEmail($dao->contactID);
         if ($toEmail) {
           $result =
             CRM_Core_BAO_ActionSchedule::sendReminder(
-              $dao->contact_id,
+              $dao->contactID,
               $toEmail,
               $actionSchedule->id,
               $fromEmailAddress,
@@ -709,8 +738,8 @@ WHERE reminder.action_schedule_id = %1 AND reminder.action_date_time IS NULL
             'subject' => $actionSchedule->title,
             'details' => $actionSchedule->body_html,
             'source_contact_id' =>
-            $session->get('userID') ? $session->get('userID') : $dao->contact_id,
-            'target_contact_id' => $dao->contact_id,
+            $session->get('userID') ? $session->get('userID') : $dao->contactID,
+            'target_contact_id' => $dao->contactID,
             'activity_date_time' => date('YmdHis'),
             'status_id' => $activityStatusID,
             'activity_type_id' => $activityTypeID,
@@ -735,7 +764,11 @@ WHERE reminder.action_schedule_id = %1 AND reminder.action_date_time IS NULL
       $mapping->id = $mappingID;
       $mapping->find(TRUE);
 
-      $select = $join = $where = array();
+      // note: $where - this filtering applies for both
+      // 'limit to' and 'addition to' options
+      // $limitWhere - this filtering applies only for
+      // 'limit to' option
+      $select = $join = $where = $limitWhere = array();
       $limitTo = $actionSchedule->limit_to;
       $value = explode(CRM_Core_DAO::VALUE_SEPARATOR,
         trim($actionSchedule->entity_value, CRM_Core_DAO::VALUE_SEPARATOR)
@@ -748,31 +781,37 @@ WHERE reminder.action_schedule_id = %1 AND reminder.action_date_time IS NULL
       $status = implode(',', $status);
 
       if (!CRM_Utils_System::isNull($mapping->entity_recipient)) {
-        $recipientOptions = CRM_Core_OptionGroup::values($mapping->entity_recipient);
+        $recipientOptions = CRM_Core_OptionGroup::values($mapping->entity_recipient, FALSE, FALSE, FALSE, NULL, 'name');
       }
       $from = "{$mapping->entity} e";
 
       if ($mapping->entity == 'civicrm_activity') {
         $contactField = 'r.contact_id';
+        $table = 'civicrm_activity e';
         $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
         $sourceID = CRM_Utils_Array::key('Activity Source', $activityContacts);
         $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
         $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
 
-        switch (CRM_Utils_Array::value($actionSchedule->recipient, $recipientOptions)) {
-          case 'Activity Assignees':
-            $join[] = "INNER JOIN civicrm_activity_contact r ON r.activity_id = e.id AND record_type_id = {$assigneeID}";
-            break;
+        if ($limitTo == 0) {
+          // including the activity target contacts if 'in addition' is defined
+          $join[] = "INNER JOIN civicrm_activity_contact r ON r.activity_id = e.id AND record_type_id = {$targetID}";
+        }
+        else {
+          switch (CRM_Utils_Array::value($actionSchedule->recipient, $recipientOptions)) {
+            case 'Activity Assignees':
+              $join[] = "INNER JOIN civicrm_activity_contact r ON r.activity_id = e.id AND record_type_id = {$assigneeID}";
+              break;
 
-          case 'Activity Source':
-            $join[] = "INNER JOIN civicrm_activity_contact r ON r.activity_id = e.id AND record_type_id = {$sourceID}";
-            break;
+            case 'Activity Source':
+              $join[] = "INNER JOIN civicrm_activity_contact r ON r.activity_id = e.id AND record_type_id = {$sourceID}";
+              break;
 
-          default:
-          case 'Activity Targets':
-            $join[] = "INNER JOIN civicrm_activity_contact r ON r.activity_id = e.id AND record_type_id = {$targetID}";
-            break;
-
+            default:
+            case 'Activity Targets':
+              $join[] = "INNER JOIN civicrm_activity_contact r ON r.activity_id = e.id AND record_type_id = {$targetID}";
+              break;
+          }
         }
         // build where clause
         if (!empty($value)) {
@@ -791,16 +830,17 @@ WHERE reminder.action_schedule_id = %1 AND reminder.action_date_time IS NULL
       }
 
       if ($mapping->entity == 'civicrm_participant') {
+        $table = 'civicrm_event r';
         $contactField = 'e.contact_id';
         $join[] = 'INNER JOIN civicrm_event r ON e.event_id = r.id';
-        if ($actionSchedule->recipient_listing) {
+        if ($actionSchedule->recipient_listing && $limitTo) {
           $rList = explode(CRM_Core_DAO::VALUE_SEPARATOR,
             trim($actionSchedule->recipient_listing, CRM_Core_DAO::VALUE_SEPARATOR)
           );
           $rList = implode(',', $rList);
 
           switch ($recipientOptions[$actionSchedule->recipient]) {
-            case 'Participant Role':
+            case 'participant_role':
               $where[] = "e.role_id IN ({$rList})";
               break;
 
@@ -817,8 +857,10 @@ WHERE reminder.action_schedule_id = %1 AND reminder.action_date_time IS NULL
           $where[] = ($mapping->entity_value == 'event_type') ? "r.event_type_id IS NULL" : "r.id IS NULL";
         }
 
+        // participant status criteria not to be implemented
+        // for additional recipients
         if (!empty($status)) {
-          $where[] = "e.status_id IN ({$status})";
+          $limitWhere[] = "e.status_id IN ({$status})";
         }
 
         $where[] = 'r.is_active = 1';
@@ -829,7 +871,7 @@ WHERE reminder.action_schedule_id = %1 AND reminder.action_date_time IS NULL
       $notINClause = '';
       if ($mapping->entity == 'civicrm_membership') {
         $contactField = 'e.contact_id';
-
+        $table = 'civicrm_membership e';
         // build where clause
         if ( $status == 2 ) {
           //auto-renew memberships
@@ -854,16 +896,28 @@ WHERE reminder.action_schedule_id = %1 AND reminder.action_date_time IS NULL
         $membershipStatus = CRM_Member_PseudoConstant::membershipStatus(NULL, "(is_current_member = 1 OR name = 'Expired')", 'id');
         $mStatus = implode (',', $membershipStatus);
         $where[] = "e.status_id IN ({$mStatus})";
-
       }
 
-      if ($actionSchedule->group_id) {
-        $join[] = "INNER JOIN civicrm_group_contact grp ON {$contactField} = grp.contact_id AND grp.status = 'Added'";
-        $where[] = "grp.group_id IN ({$actionSchedule->group_id})";
+      if ($limitTo) {
+        if ($actionSchedule->group_id) {
+          $join[] = "INNER JOIN civicrm_group_contact grp ON {$contactField} = grp.contact_id AND grp.status = 'Added'";
+          $where[] = "grp.group_id IN ({$actionSchedule->group_id})";
+        }
+        elseif (!empty($actionSchedule->recipient_manual)) {
+          $rList = CRM_Utils_Type::escape($actionSchedule->recipient_manual, 'String');
+          $where[] = "{$contactField} IN ({$rList})";
+        }
       }
-      elseif (!empty($actionSchedule->recipient_manual)) {
-        $rList = CRM_Utils_Type::escape($actionSchedule->recipient_manual, 'String');
-        $where[] = "{$contactField} IN ({$rList})";
+      else {
+        $addGroup = $addWhere = '';
+        if ($actionSchedule->group_id) {
+          $addGroup = " INNER JOIN civicrm_group_contact grp ON c.id = grp.contact_id AND grp.status = 'Added'";
+          $addWhere = " grp.group_id IN ({$actionSchedule->group_id})";
+        }
+        if (!empty($actionSchedule->recipient_manual)) {
+          $rList = CRM_Utils_Type::escape($actionSchedule->recipient_manual, 'String');
+          $addWhere = "c.id IN ({$rList})";
+        }
       }
 
       $select[] = "{$contactField} as contact_id";
@@ -904,6 +958,10 @@ reminder.action_schedule_id = %1";
       $fromClause = "FROM $from";
       $joinClause = !empty($join) ? implode(' ', $join) : '';
       $whereClause = 'WHERE ' . implode(' AND ', $where);
+      $limitWhereClause = '';
+      if (!empty($limitWhere)) {
+        $limitWhereClause = ' AND ' . implode(' AND ', $limitWhere);
+      }
 
       $query = "
 INSERT INTO civicrm_action_log (contact_id, entity_id, entity_table, action_schedule_id)
@@ -911,10 +969,40 @@ INSERT INTO civicrm_action_log (contact_id, entity_id, entity_table, action_sche
 {$fromClause}
 {$joinClause}
 LEFT JOIN {$reminderJoinClause}
-{$whereClause} AND {$dateClause} {$notINClause}";
-
+{$whereClause} {$limitWhereClause} AND {$dateClause} {$notINClause}
+";
       CRM_Core_DAO::executeQuery($query, array(1 => array($actionSchedule->id, 'Integer')));
 
+      if ($limitTo == 0) {
+        $additionWhere = ' WHERE ';
+        if ($actionSchedule->start_action_date) {
+          $additionWhere = $whereClause . ' AND ';
+        }
+        $contactTable = "civicrm_contact c";
+        $addSelect  = "SELECT c.id as contact_id, c.id as entity_id, 'civicrm_contact' as entity_table, {$actionSchedule->id} as action_schedule_id";
+        $additionReminderClause = "civicrm_action_log reminder ON reminder.contact_id = c.id AND
+          reminder.entity_id          = c.id AND
+          reminder.entity_table       = 'civicrm_contact' AND
+          reminder.action_schedule_id = {$actionSchedule->id}";
+
+        $insertAdditionalSql ="
+INSERT INTO civicrm_action_log (contact_id, entity_id, entity_table, action_schedule_id)
+{$addSelect}
+FROM ({$contactTable}, {$table})
+LEFT JOIN {$additionReminderClause}
+{$addGroup}
+{$additionWhere} c.is_deleted = 0 AND c.is_deceased = 0 AND {$addWhere}
+AND {$dateClause}
+AND c.id NOT IN (
+     SELECT rem.contact_id
+     FROM civicrm_action_log rem INNER JOIN {$mapping->entity} e ON rem.entity_id = e.id
+     WHERE rem.action_schedule_id = {$actionSchedule->id}
+      AND rem.entity_table = '{$mapping->entity}'
+    )
+GROUP BY c.id
+";
+        CRM_Core_DAO::executeQuery($insertAdditionalSql);
+      }
       // if repeat is turned ON:
       if ($actionSchedule->is_repeat) {
         $repeatEvent = ($actionSchedule->end_action == 'before' ? 'DATE_SUB' : 'DATE_ADD') . "({$dateField}, INTERVAL {$actionSchedule->end_frequency_interval} {$actionSchedule->end_frequency_unit})";
@@ -935,12 +1023,11 @@ LEFT JOIN {$reminderJoinClause}
         $havingClause = "HAVING TIMEDIFF({$now}, latest_log_time) >= TIME('{$hrs}:00:00')";
         $groupByClause = 'GROUP BY reminder.contact_id, reminder.entity_id, reminder.entity_table';
         $selectClause .= ', MAX(reminder.action_date_time) as latest_log_time';
-
         $sqlInsertValues = "{$selectClause}
 {$fromClause}
 {$joinClause}
 INNER JOIN {$reminderJoinClause}
-{$whereClause} AND {$repeatEventClause}
+{$whereClause} {$limitWhereClause} AND {$repeatEventClause}
 {$groupByClause}
 {$havingClause}";
 
@@ -957,6 +1044,38 @@ INNER JOIN {$reminderJoinClause}
           $query = '
               INSERT INTO civicrm_action_log (contact_id, entity_id, entity_table, action_schedule_id) VALUES ' . $valString;
           CRM_Core_DAO::executeQuery($query, array(1 => array($actionSchedule->id, 'Integer')));
+        }
+
+        if ($limitTo == 0) {
+          $addSelect .= ', MAX(reminder.action_date_time) as latest_log_time';
+          $sqlEndEventCheck = "
+SELECT * FROM {$table}
+{$whereClause} AND {$repeatEventClause} LIMIT 1";
+
+          $daoCheck = CRM_Core_DAO::executeQuery($sqlEndEventCheck);
+          if ($daoCheck->fetch()) {
+            $valSqlAdditionInsert = "
+{$addSelect}
+FROM  {$contactTable}
+{$addGroup}
+INNER JOIN {$additionReminderClause}
+WHERE {$addWhere} AND c.is_deleted = 0 AND c.is_deceased = 0
+GROUP BY reminder.contact_id
+{$havingClause}
+";
+            $daoForVals = CRM_Core_DAO::executeQuery($valSqlAdditionInsert);
+            $addValues = array();
+            while ($daoForVals->fetch()) {
+              $addValues[] = "( {$daoForVals->contact_id}, {$daoForVals->entity_id}, '{$daoForVals->entity_table}',{$daoForVals->action_schedule_id} )";
+            }
+            $valString = implode(',', $addValues);
+
+            if ($valString) {
+              $query = '
+                INSERT INTO civicrm_action_log (contact_id, entity_id, entity_table, action_schedule_id) VALUES ' . $valString;
+              CRM_Core_DAO::executeQuery($query);
+            }
+          }
         }
       }
     }
@@ -1034,7 +1153,7 @@ WHERE     m.owner_membership_id IS NOT NULL AND
         if (!CRM_Utils_Array::value($recipientType, $eventContacts)) {
           return $options;
         }
-        if ($eventContacts[$recipientType] == 'Participant Role') {
+        if ($eventContacts[$recipientType] == 'participant_role') {
           $options = CRM_Event_PseudoConstant::participantRole();
         }
         break;

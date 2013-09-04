@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -456,6 +456,12 @@ class CRM_Core_Config_Variables extends CRM_Core_Config_Defaults {
   /**
    * Allow second-degree relations permission to edit contacts
    */
+  public $secondDegRelPermissions = FALSE;
+
+
+  /**
+   * Allow second-degree relations permission to edit contacts
+   */
   public $wpBasePage = NULL;
 
   /**
@@ -484,10 +490,10 @@ class CRM_Core_Config_Variables extends CRM_Core_Config_Defaults {
     static $cachedSymbol = NULL;
     if (!$cachedSymbol || $defaultCurrency) {
       if ($this->defaultCurrency || $defaultCurrency) {
-        $currencySymbolName = CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution', 'currency', array('labelColumn' => 'name'));
-        $currencySymbol = CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution', 'currency');
-
-        $this->currencySymbols = array_combine($currencySymbolName, $currencySymbol);
+        $this->currencySymbols = CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution', 'currency', array(
+          'labelColumn' => 'symbol',
+          'orderColumn' => TRUE,
+        ));
         $currency = $defaultCurrency ? $defaultCurrency : $this->defaultCurrency;
         $cachedSymbol = CRM_Utils_Array::value($currency, $this->currencySymbols, '');
       }

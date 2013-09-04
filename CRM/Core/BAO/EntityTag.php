@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -268,18 +268,18 @@ class CRM_Core_BAO_EntityTag extends CRM_Core_DAO_EntityTag {
    *
    * @param object  $tag    an object of a tag.
    *
-   * @return  array   $contactIds    array of contact ids
+   * @return  array   $entityIds    array of entity ids
    * @access public
    */
   function getEntitiesByTag($tag) {
-    $contactIds = array();
+    $entityIds = array();
     $entityTagDAO = new CRM_Core_DAO_EntityTag();
     $entityTagDAO->tag_id = $tag->id;
     $entityTagDAO->find();
     while ($entityTagDAO->fetch()) {
-      $contactIds[] = $entityTagDAO->contact_id;
+      $entityIds[] = $entityTagDAO->entity_id;
     }
-    return $contactIds;
+    return $entityIds;
   }
 
   /**
@@ -294,8 +294,8 @@ class CRM_Core_BAO_EntityTag extends CRM_Core_DAO_EntityTag {
       $select = "SELECT count(*) as cnt";
     }
 
-    $query = "{$select} 
-        FROM civicrm_tag ct 
+    $query = "{$select}
+        FROM civicrm_tag ct
         INNER JOIN civicrm_entity_tag et ON ( ct.id = et.tag_id AND
             et.entity_id    = {$contactID} AND
             et.entity_table = 'civicrm_contact' AND

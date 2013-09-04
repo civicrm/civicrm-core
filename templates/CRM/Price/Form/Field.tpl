@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -50,7 +50,7 @@
 
     var radioOption, checkBoxOption;
 
-    for (var i=1; i<=11; i++) {
+    for (var i=1; i<=15; i++) {
       radioOption = 'radio'+i;
       checkBoxOption = 'checkbox'+i
       if (html_type_name == 'Radio' || html_type_name == 'CheckBox' || html_type_name == 'Select') {

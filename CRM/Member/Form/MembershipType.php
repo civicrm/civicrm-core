@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -325,8 +325,12 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form {
    */
   public function postProcess() {
     if ($this->_action & CRM_Core_Action::DELETE) {
-      CRM_Utils_Weight::delWeight('CRM_Member_DAO_MembershipType', $this->_id);
+      try{
       CRM_Member_BAO_MembershipType::del($this->_id);
+      }
+      catch(CRM_Core_Exception $e) {
+        CRM_Core_Error::statusBounce($e->getMessage(), NULL, ts('Membership Type Not Deleted'));
+      }
       CRM_Core_Session::setStatus(ts('Selected membership type has been deleted.'), ts('Record Deleted'), 'success');
     }
     else {
@@ -440,21 +444,21 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form {
     }
   }
 
-  function checkPreviousPriceField($previousID, $priceSetId, $membershipTypeId, &$optionsIds) {
+  public static function checkPreviousPriceField($previousID, $priceSetId, $membershipTypeId, &$optionsIds) {
     if ($previousID) {
       $editedFieldParams = array(
         'price_set_id ' => $priceSetId,
         'name' => $previousID,
       );
       $editedResults = array();
-      CRM_Price_BAO_Field::retrieve($editedFieldParams, $editedResults);
+      CRM_Price_BAO_PriceField::retrieve($editedFieldParams, $editedResults);
       if (!empty($editedResults)) {
         $editedFieldParams = array(
           'price_field_id' => $editedResults['id'],
           'membership_type_id' => $membershipTypeId,
         );
         $editedResults = array();
-        CRM_Price_BAO_FieldValue::retrieve($editedFieldParams, $editedResults);
+        CRM_Price_BAO_PriceFieldValue::retrieve($editedFieldParams, $editedResults);
         $optionsIds['option_id'][1] = CRM_Utils_Array::value('id', $editedResults);
       }
     }

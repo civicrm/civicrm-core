@@ -1,32 +1,40 @@
 <?php
-
-/*
- 
+/**
+ * Test Generated example of using participant_payment delete API
+ * *
  */
 function participant_payment_delete_example(){
-$params = array( 
+$params = array(
   'id' => 1,
-  'version' => 3,
 );
 
-  $result = civicrm_api( 'participant_payment','delete',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('participant_payment', 'delete', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function participant_payment_delete_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
   'values' => 1,
 );
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 

@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -120,7 +120,8 @@ class CRM_Case_XMLProcessor_Process extends CRM_Case_XMLProcessor {
   }
 
   function processStandardTimeline($activitySetXML, &$params) {
-    if ('Change Case Type' == CRM_Utils_Array::value('activityTypeName', $params)) {
+    if ('Change Case Type' == CRM_Utils_Array::value('activityTypeName', $params)
+      && CRM_Utils_Array::value('resetTimeline', $params, TRUE)) {
       // delete all existing activities which are non-empty
       $this->deleteEmptyActivity($params);
     }
@@ -255,7 +256,7 @@ class CRM_Case_XMLProcessor_Process extends CRM_Case_XMLProcessor {
   function deleteEmptyActivity(&$params) {
     $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
     $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
- 
+
     $query = "
 DELETE a
 FROM   civicrm_activity a

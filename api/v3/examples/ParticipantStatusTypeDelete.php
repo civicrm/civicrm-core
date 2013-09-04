@@ -1,39 +1,40 @@
 <?php
-
-/*
- 
+/**
+ * Test Generated example of using participant_status_type delete API
+ * *
  */
 function participant_status_type_delete_example(){
-$params = array( 
-  'version' => 3,
-  'name' => 'test status',
-  'label' => 'I am a test',
-  'class' => 'Positive',
-  'is_reserved' => 0,
-  'is_active' => 1,
-  'is_counted' => 1,
-  'visibility_id' => 1,
-  'weight' => 10,
+$params = array(
+  'id' => 15,
 );
 
-  $result = civicrm_api( 'participant_status_type','delete',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('participant_status_type', 'delete', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function participant_status_type_delete_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
   'values' => true,
 );
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 

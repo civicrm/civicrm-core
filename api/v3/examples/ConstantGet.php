@@ -1,29 +1,37 @@
 <?php
-
-/*
- 
+/**
+ * Test Generated example of using constant get API
+ * *
  */
 function constant_get_example(){
-$params = array( 
-  'name' => 'locationType',
-  'version' => 3,
+$params = array(
+  'field' => 'location_type_id',
 );
 
-  $result = civicrm_api( 'constant','get',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('constant', 'get', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function constant_get_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 5,
-  'values' => array( 
+  'values' => array(
       '5' => 'Billing',
       '1' => 'Home',
       '3' => 'Main',
@@ -32,7 +40,7 @@ function constant_get_expectedresult(){
     ),
 );
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 

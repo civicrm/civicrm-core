@@ -1,77 +1,84 @@
 <?php
-
-/*
- 
+/**
+ * Test Generated example of using pledge_payment get API
+ * *
  */
 function pledge_payment_get_example(){
-$params = array( 
-  'version' => 3,
-);
+$params = array();
 
-  $result = civicrm_api( 'pledge_payment','get',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('pledge_payment', 'get', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function pledge_payment_get_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 5,
-  'values' => array( 
-      '1' => array( 
+  'values' => array(
+      '1' => array(
           'id' => '1',
           'pledge_id' => '1',
           'scheduled_amount' => '20.00',
           'currency' => 'USD',
-          'scheduled_date' => '2013-02-15 00:00:00',
+          'scheduled_date' => '20130728085413',
           'reminder_count' => 0,
           'status_id' => '2',
         ),
-      '2' => array( 
+      '2' => array(
           'id' => '2',
           'pledge_id' => '1',
           'scheduled_amount' => '20.00',
           'currency' => 'USD',
-          'scheduled_date' => '2018-02-15 00:00:00',
+          'scheduled_date' => '20130728085413',
           'reminder_count' => 0,
           'status_id' => '2',
         ),
-      '3' => array( 
+      '3' => array(
           'id' => '3',
           'pledge_id' => '1',
           'scheduled_amount' => '20.00',
           'currency' => 'USD',
-          'scheduled_date' => '2023-02-15 00:00:00',
+          'scheduled_date' => '20130728085413',
           'reminder_count' => 0,
           'status_id' => '2',
         ),
-      '4' => array( 
+      '4' => array(
           'id' => '4',
           'pledge_id' => '1',
           'scheduled_amount' => '20.00',
           'currency' => 'USD',
-          'scheduled_date' => '2028-02-15 00:00:00',
+          'scheduled_date' => '20130728085413',
           'reminder_count' => 0,
           'status_id' => '2',
         ),
-      '5' => array( 
+      '5' => array(
           'id' => '5',
           'pledge_id' => '1',
           'scheduled_amount' => '20.00',
           'currency' => 'USD',
-          'scheduled_date' => '2033-02-15 00:00:00',
+          'scheduled_date' => '20130728085413',
           'reminder_count' => 0,
           'status_id' => '2',
         ),
     ),
 );
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 

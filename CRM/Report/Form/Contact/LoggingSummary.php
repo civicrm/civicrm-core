@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -116,6 +116,11 @@ class CRM_Report_Form_Contact_LoggingSummary extends CRM_Logging_ReportSummary {
             'title' => ts('Log Type'),
             'type' => CRM_Utils_Type::T_STRING,
           ),
+          'log_type_table' => array(
+            'name'  => 'log_type',
+            'title' => ts('Log Type Table'),
+            'type' => CRM_Utils_Type::T_STRING,
+          ),
           'log_action' => array(
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => array('Insert' => ts('Insert'), 'Update' => ts('Update'), 'Delete' => ts('Delete')),
@@ -206,7 +211,7 @@ class CRM_Report_Form_Contact_LoggingSummary extends CRM_Logging_ReportSummary {
         $row['log_civicrm_entity_log_type'] . '_' .
         $row['log_civicrm_entity_log_conn_id'] . '_' .
         $row['log_civicrm_entity_log_user_id'] . '_' .
-        $row['log_civicrm_entity_id'];
+        $row['log_civicrm_entity_altered_contact_id'];
       $newRows[$key] = $row;
 
       unset($row['log_civicrm_entity_log_user_id']);

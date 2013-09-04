@@ -1,30 +1,38 @@
 <?php
-
-/*
- This demonstrates use of the 'format.id_only' param.
+/**
+ * Test Generated example of using contact get API
+ * This demonstrates use of the 'format.id_only' param.
     /* This param causes the id of the only entity to be returned as an integer.
-    /* it will be ignored if there is not exactly 1 result
+    /* it will be ignored if there is not exactly 1 result *
  */
 function contact_get_example(){
-$params = array( 
-  'version' => 3,
+$params = array(
   'id' => 17,
   'format.only_id' => 1,
 );
 
-  $result = civicrm_api( 'contact','get',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('contact', 'get', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function contact_get_expectedresult(){
 
   $expectedResult = 17;
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 

@@ -2,7 +2,7 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -86,9 +86,11 @@ class CRM_Report_Form_Case_Summary extends CRM_Report_Form {
           ),
           'start_date' => array(
             'title' => ts('Start Date'), 'default' => TRUE,
+            'type' => CRM_Utils_Type::T_DATE,
           ),
           'end_date' => array(
             'title' => ts('End Date'), 'default' => TRUE,
+            'type' => CRM_Utils_Type::T_DATE,
           ),
           'duration' => array(
             'title' => ts('Duration (Days)'), 'default' => FALSE,

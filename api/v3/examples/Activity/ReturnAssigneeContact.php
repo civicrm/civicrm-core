@@ -1,12 +1,11 @@
 <?php
-
-/*
- Function demonstrates getting asignee_contact_id & using it to get the contact
+/**
+ * Test Generated example of using activity get API
+ * Function demonstrates getting asignee_contact_id & using it to get the contact *
  */
 function activity_get_example(){
 $params = array(
   'activity_id' => 1,
-  'version' => 3,
   'sequential' => 1,
   'return.assignee_contact_id' => 1,
   'api.contact.get' => array(
@@ -14,12 +13,21 @@ $params = array(
     ),
 );
 
-  $result = civicrm_api( 'activity','get',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('activity', 'get', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function activity_get_expectedresult(){
@@ -32,7 +40,7 @@ function activity_get_expectedresult(){
   'values' => array(
       '0' => array(
           'id' => '1',
-          'activity_type_id' => '44',
+          'activity_type_id' => '46',
           'subject' => 'test activity type id',
           'activity_date_time' => '2011-06-02 14:36:13',
           'duration' => '120',
@@ -45,39 +53,36 @@ function activity_get_expectedresult(){
           'is_current_revision' => '1',
           'is_deleted' => 0,
           'assignee_contact_id' => array(
-              '0' => '19',
+              '0' => '3',
             ),
-          'source_contact_id' => '17',
+          'source_contact_id' => '1',
           'api.contact.get' => array(
               'is_error' => 0,
-              'undefined_fields' => array(
-                  '0' => 'api.has_parent',
-                ),
               'version' => 3,
               'count' => 1,
-              'id' => 17,
+              'id' => 1,
               'values' => array(
                   '0' => array(
-                      'contact_id' => '17',
+                      'contact_id' => '1',
                       'contact_type' => 'Individual',
                       'contact_sub_type' => '',
-                      'sort_name' => '',
-                      'display_name' => 'Test Contact',
-                      'do_not_email' => '',
-                      'do_not_phone' => '',
-                      'do_not_mail' => '',
-                      'do_not_sms' => '',
-                      'do_not_trade' => '',
+                      'sort_name' => 'Anderson, Anthony',
+                      'display_name' => 'Mr. Anthony Anderson II',
+                      'do_not_email' => 0,
+                      'do_not_phone' => 0,
+                      'do_not_mail' => 0,
+                      'do_not_sms' => 0,
+                      'do_not_trade' => 0,
                       'is_opt_out' => 0,
                       'legal_identifier' => '',
                       'external_identifier' => '',
                       'nick_name' => '',
                       'legal_name' => '',
                       'image_URL' => '',
-                      'preferred_mail_format' => '',
-                      'first_name' => 'Test',
-                      'middle_name' => '',
-                      'last_name' => 'Contact',
+                      'preferred_mail_format' => 'Both',
+                      'first_name' => 'Anthony',
+                      'middle_name' => 'J.',
+                      'last_name' => 'Anderson',
                       'job_title' => '',
                       'birth_date' => '',
                       'is_deceased' => 0,
@@ -97,22 +102,22 @@ function activity_get_expectedresult(){
                       'geo_code_1' => '',
                       'geo_code_2' => '',
                       'state_province_id' => '',
-                      'state_province_name' => '',
-                      'state_province' => '',
                       'country_id' => '',
-                      'country' => '',
                       'phone_id' => '',
                       'phone_type_id' => '',
                       'phone' => '',
-                      'email_id' => '',
-                      'email' => '',
-                      'on_hold' => '',
+                      'email_id' => '1',
+                      'email' => 'anthony_anderson@civicrm.org',
+                      'on_hold' => 0,
                       'im_id' => '',
                       'provider_id' => '',
                       'im' => '',
                       'worldregion_id' => '',
                       'world_region' => '',
-                      'id' => '17',
+                      'state_province_name' => '',
+                      'state_province' => '',
+                      'country' => '',
+                      'id' => '1',
                     ),
                 ),
             ),
@@ -120,7 +125,7 @@ function activity_get_expectedresult(){
     ),
 );
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 

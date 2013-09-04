@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -83,7 +83,7 @@ class CRM_Upgrade_Incremental_php_ThreeFour {
       }
 
       // save updated instance criteria
-      $dao              = new CRM_Report_DAO_Instance();
+      $dao              = new CRM_Report_DAO_ReportInstance();
       $dao->id          = $instances->id;
       $dao->form_values = serialize($formValues);
       $dao->save();
@@ -193,7 +193,7 @@ INSERT INTO civicrm_location_type ( name, description, is_reserved, is_active )
       }
 
       // save updated instance criteria
-      $dao              = new CRM_Report_DAO_Instance();
+      $dao              = new CRM_Report_DAO_ReportInstance();
       $dao->id          = $instances->id;
       $dao->form_values = serialize($formValues);
       $dao->save();
@@ -273,7 +273,7 @@ INSERT INTO civicrm_location_type ( name, description, is_reserved, is_active )
       }
 
       // save updated instance criteria
-      $dao              = new CRM_Report_DAO_Instance();
+      $dao              = new CRM_Report_DAO_ReportInstance();
       $dao->id          = $instances->id;
       $dao->form_values = serialize($formValues);
       $dao->save();

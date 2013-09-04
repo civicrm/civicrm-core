@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -317,6 +317,43 @@ class CRM_Utils_Migrate_Export {
   }
 
   /**
+   * @param array $ufGroupIds list of custom groups to export
+   * @return void
+   */
+  function buildUFGroups($ufGroupIds) {
+    $ufGroupIdsSql = implode(',', array_filter($ufGroupIds, 'is_numeric'));
+    if (empty($ufGroupIdsSql)) {
+      return;
+    }
+
+    $sql = "
+      SELECT cg.*
+      FROM   civicrm_uf_group cg
+      WHERE  cg.id IN ($ufGroupIdsSql)
+
+    ";
+    $this->fetch('profileGroup', 'CRM_Core_DAO_UFGroup', $sql);
+
+    $sql = "
+      SELECT f.*
+      FROM   civicrm_uf_field f,
+             civicrm_uf_group cg
+      WHERE  f.uf_group_id = cg.id
+      AND    cg.id IN ($ufGroupIdsSql)
+    ";
+    $this->fetch('profileField', 'CRM_Core_DAO_UFField', $sql);
+
+    $sql = "
+      SELECT *
+      FROM   civicrm_uf_join
+      WHERE  entity_table IS NULL
+      AND    entity_id    IS NULL
+      AND    uf_group_id  IN ($ufGroupIdsSql)
+    ";
+    $this->fetch('profileJoin', 'CRM_Core_DAO_UFJoin', $sql);
+  }
+
+  /**
    * Render the in-memory representation as XML
    *
    * @return string XML
@@ -424,10 +461,7 @@ class CRM_Utils_Migrate_Export {
       if (isset($object->$name) && $object->$name !== NULL) {
         // hack for extends_entity_column_value
         if ($name == 'extends_entity_column_value') {
-          if ($object->extends == 'Event' ||
-            $object->extends == 'Activity' ||
-            $object->extends == 'Relationship'
-          ) {
+          if (in_array($object->extends, array('Event', 'Activity', 'Relationship', 'Individual', 'Organization', 'Household'))) {
             if ($object->extends == 'Event') {
               $key = 'event_type';
             }
@@ -437,14 +471,29 @@ class CRM_Utils_Migrate_Export {
             elseif ($object->extends == 'Relationship') {
               $key = 'relationship_type';
             }
-            $keyValues['extends_entity_column_value_option_group'] = $key;
             $types = explode(CRM_Core_DAO::VALUE_SEPARATOR, substr($object->$name, 1, -1));
             $values = array();
-            foreach ($types as $type) {
-              $values[] = $this->_xml['optionValue']['idNameMap']["$key.{$type}"];
+            if (in_array($object->extends, array('Individual', 'Organization', 'Household'))) {
+              $key = 'contact_type';
+              $values = $types;
             }
+            else {
+              foreach ($types as $type) {
+                if (in_array($key, array('activity_type', 'event_type'))) {
+                  $ogID = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup', $key, 'id', 'name');
+                  $ovParams = array('option_group_id' => $ogID, 'value' => $type);
+                  CRM_Core_BAO_OptionValue::retrieve($ovParams, $oValue);
+                  $values[] = $oValue['name'];
+                }
+                else {
+                  $relTypeName = CRM_Core_DAO::getFieldValue('CRM_Contact_BAO_RelationshipType', $type, 'name_a_b', 'id');
+                  $values[] = $relTypeName;
+                }
+              }
+            }
+            $keyValues['extends_entity_column_value_option_group'] = $key;
             $value = implode(',', $values);
-            $keyValues['extends_entity_column_value_option_value'] = $value;
+            $object->extends_entity_column_value = $value;
           }
           else {
             echo "This extension: {$object->extends} is not yet handled";

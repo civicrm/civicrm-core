@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -48,21 +48,16 @@
 {literal}
 <script type="text/javascript">
    cj( function( ) {
-      buildChart( );
+     buildChart( );
 
-      var resourceURL = "{/literal}{$config->userFrameworkResourceURL}{literal}";
-      var uploadURL   = "{/literal}{$uploadURL|cat:$chartId}{literal}.png";
-      var uploadDir   = "{/literal}{$config->imageUploadDir|replace:'/persist/contribute/':'/persist/'|cat:'openFlashChart/'}{literal}";
+     cj("input[id$='submit_print'],input[id$='submit_pdf']").bind('click', function(e){
+       // image creator php file path and append image name
+       var url = CRM.url('civicrm/report/chart', 'name=' + '{/literal}{$chartId}{literal}' + '.png');
 
-      cj("input[id$='submit_print'],input[id$='submit_pdf']").bind('click', function(){
-        var url = resourceURL +'packages/OpenFlashChart/php-ofc-library/ofc_upload_image.php';  // image creator php file path
-           url += '?name={/literal}{$chartId}{literal}.png';                                    // append image name
-           url += '&defaultPath=' + uploadDir;                                                  // append directory path
-
-        //fetch object
-        swfobject.getObjectById("open_flash_chart_{/literal}{$uniqueId}{literal}").post_image( url, true, false );
-        });
-    });
+       //fetch object and 'POST' image
+       swfobject.getObjectById("open_flash_chart_{/literal}{$uniqueId}{literal}").post_image(url, true, false);
+     });
+   });
 
   function buildChart( ) {
      var chartData = {/literal}{$openFlashChartData}{literal};

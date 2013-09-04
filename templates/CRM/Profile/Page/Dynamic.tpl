@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -29,6 +29,8 @@
         {include file="CRM/Profile/Page/Overlay.tpl"}
     {else}
         <div id="crm-container" class="crm-container" lang="{$config->lcMessages|truncate:2:"":true}" xml:lang="{$config->lcMessages|truncate:2:"":true}">
+            <div class="crm-profile-name-{$ufGroupName}">
+            {crmRegion name=profile-view-`$ufGroupName`}
             {foreach from=$profileFields item=field key=rowName}
               <div id="row-{$rowName}" class="crm-section {$rowName}-section">
                 <div class="label">
@@ -40,6 +42,8 @@
                  <div class="clear"></div>
               </div>
             {/foreach}
+            {/crmRegion}
+            </div>
         </div>
     {/if}
 {/if} 

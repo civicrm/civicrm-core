@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -30,6 +30,20 @@
 {/if}
     <table class="form-layout-compressed{if $context EQ 'profile'} crm-profile-tagsandgroups{/if}">
       <tr>
+       {if $groupElementType eq 'crmasmSelect'}
+          <td><span class="label">{if $title}{$form.group.label}{/if}</span>
+            {$form.group.html}
+            {literal}	
+            <script type="text/javascript">
+             cj(function(){
+               cj("select#group").crmasmSelect({
+                 respectParents: true
+               });
+             });
+             </script>
+             {/literal}
+          </td>
+      {/if}
       {foreach key=key item=item from=$tagGroup}
         {* $type assigned from dynamic.tpl *}
         {if !$type || $type eq $key }

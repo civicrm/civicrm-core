@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -63,6 +63,7 @@ cj(function($) {
     '4': 'activity',
     '5': 'CiviMember',
     '6': 'CiviCase',
+    '8': 'CiviMail'
   };
   // Handle change of results mode
   $('#component_mode').change(function() {

@@ -1,31 +1,39 @@
 <?php
-
-/*
- 
+/**
+ * Test Generated example of using participant get API
+ * *
  */
 function participant_get_example(){
-$params = array( 
+$params = array(
   'id' => 1,
-  'version' => 3,
 );
 
-  $result = civicrm_api( 'participant','get',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('participant', 'get', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function participant_get_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
   'id' => 1,
-  'values' => array( 
-      '1' => array( 
+  'values' => array(
+      '1' => array(
           'contact_id' => '2',
           'contact_type' => 'Individual',
           'contact_sub_type' => '',
@@ -33,8 +41,8 @@ function participant_get_expectedresult(){
           'display_name' => 'Mr. Anthony Anderson II',
           'event_id' => '5',
           'event_title' => 'Annual CiviCRM meet',
-          'event_start_date' => '2008-10-21 00:00:00',
-          'event_end_date' => '2008-10-23 00:00:00',
+          'event_start_date' => '2013-07-29 00:00:00',
+          'event_end_date' => '2013-08-04 00:00:00',
           'participant_id' => '1',
           'participant_fee_level' => '',
           'participant_fee_amount' => '',
@@ -56,7 +64,7 @@ function participant_get_expectedresult(){
     ),
 );
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 

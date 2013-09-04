@@ -2,7 +2,7 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -37,6 +37,7 @@ class CRM_Utils_Hook_UnitTests extends CRM_Utils_Hook {
 
   protected $mockObject;
   protected $adhocHooks;
+  protected $civiModules = NULL;
 
   // Call this in CiviUnitTestCase::setUp()
   function reset() {
@@ -62,7 +63,15 @@ class CRM_Utils_Hook_UnitTests extends CRM_Utils_Hook {
   function invoke($numParams,
     &$arg1, &$arg2, &$arg3, &$arg4, &$arg5,
     $fnSuffix) {
+
     $params = array( &$arg1, &$arg2, &$arg3, &$arg4, &$arg5);
+
+    if ($this->civiModules === NULL) {
+      $this->civiModules = array();
+      $this->requireCiviModules($this->civiModules);
+    }
+    $this->runHooks($this->civiModules, $fnSuffix, $numParams, $arg1, $arg2, $arg3, $arg4, $arg5);
+
     if ($this->mockObject && is_callable(array($this->mockObject, $fnSuffix))) {
       call_user_func(array($this->mockObject, $fnSuffix), $arg1, $arg2, $arg3, $arg4, $arg5);
     }

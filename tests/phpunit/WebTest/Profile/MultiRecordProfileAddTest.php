@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -187,6 +187,7 @@ class WebTest_Profile_MultiRecordProfileAddTest extends CiviSeleniumTestCase {
     $recordNew = $this->_addRecords('Create');
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $elements = $this->parseURL();
+
     $gid = $elements['queryString']['gid'];
     $id = $elements['queryString']['id'];
 
@@ -204,23 +205,25 @@ class WebTest_Profile_MultiRecordProfileAddTest extends CiviSeleniumTestCase {
     }
     $this->openCiviPage('profile/edit', "reset=1&id=$id&gid=$gid", NULL);
     if (!$checkMultiRecord) {
-      $this->assertElementContainsText('crm-container', 'No multi-record entries found');
+      $this->assertElementContainsText('crm-container', 'No records');
       return array($gid, $profileTitle);
     }
-    $this->waitForElementPresent("//div[@id='crm-profile-block']/a");
-    $this->click("//div[@id='crm-profile-block']/a");
-    $record1 = $this->_addRecords();
+    $this->waitForElementPresent("//div[@id='crm-profile-block']/../a");
+    $this->click("//div[@id='crm-profile-block']/../a");
+    sleep(1);
+    $record1 = $this->_addRecords('Edit', FALSE, "//div[@class='crm-container-snippet']/form/div[2]/");
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->verifyText("//div[@id='browseValues']/div/div/table/thead/tr/th[1]", preg_quote($params['textFieldLabel']));
     $this->verifyText("//div[@id='browseValues']/div/div/table/tbody/tr[2]/td[1]", preg_quote($record1['text']));
-    $this->openCiviPage('profile/edit', "reset=1&id=$id&gid=$gid", "//div[@id='crm-profile-block']/a");
-    $this->click("//div[@id='crm-profile-block']/a");
-    $record2 = $this->_addRecords();
+    $this->openCiviPage('profile/edit', "reset=1&id=$id&gid=$gid", "//div[@id='crm-profile-block']/../a");
+    $this->click("//div[@id='crm-profile-block']/../a");
+    sleep(1);
+    $record2 = $this->_addRecords('Edit', FALSE, "//div[@class='crm-container-snippet']/form/div[2]/");
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->verifyText("//div[@id='browseValues']/div/div/table/tbody/tr[3]/td[1]", preg_quote($record2['text']));
 
     // Check Max Record Limit
-    $this->verifyElementNotPresent("//div[@id='crm-profile-block']/a/span");
+    $this->verifyElementNotPresent("//div[@id='crm-profile-block']/../a/span");
 
     //Check for edit functionality
     // Because it tends to cause problems, all uses of sleep() must be justified in comments
@@ -255,23 +258,23 @@ class WebTest_Profile_MultiRecordProfileAddTest extends CiviSeleniumTestCase {
     $this->assertElementContainsText('ui-id-1', 'View '.$params['customGroupTitle']);
     $this->assertElementContainsText('crm-container', $params['textFieldLabel']);
     if ($checkSearchable) {
-      $this->verifyElementNotPresent("//div[@id='profile-dialog']/div/div/div/div[1]/div[2]/a");
+      $this->verifyElementNotPresent("//div[@id='profile-dialog']/div/div/div/div/div[1]/div[2]/a");
       return array($gid, $profileTitle);
     }
 
     // Check Search Functionality
     if (!$userCheck) {
-      $this->click("//div[@id='profile-dialog']/div/div/div/div/div[2]/a");
+      $this->click("//div[@id='profile-dialog']/div/div/div/div/div/div[2]/a");
       $this->waitForElementPresent("//form[@id='Search']");
-      $this->verifyText("//form[@id='Search']/div[3]/div[2]/table/tbody/tr[2]/td[2]", preg_quote($recordNew['firstname']));
+      $this->verifyText("//form[@id='Search']/div[2]/div[2]/div[2]/table/tbody/tr[2]/td[2]", preg_quote($recordNew['firstname']));
       $this->openCiviPage('profile/view', "reset=1&id=$id&gid=$gid", "//div[@id='row-first_name']/div[2]/a");
       $this->click("//div[@id='row-first_name']/div[2]/a");
       $this->waitForElementPresent("//form[@id='Search']");
       // Check that Email column is not present in selector results
-      $this->verifyElementNotPresent("//form[@id='Search']/div[3]/div[2]/table/tbody/tr/th[7]/a[@label='Email (Primary)']");
-      $this->verifyText("//form[@id='Search']/div[3]/div[2]/table/tbody/tr/th[3]/a", preg_quote($params['textFieldLabel']));
-      $this->verifyText("//form[@id='Search']/div[3]/div[2]/table/tbody/tr[2]/td[3]", preg_quote($record1['text']));
-      $this->verifyText("//form[@id='Search']/div[3]/div[2]/table/tbody/tr[3]/td[3]", preg_quote($record2['text']));
+      $this->verifyElementNotPresent("//form[@id='Search']/div[2]/div[2]/div[2]/table/tbody/tr/th[7]/a[@label='Email (Primary)']");
+      $this->verifyText("//form[@id='Search']/div[2]/div[2]/div[2]/table/tbody/tr/th[3]/a", preg_quote($params['textFieldLabel']));
+      $this->verifyText("//form[@id='Search']/div[2]/div[2]/div[2]/table/tbody/tr[2]/td[3]", preg_quote($record1['text']));
+      $this->verifyText("//form[@id='Search']/div[2]/div[2]/div[2]/table/tbody/tr[3]/td[3]", preg_quote($record2['text']));
     }
     return array($gid, $profileTitle);
   }
@@ -350,10 +353,12 @@ class WebTest_Profile_MultiRecordProfileAddTest extends CiviSeleniumTestCase {
     return $params;
   }
 
-  function _addRecords($context = 'Edit') {
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+  function _addRecords($context = 'Edit', $waitAtStart = TRUE, $parentElement = '//') {
+    if ($waitAtStart) {
+      $this->waitForPageToLoad($this->getTimeoutMsec());
+    }
     $params['text'] = 'text' . substr(sha1(rand()), 0, 3);
-    $this->type("//div[@id='crm-profile-block']/div/div/div[2]/input[@type='text']", $params['text']);
+    $this->type("{$parentElement}div[@id='crm-profile-block']/div/div[2]/input[@type='text']", $params['text']);
     if ($context == 'Create') {
       $params['firstname'] = 'John' . substr(sha1(rand()), 0, 3);
       $this->type('first_name', $params['firstname']);
@@ -362,9 +367,9 @@ class WebTest_Profile_MultiRecordProfileAddTest extends CiviSeleniumTestCase {
       $params['email'] =  $params['firstname'].$params['lastname'].'@exa.com';
       $this->type('email-Primary', $params['email']);
     }
-    $this->waitForElementPresent("//div[@id='crm-profile-block']/div//div/div[2]/select");
-    $this->select("//div[@id='crm-profile-block']/div//div/div[2]/select",'value=1');
-    $this->click('_qf_Edit_next');
+    $this->waitForElementPresent("{$parentElement}div[@id='crm-profile-block']//div/div[2]/select");
+    $this->select("{$parentElement}div[@id='crm-profile-block']//div/div[2]/select",'value=1');
+    $this->click("{$parentElement}div[@class='crm-submit-buttons']/span/input[@id='_qf_Edit_next']");
     return $params;
   }
 }

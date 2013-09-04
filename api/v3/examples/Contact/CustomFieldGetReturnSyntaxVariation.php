@@ -1,41 +1,49 @@
 <?php
-
-/*
- /*this demonstrates setting a custom field through the API 
+/**
+ * Test Generated example of using contact get API
+ * /*this demonstrates setting a custom field through the API  *
  */
 function contact_get_example(){
-$params = array( 
-  'return' => 'custom_3',
-  'version' => 3,
+$params = array(
+  'return' => 'custom_1',
   'id' => 1,
 );
 
-  $result = civicrm_api( 'contact','get',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('contact', 'get', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function contact_get_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
   'id' => 1,
-  'values' => array( 
-      '1' => array( 
+  'values' => array(
+      '1' => array(
           'contact_id' => '1',
-          'civicrm_value_testgetwithcu_3_id' => '1',
-          'custom_3' => 'custom string',
+          'civicrm_value_testgetwithcu_1_id' => '1',
+          'custom_1' => 'custom string',
           'id' => '1',
         ),
     ),
 );
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 

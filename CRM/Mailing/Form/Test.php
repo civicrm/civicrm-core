@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -276,7 +276,7 @@ class CRM_Mailing_Form_Test extends CRM_Core_Form {
       return $error;
     }
 
-    $job             = new CRM_Mailing_BAO_Job();
+    $job             = new CRM_Mailing_BAO_MailingJob();
     $job->mailing_id = $self->get('mailing_id');
     $job->is_test    = TRUE;
     $job->save();
@@ -342,7 +342,7 @@ ORDER BY   e.is_bulkmail DESC, e.is_primary DESC
     $testParams['job_id'] = $job->id;
     $isComplete = FALSE;
     while (!$isComplete) {
-      $isComplete = CRM_Mailing_BAO_Job::runJobs($testParams);
+      $isComplete = CRM_Mailing_BAO_MailingJob::runJobs($testParams);
     }
 
     if (CRM_Utils_Array::value('sendtest', $testParams)) {

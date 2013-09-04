@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -47,6 +47,9 @@ class CRM_Core_BAO_UFMatch extends CRM_Core_DAO_UFMatch {
   static function create($params) {
     $hook = empty($params['id']) ? 'create' : 'edit';
     CRM_Utils_Hook::pre($hook, 'UFMatch', CRM_Utils_Array::value('id', $params), $params);
+    if(empty($params['domain_id'])) {
+      $params['domain_id'] = CRM_Core_Config::domainID();
+    }
     $dao = new CRM_Core_DAO_UFMatch();
     $dao->copyValues($params);
     $dao->save();

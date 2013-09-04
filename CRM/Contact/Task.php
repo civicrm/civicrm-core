@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -39,7 +39,11 @@
  *
  */
 class CRM_Contact_Task {
-  CONST GROUP_CONTACTS = 1, REMOVE_CONTACTS = 2, TAG_CONTACTS = 3, REMOVE_TAGS = 4, EXPORT_CONTACTS = 5, EMAIL_CONTACTS = 6, SMS_CONTACTS = 7, DELETE_CONTACTS = 8, HOUSEHOLD_CONTACTS = 9, ORGANIZATION_CONTACTS = 10, RECORD_CONTACTS = 11, MAP_CONTACTS = 12, SAVE_SEARCH = 13, SAVE_SEARCH_UPDATE = 14, PRINT_CONTACTS = 15, LABEL_CONTACTS = 16, BATCH_UPDATE = 17, ADD_EVENT = 18, PRINT_FOR_CONTACTS = 19, EMAIL_UNHOLD = 22, RESTORE = 23, DELETE_PERMANENTLY = 24;
+  CONST GROUP_CONTACTS = 1, REMOVE_CONTACTS = 2, TAG_CONTACTS = 3, REMOVE_TAGS = 4, EXPORT_CONTACTS = 5,
+    EMAIL_CONTACTS = 6, SMS_CONTACTS = 7, DELETE_CONTACTS = 8, HOUSEHOLD_CONTACTS = 9, ORGANIZATION_CONTACTS = 10,
+    RECORD_CONTACTS = 11, MAP_CONTACTS = 12, SAVE_SEARCH = 13, SAVE_SEARCH_UPDATE = 14, PRINT_CONTACTS = 15,
+    LABEL_CONTACTS = 16, BATCH_UPDATE = 17, ADD_EVENT = 18, PRINT_FOR_CONTACTS = 19, EMAIL_UNHOLD = 22, RESTORE = 23,
+    DELETE_PERMANENTLY = 24;
 
   /**
    * the task array
@@ -60,71 +64,88 @@ class CRM_Contact_Task {
   static function initTasks() {
     if (!self::$_tasks) {
       self::$_tasks = array(
-        1 => array('title' => ts('Add Contacts to Group'),
+        1 => array(
+          'title' => ts('Add Contacts to Group'),
           'class' => 'CRM_Contact_Form_Task_AddToGroup',
         ),
-        2 => array('title' => ts('Remove Contacts from Group'),
+        2 => array(
+          'title' => ts('Remove Contacts from Group'),
           'class' => 'CRM_Contact_Form_Task_RemoveFromGroup',
         ),
-        3 => array('title' => ts('Tag Contacts (assign tags)'),
+        3 => array(
+          'title' => ts('Tag Contacts (assign tags)'),
           'class' => 'CRM_Contact_Form_Task_AddToTag',
         ),
-        4 => array('title' => ts('Untag Contacts (remove tags)'),
+        4 => array(
+          'title' => ts('Untag Contacts (remove tags)'),
           'class' => 'CRM_Contact_Form_Task_RemoveFromTag',
         ),
-        5 => array('title' => ts('Export Contacts'),
+        5 => array(
+          'title' => ts('Export Contacts'),
           'class' => array(
             'CRM_Export_Form_Select',
             'CRM_Export_Form_Map',
           ),
           'result' => FALSE,
         ),
-        6 => array('title' => ts('Send Email to Contacts'),
+        6 => array(
+          'title' => ts('Send Email to Contacts'),
           'class' => 'CRM_Contact_Form_Task_Email',
           'result' => TRUE,
         ),
-        7 => array('title' => ts('Send SMS to Contacts'),
+        7 => array(
+          'title' => ts('Send SMS to Contacts'),
           'class' => 'CRM_Contact_Form_Task_SMS',
           'result' => TRUE,
         ),
-        8 => array('title' => ts('Delete Contacts'),
+        8 => array(
+          'title' => ts('Delete Contacts'),
           'class' => 'CRM_Contact_Form_Task_Delete',
           'result' => FALSE,
         ),
-        11 => array('title' => ts('Record Activity for Contacts'),
+        11 => array(
+          'title' => ts('Record Activity for Contacts'),
           'class' => 'CRM_Activity_Form_Activity',
         ),
-        13 => array('title' => ts('New Smart Group'),
+        13 => array(
+          'title' => ts('New Smart Group'),
           'class' => 'CRM_Contact_Form_Task_SaveSearch',
           'result' => TRUE,
         ),
-        14 => array('title' => ts('Update Smart Group'),
+        14 => array(
+          'title' => ts('Update Smart Group'),
           'class' => 'CRM_Contact_Form_Task_SaveSearch_Update',
           'result' => TRUE,
         ),
-        15 => array('title' => ts('Print Contacts'),
+        15 => array(
+          'title' => ts('Print Contacts'),
           'class' => 'CRM_Contact_Form_Task_Print',
           'result' => FALSE,
         ),
-        16 => array('title' => ts('Mailing Labels'),
+        16 => array(
+          'title' => ts('Mailing Labels'),
           'class' => 'CRM_Contact_Form_Task_Label',
           'result' => TRUE,
         ),
-        17 => array('title' => ts('Batch Update via Profile'),
+        17 => array(
+          'title' => ts('Batch Update via Profile'),
           'class' => array(
             'CRM_Contact_Form_Task_PickProfile',
             'CRM_Contact_Form_Task_Batch',
           ),
           'result' => TRUE,
         ),
-        19 => array('title' => ts('Print PDF Letter for Contacts'),
+        19 => array(
+          'title' => ts('Print PDF Letter for Contacts'),
           'class' => 'CRM_Contact_Form_Task_PDF',
           'result' => TRUE,
         ),
-        22 => array('title' => ts('Unhold Emails'),
+        22 => array(
+          'title' => ts('Unhold Emails'),
           'class' => 'CRM_Contact_Form_Task_Unhold',
         ),
-        25 => array('title' => ts('Alter Contact Communication Preferences'),
+        25 => array(
+          'title' => ts('Alter Contact Communication Preferences'),
           'class' => 'CRM_Contact_Form_Task_AlterPreferences',
         ),
         self::RESTORE => array(
@@ -160,7 +181,8 @@ class CRM_Contact_Task {
       }
 
       if (CRM_Core_Permission::check('merge duplicate contacts')) {
-        self::$_tasks[21] = array('title' => ts('Merge Contacts'),
+        self::$_tasks[21] = array(
+          'title' => ts('Merge Contacts'),
           'class' => 'CRM_Contact_Form_Task_Merge',
           'result' => TRUE,
         );
@@ -182,20 +204,23 @@ class CRM_Contact_Task {
           )
         )
       ) {
-        self::$_tasks[12] = array('title' => ts('Map Contacts'),
+        self::$_tasks[12] = array(
+          'title' => ts('Map Contacts'),
           'class' => 'CRM_Contact_Form_Task_Map',
           'result' => FALSE,
         );
       }
 
       if (CRM_Core_Permission::access('CiviEvent')) {
-        self::$_tasks[18] = array('title' => ts('Add Contacts to Event'),
+        self::$_tasks[18] = array(
+          'title' => ts('Add Contacts to Event'),
           'class' => 'CRM_Event_Form_Participant',
         );
       }
 
       if (CRM_Core_Permission::access('CiviMail')) {
-        self::$_tasks[20] = array('title' => ts('Schedule/Send a Mass Mailing'),
+        self::$_tasks[20] = array(
+          'title' => ts('Schedule/Send a Mass Mailing'),
           'class' => array(
             'CRM_Mailing_Form_Group',
             'CRM_Mailing_Form_Settings',
@@ -209,7 +234,8 @@ class CRM_Contact_Task {
       elseif (CRM_Mailing_Info::workflowEnabled() &&
         CRM_Core_Permission::check('create mailings')
       ) {
-        self::$_tasks[20] = array('title' => ts('Create a Mass Mailing'),
+        self::$_tasks[20] = array(
+          'title' => ts('Create a Mass Mailing'),
           'class' => array(
             'CRM_Mailing_Form_Group',
             'CRM_Mailing_Form_Settings',
@@ -279,7 +305,7 @@ class CRM_Contact_Task {
    * @return array set of tasks that are valid for the user
    * @access public
    */
-  static function &permissionedTaskTitles($permission, $deletedContacts = false) {
+  static function &permissionedTaskTitles($permission, $deletedContacts = FALSE) {
     self::initTasks();
     $tasks = array();
     if ($deletedContacts) {
@@ -336,7 +362,8 @@ class CRM_Contact_Task {
       // make it the print task by default
       $value = 15;
     }
-    return array(CRM_Utils_Array::value('class', self::$_tasks[$value]),
+    return array(
+      CRM_Utils_Array::value('class', self::$_tasks[$value]),
       CRM_Utils_Array::value('result', self::$_tasks[$value]),
     );
   }

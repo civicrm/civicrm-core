@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -370,9 +370,7 @@ class CRM_Export_BAO_Export {
       }
     }
 
-    if ($componentTable &&
-      CRM_Utils_Array::value('additional_group', $exportParams)
-    ) {
+    if (!$selectAll && $componentTable && CRM_Utils_Array::value('additional_group', $exportParams)) {
       // If an Additional Group is selected, then all contacts in that group are
       // added to the export set (filtering out duplicates).
       $query = "
@@ -403,7 +401,7 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
       }
     }
 
-    $query = new CRM_Contact_BAO_Query(NULL, $returnProperties, NULL,
+    $query = new CRM_Contact_BAO_Query($params, $returnProperties, NULL,
       FALSE, FALSE, $queryMode,
       FALSE, TRUE, TRUE, NULL, $queryOperator
     );
@@ -455,8 +453,7 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
           $relIDs = $ids;
         }
         elseif ($exportMode == CRM_Export_Form_Select::ACTIVITY_EXPORT) {
-          $activityContacts = CRM_Core_PseudoConstant::activityContacts('name');
-          $sourceID = CRM_Utils_Array::key('Activity Source', $activityContacts);
+          $sourceID = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_ActivityContact', 'record_type_id', 'Activity Source');
           $query = "SELECT contact_id FROM civicrm_activity_contact
                               WHERE activity_id IN ( " . implode(',', $ids) . ") AND
                               record_type_id = {$sourceID}";
@@ -483,22 +480,24 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
               $component = 'civicrm_pledge';
               break;
 
-            case CRM_Export_Form_Select::CASE_EXPORT:
-              $component = 'civicrm_case';
-              break;
-
             case CRM_Export_Form_Select::GRANT_EXPORT:
               $component = 'civicrm_grant';
               break;
           }
-          $relIDs = CRM_Core_DAO::getContactIDsFromComponent($ids, $component);
+
+          if ($exportMode == CRM_Export_Form_Select::CASE_EXPORT) {
+            $relIDs = CRM_Case_BAO_Case::retrieveContactIdsByCaseId($ids);
+          }
+          else {
+            $relIDs = CRM_Core_DAO::getContactIDsFromComponent($ids, $component);
+          }
         }
 
         $relationshipJoin = $relationshipClause = '';
-        if ($componentTable) {
-          $relationshipJoin = " INNER JOIN $componentTable ctTable ON ctTable.contact_id = {$contactA}";
+        if (!$selectAll && $componentTable) {
+          $relationshipJoin = " INNER JOIN {$componentTable} ctTable ON ctTable.contact_id = {$contactA}";
         }
-        else {
+        elseif (!empty($relIDs)) {
           $relID = implode(',', $relIDs);
           $relationshipClause = " AND crel.{$contactA} IN ( {$relID} )";
         }
@@ -538,7 +537,7 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
       );
     }
 
-    if ($componentTable) {
+    if (!$selectAll && $componentTable) {
       $from .= " INNER JOIN $componentTable ctTable ON ctTable.contact_id = contact_a.id ";
     }
     elseif ($componentClause) {
@@ -629,6 +628,11 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
       while ($dao->fetch()) {
         $count++;
         $row = array();
+
+        if ($exportMode == CRM_Export_Form_Select::CONTACT_EXPORT) {
+          //convert the pseudo constants
+          $query->convertToPseudoNames($dao);
+        }
 
         //first loop through returnproperties so that we return what is required, and in same order.
         $relationshipField = 0;
@@ -785,12 +789,18 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
             $row[$field] = $dao->contact_id;
             // special case for calculated field
           }
+          elseif ($field == 'source_contact_id') {
+            $row[$field] = $dao->contact_id;
+          }
           elseif ($field == 'pledge_balance_amount') {
             $row[$field] = $dao->pledge_amount - $dao->pledge_total_paid;
             // special case for calculated field
           }
           elseif ($field == 'pledge_next_pay_amount') {
             $row[$field] = $dao->pledge_next_pay_amount + $dao->pledge_outstanding_amount;
+          }
+          elseif (in_array(substr($field, 0, -3), array('gender', 'prefix', 'suffix'))) {
+            $row[$field] = CRM_Core_PseudoConstant::getLabel('CRM_Contact_DAO_Contact', $field, $dao->$field);
           }
           elseif (is_array($value) && $field == 'location') {
             // fix header for location type case
@@ -1230,7 +1240,6 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
     if (isset($query->_fields[$field]['type'])) {
       switch ($query->_fields[$field]['type']) {
         case CRM_Utils_Type::T_INT:
-        case CRM_Utils_Type::T_BOOL:
         case CRM_Utils_Type::T_BOOLEAN:
           $sqlColumns[$fieldName] = "$fieldName varchar(16)";
           break;
@@ -1779,7 +1788,7 @@ LIMIT $offset, $limit
    * Function to manipulate header rows for relationship fields
    *
    */
-  function manipulateHeaderRows(&$headerRows, $contactRelationshipTypes) {
+  public static function manipulateHeaderRows(&$headerRows, $contactRelationshipTypes) {
     foreach ($headerRows as & $header) {
       $split = explode('-', $header);
       if ($relationTypeName = CRM_Utils_Array::value($split[0], $contactRelationshipTypes)) {

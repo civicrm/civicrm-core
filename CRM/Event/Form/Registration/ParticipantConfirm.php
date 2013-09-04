@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                               |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -56,7 +56,7 @@ class CRM_Event_Form_Registration_ParticipantConfirm extends CRM_Event_Form_Regi
 
     //get the contact and event id and assing to session.
     $values = array();
-    $csContactID = $eventId = NULL;
+    $csContactID = NULL;
     if ($this->_participantId) {
       $params = array('id' => $this->_participantId);
       CRM_Core_DAO::commonRetrieve('CRM_Event_DAO_Participant', $params, $values,
@@ -173,7 +173,6 @@ class CRM_Event_Form_Registration_ParticipantConfirm extends CRM_Event_Form_Regi
   public function postProcess() {
     //get the button.
     $buttonName    = $this->controller->getButtonName();
-    $eventId       = $this->_eventId;
     $participantId = $this->_participantId;
 
     if ($buttonName == '_qf_ParticipantConfirm_next') {
@@ -185,7 +184,7 @@ class CRM_Event_Form_Registration_ParticipantConfirm extends CRM_Event_Form_Regi
 
       //check user registration status is from pending class
       $url = CRM_Utils_System::url('civicrm/event/register',
-        "reset=1&id={$eventId}&participantId={$participantId}"
+        "reset=1&id={$this->_eventId}&participantId={$participantId}"
       );
       CRM_Utils_System::redirect($url);
     }

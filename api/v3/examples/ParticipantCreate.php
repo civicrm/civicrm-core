@@ -1,37 +1,45 @@
 <?php
-
-/*
- 
+/**
+ * Test Generated example of using participant create API
+ * *
  */
 function participant_create_example(){
-$params = array( 
+$params = array(
   'contact_id' => 4,
   'event_id' => 1,
   'status_id' => 1,
   'role_id' => 1,
   'register_date' => '2007-07-21 00:00:00',
   'source' => 'Online Event Registration: API Testing',
-  'version' => 3,
   'custom_1' => 'custom string',
 );
 
-  $result = civicrm_api( 'participant','create',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('participant', 'create', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function participant_create_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
   'id' => 4,
-  'values' => array( 
-      '4' => array( 
+  'values' => array(
+      '4' => array(
           'id' => '4',
           'contact_id' => '4',
           'event_id' => '1',
@@ -54,7 +62,7 @@ function participant_create_expectedresult(){
     ),
 );
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 

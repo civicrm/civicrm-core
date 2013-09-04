@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -34,7 +34,7 @@
  */
 
 /**
- * Page to disply contact name on top of the summary 
+ * Page to disply contact name on top of the summary
  *
  */
 class CRM_Contact_Page_Inline_ContactName extends CRM_Core_Page {
@@ -51,25 +51,25 @@ class CRM_Contact_Page_Inline_ContactName extends CRM_Core_Page {
   function run() {
     // get the emails for this contact
     $contactId = CRM_Utils_Request::retrieve('cid', 'Positive', CRM_Core_DAO::$_nullObject, TRUE, NULL, $_REQUEST);
-    
+
     $isDeleted = (bool) CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $contactId, 'is_deleted');
 
     $this->assign('contactId', $contactId);
-    
-    $title = CRM_Contact_Page_View::setTitle($contactId, $isDeleted); 
+
+    $title = CRM_Contact_Page_View::setTitle($contactId, $isDeleted);
     $this->assign('title', $title);
 
     // Check if this is default domain contact CRM-10482
     if (CRM_Contact_BAO_Contact::checkDomainContact($contactId)) {
       $this->assign('domainContact', TRUE);
     } else {
-      $this->assign('domainContact', FALSE);      
+      $this->assign('domainContact', FALSE);
     }
 
     // check logged in user permission
     CRM_Contact_Page_View::checkUserPermission($this, $contactId);
- 
-    // finally call parent 
+
+    // finally call parent
     parent::run();
   }
 }

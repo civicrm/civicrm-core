@@ -1,39 +1,47 @@
 <?php
-
-/*
- 
+/**
+ * Test Generated example of using membership get API
+ * *
  */
 function membership_get_example(){
-$params = array( 
-  'version' => 3,
-  'membership_type_id' => 9,
+$params = array(
+  'membership_type_id' => 19,
 );
 
-  $result = civicrm_api( 'membership','get',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('membership', 'get', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function membership_get_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
   'id' => 1,
-  'values' => array( 
-      '1' => array( 
+  'values' => array(
+      '1' => array(
           'id' => '1',
-          'contact_id' => '11',
-          'membership_type_id' => '9',
+          'contact_id' => '14',
+          'membership_type_id' => '19',
           'join_date' => '2009-01-21',
-          'start_date' => '2009-01-21',
-          'end_date' => '2009-12-21',
+          'start_date' => '2013-07-29 00:00:00',
+          'end_date' => '2013-08-04 00:00:00',
           'source' => 'Payment',
-          'status_id' => '16',
+          'status_id' => '17',
           'is_override' => '1',
           'is_test' => 0,
           'is_pay_later' => 0,
@@ -45,7 +53,7 @@ function membership_get_expectedresult(){
     ),
 );
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 

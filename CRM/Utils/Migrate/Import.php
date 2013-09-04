@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -194,35 +194,46 @@ WHERE      v.option_group_id = %1
 
         // fix extends stuff if it exists
         if (isset($customGroupXML->extends_entity_column_value_option_group) &&
-          isset($customGroupXML->extends_entity_column_value_option_value)
-        ) {
-          $optValues = explode(",", $customGroupXML->extends_entity_column_value_option_value);
-          $optValues = implode("','", $optValues);
+          isset($customGroupXML->extends_entity_column_value)) {
+          $valueIDs = array();
+          $optionValues = explode(",", $customGroupXML->extends_entity_column_value);
+          $optValues = implode("','", $optionValues);
           if (trim($customGroup->extends) != 'Participant') {
-            $sql = "
+            if ($customGroup->extends == 'Relationship') {
+              foreach ($optionValues as $key => $value) {
+                $relTypeId = CRM_Core_DAO::getFieldValue('CRM_Contact_BAO_RelationshipType', $value, 'id', 'name_a_b');
+                $valueIDs[] = $relTypeId;
+              }
+            }
+            elseif (in_array($customGroup->extends, array('Individual', 'Organization', 'Household'))) {
+              $valueIDs = $optionValues;
+            }
+            else {
+              $sql = "
 SELECT     v.value
 FROM       civicrm_option_value v
 INNER JOIN civicrm_option_group g ON g.id = v.option_group_id
 WHERE      g.name = %1
-AND        v.name IN (%2)
+AND        v.name IN ('$optValues')
 ";
-            $params = array(
-              1 => array(
-                (string ) $customGroupXML->extends_entity_column_value_option_group,
-                'String',
-              ),
-              2 => array((string ) $optValues, 'String'),
-            );
-            $dao = & CRM_Core_DAO::executeQuery($sql, $params);
+              $params = array(
+                1 => array(
+                  (string ) $customGroupXML->extends_entity_column_value_option_group,
+                  'String',
+                ),
+              );
+              $dao = & CRM_Core_DAO::executeQuery($sql, $params);
 
-            $valueIDs = array();
-            while ($dao->fetch()) {
-              $valueIDs[] = $dao->value;
+              while ($dao->fetch()) {
+                $valueIDs[] = $dao->value;
+              }
             }
             if (!empty($valueIDs)) {
               $customGroup->extends_entity_column_value = CRM_Core_DAO::VALUE_SEPARATOR . implode(CRM_Core_DAO::VALUE_SEPARATOR,
                 $valueIDs
               ) . CRM_Core_DAO::VALUE_SEPARATOR;
+
+              unset($valueIDs);
 
               // Note: No need to set extends_entity_column_id here.
 

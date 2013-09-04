@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -77,10 +77,13 @@ class CRM_Contact_Page_View_Relationship extends CRM_Core_Page {
 
     $employerId = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $this->_contactId, 'employer_id');
     $this->assign('isCurrentEmployer', FALSE);
+
+    $relTypes = CRM_Utils_Array::index(array('name_a_b'), CRM_Core_PseudoConstant::relationshipType('name'));
+    
     if ($viewRelationship[$this->_id]['employer_id'] == $this->_contactId) {
       $this->assign('isCurrentEmployer', TRUE);
     }
-    elseif ($relType == 4 &&
+    elseif ($relType == $relTypes['Employee of']['id'] &&
       ($viewRelationship[$this->_id]['cid'] == $employerId)
     ) {
       // make sure we are viewing employee of relationship

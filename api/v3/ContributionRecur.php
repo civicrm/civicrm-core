@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -57,6 +57,8 @@ function civicrm_api3_contribution_recur_create($params) {
 function _civicrm_api3_contribution_recur_create_spec(&$params) {
   $params['contact_id']['api.required'] = 1;
   $params['create_date']['api.default'] = 'now';
+  $params['frequency_interval']['api.required'] = 1;
+  $params['start_date']['api.default'] = 'now';
 }
 
 /**

@@ -1,43 +1,51 @@
 <?php
-
-/*
- Get all from group and display contacts
+/**
+ * Test Generated example of using group_contact get API
+ * Get all from group and display contacts *
  */
 function group_contact_get_example(){
-$params = array( 
+$params = array(
   'group_id' => 1,
-  'version' => 3,
   'api.group.get' => 1,
   'sequential' => 1,
 );
 
-  $result = civicrm_api( 'group_contact','get',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('group_contact', 'get', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function group_contact_get_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 2,
-  'values' => array( 
-      '0' => array( 
+  'values' => array(
+      '0' => array(
           'id' => '1',
           'group_id' => '1',
           'contact_id' => '3',
           'status' => 'Added',
-          'api.group.get' => array( 
+          'api.group.get' => array(
               'is_error' => 0,
               'version' => 3,
               'count' => 1,
               'id' => 1,
-              'values' => array( 
-                  '0' => array( 
+              'values' => array(
+                  '0' => array(
                       'id' => '1',
                       'name' => 'Test Group 1_1',
                       'title' => 'New Test Group Created',
@@ -47,9 +55,9 @@ function group_contact_get_expectedresult(){
                       'is_active' => '1',
                       'visibility' => 'Public Pages',
                       'where_clause' => ' ( `civicrm_group_contact-1`.group_id IN ( 1 ) AND `civicrm_group_contact-1`.status IN ("Added") ) ',
-                      'select_tables' => 'a:12:{s:15:"civicrm_contact";i:1;s:15:"civicrm_address";i:1;s:22:"civicrm_state_province";i:1;s:15:"civicrm_country";i:1;s:13:"civicrm_email";i:1;s:13:"civicrm_phone";i:1;s:10:"civicrm_im";i:1;s:19:"civicrm_worldregion";i:1;s:25:"`civicrm_group_contact-1`";s:114:" LEFT JOIN civicrm_group_contact `civicrm_group_contact-1` ON contact_a.id = `civicrm_group_contact-1`.contact_id ";s:6:"gender";i:1;s:17:"individual_prefix";i:1;s:17:"individual_suffix";i:1;}',
+                      'select_tables' => 'a:8:{s:15:"civicrm_contact";i:1;s:15:"civicrm_address";i:1;s:15:"civicrm_country";i:1;s:13:"civicrm_email";i:1;s:13:"civicrm_phone";i:1;s:10:"civicrm_im";i:1;s:19:"civicrm_worldregion";i:1;s:25:"`civicrm_group_contact-1`";s:114:" LEFT JOIN civicrm_group_contact `civicrm_group_contact-1` ON contact_a.id = `civicrm_group_contact-1`.contact_id ";}',
                       'where_tables' => 'a:2:{s:15:"civicrm_contact";i:1;s:25:"`civicrm_group_contact-1`";s:114:" LEFT JOIN civicrm_group_contact `civicrm_group_contact-1` ON contact_a.id = `civicrm_group_contact-1`.contact_id ";}',
-                      'group_type' => array( 
+                      'group_type' => array(
                           '0' => '1',
                           '1' => '2',
                         ),
@@ -64,18 +72,18 @@ function group_contact_get_expectedresult(){
                 ),
             ),
         ),
-      '1' => array( 
+      '1' => array(
           'id' => '2',
           'group_id' => '1',
           'contact_id' => '1',
           'status' => 'Added',
-          'api.group.get' => array( 
+          'api.group.get' => array(
               'is_error' => 0,
               'version' => 3,
               'count' => 1,
               'id' => 1,
-              'values' => array( 
-                  '0' => array( 
+              'values' => array(
+                  '0' => array(
                       'id' => '1',
                       'name' => 'Test Group 1_1',
                       'title' => 'New Test Group Created',
@@ -85,9 +93,9 @@ function group_contact_get_expectedresult(){
                       'is_active' => '1',
                       'visibility' => 'Public Pages',
                       'where_clause' => ' ( `civicrm_group_contact-1`.group_id IN ( 1 ) AND `civicrm_group_contact-1`.status IN ("Added") ) ',
-                      'select_tables' => 'a:12:{s:15:"civicrm_contact";i:1;s:15:"civicrm_address";i:1;s:22:"civicrm_state_province";i:1;s:15:"civicrm_country";i:1;s:13:"civicrm_email";i:1;s:13:"civicrm_phone";i:1;s:10:"civicrm_im";i:1;s:19:"civicrm_worldregion";i:1;s:25:"`civicrm_group_contact-1`";s:114:" LEFT JOIN civicrm_group_contact `civicrm_group_contact-1` ON contact_a.id = `civicrm_group_contact-1`.contact_id ";s:6:"gender";i:1;s:17:"individual_prefix";i:1;s:17:"individual_suffix";i:1;}',
+                      'select_tables' => 'a:8:{s:15:"civicrm_contact";i:1;s:15:"civicrm_address";i:1;s:15:"civicrm_country";i:1;s:13:"civicrm_email";i:1;s:13:"civicrm_phone";i:1;s:10:"civicrm_im";i:1;s:19:"civicrm_worldregion";i:1;s:25:"`civicrm_group_contact-1`";s:114:" LEFT JOIN civicrm_group_contact `civicrm_group_contact-1` ON contact_a.id = `civicrm_group_contact-1`.contact_id ";}',
                       'where_tables' => 'a:2:{s:15:"civicrm_contact";i:1;s:25:"`civicrm_group_contact-1`";s:114:" LEFT JOIN civicrm_group_contact `civicrm_group_contact-1` ON contact_a.id = `civicrm_group_contact-1`.contact_id ";}',
-                      'group_type' => array( 
+                      'group_type' => array(
                           '0' => '1',
                           '1' => '2',
                         ),
@@ -105,7 +113,7 @@ function group_contact_get_expectedresult(){
     ),
 );
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 

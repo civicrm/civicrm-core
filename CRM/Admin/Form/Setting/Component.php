@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -79,7 +79,7 @@ class CRM_Admin_Form_Setting_Component extends CRM_Admin_Form_Setting {
   static function formRule($fields, $files, $options) {
     $errors = array();
 
-    if (is_array($fields['enableComponents'])) {
+    if (array_key_exists('enableComponents', $fields) && is_array($fields['enableComponents'])) {
       if (in_array('CiviPledge', $fields['enableComponents']) &&
         !in_array('CiviContribute', $fields['enableComponents'])
       ) {
@@ -107,11 +107,6 @@ class CRM_Admin_Form_Setting_Component extends CRM_Admin_Form_Setting {
 
   public function postProcess() {
     $params = $this->controller->exportValues($this->_name);
-
-    $params['enableComponentIDs'] = array();
-    foreach ($params['enableComponents'] as $name) {
-      $params['enableComponentIDs'][] = $this->_components[$name]->componentID;
-    }
 
     // if CiviCase is being enabled,
     // load the case related sample data

@@ -1,24 +1,34 @@
 {literal}<?php{/literal}
-
-/*
- {$description}
+/**
+ * Test Generated example of using {$fnPrefix} {$action} API
+ *{if $description} {$description}{/if}
+ *
  */
 function {$function}_example(){literal}{{/literal}
 $params = {$params|@print_array};
+{literal}
+try{{/literal}
+  $result = civicrm_api3('{$fnPrefix}', '{$action}', $params);
+{literal}}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
+}{/literal}
 
-  $result = civicrm_api( '{$fnPrefix}','{$action}',$params );
-
-  return $result;
+return $result;
 {literal}}{/literal}
 
-/*
+/**
  * Function returns array of result expected from previous function
  */
 function {$function}_expectedresult(){literal}{{/literal}
 
   $expectedResult = {$result|@print_array};
 
-  return $expectedResult  ;
+  return $expectedResult;
 {literal}}{/literal}
 
 

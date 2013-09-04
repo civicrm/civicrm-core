@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -126,12 +126,16 @@ class CRM_Contact_Form_RelatedContact extends CRM_Core_Form {
     $params['id'] = $params['contact_id'] = $this->_contactId;
     $contact      = CRM_Contact_BAO_Contact::retrieve($params, $this->_defaults);
 
-    $countryID = CRM_Utils_Array::value('country_id',
-      $this->_defaults['address'][1]
-    );
-    $stateID = CRM_Utils_Array::value('state_province_id',
-      $this->_defaults['address'][1]
-    );
+    $countryID = '';
+    $stateID = '';
+    if (!empty($this->_defaults['address'][1])) {
+      $countryID = CRM_Utils_Array::value('country_id',
+        $this->_defaults['address'][1]
+      );
+      $stateID = CRM_Utils_Array::value('state_province_id',
+        $this->_defaults['address'][1]
+      );
+    }
     CRM_Contact_BAO_Contact_Utils::buildOnBehalfForm($this,
       $this->_contactType,
       $countryID,

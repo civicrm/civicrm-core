@@ -1,35 +1,40 @@
 <?php
-
-/*
- 
+/**
+ * Test Generated example of using survey delete API
+ * *
  */
 function survey_delete_example(){
-$params = array( 
-  'version' => 3,
-  'title' => 'survey title',
-  'activity_type_id' => '30',
-  'max_number_of_contacts' => 12,
-  'instructions' => 'Call people, ask for money',
+$params = array(
+  'id' => 1,
 );
 
-  $result = civicrm_api( 'survey','delete',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('survey', 'delete', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function survey_delete_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
   'values' => true,
 );
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 

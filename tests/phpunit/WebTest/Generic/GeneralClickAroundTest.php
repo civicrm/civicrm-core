@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -110,7 +110,7 @@ class WebTest_Generic_GeneralClickAroundTest extends CiviSeleniumTestCase {
     // Contributions → Dashboard
     $this->click("css=ul#civicrm-menu li.crm-Contributions");
     $this->click("css=ul#civicrm-menu li.crm-Contributions li.crm-Dashboard a");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->waitForElementPresent('chart_type');
 
     $this->assertTextPresent("Contribution Summary");
     $this->assertTextPresent("Select Year (for monthly breakdown)");
@@ -130,7 +130,6 @@ class WebTest_Generic_GeneralClickAroundTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     $this->assertTextPresent("Event Summary");
-    $this->assertTextPresent("Fall Fundraiser Dinner");
     $this->assertTextPresent("Counted:");
     $this->assertTextPresent("Not Counted:");
     $this->assertTextPresent("Not Counted Due To Status:");
@@ -141,6 +140,7 @@ class WebTest_Generic_GeneralClickAroundTest extends CiviSeleniumTestCase {
     $this->assertTextPresent("Cancelled:");
     $this->assertTextPresent("Recent Registrations");
     $this->assertTextPresent("Find more event participants...");
+    $this->assertTextPresent("Configure");
   }
 
   function testMembershipsDashboard() {

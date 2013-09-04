@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/Price</base>
+  <class>PriceFieldValue</class>
+  <name>civicrm_price_field_value</name>
+  <add>3.3</add>
+  <field>
+    <name>id</name>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>Price Field Value</comment>
+    <add>3.3</add>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+  <field>
+    <name>price_field_id</name>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>FK to civicrm_price_field</comment>
+    <add>3.3</add>
+  </field>
+  <foreignKey>
+    <name>price_field_id</name>
+    <table>civicrm_price_field</table>
+    <key>id</key>
+    <add>3.3</add>
+  </foreignKey>
+  <field>
+    <name>name</name>
+    <type>varchar</type>
+    <title>Name</title>
+    <length>255</length>
+    <comment>Price field option name</comment>
+    <add>3.3</add>
+  </field>
+  <field>
+    <name>label</name>
+    <type>varchar</type>
+    <title>Label</title>
+    <length>255</length>
+    <localizable>true</localizable>
+    <comment>Price field option label</comment>
+    <add>3.3</add>
+  </field>
+  <field>
+    <name>description</name>
+    <type>text</type>
+    <htmlType>textarea</htmlType>
+    <default>NULL</default>
+    <rows>2</rows>
+    <cols>60</cols>
+    <localizable>true</localizable>
+    <comment>>Price field option description.</comment>
+    <add>3.3</add>
+  </field>
+  <field>
+    <name>amount</name>
+    <type>varchar</type>
+    <title>Amount</title>
+    <length>512</length>
+    <size>EIGHT</size>
+    <required>true</required>
+    <comment>Price field option amount</comment>
+    <add>3.3</add>
+  </field>
+  <field>
+    <name>count</name>
+    <type>int unsigned</type>
+    <default>NULL</default>
+    <comment>Number of participants per field option</comment>
+    <add>3.3</add>
+  </field>
+  <field>
+    <name>max_value</name>
+    <type>int unsigned</type>
+    <default>NULL</default>
+    <comment>Max number of participants per field options</comment>
+    <add>3.3</add>
+  </field>
+  <field>
+    <name>weight</name>
+    <type>int</type>
+    <default>1</default>
+    <comment>Order in which the field options should appear</comment>
+    <add>3.3</add>
+  </field>
+  <field>
+    <name>membership_type_id</name>
+    <type>int unsigned</type>
+    <default>NULL</default>
+    <comment>FK to Membership Type</comment>
+    <add>3.4</add>
+  </field>
+  <foreignKey>
+    <name>membership_type_id</name>
+    <table>civicrm_membership_type</table>
+    <key>id</key>
+    <add>3.4</add>
+    <onDelete>SET NULL</onDelete>
+  </foreignKey>
+  <field>
+    <name>membership_num_terms</name>
+    <type>int unsigned</type>
+    <default>NULL</default>
+    <comment>Number of terms for this membership</comment>
+    <add>4.3</add>
+  </field>
+  <field>
+    <name>is_default</name>
+    <type>boolean</type>
+    <comment>Is this default price field option</comment>
+    <default>0</default>
+    <add>3.3</add>
+  </field>
+  <field>
+    <name>is_active</name>
+    <type>boolean</type>
+    <comment>Is this price field value active</comment>
+    <default>1</default>
+    <add>3.3</add>
+  </field>
+  <field>
+    <name>financial_type_id</name>
+    <title>Financial Type</title>
+    <type>int unsigned</type>
+    <default>NULL</default>
+    <comment>FK to Financial Type.</comment>
+    <add>4.3</add>
+  </field>
+  <foreignKey>
+    <name>financial_type_id</name>
+    <table>civicrm_financial_type</table>
+    <key>id</key>
+    <onDelete>SET NULL</onDelete>
+    <add>4.3</add>
+  </foreignKey>
+  <field>
+    <name>deductible_amount</name>
+    <title>Deductible Amount</title>
+    <type>decimal</type>
+    <default>0.0</default>
+    <headerPattern>/unit?.?amoun/i</headerPattern>
+    <dataPattern>/^\d+(\.\d{2})?$/</dataPattern>
+    <required>true</required>
+    <comment>Tax-deductible portion of the amount</comment>
+    <add>4.1</add>
+  </field>
+</table>
+

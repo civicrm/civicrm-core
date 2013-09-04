@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -333,6 +333,8 @@ class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
     }
 
     $name = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_UFGroup', $this->_gid, 'name');
+    $this->assign('ufGroupName', $name);
+    CRM_Utils_Hook::viewProfile($name);
 
     if (strtolower($name) == 'summary_overlay') {
       $template->assign('overlayProfile', TRUE);
@@ -369,7 +371,7 @@ class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
     // invoke the pagRun hook, CRM-3906
     CRM_Utils_Hook::pageRun($this);
 
-    return trim($template->fetch($this->getTemplateFileName()));
+    return trim($template->fetch($this->getHookedTemplateFileName()));
   }
 
   function checkTemplateFileExists($suffix = '') {

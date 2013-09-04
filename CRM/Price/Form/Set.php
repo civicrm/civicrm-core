@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -61,7 +61,7 @@ class CRM_Price_Form_Set extends CRM_Core_Form {
     // setting title for html page
     $title = ts('New Price Set');
     if ($this->_sid) {
-      $title = CRM_Price_BAO_Set::getTitle($this->_sid);
+      $title = CRM_Price_BAO_PriceSet::getTitle($this->_sid);
     }
     if ($this->_action & CRM_Core_Action::UPDATE) {
       $title = ts('Edit %1', array(1 => $title));
@@ -122,14 +122,14 @@ class CRM_Price_Form_Set extends CRM_Core_Form {
     $this->assign('sid', $this->_sid);
 
     // title
-    $this->add('text', 'title', ts('Set Name'), CRM_Core_DAO::getAttribute('CRM_Price_DAO_Set', 'title'), TRUE);
+    $this->add('text', 'title', ts('Set Name'), CRM_Core_DAO::getAttribute('CRM_Price_DAO_PriceSet', 'title'), TRUE);
     $this->addRule('title', ts('Name already exists in Database.'),
-      'objectExists', array('CRM_Price_DAO_Set', $this->_sid, 'title')
+      'objectExists', array('CRM_Price_DAO_PriceSet', $this->_sid, 'title')
     );
 
     $priceSetUsedTables = $extends = array();
     if ($this->_action == CRM_Core_Action::UPDATE && $this->_sid) {
-      $priceSetUsedTables = CRM_Price_BAO_Set::getUsedBy($this->_sid, 'table');
+      $priceSetUsedTables = CRM_Price_BAO_PriceSet::getUsedBy($this->_sid, 'table');
     }
 
     $config           = CRM_Core_Config::singleton();
@@ -197,10 +197,10 @@ class CRM_Price_Form_Set extends CRM_Core_Form {
 
     // help text
     $this->add('textarea', 'help_pre', ts('Pre-form Help'),
-      CRM_Core_DAO::getAttribute('CRM_Price_DAO_Set', 'help_pre')
+      CRM_Core_DAO::getAttribute('CRM_Price_DAO_PriceSet', 'help_pre')
     );
     $this->add('textarea', 'help_post', ts('Post-form Help'),
-      CRM_Core_DAO::getAttribute('CRM_Price_DAO_Set', 'help_post')
+      CRM_Core_DAO::getAttribute('CRM_Price_DAO_PriceSet', 'help_post')
     );
 
     // is this set active ?
@@ -242,7 +242,7 @@ class CRM_Price_Form_Set extends CRM_Core_Form {
     $defaults = array('is_active' => TRUE);
     if ($this->_sid) {
       $params = array('id' => $this->_sid);
-      CRM_Price_BAO_Set::retrieve($params, $defaults);
+      CRM_Price_BAO_PriceSet::retrieve($params, $defaults);
       $extends = explode(CRM_Core_DAO::VALUE_SEPARATOR, $defaults['extends']);
       unset($defaults['extends']);
       foreach ($extends as $compId) $defaults['extends'][$compId] = 1;
@@ -262,8 +262,7 @@ class CRM_Price_Form_Set extends CRM_Core_Form {
   public function postProcess() {
     // get the submitted form values.
     $params = $this->controller->exportValues('Set');
-    $nameLength = CRM_Core_DAO::getAttribute('CRM_Price_DAO_Set', 'name');
-    $params['name'] = CRM_Utils_String::titleToVar($params['title'], CRM_Utils_Array::value('maxlength', $nameLength));
+    $nameLength = CRM_Core_DAO::getAttribute('CRM_Price_DAO_PriceSet', 'name');
     $params['is_active'] = CRM_Utils_Array::value('is_active', $params, FALSE);
     $params['financial_type_id'] = CRM_Utils_Array::value('financial_type_id', $params, FALSE);
 
@@ -277,8 +276,12 @@ class CRM_Price_Form_Set extends CRM_Core_Form {
     if ($this->_action & CRM_Core_Action::UPDATE) {
       $params['id'] = $this->_sid;
     }
+    else {
+      $params['name'] = CRM_Utils_String::titleToVar($params['title'],
+        CRM_Utils_Array::value('maxlength', $nameLength));
+    }
 
-    $set = CRM_Price_BAO_Set::create($params);
+    $set = CRM_Price_BAO_PriceSet::create($params);
     if ($this->_action & CRM_Core_Action::UPDATE) {
       CRM_Core_Session::setStatus(ts('The Set \'%1\' has been saved.', array(1 => $set->title)), ts('Saved'), 'success');
     }

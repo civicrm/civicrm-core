@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -62,7 +62,7 @@ class CRM_Core_Page_AJAX_Location {
     $addressSequence = array_flip($config->addressSequence());
 
 
-    if ($relContact) {
+    if (!empty($relContact)) {
       $elements = array(
         "phone_1_phone" =>
         $location['phone'][1]['phone'],
@@ -147,7 +147,7 @@ class CRM_Core_Page_AJAX_Location {
         }
       }
 
-      $locTypeId = $location['address'][1]['location_type_id'];
+      $locTypeId = isset($location['address'][1]) ? $location['address'][1]['location_type_id'] : NULL;
       $addressFields = array(
         'street_address',
         'supplemental_address_1',
@@ -167,7 +167,7 @@ class CRM_Core_Page_AJAX_Location {
           }
           $elements["onbehalf_{$field}-{$locTypeId}"] = array(
             'type' => 'Text',
-            'value' => $location['address'][1][$addField],
+            'value' =>  isset($location['address'][1]) ? $location['address'][1][$addField] : null,
           );
           unset($profileFields["{$field}-{$locTypeId}"]);
         }

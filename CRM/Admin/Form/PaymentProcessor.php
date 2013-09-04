@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -45,7 +45,7 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
   protected $_fields = NULL;
 
   protected $_ppDAO;
-  
+
   function preProcess() {
     parent::preProcess();
 
@@ -185,7 +185,7 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
 
     $types = CRM_Core_PseudoConstant::paymentProcessorType();
     $this->add( 'select', 'payment_processor_type_id', ts('Payment Processor Type'), $types, true,
-      array('onchange' => "reload(true)") 
+      array('onchange' => "reload(true)")
     );
 
     // Financial Account of account type asset CRM-11515
@@ -194,9 +194,9 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
     if ($fcount = count($financialAccount)) {
       $this->assign('financialAccount', $fcount);
     }
-    $this->add('select', 'financial_account_id', ts('Financial Account'), 
+    $this->add('select', 'financial_account_id', ts('Financial Account'),
       array('' => ts('- select -')) + $financialAccount,
-      true 
+      true
     );
     // is this processor active ?
     $this->add('checkbox', 'is_active', ts('Is this Payment Processor active?'));
@@ -377,9 +377,9 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
     $dao->payment_type = $this->_ppDAO->payment_type;
 
     $dao->save();
-    
+
     //CRM-11515
-    
+
     $relationTypeId = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Asset Account is' "));
     $params = array(
       'entity_table' => 'civicrm_payment_processor',

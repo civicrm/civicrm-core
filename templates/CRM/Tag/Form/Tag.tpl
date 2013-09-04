@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -77,7 +77,8 @@
         //showing count of tags in summary tab
         var existingTagsInTagset = cj('.token-input-delete-token-facebook').length;
         var tagCount = cj("#tagtree input:checkbox:checked").length + existingTagsInTagset;
-        cj( '.ui-tabs-nav #tab_tag a' ).html( 'Tags <em>' + tagCount + '</em>');
+        cj('#tab_tag a em').html('' + tagCount);
+        tagCount ? cj('#tab_tag').removeClass('disabled') : cj('#tab_tag').addClass('disabled');
 
         //update summary tab
         tagLabels = tagsArray.join(', ');

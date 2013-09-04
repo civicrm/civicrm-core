@@ -1,7 +1,7 @@
 <?php
 /*
   +--------------------------------------------------------------------+
-  | CiviCRM version 4.3                                                |
+  | CiviCRM version 4.4                                                |
   +--------------------------------------------------------------------+
   | Copyright CiviCRM LLC (c) 2004-2013                                |
   +--------------------------------------------------------------------+
@@ -999,12 +999,7 @@ FROM   civicrm_domain
       }
     }
 
-    // CRM-11582
-    foreach($tr as $key => $value) {
-      $key   = preg_quote($key);
-      $query = preg_replace("/$key\b/", $value, $query);
-    }
-    return $query;
+    return strtr($query, $tr);
   }
 
   static function freeResult($ids = NULL) {
@@ -1322,10 +1317,12 @@ SELECT contact_id
             continue;
           }
           // Pick an option value if needed
-          $options = $daoName::buildOptions($dbName);
-          if ($options) {
-            $object->$dbName = key($options);
-            continue;
+          if ($value['type'] !== CRM_Utils_Type::T_BOOLEAN) {
+            $options = $daoName::buildOptions($dbName, 'create');
+            if ($options) {
+              $object->$dbName = key($options);
+              continue;
+            }
           }
 
           switch ($value['type']) {
@@ -1335,7 +1332,6 @@ SELECT contact_id
               $object->$dbName = $counter;
               break;
 
-            case CRM_Utils_Type::T_BOOL:
             case CRM_Utils_Type::T_BOOLEAN:
               if (isset($value['default'])) {
                 $object->$dbName = $value['default'];
@@ -1763,14 +1759,37 @@ EOS;
    * This function can be overridden by each BAO to add more logic related to context.
    * The overriding function will generally call the lower-level CRM_Core_PseudoConstant::get
    *
-   * @param String $fieldName
-   * @param String $context: e.g. "search" "get" "create" "validate"
-   * @param Array  $props: whatever is known about this bao object
+   * @param string $fieldName
+   * @param string $context: @see CRM_Core_DAO::buildOptionsContext
+   * @param array  $props: whatever is known about this bao object
    */
   public static function buildOptions($fieldName, $context = NULL, $props = array()) {
     // If a given bao does not override this function
     $baoName = get_called_class();
     return CRM_Core_PseudoConstant::get($baoName, $fieldName, array(), $context);
+  }
+
+  /**
+   * Populate option labels for this object's fields.
+   *
+   * @throws exception if called directly on the base class
+   */
+  public function getOptionLabels() {
+    $fields = $this->fields();
+    if ($fields === NULL) {
+      throw new exception ('Cannot call getOptionLabels on CRM_Core_DAO');
+    }
+    foreach ($fields as $field) {
+      $name = CRM_Utils_Array::value('name', $field);
+      if ($name && isset($this->$name)) {
+        $label = CRM_Core_PseudoConstant::getLabel(get_class($this), $name, $this->$name);
+        if ($label !== FALSE) {
+          // Append 'label' onto the field name
+          $labelName = $name . '_label';
+          $this->$labelName = $label;
+        }
+      }
+    }
   }
 
   /**
@@ -1792,5 +1811,88 @@ EOS;
     return $contexts;
   }
 
-}
+  /**
+   * SQL version of api function to assign filters to the DAO based on the syntax
+   * $field => array('IN' => array(4,6,9))
+   * OR
+   * $field => array('LIKE' => array('%me%))
+   * etc
+   *
+   * @param $fieldname string name of fields
+   * @param $filter array filter to be applied indexed by operator
+   * @param $type String type of field (not actually used - nor in api @todo )
+   * @param $alias String alternative field name ('as') @todo- not actually used
+   * @param bool $returnSanitisedArray return a sanitised array instead of a clause
+   *  this is primarily so we can add filters @ the api level to the Query object based fields
+   *  @todo a better solutution would be for the query object to apply these filters based on the
+   *  api supported format (but we don't want to risk breakage in alpha stage & query class is scary
+   *  @todo @time of writing only IN & NOT IN are supported for the array style syntax (as test is
+   *  required to extend further & it may be the comments per above should be implemented. It may be
+   *  preferable to not double-banger the return context next refactor of this - but keeping the attention
+   *  in one place has some advantages as we try to extend this format
+   *
+   *  @return NULL|string|array a string is returned if $returnSanitisedArray is not set, otherwise and Array or NULL
+   *   depending on whether it is supported as yet
+   **/
+  public static function createSQLFilter($fieldName, $filter, $type, $alias = NULL, $returnSanitisedArray = FALSE) {
+    // http://issues.civicrm.org/jira/browse/CRM-9150 - stick with 'simple' operators for now
+    // support for other syntaxes is discussed in ticket but being put off for now
+    $acceptedSQLOperators = array('=', '<=', '>=', '>', '<', 'LIKE', "<>", "!=", "NOT LIKE", 'IN', 'NOT IN', 'BETWEEN', 'NOT BETWEEN');
+    foreach ($filter as $operator => $criteria) {
+      if (in_array($operator, $acceptedSQLOperators)) {
+        switch ($operator) {
+          // unary operators
+          case 'IS NULL':
+          case 'IS NOT NULL':
+            if(!$returnSanitisedArray) {
+              return (sprintf('%s %s', $fieldName, $operator));
+            }
+            else{
+              return NULL;  // not yet implemented (tests required to implement)
+            }
+            break;
 
+          // ternary operators
+          case 'BETWEEN':
+          case 'NOT BETWEEN':
+            if (empty($criteria[0]) || empty($criteria[1])) {
+              throw new exception("invalid criteria for $operator");
+            }
+            if(!$returnSanitisedArray) {
+              return (sprintf('%s ' . $operator . ' "%s" AND "%s"', $fieldName, CRM_Core_DAO::escapeString($criteria[0]), CRM_Core_DAO::escapeString($criteria[1])));
+            }
+            else{
+              return NULL;  // not yet implemented (tests required to implement)
+            }
+            break;
+
+          // n-ary operators
+          case 'IN':
+          case 'NOT IN':
+            if (empty($criteria)) {
+              throw new exception("invalid criteria for $operator");
+            }
+            $escapedCriteria = array_map(array(
+              'CRM_Core_DAO',
+              'escapeString'
+            ), $criteria);
+            if(!$returnSanitisedArray) {
+              return (sprintf('%s %s ("%s")', $fieldName, $operator, implode('", "', $escapedCriteria)));
+            }
+            return $escapedCriteria;
+            break;
+
+          // binary operators
+
+          default:
+            if(!$returnSanitisedArray) {
+              return(sprintf('%s %s "%s"', $fieldName, $operator, CRM_Core_DAO::escapeString($criteria)));
+            }
+            else{
+              return NULL; // not yet implemented (tests required to implement)
+            }
+        }
+      }
+    }
+  }
+}

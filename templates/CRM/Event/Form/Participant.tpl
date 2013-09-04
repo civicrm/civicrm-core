@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -216,9 +216,8 @@
           {/if}
           <tr class="crm-participant-form-block-event_id">
             <td class="label">{$form.event_id.label}</td><td class="view-value bold">{$form.event_id.html}&nbsp;
-            {if $action eq 1 && !$past }
-              <br /><a href="#" onclick="buildSelect('event_id'); return false;"
-                       id='past-event'>&raquo; {ts}Include past event(s) in this select list.{/ts}</a>
+            {if $action eq 1}<span id='past-event-section'>
+              <br />&raquo; <span id="showing-event-info"></span>
             {/if}
             {if $is_test}
               {ts}(test){/ts}
@@ -285,19 +284,37 @@
     {literal}
     <script type="text/javascript">
     // event select
-    function buildSelect( selectID ) {
+    function buildSelect( selectID, listallVal ) {
       var elementID = '#' + selectID;
       cj( elementID ).html('');
       var postUrl = "{/literal}{crmURL p='civicrm/ajax/eventlist' h=0}{literal}";
-      cj.post( postUrl, null, function ( response ) {
+      cj.post( postUrl, {listall:listallVal}, function ( response ) {
         response = eval( response );
         for (i = 0; i < response.length; i++) {
           cj( elementID ).get(0).add(new Option(response[i].name, response[i].value), document.all ? i : null);
         }
-        cj('#past-event').hide( );
-        cj('input[name="past_event"]').val(1);
+        getShowEventInfo(listallVal);
+        cj('input[name="past_event"]').val(listallVal);
         cj("#feeBlock").html( '' );
       });
+    }
+
+    {/literal}
+    {if $action eq 1}getShowEventInfo({$past});{/if}
+    {literal}
+
+    function getShowEventInfo (listallVal) {
+      switch(listallVal) {
+        case 1:
+          cj('#showing-event-info').html({/literal}'{ts}Showing all events: show{/ts}'{literal}+' <a href="#" onclick="buildSelect(\'event_id\', 0); return false;">'+{/literal}'{ts}current and future{/ts}'{literal}+'</a> | <a href="#" onclick="buildSelect(\'event_id\', 2); return false;">'+{/literal}'{ts}past three months{/ts}'{literal}+'</a>');
+          break;
+        case 2:
+          cj('#showing-event-info').html({/literal}'{ts}Showing events since three months ago: show{/ts}'{literal}+' <a href="#" onclick="buildSelect(\'event_id\', 0); return false;">'+{/literal}'{ts}current and future{/ts}'{literal}+'</a> | <a href="#" onclick="buildSelect(\'event_id\', 1); return false;">'+{/literal}'{ts}all{/ts}'{literal}+'</a>');
+          break;
+        default:
+          cj('#showing-event-info').html({/literal}'{ts}Showing current and future events: show{/ts}'{literal}+' <a href="#" onclick="buildSelect(\'event_id\', 2); return false;">'+{/literal}'{ts}past three months{/ts}'{literal}+'</a> | <a href="#" onclick="buildSelect(\'event_id\', 1); return false;">'+{/literal}'{ts}all{/ts}'{literal}+'</a>');
+          break;
+      }
     }
     {/literal}
 

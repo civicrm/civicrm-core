@@ -1,43 +1,43 @@
-<?xml version="1.0" encoding="iso-8859-1" ?>  
+<?xml version="1.0" encoding="iso-8859-1" ?>
 
-<table>  
-  <base>CRM/Financial</base>  
-  <class>FinancialItem</class>  
-  <name>civicrm_financial_item</name>  
-  <add>4.3</add> 
+<table>
+  <base>CRM/Financial</base>
+  <class>FinancialItem</class>
+  <name>civicrm_financial_item</name>
+  <add>4.3</add>
   <comment>Financial data for civicrm_line_item, etc.</comment>
-  <log>true</log> 
-  <field>  
-    <name>id</name>  
+  <log>true</log>
+  <field>
+    <name>id</name>
     <type>int unsigned</type>
     <length>10</length>
-    <required>true</required>  
-    <comment></comment>  
+    <required>true</required>
+    <comment></comment>
     <add>4.3</add>
-  </field> 
-  <primaryKey>  
-    <name>id</name>  
-    <autoincrement>true</autoincrement>  
-  </primaryKey> 
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
   <field>
     <name>created_date</name>
     <type>timestamp</type>
-    <required>true</required> 
-    <default>CURRENT_TIMESTAMP</default>     
+    <required>true</required>
+    <default>CURRENT_TIMESTAMP</default>
     <comment>Date and time the item was created</comment>
     <add>4.3</add>
-  </field> 
+  </field>
   <field>
     <name>transaction_date</name>
     <type>datetime</type>
-    <required>true</required>      
+    <required>true</required>
     <comment>Date and time of the source transaction</comment>
     <add>4.3</add>
-  </field> 
+  </field>
   <field>
     <name>contact_id</name>
     <type>int unsigned</type>
-    <required>true</required> 
+    <required>true</required>
     <export>true</export>
     <comment>FK to Contact ID of contact the item is from</comment>
     <add>4.3</add>
@@ -56,18 +56,18 @@
     <comment>Human readable description of this item, to ease display without lookup of source item.</comment>
     <add>4.3</add>
   </field>
-  <field>     
-    <name>amount</name>  
+  <field>
+    <name>amount</name>
     <title>Amount</title>
     <type>decimal</type>
     <default>0</default>
-    <required>true</required> 
+    <required>true</required>
     <headerPattern>/unit?.?amoun/i</headerPattern>
     <dataPattern>/^\d+(\.\d{2})?$/</dataPattern>
-    <comment>Total amount of this item</comment>  
-    <add>4.3</add>  
+    <comment>Total amount of this item</comment>
+    <add>4.3</add>
   </field>
-  <field>     
+  <field>
     <name>currency</name>
     <export>true</export>
     <type>varchar</type>
@@ -77,7 +77,8 @@
     <pseudoconstant>
       <table>civicrm_currency</table>
       <keyColumn>name</keyColumn>
-      <labelColumn>symbol</labelColumn>
+      <labelColumn>full_name</labelColumn>
+      <nameColumn>numeric_code</nameColumn>
     </pseudoconstant>
   </field>
   <field>

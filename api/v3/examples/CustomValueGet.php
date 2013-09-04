@@ -1,72 +1,79 @@
 <?php
-
-/*
- /*this demonstrates the use of CustomValue get
+/**
+ * Test Generated example of using custom_value get API
+ * /*this demonstrates the use of CustomValue get *
  */
 function custom_value_get_example(){
-$params = array( 
+$params = array(
   'id' => 2,
-  'version' => 3,
   'entity_id' => 2,
 );
 
-  $result = civicrm_api( 'custom_value','get',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('custom_value', 'get', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function custom_value_get_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 7,
-  'values' => array( 
-      '1' => array( 
+  'values' => array(
+      '1' => array(
           'entity_id' => '2',
           'latest' => 'value 1',
           'id' => '1',
-          '0' => 'value 1',
         ),
-      '2' => array( 
+      '2' => array(
           'entity_id' => '2',
           'latest' => 'value 3',
           'id' => '2',
           '1' => 'value 2',
           '2' => 'value 3',
         ),
-      '3' => array( 
+      '3' => array(
           'entity_id' => '2',
           'latest' => '',
           'id' => '3',
           '1' => 'warm beer',
           '2' => '',
         ),
-      '4' => array( 
+      '4' => array(
           'entity_id' => '2',
           'latest' => '',
           'id' => '4',
           '1' => 'fl* w*',
           '2' => '',
         ),
-      '5' => array( 
+      '5' => array(
           'entity_id' => '2',
           'latest' => 'coffee',
           'id' => '5',
-          '1' => '',
+          '1' => 'defaultValue',
           '2' => 'coffee',
         ),
-      '6' => array( 
+      '6' => array(
           'entity_id' => '2',
           'latest' => 'value 4',
           'id' => '6',
           '1' => '',
           '2' => 'value 4',
         ),
-      '7' => array( 
+      '7' => array(
           'entity_id' => '2',
           'latest' => '',
           'id' => '7',
@@ -76,7 +83,7 @@ function custom_value_get_expectedresult(){
     ),
 );
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 

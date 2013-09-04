@@ -714,9 +714,12 @@ Alternatively you can get a version of CiviCRM that matches your PHP version
         // (since declaring optionGroupName means we are using the civicrm_option_value table)
         'optionGroupName',
         'table',
-        // Optional additional params will be passed into CRM_Core_PseudoConstant::get()
+        // If table is specified, keyColumn and labelColumn are also required
         'keyColumn',
         'labelColumn',
+        // Non-translated machine name for programmatic lookup. Defaults to 'name' if that column exists
+        'nameColumn',
+        // Where clause snippet (will be joined to the rest of the query with AND operator)
         'condition',
       );
       foreach ($validOptions as $pseudoOption) {

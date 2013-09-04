@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2010                                |
  +--------------------------------------------------------------------+
@@ -27,7 +27,7 @@
 {ts}Provider{/ts}
 {/htxt}
 {htxt id="id-provider"}
-<p>{ts}By default,CiviCRM uses the provider which are set active and the default provider is selected. User with administer CiviCRM permission can add a new Provider{/ts}</p>
+<p>{ts}By default, CiviCRM uses the provider which are set active and the default provider is selected. User with administer CiviCRM permission can add a new Provider{/ts}</p>
 {if $params.isAdmin}
     {capture assign="fromConfig"}{crmURL p="civicrm/admin/sms/provider" q="reset=1"}{/capture}
     <p>{ts 1=$fromConfig}Go to <a href='%1'>Administer CiviCRM &raquo; System Settings &raquo; SMS Providers</a> to add or edit the provider. Make sure these Providers are valid.{/ts}</p>

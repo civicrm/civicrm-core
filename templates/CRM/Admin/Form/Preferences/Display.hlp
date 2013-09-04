@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -33,5 +33,5 @@
 config.scayt_autoStartup = false;
 <p>{ts}To remove the Spell Check button, in packages/ckeditor/config.js - remove this item in the config.toolbar_Full list:{/ts}<br />
 'SpellChecker'
-<p>{ts}<strong>NOTE:</strong> If you are modifying config.js you should first have configured a Custom PHP Path under Global Settings > Directories, and place your modified version in the custom path.{/ts}</p>
+<p>{ts}<strong>NOTE:</strong> If you are modifying config.js you should first have configured a Custom PHP Path under Administer > System Settings > Directories, and place your modified version in the custom path.{/ts}</p>
 {/htxt}

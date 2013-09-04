@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -134,7 +134,7 @@ class CRM_Case_Page_AJAX {
       $caseStatuses = CRM_Case_PseudoConstant::caseStatus();
       $cs           = $caseStatuses[$dao->status_id];
       $caseDetails  = "<table><tr><td>" . ts('Case Subject') . "</td><td>{$dao->subject}</td></tr>
-                                    <tr><td>" . ts('Case Type') . "</td><td>{$caseType}</td></tr> 
+                                    <tr><td>" . ts('Case Type') . "</td><td>{$caseType}</td></tr>
                                     <tr><td>" . ts('Case Status') . "</td><td>{$cs}</td></tr>
                                     <tr><td>" . ts('Case Start Date') . "</td><td>" . CRM_Utils_Date::customFormat($dao->start_date) . "</td></tr>
                                     <tr><td>" . ts('Case End Date') . "</td><td></td></tr>" . CRM_Utils_Date::customFormat($dao->end_date) . "</table>";

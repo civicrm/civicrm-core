@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright (C) 2011 Marty Wright                                    |
  | Licensed to CiviCRM under the Academic Free License version 3.0.   |
@@ -26,51 +26,56 @@
 *}
 {* this template is for configuring label formats *}
 <div class="help">
-    {ts}You can configure one or more Label Formats for your CiviCRM installation. Label Formats are used when creating mailing labels.{/ts}
+  {ts}You can configure one or more Label Formats for your CiviCRM installation. Label Formats are used when creating mailing labels.{/ts}
 </div>
 {if $action eq 1 or $action eq 2 or $action eq 8 or $action eq 16384}
-   {include file="CRM/Admin/Form/LabelFormats.tpl"}
+  {include file="CRM/Admin/Form/LabelFormats.tpl"}
 {else}
 
-{if $rows}
-<div id="ltype">
-        {strip}
+  {if $rows}
+    <div id="ltype">
+      {strip}
         {include file="CRM/common/jsortable.tpl"}
         <table id="labelFormats" class="display">
-        <thead>
-        <tr class="columnheader">
+          <thead>
+          <tr class="columnheader">
             <th class="sortable">{ts}Name{/ts}</th>
+            <th class="sortable">{ts}Used for{/ts}</th>
             <th class="sortable">{ts}Grouping{/ts}</th>
-            <th >{ts}Default?{/ts}</th>
-            <th >{ts}Reserved?{/ts}</th>
+            <th>{ts}Default?{/ts}</th>
+            <th>{ts}Reserved?{/ts}</th>
             <th id="order" class="sortable">{ts}Order{/ts}</th>
             <th class="hiddenElement"></th>
-            <th ></th>
-        </tr>
-        </thead>
-        {foreach from=$rows item=row}
-        <tr id="row_{$row.id}" class="crm-labelFormat {cycle values="odd-row,even-row"} {$row.class}">
-            <td class="crm-labelFormat-name">{$row.label}</td>
-            <td class="crm-labelFormat-description">{$row.grouping}</td>
-            <td class="crm-labelFormat-is_default">{if $row.is_default eq 1}<img src="{$config->resourceBase}i/check.gif" alt="{ts}Default{/ts}" />{/if}&nbsp;</td>
-            <td class="crm-labelFormat-is_reserved">{if $row.is_reserved eq 1}{ts}Yes{/ts}{else}{ts}No{/ts}{/if}&nbsp;</td>
-          <td class="crm-labelFormat-order nowrap">{$row.order}</td>
-          <td class="order hiddenElement">{$row.weight}</td>
-          <td>{$row.action|replace:'xx':$row.id}</td>
-        </tr>
-        {/foreach}
+            <th></th>
+          </tr>
+          </thead>
+          {foreach from=$rows item=row}
+            <tr id="row_{$row.id}" class="crm-labelFormat {cycle values="odd-row,even-row"} {$row.class}">
+              <td class="crm-labelFormat-name">{$row.label}</td>
+              <td class="crm-labelFormat-name">{$row.groupName}</td>
+              <td class="crm-labelFormat-description">{$row.grouping}</td>
+              <td class="crm-labelFormat-is_default">{if $row.is_default eq 1}<img
+                src="{$config->resourceBase}i/check.gif" alt="{ts}Default{/ts}"/>{/if}&nbsp;</td>
+              <td class="crm-labelFormat-is_reserved">{if $row.is_reserved eq 1}{ts}Yes{/ts}{else}{ts}No{/ts}{/if}
+                &nbsp;</td>
+              <td class="crm-labelFormat-order nowrap">{$row.order}</td>
+              <td class="order hiddenElement">{$row.weight}</td>
+              <td>{$row.action|replace:'xx':$row.id}</td>
+            </tr>
+          {/foreach}
         </table>
-        {/strip}
+      {/strip}
 
       <div class="action-link">
-      <a href="{crmURL q="action=add&reset=1"}" id="newLabelFormat" class="button"><span><div class="icon add-icon"></div>{ts}Add Label Format{/ts}</span></a>
-        </div>
-</div>
-{else}
+        <a href="{crmURL q="action=add&reset=1"}" id="newLabelFormat" class="button"><span><div
+              class="icon add-icon"></div>{ts}Add Label Format{/ts}</span></a>
+      </div>
+    </div>
+  {else}
     <div class="messages status no-popup">
       <div class="icon inform-icon"></div>
-        {capture assign=crmURL}{crmURL p='civicrm/admin/labelFormats' q="action=add&reset=1"}{/capture}
-        {ts 1=$crmURL}There are no Label Formats configured. You can <a href='%1'>add one</a>.{/ts}
+      {capture assign=crmURL}{crmURL p='civicrm/admin/labelFormats' q="action=add&reset=1"}{/capture}
+      {ts 1=$crmURL}There are no Label Formats configured. You can<a href='%1'>add one</a>.{/ts}
     </div>
-{/if}
+  {/if}
 {/if}

@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -216,7 +216,7 @@ function civicrm_config(&$config) {
 
   $params['siteKey'] = md5(uniqid('', TRUE) . $params['baseURL']);
 
-  $str = file_get_contents($tplPath . 'civicrm.settings.php.tpl');
+  $str = file_get_contents($tplPath . 'civicrm.settings.php.template');
   foreach ($params as $key => $value) {
     $str = str_replace('%%' . $key . '%%', $value, $str);
   }

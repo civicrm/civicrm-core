@@ -2,7 +2,7 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -67,6 +67,16 @@ class CRM_Report_Form_Contribute_Repeat extends CRM_Report_Form {
             'no_display' => TRUE,
             'required' => TRUE,
           ),
+          'contact_type' =>
+          array(
+            'title' => ts('Contact Type'),
+            'no_repeat' => TRUE,
+          ),
+          'contact_sub_type' =>
+          array(
+            'title' => ts('Contact SubType'),
+            'no_repeat' => TRUE,
+          ),
         ),
         'filters' =>
         array(
@@ -121,7 +131,7 @@ class CRM_Report_Form_Contribute_Repeat extends CRM_Report_Form {
         'fields' =>
         array(
           'street_address' => array('title' => ts('Street Address')),
-          'supplemental_address_1' => array('title' => ts('Additional Address')),
+          'supplemental_address_1' => array('title' => ts('Supplemental Address 1')),
           'city' => array('title' => ts('City')),
           'country_id' => array('title' => ts('Country')),
           'state_province_id' => array('title' => ts('State/Province')),
@@ -454,6 +464,8 @@ LEFT JOIN civicrm_temp_civireport_repeat2 {$this->_aliases['civicrm_contribution
         'sort_name',
         'display_name',
         'addressee_display',
+        'contact_type',
+        'contact_sub_type',
         'email',
         'phone',
         'state_province_id',

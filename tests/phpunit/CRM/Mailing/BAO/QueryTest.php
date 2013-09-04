@@ -33,6 +33,7 @@ class CRM_Mailing_BAO_QueryTest extends CiviUnitTestCase {
       'civicrm_mailing_trackable_url',
       'civicrm_mailing_job',
       'civicrm_mailing',
+      'civicrm_mailing_recipients',
       'civicrm_email',
       'civicrm_contact',
     );
@@ -53,6 +54,10 @@ class CRM_Mailing_BAO_QueryTest extends CiviUnitTestCase {
 
     $params = CRM_Contact_BAO_Query::convertFormValues($fv);
     $obj    = new CRM_Contact_BAO_Query($params);
+
+    // let's set useGroupBy=true, to prevent duplicate records
+    $obj->_useGroupBy = TRUE;
+
     $dao    = $obj->searchQuery();
 
     $contacts = array();

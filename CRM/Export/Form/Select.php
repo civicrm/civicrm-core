@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -105,14 +105,37 @@ class CRM_Export_Form_Select extends CRM_Core_Form {
     }
     else {
       // we need to determine component export
-      $stateMachine  = &$this->controller->getStateMachine();
+      $stateMachine  = $this->controller->getStateMachine();
+
       $formName      = CRM_Utils_System::getClassName($stateMachine);
       $componentName = explode('_', $formName);
       $components    = array('Contribute', 'Member', 'Event', 'Pledge', 'Case', 'Grant', 'Activity');
 
       if (in_array($componentName[1], $components)) {
-        $fieldName = strtoupper($componentName[1]) . '_EXPORT';
-        $this->_exportMode = self::$fieldName;
+        switch ($componentName[1]) {
+          case 'Contribute':
+            $this->_exportMode = self::CONTRIBUTE_EXPORT;
+            break;
+          case 'Member':
+            $this->_exportMode = self::MEMBER_EXPORT;
+            break;
+          case 'Event':
+            $this->_exportMode = self::EVENT_EXPORT;
+            break;
+          case 'Pledge':
+            $this->_exportMode = self::PLEDGE_EXPORT;
+            break;
+          case 'Case':
+            $this->_exportMode = self::CASE_EXPORT;
+            break;
+          case 'Grant':
+            $this->_exportMode = self::GRANT_EXPORT;
+            break;
+          case 'Activity':
+            $this->_exportMode = self::ACTIVITY_EXPORT;
+            break;
+        }
+
         $className = "CRM_{$componentName[1]}_Form_Task";
         $className::preProcessCommon( $this, true );
         $values = $this->controller->exportValues('Search');
@@ -316,7 +339,7 @@ FROM   {$this->_componentTable}
    * @access public
    * @static
    */
-  public function formRule($params, $files, $self) {
+  static public function formRule($params, $files, $self) {
     $errors = array();
 
     if (CRM_Utils_Array::value('mergeOption', $params) == self::EXPORT_MERGE_SAME_ADDRESS &&

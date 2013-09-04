@@ -1,41 +1,51 @@
 <?php
-
-/*
- 
+/**
+ * Test Generated example of using mailing_group subscribe API
+ * *
  */
 function mailing_group_subscribe_example(){
-$params = array( 
+$params = array(
   'email' => 'test@test.test',
   'group_id' => 2,
   'contact_id' => 3,
-  'version' => 3,
   'hash' => 'b15de8b64e2cec34',
   'time_stamp' => '20101212121212',
 );
 
-  $result = civicrm_api( 'mailing_group','subscribe',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('mailing_group', 'subscribe', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function mailing_group_subscribe_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
-  'count' => 4,
-  'values' => array( 
-      'contact_id' => '3',
-      'subscribe_id' => '1',
-      'hash' => '36e4a45e541c4aa3',
-      'is_error' => 0,
+  'count' => 1,
+  'id' => 1,
+  'values' => array(
+      '1' => array(
+          'contact_id' => '3',
+          'subscribe_id' => '1',
+          'hash' => '67eac7789eaee00',
+        ),
     ),
 );
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 

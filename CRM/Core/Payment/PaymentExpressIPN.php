@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -158,11 +158,6 @@ class CRM_Core_Payment_PaymentExpressIPN extends CRM_Core_Payment_BaseIPN {
     }
 
     $transaction = new CRM_Core_Transaction();
-
-    // fix for CRM-2842
-    // if ( ! $this->createContact( $input, $ids, $objects ) ) {
-    //     return false;
-    // }
 
     // check if contribution is already completed, if so we ignore this ipn
 

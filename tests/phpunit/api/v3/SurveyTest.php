@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -36,18 +36,27 @@ require_once 'CiviTest/CiviUnitTestCase.php';
  */
 
 require_once 'CiviTest/CiviUnitTestCase.php';
+
+/**
+ * All API should contain at minimum a success test for each
+ * function - in this case - create, get & delete
+ * In addition any extra functionality should be tested & documented
+ *
+ * Failure tests should be added for specific api behaviours but note that
+ * many generic patterns are tested in the syntax conformance test
+ *
+ * @author eileen
+ *
+ */
 class api_v3_SurveyTest extends CiviUnitTestCase {
-  protected $_apiversion;
   protected $params;
-  protected $id;
+  protected $entity = 'survey';
   public $DBResetRequired = FALSE;
+  public $_eNoticeCompliant = TRUE;
 
   function setUp() {
-    $this->_apiversion = 3;
-    $phoneBankActivity = civicrm_api('Option_value', 'Get', array('label' => 'PhoneBank', 'version' => $this->_apiversion, 'sequential' => 1));
-    $phoneBankActivityTypeID = $phoneBankActivity['values'][0]['value'];
+    $phoneBankActivityTypeID = $this->callAPISuccessGetValue('Option_value', array('label' => 'PhoneBank', 'return' => 'id'), 'integer');
     $this->params = array(
-      'version' => 3,
       'title' => "survey title",
       'activity_type_id' => $phoneBankActivityTypeID,
       'max_number_of_contacts' => 12,
@@ -56,50 +65,65 @@ class api_v3_SurveyTest extends CiviUnitTestCase {
     parent::setUp();
   }
 
-  function tearDown() {}
+/**
+ * Here we clean up any test data we created.
+ * Note that the quickCleanup function turns off Foreign keys first
+ * so will not remove related entities
+ */
+  function tearDown() {
+    $tablesToTruncate = array('civicrm_survey');
+    $this->quickCleanup($tablesToTruncate);
+  }
 
+  /**
+   * test create function succeeds
+   */
   public function testCreateSurvey() {
-    $result = civicrm_api('survey', 'create', $this->params);
-    $this->documentMe($this->params, $result, __FUNCTION__, __FILE__);
-    $this->assertAPISuccess($result, 'In line ' . __LINE__);
-    $this->assertEquals(1, $result['count'], 'In line ' . __LINE__);
-    $this->assertNotNull($result['values'][$result['id']]['id'], 'In line ' . __LINE__);
+    $result = $this->callAPIAndDocument('survey', 'create', $this->params, __FUNCTION__, __FILE__);
+    $this->getAndCheck($this->params, $result['id'], $this->entity);
   }
 
+  /**
+   * Test get function succeeds (this is actually largely tested in the get
+   * action on create. Add extra checks for any 'special' return values or
+   * behaviours
+   *
+   */
   public function testGetSurvey() {
-
-    $result = civicrm_api('survey', 'get', $this->params);
-    $this->documentMe($this->params, $result, __FUNCTION__, __FILE__);
-    $this->assertAPISuccess($result, 'In line ' . __LINE__);
+    $this->createTestEntity();
+    $result = $this->callAPIAndDocument('survey', 'get', $this->params, __FUNCTION__, __FILE__);
     $this->assertEquals(1, $result['count'], 'In line ' . __LINE__);
     $this->assertNotNull($result['values'][$result['id']]['id'], 'In line ' . __LINE__);
-    $this->id = $result['id'];
   }
 
+/**
+ * Check the delete function succeeds
+ */
   public function testDeleteSurvey() {
-    $entity = civicrm_api('survey', 'get', $this->params);
-    $result = civicrm_api('survey', 'delete', array('version' => 3, 'id' => $entity['id']));
-    $this->documentMe($this->params, $result, __FUNCTION__, __FILE__);
-    $this->assertAPISuccess($result, 'In line ' . __LINE__);
-    $checkDeleted = civicrm_api('survey', 'get', array(
-      'version' => 3,
+    $entity = $this->createTestEntity();
+    $result = $this->callAPIAndDocument('survey', 'delete', array('id' => $entity['id']), __FUNCTION__, __FILE__);
+    $checkDeleted = $this->callAPISuccess($this->entity, 'get', array(
       ));
     $this->assertEquals(0, $checkDeleted['count'], 'In line ' . __LINE__);
   }
 
+  /**
+   * test & document chained delete pattern. Note that explanation of the pattern
+   * is best put in the $description variable as it will then be displayed in the
+   * test generated examples. (these are to be found in the api/examples folder)
+   *
+   */
   public function testGetSurveyChainDelete() {
     $description = "demonstrates get + delete in the same call";
     $subfile     = 'ChainedGetDelete';
     $params      = array(
-      'version' => 3,
       'title' => "survey title",
       'api.survey.delete' => 1,
     );
-    $result = civicrm_api('survey', 'create', $this->params);
-    $result = civicrm_api('survey', 'get', $params);
-    $this->documentMe($params, $result, __FUNCTION__, __FILE__, $description, $subfile);
-    $this->assertAPISuccess($result, 'In line ' . __LINE__);
-    $this->assertEquals(0, civicrm_api('survey', 'getcount', array('version' => 3)), 'In line ' . __LINE__);
+    $result = $this->callAPISuccess('survey', 'create', $this->params);
+    $result = $this->callAPIAndDocument('survey', 'get', $params, __FUNCTION__, __FILE__, $description, $subfile);
+    $this->assertEquals(0, $this->callAPISuccess('survey', 'getcount', array()), 'In line ' . __LINE__);
   }
+
 }
 

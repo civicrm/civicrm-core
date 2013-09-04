@@ -57,18 +57,18 @@
 				// initialize the alternate select multiple
 
 				// this loop ensures uniqueness, in case of existing crmasmSelects placed by ajax (1.0.3)
-				while($("#" + options.containerClass + index).size() > 0) index++; 
+				while($("#" + options.containerClass + index).size() > 0) index++;
 
 				$select = $("<select></select>")
 					.addClass(options.selectClass)
 					.attr('name', options.selectClass + index)
-					.attr('id', options.selectClass + index); 
+					.attr('id', options.selectClass + index);
 
-				$selectRemoved = $("<select></select>"); 
+				$selectRemoved = $("<select></select>");
 
 				$ol = $("<" + options.listType + "></" + options.listType + ">")
 					.addClass(options.listClass)
-					.attr('id', options.listClass + index); 
+					.attr('id', options.listClass + index);
 
 				$container = $("<div></div>")
 					.addClass(options.containerClass) 
@@ -410,11 +410,12 @@
 					'id': optionId,
 					'item': $ol.children("[rel=" + optionId + "]"),
 					'type': type
-				}]); 
+				}]);
 			}
 
 			init();
 		});
 	};
 
-})(jQuery); 
+})(jQuery);
+

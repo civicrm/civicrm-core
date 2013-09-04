@@ -30,7 +30,7 @@
        <table>civicrm_domain</table>
        <key>id</key>
        <add>4.1</add>
-  </foreignKey>  
+  </foreignKey>
   <field>
        <name>run_time</name>
        <type>timestamp</type>
@@ -69,5 +69,5 @@
        <type>text</type>
        <comment>Potential extended data for specific job run (e.g. tracebacks).</comment>
        <add>4.1</add>
-  </field>  
+  </field>
 </table>

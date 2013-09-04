@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -27,11 +27,11 @@
    <fieldset class="crm-group crm_user-group">
       <div class="messages help cms_user_help-section">
    {if !$isCMS}
-      {ts}If you would like to create an account on this site, check the box below and enter a user name{/ts}{if $form.cms_pass} {ts}and a password{/ts}.{/if}
+      {ts}If you would like to create an account on this site, check the box below and enter a Username{/ts}{if $form.cms_pass} {ts}and a password{/ts}.{/if}
    {else}
-      {ts}Please enter a user name to create an account.{/ts}
+      {ts}Please enter a Username to create an account.{/ts}
    {/if}
-   {ts 1=$loginURL}If you already have an account, <a href='%1'>please login</a> before completing this form.{/ts}
+   {ts 1=$loginURL}If you already have an account <a href='%1'>please login</a> before completing this form.{/ts}
       </div>
       <div>{$form.cms_create_account.html} {$form.cms_create_account.label}</div>
       <div id="details" class="crm_user_signup-section">
@@ -44,7 +44,7 @@
              <div class="content">
                {$form.cms_name.html} <a id="checkavailability" href="#" onClick="return false;">{ts}<strong>Check Availability</strong>{/ts}</a>
                <span id="msgbox" style="display:none"></span><br />
-               <span class="description">{ts}Your preferred username; punctuation is not allowed except for periods, hyphens, and underscores.{/ts}</span>
+               <span class="description">{ts}Punctuation is not allowed in a Username with the exception of periods, hyphens and underscores.{/ts}</span>
              </div>
            </div>
 

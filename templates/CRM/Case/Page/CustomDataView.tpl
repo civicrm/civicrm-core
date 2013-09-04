@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -23,6 +23,10 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
+{* include wysiwyg related files*}
+{if !$includeWysiwygEditor}
+  {include file="CRM/common/wysiwyg.tpl" includeWysiwygEditor=true}
+{/if}
 {* Custom Data view mode*}
 {foreach from=$viewCustomData item=customValues key=customGroupId}
   {foreach from=$customValues item=cd_edit key=cvID}
@@ -48,8 +52,8 @@
               {if $element.field_type == 'File'}
                 {if $element.field_value.displayURL}
                   <td class="html-adjust">
-                    <a href="#" onclick="imagePopUp('{$element.field_value.imageURL}'); return false;">
-                    <img src="{$element.field_value.displayURL}" height = "100" width="100">
+                    <a href="{$element.field_value.displayURL}" class='crm-image-popup'>
+                      <img src="{$element.field_value.displayURL}" height = "100" width="100">
                     </a>
                   </td>
                   {else}

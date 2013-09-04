@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -114,7 +114,7 @@ LEFT JOIN civicrm_email      ON contact_a.id = civicrm_email.contact_id
       );
       _civicrm_api3_deprecated_add_formatted_param($value, $formatted);
 
-      $formatted['onDuplicate'] = CRM_Contact_Import_Parser::DUPLICATE_SKIP;
+      $formatted['onDuplicate'] = CRM_Import_Parser::DUPLICATE_SKIP;
       $formatted['fixAddress'] = TRUE;
       require_once 'api/api.php';
       $contact = civicrm_api('contact', 'create', $formatted);
@@ -315,7 +315,7 @@ SELECT     civicrm_email.id as email_id
    * @return array $groups    array of group ids
    * @access public
    */
-  function getContactGroups($email, $contactID = NULL) {
+  public static function getContactGroups($email, $contactID = NULL) {
     if ($contactID) {
       $query = "
                  SELECT DISTINCT group_a.group_id, group_a.status, civicrm_group.title

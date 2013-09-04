@@ -1,21 +1,29 @@
 <?php
-
-/*
- Get entities and location block in 1 api call
+/**
+ * Test Generated example of using loc_block get API
+ * Get entities and location block in 1 api call *
  */
 function loc_block_get_example(){
 $params = array(
-  'version' => 3,
   'id' => 3,
   'return' => 'all',
 );
 
-  $result = civicrm_api( 'loc_block','get',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('loc_block', 'get', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function loc_block_get_expectedresult(){
@@ -61,7 +69,7 @@ function loc_block_get_expectedresult(){
     ),
 );
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 

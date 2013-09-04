@@ -1,31 +1,39 @@
 <?php
-
-/*
- 
+/**
+ * Test Generated example of using line_item get API
+ * *
  */
 function line_item_get_example(){
-$params = array( 
-  'version' => 3,
+$params = array(
   'entity_table' => 'civicrm_contribution',
 );
 
-  $result = civicrm_api( 'line_item','get',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('line_item', 'get', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function line_item_get_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
   'id' => 1,
-  'values' => array( 
-      '1' => array( 
+  'values' => array(
+      '1' => array(
           'id' => '1',
           'entity_table' => 'civicrm_contribution',
           'entity_id' => '1',
@@ -35,13 +43,13 @@ function line_item_get_expectedresult(){
           'unit_price' => '100.00',
           'line_total' => '100.00',
           'price_field_value_id' => '1',
-          'financial_type_id' => '3',
+          'financial_type_id' => '1',
           'deductible_amount' => '0.00',
         ),
     ),
 );
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 

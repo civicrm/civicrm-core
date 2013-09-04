@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -409,8 +409,8 @@ class CRM_Utils_String {
    * @static
    */
   static function htmlToText($html) {
-    require_once 'packages/html2text/class.html2text.inc';
-    $converter = new html2text($html);
+    require_once 'packages/html2text/rcube_html2text.php';
+    $converter = new rcube_html2text($html);
     return $converter->get_text();
   }
 

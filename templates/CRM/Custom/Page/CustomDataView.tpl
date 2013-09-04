@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -77,12 +77,15 @@
                       <td class="label">{$element.field_title}</td>
                       {if $element.field_type == 'File'}
                         {if $element.field_value.displayURL}
-                          <td class="html-adjust"><a href="#"
-                                                     onclick="imagePopUp('{$element.field_value.imageURL}'); return false;"><img
-                                src="{$element.field_value.displayURL}" height="100" width="100"></a></td>
+                          <td class="html-adjust">
+                            <a href="{$element.field_value.displayURL}" class='crm-image-popup'>
+                              <img src="{$element.field_value.displayURL}" height="100" width="100">
+                            </a>
+                          </td>
                         {else}
-                          <td class="html-adjust"><a
-                              href="{$element.field_value.fileURL}">{$element.field_value.fileName}</a></td>
+                          <td class="html-adjust">
+                            <a href="{$element.field_value.fileURL}">{$element.field_value.fileName}</a>
+                          </td>
                         {/if}
                       {else}
                         {if $element.field_data_type == 'Money'}

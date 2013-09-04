@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -219,7 +219,7 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
     $includeSkipButton = TRUE;
     $this->_resetAllowWaitlist = FALSE;
 
-    $pricesetFieldsCount = CRM_Price_BAO_Set::getPricesetCount($this->_priceSetId);
+    $pricesetFieldsCount = CRM_Price_BAO_PriceSet::getPricesetCount($this->_priceSetId);
 
     if ($this->_lastParticipant || $pricesetFieldsCount) {
       //get the participant total.
@@ -487,7 +487,7 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
     }
 
     if ($button == 'skip' && $self->_lastParticipant && CRM_Utils_Array::value('priceSetId', $fields)) {
-      $pricesetFieldsCount = CRM_Price_BAO_Set::getPricesetCount($fields['priceSetId']);
+      $pricesetFieldsCount = CRM_Price_BAO_PriceSet::getPricesetCount($fields['priceSetId']);
       if (($pricesetFieldsCount < 1) || $self->_allowConfirmation) {
         return $errors;
       }
@@ -532,7 +532,7 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
     $validatePayement = FALSE;
     if (CRM_Utils_Array::value('priceSetId', $fields)) {
       $lineItem = array();
-      CRM_Price_BAO_Set::processAmount($self->_values['fee'], $fields, $lineItem);
+      CRM_Price_BAO_PriceSet::processAmount($self->_values['fee'], $fields, $lineItem);
       if ($fields['amount'] > 0) {
         $validatePayement = TRUE;
         // $self->_forcePayement = true;
@@ -667,7 +667,7 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
         }
         else {
           $lineItem = array();
-          CRM_Price_BAO_Set::processAmount($this->_values['fee'], $params, $lineItem);
+          CRM_Price_BAO_PriceSet::processAmount($this->_values['fee'], $params, $lineItem);
 
           //build the line item..
           if (array_key_exists($addParticipantNum, $this->_lineItem)) {
@@ -729,7 +729,7 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
     }
   }
 
-  function &getPages($additionalParticipant) {
+  public static function &getPages($additionalParticipant) {
     $details = array();
     for ($i = 1; $i <= $additionalParticipant; $i++) {
       $details["Participant_{$i}"] = array(

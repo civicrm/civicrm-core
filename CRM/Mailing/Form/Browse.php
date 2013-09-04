@@ -2,7 +2,7 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -103,7 +103,7 @@ class CRM_Mailing_Form_Browse extends CRM_Core_Form {
       CRM_Mailing_BAO_Mailing::del($this->_mailingId);
     }
     elseif ($this->_action & CRM_Core_Action::DISABLE) {
-      CRM_Mailing_BAO_Job::cancel($this->_mailingId);
+      CRM_Mailing_BAO_MailingJob::cancel($this->_mailingId);
     }
     elseif ($this->_action & CRM_Core_Action::RENEW) {
       //set is_archived to 1

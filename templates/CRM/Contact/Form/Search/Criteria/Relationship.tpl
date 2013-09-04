@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -31,7 +31,7 @@
         {$form.relation_type_id.html}
       </td>
       <td>
-         <div class="relation-type-dependent">
+         <div>
            {$form.relation_target_name.label}<br />
            {$form.relation_target_name.html|crmAddClass:huge}
             <div class="description font-italic">
@@ -40,7 +40,7 @@
           </div>
       </td>
     </tr>
-    <tr class="relation-type-dependent">
+    <tr>
       <td>
          {$form.relation_status.label}<br />
          {$form.relation_status.html}
@@ -50,11 +50,17 @@
         {$form.relation_target_group.html|crmAddClass:huge}
       </td>
     </tr>
-    <tr class="relation-type-dependent"> 
-      <td colspan="2"><label>{ts}Start/End Dates{/ts}</label></td>
+    <tr>
+      <td colspan="2"><label>{ts}Start Date{/ts}</label></td>
     </tr>
-    <tr class="relation-type-dependent">
-      {include file="CRM/Core/DateRange.tpl" fieldName="relation_date" from='_low' to='_high'}
+    <tr>
+      {include file="CRM/Core/DateRange.tpl" fieldName="relation_start_date" from='_low' to='_high'}
+    </tr>
+    <tr>
+      <td colspan="2"><label>{ts}End Date{/ts}</label></td>
+    </tr>
+    <tr>
+      {include file="CRM/Core/DateRange.tpl" fieldName="relation_end_date" from='_low' to='_high'}
     </tr>
     {if $relationshipGroupTree}
       <tr>
@@ -73,13 +79,6 @@
           sortable: true,
           respectParents: true
       });
-      cj("#relation_type_id").change(function() {
-        if (cj(this).val() == '') {
-          cj('.relation-type-dependent').hide();
-        } else {
-          cj('.relation-type-dependent').show();
-        }
-      }).change();
     </script>
   {/literal}
 </div>

@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -360,13 +360,13 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
 
   /**
    */
-  function webtestFillAutocomplete($sortName) {
-    $this->click('contact_1');
-    $this->type('contact_1', $sortName);
-    $this->typeKeys('contact_1', $sortName);
+  function webtestFillAutocomplete($sortName, $fieldName = 'contact_1') {
+    $this->click($fieldName);
+    $this->type($fieldName, $sortName);
+    $this->typeKeys($fieldName, $sortName);
     $this->waitForElementPresent("css=div.ac_results-inner li");
     $this->click("css=div.ac_results-inner li");
-    $this->assertContains($sortName, $this->getValue('contact_1'), "autocomplete expected $sortName but didn’t find it in " . $this->getValue('contact_1'));
+    $this->assertContains($sortName, $this->getValue($fieldName), "autocomplete expected $sortName but didn’t find it in " . $this->getValue($fieldName));
   }
 
   /**
@@ -496,14 +496,20 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
 
   /**
    */
-  function webtestNewDialogContact($fname = 'Anthony', $lname = 'Anderson', $email = 'anthony@anderson.biz', $type = 4, $selectId = 'profiles_1', $row = 1) {
+  function webtestNewDialogContact($fname = 'Anthony', $lname = 'Anderson', $email = 'anthony@anderson.biz',
+                                   $type = 4, $selectId = 'profiles_1', $row = 1, $prefix = '') {
     // 4 - Individual profile
     // 5 - Organization profile
     // 6 - Household profile
     $this->select($selectId, "value={$type}");
 
     // create new contact using dialog
-    $this->waitForElementPresent("css=div#contact-dialog-{$row}");
+    if (!$prefix) {
+      $this->waitForElementPresent("css=div#contact-dialog-{$row}");
+    }
+    else {
+      $this->waitForElementPresent("css=div#contact-dialog-{$prefix}_{$row}");
+    }
     $this->waitForElementPresent('_qf_Edit_next');
 
     switch ($type) {
@@ -526,7 +532,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
 
     // Is new contact created?
     if ($lname) {
-      $this->assertTrue($this->isTextPresent("$lname, $fname has been created."), "Status message didn't show up after saving!");
+      $this->assertTrue($this->isTextPresent("$fname $lname has been created."), "Status message didn't show up after saving!");
     }
     else {
       $this->assertTrue($this->isTextPresent("$fname has been created."), "Status message didn't show up after saving!");
@@ -681,6 +687,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     $this->type('billing_city-5', 'San Bernadino');
     $this->click('billing_state_province_id-5');
     $this->select('billing_state_province_id-5', 'label=California');
+    $this->select('billing_country_id-5', 'value=1228');
     $this->type('billing_postal_code-5', '93245');
 
     return array($firstName, $middleName, $lastName);
@@ -891,7 +898,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
       if ($payLater) {
         $this->click('is_pay_later');
         $this->type('pay_later_text', "Pay later label $hash");
-        $this->type('pay_later_receipt', "Pay later instructions $hash");
+        $this->fillRichTextField('pay_later_receipt', "Pay later instructions $hash");
       }
 
       if ($pledges) {
@@ -1323,10 +1330,10 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     // Is status message correct?
     $this->assertTrue($this->isTextPresent("Activity '$subject' has been saved."), "Status message didn't show up after saving!");
 
-    $this->waitForElementPresent("xpath=//div[@id='Activities']//table/tbody/tr[2]/td[9]/span/a[text()='View']");
+    $this->waitForElementPresent("xpath=//div[@id='Activities']//table/tbody/tr[2]/td[8]/span/a[text()='View']");
 
     // click through to the Activity view screen
-    $this->click("xpath=//div[@id='Activities']//table/tbody/tr[2]/td[9]/span/a[text()='View']");
+    $this->click("xpath=//div[@id='Activities']//table/tbody/tr[2]/td[8]/span/a[text()='View']");
     $this->waitForElementPresent('_qf_Activity_cancel-bottom');
 
     // parse URL to grab the activity id

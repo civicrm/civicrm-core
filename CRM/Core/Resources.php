@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -201,7 +201,7 @@ class CRM_Core_Resources {
    * From javascript:
    * CRM.myNamespace.foo // "bar"
    *
-   * @see http://wiki.civicrm.org/confluence/display/CRMDOC43/Javascript+Reference
+   * @see http://wiki.civicrm.org/confluence/display/CRMDOC/Javascript+Reference
    *
    * @param $settings array
    * @return CRM_Core_Resources
@@ -275,7 +275,7 @@ class CRM_Core_Resources {
    * Add translated string to the js CRM object.
    * It can then be retrived from the client-side ts() function
    * Variable substitutions can happen from client-side
-   * 
+   *
    * Note: this function rarely needs to be called directly and is mostly for internal use.
    * @see CRM_Core_Resources::addScriptFile which automatically adds translated strings from js files
    *
@@ -453,9 +453,10 @@ class CRM_Core_Resources {
         }
       }
 
-      // Initialize CRM.url
+      // Initialize CRM.url and CRM.formatMoney
       $url = CRM_Utils_System::url('civicrm/example', 'placeholder', FALSE, NULL, FALSE);
-      $js = "CRM.url('init', '$url');";
+      $js = "CRM.url('init', '$url');\n";
+      $js .= "CRM.formatMoney('init', '" . CRM_Utils_Money::format(1234.56) . "');";
       $this->addScript($js, $jsWeight++, $region);
 
       // Add global settings

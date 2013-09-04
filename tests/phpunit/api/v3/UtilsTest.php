@@ -1,8 +1,7 @@
 <?php
-
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -35,7 +34,7 @@ require_once 'CRM/Utils/DeprecatedUtils.php';
  * @package   CiviCRM
  */
 class api_v3_UtilsTest extends CiviUnitTestCase {
-  protected $_apiversion;
+  protected $_apiversion = 3;
   public $DBResetRequired = FALSE;
   public $_eNoticeCompliant = TRUE;
   public $_contactID = 1;
@@ -48,7 +47,6 @@ class api_v3_UtilsTest extends CiviUnitTestCase {
    */
   protected function setUp() {
     parent::setUp();
-    $this->_apiversion = 3;
   }
 
   /**
@@ -119,7 +117,7 @@ class api_v3_UtilsTest extends CiviUnitTestCase {
       'contact_id' => $this->_contactID,
       'modified_date' => '2011-01-31',
       'subject' => NULL,
-      'version' => $this->_apiversion,
+      'version' => $this->_apiversion
     );
     try {
       $result = civicrm_api3_verify_mandatory($params, 'CRM_Core_BAO_Note', array('note', 'subject'));
@@ -162,7 +160,7 @@ class api_v3_UtilsTest extends CiviUnitTestCase {
      */
   function testVerifyOneMandatoryOneSet() {
     _civicrm_api3_initialize(TRUE);
-    $params = array('entity_table' => 'civicrm_contact', 'note' => 'note', 'contact_id' => $this->_contactID, 'modified_date' => '2011-01-31', 'subject' => NULL, 'version' => $this->_apiversion);
+    $params = array('version' => 3, 'entity_table' => 'civicrm_contact', 'note' => 'note', 'contact_id' => $this->_contactID, 'modified_date' => '2011-01-31', 'subject' => NULL);
 
     try {
       civicrm_api3_verify_one_mandatory($params, NULL, array('note', 'subject'));
@@ -247,12 +245,22 @@ class api_v3_UtilsTest extends CiviUnitTestCase {
   }
 
   function testGetFields() {
-    $result = civicrm_api('membership', 'getfields', array('version' => 3));
+    $result = $this->callAPISuccess('membership', 'getfields', array());
     $this->assertArrayHasKey('values', $result);
-    $result = civicrm_api('relationship', 'getfields', array('version' => 3));
+    $result = $this->callAPISuccess('relationship', 'getfields', array());
     $this->assertArrayHasKey('values', $result);
-    $result = civicrm_api('event', 'getfields', array('version' => 3));
+    $result = $this->callAPISuccess('event', 'getfields', array());
     $this->assertArrayHasKey('values', $result);
+  }
+
+  function testGetFields_AllOptions() {
+    $result = $this->callAPISuccess('contact', 'getfields', array(
+      'options' => array(
+        'get_options' => 'all',
+      ),
+    ));
+    $this->assertEquals('Household', $result['values']['contact_type']['options']['Household']);
+    $this->assertEquals('HTML', $result['values']['preferred_mail_format']['options']['HTML']);
   }
 }
 

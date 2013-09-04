@@ -64,7 +64,7 @@
       <type>int unsigned</type>
       <required>true</required>
       <comment>FK to admin civicrm group.</comment>
-      <add>2.0</add> 
+      <add>2.0</add>
       <pseudoconstant>
         <table>civicrm_group</table>
         <keyColumn>id</keyColumn>

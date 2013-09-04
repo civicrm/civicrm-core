@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -119,7 +119,8 @@ GROUP BY cv.label";
   }
 
   function eventList() {
-    $events = CRM_Event_BAO_Event::getEvents(TRUE);
+    $listparams = CRM_Utils_Array::value('listall', $_REQUEST, 1);
+    $events = CRM_Event_BAO_Event::getEvents($listparams);
 
     $elements = array(array('name' => ts('- select -'),
         'value' => '',

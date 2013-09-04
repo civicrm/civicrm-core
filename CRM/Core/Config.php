@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -193,10 +193,16 @@ class CRM_Core_Config extends CRM_Core_Config_Variables {
         //initialize variables. for gencode we cannot load from the
         //db since the db might not be initialized
         if ($loadFromDB) {
+          // initialize stuff from the settings file
+          self::$_singleton->setCoreVariables();
+
           self::$_singleton->_initVariables();
 
-          // retrieve and overwrite stuff from the settings file
-          self::$_singleton->setCoreVariables();
+          // I dont think we need to do this twice
+          // however just keeping this commented for now in 4.4
+          // in case we hit any issues - CRM-13064
+          // We can safely delete this once we release 4.4.4
+          // self::$_singleton->setCoreVariables();
         }
         $cache->set('CRM_Core_Config' . CRM_Core_Config::domainID(), self::$_singleton);
       }

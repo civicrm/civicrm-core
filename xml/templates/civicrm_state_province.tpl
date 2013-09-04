@@ -1,5 +1,5 @@
 -- +--------------------------------------------------------------------+
--- | CiviCRM version 4.3                                                |
+-- | CiviCRM version 4.4                                                |
 -- +--------------------------------------------------------------------+
 -- | Copyright CiviCRM LLC (c) 2004-2013                                |
 -- +--------------------------------------------------------------------+
@@ -3696,7 +3696,7 @@ INSERT INTO civicrm_state_province (id, country_id, abbreviation, name) VALUES
 (9993, 1226, "BRK", "Berkshire"),
 (9994, 1226, "WMD", "West Midlands"),
 (9998, 1226, "WGM", "West Glamorgan"),
-(9999, 1226, "LON", "Greater London"),
+(9999, 1226, "LON", "London"),
 
 (10000, 1107, "CI", "Carbonia-Iglesias"),
 (10001, 1107, "OT", "Olbia-Tempio"),
@@ -3898,4 +3898,9 @@ INSERT INTO civicrm_state_province (id, country_id, abbreviation, name) VALUES
 (NULL, 1119, "064", "Naukšēnu novads"),
 (NULL, 1119, "106", "Ventspils novads"),
 (NULL, 1119, "JKB", "Jēkabpils"),
-(NULL, 1119, "VMR", "Valmiera");
+(NULL, 1119, "VMR", "Valmiera"),
+
+-- CRM-13314 Added States for Uruguay
+(NULL, 1229, "FL", "Florida"),
+(NULL, 1229, "RN", "Rio Negro"),
+(NULL, 1229, "SJ", "San Jose");

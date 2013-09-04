@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -34,6 +34,10 @@ require_once 'CiviTest/Membership.php';
 require_once 'CRM/Core/Controller.php';
 
 class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
+  //@todo make BAO enotice compliant  & remove the line below
+  // WARNING - NEVER COPY & PASTE $_eNoticeCompliant = FALSE
+  // new test classes should be compliant.
+  public $_eNoticeCompliant = FALSE;
   function get_info() {
     return array(
       'name' => 'Membership BAOs',
@@ -62,7 +66,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
     );
 
     $this->_contactID = $this->organizationCreate();
-    $this->_membershipTypeID = $this->membershipTypeCreate($this->_contactID);
+    $this->_membershipTypeID = $this->membershipTypeCreate(array('member_of_contact_id' => $this->_contactID));
     // add a random number to avoid silly conflicts with old data
     $this->_membershipStatusID = $this->membershipStatusCreate('test status' . rand(1, 1000));
   }
@@ -291,7 +295,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
     $membershipId = $this->assertDBNotNull('CRM_Member_BAO_Membership', $contactId, 'id',
       'contact_id', 'Database check for created membership.'
     );
-    CRM_Member_BAO_Membership::deleteMembership($membershipId);
+    CRM_Member_BAO_Membership::del($membershipId);
 
     $membershipId = $this->assertDBNull('CRM_Member_BAO_Membership', $contactId, 'id',
       'contact_id', 'Database check for deleted membership.'

@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -141,8 +141,8 @@ LEFT JOIN civicrm_address ON civicrm_address.contact_id = civicrm_contact.id
 LEFT JOIN civicrm_state_province ON civicrm_address.state_province_id = civicrm_state_province.id
 LEFT JOIN civicrm_country ON civicrm_address.country_id = civicrm_country.id
 LEFT JOIN civicrm_location_type ON civicrm_location_type.id = civicrm_address.location_type_id
-WHERE civicrm_address.geo_code_1 IS NOT NULL 
-AND civicrm_address.geo_code_2 IS NOT NULL 
+WHERE civicrm_address.geo_code_1 IS NOT NULL
+AND civicrm_address.geo_code_2 IS NOT NULL
 AND civicrm_contact.id IN $idString ";
 
     $params = array();
@@ -186,7 +186,7 @@ AND civicrm_contact.id IN $idString ";
         array($dao->country)
       );
       $location['address'] = addslashes($address);
-      $location['displayAddress'] = str_replace('<br />', ', ', $address);
+      $location['displayAddress'] = str_replace('<br />', ', ', addslashes($address));
       $location['url'] = CRM_Utils_System::url('civicrm/contact/view', 'reset=1&cid=' . $dao->contact_id);
       $location['location_type'] = $dao->location_type;
       $location['image'] = CRM_Contact_BAO_Contact_Utils::getImage(isset($dao->contact_sub_type) ?

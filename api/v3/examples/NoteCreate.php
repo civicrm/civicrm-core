@@ -1,36 +1,44 @@
 <?php
-
-/*
- 
+/**
+ * Test Generated example of using note create API
+ * *
  */
 function note_create_example(){
-$params = array( 
+$params = array(
   'entity_table' => 'civicrm_contact',
   'entity_id' => 1,
   'note' => 'Hello!!! m testing Note',
   'contact_id' => 1,
   'modified_date' => '2011-01-31',
   'subject' => 'Test Note',
-  'version' => 3,
 );
 
-  $result = civicrm_api( 'note','create',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('note', 'create', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function note_create_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
   'id' => 2,
-  'values' => array( 
-      '2' => array( 
+  'values' => array(
+      '2' => array(
           'id' => '2',
           'entity_table' => 'civicrm_contact',
           'entity_id' => '1',
@@ -43,7 +51,7 @@ function note_create_expectedresult(){
     ),
 );
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 

@@ -1,28 +1,36 @@
 <?php
-
-/*
- /*This demonstrates use of the 'getCount' action
-    /*  This param causes the count of the only function to be returned as an integer
+/**
+ * Test Generated example of using contact get API
+ * /*This demonstrates use of the 'getCount' action
+    /*  This param causes the count of the only function to be returned as an integer *
  */
 function contact_get_example(){
-$params = array( 
-  'version' => 3,
+$params = array(
   'id' => 17,
 );
 
-  $result = civicrm_api( 'contact','get',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('contact', 'get', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function contact_get_expectedresult(){
 
-  $expectedResult = '1';
+  $expectedResult = 1;
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 

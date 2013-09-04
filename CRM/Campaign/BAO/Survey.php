@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -389,7 +389,7 @@ SELECT  survey.id    as id,
     }
     $reportId = CRM_Campaign_BAO_Survey::getReportID($id);
     if($reportId){
-      CRM_Report_BAO_Instance::delete($reportId);
+      CRM_Report_BAO_ReportInstance::del($reportId);
     }
     $dao = new CRM_Campaign_DAO_Survey();
     $dao->id = $id;
@@ -519,7 +519,7 @@ Group By  contact.id";
     $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
     $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
     $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
- 
+
     $query = "
     SELECT  activity.id, activity.status_id,
             activityTarget.contact_id as voter_id,
@@ -950,7 +950,7 @@ INNER JOIN  civicrm_contact contact_a ON ( activityTarget.contact_id = contact_a
     }
 
     $profileFields = CRM_Core_BAO_UFGroup::getFields($profileId,
-      FALSE, CRM_Core_Action::VIEW
+      FALSE, CRM_Core_Action::VIEW, NULL, NULL, FALSE, NULL, FALSE, NULL, CRM_Core_Permission::CREATE, 'field_name', TRUE
     );
 
     //don't load these fields in grid.

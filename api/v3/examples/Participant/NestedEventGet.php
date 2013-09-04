@@ -1,32 +1,40 @@
 <?php
-
-/*
- use nested get to get an event
+/**
+ * Test Generated example of using participant get API
+ * use nested get to get an event *
  */
 function participant_get_example(){
-$params = array( 
+$params = array(
   'id' => 1,
-  'version' => 3,
   'api.event.get' => 1,
 );
 
-  $result = civicrm_api( 'participant','get',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('participant', 'get', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function participant_get_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
   'id' => 1,
-  'values' => array( 
-      '1' => array( 
+  'values' => array(
+      '1' => array(
           'contact_id' => '2',
           'contact_type' => 'Individual',
           'contact_sub_type' => '',
@@ -34,8 +42,8 @@ function participant_get_expectedresult(){
           'display_name' => 'Mr. Anthony Anderson II',
           'event_id' => '6',
           'event_title' => 'Annual CiviCRM meet',
-          'event_start_date' => '2008-10-21 00:00:00',
-          'event_end_date' => '2008-10-23 00:00:00',
+          'event_start_date' => '2013-07-29 00:00:00',
+          'event_end_date' => '2013-08-04 00:00:00',
           'participant_id' => '1',
           'participant_fee_level' => '',
           'participant_fee_amount' => '',
@@ -53,13 +61,13 @@ function participant_get_expectedresult(){
           'participant_discount_name' => '',
           'participant_campaign_id' => '',
           'id' => '1',
-          'api.event.get' => array( 
+          'api.event.get' => array(
               'is_error' => 0,
               'version' => 3,
               'count' => 1,
               'id' => 6,
-              'values' => array( 
-                  '0' => array( 
+              'values' => array(
+                  '0' => array(
                       'id' => '6',
                       'title' => 'Annual CiviCRM meet',
                       'event_title' => 'Annual CiviCRM meet',
@@ -69,10 +77,10 @@ function participant_get_expectedresult(){
                       'event_type_id' => '1',
                       'participant_listing_id' => 0,
                       'is_public' => '1',
-                      'start_date' => '2008-10-21 00:00:00',
-                      'event_start_date' => '2008-10-21 00:00:00',
-                      'end_date' => '2008-10-23 00:00:00',
-                      'event_end_date' => '2008-10-23 00:00:00',
+                      'start_date' => '2013-07-29 00:00:00',
+                      'event_start_date' => '2013-07-29 00:00:00',
+                      'end_date' => '2013-08-04 00:00:00',
+                      'event_end_date' => '2013-08-04 00:00:00',
                       'is_online_registration' => '1',
                       'registration_start_date' => '2008-06-01 00:00:00',
                       'registration_end_date' => '2008-10-15 00:00:00',
@@ -89,7 +97,7 @@ function participant_get_expectedresult(){
                       'is_multiple_registrations' => 0,
                       'allow_same_participant_emails' => 0,
                       'is_template' => 0,
-                      'created_date' => '2013-02-04 22:37:53',
+                      'created_date' => '2013-07-28 08:49:19',
                       'is_share' => '1',
                     ),
                 ),
@@ -98,7 +106,7 @@ function participant_get_expectedresult(){
     ),
 );
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 

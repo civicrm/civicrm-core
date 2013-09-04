@@ -44,7 +44,7 @@
   </field>
   <index>
       <name>index_first_name</name>
-      <fieldName>first_name</fieldName>      
+      <fieldName>first_name</fieldName>
       <add>1.8</add>
   </index>
   <field>
@@ -71,7 +71,7 @@
   </field>
   <index>
       <name>index_last_name</name>
-      <fieldName>last_name</fieldName>      
+      <fieldName>last_name</fieldName>
       <add>1.8</add>
   </index>
   <field>
@@ -92,7 +92,7 @@
   </field>
   <index>
       <name>UI_prefix</name>
-      <fieldName>prefix_id</fieldName>      
+      <fieldName>prefix_id</fieldName>
       <add>1.6</add>
   </index>
   <field>
@@ -105,7 +105,7 @@
   </field>
   <index>
       <name>UI_suffix</name>
-      <fieldName>suffix_id</fieldName>      
+      <fieldName>suffix_id</fieldName>
       <add>1.6</add>
   </index>
   <field>
@@ -167,7 +167,7 @@
   </field>
   <index>
      <name>UI_gender</name>
-     <fieldName>gender_id</fieldName>     
+     <fieldName>gender_id</fieldName>
      <add>1.6</add>
   </index>
   <field>

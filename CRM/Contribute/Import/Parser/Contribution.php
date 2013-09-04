@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -73,18 +73,24 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
     $fields = CRM_Contribute_BAO_Contribution::importableFields($this->_contactType, FALSE);
 
     $fields = array_merge($fields,
-      array('soft_credit' => array('title' => ts('Soft Credit'),
-        'softCredit' => TRUE,
-        'headerPattern' => '/Soft Credit/i',
-      ))
+      array(
+        'soft_credit' => array(
+          'title' => ts('Soft Credit'),
+          'softCredit' => TRUE,
+          'headerPattern' => '/Soft Credit/i',
+        )
+      )
     );
 
     // add pledge fields only if its is enabled
     if (CRM_Core_Permission::access('CiviPledge')) {
-      $pledgeFields = array('pledge_payment' => array('title' => ts('Pledge Payment'),
+      $pledgeFields = array(
+        'pledge_payment' => array(
+          'title' => ts('Pledge Payment'),
           'headerPattern' => '/Pledge Payment/i',
         ),
-        'pledge_id' => array('title' => ts('Pledge ID'),
+        'pledge_id' => array(
+          'title' => ts('Pledge ID'),
           'headerPattern' => '/Pledge ID/i',
         ),
       );
@@ -136,7 +142,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
    * @access public
    */
   function mapField(&$values) {
-    return CRM_Contribute_Import_Parser::VALID;
+    return CRM_Import_Parser::VALID;
   }
 
   /**
@@ -221,10 +227,10 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
       $tempMsg = "Invalid value for field(s) : $errorMessage";
       array_unshift($values, $tempMsg);
       $errorMessage = NULL;
-      return CRM_Contribute_Import_Parser::ERROR;
+      return CRM_Import_Parser::ERROR;
     }
 
-    return CRM_Contribute_Import_Parser::VALID;
+    return CRM_Import_Parser::VALID;
   }
 
   /**
@@ -239,7 +245,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
   function import($onDuplicate, &$values) {
     // first make sure this is a valid line
     $response = $this->summary($values);
-    if ($response != CRM_Contribute_Import_Parser::VALID) {
+    if ($response != CRM_Import_Parser::VALID) {
       return $response;
     }
 
@@ -296,14 +302,14 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
     }
 
     //import contribution record according to select contact type
-    if ($onDuplicate == CRM_Contribute_Import_Parser::DUPLICATE_SKIP &&
+    if ($onDuplicate == CRM_Import_Parser::DUPLICATE_SKIP &&
       (CRM_Utils_Array::value('contribution_contact_id', $paramValues) ||
         CRM_Utils_Array::value('external_identifier', $paramValues)
       )
     ) {
       $paramValues['contact_type'] = $this->_contactType;
     }
-    elseif ($onDuplicate == CRM_Contribute_Import_Parser::DUPLICATE_UPDATE &&
+    elseif ($onDuplicate == CRM_Import_Parser::DUPLICATE_UPDATE &&
       ($paramValues['contribution_id'] || $values['trxn_id'] || $paramValues['invoice_id'])
     ) {
       $paramValues['contact_type'] = $this->_contactType;
@@ -330,10 +336,10 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
       elseif (CRM_Utils_Array::value('error_data', $formatError) == 'pledge_payment') {
         return CRM_Contribute_Import_Parser::PLEDGE_PAYMENT_ERROR;
       }
-      return CRM_Contribute_Import_Parser::ERROR;
+      return CRM_Import_Parser::ERROR;
     }
 
-    if ($onDuplicate != CRM_Contribute_Import_Parser::DUPLICATE_UPDATE) {
+    if ($onDuplicate != CRM_Import_Parser::DUPLICATE_UPDATE) {
       $formatted['custom'] = CRM_Core_BAO_CustomField::postProcess($formatted,
         CRM_Core_DAO::$_nullObject,
         NULL,
@@ -342,7 +348,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
     }
     else {
       //fix for CRM-2219 - Update Contribution
-      // onDuplicate == CRM_Contribute_Import_Parser::DUPLICATE_UPDATE
+      // onDuplicate == CRM_Import_Parser::DUPLICATE_UPDATE
       if (CRM_Utils_Array::value('invoice_id',$paramValues) ||
           CRM_Utils_Array::value('trxn_id', $paramValues) || $paramValues['contribution_id']) {
         $dupeIds = array(
@@ -387,16 +393,15 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
               'contact_id' => $formatted['soft_credit_to'],
               'contribution_id' => $ids['contribution'],
             );
-            
-            //FIXE ME: Need to fix this logic
-            $existingSoftCredit = CRM_Contribute_BAO_ContributionSoft::getSoftContribution($dupeSoftCredit);
+
+            //FIX ME: Need to fix this logic
+            $existingSoftCredit = CRM_Contribute_BAO_ContributionSoft::getSoftContribution($dupeSoftCredit['contribution_id']);
             if (CRM_Utils_Array::value('soft_credit_id', $existingSoftCredit)) {
               $formatted['softID'] = $existingSoftCredit['soft_credit_id'];
             }
           }
 
           $newContribution = CRM_Contribute_BAO_Contribution::create($formatted, $ids);
-
           $this->_newContributions[] = $newContribution->id;
 
           //return soft valid since we need to show how soft credits were added
@@ -407,7 +412,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
           // process pledge payment assoc w/ the contribution
           return self::processPledgePayments($formatted);
 
-          return CRM_Contribute_Import_Parser::VALID;
+          return CRM_Import_Parser::VALID;
         }
         else {
           $labels = array(
@@ -422,7 +427,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
           }
           $errorMsg = implode(' AND ', $errorMsg);
           array_unshift($values, 'Matching Contribution record not found for ' . $errorMsg . '. Row was skipped.');
-          return CRM_Contribute_Import_Parser::ERROR;
+          return CRM_Import_Parser::ERROR;
         }
       }
     }
@@ -442,7 +447,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
         $matchedIDs = explode(',', $error['error_message']['params'][0]);
         if (count($matchedIDs) > 1) {
           array_unshift($values, 'Multiple matching contact records detected for this row. The contribution was not imported');
-          return CRM_Contribute_Import_Parser::ERROR;
+          return CRM_Import_Parser::ERROR;
         }
         else {
           $cid = $matchedIDs[0];
@@ -453,12 +458,12 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
             if (is_array($newContribution['error_message'])) {
               array_unshift($values, $newContribution['error_message']['message']);
               if ($newContribution['error_message']['params'][0]) {
-                return CRM_Contribute_Import_Parser::DUPLICATE;
+                return CRM_Import_Parser::DUPLICATE;
               }
             }
             else {
               array_unshift($values, $newContribution['error_message']);
-              return CRM_Contribute_Import_Parser::ERROR;
+              return CRM_Import_Parser::ERROR;
             }
           }
 
@@ -473,7 +478,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
           // process pledge payment assoc w/ the contribution
           return self::processPledgePayments($formatted);
 
-          return CRM_Contribute_Import_Parser::VALID;
+          return CRM_Import_Parser::VALID;
         }
       }
       else {
@@ -506,7 +511,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
         }
 
         array_unshift($values, 'No matching Contact found for (' . $disp . ')');
-        return CRM_Contribute_Import_Parser::ERROR;
+        return CRM_Import_Parser::ERROR;
       }
     }
     else {
@@ -516,7 +521,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
         $checkCid->find(TRUE);
         if ($checkCid->id != $formatted['contact_id']) {
           array_unshift($values, 'Mismatch of External identifier :' . $paramValues['external_identifier'] . ' and Contact Id:' . $formatted['contact_id']);
-          return CRM_Contribute_Import_Parser::ERROR;
+          return CRM_Import_Parser::ERROR;
         }
       }
       $newContribution = civicrm_api('contribution', 'create', $formatted);
@@ -524,12 +529,12 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
         if (is_array($newContribution['error_message'])) {
           array_unshift($values, $newContribution['error_message']['message']);
           if ($newContribution['error_message']['params'][0]) {
-            return CRM_Contribute_Import_Parser::DUPLICATE;
+            return CRM_Import_Parser::DUPLICATE;
           }
         }
         else {
           array_unshift($values, $newContribution['error_message']);
-          return CRM_Contribute_Import_Parser::ERROR;
+          return CRM_Import_Parser::ERROR;
         }
       }
 
@@ -544,7 +549,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
       // process pledge payment assoc w/ the contribution
       return self::processPledgePayments($formatted);
 
-      return CRM_Contribute_Import_Parser::VALID;
+      return CRM_Import_Parser::VALID;
     }
   }
 

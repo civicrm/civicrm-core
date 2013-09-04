@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -41,15 +41,15 @@
 class CRM_Contact_Form_Edit_Individual {
 
   /**
-   * This function provides the HTML form elements that are specific 
+   * This function provides the HTML form elements that are specific
    * to the Individual Contact Type
    *
    * @param object $form form object
-   * @param int $inlineEditMode ( 1 for contact summary 
+   * @param int $inlineEditMode ( 1 for contact summary
    * top bar form and 2 for display name edit )
    *
    * @access public
-   * @return void 
+   * @return void
    */
   public static function buildQuickForm(&$form, $inlineEditMode = NULL) {
     $form->applyFilter('__ALL__', 'trim');

@@ -1,11 +1,10 @@
 <?php
-
-/*
- 
+/**
+ * Test Generated example of using participant_status_type get API
+ * *
  */
 function participant_status_type_get_example(){
-$params = array( 
-  'version' => 3,
+$params = array(
   'name' => 'test status',
   'label' => 'I am a test',
   'class' => 'Positive',
@@ -16,23 +15,32 @@ $params = array(
   'weight' => 10,
 );
 
-  $result = civicrm_api( 'participant_status_type','get',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('participant_status_type', 'get', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function participant_status_type_get_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
   'id' => 14,
-  'values' => array( 
-      '14' => array( 
+  'values' => array(
+      '14' => array(
           'id' => '14',
           'name' => 'test status',
           'label' => 'I am a test',
@@ -46,7 +54,7 @@ function participant_status_type_get_expectedresult(){
     ),
 );
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 

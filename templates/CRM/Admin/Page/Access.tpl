@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -29,12 +29,13 @@
     {if $config->userSystem->is_drupal EQ '1'}{ts}Note that a CiviCRM ACL Role is not related to the Drupal Role.{/ts}{/if}</p>
     <p>{ts}<strong>EXAMPLE:</strong> 'Team Leaders' (<em>ACL Role</em>) can 'Edit' (<em>Operation</em>) all contacts in the 'Active Volunteers Group' (<em>Data</em>).{/ts}</p>
     {if $config->userSystem->is_drupal EQ '1'}
-        <p>{ts 1=$ufAccessURL}Use <a href='%1'>Drupal Access Control</a> to manage basic access to CiviCRM components and menu items. Use CiviCRM ACLs to control access to specific CiviCRM contact groups. You can also configure ACLs to grant or deny access to specific Profiles, and/or Custom Data Fields.{/ts}</p>
+        <p>{ts 1=$ufAccessURL}Use <a href='%1'>Drupal Access Control</a> to manage basic access to CiviCRM components and menu items. Use CiviCRM ACLs to control access to specific CiviCRM contact groups. You can also configure ACLs to grant or deny access to specific Events Profiles, and/or Custom Data Fields.{/ts}</p>
     {elseif $config->userFramework EQ 'Joomla'}
-        <p>{ts 1=$ufAccessURL 2=$jAccessParams}Use <a href='%1' %2>Joomla Access Control</a> to manage basic access to CiviCRM components and menu items. Use CiviCRM ACLs to control access to specific CiviCRM contact groups. You can also configure ACLs to grant or deny access to specific Profiles, and/or Custom Data Fields.{/ts}</p>
+        <p>{ts 1=$ufAccessURL 2=$jAccessParams}Use <a href='%1' %2>Joomla Access Control</a> to manage basic access to CiviCRM components and menu items. Use CiviCRM ACLs to control access to specific CiviCRM contact groups. You can also configure ACLs to grant or deny access to specific Events, Profiles, and/or Custom Data Fields.{/ts}</p>
    {elseif $config->userFramework EQ 'WordPress'}
-        <p>{ts 1=$ufAccessURL}Use <a href='%1'>WordPress Access Control</a> to manage basic access to CiviCRM components and menu items. Use CiviCRM ACLs to control access to specific CiviCRM contact groups. You can also configure ACLs to grant or deny access to specific Profiles, and/or Custom Data Fields.{/ts}</p>
+        <p>{ts 1=$ufAccessURL}Use <a href='%1'>WordPress Access Control</a> to manage basic access to CiviCRM components and menu items. Use CiviCRM ACLs to control access to specific CiviCRM contact groups. You can also configure ACLs to grant or deny access to specific Events, Profiles, and/or Custom Data Fields.{/ts}</p>
    {/if}
+   <p>{ts 1=$config->userFramework}Note that %1 Access Control permissions take precedence over CiviCRM ACLs. If you wish to use CiviCRM ACLs, first disable the related permission in %1 Access control for a user role, and then gradually add ACLs to replace that permission for certain groups of contacts.{/ts}
 </div>
 
     <table class="report">

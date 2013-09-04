@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -626,7 +626,11 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
         CRM_Core_Session::setStatus(ts('Some of the profile fields cannot be configured for this page.'));
       }
       $addCaptcha = FALSE;
-      $fields = array_diff_assoc($fields, $this->_fields);
+
+      if (!empty($this->_fields)) {
+        $fields = @array_diff_assoc($fields, $this->_fields);
+      }
+
       if (!CRM_Utils_Array::value('additional_participants', $this->_params[0]) &&
         is_null($cid)
       ) {
@@ -647,11 +651,11 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
           if ($button == 'skip') {
             $field['is_required'] = FALSE;
           }
-          elseif ($field['add_captcha']) {
+          // CRM-11316 Is ReCAPTCHA enabled for this profile AND is this an anonymous visitor
+          elseif ($field['add_captcha']  && !$contactID) {
             // only add captcha for first page
             $addCaptcha = TRUE;
           }
-
           list($prefixName, $index) = CRM_Utils_System::explode('-', $key, 2);
           if ($prefixName == 'state_province' || $prefixName == 'country' || $prefixName == 'county') {
             if (!array_key_exists($index, $stateCountryMap)) {
@@ -685,23 +689,23 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
     }
     if ($discountId) {
       $priceSetId = CRM_Core_DAO::getFieldValue('CRM_Core_BAO_Discount', $discountId, 'price_set_id');
-      $price = CRM_Price_BAO_Set::initSet($form, $eventID, 'civicrm_event', TRUE, $priceSetId);
+      $price = CRM_Price_BAO_PriceSet::initSet($form, $eventID, 'civicrm_event', TRUE, $priceSetId);
     }
     else {
-      $price = CRM_Price_BAO_Set::initSet($form, $eventID, 'civicrm_event', TRUE);
+      $price = CRM_Price_BAO_PriceSet::initSet($form, $eventID, 'civicrm_event', TRUE);
     }
-    
-    if (property_exists($form, '_context') && ($form->_context == 'standalone' 
+
+    if (property_exists($form, '_context') && ($form->_context == 'standalone'
       || $form->_context == 'participant')) {
       $discountedEvent = CRM_Core_BAO_Discount::getOptionGroup($eventID, 'civicrm_event');
       if (is_array( $discountedEvent)) {
         foreach ($discountedEvent as $key => $priceSetId) {
-          $priceSet = CRM_Price_BAO_Set::getSetDetail($priceSetId);
+          $priceSet = CRM_Price_BAO_PriceSet::getSetDetail($priceSetId);
           $priceSet = CRM_Utils_Array::value($priceSetId, $priceSet);
           $form->_values['discount'][$key] = CRM_Utils_Array::value('fields', $priceSet);
           $fieldID = key($form->_values['discount'][$key]);
           $form->_values['discount'][$key][$fieldID]['name'] = CRM_Core_DAO::getFieldValue(
-            'CRM_Price_DAO_Set',
+            'CRM_Price_DAO_PriceSet',
             $priceSetId,
             'title'
           );
@@ -1074,7 +1078,7 @@ WHERE  v.option_group_id = g.id
    * @return array $optionsCount, array of each option w/ count total.
    * @access public
    */
-  function getPriceSetOptionCount(&$form) {
+  public static function getPriceSetOptionCount(&$form) {
     $params     = $form->get('params');
     $priceSet   = $form->get('priceSet');
     $priceSetId = $form->get('priceSetId');
@@ -1165,42 +1169,12 @@ WHERE  v.option_group_id = g.id
     return $fileName ? $fileName : parent::overrideExtraTemplateFileName();
   }
 
-  function getContactID() {
-    $tempID = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
-
-    // force to ignore the authenticated user
-    if ($tempID === '0') {
-      return $tempID;
-    }
-
-    // check if the user is logged in and has a contact ID
-    $session = CRM_Core_Session::singleton();
-    $userID = $session->get('userID');
-
-    if ($tempID == $userID) {
-      return $userID;
-    }
-
-    //check if this is a checksum authentication
-    $userChecksum = CRM_Utils_Request::retrieve('cs', 'String', $this);
-    if ($userChecksum) {
-      //check for anonymous user.
-      $validUser = CRM_Contact_BAO_Contact_Utils::validChecksum($tempID, $userChecksum);
-      if ($validUser) {
-        return $tempID;
-      }
-    }
-    // check if user has permission, CRM-12062
-    else if ($tempID && CRM_Contact_BAO_Contact_Permission::allow($tempID)) {
-      return $tempID;
-    }
-
-    return $userID;
-  }
-
-  /* Validate price set submitted params for price option limit,
+  /**
+   * Validate price set submitted params for price option limit,
    * as well as user should select at least one price field option.
-   *
+   * @param unknown_type $form
+   * @param unknown_type $params
+   * @return multitype:|Ambigous <multitype:, string, string>
    */
   static function validatePriceSet(&$form, $params) {
     $errors = array();

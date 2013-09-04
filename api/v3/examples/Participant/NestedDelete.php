@@ -1,40 +1,48 @@
 <?php
-
-/*
- Criteria delete by nesting a GET & a DELETE
+/**
+ * Test Generated example of using participant Get API
+ * Criteria delete by nesting a GET & a DELETE *
  */
 function participant_get_example(){
-$params = array( 
-  'version' => 3,
+$params = array(
   'contact_id' => 4,
   'api.participant.delete' => 1,
 );
 
-  $result = civicrm_api( 'participant','Get',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('participant', 'Get', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function participant_get_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 2,
-  'values' => array( 
-      '2' => array( 
+  'values' => array(
+      '2' => array(
           'contact_id' => '4',
           'contact_type' => 'Individual',
           'contact_sub_type' => '',
           'sort_name' => 'Anderson, Anthony',
           'display_name' => 'Mr. Anthony Anderson II',
-          'event_id' => '37',
+          'event_id' => '38',
           'event_title' => 'Annual CiviCRM meet',
-          'event_start_date' => '2008-10-21 00:00:00',
-          'event_end_date' => '2008-10-23 00:00:00',
+          'event_start_date' => '2013-07-29 00:00:00',
+          'event_end_date' => '2013-08-04 00:00:00',
           'participant_id' => '2',
           'participant_fee_level' => '',
           'participant_fee_amount' => '',
@@ -52,23 +60,23 @@ function participant_get_expectedresult(){
           'participant_discount_name' => '',
           'participant_campaign_id' => '',
           'id' => '2',
-          'api.participant.delete' => array( 
+          'api.participant.delete' => array(
               'is_error' => 0,
               'version' => 3,
               'count' => 1,
               'values' => 1,
             ),
         ),
-      '3' => array( 
+      '3' => array(
           'contact_id' => '4',
           'contact_type' => 'Individual',
           'contact_sub_type' => '',
           'sort_name' => 'Anderson, Anthony',
           'display_name' => 'Mr. Anthony Anderson II',
-          'event_id' => '37',
+          'event_id' => '38',
           'event_title' => 'Annual CiviCRM meet',
-          'event_start_date' => '2008-10-21 00:00:00',
-          'event_end_date' => '2008-10-23 00:00:00',
+          'event_start_date' => '2013-07-29 00:00:00',
+          'event_end_date' => '2013-08-04 00:00:00',
           'participant_id' => '3',
           'participant_fee_level' => '',
           'participant_fee_amount' => '',
@@ -86,7 +94,7 @@ function participant_get_expectedresult(){
           'participant_discount_name' => '',
           'participant_campaign_id' => '',
           'id' => '3',
-          'api.participant.delete' => array( 
+          'api.participant.delete' => array(
               'is_error' => 0,
               'version' => 3,
               'count' => 1,
@@ -96,7 +104,7 @@ function participant_get_expectedresult(){
     ),
 );
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 

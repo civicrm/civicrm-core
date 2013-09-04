@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -45,6 +45,12 @@ class CRM_Logging_Schema {
     'logging/contribute/detail',
     'logging/contribute/summary',
   );
+
+  //CRM-13028 / NYSS-6933 - table => array (cols) - to be excluded from the update statement 
+  private $exceptions = array(
+    'civicrm_job'   => array('last_run'),
+    'civicrm_group' => array('cache_date'),
+  ); 
 
   /**
    * Populate $this->tables and $this->logs with current db state.
@@ -103,6 +109,19 @@ AND    TABLE_NAME LIKE 'log_civicrm_%'
    */
   function customDataLogTables() {
     return preg_grep('/^log_civicrm_value_/', $this->logs);
+  }
+
+  /**
+   * Return custom data tables for specified entity / extends.
+   */
+  function entityCustomDataLogTables($extends) {
+    $customGroupTables = array();
+    $customGroupDAO = CRM_Core_BAO_CustomGroup::getAllCustomGroupsByBaseEntity($extends);
+    $customGroupDAO->find();
+    while ($customGroupDAO->fetch()) {
+      $customGroupTables[$customGroupDAO->table_name] = $this->logs[$customGroupDAO->table_name];
+    }
+    return $customGroupTables;
   }
 
   /**
@@ -255,7 +274,7 @@ AND    TABLE_NAME LIKE 'log_civicrm_%'
     // add report instances
     $domain_id = CRM_Core_Config::domainID();
     foreach ($this->reports as $report) {
-      $dao             = new CRM_Report_DAO_Instance;
+      $dao             = new CRM_Report_DAO_ReportInstance;
       $dao->domain_id  = $domain_id;
       $dao->report_id  = $report;
       $dao->title      = $titles[$report];
@@ -342,7 +361,7 @@ COLS;
     // delete report instances
     $domain_id = CRM_Core_Config::domainID();
     foreach ($this->reports as $report) {
-      $dao            = new CRM_Report_DAO_Instance;
+      $dao            = new CRM_Report_DAO_ReportInstance;
       $dao->domain_id = $domain_id;
       $dao->report_id = $report;
       $dao->delete();
@@ -403,7 +422,7 @@ COLS;
       $cond = array( );
       foreach ($columns as $column) {
         // ignore modified_date changes
-        if ($column != 'modified_date') {
+        if ($column != 'modified_date' && !in_array($column, CRM_Utils_Array::value($table, $this->exceptions, array()))) {
           $cond[] = "IFNULL(OLD.$column,'') <> IFNULL(NEW.$column,'')";
         }
       }

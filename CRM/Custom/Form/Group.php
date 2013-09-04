@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -82,6 +82,9 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
     // current set id
     $this->_id = $this->get('id');
 
+    if ($this->_id && $isReserved = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $this->_id, 'is_reserved', 'id')) {
+      CRM_Core_Error::fatal("You cannot edit the settings of a reserved custom field-set.");
+    }
     // setting title for html page
     if ($this->_action == CRM_Core_Action::UPDATE) {
       $title = CRM_Core_BAO_CustomGroup::getTitle($this->_id);
@@ -288,9 +291,8 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
       'extends',
       ts('Used For'),
       array(
-        'onClick' => 'showHideStyle();',
         'name' => 'extends[0]',
-        'style' => 'vertical-align: top;',
+        'style' => 'vertical-align: top;'
       ),
       TRUE
     );
@@ -353,12 +355,8 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
     $this->addElement('checkbox', 'is_active', ts('Is this Custom Data Set active?'));
 
     // does this set have multiple record?
-    $multiple = $this->addElement('checkbox',
-      'is_multiple',
-      ts('Does this Custom Field Set allow multiple records?'),
-      NULL,
-      array('onclick' => "showRange();")
-    );
+    $multiple = $this->addElement('checkbox', 'is_multiple',
+      ts('Does this Custom Field Set allow multiple records?'), NULL);
 
     // $min_multiple = $this->add('text', 'min_multiple', ts('Minimum number of multiple records'), $attributes['min_multiple'] );
     // $this->addRule('min_multiple', ts('is a numeric field') , 'numeric');
@@ -525,7 +523,7 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
   /*
    * Function to return a formatted list of relationship name.
    * @param $list array array of relationship name.
-   * @static 
+   * @static
    * return array array of relationship name.
    */
   static function getFormattedList(&$list) {

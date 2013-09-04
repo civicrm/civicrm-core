@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -202,17 +202,17 @@
 </table>
 
 {if $softContributions and !$pcp_id} {* We show soft credit name with PCP section if contribution is linked to a PCP. *}
-  <div class="crm-accordion-wrapper ">
+  <div class="crm-accordion-wrapper crm-soft-credit-pane">
     <div class="crm-accordion-header">
       {ts}Soft Credit{/ts}
     </div>
     <div class="crm-accordion-body">
-      <table class="crm-info-panel">
+      <table class="crm-info-panel crm-soft-credit-listing">
         {foreach from=$softContributions.soft_credit item="softCont"}
           <tr>
             <td>
               <a href="{crmURL p="civicrm/contact/view" q="reset=1&cid=`$softCont.contact_id`"}"
-                 id="view_contact" title="{ts}View contact record{/ts}">{$softCont.contact_name}
+                 title="{ts}View contact record{/ts}">{$softCont.contact_name}
               </a>
             </td>
             <td>{$softCont.amount|crmMoney:$currency}</td>

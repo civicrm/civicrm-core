@@ -1,47 +1,55 @@
 <?php
-
-/*
- 
+/**
+ * Test Generated example of using tag create API
+ * *
  */
 function tag_create_example(){
-$params = array( 
-  'name' => 'New Tag3',
-  'description' => 'This is description for New Tag 02',
-  'version' => 3,
+$params = array(
+  'name' => 'Super Heros',
+  'description' => 'Outside undie-wearers',
 );
 
-  $result = civicrm_api( 'tag','create',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('tag', 'create', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function tag_create_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
-  'id' => 8,
-  'values' => array( 
-      '8' => array( 
-          'id' => '8',
-          'name' => 'New Tag3',
-          'description' => 'This is description for New Tag 02',
+  'id' => 12,
+  'values' => array(
+      '12' => array(
+          'id' => '12',
+          'name' => 'Super Heros',
+          'description' => 'Outside undie-wearers',
           'parent_id' => '',
           'is_selectable' => '',
           'is_reserved' => '',
           'is_tagset' => '',
           'used_for' => 'civicrm_contact',
           'created_id' => '',
-          'created_date' => '20130204224540',
+          'created_date' => '2013-07-28 08:49:19',
         ),
     ),
 );
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 

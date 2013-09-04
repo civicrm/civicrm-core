@@ -1,6 +1,6 @@
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -44,10 +44,12 @@ var cj = jQuery;
 function ts(text, params) {
   "use strict";
   text = CRM.strings[text] || text;
-  if (params && typeof(params) === 'object') {
+  if (typeof(params) === 'object') {
     for (var i in params) {
-      // sprintf emulation: escape % characters in the replacements to avoid conflicts
-      text = text.replace(new RegExp('%' + i, 'g'), params[i].replace(/%/g, '%-crmescaped-'));
+      if (typeof(params[i]) === 'string' || typeof(params[i]) === 'number') {
+        // sprintf emulation: escape % characters in the replacements to avoid conflicts
+        text = text.replace(new RegExp('%' + i, 'g'), String(params[i]).replace(/%/g, '%-crmescaped-'));
+      }
     }
     return text.replace(/%-crmescaped-/g, '%');
   }
@@ -424,10 +426,6 @@ function popUp(URL) {
   eval("page" + id + " = window.open(URL, '" + id + "', 'toolbar=0,scrollbars=1,location=0,statusbar=0,menubar=0,resizable=0,width=640,height=420,left = 202,top = 184');");
 }
 
-function imagePopUp(path) {
-  window.open(path, 'popupWindow', 'toolbar=no,location=no,directories=no,status=no,menubar=no,scrollbars=no,resizable=yes,copyhistory=no,screenX=150,screenY=150,top=150,left=150');
-}
-
 /**
  * Function to show / hide the row in optionFields
  *
@@ -620,7 +618,7 @@ CRM.validate = CRM.validate || {
   };
 
   var h;
-  CRM.help = function (title, params) {
+  CRM.help = function (title, params, url) {
     h && h.close && h.close();
     var options = {
       expires: 0
@@ -628,7 +626,7 @@ CRM.validate = CRM.validate || {
     h = CRM.alert('...', title, 'crm-help crm-msg-loading', options);
     params.class_name = 'CRM_Core_Page_Inline_Help';
     params.type = 'page';
-    $.ajax(CRM.url('civicrm/ajax/inline'),
+    $.ajax(url || CRM.url('civicrm/ajax/inline'),
       {
         data: params,
         dataType: 'html',
@@ -712,6 +710,7 @@ CRM.validate = CRM.validate || {
       message: ts('Are you sure you want to continue?'),
       resizable: false,
       modal: true,
+      width: 'auto',
       close: function () {
         $(dialog).remove();
       },
@@ -805,7 +804,12 @@ CRM.validate = CRM.validate || {
       CRM.alert(text, title, type, options);
     });
     // Handle qf form errors
-    $('form :input.error', this).one('blur', function () {
+    $('form :input.error', this).one('blur', function() {
+      // ignore autocomplete fields
+      if ($(this).is('.ac_input')) {
+        return;
+      }
+
       $('.ui-notify-message.error a.ui-notify-close').click();
       $(this).removeClass('error');
       $(this).next('span.crm-error').remove();
@@ -822,6 +826,20 @@ CRM.validate = CRM.validate || {
       messagesFromMarkup.call($('#crm-container'));
       $('#crm-container').on('crmFormLoad', '*', messagesFromMarkup);
     }
+
+    // bind the event for image popup
+    $('body').on('click', 'a.crm-image-popup', function() {
+      var o = $('<div class="crm-container crm-custom-image-popup"><img src=' + $(this).attr('href') + '></div>');
+
+      CRM.confirm('',
+        {
+          title: ts('Preview'),
+          message: o
+        },
+        ts('Done')
+      );
+      return false;
+    });
   });
 
   $.fn.crmAccordions = function (speed) {
@@ -860,5 +878,34 @@ CRM.validate = CRM.validate || {
       }
       $(this).toggleClass('collapsed');
     });
+  };
+
+  /**
+   * Clientside currency formatting
+   * @param value
+   * @param format
+   * @return string
+   */
+  var currencyTemplate;
+  CRM.formatMoney = function(value, format) {
+    var decimal, separator, sign, i, j, result;
+    if (value === 'init' && format) {
+      currencyTemplate = format;
+      return;
+    }
+    format = format || currencyTemplate;
+    result = /1(.?)234(.?)56/.exec(format);
+    if (result === null) {
+      return 'Invalid format passed to CRM.formatMoney';
+    }
+    separator = result[1];
+    decimal = result[2];
+    sign = (value < 0) ? '-' : '';
+    //extracting the absolute value of the integer part of the number and converting to string
+    i = parseInt(value = Math.abs(value).toFixed(2)) + '';
+
+    j = ((j = i.length) > 3) ? j % 3 : 0;
+    result = sign + (j ? i.substr(0, j) + separator : '') + i.substr(j).replace(/(\d{3})(?=\d)/g, "$1" + separator) + (2 ? decimal + Math.abs(value - i).toFixed(2).slice(2) : '');
+    return format.replace(/1.*234.*56/, result);
   };
 })(jQuery);

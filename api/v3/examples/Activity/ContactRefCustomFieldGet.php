@@ -1,32 +1,32 @@
 <?php
-
-/*
- Get with Contact Ref Custom Field
+/**
+ * Test Generated example of using activity get API
+ * Get with Contact Ref Custom Field *
  */
-function activity_create_example(){
+function activity_get_example(){
 $params = array(
-  'source_contact_id' => 17,
-  'activity_type_id' => '44',
-  'subject' => 'test activity type id',
-  'activity_date_time' => '2011-06-02 14:36:13',
-  'status_id' => 2,
-  'priority_id' => 1,
-  'duration' => 120,
-  'location' => 'Pensulvania',
-  'details' => 'a test activity',
-  'version' => 3,
-  'custom_2' => '17',
+  'return.custom_2' => 1,
+  'id' => 1,
 );
 
-  $result = civicrm_api( 'activity','create',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('activity', 'get', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
-function activity_create_expectedresult(){
+function activity_get_expectedresult(){
 
   $expectedResult = array(
   'is_error' => 0,
@@ -36,7 +36,7 @@ function activity_create_expectedresult(){
   'values' => array(
       '1' => array(
           'id' => '1',
-          'activity_type_id' => '44',
+          'activity_type_id' => '46',
           'subject' => 'test activity type id',
           'activity_date_time' => '2011-06-02 14:36:13',
           'duration' => '120',
@@ -48,16 +48,16 @@ function activity_create_expectedresult(){
           'is_auto' => 0,
           'is_current_revision' => '1',
           'is_deleted' => 0,
-          'source_contact_id' => '17',
-          'custom_2_id' => '17',
-          'custom_2_1_id' => '17',
-          'custom_2' => 'Contact, Test',
-          'custom_2_1' => 'Contact, Test',
+          'source_contact_id' => '1',
+          'custom_2_id' => '1',
+          'custom_2_1_id' => '1',
+          'custom_2' => 'Anderson, Anthony',
+          'custom_2_1' => 'Anderson, Anthony',
         ),
     ),
 );
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 

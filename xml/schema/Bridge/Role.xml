@@ -17,18 +17,18 @@
        <name>id</name>
        <autoincrement>true</autoincrement>
   </primaryKey>
-  <field> 
-       <name>drupal_role_id</name> 
-       <type>int unsigned</type> 
-       <comment>Foreign key to the drupal role.</comment> 
-       <add>2.0</add> 
+  <field>
+       <name>drupal_role_id</name>
+       <type>int unsigned</type>
+       <comment>Foreign key to the drupal role.</comment>
+       <add>2.0</add>
   </field>
-  <index> 
-       <name>index_drupal_role_id</name> 
-       <fieldName>index_drupal_role_id</fieldName> 
-       <add>2.0</add> 
+  <index>
+       <name>index_drupal_role_id</name>
+       <fieldName>index_drupal_role_id</fieldName>
+       <add>2.0</add>
   </index>
-  <field> 
+  <field>
     <name>group_id</name>
     <type>int unsigned</type>
     <required>true</required>
@@ -39,11 +39,11 @@
       <keyColumn>id</keyColumn>
       <labelColumn>title</labelColumn>
     </pseudoconstant>
-  </field> 
-  <foreignKey> 
-       <name>group_id</name> 
-       <table>civicrm_group</table> 
-       <key>id</key> 
-       <add>2.0</add> 
-  </foreignKey> 
+  </field>
+  <foreignKey>
+       <name>group_id</name>
+       <table>civicrm_group</table>
+       <key>id</key>
+       <add>2.0</add>
+  </foreignKey>
 </table>

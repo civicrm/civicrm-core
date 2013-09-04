@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -137,7 +137,7 @@ class CRM_Friend_BAO_Friend extends CRM_Friend_DAO_Friend {
     $activity = CRM_Activity_BAO_Activity::create($activityParams);
     $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
     $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
- 
+
     //friend contacts creation
     foreach ($contactParams as $key => $value) {
 

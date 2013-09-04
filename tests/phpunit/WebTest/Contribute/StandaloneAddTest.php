@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -94,11 +94,7 @@ class WebTest_Contribute_StandaloneAddTest extends CiviSeleniumTestCase {
     $this->type("trxn_id", "P20901X1" . rand(100, 10000));
 
     // soft credit
-    $this->click("soft_credit_to");
-    $this->type("soft_credit_to", $softCreditFname);
-    $this->typeKeys("soft_credit_to", $softCreditFname);
-    $this->waitForElementPresent("css=div.ac_results-inner li");
-    $this->click("css=div.ac_results-inner li");
+    $this->webtestFillAutocomplete("{$softCreditLname}, {$softCreditFname}", 'soft_credit_contact_1');
 
     //Custom Data
     //$this->click('CIVICRM_QFID_3_6');
@@ -151,15 +147,24 @@ class WebTest_Contribute_StandaloneAddTest extends CiviSeleniumTestCase {
       'Contribution Status' => 'Completed',
       'Paid By' => 'Check',
       'Check Number' => 'check #1041',
-      'Soft Credit To' => "{$softCreditFname} {$softCreditLname}",
     );
 
     foreach ($expected as $label => $value) {
       $this->verifyText("xpath=id('ContributionView')/div[2]/table[1]/tbody//tr/td[1][text()='$label']/../td[2]", preg_quote($value));
     }
 
-    // go to soft creditor contact view page
-    $this->click("xpath=id('ContributionView')/div[2]/table[1]/tbody//tr/td[1][text()='Soft Credit To']/../td[2]/a[text()='{$softCreditFname} {$softCreditLname}']");
+    // verify if soft credit was created successfully
+    $expected = array(
+      'Soft Credit To' => "{$softCreditFname} {$softCreditLname}",
+      'Amount' => '100.00',
+    );
+
+    foreach ($expected as $value) {
+      $this->verifyText("css=table.crm-soft-credit-listing", preg_quote($value));
+    }
+
+    // go to first soft creditor contact view page
+    $this->click("css=table.crm-soft-credit-listing tbody tr td a");
 
     // go to contribution tab
     $this->waitForElementPresent("css=li#tab_contribute a");

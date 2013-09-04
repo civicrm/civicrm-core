@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -60,7 +60,7 @@ class CRM_Member_Page_DashBoard extends CRM_Core_Page {
 
     // You can force the dashboard to display based upon a certain date
     $ym = CRM_Utils_Array::value('date', $_GET);
-    
+
     if ($ym) {
       if (preg_match('/^\d{6}$/', $ym) == 0 ||
         !checkdate(substr($ym, 4, 2), 1, substr($ym, 0, 4)) ||
@@ -165,10 +165,10 @@ class CRM_Member_Page_DashBoard extends CRM_Core_Page {
     $status = implode(',', $status);
 
     /* Disabled for lack of appropriate search
-       
+
        The Membership search isn't able to properly filter by join or renewal events.
        Until that works properly, the subtotals shouldn't get links.
- 
+
     foreach ($membershipSummary as $typeID => $details) {
       foreach ($details as $key => $value) {
         switch ($key) {
@@ -238,9 +238,9 @@ class CRM_Member_Page_DashBoard extends CRM_Core_Page {
       }
     }
     */
-    
+
     // Temporary replacement for current totals column
-    
+
     foreach ($membershipSummary as $typeID => $details) {
       if (!$isCurrentMonth) {
         $membershipSummary[$typeID]['total']['total']['url'] = CRM_Utils_System::url('civicrm/member/search',

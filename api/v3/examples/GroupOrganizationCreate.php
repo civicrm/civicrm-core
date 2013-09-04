@@ -1,38 +1,46 @@
 <?php
-
-/*
- 
+/**
+ * Test Generated example of using group_organization create API
+ * *
  */
 function group_organization_create_example(){
-$params = array( 
+$params = array(
   'organization_id' => 1,
   'group_id' => 1,
-  'version' => 3,
 );
 
-  $result = civicrm_api( 'group_organization','create',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('group_organization', 'create', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function group_organization_create_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 3,
   'id' => 1,
-  'values' => array( 
+  'values' => array(
       'id' => '1',
       'group_id' => '1',
       'organization_id' => '1',
     ),
 );
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 

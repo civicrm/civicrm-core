@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -31,7 +31,7 @@
          <td colspan="3">
       {$form.honor_type_id.html}
       <span class="crm-clear-link">(<a href="#" title="unselect" onclick="unselectRadio('honor_type_id', '{$form.formName}'); enableHonorType(); return false;">{ts}clear{/ts}</a>)</span><br />
-      <span class="description">{ts}Please include the name, and / or email address of the person you are honoring.{/ts}</span>
+      <span class="description">{ts}Select an option to reveal honoree information fields.{/ts}</span>
          </td>
       </tr>
          {/if}

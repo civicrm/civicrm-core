@@ -1,31 +1,39 @@
 <?php
-
-/*
- 
+/**
+ * Test Generated example of using contribution_recur get API
+ * *
  */
 function contribution_recur_get_example(){
-$params = array( 
-  'version' => 3,
+$params = array(
   'amount' => '500',
 );
 
-  $result = civicrm_api( 'contribution_recur','get',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('contribution_recur', 'get', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function contribution_recur_get_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
   'id' => 1,
-  'values' => array( 
-      '1' => array( 
+  'values' => array(
+      '1' => array(
           'id' => '1',
           'contact_id' => '4',
           'amount' => '500.00',
@@ -33,8 +41,8 @@ function contribution_recur_get_expectedresult(){
           'frequency_unit' => 'day',
           'frequency_interval' => '1',
           'installments' => '12',
-          'start_date' => '2012-01-01 00:00:00',
-          'create_date' => '2013-02-04 22:26:27',
+          'start_date' => '2013-07-29 00:00:00',
+          'create_date' => '20120130621222105',
           'contribution_status_id' => '1',
           'is_test' => 0,
           'cycle_day' => '1',
@@ -45,7 +53,7 @@ function contribution_recur_get_expectedresult(){
     ),
 );
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 

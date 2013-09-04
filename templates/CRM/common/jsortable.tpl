@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -26,7 +26,7 @@
 {literal}
 <script type="text/javascript">
 cj( function( ) {
-// for date sorting see http://wiki.civicrm.org/confluence/display/CRMDOC42/Sorting+Date+Fields+in+dataTables+Widget
+// for date sorting see http://wiki.civicrm.org/confluence/display/CRMDOC/Sorting+Date+Fields+in+dataTables+Widget
 var useAjax = {/literal}{if $useAjax}1{else}0{/if}{literal};
 
 var sourceUrl = '';

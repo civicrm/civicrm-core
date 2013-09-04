@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -56,6 +56,15 @@ class CRM_PCP_Form_PCPAccount extends CRM_Core_Form {
    */
   public $_single;
 
+  /**
+   * the default values for the form
+   *
+   * @var array
+   * @protected
+   */
+  protected $_defaults;
+
+
   public function preProcess() {
     $session          = CRM_Core_Session::singleton();
     $config           = CRM_Core_Config::singleton();
@@ -108,16 +117,15 @@ class CRM_PCP_Form_PCPAccount extends CRM_Core_Form {
   }
 
   function setDefaultValues() {
-    if (!$this->_contactID) {
-      return;
+    $this->_defaults = array();
+    if ($this->_contactID) {
+      foreach ($this->_fields as $name => $dontcare) {
+        $fields[$name] = 1;
+      }
+
+      CRM_Core_BAO_UFGroup::setProfileDefaults($this->_contactID, $fields, $this->_defaults);
     }
     $stateCountryMap = array();
-    foreach ($this->_fields as $name => $dontcare) {
-      $fields[$name] = 1;
-    }
-
-    CRM_Core_BAO_UFGroup::setProfileDefaults($this->_contactID, $fields, $this->_defaults);
-
     //set custom field defaults
     foreach ($this->_fields as $name => $field) {
       if ($customFieldID = CRM_Core_BAO_CustomField::getKeyID($name)) {
@@ -179,7 +187,9 @@ class CRM_PCP_Form_PCPAccount extends CRM_Core_Form {
         }
         CRM_Core_BAO_UFGroup::buildProfile($this, $field, CRM_Profile_Form::MODE_CREATE);
         $this->_fields[$key] = $field;
-        if ($field['add_captcha']) {
+
+        // CRM-11316 Is ReCAPTCHA enabled for this profile AND is this an anonymous visitor
+        if ($field['add_captcha'] && !$this->_contactID) {
           $addCaptcha = TRUE;
         }
       }
@@ -285,7 +295,7 @@ class CRM_PCP_Form_PCPAccount extends CRM_Core_Form {
     if ($ids) {
       $this->_contactID = $ids['0'];
     }
-    $contactID = &CRM_Contact_BAO_Contact::createProfileContact($params, $this->_fields, $this->_contactID);
+    $contactID = CRM_Contact_BAO_Contact::createProfileContact($params, $this->_fields, $this->_contactID);
     $this->set('contactID', $contactID);
 
     if (!empty($params['email'])) {

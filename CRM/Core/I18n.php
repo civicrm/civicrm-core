@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -35,7 +35,8 @@
 class CRM_Core_I18n {
 
   /**
-   * A PHP-gettext instance for string translation; should stay null if the strings are not to be translated (en_US).
+   * A PHP-gettext instance for string translation;
+   * should stay null if the strings are not to be translated (en_US).
    */
   private $_phpgettext = NULL;
 
@@ -229,6 +230,14 @@ class CRM_Core_I18n {
       $context = NULL;
     }
 
+    // gettext domain for extensions
+    $domain_changed = FALSE;
+    if (isset($params['domain'])) {
+      if ($this->setGettextDomain($params['domain'])) {
+        $domain_changed = TRUE;
+      }
+    }
+
     // do all wildcard translations first
     $config = CRM_Core_Config::singleton();
     $stringTable = CRM_Utils_Array::value($config->lcMessages,
@@ -303,6 +312,10 @@ class CRM_Core_I18n {
       $text = addcslashes($text, "'");
     }
 
+    if ($domain_changed) {
+      $this->setGettextDomain('civicrm');
+    }
+
     return $text;
   }
 
@@ -358,6 +371,41 @@ class CRM_Core_I18n {
       elseif ((string ) $key == 'title') {
         $array[$key] = ts($value, array('context' => 'menu'));
       }
+    }
+  }
+
+  /**
+   * Binds a gettext domain, wrapper over bindtextdomain().
+   *
+   * @param  $key Key of the extension (can be 'civicrm', or 'org.example.foo').
+   *
+   * @return void
+   */
+  function setGettextDomain($key) {
+    static $cache = array();
+
+    // It's only necessary to find once
+    if (! isset($cache[$key])) {
+      $config = CRM_Core_Config::singleton();
+
+      try {
+        $mapper = CRM_Extension_System::singleton()->getMapper();
+        $path = $mapper->keyToBasePath($key);
+        $info = $mapper->keyToInfo($key);
+        $domain = $info->file;
+
+        bindtextdomain($domain, $path . DIRECTORY_SEPARATOR . 'l10n');
+        bind_textdomain_codeset($domain, 'UTF-8');
+        $cache[$key] = $domain;
+      }
+      catch (CRM_Extension_Exception $e) {
+        // There's not much we can do at this point
+        $cache[$key] = FALSE;
+      }
+    }
+
+    if (isset($cache[$key]) && $cache[$key]) {
+      textdomain($cache[$key]);
     }
   }
 

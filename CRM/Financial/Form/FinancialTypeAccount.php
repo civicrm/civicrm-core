@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -68,7 +68,7 @@ class CRM_Financial_Form_FinancialTypeAccount extends CRM_Contribute_Form {
    * @var boolean
    */
   protected $_isARFlag = FALSE;
-  
+
   /**
    * Function to set variables up before form is built
    *
@@ -82,25 +82,25 @@ class CRM_Financial_Form_FinancialTypeAccount extends CRM_Contribute_Form {
     if (!$this->_id && ($this->_action & CRM_Core_Action::UPDATE)) {
       $this->_id = CRM_Utils_Type::escape($this->_id, 'Positive');
     }
-    $url = CRM_Utils_System::url('civicrm/admin/financial/financialType/accounts', 
-      "reset=1&action=browse&aid={$this->_aid}"); 
-      
+    $url = CRM_Utils_System::url('civicrm/admin/financial/financialType/accounts',
+      "reset=1&action=browse&aid={$this->_aid}");
+
     $this->_BAOName = 'CRM_Financial_BAO_FinancialTypeAccount';
     if ($this->_aid && ($this->_action & CRM_Core_Action::ADD)) {
       $this->_title = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialType', $this->_aid, 'name');
       CRM_Utils_System::setTitle($this->_title . ' - ' . ts('Financial Accounts'));
 
-      $session = CRM_Core_Session::singleton(); 
+      $session = CRM_Core_Session::singleton();
       $session->pushUserContext($url);
-    } 
+    }
     // CRM-12492
-    if (!($this->_action & CRM_Core_Action::ADD)) { 
+    if (!($this->_action & CRM_Core_Action::ADD)) {
       $relationTypeId = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Accounts Receivable Account is' "));
       $accountRelationship = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_EntityFinancialAccount', $this->_id, 'account_relationship');
       if ($accountRelationship == $relationTypeId) {
         $this->_isARFlag = TRUE;
         if ($this->_action & CRM_Core_Action::DELETE) {
-          CRM_Core_Session::setStatus(ts("Selected financial type account with 'Accounts Receivable Account is' account relationship cannot be deleted."), 
+          CRM_Core_Session::setStatus(ts("Selected financial type account with 'Accounts Receivable Account is' account relationship cannot be deleted."),
             '', 'error');
           CRM_Utils_System::redirect($url);
         }

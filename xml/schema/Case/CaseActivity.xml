@@ -51,9 +51,8 @@
     <fieldName>activity_id</fieldName>
     <add>2.0</add>
   </index>
-                                
 
-  <field> 
+  <field>
    <name>activity_entity_table</name>
    <type>varchar</type>
    <length>64</length>
@@ -64,12 +63,12 @@
   </field>
 
   <field>
-   <name>activity_entity_id</name>   
+   <name>activity_entity_id</name>
    <type>int unsigned</type>
    <required>true</required>
    <comment>Entity (activity, phonecall or meeting) id for which the assigment is created</comment>
    <add>1.8</add>
-   <drop>2.0</drop>   
+   <drop>2.0</drop>
   </field>
 
   <dynamicForeignKey>

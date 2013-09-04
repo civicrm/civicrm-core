@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -35,7 +35,7 @@
       <div class="crm-content crm-contact-gender_display">{$gender_display}</div>
     </div>
     <div class="crm-summary-row">
-      <div class="crm-label">{ts}Date of birth{/ts}</div>
+      <div class="crm-label">{ts}Date of Birth{/ts}</div>
       <div class="crm-content crm-contact-birth_date_display">
           {if $birthDateViewFormat}
             {$birth_date_display|crmDate:$birthDateViewFormat}

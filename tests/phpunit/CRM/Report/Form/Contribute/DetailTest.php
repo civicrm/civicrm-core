@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -30,7 +30,7 @@ require_once 'CiviTest/CiviReportTestCase.php';
 /**
  *  Test report outcome
  *
- *  @package CiviCRM
+ * @package CiviCRM
  */
 class CRM_Report_Form_Contribute_DetailTest extends CiviReportTestCase {
   static $_tablesToTruncate = array(
@@ -45,50 +45,49 @@ class CRM_Report_Form_Contribute_DetailTest extends CiviReportTestCase {
     return array(
       array(
         'CRM_Report_Form_Contribute_Detail',
-        array( 
+        array(
           'fields' => array(
+            'sort_name',
             'first_name',
             'email',
             'total_amount',
           ),
           'filters' => array(
-            'total_amount_op'    => 'gte',
+            'total_amount_op' => 'gte',
             'total_amount_value' => 50,
           ),
           // FIXME: add filters
         ),
-        'fixtures/dataset.sql',
-        'fixtures/report.csv',      
-      ),
+        'fixtures/dataset-ascii.sql',
+        'fixtures/report-ascii.csv',
+      )
     );
   }
 
   function setUp() {
     parent::setUp();
+    $this->foreignKeyChecksOff();
+    $this->quickCleanup(self::$_tablesToTruncate);
   }
 
-  function tearDown() {}
+  function tearDown() {
+    parent::tearDown();
+    CRM_Core_DAO::executeQuery('DROP TEMPORARY TABLE IF EXISTS civireport_contribution_detail_temp1');
+    CRM_Core_DAO::executeQuery('DROP TEMPORARY TABLE IF EXISTS civireport_contribution_detail_temp2');
+    CRM_Core_DAO::executeQuery('DROP TEMPORARY TABLE IF EXISTS civireport_contribution_detail_temp3');
+  }
 
   /**
-   *  @dataProvider dataProvider
+   * @dataProvider dataProvider
    */
   public function testReportOutput($reportClass, $inputParams, $dataSet, $expectedOutputCsvFile) {
-    $this->foreignKeyChecksOff();
-    
-    $this->quickCleanup(self::$_tablesToTruncate);
-
     $config = CRM_Core_Config::singleton();
     CRM_Utils_File::sourceSQLFile($config->dsn, dirname(__FILE__) . "/{$dataSet}");
 
-    $reportCsvFile  = $this->getReportOutputAsCsv($reportClass, $inputParams);
+    $reportCsvFile = $this->getReportOutputAsCsv($reportClass, $inputParams);
     $reportCsvArray = $this->getArrayFromCsv($reportCsvFile);
 
     $expectedOutputCsvArray = $this->getArrayFromCsv(dirname(__FILE__) . "/{$expectedOutputCsvFile}");
-    $this->assertEquals(count($reportCsvArray[0]), count($expectedOutputCsvArray[0]), 'In line ' . __LINE__);
-
-    foreach($reportCsvArray as $intKey => $strVal) {
-      $this->assertNotNull($expectedOutputCsvArray[$intKey], 'In line ' . __LINE__);
-      $this->assertEquals($expectedOutputCsvArray[$intKey], $strVal);
-    }
+    $this->assertCsvArraysEqual($expectedOutputCsvArray, $reportCsvArray);
   }
 }

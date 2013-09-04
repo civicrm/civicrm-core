@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -40,5 +40,7 @@
     <p><div class="bold">{ts}Thank you for signing the petition.{/ts}</div></p>
   {/if}
   </div>
+  {if $is_share}
     {include file="CRM/Campaign/Page/Petition/SocialNetwork.tpl"}
+  {/if}
 {/if}

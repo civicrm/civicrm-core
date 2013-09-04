@@ -425,8 +425,8 @@ class InstallRequirements {
 
     $configIDSiniDir = NULL;
     global $cmsPath;
+    $siteDir = getSiteDir($cmsPath, $_SERVER['SCRIPT_FILENAME']);
     if ($installType == 'drupal') {
-      $siteDir = getSiteDir($cmsPath, $_SERVER['SCRIPT_FILENAME']);
 
       // make sure that we can write to sites/default and files/
       $writableDirectories = array(
@@ -964,7 +964,7 @@ class InstallRequirements {
       return TRUE;
     }
     else {
-      $testDetails[2] .= " (the following PHP variables are missing: " . implode(", ", $missing) . ")";
+      $testDetails[2] = " (the following PHP variables are missing: " . implode(", ", $missing) . ")";
       $this->error($testDetails);
     }
   }

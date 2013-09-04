@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -372,7 +372,7 @@ WHERE  v.option_group_id = g.id
    * @static
    *
    * @return string   the value from the row where is_default = true
-   */   
+   */
   static function getDefaultValue($groupName) {
     if (empty($groupName)) {
       return NULL;
@@ -394,7 +394,7 @@ WHERE  v.option_group_id = g.id
     $p = array(1 => array($groupName, 'String'));
     return CRM_Core_DAO::singleValueQuery($query, $p);
   }
-  
+
   /**
    * Creates a new option group with the passed in values
    * @TODO: Should update the group if it already exists intelligently, so multi-lingual is
@@ -596,6 +596,7 @@ WHERE  v.option_group_id = g.id
   static function flushAll() {
     self::$_values = array();
     self::$_cache = array();
+    CRM_Utils_Cache::singleton()->flush();
   }
 }
 

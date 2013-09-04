@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -44,6 +44,7 @@ class CRM_Campaign_Page_Petition_ThankYou extends CRM_Core_Page {
     $this->assign('thankyou_text', CRM_Utils_Array::value('thankyou_text', $this->petition));
     $this->assign('survey_id', $petition_id);
     $this->assign('status_id', $id);
+    $this->assign('is_share', CRM_Utils_Array::value('is_share', $this->petition));
     CRM_Utils_System::setTitle(CRM_Utils_Array::value('thankyou_title', $this->petition));
 
     // send thank you or email verification emails

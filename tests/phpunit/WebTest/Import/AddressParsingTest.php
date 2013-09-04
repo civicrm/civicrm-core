@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -188,8 +188,8 @@ class WebTest_Import_AddressParsingTest extends ImportCiviSeleniumTestCase {
       'email' => 'Email',
       'phone' => 'Phone',
       'street_address' => 'Street Address',
-      'address_1' => 'Additional Address 1',
-      'address_2' => 'Additional Address 2',
+      'address_1' => 'Supplemental Address 1',
+      'address_2' => 'Supplemental Address 2',
       'city' => 'City',
       'state' => 'State',
       'country' => 'Country',
@@ -236,8 +236,8 @@ class WebTest_Import_AddressParsingTest extends ImportCiviSeleniumTestCase {
       'email' => 'Email',
       'phone' => 'Phone',
       'street_address' => 'Street Address',
-      'address_1' => 'Additional Address 1',
-      'address_2' => 'Additional Address 2',
+      'address_1' => 'Supplemental Address 1',
+      'address_2' => 'Supplemental Address 2',
       'city' => 'City',
       'state' => 'State',
       'country' => 'Country',

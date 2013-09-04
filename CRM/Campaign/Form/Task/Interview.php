@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -553,11 +553,11 @@ WHERE {$clause}
     $activityParams = array(
       'details' => 'details',
       'result' => 'result',
-      'engagement_level' => 'activity_engagement_level', 
+      'engagement_level' => 'activity_engagement_level',
       'subject' => 'activity_subject',
       'status_id' => 'activity_status_id',
-      'source_contact_id' => 'source_contact', 
-      'location' => 'activity_location', 
+      'source_contact_id' => 'source_contact',
+      'location' => 'activity_location',
       'campaign_id' => 'activity_campaign_id',
       'duration' => 'activity_duration'
     );
@@ -566,7 +566,7 @@ WHERE {$clause}
         $activity->$key = $params[$field];
       }
     }
-  
+
     $activity->save();
     //really this should use Activity BAO& not be here but refactoring will have to be later
     //actually the whole ajax call could be done as an api ajax call & post hook would be sorted
@@ -626,7 +626,7 @@ WHERE {$clause}
         $query = "
      CREATE TEMPORARY TABLE {$tempTableName} (
             id int unsigned NOT NULL AUTO_INCREMENT,
-            survey_contact_id int unsigned NOT NULL,  
+            survey_contact_id int unsigned NOT NULL,
   PRIMARY KEY ( id )
 );
 ";
@@ -637,7 +637,7 @@ WHERE {$clause}
           $processIds = $this->_contactIds;
           $insertIds = array_splice($processIds, $insertedCount, $batch);
           if (!empty($insertIds)) {
-            $insertSQL = "INSERT IGNORE INTO {$tempTableName}( survey_contact_id ) 
+            $insertSQL = "INSERT IGNORE INTO {$tempTableName}( survey_contact_id )
                      VALUES (" . implode('),(', $insertIds) . ');';
             CRM_Core_DAO::executeQuery($insertSQL);
           }
@@ -646,7 +646,7 @@ WHERE {$clause}
 
         $query = "
     SELECT  contact.id as id
-      FROM  civicrm_contact contact 
+      FROM  civicrm_contact contact
 INNER JOIN  {$tempTableName} ON ( {$tempTableName}.survey_contact_id = contact.id )
      WHERE  contact.contact_type != %1";
         $removeContact = CRM_Core_DAO::executeQuery($query,

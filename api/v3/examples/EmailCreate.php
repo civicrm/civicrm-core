@@ -1,34 +1,42 @@
 <?php
-
-/*
- 
+/**
+ * Test Generated example of using email create API
+ * *
  */
 function email_create_example(){
-$params = array( 
+$params = array(
   'contact_id' => 3,
   'location_type_id' => 6,
   'email' => 'api@a-team.com',
   'is_primary' => 1,
-  'version' => 3,
 );
 
-  $result = civicrm_api( 'email','create',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('email', 'create', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function email_create_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
   'id' => 3,
-  'values' => array( 
-      '3' => array( 
+  'values' => array(
+      '3' => array(
           'id' => '3',
           'contact_id' => '3',
           'location_type_id' => '6',
@@ -45,7 +53,7 @@ function email_create_expectedresult(){
     ),
 );
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 

@@ -1,11 +1,10 @@
 <?php
-
-/*
- 
+/**
+ * Test Generated example of using price_set create API
+ * *
  */
 function price_set_create_example(){
-$params = array( 
-  'version' => 3,
+$params = array(
   'name' => 'default_goat_priceset',
   'title' => 'Goat accessories',
   'is_active' => 1,
@@ -17,23 +16,32 @@ $params = array(
   'is_reserved' => 1,
 );
 
-  $result = civicrm_api( 'price_set','create',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('price_set', 'create', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function price_set_create_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
   'id' => 15,
-  'values' => array( 
-      '15' => array( 
+  'values' => array(
+      '15' => array(
           'id' => '15',
           'domain_id' => '',
           'name' => 'default_goat_priceset',
@@ -50,7 +58,7 @@ function price_set_create_expectedresult(){
     ),
 );
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 

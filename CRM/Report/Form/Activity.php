@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -333,7 +333,7 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
               $orderByRef = "activity_assignment_civireport.contact_id";
               if (in_array($fieldName, array(
                 'contact_target', 'target_contact_id'))) {
-                $orderByRef = "activity_target_civireport.target_contact_id";
+                $orderByRef = "activity_target_civireport.contact_id";
               }
               $select[] = "GROUP_CONCAT(DISTINCT {$field['dbAlias']}  ORDER BY {$orderByRef} SEPARATOR '{$seperator}') as {$tableName}_{$fieldName}";
             }
@@ -659,7 +659,7 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
     ) {
       $this->_from .= "
                  LEFT JOIN civicrm_address {$this->_aliases['civicrm_address']}
-                           ON ({$this->_aliases['civicrm_activity_target']}.target_contact_id =
+                           ON ({$this->_aliases['civicrm_activity_target']}.contact_id =
                                {$this->_aliases['civicrm_address']}.contact_id) AND
                                {$this->_aliases['civicrm_address']}.is_primary = 1\n";
     }

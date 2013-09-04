@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -323,6 +323,15 @@ class CRM_Contact_Form_Search extends CRM_Core_Form {
           'resultFile' => 'CRM/Contact/Form/Selector.tpl',
           'resultContext' => NULL,
           'taskClassName' => 'CRM_Contact_Task',
+        ),
+        8 => array(
+          'selectorName' => 'CRM_Mailing_Selector_Search',
+          'selectorLabel' => ts('Mailings'),
+          'taskFile' => "CRM/common/searchResultTasks.tpl",
+          'taskContext' => NULL,
+          'resultFile' => 'CRM/Mailing/Form/Selector.tpl',
+          'resultContext' => 'Search',
+          'taskClassName' => 'CRM_Mailing_Task',
         ),
       );
     }
@@ -924,15 +933,11 @@ class CRM_Contact_Form_Search extends CRM_Core_Form {
       $selector->setKey($this->controller->_key);
 
       // added the sorting  character to the form array
-      // lets recompute the aToZ bar without the sortByCharacter
-      // we need this in most cases except when just pager or sort values change, which
-      // we'll ignore for now
       $config = CRM_Core_Config::singleton();
       // do this only for contact search
       if ($setDynamic && $config->includeAlphabeticalPager) {
-        if ($this->_reset ||
-          ($this->_sortByCharacter === NULL || $this->_sortByCharacter == '')
-        ) {
+        // Don't recompute if we are just paging/sorting
+        if ($this->_reset || (empty($_GET['crmPID']) && empty($_GET['crmSID']) && !$this->_sortByCharacter)) {
           $aToZBar = CRM_Utils_PagerAToZ::getAToZBar($selector, $this->_sortByCharacter);
           $this->set('AToZBar', $aToZBar);
         }

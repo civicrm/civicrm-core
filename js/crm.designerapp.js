@@ -1,4 +1,4 @@
-cj(document).ready(function($) {
+cj(function($) {
   /**
    * FIXME we depend on this being a global singleton, mainly to facilitate vents
    *

@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -134,6 +134,20 @@ return array(
     'is_domain' => 1,
     'is_contact' => 0,
     'description' => 'When CiviMail is enabled, users who "subscribe" to a group from a profile Group(s) checkbox will receive a confirmation email. They must respond (opt-in) before they are added to the group.',
+    'help_text' => null,
+  ),
+  'disable_mandatory_tokens_check' => array(
+    'group_name' => 'Mailing Preferences',
+    'group' => 'mailing',
+    'name' => 'disable_mandatory_tokens_check',
+    'type' => 'Integer',
+    'html_type' => 'checkbox',
+    'default' => 0,
+    'add' => '4.4',
+    'title' => 'Disable check for mandatory tokens',
+    'is_domain' => 1,
+    'is_contact' => 0,
+    'description' => 'Don\'t check for presence of mandatory tokens (domain address; unsubscribe/opt-out) before sending mailings. WARNING: Mandatory tokens are a safe-guard which facilitate compliance with the US CAN-SPAM Act. They should only be disabled if your organization adopts other mechanisms for compliance or if your organization is not subject to CAN-SPAM.',
     'help_text' => null,
   ),
   );

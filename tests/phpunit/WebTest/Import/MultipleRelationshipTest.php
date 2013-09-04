@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -26,10 +26,6 @@
 
 require_once 'WebTest/Import/ImportCiviSeleniumTestCase.php';
 class WebTest_Import_MultipleRelationshipTest extends ImportCiviSeleniumTestCase {
-
-  protected $captureScreenshotOnFailure = TRUE;
-  protected $screenshotPath = '/var/www/api.dev.civicrm.org/public/sc';
-  protected $screenshotUrl = 'http://api.dev.civicrm.org/sc/';
 
   protected function setUp() {
     parent::setUp();

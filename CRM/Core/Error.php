@@ -2,7 +2,7 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -38,6 +38,7 @@
 
 require_once 'PEAR/ErrorStack.php';
 require_once 'PEAR/Exception.php';
+require_once 'CRM/Core/Exception.php';
 
 require_once 'Log.php';
 class CRM_Exception extends PEAR_Exception {
@@ -717,12 +718,12 @@ class CRM_Core_Error extends PEAR_ErrorStack {
    * @access public
    * @static
    */
-  public static function statusBounce($status, $redirect = NULL) {
+  public static function statusBounce($status, $redirect = NULL, $title = '') {
     $session = CRM_Core_Session::singleton();
     if (!$redirect) {
       $redirect = $session->readUserContext();
     }
-    $session->setStatus($status);
+    $session->setStatus($status, $title);
     CRM_Utils_System::redirect($redirect);
   }
 

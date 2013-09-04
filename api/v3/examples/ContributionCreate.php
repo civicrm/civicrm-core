@@ -1,10 +1,10 @@
 <?php
-
-/*
- 
+/**
+ * Test Generated example of using contribution create API
+ * *
  */
 function contribution_create_example(){
-$params = array( 
+$params = array(
   'contact_id' => 1,
   'receive_date' => '20120511',
   'total_amount' => '100',
@@ -14,26 +14,34 @@ $params = array(
   'invoice_id' => 67890,
   'source' => 'SSF',
   'contribution_status_id' => 2,
-  'version' => 3,
 );
 
-  $result = civicrm_api( 'contribution','create',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('contribution', 'create', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function contribution_create_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
   'id' => 1,
-  'values' => array( 
-      '1' => array( 
+  'values' => array(
+      '1' => array(
           'id' => '1',
           'contact_id' => '1',
           'financial_type_id' => '1',
@@ -67,7 +75,7 @@ function contribution_create_expectedresult(){
     ),
 );
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 

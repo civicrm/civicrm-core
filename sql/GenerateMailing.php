@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -73,7 +73,7 @@ for ($i = 1; $i <= $numGroups; $i++) {
   $mailing->is_completed = 1;
   $mailing->save();
 
-  $job                 = new CRM_Mailing_BAO_Job();
+  $job                 = new CRM_Mailing_BAO_MailingJob();
   $job->mailing_id     = $mailing->id;
   $job->scheduled_date = generateRandomDate();
   $job->start_date     = generateRandomDate();

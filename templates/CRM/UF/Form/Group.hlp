@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2010                                |
  +--------------------------------------------------------------------+
@@ -23,6 +23,13 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
+{htxt id='id-description-title'}
+  {ts}Help Description{/ts}
+{/htxt}
+{htxt id='id-description'}
+  {ts}Explanatory text for profile.{/ts}
+{/htxt}
+
 {htxt id='id-used_for-title'}
   {ts}Used For{/ts}
 {/htxt}
@@ -102,7 +109,7 @@
 {htxt id='id-add_captcha'}
 {capture assign="miscURL"}{crmURL p="civicrm/admin/setting/misc" q="reset=1"}{/capture}
 <p>{ts}When reCAPTCHA is enabled for a profile form, anonymous users are required to read an image with letters and numbers and enter the value in a field. This helps prevent abuse by automated scripts.{/ts}</p>
-<p>{ts 1="https://www.google.com/recaptcha" 2=$miscURL}To use reCAPTCHA you must sign up at <a href="%1" target="_blank">Google's reCaptcha site</a> to get your public and private keys. Then enter both keys in <a href="%2">Administer CiviCRM &raquo; System Settings &raquo; Undelete, Logging and ReCAPTCHA</a>.{/ts}</p>
+<p>{ts 1="https://www.google.com/recaptcha" 2=$miscURL}To use reCAPTCHA you must sign up at <a href="%1" target="_blank">Google's reCaptcha site</a> to get your public and private keys. Then enter both keys in <a href="%2">Administer CiviCRM &raquo; System Settings &raquo; Misc (Undelete, PDFs, Limits, Logging, Captcha, etc.)</a>.{/ts}</p>
 <p><strong>{ts}Do not enable this feature if you are using this profile as an HTML Form Snippet embedded in a non-CiviCRM web page. reCAPTCHA requires dynamic page generation. Submitting a stand-alone form with reCAPTCHA included will always result in a reCAPTCHA validation error.{/ts}</strong></p>
 {if $config->userSystem->supports_form_extensions EQ '1'} 
   <p><strong>{ts}reCAPTCHA is also not available when a profile is used inside the User Registration and My Account screens.{/ts}</strong></p>
@@ -166,6 +173,6 @@
   {ts}Set Proximity Search as required if you want all searches using this profile to require the user to enter a start address and a radius.{/ts}
 </p>
 <p>
-  {ts}IMPORTANT: You must enable a Mapping Provider in order to use the Proximity Search feature (Administer > Configure > Global Settings > Mapping and Geocoding).{/ts}
+  {ts}IMPORTANT: You must enable a Mapping Provider in order to use the Proximity Search feature (Administer > System Settings > Mapping and Geocoding).{/ts}
 </p>
 {/htxt}

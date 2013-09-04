@@ -49,7 +49,7 @@
     <title>Activity Type ID</title>
     <type>int unsigned</type>
     <default>NULL</default>
-    <comment>Implicit FK to civicrm_option_value where option_group = activity_type</comment> 
+    <comment>Implicit FK to civicrm_option_value where option_group = activity_type</comment>
     <import>true</import>
     <add>3.3</add>
     <pseudoconstant>
@@ -200,5 +200,13 @@
     <localizable>true</localizable>
     <comment>text and html allowed. displayed above result on success page</comment>
     <add>4.2</add>
+  </field>
+  <field>
+    <name>is_share</name>
+    <title>Is shared through social media</title>
+    <type>boolean</type>
+    <default>1</default>
+    <comment>Can people share the petition through social media?</comment>
+    <add>4.4</add>
   </field>
 </table>

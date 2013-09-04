@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -81,7 +81,11 @@
                         <span class="html-adjust"><br />
                             &nbsp;{ts}Attached File{/ts}: &nbsp;
                             {if $element.element_value.displayURL}
-                                <a href="#" onclick="popUp('{$element.element_value.imageURL}'); return false;" ><img src="{$element.element_value.displayURL}" height = "{$element.element_value.imageThumbHeight}" width="{$element.element_value.imageThumbWidth}"></a>
+                                <a href="{$element.element_value.displayURL}" class='crm-image-popup'>
+                                  <img src="{$element.element_value.displayURL}"
+                                       height = "{$element.element_value.imageThumbHeight}"
+                                       width="{$element.element_value.imageThumbWidth}">
+                                </a>
                             {else}
                                 <a href="{$element.element_value.fileURL}">{$element.element_value.fileName}</a>
                             {/if}

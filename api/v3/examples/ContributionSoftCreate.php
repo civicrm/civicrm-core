@@ -1,34 +1,42 @@
 <?php
-
-/*
- 
+/**
+ * Test Generated example of using contribution_soft create API
+ * *
  */
 function contribution_soft_create_example(){
-$params = array( 
+$params = array(
   'contribution_id' => 1,
   'contact_id' => 2,
   'amount' => '10',
   'currency' => 'USD',
-  'version' => 3,
 );
 
-  $result = civicrm_api( 'contribution_soft','create',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('contribution_soft', 'create', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function contribution_soft_create_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
   'id' => 1,
-  'values' => array( 
-      '1' => array( 
+  'values' => array(
+      '1' => array(
           'id' => '1',
           'contribution_id' => '1',
           'contact_id' => '2',
@@ -42,7 +50,7 @@ function contribution_soft_create_expectedresult(){
     ),
 );
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 

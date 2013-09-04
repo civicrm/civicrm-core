@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -58,7 +58,7 @@ class CRM_Admin_Page_Extensions extends CRM_Core_Page_Basic {
     CRM_Utils_System::setTitle(ts('CiviCRM Extensions'));
         $destination = CRM_Utils_System::url( 'civicrm/admin/extensions',
                                               'reset=1' );
-        
+
         $destination = urlencode( $destination );
         $this->assign( 'destination', $destination );
   }

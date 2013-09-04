@@ -1,32 +1,40 @@
 <?php
-
-/*
- 
+/**
+ * Test Generated example of using membership_status get API
+ * *
  */
 function membership_status_get_example(){
-$params = array( 
+$params = array(
   'name' => 'test status',
-  'version' => 3,
 );
 
-  $result = civicrm_api( 'membership_status','get',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('membership_status', 'get', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function membership_status_get_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
-  'id' => 10,
-  'values' => array( 
-      '10' => array( 
-          'id' => '10',
+  'id' => 9,
+  'values' => array(
+      '9' => array(
+          'id' => '9',
           'name' => 'test status',
           'label' => 'test status',
           'start_event' => 'start_date',
@@ -40,7 +48,7 @@ function membership_status_get_expectedresult(){
     ),
 );
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 

@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -81,7 +81,7 @@ class CRM_Dedupe_Finder {
    *
    * @param array  $params  array of params of the form $params[$table][$field] == $value
    * @param string $ctype   contact type to match against
-   * @param string $used    dedupe rule group usage ('Unsupervised' or 'Supervised' or 'General')  
+   * @param string $used    dedupe rule group usage ('Unsupervised' or 'Supervised' or 'General')
    * @param array  $except  array of contacts that shouldn't be considered dupes
    * @param int    $ruleGroupID the id of the dedupe rule we should be using
    *

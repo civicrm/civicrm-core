@@ -1,10 +1,10 @@
 <?php
-
-/*
- 
+/**
+ * Test Generated example of using mail_settings create API
+ * *
  */
 function mail_settings_create_example(){
-$params = array( 
+$params = array(
   'domain_id' => 1,
   'name' => 'my mail setting',
   'domain' => 'setting.com',
@@ -12,26 +12,34 @@ $params = array(
   'server' => 'localhost',
   'username' => 'sue',
   'password' => 'pass',
-  'version' => 3,
 );
 
-  $result = civicrm_api( 'mail_settings','create',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('mail_settings', 'create', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function mail_settings_create_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
   'id' => 2,
-  'values' => array( 
-      '2' => array( 
+  'values' => array(
+      '2' => array(
           'id' => '2',
           'domain_id' => '1',
           'name' => 'my mail setting',
@@ -50,7 +58,7 @@ function mail_settings_create_expectedresult(){
     ),
 );
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 

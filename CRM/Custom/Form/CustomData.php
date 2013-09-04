@@ -1,7 +1,7 @@
 <?php
 /*
   +--------------------------------------------------------------------+
-  | CiviCRM version 4.3                                                |
+  | CiviCRM version 4.4                                                |
   +--------------------------------------------------------------------+
   | Copyright CiviCRM LLC (c) 2004-2013                                |
   +--------------------------------------------------------------------+
@@ -102,7 +102,7 @@ class CRM_Custom_Form_CustomData {
 
     $typeCheck = CRM_Utils_Request::retrieve( 'type', 'String', CRM_Core_DAO::$_nullObject );
     $urlGroupId = CRM_Utils_Request::retrieve('groupID', 'Positive', CRM_Core_DAO::$_nullObject);
-    if ( isset($typeCheck) && $urlGroupId) { 
+    if ( isset($typeCheck) && $urlGroupId) {
       $form->_groupID = $urlGroupId;
     } else {
       $form->_groupID = CRM_Utils_Request::retrieve('groupID', 'Positive', $form);
@@ -115,7 +115,7 @@ class CRM_Custom_Form_CustomData {
     if (!is_array($subType) && strstr($subType, CRM_Core_DAO::VALUE_SEPARATOR)) {
       $subType = str_replace(CRM_Core_DAO::VALUE_SEPARATOR, ',', trim($subType, CRM_Core_DAO::VALUE_SEPARATOR));
     }
-    
+
     $groupTree = &CRM_Core_BAO_CustomGroup::getTree($form->_type,
       $form,
       $form->_entityId,
@@ -156,7 +156,7 @@ class CRM_Custom_Form_CustomData {
   static function buildQuickForm(&$form) {
     $form->addElement('hidden', 'hidden_custom', 1);
     $form->addElement('hidden', "hidden_custom_group_count[{$form->_groupID}]", $form->_groupCount);
-    CRM_Core_BAO_CustomGroup::buildQuickForm($form, $form->_groupTree, FALSE, $form->_groupCount);
+    CRM_Core_BAO_CustomGroup::buildQuickForm($form, $form->_groupTree);
   }
 }
 

@@ -6,6 +6,9 @@ class PaypalPro extends PHPUnit_Framework_Testcase {
    * a payment processor of type Paypal Pro
    *
    * @return $paymentProcessor id of created payment processor
+   * @todo this appears not to be working but because it doesn't extend the test class
+   * callAPISuccess won't work
+   * I have duplicated this on the main test class as a work around
    */
   static function create() {
 

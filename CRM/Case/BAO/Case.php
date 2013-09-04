@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -34,7 +34,7 @@
  */
 
 /**
- * This class contains the funtions for Case Management
+ * This class contains the functions for Case Management
  *
  */
 class CRM_Case_BAO_Case extends CRM_Case_DAO_Case {
@@ -46,6 +46,7 @@ class CRM_Case_BAO_Case extends CRM_Case_DAO_Case {
    * @static
    */
   static $_exportableFields = NULL;
+
   function __construct() {
     parent::__construct();
   }
@@ -57,7 +58,7 @@ class CRM_Case_BAO_Case extends CRM_Case_DAO_Case {
    * case object. the params array could contain additional unused name/value
    * pairs
    *
-   * @param array  $params (reference ) an assoc array of name/value pairs
+   * @param array $params (reference ) an assoc array of name/value pairs
    * @param array $ids    the array that holds all the db ids
    *
    * @return object CRM_Case_BAO_Case object
@@ -321,7 +322,7 @@ class CRM_Case_BAO_Case extends CRM_Case_DAO_Case {
    * Delete the record that are associated with this case
    * record are deleted from case
    *
-   * @param  int  $caseId id of the case to delete
+   * @param  int $caseId id of the case to delete
    *
    * @return void
    * @access public
@@ -373,12 +374,12 @@ class CRM_Case_BAO_Case extends CRM_Case_DAO_Case {
   /**
    * Function to enable disable case related relationships
    *
-   *  @param int      $caseId case id
-   *  @param boolean  $enable action
+   * @param int $caseId case id
+   * @param boolean $enable action
    *
-   *  @return void
-   *  @access public
-   *  @static
+   * @return void
+   * @access public
+   * @static
    */
   static function enableDisableCaseRelationships($caseId, $enable) {
     $contactIds = self::retrieveContactIdsByCaseId($caseId);
@@ -387,8 +388,8 @@ class CRM_Case_BAO_Case extends CRM_Case_DAO_Case {
         $roles = self::getCaseRoles($cid, $caseId);
         if (!empty($roles)) {
           $relationshipIds = implode(',', array_keys($roles));
-          $enable          = (int)$enable;
-          $query           = "UPDATE civicrm_relationship SET is_active = {$enable}
+          $enable = (int) $enable;
+          $query = "UPDATE civicrm_relationship SET is_active = {$enable}
                         WHERE id IN ( {$relationshipIds} )";
           CRM_Core_DAO::executeQuery($query);
         }
@@ -399,7 +400,7 @@ class CRM_Case_BAO_Case extends CRM_Case_DAO_Case {
   /**
    * Delete the activities related to case
    *
-   * @param  int  $activityId id of the activity
+   * @param  int $activityId id of the activity
    *
    * @return void
    * @access public
@@ -414,7 +415,7 @@ class CRM_Case_BAO_Case extends CRM_Case_DAO_Case {
   /**
    * Retrieve contact_id by case_id
    *
-   * @param int    $caseId  ID of the case
+   * @param int $caseId  ID of the case
    *
    * @return array
    * @access public
@@ -461,7 +462,7 @@ class CRM_Case_BAO_Case extends CRM_Case_DAO_Case {
   /**
    * Retrieve contact names by caseId
    *
-   * @param int    $caseId  ID of the case
+   * @param int $caseId  ID of the case
    *
    * @return array
    *
@@ -506,7 +507,7 @@ class CRM_Case_BAO_Case extends CRM_Case_DAO_Case {
   /**
    * Retrieve case_id by contact_id
    *
-   * @param int     $contactId      ID of the contact
+   * @param int $contactId      ID of the contact
    * @param boolean $includeDeleted include the deleted cases in result
    *
    * @return array
@@ -669,11 +670,11 @@ LEFT JOIN civicrm_option_group aog ON aog.name='activity_type'
    * Retrieve cases related to particular contact or whole contact
    * used in Dashboad and Tab
    *
-   * @param boolean    $allCases
+   * @param boolean $allCases
    *
-   * @param int        $userID
+   * @param int $userID
    *
-   * @param String     $type /upcoming,recent,all/
+   * @param String $type /upcoming,recent,all/
    *
    * @return array     Array of Cases
    *
@@ -842,9 +843,9 @@ AND civicrm_case.status_id != $closedId";
       $allCases = FALSE;
     }
 
-    $caseTypes    = CRM_Case_PseudoConstant::caseType();
+    $caseTypes = CRM_Case_PseudoConstant::caseType();
     $caseStatuses = CRM_Case_PseudoConstant::caseStatus();
-    $caseTypes    = array_flip($caseTypes);
+    $caseTypes = array_flip($caseTypes);
 
     // get statuses as headers for the table
     $url = CRM_Utils_System::url('civicrm/case/search', "reset=1&force=1&all=1&status=");
@@ -863,10 +864,10 @@ AND civicrm_case.status_id != $closedId";
       $case_owner = 1;
     }
     else {
-      $all               = 0;
+      $all = 0;
       $case_owner = 2;
       $myCaseWhereClause = " AND case_relationship.contact_id_b = {$userID}";
-      $myGroupByClause   = " GROUP BY CONCAT(case_relationship.case_id,'-',case_relationship.contact_id_b)";
+      $myGroupByClause = " GROUP BY CONCAT(case_relationship.case_id,'-',case_relationship.contact_id_b)";
     }
 
     $seperator = CRM_Core_DAO::VALUE_SEPARATOR;
@@ -908,8 +909,8 @@ SELECT case_status.label AS case_status, status_id, case_type.label AS case_type
   /**
    * Function to get Case roles
    *
-   * @param int   $contactID contact id
-   * @param int   $caseID case id
+   * @param int $contactID contact id
+   * @param int $caseID case id
    * @return returns case role / relationships
    *
    * @static
@@ -963,9 +964,9 @@ SELECT case_status.label AS case_status, status_id, case_type.label AS case_type
   /**
    * Function to get Case Activities
    *
-   * @param int    $caseID case id
-   * @param array  $params posted params
-   * @param int    $contactID contact id
+   * @param int $caseID case id
+   * @param array $params posted params
+   * @param int $contactID contact id
    *
    * @return returns case activities
    *
@@ -976,6 +977,7 @@ SELECT case_status.label AS case_status, status_id, case_type.label AS case_type
 
     $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
     $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
+    $sourceID = CRM_Utils_Array::key('Activity Source', $activityContacts);
     $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
 
     // CRM-5081 - formatting the dates to omit seconds.
@@ -999,19 +1001,20 @@ SELECT case_status.label AS case_status, status_id, case_type.label AS case_type
                           ca.weight as weight,
                           GROUP_CONCAT(ef.file_id) as attachment_ids ";
 
-    $from = 'FROM civicrm_case_activity cca
+    $from = "
+      FROM civicrm_case_activity cca
                   INNER JOIN civicrm_activity ca ON ca.id = cca.activity_id
-                  INNER JOIN civicrm_activity_contact cac ON cac.activity_id = ca.id
+                  INNER JOIN civicrm_activity_contact cac ON cac.activity_id = ca.id AND cac.record_type_id = {$sourceID}
                   INNER JOIN civicrm_contact cc ON cc.id = cac.contact_id
-                  INNER JOIN civicrm_option_group cog ON cog.name = "activity_type"
+                  INNER JOIN civicrm_option_group cog ON cog.name = 'activity_type'
                   INNER JOIN civicrm_option_value cov ON cov.option_group_id = cog.id
                          AND cov.value = ca.activity_type_id AND cov.is_active = 1
-                  LEFT JOIN civicrm_entity_file ef on ef.entity_table = "civicrm_activity" AND ef.entity_id = ca.id
-                  LEFT OUTER JOIN civicrm_option_group og ON og.name="activity_status"
-                  LEFT OUTER JOIN civicrm_option_value ov ON ov.option_group_id=og.id AND ov.name="Scheduled"
+                  LEFT JOIN civicrm_entity_file ef on ef.entity_table = 'civicrm_activity'  AND ef.entity_id = ca.id
+                  LEFT OUTER JOIN civicrm_option_group og ON og.name = 'activity_status'
+                  LEFT OUTER JOIN civicrm_option_value ov ON ov.option_group_id=og.id AND ov.name = 'Scheduled'
                   LEFT JOIN civicrm_activity_contact caa
-                                ON caa.activity_id = ca.id AND caa.record_type_id = "$assigneeID"                  
-                  LEFT JOIN civicrm_contact acc ON acc.id = caa.contact_id  ';
+                                ON caa.activity_id = ca.id AND caa.record_type_id = {$assigneeID}
+                  LEFT JOIN civicrm_contact acc ON acc.id = caa.contact_id  ";
 
     $where = 'WHERE cca.case_id= %1
                     AND ca.is_current_revision = 1';
@@ -1080,30 +1083,29 @@ SELECT case_status.label AS case_status, status_id, case_type.label AS case_type
     $rp = CRM_Utils_Array::value('rp', $params);
 
     if (!$page) {
-
       $page = 1;
-
     }
     if (!$rp) {
       $rp = 10;
     }
 
     $start = (($page - 1) * $rp);
-
     $query = $select . $from . $where . $groupBy . $orderBy;
 
-    $params          = array(1 => array($caseID, 'Integer'));
-    $dao             = CRM_Core_DAO::executeQuery($query, $params);
+    $params = array(1 => array($caseID, 'Integer'));
+    $dao = CRM_Core_DAO::executeQuery($query, $params);
     $params['total'] = $dao->N;
 
     //FIXME: need to optimize/cache these queries
     $limit = " LIMIT $start, $rp";
     $query .= $limit;
+
+    //EXIT;
     $dao = CRM_Core_DAO::executeQuery($query, $params);
 
 
-    $activityTypes    = CRM_Case_PseudoConstant::caseActivityType(FALSE, TRUE);
-    $activityStatus   = CRM_Core_PseudoConstant::activityStatus();
+    $activityTypes = CRM_Case_PseudoConstant::caseActivityType(FALSE, TRUE);
+    $activityStatus = CRM_Core_PseudoConstant::activityStatus();
     $activityPriority = CRM_Core_PseudoConstant::get('CRM_Activity_DAO_Activity', 'priority_id');
 
     $url = CRM_Utils_System::url("civicrm/case/activity",
@@ -1114,10 +1116,10 @@ SELECT case_status.label AS case_status, status_id, case_type.label AS case_type
     if ($context == 'fulltext') {
       $contextUrl = "&context={$context}";
     }
-    $editUrl     = "{$url}&action=update{$contextUrl}";
-    $deleteUrl   = "{$url}&action=delete{$contextUrl}";
-    $restoreUrl  = "{$url}&action=renew{$contextUrl}";
-    $viewTitle   = ts('View this activity.');
+    $editUrl = "{$url}&action=update{$contextUrl}";
+    $deleteUrl = "{$url}&action=delete{$contextUrl}";
+    $restoreUrl = "{$url}&action=renew{$contextUrl}";
+    $viewTitle = ts('View this activity.');
     $statusTitle = ts('Edit status');
 
     $emailActivityTypeIDs = array(
@@ -1163,8 +1165,8 @@ SELECT case_status.label AS case_status, status_id, case_type.label AS case_type
 
     while ($dao->fetch()) {
 
-      $allowView   = self::checkPermission($dao->id, 'view', $dao->activity_type_id, $userID);
-      $allowEdit   = self::checkPermission($dao->id, 'edit', $dao->activity_type_id, $userID);
+      $allowView = self::checkPermission($dao->id, 'view', $dao->activity_type_id, $userID);
+      $allowEdit = self::checkPermission($dao->id, 'edit', $dao->activity_type_id, $userID);
       $allowDelete = self::checkPermission($dao->id, 'delete', $dao->activity_type_id, $userID);
 
       //do not have sufficient permission
@@ -1248,10 +1250,10 @@ SELECT case_status.label AS case_status, status_id, case_type.label AS case_type
         $url .= " | " . '<a href="#" onClick="Javascript:fileOnCase( \'copy\',' . $dao->id . ',' . $caseID . ' ); return false;">' . ts('Copy To Case') . '</a> ';
       }
       // if there are file attachments we will return how many and, if only one, add a link to it
-      if(!empty($dao->attachment_ids)){
-        $attachmentIDs = explode(',',$dao->attachment_ids);
+      if (!empty($dao->attachment_ids)) {
+        $attachmentIDs = explode(',', $dao->attachment_ids);
         $values[$dao->id]['no_attachments'] = count($attachmentIDs);
-        if($values[$dao->id]['no_attachments'] == 1){
+        if ($values[$dao->id]['no_attachments'] == 1) {
           // if there is only one it's easy to do a link - otherwise just flag it
           $attachmentViewUrl = CRM_Utils_System::url(
             "civicrm/file",
@@ -1290,7 +1292,7 @@ SELECT case_status.label AS case_status, status_id, case_type.label AS case_type
       }
 
       if ($allowEdit) {
-        $values[$dao->id]['status'] = '<a class="crm-activity-status crm-activity-status-' . $dao->id . ' ' . $values[$dao->id]['class'] . ' crm-activity-change-status crm-editable-enabled" activity_id='. $dao->id. ' current_status=' . $dao->status . ' case_id=' . $caseID . '" href="#" title=\'' . $statusTitle . '\'>' . $values[$dao->id]['status'] . '</a>';
+        $values[$dao->id]['status'] = '<a class="crm-activity-status crm-activity-status-' . $dao->id . ' ' . $values[$dao->id]['class'] . ' crm-activity-change-status crm-editable-enabled" activity_id=' . $dao->id . ' current_status=' . $dao->status . ' case_id=' . $caseID . '" href="#" title=\'' . $statusTitle . '\'>' . $values[$dao->id]['status'] . '</a>';
       }
     }
     $dao->free();
@@ -1301,7 +1303,7 @@ SELECT case_status.label AS case_status, status_id, case_type.label AS case_type
   /**
    * Function to get Case Related Contacts
    *
-   * @param int     $caseID case id
+   * @param int $caseID case id
    * @param boolean $skipDetails if true include details of contacts
    *
    * @return returns $searchRows array of returnproperties
@@ -1343,8 +1345,8 @@ SELECT case_status.label AS case_status, status_id, case_type.label AS case_type
   /**
    * Function that sends e-mail copy of activity
    *
-   * @param int     $activityId activity Id
-   * @param array   $contacts array of related contact
+   * @param int $activityId activity Id
+   * @param array $contacts array of related contact
    *
    * @return void
    * @access public
@@ -1482,8 +1484,8 @@ SELECT case_status.label AS case_status, status_id, case_type.label AS case_type
    * Retrieve count of activities having a particular type, and
    * associated with a particular case.
    *
-   * @param int    $caseId          ID of the case
-   * @param int    $activityTypeId  ID of the activity type
+   * @param int $caseId          ID of the case
+   * @param int $activityTypeId  ID of the activity type
    *
    * @return array
    *
@@ -1491,7 +1493,8 @@ SELECT case_status.label AS case_status, status_id, case_type.label AS case_type
    *
    */
   static function getCaseActivityCount($caseId, $activityTypeId) {
-    $queryParam = array(1 => array($caseId, 'Integer'),
+    $queryParam = array(
+      1 => array($caseId, 'Integer'),
       2 => array($activityTypeId, 'Integer'),
     );
     $query = "SELECT count(ca.id) as countact
@@ -1512,7 +1515,7 @@ SELECT case_status.label AS case_status, status_id, case_type.label AS case_type
   /**
    * Create an activity for a case via email
    *
-   * @param int    $file   email sent
+   * @param int $file   email sent
    *
    * @return $activity object of newly creted activity via email
    *
@@ -1601,9 +1604,9 @@ SELECT case_status.label AS case_status, status_id, case_type.label AS case_type
   }
 
   /**
-   * Function to retrive the scheduled activity type and date
+   * Function to retrieve the scheduled activity type and date
    *
-   * @param  array  $cases  Array of contact and case id
+   * @param  array $cases  Array of contact and case id
    *
    * @return array  $activityInfo Array of scheduled activity type and date
    *
@@ -1655,12 +1658,14 @@ SELECT case_status.label AS case_status, status_id, case_type.label AS case_type
         self::$_exportableFields = array();
       }
 
-      $fields              = CRM_Case_DAO_Case::export();
+      $fields = CRM_Case_DAO_Case::export();
       $fields['case_role'] = array('title' => ts('Role in Case'));
-      $fields['case_type'] = array('title' => ts('Case Type'),
+      $fields['case_type'] = array(
+        'title' => ts('Case Type'),
         'name' => 'case_type',
       );
-      $fields['case_status'] = array('title' => ts('Case Status'),
+      $fields['case_status'] = array(
+        'title' => ts('Case Status'),
         'name' => 'case_status',
       );
 
@@ -1672,7 +1677,7 @@ SELECT case_status.label AS case_status, status_id, case_type.label AS case_type
   /**
    * Restore the record that are associated with this case
    *
-   * @param  int  $caseId id of the case to restore
+   * @param  int $caseId id of the case to restore
    *
    * @return true if success.
    * @access public
@@ -1687,8 +1692,8 @@ SELECT case_status.label AS case_status, status_id, case_type.label AS case_type
       }
     }
     //restore case
-    $case             = new CRM_Case_DAO_Case();
-    $case->id         = $caseId;
+    $case = new CRM_Case_DAO_Case();
+    $case->id = $caseId;
     $case->is_deleted = 0;
     $case->save();
 
@@ -1709,11 +1714,11 @@ SELECT case_status.label AS case_status, status_id, case_type.label AS case_type
         $results = array();
         CRM_Contact_BAO_Group::retrieve($searchParams, $results);
         if ($results) {
-          $groupInfo['id']    = $results['id'];
+          $groupInfo['id'] = $results['id'];
           $groupInfo['title'] = $results['title'];
-          $params             = array(array('group', 'IN', array($groupInfo['id'] => 1), 0, 0));
-          $return             = array('sort_name' => 1, 'display_name' => 1, 'email' => 1, 'phone' => 1);
-          $return             = array('contact_id' => 1, 'sort_name' => 1, 'display_name' => 1, 'email' => 1, 'phone' => 1);
+          $params = array(array('group', 'IN', array($groupInfo['id'] => 1), 0, 0));
+          $return = array('sort_name' => 1, 'display_name' => 1, 'email' => 1, 'phone' => 1);
+          $return = array('contact_id' => 1, 'sort_name' => 1, 'display_name' => 1, 'email' => 1, 'phone' => 1);
           list($globalContacts, $_) = CRM_Contact_BAO_Query::apiQuery($params, $return, NULL, $sort, $offset, $rowCount, TRUE, $returnOnlyCount);
 
           if ($returnOnlyCount) {
@@ -1721,7 +1726,7 @@ SELECT case_status.label AS case_status, status_id, case_type.label AS case_type
           }
 
           if ($showLinks) {
-            foreach($globalContacts as $idx => $contact) {
+            foreach ($globalContacts as $idx => $contact) {
               $globalContacts[$idx]['sort_name'] = '<a href="' . $contactViewUrl . $contact['contact_id'] . '">' . $contact['sort_name'] . '</a>';
             }
           }
@@ -1756,19 +1761,18 @@ SELECT case_status.label AS case_status, status_id, case_type.label AS case_type
   /**
    * Function to get Case ActivitiesDueDates with given criteria.
    *
-   * @param int      $caseID case id
-   * @param array    $criteriaParams given criteria
-   * @param boolean  $latestDate if set newest or oldest date is selceted.
+   * @param int $caseID case id
+   * @param array $criteriaParams given criteria
+   * @param boolean $latestDate if set newest or oldest date is selceted.
    *
    * @return returns case activities due dates
    *
    * @static
    */
-  static function getCaseActivityDates($caseID, $criteriaParams = array(
-  ), $latestDate = FALSE) {
-    $values     = array();
+  static function getCaseActivityDates($caseID, $criteriaParams = array(), $latestDate = FALSE) {
+    $values = array();
     $selectDate = " ca.activity_date_time";
-    $where      = $groupBy = ' ';
+    $where = $groupBy = ' ';
 
     if (!$caseID) {
       return;
@@ -1808,9 +1812,9 @@ SELECT case_status.label AS case_status, status_id, case_type.label AS case_type
   /**
    * Function to create activities when Case or Other roles assigned/modified/deleted.
    *
-   * @param int      $caseID case id
-   * @param int      $relationshipId relationship id
-   * @param int      $relContactId case role assigne contactId.
+   * @param int $caseID case id
+   * @param int $relationshipId relationship id
+   * @param int $relContactId case role assignee contactId.
    *
    * @return void on success creates activity and case activity
    *
@@ -1901,8 +1905,8 @@ SELECT case_status.label AS case_status, status_id, case_type.label AS case_type
    * Function to get case manger
    * contact which is assigned a case role of case manager.
    *
-   * @param int    $caseType case type
-   * @param int    $caseId   case id
+   * @param int $caseType case type
+   * @param int $caseId   case id
    *
    * @return array $caseManagerContact array of contact on success otherwise empty
    *
@@ -1947,16 +1951,15 @@ SELECT civicrm_contact.id as casemanager_id,
    *
    * @return array of case and related data keyed on case id
    */
-  static function getUnclosedCases($params = array(
-  ), $excludeCaseIds = array(), $excludeDeleted = TRUE) {
+  static function getUnclosedCases($params = array(), $excludeCaseIds = array(), $excludeDeleted = TRUE) {
     //params from ajax call.
     $where = array('( ca.end_date is null )');
     if ($caseType = CRM_Utils_Array::value('case_type', $params)) {
       $where[] = "( ov.label LIKE '%$caseType%' )";
     }
     if ($sortName = CRM_Utils_Array::value('sort_name', $params)) {
-      $config  = CRM_Core_Config::singleton();
-      $search  = ($config->includeWildCardInName) ? "%$sortName%" : "$sortName%";
+      $config = CRM_Core_Config::singleton();
+      $search = ($config->includeWildCardInName) ? "%$sortName%" : "$sortName%";
       $where[] = "( sort_name LIKE '$search' )";
     }
     if (is_array($excludeCaseIds) &&
@@ -1973,8 +1976,8 @@ SELECT civicrm_contact.id as casemanager_id,
     $doFilterCases = FALSE;
     if (!CRM_Core_Permission::check('access all cases and activities')) {
       $doFilterCases = TRUE;
-      $session       = CRM_Core_Session::singleton();
-      $filterCases   = CRM_Case_BAO_Case::getCases(FALSE, $session->get('userID'));
+      $session = CRM_Core_Session::singleton();
+      $filterCases = CRM_Case_BAO_Case::getCases(FALSE, $session->get('userID'));
     }
     $whereClause = implode(' AND ', $where);
 
@@ -2055,7 +2058,7 @@ LEFT JOIN  civicrm_case_contact ON ( civicrm_case.id = civicrm_case_contact.case
   /**
    * Retrieve cases related to particular contact.
    *
-   * @param int     $contactId contact id
+   * @param int $contactId contact id
    * @param boolean $excludeDeleted do not include deleted cases.
    *
    * @return an array of cases.
@@ -2098,8 +2101,8 @@ INNER JOIN  civicrm_case_contact ON ( civicrm_case.id = civicrm_case_contact.cas
   /**
    * Retrieve related cases for give case.
    *
-   * @param int     $mainCaseId     id of main case
-   * @param int     $contactId      id of contact
+   * @param int $mainCaseId     id of main case
+   * @param int $contactId      id of contact
    * @param boolean $excludeDeleted do not include deleted cases.
    *
    * @return an array of related cases.
@@ -2161,8 +2164,8 @@ INNER JOIN  civicrm_case_contact ON ( civicrm_case.id = civicrm_case_contact.cas
     $doFilterCases = FALSE;
     if (!CRM_Core_Permission::check('access all cases and activities')) {
       $doFilterCases = TRUE;
-      $session       = CRM_Core_Session::singleton();
-      $filterCases   = CRM_Case_BAO_Case::getCases(FALSE, $session->get('userID'));
+      $session = CRM_Core_Session::singleton();
+      $filterCases = CRM_Case_BAO_Case::getCases(FALSE, $session->get('userID'));
     }
 
     //2. fetch the details of related cases.
@@ -2179,7 +2182,7 @@ INNER JOIN  civicrm_case_contact ON ( civicrm_case.id = civicrm_case_contact.cas
                                                      AND case_type_og.id = case_type_ov.option_group_id )
      WHERE  {$whereClause}";
 
-    $dao            = CRM_Core_DAO::executeQuery($query);
+    $dao = CRM_Core_DAO::executeQuery($query);
     $contactViewUrl = CRM_Utils_System::url("civicrm/contact/view", "reset=1&cid=");
     $hasViewContact = CRM_Core_Permission::giveMeAllACLs();
 
@@ -2188,7 +2191,7 @@ INNER JOIN  civicrm_case_contact ON ( civicrm_case.id = civicrm_case_contact.cas
       if (!$doFilterCases || array_key_exists($dao->id, $filterCases)) {
         $caseViewStr = "reset=1&id={$dao->id}&cid={$dao->client_id}&action=view&context=case&selectedChild=case";
         $caseViewUrl = CRM_Utils_System::url("civicrm/contact/view/case", $caseViewStr);
-        $caseView    = "<a href='{$caseViewUrl}'>" . ts('View Case') . "</a>";
+        $caseView = "<a href='{$caseViewUrl}'>" . ts('View Case') . "</a>";
       }
       $clientView = $dao->client_name;
       if ($hasViewContact) {
@@ -2232,7 +2235,7 @@ INNER JOIN  civicrm_case_contact ON ( civicrm_case.id = civicrm_case_contact.cas
    * @static
    */
   static function mergeCases($mainContactId, $mainCaseId = NULL, $otherContactId = NULL,
-                             $otherCaseId = NULL, $changeClient = FALSE ) {
+                             $otherCaseId = NULL, $changeClient = FALSE) {
     $moveToTrash = TRUE;
 
     $duplicateContacts = FALSE;
@@ -2260,7 +2263,7 @@ INNER JOIN  civicrm_case_contact ON ( civicrm_case.id = civicrm_case_contact.cas
     $sourceID = CRM_Utils_Array::key('Activity Source', $activityContacts);
     $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
     $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
- 
+
     $processCaseIds = array($otherCaseId);
     if ($duplicateContacts && !$duplicateCases) {
       if ($changeClient) {
@@ -2286,7 +2289,31 @@ INNER JOIN  civicrm_case_contact ON ( civicrm_case.id = civicrm_case_contact.cas
         if (!$mainCaseId) {
           continue;
         }
+
+        // CRM-11662 Copy Case custom data
+        $extends = array('case');
+        $groupTree = CRM_Core_BAO_CustomGroup::getGroupDetail(NULL, NULL, $extends);
+        if ($groupTree) {
+          foreach ($groupTree as $groupID => $group) {
+            $table[$groupTree[$groupID]['table_name']] = array('entity_id');
+            foreach ($group['fields'] as $fieldID => $field) {
+              $table[$groupTree[$groupID]['table_name']][] = $groupTree[$groupID]['fields'][$fieldID]['column_name'];
+            }
+          }
+
+          foreach ($table as $tableName => $tableColumns) {
+            $insert = 'INSERT INTO ' . $tableName . ' (' . implode(', ', $tableColumns) . ') ';
+            $tableColumns[0] = $mainCaseId;
+            $select = 'SELECT ' . implode(', ', $tableColumns);
+            $from = ' FROM ' . $tableName;
+            $where = " WHERE {$tableName}.entity_id = {$otherCaseId}";
+            $query = $insert . $select . $from . $where;
+            $dao = CRM_Core_DAO::executeQuery($query, CRM_Core_DAO::$_nullArray);
+          }
+        }
+
         $mainCase->free();
+
         $mainCaseIds[] = $mainCaseId;
         //insert record for case contact.
         $otherCaseContact = new CRM_Case_DAO_CaseContact();
@@ -2540,8 +2567,10 @@ SELECT  id
         $mergeActType = array_search('Reassigned Case', $activityTypes);
         $mergeActSubject = ts("Case %1 reassigned client from %2 to %3. New Case ID is %4.",
           array(
-            1 => $otherCaseId, 2 => $otherContactDisplayName,
-            3 => $mainContactDisplayName, 4 => $mainCaseId
+            1 => $otherCaseId,
+            2 => $otherContactDisplayName,
+            3 => $mainContactDisplayName,
+            4 => $mainCaseId
           )
         );
       }
@@ -2549,8 +2578,10 @@ SELECT  id
         $mergeActType = array_search('Merge Case', $activityTypes);
         $mergeActSubject = ts("Case %1 copied from contact id %2 to contact id %3 via merge. New Case ID is %4.",
           array(
-            1 => $otherCaseId, 2 => $otherContactId,
-            3 => $mainContactId, 4 => $mainCaseId
+            1 => $otherCaseId,
+            2 => $otherContactId,
+            3 => $mainContactId,
+            4 => $mainCaseId
           )
         );
       }
@@ -2605,8 +2636,8 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
    * Validate contact permission for
    * edit/view on activity record and build links.
    *
-   * @param array   $tplParams       params to be sent to template for sending email.
-   * @param array   $activityParams  info of the activity.
+   * @param array $tplParams       params to be sent to template for sending email.
+   * @param array $activityParams  info of the activity.
    *
    * @return void
    * @static
@@ -2644,10 +2675,10 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
    * Validate contact permission for
    * given operation on activity record.
    *
-   * @param int     $activityId      activity record id.
-   * @param string  $operation       user operation.
-   * @param int     $actTypeId       activity type id.
-   * @param int     $contactId       contact id/if not pass consider logged in
+   * @param int $activityId      activity record id.
+   * @param string $operation       user operation.
+   * @param int $actTypeId       activity type id.
+   * @param int $contactId       contact id/if not pass consider logged in
    * @param boolean $checkComponent  do we need to check component enabled.
    *
    * @return boolean $allow  true/false
@@ -2742,7 +2773,10 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
         if (!empty($hasPermissions)) {
           //need to check activity object specific.
           if (in_array($operation, array(
-            'view', 'edit'))) {
+            'view',
+            'edit'
+          ))
+          ) {
             //do we have supper permission.
             if (in_array('access all cases and activities', $hasPermissions[$operation])) {
               $allowOperations[$operation] = $allow = TRUE;
@@ -2819,7 +2853,15 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
       $actTypeName = CRM_Utils_Array::value($actTypeId, $activityTypes);
 
       //do not allow multiple copy / edit action.
-      $singletonNames = array('Open Case', 'Reassigned Case', 'Merge Case', 'Link Cases', 'Assign Case Role', 'Email', 'Inbound Email');
+      $singletonNames = array(
+        'Open Case',
+        'Reassigned Case',
+        'Merge Case',
+        'Link Cases',
+        'Assign Case Role',
+        'Email',
+        'Inbound Email'
+      );
 
       //do not allow to delete these activities, CRM-4543
       $doNotDeleteNames = array('Open Case', 'Change Case Type', 'Change Case Status', 'Change Case Start Date');
@@ -2828,7 +2870,16 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
       $allowEditNames = array('Open Case');
 
       // do not allow File on Case
-      $doNotFileNames = array('Open Case', 'Change Case Type', 'Change Case Status', 'Change Case Start Date','Reassigned Case', 'Merge Case', 'Link Cases', 'Assign Case Role');
+      $doNotFileNames = array(
+        'Open Case',
+        'Change Case Type',
+        'Change Case Status',
+        'Change Case Start Date',
+        'Reassigned Case',
+        'Merge Case',
+        'Link Cases',
+        'Assign Case Role'
+      );
 
       if (in_array($actTypeName, $singletonNames)) {
         $allow = FALSE;
@@ -2908,7 +2959,7 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
   /**
    * Function to check whether activity is a case Activity
    *
-   * @param  int      $activityID   activity id
+   * @param  int $activityID   activity id
    *
    * @return boolean  $isCaseActivity true/false
    */
@@ -3103,16 +3154,16 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
         break;
     }
     return $sql;
- }
+  }
 
- /**
-  * Function to add/copy relationships, when new client is added for a case
-  *
-  * @param int $caseId case id
-  * @param int $contactId contact id / new client id
-  *
-  * @return void
-  */
+  /**
+   * Function to add/copy relationships, when new client is added for a case
+   *
+   * @param int $caseId case id
+   * @param int $contactId contact id / new client id
+   *
+   * @return void
+   */
   static function addCaseRelationships($caseId, $contactId) {
     // get the case role / relationships for the case
     $caseRelationships = new CRM_Contact_DAO_Relationship();
@@ -3159,11 +3210,31 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
     $caseContact->case_id = $caseId;
     $caseContact->find();
 
-    while($caseContact->fetch()) {
+    while ($caseContact->fetch()) {
       $clients[] = $caseContact->contact_id;
     }
 
     return $clients;
+  }
+
+  /**
+   * Get options for a given case field.
+   * @see CRM_Core_DAO::buildOptions
+   *
+   * @param String $fieldName
+   * @param String $context: @see CRM_Core_DAO::buildOptionsContext
+   * @param Array  $props: whatever is known about this dao object
+   */
+  public static function buildOptions($fieldName, $context = NULL, $props = array()) {
+    $className = __CLASS__;
+    $params = array();
+    switch ($fieldName) {
+      // This field is not part of this object but the api supports it
+      case 'medium_id':
+        $className = 'CRM_Activity_BAO_Activity';
+        break;
+    }
+    return CRM_Core_PseudoConstant::get($className, $fieldName, $params, $context);
   }
 }
 

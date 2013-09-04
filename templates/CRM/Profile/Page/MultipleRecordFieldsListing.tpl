@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -52,54 +52,58 @@
       </div>
     </div>
     <div id='profile-dialog' class="hiddenElement"></div>
-    {literal}
-      <script type='text/javascript'>
-        cj(function () {
-          function formDialog(dataURL, dialogTitle) {
-            cj.ajax({
-              url: dataURL,
-              success: function (content) {
-                cj('#profile-dialog').show().html(content).dialog({
-                  title: dialogTitle,
-                  modal: true,
-                  width: 680,
-                  overlay: {
-                    opacity: 0.5,
-                    background: "black"
-                  },
-
-                  close: function (event, ui) {
-                    cj('#profile-dialog').html('');
-                  }
-                });
-                cj('.action-link').hide();
-                cj('#profile-dialog #crm-profile-block .edit-value label').css('display', 'inline');
-              }});
-          }
-
-          cj('.action-item').each(function () {
-            cj(this).attr('jshref', cj(this).attr('href'));
-            cj(this).attr('href', '#browseValues');
-          });
-
-          cj(".action-item").click(function () {
-            dataURL = cj(this).attr('jshref');
-            dialogTitle = cj(this).attr('title');
-            formDialog(dataURL, dialogTitle);
-          });
-        });
-      </script>
-    {/literal}
   {elseif !$records}
     <div class="messages status no-popup">
       <div class="icon inform-icon"></div>
       &nbsp;
-      {ts}No multi-record entries found. Note: check is Include in multi-record listing property of the fields you want to display in listings{/ts}
+      {ts 1=$customGroupTitle}No records of type '%1' found.{/ts}
     </div>
+    <div id='profile-dialog' class="hiddenElement"></div>
   {/if}
 
   {if !$reachedMax}
-    <a accesskey="N" href="{crmURL p='civicrm/profile/edit' q="id=`$contactId`&multiRecord=add&gid=`$gid`"}"
-       class="button"><span><div class="icon add-icon"></div>{ts}Add New Record{/ts}</span></a>
+    <a accesskey="N" href="{crmURL p='civicrm/profile/edit' q="reset=1&id=`$contactId`&multiRecord=add&gid=`$gid`&snippet=1&context=multiProfileDialog&onPopupClose=`$onPopupClose`"}"
+       class="button action-item"><span><div class="icon add-icon"></div>{ts}Add New Record{/ts}</span></a>
   {/if}
 {/if}
+{literal}
+  <script type='text/javascript'>
+    cj(function () {
+      function formDialog(dataURL, dialogTitle) {
+        cj.ajax({
+          url: dataURL,
+          success: function (content) {
+            cj('#profile-dialog').show().html(content).dialog({
+              title: dialogTitle,
+              modal: true,
+              width: 680,
+              overlay: {
+                opacity: 0.5,
+                background: "black"
+              },
+
+            close: function (event, ui) {
+              cj('#profile-dialog').html('');
+            }
+          });
+          cj('.action-link').hide();
+          cj('#profile-dialog #crm-profile-block .edit-value label').css('display', 'inline');
+        }});
+      }
+
+      var profileName = {/literal}"{$ufGroupName}"{literal};
+      cj('.action-item').each(function () {
+        if (!cj(this).attr('jshref')) {
+          cj(this).attr('jshref', cj(this).attr('href'));
+          cj(this).attr('href', '#browseValues');
+        }
+      });
+
+      cj(".crm-profile-name-" + profileName + " .action-item").click(function () {
+        dataURL = cj(this).attr('jshref');
+        dialogTitle = cj(this).attr('title');
+        formDialog(dataURL, dialogTitle);
+      });
+    });
+    </script>
+  {/literal}

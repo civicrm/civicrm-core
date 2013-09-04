@@ -35,11 +35,11 @@ if (isset($options['b'])) {
 
 
 
-    CRM_Mailing_BAO_Job::runJobs();
+    CRM_Mailing_BAO_MailingJob::runJobs();
     sleep($config->mailerPeriod);
   }
 }
 else {
-  CRM_Mailing_BAO_Job::runJobs();
+  CRM_Mailing_BAO_MailingJob::runJobs();
 }
 

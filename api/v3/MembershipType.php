@@ -2,7 +2,7 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -47,7 +47,6 @@
  * {getfields MembershipType_get}
  */
 function civicrm_api3_membership_type_create($params) {
-
   $values = $params;
   civicrm_api3_verify_mandatory($values, 'CRM_Member_DAO_MembershipType');
 
@@ -90,7 +89,6 @@ function _civicrm_api3_membership_type_create_spec(&$params) {
  * @access public
  */
 function civicrm_api3_membership_type_get($params) {
-
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 
@@ -107,9 +105,6 @@ function civicrm_api3_membership_type_get($params) {
  * {getfields MembershipType_delete}
  */
 function civicrm_api3_membership_type_delete($params) {
-
-
-  $memberDelete = CRM_Member_BAO_MembershipType::del($params['id'], 1);
-  return $memberDelete ? civicrm_api3_create_success($memberDelete) : civicrm_api3_create_error('Error while deleting membership type. id : ' . $params['id']);
+  return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 

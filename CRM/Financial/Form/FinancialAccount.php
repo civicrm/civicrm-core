@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -45,7 +45,7 @@ class CRM_Financial_Form_FinancialAccount extends CRM_Contribute_Form {
    * @var boolean
    */
   protected $_isARFlag = FALSE;
-    
+
 
   /**
    * Function to set variables up before form is built
@@ -55,7 +55,7 @@ class CRM_Financial_Form_FinancialAccount extends CRM_Contribute_Form {
    */
   public function preProcess() {
     parent::preProcess();
-    
+
     if ($this->_id) {
       $params = array(
         'id' => $this->_id,
@@ -63,11 +63,11 @@ class CRM_Financial_Form_FinancialAccount extends CRM_Contribute_Form {
       $financialAccount = CRM_Financial_BAO_FinancialAccount::retrieve($params, CRM_Core_DAO::$_nullArray);
       $financialAccountType = CRM_Core_PseudoConstant::accountOptionValues('financial_account_type');
       if ($financialAccount->financial_account_type_id == array_search('Asset', $financialAccountType)
-        && strtolower($financialAccount->account_type_code) == 'ar' 
+        && strtolower($financialAccount->account_type_code) == 'ar'
         && !CRM_Financial_BAO_FinancialAccount::getARAccounts($this->_id, array_search('Asset', $financialAccountType))) {
         $this->_isARFlag = TRUE;
         if ($this->_action & CRM_Core_Action::DELETE) {
-          CRM_Core_Session::setStatus(ts("The selected financial account cannot be deleted because at least one Accounts Receivable type account is required (to ensure that accounting transactions are in balance)."), 
+          CRM_Core_Session::setStatus(ts("The selected financial account cannot be deleted because at least one Accounts Receivable type account is required (to ensure that accounting transactions are in balance)."),
             '', 'error');
           CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/admin/financial/financialAccount',
             "reset=1&action=browse"));

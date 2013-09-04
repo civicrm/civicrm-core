@@ -1,16 +1,16 @@
 <?php
-
-/*
- 
+/**
+ * Test Generated example of using uf_group create API
+ * *
  */
 function uf_group_create_example(){
-$params = array( 
+$params = array(
   'add_captcha' => 1,
-  'add_contact_to_group' => 2,
+  'add_contact_to_group' => 1,
+  'group' => 1,
   'cancel_URL' => 'http://example.org/cancel',
   'created_date' => '2009-06-27 00:00:00',
-  'created_id' => 69,
-  'group' => 2,
+  'created_id' => 1,
   'group_type' => 'Individual,Contact',
   'help_post' => 'help post',
   'help_pre' => 'help pre',
@@ -25,35 +25,44 @@ $params = array(
   'notify' => 'admin@example.org',
   'post_URL' => 'http://example.org/post',
   'title' => 'Test Group',
-  'version' => 3,
 );
 
-  $result = civicrm_api( 'uf_group','create',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('uf_group', 'create', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function uf_group_create_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
-  'id' => 12,
-  'values' => array( 
-      '12' => array( 
-          'id' => '12',
+  'id' => 2,
+  'values' => array(
+      '2' => array(
+          'id' => '2',
           'is_active' => 0,
           'group_type' => 'Individual,Contact',
           'title' => 'Test Group',
+          'description' => '',
           'help_pre' => 'help pre',
           'help_post' => 'help post',
-          'limit_listings_group_id' => '2',
+          'limit_listings_group_id' => '1',
           'post_URL' => 'http://example.org/post',
-          'add_to_group_id' => '2',
+          'add_to_group_id' => '1',
           'add_captcha' => '1',
           'is_map' => '1',
           'is_edit_link' => '1',
@@ -63,15 +72,15 @@ function uf_group_create_expectedresult(){
           'is_cms_user' => '1',
           'notify' => 'admin@example.org',
           'is_reserved' => '1',
-          'name' => 'Test_Group_12',
-          'created_id' => '69',
-          'created_date' => '20090627000000',
+          'name' => 'Test_Group_2',
+          'created_id' => '1',
+          'created_date' => '2013-07-28 08:49:19',
           'is_proximity_search' => '',
         ),
     ),
 );
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 

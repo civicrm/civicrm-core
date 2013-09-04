@@ -1,7 +1,7 @@
 <?php
 /*
    +--------------------------------------------------------------------+
-   | CiviCRM version 4.3                                                |
+   | CiviCRM version 4.4                                                |
    +--------------------------------------------------------------------+
    | Copyright CiviCRM LLC (c) 2004-2013                                |
    +--------------------------------------------------------------------+
@@ -71,8 +71,11 @@ class WebTest_Event_TellAFriendTest extends CiviSeleniumTestCase {
     $this->open($registerUrl);
     $this->waitForElementPresent('_qf_Register_upload-bottom');
 
-    $firstName = substr(sha1(rand()), 0, 7);
-    $this->type('email-Primary', "$firstName@Anderson.com");
+    $firstName = 'Jane' .substr(sha1(rand()), 0, 7);
+    $lastName = 'Doe' . substr(sha1(rand()), 0, 7);
+    $this->type('first_name', "$firstName");
+    $this->type('last_name', "$lastName");
+    $this->type('email-Primary', "$firstName@$lastName.com");
     $this->click('_qf_Register_upload-bottom');
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->click("css=div.crm-event-thankyou-form-block div#tell-a-friend a");
@@ -144,7 +147,7 @@ class WebTest_Event_TellAFriendTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent('_qf_Activity_cancel-bottom');
 
     $this->verifyText("xpath=//table[@class='crm-info-panel']/tbody/tr[1]/td[2]",
-      preg_quote("$firstName@Anderson.com")
+      preg_quote("$lastName, $firstName")
     );
 
     $this->verifyText("xpath=//table[@class='crm-info-panel']/tbody/tr[2]/td[2]/a[1]",

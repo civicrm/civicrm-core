@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -377,6 +377,9 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
         $this->_formValues['sortByCharacter'] = $this->_sortByCharacter;
       }
     }
+    else {
+      $this->_sortByCharacter = NULL;
+    }
 
     $this->_params = &$this->convertFormValues($this->_formValues);
     $this->_returnProperties = &$this->returnProperties();
@@ -393,6 +396,7 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
     return array_merge(
       CRM_Contact_BAO_Contact::exportableFields('All', FALSE, TRUE),
       CRM_Core_Component::getQueryFields(),
+      CRM_Contact_BAO_Query_Hook::singleton()->getFields(),
       CRM_Activity_BAO_Activity::exportableFields()
     );
   }
@@ -407,10 +411,10 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
     // Hack to add options not retrieved by getfields
     // This list could go on and on, but it would be better to fix getfields
     $options = array(
-      'group' => 'contact',
-      'tag' => 'contact',
-      'country' => 'contact',
-      'state_province' => 'contact',
+      'group' => 'group_contact',
+      'tag' => 'entity_tag',
+      'country' => 'address',
+      'state_province' => 'address',
       'gender' => 'contact',
       'world_region' => 'contact',
       'individual_prefix' => 'contact',
@@ -429,10 +433,11 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
       'membership_type' => 'membership',
     );
     $entities = array('contact', 'activity', 'participant', 'pledge', 'member', 'contribution');
+    CRM_Contact_BAO_Query_Hook::singleton()->alterSearchBuilderOptions($entities, $options);
     foreach ($entities as $entity) {
       $fields = civicrm_api($entity, 'getfields', array('version' => 3));
       foreach ($fields['values'] as $field => $info) {
-        if (!empty($info['options']) || !empty($info['pseudoconstant']) || !empty($info['option_group_id'])) {
+        if (!empty($info['options']) || !empty($info['pseudoconstant']) || !empty($info['option_group_id']) || !empty($info['enumValues'])) {
           $options[$field] = $entity;
           if (substr($field, -3) == '_id') {
             $options[substr($field, 0, -3)] = $entity;

@@ -1,53 +1,55 @@
 <?php
-
-/*
- demonstrates is_current filter
+/**
+ * Test Generated example of using relationship get API
+ * demonstrates is_current filter *
  */
 function relationship_get_example(){
-$params = array( 
-  'version' => 3,
-  'filters' => array( 
+$params = array(
+  'filters' => array(
       'is_current' => 1,
     ),
 );
 
-  $result = civicrm_api( 'relationship','get',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('relationship', 'get', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function relationship_get_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
   'id' => 2,
-  'values' => array( 
-      '2' => array( 
+  'values' => array(
+      '2' => array(
           'id' => '2',
-          'contact_id_a' => '69',
-          'contact_id_b' => '70',
-          'relationship_type_id' => '32',
-          'start_date' => '2008-12-20',
+          'contact_id_a' => '60',
+          'contact_id_b' => '61',
+          'relationship_type_id' => '30',
+          'start_date' => '2013-07-29 00:00:00',
           'is_active' => '1',
           'description' => '',
           'is_permission_a_b' => 0,
           'is_permission_b_a' => 0,
-          'custom_1' => 'xyz',
-          'custom_1_-1' => 'xyz',
-          'custom_3' => '07/11/2009',
-          'custom_3_-1' => '07/11/2009',
-          'custom_4' => 'http://civicrm.org',
-          'custom_4_-1' => 'http://civicrm.org',
         ),
     ),
 );
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 

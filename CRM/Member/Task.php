@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -94,6 +94,16 @@ class CRM_Member_Task {
             'CRM_Member_Form_Task_Batch',
           ),
           'result' => TRUE,
+        ),
+        6 => array('title' => ts('Mailing Labels'),
+          'class' => array(
+            'CRM_Member_Form_Task_Label',
+          ),
+          'result' => TRUE,
+        ),
+        7 => array('title' => ts('Print PDF Letters for Memberships'),
+          'class' => 'CRM_Member_Form_Task_PDFLetter',
+          'result' => FALSE,
         ),
       );
 

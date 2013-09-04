@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -163,7 +163,7 @@ function fileOnCase( action, activityID, currentCaseId ) {
                                     //hide current activity row.
                                     cj( "#crm-activity_" + activityID ).hide( );
                       var visibleRowCount = 0;
-                      cj('[id^="'+ 'crm-activity' +'"]::visible').each(function() {
+                      cj('[id^="'+ 'crm-activity' +'"]:visible').each(function() {
                             visibleRowCount++;
                       } );
                       if ( visibleRowCount < 1 ) {

@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -432,7 +432,7 @@ class CRM_Campaign_Page_AJAX {
           $activityParams['skipRecentView'] = 1;
           $activityParams['activity_date_time'] = date('YmdHis');
           $activityParams['activity_type_id'] = $activityTypeId;
-          $activityParams['campaign_id'] = $surveyValues['campaign_id'];
+          $activityParams['campaign_id'] = isset($surveyValues['campaign_id']) ? $surveyValues['campaign_id'] : NULL;
 
           $activity = CRM_Activity_BAO_Activity::create($activityParams);
           if ($activity->id) {

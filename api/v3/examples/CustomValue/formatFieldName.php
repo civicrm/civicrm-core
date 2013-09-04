@@ -1,62 +1,90 @@
 <?php
-
-/*
- utilises field names
+/**
+ * Test Generated example of using custom_value get API
+ * utilises field names *
  */
 function custom_value_get_example(){
-$params = array( 
+$params = array(
   'id' => 2,
-  'version' => 3,
   'entity_id' => 2,
   'format.field_names' => 1,
 );
 
-  $result = civicrm_api( 'custom_value','get',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('custom_value', 'get', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function custom_value_get_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
-  'count' => 4,
-  'values' => array( 
-      'mySingleField' => array( 
+  'count' => 7,
+  'values' => array(
+      'mySingleField' => array(
           'entity_id' => '2',
           'latest' => 'value 1',
           'id' => 'mySingleField',
-          '0' => 'value 1',
         ),
-      'Cust_Field' => array( 
+      'field_12' => array(
+          'entity_id' => '2',
+          'latest' => 'value 3',
+          'id' => 'field_12',
+          '1' => 'value 2',
+          '2' => 'value 3',
+        ),
+      'field_22' => array(
+          'entity_id' => '2',
+          'latest' => '',
+          'id' => 'field_22',
+          '1' => 'warm beer',
+          '2' => '',
+        ),
+      'field_32' => array(
+          'entity_id' => '2',
+          'latest' => '',
+          'id' => 'field_32',
+          '1' => 'fl* w*',
+          '2' => '',
+        ),
+      'field_13' => array(
           'entity_id' => '2',
           'latest' => 'coffee',
-          'id' => 'Cust_Field',
-          '1' => '',
+          'id' => 'field_13',
+          '1' => 'defaultValue',
           '2' => 'coffee',
         ),
-      'field_2' => array( 
+      'field_23' => array(
           'entity_id' => '2',
           'latest' => 'value 4',
-          'id' => 'field_2',
+          'id' => 'field_23',
           '1' => '',
           '2' => 'value 4',
         ),
-      'field_3' => array( 
+      'field_33' => array(
           'entity_id' => '2',
           'latest' => '',
-          'id' => 'field_3',
+          'id' => 'field_33',
           '1' => 'vegemite',
           '2' => '',
         ),
     ),
 );
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 

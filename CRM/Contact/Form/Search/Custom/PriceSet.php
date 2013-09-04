@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -230,7 +230,7 @@ AND    p.entity_id    = e.id
     }
 
     // get all the fields and all the option values associated with it
-    $priceSet = CRM_Price_BAO_Set::getSetDetail($dao->price_set_id);
+    $priceSet = CRM_Price_BAO_PriceSet::getSetDetail($dao->price_set_id);
     if (is_array($priceSet[$dao->price_set_id])) {
       foreach ($priceSet[$dao->price_set_id]['fields'] as $key => $value) {
         if (is_array($value['options'])) {

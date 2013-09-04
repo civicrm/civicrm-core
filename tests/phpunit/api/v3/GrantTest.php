@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -47,8 +47,7 @@ class api_v3_GrantTest extends CiviUnitTestCase {
     parent::setUp();
     $this->ids['contact'][0] = $this->individualCreate();
     $this->params = array(
-      'version' => 3,
-      'contact_id' => $this->ids['contact'][0],
+           'contact_id' => $this->ids['contact'][0],
       'application_received_date' => 'now',
       'decision_date' => 'next Monday',
       'amount_total' => '500',
@@ -62,37 +61,32 @@ class api_v3_GrantTest extends CiviUnitTestCase {
   function tearDown() {
     foreach ($this->ids as $entity => $entities) {
       foreach ($entities as $id) {
-        civicrm_api($entity, 'delete', array('version' => $this->_apiversion, 'id' => $id));
+        $this->callAPISuccess($entity, 'delete', array( 'id' => $id));
       }
     }
   }
 
   public function testCreateGrant() {
-    $result = civicrm_api($this->_entity, 'create', $this->params);
-    $this->documentMe($this->params, $result, __FUNCTION__, __FILE__);
-    $this->assertAPISuccess($result, 'In line ' . __LINE__);
+    $result = $this->callAPIAndDocument($this->_entity, 'create', $this->params, __FUNCTION__, __FILE__);
     $this->assertEquals(1, $result['count'], 'In line ' . __LINE__);
     $this->assertNotNull($result['values'][$result['id']]['id'], 'In line ' . __LINE__);
     $this->getAndCheck($this->params, $result['id'], $this->_entity);
   }
 
   public function testGetGrant() {
-    $result = civicrm_api($this->_entity, 'create', $this->params);
+    $result = $this->callAPISuccess($this->_entity, 'create', $this->params);
     $this->ids['grant'][0] = $result['id'];
-    $result = civicrm_api($this->_entity, 'get', array('version' => $this->_apiversion, 'rationale' => 'Just Because'));
-    $this->documentMe($this->params, $result, __FUNCTION__, __FILE__);
+    $result = $this->callAPIAndDocument($this->_entity, 'get', array('rationale' => 'Just Because'), __FUNCTION__, __FILE__);
     $this->assertAPISuccess($result, 'In line ' . __LINE__);
     $this->assertEquals(1, $result['count'], 'In line ' . __LINE__);
   }
 
   public function testDeleteGrant() {
-    $result = civicrm_api($this->_entity, 'create', $this->params);
-    $result = civicrm_api($this->_entity, 'delete', array('version' => 3, 'id' => $result['id']));
-    $this->documentMe($this->params, $result, __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess($this->_entity, 'create', $this->params);
+    $result = $this->callAPIAndDocument($this->_entity, 'delete', array('id' => $result['id']), __FUNCTION__, __FILE__);
     $this->assertAPISuccess($result, 'In line ' . __LINE__);
-    $checkDeleted = civicrm_api($this->_entity, 'get', array(
-      'version' => 3,
-      ));
+    $checkDeleted = $this->callAPISuccess($this->_entity, 'get', array(
+           ));
     $this->assertEquals(0, $checkDeleted['count'], 'In line ' . __LINE__);
   }
   /*
@@ -106,9 +100,8 @@ class api_v3_GrantTest extends CiviUnitTestCase {
   public function testCreateAutoGrant() {
     $entityName = $this->_entity;
     $baoString  = 'CRM_Grant_BAO_Grant';
-    $fields     = civicrm_api($entityName, 'getfields', array(
-        'version' => 3,
-        'action' => 'create',
+    $fields     = $this->callAPISuccess($entityName, 'getfields', array(
+               'action' => 'create',
       )
     );
 
@@ -116,9 +109,8 @@ class api_v3_GrantTest extends CiviUnitTestCase {
     $return = array_keys($fields);
     $baoObj = new CRM_Core_DAO();
     $baoObj->createTestObject($baoString, array('currency' => 'USD'), 2, 0);
-    $getentities = civicrm_api($entityName, 'get', array(
-        'version' => 3,
-        'sequential' => 1,
+    $getentities = $this->callAPISuccess($entityName, 'get', array(
+               'sequential' => 1,
         'return' => $return,
       ));
 
@@ -152,7 +144,6 @@ class api_v3_GrantTest extends CiviUnitTestCase {
           }
           break;
 
-        case CRM_Utils_Type::T_BOOL:
         case CRM_Utils_Type::T_BOOLEAN:
           // probably created with a 1
           $entity[$field] = 0;
@@ -167,20 +158,18 @@ class api_v3_GrantTest extends CiviUnitTestCase {
           $entity[$field] = 'warm.beer.com';
       }
       $updateParams = array(
-        'version' => 3,
-        'id' => $entity['id'],
+               'id' => $entity['id'],
          $field => $entity[$field],
         'debug' => 1,
       );
-      $update = civicrm_api($entityName, 'create', $updateParams);
+      $update = $this->callAPISuccess($entityName, 'create', $updateParams);
       $this->assertAPISuccess($update, "setting $field to {$entity[$field]} in line " . __LINE__);
       $checkParams = array(
         'id' => $entity['id'],
-        'version' => 3,
         'sequential' => 1,
       );
-      $checkEntity = civicrm_api($entityName, 'getsingle', $checkParams);
-      $this->assertEquals($entity, $checkEntity, "changing field $field");
+      $checkEntity = $this->callAPISuccess($entityName, 'getsingle', $checkParams);
+      $this->assertAPIArrayComparison((array) $entity, $checkEntity);
     }
     $baoObj->deleteTestObjects($baoString);
     $baoObj->free();

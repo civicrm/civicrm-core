@@ -1,12 +1,12 @@
 <?php
-
-/*
- demonstrates create with Contact Reference Custom Field
+/**
+ * Test Generated example of using activity Create API
+ * demonstrates create with Contact Reference Custom Field *
  */
 function activity_create_example(){
 $params = array(
-  'source_contact_id' => 17,
-  'activity_type_id' => '44',
+  'source_contact_id' => 1,
+  'activity_type_id' => '46',
   'subject' => 'test activity type id',
   'activity_date_time' => '2011-06-02 14:36:13',
   'status_id' => 2,
@@ -14,16 +14,24 @@ $params = array(
   'duration' => 120,
   'location' => 'Pensulvania',
   'details' => 'a test activity',
-  'version' => 3,
-  'custom_2' => '17',
+  'custom_2' => '1',
 );
 
-  $result = civicrm_api( 'activity','create',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('activity', 'Create', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function activity_create_expectedresult(){
@@ -37,7 +45,7 @@ function activity_create_expectedresult(){
       '1' => array(
           'id' => '1',
           'source_record_id' => '',
-          'activity_type_id' => '44',
+          'activity_type_id' => '46',
           'subject' => 'test activity type id',
           'activity_date_time' => '20110602143613',
           'duration' => '120',
@@ -63,7 +71,7 @@ function activity_create_expectedresult(){
     ),
 );
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 

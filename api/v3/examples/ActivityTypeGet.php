@@ -1,32 +1,39 @@
 <?php
-
-/*
- 
+/**
+ * Test Generated example of using activity_type get API
+ * *
  */
 function activity_type_get_example(){
-$params = array( 
-  'version' => 3,
-);
+$params = array();
 
-  $result = civicrm_api( 'activity_type','get',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('activity_type', 'get', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function activity_type_get_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
-  'count' => 44,
-  'values' => array( 
+  'count' => 45,
+  'values' => array(
       '1' => 'Meeting',
       '2' => 'Phone Call',
       '3' => 'Email',
-      '4' => 'Text Message (SMS)',
+      '4' => 'Outbound SMS',
       '5' => 'Event Registration',
       '6' => 'Contribution',
       '7' => 'Membership Signup',
@@ -66,11 +73,12 @@ function activity_type_get_expectedresult(){
       '41' => 'Export Accounting Batch',
       '42' => 'Create Batch',
       '43' => 'Edit Batch',
-      '44' => 'Test activity type',
+      '44' => 'SMS delivery',
+      '45' => 'Inbound SMS',
     ),
 );
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 

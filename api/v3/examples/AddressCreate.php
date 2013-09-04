@@ -1,10 +1,10 @@
 <?php
-
-/*
- 
+/**
+ * Test Generated example of using address create API
+ * *
  */
 function address_create_example(){
-$params = array( 
+$params = array(
   'contact_id' => 3,
   'location_type_id' => 6,
   'street_name' => 'Ambachtstraat',
@@ -14,26 +14,34 @@ $params = array(
   'country_id' => '1152',
   'city' => 'Brummen',
   'is_primary' => 1,
-  'version' => 3,
 );
 
-  $result = civicrm_api( 'address','create',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('address', 'create', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function address_create_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
   'id' => 2,
-  'values' => array( 
-      '2' => array( 
+  'values' => array(
+      '2' => array(
           'id' => '2',
           'contact_id' => '3',
           'location_type_id' => '6',
@@ -50,7 +58,7 @@ function address_create_expectedresult(){
     ),
 );
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 

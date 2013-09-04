@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -290,6 +290,9 @@ function tokenReplText(element) {
   var token     = cj("#"+element.id).val( )[0];
   if ( element.id == 'token3' ) {
     ( isMailing ) ? text_message = "subject" : text_message = "msg_subject";
+  }
+  else if ( element.id == 'token1' ) {
+    ( isMailing ) ? text_message = "text_message" : text_message = "msg_text";
   }
 
   cj( "#"+ text_message ).replaceSelection( token );

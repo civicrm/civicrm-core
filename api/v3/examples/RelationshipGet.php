@@ -1,53 +1,55 @@
 <?php
-
-/*
- 
+/**
+ * Test Generated example of using relationship get API
+ * *
  */
 function relationship_get_example(){
-$params = array( 
-  'version' => 3,
+$params = array(
   'id' => 1,
 );
 
-  $result = civicrm_api( 'relationship','get',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('relationship', 'get', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function relationship_get_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
   'id' => 1,
-  'values' => array( 
-      '1' => array( 
+  'values' => array(
+      '1' => array(
           'id' => '1',
-          'contact_id_a' => '36',
-          'contact_id_b' => '37',
+          'contact_id_a' => '33',
+          'contact_id_b' => '34',
           'relationship_type_id' => '21',
-          'start_date' => '2008-12-20',
+          'start_date' => '2013-07-29 00:00:00',
           'is_active' => '1',
           'description' => '',
           'is_permission_a_b' => 0,
           'is_permission_b_a' => 0,
-          'custom_5' => 'custom string',
-          'custom_5_1' => 'custom string',
-          'custom_1' => 'xyz',
-          'custom_1_-1' => 'xyz',
-          'custom_3' => '07/11/2009',
-          'custom_3_-1' => '07/11/2009',
-          'custom_4' => 'http://civicrm.org',
-          'custom_4_-1' => 'http://civicrm.org',
+          'custom_1' => 'custom string',
+          'custom_1_1' => 'custom string',
         ),
     ),
 );
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 

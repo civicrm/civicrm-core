@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -40,6 +40,12 @@ class CRM_Admin_Form_WordReplacements extends CRM_Core_Form {
   protected $_defaults = NULL;
 
   function preProcess() {
+    // This controller was originally written to CRUD $config->locale_custom_strings,
+    // but that's no longer the canonical store. Re-sync from canonical store to ensure
+    // that we display that latest data. This is inefficient - at some point, we
+    // should rewrite this UI.
+    CRM_Core_BAO_WordReplacement::rebuild();
+
     $this->_soInstance = CRM_Utils_Array::value('instance', $_GET);
     $this->assign('soInstance', $this->_soInstance);
     $breadCrumbUrl = CRM_Utils_System::url('civicrm/admin/options/wordreplacements',
@@ -256,10 +262,10 @@ class CRM_Admin_Form_WordReplacements extends CRM_Core_Form {
     $wordReplacementSettings = CRM_Core_BAO_Domain::edit($params, $id);
 
     if ($wordReplacementSettings) {
-      // Reset navigation
-      CRM_Core_BAO_Navigation::resetNavigation();
-      // Clear js string cache
-      CRM_Core_Resources::singleton()->flushStrings();
+      // This controller was originally written to CRUD $config->locale_custom_strings,
+      // but that's no longer the canonical store. Sync changes to canonical store.
+      // This is inefficient - at some point, we should rewrite this UI.
+      CRM_Core_BAO_WordReplacement::rebuildWordReplacementTable();
 
       CRM_Core_Session::setStatus("", ts("Settings Saved"), "success");
       CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/admin/options/wordreplacements',

@@ -1,11 +1,11 @@
 <?php
-
-/*
- Example demonstrates setting & retrieving the target & source
+/**
+ * Test Generated example of using activity  API
+ * Example demonstrates setting & retrieving the target & source *
  */
 function activity__example(){
 $params = array(
-  'source_contact_id' => 17,
+  'source_contact_id' => 1,
   'subject' => 'Make-it-Happen Meeting',
   'activity_date_time' => '20110316',
   'duration' => 120,
@@ -13,18 +13,26 @@ $params = array(
   'details' => 'a test activity',
   'status_id' => 1,
   'activity_type_id' => 1,
-  'version' => 3,
   'priority_id' => 1,
-  'target_contact_id' => 17,
-  'assignee_contact_id' => 17,
+  'target_contact_id' => 1,
+  'assignee_contact_id' => 1,
 );
 
-  $result = civicrm_api( 'activity','',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('activity', '', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function activity__expectedresult(){
@@ -64,7 +72,7 @@ function activity__expectedresult(){
     ),
 );
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 

@@ -1,32 +1,40 @@
 <?php
-
-/*
- 
+/**
+ * Test Generated example of using im delete API
+ * *
  */
 function im_delete_example(){
-$params = array( 
-  'version' => 3,
+$params = array(
   'id' => 1,
 );
 
-  $result = civicrm_api( 'im','delete',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('im', 'delete', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function im_delete_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
-  'values' => 1,
+  'values' => true,
 );
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 

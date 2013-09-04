@@ -40,7 +40,7 @@
       <pseudoconstant>
         <table>civicrm_location_type</table>
         <keyColumn>id</keyColumn>
-        <labelColumn>name</labelColumn>
+        <labelColumn>display_name</labelColumn>
       </pseudoconstant>
   </field>
   <index>
@@ -51,7 +51,7 @@
   <field>
        <name>email</name>
        <type>varchar</type>
-       <length>64</length>
+       <length>254</length>
        <size>MEDIUM</size>
        <import>true</import>
        <headerPattern>/e.?mail/i</headerPattern>

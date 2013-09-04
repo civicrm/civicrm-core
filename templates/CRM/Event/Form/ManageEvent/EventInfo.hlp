@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2010                                |
  +--------------------------------------------------------------------+
@@ -108,7 +108,7 @@
 {/htxt}
 {htxt id="id-is_map"}
 {capture assign=mapURL}{crmURL p='civicrm/admin/setting/mapping' q="reset=1"}{/capture} 
-{ts 1=$mapURL}Include map presenting event location on event information page? (A map provider must be configured under <a href='%1'>Global Settings &raquo; Mapping</a>){/ts}
+{ts 1=$mapURL}Include map presenting event location on event information page? (A map provider must be configured under <a href='%1'>Administer > System Settings > Mapping and Geocoding</a>){/ts}
 {/htxt}
 
 {htxt id="id-is_public-title"}

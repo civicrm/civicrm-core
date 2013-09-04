@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -79,9 +79,7 @@ class WebTest_Contribute_OfflineRecurContributionTest extends CiviSeleniumTestCa
 
     // billing address
     $this->webtestAddBillingDetails($firstName, $middleName, $lastName);
-
     $this->click('_qf_Contribution_upload-bottom');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // Use Find Contributions to make sure test recurring contribution exists
     $this->openCiviPage("contribute/search", "reset=1", 'contribution_currency_type');

@@ -1,11 +1,10 @@
 <?php
-
-/*
- Create entities and location block in 1 api call
+/**
+ * Test Generated example of using loc_block createEntities API
+ * Create entities and location block in 1 api call *
  */
 function loc_block_createentities_example(){
 $params = array(
-  'version' => 3,
   'email' => array(
       'location_type_id' => 1,
       'email' => 'test2@loc.block',
@@ -24,12 +23,21 @@ $params = array(
     ),
 );
 
-  $result = civicrm_api( 'loc_block','createEntities',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('loc_block', 'createEntities', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function loc_block_createentities_expectedresult(){
@@ -51,7 +59,7 @@ function loc_block_createentities_expectedresult(){
             ),
           'email' => array(
               'id' => '4',
-              'contact_id' => 'null',
+              'contact_id' => '',
               'location_type_id' => '1',
               'email' => 'test2@loc.block',
               'is_primary' => 0,
@@ -65,7 +73,7 @@ function loc_block_createentities_expectedresult(){
             ),
           'phone' => array(
               'id' => '3',
-              'contact_id' => 'null',
+              'contact_id' => '',
               'location_type_id' => '1',
               'is_primary' => 0,
               'is_billing' => '',
@@ -77,7 +85,7 @@ function loc_block_createentities_expectedresult(){
             ),
           'phone_2' => array(
               'id' => '4',
-              'contact_id' => 'null',
+              'contact_id' => '',
               'location_type_id' => '1',
               'is_primary' => 0,
               'is_billing' => '',
@@ -100,7 +108,7 @@ function loc_block_createentities_expectedresult(){
     ),
 );
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 

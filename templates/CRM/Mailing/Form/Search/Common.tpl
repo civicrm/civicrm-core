@@ -1,5 +1,5 @@
 <tr>
-  <td colspan="2">
+  <td>
   {$form.mailing_id.label}
     <br />
   {$form.mailing_id.html}
@@ -14,8 +14,12 @@
     </script>
   {/literal}
   </td>
+<td>
+  {$form.mailing_job_status.label}
+    <br />
+  {$form.mailing_job_status.html}
+</td>
 </tr>
-
 <tr><td><label>{ts}Mailing Date{/ts}</label></td></tr>
 <tr>
 {include file="CRM/Core/DateRange.tpl" fieldName="mailing_date" from='_low' to='_high'}

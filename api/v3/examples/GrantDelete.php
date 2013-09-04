@@ -1,39 +1,40 @@
 <?php
-
-/*
- 
+/**
+ * Test Generated example of using grant delete API
+ * *
  */
 function grant_delete_example(){
-$params = array( 
-  'version' => 3,
-  'contact_id' => 5,
-  'application_received_date' => 'now',
-  'decision_date' => 'next Monday',
-  'amount_total' => '500',
-  'status_id' => 1,
-  'rationale' => 'Just Because',
-  'currency' => 'USD',
-  'grant_type_id' => 1,
+$params = array(
+  'id' => 3,
 );
 
-  $result = civicrm_api( 'grant','delete',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('grant', 'delete', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function grant_delete_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
   'values' => true,
 );
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 

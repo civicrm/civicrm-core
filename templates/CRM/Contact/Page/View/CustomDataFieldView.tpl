@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -46,7 +46,10 @@
           {if $element.field_type == 'File'}
             {if $element.field_value.displayURL}
                 <div class="crm-content crm-custom_data crm-displayURL">
-                  <a href="#" onclick="imagePopUp('{$element.field_value.imageURL}'); return false;" ><img src="{$element.field_value.displayURL}" height = "{$element.field_value.imageThumbHeight}" width="{$element.field_value.imageThumbWidth}"></a>
+                  <a href="{$element.field_value.displayURL}" class='crm-image-popup'>
+                    <img src="{$element.field_value.displayURL}" height = "{$element.field_value.imageThumbHeight}"
+                         width="{$element.field_value.imageThumbWidth}">
+                  </a>
                 </div>
             {else}
                 <div class="crm-content crm-custom_data crm-fileURL">

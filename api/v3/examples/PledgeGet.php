@@ -1,31 +1,39 @@
 <?php
-
-/*
- 
+/**
+ * Test Generated example of using pledge get API
+ * *
  */
 function pledge_get_example(){
-$params = array( 
+$params = array(
   'pledge_id' => 1,
-  'version' => 3,
 );
 
-  $result = civicrm_api( 'pledge','get',$params );
-
-  return $result;
+try{
+  $result = civicrm_api3('pledge', 'get', $params);
+}
+catch (CiviCRM_API3_Exception $e) {
+  // handle error here
+  $errorMessage = $e->getMessage();
+  $errorCode = $e->getErrorCode();
+  $errorData = $e->getExtraParams();
+  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
 }
 
-/*
+return $result;
+}
+
+/**
  * Function returns array of result expected from previous function
  */
 function pledge_get_expectedresult(){
 
-  $expectedResult = array( 
+  $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
   'id' => 1,
-  'values' => array( 
-      '1' => array( 
+  'values' => array(
+      '1' => array(
           'contact_id' => '5',
           'contact_type' => 'Individual',
           'contact_sub_type' => '',
@@ -33,10 +41,10 @@ function pledge_get_expectedresult(){
           'display_name' => 'Mr. Anthony Anderson II',
           'pledge_id' => '1',
           'pledge_amount' => '100.00',
-          'pledge_create_date' => '2013-02-04 00:00:00',
+          'pledge_create_date' => '2013-08-03 00:00:00',
           'pledge_status' => 'Pending',
           'pledge_total_paid' => '',
-          'pledge_next_pay_date' => '2013-02-06 00:00:00',
+          'pledge_next_pay_date' => '2013-08-05 00:00:00',
           'pledge_next_pay_amount' => '20.00',
           'pledge_outstanding_amount' => '',
           'pledge_financial_type' => 'Donation',
@@ -51,7 +59,7 @@ function pledge_get_expectedresult(){
     ),
 );
 
-  return $expectedResult  ;
+  return $expectedResult;
 }
 
 

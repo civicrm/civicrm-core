@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.3                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
@@ -165,6 +165,11 @@
 {* campaign in contribution search *}
 {include file="CRM/Campaign/Form/addCampaignToComponent.tpl" campaignContext="componentSearch"
 campaignTrClass='' campaignTdClass=''}
+
+<tr>
+  <td colspan="2">
+{include file="CRM/Contribute/Form/Search/ContributionRecur.tpl"}
+</tr>
 
 {if $contributeGroupTree}
 <tr>
