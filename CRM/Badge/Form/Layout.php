@@ -114,13 +114,22 @@ class CRM_Badge_Form_Layout extends CRM_Admin_Form {
     $attributes = array('readonly'=> true);
     $this->add('text', 'image_1', ts('Image (top right)'),
       $attributes + CRM_Core_DAO::getAttribute('CRM_Core_DAO_PrintLabel', 'title'));
+    $this->add('text', 'width_image_1', ts('Width'), array('size' => 6));
+    $this->add('text', 'height_image_1', ts('Height'), array('size' => 6));
+
     $this->add('text', 'image_2', ts('Image (top left)'),
       $attributes + CRM_Core_DAO::getAttribute('CRM_Core_DAO_PrintLabel', 'title'));
+    $this->add('text', 'width_image_2', ts('Width'), array('size' => 6));
+    $this->add('text', 'height_image_2', ts('Height'), array('size' => 6));
 
     $this->add('checkbox', 'is_default', ts('Default?'));
     $this->add('checkbox', 'is_active', ts('Enabled?'));
     $this->add('checkbox', 'is_reserved', ts('Reserved?'));
 
+    $this->addRule('width_image_1', ts('Width not valid'), 'positiveInteger');
+    $this->addRule('width_image_2', ts('Width not valid'), 'positiveInteger');
+    $this->addRule('height_image_1', ts('Height not valid'), 'positiveInteger');
+    $this->addRule('height_image_2', ts('Height not valid'), 'positiveInteger');
     $this->addFormRule(array('CRM_Badge_Form_Layout', 'formRule'));
 
     $this->addButtons(array(
