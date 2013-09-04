@@ -253,6 +253,23 @@ class CRM_Core_BAO_LabelFormat extends CRM_Core_DAO_OptionValue {
   }
 
   /**
+   * Get text alignment recognized by the TCPDF package used to create PDF labels.
+   *
+   * @param void
+   *
+   * @return array   array of alignments
+   * @access public
+   * @static
+   */
+  public static function getFontStyles() {
+    return array(
+      '' => ts('Normal'),
+      'B' => ts('Bold'),
+      'I' => ts('Italic'),
+    );
+  }
+
+  /**
    * Get Option Group ID for Label Formats
    *
    * @param void
