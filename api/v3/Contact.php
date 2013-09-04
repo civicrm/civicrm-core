@@ -519,7 +519,7 @@ function civicrm_api3_contact_quicksearch($params) {
 
 function civicrm_api3_contact_getquick($params) {
   civicrm_api3_verify_mandatory($params, NULL, array('name'));
-  $name = CRM_Utils_Type::escape($params['name'], 'String');
+  $name = CRM_Utils_Type::escape(CRM_Utils_Array::value('name', $params), 'String');
 
   // get the autocomplete options from settings
   $acpref = explode(CRM_Core_DAO::VALUE_SEPARATOR,
