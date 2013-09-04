@@ -99,6 +99,7 @@ class CRM_Badge_BAO_Badge {
           'value' => $value,
           'font_name' => $layout['data']['font_name'][$key],
           'font_size' => $layout['data']['font_size'][$key],
+          'font_style' => $layout['data']['font_style'][$key],
           'text_alignment' => $layout['data']['text_alignment'][$key],
         );
       }
@@ -166,19 +167,23 @@ class CRM_Badge_BAO_Badge {
       $titleWidth = $titleRightMargin;
     }
 
-    $this->pdf->SetFont($formattedRow['token'][1]['font_name'], '', $formattedRow['token'][1]['font_size']);
+    $this->pdf->SetFont($formattedRow['token'][1]['font_name'], $formattedRow['token'][1]['font_style'],
+      $formattedRow['token'][1]['font_size']);
     $this->pdf->MultiCell($this->pdf->width - $titleWidth, 0, $formattedRow['token'][1]['value'],
       $this->border, $formattedRow['token'][1]['text_alignment'], 0, 1, $x + $titleLeftMargin, $y);
 
-    $this->pdf->SetFont($formattedRow['token'][2]['font_name'], '', $formattedRow['token'][2]['font_size']);
+    $this->pdf->SetFont($formattedRow['token'][2]['font_name'], $formattedRow['token'][2]['font_style'],
+      $formattedRow['token'][2]['font_size']);
     $this->pdf->MultiCell($this->pdf->width, 10, $formattedRow['token'][2]['value'],
       $this->border, $formattedRow['token'][2]['text_alignment'], 0, 1, $x, $y + $this->tMarginName);
 
-    $this->pdf->SetFont($formattedRow['token'][3]['font_name'], '', $formattedRow['token'][3]['font_size']);
+    $this->pdf->SetFont($formattedRow['token'][3]['font_name'], $formattedRow['token'][3]['font_style'],
+      $formattedRow['token'][3]['font_size']);
     $this->pdf->MultiCell($this->pdf->width, 0, $formattedRow['token'][3]['value'],
       $this->border, $formattedRow['token'][3]['text_alignment'], 0, 1, $x, $this->pdf->getY());
 
-    $this->pdf->SetFont($formattedRow['token'][4]['font_name'], '', $formattedRow['token'][4]['font_size']);
+    $this->pdf->SetFont($formattedRow['token'][4]['font_name'], $formattedRow['token'][4]['font_style'],
+      $formattedRow['token'][4]['font_size']);
     $this->pdf->MultiCell($this->pdf->width, 0, $formattedRow['token'][4]['value'],
       $this->border, $formattedRow['token'][4]['text_alignment'], 0, 1, $x, $y + $this->pdf->height - 5);
 
