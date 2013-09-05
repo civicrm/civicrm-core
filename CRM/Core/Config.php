@@ -503,7 +503,7 @@ class CRM_Core_Config extends CRM_Core_Config_Variables {
   }
 
   /**
-   * Retrieve a mailer to send any mail from the applciation
+   * Retrieve a mailer to send any mail from the application
    *
    * @param boolean $persist open a persistent smtp connection, should speed up mailings
    * @access private
