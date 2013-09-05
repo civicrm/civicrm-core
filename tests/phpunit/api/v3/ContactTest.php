@@ -1204,6 +1204,49 @@ class api_v3_ContactTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test to check return works OK
+   */
+  function testContactGetReturnValues() {
+    $extraParams = array('nick_name' => 'Bob', 'phone' => '456', 'email' => 'e@mail.com');
+    $contactID = $this->individualCreate($extraParams);
+    //actually it turns out the above doesn't create a phone
+    $phones = $this->callAPISuccess('phone', 'create', array('contact_id' => $contactID, 'phone' => '456',));
+    $result = $this->callAPISuccess('contact', 'getsingle', array('id' => $contactID));
+    foreach ($extraParams as $key => $value) {
+      $this->assertEquals($result[$key], $value);
+    }
+    //now we check they are still returned with 'return' key
+    $result = $this->callAPISuccess('contact', 'getsingle', array('id' => $contactID, 'return' => array_keys($extraParams)));
+    foreach ($extraParams as $key => $value) {
+      $this->assertEquals($result[$key], $value);
+    }
+  }
+
+  function testCRM13252MultipleChainedPhones() {
+    $contactID = $this->householdCreate();
+    $this->callAPISuccessGetCount('phone', array('contact_id' => $contactID), 0);
+    $params = array(
+     'contact_id' => $contactID,
+     'household_name' => 'Household 1',
+     'contact_type' => 'Household',
+     'api.phone.create' => array(
+        0 => array(
+          'phone' => '111-111-1111',
+          'location_type_id' => 1,
+          'phone_type_id' => 1,
+        ),
+        1 => array(
+          'phone' => '222-222-2222',
+          'location_type_id' => 1,
+          'phone_type_id' => 2,
+        )
+      )
+    );
+    $result = $this->callAPISuccess('contact', 'create', $params);
+    $this->callAPISuccessGetCount('phone', array('contact_id' => $contactID), 2);
+
+  }
+  /**
    * Test for Contact.get id=@user:username (with an invalid username)
    */
   function testContactGetByUnknownUsername() {
