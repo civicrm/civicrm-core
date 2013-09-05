@@ -197,6 +197,8 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
           ),
           'contribution_status_id' => array('title' => ts('Contribution Status'),
           ),
+          'contribution_page_id' => array('title' => ts('Contribution Page'),
+          ),
           'source' => array('title' => ts('Source'),
           ),
           'payment_instrument_id' => array('title' => ts('Payment Type'),
@@ -247,6 +249,12 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
           array('title' => ts('Financial Type'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Contribute_PseudoConstant::financialType(),
+            'type' => CRM_Utils_Type::T_INT,
+          ),
+          'contribution_page_id' =>
+          array('title' => ts('Contribution Page'),
+            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
+            'options'  => CRM_Contribute_PseudoConstant::contributionPage(),
             'type' => CRM_Utils_Type::T_INT,
           ),
           'payment_instrument_id' =>
@@ -508,7 +516,7 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
     $dao = CRM_Core_DAO::executeQuery($sql);
 
     while ($dao->fetch()) {
-      $totalAmount[] = CRM_Utils_Money::format($dao->amount, $dao->currency)."(".$dao->count.")";
+      $totalAmount[] = CRM_Utils_Money::format($dao->amount, $dao->currency)." (".$dao->count.")";
       $average[] =   CRM_Utils_Money::format($dao->avg, $dao->currency);
       $count += $dao->count;
     }
@@ -645,6 +653,7 @@ UNION ALL
     $contributionTypes  = CRM_Contribute_PseudoConstant::financialType();
     $contributionStatus = CRM_Contribute_PseudoConstant::contributionStatus();
     $paymentInstruments = CRM_Contribute_PseudoConstant::paymentInstrument();
+    $contributionPages  = CRM_Contribute_PseudoConstant::contributionPage();
     $honorTypes         = CRM_Core_OptionGroup::values('honor_type', FALSE, FALSE, FALSE, NULL, 'label');
 
 
@@ -715,6 +724,10 @@ UNION ALL
       }
       if ($value = CRM_Utils_Array::value('civicrm_contribution_contribution_status_id', $row)) {
         $rows[$rowNum]['civicrm_contribution_contribution_status_id'] = $contributionStatus[$value];
+        $entryFound = TRUE;
+      }
+      if ($value = CRM_Utils_Array::value('civicrm_contribution_contribution_page_id', $row)) {
+        $rows[$rowNum]['civicrm_contribution_contribution_page_id'] = $contributionPages[$value];
         $entryFound = TRUE;
       }
       if ($value = CRM_Utils_Array::value('civicrm_contribution_payment_instrument_id', $row)) {
