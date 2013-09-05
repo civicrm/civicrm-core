@@ -876,6 +876,9 @@ VALUES
 
 -- Name Label format
    (@option_group_id_name_badge, '{ts escape="sql"}Avery 5395{/ts}', '{literal}{"name":"Avery 5395","paper-size":"a4","metric":"mm","lMargin":13.5,"tMargin":3,"NX":2,"NY":4,"SpaceX":15,"SpaceY":8.5,"width":85.7,"height":59.2,"font-size":12,"orientation":"portrait","font-name":"helvetica","font-style":"","lPadding":0,"tPadding":0}{/literal}', 'Avery 5395', NULL, 0, NULL, 1, NULL, 0, 0, 1, NULL, NULL),
+   (@option_group_id_name_badge, '{ts escape="sql"}A6 Badge Portrait 150x106{/ts}', '{literal}{"paper-size":"a4","orientation":"landscape","font-name":"times","font-size":6,"font-style":"","NX":2,"NY":1,"metric":"mm","lMargin":25,"tMargin":27,"SpaceX":0,"SpaceY":35,"width":106,"height":150,"lPadding":5,"tPadding":5}{/literal}', 'A6 Badge Portrait 150x106', NULL, 0, NULL, 2, NULL, 0, 0, 1, NULL, NULL),
+   (@option_group_id_name_badge, '{ts escape="sql"}Fattorini Name Badge 100x65{/ts}', '{literal}{"paper-size":"a4","orientation":"portrait","font-name":"times","font-size":6,"font-style":"","NX":2,"NY":4,"metric":"mm","lMargin":6,"tMargin":19,"SpaceX":0,"SpaceY":0,"width":100,"height":65,"lPadding":5,"tPadding":5}{/literal}', 'Fattorini Name Badge 100x65', NULL, 0, NULL, 3, NULL, 0, 0, 1, NULL, NULL),
+
 
 -- Mailing Label Formats
   (@option_group_id_label, '{ts escape="sql"}Avery 3475{/ts}', '{literal}{"paper-size":"a4","orientation":"portrait","font-name":"helvetica","font-size":10,"font-style":"","metric":"mm","lMargin":0,"tMargin":5,"NX":3,"NY":8,"SpaceX":0,"SpaceY":0,"width":70,"height":36,"lPadding":5.08,"tPadding":5.08}{/literal}',                   '3475',  'Avery', NULL, 0, 1,  NULL, 0, 1, 1, NULL, NULL),
