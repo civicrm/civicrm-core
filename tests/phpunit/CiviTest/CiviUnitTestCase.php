@@ -888,13 +888,11 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    *
    * @return int    id of Household created
    */
-  function householdCreate($params = NULL) {
-    if ($params === NULL) {
-      $params = array(
+  function householdCreate($params =  array()) {
+    $params = array_merge(array(
         'household_name' => 'Unit Test household',
         'contact_type' => 'Household',
-      );
-    }
+      ), $params);
     return $this->_contactCreate($params);
   }
 
