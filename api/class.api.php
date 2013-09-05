@@ -173,18 +173,27 @@ class civicrm_api3 {
       if (curl_errno($ch)) {
         $res = new stdClass;
         $res->is_error = 1;
+        $res->error_message = curl_error($ch);
+        $res->level = "cURL";
         $res->error = array('cURL error' => curl_error($ch));
         return $res;
       }
       curl_close($ch);
-      return json_decode($result);
     }
     else {
       // Should be discouraged, because the API credentials and data
       // are submitted as GET data, increasing chance of exposure..
       $result = file_get_contents($query . '&' . $fields);
-      return json_decode($result);
     }
+    if (!$res = json_decode($result)) {
+      $res = new stdClass;
+      $res->is_error = 1;
+      $res->error_message = 'Unable to parse returned JSON';
+      $res->level = 'json_decode';
+      $res->error = array('Unable to parse returned JSON' => $result);
+      $res->row_result = $result;
+    }
+    return $res;
   }
 
   function call($entity, $action = 'Get', $params = array()) {
