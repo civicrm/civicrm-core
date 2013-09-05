@@ -87,6 +87,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
       'civicrm_website',
       'civicrm_relationship',
       'civicrm_uf_match',
+      'civicrm_phone',
     );
 
     $this->quickCleanup($tablesToTruncate, TRUE);
