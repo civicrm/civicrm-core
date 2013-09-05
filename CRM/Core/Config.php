@@ -594,7 +594,7 @@ class CRM_Core_Config extends CRM_Core_Config_Variables {
     } else {
       $mailer = Mail::factory($driver, $params);
     }
-    CRM_Utils_Hook::hook_civicrm_alterMailer($mailer, $driver, $params);
+    CRM_Utils_Hook::alterMail($mailer, $driver, $params);
     return $mailer;
   }
 

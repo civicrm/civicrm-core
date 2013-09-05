@@ -1360,7 +1360,7 @@ abstract class CRM_Utils_Hook {
    *   The default mailer config options
    * @see Mail::factory
    */
-  static function hook_civicrm_alterMailer(&$mailer, $driver, $params) {
+  static function alterMail(&$mailer, $driver, $params) {
     return self::singleton()->invoke(3, $mailer, $driver, $params, self::$_nullObject, self::$_nullObject, 'civicrm_alterMailer');
   }
 
