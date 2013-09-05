@@ -53,8 +53,8 @@ class api_v3_EntityTagTest extends CiviUnitTestCase {
     $this->_individualID = $this->individualCreate();
     $this->_tag = $this->tagCreate();
     $this->_tagID = $this->_tag['id'];
-    $this->_householdID = $this->houseHoldCreate(NULL);
-    $this->_organizationID = $this->organizationCreate(NULL);
+    $this->_householdID = $this->houseHoldCreate();
+    $this->_organizationID = $this->organizationCreate();
   }
 
   function tearDown() {
