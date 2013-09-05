@@ -125,7 +125,8 @@ class CRM_Contact_Form_DedupeRules extends CRM_Admin_Form {
     for ($count = 0; $count < self::RULES_COUNT; $count++) {
       $this->add('select', "where_$count", ts('Field'),
         array(
-          NULL => ts('- none -')) + $this->_fields, FALSE, $disabled
+          NULL => ts('- none -')
+        ) + $this->_fields, FALSE, $disabled
       );
       $this->add('text', "length_$count", ts('Length'), $attributes);
       $this->add('text', "weight_$count", ts('Weight'), $attributes);
@@ -133,9 +134,9 @@ class CRM_Contact_Form_DedupeRules extends CRM_Admin_Form {
 
     $this->add('text', 'threshold', ts("Weight Threshold to Consider Contacts 'Matching':"), $attributes);
     $this->addButtons(array(
-        array('type' => 'next', 'name' => ts('Save'), 'isDefault' => TRUE),
-        array('type' => 'cancel', 'name' => ts('Cancel')),
-      ));
+      array('type' => 'next', 'name' => ts('Save'), 'isDefault' => TRUE),
+      array('type' => 'cancel', 'name' => ts('Cancel')),
+    ));
 
     $this->assign('contact_type', $this->_contactType);
 
