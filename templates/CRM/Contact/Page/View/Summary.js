@@ -156,6 +156,12 @@
   }
 
   $('document').ready(function() {
+    // don't perform inline edit during print mode
+    if (CRM.summaryPrint.mode) {
+      $('div').removeClass('crm-inline-edit');
+      $('.crm-inline-block-content > div.crm-edit-help').remove();
+      $('div.crm-inline-block-content').removeAttr('title');
+    }
     // Set page title
     var oldName = 'CiviCRM';
     var nameTitle = $('#crm-remove-title');
