@@ -1361,7 +1361,8 @@ abstract class CRM_Utils_Hook {
    * @see Mail::factory
    */
   static function alterMail(&$mailer, $driver, $params) {
-    return self::singleton()->invoke(3, $mailer, $driver, $params, self::$_nullObject, self::$_nullObject, 'civicrm_alterMailer');
+    return self::singleton()
+      ->invoke(3, $mailer, $driver, $params, self::$_nullObject, self::$_nullObject, 'civicrm_alterMailer');
   }
 
   /**
