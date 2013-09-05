@@ -59,6 +59,8 @@ class CRM_Profile_Form extends CRM_Core_Form {
    */
   protected $_id;
 
+  protected $_updateBlankInfos = array();
+
   /**
    * The group id that we are editing
    *
@@ -959,6 +961,8 @@ class CRM_Profile_Form extends CRM_Core_Form {
         elseif ($form->_isUpdateDupe == 1) {
           if (!$form->_id) {
             $form->_id = $ids[0];
+            // CRM-10128: flag to ignore empty form fields rather than clearing the existing DB value
+            $form->_updateBlankInfos['updateBlankCustomInfo'] = FALSE;
           }
         }
         else {
@@ -1070,6 +1074,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
    */
   public function postProcess() {
     $params = $this->controller->exportValues($this->_name);
+    $params = $params + $this->_updateBlankInfos;
 
     //if the delete record button is clicked
     if ($this->_deleteButtonName) {
