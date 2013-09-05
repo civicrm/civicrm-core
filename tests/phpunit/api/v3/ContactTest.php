@@ -388,7 +388,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    * Note at time of writing the default is to return default. This should possibly be changed & test added
    *
    */
-  function testGetDeceasedNotRetrieved() {
+  function testGetDeceasedRetrieved() {
     $c1 = $this->callAPISuccess($this->_entity, 'create', $this->_params);
     $c2 = $this->callAPISuccess($this->_entity, 'create', array('first_name' => 'bb', 'last_name' => 'ccc', 'contact_type' => 'Individual', 'is_deceased' => 1));
     $result = $this->callAPISuccess($this->_entity, 'get', array('is_deceased' => 0));
