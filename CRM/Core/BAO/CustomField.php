@@ -1077,6 +1077,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
           array(
             'onfocus' => "if (!this.value) {  this.value='http://';} else return false",
             'onblur' => "if ( this.value == 'http://') {  this.value='';} else return false",
+            'data-crm-custom' => $dataCrmCustomVal,
           ),
           $useRequired && !$search
         );
