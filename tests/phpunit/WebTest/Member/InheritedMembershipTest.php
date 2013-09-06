@@ -391,7 +391,8 @@ class WebTest_Member_InheritedMembershipTest extends CiviSeleniumTestCase {
     $this->assertEquals(1, $this->getText("xpath=//li[@id='tab_rel']/a/em"));
 
     // Edit Contact but do not change any field
-    $this->clickLink("css=a.edit.button");
+    $this->waitForElementPresent("xpath=//ul[@id='actions']/li[2]/a/span");
+    $this->clickLink("xpath=//ul[@id='actions']/li[2]/a/span");
     $this->waitForElementPresent('_qf_Contact_cancel-bottom');
     $this->clickLink("_qf_Contact_upload_view-top");
 

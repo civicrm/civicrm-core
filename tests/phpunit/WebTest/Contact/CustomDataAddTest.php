@@ -314,8 +314,8 @@ class WebTest_Contact_CustomDataAddTest extends CiviSeleniumTestCase {
     $this->waitForText('crm-notification-container', "{$firstName} {$lastName} has been created.");
 
     //Update the custom field
-    $this->click("css=a.edit.button");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->waitForElementPresent("xpath=//ul[@id='actions']/li[2]/a/span");
+    $this->clickLink("xpath=//ul[@id='actions']/li[2]/a/span");
     $this->click("xpath=//table//tr/td/label[text()=\"$customField\"]");
     $value1 = "custom_1".rand();
     $this->type("xpath=//table//tr/td/label[text()=\"$customField\"]/../following-sibling::td/input",$value1);

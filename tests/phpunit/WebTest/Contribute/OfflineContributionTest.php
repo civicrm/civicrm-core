@@ -173,6 +173,7 @@ class WebTest_Contribute_OfflineContributionTest extends CiviSeleniumTestCase {
       'Received Into' => $financialAccount,
     );
 
+    $this->waitForElementPresent("xpath=/html/body/div[3]/div/div[2]/div/div[3]/div/div[2]/div/div/div/form/div[2]");
     foreach ($expected as $value) {
       $this->verifyText("xpath=/html/body/div[3]/div/div[2]/div/div[3]/div/div[2]/div/div/div/form/div[2]", preg_quote($value));
     }
