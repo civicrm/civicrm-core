@@ -124,6 +124,9 @@ class CRM_Core_BAO_UFMatch extends CRM_Core_DAO_UFMatch {
         $session->set('ufID', CRM_Utils_Array::value('uf_id', $userIds, ''));
         $session->set('userID', CRM_Utils_Array::value('contact_id', $userIds, ''));
         $session->set('ufUniqID', CRM_Utils_Array::value('uf_name', $userIds, ''));
+        if (CRM_Utils_Array::value('contact_id', $userIds, FALSE)) {
+          $session->set('authSrc', CRM_Core_Permission::AUTH_SRC_LOGIN);
+        }
       }
     }
 
@@ -160,6 +163,9 @@ class CRM_Core_BAO_UFMatch extends CRM_Core_DAO_UFMatch {
     $session->set('ufID', $ufID);
     $session->set('userID', $userID);
     $session->set('ufUniqID', $ufUniqID);
+    if ($userID) {
+      $session->set('authSrc', CRM_Core_Permission::AUTH_SRC_LOGIN);
+    }
 
     // add current contact to recently viewed
     if ($ufmatch->contact_id) {

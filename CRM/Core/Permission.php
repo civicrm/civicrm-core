@@ -64,6 +64,13 @@ class CRM_Core_Permission {
   const ALWAYS_ALLOW_PERMISSION = "*always allow*";
 
   /**
+   * Various authentication sources
+   *
+   * @var int
+   */
+  CONST AUTH_SRC_CHECKSUM = 1, AUTH_SRC_SITEKEY = 2, AUTH_SRC_LOGIN = 4, ;
+
+  /**
    * get the current permission of this user
    *
    * @return string the permission of the user (edit or view or null)

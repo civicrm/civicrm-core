@@ -348,6 +348,10 @@ WHERE  (( contact_id_a = %1 AND contact_id_b = %2 AND is_permission_a_b = 1 ) OR
     CRM_Core_DAO::executeQuery('SET @civicrm_user_id = %1',
       array(1 => array($contactID, 'Integer'))
     );
+    
+    $session = CRM_Core_Session::singleton();
+    $session->set('authSrc', CRM_Core_Permission::AUTH_SRC_CHECKSUM);
+
     return TRUE;
   }
 
