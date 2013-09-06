@@ -391,6 +391,7 @@ class WebTest_Member_OfflineMembershipAddPricesetTest extends CiviSeleniumTestCa
     $this->webtestVerifyTabularData($verifyData);
 
     //check if the membership amount is correct
+    $this->waitForElementPresent("xpath=//form[@id='MembershipView']/div[2]/div/table[2]/tbody/tr/td/span[text()='{$amount}']");
     $this->assertTrue($this->isElementPresent("xpath=//form[@id='MembershipView']/div[2]/div/table[2]/tbody/tr/td/span[text()='{$amount}']"));
     $this->click("_qf_MembershipView_cancel-bottom");
     $this->waitForPageToLoad($this->getTimeoutMsec());
