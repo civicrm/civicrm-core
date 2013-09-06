@@ -1362,7 +1362,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
    * @return void
    * @access public
    */
-  static function checkRegistration($fields, &$self, $isAdditional = FALSE, $returnContactId = FALSE, $useDedupeRules = FALSE) {
+  static function checkRegistration(&$fields, &$self, $isAdditional = FALSE, $returnContactId = FALSE, $useDedupeRules = FALSE) {
     // CRM-3907, skip check for preview registrations
     // CRM-4320 participant need to walk wizard
     if (!$returnContactId &&
@@ -1405,6 +1405,9 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
             }
           }
         }
+      }
+      if ($contactID) {
+        $fields['updateBlankCustomInfo'] = FALSE;
       }
     }
 
