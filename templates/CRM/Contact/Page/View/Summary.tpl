@@ -39,6 +39,7 @@
     </div>
   </div>
 
+  {if !$summaryPrint}
   <div class="crm-actions-ribbon">
       <ul id="actions">
         {assign var='urlParams' value="reset=1"}
@@ -128,6 +129,7 @@
       </ul>
       <div class="clear"></div>
   </div><!-- .crm-actions-ribbon -->
+  {/if}
 
   <div class="crm-block crm-content-block crm-contact-page crm-inline-edit-container">
       <div id="mainTabContainer" class="ui-tabs ui-widget ui-widget-content ui-corner-all">
