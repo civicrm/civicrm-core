@@ -32,21 +32,19 @@
   #Tag #tagtree .highlighted {ldelim}background-color:lightgrey;{rdelim}
 </style>
 <script type="text/javascript">
-  (function(){ldelim}
+  (function($){ldelim}
     var entityID={$entityID};
     var entityTable='{$entityTable}';
     {literal}
-    cj(function(){initTagTree()});
-
-    function initTagTree() {
+    $(function() {
       //unobsctructive elements are there to provide the function to those not having javascript, no need for the others
-      cj(".unobstructive").hide();
+      $(".unobstructive").hide();
 
-      cj("#tagtree ul input:checked").each (function(){
-        cj(this).parents("li").children(".jstree-icon").addClass('highlighted');
+      $("#tagtree ul input:checked").each (function(){
+        $(this).parents("li").children(".jstree-icon").addClass('highlighted');
       });
 
-      cj("#tagtree input").change(function(){
+      $("#tagtree input").change(function(){
         var tagid = this.id.replace("check_", "");
         var op = (this.checked) ? 'create' : 'delete';
         CRM.api('entity_tag', op, {entity_table: entityTable, entity_id: entityID, tag_id: tagid});
@@ -54,7 +52,7 @@
       });
 
       //load js tree.
-      cj("#tagtree").jstree({
+      $("#tagtree").jstree({
         "plugins" : ["themes", "html_data"],
         "themes": {"url": CRM.config.resourceBase + 'packages/jquery/plugins/jstree/themes/default/style.css'}
       });
@@ -62,24 +60,24 @@
       {/literal}
       {if $permission neq 'edit'}
         {literal}
-          cj("#tagtree input").attr('disabled', true);
+          $("#tagtree input").attr('disabled', true);
         {/literal}
       {/if}
       {literal}
-    }
+    });
 
     CRM.updateContactSummaryTags = function() {
-      var tags = [];
-      cj('.tag-section .token-input-token-facebook p, #tagtree input:checkbox:checked+label').each(function() {
-        tags.push(cj(this).text());
-      })
+      var tags = [], $tab = $('#tab_tag');
+      $('.tag-section .token-input-token-facebook p, #tagtree input:checkbox:checked+label').each(function() {
+        tags.push($(this).text());
+      });
       // showing count of tags in summary tab
-      cj('#tab_tag a em').html('' + tags.length);
-      tags.length ? cj('#tab_tag').removeClass('disabled') : cj('#tab_tag').addClass('disabled');
+      $('a em', $tab).html('' + tags.length);
+      tags.length ? $tab.removeClass('disabled') : $tab.addClass('disabled');
       // update summary tab
-      cj("#tags").html(tags.join(', '));
+      $("#tags").html(tags.join(', '));
     };
-  })();
+  })(cj);
   {/literal}
 </script>
 <div id="Tag" class="view-content">
