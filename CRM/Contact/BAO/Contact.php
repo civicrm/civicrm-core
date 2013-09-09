@@ -2067,11 +2067,6 @@ ORDER BY civicrm_email.is_primary DESC";
             $value .= ' ' . $params[$key . '_time'];
           }
 
-          // updateBlankCustomInfo flag is false && $value is blank, do not proceed
-          if (!CRM_Utils_Array::value('updateBlankCustomInfo', $params, TRUE) && ($value == '' || !isset($value))) {
-            continue;
-          }
-
           $valueId = NULL;
           if (CRM_Utils_Array::value('customRecordValues', $params)) {
             if (is_array($params['customRecordValues']) && !empty($params['customRecordValues'])) {
