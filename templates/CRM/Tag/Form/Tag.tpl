@@ -47,42 +47,10 @@
       });
 
       cj("#tagtree input").change(function(){
-        tagid = this.id.replace("check_", "");
-        //get current tags from Summary and convert to array
-        var tagLabels = cj.trim( cj("#tags").text( ) );
-        if ( tagLabels ) {
-          var tagsArray = tagLabels.split(',');
-        }
-        else{
-          var tagsArray = new Array();
-        }
-
-        //get current tag label
-        var currentTagLabel = cj("#tagLabel_" + tagid ).text( );
-        if (this.checked) {
-          CRM.api('entity_tag','create',{entity_table:entityTable,entity_id:entityID,tag_id:tagid});
-          // add check to tab label array
-          tagsArray.push( currentTagLabel );
-        }
-        else {
-          CRM.api('entity_tag','delete',{entity_table:entityTable,entity_id:entityID,tag_id:tagid});
-          // build array of tag labels
-          tagsArray = cj.map(tagsArray, function (a) {
-            if ( cj.trim( a ) != currentTagLabel ) {
-              return cj.trim( a );
-            }
-          });
-        }
-
-        //showing count of tags in summary tab
-        var existingTagsInTagset = cj('.token-input-delete-token-facebook').length;
-        var tagCount = cj("#tagtree input:checkbox:checked").length + existingTagsInTagset;
-        cj('#tab_tag a em').html('' + tagCount);
-        tagCount ? cj('#tab_tag').removeClass('disabled') : cj('#tab_tag').addClass('disabled');
-
-        //update summary tab
-        tagLabels = tagsArray.join(', ');
-        cj("#tags").html( tagLabels );
+        var tagid = this.id.replace("check_", "");
+        var op = (this.checked) ? 'create' : 'delete';
+        CRM.api('entity_tag', op, {entity_table: entityTable, entity_id: entityID, tag_id: tagid});
+        CRM.updateContactSummaryTags();
       });
 
       //load js tree.
@@ -98,6 +66,18 @@
         {/literal}
       {/if}
       {literal}
+    }
+
+    CRM.updateContactSummaryTags = function() {
+      var tags = [];
+      cj('.tag-section .token-input-token-facebook p, #tagtree input:checkbox:checked+label').each(function() {
+        tags.push(cj(this).text());
+      })
+      // showing count of tags in summary tab
+      cj('#tab_tag a em').html('' + tags.length);
+      tags.length ? cj('#tab_tag').removeClass('disabled') : cj('#tab_tag').addClass('disabled');
+      // update summary tab
+      cj("#tags").html(tags.join(', '));
     };
   })();
   {/literal}
