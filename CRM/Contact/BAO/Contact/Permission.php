@@ -341,10 +341,10 @@ WHERE  (( contact_id_a = %1 AND contact_id_b = %2 AND is_permission_a_b = 1 ) OR
         // does not come here, we redirect in the above statement
       }
       return FALSE;
-    } else if (CRM_Utils_Request::retrieve('cs', 'String', $form, FALSE)) {
-      $session = CRM_Core_Session::singleton();
-      $session->set('authSrc', CRM_Core_Permission::AUTH_SRC_CHECKSUM);
     }
+
+    // set appropriate AUTH source
+    self::toggleChecksumAuthSrc(TRUE);
 
     // so here the contact is posing as $contactID, lets set the logging contact ID variable
     // CRM-8965
@@ -353,6 +353,18 @@ WHERE  (( contact_id_a = %1 AND contact_id_b = %2 AND is_permission_a_b = 1 ) OR
     );
     
     return TRUE;
+  }
+
+  static function toggleChecksumAuthSrc($checkSumValidationResult = FALSE) {
+    $session = CRM_Core_Session::singleton();
+    if ($checkSumValidationResult && CRM_Utils_Request::retrieve('cs', 'String', $form, FALSE)) {
+      // if result is already validated, and url has cs, set the flag.
+      $session->set('authSrc', CRM_Core_Permission::AUTH_SRC_CHECKSUM);
+    } else if (($session->get('authSrc') & CRM_Core_Permission::AUTH_SRC_CHECKSUM) == CRM_Core_Permission::AUTH_SRC_CHECKSUM) {
+      // if checksum wasn't present in REQUEST OR checksum result validated as FALSE, 
+      // and flag was already set exactly as AUTH_SRC_CHECKSUM, unset it.
+      $session->set('authSrc', CRM_Core_Permission::AUTH_SRC_UNKNOWN);
+    }
   }
 
   static function validateChecksumContact($contactID, &$form, $redirect = TRUE) {
