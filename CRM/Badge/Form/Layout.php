@@ -90,6 +90,8 @@ class CRM_Badge_Form_Layout extends CRM_Admin_Form {
     $tokens = array_merge($contactTokens, $eventTokens, $participantTokens);
     asort($tokens);
 
+    $tokens = array_merge(array('spacer' => ts('- spacer -')) + $tokens);
+
     $fontSizes = CRM_Core_BAO_LabelFormat::getFontSizes();
     $fontStyles = CRM_Core_BAO_LabelFormat::getFontStyles();
     $fontNames = CRM_Core_BAO_LabelFormat::getFontNames('name_badge');
@@ -97,7 +99,7 @@ class CRM_Badge_Form_Layout extends CRM_Admin_Form {
 
     $rowCount = self::FIELD_ROWCOUNT;
     for ( $i =1; $i <= $rowCount; $i++ ) {
-      $this->add('select', "token[$i]", ts('Token'), array('' => ts('- none -')) + $tokens);
+      $this->add('select', "token[$i]", ts('Token'), array('' => ts('- skip -')) + $tokens);
       $this->add('select', "font_name[$i]", ts('Font Name'), $fontNames);
       $this->add('select', "font_size[$i]", ts('Font Size'), $fontSizes);
       $this->add('select', "font_style[$i]", ts('Font Style'), $fontStyles);
@@ -127,11 +129,10 @@ class CRM_Badge_Form_Layout extends CRM_Admin_Form {
     $this->add('checkbox', 'is_active', ts('Enabled?'));
     $this->add('checkbox', 'is_reserved', ts('Reserved?'));
 
-    $this->addRule('width_image_1', ts('Width not valid'), 'positiveInteger');
-    $this->addRule('width_image_2', ts('Width not valid'), 'positiveInteger');
-    $this->addRule('height_image_1', ts('Height not valid'), 'positiveInteger');
-    $this->addRule('height_image_2', ts('Height not valid'), 'positiveInteger');
-    $this->addFormRule(array('CRM_Badge_Form_Layout', 'formRule'));
+    $this->addRule('width_image_1', ts('Enter valid width'), 'positiveInteger');
+    $this->addRule('width_image_2', ts('Enter valid width'), 'positiveInteger');
+    $this->addRule('height_image_1', ts('Enter valid height'), 'positiveInteger');
+    $this->addRule('height_image_2', ts('Enter valid height'), 'positiveInteger');
 
     $this->addButtons(array(
         array(
@@ -149,32 +150,6 @@ class CRM_Badge_Form_Layout extends CRM_Admin_Form {
         ),
       )
     );
-  }
-
-  /**
-   * form rule
-   *
-   * @param array $fields  the input form values
-   *
-   * @return true if no errors, else array of errors
-   * @access public
-   * @static
-   */
-  static function formRule($fields) {
-    $errors = array();
-
-    if (CRM_Utils_Array::value(4, $fields['token'])
-      && CRM_Utils_Array::value('add_barcode', $fields)
-      && (CRM_Utils_Array::value('barcode_alignment', $fields) == CRM_Utils_Array::value(4, $fields['text_alignment']))
-    ) {
-      $errors['barcode_alignment'] = ts('You cannot have same alignment for barcode and #4 row.');
-    }
-
-    if (!empty($errors)) {
-      return $errors;
-    }
-
-    return empty($errors) ? TRUE : $errors;
   }
 
   /**
