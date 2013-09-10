@@ -341,6 +341,9 @@ WHERE  (( contact_id_a = %1 AND contact_id_b = %2 AND is_permission_a_b = 1 ) OR
         // does not come here, we redirect in the above statement
       }
       return FALSE;
+    } else if (CRM_Utils_Request::retrieve('cs', 'String', $form, FALSE)) {
+      $session = CRM_Core_Session::singleton();
+      $session->set('authSrc', CRM_Core_Permission::AUTH_SRC_CHECKSUM);
     }
 
     // so here the contact is posing as $contactID, lets set the logging contact ID variable
@@ -349,9 +352,6 @@ WHERE  (( contact_id_a = %1 AND contact_id_b = %2 AND is_permission_a_b = 1 ) OR
       array(1 => array($contactID, 'Integer'))
     );
     
-    $session = CRM_Core_Session::singleton();
-    $session->set('authSrc', CRM_Core_Permission::AUTH_SRC_CHECKSUM);
-
     return TRUE;
   }
 
