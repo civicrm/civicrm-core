@@ -101,6 +101,7 @@ class CRM_Badge_BAO_Badge {
           'font_size' => $layout['data']['font_size'][$key],
           'font_style' => $layout['data']['font_style'][$key],
           'text_alignment' => $layout['data']['text_alignment'][$key],
+          'token' => $layout['data']['token'][$key],
         );
       }
     }
@@ -181,25 +182,31 @@ class CRM_Badge_BAO_Badge {
       $titleWidth = $titleRightMargin;
     }
 
+    // first row is a special row because we have images on the side
+    $value = '';
+    if ($formattedRow['token'][1]['token'] != 'spacer') {
+      $value = $formattedRow['token'][1]['value'];
+    }
+
     $this->pdf->SetFont($formattedRow['token'][1]['font_name'], $formattedRow['token'][1]['font_style'],
       $formattedRow['token'][1]['font_size']);
-    $this->pdf->MultiCell($this->pdf->width - $titleWidth, 0, $formattedRow['token'][1]['value'],
+    $this->pdf->MultiCell($this->pdf->width - $titleWidth, 0, $value,
       $this->border, $formattedRow['token'][1]['text_alignment'], 0, 1, $x + $titleLeftMargin, $y);
 
-    $this->pdf->SetFont($formattedRow['token'][2]['font_name'], $formattedRow['token'][2]['font_style'],
-      $formattedRow['token'][2]['font_size']);
-    $this->pdf->MultiCell($this->pdf->width, 10, $formattedRow['token'][2]['value'],
-      $this->border, $formattedRow['token'][2]['text_alignment'], 0, 1, $x, $y + $this->tMarginName);
+    $rowCount = CRM_Badge_Form_Layout::FIELD_ROWCOUNT;
+    for ($i = 2; $i <= $rowCount; $i++) {
+      if (!empty($formattedRow['token'][$i]['token'])) {
+        $value = '';
+        if ($formattedRow['token'][$i]['token'] != 'spacer') {
+          $value = $formattedRow['token'][$i]['value'];
+        }
 
-    $this->pdf->SetFont($formattedRow['token'][3]['font_name'], $formattedRow['token'][3]['font_style'],
-      $formattedRow['token'][3]['font_size']);
-    $this->pdf->MultiCell($this->pdf->width, 0, $formattedRow['token'][3]['value'],
-      $this->border, $formattedRow['token'][3]['text_alignment'], 0, 1, $x, $this->pdf->getY());
-
-    $this->pdf->SetFont($formattedRow['token'][4]['font_name'], $formattedRow['token'][4]['font_style'],
-      $formattedRow['token'][4]['font_size']);
-    $this->pdf->MultiCell($this->pdf->width, 0, $formattedRow['token'][4]['value'],
-      $this->border, $formattedRow['token'][4]['text_alignment'], 0, 1, $x, $y + $this->pdf->height - 5);
+        $this->pdf->SetFont($formattedRow['token'][$i]['font_name'], $formattedRow['token'][$i]['font_style'],
+          $formattedRow['token'][$i]['font_size']);
+        $this->pdf->MultiCell($this->pdf->width, 0, $value,
+          $this->border, $formattedRow['token'][$i]['text_alignment'], 0, 1, $x, $this->pdf->getY());
+      }
+    }
 
     if (CRM_Utils_Array::value('barcode', $formattedRow)) {
       $data = $formattedRow['values'];
