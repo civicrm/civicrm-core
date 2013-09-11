@@ -463,6 +463,7 @@ class CRM_Core_Resources {
       $settings = array(
         'userFramework' => $config->userFramework,
         'resourceBase' => $config->resourceBase,
+        'lcMessages' => $config->lcMessages,
       );
       $this->addSetting(array('config' => $settings));
 
