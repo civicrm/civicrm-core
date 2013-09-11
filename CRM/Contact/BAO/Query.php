@@ -4174,7 +4174,7 @@ civicrm_relationship.start_date > {$today}
       $convertedVals = $query->convertToPseudoNames($dao, TRUE);
 
       if (!empty($convertedVals)) {
-        $val = $convertedVals + $val;
+        $val = array_merge_recursive($val, $convertedVals);
       }
       $values[$dao->contact_id] = $val;
     }
