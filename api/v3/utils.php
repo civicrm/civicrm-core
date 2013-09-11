@@ -142,7 +142,8 @@ function civicrm_api3_create_error($msg, $data = array(), &$dao = NULL) {
   if (is_array($dao)) {
     if ($msg == 'DB Error: constraint violation' || substr($msg, 0,9)  == 'DB Error:' || $msg == 'DB Error: already exists') {
       try {
-        _civicrm_api3_validate_fields($dao['entity'], $dao['action'], $dao['params'], TRUE);
+        $fields = _civicrm_api3_api_getfields($dao);
+        _civicrm_api3_validate_fields($dao['entity'], $dao['action'], $dao['params'], $fields, TRUE);
       }
       catch(Exception $e) {
         $msg = $e->getMessage();
@@ -1074,16 +1075,12 @@ function _civicrm_api3_custom_data_get(&$returnArray, $entity, $entity_id, $grou
  * @param string $entity
  * @param string $action
  * @param array $params -
+ * @param boolean errorMode do intensive post fail checks?
+ * @param array $fields response from getfields
  * all variables are the same as per civicrm_api
  */
-function _civicrm_api3_validate_fields($entity, $action, &$params, $errorMode = NULL) {
-  //skip any entities without working getfields functions
-  $skippedEntities = array('entity', 'mailinggroup', 'customvalue', 'custom_value', 'mailing_group');
-  if (in_array(strtolower($entity), $skippedEntities) || strtolower($action) == 'getfields') {
-    return;
-  }
-  $fields = civicrm_api($entity, 'getfields', array('version' => 3, 'action' => $action));
-  $fields = array_intersect_key($fields['values'], $params);
+function _civicrm_api3_validate_fields($entity, $action, &$params, $fields, $errorMode = False) {
+  $fields = array_intersect_key($fields, $params);
   foreach ($fields as $fieldName => $fieldInfo) {
     switch (CRM_Utils_Array::value('type', $fieldInfo)) {
       case CRM_Utils_Type::T_INT:
@@ -1387,17 +1384,10 @@ function _getStandardTypeFromCustomDataType($dataType) {
 /**
  * Return array of defaults for the given API (function is a wrapper on getfields)
  */
-function _civicrm_api3_getdefaults($apiRequest) {
+function _civicrm_api3_getdefaults($apiRequest, $fields) {
   $defaults = array();
 
-  $result = civicrm_api3($apiRequest['entity'],
-    'getfields',
-    array(
-      'action' => $apiRequest['action'],
-    )
-  );
-
-  foreach ($result['values'] as $field => $values) {
+  foreach ($fields as $field => $values) {
     if (isset($values['api.default'])) {
       $defaults[$field] = $values['api.default'];
     }
@@ -1408,17 +1398,10 @@ function _civicrm_api3_getdefaults($apiRequest) {
 /**
  * Return array of defaults for the given API (function is a wrapper on getfields)
  */
-function _civicrm_api3_getrequired($apiRequest) {
+function _civicrm_api3_getrequired($apiRequest, $fields) {
   $required = array('version');
 
-  $result = civicrm_api($apiRequest['entity'],
-    'getfields',
-    array(
-      'version' => 3,
-      'action' => $apiRequest['action'],
-    )
-  );
-  foreach ($result['values'] as $field => $values) {
+  foreach ($fields as $field => $values) {
     if (CRM_Utils_Array::value('api.required', $values)) {
       $required[] = $field;
     }
@@ -1432,22 +1415,8 @@ function _civicrm_api3_getrequired($apiRequest) {
  *
  * Function also swaps unique fields for non-unique fields & vice versa.
  */
-function _civicrm_api3_swap_out_aliases(&$apiRequest) {
-  if (strtolower($apiRequest['action'] == 'getfields')) {
-    if (CRM_Utils_Array::value('api_action', $apiRequest['params'])) {
-      $apiRequest['params']['action'] = $apiRequest['params']['api_action'];
-      unset($apiRequest['params']['api_action']);
-    }
-    return;
-  }
-  $result = civicrm_api3($apiRequest['entity'],
-    'getfields',
-    array(
-      'action' => $apiRequest['action'],
-    )
-  );
-
-  foreach ($result['values'] as $field => $values) {
+function _civicrm_api3_swap_out_aliases(&$apiRequest, $fields) {
+  foreach ($fields as $field => $values) {
     $uniqueName = CRM_Utils_Array::value('uniqueName', $values);
     if (CRM_Utils_Array::value('api.aliases', $values)) {
       // if aliased field is not set we try to use field alias
@@ -1615,6 +1584,10 @@ function _civicrm_api3_validate_string(&$params, &$fieldName, &$fieldInfo, $enti
 function _civicrm_api3_api_match_pseudoconstant(&$params, $entity, $fieldName, $fieldInfo) {
   $options = CRM_Utils_Array::value('options', $fieldInfo);
   if (!$options) {
+    if(strtolower($entity) == 'profile' && !empty($fieldInfo['entity'])) {
+      // we need to get the options from the entity the field relates to
+      $entity = $fieldInfo['entity'];
+    }
     $options = civicrm_api($entity, 'getoptions', array('version' => 3, 'field' => $fieldInfo['name'], 'context' => 'validate'));
     $options = CRM_Utils_Array::value('values', $options, array());
   }

@@ -55,15 +55,15 @@ function civicrm_api($entity, $action, $params, $extra = NULL) {
     }
 
     _civicrm_api3_api_check_permission($apiRequest['entity'], $apiRequest['action'], $apiRequest['params']);
-
+    $fields = _civicrm_api3_api_getfields($apiRequest);
     // we do this before we
-    _civicrm_api3_swap_out_aliases($apiRequest);
+    _civicrm_api3_swap_out_aliases($apiRequest, $fields);
     if (strtolower($action) != 'getfields') {
       if (!CRM_Utils_Array::value('id', $apiRequest['params'])) {
-        $apiRequest['params'] = array_merge(_civicrm_api3_getdefaults($apiRequest), $apiRequest['params']);
+        $apiRequest['params'] = array_merge(_civicrm_api3_getdefaults($apiRequest, $fields), $apiRequest['params']);
       }
       //if 'id' is set then only 'version' will be checked but should still be checked for consistency
-      civicrm_api3_verify_mandatory($apiRequest['params'], NULL, _civicrm_api3_getrequired($apiRequest));
+      civicrm_api3_verify_mandatory($apiRequest['params'], NULL, _civicrm_api3_getrequired($apiRequest, $fields));
     }
 
     // For input filtering, process $apiWrappers in forward order
@@ -79,7 +79,7 @@ function civicrm_api($entity, $action, $params, $extra = NULL) {
       $result = $function($apiRequest);
     }
     elseif ($apiRequest['function'] && !$apiRequest['is_generic']) {
-      _civicrm_api3_validate_fields($apiRequest['entity'], $apiRequest['action'], $apiRequest['params']);
+      _civicrm_api3_validate_fields($apiRequest['entity'], $apiRequest['action'], $apiRequest['params'], $fields);
 
       $result = isset($extra) ? $function($apiRequest['params'], $extra) : $function($apiRequest['params']);
     }
@@ -269,6 +269,36 @@ function civicrm_api3($entity, $action, $params) {
   return $result;
 }
 
+/**
+ * Function to call getfields from api wrapper. This function ensures that settings that could alter
+ * getfields output (e.g. action for all api & profile_id for profile api ) are consistently passed in.
+ *
+ * We check whether the api call is 'getfields' because if getfields is being called we return an empty array
+ * as no alias swapping, validation or default filling is done on getfields & we want to avoid a loop
+ *
+ * @todo other output modifiers include contact_type
+ *
+ * @param array $apiRequest
+ * @return getfields output
+ */
+function _civicrm_api3_api_getfields(&$apiRequest) {
+  if (strtolower($apiRequest['action'] == 'getfields')) {
+    // the main param getfields takes is 'action' - however this param is not compatible with REST
+    // so we accept 'api_action' as an alias of action on getfields
+    if (CRM_Utils_Array::value('api_action', $apiRequest['params'])) {
+    //  $apiRequest['params']['action'] = $apiRequest['params']['api_action'];
+     // unset($apiRequest['params']['api_action']);
+    }
+    return array('action' => array('api_aliases' => array('action')));
+  }
+  $getFieldsParams = array('action' => $apiRequest['action']);
+  $entity = $apiRequest['entity'];
+  if($entity == 'profile' && array_key_exists('profile_id', $apiRequest['params'])) {
+    $getFieldsParams['profile_id'] = $apiRequest['params']['profile_id'];
+  }
+  $fields = civicrm_api3($entity, 'getfields', $getFieldsParams);
+  return $fields['values'];
+}
 /**
  * Load/require all files related to an entity.
  *
