@@ -321,7 +321,7 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
     //todo test target & assignee are set
 
     //$this->assertEquals($result['values'][$result['id']]['source_contact_id'], $this->_contactID, 'in line ' . __LINE__);
-    $result = $this->callAPISuccess('activity', 'get', array('id' => $result['id'], 'version' => $this->_apiversion));
+    $result = $this->callAPISuccess('activity', 'get', array('id' => $result['id']));
     $this->assertEquals($result['values'][$result['id']]['duration'], 120, 'in line ' . __LINE__);
     $this->assertEquals($result['values'][$result['id']]['subject'], 'Make-it-Happen Meeting', 'in line ' . __LINE__);
     $this->assertEquals($result['values'][$result['id']]['activity_date_time'], '2011-03-16 00:00:00', 'in line ' . __LINE__);
@@ -565,23 +565,16 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
       'details' => 'a test activity',
       'status_id' => 1,
       'activity_name' => 'Test activity type',
-      'version' => $this->_apiversion,
       'priority_id' => 1,
     );
     $this->callAPISuccess('Activity', 'Create', $params);
-    $result = $this->callAPISuccess('Activity', 'Get', array(
-                'version' => $this->_apiversion,
-                'activity_status_id' => '1'));
+    $result = $this->callAPISuccess('Activity', 'Get', array('activity_status_id' => '1'));
     $this->assertEquals(1, $result['count'], 'one activity of status 1 should exist');
 
-    $result = $this->callAPISuccess('Activity', 'Get', array(
-                'version' => $this->_apiversion,
-                'status_id' => '1'));
+    $result = $this->callAPISuccess('Activity', 'Get', array('status_id' => '1'));
     $this->assertEquals(1, $result['count'], 'status_id should also work');
 
-    $result = $this->callAPISuccess('Activity', 'Get', array(
-                'version' => $this->_apiversion,
-                'activity_status_id' => '2'));
+    $result = $this->callAPISuccess('Activity', 'Get', array('activity_status_id' => '2'));
     $this->assertEquals(0, $result['count'], 'No activities of status 1 should exist');
     $result = $this->callAPISuccess('Activity', 'Get', array(
                 'version' => $this->_apiversion,
