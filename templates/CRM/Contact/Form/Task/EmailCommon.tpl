@@ -50,9 +50,6 @@
   </div><!-- /.crm-accordion-body -->
 </div><!-- /.crm-accordion-wrapper -->
 
-
-
-
 <div class="crm-accordion-wrapper crm-plaint_text_email-accordion collapsed">
 <div class="crm-accordion-header">
   {ts}Plain-Text Format{/ts}
@@ -94,11 +91,4 @@
 {/if}
 
 {include file="CRM/Mailing/Form/InsertTokens.tpl"}
-{literal}
-<script type="text/javascript">
-cj(function() {
-   cj().crmAccordions();
-});
-</script>
-{/literal}
 
