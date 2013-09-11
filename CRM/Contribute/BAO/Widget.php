@@ -46,7 +46,7 @@ class CRM_Contribute_BAO_Widget extends CRM_Contribute_DAO_Widget {
    *
    * @return stdClass
    */
-  public function getContributionPageData($contributionPageID, $widgetID) {
+  public static function getContributionPageData($contributionPageID, $widgetID) {
     $config = CRM_Core_Config::singleton();
 
     $data = array();
