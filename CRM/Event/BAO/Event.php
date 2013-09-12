@@ -1124,7 +1124,7 @@ WHERE civicrm_event.is_active = 1
         }
 
         if ($returnMessageText) {
-          list($sent, $subject, $message, $html) = CRM_Core_BAO_MessageTemplates::sendTemplate($sendTemplateParams);
+          list($sent, $subject, $message, $html) = CRM_Core_BAO_MessageTemplate::sendTemplate($sendTemplateParams);
           return array(
             'subject' => $subject,
             'body' => $message,
@@ -1143,7 +1143,7 @@ WHERE civicrm_event.is_active = 1
           $sendTemplateParams['bcc'] = CRM_Utils_Array::value('bcc_confirm',
             $values['event']
           );
-          CRM_Core_BAO_MessageTemplates::sendTemplate($sendTemplateParams);
+          CRM_Core_BAO_MessageTemplate::sendTemplate($sendTemplateParams);
         }
       }
     }

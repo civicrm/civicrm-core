@@ -44,7 +44,7 @@ class api_v3_MessageTemplatesTest extends CiviUnitTestCase {
     $this->_apiversion = 3;
     parent::setUp();
     $this->quickCleanup(array('civicrm_msg_template'));
-    $template = CRM_Core_DAO::createTestObject('CRM_Core_DAO_MessageTemplates')->toArray();
+    $template = CRM_Core_DAO::createTestObject('CRM_Core_DAO_MessageTemplate')->toArray();
     $this->params = array(
       'msg_title' => $template['msg_title'],
       'msg_subject' => $template['msg_subject'],

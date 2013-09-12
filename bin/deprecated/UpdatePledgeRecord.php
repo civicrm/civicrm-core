@@ -241,8 +241,8 @@ SELECT  pledge.contact_id              as contact_id,
             $template->assign('amount', $details['amount']);
             $template->assign('create_date', $details['create_date']);
 
-            require_once 'CRM/Core/BAO/MessageTemplates.php';
-            list($mailSent, $subject, $message, $html) = CRM_Core_BAO_MessageTemplates::sendTemplate(
+            require_once 'CRM/Core/BAO/MessageTemplate.php';
+            list($mailSent, $subject, $message, $html) = CRM_Core_BAO_MessageTemplate::sendTemplate(
               array(
                 'groupName' => 'msg_tpl_workflow_pledge',
                 'valueName' => 'pledge_reminder',

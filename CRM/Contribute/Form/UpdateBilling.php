@@ -400,7 +400,7 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Core_Form {
         'toName' => $donorDisplayName,
         'toEmail' => $donorEmail,
       );
-      list($sent) = CRM_Core_BAO_MessageTemplates::sendTemplate($sendTemplateParams);
+      list($sent) = CRM_Core_BAO_MessageTemplate::sendTemplate($sendTemplateParams);
     }
     else {
       $status = ts('There was some problem updating the billing details.');

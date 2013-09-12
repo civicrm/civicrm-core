@@ -364,7 +364,7 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
       );
 
       if ($returnMessageText) {
-        list($sent, $subject, $message, $html) = CRM_Core_BAO_MessageTemplates::sendTemplate($sendTemplateParams);
+        list($sent, $subject, $message, $html) = CRM_Core_BAO_MessageTemplate::sendTemplate($sendTemplateParams);
         return array(
           'subject' => $subject,
           'body' => $message,
@@ -379,7 +379,7 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
         $sendTemplateParams['toEmail'] = $email;
         $sendTemplateParams['cc'] = CRM_Utils_Array::value('cc_receipt', $values);
         $sendTemplateParams['bcc'] = CRM_Utils_Array::value('bcc_receipt', $values);
-        list($sent, $subject, $message, $html) = CRM_Core_BAO_MessageTemplates::sendTemplate($sendTemplateParams);
+        list($sent, $subject, $message, $html) = CRM_Core_BAO_MessageTemplate::sendTemplate($sendTemplateParams);
       }
 
       // send duplicate alert, if dupe match found during on-behalf-of processing.
@@ -395,7 +395,7 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
         // fix cc and reset back to original, CRM-6976
         $sendTemplateParams['cc'] = $originalCCReceipt;
 
-        CRM_Core_BAO_MessageTemplates::sendTemplate($sendTemplateParams);
+        CRM_Core_BAO_MessageTemplate::sendTemplate($sendTemplateParams);
       }
     }
   }
@@ -414,7 +414,7 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
       'PDFFilename' => 'receipt.pdf',
     );
     if ($returnMessageText) {
-      list($sent, $subject, $message, $html) = CRM_Core_BAO_MessageTemplates::sendTemplate($sendTemplateParams);
+      list($sent, $subject, $message, $html) = CRM_Core_BAO_MessageTemplate::sendTemplate($sendTemplateParams);
       return array(
         'subject' => $subject,
         'body' => $message,
@@ -507,7 +507,7 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
         $template->assign('updateSubscriptionUrl', $url);
       }
 
-      list($sent, $subject, $message, $html) = CRM_Core_BAO_MessageTemplates::sendTemplate($templatesParams);
+      list($sent, $subject, $message, $html) = CRM_Core_BAO_MessageTemplate::sendTemplate($templatesParams);
 
       if ($sent) {
         CRM_Core_Error::debug_log_message('Success: mail sent for recurring notification.');

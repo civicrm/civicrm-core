@@ -301,7 +301,7 @@ class CRM_Friend_BAO_Friend extends CRM_Friend_DAO_Friend {
     foreach ($values['email'] as $displayName => $emailTo) {
       if ($emailTo) {
         // FIXME: factor the below out of the foreach loop
-        CRM_Core_BAO_MessageTemplates::sendTemplate(
+        CRM_Core_BAO_MessageTemplate::sendTemplate(
           array(
             'groupName' => 'msg_tpl_workflow_friend',
             'valueName' => 'friend',

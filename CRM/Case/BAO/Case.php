@@ -1429,7 +1429,7 @@ SELECT case_status.label AS case_status, status_id, case_type.label AS case_type
 
       $displayName = CRM_Utils_Array::value('display_name', $info);
 
-      list($result[CRM_Utils_Array::value('contact_id', $info)], $subject, $message, $html) = CRM_Core_BAO_MessageTemplates::sendTemplate(
+      list($result[CRM_Utils_Array::value('contact_id', $info)], $subject, $message, $html) = CRM_Core_BAO_MessageTemplate::sendTemplate(
         array(
           'groupName' => 'msg_tpl_workflow_case',
           'valueName' => 'case_activity',

@@ -670,7 +670,7 @@ WHERE pcp.id = %1 AND cc.contribution_status_id =1 AND cc.is_test = 0";
 
     $tplName = $isInitial ? 'pcp_supporter_notify' : 'pcp_status_change';
 
-    list($sent, $subject, $message, $html) = CRM_Core_BAO_MessageTemplates::sendTemplate(
+    list($sent, $subject, $message, $html) = CRM_Core_BAO_MessageTemplate::sendTemplate(
       array(
         'groupName' => 'msg_tpl_workflow_contribution',
         'valueName' => $tplName,

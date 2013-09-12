@@ -496,7 +496,7 @@ class CRM_Contribute_Form_AdditionalInfo {
       $form->assign('receive_date', CRM_Utils_Date::processDate($params['receive_date']));
     }
 
-    list($sendReceipt, $subject, $message, $html) = CRM_Core_BAO_MessageTemplates::sendTemplate(
+    list($sendReceipt, $subject, $message, $html) = CRM_Core_BAO_MessageTemplate::sendTemplate(
       array(
         'groupName' => 'msg_tpl_workflow_contribution',
         'valueName' => 'contribution_offline_receipt',
