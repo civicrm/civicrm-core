@@ -455,7 +455,7 @@ function _civicrm_api3_buildprofile_submitfields($profileID, $optionsBehaviour =
   $fields = civicrm_api3('uf_field', 'get', array('uf_group_id' => $profileID));
   $entities = array();
 
-  foreach ($fields['values'] as $id => $field) {
+  foreach ($fields['values'] as $field) {
     if(!$field['is_active']) {
       continue;
     }
