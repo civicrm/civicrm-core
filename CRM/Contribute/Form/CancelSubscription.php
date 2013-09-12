@@ -305,7 +305,7 @@ class CRM_Contribute_Form_CancelSubscription extends CRM_Core_Form {
                   'toName' => $this->_donorDisplayName,
                   'toEmail' => $this->_donorEmail,
                   );
-          list($sent) = CRM_Core_BAO_MessageTemplates::sendTemplate($sendTemplateParams);
+          list($sent) = CRM_Core_BAO_MessageTemplate::sendTemplate($sendTemplateParams);
         }
       }
       else {

@@ -27,7 +27,7 @@
   <xi:include href="Mapping.xml"              parse="xml" />
   <xi:include href="MappingField.xml"         parse="xml" />
   <xi:include href="Menu.xml"                 parse="xml" />
-  <xi:include href="MessageTemplates.xml"     parse="xml" />
+  <xi:include href="MessageTemplate.xml"      parse="xml" />
   <xi:include href="Navigation.xml"           parse="xml" />
   <xi:include href="Note.xml"                 parse="xml" />
   <xi:include href="OptionGroup.xml"          parse="xml" />

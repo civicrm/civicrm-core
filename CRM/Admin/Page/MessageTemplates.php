@@ -80,7 +80,7 @@ class CRM_Admin_Page_MessageTemplates extends CRM_Core_Page_Basic {
    * @return string Classname of BAO.
    */
   function getBAOName() {
-    return 'CRM_Core_BAO_MessageTemplates';
+    return 'CRM_Core_BAO_MessageTemplate';
   }
 
   /**
@@ -100,13 +100,13 @@ class CRM_Admin_Page_MessageTemplates extends CRM_Core_Page_Basic {
         ),
         CRM_Core_Action::DISABLE => array(
           'name' => ts('Disable'),
-          'extra' => 'onclick = "enableDisable( %%id%%,\'' . 'CRM_Core_BAO_MessageTemplates' . '\',\'' . 'enable-disable' . '\' );"',
+          'extra' => 'onclick = "enableDisable( %%id%%,\'' . 'CRM_Core_BAO_MessageTemplate' . '\',\'' . 'enable-disable' . '\' );"',
           'ref' => 'disable-action',
           'title' => ts('Disable this message template'),
         ),
         CRM_Core_Action::ENABLE => array(
           'name' => ts('Enable'),
-          'extra' => 'onclick = "enableDisable( %%id%%,\'' . 'CRM_Core_BAO_MessageTemplates' . '\',\'' . 'disable-enable' . '\' );"',
+          'extra' => 'onclick = "enableDisable( %%id%%,\'' . 'CRM_Core_BAO_MessageTemplate' . '\',\'' . 'disable-enable' . '\' );"',
           'ref' => 'enable-action',
           'title' => ts('Enable this message template'),
         ),
@@ -175,7 +175,7 @@ class CRM_Admin_Page_MessageTemplates extends CRM_Core_Page_Basic {
 
       $this->_revertedId = $id;
 
-      CRM_Core_BAO_MessageTemplates::revert($id);
+      CRM_Core_BAO_MessageTemplate::revert($id);
     }
 
     $this->assign('selectedChild', CRM_Utils_Request::retrieve('selectedChild', 'String', $this));
@@ -238,7 +238,7 @@ class CRM_Admin_Page_MessageTemplates extends CRM_Core_Page_Basic {
       $action -= CRM_Core_Action::ENABLE;
     }
 
-    $messageTemplate = new CRM_Core_BAO_MessageTemplates();
+    $messageTemplate = new CRM_Core_BAO_MessageTemplate();
     $messageTemplate->orderBy('msg_title' . ' asc');
 
     $userTemplates = array();

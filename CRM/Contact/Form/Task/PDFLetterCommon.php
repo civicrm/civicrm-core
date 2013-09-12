@@ -48,7 +48,7 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
   static function preProcess(&$form) {
     $messageText    = array();
     $messageSubject = array();
-    $dao            = new CRM_Core_BAO_MessageTemplates();
+    $dao            = new CRM_Core_BAO_MessageTemplate();
     $dao->is_active = 1;
     $dao->find();
     while ($dao->fetch()) {
@@ -274,14 +274,14 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
       }
       if (CRM_Utils_Array::value('saveTemplate', $formValues) && $formValues['saveTemplate']) {
         $messageTemplate['msg_title'] = $formValues['saveTemplateName'];
-        CRM_Core_BAO_MessageTemplates::add($messageTemplate);
+        CRM_Core_BAO_MessageTemplate::add($messageTemplate);
       }
 
       if (CRM_Utils_Array::value('updateTemplate', $formValues) && $formValues['template'] && $formValues['updateTemplate']) {
         $messageTemplate['id'] = $formValues['template'];
 
         unset($messageTemplate['msg_title']);
-        CRM_Core_BAO_MessageTemplates::add($messageTemplate);
+        CRM_Core_BAO_MessageTemplate::add($messageTemplate);
       }
     }
     elseif (CRM_Utils_Array::value('template', $formValues) > 0) {
