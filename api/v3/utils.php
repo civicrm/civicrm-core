@@ -1656,7 +1656,7 @@ function _civicrm_api3_api_match_pseudoconstant(&$params, $entity, $fieldName, $
     $options = CRM_Utils_Array::value('values', $options, array());
   }
 
-  // If passed a value-seperated string, explode to an array, then re-implode after matching values
+  // If passed a value-separated string, explode to an array, then re-implode after matching values
   $implode = FALSE;
   if (is_string($params[$fieldName]) && strpos($params[$fieldName], CRM_Core_DAO::VALUE_SEPARATOR) !== FALSE) {
     $params[$fieldName] = CRM_Utils_Array::explodePadded($params[$fieldName]);
