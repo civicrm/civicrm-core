@@ -202,18 +202,17 @@ AND    TABLE_NAME LIKE 'log_civicrm_%'
     foreach ((array('ADD', 'MODIFY')) as $alterType) {
       foreach ($cols[$alterType] as $col) {
         $line = $this->_getColumnQuery($col, $create);
-        CRM_Core_Error::debug_var( 'ALTER TABLE `{$this->db}`.log_$table {$alterType} {$line}', "ALTER TABLE `{$this->db}`.log_$table {$alterType} {$line}" );
         CRM_Core_DAO::executeQuery("ALTER TABLE `{$this->db}`.log_$table {$alterType} {$line}");
       }
     }
 
-    if (!empty($cols['DROP'])) {
+    // for any obsolete columns (not null) we just make the column nullable.
+    if (!empty($cols['OBSOLETE'])) {
       $create = $this->_getCreateQuery("log_{$table}");
-      foreach ($cols['DROP'] as $col) {
+      foreach ($cols['OBSOLETE'] as $col) {
         $line = $this->_getColumnQuery($col, $create);
-        // note we not dropping the column
-        CRM_Core_Error::debug_var( 'ALTER TABLE `{$this->db}`.log_$table {$alterType} {$line}', "ALTER TABLE `{$this->db}`.log_$table MODIFY {$line}" );
-        CRM_Core_DAO::executeQuery("ALTER TABLE `{$this->db}`.log_$table {$alterType} {$line}");
+        // This is just going to make a not null column to nullable
+        CRM_Core_DAO::executeQuery("ALTER TABLE `{$this->db}`.log_$table MODIFY {$line}");
       }
     }
 
@@ -242,7 +241,6 @@ AND    TABLE_NAME LIKE 'log_civicrm_%'
 
   function fixSchemaDifferencesForAll($rebuildTrigger = FALSE) {
     $diffs = array();
-    CRM_Core_Error::debug_var( '$this->logs', $this->logs );
     foreach ($this->tables as $table) {
       if (empty($this->logs[$table])) {
         $this->createLogTableFor($table);
@@ -250,7 +248,6 @@ AND    TABLE_NAME LIKE 'log_civicrm_%'
         $diffs[$table] = $this->columnsWithDiffSpecs($table, "log_$table");
       }
     }
-    CRM_Core_Error::debug_var( 'total $diffs', $diffs );
 
     foreach ($diffs as $table => $cols) {
       $this->fixSchemaDifferencesFor($table, $cols, FALSE);
@@ -345,15 +342,12 @@ AND    TABLE_NAME LIKE 'log_civicrm_%'
 SELECT TABLE_SCHEMA, TABLE_NAME, COLUMN_NAME, DATA_TYPE, IS_NULLABLE, COLUMN_DEFAULT
 FROM   INFORMATION_SCHEMA.COLUMNS
 WHERE  table_schema IN ('{$this->db}', '{$civiDB}')";
-      CRM_Core_Error::debug_var( '$query', $query );
       $dao = CRM_Core_DAO::executeQuery($query);
-      CRM_Core_Error::debug_var( '$dao', $dao );
       CRM_Core_Error::setCallback();
       if (is_a($dao, 'DB_Error')) {
         return array();
       }
       while ($dao->fetch()) {
-        //CRM_Core_Error::debug_var( '$dao', $dao );
         if (!array_key_exists($dao->TABLE_NAME, $columnSpecs)) {
           $columnSpecs[$dao->TABLE_NAME] = array();
         }
@@ -365,10 +359,7 @@ WHERE  table_schema IN ('{$this->db}', '{$civiDB}')";
               'COLUMN_DEFAULT' => $dao->COLUMN_DEFAULT
             );
       }
-      //CRM_Core_Error::debug_var( '$columnSpecs', $columnSpecs );
     }
-    CRM_Core_Error::debug_var( '$table', $table );
-    CRM_Core_Error::debug_var( '$columnSpecs[$table]', $columnSpecs[$table] );
     return $columnSpecs[$table];
   }
 
@@ -376,7 +367,7 @@ WHERE  table_schema IN ('{$this->db}', '{$civiDB}')";
     $colSpecs1 = $this->columnSpecsOf($table1);
     $colSpecs2 = $this->columnSpecsOf($table2);
     
-    $diff = array('ADD' => array(), 'MODIFY' => array(), 'DROP' => array());
+    $diff = array('ADD' => array(), 'MODIFY' => array(), 'OBSOLETE' => array());
     foreach ($colSpecs1 as $key => $val) {
       if (!empty(array_diff($colSpecs1[$key], $colSpecs2[$key])) && $key != 'id') {
         // ignore id column for any spec changes, to avoid any auto-increment mysql errors
@@ -388,10 +379,11 @@ WHERE  table_schema IN ('{$this->db}', '{$civiDB}')";
     $diff['ADD'] = array_diff(array_keys($colSpecs1), array_keys($colSpecs2));
 
     // columns to be dropped
-    $drops = array_diff(array_keys($colSpecs2), array_keys($colSpecs1));
-    foreach ($drops as $col) {
-      if (!in_array($col, array('log_date', 'log_conn_id', 'log_user_id', 'log_action'))) {
-        $diff['DROP'][] = $col;
+    $oldCols = array_diff(array_keys($colSpecs2), array_keys($colSpecs1));
+    foreach ($oldCols as $col) {
+      if (!in_array($col, array('log_date', 'log_conn_id', 'log_user_id', 'log_action')) && 
+        CRM_Utils_Array::value('IS_NULLABLE', $colSpecs2[$col]) == 'NO') {
+        $diff['OBSOLETE'][] = $col;
       }
     }
 
