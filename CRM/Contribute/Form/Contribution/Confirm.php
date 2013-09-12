@@ -969,6 +969,9 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
   /**
    * Process the form
    *
+   * @param $premiumParams
+   * @param $contribution
+   *
    * @return void
    * @access public
    */
@@ -1089,6 +1092,15 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
 
   /**
    * Process the contribution
+   *
+   * @param $form
+   * @param $params
+   * @param $result
+   * @param $contactID
+   * @param $contributionType
+   * @param bool $deductibleMode
+   * @param bool $pending
+   * @param bool $online
    *
    * @return CRM_Contribute_DAO_Contribution
    * @access public
@@ -1590,9 +1602,12 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    * Function to add on behalf of organization and it's location
    *
    * @param $behalfOrganization array  array of organization info
-   * @param $values             array  form values array
    * @param $contactID          int    individual contact id. One
    * who is doing the process of signup / contribution.
+   *
+   * @param $values             array  form values array
+   * @param $params
+   * @param null $fields
    *
    * @return void
    * @access public
@@ -1732,6 +1747,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    * @param object $page   form object
    * @param array  $params associated array
    *
+   * @return array
    * @static
    * @access public
    */
