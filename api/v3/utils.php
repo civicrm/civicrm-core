@@ -50,11 +50,11 @@ function _civicrm_api3_initialize() {
  *
  * @param array $params array of fields to check
  * @param array $daoName string DAO to check for required fields (create functions only)
- * @param array $keys list of required fields options. One of the options is required
- * @return null or throws error if there the required fields not present
-
- * @
+ * @param array $keyoptions
  *
+ * @internal param array $keys list of required fields options. One of the options is required
+ * @return null or throws error if there the required fields not present
+ * @
  */
 function civicrm_api3_verify_one_mandatory($params, $daoName = NULL, $keyoptions = array(
   )) {
@@ -269,9 +269,10 @@ function _civicrm_api3_load_DAO($entity) {
 
 /**
  * Function to return the DAO of the function or Entity
- * @param  $name is either a function of the api (civicrm_{entity}_create or the entity name
+ * @param String $name  either a function of the api (civicrm_{entity}_create or the entity name
  * return the DAO name to manipulate this function
  * eg. "civicrm_api3_contact_create" or "Contact" will return "CRM_Contact_BAO_Contact"
+ * @return mixed|string
  */
 function _civicrm_api3_get_DAO($name) {
   if (strpos($name, 'civicrm_api3') !== FALSE) {
@@ -299,9 +300,10 @@ function _civicrm_api3_get_DAO($name) {
 
 /**
  * Function to return the DAO of the function or Entity
- * @param  $name is either a function of the api (civicrm_{entity}_create or the entity name
+ * @param String $name is either a function of the api (civicrm_{entity}_create or the entity name
  * return the DAO name to manipulate this function
  * eg. "civicrm_contact_create" or "Contact" will return "CRM_Contact_BAO_Contact"
+ * @return mixed
  */
 function _civicrm_api3_get_BAO($name) {
   $dao = _civicrm_api3_get_DAO($name);
@@ -366,6 +368,7 @@ function _civicrm_api3_store_values(&$fields, &$params, &$values) {
   }
   return $valueFound;
 }
+
 /**
  * The API supports 2 types of get requestion. The more complex uses the BAO query object.
  *  This is a generic function for those functions that call it
@@ -374,9 +377,13 @@ function _civicrm_api3_store_values(&$fields, &$params, &$values) {
  *  others that use the query object. Note that this function passes permission information in.
  *  The others don't
  *
+ * @param $entity
  * @param array $params as passed into api get or getcount function
- * @param array $options array of options (so we can modify the filter)
+ * @param array $additional_options
  * @param bool $getCount are we just after the count
+ *
+ * @return
+ * @internal param array $options array of options (so we can modify the filter)
  */
 function _civicrm_api3_get_using_query_object($entity, $params, $additional_options = array(), $getCount = NULL){
 
@@ -575,9 +582,14 @@ function _civicrm_api3_apply_filters_to_dao($filterField, $filterValue, &$dao) {
 /**
  * Get sort, limit etc options from the params - supporting old & new formats.
  * get returnproperties for legacy
+ *
  * @param array $params params array as passed into civicrm_api
  * @param bool $queryObject - is this supporting a queryobject api (e.g contact) - if so we support more options
  * for legacy report & return a unique fields array
+ *
+ * @param string $entity
+ * @param string $action
+ *
  * @return array $options options extracted from params
  */
 function _civicrm_api3_get_options_from_params(&$params, $queryObject = FALSE, $entity = '', $action = '') {
@@ -665,8 +677,10 @@ function _civicrm_api3_get_options_from_params(&$params, $queryObject = FALSE, $
 
 /**
  * Apply options (e.g. sort, limit, order by) to DAO object (prior to find)
+ *
  * @param array $params params array as passed into civicrm_api
  * @param object $dao DAO object
+ * @param $entity
  */
 function _civicrm_api3_apply_options_to_dao(&$params, &$dao, $entity) {
 
@@ -715,8 +729,15 @@ function _civicrm_api3_get_unique_name_array(&$bao) {
 /**
  * Converts an DAO object to an array
  *
- * @param  object   $dao           (reference )object to convert
+ * @param  object $dao           (reference )object to convert
+ * @param null $params
+ * @param bool $uniqueFields
+ * @param string $entity
+ *
+ * @return array
+ *
  * @params array of arrays (key = id) of array of fields
+ *
  * @static void
  * @access public
  */
@@ -767,9 +788,9 @@ function _civicrm_api3_dao_to_array($dao, $params = NULL, $uniqueFields = TRUE, 
 /**
  * Converts an object to an array
  *
- * @param  object   $dao           (reference) object to convert
- * @param  array    $values        (reference) array
- * @param  array    $uniqueFields
+ * @param  object $dao           (reference) object to convert
+ * @param  array $values        (reference) array
+ * @param array|bool $uniqueFields
  *
  * @return array
  * @static void
@@ -821,8 +842,11 @@ function _civicrm_api3_custom_format_params($params, &$values, $extends, $entity
  * api level. Hence the intention is to remove this function
  * & the associated param from viery_mandatory
  *
- * @param array  $params       Associative array of property name/value
+ * @param array $params       Associative array of property name/value
  *                             pairs to insert in new history.
+ * @param $daoName
+ * @param bool $return
+ *
  * @daoName string DAO to check params agains
  *
  * @return bool should the missing fields be returned as an array (core error created as default)
@@ -918,6 +942,9 @@ function _civicrm_api3_api_check_permission($entity, $action, &$params, $throw =
  * @param string $bao_name name of BAO
  * @param array $params params from api
  * @param bool $returnAsSuccess return in api success format
+ * @param string $entity
+ *
+ * @return array
  */
 function _civicrm_api3_basic_get($bao_name, &$params, $returnAsSuccess = TRUE, $entity = "") {
   $bao = new $bao_name();
@@ -935,6 +962,7 @@ function _civicrm_api3_basic_get($bao_name, &$params, $returnAsSuccess = TRUE, $
  * @param string $bao_name Name of BAO Class
  * @param array $params parameters passed into the api call
  * @param string $entity Entity - pass in if entity is non-standard & required $ids array
+ * @return array
  */
 function _civicrm_api3_basic_create($bao_name, &$params, $entity = NULL) {
 
@@ -972,7 +1000,7 @@ function _civicrm_api3_basic_create($bao_name, &$params, $entity = NULL) {
 /**
  * For BAO's which don't have a create() or add() functions, use this fallback implementation.
  *
- * FIXME There's an intuitive sense that this behavior should be defined somehow in the BAO/DAO class
+ * @fixme There's an intuitive sense that this behavior should be defined somehow in the BAO/DAO class
  * structure. In practice, that requires a fair amount of refactoring and/or kludgery.
  *
  * @param string $bao_name
@@ -1037,10 +1065,10 @@ function _civicrm_api3_basic_delete($bao_name, &$params) {
  *
  * @param array $returnArray - array to append custom data too - generally $result[4] where 4 is the entity id.
  * @param string $entity  e.g membership, event
+ * @param $entity_id
  * @param int $groupID - per CRM_Core_BAO_CustomGroup::getTree
  * @param int $subType e.g. membership_type_id where custom data doesn't apply to all membership types
  * @param string $subName - Subtype of entity
- *
  */
 function _civicrm_api3_custom_data_get(&$returnArray, $entity, $entity_id, $groupID = NULL, $subType = NULL, $subName = NULL) {
   $groupTree = &CRM_Core_BAO_CustomGroup::getTree($entity,
@@ -1218,6 +1246,7 @@ function _civicrm_api3_validate_uniquekey(&$params, &$fieldName, &$fieldInfo) {
  * @param array $params params from civicrm_api, including:
  *   - 'values': an array of records to save
  *   - all other items: keys which identify new/pre-existing records
+ * @return array|int
  */
 function _civicrm_api3_generic_replace($entity, $params) {
 
@@ -1281,6 +1310,11 @@ function _civicrm_api3_generic_replace($entity, $params) {
   }
 }
 
+/**
+ * @param $params
+ *
+ * @return mixed
+ */
 function _civicrm_api3_generic_replace_base_params($params) {
   $baseParams = $params;
   unset($baseParams['values']);
@@ -1291,8 +1325,12 @@ function _civicrm_api3_generic_replace_base_params($params) {
 
 /**
  * returns fields allowable by api
+ *
  * @param $entity string Entity to query
  * @param bool $unique index by unique fields?
+ * @param array $params
+ *
+ * @return array
  */
 function _civicrm_api_get_fields($entity, $unique = FALSE, &$params = array(
   )) {
@@ -1541,6 +1579,14 @@ function  _civicrm_api3_resolve_contactID($contactIdExpr) {
   return NULL;
 }
 
+/**
+ * Validate html (check for scripting attack)
+ * @param $params
+ * @param $fieldName
+ * @param $fieldInfo
+ *
+ * @throws API_Exception
+ */
 function _civicrm_api3_validate_html(&$params, &$fieldName, &$fieldInfo) {
   if ($value = CRM_Utils_Array::value($fieldName, $params)) {
     if (!CRM_Utils_Rule::xssString($value)) {
