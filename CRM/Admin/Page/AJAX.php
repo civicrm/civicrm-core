@@ -171,7 +171,7 @@ class CRM_Admin_Page_AJAX {
           $status = ts('Are you sure you want to disable this custom data group? Any profile fields that are linked to custom fields of this group will be disabled.');
           break;
 
-        case 'CRM_Core_BAO_MessageTemplates':
+        case 'CRM_Core_BAO_MessageTemplate':
           $status = ts('Are you sure you want to disable this message tempate?');
           break;
 

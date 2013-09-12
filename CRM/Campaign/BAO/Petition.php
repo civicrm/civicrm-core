@@ -582,7 +582,7 @@ AND         tag_id = ( SELECT id FROM civicrm_tag WHERE name = %2 )";
         CRM_Contact_BAO_GroupContact::addContactsToGroup($p, $group_id, 'API');
 
         if ($params['email-Primary']) {
-          CRM_Core_BAO_MessageTemplates::sendTemplate(
+          CRM_Core_BAO_MessageTemplate::sendTemplate(
             array(
               'groupName' => 'msg_tpl_workflow_petition',
               'valueName' => 'petition_sign',
@@ -639,7 +639,7 @@ AND         tag_id = ( SELECT id FROM civicrm_tag WHERE name = %2 )";
         $tplParams['petition'] = $petitionTokens;
 
         if ($params['email-Primary']) {
-          CRM_Core_BAO_MessageTemplates::sendTemplate(
+          CRM_Core_BAO_MessageTemplate::sendTemplate(
             array(
               'groupName' => 'msg_tpl_workflow_petition',
               'valueName' => 'petition_confirmation_needed',

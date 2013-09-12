@@ -342,7 +342,7 @@ class CRM_Contact_Form_Task_EmailCommon {
 
       if (CRM_Utils_Array::value('saveTemplate', $formValues)) {
         $messageTemplate['msg_title'] = $formValues['saveTemplateName'];
-        CRM_Core_BAO_MessageTemplates::add($messageTemplate);
+        CRM_Core_BAO_MessageTemplate::add($messageTemplate);
       }
 
       if (CRM_Utils_Array::value('template', $formValues) &&
@@ -350,7 +350,7 @@ class CRM_Contact_Form_Task_EmailCommon {
       ) {
         $messageTemplate['id'] = $formValues['template'];
         unset($messageTemplate['msg_title']);
-        CRM_Core_BAO_MessageTemplates::add($messageTemplate);
+        CRM_Core_BAO_MessageTemplate::add($messageTemplate);
       }
     }
 

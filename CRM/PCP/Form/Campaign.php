@@ -320,7 +320,7 @@ class CRM_PCP_Form_Campaign extends CRM_Core_Form {
       unset($emailArray[0]);
       $cc = implode(',', $emailArray);
 
-      list($sent, $subject, $message, $html) = CRM_Core_BAO_MessageTemplates::sendTemplate(
+      list($sent, $subject, $message, $html) = CRM_Core_BAO_MessageTemplate::sendTemplate(
         array(
           'groupName' => 'msg_tpl_workflow_contribution',
           'valueName' => 'pcp_notify',

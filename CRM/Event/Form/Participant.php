@@ -1705,7 +1705,7 @@ loadCampaign( {$this->_eID}, {$eventCampaigns} );
           $sendTemplateParams['bcc'] = CRM_Utils_Array::value('bcc', $this->_fromEmails);
         }
 
-        list($mailSent, $subject, $message, $html) = CRM_Core_BAO_MessageTemplates::sendTemplate($sendTemplateParams);
+        list($mailSent, $subject, $message, $html) = CRM_Core_BAO_MessageTemplate::sendTemplate($sendTemplateParams);
         if ($mailSent) {
           $sent[] = $contactID;
           foreach ($participants as $ids => $values) {

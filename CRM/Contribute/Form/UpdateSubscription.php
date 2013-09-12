@@ -304,7 +304,7 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Core_Form {
             'toName' => $donorDisplayName,
             'toEmail' => $donorEmail,
           );
-          list($sent) = CRM_Core_BAO_MessageTemplates::sendTemplate($sendTemplateParams);
+          list($sent) = CRM_Core_BAO_MessageTemplate::sendTemplate($sendTemplateParams);
         }
       }
 

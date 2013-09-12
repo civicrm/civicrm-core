@@ -2415,7 +2415,7 @@ LEFT JOIN civicrm_mailing_group g ON g.mailing_id   = m.id
     );
 
 
-    $form->_templates = CRM_Core_BAO_MessageTemplates::getMessageTemplates(FALSE);
+    $form->_templates = CRM_Core_BAO_MessageTemplate::getMessageTemplates(FALSE);
     if (!empty($form->_templates)) {
       $form->assign('templates', TRUE);
       $form->add('select', 'template', ts('Use Template'),
@@ -2492,7 +2492,7 @@ LEFT JOIN civicrm_mailing_group g ON g.mailing_id   = m.id
       )
     );
 
-    $form->_templates = CRM_Core_BAO_MessageTemplates::getMessageTemplates(FALSE);
+    $form->_templates = CRM_Core_BAO_MessageTemplate::getMessageTemplates(FALSE);
     if (!empty($form->_templates)) {
       $form->assign('templates', TRUE);
       $form->add('select', 'template', ts('Select Template'),

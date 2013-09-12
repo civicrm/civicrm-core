@@ -351,7 +351,7 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
       $this->set($template_param_to_copy, $send_template_params['tplParams'][$template_param_to_copy]);
     }
 
-    CRM_Core_BAO_MessageTemplates::sendTemplate($send_template_params);
+    CRM_Core_BAO_MessageTemplate::sendTemplate($send_template_params);
   }
 
   static function formRule($fields, $files, $self) {

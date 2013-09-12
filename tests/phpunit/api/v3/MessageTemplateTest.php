@@ -32,11 +32,11 @@ require_once 'CiviTest/CiviUnitTestCase.php';
  *
  *  @package CiviCRM_APIv3
  */
-class api_v3_MessageTemplatesTest extends CiviUnitTestCase {
+class api_v3_MessageTemplateTest extends CiviUnitTestCase {
   /**
    * Assume empty database with just civicrm_data
    */
-  protected $entity = 'MessageTemplates';
+  protected $entity = 'MessageTemplate';
   protected $params;
 
 
@@ -44,7 +44,7 @@ class api_v3_MessageTemplatesTest extends CiviUnitTestCase {
     $this->_apiversion = 3;
     parent::setUp();
     $this->quickCleanup(array('civicrm_msg_template'));
-    $template = CRM_Core_DAO::createTestObject('CRM_Core_DAO_MessageTemplates')->toArray();
+    $template = CRM_Core_DAO::createTestObject('CRM_Core_DAO_MessageTemplate')->toArray();
     $this->params = array(
       'msg_title' => $template['msg_title'],
       'msg_subject' => $template['msg_subject'],
@@ -62,7 +62,7 @@ class api_v3_MessageTemplatesTest extends CiviUnitTestCase {
    * test create function succeeds
    */
   public function testCreate() {
-    $result = $this->callAPIAndDocument('MessageTemplates', 'create', $this->params, __FUNCTION__, __FILE__);
+    $result = $this->callAPIAndDocument('MessageTemplate', 'create', $this->params, __FUNCTION__, __FILE__);
     $this->getAndCheck($this->params, $result['id'], $this->entity);
   }
 
@@ -73,7 +73,7 @@ class api_v3_MessageTemplatesTest extends CiviUnitTestCase {
    *
    */
   public function testGet() {
-    $result = $this->callAPIAndDocument('MessageTemplates', 'get', $this->params, __FUNCTION__, __FILE__);
+    $result = $this->callAPIAndDocument('MessageTemplate', 'get', $this->params, __FUNCTION__, __FILE__);
     $this->assertEquals(1, $result['count'], 'In line ' . __LINE__);
     $this->assertNotNull($result['values'][$result['id']]['id'], 'In line ' . __LINE__);
   }
@@ -83,7 +83,7 @@ class api_v3_MessageTemplatesTest extends CiviUnitTestCase {
  */
   public function testDelete() {
     $entity = $this->createTestEntity();
-    $result = $this->callAPIAndDocument('MessageTemplates', 'delete', array('id' => $entity['id']), __FUNCTION__, __FILE__);
+    $result = $this->callAPIAndDocument('MessageTemplate', 'delete', array('id' => $entity['id']), __FUNCTION__, __FILE__);
     $checkDeleted = $this->callAPISuccess($this->entity, 'get', array(
       'id' => $entity['id']
     ));

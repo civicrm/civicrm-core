@@ -2,7 +2,7 @@
 
 <table>
   <base>CRM/Core</base>
-  <class>MessageTemplates</class>
+  <class>MessageTemplate</class>
   <name>civicrm_msg_template</name>
   <comment>Users will need a way to save and retrieve templates with tokens for use in recurring email communication tasks</comment>
   <add>1.6</add>
