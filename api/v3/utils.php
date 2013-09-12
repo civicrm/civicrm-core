@@ -73,6 +73,7 @@ function civicrm_api3_verify_one_mandatory($params, $daoName = NULL, $keyoptions
  * @param array $keys list of required fields. A value can be an array denoting that either this or that is required.
  * @param bool $verifyDAO
  *
+ * @throws API_Exception
  * @return null or throws error if there the required fields not present
  *
  * @todo see notes on _civicrm_api3_check_required_fields regarding removing $daoName param
@@ -127,11 +128,12 @@ function civicrm_api3_verify_mandatory($params, $daoName = NULL, $keys = array(
 
 /**
  *
- * @param <type> $msg
  * @param <type> $data
+ * @param array $data
  * @param object $dao DAO / BAO object to be freed here
  *
- * @return <type>
+ * @throws API_Exception
+ * @return array <type>
  */
 function civicrm_api3_create_error($msg, $data = array(), &$dao = NULL) {
   //fix me - $dao should be param 4 & 3 should be $apiRequest
@@ -880,6 +882,7 @@ function _civicrm_api3_check_required_fields($params, $daoName, $return = FALSE)
  * @param $params array  params of the API call
  * @param $throw bool    whether to throw exception instead of returning false
  *
+ * @throws Exception
  * @return bool whether the current API user has the permission to make the call
  */
 function _civicrm_api3_api_check_permission($entity, $action, &$params, $throw = TRUE) {
@@ -974,6 +977,8 @@ function _civicrm_api3_basic_create($bao_name, &$params, $entity = NULL) {
  *
  * @param string $bao_name
  * @param array $params
+ *
+ * @throws API_Exception
  * @return CRM_Core_DAO|NULL an instance of the BAO
  */
 function _civicrm_api3_basic_create_fallback($bao_name, &$params) {
@@ -1075,9 +1080,9 @@ function _civicrm_api3_custom_data_get(&$returnArray, $entity, $entity_id, $grou
  * @param string $entity
  * @param string $action
  * @param array $params -
- * @param boolean errorMode do intensive post fail checks?
- * @param array $fields response from getfields
- * all variables are the same as per civicrm_api
+ * @param array $fields response from getfields all variables are the same as per civicrm_api
+ * @param bool $errorMode errorMode do intensive post fail checks?
+ * @throws Exception
  */
 function _civicrm_api3_validate_fields($entity, $action, &$params, $fields, $errorMode = False) {
   $fields = array_intersect_key($fields, $params);
@@ -1138,7 +1143,9 @@ function _civicrm_api3_validate_fields($entity, $action, &$params, $fields, $err
  *
  * @param array $params params from civicrm_api
  * @param string $fieldName uniquename of field being checked
- * @param array $fieldinfo array of fields from getfields function
+ * @param $fieldInfo
+ * @throws Exception
+ * @internal param array $fieldinfo array of fields from getfields function
  */
 function _civicrm_api3_validate_date(&$params, &$fieldName, &$fieldInfo) {
   //should we check first to prevent it from being copied if they have passed in sql friendly format?
@@ -1163,7 +1170,9 @@ function _civicrm_api3_validate_date(&$params, &$fieldName, &$fieldInfo) {
  *
  * @param array $params params from civicrm_api
  * @param string $fieldName uniquename of field being checked
- * @param array $fieldinfo array of fields from getfields function
+ * @param $fieldInfo
+ * @throws Exception
+ * @internal param array $fieldinfo array of fields from getfields function
  */
 function _civicrm_api3_validate_constraint(&$params, &$fieldName, &$fieldInfo) {
   $dao = new $fieldInfo['FKClassName'];
@@ -1180,7 +1189,9 @@ function _civicrm_api3_validate_constraint(&$params, &$fieldName, &$fieldInfo) {
  *
  * @param array $params params from civicrm_api
  * @param string $fieldName uniquename of field being checked
- * @param array $fieldinfo array of fields from getfields function
+ * @param $fieldInfo
+ * @throws Exception
+ * @internal param array $fieldinfo array of fields from getfields function
  */
 function _civicrm_api3_validate_uniquekey(&$params, &$fieldName, &$fieldInfo) {
   $existing = civicrm_api($params['entity'], 'get', array(
@@ -1458,7 +1469,10 @@ function _civicrm_api3_swap_out_aliases(&$apiRequest, $fields) {
  *
  * @param array $params params from civicrm_api
  * @param string $fieldName uniquename of field being checked
- * @param array $fieldinfo array of fields from getfields function
+ * @param $fieldInfo
+ * @param $entity
+ * @throws API_Exception
+ * @internal param array $fieldinfo array of fields from getfields function
  */
 function _civicrm_api3_validate_integer(&$params, &$fieldName, &$fieldInfo, $entity) {
   //if fieldname exists in params
@@ -1539,7 +1553,11 @@ function _civicrm_api3_validate_html(&$params, &$fieldName, &$fieldInfo) {
  * Validate string fields being passed into API.
  * @param array $params params from civicrm_api
  * @param string $fieldName uniquename of field being checked
- * @param array $fieldinfo array of fields from getfields function
+ * @param $fieldInfo
+ * @param $entity
+ * @throws API_Exception
+ * @throws Exception
+ * @internal param array $fieldinfo array of fields from getfields function
  */
 function _civicrm_api3_validate_string(&$params, &$fieldName, &$fieldInfo, $entity) {
   // If fieldname exists in params
@@ -1623,6 +1641,7 @@ function _civicrm_api3_api_match_pseudoconstant(&$params, $entity, $fieldName, $
  * @param $value: field value
  * @param $options: array of options for this field
  * @param $fieldName: field name used in api call (not necessarily the canonical name)
+ * @throws API_Exception
  */
 function _civicrm_api3_api_match_pseudoconstant_value(&$value, $options, $fieldName) {
   // If option is a key, no need to translate
