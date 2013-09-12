@@ -169,9 +169,7 @@ AND    TABLE_NAME LIKE 'log_civicrm_%'
       $config->logging = TRUE;
     }
     if ($config->logging) {
-      foreach ($this->schemaDifferences() as $table => $cols) {
-        $this->fixSchemaDifferencesFor($table, $cols, FALSE);
-      }
+      $this->fixSchemaDifferencesForALL();
     }
     // invoke the meta trigger creation call
     CRM_Core_DAO::triggerRebuild();
@@ -186,30 +184,76 @@ AND    TABLE_NAME LIKE 'log_civicrm_%'
    *
    * @return void
    */
-  function fixSchemaDifferencesFor($table, $cols = NULL, $rebuildTrigger = TRUE) {
+  function fixSchemaDifferencesFor($table, $cols = array(), $rebuildTrigger = FALSE) {
+    if (empty($table)) {
+      return FALSE;
+    }
     if (empty($this->logs[$table])) {
       $this->createLogTableFor($table);
-      return;
+      return TRUE;
     }
 
-    if (is_null($cols)) {
-      $cols = array_diff($this->columnsOf($table), $this->columnsOf("log_$table"));
-    }
     if (empty($cols)) {
-      return;
+      $cols = $this->columnsWithDiffSpecs($table, "log_$table");
     }
 
     // use the relevant lines from CREATE TABLE to add colums to the log table
-    $dao = CRM_Core_DAO::executeQuery("SHOW CREATE TABLE $table");
+    $create = $this->_getCreateQuery($table);
+    foreach ((array('ADD', 'MODIFY')) as $alterType) {
+      foreach ($cols[$alterType] as $col) {
+        $line = $this->_getColumnQuery($col, $create);
+        CRM_Core_Error::debug_var( 'ALTER TABLE `{$this->db}`.log_$table {$alterType} {$line}', "ALTER TABLE `{$this->db}`.log_$table {$alterType} {$line}" );
+        CRM_Core_DAO::executeQuery("ALTER TABLE `{$this->db}`.log_$table {$alterType} {$line}");
+      }
+    }
+
+    if (!empty($cols['DROP'])) {
+      $create = $this->_getCreateQuery("log_{$table}");
+      foreach ($cols['DROP'] as $col) {
+        $line = $this->_getColumnQuery($col, $create);
+        // note we not dropping the column
+        CRM_Core_Error::debug_var( 'ALTER TABLE `{$this->db}`.log_$table {$alterType} {$line}', "ALTER TABLE `{$this->db}`.log_$table MODIFY {$line}" );
+        CRM_Core_DAO::executeQuery("ALTER TABLE `{$this->db}`.log_$table {$alterType} {$line}");
+      }
+    }
+
+    if ($rebuildTrigger) {
+      // invoke the meta trigger creation call
+      CRM_Core_DAO::triggerRebuild($table);
+    }
+    return TRUE;
+  }
+
+  private function _getCreateQuery($table) {
+    $dao = CRM_Core_DAO::executeQuery("SHOW CREATE TABLE {$table}");
     $dao->fetch();
     $create = explode("\n", $dao->Create_Table);
-    foreach ($cols as $col) {
-      $line = preg_grep("/^  `$col` /", $create);
-      $line = substr(array_pop($line), 0, -1);
-      // CRM-11179
-      $line = self::fixTimeStampAndNotNullSQL($line);
+    return $create;
+  }
 
-      CRM_Core_DAO::executeQuery("ALTER TABLE `{$this->db}`.log_$table ADD $line");
+  private function _getColumnQuery($col, $createQuery) {
+    $line = preg_grep("/^  `$col` /", $createQuery);
+    $line = substr(array_pop($line), 0, -1);
+
+    // CRM-11179
+    $line = self::fixTimeStampAndNotNullSQL($line);
+    return $line;
+  }
+
+  function fixSchemaDifferencesForAll($rebuildTrigger = FALSE) {
+    $diffs = array();
+    CRM_Core_Error::debug_var( '$this->logs', $this->logs );
+    foreach ($this->tables as $table) {
+      if (empty($this->logs[$table])) {
+        $this->createLogTableFor($table);
+      } else {
+        $diffs[$table] = $this->columnsWithDiffSpecs($table, "log_$table");
+      }
+    }
+    CRM_Core_Error::debug_var( 'total $diffs', $diffs );
+
+    foreach ($diffs as $table => $cols) {
+      $this->fixSchemaDifferencesFor($table, $cols, FALSE);
     }
 
     if ($rebuildTrigger) {
@@ -218,24 +262,17 @@ AND    TABLE_NAME LIKE 'log_civicrm_%'
     }
   }
 
+  /*
+   * log_civicrm_contact.modified_date for example would always be copied from civicrm_contact.modified_date,
+   * so there's no need for a default timestamp and therefore we remove such default timestamps
+   * also eliminate the NOT NULL constraint, since we always copy and schema can change down the road)
+   */
   function fixTimeStampAndNotNullSQL($query) {
     $query = str_ireplace("TIMESTAMP NOT NULL", "TIMESTAMP NULL", $query);
     $query = str_ireplace("DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP", '', $query);
     $query = str_ireplace("DEFAULT CURRENT_TIMESTAMP", '', $query);
     $query = str_ireplace("NOT NULL", '', $query);
     return $query;
-  }
-
-  /**
-   * Find missing log table columns by comparing columns of the relevant tables.
-   * Returns table-name-keyed array of arrays of missing columns, e.g. array('civicrm_value_foo_1' => array('bar_1', 'baz_2'))
-   */
-  function schemaDifferences() {
-    $diffs = array();
-    foreach ($this->tables as $table) {
-      $diffs[$table] = array_diff($this->columnsOf($table), $this->columnsOf("log_$table"));
-    }
-    return array_filter($diffs);
   }
 
   private function addReports() {
@@ -288,6 +325,77 @@ AND    TABLE_NAME LIKE 'log_civicrm_%'
     }
 
     return $columnsOf[$table];
+  }
+
+  /**
+   * Get an array of columns and their details like DATA_TYPE, IS_NULLABLE, COLUMN_DEFAULT for the given table.
+   */
+  private function columnSpecsOf($table) {
+    static $columnSpecs = array(), $civiDB = NULL;
+
+    if (empty($columnSpecs)) {
+      if (!$civiDB) {
+        $dao = new CRM_Contact_DAO_Contact();
+        $civiDB = $dao->_database;
+      }
+      CRM_Core_Error::ignoreException();
+      // NOTE: W.r.t Performance using one query to find all details and storing in static array is much faster 
+      // than firing query for every given table.
+      $query = "
+SELECT TABLE_SCHEMA, TABLE_NAME, COLUMN_NAME, DATA_TYPE, IS_NULLABLE, COLUMN_DEFAULT
+FROM   INFORMATION_SCHEMA.COLUMNS
+WHERE  table_schema IN ('{$this->db}', '{$civiDB}')";
+      CRM_Core_Error::debug_var( '$query', $query );
+      $dao = CRM_Core_DAO::executeQuery($query);
+      CRM_Core_Error::debug_var( '$dao', $dao );
+      CRM_Core_Error::setCallback();
+      if (is_a($dao, 'DB_Error')) {
+        return array();
+      }
+      while ($dao->fetch()) {
+        //CRM_Core_Error::debug_var( '$dao', $dao );
+        if (!array_key_exists($dao->TABLE_NAME, $columnSpecs)) {
+          $columnSpecs[$dao->TABLE_NAME] = array();
+        }
+        $columnSpecs[$dao->TABLE_NAME][$dao->COLUMN_NAME] = 
+          array(
+              'COLUMN_NAME' => $dao->COLUMN_NAME, 
+              'DATA_TYPE'   => $dao->DATA_TYPE, 
+              'IS_NULLABLE' => $dao->IS_NULLABLE, 
+              'COLUMN_DEFAULT' => $dao->COLUMN_DEFAULT
+            );
+      }
+      //CRM_Core_Error::debug_var( '$columnSpecs', $columnSpecs );
+    }
+    CRM_Core_Error::debug_var( '$table', $table );
+    CRM_Core_Error::debug_var( '$columnSpecs[$table]', $columnSpecs[$table] );
+    return $columnSpecs[$table];
+  }
+
+  private function columnsWithDiffSpecs($table1, $table2) {
+    $colSpecs1 = $this->columnSpecsOf($table1);
+    $colSpecs2 = $this->columnSpecsOf($table2);
+    
+    $diff = array('ADD' => array(), 'MODIFY' => array(), 'DROP' => array());
+    foreach ($colSpecs1 as $key => $val) {
+      if (!empty(array_diff($colSpecs1[$key], $colSpecs2[$key])) && $key != 'id') {
+        // ignore id column for any spec changes, to avoid any auto-increment mysql errors
+        $diff['MODIFY'][] = $key;
+      } 
+    }
+
+    // columns to be added
+    $diff['ADD'] = array_diff(array_keys($colSpecs1), array_keys($colSpecs2));
+
+    // columns to be dropped
+    $drops = array_diff(array_keys($colSpecs2), array_keys($colSpecs1));
+    foreach ($drops as $col) {
+      if (!in_array($col, array('log_date', 'log_conn_id', 'log_user_id', 'log_action'))) {
+        $diff['DROP'][] = $col;
+      }
+    }
+
+    return $diff;
   }
 
   /**
