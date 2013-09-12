@@ -37,16 +37,12 @@
  */
 
 /**
- * Include common API util functions
- */
-require_once 'api/v3/utils.php';
-
-/**
  * Retrieve Profile field values.
  *
- * @param array  $params       Associative array of property name/value
+ * @param array $params       Associative array of property name/value
  *                             pairs to get profile field values
  *
+ * @throws API_Exception
  * @return Profile field values|CRM_Error
  *
  * NOTE this api is not standard & since it is tested we need to honour that
@@ -55,7 +51,6 @@ require_once 'api/v3/utils.php';
  * in order to avoid breaking code. (This could still be confusing :-( but we have to keep the tested behaviour working
  *
  * Note that if contact_id is empty an array of defaults is returned
- *
  */
 function civicrm_api3_profile_get($params) {
   $nonStandardLegacyBehaviour = is_numeric($params['profile_id']) ?  TRUE : FALSE;
@@ -64,6 +59,7 @@ function civicrm_api3_profile_get($params) {
   }
   $profiles = (array) $params['profile_id'];
   $values = array();
+  $ufGroupBAO = new CRM_Core_BAO_UFGroup();
   foreach ($profiles as $profileID) {
     $profileID = _civicrm_api3_profile_getProfileID($profileID);
     $values[$profileID] = array();
@@ -111,14 +107,14 @@ function civicrm_api3_profile_get($params) {
       }
     }
 
-    CRM_Core_BAO_UFGroup::setProfileDefaults($params['contact_id'], $contactFields, $values[$profileID], TRUE);
+    $ufGroupBAO->setProfileDefaults($params['contact_id'], $contactFields, $values[$profileID], TRUE);
 
     if ($params['activity_id']) {
-      CRM_Core_BAO_UFGroup::setComponentDefaults($activityFields, $params['activity_id'], 'Activity', $values[$profileID], TRUE);
+      $ufGroupBAO->setComponentDefaults($activityFields, $params['activity_id'], 'Activity', $values[$profileID], TRUE);
     }
   }
   elseif(!empty($params['contact_id'])) {
-    CRM_Core_BAO_UFGroup::setProfileDefaults($params['contact_id'], $profileFields, $values[$profileID], TRUE);
+    $ufGroupBAO->setProfileDefaults($params['contact_id'], $profileFields, $values[$profileID], TRUE);
   }
   else{
     $values[$profileID] = array_fill_keys(array_keys($profileFields), '');
@@ -143,7 +139,10 @@ function _civicrm_api3_profile_get_spec(&$params) {
  * Submit a set of fields against a profile.
  * Note choice of submit versus create is discussed CRM-13234 & related to the fact
  * 'profile' is being treated as a data-entry entity
+ *
  * @param array $params
+ *
+ * @throws API_Exception
  * @return array API result array
  */
 function civicrm_api3_profile_submit($params) {
@@ -303,7 +302,7 @@ function _civicrm_api3_profile_submit_spec(&$params, $apirequest) {
  * @param array  $params       Associative array of property name/value
  *                             pairs to update profile field values
  *
- * @return Updated Contact/ Activity object|CRM_Error
+ * @return array Updated Contact/ Activity object|CRM_Error
  *
  *
  */
@@ -588,10 +587,14 @@ function _civicrm_api3_profile_getProfileID($profileID) {
 /**
  * helper function to add all aliases as keys to getfields response so we can look for keys within it
  * since the relationship between profile fields & api / metadata based fields is a bit inconsistent
+ *
  * @param array $values
  *
  * e.g getfields response incl 'membership_type_id' - with api.aliases = 'membership_type'
  * returned array will include both as keys (with the same values)
+ * @param $entity
+ *
+ * @return array
  */
 function _civicrm_api3_profile_appendaliases($values, $entity) {
   foreach ($values as $field => $spec) {
