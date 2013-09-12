@@ -405,7 +405,7 @@ function civicrm_api3_contribution_completetransaction(&$params) {
     $ipn = new CRM_Core_Payment_BaseIPN();
     $ipn->completeTransaction($input, $ids, $objects, $transaction);
   }
-  catch(Exception$e) {
+  catch(Exception $e) {
     throw new API_Exception('failed to load related objects' . $e->getMessage() . "\n" . $e->getTraceAsString());
   }
 }
