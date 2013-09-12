@@ -1577,16 +1577,20 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
    * Function to get the uf group for a module
    *
    * @param string $moduleName module name
-   * $param int    $count no to increment the weight
-   * $param bool   $skipPermision - whether to add permission clause
-   * $param int    $op - which operation (view, edit, create, etc) to check permission for
+   * @param int    $count no to increment the weight
+   * @param bool   $skipPermision - whether to add permission clause
+   * @param int    $op - which operation (view, edit, create, etc) to check permission for
+   * @param array|NULL $returnFields list of UFGroup fields to return; NULL for default
    *
    * @return array $ufGroups array of ufgroups for a module
    * @access public
    * @static
    */
-  public static function getModuleUFGroup($moduleName = NULL, $count = 0, $skipPermission = TRUE, $op = CRM_Core_Permission::VIEW) {
-    $queryString = 'SELECT civicrm_uf_group.id, title, created_id, description, civicrm_uf_group.is_active, is_reserved, group_type
+  public static function getModuleUFGroup($moduleName = NULL, $count = 0, $skipPermission = TRUE, $op = CRM_Core_Permission::VIEW, $returnFields = NULL) {
+    if ($returnFields === NULL) {
+      $returnFields = array('id', 'title', 'created_id', 'description', 'is_active', 'is_reserved', 'group_type');
+    }
+    $queryString = 'SELECT civicrm_uf_group.' . implode(', civicrm_uf_group.', $returnFields) . '
                         FROM civicrm_uf_group
                         LEFT JOIN civicrm_uf_join ON (civicrm_uf_group.id = uf_group_id)';
     $p = array();
