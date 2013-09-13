@@ -601,6 +601,7 @@ function _civicrm_api_get_entity_name_from_camel($entity) {
 /**
  * Having a DAO object find the entity name
  * @param object $bao DAO being passed in
+ * @return string
  */
 function _civicrm_api_get_entity_name_from_dao($bao){
   $daoName = str_replace("BAO", "DAO", get_class($bao));
