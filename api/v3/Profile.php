@@ -346,7 +346,7 @@ function civicrm_api3_profile_apply($params) {
   );
 
   if (empty($data)) {
-    return civicrm_api3_create_error('Enable to format profile parameters.');
+    throw new API_Exception('Enable to format profile parameters.');
   }
 
   return civicrm_api3_create_success($data);
