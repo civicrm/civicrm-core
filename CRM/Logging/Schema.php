@@ -375,7 +375,8 @@ WHERE  table_schema IN ('{$this->db}', '{$civiDB}')";
     // NOTE: we consider only those columns for modifications where there is a spec change, and that the column definition 
     // wasn't deliberately modified by fixTimeStampAndNotNullSQL() method.
     foreach ($civiTableSpecs as $col => $colSpecs) {
-      if (!empty(array_diff($civiTableSpecs[$col], $logTableSpecs[$col])) && $col != 'id') {
+      $specDiff = array_diff($civiTableSpecs[$col], $logTableSpecs[$col]);
+      if (!empty($specDiff) && $col != 'id') {
         // ignore 'id' column for any spec changes, to avoid any auto-increment mysql errors
         if ($civiTableSpecs[$col]['DATA_TYPE'] != $logTableSpecs[$col]['DATA_TYPE']) {
           // if data-type is different, surely consider the column 
