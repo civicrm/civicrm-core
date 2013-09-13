@@ -232,10 +232,9 @@ AND    TABLE_NAME LIKE 'log_civicrm_%'
 
   private function _getColumnQuery($col, $createQuery) {
     $line = preg_grep("/^  `$col` /", $createQuery);
-    $line = substr(array_pop($line), 0, -1);
-
+    $line = rtrim(array_pop($line), ',');
     // CRM-11179
-    $line = self::fixTimeStampAndNotNullSQL($line);
+    $line = $this->fixTimeStampAndNotNullSQL($line);
     return $line;
   }
 
@@ -363,26 +362,42 @@ WHERE  table_schema IN ('{$this->db}', '{$civiDB}')";
     return $columnSpecs[$table];
   }
 
-  private function columnsWithDiffSpecs($table1, $table2) {
-    $colSpecs1 = $this->columnSpecsOf($table1);
-    $colSpecs2 = $this->columnSpecsOf($table2);
+  function columnsWithDiffSpecs($civiTable, $logTable) {
+    $civiTableSpecs = $this->columnSpecsOf($civiTable);
+    $logTableSpecs  = $this->columnSpecsOf($logTable);
     
     $diff = array('ADD' => array(), 'MODIFY' => array(), 'OBSOLETE' => array());
-    foreach ($colSpecs1 as $key => $val) {
-      if (!empty(array_diff($colSpecs1[$key], $colSpecs2[$key])) && $key != 'id') {
-        // ignore id column for any spec changes, to avoid any auto-increment mysql errors
-        $diff['MODIFY'][] = $key;
+    
+    // columns to be added
+    $diff['ADD'] = array_diff(array_keys($civiTableSpecs), array_keys($logTableSpecs));
+    
+    // columns to be modified
+    // NOTE: we consider only those columns for modifications where there is a spec change, and that the column definition 
+    // wasn't deliberately modified by fixTimeStampAndNotNullSQL() method.
+    foreach ($civiTableSpecs as $col => $colSpecs) {
+      if (!empty(array_diff($civiTableSpecs[$col], $logTableSpecs[$col])) && $col != 'id') {
+        // ignore 'id' column for any spec changes, to avoid any auto-increment mysql errors
+        if ($civiTableSpecs[$col]['DATA_TYPE'] != $logTableSpecs[$col]['DATA_TYPE']) {
+          // if data-type is different, surely consider the column 
+          $diff['MODIFY'][] = $col;
+        } else if ($civiTableSpecs[$col]['IS_NULLABLE'] != $logTableSpecs[$col]['IS_NULLABLE'] && 
+          $logTableSpecs[$col]['IS_NULLABLE'] == 'NO') {
+          // if is-null property is different, and log table's column is NOT-NULL, surely consider the column
+          $diff['MODIFY'][] = $col;
+        } else if ($civiTableSpecs[$col]['COLUMN_DEFAULT'] != $logTableSpecs[$col]['COLUMN_DEFAULT'] && 
+          !strstr($civiTableSpecs[$col]['COLUMN_DEFAULT'], 'TIMESTAMP')) {
+          // if default property is different, and its not about a timestamp column, consider it
+          $diff['MODIFY'][] = $col;
+        }
       } 
     }
 
-    // columns to be added
-    $diff['ADD'] = array_diff(array_keys($colSpecs1), array_keys($colSpecs2));
-
-    // columns to be dropped
-    $oldCols = array_diff(array_keys($colSpecs2), array_keys($colSpecs1));
+    // columns to made obsolete by turning into not-null
+    $oldCols = array_diff(array_keys($logTableSpecs), array_keys($civiTableSpecs));
     foreach ($oldCols as $col) {
       if (!in_array($col, array('log_date', 'log_conn_id', 'log_user_id', 'log_action')) && 
-        CRM_Utils_Array::value('IS_NULLABLE', $colSpecs2[$col]) == 'NO') {
+        $logTableSpecs[$col]['IS_NULLABLE'] == 'NO') {
+        // if its a column present only in log table, not among those used by log tables for special purpose, and not-null
         $diff['OBSOLETE'][] = $col;
       }
     }
