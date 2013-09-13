@@ -17,6 +17,9 @@
  *   create, get, delete or some special action name.
  * @param array $params
  *   array to be passed to function
+ * @param null $extra
+ *
+ * @return array|int
  */
 function civicrm_api($entity, $action, $params, $extra = NULL) {
   $apiRequest = array();
@@ -251,14 +254,16 @@ function _civicrm_api_resolve($apiRequest) {
   $cache[$cachekey] = array('function' => FALSE, 'is_generic' => FALSE);
   return $cache[$cachekey];
 }
+
 /**
  * Version 3 wrapper for civicrm_api. Throws exception
+ *
  * @param string $entity type of entities to deal with
  * @param string $action create, get, delete or some special action name.
  * @param array $params array to be passed to function
  *
+ * @throws CiviCRM_API3_Exception
  * @return array
- *
  */
 function civicrm_api3($entity, $action, $params) {
   $params['version'] = 3;
@@ -299,6 +304,7 @@ function _civicrm_api3_api_getfields(&$apiRequest) {
   $fields = civicrm_api3($entity, 'getfields', $getFieldsParams);
   return $fields['values'];
 }
+
 /**
  * Load/require all files related to an entity.
  *
@@ -306,6 +312,8 @@ function _civicrm_api3_api_getfields(&$apiRequest) {
  * only appropriate when introspection is really required (eg for "getActions").
  *
  * @param string $entity
+ * @param int $version
+ *
  * @return void
  */
 function _civicrm_api_loadEntity($entity, $version = 3) {
@@ -373,6 +381,7 @@ function civicrm_api_get_function_name($entity, $action, $version = NULL) {
  *   After that, this version number will be used for the remaining request.
  *   This can either be a number, or an array(.., 'version' => $version, ..).
  *   This allows to directly pass the $params array.
+ * @return int
  */
 function civicrm_get_api_version($desired_version = NULL) {
 
@@ -397,7 +406,9 @@ function civicrm_get_api_version($desired_version = NULL) {
  * 'format.is_success' => 1
  * will result in a boolean success /fail being returned if that is what you need.
  *
- * @param  array   $params           (reference ) input parameters
+ * @param $result
+ *
+ * @internal param array $params (reference ) input parameters
  *
  * @return boolean true if error, false otherwise
  * @static void
