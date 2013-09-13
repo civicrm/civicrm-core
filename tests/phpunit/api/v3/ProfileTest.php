@@ -549,8 +549,8 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
       'activity_status_id' => '2',
     );
     $profileParams = array_merge($params, $updateParams);
-    $profile       = $this->callAPISuccess('profile', 'submit', $profileParams);
-    $result        = $this->callAPISuccess('profile', 'get', $params);
+    $this->callAPISuccess('profile', 'submit', $profileParams);
+    $result = $this->callAPISuccess('profile', 'get', $params);
 
     foreach ($updateParams as $profileField => $value) {
       $this->assertEquals($value, CRM_Utils_Array::value($profileField, $result['values']), "In line " . __LINE__ . " error message: " . "missing/mismatching value for {$profileField}"

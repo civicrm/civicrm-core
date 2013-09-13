@@ -5,11 +5,11 @@
  */
 function profile_submit_example(){
 $params = array(
-  'profile_id' => 25,
-  'contact_id' => 1,
+  'profile_id' => 29,
+  'contact_id' => 2,
   'first_name' => 'abc2',
   'last_name' => 'xyz2',
-  'email-Primary' => 'abc2.xyz2@gmail.com',
+  'email-primary' => 'abc2.xyz2@gmail.com',
   'phone-1-1' => '022 321 826',
   'country-1' => '1013',
   'state_province-1' => '1000',
@@ -38,10 +38,10 @@ function profile_submit_expectedresult(){
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
-  'id' => 1,
+  'id' => 2,
   'values' => array(
-      '1' => array(
-          'id' => '1',
+      '2' => array(
+          'id' => '2',
           'contact_type' => 'Individual',
           'contact_sub_type' => '',
           'do_not_email' => 0,
@@ -65,6 +65,7 @@ function profile_submit_expectedresult(){
           'first_name' => 'abc2',
           'middle_name' => 'J.',
           'last_name' => 'xyz2',
+          'suffix_id' => '3',
           'email_greeting_id' => '1',
           'email_greeting_custom' => '',
           'email_greeting_display' => 'Dear abc1',
