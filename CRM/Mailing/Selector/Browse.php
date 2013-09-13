@@ -517,9 +517,19 @@ LEFT JOIN  civicrm_contact scheduledContact ON ( $mailing.scheduled_id = schedul
       $clauses[] = "( civicrm_mailing.is_archived IS NULL OR civicrm_mailing.is_archived = 0 )";
     }
     if (!$this->_parent->get('unscheduled')) {
-      $status    = $this->_parent->get('mailing_status');
+
+      // all status filter implementation
+      if ($status = $this->_parent->get('mailing_status')) {
+        $status = array_keys($status);
+      }
+      if ($this->_parent->get('all_status')) {
+        $status = $this->_parent->get('allStatuses');
+      }
+      if ($this->_parent->get('all_status') && $this->_parent->get('scheduled')) {
+        $status = array('Scheduled', 'Complete', 'Running');
+      }
+
       if (!empty($status)) {
-        $status    = array_keys($status);
         $status    = implode("','", $status);
         $clauses[] = "civicrm_mailing_job.status IN ('$status')";
       }
@@ -527,7 +537,6 @@ LEFT JOIN  civicrm_contact scheduledContact ON ( $mailing.scheduled_id = schedul
         $clauses[] = "civicrm_mailing_job.status IN ('Scheduled', 'Complete', 'Running')";
       }
     }
-
     if ($this->_parent->get('archived')) {
       // CRM-6446: archived view should also show cancelled mailings
       $clauses[] = "(civicrm_mailing.is_archived = 1 OR civicrm_mailing_job.status = 'Canceled')";

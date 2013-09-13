@@ -42,15 +42,20 @@
         <td colspan="1">{$form.sort_name.label}<br />
             {$form.sort_name.html|crmAddClass:big} {help id="id-create_sort_name"}
         </td>
-        <td width="100%"><label>{if $sms eq 1}{ts}SMS Status{/ts}{else}{ts}Mailing Status{/ts}{/if}</label><br />
-        <div class="listing-box" style="width: auto; height: 60px">
-            {foreach from=$form.mailing_status item="mailing_status_val"}
-            <div class="{cycle values="odd-row,even-row"}">
-                {$mailing_status_val.html}
-            </div>
+        {if $form.mailing_status}
+           <td width="100%"><label>{if $sms eq 1}{ts}SMS Status{/ts}{else}{ts}Mailing Status{/ts}{/if}</label><br />
+           <div class="listing-box" style="width: auto; height: 100px">
+             {foreach from=$form.mailing_status item="mailing_status_val"}
+             <div class="{cycle values="odd-row,even-row"}">
+               {$mailing_status_val.html}
+             </div>
             {/foreach}
-        </div><br />
-        </td>
+            <div class='odd-row'>
+              {$form.all_status.html}
+            </div>
+           </div><br />
+           </td>
+        {/if}
     </tr>
 
     {* campaign in mailing search *}
