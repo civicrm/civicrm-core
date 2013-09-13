@@ -256,7 +256,7 @@ WHERE cf.id IN (" . $customFieldIds . ") AND is_multiple = 1 LIMIT 0,1";
       $oldWeight = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_UFField', $params['field_id'], 'weight', 'id');
     }
     $fieldValues = array('uf_group_id' => $params['group_id']);
-    return CRM_Utils_Weight::updateOtherWeights('CRM_Core_DAO_UFField', $oldWeight, $params['weight'], $fieldValues);
+    return CRM_Utils_Weight::updateOtherWeights('CRM_Core_DAO_UFField', $oldWeight, CRM_Utils_Array::value('weight', $params, 0), $fieldValues);
   }
 
   /**
@@ -282,7 +282,7 @@ WHERE cf.id IN (" . $customFieldIds . ") AND is_multiple = 1 LIMIT 0,1";
   }
 
   /**
-   * Function to copy exisiting profile fields to
+   * Function to copy existing profile fields to
    * new profile from the already built profile
    *
    * @param int      $old_id  from which we need to copy
@@ -382,7 +382,7 @@ WHERE cf.id IN (" . $customFieldIds . ") AND is_multiple = 1 LIMIT 0,1";
     }
   }
 
-  /*
+  /**
    * Function to find out whether given profile group using Activity
    * Profile fields with contact fields
    */
@@ -440,7 +440,7 @@ WHERE cf.id IN (" . $customFieldIds . ") AND is_multiple = 1 LIMIT 0,1";
 
   /**
    * Function to find out whether given profile group uses $required
-   * and/or $optionalprofile types
+   * and/or $optional profile types
    *
    * @param integer $ufGroupId  profile id
    * @param array   $required   array of types those are required
