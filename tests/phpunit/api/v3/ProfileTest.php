@@ -411,7 +411,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
     $updateParams = array(
       'first_name' => 'abc2',
       'last_name' => 'xyz2',
-      'email-Primary' => 'abc2.xyz2@gmail.com',
+      'email-primary' => 'abc2.xyz2@gmail.com',
       'phone-1-1' => '022 321 826',
       'country-1' => '1013',
       'state_province-1' => '1000',
@@ -434,6 +434,11 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
       $this->assertEquals($value, CRM_Utils_Array::value($profileField, $profileDetails['values']), "In line " . __LINE__ . " error message: " . "missing/mismatching value for {$profileField}"
       );
     }
+    unset($updateParams['email-primary']);
+    $updateParams['email-Primary'] = 'my@mail.com';
+    $result = $this->callAPISuccess('profile', 'submit',  $params);
+    $profileDetails = $this->callAPISuccess('profile', 'get', $getParams);
+
   }
 
   /**
