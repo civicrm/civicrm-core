@@ -169,9 +169,7 @@ AND    TABLE_NAME LIKE 'log_civicrm_%'
       $config->logging = TRUE;
     }
     if ($config->logging) {
-      foreach ($this->schemaDifferences() as $table => $cols) {
-        $this->fixSchemaDifferencesFor($table, $cols, FALSE);
-      }
+      $this->fixSchemaDifferencesForALL();
     }
     // invoke the meta trigger creation call
     CRM_Core_DAO::triggerRebuild();
@@ -186,30 +184,72 @@ AND    TABLE_NAME LIKE 'log_civicrm_%'
    *
    * @return void
    */
-  function fixSchemaDifferencesFor($table, $cols = NULL, $rebuildTrigger = TRUE) {
+  function fixSchemaDifferencesFor($table, $cols = array(), $rebuildTrigger = FALSE) {
+    if (empty($table)) {
+      return FALSE;
+    }
     if (empty($this->logs[$table])) {
       $this->createLogTableFor($table);
-      return;
+      return TRUE;
     }
 
-    if (is_null($cols)) {
-      $cols = array_diff($this->columnsOf($table), $this->columnsOf("log_$table"));
-    }
     if (empty($cols)) {
-      return;
+      $cols = $this->columnsWithDiffSpecs($table, "log_$table");
     }
 
     // use the relevant lines from CREATE TABLE to add colums to the log table
-    $dao = CRM_Core_DAO::executeQuery("SHOW CREATE TABLE $table");
+    $create = $this->_getCreateQuery($table);
+    foreach ((array('ADD', 'MODIFY')) as $alterType) {
+      foreach ($cols[$alterType] as $col) {
+        $line = $this->_getColumnQuery($col, $create);
+        CRM_Core_DAO::executeQuery("ALTER TABLE `{$this->db}`.log_$table {$alterType} {$line}");
+      }
+    }
+
+    // for any obsolete columns (not null) we just make the column nullable.
+    if (!empty($cols['OBSOLETE'])) {
+      $create = $this->_getCreateQuery("log_{$table}");
+      foreach ($cols['OBSOLETE'] as $col) {
+        $line = $this->_getColumnQuery($col, $create);
+        // This is just going to make a not null column to nullable
+        CRM_Core_DAO::executeQuery("ALTER TABLE `{$this->db}`.log_$table MODIFY {$line}");
+      }
+    }
+
+    if ($rebuildTrigger) {
+      // invoke the meta trigger creation call
+      CRM_Core_DAO::triggerRebuild($table);
+    }
+    return TRUE;
+  }
+
+  private function _getCreateQuery($table) {
+    $dao = CRM_Core_DAO::executeQuery("SHOW CREATE TABLE {$table}");
     $dao->fetch();
     $create = explode("\n", $dao->Create_Table);
-    foreach ($cols as $col) {
-      $line = preg_grep("/^  `$col` /", $create);
-      $line = substr(array_pop($line), 0, -1);
-      // CRM-11179
-      $line = self::fixTimeStampAndNotNullSQL($line);
+    return $create;
+  }
 
-      CRM_Core_DAO::executeQuery("ALTER TABLE `{$this->db}`.log_$table ADD $line");
+  private function _getColumnQuery($col, $createQuery) {
+    $line = preg_grep("/^  `$col` /", $createQuery);
+    $line = rtrim(array_pop($line), ',');
+    // CRM-11179
+    $line = $this->fixTimeStampAndNotNullSQL($line);
+    return $line;
+  }
+
+  function fixSchemaDifferencesForAll($rebuildTrigger = FALSE) {
+    $diffs = array();
+    foreach ($this->tables as $table) {
+      if (empty($this->logs[$table])) {
+        $this->createLogTableFor($table);
+      } else {
+        $diffs[$table] = $this->columnsWithDiffSpecs($table, "log_$table");
+      }
+    }
+
+    foreach ($diffs as $table => $cols) {
+      $this->fixSchemaDifferencesFor($table, $cols, FALSE);
     }
 
     if ($rebuildTrigger) {
@@ -218,24 +258,17 @@ AND    TABLE_NAME LIKE 'log_civicrm_%'
     }
   }
 
+  /*
+   * log_civicrm_contact.modified_date for example would always be copied from civicrm_contact.modified_date,
+   * so there's no need for a default timestamp and therefore we remove such default timestamps
+   * also eliminate the NOT NULL constraint, since we always copy and schema can change down the road)
+   */
   function fixTimeStampAndNotNullSQL($query) {
     $query = str_ireplace("TIMESTAMP NOT NULL", "TIMESTAMP NULL", $query);
     $query = str_ireplace("DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP", '', $query);
     $query = str_ireplace("DEFAULT CURRENT_TIMESTAMP", '', $query);
     $query = str_ireplace("NOT NULL", '', $query);
     return $query;
-  }
-
-  /**
-   * Find missing log table columns by comparing columns of the relevant tables.
-   * Returns table-name-keyed array of arrays of missing columns, e.g. array('civicrm_value_foo_1' => array('bar_1', 'baz_2'))
-   */
-  function schemaDifferences() {
-    $diffs = array();
-    foreach ($this->tables as $table) {
-      $diffs[$table] = array_diff($this->columnsOf($table), $this->columnsOf("log_$table"));
-    }
-    return array_filter($diffs);
   }
 
   private function addReports() {
@@ -288,6 +321,88 @@ AND    TABLE_NAME LIKE 'log_civicrm_%'
     }
 
     return $columnsOf[$table];
+  }
+
+  /**
+   * Get an array of columns and their details like DATA_TYPE, IS_NULLABLE, COLUMN_DEFAULT for the given table.
+   */
+  private function columnSpecsOf($table) {
+    static $columnSpecs = array(), $civiDB = NULL;
+
+    if (empty($columnSpecs)) {
+      if (!$civiDB) {
+        $dao = new CRM_Contact_DAO_Contact();
+        $civiDB = $dao->_database;
+      }
+      CRM_Core_Error::ignoreException();
+      // NOTE: W.r.t Performance using one query to find all details and storing in static array is much faster 
+      // than firing query for every given table.
+      $query = "
+SELECT TABLE_SCHEMA, TABLE_NAME, COLUMN_NAME, DATA_TYPE, IS_NULLABLE, COLUMN_DEFAULT
+FROM   INFORMATION_SCHEMA.COLUMNS
+WHERE  table_schema IN ('{$this->db}', '{$civiDB}')";
+      $dao = CRM_Core_DAO::executeQuery($query);
+      CRM_Core_Error::setCallback();
+      if (is_a($dao, 'DB_Error')) {
+        return array();
+      }
+      while ($dao->fetch()) {
+        if (!array_key_exists($dao->TABLE_NAME, $columnSpecs)) {
+          $columnSpecs[$dao->TABLE_NAME] = array();
+        }
+        $columnSpecs[$dao->TABLE_NAME][$dao->COLUMN_NAME] = 
+          array(
+              'COLUMN_NAME' => $dao->COLUMN_NAME, 
+              'DATA_TYPE'   => $dao->DATA_TYPE, 
+              'IS_NULLABLE' => $dao->IS_NULLABLE, 
+              'COLUMN_DEFAULT' => $dao->COLUMN_DEFAULT
+            );
+      }
+    }
+    return $columnSpecs[$table];
+  }
+
+  function columnsWithDiffSpecs($civiTable, $logTable) {
+    $civiTableSpecs = $this->columnSpecsOf($civiTable);
+    $logTableSpecs  = $this->columnSpecsOf($logTable);
+    
+    $diff = array('ADD' => array(), 'MODIFY' => array(), 'OBSOLETE' => array());
+    
+    // columns to be added
+    $diff['ADD'] = array_diff(array_keys($civiTableSpecs), array_keys($logTableSpecs));
+    
+    // columns to be modified
+    // NOTE: we consider only those columns for modifications where there is a spec change, and that the column definition 
+    // wasn't deliberately modified by fixTimeStampAndNotNullSQL() method.
+    foreach ($civiTableSpecs as $col => $colSpecs) {
+      if (!empty(array_diff($civiTableSpecs[$col], $logTableSpecs[$col])) && $col != 'id') {
+        // ignore 'id' column for any spec changes, to avoid any auto-increment mysql errors
+        if ($civiTableSpecs[$col]['DATA_TYPE'] != $logTableSpecs[$col]['DATA_TYPE']) {
+          // if data-type is different, surely consider the column 
+          $diff['MODIFY'][] = $col;
+        } else if ($civiTableSpecs[$col]['IS_NULLABLE'] != $logTableSpecs[$col]['IS_NULLABLE'] && 
+          $logTableSpecs[$col]['IS_NULLABLE'] == 'NO') {
+          // if is-null property is different, and log table's column is NOT-NULL, surely consider the column
+          $diff['MODIFY'][] = $col;
+        } else if ($civiTableSpecs[$col]['COLUMN_DEFAULT'] != $logTableSpecs[$col]['COLUMN_DEFAULT'] && 
+          !strstr($civiTableSpecs[$col]['COLUMN_DEFAULT'], 'TIMESTAMP')) {
+          // if default property is different, and its not about a timestamp column, consider it
+          $diff['MODIFY'][] = $col;
+        }
+      } 
+    }
+
+    // columns to made obsolete by turning into not-null
+    $oldCols = array_diff(array_keys($logTableSpecs), array_keys($civiTableSpecs));
+    foreach ($oldCols as $col) {
+      if (!in_array($col, array('log_date', 'log_conn_id', 'log_user_id', 'log_action')) && 
+        $logTableSpecs[$col]['IS_NULLABLE'] == 'NO') {
+        // if its a column present only in log table, not among those used by log tables for special purpose, and not-null
+        $diff['OBSOLETE'][] = $col;
+      }
+    }
+
+    return $diff;
   }
 
   /**
