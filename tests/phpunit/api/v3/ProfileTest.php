@@ -58,10 +58,10 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
   function tearDown() {
 
     $this->quickCleanup(array(
-        'civicrm_contact',
-        'civicrm_phone',
-        'civicrm_address',
-      ), TRUE);
+      'civicrm_contact',
+      'civicrm_phone',
+      'civicrm_address',
+    ), TRUE);
     // ok can't be bothered wring an api to do this & truncating is crazy
     CRM_Core_DAO::executeQuery(' DELETE FROM civicrm_uf_group WHERE id IN (25, 26)');
   }
@@ -147,7 +147,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
       'street_address' => 'is billing st',
       'location_type_id' => 2,
       'contact_id' => $contactId,
-      ));
+    ));
 
     $expected = current($individual);
 
@@ -244,7 +244,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
 
     $params['activity_id'] = 100001;
     $result = $this->callAPIFailure('profile', 'get', $params,
-       'Invalid Activity Id (aid).');
+      'Invalid Activity Id (aid).');
   }
 
   /*
@@ -344,11 +344,11 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
     $result = $this->callAPISuccess('uf_group', 'get', array('return' => 'id'));
     $profileIDs = array_keys($result['values']);
     foreach ($profileIDs as $profileID) {
-    $result = $this->callAPISuccess('profile', 'getfields', array(
-      'action' => 'submit',
-      'profile_id' => $profileID,
-      'get_options' => 'all')
-    );
+      $result = $this->callAPISuccess('profile', 'getfields', array(
+        'action' => 'submit',
+        'profile_id' => $profileID,
+        'get_options' => 'all')
+      );
     }
   }
   /////////////// test $this->callAPISuccess3_profile_set //////////////////
@@ -418,9 +418,9 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
     );
 
     $params = array_merge(array(
-        'profile_id' => 25,
-        'contact_id' => $contactId,
-      ), $updateParams);
+      'profile_id' => 25,
+      'contact_id' => $contactId,
+    ), $updateParams);
 
     $result = $this->callAPIAndDocument('profile', 'submit', $params, __FUNCTION__, __FILE__);
 
@@ -740,7 +740,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
       'profile_id' => 26,
       'contact_id' => $contactId,
       'activity_id' => $activityValues['id'],
-         );
+    );
 
     // expected result of above created profile
     $expected = array(
