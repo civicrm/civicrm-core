@@ -123,6 +123,7 @@ function _civicrm_api3_uf_field_create_spec(&$params) {
     'api.default' => TRUE,
   );
   $params['created_id']['api.default'] = 'user_contact_id';
+  $params['is_active']['api.default'] = TRUE;
 }
 
 /**
