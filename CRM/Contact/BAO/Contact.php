@@ -1278,10 +1278,12 @@ WHERE id={$id}; ";
    *
    * currentlty we are using importable fields as exportable fields
    *
-   * @param int     $contactType contact Type
+   * @param int|string $contactType contact Type
    * @param boolean $status true while exporting primary contacts
    * @param boolean $export true when used during export
    * @param boolean $search true when used during search, might conflict with export param?
+   *
+   * @param bool $withMultiRecord
    *
    * @return array array of exportable Fields
    * @access public
@@ -1534,9 +1536,10 @@ WHERE id={$id}; ";
    * given a set of flat profile style field names, create a hierarchy
    * for query to use and crete the right sql
    *
-   * @param array $properties a flat return properties name value array
-   * @param int   $contactId contact id
+   * @param $fields
+   * @param int $contactId contact id
    *
+   * @internal param array $properties a flat return properties name value array
    * @return array a hierarchical property tree if appropriate
    * @access public
    * @static
@@ -1603,6 +1606,10 @@ WHERE id={$id}; ";
    * $params int     $contactId contact_id
    * $params boolean $isPrimaryExist if true, return primary contact location type otherwise null
    * $params boolean $skipDefaultPriamry if true, return primary contact location type otherwise null
+   *
+   * @param $contactId
+   * @param bool $skipDefaultPriamry
+   * @param null $block
    *
    * @return int $locationType location_type_id
    * @access public
