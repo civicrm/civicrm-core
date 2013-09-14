@@ -6,11 +6,11 @@
 function profile_get_example(){
 $params = array(
   'profile_id' => array(
-      '0' => 25,
+      '0' => 14,
       '1' => 1,
       '2' => 'Billing',
     ),
-  'contact_id' => 1,
+  'contact_id' => 2,
 );
 
 try{
@@ -37,14 +37,15 @@ function profile_get_expectedresult(){
   'version' => 3,
   'count' => 3,
   'values' => array(
-      '25' => array(
-          'first_name' => 'abc1',
-          'last_name' => 'xyz1',
-          'email-Primary' => 'abc1.xyz1@yahoo.com',
-          'phone-1-1' => '021 512 755',
-          'country-1' => '1228',
-          'state_province-1' => '1021',
+      '14' => array(
           'postal_code-1' => '90210',
+          'state_province-1' => '1021',
+          'country-1' => '1228',
+          'phone-1-1' => '021 512 755',
+          'email-Primary' => 'abc1.xyz1@yahoo.com',
+          'last_name' => 'xyz1',
+          'first_name' => 'abc1',
+          'email-primary' => 'abc1.xyz1@yahoo.com',
         ),
       '1' => array(
           'first_name' => 'abc1',

@@ -108,7 +108,7 @@ class CRM_Utils_Weight {
   }
 
   /**
-   * Updates the weight fields of other rows according to the new and old weight paased in.
+   * Updates the weight fields of other rows according to the new and old weight passed in.
    * And returns the new weight be used. If old-weight not present, Creates a gap for a new row to be inserted
    * at the specified new weight
    *
