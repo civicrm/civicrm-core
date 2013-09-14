@@ -127,6 +127,9 @@ class CRM_Core_BAO_UFField extends CRM_Core_DAO_UFField {
    * Function to check duplicate for duplicate field in a group
    *
    * @param array $params an associative array with field and values
+   * @param $ids
+   *
+   * @return mixed
    * @ids   array $ids    array that containd ids
    *
    * @access public
@@ -147,8 +150,8 @@ class CRM_Core_BAO_UFField extends CRM_Core_DAO_UFField {
     return $ufField->find(TRUE);
   }
 
-  /*
-   *Does profile consists of a multi-record custom field
+  /**
+   * Does profile consists of a multi-record custom field
    */
   public static function checkMultiRecordFieldExists($gId) {
     $queryString = "SELECT f.field_name
@@ -193,7 +196,7 @@ WHERE cf.id IN (" . $customFieldIds . ") AND is_multiple = 1 LIMIT 0,1";
    * function to add the UF Field
    *
    * @param array $params (reference) array containing the values submitted by the form
-   * @param array $ids    (reference) array containing the id
+   * @param array $ids array containing the id
    *
    * @return object CRM_Core_BAO_UFField object
    *
@@ -201,7 +204,7 @@ WHERE cf.id IN (" . $customFieldIds . ") AND is_multiple = 1 LIMIT 0,1";
    * @static
    *
    */
-  static function add(&$params, &$ids) {
+  static function add(&$params, $ids = array()) {
     // set values for uf field properties and save
     $ufField = new CRM_Core_DAO_UFField();
     $ufField->field_type = $params['field_name'][0];
@@ -253,7 +256,7 @@ WHERE cf.id IN (" . $customFieldIds . ") AND is_multiple = 1 LIMIT 0,1";
       $oldWeight = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_UFField', $params['field_id'], 'weight', 'id');
     }
     $fieldValues = array('uf_group_id' => $params['group_id']);
-    return CRM_Utils_Weight::updateOtherWeights('CRM_Core_DAO_UFField', $oldWeight, $params['weight'], $fieldValues);
+    return CRM_Utils_Weight::updateOtherWeights('CRM_Core_DAO_UFField', $oldWeight, CRM_Utils_Array::value('weight', $params, 0), $fieldValues);
   }
 
   /**
@@ -279,7 +282,7 @@ WHERE cf.id IN (" . $customFieldIds . ") AND is_multiple = 1 LIMIT 0,1";
   }
 
   /**
-   * Function to copy exisiting profile fields to
+   * Function to copy existing profile fields to
    * new profile from the already built profile
    *
    * @param int      $old_id  from which we need to copy
@@ -353,6 +356,8 @@ WHERE cf.id IN (" . $customFieldIds . ") AND is_multiple = 1 LIMIT 0,1";
    *
    * @params  int $UFFieldId     uf field id
    *
+   * @param $UFFieldId
+   *
    * @return boolean   false if custom field are disabled else true
    * @static
    * @access public
@@ -377,7 +382,7 @@ WHERE cf.id IN (" . $customFieldIds . ") AND is_multiple = 1 LIMIT 0,1";
     }
   }
 
-  /*
+  /**
    * Function to find out whether given profile group using Activity
    * Profile fields with contact fields
    */
@@ -433,8 +438,9 @@ WHERE cf.id IN (" . $customFieldIds . ") AND is_multiple = 1 LIMIT 0,1";
     return TRUE;
   }
 
-  /* Function to find out whether given profile group uses $required
-   * and/or $optionalprofile types
+  /**
+   * Function to find out whether given profile group uses $required
+   * and/or $optional profile types
    *
    * @param integer $ufGroupId  profile id
    * @param array   $required   array of types those are required
@@ -488,6 +494,8 @@ WHERE cf.id IN (" . $customFieldIds . ") AND is_multiple = 1 LIMIT 0,1";
    * @params int     $ufGroupId  uf group id
    * @params boolean $check      this is to check mix profile (if true it will check if profile is
    *                             pure ie. it contains only one contact type)
+   *
+   * @param $ufGroupId
    *
    * @return  true for mix profile else false
    * @acess public
@@ -551,9 +559,11 @@ WHERE cf.id IN (" . $customFieldIds . ") AND is_multiple = 1 LIMIT 0,1";
   /**
    * function to get the profile type (eg: individual/organization/household)
    *
-   * @param int      $ufGroupId     uf group id
-   * @param boolean  $returnMixType this is true, then field type of  mix profile field is returned
-   * @param boolean  $onlyPure      true if only pure profiles are required
+   * @param int $ufGroupId     uf group id
+   * @param boolean $returnMixType this is true, then field type of  mix profile field is returned
+   * @param boolean $onlyPure      true if only pure profiles are required
+   *
+   * @param bool $skipComponentType
    *
    * @return  profile group_type
    * @acess public
@@ -573,10 +583,13 @@ WHERE cf.id IN (" . $customFieldIds . ") AND is_multiple = 1 LIMIT 0,1";
   /**
    * function to get the profile type (eg: individual/organization/household)
    *
-   * @param int      $ufGroupId     uf group id
-   * @param boolean  $returnMixType this is true, then field type of  mix profile field is returned
-   * @param boolean  $onlyPure      true if only pure profiles are required
+   * @param $ufGroupType
+   * @param boolean $returnMixType this is true, then field type of  mix profile field is returned
+   * @param boolean $onlyPure      true if only pure profiles are required
    *
+   * @param bool $skipComponentType
+   *
+   * @internal param int $ufGroupId uf group id
    * @return  profile group_type
    * @acess public
    * @static
@@ -679,6 +692,8 @@ WHERE cf.id IN (" . $customFieldIds . ") AND is_multiple = 1 LIMIT 0,1";
   /**
    * function to check for mix profiles groups (eg: individual + other contact types)
    *
+   * @param $ctype
+   *
    * @return  true for mix profile group else false
    * @acess public
    * @static
@@ -715,6 +730,8 @@ SELECT ufg.id as id
    *
    * @params int     $profileID profile id.
    *
+   * @param $profileID
+   *
    * @return boolean $result    true/false.
    */
   static function checkSearchableORInSelector($profileID) {
@@ -743,6 +760,8 @@ SELECT  id
    *
    * @params int $profileID profile id.
    *
+   * @param $profileID
+   *
    * @return void.
    */
   function resetInSelectorANDSearchable($profileID) {
@@ -767,7 +786,9 @@ SELECT  id
    *   as this will be used to
    * transfer profile address data to billing fields
    * http://issues.civicrm.org/jira/browse/CRM-5869
+   *
    * @param string $key Field key - e.g. street_address-Primary, first_name
+   * @param $profileAddressFields
    * @params array $profileAddressFields array of profile fields that relate to address fields
    */
   static function assignAddressField($key, &$profileAddressFields) {
@@ -988,6 +1009,8 @@ SELECT  id
 
   /**
    * Get a list of fields which can be added to profiles
+   *
+   * @param bool $force
    *
    * @return array, multidimensional; e.g. $result['field_name']['label']
    * @static

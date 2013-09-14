@@ -74,12 +74,20 @@ function civicrm_api3_custom_field_create($params) {
       $params['option_weight'][$key] = $value['weight'];
     }
   }
+  $values = array();
   $customField = CRM_Core_BAO_CustomField::create($params);
-  civicrm_api('custom_field', 'getfields', array('version' => 3, 'cache_clear' => 1));
   _civicrm_api3_object_to_array_unique_fields($customField, $values[$customField->id]);
+  _civicrm_api3_custom_field_flush_static_caches();
   return civicrm_api3_create_success($values, $params, 'custom_field', $customField);
 }
 
+/**
+ * Flush static caches in functions that might have stored available custom fields
+ */
+function _civicrm_api3_custom_field_flush_static_caches(){
+  civicrm_api('custom_field', 'getfields', array('version' => 3, 'cache_clear' => 1));
+  CRM_Core_BAO_UFField::getAvailableFieldsFlat(TRUE);
+}
 /**
  * Adjust Metadata for Create action
  *

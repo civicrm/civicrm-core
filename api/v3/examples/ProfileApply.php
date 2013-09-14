@@ -5,8 +5,8 @@
  */
 function profile_apply_example(){
 $params = array(
-  'profile_id' => 25,
-  'contact_id' => 1,
+  'profile_id' => 31,
+  'contact_id' => 2,
   'first_name' => 'abc2',
   'last_name' => 'xyz2',
   'email-Primary' => 'abc2.xyz2@gmail.com',
@@ -41,10 +41,10 @@ function profile_apply_expectedresult(){
   'values' => array(
       'contact_type' => 'Individual',
       'contact_sub_type' => '',
-      'contact_id' => 1,
+      'contact_id' => 2,
       'version' => 3,
       'debug' => 1,
-      'profile_id' => 25,
+      'profile_id' => 31,
       'first_name' => 'abc2',
       'last_name' => 'xyz2',
       'email' => array(

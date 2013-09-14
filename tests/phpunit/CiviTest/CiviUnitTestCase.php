@@ -899,7 +899,10 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   /**
    * Private helper function for calling civicrm_contact_add
    *
-   * @param array   parameters for civicrm_contact_add api function call
+   * @param $params
+   *
+   * @throws Exception
+   * @internal param \parameters $array for civicrm_contact_add api function call
    *
    * @return int    id of Household created
    */

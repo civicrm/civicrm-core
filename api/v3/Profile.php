@@ -37,16 +37,12 @@
  */
 
 /**
- * Include common API util functions
- */
-require_once 'api/v3/utils.php';
-
-/**
  * Retrieve Profile field values.
  *
- * @param array  $params       Associative array of property name/value
+ * @param array $params       Associative array of property name/value
  *                             pairs to get profile field values
  *
+ * @throws API_Exception
  * @return Profile field values|CRM_Error
  *
  * NOTE this api is not standard & since it is tested we need to honour that
@@ -55,7 +51,6 @@ require_once 'api/v3/utils.php';
  * in order to avoid breaking code. (This could still be confusing :-( but we have to keep the tested behaviour working
  *
  * Note that if contact_id is empty an array of defaults is returned
- *
  */
 function civicrm_api3_profile_get($params) {
   $nonStandardLegacyBehaviour = is_numeric($params['profile_id']) ?  TRUE : FALSE;
@@ -64,6 +59,7 @@ function civicrm_api3_profile_get($params) {
   }
   $profiles = (array) $params['profile_id'];
   $values = array();
+  $ufGroupBAO = new CRM_Core_BAO_UFGroup();
   foreach ($profiles as $profileID) {
     $profileID = _civicrm_api3_profile_getProfileID($profileID);
     $values[$profileID] = array();
@@ -108,21 +104,29 @@ function civicrm_api3_profile_get($params) {
       }
       else {
         $contactFields[$fieldName] = $field;
+          // we should return 'Primary' with & without capitalisation. it is more consistent with api to not
+          // capitalise, but for form support we need it for now. Hopefully we can move away from it
+          $contactFields[strtolower($fieldName)] = $field;
+        }
       }
-    }
 
-    CRM_Core_BAO_UFGroup::setProfileDefaults($params['contact_id'], $contactFields, $values[$profileID], TRUE);
+    $ufGroupBAO->setProfileDefaults($params['contact_id'], $contactFields, $values[$profileID], TRUE);
 
     if ($params['activity_id']) {
-      CRM_Core_BAO_UFGroup::setComponentDefaults($activityFields, $params['activity_id'], 'Activity', $values[$profileID], TRUE);
+      $ufGroupBAO->setComponentDefaults($activityFields, $params['activity_id'], 'Activity', $values[$profileID], TRUE);
     }
   }
   elseif(!empty($params['contact_id'])) {
-    CRM_Core_BAO_UFGroup::setProfileDefaults($params['contact_id'], $profileFields, $values[$profileID], TRUE);
-  }
-  else{
-    $values[$profileID] = array_fill_keys(array_keys($profileFields), '');
-  }
+    $ufGroupBAO->setProfileDefaults($params['contact_id'], $profileFields, $values[$profileID], TRUE);
+      foreach ($values[$profileID] as $fieldName => $field){
+        // we should return 'Primary' with & without capitalisation. it is more consistent with api to not
+        // capitalise, but for form support we need it for now. Hopefully we can move away from it
+        $values[$profileID][strtolower($fieldName)] = $field;
+      }
+    }
+    else{
+      $values[$profileID] = array_fill_keys(array_keys($profileFields), '');
+    }
   }
   if($nonStandardLegacyBehaviour) {
     $result = civicrm_api3_create_success();
@@ -143,7 +147,10 @@ function _civicrm_api3_profile_get_spec(&$params) {
  * Submit a set of fields against a profile.
  * Note choice of submit versus create is discussed CRM-13234 & related to the fact
  * 'profile' is being treated as a data-entry entity
+ *
  * @param array $params
+ *
+ * @throws API_Exception
  * @return array API result array
  */
 function civicrm_api3_profile_submit($params) {
@@ -162,18 +169,8 @@ function civicrm_api3_profile_submit($params) {
 
   $contactParams = $activityParams = $missingParams = array();
 
-  $profileFields = CRM_Core_BAO_UFGroup::getFields($profileID,
-    FALSE,
-    NULL,
-    NULL,
-    NULL,
-    FALSE,
-    NULL,
-    TRUE,
-    NULL,
-    CRM_Core_Permission::EDIT
-  );
-
+  $profileFields = civicrm_api3('profile', 'getfields', array('action' => 'submit', 'profile_id' => $profileID));
+  $profileFields = $profileFields['values'];
   if ($isContactActivityProfile) {
     civicrm_api3_verify_mandatory($params, NULL, array('activity_id'));
 
@@ -187,12 +184,6 @@ function civicrm_api3_profile_submit($params) {
   }
 
   foreach ($profileFields as $fieldName => $field) {
-    if (CRM_Utils_Array::value('is_required', $field)) {
-      if (!CRM_Utils_Array::value($fieldName, $params) || empty($params[$fieldName])) {
-        $missingParams[] = $fieldName;
-      }
-    }
-
     if (!isset($params[$fieldName])) {
       continue;
     }
@@ -201,17 +192,20 @@ function civicrm_api3_profile_submit($params) {
     if ($params[$fieldName] && isset($params[$fieldName . '_id'])) {
       $value = $params[$fieldName . '_id'];
     }
+    $contactEntities = array('contact', 'individual', 'organization', 'household');
+    $locationEntities = array('email', 'address', 'phone', 'website', 'im');
 
-    if ($isContactActivityProfile && CRM_Utils_Array::value('field_type', $field) == 'Activity') {
-      $activityParams[$fieldName] = $value;
+    $entity = strtolower(CRM_Utils_Array::value('entity', $field));
+    if($entity && !in_array($entity, array_merge($contactEntities, $locationEntities))) {
+      $contactParams['api.' . $entity . '.create'][$fieldName] = $value;
+      if(isset($params[$entity . '_id'])) {
+        //todo possibly declare $entity_id in getfields ?
+        $contactParams['api.' . $entity . '.create']['id'] = $params[$entity . '_id'];
+      }
     }
     else {
-      $contactParams[$fieldName] = $value;
+      $contactParams[_civicrm_api3_profile_translate_fieldnames_for_bao($fieldName)] = $value;
     }
-  }
-
-  if (!empty($missingParams)) {
-    throw new API_Exception("Missing required parameters for profile id {$params['profile_id']}: " . implode(', ', $missingParams));
   }
 
   $contactParams['contact_id'] = CRM_Utils_Array::value('contact_id', $params);
@@ -219,9 +213,6 @@ function civicrm_api3_profile_submit($params) {
   $contactParams['skip_custom'] = 1;
 
   $contactProfileParams = civicrm_api3_profile_apply($contactParams);
-  if (CRM_Utils_Array::value('is_error', $contactProfileParams)) {
-    return $contactProfileParams;
-  }
 
   // Contact profile fields
   $profileParams = $contactProfileParams['values'];
@@ -274,6 +265,20 @@ function civicrm_api3_profile_submit($params) {
   return $result;
 
 }
+
+/**
+ * The api standards expect field names to be lower case but the BAO uses mixed case
+ * so we accept 'email-primary' but pass 'email-Primary' to the BAO
+ * we could make the BAO handle email-primary but this would alter the fieldname seen by hooks
+ * & we would need to consider that change
+ * @param string $fieldName API field name
+ *
+ * @return string BAO Field Name
+ */
+function _civicrm_api3_profile_translate_fieldnames_for_bao($fieldName){
+  $fieldName = str_replace('url', 'URL', $fieldName);
+  return str_replace('primary', 'Primary', $fieldName);
+}
 /**
  * metadata for submit action
  * @param array $params
@@ -303,7 +308,7 @@ function _civicrm_api3_profile_submit_spec(&$params, $apirequest) {
  * @param array  $params       Associative array of property name/value
  *                             pairs to update profile field values
  *
- * @return Updated Contact/ Activity object|CRM_Error
+ * @return array Updated Contact/ Activity object|CRM_Error
  *
  *
  */
@@ -315,14 +320,14 @@ function civicrm_api3_profile_set($params) {
  * @deprecated - appears to be an internal function - should not be accessible via api
  * Provide formatted values for profile fields.
  *
- * @param array  $params       Associative array of property name/value
+ * @param array $params       Associative array of property name/value
  *                             pairs to profile field values
  *
+ * @throws API_Exception
  * @return formatted profile field values|CRM_Error
  *
  * @todo add example
  * @todo add test cases
- *
  */
 function civicrm_api3_profile_apply($params) {
 
@@ -347,7 +352,7 @@ function civicrm_api3_profile_apply($params) {
   );
 
   if (empty($data)) {
-    return civicrm_api3_create_error('Enable to format profile parameters.');
+    throw new API_Exception('Enable to format profile parameters.');
   }
 
   return civicrm_api3_create_success($data);
@@ -455,18 +460,23 @@ function _civicrm_api3_buildprofile_submitfields($profileID, $optionsBehaviour =
   }
   $fields = civicrm_api3('uf_field', 'get', array('uf_group_id' => $profileID));
   $entities = array();
-
-  foreach ($fields['values'] as $id => $field) {
+  foreach ($fields['values'] as $field) {
     if(!$field['is_active']) {
       continue;
     }
     list($entity, $fieldName) = _civicrm_api3_map_profile_fields_to_entity($field);
-    $profileFields[$profileID][$fieldName] = array(
+    $aliasArray = array();
+    if(strtolower($fieldName) != $fieldName) {
+      $aliasArray['api.aliases'] = array($fieldName);
+      $fieldName = strtolower($fieldName);
+    }
+    $profileFields[$profileID][$fieldName] = array_merge(array(
       'api.required' => $field['is_required'],
       'title' => $field['label'],
       'help_pre' => CRM_Utils_Array::value('help_pre', $field),
       'help_post' => CRM_Utils_Array::value('help_post', $field),
-    );
+      'entity' => $entity,
+    ), $aliasArray);
 
     $realFieldName = $field['field_name'];
     //see function notes
@@ -494,20 +504,28 @@ function _civicrm_api3_buildprofile_submitfields($profileID, $optionsBehaviour =
     $result = civicrm_api3($entity, 'getfields', array('action' => 'create'));
     $entityGetFieldsResult = _civicrm_api3_profile_appendaliases($result['values'], $entity);
     foreach ($entityFields as $entityfield => $realName) {
-      $profileFields[$profileID][$entityfield] = $entityGetFieldsResult[$realName];
+      $profileFields[$profileID][strtolower($entityfield)] = array_merge($profileFields[$profileID][$entityfield], $entityGetFieldsResult[$realName]);
       if($optionsBehaviour && !empty($entityGetFieldsResult[$realName]['pseudoconstant'])) {
         if($optionsBehaviour > 1  || !in_array($realName, array('state_province_id', 'county_id', 'country_id'))) {
           $options = civicrm_api3($entity, 'getoptions', array('field' => $realName));
           $profileFields[$profileID][$entityfield]['options'] = $options['values'];
         }
       }
+
+      if($entityfield != strtolower($entityfield)) {
+        // we will make the mixed case version (e.g. of 'Primary') an aliase
+        if(!isset($profileFields[$profileID][strtolower($entityfield)])) {
+          $profileFields[$profileID][strtolower($entityfield)]['api.aliases'] = array();
+        }
+        $profileFields[$profileID][strtolower($entityfield)]['api.aliases'][] = $entityfield;
+      }
       /**
        * putting this on hold -this would cause the api to set the default - but could have unexpected behaviour
       if(isset($result['values'][$realName]['default_value'])) {
-        //this would be the case for a custom field with a configured default
-        $profileFields[$profileID][$entityfield]['api.default'] = $result['values'][$realName]['default_value'];
+      //this would be the case for a custom field with a configured default
+      $profileFields[$profileID][$entityfield]['api.default'] = $result['values'][$realName]['default_value'];
       }
-      */
+       */
     }
   }
   return $profileFields[$profileID];
@@ -521,6 +539,7 @@ function _civicrm_api3_buildprofile_submitfields($profileID, $optionsBehaviour =
 function _civicrm_api3_map_profile_fields_to_entity(&$field) {
   $entity = $field['field_type'];
   $contactTypes = civicrm_api3('contact', 'getoptions', array('field' => 'contact_type'));
+  $locationFields = array('email' => 'Email');
   if(in_array($entity, $contactTypes['values'])) {
     $entity = 'Contact';
   }
@@ -534,10 +553,15 @@ function _civicrm_api3_map_profile_fields_to_entity(&$field) {
     }
     $fieldName .= '-' . $field['location_type_id'];
   }
+  elseif(array_key_exists($fieldName, $locationFields)) {
+    $fieldName .= '-Primary';
+    $entity = 'Email';
+  }
   if(!empty($field['phone_type_id'])) {
     $fieldName .= '-' . $field['location_type_id'];
     $entity = 'Phone';
   }
+
   // @todo - sort this out!
   //here we do a hard-code list of known fields that don't map to where they are mapped to
   // not a great solution but probably if we looked in the BAO we'd find a scary switch statement
@@ -588,10 +612,14 @@ function _civicrm_api3_profile_getProfileID($profileID) {
 /**
  * helper function to add all aliases as keys to getfields response so we can look for keys within it
  * since the relationship between profile fields & api / metadata based fields is a bit inconsistent
+ *
  * @param array $values
  *
  * e.g getfields response incl 'membership_type_id' - with api.aliases = 'membership_type'
  * returned array will include both as keys (with the same values)
+ * @param $entity
+ *
+ * @return array
  */
 function _civicrm_api3_profile_appendaliases($values, $entity) {
   foreach ($values as $field => $spec) {
