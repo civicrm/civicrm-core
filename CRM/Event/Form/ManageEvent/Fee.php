@@ -152,7 +152,7 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
           $defaults['discounted_label'][$colCount] = $discountFieldsval['label'];
           $defaults['discounted_value'][$colCount][$rowCount] =
             CRM_Utils_Money::format($discountFieldsval['amount'], NULL, '%a');
-          $defaults['discount_option_id'][$rowCount][$colCount] = $discountFieldsval['id'];
+          $defaults['discount_option_id'][$colCount][$rowCount]= $discountFieldsval['id'];
           if (CRM_Utils_Array::value('is_default', $discountFieldsval)) {
             $defaults['discounted_default'] = $discountFieldsval['weight'];
           }
