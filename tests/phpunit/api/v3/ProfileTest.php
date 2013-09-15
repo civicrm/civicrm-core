@@ -780,13 +780,14 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
           'is_required' => 1,
           'visibility' => 'Public Pages and Listings',
           'field_type' => 'Individual',
-          //is_active = 1, is_view  0, weight SHOULD be set by api (& tested), ditto is_reserved 0
+          'label' => 'First Name',
         ),
         array(
           'field_name' => 'last_name',
           'is_required' => 1,
           'visibility' => 'Public Pages and Listings',
           'field_type' => 'Individual',
+          'label' => 'Last Name',
         ),
         array(
           'field_name' => 'email',
