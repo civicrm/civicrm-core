@@ -30,12 +30,8 @@
  *  Include configuration
  */
 define('CIVICRM_SETTINGS_PATH', __DIR__ . '/civicrm.settings.dist.php');
-define('CIVICRM_SETTINGS_LOCAL_PATH', __DIR__ . '/civicrm.settings.local.php');
-
-if (file_exists(CIVICRM_SETTINGS_LOCAL_PATH)) {
-  require_once CIVICRM_SETTINGS_LOCAL_PATH;
-}
 require_once CIVICRM_SETTINGS_PATH;
+
 /**
  *  Include class definitions
  */
@@ -139,18 +135,11 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     // we need full error reporting
     error_reporting(E_ALL & ~E_NOTICE);
 
-    if (!empty($GLOBALS['mysql_db'])) {
-      self::$_dbName = $GLOBALS['mysql_db'];
-    }
-    else {
-      self::$_dbName = 'civicrm_tests_dev';
-    }
+    global $civicrm_db_settings;
+    self::$_dbName = $civicrm_db_settings->database;
 
     //  create test database
-    self::$utils = new Utils($GLOBALS['mysql_host'],
-      $GLOBALS['mysql_user'],
-      $GLOBALS['mysql_pass']
-    );
+    self::$utils = new Utils($civicrm_db_settings);
 
     // also load the class loader
     require_once 'CRM/Core/ClassLoader.php';
