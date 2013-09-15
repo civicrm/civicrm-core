@@ -294,7 +294,7 @@ function _civicrm_api3_api_getfields(&$apiRequest) {
     //  $apiRequest['params']['action'] = $apiRequest['params']['api_action'];
      // unset($apiRequest['params']['api_action']);
     }
-    return array('action' => array('api_aliases' => array('action')));
+    return array('action' => array('api.aliases' => array('api_action')));
   }
   $getFieldsParams = array('action' => $apiRequest['action']);
   $entity = $apiRequest['entity'];
