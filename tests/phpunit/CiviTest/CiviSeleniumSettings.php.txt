@@ -16,17 +16,17 @@ class CiviSeleniumSettings {
    */
   var $rcPort = 4444;
 
-  var $sandboxURL = 'http://devel.drupal.tests.dev.civicrm.org';
+  var $sandboxURL = 'http://civicrm-tests.local';
 
   var $sandboxPATH = '';
 
-  var $username = 'demo';
+  var $username = 'admin';
 
-  var $password = 'demo';
+  var $password = 'admin';
 
-  var $adminUsername = 'USERNAME';
+  var $adminUsername = 'admin';
   
-  var $adminPassword = 'PASSWORD';
+  var $adminPassword = 'admin';
 
   var $adminApiKey = NULL; // civicrm_contact.api_key for admin
 

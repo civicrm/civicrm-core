@@ -1,5 +1,5 @@
 <?php
-// vim: set si ai expandtab tabstop=4 shiftwidth=4 softtabstop=4:
+// vim: set si ai expandtab tabstop=8 shiftwidth=2 softtabstop=2:
 
 /**
  *  File for the Utils class
@@ -45,15 +45,13 @@ class Utils {
   /**
    *  Construct an object for this database
    */
-  public function __construct($host, $user, $pass) {
+  public function __construct($civicrm_db_settings) {
+    $dsn = $civicrm_db_settings->toPDODSN();
     try {
-      $this->pdo = new PDO("mysql:host={$host}",
-        $user, $pass,
-        array(PDO::MYSQL_ATTR_USE_BUFFERED_QUERY => TRUE)
-      );
+      $this->pdo = new PDO($dsn, $civicrm_db_settings->username, $civicrm_db_settings->password, array(PDO::MYSQL_ATTR_USE_BUFFERED_QUERY => TRUE));
     }
     catch(PDOException$e) {
-      echo "Can't connect to MySQL server:" . PHP_EOL . $e->getMessage() . PHP_EOL;
+      echo "Can't connect to MySQL server using '$dsn' with user '{$civicrm_db_settings->username}' and pass '{$civicrm_db_settigs->password}':" . PHP_EOL . $e->getMessage() . PHP_EOL;
       exit(1);
     }
   }

@@ -604,5 +604,69 @@ HTACCESS;
     }
     return TRUE;
   }
+
+  static function appendLines($file_path, $new_file_path, $lines_to_write) {
+    $added = FALSE;
+    $lines_written = array();
+    $orig_file = fopen($file_path, 'r');
+    $new_file = fopen($new_file_path, 'w');
+    while (($line = fgets($orig_file)) !== FALSE) {
+      foreach ($lines_to_write as $line_to_write) {
+        if (trim($line) == trim($line_to_write)) {
+          $lines_written[] = $line;
+        }
+      }
+      fwrite($new_file, $line);
+    }
+    foreach ($lines_to_write as $line_to_write) {
+      if (!in_array($line_to_write, $lines_written)) {
+        fwrite($new_file, $line_to_write);
+        $added = TRUE;
+      }
+    }
+    fclose($orig_file);
+    fclose($new_file);
+    return $added;
+  }
+
+  static function close($handle) {
+    $result = @fclose($handle);
+    if ($result === FALSE) {
+      throw new Exception("Error closing " . print_r($handle, TRUE) . ": " . print_r(error_get_last(), TRUE));
+    }
+    return $result;
+  }
+
+  static function fgets($handle) {
+    $result = @fgets($handle);
+    if ($result === FALSE) {
+      throw new Exception("Error calling fgets on " . print_r($handle, TRUE) . ": " . print_r(error_get_last(), TRUE));
+    }
+    return $result;
+  }
+
+  static function open($file_path, $mode, $use_include_path = false) {
+    $result = @fopen($file_path, $mode, $use_include_path);
+    if ($result === FALSE) {
+      throw new Exception("Error opening $file_path with mode $mode: " . print_r(error_get_last(), TRUE));
+    }
+    return $result;
+  }
+
+  static function read($handle, $length) {
+    $result = @fread($handle, $length);
+    if ($result === FALSE) {
+      throw new Exception("Error reading from " . print_r($handle, TRUE) . ": " . print_r(error_get_last(), TRUE));
+    }
+    return $result;
+  }
+
+  static function write($handle, $string) {
+    $result = @fwrite($handle, $string);
+    if ($result === FALSE) {
+      throw new Exception("Error writing '$string' to " . print_r($handle, TRUE) . ": " . print_r(error_get_last(), TRUE));
+    }
+    return $result;
+  }
 }
 
