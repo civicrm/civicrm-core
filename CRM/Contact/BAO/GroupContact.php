@@ -439,8 +439,11 @@ class CRM_Contact_BAO_GroupContact extends CRM_Contact_DAO_GroupContact {
     $leftJoin = $where = $orderBy = null;
 
     if ($method) {
-      $leftJoin =
-        "LEFT JOIN civicrm_subscription_history ON (civicrm_group_contact.contact_id = civicrm_subscription_history.contact_id)";
+      //CRM-13341 add group_id clause
+      $leftJoin = "
+        LEFT JOIN civicrm_subscription_history
+          ON ( civicrm_group_contact.contact_id = civicrm_subscription_history.contact_id
+          AND civicrm_subscription_history.group_id = {$groupID} )";
       $where = "AND civicrm_subscription_history.method ='Email'";
       $orderBy = "ORDER BY civicrm_subscription_history.id DESC";
     }
