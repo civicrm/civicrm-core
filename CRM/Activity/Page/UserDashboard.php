@@ -51,7 +51,7 @@ class CRM_Activity_Page_UserDashboard extends CRM_Contact_Page_View_UserDashBoar
     $controller->reset();
     $controller->set('context', 'user');
     $controller->set('cid', $this->_contactId);
-    $controller->set('status', array(1 => 'on'));
+    $controller->set('status', array(1 => 'on', 7 => 'on'));
     $controller->set('activity_role', 2);
     $controller->set('force', 1);
     $controller->process();
