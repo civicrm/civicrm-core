@@ -80,6 +80,12 @@ class CRM_Report_Form_Contribute_Bookkeeping extends CRM_Report_Form {
             'no_display' => TRUE,
           ),
         ),
+        'order_bys' =>
+        array(
+          'sort_name' => array(
+            'title' => ts('Last Name, First Name'),
+          ),
+        ),
         'grouping' => 'contact-fields',
       ),
       'civicrm_membership' =>
@@ -163,6 +169,9 @@ class CRM_Report_Form_Contribute_Bookkeeping extends CRM_Report_Form {
             'options' => CRM_Contribute_PseudoConstant::financialType(),
           ),
         ),
+        'order_bys' => array(
+          'financial_type_id' => array('title' => ts('Financial Type')),
+        ),
       ),
       'civicrm_contribution' =>
       array(
@@ -193,6 +202,10 @@ class CRM_Report_Form_Contribute_Bookkeeping extends CRM_Report_Form {
             'options' => CRM_Contribute_PseudoConstant::contributionStatus(),
             'default' => array(1),
           ),
+        ),
+        'order_bys' => array(
+          'contribution_id' => array('title' => ts('Contribution #')),
+          'contribution_status_id' => array('title' => ts('Contribution Status')),
         ),
         'grouping' => 'contri-fields',
       ),
@@ -240,6 +253,9 @@ class CRM_Report_Form_Contribute_Bookkeeping extends CRM_Report_Form {
             'type' => CRM_Utils_Type::T_DATE,
           ),
         ),
+        'order_bys' => array(
+          'payment_instrument_id' => array('title' => ts('Payment Instrument')),
+        ),
       ),
       'civicrm_entity_financial_trxn' => array(
         'dao' => 'CRM_Financial_DAO_EntityFinancialTrxn',
@@ -256,7 +272,25 @@ class CRM_Report_Form_Contribute_Bookkeeping extends CRM_Report_Form {
           array('title' => ts('Amount')),
         ),
       ),
+      'civicrm_group' =>
+      array(
+        'dao' => 'CRM_Contact_DAO_Group',
+        'alias' => 'cgroup',
+        'filters' =>
+        array(
+          'gid' =>
+          array(
+            'name' => 'group_id',
+            'title' => ts('Group'),
+            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
+            'group' => TRUE,
+            'options' => CRM_Core_PseudoConstant::group(),
+          ),
+        ),
+      ),
     );
+
+    $this->_tagFilter = TRUE;
     parent::__construct();
   }
 
@@ -342,7 +376,16 @@ class CRM_Report_Form_Contribute_Bookkeeping extends CRM_Report_Form {
   }
 
   function orderBy() {
-          $this->_orderBy = " ORDER BY {$this->_aliases['civicrm_contact']}.sort_name, {$this->_aliases['civicrm_contribution']}.id, {$this->_aliases['civicrm_entity_financial_trxn']}.id ";
+    parent::orderBy();
+
+    // please note this will just add the order-by columns to select query, and not display in column-headers.
+    // This is a solution to not throw fatal errors when there is a column in order-by, not present in select/display columns.
+    foreach ($this->_orderByFields as $orderBy) {
+      if (!array_key_exists($orderBy['name'], $this->_params['fields'])
+        && !CRM_Utils_Array::value('section', $orderBy)) {
+        $this->_select .= ", {$orderBy['dbAlias']} as {$orderBy['tplField']}";
+      }
+    }
   }
 
   function where() {
