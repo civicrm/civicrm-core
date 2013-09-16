@@ -589,7 +589,7 @@ class CRM_Pledge_BAO_Query {
 
     //add fields for pledge frequency
     $form->add('text', 'pledge_frequency_interval', ts('Every'), array('size' => 8, 'maxlength' => 8));
-
+    $form->addRule('pledge_frequency_interval', ts('Please enter valid Pledge Frequency Interval'), 'integer');
     $frequencies = CRM_Core_OptionGroup::values('recur_frequency_units');
     foreach ($frequencies as $val => $label) {
       $freqUnitsDisplay["'{$val}'"] = ts('%1(s)', array(1 => $label));

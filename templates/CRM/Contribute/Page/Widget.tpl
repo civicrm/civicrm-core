@@ -150,7 +150,7 @@
         <div class="crm-amount-fill" id="crm_cpid_{$cpageId}_amt_fill"></div>
     </div>
     <div class="crm-amount-raised-wrapper">
-        <span id="crm_cpid_{$cpageId}_amt_raised" class="crm-amount-raised"></span>
+        <span id="crm_cpid_{$cpageId}_amt_raised" class="crm-amount-raised"> -- placeholder -- </span>
     </div>
     {if $form.url_logo.value}
         <div class="crm-logo"><img src="{$form.url_logo.value}" alt={ts}Logo{/ts}></div>
@@ -159,7 +159,7 @@
     <div id="crm_cpid_{$cpageId}_comments" class="crm-comments"></div>
     <div id="crm_cpid_{$cpageId}_campaign" class="crm-campaign"></div>
     <div class="crm-contribute-button-wrapper" id="crm_cpid_{$cpageId}_button">
-        <a href='{crmURL p="civicrm/contribute/transact" q="reset=1&id=$cpageId" h=0 a=1 fe=1}' class="crm-contribute-button"><span class="crm-contribute-button-inner" id="crm_cpid_{$cpageId}_btn_txt"></span></a>
+        <a href='{crmURL p="civicrm/contribute/transact" q="reset=1&id=$cpageId" h=0 a=1 fe=1}' class="crm-contribute-button"><span class="crm-contribute-button-inner" id="crm_cpid_{$cpageId}_btn_txt"> -- placeholder -- </span></a>
     </div>
 </div>
 

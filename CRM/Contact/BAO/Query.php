@@ -4011,10 +4011,10 @@ civicrm_relationship.start_date > {$today}
           'first_name' => 1,
           'middle_name' => 1,
           'last_name' => 1,
-          'prefix_id' => 1,
-          'suffix_id' => 1,
+          'individual_prefix' => 1,
+          'individual_suffix' => 1,
           'birth_date' => 1,
-          'gender_id' => 1,
+          'gender' => 1,
           'street_address' => 1,
           'supplemental_address_1' => 1,
           'supplemental_address_2' => 1,
@@ -4075,7 +4075,7 @@ civicrm_relationship.start_date > {$today}
    *
    * @param array $params
    * @param array $returnProperties
-   * @param bolean $count
+   * @param \bolean|bool $count
    *
    * @return void
    * @access public
@@ -4096,14 +4096,17 @@ civicrm_relationship.start_date > {$today}
    * but it is unclear as to whehter that is historical or there is a reason
    *  CRM-11290 led to the permissioning action being extracted from searchQuery & shared with this function
    *
-   * @param array  $params
-   * @param array  $returnProperties
+   * @param array $params
+   * @param array $returnProperties
+   * @param null $fields
    * @param string $sort
-   * @param int    $offset
-   * @param int    $row_count
-   * @params bool $smartGroupCache ?? update smart group cache?
+   * @param int $offset
+   * @param int $row_count
+   * @param bool $smartGroupCache
    * @param bool $count return count obnly
    * @param bool $skipPermissions Should permissions be ignored or should the logged in user's permissions be applied
+   *
+   * @params bool $smartGroupCache ?? update smart group cache?
    *
    * @return array
    * @access public
@@ -5009,11 +5012,14 @@ AND   displayRelType.is_active = 1
    * @param $op       string the sql operator, this function should handle ALL SQL operators
    * @param $value    any    string / integer / array depends on the operator and whos calling the query builder
    * @param $grouping int    the index where to place the where clause
-   * @param $selectValue array the key value pairs for this element. This allows us to use this function for things besides option-value pairs
+   * @param $selectValues
    * @param $field    array  an array that contains various properties of the field identified by $name
    * @param $label    string The label for this field element
    * @param $dataType string The data type for this element
    *
+   * @param bool $useIDsOnly
+   *
+   * @internal param array $selectValue the key value pairs for this element. This allows us to use this function for things besides option-value pairs
    * @return void     adds the where clause and qill to the query object
    */
   function optionValueQuery(
@@ -5093,8 +5099,8 @@ AND   displayRelType.is_active = 1
    * this was the protocol used by search builder in the old old days before we had
    * super nice js widgets to do the hard work
    *
-   * @param string the string to check
-   * @param string the dataType we should check for the values, default integer
+   * @param the $string
+   * @param string $dataType the dataType we should check for the values, default integer
    *
    * @return FALSE if string does not match the patter
    *         array of numeric values if string does match the pattern
@@ -5132,7 +5138,11 @@ AND   displayRelType.is_active = 1
 
   /**
    * convert the pseudo constants id's to their names
+   *
    * @param  reference parameter $dao
+   * @param bool $return
+   *
+   * @return array
    */
   function convertToPseudoNames(&$dao, $return = FALSE) {
     if (empty($this->_pseudoConstantsSelect)) {
@@ -5146,6 +5156,7 @@ AND   displayRelType.is_active = 1
 
       if (property_exists($dao, $value['idCol'])) {
         $val = $dao->$value['idCol'];
+        $idColumn = $key;
 
         if (CRM_Utils_System::isNull($val)) {
           $dao->$key = NULL;
@@ -5153,6 +5164,9 @@ AND   displayRelType.is_active = 1
         elseif ($baoName = CRM_Utils_Array::value('bao', $value, NULL)) {
           //preserve id value
           $idColumn = "{$key}_id";
+          if (!empty($this->_fields[$key]['name'])) {
+            $idColumn = $this->_fields[$key]['name'];
+          }
           $dao->$idColumn = $val;
           $dao->$key = CRM_Core_PseudoConstant::getLabel($baoName, $value['pseudoField'], $val);
         }
@@ -5179,6 +5193,7 @@ AND   displayRelType.is_active = 1
             $current[$lastElement] = $dao->$key;
           }
           else {
+            $values[$idColumn] = $dao->$idColumn;
             $values[$key] = $dao->$key;
           }
         }
@@ -5187,10 +5202,11 @@ AND   displayRelType.is_active = 1
     return $values;
   }
 
-  /*
+  /**
    * include pseudo fields LEFT JOIN
    * @param  $sort  can be a object or string
    *
+   * @return array
    */
   function includePseudoFieldsJoin($sort) {
     if (!$sort || empty($this->_pseudoConstantsSelect)) {

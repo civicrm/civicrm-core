@@ -137,7 +137,7 @@ class WebTest_Contribute_PCPAddTest extends CiviSeleniumTestCase {
     $this->type("pcp_title", $pcpTitle);
     $this->type("pcp_intro_text", "Welcome Text $hash");
     $this->type("goal_amount", $contributionAmount);
-    $this->click("_qf_Campaign_upload-bottom");
+    $this->clickLink("_qf_Campaign_upload-bottom", '_qf_Main_upload-bottom');
 
     $this->webtestLogin();
     $this->openCiviPage("admin/pcp", "reset=1", "_qf_PCP_refresh");

@@ -142,14 +142,7 @@ class CRM_Admin_Page_LabelFormats extends CRM_Core_Page_Basic {
 
     // Add action links to each of the Label Formats
     foreach ($nameFormatList as & $format) {
-      $action = array_sum(array_keys($this->links()));
-      if (CRM_Utils_Array::value('is_reserved', $format)) {
-        $action -= CRM_Core_Action::DELETE;
-      }
-
       $format['groupName'] = ts('Name Badge');
-      $format['action'] = CRM_Core_Action::formLink(self::links(), $action,
-        array('id' => $format['id'], 'group' => 'name_badge'));
     }
 
     $labelFormatList = array_merge($labelFormatList, $nameFormatList);

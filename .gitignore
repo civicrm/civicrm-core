@@ -60,6 +60,7 @@ CRM/Core/DAO/Managed.php
 CRM/Core/DAO/Mapping.php
 CRM/Core/DAO/MappingField.php
 CRM/Core/DAO/Menu.php
+CRM/Core/DAO/MessageTemplate.php
 CRM/Core/DAO/MessageTemplates.php
 CRM/Core/DAO/Navigation.php
 CRM/Core/DAO/Note.php

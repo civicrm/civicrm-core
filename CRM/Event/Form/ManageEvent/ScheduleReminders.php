@@ -358,7 +358,7 @@ class CRM_Event_Form_ManageEvent_ScheduleReminders extends CRM_Event_Form_Manage
 
       $templateParams['id'] = $values['template'];
 
-      $msgTemplate = CRM_Core_BAO_MessageTemplates::add($templateParams);
+      $msgTemplate = CRM_Core_BAO_MessageTemplate::add($templateParams);
     }
 
     if (CRM_Utils_Array::value('saveTemplate', $composeParams)) {
@@ -371,7 +371,7 @@ class CRM_Event_Form_ManageEvent_ScheduleReminders extends CRM_Event_Form_Manage
 
       $templateParams['msg_title'] = $composeParams['saveTemplateName'];
 
-      $msgTemplate = CRM_Core_BAO_MessageTemplates::add($templateParams);
+      $msgTemplate = CRM_Core_BAO_MessageTemplate::add($templateParams);
     }
 
     if (isset($msgTemplate->id)) {

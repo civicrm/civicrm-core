@@ -34,7 +34,7 @@
  */
 
 require_once 'Mail/mime.php';
-class CRM_Core_BAO_MessageTemplates extends CRM_Core_DAO_MessageTemplates {
+class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
 
   /**
    * Takes a bunch of params that are needed to match certain criteria and
@@ -46,12 +46,12 @@ class CRM_Core_BAO_MessageTemplates extends CRM_Core_DAO_MessageTemplates {
    * @param array $params   (reference ) an assoc array of name/value pairs
    * @param array $defaults (reference ) an assoc array to hold the flattened values
    *
-   * @return object CRM_Core_BAO_MessageTemplates object
+   * @return object CRM_Core_BAO_MessageTemplate object
    * @access public
    * @static
    */
   static function retrieve(&$params, &$defaults) {
-    $messageTemplates = new CRM_Core_DAO_MessageTemplates();
+    $messageTemplates = new CRM_Core_DAO_MessageTemplate();
     $messageTemplates->copyValues($params);
     if ($messageTemplates->find(TRUE)) {
       CRM_Core_DAO::storeValues($messageTemplates, $defaults);
@@ -70,7 +70,7 @@ class CRM_Core_BAO_MessageTemplates extends CRM_Core_DAO_MessageTemplates {
    * @static
    */
   static function setIsActive($id, $is_active) {
-    return CRM_Core_DAO::setFieldValue('CRM_Core_DAO_MessageTemplates', $id, 'is_active', $is_active);
+    return CRM_Core_DAO::setFieldValue('CRM_Core_DAO_MessageTemplate', $id, 'is_active', $is_active);
   }
 
   /**
@@ -87,8 +87,7 @@ class CRM_Core_BAO_MessageTemplates extends CRM_Core_DAO_MessageTemplates {
     $hook = empty($params['id']) ? 'create' : 'edit';
     CRM_Utils_Hook::pre($hook, 'MessageTemplate', CRM_Utils_Array::value('id', $params), $params);
 
-    $params['is_active'] = CRM_Utils_Array::value('is_active', $params, FALSE);
-    $messageTemplates = new CRM_Core_DAO_MessageTemplates();
+    $messageTemplates = new CRM_Core_DAO_MessageTemplate();
     $messageTemplates->copyValues($params);
     $messageTemplates->save();
 
@@ -118,7 +117,7 @@ class CRM_Core_BAO_MessageTemplates extends CRM_Core_DAO_MessageTemplates {
     $params = array(1 => array($messageTemplatesID, 'Integer'));
     CRM_Core_DAO::executeQuery($query, $params);
 
-    $messageTemplates = new CRM_Core_DAO_MessageTemplates();
+    $messageTemplates = new CRM_Core_DAO_MessageTemplate();
     $messageTemplates->id = $messageTemplatesID;
     $messageTemplates->delete();
     CRM_Core_Session::setStatus(ts('Selected message template has been deleted.'), ts('Deleted'), 'success');
@@ -135,7 +134,7 @@ class CRM_Core_BAO_MessageTemplates extends CRM_Core_DAO_MessageTemplates {
   static function getMessageTemplates($all = TRUE) {
     $msgTpls = array();
 
-    $messageTemplates = new CRM_Core_DAO_MessageTemplates();
+    $messageTemplates = new CRM_Core_DAO_MessageTemplate();
     $messageTemplates->is_active = 1;
 
     if (!$all) {
@@ -151,7 +150,7 @@ class CRM_Core_BAO_MessageTemplates extends CRM_Core_DAO_MessageTemplates {
 
   static function sendReminder($contactId, $email, $messageTemplateID, $from) {
 
-    $messageTemplates = new CRM_Core_DAO_MessageTemplates();
+    $messageTemplates = new CRM_Core_DAO_MessageTemplate();
     $messageTemplates->id = $messageTemplateID;
 
     $domain     = CRM_Core_BAO_Domain::getDomain();
@@ -194,7 +193,7 @@ class CRM_Core_BAO_MessageTemplates extends CRM_Core_DAO_MessageTemplates {
                                                         $returnProperties,
                                                         null, null, false,
                                                         $tokens,
-                                                        'CRM_Core_BAO_MessageTemplates');
+                                                        'CRM_Core_BAO_MessageTemplate');
       $contact = reset( $details );
 
       // call token hook

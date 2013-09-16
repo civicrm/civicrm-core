@@ -330,6 +330,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     // FIXME: look at it closer in second stage
 
     // initialize the object once db is loaded
+    CRM_Core_Config::$_mail = NULL;
     $config = CRM_Core_Config::singleton();
 
     // when running unit tests, use mockup user framework
@@ -887,20 +888,21 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    *
    * @return int    id of Household created
    */
-  function householdCreate($params = NULL) {
-    if ($params === NULL) {
-      $params = array(
+  function householdCreate($params =  array()) {
+    $params = array_merge(array(
         'household_name' => 'Unit Test household',
         'contact_type' => 'Household',
-      );
-    }
+      ), $params);
     return $this->_contactCreate($params);
   }
 
   /**
    * Private helper function for calling civicrm_contact_add
    *
-   * @param array   parameters for civicrm_contact_add api function call
+   * @param $params
+   *
+   * @throws Exception
+   * @internal param \parameters $array for civicrm_contact_add api function call
    *
    * @return int    id of Household created
    */

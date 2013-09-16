@@ -40,9 +40,10 @@
 /**
  * Defines 'uf field' within a group.
  *
- * @param $groupId int Valid uf_group id
- *
  * @param $params  array  Associative array of property name/value pairs to create new uf field.
+ *
+ * @throws API_Exception
+ * @internal param int $groupId Valid uf_group id
  *
  * @return Newly created $ufFieldArray array
  *
@@ -71,7 +72,7 @@ function civicrm_api3_uf_field_create($params) {
     $params['group_id'] = $groupId;
   }
 
-  $ids = array();
+  $ids = $ufFieldArray = array();
   $ids['uf_group'] = $groupId;
 
   $fieldId = CRM_Utils_Array::value('id', $params);
@@ -94,6 +95,7 @@ function civicrm_api3_uf_field_create($params) {
   if (CRM_Core_BAO_UFField::duplicateField($params, $ids)) {
     throw new API_Exception("The field was not added. It already exists in this profile.");
   }
+  //@todo why is this even optional? Surely weight should just be 'managed' ??
   if (CRM_Utils_Array::value('option.autoweight', $params, TRUE)) {
     $params['weight'] = CRM_Core_BAO_UFField::autoWeight($params);
   }
@@ -103,19 +105,25 @@ function civicrm_api3_uf_field_create($params) {
   CRM_Core_BAO_UFGroup::updateGroupTypes($groupId, $fieldsType);
 
   _civicrm_api3_object_to_array($ufField, $ufFieldArray[$ufField->id]);
+  civicrm_api3('profile', 'getfields', array('cache_clear' => TRUE));
   return civicrm_api3_create_success($ufFieldArray, $params);
 }
 
 /**
  * Gets field for civicrm_uf_field create
  *
+ * @param $params
+ *
  * @return array fields valid for other functions
  */
 function _civicrm_api3_uf_field_create_spec(&$params) {
   $params['option.autoweight'] = array(
     'title' => "Automatically adjust weights in UFGroup to align with UFField",
-    'type' => CRM_Utils_Type::T_BOOLEAN
+    'type' => CRM_Utils_Type::T_BOOLEAN,
+    'api.default' => TRUE,
   );
+  $params['created_id']['api.default'] = 'user_contact_id';
+  $params['is_active']['api.default'] = TRUE;
 }
 
 /**
@@ -137,7 +145,10 @@ function civicrm_api3_uf_field_get($params) {
 /**
  * Delete uf field
  *
- * @param $fieldId int  Valid uf_field id that to be deleted
+ * @param $params
+ *
+ * @throws API_Exception
+ * @internal param int $fieldId Valid uf_field id that to be deleted
  *
  * @return true on successful delete or return error
  *
@@ -160,8 +171,8 @@ function civicrm_api3_uf_field_delete($params) {
 
   return civicrm_api3_create_success($result, $params);
 }
-/*
- * field id accepted for backward compat - unset required on id
+/**
+ * field id accepted for backward compatibility - unset required on id
  */
 function _civicrm_api3_uf_field_delete_spec(&$params) {
   // legacy support for field_id

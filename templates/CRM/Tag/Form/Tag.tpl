@@ -32,61 +32,27 @@
   #Tag #tagtree .highlighted {ldelim}background-color:lightgrey;{rdelim}
 </style>
 <script type="text/javascript">
-  (function(){ldelim}
+  (function($){ldelim}
     var entityID={$entityID};
     var entityTable='{$entityTable}';
     {literal}
-    cj(function(){initTagTree()});
-
-    function initTagTree() {
+    $(function() {
       //unobsctructive elements are there to provide the function to those not having javascript, no need for the others
-      cj(".unobstructive").hide();
+      $(".unobstructive").hide();
 
-      cj("#tagtree ul input:checked").each (function(){
-        cj(this).parents("li").children(".jstree-icon").addClass('highlighted');
+      $("#tagtree ul input:checked").each (function(){
+        $(this).parents("li").children(".jstree-icon").addClass('highlighted');
       });
 
-      cj("#tagtree input").change(function(){
-        tagid = this.id.replace("check_", "");
-        //get current tags from Summary and convert to array
-        var tagLabels = cj.trim( cj("#tags").text( ) );
-        if ( tagLabels ) {
-          var tagsArray = tagLabels.split(',');
-        }
-        else{
-          var tagsArray = new Array();
-        }
-
-        //get current tag label
-        var currentTagLabel = cj("#tagLabel_" + tagid ).text( );
-        if (this.checked) {
-          CRM.api('entity_tag','create',{entity_table:entityTable,entity_id:entityID,tag_id:tagid});
-          // add check to tab label array
-          tagsArray.push( currentTagLabel );
-        }
-        else {
-          CRM.api('entity_tag','delete',{entity_table:entityTable,entity_id:entityID,tag_id:tagid});
-          // build array of tag labels
-          tagsArray = cj.map(tagsArray, function (a) {
-            if ( cj.trim( a ) != currentTagLabel ) {
-              return cj.trim( a );
-            }
-          });
-        }
-
-        //showing count of tags in summary tab
-        var existingTagsInTagset = cj('.token-input-delete-token-facebook').length;
-        var tagCount = cj("#tagtree input:checkbox:checked").length + existingTagsInTagset;
-        cj('#tab_tag a em').html('' + tagCount);
-        tagCount ? cj('#tab_tag').removeClass('disabled') : cj('#tab_tag').addClass('disabled');
-
-        //update summary tab
-        tagLabels = tagsArray.join(', ');
-        cj("#tags").html( tagLabels );
+      $("#tagtree input").change(function(){
+        var tagid = this.id.replace("check_", "");
+        var op = (this.checked) ? 'create' : 'delete';
+        CRM.api('entity_tag', op, {entity_table: entityTable, entity_id: entityID, tag_id: tagid});
+        CRM.updateContactSummaryTags();
       });
 
       //load js tree.
-      cj("#tagtree").jstree({
+      $("#tagtree").jstree({
         "plugins" : ["themes", "html_data"],
         "themes": {"url": CRM.config.resourceBase + 'packages/jquery/plugins/jstree/themes/default/style.css'}
       });
@@ -94,12 +60,24 @@
       {/literal}
       {if $permission neq 'edit'}
         {literal}
-          cj("#tagtree input").attr('disabled', true);
+          $("#tagtree input").attr('disabled', true);
         {/literal}
       {/if}
       {literal}
+    });
+
+    CRM.updateContactSummaryTags = function() {
+      var tags = [], $tab = $('#tab_tag');
+      $('.tag-section .token-input-token-facebook p, #tagtree input:checkbox:checked+label').each(function() {
+        tags.push($(this).text());
+      });
+      // showing count of tags in summary tab
+      $('a em', $tab).html('' + tags.length);
+      tags.length ? $tab.removeClass('disabled') : $tab.addClass('disabled');
+      // update summary tab
+      $("#tags").html(tags.join(', '));
     };
-  })();
+  })(cj);
   {/literal}
 </script>
 <div id="Tag" class="view-content">

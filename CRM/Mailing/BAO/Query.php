@@ -80,7 +80,7 @@ class CRM_Mailing_BAO_Query {
       // get mailing status
       if (CRM_Utils_Array::value('mailing_job_status', $query->_returnProperties)) {
         $query->_tables['civicrm_mailing_job'] = $query->_whereTables['civicrm_mailing_job'] =
-          " LEFT JOIN civicrm_mailing_job ON civicrm_mailing_job.mailing_id = civicrm_mailing.id AND civicrm_mailing_job.parent_id IS NULL ";
+          " LEFT JOIN civicrm_mailing_job ON civicrm_mailing_job.mailing_id = civicrm_mailing.id AND civicrm_mailing_job.parent_id IS NULL AND civicrm_mailing_job.is_test != 1 ";
         $query->_select['mailing_job_status']  = "civicrm_mailing_job.status as mailing_job_status";
         $query->_element['mailing_job_status'] = 1;
       }
@@ -108,7 +108,7 @@ class CRM_Mailing_BAO_Query {
       // mailing job end date / completed date
       if (CRM_Utils_Array::value('mailing_job_end_date', $query->_returnProperties)) {
         $query->_tables['civicrm_mailing_job'] = $query->_whereTables['civicrm_mailing_job'] =
-          " LEFT JOIN civicrm_mailing_job ON civicrm_mailing_job.mailing_id = civicrm_mailing.id AND civicrm_mailing_job.parent_id IS NULL";
+          " LEFT JOIN civicrm_mailing_job ON civicrm_mailing_job.mailing_id = civicrm_mailing.id AND civicrm_mailing_job.parent_id IS NULL AND civicrm_mailing_job.is_test != 1 ";
         $query->_select['mailing_job_end_date']  = "civicrm_mailing_job.end_date as mailing_job_end_date";
         $query->_element['mailing_job_end_date'] = 1;
       }
@@ -156,7 +156,7 @@ class CRM_Mailing_BAO_Query {
         break;
 
       case 'civicrm_mailing_job':
-        $from = " $side JOIN civicrm_mailing_job ON civicrm_mailing_job.mailing_id = civicrm_mailing.id ";
+        $from = " $side JOIN civicrm_mailing_job ON civicrm_mailing_job.mailing_id = civicrm_mailing.id AND civicrm_mailing_job.is_test != 1 ";
         break;
 
       case 'civicrm_mailing_event_bounce':

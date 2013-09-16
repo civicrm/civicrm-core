@@ -99,7 +99,9 @@ class CRM_Badge_BAO_Badge {
           'value' => $value,
           'font_name' => $layout['data']['font_name'][$key],
           'font_size' => $layout['data']['font_size'][$key],
+          'font_style' => $layout['data']['font_style'][$key],
           'text_alignment' => $layout['data']['text_alignment'][$key],
+          'token' => $layout['data']['token'][$key],
         );
       }
     }
@@ -107,9 +109,21 @@ class CRM_Badge_BAO_Badge {
     if (CRM_Utils_Array::value('image_1', $layout['data'])) {
       $formattedRow['image_1'] = $layout['data']['image_1'];
     }
+    if (CRM_Utils_Array::value('width_image_1', $layout['data'])) {
+      $formattedRow['width_image_1'] = $layout['data']['width_image_1'];
+    }
+    if (CRM_Utils_Array::value('height_image_1', $layout['data'])) {
+      $formattedRow['height_image_1'] = $layout['data']['height_image_1'];
+    }
 
     if (CRM_Utils_Array::value('image_2', $layout['data'])) {
       $formattedRow['image_2'] = $layout['data']['image_2'];
+    }
+    if (CRM_Utils_Array::value('width_image_2', $layout['data'])) {
+      $formattedRow['width_image_2'] = $layout['data']['width_image_2'];
+    }
+    if (CRM_Utils_Array::value('height_image_2', $layout['data'])) {
+      $formattedRow['height_image_2'] = $layout['data']['height_image_2'];
     }
 
     if (CRM_Utils_Array::value('add_barcode', $layout['data'])) {
@@ -143,13 +157,15 @@ class CRM_Badge_BAO_Badge {
 
     $titleWidth = $titleLeftMargin = 0;
     if (CRM_Utils_Array::value('image_1', $formattedRow)) {
-      $this->printImage($formattedRow['image_1']);
+      $this->printImage($formattedRow['image_1'], NULL, NULL, CRM_Utils_Array::value('width_image_1', $formattedRow),
+        CRM_Utils_Array::value('height_image_1', $formattedRow));
       $titleWidth = $titleLeftMargin = $this->lMarginLogo;
     }
 
     $titleRightMargin = 0;
     if (CRM_Utils_Array::value('image_2', $formattedRow)) {
-      $this->printImage($formattedRow['image_2'], $x + 68);
+      $this->printImage($formattedRow['image_2'], $x + 68, NULL, CRM_Utils_Array::value('width_image_2', $formattedRow),
+        CRM_Utils_Array::value('height_image_2', $formattedRow));
       $titleRightMargin = 36;
       $titleWidth = $this->lMarginLogo;
     }
@@ -166,21 +182,31 @@ class CRM_Badge_BAO_Badge {
       $titleWidth = $titleRightMargin;
     }
 
-    $this->pdf->SetFont($formattedRow['token'][1]['font_name'], '', $formattedRow['token'][1]['font_size']);
-    $this->pdf->MultiCell($this->pdf->width - $titleWidth, 0, $formattedRow['token'][1]['value'],
+    // first row is a special row because we have images on the side
+    $value = '';
+    if ($formattedRow['token'][1]['token'] != 'spacer') {
+      $value = $formattedRow['token'][1]['value'];
+    }
+
+    $this->pdf->SetFont($formattedRow['token'][1]['font_name'], $formattedRow['token'][1]['font_style'],
+      $formattedRow['token'][1]['font_size']);
+    $this->pdf->MultiCell($this->pdf->width - $titleWidth, 0, $value,
       $this->border, $formattedRow['token'][1]['text_alignment'], 0, 1, $x + $titleLeftMargin, $y);
 
-    $this->pdf->SetFont($formattedRow['token'][2]['font_name'], '', $formattedRow['token'][2]['font_size']);
-    $this->pdf->MultiCell($this->pdf->width, 10, $formattedRow['token'][2]['value'],
-      $this->border, $formattedRow['token'][2]['text_alignment'], 0, 1, $x, $y + $this->tMarginName);
+    $rowCount = CRM_Badge_Form_Layout::FIELD_ROWCOUNT;
+    for ($i = 2; $i <= $rowCount; $i++) {
+      if (!empty($formattedRow['token'][$i]['token'])) {
+        $value = '';
+        if ($formattedRow['token'][$i]['token'] != 'spacer') {
+          $value = $formattedRow['token'][$i]['value'];
+        }
 
-    $this->pdf->SetFont($formattedRow['token'][3]['font_name'], '', $formattedRow['token'][3]['font_size']);
-    $this->pdf->MultiCell($this->pdf->width, 0, $formattedRow['token'][3]['value'],
-      $this->border, $formattedRow['token'][3]['text_alignment'], 0, 1, $x, $this->pdf->getY());
-
-    $this->pdf->SetFont($formattedRow['token'][4]['font_name'], '', $formattedRow['token'][4]['font_size']);
-    $this->pdf->MultiCell($this->pdf->width, 0, $formattedRow['token'][4]['value'],
-      $this->border, $formattedRow['token'][4]['text_alignment'], 0, 1, $x, $y + $this->pdf->height - 5);
+        $this->pdf->SetFont($formattedRow['token'][$i]['font_name'], $formattedRow['token'][$i]['font_style'],
+          $formattedRow['token'][$i]['font_size']);
+        $this->pdf->MultiCell($this->pdf->width, 0, $value,
+          $this->border, $formattedRow['token'][$i]['text_alignment'], 0, 1, $x, $this->pdf->getY());
+      }
+    }
 
     if (CRM_Utils_Array::value('barcode', $formattedRow)) {
       $data = $formattedRow['values'];
@@ -277,7 +303,7 @@ class CRM_Badge_BAO_Badge {
    * @return void
    * @access public
    */
-  function printImage($img, $x = '', $y = '') {
+  function printImage($img, $x = '', $y = '', $w = NULL, $h = NULL) {
     if (!$x) {
       $x = $this->pdf->GetAbsX();
     }
@@ -289,15 +315,19 @@ class CRM_Badge_BAO_Badge {
     $this->imgRes = 300;
 
     if ($img) {
-      $imgsize = getimagesize($img);
-      // mm
-      $f = $this->imgRes / 25.4;
-      $w = $imgsize[0] / $f;
-      $h = $imgsize[1] / $f;
+      list($w, $h) = self::getImageProperties($img, $this->imgRes, $w, $h);
       $this->pdf->Image($img, $x, $y, $w, $h, '', '', '', FALSE, 72, '', FALSE,
         FALSE, $this->debug, FALSE, FALSE, FALSE);
     }
     $this->pdf->SetXY($x, $y);
+  }
+
+  static function getImageProperties($img, $imgRes = 300, $w = NULL, $h = NULL) {
+    $imgsize = getimagesize($img);
+    $f = $imgRes / 25.4;
+    $w = !empty($w) ? $w : $imgsize[0] / $f;
+    $h = !empty($h) ? $h : $imgsize[1] / $f;
+    return array($w, $h);
   }
 
   /**

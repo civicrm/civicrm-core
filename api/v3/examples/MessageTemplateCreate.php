@@ -1,22 +1,22 @@
 <?php
 /**
- * Test Generated example of using message_templates create API
+ * Test Generated example of using message_template create API
  * *
  */
-function message_templates_create_example(){
+function message_template_create_example(){
 $params = array(
   'msg_title' => 'msg_title_1',
   'msg_subject' => 'msg_subject_1',
   'msg_text' => 'msg_text_1',
   'msg_html' => 'msg_html_1',
   'workflow_id' => 1,
-  'is_default' => '',
+  'is_default' => '1',
   'is_reserved' => 1,
   'pdf_format_id' => '1',
 );
 
 try{
-  $result = civicrm_api3('message_templates', 'create', $params);
+  $result = civicrm_api3('message_template', 'create', $params);
 }
 catch (CiviCRM_API3_Exception $e) {
   // handle error here
@@ -32,7 +32,7 @@ return $result;
 /**
  * Function returns array of result expected from previous function
  */
-function message_templates_create_expectedresult(){
+function message_template_create_expectedresult(){
 
   $expectedResult = array(
   'is_error' => 0,
@@ -48,7 +48,7 @@ function message_templates_create_expectedresult(){
           'msg_html' => 'msg_html_1',
           'is_active' => '1',
           'workflow_id' => '1',
-          'is_default' => '',
+          'is_default' => '1',
           'is_reserved' => '1',
           'pdf_format_id' => '1',
         ),
@@ -63,7 +63,7 @@ function message_templates_create_expectedresult(){
 * This example has been generated from the API test suite. The test that created it is called
 *
 * testCreate and can be found in
-* http://svn.civicrm.org/civicrm/trunk/tests/phpunit/CiviTest/api/v3/MessageTemplatesTest.php
+* http://svn.civicrm.org/civicrm/trunk/tests/phpunit/CiviTest/api/v3/MessageTemplateTest.php
 *
 * You can see the outcome of the API tests at
 * http://tests.dev.civicrm.org/trunk/results-api_v3

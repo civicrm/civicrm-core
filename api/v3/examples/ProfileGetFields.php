@@ -6,7 +6,7 @@
 function profile_getfields_example(){
 $params = array(
   'action' => 'submit',
-  'profile_id' => 25,
+  'profile_id' => 27,
 );
 
 try{
@@ -34,9 +34,13 @@ function profile_getfields_expectedresult(){
   'count' => 9,
   'values' => array(
       'first_name' => array(
+          'api.required' => '1',
+          'title' => 'First Name',
+          'help_pre' => '',
+          'help_post' => '',
+          'entity' => 'Contact',
           'name' => 'first_name',
           'type' => 2,
-          'title' => 'First Name',
           'maxlength' => 64,
           'size' => 30,
           'import' => true,
@@ -46,9 +50,13 @@ function profile_getfields_expectedresult(){
           'export' => true,
         ),
       'last_name' => array(
+          'api.required' => '1',
+          'title' => 'Last Name',
+          'help_pre' => '',
+          'help_post' => '',
+          'entity' => 'Contact',
           'name' => 'last_name',
           'type' => 2,
-          'title' => 'Last Name',
           'maxlength' => 64,
           'size' => 30,
           'import' => true,
@@ -57,11 +65,18 @@ function profile_getfields_expectedresult(){
           'dataPattern' => '/^\w+(\s\w+)?+$/',
           'export' => true,
         ),
-      'email' => array(
+      'email-primary' => array(
+          'api.required' => 1,
+          'title' => 'Email',
+          'help_pre' => '',
+          'help_post' => '',
+          'entity' => 'Email',
+          'api.aliases' => array(
+              '0' => 'email-Primary',
+            ),
           'name' => 'email',
           'type' => 2,
-          'title' => 'Email',
-          'maxlength' => 64,
+          'maxlength' => 254,
           'size' => 20,
           'import' => true,
           'where' => 'civicrm_email.email',
@@ -69,12 +84,15 @@ function profile_getfields_expectedresult(){
           'dataPattern' => '/^[a-zA-Z][\w\.-]*[a-zA-Z0-9]@[a-zA-Z0-9][\w\.-]*[a-zA-Z0-9]\.[a-zA-Z][a-zA-Z\.]*[a-zA-Z]$/',
           'export' => true,
           'rule' => 'email',
-          'api.required' => 1,
         ),
       'phone-1-1' => array(
+          'api.required' => 1,
+          'title' => 'Phone',
+          'help_pre' => '',
+          'help_post' => '',
+          'entity' => 'Phone',
           'name' => 'phone',
           'type' => 2,
-          'title' => 'Phone',
           'maxlength' => 32,
           'size' => 20,
           'import' => true,
@@ -82,12 +100,15 @@ function profile_getfields_expectedresult(){
           'headerPattern' => '/phone/i',
           'dataPattern' => '/^[\d\(\)\-\.\s]+$/',
           'export' => true,
-          'api.required' => 1,
         ),
       'country-1' => array(
+          'api.required' => '1',
+          'title' => 'Country',
+          'help_pre' => '',
+          'help_post' => '',
+          'entity' => 'Address',
           'name' => 'country_id',
           'type' => 1,
-          'title' => 'Country',
           'FKClassName' => 'CRM_Core_DAO_Country',
           'pseudoconstant' => array(
               'table' => 'civicrm_country',
@@ -97,9 +118,13 @@ function profile_getfields_expectedresult(){
             ),
         ),
       'state_province-1' => array(
+          'api.required' => '1',
+          'title' => 'State',
+          'help_pre' => '',
+          'help_post' => '',
+          'entity' => 'Address',
           'name' => 'state_province_id',
           'type' => 1,
-          'title' => 'State',
           'FKClassName' => 'CRM_Core_DAO_StateProvince',
           'pseudoconstant' => array(
               'table' => 'civicrm_state_province',
@@ -108,9 +133,13 @@ function profile_getfields_expectedresult(){
             ),
         ),
       'postal_code-1' => array(
+          'api.required' => 0,
+          'title' => 'Postal Code',
+          'help_pre' => '',
+          'help_post' => '',
+          'entity' => 'Address',
           'name' => 'postal_code',
           'type' => 2,
-          'title' => 'Postal Code',
           'maxlength' => 12,
           'size' => 12,
           'import' => true,
@@ -120,6 +149,11 @@ function profile_getfields_expectedresult(){
           'export' => true,
         ),
       'custom_1' => array(
+          'api.required' => '1',
+          'title' => 'first_name',
+          'help_pre' => '',
+          'help_post' => '',
+          'entity' => 'Contact',
           'label' => '_addCustomFieldToProfile',
           'groupTitle' => '_addCustomFie',
           'data_type' => 'String',

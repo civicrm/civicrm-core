@@ -85,7 +85,7 @@ class CRM_SMS_Form_Upload extends CRM_Core_Form {
       $this->assign('templateSelected', $templateId ? $templateId : 0);
       if (isset($defaults['msg_template_id']) && !$templateId) {
         $defaults['template'] = $defaults['msg_template_id'];
-        $messageTemplate = new CRM_Core_DAO_MessageTemplates();
+        $messageTemplate = new CRM_Core_DAO_MessageTemplate();
         $messageTemplate->id = $defaults['msg_template_id'];
         $messageTemplate->selectAdd();
         $messageTemplate->selectAdd('msg_text');
@@ -252,7 +252,7 @@ class CRM_SMS_Form_Upload extends CRM_Core_Form {
 
         $templateParams['id'] = $formValues['template'];
 
-        $msgTemplate = CRM_Core_BAO_MessageTemplates::add($templateParams);
+        $msgTemplate = CRM_Core_BAO_MessageTemplate::add($templateParams);
       }
 
       if (CRM_Utils_Array::value('saveTemplate', $composeParams)) {
@@ -263,7 +263,7 @@ class CRM_SMS_Form_Upload extends CRM_Core_Form {
 
         $templateParams['msg_title'] = $composeParams['saveTemplateName'];
 
-        $msgTemplate = CRM_Core_BAO_MessageTemplates::add($templateParams);
+        $msgTemplate = CRM_Core_BAO_MessageTemplate::add($templateParams);
       }
 
       if (isset($msgTemplate->id)) {
@@ -412,7 +412,7 @@ class CRM_SMS_Form_Upload extends CRM_Core_Form {
       }
     }
 
-    $templateName = CRM_Core_BAO_MessageTemplates::getMessageTemplates();
+    $templateName = CRM_Core_BAO_MessageTemplate::getMessageTemplates();
     if (CRM_Utils_Array::value('saveTemplate', $params)
       && in_array(CRM_Utils_Array::value('saveTemplateName', $params), $templateName)
     ) {

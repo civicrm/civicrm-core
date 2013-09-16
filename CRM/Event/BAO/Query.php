@@ -275,8 +275,8 @@ class CRM_Event_BAO_Query {
         $feeLabel = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceFieldValue', $value, 'label');
         $feeLabel = CRM_Core_DAO::escapeString(trim($feeLabel));
         if ($value) {
-          $query->_where[$grouping][] = "civicrm_participant.fee_level $op '$feeLabel'";
-          $query->_qill[$grouping][] = ts("Fee level") . " $op $feeLabel";
+          $query->_where[$grouping][] = "civicrm_participant.fee_level LIKE '%$feeLabel%'";
+          $query->_qill[$grouping][] = ts("Fee level") . " contains $feeLabel";
         }
         $query->_tables['civicrm_participant'] = $query->_whereTables['civicrm_participant'] = 1;
         return;

@@ -54,11 +54,14 @@ class CRM_Mailing_Form_Search extends CRM_Core_Form {
 
     CRM_Campaign_BAO_Campaign::addCampaignInComponentSearch($this);
 
-    foreach (array(
-      'Scheduled', 'Complete', 'Running') as $status) {
-      $this->addElement('checkbox', "mailing_status[$status]", NULL, $status);
+    if (!$parent->get('unscheduled')) {
+      $statusVals = array('Scheduled', 'Complete', 'Running', 'Canceled');
+      $parent->set('allStatuses', $statusVals);
+      foreach ($statusVals as $status) {
+        $this->addElement('checkbox', "mailing_status[$status]", NULL, $status);
+      }
+      $this->addElement('checkbox', 'all_status', NULL, 'All Statuses');
     }
-
     if ($parent->_sms) {
       $this->addElement('hidden', 'sms', $parent->_sms);
     }
@@ -74,12 +77,13 @@ class CRM_Mailing_Form_Search extends CRM_Core_Form {
 
   function setDefaultValues() {
     $defaults = array();
-    foreach (array(
-      'Scheduled', 'Complete', 'Running') as $status) {
+    $parent = $this->controller->getParent();
+
+    $statusVals = array('Scheduled', 'Complete', 'Running', 'Canceled');
+    foreach ($statusVals as $status) {
       $defaults['mailing_status'][$status] = 1;
     }
 
-    $parent = $this->controller->getParent();
     if ($parent->_sms) {
       $defaults['sms'] = 1;
     }
@@ -93,7 +97,7 @@ class CRM_Mailing_Form_Search extends CRM_Core_Form {
 
     $parent = $this->controller->getParent();
     if (!empty($params)) {
-      $fields = array('mailing_name', 'mailing_from', 'mailing_to', 'sort_name', 'campaign_id', 'mailing_status', 'sms');
+      $fields = array('mailing_name', 'mailing_from', 'mailing_to', 'sort_name', 'campaign_id', 'mailing_status', 'sms', 'all_status');
       foreach ($fields as $field) {
         if (isset($params[$field]) &&
           !CRM_Utils_System::isNull($params[$field])

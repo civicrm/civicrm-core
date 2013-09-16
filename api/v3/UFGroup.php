@@ -40,7 +40,6 @@
 /**
  * Files required for this package
  */
-
 function _civicrm_api3_uf_group_create_spec(&$params) {
   $session = CRM_Core_Session::singleton();
   $params['title']['api.required'] = 1;
@@ -54,7 +53,7 @@ function _civicrm_api3_uf_group_create_spec(&$params) {
  *
  * @param $params  array   Associative array of property name/value pairs to insert in group.
  *
- * @return   Newly create $ufGroupArray array
+ * @return array API result array
  * {@getfields UFGroup_create}
  * @example UFGroupCreate.php
  * @access public
@@ -83,7 +82,9 @@ function civicrm_api3_uf_group_get($params) {
 /**
  * Delete uf group
  *
- * @param $groupId int  Valid uf_group id that to be deleted
+ * @param $params
+ *
+ * @internal param int $groupId Valid uf_group id that to be deleted
  *
  * @return true on successful delete or return error
  * @todo doesnt rtn success or error properly
