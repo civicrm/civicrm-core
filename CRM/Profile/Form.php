@@ -1317,7 +1317,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
       $params['contactID'] = $this->_id;
       if (!CRM_Core_BAO_CMSUser::create($params, $this->_mail)) {
         CRM_Core_Session::setStatus(ts('Your profile is not saved and Account is not created.'), ts('Profile Error'), 'error');
-        CRM_Core_Error::debug_log_message("Rolling back transaction as CMSUser Create failed in Profile_Form for contact " . $params['contactID']);        $transaction->rollback();
+        CRM_Core_Error::debug_log_message("Rolling back transaction as CMSUser Create failed in Profile_Form for contact " . $params['contactID']);
         $transaction->rollback();
         return CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/profile/create',
             'reset=1&gid=' . $this->_gid
