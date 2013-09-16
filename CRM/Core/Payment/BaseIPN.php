@@ -298,8 +298,8 @@ class CRM_Core_Payment_BaseIPN {
   function unhandled(&$objects, &$transaction) {
     $transaction->rollback();
     // we dont handle this as yet
-    CRM_Core_Error::debug_log_message("returning since contribution status: $status is not handled");
-    echo "Failure: contribution status $status is not handled<p>";
+    CRM_Core_Error::debug_log_message("returning since contribution status: is not handled");
+    echo "Failure: contribution status is not handled<p>";
     return FALSE;
   }
 
