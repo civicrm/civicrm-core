@@ -68,7 +68,7 @@ class CRM_Core_Permission {
    *
    * @var int
    */
-  CONST AUTH_SRC_UNKNOWN = 1, AUTH_SRC_CHECKSUM = 2, AUTH_SRC_SITEKEY = 4, AUTH_SRC_LOGIN = 8;
+  CONST AUTH_SRC_UNKNOWN = 0, AUTH_SRC_CHECKSUM = 1, AUTH_SRC_SITEKEY = 2, AUTH_SRC_LOGIN = 4;
 
   /**
    * get the current permission of this user

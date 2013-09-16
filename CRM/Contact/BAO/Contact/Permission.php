@@ -344,7 +344,7 @@ WHERE  (( contact_id_a = %1 AND contact_id_b = %2 AND is_permission_a_b = 1 ) OR
     }
 
     // set appropriate AUTH source
-    self::toggleChecksumAuthSrc(TRUE);
+    self::initChecksumAuthSrc(TRUE, $form);
 
     // so here the contact is posing as $contactID, lets set the logging contact ID variable
     // CRM-8965
@@ -355,9 +355,9 @@ WHERE  (( contact_id_a = %1 AND contact_id_b = %2 AND is_permission_a_b = 1 ) OR
     return TRUE;
   }
 
-  static function toggleChecksumAuthSrc($checkSumValidationResult = FALSE) {
+  static function initChecksumAuthSrc($checkSumValidationResult = FALSE, $form = NULL) {
     $session = CRM_Core_Session::singleton();
-    if ($checkSumValidationResult && CRM_Utils_Request::retrieve('cs', 'String', $form, FALSE)) {
+    if ($checkSumValidationResult && $form && CRM_Utils_Request::retrieve('cs', 'String', $form, FALSE)) {
       // if result is already validated, and url has cs, set the flag.
       $session->set('authSrc', CRM_Core_Permission::AUTH_SRC_CHECKSUM);
     } else if (($session->get('authSrc') & CRM_Core_Permission::AUTH_SRC_CHECKSUM) == CRM_Core_Permission::AUTH_SRC_CHECKSUM) {
