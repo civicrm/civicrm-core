@@ -1555,6 +1555,10 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
     //get the custom fields for the entity
     //subtype and basic type
     $customDataSubType = NULL;
+    if (is_array($customFieldExtend)) {
+      $customFieldExtend = $customFieldExtend[0];
+    }
+    
     if (in_array($customFieldExtend,
         CRM_Contact_BAO_ContactType::subTypes()
       )) {
@@ -1585,9 +1589,6 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
 
     list($tableName, $columnName, $groupID) = self::getTableColumnGroup($customFieldId);
 
-    if (is_array($customFieldExtend)) {
-      $customFieldExtend = $customFieldExtend[0];
-    }
     if (!$customValueId &&
       // we always create new entites for is_multiple unless specified
       !$customFields[$customFieldId]['is_multiple'] &&
