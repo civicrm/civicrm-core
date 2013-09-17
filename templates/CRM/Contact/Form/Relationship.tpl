@@ -185,10 +185,10 @@
                         var postUrl = "{/literal}{crmURL p='civicrm/ajax/relationshipContactTypeList' h=0}{literal}";
                         cj.post( postUrl, { relType: relType },
                             function ( response ) {
-                                cj( selectID ).get(0).add(new Option('{/literal}{ts escape="js"}- create new contact -{/ts}{literal}', ''), document.all ? i : null);
+                                cj( selectID ).append(new Option('{/literal}{ts escape="js"}- create new contact -{/ts}{literal}', ''));
                                 response = eval( response );
-                                for (i = 0; i < response.length; i++) {
-                                    cj( selectID ).get(0).add(new Option(response[i].name, response[i].value), document.all ? i : null);
+                                for (i = 0; i <= response.length; i++) {
+                                    cj( selectID ).append(new Option(response[i].name, response[i].value));
                                 }
                             }
                         );
