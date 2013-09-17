@@ -241,7 +241,7 @@ class WebTest_Contact_SearchBuilderTest extends CiviSeleniumTestCase {
     if ($loc) {
       $this->select("mapper_{$set}_{$row}_2", "label=$loc");
     }
-    $this->select("operator_{$set}_{$row}", "label=$op");
+    $this->select("operator_{$set}_{$row}", "value=$op");
     if (is_array($value)) {
       $this->waitForElementPresent("css=#crm_search_value_{$set}_{$row} select option + option");
       foreach ($value as $val) {
