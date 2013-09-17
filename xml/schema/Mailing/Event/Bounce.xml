@@ -31,6 +31,11 @@
         <name>bounce_type_id</name>
         <type>int unsigned</type>
         <comment>What type of bounce was it?</comment>
+	<pseudoconstant>
+	  <table>civicrm_mailing_bounce_type</table>
+	  <keyColumn>id</keyColumn>
+	  <labelColumn>name</labelColumn>
+	</pseudoconstant>
     </field>
     <field>
         <name>bounce_reason</name>
