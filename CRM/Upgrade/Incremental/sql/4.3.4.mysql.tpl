@@ -105,5 +105,14 @@ INSERT INTO civicrm_entity_financial_account(entity_table, entity_id, account_re
 SELECT 'civicrm_financial_type', cft.id, @option_value_rel_id_exp, @financialAccountId
 FROM civicrm_financial_type cft
 LEFT JOIN civicrm_entity_financial_account ceft
-ON ceft.entity_id = cft.id AND ceft.account_relationship = 5 AND ceft.entity_table = 'civicrm_financial_type' 
+ON ceft.entity_id = cft.id AND ceft.account_relationship = @option_value_rel_id_exp AND ceft.entity_table = 'civicrm_financial_type' 
 WHERE ceft.entity_id IS NULL;
+
+UPDATE  civicrm_financial_trxn cft
+INNER JOIN civicrm_entity_financial_trxn ceft ON ceft.financial_trxn_id = cft .id
+INNER JOIN civicrm_entity_financial_trxn ceft1 ON ceft1.financial_trxn_id = cft .id
+INNER JOIN civicrm_financial_item cfi ON cfi.id = ceft1.entity_id
+INNER JOIN civicrm_contribution cc ON cc.id = ceft.entity_id
+INNER JOIN civicrm_entity_financial_account cefa ON cefa.entity_id = cc.financial_type_id
+SET cft.to_financial_account_id = cefa.financial_account_id
+WHERE ceft.entity_table = 'civicrm_contribution' AND ceft1.entity_table = 'civicrm_financial_item' AND cfi.entity_table = 'civicrm_financial_trxn' AND cft.to_financial_account_id IS NULL AND cefa.entity_table = 'civicrm_financial_type' AND cefa.account_relationship = @option_value_rel_id_exp;
