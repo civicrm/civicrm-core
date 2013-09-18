@@ -34,7 +34,10 @@ cj(function ($) {
   });
 
   $('.clear-image').click(function(){
-    $('#' + $(this).attr('imgname')).val('');
+    var imgName = $(this).attr('imgname');
+    $('#' + imgName).val('');
+    $('#width_' + imgName).val('');
+    $('#height_' + imgName).val('');
     return false;
   });
 });
