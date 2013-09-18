@@ -3030,6 +3030,19 @@ div.ui-dialog {
   overflow: visible;
 }
 
+/* Date plugin for profile in edit mode */
+.ui-dialog input.dateplugin {
+  background: white url(../i/cal.gif) no-repeat scroll right center;
+  padding-right: 16px;
+  /* so that text doesn't flow on top of icon */
+  width: 9em;
+}
+
+/* Date plugin for profile in edit mode */
+.ui-dialog div.batch-update {
+  overflow: visible;
+}
+
 /* Help text in Send Mail*/
 #crm-container div.messageHelp {
   z-index: 1;
