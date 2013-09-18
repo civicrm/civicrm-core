@@ -53,10 +53,10 @@
         <td>&nbsp;</td>
         <td colspan="3">{$form.is_default.html}&nbsp;{$form.is_default.label}</td>
       </tr>
-      <tr class="crm-labelFormat-form-block-label_type">
+      <!--tr class="crm-labelFormat-form-block-label_type">
         <td class="right">{$form.label_type.label}</td>
         <td colspan="3">{$form.label_type.html}</td>
-      </tr>
+      </tr-->
       <tr>
         <td class="right">{$form.paper_size.label}</td>
         <td>{$form.paper_size.html}</td>
