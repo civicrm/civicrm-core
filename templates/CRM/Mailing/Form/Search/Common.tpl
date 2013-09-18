@@ -35,6 +35,16 @@
   <br />
   {$form.mailing_bounce_types.label}
   {$form.mailing_bounce_types.html}
+  {literal}
+    <script type="text/javascript">
+      cj("select#mailing_bounce_types").crmasmSelect({
+        addItemTarget: 'bottom',
+        animate: false,
+        highlight: true,
+        sortable: true
+      });
+    </script>
+   {/literal}
   </td>
   <td>
   {$form.mailing_open_status.label}

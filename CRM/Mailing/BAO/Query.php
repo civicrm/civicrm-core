@@ -382,7 +382,9 @@ class CRM_Mailing_BAO_Query {
       'CRM_Mailing_Event_DAO_Bounce', 'bounce_type_id',
       array('keyColumn' => 'id', 'labelColumn' => 'name')
     );
-    $form->add('select', 'mailing_bounce_types', ts('Bounce Types'), $mailingBounceTypes, FALSE, array('multiple' => 'multiple'));
+    $form->add('select', 'mailing_bounce_types', ts('Bounce Types'), $mailingBounceTypes, FALSE,
+      array('id' => 'mailing_bounce_types', 'multiple' => 'multiple', 'title' => ts('- select -'))
+    );
 
     // event filters
     $form->addRadio('mailing_delivery_status', ts('Delivery Status'), CRM_Mailing_PseudoConstant::yesNoOptions('delivered'));
