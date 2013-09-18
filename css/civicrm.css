@@ -3031,7 +3031,7 @@ div.ui-dialog {
 }
 
 /* Date plugin for profile in edit mode */
-.ui-dialog input.dateplugin {
+.crm-container-snippet input.dateplugin {
   background: white url(../i/cal.gif) no-repeat scroll right center;
   padding-right: 16px;
   /* so that text doesn't flow on top of icon */
@@ -3039,7 +3039,7 @@ div.ui-dialog {
 }
 
 /* Date plugin for profile in edit mode */
-.ui-dialog div.batch-update {
+.crm-container-snippet div.batch-update {
   overflow: visible;
 }
 
