@@ -179,7 +179,7 @@ class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_
     $this->addDateTime('start_date', ts('Start Date'));
     $this->addDateTime('end_date', ts('End Date'));
 
-    $this->addFormRule(array('CRM_Contribute_Form_ContributionPage_Settings', 'formRule'), $this->_id);
+    $this->addFormRule(array('CRM_Contribute_Form_ContributionPage_Settings', 'formRule'), $this);
 
     parent::buildQuickForm();
   }
@@ -193,9 +193,9 @@ class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_
    * @static
    * @access public
    */
-  static function formRule($values, $files, $contributionPageId) {
+  static function formRule($values, $files, $self) {
     $errors = array();
-
+    $contributionPageId = $self->_id;
     //CRM-4286
     if (strstr($values['title'], '/')) {
       $errors['title'] = ts("Please do not use '/' in Title");
@@ -213,7 +213,12 @@ class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_
     if (($end < $start) && ($end != 0)) {
       $errors['end_date'] = ts('End date should be after Start date.');
     }
-
+    
+    if (CRM_Utils_Array::value('payment_processor', $self->_values) 
+      && $financialType = CRM_Contribute_BAO_Contribution::validateFinancialType($values['financial_type_id'])) {
+      $errors['financial_type_id'] = ts("Financial Account of account relationship of 'Expense Account is' is not configured for Financial Type : ") . $financialType;  
+    }
+    
     //dont allow on behalf of save when
     //pre or post profile consists of membership fields
     if ($contributionPageId && CRM_Utils_Array::value('is_organization', $values)) {
@@ -234,7 +239,7 @@ class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_
           $conProfileType = "'Includes Profile (top of page)'";
         }
       }
-
+            
       if ($contributionProfiles['custom_post_id']) {
         $postProfileType = CRM_Core_BAO_UFField::getProfileType($contributionProfiles['custom_post_id']);
         if ($postProfileType == 'Membership') {
