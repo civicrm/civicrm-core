@@ -976,17 +976,9 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     }
 
     //FIXME FOR NEW DATA FLOW http://wiki.civicrm.org/confluence/display/CRM/CiviAccounts+4.3+Data+Flow
-    if (CRM_Utils_Array::value('fee_amount', $fields)) {
-      $financialAccount = array();
-      CRM_Core_PseudoConstant::populate($financialAccount,
-        'CRM_Financial_DAO_EntityFinancialAccount',
-        $all = TRUE,
-        $retrieve = 'financial_account_id',
-        $filter = NULL,
-        " account_relationship = 5 AND entity_id = {$fields['financial_type_id']} ");
-      if (!current($financialAccount)) {
-        $errors['financial_type_id'] = ts("Financial Account of account relationship of 'Expense Account is' is not configured for this Financial Type");
-      }
+     if (CRM_Utils_Array::value('fee_amount', $fields) 
+      && $financialType = CRM_Contribute_BAO_Contribution::validateFinancialType($fields['financial_type_id'])) {
+      $errors['financial_type_id'] = ts("Financial Account of account relationship of 'Expense Account is' is not configured for Financial Type : ") . $financialType;  
     }
     return $errors;
   }
