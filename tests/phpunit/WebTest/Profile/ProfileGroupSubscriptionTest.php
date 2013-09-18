@@ -54,7 +54,7 @@ class WebTest_Profile_ProfileGroupSubscriptionTest extends CiviSeleniumTestCase 
     //Proximity search options
     $this->click('CIVICRM_QFID_0_14');
 
-    // enable maping for contact
+    // enable mapping for contact
     $this->click('is_map');
 
     // include a link in the listings to Edit profile fields
@@ -104,9 +104,9 @@ class WebTest_Profile_ProfileGroupSubscriptionTest extends CiviSeleniumTestCase 
     $this->assertElementContainsText('crm-profile-block', 'Group(s)', "Groups field was not found.");
 
     //fill the subscription form
-    $radomEmail = substr(sha1(rand()), 0, 7) . "@example.com";
+    $randomEmail = substr(sha1(rand()), 0, 7) . "@example.com";
 
-    $this->type("email-Primary", $radomEmail);
+    $this->type("email-Primary", $randomEmail);
 
     // check advisory group ( may be we should create a separate group to test this)
     $this->click("group_3");
@@ -116,7 +116,7 @@ class WebTest_Profile_ProfileGroupSubscriptionTest extends CiviSeleniumTestCase 
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     // assert for subscription message
-    $this->waitForText('messages', "Your subscription request has been submitted for group ",
+    $this->assertElementContainsText('css=div.messages', "Your subscription request has been submitted for",
       "Subscription message is not shown");
 
     //check if profile is saved
