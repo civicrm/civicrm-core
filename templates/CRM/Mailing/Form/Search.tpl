@@ -41,6 +41,9 @@
     <tr>
         <td colspan="1">{$form.sort_name.label}<br />
             {$form.sort_name.html|crmAddClass:big} {help id="id-create_sort_name"}
+            <br/><br/>
+            {$form.is_archived.label}<br/>
+            {$form.is_archived.html}
         </td>
         {if $form.mailing_status}
            <td width="100%"><label>{if $sms eq 1}{ts}SMS Status{/ts}{else}{ts}Mailing Status{/ts}{/if}</label><br />
@@ -51,7 +54,7 @@
              </div>
             {/foreach}
             <div class='odd-row'>
-              {$form.all_status.html}
+              {$form.status_unscheduled.html}
             </div>
            </div><br />
            </td>

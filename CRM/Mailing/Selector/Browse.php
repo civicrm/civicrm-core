@@ -432,7 +432,6 @@ LEFT JOIN  civicrm_contact scheduledContact ON ( $mailing.scheduled_id = schedul
 
   function whereClause(&$params, $sortBy = TRUE) {
     $values = $clauses = array();
-
     $title = $this->_parent->get('mailing_name');
 
     if ($title) {
@@ -445,6 +444,7 @@ LEFT JOIN  civicrm_contact scheduledContact ON ( $mailing.scheduled_id = schedul
       }
     }
 
+    $dateClause1 = $dateClause2 = array();
     $from = $this->_parent->get('mailing_from');
     if (!CRM_Utils_System::isNull($from)) {
       if ($this->_parent->get('unscheduled')) {
@@ -469,77 +469,47 @@ LEFT JOIN  civicrm_contact scheduledContact ON ( $mailing.scheduled_id = schedul
       $params[3]     = array($to, 'String');
     }
 
-    $addtlStatuses = $this->_parent->get('archived') ? ", 'Canceled'" : '';
+    $dateClauses = array();
     if (!empty($dateClause1)) {
-      if (!$this->_parent->get('unscheduled')) {
-        $dateClause1[] = "civicrm_mailing_job.status IN ('Complete', 'Running' $addtlStatuses)";
-        $dateClause2[] = "civicrm_mailing_job.status IN ('Scheduled' $addtlStatuses)";
-      }
-
-      if (!empty($dateClause1)) {
-        $dateClause1   = implode(' AND ', $dateClause1);
-      }
-      if (!empty($dateClause2)) {
-        $dateClause2   = implode(' AND ', $dateClause2);
-      }
-
-      $dateC = NULL;
-      if (!empty($dateClause1)) {
-        $dateC = " ({$dateClause1}) ";
-      }
-      if (!empty($dateClause2)) {
-        if ($dateC) {
-          $dateC .= " OR ({$dateClause2}) ";
-        }
-        else {
-          $dateC = " ({$dateClause2}) ";
-        }
-      }
-      $clauses[] = " ({$dateC}) ";
+      $dateClauses[] = implode(' AND ', $dateClause1);
+    }
+    if (!empty($dateClause2)) {
+      $dateClauses[] = implode(' AND ', $dateClause2);
+    }
+    $dateClauses = implode(' OR ', $dateClauses);
+    if (!empty($dateClauses)) {
+      $clauses[] = "({$dateClauses})";
     }
 
-    if ($this->_parent->get('unscheduled')) {
-      $clauses[] = "civicrm_mailing_job.status is null";
+    if ($this->_parent->get('status_unscheduled')) {
+      $clauses[] = "civicrm_mailing_job.status IS NULL";
       $clauses[] = "civicrm_mailing.scheduled_id IS NULL";
     }
 
     if ($this->_parent->get('sms')) {
-      $clauses[] = "(civicrm_mailing.sms_provider_id IS NOT NULL)";
+      $clauses[] = "civicrm_mailing.sms_provider_id IS NOT NULL";
     }
     else {
-      $clauses[] = "(civicrm_mailing.sms_provider_id IS NULL)";
+      $clauses[] = "civicrm_mailing.sms_provider_id IS NULL";
     }
+
+    $mailingStatus = $this->_parent->get('mailing_status');
 
     // CRM-4290, do not show archived or unscheduled mails
     // on 'Scheduled and Sent Mailing' page selector
-    if ($this->_parent->get('scheduled')) {
+    if (!empty($mailingStatus)) {
       $clauses[] = "civicrm_mailing.scheduled_id IS NOT NULL";
-      $clauses[] = "( civicrm_mailing.is_archived IS NULL OR civicrm_mailing.is_archived = 0 )";
+      $clauses[] = "civicrm_mailing.scheduled_id IN ('" . implode("', '", array_keys($mailingStatus)) . "')";
     }
-    if (!$this->_parent->get('unscheduled')) {
 
-      // all status filter implementation
-      if ($status = $this->_parent->get('mailing_status')) {
-        $status = array_keys($status);
+    $isArchived = $this->_parent->get('is_archived');
+    if (isset($isArchived)) {
+      if ($isArchived) {
+        // CRM-6446: archived view should also show cancelled mailings
+        $clauses[] = "(civicrm_mailing.is_archived = 1 OR civicrm_mailing_job.status = 'Canceled')";
+      } else {
+        $clauses[] = "(civicrm_mailing.is_archived IS NULL OR civicrm_mailing.is_archived = 0)";
       }
-      if ($this->_parent->get('all_status')) {
-        $status = $this->_parent->get('allStatuses');
-      }
-      if ($this->_parent->get('all_status') && $this->_parent->get('scheduled')) {
-        $status = array('Scheduled', 'Complete', 'Running');
-      }
-
-      if (!empty($status)) {
-        $status    = implode("','", $status);
-        $clauses[] = "civicrm_mailing_job.status IN ('$status')";
-      }
-      elseif ($this->_parent->get('scheduled')) {
-        $clauses[] = "civicrm_mailing_job.status IN ('Scheduled', 'Complete', 'Running')";
-      }
-    }
-    if ($this->_parent->get('archived')) {
-      // CRM-6446: archived view should also show cancelled mailings
-      $clauses[] = "(civicrm_mailing.is_archived = 1 OR civicrm_mailing_job.status = 'Canceled')";
     }
 
     if ($sortBy &&

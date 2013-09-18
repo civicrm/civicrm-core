@@ -54,14 +54,13 @@ class CRM_Mailing_Form_Search extends CRM_Core_Form {
 
     CRM_Campaign_BAO_Campaign::addCampaignInComponentSearch($this);
 
-    if (!$parent->get('unscheduled')) {
-      $statusVals = array('Scheduled', 'Complete', 'Running', 'Canceled');
-      $parent->set('allStatuses', $statusVals);
-      foreach ($statusVals as $status) {
-        $this->addElement('checkbox', "mailing_status[$status]", NULL, $status);
-      }
-      $this->addElement('checkbox', 'all_status', NULL, 'All Statuses');
+    $statusVals = array('Scheduled', 'Complete', 'Running', 'Canceled');
+    foreach ($statusVals as $status) {
+      $this->addElement('checkbox', "mailing_status[$status]", NULL, $status);
     }
+    $this->addElement('checkbox', 'status_unscheduled', NULL, 'Draft / Unscheduled');
+    $this->addYesNo('is_archived', ts('Mailing is Archived'));
+
     if ($parent->_sms) {
       $this->addElement('hidden', 'sms', $parent->_sms);
     }
@@ -79,9 +78,20 @@ class CRM_Mailing_Form_Search extends CRM_Core_Form {
     $defaults = array();
     $parent = $this->controller->getParent();
 
-    $statusVals = array('Scheduled', 'Complete', 'Running', 'Canceled');
-    foreach ($statusVals as $status) {
-      $defaults['mailing_status'][$status] = 1;
+    if ($parent->get('unscheduled')) {
+      $defaults['status_unscheduled'] = 1;
+    }
+
+    if ($parent->get('scheduled')) {
+      $statusVals = array('Scheduled', 'Complete', 'Running', 'Canceled');
+      foreach ($statusVals as $status) {
+        $defaults['mailing_status'][$status] = 1;
+      }
+      $defaults['is_archived'] = 0;
+    }
+
+    if ($parent->get('archived')) {
+      $defaults['is_archived'] = 1;
     }
 
     if ($parent->_sms) {
@@ -97,7 +107,8 @@ class CRM_Mailing_Form_Search extends CRM_Core_Form {
 
     $parent = $this->controller->getParent();
     if (!empty($params)) {
-      $fields = array('mailing_name', 'mailing_from', 'mailing_to', 'sort_name', 'campaign_id', 'mailing_status', 'sms', 'all_status');
+      $fields = array('mailing_name', 'mailing_from', 'mailing_to', 'sort_name', 
+                'campaign_id', 'mailing_status', 'sms', 'status_unscheduled', 'is_archived');
       foreach ($fields as $field) {
         if (isset($params[$field]) &&
           !CRM_Utils_System::isNull($params[$field])
