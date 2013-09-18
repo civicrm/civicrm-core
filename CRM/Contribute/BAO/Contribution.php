@@ -3018,4 +3018,23 @@ WHERE  contribution_id = %1 ";
       self::deleteContribution($contribution->id);
     }
   }
+  /**
+   * Function to validate financial type
+   *
+   * CRM-13231
+   *
+   * @param integer $financialTypeId Financial Type id 
+   *
+   * @access public
+   * @static
+   */
+  static function validateFinancialType($financialTypeId, $relationName = 'Expense Account is') {
+    $expenseTypeId = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE '{$relationName}' "));
+    $financialAccount = CRM_Contribute_PseudoConstant::financialAccountType($financialTypeId, $expenseTypeId);
+
+    if (!$financialAccount) {
+      return CRM_Contribute_PseudoConstant::financialType($financialTypeId);
+    }
+    return FALSE;
+  }
 }
