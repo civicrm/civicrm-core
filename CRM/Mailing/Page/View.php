@@ -135,9 +135,14 @@ class CRM_Mailing_Page_View extends CRM_Core_Page {
       TRUE, $details, $attachments
     );
 
+    $title = NULL;
     if (isset($this->_mailing->body_html)) {
+      
       $header = 'Content-Type: text/html; charset=utf-8';
       $content = $mime->getHTMLBody();
+      if (strpos($content, '<head>') === FALSE && strpos($content, '<title>') === FALSE) {
+        $title = '<head><title>' . $this->_mailing->subject . '</title></head>';
+      }
     }
     else {
       $header = 'Content-Type: text/plain; charset=utf-8';
@@ -146,6 +151,7 @@ class CRM_Mailing_Page_View extends CRM_Core_Page {
 
     if ($print) {
       header($header);
+      print $title;
       print $content;
       CRM_Utils_System::civiExit();
     }
