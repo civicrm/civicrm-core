@@ -88,6 +88,8 @@ class CRM_Admin_Form_LabelFormats extends CRM_Admin_Form {
     $this->add('text', 'description', ts('Description'), array('size' => CRM_Utils_Type::HUGE));
     $this->add('checkbox', 'is_default', ts('Is this Label Format the default?'));
 
+    // currently we support only mailing label creation, hence comment below code
+    /*
     $options = array(
       'label_format' => ts('Mailing Label'),
       'name_badge'   => ts('Name Badge'),
@@ -98,6 +100,7 @@ class CRM_Admin_Form_LabelFormats extends CRM_Admin_Form {
     if ($this->_action != CRM_Core_Action::ADD) {
       $labelType->freeze();
     }
+    */
 
     $this->add('select', 'paper_size', ts('Sheet Size'),
       array(
@@ -208,6 +211,10 @@ class CRM_Admin_Form_LabelFormats extends CRM_Admin_Form {
     }
 
     $values = $this->controller->exportValues($this->getName());
+
+    // since we currently support only mailing label format
+    $values['label_type'] = 'label_format';
+
     $values['is_default'] = isset($values['is_default']);
 
     // Restore field names that were converted because they are illegal PHP/SMARTY variable names
