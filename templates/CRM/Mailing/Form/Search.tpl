@@ -41,6 +41,12 @@
     <tr>
         <td colspan="1">{$form.sort_name.label}<br />
             {$form.sort_name.html|crmAddClass:big} {help id="id-create_sort_name"}
+            <br/><br/>
+            <div class="crm-search-form-block-is_archive">
+            {$form.is_archived.label}<br/>
+            {$form.is_archived.html}
+            <span class="crm-clear-link">(<a href="#r">{ts}clear{/ts}</a>)</span>
+            </div>
         </td>
         {if $form.mailing_status}
            <td width="100%"><label>{if $sms eq 1}{ts}SMS Status{/ts}{else}{ts}Mailing Status{/ts}{/if}</label><br />
@@ -51,7 +57,7 @@
              </div>
             {/foreach}
             <div class='odd-row'>
-              {$form.all_status.html}
+              {$form.status_unscheduled.html}
             </div>
            </div><br />
            </td>
@@ -67,3 +73,52 @@
     </tr>
 </table>
 </div>
+
+{literal}
+<script type="text/javascript">
+  cj(document).ready( function( ) {
+    var statusBoxes = cj(":checkbox[name^='mailing_status[']");
+    var archiveOption = cj("input[name^='is_archived']:radio");
+    statusBoxes.each(function() {
+      cj(this).change(function() {
+        if (cj(":checkbox[name^='mailing_status[']:checked").length > 0) {
+          disableDraft();
+        } else if (cj("input[name^='is_archived']:radio:checked").length <= 0) {
+          cj('#status_unscheduled').attr('readonly',false);
+        }
+      }).trigger('change');
+    });
+    cj('#status_unscheduled').change(function() {
+      if (cj(this).prop('checked') ) {
+        statusBoxes.each(function() {
+          cj(this).attr('checked',false);
+          cj(this).attr('readonly',true);
+          archiveOption.attr('checked',false);
+          archiveOption.attr('readonly',true);
+        });
+      } else {
+        statusBoxes.each(function() {
+          cj(this).attr('readonly',false);
+          archiveOption.attr('readonly',false);
+        });
+      }
+    }).trigger('change');
+    archiveOption.change(function() {
+      if (cj("input[name^='is_archived']:radio:checked").length) {
+        disableDraft();
+      }
+    }).trigger('change');
+    cj(".crm-search-form-block-is_archive .crm-clear-link a").click(function() {
+      archiveOption.attr('checked',false);
+      if (cj(":checkbox[name^='mailing_status[']:checked").length <= 0) { 
+        cj('#status_unscheduled').attr('readonly',false); 
+      }
+    });
+  });
+
+  function disableDraft() {
+    cj('#status_unscheduled').attr('checked',false); 
+    cj('#status_unscheduled').attr('readonly',true); 
+  } 
+</script>
+{/literal}
