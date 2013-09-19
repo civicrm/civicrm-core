@@ -64,6 +64,7 @@ class CRM_Mailing_Form_Search extends CRM_Core_Form {
     if ($parent->_sms) {
       $this->addElement('hidden', 'sms', $parent->_sms);
     }
+    $this->add('hidden', 'hidden_find_mailings', 1);
 
     $this->addButtons(array(
         array(
@@ -108,7 +109,7 @@ class CRM_Mailing_Form_Search extends CRM_Core_Form {
     $parent = $this->controller->getParent();
     if (!empty($params)) {
       $fields = array('mailing_name', 'mailing_from', 'mailing_to', 'sort_name', 
-                'campaign_id', 'mailing_status', 'sms', 'status_unscheduled', 'is_archived');
+                'campaign_id', 'mailing_status', 'sms', 'status_unscheduled', 'is_archived', 'hidden_find_mailings');
       foreach ($fields as $field) {
         if (isset($params[$field]) &&
           !CRM_Utils_System::isNull($params[$field])

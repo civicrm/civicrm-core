@@ -432,8 +432,9 @@ LEFT JOIN  civicrm_contact scheduledContact ON ( $mailing.scheduled_id = schedul
 
   function whereClause(&$params, $sortBy = TRUE) {
     $values = $clauses = array();
-    $title = $this->_parent->get('mailing_name');
+    $isFormSubmitted   = $this->_parent->get('hidden_find_mailings');
 
+    $title = $this->_parent->get('mailing_name');
     if ($title) {
       $clauses[] = 'name LIKE %1';
       if (strpos($title, '%') !== FALSE) {
@@ -481,11 +482,6 @@ LEFT JOIN  civicrm_contact scheduledContact ON ( $mailing.scheduled_id = schedul
       $clauses[] = "({$dateClauses})";
     }
 
-    if ($this->_parent->get('status_unscheduled')) {
-      $clauses[] = "civicrm_mailing_job.status IS NULL";
-      $clauses[] = "civicrm_mailing.scheduled_id IS NULL";
-    }
-
     if ($this->_parent->get('sms')) {
       $clauses[] = "civicrm_mailing.sms_provider_id IS NOT NULL";
     }
@@ -493,16 +489,37 @@ LEFT JOIN  civicrm_contact scheduledContact ON ( $mailing.scheduled_id = schedul
       $clauses[] = "civicrm_mailing.sms_provider_id IS NULL";
     }
 
+    // get values submitted by form
+    $isDraft       = $this->_parent->get('status_unscheduled');
+    $isArchived    = $this->_parent->get('is_archived');
     $mailingStatus = $this->_parent->get('mailing_status');
+
+    if (!$isFormSubmitted && $this->_parent->get('scheduled')) {
+      // mimic default behavior for scheduled screen
+      $isArchived = 0;
+      $mailingStatus = array('Scheduled' => 1, 'Complete' => 1, 'Running' => 1, 'Canceled' => 1);
+    }
+    if (!$isFormSubmitted && $this->_parent->get('archived')) {
+      // mimic default behavior for archived screen
+      $isArchived = 1;
+    }
+    if (!$isFormSubmitted && $this->_parent->get('unscheduled')) {
+      // mimic default behavior for draft screen
+      $isDraft = 1;
+    }
+
+    if ($isDraft) {
+      $clauses[] = "civicrm_mailing_job.status IS NULL";
+      $clauses[] = "civicrm_mailing.scheduled_id IS NULL";
+    }
 
     // CRM-4290, do not show archived or unscheduled mails
     // on 'Scheduled and Sent Mailing' page selector
     if (!empty($mailingStatus)) {
       $clauses[] = "civicrm_mailing.scheduled_id IS NOT NULL";
-      $clauses[] = "civicrm_mailing.scheduled_id IN ('" . implode("', '", array_keys($mailingStatus)) . "')";
+      $clauses[] = "civicrm_mailing_job.status IN ('" . implode("', '", array_keys($mailingStatus)) . "')";
     }
 
-    $isArchived = $this->_parent->get('is_archived');
     if (isset($isArchived)) {
       if ($isArchived) {
         // CRM-6446: archived view should also show cancelled mailings
