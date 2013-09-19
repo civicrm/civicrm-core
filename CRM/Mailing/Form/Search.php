@@ -76,23 +76,22 @@ class CRM_Mailing_Form_Search extends CRM_Core_Form {
   }
 
   function setDefaultValues() {
-    $defaults = array();
+    $defaults = $statusVals = array();
     $parent = $this->controller->getParent();
 
     if ($parent->get('unscheduled')) {
       $defaults['status_unscheduled'] = 1;
     }
-
     if ($parent->get('scheduled')) {
       $statusVals = array('Scheduled', 'Complete', 'Running', 'Canceled');
-      foreach ($statusVals as $status) {
-        $defaults['mailing_status'][$status] = 1;
-      }
       $defaults['is_archived'] = 0;
     }
-
     if ($parent->get('archived')) {
+      $statusVals = array('Scheduled', 'Complete', 'Running', 'Canceled');
       $defaults['is_archived'] = 1;
+    }
+    foreach ($statusVals as $status) {
+      $defaults['mailing_status'][$status] = 1;
     }
 
     if ($parent->_sms) {
