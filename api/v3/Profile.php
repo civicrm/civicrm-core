@@ -295,7 +295,10 @@ function _civicrm_api3_profile_submit_spec(&$params, $apirequest) {
     // we don't resolve state, country & county for performance reasons
     $resolveOptions = CRM_Utils_Array::value('get_options',$apirequest['params']) == 'all' ? True : False;
     $profileID = _civicrm_api3_profile_getProfileID($apirequest['params']['profile_id']);
-    $params = _civicrm_api3_buildprofile_submitfields($profileID, $resolveOptions);
+    $params = _civicrm_api3_buildprofile_submitfields($profileID, $resolveOptions, CRM_Utils_Array::value('cache_clear', $params));
+  }
+  elseif (isset($apirequest['params']['cache_clear'])) {
+    _civicrm_api3_buildprofile_submitfields(FALSE, FALSE, True);
   }
   $params['profile_id']['api.required'] = TRUE;
 }
@@ -451,10 +454,19 @@ function _civicrm_api3_profile_getbillingpseudoprofile(&$params) {
  *
  * @param integer $profileID
  * @param integer $optionsBehaviour 0 = don't resolve, 1 = resolve non-aggressively, 2 = resolve aggressively - ie include country & state
+ * @param $params
+ *
+ * @return
  */
 
-function _civicrm_api3_buildprofile_submitfields($profileID, $optionsBehaviour = 1) {
+function _civicrm_api3_buildprofile_submitfields($profileID, $optionsBehaviour = 1, $is_flush) {
   static $profileFields = array();
+  if($is_flush) {
+    $profileFields = array();
+    if(empty($profileID)) {
+      return;
+    }
+  }
   if(isset($profileFields[$profileID])) {
     return $profileFields[$profileID];
   }
@@ -537,29 +549,29 @@ function _civicrm_api3_buildprofile_submitfields($profileID, $optionsBehaviour =
  *
  */
 function _civicrm_api3_map_profile_fields_to_entity(&$field) {
-  $entity = $field['field_type'];
+  $entity = _civicrm_api_get_entity_name_from_camel($field['field_type']);
   $contactTypes = civicrm_api3('contact', 'getoptions', array('field' => 'contact_type'));
-  $locationFields = array('email' => 'Email');
+  $locationFields = array('email' => 'email');
   if(in_array($entity, $contactTypes['values'])) {
-    $entity = 'Contact';
+    $entity = 'contact';
   }
   $fieldName = $field['field_name'];
   if(!empty($field['location_type_id'])) {
     if($fieldName == 'email') {
-      $entity = 'Email';
+      $entity = 'email';
     }
     else{
-      $entity = 'Address';
+      $entity = 'address';
     }
     $fieldName .= '-' . $field['location_type_id'];
   }
   elseif(array_key_exists($fieldName, $locationFields)) {
     $fieldName .= '-Primary';
-    $entity = 'Email';
+    $entity = 'email';
   }
   if(!empty($field['phone_type_id'])) {
     $fieldName .= '-' . $field['location_type_id'];
-    $entity = 'Phone';
+    $entity = 'phone';
   }
 
   // @todo - sort this out!
@@ -568,29 +580,29 @@ function _civicrm_api3_map_profile_fields_to_entity(&$field) {
   // in a perfect world the uf_field table would hold the correct entity for each item
   // & only the relationships between entities would need to be coded
   $hardCodedEntityMappings = array(
-    'street_address' => 'Address',
-    'street_number' => 'Address',
-    'supplemental_address_1' => 'Address',
-    'supplemental_address_2' => 'Address',
-    'supplemental_address_3' => 'Address',
-    'postal_code' => 'Address',
-    'city' => 'Address',
-    'email' => 'Email',
-    'state_province' => 'Address',
-    'country' => 'Address',
-    'county' => 'Address',
+    'street_address' => 'address',
+    'street_number' => 'address',
+    'supplemental_address_1' => 'address',
+    'supplemental_address_2' => 'address',
+    'supplemental_address_3' => 'address',
+    'postal_code' => 'address',
+    'city' => 'address',
+    'email' => 'email',
+    'state_province' => 'address',
+    'country' => 'address',
+    'county' => 'address',
     //note that in discussions about how to restructure the api we discussed making these membership
     // fields into 'membership_payment' fields - which would entail declaring them in getfields
     // & renaming them in existing profiles
-    'financial_type' => 'Contribution',
-    'total_amount' => 'Contribution',
-    'receive_date' => 'Contribution',
-    'payment_instrument' => 'Contribution',
-    'check_number' => 'Contribution',
-    'contribution_status_id' => 'Contribution',
-    'soft_credit' => 'Contribution',
-    'group' => 'GroupContact',
-    'tag' => 'EntityTag',
+    'financial_type' => 'contribution',
+    'total_amount' => 'contribution',
+    'receive_date' => 'contribution',
+    'payment_instrument' => 'contribution',
+    'check_number' => 'contribution',
+    'contribution_status_id' => 'contribution',
+    'soft_credit' => 'contribution',
+    'group' => 'group_contact',
+    'tag' => 'entity_tag',
    );
   if(array_key_exists($fieldName, $hardCodedEntityMappings)) {
     $entity = $hardCodedEntityMappings[$fieldName];
@@ -633,7 +645,7 @@ function _civicrm_api3_profile_appendaliases($values, $entity) {
     }
   }
   //special case on membership & contribution - can't see how to handle in a generic way
-  if(in_array($entity, array('Membership', 'Contribution'))) {
+  if(in_array($entity, array('membership', 'contribution'))) {
     $values['send_receipt'] = array('title' => 'Send Receipt', 'type' => (int) 16);
   }
   return $values;

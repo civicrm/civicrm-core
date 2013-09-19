@@ -39,6 +39,8 @@ require_once 'tests/phpunit/CiviTest/CiviUnitTestCase.php';
 class api_v3_ProfileTest extends CiviUnitTestCase {
   protected $_apiversion;
   protected $_profileID = 0;
+  protected $_membershipTypeID;
+  protected $_contactID;
   function get_info() {
     return array(
       'name' => 'Profile Test',
@@ -54,6 +56,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
     $config->countryLimit[1] = 1013;
     $config->stateLimit[1] = 1013;
     $this->createLoggedInUser();
+    $this->_membershipTypeID = $this->membershipTypeCreate();
   }
 
   function tearDown() {
@@ -62,7 +65,10 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
       'civicrm_contact',
       'civicrm_phone',
       'civicrm_address',
+      'civicrm_membership',
+      'civicrm_contribution',
     ), TRUE);
+    $this->callAPISuccess('membership_type', 'delete', array('id' => $this->_membershipTypeID));
     // ok can't be bothered wring an api to do this & truncating is crazy
     CRM_Core_DAO::executeQuery(" DELETE FROM civicrm_uf_group WHERE id IN ($this->_profileID, 26)");
   }
@@ -672,10 +678,10 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
      ), $params
     );
 
-    $contactID = $this->individualCreate($contactParams);
+    $this->_contactID = $this->individualCreate($contactParams);
     $this->_createIndividualProfile();
     // expected result of above created profile with contact Id $contactId
-    $profileData[$contactID] = array(
+    $profileData[$this->_contactID] = array(
       'first_name' => 'abc1',
       'last_name' => 'xyz1',
       'email-primary' => 'abc1.xyz1@yahoo.com',
