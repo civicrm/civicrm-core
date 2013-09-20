@@ -87,7 +87,6 @@ class CRM_Mailing_Form_Search extends CRM_Core_Form {
       $defaults['is_archived'] = 0;
     }
     if ($parent->get('archived')) {
-      $statusVals = array('Scheduled', 'Complete', 'Running', 'Canceled');
       $defaults['is_archived'] = 1;
     }
     foreach ($statusVals as $status) {

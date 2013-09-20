@@ -508,22 +508,20 @@ LEFT JOIN  civicrm_contact scheduledContact ON ( $mailing.scheduled_id = schedul
       $isDraft = 1;
     }
 
+    $statusClauses = array();
     if ($isDraft) {
-      $clauses[] = "civicrm_mailing_job.status IS NULL";
-      $clauses[] = "civicrm_mailing.scheduled_id IS NULL";
+      $statusClauses[] = "civicrm_mailing.scheduled_id IS NULL";
     }
-
-    // CRM-4290, do not show archived or unscheduled mails
-    // on 'Scheduled and Sent Mailing' page selector
     if (!empty($mailingStatus)) {
-      $clauses[] = "civicrm_mailing.scheduled_id IS NOT NULL";
-      $clauses[] = "civicrm_mailing_job.status IN ('" . implode("', '", array_keys($mailingStatus)) . "')";
+      $statusClauses[] = "civicrm_mailing_job.status IN ('" . implode("', '", array_keys($mailingStatus)) . "')";
+    }
+    if (!empty($statusClauses)) {
+      $clauses[] = "(" . implode(' OR ', $statusClauses) . ")";
     }
 
     if (isset($isArchived)) {
       if ($isArchived) {
-        // CRM-6446: archived view should also show cancelled mailings
-        $clauses[] = "(civicrm_mailing.is_archived = 1 OR civicrm_mailing_job.status = 'Canceled')";
+        $clauses[] = "civicrm_mailing.is_archived = 1";
       } else {
         $clauses[] = "(civicrm_mailing.is_archived IS NULL OR civicrm_mailing.is_archived = 0)";
       }
