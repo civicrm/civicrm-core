@@ -44,7 +44,15 @@ class CRM_Tests_Runner {
 
   function connect_to_db() {
     if ($this->db == NULL) {
-      $this->db = new PDO($this->civicrm_db_settings->toPDODSN(array('no_database' => TRUE)), $this->civicrm_db_settings->username, $this->civicrm_db_settings->password);
+      try {
+        $this->db = new PDO($this->civicrm_db_settings->toPDODSN(array('no_database' => TRUE)), $this->civicrm_db_settings->username, $this->civicrm_db_settings->password);
+      } catch (PDOException $e) {
+        if ($e->getCode() != 1045) {
+          throw $e;
+        } else {
+          throw new Exception("Unable to login to the test database ({$this->civicrm_db_settings->database}) using user name '{$this->civicrm_db_settings->username}' and password '{$this->civicrm_db_settings->password}'. Please update the settings in {$this->settings_file_path} to point to the database you want to use.");
+        }
+      }
       $this->db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     }
     return $this->db;
