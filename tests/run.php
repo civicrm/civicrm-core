@@ -5,6 +5,12 @@ $civicrm_source_dir_path = dirname(__DIR__);
 $autoloader_path = implode(DIRECTORY_SEPARATOR, array('CRM', 'Core', 'ClassLoader.php'));
 require_once($autoloader_path);
 CRM_Core_ClassLoader::singleton()->register();
+
+$packages_path = CRM_Utils_Path::join($civicrm_source_dir_path, 'packages');
+if (!file_exists($packages_path)) {
+  system("git clone https://github.com/giant-rabbit/civicrm-packages.git packages");
+}
+
 require_once(CRM_Utils_Path::join($civicrm_source_dir_path, "packages", "optionparser", "lib", "OptionParser.php"));
 
 $option_parser = new OptionParser();
