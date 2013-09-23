@@ -42,7 +42,7 @@
             {ts 1=$docLink}This process may change your database structure and values. In case of emergency you may need to revert to a backup. For more detailed information, refer to the %1.{/ts}</p>
         <p>{ts}Click 'Upgrade Now' if you are ready to proceed. Otherwise click 'Cancel' to return to the CiviCRM home page.{/ts}</p>
         <input type="hidden" name="action" value="begin" />
-        <input type="submit" value="{ts}Upgrade Now{/ts}" name="upgrade" onclick="return confirm('{ts}Are you sure you are ready to upgrade now?{/ts}');" /> &nbsp;&nbsp;
+        <input type="submit" value="{ts}Upgrade Now{/ts}" name="upgrade" onclick="return confirm('{ts escape="js"}Are you sure you are ready to upgrade now?{/ts}');" /> &nbsp;&nbsp;
         <input type="button" value="{ts}Cancel{/ts}" onclick="window.location='{$cancelURL}';" />
     </form>
   </div>
@@ -53,18 +53,14 @@
       <div style="padding: 1em; background-color: rgba(255, 255, 255, 0.76);">
         <p>
           <img style="display:block; float:left; width:40px; margin-right:10px;" src="{$config->resourceBase}i/logo_lg.png">
-          {ts 1='http://civicrm.org/civicrm/profile/create?reset=1&gid=15'}
-          This release was made possible by contributions from people like <strong>you</strong>. <a href="%1" target="_blank">Register your site</a> to join the community.
-          {/ts}
+          {ts 1='http://civicrm.org/civicrm/profile/create?reset=1&gid=15'}This release was made possible by contributions from people like <strong>you</strong>. <a href="%1" target="_blank">Register your site</a> to join the community.{/ts}
         </p>
         <p>
-          {ts 1='http://civicrm.org/contribute' 2='http://civicrm.org/make-it-happen'}
-          If CiviCRM is useful to your organization, consider making a <a href="%1" target="_blank">monthly contribution</a>, or helping to <a href="%2" target="_blank">fund a proposed improvement</a>.
-          {/ts}
+          {ts 1='http://civicrm.org/contribute' 2='http://civicrm.org/make-it-happen'}If CiviCRM is useful to your organization, consider making a <a href="%1" target="_blank">monthly contribution</a>, or helping to <a href="%2" target="_blank">fund a proposed improvement</a>.{/ts}
         </p>
       </div>
       {if $afterUpgradeMessage}
-        <h3>Important Notes</h3>
+        <h3>{ts}Important Notes{/ts}</h3>
         <p>{$afterUpgradeMessage}</p>
       {/if}
       <p><a href="{crmURL p='civicrm/dashboard' q='reset=1'}" title="{ts}CiviCRM home page{/ts}" style="text-decoration: underline;">{ts}Return to CiviCRM home page.{/ts}</a></p>
