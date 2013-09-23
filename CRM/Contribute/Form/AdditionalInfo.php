@@ -506,6 +506,7 @@ class CRM_Contribute_Form_AdditionalInfo {
         'toName' => $contributorDisplayName,
         'toEmail' => $contributorEmail,
         'isTest' => $form->_mode == 'test',
+        'PDFFilename' => ts('receipt').'.pdf',
       )
     );
 
