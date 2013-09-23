@@ -298,7 +298,7 @@ ALTER TABLE {$tableName}
       // logging support: if we’re adding a column (but only then!) make sure the potential relevant log table gets a column as well
       if ($params['operation'] == 'add') {
         $logging = new CRM_Logging_Schema;
-        $logging->fixSchemaDifferencesFor($params['table_name'], array($params['name']), FALSE);
+        $logging->fixSchemaDifferencesFor($params['table_name'], array('ADD' => array($params['name'])), FALSE);
       }
     }
 

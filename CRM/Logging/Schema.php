@@ -200,9 +200,11 @@ AND    TABLE_NAME LIKE 'log_civicrm_%'
     // use the relevant lines from CREATE TABLE to add colums to the log table
     $create = $this->_getCreateQuery($table);
     foreach ((array('ADD', 'MODIFY')) as $alterType) {
-      foreach ($cols[$alterType] as $col) {
-        $line = $this->_getColumnQuery($col, $create);
-        CRM_Core_DAO::executeQuery("ALTER TABLE `{$this->db}`.log_$table {$alterType} {$line}");
+      if (!empty($cols[$alterType])) {
+        foreach ($cols[$alterType] as $col) {
+          $line = $this->_getColumnQuery($col, $create);
+          CRM_Core_DAO::executeQuery("ALTER TABLE `{$this->db}`.log_$table {$alterType} {$line}");
+        }
       }
     }
 
@@ -376,7 +378,7 @@ WHERE  table_schema IN ('{$this->db}', '{$civiDB}')";
     // wasn't deliberately modified by fixTimeStampAndNotNullSQL() method.
     foreach ($civiTableSpecs as $col => $colSpecs) {
       $specDiff = array_diff($civiTableSpecs[$col], $logTableSpecs[$col]);
-      if (!empty($specDiff) && $col != 'id') {
+      if (!empty($specDiff) && $col != 'id' && !array_key_exists($col, $diff['ADD'])) {
         // ignore 'id' column for any spec changes, to avoid any auto-increment mysql errors
         if ($civiTableSpecs[$col]['DATA_TYPE'] != $logTableSpecs[$col]['DATA_TYPE']) {
           // if data-type is different, surely consider the column 
