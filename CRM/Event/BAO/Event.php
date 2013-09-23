@@ -1092,7 +1092,7 @@ WHERE civicrm_event.is_active = 1
           'contactId' => $contactID,
           'isTest' => $isTest,
           'tplParams' => $tplParams,
-          'PDFFilename' => 'eventReceipt.pdf',
+          'PDFFilename' => ts('confirmation').'.pdf',
         );
 
         // address required during receipt processing (pdf and email receipt)
