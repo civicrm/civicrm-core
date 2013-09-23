@@ -749,6 +749,16 @@ abstract class CRM_Utils_Hook {
   }
 
   /**
+   * This hook is called when locating CiviCase types.
+   *
+   * @param array $caseTypes
+   * @return void
+   */
+  static function caseTypes(&$caseTypes) {
+    return self::singleton()->invoke(1, $caseTypes, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, 'civicrm_caseTypes');
+  }
+
+  /**
    * This hook is called soon after the CRM_Core_Config object has ben initialized.
    * You can use this hook to modify the config object and hence behavior of CiviCRM dynamically.
 
