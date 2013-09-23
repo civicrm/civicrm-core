@@ -862,7 +862,7 @@ ALTER TABLE civicrm_financial_account
     while ($dao->fetch()) {
       // FIXME civicrm_log.modified_date is DATETIME; civicrm_contact.modified_date is TIMESTAMP
       CRM_Core_DAO::executeQuery(
-        'UPDATE civicrm_contact SET created_date = %1, modified_date = %2 WHERE id = %3',
+        'UPDATE civicrm_contact SET created_date = FROM_UNIXTIME(UNIX_TIMESTAMP(%1)), modified_date = FROM_UNIXTIME(UNIX_TIMESTAMP(%2)) WHERE id = %3',
         array(
           1 => array($dao->created, 'String'),
           2 => array($dao->modified, 'String'),
