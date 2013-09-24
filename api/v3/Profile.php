@@ -454,7 +454,9 @@ function _civicrm_api3_profile_getbillingpseudoprofile(&$params) {
  *
  * @param integer $profileID
  * @param integer $optionsBehaviour 0 = don't resolve, 1 = resolve non-aggressively, 2 = resolve aggressively - ie include country & state
- * @param $params
+ * @param $is_flush
+ *
+ * @internal param $params
  *
  * @return
  */
@@ -516,20 +518,31 @@ function _civicrm_api3_buildprofile_submitfields($profileID, $optionsBehaviour =
     $result = civicrm_api3($entity, 'getfields', array('action' => 'create'));
     $entityGetFieldsResult = _civicrm_api3_profile_appendaliases($result['values'], $entity);
     foreach ($entityFields as $entityfield => $realName) {
-      $profileFields[$profileID][strtolower($entityfield)] = array_merge($profileFields[$profileID][$entityfield], $entityGetFieldsResult[$realName]);
+      $fieldName = strtolower($entityfield);
+      if(!stristr('-', $fieldName) && realName != $fieldName) {
+        // we want to keep the '-' pattern for locations but otherwise
+        // we are going to make the api-standard field the main / preferred name but support the db name
+        // in future naming the fields in the DB to reflect the way the rest of the api / BAO / metadata works would
+        // reduce code
+        $fieldName = $realName;
+      }
+      $profileFields[$profileID][$fieldName] = array_merge($profileFields[$profileID][$entityfield], $entityGetFieldsResult[$realName]);
       if($optionsBehaviour && !empty($entityGetFieldsResult[$realName]['pseudoconstant'])) {
         if($optionsBehaviour > 1  || !in_array($realName, array('state_province_id', 'county_id', 'country_id'))) {
           $options = civicrm_api3($entity, 'getoptions', array('field' => $realName));
-          $profileFields[$profileID][$entityfield]['options'] = $options['values'];
+          $profileFields[$profileID][$fieldName]['options'] = $options['values'];
         }
       }
 
-      if($entityfield != strtolower($entityfield)) {
-        // we will make the mixed case version (e.g. of 'Primary') an aliase
-        if(!isset($profileFields[$profileID][strtolower($entityfield)])) {
-          $profileFields[$profileID][strtolower($entityfield)]['api.aliases'] = array();
+      if($entityfield != $fieldName) {
+        if(isset($profileFields[$profileID][$entityfield])) {
+          unset($profileFields[$profileID][$entityfield]);
         }
-        $profileFields[$profileID][strtolower($entityfield)]['api.aliases'][] = $entityfield;
+        // we will make the mixed case version (e.g. of 'Primary') an alias
+        if(!isset($profileFields[$profileID][$fieldName]['api.aliases'])) {
+          $profileFields[$profileID][$fieldName]['api.aliases'] = array();
+        }
+        $profileFields[$profileID][$fieldName]['api.aliases'][] = $entityfield;
       }
       /**
        * putting this on hold -this would cause the api to set the default - but could have unexpected behaviour
@@ -549,12 +562,13 @@ function _civicrm_api3_buildprofile_submitfields($profileID, $optionsBehaviour =
  *
  */
 function _civicrm_api3_map_profile_fields_to_entity(&$field) {
-  $entity = _civicrm_api_get_entity_name_from_camel($field['field_type']);
+  $entity = $field['field_type'];
   $contactTypes = civicrm_api3('contact', 'getoptions', array('field' => 'contact_type'));
-  $locationFields = array('email' => 'email');
   if(in_array($entity, $contactTypes['values'])) {
     $entity = 'contact';
   }
+  $entity = _civicrm_api_get_entity_name_from_camel($entity);
+  $locationFields = array('email' => 'email');
   $fieldName = $field['field_name'];
   if(!empty($field['location_type_id'])) {
     if($fieldName == 'email') {

@@ -339,6 +339,9 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
       'get_options' => 'all')
     );
     $this->assertTrue(array_key_exists('total_amount', $result['values']));
+    $this->assertTrue(array_key_exists('financial_type_id', $result['values']));
+    $this->assertEquals(array('contribution_type_id', 'contribution_type', 'financial_type'), $result['values']['financial_type_id']['api.aliases']);
+    $this->assertTrue(!array_key_exists('financial_type', $result['values']));
     $this->assertEquals(12, $result['values']['receive_date']['type']);
   }
 
@@ -447,6 +450,37 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
     $this->assertEquals('my@mail.com', $profileDetails['values']['email-Primary']);
   }
 
+  /**
+   * Ensure caches are being cleared so we don't get into a debugging trap because of cached metadata
+   * First we delete & create to increment the version & then check for caching probs
+   */
+  function testProfileSubmitCheckCaching() {
+    $this->callAPISuccess('membership_type', 'delete', array('id' => $this->_membershipTypeID));
+    $this->_membershipTypeID = $this->membershipTypeCreate();
+
+    $membershipTypes = $this->callAPISuccess('membership_type', 'get', array());
+    $profileFields = $this->callAPISuccess('profile', 'getfields', array('get_options' => 'all', 'action' => 'submit', 'profile_id' => 'membership_batch_entry'));
+    $getoptions = $this->callAPISuccess('membership', 'getoptions', array('field' => 'membership_type', 'context' => 'validate'));
+    $this->assertEquals(array_keys($membershipTypes['values']), array_keys($getoptions['values']));
+    $this->assertEquals(array_keys($membershipTypes['values']), array_keys($profileFields['values']['membership_type']['options']));
+
+}
+  /**
+   * Check we can submit membership batch profiles (create mode)
+   */
+  function testProfileSubmitMembershipBatch() {
+    $this->_contactID = $this->individualCreate();
+    $this->callAPISuccess('profile', 'submit', array(
+     'profile_id' => 'membership_batch_entry',
+     'financial_type_id' => 1,
+     'membership_type' => $this->_membershipTypeID,
+     'join_date' => 'now',
+     'total_amount' => 10,
+     'contribution_status_id' => 1,
+     'receive_date' => 'now',
+     'contact_id' => $this->_contactID,
+    ));
+  }
   /**
    * set is deprecated but we need to ensure it still works
    */
