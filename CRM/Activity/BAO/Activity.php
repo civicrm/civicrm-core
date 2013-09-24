@@ -701,7 +701,7 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
     // this cannot be primary key because we need that for the auto_increment
     // fixed_sort_order field
     $sql .= "
-          UNIQUE KEY ( activity_id ) 
+          UNIQUE KEY ( activity_id )
         ) ENGINE=HEAP DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci
         ";
 
@@ -1149,6 +1149,7 @@ INNER JOIN civicrm_contact contact ON ac.contact_id = contact.id
    * @param string $cc           cc recipient
    * @param string $bcc          bcc recipient
    * @param array $contactIds    contact ids
+   * @param string $additionalDetails the additional information of CC and BCC appended to the activity Details
    *
    * @return array               ( sent, activityId) if any email is sent and activityId
    * @access public
@@ -1165,7 +1166,8 @@ INNER JOIN civicrm_contact contact ON ac.contact_id = contact.id
     $attachments = NULL,
     $cc          = NULL,
     $bcc         = NULL,
-    $contactIds // FIXME a param with no default shouldn't be last
+    $contactIds, // FIXME a param with no default shouldn't be last
+    $additionalDetails = NULL
   ) {
     // get the contact details of logged in contact, which we set as from email
     if ($userID == NULL) {
@@ -1200,10 +1202,11 @@ INNER JOIN civicrm_contact contact ON ac.contact_id = contact.id
 
     // CRM-6265: save both text and HTML parts in details (if present)
     if ($html and $text) {
-      $details = "-ALTERNATIVE ITEM 0-\n$html\n-ALTERNATIVE ITEM 1-\n$text\n-ALTERNATIVE END-\n";
+      $details = "-ALTERNATIVE ITEM 0-\n$html$additionalDetails\n-ALTERNATIVE ITEM 1-\n$text$additionalDetails\n-ALTERNATIVE END-\n";
     }
     else {
       $details = $html ? $html : $text;
+      $details .= $additionalDetails;
     }
 
     $activityParams = array(
