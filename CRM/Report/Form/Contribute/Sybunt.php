@@ -120,34 +120,9 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
           ),
         ),
       ),
-      'civicrm_address' =>
-      array(
-        'dao' => 'CRM_Core_DAO_Address',
-        'grouping' => 'contact-fields',
-        'fields' =>
-        array(
-          'street_address' => array('default' => TRUE),
-          'city' => array('default' => TRUE),
-          'postal_code' => NULL,
-          'state_province_id' => array('title' => ts('State/Province')),
-          'country_id' => array('title' => ts('Country')),
-        ),
-        'filters' =>
-        array(
-          'country_id' =>
-          array(
-            'title' => ts('Country'),
-            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => CRM_Core_PseudoConstant::country(),
-          ),
-          'state_province_id' =>
-          array(
-            'title' => ts('State / Province'),
-            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => CRM_Core_PseudoConstant::stateProvince(),
-          ),
-        ),
-      ),
+    )
+    + $this->addAddressFields()
+    + array(
       'civicrm_contribution' =>
       array(
         'dao' => 'CRM_Contribute_DAO_Contribution',
@@ -306,12 +281,7 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
                       ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_phone']}.contact_id AND
                          {$this->_aliases['civicrm_phone']}.is_primary = 1";
     }
-    if ($this->isTableSelected('civicrm_address')) {
-      $this->_from .= "
-              LEFT  JOIN civicrm_address {$this->_aliases['civicrm_address']}
-                      ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_address']}.contact_id AND
-                         {$this->_aliases['civicrm_address']}.is_primary = 1";
-    }
+    $this->addAddressFromClause();
   }
 
   function where() {
@@ -504,6 +474,8 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
   }
 
   function alterDisplay(&$rows) {
+    // custom code to alter rows
+    $entryFound = FALSE;
 
     foreach ($rows as $rowNum => $row) {
       //Convert Display name into link
@@ -516,6 +488,7 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
         );
         $rows[$rowNum]['civicrm_contact_sort_name_link'] = $url;
         $rows[$rowNum]['civicrm_contact_sort_name_hover'] = ts("View Contribution Details for this Contact.");
+        $entryFound = TRUE;
       }
 
       // convert campaign_id to campaign title
@@ -526,13 +499,12 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
         }
       }
 
-      if ($value = CRM_Utils_Array::value('civicrm_address_state_province_id', $row)) {
-        $rows[$rowNum]['civicrm_address_state_province_id'] = CRM_Core_PseudoConstant::stateProvince($value, FALSE);
-        $entryFound = TRUE;
-      }
-      if ($value = CRM_Utils_Array::value('civicrm_address_country_id', $row)) {
-        $rows[$rowNum]['civicrm_address_country_id'] = CRM_Core_PseudoConstant::country($value, FALSE);
-        $entryFound = TRUE;
+      $entryFound = $this->alterDisplayAddressFields($row, $rows, $rowNum, 'contribute/detail', 'List all contribution(s)') ? TRUE : $entryFound;
+
+      // skip looking further in rows, if first row itself doesn't
+      // have the column we need
+      if (!$entryFound) {
+        break;
       }
     }
   }
