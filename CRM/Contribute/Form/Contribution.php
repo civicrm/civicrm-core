@@ -1046,7 +1046,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         );
         CRM_Event_BAO_Participant::add($participantParams);
         if (empty($this->_lineItems)) {
-          $this->_lineItems = CRM_Price_BAO_LineItem::getLineItems($entityID, 'participant',1);
+          $this->_lineItems[] = CRM_Price_BAO_LineItem::getLineItems($entityID, 'participant', 1);
         }
       } else {
         $entityTable = 'contribution';
