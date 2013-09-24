@@ -204,7 +204,11 @@ class CRM_Core_Error extends PEAR_ErrorStack {
       echo "Sorry. A non-recoverable error has occurred. The error trace below might help to resolve the issue<p>";
       CRM_Core_Error::debug(NULL, $error);
     }
-
+    static $runOnce = FALSE;
+    if ($runOnce) {
+      exit;
+    }
+    $runOnce = TRUE;
     self::abend(1);
   }
 
