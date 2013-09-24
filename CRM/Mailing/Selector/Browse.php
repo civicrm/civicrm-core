@@ -374,7 +374,8 @@ LEFT JOIN  civicrm_contact scheduledContact ON ( $mailing.scheduled_id = schedul
           }
         }
 
-        if ($row['status'] == 'Complete' && !$row['archived']) {
+        if (in_array($row['status'], array('Complete', 'Canceled')) && 
+          !$row['archived']) {
           if ($allAccess || $showCreateLinks) {
             $actionMask |= CRM_Core_Action::RENEW;
           }
