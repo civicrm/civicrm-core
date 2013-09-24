@@ -172,7 +172,13 @@ class CRM_Report_Form_Contact_Summary extends CRM_Report_Form {
       array(
         'dao' => 'CRM_Core_DAO_Phone',
         'fields' =>
-        array('phone' => NULL),
+        array(
+          'phone' => NULL,   
+          'phone_ext' =>
+          array(
+            'title' => ts('Phone Extension')
+          )
+        ),
         'grouping' => 'contact-fields',
       ),
       'civicrm_group' =>
