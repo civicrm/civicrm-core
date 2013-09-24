@@ -197,7 +197,7 @@ class WebTest_Contribute_PCPAddTest extends CiviSeleniumTestCase {
     $this->verifyText("xpath=id('PCPView')//div[@class='crm-accordion-body']/table/tbody/tr[2]/td[2]/a[text()]", preg_quote("{$firstName} {$lastName}"));
 
     // Check PCP Summary Report
-    $this->openCiviPage('report/instance/15', 'reset=1');
+    $this->openCiviPage('report/instance/16', 'reset=1');
     $this->verifyText("PCP", preg_quote($pcpTitle));
     $this->verifyText("PCP", preg_quote("{$lastName}, {$firstName}"));
   }
