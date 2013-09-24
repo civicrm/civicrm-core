@@ -241,7 +241,7 @@ class WebTest_Contribute_ContributionPageAddTest extends CiviSeleniumTestCase {
     //View Contribution for separate contribution
     $this->waitForElementPresent("xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']");
     // Open search criteria again
-    $this->click("xpath=id('Search')/x:div[2]/x:div/x:div[1]");
+    $this->click("xpath=id('Search')/div[2]/div/div[1]");
     $this->waitForElementPresent("financial_type_id");
     $this->select('financial_type_id',"label=Donation");
     $this->clickLink('_qf_Search_refresh', "xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']");
