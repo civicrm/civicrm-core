@@ -1586,17 +1586,32 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
    * @access public
    * @static
    */
-  public static function getModuleUFGroup($moduleName = NULL, $count = 0, $skipPermission = TRUE, $op = CRM_Core_Permission::VIEW, $returnFields = NULL) {
+  public static function getModuleUFGroup(
+    $moduleName = NULL,
+    $count = 0,
+    $skipPermission = TRUE,
+    $op = CRM_Core_Permission::VIEW,
+    $returnFields = NULL
+  ) {
+    $reqdFields = array('id', 'title', 'created_id', 'description', 'is_active', 'is_reserved', 'group_type');
     if ($returnFields === NULL) {
-      $returnFields = array('id', 'title', 'created_id', 'description', 'is_active', 'is_reserved', 'group_type');
+      $returnFields = $reqdFields;
     }
+    else {
+      foreach ($reqdFields as $field) {
+        if (!in_array($field, $returnFields)) {
+          $returnFields[] = $field;
+        }
+      }
+    }
+
     $queryString = 'SELECT civicrm_uf_group.' . implode(', civicrm_uf_group.', $returnFields) . '
                         FROM civicrm_uf_group
                         LEFT JOIN civicrm_uf_join ON (civicrm_uf_group.id = uf_group_id)';
     $p = array();
     if ($moduleName) {
       $queryString .= ' AND civicrm_uf_group.is_active = 1
-                              WHERE civicrm_uf_join.module = %2';
+                        WHERE civicrm_uf_join.module = %2';
       $p[2] = array($moduleName, 'String');
     }
 
@@ -1618,7 +1633,8 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
     $ufGroups = array();
     while ($dao->fetch()) {
       //skip mix profiles in user Registration / User Account
-      if (($moduleName == 'User Registration' || $moduleName == 'User Account') &&
+      if (
+        ($moduleName == 'User Registration' || $moduleName == 'User Account') &&
         CRM_Core_BAO_UFField::checkProfileType($dao->id)
       ) {
         continue;
