@@ -226,13 +226,18 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
           $this->_defaultMemTypeId = $membership->membership_type_id;
           if ($membership->contact_id != $this->_contactID) {
             $employers = CRM_Contact_BAO_Relationship::getPermissionedEmployer($this->_userID);
-            if (array_key_exists($membership->contact_id, $employers)) {
-              $this->_membershipContactID = $membership->contact_id;
-              $this->assign('membershipContactID', $this->_membershipContactID);
-              $this->assign('membershipContactName', $employers[$this->_membershipContactID]['name']);
+            if (!empty($employers)) {
+              if (array_key_exists($membership->contact_id, $employers)) {
+                $this->_membershipContactID = $membership->contact_id;
+                $this->assign('membershipContactID', $this->_membershipContactID);
+                $this->assign('membershipContactName', $employers[$this->_membershipContactID]['name']);
+              }
+              else {
+                CRM_Core_Session::setStatus(ts("Oops. The membership you're trying to renew appears to be invalid. Contact your site administrator if you need assistance. If you continue, you will be issued a new membership."), ts('Membership Invalid'), 'alert');
+              }
             }
             else {
-              CRM_Core_Session::setStatus(ts("Oops. The membership you're trying to renew appears to be invalid. Contact your site administrator if you need assistance. If you continue, you will be issued a new membership."), ts('Membership Invalid'), 'alert');
+              $this->_membershipContactID = $membership->contact_id;
             }
           }
         }
