@@ -105,7 +105,7 @@ class WebTest_Contribute_OnlineContributionTest extends CiviSeleniumTestCase {
     $this->select("state_province-1", "value=1001");
 
     // Honoree Info
-    $this->click("xpath=id('Main')/x:div[2]/x:fieldset/x:div[2]/x:div/x:label[text()='In Honor of']");
+    $this->click("xpath=id('Main')/div[2]/fieldset/div[2]/div/label[text()='In Honor of']");
     $this->waitForElementPresent("honor_email");
 
     $this->select("honor_prefix_id", "label=Ms.");
