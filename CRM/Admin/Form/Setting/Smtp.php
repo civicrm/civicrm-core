@@ -170,6 +170,7 @@ class CRM_Admin_Form_Setting_Smtp extends CRM_Admin_Form_Setting {
 
         CRM_Core_Error::ignoreException();
         $result = $mailer->send($toEmail, $headers, $message);
+        CRM_Core_Error::setCallback();
         if (!is_a($result, 'PEAR_Error')) {
           CRM_Core_Session::setStatus($testMailStatusMsg . ts('Your %1 settings are correct. A test email has been sent to your email address.', array(1 => strtoupper($mailerName))), ts("Mail Sent"), "success");
         }
