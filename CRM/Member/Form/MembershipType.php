@@ -403,8 +403,8 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form {
         ) {
           $mon          = $params[$per]['M'];
           $dat          = $params[$per]['d'];
-          $mon          = ($mon < 9) ? '0' . $mon : $mon;
-          $dat          = ($dat < 9) ? '0' . $dat : $dat;
+          $mon          = ($mon < 10) ? '0' . $mon : $mon;
+          $dat          = ($dat < 10) ? '0' . $dat : $dat;
           $params[$per] = $mon . $dat;
         }
         else if($per == 'fixed_period_rollover_day' && !empty($params['month_fixed_period_rollover_day'])){
