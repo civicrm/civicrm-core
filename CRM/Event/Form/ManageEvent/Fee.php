@@ -160,6 +160,7 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
       }
       //CRM-12970
       ksort($defaults['discounted_value']);
+      ksort($defaults['discounted_label']);
       $rowCount = 1;
       foreach ($defaults['discounted_label'] as $key => $value) {
         if ($key != $rowCount) {
