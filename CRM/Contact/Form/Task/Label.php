@@ -434,14 +434,16 @@ class CRM_Contact_Form_Task_Label extends CRM_Contact_Form_Task {
       }
       // fill uniqueAddress array with last/first name tree
       if (isset($uniqueAddress[$address])) {
-        $uniqueAddress[$address]['names'][$name][] = $rows[$rowID]['first_name'];
+        $uniqueAddress[$address]['names'][$name][$rows[$rowID]['first_name']]['first_name'] = $rows[$rowID]['first_name'];
+        $uniqueAddress[$address]['names'][$name][$rows[$rowID]['first_name']]['addressee_display'] = $rows[$rowID]['addressee_display'];
         // drop unnecessary rows
         unset($rows[$rowID]);
         // this is the first listing at this address
       }
       else {
         $uniqueAddress[$address]['ID'] = $rowID;
-        $uniqueAddress[$address]['names'][$name][] = $rows[$rowID]['first_name'];
+        $uniqueAddress[$address]['names'][$name][$rows[$rowID]['first_name']]['first_name'] = $rows[$rowID]['first_name'];
+        $uniqueAddress[$address]['names'][$name][$rows[$rowID]['first_name']]['addressee_display'] = $rows[$rowID]['addressee_display'];
       }
     }
     foreach ($uniqueAddress as $address => $data) {
@@ -453,15 +455,20 @@ class CRM_Contact_Form_Task_Label extends CRM_Contact_Form_Task {
         if ($count > 2) {
           break;
         }
-        // collapse the tree to summarize
-        $family = trim(implode(" & ", $first_names) . " " . $last_name);
-        if ($count) {
-          $processedNames .= "\n" . $family;
-        }
-        else {
-          // build display_name string
-          $processedNames = $family;
-        }
+          if(count($first_names) == 1){
+            $family = $first_names[current(array_keys($first_names))]['addressee_display'];
+          }
+          else {
+            // collapse the tree to summarize
+            $family = trim(implode(" & ", array_keys($first_names)) . " " . $last_name);
+          }
+          if ($count) {
+            $processedNames .= "\n" . $family;
+          }
+          else {
+            // build display_name string
+            $processedNames = $family;
+          }
         $count++;
       }
       $rows[$data['ID']]['addressee'] = $rows[$data['ID']]['addressee_display'] = $rows[$data['ID']]['display_name'] = $processedNames;
