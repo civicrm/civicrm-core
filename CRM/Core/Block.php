@@ -562,7 +562,8 @@ class CRM_Core_Block {
       }
       // do nothing
     }
-    elseif (!CRM_Core_Permission::check('access CiviCRM')) {
+    // require 'access CiviCRM' permissons, except for the language switch block
+    elseif (!CRM_Core_Permission::check('access CiviCRM') && $id!=self::LANGSWITCH) {
       return NULL;
     }
     elseif ($id == self::ADD) {

@@ -2875,7 +2875,7 @@ WHERE  contribution_id = %1 ";
    *
    * @param String $fieldName
    * @param String $context: @see CRM_Core_DAO::buildOptionsContext
-   * @param Array  $props: whatever is known about this dao object
+   * @param Array $props: whatever is known about this dao object
    */
   public static function buildOptions($fieldName, $context = NULL, $props = array()) {
     $className = __CLASS__;
@@ -2886,12 +2886,35 @@ WHERE  contribution_id = %1 ";
         $className = 'CRM_Contribute_BAO_ContributionPage';
         // Filter results by contribution page
         if (!empty($props['contribution_page_id'])) {
-          $page = civicrm_api('contribution_page', 'getsingle', array('version' => 3, 'id' => ($props['contribution_page_id'])));
+          $page = civicrm_api('contribution_page', 'getsingle', array(
+            'version' => 3,
+            'id' => ($props['contribution_page_id'])
+          ));
           $types = (array) CRM_Utils_Array::value('payment_processor', $page, 0);
           $params['condition'] = 'id IN (' . implode(',', $types) . ')';
         }
     }
     return CRM_Core_PseudoConstant::get($className, $fieldName, $params, $context);
+  }
+
+  /**
+   * Function to validate financial type
+   *
+   * CRM-13231
+   *
+   * @param integer $financialTypeId Financial Type id
+   *
+   * @access public
+   * @static
+   */
+  static function validateFinancialType($financialTypeId, $relationName = 'Expense Account is') {
+    $expenseTypeId = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE '{$relationName}' "));
+    $financialAccount = CRM_Contribute_PseudoConstant::financialAccountType($financialTypeId, $expenseTypeId);
+
+    if (!$financialAccount) {
+      return CRM_Contribute_PseudoConstant::financialType($financialTypeId);
+    }
+    return FALSE;
   }
 }
 

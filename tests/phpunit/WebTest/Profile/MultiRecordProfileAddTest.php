@@ -208,22 +208,20 @@ class WebTest_Profile_MultiRecordProfileAddTest extends CiviSeleniumTestCase {
       $this->assertElementContainsText('crm-container', 'No records');
       return array($gid, $profileTitle);
     }
-    $this->waitForElementPresent("//div[@id='crm-profile-block']/../a");
-    $this->click("//div[@id='crm-profile-block']/../a");
-    sleep(1);
-    $record1 = $this->_addRecords('Edit', FALSE, "//div[@class='crm-container-snippet']/form/div[2]/");
+    $this->waitForElementPresent("//a/span[contains(text(), 'Add New Record')]");
+    $this->click("//a/span[contains(text(), 'Add New Record')]");
+    $record1 = $this->_addRecords();
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->verifyText("//div[@id='browseValues']/div/div/table/thead/tr/th[1]", preg_quote($params['textFieldLabel']));
     $this->verifyText("//div[@id='browseValues']/div/div/table/tbody/tr[2]/td[1]", preg_quote($record1['text']));
-    $this->openCiviPage('profile/edit', "reset=1&id=$id&gid=$gid", "//div[@id='crm-profile-block']/../a");
-    $this->click("//div[@id='crm-profile-block']/../a");
-    sleep(1);
-    $record2 = $this->_addRecords('Edit', FALSE, "//div[@class='crm-container-snippet']/form/div[2]/");
+    $this->openCiviPage('profile/edit', "reset=1&id=$id&gid=$gid", "//a/span[contains(text(), 'Add New Record')]");
+    $this->click("//a/span[contains(text(), 'Add New Record')]");
+    $record2 = $this->_addRecords();
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->verifyText("//div[@id='browseValues']/div/div/table/tbody/tr[3]/td[1]", preg_quote($record2['text']));
 
     // Check Max Record Limit
-    $this->verifyElementNotPresent("//div[@id='crm-profile-block']/../a/span");
+    $this->verifyElementNotPresent("//a/span[contains(text(), 'Add New Record')]");
 
     //Check for edit functionality
     // Because it tends to cause problems, all uses of sleep() must be justified in comments
@@ -233,8 +231,8 @@ class WebTest_Profile_MultiRecordProfileAddTest extends CiviSeleniumTestCase {
     $this->click("//div[@id='browseValues']/div/div/table/tbody/tr/td[3]/span/a[text()='Edit']");
     $this->waitForElementPresent("//html/body/div[5]");
     $this->verifyText("//div[@id='browseValues']/div/div/table/thead/tr/th[1]", preg_quote($params['textFieldLabel']));
-    $this->type("//div[@id='profile-dialog']/div/form/div[2]/div/div/div[2]/input", $recordNew['text'].'edit');
-    $this->click("//div[@id='profile-dialog']/div/form/div[2]/div[2]/span/input[@id='_qf_Edit_next']");
+    $this->type("//div[@id='profile-dialog']/div/form/div[2]/div/div[2]/input", $recordNew['text'].'edit');
+    $this->click("//div[@id='profile-dialog']/div/form/div[3]/span/input[@id='_qf_Edit_next']");
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->verifyText("//div[@id='browseValues']/div/div/table/tbody/tr[1]/td[1]", preg_quote($recordNew['text'].'edit'));
 
@@ -358,7 +356,7 @@ class WebTest_Profile_MultiRecordProfileAddTest extends CiviSeleniumTestCase {
       $this->waitForPageToLoad($this->getTimeoutMsec());
     }
     $params['text'] = 'text' . substr(sha1(rand()), 0, 3);
-    $this->type("{$parentElement}div[@id='crm-profile-block']/div/div[2]/input[@type='text']", $params['text']);
+    $this->type("//div[@id='crm-profile-block']/div/div[2]/input[@type='text']", $params['text']);
     if ($context == 'Create') {
       $params['firstname'] = 'John' . substr(sha1(rand()), 0, 3);
       $this->type('first_name', $params['firstname']);
@@ -367,9 +365,9 @@ class WebTest_Profile_MultiRecordProfileAddTest extends CiviSeleniumTestCase {
       $params['email'] =  $params['firstname'].$params['lastname'].'@exa.com';
       $this->type('email-Primary', $params['email']);
     }
-    $this->waitForElementPresent("{$parentElement}div[@id='crm-profile-block']//div/div[2]/select");
-    $this->select("{$parentElement}div[@id='crm-profile-block']//div/div[2]/select",'value=1');
-    $this->click("{$parentElement}div[@class='crm-submit-buttons']/span/input[@id='_qf_Edit_next']");
+    $this->waitForElementPresent("//div[@id='crm-profile-block']//div/div[2]/select");
+    $this->select("//div[@id='crm-profile-block']//div/div[2]/select",'value=1');
+    $this->click('_qf_Edit_next');
     return $params;
   }
 }
