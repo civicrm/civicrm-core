@@ -1587,10 +1587,13 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
    * @static
    */
   public static function getModuleUFGroup($moduleName = NULL, $count = 0, $skipPermission = TRUE, $op = CRM_Core_Permission::VIEW, $returnFields = NULL) {
-    if ($returnFields === NULL) {
-      $returnFields = array('id', 'title', 'created_id', 'description', 'is_active', 'is_reserved', 'group_type');
+    $selectFields = array('id', 'title', 'created_id', 'description', 'is_active', 'is_reserved', 'group_type');
+
+    if (!empty($returnFields)) {
+      $selectFields = array_merge($returnFields, array_diff($selectFields, $returnFields));
     }
-    $queryString = 'SELECT civicrm_uf_group.' . implode(', civicrm_uf_group.', $returnFields) . '
+
+    $queryString = 'SELECT civicrm_uf_group.' . implode(', civicrm_uf_group.', $selectFields) . '
                         FROM civicrm_uf_group
                         LEFT JOIN civicrm_uf_join ON (civicrm_uf_group.id = uf_group_id)';
     $p = array();
@@ -1623,13 +1626,16 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
       ) {
         continue;
       }
-      $ufGroups[$dao->id]['name'] = $dao->title;
-      $ufGroups[$dao->id]['title'] = $dao->title;
-      $ufGroups[$dao->id]['created_id'] = $dao->created_id;
-      $ufGroups[$dao->id]['description'] = $dao->description;
-      $ufGroups[$dao->id]['is_active'] = $dao->is_active;
-      $ufGroups[$dao->id]['group_type'] = $dao->group_type;
-      $ufGroups[$dao->id]['is_reserved'] = $dao->is_reserved;
+      foreach ($selectFields as $key => $field) {
+        if($field == 'id') {
+          continue;
+        }
+        elseif ($field == 'name') {
+          $ufGroups[$dao->id][$field] = $dao->title;
+          continue;
+        }
+        $ufGroups[$dao->id][$field] = $dao->$field;
+      }
     }
 
     // Allow other modules to alter/override the UFGroups.
