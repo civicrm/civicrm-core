@@ -392,12 +392,17 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
 
   function getTemplateFileName() {
     if ($this->_contactId) {
-      $csType = $this->get('contactSubtype');
-      if ($csType) {
-        $templateFile = "CRM/Contact/Page/View/SubType/{$csType}.tpl";
-        $template = CRM_Core_Page::getTemplate();
-        if ($template->template_exists($templateFile)) {
-          return $templateFile;
+      $contactSubtypes = $this->get('contactSubtype') ? 
+        explode(CRM_Core_DAO::VALUE_SEPARATOR, $this->get('contactSubtype')) : array();
+
+      // there could be multiple subtypes. We check templates for each of the subtype, and return the first one found.
+      foreach ($contactSubtypes as $csType) {
+        if ($csType) {
+          $templateFile = "CRM/Contact/Page/View/SubType/{$csType}.tpl";
+          $template = CRM_Core_Page::getTemplate();
+          if ($template->template_exists($templateFile)) {
+            return $templateFile;
+          }
         }
       }
     }
