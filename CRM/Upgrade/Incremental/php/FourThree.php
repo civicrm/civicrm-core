@@ -981,7 +981,7 @@ ORDER BY cli.id";
         $financialTrxn[$dao->contribution_recur_id] = array(
            'price_field_id' => $dao->price_field_id,
            'price_field_value_id' => $dao->price_field_value_id,
-           'label' => $dao->label,
+           'label' => strval($dao->label),
            'financial_account_id' => $dao->financial_account_id,
            $dao->contribution_id => 1,
         );
