@@ -519,14 +519,24 @@ function _civicrm_api3_buildprofile_submitfields($profileID, $optionsBehaviour =
     $entityGetFieldsResult = _civicrm_api3_profile_appendaliases($result['values'], $entity);
     foreach ($entityFields as $entityfield => $realName) {
       $fieldName = strtolower($entityfield);
-      if(!stristr('-', $fieldName) && realName != $fieldName) {
+      if(!strstr($fieldName, '-')) {
+         if(strtolower($realName) != $fieldName) {
         // we want to keep the '-' pattern for locations but otherwise
         // we are going to make the api-standard field the main / preferred name but support the db name
         // in future naming the fields in the DB to reflect the way the rest of the api / BAO / metadata works would
         // reduce code
-        $fieldName = $realName;
+        $fieldName = strtolower($realName);
+        }
+        if(isset($entityGetFieldsResult[$realName]['uniqueName'])) {
+         // we won't alias the field name on here are we are using uniqueNames for the possibility of needing to differentiate
+         // which entity 'status_id' belongs to
+          $fieldName = $entityGetFieldsResult[$realName]['uniqueName'];
+        }
       }
       $profileFields[$profileID][$fieldName] = array_merge($profileFields[$profileID][$entityfield], $entityGetFieldsResult[$realName]);
+      if(!isset($profileFields[$profileID][$fieldName]['api.aliases'])) {
+       $profileFields[$profileID][$fieldName]['api.aliases'] = array();
+      }
       if($optionsBehaviour && !empty($entityGetFieldsResult[$realName]['pseudoconstant'])) {
         if($optionsBehaviour > 1  || !in_array($realName, array('state_province_id', 'county_id', 'country_id'))) {
           $options = civicrm_api3($entity, 'getoptions', array('field' => $realName));
@@ -539,9 +549,6 @@ function _civicrm_api3_buildprofile_submitfields($profileID, $optionsBehaviour =
           unset($profileFields[$profileID][$entityfield]);
         }
         // we will make the mixed case version (e.g. of 'Primary') an alias
-        if(!isset($profileFields[$profileID][$fieldName]['api.aliases'])) {
-          $profileFields[$profileID][$fieldName]['api.aliases'] = array();
-        }
         $profileFields[$profileID][$fieldName]['api.aliases'][] = $entityfield;
       }
       /**
