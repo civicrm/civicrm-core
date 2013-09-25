@@ -120,6 +120,9 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
           ),
         ),
       ),
+    )
+    + $this->addAddressFields()
+    + array(
       'civicrm_contribution' =>
       array(
         'dao' => 'CRM_Contribute_DAO_Contribution',
@@ -260,17 +263,25 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
 
   function from() {
 
-    $this->_from = "
+    $this->_from = " 
         FROM  civicrm_contribution  {$this->_aliases['civicrm_contribution']}
-             INNER JOIN civicrm_contact {$this->_aliases['civicrm_contact']}
-                         ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_contribution']}.contact_id
-             {$this->_aclFrom}
-             LEFT  JOIN civicrm_email  {$this->_aliases['civicrm_email']}
-                         ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_email']}.contact_id
-                         AND {$this->_aliases['civicrm_email']}.is_primary = 1
-             LEFT  JOIN civicrm_phone  {$this->_aliases['civicrm_phone']}
-                         ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_phone']}.contact_id AND
-                            {$this->_aliases['civicrm_phone']}.is_primary = 1 ";
+              INNER JOIN civicrm_contact {$this->_aliases['civicrm_contact']}
+                      ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_contribution']}.contact_id
+             {$this->_aclFrom}";
+
+    if ($this->isTableSelected('civicrm_email')) {
+      $this->_from .= "
+              LEFT  JOIN civicrm_email  {$this->_aliases['civicrm_email']}
+                      ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_email']}.contact_id
+                     AND {$this->_aliases['civicrm_email']}.is_primary = 1";
+    }
+    if ($this->isTableSelected('civicrm_phone')) {
+      $this->_from .= "
+              LEFT  JOIN civicrm_phone  {$this->_aliases['civicrm_phone']}
+                      ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_phone']}.contact_id AND
+                         {$this->_aliases['civicrm_phone']}.is_primary = 1";
+    }
+    $this->addAddressFromClause();
   }
 
   function where() {
@@ -463,6 +474,8 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
   }
 
   function alterDisplay(&$rows) {
+    // custom code to alter rows
+    $entryFound = FALSE;
 
     foreach ($rows as $rowNum => $row) {
       //Convert Display name into link
@@ -475,6 +488,7 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
         );
         $rows[$rowNum]['civicrm_contact_sort_name_link'] = $url;
         $rows[$rowNum]['civicrm_contact_sort_name_hover'] = ts("View Contribution Details for this Contact.");
+        $entryFound = TRUE;
       }
 
       // convert campaign_id to campaign title
@@ -483,6 +497,14 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
           $rows[$rowNum]['civicrm_contribution_campaign_id'] = $this->activeCampaigns[$value];
           $entryFound = TRUE;
         }
+      }
+
+      $entryFound = $this->alterDisplayAddressFields($row, $rows, $rowNum, 'contribute/detail', 'List all contribution(s)') ? TRUE : $entryFound;
+
+      // skip looking further in rows, if first row itself doesn't
+      // have the column we need
+      if (!$entryFound) {
+        break;
       }
     }
   }
