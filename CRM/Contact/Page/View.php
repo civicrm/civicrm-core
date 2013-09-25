@@ -192,7 +192,9 @@ class CRM_Contact_Page_View extends CRM_Core_Page {
     $this->assign('displayName', $displayName);
 
     $this->set('contactType', $contactType);
-    $this->set('contactSubtype', $contactSubtype);
+
+    // note: there could still be multiple subtypes. We just trimming the outer separator.
+    $this->set('contactSubtype', trim($contactSubtype, CRM_Core_DAO::VALUE_SEPARATOR));
 
     // add to recently viewed block
     $isDeleted = (bool) CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $this->_contactId, 'is_deleted');
