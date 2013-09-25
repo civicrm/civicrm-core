@@ -1122,6 +1122,7 @@ AND cli.entity_table = 'civicrm_contribution' AND cli.id IN (" . implode(',', $v
    * @return bool TRUE for success
    */
   function task_4_3_x_checkConstraints(CRM_Queue_TaskContext $ctx) {
+    CRM_Core_DAO::executeQuery('ALTER TABLE `civicrm_financial_account` CHANGE `contact_id` `contact_id` INT( 10 ) UNSIGNED NULL DEFAULT NULL');
     $config = CRM_Core_Config::singleton();
     $dbname  = DB::parseDSN($config->dsn);
     $constraintArray = array(
