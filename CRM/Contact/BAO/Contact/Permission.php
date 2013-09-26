@@ -343,12 +343,28 @@ WHERE  (( contact_id_a = %1 AND contact_id_b = %2 AND is_permission_a_b = 1 ) OR
       return FALSE;
     }
 
+    // set appropriate AUTH source
+    self::initChecksumAuthSrc(TRUE, $form);
+
     // so here the contact is posing as $contactID, lets set the logging contact ID variable
     // CRM-8965
     CRM_Core_DAO::executeQuery('SET @civicrm_user_id = %1',
       array(1 => array($contactID, 'Integer'))
     );
+    
     return TRUE;
+  }
+
+  static function initChecksumAuthSrc($checkSumValidationResult = FALSE, $form = NULL) {
+    $session = CRM_Core_Session::singleton();
+    if ($checkSumValidationResult && $form && CRM_Utils_Request::retrieve('cs', 'String', $form, FALSE)) {
+      // if result is already validated, and url has cs, set the flag.
+      $session->set('authSrc', CRM_Core_Permission::AUTH_SRC_CHECKSUM);
+    } else if (($session->get('authSrc') & CRM_Core_Permission::AUTH_SRC_CHECKSUM) == CRM_Core_Permission::AUTH_SRC_CHECKSUM) {
+      // if checksum wasn't present in REQUEST OR checksum result validated as FALSE, 
+      // and flag was already set exactly as AUTH_SRC_CHECKSUM, unset it.
+      $session->set('authSrc', CRM_Core_Permission::AUTH_SRC_UNKNOWN);
+    }
   }
 
   static function validateChecksumContact($contactID, &$form, $redirect = TRUE) {

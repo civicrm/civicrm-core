@@ -1913,6 +1913,7 @@ ORDER BY civicrm_email.is_primary DESC";
     }
 
     $primaryPhoneLoc = NULL;
+    $session = CRM_Core_Session::singleton();
     foreach ($params as $key => $value) {
       $fieldName = $locTypeId = $typeId = NULL;
       list($fieldName, $locTypeId, $typeId) = CRM_Utils_System::explode('-', $key, 3);
@@ -2073,6 +2074,12 @@ ORDER BY civicrm_email.is_primary DESC";
           if ($params[$key] && isset($params[$key . '_time'])) {
             $value .= ' ' . $params[$key . '_time'];
           }
+
+          // if auth source is not checksum / login && $value is blank, do not proceed - CRM-10128
+          if (($session->get('authSrc') & (CRM_Core_Permission::AUTH_SRC_CHECKSUM + CRM_Core_Permission::AUTH_SRC_LOGIN)) == 0 &&
+            ($value == '' || !isset($value))) {
+            continue;
+          } 
 
           $valueId = NULL;
           if (CRM_Utils_Array::value('customRecordValues', $params)) {
