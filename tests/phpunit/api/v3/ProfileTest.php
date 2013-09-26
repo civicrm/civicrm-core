@@ -463,9 +463,24 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
     $profileFields = $this->callAPISuccess('profile', 'getfields', array('get_options' => 'all', 'action' => 'submit', 'profile_id' => 'membership_batch_entry'));
     $getoptions = $this->callAPISuccess('membership', 'getoptions', array('field' => 'membership_type', 'context' => 'validate'));
     $this->assertEquals(array_keys($membershipTypes['values']), array_keys($getoptions['values']));
-    $this->assertEquals(array_keys($membershipTypes['values']), array_keys($profileFields['values']['membership_type']['options']));
+    $this->assertEquals(array_keys($membershipTypes['values']), array_keys($profileFields['values']['membership_type_id']['options']));
 
 }
+
+  /**
+   * Test that the fields are returned in the right order despite the faffing around that goes on
+   */
+  function testMembershipGetFieldsOrder() {
+    $result = $this->callAPISuccess('profile', 'getfields', array('action' => 'submit', 'profile_id' => 'membership_batch_entry'));
+    $weight = 1;
+    foreach($result['values'] as $fieldName => $field) {
+      if($fieldName == 'profile_id') {
+        continue;
+      }
+      $this->assertEquals($field['weight'], $weight);
+      $weight++;
+    }
+  }
   /**
    * Check we can submit membership batch profiles (create mode)
    */
