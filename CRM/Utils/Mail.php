@@ -163,19 +163,21 @@ class CRM_Utils_Mail {
     $headers = &$msg->headers($headers);
 
     $to = array($params['toEmail']);
+    $result = null;
+    $mailer =& CRM_Core_Config::getMailer( );
 
-    //get emails from headers, since these are
-    //combination of name and email addresses.
-    if (CRM_Utils_Array::value('Cc', $headers)) {
-      $to[] = CRM_Utils_Array::value('Cc', $headers);
+    // Mail_smtp and Mail_sendmail mailers require Bcc anc Cc emails
+    // be included in both $to and $headers['Cc', 'Bcc']
+    if (get_class($mailer) != "Mail_mail") {
+        //get emails from headers, since these are 
+        //combination of name and email addresses.
+        if ( CRM_Utils_Array::value( 'Cc', $headers ) ) {
+            $to[] = CRM_Utils_Array::value( 'Cc', $headers );
+        }
+        if ( CRM_Utils_Array::value( 'Bcc', $headers ) ) {
+            $to[] = CRM_Utils_Array::value( 'Bcc', $headers );
+        }
     }
-    if (CRM_Utils_Array::value('Bcc', $headers)) {
-      $to[] = CRM_Utils_Array::value('Bcc', $headers);
-      unset($headers['Bcc']);
-    }
-
-    $result = NULL;
-    $mailer = CRM_Core_Config::getMailer();
     if (is_object($mailer)) {
       CRM_Core_Error::ignoreException();
       $result = $mailer->send($to, $headers, $message);
