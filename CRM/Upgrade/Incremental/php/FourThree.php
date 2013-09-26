@@ -193,7 +193,15 @@ WHERE     ceft.entity_id IS NULL;
     if ($rev == '4.3.5') {
       $postUpgradeMessage .= '<br />' . ts('Default versions of the following System Workflow Message Templates have been modified to handle new functionality: <ul><li>Events - Registration Confirmation and Receipt (on-line)</li><li>Events - Registration Confirmation and Receipt (off-line)</li></ul> If you have modified these templates, please review the new default versions and implement updates as needed to your copies (Administer > Communications > Message Templates > System Workflow Messages).');
     }
-
+    if ($rev == '4.3.6') {
+      $flag = CRM_Core_DAO::singleValueQuery('SELECT count(ccp.id) FROM civicrm_contribution_product ccp
+INNER JOIN civicrm_product cp ON ccp.product_id = cp.id
+WHERE ccp.financial_type_id IS NULL and cp.cost > 0');
+      if ($flag) {
+        $postUpgradeMessage .= '<br />' . ts('Your database contains one or more premiums which have a cost but are not linked to a financial type. If you are exporting transations to an accounting package, this will result in unbalanced transactions. <a href="%1" target="_blank">You can review steps to correct this situation on the wiki.</a>',
+        array( 1 => 'http://wiki.civicrm.org/confluence/display/CRMDOC/Fixing+Issues+Caused+by+Missing+Cost+of+Goods+Account+-+4.3+Upgrades'));
+      }
+    }
   }
 
   function upgrade_4_3_alpha1($rev) {
@@ -862,7 +870,7 @@ ALTER TABLE civicrm_financial_account
     while ($dao->fetch()) {
       // FIXME civicrm_log.modified_date is DATETIME; civicrm_contact.modified_date is TIMESTAMP
       CRM_Core_DAO::executeQuery(
-        'UPDATE civicrm_contact SET created_date = %1, modified_date = %2 WHERE id = %3',
+        'UPDATE civicrm_contact SET created_date = FROM_UNIXTIME(UNIX_TIMESTAMP(%1)), modified_date = FROM_UNIXTIME(UNIX_TIMESTAMP(%2)) WHERE id = %3',
         array(
           1 => array($dao->created, 'String'),
           2 => array($dao->modified, 'String'),
@@ -994,7 +1002,7 @@ ORDER BY cli.id";
         $financialTrxn[$dao->contribution_recur_id] = array(
            'price_field_id' => $dao->price_field_id,
            'price_field_value_id' => $dao->price_field_value_id,
-           'label' => $dao->label,
+           'label' => strval($dao->label),
            'financial_account_id' => $dao->financial_account_id,
            $dao->contribution_id => 1,
         );

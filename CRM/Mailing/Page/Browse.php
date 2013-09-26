@@ -255,43 +255,17 @@ class CRM_Mailing_Page_Browse extends CRM_Core_Page {
       $urlString .= '/unscheduled';
       $urlParams .= '&scheduled=false';
       $this->assign('unscheduled', TRUE);
-
-      if ($this->get('sms')) {
-        CRM_Utils_System::setTitle(ts('Draft and Unscheduled Mass SMS'));
-      }
-      else {
-        CRM_Utils_System::setTitle(ts('Draft and Unscheduled Mailings'));
-      }
     }
     elseif (CRM_Utils_Array::value(3, $newArgs) == 'archived') {
       $urlString .= '/archived';
       $this->assign('archived', TRUE);
-
-      if ($this->get('sms')) {
-        CRM_Utils_System::setTitle(ts('Archived Mass SMS'));
-      }
-      else {
-        CRM_Utils_System::setTitle(ts('Archived Mailings'));
-      }
     }
     elseif (CRM_Utils_Array::value(3, $newArgs) == 'scheduled') {
       $urlString .= '/scheduled';
       $urlParams .= '&scheduled=true';
-
-      if ($this->get('sms')) {
-        CRM_Utils_System::setTitle(ts('Scheduled and Sent Mass SMS'));
-      }
-      else {
-        CRM_Utils_System::setTitle(ts('Scheduled and Sent Mailings'));
-      }
     }
-    else {
-      if ($this->get('sms')) {
-        CRM_Utils_System::setTitle(ts('Find Mass SMS'));
-      }
-      else {
-        CRM_Utils_System::setTitle(ts('Find Mailings'));
-      }
+    if ($this->get('sms')) {
+      CRM_Utils_System::setTitle(ts('Find Mass SMS'));
     }
 
     $crmRowCount = CRM_Utils_Request::retrieve('crmRowCount', 'Integer', CRM_Core_DAO::$_nullObject);

@@ -53,7 +53,8 @@ class CRM_Admin_Form_Setting_Smtp extends CRM_Admin_Form_Setting {
       CRM_Mailing_Config::OUTBOUND_OPTION_SMTP => ts('SMTP'),
       CRM_Mailing_Config::OUTBOUND_OPTION_SENDMAIL => ts('Sendmail'),
       CRM_Mailing_Config::OUTBOUND_OPTION_DISABLED => ts('Disable Outbound Email'),
-      CRM_Mailing_Config::OUTBOUND_OPTION_REDIRECT_TO_DB => ts('Redirect to Database'),
+      // CRM-13445 Suppressing the Redirect to DB option pending further evaluation
+      // CRM_Mailing_Config::OUTBOUND_OPTION_REDIRECT_TO_DB => ts('Redirect to Database'),
     );
     $this->addRadio('outBound_option', ts('Select Mailer'), $outBoundOption);
 
@@ -170,6 +171,7 @@ class CRM_Admin_Form_Setting_Smtp extends CRM_Admin_Form_Setting {
 
         CRM_Core_Error::ignoreException();
         $result = $mailer->send($toEmail, $headers, $message);
+        CRM_Core_Error::setCallback();
         if (!is_a($result, 'PEAR_Error')) {
           CRM_Core_Session::setStatus($testMailStatusMsg . ts('Your %1 settings are correct. A test email has been sent to your email address.', array(1 => strtoupper($mailerName))), ts("Mail Sent"), "success");
         }

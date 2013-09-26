@@ -234,9 +234,7 @@ function checkResponse(responseText, statusText, xhr, $form) {
         {/if}
       {/if}{* end of main if field name if *}
     {/foreach}
-    </div><!-- end form-layout-compressed for last profile --> {* closing main form layout div when all the fields are built*}
-
-
+   
     {if $isCaptcha && ( $mode eq 8 || $mode eq 4 || $mode eq 1 ) }
       {include file='CRM/common/ReCAPTCHA.tpl'}
       <script type="text/javascript">cj('.recaptcha_label').attr('width', '140px');</script>

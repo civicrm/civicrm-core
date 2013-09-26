@@ -401,12 +401,12 @@ SELECT     civicrm_email.id as email_id
       }
     }
     if ($success) {
-      $groupTitle = implode(',', $groupAdded);
-      CRM_Utils_System::setUFMessage(ts('Your subscription request has been submitted for group %1. Check your inbox shortly for the confirmation email(s). If you do not see a confirmation email, please check your spam/junk mail folder.', array(1 => $groupTitle)));
+      $groupTitle = implode(', ', $groupAdded);
+      CRM_Utils_System::setUFMessage(ts('Your subscription request has been submitted for %1. Check your inbox shortly for the confirmation email(s). If you do not see a confirmation email, please check your spam/junk mail folder.', array(1 => $groupTitle)));
     }
     elseif ($success === FALSE) {
       $groupTitle = implode(',', $groupFailed);
-      CRM_Utils_System::setUFMessage(ts('We had a problem processing your subscription request for group %1. You have tried to subscribe to a private group and/or we encountered a database error. Please contact the site administrator.', array(1 => $groupTitle)));
+      CRM_Utils_System::setUFMessage(ts('We had a problem processing your subscription request for %1. You have tried to subscribe to a private group and/or we encountered a database error. Please contact the site administrator.', array(1 => $groupTitle)));
     }
   }
   //end of function

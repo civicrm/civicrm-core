@@ -381,7 +381,7 @@ class CRM_Price_BAO_LineItem extends CRM_Price_DAO_LineItem {
       foreach ($entityId as $id) {
         $lineItems = CRM_Price_BAO_LineItem::getLineItems($id, $entityTable);
         foreach ($lineItems as $key => $values) {
-          if (!$setID) {
+          if (!$setID && $values['price_field_id']) {
             $setID = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceField', $values['price_field_id'], 'price_set_id');
             $params['is_quick_config'] = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $setID, 'is_quick_config');
           }

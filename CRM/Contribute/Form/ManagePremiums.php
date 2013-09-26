@@ -242,14 +242,17 @@ class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
     if (isset($params['imageOption'])) {
       if ($params['imageOption'] == 'thumbnail') {
         if (!$params['imageUrl']) {
-          $errors['imageUrl'] = 'Image URL is Required ';
+          $errors['imageUrl'] = ts('Image URL is Required');
         }
         if (!$params['thumbnailUrl']) {
-          $errors['thumbnailUrl'] = 'Thumbnail URL is Required ';
+          $errors['thumbnailUrl'] = ts('Thumbnail URL is Required');
         }
       }
     }
-
+    // CRM-13231 financial type required if product has cost
+    if (CRM_Utils_Array::value('cost', $params) && !CRM_Utils_Array::value('financial_type_id', $params)) {
+      $errors['financial_type_id'] = ts('Financial Type is required for product having cost.');
+    }
     $fileLocation = $files['uploadFile']['tmp_name'];
     if ($fileLocation != "") {
       list($width, $height) = getimagesize($fileLocation);

@@ -378,7 +378,12 @@ SELECT id
         }
       }
     }
-
+    
+    if (CRM_Utils_Array::value('payment_processor', $fields) 
+      && $financialType = CRM_Contribute_BAO_Contribution::validateFinancialType($self->_defaultValues['financial_type_id'])) {
+      $errors['payment_processor'] = ts("Financial Account of account relationship of 'Expense Account is' is not configured for Financial Type : ") . $financialType;  
+    }
+        
     if (CRM_Utils_Array::value('is_recur_interval', $fields)) {
       foreach(array_keys($fields['payment_processor']) as $paymentProcessorID) {
         $paymentProcessorTypeId = CRM_Core_DAO::getFieldValue(

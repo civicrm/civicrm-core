@@ -375,6 +375,7 @@ class WebTest_Member_OfflineMembershipAddPricesetTest extends CiviSeleniumTestCa
     $amount = $this->getText("xpath=//div[@id='priceset']/div[2]/div[2]/div[$i]/span/label/span[@class='crm-price-amount-amount']");
 
     $this->type('source', 'Offline membership Sign Up Test Text');
+    $this->waitForElementPresent('recordContribution');
     $this->click('_qf_Membership_upload-bottom');
 
     $this->waitForElementPresent("xpath=//div[@id='memberships']//table/tbody/tr");

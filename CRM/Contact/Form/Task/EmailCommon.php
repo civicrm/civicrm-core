@@ -42,6 +42,7 @@ class CRM_Contact_Form_Task_EmailCommon {
   CONST MAX_EMAILS_KILL_SWITCH = 50;
 
   public $_contactDetails = array();
+  public $_additionalContactDetails = array();
   public $_allContactDetails = array();
   public $_toContactEmails = array();
 
@@ -146,8 +147,9 @@ class CRM_Contact_Form_Task_EmailCommon {
             'name' => $name,
             'id' => $matches[0][$i],
           );
+          $id = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Email', $matches[2][$i] , 'contact_id', 'email');
+          $form->_additionalContactDetails[$element][$id] = CRM_Contact_BAO_Contact::displayName($id);
         }
-
         $var = "{$element}Contact";
         $form->assign($var, json_encode($elementValues));
       }
@@ -323,6 +325,21 @@ class CRM_Contact_Form_Task_EmailCommon {
     $bcc       = CRM_Utils_Array::value('bcc_id', $formValues);
     $subject   = $formValues['subject'];
 
+
+    // CRM-13378: Append CC and BCC information at the end of Activity Details
+    $elements = array('cc', 'bcc');
+    $additionalDetails = NULL;
+    foreach ($elements as $element) {
+      if (isset($form->_additionalContactDetails[$element])) {
+        foreach ($form->_additionalContactDetails[$element] as $id => $display_name) {
+          $url = CRM_Utils_System::url('civicrm/contact/view', "reset=1&force=1&cid={$id}");
+          $form->_additionalContactDetails[$element][$id] = "<a href=$url>$display_name</a>";
+        }
+        $additionalDetails .= "\n$element : " . implode(", ", $form->_additionalContactDetails[$element]);
+        unset($form->_additionalContactDetails[$element]);
+      }
+    }
+
     // CRM-5916: prepend case id hash to CiviCase-originating emails’ subjects
     if (isset($form->_caseId) && is_numeric($form->_caseId)) {
       $hash = substr(sha1(CIVICRM_SITE_KEY . $form->_caseId), 0, 7);
@@ -395,7 +412,8 @@ class CRM_Contact_Form_Task_EmailCommon {
       $attachments,
       $cc,
       $bcc,
-      array_keys($form->_contactDetails)
+      array_keys($form->_contactDetails),
+      $additionalDetails
     );
 
     if ($sent) {

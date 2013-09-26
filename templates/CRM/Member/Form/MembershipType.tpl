@@ -203,10 +203,19 @@ cj(function(){
     showHidePeriodSettings();
   });
 
-  showHideMaxRelated(cj('#relationship_type_id :selected').val());
-  cj('#relationship_type_id').change(function(){
-    showHideMaxRelated(cj('#relationship_type_id :selected').val());
-  });
+  {/literal}
+	{if $action eq 2}
+	{literal}
+	  showHideMaxRelated(cj('#relationship_type_id').val());
+	  cj('#relationship_type_id').change(function(){
+	    showHideMaxRelated(cj('#relationship_type_id').val());
+	  });
+	{/literal}{else}{literal}
+	  showHideMaxRelated(cj('#relationship_type_id :selected').val());
+	  cj('#relationship_type_id').change(function(){
+	    showHideMaxRelated(cj('#relationship_type_id :selected').val());
+	  });	
+	{/literal}{/if}{literal}
 });
 
 function showHidePeriodSettings() {

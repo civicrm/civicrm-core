@@ -274,6 +274,17 @@ class CRM_Mailing_BAO_Query {
         }
         return;
 
+      case 'mailing_bounce_types':
+        $op = 'IN';
+        $values = array($name, $op, $value, $grouping, $wildcard);
+        self::mailingEventQueryBuilder($query, $values,
+          'civicrm_mailing_event_bounce',
+          'bounce_type_id',
+          ts('Bounce type(s)'),
+          CRM_Core_PseudoConstant::get('CRM_Mailing_Event_DAO_Bounce', 'bounce_type_id', array('keyColumn' => 'id', 'labelColumn' => 'name'))
+        );
+        return;
+
       case 'mailing_open_status':
         self::mailingEventQueryBuilder($query, $values,
           'civicrm_mailing_event_opened', 'mailing_open_status', ts('Mailing: Trackable Opens'), CRM_Mailing_PseudoConstant::yesNoOptions('open')
@@ -367,6 +378,14 @@ class CRM_Mailing_BAO_Query {
     );
     $form->addElement('select', 'mailing_job_status', ts('Mailing Job Status'), $mailingJobStatuses, FALSE);
 
+    $mailingBounceTypes = CRM_Core_PseudoConstant::get(
+      'CRM_Mailing_Event_DAO_Bounce', 'bounce_type_id',
+      array('keyColumn' => 'id', 'labelColumn' => 'name')
+    );
+    $form->add('select', 'mailing_bounce_types', ts('Bounce Types'), $mailingBounceTypes, FALSE,
+      array('id' => 'mailing_bounce_types', 'multiple' => 'multiple', 'title' => ts('- select -'))
+    );
+
     // event filters
     $form->addRadio('mailing_delivery_status', ts('Delivery Status'), CRM_Mailing_PseudoConstant::yesNoOptions('delivered'));
     $form->addRadio('mailing_open_status', ts('Trackable Opens'), CRM_Mailing_PseudoConstant::yesNoOptions('open'));
@@ -398,7 +417,8 @@ class CRM_Mailing_BAO_Query {
     if ((CRM_Utils_Array::value('mailing_delivery_status', $fields) ||
         CRM_Utils_Array::value('mailing_open_status', $fields) ||
         CRM_Utils_Array::value('mailing_click_status', $fields) ||
-        CRM_Utils_Array::value('mailing_reply_status', $fields)
+        CRM_Utils_Array::value('mailing_reply_status', $fields) ||
+        CRM_Utils_Array::value('mailing_bounce_types', $fields)
       ) &&
       (!CRM_Utils_Array::value('mailing_id', $fields) &&
         !CRM_Utils_Array::value('mailing_date_low', $fields) &&
@@ -450,7 +470,14 @@ class CRM_Mailing_BAO_Query {
       $query->_where[$grouping][] = $tableName . ".id is null ";
     }
 
-    $query->_qill[$grouping][] = $fieldTitle . ' - ' . $valueTitles[$value];
+    if (is_array($value)) {
+      $query->_where[$grouping][] = "$tableName.$fieldName $op (" . implode(',', $value) . ")";
+      $query->_qill[$grouping][] = "$fieldTitle $op ". implode(', ', array_intersect_key($valueTitles, array_flip($value)));
+    }
+    else {
+      $query->_qill[$grouping][] = $fieldTitle . ' - ' . $valueTitles[$value];
+    }
+
     $query->_tables['civicrm_mailing_job'] = $query->_whereTables['civicrm_mailing_job'] = 1;
     $query->_tables['civicrm_mailing_event_queue'] = $query->_whereTables['civicrm_mailing_event_queue'] = 1;
     $query->_tables['civicrm_mailing_recipients'] = $query->_whereTables['civicrm_mailing_recipients'] = 1;

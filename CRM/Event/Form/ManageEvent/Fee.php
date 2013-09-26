@@ -147,16 +147,33 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
         $discountFields = current($val);
         $discountFields = current($discountFields['fields']);
 
-        $colCount = 1;
         foreach ($discountFields['options'] as $discountFieldsval) {
-          $defaults['discounted_label'][$colCount] = $discountFieldsval['label'];
-          $defaults['discounted_value'][$colCount][$rowCount] =
+          $defaults['discounted_label'][$discountFieldsval['weight']] = $discountFieldsval['label'];
+          $defaults['discounted_value'][$discountFieldsval['weight']][$rowCount] =
             CRM_Utils_Money::format($discountFieldsval['amount'], NULL, '%a');
-          $defaults['discount_option_id'][$rowCount][$colCount] = $discountFieldsval['id'];
+          $defaults['discount_option_id'][$rowCount][$discountFieldsval['weight']]= $discountFieldsval['id'];
           if (CRM_Utils_Array::value('is_default', $discountFieldsval)) {
             $defaults['discounted_default'] = $discountFieldsval['weight'];
           }
-          $colCount++;
+        }
+        $rowCount++;
+      }
+      //CRM-12970
+      ksort($defaults['discounted_value']);
+      ksort($defaults['discounted_label']);
+      $rowCount = 1;
+      foreach ($defaults['discounted_label'] as $key => $value) {
+        if ($key != $rowCount) {
+          $defaults['discounted_label'][$rowCount] = $value;
+          $defaults['discounted_value'][$rowCount] = $defaults['discounted_value'][$key];
+          unset($defaults['discounted_value'][$key]);
+          unset($defaults['discounted_label'][$key]);
+          foreach ($defaults['discount_option_id'] as &$optionIds) {
+            if (array_key_exists($key, $optionIds)) {
+              $optionIds[$rowCount] = $optionIds[$key];
+              unset($optionIds[$key]);
+            }
+          } 
         }
         $rowCount++;
       }

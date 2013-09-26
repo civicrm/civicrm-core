@@ -190,7 +190,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
       }
 
       if (!empty($fields)) {
-        CRM_Core_BAO_UFGroup::setProfileDefaults($contactID, $fields, $this->_defaults); 
+        CRM_Core_BAO_UFGroup::setProfileDefaults($contactID, $fields, $this->_defaults);
       }
 
       $billingDefaults = $this->getProfileDefaults('Billing', $contactID);
@@ -214,11 +214,6 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
           }
         }
       }
-    }
-
-    //set default membership for membershipship block
-    if ($this->_membershipBlock) {
-      $this->_defaults['selectMembership'] = $defaultMemType = $this->_defaultMemTypeId ? $this->_defaultMemTypeId : CRM_Utils_Array::value('membership_type_default', $this->_membershipBlock);
     }
 
     //         // hack to simplify credit card entry for testing
@@ -281,7 +276,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     CRM_Core_BAO_Address::fixAllStateSelects($this, $this->_defaults);
 
     if ($this->_priceSetId) {
-      if ($this->_useForMember && !empty($this->_currentMemberships)) {
+      if (($this->_useForMember && !empty($this->_currentMemberships)) || $this->_defaultMemTypeId) {
         $selectedCurrentMemTypes = array();
         foreach ($this->_priceSet['fields'] as $key => $val) {
           foreach ($val['options'] as $keys => $values) {

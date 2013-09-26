@@ -36,10 +36,10 @@ class CRM_Case_XMLProcessor {
 
   static protected $_xml;
 
+  static protected $_hookCache = NULL;
+
   function retrieve($caseType) {
-    // trim all spaces from $caseType
-    $caseType = str_replace('_', ' ', $caseType);
-    $caseType = CRM_Utils_String::munge(ucwords($caseType), '', 0);
+    $caseType = self::mungeCaseType($caseType);
 
     if (!CRM_Utils_Array::value($caseType, self::$_xml)) {
       if (!self::$_xml) {
@@ -87,6 +87,17 @@ class CRM_Case_XMLProcessor {
             )
           );
         }
+
+        if (!file_exists($fileName)) {
+          if (self::$_hookCache === NULL) {
+            self::$_hookCache = array();
+            CRM_Utils_Hook::caseTypes(self::$_hookCache);
+          }
+          if (isset(self::$_hookCache[$caseType], self::$_hookCache[$caseType]['file'])) {
+            $fileName = self::$_hookCache[$caseType]['file'];
+          }
+        }
+
         if (!file_exists($fileName)) {
           return FALSE;
         }
@@ -99,6 +110,13 @@ class CRM_Case_XMLProcessor {
       self::$_xml[$caseType] = simplexml_import_dom($dom);
     }
     return self::$_xml[$caseType];
+  }
+
+  public static function mungeCaseType($caseType) {
+    // trim all spaces from $caseType
+    $caseType = str_replace('_', ' ', $caseType);
+    $caseType = CRM_Utils_String::munge(ucwords($caseType), '', 0);
+    return $caseType;
   }
 
   function &allActivityTypes($indexName = TRUE, $all = FALSE) {
