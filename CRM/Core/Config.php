@@ -242,6 +242,9 @@ class CRM_Core_Config extends CRM_Core_Config_Variables {
           array(1 => array($userID, 'Integer'))
         );
       }
+
+      // initialize authentication source
+      self::$_singleton->initAuthSrc();
     }
     return self::$_singleton;
   }
@@ -650,6 +653,17 @@ class CRM_Core_Config extends CRM_Core_Config_Variables {
   function reset() {
     $query = "UPDATE civicrm_domain SET config_backend = null";
     CRM_Core_DAO::executeQuery($query);
+  }
+
+  // This method should initialize auth sources
+  function initAuthSrc() {
+    $session = CRM_Core_Session::singleton();
+    if ($session->get('userID') && !$session->get('authSrc')) {
+      $session->set('authSrc', CRM_Core_Permission::AUTH_SRC_LOGIN);
+    }
+
+    // checksum source
+    CRM_Contact_BAO_Contact_Permission::initChecksumAuthSrc();
   }
 
   /**
