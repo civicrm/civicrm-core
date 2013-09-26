@@ -65,6 +65,7 @@ function profile_submit_expectedresult(){
           'first_name' => 'abc2',
           'middle_name' => 'J.',
           'last_name' => 'xyz2',
+          'prefix_id' => '3',
           'suffix_id' => '3',
           'email_greeting_id' => '1',
           'email_greeting_custom' => '',
