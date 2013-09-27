@@ -711,22 +711,13 @@ class CRM_Contact_BAO_Query {
               if (in_array($tName, array('country', 'state_province', 'county'))) {
                 $pf = ($tName == 'state_province') ? 'state_province_name' : $name;
                 $this->_pseudoConstantsSelect[$pf] =
-                  array(
-                    'pseudoField' => "{$tName}_id",
-                    'idCol' => "{$tName}_id",
-                    'bao' => 'CRM_Core_BAO_Address',
-                    'table' => "civicrm_{$tName}",
-                    'join' => " LEFT JOIN civicrm_{$tName} ON civicrm_address.{$tName}_id = civicrm_{$tName}.id "
-                  );
+                  array('pseudoField' => "{$tName}_id", 'idCol' => "{$tName}_id", 'bao' => 'CRM_Core_BAO_Address',
+                    'table' => "civicrm_{$tName}", 'join' => " LEFT JOIN civicrm_{$tName} ON civicrm_address.{$tName}_id = civicrm_{$tName}.id ");
 
                 if ($tName == 'state_province') {
                   $this->_pseudoConstantsSelect[$tName] =
-                    array(
-                      'pseudoField' => 'state_province_abbreviation',
-                      'idCol' => "{$tName}_id",
-                      'table' => "civicrm_{$tName}",
-                      'join' => " LEFT JOIN civicrm_{$tName} ON civicrm_address.{$tName}_id = civicrm_{$tName}.id "
-                    );
+                    array('pseudoField' => 'state_province_abbreviation', 'idCol' => "{$tName}_id",
+                      'table' => "civicrm_{$tName}", 'join' => " LEFT JOIN civicrm_{$tName} ON civicrm_address.{$tName}_id = civicrm_{$tName}.id ");
                 }
 
                 $this->_select["{$tName}_id"] = "civicrm_address.{$tName}_id as {$tName}_id";
@@ -756,26 +747,14 @@ class CRM_Contact_BAO_Query {
                   $this->_select[$name] = "IF ( contact_a.contact_type = 'Individual', NULL, contact_a.organization_name ) as organization_name";
                 }
                 elseif ($fieldName != 'id') {
-                  if ($name == 'individual_prefix') {
-                    $this->_pseudoConstantsSelect['individual_prefix'] = array(
-                      'pseudoField' => 'prefix_id',
-                      'idCol' => "individual_prefix",
-                      'bao' => 'CRM_Contact_BAO_Contact'
-                    );
+                  if ($fieldName == 'prefix_id') {
+                    $this->_pseudoConstantsSelect['individual_prefix'] = array('pseudoField' => 'prefix_id', 'idCol' => "prefix_id", 'bao' => 'CRM_Contact_BAO_Contact');
                   }
-                  if ($name == 'individual_suffix') {
-                    $this->_pseudoConstantsSelect['individual_suffix'] = array(
-                      'pseudoField' => 'suffix_id',
-                      'idCol' => "individual_suffix",
-                      'bao' => 'CRM_Contact_BAO_Contact'
-                    );
+                  if ($fieldName == 'suffix_id') {
+                    $this->_pseudoConstantsSelect['individual_suffix'] = array('pseudoField' => 'suffix_id', 'idCol' => "suffix_id", 'bao' => 'CRM_Contact_BAO_Contact');
                   }
-                  if ($name == 'gender') {
-                    $this->_pseudoConstantsSelect['gender'] = array(
-                      'pseudoField' => 'gender_id',
-                      'idCol' => "gender",
-                      'bao' => 'CRM_Contact_BAO_Contact'
-                    );
+                  if ($fieldName == 'gender_id') {
+                    $this->_pseudoConstantsSelect['gender'] = array('pseudoField' => 'gender_id', 'idCol' => "gender_id", 'bao' => 'CRM_Contact_BAO_Contact');
                   }
                   $this->_select[$name] = "contact_a.{$fieldName}  as `$name`";
                 }
@@ -1842,12 +1821,6 @@ class CRM_Contact_BAO_Query {
 
     if (!$field) {
       $field = CRM_Utils_Array::value($locType[0], $this->_fields);
-
-      // handling for special fields like gender
-      $specialFields = array('gender_id' => 'gender');
-      if (!$field && array_key_exists($name, $specialFields)) {
-        $field = $this->_fields[$specialFields[$name]];
-      }
 
       if (!$field) {
         return;
@@ -3858,6 +3831,7 @@ WHERE  id IN ( $groupIDs )
       }
     }
 
+
     $relTypeInd = CRM_Contact_BAO_Relationship::getContactRelationshipType(NULL, 'null', NULL, 'Individual');
     $relTypeOrg = CRM_Contact_BAO_Relationship::getContactRelationshipType(NULL, 'null', NULL, 'Organization');
     $relTypeHou = CRM_Contact_BAO_Relationship::getContactRelationshipType(NULL, 'null', NULL, 'Household');
@@ -4011,10 +3985,10 @@ civicrm_relationship.start_date > {$today}
           'first_name' => 1,
           'middle_name' => 1,
           'last_name' => 1,
-          'individual_prefix' => 1,
-          'individual_suffix' => 1,
+          'prefix_id' => 1,
+          'suffix_id' => 1,
           'birth_date' => 1,
-          'gender' => 1,
+          'gender_id' => 1,
           'street_address' => 1,
           'supplemental_address_1' => 1,
           'supplemental_address_2' => 1,
@@ -5041,14 +5015,7 @@ AND   displayRelType.is_active = 1
       $qill = $value;
     }
 
-    $pseudoFields = array(
-      'email_greeting',
-      'postal_greeting',
-      'addressee',
-      'gender',
-      'individual_prefix',
-      'individual_suffix',
-    );
+    $pseudoFields = array('email_greeting', 'postal_greeting', 'addressee', 'gender_id', 'prefix_id', 'suffix_id');
 
     if (is_numeric($value)) {
       $qill = $selectValues[(int ) $value];
@@ -5082,7 +5049,7 @@ AND   displayRelType.is_active = 1
     }
 
     if (in_array($name, $pseudoFields)) {
-      if (!in_array($name, array('gender', 'individual_prefix', 'individual_suffix'))) {
+      if (!in_array($name, array('gender_id', 'prefix_id', 'suffix_id'))) {
         $wc = "contact_a.{$name}_id";
       }
       $dataType = 'Positive';
