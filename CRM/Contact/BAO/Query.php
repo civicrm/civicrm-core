@@ -5123,7 +5123,6 @@ AND   displayRelType.is_active = 1
 
       if (property_exists($dao, $value['idCol'])) {
         $val = $dao->$value['idCol'];
-        $idColumn = $key;
 
         if (CRM_Utils_System::isNull($val)) {
           $dao->$key = NULL;
@@ -5131,9 +5130,6 @@ AND   displayRelType.is_active = 1
         elseif ($baoName = CRM_Utils_Array::value('bao', $value, NULL)) {
           //preserve id value
           $idColumn = "{$key}_id";
-          if (!empty($this->_fields[$key]['name'])) {
-            $idColumn = $this->_fields[$key]['name'];
-          }
           $dao->$idColumn = $val;
           $dao->$key = CRM_Core_PseudoConstant::getLabel($baoName, $value['pseudoField'], $val);
         }
@@ -5160,7 +5156,6 @@ AND   displayRelType.is_active = 1
             $current[$lastElement] = $dao->$key;
           }
           else {
-            $values[$idColumn] = $dao->$idColumn;
             $values[$key] = $dao->$key;
           }
         }
