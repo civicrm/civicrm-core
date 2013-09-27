@@ -237,6 +237,8 @@ UPDATE civicrm_dedupe_rule_group
     $substrLenghts = array();
 
     $tables = array();
+    $daoObj = new CRM_Core_DAO();
+    $database = $daoObj->database();
     for ($count = 0; $count < self::RULES_COUNT; $count++) {
       if (!CRM_Utils_Array::value("where_$count", $values)) {
         continue;
@@ -267,14 +269,12 @@ UPDATE civicrm_dedupe_rule_group
         }
 
         //CRM-13417 to avoid fatal error "Incorrect prefix key; the used key part isn't a string, the used length is longer than the key part, or the storage engine doesn't support unique prefix keys, 1089"
-        $daoObj = new CRM_Core_DAO();
-        $database = $daoObj->database();
         $schemaQuery = "SELECT * FROM INFORMATION_SCHEMA.COLUMNS
           WHERE TABLE_SCHEMA = '{$database}' AND
           TABLE_NAME = '{$table}' AND COLUMN_NAME = '{$field}';";
         $dao = CRM_Core_DAO::executeQuery($schemaQuery);
 
-        while ($dao->fetch()) {
+        if ($dao->fetch()) {
           // set the length to null for all the fields where prefix length is not supported. eg. int,tinyint,date,enum etc dataTypes.
           if ($dao->COLUMN_NAME == $field && !in_array($dao->DATA_TYPE, array('char', 'varchar', 'binary', 'varbinary', 'text', 'blob'))) {
             $length = NULL;
