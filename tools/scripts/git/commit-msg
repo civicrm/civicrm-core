@@ -15,5 +15,5 @@ if [ -f "$PACKAGES/git-footnote/bin/git-footnote" ]; then
   TMPFILE="$1.jira"
   cp -p "$FILE" "$TMPFILE"
   $PACKAGES/git-footnote/bin/git-footnote CRM http://issues.civicrm.org/jira < "$TMPFILE" > "$FILE"
-  # rm -f "$TMPFILE"
+  rm -f "$TMPFILE"
 fi
