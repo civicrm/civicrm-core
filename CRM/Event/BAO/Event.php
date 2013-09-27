@@ -279,7 +279,12 @@ WHERE  ( civicrm_event.is_template IS NULL OR civicrm_event.is_template = 0 )";
     elseif ($all == 0) {
       // find only events ending in the future
       $endDate = date('YmdHis');
-      $query .= " AND ( `end_date` >= {$endDate} OR end_date IS NULL )";
+      $query .= "
+        AND ( `end_date` >= {$endDate} OR
+          (
+            ( end_date IS NULL OR end_date = '' ) AND start_date >= {$endDate}
+          )
+        )";
     }
     elseif ($all == 2) {
       // find only events starting in the last 3 months
