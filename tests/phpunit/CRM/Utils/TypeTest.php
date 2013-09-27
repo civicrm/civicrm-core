@@ -39,24 +39,4 @@ class CRM_Utils_TypeTest extends CiviUnitTestCase {
       array('-10foo', 'Positive', NULL),
     );
   }
-
-  /**
-   * @dataProvider numericDataProvider
-   */
-  function testNumeric($inputData, $expectedResult) {
-    $this->assertEquals($expectedResult, CRM_Utils_Rule::numeric($inputData, $inputType));
-  }
-
-  function numericDataProvider() {
-    return array(
-      array(10, true),
-      array('145.0E+3', false),
-      array('10', true),
-      array(-10, true),
-      array('-10', true),
-      array('-10foo', false),
-    );
-  }
-
-
 }
