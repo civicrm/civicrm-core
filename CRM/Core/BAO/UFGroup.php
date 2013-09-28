@@ -949,10 +949,9 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
       // hack for CRM-665
       if (isset($details->$name) || $name == 'group' || $name == 'tag') {
         // to handle gender / suffix / prefix
-        if (in_array(substr($name, -6), array('gender', 'prefix', 'suffix'))) {
-          $values[$index] = $details->$name;
-          $idColumn = "{$name}_id";
-          $params[$index] = $details->$idColumn;
+        if (in_array(substr($name, 0, -3), array('gender', 'prefix', 'suffix'))) {
+          $values[$index] = CRM_Core_PseudoConstant::getLabel('CRM_Contact_DAO_Contact', $name, $details->$name);
+          $params[$index] = $details->$name;
         }
         elseif (in_array($name, CRM_Contact_BAO_Contact::$_greetingTypes)) {
           $dname          = $name . '_display';
@@ -1857,7 +1856,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
           '' => ts('- select -')) + CRM_Member_PseudoConstant::membershipStatus(NULL, NULL, 'label'), $required
       );
     }
-    elseif ($fieldName === 'gender') {
+    elseif ($fieldName === 'gender_id') {
       $genderOptions = array();
       $gender = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'gender_id');
       foreach ($gender as $key => $var) {
@@ -1868,13 +1867,13 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
         $form->addRule($name, ts('%1 is a required field.', array(1 => $title)), 'required');
       }
     }
-    elseif ($fieldName === 'individual_prefix') {
+    elseif ($fieldName === 'prefix_id') {
       $form->add('select', $name, $title,
         array(
           '' => ts('- select -')) + CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'prefix_id'), $required
       );
     }
-    elseif ($fieldName === 'individual_suffix') {
+    elseif ($fieldName === 'suffix_id') {
       $form->add('select', $name, $title,
         array(
           '' => ts('- select -')) + CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'suffix_id'), $required
