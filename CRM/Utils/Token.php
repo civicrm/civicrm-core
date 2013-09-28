@@ -644,6 +644,9 @@ class CRM_Utils_Token {
 
     $value = NULL;
 
+    // Support legacy tokens
+    $token = CRM_Utils_Array::value($token, self::legacyContactTokens(), $token);
+
     // check if the token we were passed is valid
     // we have to do this because this function is
     // called only when we find a token in the string
@@ -664,9 +667,16 @@ class CRM_Utils_Token {
     else {
       $value = CRM_Utils_Array::retrieveValueRecursive($contact, $token);
 
-      // note that incase of pseudoconstants we get array ( 0 => id, 1 => label )
+      // FIXME: for some pseudoconstants we get array ( 0 => id, 1 => label )
       if (is_array($value)) {
         $value = $value[1];
+      }
+      // Convert pseudoconstants using metadata
+      elseif ($value && is_numeric($value)) {
+        $allFields = CRM_Contact_BAO_Contact::exportableFields('All');
+        if (!empty($allFields[$token]['pseudoconstant'])) {
+          $value = CRM_Core_PseudoConstant::getLabel('CRM_Contact_BAO_Contact', $token, $value);
+        }
       }
     }
 
@@ -1214,10 +1224,6 @@ class CRM_Utils_Token {
     if (!empty($greetingTokens)) {
       // first use the existing contact object for token replacement
       if (!empty($contactDetails)) {
-        // unset id's to get labels for the pseudoconstants
-        foreach ( array('individual_prefix', 'individual_suffix', 'gender') as $field ) {
-          unset($contactDetails[0][$contactId][$field]);
-        }
         $tokenString = CRM_Utils_Token::replaceContactTokens($tokenString, $contactDetails, TRUE, $greetingTokens, TRUE);
       }
 
@@ -1473,4 +1479,16 @@ class CRM_Utils_Token {
   function getPermissionEmails($permissionName) {}
 
   function getRoleEmails($roleName) {}
+
+  /**
+   * @return array: legacy_token => new_token
+   */
+  static function legacyContactTokens() {
+    return array(
+      'individual_prefix' => 'prefix_id',
+      'individual_suffix' => 'suffix_id',
+      'gender' => 'gender_id',
+    );
+  }
+
 }
