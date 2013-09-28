@@ -635,5 +635,21 @@ class CRM_Utils_Array {
     }
     return $default;
   }
+
+  /*
+   * Similar to the value method, but this one will throw an exception 
+   * if you give it bad arguments.
+   */
+  static function fetch($key, $array, $default = NULL) {
+    if (is_array($array)) {
+      if (array_key_exists($key, $array)) {
+        return $array[$key];
+      } else {
+        return $default;
+      }
+    } else {
+      throw Exception("CRM_Utils_Array::fetch expects an array as the second argument, but you passed (" . print_r($key, TRUE) . ", " . print_r($array, TRUE) . ", " . print_r($default, TRUE) . ")");
+    }
+  }
 }
 
