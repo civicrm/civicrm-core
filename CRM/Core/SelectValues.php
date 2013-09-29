@@ -659,8 +659,9 @@ class CRM_Core_SelectValues {
       $customFields        = CRM_Core_BAO_CustomField::getFields('Individual');
       $customFieldsAddress = CRM_Core_BAO_CustomField::getFields('Address');
       $customFields        = $customFields + $customFieldsAddress;
+      $legacyTokenNames = array_flip(CRM_Utils_Token::legacyContactTokens());
 
-      foreach ($values as $key => $val) {
+      foreach ($values as $val) {
         if (in_array($val, $skipTokens)) {
           continue;
         }
@@ -669,7 +670,9 @@ class CRM_Core_SelectValues {
           $tokens["{contact.$val}"] = CRM_Utils_Array::value($customFieldId, $customFields) ? $customFields[$customFieldId]['label'] . " :: " . $customFields[$customFieldId]['groupTitle'] : '';
         }
         else {
-          $tokens["{contact.$val}"] = $exportFields[$val]['title'];
+          // Support legacy token names
+          $tokenName = CRM_Utils_Array::value($val, $legacyTokenNames, $val);
+          $tokens["{contact.$tokenName}"] = $exportFields[$val]['title'];
         }
       }
 
