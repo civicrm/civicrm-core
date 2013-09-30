@@ -2136,6 +2136,21 @@ ORDER BY civicrm_email.is_primary DESC";
               }
             }
           }
+          else if (in_array($key, 
+              array('nick_name', 
+                'job_title', 
+                'middle_name', 
+                'birth_date', 
+                'gender',
+                'current_employer', 
+                'individual_prefix', 
+                'individual_suffix')) &&
+            ($value == '' || !isset($value)) &&
+            ($session->get('authSrc') & (CRM_Core_Permission::AUTH_SRC_CHECKSUM + CRM_Core_Permission::AUTH_SRC_LOGIN)) == 0) {
+            // CRM-10128: if auth source is not checksum / login && $value is blank, do not fill $data with empty value 
+            // to avoid update with empty values
+            continue;
+          } 
           else {
             $data[$key] = $value;
           }
