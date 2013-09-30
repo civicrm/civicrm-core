@@ -31,8 +31,9 @@
 
       var activeContactId = null;
       // For organization autocomplete
-      if($(this).attr('autocompleteType') == 'org') {
-	var urlParams = urlParams + '&org=1'; 
+      if($(this).attr('urlParam')) {
+	var param = $(this).attr('urlParam');
+      	var urlParams = urlParams + '&' + param; 
       }
       var contactUrl = CRM.url('civicrm/ajax/rest', urlParams);
       var setContactId = function(newContactId) {
