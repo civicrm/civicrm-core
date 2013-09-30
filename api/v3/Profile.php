@@ -490,9 +490,15 @@ function _civicrm_api3_buildprofile_submitfields($profileID, $optionsBehaviour =
       'help_pre' => CRM_Utils_Array::value('help_pre', $field),
       'help_post' => CRM_Utils_Array::value('help_post', $field),
       'entity' => $entity,
+      'weight' => CRM_Utils_Array::value('weight', $field),
     ), $aliasArray);
 
-    $realFieldName = $field['field_name'];
+    $ufFieldTaleFieldName = $field['field_name'];
+    if(isset($entity[$ufFieldTaleFieldName]['name'])) {
+      // in the case where we are dealing with an alias we map back to a name
+      // this will be tested by 'membership_type_id' field
+      $ufFieldTaleFieldName = $entity[$ufFieldTaleFieldName]['name'];
+    }
     //see function notes
     // as we build up a list of these we should be able to determine a generic approach
     //
@@ -507,11 +513,11 @@ function _civicrm_api3_buildprofile_submitfields($profileID, $optionsBehaviour =
       'tag' => 'tag_id',
     );
 
-    if(array_key_exists($realFieldName, $hardCodedEntityFields)) {
-      $realFieldName = $hardCodedEntityFields[$realFieldName];
+    if(array_key_exists($ufFieldTaleFieldName, $hardCodedEntityFields)) {
+      $ufFieldTaleFieldName = $hardCodedEntityFields[$ufFieldTaleFieldName];
     }
 
-    $entities[$entity][$fieldName] = $realFieldName;
+    $entities[$entity][$fieldName] = $ufFieldTaleFieldName;
   }
 
   foreach ($entities as $entity => $entityFields) {
@@ -528,12 +534,18 @@ function _civicrm_api3_buildprofile_submitfields($profileID, $optionsBehaviour =
         $fieldName = strtolower($realName);
         }
         if(isset($entityGetFieldsResult[$realName]['uniqueName'])) {
-         // we won't alias the field name on here are we are using uniqueNames for the possibility of needing to differentiate
-         // which entity 'status_id' belongs to
+          // we won't alias the field name on here are we are using uniqueNames for the possibility of needing to differentiate
+          // which entity 'status_id' belongs to
           $fieldName = $entityGetFieldsResult[$realName]['uniqueName'];
         }
+        else{
+          if(isset($entityGetFieldsResult[$realName]['name'])) {
+            // this will sort out membership_type_id vs membership_type
+            $fieldName = $entityGetFieldsResult[$realName]['name'];
+          }
+        }
       }
-      $profileFields[$profileID][$fieldName] = array_merge($profileFields[$profileID][$entityfield], $entityGetFieldsResult[$realName]);
+      $profileFields[$profileID][$fieldName] = array_merge($entityGetFieldsResult[$realName], $profileFields[$profileID][$entityfield]);
       if(!isset($profileFields[$profileID][$fieldName]['api.aliases'])) {
        $profileFields[$profileID][$fieldName]['api.aliases'] = array();
       }
@@ -560,9 +572,13 @@ function _civicrm_api3_buildprofile_submitfields($profileID, $optionsBehaviour =
        */
     }
   }
+  uasort($profileFields[$profileID], "_civicrm_api3_order_by_weight");
   return $profileFields[$profileID];
 }
 
+function _civicrm_api3_order_by_weight($a, $b) {
+  return CRM_Utils_Array::value('weight', $b) < CRM_Utils_Array::value('weight', $a) ? TRUE : FALSE;
+}
 /**
  * Here we map the profile fields as stored in the uf_field table to their 'real entity'
  * we also return the profile fieldname
