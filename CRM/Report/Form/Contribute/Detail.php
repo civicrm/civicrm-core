@@ -550,7 +550,7 @@ SELECT COUNT(contribution_soft_civireport.amount ) as count,
 GROUP BY {$this->_aliases['civicrm_contribution']}.currency";
       $dao = CRM_Core_DAO::executeQuery($sql);
       while ($dao->fetch()) {
-        $totalAmount[] = CRM_Utils_Money::format($dao->amount, $dao->currency)."(".$dao->count.")";
+        $totalAmount[] = CRM_Utils_Money::format($dao->amount, $dao->currency)." (".$dao->count.")";
         $average[] =   CRM_Utils_Money::format($dao->avg, $dao->currency);
         $count += $dao->count;
       }
