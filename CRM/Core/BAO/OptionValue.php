@@ -290,6 +290,7 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
     $value = $optionValue->value;
 
     // get the proper group name & affected field name
+    // todo: this may no longer be needed for individuals - check inputs
     $individuals = array(
       'gender' => 'gender_id',
       'individual_prefix' => 'prefix_id',

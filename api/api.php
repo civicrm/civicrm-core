@@ -265,7 +265,7 @@ function _civicrm_api_resolve($apiRequest) {
  * @throws CiviCRM_API3_Exception
  * @return array
  */
-function civicrm_api3($entity, $action, $params) {
+function civicrm_api3($entity, $action, $params = array()) {
   $params['version'] = 3;
   $result = civicrm_api($entity, $action, $params);
   if(is_array($result) && !empty($result['is_error'])){
