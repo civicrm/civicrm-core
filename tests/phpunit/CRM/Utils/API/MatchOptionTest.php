@@ -6,12 +6,45 @@ require_once 'CiviTest/CiviUnitTestCase.php';
  */
 class CRM_Utils_API_MatchOptionTest extends CiviUnitTestCase {
 
+  /**
+   * @var array
+   */
+  var $noise;
+
   function setUp() {
     parent::setUp();
     $this->assertDBQuery(0, "SELECT count(*) FROM civicrm_contact WHERE first_name='Jeffrey' and last_name='Lebowski'");
 
     // Create noise to ensure we don't accidentally/coincidentally match the first record
-    $this->individualCreate(array('email' => 'ignore1@example.com'));
+    $this->noise['individual'] = $this->individualCreate(array(
+      'email' => 'ignore1@example.com',
+      // 'street_address-1' => 'Irrelevant'
+      'api.Address.create' => array(
+       'location_type_id' => 1,
+        'street_address' => '123 Irrelevant Str',
+        'supplemental_address_1' => 'Room 987',
+      ),
+    ));
+  }
+
+  function tearDown() {
+    $noise = $this->callAPISuccess('Contact', 'get', array(
+      'id' => $this->noise['individual'],
+      'return' => array('email'),
+      'api.Address.get' => 1,
+    ));
+    $this->assertEquals(1, count($noise['values']));
+    foreach ($noise['values'] as $value) {
+      $this->assertEquals('ignore1@example.com', $value['email']);
+      $this->assertEquals(1, count($value['api.Address.get']['values']));
+    }
+    CRM_core_DAO::executeQuery('DELETE FROM civicrm_address WHERE contact_id=%1', array(
+      1 => array($this->noise['individual'], 'Positive')
+    ));
+    $this->callAPISuccess('Contact', 'delete', array(
+      'id' => $this->noise['individual'],
+    ));
+    parent::tearDown();
   }
 
   /**
