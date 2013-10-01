@@ -491,7 +491,7 @@ WHERE  civicrm_group_contact.status = 'Added'
       $result = CRM_Core_DAO::executeQuery($insertSql);
       CRM_Core_DAO::executeQuery(
         "INSERT IGNORE INTO civicrm_group_contact_cache (contact_id, group_id)
-        SELECT DISTINCT id, group_id FROM $tempTable
+        SELECT DISTINCT $idName, group_id FROM $tempTable
       ");
       CRM_Core_DAO::executeQuery(" DROP TABLE $tempTable");
     }
