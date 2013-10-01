@@ -209,7 +209,7 @@ class WebTest_Campaign_MailingTest extends CiviSeleniumTestCase {
     //----------end New Mailing-------------
 
     //check redirected page to Scheduled and Sent Mailings and  verify for mailing name
-    $this->assertElementContainsText('page-title', "Scheduled and Sent Mailings");
+    $this->assertElementContainsText('page-title', "Find Mailings");
     $this->assertElementContainsText('Search', "Mailing $mailingName Webtest");
 
     //--------- mail delivery verification---------
