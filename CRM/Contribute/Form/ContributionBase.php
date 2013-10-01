@@ -237,7 +237,17 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
               }
             }
             else {
-              $this->_membershipContactID = $membership->contact_id;
+              $membershipType = new CRM_Member_BAO_MembershipType();
+              $membershipType->id = $membership->membership_type_id;
+              if ($membershipType->find(TRUE)) {
+                $permContacts = CRM_Contact_BAO_Relationship::getPermissionedContacts($this->_userID, $membershipType->relationship_type_id);
+                if (array_key_exists($membership->contact_id, $permContacts)) {
+                  $this->_membershipContactID = $membership->contact_id;
+                }
+                else {
+                  CRM_Core_Session::setStatus(ts("Oops. The membership you're trying to renew appears to be invalid. Contact your site administrator if you need assistance. If you continue, you will be issued a new membership."), ts('Membership Invalid'), 'alert');
+                }
+              }
             }
           }
         }
