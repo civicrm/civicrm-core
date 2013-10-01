@@ -102,7 +102,7 @@ var CRM = CRM || {};
         }
         return settings.success.call(this, result, settings);
       },
-      ajaxURL: 'civicrm/ajax/rest',
+      ajaxURL: 'civicrm/ajax/rest'
     };
     action = action.toLowerCase();
     // Default success handler
