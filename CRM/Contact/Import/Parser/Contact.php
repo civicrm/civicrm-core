@@ -1678,7 +1678,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
     //get the id of the contact whose street address is not parsable, CRM-5886
     if ($this->_parseStreetAddress && $newContact->address) {
       foreach ($newContact->address as $address) {
-        if ($address['street_address'] && (!CRM_Utils_Array::value('street_number', $address) || !CRM_Utils_Array::value('street_name', $address))) {
+        if (!empty($address['street_address']) && (!CRM_Utils_Array::value('street_number', $address) || !CRM_Utils_Array::value('street_name', $address))) {
           $this->_unparsedStreetAddressContacts[] = array(
             'id' => $newContact->id,
             'streetAddress' => $address['street_address'],
