@@ -62,7 +62,7 @@ cj(function($) {
     '3': 'CiviEvent',
     '4': 'activity',
     '5': 'CiviMember',
-    '6': 'CiviCase',
+    '6': 'CiviCase'
   };
   // Handle change of results mode
   $('#component_mode').change(function() {
