@@ -2822,6 +2822,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
         }
       }
       else {
+        // TODO: prefix, suffix and gender translation may no longer be necessary - check inputs
         if ($key === 'individual_suffix') {
           $data['suffix_id'] = $value;
         }

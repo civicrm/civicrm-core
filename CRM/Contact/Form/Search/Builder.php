@@ -413,29 +413,19 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
     $options = array(
       'group' => 'group_contact',
       'tag' => 'entity_tag',
-      'country' => 'address',
-      'state_province' => 'address',
-      'gender' => 'contact',
-      'world_region' => 'contact',
-      'individual_prefix' => 'contact',
-      'individual_suffix' => 'contact',
-      'preferred_communication_method' => 'contact',
-      'preferred_language' => 'contact',
       'on_hold' => 'yesno',
       'is_bulkmail' => 'yesno',
-      'activity_type' => 'activity',
-      'activity_status' => 'activity',
-      'financial_type' => 'contribution',
-      'contribution_page_id' => 'contribution',
-      'contribution_status' => 'contribution',
       'payment_instrument' => 'contribution',
       'membership_status' => 'membership',
       'membership_type' => 'membership',
+      'member_is_test' => 'yesno',
+      'member_is_pay_later' => 'yesno',
+      'is_override' => 'yesno',
     );
-    $entities = array('contact', 'activity', 'participant', 'pledge', 'member', 'contribution');
+    $entities = array('contact', 'address', 'activity', 'participant', 'pledge', 'member', 'contribution');
     CRM_Contact_BAO_Query_Hook::singleton()->alterSearchBuilderOptions($entities, $options);
     foreach ($entities as $entity) {
-      $fields = civicrm_api($entity, 'getfields', array('version' => 3));
+      $fields = civicrm_api3($entity, 'getfields');
       foreach ($fields['values'] as $field => $info) {
         if (!empty($info['options']) || !empty($info['pseudoconstant']) || !empty($info['option_group_id']) || !empty($info['enumValues'])) {
           $options[$field] = $entity;
