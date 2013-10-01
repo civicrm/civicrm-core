@@ -154,7 +154,8 @@ function _civicrm_api3_membership_create_spec(&$params) {
     'title' => 'Skip status calculation. By default this is 0 if id is not set and 1 if it is set.'
   );
   $params['num_terms'] = array(
-    'title' => 'Number of terms to add/renew. If this parameter is passed, dates will be calculated automatically. If no id is passed (new membership) and no dates are given, num_terms will be assumed to be 1.'
+    'title' => 'Number of terms to add/renew. If this parameter is passed, dates will be calculated automatically. If no id is passed (new membership) and no dates are given, num_terms will be assumed to be 1.',
+    'type' => CRM_Utils_Type::T_INT,
   );
 }
 /**
