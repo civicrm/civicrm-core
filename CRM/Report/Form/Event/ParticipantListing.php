@@ -38,10 +38,12 @@ class CRM_Report_Form_Event_ParticipantListing extends CRM_Report_Form_Event {
 
   protected $_contribField = FALSE;
 
-  protected $_customGroupExtends = array('Participant');
+  protected $_customGroupExtends = array('Participant', 'Contact', 'Individual',);
+
   public $_drilldownReport = array('event/income' => 'Link to Detail Report');
 
   function __construct() {
+    $this->_autoIncludeIndexedFieldsAsOrderBys = 1;
 
     // Check if CiviCampaign is a) enabled and b) has active campaigns
     $config = CRM_Core_Config::singleton();
@@ -73,11 +75,19 @@ class CRM_Report_Form_Event_ParticipantListing extends CRM_Report_Form_Event {
             'no_display' => TRUE,
             'required' => TRUE,
           ),
+          'gender_id' =>
+          array('title' => ts('Gender'),
+          ),
           'birth_date' =>
           array('title' => ts('Birth Date'),
           ),
-          'gender_id' =>
-          array('title' => ts('Gender'),
+          'age' => array(
+            'title'   => ts('Age'),
+            'dbAlias' => 'TIMESTAMPDIFF(YEAR, contact_civireport.birth_date, CURDATE())',
+          ),
+          'age_at_event' => array(
+            'title'   => ts('Age at Event'),
+            'dbAlias' => 'TIMESTAMPDIFF(YEAR, contact_civireport.birth_date, event_civireport.start_date)',
           ),
           'employer_id' =>
           array('title' => ts('Organization'),
@@ -92,12 +102,37 @@ class CRM_Report_Form_Event_ParticipantListing extends CRM_Report_Form_Event {
             'default_weight' => '0',
             'default_order' => 'ASC',
           ),
+          'gender_id' =>
+          array(
+            'name' => 'gender_id',
+            'title' => ts('Gender'),
+          ),
+          'birth_date' =>
+          array(
+            'name' => 'birth_date',
+            'title' => ts('Birth Date'),
+          ),
+          'age_at_event' =>
+          array(
+            'name' => 'age_at_event',
+            'title' => ts('Age at Event'),
+          ),
         ),
         'filters' =>
         array(
           'sort_name' =>
           array('title' => ts('Participant Name'),
             'operator' => 'like',
+          ),
+          'gender_id' =>
+          array('title' => ts('Gender'),
+            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
+            'options' => CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'gender_id'),
+          ),
+          'birth_date' => array(
+            'title' => 'Birth Date',
+            'operatorType' => CRM_Report_Form::OP_DATE,
+            'type'         => CRM_Utils_Type::T_DATE
           ),
         ),
       ),
@@ -652,6 +687,14 @@ class CRM_Report_Form_Event_ParticipantListing extends CRM_Report_Form_Event {
       if (array_key_exists('civicrm_contact_gender_id', $row)) {
         if ($value = $row['civicrm_contact_gender_id']) {
           $rows[$rowNum]['civicrm_contact_gender_id'] = $genders[$value];
+        }
+        $entryFound = TRUE;
+      }
+
+      // display birthday in the configured custom format
+      if (array_key_exists('civicrm_contact_birth_date', $row)) {
+        if ($value = $row['civicrm_contact_birth_date']) {
+            $rows[$rowNum]['civicrm_contact_birth_date'] = CRM_Utils_Date::customFormat($row['civicrm_contact_birth_date'], '%Y%m%d');
         }
         $entryFound = TRUE;
       }
