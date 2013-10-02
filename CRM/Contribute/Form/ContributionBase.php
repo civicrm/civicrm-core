@@ -225,29 +225,26 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
         if ($membership->find(TRUE)) {
           $this->_defaultMemTypeId = $membership->membership_type_id;
           if ($membership->contact_id != $this->_contactID) {
+            $validMembership = FALSE;
             $employers = CRM_Contact_BAO_Relationship::getPermissionedEmployer($this->_userID);
-            if (!empty($employers)) {
-              if (array_key_exists($membership->contact_id, $employers)) {
-                $this->_membershipContactID = $membership->contact_id;
-                $this->assign('membershipContactID', $this->_membershipContactID);
-                $this->assign('membershipContactName', $employers[$this->_membershipContactID]['name']);
-              }
-              else {
-                CRM_Core_Session::setStatus(ts("Oops. The membership you're trying to renew appears to be invalid. Contact your site administrator if you need assistance. If you continue, you will be issued a new membership."), ts('Membership Invalid'), 'alert');
-              }
-            }
-            else {
+            if (!empty($employers) && array_key_exists($membership->contact_id, $employers)) {
+              $this->_membershipContactID = $membership->contact_id;
+              $this->assign('membershipContactID', $this->_membershipContactID);
+              $this->assign('membershipContactName', $employers[$this->_membershipContactID]['name']);
+              $validMembership = TRUE;
+            } else {
               $membershipType = new CRM_Member_BAO_MembershipType();
               $membershipType->id = $membership->membership_type_id;
               if ($membershipType->find(TRUE)) {
                 $permContacts = CRM_Contact_BAO_Relationship::getPermissionedContacts($this->_userID, $membershipType->relationship_type_id);
                 if (array_key_exists($membership->contact_id, $permContacts)) {
                   $this->_membershipContactID = $membership->contact_id;
-                }
-                else {
-                  CRM_Core_Session::setStatus(ts("Oops. The membership you're trying to renew appears to be invalid. Contact your site administrator if you need assistance. If you continue, you will be issued a new membership."), ts('Membership Invalid'), 'alert');
+                  $validMembership = TRUE;
                 }
               }
+            }
+            if (!$validMembership) {
+              CRM_Core_Session::setStatus(ts("Oops. The membership you're trying to renew appears to be invalid. Contact your site administrator if you need assistance. If you continue, you will be issued a new membership."), ts('Membership Invalid'), 'alert');
             }
           }
         }
