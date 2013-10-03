@@ -182,7 +182,7 @@ class CRM_Core_Payment_Form {
       'title' => ts('Card Type'),
       'cc_field' => TRUE,
       'attributes' => $creditCardType,
-      'is_required' => TRUE,
+      'is_required' => FALSE,
     );
   }
 
@@ -237,7 +237,7 @@ class CRM_Core_Payment_Form {
   /**
    * Function to add all the credit card fields
    *
-   * @return None
+   * @return void
    * @access public
    */
   static function buildCreditCard(&$form, $useRequired = FALSE) {
@@ -362,6 +362,9 @@ class CRM_Core_Payment_Form {
       ) {
         $errors['cvv2'] = ts('Please enter a valid Credit Card Verification Number');
       }
+    }
+    elseif (!empty($values['credit_card_number'])) {
+      $errors['credit_card_number'] = ts('Please enter a valid Credit Card Number and Type');
     }
   }
 
