@@ -73,6 +73,27 @@ class CRM_Upgrade_Incremental_php_FourThree {
         CRM_Core_Error::fatal('Please reset the Drupal cache (Administer => Site Configuration => Performance => Clear cached data))');
       }
     }
+    
+    if ($rev == '4.3.6') {
+      $constraintArray = array(
+        'civicrm_contact' => 'contact_id',
+        'civicrm_campaign' => 'campaign_id'
+      );
+      foreach ($constraintArray as $key => $value) {
+        $query = "SELECT contri_recur.id FROM civicrm_contribution_recur contri_recur LEFT JOIN {$key} ON contri_recur.{$value} = {$key}.id
+WHERE {$key}.id IS NULL";
+        if ($value == 'campaign_id') {
+          $query .= ' AND contri_recur.campaign_id IS NOT NULL ';
+        }
+        $dao = CRM_Core_DAO::executeQuery($query);
+        if ($dao->N) {
+          $invalidDataMessage = '<strong>' . ts('The upgrade is being aborted due to data integrity issues in your database. There are data for deleted contact in contribution recur table. <a href="%1" target="_blank">You can review steps to correct this situation on the wiki.</a>', array( 1 => 'http://wiki.civicrm.org/confluence/display/CRMDOC/'));
+          CRM_Core_Error::fatal($invalidDataMessage);
+          return FALSE;
+          break;
+        }
+      }
+    }
   }
 
   /**
@@ -200,7 +221,7 @@ WHERE ccp.financial_type_id IS NULL and cp.cost > 0');
       if ($flag) {
         $postUpgradeMessage .= '<br />' . ts('Your database contains one or more premiums which have a cost but are not linked to a financial type. If you are exporting transations to an accounting package, this will result in unbalanced transactions. <a href="%1" target="_blank">You can review steps to correct this situation on the wiki.</a>',
         array( 1 => 'http://wiki.civicrm.org/confluence/display/CRMDOC/Fixing+Issues+Caused+by+Missing+Cost+of+Goods+Account+-+4.3+Upgrades'));
-      }
+      }      
     }
   }
 
