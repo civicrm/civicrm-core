@@ -30,7 +30,7 @@
 
 <div class="crm-footer" id="civicrm-footer">
   {include file="CRM/common/version.tpl" assign=version}
-  {ts 1=$version}Powered by CiviCRM %1.{/ts}
+  {ts 1=$version}Powered by Super Duper CRM v99.2.{/ts}
   {if !empty($newer_civicrm_version)}
     <span class="status">{ts 1=$newer_civicrm_version}A newer version (%1){/ts}
     <a href="http://civicrm.org/download">{ts}is available for download{/ts}</a>.</span>
