@@ -51,7 +51,12 @@
     <tr class="even">
         <td class="tasklist nowrap"><a href="{crmURL p="civicrm/admin/domain" q="action=update&reset=1&civicrmDestination=`$destination`"}" title="{$linkTitle}">{ts}Organization Address and Contact Info
         {/ts}</a></td>
-        <td>{ts}Organization name, email address for system-generated emails, organization address{/ts}</li>
+        <td>{ts}Organization name, email address for system-generated emails, organization address{/ts}</td>
+    </tr>
+    <tr class="even">
+        <td class="tasklist nowrap"><a href="{crmURL p="civicrm/admin/setting/component" q="action=update&reset=1&civicrmDestination=`$destination`"}" title="{$linkTitle}">{ts}Enable components
+        {/ts}</a></td>
+        <td>{ts}Enable the required CiviCRM components.(CiviContribute, CiviEvent etc.){/ts}</td>
     </tr>
 
     <tr class="columnheader">
@@ -71,15 +76,15 @@
     </tr>
     <tr class="even">
         <td class="tasklist nowrap"><a href="{crmURL p="civicrm/admin/setting/search" q="reset=1&civicrmDestination=`$destination`"}" title="{$linkTitle}">{ts}Search Settings{/ts}</a></td>
-        <td>{ts}Adjust search behaviors including wildcards, and data to include in quick search results. Adjusting search settings can improve performance for larger datasets.{/ts}</li>
+        <td>{ts}Adjust search behaviors including wildcards, and data to include in quick search results. Adjusting search settings can improve performance for larger datasets.{/ts}</td>
     </tr>
     <tr class="even">
         <td class="tasklist nowrap"><a href="{crmURL p="civicrm/admin/setting/misc" q="reset=1&civicrmDestination=`$destination`"}" title="{$linkTitle}">{ts}Misc (Undelete, PDFs, Limits, Logging, Captcha, etc.){/ts}</a></td>
-        <td>{ts}Version reporting and alerts, reCAPTCHA configuration and attachments.{/ts}</li>
+        <td>{ts}Version reporting and alerts, reCAPTCHA configuration and attachments.{/ts}</td>
     </tr>
     <tr class="even">
         <td class="tasklist nowrap"><a href="{crmURL p="civicrm/admin/options/subtype" q="reset=1&civicrmDestination=`$destination`"}" title="{$linkTitle}">{ts}Contact Types{/ts}</a></td>
-        <td>{ts}You can modify the names of the built-in contact types (Individual, Household, Organizations), and you can create or modify "contact subtypes" for more specific uses (e.g. Student, Parent, Team, etc.).{/ts}</li>
+        <td>{ts}You can modify the names of the built-in contact types (Individual, Household, Organizations), and you can create or modify "contact subtypes" for more specific uses (e.g. Student, Parent, Team, etc.).{/ts}</td>
     </tr>
 
     <tr class="columnheader">
@@ -91,7 +96,7 @@
     </tr>
     <tr class="even">
         <td class="tasklist nowrap"><a href="{crmURL p="civicrm/admin/options/from_email_address" q="group=from_email_address`$fromAction`&reset=1&civicrmDestination=`$destination`"}" title="{$linkTitle}">{ts}From Email Addresses{/ts}</a></td>
-        <td>{ts}Define general email address(es) that can be used as the FROM address when sending email to contacts from within CiviCRM (e.g. info@example.org){/ts}</li>
+        <td>{ts}Define general email address(es) that can be used as the FROM address when sending email to contacts from within CiviCRM (e.g. info@example.org){/ts}</td>
     </tr>
 
     <tr class="columnheader">
@@ -108,7 +113,7 @@
             {else}
                 <td class="tasklist"><a href="{$config->userFrameworkBaseURL}?q=admin/user/permissions&civicrmDestination=civicrm/admin/configtask">{ts}Permissions for Anonymous Users{/ts}</a></td>
             {/if}
-            <td>{ts}You will also need to change Drupal permissions so anonymous users can make contributions, register for events and / or use profiles to enter contact information.{/ts} {docURL page="Default Permissions and Roles" resource="wiki"}</li>
+            <td>{ts}You will also need to change Drupal permissions so anonymous users can make contributions, register for events and / or use profiles to enter contact information.{/ts} {docURL page="Default Permissions and Roles" resource="wiki"}</td>
         </tr>
     {/if}
     <tr class="even">
@@ -133,7 +138,7 @@
     </tr>
     <tr class="even">
         <td class="tasklist nowrap"><a href="{crmURL p="civicrm/group" q="reset=1&civicrmDestination=`$destination`"}" title="{$linkTitle}">{ts}Manage Groups{/ts}</a></td>
-        <td>{ts}Use Groups to organize contacts (e.g. these contacts are part of our 'Steering Committee').{/ts}</li>
+        <td>{ts}Use Groups to organize contacts (e.g. these contacts are part of our 'Steering Committee').{/ts}</td>
     </tr>
 
     <tr class="columnheader">
@@ -145,7 +150,7 @@
     </tr>
     <tr class="even">
         <td class="tasklist nowrap"><a href="{crmURL p="civicrm/admin/uf/group" q="reset=1&civicrmDestination=`$destination`"}" title="{$linkTitle}">{ts}Profiles{/ts}</a></td>
-        <td>{ts}Profiles allow you to aggregate groups of fields and include them in your site as input forms, contact display pages, and search and listings features.{/ts}</li>
+        <td>{ts}Profiles allow you to aggregate groups of fields and include them in your site as input forms, contact display pages, and search and listings features.{/ts}</td>
     </tr>
 </table>
 <br />
