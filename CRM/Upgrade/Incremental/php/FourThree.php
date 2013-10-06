@@ -47,7 +47,7 @@ class CRM_Upgrade_Incremental_php_FourThree {
    *
    * @param $postUpgradeMessage string, alterable
    * @param $rev string, a version number, e.g. '4.3.alpha1', '4.3.beta3', '4.3.0'
-   * @return void
+   * @return void|bool
    */
   function setPreUpgradeMessage(&$preUpgradeMessage, $rev, $currentVer = NULL) {
     if ($rev == '4.3.beta3') {
@@ -71,6 +71,26 @@ class CRM_Upgrade_Incremental_php_FourThree {
         FALSE === array_search('civicrm_preprocess_page_inject', $theme_registry['page']['preprocess functions'])
       ) {
         CRM_Core_Error::fatal('Please reset the Drupal cache (Administer => Site Configuration => Performance => Clear cached data))');
+      }
+    }
+    
+    if ($rev == '4.3.6') {
+      $constraintArray = array(
+        'civicrm_contact' => 'contact_id',
+        'civicrm_campaign' => 'campaign_id'
+      );
+      foreach ($constraintArray as $key => $value) {
+        $query = "SELECT contri_recur.id FROM civicrm_contribution_recur contri_recur LEFT JOIN {$key} ON contri_recur.{$value} = {$key}.id
+WHERE {$key}.id IS NULL";
+        if ($value == 'campaign_id') {
+          $query .= ' AND contri_recur.campaign_id IS NOT NULL ';
+        }
+        $dao = CRM_Core_DAO::executeQuery($query);
+        if ($dao->N) {
+          $invalidDataMessage = '<strong>Oops, it looks like you have orphaned recurring contribution records in your database. Before this upgrade can complete they will need to be fixed or deleted. <a href="http://wiki.civicrm.org/confluence/display/CRMDOC/Fixing+Orphaned+Contribution+Recur+Records" target="_blank">You can review steps to correct this situation on the documentation wiki.</a></strong>';
+          CRM_Core_Error::fatal($invalidDataMessage);
+          return FALSE;
+        }
       }
     }
   }
