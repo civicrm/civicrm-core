@@ -53,8 +53,7 @@ class CRM_Admin_Form_Setting_Smtp extends CRM_Admin_Form_Setting {
       CRM_Mailing_Config::OUTBOUND_OPTION_SMTP => ts('SMTP'),
       CRM_Mailing_Config::OUTBOUND_OPTION_SENDMAIL => ts('Sendmail'),
       CRM_Mailing_Config::OUTBOUND_OPTION_DISABLED => ts('Disable Outbound Email'),
-      // CRM-13445 Suppressing the Redirect to DB option pending further evaluation
-      // CRM_Mailing_Config::OUTBOUND_OPTION_REDIRECT_TO_DB => ts('Redirect to Database'),
+      CRM_Mailing_Config::OUTBOUND_OPTION_REDIRECT_TO_DB => ts('Redirect to Database'),
     );
     $this->addRadio('outBound_option', ts('Select Mailer'), $outBoundOption);
 
