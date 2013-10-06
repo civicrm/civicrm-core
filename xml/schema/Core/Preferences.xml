@@ -181,7 +181,10 @@
        <name>mailing_backend</name>
        <type>text</type>
        <comment>Smtp Backend configuration.</comment>
-       <htmlType>textarea</htmlType>
+       <html>
+         <type>TextArea</type>
+       </html>
+
        <rows>20</rows>
        <cols>80</cols>
        <add>2.2</add>

@@ -87,7 +87,10 @@
        <name>parameters</name>
        <type>text</type>
        <comment>List of parameters to the command.</comment>
-       <htmlType>textarea</htmlType>
+       <html>
+         <type>TextArea</type>
+       </html>
+
        <rows>4</rows>
        <cols>60</cols>
        <add>4.1</add>

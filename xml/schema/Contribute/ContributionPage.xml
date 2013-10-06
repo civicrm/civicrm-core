@@ -29,7 +29,10 @@
   <field>
     <name>intro_text</name>
     <type>text</type>
-    <htmlType>textarea</htmlType>
+    <html>
+      <type>TextArea</type>
+    </html>
+
     <rows>6</rows>
     <cols>50</cols>
     <localizable>true</localizable>
@@ -221,7 +224,10 @@
     <name>thankyou_text</name>
     <title>Thank-you Text</title>
     <type>text</type>
-    <htmlType>textarea</htmlType>
+    <html>
+      <type>TextArea</type>
+    </html>
+
     <rows>8</rows>
     <cols>60</cols>
     <localizable>true</localizable>
@@ -232,7 +238,10 @@
     <name>thankyou_footer</name>
     <title>Thank-you Footer</title>
     <type>text</type>
-    <htmlType>textarea</htmlType>
+    <html>
+      <type>TextArea</type>
+    </html>
+
     <rows>8</rows>
     <cols>60</cols>
     <localizable>true</localizable>
@@ -250,7 +259,10 @@
     <name>for_organization</name>
     <title>On Behalf Of Organization</title>
     <type>text</type>
-    <htmlType>textarea</htmlType>
+    <html>
+      <type>TextArea</type>
+    </html>
+
     <rows>2</rows>
     <cols>50</cols>
     <localizable>true</localizable>
@@ -296,7 +308,10 @@
   <field>
     <name>receipt_text</name>
     <type>text</type>
-    <htmlType>textarea</htmlType>
+    <html>
+      <type>TextArea</type>
+    </html>
+
     <rows>6</rows>
     <cols>50</cols>
     <localizable>true</localizable>
@@ -312,7 +327,10 @@
   <field>
     <name>footer_text</name>
     <type>text</type>
-    <htmlType>textarea</htmlType>
+    <html>
+      <type>TextArea</type>
+    </html>
+
     <rows>6</rows>
     <cols>50</cols>
     <localizable>true</localizable>
@@ -343,7 +361,10 @@
   <field>
     <name>honor_block_text</name>
     <type>text</type>
-    <htmlType>textarea</htmlType>
+    <html>
+      <type>TextArea</type>
+    </html>
+
     <rows>2</rows>
     <cols>50</cols>
     <localizable>true</localizable>

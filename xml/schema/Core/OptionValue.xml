@@ -96,7 +96,10 @@
   <field>
        <name>description</name>
        <type>text</type>
-       <htmlType>textarea</htmlType>
+       <html>
+         <type>TextArea</type>
+       </html>
+
        <rows>8</rows>
        <cols>60</cols>
        <localizable>true</localizable>

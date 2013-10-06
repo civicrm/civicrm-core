@@ -152,7 +152,10 @@
     <type>text</type>
     <title>Grant Rationale</title>
     <comment>Grant rationale.</comment>
-    <htmlType>textarea</htmlType>
+    <html>
+      <type>TextArea</type>
+    </html>
+
     <rows>4</rows>
     <cols>60</cols>
     <import>true</import>

@@ -22,7 +22,10 @@
        <name>message</name>
        <type>text</type>
        <comment>Contents of the SMS.</comment>
-       <htmlType>textarea</htmlType>
+       <html>
+         <type>TextArea</type>
+       </html>
+
        <rows>5</rows>
        <cols>80</cols>
        <add>1.4</add>

@@ -84,7 +84,10 @@
      <type>text</type>
      <localizable>true</localizable>
      <comment>Description and/or help text to display before fields in form.</comment>
-     <htmlType>textarea</htmlType>
+     <html>
+       <type>TextArea</type>
+     </html>
+
      <rows>4</rows>
      <cols>80</cols>
        <add>1.1</add>
@@ -94,7 +97,10 @@
      <type>text</type>
      <localizable>true</localizable>
      <comment>Description and/or help text to display after fields in form.</comment>
-     <htmlType>textarea</htmlType>
+     <html>
+       <type>TextArea</type>
+     </html>
+
      <rows>4</rows>
      <cols>80</cols>
      <add>1.1</add>

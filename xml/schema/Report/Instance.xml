@@ -130,7 +130,10 @@
       <title>Report Instance Header</title>
       <type>text</type>
       <comment>comma-separated list of email addresses to send the report to</comment>
-      <htmlType>textarea</htmlType>
+      <html>
+        <type>TextArea</type>
+      </html>
+
       <rows>4</rows>
       <cols>60</cols>
       <add>2.2</add>
@@ -140,7 +143,10 @@
       <title>Report Instance Footer</title>
       <type>text</type>
       <comment>comma-separated list of email addresses to send the report to</comment>
-      <htmlType>textarea</htmlType>
+      <html>
+        <type>TextArea</type>
+      </html>
+
       <rows>4</rows>
       <cols>60</cols>
       <add>2.2</add>

@@ -52,7 +52,10 @@
     <type>text</type>
     <comment>Description of this batch set.</comment>
     <localizable>true</localizable>
-    <htmlType>textarea</htmlType>
+    <html>
+      <type>TextArea</type>
+    </html>
+
     <rows>4</rows>
     <cols>80</cols>
     <add>3.3</add>

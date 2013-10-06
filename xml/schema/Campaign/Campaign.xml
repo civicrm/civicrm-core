@@ -28,6 +28,9 @@
       <required>true</required>
       <comment>Name of the Campaign.</comment>
       <import>true</import>
+      <html>
+        <type>Text</type>
+      </html>
       <add>3.3</add>
   </field>
 
@@ -38,6 +41,9 @@
        <length>255</length>
        <comment>Title of the Campaign.</comment>
        <import>true</import>
+       <html>
+        <type>Text</type>
+      </html>
        <add>3.3</add>
   </field>
 
@@ -45,8 +51,10 @@
       <name>description</name>
       <title>Campaign Description</title>
       <type>text</type>
-      <htmlType>textarea</htmlType>
-      <rows>8</rows>
+      <html>
+        <type>TextArea</type>
+        <rows>8</rows>
+      </html>
       <cols>60</cols>
       <comment>Full description of Campaign.</comment>
       <add>3.3</add>
@@ -59,6 +67,9 @@
       <headerPattern>/^start|(s(tart\s)?date)$/i</headerPattern>
       <comment>Date and time that Campaign starts.</comment>
       <import>true</import>
+      <html>
+        <type>Select Date</type>
+      </html>
       <add>3.3</add>
   </field>
 
@@ -69,6 +80,9 @@
       <headerPattern>/^end|(e(nd\s)?date)$/i</headerPattern>
       <comment>Date and time that Campaign ends.</comment>
       <import>true</import>
+      <html>
+        <type>Select Date</type>
+      </html>
       <add>3.3</add>
   </field>
 

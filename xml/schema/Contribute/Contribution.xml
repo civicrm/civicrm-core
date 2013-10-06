@@ -268,7 +268,10 @@
     <name>note</name>
     <type>text</type>
     <comment>Note and/or Comment.</comment>
-    <htmlType>textarea</htmlType>
+    <html>
+      <type>TextArea</type>
+    </html>
+
     <rows>4</rows>
     <cols>80</cols>
     <import>true</import>

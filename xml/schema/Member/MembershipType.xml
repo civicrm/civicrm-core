@@ -45,7 +45,10 @@
   <field>
     <name>description</name>
     <type>varchar</type>
-    <htmlType>textarea</htmlType>
+    <html>
+      <type>TextArea</type>
+    </html>
+
     <rows>6</rows>
     <cols>50</cols>
     <length>255</length>
@@ -184,7 +187,10 @@
   <field>
     <name>receipt_text_signup</name>
     <type>varchar</type>
-    <htmlType>textarea</htmlType>
+    <html>
+      <type>TextArea</type>
+    </html>
+
     <rows>6</rows>
     <cols>50</cols>
     <length>255</length>
@@ -194,7 +200,10 @@
   <field>
     <name>receipt_text_renewal</name>
     <type>varchar</type>
-    <htmlType>textarea</htmlType>
+    <html>
+      <type>TextArea</type>
+    </html>
+
     <rows>6</rows>
     <cols>50</cols>
     <length>255</length>

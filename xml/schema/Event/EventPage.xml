@@ -33,7 +33,10 @@
   <field>
       <name>intro_text</name>
       <type>text</type>
-      <htmlType>textarea</htmlType>
+      <html>
+        <type>TextArea</type>
+      </html>
+
       <rows>6</rows>
       <cols>50</cols>
       <title>Introductory Message</title>
@@ -45,7 +48,10 @@
       <name>footer_text</name>
       <title>Footer Message</title>
       <type>text</type>
-      <htmlType>textarea</htmlType>
+      <html>
+        <type>TextArea</type>
+      </html>
+
       <rows>6</rows>
       <cols>50</cols>
       <localizable>true</localizable>
@@ -65,7 +71,10 @@
   <field>
       <name>confirm_text</name>
       <type>text</type>
-      <htmlType>textarea</htmlType>
+      <html>
+        <type>TextArea</type>
+      </html>
+
       <rows>6</rows>
       <cols>50</cols>
       <title>Confirm Text</title>
@@ -77,7 +86,10 @@
       <name>confirm_footer_text</name>
       <type>text</type>
       <title>Footer Text</title>
-      <htmlType>textarea</htmlType>
+      <html>
+        <type>TextArea</type>
+      </html>
+
       <rows>6</rows>
       <cols>50</cols>
       <localizable>true</localizable>
@@ -96,7 +108,10 @@
       <name>confirm_email_text</name>
       <type>text</type>
       <title>Confirmation Email Text</title>
-      <htmlType>textarea</htmlType>
+      <html>
+        <type>TextArea</type>
+      </html>
+
       <rows>4</rows>
       <cols>50</cols>
       <localizable>true</localizable>
@@ -159,7 +174,10 @@
   <field>
       <name>thankyou_text</name>
       <type>text</type>
-      <htmlType>textarea</htmlType>
+      <html>
+        <type>TextArea</type>
+      </html>
+
       <rows>6</rows>
       <cols>50</cols>
       <title>ThankYou Text</title>
@@ -171,7 +189,10 @@
       <name>thankyou_footer_text</name>
       <type>text</type>
       <title>Footer Text</title>
-      <htmlType>textarea</htmlType>
+      <html>
+        <type>TextArea</type>
+      </html>
+
       <rows>6</rows>
       <cols>50</cols>
       <localizable>true</localizable>

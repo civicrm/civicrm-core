@@ -36,7 +36,10 @@
        <name>body_html</name>
        <type>text</type>
        <comment>Body of the component in html format.</comment>
-       <htmlType>textarea</htmlType>
+       <html>
+         <type>TextArea</type>
+       </html>
+
        <rows>8</rows>
        <cols>80</cols>
   </field>
@@ -44,7 +47,10 @@
        <name>body_text</name>
        <type>text</type>
        <comment>Body of the component in text format.</comment>
-       <htmlType>textarea</htmlType>
+       <html>
+         <type>TextArea</type>
+       </html>
+
        <rows>8</rows>
        <cols>80</cols>
   </field>
