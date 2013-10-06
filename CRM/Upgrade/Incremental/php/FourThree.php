@@ -87,10 +87,7 @@ WHERE {$key}.id IS NULL";
         }
         $dao = CRM_Core_DAO::executeQuery($query);
         if ($dao->N) {
-          $invalidDataMessage = '<strong>' .
-            ts('Oops, it looks like you have orphaned recurring contribution records in your database. Before this upgrade can complete they will need to be fixed or deleted. <a href="%1" target="_blank">You can review steps to correct this situation on the documentation wiki.</a>',
-              array( 1 => 'http://wiki.civicrm.org/confluence/display/CRMDOC/Fixing+Orphaned+Contribution+Recur+Records')
-            ) . '</strong>';
+          $invalidDataMessage = '<strong>Oops, it looks like you have orphaned recurring contribution records in your database. Before this upgrade can complete they will need to be fixed or deleted. <a href="http://wiki.civicrm.org/confluence/display/CRMDOC/Fixing+Orphaned+Contribution+Recur+Records" target="_blank">You can review steps to correct this situation on the documentation wiki.</a></strong>';
           CRM_Core_Error::fatal($invalidDataMessage);
           return FALSE;
         }
