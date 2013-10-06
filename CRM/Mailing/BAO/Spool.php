@@ -76,9 +76,6 @@ class CRM_Mailing_BAO_Spool extends CRM_Mailing_DAO_Spool {
       $params['created_date'] = date('YmdHis');
       $params['scheduled_id'] = $params['created_id'];
       $params['scheduled_date'] = $params['created_date'];
-      $params['approver_id'] = $params['created_id'];
-      $params['approval_date'] = $params['created_date'];
-      $params['approval_status_id'] = CRM_Core_OptionGroup::getValue('mail_approval_status', 'Approved', 'name');
       $params['is_completed'] = 1;
       $params['is_archived'] = 1;
       $params['body_html'] = htmlspecialchars( $headerStr ) . "\n\n" . $body;
