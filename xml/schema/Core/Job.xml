@@ -89,10 +89,9 @@
        <comment>List of parameters to the command.</comment>
        <html>
          <type>TextArea</type>
+         <rows>4</rows>
+         <cols>60</cols>
        </html>
-
-       <rows>4</rows>
-       <cols>60</cols>
        <add>4.1</add>
   </field>
   <field>

@@ -132,10 +132,9 @@
       <comment>comma-separated list of email addresses to send the report to</comment>
       <html>
         <type>TextArea</type>
+        <rows>4</rows>
+        <cols>60</cols>
       </html>
-
-      <rows>4</rows>
-      <cols>60</cols>
       <add>2.2</add>
   </field>
   <field>
@@ -145,10 +144,9 @@
       <comment>comma-separated list of email addresses to send the report to</comment>
       <html>
         <type>TextArea</type>
+        <rows>4</rows>
+        <cols>60</cols>
       </html>
-
-      <rows>4</rows>
-      <cols>60</cols>
       <add>2.2</add>
   </field>
   <field>

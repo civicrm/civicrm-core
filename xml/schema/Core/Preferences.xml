@@ -183,10 +183,9 @@
        <comment>Smtp Backend configuration.</comment>
        <html>
          <type>TextArea</type>
+         <rows>20</rows>
+         <cols>80</cols>
        </html>
-
-       <rows>20</rows>
-       <cols>80</cols>
        <add>2.2</add>
   </field>
   <field>

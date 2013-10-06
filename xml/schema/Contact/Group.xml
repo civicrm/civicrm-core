@@ -42,10 +42,9 @@
        <title>Group Description</title>
        <html>
          <type>TextArea</type>
+         <rows>2</rows>
+         <cols>60</cols>
        </html>
-
-       <rows>2</rows>
-       <cols>60</cols>
        <comment>Optional verbose description of the group.</comment>
        <add>1.1</add>
   </field>

@@ -75,10 +75,9 @@
       <comment>Description and/or help text to display before this field.</comment>
       <html>
         <type>TextArea</type>
+        <rows>4</rows>
+        <cols>80</cols>
       </html>
-
-      <rows>4</rows>
-      <cols>80</cols>
       <add>1.8</add>
   </field>
   <field>
@@ -88,10 +87,9 @@
       <comment>Description and/or help text to display after this field.</comment>
       <html>
         <type>TextArea</type>
+        <rows>4</rows>
+        <cols>80</cols>
       </html>
-
-      <rows>4</rows>
-      <cols>80</cols>
       <add>1.8</add>
   </field>
   <field>

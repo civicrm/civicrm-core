@@ -35,10 +35,9 @@
       <type>text</type>
       <html>
         <type>TextArea</type>
+        <rows>6</rows>
+        <cols>50</cols>
       </html>
-
-      <rows>6</rows>
-      <cols>50</cols>
       <title>Introductory Message</title>
       <localizable>true</localizable>
       <comment>Introductory message for Event Registration page. Text and html allowed. Displayed at the top of Event Registration form.</comment>
@@ -50,10 +49,9 @@
       <type>text</type>
       <html>
         <type>TextArea</type>
+        <rows>6</rows>
+        <cols>50</cols>
       </html>
-
-      <rows>6</rows>
-      <cols>50</cols>
       <localizable>true</localizable>
       <comment>Footer message for Event Registration page. Text and html allowed. Displayed at the bottom of Event Registration form.</comment>
       <add>1.7</add>
@@ -73,10 +71,9 @@
       <type>text</type>
       <html>
         <type>TextArea</type>
+        <rows>6</rows>
+        <cols>50</cols>
       </html>
-
-      <rows>6</rows>
-      <cols>50</cols>
       <title>Confirm Text</title>
       <localizable>true</localizable>
       <comment>Introductory message for Event Registration page. Text and html allowed. Displayed at the top of Event Registration form.</comment>
@@ -88,10 +85,9 @@
       <title>Footer Text</title>
       <html>
         <type>TextArea</type>
+        <rows>6</rows>
+        <cols>50</cols>
       </html>
-
-      <rows>6</rows>
-      <cols>50</cols>
       <localizable>true</localizable>
       <comment>Footer message for Event Registration page. Text and html allowed. Displayed at the bottom of Event Registration form.</comment>
       <add>1.7</add>
@@ -110,10 +106,9 @@
       <title>Confirmation Email Text</title>
       <html>
         <type>TextArea</type>
+        <rows>4</rows>
+        <cols>50</cols>
       </html>
-
-      <rows>4</rows>
-      <cols>50</cols>
       <localizable>true</localizable>
       <comment>text to include above standard event info on confirmation email. emails are text-only, so do not allow html for now</comment>
       <add>1.7</add>
@@ -176,10 +171,9 @@
       <type>text</type>
       <html>
         <type>TextArea</type>
+        <rows>6</rows>
+        <cols>50</cols>
       </html>
-
-      <rows>6</rows>
-      <cols>50</cols>
       <title>ThankYou Text</title>
       <localizable>true</localizable>
       <comment>ThankYou Text.</comment>
@@ -191,10 +185,9 @@
       <title>Footer Text</title>
       <html>
         <type>TextArea</type>
+        <rows>6</rows>
+        <cols>50</cols>
       </html>
-
-      <rows>6</rows>
-      <cols>50</cols>
       <localizable>true</localizable>
       <comment>Footer message.</comment>
       <add>1.7</add>

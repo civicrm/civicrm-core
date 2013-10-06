@@ -134,10 +134,9 @@
       <type>text</type>
       <html>
         <type>TextArea</type>
+        <rows>8</rows>
+        <cols>60</cols>
       </html>
-
-      <rows>8</rows>
-      <cols>60</cols>
       <comment>Details about the meeting (agenda, notes, etc).</comment>
       <add>1.8</add>
   </field>

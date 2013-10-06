@@ -24,10 +24,9 @@
        <comment>Contents of the SMS.</comment>
        <html>
          <type>TextArea</type>
+         <rows>5</rows>
+         <cols>80</cols>
        </html>
-
-       <rows>5</rows>
-       <cols>80</cols>
        <add>1.4</add>
   </field>
   <field>

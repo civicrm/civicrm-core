@@ -83,10 +83,9 @@
     <comment>Backend configuration.</comment>
     <html>
       <type>TextArea</type>
+      <rows>20</rows>
+      <cols>80</cols>
     </html>
-
-    <rows>20</rows>
-    <cols>80</cols>
     <add>1.6</add>
   </field>
   <field>
@@ -127,10 +126,9 @@
     <comment>Locale specific string overrides</comment>
     <html>
       <type>TextArea</type>
+      <rows>20</rows>
+      <cols>80</cols>
     </html>
-
-    <rows>20</rows>
-    <cols>80</cols>
     <add>3.2</add>
   </field>
 </table>

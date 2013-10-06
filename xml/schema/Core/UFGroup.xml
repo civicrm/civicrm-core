@@ -55,10 +55,9 @@
        <title>Profile Description</title>
        <html>
          <type>TextArea</type>
+         <rows>2</rows>
+         <cols>60</cols>
        </html>
-
-       <rows>2</rows>
-       <cols>60</cols>
        <comment>Optional verbose description of the profile.</comment>
        <add>4.4</add>
   </field>
@@ -77,10 +76,9 @@
      <comment>Description and/or help text to display before fields in form.</comment>
      <html>
        <type>TextArea</type>
+       <rows>4</rows>
+       <cols>80</cols>
      </html>
-
-     <rows>4</rows>
-     <cols>80</cols>
      <add>1.2</add>
   </field>
   <field>
@@ -90,10 +88,9 @@
      <comment>Description and/or help text to display after fields in form.</comment>
      <html>
        <type>TextArea</type>
+       <rows>4</rows>
+       <cols>80</cols>
      </html>
-
-     <rows>4</rows>
-     <cols>80</cols>
      <add>1.2</add>
   </field>
   <field>

@@ -36,10 +36,9 @@
     <title>Event Summary</title>
     <html>
       <type>TextArea</type>
+      <rows>4</rows>
+      <cols>60</cols>
     </html>
-
-    <rows>4</rows>
-    <cols>60</cols>
     <localizable>true</localizable>
     <comment>Brief summary of event. Text and html allowed. Displayed on Event Registration form and can be used on other CMS pages which need an event summary.</comment>
     <add>1.7</add>
@@ -51,10 +50,9 @@
     <title>Event Description</title>
     <html>
       <type>TextArea</type>
+      <rows>8</rows>
+      <cols>60</cols>
     </html>
-
-    <rows>8</rows>
-    <cols>60</cols>
     <localizable>true</localizable>
     <comment>Full description of event. Text and html allowed. Displayed on built-in Event Information screens.</comment>
     <add>1.7</add>
@@ -161,10 +159,9 @@
     <title>Event Information</title>
     <html>
       <type>TextArea</type>
+      <rows>4</rows>
+      <cols>60</cols>
     </html>
-
-    <rows>4</rows>
-    <cols>60</cols>
     <localizable>true</localizable>
     <comment>Message to display on Event Information page and INSTEAD OF Event Registration form if maximum participants are signed up. Can include email address/info about getting on a waiting list, etc. Text and html allowed.</comment>
     <add>1.7</add>
@@ -263,10 +260,9 @@
     <type>varchar</type>
     <html>
       <type>TextArea</type>
+      <rows>6</rows>
+      <cols>50</cols>
     </html>
-
-    <rows>6</rows>
-    <cols>50</cols>
     <length>255</length>
     <comment>Receipt Text for off-line event participation</comment>
     <add>2.0</add>
@@ -287,10 +283,9 @@
     <type>text</type>
     <html>
       <type>TextArea</type>
+      <rows>6</rows>
+      <cols>50</cols>
     </html>
-
-    <rows>6</rows>
-    <cols>50</cols>
     <title>Introductory Message</title>
     <localizable>true</localizable>
     <comment>Introductory message for Event Registration page. Text and html allowed. Displayed at the top of Event Registration form.</comment>
@@ -302,10 +297,9 @@
     <type>text</type>
     <html>
       <type>TextArea</type>
+      <rows>6</rows>
+      <cols>50</cols>
     </html>
-
-    <rows>6</rows>
-    <cols>50</cols>
     <localizable>true</localizable>
     <comment>Footer message for Event Registration page. Text and html allowed. Displayed at the bottom of Event Registration form.</comment>
     <add>1.7</add>
@@ -325,10 +319,9 @@
     <type>text</type>
     <html>
       <type>TextArea</type>
+      <rows>6</rows>
+      <cols>50</cols>
     </html>
-
-    <rows>6</rows>
-    <cols>50</cols>
     <title>Confirm Text</title>
     <localizable>true</localizable>
     <comment>Introductory message for Event Registration page. Text and html allowed. Displayed at the top of Event Registration form.</comment>
@@ -340,10 +333,9 @@
     <title>Footer Text</title>
     <html>
       <type>TextArea</type>
+      <rows>6</rows>
+      <cols>50</cols>
     </html>
-
-    <rows>6</rows>
-    <cols>50</cols>
     <localizable>true</localizable>
     <comment>Footer message for Event Registration page. Text and html allowed. Displayed at the bottom of Event Registration form.</comment>
     <add>1.7</add>
@@ -362,10 +354,9 @@
     <title>Confirmation Email Text</title>
     <html>
       <type>TextArea</type>
+      <rows>4</rows>
+      <cols>50</cols>
     </html>
-
-    <rows>4</rows>
-    <cols>50</cols>
     <localizable>true</localizable>
     <comment>text to include above standard event info on confirmation email. emails are text-only, so do not allow html for now</comment>
     <add>1.7</add>
@@ -430,10 +421,9 @@
     <type>text</type>
     <html>
       <type>TextArea</type>
+      <rows>6</rows>
+      <cols>50</cols>
     </html>
-
-    <rows>6</rows>
-    <cols>50</cols>
     <title>ThankYou Text</title>
     <localizable>true</localizable>
     <comment>ThankYou Text.</comment>
@@ -445,10 +435,9 @@
     <title>Footer Text</title>
     <html>
       <type>TextArea</type>
+      <rows>6</rows>
+      <cols>50</cols>
     </html>
-
-    <rows>6</rows>
-    <cols>50</cols>
     <localizable>true</localizable>
     <comment>Footer message.</comment>
     <add>1.7</add>
@@ -549,10 +538,9 @@
     <type>text</type>
     <html>
       <type>TextArea</type>
+      <rows>4</rows>
+      <cols>60</cols>
     </html>
-
-    <rows>4</rows>
-    <cols>60</cols>
     <localizable>true</localizable>
     <comment>Text to display when the event is full, but participants can signup for a waitlist.</comment>
     <add>3.0</add>
@@ -562,10 +550,9 @@
     <type>text</type>
     <html>
       <type>TextArea</type>
+      <rows>4</rows>
+      <cols>60</cols>
     </html>
-
-    <rows>4</rows>
-    <cols>60</cols>
     <localizable>true</localizable>
     <comment>Text to display when the approval is required to complete registration for an event.</comment>
     <add>3.0</add>

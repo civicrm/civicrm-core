@@ -47,10 +47,9 @@
     <type>varchar</type>
     <html>
       <type>TextArea</type>
+      <rows>6</rows>
+      <cols>50</cols>
     </html>
-
-    <rows>6</rows>
-    <cols>50</cols>
     <length>255</length>
     <localizable>true</localizable>
     <comment>Description of Membership Type</comment>
@@ -189,10 +188,9 @@
     <type>varchar</type>
     <html>
       <type>TextArea</type>
+      <rows>6</rows>
+      <cols>50</cols>
     </html>
-
-    <rows>6</rows>
-    <cols>50</cols>
     <length>255</length>
     <comment>Receipt Text for membership signup</comment>
     <add>2.0</add>
@@ -202,10 +200,9 @@
     <type>varchar</type>
     <html>
       <type>TextArea</type>
+      <rows>6</rows>
+      <cols>50</cols>
     </html>
-
-    <rows>6</rows>
-    <cols>50</cols>
     <length>255</length>
     <comment>Receipt Text for membership renewal</comment>
     <add>2.0</add>

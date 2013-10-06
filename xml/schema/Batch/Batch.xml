@@ -54,10 +54,9 @@
     <localizable>true</localizable>
     <html>
       <type>TextArea</type>
+      <rows>4</rows>
+      <cols>80</cols>
     </html>
-
-    <rows>4</rows>
-    <cols>80</cols>
     <add>3.3</add>
   </field>
   <field>

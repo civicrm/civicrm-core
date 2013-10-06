@@ -98,10 +98,9 @@
        <type>text</type>
        <html>
          <type>TextArea</type>
+         <rows>8</rows>
+         <cols>60</cols>
        </html>
-
-       <rows>8</rows>
-       <cols>60</cols>
        <localizable>true</localizable>
        <comment>Optional description.</comment>
        <add>1.5</add>

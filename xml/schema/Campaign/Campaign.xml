@@ -54,8 +54,8 @@
       <html>
         <type>TextArea</type>
         <rows>8</rows>
+        <cols>60</cols>
       </html>
-      <cols>60</cols>
       <comment>Full description of Campaign.</comment>
       <add>3.3</add>
   </field>

@@ -154,10 +154,9 @@
     <comment>Grant rationale.</comment>
     <html>
       <type>TextArea</type>
+      <rows>4</rows>
+      <cols>60</cols>
     </html>
-
-    <rows>4</rows>
-    <cols>60</cols>
     <import>true</import>
     <add>1.8</add>
   </field>

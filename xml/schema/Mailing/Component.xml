@@ -38,22 +38,20 @@
        <comment>Body of the component in html format.</comment>
        <html>
          <type>TextArea</type>
+         <rows>8</rows>
+         <cols>80</cols>
        </html>
-
-       <rows>8</rows>
-       <cols>80</cols>
-  </field>
+       </field>
   <field>
        <name>body_text</name>
        <type>text</type>
        <comment>Body of the component in text format.</comment>
        <html>
          <type>TextArea</type>
+         <rows>8</rows>
+         <cols>80</cols>
        </html>
-
-       <rows>8</rows>
-       <cols>80</cols>
-  </field>
+       </field>
   <field>
        <name>is_default</name>
        <type>boolean</type>

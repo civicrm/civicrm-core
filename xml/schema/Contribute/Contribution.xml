@@ -270,10 +270,9 @@
     <comment>Note and/or Comment.</comment>
     <html>
       <type>TextArea</type>
+      <rows>4</rows>
+      <cols>80</cols>
     </html>
-
-    <rows>4</rows>
-    <cols>80</cols>
     <import>true</import>
     <headerPattern>/Note|Comment/i</headerPattern>
     <dataPattern>//</dataPattern>

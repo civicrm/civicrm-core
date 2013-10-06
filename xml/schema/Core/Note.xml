@@ -50,10 +50,9 @@
        <comment>Note and/or Comment.</comment>
        <html>
          <type>TextArea</type>
+         <rows>4</rows>
+         <cols>60</cols>
        </html>
-
-       <rows>4</rows>
-       <cols>60</cols>
        <import>true</import>
        <headerPattern>/Note|Comment/i</headerPattern>
        <dataPattern>//</dataPattern>

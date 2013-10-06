@@ -86,11 +86,10 @@
      <comment>Description and/or help text to display before fields in form.</comment>
      <html>
        <type>TextArea</type>
+       <rows>4</rows>
+       <cols>80</cols>
      </html>
-
-     <rows>4</rows>
-     <cols>80</cols>
-       <add>1.1</add>
+     <add>1.1</add>
   </field>
   <field>
      <name>help_post</name>
@@ -99,10 +98,9 @@
      <comment>Description and/or help text to display after fields in form.</comment>
      <html>
        <type>TextArea</type>
+       <rows>4</rows>
+       <cols>80</cols>
      </html>
-
-     <rows>4</rows>
-     <cols>80</cols>
      <add>1.1</add>
   </field>
   <field>
