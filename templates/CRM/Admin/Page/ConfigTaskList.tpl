@@ -53,6 +53,11 @@
         {/ts}</a></td>
         <td>{ts}Organization name, email address for system-generated emails, organization address{/ts}</li>
     </tr>
+    <tr class="even">
+        <td class="tasklist nowrap"><a href="{crmURL p="civicrm/admin/setting/component" q="action=update&reset=1&civicrmDestination=`$destination`"}" title="{$linkTitle}">{ts}Enable components
+        {/ts}</a></td>
+        <td>{ts}Enable the required CiviCRM components.(CiviContribution, CiviEvent etc.){/ts}</li>
+    </tr>
 
     <tr class="columnheader">
         <td colspan="2">{ts}Viewing and Editing Contacts{/ts}</td>
