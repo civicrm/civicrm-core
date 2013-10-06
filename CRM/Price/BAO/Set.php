@@ -341,7 +341,7 @@ WHERE     ct.id = cp.financial_type_id AND
   }
 
   /**
-   * Find a price_set_id associatied with the given table, id and usedFor
+   * Find the current price_set_id associated with the given table, id and usedFor
    * Used For value for events:1, contribution:2, membership:3
    *
    * @param string $entityTable
@@ -376,6 +376,54 @@ WHERE     ct.id = cp.financial_type_id AND
     return (isset($dao->price_set_id)) ? $dao->price_set_id : FALSE;
   }
 
+  /**
+   * Find all price_sets ever associated with the given table and entityId by looking at line items.
+   * FIXME: Might be better to add is_active to CRM_Price_DAO_SetEntity and filter the getFor function.
+   *
+   * @param string $entityTable
+   * @param int    $entityId
+   *
+   * @return array associative array of id => name
+   */
+  public static function getByLineItem($entityTable, $entityId, $isQuickConfig = NULL) {
+    if (!$entityTable || !$entityId) {
+      return FALSE;
+    }
+    // Convert entity_table to values used in civicrm_line_item table
+    // Membership price sets also use 'civicrm_contribution_page'
+    if ($entityTable == 'civicrm_event') {
+      $lientityTable = 'civicrm_participant';
+      $entityJoinField = 'event_id';
+    } else if ($entityTable == 'civicrm_contribution_page') {
+      $lientityTable = 'civicrm_contribution';
+      $entityJoinField = 'contribution_page_id';
+    }
+    $sql = "SELECT ps.id as price_set_id, ps.name as price_set_name
+    FROM civicrm_line_item li
+    INNER JOIN civicrm_price_field fld ON li.price_field_id = fld.id
+    INNER JOIN civicrm_price_set ps ON fld.price_set_id = ps.id
+    INNER JOIN {$lientityTable} ent ON li.entity_id = ent.id
+    WHERE li.entity_table = %1 AND ent.{$entityJoinField} = %2";
+    if ($isQuickConfig) {
+    $sql .= ' AND ps.is_quick_config = 0 ';
+  }
+    $sql .= ' GROUP BY ps.id, ps.name ';
+    $params = array(
+        1 => array($lientityTable, 'String'),
+        2 => array($entityId, 'Integer'),
+    );
+  
+    $dao = CRM_Core_DAO::executeQuery($sql, $params);
+    $sets = array();
+        while ($dao->fetch()) {
+        $setName = (isset($dao->price_set_name)) ? $dao->price_set_name : FALSE;
+        if(isset($dao->price_set_id)) {
+        $sets[$dao->price_set_id] = $setName;
+    }
+    }
+    return $sets;
+  }
+  
   /**
    * Find a price_set_id associatied with the given option value or  field ID
    *
