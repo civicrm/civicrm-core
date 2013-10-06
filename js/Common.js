@@ -396,13 +396,8 @@ function unselectRadio(fieldName, form) {
  * @return null
  */
 var submitcount = 0;
-/**
- * @deprecated
- * Changes button label on submit, and disables button after submit for newer browsers.
- * Puts up alert for older browsers.
- * @todo CRM-13397 replaces this with an alternate (jquery) mechanism - to use the jquery mechanism add
- * parent::buildQuickForm to make buttons 'protected'
- * */
+/* Changes button label on submit, and disables button after submit for newer browsers.
+ Puts up alert for older browsers. */
 function submitOnce(obj, formId, procText) {
   // if named button clicked, change text
   if (obj.value != null) {

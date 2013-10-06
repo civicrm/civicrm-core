@@ -121,8 +121,6 @@ class CRM_Contact_Form_Task_EmailCommon {
    *
    * @access public
    *
-   * @param $form
-   *
    * @return void
    */
   static function buildQuickForm(&$form) {
@@ -272,7 +270,6 @@ class CRM_Contact_Form_Task_EmailCommon {
     }
 
     $form->addFormRule(array('CRM_Contact_Form_Task_EmailCommon', 'formRule'), $form);
-    CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'templates/CRM/Core/Form.js');
     CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'templates/CRM/Contact/Form/Task/EmailCommon.js');
   }
 
@@ -309,8 +306,6 @@ class CRM_Contact_Form_Task_EmailCommon {
    * process the form after the input has been submitted and validated
    *
    * @access public
-   *
-   * @param $form
    *
    * @return None
    */
