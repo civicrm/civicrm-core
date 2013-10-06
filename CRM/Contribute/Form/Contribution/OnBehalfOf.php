@@ -69,9 +69,19 @@ class CRM_Contribute_Form_Contribution_OnBehalfOf {
 
     if ($contactID) {
       $form->_employers = CRM_Contact_BAO_Relationship::getPermissionedEmployer($contactID);
-      if (!empty($form->_employers)) {
-        $form->_relatedOrganizationFound = TRUE;
 
+      if (!empty($form->_membershipContactID) && $contactID != $form->_membershipContactID) {
+        // renewal case - membership being renewed may or may not be for organization
+        if (!empty($form->_employers) && array_key_exists($form->_membershipContactID, $form->_employers)) {
+          // if _membershipContactID belongs to employers list, we can say: 
+          $form->_relatedOrganizationFound = TRUE;
+        }
+      } else if (!empty($form->_employers)) {
+        // not a renewal case and _employers list is not empty
+        $form->_relatedOrganizationFound = TRUE;
+      }
+
+      if ($form->_relatedOrganizationFound) {
         $locDataURL = CRM_Utils_System::url('civicrm/ajax/permlocation', 'cid=', FALSE, NULL, FALSE);
         $form->assign('locDataURL', $locDataURL);
 

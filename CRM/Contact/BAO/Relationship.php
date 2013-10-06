@@ -1417,38 +1417,59 @@ WHERE id IN ( {$contacts} )
    * @return array array of employers.
    *
    */
-  static function getPermissionedEmployer($contactID, $name = '%') {
-    $employers = array();
-
+  static function getPermissionedEmployer($contactID, $name = NULL) {
     //get the relationship id
     $relTypeId = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_RelationshipType',
       'Employee of', 'id', 'name_a_b'
     );
 
+    return self::getPermissionedContacts($contactID, $relTypeId, $name);
+  }
+
+
+ /**
+  * Function to return list of permissioned contacts for a given contact and relationship type
+  *
+  * @param $contactID int contact id whose permissioned contacts are to be found.
+  * @param $relTypeId relationship type id
+  * @param $name string
+  *
+  * @static
+  *
+  * @return array of contacts
+  */
+  static function getPermissionedContacts($contactID, $relTypeId, $name = NULL) {
+    $contacts = array();
+
     if ($relTypeId) {
       $query = "
 SELECT cc.id as id, cc.sort_name as name
 FROM civicrm_relationship cr, civicrm_contact cc
-WHERE cr.contact_id_a = $contactID AND
-cr.relationship_type_id = $relTypeId AND
-cr.is_permission_a_b = 1 AND
+WHERE 
+cr.contact_id_a         = %1 AND
+cr.relationship_type_id = %2 AND
+cr.is_permission_a_b    = 1 AND
 IF(cr.end_date IS NULL, 1, (DATEDIFF( CURDATE( ), cr.end_date ) <= 0)) AND
 cr.is_active = 1 AND
-cc.id = cr.contact_id_b AND
-cc.sort_name LIKE '%$name%'";
+cc.id = cr.contact_id_b";
 
-      $nullArray = array();
-      $dao = CRM_Core_DAO::executeQuery($query, $nullArray);
+      if (!empty($name)) {
+        $name   = CRM_Utils_Type::escape($name, 'String');
+        $query .= "
+AND cc.sort_name LIKE '%$name%'"; 
+      }
+
+      $args = array(1 => array($contactID, 'Integer'), 2 => array($relTypeId, 'Integer'));
+      $dao  = CRM_Core_DAO::executeQuery($query, $args);
 
       while ($dao->fetch()) {
-        $employers[$dao->id] = array(
+        $contacts[$dao->id] = array(
           'name' => $dao->name,
           'value' => $dao->id,
         );
       }
     }
-
-    return $employers;
+    return $contacts;
   }
 
   static function getValidContactTypeList($relType) {
