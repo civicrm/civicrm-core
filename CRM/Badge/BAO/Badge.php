@@ -141,14 +141,18 @@ class CRM_Badge_BAO_Badge {
 
   public function generateLabel($formattedRow) {
     switch ($formattedRow['labelFormat']) {
+      case 'A6 Badge Portrait 150x106':
+      case 'Hanging Badge 3-3/4" x 4-3"/4':
+        self::labelCreator($formattedRow, 5);
+        break;
       case 'Avery 5395':
       default:
-        self::labelAvery5395($formattedRow);
+        self::labelCreator($formattedRow);
         break;
     }
   }
 
-  public function labelAvery5395(&$formattedRow) {
+  public function labelCreator(&$formattedRow, $cellspacing = 0) {
     $this->lMarginLogo = 18;
     $this->tMarginName = 20;
 
@@ -190,7 +194,7 @@ class CRM_Badge_BAO_Badge {
           $value = $formattedRow['token'][$i]['value'];
         }
 
-        $offset = $this->pdf->getY() + $startOffset;
+        $offset = $this->pdf->getY() + $startOffset + $cellspacing;
 
         $this->pdf->SetFont($formattedRow['token'][$i]['font_name'], $formattedRow['token'][$i]['font_style'],
           $formattedRow['token'][$i]['font_size']);
