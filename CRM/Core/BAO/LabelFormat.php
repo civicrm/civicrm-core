@@ -195,8 +195,8 @@ class CRM_Core_BAO_LabelFormat extends CRM_Core_DAO_OptionValue {
    */
   public static function getFontSizes() {
     $fontSizes = array();
-    for ($i=6; $i<=60; $i++) {
-      $fontSizes[$i] = ts('%1 pt', $i);
+    for ($i = 6; $i <= 60; $i++) {
+      $fontSizes[$i] = ts('%1 pt', array(1 => $i));
     }
 
     return $fontSizes;
