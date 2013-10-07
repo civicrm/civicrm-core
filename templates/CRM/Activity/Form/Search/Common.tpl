@@ -24,6 +24,26 @@
  +--------------------------------------------------------------------+
 *}
 <tr>
+  <td>
+  {$form.activity_role.html}
+    <span class="crm-clear-link">
+      (<a href="#" title="unselect"
+          onclick="unselectRadio('activity_role', '{$form.formName}');
+            return false;">
+        {ts}clear{/ts}
+      </a>)
+    </span>
+
+    <div>
+      <div class="description font-italic">{ts}Complete OR partial name{/ts}
+        <span class="contact-name-option option-1">{ts} of the Source Contact{/ts}</span>
+        <span class="contact-name-option option-2">{ts} of the Assignee Contact{/ts}</span>
+        <span class="contact-name-option option-3">{ts} of the Target Contact{/ts}</span>
+      </div>
+    </div>
+  </td>
+</tr>
+<tr>
 {if $form.activity_type_id}
   <td><label>{ts}Activity Type(s){/ts}</label>
     <div id="Activity" class="listing-box">
@@ -49,16 +69,16 @@
   </td>
 {/if}
 
-{if $form.activity_tags }
+{if $form.activity_tags}
   <td><label>{ts}Activity Tag(s){/ts}</label>
-    <div id ="Tags" class="listing-box">
+    <div id="Tags" class="listing-box">
       {foreach from=$form.activity_tags item="tag_val"}
         <div class="{cycle values='odd-row,even-row'}">
           {$tag_val.html}
         </div>
       {/foreach}
   </td>
-  {else}
+{else}
   <td>&nbsp;</td>
 {/if}
 </tr>
@@ -69,39 +89,23 @@
 </tr>
 <tr>
   <td>
-  {$form.activity_role.html}
-    <span class="crm-clear-link">
-      (<a href="#" title="unselect"
-          onclick="unselectRadio('activity_role', '{$form.formName}');
-            return false;">
-        {ts}clear{/ts}
-      </a>)
-    </span>
-
-    <div>
-      <div class="description font-italic">{ts}Complete OR partial name{/ts}
-        <span class="contact-name-option option-1">{ts} of the Source Contact{/ts}</span>
-        <span class="contact-name-option option-2">{ts} of the Assignee Contact{/ts}</span>
-        <span class="contact-name-option option-3">{ts} of the Target Contact{/ts}</span>
-      </div>
-    </div>
-  </td>
-  <td colspan="2">
-  {$form.activity_test.label} {help id="is-test" file="CRM/Contact/Form/Search/Advanced"}
-    &nbsp; {$form.activity_test.html}
-    <span class="crm-clear-link">
-      (<a href="#" onclick="unselectRadio('activity_test','{$form.formName}'); return false;">{ts}clear{/ts}</a>)
-    </span>
-  </td>
-</tr>
-<tr>
-  <td>
   {$form.activity_subject.label}<br />
   {$form.activity_subject.html|crmAddClass:big}
   </td>
   <td colspan="2">
   {$form.activity_status.label}<br />
   {$form.activity_status.html}
+  </td>
+</tr>
+<tr>
+  {* td intentionally left blank to align the 'is test' widget on the right *}
+  <td></td>
+  <td colspan="2">
+  {$form.activity_test.label} {help id="is-test" file="CRM/Contact/Form/Search/Advanced"}
+    &nbsp; {$form.activity_test.html}
+    <span class="crm-clear-link">
+      (<a href="#" onclick="unselectRadio('activity_test','{$form.formName}'); return false;">{ts}clear{/ts}</a>)
+    </span>
   </td>
 </tr>
 
