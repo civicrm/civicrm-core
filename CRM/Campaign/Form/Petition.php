@@ -265,14 +265,14 @@ class CRM_Campaign_Form_Petition extends CRM_Core_Form {
       1 => array($fields['activity_type_id'], 'Integer'),
       2 => array($fields['title'], 'String'),
     );
-    $uniqueRule = ts('activity type');
+    $uniqueRuleErrorMessage = ts('This title is already associated with the selected activity type. Please specify a unique title.');
 
     if (empty($fields['campaign_id'])) {
       $where[] = 'campaign_id IS NULL';
     } else {
       $where[] = 'campaign_id = %3';
       $params[3] = array($fields['campaign_id'], 'Integer');        
-      $uniqueRule = ts('campaign and activity type');
+      $uniqueRuleErrorMessage = ts('This title is already associated with the selected campaign and activity type. Please specify a unique title.');
     }
 
     // Exclude current Petition row if UPDATE.
@@ -291,7 +291,7 @@ WHERE  $whereClause
 
     $result = CRM_Core_DAO::singleValueQuery($query, $params);
     if ($result >= 1) {
-      $errors['title'] = ts('This title is already associated with the selected %1. Please specify a unique title.', array(1 => $uniqueRule));
+      $errors['title'] = $uniqueRuleErrorMessage;
     }
     return empty($errors) ? TRUE : $errors;
   }
