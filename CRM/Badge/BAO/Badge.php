@@ -153,21 +153,25 @@ class CRM_Badge_BAO_Badge {
     $this->tMarginName = 20;
 
     $x = $this->pdf->GetAbsX();
-    $y = $this->pdf->GetY();
 
-    $titleWidth = $titleLeftMargin = 0;
+    $startOffset = 0;
     if (CRM_Utils_Array::value('image_1', $formattedRow)) {
       $this->printImage($formattedRow['image_1'], NULL, NULL, CRM_Utils_Array::value('width_image_1', $formattedRow),
         CRM_Utils_Array::value('height_image_1', $formattedRow));
-      $titleWidth = $titleLeftMargin = $this->lMarginLogo;
     }
 
-    $titleRightMargin = 0;
     if (CRM_Utils_Array::value('image_2', $formattedRow)) {
       $this->printImage($formattedRow['image_2'], $x + 68, NULL, CRM_Utils_Array::value('width_image_2', $formattedRow),
         CRM_Utils_Array::value('height_image_2', $formattedRow));
-      $titleRightMargin = 36;
-      $titleWidth = $this->lMarginLogo;
+    }
+
+    if ((CRM_Utils_Array::value('height_image_1', $formattedRow) >
+      CRM_Utils_Array::value('height_image_2', $formattedRow)) &&
+      CRM_Utils_Array::value('height_image_1', $formattedRow)) {
+      $startOffset = CRM_Utils_Array::value('height_image_1', $formattedRow);
+    }
+    elseif (CRM_Utils_Array::value('height_image_2', $formattedRow)) {
+      $startOffset = CRM_Utils_Array::value('height_image_2', $formattedRow);
     }
 
     $this->pdf->SetLineStyle(array(
@@ -178,33 +182,23 @@ class CRM_Badge_BAO_Badge {
       'color' => array(0, 0, 200)
     ));
 
-    if ($titleLeftMargin && $titleRightMargin) {
-      $titleWidth = $titleRightMargin;
-    }
-
-    // first row is a special row because we have images on the side
-    $value = '';
-    if ($formattedRow['token'][1]['token'] != 'spacer') {
-      $value = $formattedRow['token'][1]['value'];
-    }
-
-    $this->pdf->SetFont($formattedRow['token'][1]['font_name'], $formattedRow['token'][1]['font_style'],
-      $formattedRow['token'][1]['font_size']);
-    $this->pdf->MultiCell($this->pdf->width - $titleWidth, 0, $value,
-      $this->border, $formattedRow['token'][1]['text_alignment'], 0, 1, $x + $titleLeftMargin, $y);
-
     $rowCount = CRM_Badge_Form_Layout::FIELD_ROWCOUNT;
-    for ($i = 2; $i <= $rowCount; $i++) {
+    for ($i = 1; $i <= $rowCount; $i++) {
       if (!empty($formattedRow['token'][$i]['token'])) {
         $value = '';
         if ($formattedRow['token'][$i]['token'] != 'spacer') {
           $value = $formattedRow['token'][$i]['value'];
         }
 
+        $offset = $this->pdf->getY() + $startOffset;
+
         $this->pdf->SetFont($formattedRow['token'][$i]['font_name'], $formattedRow['token'][$i]['font_style'],
           $formattedRow['token'][$i]['font_size']);
         $this->pdf->MultiCell($this->pdf->width, 0, $value,
-          $this->border, $formattedRow['token'][$i]['text_alignment'], 0, 1, $x, $this->pdf->getY());
+          $this->border, $formattedRow['token'][$i]['text_alignment'], 0, 1, $x, $offset);
+
+        // set this to zero so that it is added only for first element
+        $startOffset = 0;
       }
     }
 
