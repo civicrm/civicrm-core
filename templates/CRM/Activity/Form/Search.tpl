@@ -25,30 +25,39 @@
 *}
 {* Search form and results for Activities *}
 <div class="crm-form-block crm-search-form-block">
-<div class="crm-accordion-wrapper crm-advanced_search_form-accordion {if $rows}collapsed{/if}">
- <div class="crm-accordion-header crm-master-accordion-header">
-        {ts}Edit Search Criteria{/ts}
-</div><!-- /.crm-accordion-header -->
-<div class="crm-accordion-body">
-  <div id="searchForm" class="form-item">
-    {strip}
-        <table class="form-layout">
-        <tr>
-           <td class="font-size12pt" colspan="3">
-               {$form.sort_name.label}&nbsp;&nbsp;{$form.sort_name.html|crmAddClass:'twenty'}&nbsp;&nbsp;&nbsp;{$form.buttons.html}
-           </td>
-        </tr>
+  <div class="crm-accordion-wrapper crm-advanced_search_form-accordion {if $rows}collapsed{/if}">
+    <div class="crm-accordion-header crm-master-accordion-header">
+      {ts}Edit Search Criteria{/ts}
+    </div>
+    <!-- /.crm-accordion-header -->
+    <div class="crm-accordion-body">
+      <div id="searchForm" class="form-item">
+        {strip}
+          <table class="form-layout">
+            <tr>
+              <td class="font-size12pt" colspan="3">
+                {$form.sort_name.label}&nbsp;&nbsp;{$form.sort_name.html|crmAddClass:'twenty'}
+                &nbsp;&nbsp;&nbsp;{$form.buttons.html}
+                <div>
+                  <div class="description font-italic">{ts}Complete OR partial name{/ts}
+                    <span class="contact-name-option option-1">{ts} of the Source Contact{/ts}</span>
+                    <span class="contact-name-option option-2">{ts} of the Assignee Contact{/ts}</span>
+                    <span class="contact-name-option option-3">{ts} of the Target Contact{/ts}</span>
+                  </div>
+                </div>
+              </td>
+            </tr>
 
-        {include file="CRM/Activity/Form/Search/Common.tpl"}
+            {include file="CRM/Activity/Form/Search/Common.tpl"}
 
-        <tr>
-           <td colspan="3">{$form.buttons.html}</td>
-        </tr>
-        </table>
-    {/strip}
+            <tr>
+              <td colspan="3">{$form.buttons.html}</td>
+            </tr>
+          </table>
+        {/strip}
+      </div>
+    </div>
   </div>
-</div>
-</div>
 </div>
 
 {if $rowsEmpty || $rows }

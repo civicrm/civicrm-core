@@ -25,7 +25,7 @@
 *}
 <tr>
   <td>
-  {$form.activity_role.html}
+    {$form.activity_role.html}
     <span class="crm-clear-link">
       (<a href="#" title="unselect"
           onclick="unselectRadio('activity_role', '{$form.formName}');
@@ -33,14 +33,6 @@
         {ts}clear{/ts}
       </a>)
     </span>
-
-    <div>
-      <div class="description font-italic">{ts}Complete OR partial name{/ts}
-        <span class="contact-name-option option-1">{ts} of the Source Contact{/ts}</span>
-        <span class="contact-name-option option-2">{ts} of the Assignee Contact{/ts}</span>
-        <span class="contact-name-option option-3">{ts} of the Target Contact{/ts}</span>
-      </div>
-    </div>
   </td>
 </tr>
 <tr>
