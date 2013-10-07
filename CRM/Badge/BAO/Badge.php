@@ -355,7 +355,7 @@ class CRM_Badge_BAO_Badge {
           elseif (key($token) == 'event') {
             $element = $token['event'][0];
             //FIX ME - we need to standardize event token names
-            if (!strpos($element, 'event_')) {
+            if (substr($element, 0, 6) != 'event_') {
               $element = 'event_' . $element;
             }
           }
