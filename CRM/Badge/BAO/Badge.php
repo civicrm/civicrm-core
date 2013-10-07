@@ -157,6 +157,7 @@ class CRM_Badge_BAO_Badge {
     $this->tMarginName = 20;
 
     $x = $this->pdf->GetAbsX();
+    $y = $this->pdf->getY();
 
     $startOffset = 0;
     if (CRM_Utils_Array::value('image_1', $formattedRow)) {
