@@ -29,18 +29,27 @@
        <type>varchar</type>
        <length>64</length>
        <comment>Provider name visible to user</comment>
+       <html>
+         <type>Text</type>
+       </html>
        <add>4.2</add>
   </field>
   <field>
        <name>username</name>
        <type>varchar</type>
        <length>255</length>
+       <html>
+          <type>Text</type>
+       </html>
        <add>4.2</add>
   </field>
   <field>
        <name>password</name>
        <type>varchar</type>
        <length>255</length>
+       <html>
+          <type>Text</type>
+       </html>
        <add>4.2</add>
   </field>
   <field>
@@ -48,18 +57,27 @@
        <type>int unsigned</type>
        <required>true</required>
        <comment>points to value in civicrm_option_value for group sms_api_type</comment>
+       <html>
+         <type>Select</type>
+       </html>
        <add>4.2</add>
   </field>
   <field>
        <name>api_url</name>
        <type>varchar</type>
        <length>128</length>
+       <html>
+          <type>Text</type>
+       </html>
        <add>4.2</add>
   </field>
   <field>
        <name>api_params</name>
        <type>text</type>
        <comment>the api params in xml, http or smtp format</comment>
+       <html>
+          <type>Text</type>
+       </html>
        <add>4.2</add>
   </field>
    <field>
@@ -67,11 +85,17 @@
        <type>boolean</type>
        <default>0</default>
        <add>4.2</add>
+       <html>
+         <type>CheckBox</type>
+       </html>
   </field>
    <field>
        <name>is_active</name>
        <type>boolean</type>
        <default>0</default>
        <add>4.2</add>
+       <html>
+         <type>CheckBox</type>
+       </html>       
   </field>
 </table>

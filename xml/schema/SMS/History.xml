@@ -35,6 +35,9 @@
       <required>true</required>
       <comment>FK to Contact who is sending this SMS</comment>
        <add>1.4</add>
+       <html>
+         <type>Autocomplete-Select</type>
+       </html>
   </field>
   <foreignKey>
        <name>contact_id</name>
