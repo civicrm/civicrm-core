@@ -71,6 +71,9 @@
      <values>Tab, Inline</values>
      <comment>Visual relationship between this form and its parent.</comment>
        <add>1.1</add>
+       <html>
+         <type>Select</type>
+       </html>
   </field>
   <field>
      <name>collapse_display</name>

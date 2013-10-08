@@ -28,6 +28,9 @@
         <keyColumn>id</keyColumn>
         <labelColumn>name</labelColumn>
       </pseudoconstant>
+      <html>
+        <type>Select></type>
+      </html>
   </field>
   <foreignKey>
        <name>option_group_id</name>
@@ -136,6 +139,9 @@
         <keyColumn>id</keyColumn>
         <labelColumn>name</labelColumn>
       </pseudoconstant>
+      <html>
+        <type>Select></type>
+      </html>
   </field>
   <foreignKey>
        <name>component_id</name>

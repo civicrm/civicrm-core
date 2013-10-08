@@ -15,6 +15,7 @@
       <required>true</required>
       <comment>Unique  Other Activity ID</comment>
        <add>1.1</add>
+       
   </field>
   <primaryKey>
        <name>id</name>
@@ -73,7 +74,7 @@
       </pseudoconstant>
       <html>
         <type>Select</type>
-      </html>
+      </html>            
   </field>
   <index>
        <name>UI_activity_type_id</name>
@@ -194,6 +195,9 @@
       <title>Phone (called) ID</title>
       <comment>Phone ID of the number called (optional - used if an existing phone number is selected).</comment>
       <add>2.0</add>
+      <html>
+        <type>Autocomplete-Select</type>
+      </html>
   </field>
   <foreignKey>
        <name>phone_id</name>
@@ -255,8 +259,8 @@
         <optionGroupName>activity_status</optionGroupName>
       </pseudoconstant>
       <html>
-            <type>Select</type>
-      </html>
+        <type>Select</type>
+      </html>      
   </field>
   <field>
       <name>priority_id</name>
@@ -268,7 +272,7 @@
         <optionGroupName>priority</optionGroupName>
       </pseudoconstant>
       <html>
-            <type>Select</type>
+        <type>Select</type>
       </html>
   </field>
   <field>
@@ -295,6 +299,9 @@
        <import>true</import>
        <headerPattern>/(is.)?test(.activity)?/i</headerPattern>
        <add>2.0</add>
+       <html>
+         <type>Select</type>
+       </html>
   </field>
   <field>
       <name>medium_id</name>
@@ -307,7 +314,7 @@
         <optionGroupName>encounter_medium</optionGroupName>
       </pseudoconstant>
       <html>
-            <type>Select</type>
+        <type>Select</type>
       </html>
       <add>2.2</add>
   </field>
@@ -345,6 +352,9 @@
        <import>true</import>
        <headerPattern>/(is.)?(current.)?(revision|version(ing)?)/i</headerPattern>
        <add>2.2</add>
+       <html>
+         <type>CheckBox</type>
+       </html>
   </field>
   <index>
        <name>index_is_current_revision</name>
@@ -392,6 +402,9 @@
        <import>true</import>
        <headerPattern>/(activity.)?(trash|deleted)/i</headerPattern>
        <add>2.2</add>
+       <html>
+         <type>Text</type>
+       </html>
   </field>
   <index>
        <name>index_is_deleted</name>
@@ -405,10 +418,10 @@
        <title>Campaign ID</title>
        <import>true</import>
        <comment>The campaign for which this activity has been triggered.</comment>
-       <html>
-            <type>Select</type>
-      </html>
        <add>3.4</add>
+       <html>
+         <type>CheckBox</type>
+       </html>
   </field>
   <foreignKey>
        <name>campaign_id</name>
@@ -427,7 +440,7 @@
         <optionGroupName>engagement_index</optionGroupName>
       </pseudoconstant>
       <html>
-            <type>Select</type>
+        <type>Select</type>
       </html>
       <add>3.4</add>
   </field>
@@ -435,5 +448,8 @@
       <name>weight</name>
       <type>int</type>
       <add>4.1</add>
+      <html>
+         <type>Text</type>
+      </html>
   </field>
 </table>

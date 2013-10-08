@@ -96,6 +96,9 @@
       <pseudoconstant>
         <optionGroupName>campaign_type</optionGroupName>
       </pseudoconstant>
+      <html>
+        <type>Select></type>
+      </html>
       <add>3.3</add>
   </field>
   <index>
@@ -114,6 +117,9 @@
       <pseudoconstant>
         <optionGroupName>campaign_status</optionGroupName>
       </pseudoconstant>
+      <html>
+        <type>Select></type>
+      </html>
       <add>3.3</add>
   </field>
   <index>
@@ -131,6 +137,9 @@
        <comment>Unique trusted external ID (generally from a legacy app/datasource). Particularly useful for deduping operations.</comment>
        <import>true</import>
        <add>3.3</add>
+       <html>
+         <type>Text</type>
+       </html>
   </field>
   <index>
        <name>UI_external_identifier</name>
@@ -146,6 +155,9 @@
        <comment>Optional parent id for this Campaign.</comment>
        <import>true</import>
        <add>3.3</add>
+       <html>
+         <type>Autocomplete-Select</type>
+       </html>
   </field>
   <foreignKey>
        <name>parent_id</name>
@@ -161,6 +173,9 @@
       <default>1</default>
       <comment>Is this Campaign enabled or disabled/cancelled?</comment>
       <add>3.3</add>
+      <html>
+        <type>CheckBox</type>
+      </html>
   </field>
 
   <field>
@@ -183,6 +198,9 @@
       <title>Campaign Created Date</title>
       <comment>Date and time that Campaign was created.</comment>
       <add>3.3</add>
+      <html>
+        <type>Select Date</type>
+      </html>
   </field>
 
   <field>
@@ -211,11 +229,17 @@
       <title>Campaign Goals</title>
       <comment>General goals for Campaign.</comment>
       <add>3.4</add>
+      <html>
+        <type>RichTextEditor</type>
+      </html>
   </field>
   <field>
       <name>goal_revenue</name>
       <type>decimal</type>
       <comment>The target revenue for this campaign.</comment>
       <add>3.4</add>
+      <html>
+        <type>Text</type>
+      </html>
   </field>
 </table>

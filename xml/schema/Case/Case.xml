@@ -49,6 +49,9 @@
        <pseudoconstant>
          <optionGroupName>case_type</optionGroupName>
        </pseudoconstant>
+       <html>
+         <type>Select></type>
+       </html>
        <add>2.0</add>
   </field>
   <index>
@@ -109,7 +112,10 @@
       <import>true</import>
       <uniqueName>case_subject</uniqueName>
       <comment>Short name of the case.</comment>
-       <add>1.8</add>
+      <html>
+         <type>Text</type>
+      </html>
+      <add>1.8</add>
   </field>
     <field>
      <name>start_date</name>
@@ -118,6 +124,9 @@
      <import>true</import>
      <type>date</type>
      <comment>Date on which given case starts.</comment>
+     <html>
+         <type>Select Date</type>
+     </html>
      <add>1.8</add>
   </field>
   <field>
@@ -127,6 +136,9 @@
      <import>true</import>
      <type>date</type>
      <comment>Date on which given case ends.</comment>
+     <html>
+         <type>Select Date</type>
+      </html>
      <add>1.8</add>
   </field>
   <field>
@@ -152,6 +164,9 @@
        <pseudoconstant>
          <optionGroupName>case_status</optionGroupName>
        </pseudoconstant>
+       <html>
+         <type>Select></type>
+       </html>
        <add>1.8</add>
   </field>
   <field>

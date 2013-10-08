@@ -42,6 +42,9 @@
        <values>start_date, end_date, join_date</values>
        <comment>Event when this status starts.</comment>
        <add>1.5</add>
+       <html>
+         <type>Select</type>
+       </html>
   </field>
   <field>
       <name>start_event_adjust_unit</name>
@@ -49,6 +52,9 @@
       <values>day, month, year</values>
       <comment>Unit used for adjusting from start_event.</comment>
       <add>1.5</add>
+      <html>
+        <type>Select</type>
+      </html>
   </field>
   <field>
       <name>start_event_adjust_interval</name>
@@ -62,6 +68,9 @@
       <values>start_date, end_date, join_date</values>
       <comment>Event after which this status ends.</comment>
       <add>1.5</add>
+      <html>
+        <type>Select</type>
+      </html>
   </field>
   <field>
       <name>end_event_adjust_unit</name>
@@ -69,6 +78,9 @@
       <values>day, month, year</values>
       <comment>Unit used for adjusting from the ending event.</comment>
       <add>1.5</add>
+      <html>
+        <type>Select</type>
+      </html>
   </field>
  <field>
       <name>end_event_adjust_interval</name>

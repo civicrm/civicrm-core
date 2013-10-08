@@ -35,6 +35,9 @@
     <title>Name</title>
     <length>255</length>
     <comment>Price field option name</comment>
+    <html>
+      <type>Text</type>
+    </html>
     <add>3.3</add>
   </field>
   <field>
@@ -44,6 +47,9 @@
     <length>255</length>
     <localizable>true</localizable>
     <comment>Price field option label</comment>
+    <html>
+      <type>Text</type>
+    </html>    
     <add>3.3</add>
   </field>
   <field>
@@ -51,11 +57,10 @@
     <type>text</type>
     <html>
       <type>TextArea</type>
-    </html>
-
-    <default>NULL</default>
-    <rows>2</rows>
+      <rows>2</rows>
     <cols>60</cols>
+    </html>
+    <default>NULL</default>    
     <localizable>true</localizable>
     <comment>>Price field option description.</comment>
     <add>3.3</add>
@@ -65,7 +70,10 @@
     <type>varchar</type>
     <title>Amount</title>
     <length>512</length>
-    <size>EIGHT</size>
+    <html>
+      <type>Text</type>
+      <size>EIGHT</size>
+    </html>
     <required>true</required>
     <comment>Price field option amount</comment>
     <add>3.3</add>
@@ -76,6 +84,9 @@
     <default>NULL</default>
     <comment>Number of participants per field option</comment>
     <add>3.3</add>
+    <html>
+      <type>Text</type>
+    </html>
   </field>
   <field>
     <name>max_value</name>
@@ -83,6 +94,9 @@
     <default>NULL</default>
     <comment>Max number of participants per field options</comment>
     <add>3.3</add>
+    <html>
+      <type>Text</type>
+    </html>
   </field>
   <field>
     <name>weight</name>
@@ -90,12 +104,18 @@
     <default>1</default>
     <comment>Order in which the field options should appear</comment>
     <add>3.3</add>
+    <html>
+      <type>Text</type>
+    </html>
   </field>
   <field>
     <name>membership_type_id</name>
     <type>int unsigned</type>
     <default>NULL</default>
     <comment>FK to Membership Type</comment>
+    <html>
+      <type>Select</type>
+    </html>
     <add>3.4</add>
   </field>
   <foreignKey>
@@ -111,6 +131,9 @@
     <default>NULL</default>
     <comment>Number of terms for this membership</comment>
     <add>4.3</add>
+    <html>
+      <type>Text</type>
+    </html>
   </field>
   <field>
     <name>is_default</name>
@@ -118,6 +141,9 @@
     <comment>Is this default price field option</comment>
     <default>0</default>
     <add>3.3</add>
+    <html>
+      <type>CheckBox</type>
+    </html>
   </field>
   <field>
     <name>is_active</name>
@@ -133,6 +159,9 @@
     <default>NULL</default>
     <comment>FK to Financial Type.</comment>
     <add>4.3</add>
+    <html>
+      <type>Select</type>
+    </html>
   </field>
   <foreignKey>
     <name>financial_type_id</name>
@@ -151,6 +180,9 @@
     <required>true</required>
     <comment>Tax-deductible portion of the amount</comment>
     <add>4.1</add>
+    <html>
+      <type>Text</type>
+    </html>
   </field>
 </table>
 

@@ -61,6 +61,9 @@
       <keyColumn>id</keyColumn>
       <labelColumn>name</labelColumn>
     </pseudoconstant>
+    <html>
+      <type>Select></type>
+    </html>
     <add>4.3</add>
   </field>
   <foreignKey>
@@ -79,6 +82,9 @@
       <keyColumn>id</keyColumn>
       <labelColumn>name</labelColumn>
     </pseudoconstant>
+    <html>
+      <type>Select></type>
+    </html>
     <add>1.8</add>
   </field>
   <field>
@@ -413,6 +419,9 @@
       <labelColumn>full_name</labelColumn>
       <nameColumn>numeric_code</nameColumn>
     </pseudoconstant>
+    <html>
+      <type>Select></type>
+    </html>
   </field>
   <field>
     <name>campaign_id</name>

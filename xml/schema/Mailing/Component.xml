@@ -26,6 +26,9 @@
        <type>enum</type>
        <values>Header, Footer, Subscribe, Welcome, Unsubscribe, OptOut, Reply, Resubscribe</values>
        <comment>Type of Component.</comment>
+       <html>
+         <type>Select</type>
+       </html>
   </field>
   <field>
        <name>subject</name>

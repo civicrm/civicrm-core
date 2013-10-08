@@ -50,6 +50,9 @@
        <values>wildcardMatch, exactMatch</values>
        <default>"wildcardMatch"</default>
        <add>4.4</add>
+       <html>
+         <type>Select</type>
+       </html>
   </field>
   <field>
     <name>domain_id</name>

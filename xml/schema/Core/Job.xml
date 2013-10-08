@@ -38,6 +38,9 @@
        <default>"Daily"</default>
        <comment>Scheduled job run frequency.</comment>
        <add>4.1</add>
+       <html>
+         <type>Select</type>
+       </html>
   </field>
   <field>
        <name>last_run</name>

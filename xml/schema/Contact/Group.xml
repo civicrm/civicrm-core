@@ -85,6 +85,9 @@
        <default>'User and User Admin Only'</default>
        <comment>In what context(s) is this field visible.</comment>
        <add>1.2</add>
+       <html>
+         <type>Select</type>
+       </html>
   </field>
   <field>
        <name>where_clause</name>

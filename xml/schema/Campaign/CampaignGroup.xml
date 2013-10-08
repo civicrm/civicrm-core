@@ -39,6 +39,9 @@
     <values>Include, Exclude</values>
     <default>NULL</default>
     <comment>Type of Group.</comment>
+    <html>
+      <type>Select</type>
+    </html>
   </field>
 
   <field>
