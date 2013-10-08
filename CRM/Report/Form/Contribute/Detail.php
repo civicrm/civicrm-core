@@ -882,17 +882,18 @@ WHERE  civicrm_contribution_contribution_id={$row['civicrm_contribution_contribu
       }
       if ($showsumcontribs) {
         $totalandsum = array();
-        $title = ts('contributions / soft-credits');
+        // ts exception to avoid having ts("%1 %2: %3")
+        $title = '%1 contributions / soft-credits: %2';
+
         if (CRM_Utils_Array::value('contribution_or_soft_value', $this->_params) == 'contributions_only') {
-          $title = ts('contributions');
+          $title = '%1 contributions: %2';
         } else if (CRM_Utils_Array::value('contribution_or_soft_value', $this->_params) == 'soft_credits_only') {
-          $title = ts('soft-credits');
+          $title = '%1 soft-credits: %2';
         }
         foreach ($totals as $key => $total) {
-          $totalandsum[$key] = ts("%1 %2: %3", array(
+          $totalandsum[$key] = ts($title, array(
             1 => $total,
-            2 => $title,
-            3 => CRM_Utils_Money::format($sumcontribs[$key])
+            2 => CRM_Utils_Money::format($sumcontribs[$key])
           ));
         }
         $this->assign('sectionTotals', $totalandsum);
