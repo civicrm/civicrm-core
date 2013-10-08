@@ -154,7 +154,7 @@ class CRM_Financial_BAO_FinancialTypeAccount extends CRM_Financial_DAO_EntityFin
     $financialType->id = $financialTypeAccountId;
     $financialType->find(TRUE);
     $financialType->delete();
-    CRM_Core_Session::setStatus(ts('Unbalanced transactions may be created if you delete  %1 account.', array(1 => $relationValues[$financialType->account_relationship])));
+    CRM_Core_Session::setStatus(ts('Unbalanced transactions may be created if you delete the account of type: %1.', array(1 => $relationValues[$financialType->account_relationship])));
   }
 
   /**
