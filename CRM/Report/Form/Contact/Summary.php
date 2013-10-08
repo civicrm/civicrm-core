@@ -78,6 +78,10 @@ class CRM_Report_Form_Contact_Summary extends CRM_Report_Form {
           array(
             'title' => ts('Contact SubType'),
           ),
+          'birth_date' =>
+          array(
+            'title' => ts('Birth Date'),
+          ),
         ),
         'filters' =>
         array(
@@ -90,6 +94,11 @@ class CRM_Report_Form_Contact_Summary extends CRM_Report_Form {
           'id' =>
           array('title' => ts('Contact ID'),
             'no_display' => TRUE,
+          ),
+          'birth_date' =>
+          array(
+            'title' => ts('Birth Date'),
+            'operatorType' => CRM_Report_Form::OP_DATE,
           ),
         ),
         'grouping' => 'contact-fields',
