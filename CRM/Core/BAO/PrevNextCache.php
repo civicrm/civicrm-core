@@ -152,6 +152,9 @@ WHERE  cacheKey = %1
     }
 
     if ($rowCount) {
+      $offset = CRM_Utils_Type::escape($offset, 'Int');
+      $rowCount = CRM_Utils_Type::escape($rowCount, 'Int');
+
       $query .= " LIMIT {$offset}, {$rowCount}";
     }
 

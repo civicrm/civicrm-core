@@ -4000,6 +4000,8 @@ civicrm_relationship.start_date > {$today}
       $sql .= " ORDER BY $sort ";
     }
     if ($row_count > 0 && $offset >= 0) {
+      $offset = CRM_Utils_Type::escape($offset, 'Int');
+      $rowCount = CRM_Utils_Type::escape($rowCount, 'Int');
       $sql .= " LIMIT $offset, $row_count ";
     }
 
@@ -4185,6 +4187,8 @@ civicrm_relationship.start_date > {$today}
 
 
       if ($rowCount > 0 && $offset >= 0) {
+        $offset = CRM_Utils_Type::escape($offset, 'Int');
+        $rowCount = CRM_Utils_Type::escape($rowCount, 'Int');
         $limit = " LIMIT $offset, $rowCount ";
 
         // ok here is a first hack at an optimization, lets get all the contact ids
