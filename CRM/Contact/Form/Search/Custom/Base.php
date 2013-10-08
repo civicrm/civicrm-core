@@ -124,6 +124,7 @@ class CRM_Contact_Form_Search_Custom_Base {
   function addSortOffset(&$sql, $offset, $rowcount, $sort) {
     if (!empty($sort)) {
       if (is_string($sort)) {
+        $sort = CRM_Utils_Type::escape($sort, 'String');
         $sql .= " ORDER BY $sort ";
       }
       else {

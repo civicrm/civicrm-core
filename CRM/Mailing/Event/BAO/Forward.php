@@ -331,6 +331,7 @@ class CRM_Mailing_Event_BAO_Forward extends CRM_Mailing_Event_DAO_Forward {
     $orderBy = "sort_name ASC, {$forward}.time_stamp DESC";
     if ($sort) {
       if (is_string($sort)) {
+        $sort = CRM_Utils_Type::escape($sort, 'String');
         $orderBy = $sort;
       }
       else {
