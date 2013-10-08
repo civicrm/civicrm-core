@@ -136,32 +136,27 @@ class CRM_Contact_BAO_Individual extends CRM_Contact_DAO_Contact {
         }
 
         foreach (array('prefix', 'suffix') as $name) {
-          $phpName = $name;
           $dbName  = "{$name}_id";
-          $vals    = "{$name}es";
 
           $value = $individual->$dbName;
           if (in_array($name, $useDBNames)) {
             $params[$dbName] = $value;
             $contact->$dbName = $value;
             if ($value) {
-              $temp = $$vals;
-              $$phpName = $temp[$value];
+              $$name = CRM_Core_PseudoConstant::getLabel('CRM_Contact_DAO_Contact', $name, $value);
             }
             else {
-              $$phpName = NULL;
+              $$name = NULL;
             }
           }
           elseif (array_key_exists($dbName, $params)) {
-            $temp = $$vals;
             // CRM-5278
             if (!empty($params[$dbName])) {
-              $$phpName = CRM_Utils_Array::value($params[$dbName], $temp);
+              $$name = CRM_Core_PseudoConstant::getLabel('CRM_Contact_DAO_Contact', $dbName, $params[$dbName]);
             }
           }
           elseif ($value) {
-            $temp = $$vals;
-            $$phpName = $temp[$value];
+            $$name = CRM_Core_PseudoConstant::getLabel('CRM_Contact_DAO_Contact', $name, $value);
           }
         }
       }
