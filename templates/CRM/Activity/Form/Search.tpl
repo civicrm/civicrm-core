@@ -89,6 +89,12 @@
   <script type="text/javascript">
     cj(function () {
       cj().crmAccordions();
+
+      var roleId = cj('input[name=activity_role]:checked', '#Search').val();
+      if (roleId) {
+        cj('.description .option-' + roleId).show();
+      }
+
     });
 
     cj('[name=activity_role]:input').change(function () {
