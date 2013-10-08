@@ -61,34 +61,46 @@
 </div>
 
 {if $rowsEmpty || $rows }
-<div class="crm-content-block">
-{if $rowsEmpty}
-  <div class="crm-results-block crm-results-block-empty">
-  {include file="CRM/Activity/Form/Search/EmptyResults.tpl"}
+  <div class="crm-content-block">
+    {if $rowsEmpty}
+      <div class="crm-results-block crm-results-block-empty">
+        {include file="CRM/Activity/Form/Search/EmptyResults.tpl"}
+      </div>
+    {/if}
+
+    {if $rows}
+      <div class="crm-results-block">
+        {* Search request has returned 1 or more matching rows. *}
+
+        {* This section handles form elements for action task select and submit *}
+        <div class="crm-search-tasks">
+          {include file="CRM/common/searchResultTasks.tpl"}
+        </div>
+        {* This section displays the rows along and includes the paging controls *}
+        <div class="crm-search-results">
+          {include file="CRM/Activity/Form/Selector.tpl" context="Search"}
+        </div>
+        {* END Actions/Results section *}
+      </div>
+    {/if}
   </div>
 {/if}
-
-{if $rows}
-  <div class="crm-results-block">
-    {* Search request has returned 1 or more matching rows. *}
-
-       {* This section handles form elements for action task select and submit *}
-       <div class="crm-search-tasks">
-       {include file="CRM/common/searchResultTasks.tpl"}
-    </div>
-       {* This section displays the rows along and includes the paging controls *}
-     <div class="crm-search-results">
-       {include file="CRM/Activity/Form/Selector.tpl" context="Search"}
-    </div>
-    {* END Actions/Results section *}
-</div>
-{/if}
-</div>
-{/if}
 {literal}
-<script type="text/javascript">
-cj(function() {
-   cj().crmAccordions();
-});
-</script>
+  <script type="text/javascript">
+    cj(function () {
+      cj().crmAccordions();
+    });
+
+    cj('[name=activity_role]:input').change(function () {
+      cj('.description .contact-name-option').hide();
+      if (cj(this).is(':checked')) {
+        cj('.description .option-' + cj(this).val()).show();
+      }
+    }).change();
+
+    cj(".crm-clear-link").click(function () {
+      cj('.description .contact-name-option').hide();
+    });
+
+  </script>
 {/literal}

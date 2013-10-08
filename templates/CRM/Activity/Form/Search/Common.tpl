@@ -24,7 +24,7 @@
  +--------------------------------------------------------------------+
 *}
 <tr>
-  <td>
+  <td colspan="2">
     {$form.activity_role.html}
     <span class="crm-clear-link">
       (<a href="#" title="unselect"
@@ -36,64 +36,72 @@
   </td>
 </tr>
 <tr>
-{if $form.activity_type_id}
-  <td><label>{ts}Activity Type(s){/ts}</label>
-    <div id="Activity" class="listing-box">
-      {foreach from=$form.activity_type_id item="activity_type_val"}
-        <div class="{cycle values='odd-row,even-row'}">
-          {$activity_type_val.html}
-        </div>
-      {/foreach}
-    </div>
-  </td>
+  {if $form.activity_type_id}
+    <td><label>{ts}Activity Type(s){/ts}</label>
+      <div id="Activity" class="listing-box">
+        {foreach from=$form.activity_type_id item="activity_type_val"}
+          <div class="{cycle values='odd-row,even-row'}">
+            {$activity_type_val.html}
+          </div>
+        {/foreach}
+      </div>
+    </td>
   {else}
-  <td>&nbsp;</td>
-{/if}
-{if $form.activity_survey_id || $buildEngagementLevel}
-  <td>
-    {if $form.activity_survey_id}
-      <label>{$form.activity_survey_id.label}</label><br />{$form.activity_survey_id.html}
-    {/if}
-    {if $buildEngagementLevel}
-      <br/ ><br />
-      <label>{$form.activity_engagement_level.label}</label><br />{$form.activity_engagement_level.html}
-    {/if}
-  </td>
-{/if}
+    <td>&nbsp;</td>
+  {/if}
+  {if $form.activity_survey_id || $buildEngagementLevel}
+    <td>
+      {if $form.activity_survey_id}
+        <label>{$form.activity_survey_id.label}</label>
+        <br/>
+        {$form.activity_survey_id.html}
+      {/if}
+      {if $buildEngagementLevel}
+        <br
+        / >
+        <br/>
+        <label>{$form.activity_engagement_level.label}</label>
+        <br/>
+        {$form.activity_engagement_level.html}
+      {/if}
+    </td>
+  {/if}
 
-{if $form.activity_tags}
-  <td><label>{ts}Activity Tag(s){/ts}</label>
-    <div id="Tags" class="listing-box">
-      {foreach from=$form.activity_tags item="tag_val"}
-        <div class="{cycle values='odd-row,even-row'}">
-          {$tag_val.html}
-        </div>
-      {/foreach}
-  </td>
-{else}
-  <td>&nbsp;</td>
-{/if}
+  {if $form.activity_tags}
+    <td><label>{ts}Activity Tag(s){/ts}</label>
+      <div id="Tags" class="listing-box">
+        {foreach from=$form.activity_tags item="tag_val"}
+          <div class="{cycle values='odd-row,even-row'}">
+            {$tag_val.html}
+          </div>
+        {/foreach}
+    </td>
+  {else}
+    <td>&nbsp;</td>
+  {/if}
 </tr>
 
-<tr><td><label>{ts}Activity Dates{/ts}</label></td></tr>
 <tr>
-{include file="CRM/Core/DateRange.tpl" fieldName="activity_date" from='_low' to='_high'}
+  <td><label>{ts}Activity Dates{/ts}</label></td>
+</tr>
+<tr>
+  {include file="CRM/Core/DateRange.tpl" fieldName="activity_date" from='_low' to='_high'}
 </tr>
 <tr>
   <td>
-  {$form.activity_subject.label}<br />
-  {$form.activity_subject.html|crmAddClass:big}
+    {$form.activity_subject.label}<br/>
+    {$form.activity_subject.html|crmAddClass:big}
   </td>
   <td colspan="2">
-  {$form.activity_status.label}<br />
-  {$form.activity_status.html}
+    {$form.activity_status.label}<br/>
+    {$form.activity_status.html}
   </td>
 </tr>
 <tr>
   {* td intentionally left blank to align the 'is test' widget on the right *}
   <td></td>
   <td colspan="2">
-  {$form.activity_test.label} {help id="is-test" file="CRM/Contact/Form/Search/Advanced"}
+    {$form.activity_test.label} {help id="is-test" file="CRM/Contact/Form/Search/Advanced"}
     &nbsp; {$form.activity_test.html}
     <span class="crm-clear-link">
       (<a href="#" onclick="unselectRadio('activity_test','{$form.formName}'); return false;">{ts}clear{/ts}</a>)
@@ -101,18 +109,20 @@
   </td>
 </tr>
 
-<tr><td colspan="3">{include file="CRM/common/Tag.tpl" tagsetType='activity'}</td></tr>
+<tr>
+  <td colspan="3">{include file="CRM/common/Tag.tpl" tagsetType='activity'}</td>
+</tr>
 
 {* campaign in activity search *}
 {include file="CRM/Campaign/Form/addCampaignToComponent.tpl"
 campaignContext="componentSearch" campaignTrClass='' campaignTdClass=''}
 
 {if $activityGroupTree}
-<tr id="activityCustom">
-  <td id="activityCustomData" colspan="2">
-  {include file="CRM/Custom/Form/Search.tpl" groupTree=$activityGroupTree showHideLinks=false}
-  </td>
-</tr>
+  <tr id="activityCustom">
+    <td id="activityCustomData" colspan="2">
+      {include file="CRM/Custom/Form/Search.tpl" groupTree=$activityGroupTree showHideLinks=false}
+    </td>
+  </tr>
 {/if}
 
 {literal}
@@ -155,14 +165,8 @@ campaignContext="componentSearch" campaignTrClass='' campaignTdClass=''}
 
 
 <script type="text/javascript">
-cj('[name=activity_role]:input').change(function() {
-  cj('.description .contact-name-option').hide();
-  if (cj(this).is(':checked')) {
-    cj('.description .option-' + cj(this).val()).show();
-  }
-}).change();
 
-function showCustomData(chkbox) {
+  function showCustomData(chkbox) {
   if (document.getElementById(chkbox).checked) {
     //inject Searchable activity custom fields according to activity type selected
     var element = chkbox.split("[");
