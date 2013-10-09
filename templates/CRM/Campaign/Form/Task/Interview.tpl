@@ -155,7 +155,7 @@
                 {continue}
               {/if}
               <td class="compressed {$field.data_type} {$fieldName}">
-                {if ( $field.data_type eq 'Date' and $field.is_view == 0) or
+                {if ( $field.data_type eq 'Date' and $field.is_view eq 0) or
                 ( $fieldName eq 'thankyou_date' ) or ( $fieldName eq 'cancel_date' ) or ( $fieldName eq 'receipt_date' ) or (  $fieldName eq 'activity_date_time') }
                 {include file="CRM/common/jcalendar.tpl" elementName=$fieldName elementIndex=$voterId batchUpdate=1}
                 {elseif $fieldName|substr:0:5 eq 'phone'}
