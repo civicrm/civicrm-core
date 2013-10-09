@@ -32,6 +32,12 @@
   </div><!-- /.crm-accordion-header -->
 <div id="commPrefs" class="crm-accordion-body">
     <table class="form-layout-compressed" >
+        {if !empty($form.communication_style_id)}
+            <tr><td colspan='4'>
+                <span class="label">{$form.communication_style_id.label} {help id="id-communication_style" file="CRM/Contact/Form/Contact.hlp"}</span>
+                <span class="value">{$form.communication_style_id.html}</span>
+            </td><tr>
+        {/if}
         <tr>
             {if !empty($form.email_greeting_id)}
                 <td>{$form.email_greeting_id.label}</td>

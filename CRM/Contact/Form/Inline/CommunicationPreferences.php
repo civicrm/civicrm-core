@@ -69,6 +69,10 @@ class CRM_Contact_Form_Inline_CommunicationPreferences extends CRM_Contact_Form_
       $defaults['preferred_language'] = $config->lcMessages;
     }
 
+    if (empty($defaults['communication_style_id'])) {
+      $defaults['communication_style_id'] = array_pop(CRM_Core_OptionGroup::values('communication_style', TRUE, NULL, NULL, 'AND is_default = 1'));
+    }
+
     foreach (CRM_Contact_BAO_Contact::$_greetingTypes as $greeting) {
       $name = "{$greeting}_display";
       $this->assign($name, CRM_Utils_Array::value($name, $defaults));

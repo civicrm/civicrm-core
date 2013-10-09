@@ -61,7 +61,7 @@ class CRM_Contact_BAO_Individual extends CRM_Contact_DAO_Contact {
     // "null" value for example is passed by dedupe merge in order to empty.
     // Display name computation shouldn't consider such values.
     foreach (array(
-      'first_name', 'middle_name', 'last_name', 'nick_name') as $displayField) {
+      'first_name', 'middle_name', 'last_name', 'nick_name', 'formal_title') as $displayField) {
       if (CRM_Utils_Array::value($displayField, $params) == "null") {
         $params[$displayField] = '';
       }
@@ -74,6 +74,7 @@ class CRM_Contact_BAO_Individual extends CRM_Contact_DAO_Contact {
     $nickName   = CRM_Utils_Array::value('nick_name', $params, '');
     $prefix_id  = CRM_Utils_Array::value('prefix_id', $params, '');
     $suffix_id  = CRM_Utils_Array::value('suffix_id', $params, '');
+    $formalTitle = CRM_Utils_Array::value('formal_title', $params, '');
 
     // get prefix and suffix names
     $prefixes = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'prefix_id');
@@ -119,6 +120,10 @@ class CRM_Contact_BAO_Individual extends CRM_Contact_DAO_Contact {
           if ($value && CRM_Utils_Array::value('preserveDBName', $params)) {
             $useDBNames[] = $name;
           }
+        }
+
+        if ($individual->formal_title && CRM_Utils_Array::value('preserveDBName', $params)) {
+          $useDBNames[] = 'formal_title';
         }
 
         // CRM-4430
@@ -174,6 +179,18 @@ class CRM_Contact_BAO_Individual extends CRM_Contact_DAO_Contact {
             $$phpName = $temp[$value];
           }
         }
+
+        if (in_array('formal_title', $useDBNames)) {
+          $params['formal_title'] = $individual->formal_title;
+          $contact->formal_title  = $individual->formal_title;
+          $formalTitle            = $individual->formal_title;
+        }
+        elseif (array_key_exists('formal_title', $params)) {
+          $formalTitle = $params['formal_title'];
+        }
+        elseif ($individual->formal_title) {
+          $formalTitle = $individual->formal_title;
+        }
       }
     }
 
@@ -195,6 +212,7 @@ class CRM_Contact_BAO_Individual extends CRM_Contact_DAO_Contact {
         'individual_prefix' => $prefix,
         'prefix_id' => $prefix_id,
         'suffix_id' => $suffix_id,
+        'formal_title' => $formalTitle,
       );
       // make sure we have all the name fields.
       foreach ($nameParams as $name => $value) {

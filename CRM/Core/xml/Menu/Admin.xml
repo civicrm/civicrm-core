@@ -331,6 +331,16 @@
      <weight>70</weight>
   </item>
   <item>
+     <path>civicrm/admin/options/communication_style</path>
+     <title>Communication Style Options</title>
+     <desc>Options for Communication Style selection.</desc>
+     <path_arguments>group=communication_style</path_arguments>
+     <page_callback>CRM_Admin_Page_Options</page_callback>
+     <adminGroup>Communications</adminGroup>
+     <icon>admin/small/01.png</icon>
+     <weight>75</weight>
+  </item>
+  <item>
      <path>civicrm/admin/options/email_greeting</path>
      <title>Email Greeting Formats</title>
      <desc>Options for assigning email greetings to individual and household contacts.</desc>

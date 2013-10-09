@@ -104,6 +104,11 @@ class CRM_Admin_Form_Preferences_Display extends CRM_Admin_Form_Preferences {
           'html_type' => NULL,
           'weight' => 11,
         ),
+        'formal_title' => array(
+          'html_type' => 'checkbox',
+          'title' => ts('Use Formal Title Field'),
+          'weight' => 12,
+        ),
       ),
     );
 

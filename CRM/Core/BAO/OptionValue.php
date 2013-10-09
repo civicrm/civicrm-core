@@ -295,6 +295,7 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
       'gender' => 'gender_id',
       'individual_prefix' => 'prefix_id',
       'individual_suffix' => 'suffix_id',
+      'communication_style' => 'communication_style_id', // Not only Individuals -- but the code seems to be generic for all contact types, despite the naming...
     );
     $contributions = array('payment_instrument' => 'payment_instrument_id');
     $activities    = array('activity_type' => 'activity_type_id');
