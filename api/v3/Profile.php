@@ -155,7 +155,6 @@ function _civicrm_api3_profile_get_spec(&$params) {
  */
 function civicrm_api3_profile_submit($params) {
   $profileID = _civicrm_api3_profile_getProfileID($params['profile_id']);
-
   if (!CRM_Core_DAO::getFieldValue('CRM_Core_DAO_UFGroup', $profileID, 'is_active')) {
     //@todo declare pseudoconstant & let api do this
     throw new API_Exception('Invalid value for profile_id');
@@ -198,6 +197,10 @@ function civicrm_api3_profile_submit($params) {
     $entity = strtolower(CRM_Utils_Array::value('entity', $field));
     if($entity && !in_array($entity, array_merge($contactEntities, $locationEntities))) {
       $contactParams['api.' . $entity . '.create'][$fieldName] = $value;
+      //@todo we are not currently declaring this option
+      if(isset($params['batch_id']) && strtolower($entity) == 'contribution') {
+        $contactParams['api.' . $entity . '.create']['batch_id'] = $params['batch_id'];
+      }
       if(isset($params[$entity . '_id'])) {
         //todo possibly declare $entity_id in getfields ?
         $contactParams['api.' . $entity . '.create']['id'] = $params[$entity . '_id'];
@@ -206,6 +209,19 @@ function civicrm_api3_profile_submit($params) {
     else {
       $contactParams[_civicrm_api3_profile_translate_fieldnames_for_bao($fieldName)] = $value;
     }
+  }
+  if(isset($contactParams['api.contribution.create']) && isset($contactParams['api.membership.create'])) {
+    $contactParams['api.membership_payment.create'] = array(
+      'contribution_id' => '$value.api.contribution.create.id',
+      'membership_id' => '$value.api.membership.create.id'
+    );
+  }
+
+  if(isset($contactParams['api.contribution.create']) && isset($contactParams['api.participant.create'])) {
+    $contactParams['api.participant_payment.create'] = array(
+      'contribution_id' => '$value.api.contribution.create.id',
+      'participant_id' => '$value.api.participant.create.id'
+    );
   }
 
   $contactParams['contact_id'] = CRM_Utils_Array::value('contact_id', $params);
@@ -233,7 +249,7 @@ function civicrm_api3_profile_submit($params) {
     $tags = $profileParams['tag'];
     unset($profileParams['tag']);
   }
-
+  
   return civicrm_api3('contact', 'create', $profileParams);
 
   $ufGroupDetails = array();
