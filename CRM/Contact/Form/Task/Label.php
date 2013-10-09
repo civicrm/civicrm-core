@@ -480,36 +480,5 @@ class CRM_Contact_Form_Task_Label extends CRM_Contact_Form_Task {
       $rows[$data['ID']]['addressee'] = $rows[$data['ID']]['addressee_display'] = $rows[$data['ID']]['display_name'] = $processedNames;
     }
   }
-
-  function mergeSameHousehold(&$rows) {
-    # group selected contacts by type
-    $individuals = array();
-    $households = array();
-    foreach ($rows as $contact_id => $row) {
-      if ($row['contact_type'] == 'Household') {
-        $households[$contact_id] = $row;
-      }
-      elseif ($row['contact_type'] == 'Individual') {
-        $individuals[$contact_id] = $row;
-      }
-    }
-
-    # exclude individuals belonging to selected households
-    foreach ($households as $household_id => $row) {
-      $dao = new CRM_Contact_DAO_Relationship();
-      $dao->contact_id_b = $household_id;
-      $dao->find();
-      while ($dao->fetch()) {
-        $individual_id = $dao->contact_id_a;
-        if (array_key_exists($individual_id, $individuals)) {
-          unset($individuals[$individual_id]);
-        }
-      }
-    }
-
-    # merge back individuals and households
-    $rows = array_merge($individuals, $households);
-    return $rows;
-  }
 }
 
