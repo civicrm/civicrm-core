@@ -86,6 +86,12 @@ cj(function($) {
       {$form.prefix_id.html}
     </td>    
     {/if}
+    {if $form.formal_title}
+    <td>
+      {$form.formal_title.label}<br/>
+      {$form.formal_title.html}
+    </td>
+    {/if}
     <td>
       {$form.first_name.label}<br /> 
       {$form.first_name.html}

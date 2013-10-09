@@ -756,6 +756,9 @@ class CRM_Contact_BAO_Query {
                   if ($fieldName == 'gender_id') {
                     $this->_pseudoConstantsSelect['gender'] = array('pseudoField' => 'gender_id', 'idCol' => "gender_id", 'bao' => 'CRM_Contact_BAO_Contact');
                   }
+                  if ($name == 'communication_style_id') {
+                    $this->_pseudoConstantsSelect['communication_style'] = array('pseudoField' => 'communication_style_id', 'idCol' => "communication_style_id", 'bao' => 'CRM_Contact_BAO_Contact');
+                  }
                   $this->_select[$name] = "contact_a.{$fieldName}  as `$name`";
                 }
               }
@@ -3987,6 +3990,8 @@ civicrm_relationship.start_date > {$today}
           'last_name' => 1,
           'prefix_id' => 1,
           'suffix_id' => 1,
+          'formal_title' => 1,
+          'communication_style_id' => 1,
           'birth_date' => 1,
           'gender_id' => 1,
           'street_address' => 1,
@@ -4538,6 +4543,8 @@ SELECT COUNT( civicrm_contribution.total_amount ) as cancel_count,
         'last_name' => 1,
         'prefix_id' => 1,
         'suffix_id' => 1,
+        'formal_title' => 1,
+        'communication_style_id' => 1,
         'email_greeting' => 1,
         'postal_greeting' => 1,
         'addressee' => 1,
@@ -5015,7 +5022,7 @@ AND   displayRelType.is_active = 1
       $qill = $value;
     }
 
-    $pseudoFields = array('email_greeting', 'postal_greeting', 'addressee', 'gender_id', 'prefix_id', 'suffix_id');
+    $pseudoFields = array('email_greeting', 'postal_greeting', 'addressee', 'gender_id', 'prefix_id', 'suffix_id', 'communication_style_id');
 
     if (is_numeric($value)) {
       $qill = $selectValues[(int ) $value];
@@ -5049,7 +5056,7 @@ AND   displayRelType.is_active = 1
     }
 
     if (in_array($name, $pseudoFields)) {
-      if (!in_array($name, array('gender_id', 'prefix_id', 'suffix_id'))) {
+      if (!in_array($name, array('gender_id', 'prefix_id', 'suffix_id', 'communication_style_id'))) {
         $wc = "contact_a.{$name}_id";
       }
       $dataType = 'Positive';

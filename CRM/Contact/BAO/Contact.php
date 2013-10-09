@@ -520,6 +520,7 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
     CRM_Utils_Array::lookupValue($defaults, 'prefix', CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'prefix_id'), $reverse);
     CRM_Utils_Array::lookupValue($defaults, 'suffix', CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'suffix_id'), $reverse);
     CRM_Utils_Array::lookupValue($defaults, 'gender', CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'gender_id'), $reverse);
+    CRM_Utils_Array::lookupValue($defaults, 'communication_style', CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'communication_style_id'), $reverse);
 
     //lookup value of email/postal greeting, addressee, CRM-4575
     foreach (self::$_greetingTypes as $greeting) {
@@ -1187,6 +1188,7 @@ WHERE id={$id}; ";
             'first_name',
             'middle_name',
             'last_name',
+            'formal_title',
             'job_title',
             'gender_id',
             'prefix_id',
@@ -1204,6 +1206,7 @@ WHERE id={$id}; ";
             'first_name',
             'middle_name',
             'last_name',
+            'formal_title',
             'job_title',
             'gender_id',
             'prefix_id',
@@ -1444,6 +1447,7 @@ WHERE id={$id}; ";
               'first_name',
               'middle_name',
               'last_name',
+              'formal_title',
               'job_title',
               'gender_id',
               'prefix_id',
@@ -1467,6 +1471,7 @@ WHERE id={$id}; ";
               'first_name',
               'middle_name',
               'last_name',
+              'formal_title',
               'job_title',
               'gender_id',
               'prefix_id',
@@ -2551,7 +2556,7 @@ AND       civicrm_openid.is_primary = 1";
     }
 
     if ($emailGreetingString) {
-      CRM_Utils_Token::replaceGreetingTokens($emailGreetingString,
+      CRM_Contact_BAO_Contact_Utils::processGreetingTemplate($emailGreetingString,
         $contactDetails,
         $contact->id,
         'CRM_Contact_BAO_Contact'
@@ -2587,7 +2592,7 @@ AND       civicrm_openid.is_primary = 1";
     }
 
     if ($postalGreetingString) {
-      CRM_Utils_Token::replaceGreetingTokens($postalGreetingString,
+      CRM_Contact_BAO_Contact_Utils::processGreetingTemplate($postalGreetingString,
         $contactDetails,
         $contact->id,
         'CRM_Contact_BAO_Contact'
@@ -2624,7 +2629,7 @@ AND       civicrm_openid.is_primary = 1";
     }
 
     if ($addresseeString) {
-      CRM_Utils_Token::replaceGreetingTokens($addresseeString,
+      CRM_Contact_BAO_Contact_Utils::processGreetingTemplate($addresseeString,
         $contactDetails,
         $contact->id,
         'CRM_Contact_BAO_Contact'

@@ -1418,7 +1418,7 @@ WHERE civicrm_event.is_active = 1
             $values[$index] = '';
           }
         }
-        elseif (in_array(substr($name, 0, -3), array('gender', 'prefix', 'suffix'))) {
+        elseif (in_array(substr($name, 0, -3), array('gender', 'prefix', 'suffix', 'communication_style'))) {
           $values[$index] = CRM_Core_PseudoConstant::getLabel('CRM_Contact_DAO_Contact', $name, $params[$name]);
         }
         elseif (in_array($name, array(

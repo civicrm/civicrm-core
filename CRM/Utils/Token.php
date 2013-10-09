@@ -643,6 +643,7 @@ class CRM_Utils_Token {
     /* Construct value from $token and $contact */
 
     $value = NULL;
+    $noReplace = FALSE;
 
     // Support legacy tokens
     $token = CRM_Utils_Array::value($token, self::legacyContactTokens(), $token);
@@ -652,7 +653,7 @@ class CRM_Utils_Token {
     // called only when we find a token in the string
 
     if (!in_array($token, self::$_tokens['contact'])) {
-      $value = "{contact.$token}";
+      $noReplace = TRUE;
     }
     elseif ($token == 'checksum') {
       $hash = CRM_Utils_Array::value('hash', $contact);
@@ -686,10 +687,15 @@ class CRM_Utils_Token {
 
     // if null then return actual token
     if ($returnBlankToken && !$value) {
+      $noReplace = TRUE;
+    }
+
+    if ($noReplace) {
       $value = "{contact.$token}";
     }
 
-    if ($escapeSmarty) {
+    if ($escapeSmarty
+        && !($returnBlankToken && $noReplace)) { // $returnBlankToken means the caller wants to do further attempts at processing unreplaced tokens -- so don't escape them yet in this case.
       $value = self::tokenEscapeSmarty($value);
     }
 
@@ -1212,7 +1218,7 @@ class CRM_Utils_Token {
    *
    * @access public
    */
-  static function replaceGreetingTokens(&$tokenString, $contactDetails = NULL, $contactId = NULL, $className = NULL) {
+  static function replaceGreetingTokens(&$tokenString, $contactDetails = NULL, $contactId = NULL, $className = NULL, $escapeSmarty = FALSE) {
 
     if (!$contactDetails && !$contactId) {
       return;
@@ -1224,7 +1230,7 @@ class CRM_Utils_Token {
     if (!empty($greetingTokens)) {
       // first use the existing contact object for token replacement
       if (!empty($contactDetails)) {
-        $tokenString = CRM_Utils_Token::replaceContactTokens($tokenString, $contactDetails, TRUE, $greetingTokens, TRUE);
+        $tokenString = CRM_Utils_Token::replaceContactTokens($tokenString, $contactDetails, TRUE, $greetingTokens, TRUE, $escapeSmarty);
       }
 
       // check if there are any unevaluated tokens
@@ -1248,7 +1254,9 @@ class CRM_Utils_Token {
         $tokenString = CRM_Utils_Token::replaceContactTokens($tokenString,
           $greetingDetails,
           TRUE,
-          $greetingTokens
+          $greetingTokens,
+          FALSE,
+          $escapeSmarty
         );
       }
     }
@@ -1488,6 +1496,7 @@ class CRM_Utils_Token {
       'individual_prefix' => 'prefix_id',
       'individual_suffix' => 'suffix_id',
       'gender' => 'gender_id',
+      'communication_style' => 'communication_style_id',
     );
   }
 

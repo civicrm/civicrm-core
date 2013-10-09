@@ -76,6 +76,14 @@
 <p>{ts}You can use an address belonging to an existing contact or create a new contact by selecting the desired contact type from the select field. If you link an individual's address to an organization, an employee-employer relationship will be automatically created. If you link an individual's address to a household, a household member relationship is created.{/ts}</p>
 {/htxt}
 
+{htxt id="id-communication_style-title"}
+  {ts}Communication Style{/ts}
+{/htxt}
+{htxt id="id-communication_style"}
+<p>{ts}Choose how you communicate with this contact, e.g. on formal or familiar terms.{/ts}</p>
+<p>{ts}Depending on the CiviCRM setup, email and postal greetings (see below) may be automatically adapted accordingly; or the information can be used in other ways.{/ts}</p>
+{/htxt}
+
 {htxt id="id-greeting-title"}
   {ts}Greeting{/ts}
 {/htxt}
