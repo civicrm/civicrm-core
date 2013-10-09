@@ -3996,9 +3996,12 @@ civicrm_relationship.start_date > {$today}
       $sql .= ' GROUP BY contact_a.id';
     }
     if (!empty($sort)) {
+      $sort = CRM_Utils_Type::escape($sort, 'String');
       $sql .= " ORDER BY $sort ";
     }
     if ($row_count > 0 && $offset >= 0) {
+      $offset = CRM_Utils_Type::escape($offset, 'Int');
+      $rowCount = CRM_Utils_Type::escape($rowCount, 'Int');
       $sql .= " LIMIT $offset, $row_count ";
     }
 
@@ -4121,9 +4124,11 @@ civicrm_relationship.start_date > {$today}
               $orderBy = str_replace('sort_name', 'contact_a.sort_name', $orderBy);
             }
 
+            $orderBy = CRM_Utils_Type::escape($orderBy, 'String');
             $order = " ORDER BY $orderBy";
 
             if ($sortOrder) {
+              $sortOrder = CRM_Utils_Type::escape($sortOrder, 'String');
               $order .= " $sortOrder";
             }
 
@@ -4182,6 +4187,8 @@ civicrm_relationship.start_date > {$today}
 
 
       if ($rowCount > 0 && $offset >= 0) {
+        $offset = CRM_Utils_Type::escape($offset, 'Int');
+        $rowCount = CRM_Utils_Type::escape($rowCount, 'Int');
         $limit = " LIMIT $offset, $rowCount ";
 
         // ok here is a first hack at an optimization, lets get all the contact ids

@@ -266,7 +266,7 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
 
     $orderBy = ' ORDER BY batch.id desc';
     if (!empty($params['sort'])) {
-      $orderBy = ' ORDER BY ' . $params['sort'];
+      $orderBy = ' ORDER BY ' . CRM_Utils_Type::escape($params['sort'], 'String');
     }
 
     $query = "
@@ -633,8 +633,8 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
     }
 
     $orderBy = " ORDER BY civicrm_financial_trxn.id";
-    if (CRM_Utils_Array::value('sort', $params)) {
-      $orderBy = ' ORDER BY ' . CRM_Utils_Array::value('sort', $params);
+    if (!empty($params['sort'])) {
+      $orderBy = ' ORDER BY ' . CRM_Utils_Type::escape($params['sort'], 'String');
     }
 
     $from = "civicrm_financial_trxn
