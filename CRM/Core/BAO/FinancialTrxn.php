@@ -128,8 +128,13 @@ class CRM_Core_BAO_FinancialTrxn extends CRM_Financial_DAO_FinancialTrxn {
     if (!$newTrxn) {
       $condition = " AND ((ceft1.entity_table IS NOT NULL) OR (cft.payment_instrument_id IS NOT NULL AND ceft1.entity_table IS NULL)) ";
     }
+
+    if ($orderBy) {
+      $orderBy = CRM_Utils_Type::escape($orderBy, 'String');
+    }
+
     $query = "SELECT ceft.id, ceft.financial_trxn_id FROM `civicrm_financial_trxn` cft
-LEFT JOIN civicrm_entity_financial_trxn ceft 
+LEFT JOIN civicrm_entity_financial_trxn ceft
 ON ceft.financial_trxn_id = cft.id AND ceft.entity_table = 'civicrm_contribution'
 LEFT JOIN civicrm_entity_financial_trxn ceft1
 ON ceft1.financial_trxn_id = cft.id AND ceft1.entity_table = 'civicrm_financial_item'
@@ -137,8 +142,8 @@ LEFT JOIN civicrm_financial_item cfi ON ceft1.entity_table = 'civicrm_financial_
 WHERE ceft.entity_id = %1 AND (cfi.entity_table <> 'civicrm_financial_trxn' or cfi.entity_table is NULL)
 {$condition}
 ORDER BY cft.id {$orderBy}
-LIMIT 1;"; 
- 
+LIMIT 1;";
+
     $params = array(1 => array($entity_id, 'Integer'));
     $dao = CRM_Core_DAO::executeQuery($query, $params);
     if ($dao->fetch()) {
@@ -163,7 +168,7 @@ LIMIT 1;";
   static function getFinancialTrxnTotal($entity_id) {
     $query = "
       SELECT (ft.amount+SUM(ceft.amount)) AS total FROM civicrm_entity_financial_trxn AS ft
-LEFT JOIN civicrm_entity_financial_trxn AS ceft ON ft.financial_trxn_id = ceft.entity_id 
+LEFT JOIN civicrm_entity_financial_trxn AS ceft ON ft.financial_trxn_id = ceft.entity_id
 WHERE ft.entity_table = 'civicrm_contribution' AND ft.entity_id = %1
         ";
 
@@ -236,7 +241,7 @@ WHERE  ef2.financial_trxn_id =%1
   static function getFinancialTrxnLineTotal($entity_id, $entity_table = 'civicrm_contribution') {
     $query = "SELECT lt.price_field_value_id AS id, ft.financial_trxn_id,ft.amount AS amount FROM civicrm_entity_financial_trxn AS ft
 LEFT JOIN civicrm_financial_item AS fi ON fi.id = ft.entity_id AND fi.entity_table = 'civicrm_line_item' AND ft.entity_table = 'civicrm_financial_item'
-LEFT JOIN civicrm_line_item AS lt ON lt.id = fi.entity_id AND lt.entity_table = %2 
+LEFT JOIN civicrm_line_item AS lt ON lt.id = fi.entity_id AND lt.entity_table = %2
 WHERE lt.entity_id = %1 ";
 
     $sqlParams = array(1 => array($entity_id, 'Integer'), 2 => array($entity_table, 'String'));
@@ -261,11 +266,11 @@ WHERE lt.entity_id = %1 ";
    */
   static function deleteFinancialTrxn($entity_id) {
     $query = "DELETE ceft1, cfi, ceft, cft FROM `civicrm_financial_trxn` cft
-LEFT JOIN civicrm_entity_financial_trxn ceft 
+LEFT JOIN civicrm_entity_financial_trxn ceft
   ON ceft.financial_trxn_id = cft.id AND ceft.entity_table = 'civicrm_contribution'
 LEFT JOIN civicrm_entity_financial_trxn ceft1
   ON ceft1.financial_trxn_id = cft.id AND ceft1.entity_table = 'civicrm_financial_item'
-LEFT JOIN civicrm_financial_item cfi 
+LEFT JOIN civicrm_financial_item cfi
   ON ceft1.entity_table = 'civicrm_financial_item' and cfi.id = ceft1.entity_id
 WHERE ceft.entity_id = %1";
     CRM_Core_DAO::executeQuery($query, array(1 => array($entity_id, 'Integer')));
@@ -282,7 +287,7 @@ WHERE ceft.entity_id = %1";
     if ((!CRM_Utils_Array::value('financial_type_id', $params) || !CRM_Utils_Array::value('contributionId', $params)) && !CRM_Utils_Array::value('oldPremium', $params)) {
       return;
     }
-    
+
     if (CRM_Utils_Array::value('cost', $params)) {
       $contributionStatuses = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
       $financialAccountType = CRM_Contribute_PseudoConstant::financialAccountType($params['financial_type_id']);
@@ -343,7 +348,7 @@ WHERE ceft.entity_id = %1";
     $params['trxnParams']['from_financial_account_id'] = $params['to_financial_account_id'];
     $params['trxnParams']['to_financial_account_id'] = $financialAccount;
     $params['trxnParams']['total_amount'] = $amount;
-    $params['trxnParams']['fee_amount'] = 
+    $params['trxnParams']['fee_amount'] =
       $params['trxnParams']['net_amount'] = 0;
     $params['trxnParams']['status_id'] = CRM_Core_OptionGroup::getValue('contribution_status','Completed','name');
     $params['trxnParams']['contribution_id'] = isset($params['contribution']->id) ? $params['contribution']->id : $params['contribution_id'];
@@ -352,7 +357,7 @@ WHERE ceft.entity_id = %1";
       $financialTrxnID = CRM_Core_BAO_FinancialTrxn::getFinancialTrxnId($params['trxnParams']['contribution_id'], 'DESC');
       $params['entity_id'] = $financialTrxnID['financialTrxnId'];
     }
-    $fItemParams = 
+    $fItemParams =
       array(
         'financial_account_id' => $financialAccount,
         'contact_id' => CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Domain', $domainId, 'contact_id'),
