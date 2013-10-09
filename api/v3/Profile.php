@@ -249,7 +249,7 @@ function civicrm_api3_profile_submit($params) {
     $tags = $profileParams['tag'];
     unset($profileParams['tag']);
   }
-  
+
   return civicrm_api3('contact', 'create', $profileParams);
 
   $ufGroupDetails = array();
@@ -386,6 +386,10 @@ function civicrm_api3_profile_apply($params) {
  *
  *  Note that that since the existing code for deriving a blank profile is not easily accessible our
  *  interim solution is just to return an empty array
+ *
+ * @param $params
+ *
+ * @return array
  */
 function _civicrm_api3_profile_getbillingpseudoprofile(&$params) {
 
@@ -595,10 +599,14 @@ function _civicrm_api3_buildprofile_submitfields($profileID, $optionsBehaviour =
 function _civicrm_api3_order_by_weight($a, $b) {
   return CRM_Utils_Array::value('weight', $b) < CRM_Utils_Array::value('weight', $a) ? TRUE : FALSE;
 }
+
 /**
  * Here we map the profile fields as stored in the uf_field table to their 'real entity'
  * we also return the profile fieldname
  *
+ * @param $field
+ *
+ * @return array
  */
 function _civicrm_api3_map_profile_fields_to_entity(&$field) {
   $entity = $field['field_type'];
