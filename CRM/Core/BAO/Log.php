@@ -89,6 +89,14 @@ class CRM_Core_BAO_Log extends CRM_Core_DAO_Log {
     }
 
     if (!$userID) {
+      $api_key = CRM_Utils_Request::retrieve('api_key', 'String', $store, FALSE, NULL, 'REQUEST');
+
+      if ($api_key && strtolower($api_key) != 'null') {
+        $userID = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $api_key, 'id', 'api_key');
+      }
+    }
+
+    if (!$userID) {
       $userID = $contactID;
     }
 
