@@ -171,6 +171,17 @@ class CRM_Contact_Form_Task_Label extends CRM_Contact_Form_Task {
       $returnProperties['last_name'] = 1;
     }
 
+    $individualFormat = FALSE;
+
+    /*
+     * CRM-8338: replace ids of household members with the id of their household
+     * so we can merge labels by household.
+     */
+    if (isset($fv['merge_same_household'])) {
+      $this->mergeContactIdsByHousehold();
+      $individualFormat = TRUE;
+    }
+
     //get the contacts information
     $params = array();
     if (CRM_Utils_Array::value('location_type_id', $fv)) {
@@ -307,13 +318,8 @@ class CRM_Contact_Form_Task_Label extends CRM_Contact_Form_Task {
       }
     }
 
-    $individualFormat = FALSE;
     if (isset($fv['merge_same_address'])) {
       $this->mergeSameAddress($rows);
-      $individualFormat = TRUE;
-    }
-    if (isset($fv['merge_same_household'])) {
-      $rows = $this->mergeSameHousehold($rows);
       $individualFormat = TRUE;
     }
 
