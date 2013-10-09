@@ -112,7 +112,10 @@
     // setdefaults incase of formRule
     {/literal}
     {if $selectedContacts}
-      {literal} var prePopulateData = cj.ajax({ url: contactUrl + "&cid={/literal}{$selectedContacts}{literal}", async: false }).responseText;{/literal}
+      {literal}
+        var prePopulateData = cj.ajax({ url: contactUrl + "&cid={/literal}{$selectedContacts}{literal}", async: false }).responseText;
+        prePopulateData = cj.parseJSON(prePopulateData);
+      {/literal}
     {/if}
     {literal}
 
