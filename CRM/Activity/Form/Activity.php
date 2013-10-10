@@ -415,18 +415,16 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
         $urlParams .= "&qfKey=$qfKey";
       }
       $path = CRM_Utils_System::currentPath();
-      if ($this->_compContext == 'advanced' ||
-        $path == 'civicrm/contact/search/advanced'
-      ) {
+      if ($this->_compContext == 'advanced' ) {
         $urlString = 'civicrm/contact/search/advanced';
       }
+      elseif ($path == 'civicrm/contact/search'
+        || $path == 'civicrm/contact/search/advanced'
+        || $path == 'civicrm/contact/search/custom') {
+        $urlString = $path;
+      }
       else {
-        if ($path == 'civicrm/contact/search') {
-          $urlString = 'civicrm/contact/search';
-        }
-        else {
-          $urlString = 'civicrm/activity/search';
-        }
+        $urlString = 'civicrm/activity/search';
       }
       $this->assign('searchKey', $qfKey);
     }
