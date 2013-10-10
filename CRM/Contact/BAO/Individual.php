@@ -60,8 +60,7 @@ class CRM_Contact_BAO_Individual extends CRM_Contact_DAO_Contact {
 
     // "null" value for example is passed by dedupe merge in order to empty.
     // Display name computation shouldn't consider such values.
-    foreach (array(
-      'first_name', 'middle_name', 'last_name', 'nick_name') as $displayField) {
+    foreach (array('first_name', 'middle_name', 'last_name', 'nick_name') as $displayField) {
       if (CRM_Utils_Array::value($displayField, $params) == "null") {
         $params[$displayField] = '';
       }
@@ -76,17 +75,12 @@ class CRM_Contact_BAO_Individual extends CRM_Contact_DAO_Contact {
     $suffix_id  = CRM_Utils_Array::value('suffix_id', $params, '');
 
     // get prefix and suffix names
-    $prefixes = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'prefix_id');
-    $suffixes = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'suffix_id');
-
     $prefix = $suffix = NULL;
     if ($prefix_id) {
-      $prefix = $prefixes[$prefix_id];
-      $params['individual_prefix'] = $prefix;
+      $params['individual_prefix'] = $prefix = CRM_Core_PseudoConstant::getLabel('CRM_Contact_DAO_Contact', 'prefix_id', $prefix_id);
     }
     if ($suffix_id) {
-      $suffix = $suffixes[$suffix_id];
-      $params['individual_suffix'] = $suffix;
+      $params['individual_suffix'] = $suffix = CRM_Core_PseudoConstant::getLabel('CRM_Contact_DAO_Contact', 'suffix_id', $suffix_id);
     }
 
     $params['is_deceased'] = CRM_Utils_Array::value('is_deceased', $params, FALSE);
@@ -101,8 +95,7 @@ class CRM_Contact_BAO_Individual extends CRM_Contact_DAO_Contact {
         //but if db having null value and params contain value, CRM-4330.
         $useDBNames = array();
 
-        foreach (array(
-          'last', 'middle', 'first', 'nick') as $name) {
+        foreach (array('last', 'middle', 'first', 'nick') as $name) {
           $dbName = "{$name}_name";
           $value = $individual->$dbName;
 
@@ -112,8 +105,7 @@ class CRM_Contact_BAO_Individual extends CRM_Contact_DAO_Contact {
           }
         }
 
-        foreach (array(
-          'prefix', 'suffix') as $name) {
+        foreach (array('prefix', 'suffix') as $name) {
           $dbName = "{$name}_id";
           $value = $individual->$dbName;
           if ($value && CRM_Utils_Array::value('preserveDBName', $params)) {
@@ -126,8 +118,7 @@ class CRM_Contact_BAO_Individual extends CRM_Contact_DAO_Contact {
         //2. lets get value from param if exists.
         //3. if not in params, lets get from db.
 
-        foreach (array(
-          'last', 'middle', 'first', 'nick') as $name) {
+        foreach (array('last', 'middle', 'first', 'nick') as $name) {
           $phpName = "{$name}Name";
           $dbName  = "{$name}_name";
           $value   = $individual->$dbName;
@@ -144,42 +135,35 @@ class CRM_Contact_BAO_Individual extends CRM_Contact_DAO_Contact {
           }
         }
 
-        foreach (array(
-          'prefix', 'suffix') as $name) {
-          $phpName = $name;
+        foreach (array('prefix', 'suffix') as $name) {
           $dbName  = "{$name}_id";
-          $vals    = "{$name}es";
 
           $value = $individual->$dbName;
           if (in_array($name, $useDBNames)) {
             $params[$dbName] = $value;
             $contact->$dbName = $value;
             if ($value) {
-              $temp = $$vals;
-              $$phpName = $temp[$value];
+              $$name = CRM_Core_PseudoConstant::getLabel('CRM_Contact_DAO_Contact', $name, $value);
             }
             else {
-              $$phpName = NULL;
+              $$name = NULL;
             }
           }
           elseif (array_key_exists($dbName, $params)) {
-            $temp = $$vals;
             // CRM-5278
             if (!empty($params[$dbName])) {
-              $$phpName = CRM_Utils_Array::value($params[$dbName], $temp);
+              $$name = CRM_Core_PseudoConstant::getLabel('CRM_Contact_DAO_Contact', $dbName, $params[$dbName]);
             }
           }
           elseif ($value) {
-            $temp = $$vals;
-            $$phpName = $temp[$value];
+            $$name = CRM_Core_PseudoConstant::getLabel('CRM_Contact_DAO_Contact', $name, $value);
           }
         }
       }
     }
 
     //first trim before further processing.
-    foreach (array(
-      'lastName', 'firstName', 'middleName') as $fld) {
+    foreach (array('lastName', 'firstName', 'middleName') as $fld) {
       $$fld = trim($$fld);
     }
 
@@ -206,7 +190,7 @@ class CRM_Contact_BAO_Individual extends CRM_Contact_DAO_Contact {
       $tokens = array();
       CRM_Utils_Hook::tokens($tokens);
       $tokenFields = array();
-      foreach ($tokens as $category => $catTokens) {
+      foreach ($tokens as $catTokens) {
         foreach ($catTokens as $token => $label) {
           $tokenFields[] = $token;
         }

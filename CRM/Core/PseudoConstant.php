@@ -283,7 +283,7 @@ class CRM_Core_PseudoConstant {
     // Support "unique names" as well as sql names
     $fieldKey = $fieldName;
     if (empty($fields[$fieldKey])) {
-      $fieldKey = $fieldKeys[$fieldName];
+      $fieldKey = CRM_Utils_Array::value($fieldName, $fieldKeys);
     }
     // If neither worked then this field doesn't exist. Return false.
     if (empty($fields[$fieldKey])) {
