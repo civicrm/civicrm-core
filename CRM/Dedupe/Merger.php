@@ -1496,6 +1496,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
   static function getContactFields() {
     $contactFields = CRM_Contact_DAO_Contact::fields();
     unset($contactFields['id']);
+    unset($contactFields['hash']);
 
     return array_keys($contactFields);
   }
