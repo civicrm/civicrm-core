@@ -4872,6 +4872,7 @@ SELECT COUNT( civicrm_contribution.total_amount ) as cancel_count,
       ts('Change Log') => 'civicrm_log',
       ts('Mailings') => 'civicrm_mailing_event_queue',
     );
+    CRM_Contact_BAO_Query_Hook::singleton()->getPanesMapper($panesMapper);
 
     foreach (array_keys($this->_whereTables) as $table) {
       if ($panName = array_search($table, $panesMapper)) {
