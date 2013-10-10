@@ -184,16 +184,6 @@
           fields).{/ts} {help id="id-editor_id"}
       </td>
     </tr>
-    <tr class="crm-preferences-display-form-block-formal_title">
-      <td class="label">{$form.formal_title.label}</td>
-      <td>{$form.formal_title.html}</td>
-    </tr>
-    <tr class="crm-preferences-display-form-block-description">
-      <td>&nbsp;</td>
-      <td class="description">
-        {ts}Enables display of the Formal Title field in the name edit block for individuals.{/ts}
-      </td>
-    </tr>
     <tr class="crm-preferences-display-form-block-display_name_format">
       <td class="label">{$form.display_name_format.label}</td>
       <td>{$form.display_name_format.html}</td>
