@@ -155,7 +155,6 @@ function _civicrm_api3_profile_get_spec(&$params) {
  */
 function civicrm_api3_profile_submit($params) {
   $profileID = _civicrm_api3_profile_getProfileID($params['profile_id']);
-
   if (!CRM_Core_DAO::getFieldValue('CRM_Core_DAO_UFGroup', $profileID, 'is_active')) {
     //@todo declare pseudoconstant & let api do this
     throw new API_Exception('Invalid value for profile_id');
@@ -198,6 +197,10 @@ function civicrm_api3_profile_submit($params) {
     $entity = strtolower(CRM_Utils_Array::value('entity', $field));
     if($entity && !in_array($entity, array_merge($contactEntities, $locationEntities))) {
       $contactParams['api.' . $entity . '.create'][$fieldName] = $value;
+      //@todo we are not currently declaring this option
+      if(isset($params['batch_id']) && strtolower($entity) == 'contribution') {
+        $contactParams['api.' . $entity . '.create']['batch_id'] = $params['batch_id'];
+      }
       if(isset($params[$entity . '_id'])) {
         //todo possibly declare $entity_id in getfields ?
         $contactParams['api.' . $entity . '.create']['id'] = $params[$entity . '_id'];
@@ -206,6 +209,19 @@ function civicrm_api3_profile_submit($params) {
     else {
       $contactParams[_civicrm_api3_profile_translate_fieldnames_for_bao($fieldName)] = $value;
     }
+  }
+  if(isset($contactParams['api.contribution.create']) && isset($contactParams['api.membership.create'])) {
+    $contactParams['api.membership_payment.create'] = array(
+      'contribution_id' => '$value.api.contribution.create.id',
+      'membership_id' => '$value.api.membership.create.id'
+    );
+  }
+
+  if(isset($contactParams['api.contribution.create']) && isset($contactParams['api.participant.create'])) {
+    $contactParams['api.participant_payment.create'] = array(
+      'contribution_id' => '$value.api.contribution.create.id',
+      'participant_id' => '$value.api.participant.create.id'
+    );
   }
 
   $contactParams['contact_id'] = CRM_Utils_Array::value('contact_id', $params);
@@ -370,6 +386,10 @@ function civicrm_api3_profile_apply($params) {
  *
  *  Note that that since the existing code for deriving a blank profile is not easily accessible our
  *  interim solution is just to return an empty array
+ *
+ * @param $params
+ *
+ * @return array
  */
 function _civicrm_api3_profile_getbillingpseudoprofile(&$params) {
 
@@ -579,10 +599,14 @@ function _civicrm_api3_buildprofile_submitfields($profileID, $optionsBehaviour =
 function _civicrm_api3_order_by_weight($a, $b) {
   return CRM_Utils_Array::value('weight', $b) < CRM_Utils_Array::value('weight', $a) ? TRUE : FALSE;
 }
+
 /**
  * Here we map the profile fields as stored in the uf_field table to their 'real entity'
  * we also return the profile fieldname
  *
+ * @param $field
+ *
+ * @return array
  */
 function _civicrm_api3_map_profile_fields_to_entity(&$field) {
   $entity = $field['field_type'];

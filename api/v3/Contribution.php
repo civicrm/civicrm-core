@@ -122,6 +122,11 @@ function _civicrm_api3_contribution_create_spec(&$params) {
     'api.default' => 0,
     'description' => 'Do not add line items by default (if you wish to add your own)',
   );
+  $params['batch_id'] = array(
+    'title' => 'Batch',
+    'type' => 1,
+    'description' => 'Batch which relevant transactions should be added to',
+  );
 }
 
 /**
