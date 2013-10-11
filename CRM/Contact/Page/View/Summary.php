@@ -211,17 +211,6 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
       $defaults['gender_display'] = $gender[CRM_Utils_Array::value('gender_id', $defaults)];
     }
 
-    $communicationStyle = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'communication_style_id');
-    if (!empty($communicationStyle)) {
-      if (CRM_Utils_Array::value('communication_style_id', $defaults)) {
-        $defaults['communication_style_display'] = $communicationStyle[CRM_Utils_Array::value('communication_style_id', $defaults)];
-      }
-      else {
-        // Make sure the field is displayed as long as it is active, even if it is unset for this contact.
-        $defaults['communication_style_display'] = '';
-      }
-    }
-
     // to make contact type label available in the template -
     $contactType = array_key_exists('contact_sub_type', $defaults) ? $defaults['contact_sub_type'] : $defaults['contact_type'];
     $defaults['contact_type_label'] = CRM_Contact_BAO_ContactType::contactTypePairs(TRUE, $contactType, ', ');
@@ -272,7 +261,8 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
       //for birthdate format with respect to birth format set
       $this->assign('birthDateViewFormat', CRM_Utils_Array::value('qfMapping', CRM_Utils_Date::checkBirthDateFormat()));
     }
-
+    $defaults['external_identifier'] = $contact->external_identifier;
+    
     $this->assign($defaults);
 
     // FIXME: when we sort out TZ isssues with DATETIME/TIMESTAMP, we can skip next query
