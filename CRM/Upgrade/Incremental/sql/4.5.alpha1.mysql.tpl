@@ -34,3 +34,6 @@ INSERT INTO `civicrm_navigation`
   ( domain_id, url, label, name, permission, permission_operator, parent_id, is_active, has_separator, weight )
 VALUES
   ( {$domainID}, 'civicrm/admin/options/communication_style&group=communication_style&reset=1', '{ts escape="sql" skip="true"}Communication Style Options{/ts}', 'Communication Style Options', 'administer CiviCRM', '', @parent_id, '1', NULL, @add_weight );
+
+-- CRM-9988 Change world region of Panama country to America South, Central, North and Caribbean
+UPDATE `civicrm_country` SET `region_id` = 2 WHERE `id` = 1166;
