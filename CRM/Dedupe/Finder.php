@@ -201,14 +201,13 @@ class CRM_Dedupe_Finder {
     $flat = array();
     CRM_Utils_Array::flatten($fields, $flat);
 
+    // FIXME: This may no longer be necessary - check inputs
     $replace_these = array(
       'individual_prefix' => 'prefix_id',
       'individual_suffix' => 'suffix_id',
       'gender' => 'gender_id',
     );
-    //handle for individual_suffix, individual_prefix, gender
-    foreach (array(
-      'individual_suffix', 'individual_prefix', 'gender') as $name) {
+    foreach (array('individual_suffix', 'individual_prefix', 'gender') as $name) {
       if (CRM_Utils_Array::value($name, $fields)) {
         $flat[$replace_these[$name]] = $flat[$name];
         unset($flat[$name]);
