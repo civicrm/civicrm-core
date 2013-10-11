@@ -462,6 +462,12 @@ VALUES
   (@option_group_id_ceOpt, '{ts escape="sql"}Instant Messenger{/ts}'        ,   9, 'IM', NULL, 1, NULL, 9, NULL, 0, 0, 1, NULL, NULL),
   (@option_group_id_ceOpt, '{ts escape="sql"}Open ID{/ts}'                  ,   10, 'OpenID', NULL, 1, NULL, 10, NULL, 0, 0, 1, NULL, NULL),
   (@option_group_id_ceOpt, '{ts escape="sql"}Website{/ts}'                  ,   11, 'Website', NULL, 1, NULL, 11, NULL, 0, 0, 1, NULL, NULL),
+  (@option_group_id_ceOpt, '{ts escape="sql"}Prefix{/ts}'                   ,   12, 'Prefix', NULL, 2, NULL, 12, NULL, 0, 0, 1, NULL, NULL),
+  (@option_group_id_ceOpt, '{ts escape="sql"}Formal Title{/ts}'             ,   13, 'Formal Title', NULL, 2, NULL, 13, NULL, 0, 0, 1, NULL, NULL),
+  (@option_group_id_ceOpt, '{ts escape="sql"}First Name{/ts}'               ,   14, 'First Name', NULL, 2, NULL, 14, NULL, 0, 0, 1, NULL, NULL),
+  (@option_group_id_ceOpt, '{ts escape="sql"}Middle Name{/ts}'              ,   15, 'Middle Name', NULL, 2, NULL, 15, NULL, 0, 0, 1, NULL, NULL),
+  (@option_group_id_ceOpt, '{ts escape="sql"}Last Name{/ts}'                ,   16, 'Last Name', NULL, 2, NULL, 16, NULL, 0, 0, 1, NULL, NULL),
+  (@option_group_id_ceOpt, '{ts escape="sql"}Suffix{/ts}'                   ,   17, 'Suffix', NULL, 2, NULL, 17, NULL, 0, 0, 1, NULL, NULL),
 
   (@option_group_id_asOpt, '{ts escape="sql"}Address Fields{/ts}'          ,   1, 'location', NULL, 0, NULL,  1, NULL, 0, 0, 1, NULL, NULL),
   (@option_group_id_asOpt, '{ts escape="sql"}Custom Fields{/ts}'           ,   2, 'custom', NULL, 0, NULL,  2, NULL, 0, 0, 1, NULL, NULL),

@@ -92,18 +92,24 @@ cj(function($) {
       {$form.formal_title.html}
     </td>
     {/if}
+    {if $form.first_name}
     <td>
       {$form.first_name.label}<br /> 
       {$form.first_name.html}
     </td>
+    {/if}
+    {if $form.middle_name}
     <td>
       {$form.middle_name.label}<br />
       {$form.middle_name.html}
     </td>
+    {/if}
+    {if $form.last_name}
     <td>
       {$form.last_name.label}<br />
       {$form.last_name.html}
     </td>
+    {/if}
     {if $form.suffix_id}
     <td>
       {$form.suffix_id.label}<br/>
