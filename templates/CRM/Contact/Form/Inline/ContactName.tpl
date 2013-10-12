@@ -42,18 +42,24 @@
         {$form.formal_title.html}
       </div>
     {/if}
-    <div class="crm-inline-edit-field">
-      {$form.first_name.label}<br /> 
-      {$form.first_name.html}
-    </div>
-    <div class="crm-inline-edit-field">
-      {$form.middle_name.label}<br />
-      {$form.middle_name.html}
-    </div>
-    <div class="crm-inline-edit-field">
-      {$form.last_name.label}<br />
-      {$form.last_name.html}
-    </div>
+    {if $form.first_name}
+      <div class="crm-inline-edit-field">
+        {$form.first_name.label}<br /> 
+        {$form.first_name.html}
+      </div>
+    {/if}
+    {if $form.middle_name}
+      <div class="crm-inline-edit-field">
+        {$form.middle_name.label}<br />
+        {$form.middle_name.html}
+      </div>
+    {/if}
+    {if $form.last_name}
+      <div class="crm-inline-edit-field">
+        {$form.last_name.label}<br />
+        {$form.last_name.html}
+      </div>
+    {/if}
     {if $form.suffix_id}
       <div class="crm-inline-edit-field">
         {$form.suffix_id.label}<br/>

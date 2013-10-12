@@ -36,7 +36,7 @@ INSERT INTO civicrm_setting
 VALUES
   ( @domainID, NULL, 1, 'CiviCRM Preferences', 'contact_view_options', '{serialize}123456789101113{/serialize}' ),
   ( @domainID, NULL, 1, 'CiviCRM Preferences', 'contact_smart_group_display', '{serialize}1{/serialize}' ),
-  ( @domainID, NULL, 1, 'CiviCRM Preferences', 'contact_edit_options', '{serialize}12345678911{/serialize}' ),
+  ( @domainID, NULL, 1, 'CiviCRM Preferences', 'contact_edit_options', '{serialize}123456789111214151617{/serialize}' ),
   ( @domainID, NULL, 1, 'CiviCRM Preferences', 'advanced_search_options', '{serialize}123456789101112131516171819{/serialize}' ),
   ( @domainID, NULL, 1, 'CiviCRM Preferences', 'user_dashboard_options', '{serialize}1234578{/serialize}' ),
   ( @domainID, NULL, 1, 'CiviCRM Preferences', 'address_options', '{serialize}123456891011{/serialize}' ),

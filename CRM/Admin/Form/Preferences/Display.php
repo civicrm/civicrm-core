@@ -104,11 +104,6 @@ class CRM_Admin_Form_Preferences_Display extends CRM_Admin_Form_Preferences {
           'html_type' => NULL,
           'weight' => 11,
         ),
-        'formal_title' => array(
-          'html_type' => 'checkbox',
-          'title' => ts('Use Formal Title Field'),
-          'weight' => 12,
-        ),
       ),
     );
 
@@ -193,6 +188,9 @@ class CRM_Admin_Form_Preferences_Display extends CRM_Admin_Form_Preferences {
 
     $contactBlocks = CRM_Core_OptionGroup::values('contact_edit_options', FALSE, FALSE, FALSE, 'AND v.filter = 1');
     $this->assign('contactBlocks', $contactBlocks);
+
+    $nameFields = CRM_Core_OptionGroup::values('contact_edit_options', FALSE, FALSE, FALSE, 'AND v.filter = 2');
+    $this->assign('nameFields', $nameFields);
 
     $this->addElement('hidden', 'contact_edit_preferences', NULL, array('id' => 'contact_edit_preferences'));
 
