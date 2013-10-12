@@ -91,16 +91,22 @@ SELECT  id
       }
     }
 
+    // http://issues.civicrm.org/jira/browse/CRM-13572
+    // Depending on how the code was upgraded, some sites may still have copies of old
+    // source files left behind. This is often a forgivable offense, but it's quite
+    // dangerous for CIVI-SA-2013-001.
     global $civicrm_root;
     $ofcFile = "$civicrm_root/packages/OpenFlashChart/php-ofc-library/ofc_upload_image.php";
     if (file_exists($ofcFile)) {
-      // http://issues.civicrm.org/jira/browse/CRM-13572
-      // Depending on how the code was upgraded, some sites may still have copies of old
-      // source files left behind. This is often a forgivable offense, but it's quite
-      // dangerous for CIVI-SA-2013-001.
-      $preUpgradeMessage .= '<br />' . ts('This system includes an outdated, insecure script (%1). Please delete it.', array(
-        1 => $ofcFile
-      ));
+      if (@unlink($ofcFile)) {
+        $preUpgradeMessage .= '<br />' . ts('This system included an outdated, insecure script (%1). The file was automatically deleted.', array(
+          1 => $ofcFile
+        ));
+      } else {
+        $preUpgradeMessage .= '<br />' . ts('This system includes an outdated, insecure script (%1). Please delete it.', array(
+          1 => $ofcFile
+        ));
+      }
     }
   }
 
