@@ -209,14 +209,14 @@ WHERE ccp.financial_type_id IS NULL and cp.cost > 0');
 
     // add indexes for civicrm_entity_financial_trxn
     // CRM-12141
-    $this->addTask(ts('Check/Add indexes for civicrm_entity_financial_trxn'), 'task_4_3_x_checkIndexes', $rev);
+    $this->addTask('Check/Add indexes for civicrm_entity_financial_trxn', 'task_4_3_x_checkIndexes', $rev);
     // task to process sql
-    $this->addTask(ts('Upgrade DB to 4.3.alpha1: SQL'), 'task_4_3_x_runSql', $rev);
+    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => '4.3.alpha1')), 'task_4_3_x_runSql', $rev);
 
     //CRM-11636
-    $this->addTask(ts('Populate financial type values for price records'), 'assignFinancialTypeToPriceRecords');
+    $this->addTask('Populate financial type values for price records', 'assignFinancialTypeToPriceRecords');
     //CRM-11514 create financial records for contributions
-    $this->addTask(ts('Create financial records for contributions'), 'createFinancialRecords');
+    $this->addTask('Create financial records for contributions', 'createFinancialRecords');
 
     $minId = CRM_Core_DAO::singleValueQuery('SELECT coalesce(min(id),0) FROM civicrm_contact');
     $maxId = CRM_Core_DAO::singleValueQuery('SELECT coalesce(max(id),0) FROM civicrm_contact');
@@ -234,7 +234,7 @@ WHERE ccp.financial_type_id IS NULL and cp.cost > 0');
     }
 
     // Update phones CRM-11292.
-    $this->addTask(ts('Upgrade Phone Numbers'), 'phoneNumeric');
+    $this->addTask('Upgrade Phone Numbers', 'phoneNumeric');
 
     return TRUE;
   }
@@ -245,15 +245,15 @@ WHERE ccp.financial_type_id IS NULL and cp.cost > 0');
     if ($isColumnPresent) {
       CRM_Core_DAO::executeQuery('ALTER TABLE civicrm_dedupe_rule_group DROP COLUMN is_default');
     }
-    $this->addTask(ts('Upgrade DB to 4.3.alpha2: SQL'), 'task_4_3_x_runSql', $rev);
+    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => '4.3.alpha2')), 'task_4_3_x_runSql', $rev);
   }
 
   function upgrade_4_3_alpha3($rev) {
-    $this->addTask(ts('Upgrade DB to 4.3.alpha3: SQL'), 'task_4_3_x_runSql', $rev);
+    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => '4.3.alpha3')), 'task_4_3_x_runSql', $rev);
   }
 
   function upgrade_4_3_beta2($rev) {
-    $this->addTask(ts('Upgrade DB to 4.3.beta2: SQL'), 'task_4_3_x_runSql', $rev);
+    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => '4.3.beta2')), 'task_4_3_x_runSql', $rev);
 
     // CRM-12002
     if (
@@ -265,7 +265,7 @@ WHERE ccp.financial_type_id IS NULL and cp.cost > 0');
   }
 
   function upgrade_4_3_beta3($rev) {
-    $this->addTask(ts('Upgrade DB to 4.3.beta3: SQL'), 'task_4_3_x_runSql', $rev);
+    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => '4.3.beta3')), 'task_4_3_x_runSql', $rev);
     // CRM-12065
     $query = "SELECT id, form_values FROM civicrm_report_instance WHERE form_values LIKE '%contribution_type%'";
     $this->addTask('Replace contribution_type to financial_type in table civicrm_report_instance', 'replaceContributionTypeId', $query, 'reportInstance');
@@ -274,10 +274,10 @@ WHERE ccp.financial_type_id IS NULL and cp.cost > 0');
   }
 
   function upgrade_4_3_beta4($rev) {
-    $this->addTask(ts('Upgrade DB to 4.3.beta4: SQL'), 'task_4_3_x_runSql', $rev);
+    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => '4.3.beta4')), 'task_4_3_x_runSql', $rev);
     // add indexes for civicrm_entity_financial_trxn
     // CRM-12141
-    $this->addTask(ts('Check/Add indexes for civicrm_entity_financial_trxn'), 'task_4_3_x_checkIndexes', $rev);
+    $this->addTask('Check/Add indexes for civicrm_entity_financial_trxn', 'task_4_3_x_checkIndexes', $rev);
   }
 
   function upgrade_4_3_beta5($rev) {
@@ -301,11 +301,11 @@ ADD COLUMN   premiums_nothankyou_label varchar(255) COLLATE utf8_unicode_ci DEFA
 ";
       CRM_Core_DAO::executeQuery($query, array(), TRUE, NULL, FALSE, FALSE);
     }
-    $this->addTask(ts('Upgrade DB to 4.3.beta5: SQL'), 'task_4_3_x_runSql', $rev);
+    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => '4.3.beta5')), 'task_4_3_x_runSql', $rev);
   }
 
   function upgrade_4_3_4($rev) {
-    $this->addTask(ts('Upgrade DB to 4.3.4: SQL'), 'task_4_3_x_runSql', $rev);
+    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => '4.3.4')), 'task_4_3_x_runSql', $rev);
   }
 
   function upgrade_4_3_5($rev) {
@@ -330,19 +330,19 @@ ADD CONSTRAINT `FK_civicrm_financial_item_contact_id` FOREIGN KEY (`contact_id`)
 ";
       CRM_Core_DAO::executeQuery($query, array(), TRUE, NULL, FALSE, FALSE);
     }
-    $this->addTask(ts('Upgrade DB to 4.3.5: SQL'), 'task_4_3_x_runSql', $rev);
+    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => '4.3.5')), 'task_4_3_x_runSql', $rev);
   }
 
   function upgrade_4_3_6($rev) {
     //CRM-13094
-    $this->addTask(ts('Add mising contraints'), 'addMissingConstraints', $rev);
+    $this->addTask('Add mising contraints', 'addMissingConstraints', $rev);
     //CRM-13088
-    $this->addTask(ts('Add ON DELETE Options for constraints'), 'task_4_3_x_checkConstraints', $rev);
-    $this->addTask(ts('Upgrade DB to 4.3.6: SQL'), 'task_4_3_x_runSql', $rev);
+    $this->addTask('Add ON DELETE Options for constraints', 'task_4_3_x_checkConstraints', $rev);
+    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => '4.3.6')), 'task_4_3_x_runSql', $rev);
     // CRM-12844
     // update line_item, financial_trxn and financial_item table for recurring contributions
-    $this->addTask(ts('Update financial_account_id in financial_trxn table'), 'updateFinancialTrxnData', $rev);
-    $this->addTask(ts('Update Line Item Data'), 'updateLineItemData', $rev);
+    $this->addTask('Update financial_account_id in financial_trxn table', 'updateFinancialTrxnData', $rev);
+    $this->addTask('Update Line Item Data', 'updateLineItemData', $rev);
   }
   
   //CRM-11636

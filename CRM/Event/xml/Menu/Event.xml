@@ -120,11 +120,11 @@
      <weight>398</weight>
   </item>
   <item>
-     <path>civicrm/admin/options/event_badge</path>
-     <title>Event Name Badge Templates</title>
-     <desc>Template to control event name badge format.</desc>
-     <path_arguments>group=event_badge</path_arguments>
-     <page_callback>CRM_Admin_Page_Options</page_callback>
+     <path>civicrm/admin/badgelayout</path>
+     <title>Event Name Badge Layouts</title>
+     <desc>Configure name badge layouts for event participants, including logos and what data to include on the badge.</desc>
+     <path_arguments>action=browse</path_arguments>
+     <page_callback>CRM_Badge_Page_Layout</page_callback>
      <adminGroup>CiviEvent</adminGroup>
      <weight>399</weight>
   </item>

@@ -232,7 +232,7 @@ class CRM_Activity_Form_Search extends CRM_Core_Form {
    * @return void
    */
   function buildQuickForm() {
-    $this->addElement('text', 'sort_name', ts('With (name or email)'), CRM_Core_DAO::getAttribute('CRM_Contact_DAO_Contact', 'sort_name'));
+    $this->addElement('text', 'sort_name', ts('Name or Email'), CRM_Core_DAO::getAttribute('CRM_Contact_DAO_Contact', 'sort_name'));
 
     CRM_Activity_BAO_Query::buildSearchForm($this);
 

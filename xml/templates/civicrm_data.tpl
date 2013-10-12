@@ -360,8 +360,8 @@ VALUES
    (@option_group_id_act, '{ts escape="sql"}Edit Batch{/ts}', 43, 'Edit Batch', NULL, 1, 0, 43, 'Edit Batch', 0, 1, 1, @contributeCompId, NULL),
 
 -- new sms options
-   (@option_group_id_act, '{ts escape="sql"}SMS delivery{/ts}', 44, 'SMS delivery', NULL, 1, NULL, 44, '{ts escape="sql"}SMS delivery.{/ts}', 0, 1, 1, NULL, NULL),
-   (@option_group_id_act, '{ts escape="sql"}Inbound SMS{/ts}',  45, 'Inbound SMS', NULL, 1, NULL,  45, '{ts escape="sql"}Inbound SMS.{/ts}', 0, 1, 1, NULL, NULL),
+   (@option_group_id_act, '{ts escape="sql"}SMS delivery{/ts}', 44, 'SMS delivery', NULL, 1, NULL, 44, '{ts escape="sql"}SMS delivery{/ts}', 0, 1, 1, NULL, NULL),
+   (@option_group_id_act, '{ts escape="sql"}Inbound SMS{/ts}',  45, 'Inbound SMS', NULL, 1, NULL,  45, '{ts escape="sql"}Inbound SMS{/ts}', 0, 1, 1, NULL, NULL),
 
    (@option_group_id_gender, '{ts escape="sql"}Female{/ts}',      1, 'Female',      NULL, 0, NULL, 1, NULL, 0, 0, 1, NULL, NULL),
    (@option_group_id_gender, '{ts escape="sql"}Male{/ts}',        2, 'Male',        NULL, 0, NULL, 2, NULL, 0, 0, 1, NULL, NULL),
