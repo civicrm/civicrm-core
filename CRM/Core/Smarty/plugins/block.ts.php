@@ -47,6 +47,9 @@
  * @return string  the string, translated by gettext
  */
 function smarty_block_ts($params, $text, &$smarty) {
+  if (!isset($params['domain'])) {
+    $params['domain'] = $smarty->get_template_vars('extensionKey');
+  }
   return ts($text, $params);
 }
 
