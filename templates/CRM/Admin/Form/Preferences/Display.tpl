@@ -57,9 +57,20 @@
     <tr class="crm-preferences-display-form-block-contact_edit_options">
       <td class="label">{$form.contact_edit_options.label}</td>
       <td>
-        <table style="width:80%">
+        <table style="width:90%">
           <tr>
-            <td style="width:40%">
+            <td style="width:30%">
+              <span class="label"><strong>{ts}Individual Name Fields{/ts}</strong></span>
+              <ul id="contactEditNameFields">
+                {foreach from=$nameFields item="title" key="opId"}
+                  <li id="preference-{$opId}-contactedit" class="ui-state-default ui-corner-all"
+                      style="padding-left:1px;">
+                    <span>{$form.contact_edit_options.$opId.html}</span>
+                  </li>
+                {/foreach}
+              </ul>
+            </td>
+            <td style="width:30%">
               <span class="label"><strong>{ts}Contact Details{/ts}</strong></span>
               <ul id="contactEditBlocks">
                 {foreach from=$contactBlocks item="title" key="opId"}
@@ -182,16 +193,6 @@
         {ts}Select the HTML WYSIWYG Editor provided for fields that allow HTML formatting. Select 'Textarea'
           if you don't want to provide a WYSIWYG Editor (users will type text and / or HTML code into plain text
           fields).{/ts} {help id="id-editor_id"}
-      </td>
-    </tr>
-    <tr class="crm-preferences-display-form-block-formal_title">
-      <td class="label">{$form.formal_title.label}</td>
-      <td>{$form.formal_title.html}</td>
-    </tr>
-    <tr class="crm-preferences-display-form-block-description">
-      <td>&nbsp;</td>
-      <td class="description">
-        {ts}Enables display of the Formal Title field in the name edit block for individuals.{/ts}
       </td>
     </tr>
     <tr class="crm-preferences-display-form-block-display_name_format">

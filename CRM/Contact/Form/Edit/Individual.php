@@ -55,30 +55,41 @@ class CRM_Contact_Form_Edit_Individual {
     $form->applyFilter('__ALL__', 'trim');
 
     if ( !$inlineEditMode || $inlineEditMode == 1 ) {
+      $nameFields = CRM_Core_BAO_Setting::valueOptions(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
+        'contact_edit_options', TRUE, NULL,
+        FALSE, 'name', TRUE, 'AND v.filter = 2'
+      );
+
       //prefix
       $prefix = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'prefix_id');
-      if (!empty($prefix)) {
+      if (isset($nameFields['Prefix']) && !empty($prefix)) {
         $form->addElement('select', 'prefix_id', ts('Prefix'), array('' => '') + $prefix);
       }
 
       $attributes = CRM_Core_DAO::getAttribute('CRM_Contact_DAO_Contact');
 
-      if (CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'formal_title')) {
+      if (isset($nameFields['Formal Title'])) {
         $form->addElement('text', 'formal_title', ts('Title'), $attributes['formal_title']);
       }
 
       // first_name
-      $form->addElement('text', 'first_name', ts('First Name'), $attributes['first_name']);
+      if (isset($nameFields['First Name'])) {
+        $form->addElement('text', 'first_name', ts('First Name'), $attributes['first_name']);
+      }
 
       //middle_name
-      $form->addElement('text', 'middle_name', ts('Middle Name'), $attributes['middle_name']);
+      if (isset($nameFields['Middle Name'])) {
+        $form->addElement('text', 'middle_name', ts('Middle Name'), $attributes['middle_name']);
+      }
 
       // last_name
-      $form->addElement('text', 'last_name', ts('Last Name'), $attributes['last_name']);
+      if (isset($nameFields['Last Name'])) {
+        $form->addElement('text', 'last_name', ts('Last Name'), $attributes['last_name']);
+      }
 
       // suffix
       $suffix = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'suffix_id');
-      if ($suffix) {
+      if (isset($nameFields['Suffix']) && $suffix) {
         $form->addElement('select', 'suffix_id', ts('Suffix'), array('' => '') + $suffix);
       }
     }

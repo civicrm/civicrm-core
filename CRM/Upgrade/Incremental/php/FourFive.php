@@ -65,6 +65,28 @@ class CRM_Upgrade_Incremental_php_FourFive {
     // task to process sql
     $this->addTask(ts('Upgrade DB to 4.5.alpha1: SQL'), 'task_4_5_x_runSql', $rev);
 
+    $this->addTask(ts('Set default for Individual name fields configuration'), 'addNameFieldOptions');
+
+    return TRUE;
+  }
+
+  /**
+   * Add defaults for the newly introduced name fields configuration in 'contact_edit_options' setting
+   *
+   * @return bool TRUE for success
+   */
+  static function addNameFieldOptions(CRM_Queue_TaskContext $ctx) {
+    $query = "SELECT `value` FROM `civicrm_setting` WHERE `group_name` = 'CiviCRM Preferences' AND `name` = 'contact_edit_options'";
+    $dao = CRM_Core_DAO::executeQuery($query);
+    $dao->fetch();
+    $oldValue = unserialize($dao->value);
+
+    $newValue = $oldValue . '1214151617';
+
+    $query = "UPDATE `civicrm_setting` SET `value` = %1 WHERE `group_name` = 'CiviCRM Preferences' AND `name` = 'contact_edit_options'";
+    $params = array(1 => array(serialize($newValue), 'String'));
+    CRM_Core_DAO::executeQuery($query, $params);
+
     return TRUE;
   }
 
