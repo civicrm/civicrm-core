@@ -1,9 +1,15 @@
+body {
+  background: #EEE;
+}
 #All {
-    font-family: Arial;
-    width: auto;
-  margin: 2em auto;
+  font-family: Arial, sans-serif;
+  width: auto;
+  margin: 0.5em auto;
   padding: 1em;
-    border: 1px #CCC solid;
+  border: 1px #CCC solid;
+  border-radius: 10px;
+  background: #fff;
+  max-width: 1200px;
 }
 form {
   margin: 0;
@@ -13,7 +19,7 @@ h1 {
 }
 
 li {
-    padding-bottom: 1.5em;
+  padding-bottom: 1.5em;
 }
 
 label span {
@@ -40,18 +46,25 @@ p.error {
   background-color: #C00;
   border: 1px #700 solid;
   color: white;
+  clear: both;
 }
 p.warning {
   padding: 0.5em;
   background-color: #E70;
   border: 1px #A70 solid;
   color: white;
+  clear: both;
 }
 p.good {
   padding: 0.5em;
   background-color: #0C0;
   border: 1px #070 solid;
   color: white;
+  clear: both;
+}
+
+p.error a {
+  color: #CCF;
 }
 
 .testResults {
