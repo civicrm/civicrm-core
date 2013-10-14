@@ -171,6 +171,17 @@ class CRM_Contact_Form_Task_Label extends CRM_Contact_Form_Task {
       $returnProperties['last_name'] = 1;
     }
 
+    $individualFormat = FALSE;
+
+    /*
+     * CRM-8338: replace ids of household members with the id of their household
+     * so we can merge labels by household.
+     */
+    if (isset($fv['merge_same_household'])) {
+      $this->mergeContactIdsByHousehold();
+      $individualFormat = TRUE;
+    }
+
     //get the contacts information
     $params = array();
     if (CRM_Utils_Array::value('location_type_id', $fv)) {
@@ -307,13 +318,8 @@ class CRM_Contact_Form_Task_Label extends CRM_Contact_Form_Task {
       }
     }
 
-    $individualFormat = FALSE;
     if (isset($fv['merge_same_address'])) {
       $this->mergeSameAddress($rows);
-      $individualFormat = TRUE;
-    }
-    if (isset($fv['merge_same_household'])) {
-      $rows = $this->mergeSameHousehold($rows);
       $individualFormat = TRUE;
     }
 
@@ -473,37 +479,6 @@ class CRM_Contact_Form_Task_Label extends CRM_Contact_Form_Task {
       }
       $rows[$data['ID']]['addressee'] = $rows[$data['ID']]['addressee_display'] = $rows[$data['ID']]['display_name'] = $processedNames;
     }
-  }
-
-  function mergeSameHousehold(&$rows) {
-    # group selected contacts by type
-    $individuals = array();
-    $households = array();
-    foreach ($rows as $contact_id => $row) {
-      if ($row['contact_type'] == 'Household') {
-        $households[$contact_id] = $row;
-      }
-      elseif ($row['contact_type'] == 'Individual') {
-        $individuals[$contact_id] = $row;
-      }
-    }
-
-    # exclude individuals belonging to selected households
-    foreach ($households as $household_id => $row) {
-      $dao = new CRM_Contact_DAO_Relationship();
-      $dao->contact_id_b = $household_id;
-      $dao->find();
-      while ($dao->fetch()) {
-        $individual_id = $dao->contact_id_a;
-        if (array_key_exists($individual_id, $individuals)) {
-          unset($individuals[$individual_id]);
-        }
-      }
-    }
-
-    # merge back individuals and households
-    $rows = array_merge($individuals, $households);
-    return $rows;
   }
 }
 
