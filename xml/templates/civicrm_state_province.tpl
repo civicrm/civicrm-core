@@ -2407,7 +2407,7 @@ INSERT INTO civicrm_state_province (id, country_id, abbreviation, name) VALUES
 (3948, 1161, "20", "Finnmark"),
 (3949, 1161, "04", "Hedmark"),
 (3950, 1161, "12", "Hordaland"),
-(3951, 1161, "15", "Møre ag Romsdal"),
+(3951, 1161, "15", "Møre og Romsdal"),
 (3952, 1161, "18", "Nordland"),
 (3953, 1161, "17", "Nord-Trøndelag"),
 (3954, 1161, "05", "Oppland"),
