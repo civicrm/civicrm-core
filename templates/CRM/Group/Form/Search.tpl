@@ -91,7 +91,7 @@
 {literal}
 <script type="text/javascript">
 cj( function() {
-  buildGroupSelector( false );
+  buildGroupSelector( true );
   cj('#_qf_Search_refresh').click( function() {
     buildGroupSelector( true );
   });
@@ -99,7 +99,9 @@ cj( function() {
 
 function buildGroupSelector( filterSearch ) {
     if ( filterSearch ) {
-        crmGroupSelector.fnDestroy();
+        if (typeof crmGroupSelector !== 'undefined') {
+          crmGroupSelector.fnDestroy();
+        }
         var parentsOnly = 0;
         var ZeroRecordText = '<div class="status messages">{/literal}{ts escape="js"}No matching Groups found for your search criteria. Suggestions:{/ts}{literal}<div class="spacer"></div><ul><li>{/literal}{ts escape="js"}Check your spelling.{/ts}{literal}</li><li>{/literal}{ts escape="js"}Try a different spelling or use fewer letters.{/ts}{literal}</li><li>{/literal}{ts escape="js"}Make sure you have enough privileges in the access control system.{/ts}{literal}</li></ul></div>';
     } else {
