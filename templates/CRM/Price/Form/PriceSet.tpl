@@ -30,7 +30,7 @@
 
     {foreach from=$priceSet.fields item=element key=field_id}
         {* Skip 'Admin' visibility price fields since this tpl is used in online registration. *}
-        {if $element.visibility EQ 'public' || $context eq 'standalone' || $context eq 'search' || $context eq 'participant' || $context eq 'dashboard' || $action eq 1024}
+        {if $element.visibility EQ 'public' || $context eq 'standalone' || $context eq 'advanced' || $context eq 'search' || $context eq 'participant' || $context eq 'dashboard' || $action eq 1024}
             <div class="crm-section {$element.name}-section">
             {if ($element.html_type eq 'CheckBox' || $element.html_type == 'Radio') && $element.options_per_line}
               {assign var="element_name" value="price_"|cat:$field_id}
