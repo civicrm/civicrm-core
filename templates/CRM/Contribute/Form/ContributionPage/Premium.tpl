@@ -24,11 +24,7 @@
  +--------------------------------------------------------------------+
 *}
 <div id="help">
-  {ts}Edit
-    <strong>Premiums Settings</strong>
-    to customize the title and introductory message (e.g ...in appreciation of your support, you will be able to select
-    from a number of exciting thank-you gifts...). You can optionally provide a contact email address and/or
-    phone number for inquiries.{/ts}
+  {ts}Edit <strong>Premiums Settings</strong> to customize the title and introductory message (e.g ...in appreciation of your support, you will be able to select from a number of exciting thank-you gifts...). You can optionally provide a contact email address and/or phone number for inquiries.{/ts}
   {ts}Then select and review the premiums that you want to offer on this contribution page.{/ts}
 </div>
 <div id="id_Premiums" class="crm-block crm-form-block crm-contribution-contributionpage-premium-form-block">

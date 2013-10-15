@@ -29,9 +29,7 @@
   {if $action eq 8}
     <div class="messages status no-popup">
       <div class="icon inform-icon"></div>
-      {ts 1=$formatName}WARNING: You are about to delete the Label Format titled
-        <strong>%1</strong>
-        .{/ts} {ts}Do you want to continue?{/ts}
+      {ts 1=$formatName}WARNING: You are about to delete the Label Format titled <strong>%1</strong>.{/ts} {ts}Do you want to continue?{/ts}
     </div>
   {elseif $action eq 16384}
     <div class="messages status no-popup">
@@ -111,12 +109,8 @@
       </tr>
       <tr class="crm-labelFormat-form-block-weight">
         <td class="right">{$form.weight.label}</td>
-        <td colspan="3">{$form.weight.html}<br/>
-          <span class="description">{ts}Weight controls the order in which Label Formats are displayed
-              <br/>
-              in selection lists. Enter a positive or negative integer. Lower numbers
-              <br/>
-              are displayed ahead of higher numbers.{/ts}</span>
+        <td colspan="3">{$form.weight.html}
+          <div class="description">{ts}Weight controls the order in which Label Formats are displayed in selection lists. Enter a positive or negative integer. Lower numbers are displayed ahead of higher numbers.{/ts}</div>
       </tr>
     </table>
   {/if}

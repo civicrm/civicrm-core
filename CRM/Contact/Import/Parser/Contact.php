@@ -665,21 +665,11 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
     if ($createNewContact) {
 
       //CRM-4430, don't carry if not submitted.
-      foreach (array(
-        'prefix',
-        'suffix',
-        'gender',
-      ) as $name) {
-        if (array_key_exists($name, $formatted)) {
-          if (in_array($name, array(
-                'prefix',
-                'suffix',
-              ))) {
-            $formattedName = "individual_{$name}";
-            $formatted[$formattedName] = CRM_Core_OptionGroup::getValue($formattedName, (string) $formatted[$name]);
-          }
-          else {
-            $formatted[$name] = CRM_Core_OptionGroup::getValue($name, (string) $formatted[$name]);
+      foreach (array('prefix_id', 'suffix_id', 'gender_id') as $name) {
+        if (!empty($formatted[$name])) {
+          $options = CRM_Contact_BAO_Contact::buildOptions($name, 'get');
+          if (!isset($options[$formatted[$name]])) {
+            $formatted[$name] = CRM_Utils_Array::key((string) $formatted[$name], $options);
           }
         }
       }

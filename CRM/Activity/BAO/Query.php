@@ -444,12 +444,12 @@ class CRM_Activity_BAO_Query {
     CRM_Core_Form_Date::buildDateRange($form, 'activity_date', 1, '_low', '_high', ts('From'), FALSE, FALSE);
 
     $activityRoles = array(
-      1 => ts('Created by'),
+      3 => ts('With'),
       2 => ts('Assigned to'),
-      3 => ts('Targeted to')
+      1 => ts('Added by'),
     );
     $form->addRadio('activity_role', NULL, $activityRoles);
-
+    $form->setDefaults(array('activity_role' => 3));
     $activityStatus = CRM_Core_PseudoConstant::activityStatus();
     foreach ($activityStatus as $activityStatusID => $activityStatusName) {
       $activity_status[] = $form->createElement('checkbox', $activityStatusID, NULL, $activityStatusName);

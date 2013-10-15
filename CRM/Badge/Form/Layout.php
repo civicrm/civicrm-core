@@ -84,7 +84,12 @@ class CRM_Badge_Form_Layout extends CRM_Admin_Form {
 
     // get the tokens
     $contactTokens = CRM_Core_SelectValues::contactTokens();
-    $eventTokens   = CRM_Core_SelectValues::eventTokens();
+    $eventTokens = array(
+      '{event.event_id}' => ts('Event ID'),
+      '{event.title}' => ts('Event Title'),
+      '{event.start_date}' => ts('Event Start Date'),
+      '{event.end_date}' => ts('Event End Date')
+    );
     $participantTokens = CRM_Core_SelectValues::participantTokens();
 
     $tokens = array_merge($contactTokens, $eventTokens, $participantTokens);

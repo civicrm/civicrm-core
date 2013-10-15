@@ -257,7 +257,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
 
       //validate for soft credit fields
       if (CRM_Utils_Array::value($key, $params['soft_credit_contact_select_id']) && !CRM_Utils_Array::value($key, $params['soft_credit_amount'])) {
-        $errors["soft_credit_amount[$key]"] = ts('Please enter the soft credit amount');
+        $errors["soft_credit_amount[$key]"] = ts('Please enter the soft credit amount.');
       }
       if (!empty($params['soft_credit_amount']) && CRM_Utils_Array::value($key, $params['soft_credit_amount'])
         && CRM_Utils_Rule::cleanMoney(CRM_Utils_Array::value($key, $params['soft_credit_amount'])) > CRM_Utils_Rule::cleanMoney($value['total_amount'])) {
