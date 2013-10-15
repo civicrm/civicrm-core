@@ -166,7 +166,7 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
     $group->save();
     if (!isset($params['id'])) {
       if (!isset($params['table_name'])) {
-        $munged_title = strtolower(CRM_Utils_String::munge($group->title, '_', 32));
+        $munged_title = strtolower(CRM_Utils_String::munge($group->title, '_', 42));
         $tableName = "civicrm_value_{$munged_title}_{$group->id}";
       }
       $group->table_name = $tableName;
