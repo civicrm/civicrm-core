@@ -165,6 +165,20 @@ AND    TABLE_NAME LIKE 'log_civicrm_%'
       $dao->executeQuery("DROP TRIGGER IF EXISTS {$validName}_after_update");
       $dao->executeQuery("DROP TRIGGER IF EXISTS {$validName}_after_delete");
     }
+
+    // now lets also be safe and drop all triggers that start with
+    // civicrm_ if we are dropping all triggers
+    // we need to do this to capture all the leftover triggers since
+    // we did the shortening trigger name for CRM-11794
+    if ($tableName === NULL) {
+      $triggers = $dao->executeQuery("SHOW TRIGGERS LIKE 'civicrm_%'");
+
+      while ($triggers->fetch()) {
+        // note that drop trigger has a wierd syntax and hence we do not
+        // send the trigger name as a string (i.e. its not quoted
+        $dao->executeQuery("DROP TRIGGER IF EXISTS {$triggers->Trigger}");
+      }
+    }
   }
 
   /**
