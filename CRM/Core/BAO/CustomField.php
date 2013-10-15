@@ -1180,7 +1180,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
           if ($value) {
             $display = ts('Yes');
           }
-          elseif ($value === '0') {
+          elseif ((string)$value === '0') {
             $display = ts('No');
           }
         }
@@ -1345,7 +1345,6 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
           $display = $value;
         }
     }
-
     return $display ? $display : $value;
   }
 
