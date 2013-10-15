@@ -1922,9 +1922,9 @@ EOS;
     // the string is longer than the length and we need a uniq string
     // for the same tablename we need the same uniq string everytime
     // hence we use md5 on the string, which is not random
-    // we'll append 16 characters to the end of the tableName
-    $md5string = substr(md5($string), 0, 16);
-    return substr($string, 0, $length - 17) . "_{$md5string}";
+    // we'll append 8 characters to the end of the tableName
+    $md5string = substr(md5($string), 0, 8);
+    return substr($string, 0, $length - 8) . "_{$md5string}";
   }
 
 }
