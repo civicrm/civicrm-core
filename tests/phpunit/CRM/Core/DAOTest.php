@@ -159,4 +159,24 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
     $actualSql = CRM_Core_DAO::composeQuery($inputSql, $inputParams);
     $this->assertFalse(($expectSql == $actualSql));
   }
+
+  function sqlNameDataProvider() {
+    return array(
+      array('this is a long string', 30, FALSE, 'this is a long string'),
+
+      array('this is an even longer string which is exactly 60 character', 60, FALSE, 'this is an even longer string which is exactly 60 character'),
+      array('this is an even longer string which is exactly 60 character', 60, TRUE , 'this is an even longer string which is exactly 60 character'),
+
+      array('this is an even longer string which is a bit more than 60 character', 60, FALSE, 'this is an even longer string which is a bit more than 60 ch'),
+      array('this is an even longer string which is a bit more than 60 character', 60, TRUE , 'this is an even longer string which is a bi_c1cbd5198187eb96'),
+    );
+  }
+
+  /**
+   * @dataProvider sqlNameDataProvider
+   */
+  function testShortenSQLName($inputData, $length, $makeRandom, $expectedResult) {
+    $this->assertEquals($expectedResult, CRM_Core_DAO::shortenSQLName($inputData, $length, $makeRandom));
+  }
+
 }
