@@ -468,7 +468,7 @@ AND    $mg.mailing_id = {$mailing_id}
     $limitString = NULL;
     if ($limit && $offset !== NULL) {
       $offset = CRM_Utils_Type::escape($offset, 'Int');
-      $rowCount = CRM_Utils_Type::escape($rowCount, 'Int');
+      $limit = CRM_Utils_Type::escape($limit, 'Int');
 
       $limitString = "LIMIT $offset, $limit";
     }

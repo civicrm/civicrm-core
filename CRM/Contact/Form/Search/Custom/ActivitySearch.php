@@ -215,7 +215,7 @@ class CRM_Contact_Form_Search_Custom_ActivitySearch implements CRM_Contact_Form_
 
     if ($rowcount > 0 && $offset >= 0) {
       $offset = CRM_Utils_Type::escape($offset, 'Int');
-      $rowCount = CRM_Utils_Type::escape($rowCount, 'Int');
+      $rowcount = CRM_Utils_Type::escape($rowcount, 'Int');
       $sql .= " LIMIT $offset, $rowcount ";
     }
     return $sql;
