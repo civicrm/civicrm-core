@@ -4001,7 +4001,7 @@ civicrm_relationship.start_date > {$today}
     }
     if ($row_count > 0 && $offset >= 0) {
       $offset = CRM_Utils_Type::escape($offset, 'Int');
-      $rowCount = CRM_Utils_Type::escape($rowCount, 'Int');
+      $rowCount = CRM_Utils_Type::escape($row_count, 'Int');
       $sql .= " LIMIT $offset, $row_count ";
     }
 
