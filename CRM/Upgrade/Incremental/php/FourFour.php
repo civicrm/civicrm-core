@@ -82,7 +82,7 @@ class CRM_Upgrade_Incremental_php_FourFour {
 
     // add new 'data' column in civicrm_batch
     $query = 'ALTER TABLE civicrm_batch ADD data LONGTEXT NULL COMMENT "cache entered data"';
-    CRM_Core_DAO::executeQuery($query);
+    CRM_Core_DAO::executeQuery($query, array(), TRUE, NULL, FALSE, FALSE);
 
     // check if batch entry data exists in civicrm_cache table
     $query = 'SELECT path, data FROM civicrm_cache WHERE group_name = "batch entry"';
