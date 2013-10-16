@@ -170,29 +170,41 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
     }
 
     $sql = "
-SELECT name, mail
-  FROM {users}
- WHERE (LOWER(name) = LOWER('$name')) OR (LOWER(mail) = LOWER('$email'))";
+      SELECT name, mail
+      FROM {users}
+      WHERE (LOWER(name) = LOWER('$name')) OR (LOWER(mail) = LOWER('$email'))
+    ";
+    $result = db_query($sql);
+    $rows = array();
 
-    $db_cms = DB::connect($config->userFrameworkDSN);
-    if (DB::isError($db_cms)) {
-      die("Cannot connect to UF db via $dsn, " . $db_cms->getMessage());
+    if (count($result) > 0) {
+     $rows[] = db_fetch_array($result);
     }
-    $query = $db_cms->query($sql);
-    $row = $query->fetchRow();
+    if(empty($rows)) {
+      return;
+    }
+    $row = $rows[0];
+    $user = NULL;
+
     if (!empty($row)) {
-      $dbName = CRM_Utils_Array::value(0, $row);
-      $dbEmail = CRM_Utils_Array::value(1, $row);
+      $dbName = CRM_Utils_Array::value('name', $row);
+      $dbEmail = CRM_Utils_Array::value('mail', $row);
       if (strtolower($dbName) == strtolower($name)) {
         $errors['cms_name'] = ts('The username %1 is already taken. Please select another username.',
           array(1 => $name)
         );
       }
       if (strtolower($dbEmail) == strtolower($email)) {
-        $resetUrl = $config->userFrameworkBaseURL . 'user/password';
-        $errors[$emailName] = ts('The email address %1 is already registered. <a href="%2">Have you forgotten your password?</a>',
-          array(1 => $email, 2 => $resetUrl)
-        );
+        if(empty($email)) {
+          $errors[$emailName] = ts('You cannot create an email account for a contact with no email',
+            array(1 => $email)
+          );
+        }
+        else{
+          $errors[$emailName] = ts('This email %1 is already registered. Please select another email.',
+            array(1 => $email)
+          );
+        }
       }
     }
   }
@@ -528,7 +540,7 @@ SELECT name, mail
     $strtolower = function_exists('mb_strtolower') ? 'mb_strtolower' : 'strtolower';
     $dbpassword   = md5($password);
     $name       = $dbDrupal->escapeSimple($strtolower($name));
-    $sql        = "SELECT u.* FROM {users} u WHERE LOWER(u.name) = '$name' AND u.pass = '$dbpassword' AND u.status = 1";
+    $sql        = 'SELECT u.* FROM ' . $config->userFrameworkUsersTableName . " u WHERE LOWER(u.name) = '$name' AND u.pass = '$dbpassword' AND u.status = 1";
     $query      = $dbDrupal->query($sql);
 
     $user = NULL;
