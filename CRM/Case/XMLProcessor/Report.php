@@ -389,7 +389,7 @@ WHERE      a.id = %1
       );
 
       $reporterSortName = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact',
-        $activityDAO->source_contact_id,
+       $source_contact_id,
         'sort_name'
       );
       if (!array_key_exists($reporterSortName, $this->_redactionStringRules)) {
