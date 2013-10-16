@@ -528,6 +528,13 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
    * @access public
    */
   function authenticate($name, $password, $loadCMSBootstrap = FALSE, $realPath = NULL) {
+   //@todo this 'PEAR-y' stuff is only required when bookstrap is not being loaded which is rare
+   // if ever now.
+   // probably if bootstrap is loaded this call
+   // CRM_Utils_System::loadBootStrap($bootStrapParams, TRUE, TRUE, $realPath); would be
+   // sufficient to do what this fn does. It does exist as opposed to return which might need some hanky-panky to make
+   // safe in the unknown situation where authenticate might be called & it is important that
+   // false is returned
     require_once 'DB.php';
 
     $config = CRM_Core_Config::singleton();
