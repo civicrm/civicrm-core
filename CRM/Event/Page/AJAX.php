@@ -68,13 +68,13 @@ class CRM_Event_Page_AJAX {
 ";
     $dao = CRM_Core_DAO::executeQuery($query);
     while ($dao->fetch()) {
+      $fields = array();
       foreach (array('title', 'city', 'start_date') as $field) {
         if (isset($dao->$field)) {
-          $fields[] = $dao->$field;
+          array_push($fields, $dao->$field);
         }
       }
       $eventinfo = implode(' - ', $fields);
-      unset($fields);
       echo $elements = "$eventinfo|$dao->id\n";
     }
     CRM_Utils_System::civiExit();
