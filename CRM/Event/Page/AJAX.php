@@ -68,12 +68,13 @@ class CRM_Event_Page_AJAX {
 ";
     $dao = CRM_Core_DAO::executeQuery($query);
     while ($dao->fetch()) {
-      if (CRM_Utils_System::isNull($dao->city)) {
-        $eventinfo = $dao->title . ' - ' . $dao->start_date;
+      foreach (array('title', 'city', 'start_date') as $field) {
+        if (isset($dao->$field)) {
+          $fields[] = $dao->$field;
+        }
       }
-      else {
-        $eventinfo = $dao->title . ' - ' . $dao->city . ' - ' . $dao->start_date;
-      }
+      $eventinfo = implode(' - ', $fields);
+      unset($fields);
       echo $elements = "$eventinfo|$dao->id\n";
     }
     CRM_Utils_System::civiExit();
