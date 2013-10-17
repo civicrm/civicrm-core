@@ -112,6 +112,12 @@ class CRM_Contact_BAO_Query_Hook {
     }
   }
 
+  public function getPanesMapper(&$panes) {
+    foreach (self::getSearchQueryObjects() as $obj) {
+      $obj->getPanesMapper($panes);
+    }
+  }
+
   public function buildAdvancedSearchPaneForm(&$form, $type) {
     foreach (self::getSearchQueryObjects() as $obj) {
       $obj->buildAdvancedSearchPaneForm($form, $type);

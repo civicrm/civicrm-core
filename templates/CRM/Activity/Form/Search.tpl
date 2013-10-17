@@ -25,61 +25,88 @@
 *}
 {* Search form and results for Activities *}
 <div class="crm-form-block crm-search-form-block">
-<div class="crm-accordion-wrapper crm-advanced_search_form-accordion {if $rows}collapsed{/if}">
- <div class="crm-accordion-header crm-master-accordion-header">
-        {ts}Edit Search Criteria{/ts}
-</div><!-- /.crm-accordion-header -->
-<div class="crm-accordion-body">
-  <div id="searchForm" class="form-item">
-    {strip}
-        <table class="form-layout">
-        <tr>
-           <td class="font-size12pt" colspan="3">
-               {$form.sort_name.label}&nbsp;&nbsp;{$form.sort_name.html|crmAddClass:'twenty'}&nbsp;&nbsp;&nbsp;{$form.buttons.html}
-           </td>
-        </tr>
+  <div class="crm-accordion-wrapper crm-advanced_search_form-accordion {if $rows}collapsed{/if}">
+    <div class="crm-accordion-header crm-master-accordion-header">
+      {ts}Edit Search Criteria{/ts}
+    </div>
+    <!-- /.crm-accordion-header -->
+    <div class="crm-accordion-body">
+      <div id="searchForm" class="form-item">
+        {strip}
+          <table class="form-layout">
+            <tr>
+              <td class="font-size12pt" colspan="3">
+                {$form.sort_name.label}&nbsp;&nbsp;{$form.sort_name.html|crmAddClass:'twenty'}
+                &nbsp;&nbsp;&nbsp;{$form.buttons.html}
+                <div>
+                  <div class="description font-italic">{ts}Complete OR partial name{/ts}
+                    <span class="contact-name-option option-1">{ts} of the Source Contact{/ts}</span>
+                    <span class="contact-name-option option-2">{ts} of the Assignee Contact{/ts}</span>
+                    <span class="contact-name-option option-3">{ts} of the Target Contact{/ts}</span>
+                  </div>
+                </div>
+              </td>
+            </tr>
 
-        {include file="CRM/Activity/Form/Search/Common.tpl"}
+            {include file="CRM/Activity/Form/Search/Common.tpl"}
 
-        <tr>
-           <td colspan="3">{$form.buttons.html}</td>
-        </tr>
-        </table>
-    {/strip}
+            <tr>
+              <td colspan="3">{$form.buttons.html}</td>
+            </tr>
+          </table>
+        {/strip}
+      </div>
+    </div>
   </div>
-</div>
-</div>
 </div>
 
 {if $rowsEmpty || $rows }
-<div class="crm-content-block">
-{if $rowsEmpty}
-  <div class="crm-results-block crm-results-block-empty">
-  {include file="CRM/Activity/Form/Search/EmptyResults.tpl"}
+  <div class="crm-content-block">
+    {if $rowsEmpty}
+      <div class="crm-results-block crm-results-block-empty">
+        {include file="CRM/Activity/Form/Search/EmptyResults.tpl"}
+      </div>
+    {/if}
+
+    {if $rows}
+      <div class="crm-results-block">
+        {* Search request has returned 1 or more matching rows. *}
+
+        {* This section handles form elements for action task select and submit *}
+        <div class="crm-search-tasks">
+          {include file="CRM/common/searchResultTasks.tpl"}
+        </div>
+        {* This section displays the rows along and includes the paging controls *}
+        <div class="crm-search-results">
+          {include file="CRM/Activity/Form/Selector.tpl" context="Search"}
+        </div>
+        {* END Actions/Results section *}
+      </div>
+    {/if}
   </div>
 {/if}
-
-{if $rows}
-  <div class="crm-results-block">
-    {* Search request has returned 1 or more matching rows. *}
-
-       {* This section handles form elements for action task select and submit *}
-       <div class="crm-search-tasks">
-       {include file="CRM/common/searchResultTasks.tpl"}
-    </div>
-       {* This section displays the rows along and includes the paging controls *}
-     <div class="crm-search-results">
-       {include file="CRM/Activity/Form/Selector.tpl" context="Search"}
-    </div>
-    {* END Actions/Results section *}
-</div>
-{/if}
-</div>
-{/if}
 {literal}
-<script type="text/javascript">
-cj(function() {
-   cj().crmAccordions();
-});
-</script>
+  <script type="text/javascript">
+    cj(function () {
+      cj().crmAccordions();
+
+      var roleId = cj('input[name=activity_role]:checked', '#Search').val();
+      if (roleId) {
+        cj('.description .option-' + roleId).show();
+      }
+
+    });
+
+    cj('[name=activity_role]:input').change(function () {
+      cj('.description .contact-name-option').hide();
+      if (cj(this).is(':checked')) {
+        cj('.description .option-' + cj(this).val()).show();
+      }
+    }).change();
+
+    cj(".crm-clear-link").click(function () {
+      cj('.description .contact-name-option').hide();
+    });
+
+  </script>
 {/literal}

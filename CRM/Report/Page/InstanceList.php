@@ -180,6 +180,8 @@ class CRM_Report_Page_InstanceList extends CRM_Core_Page {
       $this->assign('reportUrl', $reportUrl);
       if ($this->ovID) {
         $this->assign('title', $this->title);
+      } else {
+        CRM_Utils_System::setTitle(ts('%1 Reports', array(1 => $this->_compName)));
       }
     }
     // assign link to template list for users with appropriate permissions

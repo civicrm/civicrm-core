@@ -3476,7 +3476,7 @@ div.m ul#civicrm-menu,
 }
 
 /* classes related to batch entry operation */
-#crm-container span.batch-edit {
+.crm-container span.batch-edit {
   padding: 2px 9px 2px 3px;
   margin: 2px 2px 3px 2px;
   cursor: pointer;
@@ -3485,7 +3485,7 @@ div.m ul#civicrm-menu,
   background-image: url("../packages/jquery/jquery-ui-1.9.0/css/smoothness/images/ui-icons_222222_256x240.png");
 }
 
-#crm-container span.batch-valid {
+.crm-container span.batch-valid {
   padding: 2px 9px 2px 3px;
   margin: 2px 2px 3px 2px;
   cursor: pointer;
@@ -3494,7 +3494,7 @@ div.m ul#civicrm-menu,
   background-image: url("../packages/jquery/jquery-ui-1.9.0/css/smoothness/images/ui-icons_222222_256x240.png");
 }
 
-#crm-container span.batch-invalid {
+.crm-container span.batch-invalid {
   padding: 2px 9px 2px 3px;
   margin: 2px 2px 3px 2px;
   cursor: pointer;
@@ -3503,17 +3503,17 @@ div.m ul#civicrm-menu,
   background-image: url("../packages/jquery/jquery-ui-1.9.0/css/smoothness/images/ui-icons_222222_256x240.png");
 }
 
-#crm-container #Entry ul#errorList {
+.crm-container #Entry ul#errorList {
   display: none;
 }
 
-#crm-container table.batch-totals {
+.crm-container table.batch-totals {
   border: 1px solid #7A7A60 !important;
   margin-top: 10px !important;
 }
 
 /* grid div as table */
-#crm-container .crm-grid-table {
+.crm-container .crm-grid-table {
   display: table;
   border-collapse: collapse;
   border: 1px solid #7A7A60;
@@ -3521,20 +3521,20 @@ div.m ul#civicrm-menu,
   margin: 10px 3px 10px !important;
 }
 
-#crm-container #crm-batch-entry-table {
+.crm-container .crm-batch-entry-table {
   border-right: 2px solid #7A7A60 !important;
 }
 
-#crm-container .crm-grid-row,
-#crm-container .crm-grid-header {
+.crm-container .crm-grid-row,
+.crm-container .crm-grid-header {
   display: table-row;
 }
 
-#crm-container .crm-grid-header {
+.crm-container .crm-grid-header {
   white-space: nowrap;
 }
 
-#crm-container .crm-grid-cell {
+.crm-container .crm-grid-cell {
   display: table-cell;
   border-right: 1px solid #EFEFEF;
   padding: 2px;
