@@ -96,6 +96,7 @@ popd
 ## Create CiviCRM config
 cat > "$CIVI_ROOT/bin/setup.conf" << EOF
   SVNROOT="$CIVI_ROOT"
+  CIVISOURCEDIR="$CIVI_ROOT"
   SCHEMA=schema/Schema.xml
   DBNAME="$DB_NAME"
   DBUSER="$DB_USER"
