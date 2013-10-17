@@ -683,6 +683,7 @@ class CRM_Report_Form_Member_ContributionDetail extends CRM_Report_Form {
     $sql = "{$select} {$this->_from} {$this->_where} {$group}";
 
     $dao = CRM_Core_DAO::executeQuery($sql);
+    $totalAmount = $average = array();
     while ($dao->fetch()) {
       $totalAmount[] = CRM_Utils_Money::format($dao->amount, $dao->currency)."(".$dao->count.")";
       $average[] =   CRM_Utils_Money::format($dao->avg, $dao->currency);

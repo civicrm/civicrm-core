@@ -1538,7 +1538,10 @@ WHERE  id = $cfID
                 if ($dao->data_type == 'Int' ||
                   $dao->data_type == 'Boolean'
                 ) {
-                  $customVal = (int )($params[$name]);
+                  $v = $params[$name];
+                  if (!CRM_Utils_System::isNull($v)) {
+                    $customVal = (int)$v;
+                  }
                 }
                 elseif ($dao->data_type == 'Float') {
                   $customVal = (float )($params[$name]);

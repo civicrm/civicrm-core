@@ -46,11 +46,11 @@ class CRM_Logging_Schema {
     'logging/contribute/summary',
   );
 
-  //CRM-13028 / NYSS-6933 - table => array (cols) - to be excluded from the update statement 
+  //CRM-13028 / NYSS-6933 - table => array (cols) - to be excluded from the update statement
   private $exceptions = array(
     'civicrm_job'   => array('last_run'),
     'civicrm_group' => array('cache_date'),
-  ); 
+  );
 
   /**
    * Populate $this->tables and $this->logs with current db state.
@@ -153,15 +153,31 @@ AND    TABLE_NAME LIKE 'log_civicrm_%'
     }
 
     foreach ($tableNames as $table) {
+      $validName = CRM_Core_DAO::shortenSQLName($table, 48, TRUE);
+
       // before triggers
-      $dao->executeQuery("DROP TRIGGER IF EXISTS {$table}_before_insert");
-      $dao->executeQuery("DROP TRIGGER IF EXISTS {$table}_before_update");
-      $dao->executeQuery("DROP TRIGGER IF EXISTS {$table}_before_delete");
+      $dao->executeQuery("DROP TRIGGER IF EXISTS {$validName}_before_insert");
+      $dao->executeQuery("DROP TRIGGER IF EXISTS {$validName}_before_update");
+      $dao->executeQuery("DROP TRIGGER IF EXISTS {$validName}_before_delete");
 
      // after triggers
-      $dao->executeQuery("DROP TRIGGER IF EXISTS {$table}_after_insert");
-      $dao->executeQuery("DROP TRIGGER IF EXISTS {$table}_after_update");
-      $dao->executeQuery("DROP TRIGGER IF EXISTS {$table}_after_delete");
+      $dao->executeQuery("DROP TRIGGER IF EXISTS {$validName}_after_insert");
+      $dao->executeQuery("DROP TRIGGER IF EXISTS {$validName}_after_update");
+      $dao->executeQuery("DROP TRIGGER IF EXISTS {$validName}_after_delete");
+    }
+
+    // now lets also be safe and drop all triggers that start with
+    // civicrm_ if we are dropping all triggers
+    // we need to do this to capture all the leftover triggers since
+    // we did the shortening trigger name for CRM-11794
+    if ($tableName === NULL) {
+      $triggers = $dao->executeQuery("SHOW TRIGGERS LIKE 'civicrm_%'");
+
+      while ($triggers->fetch()) {
+        // note that drop trigger has a wierd syntax and hence we do not
+        // send the trigger name as a string (i.e. its not quoted
+        $dao->executeQuery("DROP TRIGGER IF EXISTS {$triggers->Trigger}");
+      }
     }
   }
 
@@ -356,7 +372,7 @@ AND    TABLE_NAME LIKE 'log_civicrm_%'
         $civiDB = $dao->_database;
       }
       CRM_Core_Error::ignoreException();
-      // NOTE: W.r.t Performance using one query to find all details and storing in static array is much faster 
+      // NOTE: W.r.t Performance using one query to find all details and storing in static array is much faster
       // than firing query for every given table.
       $query = "
 SELECT TABLE_SCHEMA, TABLE_NAME, COLUMN_NAME, DATA_TYPE, IS_NULLABLE, COLUMN_DEFAULT
@@ -371,11 +387,11 @@ WHERE  table_schema IN ('{$this->db}', '{$civiDB}')";
         if (!array_key_exists($dao->TABLE_NAME, $columnSpecs)) {
           $columnSpecs[$dao->TABLE_NAME] = array();
         }
-        $columnSpecs[$dao->TABLE_NAME][$dao->COLUMN_NAME] = 
+        $columnSpecs[$dao->TABLE_NAME][$dao->COLUMN_NAME] =
           array(
-              'COLUMN_NAME' => $dao->COLUMN_NAME, 
-              'DATA_TYPE'   => $dao->DATA_TYPE, 
-              'IS_NULLABLE' => $dao->IS_NULLABLE, 
+              'COLUMN_NAME' => $dao->COLUMN_NAME,
+              'DATA_TYPE'   => $dao->DATA_TYPE,
+              'IS_NULLABLE' => $dao->IS_NULLABLE,
               'COLUMN_DEFAULT' => $dao->COLUMN_DEFAULT
             );
       }
@@ -386,38 +402,38 @@ WHERE  table_schema IN ('{$this->db}', '{$civiDB}')";
   function columnsWithDiffSpecs($civiTable, $logTable) {
     $civiTableSpecs = $this->columnSpecsOf($civiTable);
     $logTableSpecs  = $this->columnSpecsOf($logTable);
-    
+
     $diff = array('ADD' => array(), 'MODIFY' => array(), 'OBSOLETE' => array());
-    
+
     // columns to be added
     $diff['ADD'] = array_diff(array_keys($civiTableSpecs), array_keys($logTableSpecs));
-    
+
     // columns to be modified
-    // NOTE: we consider only those columns for modifications where there is a spec change, and that the column definition 
+    // NOTE: we consider only those columns for modifications where there is a spec change, and that the column definition
     // wasn't deliberately modified by fixTimeStampAndNotNullSQL() method.
     foreach ($civiTableSpecs as $col => $colSpecs) {
       $specDiff = array_diff($civiTableSpecs[$col], $logTableSpecs[$col]);
       if (!empty($specDiff) && $col != 'id' && !array_key_exists($col, $diff['ADD'])) {
         // ignore 'id' column for any spec changes, to avoid any auto-increment mysql errors
         if ($civiTableSpecs[$col]['DATA_TYPE'] != $logTableSpecs[$col]['DATA_TYPE']) {
-          // if data-type is different, surely consider the column 
+          // if data-type is different, surely consider the column
           $diff['MODIFY'][] = $col;
-        } else if ($civiTableSpecs[$col]['IS_NULLABLE'] != $logTableSpecs[$col]['IS_NULLABLE'] && 
+        } else if ($civiTableSpecs[$col]['IS_NULLABLE'] != $logTableSpecs[$col]['IS_NULLABLE'] &&
           $logTableSpecs[$col]['IS_NULLABLE'] == 'NO') {
           // if is-null property is different, and log table's column is NOT-NULL, surely consider the column
           $diff['MODIFY'][] = $col;
-        } else if ($civiTableSpecs[$col]['COLUMN_DEFAULT'] != $logTableSpecs[$col]['COLUMN_DEFAULT'] && 
+        } else if ($civiTableSpecs[$col]['COLUMN_DEFAULT'] != $logTableSpecs[$col]['COLUMN_DEFAULT'] &&
           !strstr($civiTableSpecs[$col]['COLUMN_DEFAULT'], 'TIMESTAMP')) {
           // if default property is different, and its not about a timestamp column, consider it
           $diff['MODIFY'][] = $col;
         }
-      } 
+      }
     }
 
     // columns to made obsolete by turning into not-null
     $oldCols = array_diff(array_keys($logTableSpecs), array_keys($civiTableSpecs));
     foreach ($oldCols as $col) {
-      if (!in_array($col, array('log_date', 'log_conn_id', 'log_user_id', 'log_action')) && 
+      if (!in_array($col, array('log_date', 'log_conn_id', 'log_user_id', 'log_action')) &&
         $logTableSpecs[$col]['IS_NULLABLE'] == 'NO') {
         // if its a column present only in log table, not among those used by log tables for special purpose, and not-null
         $diff['OBSOLETE'][] = $col;

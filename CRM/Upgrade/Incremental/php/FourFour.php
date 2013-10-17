@@ -62,27 +62,27 @@ class CRM_Upgrade_Incremental_php_FourFour {
     if ($rev == '4.4.alpha1') {
       $config = CRM_Core_Config::singleton();
       if (!empty($config->useIDS)) {
-        $postUpgradeMessage .= '<br />' . ts("The setting to skip IDS check has been deprecated. Please use the permission 'skip IDS check' to bypass the IDS system");
+        $postUpgradeMessage .= '<br />' . ts("The setting to skip IDS check has been deprecated. Please use the permission 'skip IDS check' to bypass the IDS system.");
       }
     }
   }
 
   function upgrade_4_4_alpha1($rev) {
     // task to process sql
-    $this->addTask(ts('Upgrade DB to 4.4.alpha1: SQL'), 'task_4_4_x_runSql', $rev);
+    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => '4.4.alpha1')), 'task_4_4_x_runSql', $rev);
 
     // Consolidate activity contacts CRM-12274.
-    $this->addTask(ts('Consolidate activity contacts'), 'activityContacts');
+    $this->addTask('Consolidate activity contacts', 'activityContacts');
 
     return TRUE;
   }
 
   function upgrade_4_4_beta1($rev) {
-    $this->addTask(ts('Upgrade DB to 4.4.beta1: SQL'), 'task_4_4_x_runSql', $rev);
+    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => '4.4.beta1')), 'task_4_4_x_runSql', $rev);
 
     // add new 'data' column in civicrm_batch
     $query = 'ALTER TABLE civicrm_batch ADD data LONGTEXT NULL COMMENT "cache entered data"';
-    CRM_Core_DAO::executeQuery($query);
+    CRM_Core_DAO::executeQuery($query, array(), TRUE, NULL, FALSE, FALSE);
 
     // check if batch entry data exists in civicrm_cache table
     $query = 'SELECT path, data FROM civicrm_cache WHERE group_name = "batch entry"';
@@ -100,7 +100,7 @@ class CRM_Upgrade_Incremental_php_FourFour {
     $query = 'DELETE FROM civicrm_cache WHERE group_name = "batch entry"';
     CRM_Core_DAO::executeQuery($query);
 
-    $this->addTask(ts('Migrate custom word-replacements'), 'wordReplacements');
+    $this->addTask('Migrate custom word-replacements', 'wordReplacements');
   }
 
   /**

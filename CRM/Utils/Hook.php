@@ -561,9 +561,12 @@ abstract class CRM_Utils_Hook {
    * This hook is called when a contact unsubscribes from a mailing.  It allows modules
    * to override what the contacts are removed from.
    *
+   * @param string $op      - ignored for now
    * @param int $mailing_id - the id of the mailing to unsub from
    * @param int $contact_id - the id of the contact who is unsubscribing
    * @param array / int $groups - array of groups the contact will be removed from
+   * @param array / int $baseGroups - array of base groups (used in smart mailings) the contact will be removed from
+   *
    **/
   static function unsubscribeGroups($op, $mailingId, $contactId, &$groups, &$baseGroups) {
     return self::singleton()->invoke(5, $op, $mailingId, $contactId, $groups, $baseGroups, 'civicrm_unsubscribeGroups');

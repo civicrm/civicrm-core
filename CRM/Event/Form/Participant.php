@@ -924,7 +924,11 @@ loadCampaign( {$this->_eID}, {$eventCampaigns} );
     );
 
     $path = CRM_Utils_System::currentPath();
-    if (strpos($path, 'civicrm/contact/search') !== 0) {
+    $excludeForPaths = array(
+      'civicrm/contact/search',
+      'civicrm/group/search'
+    );
+    if (!in_array($path, $excludeForPaths)) {
       $buttons[] = array(
         'type' => 'upload',
         'name' => ts('Save and New'),
@@ -932,6 +936,7 @@ loadCampaign( {$this->_eID}, {$eventCampaigns} );
         'js' => $confirmJS,
       );
     }
+
     $buttons[] = array(
       'type' => 'cancel',
       'name' => ts('Cancel'),

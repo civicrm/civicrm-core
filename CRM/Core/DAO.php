@@ -1650,7 +1650,8 @@ SELECT contact_id
         foreach ($events as $whenName => $parts) {
           $varString   = implode("\n", $parts['variables']);
           $sqlString   = implode("\n", $parts['sql']);
-          $triggerName = "{$tableName}_{$whenName}_{$eventName}";
+          $validName   = CRM_Core_DAO::shortenSQLName($tableName, 48, TRUE);
+          $triggerName = "{$validName}_{$whenName}_{$eventName}";
           $triggerSQL  = "CREATE TRIGGER $triggerName $whenName $eventName ON $tableName FOR EACH ROW BEGIN $varString $sqlString END";
 
           CRM_Core_DAO::executeQuery("DROP TRIGGER IF EXISTS $triggerName");
@@ -1895,4 +1896,35 @@ EOS;
       }
     }
   }
+
+  /**
+   * SQL has a limit of 64 characters on various names:
+   * table name, trigger name, column name ...
+   *
+   * For custom groups and fields we generated names from user entered input
+   * which can be longer than this length, this function helps with creating
+   * strings that meet various criteria.
+   *
+   * @param string $string - the string to be shortened
+   * @param int    $length - the max length of the string
+   */
+  public static function shortenSQLName($string, $length = 60, $makeRandom = FALSE) {
+    // early return for strings that meet the requirements
+    if (strlen($string) <= $length) {
+      return $string;
+    }
+
+    // easy return for calls that dont need a randomized uniq string
+    if (! $makeRandom) {
+      return substr($string, 0, $length);
+    }
+
+    // the string is longer than the length and we need a uniq string
+    // for the same tablename we need the same uniq string everytime
+    // hence we use md5 on the string, which is not random
+    // we'll append 8 characters to the end of the tableName
+    $md5string = substr(md5($string), 0, 8);
+    return substr($string, 0, $length - 8) . "_{$md5string}";
+  }
+
 }
