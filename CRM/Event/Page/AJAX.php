@@ -52,14 +52,33 @@ class CRM_Event_Page_AJAX {
       $whereClause .= " AND ( end_date IS NULL OR end_date >= NOW() )";
     }
     $query = "
-SELECT title, id
-FROM civicrm_event
-WHERE {$whereClause}
-ORDER BY title
+      SELECT civicrm_event.title AS title,
+        civicrm_event.id AS id,
+        civicrm_address.city AS city,
+        civicrm_event.start_date
+      FROM civicrm_event
+        LEFT JOIN civicrm_loc_block ON
+          civicrm_event.loc_block_id = civicrm_loc_block.id
+        LEFT JOIN civicrm_address ON
+          civicrm_loc_block.address_id = civicrm_address.id
+      WHERE
+        {$whereClause}
+      ORDER BY
+        civicrm_event.title
 ";
     $dao = CRM_Core_DAO::executeQuery($query);
     while ($dao->fetch()) {
-      echo $elements = "$dao->title|$dao->id\n";
+      $fields = array();
+      foreach (array('title', 'city') as $field) {
+        if (isset($dao->$field)) {
+          array_push($fields, $dao->$field);
+        }
+      }
+      if (isset($dao->start_date)) {
+        array_push($fields, CRM_Utils_Date::customFormat($dao->start_date));
+      }
+      $eventinfo = implode(' - ', $fields);
+      echo $elements = "$eventinfo|$dao->id\n";
     }
     CRM_Utils_System::civiExit();
   }
