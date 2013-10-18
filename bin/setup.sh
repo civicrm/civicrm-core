@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+set -e
 
 CALLEDPATH=`dirname $0`
 
@@ -24,11 +25,11 @@ fi
 
 
 # fetch command line arguments if available
-if [ ! -z $1 ] ; then SCHEMA=$1; fi
-if [ ! -z $2 ] ; then DBLOAD=$2; fi
-if [ ! -z $3 ] ; then DBNAME=$3; fi
-if [ ! -z $4 ] ; then DBUSER=$4; fi
-if [ ! -z $5 ] ; then DBPASS=$5; fi
+if [ ! -z "$1" ] ; then SCHEMA="$1"; fi
+if [ ! -z "$2" ] ; then DBLOAD="$2"; fi
+if [ ! -z "$3" ] ; then DBNAME="$3"; fi
+if [ ! -z "$4" ] ; then DBUSER="$4"; fi
+if [ ! -z "$5" ] ; then DBPASS="$5"; fi
 
 # verify if we have at least DBNAME given
 if [ -z $DBNAME ] ; then
@@ -46,8 +47,8 @@ fi
 
 # run code generator if it's there - which means it's
 # checkout, not packaged code
-if [ -d $CALLEDPATH/../xml ]; then
-  cd $CALLEDPATH/../xml
+if [ -d "$CALLEDPATH/../xml" ]; then
+  cd "$CALLEDPATH/../xml"
   "$PHP5PATH"php GenCode.php $SCHEMA
 fi
 
@@ -59,7 +60,7 @@ else
   PASSWDSECTION="-p$DBPASS"
 fi
 
-cd $CALLEDPATH/../sql
+cd "$CALLEDPATH/../sql"
 echo; echo "Dropping civicrm_* tables from database $DBNAME"
 # mysqladmin -f -u $DBUSER $PASSWDSECTION $DBARGS drop $DBNAME
 MYSQLCMD="mysql -u$DBUSER $PASSWDSECTION $DBARGS $DBNAME"
