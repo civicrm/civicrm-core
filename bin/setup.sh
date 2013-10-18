@@ -97,7 +97,7 @@ if [ ! -z $DBADD ]; then
 fi
 
 # run the cli script to build the menu and the triggers
-cd $CALLEDPATH/..
+cd "$CALLEDPATH/.."
 "$PHP5PATH"php bin/cli.php -e System -a flush --triggers 1 --session 1
 
 # reset config_backend and userFrameworkResourceURL which gets set
