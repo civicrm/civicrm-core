@@ -829,7 +829,6 @@ class CiviCRM_For_WordPress {
    * @return bool true if authenticated, false otherwise
    */
   public function check_permission( $args ) {
-
     if ( $args[0] != 'civicrm' ) {
       return FALSE;
     }
@@ -842,99 +841,13 @@ class CiviCRM_For_WordPress {
     require_once 'CRM/Utils/Array.php';
     // all profile and file urls, as well as user dashboard and tell-a-friend are valid
     $arg1 = CRM_Utils_Array::value(1, $args);
-    $validPaths = array('profile', 'user', 'dashboard', 'friend', 'file', 'ajax');
-    if ( in_array( $arg1, $validPaths ) ) {
-      return TRUE;
+    $invalidPaths = array('admin');
+    if ( in_array( $arg1, $invalidPaths ) ) {
+      return FALSE;
     }
 
-    $arg2 = CRM_Utils_Array::value(2, $args);
-    $arg3 = CRM_Utils_Array::value(3, $args);
-
-    // allow editing of related contacts
-    if (
-      $arg1 == 'contact' &&
-      $arg2 == 'relatedcontact'
-    ) {
-      return TRUE;
-    }
-
-    // a contribution page
-    if ( in_array( 'CiviContribute', $config->enableComponents ) ) {
-
-      if (
-        $arg1 == 'contribute' &&
-        in_array( $arg2, array('transact', 'campaign', 'pcp', 'updaterecur', 'updatebilling', 'unsubscribe') )
-      ) {
-        return TRUE;
-      }
-
-      if (
-        $arg1 == 'pcp' &&
-        ( !$arg2 || in_array( $arg2, array('info') ) )
-      ) {
-        return TRUE;
-      }
-
-    }
-
-    // an event registration page is valid
-    if ( in_array( 'CiviEvent', $config->enableComponents ) ) {
-
-      if (
-        $arg1 == 'event' &&
-        in_array( $arg2, array('register', 'info', 'participant', 'ical', 'confirm') )
-      ) {
-        return TRUE;
-      }
-
-      // also allow events to be mapped
-      if (
-        $arg1 == 'contact' &&
-        $arg2 == 'map' &&
-        $arg3 == 'event'
-      ) {
-        return TRUE;
-      }
-
-      if (
-        $arg1 == 'pcp' &&
-        ( !$arg2 || in_array( $arg2, array('info') ) )
-      ) {
-        return TRUE;
-      }
-
-    }
-
-    // allow mailing urls to be processed
-    if (
-      $arg1 == 'mailing' &&
-      in_array( 'CiviMail', $config->enableComponents )
-    ) {
-      if (
-        in_array(
-          $arg2,
-          array('forward', 'unsubscribe', 'resubscribe', 'optout', 'subscribe', 'confirm', 'view')
-        )
-      ) {
-        return TRUE;
-      }
-    }
-
-    // allow petition sign in, CRM-7401
-    if ( in_array( 'CiviCampaign', $config->enableComponents ) ) {
-      $validPaths = array('sign', 'thankyou', 'confirm');
-      if (
-        $arg1 == 'petition' &&
-        in_array($arg2, $validPaths)
-      ) {
-        return TRUE;
-      }
-    }
-
-    return FALSE;
-
+    return TRUE;
   }
-
 
   /**
    * @description: called when authentication fails in wp_frontend()
