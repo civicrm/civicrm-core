@@ -77,13 +77,15 @@ class CRM_Upgrade_Incremental_php_FourThree {
     if ($rev == '4.3.6') {
       $constraintArray = array(
         'civicrm_contact' => 'contact_id',
-        'civicrm_campaign' => 'campaign_id'
+        'civicrm_campaign' => 'campaign_id',
+        'civicrm_payment_processor' => 'payment_processor_id',
+        'civicrm_financial_type' => 'financial_type_id'
       );
       foreach ($constraintArray as $key => $value) {
         $query = "SELECT contri_recur.id FROM civicrm_contribution_recur contri_recur LEFT JOIN {$key} ON contri_recur.{$value} = {$key}.id
 WHERE {$key}.id IS NULL";
-        if ($value == 'campaign_id') {
-          $query .= ' AND contri_recur.campaign_id IS NOT NULL ';
+        if ($value != 'contact_id') {
+          $query .= " AND contri_recur.{$value} IS NOT NULL ";
         }
         $dao = CRM_Core_DAO::executeQuery($query);
         if ($dao->N) {
