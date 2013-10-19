@@ -60,7 +60,7 @@
         <labelColumn>name</labelColumn>
       </pseudoconstant>
       <html>
-        <type>Select></type>
+        <type>Select</type>
       </html>
       <add>1.5</add>
   </field>
@@ -140,7 +140,7 @@
         <labelColumn>label</labelColumn>
       </pseudoconstant>
       <html>
-        <type>Select></type>
+        <type>Select</type>
       </html>
       <add>1.5</add>
   </field>

@@ -35,7 +35,7 @@
         <condition>parent_id IS NULL</condition>
       </pseudoconstant>
       <html>
-        <type>Select></type>
+        <type>Select</type>
       </html>
        <add>1.1</add>
        <change>3.1</change>
@@ -288,7 +288,7 @@
         <optionGroupName>preferred_communication_method</optionGroupName>
       </pseudoconstant>
       <html>
-        <type>Select></type>
+        <type>Select</type>
       </html>
   </field>
   <index>
@@ -309,7 +309,7 @@
         <keyColumn>name</keyColumn>
       </pseudoconstant>
       <html>
-        <type>Select></type>
+        <type>Select</type>
       </html>
       <add>3.2</add>
   </field>
@@ -436,7 +436,7 @@
         <optionGroupName>individual_prefix</optionGroupName>
       </pseudoconstant>
       <html>
-        <type>Select></type>
+        <type>Select</type>
       </html>
       <headerPattern>/^(prefix|title)/i</headerPattern>
       <dataPattern>/^(mr|ms|mrs|sir|dr)\.?$/i</dataPattern>
@@ -456,7 +456,7 @@
         <optionGroupName>individual_suffix</optionGroupName>
       </pseudoconstant>
       <html>
-        <type>Select></type>
+        <type>Select</type>
       </html>
       <import>true</import>
       <comment>Suffix for name (Jr, Sr...). FK to suffix ID</comment>
@@ -610,7 +610,7 @@
         <optionGroupName>gender</optionGroupName>
       </pseudoconstant>
       <html>
-        <type>Select></type>
+        <type>Select</type>
       </html>
       <headerPattern>/^gender$/i</headerPattern>
       <comment>FK to gender ID</comment>

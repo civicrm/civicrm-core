@@ -43,7 +43,7 @@
         <labelColumn>display_name</labelColumn>
       </pseudoconstant>
       <html>
-        <type>Select></type>
+        <type>Select</type>
       </html>
   </field>
   <index>
@@ -199,7 +199,7 @@
         <labelColumn>name</labelColumn>
       </pseudoconstant>
       <html>
-        <type>Select></type>
+        <type>Select</type>
       </html>
       <add>1.1</add>
   </field>
@@ -224,7 +224,7 @@
         <labelColumn>name</labelColumn>
       </pseudoconstant>
       <html>
-        <type>Select></type>
+        <type>Select</type>
       </html>
       <add>1.1</add>
   </field>
@@ -279,7 +279,7 @@
         <nameColumn>iso_code</nameColumn>
       </pseudoconstant>
       <html>
-        <type>Select></type>
+        <type>Select</type>
       </html>
       <add>1.1</add>
   </field>

@@ -43,7 +43,7 @@
         <labelColumn>display_name</labelColumn>
       </pseudoconstant>
       <html>
-        <type>Select></type>
+        <type>Select</type>
       </html>
   </field>
   <index>

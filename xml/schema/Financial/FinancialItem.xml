@@ -81,7 +81,7 @@
       <nameColumn>numeric_code</nameColumn>
     </pseudoconstant>
     <html>
-      <type>Select></type>
+      <type>Select</type>
     </html>
   </field>
   <field>
@@ -95,7 +95,7 @@
       <labelColumn>name</labelColumn>
     </pseudoconstant>
     <html>
-      <type>Select></type>
+      <type>Select</type>
     </html>
   </field>
   <foreignKey>
@@ -114,7 +114,7 @@
       <optionGroupName>financial_item_status</optionGroupName>
     </pseudoconstant>
     <html>
-      <type>Select></type>
+      <type>Select</type>
     </html>
   </field>
   <field>

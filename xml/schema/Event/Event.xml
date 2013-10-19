@@ -70,7 +70,7 @@
       <optionGroupName>event_type</optionGroupName>
     </pseudoconstant>
     <html>
-      <type>Select></type>
+      <type>Select</type>
     </html>
     <comment>Event Type ID.Implicit FK to civicrm_option_value where option_group = event_type.</comment>
     <add>1.7</add>
@@ -230,7 +230,7 @@
       <labelColumn>name</labelColumn>
     </pseudoconstant>
     <html>
-      <type>Select></type>
+      <type>Select</type>
     </html>
     <add>4.3</add>
   </field>
@@ -245,7 +245,7 @@
       <labelColumn>name</labelColumn>
     </pseudoconstant>
     <html>
-      <type>Select></type>
+      <type>Select</type>
     </html>
     <add>1.8</add>
   </field>
@@ -734,7 +734,7 @@
       <nameColumn>numeric_code</nameColumn>
     </pseudoconstant>
     <html>
-      <type>Select></type>
+      <type>Select</type>
     </html>
   </field>
   <field>

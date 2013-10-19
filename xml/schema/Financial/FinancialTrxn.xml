@@ -55,7 +55,7 @@
       <labelColumn>name</labelColumn>
     </pseudoconstant>
     <html>
-      <type>Select></type>
+      <type>Select</type>
     </html>
   </field>
   <foreignKey>
@@ -75,7 +75,7 @@
       <labelColumn>name</labelColumn>
     </pseudoconstant>
     <html>
-      <type>Select></type>
+      <type>Select</type>
     </html>
   </field>
   <foreignKey>
@@ -135,7 +135,7 @@
       <nameColumn>numeric_code</nameColumn>
     </pseudoconstant>
     <html>
-      <type>Select></type>
+      <type>Select</type>
     </html>
   </field>
   <field>
@@ -194,7 +194,7 @@
       <optionGroupName>payment_instrument</optionGroupName>
     </pseudoconstant>
     <html>
-      <type>Select></type>
+      <type>Select</type>
     </html>
     <add>4.3</add>
   </field>

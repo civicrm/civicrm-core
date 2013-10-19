@@ -50,7 +50,7 @@
          <optionGroupName>case_type</optionGroupName>
        </pseudoconstant>
        <html>
-         <type>Select></type>
+         <type>Select</type>
        </html>
        <add>2.0</add>
   </field>
@@ -165,7 +165,7 @@
          <optionGroupName>case_status</optionGroupName>
        </pseudoconstant>
        <html>
-         <type>Select></type>
+         <type>Select</type>
        </html>
        <add>1.8</add>
   </field>

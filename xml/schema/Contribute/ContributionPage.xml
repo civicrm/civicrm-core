@@ -62,7 +62,7 @@
       <labelColumn>name</labelColumn>
     </pseudoconstant>
     <html>
-      <type>Select></type>
+      <type>Select</type>
     </html>
     <add>4.3</add>
   </field>
@@ -83,7 +83,7 @@
       <labelColumn>name</labelColumn>
     </pseudoconstant>
     <html>
-      <type>Select></type>
+      <type>Select</type>
     </html>
     <add>1.8</add>
   </field>
@@ -420,7 +420,7 @@
       <nameColumn>numeric_code</nameColumn>
     </pseudoconstant>
     <html>
-      <type>Select></type>
+      <type>Select</type>
     </html>
   </field>
   <field>

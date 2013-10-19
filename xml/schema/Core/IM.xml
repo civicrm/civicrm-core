@@ -64,7 +64,7 @@
         <optionGroupName>instant_messenger_service</optionGroupName>
       </pseudoconstant>
       <html>
-        <type>Select></type>
+        <type>Select</type>
       </html>
   </field>
   <index>

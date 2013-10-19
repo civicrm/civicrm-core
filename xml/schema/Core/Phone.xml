@@ -42,7 +42,7 @@
         <labelColumn>display_name</labelColumn>
       </pseudoconstant>
       <html>
-        <type>Select></type>
+        <type>Select</type>
       </html>
       <add>2.0</add>
   </field>
@@ -144,7 +144,7 @@
         <optionGroupName>phone_type</optionGroupName>
       </pseudoconstant>
       <html>
-        <type>Select></type>
+        <type>Select</type>
       </html>
       <add>2.2</add>
   </field>

@@ -49,7 +49,7 @@
          <labelColumn>label</labelColumn>
        </pseudoconstant>
        <html>
-         <type>Select></type>
+         <type>Select</type>
        </html>
       <add>1.2</add>
   </field>
@@ -95,7 +95,7 @@
         <optionGroupName>instant_messenger_service</optionGroupName>
       </pseudoconstant>
       <html>
-        <type>Select></type>
+        <type>Select</type>
       </html>
   </field>
   <field>
@@ -107,7 +107,7 @@
          <optionGroupName>website_type</optionGroupName>
        </pseudoconstant>
        <html>
-         <type>Select></type>
+         <type>Select</type>
        </html>
   </field>
   <field>

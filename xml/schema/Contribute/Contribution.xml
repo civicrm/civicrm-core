@@ -87,7 +87,7 @@
       <labelColumn>name</labelColumn>
     </pseudoconstant>
     <html>
-      <type>Select></type>
+      <type>Select</type>
     </html>
     <add>4.3</add>
   </field>
@@ -109,7 +109,7 @@
       <labelColumn>title</labelColumn>
     </pseudoconstant>
     <html>
-      <type>Select></type>
+      <type>Select</type>
     </html>
     <add>1.5</add>
   </field>
@@ -129,7 +129,7 @@
       <optionGroupName>payment_instrument</optionGroupName>
     </pseudoconstant>
     <html>
-      <type>Select></type>
+      <type>Select</type>
     </html>
     <add>1.3</add>
   </field>
@@ -244,7 +244,7 @@
       <nameColumn>numeric_code</nameColumn>
     </pseudoconstant>
     <html>
-      <type>Select></type>
+      <type>Select</type>
     </html>
   </field>
   <field>
@@ -403,7 +403,7 @@
       <optionGroupName>contribution_status</optionGroupName>
     </pseudoconstant>
     <html>
-      <type>Select></type>
+      <type>Select</type>
     </html>
     <add>1.6</add>
   </field>
@@ -418,7 +418,7 @@
       <optionGroupName>honor_type</optionGroupName>
     </pseudoconstant>
     <html>
-      <type>Select></type>
+      <type>Select</type>
     </html>
   </field>
   <index>

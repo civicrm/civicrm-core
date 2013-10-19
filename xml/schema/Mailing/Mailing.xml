@@ -272,7 +272,7 @@
         <optionGroupName>mail_approval_status</optionGroupName>
       </pseudoconstant>
       <html>
-        <type>Select></type>
+        <type>Select</type>
       </html>
       <add>3.3</add>
   </field>

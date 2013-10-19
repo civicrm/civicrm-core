@@ -72,7 +72,7 @@
         <labelColumn>label</labelColumn>
       </pseudoconstant>
       <html>
-        <type>Select></type>
+        <type>Select</type>
       </html>
   </field>
   <foreignKey>
@@ -94,7 +94,7 @@
         <optionGroupName>participant_role</optionGroupName>
       </pseudoconstant>
       <html>
-        <type>Select></type>
+        <type>Select</type>
       </html>
       <headerPattern>/(participant.)?(role)$/i</headerPattern>
       <import>true</import>
@@ -225,7 +225,7 @@
         <nameColumn>numeric_code</nameColumn>
       </pseudoconstant>
       <html>
-        <type>Select></type>
+        <type>Select</type>
       </html>
   </field>
   <field>

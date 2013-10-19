@@ -99,7 +99,7 @@
       <optionGroupName>grant_type</optionGroupName>
     </pseudoconstant>
     <html>
-      <type>Select></type>
+      <type>Select</type>
     </html>
     <export>false</export>
     <required>true</required>
@@ -113,7 +113,7 @@
       <optionGroupName>grant_type</optionGroupName>
     </pseudoconstant>
     <html>
-      <type>Select></type>
+      <type>Select</type>
     </html>
     <add>1.8</add>
   </index>
@@ -168,7 +168,7 @@
         <nameColumn>numeric_code</nameColumn>
       </pseudoconstant>
       <html>
-        <type>Select></type>
+        <type>Select</type>
       </html>
   </field>
   <field>
@@ -206,7 +206,7 @@
       <optionGroupName>grant_status</optionGroupName>
     </pseudoconstant>
     <html>
-      <type>Select></type>
+      <type>Select</type>
     </html>
     <add>1.8</add>
   </field>

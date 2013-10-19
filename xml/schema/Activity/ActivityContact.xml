@@ -59,7 +59,7 @@
       <optionGroupName>activity_contacts</optionGroupName>
     </pseudoconstant>
     <html>
-      <type>Select></type>
+      <type>Select</type>
     </html>
     <add>4.4</add>
   </field>

@@ -55,7 +55,7 @@
         <optionGroupName>website_type</optionGroupName>
       </pseudoconstant>
       <html>
-        <type>Select></type>
+        <type>Select</type>
       </html>
   </field>
   <index>

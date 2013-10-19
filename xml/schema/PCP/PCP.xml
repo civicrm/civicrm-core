@@ -48,7 +48,7 @@
         <optionGroupName>pcp_status</optionGroupName>
       </pseudoconstant>
       <html>
-        <type>Select></type>
+        <type>Select</type>
       </html>
   </field>
   <field>
@@ -171,7 +171,7 @@
         <nameColumn>numeric_code</nameColumn>
       </pseudoconstant>
       <html>
-        <type>Select></type>
+        <type>Select</type>
       </html>
   </field>
   <field>

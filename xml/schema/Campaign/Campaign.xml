@@ -97,7 +97,7 @@
         <optionGroupName>campaign_type</optionGroupName>
       </pseudoconstant>
       <html>
-        <type>Select></type>
+        <type>Select</type>
       </html>
       <add>3.3</add>
   </field>
@@ -118,7 +118,7 @@
         <optionGroupName>campaign_status</optionGroupName>
       </pseudoconstant>
       <html>
-        <type>Select></type>
+        <type>Select</type>
       </html>
       <add>3.3</add>
   </field>
