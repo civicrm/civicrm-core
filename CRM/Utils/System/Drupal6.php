@@ -176,11 +176,11 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
     ";
 
     $result = db_query($sql);
-    $rows = db_fetch_array($result);
-    if (!$rows) {
+    $row = db_fetch_array($result);
+    if (!$row) {
       return;
     }
-    $row = $rows[0];
+ 
     $user = NULL;
 
     if (!empty($row)) {
