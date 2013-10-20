@@ -174,13 +174,10 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
       FROM {users}
       WHERE (LOWER(name) = LOWER('$name')) OR (LOWER(mail) = LOWER('$email'))
     ";
-    $result = db_query($sql);
-    $rows = array();
 
-    if (count($result) > 0) {
-     $rows[] = db_fetch_array($result);
-    }
-    if(empty($rows)) {
+    $result = db_query($sql);
+    $rows = db_fetch_array($result);
+    if (!$rows) {
       return;
     }
     $row = $rows[0];
