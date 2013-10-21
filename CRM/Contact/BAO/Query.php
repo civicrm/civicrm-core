@@ -2693,10 +2693,17 @@ class CRM_Contact_BAO_Query {
     return $this->addGroupContactCache(array_keys($value));
   }
 
+  /**
+   * @param array  $groups
+   * @param string $tableAlias
+   * @param string $joinTable
+   *
+   * @return null|string
+   */
   function addGroupContactCache($groups, $tableAlias = NULL, $joinTable = "contact_a") {
     $config = CRM_Core_Config::singleton();
 
-    // find all the groups that are part of a saved search
+    // Find all the groups that are part of a saved search.
     $groupIDs = implode(',', $groups);
     if (empty($groupIDs)) {
       return NULL;
@@ -2710,29 +2717,35 @@ WHERE  id IN ( $groupIDs )
    OR    saved_search_id IS NOT NULL
    OR    children IS NOT NULL )
 ";
-    $group = CRM_Core_DAO::executeQuery($sql);
-    $ssWhere = array();
+
+    $group          = CRM_Core_DAO::executeQuery($sql);
+    $groupsFiltered = array();
+
     while ($group->fetch()) {
-      if ($tableAlias == NULL) {
-        $alias = "`civicrm_group_contact_cache_{$group->id}`";
-      }
-      else {
-        $alias = $tableAlias;
-      }
+      $groupsFiltered[] = $group->id;
 
       $this->_useDistinct = TRUE;
 
       if (!$this->_smartGroupCache || $group->cache_date == NULL) {
         CRM_Contact_BAO_GroupContactCache::load($group);
       }
-
-      $this->_tables[$alias] = $this->_whereTables[$alias] = " LEFT JOIN civicrm_group_contact_cache {$alias} ON {$joinTable}.id = {$alias}.contact_id ";
-      $ssWhere[] = "{$alias}.group_id = {$group->id}";
     }
 
-    if (!empty($ssWhere)) {
-      return implode(' OR ', $ssWhere);
+    if (count($groupsFiltered)) {
+      $groupIDsFiltered = implode(',', $groupsFiltered);
+
+      if ($tableAlias == NULL) {
+        $alias = "`civicrm_group_contact_cache_{$groupIDsFiltered}`";
+      }
+      else {
+        $alias = $tableAlias;
+      }
+
+      $this->_tables[$alias] = $this->_whereTables[$alias] = " LEFT JOIN civicrm_group_contact_cache `{$alias}` ON {$joinTable}.id = `{$alias}`.contact_id ";
+
+      return "`{$alias}`.group_id IN (" . $groupIDsFiltered . ")";
     }
+
     return NULL;
   }
 
