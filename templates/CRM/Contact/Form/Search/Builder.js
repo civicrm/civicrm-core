@@ -74,10 +74,10 @@
    */
   function fetchOptions(row, field) {
     if (CRM.searchBuilder.fieldOptions[field] === 'yesno') {
-      CRM.searchBuilder.fieldOptions[field] = {1: ts('Yes'), 0: ts('No')};
+      CRM.searchBuilder.fieldOptions[field] = [{key: 1, value: ts('Yes')}, {key: 0, value: ts('No')}];
     }
     if (typeof(CRM.searchBuilder.fieldOptions[field]) == 'string') {
-      CRM.api(CRM.searchBuilder.fieldOptions[field], 'getoptions', {field: field}, {
+      CRM.api(CRM.searchBuilder.fieldOptions[field], 'getoptions', {field: field, sequential: 1}, {
         success: function(result, settings) {
           var field = settings.field;
           if (result.count) {
@@ -121,9 +121,9 @@
         options = [options[0]];
       }
     }
-    $.each(CRM.searchBuilder.fieldOptions[field], function(value, label) {
-      var selected = ($.inArray(value, options) > -1) ? 'selected="selected"' : '';
-      select.append('<option value="' + value + '"' + selected + '>' + label + '</option>');
+    $.each(CRM.searchBuilder.fieldOptions[field], function(key, option) {
+      var selected = ($.inArray(option.key, options) > -1) ? 'selected="selected"' : '';
+      select.append('<option value="' + option.key + '"' + selected + '>' + option.value + '</option>');
     });
     select.change();
   }
