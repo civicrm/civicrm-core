@@ -419,6 +419,9 @@ function civicrm_contact_get(&$params, $deprecated_behavior = FALSE) {
 
   require_once 'CRM/Contact/BAO/Query.php';
   $newParams = CRM_Contact_BAO_Query::convertFormValues($inputParams);
+  $sort = CRM_Utils_Type::escape($sort, 'String');
+  $offset = CRM_Utils_Type::escape($offset, 'Int');
+  $rowCount = CRM_Utils_Type::escape($rowCount, 'Int');
   list($contacts, $options) = CRM_Contact_BAO_Query::apiQuery($newParams,
     $returnProperties,
     NULL,
@@ -547,6 +550,9 @@ function &civicrm_contact_search(&$params) {
 
   require_once 'CRM/Contact/BAO/Query.php';
   $newParams = CRM_Contact_BAO_Query::convertFormValues($inputParams);
+  $sort = CRM_Utils_Type::escape($sort, 'String');
+  $offset = CRM_Utils_Type::escape($offset, 'Int');
+  $rowCount = CRM_Utils_Type::escape($rowCount, 'Int');
   list($contacts, $options) = CRM_Contact_BAO_Query::apiQuery($newParams,
     $returnProperties,
     NULL,

@@ -656,11 +656,15 @@ function _civicrm_api3_get_options_from_params(&$params, $queryObject = FALSE, $
 
 
   $options = array(
-    'offset' => CRM_Utils_Rule::integer($offset),
-    'sort' => CRM_Utils_Rule::string($sort),
-    'limit' => CRM_Utils_Rule::integer($limit),
+    'offset' => CRM_Utils_Rule::integer($offset) ? $offset : NULL,
+    'sort' => CRM_Utils_Rule::string($sort) ? $sort : NULL,
+    'limit' => CRM_Utils_Rule::integer($limit) ? $limit : NULL,
     'return' => !empty($returnProperties) ? $returnProperties : NULL,
   );
+
+  if($options['sort'] && stristr($options['sort'], 'SELECT')) {
+    throw new API_Exception('invalid string in sort options');
+  }
   if (!$queryObject) {
     return $options;
   }
@@ -680,7 +684,10 @@ function _civicrm_api3_get_options_from_params(&$params, $queryObject = FALSE, $
     }
     elseif (in_array($n, $otherVars)) {}
     else{
-      $inputParams[$n] = CRM_Utils_Rule::string($v);
+      $inputParams[$n] = $v;
+      if($v && !is_array($v) && stristr($v, 'SELECT')) {
+        throw new API_Exception('invalid string');
+      }
     }
   }
   $options['return'] = array_merge($returnProperties, $legacyreturnProperties);
