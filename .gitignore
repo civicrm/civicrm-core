@@ -121,6 +121,7 @@ packages/cache
 packages/doc
 packages/temp
 packages/test
+selenium.log
 settings_location.php
 sql/civicrm.mysql
 sql/civicrm_acl.??_??.mysql
@@ -133,6 +134,7 @@ sql/civicrm_sample.mysql
 templates/CRM/common/version.tpl
 tests/phpunit/CiviTest/CiviSeleniumSettings.php
 tests/phpunit/CiviTest/civicrm.settings.php
+tmpfs/
 tools/stats/config.php
 authors.txt
 CRM/Batch/DAO/
