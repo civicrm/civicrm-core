@@ -77,7 +77,7 @@ class CRM_Upgrade_Incremental_php_FourThree {
     if ($rev == '4.3.6') {
       $constraintArray = array(
         'civicrm_contact' => 'contact_id',
-        'civicrm_campaign' => 'campaign_id',
+        'civicrm_payment_processor' => 'payment_processor_id', 
       );
       
       if (version_compare('4.1alpha1', $currentVer) <= 0) { 
