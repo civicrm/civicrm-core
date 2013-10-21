@@ -106,6 +106,16 @@ class CRM_Activity_Task {
           'class' => 'CRM_Activity_Form_Task_SMS',
           'result' => FALSE,
         ),
+        7 => array(
+          'title' => ts('Tag Activities (assign tags)'),
+          'class' => 'CRM_Activity_Form_Task_AddToTag',
+          'result' => FALSE,
+        ),
+        8 => array(
+          'title' => ts('Untag Activities (remove tags)'),
+          'class' => 'CRM_Activity_Form_Task_RemoveFromTag',
+          'result' => FALSE,
+        ),
       );
 
       $config = CRM_Core_Config::singleton();
