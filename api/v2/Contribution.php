@@ -211,6 +211,9 @@ function &civicrm_contribution_search(&$params) {
   }
 
   $newParams = CRM_Contact_BAO_Query::convertFormValues($inputParams);
+  $sort = CRM_Utils_Type::escape($sort, 'String');
+  $offset = CRM_Utils_Type::escape($offset, 'Int');
+  $rowCount = CRM_Utils_Type::escape($rowCount, 'Int');
 
   $query = new CRM_Contact_BAO_Query($newParams, $returnProperties, NULL);
   list($select, $from, $where, $having) = $query->query();

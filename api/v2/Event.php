@@ -198,8 +198,8 @@ function civicrm_event_search(&$params) {
     $eventDAO->whereAdd('(start_date >= CURDATE() || end_date >= CURDATE())');
   }
 
-  $eventDAO->orderBy($sort);
-  $eventDAO->limit((int)$offset, (int)$rowCount);
+  $eventDAO->orderBy(CRM_Utils_Type::escape($sort, 'String'));
+  $eventDAO->limit(CRM_Utils_Type::escape($offset, 'Int'), CRM_Utils_Type::escape($rowCount, 'Int'));
   $eventDAO->find();
   while ($eventDAO->fetch()) {
     $event[$eventDAO->id] = array();
