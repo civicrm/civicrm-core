@@ -343,7 +343,7 @@ ADD COLUMN   premiums_nothankyou_label varchar(255) COLLATE utf8_unicode_ci DEFA
 
   function upgrade_4_3_6($rev) {
     //CRM-13094
-    $this->addTask(ts('Add mising contraints'), 'addMissingConstraints', $rev);
+    $this->addTask(ts('Add missing contraints'), 'addMissingConstraints', $rev);
     //CRM-13088
     $this->addTask(ts('Add ON DELETE Options for constraints'), 'task_4_3_x_checkConstraints', $rev);
     $this->addTask(ts('Upgrade DB to 4.3.6: SQL'), 'task_4_3_x_runSql', $rev);
