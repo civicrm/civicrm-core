@@ -165,15 +165,22 @@ class CRM_Event_Form_ManageEvent_TabHeader {
 
       // retrieve info about paid event, tell a friend and online reg
       $sql = "
-SELECT     e.is_online_registration, e.is_monetary, taf.is_active
+SELECT     e.loc_block_id as is_location, e.is_online_registration, e.is_monetary, taf.is_active, pcp.id as is_pcp, sch.id as is_reminder
 FROM       civicrm_event e
 LEFT JOIN  civicrm_tell_friend taf ON ( taf.entity_table = 'civicrm_event' AND taf.entity_id = e.id )
+LEFT JOIN  civicrm_pcp_block pcp   ON ( pcp.entity_table = 'civicrm_event' AND pcp.entity_id = e.id )
+LEFT JOIN  civicrm_action_mapping  map ON ( map.entity_value = 'civicrm_event' )
+LEFT JOIN  civicrm_action_schedule sch ON ( sch.mapping_id = map.id AND sch.entity_value = %1 )
 WHERE      e.id = %1
 ";
       $params = array(1 => array($eventID, 'Integer'));
       $dao = CRM_Core_DAO::executeQuery($sql, $params);
       if (!$dao->fetch()) {
         CRM_Core_Error::fatal();
+      }
+
+      if (!$dao->is_location) {
+        $tabs['location']['valid'] = FALSE;
       }
 
       if (!$dao->is_online_registration) {
@@ -188,6 +195,13 @@ WHERE      e.id = %1
         $tabs['friend']['valid'] = FALSE;
       }
 
+      if (!$dao->is_pcp) {
+        $tabs['pcp']['valid'] = FALSE;
+      }
+
+      if (!$dao->is_reminder) {
+        $tabs['reminder']['valid'] = FALSE;
+      }
       //calculate if the reminder has been configured for this event
     }
 
