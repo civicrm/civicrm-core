@@ -656,9 +656,9 @@ function _civicrm_api3_get_options_from_params(&$params, $queryObject = FALSE, $
 
 
   $options = array(
-    'offset' => $offset,
-    'sort' => $sort,
-    'limit' => $limit,
+    'offset' => CRM_Utils_Rule::integer($offset),
+    'sort' => CRM_Utils_Rule::string($sort),
+    'limit' => CRM_Utils_Rule::integer($limit),
     'return' => !empty($returnProperties) ? $returnProperties : NULL,
   );
   if (!$queryObject) {
@@ -680,7 +680,7 @@ function _civicrm_api3_get_options_from_params(&$params, $queryObject = FALSE, $
     }
     elseif (in_array($n, $otherVars)) {}
     else{
-      $inputParams[$n] = $v;
+      $inputParams[$n] = CRM_Utils_Rule::string($v);
     }
   }
   $options['return'] = array_merge($returnProperties, $legacyreturnProperties);
