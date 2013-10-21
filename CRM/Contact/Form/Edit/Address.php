@@ -274,6 +274,14 @@ class CRM_Contact_Form_Edit_Address {
       // And we can't set it to 'address_' because we want to set it in a slightly different format.
       CRM_Core_BAO_CustomGroup::buildQuickForm($form, $groupTree, FALSE, 'dnc_');
 
+      // detach required rule for custom data.
+      // during contact editing : if no address is filled
+      // required custom data must not produce 'required' form rule error
+      // more handling done in formRule func
+      if (!$inlineEdit) {
+        CRM_Core_BAO_Address::detachRequiredRule(&$form, $groupTree);
+      }
+
       $template     = CRM_Core_Smarty::singleton();
       $tplGroupTree = $template->get_template_vars('address_groupTree');
       $tplGroupTree = empty($tplGroupTree) ? array(
@@ -312,13 +320,31 @@ class CRM_Contact_Form_Edit_Address {
    * @access public
    * @static
    */
-  static function formRule($fields) {
+  static function formRule($fields, $files, $self) {
     $errors = array();
+
+    $customDataRequiredFields = array();
+    if (property_exists($self, '_addressRequireOmission')) {
+      $customDataRequiredFields = explode(',', $self->_addressRequireOmission);
+    }
+
     // check for state/county match if not report error to user.
     if (CRM_Utils_Array::value('address', $fields) && is_array($fields['address'])) {
       foreach ($fields['address'] as $instance => $addressValues) {
         if (CRM_Utils_System::isNull($addressValues)) {
           continue;
+        }
+
+        // attach 'required' form rule error to
+        // custom data only if address data exists i.e. user intended to fill address
+        // but forgot to fill in required fields
+        if (!empty($customDataRequiredFields) && CRM_Core_BAO_Address::dataExists($addressValues)) {
+          foreach($customDataRequiredFields as $elementName) {
+            if (!CRM_Utils_Array::value($elementName, $addressValues)) {
+              $label = $self->getElement("address[$instance][$elementName]")->getLabel();
+              $errors["address[$instance][$elementName]"] = ts('%1 is required field', array(1 => $label));
+            }
+          }
         }
 
         $countryId = CRM_Utils_Array::value('country_id', $addressValues);
