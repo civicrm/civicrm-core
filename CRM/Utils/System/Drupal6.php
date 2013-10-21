@@ -740,7 +740,7 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
     if (!$loadUser) {
       return TRUE;
     }
-
+    global $user;
     // If $uid is passed in, authentication has been done already.
     $uid = CRM_Utils_Array::value('uid', $params);
     if (!$uid) {
@@ -749,13 +749,16 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
       $pass = CRM_Utils_Array::value('pass', $params, FALSE) ? $params['pass'] : trim(CRM_Utils_Array::value('pass', $_REQUEST));
 
       if ($name) {
-        $uid = user_authenticate(array('name' => $name, 'pass' => $pass));
-        if (!$uid) {
+        $user = user_authenticate(array('name' => $name, 'pass' => $pass));
+        if (!$user->uid) {
           if ($throwError) {
             echo '<br />Sorry, unrecognized username or password.';
             exit();
           }
           return FALSE;
+        }
+        else {
+          return TRUE;
         }
       }
     }
@@ -763,7 +766,6 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
     if ($uid) {
       $account = user_load($uid);
       if ($account && $account->uid) {
-        global $user;
         $user = $account;
         return TRUE;
       }

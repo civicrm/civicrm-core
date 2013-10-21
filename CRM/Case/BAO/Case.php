@@ -1073,7 +1073,9 @@ SELECT case_status.label AS case_status, status_id, case_type.label AS case_type
       $orderBy = " ORDER BY overdue_date ASC, display_date DESC, weight DESC";
     }
     else {
-      $orderBy = " ORDER BY {$sortname} {$sortorder}";
+      $sort = "{$sortname} {$sortorder}";
+      $sort = CRM_Utils_Type::escape($sort, 'String');
+      $orderBy = " ORDER BY $sort ";
       if ($sortname != 'display_date') {
         $orderBy .= ', display_date DESC';
       }
