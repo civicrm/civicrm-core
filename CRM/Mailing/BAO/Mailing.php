@@ -467,6 +467,9 @@ AND    $mg.mailing_id = {$mailing_id}
     $aclWhere = $aclWhere ? "WHERE {$aclWhere}" : '';
     $limitString = NULL;
     if ($limit && $offset !== NULL) {
+      $offset = CRM_Utils_Type::escape($offset, 'Int');
+      $limit = CRM_Utils_Type::escape($limit, 'Int');
+
       $limitString = "LIMIT $offset, $limit";
     }
 
@@ -2233,6 +2236,9 @@ LEFT JOIN civicrm_mailing_group g ON g.mailing_id   = m.id
     }
 
     if ($rowCount) {
+      $offset = CRM_Utils_Type::escape($offset, 'Int');
+      $rowCount = CRM_Utils_Type::escape($rowCount, 'Int');
+
       $query .= " LIMIT $offset, $rowCount ";
     }
 

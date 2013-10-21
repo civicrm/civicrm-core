@@ -738,8 +738,8 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
     }
 
     $orderBy = ' ORDER BY groups.title asc';
-    if (CRM_Utils_Array::value('sort', $params)) {
-      $orderBy = ' ORDER BY ' . CRM_Utils_Array::value('sort', $params);
+    if (!empty($params['sort'])) {
+      $orderBy = ' ORDER BY ' . CRM_Utils_Type::escape($params['sort'], 'String');
     }
 
     $select = $from = $where = "";
