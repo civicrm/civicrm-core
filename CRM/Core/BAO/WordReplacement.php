@@ -40,10 +40,10 @@ class CRM_Core_BAO_WordReplacement extends CRM_Core_DAO_WordReplacement {
 
   function __construct() {
     parent::__construct();
-  }  
+  }
   /**
    * Takes a bunch of params that are needed to match certain criteria and
-   * retrieves the relevant objects. 
+   * retrieves the relevant objects.
    *
    * @param array $params   (reference ) an assoc array of name/value pairs
    * @param array $defaults (reference ) an assoc array to hold the flattened values
@@ -52,7 +52,7 @@ class CRM_Core_BAO_WordReplacement extends CRM_Core_DAO_WordReplacement {
    * @access public
    * @static
    */
-    
+
   static function retrieve(&$params, &$defaults) {
     return CRM_Core_DAO::commonRetrieve('CRM_Core_DAO_WordRepalcement', $params, $defaults);
   }
@@ -102,8 +102,8 @@ class CRM_Core_BAO_WordReplacement extends CRM_Core_DAO_WordReplacement {
    */
   static function create($params) {
     if(array_key_exists("domain_id",$params) === FALSE) {
-      $params["domain_id"] = CRM_Core_Config::domainID();  
-    }  
+      $params["domain_id"] = CRM_Core_Config::domainID();
+    }
     $wordReplacement = new CRM_Core_DAO_WordReplacement();
     $wordReplacement->copyValues($params);
     $wordReplacement->save();
@@ -112,7 +112,7 @@ class CRM_Core_BAO_WordReplacement extends CRM_Core_DAO_WordReplacement {
     }
     return $wordReplacement;
   }
-  
+
   /**
    * Delete website
    *
@@ -139,9 +139,17 @@ class CRM_Core_BAO_WordReplacement extends CRM_Core_DAO_WordReplacement {
    * @see civicrm_domain.locale_custom_strings
    */
   public static function getAllAsConfigArray($id) {
-    $query = "SELECT find_word,replace_word,is_active,match_type FROM civicrm_word_replacement WHERE domain_id = ".CRM_Utils_Type::escape($id, 'Integer');
-    $dao = CRM_Core_DAO::executeQuery($query);
-    
+    $query = "
+SELECT find_word,replace_word,is_active,match_type
+FROM   civicrm_word_replacement
+WHERE  domain_id = %1
+";
+    $params = array( 1 => array($id, 'Integer'));
+
+    $dao = CRM_Core_DAO::executeQuery($query, $params);
+
+    $overrides = array();
+
     while ($dao->fetch()) {
       if ($dao->is_active==1) {
       	$overrides['enabled'][$dao->match_type][$dao->find_word] = $dao->replace_word;
