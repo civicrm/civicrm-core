@@ -226,6 +226,7 @@ class CRM_Core_Form_Tag {
     }
 
     if (!empty($tagset)) {
+      $form->assign("tagsetType", $mode);
       $form->assign("tagsetInfo_$mode", $tagset);
       $form->assign("isTagset", TRUE);
     }
