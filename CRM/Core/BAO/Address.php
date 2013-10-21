@@ -1198,4 +1198,33 @@ SELECT is_primary,
     }
     return CRM_Core_PseudoConstant::get(__CLASS__, $fieldName, $params, $context);
   }
+
+  /**
+   * CRM-13490 : helper function to detach required rule for address custom data
+   */
+  static function detachRequiredRule(&$form, $groupTree) {
+    if (CRM_Utils_System::getClassName($form) == 'CRM_Contact_Form_Contact') {
+      $requireOmission = NULL;
+      foreach ($groupTree as $csId => $csVal) {
+        // only process Address entity fields
+        if ($csVal['extends'] != 'Address') {
+          continue;
+        }
+
+        foreach ($csVal['fields'] as $cdId => $cdVal) {
+          if ($cdVal['is_required']) {
+            // unset-ing of required rule done here, also store the element name whose required rule is been removed
+            $elementName = $cdVal['element_name'];
+            if (in_array($elementName, $form->_required)) {
+              $form->_required = array_diff($form->_required, array($elementName));
+              // store the omitted rule for a element, to be used later on
+              $requireOmission = $cdVal['element_custom_name'] . ',';
+            }
+          }
+        }
+      }
+
+      $form->_addressRequireOmission = rtrim($requireOmission, ',');
+    }
+  }
 }
