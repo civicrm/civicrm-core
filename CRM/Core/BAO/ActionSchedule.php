@@ -898,10 +898,44 @@ WHERE reminder.action_schedule_id = %1 AND reminder.action_date_time IS NULL
         $where[] = "e.status_id IN ({$mStatus})";
       }
 
+      // CRM-13577 Introduce Smart Groups Handling
+      if ($actionSchedule->group_id) {
+
+        // Need to check if its a smart group or not
+        // Then decide which table to join onto the query
+        $group			= CRM_Contact_DAO_Group::getTableName();
+
+        // Get the group information
+        $sql = "
+SELECT     $group.id, $group.cache_date, $group.saved_search_id, $group.children
+FROM       $group
+WHERE      $group.id = {$actionSchedule->group_id}
+";
+
+        $groupDAO = CRM_Core_DAO::executeQuery($sql);
+        $isSmartGroup = FALSE;
+        if (
+          $groupDAO->fetch() &&
+          !empty($groupDAO->saved_search_id)
+        ) {
+          // Check that the group is in place in the cache and up to date
+          CRM_Contact_BAO_GroupContactCache::check($actionSchedule->group_id);
+          // Set smart group flag
+          $isSmartGroup = TRUE;
+        }
+      }
+      // CRM-13577 End Introduce Smart Groups Handling
+
       if ($limitTo) {
         if ($actionSchedule->group_id) {
-          $join[] = "INNER JOIN civicrm_group_contact grp ON {$contactField} = grp.contact_id AND grp.status = 'Added'";
-          $where[] = "grp.group_id IN ({$actionSchedule->group_id})";
+          // CRM-13577 If smart group then use Cache table
+          if ($isSmartGroup) {
+            $join[] = "INNER JOIN civicrm_group_contact_cache grp ON {$contactField} = grp.contact_id";
+            $where[] = "grp.group_id IN ({$actionSchedule->group_id})";
+          } else {
+            $join[] = "INNER JOIN civicrm_group_contact grp ON {$contactField} = grp.contact_id AND grp.status = 'Added'";
+            $where[] = "grp.group_id IN ({$actionSchedule->group_id})";
+          }
         }
         elseif (!empty($actionSchedule->recipient_manual)) {
           $rList = CRM_Utils_Type::escape($actionSchedule->recipient_manual, 'String');
@@ -911,8 +945,14 @@ WHERE reminder.action_schedule_id = %1 AND reminder.action_date_time IS NULL
       else {
         $addGroup = $addWhere = '';
         if ($actionSchedule->group_id) {
-          $addGroup = " INNER JOIN civicrm_group_contact grp ON c.id = grp.contact_id AND grp.status = 'Added'";
-          $addWhere = " grp.group_id IN ({$actionSchedule->group_id})";
+          // CRM-13577 If smart group then use Cache table
+          if ($isSmartGroup) {
+            $addGroup = " INNER JOIN civicrm_group_contact_cache grp ON c.id = grp.contact_id";
+            $addWhere = " grp.group_id IN ({$actionSchedule->group_id})";
+          } else {
+            $addGroup = " INNER JOIN civicrm_group_contact grp ON c.id = grp.contact_id AND grp.status = 'Added'";
+            $addWhere = " grp.group_id IN ({$actionSchedule->group_id})";
+          }
         }
         if (!empty($actionSchedule->recipient_manual)) {
           $rList = CRM_Utils_Type::escape($actionSchedule->recipient_manual, 'String');
