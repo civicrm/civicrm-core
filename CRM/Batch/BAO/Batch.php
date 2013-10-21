@@ -471,7 +471,7 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
    * function to get batch list
    *
    * @return array array of all batches
-   * excluding batches with data entry in progress (status_id = 3)
+   * excluding batches with data entry in progress
    */
   static function getBatches() {
     $dataEntryStatusId = CRM_Core_OptionGroup::getValue('batch_status','Data Entry');
