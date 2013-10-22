@@ -2212,6 +2212,13 @@ WHERE  contribution_id = %1 ";
     }
     // todo remove strtolower - check consistency
     if (strtolower($this->_component) == 'event') {
+      // workaround for missing $totalAmount in Email:
+      $values['totalAmount'] =  0.0;
+      foreach ($values['lineItem'] as $lineItems) {
+        foreach ($lineItems as $lineItem) {
+          $values['totalAmount'] += $lineItem['line_total'];
+        }
+      }
       return CRM_Event_BAO_Event::sendMail($ids['contact'], $values,
         $this->_relatedObjects['participant']->id, $this->is_test, $returnMessageText
       );
