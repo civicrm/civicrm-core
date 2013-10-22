@@ -591,7 +591,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
     }
 
     if (array_key_exists('Address', $this->_editOptions)) {
-      $this->addFormRule(array('CRM_Contact_Form_Edit_Address', 'formRule'));
+      $this->addFormRule(array('CRM_Contact_Form_Edit_Address', 'formRule'), $this);
     }
 
     if (array_key_exists('CommunicationPreferences', $this->_editOptions)) {
