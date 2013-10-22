@@ -42,6 +42,7 @@ class CRM_Report_Form_Member_ContributionDetail extends CRM_Report_Form {
   protected $_nameFieldHonor = FALSE;
 
   protected $_summary = NULL;
+  protected $_allBatches = NULL;
 
   protected $_customGroupExtends = array(
     'Contribution', 'Membership');
@@ -420,8 +421,8 @@ class CRM_Report_Form_Member_ContributionDetail extends CRM_Report_Form {
     $this->_tagFilter = TRUE;
 
     // Don't show Batch display column and filter unless batches are being used
-    $this->_closedBatches = CRM_Batch_BAO_Batch::getBatches();
-    if (!empty($this->_closedBatches)) {
+    $this->_allBatches = CRM_Batch_BAO_Batch::getBatches();
+    if (!empty($this->_allBatches)) {
       $this->_columns['civicrm_batch']['dao'] = 'CRM_Batch_DAO_Batch';
       $this->_columns['civicrm_batch']['fields']['batch_id'] = array(
         'name' => 'id',
@@ -432,7 +433,7 @@ class CRM_Report_Form_Member_ContributionDetail extends CRM_Report_Form {
         'title' => ts('Batch Name'),
         'type' => CRM_Utils_Type::T_INT,
         'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-        'options' => $this->_closedBatches,
+        'options' => $this->_allBatches,
       );
       $this->_columns['civicrm_entity_batch']['dao'] = 'CRM_Batch_DAO_EntityBatch';
       $this->_columns['civicrm_entity_batch']['fields']['entity_batch_id'] = array(
@@ -575,12 +576,14 @@ class CRM_Report_Form_Member_ContributionDetail extends CRM_Report_Form {
                          {$this->_aliases['civicrm_phone']}.is_primary = 1)";
     }
     //for contribution batches
-    if ($this->_closedBatches &&
+    if ($this->_allBatches &&
       (CRM_Utils_Array::value('batch_id', $this->_params['fields']) || !empty($this->_params['bid_value']))) {
       $this->_from .= "
+                LEFT JOIN civicrm_entity_financial_trxn tx ON (tx.entity_id = {$this->_aliases['civicrm_contribution']}.id AND
+                   tx.entity_table = 'civicrm_contribution')
                  LEFT JOIN  civicrm_entity_batch {$this->_aliases['civicrm_entity_batch']}
-                        ON ({$this->_aliases['civicrm_entity_batch']}.entity_id = {$this->_aliases['civicrm_contribution']}.id AND
-                        {$this->_aliases['civicrm_entity_batch']}.entity_table = 'civicrm_contribution')
+                        ON ({$this->_aliases['civicrm_entity_batch']}.entity_id = tx.financial_trxn_id AND
+                        {$this->_aliases['civicrm_entity_batch']}.entity_table = 'civicrm_financial_trxn')
                  LEFT JOIN civicrm_batch {$this->_aliases['civicrm_batch']}
                         ON {$this->_aliases['civicrm_batch']}.id = {$this->_aliases['civicrm_entity_batch']}.batch_id";
     }

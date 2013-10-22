@@ -90,6 +90,24 @@ SELECT  id
         $preUpgradeMessage .= '<br />' . ts('To continue using Google Checkout Payment Processor with latest version of CiviCRM, requires updating merchant account settings. Please refer "Set API callback URL and other settings" section of <a href="%1" target="_blank"><strong>Google Checkout Configuration</strong></a> doc.', array(1 => 'http://wiki.civicrm.org/confluence/x/zAJTAg'));
       }
     }
+
+    // http://issues.civicrm.org/jira/browse/CRM-13572
+    // Depending on how the code was upgraded, some sites may still have copies of old
+    // source files left behind. This is often a forgivable offense, but it's quite
+    // dangerous for CIVI-SA-2013-001.
+    global $civicrm_root;
+    $ofcFile = "$civicrm_root/packages/OpenFlashChart/php-ofc-library/ofc_upload_image.php";
+    if (file_exists($ofcFile)) {
+      if (@unlink($ofcFile)) {
+        $preUpgradeMessage .= '<br />' . ts('This system included an outdated, insecure script (%1). The file was automatically deleted.', array(
+          1 => $ofcFile
+        ));
+      } else {
+        $preUpgradeMessage .= '<br />' . ts('This system includes an outdated, insecure script (%1). Please delete it.', array(
+          1 => $ofcFile
+        ));
+      }
+    }
   }
 
   static function checkMessageTemplate(&$template, &$message, $latestVer, $currentVer) {

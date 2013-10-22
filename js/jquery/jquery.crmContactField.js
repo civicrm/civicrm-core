@@ -25,11 +25,17 @@
    */
   $.fn.crmContactField = function() {
     return this.each(function(){
-      var contactUrl = CRM.url('civicrm/ajax/rest', 'className=CRM_Contact_Page_AJAX&fnName=getContactList&json=1');
+      var urlParams = 'className=CRM_Contact_Page_AJAX&fnName=getContactList&json=1';
       var hiddenEl = this;
       var widgetEl = $('<input type="text" />');
 
       var activeContactId = null;
+      // For organization autocomplete
+      if($(this).attr('urlParam')) {
+        var param = $(this).attr('urlParam');
+        var urlParams = urlParams + '&' + param;
+      }
+      var contactUrl = CRM.url('civicrm/ajax/rest', urlParams);
       var setContactId = function(newContactId) {
         if (newContactId != $(hiddenEl).val()) {
           $(hiddenEl).val(newContactId);
