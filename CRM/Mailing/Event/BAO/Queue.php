@@ -190,6 +190,7 @@ class CRM_Mailing_Event_BAO_Queue extends CRM_Mailing_Event_DAO_Queue {
     $orderBy = "sort_name ASC, {$job}.start_date DESC";
     if ($sort) {
       if (is_string($sort)) {
+        $sort = CRM_Utils_Type::escape($sort, 'String');
         $orderBy = $sort;
       }
       else {

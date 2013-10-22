@@ -128,6 +128,11 @@ class CRM_Core_BAO_FinancialTrxn extends CRM_Financial_DAO_FinancialTrxn {
     if (!$newTrxn) {
       $condition = " AND ((ceft1.entity_table IS NOT NULL) OR (cft.payment_instrument_id IS NOT NULL AND ceft1.entity_table IS NULL)) ";
     }
+
+    if ($orderBy) {
+      $orderBy = CRM_Utils_Type::escape($orderBy, 'String');
+    }
+
     $query = "SELECT ceft.id, ceft.financial_trxn_id FROM `civicrm_financial_trxn` cft
 LEFT JOIN civicrm_entity_financial_trxn ceft
 ON ceft.financial_trxn_id = cft.id AND ceft.entity_table = 'civicrm_contribution'

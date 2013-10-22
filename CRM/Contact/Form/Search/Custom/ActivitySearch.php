@@ -201,6 +201,7 @@ class CRM_Contact_Form_Search_Custom_ActivitySearch implements CRM_Contact_Form_
       // Define ORDER BY for query in $sort, with default value
       if (!empty($sort)) {
         if (is_string($sort)) {
+          $sort = CRM_Utils_Type::escape($sort, 'String');
           $sql .= " ORDER BY $sort ";
         }
         else {
@@ -213,6 +214,8 @@ class CRM_Contact_Form_Search_Custom_ActivitySearch implements CRM_Contact_Form_
     }
 
     if ($rowcount > 0 && $offset >= 0) {
+      $offset = CRM_Utils_Type::escape($offset, 'Int');
+      $rowcount = CRM_Utils_Type::escape($rowcount, 'Int');
       $sql .= " LIMIT $offset, $rowcount ";
     }
     return $sql;
