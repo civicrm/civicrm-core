@@ -37,9 +37,9 @@ function relationship_get_expectedresult(){
   'values' => array(
       '2' => array(
           'id' => '2',
-          'contact_id_a' => '60',
-          'contact_id_b' => '61',
-          'relationship_type_id' => '30',
+          'contact_id_a' => '83',
+          'contact_id_b' => '85',
+          'relationship_type_id' => '31',
           'start_date' => '2013-07-29 00:00:00',
           'is_active' => '1',
           'description' => '',

@@ -288,7 +288,22 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
     $params['id'] = $result['id'];
     $this->callAPISuccess('relationship', 'delete', $params);
   }
-
+  /**
+   * ensure disabling works
+   */
+  function testRelationshipUpdate() {
+    $result = $this->callAPISuccess('relationship', 'create', $this->_params);
+    $relID = $result['id'];
+    $result = $this->callAPISuccess('relationship', 'create', array('id' => $relID, 'description' => 'blah'));
+    $this->assertEquals($relID, $result['id']);
+    $this->assertEquals('blah', $result['values'][$result['id']]['description']);
+    $result = $this->callAPISuccess('relationship', 'create', array('id' => $relID, 'is_permission_b_a' => 1));
+    $this->assertEquals(1, $result['values'][$result['id']]['is_permission_b_a']);
+    $result = $this->callAPISuccess('relationship', 'create', array('id' => $result['id'], 'is_active' => 0));
+    $this->assertEquals(0, $result['values'][$result['id']]['is_active']);
+    $this->assertEquals('blah', $result['values'][$result['id']]['description']);
+    $this->assertEquals(1, $result['values'][$result['id']]['is_permission_b_a']);
+  }
   /**
    * check relationship creation
    */
