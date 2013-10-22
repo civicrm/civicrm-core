@@ -802,7 +802,7 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
    */
   public function invalidKeyRedirect() {
     if ($this->_entryURL) {
-      CRM_Core_Session::setStatus(ts('We need a simple clear error message here'));
+      CRM_Core_Session::setStatus(ts('We have lost your user session and are unable to complete your form submission. We have returned you to the initial step in the form which you can complete and resubmit. If you experience continued difficulties, please contact us for assistance.'));
       return CRM_Utils_System::redirect($this->_entryURL);
     }
     else {
