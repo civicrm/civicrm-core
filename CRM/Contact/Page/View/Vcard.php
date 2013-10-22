@@ -70,6 +70,10 @@ class CRM_Contact_Page_View_Vcard extends CRM_Contact_Page_View {
         CRM_Utils_Array::value('prefix', $defaults),
         CRM_Utils_Array::value('suffix', $defaults)
       );
+      $organizationName = CRM_Utils_Array::value('organization_name', $defaults);
+      if ($organizationName !== NULL) {
+        $vcard->addOrganization($organizationName);
+      }
     }
     elseif ($defaults['contact_type'] == 'Organization') {
       $vcard->setName($defaults['organization_name'], '', '', '', '');

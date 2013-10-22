@@ -528,6 +528,7 @@ WHERE  email = %2
     $orderBy = "sort_name ASC, {$unsub}.time_stamp DESC";
     if ($sort) {
       if (is_string($sort)) {
+        $sort = CRM_Utils_Type::escape($sort, 'String');
         $orderBy = $sort;
       }
       else {

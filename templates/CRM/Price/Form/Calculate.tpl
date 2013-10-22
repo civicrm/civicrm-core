@@ -221,7 +221,7 @@ function calculateText( object ) {
 function display( totalfee ) {
     num_participants = cj('#additional_participants').val()
 
-    if(!num_participants) {
+    if (!num_participants) {
       num_participants = 0
     }
     // The value of this field is the number of *additional* participants
@@ -230,7 +230,11 @@ function display( totalfee ) {
     // to add one to the value of #additional_participants.
     num_participants++;
 
-    var totalEventFee  = formatMoney( totalfee * num_participants, 2, seperator, thousandMarker);
+    // totalfee is monetary, round it to 2 decimal points so it can
+    // go as a float - CRM-13491
+    totalfee = totalfee * num_participants;
+    totalfee = Math.round(totalfee*100)/100;
+    var totalEventFee  = formatMoney( totalfee, 2, seperator, thousandMarker);
     document.getElementById('pricevalue').innerHTML = "<b>"+symbol+"</b> "+totalEventFee;
     scriptfee   = totalfee;
     scriptarray = price;
