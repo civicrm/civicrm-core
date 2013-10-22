@@ -544,15 +544,17 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     }
 
     if (!($allAreBillingModeProcessors && !$this->_values['is_pay_later'])) {
-      $this->addButtons(array(
-          array(
-            'type' => 'upload',
-            'name' => ts('Contribute'),
-            'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
-            'isDefault' => TRUE,
-          ),
-        )
+      $submitButton = array(
+        'type' => 'upload',
+        'name' => ts('Contribute'),
+        'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
+        'isDefault' => TRUE,
       );
+      // Add submit-once behavior when confirm page disabled
+      if (empty($this->_values['is_confirm_enabled'])) {
+        $submitButton['js'] = array('onclick' => "return submitOnce(this,'" . $this->_name . "','" . ts('Processing') . "');");
+      }
+      $this->addButtons(array($submitButton));
     }
 
     $this->addFormRule(array('CRM_Contribute_Form_Contribution_Main', 'formRule'), $this);
