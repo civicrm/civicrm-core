@@ -119,7 +119,7 @@ class CRM_Event_Page_ManageEvent extends CRM_Core_Page {
         'location' => array(
           'title' => ts('Location'),
           'url' => 'civicrm/event/manage/location',
-          'field' => 'is_show_location',
+          'field' => 'loc_block_id',
         ),
         'fee' => array(
           'title' => ts('Fees'),
@@ -348,6 +348,9 @@ ORDER BY start_date desc
         $manageEvent[$dao->id]['reminder'] = CRM_Core_BAO_ActionSchedule::isConfigured($dao->id, $mappingID);
         $manageEvent[$dao->id]['is_pcp_enabled'] = CRM_Utils_Array::value($dao->id, $eventPCPS);
         $manageEvent[$dao->id]['event_type'] = CRM_Utils_Array::value($manageEvent[$dao->id]['event_type_id'], $eventType);
+        
+        // allow hooks to set 'field' value which allows configuration pop-up to show a tab as enabled/disabled
+        CRM_Utils_Hook::tabset('civicrm/event/manage/rows', $manageEvent, array('event_id' => $dao->id));
       }
     }
 
