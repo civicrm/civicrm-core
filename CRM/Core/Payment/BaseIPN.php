@@ -468,6 +468,9 @@ LIMIT 1;";
 
       $values['custom_pre_id'] = $custom_pre_id;
       $values['custom_post_id'] = $custom_post_ids;
+      //for tasks 'Change Participant Status' and 'Batch Update Participants Via Profile' case
+      //and cases involving status updation through ipn
+      $values['totalAmount'] = $input['amount'];
 
       $contribution->source = ts('Online Event Registration') . ': ' . $values['event']['title'];
 
