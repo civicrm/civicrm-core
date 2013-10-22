@@ -71,7 +71,12 @@ class CRM_Mailing_Event_BAO_Confirm extends CRM_Mailing_Event_DAO_Confirm {
     $details = CRM_Contact_BAO_GroupContact::getMembershipDetail($contact_id, $se->group_id);
     if ($details && $details->status == 'Added') {
       // This contact is already subscribed
-      return $details->title;
+      // lets return the group title
+      return CRM_Core_DAO::getFieldValue(
+        'CRM_Contact_DAO_Group',
+        $se->group_id,
+        'title'
+      );
     }
 
     $transaction = new CRM_Core_Transaction();
