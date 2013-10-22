@@ -315,6 +315,9 @@ class CRM_Mailing_Form_Group extends CRM_Contact_Form_Task {
 
     $this->assign('groupCount', count($groups));
     $this->assign('mailingCount', count($mailings));
+    if(count($groups) == 0 && count($mailings) == 0 && !$this->_searchBasedMailing) {
+      CRM_Core_Error::statusBounce("To send a mailing, you must have a valid group of recipients - either at least one group that's a Mailing List or at least one previous mailing or start from a search");
+    }
   }
 
   public function postProcess() {
