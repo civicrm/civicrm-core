@@ -544,15 +544,17 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     }
 
     if (!($allAreBillingModeProcessors && !$this->_values['is_pay_later'])) {
-      $this->addButtons(array(
-          array(
-            'type' => 'upload',
-            'name' => ts('Contribute'),
-            'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
-            'isDefault' => TRUE,
-          ),
-        )
+      $submitButton = array(
+        'type' => 'upload',
+        'name' => ts('Contribute'),
+        'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
+        'isDefault' => TRUE,
       );
+      // Add submit-once behavior when confirm page disabled
+      if (empty($this->_values['is_confirm_enabled'])) {
+        $submitButton['js'] = array('onclick' => "return submitOnce(this,'" . $this->_name . "','" . ts('Processing') . "');");
+      }
+      $this->addButtons(array($submitButton));
     }
 
     $this->addFormRule(array('CRM_Contribute_Form_Contribution_Main', 'formRule'), $this);
@@ -1356,8 +1358,10 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
         // Add JS to show icons for the accepted credit cards
         $creditCardTypes = CRM_Core_Payment_Form::getCreditCardCSSNames();
         CRM_Core_Resources::singleton()
-          ->addSetting(array('config' => array('creditCardTypes' => $creditCardTypes)))
-          ->addScriptFile('civicrm', 'templates/CRM/Core/BillingBlock.js');
+          ->addScriptFile('civicrm', 'templates/CRM/Core/BillingBlock.js', 10)
+          // workaround for CRM-13634
+          // ->addSetting(array('config' => array('creditCardTypes' => $creditCardTypes)));
+          ->addScript('CRM.config.creditCardTypes = ' . json_encode($creditCardTypes) . ';');
       }
     }
     $form->assign('ppType', $form->_ppType);
