@@ -207,8 +207,12 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
     $this->assign('tokenUrl', $tokenUrl);
     $this->add('text', 'recipient_manual_id', ts('Manual Recipients'));
 
-    $this->addElement('select', 'group_id', ts('Group'),
-      CRM_Core_PseudoConstant::staticGroup()
+    $this->addElement(
+      'select',
+      'group_id',
+      ts('Group'),
+      // CRM-13577
+      CRM_Core_PseudoConstant::group()
     );
 
     CRM_Mailing_BAO_Mailing::commonCompose($this);
