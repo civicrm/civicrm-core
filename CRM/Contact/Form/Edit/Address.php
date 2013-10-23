@@ -323,7 +323,7 @@ class CRM_Contact_Form_Edit_Address {
     $errors = array();
 
     $customDataRequiredFields = array();
-    if (property_exists($self, '_addressRequireOmission')) {
+    if ($self && property_exists($self, '_addressRequireOmission')) {
       $customDataRequiredFields = explode(',', $self->_addressRequireOmission);
     }
 
