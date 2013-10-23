@@ -7,8 +7,8 @@ function relationship_get_example(){
 $params = array(
   'relationship_type_id' => array(
       'NOT BETWEEN' => array(
-          '0' => 32,
-          '1' => 34,
+          '0' => 33,
+          '1' => 35,
         ),
     ),
 );
@@ -40,9 +40,9 @@ function relationship_get_expectedresult(){
   'values' => array(
       '1' => array(
           'id' => '1',
-          'contact_id_a' => '63',
-          'contact_id_b' => '64',
-          'relationship_type_id' => '31',
+          'contact_id_a' => '87',
+          'contact_id_b' => '89',
+          'relationship_type_id' => '32',
           'start_date' => '2013-07-29 00:00:00',
           'is_active' => '1',
           'description' => '',

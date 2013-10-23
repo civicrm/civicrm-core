@@ -7,8 +7,8 @@ function relationship_get_example(){
 $params = array(
   'relationship_type_id' => array(
       'BETWEEN' => array(
-          '0' => 32,
-          '1' => 34,
+          '0' => 33,
+          '1' => 35,
         ),
     ),
 );
@@ -39,9 +39,9 @@ function relationship_get_expectedresult(){
   'values' => array(
       '2' => array(
           'id' => '2',
-          'contact_id_a' => '63',
-          'contact_id_b' => '64',
-          'relationship_type_id' => '32',
+          'contact_id_a' => '87',
+          'contact_id_b' => '89',
+          'relationship_type_id' => '33',
           'start_date' => '2013-07-29 00:00:00',
           'is_active' => '1',
           'description' => '',
@@ -50,9 +50,9 @@ function relationship_get_expectedresult(){
         ),
       '3' => array(
           'id' => '3',
-          'contact_id_a' => '63',
-          'contact_id_b' => '64',
-          'relationship_type_id' => '33',
+          'contact_id_a' => '87',
+          'contact_id_b' => '89',
+          'relationship_type_id' => '34',
           'start_date' => '2013-07-29 00:00:00',
           'is_active' => '1',
           'description' => '',
@@ -61,9 +61,9 @@ function relationship_get_expectedresult(){
         ),
       '4' => array(
           'id' => '4',
-          'contact_id_a' => '63',
-          'contact_id_b' => '64',
-          'relationship_type_id' => '34',
+          'contact_id_a' => '87',
+          'contact_id_b' => '89',
+          'relationship_type_id' => '35',
           'start_date' => '2013-07-29 00:00:00',
           'is_active' => '1',
           'description' => '',

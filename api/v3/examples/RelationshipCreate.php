@@ -5,8 +5,8 @@
  */
 function relationship_create_example(){
 $params = array(
-  'contact_id_a' => 24,
-  'contact_id_b' => 25,
+  'contact_id_a' => 31,
+  'contact_id_b' => 33,
   'relationship_type_id' => 18,
   'start_date' => '2010-10-30',
   'end_date' => '2010-12-30',
@@ -41,8 +41,8 @@ function relationship_create_expectedresult(){
   'values' => array(
       '1' => array(
           'id' => '1',
-          'contact_id_a' => '24',
-          'contact_id_b' => '25',
+          'contact_id_a' => '31',
+          'contact_id_b' => '33',
           'relationship_type_id' => '18',
           'start_date' => '2013-07-29 00:00:00',
           'end_date' => '2013-08-04 00:00:00',
