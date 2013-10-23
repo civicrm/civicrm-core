@@ -2161,11 +2161,10 @@ ORDER BY   civicrm_email.is_bulkmail DESC
     $groups = CRM_Core_PseudoConstant::group(NULL, FALSE);
     if (!empty($groups)) {
       $groupIDs = implode(',', array_keys($groups));
-      $selectClause = ($count) ? 'COUNT( DISTINCT m.id) as count' : 'DISTINCT( m.id ) as id';
 
       // get all the mailings that are in this subset of groups
       $query = "
-SELECT    $selectClause
+SELECT    DISTINCT( m.id ) as id
   FROM    civicrm_mailing m
 LEFT JOIN civicrm_mailing_group g ON g.mailing_id   = m.id
  WHERE ( ( g.entity_table like 'civicrm_group%' AND g.entity_id IN ( $groupIDs ) )
