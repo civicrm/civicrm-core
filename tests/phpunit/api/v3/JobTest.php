@@ -38,7 +38,6 @@
 require_once 'CiviTest/CiviUnitTestCase.php';
 class api_v3_JobTest extends CiviUnitTestCase {
   protected $_apiversion = 3;
-
   public $_eNoticeCompliant = TRUE;
   public $DBResetRequired = FALSE;
   public $_entity = 'Job';
@@ -60,6 +59,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
 
   function tearDown() {
     $this->quickCleanup(array('civicrm_job'));
+    CRM_Utils_Hook::singleton()->reset();
     parent::tearDown();
   }
 
@@ -174,6 +174,39 @@ class api_v3_JobTest extends CiviUnitTestCase {
     $gt = 'postal_greeting,email_greeting,addressee';
     $ct = 'Individual,Household';
     $result = $this->callAPISuccess($this->_entity, 'update_greeting', array('gt' => $gt, 'ct' => $ct));
+  }
+
+  public function testCallDisableExpiredRelationships() {
+    $individualID = $this->individualCreate();
+    $orgID = $this->organizationCreate();
+    CRM_Utils_Hook_UnitTests::singleton()->setHook('civicrm_pre', array($this, 'hookPreRelationship'));
+    $relationshipTypeID = $this->callAPISuccess('relationship_type', 'getvalue', array('return' => 'id', 'name_a_b' => 'Employee of'));
+    $result = $this->callAPISuccess('relationship', 'create', array(
+      'relationship_type_id' => $relationshipTypeID,
+      'contact_id_a' => $individualID,
+      'contact_id_b' => $orgID,
+      'is_active' => 1,
+      'end_date' => 'yesterday',
+    ));
+    $relationshipID = $result['id'];
+    $this->assertEquals('Hooked', $result['values'][$relationshipID]['description']);
+    $this->callAPISuccess($this->_entity, 'disable_expired_relationships', array());
+    $result = $this->callAPISuccess('relationship', 'get', array());
+    $this->assertEquals('Go Go you good thing', $result['values'][$relationshipID]['description']);
+    $this->contactDelete($individualID);
+    $this->contactDelete($orgID);
+  }
+
+  function hookPreRelationship($op, $objectName, $id, &$params ) {
+    if($op == 'delete') {
+      return;
+    }
+    if($params['is_active']) {
+      $params['description'] = 'Hooked';
+    }
+    else {
+      $params['description'] = 'Go Go you good thing';
+    }
   }
 }
 
