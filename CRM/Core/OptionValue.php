@@ -146,7 +146,12 @@ class CRM_Core_OptionValue {
           'id' => $dao->id,
           'gid' => $optionGroupID,
           'value' => $dao->value,
-        )
+        ),
+        ts('more'),
+        FALSE,
+        'optionValue.row.actions',
+        'optionValue',
+        $dao->id
       );
 
       if (CRM_Utils_Array::value('component_id', $optionValue[$dao->id])) {

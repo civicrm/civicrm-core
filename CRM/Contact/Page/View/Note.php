@@ -118,7 +118,12 @@ class CRM_Contact_Page_View_Note extends CRM_Core_Page {
           array(
             'id' => $note->id,
             'cid' => $this->_contactId,
-          )
+          ),
+          ts('more'),
+          FALSE,
+          'note.selector.row',
+          'Note',
+          $note->id
         );
         $contact = new CRM_Contact_DAO_Contact();
         $contact->id = $note->contact_id;
@@ -141,7 +146,12 @@ class CRM_Contact_Page_View_Note extends CRM_Core_Page {
         'id' => $note->id,
         'pid' => $note->entity_id,
         'cid' => $note->entity_id,
-      )
+      ),
+      ts('more'),
+      FALSE,
+      'note.comment.action',
+      'Note',
+      $note->id
     );
     $this->assign('commentAction', $commentAction);
   }

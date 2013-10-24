@@ -96,7 +96,16 @@ class CRM_Campaign_Page_Survey extends CRM_Core_Page {
           $action -= CRM_Core_Action::DISABLE;
         }
 
-        $surveys[$sid]['action'] = CRM_Core_Action::formLink($this->actionLinks(), $action, array('id' => $sid));
+        $surveys[$sid]['action'] = CRM_Core_Action::formLink(
+          $this->actionLinks(),
+          $action,
+          array('id' => $sid),
+          ts('more'),
+          FALSE,
+          'survey.selector.row',
+          'Survey',
+          $sid
+        );
       }
     }
 

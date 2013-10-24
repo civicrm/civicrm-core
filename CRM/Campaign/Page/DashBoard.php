@@ -241,7 +241,12 @@ class CRM_Campaign_Page_DashBoard extends CRM_Core_Page {
         }
         $campaignsData[$cmpid]['action'] = CRM_Core_Action::formLink(self::campaignActionLinks(),
           $action,
-          array('id' => $campaign['id'])
+          array('id' => $campaign['id']),
+          ts('more'),
+          FALSE,
+          'campaign.dashboard.row',
+          'Campaign',
+          $campaign['id']
         );
       }
     }
@@ -321,7 +326,12 @@ class CRM_Campaign_Page_DashBoard extends CRM_Core_Page {
         }
         $surveysData[$sid]['action'] = CRM_Core_Action::formLink(self::surveyActionLinks($surveysData[$sid]['activity_type']),
           $action,
-          array('id' => $sid)
+          array('id' => $sid),
+          ts('more'),
+          FALSE,
+          'survey.dashboard.row',
+          'Survey',
+          $sid
         );
 
         if (CRM_Utils_Array::value('activity_type', $surveysData[$sid]) != 'Petition') {
@@ -402,7 +412,12 @@ class CRM_Campaign_Page_DashBoard extends CRM_Core_Page {
 
         $petitionsData[$pid]['action'] = CRM_Core_Action::formLink(self::petitionActionLinks(),
           $action,
-          array('id' => $pid)
+          array('id' => $pid),
+          ts('more'),
+          FALSE,
+          'petition.dashboard.row',
+          'Petition',
+          $pid
         );
       }
     }

@@ -362,7 +362,12 @@ class CRM_UF_Page_Group extends CRM_Core_Page {
       $ufGroup[$id]['group_type'] = $groupTypesString;
 
       $ufGroup[$id]['action'] = CRM_Core_Action::formLink(self::actionLinks(), $action,
-        array('id' => $id)
+        array('id' => $id),
+        ts('more'),
+        FALSE,
+        'ufGroup.row.actions',
+        'UFGroup',
+        $id
       );
       //get the "Used For" from uf_join
       $ufGroup[$id]['module'] = implode(', ', CRM_Core_BAO_UFGroup::getUFJoinRecord($id, TRUE));

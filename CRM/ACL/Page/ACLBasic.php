@@ -169,8 +169,15 @@ ORDER BY entity_id
         // form all action links
         $action = array_sum(array_keys($this->links()));
 
-        $acl[$dao->entity_id]['action'] = CRM_Core_Action::formLink(self::links(), $action,
-          array('id' => $dao->entity_id)
+        $acl[$dao->entity_id]['action'] = CRM_Core_Action::formLink(
+          self::links(),
+          $action,
+          array('id' => $dao->entity_id),
+          ts('more'),
+          FALSE,
+          'aclRole.manage.action',
+          'ACLRole',
+          $dao->entity_id
         );
       }
       elseif (CRM_Utils_Array::value($dao->object_table, $permissions)) {

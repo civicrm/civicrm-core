@@ -178,7 +178,12 @@ class CRM_Financial_Page_FinancialTypeAccount extends CRM_Core_Page {
           array(
             'id' => $dao->id,
             'aid'=> $dao->entity_id,
-          )
+          ),
+          ts('more'),
+          FALSE,
+          'financialTypeAccount.manage.action',
+          'FinancialTypeAccount',
+          $dao->id
         );
       }
       $this->assign('rows', $financialType);

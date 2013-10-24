@@ -159,7 +159,8 @@ ORDER BY page_type, page_id";
       else {
         $mask -= CRM_Core_Action::DISABLE;
       }
-      $action = CRM_Core_Action::formLink($pcpLink, $mask, $replace);
+      $action = CRM_Core_Action::formLink($pcpLink, $mask, $replace, ts('more'),
+        FALSE, 'pcp.dashboard.active', 'PCP', $pcpInfoDao->id);
       $component = $pcpInfoDao->page_type;
       $pageTitle = CRM_Utils_Array::value($pcpInfoDao->page_id, $$component);
 
@@ -206,7 +207,8 @@ ORDER BY target_entity_type, target_entity_id
         );
       }
       $pcpLink = $links['add'];
-      $action = CRM_Core_Action::formLink($pcpLink, $mask, $replace);
+      $action = CRM_Core_Action::formLink($pcpLink, $mask, $replace, ts('more'),
+        FALSE, 'pcp.dashboard.other', "{$pcpBlockDao->target_entity_type}_PCP", $pcpBlockDao->target_entity_id);
       $component = $pcpBlockDao->target_entity_type;
       $pageTitle = CRM_Utils_Array::value($pcpBlockDao->target_entity_id, $$component);
       $pcpBlock[] = array(

@@ -323,7 +323,10 @@ ORDER BY start_date desc
           $action,
           array('id' => $dao->id),
           ts('more'),
-          TRUE
+          TRUE,
+          'event.manage.list',
+          'Event',
+          $dao->id
         );
 
         $params = array(

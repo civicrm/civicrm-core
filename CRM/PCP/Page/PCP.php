@@ -320,7 +320,7 @@ class CRM_PCP_Page_PCP extends CRM_Core_Page_Basic {
         'page_url' => $pageUrl,
         'page_type' => $page_type,
         'action' => CRM_Core_Action::formLink(self::links(), $action,
-          array('id' => $pcp->id)
+          array('id' => $pcp->id), ts('more'), FALSE, 'contributionpage.pcp.list', 'PCP', $pcp->id
         ),
         'title' => $pcp->title,
         'class' => $class,

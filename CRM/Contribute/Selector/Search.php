@@ -379,7 +379,12 @@ class CRM_Contribute_Selector_Search extends CRM_Core_Selector_Base implements C
           $qfKey,
           $componentContext
         ),
-        $mask, $actions
+        $mask, $actions,
+        ts('more'),
+        FALSE,
+        'contribution.selector.row',
+        'Contribution',
+        $result->contribution_id
       );
 
       $row['contact_type'] = CRM_Contact_BAO_Contact_Utils::getImage($result->contact_sub_type ?
