@@ -24,7 +24,7 @@
  +--------------------------------------------------------------------+
 *}
 {* template for adding form elements for selecting existing or creating new contact*}
-{if !in_array($context, array('search','advanced', 'builder')) }
+{if !in_array($context, array('search','advanced', 'builder')) || $parent eq 'activity'}
   {assign var='fldName' value=$prefix|cat:'contact'}
   {assign var='profSelect' value=$prefix|cat:'profiles'}
 
