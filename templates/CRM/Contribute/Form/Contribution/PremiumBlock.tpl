@@ -188,11 +188,8 @@
             amount = 0;
           }
 
-          // next, check for contribution amount price sets
-          check_price_set('.contribution_amount-content input[type="radio"]');
-
-          // next, check for membership level price set
-          check_price_set('.membership_amount-content input[type="radio"]');
+          // next, check for membership/contribution level price set
+          check_price_set('#priceset input[type="radio"]');
 
           // make sure amount is a number at this point
           if(!amount) amount = 0;
@@ -219,8 +216,7 @@
           });
         }
         cj('.other_amount-content input').change(update_premiums);
-        cj('.contribution_amount-content input[type="radio"]').click(update_premiums);
-        cj('.membership_amount-content input[type="radio"]').click(update_premiums);
+        cj('#priceset input[type="radio"]').click(update_premiums);
         update_premiums();
 
         // build a list of price sets
