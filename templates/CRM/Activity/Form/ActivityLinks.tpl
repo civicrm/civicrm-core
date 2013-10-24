@@ -47,11 +47,11 @@
 {if $hookLinks}
    {foreach from=$hookLinks item=link}
     <li>
-        <a href="{$link.url}">
+        <a href="{$link.url}"{if $link.title} title="{$link.title}"{/if}>
           {if $link.img}
                 <img src="{$link.img}" alt="{$link.title}" />&nbsp;
           {/if}
-          {$link.title}
+          {$link.name}
         </a>
     </li>
    {/foreach}
