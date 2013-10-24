@@ -598,7 +598,7 @@ LIKE %1
    *
    * @return boolean true if CONSTRAINT keyword exists, false otherwise
    */
-  function schemaRequiresRebuilding($tables = array("civicrm_contact")) {
+  static function schemaRequiresRebuilding($tables = array("civicrm_contact")) {
     $show = array();
     foreach($tables as $tableName){
       if (!array_key_exists($tableName, $show)) {
