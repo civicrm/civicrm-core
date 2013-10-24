@@ -242,7 +242,7 @@ abstract class CRM_Utils_Hook {
    * @param int    $mask       (optional) the bitmask to show/hide links
    * @param array  $values     (optional) the values to fill the links
    *
-   * @return array|null        an array of arrays, each element is a tuple consisting of id, url, img, title, weight
+   * @return null  the return value is ignored
    *
    * @access public
    */
