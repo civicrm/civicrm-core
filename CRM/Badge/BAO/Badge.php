@@ -237,7 +237,7 @@ class CRM_Badge_BAO_Badge {
             $xAlign += -14;
             break;
           case 'R':
-            $xAlign += 32;
+            $xAlign += 27;
             break;
           case 'C':
             $xAlign += 9;
