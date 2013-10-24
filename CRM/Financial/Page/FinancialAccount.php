@@ -156,7 +156,13 @@ class CRM_Financial_Page_FinancialAccount extends CRM_Core_Page_Basic {
       }
 
       $contributionType[$dao->id]['action'] = CRM_Core_Action::formLink(self::links(), $action,
-        array('id' => $dao->id));
+        array('id' => $dao->id),
+        ts('more'),
+        FALSE,
+        'financialAccount.manage.action',
+        'FinancialAccount',
+        $dao->id
+      );
     }
     $this->assign('rows', $contributionType);
   }

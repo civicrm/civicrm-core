@@ -162,7 +162,12 @@ class CRM_Price_Page_Option extends CRM_Core_Page {
           'oid' => $id,
           'fid' => $this->_fid,
           'sid' => $this->_sid,
-        )
+        ),
+        ts('more'),
+        FALSE,
+        'priceFieldValue.row.actions',
+        'PriceFieldValue',
+        $id
       );
     }
     // Add order changing widget to selector

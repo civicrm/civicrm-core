@@ -182,7 +182,13 @@ class CRM_Financial_Page_FinancialType extends CRM_Core_Page_Basic {
       }
 
       $financialType[$dao->id]['action'] = CRM_Core_Action::formLink(self::links(), $action,
-        array('id' => $dao->id));
+        array('id' => $dao->id),
+        ts('more'),
+        FALSE,
+        'financialType.manage.action',
+        'FinancialType',
+        $dao->id
+      );
     }
     $this->assign('rows', $financialType);
   }

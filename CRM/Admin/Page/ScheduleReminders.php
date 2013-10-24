@@ -143,7 +143,16 @@ class CRM_Admin_Page_ScheduleReminders extends CRM_Core_Page_Basic {
         else {
           $action -= CRM_Core_Action::DISABLE;
         }
-        $format['action'] = CRM_Core_Action::formLink(self::links(), $action, array('id' => $format['id']));
+        $format['action'] = CRM_Core_Action::formLink(
+          self::links(),
+          $action,
+          array('id' => $format['id']),
+          ts('more'),
+          FALSE,
+          'actionSchedule.manage.action',
+          'ActionSchedule',
+          $format['id']
+        );
       }
     }
 

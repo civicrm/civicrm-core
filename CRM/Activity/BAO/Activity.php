@@ -2512,7 +2512,12 @@ INNER JOIN  civicrm_option_group grp ON ( grp.id = val.option_group_id AND grp.n
             'cid' => $params['contact_id'],
             'cxt' => $context,
             'caseid' => CRM_Utils_Array::value('case_id', $values),
-          )
+          ),
+          ts('more'),
+          FALSE,
+          'activity.tab.row',
+          'Activity',
+          $values['activity_id']
         );
       }
     }

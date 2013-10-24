@@ -177,7 +177,12 @@ class CRM_Admin_Page_Job extends CRM_Core_Page_Basic {
       }
 
       $job->action = CRM_Core_Action::formLink(self::links(), $action,
-        array('id' => $job->id)
+        array('id' => $job->id),
+        ts('more'),
+        FALSE,
+        'job.manage.action',
+        'Job',
+        $job->id
       );
       $rows[] = get_object_vars($job);
     }

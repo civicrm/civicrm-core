@@ -177,7 +177,12 @@ class CRM_Custom_Page_Field extends CRM_Core_Page {
         array(
           'id' => $customFieldBAO->id,
           'gid' => $this->_gid,
-        )
+        ),
+        ts('more'),
+        FALSE,
+        'customField.row.actions',
+        'CustomField',
+        $customFieldBAO->id
       );
     }
 

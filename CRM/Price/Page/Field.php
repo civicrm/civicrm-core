@@ -172,11 +172,18 @@ class CRM_Price_Page_Field extends CRM_Core_Page {
       $htmlTypes = CRM_Price_BAO_PriceField::htmlTypes();
       $priceField[$priceFieldBAO->id]['html_type'] = $htmlTypes[$priceField[$priceFieldBAO->id]['html_type']];
       $priceField[$priceFieldBAO->id]['order'] = $priceField[$priceFieldBAO->id]['weight'];
-      $priceField[$priceFieldBAO->id]['action'] = CRM_Core_Action::formLink(self::actionLinks(), $action,
+      $priceField[$priceFieldBAO->id]['action'] = CRM_Core_Action::formLink(
+        self::actionLinks(),
+        $action,
         array(
           'fid' => $priceFieldBAO->id,
           'sid' => $this->_sid,
-        )
+        ),
+        ts('more'),
+        FALSE,
+        'priceField.row.actions',
+        'PriceField',
+        $priceFieldBAO->id
       );
     }
 

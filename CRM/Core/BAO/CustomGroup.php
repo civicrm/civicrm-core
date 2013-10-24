@@ -748,7 +748,12 @@ ORDER BY civicrm_custom_group.weight,
               'id' => $fileDAO->id,
               'eid' => $dao->$entityIDName,
               'fid' => $fieldID,
-            )
+            ),
+            ts('more'),
+            FALSE,
+            'file.manage.delete',
+            'File',
+            $fileDAO->id
           );
           $customValue['deleteURLArgs'] = CRM_Core_BAO_File::deleteURLArgs($table, $dao->$entityIDName, $fileDAO->id);
           $customValue['fileName'] = CRM_Utils_File::cleanFileName(basename($fileDAO->uri));

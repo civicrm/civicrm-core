@@ -111,7 +111,12 @@ class CRM_Contribute_Page_UserDashboard extends CRM_Contact_Page_View_UserDashBo
           'cid' => $this->_contactId,
           'crid' => $values['id'],
           'cxt' => 'contribution',
-        )
+        ),
+        ts('more'),
+        FALSE,
+        'contribution.dashboard.recurring',
+        'Contribution',
+        $values['id']
       );
 
       $recurIDs[] = $values['id'];

@@ -158,7 +158,12 @@ class CRM_Member_Page_MembershipStatus extends CRM_Core_Page_Basic {
           $action -= CRM_Core_Action::DISABLE;
         }
         $membershipStatus[$dao->id]['action'] = CRM_Core_Action::formLink(self::links(), $action,
-          array('id' => $dao->id)
+          array('id' => $dao->id),
+          ts('more'),
+          FALSE,
+          'membershipStatus.manage.action',
+          'MembershipStatus',
+          $dao->id
         );
       }
       if ($startEvent = CRM_Utils_Array::value('start_event', $membershipStatus[$dao->id])) {

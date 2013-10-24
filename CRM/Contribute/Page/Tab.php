@@ -193,7 +193,12 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
               'cid' => $this->_contactId,
               'crid' => $ids,
               'cxt' => 'contribution',
-            )
+            ),
+            ts('more'),
+            FALSE,
+            'contribution.selector.recurring',
+            'Contribution',
+            $ids
           );
         }
       }
@@ -220,7 +225,12 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
             'cxt' => 'contribution',
             'contributionType' => $honorId['type_id'],
             'honorId' => $this->_contactId,
-          )
+          ),
+          ts('more'),
+          FALSE,
+          'contribution.selector.honoree',
+          'Contribution',
+          $ids
         );
       }
 

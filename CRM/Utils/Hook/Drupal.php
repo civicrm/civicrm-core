@@ -56,14 +56,14 @@ class CRM_Utils_Hook_Drupal extends CRM_Utils_Hook {
   private $drupalModules = NULL;
 
   function invoke($numParams,
-                  &$arg1, &$arg2, &$arg3, &$arg4, &$arg5,
+                  &$arg1, &$arg2, &$arg3, &$arg4, &$arg5, &$arg6,
                   $fnSuffix
   ) {
 
     $this->buildModuleList();
 
     return $this->runHooks($this->allModules, $fnSuffix,
-      $numParams, $arg1, $arg2, $arg3, $arg4, $arg5
+      $numParams, $arg1, $arg2, $arg3, $arg4, $arg5, $arg6
     );
   }
 

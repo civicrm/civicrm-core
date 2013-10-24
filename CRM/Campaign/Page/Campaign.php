@@ -110,7 +110,12 @@ class CRM_Campaign_Page_Campaign extends CRM_Core_Page {
           $action -= CRM_Core_Action::DISABLE;
         }
         $campaigns[$cmpid]['action'] = CRM_Core_Action::formLink(self::actionLinks(), $action,
-          array('id' => $campaign['id'])
+          array('id' => $campaign['id']),
+          ts('more'),
+          FALSE,
+          'campaign.selector.row',
+          'Campaign',
+          $campaign['id']
         );
       }
     }

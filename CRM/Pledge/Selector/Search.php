@@ -348,7 +348,12 @@ class CRM_Pledge_Selector_Search extends CRM_Core_Selector_Base {
           'id' => $result->pledge_id,
           'cid' => $result->contact_id,
           'cxt' => $this->_context,
-        )
+        ),
+        ts('more'),
+        FALSE,
+        'pledge.selector.row',
+        'Pledge',
+        $result->pledge_id
       );
 
 

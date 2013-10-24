@@ -137,7 +137,13 @@ class CRM_Admin_Page_LabelFormats extends CRM_Core_Page_Basic {
 
       $format['groupName'] = ts('Mailing Label');
       $format['action'] = CRM_Core_Action::formLink(self::links(), $action,
-        array('id' => $format['id'], 'group' => 'label_format'));
+        array('id' => $format['id'], 'group' => 'label_format'),
+        ts('more'),
+        FALSE,
+        'labelFormat.manage.action',
+        'LabelFormat',
+        $format['id']
+      );
     }
 
     // Add action links to each of the Label Formats

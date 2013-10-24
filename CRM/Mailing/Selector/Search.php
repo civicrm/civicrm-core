@@ -308,7 +308,13 @@ class CRM_Mailing_Selector_Search extends CRM_Core_Selector_Base implements CRM_
 
       $row['action'] = CRM_Core_Action::formLink(
         self::links($qfKey, $this->_context),
-        $mask, $actions
+        $mask, 
+        $actions,
+        ts('more'),
+        FALSE,
+        'contact.mailing.row',
+        'Contact',
+        $result->contact_id
       );
       $row['contact_type'] = CRM_Contact_BAO_Contact_Utils::getImage($result->contact_sub_type ?
         $result->contact_sub_type : $result->contact_type, FALSE, $result->contact_id
