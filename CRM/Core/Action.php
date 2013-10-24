@@ -217,16 +217,23 @@ class CRM_Core_Action {
       return NULL;
     }
 
+    // make links indexed sequentially instead of by bitmask
+    // otherwise it's next to impossible to reliably add new ones
+    $seqLinks = array();
+    foreach ($links as $bit => $link) {
+      $link['bit'] = $bit;
+      $seqLinks[] = $link;
+    }
 
     if ($op && $objectName && $objectId) {
-      CRM_Utils_Hook::links($op, $objectName, $objectId, $links, $mask);
+      CRM_Utils_Hook::links($op, $objectName, $objectId, $seqLinks, $mask, $values);
     }
 
     $url = array();
 
     $firstLink = TRUE;
-    foreach ($links as $m => $link) {
-      if (!$mask || ($mask & $m)) {
+    foreach ($seqLinks as $link) {
+      if (!$mask || !array_key_exists('bit', $link) || ($mask & $link['bit'])) {
         $extra = isset($link['extra']) ? self::replace($link['extra'], $values) : NULL;
 
         $frontend = (isset($link['fe'])) ? TRUE : FALSE;

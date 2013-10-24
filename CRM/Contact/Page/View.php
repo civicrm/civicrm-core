@@ -390,9 +390,11 @@ class CRM_Contact_Page_View extends CRM_Core_Page {
     }
 
     // See if other modules want to add links to the activtity bar
-    $hookLinks = CRM_Utils_Hook::links('view.contact.activity',
+    $hookLinks = array();
+    CRM_Utils_Hook::links('view.contact.activity',
       'Contact',
       $cid,
+      $hookLinks,
       CRM_Core_DAO::$_nullObject,
       CRM_Core_DAO::$_nullObject
     );
