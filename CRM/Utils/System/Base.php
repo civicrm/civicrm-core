@@ -163,5 +163,23 @@ abstract class CRM_Utils_System_Base {
    */
   function userLoginFinalize($params = array()){
   }
+
+  /**
+   * Set timezone in mysql so that timestamp fields show the correct time
+   */
+  function setMySQLTimeZone(){
+    $timeZoneOffset = $this->getTimeZoneOffset();
+    if($timeZoneOffset){
+      $sql = "SET time_zone = '$timeZoneOffset'";
+      CRM_Core_DAO::executequery($sql);
+    }
+  }
+
+  /**
+   * Get timezone from CMS
+   * @return boolean|string
+   */
+  function getTimeZoneOffset(){
+  }
 }
 

@@ -1066,6 +1066,32 @@ AND    u.status = 1
   }
 
   /**
+   * Get timezone from Drupal
+   * @return boolean|string
+   */
+  function getTimeZoneOffset(){
+    global $user;
+    if (variable_get('configurable_timezones', 1) && $user->uid && strlen($user->timezone)) {
+      $timezone = $user->timezone;
+    } else {
+      $timezone = variable_get('date_default_timezone', null);
+    }
+    $tzObj = new DateTimeZone($timezone);
+    $dateTime = new DateTime("now", $tzObj);
+    $tz = $tzObj->getOffset($dateTime);
+
+    if(empty($tz)){
+      return false;
+    }
+
+    $timeZoneOffset = sprintf("%02d:%02d", $tz / 3600, ($tz/60)%60 );
+
+    if($timeZoneOffset > 0){
+      $timeZoneOffset = '+' . $timeZoneOffset;
+    }
+    return $timeZoneOffset;
+  }
+  /**
    * Reset any system caches that may be required for proper CiviCRM
    * integration.
    */

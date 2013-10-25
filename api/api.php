@@ -509,7 +509,7 @@ function _civicrm_api_call_nested_api(&$params, &$result, $action, $entity, $ver
         if (array_key_exists(0, $newparams)) {
           $genericParams = $subParams;
           // it is a numerically indexed array - ie. multiple creates
-          foreach ($newparams as $entity => $entityparams) {
+          foreach ($newparams as $entityparams) {
             $subParams = array_merge($genericParams, $entityparams);
             _civicrm_api_replace_variables($subAPI[1], $subaction, $subParams, $result['values'][$idIndex], $separator);
             $result['values'][$result['id']][$field][] = civicrm_api($subEntity, $subaction, $subParams);
