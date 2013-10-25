@@ -522,7 +522,7 @@ ORDER BY   i.contact_id, i.{$tempColumn}
   private function _getMailingGroupIds($type = 'Include') {
     $mailingGroup = new CRM_Mailing_DAO_MailingGroup();
     $group = CRM_Contact_DAO_Group::getTableName();
-    if (!isset($thi->sid)) {
+    if (!isset($this->id)) {
       // we're just testing tokens, so return any group
       $query = "SELECT   id AS entity_id
                       FROM     $group
