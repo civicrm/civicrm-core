@@ -2367,12 +2367,14 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
                         $defaults[$fldName] = $value['county_id'];
                       }
                       elseif ($fieldName == 'country') {
-                        $defaults[$fldName] = $value['country_id'];
                         if (!isset($value['country_id']) || !$value['country_id']) {
                           $config = CRM_Core_Config::singleton();
                           if ($config->defaultContactCountry) {
                             $defaults[$fldName] = $config->defaultContactCountry;
                           }
+                        }
+                        else {
+                          $defaults[$fldName] = $value['country_id'];
                         }
                       }
                       elseif ($fieldName == 'phone') {
