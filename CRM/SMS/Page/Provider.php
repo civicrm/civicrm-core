@@ -147,7 +147,12 @@ class CRM_SMS_Page_Provider extends CRM_Core_Page_Basic {
       $provider['api_type'] = $apiTypes[$provider['api_type']];
 
       $provider['action'] = CRM_Core_Action::formLink(self::links(), $action,
-        array('id' => $provider['id'])
+        array('id' => $provider['id']),
+        ts('more'),
+        FALSE,
+        'sms.provider.row',
+        'SMSProvider',
+        $provider['id']
       );
       $rows[] = $provider;
     }

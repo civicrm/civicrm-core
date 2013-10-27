@@ -332,7 +332,12 @@ class CRM_Contact_Selector_Custom extends CRM_Contact_Selector {
         $row['checkbox'] = CRM_Core_Form::CB_PREFIX . $contactID;
         $row['action'] = CRM_Core_Action::formLink($links,
           $mask,
-          array('id' => $contactID)
+          array('id' => $contactID),
+          ts('more'),
+          FALSE,
+          'contact.custom.actions',
+          'Contact',
+          $contactID
         );
         $row['contact_id'] = $contactID;
 
@@ -406,7 +411,12 @@ class CRM_Contact_Selector_Custom extends CRM_Contact_Selector {
     foreach ($rows as $id => & $row) {
       $row['action'] = CRM_Core_Action::formLink($links,
         $mask,
-        array('id' => $row['contact_id'])
+        array('id' => $row['contact_id']),
+        ts('more'),
+        FALSE,
+        'contact.custom.actions',
+        'Contact',
+        $row['contact_id']
       );
     }
   }

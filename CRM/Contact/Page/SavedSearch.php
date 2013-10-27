@@ -104,7 +104,16 @@ class CRM_Contact_Page_SavedSearch extends CRM_Core_Page {
 
           $action        = array_sum(array_keys(self::links()));
           $action        = $action & CRM_Core_Action::mask($permissions);
-          $row['action'] = CRM_Core_Action::formLink(self::links(), $action, array('id' => $row['id']));
+          $row['action'] = CRM_Core_Action::formLink(
+            self::links(),
+            $action,
+            array('id' => $row['id']),
+            ts('more'),
+            FALSE,
+            'savedSearch.manage.action',
+            'SavedSearch',
+            $row['id']
+          );
 
           $rows[] = $row;
         }

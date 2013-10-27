@@ -326,7 +326,12 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
       $values['action'] = CRM_Core_Action::formLink(
         $newLinks,
         $action,
-        $tokens
+        $tokens),
+        ts('more'),
+        FALSE,
+        'batch.selector.row',
+        'Batch',
+        $object->id
       );
       $results[$object->id] = $values;
     }

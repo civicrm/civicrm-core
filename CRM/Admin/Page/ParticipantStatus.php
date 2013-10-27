@@ -92,7 +92,16 @@ class CRM_Admin_Page_ParticipantStatus extends CRM_Core_Page_Basic {
         }
       }
       $action -= $dao->is_active ? CRM_Core_Action::ENABLE : CRM_Core_Action::DISABLE;
-      $statusTypes[$dao->id]['action'] = CRM_Core_Action::formLink(self::links(), $action, array('id' => $dao->id));
+      $statusTypes[$dao->id]['action'] = CRM_Core_Action::formLink(
+        self::links(),
+        $action,
+        array('id' => $dao->id),
+        ts('more'),
+        FALSE,
+        'participantStatusType.manage.action',
+        'ParticipantStatusType',
+        $dao->id
+      );
       $statusTypes[$dao->id]['visibility'] = $visibilities[$dao->visibility_id];
     }
     $this->assign('rows', $statusTypes);

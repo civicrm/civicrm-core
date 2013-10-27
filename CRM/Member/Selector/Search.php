@@ -397,7 +397,12 @@ class CRM_Member_Selector_Search extends CRM_Core_Selector_Base implements CRM_C
             'id' => $result->membership_id,
             'cid' => $result->contact_id,
             'cxt' => $this->_context,
-          )
+          ),
+          ts('more'),
+          FALSE,
+          'membership.selector.row',
+          'Membership',
+          $result->membership_id
         );
       }
       else {
@@ -406,7 +411,12 @@ class CRM_Member_Selector_Search extends CRM_Core_Selector_Base implements CRM_C
             'id' => $result->membership_id,
             'cid' => $result->contact_id,
             'cxt' => $this->_context,
-          )
+          ),
+          ts('more'),
+          FALSE,
+          'membership.selector.row',
+          'Membership',
+          $result->membership_id
         );
       }
 

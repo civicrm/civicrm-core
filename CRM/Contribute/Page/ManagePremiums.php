@@ -165,7 +165,12 @@ class CRM_Contribute_Page_ManagePremiums extends CRM_Core_Page_Basic {
 
       $premiums[$dao->id]['action'] = CRM_Core_Action::formLink(self::links(),
         $action,
-        array('id' => $dao->id)
+        array('id' => $dao->id)),
+        ts('more'),
+        FALSE,
+        'premium.manage.row',
+        'Premium',
+        $dao->id
       );
            //Financial Type
                 if( !empty( $dao->financial_type_id )  ){

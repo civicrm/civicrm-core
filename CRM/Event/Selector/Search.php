@@ -367,7 +367,12 @@ class CRM_Event_Selector_Search extends CRM_Core_Selector_Base implements CRM_Co
           'id' => $result->participant_id,
           'cid' => $result->contact_id,
           'cxt' => $this->_context,
-        )
+        ),
+        ts('more'),
+        FALSE,
+        'participant.selector.row',
+        'Participant',
+        $result->participant_id
       );
 
 

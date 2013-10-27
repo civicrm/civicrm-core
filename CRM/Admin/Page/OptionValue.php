@@ -205,7 +205,12 @@ class CRM_Admin_Page_OptionValue extends CRM_Core_Page_Basic {
       }
 
       $optionValue[$dao->id]['action'] = CRM_Core_Action::formLink(self::links(), $action,
-        array('id' => $dao->id, 'gid' => $this->_gid)
+        array('id' => $dao->id, 'gid' => $this->_gid),
+        ts('more'),
+        FALSE,
+        'optionValue.admin.actions',
+        'optionValue',
+        $dao->id
       );
     }
 

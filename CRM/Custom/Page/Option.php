@@ -217,7 +217,12 @@ ORDER BY weight, label
           'id' => $dao->id,
           'fid' => $this->_fid,
           'gid' => $this->_gid,
-        )
+        ),
+        ts('more'),
+        FALSE,
+        'customOption.row.actions',
+        'customOption',
+        $dao->id
       );
     }
 

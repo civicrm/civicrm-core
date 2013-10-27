@@ -2030,7 +2030,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
       ) as $key) {
       $url          = 'mailing/detail';
       $reportFilter = "reset=1&mailing_id_value={$mailing_id}";
-      $searchFilter = "force=1&mailing_id={$mailing_id}";
+      $searchFilter = "force=1&mailing_id=%%mid%%";
       switch ($key) {
         case 'delivered':
           $reportFilter .= "&delivery_status_value=successful";
@@ -2077,7 +2077,16 @@ ORDER BY   civicrm_email.is_bulkmail DESC
       if (array_key_exists(CRM_Core_Action::ADVANCED, $actionLinks)) {
         $actionLinks[CRM_Core_Action::ADVANCED]['qs'] = $searchFilter;
       }
-      $report['event_totals']['actionlinks'][$key] = CRM_Core_Action::formLink($actionLinks, $action, array());
+      $report['event_totals']['actionlinks'][$key] = CRM_Core_Action::formLink(
+        $actionLinks,
+        $action,
+        array('mid' => $mailing_id),
+        ts('more'),
+        FALSE,
+        'mailing.report.action',
+        'Mailing',
+        $mailing_id
+      );
     }
 
     return $report;
@@ -2794,19 +2803,31 @@ AND        m.id = %1
         CRM_Core_Action::VIEW => array(
           'name' => ts('View'),
           'url' => 'civicrm/mailing/view',
-          'qs' => "reset=1&id={$values['mailing_id']}",
+          'qs' => "reset=1&id=%%mid%%",
           'title' => ts('View Mailing'),
           'class' => 'crm-mailing-view',
         ),
         CRM_Core_Action::BROWSE => array(
           'name' => ts('Mailing Report'),
           'url' => 'civicrm/mailing/report',
-          'qs' => "mid={$values['mailing_id']}&reset=1&cid={$params['contact_id']}&context=mailing",
+          'qs' => "mid=%%mid%%&reset=1&cid=%%cid%%&context=mailing",
           'title' => ts('View Mailing Report'),
         )
       );
 
-      $contactMailings[$mailingId]['links'] = CRM_Core_Action::formLink($actionLinks);
+      $contactMailings[$mailingId]['links'] = CRM_Core_Action::formLink(
+        $actionLinks,
+        null,
+        array(
+          'mid' => $values['mailing_id'],
+          'cid' => $params['contact_id'],
+        ),
+        ts('more'),
+        FALSE,
+        'mailing.contact.action',
+        'Mailing',
+        $values['mailing_id']
+      );
     }
 
     return $contactMailings;

@@ -149,7 +149,12 @@ class CRM_Admin_Page_PaymentProcessor extends CRM_Core_Page_Basic {
       }
 
       $paymentProcessor[$dao->id]['action'] = CRM_Core_Action::formLink(self::links(), $action,
-        array('id' => $dao->id)
+        array('id' => $dao->id),
+        ts('more'),
+        FALSE,
+        'paymentProcessor.manage.action',
+        'PaymentProcessor',
+        $dao->id
       );
       $paymentProcessor[$dao->id]['financialAccount'] = CRM_Financial_BAO_FinancialTypeAccount::getFinancialAccount($dao->id, 'civicrm_payment_processor');
     }

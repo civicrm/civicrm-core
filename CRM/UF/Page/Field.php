@@ -171,7 +171,12 @@ class CRM_UF_Page_Field extends CRM_Core_Page {
         array(
           'id' => $ufFieldBAO->id,
           'gid' => $this->_gid,
-        )
+        ),
+        ts('more'),
+        FALSE,
+        'ufField.row.actions',
+        'UFField',
+        $ufFieldBAO->id
       );
     }
 

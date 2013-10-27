@@ -419,6 +419,7 @@ class CRM_Core_Block {
       NULL,
       CRM_Core_DAO::$_nullObject,
       $values,
+      CRM_Core_DAO::$_nullObject,
       CRM_Core_DAO::$_nullObject
     );
 
