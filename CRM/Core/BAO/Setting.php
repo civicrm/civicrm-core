@@ -142,6 +142,13 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
     $contactID   = NULL,
     $domainID = NULL
   ) {
+    if (self::isUpgradeFromPreFourOneAlpha1()) {
+      // civicrm_setting table is not going to be present. For now we'll just 
+      // return a dummy object
+      $dao = new CRM_Core_DAO_Domain();
+      $dao->id = -1; // so ->find() doesn't fetch any data later on
+      return $dao;
+    }
     $dao = new CRM_Core_DAO_Setting();
 
     $dao->group_name   = $group;
@@ -800,6 +807,10 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
   }
 
   static function fixAndStoreDirAndURL(&$params, $domainID = null) {
+    if (self::isUpgradeFromPreFourOneAlpha1()) {
+      return;
+    }
+
     if (empty($domainID)) {
       $domainID = CRM_Core_Config::domainID();
     }
@@ -876,18 +887,21 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
   }
 
   static function retrieveDirectoryAndURLPreferences(&$params, $setInConfig = FALSE) {
+    if (CRM_Core_Config::isUpgradeMode()) {
+      $isJoomla = (defined('CIVICRM_UF') && CIVICRM_UF == 'Joomla') ? TRUE : FALSE;
+      // hack to set the resource base url so that js/ css etc is loaded correctly
+      if ($isJoomla) {
+        $params['userFrameworkResourceURL'] = CRM_Utils_File::addTrailingSlash(CIVICRM_UF_BASEURL, '/') . str_replace('administrator', '', CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionValue', 'userFrameworkResourceURL', 'value', 'name'));
+      }
+      if (self::isUpgradeFromPreFourOneAlpha1()) {
+        return;
+      }
+    }
+
     if ($setInConfig) {
       $config = CRM_Core_Config::singleton();
     }
 
-    $isJoomla = (defined('CIVICRM_UF') && CIVICRM_UF == 'Joomla') ? TRUE : FALSE;
-
-    if (CRM_Core_Config::isUpgradeMode() && !$isJoomla) {
-      $currentVer = CRM_Core_BAO_Domain::version();
-      if (version_compare($currentVer, '4.1.alpha1') < 0) {
-        return;
-      }
-    }
     $sql = "
 SELECT name, group_name, value
 FROM   civicrm_setting
@@ -911,18 +925,8 @@ AND domain_id = %3
     );
 
     if (is_a($dao, 'DB_Error')) {
-      if (CRM_Core_Config::isUpgradeMode()) {
-        // seems like this is a 4.0 -> 4.1 upgrade, so we suppress this error and continue
-        // hack to set the resource base url so that js/ css etc is loaded correctly
-        if ($isJoomla) {
-          $params['userFrameworkResourceURL'] = CRM_Utils_File::addTrailingSlash(CIVICRM_UF_BASEURL, '/') . str_replace('administrator', '', CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionValue', 'userFrameworkResourceURL', 'value', 'name'));
-        }
-        return;
-      }
-      else {
-        echo "Fatal DB error, exiting, seems like your schema does not have civicrm_setting table\n";
-        exit();
-      }
+      echo "Fatal DB error, exiting, seems like your schema does not have civicrm_setting table\n";
+      exit();
     }
 
     while ($dao->fetch()) {
@@ -964,5 +968,19 @@ AND domain_id = %3
       return $default;
     }
   }
-}
 
+  /**
+   * civicrm_setting didn't exist before 4.1.alpha1 and this function helps taking decisions during upgrade
+   *
+   * @return boolean
+   */
+  static function isUpgradeFromPreFourOneAlpha1() {
+    if (CRM_Core_Config::isUpgradeMode()) {
+      $currentVer = CRM_Core_BAO_Domain::version();
+      if (version_compare($currentVer, '4.1.alpha1') < 0) {
+        return TRUE;
+      }
+    }
+    return FALSE;
+  }
+}
