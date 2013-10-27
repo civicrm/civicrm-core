@@ -239,6 +239,7 @@ class CRM_Report_Form extends CRM_Core_Form {
 
   public $_having = NULL;
   public $_select = NULL;
+  public $_selectClauses = array();
   public $_columnHeaders = array();
   public $_orderBy = NULL;
   public $_orderByFields = array();
@@ -1726,7 +1727,7 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
   // still be having their own select() method. We should fix them as and when encountered and move
   // towards generalizing the select() method below.
   function select() {
-    $select = array();
+    $select = $this->_selectAliases = array();
 
     foreach ($this->_columns as $tableName => $table) {
       if (array_key_exists('fields', $table)) {
@@ -1878,6 +1879,7 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
       }
     }
 
+    $this->_selectClauses = $select;
     $this->_select = "SELECT " . implode(', ', $select) . " ";
   }
 
