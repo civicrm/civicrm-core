@@ -255,13 +255,13 @@ WHERE       source_contact_id IS NOT NULL";
     $query = "
 CREATE TABLE IF NOT EXISTS `civicrm_word_replacement` (
      `id` int unsigned NOT NULL AUTO_INCREMENT  COMMENT 'Word replacement ID',
-     `find_word` varchar(255)    COMMENT 'Word which need to be replaced',
-     `replace_word` varchar(255)    COMMENT 'Word which will replace the word in find',
+     `find_word` varchar(255) COLLATE utf8_bin    COMMENT 'Word which need to be replaced',
+     `replace_word` varchar(255) COLLATE utf8_bin    COMMENT 'Word which will replace the word in find',
      `is_active` tinyint    COMMENT 'Is this entry active?',
      `match_type` enum('wildcardMatch', 'exactMatch')   DEFAULT 'wildcardMatch',
      `domain_id` int unsigned    COMMENT 'FK to Domain ID. This is for Domain specific word replacement',
     PRIMARY KEY ( `id` ),
-    UNIQUE INDEX `UI_find`(find_word),
+    UNIQUE INDEX `UI_find`(domain_id, find_word),
     CONSTRAINT FK_civicrm_word_replacement_domain_id FOREIGN KEY (`domain_id`) REFERENCES `civicrm_domain`(`id`)
 )  ENGINE=InnoDB DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci  ;
     ";
