@@ -125,7 +125,12 @@ class CRM_Admin_Page_EventTemplate extends CRM_Core_Page_Basic {
 
       //add action links.
       $allEventTemplates[$eventTemplate->id]['action'] = CRM_Core_Action::formLink(self::links(), $action,
-        array('id' => $eventTemplate->id)
+        array('id' => $eventTemplate->id),
+        ts('more'),
+        FALSE,
+        'eventTemplate.manage.action',
+        'Event',
+        $eventTemplate->id
       );
     }
     $this->assign('rows', $allEventTemplates);

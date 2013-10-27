@@ -181,8 +181,15 @@ class CRM_ACL_Page_EntityRole extends CRM_Core_Page_Basic {
         $action -= CRM_Core_Action::DISABLE;
       }
 
-      $entityRoles[$dao->id]['action'] = CRM_Core_Action::formLink(self::links(), $action,
-        array('id' => $dao->id)
+      $entityRoles[$dao->id]['action'] = CRM_Core_Action::formLink(
+        self::links(),
+        $action,
+        array('id' => $dao->id),
+        ts('more'),
+        FALSE,
+        'entityRole.manage.action',
+        'EntityRole',
+        $dao->id
       );
     }
     $this->assign('rows', $entityRoles);

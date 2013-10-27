@@ -197,8 +197,15 @@ class CRM_Admin_Page_Extensions extends CRM_Core_Page_Basic {
         array(
           'id' => $row['id'],
           'key' => $obj->key,
-        )
+        ),
+        ts('more'),
+        FALSE,
+        'extension.local.action',
+        'Extension',
+        $row['id']
       );
+      // Key would be better to send, but it's not an integer.  Moreover, sending the
+      // values to hook_civicrm_links means that you can still get at the key
 
       $localExtensionRows[$row['id']] = $row;
     }
@@ -215,7 +222,12 @@ class CRM_Admin_Page_Extensions extends CRM_Core_Page_Basic {
         array(
           'id' => $row['id'],
           'key' => $row['key'],
-        )
+        ),
+        ts('more'),
+        FALSE,
+        'extension.remote.action',
+        'Extension',
+        $row['id']
       );
       $remoteExtensionRows[$row['id']] = $row;
     }

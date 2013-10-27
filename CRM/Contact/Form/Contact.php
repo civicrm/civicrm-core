@@ -762,7 +762,12 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
         CRM_Core_Action::DELETE,
         array(
           'id' => $this->_contactId,
-        )
+        ),
+        ts('more'),
+        FALSE,
+        'contact.image.delete',
+        'Contact',
+        $this->_contactId
       );
       $this->assign('deleteURL', $deleteURL);
     }

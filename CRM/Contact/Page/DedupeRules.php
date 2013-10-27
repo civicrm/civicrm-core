@@ -164,7 +164,16 @@ class CRM_Contact_Page_DedupeRules extends CRM_Core_Page_Basic {
         unset($links[CRM_Core_Action::DELETE]);
       }
 
-      $ruleGroups[$dao->contact_type][$dao->id]['action'] = CRM_Core_Action::formLink($links, $action, array('id' => $dao->id));
+      $ruleGroups[$dao->contact_type][$dao->id]['action'] = CRM_Core_Action::formLink(
+        $links,
+        $action,
+        array('id' => $dao->id),
+        ts('more'),
+        FALSE,
+        'dedupeRule.manage.action',
+        'DedupeRule',
+        $dao->id
+      );
       CRM_Dedupe_DAO_RuleGroup::addDisplayEnums($ruleGroups[$dao->contact_type][$dao->id]);
     }
 

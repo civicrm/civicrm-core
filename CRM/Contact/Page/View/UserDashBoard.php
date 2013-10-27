@@ -243,7 +243,7 @@ class CRM_Contact_Page_View_UserDashBoard extends CRM_Core_Page {
           CRM_Core_Action::DISABLE => array(
               'name' => ts('Disable'),
               'url' => 'civicrm/contact/view/rel',
-              'qs' => 'action=disable&reset=1&cid=%%cid%%&id=%%id%%&rtype=%%rtype%%&selectedChild=rel%%&context=dashboard',
+              'qs' => 'action=disable&reset=1&cid=%%cid%%&id=%%id%%&rtype=%%rtype%%&selectedChild=rel&context=dashboard',
               'extra' => 'onclick = "return confirm(\'' . $disableExtra . '\');"',
               'title' => ts('Disable Relationship'),
             ),
@@ -256,6 +256,7 @@ class CRM_Contact_Page_View_UserDashBoard extends CRM_Core_Page {
       'Contact',
       CRM_Core_DAO::$_nullObject,
       self::$_links,
+      CRM_Core_DAO::$_nullObject,
       CRM_Core_DAO::$_nullObject
     );
     return self::$_links;

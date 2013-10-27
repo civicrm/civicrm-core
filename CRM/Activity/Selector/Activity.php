@@ -422,7 +422,12 @@ class CRM_Activity_Selector_Activity extends CRM_Core_Selector_Base implements C
             'cid' => $this->_contactId,
             'cxt' => $this->_context,
             'caseid' => CRM_Utils_Array::value('case_id', $row),
-          )
+          ),
+          ts('more'),
+          FALSE,
+          'activity.selector.action',
+          'Activity',
+          $row['activity_id']
         );
       }
 

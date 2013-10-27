@@ -698,7 +698,12 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
 
       $row[] = CRM_Core_Action::formLink($newLinks,
         $mask,
-        $params
+        $params,
+        ts('more'),
+        FALSE,
+        'profile.selector.row',
+        'Contact',
+        $result->contact_id
       );
 
       if (!$empty) {

@@ -236,8 +236,15 @@ ORDER BY entity_id
         $action -= CRM_Core_Action::DISABLE;
       }
 
-      $acl[$dao->id]['action'] = CRM_Core_Action::formLink(self::links(), $action,
-        array('id' => $dao->id)
+      $acl[$dao->id]['action'] = CRM_Core_Action::formLink(
+        self::links(),
+        $action,
+        array('id' => $dao->id),
+        ts('more'),
+        FALSE,
+        'ACL.manage.action',
+        'ACL',
+        $dao->id
       );
     }
     $this->assign('rows', $acl);

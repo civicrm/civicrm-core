@@ -227,7 +227,12 @@ class CRM_Custom_Page_Group extends CRM_Core_Page {
       }
       $customGroup[$dao->id]['order'] = $customGroup[$dao->id]['weight'];
       $customGroup[$dao->id]['action'] = CRM_Core_Action::formLink(self::actionLinks(), $action,
-        array('id' => $dao->id)
+        array('id' => $dao->id),
+        ts('more'),
+        FALSE,
+        'customGroup.row.actions',
+        'CustomGroup',
+        $dao->id
       );
     }
 

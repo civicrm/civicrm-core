@@ -300,7 +300,12 @@ class CRM_Price_Page_Set extends CRM_Core_Page {
         $actionLinks[CRM_Core_Action::BROWSE]['name'] = 'View Price Fields';
       }
       $priceSet[$dao->id]['action'] = CRM_Core_Action::formLink($actionLinks, $action,
-        array('sid' => $dao->id)
+        array('sid' => $dao->id),
+        ts('more'),
+        FALSE,
+        'priceSet.row.actions',
+        'PriceSet',
+        $dao->id
       );
     }
     $this->assign('rows', $priceSet);

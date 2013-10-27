@@ -320,7 +320,12 @@ class CRM_Activity_Selector_Search extends CRM_Core_Selector_Base implements CRM
           'id' => $result->activity_id,
           'cid' => $contactId,
           'cxt' => $this->_context,
-        )
+        ),
+        ts('more'),
+        FALSE,
+        'activity.selector.row',
+        'Activity',
+        $result->activity_id
       );
 
       //carry campaign to selector.

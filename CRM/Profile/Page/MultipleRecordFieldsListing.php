@@ -234,8 +234,16 @@ class CRM_Profile_Page_MultipleRecordFieldsListing extends CRM_Core_Page_Basic {
              if ($pageCheckSum) {
                $actionParams['cs'] = $pageCheckSum;
              }
-             $value['action'] =
-               CRM_Core_Action::formLink($links, $linkAction, $actionParams);
+             $value['action'] = CRM_Core_Action::formLink(
+               $links,
+               $linkAction,
+               $actionParams,
+               ts('more'),
+               FALSE,
+               'profile.multiValue.row',
+               'customValue',
+               $fieldId // not ideal, but the one thing not sent in $actionParams
+             );
            }
          }
        }

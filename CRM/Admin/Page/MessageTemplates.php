@@ -155,7 +155,13 @@ class CRM_Admin_Page_MessageTemplates extends CRM_Core_Page_Basic {
       $values['action'] = CRM_Core_Action::formLink($links, $action, array(
         'id' => $object->id,
           'orig_id' => CRM_Utils_Array::value($object->id, $this->_revertible),
-        ));
+        ),
+        ts('more'),
+        FALSE,
+        'messageTemplate.manage.action',
+        'MessageTemplate',
+        $object->id
+      );
     }
     else {
       $action &= ~CRM_Core_Action::REVERT;

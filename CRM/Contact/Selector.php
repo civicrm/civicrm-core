@@ -731,7 +731,16 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
               'title' => ts('Permanently Delete Contact'),
             );
           }
-          $row['action'] = CRM_Core_Action::formLink($links, NULL, array('id' => $result->contact_id));
+          $row['action'] = CRM_Core_Action::formLink(
+            $links,
+            NULL,
+            array('id' => $result->contact_id),
+            ts('more'),
+            FALSE,
+            'contact.selector.row',
+            'Contact',
+            $result->contact_id
+          );
         }
         elseif ((is_numeric(CRM_Utils_Array::value('geo_code_1', $row))) ||
           ($config->mapGeoCoding &&
@@ -739,10 +748,28 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
             CRM_Utils_Array::value('state_province', $row)
           )
         ) {
-          $row['action'] = CRM_Core_Action::formLink($links, $mask, array('id' => $result->contact_id));
+          $row['action'] = CRM_Core_Action::formLink(
+            $links,
+            $mask,
+            array('id' => $result->contact_id),
+            ts('more'),
+            FALSE,
+            'contact.selector.row',
+            'Contact',
+            $result->contact_id
+          );
         }
         else {
-          $row['action'] = CRM_Core_Action::formLink($links, $mapMask, array('id' => $result->contact_id));
+          $row['action'] = CRM_Core_Action::formLink(
+            $links,
+            $mapMask,
+            array('id' => $result->contact_id),
+            ts('more'),
+            FALSE,
+            'contact.selector.row',
+            'Contact',
+            $result->contact_id
+          );
         }
 
         // allow components to add more actions
@@ -848,7 +875,16 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
             'title' => ts('Permanently Delete Contact'),
           );
         }
-        $row['action'] = CRM_Core_Action::formLink($links, NULL, array('id' => $row['contact_id']));
+        $row['action'] = CRM_Core_Action::formLink(
+          $links,
+          null,
+          array('id' => $row['contact_id']),
+          ts('more'),
+          FALSE,
+          'contact.selector.actions',
+          'Contact',
+          $row['contact_id']
+        );
       }
       elseif ((is_numeric(CRM_Utils_Array::value('geo_code_1', $row))) ||
         ($config->mapGeoCoding &&
@@ -856,10 +892,28 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
           CRM_Utils_Array::value('state_province', $row)
         )
       ) {
-        $row['action'] = CRM_Core_Action::formLink($links, $mask, array('id' => $row['contact_id']));
+        $row['action'] = CRM_Core_Action::formLink(
+          $links,
+          $mask,
+          array('id' => $row['contact_id']),
+          ts('more'),
+          FALSE,
+          'contact.selector.actions',
+          'Contact',
+          $row['contact_id']
+        );
       }
       else {
-        $row['action'] = CRM_Core_Action::formLink($links, $mapMask, array('id' => $row['contact_id']));
+        $row['action'] = CRM_Core_Action::formLink(
+          $links,
+          $mapMask,
+          array('id' => $row['contact_id']),
+          ts('more'),
+          FALSE,
+          'contact.selector.actions',
+          'Contact',
+          $row['contact_id']
+        );
       }
 
       // allow components to add more actions

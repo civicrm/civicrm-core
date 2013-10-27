@@ -487,7 +487,10 @@ ORDER BY title asc
         $action,
         array('id' => $dao->id),
         ts('Configure'),
-        TRUE
+        TRUE,
+        'contributionpage.configure.actions',
+        'ContributionPage',
+        $dao->id
       );
 
       //build the contributions links.
@@ -495,7 +498,10 @@ ORDER BY title asc
         $action,
         array('id' => $dao->id),
         ts('Contributions'),
-        TRUE
+        TRUE,
+        'contributionpage.contributions.search',
+        'ContributionPage',
+        $dao->id
       );
 
       //build the online contribution links.
@@ -503,7 +509,10 @@ ORDER BY title asc
         $action,
         array('id' => $dao->id),
         ts('Links'),
-        TRUE
+        TRUE,
+        'contributionpage.online.links',
+        'ContributionPage',
+        $dao->id
       );
 
       //build the normal action links.
@@ -511,7 +520,10 @@ ORDER BY title asc
         $action,
         array('id' => $dao->id),
         ts('more'),
-        TRUE
+        TRUE,
+        'contributionpage.action.links',
+        'ContributionPage',
+        $dao->id
       );
 
       //show campaigns on selector.

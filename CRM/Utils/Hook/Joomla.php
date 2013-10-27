@@ -35,7 +35,7 @@
  */
 class CRM_Utils_Hook_Joomla extends CRM_Utils_Hook {
   function invoke($numParams,
-                  &$arg1, &$arg2, &$arg3, &$arg4, &$arg5,
+                  &$arg1, &$arg2, &$arg3, &$arg4, &$arg5, &$arg6
                   $fnSuffix
   ) {
     // ensure that we are running in a joomla context
@@ -60,10 +60,10 @@ class CRM_Utils_Hook_Joomla extends CRM_Utils_Hook {
         }
       }
 
-      $result = $app->triggerEvent($fnSuffix, array(&$arg1, &$arg2, &$arg3, &$arg4, &$arg5));
+      $result = $app->triggerEvent($fnSuffix, array(&$arg1, &$arg2, &$arg3, &$arg4, &$arg5, &$arg6));
 
       $moduleResult = $this->commonInvoke($numParams,
-        $arg1, $arg2, $arg3, $arg4, $arg5,
+        $arg1, $arg2, $arg3, $arg4, $arg5, $arg6,
         $fnSuffix, 'joomla');
       if (!empty($moduleResult) && is_array($moduleResult)) {
         if (empty($result)) {

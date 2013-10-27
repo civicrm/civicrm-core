@@ -127,7 +127,12 @@ class CRM_Admin_Page_ContactType extends CRM_Core_Page_Basic {
         }
       }
       $rows[$key]['action'] = CRM_Core_Action::formLink(self::links(), $mask,
-        array('id' => $value['id'])
+        array('id' => $value['id']),
+        ts('more'),
+        FALSE,
+        'contactType.manage.action',
+        'ContactType',
+        $value['id']
       );
     }
     $this->assign('rows', $rows);

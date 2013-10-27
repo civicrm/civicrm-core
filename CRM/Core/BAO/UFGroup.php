@@ -1759,7 +1759,12 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
         CRM_Core_Action::DELETE,
         array('id' => $form->get('id'),
           'gid' => $form->get('gid'),
-        )
+        ),
+        ts('more'),
+        FALSE,
+        'contact.profileimage.delete',
+        'Contact',
+        $form->get('id')
       );
       $form->assign('deleteURL', $deleteURL);
     }

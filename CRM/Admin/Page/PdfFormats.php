@@ -124,7 +124,16 @@ class CRM_Admin_Page_PdfFormats extends CRM_Core_Page_Basic {
     // Add action links to each of the PDF Page Formats
     $action = array_sum(array_keys($this->links()));
     foreach ($pdfFormatList as & $format) {
-      $format['action'] = CRM_Core_Action::formLink(self::links(), $action, array('id' => $format['id']));
+      $format['action'] = CRM_Core_Action::formLink(
+        self::links(),
+        $action,
+        array('id' => $format['id']),
+        ts('more'),
+        FALSE,
+        'pdfFormat.manage.action',
+        'PdfFormat',
+        $format['id']
+      );
     }
 
     // Order Label Formats by weight
