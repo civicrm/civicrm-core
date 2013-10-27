@@ -41,7 +41,7 @@
     <add>4.4</add>
   </field>
   <index>
-    <name>UI_find</name>
+    <name>UI_domain_find</name>
     <fieldName>domain_id</fieldName>
     <fieldName>find_word</fieldName>
     <unique>true</unique>
