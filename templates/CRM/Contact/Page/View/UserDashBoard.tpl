@@ -24,24 +24,24 @@
  +--------------------------------------------------------------------+
 *}
 <table class="dashboard-elements">
-{if $showGroup}
+  {if $showGroup}
     <tr>
-        <td>
-          <div class="header-dark">
+      <td>
+        <div class="header-dark">
           {ts}Your Group(s){/ts}
-          </div>
-          {include file="CRM/Contact/Page/View/UserDashBoard/GroupContact.tpl"}
+        </div>
+        {include file="CRM/Contact/Page/View/UserDashBoard/GroupContact.tpl"}
 
-        </td>
+      </td>
     </tr>
-{/if}
+  {/if}
 
-    {foreach from=$dashboardElements item=element}
+  {foreach from=$dashboardElements item=element}
     <tr>
-        <td>
-            <div class="header-dark">{$element.sectionTitle}</div>
-            {include file=$element.templatePath}
-        </td>
+      <td>
+        <div class="header-dark">{$element.sectionTitle}</div>
+        {include file=$element.templatePath}
+      </td>
     </tr>
-    {/foreach}
+  {/foreach}
 </table>
