@@ -138,8 +138,10 @@ class CRM_Contact_Page_View_UserDashBoard extends CRM_Core_Page {
       ) {
 
         $userDashboard = $component->getUserDashboardObject();
-        $dashboardElements[] = array('templatePath' => $userDashboard->getHookedTemplateFileName(),
+        $dashboardElements[] = array(
+          'class' => 'crm-dashboard-' . strtolower($component->name),
           'sectionTitle' => $elem['title'],
+          'templatePath' => $userDashboard->getTemplateFileName(),
           'weight' => $elem['weight'],
         );
         $userDashboard->run();
@@ -148,6 +150,7 @@ class CRM_Contact_Page_View_UserDashBoard extends CRM_Core_Page {
 
     if (CRM_Utils_Array::value('Permissioned Orgs', $this->_userOptions)) {
       $dashboardElements[] = array(
+        'class' => 'crm-dashboard-permissionedOrgs',
         'templatePath' => 'CRM/Contact/Page/View/Relationship.tpl',
         'sectionTitle' => ts('Your Contacts / Organizations'),
         'weight' => 40,
@@ -164,6 +167,7 @@ class CRM_Contact_Page_View_UserDashBoard extends CRM_Core_Page {
 
     if (CRM_Utils_Array::value('PCP', $this->_userOptions)) {
       $dashboardElements[] = array(
+        'class' => 'crm-dashboard-pcp',
         'templatePath' => 'CRM/Contribute/Page/PcpUserDashboard.tpl',
         'sectionTitle' => ts('Personal Campaign Pages'),
         'weight' => 40,
@@ -176,6 +180,7 @@ class CRM_Contact_Page_View_UserDashBoard extends CRM_Core_Page {
     if (CRM_Utils_Array::value('Assigned Activities', $this->_userOptions)) {
       // Assigned Activities section
       $dashboardElements[] = array(
+        'class' => 'crm-dashboard-assignedActivities',
         'templatePath' => 'CRM/Activity/Page/UserDashboard.tpl',
         'sectionTitle' => ts('Your Assigned Activities'),
         'weight' => 5,
@@ -261,4 +266,3 @@ class CRM_Contact_Page_View_UserDashBoard extends CRM_Core_Page {
     return self::$_links;
   }
 }
-

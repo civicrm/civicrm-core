@@ -25,7 +25,7 @@
 *}
 <table class="dashboard-elements">
   {if $showGroup}
-    <tr>
+    <tr class="crm-dashboard-groups">
       <td>
         <div class="header-dark">
           {ts}Your Group(s){/ts}
@@ -37,7 +37,7 @@
   {/if}
 
   {foreach from=$dashboardElements item=element}
-    <tr>
+    <tr{if isset($element.class)} class="{$element.class}"{/if}>
       <td>
         <div class="header-dark">{$element.sectionTitle}</div>
         {include file=$element.templatePath}
