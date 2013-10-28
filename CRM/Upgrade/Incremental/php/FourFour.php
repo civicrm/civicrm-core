@@ -141,6 +141,7 @@ class CRM_Upgrade_Incremental_php_FourFour {
     }
 
     $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => '4.4.1')), 'task_4_4_x_runSql', $rev);
+    $this->addTask('Patch word-replacement schema', 'wordReplacements_patch', $rev);
   }
 
   /**
@@ -255,19 +256,41 @@ WHERE       source_contact_id IS NOT NULL";
     $query = "
 CREATE TABLE IF NOT EXISTS `civicrm_word_replacement` (
      `id` int unsigned NOT NULL AUTO_INCREMENT  COMMENT 'Word replacement ID',
-     `find_word` varchar(255)    COMMENT 'Word which need to be replaced',
-     `replace_word` varchar(255)    COMMENT 'Word which will replace the word in find',
+     `find_word` varchar(255) COLLATE utf8_bin    COMMENT 'Word which need to be replaced',
+     `replace_word` varchar(255) COLLATE utf8_bin    COMMENT 'Word which will replace the word in find',
      `is_active` tinyint    COMMENT 'Is this entry active?',
      `match_type` enum('wildcardMatch', 'exactMatch')   DEFAULT 'wildcardMatch',
      `domain_id` int unsigned    COMMENT 'FK to Domain ID. This is for Domain specific word replacement',
     PRIMARY KEY ( `id` ),
-    UNIQUE INDEX `UI_find`(find_word),
+    UNIQUE INDEX `UI_domain_find` (domain_id, find_word),
     CONSTRAINT FK_civicrm_word_replacement_domain_id FOREIGN KEY (`domain_id`) REFERENCES `civicrm_domain`(`id`)
 )  ENGINE=InnoDB DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci  ;
     ";
     $dao = CRM_Core_DAO::executeQuery($query);
 
     self::rebuildWordReplacementTable();
+    return TRUE;
+  }
+
+  /**
+   * Fix misconfigured constraints created in 4.4.0. To distinguish the good
+   * and bad configurations, we change the constraint name from "UI_find"
+   * (the original name in 4.4.0) to "UI_domain_find" (the new name in
+   * 4.4.1).
+   *
+   * @return bool TRUE for success
+   * @see http://issues.civicrm.org/jira/browse/CRM-13655
+   */
+  static function wordReplacements_patch(CRM_Queue_TaskContext $ctx, $rev) {
+    if (CRM_Core_DAO::checkConstraintExists('civicrm_word_replacement', 'UI_find')) {
+      CRM_Core_DAO::executeQuery("ALTER TABLE civicrm_word_replacement DROP FOREIGN KEY FK_civicrm_word_replacement_domain_id;");
+      CRM_Core_DAO::executeQuery("ALTER TABLE civicrm_word_replacement DROP KEY FK_civicrm_word_replacement_domain_id;");
+      CRM_Core_DAO::executeQuery("ALTER TABLE civicrm_word_replacement DROP KEY UI_find;");
+      CRM_Core_DAO::executeQuery("ALTER TABLE civicrm_word_replacement MODIFY COLUMN `find_word` varchar(255) COLLATE utf8_bin DEFAULT NULL COMMENT 'Word which need to be replaced';");
+      CRM_Core_DAO::executeQuery("ALTER TABLE civicrm_word_replacement MODIFY COLUMN `replace_word` varchar(255) COLLATE utf8_bin DEFAULT NULL COMMENT 'Word which will replace the word in find';");
+      CRM_Core_DAO::executeQuery("ALTER TABLE civicrm_word_replacement ADD CONSTRAINT UI_domain_find UNIQUE KEY `UI_domain_find` (`domain_id`,`find_word`);");
+      CRM_Core_DAO::executeQuery("ALTER TABLE civicrm_word_replacement ADD CONSTRAINT FK_civicrm_word_replacement_domain_id FOREIGN KEY (`domain_id`) REFERENCES `civicrm_domain` (`id`);");
+    }
     return TRUE;
   }
 
