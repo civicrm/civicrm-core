@@ -1445,7 +1445,7 @@ AND civicrm_membership.is_test = %2";
         'legacy_redirect_path' => 'civicrm/contribute/transact',
         'legacy_redirect_query' => "_qf_Main_display=true&qfKey={$form->_params['qfKey']}",
       );
-      throw new CiviCRM_Exception($message, 0, $errorParams);
+      throw new CRM_Core_Exception($message, 0, $errorParams);
     }
 
     // CRM-7851
