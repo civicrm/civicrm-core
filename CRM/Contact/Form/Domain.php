@@ -205,9 +205,13 @@ class CRM_Contact_Form_Domain extends CRM_Core_Form {
    * @access public
    */
   static function formRule($fields) {
-    $errors = array();
     // check for state/country mapping
-    CRM_Contact_Form_Edit_Address::formRule($fields, $errors);
+    $errors = CRM_Contact_Form_Edit_Address::formRule($fields, CRM_Core_DAO::$_nullArray, CRM_Core_DAO::$_nullObject);
+    // $errors === TRUE means no errors from above formRule excution,
+    // so declaring $errors to array for futher processing
+    if ($errors === TRUE) {
+      $errors = array();
+    }
 
     //fix for CRM-3552,
     //as we use "fromName"<emailaddresss> format for domain email.

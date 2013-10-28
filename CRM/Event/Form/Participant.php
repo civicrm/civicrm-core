@@ -1456,6 +1456,9 @@ loadCampaign( {$this->_eID}, {$eventCampaigns} );
           $contributionParams['is_pay_later'] = 1;
         }
         if ($this->_single) {
+          if (empty($ids)) {
+            $ids = array();
+          }
           $contributions[] = CRM_Contribute_BAO_Contribution::create($contributionParams, $ids);
         }
         else {
@@ -1467,7 +1470,7 @@ loadCampaign( {$this->_eID}, {$eventCampaigns} );
         }
 
         //insert payment record for this participation
-        if (!$ids['contribution']) {
+        if (empty($ids['contribution'])) {
           foreach ($this->_contactIds as $num => $contactID) {
             $ppDAO = new CRM_Event_DAO_ParticipantPayment();
             $ppDAO->participant_id = $participants[$num]->id;

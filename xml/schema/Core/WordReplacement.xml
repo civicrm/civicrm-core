@@ -21,6 +21,7 @@
     <name>find_word</name>
     <type>varchar</type>
     <length>255</length>
+    <collate>utf8_bin</collate>
     <comment>Word which need to be replaced</comment>
     <add>4.4</add>
   </field>
@@ -28,6 +29,7 @@
     <name>replace_word</name>
     <type>varchar</type>
     <length>255</length>
+    <collate>utf8_bin</collate>
     <comment>Word which will replace the word in find</comment>
     <add>4.4</add>
   </field>
@@ -39,7 +41,8 @@
     <add>4.4</add>
   </field>
   <index>
-    <name>UI_find</name>
+    <name>UI_domain_find</name>
+    <fieldName>domain_id</fieldName>
     <fieldName>find_word</fieldName>
     <unique>true</unique>
     <add>4.4</add>

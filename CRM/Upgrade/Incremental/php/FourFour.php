@@ -103,6 +103,47 @@ class CRM_Upgrade_Incremental_php_FourFour {
     $this->addTask('Migrate custom word-replacements', 'wordReplacements');
   }
 
+  function upgrade_4_4_1($rev) {
+    // CRM-13327 upgrade handling for the newly added name badges
+    $ogID = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup', 'name_badge', 'id', 'name');
+    $nameBadges = array_flip(array_values(CRM_Core_BAO_OptionValue::getOptionValuesAssocArrayFromName('name_badge')));
+    unset($nameBadges['Avery 5395']);
+    if (!empty($nameBadges)) {
+      $dimension = '{"paper-size":"a4","orientation":"portrait","font-name":"times","font-size":6,"font-style":"","NX":2,"NY":4,"metric":"mm","lMargin":6,"tMargin":19,"SpaceX":0,"SpaceY":0,"width":100,"height":65,"lPadding":0,"tPadding":0}';
+      $query = "UPDATE civicrm_option_value
+        SET value = '{$dimension}'
+        WHERE option_group_id = %1 AND name = 'Fattorini Name Badge 100x65'";
+
+      CRM_Core_DAO::executeQuery($query, array(1 => array($ogID, 'Integer')));
+    }
+    else {
+      $dimensions = array(
+        1 => '{"paper-size":"a4","orientation":"landscape","font-name":"times","font-size":6,"font-style":"","NX":2,"NY":1,"metric":"mm","lMargin":25,"tMargin":27,"SpaceX":0,"SpaceY":35,"width":106,"height":150,"lPadding":5,"tPadding":5}',
+        2 => '{"paper-size":"a4","orientation":"portrait","font-name":"times","font-size":6,"font-style":"","NX":2,"NY":4,"metric":"mm","lMargin":6,"tMargin":19,"SpaceX":0,"SpaceY":0,"width":100,"height":65,"lPadding":0,"tPadding":0}',
+        3 => '{"paper-size":"a4","orientation":"portrait","font-name":"times","font-size":6,"font-style":"","NX":2,"NY":2,"metric":"mm","lMargin":10,"tMargin":28,"SpaceX":0,"SpaceY":0,"width":96,"height":121,"lPadding":5,"tPadding":5}',
+      );
+      $insertStatements = array(
+        1 => "($ogID, %1, '{$dimensions[1]}', %1, NULL, 0, NULL, 2, NULL, 0, 0, 1, NULL, NULL)",
+        2 => "($ogID, %2, '{$dimensions[2]}', %2, NULL, 0, NULL, 3, NULL, 0, 0, 1, NULL, NULL)",
+        3 => "($ogID, %3, '{$dimensions[3]}', %3, NULL, 0, NULL, 4, NULL, 0, 0, 1, NULL, NULL)",
+      );
+
+      $queryParams = array(
+        1 => array('A6 Badge Portrait 150x106', 'String'),
+        2 => array('Fattorini Name Badge 100x65', 'String'),
+        3 => array('Hanging Badge 3-3/4" x 4-3"/4', 'String'),
+      );
+      
+      foreach ($insertStatements as $values) {
+        $query = 'INSERT INTO civicrm_option_value (`option_group_id`, `label`, `value`, `name`, `grouping`, `filter`, `is_default`, `weight`, `description`, `is_optgroup`, `is_reserved`, `is_active`, `component_id`, `visibility_id`) VALUES' . $values;
+        CRM_Core_DAO::executeQuery($query, $queryParams);
+      }
+    }
+
+    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => '4.4.1')), 'task_4_4_x_runSql', $rev);
+    $this->addTask('Patch word-replacement schema', 'wordReplacements_patch', $rev);
+  }
+
   /**
    * Update activity contacts CRM-12274
    *
@@ -215,19 +256,41 @@ WHERE       source_contact_id IS NOT NULL";
     $query = "
 CREATE TABLE IF NOT EXISTS `civicrm_word_replacement` (
      `id` int unsigned NOT NULL AUTO_INCREMENT  COMMENT 'Word replacement ID',
-     `find_word` varchar(255)    COMMENT 'Word which need to be replaced',
-     `replace_word` varchar(255)    COMMENT 'Word which will replace the word in find',
+     `find_word` varchar(255) COLLATE utf8_bin    COMMENT 'Word which need to be replaced',
+     `replace_word` varchar(255) COLLATE utf8_bin    COMMENT 'Word which will replace the word in find',
      `is_active` tinyint    COMMENT 'Is this entry active?',
      `match_type` enum('wildcardMatch', 'exactMatch')   DEFAULT 'wildcardMatch',
      `domain_id` int unsigned    COMMENT 'FK to Domain ID. This is for Domain specific word replacement',
     PRIMARY KEY ( `id` ),
-    UNIQUE INDEX `UI_find`(find_word),
+    UNIQUE INDEX `UI_domain_find` (domain_id, find_word),
     CONSTRAINT FK_civicrm_word_replacement_domain_id FOREIGN KEY (`domain_id`) REFERENCES `civicrm_domain`(`id`)
 )  ENGINE=InnoDB DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci  ;
     ";
     $dao = CRM_Core_DAO::executeQuery($query);
 
     self::rebuildWordReplacementTable();
+    return TRUE;
+  }
+
+  /**
+   * Fix misconfigured constraints created in 4.4.0. To distinguish the good
+   * and bad configurations, we change the constraint name from "UI_find"
+   * (the original name in 4.4.0) to "UI_domain_find" (the new name in
+   * 4.4.1).
+   *
+   * @return bool TRUE for success
+   * @see http://issues.civicrm.org/jira/browse/CRM-13655
+   */
+  static function wordReplacements_patch(CRM_Queue_TaskContext $ctx, $rev) {
+    if (CRM_Core_DAO::checkConstraintExists('civicrm_word_replacement', 'UI_find')) {
+      CRM_Core_DAO::executeQuery("ALTER TABLE civicrm_word_replacement DROP FOREIGN KEY FK_civicrm_word_replacement_domain_id;");
+      CRM_Core_DAO::executeQuery("ALTER TABLE civicrm_word_replacement DROP KEY FK_civicrm_word_replacement_domain_id;");
+      CRM_Core_DAO::executeQuery("ALTER TABLE civicrm_word_replacement DROP KEY UI_find;");
+      CRM_Core_DAO::executeQuery("ALTER TABLE civicrm_word_replacement MODIFY COLUMN `find_word` varchar(255) COLLATE utf8_bin DEFAULT NULL COMMENT 'Word which need to be replaced';");
+      CRM_Core_DAO::executeQuery("ALTER TABLE civicrm_word_replacement MODIFY COLUMN `replace_word` varchar(255) COLLATE utf8_bin DEFAULT NULL COMMENT 'Word which will replace the word in find';");
+      CRM_Core_DAO::executeQuery("ALTER TABLE civicrm_word_replacement ADD CONSTRAINT UI_domain_find UNIQUE KEY `UI_domain_find` (`domain_id`,`find_word`);");
+      CRM_Core_DAO::executeQuery("ALTER TABLE civicrm_word_replacement ADD CONSTRAINT FK_civicrm_word_replacement_domain_id FOREIGN KEY (`domain_id`) REFERENCES `civicrm_domain` (`id`);");
+    }
     return TRUE;
   }
 

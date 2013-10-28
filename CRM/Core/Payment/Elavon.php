@@ -90,7 +90,7 @@ class CRM_Core_Payment_Elavon extends CRM_Core_Payment {
     // contact name
     $requestFields['ssl_ship_to_last_name'] = $params['last_name'];
     $requestFields['ssl_card_number'] = $params['credit_card_number'];
-    $requestFields['ssl_amount'] = $params['amount'];
+    $requestFields['ssl_amount'] = trim($params['amount']);
     $requestFields['ssl_exp_date'] = sprintf('%02d', (int) $params['month']) . substr($params['year'], 2, 2);;
     $requestFields['ssl_cvv2cvc2'] = $params['cvv2'];
     // CVV field passed to processor
@@ -106,6 +106,10 @@ class CRM_Core_Payment_Elavon extends CRM_Core_Payment {
     $requestFields['ssl_transaction_type'] = "CCSALE";
     $requestFields['ssl_description'] = empty($params['description']) ? "backoffice payment" : $params['description'];
     $requestFields['ssl_customer_number'] = substr($params['credit_card_number'], -4);
+    // Added two lines below to allow commercial cards to go through as per page 15 of Elavon developer guide
+    $requestFields['ssl_customer_code'] = '1111';
+    $requestFields['ssl_salestax'] = 0.0;
+
 
     /************************************************************************************
      *  Fields available from civiCRM not implemented for Elavon
@@ -127,7 +131,7 @@ class CRM_Core_Payment_Elavon extends CRM_Core_Payment {
    * the processor
    **********************************************************/
   function doDirectPayment(&$params) {
-    if ($params['is_recur'] == TRUE) {
+    if (isset($params['is_recur']) && $params['is_recur'] == TRUE) {
       CRM_Core_Error::fatal(ts('Elavon - recurring payments not implemented'));
     }
 
@@ -147,7 +151,7 @@ class CRM_Core_Payment_Elavon extends CRM_Core_Payment {
          */
 
     $requestFields['ssl_merchant_id'] = $this->_paymentProcessor['user_name'];
-    $requestFields['user_id'] = $this->_paymentProcessor['password'];
+    $requestFields['ssl_user_id'] = $this->_paymentProcessor['password'];
     $requestFields['ssl_pin'] = $this->_paymentProcessor['signature'];
     $host = $this->_paymentProcessor['url_site'];
 
@@ -386,18 +390,18 @@ class CRM_Core_Payment_Elavon extends CRM_Core_Payment {
     $xmlFieldLength['ssl_transaction_type'] = 20;
     $xmlFieldLength['ssl_description'] = 255;
     $xmlFieldLength['ssl_merchant_id'] = 15;
-    $xmlFieldLength['user_id'] = 15;
-    $xmlFieldLength['ssl_pin'] = 6;
+    $xmlFieldLength['ssl_user_id'] = 15;
+    $xmlFieldLength['ssl_pin'] = 128;
     $xmlFieldLength['ssl_test_mode'] = 5;
+    $xmlFieldLength['ssl_salestax'] = 10;
+    $xmlFieldLength['ssl_customer_code'] = 17;
+    $xmlFieldLength['ssl_customer_number'] = 25;
 
     $xml = '<txn>';
     foreach ($requestFields as $key => $value) {
       $xml .= '<' . $key . '>' . self::tidyStringforXML($value, $xmlFieldLength[$key]) . '</' . $key . '>';
-
-      //  $xml .= '<' . $key . '>' . rawurlencode($value) . '</' . $key . '>';
     }
-    // sales tax appears to be required even though the dev guide says it isn't - not used by civi
-    $xml .= '<ssl_salestax>0.00</ssl_salestax></txn>';
+    $xml .= '</txn>';
     return $xml;
   }
 

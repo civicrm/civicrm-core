@@ -77,10 +77,17 @@ class CRM_Upgrade_Incremental_php_FourThree {
     if ($rev == '4.3.6') {
       $constraintArray = array(
         'civicrm_contact' => 'contact_id',
-        'civicrm_campaign' => 'campaign_id',
-        'civicrm_payment_processor' => 'payment_processor_id',
-        'civicrm_financial_type' => 'financial_type_id'
+        'civicrm_payment_processor' => 'payment_processor_id', 
       );
+      
+      if (version_compare('4.1alpha1', $currentVer) <= 0) { 
+        $constraintArray['civicrm_campaign'] = 'campaign_id';
+      }
+      
+      if (version_compare('4.3alpha1', $currentVer) <= 0) { 
+        $constraintArray['civicrm_financial_type'] = 'financial_type_id';
+      }
+      
       foreach ($constraintArray as $key => $value) {
         $query = "SELECT contri_recur.id FROM civicrm_contribution_recur contri_recur LEFT JOIN {$key} ON contri_recur.{$value} = {$key}.id
 WHERE {$key}.id IS NULL";
@@ -357,7 +364,7 @@ ADD CONSTRAINT `FK_civicrm_financial_item_contact_id` FOREIGN KEY (`contact_id`)
 
   function upgrade_4_3_6($rev) {
     //CRM-13094
-    $this->addTask('Add mising contraints', 'addMissingConstraints', $rev);
+    $this->addTask(ts('Add missing contraints'), 'addMissingConstraints', $rev);
     //CRM-13088
     $this->addTask('Add ON DELETE Options for constraints', 'task_4_3_x_checkConstraints', $rev);
     $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => '4.3.6')), 'task_4_3_x_runSql', $rev);

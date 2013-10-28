@@ -626,8 +626,8 @@ function _civicrm_api3_get_options_from_params(&$params, $queryObject = FALSE, $
       $returnProperties = array_fill_keys($returnProperties, 1);
     }
   }
-  if($entity && $action =='get' ){
-    if(CRM_Utils_Array::value('id',$returnProperties)){
+  if ($entity && $action =='get') {
+    if (CRM_Utils_Array::value('id',$returnProperties)) {
       $returnProperties[$entity . '_id'] = 1;
       unset($returnProperties['id']);
     }
@@ -639,14 +639,17 @@ function _civicrm_api3_get_options_from_params(&$params, $queryObject = FALSE, $
     }
   }
 
-
   $options = array(
-    'offset' => $offset,
-    'sort' => $sort,
-    'limit' => $limit,
+    'offset' => CRM_Utils_Rule::integer($offset) ? $offset : NULL,
+    'sort' => CRM_Utils_Rule::string($sort) ? $sort : NULL,
+    'limit' => CRM_Utils_Rule::integer($limit) ? $limit : NULL,
     'is_count' => $is_count,
     'return' => !empty($returnProperties) ? $returnProperties : NULL,
   );
+
+  if ($options['sort'] && stristr($options['sort'], 'SELECT')) {
+    throw new API_Exception('invalid string in sort options');
+  }
 
   if (!$queryObject) {
     return $options;
@@ -662,12 +665,15 @@ function _civicrm_api3_get_options_from_params(&$params, $queryObject = FALSE, $
     if (substr($n, 0, 7) == 'return.') {
       $legacyreturnProperties[substr($n, 7)] = $v;
     }
-    elseif($n == 'id'){
+    elseif ($n == 'id') {
       $inputParams[$entity. '_id'] = $v;
     }
     elseif (in_array($n, $otherVars)) {}
-    else{
+    else {
       $inputParams[$n] = $v;
+      if ($v && !is_array($v) && stristr($v, 'SELECT')) {
+        throw new API_Exception('invalid string');
+      }
     }
   }
   $options['return'] = array_merge($returnProperties, $legacyreturnProperties);

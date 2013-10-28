@@ -688,6 +688,7 @@ Alternatively you can get a version of CiviCRM that matches your PHP version
     }
 
     $field['required'] = $this->value('required', $fieldXML);
+    $field['collate']  = $this->value('collate', $fieldXML);
     $field['comment']  = $this->value('comment', $fieldXML);
     $field['default']  = $this->value('default', $fieldXML);
     $field['import']   = $this->value('import', $fieldXML);

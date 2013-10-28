@@ -180,7 +180,7 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
     if (!$row) {
       return;
     }
- 
+
     $user = NULL;
 
     if (!empty($row)) {
@@ -1015,6 +1015,29 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
   function og_membership_delete($ogID, $drupalID) {
       og_delete_subscription( $ogID, $drupalID );
   }
+
+  /**
+   * Get timezone from Drupal
+   * @return boolean|string
+   */
+  function getTimeZoneOffset(){
+    global $user;
+    if (variable_get('configurable_timezones', 1) && $user->uid && strlen($user->timezone)) {
+      $timezone = $user->timezone;
+    } else {
+      $timezone = variable_get('date_default_timezone', null);
+    }
+    if(empty($timezone)){
+      return false;
+    }
+    $hour = $user->timezone / 3600;
+    $timeZoneOffset = sprintf("%02d:%02d", $timezone / 3600, ($timezone/60)%60 );
+    if($timeZoneOffset > 0){
+      $timeZoneOffset = '+' . $timeZoneOffset;
+    }
+    return $timeZoneOffset;
+  }
+
 
   /**
    * Reset any system caches that may be required for proper CiviCRM
