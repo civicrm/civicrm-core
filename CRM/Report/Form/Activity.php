@@ -296,7 +296,8 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
         if (strstr($clause, 'civicrm_contact_target.') || 
           strstr($clause, 'civicrm_contact_source.') ||
           strstr($clause, 'civicrm_email_target.') ||
-          strstr($clause, 'civicrm_email_source.')
+          strstr($clause, 'civicrm_email_source.') ||
+          strstr($clause, 'address_civireport.')
         ) {
           $removeKeys[] = $key;
           unset($this->_selectClauses[$key]);
@@ -307,7 +308,8 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
         if (strstr($clause, 'civicrm_contact_target.') || 
           strstr($clause, 'civicrm_contact_assignee.') ||
           strstr($clause, 'civicrm_email_target.') ||
-          strstr($clause, 'civicrm_email_assignee.')
+          strstr($clause, 'civicrm_email_assignee.') ||
+          strstr($clause, 'address_civireport.')
         ) {
           $removeKeys[] = $key;
           unset($this->_selectClauses[$key]);
@@ -492,7 +494,6 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
 
   function postProcess() {
     $this->buildACLClause(array('civicrm_contact_source', 'civicrm_contact_target', 'civicrm_contact_assignee'));
-
     $this->beginPostProcess();
 
     // 1. fill temp table with target results
@@ -515,26 +516,30 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
     CRM_Core_DAO::executeQuery($tempQuery);
 
     // 3. fill temp table with assignee results
-    $this->select('assignee');
-    $this->from('assignee');
-    $this->where();
-    $insertCols = implode(',', $this->_selectAliases);
-    // fixme: do this when assignee name/email is selected
-    $tempQuery  = "INSERT INTO civireport_activity_temp_target ({$insertCols})
+    if (CRM_Utils_Array::value("contact_assignee", $this->_params['fields']) ||
+      CRM_Utils_Array::value("contact_assignee_email", $this->_params['fields'])) {
+      $this->select('assignee');
+      $this->from('assignee');
+      $this->where();
+      $insertCols = implode(',', $this->_selectAliases);
+      $tempQuery  = "INSERT INTO civireport_activity_temp_target ({$insertCols})
 {$this->_select}
 {$this->_from} {$this->_where}";
-    CRM_Core_DAO::executeQuery($tempQuery);
+      CRM_Core_DAO::executeQuery($tempQuery);
+    }
 
     // 4. fill temp table with source results
-    $this->select('source');
-    $this->from('source');
-    $this->where();
-    $insertCols = implode(',', $this->_selectAliases);
-    // fixme: do this when source name/email is selected
-    $tempQuery  = "INSERT INTO civireport_activity_temp_target ({$insertCols}) 
+    if (CRM_Utils_Array::value("contact_source", $this->_params['fields']) ||
+      CRM_Utils_Array::value("contact_source_email", $this->_params['fields'])) {
+      $this->select('source');
+      $this->from('source');
+      $this->where();
+      $insertCols = implode(',', $this->_selectAliases);
+      $tempQuery  = "INSERT INTO civireport_activity_temp_target ({$insertCols}) 
 {$this->_select}
 {$this->_from} {$this->_where}";
-    CRM_Core_DAO::executeQuery($tempQuery);
+      CRM_Core_DAO::executeQuery($tempQuery);
+    }
 
     // 5. show final result set from temp table
     $rows = array();
@@ -609,8 +614,6 @@ GROUP BY civicrm_activity_id {$this->_orderBy} {$this->_limit}";
           $entryFound = TRUE;
         }
       }
-
-      $entryFound = $this->alterDisplayAddressFields($row, $rows, $rowNum, 'activity', 'List all activities for this ') ? TRUE : $entryFound;
 
       if (!$entryFound) {
         break;
