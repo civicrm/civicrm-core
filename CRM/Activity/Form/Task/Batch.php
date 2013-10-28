@@ -262,7 +262,7 @@ FROM   civicrm_activity a
 JOIN   civicrm_activity_contact ac ON ( ac.activity_id = a.id
 AND    ac.record_type_id = %2 )
 WHERE  a.id = %1 ";
-        $activityContacts = CRM_Core_PseudoConstant::activityContacts('name');
+        $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
         $sourceID = CRM_Utils_Array::key('Activity Source', $activityContacts);
         $params = array(1 => array($key, 'Integer'), 2 => array($sourceID, 'Integer'));
         $dao = CRM_Core_DAO::executeQuery($query, $params);
