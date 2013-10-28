@@ -274,6 +274,13 @@ class CRM_Contact_Form_Edit_Address {
       // And we can't set it to 'address_' because we want to set it in a slightly different format.
       CRM_Core_BAO_CustomGroup::buildQuickForm($form, $groupTree, FALSE, 'dnc_');
 
+      // during contact editing : if no address is filled
+      // required custom data must not produce 'required' form rule error
+      // more handling done in formRule func
+      if (!$inlineEdit) {
+        CRM_Contact_Form_Edit_Address::storeRequiredCustomDataInfo($form, $groupTree);
+      }
+
       $template     = CRM_Core_Smarty::singleton();
       $tplGroupTree = $template->get_template_vars('address_groupTree');
       $tplGroupTree = empty($tplGroupTree) ? array(
@@ -312,16 +319,47 @@ class CRM_Contact_Form_Edit_Address {
    * @access public
    * @static
    */
-  static function formRule($fields) {
+  static function formRule($fields, $files, $self) {
     $errors = array();
+
+    $customDataRequiredFields = array();
+    if ($self && property_exists($self, '_addressRequireOmission')) {
+      $customDataRequiredFields = explode(',', $self->_addressRequireOmission);
+    }
+
     // check for state/county match if not report error to user.
     if (CRM_Utils_Array::value('address', $fields) && is_array($fields['address'])) {
       foreach ($fields['address'] as $instance => $addressValues) {
+
         if (CRM_Utils_System::isNull($addressValues)) {
+          // DETACH 'required' form rule error to
+          // custom data only if address data not exists upon submission
+          if (!empty($customDataRequiredFields)) {
+            foreach($customDataRequiredFields as $customElementName) {
+              $elementName = "address[$instance][$customElementName]";
+              if ($self->getElementError($elementName)) {
+                // set element error to none
+                $self->setElementError($elementName, NULL);
+              }
+            }
+          }
           continue;
         }
 
+        // DETACH 'required' form rule error to
+        // custom data only if address data not exists upon submission
+        if (!empty($customDataRequiredFields) && !CRM_Core_BAO_Address::dataExists($addressValues)) {
+          foreach($customDataRequiredFields as $customElementName) {
+            $elementName = "address[$instance][$customElementName]";
+            if ($self->getElementError($elementName)) {
+              // set element error to none
+              $self->setElementError($elementName, NULL);
+            }
+          }
+        }
+
         $countryId = CRM_Utils_Array::value('country_id', $addressValues);
+
         $stateProvinceId = CRM_Utils_Array::value('state_province_id', $addressValues);
 
         //do check for mismatch countries
@@ -546,5 +584,29 @@ class CRM_Contact_Form_Edit_Address {
       // end of parse address functionality
     }
   }
-}
 
+
+  static function storeRequiredCustomDataInfo(&$form, $groupTree) {
+    if (CRM_Utils_System::getClassName($form) == 'CRM_Contact_Form_Contact') {
+      $requireOmission = NULL;
+      foreach ($groupTree as $csId => $csVal) {
+        // only process Address entity fields
+        if ($csVal['extends'] != 'Address') {
+          continue;
+        }
+
+        foreach ($csVal['fields'] as $cdId => $cdVal) {
+          if ($cdVal['is_required']) {
+            $elementName = $cdVal['element_name'];
+            if (in_array($elementName, $form->_required)) {
+              // store the omitted rule for a element, to be used later on
+              $requireOmission .= $cdVal['element_custom_name'] . ',';
+            }
+          }
+        }
+      }
+
+      $form->_addressRequireOmission = rtrim($requireOmission, ',');
+    }
+  }
+}

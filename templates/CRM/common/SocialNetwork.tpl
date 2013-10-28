@@ -45,7 +45,7 @@
             {*use advanced buttons for pages*}
             <div class="label">
                 <iframe allowtransparency="true" frameborder="0" scrolling="no"
-                src="//platform.twitter.com/widgets/tweet_button.html?text={$title}&amp;url={$url}"
+                src="//platform.twitter.com/widgets/tweet_button.html?text={$title}&amp;url={$url|escape:'url'}"
                 style="width:100px; height:20px;">
                 </iframe>
             </div>

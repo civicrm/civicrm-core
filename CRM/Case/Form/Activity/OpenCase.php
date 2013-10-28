@@ -69,6 +69,11 @@ class CRM_Case_Form_Activity_OpenCase {
     $form->_contactID = CRM_Utils_Request::retrieve('cid', 'Positive', $form);
     $form->assign('context', $form->_context);
 
+    // check if the case type id passed in url is a valid one
+    $caseTypeId = CRM_Utils_Request::retrieve('ctype', 'Positive', $form);
+    $caseTypes = CRM_Case_PseudoConstant::caseType();
+    $form->_caseTypeId = array_key_exists($caseTypeId, $caseTypes) ? $caseTypeId : NULL;
+
     // Add attachments
     CRM_Core_BAO_File::buildAttachment( $form, 'civicrm_activity', $form->_activityId );
   }
@@ -94,10 +99,20 @@ class CRM_Case_Form_Activity_OpenCase {
     if (count($caseStatus) == 1) {
       $defaults['status_id'] = key($caseStatus);
     }
-    $caseType = CRM_Core_OptionGroup::values('case_type', FALSE, FALSE, FALSE, 'AND is_default = 1');
-    if (count($caseType) == 1) {
-      $defaults['case_type_id'] = key($caseType);
+
+    // set default case type passed in url
+    if ($form->_caseTypeId) {
+      $caseType = $form->_caseTypeId;
     }
+    else {
+      // set default case type if only one of it exists
+      $caseType = CRM_Core_OptionGroup::values('case_type', FALSE, FALSE, FALSE, 'AND is_default = 1');
+      if (count($caseType) == 1) {
+        $caseType = key($caseType);
+      }
+    }
+    $defaults['case_type_id'] = $caseType;
+
     $medium = CRM_Core_OptionGroup::values('encounter_medium', FALSE, FALSE, FALSE, 'AND is_default = 1');
     if (count($medium) == 1) {
       $defaults['medium_id'] = key($medium);
@@ -125,12 +140,16 @@ class CRM_Case_Form_Activity_OpenCase {
     }
 
     $caseType = array('' => '-select-') + CRM_Case_PseudoConstant::caseType();
-    $form->add('select', 'case_type_id', ts('Case Type'),
+    $element = $form->add('select', 'case_type_id', ts('Case Type'),
       $caseType, TRUE, array(
         'onchange' =>
         "CRM.buildCustomData( 'Case', this.value );",
       )
     );
+
+    if ($form->_caseTypeId) {
+      $element->freeze();
+    }
 
     $caseStatus = CRM_Case_PseudoConstant::caseStatus();
     $form->add('select', 'status_id', ts('Case Status'),

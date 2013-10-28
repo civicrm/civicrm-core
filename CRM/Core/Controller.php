@@ -146,6 +146,14 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
   public $_destination = NULL;
 
   /**
+   * The entry url for a top level form or wizard. Typically the URL with a reset=1
+   * used to redirect back to when we land into some session wierdness
+   *
+   * @var string
+   */
+  public $_entryURL = NULL;
+
+  /**
    * All CRM single or multi page pages should inherit from this class.
    *
    * @param string  title        descriptive title of the controller
@@ -175,6 +183,18 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
       self::$_template = CRM_Core_Smarty::singleton();
       self::$_session = CRM_Core_Session::singleton();
     }
+
+    // lets try to get it from the session and/or the request vars
+    // we do this early on in case there is a fatal error in retrieving the
+    // key and/or session
+    $this->_entryURL = CRM_Utils_Request::retrieve(
+      'entryURL',
+      'String',
+      $this,
+      FALSE,
+      NULL,
+      $_REQUEST
+    );
 
     // add a unique validable key to the name
     $name         = CRM_Utils_System::getClassName($this);
@@ -229,9 +249,14 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
       }
     }
 
-    // if the request has a reset value, initialize the controller session
+   // if the request has a reset value, initialize the controller session
     if (CRM_Utils_Array::value('reset', $_GET)) {
       $this->reset();
+
+      // in this case we'll also cache the url as a hidden form variable, this allows us to
+      // redirect in case the session has disappeared on us
+      $this->_entryURL = CRM_Utils_System::makeURL(NULL, TRUE, FALSE, NULL, TRUE);
+      $this->set('entryURL', $this->_entryURL);
     }
 
     // set the key in the session
@@ -241,8 +266,13 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
 
 
     // also retrieve and store destination in session
-    $this->_destination = CRM_Utils_Request::retrieve('civicrmDestination', 'String', $this,
-      FALSE, NULL, $_REQUEST
+    $this->_destination = CRM_Utils_Request::retrieve(
+      'civicrmDestination',
+      'String',
+      $this,
+      FALSE,
+      NULL,
+      $_REQUEST
     );
   }
 
@@ -757,8 +787,27 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
    *
    */
   public function invalidKey() {
+    self::invalidKeyCommon();
+  }
+
+  public function invalidKeyCommon() {
     $msg = ts('We can\'t load the requested web page. This page requires cookies to be enabled in your browser settings. Please check this setting and enable cookies (if they are not enabled). Then try again. If this error persists, contact the site adminstrator for assistance.') . '<br /><br />' . ts('Site Administrators: This error may indicate that users are accessing this page using a domain or URL other than the configured Base URL. EXAMPLE: Base URL is http://example.org, but some users are accessing the page via http://www.example.org or a domain alias like http://myotherexample.org.') . '<br /><br />' . ts('Error type: Could not find a valid session key.');
     CRM_Core_Error::fatal($msg);
+  }
+
+  /**
+   * Instead of outputting a fatal error message, we'll just redirect to the entryURL if present
+   *
+   * @return void
+   */
+  public function invalidKeyRedirect() {
+    if ($this->_entryURL) {
+      CRM_Core_Session::setStatus(ts('Your browser session has expired and we are unable to complete your form submission. We have returned you to the initial step so you can complete and resubmit the form. If you experience continued difficulties, please contact us for assistance.'));
+      return CRM_Utils_System::redirect($this->_entryURL);
+    }
+    else {
+      self::invalidKeyCommon();
+    }
   }
 
 }
