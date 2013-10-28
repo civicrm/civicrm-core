@@ -152,7 +152,7 @@ class CRM_Activity_Form_Task extends CRM_Core_Form {
   public function setContactIDs() {
     $IDs = implode(',', $this->_activityHolderIds);
 
-    $activityContacts = CRM_Core_PseudoConstant::activityContacts('name');
+    $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
     $sourceID = CRM_Utils_Array::key('Activity Source', $activityContacts);
     $query = "
 SELECT contact_id
