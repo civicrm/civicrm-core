@@ -133,7 +133,7 @@ class CRM_Upgrade_Incremental_php_FourFour {
         2 => array('Fattorini Name Badge 100x65', 'String'),
         3 => array('Hanging Badge 3-3/4" x 4-3"/4', 'String'),
       );
-      
+
       foreach ($insertStatements as $values) {
         $query = 'INSERT INTO civicrm_option_value (`option_group_id`, `label`, `value`, `name`, `grouping`, `filter`, `is_default`, `weight`, `description`, `is_optgroup`, `is_reserved`, `is_active`, `component_id`, `visibility_id`) VALUES' . $values;
         CRM_Core_DAO::executeQuery($query, $queryParams);
@@ -193,6 +193,10 @@ VALUES
       $dao = CRM_Core_DAO::executeQuery($query);
     }
 
+    // sometimes an user does not make a clean backup and the above table
+    // already exists, so lets delete this table - CRM-13665
+    $query = "DROP TABLE civicrm_activity_contact";
+    $dao = CRM_Core_DAO::executeQuery($query);
 
     $query = "
 CREATE TABLE IF NOT EXISTS civicrm_activity_contact (
@@ -207,6 +211,7 @@ CREATE TABLE IF NOT EXISTS civicrm_activity_contact (
 ";
 
     $dao = CRM_Core_DAO::executeQuery($query);
+
 
     $query = "
 INSERT INTO civicrm_activity_contact (activity_id, contact_id, record_type_id)
