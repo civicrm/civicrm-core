@@ -31,7 +31,7 @@ class CRM_Utils_HookTest extends CiviUnitTestCase {
    */
   function testRunHooks_reentrancy() {
     $arg1 = 'whatever';
-    $this->hook->runHooks($this->fakeModules, 'civicrm_testRunHooks_outer', 1, $arg1, CRM_Utils_Hook::$_nullObject, CRM_Utils_Hook::$_nullObject, CRM_Utils_Hook::$_nullObject, CRM_Utils_Hook::$_nullObject);
+    $this->hook->runHooks($this->fakeModules, 'civicrm_testRunHooks_outer', 1, $arg1, CRM_Utils_Hook::$_nullObject, CRM_Utils_Hook::$_nullObject, CRM_Utils_Hook::$_nullObject, CRM_Utils_Hook::$_nullObject, CRM_Utils_Hook::$_nullObject);
     $this->assertEquals(
       array(
         'a-outer',
@@ -56,7 +56,7 @@ function hooktesta_civicrm_testRunHooks_outer() {
 function hooktestb_civicrm_testRunHooks_outer() {
   $test = CRM_Utils_HookTest::$activeTest;
   $test->log[] = 'b-outer-1';
-  $test->hook->runHooks($test->fakeModules, 'civicrm_testRunHooks_inner', 0, CRM_Utils_Hook::$_nullObject, CRM_Utils_Hook::$_nullObject, CRM_Utils_Hook::$_nullObject, CRM_Utils_Hook::$_nullObject, CRM_Utils_Hook::$_nullObject);
+  $test->hook->runHooks($test->fakeModules, 'civicrm_testRunHooks_inner', 0, CRM_Utils_Hook::$_nullObject, CRM_Utils_Hook::$_nullObject, CRM_Utils_Hook::$_nullObject, CRM_Utils_Hook::$_nullObject, CRM_Utils_Hook::$_nullObject, CRM_Utils_Hook::$_nullObject);
   $test->log[] = 'b-outer-2';
 }
 
