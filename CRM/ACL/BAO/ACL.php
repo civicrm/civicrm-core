@@ -822,6 +822,7 @@ SELECT g.*
 
     $acls = CRM_ACL_BAO_Cache::build($contactID);
 
+    $ids = array();
     if (!empty($acls)) {
       $aclKeys = array_keys($acls);
       $aclKeys = implode(',', $aclKeys);
@@ -842,9 +843,7 @@ ORDER BY a.object_id
 ";
         $params = array(1 => array($tableName, 'String'));
         $dao = CRM_Core_DAO::executeQuery($query, $params);
-        $aclFound = FALSE;
         while ($dao->fetch()) {
-          $aclFound = TRUE;
           if ($dao->object_id) {
             if (self::matchType($type, $dao->operation)) {
               $ids[] = $dao->object_id;
@@ -861,20 +860,14 @@ ORDER BY a.object_id
             break;
           }
         }
-
-        if (!$aclFound) {
-          if (!empty($includedGroups) &&
-            is_array($includedGroups)
-          ) {
-            $ids = $includedGroups;
-          }
-          else {
-            $ids = array();
-          }
-        }
-
         $cache->set($cacheKey, $ids);
       }
+    }
+
+    if (empty($ids) && !empty($includedGroups) &&
+      is_array($includedGroups)
+    ) {
+      $ids = $includedGroups;
     }
 
     CRM_Utils_Hook::aclGroup($type, $contactID, $tableName, $allGroups, $ids);
