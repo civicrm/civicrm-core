@@ -1204,7 +1204,7 @@ class CRM_Utils_Token {
    * @param array $membershipIDs array of membership IDS
    */
   static function getMembershipTokenDetails($membershipIDs) {
-    $memberships = civicrm_api3('membership', 'get', array('membership_id' => array('IN' => (array) $membershipIDs)));
+    $memberships = civicrm_api3('membership', 'get', array('options' => array('limit' => 200000), 'membership_id' => array('IN' => (array) $membershipIDs)));
     return $memberships['values'];
   }
   /**
