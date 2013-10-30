@@ -957,6 +957,7 @@ class CRM_Report_Form extends CRM_Core_Form {
         $this->addElement('select', "order_bys[{$i}][column]", ts('Order by Column'), $options);
         $this->addElement('select', "order_bys[{$i}][order]", ts('Order by Order'), array('ASC' => 'Ascending', 'DESC' => 'Descending'));
         $this->addElement('checkbox', "order_bys[{$i}][section]", ts('Order by Section'), FALSE, array('id' => "order_by_section_$i"));
+        $this->addElement('checkbox', "order_bys[{$i}][pageBreak]", ts('Page Break'), FALSE, array('id' => "order_by_section_$i"));
       }
     }
   }
@@ -2152,6 +2153,7 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
 
           // Record any section headers for assignment to the template
           if (CRM_Utils_Array::value('section', $orderBy)) {
+            $orderByField['pageBreak'] = CRM_Utils_Array::value('pageBreak', $orderBy);
             $this->_sections[$orderByField['tplField']] = $orderByField;
           }
         }
