@@ -134,6 +134,17 @@
 
             // hide and display the appropriate blocks as directed by the php code
             on_load_init_blocks( showRows, hideBlocks, '' );
+            
+            cj('input[id^="order_by_section_"]').click(disPageBreak).each(disPageBreak);
+            
+            function disPageBreak() {
+              if (!cj(this).attr('checked')) {
+                cj(this).parent('td').next('td').children('input[id^="order_by_pagebreak_"]').attr({checked: false, disabled: "disabled"});
+              }
+              else {
+                cj(this).parent('td').next('td').children('input[id^="order_by_pagebreak_"]').attr({disabled: false});
+              }
+            }
 
             function hideRow(i) {
                 showHideRow(i);
@@ -141,7 +152,7 @@
                 cj('select#order_by_column_'+ i).val('');
                 cj('select#order_by_order_'+ i).val('ASC');
                 cj('input#order_by_section_'+ i).attr('checked', false);
-                cj('input#order_by_pageBreak_'+ i).attr('checked', false);
+                cj('input#order_by_pagebreak_'+ i).attr('checked', false);
             }
 
             {/literal}
