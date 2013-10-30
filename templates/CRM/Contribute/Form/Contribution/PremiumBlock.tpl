@@ -309,8 +309,8 @@
                 cj(option[0]).val(option[1]);
                 cj(option[0]).trigger('change');
               }
-              else if (cj(price_sets[amount]).attr('type') == 'checkbox') {
-                cj(price_sets[amount]).attr("checked",true);
+              else if (cj(price_sets[selected_price_set]).attr('type') == 'checkbox') {
+                cj(price_sets[selected_price_set]).attr("checked",true);
                 if ((typeof totalfee !== 'undefined') && (typeof display == 'function')) {
                   if (totalfee > 0) {
                     totalfee += amount;
@@ -322,8 +322,8 @@
                 }
              }
              else {
-               cj(price_sets[amount]).click();
-               cj(price_sets[amount]).trigger('click');
+               cj(price_sets[selected_price_set]).click();
+               cj(price_sets[selected_price_set]).trigger('click');
              }
             }
           }
