@@ -99,6 +99,7 @@
         <th> Column</th>
         <th> Order</th>
         <th> Section Header / Group By</th>
+        <th> Page Break</th>
         </tr>
 
   {section name=rowLoop start=1 loop=6}
@@ -112,6 +113,7 @@
         <td> {$form.order_bys.$index.column.html}</td>
         <td> {$form.order_bys.$index.order.html}</td>
         <td> {$form.order_bys.$index.section.html}</td>
+        <td> {$form.order_bys.$index.pageBreak.html}</td>
   </tr>
         {/section}
         </table>
@@ -139,6 +141,7 @@
                 cj('select#order_by_column_'+ i).val('');
                 cj('select#order_by_order_'+ i).val('ASC');
                 cj('input#order_by_section_'+ i).attr('checked', false);
+                cj('input#order_by_pageBreak_'+ i).attr('checked', false);
             }
 
             {/literal}

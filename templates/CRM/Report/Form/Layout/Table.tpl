@@ -81,13 +81,13 @@
                         {$l}assign var=printValue value=$row.{$column}{$r}
                     {$l}/if{$r}
 
-                    <tr><th colspan="{$columnCount}">
+                    <tr class="crm-report-sectionHeader crm-report-sectionHeader-{$h}{if $section.pageBreak} page-break{/if}"><th colspan="{$columnCount}">
                         <h{$h}>{$section.title}: {$l}$printValue|default:"<em>none</em>"{$r}
                             ({$l}sectionTotal key=$row.{$column} depth={$smarty.foreach.sections.index}{$r})
                         </h{$h}>
                     </th></tr>
                     {if $smarty.foreach.sections.last}
-                        <tr>{$l}$tableHeader{$r}</tr>
+                        <tr class="crm-report-sectionCols">{$l}$tableHeader{$r}</tr>
                     {/if}
                 {$l}/if{$r}
             {/foreach}
