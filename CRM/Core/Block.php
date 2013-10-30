@@ -422,6 +422,12 @@ class CRM_Core_Block {
       CRM_Core_DAO::$_nullObject,
       CRM_Core_DAO::$_nullObject
     );
+    
+    foreach ($values as $key => $val) {
+      if (CRM_Utils_Array::value('title', $val)) {
+        $values[$key]['name'] = CRM_Utils_Array::value('name', $val, $val['title']);
+      }
+    }
 
     self::setProperty(self::CREATE_NEW, 'templateValues', array('shortCuts' => $values));
   }
