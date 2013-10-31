@@ -113,9 +113,11 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
     }
     else {
       // check for duplicate relationship
-      //@todo this code doesn't cope well with updates - causes e-Notices. API has a lot of code to work around
+      // @todo this code doesn't cope well with updates - causes e-Notices.
+      // API has a lot of code to work around
       // this but should review this code & remove the extra handling from the api
-      // it seems doubtful any of this is relevant if the contact fields & relationship type fields are not set
+      // it seems doubtful any of this is relevant if the contact fields & relationship
+      // type fields are not set
       if (
         self::checkDuplicateRelationship(
           $params,
@@ -199,7 +201,9 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
    * @static
    */
   static function add(&$params, $ids = array(), $contactId = NULL) {
-    $relationshipId = CRM_Utils_Array::value('relationship', $ids, CRM_Utils_Array::value('id', $params));
+    $relationshipId =
+      CRM_Utils_Array::value('relationship', $ids, CRM_Utils_Array::value('id', $params));
+
     $hook = 'create';
     if($relationshipId) {
       $hook = 'edit';
@@ -209,14 +213,16 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
 
     $relationshipTypes = CRM_Utils_Array::value('relationship_type_id', $params);
 
-    // expolode the string with _ to get the relationship type id and to know which contact has to be inserted in
+    // explode the string with _ to get the relationship type id
+    // and to know which contact has to be inserted in
     // contact_id_a and which one in contact_id_b
     list($type, $first, $second) = explode('_', $relationshipTypes);
 
     ${'contact_' . $first} = CRM_Utils_Array::value('contact', $ids);
     ${'contact_' . $second} = $contactId;
 
-    //check if the relationship type is Head of Household then update the household's primary contact with this contact.
+    // check if the relationship type is Head of Household then update the
+    // household's primary contact with this contact.
     if ($type == 6) {
       CRM_Contact_BAO_Household::updatePrimaryContact($contact_b, $contact_a);
     }
@@ -664,14 +670,16 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
     $relationshipTypeId = CRM_Utils_Array::value('relationship_type_id', $params);
     list($type, $first, $second) = explode('_', $relationshipTypeId);
 
-    $queryString = " SELECT id
-                         FROM   civicrm_relationship
-                         WHERE  relationship_type_id = " . CRM_Utils_Type::escape($type, 'Integer');
+    $queryString = "
+SELECT id
+FROM   civicrm_relationship
+WHERE  relationship_type_id = " . CRM_Utils_Type::escape($type, 'Integer');
 
     /*
-    * CRM-11792 - date fields from API are in ISO format, but this function supports date arrays
-    * BAO has increasingly standardised to ISO format so I believe this function should support
-    * ISO rather than make API format it - however, need to support array format for now to avoid breakage
+    * CRM-11792 - date fields from API are in ISO format, but this function
+    * supports date arrays BAO has increasingly standardised to ISO format
+    * so I believe this function should support ISO rather than make API
+    * format it - however, need to support array format for now to avoid breakage
     * @ time of writing this function is called from Relationship::create (twice)
     * CRM_BAO_Contact_Utils::clearCurrentEmployer (seemingly without dates)
     * CRM_Contact_Form_Task_AddToOrganization::postProcess &
@@ -683,16 +691,20 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
     foreach ($dateFields as $dateField){
       if(array_key_exists($dateField, $params)) {
         if (empty($params[$dateField]) || $params[$dateField] == 'null'){
-          //this is most likely coming from an api call & probably loaded from the DB to deal with some of the
-          //other myriad of excessive checks still in place both in the api & the create functions
+          //this is most likely coming from an api call & probably loaded
+          // from the DB to deal with some of the
+          // other myriad of excessive checks still in place both in
+          // the api & the create functions
           $queryString .= " AND $dateField IS NULL";
           continue;
         }
         elseif (is_array($params[$dateField])){
-          $queryString .= " AND $dateField = " . CRM_Utils_Type::escape(CRM_Utils_Date::format($params[$dateField]), 'Date');
+          $queryString .= " AND $dateField = " .
+            CRM_Utils_Type::escape(CRM_Utils_Date::format($params[$dateField]), 'Date');
         }
-        else{
-          $queryString .= " AND $dateField = " . CRM_Utils_Type::escape($params[$dateField], 'Date');
+        else {
+          $queryString .= " AND $dateField = " .
+            CRM_Utils_Type::escape($params[$dateField], 'Date');
         }
       }
     }
