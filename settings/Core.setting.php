@@ -627,4 +627,19 @@ When enabled, statistics about your CiviCRM installation are reported anonymousl
     'description' => null,
     'help_text'   => null,
   ),
+
+  'disable_core_css' => array(
+    'group_name' => 'CiviCRM Preferences',
+    'group' => 'core',
+    'name' => 'disable_core_css',
+    'type' => 'Boolean',
+    'quick_form_type' => 'YesNo',
+    'default' => '0',
+    'add' => '4.4',
+    'title' => 'Disable CiviCRM css',
+    'is_domain' => 1,
+    'is_contact' => 0,
+    'description' => 'Prevent the stylesheet "civicrm.css" from being loaded.',
+    'help_text' => NULL,
+  ),
 );
