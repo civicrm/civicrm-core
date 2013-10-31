@@ -59,10 +59,10 @@ class CRM_Upgrade_Incremental_php_FourFour {
    * @return void
    */
   function setPostUpgradeMessage(&$postUpgradeMessage, $rev) {
-    if ($rev == '4.4.alpha1') {
+    if ($rev == '4.4.1') {
       $config = CRM_Core_Config::singleton();
       if (!empty($config->useIDS)) {
-        $postUpgradeMessage .= '<br />' . ts("The setting to skip IDS check has been deprecated. Please use the permission 'skip IDS check' to bypass the IDS system.");
+        $postUpgradeMessage .= '<br />' . ts("The setting to skip IDS check has been removed. Your site has this configured in civicrm.settings.php but it will no longer work. Instead, use the new permission 'skip IDS check' to bypass the IDS system.");
       }
     }
   }
