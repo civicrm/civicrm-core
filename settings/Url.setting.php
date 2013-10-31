@@ -78,6 +78,19 @@ return array (
     'help_text' => null,
     'validate_callback' => 'CRM_Utils_Rule::url',
   ),
+  'disable_core_css' => array(
+    'group' => 'UrlPreferences',
+    'group_name' => 'url',
+    'name' => 'disableCoreCSS',
+    'type' => 'Boolean',
+    'quick_form_type' => 'YesNo',
+    'default' => '0',
+    'add' => '4.4',
+    'title' => 'Disable CiviCRM css',
+    'is_domain' => 1,
+    'is_contact' => 0,
+    'description' => 'If you enable this option, the stylesheet "civicrm.css" will not be loaded. You will have to provide your own css to theme CiviCRM',
+    'help_text' => NULL,
+  ),
 
-
-  );
+);
