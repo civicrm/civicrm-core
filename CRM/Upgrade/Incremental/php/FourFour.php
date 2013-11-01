@@ -104,6 +104,7 @@ class CRM_Upgrade_Incremental_php_FourFour {
   }
 
   function upgrade_4_4_1($rev) {
+    $config = CRM_Core_Config::singleton();
     // CRM-13327 upgrade handling for the newly added name badges
     $ogID = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup', 'name_badge', 'id', 'name');
     $nameBadges = array_flip(array_values(CRM_Core_BAO_OptionValue::getOptionValuesAssocArrayFromName('name_badge')));
@@ -138,6 +139,13 @@ class CRM_Upgrade_Incremental_php_FourFour {
         $query = 'INSERT INTO civicrm_option_value (`option_group_id`, `label`, `value`, `name`, `grouping`, `filter`, `is_default`, `weight`, `description`, `is_optgroup`, `is_reserved`, `is_active`, `component_id`, `visibility_id`) VALUES' . $values;
         CRM_Core_DAO::executeQuery($query, $queryParams);
       }
+    }
+
+    // CRM-12578 - Prior to this version a CSS file under drupal would disable core css
+    if (!empty($config->customCSSURL) && strpos($config->userFramework, 'Drupal') === 0) {
+      // The new setting doesn't exist yet - need to create it first
+      CRM_Core_BAO_Setting::updateSettingsFromMetaData();
+      CRM_Core_BAO_Setting::setItem('1', CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'disable_core_css');
     }
 
     $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => '4.4.1')), 'task_4_4_x_runSql', $rev);
