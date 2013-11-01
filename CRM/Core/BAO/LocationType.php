@@ -111,7 +111,7 @@ class CRM_Core_BAO_LocationType extends CRM_Core_DAO_LocationType {
    */
   static function getBilling() {
     if (self::$_billingLocationType == NULL) {
-      $locationTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id');
+      $locationTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id', array(), 'validate');
       self::$_billingLocationType = array_search('Billing', $locationTypes);
     }
     return self::$_billingLocationType;

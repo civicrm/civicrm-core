@@ -109,7 +109,7 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Core_Form {
     $this->assign('paymentProcessor', $this->_paymentProcessor);
 
     // get the billing location type
-    $locationTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id');
+    $locationTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id', array(), 'validate');
     $this->_bltID = array_search('Billing', $locationTypes);
     $this->assign('bltID', $this->_bltID);
     if (!$this->_bltID) {
