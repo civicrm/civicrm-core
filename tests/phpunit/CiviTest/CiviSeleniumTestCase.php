@@ -341,9 +341,13 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     return $email;
   }
 
-  function webtestAddOrganization($organizationName = "Organization XYZ", $email = NULL) {
+  function webtestAddOrganization($organizationName = "Organization XYZ", $email = NULL, $contactSubtype = NULL) {
 
-    $this->openCiviPage("contact/add", "reset=1&ct=Organization");
+    $url = $this->sboxPath . 'civicrm/contact/add?reset=1&ct=Organization';
+    if ($contactSubtype) {
+      $url = $url . "&cst={$contactSubtype}";
+    }
+    $this->open($url);
     $this->click('organization_name');
     $this->type('organization_name', $organizationName);
 
