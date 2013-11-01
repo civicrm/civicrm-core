@@ -6,5 +6,7 @@ SET value = '{literal}{"name":"Avery 5395","paper-size":"a4","metric":"mm","lMar
 WHERE option_group_id = @option_group_id_name_badge AND name = 'Avery 5395';
 
 -- CRM-13669
+{literal}
 UPDATE civicrm_option_value SET name = 'Dear {contact.household_name}'
 WHERE name = 'Dear {contact.househols_name}';
+{/literal}
