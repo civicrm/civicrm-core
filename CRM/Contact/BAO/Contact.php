@@ -1896,7 +1896,7 @@ ORDER BY civicrm_email.is_primary DESC";
     }
 
     // get the billing location type
-    $locationTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id');
+    $locationTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id', array(), 'validate');
     $billingLocationTypeId = array_search('Billing', $locationTypes);
 
     $blocks = array('email', 'phone', 'im', 'openid');
