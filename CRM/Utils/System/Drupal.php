@@ -958,7 +958,7 @@ AND    u.status = 1
         if ($urlType == LOCALE_LANGUAGE_NEGOTIATION_URL_PREFIX) {
           if (isset($language->prefix) && $language->prefix) {
             if ($addLanguagePart) {
-              $url .= $language->prefix . '/';
+              $url = (CRM_Utils_System::isSSL() ? 'https' : 'http') . '://' . $language->domain . base_path();
             }
             if ($removeLanguagePart) {
               $url = str_replace("/{$language->prefix}/", '/', $url);

@@ -41,7 +41,8 @@ class CRM_Member_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDFLett
   static function generateHTML($membershipIDs, $returnProperties, $skipOnHold, $skipDeceased, $messageToken, $html_message, $categories) {
     $memberships = CRM_Utils_Token::getMembershipTokenDetails($membershipIDs);
 
-    foreach ($memberships as $membershipID => $membership) {
+    foreach ($membershipIDs as $membershipID) {
+      $membership = $memberships[$membershipID];
       // get contact information
       $contactId = $membership['contact_id'];
       $params = array('contact_id' => $contactId);
