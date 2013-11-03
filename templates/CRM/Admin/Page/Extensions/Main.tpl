@@ -22,7 +22,7 @@ Depends: CRM/common/enableDisable.tpl and CRM/common/jsortable.tpl
         <tr id="row_{$row.id}" class="crm-extensions crm-extensions_{$row.id}{if $row.status eq 'disabled'} disabled{/if}{if $row.status eq 'installed-missing' or $row.status eq 'disabled-missing'} extension-missing{/if}{if $row.upgradable} extension-upgradable{elseif $row.status eq 'installed'} extension-installed{/if}">
           <td class="crm-extensions-label">
               <a class="collapsed" href="#"></a>&nbsp;<strong>{$row.label}</strong><br/>({$row.key})
-              {if $extAddNewEnabled && $remoteExtensionRows[$extKey] && $row.version != $remoteExtensionRows[$extKey].version}
+              {if $extAddNewEnabled && $remoteExtensionRows[$extKey] && $remoteExtensionRows[$extKey].is_upgradeable}
                 {capture assign='upgradeURL'}{crmURL p='civicrm/admin/extensions' q="action=update&id=$extKey&key=$extKey"}{/capture}
                 <div class="crm-extensions-upgrade">{ts 1=$upgradeURL}Version {$remoteExtensionRows[$extKey].version} is available. <a href="%1">Upgrade</a>{/ts}</div>
               {/if}

@@ -208,7 +208,7 @@ class CRM_Utils_Mail {
     }
 
     $message .= '<li>' . ts('The FROM Email Address configured for this feature may not be a valid sender based on your email service provider rules.') . '</li>' . '</ul>' . '<p>' . ts('Check <a href="%1">this page</a> for more information.', array(
-      1 => CRM_Utils_System::docURL2('user/initial-set-up/email-system-configuration', TRUE))) . '</p>';
+      1 => CRM_Utils_System::docURL2('user/advanced-configuration/email-system-configuration', TRUE))) . '</p>';
 
     return $message;
   }

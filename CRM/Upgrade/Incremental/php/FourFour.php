@@ -59,10 +59,10 @@ class CRM_Upgrade_Incremental_php_FourFour {
    * @return void
    */
   function setPostUpgradeMessage(&$postUpgradeMessage, $rev) {
-    if ($rev == '4.4.alpha1') {
+    if ($rev == '4.4.1') {
       $config = CRM_Core_Config::singleton();
       if (!empty($config->useIDS)) {
-        $postUpgradeMessage .= '<br />' . ts("The setting to skip IDS check has been deprecated. Please use the permission 'skip IDS check' to bypass the IDS system.");
+        $postUpgradeMessage .= '<br />' . ts("The setting to skip IDS check has been removed. Your site has this configured in civicrm.settings.php but it will no longer work. Instead, use the new permission 'skip IDS check' to bypass the IDS system.");
       }
     }
   }
@@ -133,7 +133,7 @@ class CRM_Upgrade_Incremental_php_FourFour {
         2 => array('Fattorini Name Badge 100x65', 'String'),
         3 => array('Hanging Badge 3-3/4" x 4-3"/4', 'String'),
       );
-      
+
       foreach ($insertStatements as $values) {
         $query = 'INSERT INTO civicrm_option_value (`option_group_id`, `label`, `value`, `name`, `grouping`, `filter`, `is_default`, `weight`, `description`, `is_optgroup`, `is_reserved`, `is_active`, `component_id`, `visibility_id`) VALUES' . $values;
         CRM_Core_DAO::executeQuery($query, $queryParams);
@@ -193,6 +193,10 @@ VALUES
       $dao = CRM_Core_DAO::executeQuery($query);
     }
 
+    // sometimes an user does not make a clean backup and the above table
+    // already exists, so lets delete this table - CRM-13665
+    $query = "DROP TABLE civicrm_activity_contact";
+    $dao = CRM_Core_DAO::executeQuery($query);
 
     $query = "
 CREATE TABLE IF NOT EXISTS civicrm_activity_contact (
@@ -207,6 +211,7 @@ CREATE TABLE IF NOT EXISTS civicrm_activity_contact (
 ";
 
     $dao = CRM_Core_DAO::executeQuery($query);
+
 
     $query = "
 INSERT INTO civicrm_activity_contact (activity_id, contact_id, record_type_id)

@@ -37,6 +37,6 @@
     {ts}Click <strong>Continue Later</strong> if you're not ready to schedule or send this mailing. Click the <strong>Continue</strong> link from Unscheduled and Draft Mailings when you are ready to schedule or send it.{/ts}
 </p>
 <p>
-    {ts}<strong>Trouble-shooting Tip</strong> - If you find that your mailings are not being sent, ask the system administrator or technical support contact for your site to verify that the automated task (&quot;cron job&quot;) is running - and how frequently.{/ts} {docURL page="user/initial-set-up/email-system-configuration"}
+    {ts}<strong>Trouble-shooting Tip</strong> - If you find that your mailings are not being sent, ask the system administrator or technical support contact for your site to verify that the automated task (&quot;cron job&quot;) is running - and how frequently.{/ts} {docURL page="user/advanced-configuration/email-system-configuration"}
 </p>
 {/htxt}

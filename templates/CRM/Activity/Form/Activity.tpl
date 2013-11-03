@@ -151,19 +151,6 @@
     {/if}
   </tr>
 
-  {if $action neq 4}
-    <tr class="crm-activity-form-block-swap_target_assignee">
-      <td class="label"></td>
-      <td>
-        <a href="#" class="button" id="swap_target_assignee">
-          <span>
-            <div class="icon swap-icon"></div>{ts}Swap Target and Assignee Contacts{/ts}
-          </span>
-        </div>
-      </td>
-    </tr>
-  {/if}
-
   <tr class="crm-activity-form-block-assignee_contact_id">
     {if $action eq 4}
       <td class="label">{ts}Assigned To{/ts}</td><td class="view-value">
@@ -173,7 +160,13 @@
     </td>
       {else}
       <td class="label">{ts}Assigned To{/ts}</td>
-      <td>{$form.assignee_contact_id.html}
+      <td>
+        <a href="#" class="button" id="swap_target_assignee" title="{ts}Swap Target and Assignee Contacts{/ts}" style="float:right;">
+          <span>
+            <div class="icon swap-icon"></div>
+          </span>
+        </a>
+        {$form.assignee_contact_id.html}
         {edit}
           <span class="description">{ts}You can optionally assign this activity to someone. Assigned activities will appear in their Activities listing at CiviCRM Home.{/ts}
           {if $activityAssigneeNotification}

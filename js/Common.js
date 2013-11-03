@@ -884,8 +884,9 @@ CRM.validate = CRM.validate || {
   /**
    * Clientside currency formatting
    * @param value
-   * @param format
+   * @param format - currency representation of the number 1234.56
    * @return string
+   * @see CRM_Core_Resources::addCoreResources
    */
   var currencyTemplate;
   CRM.formatMoney = function(value, format) {
@@ -904,7 +905,6 @@ CRM.validate = CRM.validate || {
     sign = (value < 0) ? '-' : '';
     //extracting the absolute value of the integer part of the number and converting to string
     i = parseInt(value = Math.abs(value).toFixed(2)) + '';
-
     j = ((j = i.length) > 3) ? j % 3 : 0;
     result = sign + (j ? i.substr(0, j) + separator : '') + i.substr(j).replace(/(\d{3})(?=\d)/g, "$1" + separator) + (2 ? decimal + Math.abs(value - i).toFixed(2).slice(2) : '');
     return format.replace(/1.*234.*56/, result);

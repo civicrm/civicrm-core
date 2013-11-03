@@ -84,6 +84,33 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
             'dbAlias' => "civicrm_contact_target.sort_name",
             'default' => TRUE,
           ),
+         'contact_source_id' =>
+          array(
+            'name' => 'id',
+            'alias' => 'civicrm_contact_source',
+            'dbAlias' => "civicrm_contact_source.id",
+            'no_display' => TRUE,
+            'default' => TRUE,
+            'required' => TRUE,
+          ),
+          'contact_assignee_id' =>
+          array(
+            'name' => 'id',
+            'alias' => 'civicrm_contact_assignee',
+            'dbAlias' => "civicrm_contact_assignee.id",
+            'no_display' => TRUE,
+            'default' => TRUE,
+            'required' => TRUE,
+          ),
+          'contact_target_id' =>
+          array(
+            'name' => 'id',
+            'alias' => 'civicrm_contact_target',
+            'dbAlias' => "civicrm_contact_target.id",
+            'no_display' => TRUE,
+            'default' => TRUE,
+            'required' => TRUE,
+          ),
         ),
         'filters' =>
         array(
@@ -296,8 +323,7 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
         if (strstr($clause, 'civicrm_contact_target.') || 
           strstr($clause, 'civicrm_contact_source.') ||
           strstr($clause, 'civicrm_email_target.') ||
-          strstr($clause, 'civicrm_email_source.') ||
-          strstr($clause, 'address_civireport.')
+          strstr($clause, 'civicrm_email_source.')
         ) {
           $removeKeys[] = $key;
           unset($this->_selectClauses[$key]);
@@ -308,8 +334,7 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
         if (strstr($clause, 'civicrm_contact_target.') || 
           strstr($clause, 'civicrm_contact_assignee.') ||
           strstr($clause, 'civicrm_email_target.') ||
-          strstr($clause, 'civicrm_email_assignee.') ||
-          strstr($clause, 'address_civireport.')
+          strstr($clause, 'civicrm_email_assignee.')
         ) {
           $removeKeys[] = $key;
           unset($this->_selectClauses[$key]);
@@ -321,7 +346,7 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
         if (strstr($clause, 'civicrm_contact_contact_target') || 
           strstr($clause, 'civicrm_contact_contact_assignee') ||
           strstr($clause, 'civicrm_contact_contact_source') ) {
-          $this->_selectClauses[$key] = "GROUP_CONCAT($clause) as $clause";
+          $this->_selectClauses[$key] = "GROUP_CONCAT($clause SEPARATOR ';') as $clause";
         }
       }
     }
@@ -358,7 +383,6 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
                       civicrm_email_target.is_primary = 1";
       }
       $this->_aliases['civicrm_contact'] = 'civicrm_contact_target';
-      $this->addAddressFromClause();
     }
 
     if ($recordType == 'assignee') {
@@ -377,6 +401,7 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
                    ON {$this->_aliases['civicrm_activity_contact']}.contact_id = civicrm_email_assignee.contact_id AND
                       civicrm_email_assignee.is_primary = 1";
       }
+      $this->_aliases['civicrm_contact'] = 'civicrm_contact_assignee';
     }
 
     if ($recordType == 'source') {
@@ -395,7 +420,9 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
                    ON {$this->_aliases['civicrm_activity_contact']}.contact_id = civicrm_email_source.contact_id AND
                       civicrm_email_source.is_primary = 1";
       }
+      $this->_aliases['civicrm_contact'] = 'civicrm_contact_source';
     }
+    $this->addAddressFromClause();
   }
 
   function where() {
@@ -501,8 +528,8 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
     $this->from('target');
     $this->where();
     $insertCols = implode(',', $this->_selectAliases);
-    $tempQuery  = "CREATE TEMPORARY TABLE civireport_activity_temp_target AS 
-{$this->_select} {$this->_from} {$this->_where}";
+    $tempQuery  = "CREATE TEMPORARY TABLE civireport_activity_temp_target CHARACTER SET utf8 COLLATE utf8_unicode_ci AS 
+{$this->_select} {$this->_from} {$this->_where} ";
     CRM_Core_DAO::executeQuery($tempQuery);
 
     // 2. add new columns to hold assignee and source results
@@ -511,6 +538,8 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
   ALTER TABLE  civireport_activity_temp_target
   ADD COLUMN civicrm_contact_contact_assignee VARCHAR(128),
   ADD COLUMN civicrm_contact_contact_source VARCHAR(128),
+  ADD COLUMN civicrm_contact_contact_assignee_id VARCHAR(128), 
+  ADD COLUMN civicrm_contact_contact_source_id VARCHAR(128),
   ADD COLUMN civicrm_email_contact_assignee_email VARCHAR(128),
   ADD COLUMN civicrm_email_contact_source_email VARCHAR(128)";
     CRM_Core_DAO::executeQuery($tempQuery);
@@ -578,9 +607,93 @@ GROUP BY civicrm_activity_id {$this->_orderBy} {$this->_limit}";
     }
 
     foreach ($rows as $rowNum => $row) {
+      if (array_key_exists('civicrm_contact_contact_source', $row)) {
+        if ($value = $row['civicrm_contact_contact_source_id']) {
+          if ($viewLinks) {
+            $url = CRM_Utils_System::url("civicrm/contact/view",
+              'reset=1&cid=' . $value,
+              $this->_absoluteUrl
+            );
+            $rows[$rowNum]['civicrm_contact_contact_source_link'] = $url;
+            $rows[$rowNum]['civicrm_contact_contact_source_hover'] = $onHover;
+          }
+          $entryFound = TRUE;
+        }
+      }
+
+      if (array_key_exists('civicrm_contact_contact_assignee', $row)) {
+        $assigneeNames = explode(';', $row['civicrm_contact_contact_assignee']);
+        if ($value = $row['civicrm_contact_contact_assignee_id']) {
+          $assigneeContactIds = explode(';', $value);
+          $link = array();
+          if ($viewLinks) {
+            foreach ($assigneeContactIds as $id => $value) {
+              if (isset($value) && isset($assigneeNames[$id])) {
+                $url = CRM_Utils_System::url("civicrm/contact/view",
+                  'reset=1&cid=' . $value,
+                  $this->_absoluteUrl
+                );
+                $link[] = "<a title='" . $onHover . "' href='" . $url . "'>{$assigneeNames[$id]}</a>";
+              }
+            }
+            $rows[$rowNum]['civicrm_contact_contact_assignee'] = implode('; ', $link);
+          }
+          $entryFound = TRUE;
+        }
+      }
+
+      if (array_key_exists('civicrm_contact_contact_target', $row)) {
+        $targetNames = explode(';', $row['civicrm_contact_contact_target']);
+        if ($value = $row['civicrm_contact_contact_target_id']) {
+          $targetContactIds = explode(';', $value);
+          $link = array();
+          if ($viewLinks) {
+            foreach ($targetContactIds as $id => $value) {
+              if (isset($value) && isset($targetNames[$id])) {
+                $url = CRM_Utils_System::url("civicrm/contact/view",
+                  'reset=1&cid=' . $value,
+                  $this->_absoluteUrl
+                );
+                $link[] = "<a title='" . $onHover . "' href='" . $url . "'>{$targetNames[$id]}</a>";
+              }
+            }
+            $rows[$rowNum]['civicrm_contact_contact_target'] = implode('; ', $link);
+          }
+          $entryFound = TRUE;
+        }
+      }
+
       if (array_key_exists('civicrm_activity_activity_type_id', $row)) {
         if ($value = $row['civicrm_activity_activity_type_id']) {
           $rows[$rowNum]['civicrm_activity_activity_type_id'] = $activityType[$value];
+          if ($viewLinks) {
+            // Check for target contact id(s) and use the first contact id in that list for view activity link if found,
+            // else use source contact id
+            if (!empty($rows[$rowNum]['civicrm_contact_contact_target_id'])) {
+              $targets = explode(';', $rows[$rowNum]['civicrm_contact_contact_target_id']);
+              $cid = $targets[0];
+            }
+            else {
+              $cid = $rows[$rowNum]['civicrm_contact_contact_source_id'];
+            }
+
+            $actionLinks = CRM_Activity_Selector_Activity::actionLinks($row['civicrm_activity_activity_type_id'],
+              CRM_Utils_Array::value('civicrm_activity_source_record_id', $rows[$rowNum]),
+              FALSE,
+              $rows[$rowNum]['civicrm_activity_id']
+            );
+
+            $linkValues = array(
+              'id' => $rows[$rowNum]['civicrm_activity_id'],
+              'cid' => $cid,
+              'cxt' => $context,
+            );
+            $url = CRM_Utils_System::url($actionLinks[CRM_Core_Action::VIEW]['url'],
+              CRM_Core_Action::replace($actionLinks[CRM_Core_Action::VIEW]['qs'], $linkValues), TRUE
+            );
+            $rows[$rowNum]['civicrm_activity_activity_type_id_link'] = $url;
+            $rows[$rowNum]['civicrm_activity_activity_type_id_hover'] = $onHoverAct;
+          }
           $entryFound = TRUE;
         }
       }
@@ -614,6 +727,8 @@ GROUP BY civicrm_activity_id {$this->_orderBy} {$this->_limit}";
           $entryFound = TRUE;
         }
       }
+
+      $entryFound = $this->alterDisplayAddressFields($row, $rows, $rowNum, 'activity', 'List all activities for this ') ? TRUE : $entryFound;
 
       if (!$entryFound) {
         break;
