@@ -731,6 +731,7 @@ LEFT JOIN  civicrm_email ce ON ( ce.contact_id=c.id AND ce.is_primary = 1 )
     }
     elseif ($componentName == 'Activity') {
       $compTable = 'civicrm_activity';
+      $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
     }
     else {
       $compTable = 'civicrm_participant';
@@ -743,8 +744,11 @@ LEFT JOIN  civicrm_email ce ON ( ce.contact_id=c.id AND ce.is_primary = 1 )
       switch ($property) {
         case 'sort_name':
           if ($componentName == 'Activity') {
-            $select[] = "contact_source.$property as $property";
-            $from[$value] = "INNER JOIN civicrm_contact contact ON ( contact.id = $compTable.source_contact_id )";
+            $sourceID = CRM_Utils_Array::key('Activity Source', $activityContacts);
+            $select[] = "contact.$property as $property";
+            $from[$value] = "
+INNER JOIN civicrm_activity_contact acs ON (acs.activity_id = {$compTable}.id AND acs.record_type_id = {$sourceID})
+INNER JOIN civicrm_contact contact ON ( contact.id = acs.contact_id )";
           }
           else {
             $select[] = "$property as $property";
@@ -753,12 +757,11 @@ LEFT JOIN  civicrm_email ce ON ( ce.contact_id=c.id AND ce.is_primary = 1 )
           break;
 
         case 'target_sort_name':
+          $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
           $select[] = "contact_target.sort_name as $property";
           $from[$value] = "
-INNER JOIN civicrm_contact contact_source ON ( contact_source.id = $compTable.source_contact_id )
-LEFT JOIN civicrm_activity_contact ON (civicrm_activity_contact.activity_id = $compTable.id)
-LEFT JOIN civicrm_contact as contact_target ON ( contact_target.id = civicrm_activity_contact.contact_id )
-";
+INNER JOIN civicrm_activity_contact act ON (act.activity_id = {$compTable}.id AND act.record_type_id = {$targetID})
+INNER JOIN civicrm_contact contact_target ON ( contact_target.id = act.contact_id )";
           break;
 
         case 'email':
