@@ -1833,8 +1833,8 @@ class CRM_Contact_BAO_Query {
     $locationType = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id');
 
     if (substr($name, 0, 14) === 'state_province') {
-      $setTables = FALSE;
       if (isset($locType[1]) && is_numeric($locType[1])) {
+        $setTables = FALSE;
         $aName = "{$locationType[$locType[1]]}-address";
         $where = "`$aName`.state_province_id";
       }
@@ -1872,8 +1872,8 @@ class CRM_Contact_BAO_Query {
       }
     }
     elseif (substr($name, 0, 7) === 'country') {
-      $setTables = FALSE;
       if (isset($locType[1]) && is_numeric($locType[1])) {
+        $setTables = FALSE;
         $aName = "{$locationType[$locType[1]]}-address";
         $where = "`$aName`.country_id";
       }
@@ -1890,6 +1890,7 @@ class CRM_Contact_BAO_Query {
         $intVal = CRM_Utils_Array::key($value, $countries);
         $this->_where[$grouping][] = self::buildClause($where, $op, $intVal, 'Positive');
       }
+
       if (!$lType) {
         $this->_qill[$grouping][] = ts('Country') . " $op '$value'";
       }
@@ -1898,8 +1899,8 @@ class CRM_Contact_BAO_Query {
       }
     }
     elseif (substr($name, 0, 6) === 'county') {
-      $setTables = FALSE;
       if (isset($locType[1]) && is_numeric($locType[1])) {
+        $setTables = FALSE;
         $aName = "{$locationType[$locType[1]]}-address";
         $where = "`$aName`.county_id";
       }
