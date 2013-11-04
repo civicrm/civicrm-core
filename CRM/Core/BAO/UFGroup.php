@@ -3062,7 +3062,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
    *
    * @return void.
    */
-  function setComponentDefaults(&$fields, $componentId, $component, &$defaults, $isStandalone = FALSE) {
+  public static function setComponentDefaults(&$fields, $componentId, $component, &$defaults, $isStandalone = FALSE) {
     if (!$componentId ||
       !in_array($component, array('Contribute', 'Membership', 'Event', 'Activity'))
     ) {
