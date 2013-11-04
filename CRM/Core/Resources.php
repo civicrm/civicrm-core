@@ -493,8 +493,9 @@ class CRM_Core_Resources {
       if (!empty($config->customCSSURL)) {
         $this->addStyleUrl($config->customCSSURL, -99, $region);
       }
-      else {
+      if (!CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'disable_core_css')) {
         $this->addStyleFile('civicrm', 'css/civicrm.css', -99, $region);
+        // extras.css is deprecated. Don't use it.
         $this->addStyleFile('civicrm', 'css/extras.css', -98, $region);
       }
     }

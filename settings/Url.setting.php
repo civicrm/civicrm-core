@@ -37,8 +37,8 @@
  */
 return array (
   'userFrameworkResourceURL' => array(
-    'group' => 'UrlPreferences',
-    'group_name' => 'url',
+    'group' => 'url',
+    'group_name' => 'URL Preferences',
     'name' => 'userFrameworkResourceURL',
     'type' => 'String',
     'default' => null,
@@ -51,8 +51,8 @@ return array (
     'validate_callback' => 'CRM_Utils_Rule::url',
   ),
   'imageUploadURL' => array(
-    'group' => 'UrlPreferences',
-    'group_name' => 'url',
+    'group' => 'url',
+    'group_name' => 'URL Preferences',
     'name' => 'imageUploadURL',
     'type' => 'String',
     'default' => null,
@@ -65,8 +65,8 @@ return array (
     'validate_callback' => 'CRM_Utils_Rule::url',
   ),
   'customCSSURL' => array(
-    'group' => 'UrlPreferences',
-    'group_name' => 'url',
+    'group' => 'url',
+    'group_name' => 'URL Preferences',
     'name' => 'customCSSURL',
     'type' => 'String',
     'default' => null,
@@ -79,5 +79,4 @@ return array (
     'validate_callback' => 'CRM_Utils_Rule::url',
   ),
 
-
-  );
+);
