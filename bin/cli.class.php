@@ -51,6 +51,7 @@ class civicrm_cli {
   // optional arguments
   var $_site = 'localhost';
   var $_user = NULL;
+  var $_password = NULL;
 
   // all other arguments populate the parameters
   // array that is passed to civicrm_api
@@ -366,7 +367,7 @@ class civicrm_cli_csv_file extends civicrm_cli {
   function convertLine($data) {
     $params = array();
     foreach ($this->header as $i => $field) {
-      //split any multiselect data, denoted with CRM_Core_DAO::VALUE_SEPARATOR 
+      //split any multiselect data, denoted with CRM_Core_DAO::VALUE_SEPARATOR
       if (strpos($data[$i], CRM_Core_DAO::VALUE_SEPARATOR) !== FALSE) {
         $data[$i] = explode(CRM_Core_DAO::VALUE_SEPARATOR,$data[$i]);
         $data[$i] = array_combine($data[$i], $data[$i]);
