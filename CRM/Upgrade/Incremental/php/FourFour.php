@@ -217,7 +217,7 @@ VALUES
 
     // sometimes an user does not make a clean backup and the above table
     // already exists, so lets delete this table - CRM-13665
-    $query = "DROP TABLE civicrm_activity_contact";
+    $query = "DROP TABLE IF EXISTS civicrm_activity_contact";
     $dao = CRM_Core_DAO::executeQuery($query);
 
     $query = "
