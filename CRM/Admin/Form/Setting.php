@@ -108,15 +108,6 @@ class CRM_Admin_Form_Setting extends CRM_Core_Form {
 
       $this->_defaults['enableSSL'] = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'enableSSL', NULL, 0);
       $this->_defaults['verifySSL'] = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'verifySSL', NULL, 1);
-
-      $sql = "
-SELECT time_format
-FROM   civicrm_preferences_date
-WHERE  time_format IS NOT NULL
-AND    time_format <> ''
-LIMIT  1
-";
-      $this->_defaults['timeInputFormat'] = CRM_Core_DAO::singleValueQuery($sql);
     }
 
     return $this->_defaults;
@@ -247,8 +238,6 @@ AND    time_format <> ''
 ";
       $sqlParams = array(1 => array($params['timeInputFormat'], 'String'));
       CRM_Core_DAO::executeQuery($query, $sqlParams);
-
-      unset($params['timeInputFormat']);
     }
 
     // verify ssl peer option
