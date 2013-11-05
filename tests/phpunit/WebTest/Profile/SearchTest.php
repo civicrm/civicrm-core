@@ -34,6 +34,11 @@ class WebTest_Profile_SearchTest extends CiviSeleniumTestCase {
   function testSearchProfile() {
     $this->webtestLogin();
 
+    // enable county field
+    $this->openCiviPage('admin/setting/preferences/address', 'reset=1');
+    $this->check('address_options[7]');
+    $this->clickLink('_qf_Address_next-bottom');
+
     // Add new profile.
     $this->openCiviPage('admin/uf/group', 'reset=1');
 
@@ -99,6 +104,43 @@ class WebTest_Profile_SearchTest extends CiviSeleniumTestCase {
     $this->select('visibility', 'value=Public Pages');
     $this->click('is_searchable');
     $this->click('in_selector');
+    $this->clickLink('_qf_Field_next_new-bottom');
+
+    // Add state, country and county field
+    $this->click('field_name[0]');
+    $this->select('field_name[0]', 'value=Contact');
+    $this->click('field_name[1]');
+    $this->select('field_name[1]', 'value=country');
+    $this->select('field_name[2]', 'Primary');
+    $this->click('visibility');
+    $this->select('visibility', 'value=Public Pages and Listings');
+    $this->click('is_searchable');
+    $this->click('in_selector');
+    // click on save and new
+    $this->clickLink('_qf_Field_next_new-bottom');
+
+    $this->click('field_name[0]');
+    $this->select('field_name[0]', 'value=Contact');
+    $this->click('field_name[1]');
+    $this->select('field_name[1]', 'value=state_province');
+    $this->select('field_name[2]', 'Primary');
+    $this->click('visibility');
+    $this->select('visibility', 'value=Public Pages and Listings');
+    $this->click('is_searchable');
+    $this->click('in_selector');
+    // click on save and new
+    $this->clickLink('_qf_Field_next_new-bottom');
+
+    $this->click('field_name[0]');
+    $this->select('field_name[0]', 'value=Contact');
+    $this->click('field_name[1]');
+    $this->select('field_name[1]', 'value=county');
+    $this->select('field_name[2]', 'Primary');
+    $this->click('visibility');
+    $this->select('visibility', 'value=Public Pages and Listings');
+    $this->click('is_searchable');
+    $this->click('in_selector');
+
     // click on save
     $this->clickLink('_qf_Field_next-bottom', "xpath=//div[@id='field_page']/div[1]/a[4]/span[text()='Use (create mode)']");
     $this->click("xpath=//div[@id='field_page']/div[1]/a[4]/span[text()='Use (create mode)']");
@@ -112,6 +154,17 @@ class WebTest_Profile_SearchTest extends CiviSeleniumTestCase {
     $this->type('email-Primary', "jhon@$lastName.com");
     // Select Custom option
     $this->click('CIVICRM_QFID_Edu_2');
+
+    // fill country, state, county
+    $this->select('country-Primary', "United States");
+    // adding sleep gives time for state data
+    // to get populated in state combo box
+    sleep(1);
+    $this->select('state_province-Primary', "California");
+    // adding sleep gives time for county data
+    // to get populated in county combo box
+    sleep(1);
+    $this->select('county-Primary', "Alameda");
     $this->click('_qf_Edit_next');
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
@@ -126,6 +179,18 @@ class WebTest_Profile_SearchTest extends CiviSeleniumTestCase {
     $this->type('last_name', $lastName);
     // Fill Email
     $this->type('email-Primary', "jhon@$lastName.com");
+
+    // Fill state, county, country
+    $this->select('country-Primary', "United States");
+    // adding sleep gives time for state data
+    // to get populated in state combo box
+    sleep(1);
+    $this->select('state_province-Primary', "California");
+    // adding sleep gives time for county data
+    // to get populated in county combo box
+    sleep(1);
+    $this->select('county-Primary', "Alameda");
+
     // Select Custom option
     $this->click('CIVICRM_QFID_Edu_2');
     $this->click('_qf_Search_refresh');
@@ -136,6 +201,9 @@ class WebTest_Profile_SearchTest extends CiviSeleniumTestCase {
     $this->assertTrue($this->isElementPresent("xpath=//table/tbody/tr[2]/td[3][text()='$lastName']"));
     $this->assertTrue($this->isElementPresent("xpath=//table/tbody/tr[2]/td[4][text()='jhon@$lastName.com']"));
     $this->assertTrue($this->isElementPresent("xpath=//table/tbody/tr[2]/td[5][text()='Education']"));
+    $this->assertTrue($this->isElementPresent("xpath=//table/tbody/tr[2]/td[6][text()='United States']"));
+    $this->assertTrue($this->isElementPresent("xpath=//table/tbody/tr[2]/td[7][text()='CA']"));
+    $this->assertTrue($this->isElementPresent("xpath=//table/tbody/tr[2]/td[8][text()='Alameda']"));
 
     // Go back to Profile fields admin
     $this->openCiviPage('admin/uf/group/field', "reset=1&action=browse&gid=$profileId");
