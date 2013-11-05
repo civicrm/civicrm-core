@@ -1526,11 +1526,11 @@ SELECT contact_id
     * @param $tableName string the specific table requiring a rebuild; or NULL to rebuild all tables
     * @see CRM-9716
     */
-  static function triggerRebuild($tableName = NULL) {
+  static function triggerRebuild($tableName = NULL, $force = FALSE) {
     $info = array();
 
     $logging = new CRM_Logging_Schema;
-    $logging->triggerInfo($info, $tableName);
+    $logging->triggerInfo($info, $tableName, $force);
 
     CRM_Core_I18n_Schema::triggerInfo($info, $tableName);
     CRM_Contact_BAO_Contact::triggerInfo($info, $tableName);
