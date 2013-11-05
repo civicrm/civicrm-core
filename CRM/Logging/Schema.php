@@ -245,7 +245,7 @@ AND    TABLE_NAME LIKE 'log_civicrm_%'
 
     // for any obsolete columns (not null) we just make the column nullable.
     if (!empty($cols['OBSOLETE'])) {
-      $create = $this->_getCreateQuery("log_{$table}");
+      $create = $this->_getCreateQuery("`{$this->db}`.log_{$table}");
       foreach ($cols['OBSOLETE'] as $col) {
         $line = $this->_getColumnQuery($col, $create);
         // This is just going to make a not null column to nullable
