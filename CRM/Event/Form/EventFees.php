@@ -121,10 +121,14 @@ class CRM_Event_Form_EventFees {
 
     //CRM-11601 we should keep the record contribution
     //true by default while adding participant
-     if ($form->_action == CRM_Core_Action::ADD && !$form->_mode && $form->_isPaidEvent) {
+    if ($form->_action == CRM_Core_Action::ADD && !$form->_mode && $form->_isPaidEvent) {
       $defaults[$form->_pId]['record_contribution'] = 1;
     }
-
+    
+    //CRM-13420
+    if (!CRM_Utils_Array::value('payment_instrument_id', $defaults)) {
+      $defaults[$form->_pId]['payment_instrument_id'] = key(CRM_Core_OptionGroup::values('payment_instrument', FALSE, FALSE, FALSE, 'AND is_default = 1'));
+    }
     if ($form->_mode) {
       $config = CRM_Core_Config::singleton();
       // set default country from config if no country set
