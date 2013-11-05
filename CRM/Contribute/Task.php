@@ -187,6 +187,11 @@ class CRM_Contribute_Task {
       // make the print task by default
       $value = 2;
     }
+    // this is possible since hooks can inject a task
+    // CRM-13697
+    if (!isset(self::$_tasks[$value]['result'])) {
+      self::$_tasks[$value]['result'] = NULL;
+    }
     return array(
       self::$_tasks[$value]['class'],
       self::$_tasks[$value]['result'],
