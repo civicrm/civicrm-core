@@ -148,6 +148,20 @@ class CRM_Upgrade_Incremental_php_FourFour {
       CRM_Core_BAO_Setting::setItem('1', CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'disable_core_css');
     }
 
+    // CRM-13701 - Fix $config->timeInputFormat
+    $sql = "
+      SELECT time_format
+      FROM   civicrm_preferences_date
+      WHERE  time_format IS NOT NULL
+      AND    time_format <> ''
+      LIMIT  1
+    ";
+    $timeInputFormat = CRM_Core_DAO::singleValueQuery($sql);
+    if ($timeInputFormat && $timeInputFormat != $config->timeInputFormat) {
+      $params = array('timeInputFormat' => $timeInputFormat);
+      CRM_Core_BAO_ConfigSetting::add($params);
+    }
+
     $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => '4.4.1')), 'task_4_4_x_runSql', $rev);
     $this->addTask('Patch word-replacement schema', 'wordReplacements_patch', $rev);
   }
