@@ -152,7 +152,6 @@ class CRM_Contribute_Form_Contribution_OnBehalfOf {
     }
 
     $stateCountryMap = array();
-    $locationTypeId = null;
     foreach ($profileFields as $name => $field) {
       if (in_array($field['field_type'], $fieldTypes)) {
         list($prefixName, $index) = CRM_Utils_System::explode('-', $name, 2);
