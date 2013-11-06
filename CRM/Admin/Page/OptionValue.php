@@ -46,7 +46,7 @@ class CRM_Admin_Page_OptionValue extends CRM_Core_Page_Basic {
    */
   static $_links = NULL;
 
-  static $_gid = NULL;
+  protected $_gid = NULL;
 
   /**
    * The option group name
@@ -54,7 +54,7 @@ class CRM_Admin_Page_OptionValue extends CRM_Core_Page_Basic {
    * @var string
    * @static
    */
-  static $_gName = NULL;
+  protected $_gName = NULL;
 
   /**
    * Get BAO Name
