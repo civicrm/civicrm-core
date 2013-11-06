@@ -236,6 +236,7 @@
           <th>{ts}Subject{/ts}</th>
           <th>{ts}Date{/ts}</th>
           <th>{ts}Created By{/ts}</th>
+          <th>{ts}Attachment(s){/ts}</th>
           <th></th>
         </tr>
         </thead>
@@ -266,6 +267,11 @@
             <td class="crm-note-modified_date">{$note.modified_date|crmDate}</td>
             <td class="crm-note-createdBy">
                 <a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=`$note.contact_id`"}">{$note.createdBy}</a>
+            </td>
+            <td class="crm-note-attachment">
+                {foreach from=$note.attachment item=fileinfo}
+                  {$fileinfo}
+                {/foreach}
             </td>
             <td class="nowrap">{$note.action|replace:'xx':$note.id}</td>
         </tr>

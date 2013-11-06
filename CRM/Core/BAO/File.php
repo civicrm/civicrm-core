@@ -556,5 +556,52 @@
     CRM_Core_BAO_File::deleteEntityFile($params['entityTable'], $params['entityID'], NULL, $params['fileID']);
   }
 
-}
 
+  /**
+   * function to display paper icon for a file attachment -- CRM-13624
+   *
+   * @static
+   * @access public
+   */
+  static function paperIconAttachment( $entityTable, $entityID ) {
+     if (empty($entityTable) || !$entityID) {
+       $results = NULL;
+       return $results;
+     }
+    $currentAttachmentInfo = self::getEntityFile( $entityTable, $entityID );
+    foreach($currentAttachmentInfo as $fileKey => $fileValue) {
+      $fileID = $fileValue['fileID'];
+      $fileType = $fileValue['mime_type'];
+      $eid = $entityID;
+      if($fileID) {
+        if ($fileType == 'image/jpeg' ||
+            $fileType == 'image/pjpeg' ||
+            $fileType == 'image/gif' ||
+            $fileType == 'image/x-png' ||
+            $fileType == 'image/png'
+            ) {
+          $url = $fileValue['url'];
+          $alt = $fileValue['cleanName'];
+          $file_url[$fileID] = "
+              <a href=\"$url\" class='crm-image-popup'>
+              <div class='icon paper-icon' title=\"$alt\" alt=\"$alt\"></div>
+              </a>";
+          // for non image files
+        }
+        else {
+          $url = $fileValue['url'];
+          $alt = $fileValue['cleanName'];
+          $file_url[$fileID] = "<a href=\"$url\"><div class='icon paper-icon' title=\"$alt\" alt=\"$alt\"></div></a>";
+        }
+      }
+    }
+    if(empty($file_url)) {
+       $results = NULL;
+    }
+    else {
+       $results = $file_url;
+    }
+    return $results;
+  }
+
+}
