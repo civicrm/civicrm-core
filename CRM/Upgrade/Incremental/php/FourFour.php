@@ -169,8 +169,8 @@ class CRM_Upgrade_Incremental_php_FourFour {
       $insertStatus[] = "(%1, 'Available', %2, 'Available',  NULL, 0, NULL, %3, 0, 0, 1, NULL, NULL)";
       $avinc = $inc = 1;
     }
-    if (!CRM_Core_OptionGroup::getValue('activity_status', 'No-show', 'name')) {
-      $insertStatus[] = "(%1, 'No-show', %4, 'No-show',  NULL, 0, NULL, %5, 0, 0, 1, NULL, NULL)";
+    if (!CRM_Core_OptionGroup::getValue('activity_status', 'No_show', 'name')) {
+      $insertStatus[] = "(%1, 'No-show', %4, 'No_show',  NULL, 0, NULL, %5, 0, 0, 1, NULL, NULL)";
       $nsinc = $inc + 1;
     }
     if (!empty($insertStatus)) {
