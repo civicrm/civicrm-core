@@ -38,7 +38,7 @@
  *
  */
 class CRM_Admin_Form_OptionValue extends CRM_Admin_Form {
-  static $_gid = NULL;
+  protected $_gid = NULL;
 
   /**
    * The option group name
@@ -46,7 +46,7 @@ class CRM_Admin_Form_OptionValue extends CRM_Admin_Form {
    * @var string
    * @static
    */
-  static $_gName = NULL;
+  protected $_gName = NULL;
 
   /**
    * Function to for pre-processing
