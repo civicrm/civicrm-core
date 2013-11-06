@@ -43,8 +43,7 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
   protected $_summary = NULL;
   protected $_allBatches = NULL;
 
-  protected $_customGroupExtends = array(
-    'Contribution');
+  protected $_customGroupExtends = array( 'Contribution');
 
   function __construct() {
 
@@ -604,7 +603,10 @@ GROUP BY {$this->_aliases['civicrm_contribution']}.currency";
 
     // copy _from for later use of stats calculation for soft credits, and reset $this->_from to main query
     $this->_softFrom = $this->_from;
-    $this->from(); // simple reset of ->_from
+
+    // simple reset of ->_from
+    $this->from();
+    $this->customDataFrom();
 
     // 3. Decide where to populate temp3 table from
     if (CRM_Utils_Array::value('contribution_or_soft_value', $this->_params) == 'contributions_only') {
