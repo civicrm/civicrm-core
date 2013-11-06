@@ -689,6 +689,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
 
         CRM_Core_BAO_Address::checkContactSharedAddressFields($fields, $contactID);
         $addCaptcha = FALSE;
+        $location_type_id = NULL;
         foreach ($fields as $key => $field) {
           if ($viewOnly &&
             isset($field['data_type']) &&
@@ -704,6 +705,25 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
               $stateCountryMap[$index] = array();
             }
             $stateCountryMap[$index][$prefixName] = $key;
+
+            if ($prefixName == "state_province") {
+              if ($onBehalf) {
+                //CRM-11881: Bypass required-ness check for state/province on Contribution Confirm page
+                //as already done during Contribution registration via onBehalf's quickForm
+                $field['is_required'] = FALSE;
+              }
+              else {
+                if (count($this->_submitValues)) {
+                  $location_type_id = $field['location_type_id'];
+                  if (array_key_exists("country-{$location_type_id}", $fields) &&
+                  array_key_exists("state_province-{$location_type_id}", $fields) &&
+                    !empty($this->_submitValues["country-{$location_type_id}"])) {
+                    $field['is_required'] =
+                      CRM_Core_Payment_Form::checkRequiredStateProvince($this, "country-{$location_type_id}");
+                  }
+                }
+              }
+            }
           }
 
           if ($onBehalf) {
