@@ -681,16 +681,16 @@ class CRM_Profile_Form extends CRM_Core_Form {
     }
 
     if (count($this->_submitValues)) {
-      $location_type_id = null;
+      $locationTypeId = null;
       foreach ($this->_fields as $field) {
         if (!empty($field['location_type_id'])) {
-          $location_type_id = $field['location_type_id'];
+          $locationTypeId = $field['location_type_id'];
         }
-        if (array_key_exists("country-{$location_type_id}", $this->_fields) &&
-          array_key_exists("state_province-{$location_type_id}", $this->_fields) &&
-          !empty($this->_submitValues["country-{$location_type_id}"])) {
-          $this->_fields["state_province-{$location_type_id}"]['is_required'] =
-            CRM_Core_Payment_Form::checkRequiredStateProvince($this, "country-{$location_type_id}");
+        if (array_key_exists("country-{$locationTypeId}", $this->_fields) &&
+          array_key_exists("state_province-{$locationTypeId}", $this->_fields) &&
+          !empty($this->_submitValues["country-{$locationTypeId}"])) {
+          $this->_fields["state_province-{$locationTypeId}"]['is_required'] =
+            CRM_Core_Payment_Form::checkRequiredStateProvince($this, "country-{$locationTypeId}");
         }
       }
     }
