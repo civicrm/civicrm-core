@@ -24,7 +24,7 @@ class CRM_DB_EntityManager
       $annotation_reader = new AnnotationReader();
       $file_cache_reader = new FileCacheReader($annotation_reader, $annotation_cache_path, TRUE);
       $metadata_path = CRM_Utils_Path::join($civicrm_base_path, 'src');
-      $driver = new AnnotationDriver($annotation_reader, $metadata_path);
+      $driver = new AnnotationDriver($file_cache_reader, $metadata_path);
       $config = Setup::createConfiguration(TRUE, NULL, $annotation_file_cache);
       $config->setMetadataDriverImpl($driver);
       self::$entity_manager = EntityManager::create($db_settings->toDoctrineArray(), $config);
