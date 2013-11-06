@@ -2184,7 +2184,14 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
       'non_deductible_amount', 'total_amount', 'fee_amount', 'net_amount'))) {
       $form->addRule($name, ts('Please enter a valid amount.'), 'money');
     }
-
+    $stateCountryMap = array();
+    if (!empty($form->_stateCountryMap['state_province']) && !empty($form->_stateCountryMap['country'])) {
+      foreach ($form->_stateCountryMap['state_province'] as $key => $value) {
+        $stateCountryMap[$key]['state_province'] = $value;
+        $stateCountryMap[$key]['country'] = $form->_stateCountryMap['country'][$key];
+      }
+      CRM_Core_BAO_Address::addStateCountryMap($stateCountryMap);
+    }
     if ($rule) {
       if (!($rule == 'email' && $mode == CRM_Profile_Form::MODE_SEARCH)) {
         $form->addRule($name, ts('Please enter a valid %1', array(1 => $title)), $rule);
