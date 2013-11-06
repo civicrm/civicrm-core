@@ -73,7 +73,7 @@ class CRM_Contribute_Form_Contribution_OnBehalfOf {
       if (!empty($form->_membershipContactID) && $contactID != $form->_membershipContactID) {
         // renewal case - membership being renewed may or may not be for organization
         if (!empty($form->_employers) && array_key_exists($form->_membershipContactID, $form->_employers)) {
-          // if _membershipContactID belongs to employers list, we can say: 
+          // if _membershipContactID belongs to employers list, we can say:
           $form->_relatedOrganizationFound = TRUE;
         }
       } else if (!empty($form->_employers)) {
@@ -152,6 +152,7 @@ class CRM_Contribute_Form_Contribution_OnBehalfOf {
     }
 
     $stateCountryMap = array();
+    $location_type_id = null;
     foreach ($profileFields as $name => $field) {
       if (in_array($field['field_type'], $fieldTypes)) {
         list($prefixName, $index) = CRM_Utils_System::explode('-', $name, 2);
@@ -162,6 +163,14 @@ class CRM_Contribute_Form_Contribution_OnBehalfOf {
           }
 
           $stateCountryMap[$index][$prefixName] = 'onbehalf[' . $name . ']';
+
+          if (count($form->_submitValues)) {
+            $location_type_id = $field['location_type_id'];
+            if(!empty($form->_submitValues['onbehalf']["country-{$location_type_id}"]) &&
+              $prefixName == "state_province") {
+              $field['is_required'] = CRM_Core_Payment_Form::checkRequiredStateProvince($form, "country-{$location_type_id}", TRUE);
+            }
+          }
         }
         elseif (in_array($prefixName, array(
           'organization_name', 'email')) &&
