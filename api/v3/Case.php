@@ -305,7 +305,7 @@ function civicrm_api3_case_update($params) {
 
   // get original contact id and creator id of case
   if (!empty($params['contact_id'])) {
-    $origContactIds = CRM_Case_BAO_Case::retrieveContactIdsByCaseId($params['case_id']);
+    $origContactIds = CRM_Case_BAO_Case::retrieveContactIdsByCaseId($params['id']);
     $origContactId = $origContactIds[1];
   }
 
@@ -326,7 +326,7 @@ function civicrm_api3_case_update($params) {
   }
 
   if (!empty($mCaseId[0])) {
-    $params['case_id'] = $mCaseId[0];
+    $params['id'] = $mCaseId[0];
   }
 
   $dao = new CRM_Case_BAO_Case();
