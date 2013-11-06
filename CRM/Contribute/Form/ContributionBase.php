@@ -714,12 +714,12 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
               }
               else {
                 if (count($this->_submitValues)) {
-                  $location_type_id = $field['location_type_id'];
-                  if (array_key_exists("country-{$location_type_id}", $fields) &&
-                  array_key_exists("state_province-{$location_type_id}", $fields) &&
-                    !empty($this->_submitValues["country-{$location_type_id}"])) {
+                  $locationTypeId = $field['location_type_id'];
+                  if (array_key_exists("country-{$locationTypeId}", $fields) &&
+                  array_key_exists("state_province-{$locationTypeId}", $fields) &&
+                    !empty($this->_submitValues["country-{$locationTypeId}"])) {
                     $field['is_required'] =
-                      CRM_Core_Payment_Form::checkRequiredStateProvince($this, "country-{$location_type_id}");
+                      CRM_Core_Payment_Form::checkRequiredStateProvince($this, "country-{$locationTypeId}");
                   }
                 }
               }
