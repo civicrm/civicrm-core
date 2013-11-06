@@ -1992,7 +1992,17 @@ SELECT IF( EXISTS(SELECT name FROM civicrm_contact_type WHERE name like %1), 1, 
 
                 if (is_object($coDAO)) {
                   while ($coDAO->fetch()) {
-                    $options[$coDAO->value] = $coDAO->label;
+                    if ($dataType == 'Country') {
+                      // NB: using ts() on a variable here is OK, since the value is pre-determined, not variable
+                      // and already extracted to .pot files.
+                      $options[$coDAO->value] = ts($coDAO->label, array('context' => 'country'));
+                    }
+                    elseif ($dataType == 'StateProvince') {
+                      $options[$coDAO->value] = ts($coDAO->label, array('context' => 'province'));
+                    }
+                    else {
+                      $options[$coDAO->value] = $coDAO->label;
+                    }
                   }
                 }
 
