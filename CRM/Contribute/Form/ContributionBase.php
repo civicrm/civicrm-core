@@ -689,7 +689,6 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
 
         CRM_Core_BAO_Address::checkContactSharedAddressFields($fields, $contactID);
         $addCaptcha = FALSE;
-        $location_type_id = NULL;
         foreach ($fields as $key => $field) {
           if ($viewOnly &&
             isset($field['data_type']) &&
