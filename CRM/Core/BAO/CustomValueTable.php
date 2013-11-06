@@ -399,7 +399,8 @@ SELECT cg.table_name,
        cg.id as groupID,
        cg.is_multiple,
        cf.column_name,
-       cf.id as fieldID
+       cf.id as fieldID,
+       cf.data_type as fieldDataType
 FROM   civicrm_custom_group cg,
        civicrm_custom_field cf
 WHERE  cf.custom_group_id = cg.id
@@ -419,6 +420,7 @@ AND    $cond
       $fields[$dao->table_name][] = $dao->fieldID;
       $select[$dao->table_name][] = "{$dao->column_name} AS custom_{$dao->fieldID}";
       $isMultiple[$dao->table_name] = $dao->is_multiple ? TRUE : FALSE;
+      $file[$dao->table_name][$dao->fieldID] = $dao->fieldDataType;     
     }
 
     $result = array();
@@ -430,13 +432,29 @@ AND    $cond
           $fieldName = "custom_{$fieldID}";
           if ($isMultiple[$tableName]) {
             if ($formatMultiRecordField) {
-              $result["{$dao->id}"]["{$fieldID}"] = $dao->$fieldName;
+              if($file[$tableName][$fieldID] == 'File') {
+                if($fileid = $dao->$fieldName) {
+                  $fileurl = CRM_Core_BAO_File::paperIconAttachment($tableName,$entityID);
+                  $result["{$dao->id}"]["{$fieldID}"] = $fileurl[$dao->$fieldName];
+                }
+              }
+              else {
+                $result["{$dao->id}"]["{$fieldID}"] = $dao->$fieldName;
+              }
             } else {
               $result["{$fieldID}_{$dao->id}"] = $dao->$fieldName;
             }
           }
           else {
-            $result[$fieldID] = $dao->$fieldName;
+            if($file[$tableName][$fieldID] == 'File') {
+              if($fileid = $dao->$fieldName) {
+                $fileurl = CRM_Core_BAO_File::paperIconAttachment($tableName,$entityID);
+                $result[$fieldID] = $fileurl[$dao->$fieldName];
+              }
+            }
+            else {
+              $result[$fieldID] = $dao->$fieldName;          
+            }
           }
         }
       }

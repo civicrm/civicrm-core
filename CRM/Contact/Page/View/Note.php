@@ -131,6 +131,10 @@ class CRM_Contact_Page_View_Note extends CRM_Core_Page {
         $contact->fetch();
         $values[$note->id]['createdBy'] = $contact->display_name;
         $values[$note->id]['comment_count'] = CRM_Core_BAO_Note::getChildCount($note->id);
+
+        // paper icon view for attachments part
+        $paperIconAttachmentInfo = CRM_Core_BAO_File::paperIconAttachment('civicrm_note', $note->id);
+        $values[$note->id]['attachment'] = $paperIconAttachmentInfo;
       }
     }
 
