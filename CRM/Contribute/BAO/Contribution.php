@@ -124,6 +124,12 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
         $params[$field] = CRM_Utils_Rule::cleanMoney($params[$field]);
       }
     }
+    
+    // CRM-13420, set payment instrument to default if payment_instrument_id is empty
+    if (!$contributionID && !CRM_Utils_Array::value('payment_instrument_id', $params)) {
+      $params['payment_instrument_id'] = key(CRM_Core_OptionGroup::values('payment_instrument', 
+        FALSE, FALSE, FALSE, 'AND is_default = 1'));
+    }
 
     if (CRM_Utils_Array::value('payment_instrument_id', $params)) {
       $paymentInstruments = CRM_Contribute_PseudoConstant::paymentInstrument('name');
