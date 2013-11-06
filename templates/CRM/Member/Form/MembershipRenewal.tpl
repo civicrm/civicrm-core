@@ -166,7 +166,7 @@
                   <td>{include file="CRM/common/jcalendar.tpl" elementName=receive_date}</td>
                 </tr>
                 <tr class="crm-member-membershiprenew-form-block-payment_instrument_id">
-                  <td class="label">{$form.payment_instrument_id.label}</td>
+                  <td class="label">{$form.payment_instrument_id.label}<span class='marker'>*</span></td>
                   <td>{$form.payment_instrument_id.html}</td>
                 </tr>
                 <tr id="checkNumber" class="crm-member-membershiprenew-form-block-check_number">
