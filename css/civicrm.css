@@ -4032,3 +4032,6 @@ span.crm-status-icon {
   color: #fff;
 }
 
+.crm-container .paper-icon {
+  background-position: -101px -222px;background-image: url("../i/icons/jquery-ui-3E3E3E.gif");
+}
