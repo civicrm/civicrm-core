@@ -2042,18 +2042,21 @@ class Event extends \Civi\Core\Entity
         foreach ($this->paymentProcessors as $payment_processor) {
             $state = $unit_of_work->getEntityState($payment_processor, UnitOfWork::STATE_NEW);
             if ($state == UnitOfWork::STATE_NEW) {
-              $unit_of_work->persist($payment_processor);
-              if (!$listener_created) {
-                $listener_created = TRUE;
-                $commit_order_calculator = $unit_of_work->getCommitOrderCalculator();
-                $from_class = $entity_manager->getClassMetadata('\Civi\Financial\PaymentProcessor');
-                $to_class = $entity_manager->getClassMetadata('\Civi\Event\Event');
-                $commit_order_calculator->addDependency($from_class, $to_class);
-                $event_manager = $entity_manager->getEventManager();
-                $post_persist_listener = new \Civi\Event\PaymentProcessorPostPersistListener($this);
-                $event_manager->addEventListener(array(Events::postPersist), $post_persist_listener);
-              }
+                $unit_of_work->persist($payment_processor);
+                if (!$listener_created) {
+                    $listener_created = TRUE;
+                    $commit_order_calculator = $unit_of_work->getCommitOrderCalculator();
+                    $from_class = $entity_manager->getClassMetadata('\Civi\Financial\PaymentProcessor');
+                    $to_class = $entity_manager->getClassMetadata('\Civi\Event\Event');
+                    $commit_order_calculator->addDependency($from_class, $to_class);
+                    $event_manager = $entity_manager->getEventManager();
+                    $post_persist_listener = new \Civi\Event\PaymentProcessorPostPersistListener($this);
+                    $event_manager->addEventListener(array(Events::postPersist), $post_persist_listener);
+                }
             }
+        }
+        if (!$listener_created) {
+            $this->updatePaymentProcessorField();
         }
     }
 
@@ -2080,8 +2083,10 @@ class Event extends \Civi\Core\Entity
         $this->paymentProcessors = new \Doctrine\Common\Collections\ArrayCollection();
         $entity_manager = $event_args->getEntityManager();
         $payment_processor_ids = \CRM_Utils_Array::explodePadded($this->getPaymentProcessor());
-        foreach ($payment_processor_ids as $payment_processor_id) {
-            $this->paymentProcessors[] = $entity_manager->find('\Civi\Financial\PaymentProcessor', $payment_processor_id);
+        if ($payment_processor_ids != NULL) {
+            foreach ($payment_processor_ids as $payment_processor_id) {
+                $this->paymentProcessors[] = $entity_manager->find('\Civi\Financial\PaymentProcessor', $payment_processor_id);
+            }
         }
     }
 }
