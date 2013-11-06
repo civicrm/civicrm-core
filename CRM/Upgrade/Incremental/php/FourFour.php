@@ -162,6 +162,40 @@ class CRM_Upgrade_Incremental_php_FourFour {
       CRM_Core_BAO_ConfigSetting::add($params);
     }
 
+    // CRM-13698 - add 'Available' and 'No-show' activity statuses
+    $insertStatus = array();
+    $nsinc = $avinc = $inc = 0;
+    if (!CRM_Core_OptionGroup::getValue('activity_status', 'Available', 'name')) {
+      $insertStatus[] = "(%1, 'Available', %2, 'Available',  NULL, 0, NULL, %3, 0, 0, 1, NULL, NULL)";
+      $avinc = $inc = 1;
+    }
+    if (!CRM_Core_OptionGroup::getValue('activity_status', 'No-show', 'name')) {
+      $insertStatus[] = "(%1, 'No-show', %4, 'No-show',  NULL, 0, NULL, %5, 0, 0, 1, NULL, NULL)";
+      $nsinc = $inc + 1;
+    }
+    if (!empty($insertStatus)) {
+      $acOptionGroupID = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup', 'activity_status', 'id', 'name');
+      $maxVal = CRM_Core_DAO::singleValueQuery("SELECT MAX(ROUND(op.value)) FROM civicrm_option_value op WHERE op.option_group_id  = $acOptionGroupID");
+      $maxWeight = CRM_Core_DAO::singleValueQuery("SELECT MAX(weight) FROM civicrm_option_value WHERE option_group_id = $acOptionGroupID");
+
+      $p[1] = array($acOptionGroupID, 'Integer');
+      if ($avinc) {
+        $p[2] = array($avinc+$maxVal, 'Integer');
+        $p[3] = array($avinc+$maxWeight, 'Integer');
+      }
+      if ($nsinc) {
+        $p[4] = array($nsinc+$maxVal, 'Integer');
+        $p[5] = array($nsinc+$maxWeight, 'Integer');
+      }
+      $insertStatus = implode(',', $insertStatus);
+
+      $sql = "
+INSERT INTO
+   civicrm_option_value (`option_group_id`, label, `value`, `name`, `grouping`, `filter`, `is_default`, `weight`, `is_optgroup`, `is_reserved`, `is_active`, `component_id`, `visibility_id`)
+VALUES {$insertStatus}";
+      CRM_Core_DAO::executeQuery($sql, $p);
+    }
+
     $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => '4.4.1')), 'task_4_4_x_runSql', $rev);
     $this->addTask('Patch word-replacement schema', 'wordReplacements_patch', $rev);
   }
@@ -217,7 +251,7 @@ VALUES
 
     // sometimes an user does not make a clean backup and the above table
     // already exists, so lets delete this table - CRM-13665
-    $query = "DROP TABLE civicrm_activity_contact";
+    $query = "DROP TABLE IF EXISTS civicrm_activity_contact";
     $dao = CRM_Core_DAO::executeQuery($query);
 
     $query = "
