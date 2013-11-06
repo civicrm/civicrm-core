@@ -180,6 +180,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
   protected $_currentUserID = NULL;
   protected $_session       = NULL;
 
+  public $_stateCountryMap = array();
   /**
    * pre processing work done here.
    *
