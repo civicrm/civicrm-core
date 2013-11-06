@@ -604,7 +604,7 @@ VALUES
   (@option_group_id_acs, '{ts escape="sql"}Unreachable{/ts}', 5, 'Unreachable', NULL, 0, NULL, 5, NULL, 0, 0, 1, NULL, NULL),
   (@option_group_id_acs, '{ts escape="sql"}Not Required{/ts}',  6, 'Not Required',  NULL, 0, NULL, 6, NULL, 0, 0, 1, NULL, NULL),
   (@option_group_id_acs, '{ts escape="sql"}Available{/ts}',  7, 'Available',  NULL, 0, NULL, 7, NULL, 0, 0, 1, NULL, NULL),
-  (@option_group_id_acs, '{ts escape="sql"}No-show{/ts}',  8, 'No-show',  NULL, 0, NULL, 8, NULL, 0, 0, 1, NULL, NULL),
+  (@option_group_id_acs, '{ts escape="sql"}No-show{/ts}',  8, 'No_show',  NULL, 0, NULL, 8, NULL, 0, 0, 1, NULL, NULL),
 
   (@option_group_id_cas, '{ts escape="sql"}Ongoing{/ts}' , 1, 'Open'  ,  'Opened', 0, 1,    1, NULL, 0, 1, 1, NULL, NULL),
   (@option_group_id_cas, '{ts escape="sql"}Resolved{/ts}', 2, 'Closed',  'Closed', 0, NULL, 2, NULL, 0, 1, 1, NULL, NULL),
