@@ -9,6 +9,9 @@ use Doctrine\ORM\Mapping as ORM;
  *
  * @ORM\Table(name="civicrm_price_set_entity", uniqueConstraints={@ORM\UniqueConstraint(name="UI_entity", columns={"entity_table", "entity_id"})}, indexes={@ORM\Index(name="FK_civicrm_price_set_entity_price_set_id", columns={"price_set_id"})})
  * @ORM\Entity
+ * @ORM\InheritanceType("SINGLE_TABLE")
+ * @ORM\DiscriminatorColumn(name="entity_table", type="string", length=64)
+ * @ORM\DiscriminatorMap({"civicrm_event" = "Civi\Price\SetEventEntity", "civicrm_contribution" = "Civi\Price\SetContributionEntity"})
  */
 class SetEntity extends \Civi\Core\Entity
 {
@@ -22,30 +25,14 @@ class SetEntity extends \Civi\Core\Entity
     private $id;
 
     /**
-     * @var string
-     *
-     * @ORM\Column(name="entity_table", type="string", length=64, nullable=false)
-     */
-    private $entityTable;
-
-    /**
-     * @var integer
-     *
-     * @ORM\Column(name="entity_id", type="integer", nullable=false)
-     */
-    private $entityId;
-
-    /**
      * @var \Civi\Price\Set
      *
-     * @ORM\ManyToOne(targetEntity="Civi\Price\Set")
+     * @ORM\ManyToOne(targetEntity="Civi\Price\Set", cascade={"persist"})
      * @ORM\JoinColumns({
      *   @ORM\JoinColumn(name="price_set_id", referencedColumnName="id")
      * })
      */
     private $priceSet;
-
-
 
     /**
      * Get id
@@ -55,52 +42,6 @@ class SetEntity extends \Civi\Core\Entity
     public function getId()
     {
         return $this->id;
-    }
-
-    /**
-     * Set entityTable
-     *
-     * @param string $entityTable
-     * @return SetEntity
-     */
-    public function setEntityTable($entityTable)
-    {
-        $this->entityTable = $entityTable;
-
-        return $this;
-    }
-
-    /**
-     * Get entityTable
-     *
-     * @return string 
-     */
-    public function getEntityTable()
-    {
-        return $this->entityTable;
-    }
-
-    /**
-     * Set entityId
-     *
-     * @param integer $entityId
-     * @return SetEntity
-     */
-    public function setEntityId($entityId)
-    {
-        $this->entityId = $entityId;
-
-        return $this;
-    }
-
-    /**
-     * Get entityId
-     *
-     * @return integer 
-     */
-    public function getEntityId()
-    {
-        return $this->entityId;
     }
 
     /**

@@ -136,6 +136,10 @@ class Field extends \Civi\Core\Entity
      */
     private $priceSet;
 
+    /**
+     * @ORM\OneToMany(targetEntity="Civi\Price\FieldValue", mappedBy="priceField", cascade={"persist"})
+     */
+    private $priceFieldValues;
 
 
     /**
@@ -514,5 +518,46 @@ class Field extends \Civi\Core\Entity
     public function getPriceSet()
     {
         return $this->priceSet;
+    }
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        $this->priceFieldValues = new \Doctrine\Common\Collections\ArrayCollection();
+    }
+
+    /**
+     * Add priceFieldValues
+     *
+     * @param \Civi\Price\FieldValue $priceFieldValues
+     * @return Field
+     */
+    public function addPriceFieldValue(\Civi\Price\FieldValue $priceFieldValues)
+    {
+        $priceFieldValues->setPriceField($this);
+        $this->priceFieldValues[] = $priceFieldValues;
+
+        return $this;
+    }
+
+    /**
+     * Remove priceFieldValues
+     *
+     * @param \Civi\Price\FieldValue $priceFieldValues
+     */
+    public function removePriceFieldValue(\Civi\Price\FieldValue $priceFieldValues)
+    {
+        $this->priceFieldValues->removeElement($priceFieldValues);
+    }
+
+    /**
+     * Get priceFieldValues
+     *
+     * @return \Doctrine\Common\Collections\Collection 
+     */
+    public function getPriceFieldValues()
+    {
+        return $this->priceFieldValues;
     }
 }

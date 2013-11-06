@@ -104,6 +104,11 @@ class Set extends \Civi\Core\Entity
      */
     private $financialType;
 
+    /**
+     * 
+     * @ORM\OneToMany(targetEntity="Civi\Price\Field", mappedBy="priceSet", cascade={"persist"})
+     */
+    private $priceFields;
 
 
     /**
@@ -367,5 +372,46 @@ class Set extends \Civi\Core\Entity
     public function getFinancialType()
     {
         return $this->financialType;
+    }
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        $this->priceFields = new \Doctrine\Common\Collections\ArrayCollection();
+    }
+
+    /**
+     * Add priceFields
+     *
+     * @param \Civi\Price\Field $priceFields
+     * @return Set
+     */
+    public function addPriceField(\Civi\Price\Field $priceFields)
+    {
+        $priceFields->setPriceSet($this);
+        $this->priceFields[] = $priceFields;
+
+        return $this;
+    }
+
+    /**
+     * Remove priceFields
+     *
+     * @param \Civi\Price\Field $priceFields
+     */
+    public function removePriceField(\Civi\Price\Field $priceFields)
+    {
+        $this->priceFields->removeElement($priceFields);
+    }
+
+    /**
+     * Get priceFields
+     *
+     * @return \Doctrine\Common\Collections\Collection 
+     */
+    public function getPriceFields()
+    {
+        return $this->priceFields;
     }
 }

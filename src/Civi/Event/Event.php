@@ -2,13 +2,17 @@
 
 namespace Civi\Event;
 
+use Doctrine\Common\Persistence\Event\LifecycleEventArgs;
+use Doctrine\ORM\Events;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ORM\UnitOfWork;
 
 /**
  * Event
  *
  * @ORM\Table(name="civicrm_event", indexes={@ORM\Index(name="index_event_type_id", columns={"event_type_id"}), @ORM\Index(name="index_participant_listing_id", columns={"participant_listing_id"}), @ORM\Index(name="index_parent_event_id", columns={"parent_event_id"}), @ORM\Index(name="FK_civicrm_event_loc_block_id", columns={"loc_block_id"}), @ORM\Index(name="FK_civicrm_event_created_id", columns={"created_id"}), @ORM\Index(name="FK_civicrm_event_campaign_id", columns={"campaign_id"})})
- * @ORM\Entity
+ * @ORM\Entity 
+ * @ORM\HasLifecycleCallbacks
  */
 class Event extends \Civi\Core\Entity
 {
@@ -127,11 +131,14 @@ class Event extends \Civi\Core\Entity
     private $isMonetary = '0';
 
     /**
-     * @var integer
+     * @var \Civi\Financial\Type
      *
-     * @ORM\Column(name="financial_type_id", type="integer", nullable=true)
+     * @ORM\ManyToOne(targetEntity="Civi\Financial\Type")
+     * @ORM\JoinColumns({
+     *    @ORM\JoinColumn(name="financial_type_id", referencedColumnName="id")
+     * })
      */
-    private $financialTypeId;
+    private $financialType;
 
     /**
      * @var string
@@ -464,7 +471,20 @@ class Event extends \Civi\Core\Entity
      */
     private $campaign;
 
+    /**
+     *
+     * @ORM\OneToMany(targetEntity="Civi\Event\Participant", mappedBy="event", cascade={"persist"})
+     */
+    private $participants;
 
+    /**
+     *
+     * @ORM\OneToMany(targetEntity="Civi\Price\SetEventEntity", mappedBy="event", cascade={"persist"})
+     */
+
+    private $priceSetEventEntities;
+
+    private $paymentProcessors;
 
     /**
      * Get id
@@ -819,52 +839,6 @@ class Event extends \Civi\Core\Entity
     public function getIsMonetary()
     {
         return $this->isMonetary;
-    }
-
-    /**
-     * Set financialTypeId
-     *
-     * @param integer $financialTypeId
-     * @return Event
-     */
-    public function setFinancialTypeId($financialTypeId)
-    {
-        $this->financialTypeId = $financialTypeId;
-
-        return $this;
-    }
-
-    /**
-     * Get financialTypeId
-     *
-     * @return integer 
-     */
-    public function getFinancialTypeId()
-    {
-        return $this->financialTypeId;
-    }
-
-    /**
-     * Set paymentProcessor
-     *
-     * @param string $paymentProcessor
-     * @return Event
-     */
-    public function setPaymentProcessor($paymentProcessor)
-    {
-        $this->paymentProcessor = $paymentProcessor;
-
-        return $this;
-    }
-
-    /**
-     * Get paymentProcessor
-     *
-     * @return string 
-     */
-    public function getPaymentProcessor()
-    {
-        return $this->paymentProcessor;
     }
 
     /**
@@ -1900,5 +1874,214 @@ class Event extends \Civi\Core\Entity
     public function getCampaign()
     {
         return $this->campaign;
+    }
+
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        $this->participants = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->priceSetEventEntities = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->paymentProcessors = new \Doctrine\Common\Collections\ArrayCollection();
+    }
+
+    /**
+     * Set paymentProcessor
+     *
+     * @param string $paymentProcessor
+     * @return Event
+     */
+    public function setPaymentProcessor($paymentProcessor)
+    {
+        $this->paymentProcessor = $paymentProcessor;
+
+        return $this;
+    }
+
+    /**
+     * Get paymentProcessor
+     *
+     * @return string 
+     */
+    public function getPaymentProcessor()
+    {
+        return $this->paymentProcessor;
+    }
+
+    /**
+     * Add participants
+     *
+     * @param \Civi\Event\Participant $participants
+     * @return Event
+     */
+    public function addParticipant(\Civi\Event\Participant $participants)
+    {
+        $this->participants[] = $participants;
+
+        return $this;
+    }
+
+    /**
+     * Remove participants
+     *
+     * @param \Civi\Event\Participant $participants
+     */
+    public function removeParticipant(\Civi\Event\Participant $participants)
+    {
+        $this->participants->removeElement($participants);
+    }
+
+    /**
+     * Get participants
+     *
+     * @return \Doctrine\Common\Collections\Collection 
+     */
+    public function getParticipants()
+    {
+        return $this->participants;
+    }
+
+    /**
+     * Add priceSetEventEntities
+     *
+     * @param \Civi\Price\SetEventEntity $priceSetEventEntities
+     * @return Event
+     */
+    public function addPriceSetEventEntity(\Civi\Price\SetEventEntity $priceSetEventEntities)
+    {
+        $this->priceSetEventEntities[] = $priceSetEventEntities;
+
+        return $this;
+    }
+
+    /**
+     * Remove priceSetEventEntities
+     *
+     * @param \Civi\Price\SetEventEntity $priceSetEventEntities
+     */
+    public function removePriceSetEventEntity(\Civi\Price\SetEventEntity $priceSetEventEntities)
+    {
+        $this->priceSetEventEntities->removeElement($priceSetEventEntities);
+    }
+
+    /**
+     * Get priceSetEventEntities
+     *
+     * @return \Doctrine\Common\Collections\Collection 
+     */
+    public function getPriceSetEventEntities()
+    {
+        return $this->priceSetEventEntities;
+    }
+
+    public function addPaymentProcessor(\Civi\Financial\PaymentProcessor $paymentProcessor)
+    {
+        $this->paymentProcessors[] = $paymentProcessor;
+        return $this;
+    }
+
+    public function removePaymentProcessor(\Civi\Financial\PaymentProcessor $paymentProcessor)
+    {
+        $this->paymentProcessors->removeElement($paymentProcessor);
+        if ($this->updatePaymentProcessorField() === FALSE) {
+            throw new Exception("Not expecting any payment processors in the array to not be persisted here.");
+        }
+    }
+
+    public function getPaymentProcessors()
+    {
+        return $this->paymentProcessors;
+    }
+
+    public function getPriceSets()
+    {
+      return array_map($this->getPriceSetEventEntities(), function ($price_set_entity) { $price_set_entity->getPriceSet(); });
+    }
+
+    public function addPriceSet($priceSet)
+    {
+      $priceSetEventEntity = new \Civi\Price\SetEventEntity();
+      $priceSetEventEntity->setPriceSet($priceSet);
+      $priceSetEventEntity->setEvent($this);
+      $this->addPriceSetEventEntity($priceSetEventEntity);
+    }
+
+    /**
+     * Set financialType
+     *
+     * @param \Civi\Financial\Type $financialType
+     * @return Event
+     */
+    public function setFinancialType(\Civi\Financial\Type $financialType = null)
+    {
+        $this->financialType = $financialType;
+
+        return $this;
+    }
+
+    /**
+     * Get financialType
+     *
+     * @return \Civi\Financial\Type 
+     */
+    public function getFinancialType()
+    {
+        return $this->financialType;
+    }
+
+    /** 
+     * @ORM\PrePersist 
+     */
+    public function cascadePaymentProcessors(LifecycleEventArgs $event_args)
+    {
+        $listener_created = FALSE;
+        $entity_manager = $event_args->getEntityManager();
+        $unit_of_work = $entity_manager->getUnitOfWork();
+        $payment_processor_ids = array();
+        foreach ($this->paymentProcessors as $payment_processor) {
+            $state = $unit_of_work->getEntityState($payment_processor, UnitOfWork::STATE_NEW);
+            if ($state == UnitOfWork::STATE_NEW) {
+              $unit_of_work->persist($payment_processor);
+              if (!$listener_created) {
+                $listener_created = TRUE;
+                $commit_order_calculator = $unit_of_work->getCommitOrderCalculator();
+                $from_class = $entity_manager->getClassMetadata('\Civi\Financial\PaymentProcessor');
+                $to_class = $entity_manager->getClassMetadata('\Civi\Event\Event');
+                $commit_order_calculator->addDependency($from_class, $to_class);
+                $event_manager = $entity_manager->getEventManager();
+                $post_persist_listener = new \Civi\Event\PaymentProcessorPostPersistListener($this);
+                $event_manager->addEventListener(array(Events::postPersist), $post_persist_listener);
+              }
+            }
+        }
+    }
+
+    public function updatePaymentProcessorField()
+    {
+        $payment_processor_ids = array();
+        foreach ($this->paymentProcessors as $payment_processor) {
+            $payment_processor_id = $payment_processor->getId();
+            if ($payment_processor_id == NULL) {
+                return FALSE;
+            }
+            $payment_processor_ids[] = $payment_processor_id;
+        }
+        $value = \CRM_Utils_Array::implodePadded($payment_processor_ids);
+        $this->setPaymentProcessor($value);
+        return TRUE;
+    }
+
+    /** 
+     * @ORM\PostLoad
+     */
+    public function loadPaymentProcessorsFromField(LifecycleEventArgs $event_args)
+    {
+        $this->paymentProcessors = new \Doctrine\Common\Collections\ArrayCollection();
+        $entity_manager = $event_args->getEntityManager();
+        $payment_processor_ids = \CRM_Utils_Array::explodePadded($this->getPaymentProcessor());
+        foreach ($payment_processor_ids as $payment_processor_id) {
+            $this->paymentProcessors[] = $entity_manager->find('\Civi\Financial\PaymentProcessor', $payment_processor_id);
+        }
     }
 }

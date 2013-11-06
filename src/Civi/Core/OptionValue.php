@@ -8,7 +8,7 @@ use Doctrine\ORM\Mapping as ORM;
  * OptionValue
  *
  * @ORM\Table(name="civicrm_option_value", indexes={@ORM\Index(name="index_option_group_id_value", columns={"value", "option_group_id"}), @ORM\Index(name="index_option_group_id_name", columns={"name", "option_group_id"}), @ORM\Index(name="FK_civicrm_option_value_option_group_id", columns={"option_group_id"}), @ORM\Index(name="FK_civicrm_option_value_component_id", columns={"component_id"}), @ORM\Index(name="FK_civicrm_option_value_domain_id", columns={"domain_id"})})
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="Civi\Core\OptionValueRepository")
  */
 class OptionValue extends \Civi\Core\Entity
 {
