@@ -130,7 +130,7 @@
        <name>operator</name>
        <type>enum</type>
        <values>&#61;, !&#61;, &#62;, &#60;, &#62;&#61;, &#60;&#61;,
-       IN, NOT IN, LIKE, NOT LIKE, IS NULL, IS NOT NULL</values>
+       IN, NOT IN, LIKE, NOT LIKE, IS NULL, IS NOT NULL, IS NOT EMPTY, IS EMPTY</values>
        <comment>SQL WHERE operator for search-builder mapping fields (search criteria).</comment>
       <add>1.5</add>
   </field>
