@@ -958,7 +958,7 @@ AND    u.status = 1
         if ($urlType == LOCALE_LANGUAGE_NEGOTIATION_URL_PREFIX) {
           if (isset($language->prefix) && $language->prefix) {
             if ($addLanguagePart) {
-              $url = (CRM_Utils_System::isSSL() ? 'https' : 'http') . '://' . $language->domain . base_path();
+              $url .= $language->prefix . '/';
             }
             if ($removeLanguagePart) {
               $url = str_replace("/{$language->prefix}/", '/', $url);
@@ -969,7 +969,7 @@ AND    u.status = 1
         if ($urlType == LOCALE_LANGUAGE_NEGOTIATION_URL_DOMAIN) {
           if (isset($language->domain) && $language->domain) {
             if ($addLanguagePart) {
-              $url = CRM_Utils_File::addTrailingSlash($language->domain, '/');
+              $url = (CRM_Utils_System::isSSL() ? 'https' : 'http') . '://' . $language->domain . base_path();
             }
             if ($removeLanguagePart && defined('CIVICRM_UF_BASEURL')) {
               $url = str_replace('\\', '/', $url);
