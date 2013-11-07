@@ -704,6 +704,25 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
               $stateCountryMap[$index] = array();
             }
             $stateCountryMap[$index][$prefixName] = $key;
+
+            if ($prefixName == "state_province") {
+              if ($onBehalf) {
+                //CRM-11881: Bypass required-ness check for state/province on Contribution Confirm page
+                //as already done during Contribution registration via onBehalf's quickForm
+                $field['is_required'] = FALSE;
+              }
+              else {
+                if (count($this->_submitValues)) {
+                  $locationTypeId = $field['location_type_id'];
+                  if (array_key_exists("country-{$locationTypeId}", $fields) &&
+                  array_key_exists("state_province-{$locationTypeId}", $fields) &&
+                    !empty($this->_submitValues["country-{$locationTypeId}"])) {
+                    $field['is_required'] =
+                      CRM_Core_Payment_Form::checkRequiredStateProvince($this, "country-{$locationTypeId}");
+                  }
+                }
+              }
+            }
           }
 
           if ($onBehalf) {
