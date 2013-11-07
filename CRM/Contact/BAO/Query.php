@@ -1928,6 +1928,7 @@ class CRM_Contact_BAO_Query {
       }
     }
     elseif ($name === 'world_region') {
+      $field['where'] = 'civicrm_worldregion.id';
       $this->optionValueQuery(
         $name, $op, $value, $grouping,
         CRM_Core_PseudoConstant::worldRegion(),
