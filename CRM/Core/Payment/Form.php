@@ -111,7 +111,7 @@ class CRM_Core_Payment_Form {
       'attributes' => array(
         '' => ts('- select -')) +
       CRM_Core_PseudoConstant::stateProvince(),
-      'is_required' => self::checkRequiredStateProvince($form),
+      'is_required' => self::checkRequiredStateProvince($form, "billing_country_id-{$bltID}"),
     );
 
     $form->_paymentFields["billing_postal_code-{$bltID}"] = array(
@@ -436,13 +436,28 @@ class CRM_Core_Payment_Form {
   /**
    * function to return state/province is_required = true/false
    *
+   * @param obj     $form: Form object
+   * @param string  $name: Country index name on $_submitValues array
+   * @param bool    $onBehalf: Is 'On Behalf Of' profile?
+   *
+   * @return bool
+   *   TRUE/FALSE for is_required if country consist/not consist of state/province respectively
+   * @static
    */
-  static function checkRequiredStateProvince($form) {
+  static function checkRequiredStateProvince($form, $name, $onBehalf = FALSE) {
     // If selected country has possible values for state/province mark the
     // state/province field as required.
     $config = CRM_Core_Config::singleton();
     $stateProvince = new CRM_Core_DAO_StateProvince();
-    $stateProvince->country_id = CRM_Utils_Array::value("billing_country_id-{$form->_bltID}", $form->_submitValues);
+
+    if ($onBehalf) {
+      $stateProvince->country_id = CRM_Utils_Array::value($name, $form->_submitValues['onbehalf']);
+    }
+    else {
+      $stateProvince->country_id = CRM_Utils_Array::value($name, $form->_submitValues);
+    }
+
+    $limitCountryId = $stateProvince->country_id;
 
     if ($stateProvince->count() > 0) {
       // check that the state/province data is not excluded by a
@@ -454,7 +469,6 @@ class CRM_Core_Payment_Form {
         $limitIds = array_merge($limitIds, array_keys($countryIsoCodes, $code));
       }
 
-      $limitCountryId = CRM_Utils_Array::value("billing_country_id-{$form->_bltID}", $form->_submitValues);
       if ($limitCountryId && in_array($limitCountryId, $limitIds)) {
         return TRUE;
       }

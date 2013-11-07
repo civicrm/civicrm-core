@@ -680,6 +680,21 @@ class CRM_Profile_Form extends CRM_Core_Form {
       return FALSE;
     }
 
+    if (count($this->_submitValues)) {
+      $locationTypeId = null;
+      foreach ($this->_fields as $field) {
+        if (!empty($field['location_type_id'])) {
+          $locationTypeId = $field['location_type_id'];
+        }
+        if (array_key_exists("country-{$locationTypeId}", $this->_fields) &&
+          array_key_exists("state_province-{$locationTypeId}", $this->_fields) &&
+          !empty($this->_submitValues["country-{$locationTypeId}"])) {
+          $this->_fields["state_province-{$locationTypeId}"]['is_required'] =
+            CRM_Core_Payment_Form::checkRequiredStateProvince($this, "country-{$locationTypeId}");
+        }
+      }
+    }
+
     $this->assign('id', $this->_id);
     $this->assign('mode', $this->_mode);
     $this->assign('action', $this->_action);
