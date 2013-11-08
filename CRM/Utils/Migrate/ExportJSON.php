@@ -378,34 +378,39 @@ AND    entity_table = 'civicrm_contact'
     $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
     $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
     $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
-
     $ids = implode(',', $contactIDs);
 
-    $sql = "(
-  SELECT     a.*
-  FROM       civicrm_activity a
-  INNER JOIN civicrm_activity_contact aa ON aa.activity_id = a.id AND aa.record_type_id = $assigneeID
-  WHERE      aa.contact_id IN ( $ids )
-    AND      ( a.activity_type_id != 3 AND a.activity_type_id != 20 )
-) UNION (
-  SELECT     a.*
-  FROM       civicrm_activity a
-  INNER JOIN civicrm_activity_contact at ON at.activity_id = a.id AND at.record_type_id = $targetID
-  WHERE      at.contact_id IN ( $ids )
-    AND      ( a.activity_type_id != 3 AND a.activity_type_id != 20 )
-)
+    // query framing returning all contacts in valid activity
+    $sql = "
+SELECT  a.*, ac.id as acID, ac.activity_id, ac.contact_id, ac.record_type_id
+FROM civicrm_activity a
+INNER JOIN civicrm_activity_contact ac ON ac.activity_id = a.id
+WHERE ac.contact_id IN ( $ids )
+  AND (a.activity_type_id != 3 AND a.activity_type_id != 20)
 ";
 
     $fields = & $this->dbFields('CRM_Activity_DAO_Activity', TRUE);
 
-    $activityIDs = array();
     $dao = & CRM_Core_DAO::executeQuery($sql);
     while ($dao->fetch()) {
+      // adding source, target and assignee contacts in additional contacts array
+      $this->addAdditionalContacts(array($dao->contact_id),
+        $additionalContacts
+      );
+
+      // append values of activity contacts
+      $activityContacts = array(
+        'id' => $dao->acID,
+        'contact_id' => $dao->contact_id,
+        'activity_id' => $dao->activity_id,
+        'record_type_id' => $dao->record_type_id
+      );
+      $this->appendValue($dao->acID, 'civicrm_activity_contact', $activityContacts);
+
       if (isset($_activitiesHandled[$dao->id])) {
         continue;
       }
       $_activitiesHandled[$dao->id] = $dao->id;
-      $activityIDs[] = $dao->id;
 
       $activity = array();
       foreach ($fields as $fld) {
@@ -417,50 +422,10 @@ AND    entity_table = 'civicrm_contact'
         }
       }
 
+      // append activity value
       $this->appendValue($dao->id, 'civicrm_activity', $activity);
-      $this->addAdditionalContacts(array($dao->source_contact_id),
-        $additionalContacts
-      );
     }
     $dao->free();
-
-    if (empty($activityIDs)) {
-      return;
-    }
-
-    $activityIDString = implode(",", $activityIDs);
-
-    // now get all assignee contact ids and target contact ids for this activity
-    $sql   = "SELECT * FROM civicrm_activity_contact WHERE activity_id IN ($activityIDString) AND record_type = 'Assignee'";
-    $aaDAO = &CRM_Core_DAO::executeQuery($sql);
-
-    $activityContacts = array();
-    while ($aaDAO->fetch()) {
-      $activityAssignee = array(
-        'id' => $aaDAO->id,
-        'assignee_contact_id' => $aaDAO->assignee_contact_id,
-        'activity_id' => $aaDAO->activity_id,
-      );
-      $this->appendValue($aaDAO->id, 'civicrm_activity_assignment', $activityAssignee);
-      $activityContacts[] = $aaDAO->assignee_contact_id;
-    }
-    $aaDAO->free();
-
-    $sql = "SELECT * FROM civicrm_activity_contact WHERE activity_id IN ($activityIDString) AND record_type = 'Target'";
-    $atDAO = &CRM_Core_DAO::executeQuery($sql);
-
-    while ($atDAO->fetch()) {
-      $activityTarget = array(
-        'id' => $atDAO->id,
-        'target_contact_id' => $atDAO->target_contact_id,
-        'activity_id' => $atDAO->activity_id,
-      );
-      $this->appendValue($atDAO->id, 'civicrm_activity_target', $activityTarget);
-      $activityContacts[] = $atDAO->target_contact_id;
-    }
-    $atDAO->free();
-
-    $this->addAdditionalContacts($activityContacts, $additionalContacts);
   }
 
   function appendValue($id, $name, $value) {
