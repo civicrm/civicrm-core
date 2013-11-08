@@ -958,6 +958,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
           $useRequired && !$search,
           $dataCrmCustomAttr
         );
+        $qf->_stateCountryMap['state_province'][] = $elementName;
         break;
 
       case 'Multi-Select State/Province':
@@ -977,6 +978,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
           $useRequired && !$search,
           $dataCrmCustomAttr
         );
+        $qf->_stateCountryMap['country'][] = $elementName;
         break;
 
       case 'Multi-Select Country':
