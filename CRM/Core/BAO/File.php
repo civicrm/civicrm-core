@@ -560,6 +560,11 @@
   /**
    * function to display paper icon for a file attachment -- CRM-13624
    *
+   * @param $entityTable string  The entityTable to which the file is attached. eg "civicrm_contact", "civicrm_note", "civicrm_activity"
+   * @param $entityID    int     The id of the object in the above entityTable
+   *
+   * @return array|NULL          list of HTML snippets; one HTML snippet for each attachment. If none found, then NULL
+   *
    * @static
    * @access public
    */
