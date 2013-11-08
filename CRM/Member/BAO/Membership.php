@@ -2669,7 +2669,7 @@ WHERE      civicrm_membership.is_test = 0";
    * @return void
    * @static
    */
-  static function recordMembershipContribution( &$params, $ids = array()) {
+  static function recordMembershipContribution( $params, $ids = array()) {
     $membershipId = $params['membership_id'];
     $contributionParams = array();
     $config = CRM_Core_Config::singleton();
