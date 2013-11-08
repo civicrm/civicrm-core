@@ -564,7 +564,7 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
         }
         $_showHide->addToTemplate();
 
-        if ($countemptyrows == 11) {
+        if ($countemptyrows == 15) {
           $errors['option_label[1]'] = $errors['option_amount[1]'] = ts('Label and value cannot be empty.');
           $_flagOption = 1;
         }
