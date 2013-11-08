@@ -122,13 +122,13 @@ class CRM_Badge_Form_Layout extends CRM_Admin_Form {
     $attributes = array('readonly'=> true);
     $this->add('text', 'image_1', ts('Image (top left)'),
       $attributes + CRM_Core_DAO::getAttribute('CRM_Core_DAO_PrintLabel', 'title'));
-    $this->add('text', 'width_image_1', ts('Width'), array('size' => 6));
-    $this->add('text', 'height_image_1', ts('Height'), array('size' => 6));
+    $this->add('text', 'width_image_1', ts('Width (mm)'), array('size' => 6));
+    $this->add('text', 'height_image_1', ts('Height (mm)'), array('size' => 6));
 
     $this->add('text', 'image_2', ts('Image (top right)'),
       $attributes + CRM_Core_DAO::getAttribute('CRM_Core_DAO_PrintLabel', 'title'));
-    $this->add('text', 'width_image_2', ts('Width'), array('size' => 6));
-    $this->add('text', 'height_image_2', ts('Height'), array('size' => 6));
+    $this->add('text', 'width_image_2', ts('Width (mm)'), array('size' => 6));
+    $this->add('text', 'height_image_2', ts('Height (mm)'), array('size' => 6));
 
     $this->add('checkbox', 'is_default', ts('Default?'));
     $this->add('checkbox', 'is_active', ts('Enabled?'));
