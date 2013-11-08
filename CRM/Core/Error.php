@@ -330,6 +330,9 @@ class CRM_Core_Error extends PEAR_ErrorStack {
         echo CRM_Utils_System::theme($content);
       }
     }
+    else {
+      echo CRM_Utils_System::theme($content);
+    }
 
     self::abend(CRM_Core_Error::FATAL_ERROR);
   }
