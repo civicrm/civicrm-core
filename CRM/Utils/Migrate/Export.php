@@ -471,6 +471,9 @@ class CRM_Utils_Migrate_Export {
             elseif ($object->extends == 'Relationship') {
               $key = 'relationship_type';
             }
+            elseif($object->extends == 'Case') {
+              $key = 'case_type';
+            }
             $types = explode(CRM_Core_DAO::VALUE_SEPARATOR, substr($object->$name, 1, -1));
             $values = array();
             if (in_array($object->extends, array('Individual', 'Organization', 'Household'))) {
