@@ -30,8 +30,12 @@
  *  Include configuration
  */
 define('CIVICRM_SETTINGS_PATH', __DIR__ . '/civicrm.settings.dist.php');
+define('CIVICRM_SETTINGS_LOCAL_PATH', __DIR__ . '/civicrm.settings.local.php');
+ 
+if (file_exists(CIVICRM_SETTINGS_LOCAL_PATH)) {
+ require_once CIVICRM_SETTINGS_LOCAL_PATH;
+}
 require_once CIVICRM_SETTINGS_PATH;
-
 /**
  *  Include class definitions
  */
@@ -154,8 +158,8 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   }
 
   static function getDBName() {
-    $dbName = !empty($GLOBALS['mysql_db']) ? $GLOBALS['mysql_db'] : 'civicrm_tests_dev';
-    return $dbName;
+    global $civicrm_db_settings;
+    return $civicrm_db_settings->database;
   }
 
   /**
@@ -394,10 +398,9 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    *  FIXME: Maybe a better way to do it
    */
   function foreignKeyChecksOff() {
-    self::$utils = new Utils($GLOBALS['mysql_host'],
-      $GLOBALS['mysql_user'],
-      $GLOBALS['mysql_pass']
-    );
+    global $civicrm_db_settings;
+
+    self::$utils = new Utils($civicrm_db_settings);
     $dbName = self::getDBName();
     $query = "USE {$dbName};" . "SET foreign_key_checks = 1";
     if (self::$utils->do_query($query) === FALSE) {

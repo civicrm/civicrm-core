@@ -6,7 +6,37 @@
 
 //--- you shouldn't have to modify anything under this line, but might want to put the compiled templates CIVICRM_TEMPLATE_COMPILEDIR in a different folder than our default location ----------
 
+if ( ! defined( 'CIVICRM_DSN' ) && ! empty( $GLOBALS['mysql_user'] ) ) {
+  $dbName = ! empty( $GLOBALS['mysql_db'] ) ? $GLOBALS['mysql_db'] : 'civicrm_tests_dev';
+  if ( empty( $GLOBALS['mysql_pass'] ) && $GLOBALS['mysql_pass_need_password'] ) {
+    $GLOBALS['mysql_pass'] = PHPUnit_TextUI_Command::getPassword( 'Password' );
+  }
+  define( 'CIVICRM_DSN'          , "mysql://{$GLOBALS['mysql_user']}:{$GLOBALS['mysql_pass']}@{$GLOBALS['mysql_host']}/{$dbName}?new_link=true" );
+}
 
+
+
+if (!defined("CIVICRM_DSN")) {
+  $dsn= getenv("CIVICRM_TEST_DSN");
+  if (!empty ($dsn)) {
+    define("CIVICRM_DSN",$dsn);
+  } else {
+    echo "\nFATAL: no DB connection configured (CIVICRM_DSN). \nYou can either create/edit " . __DIR__ . "/civicrm.settings.local.php\n";
+    if (strtoupper(substr(PHP_OS, 0, 3)) !== 'WIN') {
+      echo "OR set it in your shell:\n \$export CIVICRM_TEST_DSN=mysql://db_username:db_password@localhost/civicrm_tests_dev \n";
+    } else {
+      echo "OR set it in your shell:\n SETX CIVICRM_TEST_DSN mysql://db_username:db_password@localhost/civicrm_tests_dev \n
+      (you will need to open a new command shell before it takes effect)";
+    }
+echo "\n\n
+If you haven't done so already, you need to create (once) a database dedicated to the unit tests:
+mysql -uroot -p
+create database civicrm_tests_dev;
+grant ALL on civicrm_tests_dev.* to db_username@localhost identified by 'db_password';
+grant SUPER on *.* to db_username@localhost identified by 'db_password';\n";
+    die ("");
+  }
+}
 
 /**
  * Content Management System (CMS) Host:
@@ -110,39 +140,4 @@ require_once 'CRM/Core/ClassLoader.php';
 CRM_Core_ClassLoader::singleton()->register();
 
 global $civicrm_db_settings;
-$civicrm_database_settings = NULL;
-$civicrm_local_settings_path = CRM_Utils_Path::join(__DIR__, 'civicrm.settings.local.php');
-if (file_exists($civicrm_local_settings_path)) {
-  include($civicrm_local_settings_path);
-}
-try {
-  $civicrm_db_settings = new CRM_DB_Settings($civicrm_database_settings);
-} catch (CRM_DB_InvalidSettings $e) {
-  echo "\nFATAL: no DB connection configured (CIVICRM_DSN). \nYou can either create/edit " . __DIR__ . "/civicrm.settings.local.php\n";
-  if (strtoupper(substr(PHP_OS, 0, 3)) !== 'WIN') {
-    echo "OR set it in your shell:\n \$export CIVICRM_TEST_DSN=mysql://db_username:db_password@localhost/civicrm_tests_dev \n";
-  } else {
-    echo "OR set it in your shell:\n SETX CIVICRM_TEST_DSN mysql://db_username:db_password@localhost/civicrm_tests_dev \n
-      (you will need to open a new command shell before it takes effect)";
-  }
-  echo "\n\n
-If you haven't done so already, you need to create (once) a database dedicated to the unit tests:
-mysql -uroot -p
-create database civicrm_tests_dev;
-grant ALL on civicrm_tests_dev.* to db_username@localhost identified by 'db_password';
-grant SUPER on *.* to db_username@localhost identified by 'db_password';\n";
-  die ("");
-}
-
-
-if ( ! defined( 'CIVICRM_DSN' ) && ! empty( $GLOBALS['mysql_user'] ) ) {
-  $dbName = ! empty( $GLOBALS['mysql_db'] ) ? $GLOBALS['mysql_db'] : 'civicrm_tests_dev';
-  if ( empty( $GLOBALS['mysql_pass'] ) && $GLOBALS['mysql_pass_need_password'] ) {
-    $GLOBALS['mysql_pass'] = PHPUnit_TextUI_Command::getPassword( 'Password' );
-  }
-  define( 'CIVICRM_DSN'          , "mysql://{$GLOBALS['mysql_user']}:{$GLOBALS['mysql_pass']}@{$GLOBALS['mysql_host']}/{$dbName}?new_link=true" );
-}
-
-if (!defined("CIVICRM_DSN")) {
-  define("CIVICRM_DSN", $civicrm_db_settings->toCiviDSN());
-}
+$civicrm_db_settings = new CRM_DB_Settings();

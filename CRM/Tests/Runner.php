@@ -20,6 +20,7 @@ class CRM_Tests_Runner {
     $this->drupal_path = CRM_Utils_Path::join($this->tmp_path, 'drupal');
     $this->phpunit_args = CRM_Utils_Array::fetch('php-unit', $options, 'AllTests');
     $this->settings_file_path = CRM_Utils_Path::join($this->base_path, 'tests', 'phpunit', 'CiviTest', 'civicrm.settings.local.php');
+    $this->dist_settings_file_path = CRM_Utils_Path::join($this->base_path, 'tests', 'phpunit', 'CiviTest', 'civicrm.settings.dist.php');
     $this->use_mysql_ram_server = CRM_Utils_Array::fetch('mysql-ram-server', $options, FALSE);
     $this->use_selenium = !CRM_Utils_Array::fetch('no-selenium', $options, FALSE);
   }
@@ -111,22 +112,26 @@ class CRM_Tests_Runner {
         $host = '127.0.0.1';
         $port = '3307';
       }
+      $civicrm_database_settings = array(
+        'database' => 'civicrm_tests_dev',
+        'driver' => 'mysql',
+        'host' => $host,
+        'password' => '',
+        'port' => $port,
+        'username' => 'root',
+      );
+      $db_settings = new CRM_DB_Settings($civicrm_database_settings);
+      $civicrm_dsn = $db_settings->toCiviDSN();
       $settings_file_contents = <<<EOS
 <?php
-\$civicrm_database_settings = array(
-  'database' => 'civicrm_tests_dev',
-  'driver' => 'mysql',
-  'host' => '$host',
-  'password' => '',
-  'port' => $port,
-  'username' => 'root',
-);
+define('CIVICRM_DSN', "$civicrm_dsn");
 EOS;
       CRM_Utils_File::write($settings_file, $settings_file_contents);
       CRM_Utils_File::close($settings_file);
     }
     require_once($this->settings_file_path);
-    $this->civicrm_db_settings = new CRM_DB_Settings($civicrm_database_settings);
+    require_once($this->dist_settings_file_path);
+    $this->civicrm_db_settings = new CRM_DB_Settings();
     $civicrm_database_settings['database'] = 'civicrm_tests_drupal';
     $this->drupal_db_settings = new CRM_DB_Settings($civicrm_database_settings);
     if ($this->use_mysql_ram_server) {
