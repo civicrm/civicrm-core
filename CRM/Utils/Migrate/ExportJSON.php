@@ -546,7 +546,7 @@ WHERE  date >= $lastExportTime
       $json
     );
 
-    print_r( json_decode( $json ) );
+    // print_r( json_decode( $json ) );
   }
 }
 
