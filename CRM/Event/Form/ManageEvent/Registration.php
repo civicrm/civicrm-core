@@ -460,7 +460,10 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
         }
       }
 
-      if ($values['registration_start_date'] && $values['registration_end_date']) {
+      if (
+        isset($values['registration_start_date']) &&
+        isset($values['registration_end_date'])
+      ) {
         $start = CRM_Utils_Date::processDate($values['registration_start_date']);
         $end   = CRM_Utils_Date::processDate($values['registration_end_date']);
         if ($end < $start) {
