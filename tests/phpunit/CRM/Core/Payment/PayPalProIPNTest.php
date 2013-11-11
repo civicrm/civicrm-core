@@ -100,6 +100,33 @@ class CRM_Core_Payment_PayPalProIPNTest extends CiviUnitTestCase {
   }
 
   /**
+   * CRM-13743 test IPN edge case where the first transaction fails and the second succeeds
+   * We are checking that the created contribution has the same date as IPN says it should
+   * Note that only one contribution will be created (no evidence of the failed contribution is left)
+   * It seems likely that may change in future & this test will start failing (I point this out in the hope it
+   * will help future debuggers)
+   */
+  function testIPNPaymentCRM13743() {
+    $this->setupPaymentProcessorTransaction();
+    $firstPaymentParams = $this->getPaypalProRecurTransaction();
+    $firstPaymentParams['txn_type'] = 'recurring_payment_failed';
+    $paypalIPN = new CRM_Core_Payment_PayPalProIPN($firstPaymentParams);
+    $paypalIPN->main();
+
+    $contribution = $this->callAPISuccess('contribution', 'getsingle', array('id' => $this->_contributionID));
+    $this->assertEquals(2, $contribution['contribution_status_id']);
+    $this->assertEquals('', $contribution['trxn_id']);
+    $contributionRecur = $this->callAPISuccess('contribution_recur', 'getsingle', array('id' => $this->_contributionRecurID));
+    $this->assertEquals(2, $contributionRecur['contribution_status_id']);
+    $paypalIPN = new CRM_Core_Payment_PayPalProIPN($this->getPaypalProRecurSubsequentTransaction());
+    $paypalIPN->main();
+    $contribution = $this->callAPISuccess('contribution', 'get', array('contribution_recur_id' => $this->_contributionRecurID, 'sequential' => 1));
+    $this->assertEquals(1, $contribution['count']);
+    $this->assertEquals('secondone', $contribution['values'][0]['trxn_id']);
+    $this->assertEquals(strtotime('03:59:05 Jul 14, 2013 PDT'), strtotime($contribution['values'][0]['receive_date']));
+  }
+
+  /**
    * check a payment express IPN call does not throw any errors
    * At this stage nothing it supposed to happen so it's a pretty blunt test
    * but at least it should be e-notice free
