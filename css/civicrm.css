@@ -4032,3 +4032,6 @@ span.crm-status-icon {
   color: #fff;
 }
 
+.survey-completed {
+  text-decoration: line-through;
+}
