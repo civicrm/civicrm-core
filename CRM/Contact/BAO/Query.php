@@ -3818,9 +3818,12 @@ WHERE  id IN ( $groupIDs )
       self::$_relType = 'reciprocal';
     }
     // if we are creating a temp table we build our own where for the relationship table
+    $relationshipTempTable = NULL;
     if(self::$_relType == 'reciprocal' && empty($targetGroup)) {
       $where = array();
-      self::$_relationshipTempTable = $relationshipTempTable = 'civicrm_temp_rel' . rand(0,99999);
+      self::$_relationshipTempTable =
+        $relationshipTempTable =
+        CRM_Core_DAO::createTempTableName( 'civicrm_rel');
       if($nameClause) {
         $where[$grouping][] = " sort_name $nameClause ";
       }
@@ -3850,8 +3853,10 @@ WHERE  id IN ( $groupIDs )
       //add contacts from static groups
       $this->_tables['civicrm_relationship_group_contact'] =
         $this->_whereTables['civicrm_relationship_group_contact'] =
-        " LEFT JOIN civicrm_group_contact civicrm_relationship_group_contact ON civicrm_relationship_group_contact.contact_id = contact_b.id";
-      $groupWhere[] = "( civicrm_relationship_group_contact.group_id IN  (" . implode(",", $targetGroup[2]) . ") )";
+        " LEFT JOIN civicrm_group_contact civicrm_relationship_group_contact ON civicrm_relationship_group_contact.contact_id = contact_b.id AND civicrm_relationship_group_contact.status = 'Added'";
+      $groupWhere[] =
+        "( civicrm_relationship_group_contact.group_id IN  (" .
+        implode(",", $targetGroup[2]) .  ") ) ";
 
       //add contacts from saved searches
       $ssWhere = $this->addGroupContactCache($targetGroup[2], "civicrm_relationship_group_contact_cache", "contact_b");
@@ -3863,7 +3868,7 @@ WHERE  id IN ( $groupIDs )
       $this->_where[$grouping][] = "( " . implode(" OR ", $groupWhere) . " )";
 
       //Get the names of the target groups for the qill
-      $groupNames = &CRM_Core_PseudoConstant::group();
+      $groupNames = CRM_Core_PseudoConstant::group();
       $qillNames = array();
       foreach ($targetGroup[2] as $groupId) {
         if (array_key_exists($groupId, $groupNames)) {
