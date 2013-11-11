@@ -55,7 +55,7 @@ class CRM_Admin_Form_Setting_Localization extends CRM_Admin_Form_Setting {
     CRM_Utils_System::setTitle(ts('Settings - Localization'));
 
     $locales = CRM_Core_I18n::languages();
-
+    $warningTitle = json_encode(ts("Warning"));
     $domain = new CRM_Core_DAO_Domain();
     $domain->find(TRUE);
     if ($domain->locales) {
@@ -73,26 +73,27 @@ class CRM_Admin_Form_Setting_Localization extends CRM_Admin_Form_Setting {
       $this->addElement('select', 'addLanguage', ts('Add Language'), array_merge(array('' => ts('- select -')), array_diff($locales, $lcMessages)));
 
       // add the ability to return to single language
-      $warning = ts('WARNING: This will make your CiviCRM installation a single-language one again. THIS WILL DELETE ALL DATA RELATED TO LANGUAGES OTHER THAN THE DEFAULT ONE SELECTED ABOVE (and only that language will be preserved).');
+      $warning = ts('This will make your CiviCRM installation a single-language one again. THIS WILL DELETE ALL DATA RELATED TO LANGUAGES OTHER THAN THE DEFAULT ONE SELECTED ABOVE (and only that language will be preserved).');
       $this->assign('warning', $warning);
+      $warning = json_encode($warning);
       $this->addElement('checkbox', 'makeSinglelingual', ts('Return to Single Language'),
-        NULL, array('onChange' => "if (this.checked) alert('$warning')")
+        NULL, array('onChange' => "if (this.checked) CRM.alert($warning, $warningTitle)")
       );
     }
     else {
       // for single-lingual sites, populate default language drop-down with all languages
       $this->addElement('select', 'lcMessages', ts('Default Language'), $locales);
 
-      $warning = ts('WARNING: Enabling multiple languages changes the schema of your database, so make sure you know what you are doing when enabling this function; making a database backup is strongly recommended.');
+      $warning = ts('Enabling multiple languages changes the schema of your database, so make sure you know what you are doing when enabling this function; making a database backup is strongly recommended.');
       $this->assign('warning', $warning);
-
+      $warning = json_encode($warning);
       $validTriggerPermission = CRM_Core_DAO::checkTriggerViewPermission(TRUE);
 
       if ($validTriggerPermission &&
         !$config->logging
       ) {
         $this->addElement('checkbox', 'makeMultilingual', ts('Enable Multiple Languages'),
-          NULL, array('onChange' => "if (this.checked) alert('$warning')")
+          NULL, array('onChange' => "if (this.checked) CRM.alert($warning, $warningTitle)")
         );
       }
     }

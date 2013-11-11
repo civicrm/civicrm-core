@@ -514,7 +514,7 @@ class CRM_Report_Form extends CRM_Core_Form {
             }
 
             // a few auto fills for filters
-            if ($fieldGrp == 'filters') { 
+            if ($fieldGrp == 'filters') {
               // fill operator types
               if (!array_key_exists('operatorType', $this->_columns[$tableName][$fieldGrp][$fieldName])) {
                 switch (CRM_Utils_Array::value('type', $this->_columns[$tableName][$fieldGrp][$fieldName])) {
@@ -526,18 +526,18 @@ class CRM_Report_Form extends CRM_Core_Form {
                     $this->_columns[$tableName][$fieldGrp][$fieldName]['operatorType'] = CRM_Report_Form::OP_INT;
                     break;
                   case CRM_Utils_Type::T_DATE:
-                    $this->_columns[$tableName][$fieldGrp][$fieldName]['operatorType'] = CRM_Report_Form::OP_DATE;  
+                    $this->_columns[$tableName][$fieldGrp][$fieldName]['operatorType'] = CRM_Report_Form::OP_DATE;
                     break;
                   case CRM_Utils_Type::T_BOOLEAN:
                     $this->_columns[$tableName][$fieldGrp][$fieldName]['operatorType'] = CRM_Report_Form::OP_SELECT;
                     if (!array_key_exists('options', $this->_columns[$tableName][$fieldGrp][$fieldName])) {
-                      $this->_columns[$tableName][$fieldGrp][$fieldName]['options'] = 
+                      $this->_columns[$tableName][$fieldGrp][$fieldName]['options'] =
                         array('' => ts('Any'), '0' => ts('No'), '1' => ts('Yes'));
                     }
                     break;
                   default:
-                    if ($daoOrBaoName && 
-                      (array_key_exists('pseudoconstant', $this->_columns[$tableName][$fieldGrp][$fieldName]) 
+                    if ($daoOrBaoName &&
+                      (array_key_exists('pseudoconstant', $this->_columns[$tableName][$fieldGrp][$fieldName])
                         || array_key_exists('enumValues', $this->_columns[$tableName][$fieldGrp][$fieldName]))
                     ) {
                       // with multiple options operator-type is generally multi-select
