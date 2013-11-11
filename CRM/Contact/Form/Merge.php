@@ -207,6 +207,7 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
     $this->assign('other_name', $other['display_name']);
     $this->assign('main_cid', $main['contact_id']);
     $this->assign('other_cid', $other['contact_id']);
+    $this->assign('rgid', $rgid);
 
     $this->_cid         = $cid;
     $this->_oid         = $oid;
