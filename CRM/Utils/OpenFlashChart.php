@@ -124,7 +124,7 @@ class CRM_Utils_OpenFlashChart {
     // create x axis label obj.
     $xLabels = new x_axis_labels();
     // set_labels function requires xValues array of string or x_axis_label
-    // type casting array to string
+    // so type casting array values to string values
     array_walk($xValues, function(&$value, $index) {
         $value = (string)$value;
       });
