@@ -2166,7 +2166,16 @@ AND cl.modified_id  = c.id
    */
   static function getProfileFields() {
     $exportableFields = self::exportableFields('Activity');
-    $skipFields = array('activity_id', 'activity_type', 'source_contact_id', 'activity_campaign', 'activity_is_test', 'is_current_revision', 'activity_is_deleted',);
+    $skipFields = array(
+      'activity_id',
+      'activity_type',
+      'source_contact_id',
+      'source_contact',
+      'activity_campaign',
+      'activity_is_test',
+      'is_current_revision',
+      'activity_is_deleted',
+    );
     $config = CRM_Core_Config::singleton();
     if (!in_array('CiviCampaign', $config->enableComponents)) {
       $skipFields[] = 'activity_engagement_level';

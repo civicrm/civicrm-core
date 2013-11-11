@@ -31,50 +31,59 @@
 <table class="form-layout">
     <tr class="crm-url-form-block-userFrameworkResourceURL">
         <td class="label">
-            {$form.userFrameworkResourceURL.label}
+            {$form.userFrameworkResourceURL.label} {help id='id-resource_url'}
         </td>
         <td>
-            {$form.userFrameworkResourceURL.html|crmAddClass:'huge40'} {help id='id-resource_url'}
+            {$form.userFrameworkResourceURL.html|crmAddClass:'huge40'}
         </td>
     </tr>
     <tr class="crm-url-form-block-imageUploadURL">
         <td class="label">
-            {$form.imageUploadURL.label}
+            {$form.imageUploadURL.label} {help id='id-image_url'}
         </td>
         <td>
-            {$form.imageUploadURL.html|crmAddClass:'huge40'} {help id='id-image_url'}
+            {$form.imageUploadURL.html|crmAddClass:'huge40'}
         </td>
     </tr>
     <tr class="crm-url-form-block-customCSSURL">
         <td class="label">
-            {$form.customCSSURL.label}
+            {$form.customCSSURL.label} {help id='id-css_url'}
         </td>
         <td>
-            {$form.customCSSURL.html|crmAddClass:'huge40'} {help id='id-css_url'}
+            {$form.customCSSURL.html|crmAddClass:'huge40'}
+        </td>
+    </tr>
+    <tr class="crm-url-form-block-disable_core_css">
+        <td class="label">
+            {$form.disable_core_css.label} {help id='id-css_url'}
+        </td>
+        <td>
+            {$form.disable_core_css.html}<br />
+            <p class="description">{ts}{$disable_core_css_description}{/ts}</p>
         </td>
     </tr>
     <tr class="crm-url-form-block-extensionsURL">
         <td class="label">
-            {$form.extensionsURL.label}
+            {$form.extensionsURL.label} {help id='id-extensions_url'}
         </td>
         <td>
-            {$form.extensionsURL.html|crmAddClass:'huge40'} {help id='id-extensions_url'}
+            {$form.extensionsURL.html|crmAddClass:'huge40'}
         </td>
     </tr>
     <tr class="crm-url-form-block-enableSSL">
         <td class="label">
-            {$form.enableSSL.label}
+            {$form.enableSSL.label} {help id='id-enable_ssl'}
         </td>
         <td>
-            {$form.enableSSL.html} {help id='id-enable_ssl'}
+            {$form.enableSSL.html}
         </td>
     </tr>
     <tr class="crm-url-form-block-verifySSL">
         <td class="label">
-            {$form.verifySSL.label}
+            {$form.verifySSL.label} {help id='id-verify_ssl'}
         </td>
         <td>
-            {$form.verifySSL.html} {help id='id-verify_ssl'}<br/>
+            {$form.verifySSL.html}<br/>
             <p class="description font-red">{ts}{$verifySSL_description}{/ts}</p>
         </td>
     </tr>

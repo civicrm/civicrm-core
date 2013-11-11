@@ -40,6 +40,7 @@
 class CRM_Admin_Form_Setting_Url extends CRM_Admin_Form_Setting {
   protected $_settings = array(
     'cvv_backoffice_required' => CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME,
+    'disable_core_css' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
   );
   /**
    * Function to build the form
@@ -55,7 +56,7 @@ class CRM_Admin_Form_Setting_Url extends CRM_Admin_Form_Setting {
 
     $this->addElement('text', 'userFrameworkResourceURL', ts('CiviCRM Resource URL'));
     $this->addElement('text', 'imageUploadURL', ts('Image Upload URL'));
-    $this->addElement('text', 'customCSSURL', ts('Custom CiviCRM CSS URL'));
+    $this->addElement('text', 'customCSSURL', ts('Custom css URL'));
     $this->addElement('text', 'extensionsURL', ts('Extension Resource URL'));
     $this->addYesNo('enableSSL', ts('Force Secure URLs (SSL)'));
     $this->addYesNo('verifySSL', ts('Verify SSL Certs'));

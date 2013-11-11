@@ -56,8 +56,7 @@ class CRM_Utils_Migrate_ImportJSON {
     $this->note($decodedContacts->civicrm_note);
     $this->relationship($decodedContacts->civicrm_relationship);
     $this->activity($decodedContacts->civicrm_activity,
-      $decodedContacts->civicrm_activity_target,
-      $decodedContacts->civicrm_activity_assignment
+      $decodedContacts->civicrm_activity_contact
     );
     $this->group($decodedContacts->civicrm_group,
       $decodedContacts->civicrm_group_contact
@@ -73,7 +72,8 @@ class CRM_Utils_Migrate_ImportJSON {
   function contact(&$contact) {
     $this->restore($contact,
       'CRM_Contact_DAO_Contact',
-      array('id' => 'civicrm_contact')
+      array('id' => 'civicrm_contact'),
+      array('birth_date', 'deceased_date', 'created_date', 'modified_date')
     );
   }
 
@@ -101,7 +101,8 @@ class CRM_Utils_Migrate_ImportJSON {
   function note(&$note) {
     $this->restore($note,
       'CRM_Core_DAO_Note',
-      array('contact_id' => 'civicrm_contact')
+      array('contact_id' => 'civicrm_contact'),
+      array('modified_date')
     );
   }
 
@@ -115,24 +116,17 @@ class CRM_Utils_Migrate_ImportJSON {
     );
   }
 
-  function activity($activity, $activityTarget, $activityAssignment) {
+  function activity($activity, $activityContacts) {
     $this->restore($activity,
       'CRM_Activity_DAO_Activity',
-      array('source_contact_id' => 'civicrm_contact')
+      NULL,
+      array('activity_date_time')
     );
 
-    $this->restore($activityTarget,
-      'CRM_Activity_DAO_ActivityTarget',
+    $this->restore($activityContacts,
+      'CRM_Activity_DAO_ActivityContact',
       array(
-        'target_contact_id' => 'civicrm_contact',
-        'activity_id' => 'civicrm_activity',
-      )
-    );
-
-    $this->restore($activityAssignment,
-      'CRM_Activity_DAO_ActivityAssignment',
-      array(
-        'assignee_contact_id' => 'civicrm_contact',
+        'contact_id' => 'civicrm_contact',
         'activity_id' => 'civicrm_activity',
       )
     );
@@ -140,7 +134,9 @@ class CRM_Utils_Migrate_ImportJSON {
 
   function group($group, $groupContact) {
     $this->restore($group,
-      'CRM_Contact_DAO_Group'
+      'CRM_Contact_DAO_Group',
+      NULL,
+      array('cache_date', 'refresh_date')
     );
 
     $this->restore($groupContact,
@@ -170,7 +166,7 @@ class CRM_Utils_Migrate_ImportJSON {
     );
   }
 
-  function restore(&$chunk, $daoName, $lookUpMapping = NULL) {
+  function restore(&$chunk, $daoName, $lookUpMapping = NULL, $dateFields = NULL) {
     $object   = new $daoName();
     $tableName = $object->__table;
 
@@ -204,6 +200,9 @@ class CRM_Utils_Migrate_ImportJSON {
           else {
             if (array_key_exists($column, $lookUpMapping)) {
               $object->$column = $this->_lookupCache[$lookUpMapping[$column]][$value[$k]];
+            }
+            elseif (!empty($dateFields) && in_array($column, $dateFields)) {
+              $object->$column = CRM_Utils_Date::isoToMysql($value[$k]);
             }
             else {
               $object->$column = $value[$k];

@@ -935,9 +935,21 @@ AND    civicrm_activity.source_record_id = %2
 
         // CRM-9519
         if (CRM_Core_BAO_Email::isMultipleBulkMail()) {
+          static $targetRecordID = NULL;
+          if (!$targetRecordID) {
+            $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
+            $targetRecordID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
+          }
+
           // make sure we don't attempt to duplicate the target activity
           foreach ($activity['target_contact_id'] as $key => $targetID) {
-            $sql = "SELECT id FROM civicrm_activity_target WHERE activity_id = $activityID AND target_contact_id = $targetID;";
+            $sql = "
+SELECT id
+FROM   civicrm_activity_contact
+WHERE  activity_id = $activityID
+AND    contact_id = $targetID
+AND    record_type_id = $targetRecordID
+";
             if (CRM_Core_DAO::singleValueQuery($sql)) {
               unset($activity['target_contact_id'][$key]);
             }

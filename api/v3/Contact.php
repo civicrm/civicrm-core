@@ -182,7 +182,7 @@ function _civicrm_api3_contact_get_spec(&$params) {
   $params['state_province_id']['title'] = 'Primary Address State Province ID';
   $params['state_province_name']['title'] = 'Primary Address State Province Name';
   $params['state_province']['title'] = 'Primary Address State Province';
-  $params['country_id']['title'] = 'Primary Address State Province ID';
+  $params['country_id']['title'] = 'Primary Address Country ID';
   $params['country']['title'] = 'Primary Address country';
   $params['worldregion_id']['title'] = 'Primary Address World Region ID';
   $params['worldregion']['title'] = 'Primary Address World Region';

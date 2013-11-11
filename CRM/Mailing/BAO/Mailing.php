@@ -2698,7 +2698,7 @@ WHERE  civicrm_mailing_job.id = %1
     return TRUE;
   }
 
-  private function addMultipleEmails($mailingID) {
+  private static function addMultipleEmails($mailingID) {
     $sql = "
 INSERT INTO civicrm_mailing_recipients
     (mailing_id, email_id, contact_id)
