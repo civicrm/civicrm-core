@@ -78,6 +78,9 @@ class CRM_Report_Form_Contribute_TopDonor extends CRM_Report_Form {
           ),
         ),
       ),
+    )
+    + $this->getAddressColumns()
+    + array(
       'civicrm_contribution' =>
       array(
         'dao' => 'CRM_Contribute_DAO_Contribution',
@@ -227,13 +230,15 @@ class CRM_Report_Form_Contribute_TopDonor extends CRM_Report_Form {
             }
             else {
               $select[] = "{$field['dbAlias']} as {$tableName}_{$fieldName}";
-              $this->_columnHeaders["{$tableName}_{$fieldName}"]['type'] = $field['type'];
+              // $field['type'] is not always set. Use string type as default if not set.
+              $this->_columnHeaders["{$tableName}_{$fieldName}"]['type'] = isset($field['type']) ? $field['type'] : 2;
               $this->_columnHeaders["{$tableName}_{$fieldName}"]['title'] = $field['title'];
             }
           }
         }
       }
     }
+    
     $this->_select = " SELECT * FROM ( SELECT " . implode(', ', $select) . " ";
   }
 
@@ -266,6 +271,7 @@ class CRM_Report_Form_Contribute_TopDonor extends CRM_Report_Form {
                          ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_phone']}.contact_id AND
                             {$this->_aliases['civicrm_phone']}.is_primary = 1
 	";
+    $this->addAddressFromClause();
   }
 
   function where() {
@@ -438,6 +444,7 @@ ORDER BY civicrm_contribution_total_amount_sum DESC
           $rows[$rowNum]['civicrm_contact_display_name_link'] = $url;
           $entryFound = TRUE;
         }
+        $entryFound = $this->alterDisplayAddressFields($row, $rows, $rowNum, 'contribute/detail', 'List all contribution(s)') ? TRUE : $entryFound;
 
         // skip looking further in rows, if first row itself doesn't
         // have the column we need
