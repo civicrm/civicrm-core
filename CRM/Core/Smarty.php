@@ -160,6 +160,8 @@ class CRM_Core_Smarty extends Smarty {
 
     $this->register_function('crmURL', array('CRM_Utils_System', 'crmURL'));
     $this->load_filter('pre', 'resetExtScope');
+
+    $this->assign('crmPermissions', new CRM_Core_Smarty_Permissions());
   }
 
   /**
