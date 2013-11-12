@@ -2298,6 +2298,8 @@ LEFT JOIN civicrm_mailing_group g ON g.mailing_id   = m.id
       CRM_Core_Error::fatal();
     }
 
+    CRM_Utils_Hook::pre('delete', 'Mailing', $id, CRM_Core_DAO::$_nullArray);
+
     // delete all file attachments
     CRM_Core_BAO_File::deleteEntityFile('civicrm_mailing',
       $id
@@ -2308,6 +2310,8 @@ LEFT JOIN civicrm_mailing_group g ON g.mailing_id   = m.id
     $dao->delete();
 
     CRM_Core_Session::setStatus(ts('Selected mailing has been deleted.'), ts('Deleted'), 'success');
+
+    CRM_Utils_Hook::post('delete', 'Mailing', $id, $dao);
   }
 
   /**
