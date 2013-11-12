@@ -423,11 +423,17 @@ WHERE pcp.id = %1 AND cc.contribution_status_id =1 AND cc.is_test = 0";
 
     if ($pcpSupporter = CRM_PCP_BAO_PCP::displayName($pcpId)) {
       if ($pcpInfo['page_type'] == 'event') {
-        $page->assign('pcpSupporterText', ts('This event registration is being made thanks to effort of <strong>%1</strong>, who supports our campaign. You can support it as well - once you complete the registration, you will be able to create your own Personal Campaign Page!', array(1 => $pcpSupporter)));
+        $pcp_supporter_text = ts('This event registration is being made thanks to effort of <strong>%1</strong>, who supports our campaign.', array(1 => $pcpSupporter));
+        $text = CRM_PCP_BAO_PCP::getPcpBlockStatus($pcpId, 'event');
       }
       else {
-        $page->assign('pcpSupporterText', ts('This contribution is being made thanks to effort of <strong>%1</strong>, who supports our campaign. You can support it as well - once you complete the donation, you will be able to create your own Personal Campaign Page!', array(1 => $pcpSupporter)));
+        $pcp_supporter_text = ts('This contribution is being made thanks to effort of <strong>%1</strong>, who supports our campaign.', array(1 => $pcpSupporter));
+        $text = CRM_PCP_BAO_PCP::getPcpBlockStatus($pcpId, 'contribute');
       }
+      if(!empty($text)) {
+        $pcp_supporter_text .= "You can support it as well - once you complete the donation, you will be able to create your own Personal Campaign Page!";
+      }
+      $page->assign('pcpSupporterText', $pcp_supporter_text);
     }
     $page->assign('pcp', TRUE);
 

@@ -457,7 +457,13 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
     $isShowLocation = CRM_Utils_Array::value('is_show_location', $this->_values['event']);
     $this->assign('isShowLocation', $isShowLocation);
     if ($pcpId && $pcpSupporter = CRM_PCP_BAO_PCP::displayName($pcpId)) {
-      $this->assign('pcpSupporterText', ts('This event registration is being made thanks to effort of <strong>%1</strong>, who supports our campaign. You can support it as well - once you complete the registration, you will be able to create your own Personal Campaign Page!', array(1 => $pcpSupporter)));
+      $pcp_supporter_text = ts('This event registration is being made thanks to effort of <strong>%1</strong>, who supports our campaign.', array(1 => $pcpSupporter));
+      // Only tell people that can also create a PCP if the contribution page has a non-empty value in the "Create Personal Campaign Page link" field.
+      $text = CRM_PCP_BAO_PCP::getPcpBlockStatus($pcpId, 'event');
+      if(!empty($text)) {
+        $pcp_supporter_text .= "You can support it as well - once you complete the donation, you will be able to create your own Personal Campaign Page!";
+      }
+      $this->assign('pcpSupporterText', $pcp_supporter_text);
     }
     //CRM-6907
     $config->defaultCurrency = CRM_Utils_Array::value('currency', $this->_values['event'],
