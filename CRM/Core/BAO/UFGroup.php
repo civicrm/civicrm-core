@@ -2344,7 +2344,9 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
                 // type as per loc field and removed below code.
                 $primaryLocationType = FALSE;
                 if ($locTypeId == 'Primary') {
-                  if (is_array($value) && array_key_exists($fieldName, $value)){
+                  if (is_array($value) &&
+                    (array_key_exists($fieldName, $value) || array_key_exists($fieldName . '_id', $value))
+                  ) {
                     $primaryLocationType = TRUE;
                     if (in_array($fieldName, $blocks)){
                       $locTypeId = CRM_Contact_BAO_Contact::getPrimaryLocationType($contactId, FALSE, $fieldName);
@@ -2358,7 +2360,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
                 // fixed for CRM-665
                 if (is_numeric($locTypeId)) {
                   if ($primaryLocationType || $locTypeId == CRM_Utils_Array::value('location_type_id', $value)) {
-                    if (CRM_Utils_Array::value($fieldName, $value)) {
+                    if (CRM_Utils_Array::value($fieldName . '_id', $value)) {
                       //to handle stateprovince and country
                       if ($fieldName == 'state_province') {
                         $defaults[$fldName] = $value['state_province_id'];
@@ -2377,7 +2379,9 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
                           $defaults[$fldName] = $value['country_id'];
                         }
                       }
-                      elseif ($fieldName == 'phone') {
+                    }
+                    elseif (CRM_Utils_Array::value($fieldName, $value)) {
+                      if ($fieldName == 'phone') {
                         if ($phoneTypeId) {
                           if (isset($value['phone'][$phoneTypeId])) {
                             $defaults[$fldName] = $value['phone'][$phoneTypeId];
