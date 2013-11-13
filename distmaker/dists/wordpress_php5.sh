@@ -71,12 +71,13 @@ set -e
 for F in $SRC/WordPress/*; do
 	cp $F $TRG/civicrm
 done
+rm -f $TRG/civicrm/civicrm.config.php.wordpress
 
 # copy docs
 cp $SRC/agpl-3.0.txt $TRG/civicrm/civicrm
 cp $SRC/gpl.txt $TRG/civicrm/civicrm
 cp $SRC/README.txt $TRG/civicrm/civicrm
-cp $SRC/civicrm.config.php $TRG/civicrm/civicrm
+cp $SRC/WordPress/civicrm.config.php.wordpress $TRG/civicrm/civicrm/civicrm.config.php
 
 # final touch
 echo "<?php
