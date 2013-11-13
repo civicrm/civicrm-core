@@ -190,10 +190,6 @@ function _civicrm_api3_case_delete_spec(&$params) {
  * @todo Erik Hommel 16 dec 2010 check if all DB fields are returned
  */
 function civicrm_api3_case_get($params) {
-  civicrm_api3_verify_mandatory($params, NULL, array(
-    array('case_id', 'contact_id', 'activity_id', 'contact_id')
-  ));
-
   $options = _civicrm_api3_get_options_from_params($params);
 
   // Get by id
@@ -265,6 +261,16 @@ SELECT DISTINCT case_id
     }
     return civicrm_api3_create_success($cases, $params, 'case', 'get');
   }
+
+  $foundcases =  _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params, TRUE, 'Case');
+  $cases = array();
+  foreach ($foundcases['values'] as $foundcase) {
+      if ($case = _civicrm_api3_case_read($foundcase['id'], $options)) {
+        $cases[$foundcase['id']] = $case;
+      }
+    }
+
+  return civicrm_api3_create_success($cases, $params, 'case', 'get');
 }
 
 /**
