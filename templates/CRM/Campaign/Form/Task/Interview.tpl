@@ -322,7 +322,7 @@ var surveyActivityIds = {/literal}{$surveyActivityIds}{literal};
   //post data to create interview.
   cj.post(dataUrl, data, function(interview) {
     if ( interview.status == 'success' ) {
-      cj("#row_"+voterId+' td.name').attr('class', 'name disabled' );
+      cj("#row_"+voterId+' td.name').attr('class', 'name survey-completed' );
       cj('#restmsg_vote_' + voterId).fadeIn("slow").fadeOut("slow");
       cj('#interview_voter_button_' + voterId).html(updateVote);
       cj('#release_voter_button_' + voterId).hide( );
