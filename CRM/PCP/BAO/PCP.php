@@ -418,14 +418,23 @@ WHERE pcp.id = %1 AND cc.contribution_status_id =1 AND cc.is_test = 0";
 
     $prms = array('id' => $pcpId);
     CRM_Core_DAO::commonRetrieve('CRM_PCP_DAO_PCP', $prms, $pcpInfo);
-
     if ($pcpSupporter = CRM_PCP_BAO_PCP::displayName($pcpId)) {
       if ($pcpInfo['page_type'] == 'event') {
-        $page->assign('pcpSupporterText', ts('This event registration is being made thanks to effort of <strong>%1</strong>, who supports our campaign. You can support it as well - once you complete the registration, you will be able to create your own Personal Campaign Page!', array(1 => $pcpSupporter)));
+        $pcp_supporter_text = ts('This event registration is being made thanks to effort of <strong>%1</strong>, who supports our campaign. ', array(1 => $pcpSupporter));
+        $text = CRM_PCP_BAO_PCP::getPcpBlockStatus($pcpInfo['page_id'], 'event');
+        if(!empty($text)) {
+          $pcp_supporter_text .= "You can support it as well - once you complete the registration, you will be able to create your own Personal Campaign Page!";
+        }
       }
       else {
-        $page->assign('pcpSupporterText', ts('This contribution is being made thanks to effort of <strong>%1</strong>, who supports our campaign. You can support it as well - once you complete the donation, you will be able to create your own Personal Campaign Page!', array(1 => $pcpSupporter)));
+        $pcp_supporter_text = ts('This contribution is being made thanks to effort of <strong>%1</strong>, who supports our campaign. ', array(1 => $pcpSupporter));
+        $text = CRM_PCP_BAO_PCP::getPcpBlockStatus($pcpInfo['page_id'], 'contribute');
+        if(!empty($text)) {
+          $pcp_supporter_text .= "You can support it as well - once you complete the donation, you will be able to create your own Personal Campaign Page!";
+        }
       }
+      
+      $page->assign('pcpSupporterText', $pcp_supporter_text);
     }
     $page->assign('pcp', TRUE);
 
@@ -735,9 +744,10 @@ WHERE pcp.id = %1 AND cc.contribution_status_id =1 AND cc.is_test = 0";
   static function getPcpBlockStatus($pageId, $component) {
     $query = "
      SELECT pb.link_text as linkText
-     FROM civicrm_contribution_page cp
-          LEFT JOIN civicrm_pcp_block pb ON ( cp.id = pb.entity_id AND pb.entity_table = %2 )
-     WHERE pb.is_active = 1 AND cp.id = %1";
+     FROM civicrm_pcp_block pb
+     WHERE pb.is_active = 1 AND
+     pb.entity_id = %1 AND
+     pb.entity_table = %2";
 
     $entity_table = self::getPcpEntityTable($component);
 
