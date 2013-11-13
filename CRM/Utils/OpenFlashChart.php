@@ -106,7 +106,7 @@ class CRM_Utils_OpenFlashChart {
         // FIXME: for bars > 2, we'll need to come out with other colors
         $bars[$barCount]->colour( '#BF3B69');
       }
-      
+
       if ($barKey = CRM_Utils_Array::value($barCount, CRM_Utils_Array::value('barKeys', $params))) {
         $bars[$barCount]->key($barKey,12);
       }
@@ -123,6 +123,11 @@ class CRM_Utils_OpenFlashChart {
 
     // create x axis label obj.
     $xLabels = new x_axis_labels();
+    // set_labels function requires xValues array of string or x_axis_label
+    // so type casting array values to string values
+    array_walk($xValues, function(&$value, $index) {
+        $value = (string)$value;
+      });
     $xLabels->set_labels($xValues);
 
     // set angle for labels.
@@ -429,7 +434,7 @@ class CRM_Utils_OpenFlashChart {
       foreach ($rows['multiValue'] as $key => $val) {
         $graph[$key] = array_combine($dateKeys, $rows['multiValue'][$key]);
       }
-      $chartData = 
+      $chartData =
         array(
           'legend' => "$legend " . CRM_Utils_Array::value('legend', $rows, ts('Contribution')) . ' ' . ts('Summary'),
           'values' => $graph[0],
