@@ -86,12 +86,13 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
     // Handle absolute urls
     if (strpos($url, $base_url) === 0) {
       $internal = TRUE;
+      $url = $this->appendCoreDirectoryToResourceBase($url);
       $url = trim(str_replace($base_url, '', $url), '/');
     }
     // Handle relative urls
     elseif (strpos($url, $base) === 0) {
       $internal = TRUE;
-      $url = substr(drupal_get_path('module', 'civicrm'), 0, -6) . trim(substr($url, strlen($base)), '/');
+      $url = $this->appendCoreDirectoryToResourceBase(substr(drupal_get_path('module', 'civicrm'), 0, -6)) . trim(substr($url, strlen($base)), '/');
     }
     // Strip query string
     $q = strpos($url, '?');
@@ -99,5 +100,24 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
       $url = substr($url, 0, $q);
     }
     return $internal;
+  }
+
+  /**
+   * In instance where civicrm folder has a drupal folder & a civicrm core folder @ the same level append the
+   * civicrm folder name to the url
+   * See CRM-13737 for discussion of how this allows implementers to alter the folder structure
+   * @todo - this only provides a limited amount of flexiblity - it still expects a 'civicrm' folder with a 'drupal' folder
+   * and is only flexible as to the name of the civicrm folder.
+   *
+   * @param string $url potential resource url based on standard folder assumptions
+   * @return string $url with civicrm-core directory appended if not standard civi dir
+   */
+  function appendCoreDirectoryToResourceBase($url) {
+    global $civicrm_root;
+    $lastDirectory = implode(',', array_slice(explode('/', $civicrm_root), -1, 1, TRUE));
+    if(!$lastDirectory != 'civicrm') {
+      return $url .= $lastDirectory . '/';
+    }
+    return $url;
   }
 }
