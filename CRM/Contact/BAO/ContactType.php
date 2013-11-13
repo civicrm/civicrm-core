@@ -812,7 +812,7 @@ WHERE extends = %1 AND " . implode(" OR ", $subTypeClause);
    * @return void
    * @access public
    */
-  function deleteCustomRowsOfSubtype($gID, $subtypes = array(
+  public static function deleteCustomRowsOfSubtype($gID, $subtypes = array(
     )) {
     if (!$gID or empty($subtypes)) {
       return FALSE;
