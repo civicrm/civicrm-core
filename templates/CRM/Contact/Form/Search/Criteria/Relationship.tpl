@@ -44,6 +44,9 @@
       <td>
          {$form.relation_status.label}<br />
          {$form.relation_status.html}
+         </p>
+         {$form.relation_permission.label}<br />
+         {$form.relation_permission.html}
       </td>
       <td>
         {$form.relation_target_group.label} {help id="id-relationship-target-group" file="CRM/Contact/Form/Search/Advanced.hlp"}<br />
