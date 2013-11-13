@@ -1490,6 +1490,13 @@ ORDER BY civicrm_custom_group.weight,
         CRM_Core_BAO_CustomField::addQuickFormElement($form, $elementName, $fieldId, $inactiveNeeded, $required);
       }
     }
+    if (!empty($form->_stateCountryMap['state_province']) && !empty($form->_stateCountryMap['country'])) {
+      foreach ($form->_stateCountryMap['state_province'] as $key => $value) {
+        $stateCountryMap[$key]['state_province'] = $value;
+        $stateCountryMap[$key]['country'] = $form->_stateCountryMap['country'][$key];
+      }
+      CRM_Core_BAO_Address::addStateCountryMap($stateCountryMap);
+    }
   }
 
   /**
