@@ -32,22 +32,58 @@ class WebTest_Profile_ProfileCountryState extends CiviSeleniumTestCase {
   }
 
   function testStateCountry() {
-    $this->webtestLogin();
+    $this->webtestLogin();    
     $config = CRM_Core_Config::singleton();
-    $import = new CRM_Utils_Migrate_Import();
-    global $civicrm_root;
-    $path = $civicrm_root . '/tests/phpunit/WebTest/Profile/xml/CountryStateWebtest.xml';
-    $import->run($path);
-    $result = $this->webtest_civicrm_api('uf_group', 'get', array( 'name' => 'country_state_province_web_test_19' ));
-    if($result['id']) {
-      $gid = $result['id'];
-      $this->openCiviPage("admin/setting/localization", "reset=1", "_qf_Localization_next-bottom");
+    // Add new profile.
+    $this->openCiviPage('admin/uf/group', 'reset=1');
+    $this->click('newCiviCRMProfile-top');
+    $this->waitForElementPresent('_qf_Group_next-bottom');
+
+    //Name of profile
+    $profileTitle = 'Country state province web test temp';
+    $this->type('title', $profileTitle);
+
+    //click on save
+    $this->click('_qf_Group_next');
+    $this->waitForPageToLoad($this->getTimeoutMsec());
+    
+
+    //check for  profile create
+    $this->waitForText('crm-notification-container', "Profile '{$profileTitle}' has been added. You can add fields to this profile now.");
+    $gid = $this->urlArg('gid');
+    //Add Country field to profile
+    $this->click('field_name[0]');
+    $this->select('field_name[0]', 'value=Contact');
+    $this->click("//option[@value='Contact']");
+    $this->click('field_name[1]');
+    $this->select('field_name[1]', 'value=country');
+    $this->click("//option[@value='country']");
+    $this->click('is_required');
+
+    $this->click('_qf_Field_next_new');
+    $this->waitForPageToLoad($this->getTimeoutMsec());
+
+    //Add State field to profile
+    $this->click('field_name[0]');
+    $this->select('field_name[0]', 'value=Contact');
+    $this->click("//option[@value='Contact']");
+    $this->click('field_name[1]');
+    $this->select('field_name[1]', 'value=state_province');
+    $this->click("xpath=//select[@id='field_name_1']/option[@value='state_province']");
+    $this->click('is_required');
+    //click on save
+    $this->click('_qf_Field_next');
+    $this->waitForPageToLoad($this->getTimeoutMsec());
+
+    if($gid) {
+      $this->openCiviPage('admin/setting/localization', 'reset=1', '_qf_Localization_next-bottom');
       $country = array(1001 => 'Afghanistan', 1013 => 'Australia', 1039 => 'Canada', 1101 => 'India');
       $enabledCountries = $this->getSelectOptions("countryLimit-t");
       $enabledStates = $this->getSelectOptions("provinceLimit-t");
-
+      $newCountry = array();
       foreach($country as $countryID => $countryName) {
         if(!in_array($countryName, $enabledCountries)) {
+          $newCountry[$countryID] = $countryName;
           $this->addSelection("countryLimit-f", "label=$countryName");
           $this->click("xpath=//select[@id='countryLimit-f']/option[@value='$countryID']");
           $this->click("xpath=//tr[@class='crm-localization-form-block-countryLimit']/td[2]/table//tbody/tr/td[2]/input[@name='add']");
@@ -63,22 +99,48 @@ class WebTest_Profile_ProfileCountryState extends CiviSeleniumTestCase {
         $this->click("_qf_Localization_next-bottom");
         $this->waitForPageToLoad($this->getTimeoutMsec());
         $this->waitForText('crm-notification-container', "Saved");
-      }
- 
-      $url = $this->sboxPath . "civicrm/profile/create?gid={$gid}&reset=1";
+      } 
+      $this->openCiviPage("profile/create", "gid=$gid&reset=1", NULL);
 
-      $this->open($url);
       $this->waitForElementPresent("xpath=//form[@id='Edit']/div[2]/div/div/div[2]/select");
-
       $this->click("xpath=//form[@id='Edit']/div[2]/div/div/div[2]/select");
       $countryID = array_rand($country);
       $states = CRM_Core_PseudoConstant::stateProvinceForCountry($countryID, 'id');
       $stateID = array_rand($states);
       $this->select("xpath=//form[@id='Edit']/div[2]/div/div/div[2]/select", "value=$countryID");
+      sleep(2);
       $this->waitForElementPresent("xpath=//form[@id='Edit']/div[2]/div/div[2]/div[2]/select");
       $this->click("xpath=//form[@id='Edit']/div[2]/div/div[2]/div[2]/select");
       $this->select("xpath=//form[@id='Edit']/div[2]/div/div[2]/div[2]/select", "value=$stateID");
       $this->clickLink('_qf_Edit_next', NULL);
+      $this->openCiviPage('admin/uf/group', 'reset=1');
+      $this->waitForElementPresent("xpath=//div[@id='user-profiles']/div/div/table/tbody//tr/td/span[text() = '$profileTitle']/../../td[7]/span[2][text()='more']/ul/li[4]/a[text()='Delete']");
+      $this->click("xpath=//div[@id='user-profiles']/div/div/table/tbody//tr/td/span[text() = '$profileTitle']/../../td[7]/span[2][text()='more']/ul/li[4]/a[text()='Delete']");
+
+      $this->waitForElementPresent('_qf_Group_next-bottom');
+      $this->click('_qf_Group_next-bottom');
+      $this->waitForElementPresent('newCiviCRMProfile-bottom');
+      $this->waitForText('crm-notification-container', "Profile '{$profileTitle}' has been deleted.");
+
+      $this->openCiviPage("admin/setting/localization", "reset=1", "_qf_Localization_next-bottom");
+      $enabledCountries = $this->getSelectOptions("countryLimit-t");
+      $enabledStates = $this->getSelectOptions("provinceLimit-t");
+      $removed = false;
+      foreach($newCountry as $countryID => $countryName) {
+          $this->addSelection("countryLimit-t", "label=$countryName");
+          $this->click("xpath=//select[@id='countryLimit-t']/option[@value='$countryID']");
+          $this->click("xpath=//tr[@class='crm-localization-form-block-countryLimit']/td[2]/table//tbody/tr/td[2]/input[@name='remove']");
+
+          $this->addSelection("provinceLimit-t", "label=$countryName");
+          $this->click("//option[@value='$countryID']");
+          $this->click("xpath=//tr[@class='crm-localization-form-block-provinceLimit']/td[2]/table//tbody/tr/td[2]/input[@name='remove']");
+          $removed = true;
+      }
+      if ($removed) {
+        $this->click("_qf_Localization_next-bottom");
+        $this->waitForPageToLoad($this->getTimeoutMsec());
+        $this->waitForText('crm-notification-container', "Saved");
+      }
     }
   }
 }
