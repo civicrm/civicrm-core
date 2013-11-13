@@ -71,4 +71,33 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
     $url = $config->userFrameworkBaseURL;
     return array($url, $siteName, $siteRoot);
   }
+
+  /**
+   * Check if a resource url is within the drupal directory and format appropriately
+   *
+   * @param url (reference)
+   *
+   * @return bool: TRUE for internal paths, FALSE for external
+   */
+  function formatResourceUrl(&$url) {
+    $internal = FALSE;
+    $base = CRM_Core_Config::singleton()->resourceBase;
+    global $base_url;
+    // Handle absolute urls
+    if (strpos($url, $base_url) === 0) {
+      $internal = TRUE;
+      $url = trim(str_replace($base_url, '', $url), '/');
+    }
+    // Handle relative urls
+    elseif (strpos($url, $base) === 0) {
+      $internal = TRUE;
+      $url = substr(drupal_get_path('module', 'civicrm'), 0, -6) . trim(substr($url, strlen($base)), '/');
+    }
+    // Strip query string
+    $q = strpos($url, '?');
+    if ($q && $internal) {
+      $url = substr($url, 0, $q);
+    }
+    return $internal;
+  }
 }
