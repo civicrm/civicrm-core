@@ -3788,6 +3788,7 @@ WHERE  id IN ( $groupIDs )
     // for relatinship search we always do wildcard
     $targetName = $this->getWhereValues('relation_target_name', $grouping);
     $relStatus = $this->getWhereValues('relation_status', $grouping);
+    $relPermission = $this->getWhereValues('relation_permission', $grouping);
     $targetGroup = $this->getWhereValues('relation_target_group', $grouping);
 
     $nameClause = $name = NULL;
@@ -3896,6 +3897,20 @@ civicrm_relationship.end_date < {$today} OR
 civicrm_relationship.start_date > {$today}
 )";
       $this->_qill[$grouping][] = ts('Relationship - Inactive or not Current');
+    }
+
+    //check for permissioned, non-permissioned and all permissioned relations
+    if ($relPermission[2] == 1) {
+      $this->_where[$grouping][] = "(
+civicrm_relationship.is_permission_a_b = 1
+)";
+      $this->_qill[$grouping][] = ts('Relationship - Permissioned');
+    } elseif ($relPermission[2] == 2) {
+      //non-allowed permission relationship.
+      $this->_where[$grouping][] = "(
+civicrm_relationship.is_permission_a_b = 0
+)";
+      $this->_qill[$grouping][] = ts('Relationship - Non-permissioned');
     }
 
     $this->addRelationshipDateClauses($grouping, $where);
