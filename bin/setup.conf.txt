@@ -42,3 +42,9 @@ DBLOAD=
 # cumbersome during development. To speed it up,
 # list the desired locales.
 # export CIVICRM_LOCALES=en_US,fr_FR
+
+# GenCode produces some CMS-specific config files
+# If omitted, defaults to drupal.
+GENCODE_CMS=""
+# GENCODE_CMS=drupal
+# GENCODE_CMS=wordpress
