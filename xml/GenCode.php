@@ -20,12 +20,17 @@ define('CIVICRM_UF', 'Drupal');
 require_once 'CRM/Core/ClassLoader.php';
 CRM_Core_ClassLoader::singleton()->register();
 
-$genCode = new CRM_GenCode_Main('../CRM/Core/DAO/', '../sql/', '../', '../templates/');
-$genCode->main(
-  @$argv[2],
-  @$argv[3],
-  empty($argv[1]) ? 'schema/Schema.xml' : $argv[1]
+$genCode = new CRM_GenCode_Main(
+  '../CRM/Core/DAO/',                                                 // $CoreDAOCodePath
+  '../sql/',                                                          // $sqlCodePath
+  '../',                                                              // $phpCodePath
+  '../templates/',                                                    // $tplCodePath
+  array('../packages/Smarty/plugins', '../CRM/Core/Smarty/plugins'),  // smarty plugin dirs
+  @$argv[3],                                                          // cms
+  empty($argv[2]) ? NULL : $argv[2],                                  // db version
+  empty($argv[1]) ? 'schema/Schema.xml' : $argv[1]                    // schem afile
 );
+$genCode->main();
 
 class CRM_GenCode_Util_File {
   static function createDir($dir, $perm = 0755) {
@@ -62,26 +67,30 @@ class CRM_GenCode_Util_File {
 
 class CRM_GenCode_Main {
   var $buildVersion;
+  var $db_version;
   var $compileDir;
   var $classNames;
+  var $cms; // drupal, joomla, wordpress
 
   var $CoreDAOCodePath;
   var $sqlCodePath;
   var $phpCodePath;
   var $tplCodePath;
+  var $schemaPath; // ex: schema/Schema.xml
 
   var $smarty;
 
-  function __construct($CoreDAOCodePath, $sqlCodePath, $phpCodePath, $tplCodePath) {
+  function __construct($CoreDAOCodePath, $sqlCodePath, $phpCodePath, $tplCodePath, $smartyPluginDirs, $argCms, $argVersion, $schemaPath) {
     $this->CoreDAOCodePath = $CoreDAOCodePath;
     $this->sqlCodePath = $sqlCodePath;
     $this->phpCodePath = $phpCodePath;
     $this->tplCodePath = $tplCodePath;
+    $this->cms = $argCms;
 
     require_once 'Smarty/Smarty.class.php';
     $this->smarty = new Smarty();
     $this->smarty->template_dir = './templates';
-    $this->smarty->plugins_dir = array('../packages/Smarty/plugins', '../CRM/Core/Smarty/plugins');
+    $this->smarty->plugins_dir = $smartyPluginDirs;
     $this->compileDir = CRM_GenCode_Util_File::createTempDir('templates_c_');
     $this->smarty->compile_dir = $this->compileDir;
     $this->smarty->clear_all_cache();
@@ -103,6 +112,17 @@ class CRM_GenCode_Main {
     $this->beautifier->setNewLine("\n");
 
     CRM_GenCode_Util_File::createDir($this->sqlCodePath);
+
+    $versionFile        = "version.xml";
+    $versionXML         = &$this->parseInput($versionFile);
+    $this->db_version         = $versionXML->version_no;
+    $this->buildVersion = preg_replace('/^(\d{1,2}\.\d{1,2})\.(\d{1,2}|\w{4,7})$/i', '$1', $this->db_version);
+    if (isset($argVersion)) {
+      // change the version to that explicitly passed, if any
+      $this->db_version = $argVersion;
+    }
+
+    $this->schemaPath = $schemaPath;
   }
 
   function __destruct() {
@@ -112,20 +132,9 @@ class CRM_GenCode_Main {
   /**
    * Automatically generate a variety of files
    *
-   * @param $argVersion string, optional
-   * @param $argCms string, optional; "drupal" or "joomla"
-   * @param $file, the path to the XML schema file
    */
-  function main($argVersion, $argCms, $file) {
-    $versionFile        = "version.xml";
-    $versionXML         = &$this->parseInput($versionFile);
-    $db_version         = $versionXML->version_no;
-    $this->buildVersion = preg_replace('/^(\d{1,2}\.\d{1,2})\.(\d{1,2}|\w{4,7})$/i', '$1', $db_version);
-    if (isset($argVersion)) {
-      // change the version to that explicitly passed, if any
-      $db_version = $argVersion;
-    }
-    echo "\ncivicrm_domain.version := $db_version\n\n";
+  function main() {
+    echo "\ncivicrm_domain.version := ". $this->db_version . "\n\n";
     if ($this->buildVersion < 1.1) {
       echo "The Database is not compatible for this version";
       exit();
@@ -141,12 +150,12 @@ Alternatively you can get a version of CiviCRM that matches your PHP version
       exit();
     }
 
-    $this->generateTemplateVersion($db_version);
+    $this->generateTemplateVersion();
 
-    $this->setupCms($argCms, $db_version);
+    $this->setupCms($this->db_version);
 
-    echo "Parsing input file $file\n";
-    $dbXML = $this->parseInput($file);
+    echo "Parsing input file ".$this->schemaPath."\n";
+    $dbXML = $this->parseInput($this->schemaPath);
     // print_r( $dbXML );
 
     echo "Extracting database information\n";
@@ -191,7 +200,7 @@ Alternatively you can get a version of CiviCRM that matches your PHP version
     // $this->generateDropSql($archiveTables, 'civicrm_archive_drop.mysql');
 
     $this->generateNavigation();
-    $this->generateLocalDataSql($db_version, $this->findLocales());
+    $this->generateLocalDataSql($this->findLocales());
     $this->generateSample();
     $this->generateInstallLangs();
     $this->generateDAOs($tables);
@@ -244,7 +253,7 @@ Alternatively you can get a version of CiviCRM that matches your PHP version
     file_put_contents($this->sqlCodePath . "civicrm_navigation.mysql", $this->smarty->fetch('civicrm_navigation.tpl'));
   }
 
-  function generateLocalDataSql($db_version, $locales) {
+  function generateLocalDataSql($locales) {
     $this->reset_smarty_assignments();
 
     global $tsLocale;
@@ -261,7 +270,7 @@ Alternatively you can get a version of CiviCRM that matches your PHP version
       $data[] = $this->smarty->fetch('civicrm_data.tpl');
       $data[] = $this->smarty->fetch('civicrm_navigation.tpl');
 
-      $data[] = " UPDATE civicrm_domain SET version = '$db_version';";
+      $data[] = " UPDATE civicrm_domain SET version = '" . $this->db_version . "';";
 
       $data = implode("\n", $data);
 
@@ -355,8 +364,8 @@ Alternatively you can get a version of CiviCRM that matches your PHP version
     $this->beautifier->save();
   }
 
-  function generateTemplateVersion($dbVersion) {
-    file_put_contents($this->tplCodePath . "/CRM/common/version.tpl", $dbVersion);
+  function generateTemplateVersion() {
+    file_put_contents($this->tplCodePath . "/CRM/common/version.tpl", $this->db_version);
   }
 
   function findLocales() {
@@ -387,23 +396,54 @@ Alternatively you can get a version of CiviCRM that matches your PHP version
     return $locales;
   }
 
-  function setupCms($argCms, $db_version) {
+  function setupCms() {
     // default cms is 'drupal', if not specified
-    $cms = isset($argCms) ? strtolower($argCms) : 'drupal';
-    if (!in_array($cms, array(
-      'drupal', 'joomla'))) {
-      echo "Config file for '{$cms}' not known.";
+    $this->cms = isset($this->cms) ? strtolower($this->cms) : 'drupal';
+    if (!in_array($this->cms, array(
+      'drupal', 'joomla', 'wordpress'))) {
+      echo "Config file for '{$this->cms}' not known.";
       exit();
     }
-    elseif ($cms !== 'joomla') {
-      echo "Generating civicrm.config.php\n";
-      copy("../{$cms}/civicrm.config.php.{$cms}", '../civicrm.config.php');
+    elseif ($this->cms !== 'joomla') {
+      $configTemplate = $this->findConfigTemplate($this->cms);
+      if ($configTemplate) {
+        echo "Generating civicrm.config.php\n";
+        copy($configTemplate, '../civicrm.config.php');
+      } else {
+        throw new Exception("Failed to locate template for civicrm.config.php");
+      }
     }
 
     echo "Generating civicrm-version file\n";
-    $this->smarty->assign('db_version', $db_version);
-    $this->smarty->assign('cms', ucwords($cms));
+    $this->smarty->assign('db_version', $this->db_version);
+    $this->smarty->assign('cms', ucwords($this->cms));
     file_put_contents($this->phpCodePath . "civicrm-version.php", $this->smarty->fetch('civicrm_version.tpl'));
+  }
+
+  /**
+   * @param string $cms "drupal"|"wordpress"
+   * @return null|string path to config template
+   */
+  public function findConfigTemplate($cms) {
+    $candidates = array();
+    switch ($cms) {
+      case 'drupal':
+        $candidates[] = "../drupal/civicrm.config.php.drupal";
+        $candidates[] =  "../../drupal/civicrm.config.php.drupal";
+        break;
+      case 'wordpress':
+        $candidates[] = "../../civicrm.config.php.wordpress";
+        $candidates[] = "../WordPress/civicrm.config.php.wordpress";
+        $candidates[] = "../drupal/civicrm.config.php.drupal";
+        break;
+    }
+    foreach ($candidates as $candidate) {
+      if (file_exists($candidate)) {
+        return $candidate;
+        break;
+      }
+    }
+    return NULL;
   }
 
   // -----------------------------
