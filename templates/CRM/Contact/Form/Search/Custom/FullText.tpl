@@ -55,7 +55,6 @@
       : {if !$table}{if $summary.Count.Contact <= $limit}{$summary.Count.Contact}{else}{ts 1=$limit}%1 or more{/ts}{/if}{else}{$summary.Count.Contact}{/if}</h3>
     {if $table}{include file="CRM/common/pager.tpl" location="top"}{/if}
     {* This section displays the rows along and includes the paging controls *}
-    {strip}
       <table id="contact_listing" class="display" class="selector" summary="{ts}Contact listings.{/ts}">
         <thead>
         <tr>
@@ -74,7 +73,6 @@
           </tr>
         {/foreach}
       </table>
-    {/strip}
     {if !$table and $summary.addShowAllLink.Contact}
       <div class="crm-section full-text-view-all-section">
         <a href="{crmURL p='civicrm/contact/search/custom' q="csid=`$csID`&reset=1&force=1&table=Contact&text=$text"}"
@@ -94,7 +92,6 @@
       : {if !$table}{if $summary.Count.Activity <= $limit}{$summary.Count.Activity}{else}{ts 1=$limit}%1 or more{/ts}{/if}{else}{$summary.Count.Activity}{/if}</h3>
     {if $table}{include file="CRM/common/pager.tpl" location="top"}{/if}
     {* This section displays the rows along and includes the paging controls *}
-    {strip}
       <table id="activity_listing" class="display" summary="{ts}Activity listings.{/ts}">
         <thead>
         <tr>
@@ -137,7 +134,6 @@
           </tr>
         {/foreach}
       </table>
-    {/strip}
     {if !$table and $summary.addShowAllLink.Activity}
       <div class="crm-section full-text-view-all-section">
         <a href="{crmURL p='civicrm/contact/search/custom' q="csid=`$csID`&reset=1&force=1&table=Activity&text=$text"}"
@@ -156,7 +152,6 @@
       : {if !$table}{if $summary.Count.Case <= $limit}{$summary.Count.Case}{else}{ts 1=$limit}%1 or more{/ts}{/if}{else}{$summary.Count.Case}{/if}</h3>
     {if $table}{include file="CRM/common/pager.tpl" location="top"}{/if}
     {* This section displays the rows along and includes the paging controls *}
-    {strip}
       <table id="case_listing" class="display" summary="{ts}Case listings.{/ts}">
         <thead>
         <tr>
@@ -194,7 +189,6 @@
           </tr>
         {/foreach}
       </table>
-    {/strip}
     {if !$table and $summary.addShowAllLink.Case}
       <div class="crm-section full-text-view-all-section">
         <a href="{crmURL p='civicrm/contact/search/custom' q="csid=`$csID`&reset=1&force=1&table=Case&text=$text"}"
@@ -214,7 +208,6 @@
       : {if !$table}{if $summary.Count.Contribution <= $limit}{$summary.Count.Contribution}{else}{ts 1=$limit}%1 or more{/ts}{/if}{else}{$summary.Count.Contribution}{/if}</h3>
     {if $table}{include file="CRM/common/pager.tpl" location="top"}{/if}
     {* This section displays the rows along and includes the paging controls *}
-    {strip}
       <table id="contribute_listing" class="display" summary="{ts}Contribution listings.{/ts}">
         <thead>
         <tr>
@@ -248,7 +241,6 @@
           </tr>
         {/foreach}
       </table>
-    {/strip}
     {if !$table and $summary.addShowAllLink.Contribution}
       <div class="crm-section full-text-view-all-section">
         <a href="{crmURL p='civicrm/contact/search/custom' q="csid=`$csID`&reset=1&force=1&table=Contribution&text=$text"}"
@@ -268,7 +260,6 @@
       : {if !$table}{if $summary.Count.Participant <= $limit}{$summary.Count.Participant}{else}{ts 1=$limit}%1 or more{/ts}{/if}{else}{$summary.Count.Participant}{/if}</h3>
     {if $table}{include file="CRM/common/pager.tpl" location="top"}{/if}
     {* This section displays the rows along and includes the paging controls *}
-    {strip}
       <table id="participant_listing" class="display" summary="{ts}Participant listings.{/ts}">
         <thead>
         <tr>
@@ -305,7 +296,6 @@
           </tr>
         {/foreach}
       </table>
-    {/strip}
     {if !$table and $summary.addShowAllLink.Participant}
       <div class="crm-section full-text-view-all-section"><a
         href="{crmURL p='civicrm/contact/search/custom' q="csid=`$csID`&reset=1&force=1&table=Participant&text=$text"}"
@@ -324,7 +314,6 @@
       : {if !$table}{if $summary.Count.Membership <= $limit}{$summary.Count.Membership}{else}{ts 1=$limit}%1 or more{/ts}{/if}{else}{$summary.Count.Membership}{/if}</h3>
     {if $table}{include file="CRM/common/pager.tpl" location="top"}{/if}
     {* This section displays the rows along and includes the paging controls *}
-    {strip}
       <table id="membership_listing" class="display" summary="{ts}Membership listings.{/ts}">
         <thead>
         <tr>
@@ -361,7 +350,6 @@
           </tr>
         {/foreach}
       </table>
-    {/strip}
     {if !$table and $summary.addShowAllLink.Membership}
       <div class="crm-section full-text-view-all-section">
         <a href="{crmURL p='civicrm/contact/search/custom' q="csid=`$csID`&reset=1&force=1&table=Membership&text=$text"}"
