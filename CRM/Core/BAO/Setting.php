@@ -235,7 +235,7 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
    * @static
    * @access public
    */
-  static function getItems(&$params, $domains = null, $settingsToReturn) {
+  static function getItems(&$params, $domains = NULL, $settingsToReturn) {
     $originalDomain = CRM_Core_Config::domainID();
     if (empty($domains)) {
       $domains[] = $originalDomain;
@@ -273,7 +273,7 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
             $fields['values'][$name]['group_name'],
             $name,
             CRM_Utils_Array::value('component_id', $params),
-            null,
+            NULL,
             CRM_Utils_Array::value('contact_id', $params),
             $domainID
           );
@@ -372,7 +372,7 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
    * @static
    * @access public
    */
-  static function setItems(&$params, $domains = null) {
+  static function setItems(&$params, $domains = NULL) {
     $originalDomain = CRM_Core_Config::domainID();
     if (empty($domains)) {
       $domains[] = $originalDomain;
@@ -489,7 +489,7 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
       $value = CRM_Core_DAO::VALUE_SEPARATOR . implode(CRM_Core_DAO::VALUE_SEPARATOR,$value) . CRM_Core_DAO::VALUE_SEPARATOR;
     }
     if (empty($fieldSpec['validate_callback'])) {
-      return true;
+      return TRUE;
     }
     else {
       list($class,$fn) = explode('::',$fieldSpec['validate_callback']);
@@ -575,10 +575,10 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
    * - help_text
    */
   static function getSettingSpecification(
-    $componentID = null,
+    $componentID = NULL,
     $filters = array(),
-    $domainID = null,
-    $profile = null
+    $domainID = NULL,
+    $profile = NULL
   ) {
     $cacheString = 'settingsMetadata_' . $domainID . '_' . $profile;
     foreach ($filters as $filterField => $filterString) {
@@ -685,7 +685,7 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
    *
    * Note that where the key name is being changed the 'legacy_key' will give us the old name
    */
-  static function convertConfigToSetting($name, $domainID = null) {
+  static function convertConfigToSetting($name, $domainID = NULL) {
     // we have to force this here in case more than one domain is in play.
     // whenever there is a possibility of more than one domain we must force it
     $config = CRM_Core_Config::singleton();
@@ -700,7 +700,7 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
     } else {
       $values = array();
     }
-    $spec = self::getSettingSpecification(null, array('name' => $name), $domainID);
+    $spec = self::getSettingSpecification(NULL, array('name' => $name), $domainID);
     $configKey = CRM_Utils_Array::value('config_key', $spec[$name], CRM_Utils_Array::value('legacy_key', $spec[$name], $name));
     //if the key is set to config_only we don't need to do anything
     if(empty($spec[$name]['config_only'])){
@@ -806,7 +806,7 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
     self::setItem($optionValue, $group, $name);
   }
 
-  static function fixAndStoreDirAndURL(&$params, $domainID = null) {
+  static function fixAndStoreDirAndURL(&$params, $domainID = NULL) {
     if (self::isUpgradeFromPreFourOneAlpha1()) {
       return;
     }
