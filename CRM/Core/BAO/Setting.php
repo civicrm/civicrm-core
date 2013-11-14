@@ -292,6 +292,8 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
   /**
    * Store an item in the setting table
    *
+   * _setItem() is the common logic shared by setItem() and setItems().
+   *
    * @param object $value (required) The value that will be serialized and stored
    * @param string $group (required) The group name of the item
    * @param string $name  (required) The name of the setting
@@ -311,12 +313,52 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
     $createdID   = NULL,
     $domainID    = NULL
   ) {
+    $fields = array();
+    $fieldsToSet = self::validateSettingsInput(array($name => $value), $fields);
+    //We haven't traditionally validated inputs to setItem, so this breaks things.
+    //foreach ($fieldsToSet as $settingField => &$settingValue) {
+    //  self::validateSetting($settingValue, $fields['values'][$settingField]);
+    //}
+
+    return self::_setItem($fields['values'][$name], $value, $group, $name, $componentID, $contactID, $createdID, $domainID);
+  }
+
+  /**
+   * Store an item in a setting table
+   *
+   * _setItem() is the common logic shared by setItem() and setItems().
+   *
+   * @param array $metadata metadata describing this field
+   * @param $value
+   * @param $group
+   * @param $name
+   * @param null $componentID
+   * @param null $contactID
+   * @param null $createdID
+   * @param null $domainID
+   */
+  static function _setItem(
+    $metadata,
+    $value,
+    $group,
+    $name,
+    $componentID = NULL,
+    $contactID   = NULL,
+    $createdID   = NULL,
+    $domainID    = NULL
+  ) {
     if (empty($domainID)) {
       $domainID = CRM_Core_Config::domainID();
     }
 
     $dao = self::dao($group, $name, $componentID, $contactID, $domainID);
     $dao->find(TRUE);
+
+    if (isset($metadata['on_change'])) {
+      foreach ($metadata['on_change'] as $callback) {
+        call_user_func($callback, unserialize($dao->value), $value, $metadata);
+      }
+    }
 
     if (CRM_Utils_System::isNull($value)) {
       $dao->value = 'null';
@@ -366,6 +408,8 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
    *  'config_key' = the config key is different to the settings key - e.g. debug where there was a conflict
    *  'legacy_key' = rename from config or setting with this name
    *
+   * _setItem() is the common logic shared by setItem() and setItems().
+   *
    * @param array $params (required) An api formatted array of keys and values
    * @domains array an array of domains to get settings for. Default is the current domain
    * @return void
@@ -393,7 +437,8 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
       $result[$domainID] = array();
       foreach ($fieldsToSet as $name => $value) {
         if(empty($fields['values'][$name]['config_only'])){
-          CRM_Core_BAO_Setting::setItem(
+          CRM_Core_BAO_Setting::_setItem(
+            $fields['values'][$name],
             $value,
             $fields['values'][$name]['group_name'],
             $name,
