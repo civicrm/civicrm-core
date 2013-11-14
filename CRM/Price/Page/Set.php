@@ -276,8 +276,13 @@ class CRM_Price_Page_Set extends CRM_Core_Page {
         CRM_Utils_Array::value('extends', $priceSet[$dao->id])
       );
       $extends = array();
-      foreach ($compIds as $compId) $extends[] = $comps[CRM_Core_Component::getComponentName($compId)];
-      $priceSet[$dao->id]['extends'] = implode(', ', $extends);
+      //CRM-10225
+      foreach ($compIds as $compId) {
+        if (!empty($comps[CRM_Core_Component::getComponentName($compId)])) {
+          $extends[] = $comps[CRM_Core_Component::getComponentName($compId)];
+        }
+      }
+     $priceSet[$dao->id]['extends'] = implode(', ', $extends);
 
       // form all action links
       $action = array_sum(array_keys($this->actionLinks()));
