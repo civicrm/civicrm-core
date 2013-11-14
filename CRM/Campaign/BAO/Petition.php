@@ -545,7 +545,7 @@ AND         tag_id = ( SELECT id FROM civicrm_tag WHERE name = %2 )";
     $dao->title = $petitionGroupName;
     if (!$dao->find(TRUE)) {
       $dao->is_active = 1;
-      $dao->visibility = 'Public Pages';
+      $dao->visibility = 'User and User Admin Only';
       $dao->save();
     }
     $group_id = $dao->id;
@@ -604,7 +604,8 @@ AND         tag_id = ( SELECT id FROM civicrm_tag WHERE name = %2 )";
         // this will allow using a hash key to confirm email address by sending a url link
         $se = CRM_Mailing_Event_BAO_Subscribe::subscribe($group_id,
           $params['email-Primary'],
-          $params['contactId']
+          $params['contactId'],
+          'profile'
         );
 
         //    require_once 'CRM/Core/BAO/Domain.php';
