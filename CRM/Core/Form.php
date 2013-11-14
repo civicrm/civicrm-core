@@ -358,9 +358,12 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     ) {
       $this->addElement('hidden', 'qfKey', $this->controller->_key);
       $this->assign('qfKey', $this->controller->_key);
+
     }
 
-    if ($this->controller->_entryURL) {
+    // _generateQFKey suppresses the qfKey generation on form snippets that
+    // are part of other forms, hence we use that to avoid adding entryURL
+    if ($this->controller->_generateQFKey && $this->controller->_entryURL) {
       $this->addElement('hidden', 'entryURL', $this->controller->_entryURL);
     }
 
