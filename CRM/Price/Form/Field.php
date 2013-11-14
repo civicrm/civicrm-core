@@ -155,7 +155,7 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
     }
     $enabledComponents = CRM_Core_Component::getEnabledComponents();
     $eventComponentId = NULL;
-    if (array_key_exists('CiviEvent',$enabledComponents)){
+    if (array_key_exists('CiviEvent',$enabledComponents)) {
       $eventComponentId  = CRM_Core_Component::getComponentID('CiviEvent');
     }
 
