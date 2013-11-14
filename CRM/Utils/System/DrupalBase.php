@@ -77,19 +77,21 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
    *
    * @param url (reference)
    *
-   * @return bool: TRUE for internal paths, FALSE for external
+   * @return bool: TRUE for internal paths, FALSE for external. The drupal_add_js fn is able to add js more
+   * efficiently if it is known to be in the drupal site
    */
   function formatResourceUrl(&$url) {
     $internal = FALSE;
     $base = CRM_Core_Config::singleton()->resourceBase;
     global $base_url;
     // Handle absolute urls
+    // compares $url (which is some unknown/untrusted value from a third-party dev) to the CMS's base url (which is independent of civi's url)
+    // to see if the url is within our drupal dir, if it is we are able to treated it as an internal url
     if (strpos($url, $base_url) === 0) {
       $internal = TRUE;
-      $url = $this->appendCoreDirectoryToResourceBase($url);
       $url = trim(str_replace($base_url, '', $url), '/');
     }
-    // Handle relative urls
+    // Handle relative urls that are within the CiviCRM module directory
     elseif (strpos($url, $base) === 0) {
       $internal = TRUE;
       $url = $this->appendCoreDirectoryToResourceBase(substr(drupal_get_path('module', 'civicrm'), 0, -6)) . trim(substr($url, strlen($base)), '/');
