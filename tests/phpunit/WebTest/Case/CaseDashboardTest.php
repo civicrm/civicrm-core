@@ -50,7 +50,7 @@ class WebTest_Case_CaseDashboardTest extends CiviSeleniumTestCase {
     // Should default to My Cases
     $this->assertTrue($this->isChecked("name=allupcoming value=0"), 'Case dashboard should default to My Cases.');
     // The header text of the table changes too
-    $this->assertElementContainsText('crm-container', "Summary of Case Involvement");
+    $this->assertElementContainsText('crm-container', "Summary of Involvement");
 
     $this->clickLink("name=allupcoming value=1", "css=a.button");
 
