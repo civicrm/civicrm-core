@@ -228,7 +228,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
     $error['user_info']  = $pearError->getUserInfo();
     $error['to_string']  = $pearError->toString();
 
-    CRM_Core_Error::debug('Initialization Error', $error);
+    CRM_Core_Error::debug('Initialization Error', $error, TRUE, TRUE, FALSE);
 
     // always log the backtrace to a file
     self::backtrace('backTrace', TRUE);
@@ -418,12 +418,15 @@ class CRM_Core_Error extends PEAR_ErrorStack {
    * @param  mixed  reference to variables that we need a trace of
    * @param  bool   should we log or return the output
    * @param  bool   whether to generate a HTML-escaped output
+   * @param  bool   should we check permissions before displaying output
+   *                useful when we die during initialization and permissioning
+   *                subsystem is not initialized - CRM-13765
    *
    * @return string the generated output
    * @access public
    * @static
    */
-  static function debug($name, $variable = NULL, $log = TRUE, $html = TRUE) {
+  static function debug($name, $variable = NULL, $log = TRUE, $html = TRUE, $checkPermission = TRUE) {
     $error = self::singleton();
 
     if ($variable === NULL) {
@@ -446,7 +449,10 @@ class CRM_Core_Error extends PEAR_ErrorStack {
       }
       $out = "{$prefix}$out\n";
     }
-    if ($log && CRM_Core_Permission::check('view debug output')) {
+    if (
+      $log &&
+      (!$checkPermission || CRM_Core_Permission::check('view debug output'))
+    ) {
       echo $out;
     }
 
