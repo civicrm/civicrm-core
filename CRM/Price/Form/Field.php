@@ -153,7 +153,11 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
       $defaults['options_per_line'] = 1;
       $defaults['is_display_amounts'] = 1;
     }
-    $eventComponentId  = CRM_Core_Component::getComponentID('CiviEvent');
+    $enabledComponents = CRM_Core_Component::getEnabledComponents();
+    $eventComponentId = NULL;
+    if (array_key_exists('CiviEvent',$enabledComponents)) {
+      $eventComponentId  = CRM_Core_Component::getComponentID('CiviEvent');
+    }
 
     if (isset($this->_sid) && $this->_action == CRM_Core_Action::ADD) {
       $financialTypeId = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $this->_sid, 'financial_type_id');
@@ -197,9 +201,15 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
     if (count($financialType)) {
       $this->assign('financialType', $financialType);
     }
+    $enabledComponents = CRM_Core_Component::getEnabledComponents();
+    $eventComponentId = $memberComponentId = NULL;
+    if (array_key_exists('CiviEvent',$enabledComponents)) {
+      $eventComponentId  = CRM_Core_Component::getComponentID('CiviEvent');
+    }
+    if (array_key_exists('CiviMember',$enabledComponents)) {
+      $memberComponentId = CRM_Core_Component::getComponentID('CiviMember');
+    }
 
-    $eventComponentId  = CRM_Core_Component::getComponentID('CiviEvent');
-    $memberComponentId = CRM_Core_Component::getComponentID('CiviMember');
     $attributes        = CRM_Core_DAO::getAttribute('CRM_Price_DAO_PriceFieldValue');
 
     $this->add('select', 'financial_type_id',
