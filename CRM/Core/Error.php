@@ -228,6 +228,8 @@ class CRM_Core_Error extends PEAR_ErrorStack {
     $error['user_info']  = $pearError->getUserInfo();
     $error['to_string']  = $pearError->toString();
 
+    // ensure that debug does not check permissions since we are in bootstrap
+    // mode and need to print a decent message to help the user
     CRM_Core_Error::debug('Initialization Error', $error, TRUE, TRUE, FALSE);
 
     // always log the backtrace to a file
