@@ -59,7 +59,7 @@
     $('.crm-profile-selector').each(function(){
       $(this).crmProfileSelector({
         groupTypeFilter: $(this).attr('data-group-type'),
-        entities: eval('(' + $(this).attr('data-entities') + ')')
+        entities: $(this).data('entities')
       });
     });
   };
