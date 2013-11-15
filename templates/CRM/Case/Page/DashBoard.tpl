@@ -55,7 +55,7 @@
 
 <h3>
 {if $myCases}
-  {ts}Summary of Case Involvement{/ts}
+  {ts}Summary of Involvement{/ts}
 {else}
   {ts}Summary of All Cases{/ts}
 {/if}
