@@ -20,11 +20,20 @@ define('CIVICRM_UF', 'Drupal');
 require_once 'CRM/Core/ClassLoader.php';
 CRM_Core_ClassLoader::singleton()->register();
 
+$force = false;
+foreach ($argv as $k => $arg) {
+  if ("--force" == $arg) {
+    $force = true;
+    unset($argv[$k]);
+  }
+}
+
 $genCode = new CRM_GenCode_Main('../CRM/Core/DAO/', '../sql/', '../', '../templates/');
 $genCode->main(
   @$argv[2],
   @$argv[3],
-  empty($argv[1]) ? 'schema/Schema.xml' : $argv[1]
+  empty($argv[1]) ? 'schema/Schema.xml' : $argv[1],
+  $force
 );
 
 class CRM_GenCode_Util_File {
@@ -115,8 +124,9 @@ class CRM_GenCode_Main {
    * @param $argVersion string, optional
    * @param $argCms string, optional; "drupal" or "joomla"
    * @param $file, the path to the XML schema file
+   * @param $force, should it generate the full DAO or just the version files
    */
-  function main($argVersion, $argCms, $file) {
+  function main($argVersion, $argCms, $file, $force=true) {
     $versionFile        = "version.xml";
     $versionXML         = &$this->parseInput($versionFile);
     $db_version         = $versionXML->version_no;
@@ -148,6 +158,11 @@ Alternatively you can get a version of CiviCRM that matches your PHP version
     echo "Parsing input file $file\n";
     $dbXML = $this->parseInput($file);
     // print_r( $dbXML );
+
+    if (!$force) {
+      echo "\nTIP: you can generate the DAOs and data files with GenCode.php --force\n";
+      return;
+    }
 
     echo "Extracting database information\n";
     $database = &$this->getDatabase($dbXML);
