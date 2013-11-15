@@ -108,19 +108,7 @@ class CRM_Admin_Form_Setting_Component extends CRM_Admin_Form_Setting {
   public function postProcess() {
     $params = $this->controller->exportValues($this->_name);
 
-    // if CiviCase is being enabled,
-    // load the case related sample data
-    if (in_array('CiviCase', $params['enableComponents']) &&
-      !in_array('CiviCase', $this->_defaults['enableComponents'])
-    ) {
-      $config = CRM_Core_Config::singleton();
-      CRM_Admin_Form_Setting_Component::loadCaseSampleData($config->dsn, $config->sqlDir . 'case_sample.mysql');
-      CRM_Admin_Form_Setting_Component::loadCaseSampleData($config->dsn, $config->sqlDir . 'case_sample1.mysql');
-      if (!CRM_Case_BAO_Case::createCaseViews()) {
-        $msg = ts("Could not create the MySQL views for CiviCase. Your mysql user needs to have the 'CREATE VIEW' permission");
-        CRM_Core_Error::fatal($msg);
-      }
-    }
+    CRM_Case_Info::onToggleComponents($this->_defaults['enableComponents'], $params['enableComponents'], NULL);
     parent::commonProcess($params);
 
     // reset navigation when components are enabled / disabled
