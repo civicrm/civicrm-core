@@ -282,9 +282,9 @@ class CRM_Mailing_Form_Schedule extends CRM_Core_Form {
     }
 
     $session = CRM_Core_Session::singleton();
+
     // set the scheduled_id
     $params['scheduled_id'] = $session->get('userID');
-    $params['scheduled_date'] = date('YmdHis');
 
     // set approval details if workflow is not enabled
     if (!CRM_Mailing_Info::workflowEnabled()) {
@@ -294,13 +294,9 @@ class CRM_Mailing_Form_Schedule extends CRM_Core_Form {
     }
     else {
       // reset them in case this mailing was rejected
-      $mailing = new CRM_Mailing_BAO_Mailing();
-      $mailing->id = $ids['mailing_id'];
-      $mailing->find(TRUE);
-
-      $mailing->approver_id = 'null';
-      $mailing->approval_date = 'null';
-      $mailing->approval_status_id = 'null';
+      $params['approver_id'] = 'null';
+      $params['approval_date'] = 'null';
+      $params['approval_status_id'] = 'null';
     }
 
     /* Build the mailing object */
