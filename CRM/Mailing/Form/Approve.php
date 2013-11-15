@@ -196,6 +196,13 @@ class CRM_Mailing_Form_Approve extends CRM_Core_Form {
       $job->mailing_id = $ids['mailing_id'];
       $job->delete();
     }
+    else {
+      $mailing = new CRM_Mailing_BAO_Mailing();
+      $mailing->id = $ids['mailing_id'];
+      $mailing->find(TRUE);
+
+      $params['scheduled_date'] = CRM_Utils_Date::processDate($mailing->scheduled_date);
+    }
 
     CRM_Mailing_BAO_Mailing::create($params, $ids);
 
