@@ -321,9 +321,10 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
     $defaults = parent::setDefaultValues();
 
     //setting default join date and receive date
-    list($now) = CRM_Utils_Date::setDateDefaults();
+    list($now, $currentTime) = CRM_Utils_Date::setDateDefaults();
     if ($this->_action == CRM_Core_Action::ADD) {
       $defaults['receive_date'] = $now;
+      $defaults['receive_date_time'] = $currentTime;
     }
 
     if (is_numeric($this->_memType)) {
