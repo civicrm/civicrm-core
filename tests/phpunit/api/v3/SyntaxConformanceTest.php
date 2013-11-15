@@ -235,6 +235,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       'MailSettings',
       'Setting',
       'MailingContact',
+      'ActionSchedule',
     );
     if ($sequential === TRUE) {
       return $entitiesWithout;
