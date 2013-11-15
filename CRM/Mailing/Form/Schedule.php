@@ -294,16 +294,13 @@ class CRM_Mailing_Form_Schedule extends CRM_Core_Form {
     }
     else {
       // reset them in case this mailing was rejected
+      $mailing = new CRM_Mailing_BAO_Mailing();
+      $mailing->id = $ids['mailing_id'];
+      $mailing->find(TRUE);
+
       $mailing->approver_id = 'null';
       $mailing->approval_date = 'null';
       $mailing->approval_status_id = 'null';
-    }
-
-    if ($params['now']) {
-      $params['scheduled_date'] = date('YmdHis');
-    }
-    else {
-      $params['scheduled_date'] = CRM_Utils_Date::processDate($params['start_date'] . ' ' . $params['start_date_time']);
     }
 
     /* Build the mailing object */
