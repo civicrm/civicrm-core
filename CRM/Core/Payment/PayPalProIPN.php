@@ -270,7 +270,7 @@ class CRM_Core_Payment_PayPalProIPN extends CRM_Core_Payment_BaseIPN {
         return TRUE;
       }
 
-      $contribution->contact_id = $ids['contact'];
+      $contribution->contact_id = $recur->contact_id;
       $contribution->financial_type_id  = $objects['contributionType']->id;
       $contribution->contribution_page_id = $ids['contributionPage'];
       $contribution->contribution_recur_id = $ids['contributionRecur'];
