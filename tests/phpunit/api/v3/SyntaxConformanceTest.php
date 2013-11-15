@@ -252,6 +252,11 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
   public function getKnownUnworkablesUpdateSingle($entity, $key){
     // can't update values are values for which updates don't result in the value being changed
     $knownFailures = array(
+      'ActionSchedule' => array(
+        'cant_update' => array(
+          'group_id',
+        ),
+      ),
       'Address' => array(
         'cant_update' => array(
           'state_province_id', //issues with country id - need to ensure same country
@@ -738,9 +743,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       );
 
       $checkEntity = $this->callAPISuccess($entityName, 'getsingle', $checkParams);
-      $this->assertAPIArrayComparison($entity, $checkEntity, array(), "changing field $fieldName\n");
-        //print_r(array('update-params' => $updateParams, 'update-result' => $update, 'getsingle-params' => $checkParams, 'getsingle-result' => $checkEntity, 'expected entity' => $entity), TRUE)
-
+      $this->assertAPIArrayComparison($entity, $checkEntity, array(), "changing field $fieldName\n" . print_r(array('update-params' => $updateParams, 'update-result' => $update, 'getsingle-params' => $checkParams, 'getsingle-result' => $checkEntity, 'expected entity' => $entity), TRUE));
     }
     $baoObj->deleteTestObjects($baoString);
     $baoObj->free();
