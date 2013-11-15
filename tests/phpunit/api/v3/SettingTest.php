@@ -124,6 +124,72 @@ class api_v3_SettingTest extends CiviUnitTestCase {
     $this->assertArrayNotHasKey('customCSSURL', $result['values']);
     $this->assertArrayHasKey('advanced_search_options',$result['values']);
   }
+
+  /**
+   * Ensure that on_change callbacks fire.
+   *
+   * Note: api_v3_SettingTest::testOnChange and CRM_Core_BAO_SettingTest::testOnChange
+   * are very similar, but they exercise different codepaths. The first uses the API
+   * and setItems [plural]; the second uses setItem [singular].
+   */
+  function testOnChange() {
+    global $_testOnChange_hookCalls;
+    $this->setMockSettingsMetaData(array(
+      'onChangeExample' => array(
+        'group_name' => 'CiviCRM Preferences',
+        'group' => 'core',
+        'name' => 'onChangeExample',
+        'type' => 'Array',
+        'quick_form_type' => 'Element',
+        'html_type' => 'advmultiselect',
+        'default' => array('CiviEvent', 'CiviContribute'),
+        'add' => '4.4',
+        'title' => 'List of Components',
+        'is_domain' => '1',
+        'is_contact' => 0,
+        'description' => NULL,
+        'help_text' => NULL,
+        'on_change' => array( // list of callbacks
+          array(__CLASS__, '_testOnChange_onChangeExample')
+        ),
+      ),
+    ));
+
+    // set initial value
+    $_testOnChange_hookCalls = array('count' => 0);
+    $this->callAPISuccess('setting', 'create', array(
+      'onChangeExample' => array('First', 'Value'),
+    ));
+    $this->assertEquals(1, $_testOnChange_hookCalls['count']);
+    $this->assertEquals(array('First', 'Value'), $_testOnChange_hookCalls['newValue']);
+    $this->assertEquals('List of Components', $_testOnChange_hookCalls['metadata']['title']);
+
+    // change value
+    $_testOnChange_hookCalls = array('count' => 0);
+    $this->callAPISuccess('setting', 'create', array(
+      'onChangeExample' => array('Second', 'Value'),
+    ));
+    $this->assertEquals(1, $_testOnChange_hookCalls['count']);
+    $this->assertEquals(array('First', 'Value'), $_testOnChange_hookCalls['oldValue']);
+    $this->assertEquals(array('Second', 'Value'), $_testOnChange_hookCalls['newValue']);
+    $this->assertEquals('List of Components', $_testOnChange_hookCalls['metadata']['title']);
+  }
+
+  /**
+   * Mock callback for a setting's on_change handler
+   *
+   * @param $oldValue
+   * @param $newValue
+   * @param $metadata
+   */
+  static function _testOnChange_onChangeExample($oldValue, $newValue, $metadata) {
+    global $_testOnChange_hookCalls;
+    $_testOnChange_hookCalls['count']++;
+    $_testOnChange_hookCalls['oldValue'] = $oldValue;
+    $_testOnChange_hookCalls['newValue'] = $newValue;
+    $_testOnChange_hookCalls['metadata'] = $metadata;
+  }
+
   /**
    * check getfields works
    */
