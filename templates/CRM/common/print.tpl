@@ -41,12 +41,7 @@
 <div id="crm-container" class="crm-container" lang="{$config->lcMessages|truncate:2:"":true}" xml:lang="{$config->lcMessages|truncate:2:"":true}">
 {crmRegion name='page-header' allowCmsOverride=0}{/crmRegion}
 {* Check for Status message for the page (stored in session->getStatus). Status is cleared on retrieval. *}
-{if $session->getStatus(false)}
-<div class="messages status no-popup">
-  <div class="icon inform-icon"></div>
-  {$session->getStatus(true)}
-</div>
-{/if}
+{include file="CRM/common/status.tpl"}
 
 {crmRegion name='page-body' allowCmsOverride=0}
 <!-- .tpl file invoked: {$tplFile}. Call via form.tpl if we have a form in the page. -->
