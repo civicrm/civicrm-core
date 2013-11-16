@@ -40,12 +40,7 @@
     <div class="crm-container-snippet" bgColor="white">
 
     {* Check for Status message for the page (stored in session->getStatus). Status is cleared on retrieval. *}
-    {if $session->getStatus(false)}
-    <div class="messages status no-popup">
-      <div class="icon alert-icon"></div>
-      {$session->getStatus(true)}
-    </div>
-    {/if}
+    {include file="CRM/common/status.tpl"}
 
     <!-- .tpl file invoked: {$tplFile}. Call via form.tpl if we have a form in the page. -->
     {if !empty($isForm)}
