@@ -585,7 +585,12 @@ class CRM_Core_Config_Variables extends CRM_Core_Config_Defaults {
       $country = array();
       if (is_array($this->provinceLimit)) {
         foreach ($this->provinceLimit as $val) {
-          $country[] = $countryIsoCodes[$val];
+          // CRM-12007
+          // some countries have disappeared and hence they might be in country limit
+          // but not in the country table
+          if (isset($countryIsoCodes[$val])) {
+            $country[] = $countryIsoCodes[$val];
+          }
         }
       }
       else {

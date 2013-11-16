@@ -49,7 +49,7 @@ fi
 # checkout, not packaged code
 if [ -d "$CALLEDPATH/../xml" ]; then
   cd "$CALLEDPATH/../xml"
-  "$PHP5PATH"php GenCode.php $SCHEMA
+  "$PHP5PATH"php GenCode.php $SCHEMA '' $GENCODE_CMS
 fi
 
 # someone might want to use empty password for development,

@@ -68,7 +68,13 @@ cp $SRC/drupal/civicrm.config.php.drupal $TRG/civicrm.config.php
 # set full version in .info files
 MODULE_DIRS=`find "$DM_SOURCEDIR/drupal" -type f -name "*.info"`
 for INFO in $MODULE_DIRS; do
-  sed -i "s/version = [1-9.]*/version = $DM_VERSION/g" $INFO
+  if [ $(uname) = "Darwin" ]; then
+    ## BSD sed
+    sed -i '' "s/version = [1-9.]*/version = $DM_VERSION/g" $INFO
+  else
+    ## GNU sed
+    sed -i'' "s/version = [1-9.]*/version = $DM_VERSION/g" $INFO
+  fi
 done
 
 
