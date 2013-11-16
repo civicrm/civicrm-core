@@ -243,7 +243,7 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
     $sel2['ParticipantRole'] = $participantRole;
     $sel2['ParticipantEventName'] = CRM_Event_PseudoConstant::event(NULL, FALSE, "( is_template IS NULL OR is_template != 1 )");
     $sel2['ParticipantEventType'] = $eventType;
-        $sel2['Contribution']         = CRM_Contribute_PseudoConstant::financialType( );
+    $sel2['Contribution'] = CRM_Contribute_PseudoConstant::financialType();
     $sel2['Relationship'] = $allRelationshipType;
 
     $sel2['Individual'] = CRM_Contact_BAO_ContactType::subTypePairs('Individual', FALSE, NULL);

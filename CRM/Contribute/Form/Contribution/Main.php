@@ -508,7 +508,13 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     }
     if ($this->_pcpId) {
       if ($pcpSupporter = CRM_PCP_BAO_PCP::displayName($this->_pcpId)) {
-        $this->assign('pcpSupporterText', ts('This contribution is being made thanks to effort of <strong>%1</strong>, who supports our campaign. You can support it as well - once you complete the donation, you will be able to create your own Personal Campaign Page!', array(1 => $pcpSupporter)));
+        $pcp_supporter_text = ts('This contribution is being made thanks to effort of <strong>%1</strong>, who supports our campaign. ', array(1 => $pcpSupporter));
+        // Only tell people that can also create a PCP if the contribution page has a non-empty value in the "Create Personal Campaign Page link" field.
+        $text = CRM_PCP_BAO_PCP::getPcpBlockStatus($this->_id, 'contribute');
+        if(!empty($text)) {
+          $pcp_supporter_text .= "You can support it as well - once you complete the donation, you will be able to create your own Personal Campaign Page!";
+        }
+        $this->assign('pcpSupporterText', $pcp_supporter_text);
       }
       $this->assign('pcp', TRUE);
       $this->add('checkbox', 'pcp_display_in_roll', ts('Show my contribution in the public honor roll'), NULL, NULL,

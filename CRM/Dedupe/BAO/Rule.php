@@ -208,7 +208,7 @@ class CRM_Dedupe_BAO_Rule extends CRM_Dedupe_DAO_Rule {
     return $ruleFields;
   }
 
-  function validateContacts($cid, $oid) {
+  static function validateContacts($cid, $oid) {
     if (!$cid || !$oid) {
       return;
     }

@@ -207,7 +207,7 @@ class CRM_Core_Payment_PayPalProIPN extends CRM_Core_Payment_BaseIPN {
       case 'recurring_payment_profile_created':
         $recur->create_date = $now;
         $recur->contribution_status_id = 2;
-        $recur->processor_id = $this->retrieve('recurring_payment_id', 'Integer');
+        $recur->processor_id = $this->retrieve('recurring_payment_id', 'String');
         $recur->trxn_id = $recur->processor_id;
         $subscriptionPaymentStatus = CRM_Core_Payment::RECURRING_PAYMENT_START;
         $sendNotification = TRUE;
@@ -270,20 +270,20 @@ class CRM_Core_Payment_PayPalProIPN extends CRM_Core_Payment_BaseIPN {
         return TRUE;
       }
 
-      $contribution->contact_id = $ids['contact'];
+      $contribution->contact_id = $recur->contact_id;
       $contribution->financial_type_id  = $objects['contributionType']->id;
       $contribution->contribution_page_id = $ids['contributionPage'];
       $contribution->contribution_recur_id = $ids['contributionRecur'];
-      $contribution->receive_date = $now;
       $contribution->currency = $objects['contribution']->currency;
       $contribution->payment_instrument_id = $objects['contribution']->payment_instrument_id;
       $contribution->amount_level = $objects['contribution']->amount_level;
       $contribution->honor_contact_id = $objects['contribution']->honor_contact_id;
       $contribution->honor_type_id = $objects['contribution']->honor_type_id;
       $contribution->campaign_id = $objects['contribution']->campaign_id;
-
       $objects['contribution'] = &$contribution;
     }
+    // CRM-13737 - am not aware of any reason why payment_date would not be set - this if is a belt & braces
+    $objects['contribution']->receive_date = !empty($input['payment_date']) ? date('YmdHis', strtotime($input['payment_date'])): $now;
 
     $this->single($input, $ids, $objects,
       TRUE, $first
@@ -462,6 +462,7 @@ INNER JOIN civicrm_membership_payment mp ON m.id = mp.membership_id AND mp.contr
     $input['fee_amount'] = self::retrieve('mc_fee', 'Money', 'POST', FALSE);
     $input['net_amount'] = self::retrieve('settle_amount', 'Money', 'POST', FALSE);
     $input['trxn_id']    = self::retrieve('txn_id', 'String', 'POST', FALSE);
+    $input['payment_date'] = self::retrieve('payment_date', 'String', 'POST', FALSE);
   }
 
   /**
