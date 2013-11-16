@@ -373,7 +373,7 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
     CRM_Utils_System::civiExit(1);
   }
 
-  function createActivities($form, $html_message, $contactIds) {
+  static function createActivities($form, $html_message, $contactIds) {
     //Added for CRM-12682: Add activity subject and campaign fields
     $formValues     = $form->controller->exportValues($form->getName());
 
@@ -420,7 +420,7 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
     }
   }
 
-  function formatMessage(&$message) {
+  static function formatMessage(&$message) {
     $newLineOperators = array(
       'p' => array(
         'oper' => '<p>',
