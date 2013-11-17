@@ -158,84 +158,92 @@
 
           <div class="contactTopBar contact_panel">
             <div class="contactCardLeft">
-              <div class="crm-summary-contactinfo-block">
-                <div class="crm-summary-block" id="contactinfo-block">
-                  {include file="CRM/Contact/Page/Inline/ContactInfo.tpl"}
+              {crmRegion name="contact-basic-info-left"}
+                <div class="crm-summary-contactinfo-block">
+                  <div class="crm-summary-block" id="contactinfo-block">
+                    {include file="CRM/Contact/Page/Inline/ContactInfo.tpl"}
+                  </div>
                 </div>
-              </div>
+              {/crmRegion}
             </div> <!-- end of left side -->
             <div class="contactCardRight">
-              {if !empty($imageURL)}
-                <div id="crm-contact-thumbnail">
-                  {include file="CRM/Contact/Page/ContactImage.tpl"}
-                </div>
-              {/if}
-              <div class="{if !empty($imageURL)} float-left{/if}">
-                <div class="crm-clear crm-summary-block">
-                  <div class="crm-summary-row">
-                    <div class="crm-label" id="tagLink">
-                      <a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=$contactId&selectedChild=tag"}" title="{ts}Edit Tags{/ts}">{ts}Tags{/ts}</a>
+              {crmRegion name="contact-basic-info-right"}
+                {if !empty($imageURL)}
+                  <div id="crm-contact-thumbnail">
+                    {include file="CRM/Contact/Page/ContactImage.tpl"}
+                  </div>
+                {/if}
+                <div class="{if !empty($imageURL)} float-left{/if}">
+                  <div class="crm-clear crm-summary-block">
+                    <div class="crm-summary-row">
+                      <div class="crm-label" id="tagLink">
+                        <a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=$contactId&selectedChild=tag"}" title="{ts}Edit Tags{/ts}">{ts}Tags{/ts}</a>
+                      </div>
+                      <div class="crm-content" id="tags">{$contactTag}</div>
                     </div>
-                    <div class="crm-content" id="tags">{$contactTag}</div>
-                  </div>
-                  <div class="crm-summary-row">
-                    <div class="crm-label">{ts}Contact Type{/ts}</div>
-                    <div class="crm-content crm-contact_type_label">
-                    {if isset($contact_type_label)}{$contact_type_label}{/if}
+                    <div class="crm-summary-row">
+                      <div class="crm-label">{ts}Contact Type{/ts}</div>
+                      <div class="crm-content crm-contact_type_label">
+                        {if isset($contact_type_label)}{$contact_type_label}{/if}
+                      </div>
+                    </div>
+                    <div class="crm-summary-row">
+                    <div class="crm-label">
+                      {ts}CiviCRM ID{/ts}{if !empty($userRecordUrl)} / {ts}User ID{/ts}{/if}
+                    </div>
+                    <div class="crm-content">
+                      <span class="crm-contact-contact_id">{$contactId}</span>
+                      {if !empty($userRecordUrl)}
+                        <span class="crm-contact-user_record_id">
+                          &nbsp;/&nbsp;<a title="View user record" class="user-record-link" href="{$userRecordUrl}">{$userRecordId}</a>
+                        </span>
+                      {/if}
+                    </div>
                   </div>
                 </div>
-                <div class="crm-summary-row">
-                  <div class="crm-label">
-                    {ts}CiviCRM ID{/ts}{if !empty($userRecordUrl)} / {ts}User ID{/ts}{/if}
-                  </div>
-                  <div class="crm-content">
-                    <span class="crm-contact-contact_id">{$contactId}</span>
-                    {if !empty($userRecordUrl)}
-                      <span class="crm-contact-user_record_id">
-                        &nbsp;/&nbsp;<a title="View user record" class="user-record-link" href="{$userRecordUrl}">{$userRecordId}</a>
-                      </span>
-                    {/if}
-                  </div>
-                </div>
-              </div>
+              {/crmRegion}
             </div>
           </div> <!-- end of right side -->
         </div>
         <div class="contact_details">
           <div class="contact_panel">
             <div class="contactCardLeft">
-              <div >
-                {if $showEmail}
-                  <div class="crm-summary-email-block crm-summary-block" id="email-block">
-                    {include file="CRM/Contact/Page/Inline/Email.tpl"}
-                  </div>
-                {/if}
-                {if $showWebsite}
-                  <div class="crm-summary-website-block crm-summary-block" id="website-block">
-                    {include file="CRM/Contact/Page/Inline/Website.tpl"}
-                  </div>
-                {/if}
-              </div>
+              {crmRegion name="contact-details-left"}
+                <div >
+                  {if $showEmail}
+                    <div class="crm-summary-email-block crm-summary-block" id="email-block">
+                      {include file="CRM/Contact/Page/Inline/Email.tpl"}
+                    </div>
+                  {/if}
+                  {if $showWebsite}
+                    <div class="crm-summary-website-block crm-summary-block" id="website-block">
+                      {include file="CRM/Contact/Page/Inline/Website.tpl"}
+                    </div>
+                  {/if}
+                </div>
+              {/crmRegion}
             </div><!-- #contactCardLeft -->
 
             <div class="contactCardRight">
-              <div >
-                {if $showPhone}
-                  <div class="crm-summary-phone-block crm-summary-block" id="phone-block">
-                    {include file="CRM/Contact/Page/Inline/Phone.tpl"}
-                  </div>
-                {/if}
-                {if $showIM}
-                  <div class="crm-summary-im-block crm-summary-block" id="im-block">
-                    {include file="CRM/Contact/Page/Inline/IM.tpl"}
-                  </div>
-                {/if}
-                {if $showOpenID}
-                  <div class="crm-summary-openid-block crm-summary-block" id="openid-block">
-                    {include file="CRM/Contact/Page/Inline/OpenID.tpl"}
-                  </div>
-                {/if}
-              </div>
+              {crmRegion name="contact-details-right"}
+                <div>
+                  {if $showPhone}
+                    <div class="crm-summary-phone-block crm-summary-block" id="phone-block">
+                      {include file="CRM/Contact/Page/Inline/Phone.tpl"}
+                    </div>
+                  {/if}
+                  {if $showIM}
+                    <div class="crm-summary-im-block crm-summary-block" id="im-block">
+                      {include file="CRM/Contact/Page/Inline/IM.tpl"}
+                    </div>
+                  {/if}
+                  {if $showOpenID}
+                    <div class="crm-summary-openid-block crm-summary-block" id="openid-block">
+                      {include file="CRM/Contact/Page/Inline/OpenID.tpl"}
+                    </div>
+                  {/if}
+                </div>
+              {/crmRegion}
             </div><!-- #contactCardRight -->
 
             <div class="clear"></div>
