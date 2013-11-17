@@ -53,7 +53,7 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
    *
    * @var string
    */
-  protected $_title;
+  public $_title;
 
   /**
    * The key associated with this controller
