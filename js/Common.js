@@ -820,6 +820,22 @@ CRM.validate = CRM.validate || {
     });
   }
 
+  // Preprocess all cj ajax calls to display messages
+  $(document).ajaxSuccess(function(event, xhr, settings) {
+    try {
+      if ((!settings.dataType || settings.dataType == 'json') && xhr.responseText) {
+        var response = $.parseJSON(xhr.responseText);
+        if (typeof(response.crmMessages) == 'object') {
+          $.each(response.crmMessages, function(n, msg) {
+            CRM.alert(msg.text, msg.title, msg.type, msg.options);
+          })
+        }
+      }
+    }
+    // Suppress errors
+    catch (e) {}
+  });
+
   $(function () {
     if ($('#crm-notification-container').length) {
       // Initialize notifications

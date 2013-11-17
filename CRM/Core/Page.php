@@ -124,9 +124,10 @@ class CRM_Core_Page {
     }
 
     if (isset($_REQUEST['snippet']) && $_REQUEST['snippet']) {
-      if ($_REQUEST['snippet'] == 3) {
+      if ($_REQUEST['snippet'] == CRM_Core_Smarty::PRINT_PDF) {
         $this->_print = CRM_Core_Smarty::PRINT_PDF;
       }
+      // FIXME - why does this number not match the constant?
       else if ($_REQUEST['snippet'] == 5) {
         $this->_print = CRM_Core_Smarty::PRINT_NOFORM;
       }
