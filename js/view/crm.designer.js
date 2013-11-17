@@ -293,7 +293,6 @@
     events: {
       'keyup .crm-designer-palette-search input': 'doSearch',
       'click .crm-designer-palette-clear-search': 'clearSearch',
-      'click .crm-designer-palette-refresh': 'doRefresh',
       'click .crm-designer-palette-toggle': 'toggleAll'
     },
     initialize: function() {
@@ -401,30 +400,23 @@
     },
     doAddField: function(section) {
       var paletteView = this;
-      var openAddNewWindow = function() {
-        var url = CRM.url('civicrm/admin/custom/group/field/add', {
-          reset: 1,
-          action: 'add',
-          gid: section.custom_group_id
-        });
-        window.open(url, '_blank');
-      };
-
-      if (paletteView.hideAddFieldAlert) {
-        openAddNewWindow();
-      } else {
-        CRM.confirm(function() {
-            paletteView.hideAddFieldAlert = true;
-            openAddNewWindow();
-          }, {
-            title: ts('Add Field'),
-            message: ts('A new window or tab will open. Use the new window to add your field, and then return to this window and click "Refresh."')
+      var url = CRM.url('civicrm/admin/custom/group/field/add', {
+        reset: 1,
+        action: 'add',
+        gid: section.custom_group_id
+      });
+      CRM.loadForm(url, {
+        resetButton: 'next_new',
+        onSuccess: function(data, settings) {
+          paletteView.doRefresh();
+          if (data.buttonName != 'next_new') {
+            $(settings.target).dialog('close');
           }
-        );
-      }
+        }
+      });
       return false;
     },
-    doRefresh: function(event) {
+    doRefresh: function() {
       var ufGroupModel = this.model;
       CRM.Schema.reloadModels()
         .done(function(data){
