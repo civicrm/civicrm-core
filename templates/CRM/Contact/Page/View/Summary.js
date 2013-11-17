@@ -44,7 +44,7 @@
   function requestHandler(response) {
     var o = $('div.crm-inline-edit.form');
 
-    if (response.status == 'save' || response.status == 'cancel') {
+    if (response.status == 'success' || response.status == 'cancel') {
       o.trigger('crmFormSuccess', [response]);
       $('.crm-inline-edit-container').addClass('crm-edit-ready');
       var data = o.data('edit-params');

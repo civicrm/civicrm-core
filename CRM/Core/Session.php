@@ -509,7 +509,7 @@ class CRM_Core_Session {
         'text' => $text,
         'title' => $title,
         'type' => $type,
-        'options' => $options ? json_encode($options) : NULL,
+        'options' => $options ? $options : NULL,
       );
     }
   }

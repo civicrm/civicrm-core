@@ -162,5 +162,36 @@ class CRM_Core_Page_AJAX {
         return FALSE;
     }
   }
+
+  /**
+   * Outputs the CiviCRM standard json-formatted page/form response
+   * @param array|string $response
+   */
+  static function returnJsonResponse($response) {
+    // Allow lazy callers to not wrap content in an array
+    if (is_string($response)) {
+      $response = array('content' => $response);
+    }
+    $session = CRM_Core_Session::singleton();
+    $response += array(
+      'status' => 'success',
+      'userContext' => htmlspecialchars_decode($session->readUserContext()),
+    );
+    // crmMessages will be automatically handled by our client-side ajax preprocessor @see Common.js
+    if ($session->getStatus(FALSE)) {
+      $response['crmMessages'] = $session->getStatus(TRUE);
+    }
+
+    // CRM-11831 @see http://www.malsup.com/jquery/form/#file-upload
+    $xhr = isset($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest';
+    if (!$xhr) {
+      echo '<textarea>';
+    }
+    echo json_encode($response);
+    if (!$xhr) {
+      echo '</textarea>';
+    }
+    CRM_Utils_System::civiExit();
+  }
 }
 

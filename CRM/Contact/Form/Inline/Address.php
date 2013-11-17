@@ -204,6 +204,7 @@ class CRM_Contact_Form_Inline_Address extends CRM_Contact_Form_Inline {
     $address = CRM_Core_BAO_Address::create($params, TRUE);
 
     $this->log();
-    $this->response(array('addressId' => $address[0]->id));
+    $this->ajaxResponse['addressId'] = $address[0]->id;
+    $this->response();
   }
 }
