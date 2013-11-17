@@ -825,7 +825,7 @@ CRM.validate = CRM.validate || {
     url += (url.indexOf('?') < 0 ? '?' : '&') + 'snippet=6';
     var settings = {
       target: '#crm-ajax-dialog',
-      dialogSettings: {
+      dialog: {
         modal: true,
         minWidth: 600,
         close: function() {
@@ -834,19 +834,22 @@ CRM.validate = CRM.validate || {
         }
       },
       onLoad: null,
-      type: 'Page'
+      type: 'Page',
+      url: url
     };
     $.extend(true, settings, options);
-    if (settings.target == '#crm-ajax-dialog') {
-      $('<div id="crm-ajax-dialog" class="crm-container"><div class="crm-loading-element">' + ts('Loading') + '...</div></div>').dialog(settings.dialogSettings);
+    // Create new dialog
+    if (settings.dialog && settings.target[0] == '#') {
+      $('<div id="'+ settings.target.substring(1) +'" class="crm-container"><div class="crm-loading-element">' + ts('Loading') + '...</div></div>').dialog(settings.dialog);
     }
     $.getJSON(url, function(data) {
-      if (settings.target == '#crm-ajax-dialog' && !settings.dialogSettings.title && data.title) {
+      if (settings.dialog && !settings.dialog.title && data.title) {
         $(settings.target).dialog('option', 'title', data.title);
       }
+      settings.content = data.content;
       $(settings.target).html(data.content).trigger('crm' + settings.type + 'Load', data);
       if (typeof(settings.onLoad) == 'function') {
-        settings.onLoad(data, url);
+        settings.onLoad(data, settings);
       }
     });
   };
@@ -858,43 +861,55 @@ CRM.validate = CRM.validate || {
       validate: true,
       onLoad: null,
       onCancel: function(e) {
-        $(settings.target).dialog('close');
+        if (settings.dialog !== false) {
+          $(settings.target).dialog('close');
+        }
         return false;
       },
-      onError: function(data) {
+      onError: function(data, settings) {
         $(settings.target).html(data.content).trigger('crmFormReload', data);
         if (typeof(data.errors) == 'object') {
           $.each(data.errors, function(target, msg) {
             $('[name="'+target+'"]').crmError(msg);
           });
         }
-        settings.onLoad(data, url);
+        settings.onLoad(data, settings);
       },
-      onSuccess: function(data) {
-        $(settings.target).dialog('close');
+      onSuccess: function(data, settings) {
+        if (settings.dialog !== false) {
+          $(settings.target).dialog('close');
+        }
       }
     };
     $.extend(settings, options, {type: 'Form'});
-    settings.onLoad = function(data, url) {
+    settings.onLoad = function(data, settings) {
       $(".cancel.form-submit", settings.target).click(settings.onCancel);
       if (settings.validate) {
-        $("form", settings.target).validate(CRM.validate.params);
+        $("form", settings.target).validate(typeof(settings.validate) == 'object' ? settings.validate : CRM.validate.params);
       }
       $("form", settings.target).ajaxForm({
-        url: url,
+        url: settings.url,
         dataType: 'json',
         success: function(response) {
           if (response.status == 'success') {
-           settings.onSuccess(response);
+            settings.onSuccess(response, settings);
+            $(settings.target).unblock().trigger('crmFormSuccess', data);
+            if (settings.resetButton && response.buttonName == settings.resetButton) {
+              $(settings.target).html(settings.content).trigger('crmFormLoad', data);
+              settings.onLoad(data, settings);
+            }
           }
           else {
-            settings.onError(response);
+            settings.onError(response, settings);
           }
+        },
+        beforeSubmit: function() {
+          $(settings.target).block().trigger('crmFormSubmit', data);
         }
       });
       // Call original onLoad fn
       if (typeof(options.onLoad) == 'function') {
-        options.onLoad(data, url);
+        options.onLoad(data, settings);
       }
     };
     CRM.loadPage(url, settings);
