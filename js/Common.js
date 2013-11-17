@@ -820,6 +820,86 @@ CRM.validate = CRM.validate || {
     });
   }
 
+  CRM.loadPage = function(url, options) {
+    options = options || {};
+    url += (url.indexOf('?') < 0 ? '?' : '&') + 'snippet=6';
+    var settings = {
+      target: '#crm-ajax-dialog',
+      dialogSettings: {
+        modal: true,
+        minWidth: 600,
+        close: function() {
+          $(this).dialog('destroy');
+          $(this).remove();
+        }
+      },
+      onLoad: null,
+      type: 'Page'
+    };
+    $.extend(true, settings, options);
+    if (settings.target == '#crm-ajax-dialog') {
+      $('<div id="crm-ajax-dialog" class="crm-container"><div class="crm-loading-element">' + ts('Loading') + '...</div></div>').dialog(settings.dialogSettings);
+    }
+    $.getJSON(url, function(data) {
+      if (settings.target == '#crm-ajax-dialog' && !settings.dialogSettings.title && data.title) {
+        $(settings.target).dialog('option', 'title', data.title);
+      }
+      $(settings.target).html(data.content).trigger('crm' + settings.type + 'Load', data);
+      if (typeof(settings.onLoad) == 'function') {
+        settings.onLoad(data, url);
+      }
+    });
+  };
+
+  CRM.loadForm = function(url, options) {
+    options = options || {};
+    var settings = {
+      target: '#crm-ajax-dialog',
+      validate: true,
+      onLoad: null,
+      onCancel: function(e) {
+        $(settings.target).dialog('close');
+        return false;
+      },
+      onError: function(data) {
+        $(settings.target).html(data.content).trigger('crmFormReload', data);
+        if (typeof(data.errors) == 'object') {
+          $.each(data.errors, function(target, msg) {
+            $('[name="'+target+'"]').crmError(msg);
+          });
+        }
+        settings.onLoad(data, url);
+      },
+      onSuccess: function(data) {
+        $(settings.target).dialog('close');
+      }
+    };
+    $.extend(settings, options, {type: 'Form'});
+    settings.onLoad = function(data, url) {
+      $(".cancel.form-submit", settings.target).click(settings.onCancel);
+      if (settings.validate) {
+        $("form", settings.target).validate(CRM.validate.params);
+      }
+      $("form", settings.target).ajaxForm({
+        url: url,
+        dataType: 'json',
+        success: function(response) {
+          if (response.status == 'success') {
+           settings.onSuccess(response);
+          }
+          else {
+            settings.onError(response);
+          }
+        }
+      });
+      // Call original onLoad fn
+      if (typeof(options.onLoad) == 'function') {
+        options.onLoad(data, url);
+      }
+    };
+    CRM.loadPage(url, settings);
+  };
+
   // Preprocess all cj ajax calls to display messages
   $(document).ajaxSuccess(function(event, xhr, settings) {
     try {
