@@ -1304,7 +1304,7 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
   /**
    * This function update contribution as well as related objects.
    */
-  function transitionComponents($params, $processContributionObject = FALSE) {
+  static function transitionComponents($params, $processContributionObject = FALSE) {
     // get minimum required values.
     $contactId = CRM_Utils_Array::value('contact_id', $params);
     $componentId = CRM_Utils_Array::value('component_id', $params);
@@ -1737,7 +1737,7 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
    * @return array $ids containing organization id and individual id
    * @access public
    */
-  function getOnbehalfIds($contributionId, $contributorId = NULL) {
+  static function getOnbehalfIds($contributionId, $contributorId = NULL) {
 
     $ids = array();
 
