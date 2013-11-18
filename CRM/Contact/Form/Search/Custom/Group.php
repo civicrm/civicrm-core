@@ -283,6 +283,7 @@ class CRM_Contact_Form_Search_Custom_Group extends CRM_Contact_Form_Search_Custo
         $xGroups = 0;
       }
 
+
       $sql = "CREATE TEMPORARY TABLE Xg_{$this->_tableName} ( contact_id int primary key) ENGINE=HEAP";
       CRM_Core_DAO::executeQuery($sql);
 
@@ -486,15 +487,11 @@ class CRM_Contact_Form_Search_Custom_Group extends CRM_Contact_Form_Search_Custo
      */
 
     /*
-         * check the situation and set booleans
-         */
-
+     * check the situation and set booleans
+     */
     $Ig = ($iGroups != 0);
-
     $It = ($iTags != 0);
-
     $Xg = ($xGroups != 0);
-
     $Xt = ($xTags != 0);
 
     //PICK UP FROM HERE
@@ -503,8 +500,8 @@ class CRM_Contact_Form_Search_Custom_Group extends CRM_Contact_Form_Search_Custo
     }
 
     /*
-         * Set from statement depending on array sel
-         */
+     * Set from statement depending on array sel
+     */
     $whereitems = array();
     foreach (array('Ig', 'It') as $inc) {
       if ($this->_andOr == 1) {
