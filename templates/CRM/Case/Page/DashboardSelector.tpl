@@ -28,12 +28,12 @@
 <table class="caseSelector">
   <tr class="columnheader">
     <th></th>
-    <th>{ts}Client{/ts}</th>
+    <th>{ts}Contact{/ts}</th>
     <th>{ts}Subject{/ts}</th>
     <th>{ts}Status{/ts}</th>
     <th>{ts}Type{/ts}</th>
     <th>{ts}My Role{/ts}</th>
-    <th>{ts}Case Manager{/ts}</th>
+    <th>{ts}Manager{/ts}</th>
     <th>{if $list EQ 'upcoming'}{ts}Next Sched.{/ts}{elseif $list EQ 'recent'}{ts}Most Recent{/ts}{/if}</th>
     <th></th>
   </tr>
