@@ -152,5 +152,29 @@ class CRM_Case_Info extends CRM_Core_Component_Info {
       }
     }
   }
+
+  /**
+   * (Setting Callback)
+   * Respond to changes in the "enable_components" setting
+   *
+   * If CiviCase is being enabled, load the case related sample data
+   *
+   * @param array $oldValue List of component names
+   * @param array $newValue List of component names
+   * @param array $metadata Specification of the setting (per *.settings.php)
+   */
+  public static function onToggleComponents($oldValue, $newValue, $metadata) {
+    if (in_array('CiviCase', $newValue) &&
+      !in_array('CiviCase', $oldValue)
+    ) {
+      $config = CRM_Core_Config::singleton();
+      CRM_Admin_Form_Setting_Component::loadCaseSampleData($config->dsn, $config->sqlDir . 'case_sample.mysql');
+      CRM_Admin_Form_Setting_Component::loadCaseSampleData($config->dsn, $config->sqlDir . 'case_sample1.mysql');
+      if (!CRM_Case_BAO_Case::createCaseViews()) {
+        $msg = ts("Could not create the MySQL views for CiviCase. Your mysql user needs to have the 'CREATE VIEW' permission");
+        CRM_Core_Error::fatal($msg);
+      }
+    }
+  }
 }
 
