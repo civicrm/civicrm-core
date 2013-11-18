@@ -408,7 +408,7 @@
       CRM.loadForm(url, {
         resetButton: 'next_new',
         onSuccess: function(data, settings) {
-          paletteView.doRefresh();
+          paletteView.doRefresh('custom_' + data.customField.id);
           if (data.buttonName != 'next_new') {
             $(settings.target).dialog('close');
           }
@@ -416,11 +416,15 @@
       });
       return false;
     },
-    doRefresh: function() {
+    doRefresh: function(fieldToAdd) {
       var ufGroupModel = this.model;
       CRM.Schema.reloadModels()
         .done(function(data){
           ufGroupModel.resetEntities();
+          if (fieldToAdd) {
+            var field = ufGroupModel.getRel('paletteFieldCollection').getFieldByName(null, fieldToAdd);
+            field.addToUFCollection(ufGroupModel.getRel('ufFieldCollection'));
+          }
         })
         .fail(function() {
           CRM.alert(ts('Failed to retrieve schema'), ts('Error'), 'error');
