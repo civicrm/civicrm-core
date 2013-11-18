@@ -694,7 +694,7 @@ SELECT count(*)
     }
     $optionFields = array('Select', 'Multi-Select', 'CheckBox', 'Radio', 'AdvMulti-Select');
 
-    if ($fields['option_type'] == 1) {
+    if (isset($fields['option_type']) && $fields['option_type'] == 1) {
       //capture duplicate Custom option values
       if (!empty($fields['option_value'])) {
         $countValue = count($fields['option_value']);
