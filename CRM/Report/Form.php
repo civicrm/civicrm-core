@@ -3122,6 +3122,10 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
           array('title' => ts('Postal Code'),
             'default' => CRM_Utils_Array::value('postal_code', $defaults, FALSE),
           ),
+          'postal_code_suffix' =>
+          array('title' => ts('Postal Code Suffix'),
+            'default' => CRM_Utils_Array::value('postal_code_suffix', $defaults, FALSE),
+          ),
           'county_id' =>
           array('title' => ts('County'),
             'default' => CRM_Utils_Array::value('county_id', $defaults, FALSE),
