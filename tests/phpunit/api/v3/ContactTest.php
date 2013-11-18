@@ -370,6 +370,10 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $employerResult = $this->callAPISuccess('contact', 'create', array_merge($this->_params, array(
       'current_employer' => 'new employer org',)
     ));
+    // do it again as an update to check it doesn't cause an error
+    $employerResult = $this->callAPISuccess('contact', 'create', array_merge($this->_params, array(
+        'current_employer' => 'new employer org', 'id' => $employerResult['id'])
+    ));
     $expectedCount = 1;
     $count = $this->callAPISuccess('contact', 'getcount', array(
       'organization_name' => 'new employer org',
@@ -384,6 +388,36 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $this->assertEquals('new employer org', $result['current_employer']);
 
   }
+  /*
+   * Test creating a current employer through API
+   * - check it will re-activate a de-activated employer
+  */
+  function testContactCreateDuplicateCurrentEmployerEnables(){
+    //set up  - create employer relationship
+    $employerResult = $this->callAPISuccess('contact', 'create', array_merge($this->_params, array(
+        'current_employer' => 'new employer org',)
+    ));
+    $relationship = $this->callAPISuccess('relationship','get', array(
+      'contact_id_a' => $employerResult['id'],
+   ));
+
+    //disable & check it is disabled
+    $this->callAPISuccess('relationship', 'create', array('id' => $relationship['id'], 'is_active' => 0));
+    $relationship = $this->callAPISuccess('relationship','getvalue', array(
+      'id' => $relationship['id'],
+      'return' => 'is_active'
+    ), 0);
+
+    //re-set the current employer - thus enabling the relationshp
+    $employerResult = $this->callAPISuccess('contact', 'create', array_merge($this->_params, array(
+        'current_employer' => 'new employer org', 'id' => $employerResult['id'])
+    ));
+    //check is_active is now 1
+   $relationship = $this->callAPISuccess('relationship','getsingle', array(
+     'return' => 'is_active',));
+   $this->assertEquals(1, $relationship['is_active']);
+  }
+
   /**
    * Check deceased contacts are not retrieved
    * Note at time of writing the default is to return default. This should possibly be changed & test added
