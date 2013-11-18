@@ -293,6 +293,15 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
     }
 
     $this->addButtons($button);
+    $this->addFormRule(array('CRM_Contact_Form_Merge', 'formRule'), $this);
+  }
+
+  static function formRule($fields, $files, $self) {
+    $errors = array();
+    if (CRM_Contact_BAO_Contact::checkDomainContact($self->_oid)) {
+      $errors['_qf_default'] = ts("The <b>Default Organization</b> contact cannot be merged into another contact record. It is associated with the CiviCRM installation for this domain and contains information used for system functions. If you want to merge these records, you can click the link to <a class='action-item action-item-first' href=%1>Flip between the original and duplicate contacts</a> and then continue with the merge.", array(1 => CRM_Utils_System::url('civicrm/contact/merge', 'reset=1&action=update&cid=' . $self->_oid . '&oid=' . $self->_cid . '&rgid=' . $self->_rgid . '&flip=1')));
+    }
+    return $errors;
   }
 
   public function postProcess() {
