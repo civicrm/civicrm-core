@@ -39,6 +39,8 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
     'Activity'
   );
 
+  protected $_nonDisplayFields = array();
+
   function __construct() {
     // There could be multiple contacts. We not clear on which contact id to display.
     // Lets hide it for now.
@@ -300,7 +302,17 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
   }
 
   function select($recordType = NULL) {
+    if (!array_key_exists("contact_{$recordType}", $this->_params['fields']) && $recordType != 'final') {
+      $this->_nonDisplayFields[] = "civicrm_contact_contact_{$recordType}";
+      $this->_params['fields']["contact_{$recordType}"] = 1;
+    }
     parent::select();
+
+    if ($recordType == 'final' && !empty($this->_nonDisplayFields)) {
+      foreach ($this->_nonDisplayFields as $fieldName) {
+        unset($this->_columnHeaders[$fieldName]);
+      }
+    }
 
     if (empty($this->_selectAliasesTotal)) {
       $this->_selectAliasesTotal = $this->_selectAliases;
@@ -576,7 +588,8 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
 
     // 3. fill temp table with assignee results
     if (CRM_Utils_Array::value("contact_assignee", $this->_params['fields']) ||
-      CRM_Utils_Array::value("contact_assignee_email", $this->_params['fields'])) {
+      CRM_Utils_Array::value("contact_assignee_email", $this->_params['fields']) ||
+      CRM_Utils_Array::value("contact_assignee_value", $this->_params)) {
       $this->select('assignee');
       $this->from('assignee');
       $this->where('assignee');
@@ -589,7 +602,8 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
 
     // 4. fill temp table with source results
     if (CRM_Utils_Array::value("contact_source", $this->_params['fields']) ||
-      CRM_Utils_Array::value("contact_source_email", $this->_params['fields'])) {
+      CRM_Utils_Array::value("contact_source_email", $this->_params['fields']) ||
+      CRM_Utils_Array::value("contact_source_value", $this->_params)) {
       $this->select('source');
       $this->from('source');
       $this->where('source');
