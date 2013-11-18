@@ -1135,7 +1135,7 @@ LIMIT {$offset}, {$rowCount}
   /**
    * Function to retrieve Paper Size dimensions
    */
-  function paperSize() {
+  static function paperSize() {
     $paperSizeName = CRM_Utils_Type::escape($_REQUEST['paperSizeName'], 'String');
 
     $paperSize = CRM_Core_BAO_PaperSize::getByName($paperSizeName);
