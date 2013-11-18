@@ -626,6 +626,9 @@ When enabled, statistics about your CiviCRM installation are reported anonymousl
     'is_contact' => 0,
     'description' => null,
     'help_text'   => null,
+    'on_change' => array(
+      array('CRM_Case_Info', 'onToggleComponents')
+    ),
   ),
 
   'disable_core_css' => array(

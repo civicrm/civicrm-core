@@ -2267,6 +2267,30 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
     }
   }
 
+  /**
+   * Temporarily alter the settings-metadata to add a mock setting.
+   *
+   * WARNING: The setting metadata will disappear on the next cache-clear.
+   *
+   * @param $extras
+   * @return void
+   */
+  function setMockSettingsMetaData($extras) {
+    CRM_Core_BAO_Setting::$_cache = array();
+    $this->callAPISuccess('system','flush', array());
+    CRM_Core_BAO_Setting::$_cache = array();
+
+    CRM_Utils_Hook::singleton()->setHook('civicrm_alterSettingsMetaData', function (&$metadata, $domainId, $profile) use ($extras) {
+      $metadata = array_merge($metadata, $extras);
+    });
+
+    $fields = $this->callAPISuccess('setting', 'getfields', array());
+    foreach ($extras as $key => $spec) {
+      $this->assertNotEmpty($spec['title']);
+      $this->assertEquals($spec['title'], $fields['values'][$key]['title']);
+    }
+  }
+
   function financialAccountDelete($name) {
     $financialAccount = new CRM_Financial_DAO_FinancialAccount();
     $financialAccount->name = $name;
