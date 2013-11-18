@@ -269,13 +269,16 @@ LEFT JOIN  civicrm_contribution on (civicrm_contribution.contact_id = civicrm_co
         elseif ($updatedStatusName == 'Expired') {
           $statusMsg .= "<br />" . ts("Membership for %1 has been Expired.", array(1 => $userDisplayName));
         }
-        elseif ($endDate = CRM_Utils_Array::value('membership_end_date', $updateResult)) {
-          $statusMsg .= "<br />" . ts("Membership for %1 has been updated. The membership End Date is %2.",
-            array(
-              1 => $userDisplayName,
-              2 => $endDate
-            )
-          );
+        else {
+          $endDate = CRM_Utils_Array::value('membership_end_date', $updateResult);
+          if ($endDate) {
+            $statusMsg .= "<br />" . ts("Membership for %1 has been updated. The membership End Date is %2.",
+              array(
+                1 => $userDisplayName,
+                2 => $endDate
+              )
+            );
+          }
         }
       }
 
