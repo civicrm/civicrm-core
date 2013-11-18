@@ -227,7 +227,7 @@
       }
     }
 
-    cj('#priceset input').change(function () {
+    cj('#priceset input, #priceset select').change(function () {
       skipPaymentMethod();
     });
 
