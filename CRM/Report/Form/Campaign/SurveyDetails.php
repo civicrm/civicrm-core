@@ -84,6 +84,7 @@ class CRM_Report_Form_Campaign_SurveyDetails extends CRM_Report_Form {
         'fields' => array('contact_id' => array('title' => ts('Interviewer Name'))),
         'filters' => array(
           'contact_id' => array('name' => 'contact_id',
+            'alias' => 'civicrm_activity_assignment',
             'title' => ts('Interviewer Name'),
             'type' => CRM_Utils_Type::T_INT,
             'operatorType' =>

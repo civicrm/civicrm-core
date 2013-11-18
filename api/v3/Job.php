@@ -167,9 +167,9 @@ function civicrm_api3_job_geocode($params) {
 function _civicrm_api3_job_geocode_spec(&$params) {
   $params['start'] = array('title' => 'Start Date');
   $params['end'] = array('title' => 'End Date');
-  $params['geocoding'] = array('title' => 'Is this for GeoCoding? (I think this is a 1,0 field?)');
-  $params['parse'] = array('title' => 'Is this for parsing? (I think this is a 1,0 field?)');
-  $params['throttle'] = array('title' => 'Throttle? (no idea what you enter in this field)');
+  $params['geocoding'] = array('title' => 'Geocode address?');
+  $params['parse'] = array('title' => 'Parse street address?');
+  $params['throttle'] = array('title' => 'Throttle? if enabled, geocodes at a slow rate');
 }
 
 /**
