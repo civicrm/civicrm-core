@@ -60,7 +60,9 @@ class CRM_Contribute_Page_DashBoard extends CRM_Core_Page {
       'now', 'yearDate', 'monthDate') as $date) {
       $$date = $dates[$date];
     }
-    $yearNow = $yearDate + 10000;
+    // fiscal years end date
+    $yearNow = date('Ymd', strtotime('+1 year -1 day', strtotime($yearDate)));
+
     foreach ($prefixes as $prefix) {
       $aName = $prefix . 'ToDate';
       $dName = $prefix . 'Date';
