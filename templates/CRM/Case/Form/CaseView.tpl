@@ -46,7 +46,7 @@
 
   {else}
 
-<h3>{ts}Case Summary{/ts}</h3>
+<h3>{ts}Summary{/ts}</h3>
 <table class="report">
   {if $multiClient}
     <tr class="crm-case-caseview-client">
@@ -119,7 +119,7 @@
   <td>{$form.activity_type_id.label}<br />{$form.activity_type_id.html}&nbsp;<input type="button" accesskey="N" value="{ts}Go{/ts}" name="new_activity" onclick="checkSelection( this );"/></td>
   {if $hasAccessToAllCases}
     <td>
-      <span class="crm-button"><div class="icon print-icon"></div><input type="button"  value="{ts}Print Case Report{/ts}" name="case_report_all" onclick="printCaseReport( );"/></span>
+      <span class="crm-button"><div class="icon print-icon"></div><input type="button"  value="{ts}Print Report{/ts}" name="case_report_all" onclick="printCaseReport( );"/></span>
     </td>
   </tr>
   <tr>
@@ -142,7 +142,7 @@
 
   {if call_user_func(array('CRM_Core_Permission','giveMeAllACLs'))}
     <tr class="crm-case-caseview-form-block-change_client_id">
-      <td colspan='2'><a href="#" onClick='cj("#change_client").toggle( ); return false;'>{ts}Assign to Another Client{/ts}</a>
+      <td colspan='2'><a href="#" onClick='cj("#change_client").toggle( ); return false;'>{ts}Assign to Another Contact{/ts}</a>
           <span id='change_client' class='hide-block'>
             {$form.change_client_id.html|crmAddClass:twenty}&nbsp;{$form._qf_CaseView_next_edit_client.html}
           </span>
@@ -160,7 +160,7 @@
 
 <div class="crm-accordion-wrapper collapsed crm-case-roles-block">
   <div class="crm-accordion-header">
-    {ts}Case Roles{/ts}
+    {ts}Roles{/ts}
   </div><!-- /.crm-accordion-header -->
   <div class="crm-accordion-body">
 
@@ -902,7 +902,7 @@ function addTags() {
 
 <div class="crm-accordion-wrapper crm-case_activities-accordion  crm-case-activities-block">
   <div class="crm-accordion-header">
-    {ts}Case Activities{/ts}
+    {ts}Activities{/ts}
   </div>
   <div id="activities" class="crm-accordion-body">
     <div id="view-activity">
