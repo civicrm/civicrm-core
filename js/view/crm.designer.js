@@ -290,10 +290,13 @@
     serializeData: extendedSerializeData,
     template: '#palette_template',
     el: '<div class="full-height"></div>',
+    openTreeNodes: [],
     events: {
       'keyup .crm-designer-palette-search input': 'doSearch',
       'click .crm-designer-palette-clear-search': 'clearSearch',
-      'click .crm-designer-palette-toggle': 'toggleAll'
+      'click .crm-designer-palette-toggle': 'toggleAll',
+      'click .crm-designer-palette-add button': 'doNewCustomFieldDialog',
+      'dblclick .crm-designer-palette-field': 'doAddToCanvas'
     },
     initialize: function() {
       this.model.getRel('ufFieldCollection')
@@ -328,10 +331,19 @@
             });
           }
           if (section.is_addable) {
-            items.push({data: 'placeholder', attr: {'class': 'crm-designer-palette-add', 'data-entity': ufEntityModel.get('entity_name'), 'data-section': sectionKey}});
+            items.push({data: ts('+ Add New Field'), attr: {'class': 'crm-designer-palette-add'}});
           }
           if (items.length > 0) {
-            treeData.push({data: section.title, children: items});
+            treeData.push({
+              data: section.title,
+              children: items,
+              state: _.contains(paletteView.openTreeNodes, sectionKey) ? 'open' : 'closed',
+              attr: {
+                'class': 'crm-designer-palette-section',
+                'data-section': sectionKey,
+                'data-entity': ufEntityModel.get('entity_name')
+              }
+            });
           }
         })
       });
@@ -356,26 +368,11 @@
           helper: 'clone',
           connectToSortable: '.crm-designer-fields' // FIXME: tight canvas/palette coupling
         });
-        $('.crm-designer-palette-field', this).dblclick(function(event){
-          var paletteFieldModel = paletteView.model.getRel('paletteFieldCollection').get($(event.currentTarget).attr('data-plm-cid'));
-          paletteFieldModel.addToUFCollection(paletteView.model.getRel('ufFieldCollection'));
-          event.stopPropagation();
-        });
         paletteView.model.getRel('ufFieldCollection').each(function(ufFieldModel) {
           paletteView.toggleActive(ufFieldModel, paletteView.model.getRel('ufFieldCollection'))
         });
-        paletteView.$('.crm-designer-palette-add a').remove();
-        paletteView.$('.crm-designer-palette-add').append('<button>'+ts('Add Field')+'</button>');
-        paletteView.$('.crm-designer-palette-add button').button()
-          .click(function(event){
-            var entityKey = $(event.currentTarget).closest('.crm-designer-palette-add').attr('data-entity');
-            var sectionKey = $(event.currentTarget).closest('.crm-designer-palette-add').attr('data-section');
-            var ufEntityModel = paletteView.model.getRel('ufEntityCollection').getByName(entityKey);
-            var sections = ufEntityModel.getSections();
-            paletteView.doAddField(sections[sectionKey]);
-            event.stopPropagation();
-          })
-        ;
+        paletteView.$('.crm-designer-palette-add a').replaceWith('<button>' + $('.crm-designer-palette-add a').first().text() + '</<button>');
+        paletteView.$('.crm-designer-palette-add button').button();
       }).bind("select_node.jstree", function (e, data) {
         $(this).jstree("toggle_node", data.rslt.obj);
         $(this).jstree("deselect_node", data.rslt.obj);
@@ -398,12 +395,21 @@
     doSearch: function(event) {
       $('.crm-designer-palette-tree').jstree("search", $(event.target).val());
     },
-    doAddField: function(section) {
+    doAddToCanvas: function(event) {
+      var paletteFieldModel = this.model.getRel('paletteFieldCollection').get($(event.currentTarget).attr('data-plm-cid'));
+      paletteFieldModel.addToUFCollection(this.model.getRel('ufFieldCollection'));
+      event.stopPropagation();
+    },
+    doNewCustomFieldDialog: function(event) {
       var paletteView = this;
+      var entityKey = $(event.currentTarget).closest('.crm-designer-palette-section').attr('data-entity');
+      var sectionKey = $(event.currentTarget).closest('.crm-designer-palette-section').attr('data-section');
+      var ufEntityModel = paletteView.model.getRel('ufEntityCollection').getByName(entityKey);
+      var sections = ufEntityModel.getSections();
       var url = CRM.url('civicrm/admin/custom/group/field/add', {
         reset: 1,
         action: 'add',
-        gid: section.custom_group_id
+        gid: sections[sectionKey].custom_group_id
       });
       CRM.loadForm(url, {
         resetButton: 'next_new',
@@ -418,6 +424,7 @@
     },
     doRefresh: function(fieldToAdd) {
       var ufGroupModel = this.model;
+      this.getOpenTreeNodes();
       CRM.Schema.reloadModels()
         .done(function(data){
           ufGroupModel.resetEntities();
@@ -429,7 +436,6 @@
         .fail(function() {
           CRM.alert(ts('Failed to retrieve schema'), ts('Error'), 'error');
         });
-      return false;
     },
     clearSearch: function(event) {
       $('.crm-designer-palette-search input').val('').keyup();
@@ -446,6 +452,13 @@
         $('.crm-designer-palette-tree').jstree($(event.target).attr('rel'));
       }
       return false;
+    },
+    getOpenTreeNodes: function() {
+      var paletteView = this;
+      this.openTreeNodes = [];
+      this.$('.crm-designer-palette-section.jstree-open').each(function() {
+        paletteView.openTreeNodes.push($(this).data('section'));
+      })
     }
   });
 
