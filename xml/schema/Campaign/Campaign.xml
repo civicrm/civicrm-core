@@ -111,6 +111,7 @@
   <field>
        <name>external_identifier</name>
        <type>varchar</type>
+       <title>Campaign External Identifier</title>
        <length>32</length>
        <headerPattern>/external\s?id/i</headerPattern>
        <dataPattern>/^\d{11,}$/</dataPattern>
@@ -127,6 +128,7 @@
 
   <field>
        <name>parent_id</name>
+       <title>Parent Campaign</title>
        <type>int unsigned</type>
        <default>NULL</default>
        <comment>Optional parent id for this Campaign.</comment>
@@ -143,6 +145,7 @@
 
   <field>
       <name>is_active</name>
+      <title>Is Campaign Active?</title>
       <type>boolean</type>
       <default>1</default>
       <comment>Is this Campaign enabled or disabled/cancelled?</comment>
@@ -152,6 +155,7 @@
   <field>
       <name>created_id</name>
       <type>int unsigned</type>
+      <title>Campaign Created By</title>
       <comment>FK to civicrm_contact, who created this Campaign.</comment>
       <add>3.3</add>
   </field>
@@ -174,6 +178,7 @@
   <field>
       <name>last_modified_id</name>
       <type>int unsigned</type>
+      <title>Campaign Modified By</title>
       <comment>FK to civicrm_contact, who recently edited this Campaign.</comment>
       <add>3.3</add>
   </field>
@@ -188,6 +193,7 @@
   <field>
       <name>last_modified_date</name>
       <type>datetime</type>
+      <title>Campaign Modified Date</title>
       <comment>Date and time that Campaign was edited last time.</comment>
       <add>3.3</add>
   </field>
