@@ -987,14 +987,12 @@ SELECT id
     // reset the cache
     CRM_Core_BAO_Cache::deleteGroup('contact fields');
 
-    CRM_Core_Session::setStatus(ts('Your custom field \'%1\' has been saved.',
-        array(1 => $customField->label)
-      ), ts('Saved'), 'success');
+    $msg = '<p>' . ts("Custom field '%1' has been saved.", array(1 => $customField->label)) . '</p>';
 
     $buttonName = $this->controller->getButtonName();
     $session = CRM_Core_Session::singleton();
     if ($buttonName == $this->getButtonName('next', 'new')) {
-      CRM_Core_Session::setStatus(ts(' You can add another custom field.'), '', 'info');
+      $msg += '<p>' . ts("Ready to add another.") . '</p>';
       $session->replaceUserContext(CRM_Utils_System::url('civicrm/admin/custom/group/field/add',
           'reset=1&action=add&gid=' . $this->_gid
         ));
@@ -1004,6 +1002,10 @@ SELECT id
           'reset=1&action=browse&gid=' . $this->_gid
         ));
     }
+    $session->setStatus($msg, ts('Saved'), 'success');
+
+    // Add data when in ajax contect
+    $this->ajaxResponse['customField'] = $customField->toArray();
   }
 }
 
