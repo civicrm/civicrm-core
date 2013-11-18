@@ -205,6 +205,15 @@ class civicrm_cli {
     CRM_Core_ClassLoader::singleton()->register();
 
     $this->_config = CRM_Core_Config::singleton();
+    
+    // HTTP_HOST will be 'localhost' unless overwritten with the -s argument.
+    // Now we have a Config object, we can set it from the Base URL.
+    if ($_SERVER['HTTP_HOST'] == 'localhost') {
+        $_SERVER['HTTP_HOST'] = preg_replace(
+                '!^https?://([^/]+)/$!i', 
+                '$1',
+                $this->_config->userFrameworkBaseURL);
+    }
 
     $class = 'CRM_Utils_System_' . $this->_config->userFramework;
 
