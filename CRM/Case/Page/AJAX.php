@@ -55,7 +55,8 @@ class CRM_Case_Page_AJAX {
     );
 
     $excludeCaseIds = array();
-    if ($caseIdStr = CRM_Utils_Array::value('excludeCaseIds', $_GET)) {
+    $caseIdStr = CRM_Utils_Array::value('excludeCaseIds', $_GET);
+    if ($caseIdStr) {
       $excludeIdStr = CRM_Utils_Type::escape($caseIdStr, 'String');
       $excludeCaseIds = explode(',', $excludeIdStr);
     }
