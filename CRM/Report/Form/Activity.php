@@ -568,6 +568,7 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
     // 1. fill temp table with target results
     $this->select('target');
     $this->from('target');
+    $this->customDataFrom();
     $this->where('target');
     $insertCols = implode(',', $this->_selectAliases);
     $tempQuery  = "CREATE TEMPORARY TABLE civireport_activity_temp_target CHARACTER SET utf8 COLLATE utf8_unicode_ci AS
@@ -592,6 +593,7 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
       CRM_Utils_Array::value("contact_assignee_value", $this->_params)) {
       $this->select('assignee');
       $this->from('assignee');
+      $this->customDataFrom();
       $this->where('assignee');
       $insertCols = implode(',', $this->_selectAliases);
       $tempQuery  = "INSERT INTO civireport_activity_temp_target ({$insertCols})
@@ -606,6 +608,7 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
       CRM_Utils_Array::value("contact_source_value", $this->_params)) {
       $this->select('source');
       $this->from('source');
+      $this->customDataFrom();
       $this->where('source');
       $insertCols = implode(',', $this->_selectAliases);
       $tempQuery  = "INSERT INTO civireport_activity_temp_target ({$insertCols})
