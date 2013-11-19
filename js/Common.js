@@ -827,7 +827,8 @@ CRM.validate = CRM.validate || {
       target: '#crm-ajax-dialog',
       dialog: {
         modal: true,
-        minWidth: 600,
+        width: '65%',
+        height: parseInt($(window).height() * .75),
         close: function() {
           $(this).dialog('destroy');
           $(this).remove();
