@@ -996,6 +996,16 @@ function _civicrm_api3_basic_create($bao_name, &$params, $entity = NULL) {
   if (is_null($bao)) {
     return civicrm_api3_create_error('Entity not created (' . $fct_name . ')');
   }
+  elseif (is_a($bao, 'CRM_Core_Error')) {
+    //some wierd circular thing means the error takes itself as an argument
+    $msg = $bao->getMessages($bao);
+    // the api deals with entities on a one-by-one basis. However, the contribution bao pushes entities
+    // onto the error object - presumably because the contribution import is not handling multiple errors correctly
+    // so we need to reset the error object here to avoid getting concatenated errors
+    //@todo - the mulitple error handling should be moved out of the contribution object to the import / multiple entity processes
+    CRM_Core_Error::singleton()->reset();
+    throw new API_Exception($msg);
+  }
   else {
     $values = array();
     _civicrm_api3_object_to_array($bao, $values[$bao->id]);
