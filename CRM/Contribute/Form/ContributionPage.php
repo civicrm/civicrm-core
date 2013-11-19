@@ -210,6 +210,25 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
       $this->freeze();
       $this->addElement('button', 'done', ts('Done'), array('onclick' => "location.href='civicrm/admin/custom/group?reset=1&action=browse'"));
     }
+    
+    // don't show option for contribution amounts section if membership price set
+    // this flag is sent to template
+    
+    $membershipBlock = new CRM_Member_DAO_MembershipBlock();
+    $membershipBlock->entity_table = 'civicrm_contribution_page';
+    $membershipBlock->entity_id = $this->_id;
+    $membershipBlock->is_active = 1;
+    $hasMembershipBlk = FALSE;
+    if ($membershipBlock->find(TRUE) && 
+      ($setID = CRM_Price_BAO_PriceSet::getFor('civicrm_contribution_page', $this->_id, NULL, 1))
+    ) {
+      $extends = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $setID, 'extends');
+      if ($extends && $extends == CRM_Core_Component::getComponentID('CiviMember')) {
+        $hasMembershipBlk = TRUE;
+      }
+    }
+    // set value in DOM that membership price set exists
+    CRM_Core_Resources::singleton()->addSetting(array('memberPriceset' => $hasMembershipBlk));
   }
 
   /**
