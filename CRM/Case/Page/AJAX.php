@@ -43,7 +43,6 @@ class CRM_Case_Page_AJAX {
   static function unclosedCases() {
     $criteria = explode('-', CRM_Utils_Type::escape(CRM_Utils_Array::value('s', $_GET), 'String'));
 
-    $limit = NULL;
     $limit = CRM_Utils_Array::value('limit', $_GET);
     if ($limit) {
       $limit = CRM_Utils_Type::escape($limit, 'Integer');
