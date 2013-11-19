@@ -291,7 +291,7 @@ class CRM_Campaign_Page_AJAX {
     );
 
     $extraVoterColName = 'is_interview_conducted';
-    if ($params['campaign_search_voter_for'] = 'reserve') {
+    if ($params['campaign_search_voter_for'] == 'reserve') {
       $extraVoterColName = 'reserve_voter';
     }
 
