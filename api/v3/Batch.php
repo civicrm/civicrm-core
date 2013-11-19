@@ -49,6 +49,20 @@ function civicrm_api3_batch_create($params) {
 }
 
 /**
+ * Adjust Metadata for Create action
+ *
+ * The metadata is used for setting defaults, documentation & validation
+ * @param array $params array or parameters determined by getfields
+ */
+function _civicrm_api3_batch_create_spec(&$params) {
+  $params['entity_table']['api.default'] = "civicrm_batch";
+  $params['modified_date']['api.default'] = "now";
+  $params['status_id']['api.required'] = 1;
+  $params['title']['api.required'] = 1;
+  $params['status_id']['api.required'] = 1;
+}
+
+/**
  * Get a Batch
  *
  * Allowed @params array keys are:
