@@ -117,7 +117,7 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
   function appendCoreDirectoryToResourceBase($url) {
     global $civicrm_root;
     $lastDirectory = basename($civicrm_root);
-    if(!$lastDirectory != 'civicrm') {
+    if($lastDirectory != 'civicrm') {
       return $url .= $lastDirectory . '/';
     }
     return $url;
