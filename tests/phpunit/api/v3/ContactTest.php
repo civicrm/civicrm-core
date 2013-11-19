@@ -1582,7 +1582,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $config = CRM_Core_Config::singleton();
     $config->userPermissionClass->permissions = array('access CiviCRM');
     $result = $this->callAPIFailure('contact', 'create', $params);
-    $this->assertEquals('API permission check failed for contact/create call; missing permission: add contacts.', $result['error_message'], 'lacking permissions should not be enough to create a contact');
+    $this->assertEquals('API permission check failed for contact/create call; insufficient permission: require access CiviCRM and add contacts', $result['error_message'], 'lacking permissions should not be enough to create a contact');
 
     $config->userPermissionClass->permissions = array('access CiviCRM', 'add contacts', 'import contacts');
     $result = $this->callAPISuccess('contact', 'create', $params, NULL, 'overfluous permissions should be enough to create a contact');
@@ -1596,7 +1596,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
 
     $config->userPermissionClass->permissions = array('access CiviCRM');
     $result = $this->callAPIFailure('contact', 'update', $params);
-    $this->assertEquals('API permission check failed for contact/update call; missing permission: edit all contacts.', $result['error_message'], 'lacking permissions should not be enough to update a contact');
+    $this->assertEquals('API permission check failed for contact/update call; insufficient permission: require access CiviCRM and edit all contacts', $result['error_message'], 'lacking permissions should not be enough to update a contact');
 
     $config->userPermissionClass->permissions = array('access CiviCRM', 'add contacts', 'view all contacts', 'edit all contacts', 'import contacts');
     $result = $this->callAPISuccess('contact', 'update', $params, NULL, 'overfluous permissions should be enough to update a contact');
@@ -1643,5 +1643,18 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     );
     $result = $this->callAPISuccess('contact', 'proximity', $proxParams);
     $this->assertEquals(1, $result['count'], 'In line ' . __LINE__);
+  }
+
+  /**
+   * Test that Ajax API permission is suffient to access quicksearch api
+   * (note that quicksearch api is required for autocomplete & has ACL permissions applied)
+   */
+  function testQuickSearchPermission_CRM_13744() {
+    CRM_Core_Config::singleton()->userPermissionClass->permissions = array('access CiviEvent');
+    $result = $this->callAPIFailure('contact', 'getquick', array('name' => 'b', 'check_permissions' => TRUE));
+    CRM_Core_Config::singleton()->userPermissionClass->permissions = array('access CiviCRM');
+    $result = $this->callAPISuccess('contact', 'getquick', array('name' => 'b', 'check_permissions' => TRUE));
+    CRM_Core_Config::singleton()->userPermissionClass->permissions = array('access AJAX API');
+    $result = $this->callAPISuccess('contact', 'getquick', array('name' => 'b', 'check_permissions' => TRUE));
   }
 }
