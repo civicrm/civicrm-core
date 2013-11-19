@@ -699,15 +699,15 @@ WHERE sort_name LIKE '%$name%'";
         }
       }
       else {
-      	$cid = CRM_Utils_Array::value('cid', $_GET);
-      	if ($cid) {
-	      //check cid for interger
-	      $contIDS = explode(',', $cid);
-	      foreach ($contIDS as $contID) {
-	        CRM_Utils_Type::escape($contID, 'Integer');
-	      }
+        $cid = CRM_Utils_Array::value('cid', $_GET);
+        if ($cid) {
+          //check cid for interger
+          $contIDS = explode(',', $cid);
+          foreach ($contIDS as $contID) {
+            CRM_Utils_Type::escape($contID, 'Integer');
+          }
           $queryString = " cc.id IN ( $cid )";
-      	}
+        }
       }
 
       if ($queryString) {
