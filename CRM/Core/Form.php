@@ -274,6 +274,9 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     if (!empty($_REQUEST['snippet']) && $_REQUEST['snippet'] == CRM_Core_Smarty::PRINT_JSON) {
       $this->ajaxResponse['buttonName'] = str_replace('_qf_' . $this->getAttribute('id') . '_', '', $this->controller->getButtonName());
       $this->ajaxResponse['action'] = $this->_action;
+      if (isset($this->_id) || isset($this->id)) {
+        $this->ajaxResponse['id'] = isset($this->id) ? $this->id : $this->_id;
+      }
       CRM_Core_Page_AJAX::returnJsonResponse($this->ajaxResponse);
     }
   }
