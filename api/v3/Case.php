@@ -192,25 +192,6 @@ function _civicrm_api3_case_delete_spec(&$params) {
 function civicrm_api3_case_get($params) {
   $options = _civicrm_api3_get_options_from_params($params);
 
-  // Get by id
-  $caseId = CRM_Utils_Array::value('id', $params);
-  if ($caseId) {
-    // Validate param
-    if (!is_numeric($caseId)) {
-      return civicrm_api3_create_error('Invalid parameter: case_id. Must provide a numeric value.');
-    }
-    // For historic reasons we always return these when an id is provided
-    $options['return'] = array('contacts' => 1, 'activities' => 1);
-    $case = _civicrm_api3_case_read($caseId, $options);
-
-    if ($case) {
-      return civicrm_api3_create_success(array($caseId => $case), $params, 'case', 'get');
-    }
-    else {
-      return civicrm_api3_create_success(array(), $params, 'case', 'get');
-    }
-  }
-
   //search by client
   if (!empty($params['contact_id'])) {
     $ids = array();
@@ -260,6 +241,12 @@ SELECT DISTINCT case_id
       $cases[$dao->case_id] = _civicrm_api3_case_read($dao->case_id, $options);
     }
     return civicrm_api3_create_success($cases, $params, 'case', 'get');
+  }
+
+  // For historic reasons we always return these when an id is provided
+  $caseId = CRM_Utils_Array::value('id', $params);
+  if ($caseId) {
+    $options['return'] = array('contacts' => 1, 'activities' => 1);
   }
 
   $foundcases =  _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params, TRUE, 'Case');
