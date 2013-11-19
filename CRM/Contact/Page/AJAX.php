@@ -44,11 +44,13 @@ class CRM_Contact_Page_AJAX {
 
     $params = array('version' => 3, 'check_permissions' => TRUE);
 
-    if ($context = CRM_Utils_Array::value('context', $_GET)) {
+    $context = CRM_Utils_Array::value('context', $_GET);
+    if ($context) {
       $params['context'] = CRM_Utils_Type::escape($_GET['context'], 'String');
     }
 
-    if ($name = CRM_Utils_Array::value('s', $_GET)) {
+    $name = CRM_Utils_Array::value('s', $_GET);
+    if ($name) {
       $params['name'] = CRM_Utils_Type::escape($name, 'String');
     }
 
@@ -117,7 +119,7 @@ class CRM_Contact_Page_AJAX {
     $returnProperties = array('filter', 'data_type', 'is_active');
     $fldValues        = array();
     CRM_Core_DAO::commonRetrieve('CRM_Core_DAO_CustomField', $params, $cf, $returnProperties);
-    if (!$cf['id'] || !$cf['is_active'] || $cf['data_type'] = !'ContactReference') {
+    if (!$cf['id'] || !$cf['is_active'] || $cf['data_type'] != 'ContactReference') {
       echo "$name|error\n";
       CRM_Utils_System::civiExit();
     }
@@ -441,7 +443,8 @@ class CRM_Contact_Page_AJAX {
 
       if (isset($_GET['org']) || isset($_GET['hh'])) {
         $json = FALSE;
-        if ($splitName = explode(' :: ', $name)) {
+        $splitName = explode(' :: ', $name);
+        if ($splitName) {
           $contactName = trim(CRM_Utils_Array::value('0', $splitName));
           $street      = trim(CRM_Utils_Array::value('1', $splitName));
           $city        = trim(CRM_Utils_Array::value('2', $splitName));
@@ -588,7 +591,8 @@ WHERE sort_name LIKE '%$name%'";
     $customGroupID = CRM_Utils_Type::escape($_REQUEST['groupID'], 'Positive');
 
     CRM_Core_BAO_CustomValue::deleteCustomValue($customValueID, $customGroupID);
-    if ($contactId = CRM_Utils_Array::value('contactId', $_REQUEST)) {
+    $contactId = CRM_Utils_Array::value('contactId', $_REQUEST);
+    if ($contactId) {
       echo CRM_Contact_BAO_Contact::getCountComponent('custom_' . $_REQUEST['groupID'], $contactId);
     }
 
@@ -684,7 +688,8 @@ WHERE sort_name LIKE '%$name%'";
     else {
       $noemail = CRM_Utils_Array::value('noemail', $_GET);
       $queryString = NULL;
-      if ($name = CRM_Utils_Array::value('name', $_GET)) {
+      $name = CRM_Utils_Array::value('name', $_GET);
+      if ($name) {
         $name = CRM_Utils_Type::escape($name, 'String');
         if ($noemail) {
           $queryString = " cc.sort_name LIKE '%$name%'";
@@ -693,13 +698,16 @@ WHERE sort_name LIKE '%$name%'";
           $queryString = " ( cc.sort_name LIKE '%$name%' OR ce.email LIKE '%$name%' ) ";
         }
       }
-      elseif ($cid = CRM_Utils_Array::value('cid', $_GET)) {
-        //check cid for interger
-        $contIDS = explode(',', $cid);
-        foreach ($contIDS as $contID) {
-          CRM_Utils_Type::escape($contID, 'Integer');
-        }
-        $queryString = " cc.id IN ( $cid )";
+      else {
+      	$cid = CRM_Utils_Array::value('cid', $_GET);
+      	if ($cid) {
+	      //check cid for interger
+	      $contIDS = explode(',', $cid);
+	      foreach ($contIDS as $contID) {
+	        CRM_Utils_Type::escape($contID, 'Integer');
+	      }
+          $queryString = " cc.id IN ( $cid )";
+      	}
       }
 
       if ($queryString) {
@@ -779,17 +787,21 @@ LIMIT {$offset}, {$rowCount}
     $phoneTypes = CRM_Core_OptionGroup::values('phone_type', TRUE, FALSE, FALSE, NULL, 'name');
     $mobileType = CRM_Utils_Array::value('Mobile', $phoneTypes);
 
-    if ($name = CRM_Utils_Array::value('name', $_GET)) {
+    $name = CRM_Utils_Array::value('name', $_GET);
+    if ($name) {
       $name = CRM_Utils_Type::escape($name, 'String');
       $queryString = " ( cc.sort_name LIKE '%$name%' OR cp.phone LIKE '%$name%' ) ";
     }
-    elseif ($cid = CRM_Utils_Array::value('cid', $_GET)) {
-      //check cid for interger
-      $contIDS = explode(',', $cid);
-      foreach ($contIDS as $contID) {
-        CRM_Utils_Type::escape($contID, 'Integer');
-      }
-      $queryString = " cc.id IN ( $cid )";
+    else {
+      $cid = CRM_Utils_Array::value('cid', $_GET);
+      if ($cid) {
+	    //check cid for interger
+	    $contIDS = explode(',', $cid);
+	    foreach ($contIDS as $contID) {
+	      CRM_Utils_Type::escape($contID, 'Integer');
+	    }
+	    $queryString = " cc.id IN ( $cid )";
+      }    
     }
 
     if ($queryString) {
