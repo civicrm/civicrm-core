@@ -21,6 +21,10 @@
   margin: 0.5em 0;
 }
 
+.crm-designer-palette-search input {
+  max-width: 75%;
+}
+
 .crm-designer-toolbar .ui-resizable-w {
   border-left: 4px dotted #BFBFBF;
   cursor: ew-resize;

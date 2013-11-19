@@ -272,7 +272,7 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
   public function buildQuickForm() {
     if ($this->_gid) {
       $this->_title = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $this->_gid, 'title');
-      CRM_Utils_System::setTitle($this->_title . ' - ' . ts('Custom Fields'));
+      CRM_Utils_System::setTitle($this->_title . ' - ' . ($this->_id ? ts('Edit Field') : ts('Add Field')));
     }
 
     // lets trim all the whitespace
@@ -983,6 +983,7 @@ SELECT id
     }
 
     $customField = CRM_Core_BAO_CustomField::create($params);
+    $this->_id = $customField->id;
 
     // reset the cache
     CRM_Core_BAO_Cache::deleteGroup('contact fields');
