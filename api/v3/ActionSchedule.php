@@ -64,7 +64,11 @@ function civicrm_api3_action_schedule_create($params) {
   if (isset($params['id']) && !CRM_Utils_Rule::integer($params['id'])) {
     return civicrm_api3_create_error('Invalid value for ID');
   }
-	
+  
+  if (!array_key_exists('name', $params) && !array_key_exists('id', $params)) {
+  	$params['name'] = CRM_Utils_String::munge($params['title']);
+  }  	
+  
   $actionSchedule = new CRM_Core_BAO_ActionSchedule();
   $actionSchedule = CRM_Core_BAO_ActionSchedule::add($params, $ids);
 	
