@@ -238,7 +238,7 @@
   {include file="CRM/UF/Form/Block.tpl" fields=$customPre}
   </div>
 
-  {if $pcp}
+  {if $isHonor}
   <fieldset class="crm-group pcp-group">
     <div class="crm-section pcp-section">
       <div class="crm-section display_in_roll-section">
@@ -333,7 +333,7 @@
 </div>
 
 <script type="text/javascript">
-  {if $pcp}
+  {if $isHonor}
   pcpAnonymous();
   {/if}
 
