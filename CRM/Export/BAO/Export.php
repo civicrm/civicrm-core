@@ -629,10 +629,8 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
         $count++;
         $row = array();
 
-        if ($exportMode == CRM_Export_Form_Select::CONTACT_EXPORT) {
-          //convert the pseudo constants
-          $query->convertToPseudoNames($dao);
-        }
+        //convert the pseudo constants
+        $query->convertToPseudoNames($dao);
 
         //first loop through returnproperties so that we return what is required, and in same order.
         $relationshipField = 0;
