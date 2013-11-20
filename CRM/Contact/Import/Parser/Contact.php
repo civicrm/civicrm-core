@@ -1038,6 +1038,18 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
         }
 
         if (civicrm_error($newContact)) {
+          if (!CRM_Utils_Array::value('params', $newContact['error_message'])) {
+            // different kind of error other than DUPLICATE
+            $errorMessage = $newContact['error_message'];
+            array_unshift($values, $errorMessage);
+            $importRecordParams = array(
+              $statusFieldName => 'ERROR',
+              "${statusFieldName}Msg" => $errorMessage,
+            );
+            $this->updateImportRecord($values[count($values) - 1], $importRecordParams);
+            return CRM_Import_Parser::ERROR;
+          }
+
           $contactID = $newContact['error_message']['params'][0];
           if (!in_array($contactID, $this->_newContacts)) {
             $this->_newContacts[] = $contactID;
