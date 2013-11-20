@@ -115,7 +115,7 @@ class CRM_Admin_Form_Setting_Component extends CRM_Admin_Form_Setting {
     CRM_Core_BAO_Navigation::resetNavigation();
   }
 
-  public function loadCaseSampleData($dsn, $fileName, $lineMode = FALSE) {
+  public static function loadCaseSampleData($dsn, $fileName, $lineMode = FALSE) {
     global $crmPath;
 
     $db = &DB::connect($dsn);
