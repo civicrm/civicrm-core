@@ -35,15 +35,18 @@ class WebTest_Contact_EditContactTest extends CiviSeleniumTestCase {
     $this->webtestLogin();
 
     // create contact
+    $firstName = 'WebTest' . substr(sha1(rand()), 0, 7);
+    $lastName  = 'ContactEdit' . substr(sha1(rand()), 0, 7);
     $this->openCiviPage("contact/add", "reset=1&ct=Individual");
-    $this->type("first_name",'ftest');
-    $this->type("last_name",'ltest');
+    $this->type("first_name",$firstName);
+    $this->type("last_name",$lastName);
 
     //fill in phone  1
     $this->type("phone_1_phone", "111113333");
     $this->type("phone_1_phone_ext", "101");
 
     //fill in phone  2
+
     $this->click("//a[@id='addPhone']");
     $this->type("phone_2_phone", "23213333");
     $this->type("phone_2_phone_ext", "165");
@@ -65,9 +68,19 @@ class WebTest_Contact_EditContactTest extends CiviSeleniumTestCase {
     $this->click("_qf_Contact_upload_view-bottom");
     $this->waitForElementPresent('css=.crm-inline-edit-container.crm-edit-ready');
 
+    //assert
+    $this->assertTextPresent("111113333  ext. 101");
+    $this->assertTextPresent("23213333  ext. 165");
+    $this->assertTextPresent("2321877699  ext. 195");
+    $this->assertTextPresent("2321398766  ext. 198");
+
     //Edit COntact
     $cid = $this->urlArg('cid');
     $this->openCiviPage("contact/add", "reset=1&action=update&cid={$cid}");
+
+    //Edit in phone  1
+    $this->type("phone_1_phone", "12223333");
+    $this->type("phone_1_phone_ext", "100");
 
     //Edit in phone  2
     $this->type("phone_2_phone", "2321800000");
@@ -76,7 +89,7 @@ class WebTest_Contact_EditContactTest extends CiviSeleniumTestCase {
 
      //Edit in phone  3
     $this->type("phone_3_phone", "777777699");
-    $this->type("phone_3_phone_ext", "195");
+    $this->type("phone_3_phone_ext", "197");
     $this->select('phone_3_location_type_id', 'value=1');
 
     //Edit in phone  4
@@ -89,9 +102,9 @@ class WebTest_Contact_EditContactTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent('css=.crm-inline-edit-container.crm-edit-ready');
 
     //assert
-    $this->assertTextPresent("111113333  ext. 101");
+    $this->assertTextPresent("12223333  ext. 100");
     $this->assertTextPresent("2321800000  ext. 111");
-    $this->assertTextPresent("777777699  ext. 195");
+    $this->assertTextPresent("777777699  ext. 197");
     $this->assertTextPresent("2342322222  ext. 198");
 
   }
