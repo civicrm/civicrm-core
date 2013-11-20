@@ -89,11 +89,11 @@ class CRM_Dashlet_Page_Blog extends CRM_Core_Page {
    *
    * @return array|NULL array of blog items; or NULL if not available
    *
-   * @access private
+   * @access public
    */
-  private function _getFeed() {
+  public function _getFeed( $url = self::BLOG_URL) {
     $httpClient = new CRM_Utils_HttpClient(self::CHECK_TIMEOUT);
-    list ($status, $rawFeed) = $httpClient->get(self::BLOG_URL);
+    list ($status, $rawFeed) = $httpClient->get($url);
     if ($status !== CRM_Utils_HttpClient::STATUS_OK) {
       return NULL;
     }
