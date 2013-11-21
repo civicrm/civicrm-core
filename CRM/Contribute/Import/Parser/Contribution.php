@@ -263,7 +263,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
 
     //CRM-10994
     if (isset($params['total_amount']) && $params['total_amount'] == 0) {
-      $param['total_amount'] = '0.00';
+      $params['total_amount'] = '0.00';
     }
     foreach ($params as $key => $val) {
       if ($val) {
