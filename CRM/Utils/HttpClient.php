@@ -108,14 +108,17 @@ class CRM_Utils_HttpClient {
   /**
    * Send an HTTP GET for a remote resource
    *
-   * @param string $remoteFile URL of a .zip file
-   * @param string $localFile path at which to store the .zip file
+   * @param string $remoteFile URL of remote file
    * @return array array(0 => STATUS_OK|STATUS_DL_ERROR, 1 => string)
    */
   public function get($remoteFile) {
     // Download extension zip file ...
     if (!function_exists('curl_init')) {
-      //CRM_Core_Error::fatal('Cannot install this extension - curl is not installed!');
+      // CRM-13805
+      CRM_Core_Session::setStatus(
+        ts('As a result, actions like retrieving the CiviCRM news feed will fail. Talk to your server administrator or hosting company to rectify this.'),
+        ts('Curl is not installed')
+      );
       return array(self::STATUS_DL_ERROR, NULL);
     }
 
