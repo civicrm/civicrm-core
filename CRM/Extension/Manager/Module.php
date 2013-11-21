@@ -45,6 +45,10 @@ class CRM_Extension_Manager_Module extends CRM_Extension_Manager_Base {
     $this->callHook($info, 'enable');
   }
 
+  public function onPostPostInstall(CRM_Extension_Info $info) {
+    $this->callHook($info, 'postInstall');
+  }
+
   private function callHook(CRM_Extension_Info $info, $hookName) {
     try {
       $file = $this->mapper->keyToPath($info->key);
