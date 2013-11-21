@@ -201,6 +201,8 @@ class api_v3_UtilsTest extends CiviUnitTestCase {
       'Household' => 'CRM_Contact_BAO_Contact',
       // Note this one DOES NOT have a BAO so we expect to fall back on returning the DAO
       'mailing_group' => 'CRM_Mailing_DAO_MailingGroup',
+      // Make sure we get null back with nonexistant entities
+      'civicrm_this_does_not_exist' => NULL,
     );
     foreach ($params as $input => $expected) {
       $result = _civicrm_api3_get_BAO($input);
