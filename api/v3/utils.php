@@ -307,8 +307,9 @@ function _civicrm_api3_get_DAO($name) {
  */
 function _civicrm_api3_get_BAO($name) {
   $dao = _civicrm_api3_get_DAO($name);
-  $dao = str_replace("DAO", "BAO", $dao);
-  return $dao;
+  $bao = str_replace("DAO", "BAO", $dao);
+  $file = str_replace('_', '/', $dao) . '.php';
+  return file_exists($file) ? $bao : $dao;
 }
 
 /**
