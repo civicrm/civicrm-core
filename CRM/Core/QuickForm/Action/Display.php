@@ -159,7 +159,6 @@ class CRM_Core_QuickForm_Action_Display extends CRM_Core_QuickForm_Action {
     if ($controller->_QFResponseType == 'json') {
       $response = array(
         'content' => $html,
-        'title' => CRM_Utils_System::$title,
       );
       if (!empty($form['errors'])) {
         $response['status'] = 'form_error';
