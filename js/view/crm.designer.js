@@ -414,10 +414,7 @@
       CRM.loadForm(url, {
         resetButton: 'next_new',
         onSuccess: function(data, settings) {
-          paletteView.doRefresh('custom_' + data.customField.id);
-          if (data.buttonName != 'next_new') {
-            $(settings.target).dialog('close');
-          }
+          paletteView.doRefresh('custom_' + data.id);
         }
       });
       return false;

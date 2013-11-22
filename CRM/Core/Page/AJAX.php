@@ -172,12 +172,15 @@ class CRM_Core_Page_AJAX {
     if (is_string($response)) {
       $response = array('content' => $response);
     }
+    // Add session variables to response
     $session = CRM_Core_Session::singleton();
     $response += array(
       'status' => 'success',
       'userContext' => htmlspecialchars_decode($session->readUserContext()),
+      'title' => CRM_Utils_System::$title,
     );
-    // crmMessages will be automatically handled by our client-side ajax preprocessor @see Common.js
+    // crmMessages will be automatically handled by our ajax preprocessor
+    // @see js/Common.js
     if ($session->getStatus(FALSE)) {
       $response['crmMessages'] = $session->getStatus(TRUE);
     }

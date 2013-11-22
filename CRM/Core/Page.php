@@ -123,13 +123,17 @@ class CRM_Core_Page {
       self::$_session = CRM_Core_Session::singleton();
     }
 
-    if (isset($_REQUEST['snippet']) && $_REQUEST['snippet']) {
+    // FIXME - why are we messing with 'snippet'? Why not just pass it directly into $this->_print?
+    if (!empty($_REQUEST['snippet'])) {
       if ($_REQUEST['snippet'] == CRM_Core_Smarty::PRINT_PDF) {
         $this->_print = CRM_Core_Smarty::PRINT_PDF;
       }
       // FIXME - why does this number not match the constant?
-      else if ($_REQUEST['snippet'] == 5) {
+      elseif ($_REQUEST['snippet'] == 5) {
         $this->_print = CRM_Core_Smarty::PRINT_NOFORM;
+      }
+      elseif ($_REQUEST['snippet'] == CRM_Core_Smarty::PRINT_JSON) {
+        $this->_print = CRM_Core_Smarty::PRINT_JSON;
       }
       else {
         $this->_print = CRM_Core_Smarty::PRINT_SNIPPET;
@@ -164,7 +168,7 @@ class CRM_Core_Page {
 
     if ($this->_print) {
       if (in_array( $this->_print, array( CRM_Core_Smarty::PRINT_SNIPPET,
-        CRM_Core_Smarty::PRINT_PDF, CRM_Core_Smarty::PRINT_NOFORM ))) {
+        CRM_Core_Smarty::PRINT_PDF, CRM_Core_Smarty::PRINT_NOFORM, CRM_Core_Smarty::PRINT_JSON ))) {
         $content = self::$_template->fetch('CRM/common/snippet.tpl');
       }
       else {
@@ -183,6 +187,9 @@ class CRM_Core_Page {
         CRM_Utils_PDF_Utils::html2pdf($content, "{$this->_name}.pdf", FALSE,
           array('paper_size' => 'a3', 'orientation' => 'landscape')
         );
+      }
+      elseif ($this->_print == CRM_Core_Smarty::PRINT_JSON) {
+        CRM_Core_Page_AJAX::returnJsonResponse($content);
       }
       else {
         echo $content;
