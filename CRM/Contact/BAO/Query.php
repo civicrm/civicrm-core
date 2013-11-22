@@ -1526,6 +1526,7 @@ class CRM_Contact_BAO_Query {
       case 'group':
         $this->group($values);
         return;
+
       case 'group_type':
         // so we resolve this into a list of groups & proceed as if they had been
         // handed in
@@ -1537,8 +1538,8 @@ class CRM_Contact_BAO_Query {
         $this->_paramLookup['group'][0][2] = $values[2] = $this->getGroupsFromTypeCriteria($value);
         $this->group($values);
         return;
-      // case tag comes from find contacts
 
+      // case tag comes from find contacts
       case 'tag_search':
         $this->tagSearch($values);
         return;
@@ -2637,7 +2638,7 @@ class CRM_Contact_BAO_Query {
 
     if (!$skipGroup) {
       $gcTable = "`civicrm_group_contact-{$groupIds}`";
-      $this->_tables[$gcTable] = $this->_whereTables[$gcTable] = " LEFT JOIN civicrm_group_contact {$gcTable} ON contact_a.id = {$gcTable}.contact_id ";
+      $this->_tables[$gcTable] = $this->_whereTables[$gcTable] = " LEFT JOIN civicrm_group_contact {$gcTable} ON ( contact_a.id = {$gcTable}.contact_id AND {$gcTable}.group_id $op ( $groupIds ) )";
     }
 
     $qill = ts('Contacts %1', array(1 => $op));
