@@ -252,7 +252,6 @@ class CRM_Extension_Manager_ModuleTest extends CiviUnitTestCase {
     $basedir = $this->basedir;
     mkdir("$basedir/$key");
     file_put_contents("$basedir/$key/info.xml", "<extension key='$key' type='$type'><file>$file</file></extension>");
-    print_r(array('creating extension', strtr($template, array('_FILE_' => $file))));
     file_put_contents("$basedir/$key/$file.php", strtr($template, array('_FILE_' => $file)));
     $this->system->getCache()->flush();
     $this->system->getManager()->refresh();
