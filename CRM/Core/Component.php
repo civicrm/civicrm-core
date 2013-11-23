@@ -99,7 +99,7 @@ class CRM_Core_Component {
     return self::_info($force);
   }
   
-  static public function &flushEnabledComponents() {
+  static public function flushEnabledComponents() {
   	self::getEnabledComponents(TRUE);
   }
 
