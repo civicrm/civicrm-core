@@ -67,7 +67,7 @@ function _civicrm_api3_mailing_create_spec(&$params) {
 }
 
 /**
- * Handle a create event.
+ * Handle a delete event.
  *
  * @param array $params
  * @return array API Success Array
