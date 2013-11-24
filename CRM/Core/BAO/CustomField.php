@@ -125,7 +125,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
    *
    * @param array $params (reference) an assoc array of name/value pairs
    *
-   * @return object CRM_Core_DAO_CustomField object
+   * @return CRM_Core_DAO_CustomField object
    * @access public
    * @static
    */

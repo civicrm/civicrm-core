@@ -99,6 +99,13 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   static protected $_template;
 
   /**
+   * What to return to the client if in ajax mode (snippet=6)
+   *
+   * @var array
+   */
+  public $ajaxResponse = array();
+
+  /**
    * constants for attributes for various form elements
    * attempt to standardize on the number of variations that we
    * use of the below form elements
@@ -159,6 +166,8 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     if (!isset(self::$_template)) {
       self::$_template = CRM_Core_Smarty::singleton();
     }
+
+    $this->assign('snippet', (int) CRM_Utils_Array::value('snippet', $_REQUEST));
   }
 
   static function generateID() {
@@ -259,8 +268,17 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    */
   function mainProcess() {
     $this->postProcess();
-
     $this->postProcessHook();
+
+    // Respond with JSON if in AJAX context
+    if (!empty($_REQUEST['snippet']) && $_REQUEST['snippet'] == CRM_Core_Smarty::PRINT_JSON) {
+      $this->ajaxResponse['buttonName'] = str_replace('_qf_' . $this->getAttribute('id') . '_', '', $this->controller->getButtonName());
+      $this->ajaxResponse['action'] = $this->_action;
+      if (isset($this->_id) || isset($this->id)) {
+        $this->ajaxResponse['id'] = isset($this->id) ? $this->id : $this->_id;
+      }
+      CRM_Core_Page_AJAX::returnJsonResponse($this->ajaxResponse);
+    }
   }
 
   /**

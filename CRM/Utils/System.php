@@ -42,6 +42,11 @@ class CRM_Utils_System {
   static $_callbacks = NULL;
 
   /**
+   * @var string Page title
+   */
+  static $title = '';
+
+  /**
    * Compose a new url string from the current url string
    * Used by all the framework components, specifically,
    * pager, sort and qfc
@@ -293,6 +298,7 @@ class CRM_Utils_System {
    * @static
    */
   static function setTitle($title, $pageTitle = NULL) {
+    self::$title = $title;
     $config = CRM_Core_Config::singleton();
     return $config->userSystem->setTitle($title, $pageTitle);
   }

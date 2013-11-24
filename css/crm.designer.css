@@ -21,6 +21,10 @@
   margin: 0.5em 0;
 }
 
+.crm-designer-palette-search input {
+  max-width: 75%;
+}
+
 .crm-designer-toolbar .ui-resizable-w {
   border-left: 4px dotted #BFBFBF;
   cursor: ew-resize;
@@ -36,7 +40,7 @@
   height: 20em;
 }
 
-.crm-designer-palette-tree > ul > li > a {
+.crm-designer-palette-section > a {
   font-weight: bold;
 }
 
@@ -143,6 +147,14 @@
 .crm-designer-row .crm-designer-buttons a:hover,
 .crm-designer button:hover {
   box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.crm-designer .crm-designer-palette-add button {
+  font-size: .8em;
+}
+
+.crm-designer .crm-designer-palette-add span.ui-button-text {
+  padding: 0.4em;
 }
 
 .ui-sortable-helper > .crm-designer-row {

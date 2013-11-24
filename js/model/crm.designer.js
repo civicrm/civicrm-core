@@ -97,7 +97,7 @@
      */
     getFieldByName: function(entityName, fieldName) {
       return this.find(function(paletteFieldModel) {
-        return (paletteFieldModel.get('entityName') == entityName && paletteFieldModel.get('fieldName') == fieldName);
+        return ((!entityName || paletteFieldModel.get('entityName') == entityName) && paletteFieldModel.get('fieldName') == fieldName);
       });
     },
 
