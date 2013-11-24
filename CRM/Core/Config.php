@@ -167,7 +167,7 @@ class CRM_Core_Config extends CRM_Core_Config_Variables {
    * @param $loadFromDB boolean  whether to load from the database
    * @param $force      boolean  whether to force a reconstruction
    *
-   * @return object
+   * @return CRM_Core_Config
    * @static
    */
   static function &singleton($loadFromDB = TRUE, $force = FALSE) {

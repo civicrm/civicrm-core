@@ -39,8 +39,10 @@
     {else}
     <div class="crm-container-snippet" bgColor="white">
 
-    {* Check for Status message for the page (stored in session->getStatus). Status is cleared on retrieval. *}
-    {include file="CRM/common/status.tpl"}
+    {* Display Status messages unless we are outputting json. *}
+    {if $smarty.get.snippet neq 6}
+      {include file="CRM/common/status.tpl"}
+    {/if}
 
     <!-- .tpl file invoked: {$tplFile}. Call via form.tpl if we have a form in the page. -->
     {if !empty($isForm)}

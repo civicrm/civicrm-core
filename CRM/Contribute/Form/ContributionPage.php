@@ -131,6 +131,14 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
       }
       $this->set('values', $this->_values);
     }
+
+    // Preload libraries required by the "Profiles" tab
+    $schemas = array('IndividualModel', 'ContributionModel');
+    if (in_array('CiviMember', CRM_Core_Config::singleton()->enableComponents)) {
+      $schemas[] = 'MembershipModel';
+    }
+    CRM_UF_Page_ProfileEditor::registerProfileScripts();
+    CRM_UF_Page_ProfileEditor::registerSchemas($schemas);
   }
 
   /**
