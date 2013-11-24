@@ -81,14 +81,14 @@
                 opacity: 0.5,
                 background: "black"
               },
-
-            close: function (event, ui) {
-              cj('#profile-dialog').html('');
-            }
-          });
-          cj('.action-link').hide();
-          cj('#profile-dialog #crm-profile-block .edit-value label').css('display', 'inline');
-        }});
+              close: function (event, ui) {
+                cj('#profile-dialog').html('');
+              }
+            });
+            cj('.action-link').hide();
+            cj('#profile-dialog #crm-profile-block .edit-value label').css('display', 'inline');
+          }
+        });
       }
 
       var profileName = {/literal}"{$ufGroupName}"{literal};
