@@ -69,7 +69,9 @@
 {literal}
   <script type='text/javascript'>
     cj(function () {
-      function formDialog(dataURL, dialogTitle) {
+      // NOTE: Triggers two events, "profile-dialog:FOO:open" and "profile-dialog:FOO:close",
+      // where "FOO" is the internal name of a profile form
+      function formDialog(dialogName, dataURL, dialogTitle) {
         cj.ajax({
           url: dataURL,
           success: function (content) {
@@ -81,7 +83,17 @@
                 opacity: 0.5,
                 background: "black"
               },
+              open: function(event, ui) {
+                cj('body').trigger({
+                  type: "profile-dialog:" + dialogName + ":open",
+                  dialog: cj('#profile-dialog')
+                });
+              },
               close: function (event, ui) {
+                cj('body').trigger({
+                  type: "profile-dialog:" + dialogName + ":close",
+                  dialog: cj('#profile-dialog')
+                });
                 cj('#profile-dialog').html('');
               }
             });
@@ -102,7 +114,7 @@
       cj(".crm-profile-name-" + profileName + " .action-item").click(function () {
         dataURL = cj(this).attr('jshref');
         dialogTitle = cj(this).attr('title');
-        formDialog(dataURL, dialogTitle);
+        formDialog(profileName, dataURL, dialogTitle);
       });
     });
     </script>
