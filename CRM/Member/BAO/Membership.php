@@ -869,6 +869,9 @@ INNER JOIN  civicrm_membership_type type ON ( type.id = membership.membership_ty
           $form->addRule('selectMembership', ts('Please select one of the memberships.'), 'required');
         }
         else {
+          // CRM-13831
+          $form->addGroup($radio, 'selectMembership', NULL);
+
           $autoRenewOption = CRM_Price_BAO_PriceSet::checkAutoRenewForPriceSet($form->_priceSetId);
           $form->assign('autoRenewOption', $autoRenewOption);
         }
