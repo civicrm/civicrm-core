@@ -456,8 +456,13 @@ class CRM_Core_Invoke {
       }
     }
 
-    $page = new CRM_Profile_Page_Listings();
-    return $page->run();
+    if ($secondArg == 'view' || empty($secondArg)) {
+      $page = new CRM_Profile_Page_Listings();
+      return $page->run();
+    }
+
+    CRM_Utils_System::permissionDenied();
+    return;
   }
 
   /**
