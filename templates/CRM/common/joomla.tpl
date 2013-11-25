@@ -29,7 +29,8 @@
 
 <div id="crm-container" class="crm-container{if $urlIsPublic} crm-public{/if}" lang="{$config->lcMessages|truncate:2:"":true}" xml:lang="{$config->lcMessages|truncate:2:"":true}">
 
-{* Only include joomla.css in administrator (backend). Page layout style ids and classes conflict with typical front-end css and break the page layout. *}
+{* Joomla-only container to hold the civicrm menu *}
+<div id="crm-nav-menu-container"></div>
 {crmNavigationMenu is_default=1}
 
 {* include wysiwyg related files*}
