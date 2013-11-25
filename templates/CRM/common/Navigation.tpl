@@ -23,8 +23,8 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
-<div id="menu-container" style="display:none;">
-    <ul id="civicrm-menu">
+{capture assign=menuMarkup}
+  <ul id="civicrm-menu">
       {if call_user_func(array('CRM_Core_Permission','giveMeAllACLs'))}
         <li id="crm-qsearch" class="menumain crm-link-home">
             <form action="{crmURL p='civicrm/contact/search/advanced' h=0 }" name="search_block" id="id_search_block" method="post">
@@ -52,11 +52,11 @@
         </li>
       {/if}
       {$navigation}
-    </ul>
-</div>
-
+    </ul>{/capture}
 {literal}
 <script type="text/javascript">
+(function($) {
+  var menuMarkup = {/literal}{$menuMarkup|@json_encode}{literal};
 cj(function( ) {
   cj("#civicrm-menu >li").each(function(i){
     cj(this).attr("tabIndex",i+2);
@@ -120,7 +120,7 @@ cj(function( ) {
 });
 
 {/literal}{if $config->userFramework neq 'Joomla' and $config->userFrameworkFrontend ne 1}{literal}
-  cj('body').prepend( cj("#menu-container").html() );
+  cj('body').prepend(menuMarkup);
 
   //Track Scrolling
   cj(window).scroll( function () {
@@ -136,9 +136,10 @@ cj(function( ) {
   // below div is present in older version of joomla 2.5.x
   var elementExists = cj('div#toolbar-box div.m').length;
   if ( elementExists > 0 ) {
-    cj('div#toolbar-box div.m').html(cj("#menu-container").html());
+    cj('div#toolbar-box div.m').html(menuMarkup);
   }
   else {
+    // Fixme
     cj("#menu-container").show().css({'padding-bottom': '10px'});
   }
 
@@ -150,5 +151,6 @@ cj(function( ) {
   });
   {/literal}{/if}{literal}
   cj('#civicrm-menu').menu( {arrowSrc: CRM.config.resourceBase + 'packages/jquery/css/images/arrow.png'} );
+})(cj);
 </script>
 {/literal}
