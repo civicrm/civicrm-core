@@ -70,6 +70,8 @@ class CRM_Core_DAO extends DB_DataObject {
    */
   static $_factory = NULL;
 
+  static $_checkedSqlFunctionsExist = FALSE;
+
   /**
    * Class constructor
    *
@@ -1542,6 +1544,23 @@ SELECT contact_id
 
     // now create the set of new triggers
     self::createTriggers($info);
+  }
+
+  /**
+   * Because sql functions are sometimes lost, esp during db migration, we check here to avoid numerous support requests
+   * @see http://issues.civicrm.org/jira/browse/CRM-13822
+   * TODO: Alternative solutions might be
+   *  * Stop using functions and find another way to strip numeric characters from phones
+   *  * Give better error messages (currently a missing fn fatals with "unknown error")
+   */
+  static function checkSqlFunctionsExist() {
+    if (!self::$_checkedSqlFunctionsExist) {
+      self::$_checkedSqlFunctionsExist = TRUE;
+      $dao = CRM_Core_DAO::executeQuery("SHOW function status WHERE db = database() AND name = 'civicrm_strip_non_numeric'");
+      if (!$dao->fetch()) {
+        self::triggerRebuild();
+      }
+    }
   }
 
   /**
