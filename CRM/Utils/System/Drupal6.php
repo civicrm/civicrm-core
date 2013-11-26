@@ -339,7 +339,7 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
         return FALSE;
     }
     // If the path is within the drupal directory we can add in the normal way
-    if (CRM_Utils_System_Drupal::formatResourceUrl($url)) {
+    if ($this->formatResourceUrl($url)) {
       drupal_add_js($url, 'module', $scope);
       return TRUE;
     }
@@ -384,7 +384,7 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
    * @access public
    */
   public function addStyleUrl($url, $region) {
-    if ($region != 'html-header' || !CRM_Utils_System_Drupal::formatResourceUrl($url)) {
+    if ($region != 'html-header' || !$this->formatResourceUrl($url)) {
       return FALSE;
     }
     drupal_add_css($url);

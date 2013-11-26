@@ -194,7 +194,8 @@ function civicrm_api3_custom_value_get($params) {
         continue;
       }
       $fieldNumber = $idArray[1];
-      $info = array_pop(CRM_Core_BAO_CustomField::getNameFromID($fieldNumber));
+      $customFieldInfo = CRM_Core_BAO_CustomField::getNameFromID($fieldNumber);
+      $info = array_pop($customFieldInfo);
       // id is the index for returned results
 
       if (empty($idArray[2])) {

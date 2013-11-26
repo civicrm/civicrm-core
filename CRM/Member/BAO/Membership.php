@@ -2464,6 +2464,7 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
     $allTypes      = CRM_Member_PseudoConstant::membershipType();
     $contribStatus = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
 
+    // get only memberships with active membership types
     $query = "
 SELECT     civicrm_membership.id                    as membership_id,
            civicrm_membership.is_override           as is_override,
@@ -2479,6 +2480,8 @@ SELECT     civicrm_membership.id                    as membership_id,
            civicrm_membership.contribution_recur_id as recur_id
 FROM       civicrm_membership
 INNER JOIN civicrm_contact ON ( civicrm_membership.contact_id = civicrm_contact.id )
+INNER JOIN civicrm_membership_type ON
+  (civicrm_membership.membership_type_id = civicrm_membership_type.id AND civicrm_membership_type.is_active = 1)
 WHERE      civicrm_membership.is_test = 0";
 
     $params = array();
@@ -2493,20 +2496,6 @@ WHERE      civicrm_membership.is_test = 0";
     while ($dao->fetch()) {
       // echo ".";
       $processCount++;
-
-      /**
-       $count++;
-       echo $dao->contact_id . ', '. CRM_Utils_System::memory( ) . "<p>\n";
-
-       CRM_Core_Error::debug( 'fBegin', count( $GLOBALS['_DB_DATAOBJECT']['RESULTS'] ) );
-       if ( $count > 2 ) {
-       foreach ( $GLOBALS['_DB_DATAOBJECT']['RESULTS'] as $r ) {
-       CRM_Core_Error::debug( 'r', $r->query );
-       }
-       // CRM_Core_Error::debug( 'f', $GLOBALS['_DB_DATAOBJECT']['RESULTS'] );
-       exit( );
-       }
-       **/
 
       // Put common parameters into array for easy access
       $memberParams = array(

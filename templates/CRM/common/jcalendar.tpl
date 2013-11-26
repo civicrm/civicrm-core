@@ -103,6 +103,9 @@
           yearRange  += currentYear + parseInt( cj( alt_field ).attr('endOffset'  ) );
       {literal}
 
+      var startRangeYr = currentYear - parseInt( cj( alt_field ).attr('startOffset') );
+      var endRangeYr = currentYear + parseInt( cj( alt_field ).attr('endOffset'  ) );
+
       var lcMessage = {/literal}"{$config->lcMessages}"{literal};
       var localisation = lcMessage.split('_');
       var dateValue = cj(alt_field).val( );
@@ -114,7 +117,9 @@
                                     altField          : alt_field,
                                     altFormat         : altDateFormat,
                                     yearRange         : yearRange,
-                                    regional          : localisation[0]
+                                    regional          : localisation[0],
+                                    minDate           : new Date(startRangeYr, 1 - 1, 1),
+                                    maxDate           : new Date(endRangeYr, 12 - 1, 31)
                                 });
 
       // set default value to display field, setDefault param for datepicker
