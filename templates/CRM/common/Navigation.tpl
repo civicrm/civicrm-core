@@ -53,9 +53,7 @@
     {/if}
     {$navigation}
   </ul>
-{/strip}{/capture}
-{literal}
-<script type="text/javascript">
+{/strip}{/capture}{literal}
   (function($) {
     var menuMarkup = {/literal}{$menuMarkup|@json_encode}{literal};
     $(function() {
@@ -151,6 +149,4 @@
     });
     {/literal}{/if}{literal}
     $('#civicrm-menu').menu({arrowSrc: CRM.config.resourceBase + 'packages/jquery/css/images/arrow.png'});
-  })(cj);
-</script>
-{/literal}
+  })(cj);{/literal}

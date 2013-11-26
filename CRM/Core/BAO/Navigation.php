@@ -34,6 +34,9 @@
  */
 class CRM_Core_BAO_Navigation extends CRM_Core_DAO_Navigation {
 
+  // Number of characters in the menu js cache key
+  const CACHE_KEY_STRLEN = 8;
+
   /**
    * class constructor
    */
@@ -568,29 +571,9 @@ ORDER BY parent_id, weight";
   static function createNavigation($contactID) {
     $config = CRM_Core_Config::singleton();
 
-    // if on frontend, do not create navigation menu items, CRM-5349
-    if ($config->userFrameworkFrontend) {
-      return "<!-- $config->lcMessages -->";
-    }
+    $navigation = self::buildNavigation();
 
-    $navParams = array('contact_id' => $contactID);
-
-    $navigation = CRM_Core_BAO_Setting::getItem(
-      CRM_Core_BAO_Setting::PERSONAL_PREFERENCES_NAME,
-      'navigation',
-      NULL,
-      NULL,
-      $contactID
-    );
-
-    // FIXME: hack for CRM-5027: we need to prepend the navigation string with
-    // (HTML-commented-out) locale info so that we rebuild menu on locale changes
-    if (
-      !$navigation ||
-      substr($navigation, 0, 14) != "<!-- $config->lcMessages -->"
-    ) {
-      //retrieve navigation if it's not cached.
-      $navigation = self::buildNavigation();
+    if ($navigation) {
 
       //add additional navigation items
       $logoutURL = CRM_Utils_System::url('civicrm/logout', 'reset=1');
@@ -629,16 +612,32 @@ ORDER BY parent_id, weight";
         $prepandString = "<li class=\"menumain crm-link-home\"><a href=\"{$homeURL}\" title=\"" . $homeLabel . "\">" . $homeLabel . "</a></li>";
       }
 
-      // prepend the navigation with locale info for CRM-5027
-      $navigation = "<!-- $config->lcMessages -->" . $prepandString . $navigation . $appendSring;
+      $navigation = $prepandString . $navigation . $appendSring;
+    }
+    return $navigation;
+  }
 
+  /**
+   * Reset navigation for all contacts or a specified contact
+   *
+   * @param integer $contactID - reset only entries belonging to that contact ID
+   * @return string
+   */
+  static function resetNavigation($contactID = NULL) {
+    $newKey = CRM_Utils_String::createRandom(self::CACHE_KEY_STRLEN, CRM_Utils_String::ALPHANUMERIC);
+    if (!$contactID) {
+      $query = "UPDATE civicrm_setting SET value = '$newKey' WHERE name='navigation' AND contact_id IS NOT NULL";
+      CRM_Core_DAO::executeQuery($query);
+      CRM_Core_BAO_Cache::deleteGroup('navigation');
+    }
+    else {
       // before inserting check if contact id exists in db
-      // this is to handle wierd case when contact id is in session but not in db
+      // this is to handle weird case when contact id is in session but not in db
       $contact = new CRM_Contact_DAO_Contact();
       $contact->id = $contactID;
       if ($contact->find(TRUE)) {
         CRM_Core_BAO_Setting::setItem(
-          $navigation,
+          $newKey,
           CRM_Core_BAO_Setting::PERSONAL_PREFERENCES_NAME,
           'navigation',
           NULL,
@@ -647,30 +646,11 @@ ORDER BY parent_id, weight";
         );
       }
     }
-    return $navigation;
-  }
-
-  /**
-   * Reset navigation for all contacts
-   *
-   * @param integer $contactID - reset only entries belonging to that contact ID
-   */
-  static function resetNavigation($contactID = NULL) {
-    $params = array();
-    $query = "UPDATE civicrm_setting SET value = NULL WHERE name='navigation'";
-    if ($contactID) {
-      $query .= " AND contact_id = %1";
-      $params[1] = array($contactID, 'Integer');
-    }
-    else {
-      $query .= " AND contact_id IS NOT NULL";
-    }
-
-    CRM_Core_DAO::executeQuery($query, $params);
-    CRM_Core_BAO_Cache::deleteGroup('navigation');
-
     // also reset the dashlet cache in case permissions have changed etc
+    // FIXME: decouple this
     CRM_Core_BAO_Dashboard::resetDashletCache($contactID);
+
+    return $newKey;
   }
 
   /**
@@ -823,6 +803,20 @@ ORDER BY parent_id, weight";
       $dao->copyValues($newParams);
       $dao->save();
     }
+  }
+
+  static function getCacheKey($cid) {
+    $key = CRM_Core_BAO_Setting::getItem(
+      CRM_Core_BAO_Setting::PERSONAL_PREFERENCES_NAME,
+      'navigation',
+      NULL,
+      '',
+      $cid
+    );
+    if (strlen($key) !== self::CACHE_KEY_STRLEN) {
+      $key = self::resetNavigation($cid);
+    }
+    return $key;
   }
 }
 
