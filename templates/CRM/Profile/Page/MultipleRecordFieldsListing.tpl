@@ -84,15 +84,15 @@
                 background: "black"
               },
               open: function(event, ui) {
-                cj('body').trigger({
-                  type: "profile-dialog:" + dialogName + ":open",
-                  dialog: cj('#profile-dialog')
+                cj('#profile-dialog').trigger({
+                  type: "crmFormLoad",
+                  profileName: dialogName
                 });
               },
               close: function (event, ui) {
-                cj('body').trigger({
-                  type: "profile-dialog:" + dialogName + ":close",
-                  dialog: cj('#profile-dialog')
+                cj('#profile-dialog').trigger({
+                  type: "crmFormClose",
+                  profileName: dialogName
                 });
                 cj('#profile-dialog').html('');
               }
