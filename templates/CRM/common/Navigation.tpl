@@ -22,7 +22,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*}
+*}// http://civicrm.org/licensing
 {capture assign=menuMarkup}{strip}
   <ul id="civicrm-menu">
     {if call_user_func(array('CRM_Core_Permission','giveMeAllACLs'))}
@@ -53,100 +53,95 @@
     {/if}
     {$navigation}
   </ul>
-{/strip}{/capture}{literal}
-  (function($) {
-    var menuMarkup = {/literal}{$menuMarkup|@json_encode}{literal};
-    $(function() {
-      $("#civicrm-menu >li").each(function(i){
-        $(this).attr("tabIndex",i+2);
-      });
+{/strip}{/capture}// Generated {$timeGenerated}
+{literal}
+(function($) {
+  var menuMarkup = {/literal}{$menuMarkup|@json_encode};
+{if $config->userFramework neq 'Joomla'}{literal}
+  $('body').prepend(menuMarkup);
 
-      var contactUrl = {/literal}"{crmURL p='civicrm/ajax/rest' q='className=CRM_Contact_Page_AJAX&fnName=getContactList&json=1&context=navigation' h=0 }"{literal};
+  //Track Scrolling
+  $(window).scroll(function () {
+    var scroll = document.documentElement.scrollTop || document.body.scrollTop;
+    $('#civicrm-menu').css({top: "scroll", position: "fixed", top: "0px"});
+    $('div.sticky-header').css({top: "23px", position: "fixed"});
+  });
 
-      $('#sort_name_navigation').autocomplete(contactUrl, {
-        width: 200,
-        selectFirst: false,
-        minChars: 1,
-        matchContains: true,
-        delay: 400,
-        max: {/literal}{crmSetting name="search_autocomplete_count" group="Search Preferences"}{literal},
-        extraParams:{
-          fieldName:function () {
-            return  $('input[name=quickSearchField]:checked').val();
-          },
-          tableName:function () {
-            return  $('input[name=quickSearchField]:checked').attr("data-tablename");
-          }
-        }
-      }).result(function(event, data, formatted) {
-            document.location = CRM.url('civicrm/contact/view', {reset: 1, cid: data[1]});
-            return false;
-          });
-      $('#sort_name_navigation').keydown(function() {
-        $.Menu.closeAll();
-      });
-      $('.crm-quickSearchField').click(function() {
-        var label = $(this).text();
-        var value = $('input', this).val();
-        // These fields are not supported by advanced search
-        if (value === 'first_name' || value === 'last_name') {
-          value = 'sort_name';
-        }
-        $('#sort_name_navigation').attr({name: value, placeholder: label}).flushCache().focus();
-      });
-      // check if there is only one contact and redirect to view page
-      $('#id_search_block').on('submit', function() {
-        var contactId, sortValue = $('#sort_name_navigation').val();
-        if (sortValue && $('#sort_name_navigation').attr('name') == 'sort_name') {
-          {/literal}{*
-          // FIXME: async:false == bad,
-          // we should just check the autocomplete results instead of firing a new request
-          // when we fix this, the civicrm/ajax/contact server-side callback can be removed as well
-          // also that would fix the fact that this only works with sort_name search
-          // (and we can remove the above conditional)
-          *}{literal}
-          var dataUrl = {/literal}"{crmURL p='civicrm/ajax/contact' h=0 q='name='}"{literal} + sortValue;
-          contactId = $.ajax({
-            url: dataUrl,
-            async: false
-          }).responseText;
-        }
-        if (contactId && !isNaN(parseInt(contactId))) {
-          var url = {/literal}"{crmURL p='civicrm/contact/view' h=0 q='reset=1&cid='}"{literal} + contactId;
-          this.action = url;
-        }
-      });
-    });
+  if ($('#edit-shortcuts').length > 0) {
+    $('#civicrm-menu').css({'width': '97%'});
+  }
+{/literal}{else}{* Special menu hacks for Joomla *}{literal}
+  // below div is present in older version of joomla 2.5.x
+  var elementExists = $('div#toolbar-box div.m').length;
+  if (elementExists > 0) {
+    $('div#toolbar-box div.m').html(menuMarkup);
+  }
+  else {
+    $("#crm-nav-menu-container").html(menuMarkup).css({'padding-bottom': '10px'});
+  }
+{/literal}{/if}{literal}
+$('#civicrm-menu').ready(function() {
+  $('#root-menu-div .outerbox').css({'margin-top': '6px'});
+  $('#root-menu-div .menu-ul li').css({'padding-bottom': '2px', 'margin-top': '2px'});
+  $('img.menu-item-arrow').css({top: '4px'});
+  $("#civicrm-menu >li").each(function(i){
+    $(this).attr("tabIndex",i+2);
+  });
 
-    {/literal}{if $config->userFramework neq 'Joomla' and $config->userFrameworkFrontend ne 1}{literal}
-    $('body').prepend(menuMarkup);
-
-    //Track Scrolling
-    $(window).scroll(function () {
-      var scroll = document.documentElement.scrollTop || document.body.scrollTop;
-      $('#civicrm-menu').css({top: "scroll", position: "fixed", top: "0px"});
-      $('div.sticky-header').css({ 'top' : "23px", position: "fixed" });
-    });
-
-    if ($('#edit-shortcuts').length > 0) {
-      $('#civicrm-menu').css({ 'width': '97%' });
+  var contactUrl = {/literal}"{crmURL p='civicrm/ajax/rest' q='className=CRM_Contact_Page_AJAX&fnName=getContactList&json=1&context=navigation' h=0 }"{literal};
+  $('#sort_name_navigation').autocomplete(contactUrl, {
+    width: 200,
+    selectFirst: false,
+    minChars: 1,
+    matchContains: true,
+    delay: 400,
+    max: {/literal}{crmSetting name="search_autocomplete_count" group="Search Preferences"}{literal},
+    extraParams:{
+      fieldName:function () {
+        return  $('input[name=quickSearchField]:checked').val();
+      },
+      tableName:function () {
+        return  $('input[name=quickSearchField]:checked').attr("data-tablename");
+      }
     }
-    {/literal}{elseif $config->userFrameworkFrontend ne 1}{* Special menu hacks for Joomla *}{literal}
-    // below div is present in older version of joomla 2.5.x
-    var elementExists = $('div#toolbar-box div.m').length;
-    if (elementExists > 0) {
-      $('div#toolbar-box div.m').html(menuMarkup);
+  }).result(function(event, data, formatted) {
+        document.location = CRM.url('civicrm/contact/view', {reset: 1, cid: data[1]});
+        return false;
+      });
+  $('#sort_name_navigation').keydown(function() {
+    $.Menu.closeAll();
+  });
+  $('.crm-quickSearchField').click(function() {
+    var label = $(this).text();
+    var value = $('input', this).val();
+    // These fields are not supported by advanced search
+    if (value === 'first_name' || value === 'last_name') {
+      value = 'sort_name';
     }
-    else {
-      $("#crm-nav-menu-container").html(menuMarkup).css({'padding-bottom': '10px'});
+    $('#sort_name_navigation').attr({name: value, placeholder: label}).flushCache().focus();
+  });
+  // check if there is only one contact and redirect to view page
+  $('#id_search_block').on('submit', function() {
+    var contactId, sortValue = $('#sort_name_navigation').val();
+    if (sortValue && $('#sort_name_navigation').attr('name') == 'sort_name') {
+      {/literal}{*
+      // FIXME: async:false == bad,
+      // we should just check the autocomplete results instead of firing a new request
+      // when we fix this, the civicrm/ajax/contact server-side callback can be removed as well
+      // also that would fix the fact that this only works with sort_name search
+      // (and we can remove the above conditional)
+      *}{literal}
+      var dataUrl = {/literal}"{crmURL p='civicrm/ajax/contact' h=0 q='name='}"{literal} + sortValue;
+      contactId = $.ajax({
+        url: dataUrl,
+        async: false
+      }).responseText;
     }
-
-    $('#civicrm-menu').ready(function() {
-      $('#root-menu-div .outerbox').css({ 'margin-top': '6px'});
-      $('#root-menu-div .outerbox').first().css({ 'margin-top': '20px'});
-      $('#root-menu-div .menu-ul li').css({ 'padding-bottom' : '2px', 'margin-top' : '2px' });
-      $('img.menu-item-arrow').css({ 'top' : '4px' });
-    });
-    {/literal}{/if}{literal}
-    $('#civicrm-menu').menu({arrowSrc: CRM.config.resourceBase + 'packages/jquery/css/images/arrow.png'});
-  })(cj);{/literal}
+    if (contactId && !isNaN(parseInt(contactId))) {
+      var url = {/literal}"{crmURL p='civicrm/contact/view' h=0 q='reset=1&cid='}"{literal} + contactId;
+      this.action = url;
+    }
+  });
+});
+$('#civicrm-menu').menu({arrowSrc: CRM.config.resourceBase + 'packages/jquery/css/images/arrow.png'});
+})(cj);{/literal}

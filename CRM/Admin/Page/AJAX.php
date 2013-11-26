@@ -56,6 +56,7 @@ class CRM_Admin_Page_AJAX {
       // Render template as a javascript file
       $smarty = CRM_Core_Smarty::singleton();
       $navigation = CRM_Core_BAO_Navigation::createNavigation($contactID);
+      $smarty->assign('timeGenerated', date('d M Y H:i:s'));
       $smarty->assign('navigation', $navigation);
       print $smarty->fetch('CRM/common/Navigation.tpl');
     }
