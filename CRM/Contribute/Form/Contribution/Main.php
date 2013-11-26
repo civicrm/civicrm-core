@@ -735,6 +735,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
   static function formRule($fields, $files, $self) {
     $errors = array();
     $amount = self::computeAmount($fields, $self);
+    $lineItem = array();
 
     if ((CRM_Utils_Array::value('selectMembership', $fields) &&
         $fields['selectMembership'] != 'no_thanks'
