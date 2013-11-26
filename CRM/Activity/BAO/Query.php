@@ -139,7 +139,7 @@ class CRM_Activity_BAO_Query {
     }
 
     if (CRM_Utils_Array::value('source_contact', $query->_returnProperties)) {
-      $query->_select['source_contact'] = 'source_contact.display_name as source_contact';
+      $query->_select['source_contact'] = 'source_contact.sort_name as source_contact';
       $query->_element['source_contact'] = 1;
       $query->_tables['source_contact'] = $query->_whereTables['source_contact'] = 1;
     }
@@ -402,7 +402,12 @@ class CRM_Activity_BAO_Query {
         break;
 
       case 'source_contact':
-        $from = " $side JOIN civicrm_contact source_contact ON source_contact.id = civicrm_activity_contact.contact_id";
+        $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
+        $sourceID = CRM_Utils_Array::key('Activity Source', $activityContacts);
+        $from = "
+        LEFT JOIN civicrm_activity_contact ac
+                      ON ( ac.activity_id = civicrm_activity_contact.activity_id AND ac.record_type_id = {$sourceID})
+        INNER JOIN civicrm_contact source_contact ON (ac.contact_id = source_contact.id)";
         break;
     }
 
@@ -528,7 +533,7 @@ class CRM_Activity_BAO_Query {
         'activity_location' => 1,
         'activity_details' => 1,
         'activity_status' => 1,
-        'source_contact_id' => 1,
+        'source_contact' => 1,
         'source_record_id' => 1,
         'activity_is_test' => 1,
         'activity_campaign_id' => 1,
