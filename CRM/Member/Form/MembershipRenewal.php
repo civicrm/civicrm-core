@@ -217,9 +217,10 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
     $this->_memType = $defaults['membership_type_id'];
 
     // set renewal_date and receive_date to today in correct input format (setDateDefaults uses today if no value passed)
-    list($now) = CRM_Utils_Date::setDateDefaults();
+    list($now, $currentTime) = CRM_Utils_Date::setDateDefaults();
     $defaults['renewal_date'] = $now;
     $defaults['receive_date'] = $now;
+    $defaults['receive_date_time'] = $currentTime;
 
     if ($defaults['id']) {
       $defaults['record_contribution'] = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipPayment',
