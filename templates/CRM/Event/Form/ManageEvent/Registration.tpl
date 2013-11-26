@@ -62,7 +62,7 @@
          <tr class="crm-event-manage-registration-form-block-is_online_registration">
             <td class="label">{$form.is_online_registration.label}</td>
             <td>{$form.is_online_registration.html}
-            <span class="description">{ts}Enable or disable online registration for this event.{/ts}</span>
+            <span class="description">{ts}Online registration enabled?{/ts}</span>
             </td>
          </tr>
      </table>
