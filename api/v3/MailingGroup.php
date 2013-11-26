@@ -51,6 +51,7 @@ function civicrm_api3_mailing_group_event_unsubscribe($params) {
 
 /**
  * Handle a site-level unsubscribe event
+ * @deprecated
  *
  * @param array $params
  *
@@ -95,6 +96,12 @@ function civicrm_api3_mailing_group_getfields($params) {
   $d = new $dao();
   $fields = $fields + $d->fields();
   $d->free();
+
+  // CRM-13830 - prevent the api wrapper from helping out with pseudoconstants
+  // Since these fields don't belong to this entity it will fail
+  foreach ($fields as &$field) {
+    unset($field['pseudoconstant']);
+  }
 
   return civicrm_api3_create_success($fields);
 }
