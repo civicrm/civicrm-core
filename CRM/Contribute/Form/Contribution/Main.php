@@ -162,6 +162,27 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
         }
       }
     }
+
+    // CRM-13831: Translate the membership type ID stored in selectMembership to
+    // the price field option ID, stored in price_$id, as expected by all the
+    // validation code as well as CRM_Price_BAO_PriceSet::processAmount
+    if (isset($this->_priceSet) && is_array($this->_priceSet['fields'])) {
+      foreach ($this->_priceSet['fields'] as $id => $field) {
+        if ($field['name'] == 'membership_amount'
+          && !array_key_exists("price_{$id}", $this->_submitValues)
+          && array_key_exists('selectMembership', $this->_submitValues)
+        ) {
+          $result = civicrm_api3('PriceField', 'getsingle', array(
+            'price_set_id' => $this->_submitValues['priceSetId'],
+            'name' => $field['name'],
+            'api.PriceFieldValue.getsingle' => array(
+              'membership_type_id' => $this->_submitValues['selectMembership'],
+            ),
+          ));
+          $this->_submitValues["price_{$id}"] = $result['api.PriceFieldValue.getsingle']['id'];;
+        }
+      }
+    }
   }
 
   function setDefaultValues() {
