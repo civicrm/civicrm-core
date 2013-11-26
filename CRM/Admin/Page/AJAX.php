@@ -48,7 +48,6 @@ class CRM_Admin_Page_AJAX {
     if ($contactID) {
       // Set headers to encourage browsers to cache for a long time
       // If we want to refresh the menu we will send a different url
-      // @see smarty_function_crmNavigationMenu()
       $year = 60*60*24*364;
       header('Expires: '.gmdate('D, d M Y H:i:s \G\M\T', time() + $year));
       header('Content-Type:	application/javascript');
@@ -60,7 +59,7 @@ class CRM_Admin_Page_AJAX {
       $smarty->assign('navigation', $navigation);
       print $smarty->fetch('CRM/common/Navigation.tpl');
     }
-    exit();
+    CRM_Utils_System::civiExit();
   }
 
   /**
