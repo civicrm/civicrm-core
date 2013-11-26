@@ -1,6 +1,5 @@
 <?php
 
-//AGH - added filter on fee level in line item in civicrm_line_item table 
 /*
  +--------------------------------------------------------------------+
  | CiviCRM version 4.4                                                |
@@ -56,23 +55,22 @@ class CRM_Report_Form_Event_ParticipantListing extends CRM_Report_Form_Event {
       $this->activeCampaigns = $getCampaigns['campaigns'];
       asort($this->activeCampaigns);
     }
-      
-      function get_price_levels(){
-      $query = "SELECT DISTINCT 
-      cv.label, cv.id
-      FROM civicrm_price_field_value cv
-      LEFT JOIN civicrm_price_field cf ON cv.price_field_id = cf.id
-      LEFT JOIN civicrm_price_set_entity ce ON ce.price_set_id = cf.price_set_id
-      WHERE ce.entity_table = 'civicrm_event'
-      GROUP BY cv.label";
-      $dao = CRM_Core_DAO::executeQuery($query);
-        $elements = array();
-        while ($dao->fetch()) {
-           $elements[$dao->id] = "$dao->label\n";
-        }
-
-        return $elements;
-      } //searches database for priceset values
+    //searches database for priceset values
+    function get_price_levels(){
+    $query = "SELECT DISTINCT 
+    cv.label, cv.id
+    FROM civicrm_price_field_value cv
+    LEFT JOIN civicrm_price_field cf ON cv.price_field_id = cf.id
+    LEFT JOIN civicrm_price_set_entity ce ON ce.price_set_id = cf.price_set_id
+    WHERE ce.entity_table = 'civicrm_event'
+    GROUP BY cv.label";
+    $dao = CRM_Core_DAO::executeQuery($query);
+      $elements = array();
+      while ($dao->fetch()) {
+         $elements[$dao->id] = "$dao->label\n";
+      }
+    return $elements;
+    } 
 
     $this->_columns = array(
       'civicrm_contact' =>
@@ -353,17 +351,9 @@ class CRM_Report_Form_Event_ParticipantListing extends CRM_Report_Form_Event {
           ),
         ),
       ),
-//AGH custom to filter by priceset
+//filter by priceset
      'civicrm_line_item' => array(
         'dao' => 'CRM_Price_DAO_LineItem',
-#        'fields' => array(
-#          'fee_level_id' => array(
-#            'name' => 'id',
-#            'no_display' => TRUE,
-#            'required' => FALSE,
-#            'csv_display' => TRUE,
-#            'title' => ts('Contribution ID'),
-#          ),
       'grouping' => 'priceset-fields',
       'filters' => array(
         'price_field_value_id' => array(
@@ -425,9 +415,10 @@ class CRM_Report_Form_Event_ParticipantListing extends CRM_Report_Form_Event {
       $this->_columnHeaders['blankColumnBegin']['title'] = '_ _ _ _';
     }
     foreach ($this->_columns as $tableName => $table) {
-            if ($tableName == 'civicrm_line_item'){
-              $this->_lineitemField = TRUE;
-            }
+      //checks whether user selected filter by price level
+      if ($tableName == 'civicrm_line_item'){
+        $this->_lineitemField = TRUE;
+      }
       if (array_key_exists('fields', $table)) {
         foreach ($table['fields'] as $fieldName => $field) {
           if (CRM_Utils_Array::value('required', $field) ||
@@ -437,8 +428,6 @@ class CRM_Report_Form_Event_ParticipantListing extends CRM_Report_Form_Event {
             if ($tableName == 'civicrm_contribution') {
               $this->_contribField = TRUE;
             }
-
-
             $alias = "{$tableName}_{$fieldName}";
             $select[] = "{$field['dbAlias']} as $alias";
             $this->_columnHeaders["{$tableName}_{$fieldName}"]['type'] = CRM_Utils_Array::value('type', $field);
@@ -493,6 +482,7 @@ class CRM_Report_Form_Event_ParticipantListing extends CRM_Report_Form_Event {
                     ON (pp.contribution_id  = {$this->_aliases['civicrm_contribution']}.id)
       ";
     }
+    //left joins with civicrm_line_item if user has selected filter by fee level
     if ($this->_lineitemField){
       $this->_from .= "
             LEFT JOIN civicrm_line_item line_item_civireport
