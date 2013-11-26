@@ -229,6 +229,28 @@ class CRM_Extension_Manager {
     $this->statuses = NULL;
     $this->mapper->refresh();
     CRM_Core_Invoke::rebuildMenuAndCaches(TRUE);
+
+    foreach ($keys as $key) {
+      list ($info, $typeManager) = $this->_getInfoTypeHandler($key); // throws Exception
+      //print_r(array('post post?', $info, 'k' => $key, 'os'=> $origStatuses[$key]));
+
+      switch ($origStatuses[$key]) {
+        case self::STATUS_INSTALLED:
+          // ok, nothing to do
+          break;
+        case self::STATUS_DISABLED:
+          // re-enable it
+          break;
+        case self::STATUS_UNINSTALLED:
+          // install anew
+          $typeManager->onPostPostInstall($info);
+          break;
+        case self::STATUS_UNKNOWN:
+        default:
+          throw new CRM_Extension_Exception("Cannot install or enable extension: $key");
+      }
+    }
+
   }
 
   /**

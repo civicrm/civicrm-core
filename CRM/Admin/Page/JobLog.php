@@ -101,20 +101,25 @@ class CRM_Admin_Page_JobLog extends CRM_Core_Page_Basic {
     $sj = new CRM_Core_JobManager();
 
     $jobName = NULL;
-    foreach ($sj->jobs as $i => $job) {
-      if ($job->id == $jid) {
-        $jobName = $job->name;
-      }
+    if ($jid) {
+      $jobName =
+        CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Job', $jid);
     }
 
     $this->assign('jobName', $jobName);
 
     $dao = new CRM_Core_DAO_JobLog();
     $dao->orderBy('id desc');
-    if ($jobName) {
+
+    // limit to last 1000 records
+    $dao->limit(1000);
+
+    if ($jid) {
       $dao->job_id = $jid;
     }
     $dao->find();
+
+
     $rows = array();
     while ($dao->fetch()) {
       unset($row);

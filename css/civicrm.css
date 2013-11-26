@@ -2877,6 +2877,7 @@ div a.helpicon:focus {
 #crm-container .crm-tooltip table,
 #crm-container .crm-tooltip table tr td {
   border: none;
+  color: #FFF;
 }
 .crm-container .crm-tooltip .crm-summary-group {
   width: 700px;
@@ -2912,8 +2913,6 @@ div a.helpicon:focus {
 .crm-container .crm-summary-group .crm-section .content {
   margin-left: 41%;
 }
-
-
 
 /* Class for tokens and helpicon */
 .crm-container .helpIcon {

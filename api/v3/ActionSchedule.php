@@ -60,7 +60,23 @@ function civicrm_api3_action_schedule_get($params) {
  * {@getfields action_schedule_create}
  */
 function civicrm_api3_action_schedule_create($params) {
-  return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
+  $ids = array();
+  if (isset($params['id']) && !CRM_Utils_Rule::integer($params['id'])) {
+    return civicrm_api3_create_error('Invalid value for ID');
+  }
+  
+  if (!array_key_exists('name', $params) && !array_key_exists('id', $params)) {
+  	$params['name'] = CRM_Utils_String::munge($params['title']);
+  }  	
+  
+  $actionSchedule = new CRM_Core_BAO_ActionSchedule();
+  $actionSchedule = CRM_Core_BAO_ActionSchedule::add($params, $ids);
+	
+  $actSchedule = array();
+	
+  _civicrm_api3_object_to_array($actionSchedule, $actSchedule[$actionSchedule->id]);
+	
+  return civicrm_api3_create_success($actSchedule, $params, 'action_schedule', 'create', $actionSchedule);
 }
 
 /**

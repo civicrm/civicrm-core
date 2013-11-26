@@ -301,15 +301,12 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
       $actualStartDate = $startDate;
     }
     elseif (CRM_Utils_Array::value('period_type', $membershipTypeDetails) == 'fixed') {
-      //calculate start date
-
-      // today is always join date, in case of Online join date
-      // is equal to current system date
-      $toDay = explode('-', $joinDate);
-
-      // get year from join date
+      // calculate start date
+      // if !$startDate then use $joinDate
+      $toDay = explode('-', (empty($startDate) ? $joinDate : $startDate));
       $year = $toDay[0];
       $month = $toDay[1];
+      $day = $toDay[2];
 
       if ($membershipTypeDetails['duration_unit'] == 'year') {
 
@@ -319,7 +316,12 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
         );
         $startDay = substr($membershipTypeDetails['fixed_period_start_day'], -2);
 
-        $fixedStartDate = date('Y-m-d', mktime(0, 0, 0, $startMonth, $startDay, $year));
+        if (date('Y-m-d', mktime(0, 0, 0, $startMonth, $startDay, $year)) <= date('Y-m-d', mktime(0, 0, 0, $month, $day, $year))) {
+          $fixedStartDate = date('Y-m-d', mktime(0, 0, 0, $startMonth, $startDay, $year));
+        }
+        else {
+          $fixedStartDate = date('Y-m-d', mktime(0, 0, 0, $startMonth, $startDay, $year - 1));
+        }
 
         //get start rollover day
         $rolloverMonth = substr($membershipTypeDetails['fixed_period_rollover_day'], 0,
@@ -338,11 +340,6 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
 
         //store original fixed rollover date as per current year.
         $actualRolloverDate = $fixedRolloverDate;
-
-        //make sure membership should not start in future.
-        if ($joinDate < $actualStartDate) {
-          $actualStartDate = date('Y-m-d', mktime(0, 0, 0, $startMonth, $startDay, $year - 1));
-        }
 
         //get the fixed end date here.
         $dateParts = explode('-', $actualStartDate);

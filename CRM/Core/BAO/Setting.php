@@ -143,7 +143,7 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
     $domainID = NULL
   ) {
     if (self::isUpgradeFromPreFourOneAlpha1()) {
-      // civicrm_setting table is not going to be present. For now we'll just 
+      // civicrm_setting table is not going to be present. For now we'll just
       // return a dummy object
       $dao = new CRM_Core_DAO_Domain();
       $dao->id = -1; // so ->find() doesn't fetch any data later on
@@ -646,12 +646,19 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
       $cached = 0;
     }
 
-    $hookCacheString = CRM_Utils_Hook::alterSettingsMetaData($settingsMetadata, $domainID, $profile);
+    CRM_Utils_Hook::alterSettingsMetaData($settingsMetadata, $domainID, $profile);
     self::_filterSettingsSpecification($filters, $settingsMetadata);
-    if(!$cached || !empty($hookCacheString)){
-      // this is a bit 'heavy' if you are using hooks but this function is expected to only be called during setting administration
+
+    if (!$cached) {
+      // this is a bit 'heavy' if you are using hooks but this function
+      // is expected to only be called during setting administration
       // it should not be called by 'getvalue' or 'getitem
-      CRM_Core_BAO_Cache::setItem($settingsMetadata,'CiviCRM setting Specs', $cacheString . $hookCacheString, $componentID);
+      CRM_Core_BAO_Cache::setItem(
+        $settingsMetadata,
+        'CiviCRM setting Specs',
+        $cacheString,
+        $componentID
+      );
     }
     return $settingsMetadata;
 

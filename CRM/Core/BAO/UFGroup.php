@@ -1178,9 +1178,8 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
           }
           elseif ($fieldName == 'im') {
             $providerId = $detailName . '-provider_id';
-            $providerName = $imProviders[$details->$providerId];
-            if ($providerName) {
-              $values[$index] = $details->$detailName . " (" . $providerName . ")";
+            if (isset($imProviders[$details->$providerId])) {
+              $values[$index] = $details->$detailName . " (" . $imProviders[$details->$providerId] . ")";
             }
             else {
               $values[$index] = $details->$detailName;

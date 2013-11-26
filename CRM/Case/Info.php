@@ -164,8 +164,10 @@ class CRM_Case_Info extends CRM_Core_Component_Info {
    * @param array $metadata Specification of the setting (per *.settings.php)
    */
   public static function onToggleComponents($oldValue, $newValue, $metadata) {
-    if (in_array('CiviCase', $newValue) &&
-      !in_array('CiviCase', $oldValue)
+    if (
+      in_array('CiviCase', $newValue)
+      &&
+      (!$oldValue || !in_array('CiviCase', $oldValue))
     ) {
       $config = CRM_Core_Config::singleton();
       CRM_Admin_Form_Setting_Component::loadCaseSampleData($config->dsn, $config->sqlDir . 'case_sample.mysql');

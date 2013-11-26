@@ -461,9 +461,8 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
         }
         $varArray[$key] = $field;
       }
+      $sort->_vars = $varArray;
     }
-
-    $sort->_vars = $varArray;
 
     $additionalWhereClause = 'contact_a.is_deleted = 0';
     $returnQuery = NULL;
