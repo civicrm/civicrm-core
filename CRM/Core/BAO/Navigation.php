@@ -577,11 +577,12 @@ ORDER BY parent_id, weight";
 
       //add additional navigation items
       $logoutURL = CRM_Utils_System::url('civicrm/logout', 'reset=1');
-      $appendSring = "<li id=\"menu-logout\" class=\"menumain\"><a href=\"{$logoutURL}\">" . ts('Logout') . "</a></li>";
+      $appendString = "<li id=\"menu-logout\" class=\"menumain\"><a href=\"{$logoutURL}\">" . ts('Logout') . "</a></li>";
 
       // get home menu from db
       $homeParams = array('name' => 'Home');
       $homeNav = array();
+      $homeIcon = '<img src="' . $config->userFrameworkResourceURL . 'i/logo16px.png" />';
       self::retrieve($homeParams, $homeNav);
       if ($homeNav) {
         list($path, $q) = explode('&', $homeNav['url']);
@@ -589,12 +590,12 @@ ORDER BY parent_id, weight";
         $homeLabel = $homeNav['label'];
         // CRM-6804 (we need to special-case this as we don’t ts()-tag variables)
         if ($homeLabel == 'Home') {
-          $homeLabel = ts('Home');
+          $homeLabel = ts('CiviCRM Home');
         }
       }
       else {
         $homeURL = CRM_Utils_System::url('civicrm/dashboard', 'reset=1');
-        $homeLabel = ts('Home');
+        $homeLabel = ts('CiviCRM Home');
       }
 
       if (
@@ -603,16 +604,16 @@ ORDER BY parent_id, weight";
           module_exists('admin_menu') && user_access('access administration menu')
         )
       ) {
-        $prepandString = "<li class=\"menumain crm-link-home\">" . $homeLabel . "<ul id=\"civicrm-home\"><li><a href=\"{$homeURL}\">" . $homeLabel . "</a></li><li><a href=\"#\" onclick=\"cj.Menu.closeAll( );cj('#civicrm-menu').toggle( );\">" . ts('Drupal Menu') . "</a></li></ul></li>";
+        $prepandString = "<li class=\"menumain crm-link-home\">" . $homeIcon . "<ul id=\"civicrm-home\"><li><a href=\"{$homeURL}\">" . $homeLabel . "</a></li><li><a href=\"#\" onclick=\"cj.Menu.closeAll( );cj('#civicrm-menu').toggle( );\">" . ts('Drupal Menu') . "</a></li></ul></li>";
       }
       elseif ($config->userSystem->is_wordpress) {
-        $prepandString = "<li class=\"menumain crm-link-home\">" . $homeLabel . "<ul id=\"civicrm-home\"><li><a href=\"{$homeURL}\">" . $homeLabel . "</a></li><li><a href=\"#\" onclick=\"cj.Menu.closeAll( );cj('#civicrm-menu').toggle( );\">" . ts('WordPress Menu') . "</a></li></ul></li>";
+        $prepandString = "<li class=\"menumain crm-link-home\">" . $homeIcon . "<ul id=\"civicrm-home\"><li><a href=\"{$homeURL}\">" . $homeLabel . "</a></li><li><a href=\"#\" onclick=\"cj.Menu.closeAll( );cj('#civicrm-menu').toggle( );\">" . ts('WordPress Menu') . "</a></li></ul></li>";
       }
       else {
-        $prepandString = "<li class=\"menumain crm-link-home\"><a href=\"{$homeURL}\" title=\"" . $homeLabel . "\">" . $homeLabel . "</a></li>";
+        $prepandString = "<li class=\"menumain crm-link-home\"><a href=\"{$homeURL}\" title=\"" . $homeLabel . "\">" . $homeIcon . "</a></li>";
       }
 
-      $navigation = $prepandString . $navigation . $appendSring;
+      $navigation = $prepandString . $navigation . $appendString;
     }
     return $navigation;
   }
