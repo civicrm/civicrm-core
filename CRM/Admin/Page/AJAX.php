@@ -39,7 +39,32 @@
 class CRM_Admin_Page_AJAX {
 
   /**
-   * Function to build menu tree
+   * CRM-12337 Output navigation menu as executable javascript
+   * @see smarty_function_crmNavigationMenu
+   */
+  static function getNavigationMenu() {
+    $session = CRM_Core_Session::singleton();
+    $contactID = $session->get('userID');
+    if ($contactID) {
+      // Set headers to encourage browsers to cache for a long time
+      // If we want to refresh the menu we will send a different url
+      // @see smarty_function_crmNavigationMenu()
+      $year = 60*60*24*364;
+      header('Expires: '.gmdate('D, d M Y H:i:s \G\M\T', time() + $year));
+      header('Content-Type:	application/javascript');
+      header("Cache-Control: max-age=$year, public");
+
+      // Render template as a javascript file
+      $smarty = CRM_Core_Smarty::singleton();
+      $navigation = CRM_Core_BAO_Navigation::createNavigation($contactID);
+      $smarty->assign('navigation', $navigation);
+      print $smarty->fetch('CRM/common/Navigation.tpl');
+    }
+    exit();
+  }
+
+  /**
+   * Return menu tree as json data for editing
    */
   static function getNavigationList() {
     echo CRM_Core_BAO_Navigation::buildNavigation(TRUE, FALSE);
@@ -50,8 +75,7 @@ class CRM_Admin_Page_AJAX {
    * Function to process drag/move action for menu tree
    */
   static function menuTree() {
-    echo CRM_Core_BAO_Navigation::processNavigation($_GET);
-    CRM_Utils_System::civiExit();
+    CRM_Core_BAO_Navigation::processNavigation($_GET);
   }
 
   /**
