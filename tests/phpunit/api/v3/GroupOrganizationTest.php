@@ -156,6 +156,17 @@ class api_v3_GroupOrganizationTest extends CiviUnitTestCase {
   }
 
   /**
+   * CRM-13841 - Load Group Org before save
+   */
+  public function testGroupOrganizationCreateTwice() {
+    $params = array(
+        'organization_id' => $this->_orgID,
+        'group_id' => $this->_groupID,    );
+    $result = $this->callAPISuccess('group_organization', 'create', $params);
+    $result2 = $this->callAPISuccess('group_organization', 'create', $params);
+    $this->assertEquals($result['values'], $result2['values']);
+  }
+  /**
    * check with empty params array
    */
   public function testGroupOrganizationCreateWithEmptyParams() {
