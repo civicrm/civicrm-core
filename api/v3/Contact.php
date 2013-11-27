@@ -649,6 +649,10 @@ function civicrm_api3_contact_getquick($params) {
     }
   }
 
+  if (CRM_Utils_Array::value('contact_sub_type', $params)) {
+    $where .= " AND cc.contact_sub_type = \"{$params['contact_sub_type']}\" ";
+  }
+
   //set default for current_employer or return contact with particular id
   if (CRM_Utils_Array::value('id', $params)) {
     $where .= " AND cc.id = " . (int) $params['id'];
