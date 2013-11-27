@@ -58,7 +58,7 @@
             </li>
           {/if}
           {* Include Edit button if contact has 'edit contacts' permission OR user is viewing their own contact AND has 'edit my contact' permission. *}
-          {if $permission EQ 'edit' && call_user_func(array('CRM_Core_Permission','check'), 'edit my contact')}
+          {if $permission EQ 'edit' || call_user_func(array('CRM_Core_Permission','check'), 'edit my contact')}
             <li>
               {assign var='editParams' value=$urlParams|cat:"&action=update&cid=$contactId"}
               <a href="{crmURL p='civicrm/contact/add' q=$editParams}" class="edit button" title="{ts}Edit{/ts}">
