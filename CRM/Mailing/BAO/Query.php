@@ -397,7 +397,7 @@ class CRM_Mailing_BAO_Query {
     $form->add('checkbox', 'mailing_forward', ts('Forwards'));
 
     $form->assign('validCiviMailing', TRUE);
-    $form->addFormRule(array('CRM_Mailing_BAO_Query', 'formRule'), $form);
+    // $form->addFormRule(array('CRM_Mailing_BAO_Query', 'formRule'), $form);
   }
 
   /**
@@ -478,6 +478,7 @@ class CRM_Mailing_BAO_Query {
       $query->_qill[$grouping][] = $fieldTitle . ' - ' . $valueTitles[$value];
     }
 
+    $query->_tables['civicrm_mailing'] = $query->_whereTables['civicrm_mailing'] = 1;
     $query->_tables['civicrm_mailing_job'] = $query->_whereTables['civicrm_mailing_job'] = 1;
     $query->_tables['civicrm_mailing_event_queue'] = $query->_whereTables['civicrm_mailing_event_queue'] = 1;
     $query->_tables['civicrm_mailing_recipients'] = $query->_whereTables['civicrm_mailing_recipients'] = 1;
