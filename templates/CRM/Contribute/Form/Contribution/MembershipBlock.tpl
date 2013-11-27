@@ -23,7 +23,7 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
-{if !empty($useForMember) AND !$is_quick_config}
+{if !empty($useForMember) AND !$quickConfig}
 <div id="membership" class="crm-group membership-group">
 {if $context EQ "makeContribution"}
     <div id="priceset">
@@ -79,7 +79,7 @@
          </div>
         </fieldset>
     </div>
-{elseif $lineItem and $priceSetID AND !$is_quick_config}
+{elseif $lineItem and $priceSetID AND !$quickConfig}
   {assign var="totalAmount" value=$amount}
   <div class="header-dark">
   {ts}Membership Fee{/ts}
@@ -106,7 +106,7 @@ cj(function(){
 });
 </script>
 {/literal}
-{elseif $membershipBlock AND !$is_quick_config}
+{elseif $membershipBlock AND !$quickConfig}
 <div id="membership" class="crm-group membership-group">
   {if $context EQ "makeContribution"}
   <fieldset>
@@ -157,7 +157,7 @@ cj(function(){
 
 {/if}{* membership block end here *}
 
-{if $membershipBlock AND $is_quick_config}
+{if $membershipBlock AND $quickConfig}
 {if  $context neq "makeContribution" }
    <div class="header-dark">
         {if $renewal_mode }
