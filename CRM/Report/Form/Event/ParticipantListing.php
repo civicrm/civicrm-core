@@ -134,7 +134,7 @@ class CRM_Report_Form_Event_ParticipantListing extends CRM_Report_Form_Event {
           'birth_date' => array(
             'title' => 'Birth Date',
             'operatorType' => CRM_Report_Form::OP_DATE,
-            'type'         => CRM_Utils_Type::T_DATE
+            'type'         => CRM_Utils_Type::T_DATE,
           ),
         ),
       ),
@@ -552,6 +552,11 @@ GROUP BY  cv.label
     }
   }
 
+  function groupBy(){
+    parent::groupBy();
+    $this->_groupBy = "GROUP BY {$this->_aliases['civicrm_participant']}.id " . $this->_groupBy;
+
+  }
   function postProcess() {
 
     // get ready with post process params
