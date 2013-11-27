@@ -35,8 +35,29 @@
  *
  */
 interface CRM_Extension_Manager_Interface {
+  /**
+   * Perform type-specific installation logic (before marking the
+   * extension as installed or clearing the caches).
+   *
+   * @param CRM_Extension_Info $info
+   */
   public function onPreInstall(CRM_Extension_Info $info);
+
+  /**
+   * Perform type-specific installation logic (after marking the
+   * extension as installed but before clearing the caches).
+   *
+   * @param CRM_Extension_Info $info
+   */
   public function onPostInstall(CRM_Extension_Info $info);
+
+  /**
+   * Perform type-specific installation logic (after marking the
+   * extension as installed and clearing the caches).
+   *
+   * @param CRM_Extension_Info $info
+   */
+  public function onPostPostInstall(CRM_Extension_Info $info);
 
   public function onPreEnable(CRM_Extension_Info $info);
   public function onPostEnable(CRM_Extension_Info $info);
