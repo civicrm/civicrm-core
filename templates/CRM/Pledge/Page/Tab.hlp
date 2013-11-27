@@ -33,7 +33,7 @@
 <p>
 {ts}In order for reminders to be sent:{/ts}
 <ol>
-<li>{ts}Your site administrator must configure the provided script which updates pledge payment statuses and sends the reminders (UpdatePledgeRecord.php).{/ts}</li>
+<li>{ts}Your site administrator must configure the scheduled job (Administer > System Settings > Scheduled Jobs) which updates pledge payment statuses and sends the reminders.{/ts}</li>
 <li>{ts}Your site administrator must also configure a "cron job" (scheduled server task) to run this script.{/ts}</li>
 <li>{ts}This contributor must have a valid email address (and must not have the "Do Not Email" flag checked).{/ts}</li>
 </ol>
