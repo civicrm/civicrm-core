@@ -822,16 +822,16 @@ CRM.validate = CRM.validate || {
 
   $.widget('civicrm.crmSnippet', {
     options: {
-      url: document.location.href,
+      url: null,
       block: true,
       crmForm: null
     },
     _create: function() {
-      this.refresh();
       this.element.addClass('crm-ajax-container');
       if (!this.element.is('.crm-container *')) {
         this.element.addClass('crm-container');
       }
+      this.options.url ? this.refresh() : this.options.url = document.location.href;
     },
     _onFailure: function(data) {
       this.options.block && this.element.unblock();
@@ -889,18 +889,6 @@ CRM.validate = CRM.validate || {
         data.title && $(this).dialog('option', 'title', data.title);
       });
     }
-    // Automatically open form links as new popups
-    settings.formLinks && $(settings.target).on('click', settings.formLinks, function() {
-      CRM.loadForm(this.href, {
-        dialog: {
-          width: '60%',
-          height: parseInt($(window).height() * .8)
-        }
-      }).on('crmFormSuccess', function() {
-          $(settings.target).crmSnippet('refresh');
-        });
-      return false;
-    });
     return $(settings.target).crmSnippet(settings);
   };
 
