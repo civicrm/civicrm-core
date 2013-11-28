@@ -397,42 +397,6 @@ class CRM_Mailing_BAO_Query {
     $form->add('checkbox', 'mailing_forward', ts('Forwards'));
 
     $form->assign('validCiviMailing', TRUE);
-    $form->addFormRule(array('CRM_Mailing_BAO_Query', 'formRule'), $form);
-  }
-
-  /**
-   * global form rule
-   *
-   * @param array $fields  the input form values
-   * @param array $files   the uploaded files if any
-   * @param array $options additional user data
-   *
-   * @return true if no errors, else array of errors
-   * @access public
-   * @static
-   */
-  static function formRule($fields, $files, $self) {
-    $errors = array();
-    // if an event filter is specified, then a mailing selector must also be specified
-    if ((CRM_Utils_Array::value('mailing_delivery_status', $fields) ||
-        CRM_Utils_Array::value('mailing_open_status', $fields) ||
-        CRM_Utils_Array::value('mailing_click_status', $fields) ||
-        CRM_Utils_Array::value('mailing_reply_status', $fields) ||
-        CRM_Utils_Array::value('mailing_bounce_types', $fields)
-      ) &&
-      (!CRM_Utils_Array::value('mailing_id', $fields) &&
-        !CRM_Utils_Array::value('mailing_date_low', $fields) &&
-        !CRM_Utils_Array::value('mailing_date_high', $fields)
-      )
-    ) {
-      $errors['mailing_id'] = ts('Must specify mailing name or date');
-      // Keep search form opened in case of form rule.
-      if (is_a($self, 'CRM_Contact_Form_Search_Advanced') && !isset(CRM_Contact_BAO_Query::$_openedPanes['Mailings'])) {
-        CRM_Contact_BAO_Query::$_openedPanes['Mailings'] = TRUE;
-        $self->assign('openedPanes', CRM_Contact_BAO_Query::$_openedPanes);
-      }
-    }
-    return $errors;
   }
 
   static function addShowHide(&$showHide) {
@@ -440,9 +404,11 @@ class CRM_Mailing_BAO_Query {
     $showHide->addShow('MailingForm_show');
   }
 
-  static function searchAction(&$row, $id) {}
+  static function searchAction(&$row, $id) {
+  }
 
-  static function tableNames(&$tables) {}
+  static function tableNames(&$tables) {
+  }
 
   /**
    * Filter query results based on which contacts do (not) have a particular mailing event in their history.
@@ -478,6 +444,7 @@ class CRM_Mailing_BAO_Query {
       $query->_qill[$grouping][] = $fieldTitle . ' - ' . $valueTitles[$value];
     }
 
+    $query->_tables['civicrm_mailing'] = $query->_whereTables['civicrm_mailing'] = 1;
     $query->_tables['civicrm_mailing_job'] = $query->_whereTables['civicrm_mailing_job'] = 1;
     $query->_tables['civicrm_mailing_event_queue'] = $query->_whereTables['civicrm_mailing_event_queue'] = 1;
     $query->_tables['civicrm_mailing_recipients'] = $query->_whereTables['civicrm_mailing_recipients'] = 1;
