@@ -813,7 +813,7 @@ GROUP BY  currency
     return CRM_Core_DAO::singleValueQuery($query);
   }
 
-  public function updatePledgeStatus($params) {
+  public static function updatePledgeStatus($params) {
 
     $returnMessages = array();
 
