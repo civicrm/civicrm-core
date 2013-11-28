@@ -491,7 +491,7 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
         'toName' => $displayName,
         'toEmail' => $email,
       );
-      //CRM-13811
+      //CRM-13811 
       if ($pageID) {
         $templatesParams['cc'] = CRM_Utils_Array::value('cc_receipt', $value[$pageID]);
         $templatesParams['bcc'] = CRM_Utils_Array::value('bcc_receipt', $value[$pageID]);
