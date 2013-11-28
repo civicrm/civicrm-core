@@ -464,11 +464,11 @@ class CRM_Activity_Page_AJAX {
 
       $activityFilter = array(
         'activity_type_filter_id' =>
-          ( CRM_Utils_Array::value('activity_type_id', $params) ) ?
-            CRM_Utils_Type::escape(CRM_Utils_Array::value('activity_type_id', $params), 'Integer') : '',
+        CRM_Utils_Array::value('activity_type_id', $params) ?
+        CRM_Utils_Type::escape($params['activity_type_id'], 'Integer') : '',
         'activity_type_exclude_filter_id' =>
-          ( CRM_Utils_Array::value('activity_type_exclude_id', $params) ) ?
-            CRM_Utils_Type::escape(CRM_Utils_Array::value('activity_type_exclude_id', $params), 'Integer') : '',
+        CRM_Utils_Array::value('activity_type_exclude_id', $params) ?
+        CRM_Utils_Type::escape($params['activity_type_exclude_id'], 'Integer') : '',
       );
 
       CRM_Core_BAO_Setting::setItem(
