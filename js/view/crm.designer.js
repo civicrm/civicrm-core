@@ -411,11 +411,8 @@
         action: 'add',
         gid: sections[sectionKey].custom_group_id
       });
-      CRM.loadForm(url, {
-        resetButton: 'next_new',
-        onSuccess: function(data, settings) {
-          paletteView.doRefresh('custom_' + data.id);
-        }
+      CRM.loadForm(url).on('crmFormSuccess', function(e, data) {
+        paletteView.doRefresh('custom_' + data.id);
       });
       return false;
     },
