@@ -841,7 +841,7 @@ CRM.validate = CRM.validate || {
     _formatUrl: function(url) {
       // Add snippet argument to url
       if (url.search(/[&?]snippet=/) < 0) {
-        url += (url.indexOf('?') < 0 ? '?' : '&') + 'snippet=6';
+        url += (url.indexOf('?') < 0 ? '?' : '&') + 'snippet=json';
       }
       return url;
     },
