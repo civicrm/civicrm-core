@@ -192,7 +192,7 @@
       <type>int unsigned</type>
       <title>Group Modified By</title>
       <comment>FK to contact table.</comment>
-       <add>4.5</add>
+      <add>4.5</add>
   </field>
   <foreignKey>
        <name>modified_id</name>
