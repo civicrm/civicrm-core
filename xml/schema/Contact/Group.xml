@@ -187,4 +187,18 @@
        <add>4.3</add>
        <onDelete>SET NULL</onDelete>
   </foreignKey>
+  <field>
+      <name>modified_id</name>
+      <type>int unsigned</type>
+      <title>Group Modified By</title>
+      <comment>FK to contact table.</comment>
+       <add>4.5</add>
+  </field>
+  <foreignKey>
+       <name>modified_id</name>
+       <table>civicrm_contact</table>
+       <key>id</key>
+       <add>4.5</add>
+       <onDelete>SET NULL</onDelete>
+  </foreignKey>
 </table>
