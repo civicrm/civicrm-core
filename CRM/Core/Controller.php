@@ -240,8 +240,9 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
         // also used for the various tabs via TabHeader
         $this->_print = CRM_Core_Smarty::PRINT_NOFORM;
       }
-      elseif ($snippet == 6) {
-        $this->_print = CRM_Core_Smarty::PRINT_NOFORM;
+      // Respond with JSON if in AJAX context (also support legacy value '6')
+      elseif (in_array($snippet, array(CRM_Core_Smarty::PRINT_JSON, 6))) {
+        $this->_print = CRM_Core_Smarty::PRINT_JSON;
         $this->_QFResponseType = 'json';
       }
       else {
