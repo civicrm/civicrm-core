@@ -88,7 +88,6 @@ class CRM_Group_Form_Edit extends CRM_Core_Form {
    */
   function preProcess() {
     $this->_id = $this->get('id');
-
     if ($this->_id) {
       $breadCrumb = array(array('title' => ts('Manage Groups'),
           'url' => CRM_Utils_System::url('civicrm/group',
@@ -135,6 +134,11 @@ class CRM_Group_Form_Edit extends CRM_Core_Form {
         if (CRM_Utils_Array::value('created_id', $this->_groupValues))
           $groupValues['created_by'] =
             CRM_Core_DAO::getFieldValue("CRM_Contact_DAO_Contact", $this->_groupValues['created_id'] , 'sort_name', 'id');
+
+        if (CRM_Utils_Array::value('modified_id', $this->_groupValues)) {
+          $groupValues['modified_by'] =
+            CRM_Core_DAO::getFieldValue("CRM_Contact_DAO_Contact", $this->_groupValues['modified_id'] , 'sort_name', 'id');
+        }
 
         $this->assign_by_ref('group', $groupValues);
 
