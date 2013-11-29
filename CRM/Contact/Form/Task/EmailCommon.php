@@ -45,12 +45,6 @@ class CRM_Contact_Form_Task_EmailCommon {
   public $_allContactDetails = array();
   public $_toContactEmails = array();
 
-  public $_toContactDetails = array();
-  public $_allContactIds = array();
-  public $_toContactIds = array();
-  public $_ccContactIds = array();
-  public $_bccContactIds = array();
-
   static function preProcessFromAddress(&$form) {
     $form->_single = FALSE;
     $className = CRM_Utils_System::getClassName($form);
@@ -147,11 +141,12 @@ class CRM_Contact_Form_Task_EmailCommon {
     }
 
     $elements = array('to', 'cc', 'bcc');
+    $form->_allContactIds = $form->_toContactIds = $form->_contactIds;
     foreach ($elements as $element) {
       if ($$element->getValue()) {
         $allEmails = explode(',', $$element->getValue());
         if ($element == 'to') {
-          $form->_contactIds = array();
+          $form->_toContactIds = $form->_contactIds = array();
         }
 
         foreach ($allEmails as $value) {
@@ -181,12 +176,11 @@ class CRM_Contact_Form_Task_EmailCommon {
     //get the group of contacts as per selected by user in case of Find Activities
     if (!empty($form->_activityHolderIds)) {
       $contact = $form->get('contacts');
-      $form->_contactIds = $contact;
+      $form->_allContactIds = $form->_contactIds = $contact;
     }
 
-
     // check if we need to setdefaults and check for valid contact emails / communication preferences
-    if (is_array($form->_contactIds) && $setDefaults) {
+    if (is_array($form->_allContactIds) && $setDefaults) {
       $returnProperties = array(
         'sort_name' => 1,
         'email' => 1,
