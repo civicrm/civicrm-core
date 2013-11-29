@@ -373,8 +373,14 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
     }
 
     $session = CRM_Core_Session::singleton( );
-    if ($cid = $session->get('userID')) {
+    $cid = $session->get('userID');
+    // this action is add
+    if ($cid && empty($params['id'])) {
       $params['created_id'] = $cid;
+    }
+    // this action is update
+    if ($cid && !empty($params['id'])) {
+      $params['modified_id'] = $cid;
     }
 
     $group = new CRM_Contact_BAO_Group();

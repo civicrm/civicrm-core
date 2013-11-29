@@ -47,6 +47,11 @@
            <td>{if $group.created_by}{$group.created_by}{else}&nbsp;{/if}</td>
         </tr>
 
+        <tr class="crm-group-form-block-modified">
+           <td class="label">{ts}Modified By{/ts}</td>
+           <td>{if $group.modified_by}{$group.modified_by}{else}&nbsp;{/if}</td>
+        </tr>
+
         <tr class="crm-group-form-block-description">
       <td class="label">{$form.description.label}</td>
       <td>{$form.description.html}<br />
