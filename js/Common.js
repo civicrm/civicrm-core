@@ -856,7 +856,6 @@ CRM.validate = CRM.validate || {
         }
         data.url = url;
         that.element.html(data.content).trigger('crmLoad', data);
-        // This will also trigger crmFormLoad for forms
         that.options.crmForm && that.element.trigger('crmFormLoad', data);
       }).fail(function() {
           that._onFailure();
@@ -896,7 +895,6 @@ CRM.validate = CRM.validate || {
     var settings = {
       crmForm: {
         ajaxForm: {},
-        block: true,
         autoClose: true,
         validate: true,
         refreshAction: ['next_new', 'submit_savenext'],
@@ -923,19 +921,17 @@ CRM.validate = CRM.validate || {
         settings[key] = value;
       }
     });
-    settings.type = 'Form';
 
     var widget = CRM.loadPage(url, settings);
 
     widget.on('crmFormLoad', function(event, data) {
       var $el = $(this);
       var settings = $el.data('crmSnippet').options.crmForm;
-      var dialog = $el.data('dialog');
       settings.cancelButton && $(settings.cancelButton, this).click(function(event) {
         var returnVal = settings.onCancel.call($el, event);
         if (returnVal !== false) {
           $el.trigger('crmFormCancel', event);
-          dialog && settings.autoClose && $el.dialog('close');
+          $el.data('dialog') && settings.autoClose && $el.dialog('close');
         }
         return returnVal === false;
       });
@@ -951,13 +947,13 @@ CRM.validate = CRM.validate || {
         dataType: 'json',
         success: function(response) {
           if (response.status == 'success') {
-            settings.block && $el.unblock();
+            $el.crmSnippet('option', 'block') && $el.unblock();
             $el.trigger('crmFormSuccess', response);
             // Reset form for e.g. "save and new"
             if (settings.refreshAction && $.inArray(response.buttonName, settings.refreshAction) >= 0) {
               $el.crmSnippet('option', 'url', response.userContext).crmSnippet('refresh');
             }
-            else if (dialog && settings.autoClose) {
+            else if ($el.data('dialog') && settings.autoClose) {
               $el.dialog('close');
             }
           }
@@ -966,7 +962,7 @@ CRM.validate = CRM.validate || {
           }
         },
         beforeSubmit: function(submission) {
-          settings.block && $el.block();
+          $el.crmSnippet('option', 'block') && $el.block();
           $el.trigger('crmFormSubmit', submission);
         }
       }, settings.ajaxForm));
