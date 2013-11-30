@@ -69,7 +69,6 @@ class CRM_Custom_Page_Field extends CRM_Core_Page {
    */
   function &actionLinks() {
     if (!isset(self::$_actionLinks)) {
-      $deleteExtra = ts('Are you sure you want to delete this custom data field?');
       self::$_actionLinks = array(
         CRM_Core_Action::UPDATE => array(
           'name' => ts('Edit Field'),
@@ -112,7 +111,6 @@ class CRM_Custom_Page_Field extends CRM_Core_Page {
           'url' => 'civicrm/admin/custom/group/field',
           'qs' => 'action=delete&reset=1&gid=%%gid%%&id=%%id%%',
           'title' => ts('Delete Custom Field'),
-          'extra' => 'onclick = "return confirm(\'' . $deleteExtra . '\');"',
         ),
       );
     }
@@ -285,6 +283,7 @@ class CRM_Custom_Page_Field extends CRM_Core_Page {
       $this->preview($id);
     }
     else {
+      CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'templates/CRM/Custom/Page/Field.js');
       $this->browse();
     }
 
