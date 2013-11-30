@@ -153,8 +153,20 @@
   font-size: .8em;
 }
 
-.crm-designer .crm-designer-palette-add span.ui-button-text {
+.crm-designer .crm-designer-palette-tree span.ui-button-text,
+.crm-designer .crm-designer-edit-custom span.ui-button-text {
   padding: 0.4em;
+}
+
+.crm-designer .crm-designer-edit-custom {
+  position: absolute;
+  right: 5px;
+  top: 35px;
+  font-size: .8em;
+}
+
+button#crm-designer-add-custom-set {
+  margin-top: 10px;
 }
 
 .ui-sortable-helper > .crm-designer-row {
