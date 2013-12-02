@@ -167,7 +167,7 @@
                 </tr>
                 <tr class="crm-member-membershiprenew-form-block-payment_instrument_id">
                   <td class="label">{$form.payment_instrument_id.label}<span class='marker'>*</span></td>
-                  <td>{$form.payment_instrument_id.html}</td>
+                  <td>{$form.payment_instrument_id.html} {help id="payment_instrument_id" file="CRM/Contribute/Page/Tab.hlp"}</td>
                 </tr>
                 <tr id="checkNumber" class="crm-member-membershiprenew-form-block-check_number">
                   <td class="label">{$form.check_number.label}</td>

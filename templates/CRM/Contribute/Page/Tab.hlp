@@ -37,6 +37,18 @@
 {ts}Select the appropriate financial type for this transaction.{/ts}
 {/htxt}
 
+{htxt id="payment_instrument_id-title"}
+  {ts}Payment Instrument{/ts}
+{/htxt}
+{htxt id="payment_instrument_id"}
+  <p>
+    {ts}Choose the method by which this transaction was paid.{/ts}
+  </p><p>
+    {ts}Note: if the correct payment instrument is not listed here (e.g. for in-kind donations) ask your administrator to add a new option to this list.{/ts}
+  </p>
+
+{/htxt}
+
 {htxt id="id-trans_id-title"}
   {ts}Transaction ID{/ts}
 {/htxt}

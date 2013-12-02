@@ -298,8 +298,7 @@
           </tr>
           <tr class="crm-contribution-form-block-payment_instrument_id">
             <td class="label">{$form.payment_instrument_id.label}</td>
-            <td {$valueStyle}>{$form.payment_instrument_id.html}<br />
-              <span class="description">{ts}Leave blank for non-monetary contributions.{/ts}</span>
+            <td {$valueStyle}>{$form.payment_instrument_id.html} {help id="payment_instrument_id"}</td>
             </td>
           </tr>
           {if $showCheckNumber || !$isOnline}
