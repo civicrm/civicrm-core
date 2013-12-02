@@ -105,6 +105,13 @@ class CRM_Core_Page {
   static protected $_session;
 
   /**
+   * What to return to the client if in ajax mode (snippet=json)
+   *
+   * @var array
+   */
+  public $ajaxResponse = array();
+
+  /**
    * class constructor
    *
    * @param string $title title of the page
@@ -132,7 +139,8 @@ class CRM_Core_Page {
       elseif ($_REQUEST['snippet'] == 5) {
         $this->_print = CRM_Core_Smarty::PRINT_NOFORM;
       }
-      elseif ($_REQUEST['snippet'] == CRM_Core_Smarty::PRINT_JSON) {
+      // Support 'json' as well as legacy value '6'
+      elseif (in_array($_REQUEST['snippet'], array(CRM_Core_Smarty::PRINT_JSON, 6))) {
         $this->_print = CRM_Core_Smarty::PRINT_JSON;
       }
       else {
@@ -189,7 +197,8 @@ class CRM_Core_Page {
         );
       }
       elseif ($this->_print == CRM_Core_Smarty::PRINT_JSON) {
-        CRM_Core_Page_AJAX::returnJsonResponse($content);
+        $this->ajaxResponse['content'] = $content;
+        CRM_Core_Page_AJAX::returnJsonResponse($this->ajaxResponse);
       }
       else {
         echo $content;
