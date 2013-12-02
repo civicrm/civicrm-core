@@ -630,19 +630,39 @@
           }
         });
         if (this.model.get('field_name').split('_')[0] == 'custom') {
-          this.$('.crm-designer-field-summary > div').append('<button class="crm-designer-edit-custom">' + ts('Edit Custom Field') + '</button>');
-          this.$('button.crm-designer-edit-custom').button();
+          this.$('.crm-designer-field-summary > div').append('<button class="crm-designer-edit-custom">&raquo; ' + ts('Edit Custom Field') + '</button>');
+          this.$('button.crm-designer-edit-custom').button().attr('title', ts('Edit global settings for this custom field.'));
         }
       }
     },
     doEditCustomField: function() {
-      CRM.loadForm(CRM.url('civicrm/admin/custom/group/field/update', {
+      var url = CRM.url('civicrm/admin/custom/group/field/update', {
         action: 'update',
         reset: 1,
         id: this.model.get('field_name').split('_')[1]
-      })).on('crmFormLoad', function() {
+      });
+      var form1 = CRM.loadForm(url, {openInline: '.crm-custom-field-form-block-data_type a'})
+        .on('crmFormLoad', function() {
           $(this).prepend('<div class="messages status"><div class="icon inform-icon"></div>' + ts('Note: This will modify the field system-wide, not just in this profile form.') + '</div>');
-        });
+          var $link = $('.action-link a', this);
+          if ($link.length) {
+            $link.detach();
+            var buttons = {};
+            buttons[$link.text()] = function() {
+              var form2 = CRM.loadForm($link.attr('href'), {
+                cancelButton: '.cancel.form-submit, #done',
+                openInline: 'a.action-item:not(".enable-action, .disable-action")',
+                dialog: {
+                  width: '60%',
+                  height: parseInt($(window).height() * .8)
+                }
+              }).on('crmLoad', function() {
+                  $('#done', this).removeAttr('onclick');
+                });
+            }
+            $(this).dialog('option', 'buttons', buttons);
+          }
+        })
       return false;
     },
     onChangeIsDuplicate: function(model, value, options) {

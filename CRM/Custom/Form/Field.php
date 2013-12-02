@@ -276,6 +276,7 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
     if ($this->_gid) {
       $this->_title = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $this->_gid, 'title');
       CRM_Utils_System::setTitle($this->_title . ' - ' . ($this->_id ? ts('Edit Field') : ts('Add Field')));
+      $this->assign('gid', $this->_gid);
     }
 
     // lets trim all the whitespace
