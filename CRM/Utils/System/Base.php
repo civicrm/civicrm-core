@@ -175,11 +175,41 @@ abstract class CRM_Utils_System_Base {
     }
   }
 
+
   /**
    * Get timezone from CMS
    * @return boolean|string
    */
+  /**
+   * Get timezone from Drupal
+   * @return boolean|string
+   */
   function getTimeZoneOffset(){
+    $timezone = $this->getTimeZoneString();
+    if($timezone){
+      $tzObj = new DateTimeZone($timezone);
+      $dateTime = new DateTime("now", $tzObj);
+      $tz = $tzObj->getOffset($dateTime);
+
+      if(empty($tz)){
+        return false;
+      }
+
+      $timeZoneOffset = sprintf("%02d:%02d", $tz / 3600, ($tz/60)%60 );
+
+      if($timeZoneOffset > 0){
+        $timeZoneOffset = '+' . $timeZoneOffset;
+      }
+      return $timeZoneOffset;
+    }
+  }
+
+  /**
+   * Over-ridable function to get timezone as a string eg.
+   * @return string Timezone e.g. 'America/Los_Angeles'
+   */
+  function getTimeZoneString() {
+    return NULL;
   }
 }
 
