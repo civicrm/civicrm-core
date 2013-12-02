@@ -1207,7 +1207,7 @@ class Installer extends InstallRequirements {
         $wpPermissionsURL = "wp-admin/admin.php?page=CiviCRM&q=civicrm/admin/access/wp-permissions&reset=1";
 
         $output .= "
-           <li>WordPress user permissions have been automatically set - giving Aanonymous and Subscribers access to public CiviCRM forms and features. We recommend that you <a target='_blank' href={$wpPermissionsURL}>review these permissions</a> to ensure that they are appropriate for your requirements (<a target='_blank' href='http://wiki.civicrm.org/confluence/display/CRMDOC/Default+Permissions+and+Roles'>learn more...</a>)</li>
+           <li>WordPress user permissions have been automatically set - giving Anonymous and Subscribers access to public CiviCRM forms and features. We recommend that you <a target='_blank' href={$wpPermissionsURL}>review these permissions</a> to ensure that they are appropriate for your requirements (<a target='_blank' href='http://wiki.civicrm.org/confluence/display/CRMDOC/Default+Permissions+and+Roles'>learn more...</a>)</li>
            <li>Use the <a target='_blank' href=\"$cmsURL\">Configuration Checklist</a> to review and configure settings for your new site</li>
           {$commonOutputMessage}
 ";
