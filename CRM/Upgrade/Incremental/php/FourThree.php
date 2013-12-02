@@ -477,14 +477,16 @@ AND    financial_account_type_id = {$accountType}
 ";
     $financialAccountId = CRM_Core_DAO::singleValueQuery($query);
 
-    $accountRelationsips = CRM_Core_PseudoConstant::get('CRM_Financial_DAO_EntityFinancialAccount', 'account_relationship');
+    $accountRelationsips = CRM_Core_PseudoConstant::get('CRM_Financial_DAO_EntityFinancialAccount',
+      'account_relationship', CRM_Core_DAO::$_nullArray, 'validate');
 
     $accountsReceivableAccount = array_search('Accounts Receivable Account is', $accountRelationsips);
     $incomeAccountIs = array_search('Income Account is', $accountRelationsips);
     $assetAccountIs = array_search('Asset Account is', $accountRelationsips);
     $expenseAccountIs = array_search('Expense Account is', $accountRelationsips);
 
-    $financialItemStatus = CRM_Core_PseudoConstant::get('CRM_Financial_DAO_FinancialItem', 'status_id');
+    $financialItemStatus = CRM_Core_PseudoConstant::get('CRM_Financial_DAO_FinancialItem', 'status_id',
+      CRM_Core_DAO::$_nullArray, 'validate');
     $unpaidStatus = array_search('Unpaid', $financialItemStatus);
     $paidStatus = array_search('Paid', $financialItemStatus);
 
