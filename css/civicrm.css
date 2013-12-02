@@ -1708,6 +1708,25 @@ editor specific classes
   border-left: none;
   /* last action item should not have right hand border */}
 
+
+/* theming for panel and context menus */
+.crm-container td ul.panel li {
+  background-color: #2F2F2E;
+}
+
+.crm-container .panel li a {
+  color: #DFDFDF;
+}
+
+.crm-container .panel li a:hover,
+.crm-container .crm-participant-list-inner li a:hover,
+.crm-container .crm-event-links-list-inner li a:hover,
+.crm-container .crm-contribpage-links-list-inner li a:hover {
+  color: #3e3e3e;
+  background-color: #F5F6F1;
+  text-decoration: none;
+}
+
 .crm-container .panel {
   display: none;
   z-index: 9999;
@@ -3370,24 +3389,6 @@ div.m ul#civicrm-menu,
 #civicrm-menu .ac_loading,
 .crm-container .ac_loading {
   background: white url('../i/loading.gif') no-repeat right center;
-}
-
-/* theming for panel and context menus */
-#crm-container td ul.panel li {
-  background-color: #2F2F2E;
-}
-
-#crm-container .panel li a {
-  color: #DFDFDF;
-}
-
-#crm-container .panel li a:hover,
-#crm-container .crm-participant-list-inner li a:hover,
-#crm-container .crm-event-links-list-inner li a:hover,
-#crm-container .crm-contribpage-links-list-inner li a:hover {
-  color: #3e3e3e;
-  background-color: #F5F6F1;
-  text-decoration: none;
 }
 
 /* Special styling for specific form buttons */

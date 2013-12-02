@@ -80,16 +80,17 @@
         {include file="CRM/common/localNav.tpl"}
     {/if}
 
-    {include file="CRM/common/status.tpl"}
-
-    <!-- .tpl file invoked: {$tplFile}. Call via form.tpl if we have a form in the page. -->
-    {crmRegion name='page-body'}
-    {if $isForm}
-        {include file="CRM/Form/$formTpl.tpl"}
-    {else}
-        {include file=$tplFile}
-    {/if}
-    {/crmRegion}
+    <div id="crm-main-content-wrapper">
+      {include file="CRM/common/status.tpl"}
+      {crmRegion name='page-body'}
+        <!-- .tpl file invoked: {$tplFile}. Call via form.tpl if we have a form in the page. -->
+        {if isset($isForm) and $isForm}
+          {include file="CRM/Form/$formTpl.tpl"}
+        {else}
+          {include file=$tplFile}
+        {/if}
+      {/crmRegion}
+    </div>
 
     {crmRegion name='page-footer'}
     {if ! $urlIsPublic}

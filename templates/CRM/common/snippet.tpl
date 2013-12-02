@@ -40,7 +40,7 @@
     <div class="crm-container-snippet" bgColor="white">
 
     {* Display Status messages unless we are outputting json. *}
-    {if $smarty.get.snippet neq 6}
+    {if $smarty.get.snippet neq 'json'}
       {include file="CRM/common/status.tpl"}
     {/if}
 

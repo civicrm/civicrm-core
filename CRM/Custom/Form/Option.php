@@ -162,6 +162,8 @@ class CRM_Custom_Form_Option extends CRM_Core_Form {
    */
   public function buildQuickForm() {
     if ($this->_action == CRM_Core_Action::DELETE) {
+      $option = civicrm_api3('option_value', 'getsingle', array('id' => $this->_id));
+      $this->assign('label', $option['label']);
       $this->addButtons(array(
           array(
             'type' => 'next',
@@ -403,10 +405,11 @@ SELECT count(*)
     $params = $this->controller->exportValues('Option');
 
     if ($this->_action == CRM_Core_Action::DELETE) {
+      $option = civicrm_api3('option_value', 'getsingle', array('id' => $this->_id));
       $fieldValues = array('option_group_id' => $this->_optionGroupID);
-      $wt = CRM_Utils_Weight::delWeight('CRM_Core_DAO_OptionValue', $this->_id, $fieldValues);
+      CRM_Utils_Weight::delWeight('CRM_Core_DAO_OptionValue', $this->_id, $fieldValues);
       CRM_Core_BAO_CustomOption::del($this->_id);
-      CRM_Core_Session::setStatus(ts('Your multiple choice option has been deleted'), ts('Deleted'), 'success');
+      CRM_Core_Session::setStatus(ts('Option "%1" has been deleted.', array(1 => $option['label'])), ts('Deleted'), 'success');
       return;
     }
 
