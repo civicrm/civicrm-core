@@ -2236,7 +2236,7 @@ AND cl.modified_id  = c.id
       $activityContactOther = new CRM_Activity_DAO_ActivityContact();
       $activityContactOther->activity_id = $activityContact->activity_id;
 
-      //delete activity only if no other contacts connected
+      // delete activity only if no other contacts connected
       if ( ! $activityContactOther->find(TRUE) ) {
         $activityParams = array('id' => $activityContact->activity_id);
         $result = self::deleteActivity($activityParams);
