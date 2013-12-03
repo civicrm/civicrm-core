@@ -644,7 +644,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->assertAPISuccess($result);
     $contributionId = $result['id'];
     $expectedResult = contribution_create_expectedresult();
-    $this->checkArrayEquals($result, $expectedResult);
+    $this->checkArrayEquals($expectedResult, $result);
     $this->contributionDelete($contributionId);
   }
 
