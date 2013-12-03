@@ -2222,18 +2222,27 @@ AND cl.modified_id  = c.id
 
     $transaction = new CRM_Core_Transaction();
 
-    // delete activity if there is no record in
-    // civicrm_activity_contact
-    // pointing to any other contact record.
+    // delete activity if there is no record in civicrm_activity_contact pointing to any other contact record
     $activityContact = new CRM_Activity_DAO_ActivityContact();
     $activityContact->contact_id = $contactId;
     $activityContact->record_type_id = $sourceID;
     $activityContact->find();
 
     while ($activityContact->fetch()) {
-      // finally delete activity.
-      $activityParams = array('id' => $activityContact->activity_id);
-      $result = self::deleteActivity($activityParams);
+      //delete activity_contact record for the deleted contact
+      $activityContact->delete();
+
+      $activityContactOther = new CRM_Activity_DAO_ActivityContact();
+      $activityContactOther->activity_id = $activityContact->activity_id;
+      $activityContactOther->find();
+
+      //delete activity only if no other contacts connected
+      if ( !$activityContactOther->N ) {
+        $activityParams = array('id' => $activityContact->activity_id);
+        $result = self::deleteActivity($activityParams);
+      }
+
+      $activityContactOther->free();
     }
 
     $activityContact->free();
@@ -2348,7 +2357,10 @@ INNER JOIN  civicrm_option_group grp ON ( grp.id = val.option_group_id AND grp.n
     //check for source contact.
     if (!$componentId || $allow) {
       $sourceContactId = self::getActivityContact($activity->id, $sourceID);
-      $allow = CRM_Contact_BAO_Contact_Permission::allow($sourceContactId, $permission);
+      //account for possibility of activity not having a source contact (as it may have been deleted)
+      if ( $sourceContactId ) {
+        $allow = CRM_Contact_BAO_Contact_Permission::allow($sourceContactId, $permission);
+      }
     }
 
     //check for target and assignee contacts.
