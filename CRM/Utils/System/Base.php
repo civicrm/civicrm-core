@@ -29,7 +29,12 @@ abstract class CRM_Utils_System_Base {
 
     // TODO: Split up; this was copied verbatim from CiviCRM 4.0's multi-UF theming function
     // but the parts should be copied into cleaner subclass implementations
-    if (function_exists('theme') && !$print) {
+    $config = CRM_Core_Config::singleton();
+    if (
+      $config->userSystem->is_drupal &&
+      function_exists('theme') &&
+      !$print
+    ) {
       if ($maintenance) {
         drupal_set_breadcrumb('');
         drupal_maintenance_theme();
@@ -44,7 +49,8 @@ abstract class CRM_Utils_System_Base {
     $out = $content;
 
     $config = &CRM_Core_Config::singleton();
-    if (!$print &&
+    if (
+      !$print &&
       $config->userFramework == 'WordPress'
     ) {
       if (is_admin()) {
