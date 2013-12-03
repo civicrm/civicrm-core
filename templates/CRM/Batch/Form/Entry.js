@@ -17,6 +17,8 @@ cj(function () {
     var totalAmount = cj('#field_'+rowNum+'_total_amount').val();
     //assign total amount as default soft credit amount
     cj('#soft_credit_amount_'+ rowNum).val(totalAmount);
+    //assign soft credit type default value if any
+    cj('#field_'+rowNum+'_soft_credit_type').val(cj('#sct_default_id').val());
   });
 
   // validate rows

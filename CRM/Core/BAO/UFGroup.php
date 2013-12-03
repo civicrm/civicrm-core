@@ -2070,6 +2070,16 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
           '' => ts('- select -')) + $contributionStatuses, $required
       );
     }
+    elseif ($fieldName == 'soft_credit_type') {
+      $form->add('select', $name, $title,
+        array(
+          '' => ts('- select -')) + CRM_Core_OptionGroup::values("soft_credit_type")
+      );
+      $form->addElement('hidden', 'sct_default_id',
+        CRM_Core_OptionGroup::getDefaultValue("soft_credit_type"),
+        array('id' => 'sct_default_id')
+      );
+    }
     elseif ($fieldName == 'currency') {
       $form->addCurrency($name, $title, $required);
     }

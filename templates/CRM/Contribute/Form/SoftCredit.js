@@ -63,6 +63,7 @@ cj(function($) {
     //assign total amount as default soft credit amount
     $('#soft_credit_amount_'+ rowNum).val(totalAmount);
     var thousandMarker = CRM.monetaryThousandSeparator;
+    $('#soft_credit_type_'+ rowNum).val($('#sct_default_id').val());
     totalAmount = Number(totalAmount.replace(thousandMarker,''));
     if (rowNum > 1) {
       var scAmount = Number($('#soft_credit_amount_'+ (rowNum - 1)).val().replace(thousandMarker,''));

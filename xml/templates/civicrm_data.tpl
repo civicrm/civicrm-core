@@ -1570,3 +1570,24 @@ SELECT @fieldID := max(id) FROM civicrm_price_field WHERE name = 'contribution_a
 INSERT INTO `civicrm_price_field_value` (  `price_field_id`, `name`, `label`, `amount`, `weight`, `is_default`, `is_active`, `financial_type_id`)
 VALUES ( @fieldID, 'contribution_amount', 'Contribution Amount', '1', '1', '0', '1', 1);
 
+-- CRM-13833
+INSERT INTO civicrm_option_group (`name`, `title`, `is_reserved`, `is_active`) VALUES ('soft_credit_type', {localize}'{ts escape="sql"}Soft Credit Types{/ts}'{/localize}, 1, 1);
+
+SELECT @option_group_id_soft_credit_type := max(id) from civicrm_option_group where name = 'soft_credit_type';
+
+INSERT INTO `civicrm_option_value` (`option_group_id`, `label`, `value`, `name`, `weight`, `is_default`, `is_active`, `is_reserved`)
+VALUES
+  (@option_group_id_soft_credit_type   , {localize}'{ts escape="sql"}In Honor of{/ts}'{/localize}, 1, 'in_honor_of', 1, 0, 1, 1),
+  (@option_group_id_soft_credit_type   , {localize}'{ts escape="sql"}In Memory of{/ts}'{/localize}, 2, 'in_memory_of', 2, 0, 1, 1),
+  (@option_group_id_soft_credit_type   , {localize}'{ts escape="sql"}Solicited{/ts}'{/localize}, 3, 'solicited', 3, 1, 1, 1),
+  (@option_group_id_soft_credit_type   , {localize}'{ts escape="sql"}Household (for the person who's writing the check for the household's contribution){/ts}'{/localize}, 4, 'household', 4, 0, 1, 0),
+  (@option_group_id_soft_credit_type   , {localize}'{ts escape="sql"}Workplace giving (CFC, etc.){/ts}'{/localize}, 5, 'workplace', 5, 0, 1, 0),
+  (@option_group_id_soft_credit_type   , {localize}'{ts escape="sql"}Foundation Affiliate (family foundation or corporate foundation gives the gift, individual or company gets the soft credit){/ts}'{/localize}, 6, 'foundation_affiliate', 6, 0, 1, 0),
+  (@option_group_id_soft_credit_type   , {localize}'{ts escape="sql"}3rd-party service (like Razoo, Facebook Causes, etc.){/ts}'{/localize}, 7, '3rd-party_service', 7, 0, 1, 0),
+  (@option_group_id_soft_credit_type   , {localize}'{ts escape="sql"}Donor-advised Fund{/ts}'{/localize}, 8, 'donor-advised_fund', 8, 0, 1, 0),
+  (@option_group_id_soft_credit_type   , {localize}'{ts escape="sql"}Matched gift (for the person whose gift was matched){/ts}'{/localize}, 9, 'matched_gift', 9, 0, 1, 0),
+  (@option_group_id_soft_credit_type   , {localize}'{ts escape="sql"}PCP{/ts}'{/localize}, 10, 'pcp', 10, 0, 1, 1);
+
+INSERT INTO civicrm_uf_field
+       ( uf_group_id, field_name, is_required, is_reserved, weight, visibility, in_selector, is_searchable, location_type_id, label, field_type,    help_post, phone_type_id ) VALUES 
+ ( 10,     'soft_credit_type',           0, 1, 11, 'User and User Admin Only', 0, 1, NULL, '{ts escape="sql"}Soft Credit Type{/ts}', 'Contribution', NULL, NULL );

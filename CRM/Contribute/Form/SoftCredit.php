@@ -66,6 +66,13 @@ class CRM_Contribute_Form_SoftCredit {
       CRM_Contact_Form_NewContact::buildQuickForm($form, $rowNumber, NULL, FALSE, $prefix);
 
       $form->addMoney("{$prefix}amount[{$rowNumber}]", ts('Amount'), FALSE, NULL, FALSE);
+
+      $form->add('select', "{$prefix}type[{$rowNumber}]",
+        ts( 'Soft Credit Type' ),
+        array(
+          '' => ts('- select -')) +
+          CRM_Core_OptionGroup::values("{$prefix}type", FALSE)
+      );
       if (!empty($form->_softCreditInfo['soft_credit'][$rowNumber]['soft_credit_id'])) {
         $form->add('hidden', "{$prefix}id[{$rowNumber}]",
           $form->_softCreditInfo['soft_credit'][$rowNumber]['soft_credit_id']);
@@ -90,6 +97,10 @@ class CRM_Contribute_Form_SoftCredit {
     $form->assign('showSoftCreditRow', $showSoftCreditRow);
     $form->assign('rowCount', $item_count);
     $form->assign('showCreateNew', $showCreateNew);
+    $form->addElement('hidden', 'sct_default_id',
+      CRM_Core_OptionGroup::getDefaultValue("{$prefix}type"),
+      array('id' => 'sct_default_id')
+    );
 
     // Tell tpl to hide soft credit field if contribution is linked directly to a PCP Page
     if (CRM_Utils_Array::value('pcp_made_through_id', $form->_values)) {
@@ -105,6 +116,7 @@ class CRM_Contribute_Form_SoftCredit {
       foreach ($form->_softCreditInfo['soft_credit'] as $key => $value) {
         $defaults["soft_credit_amount[$key]"] = CRM_Utils_Money::format($value['amount'], NULL, '%a');
         $defaults["soft_credit_contact_select_id[$key]"] = $value['contact_id'];
+        $defaults["soft_credit_type[$key]"] = $value['soft_credit_type'];
       }
     }
 
