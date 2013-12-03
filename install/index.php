@@ -1061,6 +1061,12 @@ class Installer extends InstallRequirements {
     if (!$this->errors) {
       global $installType, $installURLPath;
 
+      $registerSiteURL = "http://civicrm.org/civicrm/profile/create?reset=1&gid=15";
+      $commonOutputMessage = "
+                      <li> Have you registered this site at CiviCRM.org? If not, please help strengthen the CiviCRM ecosystem by taking a few minutes to <a href='$registerSiteURL' target='_blank'>fill out the site registration form</a>. The information collected will help us prioritize improvements, target our communications and build the community. If you have a technical role for this site, be sure to check Keep in Touch to receive technical updates (a low volume  mailing list).</li>
+                      <li>We have integrated KCFinder with CKEditor and TinyMCE. This allows a user to upload images. All uploaded images are public.</li>
+";
+
       $output = NULL;
       if (
         $installType == 'drupal' &&
@@ -1086,12 +1092,10 @@ class Installer extends InstallRequirements {
         $drupalURL = civicrm_cms_base();
         $drupalPermissionsURL = "{$drupalURL}index.php?q=admin/people/permissions";
         $drupalURL .= "index.php?q=civicrm/admin/configtask&reset=1";
-        $registerSiteURL = "http://civicrm.org/civicrm/profile/create?reset=1&gid=15";
 
         $output .= "<li>Drupal user permissions have been automatically set - giving anonymous and authenticated users access to public CiviCRM forms and features. We recommend that you <a target='_blank' href={$drupalPermissionsURL}>review these permissions</a> to ensure that they are appropriate for your requirements (<a target='_blank' href='http://wiki.civicrm.org/confluence/display/CRMDOC/Default+Permissions+and+Roles'>learn more...</a>)</li>
                       <li>Use the <a target='_blank' href=\"$drupalURL\">Configuration Checklist</a> to review and configure settings for your new site</li>
-                      <li> Have you registered this site at CiviCRM.org? If not, please help strengthen the CiviCRM ecosystem by taking a few minutes to <a href='$registerSiteURL' target='_blank'>fill out the site registration form</a>. The information collected will help us prioritize improvements, target our communications and build the community. If you have a technical role for this site, be sure to check Keep in Touch to receive technical updates (a low volume  mailing list).</li>
-                      <li>We have integrated KCFinder with CKEditor and TinyMCE, which enables user to upload images. Note that all the images uploaded using KCFinder will be public.</li>";
+                      {$commonOutputMessage}";
 
         // automatically enable CiviCRM module once it is installed successfully.
         // so we need to Bootstrap Drupal, so that we can call drupal hooks.
@@ -1157,12 +1161,10 @@ class Installer extends InstallRequirements {
         $drupalURL = civicrm_cms_base();
         $drupalPermissionsURL = "{$drupalURL}index.php?q=admin/user/permissions";
         $drupalURL .= "index.php?q=civicrm/admin/configtask&reset=1";
-        $registerSiteURL = "http://civicrm.org/civicrm/profile/create?reset=1&gid=15";
 
         $output .= "<li>Drupal user permissions have been automatically set - giving anonymous and authenticated users access to public CiviCRM forms and features. We recommend that you <a target='_blank' href={$drupalPermissionsURL}>review these permissions</a> to ensure that they are appropriate for your requirements (<a target='_blank' href='http://wiki.civicrm.org/confluence/display/CRMDOC/Default+Permissions+and+Roles'>learn more...</a>)</li>
                       <li>Use the <a target='_blank' href=\"$drupalURL\">Configuration Checklist</a> to review and configure settings for your new site</li>
-                      <li> Have you registered this site at CiviCRM.org? If not, please help strengthen the CiviCRM ecosystem by taking a few minutes to <a href='$registerSiteURL' target='_blank'>fill out the site registration form</a>. The information collected will help us prioritize improvements, target our communications and build the community. If you have a technical role for this site, be sure to check Keep in Touch to receive technical updates (a low volume  mailing list).</li>
-                      <li>We have integrated KCFinder with CKEditor and TinyMCE, which enables user to upload images. Note that all the images uploaded using KCFinder will be public.</li>";
+                      {$commonOutputMessage}";
 
         // explicitly setting error reporting, since we cannot handle drupal related notices
         error_reporting(1);
@@ -1202,15 +1204,18 @@ class Installer extends InstallRequirements {
 
         $cmsURL = civicrm_cms_base();
         $cmsURL .= "wp-admin/admin.php?page=CiviCRM&q=civicrm/admin/configtask&reset=1";
-        $registerSiteURL = "http://civicrm.org/civicrm/profile/create?reset=1&gid=15";
+        $wpPermissionsURL = "wp-admin/admin.php?page=CiviCRM&q=civicrm/admin/access/wp-permissions&reset=1";
 
-        echo "<li>Use the <a target='_blank' href=\"$cmsURL\">Configuration Checklist</a> to review and configure settings for your new site</li>
-                    <li> Have you registered this site at CiviCRM.org? If not, please help strengthen the CiviCRM ecosystem by taking a few minutes to <a href='$registerSiteURL' target='_blank'>fill out the site registration form</a>. The information collected will help us prioritize improvements, target our communications and build the community. If you have a technical role for this site, be sure to check Keep in Touch to receive technical updates (a low volume  mailing list).</li>
-                    <li>We have integrated KCFinder with CKEditor and TinyMCE, which enables user to upload images. Note that all the images uploaded using KCFinder will be public.</li>";
-        echo '</ul>';
-        echo '</div>';
-      }
-    }
+        $output .= "
+           <li>WordPress user permissions have been automatically set - giving Anonymous and Subscribers access to public CiviCRM forms and features. We recommend that you <a target='_blank' href={$wpPermissionsURL}>review these permissions</a> to ensure that they are appropriate for your requirements (<a target='_blank' href='http://wiki.civicrm.org/confluence/display/CRMDOC/Default+Permissions+and+Roles'>learn more...</a>)</li>
+           <li>Use the <a target='_blank' href=\"$cmsURL\">Configuration Checklist</a> to review and configure settings for your new site</li>
+          {$commonOutputMessage}
+";
+
+         echo '</ul>';
+         echo '</div>';
+       }
+     }
 
     return $this->errors;
   }
