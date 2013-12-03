@@ -433,6 +433,11 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
     }
 
     require_once ($cmsRootPath . DIRECTORY_SEPARATOR . 'wp-load.php');
+    $wpUserTimezone = get_option('timezone_string');
+    if ($wpUserTimezone) {
+      date_default_timezone_set($wpUserTimezone);
+      CRM_Core_Config::singleton()->userSystem->setMySQLTimeZone();
+    }
     return true;
   }
 
@@ -621,6 +626,14 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
     else {
       return 'Unknown';
     }
+  }
+
+  /**
+   * get timezone as a string
+   * @return string Timezone e.g. 'America/Los_Angeles'
+   */
+  function getTimeZoneString() {
+    return get_option('timezone_string');
   }
 }
 
