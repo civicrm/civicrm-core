@@ -2204,7 +2204,7 @@ AND cl.modified_id  = c.id
   }
 
   /**
-   * This function delete activity record related to contact record,
+   * This function deletes the activity record related to contact record,
    * when there are no target and assignee record w/ other contact.
    *
    * @param  int $contactId contactId
@@ -2222,22 +2222,22 @@ AND cl.modified_id  = c.id
 
     $transaction = new CRM_Core_Transaction();
 
-    // delete activity if there is no record in civicrm_activity_contact pointing to any other contact record
+    // delete activity if there is no record in civicrm_activity_contact
+    // pointing to any other contact record
     $activityContact = new CRM_Activity_DAO_ActivityContact();
     $activityContact->contact_id = $contactId;
     $activityContact->record_type_id = $sourceID;
     $activityContact->find();
 
     while ($activityContact->fetch()) {
-      //delete activity_contact record for the deleted contact
+      // delete activity_contact record for the deleted contact
       $activityContact->delete();
 
       $activityContactOther = new CRM_Activity_DAO_ActivityContact();
       $activityContactOther->activity_id = $activityContact->activity_id;
-      $activityContactOther->find();
 
       //delete activity only if no other contacts connected
-      if ( !$activityContactOther->N ) {
+      if ( ! $activityContactOther->find(TRUE) ) {
         $activityParams = array('id' => $activityContact->activity_id);
         $result = self::deleteActivity($activityParams);
       }
