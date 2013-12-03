@@ -871,33 +871,6 @@ ORDER BY    fixed_sort_order
       }
     }
 
-    // add info on whether the related contacts are deleted (CRM-5673)
-    // FIXME: ideally this should be tied to ACLs
-
-    // grab all the related contact ids
-    $cids = array();
-    foreach ($values as $value) {
-      $cids[] = $value['source_contact_id'];
-    }
-    $cids = array_filter(array_unique($cids));
-
-    // see which of the cids are of deleted contacts
-    if ($cids) {
-      $sql  = 'SELECT id FROM civicrm_contact WHERE id IN (' . implode(', ', $cids) . ') AND is_deleted = 1';
-      $dao  = CRM_Core_DAO::executeQuery($sql);
-      $dels = array();
-      while ($dao->fetch()) {
-        $dels[] = $dao->id;
-      }
-
-      // hide the deleted contacts
-      foreach ($values as & $value) {
-        if (in_array($value['source_contact_id'], $dels)) {
-          unset($value['source_contact_id'], $value['source_contact_name']);
-        }
-      }
-    }
-
     return $values;
   }
 
