@@ -200,6 +200,50 @@ VALUES {$insertStatus}";
     $this->addTask('Patch word-replacement schema', 'wordReplacements_patch', $rev);
   }
 
+  function upgrade_4_4_4($rev) {
+    // task to process sql
+    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => '4.4.4')), 'task_4_4_x_runSql', $rev);
+
+    // Consolidate activity contacts CRM-12274.
+    $this->addTask('Dashboard schema', 'dashboard');
+
+    return TRUE;
+  }
+
+  static function dashboard(CRM_Queue_TaskContext $ctx) {
+    $upgrade = new CRM_Upgrade_Form();
+    $query = "
+ALTER TABLE civicrm_dashboard
+    ADD name varchar(64) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Internal name of dashlet.' AFTER domain_id ";
+    CRM_Core_DAO::executeQuery($query);
+
+    $dashboard = new CRM_Core_DAO_Dashboard();
+    $dashboard->find();
+    while ($dashboard->fetch()) {
+      $urlElements = explode('/', $dashboard->url);
+      if ($urlElements[1] == 'dashlet') {
+        $url = explode('&', $urlElements[2]);
+        $name = $url[0];
+      }
+      elseif ($urlElements[1] == 'report') {
+        $url = explode('&', $urlElements[3]);
+        $name = 'report/' .$url[0];
+      }
+      $values .= "
+      WHEN {$dashboard->id} THEN '{$name}'
+      ";
+    }
+
+    $query = "
+     UPDATE civicrm_dashboard
+  SET name = CASE id
+  {$values}
+  END;
+    ";
+
+    CRM_Core_DAO::executeQuery($query);
+  }
+
   /**
    * Update activity contacts CRM-12274
    *
