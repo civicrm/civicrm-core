@@ -760,23 +760,22 @@ LEFT JOIN  civicrm_case_activity ON ( civicrm_case_activity.activity_id = tbl.ac
     // create temp table for target contacts
     $activityContactTempTable = "civicrm_temp_activity_contact_{$randomNum}";
     $query = "CREATE TEMPORARY TABLE {$activityContactTempTable} (
-                activity_id int unsigned, contact_id int unsigned, record_type_id varchar(16), contact_name varchar(255) )
+                activity_id int unsigned, contact_id int unsigned, record_type_id varchar(16), contact_name varchar(255), is_deleted int unsigned )
                 ENGINE=MYISAM DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci";
 
     CRM_Core_DAO::executeQuery($query);
 
     // note that we ignore bulk email for targets, since we don't show it in selector
     $query = "
-INSERT INTO {$activityContactTempTable} ( activity_id, contact_id, record_type_id, contact_name )
+INSERT INTO {$activityContactTempTable} ( activity_id, contact_id, record_type_id, contact_name, is_deleted )
 SELECT     ac.activity_id,
            ac.contact_id,
            ac.record_type_id,
-           c.sort_name
+           c.sort_name,
+           c.is_deleted
 FROM       civicrm_activity_contact ac
 INNER JOIN {$activityTempTable} ON ( ac.activity_id = {$activityTempTable}.activity_id )
 INNER JOIN civicrm_contact c ON c.id = ac.contact_id
-WHERE      c.is_deleted = 0
-
 ";
     CRM_Core_DAO::executeQuery($query);
 
@@ -786,7 +785,8 @@ WHERE      c.is_deleted = 0
 SELECT     {$activityTempTable}.*,
            {$activityContactTempTable}.contact_id,
            {$activityContactTempTable}.record_type_id,
-           {$activityContactTempTable}.contact_name
+           {$activityContactTempTable}.contact_name,
+           {$activityContactTempTable}.is_deleted
 FROM       {$activityTempTable}
 INNER JOIN {$activityContactTempTable} on {$activityTempTable}.activity_id = {$activityContactTempTable}.activity_id
 ORDER BY    fixed_sort_order
@@ -834,6 +834,11 @@ ORDER BY    fixed_sort_order
 
       if (!CRM_Utils_Array::value('target_contact_name', $values[$activityID])) {
         $values[$activityID]['target_contact_name'] = array();
+      }
+
+      // if deleted, wrap in <del>
+      if ( $dao->is_deleted ) {
+        $dao->contact_name = "<del>{$dao->contact_name}</dao>";
       }
 
       if ($dao->record_type_id == $sourceID  && $dao->contact_id) {
