@@ -25,8 +25,8 @@
 *}
 {* CiviMember DashBoard (launch page) *}
 {if $membershipSummary}
-<h3>{ts}Membership Summary{/ts} {help id="id-member-intro"}</h3>
-<table class="report">
+  <h3>{ts}Membership Summary{/ts} {help id="id-member-intro"}</h3>
+  <table class="report">
     <tr class="columnheader-dark">
       <th scope="col" rowspan="2">{ts}Members by Type{/ts}</th>
         {if $preMonth}
@@ -40,13 +40,13 @@
     {$year} {ts 1=$month}through %1{/ts}
             {/if}
         </th>
-  <th scope="col" rowspan="2">
-            {if $isCurrent}
-                {ts}Current #{/ts}
-            {else}
-                {ts 1=$month 2=$year}Members as of %1 %2{/ts}
-            {/if}
-        </th>
+      <th scope="col" rowspan="2">
+        {if $isCurrent}
+          {ts}Current #{/ts}
+        {else}
+          {ts 1=$month 2=$year}Members as of %1 %2{/ts}
+        {/if}
+      </th>
     </tr>
 
     <tr class="columnheader-dark">
@@ -250,15 +250,15 @@
     <tr><td colspan='11'>
       Primary member counts (those who "own" the membership rather than receiving via relationship) are in [brackets].
     </td></tr>
-</table>
+  </table>
 {/if}
 <div class="spacer"></div>
 
 {if $rows}
 {* if $pager->_totalItems *}
-    <h3>{ts}Recent Memberships{/ts}</h3>
-    <div class="form-item">
-        { include file="CRM/Member/Form/Selector.tpl" context="dashboard" }
-    </div>
+  <h3>{ts}Recent Memberships{/ts}</h3>
+  <div class="form-item">
+    { include file="CRM/Member/Form/Selector.tpl" context="dashboard" }
+  </div>
 {* /if *}
 {/if}
