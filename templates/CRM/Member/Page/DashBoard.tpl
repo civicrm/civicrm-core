@@ -74,7 +74,7 @@
                 <a href="{$row.premonth.total.url}" title="view details">{$row.premonth.total.count}</a>
               {else}
                 {$row.premonth.total.count}
-              {/if}&nbsp;[ 
+              {/if}&nbsp;[
               {if $row.premonth_owner.premonth_owner.url}
                 <a href="{$row.premonth_owner.premonth_owner.url}" title="view details">{$row.premonth_owner.premonth_owner.count}</a>
               {else}
@@ -96,7 +96,7 @@
                 <a href="{$row.month.total.url}" title="view details">{$row.month.total.count}</a>
               {else}
                 {$row.month.total.count}
-              {/if}&nbsp;[ 
+              {/if}&nbsp;[
               {if $row.month_owner.month_owner.url}
                 <a href="{$row.month_owner.month_owner.url}" title="view details">{$row.month_owner.month_owner.count}</a>
               {else}
@@ -117,7 +117,7 @@
                 <a href="{$row.year.total.url}" title="view details">{$row.year.total.count}</a>
               {else}
                 {$row.year.total.count}
-              {/if}&nbsp;[ 
+              {/if}&nbsp;[
               {if $row.year_owner.year_owner.url}
                 <a href="{$row.year_owner.year_owner.url}" title="view details">{$row.year_owner.year_owner.count}</a>
               {else}
@@ -169,7 +169,7 @@
                 <a href="{$totalCount.premonth.total.url}" title="view details">{$totalCount.premonth.total.count}</a>
               {else}
                 {$totalCount.premonth.total.count}
-              {/if}&nbsp;[ 
+              {/if}&nbsp;[
               {if $totalCount.premonth_owner.premonth_owner.url}
                 <a href="{$totalCount.premonth_owner.premonth_owner.url}" title="view details">{$totalCount.premonth_owner.premonth_owner.count}</a>
               {else}
@@ -191,7 +191,7 @@
                 <a href="{$totalCount.month.total.url}" title="view details">{$totalCount.month.total.count}</a>
               {else}
                 {$totalCount.month.total.count}
-              {/if}&nbsp;[ 
+              {/if}&nbsp;[
               {if $totalCount.month_owner.month_owner.url}
                 <a href="{$totalCount.month_owner.month_owner.url}" title="view details">{$totalCount.month_owner.month_owner.count}</a>
               {else}
@@ -212,7 +212,7 @@
                 <a href="{$totalCount.year.total.url}" title="view details">{$totalCount.year.total.count}</a>
               {else}
                 {$totalCount.year.total.count}
-              {/if}&nbsp;[ 
+              {/if}&nbsp;[
               {if $totalCount.year_owner.year_owner.url}
                 <a href="{$totalCount.year_owner.year_owner.url}" title="view details">{$totalCount.year_owner.year_owner.count}</a>
               {else}
