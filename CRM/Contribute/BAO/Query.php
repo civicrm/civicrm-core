@@ -301,8 +301,8 @@ class CRM_Contribute_BAO_Query {
         $query->_tables['civicrm_contribution'] = $query->_whereTables['civicrm_contribution'] = 1;
         return;
 
-        case 'financial_type_id':
-        case 'financial_type':
+      case 'financial_type_id':
+      case 'financial_type':
         // The financial_type_id might be an array (from aggregate contributions custom search)
         // In this case, we need to change the query.
         if (is_array($value)) {
