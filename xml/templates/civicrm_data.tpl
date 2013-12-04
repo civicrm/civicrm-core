@@ -1591,3 +1591,9 @@ VALUES
 INSERT INTO civicrm_uf_field
        ( uf_group_id, field_name, is_required, is_reserved, weight, visibility, in_selector, is_searchable, location_type_id, label, field_type,    help_post, phone_type_id ) VALUES 
  ( 10,     'soft_credit_type',           0, 1, 11, 'User and User Admin Only', 0, 1, NULL, '{ts escape="sql"}Soft Credit Type{/ts}', 'Contribution', NULL, NULL );
+
+SELECT @sct_pcp_id := value from civicrm_option_value where name = 'pcp';
+
+UPDATE `civicrm_contribution_soft`
+SET soft_credit_type_id = @sct_pcp_id
+WHERE pcp_id IS NOT NULL;

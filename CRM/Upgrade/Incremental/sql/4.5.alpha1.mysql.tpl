@@ -81,7 +81,7 @@ VALUES
 ALTER TABLE `civicrm_contribution_soft`
   ADD COLUMN `soft_credit_type_id`  int(10) unsigned COMMENT 'Soft Credit Type ID.Implicit FK to civicrm_option_value where option_group = soft_credit_type.';
 
-SELECT @sct_pcp_id := max(id) from civicrm_option_value where name = 'pcp';
+SELECT @sct_pcp_id := value from civicrm_option_value where name = 'pcp';
 
 UPDATE `civicrm_contribution_soft`
 SET soft_credit_type_id = @sct_pcp_id
