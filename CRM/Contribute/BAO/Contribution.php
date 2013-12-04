@@ -124,10 +124,10 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
         $params[$field] = CRM_Utils_Rule::cleanMoney($params[$field]);
       }
     }
-    
+
     // CRM-13420, set payment instrument to default if payment_instrument_id is empty
     if (!$contributionID && !CRM_Utils_Array::value('payment_instrument_id', $params)) {
-      $params['payment_instrument_id'] = key(CRM_Core_OptionGroup::values('payment_instrument', 
+      $params['payment_instrument_id'] = key(CRM_Core_OptionGroup::values('payment_instrument',
         FALSE, FALSE, FALSE, 'AND is_default = 1'));
     }
 
@@ -1310,7 +1310,7 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
   /**
    * This function update contribution as well as related objects.
    */
-  function transitionComponents($params, $processContributionObject = FALSE) {
+  static function transitionComponents($params, $processContributionObject = FALSE) {
     // get minimum required values.
     $contactId = CRM_Utils_Array::value('contact_id', $params);
     $componentId = CRM_Utils_Array::value('component_id', $params);
@@ -1743,7 +1743,7 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
    * @return array $ids containing organization id and individual id
    * @access public
    */
-  function getOnbehalfIds($contributionId, $contributorId = NULL) {
+  static function getOnbehalfIds($contributionId, $contributorId = NULL) {
 
     $ids = array();
 
@@ -2579,7 +2579,7 @@ WHERE  contribution_id = %1 ";
         $params['trxnParams']['status_id'] = $params['prevContribution']->contribution_status_id;
         $params['trxnParams']['payment_instrument_id'] = $params['prevContribution']->payment_instrument_id;
         $params['trxnParams']['check_number'] = $params['prevContribution']->check_number;
-        
+
         //if financial type is changed
         if (CRM_Utils_Array::value('financial_type_id', $params) &&
           $params['contribution']->financial_type_id != $params['prevContribution']->financial_type_id) {
@@ -2606,7 +2606,7 @@ WHERE  contribution_id = %1 ";
             $params['trxnParams']['to_financial_account_id'] = $trxnParams['to_financial_account_id'];
           }
         }
-        
+
         //Update contribution status
         $params['trxnParams']['status_id'] = $params['contribution']->contribution_status_id;
         if (CRM_Utils_Array::value('contribution_status_id', $params) &&
@@ -2654,7 +2654,7 @@ WHERE  contribution_id = %1 ";
             self::updateFinancialAccounts($params, 'changePaymentInstrument');
           }
         }
-        
+
         //if Change contribution amount
         $params['trxnParams']['fee_amount'] = CRM_Utils_Array::value('fee_amount', $params);
         $params['trxnParams']['net_amount'] = CRM_Utils_Array::value('net_amount', $params);
@@ -2755,7 +2755,7 @@ WHERE  contribution_id = %1 ";
         if (CRM_Utils_Array::value('financialTrxnId', $lastFinancialTrxnId)) {
           $params['trxnParams']['to_financial_account_id'] = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialTrxn', $lastFinancialTrxnId['financialTrxnId'], 'to_financial_account_id');
           $params['trxnParams']['payment_instrument_id'] = $params['prevContribution']->payment_instrument_id;
-        } 
+        }
       }
       else {
         $params['trxnParams']['to_financial_account_id'] = $params['to_financial_account_id'];
