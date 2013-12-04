@@ -110,13 +110,14 @@ class WebTest_Contribute_OfflineContributionTest extends CiviSeleniumTestCase {
     // add second soft credit field
     $this->click("addMoreSoftCredit");
     $this->waitForElementPresent("soft_credit_amount_2");
-    // create new individual via soft credit 
+    // create new individual via soft credit
     $softCreditSecondFname = substr(sha1(rand()), 0, 7);
     $softCreditSecondLname = substr(sha1(rand()), 0, 7);
     $this->webtestNewDialogContact($softCreditSecondFname, $softCreditSecondLname, NULL, 4, 'soft_credit_profiles_2', 'soft_credit_1');
     // enter the second soft credit
     $this->verifyText("soft_credit_amount_2", ""); // it should be blank cause first soft credit != total_amount
     $this->type("soft_credit_amount_2", "100"); //the sum of the soft credit amounts can exceed total_amount
+    $this->select("soft_credit_type[2]", "In Honor of");
 
     //Custom Data
     // $this->click('CIVICRM_QFID_3_6');
@@ -182,8 +183,8 @@ class WebTest_Contribute_OfflineContributionTest extends CiviSeleniumTestCase {
     $expected = array(
       'Soft Credit To 1' => "{$softCreditFname} {$softCreditLname}",
       'Soft Credit To 2' => "{$softCreditSecondFname} {$softCreditSecondLname}",
-      'Amount' => '50.00',
-      'Amount' => '100.00',
+      'Amount (Soft Credit Type)' => '50.00 (Solicited)',
+      'Amount (Soft Credit Type)' => '100.00 (In Honor of)',
     );
 
     foreach ($expected as $value) {
@@ -200,9 +201,10 @@ class WebTest_Contribute_OfflineContributionTest extends CiviSeleniumTestCase {
 
     // verify soft credit details
     $expected = array(
-      3 => 'Donation',
+      3 => 'Solicited',
+      4 => 'Donation',
       2 => '50.00',
-      5 => 'Completed',
+      6 => 'Completed',
       1 => "{$firstName} {$lastName}"
     );
     foreach ($expected as $value => $label) {

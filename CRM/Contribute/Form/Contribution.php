@@ -930,9 +930,9 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     }
 
     //FIXME FOR NEW DATA FLOW http://wiki.civicrm.org/confluence/display/CRM/CiviAccounts+4.3+Data+Flow
-     if (CRM_Utils_Array::value('fee_amount', $fields) 
+     if (CRM_Utils_Array::value('fee_amount', $fields)
       && $financialType = CRM_Contribute_BAO_Contribution::validateFinancialType($fields['financial_type_id'])) {
-      $errors['financial_type_id'] = ts("Financial Account of account relationship of 'Expense Account is' is not configured for Financial Type : ") . $financialType;  
+      $errors['financial_type_id'] = ts("Financial Account of account relationship of 'Expense Account is' is not configured for Financial Type : ") . $financialType;
     }
 
     $errors = array_merge($errors, $softErrors);
@@ -1066,6 +1066,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
           if ($val && $submittedValues['soft_credit_amount'][$key]) {
             $softParams[$key]['contact_id'] = $val;
             $softParams[$key]['amount'] = CRM_Utils_Rule::cleanMoney($submittedValues['soft_credit_amount'][$key]);
+            $softParams[$key]['soft_credit_type_id'] = $submittedValues['soft_credit_type'][$key];
             if (!empty($submittedValues['soft_credit_id'][$key])) {
               $softIDs[] = $softParams[$key]['id'] = $submittedValues['soft_credit_id'][$key];
             }

@@ -116,4 +116,15 @@
        <default>NULL</default>
        <add>2.2</add>
   </field>
+  <field>
+       <name>soft_credit_type_id</name>
+       <type>int unsigned</type>
+       <default>NULL</default>
+       <title>Soft Credit Type ID</title>
+       <pseudoconstant>
+         <optionGroupName>soft_credit_type</optionGroupName>
+       </pseudoconstant>
+       <comment>Soft Credit Type ID.Implicit FK to civicrm_option_value where option_group = soft_credit_type.</comment>
+       <add>2.2</add>
+  </field>
 </table>
