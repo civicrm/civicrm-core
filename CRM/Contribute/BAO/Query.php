@@ -301,14 +301,47 @@ class CRM_Contribute_BAO_Query {
         $query->_tables['civicrm_contribution'] = $query->_whereTables['civicrm_contribution'] = 1;
         return;
 
-        case 'financial_type_id':
-        case 'financial_type':
-        $cType = $value;
+      case 'financial_type_id':
+      case 'financial_type':
+        // The financial_type_id might be an array (from aggregate contributions custom search)
+        // In this case, we need to change the query.
+        if (is_array($value)) {
+          $val = array();
+          // Rebuild the array to get the data we're interested in as array
+          // values not array keys.
+          foreach ($value as $k => $v) {
+            if ($v) {
+              $val[] = $k;
+            }
+          }
+          if (count($val) > 1) {
+            // Overwrite $value so it works with an IN where statement.
+            $op = 'IN';
+            $value = '(' . implode(',', $val) . ')';
+          }
+          else {
+            // If we somehow have an empty array, just return
+            return;
+          }
+        }
+
         $types = CRM_Contribute_PseudoConstant::financialType();
+
+        // Ensure we have a sensible string to display to the user.
+        $names = array();
+        if (isset($val) && is_array($val)) {
+          foreach($val as $id) {
+            $names[] = $types[$id];
+          }
+        }
+        else {
+          $names[] = $types[$value];
+        }
+
         $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause("civicrm_contribution.financial_type_id",
           $op, $value, "Integer"
         );
-        $query->_qill[$grouping ][] = ts('Financial Type - %1', array(1 => $types[$cType]));
+        $query->_qill[$grouping][] = ts('Financial Type %1', array(1 => $op)) . ' ' . implode(' ' . ts('or') . ' ', $names);
         $query->_tables['civicrm_contribution'] = $query->_whereTables['civicrm_contribution'] = 1;
         return;
 
