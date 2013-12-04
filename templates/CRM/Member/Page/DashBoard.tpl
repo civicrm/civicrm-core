@@ -24,6 +24,7 @@
  +--------------------------------------------------------------------+
 *}
 {* CiviMember DashBoard (launch page) *}
+{if $membershipSummary}
 <h3>{ts}Membership Summary{/ts} {help id="id-member-intro"}</h3>
 <table class="report">
     <tr class="columnheader-dark">
@@ -250,7 +251,7 @@
       Primary member counts (those who "own" the membership rather than receiving via relationship) are in [brackets].
     </td></tr>
 </table>
-
+{/if}
 <div class="spacer"></div>
 
 {if $rows}
