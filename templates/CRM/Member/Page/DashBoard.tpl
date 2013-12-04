@@ -24,8 +24,9 @@
  +--------------------------------------------------------------------+
 *}
 {* CiviMember DashBoard (launch page) *}
-<h3>{ts}Membership Summary{/ts} {help id="id-member-intro"}</h3>
-<table class="report">
+{if $membershipSummary}
+  <h3>{ts}Membership Summary{/ts} {help id="id-member-intro"}</h3>
+  <table class="report">
     <tr class="columnheader-dark">
       <th scope="col" rowspan="2">{ts}Members by Type{/ts}</th>
         {if $preMonth}
@@ -39,13 +40,13 @@
     {$year} {ts 1=$month}through %1{/ts}
             {/if}
         </th>
-  <th scope="col" rowspan="2">
-            {if $isCurrent}
-                {ts}Current #{/ts}
-            {else}
-                {ts 1=$month 2=$year}Members as of %1 %2{/ts}
-            {/if}
-        </th>
+      <th scope="col" rowspan="2">
+        {if $isCurrent}
+          {ts}Current #{/ts}
+        {else}
+          {ts 1=$month 2=$year}Members as of %1 %2{/ts}
+        {/if}
+      </th>
     </tr>
 
     <tr class="columnheader-dark">
@@ -73,7 +74,7 @@
                 <a href="{$row.premonth.total.url}" title="view details">{$row.premonth.total.count}</a>
               {else}
                 {$row.premonth.total.count}
-              {/if}&nbsp;[ 
+              {/if}&nbsp;[
               {if $row.premonth_owner.premonth_owner.url}
                 <a href="{$row.premonth_owner.premonth_owner.url}" title="view details">{$row.premonth_owner.premonth_owner.count}</a>
               {else}
@@ -95,7 +96,7 @@
                 <a href="{$row.month.total.url}" title="view details">{$row.month.total.count}</a>
               {else}
                 {$row.month.total.count}
-              {/if}&nbsp;[ 
+              {/if}&nbsp;[
               {if $row.month_owner.month_owner.url}
                 <a href="{$row.month_owner.month_owner.url}" title="view details">{$row.month_owner.month_owner.count}</a>
               {else}
@@ -116,7 +117,7 @@
                 <a href="{$row.year.total.url}" title="view details">{$row.year.total.count}</a>
               {else}
                 {$row.year.total.count}
-              {/if}&nbsp;[ 
+              {/if}&nbsp;[
               {if $row.year_owner.year_owner.url}
                 <a href="{$row.year_owner.year_owner.url}" title="view details">{$row.year_owner.year_owner.count}</a>
               {else}
@@ -168,7 +169,7 @@
                 <a href="{$totalCount.premonth.total.url}" title="view details">{$totalCount.premonth.total.count}</a>
               {else}
                 {$totalCount.premonth.total.count}
-              {/if}&nbsp;[ 
+              {/if}&nbsp;[
               {if $totalCount.premonth_owner.premonth_owner.url}
                 <a href="{$totalCount.premonth_owner.premonth_owner.url}" title="view details">{$totalCount.premonth_owner.premonth_owner.count}</a>
               {else}
@@ -190,7 +191,7 @@
                 <a href="{$totalCount.month.total.url}" title="view details">{$totalCount.month.total.count}</a>
               {else}
                 {$totalCount.month.total.count}
-              {/if}&nbsp;[ 
+              {/if}&nbsp;[
               {if $totalCount.month_owner.month_owner.url}
                 <a href="{$totalCount.month_owner.month_owner.url}" title="view details">{$totalCount.month_owner.month_owner.count}</a>
               {else}
@@ -211,7 +212,7 @@
                 <a href="{$totalCount.year.total.url}" title="view details">{$totalCount.year.total.count}</a>
               {else}
                 {$totalCount.year.total.count}
-              {/if}&nbsp;[ 
+              {/if}&nbsp;[
               {if $totalCount.year_owner.year_owner.url}
                 <a href="{$totalCount.year_owner.year_owner.url}" title="view details">{$totalCount.year_owner.year_owner.count}</a>
               {else}
@@ -249,15 +250,15 @@
     <tr><td colspan='11'>
       Primary member counts (those who "own" the membership rather than receiving via relationship) are in [brackets].
     </td></tr>
-</table>
-
+  </table>
+{/if}
 <div class="spacer"></div>
 
 {if $rows}
 {* if $pager->_totalItems *}
-    <h3>{ts}Recent Memberships{/ts}</h3>
-    <div class="form-item">
-        { include file="CRM/Member/Form/Selector.tpl" context="dashboard" }
-    </div>
+  <h3>{ts}Recent Memberships{/ts}</h3>
+  <div class="form-item">
+    { include file="CRM/Member/Form/Selector.tpl" context="dashboard" }
+  </div>
 {* /if *}
 {/if}

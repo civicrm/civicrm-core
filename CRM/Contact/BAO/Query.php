@@ -3197,11 +3197,15 @@ WHERE  id IN ( $groupIDs )
    */
   function phone_numeric(&$values) {
     list($name, $op, $value, $grouping, $wildcard) = $values;
-    // Strip non-numeric characters
-    $number = preg_replace('/[^\d]/', '', $value);
+    // Strip non-numeric characters; allow wildcards
+    $number = preg_replace('/[^\d%]/', '', $value);
     if ($number) {
+      if ( strpos($number, '%') === FALSE ) {
+        $number = "%$number%";
+      }
+
       $this->_qill[$grouping][] = ts('Phone number contains') . " $number";
-      $this->_where[$grouping][] = self::buildClause('civicrm_phone.phone_numeric', 'LIKE', "%$number%", 'String');
+      $this->_where[$grouping][] = self::buildClause('civicrm_phone.phone_numeric', 'LIKE', "$number", 'String');
       $this->_tables['civicrm_phone'] = $this->_whereTables['civicrm_phone'] = 1;
     }
   }

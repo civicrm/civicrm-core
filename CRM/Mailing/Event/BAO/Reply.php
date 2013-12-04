@@ -187,10 +187,8 @@ class CRM_Mailing_Event_BAO_Reply extends CRM_Mailing_Event_DAO_Reply {
     $config = CRM_Core_Config::singleton();
     $mailer = $config->getMailer();
 
-    PEAR::setErrorHandling(PEAR_ERROR_CALLBACK,
-      array('CRM_Core_Error', 'nullHandler')
-    );
     if (is_object($mailer)) {
+      CRM_Core_Error::ignoreException();
       $mailer->send($mailing->replyto_email, $h, $b);
       CRM_Core_Error::setCallback();
     }
@@ -279,10 +277,8 @@ class CRM_Mailing_Event_BAO_Reply extends CRM_Mailing_Event_DAO_Reply {
     CRM_Mailing_BAO_Mailing::addMessageIdHeader($h, 'a', $eq->job_id, queue_id, $eq->hash);
 
     $mailer = $config->getMailer();
-    PEAR::setErrorHandling(PEAR_ERROR_CALLBACK,
-      array('CRM_Core_Error', 'nullHandler')
-    );
     if (is_object($mailer)) {
+      CRM_Core_Error::ignoreException();
       $mailer->send($to, $h, $b);
       CRM_Core_Error::setCallback();
     }
