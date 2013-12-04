@@ -703,7 +703,7 @@ GROUP BY    currency
 ";
     $dao = CRM_Core_DAO::executeQuery($sql);
 
-    $amount = $average = $amount = $average = array();
+    $amount = $average = $amount2 = $average2 = array();
     $count = $count2 = 0;
     while ($dao->fetch()) {
       if ($dao->amount) {
