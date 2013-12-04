@@ -65,6 +65,9 @@ class CRM_Upgrade_Incremental_php_FourFour {
         $postUpgradeMessage .= '<br />' . ts("The setting to skip IDS check has been removed. Your site has this configured in civicrm.settings.php but it will no longer work. Instead, use the new permission 'skip IDS check' to bypass the IDS system.");
       }
     }
+    if ($rev == '4.4.3') {
+      $postUpgradeMessage .= '<br />' . ts('Default versions of the following System Workflow Message Templates have been modified to handle new functionality: <ul><li>Events - Registration Confirmation and Receipt (on-line)</li></ul> If you have modified these templates, please review the new default versions and implement updates as needed to your copies (Administer > Communications > Message Templates > System Workflow Messages).');
+    }
   }
 
   function upgrade_4_4_alpha1($rev) {
