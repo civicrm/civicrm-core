@@ -444,13 +444,13 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
                       ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_contribution']}.contact_id AND {$this->_aliases['civicrm_contribution']}.is_test = 0";
 
     if (CRM_Utils_Array::value('contribution_or_soft_value', $this->_params) == 'both') {
-      $this->_from .= "\n LEFT JOIN ";
+      $this->_from .= "\n LEFT JOIN civicrm_contribution_soft contribution_soft_civireport
+                         ON contribution_soft_civireport.contribution_id = {$this->_aliases['civicrm_contribution']}.id";
     }
     elseif (CRM_Utils_Array::value('contribution_or_soft_value', $this->_params) == 'soft_credits_only') {
-      $this->_from .= "\n INNER JOIN ";
+      $this->_from .= "\n INNER JOIN civicrm_contribution_soft contribution_soft_civireport
+                         ON contribution_soft_civireport.contribution_id = {$this->_aliases['civicrm_contribution']}.id";
     }
-    $this->_from .= "civicrm_contribution_soft contribution_soft_civireport
-                       ON contribution_soft_civireport.contribution_id = {$this->_aliases['civicrm_contribution']}.id";
 
     if ($softcredit) {
       $this->_from = "
