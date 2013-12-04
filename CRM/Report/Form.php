@@ -135,6 +135,7 @@ class CRM_Report_Form extends CRM_Core_Form {
    * @var null
    */
   protected $_customGroupExtends = NULL;
+  protected $_customGroupExtendsJoin = array();
   protected $_customGroupFilters = TRUE;
   protected $_customGroupGroupBy = FALSE;
   protected $_customGroupJoin    = 'LEFT JOIN';
@@ -2877,10 +2878,11 @@ ORDER BY cg.weight, cf.weight";
         if (!$this->isFieldSelected($prop)) {
           continue;
         }
+        $baseJoin = CRM_Utils_Array::value($prop['extends'], $this->_customGroupExtendsJoin, "{$this->_aliases[$extendsTable]}.id");
 
         $customJoin   = is_array($this->_customGroupJoin) ? $this->_customGroupJoin[$table] : $this->_customGroupJoin;
         $this->_from .= "
-{$customJoin} {$table} {$this->_aliases[$table]} ON {$this->_aliases[$table]}.entity_id = {$this->_aliases[$extendsTable]}.id";
+{$customJoin} {$table} {$this->_aliases[$table]} ON {$this->_aliases[$table]}.entity_id = {$baseJoin}";
         // handle for ContactReference
         if (array_key_exists('fields', $prop)) {
           foreach ($prop['fields'] as $fieldName => $field) {
