@@ -65,6 +65,17 @@ class CRM_Upgrade_Incremental_php_FourFour {
         $postUpgradeMessage .= '<br />' . ts("The setting to skip IDS check has been removed. Your site has this configured in civicrm.settings.php but it will no longer work. Instead, use the new permission 'skip IDS check' to bypass the IDS system.");
       }
     }
+    if ($rev == '4.4.3') {
+      $query = "SELECT cft.id financial_trxn
+FROM civicrm_financial_trxn cft
+LEFT JOIN civicrm_entity_financial_trxn ceft ON ceft.financial_trxn_id = cft.id
+LEFT JOIN civicrm_contribution cc ON ceft.entity_id = cc.id
+WHERE ceft.entity_table = 'civicrm_contribution' AND cft.payment_instrument_id IS NULL;";
+      $dao = CRM_Core_DAO::executeQuery($query);
+      if ($dao->N) {
+        $postUpgradeMessage .= '<br /><strong>' . ts('There is a data integrity issue with this CiviCRM database. It contain %1 financial transaction records with NULL payment instrument. <a href="" target="_blank">You can review steps to correct this situation on the documentation wiki.</a>', array(1 => $dao->N)) . '</strong>';
+      }
+    }
   }
 
   function upgrade_4_4_alpha1($rev) {
