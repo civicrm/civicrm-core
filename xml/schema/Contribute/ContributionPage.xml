@@ -20,6 +20,7 @@
   </primaryKey>
   <field>
     <name>title</name>
+    <title>Contribution Page Title</title>
     <type>varchar</type>
     <length>255</length>
     <localizable>true</localizable>
@@ -28,6 +29,7 @@
   </field>
   <field>
     <name>intro_text</name>
+    <title>Contribution Page Introduction Text</title>
     <type>text</type>
     <htmlType>textarea</htmlType>
     <rows>6</rows>
@@ -334,6 +336,7 @@
   </field>
   <field>
     <name>honor_block_title</name>
+    <title>Contribution Page Honor Block Title</title>
     <type>varchar</type>
     <length>255</length>
     <localizable>true</localizable>
@@ -342,6 +345,7 @@
   </field>
   <field>
     <name>honor_block_text</name>
+    <title>Contribution Page Honor Block Text</title>
     <type>text</type>
     <htmlType>textarea</htmlType>
     <rows>2</rows>
@@ -366,6 +370,7 @@
   </field>
   <field>
     <name>created_id</name>
+    <title>Contribution Page Created By</title>
     <type>int unsigned</type>
     <comment>FK to civicrm_contact, who created this contribution page</comment>
     <add>3.0</add>
@@ -386,6 +391,7 @@
   </field>
   <field>
     <name>currency</name>
+    <title>Contribution Page Currency</title>
     <type>varchar</type>
     <length>3</length>
     <default>NULL</default>
@@ -402,6 +408,7 @@
   </field>
   <field>
     <name>campaign_id</name>
+    <title>Contribution Page Campaign ID</title>
     <type>int unsigned</type>
     <comment>The campaign for which we are collecting contributions with this page.</comment>
     <add>3.4</add>
@@ -414,6 +421,7 @@
   </foreignKey>
   <field>
     <name>is_share</name>
+    <title>Is Contribution Page Shared?</title>
     <type>boolean</type>
     <default>1</default>
     <comment>Can people share the contribution page through social media?</comment>
