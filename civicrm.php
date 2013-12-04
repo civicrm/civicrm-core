@@ -429,6 +429,7 @@ class CiviCRM_For_WordPress {
     $wpUserTimezone = get_option('timezone_string');
     if ($wpUserTimezone) {
       date_default_timezone_set($wpUserTimezone);
+      CRM_Core_Config::singleton()->userSystem->setMySQLTimeZone();
     }
 
     // Add our standard css & js
