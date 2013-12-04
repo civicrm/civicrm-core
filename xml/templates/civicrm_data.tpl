@@ -1580,20 +1580,14 @@ VALUES
   (@option_group_id_soft_credit_type   , {localize}'{ts escape="sql"}In Honor of{/ts}'{/localize}, 1, 'in_honor_of', 1, 0, 1, 1),
   (@option_group_id_soft_credit_type   , {localize}'{ts escape="sql"}In Memory of{/ts}'{/localize}, 2, 'in_memory_of', 2, 0, 1, 1),
   (@option_group_id_soft_credit_type   , {localize}'{ts escape="sql"}Solicited{/ts}'{/localize}, 3, 'solicited', 3, 1, 1, 1),
-  (@option_group_id_soft_credit_type   , {localize}'{ts escape="sql"}Household (for the person who's writing the check for the household's contribution){/ts}'{/localize}, 4, 'household', 4, 0, 1, 0),
-  (@option_group_id_soft_credit_type   , {localize}'{ts escape="sql"}Workplace giving (CFC, etc.){/ts}'{/localize}, 5, 'workplace', 5, 0, 1, 0),
-  (@option_group_id_soft_credit_type   , {localize}'{ts escape="sql"}Foundation Affiliate (family foundation or corporate foundation gives the gift, individual or company gets the soft credit){/ts}'{/localize}, 6, 'foundation_affiliate', 6, 0, 1, 0),
-  (@option_group_id_soft_credit_type   , {localize}'{ts escape="sql"}3rd-party service (like Razoo, Facebook Causes, etc.){/ts}'{/localize}, 7, '3rd-party_service', 7, 0, 1, 0),
+  (@option_group_id_soft_credit_type   , {localize}'{ts escape="sql"}Household{/ts}'{/localize}, 4, 'household', 4, 0, 1, 0),
+  (@option_group_id_soft_credit_type   , {localize}'{ts escape="sql"}Workplace Giving{/ts}'{/localize}, 5, 'workplace', 5, 0, 1, 0),
+  (@option_group_id_soft_credit_type   , {localize}'{ts escape="sql"}Foundation Affiliate{/ts}'{/localize}, 6, 'foundation_affiliate', 6, 0, 1, 0),
+  (@option_group_id_soft_credit_type   , {localize}'{ts escape="sql"}3rd-party Service{/ts}'{/localize}, 7, '3rd-party_service', 7, 0, 1, 0),
   (@option_group_id_soft_credit_type   , {localize}'{ts escape="sql"}Donor-advised Fund{/ts}'{/localize}, 8, 'donor-advised_fund', 8, 0, 1, 0),
-  (@option_group_id_soft_credit_type   , {localize}'{ts escape="sql"}Matched gift (for the person whose gift was matched){/ts}'{/localize}, 9, 'matched_gift', 9, 0, 1, 0),
+  (@option_group_id_soft_credit_type   , {localize}'{ts escape="sql"}Matched Gift{/ts}'{/localize}, 9, 'matched_gift', 9, 0, 1, 0),
   (@option_group_id_soft_credit_type   , {localize}'{ts escape="sql"}PCP{/ts}'{/localize}, 10, 'pcp', 10, 0, 1, 1);
 
 INSERT INTO civicrm_uf_field
        ( uf_group_id, field_name, is_required, is_reserved, weight, visibility, in_selector, is_searchable, location_type_id, label, field_type,    help_post, phone_type_id ) VALUES 
  ( 10,     'soft_credit_type',           0, 1, 11, 'User and User Admin Only', 0, 1, NULL, '{ts escape="sql"}Soft Credit Type{/ts}', 'Contribution', NULL, NULL );
-
-SELECT @sct_pcp_id := value from civicrm_option_value where name = 'pcp';
-
-UPDATE `civicrm_contribution_soft`
-SET soft_credit_type_id = @sct_pcp_id
-WHERE pcp_id IS NOT NULL;

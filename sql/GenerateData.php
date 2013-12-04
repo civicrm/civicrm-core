@@ -134,10 +134,10 @@ class CRM_GCD {
     }
     // Init DB
     $config = CRM_Core_Config::singleton();
-    
+
     // Relationship types indexed by name_a_b from the table civicrm_relationship_type
     $this->relTypes = CRM_Utils_Array::index(array('name_a_b'), CRM_Core_PseudoConstant::relationshipType('name'));
-    
+
   }
 
   /**
@@ -1713,13 +1713,18 @@ VALUES
     $sql = "SELECT id from civicrm_contribution where contact_id = 34";
     $contriId2 = CRM_Core_DAO::singleValueQuery($sql);
 
+    $sql = "SELECT cov.value FROM civicrm_option_value cov LEFT JOIN civicrm_option_group cog ON cog.id = cov.option_group_id WHERE cov.name = 'pcp' AND cog.name = 'soft_credit_type'";
+
+    $pcpId = CRM_Core_DAO::singleValueQuery($sql);
+
     $query = "
 INSERT INTO `civicrm_contribution_soft`
-      ( contribution_id, contact_id ,amount , currency, pcp_id , pcp_display_in_roll ,pcp_roll_nickname,pcp_personal_note )
+      ( contribution_id, contact_id ,amount , currency, pcp_id , pcp_display_in_roll ,pcp_roll_nickname,pcp_personal_note, soft_credit_type_id )
 VALUES
-    ( $contriId1, {$this->Individual[3]}, 10.00, 'USD', 1, 1, 'Jones Family', 'Helping Hands'),
-    ( $contriId2, {$this->Individual[3]}, 250.00, 'USD', 1, 1, 'Annie and the kids', 'Annie Helps');
+    ( $contriId1, {$this->Individual[3]}, 10.00, 'USD', 1, 1, 'Jones Family', 'Helping Hands', $pcpId),
+    ( $contriId2, {$this->Individual[3]}, 250.00, 'USD', 1, 1, 'Annie and the kids', 'Annie Helps', $pcpId);
  ";
+
     $this->_query($query);
   }
 
