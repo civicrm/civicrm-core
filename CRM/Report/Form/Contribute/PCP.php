@@ -271,6 +271,38 @@ LEFT JOIN civicrm_contribution_page {$this->_aliases['civicrm_contribution_page'
     }
   }
 
+  function statistics(&$rows) {
+    $statistics = parent::statistics($rows);
+
+    $select = "SELECT SUM({$this->_aliases['civicrm_pcp']}.goal_amount) as goal_total, ".
+      "SUM({$this->_aliases['civicrm_contribution_soft']}.amount) as committed_total, ".
+      "COUNT({$this->_aliases['civicrm_contribution_soft']}.id) as donors_total, ".
+      "SUM(IF( contribution_civireport.contribution_status_id > 1, 0, contribution_soft_civireport.amount)) AS received_total ";
+    $sql = "{$select} {$this->_from} {$this->_where}";
+    $dao = CRM_Core_DAO::executeQuery($sql);
+    $dao->fetch();
+    $statistics['counts']['goal_total'] = array(
+      'title' => ts('Goal Total'),
+      'value' => $dao->goal_total,
+      'type' => CRM_Utils_Type::T_MONEY
+    );
+    $statistics['counts']['committed_total'] = array(
+      'title' => ts('Total Committed'),
+      'value' => $dao->committed_total,
+      'type' => CRM_Utils_Type::T_MONEY
+    );
+    $statistics['counts']['received_total'] = array(
+      'title' => ts('Total Received'),
+      'value' => $dao->received_total,
+      'type' => CRM_Utils_Type::T_MONEY
+    );
+    $statistics['counts']['donors_total'] = array(
+      'title' => ts('Total Donors'),
+      'value' => $dao->donors_total,
+      'type' => CRM_Utils_Type::T_INT
+    );
+    return $statistics;
+  }
   function alterDisplay(&$rows) {
     // custom code to alter rows
     $entryFound = FALSE;
