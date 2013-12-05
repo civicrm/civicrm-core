@@ -185,7 +185,7 @@
   {include file="CRM/common/pager.tpl" location="bottom"}
   {/strip}
   {if $isSearch eq 0}
-    <div class="status messages">{ts}Don't see your event listed? Try "Search All or by Date Range" above.{/ts}</div>
+    <div class="status messages no-popup">{ts}Don't see your event listed? Try "Search All or by Date Range" above.{/ts}</div>
   {/if}
 </div>
 {else}
