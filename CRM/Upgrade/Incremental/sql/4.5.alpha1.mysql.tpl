@@ -58,3 +58,7 @@ ALTER TABLE `civicrm_mapping_field`
 ALTER TABLE civicrm_group
   ADD COLUMN `modified_id` INT(10) unsigned DEFAULT NULL COMMENT 'FK to contact table, modifier of the group.',
   ADD CONSTRAINT `FK_civicrm_group_modified_id` FOREIGN KEY (`modified_id`) REFERENCES `civicrm_contact`(`id`) ON DELETE SET NULL;
+
+-- CRM-13913
+ALTER TABLE civicrm_word_replacement
+  ALTER COLUMN `is_active` SET DEFAULT 1;

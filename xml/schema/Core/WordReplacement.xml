@@ -37,6 +37,7 @@
     <name>is_active</name>
     <title>Word Replacement is Active</title>
     <type>boolean</type>
+    <default>1</default>
     <comment>Is this entry active?</comment>
     <add>4.4</add>
   </field>
