@@ -132,8 +132,8 @@ EOS;
     require_once($this->settings_file_path);
     require_once($this->dist_settings_file_path);
     $this->civicrm_db_settings = new CRM_DB_Settings();
-    $civicrm_database_settings['database'] = 'civicrm_tests_drupal';
-    $this->drupal_db_settings = new CRM_DB_Settings($civicrm_database_settings);
+    $this->drupal_db_settings = new CRM_DB_Settings();
+    $this->drupal_db_settings->database = 'civicrm_tests_drupal';
     if ($this->use_mysql_ram_server) {
       $this->start_mysql_ram_server();
     }
