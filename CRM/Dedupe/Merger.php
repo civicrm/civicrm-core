@@ -144,6 +144,8 @@ class CRM_Dedupe_Merger {
         ),
       );
 
+      $relTables += self::getMultiValueCustomSets('relTables');
+
       // Allow hook_civicrm_merge() to adjust $relTables
       CRM_Utils_Hook::merge('relTables', $relTables);
     }
@@ -222,6 +224,8 @@ class CRM_Dedupe_Merger {
         'civicrm_pledge' => array('contact_id'),
       );
 
+      $cidRefs += self::getMultiValueCustomSets('cidRefs');
+
       // Add ContactReference custom fields CRM-9561
       $sql = "SELECT cg.table_name, cf.column_name
               FROM civicrm_custom_group cg, civicrm_custom_field cf
@@ -259,6 +263,36 @@ class CRM_Dedupe_Merger {
       CRM_Utils_Hook::merge('eidRefs', $eidRefs);
     }
     return $eidRefs;
+  }
+
+  /**
+   * We treat multi-valued custom sets as "related tables" similar to activities, contributions, etc.
+   * @param string $request 'relTables' or 'cidRefs'
+   * @see CRM-13836
+   */
+  static function getMultiValueCustomSets($request) {
+    static $data = NULL;
+    if ($data === NULL) {
+      $data = array(
+        'relTables' => array(),
+        'cidRefs' => array(),
+      );
+      $result = civicrm_api3('custom_group', 'get', array(
+        'is_multiple' => 1,
+        'extends' => array('IN' => array('Individual', 'Organization', 'Household', 'Contact')),
+        'return' => array('id', 'title', 'table_name', 'style'),
+      ));
+      foreach($result['values'] as $custom) {
+        $data['cidRefs'][$custom['table_name']] = array('entity_id');
+        $urlSuffix = $custom['style'] == 'Tab' ? '&selectedChild=custom_' . $custom['id'] : '';
+        $data['relTables']['rel_table_custom_' . $custom['id']] = array(
+          'title' => $custom['title'],
+          'tables' => array($custom['table_name']),
+          'url' => CRM_Utils_System::url('civicrm/contact/view', 'reset=1&force=1&cid=$cid' . $urlSuffix),
+        );
+      }
+    }
+    return $data[$request];
   }
 
   /**
@@ -500,6 +534,10 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     $otherEvs = CRM_Core_BAO_CustomValueTable::getEntityValues($other['id']);
     $keys = array_unique(array_merge(array_keys($mainEvs), array_keys($otherEvs)));
     foreach ($keys as $key) {
+      // Exclude multi-value fields CRM-13836
+      if (strpos($key, '_')) {
+        continue;
+      }
       $key1 = CRM_Utils_Array::value($key, $mainEvs);
       $key2 = CRM_Utils_Array::value($key, $otherEvs);
       if ($key1 != $key2) {
