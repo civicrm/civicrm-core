@@ -9,7 +9,7 @@ $packages_path = CRM_Utils_Path::join($civicrm_source_dir_path, 'packages');
 if (!file_exists($packages_path)) {
   system("git clone https://github.com/giant-rabbit/civicrm-packages.git packages");
 }
-set_include_path(get_include_path() . PATH_SEPARATOR . $packages_path);
+set_include_path($packages_path . PATH_SEPARATOR . get_include_path());
 require_once(CRM_Utils_Path::join($civicrm_source_dir_path, "packages", "Console", "Getopt.php"));
 
 $option_parser = new CRM_Utils_CommandLineParser();
