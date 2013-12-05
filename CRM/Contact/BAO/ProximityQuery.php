@@ -36,6 +36,11 @@ class CRM_Contact_BAO_ProximityQuery {
 
   /**
    * Trigonometry for calculating geographical distances.
+   *
+   * Modification made in: CRM-13904
+   * http://en.wikipedia.org/wiki/Great-circle_distance
+   * http://www.movable-type.co.uk/scripts/latlong.html
+   *
    * All function arguments and return values measure distances in metres
    * and angles in degrees.  The ellipsoid model is from the WGS-84 datum.
    * Ka-Ping Yee, 2003-08-11
