@@ -231,6 +231,13 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
           'amount' =>
           array('title' => ts('Soft Credit Amount'),
           ),
+          'soft_credit_type_id' =>
+          array('title' => 'Soft Credit Type',
+            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
+            'options' => CRM_Core_OptionGroup::values('soft_credit_type'),
+            'default' => NULL,
+            'type' => CRM_Utils_Type::T_STRING,
+          ),
           'soft_sum' =>
           array('title' => ts('Soft Credit Aggregate'),
             'type' => CRM_Report_Form::OP_INT,
@@ -508,11 +515,23 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
     }
   }
 
+  function storeWhereHavingClauseArray(){
+    parent::storeWhereHavingClauseArray();
+    if (!CRM_Utils_Array::value('soft_amount', $this->_params['fields']) && !empty($this->_havingClauses)){
+      foreach ($this->_havingClauses as $key => $havingClause) {
+        if (stristr($havingClause, 'soft_soft')){
+          unset($this->_havingClauses[$key]);
+        }
+      }
+    }
+  }
+
   function statistics(&$rows) {
     $statistics = parent::statistics($rows);
 
     $softCredit = CRM_Utils_Array::value('soft_amount', $this->_params['fields']);
     $onlySoftCredit = $softCredit && !CRM_Utils_Array::value('total_amount', $this->_params['fields']);
+    $totalAmount = $average = $softTotalAmount = $softAverage = array();
 
     $select = "SELECT
 COUNT({$this->_aliases['civicrm_contribution']}.total_amount )        as civicrm_contribution_total_amount_count,

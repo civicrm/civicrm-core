@@ -153,7 +153,7 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
     );
 
     $query = '
-    SELECT ccs.id, pcp_id, pcp_display_in_roll, pcp_roll_nickname, pcp_personal_note, amount, contact_id, c.display_name
+    SELECT ccs.id, pcp_id, pcp_display_in_roll, pcp_roll_nickname, pcp_personal_note, amount, contact_id, c.display_name, ccs.soft_credit_type_id
     FROM civicrm_contribution_soft ccs INNER JOIN civicrm_contact c on c.id = ccs.contact_id
     WHERE contribution_id = %1;
     ';
@@ -175,7 +175,9 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
         'contact_id' => $dao->contact_id,
         'soft_credit_id' => $dao->id,
         'amount' => $dao->amount,
-        'contact_name' => $dao->display_name
+        'contact_name' => $dao->display_name,
+        'soft_credit_type' => $dao->soft_credit_type_id,
+        'soft_credit_type_label' => CRM_Core_OptionGroup::getLabel('soft_credit_type', $dao->soft_credit_type_id)
       );
       $count++;
     }
@@ -247,6 +249,7 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
            ccs.pcp_display_in_roll,
            ccs.pcp_roll_nickname,
            ccs.pcp_personal_note,
+           ccs.soft_credit_type_id,
            cc.receive_date,
            cc.contact_id as contributor_id,
            cc.contribution_status_id as contribution_status_id,
@@ -286,6 +289,7 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
       $result[$cs->id]['pcp_roll_nickname'] = $cs->pcp_roll_nickname;
       $result[$cs->id]['pcp_personal_note'] = $cs->pcp_personal_note;
       $result[$cs->id]['contribution_status'] = CRM_Utils_Array::value($cs->contribution_status_id, $contributionStatus);
+      $result[$cs->id]['sct_label'] = CRM_Core_OptionGroup::getLabel('soft_credit_type', $cs->soft_credit_type_id);
 
       if ($isTest) {
         $result[$cs->id]['contribution_status'] = $result[$cs->id]['contribution_status'] . '<br /> (test)';
