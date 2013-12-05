@@ -420,6 +420,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
         if (CRM_Utils_Array::value($key, $params['soft_credit_contact_select_id']) && CRM_Utils_Array::value($key, $params['soft_credit_amount'])) {
           $value['soft_credit'][$key]['contact_id'] = $params['soft_credit_contact_select_id'][$key];
           $value['soft_credit'][$key]['amount'] = CRM_Utils_Rule::cleanMoney($params['soft_credit_amount'][$key]);
+          $value['soft_credit'][$key]['soft_credit_type_id'] = $params['field'][$key]['soft_credit_type'];
         }
 
         $value['custom'] = CRM_Core_BAO_CustomField::postProcess($value,
