@@ -221,6 +221,17 @@ class CRM_Report_Form_Contribute_SoftCredit extends CRM_Report_Form {
             'default' => TRUE,
             'no_display' => TRUE,
           ),
+          'soft_credit_type_id' => array('title' => ts('Soft Credit Type')),
+        ),
+        'filters' =>
+        array(
+          'soft_credit_type_id' =>
+          array('title' => 'Soft Credit Type',
+            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
+            'options' => CRM_Core_OptionGroup::values('soft_credit_type'),
+            'default' => NULL,
+            'type' => CRM_Utils_Type::T_STRING,
+          ),
         ),
         'grouping' => 'softcredit-fields',
       ),
@@ -424,6 +435,7 @@ GROUP BY   {$this->_aliases['civicrm_contribution']}.currency
 
     $dao = CRM_Core_DAO::executeQuery($sql);
     $count = 0;
+    $totalAmount = $average = array();
     while ($dao->fetch()) {
       $totalAmount[] = CRM_Utils_Money::format($dao->amount, $dao->currency).'('.$dao->count.')';
       $average[] =   CRM_Utils_Money::format($dao->avg, $dao->currency);
@@ -510,6 +522,12 @@ GROUP BY   {$this->_aliases['civicrm_contribution']}.currency
           $rows[$rowNum]['civicrm_contribution_campaign_id'] = $this->activeCampaigns[$value];
           $entryFound = TRUE;
         }
+      }
+
+      //convert soft_credit_type_id into label
+      if (array_key_exists('civicrm_contribution_soft_soft_credit_type_id', $rows[$rowNum])) {
+        $rows[$rowNum]['civicrm_contribution_soft_soft_credit_type_id'] = CRM_Core_OptionGroup::getLabel('soft_credit_type',
+          $row['civicrm_contribution_soft_soft_credit_type_id']);
       }
 
       // skip looking further in rows, if first row itself doesn't
