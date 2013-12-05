@@ -33,12 +33,16 @@ class CRM_DB_Settings {
   public $socket_path;
   public $username;
 
-  function __construct($settings_array = NULL) {
-    if ($settings_array == NULL) {
+  function __construct($options = NULL) {
+    if ($options == NULL) {
       $civi_dsn = $this->findCiviDSN();
       $this->loadFromCiviDSN($civi_dsn);
+    } elseif (array_key_exists('civi_dsn', $options)) {
+      $this->loadFromCiviDSN($options['civi_dsn']);
+    } elseif (array_key_exists('settings_array', $options)) {
+      $this->loadFromSettingsArray($options['settings_array']);
     } else {
-      $this->loadFromSettingsArray($settings_array);
+      throw new Exception("The options parameter needs to be blank if you want to load from CIVICRM_DSN, or it can be an array with key 'civi_dsn' that is a CiviCRM formatted DSN string, or it can be an array with key 'settings_array' than points to another array of database settings.");
     }
   }
 

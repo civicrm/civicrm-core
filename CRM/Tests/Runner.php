@@ -120,11 +120,16 @@ class CRM_Tests_Runner {
         'port' => $port,
         'username' => 'root',
       );
-      $db_settings = new CRM_DB_Settings($civicrm_database_settings);
+      $db_settings = new CRM_DB_Settings(array('settings_array' => $civicrm_database_settings));
       $civicrm_dsn = $db_settings->toCiviDSN();
+      $drupal_database_settings = $civicrm_database_settings;
+      $drupal_database_settings['database'] = 'civicrm_tests_drupal';
+      $drupal_db_settings = new CRM_DB_Settings(array('settings_array' => $drupal_database_settings));
+      $drupal_dsn = $drupal_db_settings->toCiviDSN();
       $settings_file_contents = <<<EOS
 <?php
 define('CIVICRM_DSN', "$civicrm_dsn");
+define('CIVICRM_UF_DSN', "$drupal_dsn");
 EOS;
       CRM_Utils_File::write($settings_file, $settings_file_contents);
       CRM_Utils_File::close($settings_file);
@@ -132,8 +137,10 @@ EOS;
     require_once($this->settings_file_path);
     require_once($this->dist_settings_file_path);
     $this->civicrm_db_settings = new CRM_DB_Settings();
-    $this->drupal_db_settings = new CRM_DB_Settings();
-    $this->drupal_db_settings->database = 'civicrm_tests_drupal';
+    if (!defined('CIVICRM_UF_DSN')) {
+      throw new Exception("You must set CIVICRM_UF_DSN in {$this->settings_file_path}.");
+    }
+    $this->drupal_db_settings = new CRM_DB_Settings(array('civi_dsn' => CIVICRM_UF_DSN));
     if ($this->use_mysql_ram_server) {
       $this->start_mysql_ram_server();
     }
