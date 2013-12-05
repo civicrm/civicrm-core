@@ -820,7 +820,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         $this->_params, $ufFields
       );
     } else if (!empty($this->_membershipContactID) && $contactID != $this->_membershipContactID) {
-      // this is an onbehalf renew case for inherited membership. For e.g a permissioned member of household, 
+      // this is an onbehalf renew case for inherited membership. For e.g a permissioned member of household,
       // store current user id as related contact for later use for mailing / activity..
       $this->_values['related_contact'] = $contactID;
       $this->_params['related_contact'] = $contactID;
@@ -1742,6 +1742,8 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       $contribSoftParams['contribution_id'] = $contribution->id;
       // add pcp id
       $contribSoftParams['pcp_id'] = $params['pcp_made_through_id'];
+
+      $contribSoftParams['soft_credit_type_id'] = CRM_Core_OptionGroup::getValue('soft_credit_type', 'pcp', 'name');
 
       $softContribution = CRM_Contribute_BAO_ContributionSoft::add($contribSoftParams);
     }
