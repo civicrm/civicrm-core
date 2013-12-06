@@ -864,7 +864,7 @@ INNER JOIN  civicrm_contact contact_a ON ( activityTarget.contact_id = contact_a
       }
     }
 
-    return $ufIds[$surveyId];
+    return CRM_Utils_Array::value($surveyId, $ufIds);
   }
 
   public Static function getReportID($surveyId) {
