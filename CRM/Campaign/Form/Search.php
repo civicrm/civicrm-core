@@ -434,17 +434,15 @@ class CRM_Campaign_Form_Search extends CRM_Core_Form {
 
   function formatParams() {
     $interviewerId = CRM_Utils_Array::value('survey_interviewer_id', $this->_formValues);
-    if (!$interviewerId) {
-      $session = CRM_Core_Session::singleton();
-      $this->_formValues['survey_interviewer_id'] = $interviewerId = $session->get('userID');
-    }
-    $this->set('interviewerId', $interviewerId);
-    if (!CRM_Utils_Array::value('survey_interviewer_name', $this->_formValues)) {
-      $this->_formValues['survey_interviewer_name'] = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact',
-        $interviewerId,
-        'sort_name',
-        'id'
-      );
+    if ($interviewerId) {
+      $this->set('interviewerId', $interviewerId);
+      if (!CRM_Utils_Array::value('survey_interviewer_name', $this->_formValues)) {
+        $this->_formValues['survey_interviewer_name'] = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact',
+          $interviewerId,
+          'sort_name',
+          'id'
+        );
+      }
     }
 
     //format multi-select group and contact types.
