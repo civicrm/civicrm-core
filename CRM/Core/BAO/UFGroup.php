@@ -1871,16 +1871,10 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
         $form->addRule($name, ts('%1 is a required field.', array(1 => $title)), 'required');
       }
     }
-    elseif ($fieldName === 'prefix_id') {
+    elseif ($fieldName === 'prefix_id' || $fieldName === 'suffix_id') {
       $form->add('select', $name, $title,
         array(
-          '' => ts('- select -')) + CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'prefix_id'), $required
-      );
-    }
-    elseif ($fieldName === 'suffix_id') {
-      $form->add('select', $name, $title,
-        array(
-          '' => ts('- select -')) + CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'suffix_id'), $required
+          '' => ts('- select -')) + CRM_Core_PseudoConstant::get('CRM_Contact_BAO_Contact', $fieldName), $required
       );
     }
     elseif ($fieldName === 'contact_sub_type') {
