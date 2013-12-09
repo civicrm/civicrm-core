@@ -4,9 +4,7 @@ namespace Civi\Tests\Event;
 
 use Civi\Tests\Factories;
 
-require_once 'CiviTest/CiviUnitTestCase.php';
-
-class EventTest extends \CiviUnitTestCase 
+class EventTest extends \Civi\Tests\IsolatedTestCase
 {
   public function testAddPaymentProcessor()
   {

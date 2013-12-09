@@ -3,6 +3,14 @@
 class CRM_DB_InvalidSettings extends Exception {};
 
 class CRM_DB_Settings {
+  public static $attribute_names = array(
+    'database',
+    'driver',
+    'host',
+    'password',
+    'port',
+    'username',
+  );
   public static $cividsn_to_settings_name = array(
     'database' => 'database',
     'dbsyntax' => 'driver',
@@ -65,12 +73,14 @@ class CRM_DB_Settings {
         $this->$value = $parsed_dsn[$key];
       }
     }
+    $this->updateHost();
   }
 
   function loadFromSettingsArray($settings_array) {
     foreach ($settings_array as $key => $value) {
       $this->$key = $value;
     }
+    $this->updateHost();
   }
 
   function toCiviDSN() {
@@ -100,6 +110,24 @@ class CRM_DB_Settings {
     return $drupal_dsn;
   }
 
+  function toMySQLArguments() {
+    $args = "-h {$this->host} -u {$this->username} -p{$this->password}";
+    if ($this->port != NULL) {
+      $args .= " -P {$this->port}";
+    }
+    $args .= " {$this->database}";
+    return $args;
+  }
+
+  function toPHPArrayString() {
+    $result = "array(\n";
+    foreach (static::$attribute_names as $attribute_name) {
+      $result .= "  '$attribute_name' => '{$this->$attribute_name}',\n";
+    }
+    $result .= ")";
+    return $result;
+  }
+
   function toPDODSN($options = array()) {
     $pdo_dsn = "{$this->driver}:";
     $pdo_dsn_options = array();
@@ -114,5 +142,17 @@ class CRM_DB_Settings {
     }
     $pdo_dsn .= implode(';', $pdo_dsn_options);
     return $pdo_dsn;
+  }
+
+  function updateHost() {
+    /*
+     * If you use localhost for the host, the MySQL client library will
+     * use a unix socket to connect to the server and ignore the port,
+     * so if someone is not going to use the default port, let's
+     * assume they don't want to use the unix socket.
+     */
+    if ($this->port != NULL && $this->host == 'localhost') {
+      $this->host = '127.0.0.1';
+    }
   }
 }

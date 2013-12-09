@@ -3,7 +3,7 @@
         "This file locks the dependencies of your project to a known state",
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
     ],
-    "hash": "dd01e09d77619b5dbab70cc5ccfe0119",
+    "hash": "90046256f468ca621dedad0aaa8c7f95",
     "packages": [
         {
             "name": "doctrine/annotations",
@@ -297,12 +297,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/doctrine/dbal.git",
-                "reference": "8b28a9a1d1dfafb7cb973bb0bacf057d097885aa"
+                "reference": "f3f6b7ddb7d6af6c3fa42882bc0e2e6715c873fd"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/doctrine/dbal/zipball/8b28a9a1d1dfafb7cb973bb0bacf057d097885aa",
-                "reference": "8b28a9a1d1dfafb7cb973bb0bacf057d097885aa",
+                "url": "https://api.github.com/repos/doctrine/dbal/zipball/f3f6b7ddb7d6af6c3fa42882bc0e2e6715c873fd",
+                "reference": "f3f6b7ddb7d6af6c3fa42882bc0e2e6715c873fd",
                 "shasum": ""
             },
             "require": {
@@ -360,7 +360,7 @@
                 "persistence",
                 "queryobject"
             ],
-            "time": "2013-11-28 01:19:42"
+            "time": "2013-12-06 11:52:45"
         },
         {
             "name": "doctrine/inflector",
@@ -562,6 +562,87 @@
                 "orm"
             ],
             "time": "2013-11-12 12:40:15"
+        },
+        {
+            "name": "giant-rabbit/mysql-concentrator",
+            "version": "1.0.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/giant-rabbit/mysql-concentrator.git",
+                "reference": "87d5cf492877870bd7349390a4f49f1cf3947cbd"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/giant-rabbit/mysql-concentrator/zipball/87d5cf492877870bd7349390a4f49f1cf3947cbd",
+                "reference": "87d5cf492877870bd7349390a4f49f1cf3947cbd",
+                "shasum": ""
+            },
+            "require": {
+                "giant-rabbit/php-util": "~1.0.3"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.0.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-0": {
+                    "MySQLConcentrator\\": "lib/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Peter Haight",
+                    "email": "peterh@giantrabbit.com"
+                }
+            ],
+            "description": "A MySQL proxy server written in PHP",
+            "homepage": "https://github.com/giant-rabbit/mysql-concentrator",
+            "time": "2013-12-09 03:20:10"
+        },
+        {
+            "name": "giant-rabbit/php-util",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/giant-rabbit/php-util.git",
+                "reference": "c602f1f04fab2a46e2254955acfbff8c910f1386"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/giant-rabbit/php-util/zipball/c602f1f04fab2a46e2254955acfbff8c910f1386",
+                "reference": "c602f1f04fab2a46e2254955acfbff8c910f1386",
+                "shasum": ""
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.0.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-0": {
+                    "GR\\": "lib/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Peter Haight",
+                    "email": "peterh@giantrabbit.com"
+                }
+            ],
+            "description": "Some PHP functions we use a lot.",
+            "homepage": "https://github.com/giant-rabbit/php-util",
+            "time": "2013-11-29 23:00:58"
         },
         {
             "name": "symfony/console",

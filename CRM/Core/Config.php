@@ -170,7 +170,7 @@ class CRM_Core_Config extends CRM_Core_Config_Variables {
    * @return CRM_Core_Config
    * @static
    */
-  static function &singleton($loadFromDB = TRUE, $force = FALSE) {
+  static function &singleton($loadFromDB = TRUE, $force = FALSE, $dsn = NULL) {
     if (self::$_singleton === NULL || $force) {
       // goto a simple error handler
       $GLOBALS['_PEAR_default_error_mode'] = PEAR_ERROR_CALLBACK;
@@ -188,7 +188,7 @@ class CRM_Core_Config extends CRM_Core_Config_Variables {
       // if not in cache, fire off config construction
       if (!self::$_singleton) {
         self::$_singleton = new CRM_Core_Config;
-        self::$_singleton->_initialize($loadFromDB);
+        self::$_singleton->_initialize($loadFromDB, $dsn);
 
         //initialize variables. for gencode we cannot load from the
         //db since the db might not be initialized
@@ -208,7 +208,7 @@ class CRM_Core_Config extends CRM_Core_Config_Variables {
       }
       else {
         // we retrieve the object from memcache, so we now initialize the objects
-        self::$_singleton->_initialize($loadFromDB);
+        self::$_singleton->_initialize($loadFromDB, $dsn);
 
         // CRM-9803, NYSS-4822
         // this causes various settings to be reset and hence we should
@@ -312,19 +312,25 @@ class CRM_Core_Config extends CRM_Core_Config_Variables {
    * @return void
    * @access public
    */
-  private function _initialize($loadFromDB = TRUE) {
+  private function _initialize($loadFromDB = TRUE, $dsn = NULL) {
 
     // following variables should be set in CiviCRM settings and
     // as crucial ones, are defined upon initialisation
     // instead of in CRM_Core_Config_Defaults
-    if (defined('CIVICRM_DSN')) {
-      $this->dsn = CIVICRM_DSN;
+    if ($dsn == NULL) {
+      if (defined('CIVICRM_DSN')) {
+        $this->dsn = CIVICRM_DSN;
+      }
+      elseif ($loadFromDB) {
+        // bypass when calling from gencode
+        echo 'You need to define CIVICRM_DSN in civicrm.settings.php';
+        exit();
+      }
+    } 
+    else {
+      $this->dsn = $dsn;
     }
-    elseif ($loadFromDB) {
-      // bypass when calling from gencode
-      echo 'You need to define CIVICRM_DSN in civicrm.settings.php';
-      exit();
-    }
+    
 
     if (defined('CIVICRM_TEMPLATE_COMPILEDIR')) {
       $this->templateCompileDir = CRM_Utils_File::addTrailingSlash(CIVICRM_TEMPLATE_COMPILEDIR);

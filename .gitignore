@@ -111,6 +111,7 @@ civicrm-version.php
 civicrm-version.txt
 civicrm.config.php
 install/langs.php
+mysql-concentrator.log
 packages/.channels
 packages/.depdb
 packages/.depdblock
@@ -144,6 +145,7 @@ WordPress
 joomla
 packages/
 tests/phpunit/CiviTest/civicrm.settings.local.php
+tests/phpunit/CiviTest/civicrm.concentrator.settings.local.php
 tools/scripts/releaser/releaser.conf
 tools/tests/reports/logfile.tap
 tools/tests/reports/testdox.html

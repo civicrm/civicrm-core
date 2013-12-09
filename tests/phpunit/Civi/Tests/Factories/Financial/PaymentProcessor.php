@@ -1,10 +1,10 @@
 <?php
 
-namespace Civi\Tests\Factories;
+namespace Civi\Tests\Factories\Financial;
 
-class PaymentProcessor
+class PaymentProcessor extends \Civi\Tests\Factories\Base
 {
-  static function create()
+  static function build()
   {
     $entity_manager = \CRM_DB_EntityManager::singleton();
     $domain = $entity_manager->getReference('Civi\Core\Domain', 1);

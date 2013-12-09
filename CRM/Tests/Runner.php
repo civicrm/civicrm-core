@@ -5,8 +5,12 @@ class CRM_Tests_Runner {
   const TEST_SITE_URL = "http://civicrm-tests.local/";
   public $base_path;
   public $civicrm_db_settings;
-  public $drupal_db_settinsg;
+  public $civi_test_path;
+  public $concentrator_civicrm_db_settings;
+  public $concentrator_settings_file_path;
+  public $drupal_db_settings;
   public $db = NULL;
+  public $mysql_server_settings;
   public $phpunit_args;
   public $settings_file_path;
   public $use_mysql_ram_sever;
@@ -18,9 +22,11 @@ class CRM_Tests_Runner {
     CRM_Utils_Path::mkdir_p_if_not_exists($this->tmp_path);
     $this->tmp_path = realpath($this->tmp_path);
     $this->drupal_path = CRM_Utils_Path::join($this->tmp_path, 'drupal');
+    $this->civi_test_path = CRM_Utils_Path::join($this->base_path, 'tests', 'phpunit', 'CiviTest');
     $this->phpunit_args = CRM_Utils_Array::fetch('php-unit', $options, 'AllTests');
-    $this->settings_file_path = CRM_Utils_Path::join($this->base_path, 'tests', 'phpunit', 'CiviTest', 'civicrm.settings.local.php');
-    $this->dist_settings_file_path = CRM_Utils_Path::join($this->base_path, 'tests', 'phpunit', 'CiviTest', 'civicrm.settings.dist.php');
+    $this->concentrator_settings_file_path = CRM_Utils_Path::join($this->civi_test_path, 'civicrm.concentrator.settings.local.php');
+    $this->settings_file_path = CRM_Utils_Path::join($this->civi_test_path, 'civicrm.settings.local.php');
+    $this->dist_settings_file_path = CRM_Utils_Path::join($this->civi_test_path,'civicrm.settings.dist.php');
     $this->use_mysql_ram_server = CRM_Utils_Array::fetch('mysql-ram-server', $options, FALSE);
     $this->use_selenium = !CRM_Utils_Array::fetch('no-selenium', $options, FALSE);
   }
@@ -41,6 +47,7 @@ class CRM_Tests_Runner {
   function clear_database() {
     $this->db->exec("DROP DATABASE IF EXISTS {$this->civicrm_db_settings->database}");
     $this->db->exec("CREATE DATABASE {$this->civicrm_db_settings->database}");
+    $this->db->exec("USE {$this->civicrm_db_settings->database}");
   }
 
   function connect_to_db() {
@@ -83,12 +90,17 @@ class CRM_Tests_Runner {
     }
   }
 
-  function load_civicrm_database() {
-    $this->mysql_base_command = "mysql -u '{$this->civicrm_db_settings->username}' --password='{$this->civicrm_db_settings->password}' -h {$this->civicrm_db_settings->host}";
-    if ($this->civicrm_db_settings->port) {
-      $this->mysql_base_command .= " -P {$this->civicrm_db_settings->port}";
+  function kill_mysql_concentrator() {
+    if ($this->mysql_concentrator_launcher === NULL)
+    {
+      return;
     }
-    $this->mysql_base_command .= " {$this->civicrm_db_settings->database}";
+    $this->mysql_concentrator_launcher->kill();
+    $this->mysql_concentrator_launcher = NULL;
+  }
+
+  function load_civicrm_database() {
+    $this->mysql_base_command = "mysql " . $this->civicrm_db_settings->toMySQLArguments();
     $this->mysql_load_from_file_path(CRM_Utils_Path::join($this->base_path, 'sql', 'civicrm.mysql'));
     $this->mysql_load_from_file_path(CRM_Utils_Path::join($this->base_path, 'sql', 'civicrm_generated.mysql'));
   }
@@ -104,27 +116,29 @@ class CRM_Tests_Runner {
   }
 
   function run() {
+    /*
+     * mysql_server_settings are for the actual MySQL server, not the
+     * concentrator.
+     */
+    $this->mysql_server_settings['host'] = '127.0.0.1';
+    if ($this->use_mysql_ram_server) {
+      $this->mysql_server_settings['port'] = '3307';
+    } else {
+      $this->mysql_server_settings['port'] = '3306';
+    }
     if (!file_exists($this->settings_file_path)) {
       $settings_file = CRM_Utils_File::open($this->settings_file_path, 'w');
-      $host = 'localhost';
-      $port = '3306';
-      if ($this->use_mysql_ram_server) {
-        $host = '127.0.0.1';
-        $port = '3307';
-      }
       $civicrm_database_settings = array(
         'database' => 'civicrm_tests_dev',
         'driver' => 'mysql',
-        'host' => $host,
-        'password' => '',
-        'port' => $port,
+        'host' => $this->mysql_server_settings['host'],
+        'password' => 'foobar',
+        'port' => $this->mysql_server_settings['port'],
         'username' => 'root',
       );
       $db_settings = new CRM_DB_Settings(array('settings_array' => $civicrm_database_settings));
       $civicrm_dsn = $db_settings->toCiviDSN();
-      $drupal_database_settings = $civicrm_database_settings;
-      $drupal_database_settings['database'] = 'civicrm_tests_drupal';
-      $drupal_db_settings = new CRM_DB_Settings(array('settings_array' => $drupal_database_settings));
+      $drupal_db_settings = new CRM_DB_Settings(array('settings_array' => $civicrm_database_settings));
       $drupal_dsn = $drupal_db_settings->toCiviDSN();
       $settings_file_contents = <<<EOS
 <?php
@@ -141,9 +155,25 @@ EOS;
       throw new Exception("You must set CIVICRM_UF_DSN in {$this->settings_file_path}.");
     }
     $this->drupal_db_settings = new CRM_DB_Settings(array('civi_dsn' => CIVICRM_UF_DSN));
+    if (!file_exists($this->concentrator_settings_file_path)) {
+      $concentrator_civicrm_db_settings = clone($this->civicrm_db_settings);
+      $concentrator_civicrm_db_settings->host = '127.0.0.1';
+      $concentrator_civicrm_db_settings->port = 3308;
+      $concentrator_settings_string = $concentrator_civicrm_db_settings->toPHPArrayString();
+      $settings_file_contents = <<<EOS
+<?php
+\$concentrator_civicrm_database_settings = $concentrator_settings_string;
+EOS;
+      $settings_file = CRM_Utils_File::open($this->concentrator_settings_file_path, 'w');
+      CRM_Utils_File::write($settings_file, $settings_file_contents);
+      CRM_Utils_File::close($settings_file);
+    }
+    require_once($this->concentrator_settings_file_path);
+    $this->concentrator_civicrm_db_settings = new CRM_DB_Settings(array('settings_array' => $concentrator_civicrm_database_settings));
     if ($this->use_mysql_ram_server) {
       $this->start_mysql_ram_server();
     }
+    $this->start_mysql_concentrator();
     if (!file_exists(CRM_Utils_Path::join($this->base_path, "sql", "civicrm.mysql"))) {
       $this->build_db_files();
     }
@@ -316,6 +346,18 @@ EOS;
       CRM_Utils_Dir::chdir($orig_dir_path);
     }
     return $result;
+  }
+
+  function start_mysql_concentrator() {
+    $settings = $this->mysql_server_settings;
+    $settings['listen_port'] = $this->concentrator_civicrm_db_settings->port;
+    $this->mysql_concentrator_launcher = new \MySQLConcentrator\Launcher($settings);
+    $this->mysql_concentrator_launcher->launch();
+    $result = CRM_Utils_Network::waitForServiceStartup('127.0.0.1', $settings['listen_port'], 10);
+    if ($result === FALSE) {
+      throw new Exception("Error launching MySQL Concentrator, expected to see it on port {$settings['listen_port']}, but can't connect to it. Check mysql-concentrator.log for details.");
+    }
+    register_shutdown_function(array($this, 'kill_mysql_concentrator'));
   }
 
   function start_mysql_ram_server() {

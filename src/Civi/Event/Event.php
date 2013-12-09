@@ -3,6 +3,7 @@
 namespace Civi\Event;
 
 use Doctrine\Common\Persistence\Event\LifecycleEventArgs;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Events;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\UnitOfWork;
@@ -1996,7 +1997,7 @@ class Event extends \Civi\Core\Entity
 
     public function getPriceSets()
     {
-      return array_map($this->getPriceSetEventEntities(), function ($price_set_entity) { $price_set_entity->getPriceSet(); });
+      return new ArrayCollection(array_map(function ($price_set_entity) { return $price_set_entity->getPriceSet(); }, $this->getPriceSetEventEntities()->toArray()));
     }
 
     public function addPriceSet($priceSet)
@@ -2070,7 +2071,7 @@ class Event extends \Civi\Core\Entity
             }
             $payment_processor_ids[] = $payment_processor_id;
         }
-        $value = \CRM_Utils_Array::implodePadded($payment_processor_ids);
+        $value = \CRM_DB_Array::marshal($payment_processor_ids);
         $this->setPaymentProcessor($value);
         return TRUE;
     }
@@ -2082,7 +2083,7 @@ class Event extends \Civi\Core\Entity
     {
         $this->paymentProcessors = new \Doctrine\Common\Collections\ArrayCollection();
         $entity_manager = $event_args->getEntityManager();
-        $payment_processor_ids = \CRM_Utils_Array::explodePadded($this->getPaymentProcessor());
+        $payment_processor_ids = \CRM_DB_Array::unmarshal($this->getPaymentProcessor());
         if ($payment_processor_ids != NULL) {
             foreach ($payment_processor_ids as $payment_processor_id) {
                 $this->paymentProcessors[] = $entity_manager->find('\Civi\Financial\PaymentProcessor', $payment_processor_id);
