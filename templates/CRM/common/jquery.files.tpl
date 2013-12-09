@@ -42,7 +42,7 @@ packages/jquery/plugins/jquery.form.js
 packages/jquery/plugins/jquery.tokeninput.js
 packages/jquery/css/token-input-facebook.css
 
-packages/jquery/plugins/jquery.timeentry.pack.js
+packages/jquery/plugins/jquery.timeentry.min.js
 packages/jquery/plugins/jquery.mousewheel.pack.js
 
 packages/jquery/plugins/DataTables/media/css/demo_table_jui.css
