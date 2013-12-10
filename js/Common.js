@@ -521,17 +521,10 @@ CRM.validate = CRM.validate || {
       }
       target.toggleClass('crm-row-selected', $(this).is(':checked'));
     });
-    $('body').live('click', function (event) {
+    $('body').on('click', function (event) {
+      $('.btn-slide-active').removeClass('btn-slide-active').find('.panel').hide();
       if ($(event.target).is('.btn-slide')) {
-        var currentActive = $('#crm-container .btn-slide-active');
-        currentActive.children().hide();
-        currentActive.removeClass('btn-slide-active');
-        $(event.target).children().show();
-        $(event.target).addClass('btn-slide-active');
-      }
-      else {
-        $('.btn-slide .panel').hide();
-        $('.btn-slide-active').removeClass('btn-slide-active');
+        $(event.target).addClass('btn-slide-active').find('.panel').show();
       }
     });
   });
