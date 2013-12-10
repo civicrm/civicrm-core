@@ -540,7 +540,8 @@ class CRM_Core_Resources {
    */
   static function coreResourceList() {
     $items = array(
-      'packages/jquery/jquery-1.8.3.min.js',
+      'packages/jquery/jquery-1.10.2.min.js',
+      'packages/jquery/jquery-migrate-1.2.1.js',
       'packages/jquery/jquery-ui-1.9.0/js/jquery-ui-1.9.0.custom.min.js',
       'packages/jquery/jquery-ui-1.9.0/css/smoothness/jquery-ui-1.9.0.custom.min.css',
 
