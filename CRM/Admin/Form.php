@@ -34,8 +34,7 @@
  */
 
 /**
- * This class generates form components generic to Mobile provider
- *
+ * Base class for admin forms
  */
 class CRM_Admin_Form extends CRM_Core_Form {
 
