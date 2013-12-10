@@ -428,16 +428,16 @@ class CRM_Core_Resources {
       $this->addedCoreResources[$region] = TRUE;
       $config = CRM_Core_Config::singleton();
 
-      // Add resources from jquery.files.tpl
-      $files = self::parseTemplate('CRM/common/jquery.files.tpl');
+      // Add resources from coreResourceList
+      $files = self::coreResourceList();
       $jsWeight = -9999;
-      foreach ($files as $file => $type) {
-        if ($type == 'js') {
+      foreach ($files as $file) {
+        if (substr($file, -2) == 'js') {
           // Don't bother  looking for ts() calls in packages, there aren't any
           $translate = (substr($file, 0, 9) != 'packages/');
           $this->addScriptFile('civicrm', $file, $jsWeight++, $region, $translate);
         }
-        elseif ($type == 'css') {
+        else {
           $this->addStyleFile('civicrm', $file, -100, $region);
         }
       }
@@ -534,22 +534,55 @@ class CRM_Core_Resources {
   }
 
   /**
-   * Read resource files from a template
+   * List of core resources we add to every CiviCRM page
    *
-   * @param $tpl (str) template file name
-   * @return array: filename => filetype
+   * @return array
    */
-  static function parseTemplate($tpl) {
-    $items = array();
-    $template = CRM_Core_Smarty::singleton();
-    $buffer = $template->fetch($tpl);
-    $lines = preg_split('/\s+/', $buffer);
-    foreach ($lines as $line) {
-      $line = trim($line);
-      if ($line) {
-        $items[$line] = substr($line, 1 + strrpos($line, '.'));
-      }
-    }
+  static function coreResourceList() {
+    $items = array(
+      'packages/jquery/jquery-1.8.3.min.js',
+      'packages/jquery/jquery-ui-1.9.0/js/jquery-ui-1.9.0.custom.min.js',
+      'packages/jquery/jquery-ui-1.9.0/css/smoothness/jquery-ui-1.9.0.custom.min.css',
+
+      'packages/jquery/plugins/jquery.autocomplete.js',
+      'packages/jquery/css/jquery.autocomplete.css',
+
+      'packages/jquery/plugins/jquery.menu.pack.js',
+      'packages/jquery/css/menu.css',
+
+      'packages/jquery/plugins/jquery.tableHeader.js',
+
+      'packages/jquery/plugins/jquery.textarearesizer.js',
+
+      'packages/jquery/plugins/jquery.form.js',
+
+      'packages/jquery/plugins/jquery.tokeninput.js',
+      'packages/jquery/css/token-input-facebook.css',
+
+      'packages/jquery/plugins/jquery.timeentry.min.js',
+
+      'packages/jquery/plugins/DataTables/media/css/demo_table_jui.css',
+      'packages/jquery/plugins/DataTables/media/js/jquery.dataTables.min.js',
+
+      'packages/jquery/plugins/jquery.FormNavigate.js',
+
+      'packages/jquery/plugins/jquery.validate.min.js',
+      'packages/jquery/plugins/jquery.ui.datepicker.validation.pack.js',
+
+      'packages/jquery/plugins/jquery.jeditable.mini.js',
+
+      'packages/jquery/plugins/jquery.blockUI.js',
+
+      'packages/jquery/plugins/jquery.notify.min.js',
+
+      'packages/jquery/plugins/jquery.redirect.min.js',
+
+      'js/rest.js',
+      'js/Common.js',
+
+      'js/jquery/jquery.crmeditable.js',
+      'js/jquery/jquery.crmasmselect.js',
+    );
     return $items;
   }
 }
