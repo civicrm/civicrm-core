@@ -213,7 +213,7 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
     $values = array();
     $this->assertFalse(empty($this->objects['event']));
     $msg = $this->IPN->sendMail($this->input, $this->ids, $this->objects, $values, False,True);
-    $this->assertContains('registration has been received and your status has been updated to registered', $msg['body']);
+    $this->assertContains('registration has been received and your status has been updated to Attended.', $msg['body']);
     $this->assertContains('Annual CiviCRM meet', $msg['html']);
   }
 
