@@ -510,16 +510,12 @@ Group By  contact.id";
       $whereClause = ' AND ( activity.status_id IN ( ' . implode(',', array_values($statusIds)) . ' ) )';
     }
 
-    if (!$interviewerId) {
-      $session = CRM_Core_Session::singleton();
-      $interviewerId = $session->get('userID');
-    }
-
     $targetContactIds = ' ( ' . implode(',', $voterIds) . ' ) ';
     $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
     $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
     $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
 
+    $params[1] = array($surveyId, 'Integer');
     $query = "
     SELECT  activity.id, activity.status_id,
             activityTarget.contact_id as voter_id,
@@ -530,14 +526,14 @@ INNER JOIN  civicrm_activity_contact activityTarget
 INNER JOIN  civicrm_activity_contact activityAssignment
   ON ( activityAssignment.activity_id = activity.id AND activityAssignment.record_type_id = $assigneeID )
      WHERE  activity.source_record_id = %1
-       AND  ( activity.is_deleted IS NULL OR activity.is_deleted = 0 )
-       AND  activityAssignment.contact_id = %2
-       AND  activityTarget.contact_id IN {$targetContactIds}
+     AND  ( activity.is_deleted IS NULL OR activity.is_deleted = 0 ) ";
+    if(!empty($interviewerId)) {
+      $query .= "AND activityAssignment.contact_id = %2 ";
+      $params[2] = array($interviewerId, 'Integer');
+    }
+    $query .= "AND  activityTarget.contact_id IN {$targetContactIds}
             $whereClause";
-
-    $activity = CRM_Core_DAO::executeQuery($query, array(1 => array($surveyId, 'Integer'),
-        2 => array($interviewerId, 'Integer'),
-      ));
+    $activity = CRM_Core_DAO::executeQuery($query, $params); 
     while ($activity->fetch()) {
       $activityDetails[$activity->voter_id] = array(
         'voter_id' => $activity->voter_id,
@@ -868,7 +864,7 @@ INNER JOIN  civicrm_contact contact_a ON ( activityTarget.contact_id = contact_a
       }
     }
 
-    return $ufIds[$surveyId];
+    return CRM_Utils_Array::value($surveyId, $ufIds);
   }
 
   public Static function getReportID($surveyId) {
