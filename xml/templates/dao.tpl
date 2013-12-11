@@ -220,6 +220,15 @@ class {$table.className} extends CRM_Core_DAO {ldelim}
 {if $field.FKClassName}
                       'FKClassName' => '{$field.FKClassName}',
 {/if} {* field.FKClassName *}
+{if $field.html}
+  {assign var=htmlOptions value=$field.html}
+  'html' => array(
+{*{$htmlOptions|@print_array}*}
+  {foreach from=$htmlOptions key=optionKey item=optionValue}
+    '{$optionKey}' => '{$optionValue}',
+  {/foreach}
+  ),
+{/if} {* field.html *}
 {if $field.pseudoconstant}
 {assign var=pseudoOptions value=$field.pseudoconstant}
 'pseudoconstant' => array(
