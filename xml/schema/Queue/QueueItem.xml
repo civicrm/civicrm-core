@@ -59,8 +59,6 @@
       <name>data</name>
       <title>Queue item datas</title>
       <type>text</type>
-      <rows>8</rows>
-      <cols>60</cols>
       <comment>Serialized queue</comment>
   </field>
   <index>
