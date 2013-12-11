@@ -188,8 +188,8 @@ class CRM_Mailing_Form_Approve extends CRM_Core_Form {
     if ($rejectOptionID &&
       $params['approval_status_id'] == $rejectOptionID
     ) {
-      $params['scheduled_id'] = 'null';
-      $params['scheduled_date'] = 'null';
+      $params['scheduled_id'] = NULL;
+      $params['scheduled_date'] = NULL;
 
       // also delete any jobs associated with this mailing
       $job = new CRM_Mailing_BAO_MailingJob();

@@ -294,9 +294,9 @@ class CRM_Mailing_Form_Schedule extends CRM_Core_Form {
     }
     else {
       // reset them in case this mailing was rejected
-      $params['approver_id'] = 'null';
-      $params['approval_date'] = 'null';
-      $params['approval_status_id'] = 'null';
+      $params['approver_id'] = NULL;
+      $params['approval_date'] = NULL;
+      $params['approval_status_id'] = NULL;
     }
 
     /* Build the mailing object */
