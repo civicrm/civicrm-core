@@ -1891,8 +1891,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
 
     //now format custom data.
     foreach ($params as $key => $field) {
-        if (!isset($field)){
-        //      if ($field == NULL || $field === '') {
+      if (!isset($field) || empty($field)){
         unset($params[$key]);
         continue;
       }
