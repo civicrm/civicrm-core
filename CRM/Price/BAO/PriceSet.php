@@ -802,6 +802,7 @@ WHERE  id = %1";
 
     $priceSet           = self::getSetDetail($priceSetId, TRUE, $validFieldsOnly);
     $form->_priceSet    = CRM_Utils_Array::value($priceSetId, $priceSet);
+    $validPriceFieldIds = array_keys($form->_priceSet['fields']);
     $form->_quickConfig = $quickConfig = 0;
     if (CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $priceSetId, 'is_quick_config')) {
       $quickConfig = 1;
@@ -831,7 +832,7 @@ WHERE  id = %1";
     // call the hook.
     CRM_Utils_Hook::buildAmount($component, $form, $feeBlock);
 
-    foreach ($feeBlock as $field) {
+    foreach ($feeBlock as $id => $field) {
       if (CRM_Utils_Array::value('visibility', $field) == 'public' ||
         !$validFieldsOnly
       ) {
@@ -842,7 +843,7 @@ WHERE  id = %1";
             $form->assign('ispricelifetime', TRUE);
           }
         }
-        if (!is_array($options)) {
+        if (!is_array($options) || !in_array($id, $validPriceFieldIds)) {
           continue;
         }
         CRM_Price_BAO_PriceField::addQuickFormElement($form,
