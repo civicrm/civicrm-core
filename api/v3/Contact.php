@@ -174,6 +174,7 @@ function _civicrm_api3_contact_get_spec(&$params) {
   $params['street_address']['title'] = 'Primary Address Street Address';
   $params['supplemental_address_1']['title'] = 'Primary Address Supplemental Address 1';
   $params['supplemental_address_2']['title'] = 'Primary Address Supplemental Address 2';
+  $params['current_employer']['title'] = 'Current Employer';
   $params['city']['title'] = 'Primary Address City';
   $params['postal_code_suffix']['title'] = 'Primary Address Post Code Suffix';
   $params['postal_code']['title'] = 'Primary Address Post Code';
