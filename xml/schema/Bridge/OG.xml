@@ -39,6 +39,9 @@
         <keyColumn>id</keyColumn>
         <labelColumn>title</labelColumn>
       </pseudoconstant>
+      <html>
+        <type>Select</type>
+      </html>
   </field>
   <foreignKey>
        <name>group_id</name>
@@ -70,6 +73,9 @@
         <keyColumn>id</keyColumn>
         <labelColumn>title</labelColumn>
       </pseudoconstant>
+      <html>
+        <type>Select</type>
+      </html>
   </field>
   <foreignKey>
        <name>admin_group_id</name>
