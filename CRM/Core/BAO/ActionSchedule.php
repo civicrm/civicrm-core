@@ -463,6 +463,8 @@ WHERE   cas.entity_value = $id AND
         'toName' => $contact['display_name'],
         'toEmail' => $email,
         'subject' => $messageSubject,
+        'entity' => 'action_schedule',
+        'entity_id' => $scheduleID,
       );
 
       if (!$html || $contact['preferred_mail_format'] == 'Text' ||
