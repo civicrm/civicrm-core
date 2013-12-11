@@ -284,8 +284,10 @@ class CRM_Core_CodeGen_Specification {
       case 'text':
         $field['sqlType'] = $field['phpType'] = $type;
         $field['crmType'] = 'CRM_Utils_Type::T_' . strtoupper($type);
-        $field['rows']    = $this->value('rows', $fieldXML);
-        $field['cols']    = $this->value('cols', $fieldXML);
+        // CRM-13497 see fixme below
+        $field['rows'] = isset($fieldXML->html) ? $this->value('rows', $fieldXML->html) : NULL;
+        $field['cols'] = isset($fieldXML->html) ? $this->value('cols', $fieldXML->html) : NULL;
+        break;
         break;
 
       case 'datetime':
@@ -344,6 +346,26 @@ class CRM_Core_CodeGen_Specification {
     $field['headerPattern'] = $this->value('headerPattern', $fieldXML);
     $field['dataPattern'] = $this->value('dataPattern', $fieldXML);
     $field['uniqueName'] = $this->value('uniqueName', $fieldXML);
+    $field['html'] = $this->value('html', $fieldXML);
+    if (!empty($field['html'])) {
+      $validOptions = array(
+        'type',
+        /* Fixme: prior to CRM-13497 these were in a flat structure
+        // CRM-13497 moved them to be nested within 'html' but there's no point
+        // making that change in the DAOs right now since we are in the process of
+        // moving to docrtine anyway.
+        // So translating from nested xml back to flat structure for now.
+        'rows',
+        'cols',
+        'size', */
+      );
+      $field['html'] = array();
+      foreach ($validOptions as $htmlOption) {
+        if(!empty($fieldXML->html->$htmlOption)){
+          $field['html'][$htmlOption] = $this->value($htmlOption, $fieldXML->html);
+        }
+      }
+    }
     $field['pseudoconstant'] = $this->value('pseudoconstant', $fieldXML);
     if(!empty($field['pseudoconstant'])){
       //ok this is a bit long-winded but it gets there & is consistent with above approach
@@ -561,8 +583,8 @@ class CRM_Core_CodeGen_Specification {
    */
   protected function getSize($fieldXML) {
     // Extract from <size> tag if supplied
-    if ($this->value('size', $fieldXML)) {
-      $const = 'CRM_Utils_Type::' . strtoupper($fieldXML->size);
+    if (!empty($fieldXML->html) && $this->value('size', $fieldXML->html)) {
+      $const = 'CRM_Utils_Type::' . strtoupper($fieldXML->html->size);
       if (defined($const)) {
         return $const;
       }
