@@ -999,7 +999,7 @@ class CRM_Report_Form extends CRM_Core_Form {
       $this->assign('group', TRUE);
     }
 
-    $label = ts('Add these Contacts to Group');
+    $label = ts('Add These Contacts to Group');
     $this->addElement('submit', $this->_groupButtonName, $label, array('onclick' => 'return checkGroup();'));
 
     $this->addChartOptions();
