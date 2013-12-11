@@ -29,6 +29,9 @@
         <keyColumn>id</keyColumn>
         <labelColumn>title</labelColumn>
       </pseudoconstant>
+      <html>
+        <type>Select</type>
+      </html>
   </field>
   <foreignKey>
        <name>uf_group_id</name>
@@ -111,6 +114,9 @@
        <default>'User and User Admin Only'</default>
        <comment>In what context(s) is this field visible.</comment>
        <add>1.1</add>
+       <html>
+         <type>Select</type>
+       </html>
   </field>
   <field>
        <name>listings_title</name>

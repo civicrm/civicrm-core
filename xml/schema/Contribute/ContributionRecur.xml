@@ -54,6 +54,9 @@
       <labelColumn>full_name</labelColumn>
       <nameColumn>numeric_code</nameColumn>
     </pseudoconstant>
+    <html>
+      <type>Select</type>
+    </html>
   </field>
   <field>
     <name>frequency_unit</name>
@@ -63,6 +66,9 @@
     <default>'month'</default>
     <comment>Time units for recurrence of payment.</comment>
     <add>1.6</add>
+    <html>
+      <type>Select</type>
+    </html>
   </field>
   <field>
     <name>frequency_interval</name>
@@ -281,6 +287,9 @@
     <pseudoconstant>
       <optionGroupName>payment_instrument</optionGroupName>
     </pseudoconstant>
+    <html>
+      <type>Select</type>
+    </html>
     <add>4.1</add>
   </field>
   <index>

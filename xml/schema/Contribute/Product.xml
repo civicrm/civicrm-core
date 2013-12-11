@@ -90,6 +90,9 @@
         <labelColumn>full_name</labelColumn>
         <nameColumn>numeric_code</nameColumn>
       </pseudoconstant>
+      <html>
+        <type>Select</type>
+      </html>
   </field>
   <field>
       <name>financial_type_id</name>
@@ -138,6 +141,9 @@
       <comment>Rolling means we set start/end based on current day, fixed means we set start/end for current year or month
 (e.g. 1 year + fixed -> we would set start/end for 1/1/06 thru 12/31/06 for any premium chosen in 2006) </comment>
       <add>1.4</add>
+      <html>
+        <type>Select</type>
+      </html>
   </field>
   <field>
       <name>fixed_period_start_day</name>
@@ -154,6 +160,9 @@
       <values>day,month,week,year</values>
       <default>'year'</default>
       <add>1.4</add>
+      <html>
+        <type>Select</type>
+      </html>
   </field>
   <field>
       <name>duration_interval</name>
@@ -170,6 +179,9 @@
       <default>'month'</default>
       <comment>Frequency unit and interval allow option to store actual delivery frequency for a subscription or service.</comment>
       <add>1.4</add>
+      <html>
+        <type>Select</type>
+      </html>
   </field>
   <field>
       <name>frequency_interval</name>

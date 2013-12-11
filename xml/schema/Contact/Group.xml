@@ -40,9 +40,11 @@
        <name>description</name>
        <type>text</type>
        <title>Group Description</title>
-       <htmlType>textarea</htmlType>
-       <rows>2</rows>
-       <cols>60</cols>
+       <html>
+         <type>TextArea</type>
+         <rows>2</rows>
+         <cols>60</cols>
+       </html>
        <comment>Optional verbose description of the group.</comment>
        <add>1.1</add>
   </field>
@@ -83,6 +85,9 @@
        <default>'User and User Admin Only'</default>
        <comment>In what context(s) is this field visible.</comment>
        <add>1.2</add>
+       <html>
+         <type>Select</type>
+       </html>
   </field>
   <field>
        <name>where_clause</name>
