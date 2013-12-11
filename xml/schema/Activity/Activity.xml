@@ -225,12 +225,12 @@
       <title>Details</title>
       <import>true</import>
       <type>text</type>
-      <rows>8</rows>
-      <cols>60</cols>
       <headerPattern>/(activity.)?detail(s)?$/i</headerPattern>
       <comment>Details about the activity (agenda, notes, etc).</comment>
       <html>
-            <type>RichTextEditor</type>
+          <type>RichTextEditor</type>
+          <rows>8</rows>
+          <cols>60</cols>
       </html>
       <add>1.1</add>
   </field>
