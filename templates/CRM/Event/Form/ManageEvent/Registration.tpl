@@ -427,7 +427,7 @@ invert              = 0
     //show edit profile field links
     cj(function() {
         // show edit for main profile
-        cj('select[id^="custom_p"]').live( 'change',  function( event ) {
+        cj(document).on('change', 'select[id^="custom_p"]', function( event ) {
             buildLinks( cj(this), cj(this).val());
         });
 
@@ -437,7 +437,7 @@ invert              = 0
         });
 
         //show edit profile field links in additional participant
-        cj('select[id^="additional_custom_p"]').live( 'change',  function( event ) {
+      cj(document).on('change', 'select[id^="additional_custom_p"]', function( event ) {
             buildLinks( cj(this), cj(this).val());
         });
 
