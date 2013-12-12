@@ -473,7 +473,10 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
       $params['msg_template_id'] = CRM_Utils_Array::value('template', $values);
     }
 
-    CRM_Core_BAO_ActionSchedule::add($params, $ids);
+    $bao = CRM_Core_BAO_ActionSchedule::add($params);
+    // we need to set this on the form so that hooks can identify the created entity
+    $this->set('id', $bao->id);
+    $bao->free();
 
     $status = ts("Your new Reminder titled %1 has been saved.",
       array(1 => "<strong>{$values['title']}</strong>")
