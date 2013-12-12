@@ -55,7 +55,13 @@ Alternatively you can get a version of CiviCRM that matches your PHP version
       exit();
     }
 
-    $specification = new CRM_Core_CodeGen_Specification();
+    if (defined('CIVICRM_GEN_ENTITY') && CIVICRM_GEN_ENTITY) {
+      $specification = new CRM_Core_CodeGen_EntitySpecification();
+    }
+    else {
+      $specification = new CRM_Core_CodeGen_Specification();
+    }
+
     $specification->parse($this->schemaPath, $this->buildVersion);
     # cheese:
     $this->database = $specification->database;
@@ -74,6 +80,11 @@ Alternatively you can get a version of CiviCRM that matches your PHP version
       'CRM_Core_CodeGen_Test',
       'CRM_Core_CodeGen_I18n',
     );
+
+    if (defined('CIVICRM_GEN_ENTITY') && CIVICRM_GEN_ENTITY) {
+      $components[3] = 'CRM_Core_CodeGen_Entity';
+    }
+
     foreach ($components as $component) {
       $task = new $component($this);
 
