@@ -579,8 +579,6 @@ class CRM_Core_Resources {
 
       "packages/jquery/plugins/jquery.notify$min.js",
 
-      "packages/jquery/plugins/jquery.redirect.min.js",
-
       "js/rest.js",
       "js/Common.js",
 
