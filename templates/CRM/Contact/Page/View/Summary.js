@@ -93,7 +93,12 @@
         $("#tab_log a em").html(response.changeLog.count);
       }
       $("#crm-record-log").replaceWith(response.changeLog.markup);
-      if ($('#Change_Log div').length) {
+      // Refresh tab contents - Advanced logging
+      if (CRM.reloadChangeLogTab) {
+        CRM.reloadChangeLogTab();
+      }
+      // Refresh tab contents - Simple logging
+      else if ($('#Change_Log div').length) {
         $('#Change_Log').load($("#tab_log a").attr('href'));
       }
     }
