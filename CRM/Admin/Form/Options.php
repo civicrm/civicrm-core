@@ -270,8 +270,19 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
     }
 
     //fix for CRM-3552, CRM-4575
-    if (in_array($this->_gName, array(
-      'communication_style', 'email_greeting', 'postal_greeting', 'addressee', 'from_email_address', 'case_status', 'encounter_medium', 'case_type'))) {
+    $showIsDefaultGroups = array(
+      'email_greeting',
+      'postal_greeting',
+      'addressee',
+      'from_email_address',
+      'case_status',
+      'encounter_medium',
+      'case_type',
+      'payment_instrument',
+      'communication_style',
+    );
+
+    if (in_array($this->_gName, $showIsDefaultGroups)) {
       $this->assign('showDefault', TRUE);
       $this->add('checkbox', 'is_default', ts('Default Option?'));
     }

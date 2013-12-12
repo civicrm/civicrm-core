@@ -38,6 +38,9 @@
        <default>"Daily"</default>
        <comment>Scheduled job run frequency.</comment>
        <add>4.1</add>
+       <html>
+         <type>Select</type>
+       </html>
   </field>
   <field>
        <name>last_run</name>
@@ -87,9 +90,11 @@
        <name>parameters</name>
        <type>text</type>
        <comment>List of parameters to the command.</comment>
-       <htmlType>textarea</htmlType>
-       <rows>4</rows>
-       <cols>60</cols>
+       <html>
+         <type>TextArea</type>
+         <rows>4</rows>
+         <cols>60</cols>
+       </html>
        <add>4.1</add>
   </field>
   <field>

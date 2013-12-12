@@ -54,6 +54,9 @@
       <keyColumn>id</keyColumn>
       <labelColumn>name</labelColumn>
     </pseudoconstant>
+    <html>
+      <type>Select</type>
+    </html>
   </field>
   <foreignKey>
     <name>from_financial_account_id</name>
@@ -71,6 +74,9 @@
       <keyColumn>id</keyColumn>
       <labelColumn>name</labelColumn>
     </pseudoconstant>
+    <html>
+      <type>Select</type>
+    </html>
   </field>
   <foreignKey>
     <name>to_financial_account_id</name>
@@ -128,6 +134,9 @@
       <labelColumn>full_name</labelColumn>
       <nameColumn>numeric_code</nameColumn>
     </pseudoconstant>
+    <html>
+      <type>Select</type>
+    </html>
   </field>
   <field>
     <name>payment_processor</name>
@@ -184,6 +193,9 @@
     <pseudoconstant>
       <optionGroupName>payment_instrument</optionGroupName>
     </pseudoconstant>
+    <html>
+      <type>Select</type>
+    </html>
     <add>4.3</add>
   </field>
   <index>
@@ -198,7 +210,10 @@
     <comment>Check number</comment>
     <type>varchar</type>
     <length>255</length>
-    <size>SIX</size>
+    <html>
+      <type>Text</type>
+      <size>SIX</size>
+    </html>
     <add>4.3</add>
   </field>
   <index>

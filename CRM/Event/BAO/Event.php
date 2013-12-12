@@ -1104,6 +1104,13 @@ WHERE civicrm_event.is_active = 1
             'conference_sessions' => $sessions,
           ));
 
+        // CRM-13890 : NOTE wait list condition need to be given so that
+        // wait list message is shown properly in email i.e. WRT online event registration template
+        if (empty($tplParams['participant_status']) && !CRM_Utils_Array::value('isOnWaitlist', $values['params'])) {
+          $statusId = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Participant', $participantId, 'status_id', 'id');
+          $tplParams['participant_status'] = CRM_Event_PseudoConstant::participantStatus($statusId, NULL, 'label');
+        }
+
         $sendTemplateParams = array(
           'groupName' => 'msg_tpl_workflow_event',
           'valueName' => 'event_online_receipt',

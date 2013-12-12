@@ -134,10 +134,10 @@ class CRM_GCD {
     }
     // Init DB
     $config = CRM_Core_Config::singleton();
-    
+
     // Relationship types indexed by name_a_b from the table civicrm_relationship_type
     $this->relTypes = CRM_Utils_Array::index(array('name_a_b'), CRM_Core_PseudoConstant::relationshipType('name'));
-    
+
   }
 
   /**
@@ -485,6 +485,7 @@ class CRM_GCD {
       if ($this->probability(.5)) {
         $contact->preferred_communication_method = CRM_Core_DAO::VALUE_SEPARATOR . $this->randomItem($this->preferredCommunicationMethod) . CRM_Core_DAO::VALUE_SEPARATOR;
       }
+      $contact->source = 'Sample Data';
       $this->_insert($contact);
     }
   }
@@ -1713,13 +1714,18 @@ VALUES
     $sql = "SELECT id from civicrm_contribution where contact_id = 34";
     $contriId2 = CRM_Core_DAO::singleValueQuery($sql);
 
+    $sql = "SELECT cov.value FROM civicrm_option_value cov LEFT JOIN civicrm_option_group cog ON cog.id = cov.option_group_id WHERE cov.name = 'pcp' AND cog.name = 'soft_credit_type'";
+
+    $pcpId = CRM_Core_DAO::singleValueQuery($sql);
+
     $query = "
 INSERT INTO `civicrm_contribution_soft`
-      ( contribution_id, contact_id ,amount , currency, pcp_id , pcp_display_in_roll ,pcp_roll_nickname,pcp_personal_note )
+      ( contribution_id, contact_id ,amount , currency, pcp_id , pcp_display_in_roll ,pcp_roll_nickname,pcp_personal_note, soft_credit_type_id )
 VALUES
-    ( $contriId1, {$this->Individual[3]}, 10.00, 'USD', 1, 1, 'Jones Family', 'Helping Hands'),
-    ( $contriId2, {$this->Individual[3]}, 250.00, 'USD', 1, 1, 'Annie and the kids', 'Annie Helps');
+    ( $contriId1, {$this->Individual[3]}, 10.00, 'USD', 1, 1, 'Jones Family', 'Helping Hands', $pcpId),
+    ( $contriId2, {$this->Individual[3]}, 250.00, 'USD', 1, 1, 'Annie and the kids', 'Annie Helps', $pcpId);
  ";
+
     $this->_query($query);
   }
 
@@ -1776,7 +1782,7 @@ WHERE cefa.account_relationship = 1; ";
 
   private function addParticipantFinancialItem() {
 
-    $sql = " SELECT cpp.contribution_id, cli.id as line_item_id, cp.contact_id, now() as receive_date, cp.fee_amount as total_amount, cp.fee_currency as currency, cli.label, cli.financial_type_id, cefa.financial_account_id, NULL as payment_instrument_id, NULL as check_number, NULL as trxn_id
+    $sql = " SELECT cpp.contribution_id, cli.id as line_item_id, cp.contact_id, now() as receive_date, cp.fee_amount as total_amount, cp.fee_currency as currency, cli.label, cli.financial_type_id, cefa.financial_account_id, 4 as payment_instrument_id, NULL as check_number, NULL as trxn_id
 FROM `civicrm_participant` cp
 INNER JOIN civicrm_participant_payment cpp ON cpp.participant_id = cp.id
 INNER JOIN civicrm_line_item cli ON cli.entity_id = cp.id and cli.entity_table = 'civicrm_participant'
@@ -1826,8 +1832,9 @@ SELECT 'civicrm_participant',cp.id, cpfv.price_field_id, cpfv.label, 1, cpfv.amo
   private function addMembershipPayment() {
     $maxContribution = CRM_Core_DAO::singleValueQuery("select max(id) from civicrm_contribution");
     $financialTypeID = CRM_Core_DAO::singleValueQuery("select id from civicrm_financial_type where name = 'Member Dues'");
-    $sql = "INSERT INTO civicrm_contribution (contact_id,financial_type_id,receive_date, total_amount, currency, source, contribution_status_id)
-SELECT  cm.contact_id, $financialTypeID, now(), cmt.minimum_fee, 'USD', CONCAT(cmt.name, ' Membership: Offline signup'), 1 FROM `civicrm_membership` cm
+    $paymentInstrumentID = CRM_Core_DAO::singleValueQuery("select value from civicrm_option_value where name = 'Credit Card' AND option_group_id = (SELECT id from civicrm_option_group where name = 'payment_instrument')");
+    $sql = "INSERT INTO civicrm_contribution (contact_id,financial_type_id,payment_instrument_id, receive_date, total_amount, currency, source, contribution_status_id)
+SELECT  cm.contact_id, $financialTypeID, $paymentInstrumentID, now(), cmt.minimum_fee, 'USD', CONCAT(cmt.name, ' Membership: Offline signup'), 1 FROM `civicrm_membership` cm
 LEFT JOIN civicrm_membership_type cmt ON cmt.id = cm.membership_type_id;";
 
     $this->_query($sql);
@@ -1865,8 +1872,9 @@ AND    a.details = 'Membership Payment'
   private function addParticipantPayment() {
     $maxContribution = CRM_Core_DAO::singleValueQuery("select max(id) from civicrm_contribution");
     $financialTypeID = CRM_Core_DAO::singleValueQuery("select id from civicrm_financial_type where name = 'Event Fee'");
-    $sql = "INSERT INTO civicrm_contribution (contact_id, financial_type_id, receive_date, total_amount, currency, receipt_date, source, contribution_status_id)
-SELECT  `contact_id`, $financialTypeID, now(), `fee_amount`, 'USD', now(), CONCAT(ce.title, ' : Offline registration'), 1  FROM `civicrm_participant` cp
+    $paymentInstrumentID = CRM_Core_DAO::singleValueQuery("select value from civicrm_option_value where name = 'Credit Card' AND option_group_id = (SELECT id from civicrm_option_group where name = 'payment_instrument')");
+    $sql = "INSERT INTO civicrm_contribution (contact_id, financial_type_id, payment_instrument_id, receive_date, total_amount, currency, receipt_date, source, contribution_status_id)
+SELECT  `contact_id`, $financialTypeID, $paymentInstrumentID, now(), `fee_amount`, 'USD', now(), CONCAT(ce.title, ' : Offline registration'), 1  FROM `civicrm_participant` cp
 LEFT JOIN civicrm_event ce ON ce.id = cp.event_id
 group by `contact_id`;";
 

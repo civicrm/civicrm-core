@@ -31,6 +31,9 @@
       <keyColumn>id</keyColumn>
       <labelColumn>title</labelColumn>
     </pseudoconstant>
+    <html>
+      <type>Select</type>
+    </html>
   </field>
   <foreignKey>
        <name>group_id</name>
@@ -61,6 +64,9 @@
        <values>Added, Removed, Pending</values>
        <comment>status of contact relative to membership in group</comment>
        <add>1.1</add>
+       <html>
+         <type>Select</type>
+       </html>
   </field>
   <field>
        <name>location_id</name>

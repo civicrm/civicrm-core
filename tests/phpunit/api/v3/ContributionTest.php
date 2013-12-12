@@ -644,7 +644,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->assertAPISuccess($result);
     $contributionId = $result['id'];
     $expectedResult = contribution_create_expectedresult();
-    $this->checkArrayEquals($result, $expectedResult);
+    $this->checkArrayEquals($expectedResult, $result);
     $this->contributionDelete($contributionId);
   }
 
@@ -895,7 +895,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     );
     $contribution = $this->callAPISuccess('contribution', 'update', $newParams);
     $this->assertAPISuccess($contribution);
-    $this->_checkFinancialTrxn($contribution, 'paymentInstrument');
+    $this->_checkFinancialTrxn($contribution, 'paymentInstrument', $instrumentId);
   }
 
   /*
@@ -1236,7 +1236,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $mut->checkMailLog(array(
       'Annual CiviCRM meet',
       'Event',
-      'This letter is a confirmation that your registration has been received and your status has been updated to registered for the following',
+      'This letter is a confirmation that your registration has been received and your status has been updated to Registered.',
     ));
   $mut->stop();
 
@@ -1444,7 +1444,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    }
  }
 
- function _checkFinancialTrxn($contribution, $context) {
+ function _checkFinancialTrxn($contribution, $context, $instrumentId = NULL) {
    $trxnParams = array(
      'entity_id' =>   $contribution['id'],
      'entity_table' => 'civicrm_contribution',
@@ -1458,12 +1458,6 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
      $compareParams = array(
        'status_id' => 1,
        'from_financial_account_id' => CRM_Contribute_PseudoConstant::financialAccountType($contribution['financial_type_id'], $relationTypeId),
-     );
-   }
-   elseif ($context == 'paymentInstrument') {
-     $compareParams = array(
-       'from_financial_account_id' => 6,
-       'to_financial_account_id'  =>  7,
      );
    }
    elseif ($context == 'refund') {
@@ -1480,7 +1474,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
        'status_id' => 3,
      );
    }
-   elseif ($context == 'changeFinancial') {
+   elseif ($context == 'changeFinancial' || $context == 'paymentInstrument') {
      $entityParams = array(
        'entity_id' =>   $contribution['id'],
        'entity_table' => 'civicrm_contribution',
@@ -1491,16 +1485,27 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
         'id' => $trxn['financial_trxn_id'],
      );
      $compareParams = array(
-       'to_financial_account_id' => 12,
        'total_amount' => -100,
        'status_id' => 1,
      );
+     if ($context == 'paymentInstrument') {
+       $compareParams += array(
+         'to_financial_account_id' => CRM_Financial_BAO_FinancialTypeAccount::getInstrumentFinancialAccount(4),
+         'payment_instrument_id' => 4,
+       );
+     }
+     else {
+       $compareParams['to_financial_account_id'] = 12;
+     }
      $this->assertDBCompareValues('CRM_Financial_DAO_FinancialTrxn', $trxnParams1, $compareParams);
-     $compareParams = array(
-       'to_financial_account_id' => 12,
-       'total_amount' => 100,
-       'status_id' => 1,
-     );
+     $compareParams['total_amount'] = 100;
+     if ($context == 'paymentInstrument') {
+       $compareParams['to_financial_account_id'] = CRM_Financial_BAO_FinancialTypeAccount::getInstrumentFinancialAccount($instrumentId);
+       $compareParams['payment_instrument_id'] = $instrumentId;
+     }
+     else {
+       $compareParams['to_financial_account_id'] = 12;
+     }
    }
 
    $this->assertDBCompareValues('CRM_Financial_DAO_FinancialTrxn', $params, $compareParams);

@@ -23,7 +23,7 @@
       <title>Report Instance Domain ID</title>
       <type>int unsigned</type>
       <required>true</required>
-      <comment>Which Domain is this instance for</comment>
+      <comment>Which Domain is this instance for</comment>      
       <add>3.1</add>
   </field>
   <foreignKey>
@@ -38,6 +38,9 @@
        <type>varchar</type>
        <length>255</length>
        <comment>Report Instance Title.</comment>
+       <html>
+        <type>Text</type>
+      </html>
        <add>2.2</add>
   </field>
   <field>
@@ -47,6 +50,9 @@
       <length>64</length>
       <required>true</required>
       <comment>FK to civicrm_option_value for the report template</comment>
+      <html>
+        <type>Select</type>
+      </html>
       <add>2.2</add>
   </field>
   <field>
@@ -55,6 +61,9 @@
       <type>varchar</type>
       <length>255</length>
       <comment>when combined with report_id/template uniquely identifies the instance</comment>
+      <html>
+        <type>Text</type>
+      </html>
       <add>3.2</add>
   </field>
   <field>
@@ -64,6 +73,9 @@
       <length>255</length>
       <comment>arguments that are passed in the url when invoking the instance</comment>
       <add>3.2</add>
+      <html>
+        <type>Text</type>
+      </html>
   </field>
   <field>
        <name>description</name>
@@ -71,6 +83,9 @@
        <type>varchar</type>
        <length>255</length>
        <comment>Report Instance description.</comment>
+       <html>
+        <type>Text</type>
+      </html>
        <add>2.2</add>
   </field>
   <field>
@@ -79,6 +94,9 @@
        <type>varchar</type>
        <length>255</length>
        <comment>permission required to be able to run this instance</comment>
+       <html>
+        <type>Text</type>
+      </html>
        <add>2.2</add>
   </field>
   <field>
@@ -88,6 +106,9 @@
        <length>1024</length>
        <comment>role required to be able to run this instance</comment>
        <add>4.1</add>
+       <html>
+        <type>Text</type>
+      </html>
   </field>
   <field>
        <name>form_values</name>
@@ -102,6 +123,9 @@
        <title>Report Instance is Active</title>
        <type>boolean</type>
        <comment>Is this entry active?</comment>
+       <html>
+         <type>CheckBox</type>
+       </html>
        <add>2.2</add>
   </field>
   <field>
@@ -110,12 +134,18 @@
        <type>varchar</type>
        <length>255</length>
        <comment>Subject of email</comment>
+       <html>
+         <type>Text</type>
+       </html>
   </field>
   <field>
       <name>email_to</name>
       <title>Email Report Instance To</title>
       <type>text</type>
       <comment>comma-separated list of email addresses to send the report to</comment>
+      <html>
+        <type>Text</type>
+      </html>
       <add>2.2</add>
   </field>
   <field>
@@ -123,6 +153,9 @@
       <title>cc Email Report Instance To</title>
       <type>text</type>
       <comment>comma-separated list of email addresses to send the report to</comment>
+      <html>
+        <type>Text</type>
+      </html>
       <add>2.2</add>
   </field>
   <field>
@@ -130,9 +163,11 @@
       <title>Report Instance Header</title>
       <type>text</type>
       <comment>comma-separated list of email addresses to send the report to</comment>
-      <htmlType>textarea</htmlType>
-      <rows>4</rows>
-      <cols>60</cols>
+      <html>
+        <type>TextArea</type>
+        <rows>4</rows>
+        <cols>60</cols>
+      </html>
       <add>2.2</add>
   </field>
   <field>
@@ -140,9 +175,11 @@
       <title>Report Instance Footer</title>
       <type>text</type>
       <comment>comma-separated list of email addresses to send the report to</comment>
-      <htmlType>textarea</htmlType>
-      <rows>4</rows>
-      <cols>60</cols>
+      <html>
+        <type>TextArea</type>
+        <rows>4</rows>
+        <cols>60</cols>
+      </html>
       <add>2.2</add>
   </field>
   <field>
@@ -180,6 +217,9 @@
     <title>Instance is Reserved</title>
     <type>boolean</type>
     <default>0</default>
+    <html>
+      <type>CheckBox</type>
+    </html>
     <add>4.2</add>
   </field>
 </table>

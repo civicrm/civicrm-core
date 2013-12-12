@@ -42,6 +42,9 @@
         <keyColumn>id</keyColumn>
         <labelColumn>display_name</labelColumn>
       </pseudoconstant>
+      <html>
+        <type>Select</type>
+      </html>
   </field>
   <index>
     <name>index_location_type</name>
@@ -195,6 +198,9 @@
         <keyColumn>id</keyColumn>
         <labelColumn>name</labelColumn>
       </pseudoconstant>
+      <html>
+        <type>Select</type>
+      </html>
       <add>1.1</add>
   </field>
   <foreignKey>
@@ -217,6 +223,9 @@
         <keyColumn>id</keyColumn>
         <labelColumn>name</labelColumn>
       </pseudoconstant>
+      <html>
+        <type>Select</type>
+      </html>
       <add>1.1</add>
   </field>
   <foreignKey>
@@ -269,6 +278,9 @@
         <labelColumn>name</labelColumn>
         <nameColumn>iso_code</nameColumn>
       </pseudoconstant>
+      <html>
+        <type>Select</type>
+      </html>
       <add>1.1</add>
   </field>
   <foreignKey>

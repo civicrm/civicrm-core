@@ -189,9 +189,8 @@ class CRM_Admin_Form_OptionValue extends CRM_Admin_Form {
       $this->add('select', 'contactOptions', ts('Contact Type'), array('' => '-select-') + $values, TRUE);
     }
 
+    $this->add('hidden', 'gid', $this->_gid);
     $this->addFormRule(array('CRM_Admin_Form_OptionValue', 'formRule'), $this);
-    $cancelURL = CRM_Utils_System::url('civicrm/admin/optionValue', "gid={$this->_gid}&reset=1");
-    $cancelURL = str_replace('&amp;', '&', $cancelURL);
     $this->addButtons(
       array(
         array(
@@ -202,10 +201,19 @@ class CRM_Admin_Form_OptionValue extends CRM_Admin_Form {
         array(
           'type' => 'cancel',
           'name' => ts('Cancel'),
-          'js' => array('onclick' => "location.href='{$cancelURL}'; return false;"),
         ),
       )
     );
+  }
+
+  function cancelAction() {
+    parent::cancelAction();
+
+    $gid = CRM_Utils_Request::retrieve('gid', 'Positive', $this, FALSE, 0);
+    $cancelURL = CRM_Utils_System::url('civicrm/admin/optionValue', "gid={$gid}&reset=1");
+
+    $session = CRM_Core_Session::singleton();
+    $session->pushUserContext($cancelURL);
   }
 
   /**

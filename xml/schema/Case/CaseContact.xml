@@ -37,7 +37,10 @@
       <uniqueName>case_contact_id</uniqueName>
       <required>true</required>
       <comment>Contact ID of contact record given case belongs to.</comment>
-       <add>2.1</add>
+      <html>
+        <type>Autocomplete-Select</type>
+      </html>      
+      <add>2.1</add>
   </field>
   <foreignKey>
        <name>contact_id</name>

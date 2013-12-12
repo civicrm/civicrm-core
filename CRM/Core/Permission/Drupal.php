@@ -127,5 +127,40 @@ class CRM_Core_Permission_Drupal extends CRM_Core_Permission_DrupalBase{
       ->condition('permission', array_keys($permissions), 'NOT IN');
     $query->execute();
   }
+
+  /**
+   * Get all the contact emails for users that have a specific permission
+   *
+   * @param string $permissionName name of the permission we are interested in
+   *
+   * @return string a comma separated list of email addresses
+   */
+  public function permissionEmails($permissionName) {
+    static $_cache = array();
+
+    if (isset($_cache[$permissionName])) {
+      return $_cache[$permissionName];
+    }
+
+    $uids = array();
+    $sql = "
+      SELECT {users}.uid, {role_permission}.permission
+      FROM {users}
+      JOIN {users_roles}
+        ON {users}.uid = {users_roles}.uid
+      JOIN {role_permission}
+        ON {role_permission}.rid = {users_roles}.rid
+      WHERE {role_permission}.permission = '{$permissionName}'
+        AND {users}.status = 1
+    ";
+
+    $result = db_query($sql);
+    foreach ( $result as $record ) {
+      $uids[] = $record->uid;
+    }
+
+    $_cache[$permissionName] = self::getContactEmails($uids);
+    return $_cache[$permissionName];
+  }
 }
 
