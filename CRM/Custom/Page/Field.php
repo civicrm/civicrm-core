@@ -290,7 +290,7 @@ class CRM_Custom_Page_Field extends CRM_Core_Page {
       $this->preview($id);
     }
     else {
-      CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'templates/CRM/Custom/Page/Field.js');
+      CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'js/crm.livePage.js');
       $this->browse();
     }
 
