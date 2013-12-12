@@ -560,7 +560,7 @@ class CRM_Core_Resources {
 
       "packages/jquery/plugins/jquery.form$min.js",
 
-      "packages/jquery/plugins/jquery.tokeninput.js",
+      "packages/jquery/plugins/jquery.tokeninput$min.js",
       "packages/jquery/css/token-input-facebook.css",
 
       "packages/jquery/plugins/jquery.timeentry$min.js",
@@ -568,12 +568,12 @@ class CRM_Core_Resources {
       "packages/jquery/plugins/DataTables/media/css/demo_table_jui.css",
       "packages/jquery/plugins/DataTables/media/js/jquery.dataTables$min.js",
 
-      "packages/jquery/plugins/jquery.FormNavigate.js",
+      "packages/jquery/plugins/jquery.FormNavigate$min.js",
 
       "packages/jquery/plugins/jquery.validate$min.js",
       "packages/jquery/plugins/jquery.ui.datepicker.validation.pack.js",
 
-      "packages/jquery/plugins/jquery.jeditable.mini.js",
+      "packages/jquery/plugins/jquery.jeditable$min.js",
 
       "packages/jquery/plugins/jquery.blockUI$min.js",
 
