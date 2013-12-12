@@ -854,6 +854,7 @@ CRM.validate = CRM.validate || {
       if (!this.element.is('.crm-container *')) {
         this.element.addClass('crm-container');
       }
+      this._handleOrderLinks();
       this.options.url ? this.refresh() : this.options.url = document.location.href;
       this._originalUrl = this.options.url;
     },
@@ -869,17 +870,30 @@ CRM.validate = CRM.validate || {
       }
       return url;
     },
+    _handleOrderLinks: function() {
+      var that = this;
+      $('a.crm-weight-arrow', that.element).click(function(e) {
+        that.options.block && that.element.block();
+        $.getJSON(that._formatUrl(this.href)).done(function() {
+          that.refresh();
+        });
+        e.stopImmediatePropagation();
+        return false;
+      });
+    },
     refresh: function() {
       var that = this;
       var url = this._formatUrl(this.options.url);
-      this.options.block && this.element.block();
+      this.options.block && $('.blockOverlay', this.element).length < 1 && this.element.block();
       $.getJSON(url, function(data) {
         if (typeof(data) != 'object' || typeof(data.content) != 'string') {
           that._onFailure(data);
           return;
         }
         data.url = url;
-        that.element.html(data.content).trigger('crmLoad', data);
+        that.element.html(data.content);
+        that._handleOrderLinks();
+        that.element.trigger('crmLoad', data);
         that.options.crmForm && that.element.trigger('crmFormLoad', data);
       }).fail(function() {
           that._onFailure();
