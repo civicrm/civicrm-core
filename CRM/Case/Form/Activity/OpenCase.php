@@ -84,7 +84,7 @@ class CRM_Case_Form_Activity_OpenCase {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   static function setDefaultValues(&$form) {
     $defaults = array();
@@ -199,7 +199,7 @@ class CRM_Case_Form_Activity_OpenCase {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   static function beginPostProcess(&$form, &$params) {
     if ($form->_context == 'caseActivity') {
@@ -273,7 +273,7 @@ class CRM_Case_Form_Activity_OpenCase {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   static function endPostProcess(&$form, &$params) {
     if ($form->_context == 'caseActivity') {

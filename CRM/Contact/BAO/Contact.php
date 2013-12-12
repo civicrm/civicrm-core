@@ -505,7 +505,7 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
    * @param array   $defaults (reference) the default values, some of which need to be resolved.
    * @param boolean $reverse  true if we want to resolve the values in the reverse direction (value -> name)
    *
-   * @return none
+   * @return void
    * @access public
    * @static
    */

@@ -237,7 +237,7 @@ class CRM_Friend_BAO_Friend extends CRM_Friend_DAO_Friend {
    *
    * @param object $form form object
    *
-   * @return None
+   * @return void
    * @access public
    */
   static function buildFriendForm($form) {

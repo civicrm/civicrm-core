@@ -61,7 +61,7 @@ class CRM_Mailing_Form_Test extends CRM_Core_Form {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   function setDefaultValues() {
     $count = $this->get('count');

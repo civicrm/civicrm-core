@@ -569,7 +569,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
   /**
    * Function to add the custom fields
    *
-   * @return None
+   * @return void
    * @access public
    */
   function buildCustom($id, $name, $viewOnly = FALSE) {
@@ -731,7 +731,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
   /**
    * Function to handle  process after the confirmation of payment by User
    *
-   * @return None
+   * @return void
    * @access public
    */
   function confirmPostProcess($contactID = NULL, $contribution = NULL, $payment = NULL) {

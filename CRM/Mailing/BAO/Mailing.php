@@ -2380,7 +2380,7 @@ LEFT JOIN civicrm_mailing_group g ON g.mailing_id   = m.id
    *
    * @param   $form
    *
-   * @return None
+   * @return void
    * @access public
    */
   public static function commonCompose(&$form) {
@@ -2478,7 +2478,7 @@ LEFT JOIN civicrm_mailing_group g ON g.mailing_id   = m.id
    *
    * @param   $form
    *
-   * @return None
+   * @return void
    * @access public
    */
   public static function commonLetterCompose(&$form) {

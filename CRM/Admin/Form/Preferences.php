@@ -135,7 +135,7 @@ class CRM_Admin_Form_Preferences extends CRM_Core_Form {
   /**
    * Function to build the form
    *
-   * @return None
+   * @return void
    * @access public
    */
   public function buildQuickForm() {
@@ -219,7 +219,7 @@ class CRM_Admin_Form_Preferences extends CRM_Core_Form {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   public function postProcess() {
     $config = CRM_Core_Config::singleton();
@@ -238,7 +238,7 @@ class CRM_Admin_Form_Preferences extends CRM_Core_Form {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   public function postProcessCommon() {
     foreach ($this->_varNames as $groupName => $groupValues) {

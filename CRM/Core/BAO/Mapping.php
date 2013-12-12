@@ -258,7 +258,7 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
    * @params mixed  $columnCount column count is int for and array for search builder
    * @params int    $blockCount  block count (no of blocks shown)
    *
-   * @return none
+   * @return void
    * @access public
    * @static
    */

@@ -161,7 +161,7 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
   /**
    * Function to build the form
    *
-   * @return None
+   * @return void
    * @access public
    */
   public function buildQuickForm($check = FALSE) {

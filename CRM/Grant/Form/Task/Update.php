@@ -82,7 +82,7 @@ class CRM_Grant_Form_Task_Update extends CRM_Grant_Form_Task {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   public function postProcess() {
     $updatedGrants = 0;

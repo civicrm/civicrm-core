@@ -111,7 +111,7 @@ class CRM_Contact_Page_View_UserDashBoard extends CRM_Core_Page {
   /**
    * Function to build user dashboard
    *
-   * @return none
+   * @return void
    * @access public
    */
   function buildUserDashBoard() {
@@ -206,7 +206,7 @@ class CRM_Contact_Page_View_UserDashBoard extends CRM_Core_Page {
   /**
    * perform actions and display for user dashboard
    *
-   * @return none
+   * @return void
    *
    * @access public
    */

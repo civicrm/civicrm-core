@@ -64,7 +64,7 @@ class CRM_Admin_Form_Job extends CRM_Admin_Form {
   /**
    * Function to build the form
    *
-   * @return None
+   * @return void
    * @access public
    */
   public function buildQuickForm($check = FALSE) {
@@ -165,7 +165,7 @@ class CRM_Admin_Form_Job extends CRM_Admin_Form {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   public function postProcess() {
 

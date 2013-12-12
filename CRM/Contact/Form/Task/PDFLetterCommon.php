@@ -327,7 +327,7 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   static function postProcess(&$form) {
     list($formValues, $categories, $html_message, $messageToken, $returnProperties) = self::processMessageTemplate($form);

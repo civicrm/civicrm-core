@@ -505,7 +505,7 @@ SELECT civicrm_custom_group.name as name,
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   public function setDefaultValues() {
     if ($this->_showFeeBlock) {
@@ -661,7 +661,7 @@ SELECT civicrm_custom_group.name as name,
   /**
    * Function to build the form
    *
-   * @return None
+   * @return void
    * @access public
    */
   public function buildQuickForm() {

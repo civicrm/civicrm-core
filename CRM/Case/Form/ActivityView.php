@@ -44,7 +44,7 @@ class CRM_Case_Form_ActivityView extends CRM_Core_Form {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   public function preProcess() {
     $contactID       = CRM_Utils_Request::retrieve('cid', 'Integer', $this, TRUE);

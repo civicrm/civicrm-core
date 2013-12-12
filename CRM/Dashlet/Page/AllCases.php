@@ -42,7 +42,7 @@ class CRM_Dashlet_Page_AllCases extends CRM_Core_Page {
   /**
    * List activities as dashlet
    *
-   * @return none
+   * @return void
    *
    * @access public
    */

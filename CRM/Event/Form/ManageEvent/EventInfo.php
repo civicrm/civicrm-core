@@ -91,7 +91,7 @@ class CRM_Event_Form_ManageEvent_EventInfo extends CRM_Event_Form_ManageEvent {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   function setDefaultValues() {
     if ($this->_cdType) {
@@ -152,7 +152,7 @@ class CRM_Event_Form_ManageEvent_EventInfo extends CRM_Event_Form_ManageEvent {
   /**
    * Function to build the form
    *
-   * @return None
+   * @return void
    * @access public
    */
   public function buildQuickForm() {
@@ -296,7 +296,7 @@ class CRM_Event_Form_ManageEvent_EventInfo extends CRM_Event_Form_ManageEvent {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   public function postProcess() {
     $params = $this->controller->exportValues($this->_name);

@@ -96,7 +96,7 @@ class CRM_Event_Form_Task_Email extends CRM_Event_Form_Task {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   public function postProcess() {
     CRM_Contact_Form_Task_EmailCommon::postProcess($this);
