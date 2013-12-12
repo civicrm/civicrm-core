@@ -41,7 +41,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * {$table.className}
  *
- * @ORM\Table(name="{$table.name}", {literal}uniqueConstraints={@ORM\UniqueConstraint(name="UI_name", columns={"name"})}{/literal})
+ * {$table.tableInfo}
  * @ORM\Entity
  */
 class {$table.className} extends \Civi\Core\Entity {ldelim}

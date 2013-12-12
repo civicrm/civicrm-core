@@ -262,6 +262,43 @@ class CRM_Core_CodeGen_EntitySpecification {
       $table['dynamicForeignKey'] = $dynamicForeign;
     }
 
+    // create tags for indexes
+    $table['indexes'] = '';
+    $table['uniqueConstraints'] = '';
+    $indexElements = array();
+    if (!empty($table['index'])) {
+      $uniqueElements = array();
+      foreach($table['index'] as $value) {
+        $indexElements[] = '@ORM\Index(name="' . $value['name'] . '", columns={"' . implode(',', $value['field']) . '"})';
+        if (isset($value['unique'])) {
+          $uniqueElements[] = '@ORM\UniqueConstraint(name="' . $value['name'] . '", columns={"' . implode(',', $value['field']) . '"})';
+        }
+      }
+    }
+
+    // note that we explicitly create indexes for all foreign keys
+    if (!empty($table['foreignKey'])) {
+      foreach($table['foreignKey'] as $value) {
+        $indexElements[] = '@ORM\Index(name="' . $value['uniqName'] . '", columns={"' . $value['name'] . '"})';
+      }
+    }
+
+    //build table annotation
+    $tableInfo = '@ORM\Table(name="' . $name . '"';
+    // add unique constraints if any
+    if (!empty($uniqueElements)) {
+      $tableInfo .= ', uniqueConstraints={' . implode(',', $uniqueElements) . '}';
+    }
+
+    // add indexes if any
+    if (!empty($uniqueElements)) {
+      $tableInfo .= ', indexes={' . implode(',', $indexElements) . '}';
+    }
+
+    $tableInfo .= ')';
+
+    $table['tableInfo'] = $tableInfo;
+
     $tables[$name] = &$table;
     return;
   }
