@@ -196,7 +196,7 @@ class CRM_Core_DAO extends DB_DataObject {
    */
   function initialize() {
     $this->_connect();
-	$this->query("SET NAMES utf8");
+    $this->query("SET NAMES utf8");
   }
 
   /**
