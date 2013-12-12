@@ -221,7 +221,7 @@ class CRM_Contact_Form_Edit_TagsAndGroups {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   public static function setDefaultValues(&$form, &$defaults) {
     $contactEditOptions = $form->get('contactEditOptions');

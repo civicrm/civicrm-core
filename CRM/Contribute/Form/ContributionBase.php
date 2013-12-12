@@ -634,7 +634,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
   /**
    * Function to add the custom fields
    *
-   * @return None
+   * @return void
    * @access public
    */
   function buildCustom($id, $name, $viewOnly = FALSE, $onBehalf = FALSE, $fieldTypes = NULL) {
@@ -795,7 +795,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   public function authenticatePledgeUser() {
     //get the userChecksum and contact id

@@ -388,7 +388,7 @@ WHERE {$clause}
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   function setDefaultValues() {
     //load default data for only contact fields.
@@ -449,7 +449,7 @@ WHERE {$clause}
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   public function postProcess() {
     $buttonName = $this->controller->getButtonName();

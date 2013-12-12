@@ -222,7 +222,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
   /**
    * Function to build the form
    *
-   * @return None
+   * @return void
    * @access public
    */
   public function buildQuickForm() {
@@ -445,7 +445,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   public function postProcess() {
     $now           = date('YmdHis');

@@ -480,7 +480,7 @@ GROUP BY  currency
    * @param array  $params (reference ) an assoc array of name/value pairs.
    * @access public
    *
-   * @return None.
+   * @return void.
    */
   function sendAcknowledgment(&$form, $params) {
     //handle Acknowledgment.

@@ -51,7 +51,7 @@ class CRM_Case_Form_Activity_ChangeCaseType {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   static function setDefaultValues(&$form) {
     $defaults = array();
@@ -106,7 +106,7 @@ class CRM_Case_Form_Activity_ChangeCaseType {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   static function beginPostProcess(&$form, &$params) {
     if ($form->_context == 'case') {
@@ -127,7 +127,7 @@ class CRM_Case_Form_Activity_ChangeCaseType {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   static function endPostProcess(&$form, &$params, $activity) {
     if (!$form->_caseId) {

@@ -42,7 +42,7 @@ class CRM_Case_Form_ActivityToCase extends CRM_Core_Form {
   /**
    * build all the data structures needed to build the form.
    *
-   * @return None
+   * @return void
    * @access public
    */
   function preProcess() {
@@ -62,7 +62,7 @@ class CRM_Case_Form_ActivityToCase extends CRM_Core_Form {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   function setDefaultValues() {
     $targetContactValues = $defaults = array();
@@ -83,7 +83,7 @@ class CRM_Case_Form_ActivityToCase extends CRM_Core_Form {
   /**
    * Function to build the form
    *
-   * @return None
+   * @return void
    * @access public
    */
   public function buildQuickForm() {

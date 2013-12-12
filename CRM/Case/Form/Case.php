@@ -89,7 +89,7 @@ class CRM_Case_Form_Case extends CRM_Core_Form {
   /**
    * Function to build the form
    *
-   * @return None
+   * @return void
    * @access public
    */
   function preProcess() {
@@ -209,7 +209,7 @@ class CRM_Case_Form_Case extends CRM_Core_Form {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   function setDefaultValues() {
     if ($this->_action & CRM_Core_Action::DELETE || $this->_action & CRM_Core_Action::RENEW || $this->_cdType) {
@@ -329,7 +329,7 @@ class CRM_Case_Form_Case extends CRM_Core_Form {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   public function postProcess() {
     $transaction = new CRM_Core_Transaction();

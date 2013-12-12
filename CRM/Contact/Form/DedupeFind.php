@@ -48,7 +48,7 @@ class CRM_Contact_Form_DedupeFind extends CRM_Admin_Form {
   /**
    * Function to pre processing
    *
-   * @return None
+   * @return void
    * @access public
    */
   function preProcess() {
@@ -58,7 +58,7 @@ class CRM_Contact_Form_DedupeFind extends CRM_Admin_Form {
   /**
    * Function to build the form
    *
-   * @return None
+   * @return void
    * @access public
    */
   public function buildQuickForm() {
@@ -92,7 +92,7 @@ class CRM_Contact_Form_DedupeFind extends CRM_Admin_Form {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   public function postProcess() {
     $values = $this->exportValues();

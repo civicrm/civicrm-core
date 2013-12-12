@@ -309,7 +309,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   function setDefaultValues() {
     if (empty($this->_fields)) {
@@ -351,7 +351,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   public function postProcess() {
     $params = $this->controller->exportValues($this->_name);
@@ -389,7 +389,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   private function processContribution(&$params) {
     $dates = array(
@@ -532,7 +532,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   private function processMembership(&$params) {
     $dateTypes = array(
@@ -766,7 +766,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   private function updateContactInfo(&$value) {
     $value['preserveDBName'] = $this->_preserveDefault;

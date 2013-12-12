@@ -219,7 +219,7 @@ AND    co.id IN ( $contribIDs )";
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   public function postProcess() {
     $params = $this->controller->exportValues($this->_name);
