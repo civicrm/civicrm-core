@@ -575,7 +575,7 @@ class CRM_Core_Resources {
 
       "packages/jquery/plugins/jquery.jeditable.mini.js",
 
-      "packages/jquery/plugins/jquery.blockUI.js",
+      "packages/jquery/plugins/jquery.blockUI$min.js",
 
       "packages/jquery/plugins/jquery.notify$min.js",
 
