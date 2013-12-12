@@ -961,6 +961,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     $this->assign('editor', $editor);
 
     // include wysiwyg editor js files
+    // FIXME: This code does not make any sense
     $includeWysiwygEditor = FALSE;
     $includeWysiwygEditor = $this->get('includeWysiwygEditor');
     if (!$includeWysiwygEditor) {
