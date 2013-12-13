@@ -58,9 +58,10 @@ class {$table.className} extends \Civi\Core\Entity {ldelim}
   {if $field.name eq 'id'}{continue}{/if}
 
   /**
-   * @var {$field.phpType}
+   * @var {$field.columnType}
    *
-   * @ORM\Column({$field.columnInfo})
+   * {$field.columnInfo}
+   * {$field.columnJoin}
    */
   private ${$field.propertyName}{if isset($field.default)} = '{$field.default}'{/if};
 {/foreach}
