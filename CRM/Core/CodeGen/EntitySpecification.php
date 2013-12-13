@@ -111,6 +111,11 @@ class CRM_Core_CodeGen_EntitySpecification {
       $tables[$name]['foreignKey'][$fkey]['className'] = $classNames[$ftable];
       $tables[$name]['foreignKey'][$fkey]['fileName'] = str_replace('_', '/', $classNames[$ftable]) . '.php';
       $tables[$name]['fields'][$fkey]['FKClassName'] = $classNames[$ftable];
+
+      $targetEntity = str_replace('CRM', 'Civi', str_replace('_', '\\', $classNames[$ftable]));
+      $tables[$name]['fields'][$fkey]['columnType'] = '\\' . $targetEntity;
+      $tables[$name]['fields'][$fkey]['columnInfo'] = '@ORM\ManyToOne(targetEntity="' . $targetEntity . '")';
+      $tables[$name]['fields'][$fkey]['columnJoin'] = '@ORM\JoinColumns({@ORM\JoinColumn(name="' . $tables[$name]['foreignKey'][$fkey]['name'] . '", referencedColumnName="' . $tables[$name]['foreignKey'][$fkey]['key'] . '")})';
     }
   }
 
@@ -194,7 +199,7 @@ class CRM_Core_CodeGen_EntitySpecification {
     foreach ($table['fields'] as &$field) {
       $field['propertyName'] = lcfirst(str_replace(' ', '', ucwords(str_replace('_', ' ', $field['name']))));
 
-      $field['columnInfo'] = 'name="' . $field['name'] . '", type="' . $field['phpType'] . '"';
+      $field['columnInfo'] = '@ORM\Column(name="' . $field['name'] . '", type="' . $field['phpType'] . '"';
 
       if ($field['phpType'] == 'string') {
         $field['columnInfo'] .= ', length=' . $field['length'];
@@ -206,6 +211,11 @@ class CRM_Core_CodeGen_EntitySpecification {
       else {
         $field['columnInfo'] .= ', nullable=true';
       }
+
+      $field['columnInfo'] .= ')';
+
+      $field['columnType'] = $field['phpType'];
+      $field['columnJoin'] = '';
 
       /*
        * FIX ME: if needed
@@ -263,8 +273,6 @@ class CRM_Core_CodeGen_EntitySpecification {
     }
 
     // create tags for indexes
-    $table['indexes'] = '';
-    $table['uniqueConstraints'] = '';
     $indexElements = array();
     if (!empty($table['index'])) {
       $uniqueElements = array();
@@ -291,7 +299,7 @@ class CRM_Core_CodeGen_EntitySpecification {
     }
 
     // add indexes if any
-    if (!empty($uniqueElements)) {
+    if (!empty($indexElements)) {
       $tableInfo .= ', indexes={' . implode(',', $indexElements) . '}';
     }
 
