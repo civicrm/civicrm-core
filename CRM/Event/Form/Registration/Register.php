@@ -841,7 +841,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
     }
 
     if ($self->_values['event']['is_monetary']) {
-      if ($fields['amount'] > 0 && !isset($fields['payment_processor'])) {
+      if (empty($self->_requireApproval) && $fields['amount'] > 0 && !isset($fields['payment_processor'])) {
         $errors['payment_processor'] = ts('Please select a Payment Method');
       }
       if (is_array($self->_paymentProcessor)) {

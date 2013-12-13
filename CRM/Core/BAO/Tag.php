@@ -187,6 +187,9 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
     $parentId  = NULL,
     $separator = '&nbsp;&nbsp;'
   ) {
+    if (!is_array($tags)) {
+      $tags = array();
+    }
     // We need to build a list of tags ordered by hierarchy and sorted by
     // name. The heirarchy will be communicated by an accumulation of
     // separators in front of the name to give it a visual offset.
