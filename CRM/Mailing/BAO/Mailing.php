@@ -2643,7 +2643,7 @@ WHERE  civicrm_mailing_job.id = %1
 
   static function processQueue($mode = NULL) {
     $config = &CRM_Core_Config::singleton();
- //   CRM_Core_Error::debug_log_message("Beginning processQueue run: {$config->mailerJobsMax}, {$config->mailerJobSize}");
+    //   CRM_Core_Error::debug_log_message("Beginning processQueue run: {$config->mailerJobsMax}, {$config->mailerJobSize}");
 
     if ($mode == NULL && CRM_Core_BAO_MailSettings::defaultDomain() == "EXAMPLE.ORG") {
       CRM_Core_Error::fatal(ts('The <a href="%1">default mailbox</a> has not been configured. You will find <a href="%2">more info in the online user and administrator guide</a>', array(1 => CRM_Utils_System::url('civicrm/admin/mailSettings', 'reset=1'), 2 => "http://book.civicrm.org/user/advanced-configuration/email-system-configuration/")));
@@ -2652,8 +2652,8 @@ WHERE  civicrm_mailing_job.id = %1
     // check if we are enforcing number of parallel cron jobs
     // CRM-8460
     $gotCronLock = FALSE;
-    if ($config->mailerJobsMax && $config->mailerJobsMax > 1) {
 
+    if (property_exists($config, 'mailerJobsMax') && $config->mailerJobsMax && $config->mailerJobsMax > 1) {
       $lockArray = range(1, $config->mailerJobsMax);
       shuffle($lockArray);
 
@@ -2680,7 +2680,8 @@ WHERE  civicrm_mailing_job.id = %1
     // load bootstrap to call hooks
 
     // Split up the parent jobs into multiple child jobs
-    CRM_Mailing_BAO_MailingJob::runJobs_pre($config->mailerJobSize, $mode);
+    $mailerJobSize = (property_exists($config, 'mailerJobSize')) ? $config->mailerJobSize : NULL;
+    CRM_Mailing_BAO_MailingJob::runJobs_pre($mailerJobSize, $mode);
     CRM_Mailing_BAO_MailingJob::runJobs(NULL, $mode);
     CRM_Mailing_BAO_MailingJob::runJobs_post($mode);
 
