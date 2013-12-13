@@ -316,16 +316,16 @@ VALUES
    (@option_group_id_act, '{ts escape="sql"}Inbound Email{/ts}',                      12, 'Inbound Email',      NULL, 1, NULL, 12, '{ts escape="sql"}Inbound Email.{/ts}',                                                      0, 1, 1, NULL, NULL),
 
 -- Activity Types for case activities
-   (@option_group_id_act, '{ts escape="sql"}Open Case{/ts}',          13, 'Open Case',          NULL, 0,  0, 13, '', 0, 0, 1, @caseCompId, NULL),
-   (@option_group_id_act, '{ts escape="sql"}Follow up{/ts}',          14, 'Follow up',          NULL, 0,  0, 14, '', 0, 0, 1, @caseCompId, NULL ),
-   (@option_group_id_act, '{ts escape="sql"}Change Case Type{/ts}',   15, 'Change Case Type',   NULL, 0,  0, 15, '', 0, 0, 1, @caseCompId, NULL ),
-   (@option_group_id_act, '{ts escape="sql"}Change Case Status{/ts}', 16, 'Change Case Status', NULL, 0,  0, 16, '', 0, 0, 1, @caseCompId, NULL ),
+   (@option_group_id_act, '{ts escape="sql"}Open Case{/ts}',          13, 'Open Case',          NULL, 0,  0, 13, '', 0, 1, 1, @caseCompId, NULL),
+   (@option_group_id_act, '{ts escape="sql"}Follow up{/ts}',          14, 'Follow up',          NULL, 0,  0, 14, '', 0, 1, 1, @caseCompId, NULL ),
+   (@option_group_id_act, '{ts escape="sql"}Change Case Type{/ts}',   15, 'Change Case Type',   NULL, 0,  0, 15, '', 0, 1, 1, @caseCompId, NULL ),
+   (@option_group_id_act, '{ts escape="sql"}Change Case Status{/ts}', 16, 'Change Case Status', NULL, 0,  0, 16, '', 0, 1, 1, @caseCompId, NULL ),
 
    (@option_group_id_act, '{ts escape="sql"}Membership Renewal Reminder{/ts}',        17, 'Membership Renewal Reminder',  NULL, 1, NULL, 17, '{ts escape="sql"}offline membership renewal reminder.{/ts}',                      0, 1, 1, @memberCompId, NULL),
-   (@option_group_id_act, '{ts escape="sql"}Change Case Start Date{/ts}',             18, 'Change Case Start Date',         NULL, 0,  0, 18, '', 0, 0, 1, @caseCompId, NULL ),
+   (@option_group_id_act, '{ts escape="sql"}Change Case Start Date{/ts}',             18, 'Change Case Start Date',         NULL, 0,  0, 18, '', 0, 1, 1, @caseCompId, NULL ),
    (@option_group_id_act, '{ts escape="sql"}Bulk Email{/ts}',                         19, 'Bulk Email',         NULL, 1, NULL, 19, '{ts escape="sql"}Bulk Email Sent.{/ts}',                                                    0, 1, 1, NULL, NULL),
-   (@option_group_id_act, '{ts escape="sql"}Assign Case Role{/ts}',                   20, 'Assign Case Role', NULL,0, 0, 20, '', 0, 0, 1, @caseCompId, NULL),
-   (@option_group_id_act, '{ts escape="sql"}Remove Case Role{/ts}',                   21, 'Remove Case Role', NULL,0, 0, 21, '', 0, 0, 1, @caseCompId, NULL),
+   (@option_group_id_act, '{ts escape="sql"}Assign Case Role{/ts}',                   20, 'Assign Case Role', NULL,0, 0, 20, '', 0, 1, 1, @caseCompId, NULL),
+   (@option_group_id_act, '{ts escape="sql"}Remove Case Role{/ts}',                   21, 'Remove Case Role', NULL,0, 0, 21, '', 0, 1, 1, @caseCompId, NULL),
    (@option_group_id_act, '{ts escape="sql"}Print PDF Letter{/ts}',                   22, 'Print PDF Letter',    NULL, 0, NULL, 22, '{ts escape="sql"}Print PDF Letter.{/ts}',                                                  0, 1, 1, NULL, NULL),
    (@option_group_id_act, '{ts escape="sql"}Merge Case{/ts}',                         23, 'Merge Case', NULL, 0,  NULL, 23, '', 0, 1, 1, @caseCompId, NULL ),
    (@option_group_id_act, '{ts escape="sql"}Reassigned Case{/ts}',                    24, 'Reassigned Case', NULL, 0,  NULL, 24, '', 0, 1, 1, @caseCompId, NULL ),
