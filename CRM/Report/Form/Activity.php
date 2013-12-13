@@ -480,7 +480,8 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
               // get current user
               $session = CRM_Core_Session::singleton();
               if ($contactID = $session->get('userID')) {
-                $clause = "civicrm_contact_{$recordType}.id = " . $contactID;
+                $clause = "{$this->_aliases['civicrm_activity_contact']}.activity_id IN
+                           (SELECT activity_id FROM civicrm_activity_contact WHERE contact_id = {$contactID})";
               }
               else {
                 $clause = NULL;
