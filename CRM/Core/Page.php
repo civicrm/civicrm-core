@@ -112,6 +112,13 @@ class CRM_Core_Page {
   public $ajaxResponse = array();
 
   /**
+   * Url path used to reach this page
+   *
+   * @var array
+   */
+  public $urlPath = array();
+
+  /**
    * class constructor
    *
    * @param string $title title of the page
