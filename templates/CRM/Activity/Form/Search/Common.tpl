@@ -112,6 +112,18 @@
 <tr>
   <td colspan="3">{include file="CRM/common/Tag.tpl" tagsetType='activity'}</td>
 </tr>
+<tr>
+  <td id="activityResult">
+    <label>{$form.activity_result.label}</label><br />
+    {$form.activity_result.html}
+    <script type="text/javascript">
+      cj("select#activity_result").crmasmSelect({
+      });
+    </script>
+  </td>
+  <td colspan="2">{include file="CRM/common/Tag.tpl" tagsetType='activity'}</td>
+  </tr>
+</tr>
 
 {* campaign in activity search *}
 {include file="CRM/Campaign/Form/addCampaignToComponent.tpl"
