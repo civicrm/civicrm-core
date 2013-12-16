@@ -43,6 +43,8 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
   protected $_summary = NULL;
   protected $_allBatches = NULL;
 
+  protected $_softFrom = NULL;
+
   protected $_customGroupExtends = array( 'Contribution');
 
   function __construct() {
@@ -540,7 +542,7 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
     );
 
     // Stats for soft credits
-    if (CRM_Utils_Array::value('contribution_or_soft_value', $this->_params) != 'contributions_only') {
+    if ($this->_softFrom && CRM_Utils_Array::value('contribution_or_soft_value', $this->_params) != 'contributions_only') {
       $totalAmount = $average = array();
       $count  = 0;
       $select = "
