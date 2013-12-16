@@ -1758,12 +1758,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
         CRM_Core_Action::DELETE,
         array('id' => $form->get('id'),
           'gid' => $form->get('gid'),
-        ),
-        ts('more'),
-        FALSE,
-        'contact.profileimage.delete',
-        'Contact',
-        $form->get('id')
+        )
       );
       $form->assign('deleteURL', $deleteURL);
     }
@@ -2024,7 +2019,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
       'receive_date', 'receipt_date', 'thankyou_date', 'cancel_date'))) {
       $form->addDateTime($name, $title, $required, array('formatType' => 'activityDateTime'));
     }
-    elseif ($fieldName == 'send_receipt') {
+    elseif (in_array($fieldName, array('send_receipt', 'owner_membership_custom_override'))) {
       $form->addElement('checkbox', $name, $title);
     }
     elseif ($fieldName == 'soft_credit') {
@@ -2187,14 +2182,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
       'non_deductible_amount', 'total_amount', 'fee_amount', 'net_amount'))) {
       $form->addRule($name, ts('Please enter a valid amount.'), 'money');
     }
-    $stateCountryMap = array();
-    if (!empty($form->_stateCountryMap['state_province']) && !empty($form->_stateCountryMap['country'])) {
-      foreach ($form->_stateCountryMap['state_province'] as $key => $value) {
-        $stateCountryMap[$key]['state_province'] = $value;
-        $stateCountryMap[$key]['country'] = $form->_stateCountryMap['country'][$key];
-      }
-      CRM_Core_BAO_Address::addStateCountryMap($stateCountryMap);
-    }
+
     if ($rule) {
       if (!($rule == 'email' && $mode == CRM_Profile_Form::MODE_SEARCH)) {
         $form->addRule($name, ts('Please enter a valid %1', array(1 => $title)), $rule);
@@ -2382,14 +2370,12 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
                         $defaults[$fldName] = $value['county_id'];
                       }
                       elseif ($fieldName == 'country') {
+                        $defaults[$fldName] = $value['country_id'];
                         if (!isset($value['country_id']) || !$value['country_id']) {
                           $config = CRM_Core_Config::singleton();
                           if ($config->defaultContactCountry) {
                             $defaults[$fldName] = $config->defaultContactCountry;
                           }
-                        }
-                        else {
-                          $defaults[$fldName] = $value['country_id'];
                         }
                       }
                       elseif ($fieldName == 'phone') {
@@ -3077,7 +3063,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
    *
    * @return void.
    */
-  public static function setComponentDefaults(&$fields, $componentId, $component, &$defaults, $isStandalone = FALSE) {
+  function setComponentDefaults(&$fields, $componentId, $component, &$defaults, $isStandalone = FALSE) {
     if (!$componentId ||
       !in_array($component, array('Contribute', 'Membership', 'Event', 'Activity'))
     ) {

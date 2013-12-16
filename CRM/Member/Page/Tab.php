@@ -122,26 +122,24 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
           array(
             'id' => $dao->id,
             'cid' => $this->_contactId,
-          ),
-          ts('more'),
-          FALSE,
-          'membership.tab.row',
-          'Membership',
-          $dao->id
+          )
         );
       }
       else {
-        $membership[$dao->id]['action'] = CRM_Core_Action::formLink(self::links('view'),
+        $rel_mem_links = self::links('view');
+        $rel_mem_links[CRM_Core_Action::UPDATE] = array(
+          'name' => ts('Edit'),
+          'url' => 'civicrm/contact/view/membership',
+          'qs' => 'action=update&reset=1&cid=%%cid%%&id=%%id%%&context=membership&selectedChild=member',
+          'title' => ts('Edit inherited membership\'s custom fields'),
+        );
+
+        $membership[$dao->id]['action'] = CRM_Core_Action::formLink($rel_mem_links,
           $mask,
           array(
             'id' => $dao->id,
             'cid' => $this->_contactId,
-          ),
-          ts('more'),
-          FALSE,
-          'membership.tab.row',
-          'Membership',
-          $dao->id
+          )
         );
       }
 
@@ -187,12 +185,7 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
         array(
           'id' => $value['id'],
           'cid' => $this->_contactId,
-        ),
-        ts('more'),
-        FALSE,
-        'membershipType.organization.action',
-        'MembershipType',
-        $value['id']
+        )
       );
     }
 
