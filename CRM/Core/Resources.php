@@ -429,7 +429,7 @@ class CRM_Core_Resources {
       $config = CRM_Core_Config::singleton();
 
       // Add resources from coreResourceList
-      $files = self::coreResourceList();
+      $files = $this->coreResourceList();
       $jsWeight = -9999;
       foreach ($files as $file) {
         if (substr($file, -2) == 'js') {
@@ -439,17 +439,6 @@ class CRM_Core_Resources {
         }
         else {
           $this->addStyleFile('civicrm', $file, -100, $region);
-        }
-      }
-
-      // Add localized calendar js
-      // Search for i18n file in order of specificity (try fr-CA, then fr)
-      list($lang) = explode('_', $config->lcMessages);
-      foreach (array(str_replace('_', '-', $config->lcMessages), $lang) as $language) {
-        $localizationFile = "packages/jquery/jquery-ui-1.9.0/development-bundle/ui/i18n/jquery.ui.datepicker-{$language}.js";
-        if ($this->getPath('civicrm', $localizationFile)) {
-          $this->addScriptFile('civicrm', $localizationFile, $jsWeight++, $region, FALSE);
-          break;
         }
       }
 
@@ -538,15 +527,16 @@ class CRM_Core_Resources {
    *
    * @return array
    */
-  static function coreResourceList() {
-    // Use minified javascript for production, uncompressed in debug mode
-    $min = CRM_Core_Config::singleton()->debug ? '' : '.min';
+  public function coreResourceList() {
+    $config = CRM_Core_Config::singleton();
+    // Use minified files for production, uncompressed in debug mode
+    $min = $config->debug ? '' : '.min';
 
     $items = array(
       "packages/jquery/jquery-1.10.2.min.js",
       "packages/jquery/jquery-migrate-1.2.1.js",
-      "packages/jquery/jquery-ui-1.9.0/js/jquery-ui-1.9.0.custom.min.js",
-      "packages/jquery/jquery-ui-1.9.0/css/smoothness/jquery-ui-1.9.0.custom.min.css",
+      "packages/jquery/jquery-ui/js/jquery-ui-1.10.3.custom$min.js",
+      "packages/jquery/jquery-ui/css/black-tie/jquery-ui-1.10.3.custom$min.css",
         
       "packages/jquery/plugins/jquery.autocomplete.js",
       "packages/jquery/css/jquery.autocomplete.css",
@@ -585,6 +575,20 @@ class CRM_Core_Resources {
       "js/jquery/jquery.crmeditable.js",
       "js/jquery/jquery.crmasmselect.js",
     );
+
+    // Add localized jQuery UI files
+    if ($config->lcMessages && $config->lcMessages != 'en_US') {
+      // Search for i18n file in order of specificity (try fr-CA, then fr)
+      list($lang) = explode('_', $config->lcMessages);
+      $path = "packages/jquery/jquery-ui/development-bundle/ui/" . ($min ? 'minified/' : '') . "i18n";
+      foreach (array(str_replace('_', '-', $config->lcMessages), $lang) as $language) {
+        $localizationFile = "$path/jquery.ui.datepicker-{$language}{$min}.js";
+        if ($this->getPath('civicrm', $localizationFile)) {
+          $items[] = $localizationFile;
+          break;
+        }
+      }
+    }
     return $items;
   }
 }
