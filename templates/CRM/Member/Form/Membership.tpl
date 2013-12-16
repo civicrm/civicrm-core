@@ -79,7 +79,7 @@
       <p>{ts}Click 'Delete' if you want to continue.{/ts}</p>
     </div>
     {else}
-      <table class="form-layout-compressed">
+      <table id="crm-membership-form" class="form-layout-compressed">
         {if $context neq 'standalone'}
           <tr>
             <td class="font-size12pt label"><strong>{ts}Member{/ts}</strong></td><td class="font-size12pt"><strong>{$displayName}</strong></td>
@@ -286,6 +286,9 @@
           <td class="html-adjust"><span class="description">{ts}If you need to include a special message for this member, enter it here. Otherwise, the confirmation email will include the standard receipt message configured under System Message Templates.{/ts}</span>
             {$form.receipt_text_signup.html|crmAddClass:huge}</td>
         </tr>
+        {if $ownerMemID}
+          <tr id='owner_membership_custom_override'><td class="label">{$form.owner_membership_custom_override.label}</td><td>{$form.owner_membership_custom_override.html}</td></tr>
+        {/if} {* end of if owner_membership_id *}
       </table>
       <div id="customData"></div>
       {*include custom data js file*}
@@ -298,8 +301,22 @@
         {if $customDataSubType}
           CRM.buildCustomData( '{$customDataType}', {$customDataSubType} );
         {/if}
+        {if $ownerMemID}
+          {literal}
+            showHideCustomOverride();
+            cj('#owner_membership_custom_override').click( showHideCustomOverride );
+          {/literal}
+        {/if}
         {literal}
       });
+      function showHideCustomOverride() {
+        if (cj("#owner_membership_custom_override:checked").length) { 
+          cj('#customData').show();
+        }
+        else {
+          cj('#customData').hide();
+        }
+      }
       </script>
       {/literal}
       {if $accessContribution and $action eq 2 and $rows.0.contribution_id}
@@ -819,6 +836,13 @@
     cj('#financial_type_id').val(setContributionType);
     }
   }
+  {/literal}
+  {if $ownerMemID}
+    {literal}
+      cj('table#crm-membership-form tr[id!="owner_membership_custom_override"]').hide();
+    {/literal}
+  {/if}
+  {literal}
   </script>
   {/literal}
   {/if} {* closing of delete check if *}

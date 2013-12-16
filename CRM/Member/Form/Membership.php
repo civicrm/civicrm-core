@@ -42,6 +42,8 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
   protected $_memType = NULL;
 
   protected $_onlinePendingContributionId;
+  
+  protected $_ownerMemId = null;
 
   public $_mode;
 
@@ -142,6 +144,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
     if ($this->_id) {
       $this->_memType = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_Membership', $this->_id, 'membership_type_id');
       $this->_membershipIDs[] = $this->_id;
+      $this->_ownerMemId = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_Membership', $this->_id, 'owner_membership_id');
     }
 
     $this->_mode = CRM_Utils_Request::retrieve('mode', 'String', $this);
@@ -177,7 +180,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       }
       // also check for billing information
       // get the billing location type
-      $locationTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id', array(), 'validate');
+      $locationTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id');
       // CRM-8108 remove ts around Billing location type
       //$this->_bltID = array_search( ts('Billing'),  $locationTypes );
       $this->_bltID = array_search('Billing', $locationTypes);
@@ -321,10 +324,9 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
     $defaults = parent::setDefaultValues();
 
     //setting default join date and receive date
-    list($now, $currentTime) = CRM_Utils_Date::setDateDefaults();
+    list($now) = CRM_Utils_Date::setDateDefaults();
     if ($this->_action == CRM_Core_Action::ADD) {
       $defaults['receive_date'] = $now;
-      $defaults['receive_date_time'] = $currentTime;
     }
 
     if (is_numeric($this->_memType)) {
@@ -523,6 +525,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
     $this->assign('customDataType', 'Membership');
     $this->assign('customDataSubType', $this->_memType);
     $this->assign('entityID', $this->_id);
+    $this->assign('ownerMemID', $this->_ownerMemId);
 
     if ($this->_action & CRM_Core_Action::DELETE) {
       $this->addButtons(array(
@@ -711,6 +714,11 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
       );
       if ($statusOverride) {
         $elements[] = $statusOverride;
+      }
+      
+      // TODO: Need to only show this if membership is inherited
+      if ($this->_ownerMemId) {
+        $this->addElement('checkbox', 'owner_membership_custom_override', ts('Override inherited custom fields?'));
       }
 
       $this->addElement('checkbox', 'record_contribution', ts('Record Membership Payment?'));
@@ -1152,6 +1160,8 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
     foreach ($fields as $f) {
       $params[$f] = CRM_Utils_Array::value($f, $formValues);
     }
+    
+    $params['owner_membership_custom_override'] = CRM_Utils_Array::value('owner_membership_custom_override', $formValues, 0);
 
     // fix for CRM-3724
     // when is_override false ignore is_admin statuses during membership
