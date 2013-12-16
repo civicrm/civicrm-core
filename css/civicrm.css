@@ -2514,7 +2514,7 @@ div.grippie {
 }
 
 .crm-container .dark-icon {
-  background-image: url("../packages/jquery/jquery-ui-1.9.0/css/smoothness/images/ui-icons_222222_256x240.png")}
+  background-image: url("../packages/jquery/jquery-ui/css/black-tie/images/ui-icons_222222_256x240.png")}
 .crm-container .red-icon {
   background-image: url("../i/icons/jquery-ui-8A1F11.png")}
 
@@ -2540,11 +2540,12 @@ div.grippie {
   background-position: -129px -112px;
 }
 .crm-container .button:hover .delete-icon {
-  background-image: url("../packages/jquery/jquery-ui-1.9.0/css/smoothness/images/ui-icons_cd0a0a_256x240.png")!important;
+  background-image: url("../i/icons/jquery-ui-8A1F11.png")!important;
 }
 
 .crm-container .restore-icon {
-  background-position: 0px -66px;background-image: url("../i/icons/jquery-ui-91CE00.png");
+  background-position: 0px -66px;
+  background-image: url("../i/icons/jquery-ui-91CE00.png");
 }
 .crm-container .button:hover .restore-icon {
   background-image: url("../i/icons/jquery-ui-91CE00.png");
@@ -2980,34 +2981,6 @@ div#crm-container form {
 
 #activity-content table {
   width: 100%!important;
-}
-
-/* ui dialog state */
-.ui-state-default,
-.ui-widget-content .ui-state-default,
-.ui-widget-content,
-.ui-widget-header  {
-  color: #3e3e3e;
-  border:0px solid transparent;
-  border-color:transparent;
-}
-
-/* ui dialog state */
-.ui-state-hover,
-.ui-widget-content .ui-state-hover,
-.ui-widget-header .ui-state-hover,
-.ui-state-focus,
-.ui-widget-content .ui-state-focus,
-.ui-widget-header .ui-state-focus {
-  border: 0px solid #70716b;
-  background: #484e4c url("../packages/jquery/jquery-ui-1.9.0/css/smoothness/images/ui-bg_flat_0_aaaaaa_40x100.png") 50% 50% repeat-x;
-  font-weight: normal;
-  color: #f5f6f1;
-}
-
-/* add border to jQuery ui-dialog box CRM-13177 */
-div.ui-dialog {
-  border: 1px solid black;
 }
 
 #Tag .tree .collapsable .hit,
@@ -3482,7 +3455,7 @@ div.m ul#civicrm-menu,
   cursor: pointer;
   cursor: hand;
   background-position: -66px -114px;
-  background-image: url("../packages/jquery/jquery-ui-1.9.0/css/smoothness/images/ui-icons_222222_256x240.png");
+  background-image: url("../i/icons/jquery-ui-3E3E3E.gif");
 }
 
 .crm-container span.batch-valid {
@@ -3491,7 +3464,7 @@ div.m ul#civicrm-menu,
   cursor: pointer;
   cursor: hand;
   background-position: -322px -143px;
-  background-image: url("../packages/jquery/jquery-ui-1.9.0/css/smoothness/images/ui-icons_222222_256x240.png");
+  background-image: url("../i/icons/jquery-ui-3E3E3E.gif");
 }
 
 .crm-container span.batch-invalid {
@@ -3500,7 +3473,7 @@ div.m ul#civicrm-menu,
   cursor: pointer;
   cursor: hand;
   background-position: -258px -143px;
-  background-image: url("../packages/jquery/jquery-ui-1.9.0/css/smoothness/images/ui-icons_222222_256x240.png");
+  background-image: url("../i/icons/jquery-ui-3E3E3E.gif");
 }
 
 .crm-container #Entry ul#errorList {
