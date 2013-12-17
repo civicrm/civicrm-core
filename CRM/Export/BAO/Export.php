@@ -549,6 +549,12 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
       }
     }
 
+    if(empty($where)) {
+      $where = "WHERE contact_a.is_deleted = 0";
+    }
+    else {
+      $where .= " AND contact_a.is_deleted = 0";
+    }
     $queryString = "$select $from $where $having";
 
     $groupBy = "";
