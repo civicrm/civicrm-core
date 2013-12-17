@@ -107,7 +107,7 @@ class CRM_Event_BAO_Participant extends CRM_Event_DAO_Participant {
     }
 
     // ensure that role ids are encoded as a string
-    if (is_array($params['role_id'])) {
+    if (isset($params['role_id']) && is_array($params['role_id'])) {
       $params['role_id'] = implode(CRM_Core_DAO::VALUE_SEPARATOR, $params['role_id']);
     }
 

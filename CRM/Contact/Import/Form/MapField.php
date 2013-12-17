@@ -344,6 +344,7 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
         //Modified the Relationship fields if the fields are
         //present in dedupe rule
         if ($this->_onDuplicate != CRM_Import_Parser::DUPLICATE_NOCHECK &&
+          CRM_Utils_Array::value($cType, $this->_dedupeFields) &&
           is_array($this->_dedupeFields[$cType])
         ) {
           static $cTypeArray = array();
