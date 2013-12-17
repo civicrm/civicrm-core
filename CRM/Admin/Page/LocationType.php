@@ -56,6 +56,16 @@ class CRM_Admin_Page_LocationType extends CRM_Core_Page_Basic {
   }
 
   /**
+   * Get BAO Name
+   *
+   * @return string Classname of BAO.
+   */
+  function getORMName() {
+    return '\Civi\Core\LocationType';
+  }
+
+
+  /**
    * Get action Links
    *
    * @return array (reference) of action links

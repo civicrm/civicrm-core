@@ -11,11 +11,11 @@ use Doctrine\ORM\Tools\Setup;
 class CRM_DB_EntityManager
 {
   private static $entity_manager = NULL;
-  
+
   static function singleton() {
     if (self::$entity_manager == NULL) {
       $db_settings = new CRM_DB_Settings();
-      reset_entity_manager($db_settings);
+      self::reset_entity_manager($db_settings);
     }
     return self::$entity_manager;
   }
