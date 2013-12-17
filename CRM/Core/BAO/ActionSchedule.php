@@ -463,6 +463,8 @@ WHERE   cas.entity_value = $id AND
         'toName' => $contact['display_name'],
         'toEmail' => $email,
         'subject' => $messageSubject,
+        'entity' => 'action_schedule',
+        'entity_id' => $scheduleID,
       );
 
       if (!$html || $contact['preferred_mail_format'] == 'Text' ||
@@ -682,7 +684,7 @@ WHERE reminder.action_schedule_id = %1 AND reminder.action_date_time IS NULL
             $stateProvince = CRM_Core_PseudoConstant::stateProvince();
             $loc['street_address'] = $dao->street_address;
             $loc['city'] = $dao->city;
-            $loc['state_province'] = CRM_Utils_array::value($dao->state_province_id, $stateProvince);
+            $loc['state_province'] = CRM_Utils_Array::value($dao->state_province_id, $stateProvince);
             $loc['postal_code'] = $dao->postal_code;
             $entityTokenParams["{$tokenEntity}." . $field] = CRM_Utils_Address::format($loc);
           }
