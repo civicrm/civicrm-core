@@ -58,7 +58,7 @@ cj(document).ready( function( ) {
 
      var selectedTabIndex = {/literal}{$selectedTabIndex}{literal};
      cj("#mainTabContainer").tabs( {
-                             selected: selectedTabIndex,
+                             active: selectedTabIndex,
                              spinner: spinnerImage,
                  cache: false,
                  load: stopSpinner
