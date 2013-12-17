@@ -225,8 +225,7 @@ class CRM_UF_Page_Group extends CRM_Core_Page {
     $template = CRM_Core_Smarty::singleton();
     $template->assign('gid', $gid);
     $template->assign('tplFile', 'CRM/Profile/Form/Edit.tpl');
-    $profile = trim($template->fetch('CRM/common/commonCSS.tpl'));
-    $profile .= trim($template->fetch('CRM/Form/default.tpl'));
+    $profile = trim($template->fetch('CRM/Form/default.tpl'));
 
     // not sure how to circumvent our own navigation system to generate the right form url
     $urlReplaceWith = 'civicrm/profile/create&amp;gid=' . $gid . '&amp;reset=1';
@@ -244,8 +243,9 @@ class CRM_UF_Page_Group extends CRM_Core_Page {
       $profile = str_replace('/wp-admin/admin.php', '/index.php', $profile);
     }
 
-    // add jquery files
-    $profile = CRM_Utils_String::addJqueryFiles($profile);
+    // add header files
+    CRM_Core_Resources::singleton()->addCoreResources('html-header');
+    $profile = CRM_Core_Region::instance('html-header')->render('', FALSE) . $profile;
 
     $this->assign('profile', htmlentities($profile, ENT_NOQUOTES, 'UTF-8'));
     //get the title of uf group
