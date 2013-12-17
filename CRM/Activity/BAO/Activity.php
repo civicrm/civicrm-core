@@ -192,6 +192,10 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
 
         // CRM-8708
         $activity->case_id = CRM_Case_BAO_Case::getCaseIdByActivityId($activity->id);
+
+        // CRM-13994 delete activity entity_tag
+        $query = "DELETE FROM civicrm_entity_tag WHERE entity_table = 'civicrm_activity' AND entity_id = {$activity->id}";
+        $dao = CRM_Core_DAO::executeQuery($query);
       }
     }
     else {
@@ -201,9 +205,9 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
       $activity->is_deleted = 1;
       $result = $activity->save();
 
-      //log activty delete.CRM-4525.
-      $logMsg          = 'Case Activity deleted for';
-      $msgs            = array();
+      // CRM-4525 log activity delete
+      $logMsg = 'Case Activity deleted for';
+      $msgs = array();
 
       $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
       $sourceID = CRM_Utils_Array::key('Activity Source', $activityContacts);
