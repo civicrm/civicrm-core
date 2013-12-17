@@ -1820,8 +1820,6 @@ div.grippie {
 }
 
 .crm-container .ui-tabs .ui-tabs-nav {
-  border: none;
-  background-image: none;
   padding: 4px;
 }
 
@@ -1844,11 +1842,15 @@ div.grippie {
 .crm-container .crm-tab-button a,
 .crm-container .ui-tabs .ui-tabs-nav li a {
   padding: 5px !important;
+  color: #fafafa;
+}
+
+.crm-container .crm-tab-button a,
+.crm-container .ui-tabs .ui-tabs-nav li.ui-state-active a {
+  color: #090909;
 }
 
 .crm-container .crm-tab-button a em {
-  color: #3e3e3e;
-  font-size: 10px;
   font-style: normal;
 }
 
@@ -3119,17 +3121,6 @@ tbody.scrollContent tr.alternateRow {
 }
 
 /*contact summary page */
-.crm-container .ui-tabs .ui-tabs-nav {
-  background-color: #e6e6dc;
-}
-#mainTabContainer .crm-tab-button {
-  background-color: #f5f6f1;
-}
-#mainTabContainer li.ui-state-active,
-#mainTabContainer li.ui-state-hover {
-  background: #FFF;
-}
-
 #crm-container div.contact_details,
 #crm-container #customFields .contact_panel .customFieldGroup {
   background-color: transparent;
