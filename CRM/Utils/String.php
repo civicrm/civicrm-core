@@ -482,19 +482,6 @@ class CRM_Utils_String {
   }
 
   /**
-   * Function to add include files needed for jquery
-   *
-   * This appears to be used in cases where the normal html-header
-   * provided by CRM_Core_Resources can't be used (e.g. when outputting in
-   * "print" mode, the execution will short-circuit without allowing the
-   * CMS to output JS/CSS tags).
-   */
-  static function addJqueryFiles(&$html) {
-    CRM_Core_Resources::singleton()->addCoreResources('html-header');
-    return CRM_Core_Region::instance('html-header')->render('', FALSE) . $html;
-  }
-
-  /**
    * Given an ezComponents-parsed representation of
    * a text with alternatives return only the first one
    *
