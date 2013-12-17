@@ -957,12 +957,12 @@ CRM.validate = CRM.validate || {
 
     widget.on('crmFormLoad', function(event, data) {
       var $el = $(this);
-      var settings = $el.data('crmSnippet').options.crmForm;
+      var settings = $el.crmSnippet('option', 'crmForm');
       settings.cancelButton && $(settings.cancelButton, this).click(function(event) {
         var returnVal = settings.onCancel.call($el, event);
         if (returnVal !== false) {
           $el.trigger('crmFormCancel', event);
-          if ($el.data('dialog') && settings.autoClose) {
+          if ($el.data('uiDialog') && settings.autoClose) {
             $el.dialog('close');
           }
           else if (!settings.autoClose) {
@@ -987,7 +987,7 @@ CRM.validate = CRM.validate || {
             {
               $el.crmSnippet('option', 'url', response.userContext).crmSnippet('refresh');
             }
-            else if ($el.data('dialog') && settings.autoClose) {
+            else if ($el.data('uiDialog') && settings.autoClose) {
               $el.dialog('close');
             }
           }
