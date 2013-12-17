@@ -56,7 +56,7 @@
 cj( function() {
     var tabIndex = cj('#tab_' + selectedTab).prevAll().length
     cj("#mainTabContainer").tabs( {
-        selected: tabIndex,
+        active: tabIndex,
         spinner: spinnerImage,
         select: function(event, ui) {
             // we need to change the action of parent form, so that form submits to correct page

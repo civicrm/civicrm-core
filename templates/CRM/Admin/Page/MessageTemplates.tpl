@@ -159,7 +159,7 @@
     {literal}
       cj( function() {
         var tabIndex = cj('#tab_' + selectedTab).prevAll().length
-        cj("#mainTabContainer").tabs( {selected: tabIndex} );
+        cj("#mainTabContainer").tabs( {active: tabIndex} );
       });
     {/literal}
   </script>

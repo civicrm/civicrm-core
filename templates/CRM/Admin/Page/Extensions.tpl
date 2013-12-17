@@ -103,19 +103,13 @@
     {* Tab management *}
     <script type="text/javascript">
     var selectedTab  = 'summary';
-    var spinnerImage = '<img src="{$config->resourceBase}i/loading.gif" style="width:10px;height:10px"/>';
     {if $selectedChild}selectedTab = "{$selectedChild}";{/if}
 
     {literal}
 
-    //explicitly stop spinner
-    function stopSpinner( ) {
-      cj('li.crm-tab-button').each(function(){ cj(this).find('span').text(' ');})
-    }
-
     cj( function() {
       var tabIndex = cj('#tab_' + selectedTab).prevAll().length;
-      cj("#mainTabContainer").tabs({ selected: tabIndex, spinner: spinnerImage, cache: true, load: stopSpinner});
+      cj("#mainTabContainer").tabs({ active: tabIndex, cache: true});
       cj(".crm-tab-button").addClass("ui-corner-bottom");
     });
     {/literal}

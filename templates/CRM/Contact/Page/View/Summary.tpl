@@ -341,7 +341,7 @@
       var tabIndex = $('#tab_' + selectedTab).prevAll().length;
       var spinnerImage = '<img src="{$config->resourceBase}i/loading.gif" style="width:10px;height:10px"/>';
       {literal}
-      $("#mainTabContainer").tabs({ selected: tabIndex, spinner: spinnerImage, cache: true, load: stopSpinner});
+      $("#mainTabContainer").tabs({ active: tabIndex, spinner: spinnerImage, cache: true, load: stopSpinner});
       $(".crm-tab-button").addClass("ui-corner-bottom");
       $().crmAccordions();
 
