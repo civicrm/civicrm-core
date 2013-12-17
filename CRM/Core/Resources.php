@@ -541,7 +541,7 @@ class CRM_Core_Resources {
       "packages/jquery/plugins/jquery.autocomplete.js",
       "packages/jquery/css/jquery.autocomplete.css",
 
-      "packages/jquery/plugins/jquery.menu.pack.js",
+      "packages/jquery/plugins/jquery.menu$min.js",
       "packages/jquery/css/menu.css",
 
       "packages/jquery/plugins/jquery.tableHeader.js",
