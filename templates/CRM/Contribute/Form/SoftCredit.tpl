@@ -41,6 +41,9 @@
       </td>
       <td>
         {$form.soft_credit_amount.$rowNumber.label}&nbsp;{$form.soft_credit_amount.$rowNumber.html|crmAddClass:eight}
+      </td>
+      <td>
+        {$form.soft_credit_type.$rowNumber.label}&nbsp;{$form.soft_credit_type.$rowNumber.html|crmAddClass:eight}
         &nbsp;<a class="delete-link" row-no={$rowNumber} href="#">{ts}delete{/ts}</a>
       </td>
     </tr>

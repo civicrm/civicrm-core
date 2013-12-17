@@ -43,6 +43,21 @@ class CRM_Dashlet_Page_Blog extends CRM_Core_Page {
   const BLOG_URL = 'https://civicrm.org/blog/feed';
 
   /**
+   * Get the final, usable URL string (after interpolating any variables)
+   *
+   * @return FALSE|string
+   */
+  public function getBlogUrl() {
+    // Note: We use "*default*" as the default (rather than self::BLOG_URL) so that future
+    // developers can change BLOG_URL without needing to update {civicrm_setting}.
+    $url = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'blogUrl', NULL, '*default*');
+    if ($url === '*default*') {
+      $url = self::BLOG_URL;
+    }
+    return CRM_Utils_System::evalUrl($url);
+  }
+
+  /**
    * List blog articles as dashlet
    *
    * @access public
@@ -72,7 +87,7 @@ class CRM_Dashlet_Page_Blog extends CRM_Core_Page {
       $expire = time() - (60 * 60 * 24 * self::CACHE_DAYS);
       // Refresh data after CACHE_DAYS
       if (strtotime($cache->created_date) < $expire) {
-        $new_data = $this->_getFeed();
+        $new_data = $this->_getFeed($this->getBlogUrl());
         // If fetching the new rss feed was successful, return it
         // Otherwise use the old cached data - it's better than nothing
         if ($new_data) {
@@ -81,7 +96,7 @@ class CRM_Dashlet_Page_Blog extends CRM_Core_Page {
       }
       return unserialize($cache->data);
     }
-    return $this->_getFeed();
+    return $this->_getFeed($this->getBlogUrl());
   }
 
   /**
@@ -89,11 +104,11 @@ class CRM_Dashlet_Page_Blog extends CRM_Core_Page {
    *
    * @return array|NULL array of blog items; or NULL if not available
    *
-   * @access private
+   * @access public
    */
-  private function _getFeed() {
+  public function _getFeed($url) {
     $httpClient = new CRM_Utils_HttpClient(self::CHECK_TIMEOUT);
-    list ($status, $rawFeed) = $httpClient->get(self::BLOG_URL);
+    list ($status, $rawFeed) = $httpClient->get($url);
     if ($status !== CRM_Utils_HttpClient::STATUS_OK) {
       return NULL;
     }

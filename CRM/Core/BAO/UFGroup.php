@@ -1178,9 +1178,8 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
           }
           elseif ($fieldName == 'im') {
             $providerId = $detailName . '-provider_id';
-            $providerName = $imProviders[$details->$providerId];
-            if ($providerName) {
-              $values[$index] = $details->$detailName . " (" . $providerName . ")";
+            if (isset($imProviders[$details->$providerId])) {
+              $values[$index] = $details->$detailName . " (" . $imProviders[$details->$providerId] . ")";
             }
             else {
               $values[$index] = $details->$detailName;
@@ -1804,7 +1803,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
       if ($addressOptions['county']) {
         $form->add('select', $name, $title,
           array(
-            '' => ts('- select state -')), $required
+            '' => ts('(choose state first)')), $required
         );
       }
     }
@@ -1877,16 +1876,10 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
         $form->addRule($name, ts('%1 is a required field.', array(1 => $title)), 'required');
       }
     }
-    elseif ($fieldName === 'prefix_id') {
+    elseif ($fieldName === 'prefix_id' || $fieldName === 'suffix_id') {
       $form->add('select', $name, $title,
         array(
-          '' => ts('- select -')) + CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'prefix_id'), $required
-      );
-    }
-    elseif ($fieldName === 'suffix_id') {
-      $form->add('select', $name, $title,
-        array(
-          '' => ts('- select -')) + CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'suffix_id'), $required
+          '' => ts('- select -')) + CRM_Core_PseudoConstant::get('CRM_Contact_BAO_Contact', $fieldName), $required
       );
     }
     elseif ($fieldName === 'contact_sub_type') {
@@ -2069,6 +2062,16 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
       $form->add('select', $name, $title,
         array(
           '' => ts('- select -')) + $contributionStatuses, $required
+      );
+    }
+    elseif ($fieldName == 'soft_credit_type') {
+      $form->add('select', $name, $title,
+        array(
+          '' => ts('- select -')) + CRM_Core_OptionGroup::values("soft_credit_type")
+      );
+      $form->addElement('hidden', 'sct_default_id',
+        CRM_Core_OptionGroup::getDefaultValue("soft_credit_type"),
+        array('id' => 'sct_default_id')
       );
     }
     elseif ($fieldName == 'currency') {

@@ -51,6 +51,9 @@
       <required>true</required>
       <comment>What operation does this user have permission on?</comment>
       <add>1.6</add>
+      <html>
+        <type>Select</type>
+      </html>
   </field>
   <index>
     <name>UI_user_contact_operation</name>

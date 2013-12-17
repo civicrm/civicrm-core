@@ -135,7 +135,7 @@
       {elseif $action neq 4}
       <td class="label">{ts}With Contact{/ts}</td>
       <td class="view-value">
-        {include file="CRM/Contact/Form/NewContact.tpl" noLabel=true skipBreak=true multiClient=true parent="activity"}
+        {include file="CRM/Contact/Form/NewContact.tpl" noLabel=true skipBreak=true multiClient=true parent="activity" showNewSelect=true}
         {if $action eq 1}
         <br/>
         {$form.is_multi_activity.html}&nbsp;{$form.is_multi_activity.label} {help id="id-is_multi_activity"}

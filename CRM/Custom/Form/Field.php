@@ -103,8 +103,23 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
       self::$_dataToHTML = CRM_Core_BAO_CustomField::dataToHtml();
     }
 
-    //custom group id
-    $this->_gid = CRM_Utils_Request::retrieve('gid', 'Positive', $this);
+    //custom field id
+    $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
+
+    $this->_values = array();
+    //get the values form db if update.
+    if ($this->_id) {
+      $params = array('id' => $this->_id);
+      CRM_Core_BAO_CustomField::retrieve($params, $this->_values);
+      // note_length is an alias for the text_length field
+      $this->_values['note_length'] = CRM_Utils_Array::value('text_length', $this->_values);
+      // custom group id
+      $this->_gid = $this->_values['custom_group_id'];
+    }
+    else {
+      // custom group id
+      $this->_gid = CRM_Utils_Request::retrieve('gid', 'Positive', $this);
+    }
 
     if ($isReserved = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $this->_gid, 'is_reserved', 'id')) {
       CRM_Core_Error::fatal("You cannot add or edit fields in a reserved custom field-set.");
@@ -117,18 +132,6 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
 
       $session = CRM_Core_Session::singleton();
       $session->pushUserContext($url);
-    }
-
-    //custom field id
-    $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
-
-    //get the values form db if update.
-    $this->_values = array();
-    if ($this->_id) {
-      $params = array('id' => $this->_id);
-      CRM_Core_BAO_CustomField::retrieve($params, $this->_values);
-      // note_length is an alias for the text_length field
-      $this->_values['note_length'] = CRM_Utils_Array::value('text_length', $this->_values);
     }
 
     if (self::$_dataToLabels == NULL) {
@@ -273,6 +276,7 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
     if ($this->_gid) {
       $this->_title = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $this->_gid, 'title');
       CRM_Utils_System::setTitle($this->_title . ' - ' . ($this->_id ? ts('Edit Field') : ts('Add Field')));
+      $this->assign('gid', $this->_gid);
     }
 
     // lets trim all the whitespace
@@ -694,7 +698,7 @@ SELECT count(*)
     }
     $optionFields = array('Select', 'Multi-Select', 'CheckBox', 'Radio', 'AdvMulti-Select');
 
-    if ($fields['option_type'] == 1) {
+    if (isset($fields['option_type']) && $fields['option_type'] == 1) {
       //capture duplicate Custom option values
       if (!empty($fields['option_value'])) {
         $countValue = count($fields['option_value']);

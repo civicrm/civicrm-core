@@ -91,13 +91,17 @@
 {literal}
 <script type="text/javascript">
 cj( function() {
-  buildGroupSelector( true );
+  // for CRM-11310 and CRM-10635 : processing just parent groups on initial display
+  // passing '1' for parentsOnlyArg to show parent child heirarchy structure display
+  // on initial load of manage group page and
+  // also to handle search filtering for initial load of same page.
+  buildGroupSelector(true, 1);
   cj('#_qf_Search_refresh').click( function() {
     buildGroupSelector( true );
   });
 });
 
-function buildGroupSelector( filterSearch ) {
+function buildGroupSelector( filterSearch, parentsOnlyArg ) {
     if ( filterSearch ) {
         if (typeof crmGroupSelector !== 'undefined') {
           crmGroupSelector.fnDestroy();
@@ -107,6 +111,11 @@ function buildGroupSelector( filterSearch ) {
     } else {
         var parentsOnly = 1;
         var ZeroRecordText = {/literal}'{ts escape="js"}<div class="status messages">No Groups have been created for this site.{/ts}</div>'{literal};
+    }
+
+    // this argument should only be used on initial display i.e onPageLoad
+    if (typeof parentsOnlyArg !== 'undefined') {
+      parentsOnly = parentsOnlyArg;
     }
 
     var columns = '';

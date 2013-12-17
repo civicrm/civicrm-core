@@ -28,6 +28,9 @@
         <keyColumn>id</keyColumn>
         <labelColumn>name</labelColumn>
       </pseudoconstant>
+      <html>
+        <type>Select</type>
+      </html>
   </field>
   <foreignKey>
        <name>option_group_id</name>
@@ -96,9 +99,11 @@
   <field>
        <name>description</name>
        <type>text</type>
-       <htmlType>textarea</htmlType>
-       <rows>8</rows>
-       <cols>60</cols>
+       <html>
+         <type>TextArea</type>
+         <rows>8</rows>
+         <cols>60</cols>
+       </html>
        <localizable>true</localizable>
        <comment>Optional description.</comment>
        <add>1.5</add>
@@ -134,6 +139,9 @@
         <keyColumn>id</keyColumn>
         <labelColumn>name</labelColumn>
       </pseudoconstant>
+      <html>
+        <type>Select</type>
+      </html>
   </field>
   <foreignKey>
        <name>component_id</name>

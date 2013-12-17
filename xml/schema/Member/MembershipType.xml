@@ -45,9 +45,11 @@
   <field>
     <name>description</name>
     <type>varchar</type>
-    <htmlType>textarea</htmlType>
-    <rows>6</rows>
-    <cols>50</cols>
+    <html>
+      <type>TextArea</type>
+      <rows>6</rows>
+      <cols>50</cols>
+    </html>
     <length>255</length>
     <localizable>true</localizable>
     <comment>Description of Membership Type</comment>
@@ -108,6 +110,9 @@
     <values>day, month, year, lifetime</values>
     <comment>Unit in which membership period is expressed.</comment>
     <add>1.5</add>
+    <html>
+      <type>Select</type>
+    </html>
   </field>
   <field>
     <name>duration_interval</name>
@@ -174,6 +179,9 @@
     <pseudoconstant>
       <optionGroupName>visibility</optionGroupName>
     </pseudoconstant>
+    <html>
+      <type>Select</type>
+    </html>
   </field>
   <field>
     <name>weight</name>
@@ -184,9 +192,11 @@
   <field>
     <name>receipt_text_signup</name>
     <type>varchar</type>
-    <htmlType>textarea</htmlType>
-    <rows>6</rows>
-    <cols>50</cols>
+    <html>
+      <type>TextArea</type>
+      <rows>6</rows>
+      <cols>50</cols>
+    </html>
     <length>255</length>
     <comment>Receipt Text for membership signup</comment>
     <add>2.0</add>
@@ -194,9 +204,11 @@
   <field>
     <name>receipt_text_renewal</name>
     <type>varchar</type>
-    <htmlType>textarea</htmlType>
-    <rows>6</rows>
-    <cols>50</cols>
+    <html>
+      <type>TextArea</type>
+      <rows>6</rows>
+      <cols>50</cols>
+    </html>
     <length>255</length>
     <comment>Receipt Text for membership renewal</comment>
     <add>2.0</add>

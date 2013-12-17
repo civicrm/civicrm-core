@@ -80,6 +80,9 @@
       <labelColumn>full_name</labelColumn>
       <nameColumn>numeric_code</nameColumn>
     </pseudoconstant>
+    <html>
+      <type>Select</type>
+    </html>
   </field>
   <field>
     <name>financial_account_id</name>
@@ -91,6 +94,9 @@
       <keyColumn>id</keyColumn>
       <labelColumn>name</labelColumn>
     </pseudoconstant>
+    <html>
+      <type>Select</type>
+    </html>
   </field>
   <foreignKey>
     <name>financial_account_id</name>
@@ -107,6 +113,9 @@
     <pseudoconstant>
       <optionGroupName>financial_item_status</optionGroupName>
     </pseudoconstant>
+    <html>
+      <type>Select</type>
+    </html>
   </field>
   <field>
     <name>entity_table</name>

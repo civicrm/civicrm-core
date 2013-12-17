@@ -22,9 +22,11 @@
        <name>message</name>
        <type>text</type>
        <comment>Contents of the SMS.</comment>
-       <htmlType>textarea</htmlType>
-       <rows>5</rows>
-       <cols>80</cols>
+       <html>
+         <type>TextArea</type>
+         <rows>5</rows>
+         <cols>80</cols>
+       </html>
        <add>1.4</add>
   </field>
   <field>
@@ -33,6 +35,9 @@
       <required>true</required>
       <comment>FK to Contact who is sending this SMS</comment>
        <add>1.4</add>
+       <html>
+         <type>Autocomplete-Select</type>
+       </html>
   </field>
   <foreignKey>
        <name>contact_id</name>

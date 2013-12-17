@@ -78,6 +78,63 @@ function civicrm_api3_report_template_delete($params) {
   return civicrm_api3_option_value_delete($params);
 }
 
+/**
+ * Retrieve rows from a report template
+ *
+ * @param  array  $params input parameters
+ *
+ * @return  array details of found instances
+ * @access public
+ */
+function civicrm_api3_report_template_getrows($params) {
+  list($rows, $instance) = _civicrm_api3_report_template_getrows($params);
+  return civicrm_api3_create_success($rows, $params, 'report_template');
+}
+
+function _civicrm_api3_report_template_getrows($params) {
+  $class = civicrm_api3('option_value', 'getvalue', array(
+      'option_group_id' => 'report_template',
+      'return' => 'name',
+      'value' => $params['report_id'],
+  )
+  );
+
+  $reportInstance = new $class();
+  if(!empty($params['instance_id'])) {
+    $reportInstance->setID($params['instance_id']);
+  }
+  $reportInstance->setParams($params);
+  $reportInstance->noController = TRUE;
+  $reportInstance->preProcess();
+  $reportInstance->setDefaultValues(FALSE);
+  $reportInstance->setParams(array_merge($reportInstance->getDefaultValues(), $params));
+  $reportInstance->beginPostProcessCommon();
+  $sql = $reportInstance->buildQuery();
+  $rows = array();
+  $reportInstance->buildRows($sql, $rows);
+  return array($rows, $reportInstance);
+}
+
+function civicrm_api3_report_template_getstatistics($params) {
+  list($rows, $reportInstance) = _civicrm_api3_report_template_getrows($params);
+  $stats = $reportInstance->statistics($rows);
+  return civicrm_api3_create_success($stats, $params, 'report_template');
+}
+/**
+ * Retrieve rows from a report template
+ *
+ * @param  array  $params input parameters
+ *
+ * @return  array details of found instances
+ * @access public
+ */
+function _civicrm_api3_report_template_getrows_spec(&$params) {
+  $params['report_id'] = array(
+    'api.required' => TRUE,
+    'title' => 'Report ID - eg. member/lapse',
+  );
+}
+
 /*
 function civicrm_api3_report_template_getfields($params) {
   return civicrm_api3_create_success(array(

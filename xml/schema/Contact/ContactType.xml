@@ -41,9 +41,11 @@
   <field>
        <name>description</name>
        <type>text</type>
-       <htmlType>textarea</htmlType>
-       <rows>2</rows>
-       <cols>60</cols>
+       <html>
+         <type>TextArea</type>
+         <rows>2</rows>
+         <cols>60</cols>
+       </html>
        <comment>localized Optional verbose description of the type.</comment>
        <localizable>true</localizable>
        <add>3.1</add>

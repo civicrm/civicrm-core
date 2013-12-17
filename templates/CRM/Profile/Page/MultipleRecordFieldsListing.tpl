@@ -69,7 +69,9 @@
 {literal}
   <script type='text/javascript'>
     cj(function () {
-      function formDialog(dataURL, dialogTitle) {
+      // NOTE: Triggers two events, "profile-dialog:FOO:open" and "profile-dialog:FOO:close",
+      // where "FOO" is the internal name of a profile form
+      function formDialog(dialogName, dataURL, dialogTitle) {
         cj.ajax({
           url: dataURL,
           success: function (content) {
@@ -81,14 +83,24 @@
                 opacity: 0.5,
                 background: "black"
               },
-
-            close: function (event, ui) {
-              cj('#profile-dialog').html('');
-            }
-          });
-          cj('.action-link').hide();
-          cj('#profile-dialog #crm-profile-block .edit-value label').css('display', 'inline');
-        }});
+              open: function(event, ui) {
+                cj('#profile-dialog').trigger({
+                  type: "crmFormLoad",
+                  profileName: dialogName
+                });
+              },
+              close: function (event, ui) {
+                cj('#profile-dialog').trigger({
+                  type: "crmFormClose",
+                  profileName: dialogName
+                });
+                cj('#profile-dialog').html('');
+              }
+            });
+            cj('.action-link').hide();
+            cj('#profile-dialog #crm-profile-block .edit-value label').css('display', 'inline');
+          }
+        });
       }
 
       var profileName = {/literal}"{$ufGroupName}"{literal};
@@ -102,7 +114,7 @@
       cj(".crm-profile-name-" + profileName + " .action-item").click(function () {
         dataURL = cj(this).attr('jshref');
         dialogTitle = cj(this).attr('title');
-        formDialog(dataURL, dialogTitle);
+        formDialog(profileName, dataURL, dialogTitle);
       });
     });
     </script>

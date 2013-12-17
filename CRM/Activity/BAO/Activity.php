@@ -676,9 +676,10 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
     $tableFields = array(
       'activity_id' => 'int unsigned',
       'activity_date_time' => 'datetime',
+      'source_record_id' => 'int unsigned',
       'status_id' => 'int unsigned',
       'subject' => 'varchar(255)',
-      'source_record_id' => 'int unsigned',
+      'source_contact_name' => 'varchar(255)',
       'activity_type_id' => 'int unsigned',
       'activity_type' => 'varchar(128)',
       'case_id' => 'int unsigned',
@@ -710,6 +711,7 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
     $insertSQL = "INSERT INTO {$activityTempTable} (" . implode(',', $insertValueSQL) . " ) ";
 
     $order = $limit = $groupBy = '';
+    $groupBy = " GROUP BY tbl.activity_id ";
 
     if (!empty($input['sort'])) {
       if (is_a($input['sort'], 'CRM_Utils_Sort')) {
@@ -758,23 +760,22 @@ LEFT JOIN  civicrm_case_activity ON ( civicrm_case_activity.activity_id = tbl.ac
     // create temp table for target contacts
     $activityContactTempTable = "civicrm_temp_activity_contact_{$randomNum}";
     $query = "CREATE TEMPORARY TABLE {$activityContactTempTable} (
-                activity_id int unsigned, contact_id int unsigned, record_type_id varchar(16), contact_name varchar(255) )
+                activity_id int unsigned, contact_id int unsigned, record_type_id varchar(16), contact_name varchar(255), is_deleted int unsigned )
                 ENGINE=MYISAM DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci";
 
     CRM_Core_DAO::executeQuery($query);
 
     // note that we ignore bulk email for targets, since we don't show it in selector
     $query = "
-INSERT INTO {$activityContactTempTable} ( activity_id, contact_id, record_type_id, contact_name )
+INSERT INTO {$activityContactTempTable} ( activity_id, contact_id, record_type_id, contact_name, is_deleted )
 SELECT     ac.activity_id,
            ac.contact_id,
            ac.record_type_id,
-           c.sort_name
+           c.sort_name,
+           c.is_deleted
 FROM       civicrm_activity_contact ac
 INNER JOIN {$activityTempTable} ON ( ac.activity_id = {$activityTempTable}.activity_id )
 INNER JOIN civicrm_contact c ON c.id = ac.contact_id
-WHERE      c.is_deleted = 0
-
 ";
     CRM_Core_DAO::executeQuery($query);
 
@@ -784,7 +785,8 @@ WHERE      c.is_deleted = 0
 SELECT     {$activityTempTable}.*,
            {$activityContactTempTable}.contact_id,
            {$activityContactTempTable}.record_type_id,
-           {$activityContactTempTable}.contact_name
+           {$activityContactTempTable}.contact_name,
+           {$activityContactTempTable}.is_deleted
 FROM       {$activityTempTable}
 INNER JOIN {$activityContactTempTable} on {$activityTempTable}.activity_id = {$activityContactTempTable}.activity_id
 ORDER BY    fixed_sort_order
@@ -834,6 +836,11 @@ ORDER BY    fixed_sort_order
         $values[$activityID]['target_contact_name'] = array();
       }
 
+      // if deleted, wrap in <del>
+      if ( $dao->is_deleted ) {
+        $dao->contact_name = "<del>{$dao->contact_name}</dao>";
+      }
+
       if ($dao->record_type_id == $sourceID  && $dao->contact_id) {
         $values[$activityID]['source_contact_id'] = $dao->contact_id;
         $values[$activityID]['source_contact_name'] = $dao->contact_name;
@@ -860,33 +867,6 @@ ORDER BY    fixed_sort_order
           ($mailingIDs === TRUE || in_array($dao->source_record_id, $mailingIDs))
         ) {
           $values[$activityID]['mailingId'] = true;
-        }
-      }
-    }
-
-    // add info on whether the related contacts are deleted (CRM-5673)
-    // FIXME: ideally this should be tied to ACLs
-
-    // grab all the related contact ids
-    $cids = array();
-    foreach ($values as $value) {
-      $cids[] = $value['source_contact_id'];
-    }
-    $cids = array_filter(array_unique($cids));
-
-    // see which of the cids are of deleted contacts
-    if ($cids) {
-      $sql  = 'SELECT id FROM civicrm_contact WHERE id IN (' . implode(', ', $cids) . ') AND is_deleted = 1';
-      $dao  = CRM_Core_DAO::executeQuery($sql);
-      $dels = array();
-      while ($dao->fetch()) {
-        $dels[] = $dao->id;
-      }
-
-      // hide the deleted contacts
-      foreach ($values as & $value) {
-        if (in_array($value['source_contact_id'], $dels)) {
-          unset($value['source_contact_id'], $value['source_contact_name']);
         }
       }
     }
@@ -1051,6 +1031,9 @@ LEFT JOIN   civicrm_case_activity ON ( civicrm_case_activity.activity_id = tbl.a
 
     // build main activity table select clause
     $sourceSelect = '';
+
+    $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
+    $sourceID = CRM_Utils_Array::key('Activity Source', $activityContacts);
     $sourceJoin = "
 INNER JOIN civicrm_activity_contact ac ON ac.activity_id = civicrm_activity.id
 INNER JOIN civicrm_contact contact ON ac.contact_id = contact.id
@@ -1059,15 +1042,19 @@ INNER JOIN civicrm_contact contact ON ac.contact_id = contact.id
     if (!$input['count']) {
       $sourceSelect = ',
                 civicrm_activity.activity_date_time,
+                civicrm_activity.source_record_id,
                 civicrm_activity.status_id,
                 civicrm_activity.subject,
-                civicrm_activity.source_record_id,
+                contact.sort_name as source_contact_name,
                 civicrm_option_value.value as activity_type_id,
                 civicrm_option_value.label as activity_type,
                 null as case_id, null as case_subject,
                 civicrm_activity.campaign_id as campaign_id
             ';
 
+      $sourceJoin .= "
+LEFT JOIN civicrm_activity_contact src ON (src.activity_id = ac.activity_id AND src.record_type_id = {$sourceID} AND src.contact_id = contact.id)
+";
     }
 
     $sourceClause = "
@@ -1093,10 +1080,10 @@ INNER JOIN civicrm_contact contact ON ac.contact_id = contact.id
       if (!$input['count']) {
         $caseSelect = ',
                 civicrm_activity.activity_date_time,
+                civicrm_activity.source_record_id,
                 civicrm_activity.status_id,
                 civicrm_activity.subject,
-                ac.contact_id,
-                civicrm_activity.source_record_id,
+                contact.sort_name as source_contact_name,
                 civicrm_option_value.value as activity_type_id,
                 civicrm_option_value.label as activity_type,
                 null as case_id, null as case_subject,
@@ -2195,7 +2182,7 @@ AND cl.modified_id  = c.id
   }
 
   /**
-   * This function delete activity record related to contact record,
+   * This function deletes the activity record related to contact record,
    * when there are no target and assignee record w/ other contact.
    *
    * @param  int $contactId contactId
@@ -2213,18 +2200,27 @@ AND cl.modified_id  = c.id
 
     $transaction = new CRM_Core_Transaction();
 
-    // delete activity if there is no record in
-    // civicrm_activity_contact
-    // pointing to any other contact record.
+    // delete activity if there is no record in civicrm_activity_contact
+    // pointing to any other contact record
     $activityContact = new CRM_Activity_DAO_ActivityContact();
     $activityContact->contact_id = $contactId;
     $activityContact->record_type_id = $sourceID;
     $activityContact->find();
 
     while ($activityContact->fetch()) {
-      // finally delete activity.
-      $activityParams = array('id' => $activityContact->activity_id);
-      $result = self::deleteActivity($activityParams);
+      // delete activity_contact record for the deleted contact
+      $activityContact->delete();
+
+      $activityContactOther = new CRM_Activity_DAO_ActivityContact();
+      $activityContactOther->activity_id = $activityContact->activity_id;
+
+      // delete activity only if no other contacts connected
+      if ( ! $activityContactOther->find(TRUE) ) {
+        $activityParams = array('id' => $activityContact->activity_id);
+        $result = self::deleteActivity($activityParams);
+      }
+
+      $activityContactOther->free();
     }
 
     $activityContact->free();
@@ -2339,7 +2335,10 @@ INNER JOIN  civicrm_option_group grp ON ( grp.id = val.option_group_id AND grp.n
     //check for source contact.
     if (!$componentId || $allow) {
       $sourceContactId = self::getActivityContact($activity->id, $sourceID);
-      $allow = CRM_Contact_BAO_Contact_Permission::allow($sourceContactId, $permission);
+      //account for possibility of activity not having a source contact (as it may have been deleted)
+      if ( $sourceContactId ) {
+        $allow = CRM_Contact_BAO_Contact_Permission::allow($sourceContactId, $permission);
+      }
     }
 
     //check for target and assignee contacts.

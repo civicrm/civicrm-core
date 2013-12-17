@@ -521,7 +521,7 @@ CRM.validate = CRM.validate || {
       }
       target.toggleClass('crm-row-selected', $(this).is(':checked'));
     });
-    $('#crm-container').live('click', function (event) {
+    $('body').live('click', function (event) {
       if ($(event.target).is('.btn-slide')) {
         var currentActive = $('#crm-container .btn-slide-active');
         currentActive.children().hide();
@@ -820,9 +820,89 @@ CRM.validate = CRM.validate || {
     });
   }
 
+  $.widget('civicrm.crmSnippet', {
+    options: {
+      url: null,
+      block: true,
+      crmForm: null
+    },
+    _originalUrl: null,
+    isOriginalUrl: function() {
+      var args = {}, same = true;
+      // Compare path
+      if (this.options.url.split('?')[0] !== this._originalUrl.split('?')[0]) {
+        return false;
+      }
+      // Compare arguments
+      $.each(this.options.url.split('?')[1].split('&'), function(k, v) {
+        var arg = v.split('=');
+        args[arg[0]] = arg[1];
+      });
+      $.each(this._originalUrl.split('?')[1].split('&'), function(k, v) {
+        var arg = v.split('=');
+        if (args[arg[0]] !== undefined && arg[1] !== args[arg[0]]) {
+          same = false;
+        }
+      });
+      return same;
+    },
+    resetUrl: function() {
+      this.options.url = this._originalUrl;
+    },
+    _create: function() {
+      this.element.addClass('crm-ajax-container');
+      if (!this.element.is('.crm-container *')) {
+        this.element.addClass('crm-container');
+      }
+      this._handleOrderLinks();
+      this.options.url ? this.refresh() : this.options.url = document.location.href;
+      this._originalUrl = this.options.url;
+    },
+    _onFailure: function(data) {
+      this.options.block && this.element.unblock();
+      this.element.trigger('crmAjaxFail', data);
+      CRM.alert(ts('Unable to reach the server. Please refresh this page in your browser and try again.'), ts('Network Error'), 'error');
+    },
+    _formatUrl: function(url) {
+      // Add snippet argument to url
+      if (url.search(/[&?]snippet=/) < 0) {
+        url += (url.indexOf('?') < 0 ? '?' : '&') + 'snippet=json';
+      }
+      return url;
+    },
+    _handleOrderLinks: function() {
+      var that = this;
+      $('a.crm-weight-arrow', that.element).click(function(e) {
+        that.options.block && that.element.block();
+        $.getJSON(that._formatUrl(this.href)).done(function() {
+          that.refresh();
+        });
+        e.stopImmediatePropagation();
+        return false;
+      });
+    },
+    refresh: function() {
+      var that = this;
+      var url = this._formatUrl(this.options.url);
+      this.options.block && $('.blockOverlay', this.element).length < 1 && this.element.block();
+      $.getJSON(url, function(data) {
+        if (typeof(data) != 'object' || typeof(data.content) != 'string') {
+          that._onFailure(data);
+          return;
+        }
+        data.url = url;
+        that.element.html(data.content);
+        that._handleOrderLinks();
+        that.element.trigger('crmLoad', data);
+        that.options.crmForm && that.element.trigger('crmFormLoad', data);
+      }).fail(function() {
+          that._onFailure();
+        });
+    }
+  });
+
   var dialogCount = 0;
   CRM.loadPage = function(url, options) {
-    options = options || {};
     var settings = {
       target: '#crm-ajax-dialog-' + (dialogCount++),
       dialog: {
@@ -833,104 +913,110 @@ CRM.validate = CRM.validate || {
           $(this).dialog('destroy');
           $(this).remove();
         }
-      },
-      autoClose: true,
-      onFailure: function(data, settings) {
-        if (settings.dialog !== false && settings.autoClose) {
-          $(this).dialog('close');
-        }
-        CRM.alert(ts('Unable to reach the server. Please refresh this page in your browser and try again.'), ts('Network Error'), 'error');
-      },
-      type: 'Page'
+      }
     };
-    $.extend(true, settings, options);
-    // Add snippet argument to url
-    if (url.search(/[&?]snippet=/) < 0) {
-      url += (url.indexOf('?') < 0 ? '?' : '&') + 'snippet=6';
-    }
+    options && $.extend(true, settings, options);
     settings.url = url;
     // Create new dialog
     if (settings.dialog !== false && settings.target[0] == '#') {
-      $('<div id="'+ settings.target.substring(1) +'" class="crm-container"><div class="crm-loading-element">' + ts('Loading') + '...</div></div>').dialog(settings.dialog);
+      $('<div id="'+ settings.target.substring(1) +'"><div class="crm-loading-element">' + ts('Loading') + '...</div></div>').dialog(settings.dialog);
     }
-    $.getJSON(url, function(data) {
-      if (typeof(data) != 'object' || typeof(data.content) != 'string') {
-        settings.onFailure.call($(settings.target), data, settings);
-        return;
-      }
-      if (settings.dialog && !settings.dialog.title && data.title) {
-        $(settings.target).dialog('option', 'title', data.title);
-      }
-      settings.content = data.content;
-      $(settings.target).html(data.content).trigger('crm' + settings.type + 'Load', data);
-      if (typeof(settings.onLoad) == 'function') {
-        settings.onLoad.call($(settings.target),data, settings);
-      }
-    });
-    return $(settings.target);
+    if (settings.dialog && !settings.dialog.title) {
+      $(settings.target).on('crmLoad', function(event, data) {
+        data.title && $(this).dialog('option', 'title', data.title);
+      });
+    }
+    return $(settings.target).crmSnippet(settings);
   };
 
   CRM.loadForm = function(url, options) {
-    options = options || {};
     var settings = {
-      validate: true,
-      onCancel: function(event, settings) {
-        return false;
-      },
-      onError: function(data, settings) {
-        $(this).html(data.content).trigger('crmFormReload', data);
-        if (typeof(data.errors) == 'object') {
-          $.each(data.errors, function(formElement, msg) {
-            $('[name="'+formElement+'"]').crmError(msg);
-          });
+      crmForm: {
+        ajaxForm: {},
+        autoClose: true,
+        validate: true,
+        refreshAction: ['next_new', 'submit_savenext'],
+        cancelButton: '.cancel.form-submit',
+        openInline: 'a.button',
+        onCancel: function(event) {},
+        onError: function(data) {
+          var $el = $(this);
+          $el.html(data.content).trigger('crmLoad', data).trigger('crmFormLoad', data);
+          if (typeof(data.errors) == 'object') {
+            $.each(data.errors, function(formElement, msg) {
+              $('[name="'+formElement+'"]', $el).crmError(msg);
+            });
+          }
         }
-        settings.onLoad.call($(settings.target), data, settings);
       }
     };
-    $.extend(settings, options, {type: 'Form'});
-    settings.onLoad = function(data, settings) {
-      $(".cancel.form-submit", this).click(function(event) {
-        var returnVal = settings.onCancel.call($(settings.target), event, settings);
-        if (settings.dialog !== false && settings.autoClose && returnVal !== true) {
-          $(settings.target).dialog('close');
+    // Move options that belong to crmForm. Others will be passed through to crmSnippet
+    options && $.each(options, function(key, value) {
+      if (typeof(settings.crmForm[key]) !== 'undefined') {
+        settings.crmForm[key] = value;
+      }
+      else {
+        settings[key] = value;
+      }
+    });
+
+    var widget = CRM.loadPage(url, settings);
+
+    widget.on('crmFormLoad', function(event, data) {
+      var $el = $(this);
+      var settings = $el.data('crmSnippet').options.crmForm;
+      settings.cancelButton && $(settings.cancelButton, this).click(function(event) {
+        var returnVal = settings.onCancel.call($el, event);
+        if (returnVal !== false) {
+          $el.trigger('crmFormCancel', event);
+          if ($el.data('dialog') && settings.autoClose) {
+            $el.dialog('close');
+          }
+          else if (!settings.autoClose) {
+            $el.crmSnippet('resetUrl').crmSnippet('refresh');
+          }
         }
-        return returnVal === true ? returnVal : false;
+        return returnVal === false;
       });
       if (settings.validate) {
         $("form", this).validate(typeof(settings.validate) == 'object' ? settings.validate : CRM.validate.params);
       }
-      $("form", this).ajaxForm({
-        url: settings.url,
+      $("form", this).ajaxForm($.extend({
+        url: data.url.replace(/reset=1[&]?/, ''),
         dataType: 'json',
         success: function(response) {
           if (response.status == 'success') {
-            if (typeof(settings.onSuccess) === 'function') {
-              settings.onSuccess.call($(settings.target), response, settings);
-            }
-            $(settings.target).unblock().trigger('crmFormSuccess', data);
+            $el.crmSnippet('option', 'block') && $el.unblock();
+            $el.trigger('crmFormSuccess', response);
             // Reset form for e.g. "save and new"
-            if (settings.resetButton && response.buttonName == settings.resetButton) {
-              $(settings.target).html(settings.content).trigger('crmFormLoad', data);
-              settings.onLoad.call($(settings.target), data, settings);
+            if (response.userContext && (!settings.autoClose ||
+              (settings.refreshAction && $.inArray(response.buttonName, settings.refreshAction) >= 0)))
+            {
+              $el.crmSnippet('option', 'url', response.userContext).crmSnippet('refresh');
             }
-            else if (settings.dialog !== false && settings.autoClose) {
-              $(settings.target).dialog('close');
+            else if ($el.data('dialog') && settings.autoClose) {
+              $el.dialog('close');
             }
           }
           else {
-            settings.onError.call($(settings.target), response, settings);
+            response.url = data.url;
+            settings.onError.call($el, response);
           }
         },
-        beforeSubmit: function() {
-          $(settings.target).block().trigger('crmFormSubmit', data);
+        beforeSubmit: function(submission) {
+          $el.crmSnippet('option', 'block') && $el.block();
+          $el.trigger('crmFormSubmit', submission);
         }
-      });
-      // Call original onLoad fn
-      if (typeof(options.onLoad) == 'function') {
-        options.onLoad.call($(settings.target), data, settings);
+      }, settings.ajaxForm));
+      if (settings.openInline) {
+        settings.autoClose = $el.crmSnippet('isOriginalUrl');
+        $(settings.openInline, this).click(function(event) {
+          $el.crmSnippet('option', 'url', $(this).attr('href')).crmSnippet('refresh');
+          return false;
+        });
       }
-    };
-    return CRM.loadPage(url, settings);
+    });
+    return widget;
   };
 
   // Preprocess all cj ajax calls to display messages
@@ -950,6 +1036,9 @@ CRM.validate = CRM.validate || {
   });
 
   $(function () {
+    // Trigger crmLoad on initial content for consistency. It will also be triggered for ajax-loaded content.
+    $('#crm-container').trigger('crmLoad');
+
     if ($('#crm-notification-container').length) {
       // Initialize notifications
       $('#crm-notification-container').notify();

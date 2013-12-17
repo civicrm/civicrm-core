@@ -141,8 +141,10 @@ class CRM_Mailing_Form_Upload extends CRM_Core_Form {
           }
         }
         $replyToEmailAddress = explode('<', $replyToEmailAddress);
-        $replyToEmailAddress = $replyToEmailAddress[0] . '<' . $replyToEmailAddress[1];
-        $this->replytoAddress = $defaults['reply_to_address'] = array_search($replyToEmailAddress, $replyToEmail);
+        if (count($replyToEmailAddress) > 1) {
+          $replyToEmailAddress = $replyToEmailAddress[0] . '<' . $replyToEmailAddress[1];
+        }
+        $defaults['reply_to_address'] = array_search($replyToEmailAddress, $replyToEmail);
       }
     }
 

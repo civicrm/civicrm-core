@@ -59,8 +59,10 @@ class CRM_Core_Smarty extends Smarty {
     // this prints a complete form and also generates a qfKey, can we replace this with
     // snippet = 2?? Does the constant _NOFFORM do anything?
     PRINT_QFKEY = 5,
-    // this sends the output back in json
-    PRINT_JSON = 6;
+    // Note: added in v 4.3 with the value '6'
+    // Value changed in 4.5 to 'json' for better readability
+    // @see CRM_Core_Page_AJAX::returnJsonResponse
+    PRINT_JSON = 'json';
 
   /**
    * We only need one instance of this object. So we use the singleton

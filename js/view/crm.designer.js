@@ -296,6 +296,7 @@
       'click .crm-designer-palette-clear-search': 'clearSearch',
       'click .crm-designer-palette-toggle': 'toggleAll',
       'click .crm-designer-palette-add button': 'doNewCustomFieldDialog',
+      'click #crm-designer-add-custom-set': 'doNewCustomSetDialog',
       'dblclick .crm-designer-palette-field': 'doAddToCanvas'
     },
     initialize: function() {
@@ -372,7 +373,8 @@
           paletteView.toggleActive(ufFieldModel, paletteView.model.getRel('ufFieldCollection'))
         });
         paletteView.$('.crm-designer-palette-add a').replaceWith('<button>' + $('.crm-designer-palette-add a').first().text() + '</<button>');
-        paletteView.$('.crm-designer-palette-add button').button();
+        paletteView.$('.crm-designer-palette-tree > ul').append('<li><button id="crm-designer-add-custom-set">+ ' + ts('Add Set of Custom Fields') + '</button></li>');
+        paletteView.$('.crm-designer-palette-tree button').button();
       }).bind("select_node.jstree", function (e, data) {
         $(this).jstree("toggle_node", data.rslt.obj);
         $(this).jstree("deselect_node", data.rslt.obj);
@@ -411,12 +413,21 @@
         action: 'add',
         gid: sections[sectionKey].custom_group_id
       });
-      CRM.loadForm(url, {
-        resetButton: 'next_new',
-        onSuccess: function(data, settings) {
-          paletteView.doRefresh('custom_' + data.id);
-        }
+      CRM.loadForm(url).on('crmFormSuccess', function(e, data) {
+        paletteView.doRefresh('custom_' + data.id);
       });
+      return false;
+    },
+    doNewCustomSetDialog: function(event) {
+      var paletteView = this;
+      var url = CRM.url('civicrm/admin/custom/group', 'action=add&reset=1');
+      // Create custom field set and automatically go to next step (create fields) after save button is clicked.
+      CRM.loadForm(url, {refreshAction: ['next']})
+        .on('crmFormSuccess', function(e, data) {
+          // When form switches to create custom field context, modify button behavior to only continue for "save and new"
+          data.customField && ($(this).data('crmSnippet').options.crmForm.refreshAction = ['next_new']);
+          paletteView.doRefresh(data.customField ? 'custom_' + data.id : null);
+        });
       return false;
     },
     doRefresh: function(fieldToAdd) {
@@ -565,6 +576,7 @@
     },
     events: {
       "click .crm-designer-action-settings": 'doToggleForm',
+      "click button.crm-designer-edit-custom": 'doEditCustomField',
       "click .crm-designer-action-remove": 'doRemove'
     },
     modelEvents: {
@@ -601,6 +613,7 @@
       var $detail = this.detail.$el;
       if (!this.expanded) {
         $detail.toggle('blind', 250);
+        this.$('button.crm-designer-edit-custom').remove();
       }
       else {
         var $canvas = $('.crm-designer-canvas');
@@ -616,7 +629,41 @@
             }
           }
         });
+        if (this.model.get('field_name').split('_')[0] == 'custom') {
+          this.$('.crm-designer-field-summary > div').append('<button class="crm-designer-edit-custom">&raquo; ' + ts('Edit Custom Field') + '</button>');
+          this.$('button.crm-designer-edit-custom').button().attr('title', ts('Edit global settings for this custom field.'));
+        }
       }
+    },
+    doEditCustomField: function() {
+      var url = CRM.url('civicrm/admin/custom/group/field/update', {
+        action: 'update',
+        reset: 1,
+        id: this.model.get('field_name').split('_')[1]
+      });
+      var form1 = CRM.loadForm(url, {openInline: '.crm-custom-field-form-block-data_type a'})
+        .on('crmFormLoad', function() {
+          $(this).prepend('<div class="messages status"><div class="icon inform-icon"></div>' + ts('Note: This will modify the field system-wide, not just in this profile form.') + '</div>');
+          var $link = $('.action-link a', this);
+          if ($link.length) {
+            $link.detach();
+            var buttons = {};
+            buttons[$link.text()] = function() {
+              var form2 = CRM.loadForm($link.attr('href'), {
+                cancelButton: '.cancel.form-submit, #done',
+                openInline: 'a.action-item:not(".enable-action, .disable-action")',
+                dialog: {
+                  width: '60%',
+                  height: parseInt($(window).height() * .8)
+                }
+              }).on('crmLoad', function() {
+                  $('#done', this).removeAttr('onclick');
+                });
+            }
+            $(this).dialog('option', 'buttons', buttons);
+          }
+        })
+      return false;
     },
     onChangeIsDuplicate: function(model, value, options) {
       this.$el.toggleClass('crm-designer-duplicate', value);

@@ -359,7 +359,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
         }
       }
     }
-
+    
     if (CRM_Utils_Array::value('record_contribution', $defaults) && !$this->_mode) {
       $contributionParams = array('id' => $defaults['record_contribution']);
       $contributionIds = array();
@@ -380,6 +380,10 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       if (CRM_Utils_Array::value('membership_source', $defaults)) {
         $defaults['source'] = $defaults['membership_source'];
       }
+    }
+    //CRM-13420
+    if (!CRM_Utils_Array::value('payment_instrument_id', $defaults)) {
+      $defaults['payment_instrument_id'] = key(CRM_Core_OptionGroup::values('payment_instrument', FALSE, FALSE, FALSE, 'AND is_default = 1'));
     }
 
     // User must explicitly choose to send a receipt in both add and update mode.
@@ -424,7 +428,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
 
       // now fix all state country selectors, set correct state based on country
       CRM_Core_BAO_Address::fixAllStateSelects($this, $defaults);
-      
+
       //             // hack to simplify credit card entry for testing
       //             $defaults['credit_card_type']     = 'Visa';
       //             $defaults['credit_card_number']   = '4807731747657838';
@@ -925,6 +929,10 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
 
     if (!$priceSetId && $self->_mode && !CRM_Utils_Array::value('financial_type_id', $params)) {
       $errors['financial_type_id'] = ts('Please enter the financial Type.');
+    }
+    
+    if (CRM_Utils_Array::value('record_contribution', $params) && !CRM_Utils_Array::value('payment_instrument_id', $params)) {
+      $errors['payment_instrument_id'] = ts('Paid By is a required field.');
     }
 
     if (CRM_Utils_Array::value('payment_processor_id', $params)) {

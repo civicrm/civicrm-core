@@ -25,6 +25,9 @@
     <required>true</required>
     <comment></comment>
     <add>4.2</add>
+    <html>
+      <type>Select</type>
+    </html>
   </field>
   <field>
     <!-- "key" is a reserved word in MySQL -->

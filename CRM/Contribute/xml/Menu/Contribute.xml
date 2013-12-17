@@ -151,6 +151,15 @@
     <weight>395</weight>
   </item>
   <item>
+    <path>civicrm/admin/options/soft_credit_type</path>
+    <title>Soft Credit Types</title>
+    <page_callback>CRM_Admin_Page_Options</page_callback>
+    <desc>Soft Credit Types that will be offered to contributors during soft credit contribution</desc>
+    <path_arguments>group=soft_credit_type</path_arguments>
+    <adminGroup>CiviContribute</adminGroup>
+    <icon>admin/small/soft_credit_type.png</icon>
+  </item>
+  <item>
     <path>civicrm/contact/view/contribution</path>
     <title>Contributions</title>
     <page_callback>CRM_Contribute_Page_Tab</page_callback>

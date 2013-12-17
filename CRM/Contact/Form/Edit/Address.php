@@ -450,28 +450,28 @@ class CRM_Contact_Form_Edit_Address {
         $stateID = CRM_Utils_Array::value(0, $form->getElementValue($stateElementName));
       }
     }
-    if ($countryID &&
-      isset($form->_elementIndex[$stateElementName])
-    ) {
-      $stateSelect = &$form->addElement('select',
-        $stateElementName,
-        $stateTitle,
-        array(
-          '' => ts('- select -')) +
-        CRM_Core_PseudoConstant::stateProvinceForCountry($countryID)
-      );
+
+    if (isset($form->_elementIndex[$stateElementName])) {
+      if ($countryID) {
+        $stateProvinces = CRM_Core_PseudoConstant::stateProvinceForCountry($countryID);
+      }
+      else {
+        $stateProvinces = CRM_Core_PseudoConstant::stateProvince();
+      }
+
+      $stateSelect = & $form->addElement('select', $stateElementName, $stateTitle,
+        array('' => ts('- select -')) + $stateProvinces);
     }
-    if ($stateID &&
-      isset($form->_elementIndex[$stateElementName]) &&
-      isset($form->_elementIndex[$countyElementName])
-    ) {
-      $form->addElement('select',
-        $countyElementName,
-        ts('County'),
-        array(
-          '' => ts('- select -')) +
-        CRM_Core_PseudoConstant::countyForState($stateID)
-      );
+
+    if (isset($form->_elementIndex[$stateElementName]) && isset($form->_elementIndex[$countyElementName])) {
+      if ($stateID) {
+        $counties = CRM_Core_PseudoConstant::countyForState($stateID);
+      }
+      else {
+        $counties = CRM_Core_PseudoConstant::country();
+      }
+
+      $form->addElement('select', $countyElementName, ts('County'), array('' => ts('- select -')) + $counties);
     }
 
     // CRM-7296 freeze the select for state if address is shared with household

@@ -1529,6 +1529,7 @@ class CRM_Contact_BAO_Query {
       case 'group':
         $this->group($values);
         return;
+
       case 'group_type':
         // so we resolve this into a list of groups & proceed as if they had been
         // handed in
@@ -1540,8 +1541,8 @@ class CRM_Contact_BAO_Query {
         $this->_paramLookup['group'][0][2] = $values[2] = $this->getGroupsFromTypeCriteria($value);
         $this->group($values);
         return;
-      // case tag comes from find contacts
 
+      // case tag comes from find contacts
       case 'tag_search':
         $this->tagSearch($values);
         return;
@@ -1990,9 +1991,11 @@ class CRM_Contact_BAO_Query {
         $op = 'LIKE';
       }
       $wc = self::caseImportant($op) ? "LOWER(contact_a.organization_name)" : "contact_a.organization_name";
-      $this->_where[$grouping][] = self::buildClause($wc, $op,
-        "'$value' AND contact_a.contact_type ='Individual'"
+      $ceWhereClause = self::buildClause($wc, $op,
+        $value
       );
+      $ceWhereClause .= " AND contact_a.contact_type = 'Individual'";
+      $this->_where[$grouping][] = $ceWhereClause;
       $this->_qill[$grouping][] = "$field[title] $op \"$value\"";
     }
     elseif ($name === 'email_greeting') {
@@ -2032,7 +2035,7 @@ class CRM_Contact_BAO_Query {
       }
 
       $wc = 'civicrm_website.url';
-      $this->_where[$grouping][] = self::buildClause($wc, $op, "'$value'");
+      $this->_where[$grouping][] = $d = self::buildClause($wc, $op, $value);
       $this->_qill[$grouping][] = "$field[title] $op \"$value\"";
     }
     elseif ($name === 'contact_is_deleted') {
@@ -2641,7 +2644,7 @@ class CRM_Contact_BAO_Query {
 
     if (!$skipGroup) {
       $gcTable = "`civicrm_group_contact-{$groupIds}`";
-      $this->_tables[$gcTable] = $this->_whereTables[$gcTable] = " LEFT JOIN civicrm_group_contact {$gcTable} ON contact_a.id = {$gcTable}.contact_id ";
+      $this->_tables[$gcTable] = $this->_whereTables[$gcTable] = " LEFT JOIN civicrm_group_contact {$gcTable} ON ( contact_a.id = {$gcTable}.contact_id AND {$gcTable}.group_id $op ( $groupIds ) )";
     }
 
     $qill = ts('Contacts %1', array(1 => $op));
@@ -3196,11 +3199,15 @@ WHERE  id IN ( $groupIDs )
    */
   function phone_numeric(&$values) {
     list($name, $op, $value, $grouping, $wildcard) = $values;
-    // Strip non-numeric characters
-    $number = preg_replace('/[^\d]/', '', $value);
+    // Strip non-numeric characters; allow wildcards
+    $number = preg_replace('/[^\d%]/', '', $value);
     if ($number) {
+      if ( strpos($number, '%') === FALSE ) {
+        $number = "%$number%";
+      }
+
       $this->_qill[$grouping][] = ts('Phone number contains') . " $number";
-      $this->_where[$grouping][] = self::buildClause('civicrm_phone.phone_numeric', 'LIKE', "%$number%", 'String');
+      $this->_where[$grouping][] = self::buildClause('civicrm_phone.phone_numeric', 'LIKE', "$number", 'String');
       $this->_tables['civicrm_phone'] = $this->_whereTables['civicrm_phone'] = 1;
     }
   }
@@ -4889,7 +4896,6 @@ SELECT COUNT( civicrm_contribution.total_amount ) as cancel_count,
         }
 
         $value = CRM_Utils_Type::escape($value, $dataType);
-
         // if we dont have a dataType we should assume
         if ($dataType == 'String' || $dataType == 'Text') {
           $value = "'" . strtolower($value) . "'";

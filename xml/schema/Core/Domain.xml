@@ -81,9 +81,11 @@
     <name>config_backend</name>
     <type>text</type>
     <comment>Backend configuration.</comment>
-    <htmlType>textarea</htmlType>
-    <rows>20</rows>
-    <cols>80</cols>
+    <html>
+      <type>TextArea</type>
+      <rows>20</rows>
+      <cols>80</cols>
+    </html>
     <add>1.6</add>
   </field>
   <field>
@@ -122,9 +124,11 @@
     <name>locale_custom_strings</name>
     <type>text</type>
     <comment>Locale specific string overrides</comment>
-    <htmlType>textarea</htmlType>
-    <rows>20</rows>
-    <cols>80</cols>
+    <html>
+      <type>TextArea</type>
+      <rows>20</rows>
+      <cols>80</cols>
+    </html>
     <add>3.2</add>
   </field>
 </table>

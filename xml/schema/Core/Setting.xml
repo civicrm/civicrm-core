@@ -86,6 +86,9 @@
       <keyColumn>id</keyColumn>
       <labelColumn>name</labelColumn>
     </pseudoconstant>
+    <html>
+      <type>Select</type>
+    </html>
   </field>
   <foreignKey>
        <name>component_id</name>

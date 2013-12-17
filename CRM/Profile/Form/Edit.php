@@ -254,10 +254,7 @@ SELECT module
     if (($this->_multiRecord & CRM_Core_Action::DELETE) && $this->_recordExists) {
       $this->_deleteButtonName = $this->getButtonName('upload', 'delete');
 
-      $this->addElement('submit',
-        $this->_deleteButtonName,
-        ts('Delete')
-      );
+      $this->addElement('submit', $this->_deleteButtonName, ts('Delete'));
 
       $buttons[] = array(
         'type' => 'cancel',
@@ -310,6 +307,11 @@ SELECT module
 
     // this is special case when we create contact using Dialog box
     if ($this->_context == 'dialog') {
+      //replace the session stack for redirecting user to contact summary if new contact is created.
+      $contactViewURL = CRM_Utils_System::url('civicrm/contact/view', "reset=1&cid={$this->_id}", FALSE, NULL, FALSE);
+      $session = CRM_Core_Session::singleton();
+      $session->replaceUserContext($contactViewURL);
+
       $displayName = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $this->_id, 'display_name');
       $sortName = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $this->_id, 'sort_name');
       $returnArray = array(

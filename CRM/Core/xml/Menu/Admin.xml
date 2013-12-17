@@ -659,6 +659,11 @@
      <page_callback>CRM_Admin_Page_OptionValue</page_callback>
   </item>
   <item>
+     <path>civicrm/ajax/menujs</path>
+     <page_callback>CRM_Admin_Page_AJAX::getNavigationMenu</page_callback>
+     <access_arguments>access CiviCRM</access_arguments>
+  </item>
+  <item>
      <path>civicrm/ajax/menu</path>
      <page_callback>CRM_Admin_Page_AJAX::getNavigationList</page_callback>
      <access_arguments>access CiviCRM,administer CiviCRM</access_arguments>

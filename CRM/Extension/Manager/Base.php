@@ -63,6 +63,12 @@ class CRM_Extension_Manager_Base implements CRM_Extension_Manager_Interface {
   /**
    * {@inheritdoc}
    */
+  public function onPostPostInstall(CRM_Extension_Info $info) {
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function onPreEnable(CRM_Extension_Info $info) {
   }
 

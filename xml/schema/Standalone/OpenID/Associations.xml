@@ -25,6 +25,9 @@
        <name>handle</name>
        <type>varchar</type>
        <length>255</length>
+       <html>
+          <type>Text</type>
+       </html>
        <add>2.0</add>
   </field>
   <field>
@@ -46,6 +49,9 @@
       <name>assoc_type</name>
       <type>varchar</type>
       <length>64</length>
+      <html>
+          <type>Text</type>
+       </html>
       <add>2.0</add>
   </field>
   <index>

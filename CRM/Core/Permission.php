@@ -81,17 +81,63 @@ class CRM_Core_Permission {
   }
 
   /**
-   * given a permission string, check for access requirements
+   * given a permission string or array, check for access requirements
+   * @param mixed $permissions the permission to check as an array or string -see examples
+   *  arrays
    *
-   * @param string $str the permission to check
+   *  Ex 1
+   *
+   *  Must have 'access CiviCRM'
+   *  (string) 'access CiviCRM'
+   *
+   *
+   *  Ex 2 Must have 'access CiviCRM' and 'access Ajax API'
+   *   array('access CiviCRM', 'access Ajax API')
+   *
+   *  Ex 3 Must have 'access CiviCRM' or 'access Ajax API'
+   *   array(
+   *      array('access CiviCRM', 'access Ajax API'),
+   *   ),
+   *
+   *  Ex 4 Must have 'access CiviCRM' or 'access Ajax API' AND 'access CiviEvent'
+   *  array(
+   *    array('access CiviCRM', 'access Ajax API'),
+   *    'access CiviEvent',
+   *   ),
+   *
+   *  Note that in permissions.php this is keyed by the action eg.
+   *  (access Civi || access AJAX) && (access CiviEvent || access CiviContribute)
+   *  'myaction' => array(
+   *    array('access CiviCRM', 'access Ajax API'),
+   *    array('access CiviEvent', 'access CiviContribute')
+   *  ),
    *
    * @return boolean true if yes, else false
    * @static
    * @access public
    */
-  static function check($str) {
-    $config = CRM_Core_Config::singleton();
-    return $config->userPermissionClass->check($str);
+  static function check($permissions) {
+    $permissions = (array) $permissions;
+
+    foreach ($permissions as $permission) {
+      if(is_array($permission)) {
+        foreach ($permission as $orPerm) {
+          if(self::check($orPerm)) {
+            //one of our 'or' permissions has succeeded - stop checking this permission
+            return TRUE;;
+          }
+        }
+        //none of our our conditions was met
+        return FALSE;
+      }
+      else {
+        if(!CRM_Core_Config::singleton()->userPermissionClass->check($permission)) {
+          //one of our 'and' conditions has not been met
+          return FALSE;
+        }
+      }
+    }
+    return TRUE;
   }
 
   /**
