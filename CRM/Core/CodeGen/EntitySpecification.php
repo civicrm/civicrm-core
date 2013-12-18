@@ -277,9 +277,11 @@ class CRM_Core_CodeGen_EntitySpecification {
     if (!empty($table['index'])) {
       $uniqueElements = array();
       foreach($table['index'] as $value) {
-        $indexElements[] = '@ORM\Index(name="' . $value['name'] . '", columns={"' . implode(',', $value['field']) . '"})';
         if (isset($value['unique'])) {
           $uniqueElements[] = '@ORM\UniqueConstraint(name="' . $value['name'] . '", columns={"' . implode(',', $value['field']) . '"})';
+        }
+        else {
+          $indexElements[] = '@ORM\Index(name="' . $value['name'] . '", columns={"' . implode(',', $value['field']) . '"})';
         }
       }
     }
