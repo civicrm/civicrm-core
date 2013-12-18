@@ -2517,7 +2517,9 @@ AND       civicrm_openid.is_primary = 1";
     // fields that are required to calculate greeting and
     // also other fields used in tokens etc,
     // hence we need to retrieve it again.
-    $contact->find(TRUE);
+    if ( $contact->_query !== FALSE ) {
+      $contact->find(TRUE);
+    }
 
     // store object values to an array
     $contactDetails = array();

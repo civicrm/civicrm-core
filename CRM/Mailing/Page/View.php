@@ -75,7 +75,7 @@ class CRM_Mailing_Page_View extends CRM_Core_Page {
    *
    * @return void
    */
-  function run($id = NULL, $contact_id = NULL, $print = TRUE) {
+  function run($id = NULL, $contactID = NULL, $print = TRUE) {
     if (is_numeric($id)) {
       $this->_mailingID = $id;
     }

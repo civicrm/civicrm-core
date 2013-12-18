@@ -90,3 +90,11 @@ SELECT @sct_pcp_id := value from civicrm_option_value where name = 'pcp' and opt
 UPDATE `civicrm_contribution_soft`
 SET soft_credit_type_id = @sct_pcp_id
 WHERE pcp_id IS NOT NULL;
+
+--CRM-13734 make basic Case Activity Types reserved
+SELECT @option_group_id_activity_type := id from civicrm_option_group where name = 'activity_type';
+SELECT @caseCompId := id FROM `civicrm_component` where `name` like 'CiviCase';
+
+UPDATE `civicrm_option_value`
+SET is_reserved = 1
+WHERE is_reserved = 0 AND option_group_id = @option_group_id_activity_type AND component_id = @caseCompId;

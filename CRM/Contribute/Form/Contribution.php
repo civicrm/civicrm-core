@@ -938,6 +938,20 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       && $financialType = CRM_Contribute_BAO_Contribution::validateFinancialType($fields['financial_type_id'])) {
       $errors['financial_type_id'] = ts("Financial Account of account relationship of 'Expense Account is' is not configured for Financial Type : ") . $financialType;
     }
+    
+    // $trxn_id must be unique CRM-13919
+    if (!empty($fields['trxn_id'])) {
+      $queryParams = array(1 => array($fields['trxn_id'], 'String'));
+      $query = 'select count(*) from civicrm_contribution where trxn_id = %1';
+      if ($self->_id) {
+        $queryParams[2] = array((int)$self->_id, 'Integer');
+        $query .= ' and id !=%2';
+      }
+      $tCnt = CRM_Core_DAO::singleValueQuery($query, $queryParams);
+      if ($tCnt) {
+        $errors['trxn_id'] = ts('Transaction ID\'s must be unique. Transaction \'%1\' already exists in your database.', array(1 => $fields['trxn_id']));
+      }      
+    }
 
     $errors = array_merge($errors, $softErrors);
     return $errors;

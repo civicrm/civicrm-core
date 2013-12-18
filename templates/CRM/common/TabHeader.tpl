@@ -89,7 +89,7 @@ cj( function() {
         },
         load: function(event, ui) {
           if ((typeof(Drupal) != 'undefined') && Drupal.attachBehaviors) {
-            Drupal.attachBehaviors(ui.panel);
+            Drupal.attachBehaviors(ui.panel[0]);
           }
           cj(ui.panel).trigger('crmFormLoad');
           // FIXME - decouple scanProfileSelectors and TabHeader

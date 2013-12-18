@@ -3724,14 +3724,12 @@ div.m ul#civicrm-menu,
   padding: 0;
   line-height: 18px;
 }
-.crm-container div.ui-notify-message: last-child {
+.crm-container div.ui-notify-message:last-child {
   margin-bottom: 0;
 }
 .crm-container div.ui-notify-message-style {
   background: #000;
   background: rgba(0,0,0,0.8);
-  -moz-box-shadow: 0 0 6px #000;
-  -webkit-box-shadow: 0 0 6px #000;
   box-shadow: 0 0 6px #000;
 }
 .crm-container div.ui-notify-message-style a,
