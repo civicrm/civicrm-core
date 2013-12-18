@@ -59,15 +59,36 @@ class CRM_Admin_Form extends CRM_Core_Form {
    */
   protected $_BAOName;
 
+  /**
+   * The name of the ORM object for this form
+   *
+   * @var string
+   */
+  protected $_ORMName;
+
   function preProcess() {
     $this->_id      = $this->get('id');
     $this->_BAOName = $this->get('BAOName');
+    $this->_ORMName = $this->get('ORMName');
     $this->_values  = array();
     if (isset($this->_id)) {
-      $params = array('id' => $this->_id);
-      // this is needed if the form is outside the CRM name space
-      $baoName = $this->_BAOName;
-      $baoName::retrieve($params, $this->_values );
+      if ($this->_ORMName) {
+        $em = CRM_DB_EntityManager::singleton();
+        $orm = $em->find($this->_ORMName, $this->_id);
+        $data = $em->getClassMetaData($this->_ORMName);
+
+        $this->_values = array();
+        foreach ($data->fieldNames as $dbName => $ormName) {
+          $fnName = 'get' . ucfirst($ormName);
+          $this->_values[$dbName] = $orm->$fnName();
+        }
+      }
+      else {
+        $params = array('id' => $this->_id);
+        // this is needed if the form is outside the CRM name space
+        $baoName = $this->_BAOName;
+        $baoName::retrieve($params, $this->_values );
+      }
     }
   }
 
@@ -82,13 +103,27 @@ class CRM_Admin_Form extends CRM_Core_Form {
   function setDefaultValues() {
     if (isset($this->_id) && empty($this->_values)) {
       $this->_values = array();
-      $params = array('id' => $this->_id);
-      $baoName = $this->_BAOName;
-      $baoName::retrieve($params, $this->_values );
+      if ($this->_ORMName) {
+        $em = CRM_DB_EntityManager::singleton();
+        $orm = $em->find($this->_ORMName, $this->_id);
+        $data = $em->getClassMetaData($this->_ORMName);
+
+        $this->_values = array();
+        foreach ($data->fieldNames as $dbName => $ormName) {
+          $fnName = 'get' . $ormName;
+          $this->_values[$dbName] = $locTypeORM->$fnName();
+        }
+      }
+      else {
+        $params = array('id' => $this->_id);
+        $baoName = $this->_BAOName;
+        $baoName::retrieve($params, $this->_values );
+      }
     }
     $defaults = $this->_values;
 
-    if ($this->_action == CRM_Core_Action::DELETE &&
+    if (
+      $this->_action == CRM_Core_Action::DELETE &&
       isset($defaults['name'])
     ) {
       $this->assign('delName', $defaults['name']);

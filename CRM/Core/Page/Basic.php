@@ -50,8 +50,19 @@ abstract class CRM_Core_Page_Basic extends CRM_Core_Page {
    * @return string
    * @access public
    */
-
   abstract function getBAOName();
+
+  /**
+   * name of the ORM to perform various DB manipulations
+   * optional for all objects for now
+   *
+   * @return string
+   * @access public
+   */
+  function getORMName() {
+    return NULL;
+  }
+
 
   /**
    * an array of action links
@@ -165,7 +176,8 @@ abstract class CRM_Core_Page_Basic extends CRM_Core_Page {
     }
 
     if ($this->_action &
-      (CRM_Core_Action::VIEW |
+      (
+        CRM_Core_Action::VIEW |
         CRM_Core_Action::ADD |
         CRM_Core_Action::UPDATE |
         CRM_Core_Action::COPY |
@@ -214,57 +226,78 @@ abstract class CRM_Core_Page_Basic extends CRM_Core_Page {
       $action -= CRM_Core_Action::ENABLE;
     }
     $baoString = $this->getBAOName();
-    $object = new $baoString();
-
+    $ormString = $this->getORMName();
     $values = array();
 
-    /*
-         * lets make sure we get the stuff sorted by name if it exists
-         */
+    if ($ormString) {
+      $dql = "
+SELECT   o
+FROM     $ormString o
+";
 
-    $fields = &$object->fields();
-    $key = '';
-    if (CRM_Utils_Array::value('title', $fields)) {
-      $key = 'title';
-    }
-    elseif (CRM_Utils_Array::value('label', $fields)) {
-      $key = 'label';
-    }
-    elseif (CRM_Utils_Array::value('name', $fields)) {
-      $key = 'name';
-    }
-
-    if (trim($sort)) {
-      $object->orderBy($sort);
-    }
-    elseif ($key) {
-      $object->orderBy($key . ' asc');
-    }
-
-
-    // find all objects
-    $object->find();
-    while ($object->fetch()) {
-      if (!isset($object->mapping_type_id) ||
-        // "1 for Search Builder"
-        $object->mapping_type_id != 1
-      ) {
-        $permission = CRM_Core_Permission::EDIT;
-        if ($key) {
-          $permission = $this->checkPermission($object->id, $object->$key);
+      $em = CRM_DB_EntityManager::singleton();
+      $query = $em->createQuery($dql);
+      $results = $query->getResult();
+      $data = $em->getClassMetaData($ormString);
+      foreach($results as $result) {
+        $values[$result->getId()] = array();
+        foreach ($data->fieldNames as $dbName => $ormName) {
+          $fnName = 'get' . ucfirst($ormName);
+          $values[$result->getId()][$dbName] = $result->$fnName();
         }
-        if ($permission) {
-          $values[$object->id] = array();
-          CRM_Core_DAO::storeValues($object, $values[$object->id]);
+      }
+    }
+    else {
+      $object = new $baoString();
 
-          CRM_Contact_DAO_RelationshipType::addDisplayEnums($values[$object->id]);
+      /*
+       * lets make sure we get the stuff sorted by name if it exists
+       */
 
-          // populate action links
-          $this->action($object, $action, $values[$object->id], $links, $permission);
+      $fields =& $object->fields();
+      $key = '';
+      if (CRM_Utils_Array::value('title', $fields)) {
+        $key = 'title';
+      }
+      elseif (CRM_Utils_Array::value('label', $fields)) {
+        $key = 'label';
+      }
+      elseif (CRM_Utils_Array::value('name', $fields)) {
+        $key = 'name';
+      }
 
-          if (isset($object->mapping_type_id)) {
-            $mappintTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Mapping', 'mapping_type_id');
-            $values[$object->id]['mapping_type'] = $mappintTypes[$object->mapping_type_id];
+      if (trim($sort)) {
+        $object->orderBy($sort);
+      }
+      elseif ($key) {
+        $object->orderBy($key . ' asc');
+      }
+
+      // find all objects
+      $object->find();
+      while ($object->fetch()) {
+        if (
+          !isset($object->mapping_type_id) ||
+          // "1 for Search Builder"
+          $object->mapping_type_id != 1
+        ) {
+          $permission = CRM_Core_Permission::EDIT;
+          if ($key) {
+            $permission = $this->checkPermission($object->id, $object->$key);
+          }
+          if ($permission) {
+            $values[$object->id] = array();
+            CRM_Core_DAO::storeValues($object, $values[$object->id]);
+
+            CRM_Contact_DAO_RelationshipType::addDisplayEnums($values[$object->id]);
+
+            // populate action links
+            $this->action($object, $action, $values[$object->id], $links, $permission);
+
+            if (isset($object->mapping_type_id)) {
+              $mappintTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Mapping', 'mapping_type_id');
+              $values[$object->id]['mapping_type'] = $mappintTypes[$object->mapping_type_id];
+            }
           }
         }
       }
@@ -375,6 +408,7 @@ abstract class CRM_Core_Page_Basic extends CRM_Core_Page {
       $controller->set('id', $id);
     }
     $controller->set('BAOName', $this->getBAOName());
+    $controller->set('ORMName', $this->getORMName());
     $this->addValues($controller);
     $controller->setEmbedded(TRUE);
     $controller->process();

@@ -40,6 +40,44 @@
 class CRM_Admin_Form_LocationType extends CRM_Admin_Form {
 
   /**
+   * This function sets the default values for the form. MobileProvider that in edit/view mode
+   * the default values are retrieved from the database
+   *
+   * @access public
+   *
+   * @return None
+   */
+  function setDefaultValues() {
+
+    if (isset($this->_id) && empty($this->_values)) {
+      $em = CRM_DB_EntityManager::singleton();
+      $locTypeORM = $em->find('\Civi\Core\LocationType', $this->_id);
+      $locTypeData = $em->getClassMetaData('\Civi\Core\LocationType');
+
+      $this->_values = array();
+      foreach ($locTypeData->fieldNames as $dbName => $ormName) {
+        $fnName = 'get' . $ormName;
+        $this->_values[$dbName] = $locTypeORM->$fnName();
+      }
+    }
+    $defaults = $this->_values;
+
+    if (
+      $this->_action == CRM_Core_Action::DELETE &&
+      isset($defaults['name'])
+    ) {
+      $this->assign('delName', $defaults['name']);
+    }
+
+    // its ok if there is no element called is_active
+    $defaults['is_active'] = ($this->_id) ? CRM_Utils_Array::value('is_active', $defaults) : 1;
+    if (CRM_Utils_Array::value('parent_id', $defaults)) {
+      $this->assign('is_parent', TRUE);
+    }
+    return $defaults;
+  }
+
+  /**
    * Function to build the form
    *
    * @return None
@@ -54,30 +92,45 @@ class CRM_Admin_Form_LocationType extends CRM_Admin_Form {
     }
 
     $this->applyFilter('__ALL__', 'trim');
-    $this->add('text',
+    $this->add(
+      'text',
       'name',
       ts('Name'),
       CRM_Core_DAO::getAttribute('CRM_Core_DAO_LocationType', 'name'),
       TRUE
     );
-    $this->addRule('name',
+    $this->addRule(
+      'name',
       ts('Name already exists in Database.'),
       'objectExists',
       array('CRM_Core_DAO_LocationType', $this->_id)
     );
-    $this->addRule('name',
+    $this->addRule(
+      'name',
       ts('Name can only consist of alpha-numeric characters'),
       'variable'
     );
 
-    $this->add('text', 'display_name', ts('Display Name'), CRM_Core_DAO::getAttribute('CRM_Core_DAO_LocationType', 'display_name'));
-    $this->add('text', 'vcard_name', ts('vCard Name'), CRM_Core_DAO::getAttribute('CRM_Core_DAO_LocationType', 'vcard_name'));
+    $this->add(
+      'text', 'display_name', ts('Display Name'),
+      CRM_Core_DAO::getAttribute('CRM_Core_DAO_LocationType', 'display_name')
+    );
+    $this->add(
+      'text', 'vcard_name', ts('vCard Name'),
+      CRM_Core_DAO::getAttribute('CRM_Core_DAO_LocationType', 'vcard_name')
+    );
 
-    $this->add('text', 'description', ts('Description'), CRM_Core_DAO::getAttribute('CRM_Core_DAO_LocationType', 'description'));
+    $this->add(
+      'text', 'description', ts('Description'),
+      CRM_Core_DAO::getAttribute('CRM_Core_DAO_LocationType', 'description')
+    );
 
     $this->add('checkbox', 'is_active', ts('Enabled?'));
     $this->add('checkbox', 'is_default', ts('Default?'));
-    if ($this->_action == CRM_Core_Action::UPDATE && CRM_Core_DAO::getFieldValue('CRM_Core_DAO_LocationType', $this->_id, 'is_reserved')) {
+    if (
+      $this->_action == CRM_Core_Action::UPDATE &&
+      CRM_Core_DAO::getFieldValue('CRM_Core_DAO_LocationType', $this->_id, 'is_reserved')
+    ) {
       $this->freeze(array('name', 'description', 'is_active'));
     }
   }
@@ -103,28 +156,36 @@ class CRM_Admin_Form_LocationType extends CRM_Admin_Form {
     $params['is_active'] = CRM_Utils_Array::value('is_active', $params, FALSE);
     $params['is_default'] = CRM_Utils_Array::value('is_default', $params, FALSE);
 
-    // action is taken depending upon the mode
-    $locationType = new CRM_Core_DAO_LocationType();
-    $locationType->name = $params['name'];
-    $locationType->display_name = $params['display_name'];
-    $locationType->vcard_name = $params['vcard_name'];
-    $locationType->description = $params['description'];
-    $locationType->is_active = $params['is_active'];
-    $locationType->is_default = $params['is_default'];
+    $em = CRM_DB_EntityManager::singleton();
+
+    if ($this->_action & CRM_Core_Action::UPDATE) {
+      $locationType = $em->find($this->_ORMName, $this->_id);
+    }
+    else {
+      $locationType = new $this->_ORMName();
+    }
+
+    $locationType->setName($params['name']);
+    $locationType->setDisplayName($params['display_name']);
+    $locationType->setVcardName($params['vcard_name']);
+    $locationType->setDescription($params['description']);
+    $locationType->setIsActive($params['is_active']);
+    $locationType->setIsDefault($params['is_default']);
 
     if ($params['is_default']) {
       $query = "UPDATE civicrm_location_type SET is_default = 0";
-      CRM_Core_DAO::executeQuery($query, CRM_Core_DAO::$_nullArray);
+      CRM_Core_DAO::executeQuery($query);
     }
 
-    if ($this->_action & CRM_Core_Action::UPDATE) {
-      $locationType->id = $this->_id;
-    }
+    $em->persist($locationType);
+    $em->flush();
 
-    $locationType->save();
-
-    CRM_Core_Session::setStatus(ts("The location type '%1' has been saved.",
-        array(1 => $locationType->name)
-      ), ts('Saved'), 'success');
+    CRM_Core_Session::setStatus(
+      ts(
+        "The location type '%1' has been saved.",
+        array(1 => $locationType->getName())
+      ),
+      ts('Saved'), 'success'
+    );
   }
 }
