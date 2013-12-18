@@ -860,6 +860,8 @@ CRM.validate = CRM.validate || {
       // Add snippet argument to url
       if (url.search(/[&?]snippet=/) < 0) {
         url += (url.indexOf('?') < 0 ? '?' : '&') + 'snippet=json';
+      } else {
+        url = url.replace(/snippet=[^&]*/, 'snippet=json');
       }
       return url;
     },
@@ -898,7 +900,10 @@ CRM.validate = CRM.validate || {
   CRM.loadPage = function(url, options) {
     var settings = {
       target: '#crm-ajax-dialog-' + (dialogCount++),
-      dialog: {
+      dialog: false
+    };
+    if (!options || !options.target) {
+      settings.dialog = {
         modal: true,
         width: '65%',
         height: parseInt($(window).height() * .75),
@@ -906,12 +911,12 @@ CRM.validate = CRM.validate || {
           $(this).dialog('destroy');
           $(this).remove();
         }
-      }
-    };
+      };
+    }
     options && $.extend(true, settings, options);
     settings.url = url;
     // Create new dialog
-    if (settings.dialog !== false && settings.target[0] == '#') {
+    if (settings.dialog) {
       $('<div id="'+ settings.target.substring(1) +'"><div class="crm-loading-element">' + ts('Loading') + '...</div></div>').dialog(settings.dialog);
     }
     if (settings.dialog && !settings.dialog.title) {
@@ -1030,13 +1035,12 @@ CRM.validate = CRM.validate || {
 
   $(function () {
     // Trigger crmLoad on initial content for consistency. It will also be triggered for ajax-loaded content.
-    $('#crm-container').trigger('crmLoad');
+    $('.crm-container').trigger('crmLoad');
 
     if ($('#crm-notification-container').length) {
       // Initialize notifications
       $('#crm-notification-container').notify();
       messagesFromMarkup.call($('#crm-container'));
-      $('#crm-container').on('crmFormLoad', '*', messagesFromMarkup);
     }
 
     // bind the event for image popup
