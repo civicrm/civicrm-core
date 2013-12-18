@@ -48,56 +48,35 @@
 </div> {* crm-content-block ends here *}
 
 <script type="text/javascript">
-   var selectedTab = 'EventInfo';
-   {if $selectedTab}selectedTab = "{$selectedTab}";{/if}
-   var spinnerImage = '<img src="{$config->resourceBase}i/loading.gif" style="width:10px;height:10px"/>';
 {literal}
-
-cj( function() {
-    var tabIndex = cj('#tab_' + selectedTab).prevAll().length
-    cj("#mainTabContainer").tabs( {
-        active: tabIndex,
-        spinner: spinnerImage,
-        select: function(event, ui) {
-            // we need to change the action of parent form, so that form submits to correct page
-            var url = ui.tab.href;
-
-            {/literal}{if $config->userSystem->is_drupal}{literal}
-                var actionUrl = url.split( '?' );
-                {/literal}{if $config->cleanURL}{literal}
-                  var actualUrl = actionUrl[0];
-                {/literal}{else}{literal}
-                  var getParams = actionUrl[1].split( '&' );
-                  var actualUrl = actionUrl[0] + '?' + getParams[0];
-                {/literal}{/if}{literal}
-            {/literal}{else}{literal}
-                var actionUrl = url.split( '&' );
-                var actualUrl = actionUrl[0] + '&' + actionUrl[1];
-            {/literal}{/if}{literal}
-
-            if ( !global_formNavigate ) {
-              var message = '{/literal}{ts escape="js"}Are you sure you want to navigate away from this tab?{/ts}' + '\n\n' + '{ts escape="js"}You have unsaved changes.{/ts}' + '\n\n' + '{ts escape="js"}Press OK to continue, or Cancel to stay on the current tab.{/ts}{literal}';
-              if ( !confirm( message ) ) {
-                return false;
-              } else {
-                global_formNavigate = true;
-              }
-            }
-            cj(this).parents("form").attr("action", actualUrl );
-
-            return true;
-        },
-        load: function(event, ui) {
-          if ((typeof(Drupal) != 'undefined') && Drupal.attachBehaviors) {
-            Drupal.attachBehaviors(ui.panel[0]);
+  cj(function($) {
+    var tabSettings = {};
+    {/literal}{if $selectedTab}
+    var selectedTab = "{$selectedTab}";
+    tabSettings.active = $('#tab_' + selectedTab).prevAll().length;
+    {/if}{literal}
+    $("#mainTabContainer")
+      .on('tabsbeforeactivate',
+        function(e, ui) {
+          // Warn of unsaved changes - requires formNavigate.tpl to be included in each tab
+          if (!global_formNavigate) {
+            var message = '{/literal}{ts escape="js" 1='%1'}Your changes in the <em>%1</em> tab have not been saved.{/ts}{literal}';
+            CRM.alert(ts(message, {1: ui.oldTab.text()}), '{/literal}{ts escape="js"}Unsaved Changes{/ts}{literal}', 'warning');
+            global_formNavigate = true;
           }
-          cj(ui.panel).trigger('crmFormLoad');
-          // FIXME - decouple scanProfileSelectors and TabHeader
-          if (CRM.scanProfileSelectors) {
-            CRM.scanProfileSelectors();
+        })
+      .on('tabsbeforeload',
+        function(e, ui) {
+          // Use civicrm ajax wrappers rather than the default $.load
+          if (!ui.tab.data("loaded")) {
+            CRM.loadPage($('a', ui.tab).attr('href'), {
+              target: ui.panel
+            })
           }
-        }
-    });
+          ui.tab.data("loaded", true);
+          e.preventDefault();
+        })
+      .tabs(tabSettings);
 });
 {/literal}
 </script>

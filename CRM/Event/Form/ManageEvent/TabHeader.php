@@ -193,7 +193,7 @@ WHERE      e.id = %1
         }
 
         $tabs[$key]['link'] = CRM_Utils_System::url("civicrm/event/manage/{$key}",
-          "{$reset}action=update&snippet=5&id={$eventID}&component=event{$new}{$tabs[$key]['qfKey']}"
+          "{$reset}action=update&id={$eventID}&component=event{$new}{$tabs[$key]['qfKey']}"
         );
       }
     }

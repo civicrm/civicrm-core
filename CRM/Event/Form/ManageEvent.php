@@ -372,7 +372,7 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
   }
 
   function getTemplateFileName() {
-    if ($this->controller->getPrint() == CRM_Core_Smarty::PRINT_NOFORM ||
+    if ($this->controller->getPrint() === CRM_Core_Smarty::PRINT_JSON ||
       $this->getVar('_id') <= 0 ||
       ($this->_action & CRM_Core_Action::DELETE)
     ) {

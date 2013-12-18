@@ -436,7 +436,7 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
   }
 
   function getTemplateFileName() {
-    if ($this->controller->getPrint() == CRM_Core_Smarty::PRINT_NOFORM ||
+    if ($this->controller->getPrint() === CRM_Core_Smarty::PRINT_JSON ||
       $this->getVar('_id') <= 0 ||
       ($this->_action & CRM_Core_Action::DELETE) ||
       (CRM_Utils_String::getClassName($this->_name) == 'AddProduct')
