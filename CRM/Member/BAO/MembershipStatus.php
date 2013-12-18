@@ -236,20 +236,21 @@ class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus {
       $statusDate = CRM_Utils_Date::customFormat($statusDate, '%Y%m%d');
     }
 
-    $startDate = CRM_Utils_Date::customFormat($startDate, '%Y%m%d');
-    $endDate   = CRM_Utils_Date::customFormat($endDate, '%Y%m%d');
-    $joinDate  = CRM_Utils_Date::customFormat($joinDate, '%Y%m%d');
-
     $dates = array('start', 'end', 'join');
     $events = array('start', 'end');
 
     foreach ($dates as $dat) {
-      if (${$dat . 'Date'}) {
+      if (${$dat . 'Date'} && ${$dat . 'Date'} != "null") {
+        ${$dat . 'Date'} = CRM_Utils_Date::customFormat(${$dat . 'Date'}, '%Y%m%d');
+
         ${$dat . 'Year'} = substr(${$dat . 'Date'}, 0, 4);
 
         ${$dat . 'Month'} = substr(${$dat . 'Date'}, 4, 2);
 
         ${$dat . 'Day'} = substr(${$dat . 'Date'}, 6, 2);
+      }
+      else {
+        ${$dat . 'Date'} = '';
       }
     }
 
