@@ -240,7 +240,7 @@ class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus {
     $events = array('start', 'end');
 
     foreach ($dates as $dat) {
-      if (${$dat . 'Date'}) {
+      if (${$dat . 'Date'}  && ${$dat . 'Date'} != "null") {
         ${$dat . 'Date'} = CRM_Utils_Date::customFormat(${$dat . 'Date'}, '%Y%m%d');
         ${$dat . 'Year'} = substr(${$dat . 'Date'}, 0, 4);
 
