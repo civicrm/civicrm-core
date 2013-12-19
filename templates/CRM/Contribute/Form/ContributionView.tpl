@@ -215,7 +215,11 @@
                  title="{ts}View contact record{/ts}">{$softCont.contact_name}
               </a>
             </td>
-            <td>{$softCont.amount|crmMoney:$currency}</td>
+            <td>{$softCont.amount|crmMoney:$currency}
+              {if $softCont.soft_credit_type_label}
+                ({$softCont.soft_credit_type_label})
+              {/if}
+            </td>
           </tr>
         {/foreach}
       </table>

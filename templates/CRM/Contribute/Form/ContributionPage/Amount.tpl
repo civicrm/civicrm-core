@@ -232,9 +232,12 @@
   if ( ! amount_block[0].checked || priceSetID ) {
      if ( !priceSetID ) {
        cj('#priceSet').hide();
+       if (CRM.memberPriceset) {
+         cj(".crm-contribution-contributionpage-amount-form-block-amount_block_is_active td").html('<span class="description">{/literal}{ts}You cannot enable the Contribution Amounts section when a Membership Price Set is in use. (See the Memberships tab above.) Membership Price Sets may include additional fields for non-membership options that require an additional fee (e.g. magazine subscription) or an additional voluntary contribution.</span>{/ts}{literal}');
+       }
      }
      cj('#amountFields').hide();
-        }
+  }
 
   cj(function() {
     payLater('is_pay_later');

@@ -91,7 +91,7 @@ class api_v3_UtilsTest extends CiviUnitTestCase {
     catch(Exception $e) {
       $message = $e->getMessage();
     }
-    $this->assertEquals($message, 'API permission check failed for contact/create call; missing permission: add contacts.', 'lacking permissions should throw an exception');
+    $this->assertEquals($message, 'API permission check failed for contact/create call; insufficient permission: require access CiviCRM and add contacts', 'lacking permissions should throw an exception');
 
     $config->userPermissionClass->permissions = array('access CiviCRM', 'add contacts', 'import contacts');
     $this->assertTrue(_civicrm_api3_api_check_permission('contact', 'create', $check), 'overfluous permissions should return true');
@@ -175,33 +175,39 @@ class api_v3_UtilsTest extends CiviUnitTestCase {
    * Test GET DAO function returns DAO
    */
   function testGetDAO() {
-    $DAO = _civicrm_api3_get_DAO('civicrm_api3_custom_group_get');
-    $this->assertEquals('CRM_Core_DAO_CustomGroup', $DAO);
-    $DAO = _civicrm_api3_get_DAO('custom_group');
-    $this->assertEquals('CRM_Core_DAO_CustomGroup', $DAO);
-    $DAO = _civicrm_api3_get_DAO('CustomGroup');
-    $this->assertEquals('CRM_Core_DAO_CustomGroup', $DAO);
-    $DAO = _civicrm_api3_get_DAO('civicrm_api3_custom_field_get');
-    $this->assertEquals('CRM_Core_DAO_CustomField', $DAO);
-    $DAO = _civicrm_api3_get_DAO('civicrm_api3_survey_get');
-    $this->assertEquals('CRM_Campaign_DAO_Survey', $DAO);
-    $DAO = _civicrm_api3_get_DAO('civicrm_api3_pledge_payment_get');
-    $this->assertEquals('CRM_Pledge_DAO_PledgePayment', $DAO);
-    $DAO = _civicrm_api3_get_DAO('civicrm_api3_website_get');
-    $this->assertEquals('CRM_Core_DAO_Website', $DAO);
-    $DAO = _civicrm_api3_get_DAO('Membership');
-    $this->assertEquals('CRM_Member_DAO_Membership', $DAO);
+    $params = array(
+      'civicrm_api3_custom_group_get' => 'CRM_Core_DAO_CustomGroup',
+      'custom_group' => 'CRM_Core_DAO_CustomGroup',
+      'CustomGroup' => 'CRM_Core_DAO_CustomGroup',
+      'civicrm_api3_custom_field_get' => 'CRM_Core_DAO_CustomField',
+      'civicrm_api3_survey_get' => 'CRM_Campaign_DAO_Survey',
+      'civicrm_api3_pledge_payment_get' => 'CRM_Pledge_DAO_PledgePayment',
+      'civicrm_api3_website_get' => 'CRM_Core_DAO_Website',
+      'Membership' => 'CRM_Member_DAO_Membership',
+    );
+    foreach ($params as $input => $expected) {
+      $result = _civicrm_api3_get_DAO($input);
+      $this->assertEquals($expected, $result);
+    }
   }
   /*
-   * Test GET DAO function returns DAO
+   * Test GET BAO function returns BAO when it exists
    */
   function testGetBAO() {
-    $BAO = _civicrm_api3_get_BAO('civicrm_api3_website_get');
-    $this->assertEquals('CRM_Core_BAO_Website', $BAO);
-    $BAO = _civicrm_api3_get_BAO('civicrm_api3_survey_get');
-    $this->assertEquals('CRM_Campaign_BAO_Survey', $BAO);
-    $BAO = _civicrm_api3_get_BAO('civicrm_api3_pledge_payment_get');
-    $this->assertEquals('CRM_Pledge_BAO_PledgePayment', $BAO);
+    $params = array(
+      'civicrm_api3_website_get' => 'CRM_Core_BAO_Website',
+      'civicrm_api3_survey_get' => 'CRM_Campaign_BAO_Survey',
+      'civicrm_api3_pledge_payment_get' => 'CRM_Pledge_BAO_PledgePayment',
+      'Household' => 'CRM_Contact_BAO_Contact',
+      // Note this one DOES NOT have a BAO so we expect to fall back on returning the DAO
+      'mailing_group' => 'CRM_Mailing_DAO_MailingGroup',
+      // Make sure we get null back with nonexistant entities
+      'civicrm_this_does_not_exist' => NULL,
+    );
+    foreach ($params as $input => $expected) {
+      $result = _civicrm_api3_get_BAO($input);
+      $this->assertEquals($expected, $result);
+    }
   }
 
   function test_civicrm_api3_validate_fields() {

@@ -77,6 +77,9 @@
         <keyColumn>id</keyColumn>
         <labelColumn>title</labelColumn>
       </pseudoconstant>
+      <html>
+        <type>Select</type>
+      </html>
   </field>
   <foreignKey>
        <name>uf_group_id</name>

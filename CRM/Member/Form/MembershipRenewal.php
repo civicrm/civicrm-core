@@ -217,9 +217,10 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
     $this->_memType = $defaults['membership_type_id'];
 
     // set renewal_date and receive_date to today in correct input format (setDateDefaults uses today if no value passed)
-    list($now) = CRM_Utils_Date::setDateDefaults();
+    list($now, $currentTime) = CRM_Utils_Date::setDateDefaults();
     $defaults['renewal_date'] = $now;
     $defaults['receive_date'] = $now;
+    $defaults['receive_date_time'] = $currentTime;
 
     if ($defaults['id']) {
       $defaults['record_contribution'] = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipPayment',
@@ -243,6 +244,11 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
     }
 
     $defaults['financial_type_id'] = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType', $this->_memType, 'financial_type_id');
+    
+    //CRM-13420
+    if (!CRM_Utils_Array::value('payment_instrument_id', $defaults)) {
+      $defaults['payment_instrument_id'] = key(CRM_Core_OptionGroup::values('payment_instrument', FALSE, FALSE, FALSE, 'AND is_default = 1'));
+    }
 
     $defaults['total_amount'] = CRM_Utils_Money::format(CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType',
         $this->_memType,
@@ -542,6 +548,9 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
       }
       if (!$params['total_amount']) {
         $errors['total_amount'] = ts('Please enter a Contribution Amount.');
+      }
+      if (!CRM_Utils_Array::value('payment_instrument_id', $params)) {
+        $errors['payment_instrument_id'] = ts('Paid By is a required field.');
       }
     }
     return empty($errors) ? TRUE : $errors;

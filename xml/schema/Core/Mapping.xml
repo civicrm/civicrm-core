@@ -48,6 +48,9 @@
       <pseudoconstant>
         <optionGroupName>mapping_type</optionGroupName>
       </pseudoconstant>
+      <html>
+        <type>Select</type>
+      </html>
   </field>
   <index>
     <name>UI_name</name>

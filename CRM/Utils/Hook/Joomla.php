@@ -35,7 +35,7 @@
  */
 class CRM_Utils_Hook_Joomla extends CRM_Utils_Hook {
   function invoke($numParams,
-                  &$arg1, &$arg2, &$arg3, &$arg4, &$arg5, &$arg6
+                  &$arg1, &$arg2, &$arg3, &$arg4, &$arg5, &$arg6,
                   $fnSuffix
   ) {
     // ensure that we are running in a joomla context

@@ -75,7 +75,7 @@ class CRM_Core_BAO_ActionSchedule extends CRM_Core_DAO_ActionSchedule {
   static function getSelection($id = NULL) {
     $mapping = self::getMapping($id);
     $activityStatus = CRM_Core_PseudoConstant::activityStatus();
-    $activityType = CRM_Core_PseudoConstant::activityType(FALSE) + CRM_Core_PseudoConstant::activityType(FALSE, TRUE);
+    $activityType   = CRM_Core_PseudoConstant::activityType(TRUE, TRUE);
 
     $participantStatus = CRM_Event_PseudoConstant::participantStatus(NULL, NULL, 'label');
     $event = CRM_Event_PseudoConstant::event(NULL, FALSE, "( is_template IS NULL OR is_template != 1 )");
@@ -463,6 +463,8 @@ WHERE   cas.entity_value = $id AND
         'toName' => $contact['display_name'],
         'toEmail' => $email,
         'subject' => $messageSubject,
+        'entity' => 'action_schedule',
+        'entity_id' => $scheduleID,
       );
 
       if (!$html || $contact['preferred_mail_format'] == 'Text' ||
@@ -682,7 +684,7 @@ WHERE reminder.action_schedule_id = %1 AND reminder.action_date_time IS NULL
             $stateProvince = CRM_Core_PseudoConstant::stateProvince();
             $loc['street_address'] = $dao->street_address;
             $loc['city'] = $dao->city;
-            $loc['state_province'] = CRM_Utils_array::value($dao->state_province_id, $stateProvince);
+            $loc['state_province'] = CRM_Utils_Array::value($dao->state_province_id, $stateProvince);
             $loc['postal_code'] = $dao->postal_code;
             $entityTokenParams["{$tokenEntity}." . $field] = CRM_Utils_Address::format($loc);
           }

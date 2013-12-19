@@ -518,11 +518,7 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
     $fields = array();
 
     if (!empty($testParams)) {
-      $mailing->from_name = ts(
-        'CiviCRM Test Mailer (%1)',
-        array(1 => $mailing->from_name)
-      );
-      $mailing->subject = ts('Test Mailing:') . ' ' . $mailing->subject;
+      $mailing->subject = ts('[CiviMail Draft]') . ' ' . $mailing->subject;
     }
 
     CRM_Mailing_BAO_Mailing::tokenReplace($mailing);

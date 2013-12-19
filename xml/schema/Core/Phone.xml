@@ -41,6 +41,9 @@
         <keyColumn>id</keyColumn>
         <labelColumn>display_name</labelColumn>
       </pseudoconstant>
+      <html>
+        <type>Select</type>
+      </html>
       <add>2.0</add>
   </field>
   <index>
@@ -99,7 +102,10 @@
        <title>Phone Extension</title>
        <type>varchar</type>
        <length>16</length>
-       <size>FOUR</size>
+       <html>
+         <type>Text</type>
+         <size>FOUR</size>
+       </html>
        <import>true</import>
        <export>true</export>
        <headerPattern>/extension/i</headerPattern>
@@ -137,6 +143,9 @@
       <pseudoconstant>
         <optionGroupName>phone_type</optionGroupName>
       </pseudoconstant>
+      <html>
+        <type>Select</type>
+      </html>
       <add>2.2</add>
   </field>
 </table>

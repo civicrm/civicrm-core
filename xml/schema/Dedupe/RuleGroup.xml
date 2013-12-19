@@ -22,6 +22,9 @@
     <values>Individual, Organization, Household</values>
     <comment>The type of contacts this group applies to</comment>
     <add>1.8</add>
+    <html>
+      <type>Select</type>
+    </html>
   </field>
   <field>
     <name>threshold</name>
@@ -45,6 +48,9 @@
     <required>true</required>
     <comment>Whether the rule should be used for cases where usage is Unsupervised, Supervised OR General(programatically)</comment>
     <add>4.3</add>
+    <html>
+      <type>Select</type>
+    </html>
   </field>
   <field>
     <name>is_default</name>

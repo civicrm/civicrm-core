@@ -73,11 +73,6 @@
      <weight>16</weight>
   </item>
   <item>
-     <path>civicrm/contact/search/simple</path>
-     <title>Simple Search</title>
-     <page_callback>CRM_Contact_Form_Search_Simple</page_callback>
-  </item>
-  <item>
      <path>civicrm/contact/add</path>
      <title>New Contact</title>
      <access_callback>CRM_Core_Permission::checkMenu</access_callback>

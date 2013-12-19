@@ -135,6 +135,7 @@ class CRM_Report_Form extends CRM_Core_Form {
    * @var null
    */
   protected $_customGroupExtends = NULL;
+  protected $_customGroupExtendsJoin = array();
   protected $_customGroupFilters = TRUE;
   protected $_customGroupGroupBy = FALSE;
   protected $_customGroupJoin    = 'LEFT JOIN';
@@ -237,6 +238,14 @@ class CRM_Report_Form extends CRM_Core_Form {
    */
   protected $_selectedTables;
 
+  /**
+   * outputmode e.g 'print', 'csv', 'pdf'
+   * @todo have declared this as public as fixing an e-Notice in a point release - would
+   * be better converted to protected in 4.5
+   * @var string
+   */
+  public $_outputMode;
+
   public $_having = NULL;
   public $_select = NULL;
   public $_selectClauses = array();
@@ -247,6 +256,13 @@ class CRM_Report_Form extends CRM_Core_Form {
   public $_groupBy = NULL;
   public $_whereClauses = array();
   public $_havingClauses = array();
+
+  /**
+   * Is this being called without a form controller (ie. the report is being render outside the normal form
+   * - e.g the api is retrieving the rows
+   * @var boolean
+   */
+  public $noController = FALSE;
 
   /**
    * Variable to hold the currency alias
@@ -317,18 +333,20 @@ class CRM_Report_Form extends CRM_Core_Form {
     CRM_Core_Region::instance('page-header')->add(array(
       'markup' => sprintf('<!-- Report class: [%s] -->', htmlentities(get_class($this))),
     ));
+    if(!$this->noController) {
+      $this->setID($this->get('instanceId'));
 
-    $this->_id = $this->get('instanceId');
-    if (!$this->_id) {
-      $this->_id = CRM_Report_Utils_Report::getInstanceID();
       if (!$this->_id) {
-        $this->_id = CRM_Report_Utils_Report::getInstanceIDForPath();
+        $this->setID(CRM_Report_Utils_Report::getInstanceID());
+        if (!$this->_id) {
+          $this->setID( CRM_Report_Utils_Report::getInstanceIDForPath());
+        }
       }
-    }
 
-    // set qfkey so that pager picks it up and use it in the "Next > Last >>" links.
-    // FIXME: Note setting it in $_GET doesn't work, since pager generates link based on QUERY_STRING
-    $_SERVER['QUERY_STRING'] .= "&qfKey={$this->controller->_key}";
+      // set qfkey so that pager picks it up and use it in the "Next > Last >>" links.
+      // FIXME: Note setting it in $_GET doesn't work, since pager generates link based on QUERY_STRING
+      $_SERVER['QUERY_STRING'] .= "&qfKey={$this->controller->_key}";
+    }
 
     if ($this->_id) {
       $this->assign('instanceId', $this->_id);
@@ -367,7 +385,7 @@ class CRM_Report_Form extends CRM_Core_Form {
       // set the mode
       $this->assign('mode', 'instance');
     }
-    else {
+    elseif (!$this->noController) {
       list($optionValueID, $optionValue) = CRM_Report_Utils_Report::getValueIDFromUrl();
       $instanceCount = CRM_Report_Utils_Report::getInstanceCount($optionValue);
       if (($instanceCount > 0) && $optionValueID) {
@@ -728,6 +746,37 @@ class CRM_Report_Form extends CRM_Core_Form {
     return FALSE;
   }
 
+  /**
+   * Setter for $_params
+   * @param array $params
+   */
+  function setParams($params) {
+    $this->_params = $params;
+  }
+
+  /**
+   * Setter for $_id
+   * @param integer $id
+   */
+  function setID($instanceid) {
+    $this->_id = $instanceid;
+  }
+
+  /**
+   * Setter for $_force
+   * @param boolean $force
+   */
+  function setForce($isForce) {
+    $this->_force = $isForce;
+  }
+  /**
+   * Getter for $_defaultValues
+   * @return array $_defaultValues
+   */
+  function getDefaultValues() {
+    return $this->_defaults;
+  }
+
   function addColumns() {
     $options = array();
     $colGroups = NULL;
@@ -998,7 +1047,7 @@ class CRM_Report_Form extends CRM_Core_Form {
       $this->assign('group', TRUE);
     }
 
-    $label = ts('Add these Contacts to Group');
+    $label = ts('Add These Contacts to Group');
     $this->addElement('submit', $this->_groupButtonName, $label, array('onclick' => 'return checkGroup();'));
 
     $this->addChartOptions();
@@ -2031,19 +2080,20 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
   }
 
   function beginPostProcess() {
-    $this->_params = $this->controller->exportValues($this->_name);
+    $this->setParams($this->controller->exportValues($this->_name));
 
     if (empty($this->_params) &&
       $this->_force
     ) {
-      $this->_params = $this->_formValues;
+      $this->setParams($this->_formValues);
     }
 
     // hack to fix params when submitted from dashboard, CRM-8532
     // fields array is missing because form building etc is skipped
     // in dashboard mode for report
+    //@todo - this could be done in the dashboard no we have a setter
     if (!CRM_Utils_Array::value('fields', $this->_params) && !$this->_noFields) {
-      $this->_params = $this->_formValues;
+      $this->setParams($this->_formValues);
     }
 
     $this->_formValues = $this->_params;
@@ -2056,6 +2106,14 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
       $this->assign('updateReportButton', TRUE);
     }
     $this->processReportMode();
+    $this->beginPostProcessCommon();
+  }
+
+  /**
+   * beginPostProcess function run in both report mode and non-report mode (api)
+   */
+  function beginPostProcessCommon() {
+
   }
 
   function buildQuery($applyLimit = TRUE) {
@@ -2879,10 +2937,11 @@ ORDER BY cg.weight, cf.weight";
         if (!$this->isFieldSelected($prop)) {
           continue;
         }
+        $baseJoin = CRM_Utils_Array::value($prop['extends'], $this->_customGroupExtendsJoin, "{$this->_aliases[$extendsTable]}.id");
 
         $customJoin   = is_array($this->_customGroupJoin) ? $this->_customGroupJoin[$table] : $this->_customGroupJoin;
         $this->_from .= "
-{$customJoin} {$table} {$this->_aliases[$table]} ON {$this->_aliases[$table]}.entity_id = {$this->_aliases[$extendsTable]}.id";
+{$customJoin} {$table} {$this->_aliases[$table]} ON {$this->_aliases[$table]}.entity_id = {$baseJoin}";
         // handle for ContactReference
         if (array_key_exists('fields', $prop)) {
           foreach ($prop['fields'] as $fieldName => $field) {
@@ -3123,6 +3182,10 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
           'postal_code' =>
           array('title' => ts('Postal Code'),
             'default' => CRM_Utils_Array::value('postal_code', $defaults, FALSE),
+          ),
+          'postal_code_suffix' =>
+          array('title' => ts('Postal Code Suffix'),
+            'default' => CRM_Utils_Array::value('postal_code_suffix', $defaults, FALSE),
           ),
           'county_id' =>
           array('title' => ts('County'),

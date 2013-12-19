@@ -69,7 +69,6 @@ class CRM_Custom_Page_Field extends CRM_Core_Page {
    */
   function &actionLinks() {
     if (!isset(self::$_actionLinks)) {
-      $deleteExtra = ts('Are you sure you want to delete this custom data field?');
       self::$_actionLinks = array(
         CRM_Core_Action::UPDATE => array(
           'name' => ts('Edit Field'),
@@ -112,7 +111,6 @@ class CRM_Custom_Page_Field extends CRM_Core_Page {
           'url' => 'civicrm/admin/custom/group/field',
           'qs' => 'action=delete&reset=1&gid=%%gid%%&id=%%id%%',
           'title' => ts('Delete Custom Field'),
-          'extra' => 'onclick = "return confirm(\'' . $deleteExtra . '\');"',
         ),
       );
     }
@@ -232,10 +230,21 @@ class CRM_Custom_Page_Field extends CRM_Core_Page {
    */
   function run() {
 
-    // get the group id
-    $this->_gid = CRM_Utils_Request::retrieve('gid', 'Positive',
-      $this
+
+    $id = CRM_Utils_Request::retrieve('id', 'Positive',
+      $this, FALSE, 0
     );
+
+    if ($id) {
+      $values = civicrm_api3('custom_field', 'getsingle', array('id' => $id));
+      $this->_gid = $values['custom_group_id'];
+    }
+    // get the group id
+    else {
+      $this->_gid = CRM_Utils_Request::retrieve('gid', 'Positive',
+        $this
+      );
+    }
 
     if ($isReserved = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $this->_gid, 'is_reserved', 'id')) {
       CRM_Core_Error::fatal("You cannot add or edit fields in a reserved custom field-set.");
@@ -272,10 +281,6 @@ class CRM_Custom_Page_Field extends CRM_Core_Page {
     // assign vars to templates
     $this->assign('action', $action);
 
-    $id = CRM_Utils_Request::retrieve('id', 'Positive',
-      $this, FALSE, 0
-    );
-
     // what action to take ?
     if ($action & (CRM_Core_Action::UPDATE | CRM_Core_Action::ADD)) {
       // no browse for edit/update/view
@@ -285,6 +290,7 @@ class CRM_Custom_Page_Field extends CRM_Core_Page {
       $this->preview($id);
     }
     else {
+      CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'js/crm.livePage.js');
       $this->browse();
     }
 
