@@ -533,7 +533,7 @@ class CRM_Core_Resources {
     $min = $config->debug ? '' : '.min';
 
     $items = array(
-      "packages/jquery/jquery-1.10.2.min.js",
+      "packages/jquery/jquery-1.10.2$min.js",
       "packages/jquery/jquery-migrate-1.2.1.js",
       "packages/jquery/jquery-ui/js/jquery-ui-1.10.3.custom$min.js",
       "packages/jquery/jquery-ui/css/black-tie/jquery-ui-1.10.3.custom$min.css",
