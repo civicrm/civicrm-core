@@ -158,7 +158,7 @@ var pay_later_sel = "input#{$form.is_pay_later.name}";
 {literal}
 cj("document").ready(function() {
   function refresh() {
-    var is_pay_later = cj(pay_later_sel).attr("checked");
+    var is_pay_later = cj(pay_later_sel).prop("checked");
     cj(".credit_card_info-group").toggle(!is_pay_later);
     cj(".pay-later-instructions").toggle(is_pay_later);
     cj("div.billingNameInfo-section .description").html(is_pay_later ? "Enter the billing address at which you can be invoiced." : "Enter the name as shown on your credit or debit card, and the billing address for this card.");

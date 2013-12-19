@@ -138,7 +138,7 @@ cj(function($) {
     if (!showMaxMultiple) {
       cj("tr#multiple").hide();
     }
-    else if(cj( '#is_multiple').attr('checked')) {
+    else if(cj( '#is_multiple').prop('checked')) {
       cj("tr#multiple").show();
     }
   }

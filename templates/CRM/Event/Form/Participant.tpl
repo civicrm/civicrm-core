@@ -97,7 +97,7 @@
 
           case 'checkbox':
             var checkBoxValue = eleIdpart[1].split(']');
-            if ( cj(obj).attr("checked") == true &&
+            if ( cj(obj).prop("checked") == true &&
               fieldOptionsFull[eleId] &&
               fieldOptionsFull[eleId][checkBoxValue[0]]) {
               showError = true;
@@ -587,11 +587,11 @@
     notificationStatusIds = notificationStatusIds.split(',');
     if (cj.inArray(cj('select#status_id option:selected').val(), notificationStatusIds) > -1) {
       cj("#notify").show();
-      cj("#is_notify").attr('checked', true);
+      cj("#is_notify").prop('checked', true);
     }
     else {
       cj("#notify").hide();
-      cj("#is_notify").removeAttr('checked');
+      cj("#is_notify").prop('checked', false);
     }
   }
 

@@ -346,7 +346,7 @@ invert              = 0
 <script type="text/javascript">
     {literal}
     cj("#is_multiple_registrations").change( function( ) {
-        if ( !cj(this).attr( 'checked') ) {
+        if ( !cj(this).prop('checked') ) {
             cj("#additional_custom_pre_id").val('');
             cj("#additional_custom_post_id").val('');
       cj(".crm-event-manage-registration-form-block-additional_custom_post_multiple").hide();
@@ -365,11 +365,11 @@ invert              = 0
 
         // Display info
         cj('.ui-notify-message .ui-notify-close').click();
-        if ( cj("#allow_same_participant_emails").attr( 'checked' ) && cj("#is_multiple_registrations").attr( 'checked' ) ) {
+        if ( cj("#allow_same_participant_emails").prop('checked' ) && cj("#is_multiple_registrations").prop('checked' ) ) {
             CRM.alert( msg1, '', 'info', {expires:0} );
-        } else if ( cj("#allow_same_participant_emails").attr( 'checked' ) && !cj("#is_multiple_registrations").attr( 'checked' ) ) {
+        } else if ( cj("#allow_same_participant_emails").prop('checked' ) && !cj("#is_multiple_registrations").prop('checked' ) ) {
             CRM.alert( msg2, '', 'info', {expires:0} );
-        } else if ( !cj("#allow_same_participant_emails").attr( 'checked' ) && cj("#is_multiple_registrations").attr( 'checked' ) ) {
+        } else if ( !cj("#allow_same_participant_emails").prop('checked' ) && cj("#is_multiple_registrations").prop('checked' ) ) {
             CRM.alert( msg3, '', 'info', {expires:0} );
         }
     }

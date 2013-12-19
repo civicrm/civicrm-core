@@ -339,7 +339,7 @@
 
     cj(function () {
       cj('#record_contribution').click(function () {
-        if (cj(this).attr('checked')) {
+        if (cj(this).prop('checked')) {
           cj('#recordContribution').show();
           setPaymentBlock(true);
         }
@@ -371,11 +371,11 @@
 
       if (!checkboxEvent) {
         if (allMemberships[memType]['total_amount_numeric'] > 0) {
-          cj('#record_contribution').attr('checked', 'checked');
+          cj('#record_contribution').prop('checked', true);
           cj('#recordContribution').show();
         }
         else {
-          cj('#record_contribution').removeAttr('checked');
+          cj('#record_contribution').prop('checked', false);
           cj('#recordContribution').hide();
         }
       }
@@ -398,7 +398,7 @@
 
     function setDifferentContactBlock() {
       //get the
-      if (cj('#contribution_contact').attr('checked')) {
+      if (cj('#contribution_contact').prop('checked')) {
         cj('#record-different-contact').show();
       }
       else {
