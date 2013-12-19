@@ -173,7 +173,7 @@
           function check_price_set(price_set_radio_buttons) {
             if (!amount) {
               cj(price_set_radio_buttons).each(function(){
-                if (cj(this).attr('checked')) {
+                if (cj(this).prop('checked')) {
                   amount = cj(this).attr('data-amount');
                   if (typeof amount !== "undefined") {
                     amount = Number(amount);
@@ -260,7 +260,7 @@
               cj(option[0]).trigger('change');
             }
             else if (cj(price_sets[amount]).attr('type') == 'checkbox') {
-               cj(price_sets[amount]).attr("checked",true);
+               cj(price_sets[amount]).prop("checked",true);
                if ((typeof totalfee !== 'undefined') && (typeof display == 'function')) {
                  if (totalfee > 0) {
                    totalfee += amount;
@@ -310,7 +310,7 @@
                 cj(option[0]).trigger('change');
               }
               else if (cj(price_sets[selected_price_set]).attr('type') == 'checkbox') {
-                cj(price_sets[selected_price_set]).attr("checked",true);
+                cj(price_sets[selected_price_set]).prop("checked",true);
                 if ((typeof totalfee !== 'undefined') && (typeof display == 'function')) {
                   if (totalfee > 0) {
                     totalfee += amount;

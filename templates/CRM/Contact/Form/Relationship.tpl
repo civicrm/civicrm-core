@@ -415,14 +415,14 @@ cj( function( ) {
 
     cj('.pagerDisplay').on('click', '.contact_select input', function () {
         var valueSelected = cj(this).val();
-        if ( cj(this).attr('checked') ) {
+        if ( cj(this).prop('checked') ) {
             contact_checked[valueSelected] =  valueSelected;
             countSelected++;
         } else if( contact_checked[valueSelected] ) {
             delete contact_checked[valueSelected];
             countSelected--;
             if ( useEmployer && employer_holdelement[valueSelected] ) {
-                cj( employer_holdelement[valueSelected] ).attr('checked',false);
+                cj( employer_holdelement[valueSelected] ).prop('checked',false);
                 delete employer_checked[valueSelected];
                 delete employer_holdelement[valueSelected];
             }
@@ -436,11 +436,11 @@ cj( function( ) {
             if ( isRadio ) {
                 employer_checked = new Array();
             }
-            if ( cj(this).attr('checked') ) {
+            if ( cj(this).prop('checked') ) {
                 // add validation to match with selected contacts
                 if( !contact_checked[valueSelected] ) {
                     cj(this).crmError({/literal}'{ts escape="js"}Current employer / Current employee should be among the selected contacts.{/ts}'{literal});
-                    cj(this).attr('checked',false);
+                    cj(this).prop('checked',false);
                 } else {
                     employer_checked[valueSelected] = valueSelected;
                     employer_holdelement[valueSelected] = this;
@@ -458,7 +458,7 @@ cj( function( ) {
 function checkSelected( ) {
     cj('.pagerDisplay tbody tr .contact_select input').each( function( ) {
         if ( contact_checked[cj(this).val()] ) {
-            cj(this).attr('checked',true);
+            cj(this).prop('checked',true);
         }
     });
 
@@ -467,7 +467,7 @@ function checkSelected( ) {
         employer_holdelement = new Array();
         cj('.pagerDisplay tbody tr .'+ employerClass +' input').each( function( ) {
             if ( employer_checked[cj(this).val()] ) {
-                cj(this).attr('checked',true);
+                cj(this).prop('checked',true);
                 employer_holdelement[cj(this).val()] = this;
             }
         });
@@ -503,7 +503,7 @@ function submitAjaxData() {
 {/literal} {if $searchRows} {literal}
 cj(".contact_select .form-checkbox").each( function( ) {
     if (this) {
-        cj(this).attr('checked',true);
+        cj(this).prop('checked',true);
     }
 });
 {/literal} {/if} {literal}

@@ -184,12 +184,8 @@ function showHideByValue(trigger_field_id, trigger_value, target_element_id, tar
  * @return
  */
 function toggleCheckboxVals(fldPrefix, object) {
-  if (object.id == 'toggleSelect' && cj(object).is(':checked')) {
-    cj('Input[id*="' + fldPrefix + '"],Input[id*="toggleSelect"]').attr('checked', true);
-  }
-  else {
-    cj('Input[id*="' + fldPrefix + '"],Input[id*="toggleSelect"]').attr('checked', false);
-  }
+  var val = (object.id == 'toggleSelect' && cj(object).is(':checked'));
+  cj('Input[id*="' + fldPrefix + '"],Input[id*="toggleSelect"]').prop('checked', val);
   // change the class of selected rows
   on_load_init_checkboxes(object.form.name);
 }
@@ -293,8 +289,8 @@ function checkPerformAction(fldPrefix, form, taskButton, selection) {
  */
 function checkSelectedBox(chkName) {
   var checkElement = cj('#' + chkName);
-  if (checkElement.attr('checked')) {
-    cj('input[value=ts_sel]:radio').attr('checked', true);
+  if (checkElement.prop('checked')) {
+    cj('input[value=ts_sel]:radio').prop('checked', true);
     checkElement.parents('tr').addClass('crm-row-selected');
   }
   else {

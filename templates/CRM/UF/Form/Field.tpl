@@ -102,7 +102,7 @@ cj(function($) {
   }
   else if( $.inArray( "Search Profile", otherModule ) > -1 ){
     $('#profile_visibility').show();
-    $("#in_selector").attr('checked',true);
+    $("#in_selector").prop('checked',true);
   }
   else if( $.inArray( "Profile", otherModule ) == -1 && $.inArray( "Search Profile", otherModule ) == -1 ){
     $('#profile_visibility').hide();
@@ -182,10 +182,10 @@ function showHideSeletorSearch() {
   if (cj("#visibility").val() == "User and User Admin Only") {
     is_search.hide();
     in_selector.hide();
-    cj("#is_searchable").attr('checked',false);
+    cj("#is_searchable").prop('checked',false);
   }
   else {
-    if (!cj("#is_view").attr('checked')) {
+    if (!cj("#is_view").prop('checked')) {
       is_search.show();
     }
     var fldName = cj("#field_name_1").val();
@@ -236,7 +236,7 @@ function multiSummaryToggle(customId) {
         }
         else {
           if (cj('#is_multi_summary').is(':checked')) {
-            cj('#is_multi_summary').removeAttr('checked');
+            cj('#is_multi_summary').prop('checked', false);
           }
           cj('.crm-uf-field-form-block-is_multi').hide();
         }
@@ -245,7 +245,7 @@ function multiSummaryToggle(customId) {
   }
   else {
     if (cj('#is_multi_summary').is(':checked')) {
-      cj('#is_multi_summary').removeAttr('checked');
+      cj('#is_multi_summary').prop('checked', false);
     }
     cj('.crm-uf-field-form-block-is_multi').hide();
   }
@@ -253,9 +253,9 @@ function multiSummaryToggle(customId) {
 
 function viewOnlyShowHide() {
   var is_search = cj('#is_search_label, #is_search_html');
-  if (cj("#is_view").attr('checked')) {
+  if (cj("#is_view").prop('checked')) {
     is_search.hide();
-    cj("#is_searchable").attr('checked', false);
+    cj("#is_searchable").prop('checked', false);
   }
   else if (cj("#visibility").val() != "User and User Admin Only")  {
     is_search.show();

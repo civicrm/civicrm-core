@@ -138,7 +138,7 @@
             cj('input[id^="order_by_section_"]').click(disPageBreak).each(disPageBreak);
             
             function disPageBreak() {
-              if (!cj(this).attr('checked')) {
+              if (!cj(this).prop('checked')) {
                 cj(this).parent('td').next('td').children('input[id^="order_by_pagebreak_"]').attr({checked: false, disabled: "disabled"});
               }
               else {
@@ -151,8 +151,8 @@
                 // clear values on hidden field, so they're not saved
                 cj('select#order_by_column_'+ i).val('');
                 cj('select#order_by_order_'+ i).val('ASC');
-                cj('input#order_by_section_'+ i).attr('checked', false);
-                cj('input#order_by_pagebreak_'+ i).attr('checked', false);
+                cj('input#order_by_section_'+ i).prop('checked', false);
+                cj('input#order_by_pagebreak_'+ i).prop('checked', false);
             }
 
             {/literal}
