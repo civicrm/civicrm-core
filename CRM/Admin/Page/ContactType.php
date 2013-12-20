@@ -73,18 +73,14 @@ class CRM_Admin_Page_ContactType extends CRM_Core_Page_Basic {
         CRM_Core_Action::DISABLE =>
         array(
           'name' => ts('Disable'),
-          'extra' => 'onclick = "enableDisable( %%id%%,\'' .
-          'CRM_Contact_BAO_ContactType' . '\',\'' . 'enable-disable' .
-          '\' );"',
+          'extra' => 'onclick = "enableDisable( %%id%%,\'' . 'CRM_Contact_BAO_ContactType' . '\',\'' . 'enable-disable' . '\' );"',
           'ref' => 'disable-action',
           'title' => ts('Disable Contact Type'),
         ),
         CRM_Core_Action::ENABLE =>
         array(
           'name' => ts('Enable'),
-          'extra' => 'onclick = "enableDisable( %%id%%,\'' .
-          'CRM_Contact_BAO_ContactType' . '\',\'' . 'disable-enable' .
-          '\' );"',
+          'extra' => 'onclick = "enableDisable( %%id%%,\'' . 'CRM_Contact_BAO_ContactType' . '\',\'' . 'disable-enable' . '\' );"',
           'ref' => 'enable-action',
           'title' => ts('Enable Contact Type'),
         ),
