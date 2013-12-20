@@ -34,6 +34,12 @@
     <type>int unsigned</type>
     <default>NULL</default>
     <comment>Foreign key to the Campaign.</comment>
+    <pseudoconstant>
+      <table>civicrm_campaign</table>
+      <keyColumn>id</keyColumn>
+      <labelColumn>title</labelColumn>
+      <condition>(end_date IS NULL OR end_date > NOW())</condition>
+    </pseudoconstant>
     <add>3.3</add>
   </field>
   <foreignKey>
