@@ -514,6 +514,7 @@ class CRM_Activity_BAO_Query {
 
     //add engagement level CRM-7775
     $buildEngagementLevel = FALSE;
+    $buildSurveyResult = FALSE;
     if (CRM_Campaign_BAO_Campaign::isCampaignEnable() &&
       CRM_Campaign_BAO_Campaign::accessCampaign()
     ) {
@@ -522,26 +523,35 @@ class CRM_Activity_BAO_Query {
         ts('Engagement Index'),
         array('' => ts('- any -')) + CRM_Campaign_PseudoConstant::engagementLevel()
       );
-    }
 
-    $optionGroups  = CRM_Campaign_BAO_Survey::getResultSets( 'name' );
-    $resultOptions = array();
-    foreach ( $optionGroups as $gid => $name ) {
-    if ( $name ) {
-      $value = array();
-      $value = CRM_Core_OptionGroup::values($name);
-      if (!empty($value))
-        while(list($k,$v) = each($value)) {
-          $resultOptions[$v] = $v;
+      // Add survey result field.
+      $optionGroups  = CRM_Campaign_BAO_Survey::getResultSets( 'name' );
+      $resultOptions = array();
+      foreach ( $optionGroups as $gid => $name ) {
+        if ( $name ) {
+          $value = array();
+          $value = CRM_Core_OptionGroup::values($name);
+          if (!empty($value)) {
+            while(list($k,$v) = each($value)) {
+              $resultOptions[$v] = $v;
+            }
+          }
         }
       }
+      // If no survey result options have been created, don't build
+      // the field to avoid clutter.
+      if(count($resultOptions) > 0) {
+        $buildSurveyResult = TRUE;
+        asort($resultOptions);
+        $form->add('select', 'activity_result', ts("Survey Result"),
+          $resultOptions, FALSE,
+          array('id' => 'activity_result', 'multiple' => 'multiple', 'title' => ts('- select -'))
+        );
+      }
     }
-    asort($resultOptions);
-    $form->add('select', 'activity_result', ts("Activity Result"),
-      $resultOptions, FALSE,
-      array('id' => 'activity_result', 'multiple' => 'multiple', 'title' => ts('- select -'))
-    );
+     
     $form->assign('buildEngagementLevel', $buildEngagementLevel);
+    $form->assign('buildSurveyResult', $buildSurveyResult);
     $form->setDefaults(array('activity_test' => 0));
   }
 

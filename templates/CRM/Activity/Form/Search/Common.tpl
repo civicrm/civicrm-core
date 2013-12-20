@@ -113,15 +113,22 @@
   <td colspan="3">{include file="CRM/common/Tag.tpl" tagsetType='activity'}</td>
 </tr>
 <tr>
+{if $buildSurveyResult }
+  {assign var="tagColSpan" value="1"}
   <td id="activityResult">
     <label>{$form.activity_result.label}</label><br />
     {$form.activity_result.html}
+    {literal}
     <script type="text/javascript">
       cj("select#activity_result").crmasmSelect({
       });
     </script>
+    {/literal}
   </td>
-  <td colspan="2">{include file="CRM/common/Tag.tpl" tagsetType='activity'}</td>
+{else}
+  {assign var="tagColSpan" value="1"}
+{/if}
+  <td colspan="{$tagColSpan}">{include file="CRM/common/Tag.tpl" tagsetType='activity'}</td>
   </tr>
 </tr>
 
