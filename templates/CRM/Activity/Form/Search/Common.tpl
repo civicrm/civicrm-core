@@ -108,29 +108,21 @@
     </span>
   </td>
 </tr>
-
-<tr>
-  <td colspan="3">{include file="CRM/common/Tag.tpl" tagsetType='activity'}</td>
-</tr>
-<tr>
 {if $buildSurveyResult }
-  {assign var="tagColSpan" value="1"}
-  <td id="activityResult">
+<tr>
+  {assign var="tagColSpan" value="2"}
+  <td colspan="3" id="activityResult">
     <label>{$form.activity_result.label}</label><br />
     {$form.activity_result.html}
-    {literal}
     <script type="text/javascript">
+    {literal}
       cj("select#activity_result").crmasmSelect({
       });
-    </script>
     {/literal}
+    </script>
   </td>
-{else}
-  {assign var="tagColSpan" value="1"}
-{/if}
-  <td colspan="{$tagColSpan}">{include file="CRM/common/Tag.tpl" tagsetType='activity'}</td>
-  </tr>
 </tr>
+{/if}
 
 {* campaign in activity search *}
 {include file="CRM/Campaign/Form/addCampaignToComponent.tpl"
