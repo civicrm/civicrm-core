@@ -5,7 +5,7 @@ cj(function($) {
     // Widgetize the content area
     .crmSnippet()
     // Open action links in a popup
-    .on('click', 'a.button, a.action-item:not(".enable-action, .disable-action")', function() {
+    .on('click', 'a.button, a.action-item:not(".crm-enable-disable")', function() {
       CRM.loadForm($(this).attr('href'), {
         openInline: 'a'
       }).on('crmFormSuccess', function(e, data) {

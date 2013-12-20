@@ -83,15 +83,13 @@ class CRM_Admin_Page_AJAX {
    * enabling/ disabling various objects
    */
   static function getStatusMsg() {
-    $recordID  = CRM_Utils_Type::escape($_POST['recordID'], 'Integer');
-    $recordBAO = CRM_Utils_Type::escape($_POST['recordBAO'], 'String');
-    $op        = CRM_Utils_Type::escape($_POST['op'], 'String');
-    $show      = NULL;
+    require_once('api/v3/utils.php');
+    $recordID  = CRM_Utils_Type::escape($_GET['id'], 'Integer');
+    $entity = CRM_Utils_Type::escape($_GET['entity'], 'String');
+    $show = $status = NULL;
 
-    if ($op == 'disable-enable') {
-      $status = ts('Are you sure you want to enable this record?');
-    }
-    else {
+    if ($recordID && $entity) {
+      $recordBAO = _civicrm_api3_get_BAO($entity);
       switch ($recordBAO) {
         case 'CRM_Core_BAO_UFGroup':
           require_once (str_replace('_', DIRECTORY_SEPARATOR, $recordBAO) . '.php');
@@ -273,11 +271,7 @@ class CRM_Admin_Page_AJAX {
           break;
       }
     }
-    $statusMessage['status'] = $status;
-    $statusMessage['show'] = $show;
-
-    echo json_encode($statusMessage);
-    CRM_Utils_System::civiExit();
+    CRM_Core_Page_AJAX::returnJsonResponse($status);
   }
 
   static function getTagList() {
