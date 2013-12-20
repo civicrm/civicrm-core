@@ -27,18 +27,21 @@
 {literal}
 <script type="text/javascript">
   cj(function($) {
-    var $row, entity, id, enabled, snippet;
+    var $row, $table, entity, id, enabled;
 
     function refresh() {
-      snippet.crmSnippet('refresh');
+      if (false && $.fn.DataTable.fnIsDataTable($table[0])) { // fixme why doesn't this work?
+        $table.dataTable().fnDraw();
+      } else {
+        // Refresh an existing ajax container or create a new one
+        $row.closest('.crm-ajax-container, #crm-main-content-wrapper').crmSnippet().crmSnippet('refresh');
+      }
       CRM.alert('', enabled ? {/literal}'{ts escape="js"}Record Disabled{/ts}' : '{ts escape="js"}Record Enabled{/ts}'{literal}, 'success');
     }
 
     function save() {
-      snippet = $row.closest('.crm-ajax-container');
-      if (snippet.length && snippet.crmSnippet('option', 'block')) {
-        snippet.block();
-      }
+      $table = $row.closest('table');
+      $table.block();
       CRM.api(entity, 'create', {id: id, is_active: enabled ? 0 : 1}, {success: refresh});
     }
 

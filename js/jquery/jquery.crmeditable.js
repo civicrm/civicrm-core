@@ -1,27 +1,4 @@
-/*
- +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
- |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
- +--------------------------------------------------------------------+
-
-*
+/**
 * Copyright (C) 2012 Xavier Dutoit
 * Licensed to CiviCRM under the Academic Free License version 3.0.
 *
@@ -38,7 +15,6 @@
 *   this embed a civicrm form and make it in place (load+ajaxForm) 
 *   to make it easier to customize the form (eg. hide a button...) it triggers a 'load' event on the form. you can then catch the load on your code (using the $('#id_of_the_form').on(function(){//do something
 */
-
 
 (function($) {
 
@@ -71,13 +47,9 @@
       }
       // param in : a dom object that contains the field name as a class crmf-xxx
       var getFieldName = function (field) {
-        if ($(field).data('field')) {
-           return $(field).data('field');
-        }
-        var fieldName=field.className.match(/crmf-(\S*)/)[1];
+        var fieldName = $(field).data('field') || field.className.match(/crmf-(\S*)/)[1];
         if (!fieldName) {
           console && console.log && console.log("Couldn't get the crm-editable field name to modify. You need to set crmf-{field_name} or data-{field_name}");
-          return false;
         }
         return fieldName;
       }

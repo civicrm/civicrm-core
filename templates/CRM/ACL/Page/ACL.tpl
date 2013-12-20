@@ -39,11 +39,10 @@
 </div>
 
 {if $rows}
-<div class="">
 <div id="ltype">
     {strip}
   {* handle enable/disable actions*}
-   {include file="CRM/common/enableDisable.tpl"}
+   {include file="CRM/common/enableDisableApi.tpl"}
     {include file="CRM/common/jsortable.tpl"}
         <table id="options" class="display">
         <thead>
@@ -59,12 +58,12 @@
         </thead>
         <tbody>
         {foreach from=$rows item=row key=aclID}
-      <tr id="row_{$aclID}"class="{cycle values="odd-row,even-row"} {$row.class} crm-acl {if NOT $row.is_active} disabled{/if}">
+        <tr id="acl-{$aclID}" class="{cycle values="odd-row,even-row"} {$row.class} crm-acl crm-entity {if NOT $row.is_active} disabled{/if}">
           <td class="crm-acl-entity">{$row.entity}</td>
           <td class="crm-acl-operation" >{$row.operation}</td>
           <td class="crm-acl-object_name">{$row.object_name}</td>
           <td class="crm-acl-object" >{$row.object}</td>
-          <td class="crm-acl-name">{$row.name}</td>
+          <td class="crm-acl-name crm-editable" data-field="name">{$row.name}</td>
           <td class="crm-acl-is_active" id="row_{$aclID}_status">{if $row.is_active eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
           <td>{$row.action|replace:'xx':$aclID}</td>
         </tr>
@@ -79,6 +78,7 @@
         </div>
         {/if}
 </div>
+{include file="CRM/common/crmeditable.tpl"}
 {elseif $action ne 1 and $action ne 2 and $action ne 8}
     <div class="messages status no-popup">
         <img src="{$config->resourceBase}i/Inform.gif" alt="{ts}status{/ts}"/>
