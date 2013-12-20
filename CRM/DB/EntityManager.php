@@ -22,7 +22,14 @@ class CRM_DB_EntityManager
 
   static function reset_entity_manager($db_settings) {
     $civicrm_base_path = CRM_Utils_Path::join(__DIR__, '..', '..');
-    $doctrine_annotations_path = CRM_Utils_Path::join($civicrm_base_path, 'vendor', 'doctrine', 'orm', 'lib', 'Doctrine', 'ORM', 'Mapping', 'Driver', 'DoctrineAnnotations.php');
+
+    if (!defined('CIVICRM_SYMFONY_PATH')) {
+      $doctrine_annotations_path = CRM_Utils_Path::join($civicrm_base_path, 'vendor', 'doctrine', 'orm', 'lib', 'Doctrine', 'ORM', 'Mapping', 'Driver', 'DoctrineAnnotations.php');
+    }
+    else {
+      $doctrine_annotations_path = CRM_Utils_Path::join(CIVICRM_SYMFONY_PATH, 'vendor', 'doctrine', 'orm', 'lib', 'Doctrine', 'ORM', 'Mapping', 'Driver', 'DoctrineAnnotations.php');
+    }
+
     AnnotationRegistry::registerFile($doctrine_annotations_path);
     $annotation_cache_path = CRM_Utils_Path::join(dirname(CIVICRM_TEMPLATE_COMPILEDIR), 'cache', 'annotations');
     CRM_Utils_Path::mkdir_p_if_not_exists($annotation_cache_path);
