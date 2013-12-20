@@ -255,6 +255,10 @@ class CRM_Event_Form_Participant extends CRM_Contact_Form_Task {
     $this->assign('eventNameCustomDataTypeID', $this->_eventNameCustomDataTypeID);
     $this->assign('eventTypeCustomDataTypeID', $this->_eventTypeCustomDataTypeID);
 
+    $partiallyPaidStatusId = CRM_Event_PseudoConstant::participantStatus();
+    $partiallyPaidStatusId = array_search('Partially paid', $partiallyPaidStatusId);
+    $this->assign('partiallyPaidStatusId', $partiallyPaidStatusId);
+
     if ($this->_mode) {
       $this->assign('participantMode', $this->_mode);
 

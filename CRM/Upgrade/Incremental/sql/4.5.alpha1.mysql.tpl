@@ -98,3 +98,20 @@ SELECT @caseCompId := id FROM `civicrm_component` where `name` like 'CiviCase';
 UPDATE `civicrm_option_value`
 SET is_reserved = 1
 WHERE is_reserved = 0 AND option_group_id = @option_group_id_activity_type AND component_id = @caseCompId;
+
+-- CRM-13964
+SELECT @option_group_id_cs   := max(id) from civicrm_option_group where name = 'contribution_status';
+SELECT @option_val_id_cs_wt  := MAX(weight) FROM civicrm_option_value WHERE option_group_id = @option_group_id_cs;
+SELECT @option_val_id_cs_val := MAX(value) FROM civicrm_option_value WHERE option_group_id = @option_group_id_cs;
+
+INSERT INTO
+   `civicrm_option_value` (`option_group_id`, {localize field='label'}label{/localize}, `value`, `name`, `grouping`, `filter`, `is_default`, `weight`, `is_optgroup`, `is_reserved`, `is_active`, `component_id`, `visibility_id`)
+VALUES
+  (@option_group_id_cs, '{ts escape="sql"}Partially paid{/ts}', @option_val_id_cs_val+1, 'Partially paid', NULL, 0, NULL, @option_val_id_cs_wt+1, 0, 1, 1, NULL, NULL);
+
+-- participant status adding
+SELECT @participant_status_wt  := max(id) from civicrm_participant_status_type;
+
+INSERT INTO civicrm_participant_status_type (id, name,  {localize field='label'}label{/localize}, class, is_reserved, is_active, is_counted, weight, visibility_id)
+VALUES
+  (1,  'Partially paid', '{ts escape="sql"}Partially paid{/ts}', 'Positive', 1, 1, 1, @participant_status_wt+1, 2);
