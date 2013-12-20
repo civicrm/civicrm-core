@@ -288,12 +288,12 @@ function _civicrm_api3_get_DAO($name) {
   //hack to deal with incorrectly named BAO/DAO - see CRM-10859 -
   // several of these have been removed but am not confident mailing_recipients is
   // tests so have not tackled.
-  // correct approach for im is unclear
   if($name == 'mailing_recipients' || $name == 'MailingRecipients'){
     return 'CRM_Mailing_BAO_Recipients';
   }
-  if(strtolower($name) == 'im'){
-    return 'CRM_Core_BAO_IM';
+  // correct approach for im & acl is unclear
+  if (strtolower($name) == 'im' || strtolower($name) == 'acl') {
+    $name = strtoupper($name);
   }
   return CRM_Core_DAO_AllCoreTables::getFullName(_civicrm_api_get_camel_name($name, 3));
 }
