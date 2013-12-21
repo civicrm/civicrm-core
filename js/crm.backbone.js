@@ -277,7 +277,7 @@
    * });
    * CRM.Backbone.extendCollection(ContactCollection);
    *
-   * // Use class
+   * // Use class (with passive criteria)
    * var c = new ContactCollection([], {
    *   crmCriteria: {contact_type: 'Organization'}
    * });
@@ -285,7 +285,20 @@
    * c.get(123).set('property', 'value');
    * c.get(456).setDeleted(true);
    * c.save();
+   *
+   * // Use class (with active criteria)
+   * var criteriaModel = new SomeModel({
+   *     contact_type: 'Organization'
+   * });
+   * var c = new ContactCollection([], {
+   *   crmCriteriaModel: criteriaModel
+   * });
+   * c.fetch();
+   * c.get(123).set('property', 'value');
+   * c.get(456).setDeleted(true);
+   * c.save();
    * @endcode
+   *
    *
    * @param Class CollectionClass
    * @see tests/qunit/crm-backbone
@@ -298,6 +311,26 @@
       toCrmCriteria: function() {
         return (this.crmCriteria) ? _.extend({}, this.crmCriteria) : {};
       },
+
+      /**
+       * Get an object which represents this collection's criteria
+       * as a live model. Any changes to the model will be applied
+       * to the collection, and the collection will be refreshed.
+       *
+       * @param criteriaModelClass
+       */
+      setCriteriaModel: function(criteriaModel) {
+        var collection = this;
+        this.crmCriteria = criteriaModel.toJSON();
+        this.listenTo(criteriaModel, 'change', function() {
+          collection.crmCriteria = criteriaModel.toJSON();
+          collection.debouncedFetch();
+        });
+      },
+
+      debouncedFetch: _.debounce(function() {
+        this.fetch({reset: true});
+      }, 500),
 
       /**
        * Reconcile the server's collection with the client's collection.
@@ -327,7 +360,9 @@
       sync: CRM.Backbone.sync,
       initialize: function(models, options) {
         options || (options = {});
-        if (options.crmCriteria) {
+        if (options.crmCriteriaModel) {
+          this.setCriteriaModel(options.crmCriteriaModel);
+        } else if (options.crmCriteria) {
           this.crmCriteria = options.crmCriteria;
         }
         if (origInit) {
