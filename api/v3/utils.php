@@ -280,22 +280,27 @@ function _civicrm_api3_get_DAO($name) {
     // len ('civicrm_api3_') == 13
     $name = substr($name, 13, $last - 13);
   }
+  
+  $name = _civicrm_api_get_camel_name($name, 3);
 
-  if (strtolower($name) == 'individual' || strtolower($name) == 'household' || strtolower($name) == 'organization') {
+  if ($name == 'Individual' || $name == 'Household' || $name == 'Organization') {
     $name = 'Contact';
   }
 
   //hack to deal with incorrectly named BAO/DAO - see CRM-10859 -
   // several of these have been removed but am not confident mailing_recipients is
   // tests so have not tackled.
-  if($name == 'mailing_recipients' || $name == 'MailingRecipients'){
+  if ($name == 'MailingRecipients') {
     return 'CRM_Mailing_BAO_Recipients';
   }
+  if ($name == 'AclRole') {
+    return 'CRM_ACL_DAO_EntityRole';
+  }
   // correct approach for im & acl is unclear
-  if (strtolower($name) == 'im' || strtolower($name) == 'acl') {
+  if ($name == 'Im' || $name == 'Acl') {
     $name = strtoupper($name);
   }
-  return CRM_Core_DAO_AllCoreTables::getFullName(_civicrm_api_get_camel_name($name, 3));
+  return CRM_Core_DAO_AllCoreTables::getFullName($name);
 }
 
 /**
