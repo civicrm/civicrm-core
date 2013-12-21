@@ -817,17 +817,21 @@ CRM.validate = CRM.validate || {
     },
     _originalUrl: null,
     isOriginalUrl: function() {
-      var args = {}, same = true;
+      var 
+        args = {}, 
+        same = true,
+        newUrl = this._formatUrl(this.options.url),
+        oldUrl = this._formatUrl(this._originalUrl);
       // Compare path
-      if (this.options.url.split('?')[0] !== this._originalUrl.split('?')[0]) {
+      if (newUrl.split('?')[0] !== oldUrl.split('?')[0]) {
         return false;
       }
       // Compare arguments
-      $.each(this.options.url.split('?')[1].split('&'), function(k, v) {
+      $.each(newUrl.split('?')[1].split('&'), function(k, v) {
         var arg = v.split('=');
         args[arg[0]] = arg[1];
       });
-      $.each(this._originalUrl.split('?')[1].split('&'), function(k, v) {
+      $.each(oldUrl.split('?')[1].split('&'), function(k, v) {
         var arg = v.split('=');
         if (args[arg[0]] !== undefined && arg[1] !== args[arg[0]]) {
           same = false;
@@ -853,6 +857,8 @@ CRM.validate = CRM.validate || {
       CRM.alert(ts('Unable to reach the server. Please refresh this page in your browser and try again.'), ts('Network Error'), 'error');
     },
     _formatUrl: function(url) {
+      // Strip hash
+      url = url.split('#')[0];
       // Add snippet argument to url
       if (url.search(/[&?]snippet=/) < 0) {
         url += (url.indexOf('?') < 0 ? '?' : '&') + 'snippet=json';
