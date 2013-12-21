@@ -1,4 +1,5 @@
 <?php
+
 /*
  +--------------------------------------------------------------------+
  | CiviCRM version 4.4                                                |
@@ -26,66 +27,51 @@
 */
 
 /**
+ * File for the CiviCRM APIv3 acl_role functions
  *
- * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
+ * @package CiviCRM_APIv3
+ * @subpackage API_acl_role
  *
  */
 
 /**
- *  Access Control EntityRole
+ * Save an acl_role
+ *
+ * Allowed @params array keys are:
+ * {@getfields acl_role_create}
+ * @example acl_roleCreate.php
+ *
+ * @return array of newly created acl_role property values.
+ * @access public
  */
-class CRM_ACL_BAO_EntityRole extends CRM_ACL_DAO_EntityRole {
-  static $_entityTable = NULL;
-
-  static function entityTable() {
-    if (!self::$_entityTable) {
-      self::$_entityTable = array(
-        'civicrm_contact' => ts('Contact'),
-        'civicrm_group' => ts('Group'),
-      );
-    }
-    return self::$_entityTable;
-  }
-
-  static function create(&$params) {
-    $dao = new CRM_ACL_DAO_EntityRole();
-    $dao->copyValues($params);
-    $dao->save();
-    return $dao;
-  }
-
-  static function retrieve(&$params, &$defaults) {
-    CRM_Core_DAO::commonRetrieve('CRM_ACL_DAO_EntityRole', $params, $defaults);
-  }
-
-  /**
-   * update the is_active flag in the db
-   *
-   * @param int      $id        id of the database record
-   * @param boolean  $is_active value we want to set the is_active field
-   *
-   * @return Object             DAO object on sucess, null otherwise
-   * @static
-   */
-  static function setIsActive($id, $is_active) {
-    return CRM_Core_DAO::setFieldValue('CRM_ACL_DAO_EntityRole', $id, 'is_active', $is_active);
-  }
-
-  /**
-   * Function to delete Entity Role records
-   *
-   * @param  int  $entityRoleId ID of the EntityRole record to be deleted.
-   *
-   * @access public
-   * @static
-   */
-  static function del($entityRoleId) {
-    $entityDAO = new CRM_ACL_DAO_EntityRole();
-    $entityDAO->id = $entityRoleId;
-    $entityDAO->find(TRUE);
-    $entityDAO->delete();
-  }
+function civicrm_api3_acl_role_create($params) {
+  return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 
+/**
+ * Get an acl_role
+ *
+ * Allowed @params array keys are:
+ * {@getfields acl_role_get}
+ * @example acl_roleCreate.php
+ *
+ * @return array of retrieved acl_role property values.
+ * @access public
+ */
+function civicrm_api3_acl_role_get($params) {
+  return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
+}
+
+/**
+ * Delete an acl_role
+ *
+ * Allowed @params array keys are:
+ * {@getfields acl_role_delete}
+ * @example acl_roleCreate.php
+ *
+ * @return array of deleted values.
+ * @access public
+ */
+function civicrm_api3_acl_role_delete($params) {
+  return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);
+}

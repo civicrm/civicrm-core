@@ -75,14 +75,12 @@ class CRM_ACL_Page_EntityRole extends CRM_Core_Page_Basic {
         ),
         CRM_Core_Action::DISABLE => array(
           'name' => ts('Disable'),
-          'extra' => 'onclick = "enableDisable( %%id%%,\'' . 'CRM_ACL_BAO_EntityRole' . '\',\'' . 'enable-disable' . '\' );"',
-          'ref' => 'disable-action',
+          'ref' => 'crm-enable-disable',
           'title' => ts('Disable ACL Role Assignment'),
         ),
         CRM_Core_Action::ENABLE => array(
           'name' => ts('Enable'),
-          'extra' => 'onclick = "enableDisable( %%id%%,\'' . 'CRM_ACL_BAO_EntityRole' . '\',\'' . 'disable-enable' . '\' );"',
-          'ref' => 'enable-action',
+          'ref' => 'crm-enable-disable',
           'title' => ts('Enable ACL Role Assignment'),
         ),
         CRM_Core_Action::DELETE => array(
@@ -141,6 +139,7 @@ class CRM_ACL_Page_EntityRole extends CRM_Core_Page_Basic {
 
     // finally browse the acl's
     if ($action & CRM_Core_Action::BROWSE) {
+      CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'js/crm.livePage.js');
       $this->browse();
     }
 
