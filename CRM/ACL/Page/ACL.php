@@ -139,9 +139,11 @@ class CRM_ACL_Page_ACL extends CRM_Core_Page_Basic {
       }
     }
 
-
     // finally browse the acl's
-    $this->browse();
+    if ($action & CRM_Core_Action::BROWSE) {
+      CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'js/crm.livePage.js');
+      $this->browse();
+    }
 
     // parent run
     return parent::run();
