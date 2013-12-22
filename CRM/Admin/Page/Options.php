@@ -211,7 +211,6 @@ class CRM_Admin_Page_Options extends CRM_Core_Page_Basic {
    * @static
    */
   function browse() {
-    CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'js/crm.livePage.js');
 
     $groupParams = array('name' => self::$_gName);
     $optionValue = CRM_Core_OptionValue::getRows($groupParams, $this->links(), 'component_id,weight');

@@ -114,8 +114,7 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
         CRM_Core_Action::DISABLE => array(
           'name' => ts('Cancel'),
           'title' => ts('Cancel'),
-          'extra' => 'onclick = "enableDisable( %%crid%%,\'' . 'CRM_Contribute_BAO_ContributionRecur' . '\',\'' . 'enable-disable' . '\' );"',
-          'ref' => 'disable-action',
+          'ref' => 'crm-enable-disable',
         ),
       );
     }
@@ -147,6 +146,7 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
    * @access public
    */
   function browse() {
+    CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'js/crm.livePage.js');
 
     // add annual contribution
     $annual = array();

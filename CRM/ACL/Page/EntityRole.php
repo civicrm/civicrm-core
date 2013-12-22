@@ -140,7 +140,6 @@ class CRM_ACL_Page_EntityRole extends CRM_Core_Page_Basic {
     // finally browse the acl's
     if ($action & CRM_Core_Action::BROWSE) {
       CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'js/crm.livePage.js');
-      $this->browse();
     }
 
     // parent run
@@ -155,6 +154,7 @@ class CRM_ACL_Page_EntityRole extends CRM_Core_Page_Basic {
    * @static
    */
   function browse() {
+    CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'js/crm.livePage.js');
 
     // get all acl's sorted by weight
     $entityRoles = array();

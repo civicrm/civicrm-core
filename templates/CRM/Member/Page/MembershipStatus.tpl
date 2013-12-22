@@ -39,7 +39,8 @@
     <div id="membership_status_id">
         {strip}
         {* handle enable/disable actions*}
-   {include file="CRM/common/enableDisable.tpl"}
+   {include file="CRM/common/enableDisableApi.tpl"}
+   {include file="CRM/common/crmeditable.tpl"}
         <table cellpadding="0" cellspacing="0" border="0">
         <thead class="sticky">
             <th>{ts}Status{/ts}</th>
@@ -52,8 +53,8 @@
           <th></th>
         </thead>
         {foreach from=$rows item=row}
-        <tr id="row_{$row.id}" class="{cycle values="odd-row,even-row"} {$row.class} {if NOT $row.is_active} disabled{/if} crm-membership-status">
-          <td class="crm-membership-status-label">{$row.label}</td>
+        <tr id="membership_status-{$row.id}" class="crm-entity {cycle values="odd-row,even-row"} {$row.class} {if NOT $row.is_active} disabled{/if} crm-membership-status">
+          <td class="crm-membership-status-label crm-editable" data-field="label">{$row.label}</td>
           <td class="crm-membership-status-start_event">{$row.start_event}</td>
           <td class="crm-membership-status-end_event">{$row.end_event}</td>
           <td class="crm-membership-status-is_current_member">{if $row.is_current_member eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>

@@ -67,14 +67,12 @@ class CRM_Campaign_Page_DashBoard extends CRM_Core_Page {
         CRM_Core_Action::DISABLE => array(
           'name' => ts('Disable'),
           'title' => ts('Disable Campaign'),
-          'extra' => 'onclick = "enableDisable( %%id%%,\'' . 'CRM_Campaign_BAO_Campaign' . '\',\'' . 'enable-disable' . '\',\'' . NULL . '\',\'' . 'campaign_row' . '\' );"',
-          'ref' => 'disable-action',
+          'ref' => 'crm-enable-disable',
         ),
         CRM_Core_Action::ENABLE => array(
           'name' => ts('Enable'),
           'title' => ts('Enable Campaign'),
-          'extra' => 'onclick = "enableDisable( %%id%%,\'' . 'CRM_Campaign_BAO_Campaign' . '\',\'' . 'disable-enable' . '\',\'' . NULL . '\',\'' . 'campaign_row' . '\' );"',
-          'ref' => 'enable-action',
+          'ref' => 'crm-enable-disable',
         ),
         CRM_Core_Action::DELETE => array(
           'name' => ts('Delete'),
@@ -100,14 +98,12 @@ class CRM_Campaign_Page_DashBoard extends CRM_Core_Page {
         ),
         CRM_Core_Action::DISABLE => array(
           'name' => ts('Disable'),
-          'extra' => 'onclick = "enableDisable( %%id%%,\'' . 'CRM_Campaign_BAO_Survey' . '\',\'' . 'enable-disable' . '\',\'' . NULL . '\',\'' . 'survey_row' . '\' );"',
-          'ref' => 'disable-action',
+          'ref' => 'crm-enable-disable',
           'title' => ts('Disable Survey'),
         ),
         CRM_Core_Action::ENABLE => array(
           'name' => ts('Enable'),
-          'extra' => 'onclick = "enableDisable( %%id%%,\'' . 'CRM_Campaign_BAO_Survey' . '\',\'' . 'disable-enable' . '\',\'' . NULL . '\',\'' . 'survey_row' . '\' );"',
-          'ref' => 'enable-action',
+          'ref' => 'crm-enable-disable',
           'title' => ts('Enable Survey'),
         ),
         CRM_Core_Action::DELETE => array(
@@ -133,14 +129,12 @@ class CRM_Campaign_Page_DashBoard extends CRM_Core_Page {
       );
       self::$_petitionActionLinks[CRM_Core_Action::DISABLE] = array(
         'name' => ts('Disable'),
-        'extra' => 'onclick = "enableDisable( %%id%%,\'' . 'CRM_Campaign_BAO_Survey' . '\',\'' . 'enable-disable' . '\',\'' . NULL . '\',\'' . 'petition_row' . '\' );"',
-        'ref' => 'disable-action',
+        'ref' => 'crm-enable-disable',
         'title' => ts('Disable Petition'),
       );
       self::$_petitionActionLinks[CRM_Core_Action::ENABLE] = array(
         'name' => ts('Enable'),
-        'extra' => 'onclick = "enableDisable( %%id%%,\'' . 'CRM_Campaign_BAO_Survey' . '\',\'' . 'disable-enable' . '\',\'' . NULL . '\',\'' . 'petition_row' . '\' );"',
-        'ref' => 'enable-action',
+        'ref' => 'crm-enable-disable',
         'title' => ts('Enable Petition'),
       );
       self::$_petitionActionLinks[CRM_Core_Action::DELETE] = array(
@@ -426,6 +420,7 @@ class CRM_Campaign_Page_DashBoard extends CRM_Core_Page {
   }
 
   function browse() {
+    CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'js/crm.livePage.js');
     $this->_tabs = array('campaign' => ts('Campaigns'),
       'survey' => ts('Surveys'),
       'petition' => ts('Petitions'),

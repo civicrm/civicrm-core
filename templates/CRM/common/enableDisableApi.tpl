@@ -27,7 +27,7 @@
 {literal}
 <script type="text/javascript">
   cj(function($) {
-    var $row, $table, entity, id, enabled;
+    var $row, $table, entity, id, enabled, fieldLabel;
 
     function refresh() {
       if (false && $.fn.DataTable.fnIsDataTable($table[0])) { // fixme why doesn't this work?
@@ -36,25 +36,46 @@
         // Refresh an existing ajax container or create a new one
         $row.closest('.crm-ajax-container, #crm-main-content-wrapper').crmSnippet().crmSnippet('refresh');
       }
-      CRM.alert('', enabled ? {/literal}'{ts escape="js"}Record Disabled{/ts}' : '{ts escape="js"}Record Enabled{/ts}'{literal}, 'success');
+      var msg = enabled ? {/literal}'{ts escape="js" 1="<em>%1</em>"}%1 Disabled{/ts}' : '{ts escape="js" 1="<em>%1</em>"}%1 Enabled{/ts}'{literal};
+      CRM.alert('', ts(msg, fieldLabel), 'success');
     }
 
     function save() {
       $table = $row.closest('table');
       $table.block();
-      CRM.api(entity, 'create', {id: id, is_active: enabled ? 0 : 1}, {success: refresh});
+      CRM.api(entity, 'setvalue', {id: id, field: 'is_active', value: enabled ? 0 : 1}, {success: refresh});
+      if (enabled) {
+        $(this).dialog('close');
+      }
     }
 
     function confirmation() {
-      var dialog = $(this);
+      var conf = $(this);
       $.getJSON(CRM.url('civicrm/ajax/statusmsg', {entity: entity, id: id}), function(response) {
-        dialog.html(response.content);
+        conf.html(response.content);
+        if (!response.illegal) {
+          conf.dialog('option', 'buttons', [
+            {text: {/literal}'{ts escape="js"}Disable{/ts}'{literal}, click: save},
+            {text: {/literal}'{ts escape="js"}Cancel{/ts}'{literal}, click: function() {$(this).dialog('close');}}
+          ]);
+        }
       });
+    }
+
+    function getLabel() {
+      var label = {/literal}'{ts escape="js"}Record{/ts}'{literal};
+      var labelField = $('.crmf-label, .crmf-title, [data-field=label], [data-field=title]', $row);
+      if (labelField.length) {
+        label = labelField.first().text();
+      }
+      // Format as object the way ts() wants it
+      fieldLabel = {1: label};
     }
 
     function enableDisable() {
       var $a = $(this);
       $row = $a.closest('.crm-entity');
+      getLabel();
       // FIXME: abstract and reuse code from $.crmEditable for fetching entity/id instead of reinventing it here
       entity = $row.data('entity');
       id = $row.data('id');
@@ -64,8 +85,9 @@
       }
       enabled = !$row.hasClass('disabled');
       if (enabled) {
-        CRM.confirm(save, {{/literal}
-          title: '{ts escape="js"}Disable Record{/ts}',
+        CRM.confirm({}, {{/literal}
+          {* client-side variable substitutions in smarty are AWKWARD! *}
+          title: ts('{ts escape="js" 1='%1'}Disable %1{/ts}', fieldLabel),
           message: '<div class="crm-loading-element">{ts escape="js"}Loading{/ts}...</div>',
           width: 300,
           open: confirmation

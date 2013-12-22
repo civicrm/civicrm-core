@@ -35,7 +35,8 @@
 <div id="ltype">
     {strip}
   {* handle enable/disable actions*}
-   {include file="CRM/common/enableDisable.tpl"}
+   {include file="CRM/common/enableDisableApi.tpl"}
+   {include file="CRM/common/crmeditable.tpl"}
     {include file="CRM/common/jsortable.tpl"}
     <table id="options" class="display">
     <thead>
@@ -50,7 +51,7 @@
     </tr>
     </thead>
     {foreach from=$rows item=row}
-    <tr id="row_{$row.id}"class="{cycle values="odd-row,even-row"} {$row.class} crm-locationType {if NOT $row.is_active} disabled{/if}">
+    <tr id="location_type-{$row.id}" class="{cycle values="odd-row,even-row"} {$row.class} crm-entity {if NOT $row.is_active} disabled{/if}">
         <td class="crm-locationType-name">{$row.name}</td>
         <td class="crm-locationType-display_name">{$row.display_name}</td>
         <td class="crm-locationType-vcard_name">{$row.vcard_name}</td>

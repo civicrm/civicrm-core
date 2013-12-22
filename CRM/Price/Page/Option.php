@@ -99,14 +99,12 @@ class CRM_Price_Page_Option extends CRM_Core_Page {
         ),
         CRM_Core_Action::DISABLE => array(
           'name' => ts('Disable'),
-          'extra' => 'onclick = "enableDisable( %%oid%%,\'' . 'CRM_Price_BAO_PriceFieldValue' . '\',\'' . 'enable-disable' . '\' );"',
-          'ref' => 'disable-action',
+          'ref' => 'crm-enable-disable',
           'title' => ts('Disable Price Option'),
         ),
         CRM_Core_Action::ENABLE => array(
           'name' => ts('Enable'),
-          'extra' => 'onclick = "enableDisable( %%oid%%,\'' . 'CRM_Price_BAO_PriceFieldValue' . '\',\'' . 'disable-enable' . '\' );"',
-          'ref' => 'enable-action',
+          'ref' => 'crm-enable-disable',
           'title' => ts('Enable Price Option'),
         ),
         CRM_Core_Action::DELETE => array(
@@ -129,6 +127,7 @@ class CRM_Price_Page_Option extends CRM_Core_Page {
    * @access public
    */
   function browse() {
+    CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'js/crm.livePage.js');
     $customOption = array();
     CRM_Price_BAO_PriceFieldValue::getValues($this->_fid, $customOption);
     $config = CRM_Core_Config::singleton();

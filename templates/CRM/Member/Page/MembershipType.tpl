@@ -34,7 +34,8 @@
 <div id="membership_type">
   {strip}
   {* handle enable/disable actions*}
-  {include file="CRM/common/enableDisable.tpl"}
+  {include file="CRM/common/enableDisableApi.tpl"}
+  {include file="CRM/common/crmeditable.tpl"}
   {include file="CRM/common/jsortable.tpl"}
     <table id="options" class="display">
       <thead>
@@ -55,8 +56,8 @@
       </tr>
       </thead>
       {foreach from=$rows item=row}
-        <tr id="row_{$row.id}" class="{cycle values='odd-row,even-row'} {$row.class} crm-membership-type {if NOT $row.is_active} disabled{/if}">
-          <td class="crm-membership-type-type_name">{$row.name}</td>
+        <tr id="membership_type-{$row.id}" class="crm-entity {cycle values='odd-row,even-row'} {$row.class} crm-membership-type {if NOT $row.is_active} disabled{/if}">
+          <td class="crm-membership-type-type_name crm-editable" data-field="name">{$row.name}</td>
           <td class="crm-memberhip-type-period_type">{$row.period_type}</td>
           <td class="crm-membership-type-fixed_period_start_day">{$row.fixed_period_start_day}</td>
           <td class="crm-membership-type-minimum_fee" align="right">{$row.minimum_fee|crmMoney}</td>
