@@ -73,6 +73,4 @@
         {else}
             <div class="crm-submit-buttons">{$form.done.html}</div>
         {/if}
-
-</fieldset>
 </div>
