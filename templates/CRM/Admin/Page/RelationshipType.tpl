@@ -37,7 +37,7 @@
 {if $rows}
 {if !($action eq 1 and $action eq 2)}
     <div class="action-link">
-      <a href="{crmURL q="action=add&reset=1"}" id="newRelationshipType" class="button"><span><div class="icon add-icon"></div>{ts}Add Relationship Type{/ts}</span></a>
+      <a href="{crmURL q="action=add&reset=1"}" class="button newRelationshipType"><span><div class="icon add-icon"></div>{ts}Add Relationship Type{/ts}</span></a>
     </div>
 {/if}
 
@@ -51,7 +51,7 @@
         <table id="options" class="display">
         <thead>
         <tr>
-          <th id="sortable">{tunction browses}Relationship A to B{/ts}</th>
+          <th id="sortable">{ts}Relationship A to B{/ts}</th>
           <th>{ts}Relationship B to A{/ts}</th>
           <th>{ts}Contact Type A{/ts}</th>
           <th>{ts}Contact Type B{/ts}</th>
@@ -78,7 +78,7 @@
 
         {if !($action eq 1 and $action eq 2)}
             <div class="action-link">
-              <a href="{crmURL q="action=add&reset=1"}" id="newRelationshipType" class="button"><span><div class="icon add-icon"></div>{ts}Add Relationship Type{/ts}</span></a>
+              <a href="{crmURL q="action=add&reset=1"}" class="button newRelationshipType"><span><div class="icon add-icon"></div>{ts}Add Relationship Type{/ts}</span></a>
             </div>
         {/if}
 </div>
