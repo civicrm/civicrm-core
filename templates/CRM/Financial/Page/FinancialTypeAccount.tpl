@@ -37,7 +37,8 @@
     {/if}
     {strip}
     {* handle enable/disable actions*}
-     {include file="CRM/common/enableDisable.tpl"}
+     {include file="CRM/common/enableDisableApi.tpl"}
+     {include file="CRM/common/crmeditable.tpl"}
       <table cellpadding="0" cellspacing="0" border="0">
         <thead class="sticky">
           <th>{ts}Relationship{/ts}</th>

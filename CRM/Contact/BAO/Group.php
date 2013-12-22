@@ -1184,14 +1184,12 @@ WHERE {$whereClause}";
       ),
       CRM_Core_Action::DISABLE => array(
         'name' => ts('Disable'),
-        'extra' => 'onclick = "enableDisable( %%id%%,\'' . 'CRM_Contact_BAO_Group' . '\',\'' . 'enable-disable' . '\' );"',
-        'ref' => 'disable-action',
+        'ref' => 'crm-enable-disable',
         'title' => ts('Disable Group'),
       ),
       CRM_Core_Action::ENABLE => array(
         'name' => ts('Enable'),
-        'extra' => 'onclick = "enableDisable( %%id%%,\'' . 'CRM_Contact_BAO_Group' . '\',\'' . 'disable-enable' . '\' );"',
-        'ref' => 'enable-action',
+        'ref' => 'crm-enable-disable',
         'title' => ts('Enable Group'),
       ),
       CRM_Core_Action::DELETE => array(

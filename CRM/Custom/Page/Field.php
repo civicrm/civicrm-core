@@ -124,6 +124,7 @@ class CRM_Custom_Page_Field extends CRM_Core_Page {
    * @access public
    */
   function browse() {
+    CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'js/crm.livePage.js');
     $customField = array();
     $customFieldBAO = new CRM_Core_BAO_CustomField();
 
@@ -288,7 +289,6 @@ class CRM_Custom_Page_Field extends CRM_Core_Page {
       $this->preview($id);
     }
     else {
-      CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'js/crm.livePage.js');
       $this->browse();
     }
 

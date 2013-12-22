@@ -45,7 +45,8 @@
        {include file="CRM/common/pager.tpl" location="top"}
              {include file="CRM/common/pagerAToZ.tpl"}
              {* handle enable/disable actions *}
-             {include file="CRM/common/enableDisable.tpl"}
+             {include file="CRM/common/enableDisableApi.tpl"}
+             {include file="CRM/common/crmeditable.tpl"}
        {include file="CRM/common/jsortable.tpl"}
              <table id="options" class="display">
                <thead>
@@ -60,7 +61,7 @@
                </tr>
                </thead>
                {foreach from=$rows item=row}
-                 <tr id="row_{$row.id}" class="{if NOT $row.is_active} disabled{/if}">
+                 <tr id="contribution_page-{$row.id}" class="crm-entity {if NOT $row.is_active} disabled{/if}">
                      <td><strong>{$row.title}</strong></td>
                      <td>{$row.id}</td>
                      <td id="row_{$row.id}_status">{if $row.is_active eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>

@@ -85,13 +85,11 @@ class CRM_Contribute_Page_ContributionPage extends CRM_Core_Page {
         CRM_Core_Action::DISABLE => array(
           'name' => ts('Disable'),
           'title' => ts('Disable'),
-          'extra' => 'onclick = "enableDisable( %%id%%,\'' . 'CRM_Contribute_BAO_ContributionPage' . '\',\'' . 'enable-disable' . '\' );"',
-          'ref' => 'disable-action',
+          'ref' => 'crm-enable-disable',
         ),
         CRM_Core_Action::ENABLE => array(
           'name' => ts('Enable'),
-          'extra' => 'onclick = "enableDisable( %%id%%,\'' . 'CRM_Contribute_BAO_ContributionPage' . '\',\'' . 'disable-enable' . '\' );"',
-          'ref' => 'enable-action',
+          'ref' => 'crm-enable-disable',
           'title' => ts('Enable'),
         ),
         CRM_Core_Action::DELETE => array(

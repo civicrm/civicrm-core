@@ -94,7 +94,8 @@
     </ul>
 
     {* create two selector tabs, first being the ‘user’ one, the second being the ‘workflow’ one *}
-    {include file="CRM/common/enableDisable.tpl"}
+    {include file="CRM/common/enableDisableApi.tpl"}
+    {include file="CRM/common/crmeditable.tpl"}
     {include file="CRM/common/jsortable.tpl"}
     {foreach from=$rows item=template_row key=type}
       <div id="{if $type eq 'userTemplates'}user{else}workflow{/if}" class='ui-tabs-panel ui-widget-content ui-corner-bottom'>
@@ -122,7 +123,7 @@
                 </thead>
                 <tbody>
                 {foreach from=$template_row item=row}
-                    <tr id="row_{$row.id}" class="{$row.class}{if NOT $row.is_active} disabled{/if}">
+                    <tr id="message_template-{$row.id}" class="crm-entity {$row.class}{if NOT $row.is_active} disabled{/if}">
                       <td>{$row.msg_title}</td>
                       {if $type eq 'userTemplates'}
                         <td>{$row.msg_subject}</td>

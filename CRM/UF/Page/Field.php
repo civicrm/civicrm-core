@@ -81,14 +81,12 @@ class CRM_UF_Page_Field extends CRM_Core_Page {
         ),
         CRM_Core_Action::DISABLE => array(
           'name' => ts('Disable'),
-          'extra' => 'onclick = "enableDisable( %%id%%,\'' . 'CRM_Core_BAO_UFField' . '\',\'' . 'enable-disable' . '\',0,\'UFField\' );"',
-          'ref' => 'disable-action',
+          'ref' => 'crm-enable-disable',
           'title' => ts('Disable CiviCRM Profile Field'),
         ),
         CRM_Core_Action::ENABLE => array(
           'name' => ts('Enable'),
-          'extra' => 'onclick = "enableDisable( %%id%%,\'' . 'CRM_Core_BAO_UFField' . '\',\'' . 'disable-enable' . '\',0,\'UFField\' );"',
-          'ref' => 'enable-action',
+          'ref' => 'crm-enable-disable',
           'title' => ts('Enable CiviCRM Profile Field'),
         ),
         CRM_Core_Action::DELETE => array(
@@ -110,6 +108,7 @@ class CRM_UF_Page_Field extends CRM_Core_Page {
    * @static
    */
   function browse() {
+    CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'js/crm.livePage.js');
     $ufField = array();
     $ufFieldBAO = new CRM_Core_BAO_UFField();
 

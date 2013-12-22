@@ -55,7 +55,8 @@
     <div id="field_page">
     {strip}
   {* handle enable/disable actions*}
-   {include file="CRM/common/enableDisable.tpl"}
+   {include file="CRM/common/enableDisableApi.tpl"}
+   {include file="CRM/common/crmeditable.tpl"}
     {include file="CRM/common/jsortable.tpl"}
          <table id="options" class="display">
          <thead>
@@ -73,8 +74,8 @@
         </tr>
         </thead>
         {foreach from=$priceField key=fid item=row}
-      <tr id="row_{$row.id}"class="{cycle values="odd-row,even-row"} {$row.class}{if NOT $row.is_active} disabled{/if}">
-            <td>{$row.label}</td>
+      <tr id="price_field-{$row.id}" class="crm-entity {cycle values="odd-row,even-row"} {$row.class}{if NOT $row.is_active} disabled{/if}">
+            <td class="crm-editable" data-field="label">{$row.label}</td>
             <td>{$row.html_type}</td>
             <td class="nowrap">{$row.order}</td>
             <td>{if $row.is_required eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
