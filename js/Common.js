@@ -937,7 +937,7 @@ CRM.validate = CRM.validate || {
         validate: true,
         refreshAction: ['next_new', 'submit_savenext'],
         cancelButton: '.cancel.form-submit',
-        openInline: 'a.button',
+        openInline: 'a.button:not([href="#"])',
         onCancel: function(event) {},
         onError: function(data) {
           var $el = $(this);

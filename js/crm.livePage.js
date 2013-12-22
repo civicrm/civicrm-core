@@ -5,9 +5,13 @@ cj(function($) {
     // Widgetize the content area
     .crmSnippet()
     // Open action links in a popup
-    .on('click', 'a.button, a.action-item:not(".crm-enable-disable")', function() {
+    .on('click', 'a.button, a.action-item', function() {
+      // only follow real links not javascript buttons
+      if ($(this).attr('href') === '#' || $(this).attr('onclick')) {console.log('bogus', this);
+        return;
+      }
       CRM.loadForm($(this).attr('href'), {
-        openInline: 'a:not(".crm-enable-disable")'
+        openInline: 'a:not([href="#"])'
       }).on('crmFormSuccess', function(e, data) {
         // Refresh page when form completes
         $('#crm-main-content-wrapper').crmSnippet('refresh');
