@@ -70,12 +70,12 @@ class CRM_Financial_Page_FinancialAccount extends CRM_Core_Page_Basic {
         ),
         CRM_Core_Action::DISABLE => array(
           'name'  => ts('Disable'),
-          'ref'   => 'disable-action',
+          'ref' => 'crm-enable-disable',
           'title' => ts('Disable Financial Type'),
         ),
         CRM_Core_Action::ENABLE  => array(
           'name'  => ts('Enable'),
-          'ref'   => 'enable-action',
+          'ref' => 'crm-enable-disable',
           'title' => ts('Enable Financial Type'),
         ),
         CRM_Core_Action::DELETE  => array(
