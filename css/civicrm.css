@@ -4020,21 +4020,17 @@ div.m ul#civicrm-menu,
 }
 
 /* in place edit  */
-.crm-container .crm-editable-enabled {
-  white-space: nowrap;
-}
-
 .crm-container .crm-editable-enabled,
 .crm-container .crm-editable-textarea-enabled {
+  white-space: nowrap;
   display: block;
   padding-left: 2px;
   border: 2px dashed transparent;
 }
 
 .crm-container .crm-editable-enabled:hover {
-  display: block;
-  padding-left: 2px;
   border: 2px dashed lightgrey;
+  cursor: pointer;
 }
 
 .crm-container .crm-editable-placeholder {
@@ -4057,6 +4053,10 @@ div.m ul#civicrm-menu,
 
 .crm-container h2.crm-editable-enabled input {
   min-height: 1.4em;
+}
+
+.crm-container td.crm-editable {
+  display: table-cell !important;
 }
 
 /*crm-10345*/
