@@ -7,7 +7,7 @@ cj(function($) {
     // Open action links in a popup
     .on('click', 'a.button, a.action-item', function() {
       // only follow real links not javascript buttons
-      if ($(this).attr('href') === '#' || $(this).attr('onclick')) {console.log('bogus', this);
+      if ($(this).attr('href') === '#' || $(this).attr('onclick')) {
         return;
       }
       CRM.loadForm($(this).attr('href'), {

@@ -32,7 +32,7 @@
     if (!ret.entity || !ret.id) {
       return false;
     }
-    $('.crm-editable', $row).each(function() {
+    $('.crm-editable, [data-field]', $row).each(function() {
       var fieldName = $(this).data('field') || this.className.match(/crmf-(\S*)/)[1];
       if (fieldName) {
         ret[fieldName] = $(this).text();
