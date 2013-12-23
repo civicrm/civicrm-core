@@ -56,7 +56,7 @@
         </tr>
         {foreach from=$rows item=row}
         <tr id="job-{$row.id}" class="crm-entity {cycle values="odd-row,even-row"} {$row.class}{if NOT $row.is_active} disabled{/if}">
-            <td class="crm-job-name"><strong>{$row.name}</strong> ({$row.run_frequency})<br/>
+            <td class="crm-job-name"><strong><span data-field="name">{$row.name}</span></strong> ({$row.run_frequency})<br/>
                 {$row.description}<br />
                 {ts}API Entity:{/ts} {$row.api_entity}<br/>
                 {ts}API Action:{/ts} <strong>{$row.api_action}</strong><br/>

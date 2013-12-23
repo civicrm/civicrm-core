@@ -67,7 +67,7 @@
          </tr>
         </thead>
         {foreach from=$customOption item=row}
-      <tr id="price_option-{$row.id}" class="crm-entity crm-price-option_{$row.id} {cycle values="odd-row,even-row"} {$row.class}{if NOT $row.is_active} disabled{/if}">
+      <tr id="price_field_value-{$row.id}" class="crm-entity {cycle values="odd-row,even-row"} {$row.class}{if NOT $row.is_active} disabled{/if}">
             <td class="crm-price-option-label crm-editable" data-field="label">{$row.label}</td>
             <td class="crm-price-option-value">{$row.amount|crmMoney}</td>
       <td class="crm-price-option-is_default">{if $row.is_default}<img src="{$config->resourceBase}i/check.gif" alt="{ts}Default{/ts}" />{/if}</td>
