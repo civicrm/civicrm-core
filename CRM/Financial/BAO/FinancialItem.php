@@ -85,6 +85,9 @@ class CRM_Financial_BAO_FinancialItem extends CRM_Financial_DAO_FinancialItem {
     elseif ($contribution->contribution_status_id == array_search('Pending', $contributionStatuses)) {
       $itemStatus = array_search('Unpaid', $financialItemStatus);
     }
+    elseif ($contribution->contribution_status_id == array_search('Partially paid', $contributionStatuses)) {
+      $itemStatus = array_search('Partially paid', $financialItemStatus);
+    }
     $params = array(
       'transaction_date'  => CRM_Utils_Date::isoToMysql($contribution->receive_date),
       'contact_id'        => $contribution->contact_id,
