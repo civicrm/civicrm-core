@@ -1061,19 +1061,15 @@ CRM.validate = CRM.validate || {
   });
 
   $.fn.crmAccordions = function (speed) {
-    var container = $('#crm-container');
-    if (speed === undefined) {
-      speed = 200;
-    }
-    if ($(this).length > 0) {
-      container = $(this);
-    }
-    if (container.length > 0 && !container.hasClass('crm-accordion-processed')) {
+    var container = $(this).length > 0 ? $(this) : $('.crm-container');
+    speed = speed === undefined ? 200 : speed;
+    container
+      .off('click.crmAccordions')
       // Allow normal clicking of links
-      container.on('click', 'div.crm-accordion-header a', function (e) {
+      .on('click.crmAccordions', 'div.crm-accordion-header a', function (e) {
         e.stopPropagation && e.stopPropagation();
-      });
-      container.on('click', '.crm-accordion-header, .crm-collapsible .collapsible-title', function () {
+      })
+      .on('click.crmAccordions', '.crm-accordion-header, .crm-collapsible .collapsible-title', function () {
         if ($(this).parent().hasClass('collapsed')) {
           $(this).next().css('display', 'none').slideDown(speed);
         }
@@ -1083,8 +1079,6 @@ CRM.validate = CRM.validate || {
         $(this).parent().toggleClass('collapsed');
         return false;
       });
-      container.addClass('crm-accordion-processed');
-    }
   };
   $.fn.crmAccordionToggle = function (speed) {
     $(this).each(function () {
