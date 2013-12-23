@@ -126,6 +126,16 @@ class CRM_Admin_Form extends CRM_Core_Form {
         )
       );
     }
+    elseif ($this->_action & CRM_Core_Action::VIEW) {
+      $this->addButtons(array(
+          array(
+            'type' => 'cancel',
+            'name' => ts('Done'),
+            'isDefault' => TRUE,
+          ),
+        )
+      );
+    }
     else {
       $this->addButtons(array(
           array(
