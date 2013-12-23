@@ -1465,6 +1465,15 @@ loadCampaign( {$this->_eID}, {$eventCampaigns} );
         if ($contributionParams['contribution_status_id'] == CRM_Core_OptionGroup::getValue('contribution_status', 'Pending', 'name')) {
           $contributionParams['is_pay_later'] = 1;
         }
+
+        // CRM-13964 partial_payment_total
+        if ($params['fee_amount'] > $params['total_amount']) {
+          // the owed amount
+          $contributionParams['partial_payment_total'] = $params['fee_amount'];
+          // the actual amount paid
+          $contributionParams['partial_amount_pay'] = $params['total_amount'];
+        }
+
         if ($this->_single) {
           if (empty($ids)) {
             $ids = array();
@@ -1513,10 +1522,10 @@ loadCampaign( {$this->_eID}, {$eventCampaigns} );
         foreach ($this->_lineItem as $key => $value) {
           if (is_array($value) && $value != 'skip') {
             foreach ($value as $lineKey => $line) {
-              //10117 update the line items for participants if contribution amount is recorded
-              if ($this->_quickConfig && CRM_Utils_Array::value('total_amount', $params )) {
-                $line['unit_price'] = $line['line_total'] = $params['total_amount'];
-              }
+              /* //10117 update the line items for participants if contribution amount is recorded */
+              /* if ($this->_quickConfig && CRM_Utils_Array::value('total_amount', $params )) { */
+              /*   $line['unit_price'] = $line['line_total'] = $params['total_amount']; */
+              /* } */
               $lineItem[$this->_priceSetId][$lineKey] = $line;
             }
             CRM_Price_BAO_LineItem::processPriceSet($participants[$num]->id, $lineItem, CRM_Utils_Array::value($num, $contributions, NULL), 'civicrm_participant');

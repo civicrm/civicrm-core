@@ -144,6 +144,14 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
       $params['contribution_status_id'] = CRM_Core_OptionGroup::getValue('contribution_status', 'Completed', 'name');
     }
 
+    // CRM-13964 partial payment
+    if (empty($contributionID)) {
+      if ($partialAmtTotal = CRM_Utils_Array('partial_amount_total', $params)
+        && $partialAmtPay = CRM_Utils_Array('partial_amount_pay', $params)) {
+        $params['total_amount'] = $partialAmtTotal;
+        $params['status_id'] = CRM_Core_OptionGroup::getValue('contribution_status', 'Partially paid', 'name');
+      }
+    }
     if ($contributionID) {
       CRM_Utils_Hook::pre('edit', 'Contribution', $contributionID, $params);
     }
@@ -2524,6 +2532,16 @@ WHERE  contribution_id = %1 ";
       $update = TRUE;
     }
 
+    $statusId = $params['contribution']->contribution_status_id;
+    // CRM-13964 partial payment
+    if (CRM_Utils_Array::value('contribution_status_id', $params) != array_search('Partially Paid', $contributionStatuses)
+      && $partialAmtTotal = CRM_Utils_Array('partial_amount_total', $params)
+      && $partialAmtPay = CRM_Utils_Array('partial_amount_pay', $params)) {
+      $params['total_amount'] = $partialAmtPay;
+      $statusId = CRM_Core_OptionGroup::getValue('contribution_status', 'Completed', 'name');
+      // new creation of financial trasaction for the balance amount
+    }
+
     // build line item array if its not set in $params
     if (!CRM_Utils_Array::value('line_item', $params) || $additionalParticipantId) {
       CRM_Price_BAO_LineItem::getLineItemArray($params, $entityID, str_replace('civicrm_', '', $entityTable));
@@ -2552,6 +2570,7 @@ WHERE  contribution_id = %1 ";
       if (!isset($totalAmount) && CRM_Utils_Array::value('prevContribution', $params)) {
         $totalAmount = $params['total_amount'] = $params['prevContribution']->total_amount;
       }
+
       //build financial transaction params
       $trxnParams = array(
         'contribution_id' => $params['contribution']->id,
@@ -2562,7 +2581,7 @@ WHERE  contribution_id = %1 ";
         'net_amount' => CRM_Utils_Array::value('net_amount', $params),
         'currency' => $params['contribution']->currency,
         'trxn_id' => $params['contribution']->trxn_id,
-        'status_id' => $params['contribution']->contribution_status_id,
+        'status_id' => $statusId,
         'payment_instrument_id' => $params['contribution']->payment_instrument_id,
         'check_number' => CRM_Utils_Array::value('check_number', $params),
       );
