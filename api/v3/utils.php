@@ -287,16 +287,24 @@ function _civicrm_api3_get_DAO($name) {
     $name = 'Contact';
   }
 
-  //hack to deal with incorrectly named BAO/DAO - see CRM-10859 -
-  // several of these have been removed but am not confident mailing_recipients is
-  // tests so have not tackled.
+  // hack to deal with incorrectly named BAO/DAO - see CRM-10859
+
+  // FIXME: DAO should be renamed CRM_Mailing_DAO_MailingRecipients
+  // but am not confident mailing_recipients is tested so have not tackled.
   if ($name == 'MailingRecipients') {
-    return 'CRM_Mailing_BAO_Recipients';
+    return 'CRM_Mailing_DAO_Recipients';
   }
+  // FIXME: DAO should be renamed CRM_ACL_DAO_AclRole
   if ($name == 'AclRole') {
     return 'CRM_ACL_DAO_EntityRole';
   }
-  // correct approach for im & acl is unclear
+  // FIXME: DAO should be renamed CRM_SMS_DAO_SmsProvider
+  // But this would impact SMS extensions so need to coordinate
+  // Probably best approach is to migrate them to use the api and decouple them from core BAOs
+  if ($name == 'SmsProvider') {
+    return 'CRM_SMS_DAO_Provider';
+  }
+  // FIXME: DAO names should follow CamelCase convention
   if ($name == 'Im' || $name == 'Acl') {
     $name = strtoupper($name);
   }
@@ -311,6 +319,10 @@ function _civicrm_api3_get_DAO($name) {
  * @return mixed
  */
 function _civicrm_api3_get_BAO($name) {
+  // FIXME: DAO should be renamed CRM_Badge_DAO_BadgeLayout
+  if ($name == 'PrintLabel') {
+    return 'CRM_Badge_BAO_Layout';
+  }
   $dao = _civicrm_api3_get_DAO($name);
   if (!$dao) {
     return NULL;
