@@ -651,7 +651,7 @@
             buttons[$link.text()] = function() {
               var form2 = CRM.loadForm($link.attr('href'), {
                 cancelButton: '.cancel.form-submit, #done',
-                openInline: 'a.action-item:not(".enable-action, .disable-action")',
+                openInline: 'a.action-item:not([href="#"])',
                 dialog: {
                   width: '60%',
                   height: parseInt($(window).height() * .8)
