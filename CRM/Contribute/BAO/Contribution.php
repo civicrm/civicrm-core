@@ -146,19 +146,20 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
 
     // CRM-13964 partial payment
     if (empty($contributionID)) {
-      if ($partialAmtTotal = CRM_Utils_Array('partial_amount_total', $params)
-        && $partialAmtPay = CRM_Utils_Array('partial_amount_pay', $params)) {
+      if (!empty($params['partial_payment_total']) && !empty($params['partial_amount_pay'])) {
+        $partialAmtTotal = $params['partial_payment_total'];
+        $partialAmtPay = $params['partial_amount_pay'];
         $params['total_amount'] = $partialAmtTotal;
-        $params['status_id'] = CRM_Core_OptionGroup::getValue('contribution_status', 'Partially paid', 'name');
+        $params['contribution_status_id'] = CRM_Core_OptionGroup::getValue('contribution_status', 'Partially paid', 'name');
       }
     }
+
     if ($contributionID) {
       CRM_Utils_Hook::pre('edit', 'Contribution', $contributionID, $params);
     }
     else {
       CRM_Utils_Hook::pre('create', 'Contribution', NULL, $params);
     }
-
     $contribution = new CRM_Contribute_BAO_Contribution();
     $contribution->copyValues($params);
 
@@ -2534,12 +2535,46 @@ WHERE  contribution_id = %1 ";
 
     $statusId = $params['contribution']->contribution_status_id;
     // CRM-13964 partial payment
-    if (CRM_Utils_Array::value('contribution_status_id', $params) != array_search('Partially Paid', $contributionStatuses)
-      && $partialAmtTotal = CRM_Utils_Array('partial_amount_total', $params)
-      && $partialAmtPay = CRM_Utils_Array('partial_amount_pay', $params)) {
-      $params['total_amount'] = $partialAmtPay;
+    if (CRM_Utils_Array::value('contribution_status_id', $params) == array_search('Partially paid', $contributionStatuses)
+      && !empty($params['partial_payment_total']) && !empty($params['partial_amount_pay'])) {
+      $partialAmtPay = $params['partial_amount_pay'];
+      $partialAmtTotal = $params['partial_payment_total'];
+
       $statusId = CRM_Core_OptionGroup::getValue('contribution_status', 'Completed', 'name');
+      $params['total_amount'] = $partialAmtPay;
       // new creation of financial trasaction for the balance amount
+      /* steps to follow :
+         fetch the current balance, if balance is not present add the balance after appropriate calculation
+         if balance is present take the current amount and re-calculate the balance and update the balance stored in DB
+      */
+      $balanceTrxnInfo = CRM_Core_BAO_FinancialTrxn::getBalanceTrxnAmt($params['contribution']->id, $params['financial_type_id']);
+      if (!empty($balanceTrxnInfo['trxn_id'])) {
+        // update the balance amt
+        $balanceTrxnParams['total_amount'] = $balanceTrxnInfo['total_amount'] - $partialAmtPay;
+        $balanceTrxnParams['id'] = $balanceTrxnInfo['trxn_id'];
+      }
+      else {
+        // create new balance transaction record
+        $relationTypeId = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Accounts Receivable Account is' "));
+        $toFinancialAccount = CRM_Contribute_PseudoConstant::financialAccountType($params['financial_type_id'], $relationTypeId);
+
+        $balanceTrxnParams['total_amount'] = $partialAmtTotal - $partialAmtPay;
+        $balanceTrxnParams['to_financial_account_id'] = $toFinancialAccount;
+        $balanceTrxnParams['contribution_id'] = $params['contribution']->id;
+
+        $balanceTrxnParams['trxn_date'] = date('YmdHis');
+        $balanceTrxnParams['fee_amount'] = CRM_Utils_Array::value('fee_amount', $params);
+        $balanceTrxnParams['net_amount'] = CRM_Utils_Array::value('net_amount', $params);
+        $balanceTrxnParams['currency'] = $params['contribution']->currency;
+        $balanceTrxnParams['trxn_id'] = $params['contribution']->trxn_id;
+        $balanceTrxnParams['status_id'] = $statusId;
+        $balanceTrxnParams['payment_instrument_id'] = $params['contribution']->payment_instrument_id;
+        $balanceTrxnParams['check_number'] = CRM_Utils_Array::value('check_number', $params);
+        if (CRM_Utils_Array::value('payment_processor', $params)) {
+          $balanceTrxnParams['payment_processor_id'] = $params['payment_processor'];
+        }
+      }
+      CRM_Core_BAO_FinancialTrxn::create($balanceTrxnParams);
     }
 
     // build line item array if its not set in $params
