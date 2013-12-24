@@ -701,7 +701,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
       foreach ($groups as $id => $value) {
         $groupList[$id]['group_id'] = $value['id'];
         $groupList[$id]['group_name'] = $value['title'];
-        $groupList[$id]['class'] = $value['class'];
+        $groupList[$id]['class'] = implode(' ', $value['class']);
 
         // append parent names if in search mode
         if ( !CRM_Utils_Array::value('parent_id', $params) &&
@@ -712,7 +712,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
             $title[] = $allGroups[$gId];
           }
           $groupList[$id]['group_name'] .= '<div class="crm-row-parent-name"><em>'.ts('Child of').'</em>: ' . implode(', ', $title) . '</div>';
-          $groupList[$id]['class'] = '';
+          $groupList[$id]['class'] = in_array('disabled', $value['class']) ? 'disabled' : '';
         }
 
         $groupList[$id]['group_description'] = CRM_Utils_Array::value('description', $value);
@@ -813,7 +813,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
 
       if ($permission) {
         $newLinks = $links;
-        $values[$object->id] = array();
+        $values[$object->id] = array('class' => array());
         CRM_Core_DAO::storeValues($object, $values[$object->id]);
         if ($object->saved_search_id) {
           $values[$object->id]['title'] .= ' (' . ts('Smart Group') . ')';
@@ -842,13 +842,12 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
           }
         }
 
-        $values[$object->id]['class'] = '';
         if (array_key_exists('is_active', $object)) {
           if ($object->is_active) {
             $action -= CRM_Core_Action::ENABLE;
           }
           else {
-            $values[$object->id]['class'] = 'disabled';
+            $values[$object->id]['class'][] = 'disabled';
             $action -= CRM_Core_Action::VIEW;
             $action -= CRM_Core_Action::DISABLE;
           }
@@ -885,18 +884,13 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
         // If group has children, add class for link to view children
         $values[$object->id]['is_parent'] = false;
         if (array_key_exists('children', $values[$object->id])) {
-          $values[$object->id]['class'] = "crm-group-parent";
+          $values[$object->id]['class'][] = "crm-group-parent";
           $values[$object->id]['is_parent'] = true;
         }
 
         // If group is a child, add child class
         if (array_key_exists('parents', $values[$object->id])) {
-          $values[$object->id]['class'] = "crm-group-child";
-        }
-
-        if (array_key_exists('children', $values[$object->id])
-        && array_key_exists('parents', $values[$object->id])) {
-          $values[$object->id]['class'] = "crm-group-child crm-group-parent";
+          $values[$object->id]['class'][] = "crm-group-child";
         }
 
         if ($groupOrg) {

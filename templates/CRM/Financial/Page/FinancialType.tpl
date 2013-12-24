@@ -55,7 +55,7 @@
          {foreach from=$rows item=row}
         <tr id="financial_type-{$row.id}" class="crm-entity {cycle values="odd-row,even-row"} {$row.class}{if NOT $row.is_active} disabled{/if}">
           <td class="crm-editable" data-field="name">{$row.name}</td>
-          <td class="crm-editable" data-field="description">{$row.description}</td>
+          <td class="crm-editable" data-field="description" data-type="textarea">{$row.description}</td>
      <td>{$row.financial_account}</td>
           <td>{if $row.is_deductible eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
           <td>{if $row.is_reserved eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>

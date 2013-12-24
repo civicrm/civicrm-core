@@ -23,12 +23,8 @@
       el = this[0],
       ret = {},
       $row = this.first().closest('.crm-entity');
-    ret.entity = $row.data('entity');
-    ret.id = $row.data('id');
-    if (!ret.entity || !ret.id) {
-      ret.entity = $row[0].id.split('-')[0];
-      ret.id = $row[0].id.split('-')[1];
-    }
+    ret.entity = $row.data('entity') || $row[0].id.split('-')[0];
+    ret.id = $row.data('id') || $row[0].id.split('-')[1];
     if (!ret.entity || !ret.id) {
       return false;
     }

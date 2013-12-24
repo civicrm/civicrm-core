@@ -51,7 +51,7 @@
       <tr id="contact_type-{$row.id}" class="{cycle values="odd-row,even-row"} {$row.class} crm-contactType crm-entity {if NOT $row.is_active} disabled{/if}">
         <td class="crm-contactType-label crm-editable" data-field="label">{ts}{$row.label}{/ts}</td>
         <td class="crm-contactType-parent">{if $row.parent}{ts}{$row.parent_label}{/ts}{else}{ts}(built-in){/ts}{/if}</td>
-        <td class="crm-contactType-description crm-editable" data-field="description">{$row.description}</td>
+        <td class="crm-contactType-description crm-editable" data-field="description" data-type="textarea">{$row.description}</td>
         <td>{$row.action|replace:'xx':$row.id}</td>
     </tr>
     {/foreach}
