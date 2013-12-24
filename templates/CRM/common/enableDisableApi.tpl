@@ -30,10 +30,12 @@
     var $row, $table, info, enabled, fieldLabel;
 
     function refresh() {
-      if (false && $.fn.DataTable.fnIsDataTable($table[0])) { // fixme why doesn't this work?
-        $table.dataTable().fnDraw();
-      } else {
-        // Refresh an existing ajax container or create a new one
+      // Call native refresh method on ajax datatables
+      if ($.fn.DataTable.fnIsDataTable($table[0]) && $table.dataTable().fnSettings().sAjaxSource) {
+        $table.unblock().dataTable().fnDraw();
+      }
+      // Otherwise refresh the content area using crmSnippet
+      else {
         $row.closest('.crm-ajax-container, #crm-main-content-wrapper').crmSnippet().crmSnippet('refresh');
       }
       {/literal} {* client-side variable substitutions in smarty are AWKWARD! *}

@@ -51,7 +51,7 @@
           {foreach from=$rows item=row}
             <tr id="print_label-{$row.id}" class="crm-entity {cycle values="odd-row,even-row"} {$row.class} crm-badge-layout {if NOT $row.is_active} disabled{/if}">
               <td class="crm-badge-layout-title crm-editable" data-field="title">{$row.title}</td>
-              <td class="crm-badge-layout-description crm-editable" data-field="description">{$row.description}</td>
+              <td class="crm-badge-layout-description crm-editable" data-field="description" data-type="textarea">{$row.description}</td>
               <td id="row_{$row.id}_status" class="crm-badge-layout-is_active">
                 {if $row.is_active eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}
               </td>

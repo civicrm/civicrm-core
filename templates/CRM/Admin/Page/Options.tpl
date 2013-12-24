@@ -134,7 +134,7 @@
               <td class="yes-no crm-admin-options-filter">{if $row.filter eq 1}<img src="{$config->resourceBase}i/check.gif" alt="{ts}Counted{/ts}" />{/if}</td>
             {/if}
             {if $showVisibility}<td class="crm-admin-visibility_label">{$row.visibility_label}</td>{/if}
-            <td class="crm-admin-options-description crm-editable" data-field="description" data-action="create">{$row.description}</td>
+            <td class="crm-admin-options-description crm-editable" data-field="description" data-type="textarea">{$row.description}</td>
             <td class="nowrap crm-admin-options-order">{$row.order}</td>
             {if $showIsDefault}
               <td class="crm-admin-options-is_default" align="center">{if $row.is_default eq 1}<img src="{$config->resourceBase}i/check.gif" alt="{ts}Default{/ts}" />{/if}&nbsp;</td>
