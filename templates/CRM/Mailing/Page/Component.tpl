@@ -46,8 +46,8 @@
         <th></th>
         </thead>
        {foreach from=$rows item=row}
-         <tr id="row_{$row.id}" class="{cycle values="odd-row,even-row"} {$row.class}{if NOT $row.is_active} disabled{/if}">
-           <td>{$row.name}</td>
+         <tr id="mailing_component-{$row.id}" class="crm-entity {cycle values="odd-row,even-row"} {$row.class}{if NOT $row.is_active} disabled{/if}">
+           <td class="crm-editable" data-field="name">{$row.name}</td>
            <td>{$row.component_type}</td>
            <td>{$row.subject}</td>
            <td>{$row.body_text}</td>
