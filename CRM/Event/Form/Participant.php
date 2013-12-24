@@ -1161,6 +1161,7 @@ loadCampaign( {$this->_eID}, {$eventCampaigns} );
     }
 
     $this->_params = $params;
+    $amountOwed = $params['amount'];
     unset($params['amount']);
     $params['register_date'] = CRM_Utils_Date::processDate($params['register_date'], $params['register_date_time']);
     $params['receive_date'] = CRM_Utils_Date::processDate(CRM_Utils_Array::value('receive_date', $params));
@@ -1467,13 +1468,12 @@ loadCampaign( {$this->_eID}, {$eventCampaigns} );
         }
 
         // CRM-13964 partial_payment_total
-        if ($params['fee_amount'] > $params['total_amount']) {
+        if ($amountOwed > $params['total_amount']) {
           // the owed amount
-          $contributionParams['partial_payment_total'] = $params['fee_amount'];
+          $contributionParams['partial_payment_total'] = $amountOwed;
           // the actual amount paid
           $contributionParams['partial_amount_pay'] = $params['total_amount'];
         }
-
         if ($this->_single) {
           if (empty($ids)) {
             $ids = array();
