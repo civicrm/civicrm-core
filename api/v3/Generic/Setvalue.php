@@ -26,7 +26,7 @@ function civicrm_api3_generic_setValue($apiRequest) {
   }
 
   $def = $fields[$field];
-  if (array_key_exists('required', $def) && empty($value)) {
+  if (array_key_exists('required', $def) && CRM_Utils_System::isNull($value)) {
     return civicrm_api3_create_error(ts("This can't be empty, please provide a value"), array("error_code" => "required", "field" => $field));
   }
 
