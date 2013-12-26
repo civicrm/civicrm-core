@@ -76,7 +76,7 @@
     {/if}
 
     <div class="crm-submit-buttons">
-        {* Check permissions and make sure this is not a related membership (edit and delete not allowed for related memberships) *}
+        {* Check permissions and make sure this is not a related membership (delete not allowed for related memberships) *}
         {if call_user_func(array('CRM_Core_Permission','check'), 'edit memberships') }
           {assign var='urlParams' value="reset=1&id=$id&cid=$contact_id&action=update&context=$context"}
           {if ( $context eq 'fulltext' || $context eq 'search' ) && $searchKey}

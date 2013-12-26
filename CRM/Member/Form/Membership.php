@@ -180,7 +180,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       }
       // also check for billing information
       // get the billing location type
-      $locationTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id');
+      $locationTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id', array(), 'validate');
       // CRM-8108 remove ts around Billing location type
       //$this->_bltID = array_search( ts('Billing'),  $locationTypes );
       $this->_bltID = array_search('Billing', $locationTypes);
@@ -324,9 +324,10 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
     $defaults = parent::setDefaultValues();
 
     //setting default join date and receive date
-    list($now) = CRM_Utils_Date::setDateDefaults();
+    list($now, $currentTime) = CRM_Utils_Date::setDateDefaults();
     if ($this->_action == CRM_Core_Action::ADD) {
       $defaults['receive_date'] = $now;
+      $defaults['receive_date_time'] = $currentTime;
     }
 
     if (is_numeric($this->_memType)) {
@@ -720,7 +721,6 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
         $elements[] = $statusOverride;
       }
       
-      // TODO: Need to only show this if membership is inherited
       if ($this->_ownerMemId) {
         $this->addElement('checkbox', 'owner_membership_custom_override', ts('Override inherited custom fields?'));
       }

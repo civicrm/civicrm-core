@@ -286,7 +286,12 @@ SELECT r.id, c.id as cid, c.display_name as name, c.job_title as comment,
                 'id' => CRM_Utils_Request::retrieve('id', 'Positive', $this),
                 'cid' => $row['cid'],
                 'mid' => $row['mid'],
-              )
+              ),
+              ts('more'),
+              FALSE,
+              'membership.relationship.action',
+              'Relationship',
+              CRM_Utils_Request::retrieve('id', 'Positive', $this)
             );
           }
           else {
@@ -296,7 +301,12 @@ SELECT r.id, c.id as cid, c.display_name as name, c.job_title as comment,
                   'id' => CRM_Utils_Request::retrieve('id', 'Positive', $this),
                   'cid' => $row['cid'],
                   'rid' => $row['cid'],
-                )
+                ),
+                ts('more'),
+                FALSE,
+                'membership.relationship.action',
+                'Relationship',
+                CRM_Utils_Request::retrieve('id', 'Positive', $this)
               );
             }
           }
