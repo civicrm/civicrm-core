@@ -122,7 +122,12 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
           array(
             'id' => $dao->id,
             'cid' => $this->_contactId,
-          )
+          ),
+          ts('more'),
+          FALSE,
+          'membership.tab.row',
+          'Membership',
+          $dao->id
         );
       }
       else {
@@ -139,7 +144,12 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
           array(
             'id' => $dao->id,
             'cid' => $this->_contactId,
-          )
+          ),
+          ts('more'),
+          FALSE,
+          'membership.tab.row',
+          'Membership',
+          $dao->id
         );
       }
 
@@ -185,7 +195,12 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
         array(
           'id' => $value['id'],
           'cid' => $this->_contactId,
-        )
+          ),
+          ts('more'),
+          FALSE,
+          'membershipType.organization.action',
+          'MembershipType',
+          $value['id']
       );
     }
 

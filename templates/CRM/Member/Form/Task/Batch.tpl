@@ -37,22 +37,25 @@
               <th>{$fTitle}</th>
            {/foreach}
               {foreach from=$fields item=field key=fieldName}
+
                 <td><img  src="{$config->resourceBase}i/copy.png" alt="{ts 1=$field.title}Click to copy %1 from row one to all rows.{/ts}" fname="{$field.name}" class="action-icon" title="{ts}Click here to copy the value in row one to ALL rows.{/ts}" />{$field.title}</td>
              {/foreach}
             </tr>
           </thead>
             {foreach from=$componentIds item=mid}
              <tr class="{cycle values="odd-row,even-row"}" entity_id="{$mid}">
+
         {foreach from=$readOnlyFields item=fTitle key=fName}
            <td>{$contactDetails.$mid.$fName}</td>
         {/foreach}
               {foreach from=$fields item=field key=fieldName}
+
                 {assign var=n value=$field.name}
                 {if ( $fields.$n.data_type eq 'Date') or ($n eq 'join_date') or ($n eq 'membership_start_date') or ($n eq 'membership_end_date')}
                    <td class="compressed">{include file="CRM/common/jcalendar.tpl" elementName=$n elementIndex=$mid batchUpdate=1}</td>
                 {else}
                   <td class="compressed">{$form.field.$mid.$n.html}</td>
-                {/if}                                                            
+                {/if}
               {/foreach}
              </tr>
             {/foreach}
