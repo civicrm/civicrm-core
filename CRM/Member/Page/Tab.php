@@ -195,12 +195,12 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
         array(
           'id' => $value['id'],
           'cid' => $this->_contactId,
-          ),
-          ts('more'),
-          FALSE,
-          'membershipType.organization.action',
-          'MembershipType',
-          $value['id']
+        ),
+        ts('more'),
+        FALSE,
+        'membershipType.organization.action',
+        'MembershipType',
+        $value['id']
       );
     }
 
