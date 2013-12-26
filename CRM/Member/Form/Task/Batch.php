@@ -154,8 +154,43 @@ class CRM_Member_Form_Task_Batch extends CRM_Member_Form_Task {
     }
 
     $customFields = CRM_Core_BAO_CustomField::getFields('Membership');
-    foreach ($this->_memberIds as $memberId) {
+    $relatedCantOverride = array();
+    foreach ($this->_memberIds as $key => $memberId) {
       $typeId = CRM_Core_DAO::getFieldValue("CRM_Member_DAO_Membership", $memberId, 'membership_type_id');
+      if (!array_key_exists('owner_membership_custom_override', $this->_fields)) {
+        $ownerMem = CRM_Core_DAO::getFieldValue("CRM_Member_DAO_Membership", $memberId, 'owner_membership_id');
+        if ($ownerMem) {
+          $override = CRM_Core_DAO::getFieldValue("CRM_Member_DAO_Membership", $memberId, 'owner_membership_custom_override');
+          if (!$override) {
+            $relatedCantOverride[] = $memberId;
+            unset($this->_memberIds[$key]);
+            continue;
+          }
+          $needsCustomFields = true;
+          // check if any applicable custom fields
+          foreach ($this->_fields as $name => $field) {
+            if ($customFieldID = CRM_Core_BAO_CustomField::getKeyID($name)) {
+              $customValue = CRM_Utils_Array::value($customFieldID, $customFields);
+              if (CRM_Utils_Array::value('extends_entity_column_value', $customValue)) {
+                $entityColumnValue = explode(CRM_Core_DAO::VALUE_SEPARATOR,
+                  $customValue['extends_entity_column_value']
+                );
+              }
+              if ((CRM_Utils_Array::value($typeId, $entityColumnValue)) ||
+                CRM_Utils_System::isNull($entityColumnValue[$typeId])
+              ) {
+                $needsCustomFields = false;
+                break;
+              }
+            }
+          }
+          if ($needsCustomFields) {
+            $relatedCantOverride[] = $memberId;
+            unset($this->_memberIds[$key]);
+            continue;
+          }
+        }
+      }
       foreach ($this->_fields as $name => $field) {
         if ($customFieldID = CRM_Core_BAO_CustomField::getKeyID($name)) {
           $customValue = CRM_Utils_Array::value($customFieldID, $customFields);
@@ -168,6 +203,7 @@ class CRM_Member_Form_Task_Batch extends CRM_Member_Form_Task {
             CRM_Utils_System::isNull($entityColumnValue[$typeId])
           ) {
             CRM_Core_BAO_UFGroup::buildProfile($this, $field, NULL, $memberId);
+            $needsCustomFields;
           }
         }
         else {
@@ -175,6 +211,18 @@ class CRM_Member_Form_Task_Batch extends CRM_Member_Form_Task {
           CRM_Core_BAO_UFGroup::buildProfile($this, $field, NULL, $memberId);
         }
       }
+    }
+    
+    $this->assign('componentIds', $this->_memberIds);
+    
+    if (count($relatedCantOverride)) {
+      $contactDetails = CRM_Contact_BAO_Contact_Utils::contactDetails($relatedCantOverride, 'CiviMember', array('sort_name' => 1));
+      $msgNames = array();
+      foreach ($contactDetails as $contact) {
+        $msgNames[] = CRM_Utils_Array::value('sort_name', $contact);
+      }
+      $msgNames = '<ul><li>' . implode('</li><li>', $msgNames) . '</li></ul>';
+      CRM_Core_Session::setStatus(ts("The following related contact(s) could not have their inherited memberships updated:") . $msgNames, ts('Related memberships'), 'warning');
     }
 
     $this->assign('fields', $this->_fields);

@@ -27,8 +27,8 @@
 <div class="crm-block crm-content-block crm-membership-view-form-block">
     <h3>{ts}View Membership{/ts}</h3>
     <div class="crm-submit-buttons">
-        {* Check permissions and make sure this is not an inherited membership (edit and delete not allowed for inherited memberships) *}
-        {if ! $owner_contact_id AND call_user_func(array('CRM_Core_Permission','check'), 'edit memberships') }
+        {* Check permissions and make sure this is not an inherited membership ( delete not allowed for inherited memberships) *}
+        {if call_user_func(array('CRM_Core_Permission','check'), 'edit memberships') }
       {assign var='urlParams' value="reset=1&id=$id&cid=$contact_id&action=update&context=$context"}
       {if ( $context eq 'fulltext' || $context eq 'search' ) && $searchKey}
       {assign var='urlParams' value="reset=1&id=$id&cid=$contact_id&action=update&context=$context&key=$searchKey"}
@@ -60,6 +60,9 @@
         <tr><td class="label">{ts}Start date{/ts}</td><td>{$start_date|crmDate}</td></tr>
         <tr><td class="label">{ts}End date{/ts}</td><td>{$end_date|crmDate}</td></tr>
         <tr><td class="label">{ts}Auto-renew{/ts}</td><td>{$auto_renew}</td></tr>
+        {if $owner_contact_id}        
+        <tr><td class="label">{ts}Override inherited custom fields{/ts}</td><td>{$owner_membership_custom_override}</td></tr>
+        {/if}
     </table>
 
     {include file="CRM/Custom/Page/CustomDataView.tpl"}
@@ -73,8 +76,8 @@
     {/if}
 
     <div class="crm-submit-buttons">
-        {* Check permissions and make sure this is not a related membership (edit and delete not allowed for related memberships) *}
-        {if ! $owner_contact_id AND call_user_func(array('CRM_Core_Permission','check'), 'edit memberships') }
+        {* Check permissions and make sure this is not a related membership (delete not allowed for related memberships) *}
+        {if call_user_func(array('CRM_Core_Permission','check'), 'edit memberships') }
           {assign var='urlParams' value="reset=1&id=$id&cid=$contact_id&action=update&context=$context"}
           {if ( $context eq 'fulltext' || $context eq 'search' ) && $searchKey}
             {assign var='urlParams' value="reset=1&id=$id&cid=$contact_id&action=update&context=$context&key=$searchKey"}

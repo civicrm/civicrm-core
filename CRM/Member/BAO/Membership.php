@@ -291,11 +291,25 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
       $transaction->rollback();
       return $membership;
     }
+    
+    if (!$membership->owner_membership_id) {
+      $params['owner_membership_custom_override'] == 0;
+    }
 
-    // add custom field values
+    // add custom field values if it's the primary membership
+    // or if it's a related membership without the inherited custom field override
     if (CRM_Utils_Array::value('custom', $params)
       && is_array($params['custom'])
+      && !($membership->owner_membership_id && $membership->owner_membership_custom_override)
     ) {
+      // If it's a related membership, the custom value id won't be the same as the original's
+      if (isset($membership->owner_membership_id)) {
+        foreach ($params['custom'] as $k => $v) {
+          foreach ($v as $i => $d) {
+            unset($params['custom'][$k][$i]['id']);
+          }
+        }
+      } 
       CRM_Core_BAO_CustomValueTable::store($params['custom'], 'civicrm_membership', $membership->id);
     }
 
@@ -2098,6 +2112,9 @@ WHERE  civicrm_membership.contact_id = civicrm_contact.id
         $relMemIds = array();
         if ($relMembership->find(TRUE)) {
           $params['id'] = $relMemIds['membership'] = $relMembership->id;
+          
+          // this will be specific to the related membership
+          $params['owner_membership_custom_override'] = $relMembership->owner_membership_custom_override;
         }
         $params['contact_id'] = $contactId;
         $params['owner_membership_id'] = $membership->id;
@@ -2135,7 +2152,7 @@ WHERE  civicrm_membership.contact_id = civicrm_contact.id
           // related membership already exists, so this is just an update
           if (isset($params['id'])) {
             if ($available > 0) {
-        CRM_Member_BAO_Membership::create($params, $relMemIds);
+              CRM_Member_BAO_Membership::create($params, $relMemIds);
               $available --;
             } else { // we have run out of inherited memberships, so delete extras
               self::deleteMembership($params['id']);

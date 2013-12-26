@@ -248,4 +248,13 @@
     <key>id</key>
     <onDelete>SET NULL</onDelete>
   </foreignKey>
+  <field>
+    <name>owner_membership_custom_override</name>
+    <title>Override Parent Membership Custom Fields</title>
+    <type>boolean</type>
+    <default>0</default>
+    <import>true</import>
+    <comment>A value of 1 on a related membership prevents it from inheriting custom field values from the original membership</comment>
+    <add>4.5</add>
+  </field>
 </table>

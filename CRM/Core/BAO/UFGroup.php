@@ -1763,7 +1763,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
         FALSE,
         'contact.profileimage.delete',
         'Contact',
-        $form->get('id')
+        $form->get('id'),       
       );
       $form->assign('deleteURL', $deleteURL);
     }
@@ -2024,7 +2024,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
       'receive_date', 'receipt_date', 'thankyou_date', 'cancel_date'))) {
       $form->addDateTime($name, $title, $required, array('formatType' => 'activityDateTime'));
     }
-    elseif ($fieldName == 'send_receipt') {
+    elseif (in_array($fieldName, array('send_receipt', 'owner_membership_custom_override'))) {
       $form->addElement('checkbox', $name, $title);
     }
     elseif ($fieldName == 'soft_credit') {
@@ -2390,7 +2390,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
                         }
                         else {
                           $defaults[$fldName] = $value['country_id'];
-                        }
+                        }                        
                       }
                       elseif ($fieldName == 'phone') {
                         if ($phoneTypeId) {

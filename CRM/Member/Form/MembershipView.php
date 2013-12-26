@@ -387,6 +387,8 @@ SELECT r.id, c.id as cid, c.display_name as name, c.job_title as comment,
       $campaigns = CRM_Campaign_BAO_Campaign::getCampaigns($campaignId);
       $values['campaign'] = $campaigns[$campaignId];
     }
+    
+    $values['owner_membership_custom_override'] = (CRM_Utils_Array::value('owner_membership_custom_override', $values)) ? 'Yes' : 'No';
 
     $this->assign($values);
   }

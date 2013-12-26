@@ -71,7 +71,7 @@
     <td>
         {$row.action|replace:'xx':$row.membership_id}
         {if $row.owner_membership_id}
-            <a href="{crmURL p='civicrm/membership/view' q="reset=1&id=`$row.owner_membership_id`&action=view&context=search"}" title="{ts}View Primary member record{/ts}" class="action-item">{ts}View Primary{/ts}</a>
+            <a href="{crmURL p='civicrm/contact/view/membership' q="reset=1&id=`$row.membership_id`&cid=`$row.contact_id`&action=update&context=search"}" title="{ts}Edit Membership{/ts}" class="action-item">{ts}Edit{/ts}</a><a href="{crmURL p='civicrm/membership/view' q="reset=1&id=`$row.owner_membership_id`&action=view&context=search"}" title="{ts}View Primary member record{/ts}" class="action-item">{ts}View Primary{/ts}</a>
         {/if}
     </td>
    </tr>
