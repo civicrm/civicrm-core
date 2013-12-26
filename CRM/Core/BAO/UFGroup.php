@@ -1763,7 +1763,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
         FALSE,
         'contact.profileimage.delete',
         'Contact',
-        $form->get('id'),       
+        $form->get('id')
       );
       $form->assign('deleteURL', $deleteURL);
     }
