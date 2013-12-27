@@ -420,31 +420,29 @@ class CRM_Campaign_Page_DashBoard extends CRM_Core_Page {
   }
 
   function browse() {
-    CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'js/crm.livePage.js');
-    $this->_tabs = array('campaign' => ts('Campaigns'),
+    $this->_tabs = array(
+      'campaign' => ts('Campaigns'),
       'survey' => ts('Surveys'),
       'petition' => ts('Petitions'),
     );
 
     $subPageType = CRM_Utils_Request::retrieve('type', 'String', $this);
     if ($subPageType) {
+      if (!isset($this->_tabs[$subPageType])) {
+        CRM_Utils_System::permissionDenied();
+      }
       //load the data in tabs.
       $this->{'browse' . ucfirst($subPageType)}();
+      $this->assign('subPageType', ucfirst($subPageType));
     }
     else {
       //build the tabs.
       $this->buildTabs();
     }
-    $this->assign('subPageType', $subPageType);
 
     //give focus to proper tab.
-    $selectedTabIndex = array_search(strtolower(CRM_Utils_Array::value('subPage', $_GET, 'campaign')),
-      array_keys($this->_tabs)
-    );
-    if (!$selectedTabIndex) {
-      $selectedTabIndex = array_search('campaign', array_keys($this->_tabs));
-    }
-    $this->assign('selectedTabIndex', $selectedTabIndex);
+    $selectedTabIndex = strtolower(CRM_Utils_Array::value('subPage', $_GET, 'campaign'));
+    $this->assign('selectedTab', $selectedTabIndex);
   }
 
   function run() {
@@ -460,14 +458,14 @@ class CRM_Campaign_Page_DashBoard extends CRM_Core_Page {
   function buildTabs() {
     $allTabs = array();
     foreach ($this->_tabs as $name => $title) {
-      $allTabs[] = array(
-        'id' => $name,
+      $allTabs[$name] = array(
         'title' => $title,
-        'url' => CRM_Utils_System::url('civicrm/campaign', "reset=1&type=$name&snippet=1"),
+        'valid' => TRUE,
+        'active' => TRUE,
+        'link' => CRM_Utils_System::url('civicrm/campaign', "reset=1&type=$name"),
       );
     }
-
-    $this->assign('allTabs', $allTabs);
+    $this->assign('tabHeader', $allTabs);
   }
 }
 
