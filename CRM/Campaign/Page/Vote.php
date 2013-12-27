@@ -115,23 +115,22 @@ class CRM_Campaign_Page_Vote extends CRM_Core_Page {
         continue;
       }
 
-      $urlParams = "type={$name}&snippet=1";
+      $urlParams = "type={$name}";
       if ($this->_surveyId) {
         $urlParams .= "&sid={$this->_surveyId}";
       }
       if ($this->_interviewerId) {
         $urlParams .= "&cid={$this->_interviewerId}";
       }
-      $allTabs[] = array(
-        'id' => $name,
+      $allTabs[$name] = array(
         'title' => $title,
-        'url' => CRM_Utils_System::url('civicrm/campaign/vote',
-          $urlParams
-        ),
+        'valid' => TRUE,
+        'active' => TRUE,
+        'link' => CRM_Utils_System::url('civicrm/campaign/vote', $urlParams),
       );
     }
 
-    $this->assign('allTabs', empty($allTabs) ? FALSE : $allTabs);
+    $this->assign('tabHeader', empty($allTabs) ? FALSE : $allTabs);
   }
 }
 

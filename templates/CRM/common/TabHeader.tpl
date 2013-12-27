@@ -67,13 +67,16 @@
         })
       .on('tabsbeforeload',
         function(e, ui) {
+          console.log(ui.panel.data())
           // Use civicrm ajax wrappers rather than the default $.load
-          if (!ui.tab.data("loaded")) {
+          if (!ui.panel.data("civicrmCrmSnippet")) {
             CRM.loadPage($('a', ui.tab).attr('href'), {
               target: ui.panel
             })
           }
-          ui.tab.data("loaded", true);
+          {/literal}{if empty($cache)}
+          else ui.panel.crmSnippet("refresh");
+          {/if}{literal}
           e.preventDefault();
         })
       .tabs(tabSettings);

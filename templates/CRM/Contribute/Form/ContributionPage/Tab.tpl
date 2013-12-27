@@ -46,7 +46,7 @@
   </ul>
   <div class="clear"></div>
 </div>
-{include file="CRM/common/TabHeader.tpl"}
+{include file="CRM/common/TabHeader.tpl" cache=true}
 
 {literal}
 <script>

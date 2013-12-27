@@ -1760,7 +1760,7 @@ editor specific classes
   position: relative;
   padding: 0px 14px 0 5px;
   background: url("../i/TreePlus.gif") no-repeat right 1px;
-  border-left: none;
+  white-space: nowrap;
   z-index: 2;
 }
 
