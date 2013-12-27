@@ -110,7 +110,7 @@
 
     cj( function() {
       var tabIndex = cj('#tab_' + selectedTab).prevAll().length;
-      cj("#mainTabContainer").tabs({ active: tabIndex, cache: true});
+      cj("#mainTabContainer").tabs({active: tabIndex});
       cj(".crm-tab-button").addClass("ui-corner-bottom");
     });
     {/literal}
