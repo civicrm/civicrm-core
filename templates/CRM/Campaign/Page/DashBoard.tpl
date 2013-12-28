@@ -30,7 +30,7 @@
   {* load campaign/survey/petition tab *}
   {include file="CRM/Campaign/Form/Search/$subPageType.tpl"}
 {else}
-  {include file="CRM/common/TabHeader.tpl" cache=true}
+  {include file="CRM/common/TabHeader.tpl"}
   <div class="clear"></div>
 {/if}
 

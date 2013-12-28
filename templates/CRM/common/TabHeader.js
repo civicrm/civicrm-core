@@ -1,0 +1,23 @@
+// https://civicrm.org/licensing
+cj(function($) {
+  var tabSettings = CRM.tabSettings || {};
+  tabSettings.active = tabSettings.active ? $('#tab_' + tabSettings.active).prevAll().length : 0;
+  $("#mainTabContainer")
+    .on('tabsbeforeactivate', function(e, ui) {
+      // Warn of unsaved changes - requires formNavigate.tpl to be included in each tab
+      if (!global_formNavigate) {
+        CRM.alert(ts('Your changes in the <em>%1</em> tab have not been saved.', {1: ui.oldTab.text()}), ts('Unsaved Changes'), 'warning');
+        global_formNavigate = true;
+      }
+    })
+    .on('tabsbeforeload', function(e, ui) {
+      // Use civicrm ajax wrappers rather than the default $.load
+      if (!ui.panel.data("civicrmCrmSnippet")) {
+        CRM.loadPage($('a', ui.tab).attr('href'), {
+          target: ui.panel
+        })
+      }
+      e.preventDefault();
+    })
+    .tabs(tabSettings);
+});

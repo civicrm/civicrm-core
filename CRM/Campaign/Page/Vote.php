@@ -86,10 +86,11 @@ class CRM_Campaign_Page_Vote extends CRM_Core_Page {
     }
     $this->assign('subPageType', $subPageType);
 
-    //give focus to proper tab.
-    $this->assign('selectedTabIndex', array_search(CRM_Utils_Array::value('subPage', $_GET, 'reserve'),
-        array_keys($this->_tabs)
-      ));
+    CRM_Core_Resources::singleton()
+      ->addScriptFile('civicrm', 'templates/CRM/common/TabHeader.js')
+      ->addSetting(array('tabSettings' => array(
+        'active' => strtolower(CRM_Utils_Array::value('subPage', $_GET, 'reserve')),
+      )));
   }
 
   function run() {

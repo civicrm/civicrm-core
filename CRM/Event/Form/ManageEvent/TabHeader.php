@@ -45,8 +45,11 @@ class CRM_Event_Form_ManageEvent_TabHeader {
       $form->set('tabHeader', $tabs);
     }
     $form->assign_by_ref('tabHeader', $tabs);
-    $selectedTab = self::getCurrentTab($tabs);
-    $form->assign_by_ref('selectedTab', $selectedTab);
+    CRM_Core_Resources::singleton()
+      ->addScriptFile('civicrm', 'templates/CRM/common/TabHeader.js')
+      ->addSetting(array('tabSettings' => array(
+        'active' => self::getCurrentTab($tabs),
+      )));
     return $tabs;
   }
 

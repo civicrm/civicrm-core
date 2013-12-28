@@ -155,11 +155,10 @@
 
   </div> {* maincontainer*}
   <script type='text/javascript'>
-    var selectedTab = 'user-profiles';
-    {if $selectedChild}selectedTab = '{$selectedChild}';{/if}
-    {literal}
-      cj( function() {
-        var tabIndex = cj('#tab_' + selectedTab).prevAll().length
+      cj( function() {ldelim}
+        var selectedTab = '{if $selectedChild}{$selectedChild}{else}user-profiles{/if}';
+        var tabIndex = cj('#tab_' + selectedTab).prevAll().length;
+        {literal}
         cj("#mainTabContainer").tabs( {active: tabIndex} );
       });
     {/literal}
