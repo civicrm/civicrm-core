@@ -3592,7 +3592,8 @@ tbody.scrollContent tr.alternateRow {
 #mainTabContainer li.disabled {
   text-decoration: none;
 }
-#mainTabContainer li.disabled a:link {
+#mainTabContainer li.disabled a.ui-tabs-anchor,
+#mainTabContainer li.crm-count-0 a.ui-tabs-anchor {
   color: #999999 !important;
 }
 #crm-container tr.crm-job {

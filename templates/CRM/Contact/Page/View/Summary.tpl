@@ -356,17 +356,11 @@
 {* CRM-10560 *}
 {literal}
 <script type="text/javascript">
-cj(document).ready(function($) {
+cj(function($) {
   $('.crm-inline-edit-container').crmFormContactLock({
     ignoreLabel: "{/literal}{ts escape='js'}Ignore{/ts}{literal}",
     saveAnywayLabel: "{/literal}{ts escape='js'}Save Anyway{/ts}{literal}",
     reloadLabel: "{/literal}{ts escape='js'}Reload Page{/ts}{literal}"
-  });
-  //Enhance styling of "View Contact" tabs to indicate empty/non-empty tags
-  $('div#mainTabContainer ul').find('li').each(function(n){
-    if($(this).find('em').html()==0){
-      $(this).addClass("disabled");
-    }
   });
 });
 </script>
