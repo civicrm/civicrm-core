@@ -71,7 +71,7 @@
     </div>
 {/if}
 
-{include file="CRM/common/TabHeader.tpl" cache=true}
+{include file="CRM/common/TabHeader.tpl"}
 
 {literal}
 <script>

@@ -44,7 +44,11 @@ class CRM_Contribute_Form_ContributionPage_TabHeader {
       $form->set('tabHeader', $tabs);
     }
     $form->assign_by_ref('tabHeader', $tabs);
-    $form->assign('selectedTab', self::getCurrentTab($tabs));
+    CRM_Core_Resources::singleton()
+      ->addScriptFile('civicrm', 'templates/CRM/common/TabHeader.js')
+      ->addSetting(array('tabSettings' => array(
+        'active' => self::getCurrentTab($tabs),
+      )));
     return $tabs;
   }
 

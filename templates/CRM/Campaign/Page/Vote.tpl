@@ -31,7 +31,7 @@
    {* build the ajax search and voters reserve interface here *}
    {include file='CRM/Campaign/Form/Gotv.tpl'}
 {elseif $tabHeader}
-  {include file="CRM/common/TabHeader.tpl" cache=false}
+  {include file="CRM/common/TabHeader.tpl"}
 {else}
  <div class="messages status no-popup">
      <div class="icon inform-icon"></div>

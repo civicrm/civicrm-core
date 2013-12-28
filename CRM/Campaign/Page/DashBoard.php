@@ -439,10 +439,11 @@ class CRM_Campaign_Page_DashBoard extends CRM_Core_Page {
       //build the tabs.
       $this->buildTabs();
     }
-
-    //give focus to proper tab.
-    $selectedTabIndex = strtolower(CRM_Utils_Array::value('subPage', $_GET, 'campaign'));
-    $this->assign('selectedTab', $selectedTabIndex);
+    CRM_Core_Resources::singleton()
+      ->addScriptFile('civicrm', 'templates/CRM/common/TabHeader.js')
+      ->addSetting(array('tabSettings' => array(
+        'active' => strtolower(CRM_Utils_Array::value('subPage', $_GET, 'campaign')),
+      )));
   }
 
   function run() {
