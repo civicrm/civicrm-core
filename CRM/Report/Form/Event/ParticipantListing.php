@@ -552,6 +552,10 @@ GROUP BY  cv.label
     }
   }
 
+  function groupBy(){
+    $this->_groupBy = "GROUP BY {$this->_aliases['civicrm_participant']}.id";
+  }
+
   function postProcess() {
 
     // get ready with post process params
