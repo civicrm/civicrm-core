@@ -67,15 +67,12 @@
     });
 
     CRM.updateContactSummaryTags = function() {
-      var tags = [], $tab = $('#tab_tag');
+      var tags = [];
       $('.tag-section .token-input-token-facebook p, #tagtree input:checkbox:checked+label').each(function() {
         tags.push($(this).text());
       });
       // showing count of tags in summary tab
-      $('a em', $tab).html('' + tags.length);
-      $tab
-        .removeClass($tab.attr('class').match(/(crm-count-\d+)/)[0])
-        .addClass('crm-count-' + tags.length);
+      CRM.updateTabCount('#tab_tag', tags.length);
       // update summary tab
       $("#tags").html(tags.join(', '));
     };

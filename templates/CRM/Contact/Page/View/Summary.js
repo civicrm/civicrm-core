@@ -90,7 +90,7 @@
       }
       // Update changelog tab and contact footer
       if (response.changeLog.count) {
-        $("#tab_log a em").html(response.changeLog.count);
+        CRM.updateTabCount('#tab_log', response.changeLog.count);
       }
       $("#crm-record-log").replaceWith(response.changeLog.markup);
       // Refresh tab contents - Advanced logging
@@ -294,5 +294,6 @@
       $('#tab_log a').click();
       return false;
     });
+    $().crmAccordions();
   });
 })(cj);

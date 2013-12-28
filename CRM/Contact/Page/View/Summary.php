@@ -137,7 +137,11 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
       ->addScriptFile('civicrm', 'templates/CRM/Contact/Page/View/Summary.js')
       ->addScriptFile('civicrm', 'packages/jquery/plugins/jstree/jquery.jstree.js', 0, 'html-header', FALSE)
       ->addStyleFile('civicrm', 'packages/jquery/plugins/jstree/themes/default/style.css', 0, 'html-header')
-      ->addSetting(array('summaryPrint' => array('mode' => $this->_print)));
+      ->addScriptFile('civicrm', 'templates/CRM/common/TabHeader.js')
+      ->addSetting(array(
+        'summaryPrint' => array('mode' => $this->_print),
+        'tabSettings' => array('active' => CRM_Utils_Request::retrieve('selectedChild', 'String', $this, FALSE, 'summary')),
+      ));
     $this->assign('summaryPrint', $this->_print);
     $session = CRM_Core_Session::singleton();
     $url = CRM_Utils_System::url('civicrm/contact/view', 'reset=1&cid=' . $this->_contactId);
@@ -316,9 +320,9 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
 
         //appending isTest to url for test soft credit CRM-3891.
         //FIXME: hack ajax url.
-        $q = "reset=1&snippet=1&force=1&cid={$this->_contactId}";
+        $q = "reset=1&force=1&cid={$this->_contactId}";
         if (CRM_Utils_Request::retrieve('isTest', 'Positive', $this)) {
-          $q = $q . "&isTest=1";
+          $q .= "&isTest=1";
         }
         $allTabs[] = array(
           'id' => $i,
@@ -351,7 +355,7 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
           'id' => $k,
           'url' => CRM_Utils_System::url(
             "civicrm/contact/view/$k",
-            "reset=1&snippet=1&cid={$this->_contactId}"
+            "reset=1&cid={$this->_contactId}"
           ),
           'title' => $v,
           'weight' => $weight,
@@ -373,7 +377,7 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
       $id = "custom_{$group['id']}";
       $allTabs[] = array(
         'id' => $id,
-        'url' => CRM_Utils_System::url($group['path'], $group['query'] . "&snippet=1&selectedChild=$id"),
+        'url' => CRM_Utils_System::url($group['path'], $group['query'] . "&selectedChild=$id"),
         'title' => $group['title'],
         'weight' => $weight,
         'count' => CRM_Contact_BAO_Contact::getCountComponent($id, $this->_contactId, $group['table_name']),
@@ -388,9 +392,6 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
     usort($allTabs, array('CRM_Utils_Sort', 'cmpFunc'));
 
     $this->assign('allTabs', $allTabs);
-
-    $selectedChild = CRM_Utils_Request::retrieve('selectedChild', 'String', $this, FALSE, 'summary');
-    $this->assign('selectedChild', $selectedChild);
 
     // hook for contact summary
     // ignored but needed to prevent warnings
