@@ -24,10 +24,10 @@
  +--------------------------------------------------------------------+
 *}
 
-{* enclosed all tabs and its content in a block *}
 {* include wysiwyg related files*}
 {include file="CRM/common/wysiwyg.tpl" includeWysiwygEditor=true}
 
+{* enclose all tabs and its content in a block *}
 <div class="crm-block crm-content-block">
   {if $tabHeader and count($tabHeader) gt 1}
     <div id="mainTabContainer">

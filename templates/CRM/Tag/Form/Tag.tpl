@@ -73,7 +73,9 @@
       });
       // showing count of tags in summary tab
       $('a em', $tab).html('' + tags.length);
-      tags.length ? $tab.removeClass('disabled') : $tab.addClass('disabled');
+      $tab
+        .removeClass($tab.attr('class').match(/(crm-count-\d+)/)[0])
+        .addClass('crm-count-' + tags.length);
       // update summary tab
       $("#tags").html(tags.join(', '));
     };
