@@ -21,3 +21,11 @@ cj(function($) {
     })
     .tabs(tabSettings);
 });
+(function($) {
+  CRM.updateTabCount = function(tab, count) {
+    $(tab)
+      .removeClass($(tab).attr('class').match(/(crm-count-\d+)/)[0])
+      .addClass('crm-count-' + count)
+      .find('a em').html('' + count);
+  }
+})(cj);

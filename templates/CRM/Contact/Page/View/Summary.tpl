@@ -131,7 +131,7 @@
   {/if}
 
   <div class="crm-block crm-content-block crm-contact-page crm-inline-edit-container">
-    <div id="mainTabContainer" class="ui-tabs ui-widget ui-widget-content ui-corner-all">
+    <div id="mainTabContainer">
       <ul class="crm-contact-tabs-list">
         <li id="tab_summary" class="crm-tab-button">
           <a href="#contact-summary" title="{ts}Summary{/ts}">
@@ -328,29 +328,6 @@
     </div>
     <div class="clear"></div>
   </div><!-- /.crm-content-block -->
-
-  <script type="text/javascript">
-    {literal}
-    cj(function($) {
-      //explicitly stop spinner
-      function stopSpinner( ) {
-        $('li.crm-tab-button span').text(' ');
-      }
-      {/literal}
-      var selectedTab = '{if !empty($selectedChild)}{$selectedChild}{else}summary{/if}';
-      var tabIndex = $('#tab_' + selectedTab).prevAll().length;
-      var spinnerImage = '<img src="{$config->resourceBase}i/loading.gif" style="width:10px;height:10px"/>';
-      {literal}
-      $("#mainTabContainer").tabs({ active: tabIndex, spinner: spinnerImage, cache: true, load: stopSpinner});
-      $(".crm-tab-button").addClass("ui-corner-bottom");
-      $().crmAccordions();
-
-      $('body').click(function() {
-        cj('#crm-contact-actions-list').hide();
-      });
-    });
-    {/literal}
-  </script>
 {/if}
 
 {* CRM-10560 *}
