@@ -74,7 +74,7 @@ class CRM_Event_Form_ManageEvent_ScheduleReminders extends CRM_Event_Form_Manage
           $format['action'] = CRM_Core_Action::formLink(
             $links,
             $action,
-            array('id' => $format['id'])),
+            array('id' => $format['id']),
             ts('more'),
             FALSE,
             'event.reminder.list',
