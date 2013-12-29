@@ -340,24 +340,38 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
     }
 
     $rest = array(
-      'activity' => ts('Activities'),
-      'case' => ts('Cases'),
-      'rel' => ts('Relationships'),
-      'group' => ts('Groups'),
-      'note' => ts('Notes'),
-      'tag' => ts('Tags'),
-      'log' => ts('Change Log'),
+      'activity' => array(
+        'title' => ts('Activities'),
+      ),
+      'case' => array(
+        'title' => ts('Cases'),
+      ),
+      'rel' => array(
+        'title' => ts('Relationships'),
+      ),
+      'group' => array(
+        'title' => ts('Groups'),
+        'class' => 'ajaxForm',
+      ),
+      'note' => array(
+        'title' => ts('Notes'),
+      ),
+      'tag' => array(
+        'title' => ts('Tags'),
+      ),
+      'log' => array(
+        'title' => ts('Change Log'),
+      ),
     );
 
     foreach ($rest as $k => $v) {
       if ($accessCiviCRM && CRM_Utils_Array::value($k, $this->_viewOptions)) {
-        $allTabs[] = array(
+        $allTabs[] = $v + array(
           'id' => $k,
           'url' => CRM_Utils_System::url(
             "civicrm/contact/view/$k",
             "reset=1&cid={$this->_contactId}"
           ),
-          'title' => $v,
           'weight' => $weight,
           'count' => CRM_Contact_BAO_Contact::getCountComponent($k, $this->_contactId),
         );

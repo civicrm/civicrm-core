@@ -867,6 +867,7 @@ CRM.validate = CRM.validate || {
       }
       return url;
     },
+    // Hack to deal with civicrm legacy sort functionality
     _handleOrderLinks: function() {
       var that = this;
       $('a.crm-weight-arrow', that.element).click(function(e) {
@@ -985,17 +986,18 @@ CRM.validate = CRM.validate || {
         url: data.url.replace(/reset=1[&]?/, ''),
         dataType: 'json',
         success: function(response) {
-          if (response.status == 'success') {
+          if (response.status === 'success') {
             $el.crmSnippet('option', 'block') && $el.unblock();
             $el.trigger('crmFormSuccess', response);
             // Reset form for e.g. "save and new"
-            if (response.userContext && (!settings.autoClose ||
-              (settings.refreshAction && $.inArray(response.buttonName, settings.refreshAction) >= 0)))
-            {
+            if (response.userContext && settings.refreshAction && $.inArray(response.buttonName, settings.refreshAction) >= 0) {
               $el.crmSnippet('option', 'url', response.userContext).crmSnippet('refresh');
             }
             else if ($el.data('uiDialog') && settings.autoClose) {
               $el.dialog('close');
+            }
+            else if (settings.autoClose === false) {
+              $el.crmSnippet('resetUrl').crmSnippet('refresh');
             }
           }
           else {
