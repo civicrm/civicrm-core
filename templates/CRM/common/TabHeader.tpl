@@ -33,7 +33,7 @@
     <div id="mainTabContainer">
     <ul>
        {foreach from=$tabHeader key=tabName item=tabValue}
-          <li id="tab_{$tabName}" class="crm-tab-button ui-corner-all {if !$tabValue.valid}disabled{/if}">
+          <li id="tab_{$tabName}" class="crm-tab-button ui-corner-all{if !$tabValue.valid} disabled{/if}{if isset($tabValue.class)} {$tabValue.class}{/if}">
           {if $tabValue.link and $tabValue.active}
              <a href="{$tabValue.link}" title="{$tabValue.title}{if !$tabValue.valid} ({ts}disabled{/ts}){/if}">{$tabValue.title}</a>
           {else}

@@ -13,9 +13,18 @@ cj(function($) {
     .on('tabsbeforeload', function(e, ui) {
       // Use civicrm ajax wrappers rather than the default $.load
       if (!ui.panel.data("civicrmCrmSnippet")) {
-        CRM.loadPage($('a', ui.tab).attr('href'), {
-          target: ui.panel
-        })
+        var method = ui.tab.hasClass('ajaxForm') ? 'loadForm' : 'loadPage';
+        var params = {target: ui.panel};
+        if (method === 'loadForm') {
+          params.autoClose = params.openInline = params.cancelButton = params.refreshAction = false;
+          ui.panel.on('crmFormLoad', function() {
+            // Hack: "Save and done" and "Cancel" buttons submit without ajax
+            $('.cancel.form-submit, input[name$=upload_done]', this).on('click', function(e) {
+              $(this).closest('form').ajaxFormUnbind();
+            })
+          });
+        }
+        CRM[method]($('a', ui.tab).attr('href'), params);
       }
       e.preventDefault();
     })
