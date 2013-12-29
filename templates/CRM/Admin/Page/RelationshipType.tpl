@@ -26,7 +26,7 @@
 {capture assign=customURL}{crmURL p='civicrm/admin/custom/group' q="reset=1"}{/capture}
 {capture assign=docLink}{docURL page="user/organising-your-data/relationships"}{/capture}
 <div id="help">
-    <p>{ts}Relationship types describe relationships between people, households and organizations. Relationship types labels describe the relationship from the perspective of each of the two entities (e.g. Parent <-> Child, Employer <-> Employee). For some types of relationships, the labels may be the same in both directions (e.g. Spouse <-> Spouse).{/ts} {$docLink}</p>
+    <p>{ts}Relationship types describe relationships between people, households and organizations. Relationship types labels describe the relationship from the perspective of each of the two entities (e.g. Parent &gt;-&lt; Child, Employer &gt;-&lt; Employee). For some types of relationships, the labels may be the same in both directions (e.g. Spouse &gt;-&lt; Spouse).{/ts} {$docLink}</p>
     <p>{ts 1=$customURL}You can define as many additional relationships types as needed to cover the types of relationships you want to track. Once a relationship type is created, you may also define custom fields to extend relationship information for that type from <a href='%1'>Administer CiviCRM &raquo; Custom Data</a>.{/ts}{help id='id-relationship-types'} </p>
 </div>
 
@@ -68,7 +68,7 @@
             <td class="crm-relationship-contact_type_b_display">
                 {if $row.contact_type_b_display} {$row.contact_type_b_display}
                 {if $row.contact_sub_type_b} - {$row.contact_sub_type_b}{/if} {else} {ts}All Contacts{/ts} {/if} </td>
-            <td class="crm-relationship-is_active" id="row_{$row.id}_status">{if $row.is_active eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td> 
+            <td class="crm-relationship-is_active" id="row_{$row.id}_status">{if $row.is_active eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
             <td>{$row.action|replace:'xx':$row.id}</td>
         </tr>
         {/foreach}

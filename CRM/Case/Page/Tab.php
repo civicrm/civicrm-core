@@ -72,7 +72,7 @@ class CRM_Case_Page_Tab extends CRM_Core_Page {
         //user might have special permissions to view this case, CRM-5666
         if (!CRM_Core_Permission::check('access all cases and activities')) {
           $session = CRM_Core_Session::singleton();
-          $userCases = CRM_Case_BAO_Case::getCases(FALSE, $session->get('userID'));
+          $userCases = CRM_Case_BAO_Case::getCases(FALSE, $session->get('userID'), 'any');
           if (!array_key_exists($this->_id, $userCases)) {
             CRM_Core_Error::fatal(ts('You are not authorized to access this page.'));
           }

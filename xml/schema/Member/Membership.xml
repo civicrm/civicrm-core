@@ -237,6 +237,12 @@
     <title>Campaign ID</title>
     <import>true</import>
     <comment>The campaign for which this membership is attached.</comment>
+    <pseudoconstant>
+      <table>civicrm_campaign</table>
+      <keyColumn>id</keyColumn>
+      <labelColumn>title</labelColumn>
+      <condition>(end_date IS NULL OR end_date > NOW())</condition>
+    </pseudoconstant>
     <add>3.4</add>
     <html>
       <type>Select</type>
