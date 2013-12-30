@@ -98,8 +98,8 @@
         CRM.reloadChangeLogTab();
       }
       // Refresh tab contents - Simple logging
-      else if ($('#Change_Log div').length) {
-        $('#Change_Log').load($("#tab_log a").attr('href'));
+      else if ($('#changeLog').closest('.ui-tabs-panel').data('civicrmCrmSnippet')) {
+        $('#changeLog').closest('.ui-tabs-panel').crmSnippet('destroy');
       }
     }
     else {

@@ -1,4 +1,9 @@
 // https://civicrm.org/licensing
+/**
+ * By default this simply loads tabs via ajax CRM.loadPage method
+ * Tabs with class 'ajaxForm' will use CRM.loadForm instead, suitable for most forms
+ * Tabs with class 'livePage' will get popup action links, suitable for crud tables
+ */
 cj(function($) {
   var tabSettings = CRM.tabSettings || {};
   tabSettings.active = tabSettings.active ? $('#tab_' + tabSettings.active).prevAll().length : 0;
@@ -23,6 +28,23 @@ cj(function($) {
               $(this).closest('form').ajaxFormUnbind();
             })
           });
+        }
+        if (ui.tab.hasClass('livePage')) {
+          ui.panel
+            .off('click.crmLivePage')
+            .on('click.crmLivePage', 'a.button, a.action-item', function() {
+              // only follow real links not javascript buttons
+              if ($(this).attr('href') === '#' || $(this).attr('onclick')) {
+                return;
+              }
+              CRM.loadForm($(this).attr('href'), {
+                openInline: 'a:not([href="#"])'
+              }).on('crmFormSuccess', function(e, data) {
+                  // Refresh when form completes
+                  ui.panel.crmSnippet('refresh');
+                });
+              return false;
+            });
         }
         CRM[method]($('a', ui.tab).attr('href'), params);
       }

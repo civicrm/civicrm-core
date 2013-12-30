@@ -5,7 +5,8 @@ cj(function($) {
     // Widgetize the content area
     .crmSnippet()
     // Open action links in a popup
-    .on('click', 'a.button, a.action-item', function() {
+    .off('click.crmLivePage')
+    .on('click.crmLivePage', 'a.button, a.action-item', function() {
       // only follow real links not javascript buttons
       if ($(this).attr('href') === '#' || $(this).attr('onclick')) {
         return;
