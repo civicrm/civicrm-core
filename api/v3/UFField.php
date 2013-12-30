@@ -77,7 +77,7 @@ function civicrm_api3_uf_field_create($params) {
 
   $fieldId = CRM_Utils_Array::value('id', $params);
   if (!empty($fieldId)) {
-    $UFField = new CRM_core_BAO_UFField();
+    $UFField = new CRM_Core_BAO_UFField();
     $UFField->id = $fieldId;
     if ($UFField->find(TRUE)) {
       $ids['uf_group'] = $UFField->uf_group_id;

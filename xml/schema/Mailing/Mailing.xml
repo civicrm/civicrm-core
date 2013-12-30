@@ -311,6 +311,12 @@
        <name>campaign_id</name>
        <type>int unsigned</type>
        <comment>The campaign for which this mailing has been initiated.</comment>
+       <pseudoconstant>
+          <table>civicrm_campaign</table>
+          <keyColumn>id</keyColumn>
+          <labelColumn>title</labelColumn>
+          <condition>(end_date IS NULL OR end_date > NOW())</condition>
+       </pseudoconstant>
        <add>3.4</add>
        <html>
           <type>Select</type>

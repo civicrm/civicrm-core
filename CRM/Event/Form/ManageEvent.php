@@ -350,7 +350,7 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
           CRM_Event_BAO_Event::updateParticipantCampaignID($eventID, $newCampaignID);
         }
       }
-
+      $this->postProcessHook();
       if ($this->controller->getButtonName('submit') == "_qf_{$className}_upload_done") {
         if ($this->_isTemplate) {
           CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/admin/eventTemplate',
