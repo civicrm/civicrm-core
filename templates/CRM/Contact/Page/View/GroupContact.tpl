@@ -23,15 +23,15 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
-<div class="view-content">
+<div class="view-content view-contact-groups">
   {if $groupCount eq 0}
     <div class="messages status no-popup">
       <div class="icon inform-icon"></div>
       &nbsp;{ts}This contact does not currently belong to any groups.{/ts}
     </div>
+  {else}
+    {include file="CRM/common/jsortable.tpl"}
   {/if}
-
-  {include file="CRM/common/jsortable.tpl"}
 
   {* Include 'add to new group' form if session has edit contact permissions *}
   {if $permission EQ 'edit'}
@@ -187,32 +187,19 @@
 <script type="text/javascript">
   // bind first click of accordion header to load crm-accordion-body with snippet
   // everything else taken care of by cj().crm-accordions()
-  cj(function () {
-    cj('.crm-ajax-accordion .crm-accordion-header').one('click', function () {
-      loadPanes(cj(this));
-    });
-    cj('.crm-ajax-accordion:not(.collapsed) .crm-accordion-header').each(function (index) {
-      loadPanes(cj(this));
-    });
+  cj(function($) {
+    // load panes function calls for snippet based on id of crm-accordion-header
+    function loadPanes() {
+      var id = $(this).attr('id');
+      var contactId = $(this).attr('contact_id');
+      if (!$('div.' + id).html()) {
+        var loading = '<img src="{/literal}{$config->resourceBase}i/loading.gif{literal}" alt="{/literal}{ts escape='js'}loading{/ts}{literal}" />&nbsp;{/literal}{ts escape='js'}Loading{/ts}{literal}...';
+        $('div.' + id).html(loading).load(CRM.url('civicrm/contact/view/smartgroup', {snippet: 4, cid: contactId}));
+      }
+    }
+    $('.view-contact-groups .crm-ajax-accordion.collapsed .crm-accordion-header').one('click', loadPanes);
+    $('.view-contact-groups .crm-ajax-accordion:not(.collapsed) .crm-accordion-header').each(loadPanes);
   });
 
-  // load panes function calls for snippet based on id of crm-accordion-header
-  function loadPanes(paneObj) {
-    var id = paneObj.attr('id');
-    var contactId = paneObj.attr('contact_id');
-
-    var dataUrl = CRM.url('civicrm/contact/view/smartgroup', 'snippet=4&cid=' + contactId);
-
-    if (!cj('div.' + id).html()) {
-      var loading = '<img src="{/literal}{$config->resourceBase}i/loading.gif{literal}" alt="{/literal}{ts escape='js'}loading{/ts}{literal}" />&nbsp;{/literal}{ts escape='js'}Loading{/ts}{literal}...';
-      cj('div.' + id).html(loading);
-      cj.ajax({
-        url: dataUrl,
-        success: function (data) {
-          cj('div.' + id).html(data);
-        }
-      });
-    }
-  }
 </script>
 {/literal}
