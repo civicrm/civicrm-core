@@ -1987,9 +1987,13 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
           }
           if(in_array($key, $keysToUnset)) {
             unset($values[$key]);
+            break;
           }
           if(array_key_exists($key, $fieldsToChange) && !empty($value)) {
             $value = $fieldsToChange[$key];
+          }
+          if(is_string($value)) {
+            $value =  addslashes($value);
           }
         }
     }

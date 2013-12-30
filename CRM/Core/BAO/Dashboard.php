@@ -357,6 +357,7 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
       // check url is same as exiting entries, if yes just update existing
       $dashlet->url = CRM_Utils_Array::value('url', $params);
       $dashlet->find(TRUE);
+      $dashlet->name = self::getDashletName(CRM_Utils_Array::value('instanceURL', $params));
     }
     else {
       $dashlet->id = $dashboardID;
@@ -377,6 +378,16 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
     return $dashlet;
   }
 
+  static function getDashletName($url) {
+    $urlElements = explode('/', $url);
+    if ($urlElements[1] == 'dashlet') {
+      return $urlElements[2];
+    }
+    elseif ($urlElements[1] == 'report') {
+      return 'report/' . $urlElements[3];
+    }
+    return $url;
+  }
   /**
    * Update contact dashboard with new dashlet
    *
