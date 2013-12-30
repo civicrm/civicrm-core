@@ -154,80 +154,79 @@
       </table>
       {include file="CRM/Contact/Form/Task/EmailCommon.tpl" upload=1 noAttach=1}
     </fieldset>
-  {/if}
 
+    {include file="CRM/common/showHideByFieldValue.tpl"
+    trigger_field_id    = "is_repeat"
+    trigger_value       = "true"
+    target_element_id   = "repeatFields"
+    target_element_type = "table-row"
+    field_type          = "radio"
+    invert              = "false"
+    }
+
+    {include file="CRM/common/showHideByFieldValue.tpl"
+    trigger_field_id    ="recipient"
+    trigger_value       = 'manual'
+    target_element_id   ="recipientManual"
+    target_element_type ="table-row"
+    field_type          ="select"
+    invert              = 0
+    }
+
+    {include file="CRM/common/showHideByFieldValue.tpl"
+    trigger_field_id    ="recipient"
+    trigger_value       = 'group'
+    target_element_id   ="recipientGroup"
+    target_element_type ="table-row"
+    field_type          ="select"
+    invert              = 0
+    }
+
+  {literal}
+    <script type='text/javascript'>
+      cj(function() {
+        populateRecipient();
+        cj('#recipient').click( function( ) {
+          populateRecipient();
+        });
+      });
+
+      function populateRecipient( ) {
+        var recipientMapping = eval({/literal}{$recipientMapping}{literal});
+        var recipient = cj("#recipient option:selected").val();
+        var postUrl = "{/literal}{crmURL p='civicrm/ajax/populateRecipient' h=0}{literal}";
+        if(recipientMapping[recipient] == 'Participant Status' || recipientMapping[recipient] == 'participant_role'){
+          var elementID = '#recipient_listing';
+          cj( elementID ).html('');
+          cj.post(postUrl, {recipient: recipientMapping[recipient]},
+            function ( response ) {
+              response = eval( response );
+              for (iota = 0; iota < response.length; iota++) {
+                cj( elementID ).get(0).add(new Option(response[iota].name, response[iota].value), document.all ? iota : null);
+              }
+            }
+          );
+          cj("#recipientList").show();
+        } else {
+          cj("#recipientList").hide();
+        }
+      }
+
+      cj('#absolute_date_display').click( function( ) {
+        if(cj('#absolute_date_display').val()) {
+          cj('#relativeDate').hide();
+          cj('#relativeDateRepeat').hide();
+          cj('#repeatFields').hide();
+        } else {
+          cj('#relativeDate').show();
+          cj('#relativeDateRepeat').show();
+        }
+      });
+
+    </script>
+  {/literal}
+  {/if}
   <div class="crm-submit-buttons">
     {include file="CRM/common/formButtons.tpl" location="bottom"}</div>
 </div>
 {/if}
-{include file="CRM/common/showHideByFieldValue.tpl"
-trigger_field_id    = "is_repeat"
-trigger_value       = "true"
-target_element_id   = "repeatFields"
-target_element_type = "table-row"
-field_type          = "radio"
-invert              = "false"
-}
-
-{include file="CRM/common/showHideByFieldValue.tpl"
-trigger_field_id    ="recipient"
-trigger_value       = 'manual'
-target_element_id   ="recipientManual"
-target_element_type ="table-row"
-field_type          ="select"
-invert              = 0
-}
-
-{include file="CRM/common/showHideByFieldValue.tpl"
-trigger_field_id    ="recipient"
-trigger_value       = 'group'
-target_element_id   ="recipientGroup"
-target_element_type ="table-row"
-field_type          ="select"
-invert              = 0
-}
-
-{literal}
-<script type='text/javascript'>
-  cj(function() {
-    populateRecipient();
-    cj('#recipient').click( function( ) {
-      populateRecipient();
-    });
-  });
-
-  function populateRecipient( ) {
-    var recipientMapping = eval({/literal}{$recipientMapping}{literal});
-    var recipient = cj("#recipient option:selected").val();
-    var postUrl = "{/literal}{crmURL p='civicrm/ajax/populateRecipient' h=0}{literal}";
-    if(recipientMapping[recipient] == 'Participant Status' || recipientMapping[recipient] == 'participant_role'){
-      var elementID = '#recipient_listing';
-      cj( elementID ).html('');
-      cj.post(postUrl, {recipient: recipientMapping[recipient]},
-        function ( response ) {
-          response = eval( response );
-          for (iota = 0; iota < response.length; iota++) {
-            cj( elementID ).get(0).add(new Option(response[iota].name, response[iota].value), document.all ? iota : null);
-          }
-        }
-      );
-      cj("#recipientList").show();
-    } else {
-      cj("#recipientList").hide();
-    }
-  }
-
-  cj('#absolute_date_display').click( function( ) {
-    if(cj('#absolute_date_display').val()) {
-      cj('#relativeDate').hide();
-      cj('#relativeDateRepeat').hide();
-      cj('#repeatFields').hide();
-    } else {
-      cj('#relativeDate').show();
-      cj('#relativeDateRepeat').show();
-    }
-  });
-
-</script>
-{/literal}
-

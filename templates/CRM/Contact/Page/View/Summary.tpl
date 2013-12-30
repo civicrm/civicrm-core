@@ -140,7 +140,7 @@
           </a>
         </li>
         {foreach from=$allTabs key=tabName item=tabValue}
-          <li id="tab_{$tabValue.id}" class="crm-tab-button crm-count-{$tabValue.count}{if isset($tabValue.class)} {$tabValue.class}{/if}">
+          <li id="tab_{$tabValue.id}" class="crm-tab-button ui-corner-all crm-count-{$tabValue.count}{if isset($tabValue.class)} {$tabValue.class}{/if}">
             <a href="{$tabValue.url}" title="{$tabValue.title}">
               <span> </span> {$tabValue.title}
               <em>{$tabValue.count}</em>

@@ -896,6 +896,9 @@ CRM.validate = CRM.validate || {
       }).fail(function() {
           that._onFailure();
         });
+    },
+    _destroy: function() {
+      this.element.removeClass('crm-ajax-container');
     }
   });
 

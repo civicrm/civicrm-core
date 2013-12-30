@@ -58,7 +58,7 @@ class CRM_Event_Form_ManageEvent_ScheduleReminders extends CRM_Event_Form_Manage
         $field = 'event_template';
       }
       $reminderList = CRM_Core_BAO_ActionSchedule::getList(FALSE, $field, $this->_id );
-      if (is_array($reminderList)) {
+      if ($reminderList && is_array($reminderList)) {
         // Add action links to each of the reminders
         foreach ($reminderList as & $format) {
           $action = CRM_Core_Action::UPDATE + CRM_Core_Action::DELETE;
@@ -82,8 +82,11 @@ class CRM_Event_Form_ManageEvent_ScheduleReminders extends CRM_Event_Form_Manage
             $this->_id
           );
         }
-        $this->assign('rows', $reminderList);
       }
+      else {
+        $reminderList = TRUE;
+      }
+      $this->assign('rows', $reminderList);
     }
   }
 
