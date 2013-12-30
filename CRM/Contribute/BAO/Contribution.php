@@ -2542,8 +2542,8 @@ WHERE  contribution_id = %1 ";
 
       $statusId = CRM_Core_OptionGroup::getValue('contribution_status', 'Completed', 'name');
       $params['total_amount'] = $partialAmtPay;
-      // new creation of financial trasaction for the balance amount
-      /* steps to follow :
+      /* new creation of financial trasaction for the balance amount
+         steps followed:
          fetch the current balance, if balance is not present add the balance after appropriate calculation
          if balance is present take the current amount and re-calculate the balance and update the balance stored in DB
       */
