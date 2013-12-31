@@ -143,14 +143,14 @@
                         contactAutocomplete.unautocomplete( );
 
                         if ( relationshipTypeValue ) {
-                            cj('#profiles_1').attr('disabled', false);
-                            contactAutocomplete.attr('disabled', false);
+                            cj('#profiles_1').prop('disabled', false);
+                            contactAutocomplete.prop('disabled', false);
                             contactAutocomplete.addClass('ac_input');
                             buildCreateNewSelect( 'profiles_1', relationshipTypeValue );
                         } else {
-                            cj('#profiles_1').attr('disabled', true);
+                            cj('#profiles_1').prop('disabled', true);
                             contactAutocomplete.removeClass('ac_input');
-                            contactAutocomplete.attr('disabled', true);
+                            contactAutocomplete.prop('disabled', true);
                         }
                     }
 

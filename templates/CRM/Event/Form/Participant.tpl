@@ -377,11 +377,11 @@
       });
 
       cj("#feeBlock").ajaxStart(function(){
-        cj(".disable-buttons input").attr('disabled', true);
+        cj(".disable-buttons input").prop('disabled', true);
       });
 
       cj("#feeBlock").ajaxStop(function(){
-        cj(".disable-buttons input").attr('disabled', false);
+        cj(".disable-buttons input").prop('disabled', false);
       });
 
       //show event real full as well as waiting list message.

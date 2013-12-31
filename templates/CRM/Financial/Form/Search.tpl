@@ -70,7 +70,7 @@
 cj(function($) {
   var batchSelector;
   buildBatchSelector();
-  $("#batch_update").removeAttr('disabled');
+  $("#batch_update").prop('disabled', false);
 
   $('#financial-search-form :input')
     .change(function() {

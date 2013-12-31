@@ -46,9 +46,9 @@
           installments.val( '' );
        }
 
-       frUnit.attr( 'disabled', isDisabled );
-       frInerval.attr( 'disabled', isDisabled );
-       installments.attr( 'disabled', isDisabled );
+       frUnit.prop( 'disabled', isDisabled );
+       frInerval.prop( 'disabled', isDisabled );
+       installments.prop( 'disabled', isDisabled );
    }
 
    function buildRecurBlock( processorId ) {

@@ -139,10 +139,10 @@
             
             function disPageBreak() {
               if (!cj(this).prop('checked')) {
-                cj(this).parent('td').next('td').children('input[id^="order_by_pagebreak_"]').attr({checked: false, disabled: "disabled"});
+                cj(this).parent('td').next('td').children('input[id^="order_by_pagebreak_"]').prop({checked: false, disabled: true});
               }
               else {
-                cj(this).parent('td').next('td').children('input[id^="order_by_pagebreak_"]').attr({disabled: false});
+                cj(this).parent('td').next('td').children('input[id^="order_by_pagebreak_"]').prop({disabled: false});
               }
             }
 

@@ -145,7 +145,7 @@
 {literal}
 <script type="text/javascript">
 {/literal}{if $freezeMailignList}{literal}
-cj('input[type=checkbox][name="group_type[{/literal}{$freezeMailignList}{literal}]"]').attr('disabled',true);
+cj('input[type=checkbox][name="group_type[{/literal}{$freezeMailignList}{literal}]"]').prop('disabled',true);
 {/literal}{/if}{literal}
 {/literal}{if $hideMailignList}{literal}
 cj('input[type=checkbox][name="group_type[{/literal}{$hideMailignList}{literal}]"]').hide();

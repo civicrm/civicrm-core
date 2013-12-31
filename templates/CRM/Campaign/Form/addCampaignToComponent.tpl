@@ -25,8 +25,8 @@
                    value = cj(this).val();
                    if ( value == 'current_campaign' || value == 'past_campaign' ) {
                         cj(this).css( 'color', 'black' );
-                        cj(this).attr( 'disabled', true );
-                  cj(this).attr( 'selected', false);
+                        cj(this).prop( 'disabled', true );
+                        cj(this).prop( 'selected', false);
                         cj(this).addClass( 'asmOptionDisabled' );
                    }
               });

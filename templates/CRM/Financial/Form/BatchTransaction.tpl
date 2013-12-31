@@ -133,8 +133,8 @@ cj( function() {
       return false;
     });
 
-    cj("#trans_assign").attr('disabled',true);
-    cj("#trans_remove").attr('disabled',true);
+    cj("#trans_assign").prop('disabled',true);
+    cj("#trans_remove").prop('disabled',true);
     cj('#crm-transaction-selector-assign #toggleSelect').click( function() {
       enableActions('x');
     });
@@ -190,10 +190,10 @@ cj( function() {
 
 function enableActions( type ) {
   if (type == 'x') {
-    cj("#trans_assign").attr('disabled',false);
+    cj("#trans_assign").prop('disabled',false);
   }
   else {
-    cj("#trans_remove").attr('disabled',false);
+    cj("#trans_remove").prop('disabled',false);
   }
 }
 

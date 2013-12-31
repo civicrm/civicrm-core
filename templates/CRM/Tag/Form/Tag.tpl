@@ -60,7 +60,7 @@
       {/literal}
       {if $permission neq 'edit'}
         {literal}
-          $("#tagtree input").attr('disabled', true);
+          $("#tagtree input").prop('disabled', true);
         {/literal}
       {/if}
       {literal}
