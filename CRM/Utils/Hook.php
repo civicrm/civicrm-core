@@ -1388,4 +1388,14 @@ abstract class CRM_Utils_Hook {
   static function queryObjects(&$queryObjects, $type = 'Contact') {
     return self::singleton()->invoke(2, $queryObjects, $type, self::$_nullObject, self::$_nullObject, self::$_nullObject, 'civicrm_queryObjects');
   }
+
+  /**
+   * This hook is called while viewing contact dashboard
+   *
+   * @param array $availableDashlets list of dashlets; each is formatted per api/v3/Dashboard
+   * @param array $activeDashlets list of dashlets; each is formatted per api/v3/DashboardContact
+   */
+  static function dashboard_defaults($availableDashlets, &$defaultDashlets) {
+    return self::singleton()->invoke(2, $availableDashlets, $defaultDashlets, self::$_nullObject, self::$_nullObject, self::$_nullObject, 'civicrm_dashboard_defaults');
+  }
 }
