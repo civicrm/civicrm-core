@@ -163,7 +163,7 @@ cj("document").ready(function() {
     cj(".pay-later-instructions").toggle(is_pay_later);
     cj("div.billingNameInfo-section .description").html(is_pay_later ? "Enter the billing address at which you can be invoiced." : "Enter the name as shown on your credit or debit card, and the billing address for this card.");
   }
-  cj("input#source").attr('disabled', 'disabled');
+  cj("input#source").prop('disabled', true);
 
   cj(pay_later_sel).change(function() {
     refresh();

@@ -181,7 +181,7 @@ function reloadWindow(tempId) {
 
    //freeze the event type element
    //when template form is loading.
-   cj( "#event_type_id" ).attr('disabled', true );
+   cj( "#event_type_id" ).prop('disabled', true );
 
    window.location += '&template_id=' + tempId;
 }

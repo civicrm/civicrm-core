@@ -235,7 +235,7 @@ function setLocationDetails(contactID) {
         }
         else if (data[ele].type == 'Multi-Select') {
           for (var selectedOption in data[ele].value) {
-            cj('#' + ele + " option[value='" + selectedOption + "']").attr('selected', 'selected');
+            cj('#' + ele + " option[value='" + selectedOption + "']").prop('selected', true);
           }
         }
         else if (data[ele].type == 'Autocomplete-Select') {

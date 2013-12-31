@@ -250,8 +250,8 @@ cj( function( ) {
 
       // if billing checkbox is active, copy other field into billing field
       if(cj('#billingcheckbox').prop('checked')) {
-        cj(orig_id+' option').removeAttr('selected');
-        cj(orig_id+' option[value="'+cj(id).val()+'"]').attr('selected', 'selected');
+        cj(orig_id+' option').prop('selected', false);
+        cj(orig_id+' option[value="'+cj(id).val()+'"]').prop('selected', true);
       };
 
       if(orig_id == '#billing_country_id-5') {
@@ -273,8 +273,8 @@ cj( function( ) {
       };
       for(var id in select_ids) {
         var orig_id = select_ids[id];
-        cj(orig_id+' option').removeAttr('selected');
-        cj(orig_id+' option[value="'+cj(id).val()+'"]').attr('selected', 'selected');
+        cj(orig_id+' option').prop('selected', false);
+        cj(orig_id+' option[value="'+cj(id).val()+'"]').prop('selected', true);
       };
     } else {
       cj('.billing_name_address-group').show(200);

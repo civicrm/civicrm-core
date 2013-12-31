@@ -140,7 +140,7 @@ cj(function () {
   {/literal}{else}{literal}
   cj('select[id^="member_option_"]').each(function () {
     if (cj(this).val() == 1) {
-      cj(this).attr('disabled', true);
+      cj(this).prop('disabled', true);
     }
   });
 
@@ -338,7 +338,7 @@ function updateContactInfo(blockNo, prefix) {
               },
               { success: function (data) {
                 var memTypeContactId = data.values[0].member_of_contact_id;
-                cj('select[id="member_option_' + blockNo + '"]').removeAttr('disabled').val(2);
+                cj('select[id="member_option_' + blockNo + '"]').prop('disabled', false).val(2);
                 cj('select[id="field_' + blockNo + '_membership_type_0"]').val(memTypeContactId).change();
                 cj('select[id="field_' + blockNo + '_membership_type_1"]').val(membershipTypeId).change();
                 setDateFieldValue('join_date', membershipJoinDate, blockNo)
