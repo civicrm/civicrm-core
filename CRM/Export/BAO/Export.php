@@ -549,6 +549,20 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
       }
     }
 
+    // CRM-13982 - check if is deleted
+    $excludeTrashed = TRUE;
+    foreach ($params as $value) {
+      if ($value[0] == 'contact_is_deleted') {
+        $excludeTrashed = FALSE;
+      }
+    }
+    if (empty($where) && $excludeTrashed) {
+      $where = "WHERE contact_a.is_deleted != 1";
+    }
+    elseif ($excludeTrashed) {
+      $where .= " AND contact_a.is_deleted != 1";
+    }
+
     $queryString = "$select $from $where $having";
 
     $groupBy = "";
