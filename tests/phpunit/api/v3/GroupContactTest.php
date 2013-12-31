@@ -34,6 +34,7 @@ class api_v3_GroupContactTest extends CiviUnitTestCase {
   protected $_contactId1;
   protected $_apiversion = 3;
   protected $_groupId1;
+  protected $_groupContactId;
 
   function get_info() {
     return array(
@@ -60,6 +61,7 @@ class api_v3_GroupContactTest extends CiviUnitTestCase {
     );
 
     $result = $this->callAPISuccess('group_contact', 'create', $params);
+    $this->_groupContactId = $result['id'];
 
     $group = array(
       'name' => 'Test Group 2',
@@ -71,10 +73,6 @@ class api_v3_GroupContactTest extends CiviUnitTestCase {
     );
 
     $this->_groupId2 = $this->groupCreate($group, 3);
-    $params = array(
-      'contact_id.1' => $this->_contactId,
-      'group_id' => $this->_groupId2,
-    );
 
     $this->_group = array(
       $this->_groupId1 => array('title' => 'New Test Group Created',
@@ -182,6 +180,16 @@ class api_v3_GroupContactTest extends CiviUnitTestCase {
     $result = $this->callAPIAndDocument('group_contact', 'delete', $params, __FUNCTION__, __FILE__);
     $this->assertEquals($result['removed'], 1, "in line " . __LINE__);
     $this->assertEquals($result['total_count'], 1, "in line " . __LINE__);
+  }
+
+  function testDeletePermanent() {
+    $params = array(
+      'id' => $this->_groupContactId,
+      'skip_undelete' => TRUE,
+    );
+    $this->callAPIAndDocument('group_contact', 'delete', $params, __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess('group_contact', 'get', $params);
+    $this->assertEquals(0, $result['count'], "in line " . __LINE__);
   }
 }
 
