@@ -1533,7 +1533,7 @@ class CRM_Utils_Date {
   static function getDateFormat($formatType = NULL) {
     $format = NULL;
     if ($formatType) {
-      $format = CRM_Core_Dao::getFieldValue('CRM_Core_DAO_PreferencesDate',
+      $format = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_PreferencesDate',
                 $formatType, 'date_format', 'name'
       );
     }

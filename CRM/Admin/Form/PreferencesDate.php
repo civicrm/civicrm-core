@@ -68,7 +68,7 @@ class CRM_Admin_Form_PreferencesDate extends CRM_Admin_Form {
     $this->add('text', 'start', ts('Start Offset'), $attributes['start'], TRUE);
     $this->add('text', 'end', ts('End Offset'), $attributes['end'], TRUE);
 
-    $formatType = CRM_Core_Dao::getFieldValue('CRM_Core_DAO_PreferencesDate', $this->_id, 'name');
+    $formatType = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_PreferencesDate', $this->_id, 'name');
 
     if ($formatType == 'creditCard') {
       $this->add('text', 'date_format', ts('Format'), $attributes['date_format'], TRUE);
