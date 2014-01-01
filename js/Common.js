@@ -989,7 +989,7 @@ CRM.validate = CRM.validate || {
         url: data.url.replace(/reset=1[&]?/, ''),
         dataType: 'json',
         success: function(response) {
-          if (response.status === 'success') {
+          if (response.status !== 'form_error') {
             $el.crmSnippet('option', 'block') && $el.unblock();
             $el.trigger('crmFormSuccess', response);
             // Reset form for e.g. "save and new"
