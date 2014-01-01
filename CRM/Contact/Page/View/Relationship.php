@@ -171,6 +171,8 @@ class CRM_Contact_Page_View_Relationship extends CRM_Core_Page {
     // from relationship tab, not from dashboard
     $this->assign('relationshipTabContext', TRUE);
     $this->assign('inactiveRelationships', $inactiveRelationships);
+
+    $this->ajaxResponse['tabCount'] = count($currentRelationships);
   }
 
   /**

@@ -330,6 +330,7 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
           'title' => $elem['title'],
           'weight' => $elem['weight'],
           'count' => CRM_Contact_BAO_Contact::getCountComponent($u, $this->_contactId),
+          'class' => 'livePage',
         );
         // make sure to get maximum weight, rest of tabs go after
         // FIXME: not very elegant again
@@ -355,6 +356,7 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
       ),
       'note' => array(
         'title' => ts('Notes'),
+        'class' => 'livePage',
       ),
       'tag' => array(
         'title' => ts('Tags'),

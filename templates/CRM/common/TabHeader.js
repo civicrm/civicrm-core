@@ -46,6 +46,13 @@ cj(function($) {
               return false;
             });
         }
+        ui.panel
+          .off('crmLoad.tabCount')
+          .on('crmLoad.tabCount', function(e, data) {
+            if (typeof(data.tabCount) !== 'undefined') {
+              CRM.tabHeader.updateCount(ui.tab, data.tabCount);
+            }
+          });
         CRM[method]($('a', ui.tab).attr('href'), params);
       }
       e.preventDefault();
@@ -53,9 +60,11 @@ cj(function($) {
     .tabs(tabSettings);
 });
 (function($) {
-  CRM.updateTabCount = function(tab, count) {
+  // Utility functions
+  CRM.tabHeader = CRM.tabHeader || {};
+  CRM.tabHeader.updateCount = function(tab, count) {
     $(tab)
-      .removeClass($(tab).attr('class').match(/(crm-count-\d+)/)[0])
+      .removeClass($(tab).attr('class').match(/(crm-count-\d+)/)[0] || 'null')
       .addClass('crm-count-' + count)
       .find('a em').html('' + count);
   }
