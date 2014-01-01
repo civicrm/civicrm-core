@@ -148,7 +148,7 @@ INNER JOIN civicrm_price_set cps ON cps.id = cpf.price_set_id AND cps.name <>'de
       $config = CRM_Core_Config::singleton();
       if (!empty($config->extensionsDir)) {
         $postUpgradeMessage .= '<br />' . ts('Please <a href="%1" target="_blank">configure the Extension Resource URL</a>.', array(
-          1 => CRM_Utils_system::url('civicrm/admin/setting/url', 'reset=1')
+          1 => CRM_Utils_System::url('civicrm/admin/setting/url', 'reset=1')
         ));
   }
     }
