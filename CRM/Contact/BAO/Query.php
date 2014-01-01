@@ -3654,18 +3654,20 @@ WHERE  id IN ( $groupIDs )
 
     // CRM-11281, default to added date if not set
     $fieldTitle = ts('Added Date');
-
+    $fieldName = 'created_date';
     foreach (array_keys($this->_params) as $id) {
       if ($this->_params[$id][0] == 'log_date') {
         if ($this->_params[$id][2] == 2) {
           $fieldTitle = ts('Modified Date');
+          $fieldName = 'modified_date';
         }
       }
     }
 
-    $this->dateQueryBuilder($values,
-      'civicrm_log', 'log_date', 'modified_date', $fieldTitle
-    );
+
+    $this->dateQueryBuilder($values, 'contact_a', 'log_date', $fieldName, $fieldTitle);
+
+    self::$_openedPanes[ts('Change Log')] = TRUE;
   }
 
   function demographics(&$values) {
@@ -4743,16 +4745,6 @@ SELECT COUNT( civicrm_contribution.total_amount ) as cancel_count,
       }
       $this->_tables[$tableName] = $this->_whereTables[$tableName] = 1;
       $this->_qill[$grouping][] = "$fieldTitle - $phrase \"$format\"";
-    }
-
-    if (
-      $tableName == 'civicrm_log' &&
-      $fieldTitle == ts('Added Date')
-    ) {
-      //CRM-6903 --hack to check modified date of first record.
-      //as added date means first modified date of object.
-      $addedDateQuery = 'select id from civicrm_log group by entity_id order by id';
-      $this->_where[$grouping][] = "civicrm_log.id IN ( {$addedDateQuery} )";
     }
   }
 
