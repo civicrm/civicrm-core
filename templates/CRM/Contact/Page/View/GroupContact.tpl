@@ -212,8 +212,6 @@
     });
   });
   {/literal}
-  // update count
-  CRM.updateTabCount('#tab_group', {$groupIn|@count});
   // Hack to ensure status msg is properly translated
   CRM.strings.Added = "{ts escape='js'}Added{/ts}";
   CRM.strings.Removed = "{ts escape='js'}Removed{/ts}";

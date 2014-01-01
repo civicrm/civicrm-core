@@ -32,8 +32,8 @@
 <div id="help">
     {ts 1=$displayName}Pledges received from %1 since inception.{/ts}
     {if $permission EQ 'edit'}
-     {capture assign=newContribURL}{crmURL p="civicrm/contact/view/pledge" q="reset=1&action=add&cid=`$contactId`&context=pledge"}{/capture}
-     {ts 1=$newContribURL}Click <a href='%1'>Add Pledge</a> to record a new pledge received from this contact.{/ts}
+     {capture assign=newContribURL}class="action-item action-item-first" href="{crmURL p="civicrm/contact/view/pledge" q="reset=1&action=add&cid=`$contactId`&context=pledge"}"{/capture}
+     {ts 1=$newContribURL}Click <a %1>Add Pledge</a> to record a new pledge received from this contact.{/ts}
     {/if}
 </div>
 
