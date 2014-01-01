@@ -2437,8 +2437,8 @@ class CRM_Contact_BAO_Query {
           continue;
 
         case 'civicrm_log':
-          $from .= " $side JOIN civicrm_log ON (civicrm_log.entity_id = contact_a.id AND civicrm_log.entity_table = 'civicrm_contact')";
-          $from .= " $side JOIN civicrm_contact contact_b_log ON (civicrm_log.modified_id = contact_b_log.id)";
+          $from .= " INNER JOIN civicrm_log ON (civicrm_log.entity_id = contact_a.id AND civicrm_log.entity_table = 'civicrm_contact')";
+          $from .= " INNER JOIN civicrm_contact contact_b_log ON (civicrm_log.modified_id = contact_b_log.id)";
           continue;
 
         case 'civicrm_tag':
@@ -3646,7 +3646,7 @@ WHERE  id IN ( $groupIDs )
     $name = $targetName[4] ? "%$name%" : $name;
     $this->_where[$grouping][] = "contact_b_log.sort_name LIKE '%$name%'";
     $this->_tables['civicrm_log'] = $this->_whereTables['civicrm_log'] = 1;
-    $this->_qill[$grouping][] = ts('Changed by') . ": $name";
+    $this->_qill[$grouping][] = ts('Modified by') . ": $name";
   }
 
   function modifiedDates($values) {
