@@ -497,7 +497,7 @@ WHERE   cas.entity_value = $id AND
    * @static
    *
    */
-  static function add(&$params, &$ids = NULL) {
+  static function add(&$params, $ids = array()) {
     $actionSchedule = new CRM_Core_DAO_ActionSchedule();
     $actionSchedule->copyValues($params);
 
