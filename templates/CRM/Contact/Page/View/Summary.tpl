@@ -353,7 +353,7 @@ cj(document).ready(function($) {
     saveAnywayLabel: "{/literal}{ts escape='js'}Save Anyway{/ts}{literal}",
     reloadLabel: "{/literal}{ts escape='js'}Reload Page{/ts}{literal}"
   });
-	//Enhance styling of "View Contact" tabs to indicate empty/non-empty tags
+  //Enhance styling of "View Contact" tabs to indicate empty/non-empty tags
   $('div#mainTabContainer ul').find('li').each(function(n){
     if($(this).find('em').html()==0){
       $(this).addClass("disabled");

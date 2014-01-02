@@ -77,8 +77,8 @@
   {/if}
 
   {if $action eq 2 | $action eq 1} {* add and update actions *}
-		{* Retrieve the ID for the Employee / Employer relationship type *}
-		{crmAPI var="employmentRelationship" entity="RelationshipType" action="getvalue" version="3" name_a_b="Employee of" return="id"}
+    {* Retrieve the ID for the Employee / Employer relationship type *}
+    {crmAPI var="employmentRelationship" entity="RelationshipType" action="getvalue" version="3" name_a_b="Employee of" return="id"}
     <h3>{if $action eq 1}{ts}New Relationship{/ts}{else}{ts}Edit Relationship{/ts}{/if}</h3>
     <div class="crm-block crm-form-block crm-relationship-form-block">
             {if $action eq 1}
