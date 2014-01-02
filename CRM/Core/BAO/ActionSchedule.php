@@ -905,7 +905,7 @@ WHERE reminder.action_schedule_id = %1 AND reminder.action_date_time IS NULL
 
         // Need to check if its a smart group or not
         // Then decide which table to join onto the query
-        $group			= CRM_Contact_DAO_Group::getTableName();
+        $group = CRM_Contact_DAO_Group::getTableName();
 
         // Get the group information
         $sql = "

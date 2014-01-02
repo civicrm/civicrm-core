@@ -742,13 +742,13 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
     }
 
     $field = self::getFieldObject($fieldId);
-    
+
     // Custom field HTML should indicate group+field name
     $groupName = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $field->custom_group_id);
     $dataCrmCustomVal = $groupName.':'.$field->name;
     $dataCrmCustomAttr = 'data-crm-custom="'.$dataCrmCustomVal.'"';
     $field->attributes .= $dataCrmCustomAttr;
-    
+
     // Fixed for Issue CRM-2183
     if ($field->html_type == 'TextArea' && $search) {
       $field->html_type = 'Text';
@@ -831,7 +831,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
               'timeFormat' => $field->time_format,
               'startOffset' => $field->start_date_years,
               'endOffset' => $field->end_date_years,
-          	  'data-crm-custom' => $dataCrmCustomVal,
+              'data-crm-custom' => $dataCrmCustomVal,
             ));
         }
         break;
@@ -889,7 +889,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
             'size' => 5,
             'style' => '',
             'class' => 'advmultiselect',
-          	'data-crm-custom' => $dataCrmCustomVal,
+            'data-crm-custom' => $dataCrmCustomVal,
           )
         );
 
@@ -1557,7 +1557,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
     if (is_array($customFieldExtend)) {
       $customFieldExtend = $customFieldExtend[0];
     }
-    
+
     if (in_array($customFieldExtend,
         CRM_Contact_BAO_ContactType::subTypes()
       )) {
