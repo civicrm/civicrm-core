@@ -1520,13 +1520,12 @@ ORDER BY   civicrm_email.is_bulkmail DESC
         'from_email'      => $domain_email,
         'from_name'       => $domain_name,
         'msg_template_id' => NULL,
-        'contact_id'      => $params['created_id'],
         'created_id'      => $params['created_id'],
-        'approver_id'     => $params['created_id'],
+        'approver_id'     => NULL,
         'auto_responder'  => 0,
         'created_date'    => date('YmdHis'),
-        'scheduled_date'  => date('YmdHis'),
-        'approval_date'   => date('YmdHis'),
+        'scheduled_date'  => NULL,
+        'approval_date'   => NULL,
       );
 
       // Get the default from email address, if not provided.
@@ -1598,16 +1597,20 @@ ORDER BY   civicrm_email.is_bulkmail DESC
     $transaction->commit();
 
     /**
-     * 'approval_status_id' set in
-     * CRM_Mailing_Form_Schedule::postProcess() or via API.
+     * create parent job if not yet created
+     * condition on the existence of a scheduled date
      */
-    if (isset($params['approval_status_id']) && $params['approval_status_id']) {
+    if (!empty($params['scheduled_date']) && $params['scheduled_date'] != 'null') {
       $job = new CRM_Mailing_BAO_MailingJob();
       $job->mailing_id = $mailing->id;
       $job->status = 'Scheduled';
       $job->is_test = 0;
-      $job->scheduled_date = $params['scheduled_date'];
-      $job->save();
+
+      if ( !$job->find(TRUE) ) {
+        $job->scheduled_date = $params['scheduled_date'];
+        $job->save();
+      }
+
       // Populate the recipients.
       $mailing->getRecipients($job->id, $mailing->id, NULL, NULL, TRUE, FALSE);
     }
