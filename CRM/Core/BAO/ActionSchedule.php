@@ -497,7 +497,7 @@ WHERE   cas.entity_value = $id AND
    * @static
    *
    */
-  static function add(&$params, &$ids = NULL) {
+  static function add(&$params, $ids = array()) {
     $actionSchedule = new CRM_Core_DAO_ActionSchedule();
     $actionSchedule->copyValues($params);
 
@@ -905,7 +905,7 @@ WHERE reminder.action_schedule_id = %1 AND reminder.action_date_time IS NULL
 
         // Need to check if its a smart group or not
         // Then decide which table to join onto the query
-        $group			= CRM_Contact_DAO_Group::getTableName();
+        $group = CRM_Contact_DAO_Group::getTableName();
 
         // Get the group information
         $sql = "
