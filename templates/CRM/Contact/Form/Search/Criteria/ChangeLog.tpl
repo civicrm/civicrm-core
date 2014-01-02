@@ -36,7 +36,8 @@
      </tr>
      <tr>
   <td>
-     <label>{ts}Modified Between{/ts}</label>
+     <span id="modbet"><label>{ts}Modified Between{/ts}</label></span>
+     <span id="addbet" class="hiddenElement"><label>{ts}Added Between{/ts}</label></span>
   </td>
      </tr>
      <tr>
@@ -44,3 +45,31 @@
      </tr>
    </table>
  </div>
+
+{literal}
+  <script type="text/javascript">
+    cj(function () {
+      var changeType = cj('input[name=log_date]:checked').val();
+      if (changeType == 2) {
+        cj('#addbet').hide();
+        cj('#modbet').show();
+      }
+      else if (changeType == 1) {
+        cj('#addbet').show();
+        cj('#modbet').hide();
+      }
+    });
+
+    cj('[name=log_date]:input').change(function () {
+      var changeType = cj('input[name=log_date]:checked').val();
+      if (changeType == 2) {
+        cj('#addbet').hide();
+        cj('#modbet').show();
+      }
+      else if (changeType == 1) {
+        cj('#addbet').show();
+        cj('#modbet').hide();
+      }
+    }).change();
+  </script>
+{/literal}
