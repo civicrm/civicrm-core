@@ -282,7 +282,7 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
     $relTypeID = explode('_', $this->_rtypeId, 3);
 
     if ($this->_action & CRM_Core_Action::DELETE) {
-
+      $this->assign('id', $this->_relationshipId);
       $this->addButtons(array(
           array(
             'type' => 'next',
@@ -690,8 +690,9 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
         CRM_Contact_BAO_Contact_Utils::setCurrentEmployer($currentEmpParams);
       }
     }
-
-    if ($quickSave) {
+    // Don't redirect in ajaxForm context
+    // FIXME: Perhaps changing the button type would avoid needing the redirect at allq
+    if ($quickSave && empty($_REQUEST['snippet'])) {
       $session = CRM_Core_Session::singleton();
       CRM_Utils_System::redirect($session->popUserContext());
     }
