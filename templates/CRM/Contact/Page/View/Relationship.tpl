@@ -70,7 +70,7 @@
                 {assign var = "rtype" value = "b_a" }
             {/if*}
 
-            <tr id="rel_{$rel.id}" class="{cycle values="odd-row,even-row"} row-relationship {if $rel.is_permission_a_b eq 1 or $rel.is_permission_b_a eq 1}row-highlight{/if}">
+            <tr id="relationship-{$rel.id}" class="crm-entity {cycle values="odd-row,even-row"} row-relationship {if $rel.is_permission_a_b eq 1 or $rel.is_permission_b_a eq 1}row-highlight{/if}">
 
             {if $relationshipTabContext}
               <td class="bold">
@@ -115,14 +115,15 @@
 {/if}
 {* end of code to show current relationships *}
 
-{if NOT ($currentRelationships or $inactiveRelationships) }
-
+{if $currentRelationships or $inactiveRelationships}
+  {include file="CRM/common/enableDisableApi.tpl"}
+{else}
   {if $action NEQ 1} {* show 'no relationships' message - unless already in 'add' mode. *}
        <div class="messages status no-popup">
             <div class="icon inform-icon"></div>
-           {capture assign=crmURL}{crmURL p='civicrm/contact/view/rel' q="cid=`$contactId`&action=add&reset=1"}{/capture}
+           {capture assign=link}accesskey="N" class="action-item action-item-first" href="{crmURL p='civicrm/contact/view/rel' q="cid=`$contactId`&action=add&reset=1"}"{/capture}
            {if $permission EQ 'edit'}
-                    {ts 1=$crmURL}There are no Relationships entered for this contact. You can <a accesskey="N" href='%1'>add one</a>.{/ts}
+                    {ts 1=$link}There are no Relationships entered for this contact. You can <a %1>add one</a>.{/ts}
                 {elseif ! $relationshipTabContext}
                     {ts}There are no related contacts / organizations on record for you.{/ts}
                 {else}
@@ -165,7 +166,7 @@
           {else}
             {assign var = "rtype" value = "a_b" }
           {/if}
-          <tr id="rel_{$rel.id}" class="{cycle values="odd-row,even-row"}">
+          <tr id="relationship-{$rel.id}" class="crm-entity {cycle values="odd-row,even-row"}">
             <td class="bold">
               {$rel.relation}
               {if $rel.description}<p class='description'>{$rel.description}</p>{/if}

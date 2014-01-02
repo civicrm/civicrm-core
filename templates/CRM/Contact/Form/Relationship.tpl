@@ -72,7 +72,7 @@
         {/foreach}
         </table>
         {include file="CRM/Custom/Page/CustomDataView.tpl"}
-        <div class="crm-submit-buttons"><a class="button" name='form-submit cancel' href="{crmURL p='civicrm/contact/view' q='action=browse&selectedChild=rel'}">{ts}Done{/ts}</a></div>
+        <div class="crm-submit-buttons"><a class="button form-submit cancel" href="{crmURL p='civicrm/contact/view' q='action=browse&selectedChild=rel'}">{ts}Done{/ts}</a></div>
         </div>
   {/if}
 
@@ -80,6 +80,17 @@
     {* Retrieve the ID for the Employee / Employer relationship type *}
     {crmAPI var="employmentRelationship" entity="RelationshipType" action="getvalue" version="3" name_a_b="Employee of" return="id"}
     <h3>{if $action eq 1}{ts}New Relationship{/ts}{else}{ts}Edit Relationship{/ts}{/if}</h3>
+    {literal}
+      <script type="text/javascript">
+        function setPermissionStatus( relTypeDirection ) {
+          var direction = relTypeDirection.split( '_' );
+          cj('#permision_a_b-' + direction[1] + '_' + direction[2] ).show( );
+          cj('#permision_a_b-' + direction[2] + '_' + direction[1] ).hide( );
+          cj('#permision_b_a-' + direction[1] + '_' + direction[2] ).show( );
+          cj('#permision_b_a-' + direction[2] + '_' + direction[1] ).hide( );
+        }
+      </script>
+    {/literal}
     <div class="crm-block crm-form-block crm-relationship-form-block">
             {if $action eq 1}
                 <div class="description">
@@ -355,17 +366,6 @@
                         <td>{$form.is_active.html}</td>
                     </tr>
                 </table>
-                {literal}
-                    <script type="text/javascript">
-                        function setPermissionStatus( relTypeDirection ) {
-                            var direction = relTypeDirection.split( '_' );
-                            cj('#permision_a_b-' + direction[1] + '_' + direction[2] ).show( );
-                            cj('#permision_a_b-' + direction[2] + '_' + direction[1] ).hide( );
-                            cj('#permision_b_a-' + direction[1] + '_' + direction[2] ).show( );
-                            cj('#permision_b_a-' + direction[2] + '_' + direction[1] ).hide( );
-                        }
-                    </script>
-                {/literal}
             </div>{* end of save element div *}
         <div id="customData"></div>
         <div class="spacer"></div>
@@ -501,11 +501,7 @@ function submitAjaxData() {
 <script type="text/javascript">
 
 {/literal} {if $searchRows} {literal}
-cj(".contact_select .form-checkbox").each( function( ) {
-    if (this) {
-        cj(this).prop('checked',true);
-    }
-});
+cj(".contact_select .form-checkbox").prop('checked',true);
 {/literal} {/if} {literal}
 
 {/literal} {if $action EQ 1}{literal}
