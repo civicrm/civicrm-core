@@ -336,7 +336,50 @@
 
     {literal}
     <script type="text/javascript">
-    cj( function( ) {
+
+      function setPaymentBlock(mode, checkboxEvent) {
+        var memType = parseInt(cj('#membership_type_id_1').val( ));
+        var isPriceSet = 0;
+
+        if ( cj('#price_set_id').length > 0 && cj('#price_set_id').val() ) {
+          isPriceSet = 1;
+        }
+
+        if ( !memType || isPriceSet ) {
+          return;
+        }
+
+        var allMemberships = {/literal}{$allMembershipInfo}{literal};
+        if ( !mode ) {
+          //check the record_contribution checkbox if membership is a paid one
+          {/literal}{if $action eq 1}{literal}
+          if (!checkboxEvent) {
+            if (allMemberships[memType]['total_amount_numeric'] > 0) {
+              cj('#record_contribution').prop('checked','checked');
+              cj('#recordContribution').show();
+            }
+            else {
+              cj('#record_contribution').prop('checked', false);
+              cj('#recordContribution').hide();
+            }
+          }
+          {/literal}{/if}{literal}
+        }
+
+        // skip this for test and live modes because financial type is set automatically
+        cj("#financial_type_id").val(allMemberships[memType]['financial_type_id']);
+        var term = cj('#num_terms').val();
+        if ( term ) {
+          var feeTotal = allMemberships[memType]['total_amount_numeric'] * term;
+          cj("#total_amount").val( feeTotal.toFixed(2) );
+        }
+        else {
+          cj("#total_amount").val( allMemberships[memType]['total_amount'] );
+        }
+      }
+
+
+      cj( function( ) {
       var mode   = {/literal}'{$membershipMode}'{literal};
       if ( !mode ) {
         // Offline form (mode = false) has the record_contribution checkbox
@@ -414,49 +457,6 @@
     }
     {/literal}{/if}
 
-    {literal}
-    function setPaymentBlock(mode, checkboxEvent) {
-      var memType = parseInt(cj('#membership_type_id_1').val( ));
-      var isPriceSet = 0;
-
-      if ( cj('#price_set_id').length > 0 && cj('#price_set_id').val() ) {
-        isPriceSet = 1;
-      }
-
-      if ( !memType || isPriceSet ) {
-        return;
-      }
-
-      var allMemberships = {/literal}{$allMembershipInfo}{literal};
-      if ( !mode ) {
-        //check the record_contribution checkbox if membership is a paid one
-        {/literal}{if $action eq 1}{literal}
-          if (!checkboxEvent) {
-            if (allMemberships[memType]['total_amount_numeric'] > 0) {
-              cj('#record_contribution').prop('checked','checked');
-              cj('#recordContribution').show();
-            }
-            else {
-              cj('#record_contribution').prop('checked', false);
-              cj('#recordContribution').hide();
-            }
-          }
-        {/literal}{/if}{literal}
-      }
-
-      // skip this for test and live modes because financial type is set automatically
-      cj("#financial_type_id").val(allMemberships[memType]['financial_type_id']);
-      var term = cj('#num_terms').val();
-      if ( term ) {
-        var feeTotal = allMemberships[memType]['total_amount_numeric'] * term;
-        cj("#total_amount").val( feeTotal.toFixed(2) );
-      }
-      else {
-        cj("#total_amount").val( allMemberships[memType]['total_amount'] );
-      }
-    }
-
-    {/literal}
     {if $context eq 'standalone' and $outBound_option != 2 }
     {literal}
     cj( function( ) {

@@ -31,11 +31,13 @@
     <div class="view-content">
         <div id="help">
             {if $permission EQ 'edit'}
-                {capture assign=newContribURL}{crmURL p="civicrm/contact/view/contribution" q="reset=1&action=add&cid=`$contactId`&context=contribution"}{/capture}
-                {ts 1=$newContribURL}Click <a href='%1'>Record Contribution (Check, Cash, EFT ...)</a> to record a new contribution received from this contact.{/ts}
+              {capture assign=newContribURL}{crmURL p="civicrm/contact/view/contribution" q="reset=1&action=add&cid=`$contactId`&context=contribution"}{/capture}
+              {capture assign=link}class="action-item action-item-first" href="{$newContribURL}"{/capture}
+              {ts 1=$link}Click <a %1>Record Contribution</a> to record a new contribution received from this contact.{/ts}
                 {if $newCredit}
-                    {capture assign=newCreditURL}{crmURL p="civicrm/contact/view/contribution" q="reset=1&action=add&cid=`$contactId`&context=contribution&mode=live"}{/capture}
-                    {ts 1=$newCreditURL}Click <a href='%1'>Submit Credit Card Contribution</a> to process a new contribution on behalf of the contributor using their credit card.{/ts}
+                  {capture assign=newCreditURL}{crmURL p="civicrm/contact/view/contribution" q="reset=1&action=add&cid=`$contactId`&context=contribution&mode=live"}{/capture}
+                  {capture assign=link}class="action-item action-item-first" href="{$newCreditURL}"{/capture}
+                  {ts 1=$link}Click <a %1>Submit Credit Card Contribution</a> to process a new contribution on behalf of the contributor using their credit card.{/ts}
                 {/if}
             {else}
                 {ts 1=$displayName}Contributions received from %1 since inception.{/ts}
