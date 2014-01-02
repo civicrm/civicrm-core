@@ -235,7 +235,7 @@ class org_civicrm_sms_clickatell extends CRM_SMS_Provider {
       }
       //TODO:
       $postDataArray['to']   = $header['To'];
-      $postDataArray['text'] = substr($message, 0, 460); // max of 460 characters, is probably not multi-lingual
+      $postDataArray['text'] = utf8_decode(substr($message, 0, 460)); // max of 460 characters, is probably not multi-lingual
       if (array_key_exists('mo', $this->_providerInfo['api_params'])) {
         $postDataArray['mo'] = $this->_providerInfo['api_params']['mo'];
       }
