@@ -132,7 +132,7 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
    * @access public
    */
   function view() {
-    // Add js for in-place editing and jstree for tags
+    // Add js for tabs, in-place editing, and jstree for tags
     CRM_Core_Resources::singleton()
       ->addScriptFile('civicrm', 'templates/CRM/Contact/Page/View/Summary.js')
       ->addScriptFile('civicrm', 'packages/jquery/plugins/jstree/jquery.jstree.js', 0, 'html-header', FALSE)
@@ -330,7 +330,8 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
           'title' => $elem['title'],
           'weight' => $elem['weight'],
           'count' => CRM_Contact_BAO_Contact::getCountComponent($u, $this->_contactId),
-          'class' => 'livePage',
+          // CiviCase UI not yet compatible with livePage popups
+          'class' => $u == 'case' ? '' : 'livePage',
         );
         // make sure to get maximum weight, rest of tabs go after
         // FIXME: not very elegant again
@@ -343,12 +344,11 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
     $rest = array(
       'activity' => array(
         'title' => ts('Activities'),
-      ),
-      'case' => array(
-        'title' => ts('Cases'),
+        'class' => 'livePage',
       ),
       'rel' => array(
         'title' => ts('Relationships'),
+        'class' => 'livePage',
       ),
       'group' => array(
         'title' => ts('Groups'),

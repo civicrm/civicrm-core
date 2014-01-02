@@ -72,7 +72,7 @@
         tags.push($(this).text());
       });
       // showing count of tags in summary tab
-      CRM.tabHeader.updateCount('#tab_tag', tags.length);
+      CRM.tabHeader && CRM.tabHeader.updateCount('#tab_tag', tags.length);
       // update summary tab
       $("#tags").html(tags.join(', '));
     };

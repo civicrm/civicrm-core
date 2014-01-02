@@ -809,7 +809,7 @@ CRM.validate = CRM.validate || {
     });
   }
 
-  $.widget('civicrm.crmSnippet', {
+  $.widget('civi.crmSnippet', {
     options: {
       url: null,
       block: true,
@@ -941,7 +941,7 @@ CRM.validate = CRM.validate || {
         validate: true,
         refreshAction: ['next_new', 'submit_savenext'],
         cancelButton: '.cancel.form-submit',
-        openInline: 'a.button:not([href="#"])',
+        openInline: 'a.button:not("[href=#], .no-popup")',
         onCancel: function(event) {},
         onError: function(data) {
           var $el = $(this);
@@ -1006,6 +1006,13 @@ CRM.validate = CRM.validate || {
           else {
             response.url = data.url;
             settings.onError.call($el, response);
+          }
+        },
+        beforeSerialize: function(form, options) {
+          if (window.CKEDITOR && window.CKEDITOR.instances) {
+            for (var instance in CKEDITOR.instances) {
+              CKEDITOR.instances[instance].updateElement();
+            }
           }
         },
         beforeSubmit: function(submission) {

@@ -2257,13 +2257,13 @@ div.grippie {
 
 /* crm button style */
 
-#crm-container .crm-submit-buttons,
-#crm-container .action-link {
+.crm-container .crm-submit-buttons,
+.crm-container .action-link {
   height: 27px;
   margin: 4px 0px 4px 2px;
 }
 
-#crm-container .register_link-top {
+.crm-container .register_link-top {
   float: right;
   margin-left: 8px;
 }
