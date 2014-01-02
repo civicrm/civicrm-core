@@ -72,6 +72,9 @@ class CRM_Tag_Form_Tag extends CRM_Core_Form {
    * @access public
    */
   public function buildQuickForm() {
+    CRM_Core_Resources::singleton()
+      ->addScriptFile('civicrm', 'packages/jquery/plugins/jstree/jquery.jstree.js', 0, 'html-header', FALSE)
+      ->addStyleFile('civicrm', 'packages/jquery/plugins/jstree/themes/default/style.css', 0, 'html-header');
     // get categories for the contact id
     $entityTag = CRM_Core_BAO_EntityTag::getTag($this->_entityID, $this->_entityTable);
     $this->assign('tagged', $entityTag);

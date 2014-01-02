@@ -8,11 +8,11 @@ cj(function($) {
     .off('click.crmLivePage')
     .on('click.crmLivePage', 'a.button, a.action-item', function() {
       // only follow real links not javascript buttons
-      if ($(this).attr('href') === '#' || $(this).attr('onclick')) {
+      if ($(this).attr('href') === '#' || $(this).attr('onclick') || $(this).hasClass('no-popup')) {
         return;
       }
       CRM.loadForm($(this).attr('href'), {
-        openInline: 'a:not([href="#"])'
+        openInline: 'a:not("[href=#], .no-popup")'
       }).on('crmFormSuccess', function(e, data) {
         // Refresh page when form completes
         $('#crm-main-content-wrapper').crmSnippet('refresh');

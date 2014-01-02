@@ -34,7 +34,7 @@
       {foreach from=$viewRelationship item="row"}
             <tr>
                 <td class="label">{$row.relation}</td>
-                <td><a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=`$row.cid`"}">{$row.name}</a></td>
+                <td><a class="no-popup" href="{crmURL p='civicrm/contact/view' q="reset=1&cid=`$row.cid`"}">{$row.name}</a></td>
             </tr>
             {if $isCurrentEmployer}
                 <tr><td class="label">{ts}Current Employee?{/ts}</td><td>{ts}Yes{/ts}</td></tr>
@@ -72,7 +72,7 @@
         {/foreach}
         </table>
         {include file="CRM/Custom/Page/CustomDataView.tpl"}
-        <div class="crm-submit-buttons"><input type="button" name='cancel' value="{ts}Done{/ts}" onclick="location.href='{crmURL p='civicrm/contact/view' q='action=browse&selectedChild=rel'}';"/></div>
+        <div class="crm-submit-buttons"><a class="button" name='form-submit cancel' href="{crmURL p='civicrm/contact/view' q='action=browse&selectedChild=rel'}">{ts}Done{/ts}</a></div>
         </div>
   {/if}
 

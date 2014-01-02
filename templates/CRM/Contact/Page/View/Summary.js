@@ -98,7 +98,7 @@
         CRM.reloadChangeLogTab();
       }
       // Refresh tab contents - Simple logging
-      else if ($('#changeLog').closest('.ui-tabs-panel').data('civicrmCrmSnippet')) {
+      else if ($('#changeLog').closest('.ui-tabs-panel').data('civiCrmSnippet')) {
         $('#changeLog').closest('.ui-tabs-panel').crmSnippet('destroy');
       }
     }
@@ -293,6 +293,28 @@
     $('#crm-container').on('click', '#crm-record-log a.crm-log-view', function() {
       $('#tab_log a').click();
       return false;
+    });
+    // Handle action links in popup
+    $('#crm-container').on('click', '.crm-contact_actions-list a, .crm-contact_activities-list a', function() {
+      var tabName = $(this).data('tab') || 'activity';
+      var $tab = $('#tab_' + tabName);
+      var $panel = $('#' + $tab.attr('aria-controls'));
+      CRM.loadForm($(this).attr('href'))
+        .on('crmFormSuccess', function() {
+          if ($panel.data('civiCrmSnippet')) {
+            $panel.crmSnippet('refresh');
+          }
+          $('#mainTabContainer').tabs('option', 'active', $tab.prevAll().length);
+        });
+      return false;
+    });
+    // Actions menu
+    $(document).on('click', function(e) {
+      if ($(e.target).is('#crm-contact-actions-link, #crm-contact-actions-link *')) {
+        $('#crm-contact-actions-list').show();
+        return false;
+      }
+      $('#crm-contact-actions-list').hide();
     });
     $().crmAccordions();
   });

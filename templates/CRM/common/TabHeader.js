@@ -17,7 +17,7 @@ cj(function($) {
     })
     .on('tabsbeforeload', function(e, ui) {
       // Use civicrm ajax wrappers rather than the default $.load
-      if (!ui.panel.data("civicrmCrmSnippet")) {
+      if (!ui.panel.data("civiCrmSnippet")) {
         var method = ui.tab.hasClass('ajaxForm') ? 'loadForm' : 'loadPage';
         var params = {target: ui.panel};
         if (method === 'loadForm') {
@@ -34,11 +34,11 @@ cj(function($) {
             .off('click.crmLivePage')
             .on('click.crmLivePage', 'a.button, a.action-item', function() {
               // only follow real links not javascript buttons
-              if ($(this).attr('href') === '#' || $(this).attr('onclick')) {
+              if ($(this).attr('href') === '#' || $(this).attr('onclick') || $(this).hasClass('no-popup')) {
                 return;
               }
               CRM.loadForm($(this).attr('href'), {
-                openInline: 'a:not([href="#"])'
+                openInline: 'a:not("[href=#], .no-popup")'
               }).on('crmFormSuccess', function(e, data) {
                   // Refresh when form completes
                   ui.panel.crmSnippet('refresh');
