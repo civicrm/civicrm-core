@@ -204,18 +204,18 @@ cj(function(){
   });
 
   {/literal}
-	{if $action eq 2}
-	{literal}
-	  showHideMaxRelated(cj('#relationship_type_id').val());
-	  cj('#relationship_type_id').change(function(){
-	    showHideMaxRelated(cj('#relationship_type_id').val());
-	  });
-	{/literal}{else}{literal}
-	  showHideMaxRelated(cj('#relationship_type_id :selected').val());
-	  cj('#relationship_type_id').change(function(){
-	    showHideMaxRelated(cj('#relationship_type_id :selected').val());
-	  });	
-	{/literal}{/if}{literal}
+  {if $action eq 2}
+  {literal}
+    showHideMaxRelated(cj('#relationship_type_id').val());
+    cj('#relationship_type_id').change(function(){
+      showHideMaxRelated(cj('#relationship_type_id').val());
+    });
+  {/literal}{else}{literal}
+    showHideMaxRelated(cj('#relationship_type_id :selected').val());
+    cj('#relationship_type_id').change(function(){
+      showHideMaxRelated(cj('#relationship_type_id :selected').val());
+    });
+  {/literal}{/if}{literal}
 });
 
 function showHidePeriodSettings() {
@@ -231,7 +231,7 @@ function showHidePeriodSettings() {
     }
     if (!cj("#fixed_period_rollover_day_d").val()) {
       cj("#fixed_period_rollover_day_d").val("31");
-    }  
+    }
     cj("#month_fixed_rollover_day_row").val("");
   }
   else if ((cj("#period_type :selected").val() == "fixed" ) &&
