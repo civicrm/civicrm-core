@@ -965,13 +965,13 @@ WHERE id={$id}; ";
    */
   public static function processImage() {
 
-    $action = CRM_Utils_Request::retrieve('action', 'String', $this);
-    $cid = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
+    $action = CRM_Utils_Request::retrieve('action', 'String');
+    $cid = CRM_Utils_Request::retrieve('cid', 'Positive');
     // retrieve contact id in case of Profile context
-    $id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
+    $id = CRM_Utils_Request::retrieve('id', 'Positive');
     $cid = $cid ? $cid : $id;
     if ($action & CRM_Core_Action::DELETE) {
-      if (CRM_Utils_Request::retrieve('confirmed', 'Boolean', $this)) {
+      if (CRM_Utils_Request::retrieve('confirmed', 'Boolean')) {
         CRM_Contact_BAO_Contact::deleteContactImage($cid);
         CRM_Core_Session::setStatus(ts('Contact image deleted successfully'), ts('Image Deleted'), 'success');
         $session = CRM_Core_Session::singleton();
