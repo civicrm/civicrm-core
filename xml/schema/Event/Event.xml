@@ -591,13 +591,12 @@
   <field>
     <name>campaign_id</name>
     <type>int unsigned</type>
-    <title>Campaign ID</title>
+    <title>Campaign</title>
     <comment>The campaign for which this event has been created.</comment>
     <pseudoconstant>
       <table>civicrm_campaign</table>
       <keyColumn>id</keyColumn>
       <labelColumn>title</labelColumn>
-      <condition>(end_date IS NULL OR end_date > NOW())</condition>
     </pseudoconstant>
     <add>3.4</add>
   </field>
