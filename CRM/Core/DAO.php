@@ -1295,6 +1295,10 @@ SELECT contact_id
             //skip the FK if it is not required
             // if it's contact id we should create even if not required
             // we'll have a go @ fetching first though
+            // we WILL create campaigns though for so tests with a campaign pseudoconstant will complete
+            if($FKClassName === 'CRM_Campaign_DAO_Campaign' && $daoName != $FKClassName) {
+              $required = TRUE;
+            }
             if (!$required && $dbName != 'contact_id') {
               $fkDAO = new $FKClassName;
               if($fkDAO->find(TRUE)){
@@ -1348,7 +1352,12 @@ SELECT contact_id
 
             case CRM_Utils_Type::T_DATE:
             case CRM_Utils_Type::T_TIMESTAMP:
+            case CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME:
               $object->$dbName = '19700101';
+              if($dbName == 'end_date') {
+                // put this in the future
+                $object->$dbName = '20200101';
+              }
               break;
 
             case CRM_Utils_Type::T_TIME:
