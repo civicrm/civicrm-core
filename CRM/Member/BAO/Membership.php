@@ -1082,10 +1082,6 @@ INNER JOIN  civicrm_membership_type type ON ( type.id = membership.membership_ty
    */
   static function &exportableFields() {
     $expFieldMembership = CRM_Member_DAO_Membership::export();
-    //campaign fields.
-    if (isset($expFieldMembership['member_campaign_id'])) {
-      $expFieldMembership['member_campaign'] = array('title' => ts('Campaign Title'));
-    }
 
     $expFieldsMemType = CRM_Member_DAO_MembershipType::export();
     $fields           = array_merge($expFieldMembership, $expFieldsMemType);
@@ -1949,16 +1945,6 @@ SELECT c.contribution_page_id as pageID
    */
   static function getMembershipFields($mode = NULL) {
     $fields = CRM_Member_DAO_Membership::export();
-
-    //campaign fields.
-    if (isset($fields['member_campaign_id'])) {
-      if ($mode == CRM_Export_Form_Select::MEMBER_EXPORT) {
-        $fields['member_campaign'] = array('title' => ts('Campaign Title'));
-      }
-      else {
-        $fields['member_campaign_id']['title'] = ts('Campaign');
-      }
-    }
 
     unset($fields['membership_contact_id']);
     $fields = array_merge($fields, CRM_Core_BAO_CustomField::getFieldsForImport('Membership'));
