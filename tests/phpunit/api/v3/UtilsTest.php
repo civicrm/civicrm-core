@@ -36,7 +36,7 @@ require_once 'CRM/Utils/DeprecatedUtils.php';
 class api_v3_UtilsTest extends CiviUnitTestCase {
   protected $_apiversion = 3;
   public $DBResetRequired = FALSE;
-  public $_eNoticeCompliant = TRUE;
+
   public $_contactID = 1;
 
   /**

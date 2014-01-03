@@ -38,7 +38,7 @@ require_once 'tests/phpunit/CiviTest/CiviUnitTestCase.php';
  */
 class api_v3_CustomFieldTest extends CiviUnitTestCase {
   protected $_apiversion;
-  public $_eNoticeCompliant = TRUE;
+
   function get_info() {
     return array(
       'name' => 'Custom Field Create',

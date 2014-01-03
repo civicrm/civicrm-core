@@ -36,7 +36,7 @@ require_once 'api/Wrapper.php';
  */
 class api_v3_APIWrapperTest extends CiviUnitTestCase {
   public $DBResetRequired = FALSE;
-  public $_eNoticeCompliant = TRUE;
+
 
   protected $_apiversion = 3;
 
