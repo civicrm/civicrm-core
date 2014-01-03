@@ -635,6 +635,12 @@ class CRM_Contact_BAO_Query {
         }
       }
 
+      if (in_array($name, array('prefix_id', 'suffix_id', 'gender_id'))) {
+        if (CRM_Utils_Array::value($field['pseudoconstant']['optionGroupName'], $this->_returnProperties)) {
+          $makeException = TRUE;
+        }
+      }
+
       $cfID = CRM_Core_BAO_CustomField::getKeyID($name);
       if (
         CRM_Utils_Array::value($name, $this->_paramLookup) ||
