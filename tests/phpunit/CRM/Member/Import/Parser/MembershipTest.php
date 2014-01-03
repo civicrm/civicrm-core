@@ -34,8 +34,6 @@ require_once 'CiviTest/Membership.php';
  *  @package   CiviCRM
  */
 class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
-
-  public $_eNoticeCompliant = TRUE;
   /**
    * Membership type name used in test function
    * @var String
@@ -87,6 +85,7 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
       'fixed_period_start_day' => 101,
       'fixed_period_rollover_day' => 1231
     );
+    $ids = array();
     $membershipType = CRM_Member_BAO_MembershipType::add($params, $ids);
     $this->_membershipTypeID = $membershipType->id;
 
