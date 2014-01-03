@@ -495,7 +495,7 @@ ORDER BY parent_id, weight";
         //CRM-7656 --make sure to separate out url path from url params,
         //as we'r going to validate url path across cross-site scripting.
         $urlParam = CRM_Utils_System::explode('&', str_replace('?', '&', $url), 2);
-        $url = CRM_Utils_System::url($urlParam[0], $urlParam[1], FALSE, NULL, FALSE);
+        $url = CRM_Utils_System::url($urlParam[0], $urlParam[1], FALSE, NULL, TRUE);
       }
       $makeLink = TRUE;
     }
