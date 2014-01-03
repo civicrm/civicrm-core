@@ -41,37 +41,37 @@
       <script type="text/javascript">
       var recipient_manual = '';
       var recipient_manual_id = null;
-      var toDataUrl = "{/literal}                                                                     "; {/literal}
+      var toDataUrl = "{/literal}{crmURL p='civicrm/ajax/checkemail' q='id=1&noemail=1' h=0 }{literal}"; {/literal}
 
-  {if $recipients}
-  {foreach from=$recipients key=id item=name}
-  {literal} recipient_manual += '{"name":"' + {/literal}"{$name}"{literal} + '","id":"' + {/literal}"{$id}"{literal} + '"},';{/literal}
-  {/foreach}
-  {literal} eval('recipient_manual = [' + recipient_manual + ']'); {/literal}
-  {/if}
+    {if $recipients}
+      {foreach from=$recipients key=id item=name}
+        {literal} recipient_manual += '{"name":"'+{/literal}"{$name}"{literal}+'","id":"'+{/literal}"{$id}"{literal}+'"},';{/literal}
+      {/foreach}
+      {literal} eval( 'recipient_manual = [' + recipient_manual + ']'); {/literal}
+    {/if}
 
-  {literal}
-  if (recipient_manual_id) {
-    eval('recipient_manual = ' + recipient_manual_id);
-  }
+    {literal}
+    if ( recipient_manual_id ) {
+      eval( 'recipient_manual = ' + recipient_manual_id );
+    }
 
-    cj(document).ready( function() {
+    cj(document).ready( function( ) {
     {/literal}
     {literal}
 
-    eval('tokenClass = { tokenList: "token-input-list-facebook", token: "token-input-token-facebook", tokenDelete: "token-input-delete-token-facebook", selectedToken: "token-input-selected-token-facebook", highlightedToken: "token-input-highlighted-token-facebook", dropdown: "token-input-dropdown-facebook", dropdownItem: "token-input-dropdown-item-facebook", dropdownItem2: "token-input-dropdown-item2-facebook", selectedDropdownItem: "token-input-selected-dropdown-item-facebook", inputToken: "token-input-input-token-facebook" } ');
+    eval( 'tokenClass = { tokenList: "token-input-list-facebook", token: "token-input-token-facebook", tokenDelete: "token-input-delete-token-facebook", selectedToken: "token-input-selected-token-facebook", highlightedToken: "token-input-highlighted-token-facebook", dropdown: "token-input-dropdown-facebook", dropdownItem: "token-input-dropdown-item-facebook", dropdownItem2: "token-input-dropdown-item2-facebook", selectedDropdownItem: "token-input-selected-dropdown-item-facebook", inputToken: "token-input-input-token-facebook" } ');
 
-  var sourceDataUrl = "{/literal}{$dataUrl}{literal}";
-  var tokenDataUrl  = "{/literal}{$tokenUrl}{literal}";
-  var hintText = "{/literal}{ts escape='js'}Type in a partial or complete name of an existing recipient.     {literal}";
+    var sourceDataUrl = "{/literal}{$dataUrl}{literal}";
+    var tokenDataUrl  = "{/literal}{$tokenUrl}{literal}";
+    var hintText = "{/literal}{ts escape='js'}Type in a partial or complete name of an existing recipient.{/ts}{literal}";
     cj( "#recipient_manual_id").tokenInput( tokenDataUrl, { prePopulate: recipient_manual, classes: tokenClass, hintText: hintText });
     cj( 'ul.token-input-list-facebook, div.token-input-dropdown-facebook' ).css( 'width', '450px' );
     cj('#source_contact_id').autocomplete( sourceDataUrl, { width : 180, selectFirst : false, hintText: hintText, matchContains: true, minChars: 1
-    }).result( function(event, data, formatted) {
-    }).bind( 'click', function( ) {  });
+                                }).result( function(event, data, formatted) {
+                                }).bind( 'click', function( ) {  });
     });
     </script>
-  {/literal}
+    {/literal}
     <table class="form-layout-compressed">
       <tr class="crm-scheduleReminder-form-block-title">
         <td class="right">{$form.title.label}</td>
@@ -133,7 +133,6 @@
         <td>{$form.recipient_manual_id.html}{edit}<span
             class="description">{ts}You can manually send out the reminders to these recipients.{/ts}</span>{/edit}</td>
       </tr>
-
       <tr id="recipientGroup" class="crm-scheduleReminder-form-block-recipient_group_id">
         <td class="label">{$form.group_id.label}</td>
         <td>{$form.group_id.html}</td>
@@ -142,7 +141,6 @@
         <td class="label">{$form.mode.label}</td>
         <td>{$form.mode.html}</td>
       </tr>
-
     </table>
     <fieldset id="compose_id">
       <legend>{$title}</legend>
@@ -170,30 +168,30 @@
 </div>
 
 {include file="CRM/common/showHideByFieldValue.tpl"
-trigger_field_id    = "is_repeat"
-trigger_value       = "true"
-target_element_id   = "repeatFields"
-target_element_type = "table-row"
-field_type          = "radio"
-invert              = "false"
+    trigger_field_id    = "is_repeat"
+    trigger_value       = "true"
+    target_element_id   = "repeatFields"
+    target_element_type = "table-row"
+    field_type          = "radio"
+    invert              = "false"
 }
 
 {include file="CRM/common/showHideByFieldValue.tpl"
-trigger_field_id    ="recipient"
-trigger_value       = 'manual'
-target_element_id   ="recipientManual"
-target_element_type ="table-row"
-field_type          ="select"
-invert              = 0
+    trigger_field_id    ="recipient"
+    trigger_value       = 'manual'
+    target_element_id   ="recipientManual"
+    target_element_type ="table-row"
+    field_type          ="select"
+    invert              = 0
 }
 
 {include file="CRM/common/showHideByFieldValue.tpl"
-trigger_field_id    ="recipient"
-trigger_value       = 'group'
-target_element_id   ="recipientGroup"
-target_element_type ="table-row"
-field_type          ="select"
-invert              = 0
+    trigger_field_id    ="recipient"
+    trigger_value       = 'group'
+    target_element_id   ="recipientGroup"
+    target_element_type ="table-row"
+    field_type          ="select"
+    invert              = 0
 }
 
 {literal}

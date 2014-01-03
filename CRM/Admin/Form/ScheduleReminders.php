@@ -137,9 +137,11 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
     $this->add('select', 'start_action_offset', ts('When'), $numericOptions);
     $title = ts('Email');
     $isActive = ts('Send email');
+    $recordActivity = ts('Record activity for automated email');
     if ($providersCount) {
       $title = ts('Email or SMS');
       $isActive = ts('Send email or SMS');
+      $recordActivity = ts('Record activity for automated email or SMS');
       $options = array(ts('-none-')) + CRM_Core_OptionGroup::values('msg_mode');;
       $this->add('select', 'mode', ts('Send as'), $options);
     }
@@ -162,7 +164,7 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
 
     $this->add('select', 'start_action_date', ts('Date Field'), $sel4, TRUE);
 
-    $this->addElement('checkbox', 'record_activity', ts('Record activity for automated email'));
+    $this->addElement('checkbox', 'record_activity', $recordActivity);
 
     $this->addElement('checkbox', 'is_repeat', ts('Repeat'),
       NULL, array('onclick' => "return showHideByValue('is_repeat',true,'repeatFields','table-row','radio',false);")
@@ -278,6 +280,7 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
   function setDefaultValues() {
     if ($this->_action & CRM_Core_Action::ADD) {
       $defaults['is_active'] = 1;
+      $defaults['mode'] = 'Email';
       $defaults['record_activity'] = 1;
     }
     else {
@@ -352,7 +355,8 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
       'absolute_date',
       'group_id',
       'record_activity',
-      'limit_to'
+      'limit_to',
+      'mode'
     );
     foreach ($keys as $key) {
       $params[$key] = CRM_Utils_Array::value($key, $values);
