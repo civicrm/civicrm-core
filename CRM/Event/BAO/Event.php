@@ -1158,7 +1158,7 @@ WHERE civicrm_event.is_active = 1
           );
         }
         else {
-          $sendTemplateParams['from'] = CRM_Utils_Array::value('confirm_from_name', $values['event']) . " <{$values['event']['confirm_from_email']}>";
+          $sendTemplateParams['from'] = CRM_Utils_Array::value('confirm_from_name', $values['event']) . " <" . CRM_Utils_Array::value('confirm_from_email', $values['event']) . ">";
           $sendTemplateParams['toName'] = $displayName;
           $sendTemplateParams['toEmail'] = $email;
           $sendTemplateParams['autoSubmitted'] = TRUE;
