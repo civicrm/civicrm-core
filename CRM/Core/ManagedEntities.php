@@ -50,15 +50,15 @@ class CRM_Core_ManagedEntities {
     $dao->name = $name;
     if ($dao->find(TRUE)) {
       $params = array(
-        'version' => 3,
         'id' => $dao->entity_id,
       );
-      $result = civicrm_api($dao->entity_type, 'getsingle', $params);
-      if ($result['is_error']) {
-        $this->onApiError($params, $result);
-      } else {
-        return $result;
+      try {
+        $result = civicrm_api3($dao->entity_type, 'getsingle', $params);
       }
+      catch (Exception $e) {
+        $this->onApiError($params, $result);
+      }
+      return $result;
     } else {
       return NULL;
     }
