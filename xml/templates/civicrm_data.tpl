@@ -206,7 +206,8 @@ VALUES
    ('financial_item_status'         , '{ts escape="sql"}Financial Item Status{/ts}'              , 1, 1),
    ('label_type'                    , '{ts escape="sql"}Label Type{/ts}'                         , 1, 1),
    ('name_badge'                    , '{ts escape="sql"}Name Badge Format{/ts}'                  , 1, 1),
-   ('communication_style'           , '{ts escape="sql"}Communication Style{/ts}'                , 1, 1);
+   ('communication_style'           , '{ts escape="sql"}Communication Style{/ts}'                , 1, 1),
+   ('msg_mode'                      , '{ts escape="sql"}Message Mode{/ts}'                       , 1, 1);
 
 SELECT @option_group_id_pcm            := max(id) from civicrm_option_group where name = 'preferred_communication_method';
 SELECT @option_group_id_act            := max(id) from civicrm_option_group where name = 'activity_type';
@@ -282,7 +283,7 @@ SELECT @option_group_id_financial_item_status := max(id) from civicrm_option_gro
 SELECT @option_group_id_label_type := max(id) from civicrm_option_group where name = 'label_type';
 SELECT @option_group_id_name_badge := max(id) from civicrm_option_group where name = 'name_badge';
 SELECT @option_group_id_communication_style := max(id) from civicrm_option_group where name = 'communication_style';
-
+SELECT @option_group_id_msg_mode := max(id) from civicrm_option_group where name = 'msg_mode';
 
 SELECT @contributeCompId := max(id) FROM civicrm_component where name = 'CiviContribute';
 SELECT @eventCompId      := max(id) FROM civicrm_component where name = 'CiviEvent';
@@ -905,7 +906,12 @@ VALUES
 
 -- Communication Styles
   (@option_group_id_communication_style, '{ts escape="sql"}Formal{/ts}'  , 1, 'formal'  , NULL, 0, 1, 1, NULL, 0, 0, 1, NULL, NULL),
-  (@option_group_id_communication_style, '{ts escape="sql"}Familiar{/ts}', 2, 'familiar', NULL, 0, 0, 2, NULL, 0, 0, 1, NULL, NULL);
+  (@option_group_id_communication_style, '{ts escape="sql"}Familiar{/ts}', 2, 'familiar', NULL, 0, 0, 2, NULL, 0, 0, 1, NULL, NULL),
+
+-- Message Mode
+(@option_group_id_msg_mode, '{ts escape="sql"}Email{/ts}', 'Email', 'Email', NULL, 0, NULL, 1, NULL, 0, 0, 1, NULL, NULL),
+(@option_group_id_msg_mode, '{ts escape="sql"}SMS{/ts}', 'SMS', 'SMS', NULL, 0, NULL, 2, NULL, 0, 0, 1, NULL, NULL),
+(@option_group_id_msg_mode, '{ts escape="sql"}User Preference{/ts}', 'User_Preference', 'User Preference', NULL, 0, NULL, 3, NULL, 0, 0, 1, NULL, NULL);
 
 -- financial accounts
 SELECT @opval := value FROM civicrm_option_value WHERE name = 'Revenue' and option_group_id = @option_group_id_fat;

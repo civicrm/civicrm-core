@@ -241,4 +241,19 @@
        <comment>Date on which the reminder be sent.</comment>
        <add>4.1</add>
   </field>
+  <field>
+    <name>mode</name>
+    <title>Message Mode</title>
+    <type>varchar</type>
+    <default>Email</default>
+    <length>128</length>
+    <comment>Send the message as email or sms or both.</comment>
+    <pseudoconstant>
+      <optionGroupName>msg_mode</optionGroupName>
+    </pseudoconstant>
+    <html>
+      <type>Select</type>
+    </html>
+    <add>4.5</add>
+  </field>
 </table>

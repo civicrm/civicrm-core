@@ -56,7 +56,8 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
   public function buildQuickForm() {
     parent::buildQuickForm();
     $this->_mappingID = $mappingID = NULL;
-
+    $providersCount = CRM_SMS_BAO_Provider::activeProviderCount();
+    //CRM_Core_Error::debug('pc', $providersCount);
     if ($this->_action & (CRM_Core_Action::DELETE)) {
       $reminderName =
         CRM_Core_DAO::getFieldValue('CRM_Core_DAO_ActionSchedule', $this->_id, 'title');
@@ -134,7 +135,16 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
 
     //reminder_interval
     $this->add('select', 'start_action_offset', ts('When'), $numericOptions);
+    $title = ts('Email');
+    $isActive = ts('Send email');
+    if ($providersCount) {
+      $title = ts('Email or SMS');
+      $isActive = ts('Send email or SMS');
+      $options = array(ts('-none-')) + CRM_Core_OptionGroup::values('msg_mode');;
+      $this->add('select', 'mode', ts('Send as'), $options);
+    }
 
+    $this->assign('title', $title);
     foreach ($this->_freqUnits as $val => $label) {
       $freqUnitsDisplay[$val] = ts('%1(s)', array(1 => $label));
     }
@@ -221,7 +231,7 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
       CRM_Core_DAO::getAttribute('CRM_Core_DAO_ActionSchedule', 'subject')
     );
 
-    $this->add('checkbox', 'is_active', ts('Send email'));
+    $this->add('checkbox', 'is_active', $isActive);
 
     $this->addFormRule(array('CRM_Admin_Form_ScheduleReminders', 'formRule'));
   }
