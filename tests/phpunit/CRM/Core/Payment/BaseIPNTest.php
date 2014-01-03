@@ -71,9 +71,14 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
       'user_name' => 'user_name',
       'password' => 'password',
       'url_recur' => 'url_recur',
+      //@todo - if we used the api then we could pass in 'AuthNet & the api will resolve
+      // (as least it will once the pseudoconstant s in the schema)
+      'payment_processor_type_id' => $this->callAPISuccess('payment_processor_type', 'getvalue', array(
+        'return' => 'id',
+        'name' => 'AuthNet'
+      )),
     );
 
-    $paymentProcessorParams['payment_processor_type'] = 'AuthorizeNet';
     $paymentProcessorParams['domain_id'] = 1;
     $paymentProcessorParams['is_active'] = 1;
     $paymentProcessorParams['is_test'] = 1;
@@ -122,7 +127,7 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
       'civicrm_line_item',
     );
     $this->quickCleanup($tablesToTruncate);
-    CRM_Member_PseudoConstant::membershipType($this->_membershipTypeID, TRUE);
+    CRM_Member_PseudoConstant::membershipType(NULL, TRUE);
     CRM_Member_PseudoConstant::membershipStatus(NULL, NULL, 'name', TRUE);
   }
 
@@ -462,17 +467,18 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
     $contribution = new CRM_Contribute_BAO_Contribution();
     $contribution->id = $this->_contributionId;
     $contribution->find(TRUE);
+    $contributionPageID = NULL;
     if (!empty($contributionPage)) {
       $dao = new CRM_Core_DAO();
       $contribution_page = $dao->createTestObject('CRM_Contribute_DAO_ContributionPage');
-      $contribution->contribution_page_id = $contribution_page->id;
-      $contribution->save;
+      $contribution->contribution_page_id = $contributionPageID = $contribution_page->id;
+      $contribution->save();
     }
 
     $this->objects['contribution'] = $contribution;
     $this->input = array(
       'component' => 'contribute',
-      'contribution_page_id' => $contribution_page->id,
+      'contribution_page_id' => $contributionPageID,
       'total_amount' => 110.00,
       'invoiceID' => "c8acb91e080ad7777a2adc119c192885",
       'contactID' => $this->_contactId,
