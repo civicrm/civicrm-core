@@ -399,8 +399,6 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
       CRM_Contact_BAO_Query_Hook::singleton()->getFields(),
       CRM_Activity_BAO_Activity::exportableFields()
     );
-    // CRM-13810 Remove 'Campaign Title' pseudofield
-    CRM_Utils_Array::remove($fields, 'activity_campaign', 'participant_campaign', 'member_campaign', 'pledge_campaign');
     return $fields;
   }
 
