@@ -393,12 +393,15 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
   }
 
   static function fields() {
-    return array_merge(
+    $fields = array_merge(
       CRM_Contact_BAO_Contact::exportableFields('All', FALSE, TRUE),
       CRM_Core_Component::getQueryFields(),
       CRM_Contact_BAO_Query_Hook::singleton()->getFields(),
       CRM_Activity_BAO_Activity::exportableFields()
     );
+    // CRM-13810 Remove 'Campaign Title' pseudofield
+    CRM_Utils_Array::remove($fields, 'activity_campaign', 'participant_campaign', 'member_campaign', 'pledge_campaign');
+    return $fields;
   }
 
   /**
