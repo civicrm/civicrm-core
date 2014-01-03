@@ -1341,6 +1341,9 @@ function _civicrm_api3_deprecated_contact_check_params(
 
 
     // contact_type has a limited number of valid values
+    if(empty($params['contact_type'])) {
+      return civicrm_api3_create_error("No Contact Type");
+    }
     $fields = CRM_Utils_Array::value($params['contact_type'], $required);
     if ($fields == NULL) {
       return civicrm_api3_create_error("Invalid Contact Type: {$params['contact_type']}");
