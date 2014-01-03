@@ -519,7 +519,7 @@ class CRM_Utils_Array {
         } else {
           $keyvalue = $record->{$key};
         }
-        if (!is_array($node[$keyvalue])) {
+        if (isset($node[$keyvalue]) && !is_array($node[$keyvalue])) {
           $node[$keyvalue] = array();
         }
         $node = &$node[$keyvalue];
