@@ -48,7 +48,7 @@ class api_v3_TagTest extends CiviUnitTestCase {
   protected $tag = array();
 
   protected $tagID;
-  public $_eNoticeCompliant = TRUE;
+
   function setUp() {
     parent::setUp();
     $this->tag = $this->tagCreate();

@@ -31,7 +31,7 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
   protected $individual;
   protected $params;
   protected $ids;
-  public $_eNoticeCompliant = TRUE;
+
   public $DBResetRequired = FALSE;
 
   function setUp() {

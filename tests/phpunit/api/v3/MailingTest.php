@@ -37,7 +37,7 @@ class api_v3_MailingTest extends CiviUnitTestCase {
   protected $_apiversion = 3;
   protected $_params = array();
   protected $_entity = 'Mailing';
-  public $_eNoticeCompliant = TRUE;
+
 
   function get_info() {
     return array(
