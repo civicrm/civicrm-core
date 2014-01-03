@@ -438,7 +438,7 @@ class CRM_Contact_BAO_GroupContact extends CRM_Contact_DAO_GroupContact {
    * @access public
    * @static
    */
-  function &getMembershipDetail($contactId, $groupID, $method = 'Email') {
+  static function getMembershipDetail($contactId, $groupID, $method = 'Email') {
     $leftJoin = $where = $orderBy = null;
 
     if ($method) {
