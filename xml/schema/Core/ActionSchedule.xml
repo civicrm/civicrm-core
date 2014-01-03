@@ -244,8 +244,8 @@
   <field>
     <name>mode</name>
     <title>Message Mode</title>
+    <default>"Email"</default>
     <type>varchar</type>
-    <default>Email</default>
     <length>128</length>
     <comment>Send the message as email or sms or both.</comment>
     <pseudoconstant>

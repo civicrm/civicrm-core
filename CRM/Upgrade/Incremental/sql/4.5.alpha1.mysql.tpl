@@ -98,3 +98,21 @@ SELECT @caseCompId := id FROM `civicrm_component` where `name` like 'CiviCase';
 UPDATE `civicrm_option_value`
 SET is_reserved = 1
 WHERE is_reserved = 0 AND option_group_id = @option_group_id_activity_type AND component_id = @caseCompId;
+
+-- CRM-13912
+ALTER TABLE civicrm_action_schedule
+ADD COLUMN `mode` varchar(128) COLLATE utf8_unicode_ci DEFAULT 'Email' COMMENT 'Send the message as email or sms or both.';
+
+INSERT INTO
+civicrm_option_group (name, {localize field='title'}title{/localize}, is_reserved, is_active)
+VALUES
+('msg_mode', {localize}'{ts escape="sql"}Message Mode{/ts}'{/localize}, 1, 1);
+
+SELECT @option_group_id_msg_mode := max(id) from civicrm_option_group where name = 'msg_mode';
+
+INSERT INTO
+civicrm_option_value (option_group_id, label, value, name, is_default, weight, is_reserved, is_active)
+VALUES
+(@option_group_id_msg_mode, {localize}'{ts escape="sql"}Email{/ts}'{/localize}, 'Email', 'Email', 1, 1, 1, 1),
+(@option_group_id_msg_mode, {localize}'{ts escape="sql"}SMS{/ts}'{/localize},'SMS', 'SMS', 0, 2, 1, 1),
+(@option_group_id_msg_mode, {localize}'{ts escape="sql"}User Preference{/ts}'{/localize}, 'User_Preference', 'User Preference', 0, 3, 1, 1);

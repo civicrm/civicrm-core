@@ -909,9 +909,9 @@ VALUES
   (@option_group_id_communication_style, '{ts escape="sql"}Familiar{/ts}', 2, 'familiar', NULL, 0, 0, 2, NULL, 0, 0, 1, NULL, NULL),
 
 -- Message Mode
-(@option_group_id_msg_mode, '{ts escape="sql"}Email{/ts}', 'Email', 'Email', NULL, 0, NULL, 1, NULL, 0, 0, 1, NULL, NULL),
-(@option_group_id_msg_mode, '{ts escape="sql"}SMS{/ts}', 'SMS', 'SMS', NULL, 0, NULL, 2, NULL, 0, 0, 1, NULL, NULL),
-(@option_group_id_msg_mode, '{ts escape="sql"}User Preference{/ts}', 'User_Preference', 'User Preference', NULL, 0, NULL, 3, NULL, 0, 0, 1, NULL, NULL);
+(@option_group_id_msg_mode, '{ts escape="sql"}Email{/ts}', 'Email', 'Email', NULL, 0, 1, 1, NULL, 0, 1, 1, NULL, NULL),
+(@option_group_id_msg_mode, '{ts escape="sql"}SMS{/ts}', 'SMS', 'SMS', NULL, 0, 0, 2, NULL, 0, 1, 1, NULL, NULL),
+(@option_group_id_msg_mode, '{ts escape="sql"}User Preference{/ts}', 'User_Preference', 'User Preference', NULL, 0, 0, 3, NULL, 0, 1, 1, NULL, NULL);
 
 -- financial accounts
 SELECT @opval := value FROM civicrm_option_value WHERE name = 'Revenue' and option_group_id = @option_group_id_fat;
