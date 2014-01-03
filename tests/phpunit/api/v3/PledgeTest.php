@@ -44,7 +44,6 @@ class api_v3_PledgeTest extends CiviUnitTestCase {
   protected $_entity;
   protected $scheduled_date;
   public $DBResetRequired = True;
-  public $_eNoticeCompliant = FALSE;
 
   function setUp() {
     $this->_apiversion = 3;

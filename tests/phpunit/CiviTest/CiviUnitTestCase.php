@@ -580,7 +580,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   function assertAttributesEquals($expectedValues, $actualValues, $message = NULL) {
     foreach ($expectedValues as $paramName => $paramValue) {
       if (isset($actualValues[$paramName])) {
-        $this->assertEquals($paramValue, $actualValues[$paramName], "Value Mismatch On $paramName - value 1 is $paramValue  value 2 is {$actualValues[$paramName]}");
+        $this->assertEquals($paramValue, $actualValues[$paramName], "Value Mismatch On $paramName - value 1 is " . print_r($paramValue, TRUE) . "  value 2 is " . print_r($actualValues[$paramName], TRUE) );
       }
       else {
         $this->fail("Attribute '$paramName' not present in actual array.");
@@ -1806,6 +1806,17 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     );
 
     return $this->callAPISuccess('Note', 'create', $params);
+  }
+
+  /**
+   * Enable CiviCampaign Component
+   */
+  function enableCiviCampaign() {
+    CRM_Core_BAO_ConfigSetting::enableComponent('CiviCampaign');
+    // force reload of config object
+    $config = CRM_Core_Config::singleton(TRUE, TRUE);
+    //flush cache by calling with reset
+    $activityTypes = CRM_Core_PseudoConstant::activityType(TRUE, TRUE, TRUE, 'name', TRUE);
   }
 
   /**

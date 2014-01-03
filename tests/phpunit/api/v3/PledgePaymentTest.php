@@ -44,7 +44,6 @@ class api_v3_PledgePaymentTest extends CiviUnitTestCase {
   protected $_contributionID;
   protected $_financialTypeId = 1;
   protected $_entity = 'PledgePayment';
-  public $_eNoticeCompliant = FALSE;
   public $DBResetRequired = TRUE;
 
   function setUp() {
