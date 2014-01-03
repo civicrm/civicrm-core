@@ -219,7 +219,7 @@ class CRM_Event_BAO_Participant extends CRM_Event_DAO_Participant {
     $session = CRM_Core_Session::singleton();
     $id = $session->get('userID');
     if (!$id) {
-      $id = $params['contact_id'];
+      $id = CRM_Utils_Array::value('contact_id', $params);
     }
 
     // add custom field values
