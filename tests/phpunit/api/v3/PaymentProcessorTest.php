@@ -35,7 +35,7 @@ class api_v3_PaymentProcessorTest extends CiviUnitTestCase {
   protected $_paymentProcessorType;
   protected $_apiversion = 3;
   protected $_params;
-  public $_eNoticeCompliant = TRUE;
+
   function get_info() {
     return array(
       'name' => 'PaymentProcessor Create',

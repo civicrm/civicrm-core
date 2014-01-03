@@ -37,7 +37,7 @@ require_once 'CiviTest/CiviUnitTestCase.php';
 
 class api_v3_ReportTemplateTest extends CiviUnitTestCase {
   protected $_apiversion = 3;
-  public $_eNoticeCompliant = TRUE;
+
   function setUp() {
     parent::setUp();
     $this->_sethtmlGlobals();

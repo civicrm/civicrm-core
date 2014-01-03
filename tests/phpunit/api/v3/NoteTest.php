@@ -38,7 +38,7 @@ class api_v3_NoteTest extends CiviUnitTestCase {
   protected $_params;
   protected $_noteID;
   protected $_note;
-  public $_eNoticeCompliant = TRUE;
+
 
   function __construct() {
     parent::__construct();
