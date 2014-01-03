@@ -44,7 +44,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
   protected $__membershipID;
   protected $_entity;
   protected $_params;
-  public $_eNoticeCompliant = TRUE;
+
 
   public function setUp() {
     //  Connect to the database

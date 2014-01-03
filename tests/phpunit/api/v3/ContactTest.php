@@ -46,7 +46,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
   protected $_apiversion;
   protected $_entity;
   protected $_params;
-  public $_eNoticeCompliant = TRUE;
+
   protected $_contactID;
   protected $_financialTypeId =1;
 

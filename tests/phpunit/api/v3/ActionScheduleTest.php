@@ -38,7 +38,7 @@ class api_v3_ActionScheduleTest extends CiviUnitTestCase {
   protected $_entity = 'action_schedule';
   protected $_apiversion = 3;
 
-  public $_eNoticeCompliant = TRUE;
+
 
   /**
    *  Test setup for every test

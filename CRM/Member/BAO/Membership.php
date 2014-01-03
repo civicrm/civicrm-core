@@ -1546,11 +1546,15 @@ AND civicrm_membership.is_test = %2";
 
     //decide status here, if needed.
     $updateStatusId = NULL;
-
+    $membershipID = NULL;
+    //@todo would be better to accept $membershipID as an FN param & make form layer responsible for extracting it
+    if(isset($form->_membershipId)) {
+      $membershipID = $form->_membershipId;
+    }
     // CRM-7297 - allow membership type to be be changed during renewal so long as the parent org of new membershipType
     // is the same as the parent org of an existing membership of the contact
     $currentMembership = CRM_Member_BAO_Membership::getContactMembership($contactID, $membershipTypeID,
-      $is_test, $form->_membershipId, TRUE
+      $is_test, $membershipID, TRUE
     );
     if ($currentMembership) {
       $activityType = 'Membership Renewal';
