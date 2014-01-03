@@ -303,8 +303,7 @@ class CRM_Core_PseudoConstant {
       $pseudoconstant = $fieldSpec['pseudoconstant'];
       // Merge params with schema defaults
       $params += array(
-        // Skip default condition in validate context
-        'condition' => $context == 'validate' ? array() : CRM_Utils_Array::value('condition', $pseudoconstant, array()),
+        'condition' => CRM_Utils_Array::value('condition', $pseudoconstant, array()),
         'keyColumn' => CRM_Utils_Array::value('keyColumn', $pseudoconstant),
         'labelColumn' => CRM_Utils_Array::value('labelColumn', $pseudoconstant),
       );
