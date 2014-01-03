@@ -137,7 +137,7 @@
         <td class="label">{$form.group_id.label}</td>
         <td>{$form.group_id.html}</td>
       </tr>
-      <tr id="mode" class="crm-scheduleReminder-form-block-mode">
+      <tr id="msgMode" class="crm-scheduleReminder-form-block-mode">
         <td class="label">{$form.mode.label}</td>
         <td>{$form.mode.html}</td>
       </tr>
@@ -245,6 +245,28 @@
     });
   });
 
+  cj(function () {
+    loadMsgBox();
+    cj('#mode').change(function () {
+      loadMsgBox();
+    });
+  });
+
+  function loadMsgBox() {
+    if (cj('#mode').val() == 'Email' || cj('#mode').val() == 0){
+      cj('#sms').hide();
+      cj('#email').show();
+    }
+    else if (cj('#mode').val() == 'SMS'){
+      cj('#email').hide();
+      cj('#sms').show();
+    }
+    else if (cj('#mode').val() == 'User_Preference'){
+        cj('#email').show();
+        cj('#sms').show();
+      }
+  }
+  
   function populateRecipient() {
     var recipient = cj("#recipient option:selected").val();
     var entity = cj("#entity_0 option:selected").val();

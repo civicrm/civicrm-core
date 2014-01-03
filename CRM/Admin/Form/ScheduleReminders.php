@@ -138,7 +138,7 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
     $title = ts('Email');
     $isActive = ts('Send email');
     $recordActivity = ts('Record activity for automated email');
-    if ($providersCount) {
+    if ($providersCount=1) {
       $title = ts('Email or SMS');
       $isActive = ts('Send email or SMS');
       $recordActivity = ts('Record activity for automated email or SMS');
