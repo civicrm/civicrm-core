@@ -120,15 +120,18 @@ class CRM_Contact_BAO_GroupContact extends CRM_Contact_DAO_GroupContact {
   /**
    * Given an array of contact ids, add all the contacts to the group
    *
-   * @param array  $contactIds (reference ) the array of contact ids to be added
-   * @param int    $groupId    the id of the group
+   * @param array $contactIds the array of contact ids to be added
+   * @param int $groupId the id of the group
+   * @param string $method
+   * @param string $status
+   * @param int $tracking
    *
    * @return array             (total, added, notAdded) count of contacts added to group
    * @access public
    * @static
    */
   static function addContactsToGroup(
-    &$contactIds,
+    $contactIds,
     $groupId,
     $method   = 'Admin',
     $status   = 'Added',
@@ -435,7 +438,7 @@ class CRM_Contact_BAO_GroupContact extends CRM_Contact_DAO_GroupContact {
    * @access public
    * @static
    */
-  function &getMembershipDetail($contactId, $groupID, $method = 'Email') {
+  static function getMembershipDetail($contactId, $groupID, $method = 'Email') {
     $leftJoin = $where = $orderBy = null;
 
     if ($method) {
@@ -464,48 +467,6 @@ SELECT    *
     $dao = CRM_Core_DAO::executeQuery($query, $params);
     $dao->fetch();
     return $dao;
-  }
-
-  /**
-   * Method to update the Status of Group member form 'Pending' to 'Added'
-   *
-   * @param  int  $contactId id of the contact
-   *
-   * @param  int  $groupID   Id of a perticuler group
-   *
-   * @param mixed $tracking   tracking information for history
-   *
-   * @return null If success
-   * @access public
-   * @static
-   */
-  static function updateGroupMembershipStatus($contactId, $groupID, $method = 'Email', $tracking = NULL) {
-    if (!isset($contactId) && !isset($groupID)) {
-      return CRM_Core_Error::fatal("$contactId or $groupID should not empty");
-    }
-
-    $query = "
-UPDATE civicrm_group_contact
-  SET civicrm_group_contact.status = 'Added'
-  WHERE civicrm_group_contact.contact_id = %1
-  AND civicrm_group_contact.group_id = %2";
-    $params = array(
-      1 => array($contactId, 'Integer'),
-      2 => array($groupID, 'Integer'),
-    );
-
-    $dao = CRM_Core_DAO::executeQuery($query, $params);
-
-    $params = array(
-      'contact_id' => $contactId,
-      'group_id' => $groupID,
-      'status' => 'Added',
-      'method' => $method,
-      'tracking' => $tracking,
-    );
-
-    CRM_Contact_BAO_SubscriptionHistory::create($params);
-    return NULL;
   }
 
   /**
