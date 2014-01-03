@@ -228,10 +228,13 @@ function civicrm_api3_group_contact_update_status($params) {
 
   civicrm_api3_verify_mandatory($params, NULL, array('contact_id', 'group_id'));
 
-  $method = CRM_Utils_Array::value('method', $params, 'API');
-  $tracking = CRM_Utils_Array::value('tracking', $params);
-
-  CRM_Contact_BAO_GroupContact::updateGroupMembershipStatus($params['contact_id'], $params['group_id'], $method, $tracking);
+  CRM_Contact_BAO_GroupContact::addContactsToGroup(
+    array($params['contact_id']),
+    $params['group_id'],
+    CRM_Utils_Array::value('method', $params, 'API'),
+    'Added',
+    CRM_Utils_Array::value('tracking', $params)
+  );
 
   return TRUE;
 }
