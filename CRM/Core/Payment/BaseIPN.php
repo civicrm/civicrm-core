@@ -57,7 +57,7 @@ class CRM_Core_Payment_BaseIPN {
    */
   function setInputParameters($parameters) {
     if(!is_array($parameters)) {
-      throw new CRM_Core_Exceptions('Invalid input parameters');
+      throw new CRM_Core_Exception('Invalid input parameters');
     }
     $this->_inputParameters = $parameters;
   }
@@ -142,6 +142,7 @@ class CRM_Core_Payment_BaseIPN {
       $success = $contribution->loadRelatedObjects($input, $ids, $required);
     }
     catch(Exception $e) {
+      $success = FALSE;
       if (CRM_Utils_Array::value('log_error', $error_handling)) {
         CRM_Core_Error::debug_log_message($e->getMessage());
       }
