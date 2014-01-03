@@ -3,10 +3,6 @@
 require_once 'CiviTest/CiviUnitTestCase.php';
 
 class CRM_Core_Page_AJAXTest extends CiviUnitTestCase {
-  //@todo make BAO enotice compliant  & remove the line below
-  // WARNING - NEVER COPY & PASTE $_eNoticeCompliant = FALSE
-  // new test classes should be compliant.
-  public $_eNoticeCompliant = FALSE;
   public function testCheckAuthz() {
     $cases = array();
 
@@ -50,7 +46,8 @@ class CRM_Core_Page_AJAXTest extends CiviUnitTestCase {
     $cases[] = array('invalidtype', 'CRM_Foo_Page_AJAX::method', FALSE);
 
     foreach ($cases as $case) {
-      list ($type, $className, $expectedResult, $methodName) = $case;
+      list ($type, $className, $expectedResult) = $case;
+      $methodName = CRM_Utils_Array::value(3, $case);
       $actualResult = CRM_Core_Page_AJAX::checkAuthz($type, $className, $methodName);
       if ($methodName) {
         $this->assertEquals($expectedResult, $actualResult,
