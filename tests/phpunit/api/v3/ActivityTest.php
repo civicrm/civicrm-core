@@ -49,7 +49,6 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
   protected $test_activity_type_value;
   protected $_contactID;
 
-  public $_eNoticeCompliant = TRUE;
   /**
    *  Test setup for every test
    *
@@ -297,11 +296,7 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
    *  Test civicrm_activity_create() with valid parameters - use type_id
    */
   function testActivityCreateCampaignTypeID() {
-    CRM_Core_BAO_ConfigSetting::enableComponent('CiviCampaign');
-    // force reload of config object
-    $config = CRM_Core_Config::singleton(TRUE, TRUE);
-    //flush cache by calling with reset
-    $activityTypes = CRM_Core_PseudoConstant::activityType(TRUE, TRUE, TRUE, 'name', TRUE);
+    $this->enableCiviCampaign();
 
     $defaults = array();
 
