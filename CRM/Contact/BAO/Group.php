@@ -379,7 +379,16 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
 
     $group = new CRM_Contact_BAO_Group();
     $group->copyValues($params);
-
+    //@todo very hacky fix for the fact this function wants to receive 'parents' as an array further down but
+    // needs it as a separated string for the DB. Preferred approaches are having the copyParams or save fn
+    // use metadata to translate the array to the appropriate DB type or altering the param in the api layer,
+    // or at least altering the param in same section as 'group_type' rather than repeating here. However, further down
+    // we need the $params one to be in it's original form & we are not sure what test coverage we have on that
+    if(isset($group->parents) && is_array($group->parents)) {
+      $group->parents = CRM_Core_DAO::VALUE_SEPARATOR . implode(CRM_Core_DAO::VALUE_SEPARATOR,
+        array_keys($group->parents)
+      ) . CRM_Core_DAO::VALUE_SEPARATOR;
+    }
     if (!CRM_Utils_Array::value('id', $params)) {
       $group->name .= "_tmp";
     }
