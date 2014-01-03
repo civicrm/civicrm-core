@@ -1530,7 +1530,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
     $test = $this;
     $this->_testTimestamps(array(
       'INSERT' => function ($contactId) use ($test, $customGroup, $customField) {
-        $result = $this->callAPISuccess('contact', 'create', array(
+        $result = civicrm_api3('contact', 'create', array(
           'contact_id' => $contactId,
           'custom_' . $customField['id'] => 'test-1',
         ));
