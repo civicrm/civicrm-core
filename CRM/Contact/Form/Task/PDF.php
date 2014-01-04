@@ -74,9 +74,7 @@ class CRM_Contact_Form_Task_PDF extends CRM_Contact_Form_Task {
       // in search context 'id' is the default profile id for search display
       // CRM-11227
       $this->_activityId = CRM_Utils_Request::retrieve('id', 'Positive', $this, FALSE);
-    }
 
-    if ($cid) {
       CRM_Contact_Form_Task_PDFLetterCommon::preProcessSingle($this, $cid);
       $this->_single = TRUE;
       $this->_cid = $cid;

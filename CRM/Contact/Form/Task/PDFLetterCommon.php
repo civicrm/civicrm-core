@@ -376,47 +376,15 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
   static function createActivities($form, $html_message, $contactIds) {
     //Added for CRM-12682: Add activity subject and campaign fields
     $formValues     = $form->controller->exportValues($form->getName());
-
-    $session        = CRM_Core_Session::singleton();
-    $userID         = $session->get('userID');
-    $activityTypeID = CRM_Core_OptionGroup::getValue(
-      'activity_type',
-      'Print PDF Letter',
-      'name'
-    );
-    $activityParams = array(
-      'subject' => $formValues['subject'],
-      'campaign_id' => CRM_Utils_Array::value('campaign_id', $formValues),
-      'source_contact_id' => $userID,
-      'activity_type_id' => $activityTypeID,
-      'activity_date_time' => date('YmdHis'),
-      'details' => $html_message,
-    );
-    if (!empty($form->_activityId)) {
-      $activityParams += array('id' => $form->_activityId);
-    }
-    if ($form->_cid) {
-      $activity = CRM_Activity_BAO_Activity::create($activityParams);
-    }
-    else {
-      // create  Print PDF activity for each selected contact. CRM-6886
-      $activityIds = array();
-      foreach ($contactIds as $contactId) {
-        $activityID = CRM_Activity_BAO_Activity::create($activityParams);
-        $activityIds[$contactId] = $activityID->id;
-      }
-    }
-
-    $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
-    $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
-
-    foreach ($form->_contactIds as $contactId) {
-      $activityTargetParams = array(
-        'activity_id' => empty($activity->id) ? $activityIds[$contactId] : $activity->id,
-        'contact_id' => $contactId,
-        'record_type_id' => $targetID
-      );
-      CRM_Activity_BAO_ActivityContact::create($activityTargetParams);
+    foreach ($contactIds as $contactID) {
+      civicrm_api3('activity', 'create', array(
+        'subject' => $formValues['subject'],
+        'campaign_id' => CRM_Utils_Array::value('campaign_id', $formValues),
+        'activity_type_id' => 'Print PDF Letter',
+        'details' => $html_message,
+        'target_contact_id' => $contactID,
+        'id' => empty($form->_activityId) ? NULL : $form->_activityId,
+      ));
     }
   }
 
