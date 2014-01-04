@@ -33,7 +33,7 @@ require_once 'CiviTest/CiviUnitTestCase.php';
  *  @package CiviCRM_APIv3
  */
 class api_v3_BatchTest extends CiviUnitTestCase {
-  public $_eNoticeCompliant = TRUE;
+
   protected $_params = array();
   protected $_entity = 'batch';
 

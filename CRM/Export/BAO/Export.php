@@ -81,7 +81,6 @@ class CRM_Export_BAO_Export {
     $queryMode  = $relationField = NULL;
 
     $allCampaigns = array();
-    $exportCampaign = FALSE;
 
     $phoneTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Phone', 'phone_type_id');
     $imProviders = CRM_Core_PseudoConstant::get('CRM_Core_DAO_IM', 'provider_id');
@@ -156,9 +155,6 @@ class CRM_Export_BAO_Export {
         }
         elseif ($fieldName == 'im') {
           $imProviderId = CRM_Utils_Array::value(3, $value);
-        }
-        elseif (substr($fieldName, -8) == 'campaign') {
-          $exportCampaign = TRUE;
         }
 
         if (array_key_exists($relationshipTypes, $contactRelationshipTypes)) {
@@ -236,12 +232,6 @@ class CRM_Export_BAO_Export {
           }
           else {
             $returnProperties[$fieldName] = 1;
-
-            //campaign field export.
-            if (substr($fieldName, -8) == 'campaign') {
-              $fldNames = explode('_', $fieldName);
-              $returnProperties["{$fldNames[0]}_campaign_id"] = 1;
-            }
           }
         }
       }
@@ -318,17 +308,6 @@ class CRM_Export_BAO_Export {
 
       if ($queryMode != CRM_Contact_BAO_Query::MODE_CONTACTS) {
         $componentReturnProperties = CRM_Contact_BAO_Query::defaultReturnProperties($queryMode);
-
-        $campaignReturnProperties = array();;
-        foreach ($componentReturnProperties as $fld => $true) {
-          $campaignReturnProperties[$fld] = $true;
-          if (substr($fld, -11) == 'campaign_id') {
-            $exportCampaign = TRUE;
-            $campaignReturnProperties[substr($fld, 0, -3)] = 1;
-          }
-        }
-        $componentReturnProperties = $campaignReturnProperties;
-
         $returnProperties = array_merge($returnProperties, $componentReturnProperties);
 
         if (!empty($extraReturnProperties)) {
@@ -549,6 +528,20 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
       }
     }
 
+    // CRM-13982 - check if is deleted
+    $excludeTrashed = TRUE;
+    foreach ($params as $value) {
+      if ($value[0] == 'contact_is_deleted') {
+        $excludeTrashed = FALSE;
+      }
+    }
+    if (empty($where) && $excludeTrashed) {
+      $where = "WHERE contact_a.is_deleted != 1";
+    }
+    elseif ($excludeTrashed) {
+      $where .= " AND contact_a.is_deleted != 1";
+    }
+
     $queryString = "$select $from $where $having";
 
     $groupBy = "";
@@ -600,8 +593,18 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
       $nullContributionDetails = array_fill_keys(array_keys($paymentHeaders), NULL);
     }
 
+    // Split campaign into 2 fields for id and title
+    $campaignReturnProperties = array();
+    foreach ($returnProperties as $fld => $true) {
+      $campaignReturnProperties[$fld] = $true;
+      if (substr($fld, -11) == 'campaign_id') {
+        $exportCampaign = TRUE;
+        $campaignReturnProperties[substr($fld, 0, -3)] = 1;
+      }
+    }
+    $returnProperties = $campaignReturnProperties;
     //get all campaigns.
-    if ($exportCampaign) {
+    if (isset($exportCampaign)) {
       $allCampaigns = CRM_Campaign_BAO_Campaign::getCampaigns(NULL, NULL, FALSE, FALSE, FALSE, TRUE);
     }
 
@@ -638,7 +641,14 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
           //we should set header only once
           if ($setHeader) {
             $sqlDone = FALSE;
-            if (isset($query->_fields[$field]['title'])) {
+            // Split campaign into 2 fields for id and title
+            if (substr($field, -8) == 'campaign') {
+              $headerRows[] = ts('Campaign Title');
+            }
+            elseif (substr($field, -11) == 'campaign_id') {
+              $headerRows[] = ts('Campaign ID');
+            }
+            elseif (isset($query->_fields[$field]['title'])) {
               $headerRows[] = $query->_fields[$field]['title'];
             }
             elseif ($field == 'phone_type_id') {

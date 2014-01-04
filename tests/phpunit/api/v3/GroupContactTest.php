@@ -34,7 +34,6 @@ class api_v3_GroupContactTest extends CiviUnitTestCase {
   protected $_contactId1;
   protected $_apiversion = 3;
   protected $_groupId1;
-  public $_eNoticeCompliant = True;
 
   function get_info() {
     return array(

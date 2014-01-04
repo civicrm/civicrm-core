@@ -1635,6 +1635,7 @@ class CRM_Contact_BAO_Query {
       case 'activity_campaign_id':
       case 'activity_engagement_level':
       case 'activity_id':
+      case 'activity_result':
       case 'source_contact':
         CRM_Activity_BAO_Query::whereClauseSingle($values, $this);
         return;
@@ -3764,7 +3765,10 @@ WHERE  id IN ( $groupIDs )
     list($name, $op, $value, $grouping, $wildcard) = $values;
 
     $pref = array();
-    if (!is_array($value)) {
+    if (in_array($op, array( 'IS NULL', 'IS NOT NULL', 'IS EMPTY', 'IS NOT EMPTY'))) {
+      $value = NULL;
+    }
+    elseif (!is_array($value)) {
       $v = array();
       $value = trim($value, ' ()');
       if (strpos($value, CRM_Core_DAO::VALUE_SEPARATOR) !== FALSE) {
@@ -3791,10 +3795,16 @@ WHERE  id IN ( $groupIDs )
     $commPref = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'preferred_communication_method');
 
     $sqlValue = array();
+    $showValue = array();
     $sql = "contact_a.preferred_communication_method";
-    foreach ($pref as $val) {
-      $sqlValue[] = "( $sql like '%" . CRM_Core_DAO::VALUE_SEPARATOR . $val . CRM_Core_DAO::VALUE_SEPARATOR . "%' ) ";
-      $showValue[] = $commPref[$val];
+    if (in_array($op, array('IS NULL', 'IS NOT NULL', 'IS EMPTY', 'IS NOT EMPTY'))) {
+      $sqlValue[] = "{$sql} {$op}";
+    }
+    else {
+      foreach ($pref as $val) {
+        $sqlValue[] = "( $sql like '%" . CRM_Core_DAO::VALUE_SEPARATOR . $val . CRM_Core_DAO::VALUE_SEPARATOR . "%' ) ";
+        $showValue[] = $commPref[$val];
+      }
     }
     $this->_where[$grouping][] = "( " . implode(' OR ', $sqlValue) . " )";
     $this->_qill[$grouping][] = ts('Preferred Communication Method') . " $op " . implode(' ' . ts('or') . ' ', $showValue);

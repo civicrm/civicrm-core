@@ -45,7 +45,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
 
   /** This test case doesn't require DB reset */
   public $DBResetRequired = FALSE;
-  public $_eNoticeCompliant = FALSE;
+
   /* they are two types of missing APIs:
        - Those that are to be implemented
          (in some future version when someone steps in -hint hint-). List the entities in toBeImplemented[ {$action} ]
@@ -55,7 +55,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     */
   function setUp() {
     parent::setUp();
-
+    $this->enableCiviCampaign();
     $this->toBeImplemented['get'] = array('Profile', 'CustomValue', 'Constant', 'CustomSearch', 'Extension', 'ReportTemplate', 'System', 'Setting');
     $this->toBeImplemented['create'] = array('SurveyRespondant', 'OptionGroup', 'MailingRecipients', 'UFMatch', 'LocationType', 'CustomSearch', 'Extension', 'ReportTemplate', 'System');
     $this->toBeImplemented['delete'] = array('MembershipPayment', 'OptionGroup', 'SurveyRespondant', 'UFJoin', 'UFMatch', 'Extension', 'LocationType', 'System');
@@ -265,6 +265,14 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
         'cant_return' => array(
         )
       ),
+      'Batch' => array(
+        'cant_update' => array(
+          'entity_table', // believe this field is defined in error
+        ),
+        'cant_return' => array(
+          'entity_table',
+        )
+      ),
       'Pledge' => array(
         'cant_update' => array(
           'pledge_original_installment_amount',
@@ -446,21 +454,18 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     list($baoObj1, $baoObj2) = $baos;
 
     // fetch first by ID
-    $result = civicrm_api($entityName, 'get', array(
-      'version' => 3,
+    $result = $this->callAPISuccess($entityName, 'get', array(
       'id' => $baoObj1->id,
     ));
-    $this->assertAPISuccess($result);
+
     $this->assertTrue(!empty($result['values'][$baoObj1->id]), 'Should find first object by id');
     $this->assertEquals($baoObj1->id, $result['values'][$baoObj1->id]['id'], 'Should find id on first object');
     $this->assertEquals(1, count($result['values']));
 
     // fetch second by ID
-    $result = civicrm_api($entityName, 'get', array(
-      'version' => 3,
+    $result = $this->callAPISuccess($entityName, 'get', array(
       'id' => $baoObj2->id,
     ));
-    $this->assertAPISuccess($result);
     $this->assertTrue(!empty($result['values'][$baoObj2->id]), 'Should find second object by id');
     $this->assertEquals($baoObj2->id, $result['values'][$baoObj2->id]['id'], 'Should find id on second object');
     $this->assertEquals(1, count($result['values']));
@@ -589,7 +594,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
    */
   public function testInvalidID_create($Entity) {
     // turn test off for noew
-    $this->markTestIncomplete("Entity [$entityName] cannot be mocked - no known DAO");
+    $this->markTestIncomplete("Entity [ $Entity ] cannot be mocked - no known DAO");
     return;
     if (in_array($Entity, $this->toBeImplemented['create'])) {
       // $this->markTestIncomplete("civicrm_api3_{$Entity}_create to be implemented");
@@ -623,15 +628,9 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     $baoString = _civicrm_api3_get_DAO($entityName);
     $this->assertNotEmpty($baoString, $entityName);
     $this->assertNotEmpty($entityName, $entityName);
-    $fieldsget = $fields = civicrm_api($entityName, 'getfields', array(
-        'version' => 3, 'action' => 'get'
-      )
-    );
+    $fieldsget = $fields = $this->callAPISuccess($entityName, 'getfields', array('action' => 'get'));
     if($entityName != 'Pledge'){
-    $fields = civicrm_api($entityName, 'getfields', array(
-        'version' => 3, 'action' => 'create'
-      )
-    );
+      $fields = $this->callAPISuccess($entityName, 'getfields', array('action' => 'create'));
     }
     $fields = $fields['values'];
     $return = array_keys($fieldsget['values']);
@@ -646,15 +645,14 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     $return = array_diff($return,$valuesNotToReturn);
     $baoObj = new CRM_Core_DAO();
     $baoObj->createTestObject($baoString, array('currency' => 'USD'), 2, 0);
-    $getentities = civicrm_api($entityName, 'get', array(
-        'version' => 3,
-        'sequential' => 1,
-        'return' => $return,
-        'options' => array(
-          'sort' => 'id DESC',
-          'limit' => 2,
-        ),
-      ));
+    $getentities = $this->callAPISuccess($entityName, 'get', array(
+      'sequential' => 1,
+      'return' => $return,
+      'options' => array(
+        'sort' => 'id DESC',
+        'limit' => 2,
+      ),
+    ));
     // lets use first rather than assume only one exists
     $entity = $getentities['values'][0];
     $entity2 = $getentities['values'][1];
@@ -696,7 +694,8 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
               $entity[$fieldName] = (string) $entity2['id'];
             }
             else{
-              $entity[$fieldName] = (string) empty($entity2[$field]) ? CRM_Utils_Array::value($specs['uniqueName'], $entity2) : $entity2[$field];
+              $uniqueName = CRM_Utils_Array::value('uniqueName', $specs);
+              $entity[$fieldName] = (string) empty($entity2[$field]) ? CRM_Utils_Array::value($uniqueName, $entity2) : $entity2[$field];
              //todo - there isn't always something set here - & our checking on unset values is limited
               if (empty($entity[$field])) {
                 unset($entity[$field]);
@@ -719,21 +718,19 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
           $entity[$field] = 'warm.beer.com';
       }
       if (!empty($specs['pseudoconstant']) || !empty($specs['enumValues'])) {
-        $options = civicrm_api($entityName, 'getoptions', array('context' => 'create', 'field' => $field, 'version' => 3));
+        $options = $this->callAPISuccess($entityName, 'getoptions', array('context' => 'create', 'field' => $field));
         if (empty($options['values'])) {
         }
         $entity[$field] = array_rand($options['values']);
       }
       $updateParams = array(
-        'version' => 3,
         'id' => $entity['id'],
-        $field => $entity[$field],
+        $field => isset($entity[$field]) ? $entity[$field] : NULL,
       );
 
       $update = $this->callAPISuccess($entityName, 'create', $updateParams);
       $checkParams = array(
         'id' => $entity['id'],
-        'version' => 3,
         'sequential' => 1,
         'return' => $return,
         'options' => array(
@@ -789,8 +786,8 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
    * @dataProvider entities_delete
    */
   public function testInvalidID_delete($Entity) {
-    // turn test off for noew
-    $this->markTestIncomplete("Entity [$entityName] cannot be mocked - no known DAO");
+    // turn test off for now
+    $this->markTestIncomplete("Entity [ $Entity ] cannot be mocked - no known DAO");
     return;
     if (in_array($Entity, $this->toBeImplemented['delete'])) {
       // $this->markTestIncomplete("civicrm_api3_{$Entity}_delete to be implemented");
@@ -860,6 +857,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       return;
     }
     $baos = array();
+    $i = 0;
     while($i < $count) {
     // create entities
       $baoObj = CRM_Core_DAO::createTestObject($baoString, array('currency' => 'USD'));
@@ -918,18 +916,15 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     $this->assertEquals('TheRest <> CiviCRM', $getByTitleResult['values'][$eventId]['description']);
 
     // Verify that "getSingle" handles decoding
-    $getSingleResult = civicrm_api('Event', 'GetSingle', array(
-      'version' => 3,
+    $getSingleResult = $this->callAPISuccess('Event', 'GetSingle', array(
       'id' => $eventId,
     ));
 
-    $this->assertAPISuccess($getSingleResult);
     $this->assertEquals('CiviCRM <> TheRest', $getSingleResult['title']);
     $this->assertEquals('TheRest <> CiviCRM', $getSingleResult['description']);
 
     // Verify that chaining handles decoding
-    $chainResult = civicrm_api('Event', 'Get', array(
-      'version' => 3,
+    $chainResult = $this->callAPISuccess('Event', 'Get', array(
       'id' => $eventId,
       'api.event.get' => array(
       ),
@@ -955,7 +950,6 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       'value' => 'setValueDescription: TheRest <> CiviCRM',
     ));
     $this->assertTrue((bool)$setValueDescriptionResult['is_error']); // not supported by setValue
-    //$this->assertAPISuccess($setValueDescriptionResult);
     //$this->assertEquals('setValueDescription: TheRest <> CiviCRM', $setValueDescriptionResult['values']['description']);
 }
 

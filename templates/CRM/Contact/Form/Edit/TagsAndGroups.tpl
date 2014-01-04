@@ -33,7 +33,7 @@
        {if $groupElementType eq 'crmasmSelect'}
           <td><span class="label">{if $title}{$form.group.label}{/if}</span>
             {$form.group.html}
-            {literal}	
+            {literal}
             <script type="text/javascript">
              cj(function(){
                cj("select#group").crmasmSelect({

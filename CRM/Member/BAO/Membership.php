@@ -1082,10 +1082,6 @@ INNER JOIN  civicrm_membership_type type ON ( type.id = membership.membership_ty
    */
   static function &exportableFields() {
     $expFieldMembership = CRM_Member_DAO_Membership::export();
-    //campaign fields.
-    if (isset($expFieldMembership['member_campaign_id'])) {
-      $expFieldMembership['member_campaign'] = array('title' => ts('Campaign Title'));
-    }
 
     $expFieldsMemType = CRM_Member_DAO_MembershipType::export();
     $fields           = array_merge($expFieldMembership, $expFieldsMemType);
@@ -1550,11 +1546,15 @@ AND civicrm_membership.is_test = %2";
 
     //decide status here, if needed.
     $updateStatusId = NULL;
-
+    $membershipID = NULL;
+    //@todo would be better to accept $membershipID as an FN param & make form layer responsible for extracting it
+    if(isset($form->_membershipId)) {
+      $membershipID = $form->_membershipId;
+    }
     // CRM-7297 - allow membership type to be be changed during renewal so long as the parent org of new membershipType
     // is the same as the parent org of an existing membership of the contact
     $currentMembership = CRM_Member_BAO_Membership::getContactMembership($contactID, $membershipTypeID,
-      $is_test, $form->_membershipId, TRUE
+      $is_test, $membershipID, TRUE
     );
     if ($currentMembership) {
       $activityType = 'Membership Renewal';
@@ -1949,16 +1949,6 @@ SELECT c.contribution_page_id as pageID
    */
   static function getMembershipFields($mode = NULL) {
     $fields = CRM_Member_DAO_Membership::export();
-
-    //campaign fields.
-    if (isset($fields['member_campaign_id'])) {
-      if ($mode == CRM_Export_Form_Select::MEMBER_EXPORT) {
-        $fields['member_campaign'] = array('title' => ts('Campaign Title'));
-      }
-      else {
-        $fields['member_campaign_id']['title'] = ts('Campaign');
-      }
-    }
 
     unset($fields['membership_contact_id']);
     $fields = array_merge($fields, CRM_Core_BAO_CustomField::getFieldsForImport('Membership'));

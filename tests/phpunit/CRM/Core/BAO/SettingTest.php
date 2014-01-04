@@ -28,10 +28,6 @@
 
 require_once 'CiviTest/CiviUnitTestCase.php';
 class CRM_Core_BAO_SettingTest extends CiviUnitTestCase {
-  //@todo make BAO enotice compliant  & remove the line below
-  // WARNING - NEVER COPY & PASTE $_eNoticeCompliant = FALSE
-  // new test classes should be compliant.
-  public $_eNoticeCompliant = FALSE;
   function get_info() {
     return array(
       'name' => 'Setting BAO',
@@ -162,7 +158,8 @@ class CRM_Core_BAO_SettingTest extends CiviUnitTestCase {
 
     //some caching inconsistency here
     $config = CRM_Core_Config::singleton(TRUE, TRUE);
-    $this->assertEmpty($config->maxAttachments, "Config item still Set to {$config->maxAttachments}
+    $maxAttachments = empty($config->maxAttachments) ? NULL : $config->maxAttachments;
+    $this->assertEmpty($maxAttachments, "Config item still Set to $maxAttachments
     . This works fine when test run alone");
   }
 
@@ -180,9 +177,10 @@ class CRM_Core_BAO_SettingTest extends CiviUnitTestCase {
     $value = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'max_attachments');
     $this->assertEquals(6, $value);
 
-    civicrm_api('system', 'flush', array('version' => 3));
+    $this->callAPISuccess('system', 'flush', array());
     $config = CRM_Core_Config::singleton(TRUE, TRUE);
-    $this->assertEmpty($config->maxAttachments);
+    $maxAttachments = empty($config->maxAttachments) ? NULL : $config->maxAttachments;
+    $this->assertEmpty($maxAttachments);
   }
 
   /*

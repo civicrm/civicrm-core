@@ -183,7 +183,7 @@ class CRM_Event_Form_ManageEvent_EventInfo extends CRM_Event_Form_ManageEvent {
       if (!CRM_Utils_System::isNull($eventTemplates)) {
         $this->add('select', 'template_id', ts('From Template'), array(
           '' => ts('- select -')) + $eventTemplates,
-          FALSE, array('onchange' => "reloadWindow( this.value );")
+          FALSE, array('onchange' => "reloadWindow(this.value);")
         );
       }
     }

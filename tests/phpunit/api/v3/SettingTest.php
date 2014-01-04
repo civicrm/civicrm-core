@@ -47,7 +47,7 @@ class api_v3_SettingTest extends CiviUnitTestCase {
   protected $_currentDomain;
   protected $_domainID2;
   protected $_domainID3;
-  public $_eNoticeCompliant = TRUE;
+
   function __construct() {
     parent::__construct();
 

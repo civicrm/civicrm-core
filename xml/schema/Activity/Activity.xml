@@ -415,14 +415,13 @@
        <name>campaign_id</name>
        <uniqueName>activity_campaign_id</uniqueName>
        <type>int unsigned</type>
-       <title>Campaign ID</title>
+       <title>Campaign</title>
        <import>true</import>
        <comment>The campaign for which this activity has been triggered.</comment>
        <pseudoconstant>
           <table>civicrm_campaign</table>
           <keyColumn>id</keyColumn>
           <labelColumn>title</labelColumn>
-          <condition>(end_date IS NULL OR end_date > NOW())</condition>
        </pseudoconstant>
        <add>3.4</add>
        <html>
