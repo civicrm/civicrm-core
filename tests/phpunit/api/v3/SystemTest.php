@@ -63,7 +63,7 @@ class api_v3_SystemTest extends CiviUnitTestCase {
 
   const TEST_CACHE_GROUP = 'SystemTest';
   const TEST_CACHE_PATH = 'api/v3/system';
-  public $_eNoticeCompliant = TRUE;
+
   /**
    *  Constructor
    *

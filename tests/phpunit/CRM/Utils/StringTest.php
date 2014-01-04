@@ -1,10 +1,6 @@
 <?php
 require_once 'CiviTest/CiviUnitTestCase.php';
 class CRM_Utils_StringTest extends CiviUnitTestCase {
-  //@todo make BAO enotice compliant  & remove the line below
-  // WARNING - NEVER COPY & PASTE $_eNoticeCompliant = FALSE
-  // new test classes should be compliant.
-  public $_eNoticeCompliant = FALSE;
   function get_info() {
     return array(
       'name' => 'String Test',
@@ -80,8 +76,8 @@ class CRM_Utils_StringTest extends CiviUnitTestCase {
       $actual = array();
       CRM_Utils_String::extractName($case['full_name'], $actual);
       $this->assertEquals($actual['first_name'], $case['first_name']);
-      $this->assertEquals($actual['last_name'], $case['last_name']);
-      $this->assertEquals($actual['middle_name'], $case['middle_name']);
+      $this->assertEquals(CRM_Utils_Array::value('last_name', $actual), CRM_Utils_Array::value('last_name', $case));
+      $this->assertEquals(CRM_Utils_Array::value('middle_name', $actual), CRM_Utils_Array::value('middle_name', $case));
     }
   }
 

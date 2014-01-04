@@ -44,7 +44,6 @@ class api_v3_PledgePaymentTest extends CiviUnitTestCase {
   protected $_contributionID;
   protected $_financialTypeId = 1;
   protected $_entity = 'PledgePayment';
-  public $_eNoticeCompliant = FALSE;
   public $DBResetRequired = TRUE;
 
   function setUp() {
@@ -210,7 +209,7 @@ class api_v3_PledgePaymentTest extends CiviUnitTestCase {
       'contact_id' => $this->_individualId,
       'pledge_create_date' => date('Ymd'),
       'start_date' => date('Ymd'),
-      'scheduled_date' => $this->scheduled_date,
+      'scheduled_date' => 'first day 2015',
       'pledge_amount' => 100.00,
       'pledge_status_id' => '2',
       'pledge_financial_type_id' => '1',

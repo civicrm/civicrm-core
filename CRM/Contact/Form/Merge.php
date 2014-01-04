@@ -110,7 +110,7 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
       $this->assign('mainUfName', $mainUser ? $mainUser->name : NULL);
     }
 
-    $flipUrl = CRM_Utils_system::url('civicrm/contact/merge',
+    $flipUrl = CRM_Utils_System::url('civicrm/contact/merge',
       "reset=1&action=update&cid={$oid}&oid={$cid}&rgid={$rgid}&gid={$gid}"
     );
     if (!$flip) {
@@ -132,7 +132,7 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
             $urlParam .= "&gid={$gid}";
           }
 
-          $this->$position = CRM_Utils_system::url('civicrm/contact/merge', $urlParam);
+          $this->$position = CRM_Utils_System::url('civicrm/contact/merge', $urlParam);
           $this->assign($position, $this->$position);
         }
       }
@@ -166,7 +166,7 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
       if ($gid) {
         $urlParam .= "&gid={$gid}";
       }
-      $session->pushUserContext(CRM_Utils_system::url('civicrm/contact/dedupefind', $urlParam));
+      $session->pushUserContext(CRM_Utils_System::url('civicrm/contact/dedupefind', $urlParam));
     }
 
     // ensure that oid is not the current user, if so refuse to do the merge
@@ -365,7 +365,7 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
           $urlParam .= "&gid={$this->_gid}";
         }
 
-        $url = CRM_Utils_system::url('civicrm/contact/merge', $urlParam);
+        $url = CRM_Utils_System::url('civicrm/contact/merge', $urlParam);
       }
     }
 

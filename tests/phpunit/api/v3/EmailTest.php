@@ -32,7 +32,7 @@ class api_v3_EmailTest extends CiviUnitTestCase {
   protected $_locationType;
   protected $_entity;
   protected $_params;
-  public $_eNoticeCompliant = TRUE;
+
   function setUp() {
     $this->_apiversion = 3;
     $this->_entity = 'Email';

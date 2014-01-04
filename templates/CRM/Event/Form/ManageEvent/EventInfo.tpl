@@ -174,7 +174,7 @@
 {literal}
 <script type="text/javascript">
 
-function reloadWindow( tempId ) {
+function reloadWindow(tempId) {
 
    //ignore form navigation, CRM-6815
    global_formNavigate = true;

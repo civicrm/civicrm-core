@@ -238,9 +238,8 @@ class CRM_Pledge_BAO_Pledge extends CRM_Pledge_DAO_Pledge {
       );
     }
 
-    $config            = CRM_Core_Config::singleton();
-        $contributionTypes = CRM_Contribute_PseudoConstant::financialType();
-    $title             = CRM_Contact_BAO_Contact::displayName($pledge->contact_id) . ' - (' . ts('Pledged') . ' ' . CRM_Utils_Money::format($pledge->amount, $pledge->currency) . ' - ' . $contributionTypes[$pledge->financial_type_id] . ')';
+    $contributionTypes = CRM_Contribute_PseudoConstant::financialType();
+    $title = CRM_Contact_BAO_Contact::displayName($pledge->contact_id) . ' - (' . ts('Pledged') . ' ' . CRM_Utils_Money::format($pledge->amount, $pledge->currency) . ' - ' . CRM_Utils_Array::value($pledge->financial_type_id, $contributionTypes) . ')';
 
     // add the recently created Pledge
     CRM_Utils_Recent::add($title,
@@ -701,11 +700,6 @@ GROUP BY  currency
       }
 
       $fields = CRM_Pledge_DAO_Pledge::export();
-
-      //export campaign title.
-      if (isset($fields['pledge_campaign_id'])) {
-        $fields['pledge_campaign'] = array('title' => ts('Campaign Title'));
-      }
 
       $fields = array_merge($fields, CRM_Pledge_DAO_PledgePayment::export());
 

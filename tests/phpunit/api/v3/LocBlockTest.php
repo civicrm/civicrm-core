@@ -29,7 +29,7 @@ require_once 'CiviTest/CiviUnitTestCase.php';
 class api_v3_LocBlockTest extends CiviUnitTestCase {
   protected $_apiversion = 3;
   protected $_entity = 'loc_block';
-  public $_eNoticeCompliant = TRUE;
+
   public function setUp() {
     parent::setUp();
   }

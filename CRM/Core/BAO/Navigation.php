@@ -495,7 +495,7 @@ ORDER BY parent_id, weight";
         //CRM-7656 --make sure to separate out url path from url params,
         //as we'r going to validate url path across cross-site scripting.
         $urlParam = CRM_Utils_System::explode('&', str_replace('?', '&', $url), 2);
-        $url = CRM_Utils_System::url($urlParam[0], $urlParam[1], FALSE, NULL, FALSE);
+        $url = CRM_Utils_System::url($urlParam[0], $urlParam[1], FALSE, NULL, TRUE);
       }
       $makeLink = TRUE;
     }
@@ -604,13 +604,13 @@ ORDER BY parent_id, weight";
           module_exists('admin_menu') && user_access('access administration menu')
         )
       ) {
-        $prepandString = "<li class=\"menumain crm-link-home\">" . $homeIcon . "<ul id=\"civicrm-home\"><li><a href=\"{$homeURL}\">" . $homeLabel . "</a></li><li><a href=\"#\" onclick=\"cj.Menu.closeAll( );cj('#civicrm-menu').toggle( );\">" . ts('Drupal Menu') . "</a></li></ul></li>";
+        $prepandString = "<li class=\"menumain crm-link-home\">" . $homeIcon . "<ul id=\"civicrm-home\"><li><a href=\"{$homeURL}\">" . $homeLabel . "</a></li><li><a href=\"#\" onclick=\"cj.Menu.closeAll( );cj('#civicrm-menu').toggle( );\">" . ts('Drupal Menu') . "</a></li></ul>";
       }
       elseif ($config->userSystem->is_wordpress) {
-        $prepandString = "<li class=\"menumain crm-link-home\">" . $homeIcon . "<ul id=\"civicrm-home\"><li><a href=\"{$homeURL}\">" . $homeLabel . "</a></li><li><a href=\"#\" onclick=\"cj.Menu.closeAll( );cj('#civicrm-menu').toggle( );\">" . ts('WordPress Menu') . "</a></li></ul></li>";
+        $prepandString = "<li class=\"menumain crm-link-home\">" . $homeIcon . "<ul id=\"civicrm-home\"><li><a href=\"{$homeURL}\">" . $homeLabel . "</a></li><li><a href=\"#\" onclick=\"cj.Menu.closeAll( );cj('#civicrm-menu').toggle( );\">" . ts('WordPress Menu') . "</a></li></ul>";
       }
       else {
-        $prepandString = "<li class=\"menumain crm-link-home\"><a href=\"{$homeURL}\" title=\"" . $homeLabel . "\">" . $homeIcon . "</a></li>";
+        $prepandString = "<li class=\"menumain crm-link-home\"><a href=\"{$homeURL}\" title=\"" . $homeLabel . "\">" . $homeIcon . "</a>";
       }
 
       $navigation = $prepandString . $navigation . $appendString;

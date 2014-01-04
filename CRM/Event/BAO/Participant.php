@@ -219,7 +219,7 @@ class CRM_Event_BAO_Participant extends CRM_Event_DAO_Participant {
     $session = CRM_Core_Session::singleton();
     $id = $session->get('userID');
     if (!$id) {
-      $id = $params['contact_id'];
+      $id = CRM_Utils_Array::value('contact_id', $params);
     }
 
     // add custom field values
@@ -698,11 +698,6 @@ GROUP BY  participant.event_id
       $tmpFields['participant_contact_id']['title'] =
         $tmpFields['participant_contact_id']['title'] . ' (match to contact)';
 
-      //campaign fields.
-      if (isset($tmpFields['participant_campaign_id'])) {
-        $tmpFields['participant_campaign'] = array('title' => ts('Campaign Title'));
-      }
-
       $fields = array_merge($fields, $tmpContactField);
       $fields = array_merge($fields, $tmpFields);
       $fields = array_merge($fields, $note, $participantStatus, $participantRole, $eventType);
@@ -744,11 +739,6 @@ GROUP BY  participant.event_id
         'participant_role' => array('title' => 'Participant Role',
           'name' => 'participant_role',
         ));
-
-      //campaign fields.
-      if (isset($participantFields['participant_campaign_id'])) {
-        $participantFields['participant_campaign'] = array('title' => ts('Campaign Title'));
-      }
 
       $discountFields  = CRM_Core_DAO_Discount::export();
 
