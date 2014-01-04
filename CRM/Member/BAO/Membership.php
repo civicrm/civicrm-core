@@ -2395,7 +2395,7 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   function processPriceSet($membershipId, $lineItem) {
     //FIXME : need to move this too

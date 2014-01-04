@@ -77,7 +77,7 @@ class CRM_Contact_Form_Task_RemoveFromGroup extends CRM_Contact_Form_Task {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   public function postProcess() {
     $groupId = $this->controller->exportValue('RemoveFromGroup', 'group_id');

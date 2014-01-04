@@ -494,7 +494,7 @@ SELECT    *
    * @param array $params (reference ) an assoc array of name/value pairs
    * @param array $contactId    contact id
    *
-   * @return none
+   * @return void
    * @access public
    * @static
    */

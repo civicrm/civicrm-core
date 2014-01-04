@@ -130,7 +130,7 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Core_Form {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   function setDefaultValues() {
 
@@ -145,7 +145,7 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Core_Form {
   /**
    * Function to actually build the components of the form
    *
-   * @return None
+   * @return void
    * @access public
    */
   public function buildQuickForm() {
@@ -187,7 +187,7 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Core_Form {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   public function postProcess() {
     // store the submitted values in an array

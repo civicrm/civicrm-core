@@ -56,7 +56,7 @@ class CRM_Friend_Form_Contribute extends CRM_Contribute_Form_ContributionPage {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   public function setDefaultValues() {
     $title = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_ContributionPage', $this->_id, 'title');
@@ -89,7 +89,7 @@ class CRM_Friend_Form_Contribute extends CRM_Contribute_Form_ContributionPage {
   /**
    * Function to build the form
    *
-   * @return None
+   * @return void
    * @access public
    */
   public function buildQuickForm() {
@@ -102,7 +102,7 @@ class CRM_Friend_Form_Contribute extends CRM_Contribute_Form_ContributionPage {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   public function postProcess() {
     // get the submitted form values.

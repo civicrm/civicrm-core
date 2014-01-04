@@ -45,7 +45,7 @@ class CRM_Admin_Form_Setting_Url extends CRM_Admin_Form_Setting {
   /**
    * Function to build the form
    *
-   * @return None
+   * @return void
    * @access public
    */
   public function buildQuickForm() {

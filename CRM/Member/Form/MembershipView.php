@@ -394,7 +394,7 @@ SELECT r.id, c.id as cid, c.display_name as name, c.job_title as comment,
   /**
    * Function to build the form
    *
-   * @return None
+   * @return void
    * @access public
    */
   public function buildQuickForm() {

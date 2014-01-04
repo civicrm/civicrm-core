@@ -181,7 +181,7 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   function setDefaultValues() {
     $defaults = $this->_values;
@@ -278,7 +278,7 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
   /**
    * Function to build the form
    *
-   * @return None
+   * @return void
    * @access public
    */
   public function buildQuickForm() {
@@ -561,7 +561,7 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   public function postProcess() {
     if ($this->_action & CRM_Core_Action::DELETE) {

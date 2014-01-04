@@ -157,7 +157,7 @@ class CRM_Group_Form_Edit extends CRM_Core_Form {
    * the default values are retrieved from the database
    *
    * @access public
-   * @return None
+   * @return void
    */
   function setDefaultValues() {
     $defaults = array();
@@ -214,7 +214,7 @@ class CRM_Group_Form_Edit extends CRM_Core_Form {
   /**
    * Function to actually build the form
    *
-   * @return None
+   * @return void
    * @access public
    */
   public function buildQuickForm() {

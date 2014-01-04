@@ -74,7 +74,7 @@ class CRM_Contact_Form_Location {
   /**
    * Function to build the form
    *
-   * @return None
+   * @return void
    * @access public
    */
   static function buildQuickForm(&$form) {

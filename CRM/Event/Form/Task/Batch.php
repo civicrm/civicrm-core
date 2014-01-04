@@ -227,7 +227,7 @@ class CRM_Event_Form_Task_Batch extends CRM_Event_Form_Task {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   function setDefaultValues() {
     if (empty($this->_fields)) {
@@ -265,7 +265,7 @@ class CRM_Event_Form_Task_Batch extends CRM_Event_Form_Task {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   public function postProcess() {
     $params = $this->exportValues();

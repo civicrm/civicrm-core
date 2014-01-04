@@ -71,7 +71,7 @@ class CRM_Event_Form_EventFees {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   static function setDefaultValues(&$form) {
     $defaults = array();
@@ -256,7 +256,7 @@ class CRM_Event_Form_EventFees {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   static function setDefaultPriceSet($participantID, $eventID = NULL) {
     $defaults = array();
@@ -338,7 +338,7 @@ SELECT  id, html_type
   /**
    * Function to build the form
    *
-   * @return None
+   * @return void
    * @access public
    */
   static function buildQuickForm(&$form) {
