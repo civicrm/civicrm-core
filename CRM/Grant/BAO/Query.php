@@ -360,11 +360,6 @@ class CRM_Grant_BAO_Query {
     $form->assign('validGrant', TRUE);
   }
 
-  static function addShowHide(&$showHide) {
-    $showHide->addHide('grantForm');
-    $showHide->addShow('grantForm_show');
-  }
-
   static function searchAction(&$row, $id) {}
 
   static function tableNames(&$tables) {}

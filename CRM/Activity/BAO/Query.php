@@ -555,11 +555,6 @@ class CRM_Activity_BAO_Query {
     $form->setDefaults(array('activity_test' => 0));
   }
 
-  static function addShowHide(&$showHide) {
-    $showHide->addHide('caseActivityForm');
-    $showHide->addShow('caseActivityForm_show');
-  }
-
   static function defaultReturnProperties($mode, $includeCustomFields = TRUE) {
     $properties = NULL;
     if ($mode & CRM_Contact_BAO_Query::MODE_ACTIVITY) {
