@@ -328,7 +328,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
   /**
    * Function to build the form
    *
-   * @return None
+   * @return void
    * @access public
    */
   public function buildQuickForm() {
@@ -574,7 +574,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
   /**
    * Function to add the honor block
    *
-   * @return None
+   * @return void
    * @access public
    */
   function buildHonorBlock() {
@@ -1074,7 +1074,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   public function postProcess() {
     $config = CRM_Core_Config::singleton();

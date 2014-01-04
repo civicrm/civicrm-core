@@ -42,7 +42,7 @@ class CRM_Admin_Form_CMSUser extends CRM_Core_Form {
   /**
    * Function to build the form
    *
-   * @return None
+   * @return void
    * @access public
    */
   public function buildQuickForm() {
@@ -66,7 +66,7 @@ class CRM_Admin_Form_CMSUser extends CRM_Core_Form {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   public function postProcess() {
     CRM_Core_BAO_CMSUser::synchronize();

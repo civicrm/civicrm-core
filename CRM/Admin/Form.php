@@ -59,6 +59,9 @@ class CRM_Admin_Form extends CRM_Core_Form {
    */
   protected $_BAOName;
 
+  /**
+   * Basic setup
+   */
   function preProcess() {
     $this->_id      = $this->get('id');
     $this->_BAOName = $this->get('BAOName');
@@ -77,7 +80,7 @@ class CRM_Admin_Form extends CRM_Core_Form {
    *
    * @access public
    *
-   * @return None
+   * @return array
    */
   function setDefaultValues() {
     if (isset($this->_id) && empty($this->_values)) {
@@ -105,7 +108,7 @@ class CRM_Admin_Form extends CRM_Core_Form {
   /**
    * Function to actually build the form
    *
-   * @return None
+   * @return void
    * @access public
    */
   public function buildQuickForm() {

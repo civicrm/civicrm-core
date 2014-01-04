@@ -75,7 +75,7 @@ INNER JOIN civicrm_contact ct ON ( grt.contact_id = ct.id )
   /**
    * Function to actually build the form
    *
-   * @return None
+   * @return void
    * @access public
    */
   public function buildQuickForm() {

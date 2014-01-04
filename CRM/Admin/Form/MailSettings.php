@@ -42,7 +42,7 @@ class CRM_Admin_Form_MailSettings extends CRM_Admin_Form {
   /**
    * Function to build the form
    *
-   * @return None
+   * @return void
    * @access public
    */
   public function buildQuickForm() {
@@ -125,7 +125,7 @@ class CRM_Admin_Form_MailSettings extends CRM_Admin_Form {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   function postProcess() {
     if ($this->_action & CRM_Core_Action::DELETE) {

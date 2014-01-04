@@ -234,7 +234,7 @@ class CRM_Campaign_Form_Task_Reserve extends CRM_Campaign_Form_Task {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   public function postProcess() {
     //add reservation.

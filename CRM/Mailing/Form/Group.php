@@ -94,7 +94,7 @@ class CRM_Mailing_Form_Group extends CRM_Contact_Form_Task {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   function setDefaultValues() {
     $continue = CRM_Utils_Request::retrieve('continue', 'String', $this, FALSE, NULL);
@@ -179,7 +179,7 @@ class CRM_Mailing_Form_Group extends CRM_Contact_Form_Task {
   /**
    * Function to actually build the form
    *
-   * @return None
+   * @return void
    * @access public
    */
   public function buildQuickForm() {

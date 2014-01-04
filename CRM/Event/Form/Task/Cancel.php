@@ -78,7 +78,7 @@ class CRM_Event_Form_Task_Cancel extends CRM_Event_Form_Task {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   public function postProcess() {
     $params = $this->exportValues();

@@ -324,7 +324,7 @@ class CRM_Contact_Form_Task_EmailCommon {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   static function postProcess(&$form) {
     if (count($form->_contactIds) > self::MAX_EMAILS_KILL_SWITCH) {

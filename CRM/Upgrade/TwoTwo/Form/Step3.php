@@ -101,7 +101,7 @@ class CRM_Upgrade_TwoTwo_Form_Step3 extends CRM_Upgrade_Form {
    * and drop these columns from civicrm_domain table.
    * @access public
    *
-   * @return None
+   * @return void
    */
   function upgradeDomainFromEmail() {
     $query = "

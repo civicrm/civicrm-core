@@ -204,7 +204,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
   /**
    * Function to build the form
    *
-   * @return None
+   * @return void
    * @access public
    */
   function preProcess() {
@@ -491,7 +491,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   function setDefaultValues() {
     if ($this->_cdType) {
@@ -966,7 +966,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   public function postProcess($params = NULL) {
     if ($this->_action & CRM_Core_Action::DELETE) {

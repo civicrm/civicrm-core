@@ -43,7 +43,7 @@ class CRM_Admin_Form_Setting_Smtp extends CRM_Admin_Form_Setting {
   /**
    * Function to build the form
    *
-   * @return None
+   * @return void
    * @access public
    */
   public function buildQuickForm() {
@@ -79,7 +79,7 @@ class CRM_Admin_Form_Setting_Smtp extends CRM_Admin_Form_Setting {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   public function postProcess() {
     // flush caches so we reload details for future requests
@@ -244,7 +244,7 @@ class CRM_Admin_Form_Setting_Smtp extends CRM_Admin_Form_Setting {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   function setDefaultValues() {
     if (!$this->_defaults) {

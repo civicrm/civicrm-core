@@ -147,7 +147,7 @@ AND    {$this->_componentClause}";
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   public function postProcess() {
     // get all the details needed to generate a receipt

@@ -58,7 +58,7 @@ class CRM_Contact_Form_Task_AddToHousehold extends CRM_Contact_Form_Task {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   function buildQuickForm() {
 
@@ -114,7 +114,7 @@ class CRM_Contact_Form_Task_AddToHousehold extends CRM_Contact_Form_Task {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   public function postProcess() {
 
@@ -182,7 +182,7 @@ class CRM_Contact_Form_Task_AddToHousehold extends CRM_Contact_Form_Task {
    *
    * @access public
    *
-   * @return None
+   * @return void
    *
    */
   function search(&$form, &$params) {

@@ -94,7 +94,7 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   function setDefaultValues() {
     $defaults = $unsetSubmittedOptions = array();
@@ -168,7 +168,7 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
   /**
    * Function to build the form
    *
-   * @return None
+   * @return void
    * @access public
    */
   public function buildQuickForm() {
@@ -575,7 +575,7 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   public function postProcess() {
     //get the button name.

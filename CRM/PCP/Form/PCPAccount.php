@@ -156,7 +156,7 @@ class CRM_PCP_Form_PCPAccount extends CRM_Core_Form {
   /**
    * Function to build the form
    *
-   * @return None
+   * @return void
    * @access public
    */
   public function buildQuickForm() {
@@ -263,7 +263,7 @@ class CRM_PCP_Form_PCPAccount extends CRM_Core_Form {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   public function postProcess() {
     $params = $this->controller->exportValues($this->getName());

@@ -93,7 +93,7 @@ class CRM_Event_Form_ManageEvent_ScheduleReminders extends CRM_Event_Form_Manage
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   function setDefaultValues() {
     $defaults = array();
@@ -105,7 +105,7 @@ class CRM_Event_Form_ManageEvent_ScheduleReminders extends CRM_Event_Form_Manage
   /**
    * Function to build the form
    *
-   * @return None
+   * @return void
    * @access public
    */
   public function buildQuickForm() {
@@ -251,7 +251,7 @@ class CRM_Event_Form_ManageEvent_ScheduleReminders extends CRM_Event_Form_Manage
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   public function postProcess() {
     if ($this->_action & CRM_Core_Action::DELETE) {

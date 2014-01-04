@@ -70,7 +70,7 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
   /**
    * Function to build the form
    *
-   * @return None
+   * @return void
    * @access public
    */
   function preProcess() {
@@ -217,7 +217,7 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   function setDefaultValues() {
     $this->_defaults = parent::setDefaultValues();
@@ -354,7 +354,7 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   public function postProcess($params = NULL) {
     $transaction = new CRM_Core_Transaction();

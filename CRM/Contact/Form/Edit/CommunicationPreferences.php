@@ -169,7 +169,7 @@ class CRM_Contact_Form_Edit_CommunicationPreferences {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   static function setDefaultValues(&$form, &$defaults) {
 
@@ -212,7 +212,7 @@ class CRM_Contact_Form_Edit_CommunicationPreferences {
   /**
    *  set array of greeting fields
    *
-   * @return None
+   * @return void
    * @access public
    */
   static function getGreetingFields($contactType) {

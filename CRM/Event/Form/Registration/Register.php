@@ -133,7 +133,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   function setDefaultValues() {
     if ($this->_ppType && $this->_snippet && !($this->_paymentProcessor['billing_mode'] & CRM_Core_Payment::BILLING_MODE_FORM)) {
@@ -312,7 +312,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
   /**
    * Function to build the form
    *
-   * @return None
+   * @return void
    * @access public
    */
   public function buildQuickForm() {
@@ -942,7 +942,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   public function postProcess() {
     // get the submitted form values.
@@ -1175,7 +1175,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
    * @param  array $param Form valuess
    * @param  int contactID
    *
-   * @return None
+   * @return void
    * access public
    *
    */
