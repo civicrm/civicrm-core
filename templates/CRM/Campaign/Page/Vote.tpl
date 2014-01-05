@@ -32,6 +32,21 @@
    {include file='CRM/Campaign/Form/Gotv.tpl'}
 {elseif $tabHeader}
   {include file="CRM/common/TabHeader.tpl"}
+  <script type="text/javascript">
+    {* very crude refresh of tabs - fixme: use datatable native refresh method *}
+    {literal}
+    cj(function($) {
+      $('#mainTabContainer').on('tabsbeforeactivate', function(e, ui) {
+        // fixme - can't search more than once! Uncomment this code, switching tabs gives qfkey error.
+        //if (ui.newTab.is('#tab_reserve')) {
+          //$('.searchVoter.button').click();
+          ui.oldPanel.data('civiCrmSnippet') && ui.oldPanel.crmSnippet('destroy');
+        //}
+      });
+    });
+    {/literal}
+  </script>
+
 {else}
  <div class="messages status no-popup">
      <div class="icon inform-icon"></div>
