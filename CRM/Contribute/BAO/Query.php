@@ -314,7 +314,7 @@ class CRM_Contribute_BAO_Query {
               $val[] = $k;
             }
           }
-          if (count($val) > 1) {
+          if (count($val) > 0) {
             // Overwrite $value so it works with an IN where statement.
             $op = 'IN';
             $value = '(' . implode(',', $val) . ')';
@@ -331,7 +331,7 @@ class CRM_Contribute_BAO_Query {
         $names = array();
         if (isset($val) && is_array($val)) {
           foreach($val as $id) {
-            $names[] = $types[$id];
+            $names[] = CRM_Utils_Array::value($id, $types);
           }
         }
         else {
@@ -821,11 +821,11 @@ class CRM_Contribute_BAO_Query {
       CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution', 'currency', array('labelColumn' => 'name'))
     );
 
+    // CRM-13848
     $form->add('select', 'financial_type_id',
       ts('Financial Type'),
-      array(
-        '' => ts('- any -')) +
-      CRM_Contribute_PseudoConstant::financialType()
+      CRM_Contribute_PseudoConstant::financialType(), FALSE,
+        array('id' => 'financial_type_id', 'multiple' => 'multiple', 'title' => ts('- select -'))
     );
 
     $form->add('select', 'contribution_page_id',

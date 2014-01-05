@@ -371,6 +371,15 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form {
     }
 
     $config = CRM_Core_Config::singleton();
+    // CRM-13848
+    $financialType = CRM_Utils_Array::value('financial_type_id', $this->_formValues);
+    if ($financialType && is_array($financialType)) {
+      unset($this->_formValues['financial_type_id']);
+      foreach($financialType as $notImportant => $typeID) {
+        $this->_formValues['financial_type_id'][$typeID] = 1;
+      }
+    }
+
     $tags = CRM_Utils_Array::value('contact_tags', $this->_formValues);
     if ($tags && !is_array($tags)) {
       unset($this->_formValues['contact_tags']);
@@ -380,7 +389,7 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form {
     if ($tags && is_array($tags)) {
       unset($this->_formValues['contact_tags']);
       foreach($tags as $notImportant => $tagID) {
-          $this->_formValues['contact_tags'][$tagID] = 1;
+        $this->_formValues['contact_tags'][$tagID] = 1;
       }
     }
 
@@ -395,7 +404,7 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form {
       if ($group && is_array($group)) {
         unset($this->_formValues['group']);
         foreach($group as $notImportant => $groupID) {
-            $this->_formValues['group'][$groupID] = 1;
+          $this->_formValues['group'][$groupID] = 1;
         }
       }
 
