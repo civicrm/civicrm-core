@@ -34,14 +34,21 @@
     <ul>
        {foreach from=$tabHeader key=tabName item=tabValue}
           <li id="tab_{$tabName}" class="crm-tab-button ui-corner-all{if !$tabValue.valid} disabled{/if}{if isset($tabValue.class)} {$tabValue.class}{/if}">
-          {if $tabValue.link and $tabValue.active}
-             <a href="{$tabValue.link}" title="{$tabValue.title}{if !$tabValue.valid} ({ts}disabled{/ts}){/if}">{$tabValue.title}</a>
+          {if $tabValue.active}
+             <a href="{if !empty($tabValue.template)}#panel_{$tabName}{else}{$tabValue.link}{/if}" title="{$tabValue.title}{if !$tabValue.valid} ({ts}disabled{/ts}){/if}">{$tabValue.title}</a>
           {else}
              <span {if !$tabValue.valid} title="{ts}disabled{/ts}"{/if}>{$tabValue.title}</span>
           {/if}
           </li>
        {/foreach}
     </ul>
+      {foreach from=$tabHeader key=tabName item=tabValue}
+        {if !empty($tabValue.template)}
+          <div id="#panel_{$tabName}">
+            {include file=$tabValue.template}
+          </div>
+        {/if}
+      {/foreach}
     </div>
   {/if}
   <div class="clear"></div>
