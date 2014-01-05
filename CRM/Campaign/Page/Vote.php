@@ -100,19 +100,10 @@ class CRM_Campaign_Page_Vote extends CRM_Core_Page {
   }
 
   function buildTabs() {
-    //check for required permissions.
-    $superUser = FALSE;
-    if (CRM_Core_Permission::check('manage campaign') ||
-      CRM_Core_Permission::check('administer CiviCampaign')
-    ) {
-      $superUser = TRUE;
-    }
-
     $allTabs = array();
     foreach ($this->_tabs as $name => $title) {
-      if (!$superUser &&
-        !CRM_Core_Permission::check("{$name} campaign contacts")
-      ) {
+      // check for required permissions.
+      if (!CRM_Core_Permission::check(array(array('manage campaign', 'administer CiviCampaign', "{$name} campaign contacts")))) {
         continue;
       }
 
