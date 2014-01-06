@@ -194,7 +194,28 @@ class CRM_Report_Form extends CRM_Core_Form {
   protected $_rowsFound = NULL;
   protected $_selectAliases = array();
   protected $_rollup = NULL;
+
+  /**
+   * SQL Limit clause
+   * @var  string
+   */
   protected $_limit = NULL;
+
+  /**
+   * This can be set to specify a limit to the number of rows
+   * Since it is currently envisaged as part of the api usage it is only being applied
+   * when $_output mode is not 'html' or 'group' so as not to have to interpret / mess with that part
+   * of the code (see limit() fn
+   * @var integer
+   */
+  protected $_limitValue = NULL;
+
+  /**
+   * This can be set to specify row offset
+   * See notes on _limitValue
+   * @var integer
+   */
+  protected $_offsetValue = NULL;
   protected $_sections = NULL;
   protected $_autoIncludeIndexedFieldsAsOrderBys = 0;
   protected $_absoluteUrl = FALSE;
@@ -767,6 +788,23 @@ class CRM_Report_Form extends CRM_Core_Form {
   function setForce($isForce) {
     $this->_force = $isForce;
   }
+
+  /**
+   * Setter for $_limitValue
+   * @param number $_limitValue
+   */
+  function setLimitValue($_limitValue) {
+    $this->_limitValue = $_limitValue;
+  }
+
+  /**
+   * Setter for $_offsetValue
+   * @param number $_offsetValue
+   */
+  function setOffsetValue($_offsetValue) {
+    $this->_offsetValue = $_offsetValue;
+  }
+
   /**
    * Getter for $_defaultValues
    * @return array $_defaultValues
@@ -2667,6 +2705,14 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
 
       $this->_limit = " LIMIT $offset, $rowCount";
       return array($offset, $rowCount);
+    }
+    if($this->_limitValue) {
+      if($this->_offsetValue) {
+        $this->_limit = " LIMIT {$this->_offsetValue}, {$this->_limitValue} ";
+      }
+      else {
+        $this->_limit = " LIMIT " . $this->_limitValue;
+      }
     }
   }
 
