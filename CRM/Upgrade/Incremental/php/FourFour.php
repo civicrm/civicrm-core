@@ -256,6 +256,7 @@ ALTER TABLE civicrm_dashboard
     ";
 
     CRM_Core_DAO::executeQuery($query);
+    return TRUE;
   }
 
   /**
