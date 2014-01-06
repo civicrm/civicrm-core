@@ -113,10 +113,6 @@
           <div class="description">{ts}Weight controls the order in which Label Formats are displayed in selection lists. Enter a positive or negative integer. Lower numbers are displayed ahead of higher numbers.{/ts}</div>
       </tr>
     </table>
-  {/if}
-  <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
-</div>
-{if $action neq 8}
 {literal}
   <script type="text/javascript">
     var currentWidth;
@@ -203,4 +199,6 @@
 
   </script>
 {/literal}
-{/if}
+  {/if}
+  <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
+</div>

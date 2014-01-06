@@ -359,7 +359,7 @@
       //disabled auto renew settings.
     var allowAutoRenew = {/literal}'{$allowAutoRenewMembership}'{literal};
       if ( allowAutoRenew && cj("#auto_renew") ) {
-        cj("#auto_renew").attr( 'checked', false );
+        cj("#auto_renew").prop('checked', false );
         cj('#allow_auto_renew').hide( );
       }
     }
@@ -367,7 +367,7 @@
 
   {/literal}
   {if $relatedOrganizationFound and $reset}
-    cj( "#is_for_organization" ).attr( 'checked', true );
+    cj( "#is_for_organization" ).prop('checked', true );
     showOnBehalf(false);
   {elseif $onBehalfRequired}
     showOnBehalf(true);

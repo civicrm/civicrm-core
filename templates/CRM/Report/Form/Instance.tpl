@@ -126,7 +126,7 @@
       var formName = {/literal}"{$form.formName}"{literal};
       cj('#_qf_' + formName + '_submit_save').click (
           function(){
-              if ( cj('#is_navigation').attr('checked') && cj('#parent_id').val() == '') {
+              if ( cj('#is_navigation').prop('checked') && cj('#parent_id').val() == '') {
                   var confirmMsg = {/literal}'{ts escape="js"}You have chosen to include this report in the Navigation Menu without selecting a Parent Menu item from the dropdown. This will add the report to the top level menu bar. Are you sure you want to continue?{/ts}'{literal}
                   return confirm(confirmMsg);
               }

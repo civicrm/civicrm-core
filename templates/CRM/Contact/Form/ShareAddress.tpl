@@ -52,7 +52,7 @@
 <script type="text/javascript">
   function showHideSharedAddress( blockNo, showSelect ) {
     // based on checkbox, show or hide
-    if ( cj( '#address\\[' + blockNo + '\\]\\[use_shared_address\\]' ).attr( 'checked') ) {
+    if ( cj( '#address\\[' + blockNo + '\\]\\[use_shared_address\\]' ).prop('checked') ) {
       if ( showSelect && cj( '#shared-address-display-' + blockNo ).length == 0 ) {
         cj( '#shared-address-' + blockNo ).show( );
       }

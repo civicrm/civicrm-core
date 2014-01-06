@@ -280,22 +280,39 @@ function _civicrm_api3_get_DAO($name) {
     // len ('civicrm_api3_') == 13
     $name = substr($name, 13, $last - 13);
   }
+  
+  $name = _civicrm_api_get_camel_name($name, 3);
 
-  if (strtolower($name) == 'individual' || strtolower($name) == 'household' || strtolower($name) == 'organization') {
+  if ($name == 'Individual' || $name == 'Household' || $name == 'Organization') {
     $name = 'Contact';
   }
 
-  //hack to deal with incorrectly named BAO/DAO - see CRM-10859 -
-  // several of these have been removed but am not confident mailing_recipients is
-  // tests so have not tackled.
-  // correct approach for im is unclear
-  if($name == 'mailing_recipients' || $name == 'MailingRecipients'){
-    return 'CRM_Mailing_BAO_Recipients';
+  // hack to deal with incorrectly named BAO/DAO - see CRM-10859
+
+  // FIXME: DAO should be renamed CRM_Mailing_DAO_MailingRecipients
+  // but am not confident mailing_recipients is tested so have not tackled.
+  if ($name == 'MailingRecipients') {
+    return 'CRM_Mailing_DAO_Recipients';
   }
-  if(strtolower($name) == 'im'){
-    return 'CRM_Core_BAO_IM';
+  // FIXME: DAO should be renamed CRM_Mailing_DAO_MailingComponent
+  if ($name == 'MailingComponent') {
+    return 'CRM_Mailing_DAO_Component';
   }
-  return CRM_Core_DAO_AllCoreTables::getFullName(_civicrm_api_get_camel_name($name, 3));
+  // FIXME: DAO should be renamed CRM_ACL_DAO_AclRole
+  if ($name == 'AclRole') {
+    return 'CRM_ACL_DAO_EntityRole';
+  }
+  // FIXME: DAO should be renamed CRM_SMS_DAO_SmsProvider
+  // But this would impact SMS extensions so need to coordinate
+  // Probably best approach is to migrate them to use the api and decouple them from core BAOs
+  if ($name == 'SmsProvider') {
+    return 'CRM_SMS_DAO_Provider';
+  }
+  // FIXME: DAO names should follow CamelCase convention
+  if ($name == 'Im' || $name == 'Acl') {
+    $name = strtoupper($name);
+  }
+  return CRM_Core_DAO_AllCoreTables::getFullName($name);
 }
 
 /**
@@ -306,6 +323,10 @@ function _civicrm_api3_get_DAO($name) {
  * @return mixed
  */
 function _civicrm_api3_get_BAO($name) {
+  // FIXME: DAO should be renamed CRM_Badge_DAO_BadgeLayout
+  if ($name == 'PrintLabel') {
+    return 'CRM_Badge_BAO_Layout';
+  }
   $dao = _civicrm_api3_get_DAO($name);
   if (!$dao) {
     return NULL;
@@ -1035,7 +1056,11 @@ function _civicrm_api3_basic_create($bao_name, &$params, $entity = NULL) {
  * @return CRM_Core_DAO|NULL an instance of the BAO
  */
 function _civicrm_api3_basic_create_fallback($bao_name, &$params) {
-  $entityName = CRM_Core_DAO_AllCoreTables::getBriefName(get_parent_class($bao_name));
+  $dao_name = get_parent_class($bao_name);
+  if ($dao_name === 'CRM_Core_DAO' || !$dao_name) {
+    $dao_name = $bao_name;
+  }
+  $entityName = CRM_Core_DAO_AllCoreTables::getBriefName($dao_name);
   if (empty($entityName)) {
     throw new API_Exception("Class \"$bao_name\" does not map to an entity name", "unmapped_class_to_entity", array(
       'class_name' => $bao_name,
@@ -1044,7 +1069,7 @@ function _civicrm_api3_basic_create_fallback($bao_name, &$params) {
   $hook = empty($params['id']) ? 'create' : 'edit';
 
   CRM_Utils_Hook::pre($hook, $entityName, CRM_Utils_Array::value('id', $params), $params);
-  $instance = new $bao_name();
+  $instance = new $dao_name();
   $instance->copyValues($params);
   $instance->save();
   CRM_Utils_Hook::post($hook, $entityName, $instance->id, $instance);

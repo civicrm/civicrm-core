@@ -75,7 +75,7 @@
 <div id={$gName}>
         {strip}
   {* handle enable/disable actions*}
-  {include file="CRM/common/enableDisable.tpl"}
+  {include file="CRM/common/enableDisableApi.tpl"}
     {include file="CRM/common/jsortable.tpl"}
         <table id="options" class="display">
          <thead>
@@ -118,11 +118,11 @@
           </thead>
           <tbody>
         {foreach from=$rows item=row}
-          <tr id="row_{$row.id}" class="crm-admin-options crm-admin-options_{$row.id} {cycle values="odd-row,even-row"}{if NOT $row.is_active} disabled{/if}">
+          <tr id="option_value-{$row.id}" class="crm-admin-options crm-admin-options_{$row.id} crm-entity {cycle values="odd-row,even-row"}{if NOT $row.is_active} disabled{/if}">
             {if $showComponent}
               <td class="crm-admin-options-component_name">{$row.component_name}</td>
             {/if}
-            <td class="crm-admin-options-label">{$row.label}</td>
+            <td class="crm-admin-options-label crm-editable" data-field="label">{$row.label}</td>
             {if $gName eq "case_status"}
               <td class="crm-admin-options-grouping">{$row.grouping}</td>
             {/if}
@@ -134,7 +134,7 @@
               <td class="yes-no crm-admin-options-filter">{if $row.filter eq 1}<img src="{$config->resourceBase}i/check.gif" alt="{ts}Counted{/ts}" />{/if}</td>
             {/if}
             {if $showVisibility}<td class="crm-admin-visibility_label">{$row.visibility_label}</td>{/if}
-            <td class="crm-admin-options-description">{$row.description}</td>
+            <td class="crm-admin-options-description crm-editable" data-field="description" data-type="textarea">{$row.description}</td>
             <td class="nowrap crm-admin-options-order">{$row.order}</td>
             {if $showIsDefault}
               <td class="crm-admin-options-is_default" align="center">{if $row.is_default eq 1}<img src="{$config->resourceBase}i/check.gif" alt="{ts}Default{/ts}" />{/if}&nbsp;</td>
@@ -147,6 +147,7 @@
         {/foreach}
         </tbody>
         </table>
+        {include file="CRM/common/crmeditable.tpl"}
         {/strip}
 
         {if $action ne 1 and $action ne 2}

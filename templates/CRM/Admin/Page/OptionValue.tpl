@@ -37,7 +37,8 @@
 <div id="browseValues">
     {strip}
    {* handle enable/disable actions*}
-    {include file="CRM/common/enableDisable.tpl"}
+    {include file="CRM/common/enableDisableApi.tpl"}
+    {include file="CRM/common/crmeditable.tpl"}
     {include file="CRM/common/jsortable.tpl"}
          <table id="options" class="display">
          <thead>
@@ -55,8 +56,8 @@
         </tr>
         </thead>
         {foreach from=$rows item=row}
-      <tr id="row_{$row.id}"class="crm-admin-optionValue {cycle values="odd-row,even-row"} {$row.class}{if NOT $row.is_active} disabled{/if}">
-            <td class="crm-admin-optionValue-label">{$row.label}</td>
+      <tr id="optionValue-{$row.id}" class="crm-entity {cycle values="odd-row,even-row"} {$row.class}{if NOT $row.is_active} disabled{/if}">
+            <td class="crm-admin-optionValue-label crm-editable" data-field="label">{$row.label}</td>
             <td class="crm-admin-optionValue-value">{$row.value}</td>
             <td class="crm-admin-optionValue-description">{$row.description}</td>
             <td class="nowrap crm-admin-optionValue-weight">{$row.weight}</td>

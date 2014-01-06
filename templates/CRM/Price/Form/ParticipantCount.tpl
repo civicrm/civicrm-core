@@ -53,13 +53,13 @@
                 addCount = parseInt(optionPart[1]);
       }
 
-       if( cj(this).attr('checked') ) {
+       if( cj(this).prop('checked') ) {
               pPartiCount    += addCount;
               pPartiRef[ele] += addCount;
           }
 
        cj(this).click( function(){
-        if( cj(this).attr('checked') ) {
+        if( cj(this).prop('checked') ) {
                 pPartiCount    += addCount;
                 pPartiRef[ele] += addCount;
             } else {
@@ -84,7 +84,7 @@
               pPartiRef[ele] = 0;
           }
 
-            if( cj(this).attr('checked') ) {
+            if( cj(this).prop('checked') ) {
                     pPartiCount    = parseInt(pPartiCount) + addCount - parseInt(pPartiRef[ele]);
                     pPartiRef[ele] = addCount;
                   }

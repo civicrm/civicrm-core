@@ -84,14 +84,12 @@ class CRM_Price_Page_Set extends CRM_Core_Page {
         ),
         CRM_Core_Action::DISABLE => array(
           'name' => ts('Disable'),
-          'extra' => 'onclick = "enableDisable( %%sid%%,\'' . 'CRM_Price_BAO_PriceSet' . '\',\'' . 'enable-disable' . '\' );"',
-          'ref' => 'disable-action',
+          'ref' => 'crm-enable-disable',
           'title' => ts('Disable Price Set'),
         ),
         CRM_Core_Action::ENABLE => array(
           'name' => ts('Enable'),
-          'extra' => 'onclick = "enableDisable( %%sid%%,\'' . 'CRM_Price_BAO_PriceSet' . '\',\'' . 'disable-enable' . '\' );"',
-          'ref' => 'enable-action',
+          'ref' => 'crm-enable-disable',
           'title' => ts('Enable Price Set'),
         ),
         CRM_Core_Action::DELETE => array(

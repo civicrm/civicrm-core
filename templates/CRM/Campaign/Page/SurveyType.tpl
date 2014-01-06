@@ -10,7 +10,8 @@
 <div id={$gName}>
         {strip}
   {* handle enable/disable actions*}
-  {include file="CRM/common/enableDisable.tpl"}
+  {include file="CRM/common/enableDisableApi.tpl"}
+  {include file="CRM/common/crmeditable.tpl"}
         {include file="CRM/common/jsortable.tpl"}
         <table class="display">
          <thead>
@@ -30,8 +31,8 @@
                  </tr>
         </thead>
         {foreach from=$rows item=row}
-        <tr id="row_{$row.id}" class="crm-admin-options crm-admin-options_{$row.id} {if NOT $row.is_active} disabled{/if}">
-          <td class="crm-admin-options-label">{$row.label}</td>
+        <tr id="option_value-{$row.id}" class="crm-entity crm-admin-options_{$row.id} {if NOT $row.is_active} disabled{/if}">
+          <td class="crm-admin-options-label crm-editable" data-field="label">{$row.label}</td>
           <td class="crm-admin-options-value">{$row.value}</td>
           <td class="crm-admin-options-description">{$row.description}</td>
           <td class="nowrap crm-admin-options-order">{$row.order}</td>

@@ -99,7 +99,7 @@ cj(function(){
         cj('#allow_auto_renew').show();
     } else if ( autoRenewOption == 2 ) {
         var autoRenew = cj("#auto_renew");
-        autoRenew.attr( 'checked',  true );
+        autoRenew.prop('checked',  true );
         autoRenew.attr( 'readonly', true );
         cj('#allow_auto_renew').show();
     }
@@ -272,7 +272,7 @@ function showHideAutoRenew( memTypeId )
   }
 
   var autoRenew = cj("#auto_renew");
-  if ( considerUserInput ) isChecked = autoRenew.attr( 'checked' );
+  if ( considerUserInput ) isChecked = autoRenew.prop('checked' );
 
   //its a normal recur contribution.
   if ( cj( "is_recur" ) &&
@@ -286,7 +286,7 @@ function showHideAutoRenew( memTypeId )
   if ( readOnly && funName == 'show();' ) isChecked = true;
 
   autoRenew.attr( 'readonly', readOnly );
-  autoRenew.attr( 'checked',  isChecked );
+  autoRenew.prop('checked',  isChecked );
   eval( "cj('#allow_auto_renew')." + funName );
 }
 
@@ -295,7 +295,7 @@ function showHideAutoRenew( memTypeId )
      //keep read only always checked.
      cj( "#auto_renew" ).click(function( ) {
         if ( cj(this).attr( 'readonly' ) ) {
-            cj(this).attr( 'checked', true );
+            cj(this).prop('checked', true );
         }
      });
   });

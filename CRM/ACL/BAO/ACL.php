@@ -648,6 +648,7 @@ SELECT $acl.*
     $dao = new CRM_ACL_DAO_ACL();
     $dao->copyValues($params);
     $dao->save();
+    return $dao;
   }
 
   static function retrieve(&$params, &$defaults) {

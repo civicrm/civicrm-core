@@ -61,6 +61,7 @@ class CRM_Admin_Page_RelationshipType extends CRM_Core_Page_Basic {
    * @return array (reference) of action links
    */
   function &links() {
+    CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'js/crm.livePage.js');
     if (!(self::$_links)) {
       self::$_links = array(
         CRM_Core_Action::VIEW => array(
@@ -77,14 +78,12 @@ class CRM_Admin_Page_RelationshipType extends CRM_Core_Page_Basic {
         ),
         CRM_Core_Action::DISABLE => array(
           'name' => ts('Disable'),
-          'extra' => 'onclick = "enableDisable( %%id%%,\'' . 'CRM_Contact_BAO_RelationshipType' . '\',\'' . 'enable-disable' . '\' );"',
-          'ref' => 'disable-action',
+          'ref' => 'crm-enable-disable',
           'title' => ts('Disable Relationship Type'),
         ),
         CRM_Core_Action::ENABLE => array(
           'name' => ts('Enable'),
-          'extra' => 'onclick = "enableDisable( %%id%%,\'' . 'CRM_Contact_BAO_RelationshipType' . '\',\'' . 'disable-enable' . '\' );"',
-          'ref' => 'enable-action',
+          'ref' => 'crm-enable-disable',
           'title' => ts('Enable Relationship Type'),
         ),
         CRM_Core_Action::DELETE => array(

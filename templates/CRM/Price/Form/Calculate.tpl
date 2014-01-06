@@ -57,7 +57,7 @@ cj("input,#priceset select,#priceset").each(function () {
     optionPart = option[1].split(optionSep);
     addprice   = parseFloat( optionPart[0] );
 
-    if( cj(this).attr('checked') ) {
+    if( cj(this).prop('checked') ) {
       totalfee   += addprice;
       price[ele] += addprice;
     }
@@ -65,7 +65,7 @@ cj("input,#priceset select,#priceset").each(function () {
     //event driven calculation of element.
     cj(this).click( function(){
 
-      if ( cj(this).attr('checked') )  {
+      if ( cj(this).prop('checked') )  {
   totalfee   += addprice;
   price[ele] += addprice;
       } else {
@@ -92,7 +92,7 @@ cj("input,#priceset select,#priceset").each(function () {
       price[ele] = 0;
     }
 
-    if( cj(this).attr('checked') ) {
+    if( cj(this).prop('checked') ) {
       totalfee   = parseFloat(totalfee) + addprice - parseFloat(price[ele]);
       price[ele] = addprice;
     }

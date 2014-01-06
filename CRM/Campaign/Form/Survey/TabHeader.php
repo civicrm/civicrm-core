@@ -45,8 +45,11 @@ class CRM_Campaign_Form_Survey_TabHeader {
       $form->set('tabHeader', $tabs);
     }
     $form->assign_by_ref('tabHeader', $tabs);
-    $selectedTab = self::getCurrentTab($tabs);
-    $form->assign_by_ref('selectedTab', $selectedTab);
+    CRM_Core_Resources::singleton()
+      ->addScriptFile('civicrm', 'templates/CRM/common/TabHeader.js')
+      ->addSetting(array('tabSettings' => array(
+        'active' => self::getCurrentTab($tabs),
+      )));
     return $tabs;
   }
 
@@ -98,7 +101,7 @@ class CRM_Campaign_Form_Survey_TabHeader {
         }
 
         $tabs[$key]['link'] = CRM_Utils_System::url("civicrm/survey/configure/{$key}",
-          "{$reset}action=update&snippet=5&id={$surveyID}{$tabs[$key]['qfKey']}"
+          "{$reset}action=update&id={$surveyID}{$tabs[$key]['qfKey']}"
         );
         $tabs[$key]['active'] = $tabs[$key]['valid'] = TRUE;
       }

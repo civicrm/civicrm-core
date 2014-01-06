@@ -28,7 +28,7 @@
    <div class="bold">{ts}Change Log:{/ts} {$displayName}</div>
    {if $useLogging}
      <br />
-     <div class='hiddenElement' id='instance_data'> </div>
+     <div id='instance_data'><div class="crm-loading-element"></div></div>
    {else}
     <div class="form-item">
      {if $logCount > 0 }
@@ -55,35 +55,22 @@
 {if $useLogging}
 {literal}
   <script type="text/javascript">
-  cj( document ).ready( function ( ) {
-    var dataURL = {/literal}"{$instanceUrl}"{literal};
-    cj.ajax({
-      url: dataURL,
-      success: function( content ) {
-        cj('#instance_data').show( ).html( content );
-      }
-    });
-  });
+  CRM.reloadChangeLogTab = function() {
+    cj('#changeLog #instance_data').load({/literal}"{$instanceUrl}"{literal});
+  };
+  cj(function () {
+    CRM.reloadChangeLogTab();
 
-  cj('div#changeLog div#instance_data .report-pager .crm-pager-nav a').live("click", function(e) {
-    cj.ajax({
-      url: this.href + '&snippet=4&section=2',
-      success: function( content ) {
-        cj('div#changeLog div#instance_data').html(content);
-      }
+    cj('#changeLog').on('click', '.report-pager .crm-pager-nav a', function(e) {
+      cj('#changeLog #instance_data').block().load(this.href + '&snippet=4&section=2');
+      return false;
     });
-    return false;
-  });
 
-  cj('input[name="PagerBottomButton"], input[name="PagerTopButton"]').live("click", function(e) {
-    var crmpid  = (this.name == 'PagerBottomButton') ? cj('input[name="crmPID_B"]').val() : cj('input[name="crmPID"]').val();
-    cj.ajax({
-      url: cj('div#changeLog div#instance_data .report-pager .crm-pager-nav a:first').attr('href') + '&snippet=4&section=2&crmPID=' + crmpid,
-      success: function( content ) {
-        cj('div#changeLog div#instance_data').html(content);
-      }
+    cj('#changeLog').on('click', 'input[name="PagerBottomButton"], input[name="PagerTopButton"]', function(e) {
+      var url  = cj('#changeLog #instance_data .report-pager .crm-pager-nav a:first').attr('href') + '&snippet=4&section=2';
+      cj('#changeLog #instance_data').block().load(url + '&crmPID=' + cj(this).siblings('input[type=text]').val());
+      return false;
     });
-    return false;
   });
 
   </script>

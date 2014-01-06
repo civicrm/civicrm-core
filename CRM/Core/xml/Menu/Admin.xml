@@ -299,7 +299,6 @@
   </item>
   <item>
      <path>civicrm/admin/weight</path>
-     <title>This should never be seen</title>
      <page_callback>CRM_Utils_Weight::fixOrder</page_callback>
   </item>
   <item>

@@ -162,14 +162,12 @@ class CRM_Admin_Page_Options extends CRM_Core_Page_Basic {
         ),
         CRM_Core_Action::DISABLE => array(
           'name' => ts('Disable'),
-          'extra' => 'onclick = "enableDisable( %%id%%,\'' . 'CRM_Core_BAO_OptionValue' . '\',\'' . 'enable-disable' . '\' );"',
-          'ref' => 'disable-action',
+          'ref' => 'crm-enable-disable',
           'title' => ts('Disable %1', array(1 => self::$_gName)),
         ),
         CRM_Core_Action::ENABLE => array(
           'name' => ts('Enable'),
-          'extra' => 'onclick = "enableDisable( %%id%%,\'' . 'CRM_Core_BAO_OptionValue' . '\',\'' . 'disable-enable' . '\' );"',
-          'ref' => 'enable-action',
+          'ref' => 'crm-enable-disable',
           'title' => ts('Enable %1', array(1 => self::$_gName)),
         ),
         CRM_Core_Action::DELETE => array(
@@ -213,7 +211,6 @@ class CRM_Admin_Page_Options extends CRM_Core_Page_Basic {
    * @static
    */
   function browse() {
-    CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'js/crm.livePage.js');
 
     $groupParams = array('name' => self::$_gName);
     $optionValue = CRM_Core_OptionValue::getRows($groupParams, $this->links(), 'component_id,weight');

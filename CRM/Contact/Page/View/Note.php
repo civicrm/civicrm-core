@@ -158,6 +158,8 @@ class CRM_Contact_Page_View_Note extends CRM_Core_Page {
       $note->id
     );
     $this->assign('commentAction', $commentAction);
+
+    $this->ajaxResponse['tabCount'] = CRM_Contact_BAO_Contact::getCountComponent('note', $this->_contactId);
   }
 
   /**
@@ -284,7 +286,6 @@ class CRM_Contact_Page_View_Note extends CRM_Core_Page {
           'name' => ts('Delete'),
           'url' => 'civicrm/contact/view/note',
           'qs' => 'action=delete&reset=1&cid=%%cid%%&id=%%id%%&selectedChild=note',
-          'extra' => 'onclick = "if (confirm(\'' . $deleteExtra . '\') ) this.href+=\'&amp;confirmed=1\'; else return false;"',
           'title' => ts('Delete Note'),
         ),
       );

@@ -34,7 +34,7 @@
       {foreach from=$viewRelationship item="row"}
             <tr>
                 <td class="label">{$row.relation}</td>
-                <td><a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=`$row.cid`"}">{$row.name}</a></td>
+                <td><a class="no-popup" href="{crmURL p='civicrm/contact/view' q="reset=1&cid=`$row.cid`"}">{$row.name}</a></td>
             </tr>
             {if $isCurrentEmployer}
                 <tr><td class="label">{ts}Current Employee?{/ts}</td><td>{ts}Yes{/ts}</td></tr>
@@ -72,7 +72,7 @@
         {/foreach}
         </table>
         {include file="CRM/Custom/Page/CustomDataView.tpl"}
-        <div class="crm-submit-buttons"><input type="button" name='cancel' value="{ts}Done{/ts}" onclick="location.href='{crmURL p='civicrm/contact/view' q='action=browse&selectedChild=rel'}';"/></div>
+        <div class="crm-submit-buttons"><a class="button" name='form-submit cancel' href="{crmURL p='civicrm/contact/view' q='action=browse&selectedChild=rel'}">{ts}Done{/ts}</a></div>
         </div>
   {/if}
 
@@ -143,14 +143,14 @@
                         contactAutocomplete.unautocomplete( );
 
                         if ( relationshipTypeValue ) {
-                            cj('#profiles_1').attr('disabled', false);
-                            contactAutocomplete.attr('disabled', false);
+                            cj('#profiles_1').prop('disabled', false);
+                            contactAutocomplete.prop('disabled', false);
                             contactAutocomplete.addClass('ac_input');
                             buildCreateNewSelect( 'profiles_1', relationshipTypeValue );
                         } else {
-                            cj('#profiles_1').attr('disabled', true);
+                            cj('#profiles_1').prop('disabled', true);
                             contactAutocomplete.removeClass('ac_input');
-                            contactAutocomplete.attr('disabled', true);
+                            contactAutocomplete.prop('disabled', true);
                         }
                     }
 
@@ -415,14 +415,14 @@ cj( function( ) {
 
     cj('.pagerDisplay').on('click', '.contact_select input', function () {
         var valueSelected = cj(this).val();
-        if ( cj(this).attr('checked') ) {
+        if ( cj(this).prop('checked') ) {
             contact_checked[valueSelected] =  valueSelected;
             countSelected++;
         } else if( contact_checked[valueSelected] ) {
             delete contact_checked[valueSelected];
             countSelected--;
             if ( useEmployer && employer_holdelement[valueSelected] ) {
-                cj( employer_holdelement[valueSelected] ).attr('checked',false);
+                cj( employer_holdelement[valueSelected] ).prop('checked',false);
                 delete employer_checked[valueSelected];
                 delete employer_holdelement[valueSelected];
             }
@@ -436,11 +436,11 @@ cj( function( ) {
             if ( isRadio ) {
                 employer_checked = new Array();
             }
-            if ( cj(this).attr('checked') ) {
+            if ( cj(this).prop('checked') ) {
                 // add validation to match with selected contacts
                 if( !contact_checked[valueSelected] ) {
                     cj(this).crmError({/literal}'{ts escape="js"}Current employer / Current employee should be among the selected contacts.{/ts}'{literal});
-                    cj(this).attr('checked',false);
+                    cj(this).prop('checked',false);
                 } else {
                     employer_checked[valueSelected] = valueSelected;
                     employer_holdelement[valueSelected] = this;
@@ -458,7 +458,7 @@ cj( function( ) {
 function checkSelected( ) {
     cj('.pagerDisplay tbody tr .contact_select input').each( function( ) {
         if ( contact_checked[cj(this).val()] ) {
-            cj(this).attr('checked',true);
+            cj(this).prop('checked',true);
         }
     });
 
@@ -467,7 +467,7 @@ function checkSelected( ) {
         employer_holdelement = new Array();
         cj('.pagerDisplay tbody tr .'+ employerClass +' input').each( function( ) {
             if ( employer_checked[cj(this).val()] ) {
-                cj(this).attr('checked',true);
+                cj(this).prop('checked',true);
                 employer_holdelement[cj(this).val()] = this;
             }
         });
@@ -503,7 +503,7 @@ function submitAjaxData() {
 {/literal} {if $searchRows} {literal}
 cj(".contact_select .form-checkbox").each( function( ) {
     if (this) {
-        cj(this).attr('checked',true);
+        cj(this).prop('checked',true);
     }
 });
 {/literal} {/if} {literal}

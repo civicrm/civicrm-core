@@ -138,15 +138,15 @@
   showOnBehalf({/literal}"{$onBehalfRequired}"{literal});
 
   cj( "#mode" ).hide( );
-  cj( "#mode" ).attr( 'checked', 'checked' );
-  if ( cj( "#mode" ).attr( 'checked' ) && !{/literal}"{$reset}"{literal} ) {
+  cj( "#mode" ).prop('checked', true );
+  if ( cj( "#mode" ).prop('checked' ) && !{/literal}"{$reset}"{literal} ) {
     $text = ' {/literal}{ts escape="js"}Use existing organization{/ts}{literal} ';
     cj( "#createNewOrg" ).text( $text );
-    cj( "#mode" ).removeAttr( 'checked' );
+    cj( "#mode" ).prop('checked', false );
   }
 
 function showOnBehalf(onBehalfRequired) {
-  if ( cj( "#is_for_organization" ).attr( 'checked' ) || onBehalfRequired ) {
+  if ( cj( "#is_for_organization" ).prop('checked' ) || onBehalfRequired ) {
     var urlPath = {/literal}"{crmURL p=$urlPath h=0 q='snippet=4&onbehalf=1'}";
     urlPath += "{$urlParams}";
     {if $mode eq 'test'}
@@ -186,20 +186,20 @@ function resetValues( filter ) {
     });
   }
   cj("#select_org tr td").find( 'input[type=radio], input[type=checkbox]' ).each(function( ) {
-    cj(this).attr('checked', false);
+    cj(this).prop('checked', false);
   });
 }
 
 function createNew( ) {
-  if (cj("#mode").attr('checked')) {
+  if (cj("#mode").prop('checked')) {
     var textMessage = ' {/literal}{ts escape="js"}Use existing organization{/ts}{literal} ';
     cj("#onbehalf_organization_name").removeAttr('readonly');
-    cj("#mode").removeAttr('checked');
+    cj("#mode").prop('checked', false);
     resetValues( false );
   }
   else {
     var textMessage = ' {/literal}{ts escape="js"}Enter a new organization{/ts}{literal} ';
-    cj("#mode").attr('checked', 'checked');
+    cj("#mode").prop('checked', true);
     setOrgName( );
   }
   cj("#createNewOrg").text(textMessage);
@@ -225,17 +225,17 @@ function setLocationDetails(contactID) {
       for (var ele in data) {
         if (data[ele].type == 'Radio') {
           if (data[ele].value) {
-            cj("input[name='"+ ele +"']").filter("[value=" + data[ele].value + "]").attr('checked', 'checked');
+            cj("input[name='"+ ele +"']").filter("[value=" + data[ele].value + "]").prop('checked', true);
           }
         }
         else if (data[ele].type == 'CheckBox') {
           if (data[ele].value) {
-            cj("input[name='"+ ele +"']").attr('checked','checked');
+            cj("input[name='"+ ele +"']").prop('checked','checked');
           }
         }
         else if (data[ele].type == 'Multi-Select') {
           for (var selectedOption in data[ele].value) {
-            cj('#' + ele + " option[value='" + selectedOption + "']").attr('selected', 'selected');
+            cj('#' + ele + " option[value='" + selectedOption + "']").prop('selected', true);
           }
         }
         else if (data[ele].type == 'Autocomplete-Select') {

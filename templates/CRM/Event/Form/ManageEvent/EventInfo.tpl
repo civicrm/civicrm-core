@@ -173,19 +173,13 @@
 </div>
 {literal}
 <script type="text/javascript">
-
-function reloadWindow(tempId) {
-
-   //ignore form navigation, CRM-6815
-   global_formNavigate = true;
-
-   //freeze the event type element
-   //when template form is loading.
-   cj( "#event_type_id" ).attr('disabled', true );
-
-   window.location += '&template_id=' + tempId;
-}
-
+  cj(function($) {
+    $('#template_id', '#EventInfo').change(function() {
+      $('#crm-main-content-wrapper')
+        .crmSnippet({url: CRM.url('civicrm/event/add', {action: 'add', reset: 1, template_id: $(this).val()})})
+        .crmSnippet('refresh');
+    })
+  });
 </script>
 {/literal}
 

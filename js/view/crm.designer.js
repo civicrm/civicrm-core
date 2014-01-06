@@ -203,7 +203,7 @@
     },
     onUfChanged: function(isUfUnsaved) {
       if (isUfUnsaved) {
-        this.$('.crm-designer-save').removeAttr('style').removeAttr('disabled');
+        this.$('.crm-designer-save').removeAttr('style').prop('disabled', false);
       }
     },
     doSave: function(event) {
@@ -651,7 +651,7 @@
             buttons[$link.text()] = function() {
               var form2 = CRM.loadForm($link.attr('href'), {
                 cancelButton: '.cancel.form-submit, #done',
-                openInline: 'a.action-item:not(".enable-action, .disable-action")',
+                openInline: 'a.action-item:not([href="#"])',
                 dialog: {
                   width: '60%',
                   height: parseInt($(window).height() * .8)
@@ -763,7 +763,6 @@
       this.form.commit();
       this.$('.field-is_multi_summary').toggle(this.options.fieldSchema.civiIsMultiple ? true : false);
       this.$('.field-in_selector').toggle(this.model.isInSelectorAllowed());
-      // this.$(':input').attr('disabled', this.model.get("is_reserved") == 1);
 
       if (!this.model.isInSelectorAllowed() && this.model.get('in_selector') != "0") {
         this.model.set('in_selector', "0");

@@ -97,7 +97,7 @@
 
           case 'checkbox':
             var checkBoxValue = eleIdpart[1].split(']');
-            if ( cj(obj).attr("checked") == true &&
+            if ( cj(obj).prop("checked") == true &&
               fieldOptionsFull[eleId] &&
               fieldOptionsFull[eleId][checkBoxValue[0]]) {
               showError = true;
@@ -377,11 +377,11 @@
       });
 
       cj("#feeBlock").ajaxStart(function(){
-        cj(".disable-buttons input").attr('disabled', true);
+        cj(".disable-buttons input").prop('disabled', true);
       });
 
       cj("#feeBlock").ajaxStop(function(){
-        cj(".disable-buttons input").attr('disabled', false);
+        cj(".disable-buttons input").prop('disabled', false);
       });
 
       //show event real full as well as waiting list message.
@@ -587,11 +587,11 @@
     notificationStatusIds = notificationStatusIds.split(',');
     if (cj.inArray(cj('select#status_id option:selected').val(), notificationStatusIds) > -1) {
       cj("#notify").show();
-      cj("#is_notify").attr('checked', true);
+      cj("#is_notify").prop('checked', true);
     }
     else {
       cj("#notify").hide();
-      cj("#is_notify").removeAttr('checked');
+      cj("#is_notify").prop('checked', false);
     }
   }
 
