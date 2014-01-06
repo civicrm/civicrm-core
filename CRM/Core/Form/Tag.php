@@ -236,6 +236,7 @@ class CRM_Core_Form_Tag {
    *
    */
   static function postProcess(&$params, $entityId, $entityTable = 'civicrm_contact', &$form) {
+    $allTagIds = array();
     foreach ($params as $parentId => $value) {
       if (!$value) {
         continue;
@@ -260,6 +261,7 @@ class CRM_Core_Form_Tag {
             }
           }
 
+          $allTagIds[] = $tagId;
           if ($form && $form->_action != CRM_Core_Action::UPDATE) {
             $insertValues[] = "( {$tagId}, {$entityId}, '{$entityTable}' ) ";
           }
@@ -273,6 +275,14 @@ class CRM_Core_Form_Tag {
           CRM_Core_DAO::executeQuery($insertSQL);
         }
       }
+    }
+
+    // delete tags that are missing
+    if (!empty($allTagIds)) {
+      $validTagIds = implode(',', $allTagIds);
+      $deleteSQL = "DELETE FROM civicrm_entity_tag WHERE entity_id={$entityId} AND entity_table='{$entityTable}'
+      AND tag_id NOT IN ({$validTagIds})";
+      CRM_Core_DAO::executeQuery($deleteSQL);
     }
   }
 }
