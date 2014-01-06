@@ -105,7 +105,7 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
 
     //get the log start date.
     //it is set during renewal of membership.
-    $logStartDate = CRM_Utils_array::value('log_start_date', $params);
+    $logStartDate = CRM_Utils_Array::value('log_start_date', $params);
     $logStartDate = ($logStartDate) ? CRM_Utils_Date::isoToMysql($logStartDate) : CRM_Utils_Date::isoToMysql($membership->start_date);
     $values       = self::getStatusANDTypeValues($membership->id);
 
@@ -235,6 +235,7 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
       !CRM_Utils_Array::value('skipStatusCal', $params)
     ) {
       $dates = array('start_date', 'end_date', 'join_date');
+      $start_date = $end_date = $join_date = NULL; // declare these out of courtesy as IDEs don't pick up the setting of them below
       foreach ($dates as $date) {
         $$date = $params[$date] = CRM_Utils_Date::processDate(CRM_Utils_Array::value($date, $params), NULL, TRUE, 'Ymd');
       }
@@ -333,6 +334,7 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
       CRM_Utils_Array::value('createActivity', $params)
     ) {
       if (CRM_Utils_Array::value('membership', $ids)) {
+        $data = array();
         CRM_Core_DAO::commonRetrieveAll('CRM_Member_DAO_Membership',
           'id',
           $membership->id,
@@ -966,7 +968,7 @@ INNER JOIN  civicrm_membership_type type ON ( type.id = membership.membership_ty
     if ($onlySameParentOrg && $memType) {
       // require the same parent org as the $memType
       $params = array('id' => $memType);
-      $defaults = array();
+      $defaults = $membershipType = array();
       if (CRM_Member_BAO_MembershipType::retrieve($params, $membershipType)) {
         $memberTypesSameParentOrg = CRM_Member_BAO_MembershipType::getMembershipTypesByOrg($membershipType['member_of_contact_id']);
         $memberTypesSameParentOrgList = implode(',', array_keys($memberTypesSameParentOrg));
@@ -2400,7 +2402,7 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
   function processPriceSet($membershipId, $lineItem) {
     //FIXME : need to move this too
     if (!$membershipId || !is_array($lineItem)
-      || CRM_Utils_system::isNull($lineItem)
+      || CRM_Utils_System::isNull($lineItem)
     ) {
       return;
     }

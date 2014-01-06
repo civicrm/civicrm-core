@@ -511,7 +511,7 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
     $fields = civicrm_api('setting','getfields', $getFieldsParams);
     $invalidParams = (array_diff_key($settingParams, $fields['values']));
     if (!empty($invalidParams)) {
-      throw new API_Exception(implode(',', $invalidParams) . " not valid settings");
+      throw new api_Exception(implode(',', $invalidParams) . " not valid settings");
     }
     if (!empty($settingParams)) {
       $filteredFields = array_intersect_key($settingParams, $fields['values']);
@@ -539,7 +539,7 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
     else {
       list($class,$fn) = explode('::',$fieldSpec['validate_callback']);
       if (!$class::$fn($value,$fieldSpec)) {
-        throw new API_Exception("validation failed for {$fieldSpec['name']} = $value  based on callback {$fieldSpec['validate_callback']}");
+        throw new api_Exception("validation failed for {$fieldSpec['name']} = $value  based on callback {$fieldSpec['validate_callback']}");
       }
     }
   }
@@ -552,7 +552,7 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
    */
   static function validateBoolSetting(&$value, $fieldSpec) {
     if (!CRM_Utils_Rule::boolean($value)) {
-      throw new API_Exception("Boolean value required for {$fieldSpec['name']}");
+      throw new api_Exception("Boolean value required for {$fieldSpec['name']}");
     }
     if (!$value) {
       $value = 0;
@@ -630,6 +630,8 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
       $cacheString .= "_{$filterField}_{$filterString}";
     }
     $cached = 1;
+    // the caching into 'All' seems to be a duplicate of caching to
+    // settingsMetadata__ - I think the reason was to cache all settings as defined & then those altered by a hook
     $settingsMetadata = CRM_Core_BAO_Cache::getItem('CiviCRM setting Specs', $cacheString, $componentID);
     if ($settingsMetadata === NULL) {
       $settingsMetadata = CRM_Core_BAO_Cache::getItem('CiviCRM setting Spec', 'All', $componentID);
