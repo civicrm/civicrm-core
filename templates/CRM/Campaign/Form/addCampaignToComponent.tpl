@@ -59,7 +59,8 @@
             <div class="status">
             {ts}There are currently no active Campaigns.{/ts}
             {if $campaignInfo.addCampaignURL}
-                {ts 1=$campaignInfo.addCampaignURL}If you want to associate this record with a campaign, you can <a href="%1">create a campaign here</a>.{/ts}
+              {capture assign="link"}href="{$campaignInfo.addCampaignURL}" class="action-item action-item-first"{/capture}
+              {ts 1=$link}If you want to associate this record with a campaign, you can <a %1>create a campaign here</a>.{/ts}
             {/if} {help id="id-campaign_id" file="CRM/Campaign/Form/addCampaignToComponent.hlp"}
             </div>
           {/if}
