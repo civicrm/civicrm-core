@@ -240,11 +240,9 @@ class CRM_Report_Form extends CRM_Core_Form {
 
   /**
    * outputmode e.g 'print', 'csv', 'pdf'
-   * @todo have declared this as public as fixing an e-Notice in a point release - would
-   * be better converted to protected in 4.5
    * @var string
    */
-  public $_outputMode;
+  protected $_outputMode;
 
   public $_having = NULL;
   public $_select = NULL;
