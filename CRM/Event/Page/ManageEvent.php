@@ -228,7 +228,6 @@ class CRM_Event_Page_ManageEvent extends CRM_Core_Page {
    * @return void
    */
   function browse() {
-    CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'js/crm.livePage.js');
     $this->_sortByCharacter = CRM_Utils_Request::retrieve('sortByCharacter',
       'String',
       $this

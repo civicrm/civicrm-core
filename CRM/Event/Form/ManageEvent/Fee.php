@@ -796,6 +796,8 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
     
     CRM_Event_BAO_Event::add($params);
 
+    // Update tab "disabled" css class
+    $this->ajaxResponse['tabValid'] = !empty($params['is_monetary']);
     parent::endPostProcess();
   }
 

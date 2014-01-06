@@ -848,7 +848,8 @@ CRM.validate = CRM.validate || {
         this.element.addClass('crm-container');
       }
       this._handleOrderLinks();
-      this.options.url ? this.refresh() : this.options.url = document.location.href;
+      // Set default if not supplied
+      this.options.url = this.options.url || document.location.href;
       this._originalUrl = this.options.url;
     },
     _onFailure: function(data) {
@@ -889,7 +890,7 @@ CRM.validate = CRM.validate || {
           return;
         }
         data.url = url;
-        that.element.html(data.content);
+        that.element.trigger('crmBeforeLoad', data).html(data.content);
         that._handleOrderLinks();
         that.element.trigger('crmLoad', data);
         that.options.crmForm && that.element.trigger('crmFormLoad', data);
@@ -930,7 +931,8 @@ CRM.validate = CRM.validate || {
         data.title && $(this).dialog('option', 'title', data.title);
       });
     }
-    return $(settings.target).crmSnippet(settings);
+    $(settings.target).crmSnippet(settings).crmSnippet('refresh');
+    return $(settings.target);
   };
 
   CRM.loadForm = function(url, options) {
@@ -945,7 +947,7 @@ CRM.validate = CRM.validate || {
         onCancel: function(event) {},
         onError: function(data) {
           var $el = $(this);
-          $el.html(data.content).trigger('crmLoad', data).trigger('crmFormLoad', data);
+          $el.html(data.content).trigger('crmLoad', data).trigger('crmFormLoad', data).trigger('crmFormError', data);
           if (typeof(data.errors) == 'object') {
             $.each(data.errors, function(formElement, msg) {
               $('[name="'+formElement+'"]', $el).crmError(msg);

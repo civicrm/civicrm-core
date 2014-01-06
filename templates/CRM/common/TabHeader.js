@@ -47,10 +47,14 @@ cj(function($) {
             });
         }
         ui.panel
-          .off('crmLoad.tabCount')
-          .on('crmLoad.tabCount', function(e, data) {
+          .off('.tabInfo')
+          .on('crmLoad.tabInfo crmFormSuccess.tabInfo', function(e, data) {
             if (typeof(data.tabCount) !== 'undefined') {
               CRM.tabHeader.updateCount(ui.tab, data.tabCount);
+            }
+            if (typeof(data.tabValid) !== 'undefined') {
+              var method = data.tabValid ? 'removeClass' : 'addClass';
+              ui.tab[method]('disabled');
             }
           });
         CRM[method]($('a', ui.tab).attr('href'), params);

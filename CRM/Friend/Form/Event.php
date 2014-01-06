@@ -126,6 +126,9 @@ class CRM_Friend_Form_Event extends CRM_Event_Form_ManageEvent {
 
     CRM_Friend_BAO_Friend::addTellAFriend($formValues);
 
+    // Update tab "disabled" css class
+    $this->ajaxResponse['tabValid'] = !empty($formValues['tf_is_active']);
+
     parent::endPostProcess();
   }
 

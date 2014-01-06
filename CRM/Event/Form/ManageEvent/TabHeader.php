@@ -67,7 +67,7 @@ class CRM_Event_Form_ManageEvent_TabHeader {
     );
 
     $tabs = array(
-      'settings' => array('title' => ts('Info and Settings')) + $default,
+      'settings' => array('title' => ts('Info and Settings'), 'class' => 'ajaxForm livePage') + $default,
       'location' => array('title' => ts('Event Location')) + $default,
       'fee' => array('title' => ts('Fees')) + $default,
       'registration' => array('title' => ts('Online Registration')) + $default,
@@ -89,7 +89,7 @@ class CRM_Event_Form_ManageEvent_TabHeader {
     if ($eventID) {
       // disable tabs based on their configuration status 
       $sql = "
-SELECT     e.loc_block_id as is_location, e.is_online_registration, e.is_monetary, taf.is_active, pcp.id as is_pcp, sch.id as is_reminder
+SELECT     e.loc_block_id as is_location, e.is_online_registration, e.is_monetary, taf.is_active, pcp.is_active as is_pcp, sch.id as is_reminder
 FROM       civicrm_event e
 LEFT JOIN  civicrm_tell_friend taf ON ( taf.entity_table = 'civicrm_event' AND taf.entity_id = e.id )
 LEFT JOIN  civicrm_pcp_block pcp   ON ( pcp.entity_table = 'civicrm_event' AND pcp.entity_id = e.id )
