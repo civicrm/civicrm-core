@@ -35,7 +35,8 @@
     <div id="badge-layout">
       {strip}
       {* handle enable/disable actions*}
-        {include file="CRM/common/enableDisable.tpl"}
+        {include file="CRM/common/enableDisableApi.tpl"}
+        {include file="CRM/common/crmeditable.tpl"}
         {include file="CRM/common/jsortable.tpl"}
         <table id="options" class="display">
           <thead>
@@ -48,10 +49,9 @@
           </tr>
           </thead>
           {foreach from=$rows item=row}
-            <tr id="row_{$row.id}"
-                class="{cycle values="odd-row,even-row"} {$row.class} crm-badge-layout {if NOT $row.is_active} disabled{/if}">
-              <td class="crm-badge-layout-title">{$row.title}</td>
-              <td class="crm-badge-layout-description">{$row.description}</td>
+            <tr id="print_label-{$row.id}" class="crm-entity {cycle values="odd-row,even-row"} {$row.class} crm-badge-layout {if NOT $row.is_active} disabled{/if}">
+              <td class="crm-badge-layout-title crm-editable" data-field="title">{$row.title}</td>
+              <td class="crm-badge-layout-description crm-editable" data-field="description" data-type="textarea">{$row.description}</td>
               <td id="row_{$row.id}_status" class="crm-badge-layout-is_active">
                 {if $row.is_active eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}
               </td>

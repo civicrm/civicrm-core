@@ -184,12 +184,8 @@ function showHideByValue(trigger_field_id, trigger_value, target_element_id, tar
  * @return
  */
 function toggleCheckboxVals(fldPrefix, object) {
-  if (object.id == 'toggleSelect' && cj(object).is(':checked')) {
-    cj('Input[id*="' + fldPrefix + '"],Input[id*="toggleSelect"]').attr('checked', true);
-  }
-  else {
-    cj('Input[id*="' + fldPrefix + '"],Input[id*="toggleSelect"]').attr('checked', false);
-  }
+  var val = (object.id == 'toggleSelect' && cj(object).is(':checked'));
+  cj('Input[id*="' + fldPrefix + '"],Input[id*="toggleSelect"]').prop('checked', val);
   // change the class of selected rows
   on_load_init_checkboxes(object.form.name);
 }
@@ -293,8 +289,8 @@ function checkPerformAction(fldPrefix, form, taskButton, selection) {
  */
 function checkSelectedBox(chkName) {
   var checkElement = cj('#' + chkName);
-  if (checkElement.attr('checked')) {
-    cj('input[value=ts_sel]:radio').attr('checked', true);
+  if (checkElement.prop('checked')) {
+    cj('input[value=ts_sel]:radio').prop('checked', true);
     checkElement.parents('tr').addClass('crm-row-selected');
   }
   else {
@@ -521,17 +517,10 @@ CRM.validate = CRM.validate || {
       }
       target.toggleClass('crm-row-selected', $(this).is(':checked'));
     });
-    $('body').live('click', function (event) {
+    $('body').on('click', function (event) {
+      $('.btn-slide-active').removeClass('btn-slide-active').find('.panel').hide();
       if ($(event.target).is('.btn-slide')) {
-        var currentActive = $('#crm-container .btn-slide-active');
-        currentActive.children().hide();
-        currentActive.removeClass('btn-slide-active');
-        $(event.target).children().show();
-        $(event.target).addClass('btn-slide-active');
-      }
-      else {
-        $('.btn-slide .panel').hide();
-        $('.btn-slide-active').removeClass('btn-slide-active');
+        $(event.target).addClass('btn-slide-active').find('.panel').show();
       }
     });
   });
@@ -820,7 +809,7 @@ CRM.validate = CRM.validate || {
     });
   }
 
-  $.widget('civicrm.crmSnippet', {
+  $.widget('civi.crmSnippet', {
     options: {
       url: null,
       block: true,
@@ -828,17 +817,21 @@ CRM.validate = CRM.validate || {
     },
     _originalUrl: null,
     isOriginalUrl: function() {
-      var args = {}, same = true;
+      var 
+        args = {}, 
+        same = true,
+        newUrl = this._formatUrl(this.options.url),
+        oldUrl = this._formatUrl(this._originalUrl);
       // Compare path
-      if (this.options.url.split('?')[0] !== this._originalUrl.split('?')[0]) {
+      if (newUrl.split('?')[0] !== oldUrl.split('?')[0]) {
         return false;
       }
       // Compare arguments
-      $.each(this.options.url.split('?')[1].split('&'), function(k, v) {
+      $.each(newUrl.split('?')[1].split('&'), function(k, v) {
         var arg = v.split('=');
         args[arg[0]] = arg[1];
       });
-      $.each(this._originalUrl.split('?')[1].split('&'), function(k, v) {
+      $.each(oldUrl.split('?')[1].split('&'), function(k, v) {
         var arg = v.split('=');
         if (args[arg[0]] !== undefined && arg[1] !== args[arg[0]]) {
           same = false;
@@ -855,7 +848,8 @@ CRM.validate = CRM.validate || {
         this.element.addClass('crm-container');
       }
       this._handleOrderLinks();
-      this.options.url ? this.refresh() : this.options.url = document.location.href;
+      // Set default if not supplied
+      this.options.url = this.options.url || document.location.href;
       this._originalUrl = this.options.url;
     },
     _onFailure: function(data) {
@@ -864,12 +858,17 @@ CRM.validate = CRM.validate || {
       CRM.alert(ts('Unable to reach the server. Please refresh this page in your browser and try again.'), ts('Network Error'), 'error');
     },
     _formatUrl: function(url) {
+      // Strip hash
+      url = url.split('#')[0];
       // Add snippet argument to url
       if (url.search(/[&?]snippet=/) < 0) {
         url += (url.indexOf('?') < 0 ? '?' : '&') + 'snippet=json';
+      } else {
+        url = url.replace(/snippet=[^&]*/, 'snippet=json');
       }
       return url;
     },
+    // Hack to deal with civicrm legacy sort functionality
     _handleOrderLinks: function() {
       var that = this;
       $('a.crm-weight-arrow', that.element).click(function(e) {
@@ -891,13 +890,16 @@ CRM.validate = CRM.validate || {
           return;
         }
         data.url = url;
-        that.element.html(data.content);
+        that.element.trigger('crmBeforeLoad', data).html(data.content);
         that._handleOrderLinks();
         that.element.trigger('crmLoad', data);
         that.options.crmForm && that.element.trigger('crmFormLoad', data);
       }).fail(function() {
           that._onFailure();
         });
+    },
+    _destroy: function() {
+      this.element.removeClass('crm-ajax-container');
     }
   });
 
@@ -905,7 +907,10 @@ CRM.validate = CRM.validate || {
   CRM.loadPage = function(url, options) {
     var settings = {
       target: '#crm-ajax-dialog-' + (dialogCount++),
-      dialog: {
+      dialog: false
+    };
+    if (!options || !options.target) {
+      settings.dialog = {
         modal: true,
         width: '65%',
         height: parseInt($(window).height() * .75),
@@ -913,12 +918,12 @@ CRM.validate = CRM.validate || {
           $(this).dialog('destroy');
           $(this).remove();
         }
-      }
-    };
+      };
+    }
     options && $.extend(true, settings, options);
     settings.url = url;
     // Create new dialog
-    if (settings.dialog !== false && settings.target[0] == '#') {
+    if (settings.dialog) {
       $('<div id="'+ settings.target.substring(1) +'"><div class="crm-loading-element">' + ts('Loading') + '...</div></div>').dialog(settings.dialog);
     }
     if (settings.dialog && !settings.dialog.title) {
@@ -926,7 +931,8 @@ CRM.validate = CRM.validate || {
         data.title && $(this).dialog('option', 'title', data.title);
       });
     }
-    return $(settings.target).crmSnippet(settings);
+    $(settings.target).crmSnippet(settings).crmSnippet('refresh');
+    return $(settings.target);
   };
 
   CRM.loadForm = function(url, options) {
@@ -937,11 +943,11 @@ CRM.validate = CRM.validate || {
         validate: true,
         refreshAction: ['next_new', 'submit_savenext'],
         cancelButton: '.cancel.form-submit',
-        openInline: 'a.button',
+        openInline: 'a.button:not("[href=#], .no-popup")',
         onCancel: function(event) {},
         onError: function(data) {
           var $el = $(this);
-          $el.html(data.content).trigger('crmLoad', data).trigger('crmFormLoad', data);
+          $el.html(data.content).trigger('crmLoad', data).trigger('crmFormLoad', data).trigger('crmFormError', data);
           if (typeof(data.errors) == 'object') {
             $.each(data.errors, function(formElement, msg) {
               $('[name="'+formElement+'"]', $el).crmError(msg);
@@ -964,12 +970,12 @@ CRM.validate = CRM.validate || {
 
     widget.on('crmFormLoad', function(event, data) {
       var $el = $(this);
-      var settings = $el.data('crmSnippet').options.crmForm;
+      var settings = $el.crmSnippet('option', 'crmForm');
       settings.cancelButton && $(settings.cancelButton, this).click(function(event) {
         var returnVal = settings.onCancel.call($el, event);
         if (returnVal !== false) {
           $el.trigger('crmFormCancel', event);
-          if ($el.data('dialog') && settings.autoClose) {
+          if ($el.data('uiDialog') && settings.autoClose) {
             $el.dialog('close');
           }
           else if (!settings.autoClose) {
@@ -985,22 +991,30 @@ CRM.validate = CRM.validate || {
         url: data.url.replace(/reset=1[&]?/, ''),
         dataType: 'json',
         success: function(response) {
-          if (response.status == 'success') {
+          if (response.status !== 'form_error') {
             $el.crmSnippet('option', 'block') && $el.unblock();
             $el.trigger('crmFormSuccess', response);
             // Reset form for e.g. "save and new"
-            if (response.userContext && (!settings.autoClose ||
-              (settings.refreshAction && $.inArray(response.buttonName, settings.refreshAction) >= 0)))
-            {
+            if (response.userContext && settings.refreshAction && $.inArray(response.buttonName, settings.refreshAction) >= 0) {
               $el.crmSnippet('option', 'url', response.userContext).crmSnippet('refresh');
             }
-            else if ($el.data('dialog') && settings.autoClose) {
+            else if ($el.data('uiDialog') && settings.autoClose) {
               $el.dialog('close');
+            }
+            else if (settings.autoClose === false) {
+              $el.crmSnippet('resetUrl').crmSnippet('refresh');
             }
           }
           else {
             response.url = data.url;
             settings.onError.call($el, response);
+          }
+        },
+        beforeSerialize: function(form, options) {
+          if (window.CKEDITOR && window.CKEDITOR.instances) {
+            for (var instance in CKEDITOR.instances) {
+              CKEDITOR.instances[instance].updateElement();
+            }
           }
         },
         beforeSubmit: function(submission) {
@@ -1037,13 +1051,12 @@ CRM.validate = CRM.validate || {
 
   $(function () {
     // Trigger crmLoad on initial content for consistency. It will also be triggered for ajax-loaded content.
-    $('#crm-container').trigger('crmLoad');
+    $('.crm-container').trigger('crmLoad');
 
     if ($('#crm-notification-container').length) {
       // Initialize notifications
       $('#crm-notification-container').notify();
       messagesFromMarkup.call($('#crm-container'));
-      $('#crm-container').on('crmFormLoad', '*', messagesFromMarkup);
     }
 
     // bind the event for image popup
@@ -1062,19 +1075,15 @@ CRM.validate = CRM.validate || {
   });
 
   $.fn.crmAccordions = function (speed) {
-    var container = $('#crm-container');
-    if (speed === undefined) {
-      speed = 200;
-    }
-    if ($(this).length > 0) {
-      container = $(this);
-    }
-    if (container.length > 0 && !container.hasClass('crm-accordion-processed')) {
+    var container = $(this).length > 0 ? $(this) : $('.crm-container');
+    speed = speed === undefined ? 200 : speed;
+    container
+      .off('click.crmAccordions')
       // Allow normal clicking of links
-      container.on('click', 'div.crm-accordion-header a', function (e) {
+      .on('click.crmAccordions', 'div.crm-accordion-header a', function (e) {
         e.stopPropagation && e.stopPropagation();
-      });
-      container.on('click', '.crm-accordion-header, .crm-collapsible .collapsible-title', function () {
+      })
+      .on('click.crmAccordions', '.crm-accordion-header, .crm-collapsible .collapsible-title', function () {
         if ($(this).parent().hasClass('collapsed')) {
           $(this).next().css('display', 'none').slideDown(speed);
         }
@@ -1084,8 +1093,6 @@ CRM.validate = CRM.validate || {
         $(this).parent().toggleClass('collapsed');
         return false;
       });
-      container.addClass('crm-accordion-processed');
-    }
   };
   $.fn.crmAccordionToggle = function (speed) {
     $(this).each(function () {

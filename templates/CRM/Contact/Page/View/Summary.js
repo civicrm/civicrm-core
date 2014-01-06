@@ -90,11 +90,16 @@
       }
       // Update changelog tab and contact footer
       if (response.changeLog.count) {
-        $("#tab_log a em").html(response.changeLog.count);
+        CRM.tabHeader.updateCount('#tab_log', response.changeLog.count);
       }
       $("#crm-record-log").replaceWith(response.changeLog.markup);
-      if ($('#Change_Log div').length) {
-        $('#Change_Log').load($("#tab_log a").attr('href'));
+      // Refresh tab contents - Advanced logging
+      if (CRM.reloadChangeLogTab) {
+        CRM.reloadChangeLogTab();
+      }
+      // Refresh tab contents - Simple logging
+      else if ($('#changeLog').closest('.ui-tabs-panel').data('civiCrmSnippet')) {
+        $('#changeLog').closest('.ui-tabs-panel').crmSnippet('destroy');
       }
     }
     else {
@@ -179,8 +184,7 @@
     function refreshTitle() {
       var contactName = $('.crm-summary-display_name').text();
       contactName = $.trim(contactName);
-      var title = $('title').html().replace(oldName, contactName);
-      document.title = title;
+      document.title = $('title').html().replace(oldName, contactName);
       oldName = contactName;
     }
     $('#contactname-block').load(refreshTitle);
@@ -284,10 +288,34 @@
         $('.crm-inline-edit.form :submit[name$=cancel]').click();
       }
     });
-    // Switch tabs when clicking log link
-    $('#crm-container').on('click', '#crm-record-log a.crm-log-view', function() {
-      $('#tab_log a').click();
-      return false;
+    $('#crm-container')
+      // Switch tabs when clicking log link
+      .on('click', '#crm-record-log a.crm-log-view', function() {
+        $('#tab_log a').click();
+        return false;
+      })
+      // Handle action links in popup
+      .on('click', '.crm-contact_actions-list a, .crm-contact_activities-list a', function() {
+        var tabName = $(this).data('tab') || 'activity';
+        var $tab = $('#tab_' + tabName);
+        var $panel = $('#' + $tab.attr('aria-controls'));
+        CRM.loadForm($(this).attr('href'))
+          .on('crmFormSuccess', function() {
+            if ($panel.data('civiCrmSnippet')) {
+              $panel.crmSnippet('refresh');
+            }
+            $('#mainTabContainer').tabs('option', 'active', $tab.prevAll().length);
+          });
+        return false;
+      });
+    // Actions menu
+    $(document).on('click', function(e) {
+      if ($(e.target).is('#crm-contact-actions-link, #crm-contact-actions-link *')) {
+        $('#crm-contact-actions-list').show();
+        return false;
+      }
+      $('#crm-contact-actions-list').hide();
     });
+    $().crmAccordions();
   });
 })(cj);

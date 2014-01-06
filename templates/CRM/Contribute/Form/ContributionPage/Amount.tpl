@@ -208,7 +208,7 @@
         function checked_payment_processors() {
             var ids = [];
             cj('.crm-contribution-contributionpage-amount-form-block-payment_processor input[type="checkbox"]').each(function(){
-                if(cj(this).attr('checked')) {
+                if(cj(this).prop('checked')) {
                     var id = cj(this).attr('id').split('_')[2];
         ids.push(id);
                 }
@@ -260,7 +260,7 @@
 
   function payLater(chkbox) {
     var elementId = 'payLaterFields';
-    if (cj('#' + chkbox).attr('checked')) {
+    if (cj('#' + chkbox).prop('checked')) {
       cj('#' + elementId).show();
     } else {
       cj('#' + elementId).hide();
@@ -280,7 +280,7 @@
            } else {
                cj('#amountFields').show();
            }
-           cj("#amount_block_is_active").attr( 'checked', true );
+           cj("#amount_block_is_active").prop('checked', true );
       break;
 
       case 'is_pledge_active' :
@@ -289,7 +289,7 @@
                if ( priceSetID ) cj( "#price_set_id" ).val( '' );
              cj('#amountFields').show();
                  }
-           cj("#amount_block_is_active").attr( 'checked', true );
+           cj("#amount_block_is_active").prop('checked', true );
       break;
 
          case 'amount_block_is_active' :
@@ -321,8 +321,8 @@
         if(display) {
             cj( '#recurringContribution' ).show( );
         } else {
-            if ( cj( '#is_recur' ).attr( 'checked' ) ) {
-                cj( '#is_recur' ).removeAttr("checked");
+            if ( cj( '#is_recur' ).prop('checked' ) ) {
+                cj( '#is_recur' ).prop('checked', false);
                 cj( '#recurFields' ).hide( );
             }
             cj( '#recurringContribution' ).hide( );

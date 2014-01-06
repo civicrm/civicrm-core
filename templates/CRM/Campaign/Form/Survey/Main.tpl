@@ -107,8 +107,8 @@
     });
 </script>
 {/literal}
-
-{include file="CRM/common/customData.tpl"}
+{* editor has already been included in TabHeader.tpl so set flag true *}
+{include file="CRM/common/customData.tpl" includeWysiwygEditor=true}
 {literal}
   <script type="text/javascript">
     cj(document).ready(function() {

@@ -158,7 +158,7 @@
 
     // function to show/hide membership block fields
     function showHideMembershipBlock( ) {
-      if ( cj('#member_is_active').attr('checked') ) {
+      if ( cj('#member_is_active').prop('checked') ) {
         cj('#memberFields').show();
       } else {
         cj('#memberFields').hide();

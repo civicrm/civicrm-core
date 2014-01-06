@@ -101,14 +101,14 @@
             cj('#groupselect').show();
             cj('#group_type').val('') ;
             cj('#crmasmList2 li').remove();
-            cj('#crmasmSelect2').children().removeClass('asmOptionDisabled').removeAttr('disabled');
+            cj('#crmasmSelect2').children().removeClass('asmOptionDisabled').prop('disabled', false);
         }
         function showGroupTypeSearch(){
             cj('#groupselect').hide();
             cj('#grouptypeselect').show();
             cj('#group').val('') ;
             cj('#crmasmList1 li').remove();
-            cj('#crmasmSelect1').children().removeClass('asmOptionDisabled').removeAttr('disabled');
+            cj('#crmasmSelect1').children().removeClass('asmOptionDisabled').prop('disabled', false);
         }
 
         cj(function(){

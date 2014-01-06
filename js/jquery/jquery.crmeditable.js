@@ -1,27 +1,4 @@
-/*
- +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
- |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
- +--------------------------------------------------------------------+
-
-*
+/**
 * Copyright (C) 2012 Xavier Dutoit
 * Licensed to CiviCRM under the Academic Free License version 3.0.
 *
@@ -39,72 +16,51 @@
 *   to make it easier to customize the form (eg. hide a button...) it triggers a 'load' event on the form. you can then catch the load on your code (using the $('#id_of_the_form').on(function(){//do something
 */
 
-
 (function($) {
 
-    $.fn.crmEditable = function (options) {
-      // for a jquery object (the crm-editable), find the entity name and id to apply the changes to
-      // call result function(entity,id). The caller is responsible to use these params and do the needed
-      var getEntityID = function (field,result) {
-        var domid= $(field).closest('.crm-entity');
-        if (!domid) {
-          console && console.log && console.log("Couldn't get the entity id. You need to set class='crm-entity' on a parent element of the field");
-          return false;
+  $.fn.crmEditableEntity = function() {
+    var
+      el = this[0],
+      ret = {},
+      $row = this.first().closest('.crm-entity');
+    ret.entity = $row.data('entity') || $row[0].id.split('-')[0];
+    ret.id = $row.data('id') || $row[0].id.split('-')[1];
+    if (!ret.entity || !ret.id) {
+      return false;
+    }
+    $('.crm-editable, [data-field]', $row).each(function() {
+      var fieldName = $(this).data('field') || this.className.match(/crmf-(\S*)/)[1];
+      if (fieldName) {
+        ret[fieldName] = $(this).text();
+        if (this === el) {
+          ret.field = fieldName;
         }
-        // trying to extract using the html5 data
-        if (domid.data('entity')) {
-          result (domid.data('entity'),domid.data('id'));
-          return true;
-        }
-        domid=domid.attr('id');
-        if (!domid) {
-          console && console.log && console.log("FATAL crm-editable: Couldn't get the entity id. You need to set class='crm-entity' id='{entityName}-{id}'");
-          return false;
-        }
-        var e=domid.match(/(\S*)-(\S*)/);
-        if (!e) {
-           console && console.log && console.log("Couldn't get the entity id. You need to set class='crm-entity' id='{entityName}-{id}'");
-           return false;
-        }
-        result(e[1],e[2]);
-        return true;
       }
-      // param in : a dom object that contains the field name as a class crmf-xxx
-      var getFieldName = function (field) {
-        if ($(field).data('field')) {
-           return $(field).data('field');
-        }
-        var fieldName=field.className.match(/crmf-(\S*)/)[1];
-        if (!fieldName) {
-          console && console.log && console.log("Couldn't get the crm-editable field name to modify. You need to set crmf-{field_name} or data-{field_name}");
-          return false;
-        }
-        return fieldName;
-      }
+    });
+    return ret;
+  };
 
+    $.fn.crmEditable = function (options) {
       var checkable = function () {
         $(this).change (function() {
-          var params={sequential:1};
-          var entity = null;
-          var checked = $(this).is(':checked');
-          if  (!getEntityID (this,function (e,id) {
-            entity=e;
-            params.id = id;
-
-          })) { return };
-
-          params['field']=getFieldName(this);
-          if (!params['field'])
+          var info = $(this).crmEditableEntity();
+          if (!info.field) {
             return false;
-          params['value']=checked?'1':'0';//seems that the ajax backend gets lost with boolean
-
-          CRM.api(entity,'setvalue',params,{
+          }
+          var checked = $(this).is(':checked');
+          var params = {
+            sequential: 1,
+            id: info.id,
+            field: info.field,
+            value: checked ? 1 : 0
+          };
+          CRM.api(info.entity, 'setvalue', params, {
             context: this,
             error: function (data) {
-              editableSettings.error.call(this,entity,params.field,checked,data);
+              editableSettings.error.call(this, info.entity, info.field, checked, data);
             },
             success: function (data) {
-              editableSettings.success.call(this,entity,params.field,checked,data);
+              editableSettings.success.call(this, info.entity, info.field, checked, data);
             }
           });
         });
@@ -218,49 +174,34 @@
         }
 
         $i.editable(function(value,settings) {
-        //$i.editable(function(value,editableSettings) {
-          parent=$i.closest('.crm-entity');
-          if (!parent) {
-            console && console.log && console.log("crm-editable: you need to define one parent element that has a class .crm-entity");
-            return;
-          }
-
           $i.addClass ('crm-editable-saving');
-          var params = {};
-          var entity = null;
-          params['field']=getFieldName(this);
-          if (!params['field'])
+          var
+            info = $i.crmEditableEntity(),
+            params= {},
+            action = $i.data('action') || 'setvalue';
+          if (!info.field) {
             return false;
-          params['value']=value;
-          if  (!getEntityID (this,function (e,id) {
-            entity=e;
-            params.id = id;
-          })) {return;}
-
-          if (params.id == "new") {
-            params.id = '';
           }
-
-          if ($i.data('action')) {
-            var fieldName = params['field'];
-            delete params['field'];
-            delete params['value'];
-
-            params[fieldName]=value;//format for create at least
-            action=$i.data('action');
-          } else {
-            action="setvalue";
+          if (info.id && info.id !== 'new') {
+            params.id = info.id;
           }
-          CRM.api(entity, action, params, {
+          if (action === 'setvalue') {
+            params.field = info.field;
+            params.value = value;
+          }
+          else {
+            params[info.field] = value;
+          }
+          CRM.api(info.entity, action, params, {
               context: this,
               error: function (data) {
-                editableSettings.error.call(this,entity,fieldName,value,data);
+                editableSettings.error.call(this, info.entity, info.field, value, data);
               },
               success: function (data) {
                 if ($i.data('options')){
                   value = $i.data('options')[value];
                 }
-                editableSettings.success.call(this,entity,fieldName,value,data);
+                editableSettings.success.call(this, info.entity, info.field, value, data);
               }
             });
            },settings);

@@ -131,7 +131,7 @@
   {/if}
 
   <div class="crm-block crm-content-block crm-contact-page crm-inline-edit-container">
-    <div id="mainTabContainer" class="ui-tabs ui-widget ui-widget-content ui-corner-all">
+    <div id="mainTabContainer">
       <ul class="crm-contact-tabs-list">
         <li id="tab_summary" class="crm-tab-button">
           <a href="#contact-summary" title="{ts}Summary{/ts}">
@@ -140,7 +140,7 @@
           </a>
         </li>
         {foreach from=$allTabs key=tabName item=tabValue}
-          <li id="tab_{$tabValue.id}" class="crm-tab-button crm-count-{$tabValue.count}">
+          <li id="tab_{$tabValue.id}" class="crm-tab-button ui-corner-all crm-count-{$tabValue.count}{if isset($tabValue.class)} {$tabValue.class}{/if}">
             <a href="{$tabValue.url}" title="{$tabValue.title}">
               <span> </span> {$tabValue.title}
               <em>{$tabValue.count}</em>
@@ -328,45 +328,16 @@
     </div>
     <div class="clear"></div>
   </div><!-- /.crm-content-block -->
-
-  <script type="text/javascript">
-    {literal}
-    cj(function($) {
-      //explicitly stop spinner
-      function stopSpinner( ) {
-        $('li.crm-tab-button span').text(' ');
-      }
-      {/literal}
-      var selectedTab = '{if !empty($selectedChild)}{$selectedChild}{else}summary{/if}';
-      var tabIndex = $('#tab_' + selectedTab).prevAll().length;
-      var spinnerImage = '<img src="{$config->resourceBase}i/loading.gif" style="width:10px;height:10px"/>';
-      {literal}
-      $("#mainTabContainer").tabs({ selected: tabIndex, spinner: spinnerImage, cache: true, load: stopSpinner});
-      $(".crm-tab-button").addClass("ui-corner-bottom");
-      $().crmAccordions();
-
-      $('body').click(function() {
-        cj('#crm-contact-actions-list').hide();
-      });
-    });
-    {/literal}
-  </script>
 {/if}
 
 {* CRM-10560 *}
 {literal}
 <script type="text/javascript">
-cj(document).ready(function($) {
+cj(function($) {
   $('.crm-inline-edit-container').crmFormContactLock({
     ignoreLabel: "{/literal}{ts escape='js'}Ignore{/ts}{literal}",
     saveAnywayLabel: "{/literal}{ts escape='js'}Save Anyway{/ts}{literal}",
     reloadLabel: "{/literal}{ts escape='js'}Reload Page{/ts}{literal}"
-  });
-  //Enhance styling of "View Contact" tabs to indicate empty/non-empty tags
-  $('div#mainTabContainer ul').find('li').each(function(n){
-    if($(this).find('em').html()==0){
-      $(this).addClass("disabled");
-    }
   });
 });
 </script>

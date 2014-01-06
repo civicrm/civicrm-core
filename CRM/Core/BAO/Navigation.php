@@ -604,13 +604,13 @@ ORDER BY parent_id, weight";
           module_exists('admin_menu') && user_access('access administration menu')
         )
       ) {
-        $prepandString = "<li class=\"menumain crm-link-home\">" . $homeIcon . "<ul id=\"civicrm-home\"><li><a href=\"{$homeURL}\">" . $homeLabel . "</a></li><li><a href=\"#\" onclick=\"cj.Menu.closeAll( );cj('#civicrm-menu').toggle( );\">" . ts('Drupal Menu') . "</a></li></ul>";
+        $prepandString = '<li class="menumain crm-link-home">' . $homeIcon . "<ul id=\"civicrm-home\"><li><a href=\"{$homeURL}\">" . $homeLabel . '</a></li><li><a href="#" class="crm-hidemenu">' . ts('Drupal Menu') . "</a></li></ul>";
       }
       elseif ($config->userSystem->is_wordpress) {
-        $prepandString = "<li class=\"menumain crm-link-home\">" . $homeIcon . "<ul id=\"civicrm-home\"><li><a href=\"{$homeURL}\">" . $homeLabel . "</a></li><li><a href=\"#\" onclick=\"cj.Menu.closeAll( );cj('#civicrm-menu').toggle( );\">" . ts('WordPress Menu') . "</a></li></ul>";
+        $prepandString = '<li class="menumain crm-link-home">' . $homeIcon . "<ul id=\"civicrm-home\"><li><a href=\"{$homeURL}\">" . $homeLabel . '</a></li><li><a href="#" class="crm-hidemenu">' . ts('WordPress Menu') . "</a></li></ul>";
       }
       else {
-        $prepandString = "<li class=\"menumain crm-link-home\"><a href=\"{$homeURL}\" title=\"" . $homeLabel . "\">" . $homeIcon . "</a>";
+        $prepandString = "<li class=\"menumain crm-link-home\"><a href=\"{$homeURL}\" title=\"" . $homeLabel . '">' . $homeIcon . "</a>";
       }
 
       $navigation = $prepandString . $navigation . $appendString;

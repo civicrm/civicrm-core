@@ -151,7 +151,7 @@
                 }
 
                 if ( result[key].is_default == 1 ) {
-                    cj('#radio'+countRows+' input').attr('checked', 'true');
+                    cj('#radio'+countRows+' input').prop('checked', true);
                 }
 
                 if ( countRows > 1 ) {

@@ -63,7 +63,7 @@
       this.doPreview();
     },
     toggleButtons: function() {
-      this.$('.crm-profile-selector-edit,.crm-profile-selector-copy').attr('disabled', !this.hasUfGroupId());
+      this.$('.crm-profile-selector-edit,.crm-profile-selector-copy').prop('disabled', !this.hasUfGroupId());
     },
     hasUfGroupId: function() {
       return (this.getUfGroupId() && this.getUfGroupId() != '') ? true : false;

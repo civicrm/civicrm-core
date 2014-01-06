@@ -245,7 +245,7 @@ function checkEmail( ) {
        cj("#contribution_status_id").val( cStatusId );
 
        //unset value for send receipt check box.
-       cj("#send_receipt").attr( "checked", false );
+       cj("#send_receipt").prop("checked", false );
        cj("#send_confirmation_receipt").hide( );
 
        // set receive data to null.
