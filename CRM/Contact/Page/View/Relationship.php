@@ -314,10 +314,6 @@ class CRM_Contact_Page_View_Relationship extends CRM_Core_Page {
    */
   static function &links() {
     if (!(self::$_links)) {
-      $deleteExtra  = ts('Are you sure you want to delete this relationship?');
-      $disableExtra = ts('Are you sure you want to disable this relationship?');
-      $enableExtra  = ts('Are you sure you want to re-enable this relationship?');
-
       self::$_links = array(
         CRM_Core_Action::VIEW => array(
           'name' => ts('View'),
@@ -333,23 +329,18 @@ class CRM_Contact_Page_View_Relationship extends CRM_Core_Page {
         ),
         CRM_Core_Action::ENABLE => array(
           'name' => ts('Enable'),
-          'url' => 'civicrm/contact/view/rel',
-          'qs' => 'action=enable&reset=1&cid=%%cid%%&id=%%id%%&rtype=%%rtype%%&selectedChild=rel',
-          'extra' => 'onclick = "return confirm(\'' . $enableExtra . '\');"',
+          'ref' => 'crm-enable-disable',
           'title' => ts('Enable Relationship'),
         ),
         CRM_Core_Action::DISABLE => array(
           'name' => ts('Disable'),
-          'url' => 'civicrm/contact/view/rel',
-          'qs' => 'action=disable&reset=1&cid=%%cid%%&id=%%id%%&rtype=%%rtype%%&selectedChild=rel',
-          'extra' => 'onclick = "return confirm(\'' . $disableExtra . '\');"',
+          'ref' => 'crm-enable-disable',
           'title' => ts('Disable Relationship'),
         ),
         CRM_Core_Action::DELETE => array(
           'name' => ts('Delete'),
           'url' => 'civicrm/contact/view/rel',
           'qs' => 'action=delete&reset=1&cid=%%cid%%&id=%%id%%&rtype=%%rtype%%',
-          'extra' => 'onclick = "if (confirm(\'' . $deleteExtra . '\') ) this.href+=\'&amp;confirmed=1\'; else return false;"',
           'title' => ts('Delete Relationship'),
         ),
         // FIXME: Not sure what to put as the key.
