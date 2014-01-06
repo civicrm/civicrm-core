@@ -287,7 +287,8 @@ ALTER TABLE `civicrm_domain`
       $domain->config_backend = serialize($backendValues);
       $domain->save();
 
-      $mailingDomain = new CRM_Core_DAO_Preferences();
+      $sql = 'SELECT id, mailing_backend FROM civicrm_preferences';
+      $mailingDomain = CRM_Core_DAO::executeQuery($sql);
       $mailingDomain->find(TRUE);
       $mailingDomain->mailing_backend = serialize($mailerValues);
       $mailingDomain->save();
