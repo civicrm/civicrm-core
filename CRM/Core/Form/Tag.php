@@ -236,7 +236,7 @@ class CRM_Core_Form_Tag {
    *
    */
   static function postProcess(&$params, $entityId, $entityTable = 'civicrm_contact', &$form) {
-    foreach ($params as $value) {
+    foreach ($params as $parentId => $value) {
       if (!$value) {
         continue;
       }
@@ -245,13 +245,26 @@ class CRM_Core_Form_Tag {
       $insertSQL    = NULL;
       if (!empty($tagsIDs)) {
         foreach ($tagsIDs as $tagId) {
-          if (is_numeric($tagId)) {
-            if ($form && $form->_action != CRM_Core_Action::UPDATE) {
-              $insertValues[] = "( {$tagId}, {$entityId}, '{$entityTable}' ) ";
+          if (!is_numeric($tagId)) {
+            // check if user has selected existing tag or is creating new tag
+            // this is done to allow numeric tags etc.
+            $tagValue = explode(':::', $tagId);
+
+            if (isset($tagValue[1]) && $tagValue[1] == 'value') {
+              $params = array(
+                'name' => $tagValue[0],
+                'parent_id' => $parentId,
+              );
+              $tagObject = CRM_Core_BAO_Tag::add($params, CRM_Core_DAO::$_nullArray);
+              $tagId = $tagObject->id;
             }
-            elseif (!$form || !array_key_exists($tagId, $form->_entityTagValues)) {
-              $insertValues[] = "( {$tagId}, {$entityId}, '{$entityTable}' ) ";
-            }
+          }
+
+          if ($form && $form->_action != CRM_Core_Action::UPDATE) {
+            $insertValues[] = "( {$tagId}, {$entityId}, '{$entityTable}' ) ";
+          }
+          elseif (!$form || !array_key_exists($tagId, $form->_entityTagValues)) {
+            $insertValues[] = "( {$tagId}, {$entityId}, '{$entityTable}' ) ";
           }
         }
 
