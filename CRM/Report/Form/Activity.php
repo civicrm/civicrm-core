@@ -558,7 +558,7 @@ GROUP BY civicrm_activity_id {$this->_having} {$this->_orderBy}";
       if ($dao->addtogroup_contact_id) {
         $contact_id = explode(';', $dao->addtogroup_contact_id);
         if ($contact_id[0]) {
-          $contactIDs[] = $contact_id[0];
+          $contactIDs[$contact_id[0]] = $contact_id[0];
         }
       }
     }
