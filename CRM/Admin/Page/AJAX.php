@@ -404,7 +404,7 @@ LIMIT $limit";
       if (!is_numeric($tagID)) {
         $tagID = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Tag', $tagID, 'id', 'name');
       }
-      if ($entityId) {
+      if (!$skipEntityAction && $entityId) {
         // delete this tag entry for the entity
         $params = array(
           'entity_table' => $entityTable,
