@@ -1449,7 +1449,7 @@ WHERE id IN ( {$contacts} )
   * Function to return list of permissioned contacts for a given contact and relationship type
   *
   * @param $contactID int contact id whose permissioned contacts are to be found.
-  * @param $relTypeId relationship type id
+  * @param $relTypeId string one or more relationship type id's
   * @param $name string
   *
   * @static
@@ -1465,7 +1465,7 @@ SELECT cc.id as id, cc.sort_name as name
 FROM civicrm_relationship cr, civicrm_contact cc
 WHERE
 cr.contact_id_a         = %1 AND
-cr.relationship_type_id = %2 AND
+cr.relationship_type_id IN (%2) AND
 cr.is_permission_a_b    = 1 AND
 IF(cr.end_date IS NULL, 1, (DATEDIFF( CURDATE( ), cr.end_date ) <= 0)) AND
 cr.is_active = 1 AND
@@ -1477,7 +1477,7 @@ cc.id = cr.contact_id_b";
 AND cc.sort_name LIKE '%$name%'";
       }
 
-      $args = array(1 => array($contactID, 'Integer'), 2 => array($relTypeId, 'Integer'));
+      $args = array(1 => array($contactID, 'Integer'), 2 => array($relTypeId, 'String'));
       $dao  = CRM_Core_DAO::executeQuery($query, $args);
 
       while ($dao->fetch()) {
