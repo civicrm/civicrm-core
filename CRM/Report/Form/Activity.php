@@ -663,7 +663,7 @@ GROUP BY civicrm_activity_id {$this->_having} {$this->_orderBy} {$this->_limit}"
     $activityType   = CRM_Core_PseudoConstant::activityType(TRUE, TRUE, FALSE, 'label', TRUE);
     $activityStatus = CRM_Core_PseudoConstant::activityStatus();
     $viewLinks      = FALSE;
-    $seperator      = CRM_CORE_DAO::VALUE_SEPARATOR;
+    $seperator      = CRM_Core_DAO::VALUE_SEPARATOR;
     $context        = CRM_Utils_Request::retrieve('context', 'String', $this, FALSE, 'report');
 
     if (CRM_Core_Permission::check('access CiviCRM')) {
