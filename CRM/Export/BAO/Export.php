@@ -870,13 +870,25 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
                   $fieldValue = CRM_Utils_Array::value($relationValue, $imProviders);
                 }
               }
+              // CRM-13995
+              elseif (in_array($relationField, array(
+                'email_greeting', 'postal_greeting', 'addressee'))) {
+                //special case for greeting replacement
+                $fldValue = "{$relationField}_display";
+                $fieldValue = $relDAO->$fldValue;
+              }
+              elseif ( is_object($relDAO) && $relationField == 'state_province' ) {
+                $fieldValue = CRM_Core_PseudoConstant::stateProvince($relDAO->state_province_id);
+              }
               else {
                 $fieldValue = '';
               }
               $field = $field . '_';
+
               if (is_object($relDAO) && $relationField == 'id') {
                 $row[$field . $relationField] = $relDAO->contact_id;
-                            } else  if ( is_object( $relDAO ) && is_array( $relationValue ) && $relationField == 'location' ) {
+              }
+              elseif ( is_object( $relDAO ) && is_array( $relationValue ) && $relationField == 'location' ) {
                 foreach ($relationValue as $ltype => $val) {
                   foreach (array_keys($val) as $fld) {
                     $type = explode('-', $fld);
@@ -917,12 +929,6 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
                   $row[$field . $relationField] = CRM_Core_BAO_CustomField::getDisplayValue($fieldValue, $cfID,
                     $relationQuery[$field]->_options
                   );
-                }
-                elseif (in_array($relationField, array(
-                  'email_greeting', 'postal_greeting', 'addressee'))) {
-                  //special case for greeting replacement
-                  $fldValue = "{$relationField}_display";
-                  $row[$field . $relationField] = $relDAO->$fldValue;
                 }
                 else {
                   //normal relationship fields
