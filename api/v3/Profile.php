@@ -531,6 +531,7 @@ function _civicrm_api3_buildprofile_submitfields($profileID, $optionsBehaviour =
       'soft_credit' => 'soft_credit_to',
       'group' => 'group_id',
       'tag' => 'tag_id',
+      'soft_credit_type' => 'soft_credit_type_id',
     );
 
     if(array_key_exists($ufFieldTaleFieldName, $hardCodedEntityFields)) {
@@ -662,6 +663,7 @@ function _civicrm_api3_map_profile_fields_to_entity(&$field) {
     'check_number' => 'contribution',
     'contribution_status_id' => 'contribution',
     'soft_credit' => 'contribution',
+    'soft_credit_type' => 'contribution_soft',
     'group' => 'group_contact',
     'tag' => 'entity_tag',
    );
