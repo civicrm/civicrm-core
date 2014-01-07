@@ -880,6 +880,9 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
               elseif ( is_object($relDAO) && $relationField == 'state_province' ) {
                 $fieldValue = CRM_Core_PseudoConstant::stateProvince($relDAO->state_province_id);
               }
+              elseif ( is_object($relDAO) && $relationField == 'country' ) {
+                $fieldValue = CRM_Core_PseudoConstant::country($relDAO->country_id);
+              }
               else {
                 $fieldValue = '';
               }
