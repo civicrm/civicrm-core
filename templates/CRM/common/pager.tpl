@@ -26,7 +26,7 @@
 {if $pager and $pager->_response}
     {if $pager->_response.numPages > 1}
         <div class="crm-pager">
-          {if ! isset($noForm) || ! $noForm}
+          {if empty($noForm)}
             <span class="element-right">
             {if $location eq 'top'}
               {$pager->_response.titleTop}&nbsp;<input class="form-submit" name="{$pager->_response.buttonTop}" value="{ts}Go{/ts}" type="submit"/>
@@ -44,6 +44,14 @@
           </span>
 
         </div>
+      {if empty($noForm) and $location neq 'top'}
+      <script type="text/javascript">
+        cj('input[name^=crmPID]', '#{$form.formName}').spinner({ldelim}
+          min: 1,
+          max: {$pager->_response.numPages}
+        {rdelim});
+      </script>
+      {/if}
     {/if}
 
     {* Controller for 'Rows Per Page' *}
