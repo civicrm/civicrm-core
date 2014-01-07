@@ -67,8 +67,11 @@ cj(function($) {
   // Utility functions
   CRM.tabHeader = CRM.tabHeader || {};
   CRM.tabHeader.updateCount = function(tab, count) {
+    var oldClass = $(tab).attr('class').match(/(crm-count-\d+)/);
+    if (oldClass) {
+      $(tab).removeClass(oldClass[0]);
+    }
     $(tab)
-      .removeClass($(tab).attr('class').match(/(crm-count-\d+)/)[0] || 'null')
       .addClass('crm-count-' + count)
       .find('a em').html('' + count);
   }

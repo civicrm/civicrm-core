@@ -93,12 +93,8 @@
         CRM.tabHeader.updateCount('#tab_log', response.changeLog.count);
       }
       $("#crm-record-log").replaceWith(response.changeLog.markup);
-      // Refresh tab contents - Advanced logging
-      if (CRM.reloadChangeLogTab) {
-        CRM.reloadChangeLogTab();
-      }
-      // Refresh tab contents - Simple logging
-      else if ($('#changeLog').closest('.ui-tabs-panel').data('civiCrmSnippet')) {
+      // Refresh tab contents - Simple
+      if (!CRM.reloadChangeLogTab && $('#changeLog').closest('.ui-tabs-panel').data('civiCrmSnippet')) {
         $('#changeLog').closest('.ui-tabs-panel').crmSnippet('destroy');
       }
     }
@@ -308,14 +304,18 @@
           });
         return false;
       });
-    // Actions menu
-    $(document).on('click', function(e) {
-      if ($(e.target).is('#crm-contact-actions-link, #crm-contact-actions-link *')) {
-        $('#crm-contact-actions-list').show();
-        return false;
-      }
-      $('#crm-contact-actions-list').hide();
-    });
+    $(document)
+      // Actions menu
+      .on('click', function(e) {
+        if ($(e.target).is('#crm-contact-actions-link, #crm-contact-actions-link *')) {
+          $('#crm-contact-actions-list').show();
+          return false;
+        }
+        $('#crm-contact-actions-list').hide();
+      })
+      .on('crmFormSuccess', function(e) {
+        CRM.reloadChangeLogTab && CRM.reloadChangeLogTab();
+      });
     $().crmAccordions();
   });
 })(cj);

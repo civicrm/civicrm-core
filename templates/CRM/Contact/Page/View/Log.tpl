@@ -28,7 +28,7 @@
    <div class="bold">{ts}Change Log:{/ts} {$displayName}</div>
    {if $useLogging}
      <br />
-     <div id='instance_data'><div class="crm-loading-element"></div></div>
+     <div class='instance_data'><div class="crm-loading-element"></div></div>
    {else}
     <div class="form-item">
      {if $logCount > 0 }
@@ -55,20 +55,26 @@
 {if $useLogging}
 {literal}
   <script type="text/javascript">
-  CRM.reloadChangeLogTab = function() {
-    cj('#changeLog #instance_data').load({/literal}"{$instanceUrl}"{literal});
-  };
-  cj(function () {
-    CRM.reloadChangeLogTab();
+  cj(function ($) {
+    $('#changeLog .instance_data').on('crmLoad', function(e, data) {
+      CRM.tabHeader.updateCount('#tab_log', data.totalRows);
+    });
+    CRM.reloadChangeLogTab = function(url) {
+      if (url) {
+        $('#changeLog .instance_data').crmSnippet({url: url});
+      }
+      $('#changeLog .instance_data').crmSnippet('refresh');
+    };
+    CRM.reloadChangeLogTab({/literal}"{$instanceUrl}"{literal});
 
-    cj('#changeLog').on('click', '.report-pager .crm-pager-nav a', function(e) {
-      cj('#changeLog #instance_data').block().load(this.href + '&snippet=4&section=2');
+    $('#changeLog').on('click', '.report-pager .crm-pager-nav a', function(e) {
+      CRM.reloadChangeLogTab(this.href + '&section=2');
       return false;
     });
 
-    cj('#changeLog').on('click', 'input[name="PagerBottomButton"], input[name="PagerTopButton"]', function(e) {
-      var url  = cj('#changeLog #instance_data .report-pager .crm-pager-nav a:first').attr('href') + '&snippet=4&section=2';
-      cj('#changeLog #instance_data').block().load(url + '&crmPID=' + cj(this).siblings('input[type=text]').val());
+    $('#changeLog').on('click', 'input[name="PagerBottomButton"], input[name="PagerTopButton"]', function(e) {
+      var url  = $('#changeLog .instance_data .report-pager .crm-pager-nav a:first').attr('href') + '&section=2';
+      CRM.reloadChangeLogTab(url + '&crmPID=' + $(this).siblings('input[type=text]').val());
       return false;
     });
   });
