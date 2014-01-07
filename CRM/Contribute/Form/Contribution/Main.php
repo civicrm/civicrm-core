@@ -977,7 +977,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
       }
       elseif (CRM_Utils_Array::value('is_pledge', $fields)) {
         if (CRM_Utils_Rule::positiveInteger(CRM_Utils_Array::value('pledge_installments', $fields)) == FALSE) {
-          $errors['pledge_installments'] = ts('Please enter a valid pledge installment.');
+          $errors['pledge_installments'] = ts('Please enter a valid number of pledge installments.');
         }
         else {
           if (CRM_Utils_Array::value('pledge_installments', $fields) == NULL) {
