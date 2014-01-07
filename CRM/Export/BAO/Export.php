@@ -871,7 +871,7 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
                 }
               }
               // CRM-13995
-              elseif (in_array($relationField, array(
+              elseif (is_object($relDAO) && in_array($relationField, array(
                 'email_greeting', 'postal_greeting', 'addressee'))) {
                 //special case for greeting replacement
                 $fldValue = "{$relationField}_display";
