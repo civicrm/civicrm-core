@@ -268,7 +268,7 @@ class CRM_Contact_Page_View_Relationship extends CRM_Core_Page {
     }
 
     // if this is called from case view, suppress browse relationships form
-    if (!$this->_caseId) {
+    else {
       $this->browse();
     }
 

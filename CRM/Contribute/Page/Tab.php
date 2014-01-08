@@ -166,7 +166,7 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
     $controller->reset();
     $controller->set('cid', $this->_contactId);
     $controller->set('crid', $this->_crid);
-    $controller->set('context', 'contribution');
+    $controller->set('context', 'Search');
     $controller->process();
     $controller->run();
 

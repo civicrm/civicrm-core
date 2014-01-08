@@ -178,6 +178,7 @@ function toggleContactSelection( name, qfKey, selection ){
     var formName = "{/literal}{$form.formName}{literal}";
     on_load_init_checkboxes(formName);
   }
+  return false;
 }
 </script>
 

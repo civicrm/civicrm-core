@@ -815,6 +815,7 @@ CRM.validate = CRM.validate || {
       block: true,
       crmForm: null
     },
+    _originalContent: null,
     _originalUrl: null,
     isOriginalUrl: function() {
       var 
@@ -890,7 +891,11 @@ CRM.validate = CRM.validate || {
           return;
         }
         data.url = url;
-        that.element.trigger('crmBeforeLoad', data).html(data.content);
+        that.element.trigger('crmBeforeLoad', data);
+        if (that._originalContent === null) {
+          that._originalContent = that.element.contents().detach();
+        }
+        that.element.html(data.content);
         that._handleOrderLinks();
         that.element.trigger('crmLoad', data);
         that.options.crmForm && that.element.trigger('crmFormLoad', data);
@@ -900,6 +905,9 @@ CRM.validate = CRM.validate || {
     },
     _destroy: function() {
       this.element.removeClass('crm-ajax-container');
+      if (this._originalContent !== null) {
+        this.element.empty().append(this._originalContent);
+      }
     }
   });
 
@@ -915,8 +923,7 @@ CRM.validate = CRM.validate || {
         width: '65%',
         height: parseInt($(window).height() * .75),
         close: function() {
-          $(this).dialog('destroy');
-          $(this).remove();
+          $(this).dialog('destroy').remove();
         }
       };
     }

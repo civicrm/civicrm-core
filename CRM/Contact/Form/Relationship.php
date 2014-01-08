@@ -424,7 +424,7 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
     }
     $this->addElement('submit', $this->getButtonName('refresh'), $searchBtn, array('class' => 'form-submit', 'id' => 'search-button'));
     $this->addElement('submit', $this->getButtonName('refresh', 'save'), 'Quick Save', array('class' => 'form-submit', 'id' => 'quick-save'));
-    $this->addElement('submit', $this->getButtonName('cancel'), ts('Cancel'), array('class' => 'form-submit'));
+    $this->addElement('submit', $this->getButtonName('cancel'), ts('Cancel'), array('class' => 'form-submit cancel'));
 
     $this->addElement('submit', $this->getButtonName('refresh', 'savedetails'), 'Save Relationship', array('class' => 'form-submit hiddenElement', 'id' => 'details-save'));
     $this->addElement('checkbox', 'add_current_employer', ts('Current Employer'), NULL);
