@@ -781,7 +781,7 @@ function addRole() {
  <div class="crm-accordion-body">
   {assign var="tagExits" value=0}
   {if $tags}
-    <div class="crm-block crm-content-block crm-case-caseview-display-tags">{$tags}</div>
+    <div class="crm-block crm-content-block crm-case-caseview-display-tags">&nbsp;&nbsp;{$tags}</div>
     {assign var="tagExits" value=1}
   {/if}
 
@@ -853,18 +853,15 @@ function addTags() {
           }
         });
 
-        var tagList = '';
-        cj("#manageTags input[name^=case_taglist]").each(function( ) {
-          if (!tagsChecked) {
-            tagsChecked = cj(this).val() + '';
-          }
-          else {
-            tagsChecked = tagsChecked + ',' + cj(this).val();
-          }
+        var tagList = {};
+        cj("#manageTags input[name^=case_taglist]").each(function(){
+          var tsId = cj(this).attr('id').split('_');
+          tagList[tsId[2]] = cj(this).val();
         });
 
         var postUrl = {/literal}"{crmURL p='civicrm/case/ajax/processtags' h=0 }"{literal};
-        var data = 'case_id=' + caseID + '&tag=' + tagsChecked + '&key=' + {/literal}"{crmKey name='civicrm/case/ajax/processtags'}"{literal};
+        var key = {/literal}"{crmKey name='civicrm/case/ajax/processtags'}"{literal};
+        var data = {'case_id': caseID, 'tag': tagsChecked, 'taglist': tagList, 'key': key};
 
         cj.ajax({ type: "POST", url: postUrl, data: data, async: false });
         cj(this).dialog("close");

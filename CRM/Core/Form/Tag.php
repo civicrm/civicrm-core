@@ -234,32 +234,80 @@ class CRM_Core_Form_Tag {
   /**
    * Function to save entity tags when it is not save used AJAX
    *
+   * @param array   $params      associated array
+   * @param int     $entityId    entity id, eg: contact id, activity id, case id, file id
+   * @param string  $entityTable entity table
+   * @param object  $form        form object
+   * @param boolean $skipDelete  TRUE if you need to skip delete action in tag entity table
+   *
+   * @return void
+   * @access public
+   * @static
    */
-  static function postProcess(&$params, $entityId, $entityTable = 'civicrm_contact', &$form) {
-    foreach ($params as $value) {
-      if (!$value) {
+  static function postProcess(&$params, $entityId, $entityTable = 'civicrm_contact', &$form, $skipDelete = FALSE) {
+    if ($form && !empty($form->_entityTagValues)) {
+      $existingTags = $form->_entityTagValues;
+    }
+    else {
+      $existingTags = CRM_Core_BAO_EntityTag::getTag($entityId, $entityTable);
+    }
+
+    $allTagIds = array();
+    foreach ($params as $parentId => $value) {
+      if (!$value || empty($value)) {
         continue;
       }
+
       $tagsIDs      = explode(',', $value);
       $insertValues = array();
       $insertSQL    = NULL;
       if (!empty($tagsIDs)) {
         foreach ($tagsIDs as $tagId) {
-          if (is_numeric($tagId)) {
-            if ($form && $form->_action != CRM_Core_Action::UPDATE) {
-              $insertValues[] = "( {$tagId}, {$entityId}, '{$entityTable}' ) ";
+          if (!is_numeric($tagId)) {
+            // check if user has selected existing tag or is creating new tag
+            // this is done to allow numeric tags etc.
+            $tagValue = explode(':::', $tagId);
+
+            if (isset($tagValue[1]) && $tagValue[1] == 'value') {
+              $tagParams = array(
+                'name' => $tagValue[0],
+                'parent_id' => $parentId,
+              );
+              $tagObject = CRM_Core_BAO_Tag::add($tagParams, CRM_Core_DAO::$_nullArray);
+              $tagId = $tagObject->id;
             }
-            elseif (!$form || !array_key_exists($tagId, $form->_entityTagValues)) {
-              $insertValues[] = "( {$tagId}, {$entityId}, '{$entityTable}' ) ";
-            }
+          }
+
+          $allTagIds[] = $tagId;
+          if ($form && $form->_action != CRM_Core_Action::UPDATE) {
+            $insertValues[] = "( {$tagId}, {$entityId}, '{$entityTable}' ) ";
+          }
+          elseif (!array_key_exists($tagId, $existingTags)) {
+            $insertValues[] = "( {$tagId}, {$entityId}, '{$entityTable}' ) ";
           }
         }
 
         if (!empty($insertValues)) {
-          $insertSQL = 'INSERT INTO civicrm_entity_tag ( tag_id, entity_id, entity_table ) VALUES ' . implode(', ', $insertValues) . ';';
+          $insertSQL = 'INSERT INTO civicrm_entity_tag ( tag_id, entity_id, entity_table )
+          VALUES ' . implode(', ', $insertValues) . ';';
           CRM_Core_DAO::executeQuery($insertSQL);
         }
       }
+    }
+
+    // delete tags that are missing from civicrm_entity_tag table
+    if (!$skipDelete) {
+      $inClause = '';
+      if (!empty($allTagIds)) {
+        $validTagIds = implode(',', $allTagIds);
+        $inClause = " AND civicrm_entity_tag.tag_id NOT IN ({$validTagIds})";
+      }
+
+      $deleteSQL = "
+DELETE FROM civicrm_entity_tag USING civicrm_entity_tag, civicrm_tag
+WHERE civicrm_entity_tag.tag_id = civicrm_tag.id AND civicrm_tag.parent_id IS NOT NULL
+AND civicrm_entity_tag.entity_id={$entityId} AND civicrm_entity_tag.entity_table='{$entityTable}' {$inClause}";
+      CRM_Core_DAO::executeQuery($deleteSQL);
     }
   }
 }
