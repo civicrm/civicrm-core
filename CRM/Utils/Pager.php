@@ -112,9 +112,7 @@ class CRM_Utils_Pager extends Pager_Sliding {
       'status' => CRM_Utils_Array::value('status', $params),
       'buttonTop' => CRM_Utils_Array::value('buttonTop', $params),
       'buttonBottom' => CRM_Utils_Array::value('buttonBottom', $params),
-      'twentyfive' => $this->getPerPageLink(25),
-      'fifty' => $this->getPerPageLink(50),
-      'onehundred' => $this->getPerPageLink(100),
+      'currentLocation' => $this->getCurrentLocation(),
     );
 
     /**
@@ -263,29 +261,10 @@ class CRM_Utils_Pager extends Pager_Sliding {
     return array($offset, $this->_perPage);
   }
 
-  /**
-   * given a number create a link that will display the number of
-   * rows as specified by that link
-   *
-   * @param int $perPage the number of rows
-   *
-   * @return string      the link
-   * @access void
-   */
-  function getPerPageLink($perPage) {
-    if ($perPage != $this->_perPage) {
-      $href = $this->makeURL(self::PAGE_ROWCOUNT, $perPage);
-      $link = sprintf('<a href="%s" %s>%s</a>',
-        $href,
-        $this->_classString,
-        $perPage
-      ) . $this->_spacesBefore . $this->_spacesAfter;
-    }
-    else {
-      $link = $this->_spacesBefore . $perPage . $this->_spacesAfter;
-    }
-
-    return $link;
+  function getCurrentLocation() {
+    $config = CRM_Core_Config::singleton();
+    $path = CRM_Utils_Array::value($config->userFrameworkURLVar, $_GET);
+    return CRM_Utils_System::url($path, CRM_Utils_System::getLinksUrl(self::PAGE_ID, FALSE, TRUE), FALSE, NULL, FALSE) . $this->getCurrentPageID();
   }
 
   function getFirstPageLink() {
