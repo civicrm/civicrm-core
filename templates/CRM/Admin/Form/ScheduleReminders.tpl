@@ -141,6 +141,10 @@
         <td class="label">{$form.mode.label}</td>
         <td>{$form.mode.html}</td>
       </tr>
+      <tr id="smsProvider" class="crm-scheduleReminder-form-block-sms_provider_id">
+        <td class="label">{$form.sms_provider_id.label}</td>
+        <td>{$form.sms_provider_id.html}</td>
+      </tr>
     </table>
     <fieldset id="compose_id">
       <legend>{$title}</legend>
@@ -253,18 +257,21 @@
   });
 
   function loadMsgBox() {
-    if (cj('#mode').val() == 'Email' || cj('#mode').val() == 0){
+    if (cj('#mode').val() == 'Email'){
       cj('#sms').hide();
+      cj('#smsProvider').hide();
       cj('#email').show();
     }
-    else if (cj('#mode').val() == 'SMS'){
+    else if (cj('#mode').val() == 'SMS') {
       cj('#email').hide();
+      cj('#smsProvider').show();
       cj('#sms').show();
     }
-    else if (cj('#mode').val() == 'User_Preference'){
-        cj('#email').show();
-        cj('#sms').show();
-      }
+    else if (cj('#mode').val() == 'User_Preference') {
+      cj('#email').show();
+      cj('#smsProvider').show();
+      cj('#sms').show();
+    }
   }
   
   function populateRecipient() {

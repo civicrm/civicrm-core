@@ -460,7 +460,7 @@ WHERE   cas.entity_value = $id AND
       if ($schedule->mode == 'SMS' or $schedule->mode == 'User_Preference') {
         $session = CRM_Core_Session::singleton();
         $userID = $session->get('userID') ? $session->get('userID') : $contactId;
-        $smsParams = array('To' => $phoneNumber, 'provider_id' => 1, 'activity_subject' => $messageSubject);
+        $smsParams = array('To' => $phoneNumber, 'provider_id' => $schedule->sms_provider_id, 'activity_subject' => $messageSubject);
         $activityTypeID = CRM_Core_OptionGroup::getValue('activity_type',
           'SMS',
           'name'
@@ -735,7 +735,7 @@ WHERE reminder.action_schedule_id = %1 AND reminder.action_date_time IS NULL
         }
 
         $isError  = 0;
-        $errorMsg = '';
+        $errorMsg = $toEmail = $toPhoneNumber = '';
 
         if ($actionSchedule->mode == 'SMS' or $actionSchedule->mode == 'User_Preference') {
           $filters = array('is_deceased' => 0, 'is_deleted' => 0, 'do_not_sms' => 0);

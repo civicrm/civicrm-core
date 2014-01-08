@@ -256,4 +256,19 @@
     </html>
     <add>4.5</add>
   </field>
+  <field>
+    <name>sms_provider_id</name>
+    <type>int unsigned</type>
+    <add>4.5</add>
+    <html>
+      <type>Select</type>
+    </html>
+  </field>
+  <foreignKey>
+    <name>sms_provider_id</name>
+    <table>civicrm_sms_provider</table>
+    <key>id</key>
+    <onDelete>SET NULL</onDelete>
+    <add>4.5</add>
+  </foreignKey>
 </table>

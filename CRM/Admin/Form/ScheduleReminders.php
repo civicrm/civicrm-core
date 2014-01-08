@@ -57,7 +57,7 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
     parent::buildQuickForm();
     $this->_mappingID = $mappingID = NULL;
     $providersCount = CRM_SMS_BAO_Provider::activeProviderCount();
-    //CRM_Core_Error::debug('pc', $providersCount);
+
     if ($this->_action & (CRM_Core_Action::DELETE)) {
       $reminderName =
         CRM_Core_DAO::getFieldValue('CRM_Core_DAO_ActionSchedule', $this->_id, 'title');
@@ -142,8 +142,16 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
       $title = ts('Email or SMS');
       $isActive = ts('Send email or SMS');
       $recordActivity = ts('Record activity for automated email or SMS');
-      $options = array(ts('-none-')) + CRM_Core_OptionGroup::values('msg_mode');;
+      $options = CRM_Core_OptionGroup::values('msg_mode');
       $this->add('select', 'mode', ts('Send as'), $options);
+
+      $providers = CRM_SMS_BAO_Provider::getProviders(NULL, NULL, TRUE, 'is_default desc');
+
+      $providerSelect = array();
+      foreach ($providers as $provider) {
+        $providerSelect[$provider['id']] = $provider['title'];
+      }
+      $this->add('select', 'sms_provider_id', ts('From'), $providerSelect, TRUE);
     }
 
     $this->assign('title', $title);
@@ -356,7 +364,8 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
       'group_id',
       'record_activity',
       'limit_to',
-      'mode'
+      'mode',
+      'sms_provider_id'
     );
     foreach ($keys as $key) {
       $params[$key] = CRM_Utils_Array::value($key, $values);
