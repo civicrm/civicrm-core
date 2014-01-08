@@ -66,17 +66,6 @@
       $('#changeLog .instance_data').crmSnippet('refresh');
     };
     CRM.reloadChangeLogTab({/literal}"{$instanceUrl}"{literal});
-
-    $('#changeLog').on('click', '.report-pager .crm-pager-nav a', function(e) {
-      CRM.reloadChangeLogTab(this.href + '&section=2');
-      return false;
-    });
-
-    $('#changeLog').on('click', 'input[name="PagerBottomButton"], input[name="PagerTopButton"]', function(e) {
-      var url  = $('#changeLog .instance_data .report-pager .crm-pager-nav a:first').attr('href') + '&section=2';
-      CRM.reloadChangeLogTab(url + '&crmPID=' + $(this).siblings('input[type=text]').val());
-      return false;
-    });
   });
 
   </script>

@@ -202,6 +202,7 @@ function toggleContactSelection(name, qfKey, selection) {
     params.name = name;
   }
   cj.getJSON(url, params, countSelections);
+  return false;
 }
 {/literal}
 </script>
