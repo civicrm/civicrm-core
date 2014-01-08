@@ -116,3 +116,6 @@ VALUES
 (@option_group_id_msg_mode, {localize}'{ts escape="sql"}Email{/ts}'{/localize}, 'Email', 'Email', 1, 1, 1, 1),
 (@option_group_id_msg_mode, {localize}'{ts escape="sql"}SMS{/ts}'{/localize},'SMS', 'SMS', 0, 2, 1, 1),
 (@option_group_id_msg_mode, {localize}'{ts escape="sql"}User Preference{/ts}'{/localize}, 'User_Preference', 'User Preference', 0, 3, 1, 1);
+
+ALTER TABLE civicrm_action_schedule ADD sms_provider_id int(10) unsigned NULL COMMENT 'FK to civicrm_sms_provider id ';
+ALTER TABLE civicrm_action_schedule ADD CONSTRAINT FK_civicrm_action_schedule_sms_provider_id FOREIGN KEY (`sms_provider_id`) REFERENCES `civicrm_sms_provider` (`id`) ON DELETE SET NULL;
