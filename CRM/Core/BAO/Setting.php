@@ -630,6 +630,8 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
       $cacheString .= "_{$filterField}_{$filterString}";
     }
     $cached = 1;
+    // the caching into 'All' seems to be a duplicate of caching to
+    // settingsMetadata__ - I think the reason was to cache all settings as defined & then those altered by a hook
     $settingsMetadata = CRM_Core_BAO_Cache::getItem('CiviCRM setting Specs', $cacheString, $componentID);
     if ($settingsMetadata === NULL) {
       $settingsMetadata = CRM_Core_BAO_Cache::getItem('CiviCRM setting Spec', 'All', $componentID);
