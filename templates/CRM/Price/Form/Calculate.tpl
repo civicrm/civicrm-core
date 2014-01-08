@@ -25,9 +25,9 @@
 *}
 <div id="pricesetTotal" class="crm-section section-pricesetTotal">
   <div class="label" id="pricelabel"><label>
-         {if ( $extends eq 'Contribution' ) || ( $extends eq 'Membership' )}
-           {ts}Total Amount{/ts}{else}{ts}Total Fee(s){/ts}
-         {/if}</label></div>
+    {if ( $extends eq 'Contribution' ) || ( $extends eq 'Membership' )}
+      {ts}Total Amount{/ts}{else}{ts}Total Fee(s) for this participant{/ts}
+    {/if}</label></div>
   <div class="content calc-value" id="pricevalue" ></div>
 </div>
 
@@ -74,10 +74,6 @@ cj("input,#priceset select,#priceset").each(function () {
       }
       display( totalfee );
     });
-    cj('#additional_participants').change( function( ) {
-      display( totalfee );
-    });
-
     display( totalfee );
     break;
 
@@ -104,11 +100,6 @@ cj("input,#priceset select,#priceset").each(function () {
 
       display( totalfee );
     });
-
-    cj('#additional_participants').change( function( ) {
-      display( totalfee );
-    });
-
     display( totalfee );
     break;
 
@@ -135,11 +126,6 @@ cj("input,#priceset select,#priceset").each(function () {
     cj(this).bind( 'keyup', function() { calculateText( this );
     }).bind( 'blur' , function() { calculateText( this );
     });
-
-    cj('#additional_participants').change( function( ) {
-      display( totalfee );
-    });
-
     display( totalfee );
     break;
 
@@ -185,11 +171,6 @@ cj("input,#priceset select,#priceset").each(function () {
       }
       display( totalfee );
     });
-
-    cj('#additional_participants').change( function( ) {
-      display( totalfee );
-    });
-
     display( totalfee );
     break;
     }
@@ -219,20 +200,8 @@ function calculateText( object ) {
 
 //display calculated amount
 function display( totalfee ) {
-    num_participants = cj('#additional_participants').val()
-
-    if (!num_participants) {
-      num_participants = 0
-    }
-    // The value of this field is the number of *additional* participants
-    // What is displayed to the user is 1 + the value, because it is including
-    // the "yourself". Since we want to give a total, including "yourself" we have
-    // to add one to the value of #additional_participants.
-    num_participants++;
-
     // totalfee is monetary, round it to 2 decimal points so it can
     // go as a float - CRM-13491
-    totalfee = totalfee * num_participants;
     totalfee = Math.round(totalfee*100)/100;
     var totalEventFee  = formatMoney( totalfee, 2, seperator, thousandMarker);
     document.getElementById('pricevalue').innerHTML = "<b>"+symbol+"</b> "+totalEventFee;
