@@ -920,7 +920,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       }
     }
 
-    $softErrors = CRM_Contribute_Form_SoftCredit::formRule($fields);
+    $softErrors = CRM_Contribute_Form_SoftCredit::formRule($fields, $errors, $self);
 
     if (CRM_Utils_Array::value('total_amount', $fields) && (CRM_Utils_Array::value('net_amount', $fields) || CRM_Utils_Array::value('fee_amount', $fields))) {
       $sum = CRM_Utils_Rule::cleanMoney($fields['net_amount']) + CRM_Utils_Rule::cleanMoney($fields['fee_amount']);
