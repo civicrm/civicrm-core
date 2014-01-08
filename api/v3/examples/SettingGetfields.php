@@ -28,7 +28,7 @@ function setting_getfields_expectedresult(){
   $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
-  'count' => 81,
+  'count' => 82,
   'values' => array(
       'address_standardization_provider' => array(
           'group_name' => 'Address Preferences',
@@ -654,6 +654,27 @@ When enabled, statistics about your CiviCRM installation are reported anonymousl
           'description' => '',
           'help_text' => '',
         ),
+      'blogUrl' => array(
+          'group_name' => 'CiviCRM Preferences',
+          'group' => 'core',
+          'name' => 'blogUrl',
+          'prefetch' => 0,
+          'config_only' => 0,
+          'type' => 'String',
+          'quick_form_type' => 'Element',
+          'html_type' => 'Text',
+          'html_attributes' => array(
+              'size' => 64,
+              'maxlength' => 128,
+            ),
+          'default' => '*default*',
+          'add' => '4.3',
+          'title' => 'Blog Feed URL',
+          'is_domain' => 1,
+          'is_contact' => 0,
+          'description' => 'Blog feed URL used by the blog dashlet',
+          'help_text' => 'Use \"*default*\" for the system default or override with a custom URL',
+        ),
       'communityMessagesUrl' => array(
           'group_name' => 'CiviCRM Preferences',
           'group' => 'core',
@@ -768,6 +789,16 @@ When enabled, statistics about your CiviCRM installation are reported anonymousl
           'is_contact' => 0,
           'description' => '',
           'help_text' => '',
+          'on_change' => array(
+              '0' => array(
+                  '0' => 'CRM_Case_Info',
+                  '1' => 'onToggleComponents',
+                ),
+              '1' => array(
+                  '0' => 'CRM_Core_Component',
+                  '1' => 'flushEnabledComponents',
+                ),
+            ),
         ),
       'disable_core_css' => array(
           'group_name' => 'CiviCRM Preferences',

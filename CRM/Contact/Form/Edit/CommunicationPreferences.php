@@ -174,9 +174,8 @@ class CRM_Contact_Form_Edit_CommunicationPreferences {
   static function setDefaultValues(&$form, &$defaults) {
 
     if (!empty($defaults['preferred_language'])) {
-      $defaults['preferred_language'] = CRM_Utils_Array::key($defaults['preferred_language'],
-        CRM_Contact_BAO_Contact::buildOptions('preferred_language')
-      );
+      $languages = CRM_Contact_BAO_Contact::buildOptions('preferred_language');
+      $defaults['preferred_language'] = CRM_Utils_Array::key($defaults['preferred_language'], $languages);
     }
 
     // CRM-7119: set preferred_language to default if unset
