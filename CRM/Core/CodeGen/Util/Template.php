@@ -56,7 +56,7 @@ class CRM_Core_CodeGen_Util_Template {
     unlink($outpath);
     foreach ($inputs as $infile) {
       // FIXME: does not beautify.  Document.
-      file_put_contents($outpath, $this->smarty->fetch($infile), FILE_APPEND);
+      file_put_contents($outpath, $this->smarty->fetch($infile) ."\n", FILE_APPEND);
     }
   }
 
