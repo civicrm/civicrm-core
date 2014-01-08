@@ -96,8 +96,6 @@ class CRM_Contribute_Form_SoftCredit {
       $form->assign('pcpLinked', 1);
     }
     
-    $form->addFormRule(array('CRM_Contribute_Form_SoftCredit', 'formRule'), $form);
-    
   }
 
   /**
