@@ -130,7 +130,7 @@ class CRM_Contribute_Form_SoftCredit {
    * @access public
    * @static
    */
-  static function formRule($fields) {
+  static function formRule($fields, $errors, $self) {
     $errors = array();
 
     // if honor roll fields are populated but no PCP is selected
@@ -150,7 +150,7 @@ class CRM_Contribute_Form_SoftCredit {
           if ($repeat[$fields['soft_credit_contact_select_id'][$key]] > 1) {
             $errors["soft_credit_contact_select_id[$key]"] = ts('You cannot enter multiple soft credits for the same contact.');
           }
-          if ($fields['soft_credit_amount'][$key]
+          if ($self->_action == CRM_Core_Action::ADD && $fields['soft_credit_amount'][$key]
             && (CRM_Utils_Rule::cleanMoney($fields['soft_credit_amount'][$key]) > CRM_Utils_Rule::cleanMoney($fields['total_amount']))) {
             $errors["soft_credit_amount[$key]"] = ts('Soft credit amount cannot be more than the total amount.');
           }
