@@ -1,0 +1,115 @@
+diff --git a/tests/phpunit/WebTest/Event/AddEventTest.php b/tests/phpunit/WebTest/Event/AddEventTest.php
+index 07b6c53..5cda3d7 100644
+--- a/tests/phpunit/WebTest/Event/AddEventTest.php
++++ b/tests/phpunit/WebTest/Event/AddEventTest.php
+@@ -31,6 +31,54 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
+     parent::setUp();
+   }
+ 
++  //CRM-13926 WebTest
++  function testEventParticipationAdd() {
++    // Log in using webtestLogin() method
++    $this->webtestLogin();
++    $this->openCiviPage("event/manage", "reset=1");
++    $Id =explode('_',$this->getAttribute("xpath=//table[@id='options']/tbody/tr/td/@class"));
++    $Id=$Id[1];
++    $this->openCiviPage("event/manage/registration", "reset=1&action=update&id=$Id");
++    $this->waitForElementPresent("xpath=//div[@id='register']/table/tbody/tr/td[2]/input");
++    $this->click('_qf_Registration_upload_done');
++    $this->waitForElementPresent("xpath=//table[@id='options']/tbody/tr/td");
++    $this->openCiviPage("event/register", "reset=1&id=$Id&cid=0", '_qf_Register_upload-bottom');
++
++    //fill in first name
++    $firstName ='Jane'. substr(sha1(rand()), 0, 7);
++    $this->type('first_name', $firstName);
++
++    //fill in last name
++    $lastName = 'Recuron'.substr(sha1(rand()), 0, 7);
++    $this->type('last_name', $lastName);
++
++    //fill in Email
++    $email = $firstName . '@example.com';
++    $this->type('email-Primary', $email);
++
++    // Credit Card Info
++    $this->select("credit_card_type", "value=Visa");
++    $this->type("credit_card_number", "4111111111111111");
++    $this->type("cvv2", "000");
++    $this->select("credit_card_exp_date[M]", "value=1");
++    $this->select("credit_card_exp_date[Y]", "value=2020");
++
++    //Billing Info
++    $this->type("billing_first_name", $firstName . 'billing');
++    $this->type("billing_last_name", $lastName . 'billing');
++    $this->type("billing_street_address-5", "0121 Mount Highschool.");
++    $this->type(" billing_city-5", "Shangai");
++    $this->select("billing_country_id-5", "value=1228");
++    $this->select("billing_state_province_id-5", "value=1004");
++    $this->type("billing_postal_code-5", "94129");
++     $this->assertTextPresent("Your Registration Info");
++     $this->click('_qf_Register_upload');
++
++    $this->waitForElementPresent("_qf_Confirm_next");
++    $this->assertTextPresent("Participant Information");
++    $this->click('_qf_Confirm_next');
++
++}
+   function testAddPaidEventNoTemplate() {
+     // Log in using webtestLogin() method
+     $this->webtestLogin();
+@@ -74,6 +122,8 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
+     $this->_testVerifyRegisterPage($registerStrings);
+   }
+ 
++
++
+   function testAddPaidEventDiscount() {
+ 
+     // Log in using webtestLogin() method
+@@ -327,6 +377,25 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
+     $this->customFieldSetLoadOnTheFlyCheck($customSets, $pageUrl);
+   }
+ 
++
++function testEventApprovalRegistration() {
++    $this->webtestLogin();
++    $this->openCiviPage("admin/participant_status", "reset=1&action=browse");
++    $this->_testEnableParticipantStatuses('Awaiting approval');
++    $this->_testEnableParticipantStatuses('Pending from approval');
++   $this->_testEnableParticipantStatuses('Rejected');
++  }
++
++  function _testEnableParticipantStatuses($status) {
++    // enable participant statuses
++    if ($this->isElementPresent("xpath=//div[@class='crm-section participant-status']/table/tbody//tr/td[@class='crm-particpant-label'][contains(text(), '{$status}')]/.
++      $this->click("xpath=//div[@class='crm-section participant-status']/table/tbody//tr/td[@class='crm-particpant-label'][contains(text(), '{$status}')]/../td/span/a[c
++      $this->assertTrue((bool)preg_match("/^Are you sure you want to enable this record?/",
++          $this->getConfirmation()
++        ));
++      $this->chooseOkOnNextConfirmation();
++    }
++  }
+   function _testAddEventInfo($eventTitle, $eventDescription) {
+     $this->waitForElementPresent("_qf_EventInfo_upload-bottom");
+ 
+@@ -471,7 +540,7 @@ class WebTest_Event_AddEventTest extends CiviSeleniumTestCase {
+     return array($discount1, $discount2);
+   }
+ 
+-  function _testAddOnlineRegistration($registerIntro, $multipleRegistrations = FALSE) {
++  function _testAddOnlineRegistration($registerIntro, $multipleRegistrations = FALSE,$eventApproval = FALSE) {
+     // Go to Online Registration tab
+     $this->click("link=Online Registration");
+     $this->waitForElementPresent("_qf_Registration_upload-bottom");
+@@ -797,8 +866,8 @@ WHERE c1.entity_table  = 'civicrm_contribution' AND c1.entity_id = %1 AND cfi.st
+     $dao->fetch();
+     $this->assertEquals('2', $dao->civicrm_contribution, 'civicrm_financial_trxn count does not match');
+     $this->assertEquals('8', $dao->civicrm_financial_item, 'civicrm_financial_item count does not match');
+-    $query = "SELECT COUNT(cft.id) civicrm_financial_trxn FROM civicrm_entity_financial_trxn ceft 
+-INNER JOIN civicrm_financial_trxn cft ON ceft.financial_trxn_id = cft.id 
++    $query = "SELECT COUNT(cft.id) civicrm_financial_trxn FROM civicrm_entity_financial_trxn ceft
++INNER JOIN civicrm_financial_trxn cft ON ceft.financial_trxn_id = cft.id
+ WHERE ceft.entity_id = %1 AND ceft.entity_table = 'civicrm_contribution'";
+     $dao = CRM_Core_DAO::executeQuery($query, $params);
+     $dao->fetch();
+
