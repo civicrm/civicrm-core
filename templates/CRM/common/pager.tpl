@@ -64,11 +64,16 @@
             numPages = {$pager->_response.numPages},
             currentPage = {$pager->_response.currentPage},
             perPageCount = {$pager->_perPage},
-            currentLocation = {$pager->_response.currentLocation|json_encode};
+            currentLocation = {$pager->_response.currentLocation|json_encode},
+            spinning = null;
+            refreshing = false;
           {literal}
           function refresh(url) {
-            var options = url ? {url: url} : {};
-            $form.closest('.crm-ajax-container, #crm-main-content-wrapper').crmSnippet(options).crmSnippet('refresh');
+            if (!refreshing) {
+              refreshing = true;
+              var options = url ? {url: url} : {};
+              $form.off().closest('.crm-ajax-container, #crm-main-content-wrapper').crmSnippet(options).crmSnippet('refresh');
+            }
           }
           function page(num) {
             num = parseInt(num, 10);
@@ -98,7 +103,6 @@
             })
             .on('change', function() {
               page($(this).spinner('value'));
-              return false;
             })
             .on('keyup keydown keypress', preventSubmit);
           $('input.crm-rows-per-page-select', $form)
@@ -108,16 +112,20 @@
             })
             .on('change', function() {
               changeCount($(this).spinner('value'));
-              return false;
             })
             .on('keyup keydown keypress', preventSubmit);
           $form
             .on('click', 'a.ui-spinner-button', function(e) {
-              if ($(this).is('.crm-pager a')) {
-                page($(this).siblings('input[name^=crmPID]').spinner('value'));
-              } else {
-                changeCount($(this).siblings('input.crm-rows-per-page-select').spinner('value'));
-              }
+              var $el = $(this);
+              // Update after a short delay to allow multiple clicks
+              spinning !== null && window.clearTimeout(spinning);
+              spinning = window.setTimeout(function() {
+                if ($el.is('.crm-pager a')) {
+                  page($el.siblings('input[name^=crmPID]').spinner('value'));
+                } else {
+                  changeCount($el.siblings('input.crm-rows-per-page-select').spinner('value'));
+                }
+              }, 200);
             })
             .on('click', 'a.crm-pager-link, #alpha-filter a', function() {
               refresh($(this).attr('href'));
