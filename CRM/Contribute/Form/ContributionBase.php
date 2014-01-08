@@ -230,6 +230,9 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
               $membershipType = new CRM_Member_BAO_MembershipType();
               $membershipType->id = $membership->membership_type_id;
               if ($membershipType->find(TRUE)) {
+                // CRM-14051 - membership_type.relationship_type_id is a CTRL-A padded string w one or more ID values.
+                // Convert to commma separated list.
+                $inheritedRelTypes = implode(CRM_Utils_Array::explodePadded($membershipType->relationship_type_id), ',');
                 $permContacts = CRM_Contact_BAO_Relationship::getPermissionedContacts($this->_userID, $membershipType->relationship_type_id);
                 if (array_key_exists($membership->contact_id, $permContacts)) {
                   $this->_membershipContactID = $membership->contact_id;
