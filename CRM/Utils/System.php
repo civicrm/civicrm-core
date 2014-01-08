@@ -147,11 +147,10 @@ class CRM_Utils_System {
     }
 
     $querystring = array_merge($querystring, array_unique($arrays));
-    $querystring = array_map('htmlentities', $querystring);
 
-    $url = implode('&amp;', $querystring);
+    $url = implode('&', $querystring);
     if ($urlVar) {
-      $url .= (!empty($querystring) ? '&amp;' : '') . $urlVar . '=';
+      $url .= (!empty($querystring) ? '&' : '') . $urlVar . '=';
     }
 
     return $url;
@@ -207,6 +206,9 @@ class CRM_Utils_System {
    *                           RSS feed.
    * @param $fragment string   A fragment identifier (named anchor) to append to the link.
    *
+   * @param bool $htmlize
+   * @param bool $frontend
+   * @param bool $forceBackend
    * @return string            an HTML string containing a link to the given path.
    * @access public
    * @static

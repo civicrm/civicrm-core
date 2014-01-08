@@ -48,10 +48,8 @@
     {* Controller for 'Rows Per Page' *}
     {if $location eq 'bottom' and $pager->_totalItems > 25}
      <div class="form-item float-right">
-           <label>{ts}Rows per page:{/ts}</label> &nbsp;
-           {$pager->_response.twentyfive}&nbsp; | &nbsp;
-           {$pager->_response.fifty}&nbsp; | &nbsp;
-           {$pager->_response.onehundred}&nbsp;
+       <label for="{$form.formName}-rows-per-page-select">{ts}Rows per page:{/ts}</label> &nbsp;
+       <input class="crm-rows-per-page-select" id="{$form.formName}-rows-per-page-select" type="text" size="3" value="{$pager->_perPage}"/>
      </div>
      <div class="clear"></div>
     {/if}
@@ -61,9 +59,12 @@
         {literal}
         cj(function($) {
           {/literal}
-          var $form = $('#{$form.formName}');
-          var numPages = {$pager->_response.numPages};
-          var currentPage = {$pager->_response.currentPage};
+          var
+            $form = $('#{$form.formName}'),
+            numPages = {$pager->_response.numPages},
+            currentPage = {$pager->_response.currentPage},
+            perPageCount = {$pager->_perPage},
+            currentLocation = {$pager->_response.currentLocation|json_encode};
           {literal}
           function refresh(url) {
             var options = url ? {url: url} : {};
@@ -74,24 +75,54 @@
             if (isNaN(num) || num < 1 || num > numPages || num === currentPage) {
               return;
             }
-            var url = $('a.crm-pager-link', $form).attr('href');
-            refresh(url.replace(/crmPID=\d/, 'crmPID=' + num));
+            refresh(currentLocation.replace(/crmPID=\d+/, 'crmPID=' + num));
           }
-          $('input[name^=crmPID]', $form).spinner({
-            min: 1,
-            max: numPages
-          })
+          function changeCount(num) {
+            num = parseInt(num, 10);
+            if (isNaN(num) || num < 1 || num === perPageCount) {
+              return;
+            }
+            refresh(currentLocation.replace(/&crmRowCount=\d+/, '') + '&crmRowCount=' + num);
+          }
+          function preventSubmit(e) {
+            if (e.keyCode == 13) {
+              e.preventDefault();
+              $(this).trigger('change');
+              return false;
+            }
+          }
+          $('input[name^=crmPID]', $form)
+            .spinner({
+              min: 1,
+              max: numPages
+            })
             .on('change', function() {
               page($(this).spinner('value'));
-            });
+              return false;
+            })
+            .on('keyup keydown keypress', preventSubmit);
+          $('input.crm-rows-per-page-select', $form)
+            .spinner({
+              min: 25,
+              step: 25
+            })
+            .on('change', function() {
+              changeCount($(this).spinner('value'));
+              return false;
+            })
+            .on('keyup keydown keypress', preventSubmit);
           $form
             .on('click', 'a.ui-spinner-button', function(e) {
-              page($(this).siblings('input[name^=crmPID]').spinner('value'));
+              if ($(this).is('.crm-pager a')) {
+                page($(this).siblings('input[name^=crmPID]').spinner('value'));
+              } else {
+                changeCount($(this).siblings('input.crm-rows-per-page-select').spinner('value'));
+              }
             })
             .on('click', 'a.crm-pager-link, #alpha-filter a', function() {
-            refresh($(this).attr('href'));
-            return false;
-          });
+              refresh($(this).attr('href'));
+              return false;
+            });
         });
         {/literal}
       </script>
