@@ -2689,6 +2689,7 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
 
       $pager = new CRM_Utils_Pager($params);
       $this->assign_by_ref('pager', $pager);
+      $this->ajaxResponse['totalRows'] = $this->_rowsFound;
     }
   }
 

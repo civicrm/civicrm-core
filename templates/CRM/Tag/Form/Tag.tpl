@@ -73,6 +73,7 @@
       });
       // showing count of tags in summary tab
       CRM.tabHeader && CRM.tabHeader.updateCount('#tab_tag', tags.length);
+      CRM.reloadChangeLogTab && CRM.reloadChangeLogTab();
       // update summary tab
       $("#tags").html(tags.join(', '));
     };

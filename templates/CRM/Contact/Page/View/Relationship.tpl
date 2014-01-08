@@ -26,13 +26,12 @@
 {* Relationship tab within View Contact - browse, and view relationships for a contact *}
 {if !empty($cdType) }
   {include file="CRM/Custom/Form/CustomData.tpl"}
+{elseif $action neq 16} {* add, update or view *}
+  {include file="CRM/Contact/Form/Relationship.tpl"}
 {else}
- <div class="view-content">
-   {if $action eq 1 or $action eq 2 or $action eq 4 or $action eq 8} {* add, update or view *}
-    {include file="CRM/Contact/Form/Relationship.tpl"}
-  {/if}
+<div class="view-content">
 <div class="crm-block crm-content-block">
-  {if $action NEQ 1 AND $action NEQ 2 AND $permission EQ 'edit'}
+  {if $permission EQ 'edit'}
         <div class="action-link">
             <a accesskey="N" href="{crmURL p='civicrm/contact/view/rel' q="cid=`$contactId`&action=add&reset=1"}" class="button"><span><div class="icon add-icon"></div>{ts}Add Relationship{/ts}</span></a>
         </div>
@@ -118,7 +117,6 @@
 {if $currentRelationships or $inactiveRelationships}
   {include file="CRM/common/enableDisableApi.tpl"}
 {else}
-  {if $action NEQ 1} {* show 'no relationships' message - unless already in 'add' mode. *}
        <div class="messages status no-popup">
             <div class="icon inform-icon"></div>
            {capture assign=link}accesskey="N" class="action-item action-item-first" href="{crmURL p='civicrm/contact/view/rel' q="cid=`$contactId`&action=add&reset=1"}"{/capture}
@@ -130,7 +128,6 @@
                     {ts}There are no Relationships entered for this contact.{/ts}
                 {/if}
         </div>
-  {/if}
 {/if}
 </div>
 <div class="spacer"></div>
