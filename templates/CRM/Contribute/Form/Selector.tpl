@@ -86,7 +86,7 @@
       </tr>
   {elseif $context eq 'contribution' }
       <tr class="even-row">
-      <td colspan="8"><a href="{crmURL p='civicrm/contact/view' q="reset=1&force=1&selectedChild=contribute&cid=$contactId"}">&raquo; {ts}View all contributions from this contact{/ts}... </a></td>
+      <td colspan="8"><a href="{crmURL p='civicrm/contribute/search' q="reset=1&force=1&cid=$contactId"}">&raquo; {ts}View all contributions from this contact{/ts}... </a></td>
       </tr>
   {/if}
 {/if}
