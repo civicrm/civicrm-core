@@ -99,7 +99,7 @@ UPDATE `civicrm_option_value`
 SET is_reserved = 1
 WHERE is_reserved = 0 AND option_group_id = @option_group_id_activity_type AND component_id = @caseCompId;
 
--- CRM-13964
+-- CRM-13964 and CRM-13965
 SELECT @option_group_id_cs   := max(id) from civicrm_option_group where name = 'contribution_status';
 SELECT @option_val_id_cs_wt  := MAX(weight) FROM civicrm_option_value WHERE option_group_id = @option_group_id_cs;
 SELECT @option_val_id_cs_val := MAX(value) FROM civicrm_option_value WHERE option_group_id = @option_group_id_cs;
@@ -107,11 +107,26 @@ SELECT @option_val_id_cs_val := MAX(value) FROM civicrm_option_value WHERE optio
 INSERT INTO
    `civicrm_option_value` (`option_group_id`, {localize field='label'}label{/localize}, `value`, `name`, `grouping`, `filter`, `is_default`, `weight`, `is_optgroup`, `is_reserved`, `is_active`, `component_id`, `visibility_id`)
 VALUES
-  (@option_group_id_cs, '{ts escape="sql"}Partially paid{/ts}', @option_val_id_cs_val+1, 'Partially paid', NULL, 0, NULL, @option_val_id_cs_wt+1, 0, 1, 1, NULL, NULL);
+  (@option_group_id_cs, {localize}'{ts escape="sql"}Partially paid{/ts}'{/localize}, @option_val_id_cs_val+1, 'Partially paid', NULL, 0, NULL, @option_val_id_cs_wt+1, 0, 1, 1, NULL, NULL),
+  (@option_group_id_cs, {localize}'{ts escape="sql"}Pending refund{/ts}'{/localize}, @option_val_id_cs_val+2, 'Pending refund', NULL, 0, NULL, @option_val_id_cs_wt+2, 0, 1, 1, NULL, NULL);
+
 
 -- participant status adding
 SELECT @participant_status_wt  := max(id) from civicrm_participant_status_type;
 
-INSERT INTO civicrm_participant_status_type (id, name,  {localize field='label'}label{/localize}, class, is_reserved, is_active, is_counted, weight, visibility_id)
+INSERT INTO civicrm_participant_status_type (name,  {localize field='label'}label{/localize}, class, is_reserved, is_active, is_counted, weight, visibility_id)
 VALUES
-  (1,  'Partially paid', '{ts escape="sql"}Partially paid{/ts}', 'Positive', 1, 1, 1, @participant_status_wt+1, 2);
+  ('Partially paid', {localize}'{ts escape="sql"}Partially paid{/ts}'{/localize}, 'Positive', 1, 1, 1, @participant_status_wt+1, 2),
+  ('Pending refund', {localize}'{ts escape="sql"}Pending refund{/ts}'{/localize}, 'Positive', 1, 1, 1, @participant_status_wt+2, 2);
+
+-- new activity types required for partial payments
+SELECT @option_group_id_act     := max(id) from civicrm_option_group where name = 'activity_type';
+SELECT @option_group_id_act_wt  := MAX(weight) FROM civicrm_option_value WHERE option_group_id = @option_group_id_act;
+SELECT @option_group_id_act_val := MAX(value) FROM civicrm_option_value WHERE option_group_id = @option_group_id_act;
+SELECT @contributeCompId := max(id) FROM civicrm_component where name = 'CiviContribute';
+
+INSERT INTO
+   `civicrm_option_value` (`option_group_id`, {localize field='label'}`label`{/localize}, `value`, `name`, `grouping`, `filter`, `is_default`, `weight`, {localize field='description'}`description`{/localize}, `is_optgroup`, `is_reserved`, `is_active`, `component_id`, `visibility_id`)
+VALUES
+   (@option_group_id_act, {localize}'{ts escape="sql"}Payment{/ts}'{/localize}, @option_group_id_act_val+1, 'Payment', NULL, 1, NULL, @option_group_id_act_wt+1, {localize}'{ts escape="sql"}Additional payment recorded for event or membership fee.{/ts}'{/localize}, 0, 1, 1, @contributeCompId, NULL),
+   (@option_group_id_act, {localize}'{ts escape="sql"}Refund{/ts}'{/localize}, @option_group_id_act_val+2, 'Refund', NULL, 1, NULL, @option_group_id_act_wt+2, {localize}'{ts escape="sql"}Refund recorded for event or membership fee.{/ts}'{/localize}, 0, 1, 1, @contributeCompId, NULL);

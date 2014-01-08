@@ -389,5 +389,62 @@ WHERE ceft.entity_id = %1";
     $trxnIDS['id'] = $trxn->id;
     $financialItem = CRM_Financial_BAO_FinancialItem::create($fItemParams, NULL, $trxnIDS);
   }
-}
 
+  /*
+   * function to get partial payment amount and type of it
+   * return @array : payment type => amount
+   * payment type  : 'amount_owed' or 'refund_due'
+   */
+  static function getPartialPaymentWithType($entityId, $entityName = 'pariticpant') {
+    $value = NULL;
+    if (empty($entityName)) {
+      return $value;
+    }
+
+    if ($entityName == 'participant') {
+      $partialPaymentStatusId = CRM_Core_OptionGroup::getValue('contribution_status', 'Partially paid', 'name');
+      $sql = "SELECT pp.contribution_id, con.financial_type_id FROM civicrm_participant_payment pp
+INNER JOIN civicrm_contribution con ON con.id = pp.contribution_id
+WHERE pp.participant_id = %1 AND con.contribution_status_id = %2
+";
+      $qParams[1] = array($entityId, 'Integer');
+      $qParams[2] = array($partialPaymentStatusId, 'Integer');
+      $dao = CRM_Core_DAO::executeQuery($sql, $qParams);
+      if ($dao->fetch()) {
+        $contributionId  = $dao->contribution_id;
+        $financialTypeId = $dao->financial_type_id;
+      }
+
+      if ($contributionId && $financialTypeId) {
+        $statusId = CRM_Core_OptionGroup::getValue('contribution_status', 'Completed', 'name');
+        $relationTypeId = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Accounts Receivable Account is' "));
+        $toFinancialAccount = CRM_Contribute_PseudoConstant::financialAccountType($financialTypeId, $relationTypeId);
+
+        $sqlLineItemTotal = "SELECT SUM(li.line_total)
+FROM civicrm_line_item li
+INNER JOIN civicrm_participant_payment pp ON ( li.entity_id = pp.participant_id
+AND li.entity_table = 'civicrm_participant'
+AND li.entity_id = {$entityId})";
+        $lineItemTotal = CRM_Core_DAO::singleValueQuery($sqlLineItemTotal);
+
+        $sqlFtTotalAmt = "SELECT SUM(ft.total_amount)
+FROM civicrm_financial_trxn ft
+LEFT JOIN civicrm_entity_financial_trxn eft ON (ft.id = eft.financial_trxn_id AND eft.entity_table = 'civicrm_contribution')
+LEFT JOIN civicrm_contribution c ON (eft.entity_id = c.id)
+LEFT JOIN civicrm_participant_payment pp ON (pp.contribution_id = c.id)
+WHERE pp.participant_id = {$entityId} AND ft.to_financial_account_id != {$toFinancialAccount} AND ft.status_id = {$statusId}
+";
+        $ftTotalAmt = CRM_Core_DAO::singleValueQuery($sqlFtTotalAmt);
+
+        $paymentVal = $lineItemTotal - $ftTotalAmt;
+        if ($paymentVal < 0) {
+          $value['refund_due']  = $paymentVal;
+        }
+        elseif ($paymentVal > 0) {
+          $value['amount_owed'] = $paymentVal;
+        }
+      }
+    }
+    return $value;
+  }
+}
