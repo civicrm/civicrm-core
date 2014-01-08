@@ -37,7 +37,7 @@
 {/if}
     {if $rows}
         <div class="report-pager">
-            {include file="CRM/common/pager.tpl" location="top" noForm=0}
+            {include file="CRM/common/pager.tpl" location="top"}
         </div>
 
         {* pre-compile section header here, rather than doing it every time under foreach *}
@@ -173,7 +173,7 @@
         {/foreach}
 
   <div class="report-pager">
-            {include file="CRM/common/pager.tpl" noForm=0}
+            {include file="CRM/common/pager.tpl"}
         </div>
         <br />
         {if $grandStat}

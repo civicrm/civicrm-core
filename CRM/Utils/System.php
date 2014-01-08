@@ -126,8 +126,14 @@ class CRM_Utils_System {
       $qs['force'] = 1;
     }
 
-    unset($qs['snippet']);
-    unset($qs['section']);
+    // Ok this is a big assumption but usually works
+    // If we are in snippet mode, retain the 'section' param, if not, get rid of it.
+    if (!empty($qs['snippet'])) {
+      unset($qs['snippet']);
+    }
+    else {
+      unset($qs['section']);
+    }
 
     if ($skipUFVar) {
       $config = CRM_Core_Config::singleton();

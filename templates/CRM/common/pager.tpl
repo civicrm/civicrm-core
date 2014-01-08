@@ -26,15 +26,14 @@
 {if $pager and $pager->_response}
     {if $pager->_response.numPages > 1}
         <div class="crm-pager">
-          {if empty($noForm)}
             <span class="element-right">
             {if $location eq 'top'}
-              {$pager->_response.titleTop}&nbsp;<input class="form-submit" name="{$pager->_response.buttonTop}" value="{ts}Go{/ts}" type="submit"/>
+              {$pager->_response.titleTop}
             {else}
-              {$pager->_response.titleBottom}&nbsp;<input class="form-submit" name="{$pager->_response.buttonBottom}" value="{ts}Go{/ts}" type="submit"/>
+              {$pager->_response.titleBottom}
             {/if}
             </span>
-          {/if}
+          </span>
           <span class="crm-pager-nav">
           {$pager->_response.first}&nbsp;
           {$pager->_response.back}&nbsp;
@@ -44,14 +43,6 @@
           </span>
 
         </div>
-      {if empty($noForm) and $location neq 'top'}
-      <script type="text/javascript">
-        cj('input[name^=crmPID]', '#{$form.formName}').spinner({ldelim}
-          min: 1,
-          max: {$pager->_response.numPages}
-        {rdelim});
-      </script>
-      {/if}
     {/if}
 
     {* Controller for 'Rows Per Page' *}
@@ -63,6 +54,47 @@
            {$pager->_response.onehundred}&nbsp;
      </div>
      <div class="clear"></div>
+    {/if}
+
+    {if $location neq 'top'}
+      <script type="text/javascript">
+        {literal}
+        cj(function($) {
+          {/literal}
+          var $form = $('#{$form.formName}');
+          var numPages = {$pager->_response.numPages};
+          var currentPage = {$pager->_response.currentPage};
+          {literal}
+          function refresh(url) {
+            var options = url ? {url: url} : {};
+            $form.closest('.crm-ajax-container, #crm-main-content-wrapper').crmSnippet(options).crmSnippet('refresh');
+          }
+          function page(num) {
+            num = parseInt(num, 10);
+            if (isNaN(num) || num < 1 || num > numPages || num === currentPage) {
+              return;
+            }
+            var url = $('a.crm-pager-link', $form).attr('href');
+            refresh(url.replace(/crmPID=\d/, 'crmPID=' + num));
+          }
+          $('input[name^=crmPID]', $form).spinner({
+            min: 1,
+            max: numPages
+          })
+            .on('change', function() {
+              page($(this).spinner('value'));
+            });
+          $form
+            .on('click', 'a.ui-spinner-button', function(e) {
+              page($(this).siblings('input[name^=crmPID]').spinner('value'));
+            })
+            .on('click', 'a.crm-pager-link, #alpha-filter a', function() {
+            refresh($(this).attr('href'));
+            return false;
+          });
+        });
+        {/literal}
+      </script>
     {/if}
 
 {/if}
