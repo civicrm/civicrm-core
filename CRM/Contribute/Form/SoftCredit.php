@@ -94,8 +94,7 @@ class CRM_Contribute_Form_SoftCredit {
     // Tell tpl to hide soft credit field if contribution is linked directly to a PCP Page
     if (CRM_Utils_Array::value('pcp_made_through_id', $form->_values)) {
       $form->assign('pcpLinked', 1);
-    }
-    
+    }    
   }
 
   /**
