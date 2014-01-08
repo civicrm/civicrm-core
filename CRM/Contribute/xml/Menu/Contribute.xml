@@ -122,6 +122,15 @@
     <weight>580</weight>
   </item>
   <item>
+    <path>civicrm/payment/add</path>
+    <title>New Payment</title>
+    <page_callback>CRM_Contribute_Form_AdditionalPayment</page_callback>
+    <path_arguments>action=add</path_arguments>
+    <access_arguments>access CiviContribute</access_arguments>
+    <page_type>1</page_type>
+    <component>CiviContribute</component>
+  </item>
+  <item>
     <path>civicrm/admin/financial/financialAccount</path>
     <title>Financial Accounts</title>
     <page_callback>CRM_Financial_Page_FinancialAccount</page_callback>
