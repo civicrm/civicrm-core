@@ -56,14 +56,14 @@
 {else}
 <ul>
 {foreach from=$activityTypes key=k item=link}
-<li class="crm-activity-type_{$k}"><a href="{$urls.$k}">{$link}</a></li>
+<li class="crm-activity-type_{$k}"><a href="{$urls.$k}" data-tab="activity">{$link}</a></li>
 {/foreach}
 
 {* add hook links if any *}
 {if $hookLinks}
    {foreach from=$hookLinks item=link}
     <li>
-        <a href="{$link.url}"{if $link.title} title="{$link.title}"{/if}>
+        <a href="{$link.url}" data-tab="activity"{if !empty($link.title)} title="{$link.title}"{/if}>
           {if $link.img}
                 <img src="{$link.img}" alt="{$link.title}" />&nbsp;
           {/if}

@@ -70,9 +70,9 @@
         <div class="crm-contact_actions-list">
         <ul class="contact-actions">
           {foreach from=$actionsMenuList.moreActions item='row'}
-          {if $row.href}
+          {if !empty($row.href) or !empty($row.tab)}
           <li class="crm-action-{$row.ref}">
-            <a href="{$row.href}&cid={$contactId}" title="{$row.title}" data-tab="{$row.key}">{$row.title}</a>
+            <a href="{if !empty($row.href)}{$row.href}&cid={$contactId}{else}#{/if}" title="{$row.title}" data-tab="{$row.tab}">{$row.title}</a>
           </li>
           {/if}
         {/foreach}

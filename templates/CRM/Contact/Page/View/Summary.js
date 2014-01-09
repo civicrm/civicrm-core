@@ -93,7 +93,7 @@
         CRM.tabHeader.updateCount('#tab_log', response.changeLog.count);
       }
       $("#crm-record-log").replaceWith(response.changeLog.markup);
-      // Refresh tab contents - Simple
+      // Refresh tab contents - Simple logging
       if (!CRM.reloadChangeLogTab && $('#changeLog').closest('.ui-tabs-panel').data('civiCrmSnippet')) {
         $('#changeLog').closest('.ui-tabs-panel').crmSnippet('destroy');
       }
@@ -292,16 +292,22 @@
       })
       // Handle action links in popup
       .on('click', '.crm-contact_actions-list a, .crm-contact_activities-list a', function() {
-        var tabName = $(this).data('tab') || 'activity';
+        var tabName = $(this).data('tab') || 'summary';
         var $tab = $('#tab_' + tabName);
         var $panel = $('#' + $tab.attr('aria-controls'));
-        CRM.loadForm($(this).attr('href'))
-          .on('crmFormSuccess', function() {
-            if ($panel.data('civiCrmSnippet')) {
-              $panel.crmSnippet('refresh');
-            }
-            $('#mainTabContainer').tabs('option', 'active', $tab.prevAll().length);
-          });
+        var url = $(this).attr('href');
+        if (url !== '#') {
+          CRM.loadForm(url)
+            .on('crmFormSuccess', function() {
+              if ($panel.data('civiCrmSnippet')) {
+                $panel.crmSnippet('refresh');
+              }
+              $('#mainTabContainer').tabs('option', 'active', $tab.prevAll().length);
+            });
+        } else {
+          $('#mainTabContainer').tabs('option', 'active', $tab.prevAll().length);
+        }
+        $('#crm-contact-actions-list').hide();
         return false;
       });
     $(document)
@@ -313,6 +319,7 @@
         }
         $('#crm-contact-actions-list').hide();
       })
+      // Reload changelog whenever an inline or popup form submits
       .on('crmFormSuccess', function(e) {
         CRM.reloadChangeLogTab && CRM.reloadChangeLogTab();
       });
