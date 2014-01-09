@@ -389,7 +389,9 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
         array_keys($group->parents)
       ) . CRM_Core_DAO::VALUE_SEPARATOR;
     }
-    if (!CRM_Utils_Array::value('id', $params)) {
+    if (!CRM_Utils_Array::value('id', $params) &&
+      !CRM_Utils_Array::value('name', $params)
+    ) {
       $group->name .= "_tmp";
     }
     $group->save();
@@ -398,7 +400,9 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
       return NULL;
     }
 
-    if (!CRM_Utils_Array::value('id', $params)) {
+    if (!CRM_Utils_Array::value('id', $params) &&
+      !CRM_Utils_Array::value('name', $params)
+    ) {
       $group->name = substr($group->name, 0, -4) . "_{$group->id}";
     }
 
