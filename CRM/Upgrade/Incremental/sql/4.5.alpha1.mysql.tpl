@@ -111,7 +111,7 @@ VALUES
 SELECT @option_group_id_msg_mode := max(id) from civicrm_option_group where name = 'msg_mode';
 
 INSERT INTO
-civicrm_option_value (option_group_id, label, value, name, is_default, weight, is_reserved, is_active)
+civicrm_option_value (option_group_id, {localize field='label'}`label`{/localize}, value, name, is_default, weight, is_reserved, is_active)
 VALUES
 (@option_group_id_msg_mode, {localize}'{ts escape="sql"}Email{/ts}'{/localize}, 'Email', 'Email', 1, 1, 1, 1),
 (@option_group_id_msg_mode, {localize}'{ts escape="sql"}SMS{/ts}'{/localize},'SMS', 'SMS', 0, 2, 1, 1),
