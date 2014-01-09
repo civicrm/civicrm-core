@@ -131,7 +131,7 @@
       <td>{$form.sms_provider_id.html}</td>
     </tr>
   </table>
-  <fieldset id="compose_id"><legend>{ts}Email{/ts}</legend>
+  <fieldset id="compose_id"><legend>{$title}</legend>
      <table id="email-field-table" class="form-layout-compressed">
         <tr class="crm-scheduleReminder-form-block-active">
            <td class="label"></td>
