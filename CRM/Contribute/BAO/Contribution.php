@@ -3032,8 +3032,12 @@ WHERE  contribution_id = %1 ";
     // criteria for updates contribution total_amount == financial_trxns of partial_payments
     $sql = "SELECT SUM(ft.total_amount) as sum_of_payments
 FROM civicrm_financial_trxn ft
-LEFT JOIN civicrm_entity_financial_trxn eft ON (ft.id = eft.financial_trxn_id)
-WHERE eft.entity_table = 'civicrm_contribution' AND eft.entity_id = {$contributionId} AND ft.to_financial_account_id != {$toFinancialAccount} AND ft.status_id = {$statusId}
+LEFT JOIN civicrm_entity_financial_trxn eft
+  ON (ft.id = eft.financial_trxn_id)
+WHERE eft.entity_table = 'civicrm_contribution'
+  AND eft.entity_id = {$contributionId}
+  AND ft.to_financial_account_id != {$toFinancialAccount}
+  AND ft.status_id = {$statusId}
 ";
     $sumOfPayments = CRM_Core_DAO::singleValueQuery($sql);
     if ($contributionDAO->total_amount == $sumOfPayments) {
@@ -3052,17 +3056,18 @@ WHERE eft.entity_table = 'civicrm_contribution' AND eft.entity_id = {$contributi
         CRM_Event_BAO_Participant::add($participantUpdate);
       }
 
-      /*      // update financial item statuses */
-      /*       $financialItemStatus = CRM_Core_PseudoConstant::get('CRM_Financial_DAO_FinancialItem', 'status_id'); */
-      /*       $paidStatus = array_search('Paid', $financialItemStatus); */
-      /*       $sqlFinancialItemUpdate = " */
-      /* UPDATE fi */
-      /* SET status_id = {$paidStatus} */
-      /* FROM civicrm_financial_item fi */
-      /* LEFT JOIN civicrm_entity_financial_trxn eft ON (eft.entity_id = fi.id AND eft.entity_table = 'civicrm_financial_item') */
-      /* WHERE eft.financial_trxn_id = {$trxnId} */
-      /* "; */
-      /*       CRM_Core_DAO::executeQuery($sqlFinancialItemUpdate); */
+      // update financial item statuses
+      $financialItemStatus = CRM_Core_PseudoConstant::get('CRM_Financial_DAO_FinancialItem', 'status_id');
+      $paidStatus = array_search('Paid', $financialItemStatus);
+
+      $sqlFinancialItemUpdate = "
+UPDATE civicrm_financial_item fi
+  LEFT JOIN civicrm_entity_financial_trxn eft
+    ON (eft.entity_id = fi.id AND eft.entity_table = 'civicrm_financial_item')
+SET status_id = {$paidStatus}
+WHERE eft.financial_trxn_id = {$trxnId}
+";
+      CRM_Core_DAO::executeQuery($sqlFinancialItemUpdate);
     }
   }
 }
