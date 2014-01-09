@@ -84,9 +84,7 @@ class CRM_Case_Page_AJAX {
       $tagIds = explode(',', $tags);
     }
 
-    $skipEntityDelete = FALSE;
     if (!empty($tagIds)) {
-      $skipEntityDelete = TRUE;
       $params = array(
         'entity_id' => $caseId,
         'entity_table' => 'civicrm_case',
@@ -103,7 +101,7 @@ class CRM_Case_Page_AJAX {
     }
 
     if (!empty($tagList)) {
-      CRM_Core_Form_Tag::postProcess($tagList, $caseId, 'civicrm_case', CRM_Core_DAO::$_nullObject, $skipEntityDelete);
+      CRM_Core_Form_Tag::postProcess($tagList, $caseId, 'civicrm_case', CRM_Core_DAO::$_nullObject);
     }
 
     $session = CRM_Core_Session::singleton();

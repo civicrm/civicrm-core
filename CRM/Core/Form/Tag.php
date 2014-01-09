@@ -238,13 +238,12 @@ class CRM_Core_Form_Tag {
    * @param int     $entityId    entity id, eg: contact id, activity id, case id, file id
    * @param string  $entityTable entity table
    * @param object  $form        form object
-   * @param boolean $skipDelete  TRUE if you need to skip delete action in tag entity table
    *
    * @return void
    * @access public
    * @static
    */
-  static function postProcess(&$params, $entityId, $entityTable = 'civicrm_contact', &$form, $skipDelete = FALSE) {
+  static function postProcess(&$params, $entityId, $entityTable = 'civicrm_contact', &$form) {
     if ($form && !empty($form->_entityTagValues)) {
       $existingTags = $form->_entityTagValues;
     }
