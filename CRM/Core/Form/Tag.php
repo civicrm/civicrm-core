@@ -252,14 +252,15 @@ class CRM_Core_Form_Tag {
       $existingTags = CRM_Core_BAO_EntityTag::getTag($entityId, $entityTable);
     }
 
-    $allTagIds = array();
     foreach ($params as $parentId => $value) {
       if (!$value || empty($value)) {
         continue;
       }
 
+      $newTagIds = array();
+      $realTagIds = array();
+
       $tagsIDs      = explode(',', $value);
-      $insertValues = array();
       $insertSQL    = NULL;
       if (!empty($tagsIDs)) {
         foreach ($tagsIDs as $tagId) {
@@ -278,36 +279,37 @@ class CRM_Core_Form_Tag {
             }
           }
 
-          $allTagIds[] = $tagId;
+          $realTagIds[] = $tagId;
           if ($form && $form->_action != CRM_Core_Action::UPDATE) {
-            $insertValues[] = "( {$tagId}, {$entityId}, '{$entityTable}' ) ";
+            $newTagIds[] = $tagId;
           }
           elseif (!array_key_exists($tagId, $existingTags)) {
-            $insertValues[] = "( {$tagId}, {$entityId}, '{$entityTable}' ) ";
+            $newTagIds[] = $tagId;
           }
         }
 
-        if (!empty($insertValues)) {
+        // Any existing entity tags from this tagset missing from the $params should be deleted
+        $deleteSQL = "DELETE FROM civicrm_entity_tag
+                    USING civicrm_entity_tag, civicrm_tag
+                    WHERE civicrm_tag.id=civicrm_entity_tag.tag_id
+                      AND civicrm_entity_tag.entity_table='{$entityTable}'
+                      AND entity_id={$entityId} AND parent_id={$parentId}";
+        if (!empty($realTagIds)) {
+          $deleteSQL .= " AND tag_id NOT IN (".implode(', ', $realTagIds).");";
+        }
+        CRM_Core_DAO::executeQuery($deleteSQL);
+
+        if (!empty($newTagIds)) {
+          // New tag ids can be inserted directly into the db table.
+          $insertValues = array();
+          foreach ($newTagIds as $tagId) {
+            $insertValues[] = "( {$tagId}, {$entityId}, '{$entityTable}' ) ";
+          }
           $insertSQL = 'INSERT INTO civicrm_entity_tag ( tag_id, entity_id, entity_table )
           VALUES ' . implode(', ', $insertValues) . ';';
           CRM_Core_DAO::executeQuery($insertSQL);
         }
       }
-    }
-
-    // delete tags that are missing from civicrm_entity_tag table
-    if (!$skipDelete) {
-      $inClause = '';
-      if (!empty($allTagIds)) {
-        $validTagIds = implode(',', $allTagIds);
-        $inClause = " AND civicrm_entity_tag.tag_id NOT IN ({$validTagIds})";
-      }
-
-      $deleteSQL = "
-DELETE FROM civicrm_entity_tag USING civicrm_entity_tag, civicrm_tag ct1, civicrm_tag ct2
-WHERE civicrm_entity_tag.tag_id = ct1.id AND ct1.parent_id IS NOT NULL AND civicrm_entity_tag.entity_id={$entityId}
-AND civicrm_entity_tag.entity_table='{$entityTable}' AND ct1.parent_id = ct2.id AND ct2.is_tagset=1 {$inClause}";
-      CRM_Core_DAO::executeQuery($deleteSQL);
     }
   }
 }
