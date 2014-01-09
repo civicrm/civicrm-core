@@ -963,6 +963,13 @@ CRM.validate = CRM.validate || {
         }
       }
     };
+    // Hack to make delete dialogs smaller
+    if (url.indexOf('/delete') > 0 || url.indexOf('action=delete') > 0) {
+      settings.dialog = {
+        width: 400,
+        height: 300
+      };
+    }
     // Move options that belong to crmForm. Others will be passed through to crmSnippet
     options && $.each(options, function(key, value) {
       if (typeof(settings.crmForm[key]) !== 'undefined') {
@@ -1019,9 +1026,9 @@ CRM.validate = CRM.validate || {
         },
         beforeSerialize: function(form, options) {
           if (window.CKEDITOR && window.CKEDITOR.instances) {
-            for (var instance in CKEDITOR.instances) {
-              CKEDITOR.instances[instance].updateElement();
-            }
+            $.each(CKEDITOR.instances, function() {
+              this.updateElement && this.updateElement();
+            });
           }
         },
         beforeSubmit: function(submission) {

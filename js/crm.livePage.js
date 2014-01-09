@@ -7,11 +7,12 @@ cj(function($) {
     // Open action links in a popup
     .off('click.crmLivePage')
     .on('click.crmLivePage', 'a.button, a.action-item', function() {
+      var url = $(this).attr('href');
       // only follow real links not javascript buttons
-      if ($(this).attr('href') === '#' || $(this).attr('onclick') || $(this).hasClass('no-popup')) {
+      if (url === '#' || $(this).attr('onclick') || $(this).hasClass('no-popup')) {
         return;
       }
-      CRM.loadForm($(this).attr('href'), {
+      CRM.loadForm(url, {
         openInline: 'a:not("[href=#], .no-popup")'
       }).on('crmFormSuccess', function(e, data) {
         // Refresh page when form completes
