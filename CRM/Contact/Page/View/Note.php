@@ -301,7 +301,6 @@ class CRM_Contact_Page_View_Note extends CRM_Core_Page {
    */
   static function &commentLinks() {
     if (!(self::$_commentLinks)) {
-      $deleteExtra = ts('Are you sure you want to delete this comment?');
       self::$_commentLinks = array(
         CRM_Core_Action::VIEW => array(
           'name' => ts('View'),
@@ -319,7 +318,6 @@ class CRM_Contact_Page_View_Note extends CRM_Core_Page {
           'name' => ts('Delete'),
           'url' => 'civicrm/contact/view/note',
           'qs' => 'action=delete&reset=1&cid=%%cid%%&id={id}&selectedChild=note',
-          'extra' => 'onclick = "if (confirm(\'' . $deleteExtra . '\') ) this.href+=\'&amp;confirmed=1\'; else return false;"',
           'title' => ts('Delete Comment'),
         ),
       );

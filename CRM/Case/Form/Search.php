@@ -253,7 +253,7 @@ class CRM_Case_Form_Search extends CRM_Core_Form {
      */
     $rows = $this->get('rows');
     if (is_array($rows)) {
-
+      CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'js/crm.livePage.js');
       if (!$this->_single) {
         $this->addElement('checkbox',
           'toggleSelect',

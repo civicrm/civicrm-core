@@ -71,11 +71,10 @@
       $('.tag-section .token-input-token-facebook p, #tagtree input:checkbox:checked+label').each(function() {
         tags.push($(this).text());
       });
-      // showing count of tags in summary tab
-      CRM.tabHeader && CRM.tabHeader.updateCount('#tab_tag', tags.length);
-      CRM.reloadChangeLogTab && CRM.reloadChangeLogTab();
+      // contact summary tabs and search forms both listen for this event
+      $('#Tag').closest('.crm-ajax-container').trigger('crmFormSuccess', {tabCount: tags.length});
       // update summary tab
-      $("#tags").html(tags.join(', '));
+      $("#contact-summary #tags").html(tags.join(', '));
     };
   })(cj);
   {/literal}

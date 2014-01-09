@@ -122,9 +122,6 @@ class CRM_Contact_Form_Search_Basic extends CRM_Contact_Form_Search {
     if ($this->_context === 'amtg') {
       $defaults['task'] = CRM_Contact_Task::GROUP_CONTACTS;
     }
-    else {
-      $defaults['task'] = CRM_Contact_Task::PRINT_CONTACTS;
-    }
 
     if ($this->_context === 'smog') {
       $defaults['group_contact_status[Added]'] = TRUE;
