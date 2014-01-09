@@ -156,7 +156,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
  * @return multitype:string |multitype:multitype:string
  */
   public static function toBeSkipped_automock($sequential = FALSE) {
-    $entitiesWithoutGet = array('MailingContact', 'EntityTag', 'Participant', 'ParticipantPayment', 'Setting', 'SurveyRespondant', 'MailingRecipients',  'CustomSearch', 'Extension', 'ReportTemplate', 'System');
+    $entitiesWithoutGet = array('MailingContact', 'EntityTag', 'Participant', 'ParticipantPayment', 'Setting', 'SurveyRespondant', 'MailingRecipients',  'CustomSearch', 'Extension', 'ReportTemplate', 'System', 'DashboardContact');
     if ($sequential === TRUE) {
       return $entitiesWithoutGet;
     }
@@ -235,6 +235,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       'MailSettings',
       'Setting',
       'MailingContact',
+      'DashboardContact',
     );
     if ($sequential === TRUE) {
       return $entitiesWithout;
