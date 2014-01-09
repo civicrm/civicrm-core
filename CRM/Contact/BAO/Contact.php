@@ -2763,7 +2763,6 @@ AND       civicrm_openid.is_primary = 1";
         'weight' => 35,
         'ref' => 'new-activity',
         'key' => 'activity',
-        'tab' => 'activity',
         'permissions' => array('edit all contacts'),
       ),
       'pledge' => array(

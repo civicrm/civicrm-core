@@ -230,10 +230,6 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
     }
     $this->assign('contactId', $this->_currentlyViewedContactId);
 
-    if ($this->_currentlyViewedContactId) {
-      CRM_Contact_Page_View::setTitle($this->_currentlyViewedContactId);
-    }
-
     //give the context.
     if (!isset($this->_context)) {
       $this->_context = CRM_Utils_Request::retrieve('context', 'String', $this);
@@ -305,10 +301,22 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
       }
     }
 
-    // Assign pageTitle to be "Activity - "+ activity name
+    // Set title
     if (isset($activityTName)) {
-      $pageTitle = 'Activity - ' . CRM_Utils_Array::value($this->_activityTypeId, $activityTName);
-      $this->assign('pageTitle', $pageTitle);
+      $activityName = CRM_Utils_Array::value($this->_activityTypeId, $activityTName);
+      $this->assign('pageTitle', ts('%1 Activity', $activityName));
+
+      if ($this->_currentlyViewedContactId) {
+        $displayName = CRM_Contact_BAO_Contact::displayName($this->_currentlyViewedContactId);
+        // Check if this is default domain contact CRM-10482
+        if (CRM_Contact_BAO_Contact::checkDomainContact($this->_currentlyViewedContactId)) {
+          $displayName .= ' (' . ts('default organization') . ')';
+        }
+        CRM_Utils_System::setTitle($displayName . ' - ' . $activityName);
+      }
+      else {
+        CRM_Utils_System::setTitle(ts('%1 Activity', $activityName));
+      }
     }
 
     //check the mode when this form is called either single or as
