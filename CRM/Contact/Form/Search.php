@@ -562,14 +562,6 @@ class CRM_Contact_Form_Search extends CRM_Core_Form {
       )
     );
 
-    $this->add('submit', $this->_printButtonName, ts('Print'),
-      array(
-        'class' => 'form-submit',
-        'id' => 'Print',
-        'onclick' => "return checkPerformAction('mark_x', '" . $this->getName() . "', 1, 1);",
-      )
-    );
-
     $this->setDefaultAction('refresh');
   }
 

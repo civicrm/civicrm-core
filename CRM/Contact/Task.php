@@ -291,9 +291,8 @@ class CRM_Contact_Task {
       $titles[$id] = $value['title'];
     }
 
-    // hack unset update saved search and print contacts
+    // hack unset update saved search
     unset($titles[self::SAVE_SEARCH_UPDATE]);
-    unset($titles[self::PRINT_CONTACTS]);
 
     if (!CRM_Utils_Mail::validOutBoundMail()) {
       unset($titles[self::EMAIL_CONTACTS]);
