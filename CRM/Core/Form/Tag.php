@@ -304,9 +304,9 @@ class CRM_Core_Form_Tag {
       }
 
       $deleteSQL = "
-DELETE FROM civicrm_entity_tag USING civicrm_entity_tag, civicrm_tag
-WHERE civicrm_entity_tag.tag_id = civicrm_tag.id AND civicrm_tag.parent_id IS NOT NULL
-AND civicrm_entity_tag.entity_id={$entityId} AND civicrm_entity_tag.entity_table='{$entityTable}' {$inClause}";
+DELETE FROM civicrm_entity_tag USING civicrm_entity_tag, civicrm_tag ct1, civicrm_tag ct2
+WHERE civicrm_entity_tag.tag_id = ct1.id AND ct1.parent_id IS NOT NULL AND civicrm_entity_tag.entity_id={$entityId}
+AND civicrm_entity_tag.entity_table='{$entityTable}' AND ct1.parent_id = ct2.id AND ct2.is_tagset=1 {$inClause}";
       CRM_Core_DAO::executeQuery($deleteSQL);
     }
   }
