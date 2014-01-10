@@ -240,7 +240,7 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
     $this->add('select', 'from_email_address', ts('Receipt From'), $this->_fromEmails);
 
     // add various dates
-    $this->addDateTime('receive_date', ts('Received'), FALSE, array('formatType' => 'activityDateTime'));
+    $this->addDateTime('trxn_date', ts('Received'), FALSE, array('formatType' => 'activityDateTime'));
 
     if ($this->_contactId && $this->_id) {
       if ($this->_component == 'event') {
@@ -313,22 +313,214 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
     if ($this->_component == 'event') {
       $participantId = $this->_id;
     }
+    $submittedValues = $this->controller->exportValues($this->_name);
+
     if ($this->_mode) {
       // process credit card
+      $this->processCreditCard($submittedValues);
     }
     else {
-      $submittedValues = $this->controller->exportValues($this->_name);
       $result = CRM_Contribute_BAO_Contribution::recordAdditionPayment($this->_contributionId, $submittedValues, $this->_paymentType, $participantId);
 
       // email sending
       if (!empty($result) && CRM_Utils_Array::value('is_email_receipt', $submittedValues)) {
-        $submittedValues['contact_id'] = $this->_contactID;
+        $submittedValues['contact_id'] = $this->_contactId;
         $submittedValues['contribution_id'] = $this->_contributionId;
 
         // to get 'from email id' for send receipt
         $this->fromEmailId = $submittedValues['from_email_address'];
         $sendReceipt = self::emailReceipt($this, $submittedValues);
       }
+    }
+  }
+
+  public function processCreditCard($submittedValues) {
+    $config = CRM_Core_Config::singleton();
+    $session = CRM_Core_Session::singleton();
+
+    $unsetParams = array(
+      'trxn_id',
+      'payment_instrument_id',
+      'contribution_status_id',
+    );
+    foreach ($unsetParams as $key) {
+      if (isset($submittedValues[$key])) {
+        unset($submittedValues[$key]);
+      }
+    }
+
+    //Get the rquire fields value only.
+    $params = $this->_params = $submittedValues;
+
+    $this->_paymentProcessor = CRM_Financial_BAO_PaymentProcessor::getPayment($this->_params['payment_processor_id'],
+      $this->_mode
+    );
+
+    //get the payment processor id as per mode.
+    $this->_params['payment_processor'] = $params['payment_processor_id'] =
+      $this->_params['payment_processor_id'] = $submittedValues['payment_processor_id'] = $this->_paymentProcessor['id'];
+
+    $now = date('YmdHis');
+    $fields = array();
+
+    // we need to retrieve email address
+    if ($this->_context == 'standalone' && CRM_Utils_Array::value('is_email_receipt', $submittedValues)) {
+      list($this->userDisplayName,
+        $this->userEmail
+      ) = CRM_Contact_BAO_Contact_Location::getEmailDetails($this->_contactId);
+      $this->assign('displayName', $this->userDisplayName);
+    }
+
+    //set email for primary location.
+    $fields['email-Primary'] = 1;
+    $params['email-Primary'] = $this->_contributorEmail;
+
+    // now set the values for the billing location.
+    foreach ($this->_fields as $name => $dontCare) {
+      $fields[$name] = 1;
+    }
+
+    // also add location name to the array
+    $params["address_name-{$this->_bltID}"] = CRM_Utils_Array::value('billing_first_name', $params) . ' ' . CRM_Utils_Array::value('billing_middle_name', $params) . ' ' . CRM_Utils_Array::value('billing_last_name', $params);
+    $params["address_name-{$this->_bltID}"] = trim($params["address_name-{$this->_bltID}"]);
+    $fields["address_name-{$this->_bltID}"] = 1;
+
+    $ctype = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact',
+      $this->_contactId,
+      'contact_type'
+    );
+
+    $nameFields = array('first_name', 'middle_name', 'last_name');
+    foreach ($nameFields as $name) {
+      $fields[$name] = 1;
+      if (array_key_exists("billing_$name", $params)) {
+        $params[$name] = $params["billing_{$name}"];
+        $params['preserveDBName'] = TRUE;
+      }
+    }
+
+    if (CRM_Utils_Array::value('source', $params)) {
+      unset($params['source']);
+    }
+    $contactID = CRM_Contact_BAO_Contact::createProfileContact($params, $fields,
+      $this->_contactId,
+      NULL, NULL,
+      $ctype
+    );
+
+    // add all the additioanl payment params we need
+    $this->_params["state_province-{$this->_bltID}"] = $this->_params["billing_state_province-{$this->_bltID}"] = CRM_Core_PseudoConstant::stateProvinceAbbreviation($this->_params["billing_state_province_id-{$this->_bltID}"]);
+    $this->_params["country-{$this->_bltID}"] = $this->_params["billing_country-{$this->_bltID}"] = CRM_Core_PseudoConstant::countryIsoCode($this->_params["billing_country_id-{$this->_bltID}"]);
+
+    if ($this->_paymentProcessor['payment_type'] & CRM_Core_Payment::PAYMENT_TYPE_CREDIT_CARD) {
+      $this->_params['year'] = CRM_Core_Payment_Form::getCreditCardExpirationYear($this->_params);
+      $this->_params['month'] = CRM_Core_Payment_Form::getCreditCardExpirationMonth($this->_params);
+    }
+    $this->_params['ip_address'] = CRM_Utils_System::ipAddress();
+    $this->_params['amount'] = $this->_params['total_amount'];
+    $this->_params['amount_level'] = 0;
+    $this->_params['currencyID'] = CRM_Utils_Array::value('currency',
+      $this->_params,
+      $config->defaultCurrency
+    );
+    $this->_params['payment_action'] = 'Sale';
+    if (CRM_Utils_Array::value('trxn_date', $this->_params)) {
+      $this->_params['receive_date'] = CRM_Utils_Date::processDate($this->_params['trxn_date'], $this->_params['receive_date_time']);
+    }
+
+    if (empty($this->_params['invoice_id'])) {
+      $this->_params['invoiceID'] = md5(uniqid(rand(), TRUE));
+    }
+    else {
+      $this->_params['invoiceID'] = $this->_params['invoice_id'];
+    }
+
+    //Add common data to formatted params
+    CRM_Contribute_Form_AdditionalInfo::postProcessCommon($params, $this->_params, $this);
+    // at this point we've created a contact and stored its address etc
+    // all the payment processors expect the name and address to be in the
+    // so we copy stuff over to first_name etc.
+    $paymentParams = $this->_params;
+    $paymentParams['contactID'] = $this->_contactId;
+    CRM_Core_Payment_Form::mapParams($this->_bltID, $this->_params, $paymentParams, TRUE);
+
+    $contributionType = new CRM_Financial_DAO_FinancialType();
+    $contributionType->id = $params['financial_type_id'];
+    if (!$contributionType->find(TRUE)) {
+      CRM_Core_Error::fatal('Could not find a system table');
+    }
+
+    // add some financial type details to the params list
+    // if folks need to use it
+    $paymentParams['contributionType_name'] = $this->_params['contributionType_name'] = $contributionType->name;
+    $paymentParams['contributionPageID'] = NULL;
+    if (CRM_Utils_Array::value('is_email_receipt', $this->_params)) {
+      $paymentParams['email'] = $this->_contributorEmail;
+      $paymentParams['is_email_receipt'] = 1;
+    }
+    else {
+      $paymentParams['is_email_receipt'] = 0;
+      $this->_params['is_email_receipt'] = 0;
+    }
+    if (CRM_Utils_Array::value('receive_date', $this->_params)) {
+      $paymentParams['receive_date'] = $this->_params['receive_date'];
+    }
+    if (CRM_Utils_Array::value('receive_date', $this->_params)) {
+      $paymentParams['receive_date'] = $this->_params['receive_date'];
+    }
+
+    $result = NULL;
+
+    if ($paymentParams['amount'] > 0.0) {
+      // force a reget of the payment processor in case the form changed it, CRM-7179
+      $payment = CRM_Core_Payment::singleton($this->_mode, $this->_paymentProcessor, $this, TRUE);
+      $result = $payment->doDirectPayment($paymentParams);
+    }
+
+    if (is_a($result, 'CRM_Core_Error')) {
+      //set the contribution mode.
+      $urlParams = "action=add&cid={$this->_contactId}&id={$this->_id}&component={$this->_component}";
+      if ($this->_mode) {
+        $urlParams .= "&mode={$this->_mode}";
+      }
+      CRM_Core_Error::displaySessionError($result);
+      CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/payment/add', $urlParams));
+    }
+
+    if ($result) {
+      $this->_params = array_merge($this->_params, $result);
+    }
+
+    $this->_params['receive_date'] = $now;
+
+    $this->set('params', $this->_params);
+    $this->assign('trxn_id', $result['trxn_id']);
+    $this->assign('receive_date', $this->_params['receive_date']);
+
+    // set source if not set
+    if (empty($this->_params['source'])) {
+      $userID = $session->get('userID');
+      $userSortName = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $userID,
+        'sort_name'
+      );
+      $this->_params['source'] = ts('Submit Credit Card Payment by: %1', array(1 => $userSortName));
+    }
+
+    // process the additional payment
+    $trxnRecord = CRM_Contribute_BAO_Contribution::recordAdditionPayment($this->_contributionId, $submittedValues, $this->_paymentType, $participantId);
+
+    if ($trxnRecord->id &&
+      CRM_Utils_Array::value('is_email_receipt', $this->_params)
+    ) {
+      $sendReceipt = self::emailReceipt($this, $this->_params);
+    }
+
+    if ($trxnRecord->id) {
+      $statusMsg = ts('The payment record has been processed.');
+      if (CRM_Utils_Array::value('is_email_receipt', $this->_params) && $sendReceipt) {
+        $statusMsg .= ' ' . ts('A receipt has been emailed to the contributor.');
+      }
+      CRM_Core_Session::setStatus($statusMsg, ts('Complete'), 'success');
     }
   }
 

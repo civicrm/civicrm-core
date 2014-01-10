@@ -78,9 +78,9 @@
       </div>
       <div class="crm-accordion-body">
         <table class="form-layout-compressed" >
-          <tr class="crm-payment-form-block-receive_date">
-            <td class="label">{$form.receive_date.label}</td>
-            <td {$valueStyle}>{include file="CRM/common/jcalendar.tpl" elementName=receive_date}<br />
+          <tr class="crm-payment-form-block-trxn_date">
+            <td class="label">{$form.trxn_date.label}</td>
+            <td {$valueStyle}>{include file="CRM/common/jcalendar.tpl" elementName=trxn_date}<br />
               <span class="description">{ts}The date this payment was received.{/ts}</span>
             </td>
           </tr>
