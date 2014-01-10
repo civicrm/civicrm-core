@@ -139,7 +139,7 @@ class CRM_Contact_Task {
           'result' => TRUE,
         ),
         self::PRINT_CONTACTS => array(
-          'title' => ts('Print Contacts'),
+          'title' => ts('Print Selected Rows'),
           'class' => 'CRM_Contact_Form_Task_Print',
           'result' => FALSE,
         ),

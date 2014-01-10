@@ -72,7 +72,7 @@ class CRM_Case_Task {
           'class' => 'CRM_Case_Form_Task_Delete',
           'result' => FALSE,
         ),
-        2 => array('title' => ts('Print Cases'),
+        2 => array('title' => ts('Print Selected Rows'),
           'class' => 'CRM_Case_Form_Task_Print',
           'result' => FALSE,
         ),

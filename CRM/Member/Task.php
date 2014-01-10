@@ -73,7 +73,7 @@ class CRM_Member_Task {
           'class' => 'CRM_Member_Form_Task_Delete',
           'result' => FALSE,
         ),
-        2 => array('title' => ts('Print Memberships'),
+        2 => array('title' => ts('Print Selected Rows'),
           'class' => 'CRM_Member_Form_Task_Print',
           'result' => FALSE,
         ),
