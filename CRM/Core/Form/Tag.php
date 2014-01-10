@@ -226,6 +226,7 @@ class CRM_Core_Form_Tag {
     }
 
     if (!empty($tagset)) {
+      // assign current tagsets which is used in postProcess
       $form->_tagsetInfo = $tagset;
       $form->assign("tagsetInfo_$mode", $tagset);
       $form->assign("isTagset", TRUE);
@@ -253,7 +254,9 @@ class CRM_Core_Form_Tag {
     }
 
     if ($form) {
-      // If the key is missing from the form response then all entity_tags were deleted
+      // if the key is missing from the form response then all the tags were deleted / cleared
+      // in that case we create empty tagset params so that below logic works and tagset are
+      // delete correctly
       foreach ($form->_tagsetInfo as $tagsetName => $tagsetInfo) {
         $tagsetId = substr($tagsetName, strlen('parentId_'));
         if (empty($params[$tagsetId])) {
@@ -262,6 +265,8 @@ class CRM_Core_Form_Tag {
       }
     }
 
+    // when form is submitted with tagset values below logic will work and in the case when all tags in a tagset
+    // are deleted we will have to set $params[tagset id] = '' which is done by above logic
     foreach ($params as $parentId => $value) {
       $newTagIds = array();
       $realTagIds = array();
