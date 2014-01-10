@@ -256,7 +256,7 @@ class CRM_Core_Form_Tag {
     if ($form) {
       // if the key is missing from the form response then all the tags were deleted / cleared
       // in that case we create empty tagset params so that below logic works and tagset are
-      // delete correctly
+      // deleted correctly
       foreach ($form->_tagsetInfo as $tagsetName => $tagsetInfo) {
         $tagsetId = substr($tagsetName, strlen('parentId_'));
         if (empty($params[$tagsetId])) {
