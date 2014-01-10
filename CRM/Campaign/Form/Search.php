@@ -55,14 +55,6 @@ class CRM_Campaign_Form_Search extends CRM_Core_Form {
   protected $_searchButtonName;
 
   /**
-   * name of print button
-   *
-   * @var string
-   * @access protected
-   */
-  protected $_printButtonName;
-
-  /**
    * name of action button
    *
    * @var string
@@ -306,20 +298,12 @@ class CRM_Campaign_Form_Search extends CRM_Core_Form {
           ));
       }
 
-      $this->add('select', 'task', ts('Actions:') . ' ', $taskValue);
-      $this->setDefaults(array('task' => $currentTaskValue));
+      $this->add('select', 'task', ts('Actions:') . ' ', array('' => ts('- actions -')) + $taskValue);
 
       $this->add('submit', $this->_actionButtonName, ts('Go'),
         array(
           'class' => 'form-submit',
           'id' => 'Go',
-        )
-      );
-
-      $this->add('submit', $this->_printButtonName, ts('Print'),
-        array(
-          'class' => 'form-submit',
-          'onclick' => "return checkPerformAction('mark_x', '" . $this->getName() . "', 1);",
         )
       );
 
@@ -378,7 +362,7 @@ class CRM_Campaign_Form_Search extends CRM_Core_Form {
     $this->set('queryParams', $this->_queryParams);
 
     $buttonName = $this->controller->getButtonName();
-    if ($buttonName == $this->_actionButtonName || $buttonName == $this->_printButtonName) {
+    if ($buttonName == $this->_actionButtonName) {
       // check actionName and if next, then do not repeat a search, since we are going to the next page
 
       // hack, make sure we reset the task values
