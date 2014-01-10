@@ -77,7 +77,7 @@ class CRM_Activity_Task {
           'class' => 'CRM_Activity_Form_Task_Delete',
           'result' => FALSE,
         ),
-        2 => array('title' => ts('Print Activities'),
+        2 => array('title' => ts('Print Selected Rows'),
           'class' => 'CRM_Activity_Form_Task_Print',
           'result' => FALSE,
         ),

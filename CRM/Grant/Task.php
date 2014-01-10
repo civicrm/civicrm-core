@@ -71,7 +71,7 @@ class CRM_Grant_Task {
           'class' => 'CRM_Grant_Form_Task_Delete',
           'result' => FALSE,
         ),
-        2 => array('title' => ts('Print Grants'),
+        2 => array('title' => ts('Print Selected Rows'),
           'class' => 'CRM_Grant_Form_Task_Print',
           'result' => FALSE,
         ),

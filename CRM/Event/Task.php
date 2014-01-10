@@ -75,7 +75,7 @@ class CRM_Event_Task {
           'class' => 'CRM_Event_Form_Task_Delete',
           'result' => FALSE,
         ),
-        2 => array('title' => ts('Print Participants'),
+        2 => array('title' => ts('Print Selected Rows'),
           'class' => 'CRM_Event_Form_Task_Print',
           'result' => FALSE,
         ),

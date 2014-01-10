@@ -72,7 +72,7 @@ class CRM_Contribute_Task {
           'class' => 'CRM_Contribute_Form_Task_Delete',
           'result' => FALSE,
         ),
-        2 => array('title' => ts('Print Contributions'),
+        2 => array('title' => ts('Print Selected Rows'),
           'class' => 'CRM_Contribute_Form_Task_Print',
           'result' => FALSE,
         ),

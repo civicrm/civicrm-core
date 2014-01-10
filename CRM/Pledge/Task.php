@@ -71,7 +71,7 @@ class CRM_Pledge_Task {
           'class' => 'CRM_Pledge_Form_Task_Delete',
           'result' => FALSE,
         ),
-        2 => array('title' => ts('Print Pledges'),
+        2 => array('title' => ts('Print Selected Rows'),
           'class' => 'CRM_Pledge_Form_Task_Print',
           'result' => FALSE,
         ),
