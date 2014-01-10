@@ -250,6 +250,7 @@ WHERE a.id IS NULL;
     // task to process sql
     $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => '4.4.4')), 'task_4_4_x_runSql', $rev);
 
+    // CRM-13892 : add `name` column to dashboard schema
     $query = "
 ALTER TABLE civicrm_dashboard
     ADD name varchar(64) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Internal name of dashlet.' AFTER domain_id ";
