@@ -129,10 +129,7 @@ class CRM_Member_Task {
     self::tasks();
     $titles = array();
     foreach (self::$_tasks as $id => $value) {
-      // skip Print Membership task
-      if ($id != 2) {
-        $titles[$id] = $value['title'];
-      }
+      $titles[$id] = $value['title'];
     }
     return $titles;
   }

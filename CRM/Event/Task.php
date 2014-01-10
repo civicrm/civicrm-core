@@ -142,13 +142,9 @@ class CRM_Event_Task {
     self::tasks();
     $titles = array();
     foreach (self::$_tasks as $id => $value) {
-      // skip Print Participants and Update Smart Group task
-      if (!in_array($id, array(
-        2, 14))) {
+      // skip Update Smart Group task
+      if ($id != self::SAVE_SEARCH_UPDATE) {
         $titles[$id] = $value['title'];
-      }
-      else {
-        continue;
       }
     }
     return $titles;

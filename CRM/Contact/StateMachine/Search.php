@@ -92,6 +92,7 @@ class CRM_Contact_StateMachine_Search extends CRM_Core_StateMachine {
    * @access protected
    */
   function taskName($controller, $formName = 'Search') {
+    // total hack, check POST vars and then session to determine stuff
     $value = CRM_Utils_Array::value('task', $_POST);
     if (!isset($value)) {
       $value = $this->_controller->get('task');

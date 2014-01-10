@@ -132,10 +132,7 @@ class CRM_Contribute_Task {
     self::tasks();
     $titles = array();
     foreach (self::$_tasks as $id => $value) {
-      // skip Print Contribution task
-      if ($id != 2) {
-        $titles[$id] = $value['title'];
-      }
+      $titles[$id] = $value['title'];
     }
     return $titles;
   }
