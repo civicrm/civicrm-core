@@ -67,15 +67,18 @@ class CRM_Pledge_Task {
    */
   static function &tasks() {
     if (!self::$_tasks) {
-      self::$_tasks = array(1 => array('title' => ts('Delete Pledges'),
+      self::$_tasks = array(1 => array(
+        'title' => ts('Delete Pledges'),
           'class' => 'CRM_Pledge_Form_Task_Delete',
           'result' => FALSE,
         ),
-        2 => array('title' => ts('Print Selected Rows'),
+        2 => array(
+          'title' => ts('Print Selected Rows'),
           'class' => 'CRM_Pledge_Form_Task_Print',
           'result' => FALSE,
         ),
-        3 => array('title' => ts('Export Pledges'),
+        3 => array(
+          'title' => ts('Export Pledges'),
           'class' => array(
             'CRM_Export_Form_Select',
             'CRM_Export_Form_Map',
