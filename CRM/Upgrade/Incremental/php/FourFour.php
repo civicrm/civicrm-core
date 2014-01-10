@@ -250,18 +250,10 @@ WHERE a.id IS NULL;
     // task to process sql
     $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => '4.4.4')), 'task_4_4_x_runSql', $rev);
 
-    // Consolidate activity contacts CRM-12274.
-    $this->addTask('Dashboard schema', 'dashboard');
-
-    return TRUE;
-  }
-
-  static function dashboard(CRM_Queue_TaskContext $ctx) {
-    $upgrade = new CRM_Upgrade_Form();
     $query = "
 ALTER TABLE civicrm_dashboard
     ADD name varchar(64) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Internal name of dashlet.' AFTER domain_id ";
-    CRM_Core_DAO::executeQuery($query);
+    CRM_Core_DAO::executeQuery($query, array(), TRUE, NULL, FALSE, FALSE);
 
     $dashboard = new CRM_Core_DAO_Dashboard();
     $dashboard->find();
@@ -286,8 +278,8 @@ ALTER TABLE civicrm_dashboard
   {$values}
   END;
     ";
+    CRM_Core_DAO::executeQuery($query, array(), TRUE, NULL, FALSE, FALSE);
 
-    CRM_Core_DAO::executeQuery($query);
     return TRUE;
   }
 
