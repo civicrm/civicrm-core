@@ -39,50 +39,7 @@
     <div class="crm-block crm-form-block crm-activity-form-block">
   {/if}
   {* added onload javascript for source contact*}
-  {literal}
-  <script type="text/javascript">
-  var assignee_contact = '';
-
-  {/literal}
-  {if $assignee_contact}
-    var assignee_contact = {$assignee_contact};
-  {/if}
-  {literal}
-
-  //loop to set the value of cc and bcc if form rule.
-  var assignee_contact_id = null;
-  var toDataUrl = "{/literal}{crmURL p='civicrm/ajax/checkemail' q='id=1&noemail=1' h=0 }{literal}"; {/literal}
-  {foreach from=","|explode:"assignee" key=key item=element}
-    {assign var=currentElement value=`$element`_contact_id}
-    {if $form.$currentElement.value }
-      {literal} var {/literal}{$currentElement}{literal} = cj.ajax({ url: toDataUrl + "&cid={/literal}{$form.$currentElement.value}{literal}", async: false }).responseText;{/literal}
-    {/if}
-  {/foreach}
-  {literal}
-
-  if ( assignee_contact_id ) {
-    eval( 'assignee_contact = ' + assignee_contact_id );
-  }
-
-  cj(function( ) {
-    {/literal}
-    {if $source_contact and $admin and $action neq 4}
-      {literal} cj( '#source_contact_id' ).val( "{/literal}{$source_contact}{literal}");{/literal}
-    {/if}
-    {literal}
-
-    var sourceDataUrl = "{/literal}{$dataUrl}{literal}";
-    var tokenDataUrl_assignee  = "{/literal}{$tokenUrl}&context=activity_assignee{literal}";
-    var hintText = "{/literal}{ts escape='js'}Type in a partial or complete name of an existing contact.{/ts}{literal}";
-    cj( "#assignee_contact_id").tokenInput( tokenDataUrl_assignee, { prePopulate: assignee_contact, theme: 'facebook', hintText: hintText });
-    cj( 'ul.token-input-list-facebook, div.token-input-dropdown-facebook' ).css( 'width', '450px' );
-    cj('#source_contact_id').autocomplete( sourceDataUrl, { width : 180, selectFirst : false, hintText: hintText, matchContains: true, minChars: 1, max: {/literal}{crmSetting name="search_autocomplete_count" group="Search Preferences"}{literal}
-    }).result( function(event, data, formatted) { cj( "#source_contact_qid" ).val( data[1] );
-      }).bind( 'click', function( ) { if (!cj("#source_contact_id").val()) { cj( "#source_contact_qid" ).val(''); } });
-  });
-  </script>
-
-  {/literal}
+  {include file="CRM/Activity/Form/ActivityJs.tpl" tokenContext="activity"}
   {if !$action or ( $action eq 1 ) or ( $action eq 2 ) }
   <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
   {/if}
