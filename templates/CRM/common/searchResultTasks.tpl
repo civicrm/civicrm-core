@@ -57,9 +57,10 @@
   </tr>
   <tr>
     <td colspan="2">
-    {if $printButtonName}
+    {* Note print buttons were mostly removed except for Campaign search - the following lines can be removed soon CRM-12872 *}
+    {if !empty($printButtonName)}
        {$form.$printButtonName.html} &nbsp; &nbsp;
-    {else}
+    {elseif !empty($form._qf_Search_next_print)}
        {$form._qf_Search_next_print.html} &nbsp; &nbsp;
      {/if}
    

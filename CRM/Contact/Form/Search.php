@@ -116,14 +116,6 @@ class CRM_Contact_Form_Search extends CRM_Core_Form {
    */
   protected $_searchButtonName;
 
-    /**
-   * name of print button
-   *
-   * @var string
-   * @access protected
-   */
-  protected $_printButtonName;
-
   /**
    * name of action button
    *
@@ -602,10 +594,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form {
      * set the button names
      */
     $this->_searchButtonName = $this->getButtonName('refresh');
-    $this->_printButtonName = $this->getButtonName('next', 'print');
     $this->_actionButtonName = $this->getButtonName('next', 'action');
-
-    $this->assign('printButtonName', $this->_printButtonName);
 
     $this->assign('actionButtonName', $this->_actionButtonName);
 
@@ -876,7 +865,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form {
     $this->set('queryParams', $this->_params);
     $this->set('returnProperties', $this->_returnProperties);
 
-    if ($buttonName == $this->_actionButtonName || $buttonName == $this->_printButtonName) {
+    if ($buttonName == $this->_actionButtonName) {
       // check actionName and if next, then do not repeat a search, since we are going to the next page
       // hack, make sure we reset the task values
       $stateMachine = $this->controller->getStateMachine();
