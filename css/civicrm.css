@@ -15,6 +15,10 @@ div.crm-container label {
   font-weight: normal;
 }
 
+.crm-container .crm-quickSearchField {
+  font-weight: normal;
+}
+
 #crm-container .hiddenElement,
 .crm-container .hiddenElement {
   display: none;
