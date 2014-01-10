@@ -70,6 +70,8 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
 
   protected $_contributionId = NULL;
 
+  protected $fromEmailId = NULL;
+
   public function preProcess() {
     $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this, TRUE);
     $this->_contactId = CRM_Utils_Request::retrieve('cid', 'Positive', $this, TRUE);
@@ -316,7 +318,21 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
     }
     else {
       $submittedValues = $this->controller->exportValues($this->_name);
-      CRM_Contribute_BAO_Contribution::recordAdditionPayment($this->_contributionId, $submittedValues, $this->_paymentType, $participantId);
+      $result = CRM_Contribute_BAO_Contribution::recordAdditionPayment($this->_contributionId, $submittedValues, $this->_paymentType, $participantId);
+
+      // email sending
+      if (!empty($result) && CRM_Utils_Array::value('is_email_receipt', $submittedValues)) {
+        $submittedValues['contact_id'] = $this->_contactID;
+        $submittedValues['contribution_id'] = $this->_contributionId;
+
+        // to get 'from email id' for send receipt
+        $this->fromEmailId = $submittedValues['from_email_address'];
+        $sendReceipt = self::emailReceipt($this, $submittedValues);
+      }
     }
+  }
+
+  static function emailReceipt(&$form, &$params) {
+    // email receipt sending
   }
 }

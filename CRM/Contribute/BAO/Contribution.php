@@ -2759,6 +2759,10 @@ WHERE  contribution_id = %1 ";
       CRM_Event_BAO_Participant::createDiscountTrxn($eventID, $params, $feeLevel);
     }
     unset($params['line_item']);
+
+    if (!$update) {
+      return $financialTxn;
+    }
   }
 
   /**
@@ -3019,7 +3023,7 @@ WHERE  contribution_id = %1 ";
     $params['partial_amount_pay'] = $trxnsData['total_amount'];
 
     // record the entry
-    CRM_Contribute_BAO_Contribution::recordFinancialAccounts($params, $trxnsData);
+    $financialTrxn = CRM_Contribute_BAO_Contribution::recordFinancialAccounts($params, $trxnsData);
 
     $statusId = CRM_Core_OptionGroup::getValue('contribution_status', 'Completed', 'name');
     $relationTypeId = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Accounts Receivable Account is' "));
@@ -3040,8 +3044,9 @@ WHERE eft.entity_table = 'civicrm_contribution'
   AND ft.status_id = {$statusId}
 ";
     $sumOfPayments = CRM_Core_DAO::singleValueQuery($sql);
+
+    // update statuses
     if ($contributionDAO->total_amount == $sumOfPayments) {
-      // update statuses
       // update contribution status
       $contributionUpdate['id'] = $contributionId;
       $contributionUpdate['contribution_status_id'] = $statusId;
@@ -3069,5 +3074,66 @@ WHERE eft.financial_trxn_id = {$trxnId}
 ";
       CRM_Core_DAO::executeQuery($sqlFinancialItemUpdate);
     }
+
+    if (!empty($financialTrxn)) {
+      if ($participantId) {
+        $inputParams['id'] = $participantId;
+        $values = array();
+        $ids = array();
+        $component = 'event';
+        $entityObj = CRM_Event_BAO_Participant::getValues($inputParams, $values, $ids);
+        $entityObj = $entityObj[$participantId];
+      }
+      $activityType = ($paymentType == 'refund') ? 'Refund' : 'Payment';
+
+      // creation of activity
+      $activity = new CRM_Activity_DAO_Activity();
+      $activity->source_record_id = $financialTrxn->id;
+      $activity->activity_type_id = CRM_Core_OptionGroup::getValue('activity_type',
+        $activityType,
+        'name'
+      );
+      if (!$activity->find(TRUE)) {
+        self::addActivityForPayment($entityObj, $financialTrxn, $activityType, $component);
+      }
+    }
+    return $financialTrxn;
+  }
+
+  static function addActivityForPayment($entityObj, $trxnObj, $activityType, $component) {
+    if ($component == 'event') {
+      $date = CRM_Utils_Date::isoToMysql($trxnObj->trxn_date);
+      $paymentAmount = CRM_Utils_Money::format($trxnObj->total_amount, $trxnObj->currency);
+      $eventTitle = CRM_Core_DAO::getFieldValue('CRM_Event_BAO_Event', $entityObj->event_id, 'title');
+      $subject = "{$paymentAmount} - Offline {$activityType} for {$eventTitle}";
+      $targetCid = $entityObj->contact_id;
+      $srcRecId = $trxnObj->id;
+    }
+
+    // activity params
+    $activityParams = array(
+      'source_contact_id' => $targetCid,
+      'source_record_id' => $srcRecId,
+      'activity_type_id' => CRM_Core_OptionGroup::getValue('activity_type',
+        $activityType,
+        'name'
+      ),
+      'subject' => $subject,
+      'activity_date_time' => $date,
+      'status_id' => CRM_Core_OptionGroup::getValue('activity_status',
+        'Completed',
+        'name'
+      ),
+      'skipRecentView' => TRUE,
+    );
+
+    // create activity with target contacts
+    $session = CRM_Core_Session::singleton();
+    $id = $session->get('userID');
+    if ($id) {
+      $activityParams['source_contact_id'] = $id;
+      $activityParams['target_contact_id'][] = $targetCid;
+    }
+    CRM_Activity_BAO_Activity::create($activityParams);
   }
 }
