@@ -66,7 +66,8 @@ class CRM_Mailing_Task {
   static function &tasks() {
     if (!(self::$_tasks)) {
       self::$_tasks = array(
-        1 => array('title' => ts('Print Mailing Recipients'),
+        1 => array(
+          'title' => ts('Print Mailing Recipients'),
           'class' => 'CRM_Mailing_Form_Task_Print',
           'result' => FALSE,
         ),

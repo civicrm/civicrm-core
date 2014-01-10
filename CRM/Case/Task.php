@@ -68,22 +68,26 @@ class CRM_Case_Task {
   static function &tasks() {
     if (!self::$_tasks) {
       self::$_tasks = array(
-        1 => array('title' => ts('Delete Cases'),
+        1 => array(
+          'title' => ts('Delete Cases'),
           'class' => 'CRM_Case_Form_Task_Delete',
           'result' => FALSE,
         ),
-        2 => array('title' => ts('Print Selected Rows'),
+        2 => array(
+          'title' => ts('Print Selected Rows'),
           'class' => 'CRM_Case_Form_Task_Print',
           'result' => FALSE,
         ),
-        3 => array('title' => ts('Export Cases'),
+        3 => array(
+          'title' => ts('Export Cases'),
           'class' => array(
             'CRM_Export_Form_Select',
             'CRM_Export_Form_Map',
           ),
           'result' => FALSE,
         ),
-        4 => array('title' => ts('Restore Cases'),
+        4 => array(
+          'title' => ts('Restore Cases'),
           'class' => 'CRM_Case_Form_Task_Restore',
           'result' => FALSE,
         ),
