@@ -73,48 +73,19 @@
    * @param element message JSON object.
    */
   function activityStatus(message) {
-    var d = new Date(), time = [], i;
-    var currentDateTime = d.getTime()
-    var activityTime = cj("input#activity_date_time_time").val().replace(":", "");
-
-    //chunk the time in bunch of 2 (hours,minutes,ampm)
-    for (i = 0; i < activityTime.length; i += 2) {
-      time.push(activityTime.slice(i, i + 2));
-    }
-    var activityDate = new Date(cj("input#activity_date_time_hidden").val());
-
-    d.setFullYear(activityDate.getFullYear());
-    d.setMonth(activityDate.getMonth());
-    d.setDate(activityDate.getDate());
-    var hours = time['0'];
-    var ampm = time['2'];
-
-    if (ampm == "PM" && hours != 0 && hours != 12) {
-      // force arithmetic instead of string concatenation
-      hours = hours * 1 + 12;
-    }
-    else {
-      if (ampm == "AM" && hours == 12) {
-        hours = 0;
+    var date =  cj("#activity_date_time_display").datepicker('getDate');
+    if (date) {
+      var
+        now = new Date(),
+        time = cj("#activity_date_time_time").timeEntry('getTime') || date,
+        activityStatusId = cj('#status_id').val(),
+        d = date.toString().split(' '),
+        activityDate = new Date(d[0] + ' ' + d[1] + ' ' + d[2] + ' ' + d[3] + ' ' + time.toTimeString());
+      if (activityStatusId == 2 && now < activityDate) {
+        return confirm(message.completed);
       }
-    }
-    d.setHours(hours);
-    d.setMinutes(time['1']);
-
-    var activity_date_time = d.getTime();
-
-    var activityStatusId = cj('#status_id').val();
-
-    if (activityStatusId == 2 && currentDateTime < activity_date_time) {
-      if (!confirm(message.completed)) {
-        return false;
-      }
-    }
-    else {
-      if (activity_date_time && activityStatusId == 1 && currentDateTime >= activity_date_time) {
-        if (!confirm(message.scheduled)) {
-          return false;
-        }
+      else if (activityStatusId == 1 && now >= activityDate) {
+        return confirm(message.scheduled);
       }
     }
   }
