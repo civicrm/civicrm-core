@@ -1058,6 +1058,7 @@ loadCampaign( {$this->_eID}, {$eventCampaigns} );
       return;
     }
 
+    $participantStatus = CRM_Event_PseudoConstant::participantStatus();
     // set the contact, when contact is selected
     if (CRM_Utils_Array::value('contact_select_id', $params)) {
       $this->_contactId = $params['contact_select_id'][1];
@@ -1126,7 +1127,8 @@ loadCampaign( {$this->_eID}, {$eventCampaigns} );
 
         $params['fee_level'] = $params['amount_level'];
         $contributionParams['total_amount'] = $params['amount'];
-        if ($this->_quickConfig && CRM_Utils_Array::value('total_amount', $params)) {
+        if ($this->_quickConfig && CRM_Utils_Array::value('total_amount', $params)
+          && $params['status_id'] != array_search('Partially paid', $participantStatus)) {
           $params['fee_amount'] = $params['total_amount'];
         } else {
           //fix for CRM-3086
@@ -1467,12 +1469,14 @@ loadCampaign( {$this->_eID}, {$eventCampaigns} );
           $contributionParams['is_pay_later'] = 1;
         }
 
-        // CRM-13964 partial_payment_total
-        if ($amountOwed > $params['total_amount']) {
-          // the owed amount
-          $contributionParams['partial_payment_total'] = $amountOwed;
-          // the actual amount paid
-          $contributionParams['partial_amount_pay'] = $params['total_amount'];
+        if ($params['status_id'] == array_search('Partially paid', $participantStatus)) {
+          // CRM-13964 partial_payment_total
+          if ($amountOwed > $params['total_amount']) {
+            // the owed amount
+            $contributionParams['partial_payment_total'] = $amountOwed;
+            // the actual amount paid
+            $contributionParams['partial_amount_pay'] = $params['total_amount'];
+          }
         }
         if ($this->_single) {
           if (empty($ids)) {
@@ -1522,10 +1526,12 @@ loadCampaign( {$this->_eID}, {$eventCampaigns} );
         foreach ($this->_lineItem as $key => $value) {
           if (is_array($value) && $value != 'skip') {
             foreach ($value as $lineKey => $line) {
-              /* //10117 update the line items for participants if contribution amount is recorded */
-              /* if ($this->_quickConfig && CRM_Utils_Array::value('total_amount', $params )) { */
-              /*   $line['unit_price'] = $line['line_total'] = $params['total_amount']; */
-              /* } */
+              //10117 update the line items for participants if contribution amount is recorded
+              if ($this->_quickConfig && CRM_Utils_Array::value('total_amount', $params )
+                && $params['status_id'] != array_search('Partially paid', $participantStatus)
+              ) {
+                $line['unit_price'] = $line['line_total'] = $params['total_amount'];
+              }
               $lineItem[$this->_priceSetId][$lineKey] = $line;
             }
             CRM_Price_BAO_LineItem::processPriceSet($participants[$num]->id, $lineItem, CRM_Utils_Array::value($num, $contributions, NULL), 'civicrm_participant');
