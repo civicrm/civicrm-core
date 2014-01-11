@@ -317,57 +317,6 @@ function on_load_init_checkboxes(form) {
 }
 
 /**
- * Function to change the color of the class
- *
- * @param form - name of the form
- * @param rowid - id of the <tr>, <div> you want to change
- *
- * @access public
- * @return null
- */
-function changeRowColor(rowid, form) {
-  switch (document.getElementById(rowid).className) {
-    case 'even-row'          :
-      document.getElementById(rowid).className = 'selected even-row';
-      break;
-    case 'odd-row'           :
-      document.getElementById(rowid).className = 'selected odd-row';
-      break;
-    case 'selected even-row' :
-      document.getElementById(rowid).className = 'even-row';
-      break;
-    case 'selected odd-row'  :
-      document.getElementById(rowid).className = 'odd-row';
-      break;
-    case 'form-item'         :
-      document.getElementById(rowid).className = 'selected';
-      break;
-    case 'selected'          :
-      document.getElementById(rowid).className = 'form-item';
-  }
-}
-
-/**
- * This function is to show the row with  selected checkbox in different color
- * @param form - name of form that checkboxes are part of
- *
- * @access public
- * @return null
- */
-function on_load_init_check(form) {
-  for (i = 0; i < document.forms[form].elements.length; i++) {
-    if (( document.forms[form].elements[i].type == 'checkbox'
-      && document.forms[form].elements[i].checked == true )
-      || ( document.forms[form].elements[i].type == 'hidden'
-      && document.forms[form].elements[i].value == 1 )) {
-      var ss = document.forms[form].elements[i].id;
-      var row = 'rowid' + ss;
-      changeRowColor(row, form);
-    }
-  }
-}
-
-/**
  * reset all the radio buttons with a given name
  *
  * @param string fieldName
