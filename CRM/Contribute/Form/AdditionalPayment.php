@@ -314,6 +314,7 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
       $participantId = $this->_id;
     }
     $submittedValues = $this->controller->exportValues($this->_name);
+    $submittedValues['trxn_date'] = CRM_Utils_Date::processDate($submittedValues['trxn_date'], $submittedValues['trxn_date_time']);
 
     if ($this->_mode) {
       // process credit card
@@ -331,6 +332,17 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
         $this->fromEmailId = $submittedValues['from_email_address'];
         $sendReceipt = self::emailReceipt($this, $submittedValues);
       }
+
+      $statusMsg = ts('The payment record has been processed.');
+      if (CRM_Utils_Array::value('is_email_receipt', $this->_$submittedValues) && $sendReceipt) {
+        $statusMsg .= ' ' . ts('A receipt has been emailed to the contributor.');
+      }
+      CRM_Core_Session::setStatus($statusMsg, ts('Saved'), 'success');
+
+      $session = CRM_Core_Session::singleton();
+      $session->replaceUserContext(CRM_Utils_System::url('civicrm/contact/view',
+          "reset=1&cid={$this->_contactId}&selectedChild=participant"
+        ));
     }
   }
 
@@ -521,6 +533,9 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
         $statusMsg .= ' ' . ts('A receipt has been emailed to the contributor.');
       }
       CRM_Core_Session::setStatus($statusMsg, ts('Complete'), 'success');
+      $session->replaceUserContext(CRM_Utils_System::url('civicrm/contact/view',
+          "reset=1&cid={$this->_contactId}&selectedChild=participant"
+        ));
     }
   }
 

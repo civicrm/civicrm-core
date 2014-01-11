@@ -3021,6 +3021,7 @@ WHERE  contribution_id = %1 ";
     $params['skipLineItem'] = TRUE;
     $params['partial_payment_total'] = $contributionDAO->total_amount;
     $params['partial_amount_pay'] = $trxnsData['total_amount'];
+    $trxnsData['trxn_date'] = !empty($trxnsData['trxn_date']) ? $trxnsData['trxn_date'] : date('YmdHis');
 
     // record the entry
     $financialTrxn = CRM_Contribute_BAO_Contribution::recordFinancialAccounts($params, $trxnsData);
@@ -3051,7 +3052,11 @@ WHERE eft.entity_table = 'civicrm_contribution'
       $contributionUpdate['id'] = $contributionId;
       $contributionUpdate['contribution_status_id'] = $statusId;
       $contributionUpdate['skipLineItem'] = TRUE;
-      $contributionDetails = self::add($contributionUpdate);
+      // note : not using the self::add method,
+      // the reason because it performs 'status change' related code execution for financial records
+      // which in 'Partial Paid' => 'Completed' is not useful, instead specific financial record updates
+      // are coded below i.e. just updating financial_item status to 'Paid'
+      $contributionDetails = CRM_Core_DAO::setFieldValue('CRM_Contribute_BAO_Contribution', $contributionId, 'contribution_status_id', $statusId);
 
       if ($participantId) {
         // update participant status
