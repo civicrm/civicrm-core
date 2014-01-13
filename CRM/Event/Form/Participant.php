@@ -228,8 +228,17 @@ class CRM_Event_Form_Participant extends CRM_Contact_Form_Task {
     else {
       $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
     }
+    $participantStatuses = CRM_Event_PseudoConstant::participantStatus();
 
     if ($this->_id) {
+      $this->assign('participantId', $this->_id);
+      $feePaymentBlock = FALSE;
+      $statusId = CRM_Core_DAO::getFieldValue('CRM_Event_BAO_Participant', $this->_id, 'status_id', 'id');
+
+      if (in_array($participantStatuses[$statusId], array('Partially paid', 'Pending refund'))) {
+        $feePaymentBlock = TRUE;
+      }
+      $this->assign('feePaymentBlock', $feePaymentBlock);
       $this->_paymentId = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_ParticipantPayment',
         $this->_id, 'id', 'participant_id'
       );
@@ -255,8 +264,7 @@ class CRM_Event_Form_Participant extends CRM_Contact_Form_Task {
     $this->assign('eventNameCustomDataTypeID', $this->_eventNameCustomDataTypeID);
     $this->assign('eventTypeCustomDataTypeID', $this->_eventTypeCustomDataTypeID);
 
-    $partiallyPaidStatusId = CRM_Event_PseudoConstant::participantStatus();
-    $partiallyPaidStatusId = array_search('Partially paid', $partiallyPaidStatusId);
+    $partiallyPaidStatusId = array_search('Partially paid', $participantStatuses);
     $this->assign('partiallyPaidStatusId', $partiallyPaidStatusId);
 
     if ($this->_mode) {
@@ -669,6 +677,9 @@ SELECT civicrm_custom_group.name as name,
    * @access public
    */
   public function buildQuickForm() {
+    if ($this->_action == CRM_Core_Action::UPDATE) {
+      CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'js/crm.livePage.js');
+    }
     if ($this->_showFeeBlock) {
       return CRM_Event_Form_EventFees::buildQuickForm($this);
     }

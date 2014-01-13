@@ -291,4 +291,13 @@
     <page_callback>CRM_Financial_Form_Export</page_callback>
     <weight>610</weight>
   </item>
+  <item>
+    <path>civicrm/payment/view</path>
+    <title>View Payment</title>
+    <page_callback>CRM_Contribute_Page_PaymentInfo</page_callback>
+    <path_arguments>action=view</path_arguments>
+    <access_arguments>access CiviContribute</access_arguments>
+    <page_type>1</page_type>
+    <component>CiviContribute</component>
+  </item>
 </menu>
