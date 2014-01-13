@@ -254,7 +254,7 @@ class CRM_Report_Form_Instance {
     if (CRM_Utils_Array::value('is_navigation', $params)) {
       $params['navigation'] = $form->_navigation;
     }
-    else {
+    elseif ($instanceID){
       //delete navigation if exists
       $navId = CRM_Core_DAO::getFieldValue('CRM_Report_DAO_ReportInstance', $instanceID, 'navigation_id', 'id');
       if ($navId) {

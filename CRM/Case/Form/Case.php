@@ -275,7 +275,7 @@ class CRM_Case_Form_Case extends CRM_Core_Form {
 
     // build tag widget
     $parentNames = CRM_Core_BAO_Tag::getTagSet('civicrm_case');
-    CRM_Core_Form_Tag::buildQuickForm($this, $parentNames, 'civicrm_case', NULL, FALSE, TRUE);
+    CRM_Core_Form_Tag::buildQuickForm($this, $parentNames, 'civicrm_case', NULL, TRUE, TRUE);
 
     $this->addButtons(array(
         array(
