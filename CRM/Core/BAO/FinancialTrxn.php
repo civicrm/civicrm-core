@@ -83,7 +83,10 @@ class CRM_Core_BAO_FinancialTrxn extends CRM_Financial_DAO_FinancialTrxn {
     return $trxn;
   }
 
-  static function getBalanceTrxnAmt($contributionId, $contributionFinancialTypeId) {
+  static function getBalanceTrxnAmt($contributionId, $contributionFinancialTypeId = NULL) {
+    if (!$contributionFinancialTypeId) {
+      $contributionFinancialTypeId = CRM_Core_DAO::getFieldValue('CRM_Contribute_BAO_Contribution', $contributionId, 'financial_type_id');
+    }
     $relationTypeId = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Accounts Receivable Account is' "));
     $toFinancialAccount = CRM_Contribute_PseudoConstant::financialAccountType($contributionFinancialTypeId, $relationTypeId);
     $q = "SELECT ft.id, ft.total_amount FROM civicrm_financial_trxn ft INNER JOIN civicrm_entity_financial_trxn eft ON (eft.financial_trxn_id = ft.id AND eft.entity_table = 'civicrm_contribution') WHERE eft.entity_id = %1 AND ft.to_financial_account_id = %2";
@@ -395,7 +398,7 @@ WHERE ceft.entity_id = %1";
    * return @array : payment type => amount
    * payment type  : 'amount_owed' or 'refund_due'
    */
-  static function getPartialPaymentWithType($entityId, $entityName = 'pariticpant') {
+  static function getPartialPaymentWithType($entityId, $entityName = 'pariticpant', $returnType = TRUE) {
     $value = NULL;
     if (empty($entityName)) {
       return $value;
@@ -436,12 +439,15 @@ WHERE pp.participant_id = {$entityId} AND ft.to_financial_account_id != {$toFina
 ";
         $ftTotalAmt = CRM_Core_DAO::singleValueQuery($sqlFtTotalAmt);
 
-        $paymentVal = $lineItemTotal - $ftTotalAmt;
-        if ($paymentVal < 0) {
-          $value['refund_due']  = $paymentVal;
-        }
-        elseif ($paymentVal > 0) {
-          $value['amount_owed'] = $paymentVal;
+        $value = $paymentVal = $lineItemTotal - $ftTotalAmt;
+        if ($returnType) {
+          $value = array();
+          if ($paymentVal < 0) {
+            $value['refund_due']  = $paymentVal;
+          }
+          elseif ($paymentVal > 0) {
+            $value['amount_owed'] = $paymentVal;
+          }
         }
       }
     }

@@ -165,9 +165,11 @@
   </script>
   {/literal}
   {/if}
+  {if $participantId and $feePaymentBlock}
+    {include file="CRM/Contribute/Page/PaymentInfo.tpl" show='event-payment'}
+  {/if}
   {include file="CRM/Event/Form/EventFees.tpl"}
-
-{elseif $cdType }
+{elseif $cdType}
   {include file="CRM/Custom/Form/CustomData.tpl"}
 {else}
   {if $participantMode == 'test' }
@@ -289,7 +291,15 @@
             <span class="description">{ts}Source for this registration (if applicable).{/ts}</span></td>
           </tr>
         </table>
-
+       {if $participantId and $feePaymentBlock}
+        <table class='form-layout'>
+          <tr>
+            <td class='label'>{ts}Fees{/ts}</td>
+            {* this is where the payment info is shown using CRM/Contribute/Page/PaymentInfo.tpl tpl*}
+            <td id='payment-info'></td>
+          </tr>
+         </table>
+        {/if}
       {* Fee block (EventFees.tpl) is injected here when an event is selected. *}
         <div id="feeBlock"></div>
         <fieldset>

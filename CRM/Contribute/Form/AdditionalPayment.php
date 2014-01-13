@@ -334,7 +334,7 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
       }
 
       $statusMsg = ts('The payment record has been processed.');
-      if (CRM_Utils_Array::value('is_email_receipt', $this->_$submittedValues) && $sendReceipt) {
+      if (CRM_Utils_Array::value('is_email_receipt', $submittedValues) && $sendReceipt) {
         $statusMsg .= ' ' . ts('A receipt has been emailed to the contributor.');
       }
       CRM_Core_Session::setStatus($statusMsg, ts('Saved'), 'success');

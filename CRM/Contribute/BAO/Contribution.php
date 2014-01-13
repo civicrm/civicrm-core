@@ -3141,4 +3141,49 @@ WHERE eft.financial_trxn_id = {$trxnId}
     }
     CRM_Activity_BAO_Activity::create($activityParams);
   }
+
+  function getPaymentInfo($id, $component, $getTrxnInfo = FALSE) {
+    if ($component == 'event') {
+      $entity = 'participant';
+      $contributionId = CRM_Core_DAO::getFieldValue('CRM_Event_BAO_ParticipantPayment', $id, 'contribution_id', 'participant_id');
+    }
+    $total = CRM_Core_BAO_FinancialTrxn::getBalanceTrxnAmt($contributionId);
+    $baseTrxnId = $total['trxn_id'];
+    $total = $total['total_amount'];
+    $paymentBalance = CRM_Core_BAO_FinancialTrxn::getPartialPaymentWithType($id, $entity, FALSE);
+
+    $info['total'] = $total;
+    $info['paid'] = $total - $paymentBalance;
+    $info['balance'] = $paymentBalance;
+    $info['id'] = $id;
+    $info['component'] = $component;
+
+    if ($getTrxnInfo) {
+      $sql = "
+SELECT ft.total_amount, con.financial_type_id, ft.payment_instrument_id, ft.trxn_date, ft.trxn_id, ft.status_id
+FROM civicrm_contribution con
+  LEFT JOIN civicrm_entity_financial_trxn eft ON (eft.entity_id = con.id AND eft.entity_table = 'civicrm_contribution')
+  LEFT JOIN civicrm_financial_trxn ft ON ft.id = eft.financial_trxn_id
+WHERE ft.id != {$baseTrxnId} AND con.id = {$contributionId}
+";
+      $resultDAO = CRM_Core_DAO::executeQuery($sql);
+
+      $rows = array();
+      while($resultDAO->fetch()) {
+        $paymentInstrument = CRM_Contribute_PseudoConstant::paymentInstrument();
+        $statuses = CRM_Contribute_PseudoConstant::contributionStatus();
+        $financialTypes = CRM_Contribute_PseudoConstant::financialType();
+        $rows[] = array(
+          'total_amount' => $resultDAO->total_amount,
+          'financial_type' => $financialTypes[$resultDAO->financial_type_id],
+          'payment_instrument' => $paymentInstrument[$resultDAO->payment_instrument_id],
+          'receive_date' => $resultDAO->trxn_date,
+          'trxn_id' => $resultDAO->trxn_id,
+          'status' => $statuses[$resultDAO->status_id],
+        );
+      }
+      $info['transaction'] = $rows;
+    }
+    return $info;
+  }
 }
