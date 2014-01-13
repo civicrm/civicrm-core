@@ -119,6 +119,18 @@
   <td>
     <label>{ts}Financial Type{/ts}</label> <br />
     {$form.financial_type_id.html|crmAddClass:twenty}
+    {* CRM-13848 *}
+    {literal}
+    <script type="text/javascript">
+    cj("select#financial_type_id").crmasmSelect({
+      addItemTarget: 'bottom',
+      animate: false,
+      highlight: true,
+      sortable: true,
+      respectParents: true
+    });
+    </script>
+    {/literal}
   </td>
   <td>
     <label>{ts}Contribution Page{/ts}</label> <br />
