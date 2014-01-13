@@ -351,7 +351,16 @@ class CRM_Contact_Form_Search_Advanced extends CRM_Contact_Form_Search {
         $this->_formValues['contact_tags'][$value] = 1;
       }
     }
-
+    
+    // CRM-13848
+    $financialType = CRM_Utils_Array::value('financial_type_id', $this->_formValues);
+    if ($financialType && is_array($financialType)) {
+      unset($this->_formValues['financial_type_id']);
+      foreach($financialType as $notImportant => $typeID) {
+        $this->_formValues['financial_type_id'][$typeID] = 1;
+      }
+    }
+    
     $taglist = CRM_Utils_Array::value('contact_taglist', $this->_formValues);
 
     if ($taglist && is_array($taglist)) {
