@@ -315,7 +315,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
         CRM_Utils_System::setTitle($displayName . ' - ' . $activityName);
       }
       else {
-        CRM_Utils_System::setTitle(ts('%1 Activity', $activityName));
+        CRM_Utils_System::setTitle(ts('%1 Activity', array( 1 => $activityName)));
       }
     }
 
