@@ -69,9 +69,6 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     parent::preProcess();
 
     self::preProcessPaymentOptions($this);
-    if ($this->_snippet) {
-      return;
-    }
 
     // Make the contributionPageID avilable to the template
     $this->assign('contributionPageID', $this->_id);
@@ -113,6 +110,11 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
       }
     }
     $this->assign('onBehalfRequired', $this->_onBehalfRequired);
+
+    if ($this->_snippet) {
+      $this->assign('isOnBehalfCallback', CRM_Utils_Array::value('onbehalf', $_GET, FALSE));
+      return;
+    }
 
     if (!empty($this->_pcpInfo['id']) && !empty($this->_pcpInfo['intro_text'])) {
       $this->assign('intro_text', $this->_pcpInfo['intro_text']);
@@ -346,7 +348,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     }
 
     // Build payment processor form
-    if ($this->_ppType) {
+    if ($this->_ppType && empty($_GET['onbehalf'])) {
       CRM_Core_Payment_ProcessorForm::buildQuickForm($this);
       // Return if we are in an ajax callback
       if ($this->_snippet) {
@@ -358,6 +360,10 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
 
     if ($this->_onbehalf) {
       CRM_Contribute_Form_Contribution_OnBehalfOf::buildQuickForm($this);
+      // Return if we are in an ajax callback
+      if ($this->_snippet) {
+        return;
+      }
     }
 
     $this->applyFilter('__ALL__', 'trim');
