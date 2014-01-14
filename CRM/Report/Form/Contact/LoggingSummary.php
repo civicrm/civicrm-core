@@ -201,6 +201,12 @@ class CRM_Report_Form_Contact_LoggingSummary extends CRM_Logging_ReportSummary {
         if ($this->cid) {
           $q .= '&cid=' . $this->cid;
         }
+        $q .= (!empty($row['log_civicrm_entity_altered_contact'])) ?
+          '&alteredName='.$row['log_civicrm_entity_altered_contact'] : '';
+        $q .= (!empty($row['altered_by_contact_display_name'])) ?
+          '&alteredBy='.$row['altered_by_contact_display_name'] : '';
+        $q .= (!empty($row['log_civicrm_entity_log_user_id'])) ?
+          '&alteredById='.$row['log_civicrm_entity_log_user_id'] : '';
 
         $url1 = CRM_Report_Utils_Report::getNextUrl('logging/contact/detail', "{$q}&snippet=4&section=2&layout=overlay", FALSE, TRUE);
         $url2 = CRM_Report_Utils_Report::getNextUrl('logging/contact/detail', "{$q}&section=2", FALSE, TRUE);
