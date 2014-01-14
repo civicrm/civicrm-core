@@ -685,9 +685,10 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
               $discountOptions = array();
               for ($i = 1; $i < self::NUM_OPTION; $i++) {
                 if (!empty($labels[$i]) &&
-                    !empty($values[$i][$j])
-                    ) {
-                  $discountOptions[] = array('label' => trim($labels[$i]),
+                  !CRM_Utils_System::isNull(CRM_Utils_Array::value($j, $values[$i]))
+                ) {
+                  $discountOptions[] = array(
+                    'label' => trim($labels[$i]),
                     'value' => CRM_Utils_Rule::cleanMoney(trim($values[$i][$j])),
                     'weight' => $i,
                     'is_active' => 1,
