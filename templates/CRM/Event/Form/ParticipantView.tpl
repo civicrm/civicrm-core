@@ -99,6 +99,12 @@
         <td class="label">{ts}Event Source{/ts}</td><td>{$source}&nbsp;</td>
       </tr>
     {/if}
+    {if $participantId and $feePaymentBlock}
+      <tr>
+        <td class='label'>{ts}Fees{/ts}</td>
+        <td id='payment-info'></td>
+      </tr>
+    {/if}
     {if $fee_level}
         <tr class="crm-event-participantview-form-block-fee_amount">
             {if $lineItem}
@@ -116,6 +122,9 @@
       {/if}
     {/foreach}
     </table>
+    {if $participantId and $feePaymentBlock}
+      {include file="CRM/Contribute/Page/PaymentInfo.tpl" show='event-payment'}
+    {/if}
     {include file="CRM/Custom/Page/CustomDataView.tpl"}
     {if $accessContribution and $rows.0.contribution_id}
         {include file="CRM/Contribute/Form/Selector.tpl" context="Search"}
