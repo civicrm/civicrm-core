@@ -634,9 +634,14 @@ class CRM_Contact_BAO_Query {
           }
         }
       }
-
+      // Fixme: this stuff does not need to be hard-coded, should be retrieved from schema metadata
       if (in_array($name, array('prefix_id', 'suffix_id', 'gender_id'))) {
-        if (CRM_Utils_Array::value($field['pseudoconstant']['optionGroupName'], $this->_returnProperties)) {
+        if (
+          // Hack for default search view
+          !empty($this->_returnProperties[$field['pseudoconstant']['optionGroupName']]) ||
+          // Hack for profile search view
+          !empty($this->_returnProperties[$name])
+        ) {
           $makeException = TRUE;
         }
       }
@@ -754,13 +759,31 @@ class CRM_Contact_BAO_Query {
                 }
                 elseif ($fieldName != 'id') {
                   if ($fieldName == 'prefix_id') {
-                    $this->_pseudoConstantsSelect['individual_prefix'] = array('pseudoField' => 'prefix_id', 'idCol' => "prefix_id", 'bao' => 'CRM_Contact_BAO_Contact');
+                    // Hack - profile views use different field name than normal views!
+                    $this->_pseudoConstantsSelect['prefix_id'] =
+                    $this->_pseudoConstantsSelect['individual_prefix'] = array(
+                      'pseudoField' => 'prefix_id',
+                      'idCol' => "prefix_id",
+                      'bao' => 'CRM_Contact_BAO_Contact'
+                    );
                   }
                   if ($fieldName == 'suffix_id') {
-                    $this->_pseudoConstantsSelect['individual_suffix'] = array('pseudoField' => 'suffix_id', 'idCol' => "suffix_id", 'bao' => 'CRM_Contact_BAO_Contact');
+                    // Hack - profile views use different field name than normal views!
+                    $this->_pseudoConstantsSelect['suffix_id'] =
+                    $this->_pseudoConstantsSelect['individual_suffix'] = array(
+                      'pseudoField' => 'suffix_id',
+                      'idCol' => "suffix_id",
+                      'bao' => 'CRM_Contact_BAO_Contact'
+                    );
                   }
                   if ($fieldName == 'gender_id') {
-                    $this->_pseudoConstantsSelect['gender'] = array('pseudoField' => 'gender_id', 'idCol' => "gender_id", 'bao' => 'CRM_Contact_BAO_Contact');
+                    // Hack - profile views use different field name than normal views!
+                    $this->_pseudoConstantsSelect['gender_id'] =
+                    $this->_pseudoConstantsSelect['gender'] = array(
+                      'pseudoField' => 'gender_id',
+                      'idCol' => "gender_id",
+                      'bao' => 'CRM_Contact_BAO_Contact'
+                    );
                   }
                   $this->_select[$name] = "contact_a.{$fieldName}  as `$name`";
                 }
@@ -5148,6 +5171,7 @@ AND   displayRelType.is_active = 1
 
   /**
    * convert the pseudo constants id's to their names
+   * FIXME: Get rid of hard-coded references to fields, should be retrievable from schema metadata
    *
    * @param  reference parameter $dao
    * @param bool $return
