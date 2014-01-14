@@ -619,7 +619,7 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
           $mailStatus = ts("A copy of the activity has also been sent to selected contacts(s).");
         }
         else {
-          $this->_relatedContacts = CRM_Activity_BAO_ActivityAssignment::getAssigneeNames($activity->id, TRUE, FALSE);
+          $this->_relatedContacts = CRM_Activity_BAO_ActivityAssignment::getAssigneeNames(array($activity->id), TRUE, FALSE);
           $mailStatus .= ' ' . ts("A copy of the activity has also been sent to assignee contacts(s).");
         }
 
