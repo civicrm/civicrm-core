@@ -129,8 +129,9 @@
   {/foreach}
 </div>
 <div>{$form.mode.html}</div>
+</fieldset>
 {/if}
-
+{if empty($snippet)}
 {literal}
 <script type="text/javascript">
   cj( "div#id-onbehalf-orgname-help").hide( );
@@ -147,8 +148,7 @@
 
 function showOnBehalf(onBehalfRequired) {
   if ( cj( "#is_for_organization" ).attr( 'checked' ) || onBehalfRequired ) {
-    var urlPath = {/literal}"{crmURL p=$urlPath h=0 q='snippet=4&onbehalf=1'}";
-    urlPath += "{$urlParams}";
+    var urlPath = {/literal}"{crmURL p=$urlPath h=0 q="snippet=4&onbehalf=1&id=$contributionPageID&qfKey=$qfKey"}";
     {if $mode eq 'test'}
       urlPath += '&action=preview';
     {/if}
@@ -156,15 +156,8 @@ function showOnBehalf(onBehalfRequired) {
       urlPath += '&reset={$reset}';
     {/if}{literal}
     cj("#onBehalfOfOrg").show();
-    if (cj("#onBehalfOfOrg *").length < 1) {
-      cj.ajax({
-        url     : urlPath,
-        global  : false,
-        async   : false,
-        success : function ( content ) {
-          cj( "#onBehalfOfOrg" ).html( content );
-        }
-      });
+    if (cj("fieldset", '#onBehalfOfOrg').length < 1) {
+      cj('#onBehalfOfOrg').load(urlPath);
     }
   }
   else {
@@ -318,4 +311,4 @@ function selectCreateOrg( orgOption, reset ) {
 {/if}
 
 </script>
-</fieldset>
+{/if}
