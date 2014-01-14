@@ -261,6 +261,14 @@
               <td class="label">{$form.followup_activity_subject.label}</td>
               <td>{$form.followup_activity_subject.html|crmAddClass:huge}</td>
             </tr>
+              <tr>
+                  <td class="label">{ts}Assign To{/ts}</td>
+                  <td>{$form.followup_assignee_contact_id.html}
+                      {edit}<span class="description">{ts}You can optionally assign this activity to someone. Assigned activities will appear in their Activities listing at CiviCRM Home.{/ts}
+                          </span>
+                      {/edit}
+                  </td>
+              </tr>
           </table>
         </div><!-- /.crm-accordion-body -->
       </div><!-- /.crm-accordion-wrapper -->
