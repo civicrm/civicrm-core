@@ -509,6 +509,11 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
     if ($rowCount) {
       $cacheKey = $this->buildPrevNextCache($sort);
       $result = $this->_query->getCachedContacts($cacheKey, $offset, $rowCount, $includeContactIds);
+
+      // CRM-13996: result is empty when selector columns are sorted. hence we need to run the query again
+      if ( $result->N == 0) {
+        $result = $this->_query->searchQuery($offset, $rowCount, $sort, FALSE, $includeContactIds);
+      }
     }
     else {
       $result = $this->_query->searchQuery($offset, $rowCount, $sort, FALSE, $includeContactIds);
