@@ -119,3 +119,37 @@ VALUES
 
 ALTER TABLE civicrm_action_schedule ADD sms_provider_id int(10) unsigned NULL COMMENT 'FK to civicrm_sms_provider id ';
 ALTER TABLE civicrm_action_schedule ADD CONSTRAINT FK_civicrm_action_schedule_sms_provider_id FOREIGN KEY (`sms_provider_id`) REFERENCES `civicrm_sms_provider` (`id`) ON DELETE SET NULL;
+
+--CRM-13981 migrate 'In Honor of' to Soft Credits
+INSERT INTO `civicrm_uf_group`
+     (`name`, `group_type`, {localize field='title'}`title`{/localize}, `is_cms_user`, `is_reserved`)
+VALUES
+   ('honoree_individual', 'Individual, Contact', {localize}'{ts escape="sql"}Honoree Individual{/ts}'{/localize}, 0, 1);
+
+SELECT @uf_group_id_honoree_individual := max(id) from civicrm_uf_group where name = 'honoree_individual';
+
+INSERT INTO `civicrm_uf_field`
+      (`uf_group_id`, `field_name`, `is_required`, `is_reserved`, `weight`, `visibility`, `in_selector`, `is_searchable`, {localize field='label'}`label`{/localize}, field_type)
+VALUES
+      (@uf_group_id_honoree_individual, 'honor_prefix_id',  0, 1, 1, 'User and User Admin Only', 0, 1, '{ts escape="sql"}Individual Prefix{/ts}', 'Individual'),
+      (@uf_group_id_honoree_individual, 'honor_first_name', 0, 1, 2, 'User and User Admin Only', 0, 1, '{ts escape="sql"}First Name{/ts}',        'Individual'),
+      (@uf_group_id_honoree_individual, 'honor_last_name',  0, 1, 3, 'User and User Admin Only', 0, 1, '{ts escape="sql"}Last Name{/ts}',         'Individual');
+
+ALTER TABLE `civicrm_uf_join`
+  ADD COLUMN `module_data` varchar(255) COMMENT 'Json serialized array of data used by the ufjoin.module';
+
+{if $multilingual}
+  {foreach from=$locales item=loc}
+     ALTER TABLE civicrm_contribution_page DROP honor_block_title_{$loc};
+     ALTER TABLE civicrm_contribution_page DROP honor_block_text_{$loc};
+  {/foreach}
+{else}
+     ALTER TABLE civicrm_contribution_page DROP honor_block_title;
+     ALTER TABLE civicrm_contribution_page DROP honor_block_text;
+{/if}
+
+ALTER TABLE civicrm_contribution DROP honor_contact_id;
+ALTER TABLE civicrm_contribution DROP honor_type_id;
+
+ALTER TABLE civicrm_pledge DROP honor_contact_id;
+ALTER TABLE civicrm_pledge DROP honor_type_id;

@@ -1349,6 +1349,7 @@ INSERT INTO civicrm_uf_group
     (11,  'membership_batch_entry', 'Membership',     '{ts escape="sql"}Membership Bulk Entry{/ts}' ,         0,      1,           NULL),
     (12, 'event_registration', 'Individual, Contact', '{ts escape="sql"}Your Registration Info{/ts}',         0,      0,           NULL);
 
+
 INSERT INTO civicrm_uf_join
    (is_active,module,entity_table,entity_id,weight,uf_group_id)
 VALUES
@@ -1597,3 +1598,25 @@ VALUES
 INSERT INTO civicrm_uf_field
        ( uf_group_id, field_name, is_required, is_reserved, weight, visibility, in_selector, is_searchable, location_type_id, label, field_type,    help_post, phone_type_id ) VALUES 
  ( 10,     'soft_credit_type',           0, 1, 11, 'User and User Admin Only', 0, 1, NULL, '{ts escape="sql"}Soft Credit Type{/ts}', 'Contribution', NULL, NULL );
+
+-- CRM-13981
+INSERT INTO civicrm_uf_group
+     (name, group_type, title, is_cms_user, is_reserved, help_post)
+VALUES
+   ('honoree_individual', 'Individual, Contact', '{ts escape="sql"}Honoree Individual{/ts}', 0, 1, NULL);
+
+SELECT @uf_group_id_honoree_individual := max(id) from civicrm_uf_group where name = 'honoree_individual';
+
+INSERT INTO civicrm_uf_field
+      ( uf_group_id, field_name, is_required, is_reserved, weight, visibility, in_selector, is_searchable, location_type_id, label, field_type)
+VALUES
+      (@uf_group_id_honoree_individual, 'honor_prefix_id',  0, 1, 1, 'User and User Admin Only', 0, 1, NULL, '{ts escape="sql"}Individual Prefix{/ts}', 'Individual'),
+      (@uf_group_id_honoree_individual, 'honor_first_name', 1, 1, 2, 'User and User Admin Only', 0, 1, NULL, '{ts escape="sql"}First Name{/ts}',        'Individual'),
+      (@uf_group_id_honoree_individual, 'honor_last_name',  1, 1, 3, 'User and User Admin Only', 0, 1, NULL, '{ts escape="sql"}Last Name{/ts}',         'Individual'),
+      (@uf_group_id_honoree_individual, 'honor_first_name', 1, 1, 2, 'User and User Admin Only', 0, 1, NULL, '{ts escape="sql"}First Name{/ts}',        'Individual'),
+      (@uf_group_id_honoree_individual, 'honor_email',      0, 1, 3, 'User and User Admin Only', 0, 1, 1,    '{ts escape="sql"}Last Name{/ts}',         'Individual');
+
+INSERT INTO civicrm_uf_join
+   (is_active, module,    weight, uf_group_id)
+VALUES
+   (1,         'Profile', 1,      @uf_group_id_honoree_individual);

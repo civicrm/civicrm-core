@@ -11,9 +11,9 @@ cj(function($) {
     return false;
   }
 
-  $('#addMoreSoftCredit').click(function(){
+  $('#addMoreSoftCredit').live('click', function () {
     $('.crm-contribution-form-block-soft_credit_to tr.hiddenElement').filter(':first').show().removeClass('hiddenElement');
-    if ( $('.crm-soft-credit-block tr.hiddenElement').length < 1 ) {
+    if ($('.crm-soft-credit-block tr.hiddenElement').length < 1) {
       $('#addMoreSoftCredit').hide();
     }
     return false;
@@ -58,7 +58,7 @@ cj(function($) {
   });
 
   $('input[name^="soft_credit_contact["]').change(function(){
-    var rowNum = $(this).attr('id').replace('soft_credit_contact_','');
+    var rowNum = $(this).prop('id').replace('soft_credit_contact_','');
     var totalAmount = $('#total_amount').val();
     //assign total amount as default soft credit amount
     $('#soft_credit_amount_'+ rowNum).val(totalAmount);

@@ -354,23 +354,6 @@
     <onDelete>SET NULL</onDelete>
   </foreignKey>
   <field>
-    <name>honor_contact_id</name>
-    <title>Honor Contact</title>
-    <type>int unsigned</type>
-    <comment>FK to contact ID</comment>
-    <add>1.3</add>
-    <html>
-       <type>Autocomplete-Select</type>
-     </html>
-  </field>
-  <foreignKey>
-    <name>honor_contact_id</name>
-    <table>civicrm_contact</table>
-    <key>id</key>
-    <add>1.6</add>
-    <onDelete>SET NULL</onDelete>
-  </foreignKey>
-  <field>
     <name>is_test</name>
     <title>Test</title>
     <type>boolean</type>
@@ -406,20 +389,6 @@
       <type>Select</type>
     </html>
     <add>1.6</add>
-  </field>
-  <field>
-    <name>honor_type_id</name>
-    <title>Honor Type</title>
-    <type>int unsigned</type>
-    <comment>Implicit FK to civicrm_option_value.</comment>
-    <add>2.0</add>
-    <onDelete>SET NULL</onDelete>
-    <pseudoconstant>
-      <optionGroupName>honor_type</optionGroupName>
-    </pseudoconstant>
-    <html>
-      <type>Select</type>
-    </html>
   </field>
   <index>
     <name>index_contribution_status</name>

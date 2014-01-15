@@ -359,7 +359,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
         }
       }
     }
-    
+
     if (CRM_Utils_Array::value('record_contribution', $defaults) && !$this->_mode) {
       $contributionParams = array('id' => $defaults['record_contribution']);
       $contributionIds = array();
@@ -771,8 +771,8 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
       //CRM-10223 - allow contribution to be recorded against different contact
       // causes a conflict in standalone mode so skip in standalone for now
       $this->addElement('checkbox', 'is_different_contribution_contact', ts('Record Payment from a Different Contact?'));
-      $this->add('select', 'honor_type_id', ts('Membership payment is : '),
-        array('' => ts('-')) + CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution', 'honor_type_id'));
+      $this->add('select', 'soft_credit_type_id', ts('Membership payment is : '),
+        array('' => ts('- Select - ')) + CRM_Core_OptionGroup::values("soft_credit_type", FALSE));
       CRM_Contact_Form_NewContact::buildQuickForm($this, 1, NULL, FALSE, 'contribution_');
     }
 
@@ -930,9 +930,18 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
     if (!$priceSetId && $self->_mode && !CRM_Utils_Array::value('financial_type_id', $params)) {
       $errors['financial_type_id'] = ts('Please enter the financial Type.');
     }
-    
+
     if (CRM_Utils_Array::value('record_contribution', $params) && !CRM_Utils_Array::value('payment_instrument_id', $params)) {
       $errors['payment_instrument_id'] = ts('Paid By is a required field.');
+    }
+
+    if (CRM_Utils_Array::value('is_different_contribution_contact', $params)) {
+      if (!CRM_Utils_Array::value('soft_credit_type_id', $params)) {
+        $errors['soft_credit_type_id'] = ts('Please Select a Soft Credit Type');
+      }
+      if (!CRM_Utils_Array::value(1, $params['contribution_contact'])) {
+        $errors['contribution_contact[1]'] = ts('Please select a contact');
+      }
     }
 
     if (CRM_Utils_Array::value('payment_processor_id', $params)) {
@@ -1074,7 +1083,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
     $this->_params = $formValues = $this->controller->exportValues($this->_name);
     $this->convertDateFieldsToMySQL($formValues);
 
-    $params = $ids = array();
+    $params = $softParams = $ids = array();
 
     $membershipTypeValues = array();
     foreach ($this->_memTypeSelected as $memType) {
@@ -1249,15 +1258,14 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
     //CRM-10223 - allow contribution to be recorded against different contact
     if ($this->_contributorContactID != $this->_contactID) {
       $params['contribution_contact_id'] = $this->_contributorContactID;
-      if (CRM_Utils_Array::value('honor_type_id', $this->_params)) {
-        $params['honor_type_id'] = $this->_params['honor_type_id'];
-        $params['honor_contact_id'] = $params['contact_id'];
+      if (CRM_Utils_Array::value('soft_credit_type_id', $this->_params)) {
+        $softParams['soft_credit_type_id'] = $this->_params['soft_credit_type_id'];
+        $softParams['contact_id'] = $params['contact_id'];
       }
     }
     if (CRM_Utils_Array::value('record_contribution', $formValues)) {
       $recordContribution = array(
         'total_amount',
-        'honor_type_id',
         'financial_type_id',
         'payment_instrument_id',
         'trxn_id',
@@ -1395,9 +1403,9 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
       //CRM-10377 if payment is by an alternate contact then we need to set that person
       // as the contact in the payment params
       if ($this->_contributorContactID != $this->_contactID) {
-        if (CRM_Utils_Array::value('honor_type_id', $this->_params)) {
-          $paymentParams['honor_contact_id'] = $this->_contactID;
-          $paymentParams['honor_type_id'] = $this->_params['honor_type_id'];
+        if (CRM_Utils_Array::value('soft_credit_type_id', $this->_params)) {
+          $softParams['contact_id'] = $params['contact_id'];
+          $softParams['soft_credit_type_id'] = $this->_params['soft_credit_type_id'];
         }
       }
       if (CRM_Utils_Array::value('send_receipt', $this->_params)) {
@@ -1427,6 +1435,13 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
           TRUE,
           FALSE
         );
+
+        //create new soft-credit record, CRM-13981
+        $softParams['contribution_id'] = $contribution->id;
+        $softParams['currency'] = $contribution->currency;
+        $softParams['amount'] = $contribution->total_amount;
+        CRM_Contribute_BAO_ContributionSoft::add($softParams);
+
         $paymentParams['contactID'] = $contactID;
         $paymentParams['contributionID'] = $contribution->id;
         $paymentParams['contributionTypeID'] = $contribution->financial_type_id;
@@ -1547,6 +1562,17 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
           $lineItems[$itemId]['id'] = $itemId;
           $lineItem[$priceSetId] = $lineItems;
           CRM_Price_BAO_LineItem::processPriceSet($params['contribution_id'], $lineItem);
+
+          //create new soft-credit record, CRM-13981
+          $softParams['contribution_id'] = $params['contribution_id'];
+          $dao = new CRM_Contribute_DAO_Contribution();
+          $dao->id = $params['contribution_id'];
+          $dao->find();
+          while ($dao->fetch()) {
+            $softParams['currency'] = $dao->currency;
+            $softParams['amount'] = $dao->total_amount;
+          }
+          CRM_Contribute_BAO_ContributionSoft::add($softParams);
         }
 
         //carry updated membership object.

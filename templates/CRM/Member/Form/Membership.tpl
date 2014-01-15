@@ -184,8 +184,8 @@
               <td>
                 <table class="compressed">
                   <tr class="crm-membership-form-block-honor-type">
-                    <td class="label">{$form.honor_type_id.label}</td>
-                    <td>{$form.honor_type_id.html}</td>
+                    <td class="label">{$form.soft_credit_type.label}</td>
+                    <td>{$form.soft_credit_type.html}</td>
                   </tr>
                   <tr id ='contributionContact' class="crm-membership-form-block-contribution-type">
                   {include file="CRM/Contact/Form/NewContact.tpl"}
@@ -218,8 +218,8 @@
                   <td>
                     <table class="compressed">
                       <tr class="crm-membership-form-block-honor-type">
-                        <td class="label">{$form.honor_type_id.label}</td>
-                        <td>{$form.honor_type_id.html}</td>
+                        <td class="label">{$form.soft_credit_type_id.label}</td>
+                        <td>{$form.soft_credit_type_id.html}</td>
                       </tr>
                       <tr id ='contributionContact' class="crm-membership-form-block-contribution-type">
                       {include file="CRM/Contact/Form/NewContact.tpl"}

@@ -2662,7 +2662,6 @@ WHERE      civicrm_membership.is_test = 0";
     $recordContribution = array(
       'contact_id', 'total_amount', 'receive_date', 'financial_type_id',
       'payment_instrument_id', 'trxn_id', 'invoice_id', 'is_test',
-      'honor_contact_id', 'honor_type_id',
       'contribution_status_id', 'check_number', 'campaign_id', 'is_pay_later',
     );
     foreach ($recordContribution as $f) {
