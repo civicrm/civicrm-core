@@ -207,6 +207,21 @@
          });
      });
 
+  cj(function () {
+    showHideLimitTo();
+    cj('#entity_0').change(function () {
+      showHideLimitTo();
+    });
+  });
+
+  function showHideLimitTo() {
+    if (cj('#entity_0').val() == 1) {
+      cj('#limit_to').hide();
+    }
+    else {
+      cj('#limit_to').show();
+    }
+  }
     cj(function() {
        if ( cj('#is_recipient_listing').val( ) ) {
            cj('#recipientList').show();
