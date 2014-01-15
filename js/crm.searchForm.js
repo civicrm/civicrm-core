@@ -22,25 +22,6 @@ cj(function($) {
     });
 });
 
-/**
- *
- * Function for checking ALL or unchecking ALL check boxes in a resultset page.
- *
- * @access public
- * @param fldPrefix - common string which precedes unique checkbox ID and identifies field as
- *                    belonging to the resultset's checkbox collection
- * @param object - checkbox
- * Sample usage: onClick="javascript:changeCheckboxValues('chk_', cj(this) );"
- *
- * @return
- */
-function toggleCheckboxVals(fldPrefix, object) {
-  var val = (object.id == 'toggleSelect' && cj(object).is(':checked'));
-  cj('Input[id*="' + fldPrefix + '"],Input[id*="toggleSelect"]').prop('checked', val);
-  // change the class of selected rows
-  on_load_init_checkboxes(object.form.name);
-}
-
 function countSelectedCheckboxes(fldPrefix, form) {
   fieldCount = 0;
   for (i = 0; i < form.elements.length; i++) {
@@ -50,42 +31,6 @@ function countSelectedCheckboxes(fldPrefix, form) {
     }
   }
   return fieldCount;
-}
-
-/**
- * This function changes the style for a checkbox block when it is selected.
- *
- * @access public
- * @param chkName - it is name of the checkbox
- * @return null
- */
-function checkSelectedBox(chkName) {
-  var checkElement = cj('#' + chkName);
-  if (checkElement.prop('checked')) {
-    cj('input[value=ts_sel]:radio').prop('checked', true);
-    checkElement.parents('tr').addClass('crm-row-selected');
-  }
-  else {
-    checkElement.parents('tr').removeClass('crm-row-selected');
-  }
-}
-
-/**
- * This function is to show the row with  selected checkbox in different color
- * @param form - name of form that checkboxes are part of
- *
- * @access public
- * @return null
- */
-function on_load_init_checkboxes(form) {
-  var formName = form;
-  var fldPrefix = 'mark_x';
-  for (i = 0; i < document.forms[formName].elements.length; i++) {
-    fpLen = fldPrefix.length;
-    if (document.forms[formName].elements[i].type == 'checkbox' && document.forms[formName].elements[i].name.slice(0, fpLen) == fldPrefix) {
-      checkSelectedBox(document.forms[formName].elements[i].name, formName);
-    }
-  }
 }
 
 /**

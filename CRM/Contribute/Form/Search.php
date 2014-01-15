@@ -271,12 +271,12 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form {
           'toggleSelect',
           NULL,
           NULL,
-          array('onclick' => "toggleTaskAction( true ); return toggleCheckboxVals('mark_x_',this);")
+          array('onclick' => "toggleTaskAction( true );", 'class' => 'select-rows')
         );
         foreach ($rows as $row) {
           $this->addElement('checkbox', $row['checkbox'],
             NULL, NULL,
-            array('onclick' => "toggleTaskAction( true ); return checkSelectedBox('" . $row['checkbox'] . "');")
+            array('onclick' => "toggleTaskAction( true );", 'class' => 'select-row')
           );
         }
       }
@@ -297,7 +297,7 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form {
 
       // need to perform tasks on all or selected items ? using radio_ts(task selection) for it
       $this->addElement('radio', 'radio_ts', NULL, '', 'ts_sel', array('checked' => 'checked'));
-      $this->addElement('radio', 'radio_ts', NULL, '', 'ts_all', array('onclick' => $this->getName() . ".toggleSelect.checked = false; toggleCheckboxVals('mark_x_',this); toggleTaskAction( true );"));
+      $this->addElement('radio', 'radio_ts', NULL, '', 'ts_all', array('class' => 'select-rows', 'onclick' => $this->getName() . ".toggleSelect.checked = false; toggleTaskAction( true );"));
     }
 
     // add buttons

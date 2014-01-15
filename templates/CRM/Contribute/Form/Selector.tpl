@@ -93,13 +93,7 @@
 </table>
 {/strip}
 
-{if $context EQ 'Search'}
- <script type="text/javascript">
- {* this function is called to change the color of selected row(s) *}
-    var fname = "{$form.formName}";
-    on_load_init_checkboxes(fname);
- </script>
-{/if}
+
 
 {if $context EQ 'Search'}
     {include file="CRM/common/pager.tpl" location="bottom"}

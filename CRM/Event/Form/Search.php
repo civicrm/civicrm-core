@@ -241,7 +241,7 @@ class CRM_Event_Form_Search extends CRM_Core_Form {
           'toggleSelect',
           NULL,
           NULL,
-          array('onclick' => "toggleTaskAction( true ); return toggleCheckboxVals('mark_x_',this);")
+          array('onclick' => "toggleTaskAction( true );", 'class' => 'select-rows')
         );
       }
       foreach ($rows as $row) {
@@ -249,7 +249,7 @@ class CRM_Event_Form_Search extends CRM_Core_Form {
         if (!$this->_single) {
           $this->addElement('checkbox', $row['checkbox'],
             NULL, NULL,
-            array('onclick' => "toggleTaskAction( true ); return checkSelectedBox('" . $row['checkbox'] . "');")
+            array('onclick' => "toggleTaskAction( true );", 'class' => 'select-row')
           );
         }
         if (CRM_Event_BAO_Event::usesPriceSet($row['event_id'])) {
@@ -317,7 +317,7 @@ class CRM_Event_Form_Search extends CRM_Core_Form {
         array('checked' => 'checked')
       );
       $this->addElement('radio', 'radio_ts', NULL, '', 'ts_all',
-        array('onclick' => $this->getName() . ".toggleSelect.checked = false; toggleCheckboxVals('mark_x_',this); toggleTaskAction( true );")
+        array('class' => 'select-rows', 'onclick' => $this->getName() . ".toggleSelect.checked = false; toggleTaskAction( true );")
       );
     }
 

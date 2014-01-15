@@ -78,8 +78,8 @@
 </div>
 {literal}
 <script type="text/javascript">
-toggleTaskAction( );
 cj(function() {
+  toggleTaskAction( );
   if (cj('#task option').length == 1 && !cj('#task option').val()) {
     cj('#task-section').remove();
   }

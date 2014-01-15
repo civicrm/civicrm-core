@@ -94,6 +94,8 @@
 
 {literal}
 <script type="text/javascript">
-toggleTaskAction( );
+cj(function() {
+  toggleTaskAction( );
+});
 </script>
 {/literal}

@@ -213,7 +213,7 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
     $this->_oid         = $oid;
     $this->_rgid        = $rgid;
     $this->_contactType = $main['contact_type'];
-    $this->addElement('checkbox', 'toggleSelect', NULL, NULL, array('onclick' => "return toggleCheckboxVals('move_',this);"));
+    $this->addElement('checkbox', 'toggleSelect', NULL, NULL, array('class' => 'select-rows'));
 
     $this->assign('mainLocBlock', json_encode($rowsElementsAndInfo['main_loc_block']));
     $this->assign('rows', $rowsElementsAndInfo['rows']);
