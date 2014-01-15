@@ -148,6 +148,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
 
     //  create test database
     self::$utils = new Utils($GLOBALS['mysql_host'],
+      $GLOBALS['mysql_port'],
       $GLOBALS['mysql_user'],
       $GLOBALS['mysql_pass']
     );
@@ -406,6 +407,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    */
   function foreignKeyChecksOff() {
     self::$utils = new Utils($GLOBALS['mysql_host'],
+      $GLOBALS['mysql_port'],
       $GLOBALS['mysql_user'],
       $GLOBALS['mysql_pass']
     );
