@@ -255,26 +255,23 @@ CRM.validate = CRM.validate || {
 
 (function ($, undefined) {
   "use strict";
-  $(document).ready(function () {
-    $().crmtooltip();
-    $('.crm-container table.row-highlight').on('change', 'input.select-row, input.select-rows', function () {
-      var target, table = $(this).closest('table');
-      if ($(this).hasClass('select-rows')) {
-        target = $('tbody tr', table);
-        $('input.select-row', table).prop('checked', $(this).prop('checked'));
-      }
-      else {
-        target = $(this).closest('tr');
-        $('input.select-rows', table).prop('checked', $(".select-row:not(':checked')", table).length < 1);
-      }
-      target.toggleClass('crm-row-selected', $(this).is(':checked'));
-    });
-    $('body').on('click', function (event) {
-      $('.btn-slide-active').removeClass('btn-slide-active').find('.panel').hide();
-      if ($(event.target).is('.btn-slide')) {
-        $(event.target).addClass('btn-slide-active').find('.panel').show();
-      }
-    });
+
+  $(document).on('crmLoad', function(e) {
+    $('table.row-highlight', e.target)
+      .off('.rowHighlight')
+      .on('change.rowHighlight', 'input.select-row, input.select-rows', function () {
+        var target, table = $(this).closest('table');
+        if ($(this).hasClass('select-rows')) {
+          target = $('tbody tr', table);
+          $('input.select-row', table).prop('checked', $(this).prop('checked'));
+        }
+        else {
+          target = $(this).closest('tr');
+          $('input.select-rows', table).prop('checked', $(".select-row:not(':checked')", table).length < 1);
+        }
+        target.toggleClass('crm-row-selected', $(this).is(':checked'));
+      })
+      .find('input.select-row:checked').parents('tr').addClass('crm-row-selected');
   });
 
   /**
@@ -868,6 +865,14 @@ CRM.validate = CRM.validate || {
         ts('Done')
       );
       return false;
+    });
+
+    $().crmtooltip();
+    $('body').on('click', function (event) {
+      $('.btn-slide-active').removeClass('btn-slide-active').find('.panel').hide();
+      if ($(event.target).is('.btn-slide')) {
+        $(event.target).addClass('btn-slide-active').find('.panel').show();
+      }
     });
   });
 

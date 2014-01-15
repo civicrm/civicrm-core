@@ -230,11 +230,11 @@ class CRM_Grant_Form_Search extends CRM_Core_Form {
     if (is_array($rows)) {
       CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'js/crm.searchForm.js');
       if (!$this->_single) {
-        $this->addElement('checkbox', 'toggleSelect', NULL, NULL, array('onchange' => "toggleTaskAction( true ); return toggleCheckboxVals('mark_x_',this);"));
+        $this->addElement('checkbox', 'toggleSelect', NULL, NULL, array('onchange' => "toggleTaskAction( true );", 'class' => 'select-rows'));
         foreach ($rows as $row) {
           $this->addElement('checkbox', CRM_Utils_Array::value('checkbox', $row),
             NULL, NULL,
-            array('onclick' => " toggleTaskAction( true ); return checkSelectedBox('" . CRM_Utils_Array::value('checkbox', $row) . "');")
+            array('onclick' => " toggleTaskAction( true );", 'class' => 'select-row')
           );
           $grant_id = $row['grant_id'];
         }
@@ -260,7 +260,7 @@ class CRM_Grant_Form_Search extends CRM_Core_Form {
 
       // need to perform tasks on all or selected items ? using radio_ts(task selection) for it
       $this->addElement('radio', 'radio_ts', NULL, '', 'ts_sel', array('checked' => 'checked'));
-      $this->addElement('radio', 'radio_ts', NULL, '', 'ts_all', array('onchange' => $this->getName() . ".toggleSelect.checked = false; toggleCheckboxVals('mark_x_',this); toggleTaskAction( true );"));
+      $this->addElement('radio', 'radio_ts', NULL, '', 'ts_all', array('class' => 'select-rows', 'onchange' => $this->getName() . ".toggleSelect.checked = false; toggleTaskAction( true );"));
     }
 
     // add buttons

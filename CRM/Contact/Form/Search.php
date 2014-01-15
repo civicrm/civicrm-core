@@ -517,7 +517,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form {
 
     $this->assign_by_ref('selectedContactIds', $selectedContactIds);
 
-    $allRowsRadio = $this->addElement('radio', 'radio_ts', NULL, '', 'ts_all', array('onclick' => $this->getName() . ".toggleSelect.checked = false; toggleCheckboxVals('mark_x_', this);toggleTaskAction( true );toggleContactSelection( 'resetSel', '{$qfKeyParam}', 'reset' );"));
+    $allRowsRadio = $this->addElement('radio', 'radio_ts', NULL, '', 'ts_all', array('class' => 'select-rows', 'onclick' => $this->getName() . ".toggleSelect.checked = false; toggleTaskAction( true );toggleContactSelection( 'resetSel', '{$qfKeyParam}', 'reset' );"));
     $this->assign('ts_all_id', $allRowsRadio->_attributes['id']);
 
     /*
@@ -528,13 +528,13 @@ class CRM_Contact_Form_Search extends CRM_Core_Form {
     $rows = $this->get('rows');
 
     if (is_array($rows)) {
-      $this->addElement('checkbox', 'toggleSelect', NULL, NULL, array('onclick' => "toggleTaskAction( true );  toggleCheckboxVals('mark_x_',this);return toggleContactSelection( 'toggleSelect', '" . $qfKeyParam . "' , 'multiple' );"));
+      $this->addElement('checkbox', 'toggleSelect', NULL, NULL, array('class' => 'select-rows', 'onclick' => "toggleTaskAction( true ); toggleContactSelection( 'toggleSelect', '" . $qfKeyParam . "' , 'multiple' );"));
 
       $unselectedContactIds = array();
       foreach ($rows as $row) {
         $this->addElement('checkbox', $row['checkbox'],
           NULL, NULL,
-          array('onclick' => "toggleContactSelection( '" . $row['checkbox'] . "', '" . $qfKeyParam . "' , 'single' );toggleTaskAction( true ); return checkSelectedBox('" . $row['checkbox'] . "');")
+          array('onclick' => "toggleContactSelection( '" . $row['checkbox'] . "', '" . $qfKeyParam . "' , 'single' );toggleTaskAction( true );", 'class' => 'select-row')
         );
 
         if (!in_array($row['contact_id'], $selectedContactIds)) {
