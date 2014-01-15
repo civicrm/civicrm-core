@@ -85,6 +85,19 @@ class CRM_Campaign_BAO_Query {
         }
       }
     }
+    // CRM-13810 Translate campaign_id to label for search builder
+    if (is_array($query->_select)) {
+      foreach($query->_select as $field => $queryString) {
+        if (substr($field, -11) == 'campaign_id') {
+          $query->_pseudoConstantsSelect[$field] = array(
+            'pseudoField' => 'campaign_id',
+            'idCol' => $field,
+            'bao' => 'CRM_Activity_BAO_Activity',
+          );
+        }
+      }
+    }
+
 
     //get survey clause in force,
     //only when we have survey id.
