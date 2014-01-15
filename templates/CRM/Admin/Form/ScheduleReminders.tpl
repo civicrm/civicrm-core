@@ -221,6 +221,11 @@
     cj('#mode').change(function () {
       loadMsgBox();
     });
+
+    showHideLimitTo();
+    cj('#entity_0').change(function () {
+      showHideLimitTo();
+    });
   });
 
   function loadMsgBox() {
@@ -241,16 +246,26 @@
       }
   }
 
-  cj(function() {
-       if ( cj('#is_recipient_listing').val( ) ) {
-           cj('#recipientList').show();
-       } else {
-           cj('#recipientList').hide();
-       }
-       cj('#recipient').change( function( ) {
-           populateRecipient();
-       });
-     });
+  function showHideLimitTo() {
+    if (cj('#entity_0').val() == 1) {
+      cj('#limit_to').hide();
+    }
+    else {
+      cj('#limit_to').show();
+    }
+  }
+
+  cj(function () {
+    if (cj('#is_recipient_listing').val()) {
+      cj('#recipientList').show();
+    }
+    else {
+      cj('#recipientList').hide();
+    }
+    cj('#recipient').change(function () {
+      populateRecipient();
+    });
+  });
 
      function populateRecipient( ) {
          var recipient = cj("#recipient option:selected").val();
