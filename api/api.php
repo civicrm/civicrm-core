@@ -444,6 +444,12 @@ function _civicrm_api_get_camel_name($entity, $version = NULL) {
  */
 function _civicrm_api_call_nested_api(&$params, &$result, $action, $entity, $version) {
   $entity = _civicrm_api_get_entity_name_from_camel($entity);
+
+  //we don't need to worry about nested api in the getfields/getoptions actions, so just return immediately
+  if (in_array(strtolower($action), array('getfields', 'getoptions'))) {
+    return;
+  }
+
   if(strtolower($action) == 'getsingle'){
     // I don't understand the protocol here, but we don't want
     // $result to be a recursive array
