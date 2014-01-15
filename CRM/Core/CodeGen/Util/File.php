@@ -48,9 +48,9 @@ class CRM_Core_CodeGen_Util_File {
   }
 
   /**
-   * Find the paths to all key files involved in the gen-code process
+   * Find the path to the main Civi source tree
    *
-   * @return array
+   * @return string
    * @throws RuntimeException
    */
   static function findCoreSourceDir() {
@@ -64,7 +64,6 @@ class CRM_Core_CodeGen_Util_File {
 
   /**
    * Find files in several directories using several filename patterns
-   *
    *
    * @param array $pairs each item is an array(0 => $searchBaseDir, 1 => $filePattern)
    * @return array of file paths
