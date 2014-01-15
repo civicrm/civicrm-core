@@ -11,6 +11,10 @@ div.crm-container label {
   display: inline;
 }
 
+div.crm-container fieldset label{
+  float: none;
+}
+
 .crm-container .crm-quickSearchField {
   font-weight: normal;
 }
