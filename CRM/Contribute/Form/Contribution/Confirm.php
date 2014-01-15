@@ -376,21 +376,39 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $params = $this->_params;
     $honor_block_is_active = $this->get('honor_block_is_active');
     // make sure we have values for it
-    if ($honor_block_is_active &&
-      ((!empty($params['honor_first_name']) && !empty($params['honor_last_name'])) ||
-        (!empty($params['honor_email']))
-      )
-    ) {
-      $this->assign('honor_block_is_active', $honor_block_is_active);
-      $this->assign('honor_block_title', CRM_Utils_Array::value('honor_block_title', $this->_values));
+    if ($honor_block_is_active && CRM_Utils_Array::value('soft_credit_type_id', $params)) {
+      $honorName = null;
+      $softCreditTypes = CRM_Core_OptionGroup::values("soft_credit_type", FALSE);
 
-      $prefix = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'prefix_id');
-      $honor = CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution', 'honor_type_id');
-      $this->assign('honor_type', CRM_Utils_Array::value($params['honor_type_id'], $honor));
-      $this->assign('honor_prefix', CRM_Utils_Array::value($params['honor_prefix_id'], $prefix));
-      $this->assign('honor_first_name', $params['honor_first_name']);
-      $this->assign('honor_last_name', $params['honor_last_name']);
-      $this->assign('honor_email', $params['honor_email']);
+      $this->assign('honor_block_is_active', $honor_block_is_active);
+      $this->assign('soft_credit_type', $softCreditTypes[$params['soft_credit_type_id']]);
+      $profileContactType = CRM_Core_BAO_UFGroup::getContactType($params['honoree_profile_id']);
+      switch ($profileContactType) {
+        case 'Individual':
+          if (array_key_exists('prefix_id', $params['honor'])) {
+            $honorName = CRM_Utils_Array::value(CRM_Utils_Array::value('prefix_id',$params['honor']),
+              CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'prefix_id')
+            );
+          }
+          $honorName .= ' ' . $params['honor']['first_name'] . ' ' . $params['honor']['last_name'];
+          if (array_key_exists('suffix_id', $params['honor'])) {
+            $honorName .= ' ' . CRM_Utils_Array::value(CRM_Utils_Array::value('suffix_id',$params['honor']),
+              CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'suffix_id')
+            );
+          }
+          break;
+        case 'Organization':
+          $honorName = $params['honor']['organization_name'];
+          break;
+        case 'Household':
+          $honorName = $params['honor']['household_name'];
+          break;
+      }
+      $this->assign('honorName', $honorName);
+
+      $fieldTypes = array('Contact');
+      $fieldTypes[]  = CRM_Core_BAO_UFGroup::getContactType($params['honoree_profile_id']);
+      $this->buildCustom($params['honoree_profile_id'], 'honoreeProfileFields', TRUE, 'honor', $fieldTypes);
     }
     $this->assign('receiptFromEmail', CRM_Utils_Array::value('receipt_from_email', $this->_values));
     $amount_block_is_active = $this->get('amount_block_is_active');
@@ -444,7 +462,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         $fieldTypes = array_merge($fieldTypes, array('Contribution'));
       }
 
-      $this->buildCustom($profileId, 'onbehalfProfile', TRUE, TRUE, $fieldTypes);
+      $this->buildCustom($profileId, 'onbehalfProfile', TRUE, 'onbehalf', $fieldTypes);
     }
 
     $this->_separateMembershipPayment = $this->get('separateMembershipPayment');
@@ -507,12 +525,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $defaults = array();
     $fields = array();
     foreach ($this->_fields as $name => $dontCare) {
-      if ($name == 'onbehalf') {
-        foreach ($dontCare as $key => $value) {
-          $fields['onbehalf'][$key] = 1;
-        }
-      }
-      else {
+      if ($name != 'onbehalf' || $name != 'honor') {
         $fields[$name] = 1;
       }
     }
@@ -520,17 +533,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
 
     $contact = $this->_params;
     foreach ($fields as $name => $dontCare) {
-      if ($name == 'onbehalf') {
-        foreach ($dontCare as $key => $value) {
-          if (isset($contact['onbehalf'][$key])) {
-            $defaults[$key] = $contact['onbehalf'][$key];
-          }
-          if (isset($contact['onbehalf']["{$key}_id"])) {
-            $defaults["{$key}_id"] = $contact['onbehalf']["{$key}_id"];
-          }
-        }
-      }
-      elseif (isset($contact[$name])) {
+      if (isset($contact[$name])) {
         $defaults[$name] = $contact[$name];
         if (substr($name, 0, 7) == 'custom_') {
           $timeField = "{$name}_time";
@@ -971,6 +974,9 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         $fieldTypes
       );
     }
+
+    //processing honor contact into soft-credit contribution
+    CRM_Contact_Form_ProfileContact::postProcess($this);
   }
 
   /**
@@ -1124,11 +1130,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
   ) {
     $transaction = new CRM_Core_Transaction();
     $className   = get_class($form);
-    $honorCId    = $recurringContributionID = NULL;
-
-    if ($online && $form->get('honor_block_is_active')) {
-      $honorCId = $form->createHonorContact();
-    }
+    $recurringContributionID = NULL;
 
     // add these values for the recurringContrib function ,CRM-10188
     $params['financial_type_id'] = $contributionType->id;
@@ -1142,10 +1144,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       $params['is_email_receipt'] = CRM_Utils_Array::value( 'is_email_receipt', $form->_values );
     }
     $recurringContributionID = self::processRecurringContribution($form, $params, $contactID, $contributionType, $online);
-
-    if (!$online && isset($params['honor_contact_id'])) {
-      $honorCId = $params['honor_contact_id'];
-    }
 
     $config = CRM_Core_Config::singleton();
     // CRM-11885
@@ -1262,11 +1260,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         'trxn_result_code' => CRM_Utils_Array::value('trxn_result_code', $result),
         'payment_processor' => CRM_Utils_Array::value('payment_processor', $result),
       );
-    }
-
-    if (isset($honorCId)) {
-      $contribParams['honor_contact_id'] = $honorCId;
-      $contribParams['honor_type_id'] = $params['honor_type_id'];
     }
 
     if ($recurringContributionID) {
@@ -1567,42 +1560,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     }
 
     return $recurring->id;
-  }
-
-  /**
-   * Create the Honor contact
-   *
-   * @return void
-   * @access public
-   */
-  function createHonorContact() {
-    $params = $this->controller->exportValues('Main');
-
-    // email is enough to create a contact
-    if (! CRM_Utils_Array::value('honor_email', $params) &&
-      // or we need first name AND last name
-      (! CRM_Utils_Array::value('honor_first_name', $params)
-      || ! CRM_Utils_Array::value('honor_last_name', $params))) {
-      //don't create contact - possibly the form was left blank
-      return null;
-    }
-
-    //assign to template for email receipt
-    $honor_block_is_active = $this->get('honor_block_is_active');
-
-    $this->assign('honor_block_is_active', $honor_block_is_active);
-    $this->assign('honor_block_title', CRM_Utils_Array::value('honor_block_title', $this->_values));
-
-    $prefix = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'prefix_id');
-    $honorType = CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution', 'honor_type_id');
-    $this->assign('honor_type', CRM_Utils_Array::value(CRM_Utils_Array::value('honor_type_id', $params), $honorType));
-    $this->assign('honor_prefix', CRM_Utils_Array::value(CRM_Utils_Array::value('honor_prefix_id', $params), $prefix));
-    $this->assign('honor_first_name', CRM_Utils_Array::value('honor_first_name', $params));
-    $this->assign('honor_last_name', CRM_Utils_Array::value('honor_last_name', $params));
-    $this->assign('honor_email', CRM_Utils_Array::value('honor_email', $params));
-
-    //create honoree contact
-    return CRM_Contribute_BAO_Contribution::createHonorContact($params);
   }
 
   /**
