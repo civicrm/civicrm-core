@@ -79,7 +79,7 @@ class api_v3_GroupTest extends CiviUnitTestCase {
 
     $group = $group["values"];
     $this->assertNotNull(count($group));
-    $this->assertEquals($group[$this->_groupID]['name'], "Test Group 1_{$this->_groupID}");
+    $this->assertEquals($group[$this->_groupID]['name'], "Test Group 1");
     $this->assertEquals($group[$this->_groupID]['is_active'], 1);
     $this->assertEquals($group[$this->_groupID]['visibility'], 'Public Pages');
   }
@@ -89,7 +89,7 @@ class api_v3_GroupTest extends CiviUnitTestCase {
     $group = $this->callAPISuccess('group', 'get', $params);
 
     foreach ($group['values'] as $v) {
-      $this->assertEquals($v['name'], "Test Group 1_{$this->_groupID}");
+      $this->assertEquals($v['name'], "Test Group 1");
       $this->assertEquals($v['title'], 'New Test Group Created');
       $this->assertEquals($v['description'], 'New Test Group Created');
       $this->assertEquals($v['is_active'], 1);
@@ -99,7 +99,7 @@ class api_v3_GroupTest extends CiviUnitTestCase {
 
   function testGetGroupParamsWithGroupName() {
     $params = array(
-      'name' => "Test Group 1_{$this->_groupID}",
+      'name' => "Test Group 1",
     );
     $group = $this->callAPIAndDocument('group', 'get', $params, __FUNCTION__, __FILE__);
     $group = $group['values'];
@@ -119,18 +119,18 @@ class api_v3_GroupTest extends CiviUnitTestCase {
     $params['return.name'] = 1;
     $group = $this->callAPISuccess('group', 'get', $params);
     $this->assertEquals($group['values'][$this->_groupID]['name'],
-      "Test Group 1_{$this->_groupID}"
+      "Test Group 1"
     );
   }
 
   function testGetGroupParamsWithGroupTitle() {
-    $params          = array();
+    $params = array();
     $params['title'] = 'New Test Group Created';
-    $group           = $this->callAPISuccess('group', 'get', $params);
+    $group = $this->callAPISuccess('group', 'get', $params);
 
     foreach ($group['values'] as $v) {
       $this->assertEquals($v['id'], $this->_groupID);
-      $this->assertEquals($v['name'], "Test Group 1_{$this->_groupID}");
+      $this->assertEquals($v['name'], "Test Group 1");
       $this->assertEquals($v['description'], 'New Test Group Created');
       $this->assertEquals($v['is_active'], 1);
       $this->assertEquals($v['visibility'], 'Public Pages');
@@ -138,9 +138,9 @@ class api_v3_GroupTest extends CiviUnitTestCase {
   }
 
   function testGetNonExistingGroup() {
-    $params          = array();
+    $params = array();
     $params['title'] = 'No such group Exist';
-    $group           = $this->callAPISuccess('group', 'get', $params);
+    $group = $this->callAPISuccess('group', 'get', $params);
     $this->assertEquals(0, $group['count']);
   }
 
@@ -150,7 +150,7 @@ class api_v3_GroupTest extends CiviUnitTestCase {
 
   function testgetfields() {
     $description = "demonstrate use of getfields to interogate api";
-    $params      = array('action' => 'create');
+    $params = array('action' => 'create');
     $result = $this->callAPIAndDocument('group', 'getfields', $params, __FUNCTION__, __FILE__, $description, 'getfields', 'getfields');
     $this->assertEquals(1, $result['values']['is_active']['api.default']);
   }
