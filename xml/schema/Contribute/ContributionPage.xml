@@ -353,28 +353,6 @@
     <add>1.6</add>
   </field>
   <field>
-    <name>honor_block_title</name>
-    <title>Contribution Page Honor Block Title</title>
-    <type>varchar</type>
-    <length>255</length>
-    <localizable>true</localizable>
-    <comment>Title for honor block.</comment>
-    <add>1.5</add>
-  </field>
-  <field>
-    <name>honor_block_text</name>
-    <title>Contribution Page Honor Block Text</title>
-    <type>text</type>
-    <html>
-      <type>TextArea</type>
-      <rows>2</rows>
-      <cols>50</cols>
-    </html>
-    <localizable>true</localizable>
-    <comment>text for honor block.</comment>
-    <add>1.5</add>
-  </field>
-  <field>
     <name>start_date</name>
     <type>datetime</type>
     <title>Contribution Page Start Date</title>

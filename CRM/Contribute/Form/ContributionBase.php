@@ -640,7 +640,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
    * @return void
    * @access public
    */
-  function buildCustom($id, $name, $viewOnly = FALSE, $onBehalf = FALSE, $fieldTypes = NULL) {
+  function buildCustom($id, $name, $viewOnly = FALSE, $profileContactType = NULL, $fieldTypes = NULL) {
     $stateCountryMap = array();
 
     if ($id) {
@@ -709,7 +709,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
             $stateCountryMap[$index][$prefixName] = $key;
 
             if ($prefixName == "state_province") {
-              if ($onBehalf) {
+              if ($profileContactType == 'onbehalf') {
                 //CRM-11881: Bypass required-ness check for state/province on Contribution Confirm page
                 //as already done during Contribution registration via onBehalf's quickForm
                 $field['is_required'] = FALSE;
@@ -728,16 +728,23 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
             }
           }
 
-          if ($onBehalf) {
+          if ($profileContactType) {
+            //Since we are showing honoree name separately so we are removing it from honoree profile just for display
+            $honoreeNamefields = array('prefix_id', 'first_name', 'last_name', 'suffix_id', 'organization_name', 'household_name');
+            if ($profileContactType == 'honor' && in_array($field['name'], $honoreeNamefields)) {
+              unset($fields[$field['name']]);
+              continue;
+            }
             if (!empty($fieldTypes) && in_array($field['field_type'], $fieldTypes)) {
               CRM_Core_BAO_UFGroup::buildProfile(
                 $this,
                 $field,
                 CRM_Profile_Form::MODE_CREATE,
                 $contactID,
-                TRUE
+                TRUE,
+                $profileContactType
               );
-              $this->_fields['onbehalf'][$key] = $field;
+              $this->_fields[$profileContactType][$key] = $field;
             }
             else {
               unset($fields[$key]);

@@ -127,38 +127,6 @@ class CRM_Contribute_BAO_Query {
       $query->_tables['contribution_payment_instrument'] = 1;
     }
 
-    // get honor contact name
-    if (CRM_Utils_Array::value('honor_contact_name', $query->_returnProperties)) {
-      $query->_select['contribution_honor_contact_name'] = "civicrm_contact_c.display_name as contribution_honor_contact_name";
-      $query->_element['contribution_honor_contact_name'] = 1;
-      $query->_tables['civicrm_contribution'] = 1;
-      $query->_tables['contribution_honor_contact_name'] = 1;
-    }
-
-    // get honor type label
-    if (CRM_Utils_Array::value('honor_type_label', $query->_returnProperties)) {
-      $query->_select['contribution_honor_type_label'] = "honor_type.label as contribution_honor_type_label";
-      $query->_element['contribution_honor_type_label'] = 1;
-      $query->_tables['civicrm_contribution'] = 1;
-      $query->_tables['contribution_honor_type_label'] = 1;
-    }
-
-    // get honor contact email
-    if (CRM_Utils_Array::value('honor_contact_email', $query->_returnProperties)) {
-      $query->_select['contribution_honor_contact_email'] = "honor_email.email as contribution_honor_contact_email";
-      $query->_element['contribution_honor_contact_email'] = 1;
-      $query->_tables['civicrm_contribution'] = 1;
-      $query->_tables['contribution_honor_contact_email'] = 1;
-    }
-
-    // get honor contact id
-    if (CRM_Utils_Array::value('honor_contact_id', $query->_returnProperties)) {
-      $query->_select['contribution_honor_contact_id'] = "civicrm_contribution.honor_contact_id as contribution_honor_contact_id";
-      $query->_element['contribution_honor_contact_id'] = 1;
-      $query->_tables['civicrm_contribution'] = 1;
-    }
-
-
     if (CRM_Utils_Array::value('check_number', $query->_returnProperties)) {
       $query->_select['contribution_check_number'] = "civicrm_contribution.check_number as contribution_check_number";
       $query->_element['contribution_check_number'] = 1;
@@ -370,22 +338,6 @@ class CRM_Contribute_BAO_Query {
         );
 
         $query->_qill[$grouping][] = ts('Paid By - %1', array(1 => $pis[$pi]));
-        $query->_tables['civicrm_contribution'] = $query->_whereTables['civicrm_contribution'] = 1;
-        return;
-
-      case 'contribution_in_honor_of':
-        $name    = trim($value);
-        $newName = str_replace(',', " ", $name);
-        $pieces  = explode(' ', $newName);
-        foreach ($pieces as $piece) {
-          $value = $strtolower(CRM_Core_DAO::escapeString(trim($piece)));
-          $value = "'%$value%'";
-          $sub[] = " ( contact_b.sort_name LIKE $value )";
-        }
-
-        $query->_where[$grouping][] = ' ( ' . implode('  OR ', $sub) . ' ) ';
-        $query->_qill[$grouping][] = ts('Honor name like - \'%1\'', array(1 => $name));
-        $query->_tables['civicrm_contact_b'] = $query->_whereTables['civicrm_contact_b'] = 1;
         $query->_tables['civicrm_contribution'] = $query->_whereTables['civicrm_contribution'] = 1;
         return;
 
@@ -665,10 +617,6 @@ class CRM_Contribute_BAO_Query {
                                AND option_group_payment_instrument.id = payment_instrument.option_group_id ) ";
         break;
 
-      case 'civicrm_contact_b':
-        $from .= " $side JOIN civicrm_contact contact_b ON (civicrm_contribution.honor_contact_id = contact_b.id )";
-        break;
-
       case 'contribution_status':
         $from = " $side JOIN civicrm_option_group option_group_contribution_status ON (option_group_contribution_status.name = 'contribution_status')";
         $from .= " $side JOIN civicrm_option_value contribution_status ON (civicrm_contribution.contribution_status_id = contribution_status.value
@@ -678,20 +626,6 @@ class CRM_Contribute_BAO_Query {
       case 'contribution_note':
         $from .= " $side JOIN civicrm_note ON ( civicrm_note.entity_table = 'civicrm_contribution' AND
                                                     civicrm_contribution.id = civicrm_note.entity_id )";
-        break;
-
-      case 'contribution_honor_contact_name':
-        $from .= " $side JOIN civicrm_contact civicrm_contact_c ON (civicrm_contribution.honor_contact_id = civicrm_contact_c.id )";
-        break;
-
-      case 'contribution_honor_contact_email':
-        $from .= " $side JOIN civicrm_email as honor_email ON (civicrm_contribution.honor_contact_id = honor_email.contact_id AND honor_email.is_primary = 1 )";
-        break;
-
-      case 'contribution_honor_type_label':
-        $from = " $side JOIN civicrm_option_group option_group_honor_type ON ( option_group_honor_type.name = 'honor_type')";
-        $from .= " $side JOIN civicrm_option_value honor_type ON (civicrm_contribution.honor_type_id = honor_type.value
-                               AND option_group_honor_type.id = honor_type.option_group_id ) ";
         break;
 
       case 'contribution_membership':
@@ -865,9 +799,6 @@ class CRM_Contribute_BAO_Query {
     // Add fields for thank you and receipt
     $form->addYesNo('contribution_thankyou_date_is_not_null', ts('Thank-you sent?'));
     $form->addYesNo('contribution_receipt_date_is_not_null', ts('Receipt sent?'));
-
-    // Add fields for honor search
-    $form->addElement('text', 'contribution_in_honor_of', ts("In Honor Of"));
 
     $form->addYesNo('contribution_pay_later', ts('Contribution is Pay Later?'));
     $form->addYesNo('contribution_recurring', ts('Contribution is Recurring?'));

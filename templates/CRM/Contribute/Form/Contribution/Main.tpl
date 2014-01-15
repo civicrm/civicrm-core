@@ -192,44 +192,9 @@
 
   {if $honor_block_is_active}
   <fieldset class="crm-group honor_block-group">
-    <legend>{$honor_block_title}</legend>
-    <div class="crm-section honor_block_text-section">
-      {$honor_block_text}
-    </div>
-    {if $form.honor_type_id.html}
-      <div class="crm-section {$form.honor_type_id.name}-section">
-        <div class="content" >
-          {$form.honor_type_id.html}
-          <span class="crm-clear-link">(<a href="#" title="unselect" onclick="unselectRadio('honor_type_id', '{$form.formName}');enableHonorType(); return false;">{ts}clear{/ts}</a>)</span>
-          <div class="description">{ts}Select an option to reveal honoree information fields.{/ts}</div>
-        </div>
-      </div>
-    {/if}
+    {include file="CRM/Contribute/Form/SoftCredit.tpl"}
     <div id="honorType" class="honoree-name-email-section">
-      <div class="crm-section {$form.honor_prefix_id.name}-section">
-        <div class="content">{$form.honor_prefix_id.html}</div>
-      </div>
-      <div class="crm-section {$form.honor_first_name.name}-section">
-        <div class="label">{$form.honor_first_name.label}</div>
-        <div class="content">
-          {$form.honor_first_name.html}
-        </div>
-        <div class="clear"></div>
-      </div>
-      <div class="crm-section {$form.honor_last_name.name}-section">
-        <div class="label">{$form.honor_last_name.label}</div>
-        <div class="content">
-          {$form.honor_last_name.html}
-        </div>
-        <div class="clear"></div>
-      </div>
-      <div id="honorTypeEmail" class="crm-section {$form.honor_email.name}-section">
-        <div class="label">{$form.honor_email.label}</div>
-        <div class="content">
-          {$form.honor_email.html}
-        </div>
-        <div class="clear"></div>
-      </div>
+      {include file="CRM/UF/Form/Block.tpl" fields=$honoreeProfileFields mode=8 prefix='honor'}
     </div>
   </fieldset>
   {/if}
@@ -373,13 +338,13 @@
     showOnBehalf(true);
   {/if}
 
-  {if $honor_block_is_active AND $form.honor_type_id.html}
+  {if $honor_block_is_active AND $form.soft_credit_type_id.html}
     enableHonorType();
   {/if}
   {literal}
 
   function enableHonorType( ) {
-    var element = document.getElementsByName("honor_type_id");
+    var element = document.getElementsByName("soft_credit_type_id");
     for (var i = 0; i < element.length; i++ ) {
       var isHonor = false;
       if ( element[i].checked == true ) {
@@ -392,10 +357,6 @@
       cj('#honorTypeEmail').show();
     }
     else {
-      document.getElementById('honor_first_name').value = '';
-      document.getElementById('honor_last_name').value  = '';
-      document.getElementById('honor_email').value      = '';
-      document.getElementById('honor_prefix_id').value  = '';
       cj('#honorType').hide();
       cj('#honorTypeEmail').hide();
     }
