@@ -119,7 +119,6 @@ class CRM_Contact_Form_ProfileContact {
 
       //check if there is any duplicate contact
       $profileContactType = CRM_Core_BAO_UFGroup::getContactType($params['honoree_profile_id']);
-      CRM_Core_Error::debug( '$profileContactType', $profileContactType );
       $dedupeParams = CRM_Dedupe_Finder::formatParams($params['honor'], $profileContactType);
       $dedupeParams['check_permission'] = FALSE;
       $ids = CRM_Dedupe_Finder::dupesByParams($dedupeParams, $profileContactType);
