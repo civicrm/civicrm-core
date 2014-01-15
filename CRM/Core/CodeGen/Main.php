@@ -52,7 +52,7 @@ class CRM_Core_CodeGen_Main {
    *
    */
   function main() {
-    if (!empty($this->digestPath) && file_exists($this->digestPath)) {
+    if (!empty($this->digestPath) && file_exists($this->digestPath) && $this->hasExpectedFiles()) {
       if ($this->getDigest() === file_get_contents($this->digestPath)) {
         echo "GenCode has previously executed. To force execution, please (a) omit CIVICRM_GENCODE_DIGEST\n";
         echo "or (b) remove {$this->digestPath} or (c) call GenCode with new parameters.\n";
@@ -154,5 +154,21 @@ Alternatively you can get a version of CiviCRM that matches your PHP version
       $this->digest = md5($properties);
     }
     return $this->digest;
+  }
+
+  function getExpectedFiles() {
+    return array(
+      $this->sqlCodePath . '/civicrm.mysql',
+      $this->phpCodePath . '/CRM/Contact/DAO/Contact.php',
+    );
+  }
+
+  function hasExpectedFiles() {
+    foreach ($this->getExpectedFiles() as $file) {
+      if (!file_exists($file)) {
+        return FALSE;
+      }
+    }
+    return TRUE;
   }
 }
