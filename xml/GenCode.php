@@ -29,6 +29,7 @@ $genCode = new CRM_Core_CodeGen_Main(
   array('../packages/Smarty/plugins', '../CRM/Core/Smarty/plugins'),  // smarty plugin dirs
   @$argv[3],                                                          // cms
   empty($argv[2]) ? NULL : $argv[2],                                  // db version
-  empty($argv[1]) ? 'schema/Schema.xml' : $argv[1]                    // schem afile
+  empty($argv[1]) ? 'schema/Schema.xml' : $argv[1],                    // schem afile
+  getenv('CIVICRM_GENCODE_DIGEST') ? getenv('CIVICRM_GENCODE_DIGEST') : NULL
 );
 $genCode->main();
