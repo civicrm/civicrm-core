@@ -419,6 +419,7 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
       'payment_instrument' => 'contribution',
       'membership_status' => 'membership',
       'membership_type' => 'membership',
+      'member_campaign_id' => 'membership',
       'member_is_test' => 'yesno',
       'member_is_pay_later' => 'yesno',
       'is_override' => 'yesno',
