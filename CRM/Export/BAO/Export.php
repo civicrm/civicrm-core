@@ -830,6 +830,9 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
               foreach (array_keys($val) as $fld) {
                 $type = explode('-', $fld);
                 $fldValue = "{$ltype}-" . $type[0];
+                // CRM-14076 - fix label to work as the query object expects
+                // FIXME: We should not be using labels as keys!
+                $daoField = CRM_Utils_String::munge($ltype) . '-' . $type[0];
 
                 if (CRM_Utils_Array::value(1, $type)) {
                   $fldValue .= "-" . $type[1];
@@ -839,20 +842,20 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
                 switch ($fld) {
                   case 'country':
                   case 'world_region':
-                    $row[$fldValue] = $i18n->crm_translate($dao->$fldValue, array('context' => 'country'));
+                    $row[$fldValue] = $i18n->crm_translate($dao->$daoField, array('context' => 'country'));
                     break;
 
                   case 'state_province':
-                    $row[$fldValue] = $i18n->crm_translate($dao->$fldValue, array('context' => 'province'));
+                    $row[$fldValue] = $i18n->crm_translate($dao->$daoField, array('context' => 'province'));
                     break;
 
                   case 'im_provider':
-                    $imFieldvalue = $fldValue . "-provider_id";
+                    $imFieldvalue = $daoField . "-provider_id";
                     $row[$fldValue] = CRM_Utils_Array::value($dao->$imFieldvalue, $imProviders);
                     break;
 
                   default:
-                    $row[$fldValue] = $dao->$fldValue;
+                    $row[$fldValue] = $dao->$daoField;
                     break;
                 }
               }
