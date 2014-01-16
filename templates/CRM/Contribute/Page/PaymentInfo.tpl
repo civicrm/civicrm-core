@@ -25,16 +25,20 @@
 *}
 {if $show eq 'event-payment'}
 {literal}
-  <script type='text/javascript'>
-    var dataUrl = {/literal}'{crmURL p="civicrm/payment/view" h=0 q="action=browse&id=$participantId&cid=`$contactId`&component=event&context=payment_info&snippet=4"}'{literal};
-    cj.ajax({
-      url: dataUrl,
-      async: false,
-      success: function(html) {
-        cj("#payment-info").html(html);
-      }
-    });
-  </script>
+<script type='text/javascript'>
+cj(function($){
+  var dataUrl = {/literal}'{crmURL p="civicrm/payment/view" h=0 q="action=browse&id=$participantId&cid=`$contactId`&component=event&context=payment_info&snippet=4"}'{literal};
+  cj.ajax({
+     url: dataUrl,
+     async: false,
+     success: function(html) {
+       cj("#payment-info").html(html);
+     }
+   });
+
+  cj('.total_amount-section').remove();
+});
+</script>
 {/literal}
 {/if}
 {if $context eq 'payment_info'}

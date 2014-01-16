@@ -24,7 +24,35 @@
  +--------------------------------------------------------------------+
 *}
 {* This template is used to change selections of fees for a participant *}
-   
+{literal}
+<script type='text/javascript'>
+function display(totalfee) {
+  // totalfee is monetary, round it to 2 decimal points so it can
+  // go as a float - CRM-13491
+  totalfee = Math.round(totalfee*100)/100;
+  // note : some variables used used here are global variables defined inside Calculate.tpl
+  var totalEventFee  = formatMoney( totalfee, 2, seperator, thousandMarker);
+  document.getElementById('pricevalue').innerHTML = "<b>"+symbol+"</b> "+totalEventFee;
+  scriptfee   = totalfee;
+  scriptarray = price;
+  cj('#total_amount').val( totalfee );
+  ( totalfee < 0 ) ? cj('table#pricelabel').addClass('disabled') : cj('table#pricelabel').removeClass('disabled');
+
+  // populate the balance amount div
+  populatebalanceFee();
+}
+
+function populatebalanceFee() {
+  // calculate the balance amount using total paid and updated amount
+  var updatedFeeUnFormatted = cj('#pricevalue').text();
+  var updatedAmt = parseFloat(updatedFeeUnFormatted.replace(/[^0-9-.]/g, ''));
+  var balanceAmt = updatedAmt - CRM.feePaid;
+  balanceAmt = formatMoney(balanceAmt, 2, seperator, thousandMarker);
+  cj('#balance-fee').text(symbol+" "+balanceAmt);
+}
+
+{/literal}
+</script>
 <h3>Change Registration Selections</h3>
 
 <div class="crm-block crm-form-block crm-payment-form-block">
@@ -53,8 +81,8 @@
       <table class='form-layout'>
         <tr class="crm-event-eventfees-form-block-price_set_amount">
           <td class="label" style="padding-top: 10px;">{$form.amount.label}</td>
-          <td class="view-value"><table class="form-layout">{include file="CRM/Price/Form/PriceSet.tpl" extends="Event"}</table></td>
-        </tr>  
+          <td class="view-value"><table class="form-layout">{include file="CRM/Price/Form/PriceSet.tpl" extends="Event" dontInclCal="true"}</table></td>
+        </tr>
      {if $paymentInfo}
        <tr><td></td><td>
          <div class='crm-section'> 
@@ -64,7 +92,7 @@
          </div>
          <div class='label'><strong>{ts}Balance Owed{/ts}</strong></div><div id='balance-fee' class='content'></div>
           </div>
-       {include file='CRM/Price/Form/Calculate.tpl' currencySymbol=$currencySymbol noCalcValueDisplay='false'}
+       {include file='CRM/Price/Form/Calculate.tpl' currencySymbol=$currencySymbol noCalcValueDisplay='false' displayOveride='true'}
        {/if}    
       </table>
     </fieldset>
@@ -73,19 +101,8 @@
 </div>
 {literal}
 <script type='text/javascript'>
-cj(function(){
+cj(function($){
   cj('.total_amount-section').remove();
-  cj('#pricevalue').val().trigger('populatebalanceFee');
-
-  function populatebalanceFee() {
-    console.log('dd');
-    // calculate the balance amount using total paid and updated amount
-    var updatedFeeUnFormatted = cj('#pricevalue').val();
-    var updatedAmt = parseFloat(updatedFeeUnFormatted.replace(/[^0-9-.]/g, ''));
-    var balanceAmt = updatedAmt - CRM.feePaid;
-    balanceAmt = formatMoney(balanceAmt, 2, seperator, thousandMarker);
-    cj('#balance-fee').val(balanceAmt);
-  }
 });
 </script>
 {/literal}

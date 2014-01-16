@@ -198,7 +198,9 @@ function calculateText( object ) {
     }
   display( totalfee );
 }
-
+{/literal}
+{if $displayOveride neq 'true'}
+{literal}
 //display calculated amount
 function display( totalfee ) {
     // totalfee is monetary, round it to 2 decimal points so it can
@@ -213,7 +215,9 @@ function display( totalfee ) {
     ( totalfee < 0 ) ? cj('table#pricelabel').addClass('disabled') : cj('table#pricelabel').removeClass('disabled');
 
 }
-
+{/literal}
+{/if}
+{literal}
 //money formatting/localization
 function formatMoney (amount, c, d, t) {
 var n = amount,

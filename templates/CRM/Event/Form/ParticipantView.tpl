@@ -108,8 +108,10 @@
     {if $fee_level}
         <tr class="crm-event-participantview-form-block-fee_amount">
             {if $lineItem}
-                <td class="label">{ts}Event Fees{/ts}</td>
-                <td>{include file="CRM/Price/Page/LineItem.tpl" context="Event"}</td>
+                <td class="label">{ts}Selections{/ts}</td>
+                <td>{include file="CRM/Price/Page/LineItem.tpl" context="Event"}
+                   <a class="button" href='{crmURL p="civicrm/event/participant/feeselection" q="reset=1&id=`$participantId`&cid=`$contactId`&action=update"}' title="{ts}Change Selections{/ts}"><span><div class="icon edit-icon"></div> {ts}Change Selections{/ts}</span></a>
+                </td>
             {else}
                 <td class="label">{ts}Event Level{/ts}</td>
                 <td>{$fee_level}&nbsp;{if $fee_amount}- {$fee_amount|crmMoney:$fee_currency}{/if}</td>
