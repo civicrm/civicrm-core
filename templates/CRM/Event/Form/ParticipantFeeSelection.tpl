@@ -57,6 +57,11 @@ function populatebalanceFee() {
 
 <div class="crm-block crm-form-block crm-payment-form-block">
   <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
+  {if !$email}
+  <div class="messages status no-popup">
+    <div class="icon inform-icon"></div>&nbsp;{ts}You will not be able to send an automatic email receipt for this payment because there is no email address recorded for this contact. If you want a receipt to be sent when this payment is recorded, click Cancel and then click Edit from the Summary tab to add an email address before recording the payment.{/ts}
+  </div>
+  {/if}
   <table class="form-layout">    
     <tr>
       <td class="font-size12pt label"><strong>{ts}Participant{/ts}</strong></td><td class="font-size12pt"><strong>{$displayName}</strong></td>
@@ -90,19 +95,88 @@ function populatebalanceFee() {
          <div class='label'>{ts}Total Paid{/ts}</div>
          <div class='content'><a class='action-item' href='{crmURL p="civicrm/payment/view" q="action=browse&cid=`$contactId`&id=`$paymentInfo.id`&component=`$paymentInfo.component`&context=transaction"}'>{$paymentInfo.paid|crmMoney}<br/>>> view payments</a>
          </div>
-         <div class='label'><strong>{ts}Balance Owed{/ts}</strong></div><div id='balance-fee' class='content'></div>
+         <div class='label'><strong>{ts}Balance Owed{/ts}</strong></div><div class='content'><strong id='balance-fee'></strong></div>
           </div>
        {include file='CRM/Price/Form/Calculate.tpl' currencySymbol=$currencySymbol noCalcValueDisplay='false' displayOveride='true'}
        {/if}    
       </table>
     </fieldset>
   {/if}
+{if $email}
+    <fieldset id="email-receipt"><legend>{ts}Participant Confirmation{/ts}</legend>
+      <table class="form-layout" style="width:auto;">
+       <tr class="crm-event-eventfees-form-block-send_receipt">
+          <td class="label">{ts}Send Confirmation{/ts}</td>
+          <td>{$form.send_receipt.html}<br>
+             <span class="description">{ts 1=$email'}Automatically email a confirmation to %1?{/ts}</span>
+          </td>
+       </tr>
+       <tr id="from-email" class="crm-event-eventfees-form-block-from_email_address">
+         <td class="label">{$form.from_email_address.label}</td>
+         <td>{$form.from_email_address.html} {help id ="id-from_email" file="CRM/Contact/Form/Task/Email.hlp"}</td>
+       </tr>
+       <tr id='notice' class="crm-event-eventfees-form-block-receipt_text">
+         <td class="label">{$form.receipt_text.label}</td>
+         <td><span class="description">
+             {ts}Enter a message you want included at the beginning of the confirmation email. EXAMPLE: 'We have made the changes you requested to your registration.'{/ts}
+             </span><br />
+             {$form.receipt_text.html|crmAddClass:huge}
+         </td>
+       </tr>
+      </table>
+    </fieldset>
+{/if}
+    <fieldset>
+      <table class="form-layout">
+        <tr class="crm-participant-form-block-note">
+          <td class="label">{$form.note.label}</td><td>{$form.note.html}</td>
+        </tr>
+      </table>
+    </fieldset>
   <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
 </div>
+{if $email}
+{include file="CRM/common/showHideByFieldValue.tpl"
+    trigger_field_id    ="send_receipt"
+    trigger_value       =""
+    target_element_id   ="notice"
+    target_element_type ="table-row"
+    field_type          ="radio"
+    invert              = 0
+}
+{include file="CRM/common/showHideByFieldValue.tpl"
+    trigger_field_id    ="send_receipt"
+    trigger_value       =""
+    target_element_id   ="from-email"
+    target_element_type ="table-row"
+    field_type          ="radio"
+    invert              = 0
+}
+{/if}
 {literal}
 <script type='text/javascript'>
 cj(function($){
-  cj('.total_amount-section').remove();
+  cj('.total_amount-section').remove(); 
+
+cj('#ParticipantFeeSelection').submit(function(e) {
+  var statusId = cj('#status_id').val();
+  var statusLabel = cj('#status_id option:selected').text(); 
+  var balanceFee = cj('#balance-fee').text();
+  balanceFee = parseFloat(balanceFee.replace(/[^0-9-.]/g, ''));
+  
+  if (balanceFee > 0 && statusId != CRM.partiallyPaid) {
+    var result = confirm('Balance is owing for the updated selections. Expected participant status is \'Partially paid\'. Are you sure you want to set the participant status to ' + statusLabel + ' ? Click OK to continue, Cancel to change your entries.');
+    if (result == false) {
+      e.preventDefault();
+    }
+  }
+  else if (balanceFee < 0 && statusId != CRM.pendingRefund) {
+    var result = confirm('Balance is overpaid for the updated selections. Expected participant status is \'Pending refund\'. Are you sure you want to set the participant status to ' + statusLabel + ' ? Click OK to continue, Cancel to change your entries');
+    if (result == false) {
+      e.preventDefault();
+    }
+  }
+});
 });
 </script>
 {/literal}

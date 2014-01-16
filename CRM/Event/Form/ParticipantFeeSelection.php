@@ -34,18 +34,11 @@
  */
 
 /**
- * This form records additional payments needed when
+ * This form used for changing / updating fee selections for the events
  * event/contribution is partially paid
  *
  */
 class CRM_Event_Form_ParticipantFeeSelection extends CRM_Core_Form {
-  /**
-   * related component whose financial payment is being processed
-   *
-   * @var string
-   * @public
-   */
-  protected $_component = NULL;
 
   protected $_contactId = NULL;
 
@@ -65,15 +58,14 @@ class CRM_Event_Form_ParticipantFeeSelection extends CRM_Core_Form {
 
   public $_values = NULL;
 
-  public $_isPaidEvent = NULL;
-
   public $_participantId = NULL;
 
   public function preProcess() {
     $this->_participantId = CRM_Utils_Request::retrieve('id', 'Positive', $this, TRUE);
     $this->_contactId = CRM_Utils_Request::retrieve('cid', 'Positive', $this, TRUE);
-    $this->_fromEmails = CRM_Core_BAO_Email::getFromEmail();
     $this->_eventId = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Participant', $this->_participantId, 'event_id');
+    $this->_fromEmails = CRM_Event_BAO_Event::getFromEmailIds($this->_eventId);
+
     $this->_contributionId = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_ParticipantPayment', $this->_participantId, 'contribution_id', 'participant_id');
     if ($this->_contributionId) {
       $this->_isPaidEvent = TRUE;
@@ -82,6 +74,8 @@ class CRM_Event_Form_ParticipantFeeSelection extends CRM_Core_Form {
 
     list($this->_contributorDisplayName, $this->_contributorEmail) = CRM_Contact_BAO_Contact_Location::getEmailDetails($this->_contactId);
     $this->assign('displayName', $this->_contributorDisplayName);
+    $this->assign('email', $this->_contributorEmail);
+
     //set the payment mode - _mode property is defined in parent class
     $this->_mode = CRM_Utils_Request::retrieve('mode', 'String', $this);
 
@@ -121,6 +115,14 @@ class CRM_Event_Form_ParticipantFeeSelection extends CRM_Core_Form {
   }
 
   public function buildQuickForm() {
+    CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'js/crm.livePage.js');
+
+    $statuses = CRM_Event_PseudoConstant::participantStatus();
+    CRM_Core_Resources::singleton()->addSetting(array(
+        'partiallyPaid' => array_search('Partially paid', $statuses),
+        'pendingRefund' => array_search('Pending refund', $statuses),
+      ));
+
     $config = CRM_Core_Config::singleton();
     $this->assign('currencySymbol',  $config->defaultCurrencySymbol);
 
@@ -148,10 +150,29 @@ class CRM_Event_Form_ParticipantFeeSelection extends CRM_Core_Form {
       TRUE
     );
 
+    $this->addElement('checkbox',
+      'send_receipt',
+      ts('Send Confirmation?'), NULL,
+      array('onclick' => "showHideByValue('send_receipt','','notice','table-row','radio',false); showHideByValue('send_receipt','','from-email','table-row','radio',false);")
+    );
+
+    $this->add('select', 'from_email_address', ts('Receipt From'), $this->_fromEmails['from_email_id']);
+
+    $this->add('textarea', 'receipt_text', ts('Confirmation Message'));
+
+    $noteAttributes = CRM_Core_DAO::getAttribute('CRM_Core_DAO_Note');
+    $this->add('textarea', 'note', ts('Notes'), $noteAttributes['note']);
+
     $buttons[] = array(
       'type' => 'upload',
       'name' => ts('Save'),
       'isDefault' => TRUE,
+    );
+
+    $buttons[] = array(
+      'type' => 'upload',
+      'name' => ts('Save and Record Payment'),
+      'subName' => 'new'
     );
 
     $buttons[] = array(
@@ -170,7 +191,14 @@ class CRM_Event_Form_ParticipantFeeSelection extends CRM_Core_Form {
 
   public function postProcess() {
     $params = $this->controller->exportValues($this->_name);
-  }
+    $session = CRM_Core_Session::singleton();
+    $buttonName = $this->controller->getButtonName();
+    if ($buttonName == $this->getButtonName('upload', 'new')) {
+      $session->replaceUserContext(CRM_Utils_System::url('civicrm/payment/add',
+          "reset=1&action=add&component=event&id={$this->_participantId}&cid={$this->_contactId}"
+        ));
+    }
+ }
 
   static function emailReceipt(&$form, &$params) {
     // email receipt sending
