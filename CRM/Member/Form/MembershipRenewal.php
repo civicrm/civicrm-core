@@ -244,7 +244,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
     }
 
     $defaults['financial_type_id'] = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType', $this->_memType, 'financial_type_id');
-    
+
     //CRM-13420
     if (!CRM_Utils_Array::value('payment_instrument_id', $defaults)) {
       $defaults['payment_instrument_id'] = key(CRM_Core_OptionGroup::values('payment_instrument', FALSE, FALSE, FALSE, 'AND is_default = 1'));
@@ -515,8 +515,8 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
       //CRM-10223 - allow contribution to be recorded against different contact
       // causes a conflict in standalone mode so skip in standalone for now
       $this->addElement('checkbox', 'contribution_contact', ts('Record Payment from a Different Contact?'));
-      $this->add( 'select', 'honor_type_id', ts('Membership payment is : '),
-        array( '' => ts( '-') ) + CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution', 'honor_type_id') );
+      $this->add('select', 'soft_credit_type_id', ts('Membership payment is : '),
+        array('' => ts('- Select - ')) + CRM_Core_OptionGroup::values("soft_credit_type", FALSE));
       require_once 'CRM/Contact/Form/NewContact.php';
       CRM_Contact_Form_NewContact::buildQuickForm($this,1, null, false,'contribution_');
   }
@@ -781,8 +781,12 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
       //assign contribution contact id to the field expected by recordMembershipContribution
       if($this->_contributorContactID != $this->_contactID){
         $formValues['contribution_contact_id'] = $this->_contributorContactID;
-        if(CRM_Utils_Array::value('honor_type_id', $this->_params)){
-          $formValues['honor_contact_id'] = $this->_contactID;
+        if(CRM_Utils_Array::value('soft_credit_type_id', $this->_params)){
+          $formValues['soft_credit'][] = array(
+            'soft_credit_type_id' => $this->_params['soft_credit_type_id'],
+            'contact_id' => $this->_contactID,
+            'amount' => $formValues['total_amount'],
+          );
         }
       }
       $formValues['contact_id'] = $this->_contactID;

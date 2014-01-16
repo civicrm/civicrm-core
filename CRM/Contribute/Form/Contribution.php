@@ -105,14 +105,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
   public $_options;
 
   /**
-   * stores the honor id
-   *
-   * @var int
-   * @public
-   */
-  public $_honorID = NULL;
-
-  /**
    * Store the contribution Type ID
    *
    * @var array
@@ -289,8 +281,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     //set defaults for pledge payment.
     if ($this->_ppID) {
       $defaults['total_amount'] = CRM_Utils_Array::value('scheduled_amount', $this->_pledgeValues['pledgePayment']);
-      $defaults['honor_type_id'] = CRM_Utils_Array::value('honor_type_id', $this->_pledgeValues);
-      $defaults['honor_contact_id'] = CRM_Utils_Array::value('honor_contact_id', $this->_pledgeValues);
       $defaults['financial_type_id'] = CRM_Utils_Array::value('financial_type_id', $this->_pledgeValues);
       $defaults['currency'] = CRM_Utils_Array::value('currency', $this->_pledgeValues);
       $defaults['option_type'] = 1;
@@ -349,30 +339,13 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     if ($this->_contributionType) {
       $defaults['financial_type_id'] = $this->_contributionType;
     }
-    
+
     if (!CRM_Utils_Array::value('payment_instrument_id', $defaults)) {
       $defaults['payment_instrument_id'] = key(CRM_Core_OptionGroup::values('payment_instrument', FALSE, FALSE, FALSE, 'AND is_default = 1'));
     }
 
     if (CRM_Utils_Array::value('is_test', $defaults)) {
       $this->assign('is_test', TRUE);
-    }
-
-    if (isset($defaults['honor_contact_id'])) {
-      $honorDefault = $ids = array();
-      $this->_honorID = $defaults['honor_contact_id'];
-      $honorType = CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution', 'honor_type_id');
-      $idParams = array(
-        'id' => $defaults['honor_contact_id'],
-        'contact_id' => $defaults['honor_contact_id'],
-      );
-      CRM_Contact_BAO_Contact::retrieve($idParams, $honorDefault, $ids);
-
-      $defaults['honor_prefix_id'] = CRM_Utils_Array::value('prefix_id', $honorDefault);
-      $defaults['honor_first_name'] = CRM_Utils_Array::value('first_name', $honorDefault);
-      $defaults['honor_last_name'] = CRM_Utils_Array::value('last_name', $honorDefault);
-      $defaults['honor_email'] = CRM_Utils_Array::value('email', $honorDefault['email'][1]);
-      $defaults['honor_type'] = $honorType[$defaults['honor_type_id']];
     }
 
     $this->assign('showOption', TRUE);
@@ -493,25 +466,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       }
     }
 
-    $honorFields = array(
-      'honor_type_id',
-      'honor_prefix_id',
-      'honor_first_name',
-      'honor_lastname',
-      'honor_email',
-    );
-    foreach ($honorFields as $key) {
-      if (!empty($defaults[$key])) {
-        $defaults['hidden_Honoree'] = 1;
-        break;
-      }
-    }
-
-    //check for honoree pane.
-    if ($this->_ppID && CRM_Utils_Array::value('honor_contact_id', $this->_pledgeValues)) {
-      $defaults['hidden_Honoree'] = 1;
-    }
-
     if ($this->_productDAO) {
       if ($this->_productDAO->product_id) {
         $defaults['hidden_Premium'] = 1;
@@ -526,7 +480,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
 
     $paneNames = array(
       ts('Additional Details') => 'AdditionalDetail',
-      ts('Honoree Information') => 'Honoree'
     );
 
     //Add Premium pane only if Premium is exists.
@@ -895,17 +848,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $errors['contact[1]'] = ts('Please select a contact or create new contact');
     }
 
-    if (isset($fields['honor_type_id'])) {
-      if (!((CRM_Utils_Array::value('honor_first_name', $fields) &&
-        CRM_Utils_Array::value('honor_last_name', $fields)
-      ) ||
-        CRM_Utils_Array::value('honor_email', $fields)
-      )
-      ) {
-        $errors['honor_first_name'] = ts('Honor First Name and Last Name OR an email should be set.');
-      }
-    }
-
     //check for Credit Card Contribution.
     if ($self->_mode) {
       if (empty($fields['payment_processor_id'])) {
@@ -938,7 +880,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       && $financialType = CRM_Contribute_BAO_Contribution::validateFinancialType($fields['financial_type_id'])) {
       $errors['financial_type_id'] = ts("Financial Account of account relationship of 'Expense Account is' is not configured for Financial Type : ") . $financialType;
     }
-    
+
     // $trxn_id must be unique CRM-13919
     if (!empty($fields['trxn_id'])) {
       $queryParams = array(1 => array($fields['trxn_id'], 'String'));
@@ -950,7 +892,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $tCnt = CRM_Core_DAO::singleValueQuery($query, $queryParams);
       if ($tCnt) {
         $errors['trxn_id'] = ts('Transaction ID\'s must be unique. Transaction \'%1\' already exists in your database.', array(1 => $fields['trxn_id']));
-      }      
+      }
     }
 
     $errors = array_merge($errors, $softErrors);

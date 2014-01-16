@@ -24,7 +24,23 @@
  +--------------------------------------------------------------------+
 *}
 {* template for adding form elements for soft credit form*}
-
+{if $honor_block_is_active}
+  {crmRegion name="contribution-soft-credit-block"}
+    <legend>{$honor_block_title}</legend>
+    <div class="crm-section honor_block_text-section">
+      {$honor_block_text}
+    </div>
+    {if $form.soft_credit_type_id.html}
+      <div class="crm-section {$form.soft_credit_type_id.name}-section">
+        <div class="content" >
+          {$form.soft_credit_type_id.html}
+          <span class="crm-clear-link">(<a href="#" title="unselect" onclick="unselectRadio('soft_credit_type_id', '{$form.formName}');enableHonorType(); return false;">{ts}clear{/ts}</a>)</span>
+          <div class="description">{ts}Select an option to reveal honoree information fields.{/ts}</div>
+        </div>
+      </div>
+    {/if}
+  {/crmRegion}
+{else}
 <table class="form-layout-compressed crm-soft-credit-block">
   {section name='i' start=1 loop=$rowCount}
     {assign var='rowNumber' value=$smarty.section.i.index}
@@ -55,3 +71,4 @@
     </td>
   </tr>
 </table>
+{/if}

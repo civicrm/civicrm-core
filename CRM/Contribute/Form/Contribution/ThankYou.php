@@ -120,21 +120,39 @@ class CRM_Contribute_Form_Contribution_ThankYou extends CRM_Contribute_Form_Cont
 
     $params = $this->_params;
     $honor_block_is_active = $this->get('honor_block_is_active');
-    if ($honor_block_is_active &&
-      ((!empty($params["honor_first_name"]) && !empty($params["honor_last_name"])) ||
-        (!empty($params["honor_email"]))
-      )
-    ) {
-      $this->assign('honor_block_is_active', $honor_block_is_active);
-      $this->assign('honor_block_title', CRM_Utils_Array::value('honor_block_title', $this->_values));
+    if ($honor_block_is_active && CRM_Utils_Array::value('soft_credit_type_id', $params)) {
+      $honorName = null;
+      $softCreditTypes = CRM_Core_OptionGroup::values("soft_credit_type", FALSE);
 
-      $prefix = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'prefix_id');
-      $honor = CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution', 'honor_type_id');
-      $this->assign('honor_type', $honor[$params["honor_type_id"]]);
-      $this->assign('honor_prefix', ($params["honor_prefix_id"]) ? $prefix[$params["honor_prefix_id"]] : ' ');
-      $this->assign('honor_first_name', $params["honor_first_name"]);
-      $this->assign('honor_last_name', $params["honor_last_name"]);
-      $this->assign('honor_email', $params["honor_email"]);
+      $this->assign('honor_block_is_active', $honor_block_is_active);
+      $this->assign('soft_credit_type', $softCreditTypes[$params['soft_credit_type_id']]);
+      $profileContactType = CRM_Core_BAO_UFGroup::getContactType($params['honoree_profile_id']);
+      switch ($profileContactType) {
+        case 'Individual':
+          if (array_key_exists('prefix_id', $params['honor'])) {
+            $honorName = CRM_Utils_Array::value(CRM_Utils_Array::value('prefix_id',$params['honor']),
+              CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'prefix_id')
+            );
+          }
+          $honorName .= ' ' . $params['honor']['first_name'] . ' ' . $params['honor']['last_name'];
+          if (array_key_exists('suffix_id', $params['honor'])) {
+            $honorName .= ' ' . CRM_Utils_Array::value(CRM_Utils_Array::value('suffix_id',$params['honor']),
+              CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'suffix_id')
+            );
+          }
+          break;
+        case 'Organization':
+          $honorName = $params['honor']['organization_name'];
+          break;
+        case 'Household':
+          $honorName = $params['honor']['household_name'];
+          break;
+      }
+      $this->assign('honorName', $honorName);
+
+      $fieldTypes = array('Contact');
+      $fieldTypes[]  = CRM_Core_BAO_UFGroup::getContactType($params['honoree_profile_id']);
+      $this->buildCustom($params['honoree_profile_id'], 'honoreeProfileFields', TRUE, 'honor', $fieldTypes);
     }
 
     $qParams = "reset=1&amp;id={$this->_id}";
@@ -194,7 +212,7 @@ class CRM_Contribute_Form_Contribution_ThankYou extends CRM_Contribute_Form_Cont
         $fieldTypes = array_merge($fieldTypes, array('Contribution'));
       }
 
-      $this->buildCustom($profileId, 'onbehalfProfile', TRUE, TRUE, $fieldTypes);
+      $this->buildCustom($profileId, 'onbehalfProfile', TRUE, 'onbehalf', $fieldTypes);
     }
 
     $this->assign('trxn_id',
@@ -209,12 +227,7 @@ class CRM_Contribute_Form_Contribution_ThankYou extends CRM_Contribute_Form_Cont
     $defaults = array();
     $fields = array();
     foreach ($this->_fields as $name => $dontCare) {
-      if ($name == 'onbehalf') {
-        foreach ($dontCare as $key => $value) {
-          $fields['onbehalf'][$key] = 1;
-        }
-      }
-      else {
+      if ($name != 'onbehalf' || $name != 'honor') {
         $fields[$name] = 1;
       }
     }
@@ -222,19 +235,7 @@ class CRM_Contribute_Form_Contribution_ThankYou extends CRM_Contribute_Form_Cont
     $contact = $this->_params = $this->controller->exportValues('Main');
 
     foreach ($fields as $name => $dontCare) {
-      if ($name == 'onbehalf') {
-        foreach ($dontCare as $key => $value) {
-          //$defaults[$key] = $contact['onbehalf'][$key];
-          if (isset($contact['onbehalf'][$key])) {
-          $defaults[$key] = $contact['onbehalf'][$key];
-        }
-          if (isset($contact['onbehalf']["{$key}_id"])) {
-            $defaults["{$key}_id"] = $contact['onbehalf']["{$key}_id"];
-      }
-
-        }
-      }
-      elseif (isset($contact[$name])) {
+      if (isset($contact[$name])) {
         $defaults[$name] = $contact[$name];
         if (substr($name, 0, 7) == 'custom_') {
           $timeField = "{$name}_time";
