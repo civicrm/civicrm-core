@@ -26,7 +26,9 @@ function civicrm_api3_generic_setValue($apiRequest) {
   }
 
   $def = $fields[$field];
-  if (array_key_exists('required', $def) && empty($value)) {
+  // Disallow empty values except for the number zero.
+  // TODO: create a utility for this since it's needed in many places
+  if (array_key_exists('required', $def) && empty($value) && $value !== '0' && $value !== 0) {
     return civicrm_api3_create_error(ts("This can't be empty, please provide a value"), array("error_code" => "required", "field" => $field));
   }
 
