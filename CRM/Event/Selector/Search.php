@@ -81,7 +81,7 @@ class CRM_Event_Selector_Search extends CRM_Core_Selector_Base implements CRM_Co
     'participant_fee_amount',
     'participant_fee_currency',
     'participant_status',
-    'participant_role',
+    'participant_role_id',
     'participant_campaign_id',
   );
 
@@ -389,7 +389,7 @@ class CRM_Event_Selector_Search extends CRM_Core_Selector_Base implements CRM_Co
       if (!empty($row['participant_role_id'])) {
         $viewRoles = array();
         foreach (explode($sep, $row['participant_role_id']) as $k => $v) {
-          $viewRoles[] = $participantRoles[$v];
+          $viewRoles[] = $v;
         }
         $row['participant_role_id'] = implode(', ', $viewRoles);
       }

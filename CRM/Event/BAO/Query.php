@@ -133,18 +133,8 @@ class CRM_Event_BAO_Query {
         $query->_whereTables['participant_status'] = 1;
       }
 
-      //add role
-      if (CRM_Utils_Array::value('participant_role', $query->_returnProperties)) {
-        $query->_select['participant_role'] = "participant_role.label as participant_role";
-        $query->_element['participant_role'] = 1;
-        $query->_tables['civicrm_participant'] = 1;
-        $query->_tables['participant_role'] = 1;
-        $query->_whereTables['civicrm_participant'] = 1;
-        $query->_whereTables['participant_role'] = 1;
-      }
-
       if (CRM_Utils_Array::value('participant_role_id', $query->_returnProperties)) {
-        $query->_select['participant_role_id'] = "civicrm_participant.role_id as participant_role_id";
+        $query->_select['participant_role_id'] = "participant_role.label as participant_role_id";
         $query->_element['participant_role_id'] = 1;
         $query->_tables['civicrm_participant'] = 1;
         $query->_tables['participant_role'] = 1;
@@ -475,6 +465,7 @@ class CRM_Event_BAO_Query {
         break;
 
       case 'participant_role':
+      case 'participant_role_id':
         $from = " $side JOIN civicrm_option_group option_group_participant_role ON (option_group_participant_role.name = 'participant_role')";
         $from .= " $side JOIN civicrm_option_value participant_role ON (civicrm_participant.role_id = participant_role.value
                                AND option_group_participant_role.id = participant_role.option_group_id ) ";
