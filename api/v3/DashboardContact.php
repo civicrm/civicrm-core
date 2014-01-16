@@ -42,7 +42,7 @@
  * @param array $params
  *
  * @return array
- * 
+ *
  */
 function civicrm_api3_dashboard_contact_create($params) {
   civicrm_api3_verify_one_mandatory($params,
@@ -74,7 +74,7 @@ function civicrm_api3_dashboard_contact_get($params) {
     )
   );
   $bao = new CRM_Core_BAO_Dashboard();
-  $dashboardContact = CRM_Core_BAO_Dashboard::getContactDashlets(TRUE, CRM_Utils_Array::value('contact_id',$params));
+  $dashboardContact = CRM_Core_BAO_Dashboard::getContactDashlets(TRUE, CRM_Utils_Array::value('contact_id', $params));
   return civicrm_api3_create_success($dashboardContact, $params, 'dashboard_contact', 'get');
 }
 
@@ -94,5 +94,5 @@ function _civicrm_api3_dashboard_contact_check_params(&$params) {
   if (!in_array($dashboard_id, $allDashlets)) {
     return civicrm_api3_create_error('Invalid Dashboard ID');
   }
-  return null;
+  return NULL;
 }
