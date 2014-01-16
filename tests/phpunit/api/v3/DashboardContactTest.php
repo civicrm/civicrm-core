@@ -27,8 +27,8 @@ require_once 'CiviTest/CiviUnitTestCase.php';
 /**
  *  Test APIv3 civicrm_action_schedule functions
  *
- *  @package CiviCRM_APIv3
- *  @subpackage API_ActionSchedule
+ * @package CiviCRM_APIv3
+ * @subpackage API_ActionSchedule
  */
 
 class api_v3_DashboardContactTest extends CiviUnitTestCase {
@@ -38,6 +38,7 @@ class api_v3_DashboardContactTest extends CiviUnitTestCase {
   protected $_apiversion = 3;
 
   public $_eNoticeCompliant = TRUE;
+
   /**
    *  Test setup for every test
    *
@@ -62,7 +63,7 @@ class api_v3_DashboardContactTest extends CiviUnitTestCase {
     );
     $this->quickCleanup($tablesToTruncate, TRUE);
   }
-  
+
   function testDashboardContactCreate() {
     $dashParams = array(
       'version' => 3,
@@ -71,21 +72,23 @@ class api_v3_DashboardContactTest extends CiviUnitTestCase {
       'url' => 'civicrm/report/list&compid=99&reset=1&snippet=5',
       'fullscreen_url' => 'civicrm/report/list&compid=99&reset=1&snippet=5&context=dashletFullscreen',
     );
-  	$dashresult = $this->callAPISuccess('dashboard', 'create', $dashParams);
-  	$contact = $this->callAPISuccess('contact', 'create', array( 'first_name' => 'abc1',
-      'contact_type' => 'Individual',
-      'last_name' => 'xyz1',
-      'email' => 'abc@abc.com')
-     );
-  	$oldCount = CRM_Core_DAO::singleValueQuery("select count(*) from civicrm_dashboard_contact where contact_id = {$contact['id']} AND is_active = 1 AND dashboard_id = {$dashresult['id']}");
+    $dashresult = $this->callAPISuccess('dashboard', 'create', $dashParams);
+    $contact = $this->callAPISuccess('contact', 'create', array(
+        'first_name' => 'abc1',
+        'contact_type' => 'Individual',
+        'last_name' => 'xyz1',
+        'email' => 'abc@abc.com'
+      )
+    );
+    $oldCount = CRM_Core_DAO::singleValueQuery("select count(*) from civicrm_dashboard_contact where contact_id = {$contact['id']} AND is_active = 1 AND dashboard_id = {$dashresult['id']}");
     $params = array(
       'version' => 3,
       'contact_id' => $contact['id'],
       'dashboard_id' => $dashresult['id'],
       'is_active' => 1,
     );
-  	$dashboradContact = $this->callAPISuccess('dashboard_contact', 'create', $params);
-  	$newCount = CRM_Core_DAO::singleValueQuery("select count(*) from civicrm_dashboard_contact where contact_id = {$contact['id']} AND is_active = 1 AND dashboard_id = {$dashresult['id']}");
-  	$this->assertEquals($oldCount+1, $newCount);
+    $dashboradContact = $this->callAPISuccess('dashboard_contact', 'create', $params);
+    $newCount = CRM_Core_DAO::singleValueQuery("select count(*) from civicrm_dashboard_contact where contact_id = {$contact['id']} AND is_active = 1 AND dashboard_id = {$dashresult['id']}");
+    $this->assertEquals($oldCount + 1, $newCount);
   }
 }
