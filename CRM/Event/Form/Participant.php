@@ -195,8 +195,6 @@ class CRM_Event_Form_Participant extends CRM_Contact_Form_Task {
    */
   public $_participantRoleIds = array();
 
-
-  protected $_feePaymenBlock = NULL;
   /**
    * Function to set variables up before form is built
    *
@@ -234,13 +232,8 @@ class CRM_Event_Form_Participant extends CRM_Contact_Form_Task {
 
     if ($this->_id) {
       $this->assign('participantId', $this->_id);
-      $this->_feePaymenBlock = FALSE;
       $statusId = CRM_Core_DAO::getFieldValue('CRM_Event_BAO_Participant', $this->_id, 'status_id', 'id');
 
-      if (in_array($participantStatuses[$statusId], array('Partially paid', 'Pending refund'))) {
-        $this->_feePaymenBlock = TRUE;
-      }
-      $this->assign('feePaymentBlock', $this->_feePaymenBlock);
       $this->_paymentId = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_ParticipantPayment',
         $this->_id, 'id', 'participant_id'
       );
@@ -679,9 +672,7 @@ SELECT civicrm_custom_group.name as name,
    * @access public
    */
   public function buildQuickForm() {
-    if ($this->_feePaymenBlock) {
-      CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'js/crm.livePage.js');
-    }
+    CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'js/crm.livePage.js');
     if ($this->_showFeeBlock) {
       return CRM_Event_Form_EventFees::buildQuickForm($this);
     }
