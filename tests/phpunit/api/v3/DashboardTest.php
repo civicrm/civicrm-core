@@ -27,8 +27,8 @@ require_once 'CiviTest/CiviUnitTestCase.php';
 /**
  *  Test APIv3 civicrm_action_schedule functions
  *
- *  @package CiviCRM_APIv3
- *  @subpackage API_ActionSchedule
+ * @package CiviCRM_APIv3
+ * @subpackage API_ActionSchedule
  */
 
 class api_v3_DashboardTest extends CiviUnitTestCase {
@@ -38,14 +38,15 @@ class api_v3_DashboardTest extends CiviUnitTestCase {
   protected $_apiversion = 3;
 
   public $_eNoticeCompliant = TRUE;
+
   /**
    *  Test setup for every test
    *
    *  Connect to the database, truncate the tables that will be used
    *  and redirect stdin to a temporary file
-  */
+   */
   public function setUp() {
-   //  Connect to the database
+    //  Connect to the database
     parent::setUp();
   }
 
@@ -63,7 +64,7 @@ class api_v3_DashboardTest extends CiviUnitTestCase {
   }
 
   function testDashboardCreate() {
-  	$oldCount = CRM_Core_DAO::singleValueQuery('select count(*) from civicrm_dashboard');
+    $oldCount = CRM_Core_DAO::singleValueQuery('select count(*) from civicrm_dashboard');
     $params = array(
       'version' => 3,
       'label' => 'New Dashlet element',
@@ -75,8 +76,8 @@ class api_v3_DashboardTest extends CiviUnitTestCase {
     $this->assertTrue(is_numeric($dashboard['id']), "In line " . __LINE__);
     $this->assertTrue($dashboard['id'] > 0, "In line " . __LINE__);
     $newCount = CRM_Core_DAO::singleValueQuery('select count(*) from civicrm_dashboard');
-    $this->assertEquals($oldCount+1, $newCount);
-    $this->DashboardDelete($dashboard['id'],$oldCount);
+    $this->assertEquals($oldCount + 1, $newCount);
+    $this->DashboardDelete($dashboard['id'], $oldCount);
   }
 
   function DashboardDelete($id, $oldCount) {
