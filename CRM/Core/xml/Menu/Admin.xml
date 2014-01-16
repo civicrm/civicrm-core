@@ -477,6 +477,7 @@
      <desc>Payment Processor setup for CiviCRM transactions</desc>
      <page_callback>CRM_Admin_Page_PaymentProcessor</page_callback>
      <adminGroup>System Settings</adminGroup>
+     <access_arguments>administer payment processors</access_arguments>
      <icon>admin/small/online_contribution_pages.png</icon>
      <weight>30</weight>
   </item>
