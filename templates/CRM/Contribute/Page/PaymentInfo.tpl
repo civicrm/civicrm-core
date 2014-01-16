@@ -60,24 +60,33 @@
   <a class="button" href='{crmURL p="civicrm/payment/add" q="reset=1&component=`$component`&id=`$id`&cid=`$cid`"}' title="{ts}Record Payment{/ts}"><span><div class="icon add-icon"></div> {ts}Record Payment{/ts}</span></a>
 {/if}
 {elseif $context eq 'transaction'}
-<table id='info'>
-  <tr class="columnheader">
-    <th>{ts}Amount{/ts}</th>
-    <th>{ts}Type{/ts}</th>
-    <th>{ts}Paid By{/ts}</th>
-    <th>{ts}Received{/ts}</th>
-    <th>{ts}Transaction ID{/ts}</th>
-    <th>{ts}Status{/ts}</th>
-  </tr>
-  {foreach from=$rows item=row}
-    <tr>
-      <td>{$row.total_amount|crmMoney}</td>
-      <td>{$row.financial_type}</td>
-      <td>{$row.payment_instrument}</td>
-      <td>{$row.receive_date|crmDate}</td>
-      <td>{$row.trxn_id}</td>
-      <td>{$row.status}</td>
-    </tr>
-  {/foreach}
-<table>
+  {if !empty($rows)}
+   <table id='info'>
+     <tr class="columnheader">
+       <th>{ts}Amount{/ts}</th>
+       <th>{ts}Type{/ts}</th>
+       <th>{ts}Paid By{/ts}</th>
+       <th>{ts}Received{/ts}</th>
+       <th>{ts}Transaction ID{/ts}</th>
+       <th>{ts}Status{/ts}</th>
+     </tr>
+     {foreach from=$rows item=row}
+     <tr>
+       <td>{$row.total_amount|crmMoney}</td>
+       <td>{$row.financial_type}</td>
+       <td>{$row.payment_instrument}</td>
+       <td>{$row.receive_date|crmDate}</td>
+       <td>{$row.trxn_id}</td>
+       <td>{$row.status}</td>
+     </tr>
+     {/foreach}
+    <table>
+  {else}
+     {if $component eq 'event'}
+       {assign var='entity' value='participant'}
+     {else}
+       {assign var='entity' value=$component}
+     {/if}
+    {ts 1=$entity}No additional payments found for this %1 record{/ts}
+  {/if}
 {/if}

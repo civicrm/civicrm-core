@@ -45,7 +45,6 @@ class CRM_Event_Form_ParticipantView extends CRM_Core_Form {
    * @return void
    * @access public
    */
-  protected $_feePaymentBlock = NULL;
   public function preProcess() {
     $values        = $ids = array();
     $participantID = CRM_Utils_Request::retrieve('id', 'Positive', $this, TRUE);
@@ -69,13 +68,8 @@ class CRM_Event_Form_ParticipantView extends CRM_Core_Form {
 
     $this->assign('contactId', $contactID);
     $this->assign('participantId', $participantID);
-    $this->_feePaymentBlock = FALSE;
     $statusId = CRM_Core_DAO::getFieldValue('CRM_Event_BAO_Participant', $participantID, 'status_id', 'id');
     $participantStatuses = CRM_Event_PseudoConstant::participantStatus();
-    if (in_array($participantStatuses[$statusId], array('Partially paid', 'Pending refund'))) {
-      $this->_feePaymentBlock = TRUE;
-    }
-    $this->assign('feePaymentBlock', $this->_feePaymentBlock);
 
     if ($values[$participantID]['is_test']) {
       $values[$participantID]['status'] .= ' (test) ';
@@ -208,9 +202,7 @@ class CRM_Event_Form_ParticipantView extends CRM_Core_Form {
    * @access public
    */
   public function buildQuickForm() {
-    if ($this->_feePaymentBlock) {
-      CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'js/crm.livePage.js');
-    }
+    CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'js/crm.livePage.js');
     $this->addButtons(array(
         array(
           'type' => 'cancel',

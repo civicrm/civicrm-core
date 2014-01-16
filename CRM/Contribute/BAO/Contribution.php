@@ -3148,17 +3148,23 @@ WHERE eft.financial_trxn_id = {$trxnId}
       $contributionId = CRM_Core_DAO::getFieldValue('CRM_Event_BAO_ParticipantPayment', $id, 'contribution_id', 'participant_id');
     }
     $total = CRM_Core_BAO_FinancialTrxn::getBalanceTrxnAmt($contributionId);
-    $baseTrxnId = $total['trxn_id'];
-    $total = $total['total_amount'];
-    $paymentBalance = CRM_Core_BAO_FinancialTrxn::getPartialPaymentWithType($id, $entity, FALSE);
+    $baseTrxnId = NULL;
+    if (empty($total)) {
+      $total = CRM_Price_BAO_LineItem::getLineTotal($id, 'civicrm_participant');
+    }
+    else {
+      $baseTrxnId = $total['trxn_id'];
+      $total = $total['total_amount'];
+    }
+    $paymentBalance = CRM_Core_BAO_FinancialTrxn::getPartialPaymentWithType($id, $entity, FALSE, $total);
 
     $info['total'] = $total;
     $info['paid'] = $total - $paymentBalance;
     $info['balance'] = $paymentBalance;
     $info['id'] = $id;
     $info['component'] = $component;
-
-    if ($getTrxnInfo) {
+    $rows = array();
+    if ($getTrxnInfo && $baseTrxnId) {
       $sql = "
 SELECT ft.total_amount, con.financial_type_id, ft.payment_instrument_id, ft.trxn_date, ft.trxn_id, ft.status_id
 FROM civicrm_contribution con
@@ -3168,7 +3174,6 @@ WHERE ft.id != {$baseTrxnId} AND con.id = {$contributionId}
 ";
       $resultDAO = CRM_Core_DAO::executeQuery($sql);
 
-      $rows = array();
       while($resultDAO->fetch()) {
         $paymentInstrument = CRM_Contribute_PseudoConstant::paymentInstrument();
         $statuses = CRM_Contribute_PseudoConstant::contributionStatus();

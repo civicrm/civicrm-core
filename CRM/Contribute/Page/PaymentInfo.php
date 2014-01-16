@@ -53,7 +53,7 @@ class CRM_Contribute_Page_PaymentInfo extends CRM_Core_Page {
       $this->assign('paymentInfo', $paymentInfo);
     }
     else {
-      $rows = $paymentInfo['transaction'];
+      $rows = CRM_Utils_Array::value('transaction', $paymentInfo);
       $this->assign('rows', $rows);
     }
   }

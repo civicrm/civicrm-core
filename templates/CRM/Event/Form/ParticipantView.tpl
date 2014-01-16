@@ -99,7 +99,7 @@
         <td class="label">{ts}Event Source{/ts}</td><td>{$source}&nbsp;</td>
       </tr>
     {/if}
-    {if $participantId and $feePaymentBlock}
+    {if $participantId}
       <tr>
         <td class='label'>{ts}Fees{/ts}</td>
         <td id='payment-info'></td>
@@ -122,7 +122,7 @@
       {/if}
     {/foreach}
     </table>
-    {if $participantId and $feePaymentBlock}
+    {if $participantId}
       {include file="CRM/Contribute/Page/PaymentInfo.tpl" show='event-payment'}
     {/if}
     {include file="CRM/Custom/Page/CustomDataView.tpl"}

@@ -24,7 +24,7 @@
  +--------------------------------------------------------------------+
 *}
 {* This template is used for adding/editing/deleting offline Event Registrations *}
-{if $showFeeBlock }
+{if $showFeeBlock}
   {if $priceSet}
   <div id='validate_pricefield' class='messages crm-error hiddenElement'></div>
     {literal}
@@ -165,7 +165,7 @@
   </script>
   {/literal}
   {/if}
-  {if $participantId and $feePaymentBlock}
+  {if $participantId}
     {include file="CRM/Contribute/Page/PaymentInfo.tpl" show='event-payment'}
   {/if}
   {include file="CRM/Event/Form/EventFees.tpl"}
@@ -291,7 +291,7 @@
             <span class="description">{ts}Source for this registration (if applicable).{/ts}</span></td>
           </tr>
         </table>
-       {if $participantId and $feePaymentBlock}
+       {if $participantId}
         <table class='form-layout'>
           <tr>
             <td class='label'>{ts}Fees{/ts}</td>
