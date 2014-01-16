@@ -203,9 +203,17 @@ class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_
       )
     );
 
-    $entities = array();
-    $entities[] = array('entity_name' => 'contact_1', 'entity_type' => 'IndividualModel');
-    //$entities[] = array('entity_name' => 'contact_1', 'entity_type' => 'OrganizationModel');
+    $entities = array(
+      array('entity_name' => 'contact_1',
+        'entity_type' => 'IndividualModel'
+      ),
+      array('entity_name' => 'organization_1',
+        'entity_type' => 'OrganizationModel'
+      ),
+      array('entity_name' => 'household_1',
+        'entity_type' => 'HouseholdModel'
+      ),
+    );
     $allowCoreTypes = array_merge(array('Contact', 'Individual', 'Organization', 'Household'), CRM_Contact_BAO_ContactType::subTypes('Individual'));
     $allowSubTypes = array();
 

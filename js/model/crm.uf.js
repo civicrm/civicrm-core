@@ -77,8 +77,11 @@
     switch (field_type) {
       case 'Contact':
       case 'Individual':
-      case 'Organization':
         return 'contact_1';
+      case 'Organization':
+        return 'organization_1';
+      case 'Household':
+        return 'household_1';
       case 'Activity':
         return 'activity_1';
       case 'Contribution':
