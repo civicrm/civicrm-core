@@ -313,7 +313,7 @@ VALUES
    (@option_group_id_act, '{ts escape="sql"}Tell a Friend{/ts}',                      9, 'Tell a Friend',       NULL, 1, NULL, 9, '{ts escape="sql"}Send information about a contribution campaign or event to a friend.{/ts}', 0, 1, 1, NULL, NULL),
    (@option_group_id_act, '{ts escape="sql"}Pledge Acknowledgment{/ts}',              10, 'Pledge Acknowledgment',  NULL, 1, NULL, 10, '{ts escape="sql"}Send Pledge Acknowledgment.{/ts}',                                     0, 1, 1, @pledgeCompId, NULL),
    (@option_group_id_act, '{ts escape="sql"}Pledge Reminder{/ts}',                    11, 'Pledge Reminder',    NULL, 1, NULL, 11, '{ts escape="sql"}Send Pledge Reminder.{/ts}',                                               0, 1, 1, @pledgeCompId, NULL),
-   (@option_group_id_act, '{ts escape="sql"}Inbound Email{/ts}',                      12, 'Inbound Email',      NULL, 1, NULL, 12, '{ts escape="sql"}Inbound Email.{/ts}',                                                      0, 1, 1, NULL, NULL),
+   (@option_group_id_act, '{ts escape="sql"}Inbound Email{/ts}',                      12, 'Inbound Email',      NULL, 1, NULL, 12, '{ts escape="sql"}Inbound Email.{/ts}',                                                      0, 1, 1, NULL, NULL),   
 
 -- Activity Types for case activities
    (@option_group_id_act, '{ts escape="sql"}Open Case{/ts}',          13, 'Open Case',          NULL, 0,  0, 13, '', 0, 1, 1, @caseCompId, NULL),
@@ -362,6 +362,14 @@ VALUES
 -- new sms options
    (@option_group_id_act, '{ts escape="sql"}SMS delivery{/ts}', 44, 'SMS delivery', NULL, 1, NULL, 44, '{ts escape="sql"}SMS delivery{/ts}', 0, 1, 1, NULL, NULL),
    (@option_group_id_act, '{ts escape="sql"}Inbound SMS{/ts}',  45, 'Inbound SMS', NULL, 1, NULL,  45, '{ts escape="sql"}Inbound SMS{/ts}', 0, 1, 1, NULL, NULL),
+
+
+ -- Activity types for particial payment   
+   (@option_group_id_act, '{ts escape="sql"}Payment{/ts}', 46, 'Payment', NULL, 1, NULL, 46, '{ts escape="sql"}Additional payment recorded for event or membership fee.{/ts}', 0, 1, 1, @contributeCompId, NULL),
+   (@option_group_id_act, '{ts escape="sql"}Refund{/ts}', 47, 'Refund', NULL, 1, NULL, 47, '{ts escape="sql"}Refund recorded for event or membership fee.{/ts}', 0, 1, 1, @contributeCompId, NULL),
+
+ -- for selection changes
+   (@option_group_id_act, '{ts escape="sql"}Change Registration{/ts}', 48, 'Change Registration', NULL, 1, NULL, 48, '{ts escape="sql"}Changes to an existing event registration.{/ts}', 0, 1, 1, @eventCompId, NULL),
 
    (@option_group_id_gender, '{ts escape="sql"}Female{/ts}',      1, 'Female',      NULL, 0, NULL, 1, NULL, 0, 0, 1, NULL, NULL),
    (@option_group_id_gender, '{ts escape="sql"}Male{/ts}',        2, 'Male',        NULL, 0, NULL, 2, NULL, 0, 0, 1, NULL, NULL),
@@ -413,6 +421,8 @@ VALUES
   (@option_group_id_cs, '{ts escape="sql"}In Progress{/ts}', 5, 'In Progress', NULL, 0, NULL, 5, NULL, 0, 1, 1, NULL, NULL),
   (@option_group_id_cs, '{ts escape="sql"}Overdue{/ts}'    , 6, 'Overdue'    , NULL, 0, NULL, 6, NULL, 0, 1, 1, NULL, NULL),
   (@option_group_id_cs, '{ts escape="sql"}Refunded{/ts}'   , 7, 'Refunded'   , NULL, 0, NULL, 7, NULL, 0, 1, 1, NULL, NULL),
+  (@option_group_id_cs, '{ts escape="sql"}Partially paid{/ts}', 8, 'Partially paid', NULL, 0, NULL, 8, NULL, 0, 1, 1, NULL, NULL),
+  (@option_group_id_cs, '{ts escape="sql"}Pending refund{/ts}', 9, 'Pending refund', NULL, 0, NULL, 9, NULL, 0, 1, 1, NULL, NULL),
 
   (@option_group_id_pcp, '{ts escape="sql"}Waiting Review{/ts}', 1, 'Waiting Review', NULL, 0, NULL, 1, NULL, 0, 1, 1, NULL, NULL),
   (@option_group_id_pcp, '{ts escape="sql"}Approved{/ts}'      , 2, 'Approved'      , NULL, 0, NULL, 2, NULL, 0, 1, 1, NULL, NULL),
@@ -1446,7 +1456,10 @@ INSERT INTO civicrm_participant_status_type
   (10, 'Pending from approval',               '{ts escape="sql"}Pending from approval{/ts}',               'Pending',  1,           0,         1,          10,     2            ),
   (11, 'Rejected',                            '{ts escape="sql"}Rejected{/ts}',                            'Negative', 1,           0,         0,          11,     2            ),
   (12, 'Expired',                             '{ts escape="sql"}Expired{/ts}',                             'Negative', 1,           1,         0,          12,     2            ),
-  (13, 'Pending in cart',                     '{ts escape="sql"}Pending in cart{/ts}',                     'Pending',  1,           1,         0,          13,     2            );
+  (13, 'Pending in cart',                     '{ts escape="sql"}Pending in cart{/ts}',                     'Pending',  1,           1,         0,          13,     2            ),
+  (14,  'Partially paid',                      '{ts escape="sql"}Partially paid{/ts}',                      'Positive', 1,           1,         1,          14,     2           ),
+  (15,  'Pending refund',                      '{ts escape="sql"}Pending refund{/ts}',                      'Positive', 1,           1,         1,          14,     2           );
+
 
 
 -- CRM-8150
