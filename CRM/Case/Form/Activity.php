@@ -70,7 +70,7 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
   /**
    * Function to build the form
    *
-   * @return None
+   * @return void
    * @access public
    */
   function preProcess() {
@@ -115,7 +115,7 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
       !CRM_Core_Permission::check('access all cases and activities')
     ) {
       $session = CRM_Core_Session::singleton();
-      $allCases = CRM_Case_BAO_Case::getCases(TRUE, $session->get('userID'));
+      $allCases = CRM_Case_BAO_Case::getCases(TRUE, $session->get('userID'), 'any');
       if (!array_key_exists($this->_caseId, $allCases)) {
         CRM_Core_Error::fatal(ts('You are not authorized to access this page.'));
       }
@@ -217,7 +217,7 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   function setDefaultValues() {
     $this->_defaults = parent::setDefaultValues();
@@ -354,7 +354,7 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   public function postProcess($params = NULL) {
     $transaction = new CRM_Core_Transaction();
@@ -619,7 +619,7 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
           $mailStatus = ts("A copy of the activity has also been sent to selected contacts(s).");
         }
         else {
-          $this->_relatedContacts = CRM_Activity_BAO_ActivityAssignment::getAssigneeNames($activity->id, TRUE, FALSE);
+          $this->_relatedContacts = CRM_Activity_BAO_ActivityAssignment::getAssigneeNames(array($activity->id), TRUE, FALSE);
           $mailStatus .= ' ' . ts("A copy of the activity has also been sent to assignee contacts(s).");
         }
 

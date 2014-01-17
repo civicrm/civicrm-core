@@ -95,7 +95,7 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   function setDefaultValues() {
     if ($this->_addProfileBottom || $this->_addProfileBottomAdd) {
@@ -237,7 +237,7 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
   /**
    * Function to build the form
    *
-   * @return None
+   * @return void
    * @access public
    */
   public function buildQuickForm() {
@@ -693,10 +693,9 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   public function postProcess() {
-    $params = array();
     $params = $this->exportValues();
 
     $params['id'] = $this->_id;
@@ -824,6 +823,9 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
         }
       }
     }
+
+    // Update tab "disabled" css class
+    $this->ajaxResponse['tabValid'] = !empty($params['is_online_registration']);
 
     parent::endPostProcess();
   }

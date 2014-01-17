@@ -50,7 +50,8 @@
      <p></p>
         {strip}
   {* handle enable/disable actions*}
-   {include file="CRM/common/enableDisable.tpl"}
+   {include file="CRM/common/enableDisableApi.tpl"}
+   {include file="CRM/common/crmeditable.tpl"}
    {include file="CRM/common/jsortable.tpl"}
         <table id="options" class="display">
         <thead>
@@ -66,8 +67,8 @@
          </tr>
         </thead>
         {foreach from=$customOption item=row}
-      <tr id="row_{$row.id}"class=" crm-price-option crm-price-option_{$row.id} {cycle values="odd-row,even-row"} {$row.class}{if NOT $row.is_active} disabled{/if}">
-            <td class="crm-price-option-label">{$row.label}</td>
+      <tr id="price_field_value-{$row.id}" class="crm-entity {cycle values="odd-row,even-row"} {$row.class}{if NOT $row.is_active} disabled{/if}">
+            <td class="crm-price-option-label crm-editable" data-field="label">{$row.label}</td>
             <td class="crm-price-option-value">{$row.amount|crmMoney}</td>
       <td class="crm-price-option-is_default">{if $row.is_default}<img src="{$config->resourceBase}i/check.gif" alt="{ts}Default{/ts}" />{/if}</td>
       <td class="nowrap crm-price-option-financial-type-id">{$row.financial_type_id}</td>

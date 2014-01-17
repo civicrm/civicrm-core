@@ -42,7 +42,7 @@ class CRM_Admin_Form_RelationshipType extends CRM_Admin_Form {
   /**
    * Function to build the form
    *
-   * @return None
+   * @return void
    * @access public
    */
   public function buildQuickForm() {
@@ -99,9 +99,6 @@ class CRM_Admin_Form_RelationshipType extends CRM_Admin_Form {
 
     if ($this->_action & CRM_Core_Action::VIEW) {
       $this->freeze();
-      $url = CRM_Utils_System::url('civicrm/admin/reltype&reset=1');
-      $location = "window.location='$url'";
-      $this->addElement('button', 'done', ts('Done'), array('onclick' => $location));
     }
   }
 
@@ -134,7 +131,7 @@ class CRM_Admin_Form_RelationshipType extends CRM_Admin_Form {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   public function postProcess() {
     if ($this->_action & CRM_Core_Action::DELETE) {

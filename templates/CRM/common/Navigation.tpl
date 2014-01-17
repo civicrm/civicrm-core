@@ -53,7 +53,7 @@
     {/if}
     {$navigation}
   </ul>
-{/strip}{/capture}// Generated {$timeGenerated}
+{/strip}{/capture}// <script> Generated {$timeGenerated}
 {literal}
 (function($) {
   var menuMarkup = {/literal}{$menuMarkup|@json_encode};
@@ -111,6 +111,19 @@ $('#civicrm-menu').ready(function() {
   $('#sort_name_navigation').keydown(function() {
     $.Menu.closeAll();
   });
+  $('.crm-hidemenu').click(function() {
+    $.Menu.closeAll();
+    $('#civicrm-menu').slideUp();
+    var alert = CRM.alert({/literal}'<a href="#" id="crm-restore-menu">{ts escape='js'}Restore Menu{/ts}</a>', "{ts escape='js'}CiviCRM Menu Hidden{/ts}"{literal});
+    $('#crm-notification-container')
+      .off('.hideMenu')
+      .on('click.hideMenu', '#crm-restore-menu', function() {
+        alert.close();
+        $('#civicrm-menu').slideDown();
+        return false;
+      });
+    return false;
+  });
   $('.crm-quickSearchField').click(function() {
     var label = $(this).text();
     var value = $('input', this).val();
@@ -143,5 +156,5 @@ $('#civicrm-menu').ready(function() {
     }
   });
 });
-$('#civicrm-menu').menu({arrowSrc: CRM.config.resourceBase + 'packages/jquery/css/images/arrow.png'});
+$('#civicrm-menu').menuBar({arrowSrc: CRM.config.resourceBase + 'packages/jquery/css/images/arrow.png'});
 })(cj);{/literal}

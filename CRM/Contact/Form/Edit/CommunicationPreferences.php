@@ -169,12 +169,13 @@ class CRM_Contact_Form_Edit_CommunicationPreferences {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   static function setDefaultValues(&$form, &$defaults) {
 
     if (!empty($defaults['preferred_language'])) {
-      $defaults['preferred_language'] = CRM_Core_PseudoConstant::getKey('CRM_Contact_DAO_Contact', 'preferred_language', $defaults['preferred_language']);
+      $languages = CRM_Contact_BAO_Contact::buildOptions('preferred_language');
+      $defaults['preferred_language'] = CRM_Utils_Array::key($defaults['preferred_language'], $languages);
     }
 
     // CRM-7119: set preferred_language to default if unset
@@ -210,7 +211,7 @@ class CRM_Contact_Form_Edit_CommunicationPreferences {
   /**
    *  set array of greeting fields
    *
-   * @return None
+   * @return void
    * @access public
    */
   static function getGreetingFields($contactType) {

@@ -174,7 +174,7 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   function setDefaultValues() {
     if ($this->_cdType) {
@@ -245,7 +245,7 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
   /**
    * This function is used to add the rules for form.
    *
-   * @return None
+   * @return void
    * @access public
    */
   function addRules() {
@@ -271,7 +271,7 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
   /**
    * Function to build the form
    *
-   * @return None
+   * @return void
    * @access public
    */
   public function buildQuickForm() {
@@ -282,7 +282,7 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
     $relTypeID = explode('_', $this->_rtypeId, 3);
 
     if ($this->_action & CRM_Core_Action::DELETE) {
-
+      $this->assign('id', $this->_relationshipId);
       $this->addButtons(array(
           array(
             'type' => 'next',
@@ -424,7 +424,7 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
     }
     $this->addElement('submit', $this->getButtonName('refresh'), $searchBtn, array('class' => 'form-submit', 'id' => 'search-button'));
     $this->addElement('submit', $this->getButtonName('refresh', 'save'), 'Quick Save', array('class' => 'form-submit', 'id' => 'quick-save'));
-    $this->addElement('submit', $this->getButtonName('cancel'), ts('Cancel'), array('class' => 'form-submit'));
+    $this->addElement('submit', $this->getButtonName('cancel'), ts('Cancel'), array('class' => 'form-submit cancel'));
 
     $this->addElement('submit', $this->getButtonName('refresh', 'savedetails'), 'Save Relationship', array('class' => 'form-submit hiddenElement', 'id' => 'details-save'));
     $this->addElement('checkbox', 'add_current_employer', ts('Current Employer'), NULL);
@@ -463,7 +463,7 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   public function postProcess() {
     // store the submitted values in an array
@@ -690,8 +690,9 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
         CRM_Contact_BAO_Contact_Utils::setCurrentEmployer($currentEmpParams);
       }
     }
-
-    if ($quickSave) {
+    // Don't redirect in ajaxForm context
+    // FIXME: Perhaps changing the button type would avoid needing the redirect at allq
+    if ($quickSave && empty($_REQUEST['snippet'])) {
       $session = CRM_Core_Session::singleton();
       CRM_Utils_System::redirect($session->popUserContext());
     }

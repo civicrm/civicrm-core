@@ -204,7 +204,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
   /**
    * Function to build the form
    *
-   * @return None
+   * @return void
    * @access public
    */
   function preProcess() {
@@ -229,10 +229,6 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
       $this->_currentlyViewedContactId = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
     }
     $this->assign('contactId', $this->_currentlyViewedContactId);
-
-    if ($this->_currentlyViewedContactId) {
-      CRM_Contact_Page_View::setTitle($this->_currentlyViewedContactId);
-    }
 
     //give the context.
     if (!isset($this->_context)) {
@@ -305,10 +301,22 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
       }
     }
 
-    // Assign pageTitle to be "Activity - "+ activity name
+    // Set title
     if (isset($activityTName)) {
-      $pageTitle = 'Activity - ' . CRM_Utils_Array::value($this->_activityTypeId, $activityTName);
-      $this->assign('pageTitle', $pageTitle);
+      $activityName = CRM_Utils_Array::value($this->_activityTypeId, $activityTName);
+      $this->assign('pageTitle', ts('%1 Activity', array( 1 => $activityName)));
+
+      if ($this->_currentlyViewedContactId) {
+        $displayName = CRM_Contact_BAO_Contact::displayName($this->_currentlyViewedContactId);
+        // Check if this is default domain contact CRM-10482
+        if (CRM_Contact_BAO_Contact::checkDomainContact($this->_currentlyViewedContactId)) {
+          $displayName .= ' (' . ts('default organization') . ')';
+        }
+        CRM_Utils_System::setTitle($displayName . ' - ' . $activityName);
+      }
+      else {
+        CRM_Utils_System::setTitle(ts('%1 Activity', array( 1 => $activityName)));
+      }
     }
 
     //check the mode when this form is called either single or as
@@ -491,7 +499,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   function setDefaultValues() {
     if ($this->_cdType) {
@@ -802,10 +810,13 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
       $admin
     );
 
+    $followupAssigneeContactField =& $this->add( 'text', 'followup_assignee_contact_id', ts('assignee') );
+
     $this->add('hidden', 'source_contact_qid', '', array('id' => 'source_contact_qid'));
     CRM_Contact_Form_NewContact::buildQuickForm($this);
 
     $this->add('text', 'assignee_contact_id', ts('assignee'));
+    $this->add( 'text', 'followup_assignee_contact_id', ts('assignee'));
 
     if ($sourceContactField->getValue()) {
       $this->assign('source_contact', $sourceContactField->getValue());
@@ -834,7 +845,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
     if (!in_array($this->_activityTypeName, $specialActivities)) {
       // build tag widget
       $parentNames = CRM_Core_BAO_Tag::getTagSet('civicrm_activity');
-      CRM_Core_Form_Tag::buildQuickForm($this, $parentNames, 'civicrm_activity', $this->_activityId, FALSE, TRUE);
+      CRM_Core_Form_Tag::buildQuickForm($this, $parentNames, 'civicrm_activity', $this->_activityId, TRUE, TRUE);
     }
 
     // if we're viewing, we're assigning different buttons than for adding/editing
@@ -966,7 +977,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   public function postProcess($params = NULL) {
     if ($this->_action & CRM_Core_Action::DELETE) {
@@ -1032,6 +1043,13 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
     else {
       $params['assignee_contact_id'] = array();
     }
+      // civicrm-10043 - 14/12/13
+      if ( CRM_Utils_Array::value( 'followup_assignee_contact_id', $params ) ) {
+          $params['followup_assignee_contact_id'] = explode( ',', $params['followup_assignee_contact_id'] );
+     }
+     else {
+        $params['followup_assignee_contact_id'] = array( );
+     }
 
     // get ids for associated contacts
     if (!$params['source_contact_id']) {
@@ -1133,42 +1151,69 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
 
     // create follow up activity if needed
     $followupStatus = '';
+    $followupActivity = NULL;
     if (CRM_Utils_Array::value('followup_activity_type_id', $params)) {
-      CRM_Activity_BAO_Activity::createFollowupActivity($activity->id, $params);
+      $followupActivity = CRM_Activity_BAO_Activity::createFollowupActivity($activity->id, $params);
       $followupStatus = ts('A followup activity has been scheduled.');
     }
 
     // send copy to assignee contacts.CRM-4509
     $mailStatus = '';
 
-    if (!CRM_Utils_Array::crmIsEmptyArray($params['assignee_contact_id']) &&
-      CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
-        'activity_assignee_notification'
-      )
-    ) {
-      $mailToContacts = array();
-      $assigneeContacts = CRM_Activity_BAO_ActivityAssignment::getAssigneeNames($activity->id, TRUE, FALSE);
+    if (CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
+        'activity_assignee_notification')) {
+      $activityIDs = array($activity->id);
+      if ($followupActivity) {
+        $activityIDs = array_merge($activityIDs, array($followupActivity->id));
+      }
+      $assigneeContacts = CRM_Activity_BAO_ActivityAssignment::getAssigneeNames($activityIDs, TRUE, FALSE);
 
-      //build an associative array with unique email addresses.
-      foreach ($activityAssigned as $id => $dnc) {
-        if (isset($id) && array_key_exists($id, $assigneeContacts)) {
-          $mailToContacts[$assigneeContacts[$id]['email']] = $assigneeContacts[$id];
+      if (!CRM_Utils_Array::crmIsEmptyArray($params['assignee_contact_id'])) {
+        $mailToContacts = array();
+
+        //build an associative array with unique email addresses.
+        foreach ($activityAssigned as $id => $dnc) {
+          if (isset($id) && array_key_exists($id, $assigneeContacts)) {
+            $mailToContacts[$assigneeContacts[$id]['email']] = $assigneeContacts[$id];
+          }
+        }
+
+        if (!CRM_Utils_array::crmIsEmptyArray($mailToContacts)) {
+          //include attachments while sending a copy of activity.
+          $attachments = CRM_Core_BAO_File::getEntityFile('civicrm_activity', $activity->id);
+
+          $ics = new CRM_Activity_BAO_ICalendar($activity);
+          $ics->addAttachment($attachments, $mailToContacts);
+
+          // CRM-8400 add param with _currentlyViewedContactId for URL link in mail
+          CRM_Case_BAO_Case::sendActivityCopy(NULL, $activity->id, $mailToContacts, $attachments, NULL);
+
+          $ics->cleanup();
+
+          $mailStatus .= ts("A copy of the activity has also been sent to assignee contacts(s).");
         }
       }
+      
+      // Also send email to follow-up activity assignees if set
+      if ($followupActivity) {
+        $mailToFollowupContacts = array();
+        foreach ($assigneeContacts as $values) {
+          if ($values['activity_id'] == $followupActivity->id) {
+            $mailToFollowupContacts[$values['email']] = $values;
+          }
+        }
 
-      if (!CRM_Utils_array::crmIsEmptyArray($mailToContacts)) {
-        //include attachments while sending a copy of activity.
-        $attachments = CRM_Core_BAO_File::getEntityFile('civicrm_activity', $activity->id);
+        if (!CRM_Utils_array::crmIsEmptyArray($mailToFollowupContacts)) {
+          $ics = new CRM_Activity_BAO_ICalendar($followupActivity);
+          $attachments = CRM_Core_BAO_File::getEntityFile('civicrm_activity', $followupActivity->id);
+          $ics->addAttachment($attachments, $mailToFollowupContacts);
 
-        $ics = new CRM_Activity_BAO_ICalendar($activity);
-        $ics->addAttachment($attachments, $mailToContacts);
+          CRM_Case_BAO_Case::sendActivityCopy(NULL, $followupActivity->id, $mailToFollowupContacts, $attachments, NULL);
 
-        // CRM-8400 add param with _currentlyViewedContactId for URL link in mail
-        CRM_Case_BAO_Case::sendActivityCopy(NULL, $activity->id, $mailToContacts, $attachments, NULL);
+          $ics->cleanup();
 
-        $ics->cleanup();
-
-        $mailStatus .= ts("A copy of the activity has also been sent to assignee contacts(s).");
+          $mailStatus .= '<br />' . ts("A copy of the follow-up activity has also been sent to follow-up assignee contacts(s).");
+        }
       }
     }
 

@@ -123,7 +123,7 @@ class CRM_Financial_Form_FinancialTypeAccount extends CRM_Contribute_Form {
   /**
    * Function to build the form
    *
-   * @return None
+   * @return void
    * @access public
    */
   public function buildQuickForm() {
@@ -308,7 +308,7 @@ class CRM_Financial_Form_FinancialTypeAccount extends CRM_Contribute_Form {
    * Function to process the form
    *
    * @access public
-   * @return None
+   * @return void
    */
   public function postProcess() {
     if ($this->_action & CRM_Core_Action::DELETE) {

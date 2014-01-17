@@ -114,8 +114,7 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
         CRM_Core_Action::DISABLE => array(
           'name' => ts('Cancel'),
           'title' => ts('Cancel'),
-          'extra' => 'onclick = "enableDisable( %%crid%%,\'' . 'CRM_Contribute_BAO_ContributionRecur' . '\',\'' . 'enable-disable' . '\' );"',
-          'ref' => 'disable-action',
+          'ref' => 'crm-enable-disable',
         ),
       );
     }
@@ -147,6 +146,7 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
    * @access public
    */
   function browse() {
+    CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'js/crm.livePage.js');
 
     // add annual contribution
     $annual = array();
@@ -166,7 +166,8 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
     $controller->reset();
     $controller->set('cid', $this->_contactId);
     $controller->set('crid', $this->_crid);
-    $controller->set('context', 'contribution');
+    $controller->set('context', 'Search');
+    $controller->set('limit', 50);
     $controller->process();
     $controller->run();
 
@@ -265,6 +266,7 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
     if ($this->_contactId) {
       $displayName = CRM_Contact_BAO_Contact::displayName($this->_contactId);
       $this->assign('displayName', $displayName);
+      $this->ajaxResponse['tabCount'] = CRM_Contact_BAO_Contact::getCountComponent('contribution', $this->_contactId);
     }
   }
 

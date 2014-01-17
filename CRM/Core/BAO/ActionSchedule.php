@@ -368,8 +368,9 @@ WHERE   cas.entity_value = $id AND
     return $list;
   }
 
-  static function sendReminder($contactId, $email, $scheduleID, $from, $tokenParams) {
-
+  static function sendReminder($contactId, $to, $scheduleID, $from, $tokenParams) {
+    $email = $to['email'];
+    $phoneNumber = $to['phone'];
     $schedule = new CRM_Core_DAO_ActionSchedule();
     $schedule->id = $scheduleID;
 
@@ -456,30 +457,61 @@ WHERE   cas.entity_value = $id AND
 
       $messageSubject = $smarty->fetch("string:{$messageSubject}");
 
-      // set up the parameters for CRM_Utils_Mail::send
-      $mailParams = array(
-        'groupName' => 'Scheduled Reminder Sender',
-        'from' => $from,
-        'toName' => $contact['display_name'],
-        'toEmail' => $email,
-        'subject' => $messageSubject,
-        'entity' => 'action_schedule',
-        'entity_id' => $scheduleID,
-      );
+      if ($schedule->mode == 'SMS' or $schedule->mode == 'User_Preference') {
+        $session = CRM_Core_Session::singleton();
+        $userID = $session->get('userID') ? $session->get('userID') : $contactId;
+        $smsParams = array('To' => $phoneNumber, 'provider_id' => $schedule->sms_provider_id, 'activity_subject' => $messageSubject);
+        $activityTypeID = CRM_Core_OptionGroup::getValue('activity_type',
+          'SMS',
+          'name'
+        );
+        $details = $html ? $html : $text;
+        $activityParams = array(
+          'source_contact_id' => $userID,
+          'activity_type_id' => $activityTypeID,
+          'activity_date_time' => date('YmdHis'),
+          'subject' => $messageSubject,
+          'details' => $details,
+          'status_id' => CRM_Core_OptionGroup::getValue('activity_status', 'Completed', 'name'),
+        );
 
-      if (!$html || $contact['preferred_mail_format'] == 'Text' ||
-        $contact['preferred_mail_format'] == 'Both'
-      ) {
-        // render the &amp; entities in text mode, so that the links work
-        $mailParams['text'] = str_replace('&amp;', '&', $text);
+        $activity = CRM_Activity_BAO_Activity::create($activityParams);
+
+        CRM_Activity_BAO_Activity::sendSMSMessage($contactId,
+          $text,
+          $html,
+          $smsParams,
+          $activity->id,
+          $userID
+        );
       }
-      if ($html && ($contact['preferred_mail_format'] == 'HTML' ||
+
+      if ($schedule->mode == 'Email' or $schedule->mode == 'User_Preference') {
+        // set up the parameters for CRM_Utils_Mail::send
+        $mailParams = array(
+          'groupName' => 'Scheduled Reminder Sender',
+          'from' => $from,
+          'toName' => $contact['display_name'],
+          'toEmail' => $email,
+          'subject' => $messageSubject,
+          'entity' => 'action_schedule',
+          'entity_id' => $scheduleID,
+        );
+
+        if (!$html || $contact['preferred_mail_format'] == 'Text' ||
           $contact['preferred_mail_format'] == 'Both'
-        )) {
-        $mailParams['html'] = $html;
+        ) {
+          // render the &amp; entities in text mode, so that the links work
+          $mailParams['text'] = str_replace('&amp;', '&', $text);
+        }
+        if ($html && ($contact['preferred_mail_format'] == 'HTML' ||
+            $contact['preferred_mail_format'] == 'Both'
+          )
+        ) {
+          $mailParams['html'] = $html;
+        }
+        $result = CRM_Utils_Mail::send($mailParams);
       }
-
-      $result = CRM_Utils_Mail::send($mailParams);
     }
     $schedule->free();
 
@@ -497,7 +529,7 @@ WHERE   cas.entity_value = $id AND
    * @static
    *
    */
-  static function add(&$params, &$ids = NULL) {
+  static function add(&$params, $ids = array()) {
     $actionSchedule = new CRM_Core_DAO_ActionSchedule();
     $actionSchedule->copyValues($params);
 
@@ -703,13 +735,29 @@ WHERE reminder.action_schedule_id = %1 AND reminder.action_date_time IS NULL
         }
 
         $isError  = 0;
-        $errorMsg = '';
-        $toEmail  = CRM_Contact_BAO_Contact::getPrimaryEmail($dao->contactID);
-        if ($toEmail) {
+        $errorMsg = $toEmail = $toPhoneNumber = '';
+
+        if ($actionSchedule->mode == 'SMS' or $actionSchedule->mode == 'User_Preference') {
+          $filters = array('is_deceased' => 0, 'is_deleted' => 0, 'do_not_sms' => 0);
+          $toPhoneNumbers = CRM_Core_BAO_Phone::allPhones($dao->contactID, FALSE, 'Mobile', $filters);
+          //to get primary mobile ph,if not get a first mobile phONE
+          if (!empty($toPhoneNumbers)) {
+            $toPhoneNumberDetails = reset($toPhoneNumbers);
+            $toPhoneNumber = CRM_Utils_Array::value('phone', $toPhoneNumberDetails);
+            //contact allows to send sms
+            $toDoNotSms = 0;
+          }
+        }
+        if ($actionSchedule->mode == 'Email' or $actionSchedule->mode == 'User_Preference') {
+          $toEmail = CRM_Contact_BAO_Contact::getPrimaryEmail($dao->contactID);
+        }
+        if ($toEmail || !(empty($toPhoneNumber) or $toDoNotSms)) {
+          $to['email'] = $toEmail;
+          $to['phone'] = $toPhoneNumber;
           $result =
             CRM_Core_BAO_ActionSchedule::sendReminder(
               $dao->contactID,
-              $toEmail,
+              $to,
               $actionSchedule->id,
               $fromEmailAddress,
               $entityTokenParams
@@ -905,7 +953,7 @@ WHERE reminder.action_schedule_id = %1 AND reminder.action_date_time IS NULL
 
         // Need to check if its a smart group or not
         // Then decide which table to join onto the query
-        $group			= CRM_Contact_DAO_Group::getTableName();
+        $group = CRM_Contact_DAO_Group::getTableName();
 
         // Get the group information
         $sql = "

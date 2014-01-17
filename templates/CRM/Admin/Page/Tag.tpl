@@ -96,7 +96,7 @@
         </div>
     {/if}
 
-<div id="mergeTagDialog">
+<div id="mergeTagDialog" style="display:none;">
     {ts}Begin typing name of tag to merge into.{/ts}<br/>
     <input type="text" id="tag_name"/>
     <input type="hidden" id="tag_name_id" value="">
@@ -108,11 +108,11 @@
 {literal}
 <script type="text/javascript">
 cj("#mergeTagDialog").hide( );
-cj( function() {
-    cj('.merge_tag').click(function(){
-        var row_id = cj(this).closest('tr').attr('id');
-        var tagId = row_id.split('-');
+cj( function($) {
+    cj('.merge_tag').click(function(e){
+        var tagId = cj(this).closest('tr').attr('id').split('-');
         mergeTag(tagId[1]);
+        return false;
     });
 });
 
@@ -120,7 +120,6 @@ function mergeTag( fromId ) {
     var fromTag = cj('#tag-' + fromId).children('td.crm-tag-name').text();
     cj('#used_for_warning').html('');
 
-    cj("#mergeTagDialog").show( );
   cj("#mergeTagDialog").dialog({
     title: "Merge tag '" + fromTag + "' into:",
     modal: true,
@@ -182,13 +181,11 @@ function mergeTag( fromId ) {
                       }
                 });
 
-                cj(this).dialog("close");
-        cj(this).dialog("destroy");
+        cj(this).dialog("close");
        },
 
       "Cancel": function() {
         cj(this).dialog("close");
-        cj(this).dialog("destroy");
       }
           }
   });

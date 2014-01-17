@@ -310,7 +310,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   public function setDefaultValues() {
     if ($this->_cdType) {
@@ -461,7 +461,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
   /**
    * Function to build the form
    *
-   * @return None
+   * @return void
    * @access public
    */
   public function buildQuickForm() {
@@ -1069,7 +1069,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   public function postProcess() {
     if ($this->_action & CRM_Core_Action::DELETE) {

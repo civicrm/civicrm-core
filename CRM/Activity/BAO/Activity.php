@@ -2023,6 +2023,7 @@ AND cl.modified_id  = c.id
     $followupParams['activity_type_id'] = $params['followup_activity_type_id'];
     // Get Subject of Follow-up Activiity, CRM-4491
     $followupParams['subject'] = CRM_Utils_Array::value('followup_activity_subject', $params);
+    $followupParams['assignee_contact_id'] = CRM_Utils_Array::value('followup_assignee_contact_id', $params);
 
     //create target contact for followup
     if (CRM_Utils_Array::value('target_contact_id', $params)) {
@@ -2106,9 +2107,6 @@ AND cl.modified_id  = c.id
       // my case hence we have defined fields as case_*
       if ($name == 'Activity') {
         $exportableFields = CRM_Activity_DAO_Activity::export();
-        if (isset($exportableFields['activity_campaign_id'])) {
-          $exportableFields['activity_campaign'] = array('title' => ts('Campaign Title'));
-        }
         $exportableFields['source_contact_id']['title'] = ts('Source Contact ID');
         $exportableFields['source_contact'] = array(
           'title' => ts('Source Contact'),
@@ -2368,7 +2366,7 @@ INNER JOIN  civicrm_option_group grp ON ( grp.id = val.option_group_id AND grp.n
 
         //get the assignee contacts.
         if ($allow) {
-          $assigneeContacts = CRM_Activity_BAO_Contact::retrieveContactIdsByActivityId($activity->id, $assigneeID);
+          $assigneeContacts = CRM_Activity_BAO_ActivityContact::retrieveContactIdsByActivityId($activity->id, $assigneeID);
           foreach ($assigneeContacts as $cnt => $contactId) {
             if (!CRM_Contact_BAO_Contact_Permission::allow($contactId, $permission)) {
               $allow = FALSE;

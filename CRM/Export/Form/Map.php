@@ -65,7 +65,7 @@ class CRM_Export_Form_Map extends CRM_Core_Form {
   /**
    * Function to actually build the form
    *
-   * @return None
+   * @return void
    * @access public
    */
   public function preProcess() {

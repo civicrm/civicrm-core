@@ -65,7 +65,7 @@ class CRM_Case_Form_Activity_LinkCases {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   static function setDefaultValues(&$form) {
     return $defaults = array();
@@ -110,7 +110,7 @@ class CRM_Case_Form_Activity_LinkCases {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   static function beginPostProcess(&$form, &$params) {
     $params['id'] = $params['case_id'];
@@ -121,7 +121,7 @@ class CRM_Case_Form_Activity_LinkCases {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   static function endPostProcess(&$form, &$params, &$activity) {
     $activityId = $activity->id;

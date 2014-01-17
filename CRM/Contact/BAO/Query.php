@@ -635,6 +635,12 @@ class CRM_Contact_BAO_Query {
         }
       }
 
+      if (in_array($name, array('prefix_id', 'suffix_id', 'gender_id'))) {
+        if (CRM_Utils_Array::value($field['pseudoconstant']['optionGroupName'], $this->_returnProperties)) {
+          $makeException = TRUE;
+        }
+      }
+
       $cfID = CRM_Core_BAO_CustomField::getKeyID($name);
       if (
         CRM_Utils_Array::value($name, $this->_paramLookup) ||
@@ -1629,6 +1635,7 @@ class CRM_Contact_BAO_Query {
       case 'activity_campaign_id':
       case 'activity_engagement_level':
       case 'activity_id':
+      case 'activity_result':
       case 'source_contact':
         CRM_Activity_BAO_Query::whereClauseSingle($values, $this);
         return;
@@ -2441,8 +2448,8 @@ class CRM_Contact_BAO_Query {
           continue;
 
         case 'civicrm_log':
-          $from .= " $side JOIN civicrm_log ON (civicrm_log.entity_id = contact_a.id AND civicrm_log.entity_table = 'civicrm_contact')";
-          $from .= " $side JOIN civicrm_contact contact_b_log ON (civicrm_log.modified_id = contact_b_log.id)";
+          $from .= " INNER JOIN civicrm_log ON (civicrm_log.entity_id = contact_a.id AND civicrm_log.entity_table = 'civicrm_contact')";
+          $from .= " INNER JOIN civicrm_contact contact_b_log ON (civicrm_log.modified_id = contact_b_log.id)";
           continue;
 
         case 'civicrm_tag':
@@ -3660,7 +3667,7 @@ WHERE  id IN ( $groupIDs )
     $name = $targetName[4] ? "%$name%" : $name;
     $this->_where[$grouping][] = "contact_b_log.sort_name LIKE '%$name%'";
     $this->_tables['civicrm_log'] = $this->_whereTables['civicrm_log'] = 1;
-    $this->_qill[$grouping][] = ts('Changed by') . ": $name";
+    $this->_qill[$grouping][] = ts('Modified by') . ": $name";
   }
 
   function modifiedDates($values) {
@@ -3668,18 +3675,20 @@ WHERE  id IN ( $groupIDs )
 
     // CRM-11281, default to added date if not set
     $fieldTitle = ts('Added Date');
-
+    $fieldName = 'created_date';
     foreach (array_keys($this->_params) as $id) {
       if ($this->_params[$id][0] == 'log_date') {
         if ($this->_params[$id][2] == 2) {
           $fieldTitle = ts('Modified Date');
+          $fieldName = 'modified_date';
         }
       }
     }
 
-    $this->dateQueryBuilder($values,
-      'civicrm_log', 'log_date', 'modified_date', $fieldTitle
-    );
+
+    $this->dateQueryBuilder($values, 'contact_a', 'log_date', $fieldName, $fieldTitle);
+
+    self::$_openedPanes[ts('Change Log')] = TRUE;
   }
 
   function demographics(&$values) {
@@ -3758,7 +3767,10 @@ WHERE  id IN ( $groupIDs )
     list($name, $op, $value, $grouping, $wildcard) = $values;
 
     $pref = array();
-    if (!is_array($value)) {
+    if (in_array($op, array( 'IS NULL', 'IS NOT NULL', 'IS EMPTY', 'IS NOT EMPTY'))) {
+      $value = NULL;
+    }
+    elseif (!is_array($value)) {
       $v = array();
       $value = trim($value, ' ()');
       if (strpos($value, CRM_Core_DAO::VALUE_SEPARATOR) !== FALSE) {
@@ -3785,10 +3797,16 @@ WHERE  id IN ( $groupIDs )
     $commPref = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'preferred_communication_method');
 
     $sqlValue = array();
+    $showValue = array();
     $sql = "contact_a.preferred_communication_method";
-    foreach ($pref as $val) {
-      $sqlValue[] = "( $sql like '%" . CRM_Core_DAO::VALUE_SEPARATOR . $val . CRM_Core_DAO::VALUE_SEPARATOR . "%' ) ";
-      $showValue[] = $commPref[$val];
+    if (in_array($op, array('IS NULL', 'IS NOT NULL', 'IS EMPTY', 'IS NOT EMPTY'))) {
+      $sqlValue[] = "{$sql} {$op}";
+    }
+    else {
+      foreach ($pref as $val) {
+        $sqlValue[] = "( $sql like '%" . CRM_Core_DAO::VALUE_SEPARATOR . $val . CRM_Core_DAO::VALUE_SEPARATOR . "%' ) ";
+        $showValue[] = $commPref[$val];
+      }
     }
     $this->_where[$grouping][] = "( " . implode(' OR ', $sqlValue) . " )";
     $this->_qill[$grouping][] = ts('Preferred Communication Method') . " $op " . implode(' ' . ts('or') . ' ', $showValue);
@@ -4752,16 +4770,6 @@ SELECT COUNT( civicrm_contribution.total_amount ) as cancel_count,
       }
       $this->_tables[$tableName] = $this->_whereTables[$tableName] = 1;
       $this->_qill[$grouping][] = "$fieldTitle - $phrase \"$format\"";
-    }
-
-    if (
-      $tableName == 'civicrm_log' &&
-      $fieldTitle == ts('Added Date')
-    ) {
-      //CRM-6903 --hack to check modified date of first record.
-      //as added date means first modified date of object.
-      $addedDateQuery = 'select id from civicrm_log group by entity_id order by id';
-      $this->_where[$grouping][] = "civicrm_log.id IN ( {$addedDateQuery} )";
     }
   }
 

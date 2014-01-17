@@ -105,7 +105,7 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
 
     //get the log start date.
     //it is set during renewal of membership.
-    $logStartDate = CRM_Utils_array::value('log_start_date', $params);
+    $logStartDate = CRM_Utils_Array::value('log_start_date', $params);
     $logStartDate = ($logStartDate) ? CRM_Utils_Date::isoToMysql($logStartDate) : CRM_Utils_Date::isoToMysql($membership->start_date);
     $values       = self::getStatusANDTypeValues($membership->id);
 
@@ -235,6 +235,7 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
       !CRM_Utils_Array::value('skipStatusCal', $params)
     ) {
       $dates = array('start_date', 'end_date', 'join_date');
+      $start_date = $end_date = $join_date = NULL; // declare these out of courtesy as IDEs don't pick up the setting of them below
       foreach ($dates as $date) {
         $$date = $params[$date] = CRM_Utils_Date::processDate(CRM_Utils_Array::value($date, $params), NULL, TRUE, 'Ymd');
       }
@@ -347,6 +348,7 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
       CRM_Utils_Array::value('createActivity', $params)
     ) {
       if (CRM_Utils_Array::value('membership', $ids)) {
+        $data = array();
         CRM_Core_DAO::commonRetrieveAll('CRM_Member_DAO_Membership',
           'id',
           $membership->id,
@@ -980,7 +982,7 @@ INNER JOIN  civicrm_membership_type type ON ( type.id = membership.membership_ty
     if ($onlySameParentOrg && $memType) {
       // require the same parent org as the $memType
       $params = array('id' => $memType);
-      $defaults = array();
+      $defaults = $membershipType = array();
       if (CRM_Member_BAO_MembershipType::retrieve($params, $membershipType)) {
         $memberTypesSameParentOrg = CRM_Member_BAO_MembershipType::getMembershipTypesByOrg($membershipType['member_of_contact_id']);
         $memberTypesSameParentOrgList = implode(',', array_keys($memberTypesSameParentOrg));
@@ -1096,10 +1098,6 @@ INNER JOIN  civicrm_membership_type type ON ( type.id = membership.membership_ty
    */
   static function &exportableFields() {
     $expFieldMembership = CRM_Member_DAO_Membership::export();
-    //campaign fields.
-    if (isset($expFieldMembership['member_campaign_id'])) {
-      $expFieldMembership['member_campaign'] = array('title' => ts('Campaign Title'));
-    }
 
     $expFieldsMemType = CRM_Member_DAO_MembershipType::export();
     $fields           = array_merge($expFieldMembership, $expFieldsMemType);
@@ -1564,11 +1562,15 @@ AND civicrm_membership.is_test = %2";
 
     //decide status here, if needed.
     $updateStatusId = NULL;
-
+    $membershipID = NULL;
+    //@todo would be better to accept $membershipID as an FN param & make form layer responsible for extracting it
+    if(isset($form->_membershipId)) {
+      $membershipID = $form->_membershipId;
+    }
     // CRM-7297 - allow membership type to be be changed during renewal so long as the parent org of new membershipType
     // is the same as the parent org of an existing membership of the contact
     $currentMembership = CRM_Member_BAO_Membership::getContactMembership($contactID, $membershipTypeID,
-      $is_test, $form->_membershipId, TRUE
+      $is_test, $membershipID, TRUE
     );
     if ($currentMembership) {
       $activityType = 'Membership Renewal';
@@ -1963,16 +1965,6 @@ SELECT c.contribution_page_id as pageID
    */
   static function getMembershipFields($mode = NULL) {
     $fields = CRM_Member_DAO_Membership::export();
-
-    //campaign fields.
-    if (isset($fields['member_campaign_id'])) {
-      if ($mode == CRM_Export_Form_Select::MEMBER_EXPORT) {
-        $fields['member_campaign'] = array('title' => ts('Campaign Title'));
-      }
-      else {
-        $fields['member_campaign_id']['title'] = ts('Campaign');
-      }
-    }
 
     unset($fields['membership_contact_id']);
     $fields = array_merge($fields, CRM_Core_BAO_CustomField::getFieldsForImport('Membership'));
@@ -2422,12 +2414,12 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   function processPriceSet($membershipId, $lineItem) {
     //FIXME : need to move this too
     if (!$membershipId || !is_array($lineItem)
-      || CRM_Utils_system::isNull($lineItem)
+      || CRM_Utils_System::isNull($lineItem)
     ) {
       return;
     }

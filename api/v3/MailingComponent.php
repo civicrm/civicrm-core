@@ -1,4 +1,6 @@
-{*
+<?php
+
+/*
  +--------------------------------------------------------------------+
  | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
@@ -22,47 +24,54 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*}
-packages/jquery/jquery-1.8.3.min.js
-packages/jquery/jquery-ui-1.9.0/js/jquery-ui-1.9.0.custom.min.js
-packages/jquery/jquery-ui-1.9.0/css/smoothness/jquery-ui-1.9.0.custom.min.css
+*/
 
-packages/jquery/plugins/jquery.autocomplete.js
-packages/jquery/css/jquery.autocomplete.css
+/**
+ * File for the CiviCRM APIv3 mailing_component functions
+ *
+ * @package CiviCRM_APIv3
+ * @subpackage API_mailing_component
+ *
+ */
 
-packages/jquery/plugins/jquery.menu.pack.js
-packages/jquery/css/menu.css
+/**
+ * Save a mailing_component
+ *
+ * Allowed @params array keys are:
+ * {@getfields mailing_component_create}
+ * @example mailing_componentCreate.php
+ *
+ * @return array of newly created mailing_component property values.
+ * @access public
+ */
+function civicrm_api3_mailing_component_create($params) {
+  return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
+}
 
-packages/jquery/plugins/jquery.tableHeader.js
+/**
+ * Get a mailing_component
+ *
+ * Allowed @params array keys are:
+ * {@getfields mailing_component_get}
+ * @example mailing_componentCreate.php
+ *
+ * @return array of retrieved mailing_component property values.
+ * @access public
+ */
+function civicrm_api3_mailing_component_get($params) {
+  return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
+}
 
-packages/jquery/plugins/jquery.textarearesizer.js
-
-packages/jquery/plugins/jquery.form.js
-
-packages/jquery/plugins/jquery.tokeninput.js
-packages/jquery/css/token-input-facebook.css
-
-packages/jquery/plugins/jquery.timeentry.min.js
-
-packages/jquery/plugins/DataTables/media/css/demo_table_jui.css
-packages/jquery/plugins/DataTables/media/js/jquery.dataTables.min.js
-
-packages/jquery/plugins/jquery.FormNavigate.js
-
-packages/jquery/plugins/jquery.validate.min.js
-packages/jquery/plugins/jquery.ui.datepicker.validation.pack.js
-
-packages/jquery/plugins/jquery.jeditable.mini.js
-
-packages/jquery/plugins/jquery.blockUI.js
-
-packages/jquery/plugins/jquery.notify.min.js
-
-packages/jquery/plugins/jquery.redirect.min.js
-
-js/rest.js
-js/Common.js
-
-js/jquery/jquery.crmeditable.js
-js/jquery/jquery.crmasmselect.js
-
+/**
+ * Delete a mailing_component
+ *
+ * Allowed @params array keys are:
+ * {@getfields mailing_component_delete}
+ * @example mailing_componentCreate.php
+ *
+ * @return array of deleted values.
+ * @access public
+ */
+function civicrm_api3_mailing_component_delete($params) {
+  return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);
+}

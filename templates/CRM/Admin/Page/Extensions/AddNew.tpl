@@ -1,7 +1,7 @@
 {* 
 Display a table of remotely-available extensions
 
-Depends: CRM/common/enableDisable.tpl and CRM/common/jsortable.tpl 
+Depends: CRM/common/enableDisableApi.tpl and CRM/common/jsortable.tpl
 *}
 {if $remoteExtensionRows}
   <div id="extensions-addnew">

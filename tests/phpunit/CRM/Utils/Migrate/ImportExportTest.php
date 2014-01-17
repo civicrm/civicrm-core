@@ -2,7 +2,6 @@
 require_once 'CiviTest/CiviUnitTestCase.php';
 class CRM_Utils_Migrate_ImportExportTest extends CiviUnitTestCase {
   protected $_apiversion;
-  public $_eNoticeCompliant = TRUE;
 
   function setUp() {
     $this->_apiversion = 3;

@@ -122,7 +122,7 @@ class CRM_Grant_Form_GrantView extends CRM_Core_Form {
   /**
    * Function to build the form
    *
-   * @return None
+   * @return void
    * @access public
    */
   public function buildQuickForm() {

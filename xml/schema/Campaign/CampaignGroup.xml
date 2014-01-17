@@ -23,6 +23,11 @@
     <type>int unsigned</type>
     <required>true</required>
     <comment>Foreign key to the activity Campaign.</comment>
+    <pseudoconstant>
+      <table>civicrm_campaign</table>
+      <keyColumn>id</keyColumn>
+      <labelColumn>title</labelColumn>
+    </pseudoconstant>
     <add>3.3</add>
   </field>
   <foreignKey>

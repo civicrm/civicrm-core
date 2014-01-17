@@ -44,7 +44,7 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
   protected $_eventID;
   protected $_participantPaymentID;
   protected $_contributionTypeId;
-  public $_eNoticeCompliant = TRUE;
+
 
   function get_info() {
     return array(

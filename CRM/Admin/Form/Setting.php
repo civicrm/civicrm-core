@@ -48,7 +48,7 @@ class CRM_Admin_Form_Setting extends CRM_Core_Form {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   function setDefaultValues() {
     if (!$this->_defaults) {
@@ -116,7 +116,7 @@ class CRM_Admin_Form_Setting extends CRM_Core_Form {
   /**
    * Function to actually build the form
    *
-   * @return None
+   * @return void
    * @access public
    */
   public function buildQuickForm() {
@@ -171,7 +171,7 @@ class CRM_Admin_Form_Setting extends CRM_Core_Form {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   public function postProcess() {
     // store the submitted values in an array

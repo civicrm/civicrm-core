@@ -86,10 +86,11 @@ class CRM_Mailing_Event_BAO_Confirm extends CRM_Mailing_Event_DAO_Confirm {
     $ce->time_stamp = date('YmdHis');
     $ce->save();
 
-    CRM_Contact_BAO_GroupContact::updateGroupMembershipStatus(
-      $contact_id,
+    CRM_Contact_BAO_GroupContact::addContactsToGroup(
+      array($contact_id),
       $se->group_id,
       'Email',
+      'Added',
       $ce->id
     );
 

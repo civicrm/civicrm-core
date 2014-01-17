@@ -1158,7 +1158,7 @@ WHERE civicrm_event.is_active = 1
           );
         }
         else {
-          $sendTemplateParams['from'] = CRM_Utils_Array::value('confirm_from_name', $values['event']) . " <{$values['event']['confirm_from_email']}>";
+          $sendTemplateParams['from'] = CRM_Utils_Array::value('confirm_from_name', $values['event']) . " <" . CRM_Utils_Array::value('confirm_from_email', $values['event']) . ">";
           $sendTemplateParams['toName'] = $displayName;
           $sendTemplateParams['toEmail'] = $email;
           $sendTemplateParams['autoSubmitted'] = TRUE;
@@ -1178,7 +1178,7 @@ WHERE civicrm_event.is_active = 1
    * Function to add the custom fields OR array of participant's
    * profile info
    *
-   * @return None
+   * @return void
    * @access public
    */
   static function buildCustomDisplay($id,
@@ -1358,7 +1358,7 @@ WHERE civicrm_event.is_active = 1
    * @param array $groupTitle Profile Group Title.
    * @param array $values formatted array of key value
    *
-   * @return None
+   * @return void
    * @access public
    * @static
    */

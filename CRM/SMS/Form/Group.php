@@ -60,7 +60,7 @@ class CRM_SMS_Form_Group extends CRM_Contact_Form_Task {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   function setDefaultValues() {
     $mailingID = CRM_Utils_Request::retrieve('mid', 'Integer', $this, FALSE, NULL);
@@ -105,7 +105,7 @@ class CRM_SMS_Form_Group extends CRM_Contact_Form_Task {
   /**
    * Function to actually build the form
    *
-   * @return None
+   * @return void
    * @access public
    */
   public function buildQuickForm() {

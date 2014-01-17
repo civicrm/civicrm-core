@@ -40,7 +40,7 @@ class api_v3_GrantTest extends CiviUnitTestCase {
   protected $params;
   protected $ids = array();
   protected $_entity = 'Grant';
-  public $_eNoticeCompliant = TRUE;
+
   public $DBResetRequired = FALSE;
 
   function setUp() {

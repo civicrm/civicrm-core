@@ -354,7 +354,8 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
     }
 
     // form the name only if missing: CRM-627
-    if (!CRM_Utils_Array::value('name', $params) &&
+    $nameParam = CRM_Utils_Array::value('name', $params, NULL);
+    if (!$nameParam &&
       !CRM_Utils_Array::value('id', $params)
     ) {
       $params['name'] = CRM_Utils_String::titleToVar($params['title']);
@@ -385,8 +386,19 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
 
     $group = new CRM_Contact_BAO_Group();
     $group->copyValues($params);
-
-    if (!CRM_Utils_Array::value('id', $params)) {
+    //@todo very hacky fix for the fact this function wants to receive 'parents' as an array further down but
+    // needs it as a separated string for the DB. Preferred approaches are having the copyParams or save fn
+    // use metadata to translate the array to the appropriate DB type or altering the param in the api layer,
+    // or at least altering the param in same section as 'group_type' rather than repeating here. However, further down
+    // we need the $params one to be in it's original form & we are not sure what test coverage we have on that
+    if(isset($group->parents) && is_array($group->parents)) {
+      $group->parents = CRM_Core_DAO::VALUE_SEPARATOR . implode(CRM_Core_DAO::VALUE_SEPARATOR,
+        array_keys($group->parents)
+      ) . CRM_Core_DAO::VALUE_SEPARATOR;
+    }
+    if (!CRM_Utils_Array::value('id', $params) &&
+      !$nameParam
+    ) {
       $group->name .= "_tmp";
     }
     $group->save();
@@ -395,7 +407,9 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
       return NULL;
     }
 
-    if (!CRM_Utils_Array::value('id', $params)) {
+    if (!CRM_Utils_Array::value('id', $params) &&
+      !$nameParam
+    ) {
       $group->name = substr($group->name, 0, -4) . "_{$group->id}";
     }
 
@@ -692,7 +706,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
       foreach ($groups as $id => $value) {
         $groupList[$id]['group_id'] = $value['id'];
         $groupList[$id]['group_name'] = $value['title'];
-        $groupList[$id]['class'] = $value['class'];
+        $groupList[$id]['class'] = implode(' ', $value['class']);
 
         // append parent names if in search mode
         if ( !CRM_Utils_Array::value('parent_id', $params) &&
@@ -703,7 +717,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
             $title[] = $allGroups[$gId];
           }
           $groupList[$id]['group_name'] .= '<div class="crm-row-parent-name"><em>'.ts('Child of').'</em>: ' . implode(', ', $title) . '</div>';
-          $groupList[$id]['class'] = '';
+          $groupList[$id]['class'] = in_array('disabled', $value['class']) ? 'disabled' : '';
         }
 
         $groupList[$id]['group_description'] = CRM_Utils_Array::value('description', $value);
@@ -804,7 +818,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
 
       if ($permission) {
         $newLinks = $links;
-        $values[$object->id] = array();
+        $values[$object->id] = array('class' => array());
         CRM_Core_DAO::storeValues($object, $values[$object->id]);
         if ($object->saved_search_id) {
           $values[$object->id]['title'] .= ' (' . ts('Smart Group') . ')';
@@ -833,13 +847,12 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
           }
         }
 
-        $values[$object->id]['class'] = '';
         if (array_key_exists('is_active', $object)) {
           if ($object->is_active) {
             $action -= CRM_Core_Action::ENABLE;
           }
           else {
-            $values[$object->id]['class'] = 'disabled';
+            $values[$object->id]['class'][] = 'disabled';
             $action -= CRM_Core_Action::VIEW;
             $action -= CRM_Core_Action::DISABLE;
           }
@@ -876,18 +889,13 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
         // If group has children, add class for link to view children
         $values[$object->id]['is_parent'] = false;
         if (array_key_exists('children', $values[$object->id])) {
-          $values[$object->id]['class'] = "crm-group-parent";
+          $values[$object->id]['class'][] = "crm-group-parent";
           $values[$object->id]['is_parent'] = true;
         }
 
         // If group is a child, add child class
         if (array_key_exists('parents', $values[$object->id])) {
-          $values[$object->id]['class'] = "crm-group-child";
-        }
-
-        if (array_key_exists('children', $values[$object->id])
-        && array_key_exists('parents', $values[$object->id])) {
-          $values[$object->id]['class'] = "crm-group-child crm-group-parent";
+          $values[$object->id]['class'][] = "crm-group-child";
         }
 
         if ($groupOrg) {
@@ -1175,14 +1183,12 @@ WHERE {$whereClause}";
       ),
       CRM_Core_Action::DISABLE => array(
         'name' => ts('Disable'),
-        'extra' => 'onclick = "enableDisable( %%id%%,\'' . 'CRM_Contact_BAO_Group' . '\',\'' . 'enable-disable' . '\' );"',
-        'ref' => 'disable-action',
+        'ref' => 'crm-enable-disable',
         'title' => ts('Disable Group'),
       ),
       CRM_Core_Action::ENABLE => array(
         'name' => ts('Enable'),
-        'extra' => 'onclick = "enableDisable( %%id%%,\'' . 'CRM_Contact_BAO_Group' . '\',\'' . 'disable-enable' . '\' );"',
-        'ref' => 'enable-action',
+        'ref' => 'crm-enable-disable',
         'title' => ts('Enable Group'),
       ),
       CRM_Core_Action::DELETE => array(

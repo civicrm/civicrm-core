@@ -62,7 +62,7 @@ class CRM_Contact_Form_GroupContact extends CRM_Core_Form {
   /**
    * Function to build the form
    *
-   * @return None
+   * @return void
    * @access public
    */
   public function buildQuickForm() {
@@ -119,12 +119,11 @@ class CRM_Contact_Form_GroupContact extends CRM_Core_Form {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   public function postProcess() {
     $contactID = array($this->_contactId);
     $groupId   = $this->controller->exportValue('GroupContact', 'group_id');
-    $method    = 'Admin';
     $method    = ($this->_context == 'user') ? 'Web' : 'Admin';
 
     $session = CRM_Core_Session::singleton();

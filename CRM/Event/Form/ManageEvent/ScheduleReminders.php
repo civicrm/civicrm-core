@@ -58,7 +58,7 @@ class CRM_Event_Form_ManageEvent_ScheduleReminders extends CRM_Event_Form_Manage
         $field = 'event_template';
       }
       $reminderList = CRM_Core_BAO_ActionSchedule::getList(FALSE, $field, $this->_id );
-      if (is_array($reminderList)) {
+      if ($reminderList && is_array($reminderList)) {
         // Add action links to each of the reminders
         foreach ($reminderList as & $format) {
           $action = CRM_Core_Action::UPDATE + CRM_Core_Action::DELETE;
@@ -74,7 +74,7 @@ class CRM_Event_Form_ManageEvent_ScheduleReminders extends CRM_Event_Form_Manage
           $format['action'] = CRM_Core_Action::formLink(
             $links,
             $action,
-            array('id' => $format['id'])),
+            array('id' => $format['id']),
             ts('more'),
             FALSE,
             'event.reminder.list',
@@ -82,8 +82,14 @@ class CRM_Event_Form_ManageEvent_ScheduleReminders extends CRM_Event_Form_Manage
             $this->_id
           );
         }
-        $this->assign('rows', $reminderList);
       }
+      else {
+        $reminderList = TRUE;
+      }
+      $this->assign('rows', $reminderList);
+
+      // Update tab "disabled" css class
+      $this->ajaxResponse['tabValid'] = !empty($reminderList) && is_array($reminderList);
     }
   }
 
@@ -93,7 +99,7 @@ class CRM_Event_Form_ManageEvent_ScheduleReminders extends CRM_Event_Form_Manage
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   function setDefaultValues() {
     $defaults = array();
@@ -105,7 +111,7 @@ class CRM_Event_Form_ManageEvent_ScheduleReminders extends CRM_Event_Form_Manage
   /**
    * Function to build the form
    *
-   * @return None
+   * @return void
    * @access public
    */
   public function buildQuickForm() {
@@ -251,7 +257,7 @@ class CRM_Event_Form_ManageEvent_ScheduleReminders extends CRM_Event_Form_Manage
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   public function postProcess() {
     if ($this->_action & CRM_Core_Action::DELETE) {

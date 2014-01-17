@@ -1760,7 +1760,7 @@ editor specific classes
   position: relative;
   padding: 0px 14px 0 5px;
   background: url("../i/TreePlus.gif") no-repeat right 1px;
-  border-left: none;
+  white-space: nowrap;
   z-index: 2;
 }
 
@@ -1820,8 +1820,6 @@ div.grippie {
 }
 
 .crm-container .ui-tabs .ui-tabs-nav {
-  border: none;
-  background-image: none;
   padding: 4px;
 }
 
@@ -1844,11 +1842,15 @@ div.grippie {
 .crm-container .crm-tab-button a,
 .crm-container .ui-tabs .ui-tabs-nav li a {
   padding: 5px !important;
+  color: #fafafa;
+}
+
+.crm-container .crm-tab-button a,
+.crm-container .ui-tabs .ui-tabs-nav li.ui-state-active a {
+  color: #090909;
 }
 
 .crm-container .crm-tab-button a em {
-  color: #3e3e3e;
-  font-size: 10px;
   font-style: normal;
 }
 
@@ -2255,13 +2257,13 @@ div.grippie {
 
 /* crm button style */
 
-#crm-container .crm-submit-buttons,
-#crm-container .action-link {
+.crm-container .crm-submit-buttons,
+.crm-container .action-link {
   height: 27px;
   margin: 4px 0px 4px 2px;
 }
 
-#crm-container .register_link-top {
+.crm-container .register_link-top {
   float: right;
   margin-left: 8px;
 }
@@ -2514,7 +2516,7 @@ div.grippie {
 }
 
 .crm-container .dark-icon {
-  background-image: url("../packages/jquery/jquery-ui-1.9.0/css/smoothness/images/ui-icons_222222_256x240.png")}
+  background-image: url("../packages/jquery/jquery-ui/css/black-tie/images/ui-icons_222222_256x240.png")}
 .crm-container .red-icon {
   background-image: url("../i/icons/jquery-ui-8A1F11.png")}
 
@@ -2540,11 +2542,12 @@ div.grippie {
   background-position: -129px -112px;
 }
 .crm-container .button:hover .delete-icon {
-  background-image: url("../packages/jquery/jquery-ui-1.9.0/css/smoothness/images/ui-icons_cd0a0a_256x240.png")!important;
+  background-image: url("../i/icons/jquery-ui-8A1F11.png")!important;
 }
 
 .crm-container .restore-icon {
-  background-position: 0px -66px;background-image: url("../i/icons/jquery-ui-91CE00.png");
+  background-position: 0px -66px;
+  background-image: url("../i/icons/jquery-ui-91CE00.png");
 }
 .crm-container .button:hover .restore-icon {
   background-image: url("../i/icons/jquery-ui-91CE00.png");
@@ -2823,9 +2826,28 @@ div.grippie {
   padding: 2px 16px 3px 2px;
 }
 
-#civicrm-menu #menu-logout {
-  float: right;
-  border-left: 1px solid #5D5D5D;
+/* Status message bar */
+#civicrm-menu .crm-menubar-status-container {
+  position: absolute;
+  right: 2px;
+  top: 0;
+  border-top: 1px solid #1B1B1B;
+}
+
+#civicrm-menu .crm-menubar-status-progressbar {
+  padding: 3px 14px;
+  font-size: 14px !important;
+  font-weight: bold;
+  background: rgba(142, 136, 0, 0.9);
+  text-align: center;
+}
+
+#civicrm-menu .status-busy {
+  background: #F8FF03 url("../packages/jquery/jquery-ui/css/black-tie/images/animated-overlay.gif");
+}
+
+#civicrm-menu .status-done .crm-menubar-status-progressbar {
+  background: rgba(41, 152, 32, 0.7);
 }
 
 /* Pop-up help icon - eliminate forced line break */
@@ -2982,56 +3004,475 @@ div#crm-container form {
   width: 100%!important;
 }
 
-/* ui dialog state */
-.ui-state-default,
-.ui-widget-content .ui-state-default,
-.ui-widget-content,
-.ui-widget-header  {
-  color: #3e3e3e;
-  border:0px solid transparent;
-  border-color:transparent;
-}
-
-/* ui dialog state */
-.ui-state-hover,
-.ui-widget-content .ui-state-hover,
-.ui-widget-header .ui-state-hover,
-.ui-state-focus,
-.ui-widget-content .ui-state-focus,
-.ui-widget-header .ui-state-focus {
-  border: 0px solid #70716b;
-  background: #484e4c url("../packages/jquery/jquery-ui-1.9.0/css/smoothness/images/ui-bg_flat_0_aaaaaa_40x100.png") 50% 50% repeat-x;
-  font-weight: normal;
-  color: #f5f6f1;
-}
-
-/* add border to jQuery ui-dialog box CRM-13177 */
-div.ui-dialog {
-  border: 1px solid black;
-}
-
 #Tag .tree .collapsable .hit,
 #Tag .tree .expandable .hit {
   padding-left: 16px;
 }
 
-/*  DataTables fixes */
-#crm-container .dataTables_length {
+/** DATATABLES **/
+/*
+ * jQuery UI specific styling
+ */
+
+.crm-container .paging_two_button .ui-button {
+  float: left;
+  cursor: pointer;
+  * cursor: hand;
+}
+
+.crm-container .paging_full_numbers .ui-button {
+  padding: 2px 6px;
+  margin: 0;
+  cursor: pointer;
+  * cursor: hand;
+  color: white !important;
+}
+
+.crm-container .dataTables_paginate .ui-button {
+  margin-right: -0.1em !important;
+}
+
+.crm-container .paging_full_numbers {
+  width: 350px !important;
+}
+
+.crm-container .dataTables_wrapper .ui-toolbar {
+  padding: 5px;
+}
+
+.crm-container .dataTables_paginate {
+  width: auto;
+}
+
+.crm-container .dataTables_info {
+  padding-top: 3px;
+}
+
+.crm-container div.dataTables_wrapper .ui-widget-header {
+  font-weight: normal;
+}
+
+
+/*
+ * Sort arrow icon positioning
+ */
+.crm-container table.display thead th div.DataTables_sort_wrapper {
+  position: relative;
+  padding-right: 20px;
+}
+
+.crm-container table.display thead th div.DataTables_sort_wrapper span {
+  position: absolute;
+  top: 50%;
+  margin-top: -8px;
+  right: 0;
+}
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ * DataTables features
+ */
+
+.crm-container .dataTables_wrapper {
+  position: relative;
+  clear: both;
+  zoom: 1; /* Feeling sorry for IE */
+}
+
+.crm-container .dataTables_processing {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 250px;
+  height: 30px;
+  margin-left: -125px;
+  margin-top: -15px;
+  padding: 14px 0 2px 0;
+  border: 1px solid #ddd;
+  text-align: center;
+  color: #999;
+  font-size: 14px;
+  background-color: white;
+}
+
+.crm-container .dataTables_length {
+  width: 40%;
   float: none;
   padding-bottom: 5px;
 }
-#crm-container .crm-datatable-pager-top {
+
+.crm-container .dataTables_filter {
+  width: 50%;
+  float: right;
+  text-align: right;
+}
+
+.crm-container .dataTables_info {
+  width: 60%;
+  float: left;
+}
+
+.crm-container .dataTables_paginate {
+  float: right;
+  text-align: right;
+}
+
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ * DataTables display
+ */
+.crm-container table.display {
+  margin: 0 auto;
+  clear: both;
+  width: 100%;
+}
+
+.crm-container table.display thead th {
+  padding: 3px 18px 3px 10px;
+  border-bottom: 1px solid black;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.crm-container table.display thead th.sorting_disabled {
+  cursor: default;
+}
+
+.crm-container table.display tfoot th {
+  padding: 3px 18px 3px 10px;
+  border-top: 1px solid black;
+  font-weight: bold;
+}
+
+.crm-container table.display tr.heading2 td {
+  border-bottom: 1px solid #aaa;
+}
+
+.crm-container table.display td {
+  padding: 3px 10px;
+}
+
+.crm-container table.display td.center {
+  text-align: center;
+}
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ * DataTables row classes
+ */
+.crm-container table.display tr.odd.gradeA {
+  background-color: #ddffdd;
+}
+
+.crm-container table.display tr.even.gradeA {
+  background-color: #eeffee;
+}
+
+.crm-container table.display tr.odd.gradeC {
+  background-color: #ddddff;
+}
+
+.crm-container table.display tr.even.gradeC {
+  background-color: #eeeeff;
+}
+
+.crm-container table.display tr.odd.gradeX {
+  background-color: #ffdddd;
+}
+
+.crm-container table.display tr.even.gradeX {
+  background-color: #ffeeee;
+}
+
+.crm-container table.display tr.odd.gradeU {
+  background-color: #ddd;
+}
+
+.crm-container table.display tr.even.gradeU {
+  background-color: #eee;
+}
+
+
+.crm-container tr.odd {
+  background-color: #E2E4FF;
+}
+
+.crm-container tr.even {
+  background-color: white;
+}
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ * Misc
+ */
+.crm-container .dataTables_scroll {
+  clear: both;
+}
+
+.crm-container .dataTables_scrollBody {
+  *margin-top: -1px;
+  -webkit-overflow-scrolling: touch;
+}
+
+.crm-container .top, .bottom {
+  padding: 15px;
+  background-color: #F5F5F5;
+  border: 1px solid #CCCCCC;
+}
+
+.crm-container .top .dataTables_info {
+  float: none;
+}
+
+.crm-container .dataTables_empty {
+  text-align: center;
+}
+
+.crm-container tfoot input {
+  margin: 0.5em 0;
+  width: 100%;
+  color: #444;
+}
+
+.crm-container tfoot input.search_init {
+  color: #999;
+}
+
+.crm-container td.group {
+  background-color: #d1cfd0;
+  border-bottom: 2px solid #A19B9E;
+  border-top: 2px solid #A19B9E;
+}
+
+.crm-container td.details {
+  background-color: #d1cfd0;
+  border: 2px solid #A19B9E;
+}
+
+
+.crm-container .example_alt_pagination div.dataTables_info {
+  width: 40%;
+}
+
+.crm-container .paging_full_numbers {
+  width: 400px;
+  height: 22px;
+  line-height: 22px;
+}
+
+.crm-container .paging_full_numbers a:active {
+  outline: none
+}
+
+.crm-container .paging_full_numbers a:hover {
+  text-decoration: none;
+}
+
+.crm-container .paging_full_numbers a.paginate_button,
+.crm-container .paging_full_numbers a.paginate_active {
+  border: 1px solid #aaa;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  padding: 2px 5px;
+  margin: 0 3px;
+  cursor: pointer;
+  *cursor: hand;
+  color: #333 !important;
+}
+
+.crm-container .paging_full_numbers a.paginate_button {
+  background-color: #ddd;
+}
+
+.crm-container .paging_full_numbers a.paginate_button:hover {
+  background-color: #ccc;
+  text-decoration: none !important;
+}
+
+.crm-container .paging_full_numbers a.paginate_active {
+  background-color: #99B3FF;
+}
+
+.crm-container table.display tr.even.row_selected td {
+  background-color: #B0BED9;
+}
+
+.crm-container table.display tr.odd.row_selected td {
+  background-color: #9FAFD1;
+}
+
+/*
+ * Sorting classes for columns
+ */
+/* For the standard odd/even */
+.crm-container tr.odd td.sorting_1 {
+  background-color: #D3D6FF;
+}
+
+.crm-container tr.odd td.sorting_2 {
+  background-color: #DADCFF;
+}
+
+.crm-container tr.odd td.sorting_3 {
+  background-color: #E0E2FF;
+}
+
+.crm-container tr.even td.sorting_1 {
+  background-color: #EAEBFF;
+}
+
+.crm-container tr.even td.sorting_2 {
+  background-color: #F2F3FF;
+}
+
+.crm-container tr.even td.sorting_3 {
+  background-color: #F9F9FF;
+}
+
+
+/* For the Conditional-CSS grading rows */
+/*
+ 	Colour calculations (based off the main row colours)
+  Level 1:
+		dd > c4
+		ee > d5
+	Level 2:
+	  dd > d1
+	  ee > e2
+ */
+.crm-container tr.odd.gradeA td.sorting_1 {
+  background-color: #c4ffc4;
+}
+
+.crm-container tr.odd.gradeA td.sorting_2 {
+  background-color: #d1ffd1;
+}
+
+.crm-container tr.odd.gradeA td.sorting_3 {
+  background-color: #d1ffd1;
+}
+
+.crm-container tr.even.gradeA td.sorting_1 {
+  background-color: #d5ffd5;
+}
+
+.crm-container tr.even.gradeA td.sorting_2 {
+  background-color: #e2ffe2;
+}
+
+.crm-container tr.even.gradeA td.sorting_3 {
+  background-color: #e2ffe2;
+}
+
+.crm-container tr.odd.gradeC td.sorting_1 {
+  background-color: #c4c4ff;
+}
+
+.crm-container tr.odd.gradeC td.sorting_2 {
+  background-color: #d1d1ff;
+}
+
+.crm-container tr.odd.gradeC td.sorting_3 {
+  background-color: #d1d1ff;
+}
+
+.crm-container tr.even.gradeC td.sorting_1 {
+  background-color: #d5d5ff;
+}
+
+.crm-container tr.even.gradeC td.sorting_2 {
+  background-color: #e2e2ff;
+}
+
+.crm-container tr.even.gradeC td.sorting_3 {
+  background-color: #e2e2ff;
+}
+
+.crm-container tr.odd.gradeX td.sorting_1 {
+  background-color: #ffc4c4;
+}
+
+.crm-container tr.odd.gradeX td.sorting_2 {
+  background-color: #ffd1d1;
+}
+
+.crm-container tr.odd.gradeX td.sorting_3 {
+  background-color: #ffd1d1;
+}
+
+.crm-container tr.even.gradeX td.sorting_1 {
+  background-color: #ffd5d5;
+}
+
+.crm-container tr.even.gradeX td.sorting_2 {
+  background-color: #ffe2e2;
+}
+
+.crm-container tr.even.gradeX td.sorting_3 {
+  background-color: #ffe2e2;
+}
+
+.crm-container tr.odd.gradeU td.sorting_1 {
+  background-color: #c4c4c4;
+}
+
+.crm-container tr.odd.gradeU td.sorting_2 {
+  background-color: #d1d1d1;
+}
+
+.crm-container tr.odd.gradeU td.sorting_3 {
+  background-color: #d1d1d1;
+}
+
+.crm-container tr.even.gradeU td.sorting_1 {
+  background-color: #d5d5d5;
+}
+
+.crm-container tr.even.gradeU td.sorting_2 {
+  background-color: #e2e2e2;
+}
+
+.crm-container tr.even.gradeU td.sorting_3 {
+  background-color: #e2e2e2;
+}
+
+/*
+ * KeyTable
+ */
+.crm-container table.KeyTable td {
+  border: 3px solid transparent;
+}
+
+.crm-container table.KeyTable td.focus {
+  border: 3px solid #3366FF;
+}
+
+.crm-container table.display tr.gradeA {
+  background-color: #eeffee;
+}
+
+.crm-container table.display tr.gradeC {
+  background-color: #ddddff;
+}
+
+.crm-container table.display tr.gradeX {
+  background-color: #ffdddd;
+}
+
+.crm-container table.display tr.gradeU {
+  background-color: #ddd;
+}
+
+/*  DataTables fixes */
+.crm-container .crm-datatable-pager-top {
   padding-top: 5px;
   padding-bottom: 25px;
 }
-#crm-container .crm-datatable-pager-bottom {
+.crm-container .crm-datatable-pager-bottom {
   padding-top: 10px;
   padding-bottom: 25px;
 }
-#crm-container .crm-datatable-pager-top .dataTables_length {
+.crm-container .crm-datatable-pager-top .dataTables_length {
   float: left;
 }
-#crm-container .css_right {
+.crm-container .css_right {
   float: right;
 }
 
@@ -3146,17 +3587,6 @@ tbody.scrollContent tr.alternateRow {
 }
 
 /*contact summary page */
-.crm-container .ui-tabs .ui-tabs-nav {
-  background-color: #e6e6dc;
-}
-#mainTabContainer .crm-tab-button {
-  background-color: #f5f6f1;
-}
-#mainTabContainer li.ui-state-active,
-#mainTabContainer li.ui-state-hover {
-  background: #FFF;
-}
-
 #crm-container div.contact_details,
 #crm-container #customFields .contact_panel .customFieldGroup {
   background-color: transparent;
@@ -3181,7 +3611,8 @@ tbody.scrollContent tr.alternateRow {
 #mainTabContainer li.disabled {
   text-decoration: none;
 }
-#mainTabContainer li.disabled a:link {
+#mainTabContainer li.disabled a.ui-tabs-anchor,
+#mainTabContainer li.crm-count-0 a.ui-tabs-anchor {
   color: #999999 !important;
 }
 #crm-container tr.crm-job {
@@ -3482,7 +3913,7 @@ div.m ul#civicrm-menu,
   cursor: pointer;
   cursor: hand;
   background-position: -66px -114px;
-  background-image: url("../packages/jquery/jquery-ui-1.9.0/css/smoothness/images/ui-icons_222222_256x240.png");
+  background-image: url("../i/icons/jquery-ui-3E3E3E.gif");
 }
 
 .crm-container span.batch-valid {
@@ -3491,7 +3922,7 @@ div.m ul#civicrm-menu,
   cursor: pointer;
   cursor: hand;
   background-position: -322px -143px;
-  background-image: url("../packages/jquery/jquery-ui-1.9.0/css/smoothness/images/ui-icons_222222_256x240.png");
+  background-image: url("../i/icons/jquery-ui-3E3E3E.gif");
 }
 
 .crm-container span.batch-invalid {
@@ -3500,7 +3931,7 @@ div.m ul#civicrm-menu,
   cursor: pointer;
   cursor: hand;
   background-position: -258px -143px;
-  background-image: url("../packages/jquery/jquery-ui-1.9.0/css/smoothness/images/ui-icons_222222_256x240.png");
+  background-image: url("../i/icons/jquery-ui-3E3E3E.gif");
 }
 
 .crm-container #Entry ul#errorList {
@@ -3608,19 +4039,26 @@ div.m ul#civicrm-menu,
 /* in place edit  */
 .crm-container .crm-editable-enabled {
   white-space: nowrap;
+  padding-left: 2px;
+  border: 2px dashed transparent;
 }
-
-.crm-container .crm-editable-enabled,
 .crm-container .crm-editable-textarea-enabled {
-  display: block;
   padding-left: 2px;
   border: 2px dashed transparent;
 }
 
-.crm-container .crm-editable-enabled:hover {
-  display: block;
-  padding-left: 2px;
+.crm-container .crm-editable-enabled:hover,
+.crm-container .crm-editable-textarea-enabled:hover {
   border: 2px dashed lightgrey;
+  cursor: pointer;
+}
+
+.crm-container span.crm-editable-textarea-enabled {
+  display: inline-block !important;
+  width: 96%;
+}
+.crm-container span.crm-editable-enabled {
+  display: inline-block !important;
 }
 
 .crm-container .crm-editable-placeholder {
@@ -3643,6 +4081,9 @@ div.m ul#civicrm-menu,
 
 .crm-container h2.crm-editable-enabled input {
   min-height: 1.4em;
+}
+.crm-container .crm-editable-textarea-enabled textarea {
+  min-height: 5em;
 }
 
 /*crm-10345*/
@@ -3669,6 +4110,9 @@ div.m ul#civicrm-menu,
 #crm-container .crm-group-child td.crm-group-name.level_3 {
   padding-left: 60px;
   text-indent: -20px;
+}
+#crm-container .crm-group-name span.crm-editable-enabled {
+  text-indent: 0;
 }
 
 #crm-container div.crm-row-parent-name {

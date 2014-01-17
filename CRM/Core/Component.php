@@ -98,9 +98,9 @@ class CRM_Core_Component {
   static public function &getEnabledComponents($force = FALSE) {
     return self::_info($force);
   }
-  
+
   static public function flushEnabledComponents() {
-  	self::getEnabledComponents(TRUE);
+    self::getEnabledComponents(TRUE);
   }
 
   public static function &getNames($translated = FALSE) {
@@ -275,17 +275,6 @@ class CRM_Core_Component {
       if ($comp->usesSearch()) {
         $bqr = $comp->getBAOQueryObject();
         $bqr->buildSearchForm($form);
-      }
-    }
-  }
-
-  static function &addShowHide(&$showHide) {
-    $info = self::_info();
-
-    foreach ($info as $name => $comp) {
-      if ($comp->usesSearch()) {
-        $bqr = $comp->getBAOQueryObject();
-        $bqr->addShowHide($showHide);
       }
     }
   }

@@ -1,4 +1,5 @@
 <?php
+
 /*
  +--------------------------------------------------------------------+
  | CiviCRM version 4.4                                                |
@@ -26,72 +27,51 @@
 */
 
 /**
+ * File for the CiviCRM APIv3 acl_role functions
  *
- * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
- * $Id$
+ * @package CiviCRM_APIv3
+ * @subpackage API_acl_role
  *
  */
 
 /**
- * Dummy page for details of SMS
+ * Save an acl_role
  *
+ * Allowed @params array keys are:
+ * {@getfields acl_role_create}
+ * @example acl_roleCreate.php
+ *
+ * @return array of newly created acl_role property values.
+ * @access public
  */
-class CRM_Contact_Page_View_SMS extends CRM_Core_Page {
-
-  /**
-   * Run the page.
-   *
-   * This method is called after the page is created.
-   *
-   * @return void
-   * @access public
-   *
-   */
-  function run() {
-    // get the callback, module and activity id
-    $action = CRM_Utils_Request::retrieve('action', 'String',
-      $this, FALSE, 'browse'
-    );
-    $id = CRM_Utils_Request::retrieve('id', 'Positive',
-      $this
-    );
-
-    $dao                = new CRM_Core_DAO_ActivityHistory();
-    $dao->activity_id   = $id;
-    $dao->activity_type = ts('SMS Sent');
-    if ($dao->find(TRUE)) {
-      $cid = $dao->entity_id;
-    }
-
-    $dao = new CRM_SMS_DAO_History();
-    $dao->id = $id;
-
-    if ($dao->find(TRUE)) {
-      $this->assign('fromName',
-        CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact',
-          $dao->contact_id,
-          'display_name'
-        )
-      );
-      $this->assign('toName',
-        CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact',
-          $cid,
-          'display_name'
-        )
-      );
-      $this->assign('sentDate', $dao->sent_date);
-      $this->assign('message', $dao->message);
-
-      // get the display name and images for the contact
-      list($displayName, $contactImage) = CRM_Contact_BAO_Contact::getDisplayAndImage($dao->contact_id);
-
-      CRM_Utils_System::setTitle($contactImage . ' ' . $displayName);
-
-      // also add the cid params to the Menu array
-      CRM_Core_Menu::addParam('cid', $cid);
-    }
-    return parent::run();
-  }
+function civicrm_api3_acl_role_create($params) {
+  return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 
+/**
+ * Get an acl_role
+ *
+ * Allowed @params array keys are:
+ * {@getfields acl_role_get}
+ * @example acl_roleCreate.php
+ *
+ * @return array of retrieved acl_role property values.
+ * @access public
+ */
+function civicrm_api3_acl_role_get($params) {
+  return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
+}
+
+/**
+ * Delete an acl_role
+ *
+ * Allowed @params array keys are:
+ * {@getfields acl_role_delete}
+ * @example acl_roleCreate.php
+ *
+ * @return array of deleted values.
+ * @access public
+ */
+function civicrm_api3_acl_role_delete($params) {
+  return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);
+}

@@ -78,7 +78,7 @@ class CRM_Grant_Form_Task_Delete extends CRM_Grant_Form_Task {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   public function postProcess() {
     $deletedGrants = 0;

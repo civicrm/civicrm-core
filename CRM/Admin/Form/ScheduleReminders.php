@@ -50,12 +50,13 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
   /**
    * Function to build the form
    *
-   * @return None
+   * @return void
    * @access public
    */
   public function buildQuickForm() {
     parent::buildQuickForm();
     $this->_mappingID = $mappingID = NULL;
+    $providersCount = CRM_SMS_BAO_Provider::activeProviderCount();
 
     if ($this->_action & (CRM_Core_Action::DELETE)) {
       $reminderName =
@@ -134,7 +135,26 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
 
     //reminder_interval
     $this->add('select', 'start_action_offset', ts('When'), $numericOptions);
+    $title = ts('Email');
+    $isActive = ts('Send email');
+    $recordActivity = ts('Record activity for automated email');
+    if ($providersCount) {
+      $title = ts('Email or SMS');
+      $isActive = ts('Send email or SMS');
+      $recordActivity = ts('Record activity for automated email or SMS');
+      $options = CRM_Core_OptionGroup::values('msg_mode');
+      $this->add('select', 'mode', ts('Send as'), $options);
 
+      $providers = CRM_SMS_BAO_Provider::getProviders(NULL, NULL, TRUE, 'is_default desc');
+
+      $providerSelect = array();
+      foreach ($providers as $provider) {
+        $providerSelect[$provider['id']] = $provider['title'];
+      }
+      $this->add('select', 'sms_provider_id', ts('From'), $providerSelect, TRUE);
+    }
+
+    $this->assign('title', $title);
     foreach ($this->_freqUnits as $val => $label) {
       $freqUnitsDisplay[$val] = ts('%1(s)', array(1 => $label));
     }
@@ -152,7 +172,7 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
 
     $this->add('select', 'start_action_date', ts('Date Field'), $sel4, TRUE);
 
-    $this->addElement('checkbox', 'record_activity', ts('Record activity for automated email'));
+    $this->addElement('checkbox', 'record_activity', $recordActivity);
 
     $this->addElement('checkbox', 'is_repeat', ts('Repeat'),
       NULL, array('onclick' => "return showHideByValue('is_repeat',true,'repeatFields','table-row','radio',false);")
@@ -221,7 +241,7 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
       CRM_Core_DAO::getAttribute('CRM_Core_DAO_ActionSchedule', 'subject')
     );
 
-    $this->add('checkbox', 'is_active', ts('Send email'));
+    $this->add('checkbox', 'is_active', $isActive);
 
     $this->addFormRule(array('CRM_Admin_Form_ScheduleReminders', 'formRule'));
   }
@@ -268,6 +288,7 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
   function setDefaultValues() {
     if ($this->_action & CRM_Core_Action::ADD) {
       $defaults['is_active'] = 1;
+      $defaults['mode'] = 'Email';
       $defaults['record_activity'] = 1;
     }
     else {
@@ -318,7 +339,7 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   public function postProcess() {
     if ($this->_action & CRM_Core_Action::DELETE) {
@@ -342,7 +363,9 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
       'absolute_date',
       'group_id',
       'record_activity',
-      'limit_to'
+      'limit_to',
+      'mode',
+      'sms_provider_id'
     );
     foreach ($keys as $key) {
       $params[$key] = CRM_Utils_Array::value($key, $values);

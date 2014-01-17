@@ -783,7 +783,7 @@ WHERE  id = %1";
   /**
    * Function to build the price set form.
    *
-   * @return None
+   * @return void
    * @access public
    */
   static function buildPriceSet(&$form) {

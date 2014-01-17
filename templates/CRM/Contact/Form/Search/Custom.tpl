@@ -171,13 +171,14 @@ function toggleContactSelection( name, qfKey, selection ){
     cj.post( Url, {  qfKey: qfKey , variableType: 'multiple' , action: 'unselect' } );
     {/literal}
     {foreach from=$rows item=row}{literal}
-      cj("#{/literal}{$row.checkbox}{literal}").removeAttr('checked');{/literal}
+      cj("#{/literal}{$row.checkbox}{literal}").prop('checked', false);{/literal}
     {/foreach}
     {literal}
-    cj("#toggleSelect").removeAttr('checked');
+    cj("#toggleSelect").prop('checked', false);
     var formName = "{/literal}{$form.formName}{literal}";
     on_load_init_checkboxes(formName);
   }
+  return false;
 }
 </script>
 

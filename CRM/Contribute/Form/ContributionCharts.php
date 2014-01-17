@@ -103,7 +103,7 @@ class CRM_Contribute_Form_ContributionCharts extends CRM_Core_Form {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   public function postProcess() {
     $config = CRM_Core_Config::singleton();

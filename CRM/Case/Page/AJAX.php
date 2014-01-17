@@ -72,6 +72,7 @@ class CRM_Case_Page_AJAX {
 
     $caseId = CRM_Utils_Type::escape($_POST['case_id'], 'Integer');
     $tags = CRM_Utils_Type::escape($_POST['tag'], 'String');
+    $tagList = $_POST['taglist'];
 
     if (empty($caseId)) {
       echo 'false';
@@ -83,18 +84,24 @@ class CRM_Case_Page_AJAX {
       $tagIds = explode(',', $tags);
     }
 
-    $params = array(
-      'entity_id' => $caseId,
-      'entity_table' => 'civicrm_case',
-    );
+    if (!empty($tagIds)) {
+      $params = array(
+        'entity_id' => $caseId,
+        'entity_table' => 'civicrm_case',
+      );
 
-    CRM_Core_BAO_EntityTag::del($params);
+      CRM_Core_BAO_EntityTag::del($params);
 
-    foreach ($tagIds as $tagid) {
-      if (is_numeric($tagid)) {
-        $params['tag_id'] = $tagid;
-        CRM_Core_BAO_EntityTag::add($params);
+      foreach ($tagIds as $tagid) {
+        if (is_numeric($tagid)) {
+          $params['tag_id'] = $tagid;
+          CRM_Core_BAO_EntityTag::add($params);
+        }
       }
+    }
+
+    if (!empty($tagList)) {
+      CRM_Core_Form_Tag::postProcess($tagList, $caseId, 'civicrm_case', CRM_Core_DAO::$_nullObject);
     }
 
     $session = CRM_Core_Session::singleton();

@@ -540,6 +540,38 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
     $this->_aclWhere = NULL;
   }
 
+  function add2group($groupID) {
+    if (CRM_Utils_Array::value("contact_target_op", $this->_params) == 'nll') {
+      CRM_Core_Error::fatal(ts('Current filter criteria didn\'t have any target contact to add to group'));
+    }
+
+    $query = "{$this->_select}
+FROM civireport_activity_temp_target tar
+GROUP BY civicrm_activity_id {$this->_having} {$this->_orderBy}";
+    $select = 'AS addtogroup_contact_id';
+    $query = str_ireplace('AS civicrm_contact_contact_target_id', $select, $query);
+    $dao = CRM_Core_DAO::executeQuery($query);
+
+    $contactIDs = array();
+    // Add resulting contacts to group
+    while ($dao->fetch()) {
+      if ($dao->addtogroup_contact_id) {
+        $contact_id = explode(';', $dao->addtogroup_contact_id);
+        if ($contact_id[0]) {
+          $contactIDs[$contact_id[0]] = $contact_id[0];
+        }
+      }
+    }
+
+    if ( !empty($contactIDs) ) {
+      CRM_Contact_BAO_GroupContact::addContactsToGroup($contactIDs, $groupID);
+      CRM_Core_Session::setStatus(ts("Listed contact(s) have been added to the selected group."), ts('Contacts Added'), 'success');
+    }
+    else {
+      CRM_Core_Session::setStatus(ts("The listed records(s) cannot be added to the group."));
+    }
+  }
+
   function postProcess() {
     $this->buildACLClause(array('civicrm_contact_source', 'civicrm_contact_target', 'civicrm_contact_assignee'));
     $this->beginPostProcess();

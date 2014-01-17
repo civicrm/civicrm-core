@@ -97,7 +97,7 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
     $session          = CRM_Core_Session::singleton();
     $userID           = $session->get('userID');
     if (!$this->_hasAccessToAllCases) {
-      $this->_userCases = CRM_Case_BAO_Case::getCases(FALSE, $userID);
+      $this->_userCases = CRM_Case_BAO_Case::getCases(FALSE, $userID, 'any');
       if (!array_key_exists($this->_caseID, $this->_userCases)) {
         CRM_Core_Error::fatal(ts('You are not authorized to access this page.'));
       }
@@ -211,7 +211,7 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   function setDefaultValues() {
     $defaults = array();
@@ -221,7 +221,7 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
   /**
    * Function to build the form
    *
-   * @return None
+   * @return void
    * @access public
    */
   public function buildQuickForm() {
@@ -433,7 +433,12 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
       $this->setDefaults(array('case_tag' => $tags));
 
       foreach ($tags as $tid) {
-        $tags[$tid] = $allTags[$tid];
+        if (isset($allTags[$tid])) {
+          $tags[$tid] = $allTags[$tid];
+        }
+        else {
+          unset($tags[$tid]);
+        }
       }
 
       $this->assign('tags', implode(', ', array_filter($tags)));
@@ -453,7 +458,7 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
     else {
       $this->assign('showTagsets', FALSE);
     }
-    CRM_Core_Form_Tag::buildQuickForm($this, $parentNames, 'civicrm_case', $this->_caseID, FALSE, TRUE);
+    CRM_Core_Form_Tag::buildQuickForm($this, $parentNames, 'civicrm_case', $this->_caseID, TRUE, TRUE);
 
     $this->addButtons(array(
         array(

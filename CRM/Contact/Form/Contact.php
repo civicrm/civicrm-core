@@ -392,7 +392,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   function setDefaultValues() {
     $defaults = $this->_values;
@@ -573,7 +573,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
    * This function is used to add the rules (mainly global rules) for form.
    * All local rules are added near the element
    *
-   * @return None
+   * @return void
    * @access public
    * @see valid_date
    */
@@ -736,7 +736,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
   /**
    * Function to actually build the form
    *
-   * @return None
+   * @return void
    * @access public
    */
   public function buildQuickForm() {
@@ -869,7 +869,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   public function postProcess() {
     // check if dedupe button, if so return.

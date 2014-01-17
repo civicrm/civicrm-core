@@ -60,22 +60,21 @@
       {/literal}
       {if $permission neq 'edit'}
         {literal}
-          $("#tagtree input").attr('disabled', true);
+          $("#tagtree input").prop('disabled', true);
         {/literal}
       {/if}
       {literal}
     });
 
     CRM.updateContactSummaryTags = function() {
-      var tags = [], $tab = $('#tab_tag');
+      var tags = [];
       $('.tag-section .token-input-token-facebook p, #tagtree input:checkbox:checked+label').each(function() {
         tags.push($(this).text());
       });
-      // showing count of tags in summary tab
-      $('a em', $tab).html('' + tags.length);
-      tags.length ? $tab.removeClass('disabled') : $tab.addClass('disabled');
+      // contact summary tabs and search forms both listen for this event
+      $('#Tag').closest('.crm-ajax-container').trigger('crmFormSuccess', {tabCount: tags.length});
       // update summary tab
-      $("#tags").html(tags.join(', '));
+      $("#contact-summary #tags").html(tags.join(', '));
     };
   })(cj);
   {/literal}

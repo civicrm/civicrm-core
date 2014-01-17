@@ -156,7 +156,7 @@ class CRM_Financial_Form_Export extends CRM_Core_Form {
    * process the form after the input has been submitted and validated
    *
    * @access public
-   * @return None
+   * @return void
    */
   public function postProcess( ) {
     if (!$this->_exportFormat) {

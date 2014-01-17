@@ -195,7 +195,7 @@ asyncTest("update (error)", function() {
 
 module('collection - read');
 
-asyncTest("fetch by contact_type (1+ results)", function() {
+asyncTest("fetch by contact_type (passive criteria, 1+ results)", function() {
   var c = new ContactCollection([], {
     crmCriteria: {
       contact_type: 'Organization'
@@ -210,6 +210,55 @@ asyncTest("fetch by contact_type (1+ results)", function() {
         ok(model.get('display_name') != '', 'Expected contact with valid name');
       });
       start();
+    }
+  });
+});
+
+asyncTest("fetch by contact_type (active criteria, 1+ results)", function() {
+  var criteria = new Backbone.Model({
+    contact_type: 'Organization'
+  });
+  var c = new ContactCollection([], {
+    crmCriteriaModel: criteria
+  });
+  c.fetch({
+    error: onUnexpectedError,
+    success: function() {
+      ok(c.models.length > 0, "Expected at least one contact");
+      c.each(function(model) {
+        equal(model.get('contact_type'), 'Organization', 'Expected contact with type organization');
+        ok(model.get('display_name') != '', 'Expected contact with valid name');
+      });
+      start();
+    }
+  });
+});
+
+asyncTest("fetch by contact_type (active criteria revision, 1+ results)", function() {
+  var criteria = new Backbone.Model({
+    contact_type: 'Household'
+  });
+  var c = new ContactCollection([], {
+    crmCriteriaModel: criteria
+  });
+  c.fetch({
+    error: onUnexpectedError,
+    success: function() {
+      ok(c.models.length > 0, "Expected at least one contact");
+      c.each(function(model) {
+        equal(model.get('contact_type'), 'Household', 'Expected contact with type household');
+        ok(model.get('display_name') != '', 'Expected contact with valid name');
+      });
+
+      criteria.set('contact_type', 'Organization');
+      _.delay(function() {
+        ok(c.models.length > 0, "Expected at least one contact");
+        c.each(function(model) {
+          equal(model.get('contact_type'), 'Organization', 'Expected contact with type organization');
+          ok(model.get('display_name') != '', 'Expected contact with valid name');
+        });
+        start();
+      }, 1000);
     }
   });
 });

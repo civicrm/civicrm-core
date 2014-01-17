@@ -379,6 +379,11 @@ class CRM_Contact_Form_Search extends CRM_Core_Form {
    * @return void
    */
   function buildQuickForm() {
+    CRM_Core_Resources::singleton()
+      ->addScriptFile('civicrm', 'js/crm.livePage.js')
+      // jsTree is needed for tags popup
+      ->addScriptFile('civicrm', 'packages/jquery/plugins/jstree/jquery.jstree.js', 0, 'html-header', FALSE)
+      ->addStyleFile('civicrm', 'packages/jquery/plugins/jstree/themes/default/style.css', 0, 'html-header');
     $permission = CRM_Core_Permission::getPermission();
     // some tasks.. what do we want to do with the selected contacts ?
     $tasks = array('' => ts('- actions -'));
@@ -524,9 +529,9 @@ class CRM_Contact_Form_Search extends CRM_Core_Form {
     $this->assign('ts_all_id', $allRowsRadio->_attributes['id']);
 
     /*
-         * add form checkboxes for each row. This is needed out here to conform to QF protocol
-         * of all elements being declared in builQuickForm
-         */
+     * add form checkboxes for each row. This is needed out here to conform to QF protocol
+     * of all elements being declared in builQuickForm
+     */
 
     $rows = $this->get('rows');
 
@@ -554,14 +559,6 @@ class CRM_Contact_Form_Search extends CRM_Core_Form {
           'name' => ts('Search'),
           'isDefault' => TRUE,
         ),
-      )
-    );
-
-    $this->add('submit', $this->_printButtonName, ts('Print'),
-      array(
-        'class' => 'form-submit',
-        'id' => 'Print',
-        'onclick' => "return checkPerformAction('mark_x', '" . $this->getName() . "', 1, 1);",
       )
     );
 

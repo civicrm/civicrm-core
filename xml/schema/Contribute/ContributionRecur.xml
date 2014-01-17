@@ -301,9 +301,14 @@
     <name>campaign_id</name>
     <uniqueName>contribution_campaign_id</uniqueName>
     <type>int unsigned</type>
-    <title>Campaign ID</title>
+    <title>Campaign</title>
     <import>true</import>
     <comment>The campaign for which this contribution has been triggered.</comment>
+    <pseudoconstant>
+      <table>civicrm_campaign</table>
+      <keyColumn>id</keyColumn>
+      <labelColumn>title</labelColumn>
+    </pseudoconstant>
     <add>4.1</add>
   </field>
   <foreignKey>

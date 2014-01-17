@@ -70,21 +70,21 @@
 cj(function($) {
   var batchSelector;
   buildBatchSelector();
-  $("#batch_update").removeAttr('disabled');
+  $("#batch_update").prop('disabled', false);
 
-  $('#financial-search-form :input').change(function() {
-    if (!$(this).hasClass('crm-inline-error')) {
-      batchSelector.fnDraw();
-    }
-  });
-
-  $('#financial-search-form :input').keypress(function(event) {
-    if (event.which == 13) {
-      event.preventDefault();
-      $(this).change();
-      return false;
-    }
-  });
+  $('#financial-search-form :input')
+    .change(function() {
+      if (!$(this).hasClass('crm-inline-error')) {
+        batchSelector.fnDraw();
+      }
+    })
+    .keypress(function(event) {
+      if (event.which == 13) {
+        event.preventDefault();
+        $(this).change();
+        return false;
+      }
+    });
 
   var checkedRows = [];
   function buildBatchSelector() {

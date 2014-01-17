@@ -159,7 +159,7 @@ class CRM_Contribute_Form_AdditionalInfo {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   static function buildHonoree(&$form) {
     //Honoree section
@@ -203,7 +203,7 @@ class CRM_Contribute_Form_AdditionalInfo {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   static function processPremium(&$params, $contributionID, $premiumID = NULL, &$options = NULL) {
     $dao = new CRM_Contribute_DAO_ContributionProduct();
@@ -259,7 +259,7 @@ class CRM_Contribute_Form_AdditionalInfo {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   static function processNote(&$params, $contactID, $contributionID, $contributionNoteID = NULL) {
     //process note
@@ -282,7 +282,7 @@ class CRM_Contribute_Form_AdditionalInfo {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   static function postProcessCommon(&$params, &$formatted, &$form) {
     $fields = array(
@@ -348,7 +348,7 @@ class CRM_Contribute_Form_AdditionalInfo {
    * @$ccContribution boolen,  is it credit card contribution.
    * @access public.
    *
-   * @return None.
+   * @return void.
    */
   static function emailReceipt(&$form, &$params, $ccContribution = FALSE) {
     $form->assign('receiptType', 'contribution');

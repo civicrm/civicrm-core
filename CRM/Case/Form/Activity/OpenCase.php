@@ -84,7 +84,7 @@ class CRM_Case_Form_Activity_OpenCase {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   static function setDefaultValues(&$form) {
     $defaults = array();
@@ -199,7 +199,7 @@ class CRM_Case_Form_Activity_OpenCase {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   static function beginPostProcess(&$form, &$params) {
     if ($form->_context == 'caseActivity') {
@@ -207,7 +207,7 @@ class CRM_Case_Form_Activity_OpenCase {
     }
 
     // set the contact, when contact is selected
-    if (isset($params['contact_select_id']) && CRM_utils_Array::value(1, $params['contact_select_id'])) {
+    if (isset($params['contact_select_id']) && CRM_Utils_Array::value(1, $params['contact_select_id'])) {
       $params['contact_id'] = $params['contact_select_id'][1];
       $form->_currentlyViewedContactId = $params['contact_id'];
     }
@@ -273,7 +273,7 @@ class CRM_Case_Form_Activity_OpenCase {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   static function endPostProcess(&$form, &$params) {
     if ($form->_context == 'caseActivity') {

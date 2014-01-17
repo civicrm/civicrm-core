@@ -242,7 +242,7 @@ class CRM_Member_Form_Task_Batch extends CRM_Member_Form_Task {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   function setDefaultValues() {
     if (empty($this->_fields)) {
@@ -263,7 +263,7 @@ class CRM_Member_Form_Task_Batch extends CRM_Member_Form_Task {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   public function postProcess() {
     $params = $this->exportValues();

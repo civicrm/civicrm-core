@@ -86,6 +86,9 @@ class CRM_Contribute_Form_Task_PDFLetter extends CRM_Contribute_Form_Task {
       CRM_Activity_BAO_Activity::retrieve($params, $defaults);
       $defaults['html_message'] = $defaults['details'];
     }
+    else {
+      $defaults['thankyou_update'] = 1;
+    }
     $defaults = $defaults + CRM_Contact_Form_Task_PDFLetterCommon::setDefaultValues();
     return $defaults;
   }
@@ -133,7 +136,7 @@ class CRM_Contribute_Form_Task_PDFLetter extends CRM_Contribute_Form_Task {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   public function postProcess() {
     // TODO: rewrite using contribution token and one letter by contribution

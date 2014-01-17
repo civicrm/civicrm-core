@@ -148,6 +148,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
 
     //  create test database
     self::$utils = new Utils($GLOBALS['mysql_host'],
+      $GLOBALS['mysql_port'],
       $GLOBALS['mysql_user'],
       $GLOBALS['mysql_pass']
     );
@@ -406,6 +407,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    */
   function foreignKeyChecksOff() {
     self::$utils = new Utils($GLOBALS['mysql_host'],
+      $GLOBALS['mysql_port'],
       $GLOBALS['mysql_user'],
       $GLOBALS['mysql_pass']
     );
@@ -580,7 +582,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   function assertAttributesEquals($expectedValues, $actualValues, $message = NULL) {
     foreach ($expectedValues as $paramName => $paramValue) {
       if (isset($actualValues[$paramName])) {
-        $this->assertEquals($paramValue, $actualValues[$paramName], "Value Mismatch On $paramName - value 1 is $paramValue  value 2 is {$actualValues[$paramName]}");
+        $this->assertEquals($paramValue, $actualValues[$paramName], "Value Mismatch On $paramName - value 1 is " . print_r($paramValue, TRUE) . "  value 2 is " . print_r($actualValues[$paramName], TRUE) );
       }
       else {
         $this->fail("Attribute '$paramName' not present in actual array.");
@@ -1809,6 +1811,17 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   }
 
   /**
+   * Enable CiviCampaign Component
+   */
+  function enableCiviCampaign() {
+    CRM_Core_BAO_ConfigSetting::enableComponent('CiviCampaign');
+    // force reload of config object
+    $config = CRM_Core_Config::singleton(TRUE, TRUE);
+    //flush cache by calling with reset
+    $activityTypes = CRM_Core_PseudoConstant::activityType(TRUE, TRUE, TRUE, 'name', TRUE);
+  }
+
+  /**
    * Create test generated example in api/v3/examples.
    * To turn this off (e.g. on the server) set
    * define(DONT_DOCUMENT_TEST_CONFIG ,1);
@@ -1987,9 +2000,13 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
           }
           if(in_array($key, $keysToUnset)) {
             unset($values[$key]);
+            break;
           }
           if(array_key_exists($key, $fieldsToChange) && !empty($value)) {
             $value = $fieldsToChange[$key];
+          }
+          if(is_string($value)) {
+            $value =  addslashes($value);
           }
         }
     }

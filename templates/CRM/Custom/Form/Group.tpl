@@ -138,7 +138,7 @@ cj(function($) {
     if (!showMaxMultiple) {
       cj("tr#multiple").hide();
     }
-    else if(cj( '#is_multiple').attr('checked')) {
+    else if(cj( '#is_multiple').prop('checked')) {
       cj("tr#multiple").show();
     }
   }
@@ -146,12 +146,12 @@ cj(function($) {
   function showRange(onFormLoad) {
     if(cj("#is_multiple :checked").length) {
       cj("tr#multiple").show();
-      cj("select#style option[value='Tab']").attr("selected", "selected");
+      cj("select#style option[value='Tab']").prop("selected", true);
     }
     else {
       cj("tr#multiple").hide();
       if (!onFormLoad) {
-        cj("select#style option[value='Inline']").attr("selected", "selected");
+        cj("select#style option[value='Inline']").prop("selected", true);
       }
     }
   }

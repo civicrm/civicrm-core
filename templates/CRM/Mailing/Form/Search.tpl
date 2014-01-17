@@ -80,7 +80,7 @@
     var archiveOption = cj("input[name^='is_archived']:radio");
     cj('#status_unscheduled').change(function() {
       if (cj(this).prop('checked') ) {
-        archiveOption.attr('checked',false);
+        archiveOption.prop('checked',false);
         archiveOption.attr('readonly',true);
       } else {
         archiveOption.attr('readonly',false);
@@ -94,13 +94,13 @@
       }
     }).trigger('change');
     cj(".crm-search-form-block-is_archive .crm-clear-link a").click(function() {
-      archiveOption.attr('checked',false);
+      archiveOption.prop('checked',false);
       cj('#status_unscheduled').attr('readonly',false); 
     });
   });
 
   function disableDraft() {
-    cj('#status_unscheduled').attr('checked',false); 
+    cj('#status_unscheduled').prop('checked',false);
     cj('#status_unscheduled').attr('readonly',true); 
   } 
 </script>

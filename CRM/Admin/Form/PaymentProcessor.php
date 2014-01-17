@@ -47,6 +47,9 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
   protected $_ppDAO;
 
   function preProcess() {
+    if(!CRM_Core_Permission::check('administer payment processors')) {
+      CRM_Core_Error::fatal('You do not have permission to administer payment processors');
+    }
     parent::preProcess();
 
     CRM_Utils_System::setTitle(ts('Settings - Payment Processor'));
@@ -161,7 +164,7 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
   /**
    * Function to build the form
    *
-   * @return None
+   * @return void
    * @access public
    */
   public function buildQuickForm($check = FALSE) {

@@ -44,7 +44,7 @@ cj(function () {
   else{
     cj('select[id^="member_option_"]').each(function () {
       if (cj(this).val() == 1) {
-        cj(this).attr('disabled', true);
+        cj(this).prop('disabled', true);
       }
     });
 
@@ -95,7 +95,7 @@ function updateContactInfo(blockNo, prefix) {
       if(CRM.batch.type_id == 2) {
       CRM.api('Membership', 'get', {
           'sequential': '1',
-          'contact_id': contactId,
+          'contact_id': contactId
         },
         { success: function (data) {
           if (data.count > 0) {
@@ -108,7 +108,7 @@ function updateContactInfo(blockNo, prefix) {
               },
               { success: function (data) {
                 var memTypeContactId = data.values[0].member_of_contact_id;
-                cj('select[id="member_option_' + blockNo + '"]').removeAttr('disabled').val(2);
+                cj('select[id="member_option_' + blockNo + '"]').prop('disabled', false).val(2);
                 cj('select[id="field_' + blockNo + '_membership_type_0"]').val(memTypeContactId).change();
                 cj('select[id="field_' + blockNo + '_membership_type_1"]').val(membershipTypeId).change();
                 setDateFieldValue('join_date', membershipJoinDate, blockNo)

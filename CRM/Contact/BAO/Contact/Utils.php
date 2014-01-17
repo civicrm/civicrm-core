@@ -989,8 +989,12 @@ Group By  componentId";
         $sql = "SELECT DISTINCT id, $idFldName FROM civicrm_contact WHERE contact_type = %1 ";
       }
       else {
-        $sql = "SELECT DISTINCT id, $idFldName FROM civicrm_contact WHERE contact_type = %1
-                     AND ( {$idFldName} IS NULL OR ( {$idFldName} IS NOT NULL AND {$displayFldName} IS NULL ) ) ";
+        $sql = "
+          SELECT DISTINCT id, $idFldName
+          FROM civicrm_contact
+          WHERE contact_type = %1
+          AND ({$idFldName} IS NULL
+          OR ( {$idFldName} IS NOT NULL AND ({$displayFldName} IS NULL OR {$displayFldName} = '')) )";
       }
 
       $dao = CRM_Core_DAO::executeQuery($sql, array(1 => array($contactType, 'String')));

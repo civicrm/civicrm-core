@@ -45,7 +45,7 @@ class CRM_Member_Form_MembershipStatus extends CRM_Member_Form {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   public function setDefaultValues() {
     $defaults = array();
@@ -61,7 +61,7 @@ class CRM_Member_Form_MembershipStatus extends CRM_Member_Form {
   /**
    * Function to build the form
    *
-   * @return None
+   * @return void
    * @access public
    */
   public function buildQuickForm() {
@@ -112,7 +112,7 @@ class CRM_Member_Form_MembershipStatus extends CRM_Member_Form {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   public function postProcess() {
     if ($this->_action & CRM_Core_Action::DELETE) {

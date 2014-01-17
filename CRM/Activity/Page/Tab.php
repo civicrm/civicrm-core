@@ -42,7 +42,7 @@ class CRM_Activity_Page_Tab extends CRM_Core_Page {
   /**
    * Browse all activities for a particular contact
    *
-   * @return none
+   * @return void
    *
    * @access public
    */
@@ -60,6 +60,7 @@ class CRM_Activity_Page_Tab extends CRM_Core_Page {
     $controller->set('contactId', $this->_contactId);
     $controller->setEmbedded(TRUE);
     $controller->run();
+    $this->ajaxResponse['tabCount'] = CRM_Contact_BAO_Contact::getCountComponent('activity', $this->_contactId);
   }
 
   function edit() {
@@ -166,7 +167,7 @@ class CRM_Activity_Page_Tab extends CRM_Core_Page {
   /**
    * perform actions and display for activities.
    *
-   * @return none
+   * @return void
    *
    * @access public
    */

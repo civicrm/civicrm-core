@@ -4,7 +4,7 @@ require_once 'CiviTest/CiviUnitTestCase.php';
 
 class api_v3_CustomSearchTest extends CiviUnitTestCase {
   protected $_apiversion;
-  public $_eNoticeCompliant = TRUE;
+
   function setUp() {
     $this->_apiversion = 3;
     parent::setUp();

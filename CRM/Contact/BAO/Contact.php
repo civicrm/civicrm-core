@@ -505,7 +505,7 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
    * @param array   $defaults (reference) the default values, some of which need to be resolved.
    * @param boolean $reverse  true if we want to resolve the values in the reverse direction (value -> name)
    *
-   * @return none
+   * @return void
    * @access public
    * @static
    */
@@ -965,13 +965,13 @@ WHERE id={$id}; ";
    */
   public static function processImage() {
 
-    $action = CRM_Utils_Request::retrieve('action', 'String', $this);
-    $cid = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
+    $action = CRM_Utils_Request::retrieve('action', 'String');
+    $cid = CRM_Utils_Request::retrieve('cid', 'Positive');
     // retrieve contact id in case of Profile context
-    $id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
+    $id = CRM_Utils_Request::retrieve('id', 'Positive');
     $cid = $cid ? $cid : $id;
     if ($action & CRM_Core_Action::DELETE) {
-      if (CRM_Utils_Request::retrieve('confirmed', 'Boolean', $this)) {
+      if (CRM_Utils_Request::retrieve('confirmed', 'Boolean')) {
         CRM_Contact_BAO_Contact::deleteContactImage($cid);
         CRM_Core_Session::setStatus(ts('Contact image deleted successfully'), ts('Image Deleted'), 'success');
         $session = CRM_Core_Session::singleton();
@@ -2707,28 +2707,35 @@ AND       civicrm_openid.is_primary = 1";
    */
   static function contextMenu($contactId = NULL) {
     $menu = array(
-      'view' => array('title' => ts('View Contact'),
+      'view' => array(
+        'title' => ts('View Contact'),
         'weight' => 0,
         'ref' => 'view-contact',
+        'class' => 'no-popup',
         'key' => 'view',
         'permissions' => array('view all contacts'),
       ),
-      'add' => array('title' => ts('Edit Contact'),
+      'add' => array(
+        'title' => ts('Edit Contact'),
         'weight' => 0,
         'ref' => 'edit-contact',
+        'class' => 'no-popup',
         'key' => 'add',
         'permissions' => array('edit all contacts'),
       ),
-      'delete' => array('title' => ts('Delete Contact'),
+      'delete' => array(
+        'title' => ts('Delete Contact'),
         'weight' => 0,
         'ref' => 'delete-contact',
         'key' => 'delete',
         'permissions' => array('access deleted contacts', 'delete contacts'),
       ),
-      'contribution' => array('title' => ts('Add Contribution'),
+      'contribution' => array(
+        'title' => ts('Add Contribution'),
         'weight' => 5,
         'ref' => 'new-contribution',
         'key' => 'contribution',
+        'tab' => 'contribute',
         'component' => 'CiviContribute',
         'href' => CRM_Utils_System::url('civicrm/contact/view/contribution',
           'reset=1&action=add&context=contribution'
@@ -2738,10 +2745,12 @@ AND       civicrm_openid.is_primary = 1";
           'edit contributions',
         ),
       ),
-      'participant' => array('title' => ts('Register for Event'),
+      'participant' => array(
+        'title' => ts('Register for Event'),
         'weight' => 10,
         'ref' => 'new-participant',
         'key' => 'participant',
+        'tab' => 'participant',
         'component' => 'CiviEvent',
         'href' => CRM_Utils_System::url('civicrm/contact/view/participant', 'reset=1&action=add&context=participant'),
         'permissions' => array(
@@ -2749,16 +2758,19 @@ AND       civicrm_openid.is_primary = 1";
           'edit event participants',
         ),
       ),
-      'activity' => array('title' => ts('Record Activity'),
+      'activity' => array(
+        'title' => ts('Record Activity'),
         'weight' => 35,
         'ref' => 'new-activity',
         'key' => 'activity',
         'permissions' => array('edit all contacts'),
       ),
-      'pledge' => array('title' => ts('Add Pledge'),
+      'pledge' => array(
+        'title' => ts('Add Pledge'),
         'weight' => 15,
         'ref' => 'new-pledge',
         'key' => 'pledge',
+        'tab' => 'pledge',
         'href' => CRM_Utils_System::url('civicrm/contact/view/pledge',
           'reset=1&action=add&context=pledge'
         ),
@@ -2768,10 +2780,12 @@ AND       civicrm_openid.is_primary = 1";
           'edit pledges',
         ),
       ),
-      'membership' => array('title' => ts('Add Membership'),
+      'membership' => array(
+        'title' => ts('Add Membership'),
         'weight' => 20,
         'ref' => 'new-membership',
         'key' => 'membership',
+        'tab' => 'member',
         'component' => 'CiviMember',
         'href' => CRM_Utils_System::url('civicrm/contact/view/membership',
           'reset=1&action=add&context=membership'
@@ -2781,58 +2795,71 @@ AND       civicrm_openid.is_primary = 1";
           'edit memberships',
         ),
       ),
-      'case' => array('title' => ts('Add Case'),
+      'case' => array(
+        'title' => ts('Add Case'),
         'weight' => 25,
         'ref' => 'new-case',
         'key' => 'case',
+        'tab' => 'case',
         'component' => 'CiviCase',
         'href' => CRM_Utils_System::url('civicrm/case/add', 'reset=1&action=add&context=case'),
         'permissions' => array('add cases'),
       ),
-      'grant' => array('title' => ts('Add Grant'),
+      'grant' => array(
+        'title' => ts('Add Grant'),
         'weight' => 26,
         'ref' => 'new-grant',
         'key' => 'grant',
+        'tab' => 'grant',
         'component' => 'CiviGrant',
         'href' => CRM_Utils_System::url('civicrm/contact/view/grant',
           'reset=1&action=add&context=grant'
         ),
         'permissions' => array('edit grants'),
       ),
-      'rel' => array('title' => ts('Add Relationship'),
+      'rel' => array(
+        'title' => ts('Add Relationship'),
         'weight' => 30,
         'ref' => 'new-relationship',
         'key' => 'rel',
+        'tab' => 'rel',
         'href' => CRM_Utils_System::url('civicrm/contact/view/rel',
           'reset=1&action=add'
         ),
         'permissions' => array('edit all contacts'),
       ),
-      'note' => array('title' => ts('Add Note'),
+      'note' => array(
+        'title' => ts('Add Note'),
         'weight' => 40,
         'ref' => 'new-note',
         'key' => 'note',
+        'tab' => 'note',
         'href' => CRM_Utils_System::url('civicrm/contact/view/note',
           'reset=1&action=add'
         ),
         'permissions' => array('edit all contacts'),
       ),
-      'email' => array('title' => ts('Send an Email'),
+      'email' => array(
+        'title' => ts('Send an Email'),
         'weight' => 45,
         'ref' => 'new-email',
         'key' => 'email',
         'permissions' => array('view all contacts'),
       ),
-      'group' => array('title' => ts('Add to Group'),
+      'group' => array(
+        'title' => ts('Add to Group'),
         'weight' => 50,
         'ref' => 'group-add-contact',
         'key' => 'group',
+        'tab' => 'group',
         'permissions' => array('edit groups'),
       ),
-      'tag' => array('title' => ts('Tag'),
+      'tag' => array(
+        'title' => ts('Tag Contact'),
         'weight' => 55,
         'ref' => 'tag-contact',
         'key' => 'tag',
+        'tab' => 'tag',
         'permissions' => array('edit all contacts'),
       ),
     );
@@ -2907,6 +2934,7 @@ AND       civicrm_openid.is_primary = 1";
         $contextMenu['primaryActions'][$key] = array(
           'title' => $values['title'],
           'ref' => $values['ref'],
+          'class' => CRM_Utils_Array::value('class', $values),
           'key' => $values['key'],
         );
         continue;
@@ -2917,6 +2945,8 @@ AND       civicrm_openid.is_primary = 1";
         'title' => $values['title'],
         'ref' => $values['ref'],
         'href' => CRM_Utils_Array::value('href', $values),
+        'tab' => CRM_Utils_Array::value('tab', $values),
+        'class' => CRM_Utils_Array::value('class', $values),
         'key' => $values['key'],
       );
     }

@@ -103,12 +103,12 @@ class CRM_Event_Form_ManageEvent_Location extends CRM_Event_Form_ManageEvent {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   function setDefaultValues() {
     $defaults = $this->_values;
 
-    if (CRM_Utils_Array::value('loc_block_id', $defaults)) {
+    if (!empty($defaults['loc_block_id'])) {
       $defaults['loc_event_id'] = $defaults['loc_block_id'];
       $countLocUsed = CRM_Event_BAO_Event::countEventsUsingLocBlockId($defaults['loc_block_id']);
       if ($countLocUsed > 1) {
@@ -173,7 +173,7 @@ class CRM_Event_Form_ManageEvent_Location extends CRM_Event_Form_ManageEvent {
   /**
    *  function to build location block
    *
-   * @return None
+   * @return void
    * @access public
    */
   public function buildQuickForm() {
@@ -241,7 +241,7 @@ class CRM_Event_Form_ManageEvent_Location extends CRM_Event_Form_ManageEvent {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   public function postProcess() {
     $params = $this->exportValues();
@@ -302,6 +302,8 @@ class CRM_Event_Form_ManageEvent_Location extends CRM_Event_Form_ManageEvent {
     $params['id'] = $this->_id;
     CRM_Event_BAO_Event::add($params);
 
+    // Update tab "disabled" css class
+    $this->ajaxResponse['tabValid'] = TRUE;
     parent::endPostProcess();
   }
   //end of function

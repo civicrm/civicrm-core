@@ -46,7 +46,7 @@ class CRM_Contact_Form_Edit_Address {
    * @param boolean $sharing - false, if we want to skip the address sharing features
    * @param boolean $inlineEdit true when edit used in inline edit
    *
-   * @return none
+   * @return void
    *
    * @access public
    * @static
@@ -497,7 +497,7 @@ class CRM_Contact_Form_Edit_Address {
   static function setDefaultValues( &$defaults, &$form ) {
     $addressValues = array();
     if (isset($defaults['address']) && is_array($defaults['address']) &&
-      !CRM_Utils_system::isNull($defaults['address'])
+      !CRM_Utils_System::isNull($defaults['address'])
     ) {
 
       // start of contact shared adddress defaults

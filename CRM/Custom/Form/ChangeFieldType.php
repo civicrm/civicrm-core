@@ -93,7 +93,7 @@ class CRM_Custom_Form_ChangeFieldType extends CRM_Core_Form {
   /**
    * Function to actually build the form
    *
-   * @return None
+   * @return void
    * @access public
    */
   public function buildQuickForm() {
