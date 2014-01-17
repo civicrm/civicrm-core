@@ -114,6 +114,14 @@ $('#civicrm-menu').ready(function() {
   $('.crm-hidemenu').click(function() {
     $.Menu.closeAll();
     $('#civicrm-menu').slideUp();
+    var alert = CRM.alert({/literal}'<a href="#" id="crm-restore-menu">{ts escape='js'}Restore Menu{/ts}</a>', "{ts escape='js'}CiviCRM Menu Hidden{/ts}"{literal});
+    $('#crm-notification-container')
+      .off('.hideMenu')
+      .on('click.hideMenu', '#crm-restore-menu', function() {
+        alert.close();
+        $('#civicrm-menu').slideDown();
+        return false;
+      });
     return false;
   });
   $('.crm-quickSearchField').click(function() {
