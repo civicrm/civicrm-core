@@ -93,10 +93,10 @@ function civicrm_api3_report_template_getrows($params) {
 
 function _civicrm_api3_report_template_getrows($params) {
   $class = civicrm_api3('option_value', 'getvalue', array(
-      'option_group_id' => 'report_template',
-      'return' => 'name',
-      'value' => $params['report_id'],
-  )
+    'option_group_id' => 'report_template',
+    'return' => 'name',
+    'value' => $params['report_id'],
+    )
   );
 
   $reportInstance = new $class();
@@ -108,6 +108,9 @@ function _civicrm_api3_report_template_getrows($params) {
   $reportInstance->preProcess();
   $reportInstance->setDefaultValues(FALSE);
   $reportInstance->setParams(array_merge($reportInstance->getDefaultValues(), $params));
+  $options = _civicrm_api3_get_options_from_params($params, TRUE,'report_template','get');
+  $reportInstance->setLimitValue($options['limit']);
+  $reportInstance->setOffsetValue($options['offset']);
   $reportInstance->beginPostProcessCommon();
   $sql = $reportInstance->buildQuery();
   $rows = array();

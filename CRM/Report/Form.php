@@ -194,7 +194,28 @@ class CRM_Report_Form extends CRM_Core_Form {
   protected $_rowsFound = NULL;
   protected $_selectAliases = array();
   protected $_rollup = NULL;
+
+  /**
+   * SQL Limit clause
+   * @var  string
+   */
   protected $_limit = NULL;
+
+  /**
+   * This can be set to specify a limit to the number of rows
+   * Since it is currently envisaged as part of the api usage it is only being applied
+   * when $_output mode is not 'html' or 'group' so as not to have to interpret / mess with that part
+   * of the code (see limit() fn
+   * @var integer
+   */
+  protected $_limitValue = NULL;
+
+  /**
+   * This can be set to specify row offset
+   * See notes on _limitValue
+   * @var integer
+   */
+  protected $_offsetValue = NULL;
   protected $_sections = NULL;
   protected $_autoIncludeIndexedFieldsAsOrderBys = 0;
   protected $_absoluteUrl = FALSE;
@@ -240,11 +261,9 @@ class CRM_Report_Form extends CRM_Core_Form {
 
   /**
    * outputmode e.g 'print', 'csv', 'pdf'
-   * @todo have declared this as public as fixing an e-Notice in a point release - would
-   * be better converted to protected in 4.5
    * @var string
    */
-  public $_outputMode;
+  protected $_outputMode;
 
   public $_having = NULL;
   public $_select = NULL;
@@ -660,10 +679,10 @@ class CRM_Report_Form extends CRM_Core_Form {
           }
           //assign default value as "in" for multiselect
           //operator, To freeze the select element
-          if (CRM_Utils_Array::value('operatorType', $field) == CRM_Report_FORM::OP_MULTISELECT) {
+          if (CRM_Utils_Array::value('operatorType', $field) == CRM_Report_Form::OP_MULTISELECT) {
             $this->_defaults["{$fieldName}_op"] = 'in';
           }
-          elseif (CRM_Utils_Array::value('operatorType', $field) == CRM_Report_FORM::OP_MULTISELECT_SEPARATOR) {
+          elseif (CRM_Utils_Array::value('operatorType', $field) == CRM_Report_Form::OP_MULTISELECT_SEPARATOR) {
             $this->_defaults["{$fieldName}_op"] = 'mhas';
           }
           elseif ($op = CRM_Utils_Array::value('default_op', $field)) {
@@ -769,6 +788,23 @@ class CRM_Report_Form extends CRM_Core_Form {
   function setForce($isForce) {
     $this->_force = $isForce;
   }
+
+  /**
+   * Setter for $_limitValue
+   * @param number $_limitValue
+   */
+  function setLimitValue($_limitValue) {
+    $this->_limitValue = $_limitValue;
+  }
+
+  /**
+   * Setter for $_offsetValue
+   * @param number $_offsetValue
+   */
+  function setOffsetValue($_offsetValue) {
+    $this->_offsetValue = $_offsetValue;
+  }
+
   /**
    * Getter for $_defaultValues
    * @return array $_defaultValues
@@ -855,8 +891,8 @@ class CRM_Report_Form extends CRM_Core_Form {
               // required so that filter statistics show properly.
               $this->_columns[$table]['filters'][$fieldName]['options'] = $field['options'];
             }
-          case CRM_Report_FORM::OP_MULTISELECT:
-          case CRM_Report_FORM::OP_MULTISELECT_SEPARATOR:
+          case CRM_Report_Form::OP_MULTISELECT:
+          case CRM_Report_Form::OP_MULTISELECT_SEPARATOR:
             // assume a multi-select field
             if (!empty($field['options'])) {
               $element = $this->addElement('select', "{$fieldName}_op", ts('Operator:'), $operations);
@@ -873,27 +909,27 @@ class CRM_Report_Form extends CRM_Core_Form {
             }
             break;
 
-          case CRM_Report_FORM::OP_SELECT:
+          case CRM_Report_Form::OP_SELECT:
             // assume a select field
             $this->addElement('select', "{$fieldName}_op", ts('Operator:'), $operations);
             if (!empty($field['options']))
               $this->addElement('select', "{$fieldName}_value", NULL, $field['options']);
             break;
 
-          case CRM_Report_FORM::OP_DATE:
+          case CRM_Report_Form::OP_DATE:
             // build datetime fields
             CRM_Core_Form_Date::buildDateRange($this, $fieldName, $count, '_from','_to', 'From:', FALSE, $operations);
             $count++;
             break;
 
-          case CRM_Report_FORM::OP_DATETIME:
+          case CRM_Report_Form::OP_DATETIME:
             // build datetime fields
             CRM_Core_Form_Date::buildDateRange($this, $fieldName, $count, '_from', '_to', 'From:', FALSE, $operations, 'searchDate', true);
             $count++;
             break;
 
-          case CRM_Report_FORM::OP_INT:
-          case CRM_Report_FORM::OP_FLOAT:
+          case CRM_Report_Form::OP_INT:
+          case CRM_Report_Form::OP_FLOAT:
             // and a min value input box
             $this->add('text', "{$fieldName}_min", ts('Min'));
             // and a max value input box
@@ -1114,8 +1150,8 @@ class CRM_Report_Form extends CRM_Core_Form {
     // FIXME: At some point we should move these key-val pairs
     // to option_group and option_value table.
     switch ($type) {
-      case CRM_Report_FORM::OP_INT:
-      case CRM_Report_FORM::OP_FLOAT:
+      case CRM_Report_Form::OP_INT:
+      case CRM_Report_Form::OP_FLOAT:
         return array(
           'lte' => ts('Is less than or equal to'),
           'gte' => ts('Is greater than or equal to'),
@@ -1130,27 +1166,27 @@ class CRM_Report_Form extends CRM_Core_Form {
         );
         break;
 
-      case CRM_Report_FORM::OP_SELECT:
+      case CRM_Report_Form::OP_SELECT:
         return array(
           'eq' => ts('Is equal to'),
         );
 
-      case CRM_Report_FORM::OP_MONTH:
-      case CRM_Report_FORM::OP_MULTISELECT:
+      case CRM_Report_Form::OP_MONTH:
+      case CRM_Report_Form::OP_MULTISELECT:
         return array(
           'in' => ts('Is one of'),
           'notin' => ts('Is not one of'),
         );
         break;
 
-      case CRM_Report_FORM::OP_DATE:
+      case CRM_Report_Form::OP_DATE:
         return array(
           'nll' => ts('Is empty (Null)'),
           'nnll' => ts('Is not empty (Null)'),
         );
         break;
 
-      case CRM_Report_FORM::OP_MULTISELECT_SEPARATOR:
+      case CRM_Report_Form::OP_MULTISELECT_SEPARATOR:
         // use this operator for the values, concatenated with separator. For e.g if
         // multiple options for a column is stored as ^A{val1}^A{val2}^A
         return array(
@@ -1409,7 +1445,7 @@ class CRM_Report_Form extends CRM_Core_Form {
     $relative, $from, $to, $type = NULL, $fromTime = NULL, $toTime = NULL
   ) {
     $clauses = array();
-    if (in_array($relative, array_keys($this->getOperationPair(CRM_Report_FORM::OP_DATE)))) {
+    if (in_array($relative, array_keys($this->getOperationPair(CRM_Report_Form::OP_DATE)))) {
       $sqlOP = $this->getSQLOperator($relative);
       return "( {$fieldName} {$sqlOP} )";
     }
@@ -2427,9 +2463,9 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
               );
             }
             elseif (in_array($rel = CRM_Utils_Array::value("{$fieldName}_relative", $this->_params),
-                array_keys($this->getOperationPair(CRM_Report_FORM::OP_DATE))
+                array_keys($this->getOperationPair(CRM_Report_Form::OP_DATE))
               )) {
-              $pair = $this->getOperationPair(CRM_Report_FORM::OP_DATE);
+              $pair = $this->getOperationPair(CRM_Report_Form::OP_DATE);
               $statistics['filters'][] = array(
                 'title' => $field['title'],
                 'value' => $pair[$rel],
@@ -2669,6 +2705,14 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
 
       $this->_limit = " LIMIT $offset, $rowCount";
       return array($offset, $rowCount);
+    }
+    if($this->_limitValue) {
+      if($this->_offsetValue) {
+        $this->_limit = " LIMIT {$this->_offsetValue}, {$this->_limitValue} ";
+      }
+      else {
+        $this->_limit = " LIMIT " . $this->_limitValue;
+      }
     }
   }
 
