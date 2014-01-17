@@ -140,7 +140,7 @@
         eval("{$newContactCallback}");
       {/if}
       {literal}
-    }).focus( );
+    });
 
     cj( contactElement ).click( function( ) {
       cj( contactHiddenElement ).val('');
