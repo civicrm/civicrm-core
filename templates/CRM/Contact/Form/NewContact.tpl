@@ -27,7 +27,9 @@
 {if !in_array($context, array('search','advanced', 'builder')) || $parent eq 'activity'}
   {assign var='fldName' value=$prefix|cat:'contact'}
   {assign var='profSelect' value=$prefix|cat:'profiles'}
-
+	{* Focus on select contact element unless focus=false is passed in. *}
+	{assign var='focus' value=$focus|default:true}
+	
   {if $noLabel}
     <div>
       {if !$skipBreak}
@@ -140,7 +142,7 @@
         eval("{$newContactCallback}");
       {/if}
       {literal}
-    }).focus( );
+    }){/literal}{if $focus}.focus( ){/if}{literal};
 
     cj( contactElement ).click( function( ) {
       cj( contactHiddenElement ).val('');
