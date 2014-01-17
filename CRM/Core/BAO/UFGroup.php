@@ -1695,6 +1695,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
    * @params array   $field      array field properties
    * @params int     $mode       profile mode
    * @params int     $contactID  contact id
+   * @params string  $usedFor    for building up prefixed fieldname for special cases (e.g. onBehalf, Honor)
    *
    * @return null
    * @static
@@ -1706,7 +1707,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
     $mode,
     $contactId = NULL,
     $online = FALSE,
-    $onBehalf = FALSE,
+    $usedFor = NULL,
     $rowNumber = NULL ,
     $prefix = ''
   ) {
@@ -1726,8 +1727,11 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
       return;
     }
 
-    if ($onBehalf) {
+    if ($usedFor == 'onbehalf') {
       $name = "onbehalf[$fieldName]";
+    }
+    elseif ($usedFor == 'honor') {
+      $name = "honor[$fieldName]";
     }
     elseif ($contactId && !$online) {
       $name = "field[$contactId][$fieldName]";
@@ -1814,7 +1818,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
     elseif (substr($fieldName, 0, 2) === 'im') {
       $form->add('text', $name, $title, $attributes, $required);
       if (!$contactId) {
-        if ($onBehalf) {
+        if ($usedFor) {
           if (substr($name, -1) == ']') {
             $providerName = substr($name, 0, -1) . '-provider_id]';
           }
@@ -1884,8 +1888,11 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
     }
     elseif ($fieldName === 'contact_sub_type') {
       $gId = $form->get('gid') ? $form->get('gid') : CRM_Utils_Array::value('group_id', $field);
-      if ($onBehalf) {
+      if ($usedFor == 'onbehalf') {
         $profileType = 'Organization';
+      }
+      elseif ($usedFor == 'honor') {
+        $profileType = CRM_Core_BAO_UFField::getProfileType($form->_params['honoree_profile_id']);
       }
       else {
         $profileType = $gId ? CRM_Core_BAO_UFField::getProfileType($gId) : NULL;
@@ -1993,7 +2000,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
       $form->addRule($name, ts('Enter a valid Website.'), 'url');
 
       //Website type select
-      if ($onBehalf) {
+      if ($usedFor) {
         if (substr($name, -1) == ']') {
           $websiteTypeName = substr($name, 0, -1) . '-website_type_id]';
         }
@@ -2169,8 +2176,8 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
       // lets always add the hidden
       //subtype value if there is any, and we won't have to
       // compute it while processing.
-      if ($onBehalf) {
-        $form->addElement('hidden', 'onbehalf[contact_sub_type]', $field['field_type']);
+      if ($usedFor) {
+        $form->addElement('hidden', $usedFor . '[contact_sub_type]', $field['field_type']);
       }
       else {
         $form->addElement('hidden', 'contact_sub_type_hidden', $field['field_type']);

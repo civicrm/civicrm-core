@@ -114,6 +114,10 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     }
     $this->assign('onBehalfRequired', $this->_onBehalfRequired);
 
+    if (CRM_Utils_Array::value('honor_block_is_active', $this->_values)) {
+        CRM_Contact_Form_ProfileContact::preprocess($this);
+      }
+
     if (!empty($this->_pcpInfo['id']) && !empty($this->_pcpInfo['intro_text'])) {
       $this->assign('intro_text', $this->_pcpInfo['intro_text']);
     }
@@ -231,22 +235,46 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
 
     //build set default for pledge overdue payment.
     if (CRM_Utils_Array::value('pledge_id', $this->_values)) {
-      //get all payment statuses.
-      $statuses = array();
-      $returnProperties = array('status_id');
-      CRM_Core_DAO::commonRetrieveAll('CRM_Pledge_DAO_PledgePayment', 'pledge_id', $this->_values['pledge_id'],
-        $statuses, $returnProperties
-      );
+      //get all pledge payment records of current pledge id.
+      $pledgePayments = array();
 
-      $paymentStatusTypes = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
+      //used to record completed pledge payment ids used later for honor default
+      $completedContributionIds = array();
+
+      $pledgePayments = CRM_Pledge_BAO_PledgePayment::getPledgePayments($this->_values['pledge_id']);
+
       $duePayment = FALSE;
-      foreach ($statuses as $payId => $value) {
-        if ($paymentStatusTypes[$value['status_id']] == 'Overdue') {
+      foreach ($pledgePayments as $payId => $value) {
+        if ($value['status'] == 'Overdue') {
           $this->_defaults['pledge_amount'][$payId] = 1;
         }
-        elseif (!$duePayment && $paymentStatusTypes[$value['status_id']] == 'Pending') {
+        elseif (!$duePayment && $value['status'] == 'Pending') {
           $this->_defaults['pledge_amount'][$payId] = 1;
           $duePayment = TRUE;
+        }
+        elseif ($value['status'] == 'Completed' && $value['contribution_id']) {
+          $completedContributionIds[] = $value['contribution_id'];
+        }
+      }
+
+      if (CRM_Utils_Array::value('honor_block_is_active', $this->_values) && count($completedContributionIds)) {
+        $softCredit = array();
+        foreach ($completedContributionIds as $id) {
+          $softCredit = CRM_Contribute_BAO_ContributionSoft::getSoftContribution($id);
+        }
+        if (isset($softCredit['soft_credit'])) {
+          $this->_defaults['soft_credit_type_id'] = $softCredit['soft_credit'][1]['soft_credit_type'];
+
+          //since honoree profile fieldname of fields are prefixed with 'honor'
+          //we need to reformat the fieldname to append prefix during setting default values
+          CRM_Core_BAO_UFGroup::setProfileDefaults(
+            $softCredit['soft_credit'][1]['contact_id'],
+            CRM_Core_BAO_UFGroup::getFields($this->_honoreeProfileId),
+            $defaults
+          );
+          foreach ($defaults as $fieldName => $value) {
+            $this->_defaults['honor[' . $fieldName . ']'] = $value;
+          }
         }
       }
     }
@@ -460,8 +488,15 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
       CRM_Contribute_BAO_Premium::buildPremiumBlock($this, $this->_id, TRUE);
     }
 
+    //add honor block
     if ($this->_values['honor_block_is_active']) {
-      $this->buildHonorBlock();
+      $this->assign('honor_block_is_active', TRUE);
+      $this->set('honor_block_is_active', TRUE);
+
+      //build soft-credit section
+      CRM_Contribute_Form_SoftCredit::buildQuickForm($this);
+      //build honoree profile section
+      CRM_Contact_Form_ProfileContact::buildQuickForm($this);
     }
 
 
@@ -569,42 +604,6 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     }
 
     $this->addFormRule(array('CRM_Contribute_Form_Contribution_Main', 'formRule'), $this);
-  }
-
-  /**
-   * Function to add the honor block
-   *
-   * @return void
-   * @access public
-   */
-  function buildHonorBlock() {
-    $this->assign('honor_block_is_active', TRUE);
-    $this->set('honor_block_is_active', TRUE);
-
-    $this->assign('honor_block_title', CRM_Utils_Array::value('honor_block_title', $this->_values));
-    $this->assign('honor_block_text', CRM_Utils_Array::value('honor_block_text', $this->_values));
-
-    $attributes = CRM_Core_DAO::getAttribute('CRM_Contact_DAO_Contact');
-    $extraOption = array('onclick' => "enableHonorType();");
-    // radio button for Honor Type
-    $honorOptions = array();
-    $honor = CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution', 'honor_type_id');
-    foreach ($honor as $key => $var) {
-      $honorTypes[$key] = $this->createElement('radio', NULL, NULL, $var, $key, $extraOption);
-    }
-    $this->addGroup($honorTypes, 'honor_type_id', NULL);
-
-    // prefix
-    $this->addElement('select', 'honor_prefix_id', ts('Prefix'), array('' => ts('- prefix -')) + CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'prefix_id'));
-    // first_name
-    $this->addElement('text', 'honor_first_name', ts('First Name'), $attributes['first_name']);
-
-    //last_name
-    $this->addElement('text', 'honor_last_name', ts('Last Name'), $attributes['last_name']);
-
-    //email
-    $this->addElement('text', 'honor_email', ts('Email Address'), array('class' => 'email'));
-    $this->addRule('honor_email', ts('Honoree Email is not valid.'), 'email');
   }
 
   /**
@@ -895,17 +894,6 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
       if ($amount < $min_amount) {
         $errors['selectProduct'] = ts('The premium you have selected requires a minimum contribution of %1', array(1 => CRM_Utils_Money::format($min_amount)));
         CRM_Core_Session::setStatus($errors['selectProduct']);
-      }
-    }
-
-    if ($self->_values['honor_block_is_active'] && CRM_Utils_Array::value('honor_type_id', $fields)) {
-      // make sure there is a first name and last name if email is not there
-      if (!CRM_Utils_Array::value('honor_email', $fields)) {
-        if (!CRM_Utils_Array::value('honor_first_name', $fields) ||
-          !CRM_Utils_Array::value('honor_last_name', $fields)
-        ) {
-          $errors['honor_last_name'] = ts('In Honor Of - First Name and Last Name, OR an Email Address is required.');
-        }
       }
     }
 

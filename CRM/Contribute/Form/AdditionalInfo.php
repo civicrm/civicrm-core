@@ -311,19 +311,6 @@ class CRM_Contribute_Form_AdditionalInfo {
       $params['receipt_date'] = $formatted['receipt_date'] = date('YmdHis');
     }
 
-    if (CRM_Utils_Array::value('honor_type_id', $params)) {
-      if ($form->_honorID) {
-        $honorId = CRM_Contribute_BAO_Contribution::createHonorContact($params, $form->_honorID);
-      }
-      else {
-        $honorId = CRM_Contribute_BAO_Contribution::createHonorContact($params);
-      }
-      $formatted["honor_contact_id"] = $honorId;
-    }
-    else {
-      $formatted["honor_contact_id"] = 'null';
-    }
-
     //special case to handle if all checkboxes are unchecked
     $customFields = CRM_Core_BAO_CustomField::getFields('Contribution',
       FALSE,
