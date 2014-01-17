@@ -47,6 +47,29 @@ class CRM_Contribute_Form_SoftCredit {
    * @return void
    */
   static function buildQuickForm(&$form) {
+    if ($form->_mode == 'live' && CRM_Utils_Array::value('honor_block_is_active', $form->_values)) {
+      $ufJoinDAO = new CRM_Core_DAO_UFJoin();
+      $ufJoinDAO->module = 'soft_credit';
+      $ufJoinDAO->entity_id = $form->_id;
+      if ($ufJoinDAO->find(TRUE)) {
+        $jsonData = json_decode($ufJoinDAO->module_data);
+        if ($jsonData) {
+          $form->assign('honor_block_title', $jsonData->soft_credit->honor_block_title);
+          $form->assign('honor_block_text', $jsonData->soft_credit->honor_block_text);
+
+          $softCreditTypes = CRM_Core_OptionGroup::values("soft_credit_type", FALSE);
+          $extraOption = array('onclick' => "enableHonorType();");
+
+          // radio button for Honor Type
+          foreach ($jsonData->soft_credit->soft_credit_types as $value) {
+            $honorTypes[$value] = $form->createElement('radio', NULL, NULL, $softCreditTypes[$value], $value, $extraOption);
+          }
+          $form->addGroup($honorTypes, 'soft_credit_type_id', NULL);
+        }
+      }
+        return $form;
+    }
+
     $prefix = 'soft_credit_';
     // by default generate 5 blocks
     $item_count = 6;
@@ -55,6 +78,22 @@ class CRM_Contribute_Form_SoftCredit {
     $showCreateNew = TRUE;
     if ($form->_action & CRM_Core_Action::UPDATE) {
       $form->_softCreditInfo = CRM_Contribute_BAO_ContributionSoft::getSoftContribution($form->_id, TRUE);
+    }
+    elseif ($form->_pledgeID) {
+      //Check and select most recent completed contrubtion and use it to retrieve
+      //soft-credit information to use as default for current pledge payment, CRM-13981
+      $pledgePayments = CRM_Pledge_BAO_PledgePayment::getPledgePayments($form->_pledgeID);
+      foreach ($pledgePayments as $id => $record) {
+        if ($record['contribution_id']) {
+          $softCredits = CRM_Contribute_BAO_ContributionSoft::getSoftContribution($record['contribution_id'], TRUE);
+          if ($record['status'] == 'Completed' && count($softCredits) > 0) {
+            $form->_softCreditInfo = $softCredits;
+          }
+        }
+      }
+    }
+
+    if (property_exists($form, "_softCreditInfo")) {
       if (!empty($form->_softCreditInfo['soft_credit'])) {
         $showSoftCreditRow = count($form->_softCreditInfo['soft_credit']);
         $showSoftCreditRow++;
@@ -119,7 +158,6 @@ class CRM_Contribute_Form_SoftCredit {
         $defaults["soft_credit_type[$key]"] = $value['soft_credit_type'];
       }
     }
-
     elseif (CRM_Utils_Array::value('pcp_id', $form->_softCreditInfo)) {
       $pcpInfo = $form->_softCreditInfo;
       $pcpId = CRM_Utils_Array::value('pcp_id', $pcpInfo);

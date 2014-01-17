@@ -342,10 +342,6 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
       foreach ($softParams as $softParam) {
         $softParam['contribution_id'] = $contribution->id;
         $softParam['currency'] = $contribution->currency;
-        $softParam['pcp_id'] = 'null';
-        $softParam['pcp_display_in_roll'] = 'null';
-        $softParam['pcp_roll_nickname'] = 'null';
-        $softParam['pcp_personal_note'] = 'NULL';
         CRM_Contribute_BAO_ContributionSoft::add($softParam);
       }
     }
@@ -907,44 +903,6 @@ GROUP BY p.id
     else {
       return array(NULL, NULL);
     }
-  }
-
-  /**
-   * Function to create is honor of
-   *
-   * @param array $params  associated array of fields (by reference)
-   * @param int   $honorId honor Id
-   * @param array $honorParams any params that should be send to the create function
-   *
-   * @return contact id
-   */
-  static function createHonorContact(&$params, $honorId = NULL, $honorParams = array()) {
-    $honorParams = array_merge(
-      array(
-        'first_name' => $params['honor_first_name'],
-        'last_name' => $params['honor_last_name'],
-        'prefix_id' => $params['honor_prefix_id'],
-        'email-Primary' => $params['honor_email'],
-      ),
-      $honorParams
-    );
-    if (!$honorId) {
-      $honorParams['email'] = $params['honor_email'];
-
-      $dedupeParams = CRM_Dedupe_Finder::formatParams($honorParams, 'Individual');
-      $dedupeParams['check_permission'] = FALSE;
-      $ids = CRM_Dedupe_Finder::dupesByParams($dedupeParams, 'Individual');
-
-      // if we find more than one contact, use the first one
-      $honorId = CRM_Utils_Array::value(0, $ids);
-    }
-
-    $contactID = CRM_Contact_BAO_Contact::createProfileContact(
-      $honorParams,
-      CRM_Core_DAO::$_nullArray,
-      $honorId
-    );
-    return $contactID;
   }
 
   /**
@@ -1697,7 +1655,7 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
     return $componentDetails;
   }
 
-  static function contributionCount($contactId, $includeSoftCredit = TRUE, $includeHonoree = TRUE) {
+  static function contributionCount($contactId, $includeSoftCredit = TRUE) {
     if (!$contactId) {
       return 0;
     }
@@ -1706,11 +1664,6 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
       SELECT contribution.id AS id
       FROM civicrm_contribution contribution
       WHERE contribution.is_test = 0 AND contribution.contact_id = {$contactId} ";
-
-    $contactHonoreeContributionsSQL = "
-      SELECT contribution.id
-      FROM civicrm_contribution contribution
-      WHERE contribution.is_test = 0 AND contribution.honor_contact_id = {$contactId} ";
 
     $contactSoftCreditContributionsSQL = "
       SELECT contribution.id
@@ -1723,11 +1676,6 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
     if ($includeSoftCredit) {
       $query .= " UNION ";
       $query .= $contactSoftCreditContributionsSQL;
-    }
-
-    if ($includeHonoree) {
-      $query .= " UNION ";
-      $query .= $contactHonoreeContributionsSQL;
     }
 
     $query .= ") x";

@@ -67,6 +67,8 @@ class CRM_UF_Page_ProfileEditor extends CRM_Core_Page {
    * @param array $entityTypes strings, e.g. "IndividualModel", "ActivityModel"
    */
   static function registerSchemas($entityTypes) {
+    /* CRM_Core_Error::backtrace(); */
+    /*   CRM_Core_Error::debug( '$entityTypes', $entityTypes ); */
     // TODO in cases where registerSchemas is called multiple times for same entity, be more efficient
     CRM_Core_Resources::singleton()->addSettingsFactory(function () use ($entityTypes) {
       return array(
@@ -104,10 +106,31 @@ class CRM_UF_Page_ProfileEditor extends CRM_Core_Page {
         //dpm($availableFields);
       }
       switch ($entityType) {
+        case 'ContactModel':
+          $civiSchema[$entityType] = self::convertCiviModelToBackboneModel(
+            'Contact',
+            ts('Contact'),
+            $availableFields
+          );
+          break;
         case 'IndividualModel':
           $civiSchema[$entityType] = self::convertCiviModelToBackboneModel(
             'Individual',
             ts('Individual'),
+            $availableFields
+          );
+          break;
+        case 'OrganizationModel':
+          $civiSchema[$entityType] = self::convertCiviModelToBackboneModel(
+            'Organization',
+            ts('Organization'),
+            $availableFields
+          );
+          break;
+        case 'HouseholdModel':
+          $civiSchema[$entityType] = self::convertCiviModelToBackboneModel(
+            'Household',
+            ts('Household'),
             $availableFields
           );
           break;

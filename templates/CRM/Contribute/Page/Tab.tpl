@@ -74,13 +74,6 @@
             {include file="CRM/Contribute/Page/ContributionRecur.tpl"}
         {/if}
 
-        {if $honor}
-            <div class="solid-border-top">
-                <br /><label>{ts 1=$displayName}Contributions made in honor of %1{/ts}</label>
-            </div>
-            {include file="CRM/Contribute/Page/ContributionHonor.tpl"}
-        {/if}
-
         {if $softCredit}
             <div class="solid-border-top">
                 <br />
