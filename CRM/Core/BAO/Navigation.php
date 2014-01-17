@@ -577,12 +577,11 @@ ORDER BY parent_id, weight";
 
       //add additional navigation items
       $logoutURL = CRM_Utils_System::url('civicrm/logout', 'reset=1');
-      $appendString = "<li id=\"menu-logout\" class=\"menumain\"><a href=\"{$logoutURL}\">" . ts('Logout') . "</a></li>";
 
       // get home menu from db
       $homeParams = array('name' => 'Home');
       $homeNav = array();
-      $homeIcon = '<img src="' . $config->userFrameworkResourceURL . 'i/logo16px.png" />';
+      $homeIcon = '<img src="' . $config->userFrameworkResourceURL . 'i/logo16px.png" style="vertical-align:middle;" />';
       self::retrieve($homeParams, $homeNav);
       if ($homeNav) {
         list($path, $q) = explode('&', $homeNav['url']);
@@ -597,25 +596,32 @@ ORDER BY parent_id, weight";
         $homeURL = CRM_Utils_System::url('civicrm/dashboard', 'reset=1');
         $homeLabel = ts('CiviCRM Home');
       }
-
+      // Link to hide the menubar
       if (
         ($config->userSystem->is_drupal) &&
         ((module_exists('toolbar') && user_access('access toolbar')) ||
           module_exists('admin_menu') && user_access('access administration menu')
         )
       ) {
-        $prepandString = '<li class="menumain crm-link-home">' . $homeIcon . "<ul id=\"civicrm-home\"><li><a href=\"{$homeURL}\">" . $homeLabel . '</a></li><li><a href="#" class="crm-hidemenu">' . ts('Drupal Menu') . "</a></li></ul>";
+        $hideLabel = ts('Drupal Menu');
       }
       elseif ($config->userSystem->is_wordpress) {
-        $prepandString = '<li class="menumain crm-link-home">' . $homeIcon . "<ul id=\"civicrm-home\"><li><a href=\"{$homeURL}\">" . $homeLabel . '</a></li><li><a href="#" class="crm-hidemenu">' . ts('WordPress Menu') . "</a></li></ul>";
+        $hideLabel = ts('WordPress Menu');
       }
       else {
-        $prepandString = "<li class=\"menumain crm-link-home\"><a href=\"{$homeURL}\" title=\"" . $homeLabel . '">' . $homeIcon . "</a>";
+        $hideLabel = ts('Hide Menu');
       }
 
-      $navigation = $prepandString . $navigation . $appendString;
+      $prepandString = "
+        <li class='menumain crm-link-home'>$homeIcon
+          <ul id='civicrm-home'>
+            <li><a href='$homeURL'>$homeLabel</a></li>
+            <li><a href='#' class='crm-hidemenu'>$hideLabel</a></li>
+            <li><a href='$logoutURL' class='crm-logout-link'>". ts('Logout') ."</a></li>
+          </ul>";
+      // <li> tag doesn't need to be closed
     }
-    return $navigation;
+    return $prepandString . $navigation;
   }
 
   /**

@@ -122,8 +122,16 @@
         <td class="label">{$form.group_id.label}</td>
         <td>{$form.group_id.html}</td>
     </tr>
+    <tr id="msgMode" class="crm-scheduleReminder-form-block-mode">
+      <td class="label">{$form.mode.label}</td>
+      <td>{$form.mode.html}</td>
+    </tr>
+    <tr id="smsProvider" class="crm-scheduleReminder-form-block-sms_provider_id">
+      <td class="label">{$form.sms_provider_id.label}</td>
+      <td>{$form.sms_provider_id.html}</td>
+    </tr>
   </table>
-  <fieldset id="compose_id"><legend>{ts}Email{/ts}</legend>
+  <fieldset id="compose_id"><legend>{$title}</legend>
      <table id="email-field-table" class="form-layout-compressed">
         <tr class="crm-scheduleReminder-form-block-active">
            <td class="label"></td>
@@ -139,7 +147,8 @@
         </tr>
 
   </table>
-        {include file="CRM/Contact/Form/Task/EmailCommon.tpl" upload=1 noAttach=1}
+    <div id="email">{include file="CRM/Contact/Form/Task/EmailCommon.tpl" upload=1 noAttach=1}</div>
+    <div id="sms">{include file="CRM/Contact/Form/Task/SMSCommon.tpl" upload=1 noAttach=1}</div>
   </fieldset>
 
 {include file="CRM/common/showHideByFieldValue.tpl"
@@ -207,7 +216,32 @@
          });
      });
 
-    cj(function() {
+  cj(function () {
+    loadMsgBox();
+    cj('#mode').change(function () {
+      loadMsgBox();
+    });
+  });
+
+  function loadMsgBox() {
+    if (cj('#mode').val() == 'Email' || cj('#mode').val() == 0){
+      cj('#sms').hide();
+      cj('#smsProvider').hide();
+      cj('#email').show();
+    }
+    else if (cj('#mode').val() == 'SMS'){
+      cj('#email').hide();
+      cj('#sms').show();
+      cj('#smsProvider').show();
+    }
+    else if (cj('#mode').val() == 'User_Preference'){
+        cj('#email').show();
+        cj('#sms').show();
+        cj('#smsProvider').show();
+      }
+  }
+
+  cj(function() {
        if ( cj('#is_recipient_listing').val( ) ) {
            cj('#recipientList').show();
        } else {
