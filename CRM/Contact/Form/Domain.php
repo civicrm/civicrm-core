@@ -237,7 +237,6 @@ class CRM_Contact_Form_Domain extends CRM_Core_Form {
    * @access public
    */
   public function postProcess() {
-    $params = array();
     $params = $this->exportValues();
     $params['entity_id'] = $this->_id;
     $params['entity_table'] = CRM_Core_BAO_Domain::getTableName();
@@ -245,7 +244,6 @@ class CRM_Contact_Form_Domain extends CRM_Core_Form {
 
     $defaultLocationType = CRM_Core_BAO_LocationType::getDefault();
 
-    $location = array();
     $params['address'][1]['location_type_id'] = $defaultLocationType->id;
     $params['phone'][1]['location_type_id'] = $defaultLocationType->id;
     $params['email'][1]['location_type_id'] = $defaultLocationType->id;
@@ -256,10 +254,15 @@ class CRM_Contact_Form_Domain extends CRM_Core_Form {
       'legal_name'   => $domain->name,
       'organization_name' => $domain->name,
       'contact_id' => $this->_contactId,
+      'contact_type' => 'Organization',
     );
-    CRM_Contact_BAO_Contact::add($contactParams);
-    $location = CRM_Core_BAO_Location::create($params, TRUE);
 
+    if ($this->_contactId) {
+      $contactParams['contact_sub_type'] = CRM_Contact_BAO_Contact::getContactSubType($this->_contactId);
+    }
+
+    CRM_Contact_BAO_Contact::add($contactParams);
+    CRM_Core_BAO_Location::create($params, TRUE);
 
     CRM_Core_BAO_Domain::edit($params, $this->_id);
 
