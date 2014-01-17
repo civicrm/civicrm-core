@@ -60,6 +60,8 @@ class CRM_Event_Form_ParticipantFeeSelection extends CRM_Core_Form {
 
   public $_participantId = NULL;
 
+  protected $_participantStatus = NULL;
+
   public function preProcess() {
     $this->_participantId = CRM_Utils_Request::retrieve('id', 'Positive', $this, TRUE);
     $this->_contactId = CRM_Utils_Request::retrieve('cid', 'Positive', $this, TRUE);
@@ -76,6 +78,7 @@ class CRM_Event_Form_ParticipantFeeSelection extends CRM_Core_Form {
     $this->assign('displayName', $this->_contributorDisplayName);
     $this->assign('email', $this->_contributorEmail);
 
+    $this->_participantStatus = CRM_Core_DAO::getFieldValue('CRM_Event_BAO_Participant', $this->_participantId, 'status_id');
     //set the payment mode - _mode property is defined in parent class
     $this->_mode = CRM_Utils_Request::retrieve('mode', 'String', $this);
 
@@ -121,6 +124,7 @@ class CRM_Event_Form_ParticipantFeeSelection extends CRM_Core_Form {
     CRM_Core_Resources::singleton()->addSetting(array(
         'partiallyPaid' => array_search('Partially paid', $statuses),
         'pendingRefund' => array_search('Pending refund', $statuses),
+        'participantStatus' => $this->_participantStatus
       ));
 
     $config = CRM_Core_Config::singleton();

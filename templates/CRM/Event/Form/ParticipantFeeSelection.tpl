@@ -32,24 +32,48 @@ function display(totalfee) {
   totalfee = Math.round(totalfee*100)/100;
   // note : some variables used used here are global variables defined inside Calculate.tpl
   var totalEventFee  = formatMoney( totalfee, 2, seperator, thousandMarker);
-  document.getElementById('pricevalue').innerHTML = "<b>"+symbol+"</b> "+totalEventFee;
+  cj('#pricevalue').html("<b>"+symbol+"</b> "+totalEventFee);
   scriptfee   = totalfee;
   scriptarray = price;
-  cj('#total_amount').val( totalfee );
+  cj('#total_amount').val(totalfee);
   ( totalfee < 0 ) ? cj('table#pricelabel').addClass('disabled') : cj('table#pricelabel').removeClass('disabled');
 
   // populate the balance amount div
-  populatebalanceFee();
+  // change the status selections according to updated selections
+  populatebalanceFee(totalEventFee);
 }
 
-function populatebalanceFee() {
+function populatebalanceFee(updatedAmt) {
   // calculate the balance amount using total paid and updated amount
-  var updatedFeeUnFormatted = cj('#pricevalue').text();
-  var updatedAmt = parseFloat(updatedFeeUnFormatted.replace(/[^0-9-.]/g, ''));
   var balanceAmt = updatedAmt - CRM.feePaid;
+  // change the status selections according to updated selections
+  if (balanceAmt > 0) {
+    cj('#status_id').val(CRM.partiallyPaid);
+  }
+  else if(balanceAmt < 0) {
+    cj('#status_id').val(CRM.pendingRefund);
+  }
+  else if(balanceAmt == 0) {
+    cj('#status_id').val(CRM.participantStatus);
+  }
+
   balanceAmt = formatMoney(balanceAmt, 2, seperator, thousandMarker);
   cj('#balance-fee').text(symbol+" "+balanceAmt);
 }
+
+cj(function(){
+  var updatedFeeUnFormatted = cj('#pricevalue').text();
+  var updatedAmt = parseFloat(updatedFeeUnFormatted.replace(/[^0-9-.]/g, ''));
+  var balanceAmt = updatedAmt - CRM.feePaid;
+
+  // change the status selections according to updated selections
+  if (balanceAmt > 0) {
+    cj('#status_id').val(CRM.partiallyPaid);
+  } 
+  else if(balanceAmt < 0) {
+    cj('#status_id').val(CRM.pendingRefund);
+  } 
+});
 
 {/literal}
 </script>
@@ -157,26 +181,26 @@ function populatebalanceFee() {
 <script type='text/javascript'>
 cj(function($){
   cj('.total_amount-section').remove(); 
-
-cj('#ParticipantFeeSelection').submit(function(e) {
-  var statusId = cj('#status_id').val();
-  var statusLabel = cj('#status_id option:selected').text(); 
-  var balanceFee = cj('#balance-fee').text();
-  balanceFee = parseFloat(balanceFee.replace(/[^0-9-.]/g, ''));
   
-  if (balanceFee > 0 && statusId != CRM.partiallyPaid) {
-    var result = confirm('Balance is owing for the updated selections. Expected participant status is \'Partially paid\'. Are you sure you want to set the participant status to ' + statusLabel + ' ? Click OK to continue, Cancel to change your entries.');
-    if (result == false) {
-      e.preventDefault();
+  cj('#ParticipantFeeSelection').submit(function(e) {
+    var statusId = cj('#status_id').val();
+    var statusLabel = cj('#status_id option:selected').text(); 
+    var balanceFee = cj('#balance-fee').text();
+    balanceFee = parseFloat(balanceFee.replace(/[^0-9-.]/g, ''));
+  
+    if (balanceFee > 0 && statusId != CRM.partiallyPaid) {
+      var result = confirm('Balance is owing for the updated selections. Expected participant status is \'Partially paid\'. Are you sure you want to set the participant status to ' + statusLabel + ' ? Click OK to continue, Cancel to change your entries.');
+      if (result == false) {
+        e.preventDefault();
+      }
     }
-  }
-  else if (balanceFee < 0 && statusId != CRM.pendingRefund) {
-    var result = confirm('Balance is overpaid for the updated selections. Expected participant status is \'Pending refund\'. Are you sure you want to set the participant status to ' + statusLabel + ' ? Click OK to continue, Cancel to change your entries');
-    if (result == false) {
-      e.preventDefault();
+    else if (balanceFee < 0 && statusId != CRM.pendingRefund) {
+      var result = confirm('Balance is overpaid for the updated selections. Expected participant status is \'Pending refund\'. Are you sure you want to set the participant status to ' + statusLabel + ' ? Click OK to continue, Cancel to change your entries');
+      if (result == false) {
+        e.preventDefault();
+      }
     }
-  }
-});
+  });
 });
 </script>
 {/literal}
