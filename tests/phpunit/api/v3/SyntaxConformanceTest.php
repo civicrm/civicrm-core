@@ -72,10 +72,19 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     }
   }
 
-
   public static function entities($skip = NULL) {
-    // uncomment to make a quicker run when adding a test
+    // To only test specific entities, call phpunit with SYNTAX_CONFORMANCE_ENTITIES="TheEntityName"
+    // or uncomment this line:
     //return array(array ('Tag'), array ('Activity')  );
+
+    if (getenv('SYNTAX_CONFORMANCE_ENTITIES')) {
+      $result = array();
+      foreach (explode(' ', getenv('SYNTAX_CONFORMANCE_ENTITIES')) as $entity) {
+        $result[] = array($entity);
+      }
+      return $result;
+    }
+
     $tmp = civicrm_api('Entity', 'Get', array('version' => 3));
     if (!is_array($skip)) {
       $skip = array();
@@ -156,7 +165,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
  * @return multitype:string |multitype:multitype:string
  */
   public static function toBeSkipped_automock($sequential = FALSE) {
-    $entitiesWithoutGet = array('MailingContact', 'EntityTag', 'Participant', 'ParticipantPayment', 'Setting', 'SurveyRespondant', 'MailingRecipients',  'CustomSearch', 'Extension', 'ReportTemplate', 'System', 'DashboardContact');
+    $entitiesWithoutGet = array('MailingContact', 'EntityTag', 'Participant', 'ParticipantPayment', 'Setting', 'SurveyRespondant', 'MailingRecipients',  'CustomSearch', 'Extension', 'ReportTemplate', 'System');
     if ($sequential === TRUE) {
       return $entitiesWithoutGet;
     }
@@ -235,7 +244,6 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       'MailSettings',
       'Setting',
       'MailingContact',
-      'DashboardContact',
     );
     if ($sequential === TRUE) {
       return $entitiesWithout;
@@ -741,7 +749,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       );
 
       $checkEntity = $this->callAPISuccess($entityName, 'getsingle', $checkParams);
-      $this->assertAPIArrayComparison($entity, $checkEntity, array(), "changing field $fieldName\n" . print_r(array('update-params' => $updateParams, 'update-result' => $update, 'getsingle-params' => $checkParams, 'getsingle-result' => $checkEntity, 'expected entity' => $entity), TRUE));
+      $this->assertAPIArrayComparison($entity, $checkEntity, array(), "checking if $fieldName was correctly updaetd\n" . print_r(array('update-params' => $updateParams, 'update-result' => $update, 'getsingle-params' => $checkParams, 'getsingle-result' => $checkEntity, 'expected entity' => $entity), TRUE));
     }
     $baoObj->deleteTestObjects($baoString);
     $baoObj->free();
