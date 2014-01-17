@@ -37,7 +37,7 @@
           {assign var='createNewStatus' value=false}
         {/if}
         {include file="CRM/Contact/Form/NewContact.tpl" noLabel=true skipBreak=true blockNo=$rowNumber
-        prefix="soft_credit_" showNewSelect=$createNewStatus}
+        prefix="soft_credit_" showNewSelect=$createNewStatus focus=false}
       </td>
       <td>
         {$form.soft_credit_amount.$rowNumber.label}&nbsp;{$form.soft_credit_amount.$rowNumber.html|crmAddClass:eight}
