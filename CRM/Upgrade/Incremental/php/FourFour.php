@@ -280,6 +280,10 @@ ALTER TABLE civicrm_dashboard
   END;
     ";
     CRM_Core_DAO::executeQuery($query, array(), TRUE, NULL, FALSE, FALSE);
+ 
+    // CRM-13998 : missing alter statements for civicrm_report_instance
+    $this->addTask(ts('Confirm civicrm_report_instance sql table for upgrades'), 'updateReportInstanceTable');
+
 
     return TRUE;
   }
@@ -540,5 +544,38 @@ CREATE TABLE IF NOT EXISTS `civicrm_word_replacement` (
       'values' => self::getConfigArraysAsAPIParams(FALSE),
     ));
     CRM_Core_BAO_WordReplacement::rebuild();
+  }
+
+  
+  /***
+   * CRM-13998 missing alter statements for civicrm_report_instance
+   ***/
+  public function updateReportInstanceTable() {
+
+    // add civicrm_report_instance.name 
+
+    $sql = "SELECT count(*) FROM information_schema.columns "
+      . "WHERE table_schema = database() AND table_name = 'civicrm_report_instance' AND COLUMN_NAME = 'name' ";
+
+    $res = CRM_Core_DAO::executeQuery($sql);
+
+    if ($res->N <= 0 ) {
+      $sql = "ALTER TABLE civicrm_report_instance ADD `name` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'when combined with report_id/template uniquely identifies the instance";
+      $res = CRM_Core_DAO::executeQuery($sql);
+    }
+
+    // add civicrm_report_instance args 
+
+    $sql = "SELECT count(*) FROM information_schema.columns WHERE table_schema = database() AND table_name = 'civicrm_report_instance' AND COLUMN_NAME = 'args' ";
+
+    $res = CRM_Core_DAO::executeQuery($sql);
+
+    if ($res->N <= 0 ) {
+      $sql = "ALTER TABLE civicrm_report_instance ADD `args` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'arguments that are passed in the url when invoking the instance'";
+
+      $res = CRM_Core_DAO::executeQuery($sql);
+    }
+
+    return TRUE;
   }
 }
