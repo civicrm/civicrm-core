@@ -579,6 +579,33 @@ CRM.validate = CRM.validate || {
       }
     );
   };
+  /**
+   * @param startMsg string
+   * @param endMsg string|function
+   * @param deferred optional jQuery deferred object
+   * @return jQuery deferred object - if not supplied a new one will be created
+   */
+  var fadeOut;
+  CRM.status = function(startMsg, endMsg, deferred) {
+    var $bar = $('#civicrm-menu');
+    if (!$bar.length) {
+      console && console.log && console.log('CRM.status called on a page with no menubar');
+      return;
+    }
+    $('.crm-menubar-status-container', $bar).remove();
+    fadeOut && window.clearTimeout(fadeOut);
+    $bar.append('<li class="crm-menubar-status-container status-busy"><div class="crm-menubar-status-progressbar"><div class="crm-menubar-status-msg">' + startMsg + '</div></div></li>');
+    $('.crm-menubar-status-container', $bar).css('min-width', $('.crm-menubar-status-container', $bar).width());
+    deferred || (deferred = new $.Deferred());
+    deferred.done(function(data) {
+      var msg = typeof(endMsg) === 'function' ? endMsg(data) : endMsg;
+      $('.crm-menubar-status-container', $bar).removeClass('status-busy').addClass('status-done').find('.crm-menubar-status-msg').html(msg);
+      fadeOut = window.setTimeout(function() {
+        $('.crm-menubar-status-container', $bar).fadeOut('slow');
+      }, 2000);
+    });
+    return deferred;
+  };
 
   /**
    * @param string text Displayable message
