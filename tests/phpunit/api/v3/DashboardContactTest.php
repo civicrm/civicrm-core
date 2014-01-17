@@ -34,7 +34,7 @@ require_once 'CiviTest/CiviUnitTestCase.php';
 class api_v3_DashboardContactTest extends CiviUnitTestCase {
   protected $_params;
   protected $_params2;
-  protected $_entity = 'dashborad_contact';
+  protected $_entity = 'dashboard_contact';
   protected $_apiversion = 3;
 
   public $_eNoticeCompliant = TRUE;
