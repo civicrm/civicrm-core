@@ -12,7 +12,7 @@ cj(function($) {
   }
 
   $('#addMoreSoftCredit').click(function(){
-    $('.crm-soft-credit-block tr.hiddenElement :first').show().removeClass('hiddenElement');
+    $('.crm-contribution-form-block-soft_credit_to tr.hiddenElement').filter(':first').show().removeClass('hiddenElement');
     if ( $('.crm-soft-credit-block tr.hiddenElement').length < 1 ) {
       $('#addMoreSoftCredit').hide();
     }
