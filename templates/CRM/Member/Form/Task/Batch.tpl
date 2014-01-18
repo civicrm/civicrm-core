@@ -61,6 +61,42 @@
             {/foreach}
            </tr>
          </table>
+                 {if array_key_exists("owner_membership_custom_override", $fields)}
+                  {literal}
+                      <script>
+                        //hides custom values if override custom data checked
+                        cj('input:checkbox').each(function(){
+                          var name = cj(this).attr('name');
+                          if (name.indexOf("owner_membership_custom_override") >= 0) {
+                            if (!cj(this).attr('checked')){
+                              cj(this).parent('td').siblings('td').children('input').each(function(){
+                                if (cj(this).attr('data-crm-custom').indexOf('Custom_') >=0){
+
+                                  cj(this).hide();
+                                }                              
+                              });
+                            }
+                            cj(this).change(function(){
+                              if (cj(this).attr('checked')){
+                                cj(this).parent('td').siblings('td').children('input').each(function(){
+                                  if (cj(this).attr('data-crm-custom').indexOf('Custom_') >=0){
+                                    cj(this).show();
+                                  }                                                            
+                                });     
+                              }
+                              else{
+                                cj(this).parent('td').siblings('td').children('input').each(function(){
+                                  if (cj(this).attr('data-crm-custom').indexOf('Custom_') >=0){
+                                    cj(this).hide();
+                                  }                                                            
+                                });                                   
+                              }
+                            });  
+                          }                         
+                        });
+                      </script>
+                  {/literal}
+                {/if}  
          <div class="crm-submit-buttons">
             {if $fields}{$form._qf_Batch_refresh.html}{/if} &nbsp;{include file="CRM/common/formButtons.tpl" location="bottom"}
          </div>

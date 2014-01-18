@@ -42,6 +42,8 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
   protected $_memType = NULL;
 
   protected $_onlinePendingContributionId;
+  
+  protected $_ownerMemId = null;
 
   public $_mode;
 
@@ -142,6 +144,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
     if ($this->_id) {
       $this->_memType = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_Membership', $this->_id, 'membership_type_id');
       $this->_membershipIDs[] = $this->_id;
+      $this->_ownerMemId = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_Membership', $this->_id, 'owner_membership_id');
     }
 
     $this->_mode = CRM_Utils_Request::retrieve('mode', 'String', $this);
@@ -527,6 +530,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
     $this->assign('customDataType', 'Membership');
     $this->assign('customDataSubType', $this->_memType);
     $this->assign('entityID', $this->_id);
+    $this->assign('ownerMemID', $this->_ownerMemId);
 
     if ($this->_action & CRM_Core_Action::DELETE) {
       $this->addButtons(array(
@@ -715,6 +719,10 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
       );
       if ($statusOverride) {
         $elements[] = $statusOverride;
+      }
+      
+      if ($this->_ownerMemId) {
+        $this->addElement('checkbox', 'owner_membership_custom_override', ts('Override inherited custom fields?'));
       }
 
       $this->addElement('checkbox', 'record_contribution', ts('Record Membership Payment?'));
@@ -1169,6 +1177,8 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
     foreach ($fields as $f) {
       $params[$f] = CRM_Utils_Array::value($f, $formValues);
     }
+    
+    $params['owner_membership_custom_override'] = CRM_Utils_Array::value('owner_membership_custom_override', $formValues, 0);
 
     // fix for CRM-3724
     // when is_override false ignore is_admin statuses during membership
