@@ -106,6 +106,13 @@ class CRM_UF_Page_ProfileEditor extends CRM_Core_Page {
         //dpm($availableFields);
       }
       switch ($entityType) {
+        case 'ContactModel':
+          $civiSchema[$entityType] = self::convertCiviModelToBackboneModel(
+            'Contact',
+            ts('Contact'),
+            $availableFields
+          );
+          break;
         case 'IndividualModel':
           $civiSchema[$entityType] = self::convertCiviModelToBackboneModel(
             'Individual',
