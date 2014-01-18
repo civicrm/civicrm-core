@@ -323,29 +323,55 @@
       var paletteFieldsByEntitySection = this.model.getRel('paletteFieldCollection').getFieldsByEntitySection();
 
       paletteView.model.getRel('ufEntityCollection').each(function(ufEntityModel){
+	  var ufGroupTypes = [];
+
+	  if (typeof paletteView.model.attributes.group_type == 'undefined'){
+             //Case 'Copy' where we don't get the group_type directly
+             //TODO: extract the group_type from it and split to carry forward the normal functionality
+             //as in case of Edit
+	      CRM.api('UFGroup', 'getsingle' , {'name': paletteView.model.previousAttributes().name}, {
+		  success: function(data) {
+		      ufGroupTypes.push(data.group_type.split(','));
+		  }
+	      });
+	      //console.log(ufGroupTypes['']);
+	  }
+	  else {
+	      ufGroupTypes = paletteView.model.attributes.group_type.split(',');
+	  }
+
+	  var allowedEntityNames = [];
+	  for(key in ufGroupTypes) {
+	      allowedEntityNames[key] = CRM.UF.guessEntityName(ufGroupTypes[key]);
+	  }
         _.each(ufEntityModel.getSections(), function(section, sectionKey){
-          var entitySection = ufEntityModel.get('entity_name') + '-' + sectionKey;
+	    var entitySection = null;
+	    if ($.inArray(ufEntityModel.get('entity_name'), allowedEntityNames) != -1 || !ufGroupTypes) {
+		entitySection = ufEntityModel.get('entity_name') + '-' + sectionKey;
+	    }
           var items = [];
-          if (paletteFieldsByEntitySection[entitySection]) {
-            _.each(paletteFieldsByEntitySection[entitySection], function(paletteFieldModel, k) {
-              items.push({data: paletteFieldModel.getLabel(), attr: {'class': 'crm-designer-palette-field', 'data-plm-cid': paletteFieldModel.cid}});
-            });
-          }
-          if (section.is_addable) {
-            items.push({data: ts('+ Add New Field'), attr: {'class': 'crm-designer-palette-add'}});
-          }
-          if (items.length > 0) {
-            treeData.push({
-              data: section.title,
-              children: items,
-              state: _.contains(paletteView.openTreeNodes, sectionKey) ? 'open' : 'closed',
-              attr: {
-                'class': 'crm-designer-palette-section',
-                'data-section': sectionKey,
-                'data-entity': ufEntityModel.get('entity_name')
-              }
-            });
-          }
+          if (entitySection) {
+            if (paletteFieldsByEntitySection[entitySection]) {
+              _.each(paletteFieldsByEntitySection[entitySection], function(paletteFieldModel, k) {
+                items.push({data: paletteFieldModel.getLabel(), attr: {'class': 'crm-designer-palette-field', 'data-plm-cid': paletteFieldModel.cid}});
+              });
+            }
+            if (section.is_addable) {
+              items.push({data: ts('+ Add New Field'), attr: {'class': 'crm-designer-palette-add'}});
+            }
+            if (items.length > 0) {
+	      treeData.push({
+                data: section.title,
+                children: items,
+                state: _.contains(paletteView.openTreeNodes, sectionKey) ? 'open' : 'closed',
+                attr: {
+                  'class': 'crm-designer-palette-section',
+                  'data-section': sectionKey,
+                  'data-entity': ufEntityModel.get('entity_name')
+		}
+              });
+            }
+	  }
         })
       });
 

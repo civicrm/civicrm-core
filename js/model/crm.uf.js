@@ -76,8 +76,9 @@
   CRM.UF.guessEntityName = function(field_type) {
     switch (field_type) {
       case 'Contact':
-      case 'Individual':
         return 'contact_1';
+      case 'Individual':
+        return 'individual_1';
       case 'Organization':
         return 'organization_1';
       case 'Household':
