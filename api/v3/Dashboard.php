@@ -52,7 +52,10 @@ function civicrm_api3_dashboard_create($params) {
     civicrm_api3_verify_one_mandatory($params,
       NULL,
       array(
-        'name', 'label', 'url', 'fullscreen_url',
+        'name',
+        'label',
+        'url',
+        'fullscreen_url',
       )
     );
   }
@@ -84,8 +87,8 @@ function _civicrm_api3_dashboard_create_spec(&$params) {
  */
 function civicrm_api3_dashboard_get($params) {
   $bao = new CRM_Core_BAO_Dashboard();
-  _civicrm_api3_dao_set_filter($bao, $params, true, 'Dashboard');
-  $dashlets = _civicrm_api3_dao_to_array($bao, $params, true,'Dashboard');
+  _civicrm_api3_dao_set_filter($bao, $params, TRUE, 'Dashboard');
+  $dashlets = _civicrm_api3_dao_to_array($bao, $params, TRUE, 'Dashboard');
   return civicrm_api3_create_success($dashlets, $params, 'dashboard', 'get', $bao);
 }
 

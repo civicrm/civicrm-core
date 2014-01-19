@@ -42,19 +42,22 @@
  * @param array $params
  *
  * @return array
- * 
+ *
  */
 function civicrm_api3_dashboard_contact_create($params) {
-  civicrm_api3_verify_one_mandatory($params,
-    NULL,
-    array(
-      'dashboard_id',
-    )
-  );
+  if (empty($params['id'])) {
+    civicrm_api3_verify_one_mandatory($params,
+      NULL,
+      array(
+        'dashboard_id',
+      )
+    );
+  }
   $errors = _civicrm_api3_dashboard_contact_check_params($params);
-  $dashboard[] = $params;
-  $dashbordContact = CRM_Core_BAO_Dashboard::addContactDashletToDashboard($dashboard);
-  return civicrm_api3_create_success(TRUE);
+  if ($errors !== NULL) {
+    return $errors;
+  }
+  return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 
 /**
@@ -67,15 +70,7 @@ function civicrm_api3_dashboard_contact_create($params) {
  *
  */
 function civicrm_api3_dashboard_contact_get($params) {
-  civicrm_api3_verify_one_mandatory($params,
-    NULL,
-    array(
-      'contact_id',
-    )
-  );
-  $bao = new CRM_Core_BAO_Dashboard();
-  $dashboardContact = CRM_Core_BAO_Dashboard::getContactDashlets(TRUE, CRM_Utils_Array::value('contact_id',$params));
-  return civicrm_api3_create_success($dashboardContact, $params, 'dashboard_contact', 'get');
+  return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 
 /**
@@ -90,9 +85,11 @@ function _civicrm_api3_dashboard_contact_create_spec(&$params) {
 
 function _civicrm_api3_dashboard_contact_check_params(&$params) {
   $dashboard_id = CRM_Utils_Array::value('dashboard_id', $params);
-  $allDashlets = CRM_Core_BAO_Dashboard::getDashlets();
-  if (!in_array($dashboard_id, $allDashlets)) {
-    return civicrm_api3_create_error('Invalid Dashboard ID');
+  if ($dashboard_id) {
+    $allDashlets = CRM_Core_BAO_Dashboard::getDashlets();
+    if (!isset($allDashlets[$dashboard_id])) {
+      return civicrm_api3_create_error('Invalid Dashboard ID');
+    }
   }
-  return null;
+  return NULL;
 }

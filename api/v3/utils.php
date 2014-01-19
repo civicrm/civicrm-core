@@ -116,7 +116,9 @@ function civicrm_api3_verify_mandatory($params, $daoName = NULL, $keys = array(
       }
     }
     else {
-      if (!array_key_exists($key, $params) || empty($params[$key])) {
+      // Disallow empty values except for the number zero.
+      // TODO: create a utility for this since it's needed in many places
+      if (!array_key_exists($key, $params) || (empty($params[$key]) && $params[$key] !== 0 && $params[$key] !== '0')) {
         $unmatched[] = $key;
       }
     }

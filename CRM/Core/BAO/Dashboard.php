@@ -308,10 +308,11 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
       $contactID = $session->get('userID');
     }
 
-    $session = CRM_Core_Session::singleton();
-    $contactID = $session->get('userID');
+    if (empty($contactID)) {
+      throw new RuntimeException("Failed to determine contact ID");
+    }
 
-    //we need to get existing dashletes, so we know when to update or insert
+    //we need to get existing dashlets, so we know when to update or insert
     $contactDashlets = self::getContactDashlets(TRUE, $contactID);
 
     $dashletIDs = array();
@@ -468,6 +469,10 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
     }
   }
 
+  /**
+   * @param array $params each item is a spec for a dashlet on the contact's dashboard
+   * @return bool
+   */
   static function addContactDashletToDashboard(&$params) {
     $valuesString = NULL;
     $columns = array();

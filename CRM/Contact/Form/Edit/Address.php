@@ -468,7 +468,7 @@ class CRM_Contact_Form_Edit_Address {
         $counties = CRM_Core_PseudoConstant::countyForState($stateID);
       }
       else {
-        $counties = CRM_Core_PseudoConstant::country();
+        $counties = CRM_Core_PseudoConstant::county();
       }
 
       $form->addElement('select', $countyElementName, ts('County'), array('' => ts('- select -')) + $counties);

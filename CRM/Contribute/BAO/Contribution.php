@@ -578,12 +578,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
         ));
 
       $extraFields = array(
-        'contribution_campaign' =>
-        array(
-          'title' => ts('Campaign Title')
-        ),
-        'contribution_batch' =>
-        array(
+        'contribution_batch' => array(
           'title' => ts('Batch Name')
         )
       );
