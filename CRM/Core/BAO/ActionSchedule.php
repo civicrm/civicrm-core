@@ -1074,14 +1074,18 @@ LEFT JOIN {$reminderJoinClause}
           reminder.entity_id          = c.id AND
           reminder.entity_table       = 'civicrm_contact' AND
           reminder.action_schedule_id = {$actionSchedule->id}";
-
+        $addWhereClause = '';
+        if ($addWhere) {
+          $addWhereClause = "AND {$addWhere}";
+        }
         $insertAdditionalSql ="
 INSERT INTO civicrm_action_log (contact_id, entity_id, entity_table, action_schedule_id)
 {$addSelect}
 FROM ({$contactTable}, {$table})
 LEFT JOIN {$additionReminderClause}
 {$addGroup}
-{$additionWhere} c.is_deleted = 0 AND c.is_deceased = 0 AND {$addWhere}
+{$additionWhere} c.is_deleted = 0 AND c.is_deceased = 0
+{$addWhereClause}
 AND {$dateClause}
 AND c.id NOT IN (
      SELECT rem.contact_id

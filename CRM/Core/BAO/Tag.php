@@ -356,7 +356,9 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
    * @static
    */
   static function dataExists(&$params) {
-    if (!empty($params['name'])) {
+    // Disallow empty values except for the number zero.
+    // TODO: create a utility for this since it's needed in many places
+    if (!empty($params['name']) || (string) $params['name'] === '0') {
       return TRUE;
     }
 

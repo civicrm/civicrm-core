@@ -69,9 +69,6 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     parent::preProcess();
 
     self::preProcessPaymentOptions($this);
-    if ($this->_snippet) {
-      return;
-    }
 
     // Make the contributionPageID avilable to the template
     $this->assign('contributionPageID', $this->_id);
@@ -115,8 +112,13 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     $this->assign('onBehalfRequired', $this->_onBehalfRequired);
 
     if (CRM_Utils_Array::value('honor_block_is_active', $this->_values)) {
-        CRM_Contact_Form_ProfileContact::preprocess($this);
-      }
+      CRM_Contact_Form_ProfileContact::preprocess($this);
+    }
+
+    if ($this->_snippet) {
+      $this->assign('isOnBehalfCallback', CRM_Utils_Array::value('onbehalf', $_GET, FALSE));
+      return;
+    }
 
     if (!empty($this->_pcpInfo['id']) && !empty($this->_pcpInfo['intro_text'])) {
       $this->assign('intro_text', $this->_pcpInfo['intro_text']);
@@ -365,16 +367,16 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     $this->buildCustom($this->_values['custom_pre_id'], 'customPre');
     $this->buildCustom($this->_values['custom_post_id'], 'customPost');
 
-    if (!empty($this->_fields)) {
+    if (!empty($this->_fields) && !empty($this->_values['custom_pre_id'])) {
       $profileAddressFields = array();
       foreach ($this->_fields as $key => $value) {
-        CRM_Core_BAO_UFField::assignAddressField($key, $profileAddressFields);
+        CRM_Core_BAO_UFField::assignAddressField($key, $profileAddressFields, array('uf_group_id' => $this->_values['custom_pre_id']));
       }
       $this->set('profileAddressFields', $profileAddressFields);
     }
 
     // Build payment processor form
-    if ($this->_ppType) {
+    if ($this->_ppType && empty($_GET['onbehalf'])) {
       CRM_Core_Payment_ProcessorForm::buildQuickForm($this);
       // Return if we are in an ajax callback
       if ($this->_snippet) {
@@ -386,6 +388,10 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
 
     if ($this->_onbehalf) {
       CRM_Contribute_Form_Contribution_OnBehalfOf::buildQuickForm($this);
+      // Return if we are in an ajax callback
+      if ($this->_snippet) {
+        return;
+      }
     }
 
     $this->applyFilter('__ALL__', 'trim');
