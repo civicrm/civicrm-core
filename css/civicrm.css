@@ -4146,7 +4146,7 @@ div.m ul#civicrm-menu,
   right: 15px;
   z-index: 999999;
 }
-.crm-container div.ui-notify-message {
+#crm-notification-container div.ui-notify-message {
   padding: 10px;
   margin-bottom: 15px;
   color: #fff;
@@ -4156,23 +4156,22 @@ div.m ul#civicrm-menu,
   max-height: 600px;
   overflow: auto;
 }
-.crm-container div.ui-notify-message h1 {
+#crm-notification-container div.ui-notify-message h1 {
   font-size: 14px;
   margin: 0;
   padding: 4px;
   font-weight: bold;
   color: #fff;
 }
-.crm-container div.ui-notify-message p {
+#crm-notification-container div.ui-notify-message p {
   margin: 3px 0;
   padding: 0;
   line-height: 18px;
 }
-.crm-container div.ui-notify-message:last-child {
+#crm-notification-container div.ui-notify-message:last-child {
   margin-bottom: 0;
 }
-.crm-container div.ui-notify-message-style {
-  background: #000;
+#crm-notification-container div.ui-notify-message-style {
   background: rgba(0,0,0,0.8);
   box-shadow: 0 0 6px #000;
 }
@@ -4185,10 +4184,10 @@ div.m ul#civicrm-menu,
 .crm-container div.ui-notify-message-style a:focus {
   color: #B2B8FF;
 }
-.crm-container div.ui-notify-message .ui-notify-close {
+#crm-notification-container .ui-notify-message .ui-notify-close {
   cursor: pointer;
 }
-.crm-container div.ui-notify-message a.ui-notify-cross {
+#crm-notification-container .ui-notify-message a.ui-notify-cross {
   margin-top: -4px;
   float: right;
   text-decoration: none;
@@ -4198,8 +4197,8 @@ div.m ul#civicrm-menu,
   padding: 2px;
   color: #FDFDFD;
 }
-.crm-container div.ui-notify-message .ui-notify-cross:hover,
-.crm-container div.ui-notify-message .ui-notify-cross:focus {
+#crm-notification-container .ui-notify-message .ui-notify-cross:hover,
+#crm-notification-container .ui-notify-message .ui-notify-cross:focus {
   color: #ffffab;
 }
 .crm-container div.ui-notify-message table,
