@@ -33,7 +33,7 @@ class CRM_Utils_ArrayTest extends CiviUnitTestCase {
     $inputs[] = array(
       'lang' => 'en',
       'msgid' => 'greeting',
-      'familiar' => false,
+      'familiar' => FALSE,
       'value' => 'Hello'
     );
     $inputs[] = array(
@@ -54,7 +54,7 @@ class CRM_Utils_ArrayTest extends CiviUnitTestCase {
     $inputs[] = array(
       'lang' => 'en',
       'msgid' => 'greeting',
-      'familiar' => true,
+      'familiar' => TRUE,
       'value' => 'Hey'
     );
 
@@ -82,4 +82,41 @@ class CRM_Utils_ArrayTest extends CiviUnitTestCase {
     $this->assertEquals($expected, CRM_Utils_Array::collect('catWord', $arr));
   }
 
+  function testProduct0() {
+    $actual = CRM_Utils_Array::product(
+      array(),
+      array('base data' => 1)
+    );
+    $this->assertEquals(array(
+      array('base data' => 1),
+    ), $actual);
+  }
+
+  function testProduct1() {
+    $actual = CRM_Utils_Array::product(
+      array('dim1' => array('a', 'b')),
+      array('base data' => 1)
+    );
+    $this->assertEquals(array(
+      array('base data' => 1, 'dim1' => 'a'),
+      array('base data' => 1, 'dim1' => 'b'),
+    ), $actual);
+  }
+
+  function testProduct3() {
+    $actual = CRM_Utils_Array::product(
+      array('dim1' => array('a', 'b'), 'dim2' => array('alpha', 'beta'), 'dim3' => array('one', 'two')),
+      array('base data' => 1)
+    );
+    $this->assertEquals(array(
+      array('base data' => 1, 'dim1' => 'a', 'dim2' => 'alpha', 'dim3' => 'one'),
+      array('base data' => 1, 'dim1' => 'a', 'dim2' => 'alpha', 'dim3' => 'two'),
+      array('base data' => 1, 'dim1' => 'a', 'dim2' => 'beta', 'dim3' => 'one'),
+      array('base data' => 1, 'dim1' => 'a', 'dim2' => 'beta', 'dim3' => 'two'),
+      array('base data' => 1, 'dim1' => 'b', 'dim2' => 'alpha', 'dim3' => 'one'),
+      array('base data' => 1, 'dim1' => 'b', 'dim2' => 'alpha', 'dim3' => 'two'),
+      array('base data' => 1, 'dim1' => 'b', 'dim2' => 'beta', 'dim3' => 'one'),
+      array('base data' => 1, 'dim1' => 'b', 'dim2' => 'beta', 'dim3' => 'two'),
+    ), $actual);
+  }
 }
