@@ -338,7 +338,7 @@
 
       debouncedFetch: _.debounce(function() {
         this.fetch({reset: true});
-      }, 500),
+      }, 100),
 
       /**
        * Reconcile the server's collection with the client's collection.
