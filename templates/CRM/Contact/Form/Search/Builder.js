@@ -238,5 +238,24 @@
   ;
 
   $().crmAccordions();
-  $('select[id^=mapper][id$="_1"]', '#Builder').each(handleUserInputField);
+
+  // Fetch initial options during page refresh - it's more efficient to bundle them in a single ajax request
+  var initialFields = {}, fetchFields = false;
+  $('select[id^=mapper][id$="_1"] option:selected', '#Builder').each(function() {
+    var field = $(this).attr('value');
+    if (typeof(CRM.searchBuilder.fieldOptions[field]) == 'string') {
+      initialFields[field] = [CRM.searchBuilder.fieldOptions[field], 'getoptions', {field: field, sequential: 1}];
+      fetchFields = true;
+    }
+  });
+  if (fetchFields) {
+    CRM.api3(initialFields).done(function(data) {
+      $.each(data, function(field, result) {
+        CRM.searchBuilder.fieldOptions[field] = result.values;
+      });
+      $('select[id^=mapper][id$="_1"]', '#Builder').each(handleUserInputField);
+    });
+  } else {
+    $('select[id^=mapper][id$="_1"]', '#Builder').each(handleUserInputField);
+  }
 })(cj, CRM);

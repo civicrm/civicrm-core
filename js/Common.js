@@ -599,10 +599,14 @@ CRM.validate = CRM.validate || {
     deferred || (deferred = new $.Deferred());
     deferred.done(function(data) {
       var msg = typeof(endMsg) === 'function' ? endMsg(data) : endMsg;
-      $('.crm-menubar-status-container', $bar).removeClass('status-busy').addClass('status-done').find('.crm-menubar-status-msg').html(msg);
-      fadeOut = window.setTimeout(function() {
-        $('.crm-menubar-status-container', $bar).fadeOut('slow');
-      }, 2000);
+      $('.crm-menubar-status-container', $bar).removeClass('status-busy').addClass('status-done').show().find('.crm-menubar-status-msg').html(msg);
+      if (msg) {
+        fadeOut = window.setTimeout(function() {
+          $('.crm-menubar-status-container', $bar).fadeOut('slow');
+        }, 2000);
+      } else {
+        $('.crm-menubar-status-container', $bar).hide();
+      }
     });
     return deferred;
   };
