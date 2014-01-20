@@ -59,12 +59,13 @@ function tag_getfields_expectedresult(){
       'parent_id' => array(
           'name' => 'parent_id',
           'type' => 1,
-          'default' => 'UL',
+          'default' => 'NULL',
           'FKClassName' => 'CRM_Core_DAO_Tag',
         ),
       'is_selectable' => array(
           'name' => 'is_selectable',
           'type' => 16,
+          'default' => '1',
         ),
       'is_reserved' => array(
           'name' => 'is_reserved',
@@ -80,7 +81,7 @@ function tag_getfields_expectedresult(){
           'title' => 'Used For',
           'maxlength' => 64,
           'size' => 30,
-          'default' => 'UL',
+          'default' => 'NULL',
           'api.default' => 'civicrm_contact',
         ),
       'created_id' => array(

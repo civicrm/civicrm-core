@@ -49,6 +49,8 @@ function activity_get_expectedresult(){
           'is_current_revision' => '1',
           'is_deleted' => 0,
           'source_contact_id' => '1',
+          'custom_1' => 'defaultValue',
+          'custom_1_1' => 'defaultValue',
           'custom_2_id' => '1',
           'custom_2_1_id' => '1',
           'custom_2' => 'Anderson, Anthony',

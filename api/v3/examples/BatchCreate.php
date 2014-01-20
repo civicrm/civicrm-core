@@ -46,7 +46,7 @@ function batch_create_expectedresult(){
           'created_id' => '',
           'created_date' => '',
           'modified_id' => '',
-          'modified_date' => '',
+          'modified_date' => '2012-11-14 16:02:35',
           'saved_search_id' => '',
           'status_id' => '1',
           'type_id' => '',
@@ -55,6 +55,7 @@ function batch_create_expectedresult(){
           'item_count' => '3',
           'payment_instrument_id' => '',
           'exported_date' => '',
+          'data' => '',
         ),
     ),
 );

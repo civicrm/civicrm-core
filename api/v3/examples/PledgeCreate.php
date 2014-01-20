@@ -6,9 +6,9 @@
 function pledge_create_example(){
 $params = array(
   'contact_id' => 11,
-  'pledge_create_date' => '20130803',
-  'start_date' => '20130803',
-  'scheduled_date' => '20130805',
+  'pledge_create_date' => '20140120',
+  'start_date' => '20140120',
+  'scheduled_date' => '20140122',
   'amount' => '100',
   'pledge_status_id' => '2',
   'pledge_financial_type_id' => '1',
