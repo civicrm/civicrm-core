@@ -513,6 +513,20 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->assertEquals($contribution['values'][$contribution['id']]['total_amount'], 100.00, 'In line ' . __LINE__);
     $this->assertEquals($contribution['values'][$contribution['id']]['source'], 'SSF', 'In line ' . __LINE__);
   }
+
+  /*
+   * Create test with unique field name on source
+  */
+  function testCreateDefaultNow() {
+
+    $params = $this->_params;
+    unset($params['receive_date']);
+
+    $contribution = $this->callAPISuccess('contribution', 'create', $params);
+    $contribution = $this->callAPISuccessGetSingle('contribution', array('id' => $contribution['id']));
+    $this->assertEquals(date('Y-m-d'), date('Y-m-d', strtotime($contribution['receive_date'])));
+  }
+
   /*
      * Create test with unique field name on source
      */
