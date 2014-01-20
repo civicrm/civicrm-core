@@ -50,7 +50,7 @@ function option_group_create_expectedresult(){
           'description' => '',
           'is_reserved' => '1',
           'is_active' => '1',
-          'api.OptionValue.create' => 722,
+          'api.OptionValue.create' => 727,
         ),
     ),
 );

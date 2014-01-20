@@ -44,6 +44,7 @@ function survey_get_expectedresult(){
           'is_default' => 0,
           'created_date' => '2013-07-28 08:49:19',
           'bypass_confirm' => 0,
+          'is_share' => '1',
           'api.survey.delete' => array(
               'is_error' => 0,
               'version' => 3,
