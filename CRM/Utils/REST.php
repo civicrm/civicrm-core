@@ -305,12 +305,10 @@ class CRM_Utils_REST {
       return self::error("User API key invalid");
     }
 
-    return self::process($args);
+    return self::process($args, self::buildParamList());
   }
 
-  static function process(&$args, $restInterface = TRUE) {
-    $params = &self::buildParamList();
-
+  static function process(&$args, $params) {
     $params['check_permissions'] = TRUE;
     $fnName = $apiFile = NULL;
     // clean up all function / class names. they should be alphanumeric and _ only
@@ -552,7 +550,7 @@ class CRM_Utils_REST {
       )
     ) {
       require_once 'api/v3/utils.php';
-      $error = civicrm_api3_create_error("SECURITY ALERT: Ajax requests can only be issued by javascript clients, eg. CRM.api().",
+      $error = civicrm_api3_create_error("SECURITY ALERT: Ajax requests can only be issued by javascript clients, eg. CRM.api3().",
         array(
           'IP' => $_SERVER['REMOTE_ADDR'],
           'level' => 'security',
@@ -587,11 +585,34 @@ class CRM_Utils_REST {
       return self::error('Unknown function invocation.');
     }
 
-    $result = self::process($args, FALSE);
+    // Support for multiple api calls
+    if (isset($entity) && $entity === 'api3') {
+      $result = self::processMultiple();
+    }
+    else {
+      $result = self::process($args, self::buildParamList());
+    }
 
     echo self::output($result);
 
     CRM_Utils_System::civiExit();
+  }
+
+  /**
+   * Callback for multiple ajax api calls from CRM.api3()
+   * @return array
+   */
+  static function processMultiple() {
+    $output = array();
+    foreach (json_decode($_REQUEST['json'], TRUE) as $key => $call) {
+      $args = array(
+        'civicrm',
+        $call[0],
+        $call[1],
+      );
+      $output[$key] = self::process($args, CRM_Utils_Array::value(2, $call, array()));
+    }
+    return $output;
   }
 
   /**
