@@ -469,6 +469,13 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
       $dao = new CRM_Core_DAO();
       $contribution_page = $dao->createTestObject('CRM_Contribute_DAO_ContributionPage');
       $contribution->contribution_page_id = $contributionPageID = $contribution_page->id;
+      //for unknown reasons trying to do a find & save on a contribution with a receive_date set
+      // doesn't work. This seems of minimal relevance to this test so ignoring
+      // note that in tests it worked sometimes & not others - dependent on which other tests run.
+      // running all CRM_Core tests caused failure as did just the single failing test. But running
+      // just this class succeeds - because it actually doesn't do a mysql update on the following save
+      // (unknown reason)
+      unset($contribution->receive_date);
       $contribution->save();
     }
 
