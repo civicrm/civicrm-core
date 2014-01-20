@@ -46,6 +46,8 @@ function contact_getsingle_expectedresult(){
   'nick_name' => '',
   'legal_name' => '',
   'image_URL' => '',
+  'preferred_communication_method' => '',
+  'preferred_language' => '',
   'preferred_mail_format' => '',
   'first_name' => 'Test',
   'middle_name' => '',
