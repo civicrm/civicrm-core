@@ -37,7 +37,7 @@ function grant_get_expectedresult(){
           'id' => '2',
           'contact_id' => '4',
           'application_received_date' => '20130728084957',
-          'decision_date' => '2013-08-05',
+          'decision_date' => '20130805000000',
           'grant_type_id' => '1',
           'amount_total' => '500.00',
           'currency' => 'USD',

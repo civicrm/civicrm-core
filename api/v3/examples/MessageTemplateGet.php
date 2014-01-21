@@ -5,11 +5,11 @@
  */
 function message_template_get_example(){
 $params = array(
-  'msg_title' => 'msg_title_2',
-  'msg_subject' => 'msg_subject_2',
-  'msg_text' => 'msg_text_2',
-  'msg_html' => 'msg_html_2',
-  'workflow_id' => 2,
+  'msg_title' => 'msg_title_56',
+  'msg_subject' => 'msg_subject_56',
+  'msg_text' => 'msg_text_56',
+  'msg_html' => 'msg_html_56',
+  'workflow_id' => 56,
   'is_default' => '1',
   'is_reserved' => 1,
   'pdf_format_id' => '1',
@@ -42,12 +42,12 @@ function message_template_get_expectedresult(){
   'values' => array(
       '1' => array(
           'id' => '1',
-          'msg_title' => 'msg_title_2',
-          'msg_subject' => 'msg_subject_2',
-          'msg_text' => 'msg_text_2',
-          'msg_html' => 'msg_html_2',
+          'msg_title' => 'msg_title_56',
+          'msg_subject' => 'msg_subject_56',
+          'msg_text' => 'msg_text_56',
+          'msg_html' => 'msg_html_56',
           'is_active' => '1',
-          'workflow_id' => '2',
+          'workflow_id' => '56',
           'is_default' => '1',
           'is_reserved' => '1',
           'pdf_format_id' => '1',
