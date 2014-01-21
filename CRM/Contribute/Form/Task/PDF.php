@@ -68,16 +68,23 @@ class CRM_Contribute_Form_Task_PDF extends CRM_Contribute_Form_Task {
       parent::preProcess();
     }
 
-    // check that all the contribution ids have pending status
+       $contributionStatuses = array_flip(CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name'));
+     $validStatuses = implode(',', array_intersect_key($contributionStatuses, array(
+       'Completed' => 1,
+       'Pending' => 1
+     )));
+
     $query = "
 SELECT count(*)
 FROM   civicrm_contribution
-WHERE  contribution_status_id != 1
+WHERE  contribution_status_id NOT IN (" . $validStatuses . ")
 AND    {$this->_componentClause}";
     $count = CRM_Core_DAO::singleValueQuery($query);
+
     if ($count != 0) {
-      CRM_Core_Error::statusBounce("Please select only online contributions with Completed status.");
+      CRM_Core_Error::statusBounce("Please select only online contributions with Completed or Pending status.");
     }
+
 
     // we have all the contribution ids, so now we get the contact ids
     parent::setContactIDs();
