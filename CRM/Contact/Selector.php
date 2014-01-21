@@ -326,6 +326,19 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
    */
   function &getColumnHeaders($action = NULL, $output = NULL) {
     $headers = NULL;
+
+    // unset return property elements that we don't care
+    if (!empty($this->_returnProperties)) {
+      $doNotCareElements = array(
+        'contact_type',
+        'contact_sub_type',
+        'sort_name',
+      );
+      foreach ( $doNotCareElements as $value) {
+        unset($this->_returnProperties[$value]);
+      }
+    }
+
     if ($output == CRM_Core_Selector_Controller::EXPORT) {
       $csvHeaders = array(ts('Contact Id'), ts('Contact Type'));
       foreach ($this->getColHeads($action, $output) as $column) {
@@ -428,10 +441,6 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
       $properties = self::makeProperties($this->_returnProperties);
 
       foreach ($properties as $prop) {
-        if ($prop == 'contact_type' || $prop == 'contact_sub_type' || $prop == 'sort_name') {
-          continue;
-        }
-
         if (strpos($prop, '-')) {
           list($loc, $fld, $phoneType) = CRM_Utils_System::explode('-', $prop, 3);
           $title = $this->_query->_fields[$fld]['title'];
@@ -442,7 +451,8 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
         }
         elseif (isset($this->_query->_fields[$prop]) && isset($this->_query->_fields[$prop]['title'])) {
           $title = $this->_query->_fields[$prop]['title'];
-        } else {
+        }
+        else {
           $title = '';
         }
 
