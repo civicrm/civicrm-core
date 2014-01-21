@@ -210,7 +210,12 @@
     },
     isInSelectorAllowed: function() {
       var visibility = _.first(_.where(VISIBILITY, {val: this.get('visibility')}));
-      return visibility.isInSelectorAllowed;
+      if (visibility) {
+        return visibility.isInSelectorAllowed;
+      }
+      else {
+        return false;
+      }
     },
     getFieldSchema: function() {
       return this.getRel('ufGroupModel').getFieldSchema(this.get('entity_name'), this.get('field_name'));
