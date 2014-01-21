@@ -66,6 +66,11 @@ class CRM_Event_Form_ParticipantView extends CRM_Core_Form {
       CRM_Event_BAO_Participant::fixEventLevel($values[$participantID]['fee_level']);
     }
 
+    $this->assign('contactId', $contactID);
+    $this->assign('participantId', $participantID);
+    $statusId = CRM_Core_DAO::getFieldValue('CRM_Event_BAO_Participant', $participantID, 'status_id', 'id');
+    $participantStatuses = CRM_Event_PseudoConstant::participantStatus();
+
     if ($values[$participantID]['is_test']) {
       $values[$participantID]['status'] .= ' (test) ';
     }
@@ -197,6 +202,7 @@ class CRM_Event_Form_ParticipantView extends CRM_Core_Form {
    * @access public
    */
   public function buildQuickForm() {
+    CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'js/crm.livePage.js');
     $this->addButtons(array(
         array(
           'type' => 'cancel',
