@@ -1861,11 +1861,13 @@ WHERE (li.entity_table = 'civicrm_participant' AND li.entity_id = {$participantI
         CRM_Contribute_BAO_Contribution::getValues(array('id' => $contributionId), CRM_Core_DAO::$_nullArray, CRM_Core_DAO::$_nullArray);
       $prevTrxnId = CRM_Core_BAO_FinancialTrxn::getFinancialTrxnId($contributionId);
       $fetchPrevTrxn['id'] = $prevTrxnId['financialTrxnId'];
-      $prevTrxnToFinancialId = CRM_Core_DAO::getFieldValue('CRM_Core_BAO_FinancialTrxn', $prevTrxnId['financialTrxnId'], 'to_financial_account_id');
+
+      $relationTypeId = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Accounts Receivable Account is' "));
+      $toFinancialAccount = CRM_Contribute_PseudoConstant::financialAccountType($updatedContribution->financial_type_id, $relationTypeId);
 
       $adjustedTrxnValues = array(
         'from_financial_account_id' => NULL,
-        'to_financial_account_id' => $prevTrxnToFinancialId,
+        'to_financial_account_id' => $toFinancialAccount,
         'trxn_date' => date('YmdHis'),
         'total_amount' => $balanceAmt,
         'currency' => $updatedContribution->currency,
