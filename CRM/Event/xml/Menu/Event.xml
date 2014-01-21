@@ -330,4 +330,10 @@
     <is_public>true</is_public>
     <is_ssl>false</is_ssl>
   </item>
+  <item>
+    <path>civicrm/event/participant/feeselection</path>
+    <title>Change Registration Selections</title>
+    <page_callback>CRM_Event_Form_ParticipantFeeSelection</page_callback>
+    <access_arguments>access CiviEvent</access_arguments>
+  </item>
 </menu>

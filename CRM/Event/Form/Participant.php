@@ -228,8 +228,12 @@ class CRM_Event_Form_Participant extends CRM_Contact_Form_Task {
     else {
       $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
     }
+    $participantStatuses = CRM_Event_PseudoConstant::participantStatus();
 
     if ($this->_id) {
+      $this->assign('participantId', $this->_id);
+      $statusId = CRM_Core_DAO::getFieldValue('CRM_Event_BAO_Participant', $this->_id, 'status_id', 'id');
+
       $this->_paymentId = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_ParticipantPayment',
         $this->_id, 'id', 'participant_id'
       );
@@ -254,6 +258,9 @@ class CRM_Event_Form_Participant extends CRM_Contact_Form_Task {
     $this->assign('roleCustomDataTypeID', $this->_roleCustomDataTypeID);
     $this->assign('eventNameCustomDataTypeID', $this->_eventNameCustomDataTypeID);
     $this->assign('eventTypeCustomDataTypeID', $this->_eventTypeCustomDataTypeID);
+
+    $partiallyPaidStatusId = array_search('Partially paid', $participantStatuses);
+    $this->assign('partiallyPaidStatusId', $partiallyPaidStatusId);
 
     if ($this->_mode) {
       $this->assign('participantMode', $this->_mode);
@@ -665,6 +672,7 @@ SELECT civicrm_custom_group.name as name,
    * @access public
    */
   public function buildQuickForm() {
+    CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'js/crm.livePage.js');
     if ($this->_showFeeBlock) {
       return CRM_Event_Form_EventFees::buildQuickForm($this);
     }
@@ -1054,6 +1062,7 @@ loadCampaign( {$this->_eID}, {$eventCampaigns} );
       return;
     }
 
+    $participantStatus = CRM_Event_PseudoConstant::participantStatus();
     // set the contact, when contact is selected
     if (CRM_Utils_Array::value('contact_select_id', $params)) {
       $this->_contactId = $params['contact_select_id'][1];
@@ -1122,7 +1131,8 @@ loadCampaign( {$this->_eID}, {$eventCampaigns} );
 
         $params['fee_level'] = $params['amount_level'];
         $contributionParams['total_amount'] = $params['amount'];
-        if ($this->_quickConfig && CRM_Utils_Array::value('total_amount', $params)) {
+        if ($this->_quickConfig && CRM_Utils_Array::value('total_amount', $params)
+          && $params['status_id'] != array_search('Partially paid', $participantStatus)) {
           $params['fee_amount'] = $params['total_amount'];
         } else {
           //fix for CRM-3086
@@ -1157,7 +1167,11 @@ loadCampaign( {$this->_eID}, {$eventCampaigns} );
     }
 
     $this->_params = $params;
-    unset($params['amount']);
+    $amountOwed = NULL;
+    if (isset($params['amount'])) {
+      $amountOwed = $params['amount'];
+      unset($params['amount']);
+    }
     $params['register_date'] = CRM_Utils_Date::processDate($params['register_date'], $params['register_date_time']);
     $params['receive_date'] = CRM_Utils_Date::processDate(CRM_Utils_Array::value('receive_date', $params));
     $params['contact_id'] = $this->_contactId;
@@ -1461,6 +1475,16 @@ loadCampaign( {$this->_eID}, {$eventCampaigns} );
         if ($contributionParams['contribution_status_id'] == CRM_Core_OptionGroup::getValue('contribution_status', 'Pending', 'name')) {
           $contributionParams['is_pay_later'] = 1;
         }
+
+        if ($params['status_id'] == array_search('Partially paid', $participantStatus)) {
+          // CRM-13964 partial_payment_total
+          if ($amountOwed > $params['total_amount']) {
+            // the owed amount
+            $contributionParams['partial_payment_total'] = $amountOwed;
+            // the actual amount paid
+            $contributionParams['partial_amount_pay'] = $params['total_amount'];
+          }
+        }
         if ($this->_single) {
           if (empty($ids)) {
             $ids = array();
@@ -1510,7 +1534,9 @@ loadCampaign( {$this->_eID}, {$eventCampaigns} );
           if (is_array($value) && $value != 'skip') {
             foreach ($value as $lineKey => $line) {
               //10117 update the line items for participants if contribution amount is recorded
-              if ($this->_quickConfig && CRM_Utils_Array::value('total_amount', $params )) {
+              if ($this->_quickConfig && CRM_Utils_Array::value('total_amount', $params )
+                && $params['status_id'] != array_search('Partially paid', $participantStatus)
+              ) {
                 $line['unit_price'] = $line['line_total'] = $params['total_amount'];
               }
               $lineItem[$this->_priceSetId][$lineKey] = $line;
