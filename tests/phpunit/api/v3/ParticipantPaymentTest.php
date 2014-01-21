@@ -302,7 +302,7 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
     $params = array(
       'id' => 0,    );
     $deletePayment = $this->callAPIFailure('participant_payment', 'delete', $params);
-    $this->assertEquals($deletePayment['error_message'], 'Mandatory key(s) missing from params array: id');
+    $this->assertEquals($deletePayment['error_message'], 'Error while deleting participantPayment');
   }
 
   /**
