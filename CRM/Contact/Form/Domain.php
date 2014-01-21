@@ -60,6 +60,13 @@ class CRM_Contact_Form_Domain extends CRM_Core_Form {
   protected $_fromEmailId = NULL;
 
   /**
+   * default location type fields
+   *
+   * @var array
+   */
+  protected $_locationDefaults = array();
+
+  /**
    * how many locationBlocks should we display?
    *
    * @var int
@@ -93,7 +100,6 @@ class CRM_Contact_Form_Domain extends CRM_Core_Form {
   function setDefaultValues() {
     $defaults  = array();
     $params    = array();
-    $locParams = array();
 
     if (isset($this->_id)) {
       $params['id'] = $this->_id;
@@ -115,7 +121,7 @@ class CRM_Contact_Form_Domain extends CRM_Core_Form {
 
       unset($params['id']);
       $locParams = array('contact_id' => $domainDefaults['contact_id']);
-      $defaults = CRM_Core_BAO_Location::getValues($locParams);
+      $this->_locationDefaults = $defaults = CRM_Core_BAO_Location::getValues($locParams);
 
       $config = CRM_Core_Config::singleton();
       if (!isset($defaults['address'][1]['country_id'])) {
@@ -244,9 +250,27 @@ class CRM_Contact_Form_Domain extends CRM_Core_Form {
 
     $defaultLocationType = CRM_Core_BAO_LocationType::getDefault();
 
-    $params['address'][1]['location_type_id'] = $defaultLocationType->id;
-    $params['phone'][1]['location_type_id'] = $defaultLocationType->id;
-    $params['email'][1]['location_type_id'] = $defaultLocationType->id;
+    if (isset($this->_locationDefaults['address'][1]['location_type_id'])) {
+      $params['address'][1]['location_type_id'] = $this->_locationDefaults['address'][1]['location_type_id'];
+    }
+    else {
+      $params['address'][1]['location_type_id'] = $defaultLocationType->id;
+    }
+
+    if (isset($this->_locationDefaults['phone'][1]['location_type_id'])) {
+      $params['phone'][1]['location_type_id'] = $this->_locationDefaults['phone'][1]['location_type_id'];
+    }
+    else {
+      $params['phone'][1]['location_type_id'] = $defaultLocationType->id;
+    }
+
+    if (isset($this->_locationDefaults['email'][1]['location_type_id'])) {
+      $params['email'][1]['location_type_id'] = $this->_locationDefaults['email'][1]['location_type_id'];
+    }
+    else {
+      $params['email'][1]['location_type_id'] = $defaultLocationType->id;
+    }
+
     $params += array('contact_id' => $this->_contactId);
     $contactParams = array (
       'sort_name'    => $domain->name,
