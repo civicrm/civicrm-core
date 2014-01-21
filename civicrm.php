@@ -677,6 +677,7 @@ class CiviCRM_For_WordPress {
       $argString = trim($_GET['q']);
       $args = explode('/', $argString);
     }
+    $args = array_pad($args, 2, '');
 
     // CMW: hacky procedure for overriding WordPress page/post:
     // see comments on set_post_blank()
@@ -705,19 +706,11 @@ class CiviCRM_For_WordPress {
     // output civicrm html only in a few cases and skip the WP header
     if (
       // snippet is set - i.e. ajax call
-      CRM_Utils_Array::value('snippet', $_GET) ||
-      // ical feed
-      ($argString == 'civicrm/event/ical' &&
-        // skip the html page since it is rendered in the CMS theme
-        CRM_Utils_Array::value('html', $_GET) != 1) ||
-      in_array(
-        $argString,
-        // ajax and file download urls
-        array(
-          'civicrm/ajax',
-          'civicrm/file'
-        )
-      )
+      !empty($_GET['snippet']) ||
+      // ical feed (unless 'html' is specified)
+      (strpos($argString, 'civicrm/event/ical') === 0 && empty($_GET['html'])) ||
+      // ajax and file download urls
+      ($args[0]) == 'civicrm' && in_array($args[1], array('ajax', 'file'))
     ) {
       // from my limited understanding, putting this in the init hook allows civi to
       // echo all output and exit before the theme code outputs anything - lobo
