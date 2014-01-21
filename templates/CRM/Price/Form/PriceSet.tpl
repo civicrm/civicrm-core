@@ -65,7 +65,7 @@
                 <div class="content {$element.name}-content">{$form.$element_name.html}
                   {if $element.is_display_amounts && $element.html_type eq 'Text'}
                     <span class="price-field-amount">
-                      x {foreach item=option from=$element.options}{$option.amount|crmMoney}{/foreach}
+                      {foreach item=option from=$element.options}{$option.amount|crmMoney}{/foreach}
                     </span>
                   {/if}
                       {if $element.help_post}<br /><span class="description">{$element.help_post}</span>{/if}
@@ -82,8 +82,7 @@
     {/if}
 
 {* Include the total calculation widget if this is NOT a quickconfig event/contribution page. *}
-{if !$quickConfig}
+{if !$quickConfig and !$dontInclCal}
     {include file="CRM/Price/Form/Calculate.tpl"}
 {/if}
-
 </div>
