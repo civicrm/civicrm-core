@@ -55,6 +55,7 @@ function batch_update_expectedresult(){
           'item_count' => '4',
           'payment_instrument_id' => '',
           'exported_date' => '',
+          'data' => '',
         ),
     ),
 );

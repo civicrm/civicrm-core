@@ -45,6 +45,7 @@ function activity_getfields_expectedresult(){
           'import' => true,
           'where' => 'civicrm_activity.activity_type_id',
           'headerPattern' => '/(activity.)?type(.id$)/i',
+          'default' => '1',
           'pseudoconstant' => array(
               'optionGroupName' => 'activity_type',
             ),
@@ -94,7 +95,7 @@ function activity_getfields_expectedresult(){
           'name' => 'relationship_id',
           'type' => 1,
           'title' => 'Relationship Id',
-          'default' => 'UL',
+          'default' => 'NULL',
           'FKClassName' => 'CRM_Contact_DAO_Relationship',
         ),
       'is_current_revision' => array(
@@ -105,6 +106,7 @@ function activity_getfields_expectedresult(){
           'where' => 'civicrm_activity.is_current_revision',
           'headerPattern' => '/(is.)?(current.)?(revision|version(ing)?)/i',
           'export' => true,
+          'default' => '1',
         ),
       'original_id' => array(
           'name' => 'original_id',
@@ -187,6 +189,9 @@ function activity_getfields_expectedresult(){
               'optionGroupName' => 'activity_status',
             ),
           'uniqueName' => 'activity_status_id',
+          'api.aliases' => array(
+              '0' => 'activity_status',
+            ),
         ),
       'is_test' => array(
           'name' => 'is_test',
@@ -202,7 +207,7 @@ function activity_getfields_expectedresult(){
           'name' => 'medium_id',
           'type' => 1,
           'title' => 'Activity Medium',
-          'default' => 'UL',
+          'default' => 'NULL',
           'pseudoconstant' => array(
               'optionGroupName' => 'encounter_medium',
             ),
@@ -229,11 +234,16 @@ function activity_getfields_expectedresult(){
       'campaign_id' => array(
           'name' => 'campaign_id',
           'type' => 1,
-          'title' => 'Campaign ID',
+          'title' => 'Campaign',
           'import' => true,
           'where' => 'civicrm_activity.campaign_id',
           'export' => true,
           'FKClassName' => 'CRM_Campaign_DAO_Campaign',
+          'pseudoconstant' => array(
+              'table' => 'civicrm_campaign',
+              'keyColumn' => 'id',
+              'labelColumn' => 'title',
+            ),
           'uniqueName' => 'activity_campaign_id',
         ),
       'engagement_level' => array(
