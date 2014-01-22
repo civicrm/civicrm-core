@@ -475,7 +475,7 @@ function _civicrm_api3_get_using_query_object($entity, $params, $additional_opti
     }
 
   }
-  $skipPermissions = CRM_Utils_Array::value('check_permissions', $params)? 0 :1;
+  $skipPermissions = !empty($params['check_permissions']) ? 0 :1;
 
   list($entities, $options) = CRM_Contact_BAO_Query::apiQuery(
     $newParams,

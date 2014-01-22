@@ -89,7 +89,7 @@ class CRM_Contribute_Form extends CRM_Core_Form {
     }
     elseif ($this->_action & CRM_Core_Action::UPDATE) {
       if (CRM_Utils_Array::value('contact_id', $defaults) || CRM_Utils_Array::value('created_id', $defaults)) {
-        $contactID = CRM_Utils_Array::value('created_id', $defaults) ? $defaults['created_id'] : $defaults['contact_id'];
+        $contactID = !empty($defaults['created_id']) ? $defaults['created_id'] : $defaults['contact_id'];
         $this->assign('created_id', $contactID);
         $this->assign('organisationId', $contactID);
       }

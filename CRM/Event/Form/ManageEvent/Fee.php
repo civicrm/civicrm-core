@@ -671,8 +671,8 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
           }
         }
 
-        $discountPriceSets = CRM_Utils_Array::value('discount_price_set', $this->_defaultValues) ? $this->_defaultValues['discount_price_set']: array();
-        $discountFieldIDs  = CRM_Utils_Array::value('discount_option_id', $this->_defaultValues) ? $this->_defaultValues['discount_option_id']: array();
+        $discountPriceSets = !empty($this->_defaultValues['discount_price_set']) ? $this->_defaultValues['discount_price_set']: array();
+        $discountFieldIDs  = !empty($this->_defaultValues['discount_option_id']) ? $this->_defaultValues['discount_option_id']: array();
         if (CRM_Utils_Array::value('is_discount', $params) == 1) {
           // if there are discounted set of label / values,
           // create custom options for them

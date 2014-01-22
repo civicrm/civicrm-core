@@ -2742,7 +2742,7 @@ WHERE  contribution_id = %1 ";
       }
       elseif ($params['prevContribution']->contribution_status_id == array_search('Pending', $contributionStatus)
         && $params['prevContribution']->is_pay_later) {
-        $financialTypeID = CRM_Utils_Array::value('financial_type_id', $params) ? $params['financial_type_id'] : $params['prevContribution']->financial_type_id;
+        $financialTypeID = !empty($params['financial_type_id']) ? $params['financial_type_id'] : $params['prevContribution']->financial_type_id;
         if ($params['contribution']->contribution_status_id == array_search('Cancelled', $contributionStatus)) {
           $params['trxnParams']['to_financial_account_id'] = NULL;
           $params['trxnParams']['total_amount'] = - $params['total_amount'];

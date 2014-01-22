@@ -74,7 +74,7 @@ class CRM_Utils_OpenFlashChart {
     }
 
     // get the required data.
-    $chartTitle = CRM_Utils_Array::value('legend', $params) ? $params['legend'] : ts('Bar Chart');
+    $chartTitle = !empty($params['legend']) ? $params['legend'] : ts('Bar Chart');
 
     $xValues = $yValues = array();
     $xValues = array_keys($values[0]);
@@ -203,7 +203,7 @@ class CRM_Utils_OpenFlashChart {
     foreach ($allValues as $label => $value) {
       $values[] = new pie_value((double)$value, $label);
     }
-    $graphTitle = CRM_Utils_Array::value('legend', $params) ? $params['legend'] : ts('Pie Chart');
+    $graphTitle = !empty($params['legend']) ? $params['legend'] : ts('Pie Chart');
 
     //get the currency.
     $config = CRM_Core_Config::singleton();
@@ -315,7 +315,7 @@ class CRM_Utils_OpenFlashChart {
       $count++;
     }
 
-    $chartTitle = CRM_Utils_Array::value('legend', $params) ? $params['legend'] : ts('Bar Chart');
+    $chartTitle = !empty($params['legend']) ? $params['legend'] : ts('Bar Chart');
 
     //set y axis parameters.
     $yMin = 0;

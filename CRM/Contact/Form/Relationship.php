@@ -623,7 +623,7 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
         //fixes for CRM-7985
         //only if the relationship has been toggled to enable /disable
         if (CRM_Utils_Array::value('is_active', $params) != $this->_enabled) {
-          $active = CRM_Utils_Array::value('is_active', $params) ? CRM_Core_Action::ENABLE : CRM_Core_Action::DISABLE;
+          $active = !empty($params['is_active']) ? CRM_Core_Action::ENABLE : CRM_Core_Action::DISABLE;
           CRM_Contact_BAO_Relationship::disableEnableRelationship($this->_relationshipId, $active);
         }
       }

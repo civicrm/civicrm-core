@@ -667,7 +667,7 @@ class CRM_Core_SelectValues {
         }
         //keys for $tokens should be constant. $token Values are changed for Custom Fields. CRM-3734
         if ($customFieldId = CRM_Core_BAO_CustomField::getKeyID($val)) {
-          $tokens["{contact.$val}"] = CRM_Utils_Array::value($customFieldId, $customFields) ? $customFields[$customFieldId]['label'] . " :: " . $customFields[$customFieldId]['groupTitle'] : '';
+          $tokens["{contact.$val}"] = !empty($customFields[$customFieldId]) ? $customFields[$customFieldId]['label'] . " :: " . $customFields[$customFieldId]['groupTitle'] : '';
         }
         else {
           // Support legacy token names
@@ -726,7 +726,7 @@ class CRM_Core_SelectValues {
         }
         //keys for $tokens should be constant. $token Values are changed for Custom Fields. CRM-3734
         if ($customFieldId = CRM_Core_BAO_CustomField::getKeyID($val)) {
-          $tokens["{participant.$val}"] = CRM_Utils_Array::value($customFieldId, $customFields) ? $customFields[$customFieldId]['label'] . " :: " . $customFields[$customFieldId]['groupTitle'] : '';
+          $tokens["{participant.$val}"] = !empty($customFields[$customFieldId]) ? $customFields[$customFieldId]['label'] . " :: " . $customFields[$customFieldId]['groupTitle'] : '';
         }
         else {
           $tokens["{participant.$val}"] = $exportFields[$val]['title'];

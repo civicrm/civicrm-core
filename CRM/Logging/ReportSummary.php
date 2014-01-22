@@ -346,7 +346,7 @@ ORDER BY log_civicrm_entity_log_date DESC {$this->_limit}";
   function getEntityValue($id, $entity, $logDate) {
     if (CRM_Utils_Array::value('bracket_info', $this->_logTables[$entity])) {
       if (CRM_Utils_Array::value('entity_column', $this->_logTables[$entity]['bracket_info'])) {
-        $logTable = CRM_Utils_Array::value('table_name', $this->_logTables[$entity]) ? $this->_logTables[$entity]['table_name'] : $entity;
+        $logTable = !empty($this->_logTables[$entity]['table_name']) ? $this->_logTables[$entity]['table_name'] : $entity;
         $sql = "
 SELECT {$this->_logTables[$entity]['bracket_info']['entity_column']}
   FROM `{$this->loggingDB}`.{$logTable}

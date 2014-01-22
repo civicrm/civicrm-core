@@ -1385,7 +1385,7 @@ class CRM_Contact_BAO_Query {
     foreach ($formValues as $id => $values) {
       if ($id == 'privacy') {
         if (is_array($formValues['privacy'])) {
-          $op = CRM_Utils_Array::value('do_not_toggle', $formValues['privacy']) ? '=' : '!=';
+          $op = !empty($formValues['privacy']['do_not_toggle']) ? '=' : '!=';
           foreach ($formValues['privacy'] as $key => $value) {
             if ($value) {
               $params[] = array($key, $op, $value, 0, 0);

@@ -1493,7 +1493,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
         $this->assign('amount', $params['total_amount']);
       }
 
-      $params['contribution_status_id'] = CRM_Utils_Array::value('is_recur', $paymentParams) ? 2 : 1;
+      $params['contribution_status_id'] = !empty($paymentParams['is_recur']) ? 2 : 1;
       $params['receive_date'] = $now;
       $params['invoice_id'] = $this->_params['invoiceID'];
       $params['contribution_source'] = ts('%1 Membership Signup: Credit card or direct debit (by %2)',

@@ -2452,10 +2452,10 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
                 CRM_Utils_Array::value("{$fieldName}_from_time", $this->_params),
                 CRM_Utils_Array::value("{$fieldName}_to_time", $this->_params)
               );
-            $from_time_format = CRM_Utils_Array::value("{$fieldName}_from_time", $this->_params) ? 'h' : 'd';
+            $from_time_format = !empty($this->_params["{$fieldName}_from_time"]) ? 'h' : 'd';
             $from = CRM_Utils_Date::customFormat($from, null, array($from_time_format));
 
-            $to_time_format = CRM_Utils_Array::value("{$fieldName}_to_time", $this->_params) ? 'h' : 'd';
+            $to_time_format = !empty($this->_params["{$fieldName}_to_time"]) ? 'h' : 'd';
             $to = CRM_Utils_Date::customFormat($to, null, array($to_time_format));
 
             if ($from || $to) {
