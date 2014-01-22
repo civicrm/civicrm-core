@@ -322,7 +322,7 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_Field extends CRM_Upgrade_Snapshot_V4p
 
         foreach ($customOption as $opId => $opt) {
           if ($field->is_display_amounts) {
-            $opt['label'] =  CRM_Utils_Array::value('label', $opt) ? $opt['label'] . '&nbsp;-&nbsp;' : '';
+            $opt['label'] = !empty($opt['label']) ? $opt['label'] . '&nbsp;-&nbsp;' : '';
             $opt['label'] .= CRM_Utils_Money::format($opt[$valueFieldName]);
           }
           $count     = CRM_Utils_Array::value('count', $opt, '');

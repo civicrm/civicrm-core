@@ -258,7 +258,7 @@ class CRM_Admin_Form_Preferences extends CRM_Core_Form {
             break;
 
           case 'checkbox':
-            $this->_config->$settingName = CRM_Utils_Array::value($settingName, $this->_params) ? 1 : 0;
+            $this->_config->$settingName = !empty($this->_params[$settingName]) ? 1 : 0;
             break;
 
           case 'text':

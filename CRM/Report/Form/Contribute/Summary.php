@@ -609,8 +609,8 @@ ROUND(AVG({$this->_aliases['civicrm_contribution_soft']}.amount), 2) as civicrm_
     if (CRM_Utils_Array::value('charts', $this->_params)) {
       if (CRM_Utils_Array::value('receive_date', $this->_params['group_bys'])) {
 
-        $contrib = CRM_Utils_Array::value('total_amount', $this->_params['fields']) ? TRUE : FALSE;
-        $softContrib = CRM_Utils_Array::value('soft_amount', $this->_params['fields']) ? TRUE : FALSE;
+        $contrib = !empty($this->_params['fields']['total_amount']) ? TRUE : FALSE;
+        $softContrib = !empty($this->_params['fields']['soft_amount']) ? TRUE : FALSE;
 
         foreach ($rows as $key => $row) {
           if ($row['civicrm_contribution_receive_date_subtotal']) {

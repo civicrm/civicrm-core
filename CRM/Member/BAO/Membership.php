@@ -1356,7 +1356,7 @@ AND civicrm_membership.is_test = %2";
       }
     }
 
-    $index = CRM_Utils_Array::value('is_separate_payment', $memBlockDetails) ? 2 : 1;
+    $index = !empty($memBlockDetails['is_separate_payment']) ? 2 : 1;
 
     if (!CRM_Utils_Array::value($index, $errors)) {
       if (isset($membershipParams['onbehalf']) &&

@@ -106,8 +106,8 @@ class CRM_Core_BAO_Location extends CRM_Core_DAO {
 
     foreach (array(
       'phone', 'email', 'im', 'address') as $loc) {
-      $locBlock["{$loc}_id"] = CRM_Utils_Array::value(0, $location["$loc"]) ? $location["$loc"][0]->id : NULL;
-      $locBlock["{$loc}_2_id"] = CRM_Utils_Array::value(1, $location["$loc"]) ? $location["$loc"][1]->id : NULL;
+      $locBlock["{$loc}_id"] = !empty($location["$loc"][0]) ? $location["$loc"][0]->id : NULL;
+      $locBlock["{$loc}_2_id"] = !empty($location["$loc"][1]) ? $location["$loc"][1]->id : NULL;
     }
 
     $countNull = 0;

@@ -143,7 +143,7 @@ class CRM_Contribute_Form_ContributionPage_TabHeader {
     }
 
     if ($contribPageId) {
-      $reset = CRM_Utils_Array::value('reset', $_GET) ? 'reset=1&' : '';
+      $reset = !empty($_GET['reset']) ? 'reset=1&' : '';
 
       foreach ($tabs as $key => $value) {
         if (!isset($tabs[$key]['qfKey'])) {

@@ -143,7 +143,7 @@ function _civicrm_api3_contribution_create_spec(&$params) {
  */
 function civicrm_api3_contribution_delete($params) {
 
-  $contributionID = CRM_Utils_Array::value('contribution_id', $params) ? $params['contribution_id'] : $params['id'];
+  $contributionID = !empty($params['contribution_id']) ? $params['contribution_id'] : $params['id'];
   if (CRM_Contribute_BAO_Contribution::deleteContribution($contributionID)) {
     return civicrm_api3_create_success(array($contributionID => 1));
   }

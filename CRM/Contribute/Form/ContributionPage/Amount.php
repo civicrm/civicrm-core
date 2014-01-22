@@ -736,7 +736,7 @@ SELECT id
       }
 
       if ($deleteAmountBlk ) {
-        $priceField = CRM_Utils_Array::value('price_field_id', $params)?$params['price_field_id']:CRM_Utils_Array::value('price_field_other', $params);
+        $priceField = !empty($params['price_field_id']) ?$params['price_field_id']:CRM_Utils_Array::value('price_field_other', $params);
         if ($priceField) {
           $priceSetID = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceField', $priceField, 'price_set_id');
           CRM_Price_BAO_PriceSet::setIsQuickConfig($priceSetID,0);

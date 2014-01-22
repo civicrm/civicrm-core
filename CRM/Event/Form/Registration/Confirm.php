@@ -600,7 +600,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
             $pending = TRUE;
             //get the participant statuses.
             $pendingStatuses = CRM_Event_PseudoConstant::participantStatus(NULL, "class = 'Pending'");
-            $status = CRM_Utils_Array::value('is_pay_later', $value) ? 'Pending from pay later' : 'Pending from incomplete transaction';
+            $status = !empty($value['is_pay_later']) ? 'Pending from pay later' : 'Pending from incomplete transaction';
             $value['participant_status_id'] = $value['participant_status'] = array_search($status, $pendingStatuses);
           }
         }

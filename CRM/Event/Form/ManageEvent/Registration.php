@@ -518,7 +518,7 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
           }
         }
         else {
-          $customPreId = CRM_Utils_Array::value('custom_pre_id', $values) ? $values['custom_pre_id'] : NULL;
+          $customPreId = !empty($values['custom_pre_id']) ? $values['custom_pre_id'] : NULL;
         }
         //check whether the additional custom pre profile is of type 'Individual' and its subtypes
         if (!empty($customPreId)) {
@@ -546,7 +546,7 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
             }
           }
           else {
-            $customPostId = CRM_Utils_Array::value('custom_post_id', $values) ? $values['custom_post_id'] : NULL;
+            $customPostId = !empty($values['custom_post_id']) ? $values['custom_post_id'] : NULL;
           }
           //check whether the additional custom post profile is of type 'Individual' and its subtypes
           if (!empty($customPostId)) {

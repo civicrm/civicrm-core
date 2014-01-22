@@ -375,7 +375,7 @@ class CRM_Member_Form_MembershipBlock extends CRM_Contribute_Form_ContributionPa
         CRM_Price_BAO_PriceField::retrieve($editedFieldParams, $editedResults);
         if (!CRM_Utils_Array::value('id', $editedResults)) {
           $fieldParams['name'] = strtolower(CRM_Utils_String::munge('Membership Amount', '_', 245));
-          $fieldParams['label'] = CRM_Utils_Array::value('new_title', $params) ? $params['new_title'] : ts('Membership');
+          $fieldParams['label'] = !empty($params['new_title']) ? $params['new_title'] : ts('Membership');
           if (!CRM_Utils_Array::value('mem_price_field_id', $params)) {
             CRM_Utils_Weight::updateOtherWeights('CRM_Price_DAO_PriceField', 0, 1, array('price_set_id' => $priceSetID));
           }
@@ -387,8 +387,8 @@ class CRM_Member_Form_MembershipBlock extends CRM_Contribute_Form_ContributionPa
 
         $fieldParams['is_active'] = 1;
         $fieldParams['html_type'] = 'Radio';
-        $fieldParams['is_required'] = CRM_Utils_Array::value('is_required', $params) ? 1 : 0;
-        $fieldParams['is_display_amounts'] = CRM_Utils_Array::value('display_min_fee', $params) ? 1 : 0;
+        $fieldParams['is_required'] = !empty($params['is_required']) ? 1 : 0;
+        $fieldParams['is_display_amounts'] = !empty($params['display_min_fee']) ? 1 : 0;
         $rowCount = 1;
         $options = array();
         if (CRM_Utils_Array::value('id', $fieldParams)) {

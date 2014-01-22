@@ -1449,7 +1449,7 @@ loadCampaign( {$this->_eID}, {$eventCampaigns} );
 
         $contributionParams['currency'] = $config->defaultCurrency;
         $contributionParams['non_deductible_amount'] = 'null';
-        $contributionParams['receipt_date'] = CRM_Utils_Array::value('send_receipt', $params) ? CRM_Utils_Array::value('receive_date', $params) : 'null';
+        $contributionParams['receipt_date'] = !empty($params['send_receipt']) ? CRM_Utils_Array::value('receive_date', $params) : 'null';
 
         $recordContribution = array( 'contact_id', 'financial_type_id',
           'payment_instrument_id', 'trxn_id',
