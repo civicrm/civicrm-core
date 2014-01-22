@@ -369,12 +369,12 @@ SELECT  count(*)
   // this should be handled by wrapper layer & probably the api would already manage it
   //correctly by doing pseudoconstant validation
   // needs testing
-  $activityTypes = CRM_Core_PseudoConstant::activityType(TRUE, TRUE, FALSE, 'name', TRUE);
+  $activityTypes = CRM_Activity_BAO_Activity::buildOptions('activity_type_id', 'validate');
   $activityName  = CRM_Utils_Array::value('activity_name', $params);
   $activityName  = ucfirst($activityName);
   $activityLabel = CRM_Utils_Array::value('activity_label', $params);
   if ($activityLabel) {
-    $activityTypes = CRM_Core_PseudoConstant::activityType(TRUE, TRUE, FALSE, 'label', TRUE);
+    $activityTypes = CRM_Activity_BAO_Activity::buildOptions('activity_type_id', 'create');
   }
 
   $activityTypeId = CRM_Utils_Array::value('activity_type_id', $params);
