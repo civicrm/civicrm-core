@@ -678,9 +678,7 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
       $params = array('id' => $customField->custom_group_id);
       $customGroup = array();
       CRM_Core_BAO_CustomGroup::retrieve($params, $customGroup);
-      if (($fieldType != CRM_Utils_Array::value('extends', $customGroup)) ||
-        !CRM_Utils_Array::value('extends_entity_column_value', $customGroup)
-      ) {
+      if (($fieldType != CRM_Utils_Array::value('extends', $customGroup)) || empty($customGroup['extends_entity_column_value'])) {
         return $errors;
       }
 

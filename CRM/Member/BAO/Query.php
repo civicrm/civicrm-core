@@ -457,7 +457,7 @@ class CRM_Member_BAO_Query {
 
   static function tableNames(&$tables) {
     //add membership table
-    if (!empty($tables['civicrm_membership_log']) || CRM_Utils_Array::value('civicrm_membership_status', $tables) || CRM_Utils_Array::value('civicrm_membership_type', $tables)) {
+    if (!empty($tables['civicrm_membership_log']) || !empty($tables['civicrm_membership_status']) || CRM_Utils_Array::value('civicrm_membership_type', $tables)) {
       $tables = array_merge(array('civicrm_membership' => 1), $tables);
     }
   }

@@ -305,7 +305,7 @@ SELECT id
         }
       }
       $hasMembershipBlk = TRUE;
-      if ($membershipBlock->is_separate_payment && !CRM_Utils_Array::value('amount_block_is_active', $fields)) {
+      if ($membershipBlock->is_separate_payment && empty($fields['amount_block_is_active'])) {
         $errors['amount_block_is_active'] = ts('To disable Contribution Amounts section you need to first disable Separate Membership Payment option from Membership Settings.');
       }
     }
@@ -500,7 +500,7 @@ SELECT id
         if ($priceSetID) {
           // add/update price set.
           $deletePriceSet = FALSE;
-          if (!empty($params['price_field_id']) || CRM_Utils_Array::value('price_field_other', $params) ) {
+          if (!empty($params['price_field_id']) || !empty($params['price_field_other'])) {
             $deleteAmountBlk = TRUE;
           }
 
@@ -529,12 +529,12 @@ SELECT id
               );
             }
           }
-            /* || CRM_Utils_Array::value( 'price_field_value', $params ) || CRM_Utils_Array::value( 'price_field_other', $params )*/
-          if (!empty($options) || CRM_Utils_Array::value('is_allow_other_amount', $params)) {
+            /* || !empty($params['price_field_value']) || CRM_Utils_Array::value( 'price_field_other', $params )*/
+          if (!empty($options) || !empty($params['is_allow_other_amount'])) {
             $fieldParams['is_quick_config'] = 1;
             $noContriAmount = NULL;
             $usedPriceSetId = CRM_Price_BAO_PriceSet::getFor('civicrm_contribution_page', $this->_id, 3);
-            if (!(CRM_Utils_Array::value('price_field_id', $params) || CRM_Utils_Array::value('price_field_other', $params)) && !$usedPriceSetId) {
+            if (!(!empty($params['price_field_id']) || !empty($params['price_field_other'])) && !$usedPriceSetId) {
               $pageTitle = strtolower(CRM_Utils_String::munge($this->_values['title'], '_', 245));
               $setParams['title'] = $this->_values['title'];
               if (!CRM_Core_DAO::getFieldValue('CRM_Price_BAO_PriceSet', $pageTitle, 'id', 'name')) {
@@ -553,7 +553,7 @@ SELECT id
               $priceSet = CRM_Price_BAO_PriceSet::create($setParams);
               $priceSetId = $priceSet->id;
             }
-            elseif ($usedPriceSetId && !CRM_Utils_Array::value('price_field_id', $params)) {
+            elseif ($usedPriceSetId && empty($params['price_field_id'])) {
               $priceSetId = $usedPriceSetId;
             }
             else {
@@ -613,7 +613,7 @@ SELECT id
               $fieldParams['default_option'] = $params['default'];
               $priceField = CRM_Price_BAO_PriceField::create($fieldParams);
             }
-            if (!empty($params['is_allow_other_amount']) && !CRM_Utils_Array::value('price_field_other', $params)) {
+            if (!empty($params['is_allow_other_amount']) && empty($params['price_field_other'])) {
               $editedFieldParams = array(
                  'price_set_id' => $priceSetId,
                  'name' => 'other_amount',
@@ -661,7 +661,7 @@ SELECT id
                 }
               }
             } 
-            elseif (empty($params['is_allow_other_amount']) && CRM_Utils_Array::value('price_field_other', $params)) {
+            elseif (empty($params['is_allow_other_amount']) && !empty($params['price_field_other'])) {
               CRM_Price_BAO_PriceField::setIsActive($params['price_field_other'], '0');
             } 
             elseif ($priceFieldID = CRM_Utils_Array::value('price_field_other', $params)) {
@@ -707,7 +707,7 @@ SELECT id
         }
       }
       else {
-        if (!empty($params['price_field_id']) || CRM_Utils_Array::value('price_field_other', $params)) {
+        if (!empty($params['price_field_id']) || !empty($params['price_field_other'])) {
           $usedPriceSetId = CRM_Price_BAO_PriceSet::getFor('civicrm_contribution_page', $this->_id, 3);
           if ($usedPriceSetId) {
             if (!empty($params['price_field_id'])) {

@@ -111,9 +111,7 @@ class CRM_Contact_Form_Inline_Address extends CRM_Contact_Form_Inline {
         'address_options'
       );
       $this->_parseStreetAddress = FALSE;
-      if (!empty($addressOptions['street_address']) &&
-        CRM_Utils_Array::value('street_address_parsing', $addressOptions)
-      ) {
+      if (!empty($addressOptions['street_address']) && !empty($addressOptions['street_address_parsing'])) {
         $this->_parseStreetAddress = TRUE;
       }
       $this->set('parseStreetAddress', $this->_parseStreetAddress);

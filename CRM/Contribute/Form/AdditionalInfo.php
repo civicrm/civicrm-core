@@ -376,11 +376,8 @@ class CRM_Contribute_Form_AdditionalInfo {
         $params['product_name'] = $productDAO->name;
         $params['product_sku'] = $productDAO->sku;
 
-        if (empty($params['product_option']) &&
-          CRM_Utils_Array::value($params['product_name'][0],
-            $form->_options
-          )
-        ) {
+        if (empty($params['product_option']) && !empty($form->_options
+[$params['product_name'][0]])) {
           $params['product_option'] = $form->_options[$params['product_name'][0]][$params['product_name'][1]];
         }
       }

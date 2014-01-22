@@ -116,8 +116,7 @@ class CRM_Contact_Form_Inline_OpenID extends CRM_Contact_Form_Inline {
           $hasData[] = $instance;
           if (!empty($blockValues['is_primary'])) {
             $hasPrimary[] = $instance;
-            if (!$primaryID &&
-              CRM_Utils_Array::value('openid', $blockValues)) {
+            if (!$primaryID && !empty($blockValues['openid'])) {
                 $primaryID = $blockValues['openid'];
             }
           }

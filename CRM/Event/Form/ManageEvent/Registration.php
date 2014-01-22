@@ -501,9 +501,7 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
       }
       $additionalCustomPreId = $additionalCustomPostId = NULL;
       $isPreError = $isPostError = TRUE;
-      if (!empty($values['allow_same_participant_emails']) &&
-        CRM_Utils_Array::value('is_multiple_registrations', $values)
-      ) {
+      if (!empty($values['allow_same_participant_emails']) && !empty($values['is_multiple_registrations'])) {
         $types = array_merge(array('Individual'), CRM_Contact_BAO_ContactType::subTypes('Individual'));
         $profiles = CRM_Core_BAO_UFGroup::getProfiles($types);
 
@@ -798,7 +796,7 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
       if (!empty($params['additional_custom_post_id_multiple'])) {
         $additionalPostMultiple = array();
         foreach ($params['additional_custom_post_id_multiple'] as $key => $value) {
-          if (!$value && CRM_Utils_Array::value('custom_post_id', $params)) {
+          if (!$value && !empty($params['custom_post_id'])) {
             $additionalPostMultiple[$key] = $params['custom_post_id'];
           }
           elseif ($value == 'none') {

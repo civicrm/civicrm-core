@@ -221,9 +221,7 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
       if (array_key_exists('fields', $table)) {
         foreach ($table['fields'] as $fieldName => $field) {
 
-          if (!empty($field['required']) ||
-            CRM_Utils_Array::value($fieldName, $this->_params['fields'])
-          ) {
+          if (!empty($field['required']) || !empty($this->_params['fields'][$fieldName])) {
             if ($fieldName == 'total_amount') {
               $select[] = "SUM({$field['dbAlias']}) as {$tableName}_{$fieldName}";
 
@@ -384,7 +382,7 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
       $this->setPager();
     }
 
-    if (!empty($contactIds) || CRM_Utils_Array::value('charts', $this->_params)) {
+    if (!empty($contactIds) || !empty($this->_params['charts'])) {
       if (!empty($this->_params['charts'])) {
         $sql = "{$this->_select} {$this->_from} {$this->_where} {$this->_groupBy}";
       }

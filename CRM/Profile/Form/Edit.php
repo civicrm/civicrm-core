@@ -388,9 +388,7 @@ SELECT module
   function validate() {
     $errors = parent::validate();
 
-    if (!$errors &&
-      CRM_Utils_Array::value('errorURL', $_POST)
-    ) {
+    if (!$errors && !empty($_POST['errorURL'])) {
       $message = NULL;
       foreach ($this->_errors as $name => $mess) {
         $message .= $mess;

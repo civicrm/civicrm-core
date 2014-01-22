@@ -82,9 +82,7 @@ class CRM_Event_BAO_Query {
       }
 
       //add event title also if event id is select
-      if (!empty($query->_returnProperties['event_id']) ||
-        CRM_Utils_Array::value('event_title', $query->_returnProperties)
-      ) {
+      if (!empty($query->_returnProperties['event_id']) || !empty($query->_returnProperties['event_title'])) {
         $query->_select['event_id'] = "civicrm_event.id as event_id";
         $query->_select['event_title'] = "civicrm_event.title as event_title";
         $query->_element['event_id'] = 1;
@@ -120,9 +118,7 @@ class CRM_Event_BAO_Query {
       }
 
       //add status and status_id
-      if (!empty($query->_returnProperties['participant_status']) ||
-        CRM_Utils_Array::value('participant_status_id', $query->_returnProperties)
-      ) {
+      if (!empty($query->_returnProperties['participant_status']) || !empty($query->_returnProperties['participant_status_id'])) {
         $query->_select['participant_status'] = "participant_status.label as participant_status";
         $query->_select['participant_status_id'] = "participant_status.id as participant_status_id";
         $query->_element['participant_status_id'] = 1;

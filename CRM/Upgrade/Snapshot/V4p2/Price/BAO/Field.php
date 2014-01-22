@@ -123,8 +123,7 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_Field extends CRM_Upgrade_Snapshot_V4p
 
       if (array_key_exists('option_amount', $params) &&
           array_key_exists($index, $params['option_amount']) &&
-          (CRM_Utils_Array::value($index, CRM_Utils_Array::value('option_label', $params)) ||
-           CRM_Utils_Array::value('is_quick_config', $params)) &&
+          (CRM_Utils_Array::value($index, CRM_Utils_Array::value('option_label', $params)) || !empty($params['is_quick_config'])) &&
           !CRM_Utils_System::isNull($params['option_amount'][$index])
           ) {
         $options = array(
@@ -241,7 +240,7 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_Field extends CRM_Upgrade_Snapshot_V4p
     $currencyName = $config->defaultCurrency;
 
     if (!isset($label)) {
-      $label = (property_exists($qf,'_membershipBlock') &&  CRM_Utils_Array::value('is_separate_payment', $qf->_membershipBlock) && $field->name == 'contribution_amount' && !CRM_Utils_Array::value('is_allow_other_amount', $otherAmount)) ? ts('Additional Contribution') : $field->label;
+      $label = (property_exists($qf,'_membershipBlock') && !empty($qf->_membershipBlock['is_separate_payment']) && $field->name == 'contribution_amount' && empty($otherAmount['is_allow_other_amount'])) ? ts('Additional Contribution') : $field->label;
     }
 
     if ($field->name == 'contribution_amount') {
@@ -274,7 +273,7 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_Field extends CRM_Upgrade_Snapshot_V4p
         }
 
         // if seperate membership payment is used with quick config priceset then change the other amount label
-        if (property_exists($qf,'_membershipBlock') && CRM_Utils_Array::value('is_separate_payment', $qf->_membershipBlock) && $qf->_quickConfig && $field->name == 'other_amount' && !property_exists($qf,'_contributionAmount')) {
+        if (property_exists($qf,'_membershipBlock') && !empty($qf->_membershipBlock['is_separate_payment']) && $qf->_quickConfig && $field->name == 'other_amount' && !property_exists($qf,'_contributionAmount')) {
             $label = ts('Additional Contribution');
             $useRequired = 0;
         } elseif (!empty($fieldOptions[$optionKey]['label'])) {      //check for label.
@@ -347,7 +346,7 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_Field extends CRM_Upgrade_Snapshot_V4p
           }
         }
 
-        if (property_exists($qf, '_membershipBlock') && CRM_Utils_Array::value('is_separate_payment', $qf->_membershipBlock) && $field->name == 'contribution_amount') {
+        if (property_exists($qf, '_membershipBlock') && !empty($qf->_membershipBlock['is_separate_payment']) && $field->name == 'contribution_amount') {
           $choice[] = $qf->createElement('radio', NULL, '', 'No thank you', '-1',
             array(
               'onclick' => 'clearAmountOther();',
@@ -359,7 +358,7 @@ class CRM_Upgrade_Snapshot_V4p2_Price_BAO_Field extends CRM_Upgrade_Snapshot_V4p
           // add "none" option
           if (!empty($otherAmount['is_allow_other_amount']) && $field->name == 'contribution_amount') {
             $none = ts('Other Amount');
-          } elseif (property_exists($qf, '_membershipBlock') && !CRM_Utils_Array::value('is_required', $qf->_membershipBlock) && $field->name == 'membership_amount') {
+          } elseif (property_exists($qf, '_membershipBlock') && empty($qf->_membershipBlock['is_required']) && $field->name == 'membership_amount') {
             $none = ts('No thank you');
           } else {
             $none = ts('-none-');

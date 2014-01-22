@@ -937,9 +937,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
     }
 
     //Activity type is mandatory if creating new activity, CRM-4515
-    if (array_key_exists('activity_type_id', $fields) &&
-      !CRM_Utils_Array::value('activity_type_id', $fields)
-    ) {
+    if (array_key_exists('activity_type_id', $fields) && empty($fields['activity_type_id'])) {
       $errors['activity_type_id'] = ts('Activity Type is required field.');
     }
     //FIX me temp. comment
@@ -960,13 +958,11 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
       $errors['status_id'] = ts('You cannot record scheduled SMS activity.');
     }
 
-    if (!empty($fields['followup_activity_type_id']) && !CRM_Utils_Array::value('followup_date', $fields)) {
+    if (!empty($fields['followup_activity_type_id']) && empty($fields['followup_date'])) {
       $errors['followup_date_time'] = ts('Followup date is a required field.');
     }
     //Activity type is mandatory if subject or follow-up date is specified for an Follow-up activity, CRM-4515
-    if ((CRM_Utils_Array::value('followup_activity_subject', $fields) || CRM_Utils_Array::value('followup_date', $fields)) &&
-      !CRM_Utils_Array::value('followup_activity_type_id', $fields)
-    ) {
+    if ((!empty($fields['followup_activity_subject']) || !empty($fields['followup_date'])) && empty($fields['followup_activity_type_id'])) {
       $errors['followup_activity_subject'] = ts('Follow-up Activity type is a required field.');
     }
     return $errors;

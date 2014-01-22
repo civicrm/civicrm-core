@@ -214,7 +214,7 @@ class CRM_Contribute_Form_ContributionPage_Widget extends CRM_Contribute_Form_Co
       }
 
       foreach ($params as $key => $val) {
-        if (substr($key, 0, 6) == 'color_' && !CRM_Utils_Array::value($key, $params)) {
+        if (substr($key, 0, 6) == 'color_' && empty($params[$key])) {
           $errors[$key] = ts('%1 is a required field.', array(1 => $self->_colorFields[$key][0]));
         }
       }

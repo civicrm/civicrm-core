@@ -307,7 +307,7 @@ function _civicrm_api3_contact_check_params( &$params, $dupeCheck = true, $dupeE
     $params['preferred_communication_method'] = CRM_Utils_Array::implodePadded($params['preferred_communication_method']);
   }
 
-  if (!empty($params['contact_sub_type']) && CRM_Utils_Array::value('contact_type', $params)) {
+  if (!empty($params['contact_sub_type']) && !empty($params['contact_type'])) {
       if (!(CRM_Contact_BAO_ContactType::isExtendsContactType($params['contact_sub_type'], $params['contact_type']))) {
         throw new API_Exception("Invalid or Mismatched Contact SubType: " . implode(', ', (array)$params['contact_sub_type']));
       }
@@ -534,7 +534,7 @@ function civicrm_api3_contact_getquick($params) {
 
   $list = array();
   foreach ($acpref as $value) {
-    if ($value && CRM_Utils_Array::value($value, $acOptions)) {
+    if ($value && !empty($acOptions[$value])) {
       $list[$value] = $acOptions[$value];
     }
   }

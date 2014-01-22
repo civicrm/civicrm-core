@@ -352,7 +352,7 @@ class CRM_SMS_Form_Upload extends CRM_Core_Form {
           }
         }
       }
-      if (!empty($params['saveTemplate']) && !CRM_Utils_Array::value('saveTemplateName', $params)) {
+      if (!empty($params['saveTemplate']) && empty($params['saveTemplateName'])) {
         $errors['saveTemplateName'] = ts('Please provide a Template Name.');
       }
     }

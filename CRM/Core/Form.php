@@ -1099,9 +1099,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
 
     $this->add('text', $name, $label, $attributes);
 
-    if (!empty($attributes['addTime']) ||
-      CRM_Utils_Array::value('timeFormat', $attributes)
-    ) {
+    if (!empty($attributes['addTime']) || !empty($attributes['timeFormat'])) {
 
       if (!isset($attributes['timeFormat'])) {
         $timeFormat = $config->timeInputFormat;
@@ -1130,7 +1128,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
 
     if ($required) {
       $this->addRule($name, ts('Please select %1', array(1 => $label)), 'required');
-      if (!empty($attributes['addTime']) && CRM_Utils_Array::value('addTimeRequired', $attributes)) {
+      if (!empty($attributes['addTime']) && !empty($attributes['addTimeRequired'])) {
         $this->addRule($elementName, ts('Please enter a time.'), 'required');
       }
     }

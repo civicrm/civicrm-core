@@ -265,9 +265,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
         'address_options'
       );
       $this->_parseStreetAddress = FALSE;
-      if (!empty($addressOptions['street_address']) &&
-        CRM_Utils_Array::value('street_address_parsing', $addressOptions)
-      ) {
+      if (!empty($addressOptions['street_address']) && !empty($addressOptions['street_address_parsing'])) {
         $this->_parseStreetAddress = TRUE;
       }
       $this->set('parseStreetAddress', $this->_parseStreetAddress);
@@ -659,9 +657,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
               $hasPrimary[] = $instance;
               if (!$primaryID &&
                 in_array($name, array(
-                  'email', 'openid')) &&
-                CRM_Utils_Array::value($name, $blockValues)
-              ) {
+                  'email', 'openid')) && !empty($blockValues[$name])) {
                 $primaryID = $blockValues[$name];
               }
             }
@@ -671,7 +667,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
             }
           }
 
-          if ($name == 'openid' && CRM_Utils_Array::value($name, $blockValues)) {
+          if ($name == 'openid' && !empty($blockValues[$name])) {
             $oid         = new CRM_Core_DAO_OpenID();
             $oid->openid = $openIds[$instance] = CRM_Utils_Array::value($name, $blockValues);
             $cid         = isset($contactId) ? $contactId : 0;
@@ -895,9 +891,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
       CRM_Contact_BAO_Contact::processImageParams($params);
     }
 
-    if (is_numeric(CRM_Utils_Array::value('current_employer_id', $params))
-      && CRM_Utils_Array::value('current_employer', $params)
-    ) {
+    if (is_numeric(CRM_Utils_Array::value('current_employer_id', $params)) && !empty($params['current_employer'])) {
       $params['current_employer'] = $params['current_employer_id'];
     }
 
@@ -918,10 +912,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
     }
 
     //make deceased date null when is_deceased = false
-    if ($this->_contactType == 'Individual' &&
-      CRM_Utils_Array::value('Demographics', $this->_editOptions) &&
-      !CRM_Utils_Array::value('is_deceased', $params)
-    ) {
+    if ($this->_contactType == 'Individual' && !empty($this->_editOptions['Demographics']) && empty($params['is_deceased'])) {
       $params['is_deceased'] = FALSE;
       $params['deceased_date'] = NULL;
     }
@@ -980,9 +971,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
       $contactGroupList = CRM_Contact_BAO_GroupContact::getContactGroup($params['contact_id'], 'Added');
       if (is_array($contactGroupList)) {
         foreach ($contactGroupList as $key) {
-          if ((!array_key_exists($key['group_id'], $params['group']) || $params['group'][$key['group_id']] != 1)
-            && !CRM_Utils_Array::value('is_hidden', $key)
-          ) {
+          if ((!array_key_exists($key['group_id'], $params['group']) || $params['group'][$key['group_id']] != 1) && empty($key['is_hidden'])) {
             $params['group'][$key['group_id']] = -1;
           }
         }
@@ -1273,9 +1262,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
         $success = TRUE;
         // consider address is automatically parseable,
         // when we should found street_number and street_name
-        if (empty($parsedFields['street_name']) ||
-          !CRM_Utils_Array::value('street_number', $parsedFields)
-        ) {
+        if (empty($parsedFields['street_name']) || empty($parsedFields['street_number'])) {
           $success = FALSE;
         }
 
@@ -1379,9 +1366,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
 
     // process to set membership status to deceased for both active/inactive membership
     if ($contactId &&
-      $this->_contactType == 'Individual' &&
-      CRM_Utils_Array::value('is_deceased', $deceasedParams)
-    ) {
+      $this->_contactType == 'Individual' && !empty($deceasedParams['is_deceased'])) {
 
       $session = CRM_Core_Session::singleton();
       $userId = $session->get('userID');

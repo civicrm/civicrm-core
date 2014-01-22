@@ -330,9 +330,7 @@ class CRM_Contact_Form_Task_Batch extends CRM_Contact_Form_Task {
 
         //street address consider to be parsed properly,
         //If we get street_name and street_number.
-        if (empty($parsedFields['street_name']) ||
-          !CRM_Utils_Array::value('street_number', $parsedFields)
-        ) {
+        if (empty($parsedFields['street_name']) || empty($parsedFields['street_number'])) {
           $parsedFields = array_fill_keys(array_keys($parsedFields), '');
         }
 

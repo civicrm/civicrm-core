@@ -258,7 +258,7 @@ class CRM_Contact_Form_Task_Label extends CRM_Contact_Form_Task {
       // we need to remove all the "_id"
       unset($contact['contact_id']);
 
-      if ($locName && CRM_Utils_Array::value($locName, $contact)) {
+      if ($locName && !empty($contact[$locName])) {
         // If location type is not primary, $contact contains
         // one more array as "$contact[$locName] = array( values... )"
 

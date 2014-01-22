@@ -431,7 +431,7 @@
    ) {
 
      // delete current attachments if applicable
-     if ($entityID && CRM_Utils_Array::value('is_delete_attachment', $formValues)) {
+     if ($entityID && !empty($formValues['is_delete_attachment'])) {
        CRM_Core_BAO_File::deleteEntityFile($entityTable, $entityID);
      }
 

@@ -47,7 +47,7 @@ class CRM_Contribute_Form_SoftCredit {
    * @return void
    */
   static function buildQuickForm(&$form) {
-    if ($form->_mode == 'live' && CRM_Utils_Array::value('honor_block_is_active', $form->_values)) {
+    if ($form->_mode == 'live' && !empty($form->_values['honor_block_is_active'])) {
       $ufJoinDAO = new CRM_Core_DAO_UFJoin();
       $ufJoinDAO->module = 'soft_credit';
       $ufJoinDAO->entity_id = $form->_id;
@@ -185,8 +185,7 @@ class CRM_Contribute_Form_SoftCredit {
 
     // if honor roll fields are populated but no PCP is selected
     if (empty($fields['pcp_made_through_id'])) {
-      if (!empty($fields['pcp_display_in_roll']) ||
-        CRM_Utils_Array::value('pcp_roll_nickname', $fields) ||
+      if (!empty($fields['pcp_display_in_roll']) || !empty($fields['pcp_roll_nickname']) ||
         CRM_Utils_Array::value('pcp_personal_note', $fields)
       ) {
         $errors['pcp_made_through'] = ts('Please select a Personal Campaign Page, OR uncheck Display in Honor Roll and clear both the Honor Roll Name and the Personal Note field.');

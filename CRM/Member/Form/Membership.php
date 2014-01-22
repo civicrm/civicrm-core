@@ -468,7 +468,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
 
     // build price set form.
     $buildPriceSet = FALSE;
-    if ($this->_priceSetId || CRM_Utils_Array::value('price_set_id', $_POST)) {
+    if ($this->_priceSetId || !empty($_POST['price_set_id'])) {
       if (!empty($_POST['price_set_id'])) {
         $buildPriceSet = TRUE;
       }
@@ -562,7 +562,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
     foreach ($allMemberships as $key => $values) {
       if (!empty($values['is_active'])) {
         $membershipType[$key] = CRM_Utils_Array::value('name', $values);
-        if ($this->_mode && !CRM_Utils_Array::value('minimum_fee', $values)) {
+        if ($this->_mode && empty($values['minimum_fee'])) {
           continue;
         }
         else {
@@ -923,15 +923,15 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
       return $errors;
     }
 
-    if ($priceSetId && !$self->_mode && !CRM_Utils_Array::value('record_contribution', $params)) {
+    if ($priceSetId && !$self->_mode && empty($params['record_contribution'])) {
       $errors['record_contribution'] = ts('Record Membership Payment is required when you using price set.');
     }
 
-    if (!$priceSetId && $self->_mode && !CRM_Utils_Array::value('financial_type_id', $params)) {
+    if (!$priceSetId && $self->_mode && empty($params['financial_type_id'])) {
       $errors['financial_type_id'] = ts('Please enter the financial Type.');
     }
 
-    if (!empty($params['record_contribution']) && !CRM_Utils_Array::value('payment_instrument_id', $params)) {
+    if (!empty($params['record_contribution']) && empty($params['payment_instrument_id'])) {
       $errors['payment_instrument_id'] = ts('Paid By is a required field.');
     }
 
@@ -1035,9 +1035,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
     }
 
     if (isset($params['is_override']) &&
-      $params['is_override'] &&
-      !CRM_Utils_Array::value('status_id', $params)
-    ) {
+      $params['is_override'] && empty($params['status_id'])) {
       $errors['status_id'] = ts('Please enter the status.');
     }
 
@@ -1053,8 +1051,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
     }
 
     // validate contribution status for 'Failed'.
-    if ($self->_onlinePendingContributionId &&
-      CRM_Utils_Array::value('record_contribution', $params) &&
+    if ($self->_onlinePendingContributionId && !empty($params['record_contribution']) &&
       (CRM_Utils_Array::value('contribution_status_id', $params) ==
         array_search('Failed', CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name'))
       )
@@ -1091,7 +1088,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
     }
 
     //take the required membership recur values.
-    if ($this->_mode && CRM_Utils_Array::value('auto_renew', $this->_params)) {
+    if ($this->_mode && !empty($this->_params['auto_renew'])) {
       $params['is_recur'] = $this->_params['is_recur'] = $formValues['is_recur'] = TRUE;
       $mapping = array(
         'frequency_interval' => 'duration_interval',
@@ -1539,22 +1536,20 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
     }
     else {
       $params['action'] = $this->_action;
-      if ($this->_onlinePendingContributionId &&
-        CRM_Utils_Array::value('record_contribution', $formValues)
-      ) {
+      if ($this->_onlinePendingContributionId && !empty($formValues['record_contribution'])) {
 
         // update membership as well as contribution object, CRM-4395
         $params['contribution_id'] = $this->_onlinePendingContributionId;
         $params['componentId'] = $params['id'];
         $params['componentName'] = 'contribute';
         $result = CRM_Contribute_BAO_Contribution::transitionComponents($params, TRUE);
-        if (!empty($result) && CRM_Utils_Array::value('contribution_id', $params)) {
+        if (!empty($result) && !empty($params['contribution_id'])) {
           $lineItem = array();
           $lineItems = CRM_Price_BAO_LineItem::getLineItems($params['contribution_id'], 'contribution');
           $itemId = key($lineItems);
           $priceSetId = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceField', $lineItems[$itemId]['price_field_id'], 'price_set_id');
           $fieldType = NULL;
-          if ($itemId && CRM_Utils_Array::value('price_field_id', $lineItems[$itemId])) {
+          if ($itemId && !empty($lineItems[$itemId]['price_field_id'])) {
             $fieldType = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceField', $lineItems[$itemId]['price_field_id'], 'html_type');
           }
           $lineItems[$itemId]['unit_price'] = $params['total_amount'];
@@ -1610,8 +1605,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
       else {
         $count = 0;
         foreach ($this->_memTypeSelected as $memType) {
-          if ($count &&
-            CRM_Utils_Array::value('record_contribution', $formValues) &&
+          if ($count && !empty($formValues['record_contribution']) &&
             ($relateContribution = CRM_Member_BAO_Membership::getMembershipContributionId($membership->id))
           ) {
             $membershipTypeValues[$memType]['relate_contribution_id'] = $relateContribution;
@@ -1687,7 +1681,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
         $memEndDate = ($membership->end_date) ? $membership->end_date : $endDate;
 
         //get the end date from calculated dates.
-        if (!$memEndDate && !CRM_Utils_Array::value('is_recur', $params)) {
+        if (!$memEndDate && empty($params['is_recur'])) {
           $memEndDate = CRM_Utils_Array::value('end_date', $calcDates[$memType]);
         }
 

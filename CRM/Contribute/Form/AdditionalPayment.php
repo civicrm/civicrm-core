@@ -163,8 +163,7 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
       $showAdditionalInfo = FALSE;
 
       foreach ($ccPane as $name => $type) {
-        if ($this->_formType == $type ||
-          CRM_Utils_Array::value("hidden_{$type}", $_POST) ||
+        if ($this->_formType == $type || !empty($_POST["hidden_{$type}"]) ||
           CRM_Utils_Array::value("hidden_{$type}", $defaults)
         ) {
           $showAdditionalInfo = TRUE;
@@ -324,7 +323,7 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
       $result = CRM_Contribute_BAO_Contribution::recordAdditionPayment($this->_contributionId, $submittedValues, $this->_paymentType, $participantId);
 
       // email sending
-      if (!empty($result) && CRM_Utils_Array::value('is_email_receipt', $submittedValues)) {
+      if (!empty($result) && !empty($submittedValues['is_email_receipt'])) {
         $submittedValues['contact_id'] = $this->_contactId;
         $submittedValues['contribution_id'] = $this->_contributionId;
 
@@ -376,7 +375,7 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
     $fields = array();
 
     // we need to retrieve email address
-    if ($this->_context == 'standalone' && CRM_Utils_Array::value('is_email_receipt', $submittedValues)) {
+    if ($this->_context == 'standalone' && !empty($submittedValues['is_email_receipt'])) {
       list($this->userDisplayName,
         $this->userEmail
       ) = CRM_Contact_BAO_Contact_Location::getEmailDetails($this->_contactId);
@@ -521,9 +520,7 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
     // process the additional payment
     $trxnRecord = CRM_Contribute_BAO_Contribution::recordAdditionPayment($this->_contributionId, $submittedValues, $this->_paymentType, $participantId);
 
-    if ($trxnRecord->id &&
-      CRM_Utils_Array::value('is_email_receipt', $this->_params)
-    ) {
+    if ($trxnRecord->id && !empty($this->_params['is_email_receipt'])) {
       $sendReceipt = self::emailReceipt($this, $this->_params);
     }
 

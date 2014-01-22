@@ -119,7 +119,7 @@ class CRM_Mailing_Form_Upload extends CRM_Core_Form {
       }
 
       //set default from email address.
-      if (!empty($defaults['from_name']) && CRM_Utils_Array::value('from_email', $defaults)) {
+      if (!empty($defaults['from_name']) && !empty($defaults['from_email'])) {
         $defaults['from_email_address'] = array_search('"' . $defaults['from_name'] . '" <' . $defaults['from_email'] . '>',
           CRM_Core_OptionGroup::values('from_email_address')
         );
@@ -235,8 +235,7 @@ class CRM_Mailing_Form_Upload extends CRM_Core_Form {
     );
 
     //Added code to add custom field as Reply-To on form when it is enabled from Mailer settings
-    if (isset($config->replyTo) && !empty($config->replyTo) &&
-      ! CRM_Utils_Array::value( 'override_verp', $options ) ) {
+    if (isset($config->replyTo) && !empty($config->replyTo) && empty($options['override_verp'])) {
       $this->add('select', 'reply_to_address', ts('Reply-To'),
         array('' => '- select -') + $fromEmailAddress
       );
@@ -582,10 +581,10 @@ class CRM_Mailing_Form_Upload extends CRM_Core_Form {
       }
     }
     else {
-      if (empty($params['text_message']) && !CRM_Utils_Array::value('html_message', $params)) {
+      if (empty($params['text_message']) && empty($params['html_message'])) {
         $errors['html_message'] = ts('Please provide either a Text or HTML formatted message - or both.');
       }
-      if (!empty($params['saveTemplate']) && !CRM_Utils_Array::value('saveTemplateName', $params)) {
+      if (!empty($params['saveTemplate']) && empty($params['saveTemplateName'])) {
         $errors['saveTemplateName'] = ts('Please provide a Template Name.');
       }
     }

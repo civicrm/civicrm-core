@@ -69,7 +69,7 @@ function civicrm_api3_participant_create($params) {
 
   $participantBAO = CRM_Event_BAO_Participant::create($params);
 
-  if(empty($params['price_set_id']) && empty($params['id']) && CRM_Utils_Array::value('fee_level', $params)){
+  if(empty($params['price_set_id']) && empty($params['id']) && !empty($params['fee_level'])){
     _civicrm_api3_participant_createlineitem($params, $participantBAO);
   }
   _civicrm_api3_object_to_array($participantBAO, $participant[$participantBAO->id]);

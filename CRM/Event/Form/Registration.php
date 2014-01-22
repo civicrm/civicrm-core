@@ -304,7 +304,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
       $isPayLater = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $this->_eventId, 'is_pay_later');
       //check for variour combination for paylater, payment
       //process with paid event.
-      if ($isMonetary && (!$isPayLater || CRM_Utils_Array::value('payment_processor', $this->_values['event']))) {
+      if ($isMonetary && (!$isPayLater || !empty($this->_values['event']['payment_processor']))) {
         $ppID = CRM_Utils_Array::value('payment_processor',
           $this->_values['event']
         );
@@ -532,9 +532,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
 
     $this->assign('address', CRM_Utils_Address::format($addressFields));
 
-    if ($this->_contributeMode == 'direct' &&
-      !CRM_Utils_Array::value('is_pay_later', $params)
-    ) {
+    if ($this->_contributeMode == 'direct' && empty($params['is_pay_later'])) {
       $date = CRM_Utils_Date::format(CRM_Utils_Array::value('credit_card_exp_date', $params));
       $date = CRM_Utils_Date::mysqlToIso($date);
       $this->assign('credit_card_exp_date', $date);
@@ -779,9 +777,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
       $createPayment = TRUE;
     }
 
-    if ($createPayment && $this->_values['event']['is_monetary'] &&
-      CRM_Utils_Array::value('contributionID', $this->_params)
-    ) {
+    if ($createPayment && $this->_values['event']['is_monetary'] && !empty($this->_params['contributionID'])) {
       $paymentParams = array(
         'participant_id' => $participant->id,
         'contribution_id' => $contribution->id,
@@ -791,9 +787,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
     }
 
     //set only primary participant's params for transfer checkout.
-    if (($this->_contributeMode == 'checkout' || $this->_contributeMode == 'notify')
-      && CRM_Utils_Array::value('is_primary', $this->_params)
-    ) {
+    if (($this->_contributeMode == 'checkout' || $this->_contributeMode == 'notify') && !empty($this->_params['is_primary'])) {
       $this->_params['participantID'] = $participant->id;
       $this->set('primaryParticipant', $this->_params);
     }
@@ -821,9 +815,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
       // 3. waiting list participant.
       // 4. require approval participant.
       if (!empty($this->_params['is_pay_later']) ||
-        $this->_allowWaitlist || $this->_requireApproval ||
-        !CRM_Utils_Array::value('is_monetary', $this->_values['event'])
-      ) {
+        $this->_allowWaitlist || $this->_requireApproval || empty($this->_values['event']['is_monetary'])) {
         $mail = 'email-Primary';
       }
 
@@ -909,9 +901,7 @@ WHERE  v.option_group_id = g.id
 
     // reuse id if one already exists for this one (can happen
     // with back button being hit etc)
-    if (!$participantParams['id'] &&
-      CRM_Utils_Array::value('contributionID', $params)
-    ) {
+    if (!$participantParams['id'] && !empty($params['contributionID'])) {
       $pID = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_ParticipantPayment',
         $params['contributionID'],
         'participant_id',

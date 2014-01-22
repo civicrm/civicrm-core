@@ -64,8 +64,7 @@ class CRM_Campaign_Page_AJAX {
       }
     }
 
-    if (isset($_POST['field']) &&
-      CRM_Utils_Array::value($voterId, $_POST['field']) &&
+    if (isset($_POST['field']) && !empty($_POST['field'][$voterId]) &&
       is_array($_POST['field'][$voterId])
     ) {
       foreach ($_POST['field'][$voterId] as $fieldKey => $value) {

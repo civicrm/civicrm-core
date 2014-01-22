@@ -72,9 +72,7 @@ class CRM_Utils_Mail {
     CRM_Utils_Hook::alterMailParams($params);
 
     // check if any module has aborted mail sending
-    if (!empty($params['abortMailSend']) ||
-      !CRM_Utils_Array::value('toEmail', $params)
-    ) {
+    if (!empty($params['abortMailSend']) || empty($params['toEmail'])) {
       return FALSE;
     }
 

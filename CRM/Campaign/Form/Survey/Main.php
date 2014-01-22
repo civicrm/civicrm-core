@@ -118,9 +118,7 @@ class CRM_Campaign_Form_Survey_Main extends CRM_Campaign_Form_Survey {
 
     if ($this->_surveyId) {
 
-      if (!empty($defaults['result_id']) &&
-        CRM_Utils_Array::value('recontact_interval', $defaults)
-      ) {
+      if (!empty($defaults['result_id']) && !empty($defaults['recontact_interval'])) {
 
         $resultId = $defaults['result_id'];
         $recontactInterval = unserialize($defaults['recontact_interval']);

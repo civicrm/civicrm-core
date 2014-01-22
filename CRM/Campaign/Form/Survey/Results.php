@@ -131,7 +131,7 @@ class CRM_Campaign_Form_Survey_Results extends CRM_Campaign_Form_Survey {
         'onclick' => "showOptionSelect();"), '<br/>', TRUE
     );
 
-    if (empty($optionGroups) || !CRM_Utils_Array::value('result_id', $this->_values)) {
+    if (empty($optionGroups) || empty($this->_values['result_id'])) {
       $this->setdefaults(array('option_type' => 1));
     }
     elseif (!empty($this->_values['result_id'])) {
@@ -206,24 +206,19 @@ class CRM_Campaign_Form_Survey_Results extends CRM_Campaign_Form_Survey {
    */
   static function formRule($fields, $files, $form) {
     $errors = array();
-    if (!empty($fields['option_label']) &&
-      CRM_Utils_Array::value('option_value', $fields) &&
+    if (!empty($fields['option_label']) && !empty($fields['option_value']) &&
       (count(array_filter($fields['option_label'])) == 0) &&
       (count(array_filter($fields['option_value'])) == 0)
     ) {
       $errors['option_label[1]'] = ts('Enter at least one result option.');
       return $errors;
     }
-    elseif (empty($fields['option_label']) &&
-      !CRM_Utils_Array::value('option_value', $fields)
-    ) {
+    elseif (empty($fields['option_label']) && empty($fields['option_value'])) {
       return $errors;
     }
 
     if (
-      $fields['option_type'] == 2 &&
-      !CRM_Utils_Array::value('option_group_id', $fields)
-    ) {
+      $fields['option_type'] == 2 && empty($fields['option_group_id'])) {
       $errors['option_group_id'] = ts("Please select a Survey Result Set.");
       return $errors;
     }
@@ -343,9 +338,7 @@ class CRM_Campaign_Form_Survey_Results extends CRM_Campaign_Form_Survey {
 
     $updateResultSet = FALSE;
     $resultSetOptGrpId = NULL;
-    if ((CRM_Utils_Array::value('option_type', $params) == 2) &&
-      CRM_Utils_Array::value('option_group_id', $params)
-    ) {
+    if ((CRM_Utils_Array::value('option_type', $params) == 2) && !empty($params['option_group_id'])) {
       $updateResultSet = TRUE;
       $resultSetOptGrpId = $params['option_group_id'];
     }
@@ -399,7 +392,7 @@ class CRM_Campaign_Form_Survey_Results extends CRM_Campaign_Form_Survey {
     $survey = CRM_Campaign_BAO_Survey::create($params);
 
     // create report if required.
-    if ( !$this->_reportId && $survey->id && CRM_Utils_Array::value('create_report', $params) ) {
+    if ( !$this->_reportId && $survey->id && !empty($params['create_report'])) {
       $activityStatus = CRM_Core_PseudoConstant::activityStatus('name');
       $activityStatus = array_flip($activityStatus);
       $this->_params =

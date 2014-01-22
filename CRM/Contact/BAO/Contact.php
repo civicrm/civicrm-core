@@ -272,9 +272,7 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
    */
   static function &create(&$params, $fixAddress = TRUE, $invokeHooks = TRUE, $skipDelete = FALSE) {
       $contact = NULL;
-      if (empty($params['contact_type']) &&
-        !CRM_Utils_Array::value('contact_id', $params)
-      ) {
+      if (empty($params['contact_type']) && empty($params['contact_id'])) {
         return $contact;
       }
 
@@ -1765,9 +1763,7 @@ ORDER BY civicrm_email.is_primary DESC";
       $isOptOut           = CRM_Utils_Array::value('is_opt_out', $params, FALSE);
       $data['is_opt_out'] = $isOptOut;
       // on change, create new civicrm_subscription_history entry
-      if (($wasOptOut != $isOptOut) &&
-        CRM_Utils_Array::value('contact_id', $contactDetails)
-      ) {
+      if (($wasOptOut != $isOptOut) && !empty($contactDetails['contact_id'])) {
         $shParams = array(
           'contact_id' => $contactDetails['contact_id'],
           'status' => $isOptOut ? 'Removed' : 'Added',

@@ -51,9 +51,7 @@ class CRM_Case_BAO_Query {
    * @access public
    */
   static function select(&$query) {
-    if (($query->_mode & CRM_Contact_BAO_Query::MODE_CASE) ||
-      CRM_Utils_Array::value('case_id', $query->_returnProperties)
-    ) {
+    if (($query->_mode & CRM_Contact_BAO_Query::MODE_CASE) || !empty($query->_returnProperties['case_id'])) {
       $query->_select['case_id'] = "civicrm_case.id as case_id";
       $query->_element['case_id'] = 1;
       $query->_tables['civicrm_case'] = $query->_whereTables['civicrm_case'] = 1;

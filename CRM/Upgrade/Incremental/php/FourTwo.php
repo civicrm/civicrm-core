@@ -443,7 +443,7 @@ WHERE     cpse.price_set_id IS NULL";
       if (empty($optionValue))
         return;
     }
-    elseif (empty($options['otherAmount']) && !CRM_Utils_Array::value('membership', $options)) {
+    elseif (empty($options['otherAmount']) && empty($options['membership'])) {
       //CRM-12273
       //if options group, otherAmount, membersip is empty then return, contribution should be default price set
       return;

@@ -1057,9 +1057,7 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
               if ($htmlType == 'File') {
                 $entityId = $cid;
                 if (!$cid &&
-                  $fieldType == 'Activity' &&
-                  CRM_Utils_Array::value(2, $componentWhere[0])
-                ) {
+                  $fieldType == 'Activity' && !empty($componentWhere[0][2])) {
                   $entityId = $componentWhere[0][2];
                 }
 

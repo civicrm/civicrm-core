@@ -208,13 +208,11 @@ class CRM_Contact_Form_Task_SMSCommon {
           }
         }
 
-        if ((isset($value['phone_type_id']) && $value['phone_type_id'] != CRM_Utils_Array::value('Mobile', $phoneTypes)) || $value['do_not_sms'] || empty($value['phone']) || CRM_Utils_Array::value('is_deceased', $value)) {
+        if ((isset($value['phone_type_id']) && $value['phone_type_id'] != CRM_Utils_Array::value('Mobile', $phoneTypes)) || $value['do_not_sms'] || empty($value['phone']) || !empty($value['is_deceased'])) {
 
           //if phone is not primary check if non-primary phone is "Mobile"
           if (!empty($value['phone'])
-            && $value['phone_type_id'] != CRM_Utils_Array::value('Mobile', $phoneTypes)
-            && !CRM_Utils_Array::value('is_deceased', $value)
-          ) {
+            && $value['phone_type_id'] != CRM_Utils_Array::value('Mobile', $phoneTypes) && empty($value['is_deceased'])) {
             $filter = array('do_not_sms' => 0);
             $contactPhones = CRM_Core_BAO_Phone::allPhones($contactId, FALSE, 'Mobile', $filter);
             if (count($contactPhones) > 0) {
@@ -350,8 +348,7 @@ class CRM_Contact_Form_Task_SMSCommon {
     $fromSmsProviderId = $thisValues['sms_provider_id'];
 
     // process message template
-    if (!empty($thisValues['saveTemplate']) || CRM_Utils_Array::value('updateTemplate', $thisValues)
-    ) {
+    if (!empty($thisValues['saveTemplate']) || !empty($thisValues['updateTemplate'])) {
       $messageTemplate = array(
         'msg_text' => $thisValues['text_message'],
         'is_active' => TRUE,
@@ -362,9 +359,7 @@ class CRM_Contact_Form_Task_SMSCommon {
         CRM_Core_BAO_MessageTemplate::add($messageTemplate);
       }
 
-      if (!empty($thisValues['template']) &&
-        CRM_Utils_Array::value('updateTemplate', $thisValues)
-      ) {
+      if (!empty($thisValues['template']) && !empty($thisValues['updateTemplate'])) {
         $messageTemplate['id'] = $thisValues['template'];
         unset($messageTemplate['msg_title']);
         CRM_Core_BAO_MessageTemplate::add($messageTemplate);

@@ -848,9 +848,7 @@ Group By  componentId";
     $skipFields = array('is_primary', 'location_type_id', 'is_billing', 'master_id');
     foreach ($address as & $values) {
       // 2. check if master id exists, if not continue
-      if (empty($values['master_id']) ||
-        !CRM_Utils_Array::value('use_shared_address', $values)
-      ) {
+      if (empty($values['master_id']) || empty($values['use_shared_address'])) {
         // we should unset master id when use uncheck share address for existing address
         $values['master_id'] = 'null';
         continue;

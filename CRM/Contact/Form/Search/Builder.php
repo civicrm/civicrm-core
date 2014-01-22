@@ -146,7 +146,7 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
    * @access public
    */
   static function formRule($values, $files, $self) {
-    if (!empty($values['addMore']) || CRM_Utils_Array::value('addBlock', $values)) {
+    if (!empty($values['addMore']) || !empty($values['addBlock'])) {
       return TRUE;
     }
     $fields = self::fields();

@@ -64,9 +64,7 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
    * @access public
    */
   public static function dataExists(&$params) {
-    if (!empty($params['source_contact_id']) ||
-      CRM_Utils_Array::value('id', $params)
-    ) {
+    if (!empty($params['source_contact_id']) || !empty($params['id'])) {
       return TRUE;
     }
     return FALSE;
@@ -294,10 +292,7 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
       unset($params['id']);
     }
 
-    if (empty($params['status_id']) &&
-      !CRM_Utils_Array::value('activity_status_id', $params) &&
-      !CRM_Utils_Array::value('id', $params)
-    ) {
+    if (empty($params['status_id']) && empty($params['activity_status_id']) && empty($params['id'])) {
       if (isset($params['activity_date_time']) &&
         strcmp($params['activity_date_time'], CRM_Utils_Date::processDate(date('Ymd')) == -1)
       ) {

@@ -112,8 +112,7 @@ class CRM_Event_BAO_Event extends CRM_Event_DAO_Event {
     else {
       CRM_Utils_Hook::post('create', 'Event', $event->id, $event);
     }
-    if ($financialTypeId && CRM_Utils_Array::value('financial_type_id', $params)
-      && $financialTypeId != $params['financial_type_id']) {
+    if ($financialTypeId && !empty($params['financial_type_id']) && $financialTypeId != $params['financial_type_id']) {
       CRM_Price_BAO_PriceFieldValue::updateFinancialType($params['id'], 'civicrm_event', $params['financial_type_id']);
     }
     return $result;
@@ -1106,7 +1105,7 @@ WHERE civicrm_event.is_active = 1
 
         // CRM-13890 : NOTE wait list condition need to be given so that
         // wait list message is shown properly in email i.e. WRT online event registration template
-        if (empty($tplParams['participant_status']) && !CRM_Utils_Array::value('isOnWaitlist', $values['params'])) {
+        if (empty($tplParams['participant_status']) && empty($values['params']['isOnWaitlist'])) {
           $statusId = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Participant', $participantId, 'status_id', 'id');
           $tplParams['participant_status'] = CRM_Event_PseudoConstant::participantStatus($statusId, NULL, 'label');
         }
@@ -1942,8 +1941,7 @@ WHERE  ce.loc_block_id = $locBlockId";
       $eventEmail       = array();
 
       CRM_Core_DAO::commonRetrieve('CRM_Event_DAO_Event', $params, $eventEmail, $returnProperties);
-      if (!empty($eventEmail['confirm_from_name']) && CRM_Utils_Array::value('confirm_from_email', $eventEmail)
-      ) {
+      if (!empty($eventEmail['confirm_from_name']) && !empty($eventEmail['confirm_from_email'])) {
         $eventEmailId = "{$eventEmail['confirm_from_name']} <{$eventEmail['confirm_from_email']}>";
 
         $fromEmailValues['from_email_id'][$eventEmailId] = htmlspecialchars($eventEmailId);

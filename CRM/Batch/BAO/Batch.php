@@ -66,7 +66,7 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
 
     $batch = new CRM_Batch_DAO_Batch();
     $batch->copyValues($params);
-    if ($context == 'financialBatch' && CRM_Utils_Array::value('batchID', $ids)) {
+    if ($context == 'financialBatch' && !empty($ids['batchID'])) {
       $batch->id = $ids['batchID'];
     }
     $batch->save();

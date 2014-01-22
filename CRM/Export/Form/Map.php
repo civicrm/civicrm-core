@@ -119,7 +119,7 @@ class CRM_Export_Form_Map extends CRM_Core_Form {
   static function formRule($fields, $values, $mappingTypeId) {
     $errors = array();
 
-    if (!empty($fields['saveMapping']) && CRM_Utils_Array::value('_qf_Map_next', $fields)) {
+    if (!empty($fields['saveMapping']) && !empty($fields['_qf_Map_next'])) {
       $nameField = CRM_Utils_Array::value('saveMappingName', $fields);
       if (empty($nameField)) {
         $errors['saveMappingName'] = ts('Name is required to save Export Mapping');

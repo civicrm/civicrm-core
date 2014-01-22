@@ -48,7 +48,7 @@ class CRM_Contact_Form_Task_LabelCommon {
   function tokenIsFound($contact, $mailingFormatProperties, $tokenFields) {
     foreach (array_merge($mailingFormatProperties, array_fill_keys($tokenFields, 1)) as $key => $dontCare) {
       //we should not consider addressee for data exists, CRM-6025
-       if ($key != 'addressee' && CRM_Utils_Array::value($key, $contact)) {
+       if ($key != 'addressee' && !empty($contact[$key])) {
         return TRUE;
       }
     }
@@ -188,7 +188,7 @@ class CRM_Contact_Form_Task_LabelCommon {
       // we need to remove all the "_id"
       unset($contact['contact_id']);
 
-      if ($locName && CRM_Utils_Array::value($locName, $contact)) {
+      if ($locName && !empty($contact[$locName])) {
         // If location type is not primary, $contact contains
         // one more array as "$contact[$locName] = array( values... )"
 

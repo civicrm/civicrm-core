@@ -647,8 +647,7 @@ class CRM_Contact_BAO_Query {
       }
 
       $cfID = CRM_Core_BAO_CustomField::getKeyID($name);
-      if (!empty($this->_paramLookup[$name]) ||
-        CRM_Utils_Array::value($name, $this->_returnProperties) ||
+      if (!empty($this->_paramLookup[$name]) || !empty($this->_returnProperties[$name]) ||
         $makeException
       ) {
         if ($cfID) {
@@ -838,9 +837,7 @@ class CRM_Contact_BAO_Query {
         }
       }
 
-      if ($cfID &&
-        CRM_Utils_Array::value('is_search_range', $field)
-      ) {
+      if ($cfID && !empty($field['is_search_range'])) {
         // this is a custom field with range search enabled, so we better check for two/from values
         if (!empty($this->_paramLookup[$name . '_from'])) {
           if (!array_key_exists($cfID, $this->_cfIDs)) {
@@ -1833,7 +1830,7 @@ class CRM_Contact_BAO_Query {
     $grouping = CRM_Utils_Array::value(3, $values);
     $wildcard = CRM_Utils_Array::value(4, $values);
 
-    if (isset($grouping) && !CRM_Utils_Array::value($grouping, $this->_where)) {
+    if (isset($grouping) && empty($this->_where[$grouping])) {
       $this->_where[$grouping] = array();
     }
 
@@ -2282,27 +2279,21 @@ class CRM_Contact_BAO_Query {
       $tables = array_merge(array('civicrm_country' => 1), $tables);
     }
 
-    if ((CRM_Utils_Array::value('civicrm_state_province', $tables) ||
-        CRM_Utils_Array::value('civicrm_country', $tables) ||
+    if ((!empty($tables['civicrm_state_province']) || !empty($tables['civicrm_country']) ||
         CRM_Utils_Array::value('civicrm_county', $tables)
-      ) &&
-      !CRM_Utils_Array::value('civicrm_address', $tables)
-    ) {
+      ) && empty($tables['civicrm_address'])) {
       $tables = array_merge(array('civicrm_address' => 1),
         $tables
       );
     }
 
     // add group_contact table if group table is present
-    if (!empty($tables['civicrm_group']) &&
-      !CRM_Utils_Array::value('civicrm_group_contact', $tables)
-    ) {
+    if (!empty($tables['civicrm_group']) && empty($tables['civicrm_group_contact'])) {
       $tables['civicrm_group_contact'] = " LEFT JOIN civicrm_group_contact ON civicrm_group_contact.contact_id = contact_a.id AND civicrm_group_contact.status = 'Added'";
     }
 
     // add group_contact and group table is subscription history is present
-    if (!empty($tables['civicrm_subscription_history']) && !CRM_Utils_Array::value('civicrm_group', $tables)
-    ) {
+    if (!empty($tables['civicrm_subscription_history']) && empty($tables['civicrm_group'])) {
       $tables = array_merge(array(
         'civicrm_group' => 1,
           'civicrm_group_contact' => 1,

@@ -94,7 +94,7 @@ class CRM_Event_Page_EventInfo extends CRM_Core_Page {
     $this->assign('isShowLocation', CRM_Utils_Array::value('is_show_location', $values['event']));
 
     // show event fees.
-    if ($this->_id && CRM_Utils_Array::value('is_monetary', $values['event'])) {
+    if ($this->_id && !empty($values['event']['is_monetary'])) {
       //CRM-6907
       $config = CRM_Core_Config::singleton();
       $config->defaultCurrency = CRM_Utils_Array::value('currency',
@@ -163,7 +163,7 @@ class CRM_Event_Page_EventInfo extends CRM_Core_Page {
     $this->assign('action', CRM_Core_Action::VIEW);
     //To show the event location on maps directly on event info page
     $locations = CRM_Event_BAO_Event::getMapInfo($this->_id);
-    if (!empty($locations) && CRM_Utils_Array::value('is_map', $values['event'])) {
+    if (!empty($locations) && !empty($values['event']['is_map'])) {
       $this->assign('locations', $locations);
       $this->assign('mapProvider', $config->mapProvider);
       $this->assign('mapKey', $config->mapAPIKey);

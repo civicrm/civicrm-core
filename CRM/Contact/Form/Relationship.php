@@ -469,9 +469,7 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
     // store the submitted values in an array
     $params = $this->controller->exportValues($this->_name);
     $quickSave = FALSE;
-    if (!empty($_POST['_qf_Relationship_refresh_save']) ||
-      CRM_Utils_Array::value('_qf_Relationship_refresh_savedetails', $_POST)
-    ) {
+    if (!empty($_POST['_qf_Relationship_refresh_save']) || !empty($_POST['_qf_Relationship_refresh_savedetails'])) {
       $quickSave = TRUE;
     }
 
@@ -635,9 +633,7 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
         $orgId = $params['employee_of'];
       }
       elseif ($this->_action & CRM_Core_Action::UPDATE) {
-        if (!empty($params['is_current_employer']) &&
-          CRM_Utils_Array::value('is_active', $params)
-        ) {
+        if (!empty($params['is_current_employer']) && !empty($params['is_active'])) {
           if (CRM_Utils_Array::value('contactTarget', $ids) !=
             CRM_Utils_Array::value('current_employer_id', $this->_values)
           ) {
@@ -710,8 +706,7 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
    */
   static function formRule($params, $files, $form) {
     // hack, no error check for refresh
-    if (!empty($_POST['_qf_Relationship_refresh']) ||
-      CRM_Utils_Array::value('_qf_Relationship_refresh_save', $_POST) ||
+    if (!empty($_POST['_qf_Relationship_refresh']) || !empty($_POST['_qf_Relationship_refresh_save']) ||
       CRM_Utils_Array::value('_qf_Relationship_refresh_savedetails', $_POST)
     ) {
       return TRUE;
@@ -759,8 +754,7 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
       }
     }
 
-    if (!empty($params['employer_of']) &&
-      CRM_Utils_Array::value('contact_check', $params) &&
+    if (!empty($params['employer_of']) && !empty($params['contact_check']) &&
       array_diff(array_keys($params['employer_of']), array_keys($params['contact_check']))
     ) {
       if ($form->_callAjax) {
@@ -787,9 +781,7 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
     $errors = array();
 
     // check start and end date
-    if (!empty($params['start_date']) &&
-      CRM_Utils_Array::value('end_date', $params)
-    ) {
+    if (!empty($params['start_date']) && !empty($params['end_date'])) {
       $start_date = CRM_Utils_Date::format(CRM_Utils_Array::value('start_date', $params));
       $end_date = CRM_Utils_Date::format(CRM_Utils_Array::value('end_date', $params));
       if ($start_date && $end_date && (int ) $end_date < (int ) $start_date) {

@@ -101,9 +101,7 @@ class CRM_Contact_BAO_GroupOrganization extends CRM_Contact_DAO_GroupOrganizatio
    */
   static function dataExists($params) {
     // return if no data present
-    if (!empty($params['organization_id']) &&
-      CRM_Utils_Array::value('group_id', $params)
-    ) {
+    if (!empty($params['organization_id']) && !empty($params['group_id'])) {
       return TRUE;
     }
     return FALSE;

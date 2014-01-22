@@ -188,9 +188,7 @@ class CRM_Report_BAO_ReportInstance extends CRM_Report_DAO_ReportInstance {
 
     // add / update navigation as required
     if (!empty($navigationParams)) {
-      if (empty($params['id']) &&
-        !CRM_Utils_Array::value('instance_id',$params) &&
-        CRM_Utils_Array::value('id', $navigationParams)) {
+      if (empty($params['id']) && empty($params['instance_id']) && !empty($navigationParams['id'])) {
         unset($navigationParams['id']);
       }
       $navigationParams['url'] = "civicrm/report/instance/{$instance->id}&reset=1";

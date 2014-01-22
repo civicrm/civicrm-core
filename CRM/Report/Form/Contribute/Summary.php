@@ -363,9 +363,7 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
           if ($tableName == 'civicrm_address') {
             $this->_addressField = TRUE;
           }
-          if (!empty($field['required']) ||
-            CRM_Utils_Array::value($fieldName, $this->_params['fields'])
-          ) {
+          if (!empty($field['required']) || !empty($this->_params['fields'][$fieldName])) {
 
             // only include statistics columns if set
             if (!empty($field['statistics'])) {
@@ -436,8 +434,7 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
 
   function from() {
     $softCreditJoin = "LEFT";
-    if (!empty($this->_params['fields']['soft_amount']) &&
-      !CRM_Utils_Array::value('total_amount', $this->_params['fields'])) {
+    if (!empty($this->_params['fields']['soft_amount']) && empty($this->_params['fields']['total_amount'])) {
       // if its only soft credit stats, use inner join
       $softCreditJoin = "INNER";
     }
@@ -482,9 +479,7 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
                 $this->assign('chartSupported', TRUE);
               }
 
-              if (!empty($table['group_bys'][$fieldName]['frequency']) &&
-                CRM_Utils_Array::value($fieldName, $this->_params['group_bys_freq'])
-              ) {
+              if (!empty($table['group_bys'][$fieldName]['frequency']) && !empty($this->_params['group_bys_freq'][$fieldName])) {
 
                 $append = "YEAR({$field['dbAlias']}),";
                 if (in_array(strtolower($this->_params['group_bys_freq'][$fieldName]),
@@ -654,11 +649,8 @@ ROUND(AVG({$this->_aliases['civicrm_contribution_soft']}.amount), 2) as civicrm_
 
     foreach ($rows as $rowNum => $row) {
       // make count columns point to detail report
-      if (!empty($this->_params['group_bys']['receive_date']) &&
-        CRM_Utils_Array::value('civicrm_contribution_receive_date_start', $row) &&
-        CRM_Utils_Array::value('civicrm_contribution_receive_date_start', $row) &&
-        CRM_Utils_Array::value('civicrm_contribution_receive_date_subtotal', $row)
-      ) {
+      if (!empty($this->_params['group_bys']['receive_date']) && !empty($row['civicrm_contribution_receive_date_start']) &&
+        CRM_Utils_Array::value('civicrm_contribution_receive_date_start', $row) && !empty($row['civicrm_contribution_receive_date_subtotal'])) {
 
         $dateStart = CRM_Utils_Date::customFormat($row['civicrm_contribution_receive_date_start'], '%Y%m%d');
         $endDate   = new DateTime($dateStart);

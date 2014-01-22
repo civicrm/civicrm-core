@@ -221,9 +221,7 @@ class CRM_Report_Form_Contribute_OrganizationSummary extends CRM_Report_Form {
     foreach ($this->_columns as $tableName => $table) {
       if (array_key_exists('fields', $table)) {
         foreach ($table['fields'] as $fieldName => $field) {
-          if (!empty($field['required']) ||
-            CRM_Utils_Array::value($fieldName, $this->_params['fields'])
-          ) {
+          if (!empty($field['required']) || !empty($this->_params['fields'][$fieldName])) {
             if ($tableName == 'civicrm_address') {
               $this->_addressField = TRUE;
             }
@@ -449,10 +447,8 @@ class CRM_Report_Form_Contribute_OrganizationSummary extends CRM_Report_Form {
       }
 
       // convert Organization display name to links
-      if (array_key_exists('civicrm_contact_organization_organization_name', $row) &&
-        CRM_Utils_Array::value('civicrm_contact_organization_organization_name',
-          $rows[$rowNum]
-        ) &&
+      if (array_key_exists('civicrm_contact_organization_organization_name', $row) && !empty($rows[$rowNum]
+['civicrm_contact_organization_organization_name']) &&
         array_key_exists('civicrm_contact_organization_id', $row)
       ) {
         $url = CRM_Utils_System::url('civicrm/contact/view',

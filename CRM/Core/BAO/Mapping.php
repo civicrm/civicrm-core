@@ -376,9 +376,7 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
       //build the common contact fields array.
       $fields['Contact'] = array();
       foreach ($fields['Individual'] as $key => $value) {
-        if (!empty($fields['Household'][$key]) &&
-            CRM_Utils_Array::value($key, $fields['Organization'])
-            ) {
+        if (!empty($fields['Household'][$key]) && !empty($fields['Organization'][$key])) {
           $fields['Contact'][$key] = $value;
           unset($fields['Organization'][$key],
                 $fields['Household'][$key],

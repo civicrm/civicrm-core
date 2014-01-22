@@ -78,9 +78,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
 
     CRM_Utils_Hook::eventDiscount($this, $this->_params);
 
-    if (!empty($this->_params[0]['discount']) &&
-      CRM_Utils_Array::value('applied', $this->_params[0]['discount'])
-    ) {
+    if (!empty($this->_params[0]['discount']) && !empty($this->_params[0]['discount']['applied'])) {
       $this->set('hookDiscount', $this->_params[0]['discount']);
       $this->assign('hookDiscount', $this->_params[0]['discount']);
     }
@@ -241,7 +239,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
             }
           }
 
-          if (!empty($v['first_name']) && CRM_Utils_Array::value('last_name', $v)) {
+          if (!empty($v['first_name']) && !empty($v['last_name'])) {
             $append = $v['first_name'] . ' ' . $v['last_name'];
           }
           else {
@@ -361,8 +359,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
     //consider total amount.
     $this->assign('isAmountzero', ($this->_totalAmount <= 0) ? TRUE : FALSE);
 
-    if ($this->_paymentProcessor['payment_processor_type'] == 'Google_Checkout' &&
-      !CRM_Utils_Array::value('is_pay_later', $this->_params[0]) && !($this->_params[0]['amount'] == 0) &&
+    if ($this->_paymentProcessor['payment_processor_type'] == 'Google_Checkout' && empty($this->_params[0]['is_pay_later']) && !($this->_params[0]['amount'] == 0) &&
       !$this->_allowWaitlist && !$this->_requireApproval
     ) {
       $this->_checkoutButtonName = $this->getButtonName('next', 'checkout');
@@ -463,13 +460,9 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
 
     // if a discount has been applied, lets now deduct it from the amount
     // and fix the fee level
-    if (!empty($this->_params[0]['discount']) &&
-      CRM_Utils_Array::value('applied', $this->_params[0]['discount'])
-    ) {
+    if (!empty($this->_params[0]['discount']) && !empty($this->_params[0]['discount']['applied'])) {
       foreach ($this->_params as $k => $v) {
-        if (CRM_Utils_Array::value('amount', $this->_params[$k]) > 0 &&
-          CRM_Utils_Array::value('discountAmount', $this->_params[$k])
-        ) {
+        if (CRM_Utils_Array::value('amount', $this->_params[$k]) > 0 && !empty($this->_params[$k]['discountAmount'])) {
           $this->_params[$k]['amount'] -= $this->_params[$k]['discountAmount'];
           $this->_params[$k]['amount_level'] .= CRM_Utils_Array::value('discountMessage', $this->_params[$k]);
         }
@@ -516,9 +509,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       $this->fixLocationFields($value, $fields);
       //unset the billing parameters if it is pay later mode
       //to avoid creation of billing location
-      if ($this->_allowWaitlist || $this->_requireApproval ||
-        CRM_Utils_Array::value('is_pay_later', $value) || !CRM_Utils_Array::value('is_primary', $value)
-      ) {
+      if ($this->_allowWaitlist || $this->_requireApproval || !empty($value['is_pay_later']) || empty($value['is_primary'])) {
         $billingFields = array(
           "email-{$this->_bltID}",
           'billing_first_name',
@@ -559,7 +550,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       // we dont store in userID in case the user is doing multiple
       // transactions etc
       // for things like tell a friend
-      if (!$this->getContactID() && CRM_Utils_Array::value('is_primary', $value)) {
+      if (!$this->getContactID() && !empty($value['is_primary'])) {
         $session = CRM_Core_Session::singleton();
         $session->set('transaction.userID', $contactID);
       }
@@ -604,7 +595,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
             $value['participant_status_id'] = $value['participant_status'] = array_search($status, $pendingStatuses);
           }
         }
-        elseif ($this->_contributeMode == 'express' && CRM_Utils_Array::value('is_primary', $value)) {
+        elseif ($this->_contributeMode == 'express' && !empty($value['is_primary'])) {
           if (is_object($payment))
             $result = $payment->doExpressCheckout($value);
           else
@@ -648,7 +639,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
           $createContrib = TRUE;
         }
 
-        if ($createContrib && CRM_Utils_Array::value('is_primary', $value) &&
+        if ($createContrib && !empty($value['is_primary']) &&
           !$this->_allowWaitlist && !$this->_requireApproval
         ) {
           // if paid event add a contribution record
@@ -682,7 +673,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
         $value['currencyID'] = $primaryCurrencyID;
       }
 
-      if (!$pending && CRM_Utils_Array::value('is_primary', $value) &&
+      if (!$pending && !empty($value['is_primary']) &&
         !$this->_allowWaitlist && !$this->_requireApproval
       ) {
         // transactionID & receive date required while building email template
@@ -766,8 +757,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
     // for Transfer checkout.
     if (($this->_contributeMode == 'checkout' ||
         $this->_contributeMode == 'notify'
-      ) &&
-      !CRM_Utils_Array::value('is_pay_later', $params[0]) &&
+      ) && empty($params[0]['is_pay_later']) &&
       !$this->_allowWaitlist && !$this->_requireApproval &&
       $this->_totalAmount > 0
     ) {
@@ -962,14 +952,12 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
     }
 
     //create an contribution address
-    if ($form->_contributeMode != 'notify' && !CRM_Utils_Array::value('is_pay_later', $params)) {
+    if ($form->_contributeMode != 'notify' && empty($params['is_pay_later'])) {
       $contribParams['address_id'] = CRM_Contribute_BAO_Contribution::createAddress($params, $form->_bltID);
     }
 
     // Prepare soft contribution due to pcp or Submit Credit / Debit Card Contribution by admin.
-    if (!empty($params['pcp_made_through_id']) ||
-      CRM_Utils_Array::value('soft_credit_to', $params)
-    ) {
+    if (!empty($params['pcp_made_through_id']) || !empty($params['soft_credit_to'])) {
 
       // if its due to pcp
       if (!empty($params['pcp_made_through_id'])) {
@@ -1036,14 +1024,11 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
     $fields['email-Primary'] = 1;
 
     //if its pay later or additional participant set email address as primary.
-    if ((CRM_Utils_Array::value('is_pay_later', $params) ||
-        !CRM_Utils_Array::value('is_primary', $params) ||
+    if ((!empty($params['is_pay_later']) || empty($params['is_primary']) ||
         !$this->_values['event']['is_monetary'] ||
         $this->_allowWaitlist ||
         $this->_requireApproval
-      ) &&
-      CRM_Utils_Array::value("email-{$this->_bltID}", $params)
-    ) {
+      ) && !empty($params["email-{$this->_bltID}"])) {
       $params['email-Primary'] = $params["email-{$this->_bltID}"];
     }
   }

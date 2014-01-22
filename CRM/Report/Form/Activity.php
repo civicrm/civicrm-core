@@ -579,8 +579,7 @@ GROUP BY civicrm_activity_id {$this->_having} {$this->_orderBy}";
     //Assign those recordtype to array which have filter operator as 'Is not empty' or 'Is empty'
     $nullFilters = array();
     foreach (array('target', 'source', 'assignee') as $type) {
-      if (CRM_Utils_Array::value("contact_{$type}_op", $this->_params) == 'nnll' ||
-        CRM_Utils_Array::value("contact_{$type}_value", $this->_params)) {
+      if (CRM_Utils_Array::value("contact_{$type}_op", $this->_params) == 'nnll' || !empty($this->_params["contact_{$type}_value"])) {
         $nullFilters[] = " civicrm_contact_contact_{$type} IS NOT NULL ";
       }
       else if (CRM_Utils_Array::value("contact_{$type}_op", $this->_params) == 'nll') {

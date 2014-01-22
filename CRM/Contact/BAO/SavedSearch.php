@@ -169,9 +169,7 @@ class CRM_Contact_BAO_SavedSearch extends CRM_Contact_DAO_SavedSearch {
 
   static function contactIDsSQL($id) {
     $params = self::getSearchParams($id);
-    if ($params &&
-      CRM_Utils_Array::value('customSearchID', $params)
-    ) {
+    if ($params && !empty($params['customSearchID'])) {
       return CRM_Contact_BAO_SearchCustom::contactIDSQL(NULL, $id);
     }
     else {

@@ -927,7 +927,7 @@ SELECT case_status.label AS case_status, status_id, case_type.label AS case_type
 
     $res = CRM_Core_DAO::executeQuery($query, CRM_Core_DAO::$_nullArray);
     while ($res->fetch()) {
-      if (!empty($rows[$res->case_type]) && CRM_Utils_Array::value($res->case_status, $rows[$res->case_type])) {
+      if (!empty($rows[$res->case_type]) && !empty($rows[$res->case_type][$res->case_status])) {
         $rows[$res->case_type][$res->case_status]['count'] = $rows[$res->case_type][$res->case_status]['count'] + 1;
       }
       else {

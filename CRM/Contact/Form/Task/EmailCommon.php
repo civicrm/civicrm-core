@@ -204,7 +204,7 @@ class CRM_Contact_Form_Task_EmailCommon {
       // perform all validations
       foreach ($form->_allContactIds as $key => $contactId) {
         $value = $form->_contactDetails[$contactId];
-        if ($value['do_not_email'] || empty($value['email']) || CRM_Utils_Array::value('is_deceased', $value) || $value['on_hold']) {
+        if ($value['do_not_email'] || empty($value['email']) || !empty($value['is_deceased']) || $value['on_hold']) {
           $suppressedEmails++;
 
           // unset contact details for contacts that we won't be sending email. This is prevent extra computation
@@ -381,8 +381,7 @@ class CRM_Contact_Form_Task_EmailCommon {
     }
 
     // process message template
-    if (!empty($formValues['saveTemplate']) || CRM_Utils_Array::value('updateTemplate', $formValues)
-    ) {
+    if (!empty($formValues['saveTemplate']) || !empty($formValues['updateTemplate'])) {
       $messageTemplate = array(
         'msg_text' => $formValues['text_message'],
         'msg_html' => $formValues['html_message'],
@@ -395,9 +394,7 @@ class CRM_Contact_Form_Task_EmailCommon {
         CRM_Core_BAO_MessageTemplate::add($messageTemplate);
       }
 
-      if (!empty($formValues['template']) &&
-        CRM_Utils_Array::value('updateTemplate', $formValues)
-      ) {
+      if (!empty($formValues['template']) && !empty($formValues['updateTemplate'])) {
         $messageTemplate['id'] = $formValues['template'];
         unset($messageTemplate['msg_title']);
         CRM_Core_BAO_MessageTemplate::add($messageTemplate);

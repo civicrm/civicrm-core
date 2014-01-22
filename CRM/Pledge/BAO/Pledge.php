@@ -198,9 +198,7 @@ class CRM_Pledge_BAO_Pledge extends CRM_Pledge_DAO_Pledge {
     }
 
     // skip payment stuff inedit mode
-    if (!isset($params['id']) ||
-      CRM_Utils_Array::value('is_pledge_pending', $params)
-    ) {
+    if (!isset($params['id']) || !empty($params['is_pledge_pending'])) {
 
 
       //if pledge is pending delete all payments and recreate.

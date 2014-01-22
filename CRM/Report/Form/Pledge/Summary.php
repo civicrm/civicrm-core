@@ -265,9 +265,7 @@ class CRM_Report_Form_Pledge_Summary extends CRM_Report_Form {
                 $this->assign('chartSupported', TRUE);
               }
 
-              if (!empty($table['group_bys'][$fieldName]['frequency']) &&
-                CRM_Utils_Array::value($fieldName, $this->_params['group_bys_freq'])
-              ) {
+              if (!empty($table['group_bys'][$fieldName]['frequency']) && !empty($this->_params['group_bys_freq'][$fieldName])) {
 
                 $append = "YEAR({$field['dbAlias']}),";
                 if (in_array(strtolower($this->_params['group_bys_freq'][$fieldName]),

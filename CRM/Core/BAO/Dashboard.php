@@ -123,7 +123,7 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
 
     $allDashlets = CRM_Utils_Array::index(array('name'), $getDashlets['values']);
     $defaultDashlets = array();
-    if (!$hasDashlets && CRM_Utils_Array::value('blog', $allDashlets)) {
+    if (!$hasDashlets && !empty($allDashlets['blog'])) {
       $defaultDashlets['blog'] = array(
         'dashboard_id' => $allDashlets['blog']['id'],
         'is_active' => 1,

@@ -284,11 +284,11 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
     switch ($this->_contactType) {
       case 'Individual':
         $missingNames = array();
-        if ($this->_firstNameIndex < 0 || !CRM_Utils_Array::value($this->_firstNameIndex, $values)) {
+        if ($this->_firstNameIndex < 0 || empty($values[$this->_firstNameIndex])) {
           $errorRequired = TRUE;
           $missingNames[] = ts('First Name');
         }
-        if ($this->_lastNameIndex < 0 || !CRM_Utils_Array::value($this->_lastNameIndex, $values)) {
+        if ($this->_lastNameIndex < 0 || empty($values[$this->_lastNameIndex])) {
           $errorRequired = TRUE;
           $missingNames[] = ts('Last Name');
         }
@@ -299,14 +299,14 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
         break;
 
       case 'Household':
-        if ($this->_householdNameIndex < 0 || !CRM_Utils_Array::value($this->_householdNameIndex, $values)) {
+        if ($this->_householdNameIndex < 0 || empty($values[$this->_householdNameIndex])) {
           $errorRequired = TRUE;
           $errorMessage = ts('Missing required fields:') . ' ' . ts('Household Name');
         }
         break;
 
       case 'Organization':
-        if ($this->_organizationNameIndex < 0 || !CRM_Utils_Array::value($this->_organizationNameIndex, $values)) {
+        if ($this->_organizationNameIndex < 0 || empty($values[$this->_organizationNameIndex])) {
           $errorRequired = TRUE;
           $errorMessage = ts('Missing required fields:') . ' ' . ts('Organization Name');
         }
@@ -319,7 +319,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
       /* If we don't have the required fields, bail */
 
       if ($this->_contactType == 'Individual' && !$this->_updateWithId) {
-        if ($errorRequired && !CRM_Utils_Array::value($this->_emailIndex, $values)) {
+        if ($errorRequired && empty($values[$this->_emailIndex])) {
           if ($errorMessage) {
             $errorMessage .= ' ' . ts('OR') . ' ' . ts('Email Address');
           }
@@ -478,7 +478,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
     }
 
     //check if external identifier exists in database
-    if (!empty($params['external_identifier']) && (CRM_Utils_Array::value('id', $params) || in_array($onDuplicate, array(
+    if (!empty($params['external_identifier']) && (!empty($params['id']) || in_array($onDuplicate, array(
             CRM_Import_Parser::DUPLICATE_SKIP,
             CRM_Import_Parser::DUPLICATE_NOCHECK,
           )))) {
@@ -515,7 +515,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
 
     //get contact id to format common data in update/fill mode,
     //if external identifier is present, CRM-4423
-    if ($this->_updateWithId && !CRM_Utils_Array::value('id', $params) && CRM_Utils_Array::value('external_identifier', $params)) {
+    if ($this->_updateWithId && empty($params['id']) && !empty($params['external_identifier'])) {
       if ($cid = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $params['external_identifier'], 'id', 'external_identifier')) {
         $formatted['id'] = $cid;
       }
@@ -529,7 +529,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
     // Support Match and Update Via Contact ID
     if ($this->_updateWithId) {
       $createNewContact = FALSE;
-      if (empty($params['id']) && CRM_Utils_Array::value('external_identifier', $params)) {
+      if (empty($params['id']) && !empty($params['external_identifier'])) {
         if ($cid) {
           $params['id'] = $cid;
         }
@@ -788,7 +788,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
           if (in_array($onDuplicate, array(
                 CRM_Import_Parser::DUPLICATE_UPDATE,
                 CRM_Import_Parser::DUPLICATE_FILL,
-              )) && CRM_Utils_Array::value('id', $params[$key])) {
+              )) && !empty($params[$key]['id'])) {
             $relatedContactType = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $params[$key]['id'], 'contact_type');
             if (!$relatedContactType) {
               $errorMessage = ts("No contact found for this related contact ID: %1", array(1 => $params[$key]['id']));
@@ -1683,7 +1683,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
     //get the id of the contact whose street address is not parsable, CRM-5886
     if ($this->_parseStreetAddress && is_object($newContact) && property_exists($newContact, 'address') && $newContact->address) {
       foreach ($newContact->address as $address) {
-        if (!empty($address['street_address']) && (!CRM_Utils_Array::value('street_number', $address) || !CRM_Utils_Array::value('street_name', $address))) {
+        if (!empty($address['street_address']) && (empty($address['street_number']) || empty($address['street_name']))) {
           $this->_unparsedStreetAddressContacts[] = array(
             'id' => $newContact->id,
             'streetAddress' => $address['street_address'],
@@ -1957,7 +1957,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
         case 'AdvMulti-Select':
         case 'Multi-Select':
 
-          if (!empty($formatted[$key]) && CRM_Utils_Array::value( $key, $params ) ) {
+          if (!empty($formatted[$key]) && !empty($params[$key])) {
             $mulValues       = explode( ',', $formatted[$key] );
             $customOption    = CRM_Core_BAO_CustomOption::getCustomOption( $customFieldID, true );
             $formatted[$key] = array( );
@@ -2009,7 +2009,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
 
           //street address consider to be parsed properly,
           //If we get street_name and street_number.
-          if (empty($parsedFields['street_name']) || !CRM_Utils_Array::value('street_number', $parsedFields)) {
+          if (empty($parsedFields['street_name']) || empty($parsedFields['street_number'])) {
             $parsedFields = array_fill_keys(array_keys($parsedFields), '');
           }
 

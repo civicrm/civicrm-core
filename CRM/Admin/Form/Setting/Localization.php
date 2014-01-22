@@ -223,7 +223,7 @@ class CRM_Admin_Form_Setting_Localization extends CRM_Admin_Form_Setting {
 
     // CRM-7962, CRM-7713, CRM-9004
     if (!empty($fields['defaultContactCountry']) &&
-      (CRM_Utils_Array::value('countryLimit', $fields) &&
+      (!empty($fields['countryLimit']) &&
         (!in_array($fields['defaultContactCountry'], $fields['countryLimit']))
       )
     ) {

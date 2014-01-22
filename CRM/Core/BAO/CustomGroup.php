@@ -129,7 +129,7 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
         'is_multiple'
       );
 
-      if ((CRM_Utils_Array::value('is_multiple', $params) || $isMultiple) &&
+      if ((!empty($params['is_multiple']) || $isMultiple) &&
         ($params['is_multiple'] != $isMultiple)
       ) {
         $oldTableName = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup',

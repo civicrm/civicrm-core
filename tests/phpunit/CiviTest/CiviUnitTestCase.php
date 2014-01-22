@@ -910,9 +910,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    */
   private function _contactCreate($params) {
     $result = $this->callAPISuccess('contact', 'create', $params);
-    if (!empty($result['is_error']) ||
-      !CRM_Utils_Array::value('id', $result)
-    ) {
+    if (!empty($result['is_error']) || empty($result['id'])) {
       throw new Exception('Could not create test contact, with message: ' . CRM_Utils_Array::value('error_message', $result) . "\nBacktrace:" . CRM_Utils_Array::value('trace', $result));
     }
     return $result['id'];

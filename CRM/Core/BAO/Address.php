@@ -105,14 +105,14 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address {
         continue;
       }
 
-      if ($isPrimary && CRM_Utils_Array::value('is_primary', $value)) {
+      if ($isPrimary && !empty($value['is_primary'])) {
         $isPrimary = FALSE;
       }
       else {
         $value['is_primary'] = 0;
       }
 
-      if ($isBilling && CRM_Utils_Array::value('is_billing', $value)) {
+      if ($isBilling && !empty($value['is_billing'])) {
         $isBilling = FALSE;
       }
       else {
