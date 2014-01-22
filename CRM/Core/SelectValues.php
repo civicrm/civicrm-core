@@ -363,7 +363,7 @@ class CRM_Core_SelectValues {
         $date['emptyOptionValue'] = '';
       }
 
-      if (!CRM_Utils_Array::value('format', $date)) {
+      if (empty($date['format'])) {
         $date['format'] = 'M d';
       }
     }

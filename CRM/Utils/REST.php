@@ -122,10 +122,10 @@ class CRM_Utils_REST {
       $result = self::error('Could not interpret return values from function.');
     }
 
-    if (CRM_Utils_Array::value('json', $_REQUEST)) {
+    if (!empty($_REQUEST['json'])) {
       header('Content-Type: text/javascript');
       $json = json_encode(array_merge($result));
-      if (CRM_Utils_Array::value('debug', $_REQUEST)) {
+      if (!empty($_REQUEST['debug'])) {
         return self::jsonFormated($json);
       }
       return $json;

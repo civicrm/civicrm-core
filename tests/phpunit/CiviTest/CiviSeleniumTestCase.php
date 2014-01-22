@@ -486,10 +486,10 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     foreach ($options as $oIndex => $oValue) {
       $validateStrings[] = $oValue['label'];
       $validateStrings[] = $oValue['amount'];
-      if (CRM_Utils_Array::value('membership_type_id', $oValue)) {
+      if (!empty($oValue['membership_type_id'])) {
         $this->select("membership_type_id_{$oIndex}", "value={$oValue['membership_type_id']}");
       }
-      if (CRM_Utils_Array::value('financial_type_id', $oValue)) {
+      if (!empty($oValue['financial_type_id'])) {
         $this->select("option_financial_type_id_{$oIndex}", "label={$oValue['financial_type_id']}");
       }
       $this->type("option_label_{$oIndex}", $oValue['label']);

@@ -247,7 +247,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
   static function formRule($params, $files, $self) {
     $errors = array();
 
-    if (CRM_Utils_Array::value('_qf_Entry_upload_force', $params)) {
+    if (!empty($params['_qf_Entry_upload_force'])) {
       return TRUE;
     }
 
@@ -256,7 +256,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
       $batchTotal += $value['total_amount'];
 
       //validate for soft credit fields
-      if (CRM_Utils_Array::value($key, $params['soft_credit_contact_select_id']) && !CRM_Utils_Array::value($key, $params['soft_credit_amount'])) {
+      if (!empty($params['soft_credit_contact_select_id'][$key]) && !CRM_Utils_Array::value($key, $params['soft_credit_amount'])) {
         $errors["soft_credit_amount[$key]"] = ts('Please enter the soft credit amount.');
       }
       if (!empty($params['soft_credit_amount']) && CRM_Utils_Array::value($key, $params['soft_credit_amount'])
@@ -266,7 +266,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
 
       //membership type is required for membership batch entry
       if ( $self->_batchInfo['type_id'] == 2 ) {
-        if ( !CRM_Utils_Array::value( 1, $value['membership_type'] ) ) {
+        if (empty($value['membership_type'][1])) {
           $errors["field[$key][membership_type]"] = ts('Membership type is a required field.');
         }
       }
@@ -407,7 +407,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
     if (isset($params['field'])) {
       foreach ($params['field'] as $key => $value) {
         // if contact is not selected we should skip the row
-        if (!CRM_Utils_Array::value($key, $params['primary_contact_select_id'])) {
+        if (empty($params['primary_contact_select_id'][$key])) {
           continue;
         }
 
@@ -417,7 +417,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
         $this->updateContactInfo($value);
 
         //build soft credit params
-        if (CRM_Utils_Array::value($key, $params['soft_credit_contact_select_id']) && CRM_Utils_Array::value($key, $params['soft_credit_amount'])) {
+        if (!empty($params['soft_credit_contact_select_id'][$key]) && CRM_Utils_Array::value($key, $params['soft_credit_amount'])) {
           $value['soft_credit'][$key]['contact_id'] = $params['soft_credit_contact_select_id'][$key];
           $value['soft_credit'][$key]['amount'] = CRM_Utils_Rule::cleanMoney($params['soft_credit_amount'][$key]);
           $value['soft_credit'][$key]['soft_credit_type_id'] = $params['field'][$key]['soft_credit_type'];
@@ -430,12 +430,12 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
         );
 
         foreach ($dates as $val) {
-          if ( CRM_Utils_Array::value( $val, $value ) ) {
+          if (!empty($value[$val])) {
             $value[$val] = CRM_Utils_Date::processDate( $value[$val], $value[$val . '_time'], TRUE );
           }
         }
 
-        if (CRM_Utils_Array::value('send_receipt', $value)) {
+        if (!empty($value['send_receipt'])) {
           $value['receipt_date'] = date('Y-m-d His');
         }
 
@@ -443,15 +443,15 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
           $value['financial_type_id'] = $value['financial_type'];
         }
 
-        if (CRM_Utils_Array::value('payment_instrument', $value)) {
+        if (!empty($value['payment_instrument'])) {
           $value['payment_instrument_id'] = $value['payment_instrument'];
         }
 
-        if (CRM_Utils_Array::value('contribution_source', $value)) {
+        if (!empty($value['contribution_source'])) {
           $value['source'] = $value['contribution_source'];
         }
 
-        if (CRM_Utils_Array::value('contribution_note', $value)) {
+        if (!empty($value['contribution_note'])) {
           $value['note'] = $value['contribution_note'];
         }
 
@@ -477,7 +477,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
         //CRM-11529 for backoffice transactions
         //when financial_type_id is passed in form, update the
         //lineitems with the financial type selected in form
-        if (CRM_Utils_Array::value('financial_type_id', $value) && CRM_Utils_Array::value($priceSetId, $lineItem)) {
+        if (!empty($value['financial_type_id']) && CRM_Utils_Array::value($priceSetId, $lineItem)) {
           foreach ($lineItem[$priceSetId] as &$values) {
             $values['financial_type_id'] = $value['financial_type_id'];
           }
@@ -488,7 +488,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
         $contribution = CRM_Contribute_BAO_Contribution::create($value, CRM_Core_DAO::$_nullArray);
 
         //process premiums
-        if (CRM_Utils_Array::value('product_name', $value)) {
+        if (!empty($value['product_name'])) {
           if ($value['product_name'][0] > 0) {
             list($products, $options) = CRM_Contribute_BAO_Premium::getPremiumProductInfo();
 
@@ -556,7 +556,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
       $customFields = array();
       foreach ($params['field'] as $key => $value) {
         // if contact is not selected we should skip the row
-        if (!CRM_Utils_Array::value($key, $params['primary_contact_select_id'])) {
+        if (empty($params['primary_contact_select_id'][$key])) {
           continue;
         }
 
@@ -588,18 +588,18 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
           }
         }
 
-        if (CRM_Utils_Array::value('send_receipt', $value)) {
+        if (!empty($value['send_receipt'])) {
           $value['receipt_date'] = date('Y-m-d His');
         }
 
-        if (CRM_Utils_Array::value('membership_source', $value)) {
+        if (!empty($value['membership_source'])) {
           $value['source'] = $value['membership_source'];
         }
 
         unset($value['membership_source']);
 
         //Get the membership status
-        if ( CRM_Utils_Array::value('membership_status', $value) ) {
+        if (!empty($value['membership_status'])) {
           $value['status_id'] = $value['membership_status'];
           unset($value['membership_status']);
         }
@@ -623,11 +623,11 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
           $membershipTypeId
         );
 
-        if (CRM_Utils_Array::value('financial_type', $value)) {
+        if (!empty($value['financial_type'])) {
           $value['financial_type_id'] = $value['financial_type'];
         }
 
-        if (CRM_Utils_Array::value('payment_instrument', $value)) {
+        if (!empty($value['payment_instrument'])) {
           $value['payment_instrument_id'] = $value['payment_instrument'];
         }
 
@@ -637,7 +637,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
           $value['soft_credit'][$key]['amount'] = CRM_Utils_Rule::cleanMoney($params['soft_credit_amount'][$key]);
         }
 
-        if ( CRM_Utils_Array::value('receive_date', $value) ) {
+        if (!empty($value['receive_date'])) {
           $value['receive_date'] = CRM_Utils_Date::processDate( $value['receive_date'], $value['receive_date_time'] , TRUE );
         }
 
@@ -672,7 +672,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
           $editedResults = array();
           CRM_Price_BAO_PriceFieldValue::retrieve($editedFieldParams, $editedResults);
           $this->_priceSet['fields'][$fid]['options'][$editedResults['id']] = $priceSets['fields'][$fid]['options'][$editedResults['id']];
-          if (CRM_Utils_Array::value('total_amount', $value)) {
+          if (!empty($value['total_amount'])) {
             $this->_priceSet['fields'][$fid]['options'][$editedResults['id']]['amount'] = $value['total_amount'];
           }
 
@@ -687,7 +687,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
           //CRM-11529 for backoffice transactions
           //when financial_type_id is passed in form, update the
           //lineitems with the financial type selected in form
-          if (CRM_Utils_Array::value('financial_type_id', $value) && CRM_Utils_Array::value($priceSetId, $lineItem)) {
+          if (!empty($value['financial_type_id']) && CRM_Utils_Array::value($priceSetId, $lineItem)) {
             foreach ($lineItem[$priceSetId] as &$values) {
               $values['financial_type_id'] = $value['financial_type_id'];
             }
@@ -703,7 +703,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
         unset($value['membership_end_date']);
 
         $value['is_renew'] = false;
-        if ( CRM_Utils_Array::value('member_option', $params) && CRM_Utils_Array::value( $key, $params['member_option'] ) == 2 ) {
+        if (!empty($params['member_option']) && CRM_Utils_Array::value( $key, $params['member_option'] ) == 2 ) {
           $this->_params = $params;
           $value['is_renew'] = true;
           $membership = CRM_Member_BAO_Membership::renewMembership(
@@ -721,7 +721,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
         }
 
         //process premiums
-        if (CRM_Utils_Array::value('product_name', $value)) {
+        if (!empty($value['product_name'])) {
           if ($value['product_name'][0] > 0) {
             list($products, $options) = CRM_Contribute_BAO_Premium::getPremiumProductInfo();
 

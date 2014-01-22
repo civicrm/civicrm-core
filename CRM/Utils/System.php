@@ -884,24 +884,24 @@ class CRM_Utils_System {
       return NULL;
     }
 
-    if (!CRM_Utils_Array::value('query', $items)) {
+    if (empty($items['query'])) {
       return $url;
     }
 
     $items['query'] = urlencode($items['query']);
 
     $url = $items['scheme'] . '://';
-    if (CRM_Utils_Array::value('user', $items)) {
+    if (!empty($items['user'])) {
       $url .= "{$items['user']}:{$items['pass']}@";
     }
 
     $url .= $items['host'];
-    if (CRM_Utils_Array::value('port', $items)) {
+    if (!empty($items['port'])) {
       $url .= ":{$items['port']}";
     }
 
     $url .= "{$items['path']}?{$items['query']}";
-    if (CRM_Utils_Array::value('fragment', $items)) {
+    if (!empty($items['fragment'])) {
       $url .= "#{$items['fragment']}";
     }
 

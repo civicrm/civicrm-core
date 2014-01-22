@@ -427,7 +427,7 @@ class CRM_Report_Form_Member_ContributionDetail extends CRM_Report_Form {
     foreach ($this->_columns as $tableName => $table) {
       if (array_key_exists('fields', $table)) {
         foreach ($table['fields'] as $fieldName => $field) {
-          if (CRM_Utils_Array::value('required', $field) ||
+          if (!empty($field['required']) ||
             CRM_Utils_Array::value($fieldName, $this->_params['fields'])
           ) {
             if ($tableName == 'civicrm_address') {
@@ -438,7 +438,7 @@ class CRM_Report_Form_Member_ContributionDetail extends CRM_Report_Form {
             }
 
             // only include statistics columns if set
-            if (CRM_Utils_Array::value('statistics', $field)) {
+            if (!empty($field['statistics'])) {
               foreach ($field['statistics'] as $stat => $label) {
                 switch (strtolower($stat)) {
                   case 'sum':
@@ -497,7 +497,7 @@ class CRM_Report_Form_Member_ContributionDetail extends CRM_Report_Form {
 ";
 
     //for premiums
-    if (CRM_Utils_Array::value('product_name', $this->_params['fields']) || CRM_Utils_Array::value('product_option', $this->_params['fields'])) {
+    if (!empty($this->_params['fields']['product_name']) || CRM_Utils_Array::value('product_option', $this->_params['fields'])) {
       $this->_from .= "
                  LEFT JOIN  civicrm_contribution_product {$this->_aliases['civicrm_contribution_product']}
                         ON ({$this->_aliases['civicrm_contribution_product']}.contribution_id = {$this->_aliases['civicrm_contribution']}.id)
@@ -511,7 +511,7 @@ class CRM_Report_Form_Member_ContributionDetail extends CRM_Report_Form {
     }
 
     // include contribution note
-    if (CRM_Utils_Array::value('contribution_note', $this->_params['fields']) || !empty($this->_params['note_value'])) {
+    if (!empty($this->_params['fields']['contribution_note']) || !empty($this->_params['note_value'])) {
       $this->_from.= "
             LEFT JOIN civicrm_note {$this->_aliases['civicrm_note']}
                       ON ( {$this->_aliases['civicrm_note']}.entity_table = 'civicrm_contribution' AND
@@ -519,7 +519,7 @@ class CRM_Report_Form_Member_ContributionDetail extends CRM_Report_Form {
 
     }
 
-    if (CRM_Utils_Array::value('phone', $this->_params['fields'])) {
+    if (!empty($this->_params['fields']['phone'])) {
       $this->_from .= "
                LEFT JOIN  civicrm_phone {$this->_aliases['civicrm_phone']}
                       ON ({$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_phone']}.contact_id AND
@@ -607,8 +607,7 @@ class CRM_Report_Form_Member_ContributionDetail extends CRM_Report_Form {
 
   function orderBy() {
     $this->_orderBy = " ORDER BY {$this->_aliases['civicrm_contact']}.sort_name, {$this->_aliases['civicrm_contact']}.id ";
-    if (CRM_Utils_Array::value('first_donation_date', $this->_params['fields'])
-      || CRM_Utils_Array::value('first_donation_amount', $this->_params['fields'])) {
+    if (!empty($this->_params['fields']['first_donation_date']) || CRM_Utils_Array::value('first_donation_amount', $this->_params['fields'])) {
       $this->_orderBy .= ", {$this->_aliases['civicrm_contribution']}.receive_date";
     }
   }
@@ -662,7 +661,7 @@ class CRM_Report_Form_Member_ContributionDetail extends CRM_Report_Form {
       foreach ($this->_columns as $tableName => $table) {
         if (array_key_exists('fields', $table)) {
           foreach ($table['fields'] as $fieldName => $field) {
-            if (CRM_Utils_Array::value('csv_display', $field) && CRM_Utils_Array::value('no_display', $field)) {
+            if (!empty($field['csv_display']) && CRM_Utils_Array::value('no_display', $field)) {
               $this->_columnHeaders["{$tableName}_{$fieldName}"]['title'] = CRM_Utils_Array::value('title', $field);
               $this->_columnHeaders["{$tableName}_{$fieldName}"]['type'] = CRM_Utils_Array::value('type', $field);
             }

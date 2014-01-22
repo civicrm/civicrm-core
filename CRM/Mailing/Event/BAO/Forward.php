@@ -173,7 +173,7 @@ class CRM_Mailing_Event_BAO_Forward extends CRM_Mailing_Event_DAO_Forward {
     //append comment if added while forwarding.
     if (count($comment)) {
       $message->_txtbody = CRM_Utils_Array::value('body_text', $comment) . $message->_txtbody;
-      if (CRM_Utils_Array::value('body_html', $comment)) {
+      if (!empty($comment['body_html'])) {
         $message->_htmlbody = $comment['body_html'] . '<br />---------------Original message---------------------<br />' . $message->_htmlbody;
       }
     }

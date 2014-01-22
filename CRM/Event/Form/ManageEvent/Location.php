@@ -202,10 +202,10 @@ class CRM_Event_Form_ManageEvent_Location extends CRM_Event_Form_ManageEvent {
     $locationEvents = CRM_Event_BAO_Event::getLocationEvents();
     // remove duplicates and make sure that the duplicate entry with key as
     // loc_block_id of this event (this->_id) is preserved
-    if (CRM_Utils_Array::value($this->_oldLocBlockId, $locationEvents)) {
+    if (!empty($locationEvents[$this->_oldLocBlockId])) {
       $possibleDuplicate = $locationEvents[$this->_oldLocBlockId];
       $locationEvents = array_flip(array_unique($locationEvents));
-      if (CRM_Utils_Array::value($possibleDuplicate, $locationEvents)) {
+      if (!empty($locationEvents[$possibleDuplicate])) {
         $locationEvents[$possibleDuplicate] = $this->_oldLocBlockId;
       }
       $locationEvents = array_flip($locationEvents);
@@ -283,7 +283,7 @@ class CRM_Event_Form_ManageEvent_Location extends CRM_Event_Form_ManageEvent {
     $defaultLocationType = CRM_Core_BAO_LocationType::getDefault();
     foreach (array(
       'address', 'phone', 'email') as $block) {
-      if (!CRM_Utils_Array::value($block, $params) || !is_array($params[$block])) {
+      if (empty($params[$block]) || !is_array($params[$block])) {
         continue;
       }
       foreach ($params[$block] as $count => & $values) {

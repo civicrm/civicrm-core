@@ -126,7 +126,7 @@ class CRM_Admin_Form_WordReplacements extends CRM_Core_Form {
     if ($this->_soInstance) {
       $soInstances = array($this->_soInstance);
     }
-    elseif (CRM_Utils_Array::value('old', $_POST)) {
+    elseif (!empty($_POST['old'])) {
       $soInstances = $stringOverrideInstances = array_keys($_POST['old']);
     }
     elseif (!empty($this->_defaults) && is_array($this->_defaults)) {
@@ -211,11 +211,11 @@ class CRM_Admin_Form_WordReplacements extends CRM_Core_Form {
 
     $enabled['exactMatch'] = $enabled['wildcardMatch'] = $disabled['exactMatch'] = $disabled['wildcardMatch'] = array();
     for ($i = 1; $i <= $this->_numStrings; $i++) {
-      if (CRM_Utils_Array::value($i, $params['new']) &&
+      if (!empty($params['new'][$i]) &&
         CRM_Utils_Array::value($i, $params['old'])
       ) {
         if (isset($params['enabled']) && CRM_Utils_Array::value($i, $params['enabled'])) {
-          if (CRM_Utils_Array::value('cb', $params) &&
+          if (!empty($params['cb']) &&
             CRM_Utils_Array::value($i, $params['cb'])
           ) {
             $enabled['exactMatch'] += array($params['old'][$i] => $params['new'][$i]);

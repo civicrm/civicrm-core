@@ -77,15 +77,15 @@ class CRM_Contact_BAO_GroupOrganization extends CRM_Contact_DAO_GroupOrganizatio
    * @static
    */
   static function formatValues(&$params, &$formatedValues) {
-    if (CRM_Utils_Array::value('group_organization', $params)) {
+    if (!empty($params['group_organization'])) {
       $formatedValues['id'] = $params['group_organization'];
     }
 
-    if (CRM_Utils_Array::value('group_id', $params)) {
+    if (!empty($params['group_id'])) {
       $formatedValues['group_id'] = $params['group_id'];
     }
 
-    if (CRM_Utils_Array::value('organization_id', $params)) {
+    if (!empty($params['organization_id'])) {
       $formatedValues['organization_id'] = $params['organization_id'];
     }
   }
@@ -101,7 +101,7 @@ class CRM_Contact_BAO_GroupOrganization extends CRM_Contact_DAO_GroupOrganizatio
    */
   static function dataExists($params) {
     // return if no data present
-    if (CRM_Utils_Array::value('organization_id', $params) &&
+    if (!empty($params['organization_id']) &&
       CRM_Utils_Array::value('group_id', $params)
     ) {
       return TRUE;

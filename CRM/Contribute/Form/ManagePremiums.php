@@ -250,7 +250,7 @@ class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
       }
     }
     // CRM-13231 financial type required if product has cost
-    if (CRM_Utils_Array::value('cost', $params) && !CRM_Utils_Array::value('financial_type_id', $params)) {
+    if (!empty($params['cost']) && !CRM_Utils_Array::value('financial_type_id', $params)) {
       $errors['financial_type_id'] = ts('Financial Type is required for product having cost.');
     }
     $fileLocation = $files['uploadFile']['tmp_name'];

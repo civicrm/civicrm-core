@@ -91,9 +91,9 @@ class CRM_Event_BAO_Event extends CRM_Event_DAO_Event {
   static function add(&$params) {
     CRM_Utils_System::flushCache();
     $financialTypeId = NULL;
-    if (CRM_Utils_Array::value('id', $params)) {
+    if (!empty($params['id'])) {
       CRM_Utils_Hook::pre('edit', 'Event', $params['id'], $params);
-      if (!CRM_Utils_Array::value('skipFinancialType', $params)) {
+      if (empty($params['skipFinancialType'])) {
         $financialTypeId = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $params['id'], 'financial_type_id');
       }
     }
@@ -106,7 +106,7 @@ class CRM_Event_BAO_Event extends CRM_Event_DAO_Event {
     $event->copyValues($params);
     $result = $event->save();
 
-    if (CRM_Utils_Array::value('id', $params)) {
+    if (!empty($params['id'])) {
       CRM_Utils_Hook::post('edit', 'Event', $event->id, $event);
     }
     else {
@@ -166,7 +166,7 @@ class CRM_Event_BAO_Event extends CRM_Event_DAO_Event {
 
     CRM_Core_BAO_Log::add($logParams);
 
-    if (CRM_Utils_Array::value('custom', $params) &&
+    if (!empty($params['custom']) &&
       is_array($params['custom'])
     ) {
       CRM_Core_BAO_CustomValueTable::store($params['custom'], 'civicrm_event', $event->id);
@@ -796,7 +796,7 @@ WHERE civicrm_event.is_active = 1
 
     $baseURL = parse_url($config->userFrameworkBaseURL);
     $url = "@" . $baseURL['host'];
-    if (CRM_Utils_Array::value('path', $baseURL)) {
+    if (!empty($baseURL['path'])) {
       $url .= substr($baseURL['path'], 0, -1);
     }
 
@@ -885,7 +885,7 @@ WHERE civicrm_event.is_active = 1
     $locBlockId = CRM_Utils_Array::value('loc_block_id', $eventValues);
 
     $fieldsFix = ($afterCreate) ? array( ) : array('prefix' => array('title' => ts('Copy of') . ' '));
-    if (!CRM_Utils_Array::value('is_show_location', $eventValues)) {
+    if (empty($eventValues['is_show_location'])) {
       $fieldsFix['prefix']['is_show_location'] = 0;
     }
 
@@ -1068,7 +1068,7 @@ WHERE civicrm_event.is_active = 1
         $preProfileID = CRM_Utils_Array::value('custom_pre_id', $values);
         $postProfileID = CRM_Utils_Array::value('custom_post_id', $values);
 
-        if (CRM_Utils_Array::value('additionalParticipant', $values['params'])) {
+        if (!empty($values['params']['additionalParticipant'])) {
           $preProfileID = CRM_Utils_Array::value('additional_custom_pre_id', $values, $preProfileID );
           $postProfileID = CRM_Utils_Array::value('additional_custom_post_id', $values, $postProfileID );
         }
@@ -1130,7 +1130,7 @@ WHERE civicrm_event.is_active = 1
         if ($lineItem = CRM_Utils_Array::value('lineItem', $values)) {
           // check if additional prticipant, if so filter only to relevant ones
           // CRM-9902
-          if (CRM_Utils_Array::value('additionalParticipant', $values['params'])) {
+          if (!empty($values['params']['additionalParticipant'])) {
             $ownLineItems = array( );
             foreach ( $lineItem as $liKey => $liValue ) {
               $firstElement = array_pop( $liValue );
@@ -1377,7 +1377,7 @@ WHERE civicrm_event.is_active = 1
       }
 
       foreach ($fields as $v) {
-        if (CRM_Utils_Array::value('groupTitle', $v)) {
+        if (!empty($v['groupTitle'])) {
           $groupTitle['groupTitle'] = $v['groupTitle'];
           break;
         }
@@ -1823,7 +1823,7 @@ WHERE  ce.loc_block_id = $locBlockId";
       $alreadyRegistered = self::checkRegistration($params);
     }
 
-    if (CRM_Utils_Array::value('allow_same_participant_emails', $values['event']) ||
+    if (!empty($values['event']['allow_same_participant_emails']) ||
       !$alreadyRegistered
     ) {
       return TRUE;
@@ -1839,7 +1839,7 @@ WHERE  ce.loc_block_id = $locBlockId";
    */
   static function checkRegistration($params) {
     $alreadyRegistered = FALSE;
-    if (!CRM_Utils_Array::value('contact_id', $params)) {
+    if (empty($params['contact_id'])) {
       return $alreadyRegistered;
     }
 
@@ -1942,8 +1942,7 @@ WHERE  ce.loc_block_id = $locBlockId";
       $eventEmail       = array();
 
       CRM_Core_DAO::commonRetrieve('CRM_Event_DAO_Event', $params, $eventEmail, $returnProperties);
-      if (CRM_Utils_Array::value('confirm_from_name', $eventEmail)
-        && CRM_Utils_Array::value('confirm_from_email', $eventEmail)
+      if (!empty($eventEmail['confirm_from_name']) && CRM_Utils_Array::value('confirm_from_email', $eventEmail)
       ) {
         $eventEmailId = "{$eventEmail['confirm_from_name']} <{$eventEmail['confirm_from_email']}>";
 

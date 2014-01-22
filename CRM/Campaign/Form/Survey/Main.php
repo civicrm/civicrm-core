@@ -74,7 +74,7 @@ class CRM_Campaign_Form_Survey_Main extends CRM_Campaign_Form_Survey {
     }
 
     // when custom data is included in this page
-    if (CRM_Utils_Array::value('hidden_custom', $_POST)) {
+    if (!empty($_POST['hidden_custom'])) {
       CRM_Custom_Form_CustomData::preProcess($this);
       CRM_Custom_Form_CustomData::buildQuickForm($this);
     }
@@ -118,7 +118,7 @@ class CRM_Campaign_Form_Survey_Main extends CRM_Campaign_Form_Survey {
 
     if ($this->_surveyId) {
 
-      if (CRM_Utils_Array::value('result_id', $defaults) &&
+      if (!empty($defaults['result_id']) &&
         CRM_Utils_Array::value('recontact_interval', $defaults)
       ) {
 
@@ -226,7 +226,7 @@ class CRM_Campaign_Form_Survey_Main extends CRM_Campaign_Form_Survey {
     $survey = CRM_Campaign_BAO_Survey::create($params);
     $this->_surveyId = $survey->id;
 
-    if (CRM_Utils_Array::value('result_id', $this->_values)) {
+    if (!empty($this->_values['result_id'])) {
       $query = "SELECT COUNT(*) FROM civicrm_survey WHERE result_id = %1";
       $countSurvey = (int)CRM_Core_DAO::singleValueQuery($query,
         array(

@@ -267,7 +267,7 @@ class CRM_PCP_Page_PCPInfo extends CRM_Core_Page {
     if ($validDate) {
 
       $contributionText = ts('Contribute Now');
-      if (CRM_Utils_Array::value('donate_link_text', $pcpInfo)) {
+      if (!empty($pcpInfo['donate_link_text'])) {
         $contributionText = $pcpInfo['donate_link_text'];
       }
 

@@ -53,7 +53,7 @@ class CRM_Core_Payment_ProcessorForm {
     $form->set('paymentProcessor', $form->_paymentProcessor);
 
     // also set cancel subscription url
-    if (CRM_Utils_Array::value('is_recur', $form->_paymentProcessor) &&
+    if (!empty($form->_paymentProcessor['is_recur']) &&
       CRM_Utils_Array::value('is_recur', $form->_values)
     ) {
       $form->_paymentObject = &CRM_Core_Payment::singleton($mode, $form->_paymentProcessor, $form);
@@ -86,7 +86,7 @@ class CRM_Core_Payment_ProcessorForm {
     }
 
     // make sure we have a valid payment class, else abort
-    if (CRM_Utils_Array::value('is_monetary', $form->_values) &&
+    if (!empty($form->_values['is_monetary']) &&
       !$form->_paymentProcessor['class_name'] &&
       !CRM_Utils_Array::value('is_pay_later', $form->_values)
     ) {

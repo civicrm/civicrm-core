@@ -696,7 +696,7 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
       }
 
       $fieldTypeValues = CRM_Core_BAO_UFGroup::groupTypeValues($gid, $fieldType);
-      if (!CRM_Utils_Array::value($fieldType, $fieldTypeValues)) {
+      if (empty($fieldTypeValues[$fieldType])) {
         return;
       }
 

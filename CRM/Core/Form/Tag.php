@@ -193,7 +193,7 @@ class CRM_Core_Form_Tag {
                 $contactTags = CRM_Core_BAO_Tag::getTagsUsedFor('civicrm_contact', TRUE, FALSE, $parentId);
 
                 foreach (array_keys($form->_formValues['contact_tags']) as $tagId) {
-                  if (CRM_Utils_Array::value($tagId, $contactTags)) {
+                  if (!empty($contactTags[$tagId])) {
                     $tagName = $tagId;
                     if (is_numeric($tagId)) {
                       $tagName = $contactTags[$tagId];

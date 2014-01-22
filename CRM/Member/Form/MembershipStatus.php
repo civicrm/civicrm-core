@@ -52,7 +52,7 @@ class CRM_Member_Form_MembershipStatus extends CRM_Member_Form {
     $defaults = parent::setDefaultValues();
 
     //finding default weight to be put
-    if (!CRM_Utils_Array::value('weight', $defaults)) {
+    if (empty($defaults['weight'])) {
       $defaults['weight'] = CRM_Utils_Weight::getDefaultWeight('CRM_Member_DAO_MembershipStatus');
     }
     return $defaults;

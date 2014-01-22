@@ -55,7 +55,7 @@ class CRM_Contribute_Form_ContributionView extends CRM_Core_Form {
     CRM_Contribute_BAO_Contribution::getValues($params, $values, $ids);
     CRM_Contribute_BAO_Contribution::resolveDefaults($values);
 
-    if (CRM_Utils_Array::value('contribution_page_id', $values)) {
+    if (!empty($values['contribution_page_id'])) {
       $contribPages = CRM_Contribute_PseudoConstant::contributionPage(NULL, TRUE);
       $values['contribution_page_title'] = CRM_Utils_Array::value(CRM_Utils_Array::value('contribution_page_id', $values), $contribPages);
     }
@@ -63,14 +63,14 @@ class CRM_Contribute_Form_ContributionView extends CRM_Core_Form {
     // get recieved into i.e to_financial_account_id from last trxn
     $financialTrxnId = CRM_Core_BAO_FinancialTrxn::getFinancialTrxnId($values['contribution_id'], 'DESC');
     $values['to_financial_account'] = '';
-    if (CRM_Utils_Array::value('financialTrxnId', $financialTrxnId)) {
+    if (!empty($financialTrxnId['financialTrxnId'])) {
       $values['to_financial_account_id'] = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialTrxn', $financialTrxnId['financialTrxnId'], 'to_financial_account_id');
       if ($values['to_financial_account_id']) {
         $values['to_financial_account'] = CRM_Contribute_PseudoConstant::financialAccount($values['to_financial_account_id']);
       }
     }
 
-    if (CRM_Utils_Array::value('honor_contact_id', $values)) {
+    if (!empty($values['honor_contact_id'])) {
       $sql    = "SELECT display_name FROM civicrm_contact WHERE id = %1";
       $params = array(1 => array($values['honor_contact_id'], 'Integer'));
       $dao    = CRM_Core_DAO::executeQuery($sql, $params);
@@ -82,7 +82,7 @@ class CRM_Contribute_Form_ContributionView extends CRM_Core_Form {
       $values['honor_type'] = CRM_Utils_Array::value(CRM_Utils_Array::value('honor_type_id', $values), $honor);
     }
 
-    if (CRM_Utils_Array::value('contribution_recur_id', $values)) {
+    if (!empty($values['contribution_recur_id'])) {
       $sql    = "SELECT  installments, frequency_interval, frequency_unit FROM civicrm_contribution_recur WHERE id = %1";
       $params = array(1 => array($values['contribution_recur_id'], 'Integer'));
       $dao    = CRM_Core_DAO::executeQuery($sql, $params);
@@ -121,7 +121,7 @@ class CRM_Contribute_Form_ContributionView extends CRM_Core_Form {
     $values['note'] = array_values($noteValue);
 
     // show billing address location details, if exists
-    if (CRM_Utils_Array::value('address_id', $values)) {
+    if (!empty($values['address_id'])) {
       $addressParams = array('id' => CRM_Utils_Array::value('address_id', $values));
       $addressDetails = CRM_Core_BAO_Address::getValues($addressParams, FALSE, 'id');
       $addressDetails = array_values($addressDetails);

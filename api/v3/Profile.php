@@ -271,7 +271,7 @@ function civicrm_api3_profile_submit($params) {
     );
   }
 
-  if (CRM_Utils_Array::value('add_to_group_id', $ufGroupDetails)) {
+  if (!empty($ufGroupDetails['add_to_group_id'])) {
     $contactIds = array($params['contact_id']);
     CRM_Contact_BAO_GroupContact::addContactsToGroup($contactIds,
       $ufGroupDetails['add_to_group_id']

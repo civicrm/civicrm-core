@@ -169,7 +169,7 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
 
       // we do not allow duplicates. the first field is the winner
       foreach ($subset as $name => $field) {
-        if (!CRM_Utils_Array::value($name, $fields)) {
+        if (empty($fields[$name])) {
           $fields[$name] = $field;
         }
       }
@@ -928,7 +928,7 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
       }
 
       // skip fields that should not be displayed separately
-      if (CRM_Utils_Array::value('skipDisplay', $field)) {
+      if (!empty($field['skipDisplay'])) {
         continue;
       }
 
@@ -940,7 +940,7 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
       }
 
       //handle the case to avoid re-write where the profile field labels are the same
-      if (CRM_Utils_Array::value($index, $values)) {
+      if (!empty($values[$index])) {
         $index .= $nullValueIndex;
         $nullValueIndex .= $nullValueIndex;
       }
@@ -2119,7 +2119,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
       );
     }
     elseif ($fieldName == 'participant_role') {
-      if (CRM_Utils_Array::value('is_multiple', $field)) {
+      if (!empty($field['is_multiple'])) {
         $form->addCheckBox($name, $title, CRM_Event_PseudoConstant::participantRole(), NULL, NULL, NULL, NULL, '&nbsp', TRUE);
       }
       else {
@@ -2253,7 +2253,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
           CRM_Contact_Form_Edit_TagsAndGroups::setDefaults($contactId, $defaults, CRM_Contact_Form_Edit_TagsAndGroups::TAG, $fldName);
         }
 
-        if (CRM_Utils_Array::value($name, $details) || isset($details[$name])) {
+        if (!empty($details[$name]) || isset($details[$name])) {
           //to handle custom data (checkbox) to be written
           // to handle birth/deceased date, greeting_type and few other fields
           if (($name == 'birth_date') || ($name == 'deceased_date')) {
@@ -2328,11 +2328,11 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
               case 'Select Date':
                 // CRM-6681, set defult values according to date and time format (if any).
                 $dateFormat = NULL;
-                if (CRM_Utils_Array::value('date_format', $customFields[$customFieldId])) {
+                if (!empty($customFields[$customFieldId]['date_format'])) {
                   $dateFormat = $customFields[$customFieldId]['date_format'];
                 }
 
-                if (!CRM_Utils_Array::value('time_format', $customFields[$customFieldId])) {
+                if (empty($customFields[$customFieldId]['time_format'])) {
                   list($defaults[$fldName]) = CRM_Utils_Date::setDateDefaults($details[$name], NULL,
                     $dateFormat
                   );
@@ -2380,7 +2380,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
                 // fixed for CRM-665
                 if (is_numeric($locTypeId)) {
                   if ($primaryLocationType || $locTypeId == CRM_Utils_Array::value('location_type_id', $value)) {
-                    if (CRM_Utils_Array::value($fieldName, $value)) {
+                    if (!empty($value[$fieldName])) {
                       //to handle stateprovince and country
                       if ($fieldName == 'state_province') {
                         $defaults[$fldName] = $value['state_province_id'];
@@ -2811,7 +2811,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
 
         // if we are getting in a new primary email, dont overwrite the new one
         if ($locTypeId == $primaryLocationType) {
-          if (CRM_Utils_Array::value('email-' . $primaryLocationType, $params)) {
+          if (!empty($params['email-' . $primaryLocationType])) {
             $data['location'][$loc]['email'][$loc]['email'] = $fields['email-' . $primaryLocationType];
           }
           elseif (isset($primaryEmail)) {
@@ -3130,7 +3130,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
       $fldName = $isStandalone ? $name : "field[$componentId][$name]";
       if (in_array($name, $dateTimeFields)) {
         $timefldName = $isStandalone ? "{$name}_time" : "field[$componentId][{$name}_time]";
-        if (CRM_Utils_Array::value($name, $values)) {
+        if (!empty($values[$name])) {
           list($defaults[$fldName], $defaults[$timefldName]) = CRM_Utils_Date::setDateDefaults($values[$name]);
         }
       }
@@ -3189,7 +3189,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
 
                   // CRM-6681, $default contains formatted date, time values.
                   $defaults[$fldName] = $customValue;
-                  if (CRM_Utils_Array::value($customKey . '_time', $defaults)) {
+                  if (!empty($defaults[$customKey . '_time'])) {
                     $defaults['field'][$componentId][$name . '_time'] = $defaults[$customKey . '_time'];
                   }
                 }
@@ -3436,7 +3436,7 @@ SELECT  group_id
     $groupTypes = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_UFGroup', $profileId, 'group_type');
 
     $groupTypeParts = explode(CRM_Core_DAO::VALUE_SEPARATOR, $groupTypes);
-    if (!CRM_Utils_Array::value(1, $groupTypeParts)) {
+    if (empty($groupTypeParts[1])) {
       return $groupTypeValue;
     }
     $participantExtends = array('ParticipantRole', 'ParticipantEventName', 'ParticipantEventType');

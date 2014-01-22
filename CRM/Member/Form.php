@@ -173,7 +173,7 @@ class CRM_Member_Form extends CRM_Core_Form {
    */
   function storeContactFields($formValues){
     // in a 'standalone form' (contact id not in the url) the contact will be in the form values
-    if (CRM_Utils_Array::value('contact_select_id', $formValues)) {
+    if (!empty($formValues['contact_select_id'])) {
       $this->_contactID = $formValues['contact_select_id'][1];
     }
 
@@ -183,7 +183,7 @@ class CRM_Member_Form extends CRM_Core_Form {
 
     //CRM-10375 Where the payer differs to the member the payer should get the email.
     // here we store details in order to do that
-    if (CRM_Utils_Array::value('contribution_contact_select_id', $formValues) && CRM_Utils_Array::value('1', $formValues['contribution_contact_select_id'])) {
+    if (!empty($formValues['contribution_contact_select_id']) && CRM_Utils_Array::value('1', $formValues['contribution_contact_select_id'])) {
       $this->_receiptContactId = $this->_contributorContactID = $formValues['contribution_contact_select_id'][1];
        list( $this->_contributorDisplayName,
          $this->_contributorEmail ) = CRM_Contact_BAO_Contact_Location::getEmailDetails( $this->_contributorContactID );

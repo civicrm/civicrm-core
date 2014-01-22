@@ -119,19 +119,19 @@ function _civicrm_api3_event_create_legacy_support_42(&$params){
 function civicrm_api3_event_get($params) {
 
   //legacy support for $params['return.sort']
-  if (CRM_Utils_Array::value('return.sort', $params)) {
+  if (!empty($params['return.sort'])) {
     $params['options']['sort'] = $params['return.sort'];
     unset($params['return.sort']);
   }
 
   //legacy support for $params['return.offset']
-  if (CRM_Utils_Array::value('return.offset', $params)) {
+  if (!empty($params['return.offset'])) {
     $params['options']['offset'] = $params['return.offset'];
     unset($params['return.offset']);
   }
 
   //legacy support for $params['return.max_results']
-  if (CRM_Utils_Array::value('return.max_results', $params)) {
+  if (!empty($params['return.max_results'])) {
     $params['options']['limit'] = $params['return.max_results'];
     unset($params['return.max_results']);
   }
@@ -139,14 +139,14 @@ function civicrm_api3_event_get($params) {
   $eventDAO = new CRM_Event_BAO_Event();
   _civicrm_api3_dao_set_filter($eventDAO, $params, TRUE, 'Event');
 
-  if (CRM_Utils_Array::value('is_template', $params)) {
+  if (!empty($params['is_template'])) {
     $eventDAO->whereAdd( '( is_template = 1 )' );
   }
   elseif(empty($eventDAO->id)){
     $eventDAO->whereAdd('( is_template IS NULL ) OR ( is_template = 0 )');
   }
 
-  if (CRM_Utils_Array::value('isCurrent', $params)) {
+  if (!empty($params['isCurrent'])) {
     $eventDAO->whereAdd('(start_date >= CURDATE() || end_date >= CURDATE())');
   }
 
@@ -158,7 +158,7 @@ function civicrm_api3_event_get($params) {
   while ($eventDAO->fetch()) {
     $event[$eventDAO->id] = array();
     CRM_Core_DAO::storeValues($eventDAO, $event[$eventDAO->id]);
-    if (CRM_Utils_Array::value('return.is_full', $params)) {
+    if (!empty($params['return.is_full'])) {
       _civicrm_api3_event_getisfull($event, $eventDAO->id);
     }
     _civicrm_api3_event_get_legacy_support_42($event, $eventDAO->id);

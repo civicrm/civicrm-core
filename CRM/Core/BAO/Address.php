@@ -80,7 +80,7 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address {
       }
 
       $addressExists = self::dataExists($value);
-      if ( !CRM_Utils_Array::value('id', $value) ) {
+      if (empty($value['id'])) {
         if ($updateBlankLocInfo) {
           if ((!empty($addresses) || !$addressExists) && array_key_exists($key, $addresses)) {
             $value['id'] = $addresses[$key];
@@ -119,7 +119,7 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address {
         $value['is_billing'] = 0;
       }
 
-      if (!CRM_Utils_Array::value('manual_geo_code', $value)) {
+      if (empty($value['manual_geo_code'])) {
         $value['manual_geo_code'] = 0;
       }
       $value['contact_id'] = $contactId;
@@ -203,7 +203,7 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address {
    * @static
    */
   static function fixAddress(&$params) {
-    if (CRM_Utils_Array::value('billing_street_address', $params)) {
+    if (!empty($params['billing_street_address'])) {
       //Check address is comming from online contribution / registration page
       //Fixed :CRM-5076
       $billing = array(
@@ -218,7 +218,7 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address {
 
       foreach ($billing as $key => $val) {
         if ($value = CRM_Utils_Array::value($val, $params)) {
-          if (CRM_Utils_Array::value($key, $params)) {
+          if (!empty($params[$key])) {
             unset($params[$val]);
           }
           else {
@@ -231,7 +231,7 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address {
     }
 
     /* Split the zip and +4, if it's in US format */
-    if (CRM_Utils_Array::value('postal_code', $params) &&
+    if (!empty($params['postal_code']) &&
       preg_match('/^(\d{4,5})[+-](\d{4})$/',
         $params['postal_code'],
         $match
@@ -468,7 +468,7 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address {
     $addresses = array();
     $address = new CRM_Core_BAO_Address();
 
-    if (!CRM_Utils_Array::value('entity_table', $entityBlock)) {
+    if (empty($entityBlock['entity_table'])) {
       $address->$fieldName = CRM_Utils_Array::value($fieldName, $entityBlock);
     }
     else {
@@ -967,7 +967,7 @@ SELECT is_primary,
       $nameVal = explode('-', $values['name']);
       $fldName = CRM_Utils_Array::value(0, $nameVal);
       $locType = CRM_Utils_Array::value(1, $nameVal);
-      if (CRM_Utils_Array::value('location_type_id', $values)) {
+      if (!empty($values['location_type_id'])) {
         $locType = $values['location_type_id'];
       }
 

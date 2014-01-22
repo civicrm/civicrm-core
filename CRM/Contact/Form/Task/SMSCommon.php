@@ -314,11 +314,11 @@ class CRM_Contact_Form_Task_SMSCommon {
 
     $template = CRM_Core_Smarty::singleton();
 
-    if (!CRM_Utils_Array::value('text_message', $fields)) {
+    if (empty($fields['text_message'])) {
       $errors['text_message'] = ts('Please provide Text message.');
     }
     else {
-      if (CRM_Utils_Array::value('text_message', $fields)) {
+      if (!empty($fields['text_message'])) {
         $messageCheck = CRM_Utils_Array::value('text_message', $fields);
         $messageCheck = str_replace("\r\n", "\n", $messageCheck);
         if ($messageCheck && (strlen($messageCheck) > CRM_SMS_Provider::MAX_SMS_CHAR)) {
@@ -328,7 +328,7 @@ class CRM_Contact_Form_Task_SMSCommon {
     }
 
     //Added for CRM-1393
-    if (CRM_Utils_Array::value('saveTemplate', $fields) && empty($fields['saveTemplateName'])) {
+    if (!empty($fields['saveTemplate']) && empty($fields['saveTemplateName'])) {
       $errors['saveTemplateName'] = ts("Enter name to save message template");
     }
 
@@ -350,20 +350,19 @@ class CRM_Contact_Form_Task_SMSCommon {
     $fromSmsProviderId = $thisValues['sms_provider_id'];
 
     // process message template
-    if (CRM_Utils_Array::value('saveTemplate', $thisValues)
-      || CRM_Utils_Array::value('updateTemplate', $thisValues)
+    if (!empty($thisValues['saveTemplate']) || CRM_Utils_Array::value('updateTemplate', $thisValues)
     ) {
       $messageTemplate = array(
         'msg_text' => $thisValues['text_message'],
         'is_active' => TRUE,
       );
 
-      if (CRM_Utils_Array::value('saveTemplate', $thisValues)) {
+      if (!empty($thisValues['saveTemplate'])) {
         $messageTemplate['msg_title'] = $thisValues['saveTemplateName'];
         CRM_Core_BAO_MessageTemplate::add($messageTemplate);
       }
 
-      if (CRM_Utils_Array::value('template', $thisValues) &&
+      if (!empty($thisValues['template']) &&
         CRM_Utils_Array::value('updateTemplate', $thisValues)
       ) {
         $messageTemplate['id'] = $thisValues['template'];
@@ -383,7 +382,7 @@ class CRM_Contact_Form_Task_SMSCommon {
         $phoneKey = "{$contactId}::{$phone}";
         if (!in_array($phoneKey, $tempPhones)) {
           $tempPhones[] = $phoneKey;
-          if (CRM_Utils_Array::value($contactId, $form->_contactDetails)) {
+          if (!empty($form->_contactDetails[$contactId])) {
             $formattedContactDetails[] = $form->_contactDetails[$contactId];
           }
         }

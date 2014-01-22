@@ -134,7 +134,7 @@ class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus {
     }
 
     //copy name to label when not passed.
-    if (!CRM_Utils_Array::value('label', $params) &&
+    if (empty($params['label']) &&
       CRM_Utils_Array::value('name', $params)
     ) {
       $params['label'] = $params['name'];

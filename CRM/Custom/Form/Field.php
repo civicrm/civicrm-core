@@ -215,7 +215,7 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
         $defaults['filter_selected'] = $contactRefFilter;
       }
 
-      if (CRM_Utils_Array::value('data_type', $defaults)) {
+      if (!empty($defaults['data_type'])) {
         $defaultDataType = array_search($defaults['data_type'],
           self::$_dataTypeKeys
         );
@@ -254,7 +254,7 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
       $defaults['is_view'] = 0;
     }
 
-    if (CRM_Utils_Array::value('html_type', $defaults)) {
+    if (!empty($defaults['html_type'])) {
       $dontShowLink = substr($defaults['html_type'], -14) == 'State/Province' || substr($defaults['html_type'], -7) == 'Country' ? 1 : 0;
     }
 
@@ -876,7 +876,7 @@ AND    option_group_id = %2";
     }
 
     // we can not set require and view at the same time.
-    if (CRM_Utils_Array::value('is_required', $fields) &&
+    if (!empty($fields['is_required']) &&
       CRM_Utils_Array::value('is_view', $fields)
     ) {
       $errors['is_view'] = ts('Can not set this field Required and View Only at the same time.');
@@ -910,7 +910,7 @@ AND    option_group_id = %2";
     //fix for 'is_search_range' field.
     if (in_array($dataTypeKey, array(
       1, 2, 3, 5))) {
-      if (!CRM_Utils_Array::value('is_searchable', $params)) {
+      if (empty($params['is_searchable'])) {
         $params['is_search_range'] = 0;
       }
     }

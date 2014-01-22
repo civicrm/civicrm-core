@@ -73,7 +73,7 @@ class CRM_Utils_Geocode_Yahoo {
 
     $whereComponents = array();
 
-    if (CRM_Utils_Array::value('street_address', $values)) {
+    if (!empty($values['street_address'])) {
       $whereComponents['street'] = $values['street_address'];
     }
 
@@ -81,8 +81,8 @@ class CRM_Utils_Geocode_Yahoo {
       $whereComponents['city'] = $city;
     }
 
-    if (CRM_Utils_Array::value('state_province', $values)) {
-      if (CRM_Utils_Array::value('state_province_id', $values)) {
+    if (!empty($values['state_province'])) {
+      if (!empty($values['state_province_id'])) {
         $stateProvince = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_StateProvince', $values['state_province_id']);
       }
       else {
@@ -104,11 +104,11 @@ class CRM_Utils_Geocode_Yahoo {
       }
     }
 
-    if (CRM_Utils_Array::value('postal_code', $values)) {
+    if (!empty($values['postal_code'])) {
       $whereComponents['postal'] = $values['postal_code'];
     }
 
-    if (CRM_Utils_Array::value('country', $values)) {
+    if (!empty($values['country'])) {
       $whereComponents['country'] = $values['country'];
     }
 

@@ -839,7 +839,7 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
 
       $cbValues = array();
       foreach ($groupValues as $key => $val) {
-        if (CRM_Utils_Array::value($val, $value)) {
+        if (!empty($value[$val])) {
           $cbValues[$key] = 1;
         }
       }

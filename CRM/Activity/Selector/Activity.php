@@ -401,7 +401,7 @@ class CRM_Activity_Selector_Activity extends CRM_Core_Selector_Base implements C
 
       //CRM-3553
       $accessMailingReport = FALSE;
-      if (CRM_Utils_Array::value('mailingId', $row)) {
+      if (!empty($row['mailingId'])) {
         $accessMailingReport = TRUE;
       }
 

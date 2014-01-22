@@ -307,7 +307,7 @@ function _civicrm_api3_contact_check_params( &$params, $dupeCheck = true, $dupeE
     $params['preferred_communication_method'] = CRM_Utils_Array::implodePadded($params['preferred_communication_method']);
   }
 
-  if (CRM_Utils_Array::value('contact_sub_type', $params) && CRM_Utils_Array::value('contact_type', $params)) {
+  if (!empty($params['contact_sub_type']) && CRM_Utils_Array::value('contact_type', $params)) {
       if (!(CRM_Contact_BAO_ContactType::isExtendsContactType($params['contact_sub_type'], $params['contact_type']))) {
         throw new API_Exception("Invalid or Mismatched Contact SubType: " . implode(', ', (array)$params['contact_sub_type']));
       }
@@ -619,13 +619,13 @@ function civicrm_api3_contact_getquick($params) {
     $where .= " AND $aclWhere ";
   }
 
-  if (CRM_Utils_Array::value('org', $params)) {
+  if (!empty($params['org'])) {
     $where .= " AND contact_type = \"Organization\"";
 
     // CRM-7157, hack: get current employer details when
     // employee_id is present.
     $currEmpDetails = array();
-    if (CRM_Utils_Array::value('employee_id', $params)) {
+    if (!empty($params['employee_id'])) {
       if ($currentEmployer = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact',
           (int) $params['employee_id'],
           'employer_id'
@@ -650,23 +650,23 @@ function civicrm_api3_contact_getquick($params) {
     }
   }
 
-  if (CRM_Utils_Array::value('contact_sub_type', $params)) {
+  if (!empty($params['contact_sub_type'])) {
     $contactSubType = CRM_Utils_Type::escape($params['contact_sub_type'], 'String');
     $where .= " AND cc.contact_sub_type = '{$contactSubType}'";
   }
 
   //set default for current_employer or return contact with particular id
-  if (CRM_Utils_Array::value('id', $params)) {
+  if (!empty($params['id'])) {
     $where .= " AND cc.id = " . (int) $params['id'];
   }
 
-  if (CRM_Utils_Array::value('cid', $params)) {
+  if (!empty($params['cid'])) {
     $where .= " AND cc.id <> " . (int) $params['cid'];
   }
 
   //contact's based of relationhip type
   $relType = NULL;
-  if (CRM_Utils_Array::value('rel', $params)) {
+  if (!empty($params['rel'])) {
     $relation = explode('_', CRM_Utils_Array::value('rel', $params));
     $relType  = CRM_Utils_Type::escape($relation[0], 'Integer');
     $rel      = CRM_Utils_Type::escape($relation[2], 'String');
@@ -719,7 +719,7 @@ function civicrm_api3_contact_getquick($params) {
   }
 
   // check if only CMS users are requested
-  if (CRM_Utils_Array::value('cmsuser', $params)) {
+  if (!empty($params['cmsuser'])) {
     $additionalFrom = "
       INNER JOIN civicrm_uf_match um ON (um.contact_id=cc.id)
       ";
@@ -772,7 +772,7 @@ LIMIT    0, {$limit}
     }
     $t['data'] = $dao->data;
     $contactList[] = $t;
-    if (CRM_Utils_Array::value('org', $params) &&
+    if (!empty($params['org']) &&
       !empty($currEmpDetails) &&
       $dao->id == $currEmpDetails['id']
     ) {
@@ -782,7 +782,7 @@ LIMIT    0, {$limit}
 
   //return organization name if doesn't exist in db
   if (empty($contactList)) {
-    if (CRM_Utils_Array::value('org', $params)) {
+    if (!empty($params['org'])) {
       if ($listCurrentEmployer && !empty($currEmpDetails)) {
         $contactList = array(
           array(

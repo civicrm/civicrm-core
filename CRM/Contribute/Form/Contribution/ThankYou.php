@@ -162,7 +162,7 @@ class CRM_Contribute_Form_Contribution_ThankYou extends CRM_Contribute_Form_Cont
       $this->assign('pcpBlock', TRUE);
       foreach (array(
         'pcp_display_in_roll', 'pcp_is_anonymous', 'pcp_roll_nickname', 'pcp_personal_note') as $val) {
-        if (CRM_Utils_Array::value($val, $this->_params)) {
+        if (!empty($this->_params[$val])) {
           $this->assign($val, $this->_params[$val]);
         }
       }
@@ -193,7 +193,7 @@ class CRM_Contribute_Form_Contribution_ThankYou extends CRM_Contribute_Form_Cont
 
     $this->buildCustom($this->_values['custom_pre_id'], 'customPre', TRUE);
     $this->buildCustom($this->_values['custom_post_id'], 'customPost', TRUE);
-    if (CRM_Utils_Array::value('hidden_onbehalf_profile', $params)) {
+    if (!empty($params['hidden_onbehalf_profile'])) {
       $ufJoinParams = array(
         'module' => 'onBehalf',
         'entity_table' => 'civicrm_contribution_page',
@@ -269,7 +269,7 @@ class CRM_Contribute_Form_Contribution_ThankYou extends CRM_Contribute_Form_Cont
         $tellAFriend = TRUE;
       }
     }
-    elseif (CRM_Utils_Array::value('is_active', $data)) {
+    elseif (!empty($data['is_active'])) {
       $friendText = $data['title'];
       $this->assign('friendText', $friendText);
       $subUrl = "eid={$this->_id}&pcomponent=contribute";

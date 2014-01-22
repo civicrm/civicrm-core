@@ -133,7 +133,7 @@ class CRM_Contact_Form_CustomData extends CRM_Core_Form {
     CRM_Utils_System::setTitle($displayName, $contactImage . ' ' . $displayName);
 
     // when custom data is included in this page
-    if (CRM_Utils_Array::value('hidden_custom', $_POST)) {
+    if (!empty($_POST['hidden_custom'])) {
       for ($i = 0; $i <= $_POST['hidden_custom_group_count'][$this->_groupID]; $i++) {
         CRM_Custom_Form_CustomData::preProcess($this, NULL, NULL, $i);
         CRM_Custom_Form_CustomData::buildQuickForm($this);
@@ -193,7 +193,7 @@ class CRM_Contact_Form_CustomData extends CRM_Core_Form {
       $this->_contactSubType
     );
 
-    if (!CRM_Utils_Array::value('hidden_custom_group_count', $_POST)) {
+    if (empty($_POST['hidden_custom_group_count'])) {
       // custom data building in edit mode (required to handle multi-value)
       $groupTree = &CRM_Core_BAO_CustomGroup::getTree($this->_contactType, $this, $this->_tableID,
         $this->_groupID, $this->_contactSubType

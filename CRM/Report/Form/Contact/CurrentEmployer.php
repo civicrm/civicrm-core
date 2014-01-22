@@ -206,7 +206,7 @@ class CRM_Report_Form_Contact_CurrentEmployer extends CRM_Report_Form {
     foreach ($this->_columns as $tableName => $table) {
       if (array_key_exists('fields', $table)) {
         foreach ($table['fields'] as $fieldName => $field) {
-          if (CRM_Utils_Array::value('required', $field) ||
+          if (!empty($field['required']) ||
             CRM_Utils_Array::value($fieldName, $this->_params['fields'])
           ) {
 
@@ -325,7 +325,7 @@ FROM civicrm_contact {$this->_aliases['civicrm_contact']}
         // in previous row
 
         foreach ($row as $colName => $colVal) {
-          if (CRM_Utils_Array::value($colName, $checkList) && is_array($checkList[$colName]) &&
+          if (!empty($checkList[$colName]) && is_array($checkList[$colName]) &&
             in_array($colVal, $checkList[$colName])
           ) {
             $rows[$rowNum][$colName] = "";

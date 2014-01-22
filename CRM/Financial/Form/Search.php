@@ -123,7 +123,7 @@ class CRM_Financial_Form_Search extends CRM_Core_Form {
         $batchIds[] = $batch[1];
       }
     }
-    if (CRM_Utils_Array::value('batch_update', $_POST)) {
+    if (!empty($_POST['batch_update'])) {
       CRM_Batch_BAO_Batch::closeReOpen($batchIds, $_POST['batch_update']);
     }
   }

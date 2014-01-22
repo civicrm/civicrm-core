@@ -183,7 +183,7 @@ class CRM_Admin_Form_Setting extends CRM_Core_Form {
   public function commonProcess(&$params) {
 
     // save autocomplete search options
-    if (CRM_Utils_Array::value('autocompleteContactSearch', $params)) {
+    if (!empty($params['autocompleteContactSearch'])) {
       $value = CRM_Core_DAO::VALUE_SEPARATOR . implode(CRM_Core_DAO::VALUE_SEPARATOR,
         array_keys($params['autocompleteContactSearch'])
       ) . CRM_Core_DAO::VALUE_SEPARATOR;
@@ -197,7 +197,7 @@ class CRM_Admin_Form_Setting extends CRM_Core_Form {
     }
 
     // save autocomplete contact reference options
-    if (CRM_Utils_Array::value('autocompleteContactReference', $params)) {
+    if (!empty($params['autocompleteContactReference'])) {
       $value = CRM_Core_DAO::VALUE_SEPARATOR . implode(CRM_Core_DAO::VALUE_SEPARATOR,
         array_keys($params['autocompleteContactReference'])
       ) . CRM_Core_DAO::VALUE_SEPARATOR;
@@ -221,7 +221,7 @@ class CRM_Admin_Form_Setting extends CRM_Core_Form {
     }
 
     // save checksum timeout
-    if (CRM_Utils_Array::value('checksumTimeout', $params)) {
+    if (!empty($params['checksumTimeout'])) {
       CRM_Core_BAO_Setting::setItem($params['checksumTimeout'],
         CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
         'checksum_timeout'
@@ -229,7 +229,7 @@ class CRM_Admin_Form_Setting extends CRM_Core_Form {
     }
 
     // update time for date formats when global time is changed
-    if (CRM_Utils_Array::value('timeInputFormat', $params)) {
+    if (!empty($params['timeInputFormat'])) {
       $query = "
 UPDATE civicrm_preferences_date
 SET    time_format = %1

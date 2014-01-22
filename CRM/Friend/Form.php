@@ -104,7 +104,7 @@ class CRM_Friend_Form extends CRM_Core_Form {
         $params, $values, array('is_tellfriend_enabled', 'tellfriend_limit')
       );
 
-      if (!CRM_Utils_Array::value('is_tellfriend_enabled', $values)) {
+      if (empty($values['is_tellfriend_enabled'])) {
         CRM_Core_Error::fatal(ts('Tell Friend is disable for this Personal Campaign Page'));
       }
 

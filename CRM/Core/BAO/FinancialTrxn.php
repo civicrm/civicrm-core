@@ -307,7 +307,7 @@ WHERE ceft.entity_id = %1";
       return;
     }
 
-    if (CRM_Utils_Array::value('cost', $params)) {
+    if (!empty($params['cost'])) {
       $contributionStatuses = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
       $financialAccountType = CRM_Contribute_PseudoConstant::financialAccountType($params['financial_type_id']);
       $accountRelationship = CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND label IN ('Premiums Inventory Account is', 'Cost of Sales Account is')");
@@ -327,7 +327,7 @@ WHERE ceft.entity_id = %1";
       CRM_Core_BAO_FinancialTrxn::create($financialtrxn, $trxnEntityTable);
     }
 
-    if (CRM_Utils_Array::value('oldPremium', $params)) {
+    if (!empty($params['oldPremium'])) {
       $premiumParams = array(
         'id' => $params['oldPremium']['product_id']
       );
@@ -356,7 +356,7 @@ WHERE ceft.entity_id = %1";
     $expenseTypeId = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Expense Account is' "));
     $domainId = CRM_Core_Config::domainID();
     $amount = 0;
-    if (CRM_Utils_Array::value('prevContribution', $params)) {
+    if (!empty($params['prevContribution'])) {
       $amount = $params['prevContribution']->fee_amount;
     }
     $amount = $params['fee_amount'] - $amount;
@@ -372,7 +372,7 @@ WHERE ceft.entity_id = %1";
     $params['trxnParams']['status_id'] = CRM_Core_OptionGroup::getValue('contribution_status','Completed','name');
     $params['trxnParams']['contribution_id'] = isset($params['contribution']->id) ? $params['contribution']->id : $params['contribution_id'];
     $trxn = self::create($params['trxnParams']);
-    if (!CRM_Utils_Array::value('entity_id', $params)) {
+    if (empty($params['entity_id'])) {
       $financialTrxnID = CRM_Core_BAO_FinancialTrxn::getFinancialTrxnId($params['trxnParams']['contribution_id'], 'DESC');
       $params['entity_id'] = $financialTrxnID['financialTrxnId'];
     }

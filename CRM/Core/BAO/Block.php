@@ -157,7 +157,7 @@ class CRM_Core_BAO_Block {
    */
   static function blockExists($blockName, &$params) {
     // return if no data present
-    if (!CRM_Utils_Array::value($blockName, $params) || !is_array($params[$blockName])) {
+    if (empty($params[$blockName]) || !is_array($params[$blockName])) {
       return FALSE;
     }
 
@@ -262,7 +262,7 @@ class CRM_Core_BAO_Block {
           $primaryId = TRUE;
           if (is_array($blockIds)) {
             foreach ($blockIds as $blockId => $blockValue) {
-              if (CRM_Utils_Array::value('is_primary', $blockValue)) {
+              if (!empty($blockValue['is_primary'])) {
                 $resetPrimaryId = $blockId;
                 break;
               }
@@ -294,12 +294,12 @@ class CRM_Core_BAO_Block {
       );
 
       //check for update
-      if (!CRM_Utils_Array::value('id', $value) &&
+      if (empty($value['id']) &&
         is_array($blockIds) && !empty($blockIds)
       ) {
         foreach ($blockIds as $blockId => $blockValue) {
           if ($updateBlankLocInfo) {
-            if (CRM_Utils_Array::value($count, $blockIds)) {
+            if (!empty($blockIds[$count])) {
               $value['id'] = $blockIds[$count]['id'];
               unset($blockIds[$count]);
             }
@@ -343,7 +343,7 @@ class CRM_Core_BAO_Block {
       // Note there could be cases when block info already exist ($value[id] is set) for a contact/entity
       // BUT info is not present at this time, and therefore we should be really careful when deleting the block.
       // $updateBlankLocInfo will help take appropriate decision. CRM-5969
-      if (CRM_Utils_Array::value('id', $value) && !$dataExits && $updateBlankLocInfo) {
+      if (!empty($value['id']) && !$dataExits && $updateBlankLocInfo) {
         //delete the existing record
         self::blockDelete($blockName, array('id' => $value['id']));
         continue;
@@ -376,7 +376,7 @@ class CRM_Core_BAO_Block {
     // we need to delete blocks that were deleted during update
     if ($updateBlankLocInfo && !empty($blockIds)) {
       foreach ($blockIds as $deleteBlock) {
-        if (!CRM_Utils_Array::value('id', $deleteBlock)) {
+        if (empty($deleteBlock['id'])) {
           continue;
         }
         self::blockDelete($blockName, array('id' => $deleteBlock['id']));
@@ -454,7 +454,7 @@ class CRM_Core_BAO_Block {
     }
 
     // if params is_primary then set all others to not be primary & exit out
-    if (CRM_Utils_Array::value('is_primary', $params)) {
+    if (!empty($params['is_primary'])) {
       $sql = "UPDATE $table SET is_primary = 0 WHERE contact_id = %1";
       $sqlParams = array(1 => array($contactId, 'Integer'));
       // we don't want to create unecessary entries in the log_ tables so exclude the one we are working on

@@ -305,7 +305,7 @@ AND    reset_date IS NULL
         $fromEmail = "$fromDisplayName <$email>";
         $fromEmailHtml = htmlspecialchars($fromEmail) . ' ' . $emailVal['locationType'];
 
-        if (CRM_Utils_Array::value('is_primary', $emailVal)) {
+        if (!empty($emailVal['is_primary'])) {
           $fromEmailHtml .= ' ' . ts('(preferred)');
         }
         $fromEmailValues[$fromEmail] = $fromEmailHtml;

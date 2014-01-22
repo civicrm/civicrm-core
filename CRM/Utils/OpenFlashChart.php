@@ -64,7 +64,7 @@ class CRM_Utils_OpenFlashChart {
     if (empty($params)) {
       return $chart;
     }
-    if (!CRM_Utils_Array::value('multiValues', $params)) {
+    if (empty($params['multiValues'])) {
       $params['multiValues'] = array($params['values']);
     }
 
@@ -445,7 +445,7 @@ class CRM_Utils_OpenFlashChart {
 
     // rotate the x labels.
     $chartData['xLabelAngle'] = CRM_Utils_Array::value('xLabelAngle', $rows, 0);
-    if (CRM_Utils_Array::value('tip', $rows)) {
+    if (!empty($rows['tip'])) {
       $chartData['tip'] = $rows['tip'];
     }
 
@@ -456,7 +456,7 @@ class CRM_Utils_OpenFlashChart {
     // carry some chart params if pass.
     foreach (array(
       'xSize', 'ySize', 'divName') as $f) {
-      if (CRM_Utils_Array::value($f, $rows)) {
+      if (!empty($rows[$f])) {
         $chartData[$f] = $rows[$f];
       }
     }
@@ -478,14 +478,14 @@ class CRM_Utils_OpenFlashChart {
 
     // rotate the x labels.
     $chartData['xLabelAngle'] = CRM_Utils_Array::value('xLabelAngle', $chartInfo, 20);
-    if (CRM_Utils_Array::value('tip', $chartInfo)) {
+    if (!empty($chartInfo['tip'])) {
       $chartData['tip'] = $chartInfo['tip'];
     }
 
     // carry some chart params if pass.
     foreach (array(
       'xSize', 'ySize', 'divName') as $f) {
-      if (CRM_Utils_Array::value($f, $rows)) {
+      if (!empty($rows[$f])) {
         $chartData[$f] = $rows[$f];
       }
     }

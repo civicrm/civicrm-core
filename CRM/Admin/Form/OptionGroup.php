@@ -90,7 +90,7 @@ class CRM_Admin_Form_OptionGroup extends CRM_Admin_Form {
           $element->freeze();
         }
       }
-      if (CRM_Utils_Array::value('is_reserved', $this->_values)) {
+      if (!empty($this->_values['is_reserved'])) {
         $this->freeze(array('name', 'is_active'));
       }
     }

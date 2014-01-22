@@ -76,7 +76,7 @@ class CRM_Financial_Form_FinancialBatch extends CRM_Contribute_Form {
       );
 
       $createdID = CRM_Core_DAO::getFieldValue('CRM_Batch_DAO_Batch', $this->_id, 'created_id');
-      if (CRM_Utils_Array::value($this->_action, $permissions)) {
+      if (!empty($permissions[$this->_action])) {
         $this->checkPermissions($this->_action, $permissions[$this->_action]['permission'], $createdID, $session->get('userID'), $permissions[$this->_action]['actionName'] );
       }
     }
@@ -181,7 +181,7 @@ class CRM_Financial_Form_FinancialBatch extends CRM_Contribute_Form {
    */
   static function formRule($values, $files, $self) {
     $errors = array();
-    if (CRM_Utils_Array::value('contact_name', $values) && !is_numeric($values['created_id'])) {
+    if (!empty($values['contact_name']) && !is_numeric($values['created_id'])) {
       $errors['contact_name'] = ts('Please select a valid contact.');
     }
     if ($values['item_count'] && (!is_numeric($values['item_count']) || $values['item_count'] < 1)) {
@@ -190,7 +190,7 @@ class CRM_Financial_Form_FinancialBatch extends CRM_Contribute_Form {
     if ($values['total'] && (!is_numeric($values['total']) || $values['total'] <= 0)) {
       $errors['total'] = ts('Total Amount should be a positive number');
     }
-    if (CRM_Utils_Array::value('created_date', $values) && date('Y-m-d') < date('Y-m-d', strtotime($values['created_date']))) {
+    if (!empty($values['created_date']) && date('Y-m-d') < date('Y-m-d', strtotime($values['created_date']))) {
       $errors['created_date'] = ts('Created date cannot be greater than current date');
     }
     $batchName = $values['title'];
@@ -219,7 +219,7 @@ class CRM_Financial_Form_FinancialBatch extends CRM_Contribute_Form {
     // store the submitted values in an array
     $params['modified_date'] = date('YmdHis');
     $params['modified_id'] = $session->get('userID');
-    if (CRM_Utils_Array::value('created_date', $params)) {
+    if (!empty($params['created_date'])) {
       $params['created_date'] = CRM_Utils_Date::processDate($params['created_date']);
     }
 

@@ -346,7 +346,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
    */
   public static function &create(&$params) {
 
-    if (CRM_Utils_Array::value('id', $params)) {
+    if (!empty($params['id'])) {
       CRM_Utils_Hook::pre('edit', 'Group', $params['id'], $params);
     }
     else {
@@ -396,7 +396,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
         array_keys($group->parents)
       ) . CRM_Core_DAO::VALUE_SEPARATOR;
     }
-    if (!CRM_Utils_Array::value('id', $params) &&
+    if (empty($params['id']) &&
       !$nameParam
     ) {
       $group->name .= "_tmp";
@@ -407,7 +407,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
       return NULL;
     }
 
-    if (!CRM_Utils_Array::value('id', $params) &&
+    if (empty($params['id']) &&
       !$nameParam
     ) {
       $group->name = substr($group->name, 0, -4) . "_{$group->id}";
@@ -417,7 +417,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
     $group->save();
 
     // add custom field values
-    if (CRM_Utils_Array::value('custom', $params)) {
+    if (!empty($params['custom'])) {
       CRM_Core_BAO_CustomValueTable::store($params['custom'], 'civicrm_group', $group->id);
     }
 
@@ -461,7 +461,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
       }
     }
 
-    if (CRM_Utils_Array::value('organization_id', $params)) {
+    if (!empty($params['organization_id'])) {
       $groupOrg = array();
       $groupOrg = $params;
       $groupOrg['group_id'] = $group->id;
@@ -470,7 +470,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
 
     CRM_Contact_BAO_GroupContactCache::add($group->id);
 
-    if (CRM_Utils_Array::value('id', $params)) {
+    if (!empty($params['id'])) {
       CRM_Utils_Hook::post('edit', 'Group', $group->id, $group);
     }
     else {
@@ -529,7 +529,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
    * @static
    */
   public static function createSmartGroup(&$params) {
-    if (CRM_Utils_Array::value('formValues', $params)) {
+    if (!empty($params['formValues'])) {
       $ssParams = $params;
       unset($ssParams['id']);
       if (isset($ssParams['saved_search_id'])) {
@@ -653,7 +653,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
     }
 
     $smartGroupId = NULL;
-    if (CRM_Utils_Array::value('saved_search_id', $params)) {
+    if (!empty($params['saved_search_id'])) {
       $smartGroupId = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Group', $ssId, 'id', 'saved_search_id');
     }
     else {
@@ -692,7 +692,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
     $groups = CRM_Contact_BAO_Group::getGroupList($params);
 
     //skip total if we are making call to show only children
-    if ( !CRM_Utils_Array::value('parent_id', $params) ) {
+    if (empty($params['parent_id'])) {
       // add total
       $params['total'] = CRM_Contact_BAO_Group::getGroupCount($params);
 
@@ -709,7 +709,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
         $groupList[$id]['class'] = implode(' ', $value['class']);
 
         // append parent names if in search mode
-        if ( !CRM_Utils_Array::value('parent_id', $params) &&
+        if (empty($params['parent_id']) &&
         CRM_Utils_Array::value( 'parents', $value ) ) {
           $groupIds = explode(',', $value['parents']);
           $title = array();
@@ -721,7 +721,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
         }
 
         $groupList[$id]['group_description'] = CRM_Utils_Array::value('description', $value);
-        if ( CRM_Utils_Array::value('group_type', $value) ) {
+        if (!empty($value['group_type'])) {
           $groupList[$id]['group_type'] = $value['group_type'];
         }
         else {
@@ -1038,7 +1038,7 @@ WHERE  id IN $groupIdString
     $whereClause = self::whereClause($params, FALSE);
     $query = "SELECT COUNT(*) FROM civicrm_group groups";
 
-    if (CRM_Utils_Array::value('created_by', $params)) {
+    if (!empty($params['created_by'])) {
       $query .= "
 INNER JOIN civicrm_contact createdBy
        ON createdBy.id = groups.created_id";

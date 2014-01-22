@@ -121,8 +121,8 @@ class CRM_Contribute_Form_ContributionPage_Premium extends CRM_Contribute_Form_C
    */
   public static function formRule($params) {
     $errors = array();
-    if (CRM_Utils_Array::value('premiums_active', $params)) {
-      if (!CRM_Utils_Array::value('premiums_nothankyou_label', $params)) {
+    if (!empty($params['premiums_active'])) {
+      if (empty($params['premiums_nothankyou_label'])) {
         $errors['premiums_nothankyou_label'] = ts('No Thank-you Label is a required field.');
       }
     }

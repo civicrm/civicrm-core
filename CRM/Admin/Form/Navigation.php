@@ -119,7 +119,7 @@ class CRM_Admin_Form_Navigation extends CRM_Admin_Form {
   public function setDefaultValues() {
     $defaults = $this->_defaults;
     if (isset($this->_id)) {
-      if (CRM_Utils_Array::value('permission', $this->_defaults)) {
+      if (!empty($this->_defaults['permission'])) {
         foreach (explode(',', $this->_defaults['permission']) as $value) {
           $components[$value] = $value;
         }

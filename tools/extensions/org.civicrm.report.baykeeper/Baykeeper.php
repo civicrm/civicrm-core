@@ -316,7 +316,7 @@ class CRM_Report_Form_Contribute_Baykeeper extends CRM_Report_Form {
     foreach ($this->_columns as $tableName => $table) {
       if (array_key_exists('fields', $table)) {
         foreach ($table['fields'] as $fieldName => $field) {
-          if (CRM_Utils_Array::value('required', $field) ||
+          if (!empty($field['required']) ||
             CRM_Utils_Array::value($fieldName, $this->_params['fields'])
           ) {
             if ($tableName == 'civicrm_address') {
@@ -335,7 +335,7 @@ class CRM_Report_Form_Contribute_Baykeeper extends CRM_Report_Form {
 
 
             // only include statistics columns if set
-            if (CRM_Utils_Array::value('statistics', $field)) {
+            if (!empty($field['statistics'])) {
               foreach ($field['statistics'] as $stat => $label) {
                 switch (strtolower($stat)) {
                   case 'sum':
@@ -376,12 +376,12 @@ class CRM_Report_Form_Contribute_Baykeeper extends CRM_Report_Form {
     }
 
     // insert first and last contribution at end
-    if (CRM_Utils_Array::value('first_contribution', $this->_params['options'])) {
+    if (!empty($this->_params['options']['first_contribution'])) {
       $select[] = " '' as first_contribution";
       $this->_columnHeaders['first_contribution']['title'] = ts('First Contribution');
     }
 
-    if (CRM_Utils_Array::value('last_contribution', $this->_params['options'])) {
+    if (!empty($this->_params['options']['last_contribution'])) {
       $select[] = " '' as last_contribution";
       $this->_columnHeaders['last_contribution']['title'] = ts('Last Contribution');
     }

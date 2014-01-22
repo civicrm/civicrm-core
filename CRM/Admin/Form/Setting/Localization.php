@@ -304,12 +304,12 @@ class CRM_Admin_Form_Setting_Localization extends CRM_Admin_Form_Setting {
     unset($values['currencyLimit']);
 
     // make the site multi-lang if requested
-    if (CRM_Utils_Array::value('makeMultilingual', $values)) {
+    if (!empty($values['makeMultilingual'])) {
       CRM_Core_I18n_Schema::makeMultilingual($values['lcMessages']);
       $values['languageLimit'][$values['lcMessages']] = 1;
       // make the site single-lang if requested
     }
-    elseif (CRM_Utils_Array::value('makeSinglelingual', $values)) {
+    elseif (!empty($values['makeSinglelingual'])) {
       CRM_Core_I18n_Schema::makeSinglelingual($values['lcMessages']);
       $values['languageLimit'] = '';
     }

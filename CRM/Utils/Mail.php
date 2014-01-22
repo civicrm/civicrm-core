@@ -72,8 +72,7 @@ class CRM_Utils_Mail {
     CRM_Utils_Hook::alterMailParams($params);
 
     // check if any module has aborted mail sending
-    if (
-      CRM_Utils_Array::value('abortMailSend', $params) ||
+    if (!empty($params['abortMailSend']) ||
       !CRM_Utils_Array::value('toEmail', $params)
     ) {
       return FALSE;
@@ -90,7 +89,7 @@ class CRM_Utils_Mail {
 
     $headers         = array();
     // CRM-10699 support custom email headers
-    if (CRM_Utils_Array::value('headers', $params)) {
+    if (!empty($params['headers'])) {
       $headers = array_merge($headers, $params['headers']);
     }
     $headers['From'] = $params['from'];
@@ -118,7 +117,7 @@ class CRM_Utils_Mail {
     if ($includeMessageId) {
       $headers['Message-ID'] = '<' . uniqid('civicrm_', TRUE) . "@$emailDomain>";
     }
-    if (CRM_Utils_Array::value('autoSubmitted', $params)) {
+    if (!empty($params['autoSubmitted'])) {
       $headers['Auto-Submitted'] = "Auto-Generated";
     }
 
@@ -171,10 +170,10 @@ class CRM_Utils_Mail {
     if (get_class($mailer) != "Mail_mail") {
         //get emails from headers, since these are 
         //combination of name and email addresses.
-        if ( CRM_Utils_Array::value( 'Cc', $headers ) ) {
+        if (!empty($headers['Cc'])) {
             $to[] = CRM_Utils_Array::value( 'Cc', $headers );
         }
-        if ( CRM_Utils_Array::value( 'Bcc', $headers ) ) {
+        if (!empty($headers['Bcc'])) {
             $to[] = CRM_Utils_Array::value( 'Bcc', $headers );
         }
     }

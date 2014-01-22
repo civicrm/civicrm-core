@@ -261,7 +261,7 @@ class CRM_Core_DAO extends DB_DataObject {
     if ($fields) {
       foreach ($fields as $name => $value) {
         $table[$value['name']] = $value['type'];
-        if (CRM_Utils_Array::value('required', $value)) {
+        if (!empty($value['required'])) {
           $table[$value['name']] += self::DB_DAO_NOTNULL;
         }
       }
@@ -1086,13 +1086,13 @@ FROM   civicrm_domain
         $fieldsToSuffix  = array();
         $fieldsToReplace = array();
       }
-      if (CRM_Utils_Array::value('prefix', $fieldsFix)) {
+      if (!empty($fieldsFix['prefix'])) {
         $fieldsToPrefix = $fieldsFix['prefix'];
       }
-      if (CRM_Utils_Array::value('suffix', $fieldsFix)) {
+      if (!empty($fieldsFix['suffix'])) {
         $fieldsToSuffix = $fieldsFix['suffix'];
       }
-      if (CRM_Utils_Array::value('replace', $fieldsFix)) {
+      if (!empty($fieldsFix['replace'])) {
         $fieldsToReplace = $fieldsFix['replace'];
       }
 

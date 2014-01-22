@@ -76,7 +76,7 @@ class CRM_Contribute_BAO_Query {
     }
 
     // get financial_type
-    if (CRM_Utils_Array::value('financial_type', $query->_returnProperties)) {
+    if (!empty($query->_returnProperties['financial_type'])) {
       $query->_select['financial_type']  = "civicrm_financial_type.name as financial_type";
       $query->_element['financial_type'] = 1;
       $query->_tables['civicrm_contribution'] = 1;
@@ -84,27 +84,27 @@ class CRM_Contribute_BAO_Query {
     }
 
     // get accounting code
-    if (CRM_Utils_Array::value( 'accounting_code', $query->_returnProperties)) {
+    if (!empty($query->_returnProperties['accounting_code'])) {
       $query->_select['accounting_code']  = "civicrm_financial_account.accounting_code as accounting_code";
       $query->_element['accounting_code'] = 1;
       $query->_tables['civicrm_accounting_code'] = 1;
       $query->_tables['civicrm_financial_account'] = 1;
     }
 
-    if (CRM_Utils_Array::value('contribution_note', $query->_returnProperties)) {
+    if (!empty($query->_returnProperties['contribution_note'])) {
       $query->_select['contribution_note'] = "civicrm_note.note as contribution_note";
       $query->_element['contribution_note'] = 1;
       $query->_tables['contribution_note'] = 1;
     }
 
-    if (CRM_Utils_Array::value('contribution_batch', $query->_returnProperties)) {
+    if (!empty($query->_returnProperties['contribution_batch'])) {
       $query->_select['contribution_batch'] = "civicrm_batch.title as contribution_batch";
       $query->_element['contribution_batch'] = 1;
       $query->_tables['contribution_batch'] = 1;
     }
 
     // get contribution_status
-    if (CRM_Utils_Array::value('contribution_status_id', $query->_returnProperties)) {
+    if (!empty($query->_returnProperties['contribution_status_id'])) {
       $query->_select['contribution_status_id'] = "contribution_status.value as contribution_status_id";
       $query->_element['contribution_status_id'] = 1;
       $query->_tables['civicrm_contribution'] = 1;
@@ -112,7 +112,7 @@ class CRM_Contribute_BAO_Query {
     }
 
     // get contribution_status label
-    if (CRM_Utils_Array::value('contribution_status', $query->_returnProperties)) {
+    if (!empty($query->_returnProperties['contribution_status'])) {
       $query->_select['contribution_status'] = "contribution_status.label as contribution_status";
       $query->_element['contribution_status'] = 1;
       $query->_tables['civicrm_contribution'] = 1;
@@ -120,27 +120,27 @@ class CRM_Contribute_BAO_Query {
     }
 
     // get payment instruments
-    if (CRM_Utils_Array::value('payment_instrument', $query->_returnProperties)) {
+    if (!empty($query->_returnProperties['payment_instrument'])) {
       $query->_select['contribution_payment_instrument'] = "payment_instrument.name as contribution_payment_instrument";
       $query->_element['contribution_payment_instrument'] = 1;
       $query->_tables['civicrm_contribution'] = 1;
       $query->_tables['contribution_payment_instrument'] = 1;
     }
 
-    if (CRM_Utils_Array::value('check_number', $query->_returnProperties)) {
+    if (!empty($query->_returnProperties['check_number'])) {
       $query->_select['contribution_check_number'] = "civicrm_contribution.check_number as contribution_check_number";
       $query->_element['contribution_check_number'] = 1;
       $query->_tables['civicrm_contribution'] = 1;
     }
 
-    if (CRM_Utils_Array::value('contribution_campaign_id', $query->_returnProperties)) {
+    if (!empty($query->_returnProperties['contribution_campaign_id'])) {
       $query->_select['contribution_campaign_id'] = 'civicrm_contribution.campaign_id as contribution_campaign_id';
       $query->_element['contribution_campaign_id'] = 1;
       $query->_tables['civicrm_contribution'] = 1;
     }
 
     // LCD 716
-    if (CRM_Utils_Array::value('soft_credit_name', $query->_returnProperties)) {
+    if (!empty($query->_returnProperties['soft_credit_name'])) {
       $query->_select['contribution_soft_credit_name'] = "civicrm_contact_d.display_name as contribution_soft_credit_name";
       $query->_element['contribution_soft_credit_name'] = 1;
       $query->_tables['civicrm_contribution'] = 1;
@@ -148,7 +148,7 @@ class CRM_Contribute_BAO_Query {
       $query->_tables['civicrm_contribution_soft_contact'] = 1;
     }
 
-    if (CRM_Utils_Array::value('soft_credit_email', $query->_returnProperties)) {
+    if (!empty($query->_returnProperties['soft_credit_email'])) {
       $query->_select['contribution_soft_credit_email'] = "soft_email.email as contribution_soft_credit_email";
       $query->_element['contribution_soft_credit_email'] = 1;
       $query->_tables['civicrm_contribution'] = 1;
@@ -157,7 +157,7 @@ class CRM_Contribute_BAO_Query {
       $query->_tables['civicrm_contribution_soft_email'] = 1;
     }
 
-    if (CRM_Utils_Array::value('soft_credit_phone', $query->_returnProperties)) {
+    if (!empty($query->_returnProperties['soft_credit_phone'])) {
       $query->_select['contribution_soft_credit_email'] = "soft_phone.phone as contribution_soft_credit_phone";
       $query->_element['contribution_soft_credit_phone'] = 1;
       $query->_tables['civicrm_contribution'] = 1;
@@ -171,7 +171,7 @@ class CRM_Contribute_BAO_Query {
   static function where(&$query) {
     $grouping = NULL;
     foreach (array_keys($query->_params) as $id) {
-      if (!CRM_Utils_Array::value(0, $query->_params[$id])) {
+      if (empty($query->_params[$id][0])) {
         continue;
       }
       if (substr($query->_params[$id][0], 0, 13) == 'contribution_' || substr($query->_params[$id][0], 0, 10) == 'financial_') {
@@ -860,11 +860,11 @@ class CRM_Contribute_BAO_Query {
 
   static function tableNames(&$tables) {
     // Add contribution table
-    if (CRM_Utils_Array::value('civicrm_product', $tables)) {
+    if (!empty($tables['civicrm_product'])) {
       $tables = array_merge(array('civicrm_contribution' => 1), $tables);
     }
 
-    if (CRM_Utils_Array::value('civicrm_contribution_product', $tables) &&
+    if (!empty($tables['civicrm_contribution_product']) &&
       !CRM_Utils_Array::value('civicrm_product', $tables)) {
       $tables['civicrm_product'] = 1;
     }

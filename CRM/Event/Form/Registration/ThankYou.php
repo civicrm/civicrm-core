@@ -161,7 +161,7 @@ class CRM_Event_Form_Registration_ThankYou extends CRM_Event_Form_Registration {
     $params['entity_table'] = 'civicrm_event';
     $data = array();
     CRM_Friend_BAO_Friend::retrieve($params, $data);
-    if (CRM_Utils_Array::value('is_active', $data)) {
+    if (!empty($data['is_active'])) {
       $friendText = $data['title'];
       $this->assign('friendText', $friendText);
       if ($this->_action & CRM_Core_Action::PREVIEW) {

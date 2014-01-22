@@ -698,7 +698,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
         case CRM_Utils_Type::T_INT:
           // probably created with a 1
           $entity[$fieldName] = '6';
-          if (CRM_Utils_Array::value('FKClassName', $specs)) {
+          if (!empty($specs['FKClassName'])) {
             if($specs['FKClassName'] == $baoString){
               $entity[$fieldName] = (string) $entity2['id'];
             }

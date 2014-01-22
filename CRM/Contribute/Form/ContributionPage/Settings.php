@@ -92,7 +92,7 @@ class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_
       CRM_Utils_System::setTitle(ts('Title and Settings'));
     }
 
-    if (!CRM_Utils_Array::value('soft_credit_types', $defaults)) {
+    if (empty($defaults['soft_credit_types'])) {
       $defaults['soft_credit_types'] = array(1, 2);
     }
 
@@ -219,7 +219,7 @@ class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_
 
     $this->addProfileSelector('honoree_profile', ts('Honoree Profile'), $allowCoreTypes, $allowSubTypes, $entities);
 
-    if (CRM_Utils_Array::value('honor_block_is_active', $this->_submitValues)) {
+    if (!empty($this->_submitValues['honor_block_is_active'])) {
       $this->addRule('soft_credit_types', ts('At least one value must be selected if Honor Section is active'), 'required');
       $this->addRule('honoree_profile', ts('Please select a profile used for honoree'), 'required');
     }
@@ -250,7 +250,7 @@ class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_
       $errors['title'] = ts("Please do not use '/' in Title");
     }
 
-    if (CRM_Utils_Array::value('is_organization', $values) &&
+    if (!empty($values['is_organization']) &&
       !CRM_Utils_Array::value('onbehalf_profile_id', $values)
     ) {
       $errors['onbehalf_profile_id'] = ts('Please select a profile to collect organization information on this contribution page.');
@@ -263,8 +263,7 @@ class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_
       $errors['end_date'] = ts('End date should be after Start date.');
     }
 
-    if (CRM_Utils_Array::value('payment_processor', $self->_values)
-      && $financialType = CRM_Contribute_BAO_Contribution::validateFinancialType($values['financial_type_id'])) {
+    if (!empty($self->_values['payment_processor']) && $financialType = CRM_Contribute_BAO_Contribution::validateFinancialType($values['financial_type_id'])) {
       $errors['financial_type_id'] = ts("Financial Account of account relationship of 'Expense Account is' is not configured for Financial Type : ") . $financialType;
     }
 
@@ -371,7 +370,7 @@ class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_
 
 
     foreach ($ufJoinParams as $index => $ufJoinParam) {
-      if (CRM_Utils_Array::value($index, $params)) {
+      if (!empty($params[$index])) {
           $ufJoinParam['weight'] = 1;
           if ($index == 'honor_block_is_active') {
             $ufJoinParam['is_active'] = 1;

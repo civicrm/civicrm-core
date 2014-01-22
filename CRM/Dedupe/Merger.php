@@ -730,7 +730,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
         // Rule: resolve address conflict if any -
         if ($fieldName == 'address') {
           $mainNewLocTypeId = $migrationInfo['location'][$fieldName][$fieldCount]['locTypeId'];
-          if (CRM_Utils_Array::value('main_loc_address', $migrationInfo) &&
+          if (!empty($migrationInfo['main_loc_address']) &&
               array_key_exists("main_{$mainNewLocTypeId}", $migrationInfo['main_loc_address'])) {
             // main loc already has some address for the loc-type. Its a overwrite situation.
 
@@ -826,7 +826,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
         'preferred_communication_method' => $value,
       );
 
-      if (CRM_Utils_array::value('preferred_communication_method', $contact)){
+      if (!empty($contact['preferred_communication_method'])){
       // api 3 returns pref_comm_method as an array, which breaks the lookup; so we reconstruct
       $prefCommList = is_array($specialValues[$moniker]['preferred_communication_method']) ?
         implode(CRM_Core_DAO::VALUE_SEPARATOR, $specialValues[$moniker]['preferred_communication_method']) :
@@ -863,7 +863,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
           $value = CRM_Core_DAO::VALUE_SEPARATOR . trim($specialValues[$moniker][$field], CRM_Core_DAO::VALUE_SEPARATOR) . CRM_Core_DAO::VALUE_SEPARATOR;
         }
         $label = isset($specialValues[$moniker]["{$field}_display"]) ? $specialValues[$moniker]["{$field}_display"] : $value;
-        if (CRM_Utils_Array::value('type', $fields[$field]) && $fields[$field]['type'] == CRM_Utils_Type::T_DATE) {
+        if (!empty($fields[$field]['type']) && $fields[$field]['type'] == CRM_Utils_Type::T_DATE) {
           if ($value) {
             $value = str_replace('-', '', $value);
             $label = CRM_Utils_Date::customFormat($label);
@@ -872,7 +872,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
             $value = "null";
           }
         }
-        elseif (CRM_Utils_Array::value('type', $fields[$field]) && $fields[$field]['type'] == CRM_Utils_Type::T_BOOLEAN) {
+        elseif (!empty($fields[$field]['type']) && $fields[$field]['type'] == CRM_Utils_Type::T_BOOLEAN) {
           if ($label === '0') {
             $label = ts('[ ]');
           }
@@ -1119,7 +1119,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
             $rows["custom_group_$gid"]['title'] = $group['title'];
             $foundField = TRUE;
           }
-          if (CRM_Utils_Array::value('customValue', $mainTree[$gid]['fields'][$fid])) {
+          if (!empty($mainTree[$gid]['fields'][$fid]['customValue'])) {
             foreach ($mainTree[$gid]['fields'][$fid]['customValue'] as $valueId => $values) {
               $rows["move_custom_$fid"]['main'] = CRM_Core_BAO_CustomGroup::formatCustomValues($values,
                 $field, TRUE
@@ -1127,7 +1127,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
             }
           }
           $value = "null";
-          if (CRM_Utils_Array::value('customValue', $otherTree[$gid]['fields'][$fid])) {
+          if (!empty($otherTree[$gid]['fields'][$fid]['customValue'])) {
             foreach ($otherTree[$gid]['fields'][$fid]['customValue'] as $valueId => $values) {
               $rows["move_custom_$fid"]['other'] = CRM_Core_BAO_CustomGroup::formatCustomValues($values,
                 $field, TRUE
@@ -1362,7 +1362,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
             // get the existing custom values from db.
             $customParams = array('entityID' => $mainId, $key => TRUE);
             $customfieldValues = CRM_Core_BAO_CustomValueTable::getValues($customParams);
-            if (CRM_Utils_array::value($key, $customfieldValues)) {
+            if (!empty($customfieldValues[$key])) {
               $existingValue = explode(CRM_Core_DAO::VALUE_SEPARATOR, $customfieldValues[$key]);
               if (is_array($existingValue) && !empty($existingValue)) {
                 $mergeValue = $submmtedCustomValue = array();
@@ -1492,7 +1492,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
       CRM_Core_Permission::check('delete contacts')
     ) {
       // if ext id is submitted then set it null for contact to be deleted
-      if (CRM_Utils_Array::value('external_identifier', $submitted)) {
+      if (!empty($submitted['external_identifier'])) {
         $query = "UPDATE civicrm_contact SET external_identifier = null WHERE id = {$otherId}";
         CRM_Core_DAO::executeQuery($query);
       }

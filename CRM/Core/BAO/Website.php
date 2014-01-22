@@ -86,7 +86,7 @@ class CRM_Core_BAO_Website extends CRM_Core_DAO_Website {
         }
       }
 
-      if (!CRM_Utils_Array::value('id', $values) &&
+      if (empty($values['id']) &&
         is_array($ids) && !empty($ids)
       ) {
         foreach ($ids as $id => $value) {
@@ -99,7 +99,7 @@ class CRM_Core_BAO_Website extends CRM_Core_DAO_Website {
         }
       }
       $values['contact_id'] = $contactID;
-      if ( CRM_Utils_Array::value('url', $values) ) {
+      if (!empty($values['url'])) {
         self::add($values);
       }
     }

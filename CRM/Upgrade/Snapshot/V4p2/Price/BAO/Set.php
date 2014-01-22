@@ -640,7 +640,7 @@ WHERE  id = %1";
     $radioLevel = $checkboxLevel = $selectLevel = $textLevel = array();
 
     foreach ($fields as $id => $field) {
-      if (!CRM_Utils_Array::value("price_{$id}", $params) ||
+      if (empty($params["price_{$id}"]) ||
         (empty($params["price_{$id}"]) && $params["price_{$id}"] == NULL)
       ) {
         // skip if nothing was submitted for this field
@@ -826,7 +826,7 @@ return;
 static $_contact_memberships = array();
 $checklifetime = FALSE;
 foreach ($options as $key => $value) {
-if (CRM_Utils_Array::value('membership_type_id', $value)) {
+if (!empty($value['membership_type_id'])) {
 if (!isset($_contact_memberships[$userid][$value['membership_type_id']])) {
 $_contact_memberships[$userid][$value['membership_type_id']] = CRM_Member_BAO_Membership::getContactMembership($userid, $value['membership_type_id'], FALSE);
 }
