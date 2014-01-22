@@ -116,7 +116,7 @@ class CRM_Admin_Form_Preferences_Mailing extends CRM_Admin_Form_Preferences {
     // check if mailing tab is enabled, if not prompt user to enable the tab if "write_activity_record" is disabled
     $params = $this->controller->exportValues($this->_name);
 
-    if (!CRM_Utils_Array::value('write_activity_record', $params)) {
+    if (empty($params['write_activity_record'])) {
       $existingViewOptions = CRM_Core_BAO_Setting::getItem(
         CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
         'contact_view_options'

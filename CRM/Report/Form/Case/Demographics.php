@@ -249,7 +249,7 @@ where (cg.extends='Contact' OR cg.extends='Individual' OR cg.extends_entity_colu
     foreach ($this->_columns as $tableName => $table) {
       if (array_key_exists('fields', $table)) {
         foreach ($table['fields'] as $fieldName => $field) {
-          if (CRM_Utils_Array::value('required', $field) ||
+          if (!empty($field['required']) ||
             CRM_Utils_Array::value($fieldName, $this->_params['fields'])
           ) {
             if ($tableName == 'civicrm_email') {

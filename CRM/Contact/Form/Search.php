@@ -741,7 +741,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form {
     }
 
     // show the context menu only when we’re not searching for deleted contacts; CRM-5673
-    if (!CRM_Utils_Array::value('deleted_contacts', $this->_formValues)) {
+    if (empty($this->_formValues['deleted_contacts'])) {
       $menuItems = CRM_Contact_BAO_Contact::contextMenu();
       $primaryActions = CRM_Utils_Array::value('primaryActions', $menuItems, array());
       $this->_contextMenu = CRM_Utils_Array::value('moreActions', $menuItems, array());
@@ -869,7 +869,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form {
       $this->_formValues['operator'] = $this->_operator;
     }
 
-    if (!CRM_Utils_Array::value('qfKey', $this->_formValues)) {
+    if (empty($this->_formValues['qfKey'])) {
       $this->_formValues['qfKey'] = $this->controller->_key;
     }
 

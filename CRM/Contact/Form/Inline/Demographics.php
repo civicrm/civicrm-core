@@ -59,7 +59,7 @@ class CRM_Contact_Form_Inline_Demographics extends CRM_Contact_Form_Inline {
     $params = $this->exportValues();
 
     // Process / save demographics
-    if (!CRM_Utils_Array::value('is_deceased', $params)) {
+    if (empty($params['is_deceased'])) {
       $params['is_deceased'] = FALSE;
       $params['deceased_date'] = NULL;
     }

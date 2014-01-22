@@ -104,7 +104,7 @@ class CRM_Admin_Form_Setting_UpdateConfigBackend extends CRM_Admin_Form_Setting 
   }
 
   function postProcess() {
-    if (CRM_Utils_Array::value('_qf_UpdateConfigBackend_next_cleanup', $_POST)) {
+    if (!empty($_POST['_qf_UpdateConfigBackend_next_cleanup'])) {
 
       $config = CRM_Core_Config::singleton();
 

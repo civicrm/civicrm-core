@@ -120,7 +120,7 @@ class CRM_Case_Form_Activity_ChangeCaseStartDate {
    * @return void
    */
   static function endPostProcess(&$form, &$params, $activity) {
-    if (CRM_Utils_Array::value('start_date', $params)) {
+    if (!empty($params['start_date'])) {
       $params['start_date'] = CRM_Utils_Date::processDate($params['start_date'], $params['start_date_time']);
     }
 

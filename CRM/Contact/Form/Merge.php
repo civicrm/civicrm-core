@@ -327,7 +327,7 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
 
     CRM_Core_Session::setStatus(ts('Contact id %1 has been updated and contact id %2 has been deleted.', array(1 => $this->_cid, 2 => $this->_oid)), ts('Contacts Merged'), 'success');
     $url = CRM_Utils_System::url('civicrm/contact/view', "reset=1&cid={$this->_cid}");
-    if (CRM_Utils_Array::value('_qf_Merge_submit', $formValues)) {
+    if (!empty($formValues['_qf_Merge_submit'])) {
       $listParamsURL = "reset=1&action=update&rgid={$this->_rgid}";
       if ($this->_gid) {
         $listParamsURL .= "&gid={$this->_gid}";
@@ -337,7 +337,7 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
       );
       CRM_Utils_System::redirect($lisitingURL);
     }
-     if (CRM_Utils_Array::value('_qf_Merge_done', $formValues)) {
+     if (!empty($formValues['_qf_Merge_done'])) {
       CRM_Utils_System::redirect($url);
     }
 

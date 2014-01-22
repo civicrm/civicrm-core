@@ -326,7 +326,7 @@ SELECT module
     }
 
     //for delete record handling
-    if (!CRM_Utils_Array::value($this->_deleteButtonName, $_POST)) {
+    if (empty($_POST[$this->_deleteButtonName])) {
       CRM_Core_Session::setStatus(ts('Your information has been saved.'), ts('Thank you.'), 'success');
     }
 

@@ -204,7 +204,7 @@ class CRM_Event_Form_Registration_ParticipantConfirm extends CRM_Event_Form_Regi
         $statusMessage = ts("Your event registration has been cancelled.");
       }
 
-      if (CRM_Utils_Array::value('mailedParticipants', $results)) {
+      if (!empty($results['mailedParticipants'])) {
         foreach ($results['mailedParticipants'] as $key => $displayName) {
           $statusMessage .= "<br />" . ts("Email has been sent to : %1", array(1 => $displayName));
         }

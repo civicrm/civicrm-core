@@ -131,11 +131,11 @@ class CRM_Group_Form_Edit extends CRM_Core_Form {
             'search_custom_id'
           );
         }
-        if (CRM_Utils_Array::value('created_id', $this->_groupValues))
+        if (!empty($this->_groupValues['created_id']))
           $groupValues['created_by'] =
             CRM_Core_DAO::getFieldValue("CRM_Contact_DAO_Contact", $this->_groupValues['created_id'] , 'sort_name', 'id');
 
-        if (CRM_Utils_Array::value('modified_id', $this->_groupValues)) {
+        if (!empty($this->_groupValues['modified_id'])) {
           $groupValues['modified_by'] =
             CRM_Core_DAO::getFieldValue("CRM_Contact_DAO_Contact", $this->_groupValues['modified_id'] , 'sort_name', 'id');
         }
@@ -164,7 +164,7 @@ class CRM_Group_Form_Edit extends CRM_Core_Form {
 
     if (isset($this->_id)) {
       $defaults = $this->_groupValues;
-      if (CRM_Utils_Array::value('group_type', $defaults)) {
+      if (!empty($defaults['group_type'])) {
         $types = explode(CRM_Core_DAO::VALUE_SEPARATOR,
           substr($defaults['group_type'], 1, -1)
         );
@@ -179,7 +179,7 @@ class CRM_Group_Form_Edit extends CRM_Core_Form {
       ) {
         CRM_Contact_BAO_GroupOrganization::retrieve($this->_id, $defaults);
 
-        if (CRM_Utils_Array::value('group_organization', $defaults)) {
+        if (!empty($defaults['group_organization'])) {
           //used in edit mode
           $this->_groupOrganizationID = $defaults['group_organization'];
         }
@@ -202,7 +202,7 @@ class CRM_Group_Form_Edit extends CRM_Core_Form {
       }
     }
 
-    if (!CRM_Utils_Array::value('parents', $defaults)) {
+    if (empty($defaults['parents'])) {
       $defaults['parents'] = CRM_Core_BAO_Domain::getGroupId();
     }
 
@@ -384,7 +384,7 @@ class CRM_Group_Form_Edit extends CRM_Core_Form {
       }
 
       $grpAdd = 0;
-      if (CRM_Utils_Array::value('parents', $fields)) {
+      if (!empty($fields['parents'])) {
         $grpAdd++;
       }
 
@@ -394,7 +394,7 @@ class CRM_Group_Form_Edit extends CRM_Core_Form {
     }
 
     // do check for both name and title uniqueness
-    if (CRM_Utils_Array::value('title', $fields)) {
+    if (!empty($fields['title'])) {
       $title = trim($fields['title']);
       $query = "
 SELECT count(*)
@@ -461,7 +461,7 @@ WHERE  title = %1
              * Remove any parent groups requested to be removed
              */
 
-      if (CRM_Utils_Array::value('parents', $this->_groupValues)) {
+      if (!empty($this->_groupValues['parents'])) {
         $parentGroupIds = explode(',', $this->_groupValues['parents']);
         foreach ($parentGroupIds as $parentGroupId) {
           if (isset($params["remove_parent_group_$parentGroupId"])) {

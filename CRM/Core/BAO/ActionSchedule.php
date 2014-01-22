@@ -1244,7 +1244,7 @@ WHERE     m.owner_membership_id IS NOT NULL AND
     switch ($mapping['entity']) {
       case 'civicrm_participant':
         $eventContacts = CRM_Core_OptionGroup::values('event_contacts', FALSE, FALSE, FALSE, NULL, 'name');
-        if (!CRM_Utils_Array::value($recipientType, $eventContacts)) {
+        if (empty($eventContacts[$recipientType])) {
           return $options;
         }
         if ($eventContacts[$recipientType] == 'participant_role') {

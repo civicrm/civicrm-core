@@ -388,7 +388,7 @@ AND        a.is_deleted = 0
       if ($referenceActivityName = (string) $activityTypeXML->reference_activity) {
 
         //we skip open case as reference activity.CRM-4374.
-        if (CRM_Utils_Array::value('resetTimeline', $params) && $referenceActivityName == 'Open Case') {
+        if (!empty($params['resetTimeline']) && $referenceActivityName == 'Open Case') {
           $activityDate = $params['activity_date_time'];
         }
         else {
@@ -434,7 +434,7 @@ AND        a.is_deleted = 0
       return TRUE;
     }
     $activityParams['case_id'] = $params['caseID'];
-    if (CRM_Utils_Array::value('is_auto', $activityParams)) {
+    if (!empty($activityParams['is_auto'])) {
       $activityParams['skipRecentView'] = TRUE;
     }
 

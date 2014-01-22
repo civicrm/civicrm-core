@@ -202,7 +202,7 @@ class CRM_Upgrade_Snapshot_V4p2_Price_DAO_SetEntity extends CRM_Core_DAO
             self::$_import = array();
             $fields = self::fields();
             foreach($fields as $name => $field) {
-                if (CRM_Utils_Array::value('import', $field)) {
+                if (!empty($field['import'])) {
                     if ($prefix) {
                         self::$_import['price_set_entity'] = & $fields[$name];
                     } else {
@@ -226,7 +226,7 @@ class CRM_Upgrade_Snapshot_V4p2_Price_DAO_SetEntity extends CRM_Core_DAO
             self::$_export = array();
             $fields = self::fields();
             foreach($fields as $name => $field) {
-                if (CRM_Utils_Array::value('export', $field)) {
+                if (!empty($field['export'])) {
                     if ($prefix) {
                         self::$_export['price_set_entity'] = & $fields[$name];
                     } else {

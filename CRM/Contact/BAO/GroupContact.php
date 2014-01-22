@@ -535,11 +535,11 @@ SELECT    *
 
     // check which values has to be add/remove contact from group
     foreach ($allGroup as $key => $varValue) {
-      if (CRM_Utils_Array::value($key, $params) && !array_key_exists($key, $contactGroup)) {
+      if (!empty($params[$key]) && !array_key_exists($key, $contactGroup)) {
         // add contact to group
         CRM_Contact_BAO_GroupContact::addContactsToGroup($contactIds, $key, $method);
       }
-      elseif (!CRM_Utils_Array::value($key, $params) && array_key_exists($key, $contactGroup)) {
+      elseif (empty($params[$key]) && array_key_exists($key, $contactGroup)) {
         // remove contact from group
         CRM_Contact_BAO_GroupContact::removeContactsFromGroup($contactIds, $key, $method);
       }

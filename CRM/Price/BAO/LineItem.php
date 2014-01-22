@@ -298,7 +298,7 @@ AND li.entity_id = {$entityId})";
         $line['entity_id'] = $entityId;
         // if financial type is not set and if price field value is NOT NULL
         // get financial type id of price field value
-        if (CRM_Utils_Array::value('price_field_value_id', $line) && !CRM_Utils_Array::value('financial_type_id', $line)) {
+        if (!empty($line['price_field_value_id']) && !CRM_Utils_Array::value('financial_type_id', $line)) {
           $line['financial_type_id'] = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceFieldValue', $line['price_field_value_id'], 'financial_type_id');
         }
         $lineItems = CRM_Price_BAO_LineItem::create($line);
@@ -395,7 +395,7 @@ AND li.entity_id = {$entityId})";
             $setID = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceField', $values['price_field_id'], 'price_set_id');
             $params['is_quick_config'] = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $setID, 'is_quick_config');
           }
-          if (CRM_Utils_Array::value('is_quick_config', $params) && array_key_exists('total_amount', $params)
+          if (!empty($params['is_quick_config']) && array_key_exists('total_amount', $params)
             && $totalEntityId == 1) {
             $values['line_total'] = $values['unit_price'] = $params['total_amount'];
           }

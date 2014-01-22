@@ -264,7 +264,7 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Core_Form {
         }
         CRM_Activity_BAO_Activity::create($activityParams);
 
-        if (CRM_Utils_Array::value('is_notify', $params)) {
+        if (!empty($params['is_notify'])) {
           // send notification
           if ($this->_subscriptionDetails->contribution_page_id) {
             CRM_Core_DAO::commonRetrieveAll('CRM_Contribute_DAO_ContributionPage', 'id',

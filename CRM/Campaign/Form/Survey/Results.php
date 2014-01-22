@@ -134,7 +134,7 @@ class CRM_Campaign_Form_Survey_Results extends CRM_Campaign_Form_Survey {
     if (empty($optionGroups) || !CRM_Utils_Array::value('result_id', $this->_values)) {
       $this->setdefaults(array('option_type' => 1));
     }
-    elseif (CRM_Utils_Array::value('result_id', $this->_values)) {
+    elseif (!empty($this->_values['result_id'])) {
       $this->setdefaults(array(
         'option_type' => 2,
           'option_group_id' => $this->_values['result_id'],
@@ -206,8 +206,7 @@ class CRM_Campaign_Form_Survey_Results extends CRM_Campaign_Form_Survey {
    */
   static function formRule($fields, $files, $form) {
     $errors = array();
-    if (
-      CRM_Utils_Array::value('option_label', $fields) &&
+    if (!empty($fields['option_label']) &&
       CRM_Utils_Array::value('option_value', $fields) &&
       (count(array_filter($fields['option_label'])) == 0) &&
       (count(array_filter($fields['option_value'])) == 0)
@@ -215,8 +214,7 @@ class CRM_Campaign_Form_Survey_Results extends CRM_Campaign_Form_Survey {
       $errors['option_label[1]'] = ts('Enter at least one result option.');
       return $errors;
     }
-    elseif (
-      !CRM_Utils_Array::value('option_label', $fields) &&
+    elseif (empty($fields['option_label']) &&
       !CRM_Utils_Array::value('option_value', $fields)
     ) {
       return $errors;
@@ -299,7 +297,7 @@ class CRM_Campaign_Form_Survey_Results extends CRM_Campaign_Form_Survey {
         }
       }
 
-      if (CRM_Utils_Array::value($i, $fields['option_interval']) && !CRM_Utils_Rule::integer($fields['option_interval'][$i])) {
+      if (!empty($fields['option_interval'][$i]) && !CRM_Utils_Rule::integer($fields['option_interval'][$i])) {
         $_flagOption = 1;
         $errors['option_interval[' . $i . ']'] = ts('Please enter a valid integer.');
       }
@@ -382,7 +380,7 @@ class CRM_Campaign_Form_Survey_Results extends CRM_Campaign_Form_Survey {
         $optionValue->weight = $params['option_weight'][$k];
         $optionValue->is_active = 1;
 
-        if (CRM_Utils_Array::value('default_option', $params) &&
+        if (!empty($params['default_option']) &&
           $params['default_option'] == $k
         ) {
           $optionValue->is_default = 1;

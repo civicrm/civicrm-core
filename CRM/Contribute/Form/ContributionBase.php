@@ -280,7 +280,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
       CRM_Contribute_BAO_ContributionPage::setValues($this->_id, $this->_values);
 
       // check if form is active
-      if (!CRM_Utils_Array::value('is_active', $this->_values)) {
+      if (empty($this->_values['is_active'])) {
         // form is inactive, die a fatal death
         CRM_Core_Error::fatal(ts('The page you requested is currently unavailable.'));
       }
@@ -431,7 +431,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
     }
 
     //set pledge block if block id is set
-    if (CRM_Utils_Array::value('pledge_block_id', $this->_values)) {
+    if (!empty($this->_values['pledge_block_id'])) {
       $this->assign('pledgeBlock', TRUE);
     }
 
@@ -512,7 +512,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
    */
   function assignToTemplate() {
     $name = CRM_Utils_Array::value('billing_first_name', $this->_params);
-    if (CRM_Utils_Array::value('billing_middle_name', $this->_params)) {
+    if (!empty($this->_params['billing_middle_name'])) {
       $name .= " {$this->_params['billing_middle_name']}";
     }
     $name .= ' ' . CRM_Utils_Array::value('billing_last_name', $this->_params);
@@ -586,7 +586,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
 
     $this->assign('address', CRM_Utils_Address::format($addressFields));
 
-    if (CRM_Utils_Array::value('hidden_onbehalf_profile', $this->_params)) {
+    if (!empty($this->_params['hidden_onbehalf_profile'])) {
       $this->assign('onBehalfName', $this->_params['organization_name']);
       $locTypeId = array_keys($this->_params['onbehalf_location']['email']);
       $this->assign('onBehalfEmail', $this->_params['onbehalf_location']['email'][$locTypeId[0]]['email']);
@@ -597,7 +597,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
     if ($this->_amount > 0.0) {
       $assignCCInfo = TRUE;
     }
-    elseif (CRM_Utils_array::value('selectMembership', $this->_params)) {
+    elseif (!empty($this->_params['selectMembership'])) {
       $memFee = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType', $this->_params['selectMembership'], 'minimum_fee');
       if ($memFee > 0.0) {
         $assignCCInfo = TRUE;

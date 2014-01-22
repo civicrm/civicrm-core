@@ -359,7 +359,7 @@ class CRM_Profile_Page_Listings extends CRM_Core_Page {
           )
         );
       }
-      if (CRM_Utils_Array::value('group', $this->_params)) {
+      if (!empty($this->_params['group'])) {
         foreach ($this->_params['group'] as $key => $val) {
           if (!$val) {
             unset($this->_params['group'][$key]);
@@ -423,7 +423,7 @@ class CRM_Profile_Page_Listings extends CRM_Core_Page {
 
     // add group id to params if a uf group belong to a any group
     if ($groupId) {
-      if (CRM_Utils_Array::value('group', $params)) {
+      if (!empty($params['group'])) {
         $params['group'][$groupId] = 1;
       }
       else {

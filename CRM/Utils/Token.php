@@ -267,7 +267,7 @@ class CRM_Utils_Token {
       $value = NULL;
       /* Construct the address token */
 
-      if (CRM_Utils_Array::value($token, $loc)) {
+      if (!empty($loc[$token])) {
         if ($html) {
           $value = $loc[$token][1]['display'];
           $value = str_replace("\n", '<br />', $value);
@@ -285,7 +285,7 @@ class CRM_Utils_Token {
       /* Construct the phone and email tokens */
 
       $value = NULL;
-      if (CRM_Utils_Array::value($token, $loc)) {
+      if (!empty($loc[$token])) {
         foreach ($loc[$token] as $index => $entity) {
           $value = $entity[$token];
           break;
@@ -1124,7 +1124,7 @@ class CRM_Utils_Token {
         //special case for greeting replacement
         foreach (array(
           'email_greeting', 'postal_greeting', 'addressee') as $val) {
-          if (CRM_Utils_Array::value($val, $contactDetails[$contactID])) {
+          if (!empty($contactDetails[$contactID][$val])) {
             $contactDetails[$contactID][$val] = $contactDetails[$contactID]["{$val}_display"];
           }
         }
@@ -1181,18 +1181,18 @@ class CRM_Utils_Token {
         CRM_Core_DAO::storeValues($dao, $details[$dao->id]);
 
         // do the necessary transformation
-        if (CRM_Utils_Array::value('payment_instrument_id', $details[$dao->id])) {
+        if (!empty($details[$dao->id]['payment_instrument_id'])) {
           $piId = $details[$dao->id]['payment_instrument_id'];
           $pis = CRM_Contribute_PseudoConstant::paymentInstrument();
           $details[$dao->id]['payment_instrument'] = $pis[$piId];
         }
-        if (CRM_Utils_Array::value('campaign_id', $details[$dao->id])) {
+        if (!empty($details[$dao->id]['campaign_id'])) {
           $campaignId = $details[$dao->id]['campaign_id'];
           $campaigns = CRM_Campaign_BAO_Campaign::getCampaigns($campaignId);
           $details[$dao->id]['campaign'] = $campaigns[$campaignId];
         }
 
-        if (CRM_Utils_Array::value('financial_type_id', $details[$dao->id])) {
+        if (!empty($details[$dao->id]['financial_type_id'])) {
           $financialtypeId = $details[$dao->id]['financial_type_id'];
           $ftis = CRM_Contribute_PseudoConstant::financialType();
           $details[$dao->id]['financial_type'] = $ftis[$financialtypeId];

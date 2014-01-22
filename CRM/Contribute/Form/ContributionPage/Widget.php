@@ -205,11 +205,11 @@ class CRM_Contribute_Form_ContributionPage_Widget extends CRM_Contribute_Form_Co
    */
   public static function formRule($params, $files, $self) {
     $errors = array();
-    if (CRM_Utils_Array::value('is_active', $params)) {
-      if (!CRM_Utils_Array::value('title', $params)) {
+    if (!empty($params['is_active'])) {
+      if (empty($params['title'])) {
         $errors['title'] = ts('Title is a required field.');
       }
-      if (!CRM_Utils_Array::value('about', $params)) {
+      if (empty($params['about'])) {
         $errors['about'] = ts('About is a required field.');
       }
 

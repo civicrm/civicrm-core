@@ -111,7 +111,7 @@ class CRM_Report_Form_Event_Summary extends CRM_Report_Form_Event {
     foreach ($this->_columns as $tableName => $table) {
       if (array_key_exists('fields', $table)) {
         foreach ($table['fields'] as $fieldName => $field) {
-          if (CRM_Utils_Array::value('required', $field) ||
+          if (!empty($field['required']) ||
             CRM_Utils_Array::value($fieldName, $this->_params['fields'])
           ) {
             $select[] = "{$field['dbAlias']} as {$tableName}_{$fieldName}";
@@ -240,7 +240,7 @@ class CRM_Report_Form_Event_Summary extends CRM_Report_Form_Event {
     foreach ($this->_columns as $tableName => $table) {
       if (array_key_exists('fields', $table)) {
         foreach ($table['fields'] as $fieldName => $field) {
-          if (CRM_Utils_Array::value('required', $field) ||
+          if (!empty($field['required']) ||
             CRM_Utils_Array::value($fieldName, $this->_params['fields'])
           ) {
 
@@ -326,7 +326,7 @@ class CRM_Report_Form_Event_Summary extends CRM_Report_Form_Event {
   function buildChart(&$rows) {
     $this->_interval = 'events';
     $countEvent = NULL;
-    if (CRM_Utils_Array::value('charts', $this->_params)) {
+    if (!empty($this->_params['charts'])) {
       foreach ($rows as $key => $value) {
         $graphRows['totalAmount'][] = $graphRows['value'][] = CRM_Utils_Array::value('totalAmount', $rows[$key]);
         $graphRows[$this->_interval][] = substr($rows[$key]['civicrm_event_title'], 0, 12) . "..(" . $rows[$key]['civicrm_event_id'] . ") ";

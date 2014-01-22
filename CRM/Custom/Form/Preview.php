@@ -71,7 +71,7 @@ class CRM_Custom_Form_Preview extends CRM_Core_Form {
       $fieldDAO = new CRM_Core_DAO_CustomField();
       CRM_Core_DAO::commonRetrieve('CRM_Core_DAO_CustomField', $params, $defaults);
 
-      if (CRM_Utils_Array::value('is_view', $defaults)) {
+      if (!empty($defaults['is_view'])) {
         CRM_Core_Error::statusBounce(ts('This field is view only so it will not display on edit form.'));
       }
       elseif (CRM_Utils_Array::value('is_active', $defaults) == 0) {

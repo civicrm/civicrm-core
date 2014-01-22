@@ -61,7 +61,7 @@ function civicrm_api3_setting_getfields($params) {
     CRM_Utils_Array::value('profile', $params, null)
   );
   // find any supplemental information
-  if(CRM_Utils_Array::value('action',$params)){
+  if (!empty($params['action'])){
     $specFunction = '_civicrm_api3_setting_' . strtolower($params['action']) . '_spec';
     if (function_exists($specFunction)) {
       $specFunction($result);

@@ -114,7 +114,7 @@ class CRM_Contact_Form_Task_LabelCommon {
     if (stristr($mailingFormat, 'custom_')) {
       foreach ($mailingFormatProperties as $token => $true) {
         if (substr($token, 0, 7) == 'custom_') {
-          if (!CRM_Utils_Array::value($token, $customFormatProperties)) {
+          if (empty($customFormatProperties[$token])) {
             $customFormatProperties[$token] = $mailingFormatProperties[$token];
           }
         }
@@ -138,7 +138,7 @@ class CRM_Contact_Form_Task_LabelCommon {
     }
 
     // fix for CRM-2651
-    if (CRM_Utils_Array::value('do_not_mail', $respectDoNotMail)) {
+    if (!empty($respectDoNotMail['do_not_mail'])) {
       $params[] = array('do_not_mail', '=', 0, 0, 0);
     }
     // fix for CRM-2613
@@ -198,7 +198,7 @@ class CRM_Contact_Form_Task_LabelCommon {
 
         unset($contact[$locName]);
 
-        if (CRM_Utils_Array::value('county_id', $contact)) {
+        if (!empty($contact['county_id'])) {
           unset($contact['county_id']);
         }
 
@@ -234,10 +234,10 @@ class CRM_Contact_Form_Task_LabelCommon {
           continue;
         }
 
-        if (CRM_Utils_Array::value('addressee_display', $contact)) {
+        if (!empty($contact['addressee_display'])) {
           $contact['addressee_display'] = trim($contact['addressee_display']);
         }
-        if (CRM_Utils_Array::value('addressee', $contact)) {
+        if (!empty($contact['addressee'])) {
           $contact['addressee'] = $contact['addressee_display'];
         }
 

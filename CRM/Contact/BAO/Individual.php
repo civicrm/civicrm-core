@@ -200,7 +200,7 @@ class CRM_Contact_BAO_Individual extends CRM_Contact_DAO_Contact {
       );
       // make sure we have all the name fields.
       foreach ($nameParams as $name => $value) {
-        if (!CRM_Utils_Array::value($name, $formatted) && $value) {
+        if (empty($formatted[$name]) && $value) {
           $formatted[$name] = $value;
         }
       }
@@ -236,7 +236,7 @@ class CRM_Contact_BAO_Individual extends CRM_Contact_DAO_Contact {
     //start further check for email.
     if (empty($sortName) || empty($displayName)) {
       $email = NULL;
-      if (CRM_Utils_Array::value('email', $params) &&
+      if (!empty($params['email']) &&
         is_array($params['email'])
       ) {
         foreach ($params['email'] as $emailBlock) {

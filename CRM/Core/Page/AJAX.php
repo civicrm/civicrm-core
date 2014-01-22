@@ -97,11 +97,11 @@ class CRM_Core_Page_AJAX {
    */
   static function setIsQuickConfig() {
     $id = $context = NULL;
-    if (CRM_Utils_Array::value('id', $_REQUEST)) {
+    if (!empty($_REQUEST['id'])) {
       $id = CRM_Utils_Type::escape($_REQUEST['id'], 'Integer');
     }
 
-    if (CRM_Utils_Array::value('context', $_REQUEST)) {
+    if (!empty($_REQUEST['context'])) {
       $context = CRM_Utils_Type::escape($_REQUEST['context'], 'String');
     }
     // return false if $id is null and

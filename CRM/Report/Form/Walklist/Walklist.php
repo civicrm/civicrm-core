@@ -137,7 +137,7 @@ class CRM_Report_Form_Walklist_Walklist extends CRM_Report_Form {
     $this->_columnHeaders = array();
     foreach ($this->_columns as $tableName => $table) {
       foreach ($table['fields'] as $fieldName => $field) {
-        if (CRM_Utils_Array::value('required', $field) ||
+        if (!empty($field['required']) ||
           CRM_Utils_Array::value($fieldName, $this->_params['fields'])
         ) {
           if ($tableName == 'civicrm_address') {

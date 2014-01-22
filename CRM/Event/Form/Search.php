@@ -276,11 +276,11 @@ class CRM_Event_Form_Search extends CRM_Core_Form {
         if (CRM_Utils_Array::value('participant_test', $this->_formValues) == '1' || CRM_Utils_Array::value('participant_test', $this->_formValues) == '0' ) {
           $seatClause[] = "( participant.is_test = {$this->_formValues['participant_test']} )";
         }
-        if (CRM_Utils_Array::value('participant_status_id', $this->_formValues)) {
+        if (!empty($this->_formValues['participant_status_id'])) {
           $statuses = array_keys($this->_formValues['participant_status_id']);
           $seatClause[] = '( participant.status_id IN ( ' . implode(' , ', $statuses) . ' ) )';
         }
-        if (CRM_Utils_Array::value('participant_role_id', $this->_formValues)) {
+        if (!empty($this->_formValues['participant_role_id'])) {
           $roles = array_keys($this->_formValues['participant_role_id']);
           $seatClause[] = '( participant.role_id IN ( ' . implode(' , ', $roles) . ' ) )';
         }

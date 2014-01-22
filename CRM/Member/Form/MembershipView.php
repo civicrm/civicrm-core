@@ -222,8 +222,7 @@ END AS 'relType'
 
       $this->assign('has_related', FALSE);
       // if membership can be granted, and we are the owner of the membership
-      if (CRM_Utils_Array::value('relationship_type_id', $membershipType)
-        && !CRM_Utils_Array::value('owner_membership_id', $values)
+      if (!empty($membershipType['relationship_type_id']) && !CRM_Utils_Array::value('owner_membership_id', $values)
       ) {
         // display related contacts/membership block
         $this->assign('has_related', TRUE);
@@ -375,7 +374,7 @@ SELECT r.id, c.id as cid, c.display_name as name, c.job_title as comment,
       $autoRenew = $isRecur ? TRUE : FALSE;
     }
 
-    if (CRM_Utils_Array::value('is_test', $values)) {
+    if (!empty($values['is_test'])) {
       $values['membership_type'] .= ' (test) ';
     }
 

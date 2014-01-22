@@ -373,7 +373,7 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
     // special case to handle duplicate entires for report instances
     $dashboardID = CRM_Utils_Array::value('id', $params);
 
-    if (CRM_Utils_Array::value('instanceURL', $params)) {
+    if (!empty($params['instanceURL'])) {
       $query = "SELECT id
                         FROM `civicrm_dashboard`
                         WHERE url LIKE '" . CRM_Utils_Array::value('instanceURL', $params) . "&%'";
@@ -384,7 +384,7 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
 
     if (!$dashboardID) {
       // check url is same as exiting entries, if yes just update existing
-      if (CRM_Utils_Array::value('name', $params)) {
+      if (!empty($params['name'])) {
         $dashlet->name = CRM_Utils_Array::value('name', $params);
         $dashlet->find(TRUE);
       }

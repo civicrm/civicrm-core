@@ -213,10 +213,10 @@ class CRM_Core_Payment_GoogleIPN extends CRM_Core_Payment_BaseIPN {
              * lets make use of it by passing the eventID/membershipTypeID to next level.
              * And change trxn_id to google-order-number before finishing db update */
 
-      if (CRM_Utils_Array::value('event', $ids)) {
+      if (!empty($ids['event'])) {
         $contribution->trxn_id = $ids['event'] . CRM_Core_DAO::VALUE_SEPARATOR . $ids['participant'];
       }
-      elseif (CRM_Utils_Array::value('membership', $ids)) {
+      elseif (!empty($ids['membership'])) {
         $contribution->trxn_id = $ids['membership'][0] . CRM_Core_DAO::VALUE_SEPARATOR . $ids['related_contact'] . CRM_Core_DAO::VALUE_SEPARATOR . $ids['onbehalf_dupe_alert'];
       }
     }

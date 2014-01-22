@@ -155,7 +155,7 @@ class CRM_Campaign_Page_AJAX {
 
     $params = $searchRows = array();
     foreach ($searchParams as $param) {
-      if (CRM_Utils_Array::value($param, $_POST)) {
+      if (!empty($_POST[$param])) {
         $params[$param] = $_POST[$param];
       }
     }
@@ -182,7 +182,7 @@ class CRM_Campaign_Page_AJAX {
     $interviewerId = $surveyTypeId = $surveyId = NULL;
     $searchVoterFor = $params['campaign_search_voter_for'];
     if ($searchVoterFor == 'reserve') {
-      if (CRM_Utils_Array::value('campaign_survey_id', $params)) {
+      if (!empty($params['campaign_survey_id'])) {
         $survey = new CRM_Campaign_DAO_Survey();
         $survey->id = $surveyId = $params['campaign_survey_id'];
         $survey->selectAdd('campaign_id, activity_type_id');
@@ -258,7 +258,7 @@ class CRM_Campaign_Page_AJAX {
     );
     foreach ($dataTableParams as $pName => $pValues) {
       $$pName = $pValues['default'];
-      if (CRM_Utils_Array::value($pValues['name'], $_POST)) {
+      if (!empty($_POST[$pValues['name']])) {
         $$pName = CRM_Utils_Type::escape($_POST[$pValues['name']], $pValues['type']);
         if ($pName == 'sort')$$pName = $selectorCols[$$pName];
       }
@@ -375,7 +375,7 @@ class CRM_Campaign_Page_AJAX {
     elseif ($operation == 'reserve') {
       $activityId = NULL;
       $createActivity = TRUE;
-      if (CRM_Utils_Array::value('activity_id', $_POST)) {
+      if (!empty($_POST['activity_id'])) {
         $activityId = CRM_Utils_Type::escape($_POST['activity_id'], 'Integer');
         if ($activityId) {
           $createActivity = FALSE;
@@ -565,7 +565,7 @@ class CRM_Campaign_Page_AJAX {
 
     $params = $searchRows = array();
     foreach ($searchParams as $param) {
-      if (CRM_Utils_Array::value($param, $_POST)) {
+      if (!empty($_POST[$param])) {
         $params[$param] = $_POST[$param];
       }
     }
@@ -616,7 +616,7 @@ class CRM_Campaign_Page_AJAX {
     );
     foreach ($dataTableParams as $pName => $pValues) {
       $$pName = $pValues['default'];
-      if (CRM_Utils_Array::value($pValues['name'], $_POST)) {
+      if (!empty($_POST[$pValues['name']])) {
         $$pName = CRM_Utils_Type::escape($_POST[$pValues['name']], $pValues['type']);
         if ($pName == 'sort') {
           $$pName = $selectorCols[$$pName];
@@ -661,7 +661,7 @@ class CRM_Campaign_Page_AJAX {
 
     $params = $searchRows = array();
     foreach ($searchParams as $param) {
-      if (CRM_Utils_Array::value($param, $_POST)) {
+      if (!empty($_POST[$param])) {
         $params[$param] = $_POST[$param];
       }
     }
@@ -714,7 +714,7 @@ class CRM_Campaign_Page_AJAX {
     );
     foreach ($dataTableParams as $pName => $pValues) {
       $$pName = $pValues['default'];
-      if (CRM_Utils_Array::value($pValues['name'], $_POST)) {
+      if (!empty($_POST[$pValues['name']])) {
         $$pName = CRM_Utils_Type::escape($_POST[$pValues['name']], $pValues['type']);
         if ($pName == 'sort') {
           $$pName = $selectorCols[$$pName];
@@ -759,7 +759,7 @@ class CRM_Campaign_Page_AJAX {
 
     $params = $searchRows = array();
     foreach ($searchParams as $param) {
-      if (CRM_Utils_Array::value($param, $_POST)) {
+      if (!empty($_POST[$param])) {
         $params[$param] = $_POST[$param];
       }
     }
@@ -807,7 +807,7 @@ class CRM_Campaign_Page_AJAX {
     );
     foreach ($dataTableParams as $pName => $pValues) {
       $$pName = $pValues['default'];
-      if (CRM_Utils_Array::value($pValues['name'], $_POST)) {
+      if (!empty($_POST[$pValues['name']])) {
         $$pName = CRM_Utils_Type::escape($_POST[$pValues['name']], $pValues['type']);
         if ($pName == 'sort') {
           $$pName = $selectorCols[$$pName];

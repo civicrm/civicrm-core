@@ -211,7 +211,7 @@ class CRM_Utils_Address_BatchUpdate {
         $success = TRUE;
         // consider address is automatically parseable,
         // when we should found street_number and street_name
-        if (!CRM_Utils_Array::value('street_name', $parsedFields) ||
+        if (empty($parsedFields['street_name']) ||
           !CRM_Utils_Array::value('street_number', $parsedFields)
         ) {
           $success = FALSE;

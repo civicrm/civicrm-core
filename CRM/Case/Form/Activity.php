@@ -426,7 +426,7 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
     }
 
     // format activity custom data
-    if (CRM_Utils_Array::value('hidden_custom', $params)) {
+    if (!empty($params['hidden_custom'])) {
       if ($this->_activityId) {
         // unset custom fields-id from params since we want custom
         // fields to be saved for new activity.
@@ -460,7 +460,7 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
     }
 
     // assigning formatted value
-    if (CRM_Utils_Array::value('assignee_contact_id', $params)) {
+    if (!empty($params['assignee_contact_id'])) {
       $params['assignee_contact_id'] = explode(',', $params['assignee_contact_id']);
     }
     else {
@@ -516,7 +516,7 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
     // have been modified/created by user
     if (isset($newActParams)) {
       // set proper original_id
-      if (CRM_Utils_Array::value('original_id', $this->_defaults)) {
+      if (!empty($this->_defaults['original_id'])) {
         $newActParams['original_id'] = $this->_defaults['original_id'];
       }
       else {
@@ -541,7 +541,7 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
 
       // copy files attached to old activity if any, to new one,
       // as long as users have not selected the 'delete attachment' option.
-      if (!CRM_Utils_Array::value('is_delete_attachment', $newActParams)) {
+      if (empty($newActParams['is_delete_attachment'])) {
         CRM_Core_BAO_File::copyEntityFile('civicrm_activity', $this->_activityId,
           'civicrm_activity', $activity->id
         );
@@ -573,10 +573,10 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
     $caseParams = $params;
     $caseParams['id'] = $this->_caseId;
 
-    if (CRM_Utils_Array::value('case_type_id', $caseParams)) {
+    if (!empty($caseParams['case_type_id'])) {
       $caseParams['case_type_id'] = CRM_Core_DAO::VALUE_SEPARATOR . $caseParams['case_type_id'] . CRM_Core_DAO::VALUE_SEPARATOR;
     }
-    if (CRM_Utils_Array::value('case_status_id', $caseParams)) {
+    if (!empty($caseParams['case_status_id'])) {
       $caseParams['status_id'] = $caseParams['case_status_id'];
     }
 
@@ -671,7 +671,7 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
 
     // create follow up activity if needed
     $followupStatus = '';
-    if (CRM_Utils_Array::value('followup_activity_type_id', $params)) {
+    if (!empty($params['followup_activity_type_id'])) {
       $followupActivity = CRM_Activity_BAO_Activity::createFollowupActivity($activity->id, $params);
 
       if ($followupActivity) {

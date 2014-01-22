@@ -224,13 +224,13 @@ abstract class CRM_Core_Page_Basic extends CRM_Core_Page {
 
     $fields = &$object->fields();
     $key = '';
-    if (CRM_Utils_Array::value('title', $fields)) {
+    if (!empty($fields['title'])) {
       $key = 'title';
     }
-    elseif (CRM_Utils_Array::value('label', $fields)) {
+    elseif (!empty($fields['label'])) {
       $key = 'label';
     }
-    elseif (CRM_Utils_Array::value('name', $fields)) {
+    elseif (!empty($fields['name'])) {
       $key = 'name';
     }
 
@@ -291,7 +291,7 @@ abstract class CRM_Core_Page_Basic extends CRM_Core_Page {
     $newAction       = $action;
     $hasDelete       = $hasDisable = TRUE;
 
-    if (CRM_Utils_Array::value('name', $values) && in_array($values['name'], array(
+    if (!empty($values['name']) && in_array($values['name'], array(
       'encounter_medium', 'case_type', 'case_status'))) {
       static $caseCount = NULL;
       if (!isset($caseCount)) {

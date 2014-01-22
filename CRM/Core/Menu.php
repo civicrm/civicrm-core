@@ -271,7 +271,7 @@ class CRM_Core_Menu {
     $values = array();
 
     foreach ($menu as $path => $item) {
-      if (!CRM_Utils_Array::value('adminGroup', $item)) {
+      if (empty($item['adminGroup'])) {
         continue;
       }
 

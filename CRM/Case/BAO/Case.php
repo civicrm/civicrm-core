@@ -109,7 +109,7 @@ class CRM_Case_BAO_Case extends CRM_Case_DAO_Case {
   static function &create(&$params) {
     $transaction = new CRM_Core_Transaction();
 
-    if (CRM_Utils_Array::value('id', $params)) {
+    if (!empty($params['id'])) {
       CRM_Utils_Hook::pre('edit', 'Case', $params['id'], $params);
     }
     else {
@@ -118,7 +118,7 @@ class CRM_Case_BAO_Case extends CRM_Case_DAO_Case {
 
     $case = self::add($params);
 
-    if (CRM_Utils_Array::value('custom', $params) &&
+    if (!empty($params['custom']) &&
       is_array($params['custom'])
     ) {
       CRM_Core_BAO_CustomValueTable::store($params['custom'], 'civicrm_case', $case->id);
@@ -129,7 +129,7 @@ class CRM_Case_BAO_Case extends CRM_Case_DAO_Case {
       return $case;
     }
 
-    if (CRM_Utils_Array::value('id', $params)) {
+    if (!empty($params['id'])) {
       CRM_Utils_Hook::post('edit', 'Case', $case->id, $case);
     }
     else {
@@ -927,7 +927,7 @@ SELECT case_status.label AS case_status, status_id, case_type.label AS case_type
 
     $res = CRM_Core_DAO::executeQuery($query, CRM_Core_DAO::$_nullArray);
     while ($res->fetch()) {
-      if (CRM_Utils_Array::value($res->case_type, $rows) && CRM_Utils_Array::value($res->case_status, $rows[$res->case_type])) {
+      if (!empty($rows[$res->case_type]) && CRM_Utils_Array::value($res->case_status, $rows[$res->case_type])) {
         $rows[$res->case_type][$res->case_status]['count'] = $rows[$res->case_type][$res->case_status]['count'] + 1;
       }
       else {
@@ -1057,29 +1057,29 @@ SELECT case_status.label AS case_status, status_id, case_type.label AS case_type
     $where = 'WHERE cca.case_id= %1
                     AND ca.is_current_revision = 1';
 
-    if (CRM_Utils_Array::value('reporter_id', $params)) {
+    if (!empty($params['reporter_id'])) {
       $where .= " AND cac.contact_id = " . CRM_Utils_Type::escape($params['reporter_id'], 'Integer');
     }
 
-    if (CRM_Utils_Array::value('status_id', $params)) {
+    if (!empty($params['status_id'])) {
       $where .= " AND ca.status_id = " . CRM_Utils_Type::escape($params['status_id'], 'Integer');
     }
 
-    if (CRM_Utils_Array::value('activity_deleted', $params)) {
+    if (!empty($params['activity_deleted'])) {
       $where .= " AND ca.is_deleted = 1";
     }
     else {
       $where .= " AND ca.is_deleted = 0";
     }
 
-    if (CRM_Utils_Array::value('activity_type_id', $params)) {
+    if (!empty($params['activity_type_id'])) {
       $where .= " AND ca.activity_type_id = " . CRM_Utils_Type::escape($params['activity_type_id'], 'Integer');
     }
 
-    if (CRM_Utils_Array::value('activity_date_low', $params)) {
+    if (!empty($params['activity_date_low'])) {
       $fromActivityDate = CRM_Utils_Type::escape(CRM_Utils_Date::processDate($params['activity_date_low']), 'Date');
     }
-    if (CRM_Utils_Array::value('activity_date_high', $params)) {
+    if (!empty($params['activity_date_high'])) {
       $toActivityDate = CRM_Utils_Type::escape(CRM_Utils_Date::processDate($params['activity_date_high']), 'Date');
       $toActivityDate = $toActivityDate ? $toActivityDate + 235959 : NULL;
     }
@@ -1401,7 +1401,7 @@ SELECT case_status.label AS case_status, status_id, case_type.label AS case_type
     if ($caseId) {
       $activityTypeId = CRM_Core_DAO::getFieldValue('CRM_Activity_DAO_Activity', $activityId, 'activity_type_id');
       $nonCaseActivityTypes = CRM_Core_PseudoConstant::activityType();
-      if (CRM_Utils_Array::value($activityTypeId, $nonCaseActivityTypes)) {
+      if (!empty($nonCaseActivityTypes[$activityTypeId])) {
         $anyActivity = TRUE;
       }
       else {
@@ -1599,7 +1599,7 @@ SELECT case_status.label AS case_status, status_id, case_type.label AS case_type
       // (Or for efficiency call the global one outside the loop and then union with this each time.)
       $contactDetails = self::getRelatedContacts($caseId, TRUE);
 
-      if (CRM_Utils_Array::value($result['from']['id'], $contactDetails)) {
+      if (!empty($contactDetails[$result['from']['id']])) {
         $params = array();
         $params['subject'] = $result['subject'];
         $params['activity_date_time'] = $result['date'];
@@ -1819,13 +1819,13 @@ SELECT case_status.label AS case_status, status_id, case_type.label AS case_type
     }
 
     if ($latestDate) {
-      if (CRM_Utils_Array::value('activity_type_id', $criteriaParams)) {
+      if (!empty($criteriaParams['activity_type_id'])) {
         $where .= " AND ca.activity_type_id    = " . CRM_Utils_Type::escape($criteriaParams['activity_type_id'], 'Integer');
         $where .= " AND ca.is_current_revision = 1";
         $groupBy .= " GROUP BY ca.activity_type_id";
       }
 
-      if (CRM_Utils_Array::value('newest', $criteriaParams)) {
+      if (!empty($criteriaParams['newest'])) {
         $selectDate = " max(ca.activity_date_time) ";
       }
       else {
@@ -2687,7 +2687,7 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
       'activity_type_id', 'id'
     );
 
-    if (CRM_Utils_Array::value('isCaseActivity', $tplParams)) {
+    if (!empty($tplParams['isCaseActivity'])) {
       $tplParams['editActURL'] = CRM_Utils_System::url('civicrm/case/activity',
         "reset=1&cid={$activityParams['target_id']}&caseid={$activityParams['case_id']}&action=update&id={$activityParams['source_record_id']}", TRUE
       );

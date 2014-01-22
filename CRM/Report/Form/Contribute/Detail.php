@@ -430,7 +430,7 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
                       {$this->_aliases['civicrm_email']}.is_primary = 1\n";
     }
     // include contribution note
-    if (CRM_Utils_Array::value('contribution_note', $this->_params['fields']) ||
+    if (!empty($this->_params['fields']['contribution_note']) ||
       CRM_Utils_Array::value('note_value', $this->_params)) {
       $this->_from.= "
             LEFT JOIN civicrm_note {$this->_aliases['civicrm_note']}

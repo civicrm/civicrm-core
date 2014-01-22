@@ -74,7 +74,7 @@ class CRM_PCP_Form_Event extends CRM_Event_Form_ManageEvent {
       $this->assign('pageId', $this->_id);
     }
 
-    if (!CRM_Utils_Array::value('id', $defaults)) {
+    if (empty($defaults['id'])) {
       $defaults['target_entity_type'] = 'event';
       $defaults['is_approval_needed'] = 1;
       $defaults['is_tellfriend_enabled'] = 1;
@@ -141,14 +141,14 @@ class CRM_PCP_Form_Event extends CRM_Event_Form_ManageEvent {
    */
   public static function formRule($params, $files, $self) {
     $errors = array();
-    if (CRM_Utils_Array::value('is_active', $params)) {
+    if (!empty($params['is_active'])) {
 
-      if (CRM_Utils_Array::value('is_tellfriend_enabled', $params) &&
+      if (!empty($params['is_tellfriend_enabled']) &&
         (CRM_Utils_Array::value('tellfriend_limit', $params) <= 0)
       ) {
         $errors['tellfriend_limit'] = ts('if Tell Friend is enable, Maximum recipients limit should be greater than zero.');
       }
-      if (!CRM_Utils_Array::value('supporter_profile_id', $params)) {
+      if (empty($params['supporter_profile_id'])) {
         $errors['supporter_profile_id'] = ts('Supporter profile is a required field.');
       }
       else {

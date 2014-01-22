@@ -398,7 +398,7 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form {
 
       $periods = array('fixed_period_start_day', 'fixed_period_rollover_day');
       foreach ($periods as $per) {
-        if (CRM_Utils_Array::value('M', $params[$per]) &&
+        if (!empty($params[$per]['M']) &&
           CRM_Utils_Array::value('d', $params[$per])
         ) {
           $mon          = $params[$per]['M'];

@@ -113,7 +113,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
       }
     }
     else {
-      if (CRM_Utils_Array::value('default_option', $params)) {
+      if (!empty($params['default_option'])) {
         $defaultArray[$params['default_option']] = 1;
       }
     }
@@ -146,7 +146,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
 
         if (CRM_Utils_Array::value( $index, CRM_Utils_Array::value('option_financial_type_id', $params))) {
           $options['financial_type_id'] =  $params['option_financial_type_id'][$index];
-        } elseif (CRM_Utils_Array::value( 'financial_type_id', $params )) {
+        } elseif (!empty($params['financial_type_id'])) {
           $options['financial_type_id'] = $params['financial_type_id'];
         }
 
@@ -301,7 +301,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
           $label = ts('Additional Contribution');
           $useRequired = 0;
         }
-        elseif (CRM_Utils_Array::value('label', $fieldOptions[$optionKey])) {      //check for label.
+        elseif (!empty($fieldOptions[$optionKey]['label'])) {      //check for label.
           $label = $fieldOptions[$optionKey]['label'];
         }
 
@@ -386,7 +386,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
 
         if (!$field->is_required) {
           // add "none" option
-          if (CRM_Utils_Array::value('is_allow_other_amount', $otherAmount) && $field->name == 'contribution_amount') {
+          if (!empty($otherAmount['is_allow_other_amount']) && $field->name == 'contribution_amount') {
             $none = ts('Other Amount');
           }
           elseif (!empty($qf->_membershipBlock) && !CRM_Utils_Array::value('is_required', $qf->_membershipBlock) && $field->name == 'membership_amount') {
@@ -613,7 +613,7 @@ WHERE
         }
       }
 
-      if (CRM_Utils_Array::value($key, $fields)) {
+      if (!empty($fields[$key])) {
         $priceFields[$priceField->id] = $fields[$key];
       }
     }

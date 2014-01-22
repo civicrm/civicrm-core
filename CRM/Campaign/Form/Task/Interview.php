@@ -136,7 +136,7 @@ class CRM_Campaign_Form_Task_Interview extends CRM_Campaign_Form_Task {
     $orderBy = array();
     if ( !empty($orderByParams) ) {
       foreach ( $orderByParams as $key => $val ) {
-        if (CRM_Utils_Array::value('column', $val)) {
+        if (!empty($val['column'])) {
           $orderBy[] = "{$val['column']} {$val['order']}";
         }
       }
@@ -537,7 +537,7 @@ WHERE {$clause}
     $activity->activity_date_time = date('YmdHis');
     $activity->status_id = $statusId;
 
-    if (CRM_Utils_Array::value('activity_date_time', $params)) {
+    if (!empty($params['activity_date_time'])) {
       $activity->activity_date_time = CRM_Utils_Date::processDate($params['activity_date_time'], $params['activity_date_time_time']);
     }
 
@@ -562,7 +562,7 @@ WHERE {$clause}
       'duration' => 'activity_duration'
     );
     foreach ($activityParams as $key => $field) {
-      if (CRM_Utils_Array::value($field, $params)) {
+      if (!empty($params[$field])) {
         $activity->$key = $params[$field];
       }
     }

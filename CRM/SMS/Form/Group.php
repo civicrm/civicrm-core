@@ -210,7 +210,7 @@ class CRM_SMS_Form_Group extends CRM_Contact_Form_Task {
 
     foreach (array(
       'name', 'group_id', 'is_sms') as $n) {
-      if (CRM_Utils_Array::value($n, $values)) {
+      if (!empty($values[$n])) {
         $params[$n] = $values[$n];
       }
     }

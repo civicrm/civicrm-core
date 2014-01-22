@@ -151,7 +151,7 @@ class CRM_Contact_Form_Search_Advanced extends CRM_Contact_Form_Search {
       ) {
         $allPanes[$name]['open'] = 'true';
 
-        if (CRM_Utils_Array::value($type, $components)) {
+        if (!empty($components[$type])) {
           $c = $components[$type];
           $this->add('hidden', "hidden_$type", 1);
           $c->buildAdvancedSearchPaneForm($this);
@@ -275,7 +275,7 @@ class CRM_Contact_Form_Search_Advanced extends CRM_Contact_Form_Search {
       ) {
         foreach (array(
           'case_type_id', 'case_status_id', 'case_deleted', 'case_tags') as $caseCriteria) {
-          if (CRM_Utils_Array::value($caseCriteria, $this->_formValues)) {
+          if (!empty($this->_formValues[$caseCriteria])) {
             $allCases = TRUE;
             $this->_formValues['case_owner'] = 1;
             continue;

@@ -312,7 +312,7 @@ class CRM_Contact_Form_Task_EmailCommon {
     }
 
     //Added for CRM-1393
-    if (CRM_Utils_Array::value('saveTemplate', $fields) && empty($fields['saveTemplateName'])) {
+    if (!empty($fields['saveTemplate']) && empty($fields['saveTemplateName'])) {
       $errors['saveTemplateName'] = ts("Enter name to save message template");
     }
 
@@ -345,7 +345,7 @@ class CRM_Contact_Form_Task_EmailCommon {
     $additionalDetails = NULL;
     $ccValues = $bccValues = array();
     foreach ($elements as $element) {
-      if (CRM_Utils_Array::value($element, $formValues)) {
+      if (!empty($formValues[$element])) {
         $allEmails = explode(',', $formValues[$element]);
         foreach ($allEmails as $value) {
           list($contactId, $email) = explode('::', $value);
@@ -381,8 +381,7 @@ class CRM_Contact_Form_Task_EmailCommon {
     }
 
     // process message template
-    if (CRM_Utils_Array::value('saveTemplate', $formValues)
-      || CRM_Utils_Array::value('updateTemplate', $formValues)
+    if (!empty($formValues['saveTemplate']) || CRM_Utils_Array::value('updateTemplate', $formValues)
     ) {
       $messageTemplate = array(
         'msg_text' => $formValues['text_message'],
@@ -391,12 +390,12 @@ class CRM_Contact_Form_Task_EmailCommon {
         'is_active' => TRUE,
       );
 
-      if (CRM_Utils_Array::value('saveTemplate', $formValues)) {
+      if (!empty($formValues['saveTemplate'])) {
         $messageTemplate['msg_title'] = $formValues['saveTemplateName'];
         CRM_Core_BAO_MessageTemplate::add($messageTemplate);
       }
 
-      if (CRM_Utils_Array::value('template', $formValues) &&
+      if (!empty($formValues['template']) &&
         CRM_Utils_Array::value('updateTemplate', $formValues)
       ) {
         $messageTemplate['id'] = $formValues['template'];

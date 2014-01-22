@@ -265,7 +265,7 @@ class CRM_Contact_Form_Task_Batch extends CRM_Contact_Form_Task {
 
       //CRM-5521
       //validate subtype before updating
-      if (CRM_Utils_Array::value('contact_sub_type', $value) && !CRM_Contact_BAO_ContactType::isAllowEdit($key)) {
+      if (!empty($value['contact_sub_type']) && !CRM_Contact_BAO_ContactType::isAllowEdit($key)) {
         unset($value['contact_sub_type']);
         $inValidSubtypeCnt++;
       }
@@ -330,7 +330,7 @@ class CRM_Contact_Form_Task_Batch extends CRM_Contact_Form_Task {
 
         //street address consider to be parsed properly,
         //If we get street_name and street_number.
-        if (!CRM_Utils_Array::value('street_name', $parsedFields) ||
+        if (empty($parsedFields['street_name']) ||
           !CRM_Utils_Array::value('street_number', $parsedFields)
         ) {
           $parsedFields = array_fill_keys(array_keys($parsedFields), '');

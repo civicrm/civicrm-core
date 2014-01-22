@@ -314,7 +314,7 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
     $tag = new CRM_Core_DAO_Tag();
 
     // if parent id is set then inherit used for and is hidden properties
-    if (CRM_Utils_Array::value('parent_id', $params)) {
+    if (!empty($params['parent_id'])) {
       // get parent details
       $params['used_for'] = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Tag', $params['parent_id'], 'used_for');
     }

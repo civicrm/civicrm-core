@@ -436,7 +436,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
         $prevnext[] = $this->createElement($button['type'], 'reset', $button['name'], $attrs);
       }
       else {
-        if (CRM_Utils_Array::value('subName', $button)) {
+        if (!empty($button['subName'])) {
           $buttonName = $this->getButtonName($button['type'], $button['subName']);
         }
         else {
@@ -449,7 +449,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
         }
         $prevnext[] = $this->createElement('submit', $buttonName, $button['name'], $attrs);
       }
-      if (CRM_Utils_Array::value('isDefault', $button)) {
+      if (!empty($button['isDefault'])) {
         $this->setDefaultAction($button['type']);
       }
 
@@ -1057,7 +1057,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    *
    */
   function addDate($name, $label, $required = FALSE, $attributes = NULL) {
-    if (CRM_Utils_Array::value('formatType', $attributes)) {
+    if (!empty($attributes['formatType'])) {
       // get actual format
       $params = array('name' => $attributes['formatType']);
       $values = array();
@@ -1065,7 +1065,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       // cache date information
       static $dateFormat;
       $key = "dateFormat_" . str_replace(' ', '_', $attributes['formatType']);
-      if (!CRM_Utils_Array::value($key, $dateFormat)) {
+      if (empty($dateFormat[$key])) {
         CRM_Core_DAO::commonRetrieve('CRM_Core_DAO_PreferencesDate', $params, $values);
         $dateFormat[$key] = $values;
       }
@@ -1077,7 +1077,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
         $attributes['format'] = $values['date_format'];
       }
 
-      if (CRM_Utils_Array::value('time_format', $values)) {
+      if (!empty($values['time_format'])) {
         $attributes['timeFormat'] = $values['time_format'];
       }
       $attributes['startOffset'] = $values['start'];
@@ -1085,7 +1085,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     }
 
     $config = CRM_Core_Config::singleton();
-    if (!CRM_Utils_Array::value('format', $attributes)) {
+    if (empty($attributes['format'])) {
       $attributes['format'] = $config->dateInputFormat;
     }
 
@@ -1099,7 +1099,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
 
     $this->add('text', $name, $label, $attributes);
 
-    if (CRM_Utils_Array::value('addTime', $attributes) ||
+    if (!empty($attributes['addTime']) ||
       CRM_Utils_Array::value('timeFormat', $attributes)
     ) {
 
@@ -1130,7 +1130,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
 
     if ($required) {
       $this->addRule($name, ts('Please select %1', array(1 => $label)), 'required');
-      if (CRM_Utils_Array::value('addTime', $attributes) && CRM_Utils_Array::value('addTimeRequired', $attributes)) {
+      if (!empty($attributes['addTime']) && CRM_Utils_Array::value('addTimeRequired', $attributes)) {
         $this->addRule($elementName, ts('Please enter a time.'), 'required');
       }
     }

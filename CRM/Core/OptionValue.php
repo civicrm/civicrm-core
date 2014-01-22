@@ -154,14 +154,14 @@ class CRM_Core_OptionValue {
         $dao->id
       );
 
-      if (CRM_Utils_Array::value('component_id', $optionValue[$dao->id])) {
+      if (!empty($optionValue[$dao->id]['component_id'])) {
         $optionValue[$dao->id]['component_name'] = $componentNames[$optionValue[$dao->id]['component_id']];
       }
       else {
         $optionValue[$dao->id]['component_name'] = 'Contact';
       }
 
-      if (CRM_Utils_Array::value('visibility_id', $optionValue[$dao->id])) {
+      if (!empty($optionValue[$dao->id]['visibility_id'])) {
         $optionValue[$dao->id]['visibility_label'] = $visibilityLabels[$optionValue[$dao->id]['visibility_id']];
       }
     }
@@ -349,11 +349,11 @@ class CRM_Core_OptionValue {
     if (!empty($query->_params) || !empty($query->_returnProperties)) {
       $field = self::getFields();
       foreach ($field as $name => $values) {
-        if (CRM_Utils_Array::value('pseudoconstant', $values)) {
+        if (!empty($values['pseudoconstant'])) {
           continue;
         }
         list($tableName, $fieldName) = explode('.', $values['where']);
-        if (CRM_Utils_Array::value($name, $query->_returnProperties)) {
+        if (!empty($query->_returnProperties[$name])) {
           $query->_select["{$name}_id"] = "{$name}.value as {$name}_id";
           $query->_element["{$name}_id"] = 1;
           $query->_select[$name] = "{$name}.{$fieldName} as $name";

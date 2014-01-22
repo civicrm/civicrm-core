@@ -214,7 +214,7 @@ class CRM_Report_Form_Pledge_Pbnp extends CRM_Report_Form {
     foreach ($this->_columns as $tableName => $table) {
       if (array_key_exists('fields', $table)) {
         foreach ($table['fields'] as $fieldName => $field) {
-          if (CRM_Utils_Array::value('required', $field) ||
+          if (!empty($field['required']) ||
             CRM_Utils_Array::value($fieldName, $this->_params['fields'])
           ) {
             // to include optional columns address and email, only if checked

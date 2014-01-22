@@ -304,7 +304,7 @@ class CRM_Report_Form_Case_Detail extends CRM_Report_Form {
           if ($tableName == 'civicrm_address') {
             $this->_addressField = TRUE;
           }
-          if (CRM_Utils_Array::value('required', $field) ||
+          if (!empty($field['required']) ||
             CRM_Utils_Array::value($fieldName, $this->_params['fields'])
           ) {
             if ($tableName == 'civicrm_email') {
@@ -550,7 +550,7 @@ class CRM_Report_Form_Case_Detail extends CRM_Report_Form {
       $this->_relField = TRUE;
     }
 
-    if (CRM_Utils_Array::value('activity_date_time_relative', $this->_params) ||
+    if (!empty($this->_params['activity_date_time_relative']) ||
       CRM_Utils_Array::value('activity_date_time_from', $this->_params) ||
       CRM_Utils_Array::value('activity_date_time_to', $this->_params)
     ) {
@@ -558,7 +558,7 @@ class CRM_Report_Form_Case_Detail extends CRM_Report_Form {
     }
 
     foreach (array_keys($this->_caseDetailExtra) as $field) {
-      if (CRM_Utils_Array::value($field, $this->_params['case_detail_extra'])) {
+      if (!empty($this->_params['case_detail_extra'][$field])) {
         $this->_includeCaseDetailExtra = TRUE;
         break;
       }

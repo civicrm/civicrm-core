@@ -151,7 +151,7 @@ class CRM_Financial_Page_FinancialType extends CRM_Core_Page_Basic {
       CRM_Financial_BAO_FinancialTypeAccount::retrieve($params, CRM_Core_DAO::$_nullArray, $financialAccountIds);
 
       foreach( $financialAccountIds as $key => $values){
-        if (CRM_Utils_Array::value($values['financial_account_id'], $financialAccounts)) {
+        if (!empty($financialAccounts[$values['financial_account_id']])) {
           $financialAccountId[$values['financial_account_id']] = CRM_Utils_Array::value(
             $values['financial_account_id'], $financialAccounts );
         }

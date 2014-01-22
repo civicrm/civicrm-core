@@ -130,11 +130,11 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
 
       $config = CRM_Core_Config::singleton();
       // set default country from config if no country set
-      if (!CRM_Utils_Array::value("billing_country_id-{$this->_bltID}", $defaults)) {
+      if (empty($defaults["billing_country_id-{$this->_bltID}"])) {
         $defaults["billing_country_id-{$this->_bltID}"] = $config->defaultContactCountry;
       }
 
-      if (!CRM_Utils_Array::value("billing_state_province_id-{$this->_bltID}", $defaults)) {
+      if (empty($defaults["billing_state_province_id-{$this->_bltID}"])) {
         $defaults["billing_state_province_id-{$this->_bltID}"] = $config->defaultContactStateProvince;
       }
 
@@ -334,7 +334,7 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
       }
 
       $statusMsg = ts('The payment record has been processed.');
-      if (CRM_Utils_Array::value('is_email_receipt', $submittedValues) && $sendReceipt) {
+      if (!empty($submittedValues['is_email_receipt']) && $sendReceipt) {
         $statusMsg .= ' ' . ts('A receipt has been emailed to the contributor.');
       }
       CRM_Core_Session::setStatus($statusMsg, ts('Saved'), 'success');
@@ -411,7 +411,7 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
       }
     }
 
-    if (CRM_Utils_Array::value('source', $params)) {
+    if (!empty($params['source'])) {
       unset($params['source']);
     }
     $contactID = CRM_Contact_BAO_Contact::createProfileContact($params, $fields,
@@ -436,7 +436,7 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
       $config->defaultCurrency
     );
     $this->_params['payment_action'] = 'Sale';
-    if (CRM_Utils_Array::value('trxn_date', $this->_params)) {
+    if (!empty($this->_params['trxn_date'])) {
       $this->_params['receive_date'] = CRM_Utils_Date::processDate($this->_params['trxn_date'], $this->_params['receive_date_time']);
     }
 
@@ -466,7 +466,7 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
     // if folks need to use it
     $paymentParams['contributionType_name'] = $this->_params['contributionType_name'] = $contributionType->name;
     $paymentParams['contributionPageID'] = NULL;
-    if (CRM_Utils_Array::value('is_email_receipt', $this->_params)) {
+    if (!empty($this->_params['is_email_receipt'])) {
       $paymentParams['email'] = $this->_contributorEmail;
       $paymentParams['is_email_receipt'] = 1;
     }
@@ -474,10 +474,10 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
       $paymentParams['is_email_receipt'] = 0;
       $this->_params['is_email_receipt'] = 0;
     }
-    if (CRM_Utils_Array::value('receive_date', $this->_params)) {
+    if (!empty($this->_params['receive_date'])) {
       $paymentParams['receive_date'] = $this->_params['receive_date'];
     }
-    if (CRM_Utils_Array::value('receive_date', $this->_params)) {
+    if (!empty($this->_params['receive_date'])) {
       $paymentParams['receive_date'] = $this->_params['receive_date'];
     }
 
@@ -529,7 +529,7 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
 
     if ($trxnRecord->id) {
       $statusMsg = ts('The payment record has been processed.');
-      if (CRM_Utils_Array::value('is_email_receipt', $this->_params) && $sendReceipt) {
+      if (!empty($this->_params['is_email_receipt']) && $sendReceipt) {
         $statusMsg .= ' ' . ts('A receipt has been emailed to the contributor.');
       }
       CRM_Core_Session::setStatus($statusMsg, ts('Complete'), 'success');

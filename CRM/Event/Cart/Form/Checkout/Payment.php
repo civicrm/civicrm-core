@@ -55,7 +55,7 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
     }
 
     if (self::is_administrator()) {
-      if (CRM_Utils_Array::value('note', $params)) {
+      if (!empty($params['note'])) {
         $note_params = array(
           'participant_id' => $participant->id,
           'contact_id' => self::getContactID(),
@@ -68,7 +68,7 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
     $participant->copyValues($participantParams);
     $participant->save();
 
-    if (CRM_Utils_Array::value('contributionID', $params)) {
+    if (!empty($params['contributionID'])) {
       $payment_params = array(
         'participant_id' => $participant->id,
         'contribution_id' => $params['contributionID'],
@@ -461,7 +461,7 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
 
     $contribution_statuses = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
     $params['payment_instrument_id'] = NULL;
-    if (CRM_Utils_Array::value('is_pay_later', $params)) {
+    if (!empty($params['is_pay_later'])) {
       $params['payment_instrument_id'] = CRM_Core_OptionGroup::getValue('payment_instrument', 'Check', 'name');
       $trxn_prefix = 'CK';
     }
@@ -610,7 +610,7 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
     $mer_participant->contribution_id = $contribution->id;
     $params['contributionID'] = $contribution->id;
     $params['receive_date'] = $contribution->receive_date;
-    if (CRM_Utils_Array::value('financial_trxn_id', $params)) {
+    if (!empty($params['financial_trxn_id'])) {
       $entity_financial_trxn_params = array(
         'entity_table' => "civicrm_contribution",
         'entity_id' => $contribution->id,
@@ -661,7 +661,7 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
           $defaults["billing_contact_email"] = $email['email'];
         }
       }
-      if (!CRM_Utils_Array::value('billing_contact_email', $defaults)) {
+      if (empty($defaults['billing_contact_email'])) {
         foreach ($contact->email as $email) {
           if ($email['is_primary']) {
             $defaults["billing_contact_email"] = $email['email'];

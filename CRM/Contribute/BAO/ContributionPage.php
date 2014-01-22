@@ -49,7 +49,7 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
    */
   public static function &create(&$params) {
     $financialTypeId = NULL;
-    if (CRM_Utils_Array::value('id', $params) && !CRM_Price_BAO_PriceSet::getFor('civicrm_contribution_page', $params['id'], NULL, 1)) {
+    if (!empty($params['id']) && !CRM_Price_BAO_PriceSet::getFor('civicrm_contribution_page', $params['id'], NULL, 1)) {
       $financialTypeId = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_ContributionPage', $params['id'], 'financial_type_id');
     }
     $dao = new CRM_Contribute_DAO_ContributionPage();
@@ -173,8 +173,8 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
       $gIds['custom_post_id'] = $values['custom_post_id'];
     }
 
-    if (CRM_Utils_Array::value('is_for_organization', $values)) {
-      if (CRM_Utils_Array::value('membership_id', $values)) {
+    if (!empty($values['is_for_organization'])) {
+      if (!empty($values['membership_id'])) {
         $params['onbehalf_profile'] = array(
           array(
             'member_id',
@@ -185,7 +185,7 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
           ),
         );
       }
-      elseif (CRM_Utils_Array::value('contribution_id', $values)) {
+      elseif (!empty($values['contribution_id'])) {
         $params['onbehalf_profile'] = array(
           array(
             'contribution_id',
@@ -232,7 +232,7 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
       }
     }
 
-    if ( CRM_Utils_Array::value('is_email_receipt', $values) ||
+    if (!empty($values['is_email_receipt']) ||
       CRM_Utils_Array::value('onbehalf_dupe_alert', $values) ||
       $returnMessageText
     ) {
@@ -269,7 +269,7 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
       //IF Individual type not present in profile then it is consider as Organization data.
       $userID = $contactID;
       if ($preID = CRM_Utils_Array::value('custom_pre_id', $values)) {
-        if (CRM_Utils_Array::value('related_contact', $values)) {
+        if (!empty($values['related_contact'])) {
           $preProfileTypes = CRM_Core_BAO_UFGroup::profileGroups($preID);
           if (in_array('Individual', $preProfileTypes) || in_array('Contact', $postProfileTypes)) {
             //Take Individual contact ID
@@ -280,7 +280,7 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
       }
       $userID = $contactID;
       if ($postID = CRM_Utils_Array::value('custom_post_id', $values)) {
-        if (CRM_Utils_Array::value('related_contact', $values)) {
+        if (!empty($values['related_contact'])) {
           $postProfileTypes = CRM_Core_BAO_UFGroup::profileGroups($postID);
           if (in_array('Individual', $postProfileTypes) || in_array('Contact', $postProfileTypes)) {
             //Take Individual contact ID
@@ -383,7 +383,7 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
       }
 
       // send duplicate alert, if dupe match found during on-behalf-of processing.
-      if (CRM_Utils_Array::value('onbehalf_dupe_alert', $values)) {
+      if (!empty($values['onbehalf_dupe_alert'])) {
         $sendTemplateParams['groupName'] = 'msg_tpl_workflow_contribution';
         $sendTemplateParams['valueName'] = 'contribution_dupalert';
         $sendTemplateParams['from'] = ts('Automatically Generated') . " <{$values['receipt_from_email']}>";
