@@ -55,7 +55,7 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
     }
 
     if (self::is_administrator()) {
-      if (CRM_Utils_Array::value('note', $params)) {
+      if (!empty($params['note'])) {
         $note_params = array(
           'participant_id' => $participant->id,
           'contact_id' => self::getContactID(),
@@ -68,7 +68,7 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
     $participant->copyValues($participantParams);
     $participant->save();
 
-    if (CRM_Utils_Array::value('contributionID', $params)) {
+    if (!empty($params['contributionID'])) {
       $payment_params = array(
         'participant_id' => $participant->id,
         'contribution_id' => $params['contributionID'],
@@ -357,7 +357,7 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
   static function formRule($fields, $files, $self) {
     $errors = array();
 
-    if ($self->payment_required && !CRM_Utils_Array::value('is_pay_later', $self->_submitValues)) {
+    if ($self->payment_required && empty($self->_submitValues['is_pay_later'])) {
       $payment = &CRM_Core_Payment::singleton($self->_mode, $self->_paymentProcessor, $this);
       $error = $payment->checkConfig($self->_mode);
       if ($error) {
@@ -448,7 +448,7 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
     $params['invoiceID'] = md5(uniqid(rand(), TRUE));
     $params['amount'] = $this->total;
         $params['financial_type_id'] = $this->financial_type_id;
-    if ($this->payment_required && !CRM_Utils_Array::value('is_pay_later', $params)) {
+    if ($this->payment_required && empty($params['is_pay_later'])) {
       $trxn = $this->make_payment($params);
       $params['trxn_id'] = $trxn->trxn_id;
       $params['trxn_date'] = $trxn->trxn_date;
@@ -461,14 +461,14 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
 
     $contribution_statuses = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
     $params['payment_instrument_id'] = NULL;
-    if (CRM_Utils_Array::value('is_pay_later', $params)) {
+    if (!empty($params['is_pay_later'])) {
       $params['payment_instrument_id'] = CRM_Core_OptionGroup::getValue('payment_instrument', 'Check', 'name');
       $trxn_prefix = 'CK';
     }
     else {
       $params['payment_instrument_id'] = CRM_Core_OptionGroup::getValue('payment_instrument', 'Credit Card', 'name');
     }
-    if ($this->is_pay_later && !CRM_Utils_Array::value('payment_completed', $params)) {
+    if ($this->is_pay_later && empty($params['payment_completed'])) {
       $params['contribution_status_id'] = array_search('Pending', $contribution_statuses);
     }
     else {
@@ -571,7 +571,7 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
   }
 
   function record_contribution(&$mer_participant, &$params, $event) {
-    if (self::is_administrator() && CRM_Utils_Array::value('payment_type', $params)) {
+    if (self::is_administrator() && !empty($params['payment_type'])) {
       $params['payment_instrument_id'] = $params['payment_type'];
     }
 
@@ -610,7 +610,7 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
     $mer_participant->contribution_id = $contribution->id;
     $params['contributionID'] = $contribution->id;
     $params['receive_date'] = $contribution->receive_date;
-    if (CRM_Utils_Array::value('financial_trxn_id', $params)) {
+    if (!empty($params['financial_trxn_id'])) {
       $entity_financial_trxn_params = array(
         'entity_table' => "civicrm_contribution",
         'entity_id' => $contribution->id,
@@ -661,7 +661,7 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
           $defaults["billing_contact_email"] = $email['email'];
         }
       }
-      if (!CRM_Utils_Array::value('billing_contact_email', $defaults)) {
+      if (empty($defaults['billing_contact_email'])) {
         foreach ($contact->email as $email) {
           if ($email['is_primary']) {
             $defaults["billing_contact_email"] = $email['email'];

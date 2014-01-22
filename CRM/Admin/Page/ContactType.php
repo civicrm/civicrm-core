@@ -109,12 +109,12 @@ class CRM_Admin_Page_ContactType extends CRM_Core_Page_Basic {
     $rows = CRM_Contact_BAO_ContactType::contactTypeInfo(TRUE);
     foreach ($rows as $key => $value) {
       $mask = NULL;
-      if (CRM_Utils_Array::value('is_reserved', $value)) {
+      if (!empty($value['is_reserved'])) {
         $mask = CRM_Core_Action::UPDATE;
       }
       else {
         $mask -= CRM_Core_Action::DELETE - 2;
-        if (CRM_Utils_Array::value('is_active', $value)) {
+        if (!empty($value['is_active'])) {
           $mask -= CRM_Core_Action::ENABLE;
         }
         else {

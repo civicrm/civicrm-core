@@ -62,7 +62,7 @@ function civicrm_api($entity, $action, $params, $extra = NULL) {
     // we do this before we
     _civicrm_api3_swap_out_aliases($apiRequest, $fields);
     if (strtolower($action) != 'getfields') {
-      if (!CRM_Utils_Array::value('id', $apiRequest['params'])) {
+      if (empty($apiRequest['params']['id'])) {
         $apiRequest['params'] = array_merge(_civicrm_api3_getdefaults($apiRequest, $fields), $apiRequest['params']);
       }
       //if 'id' is set then only 'version' will be checked but should still be checked for consistency
@@ -103,7 +103,7 @@ function civicrm_api($entity, $action, $params, $extra = NULL) {
         return 0;
       }
     }
-    if (CRM_Utils_Array::value('format.only_id', $apiRequest['params']) && isset($result['id'])) {
+    if (!empty($apiRequest['params']['format.only_id']) && isset($result['id'])) {
       return $result['id'];
     }
     if (CRM_Utils_Array::value('is_error', $result, 0) == 0) {
@@ -130,7 +130,7 @@ function civicrm_api($entity, $action, $params, $extra = NULL) {
       $data["error_code"] = DB::errorMessage($error->getCode());
       $data["sql"] = $error->getDebugInfo();
     }
-    if (CRM_Utils_Array::value('debug', $apiRequest['params'])) {
+    if (!empty($apiRequest['params']['debug'])) {
       if(method_exists($e, 'getUserInfo')) {
         $data['debug_info'] = $error->getUserInfo();
       }
@@ -143,7 +143,7 @@ function civicrm_api($entity, $action, $params, $extra = NULL) {
       $data['tip'] = "add debug=1 to your API call to have more info about the error";
     }
     $err = civicrm_api3_create_error($e->getMessage(), $data, $apiRequest);
-    if (CRM_Utils_Array::value('is_transactional', $apiRequest)) {
+    if (!empty($apiRequest['is_transactional'])) {
       $transaction->rollback();
     }
     return $err;
@@ -164,7 +164,7 @@ function civicrm_api($entity, $action, $params, $extra = NULL) {
     ) {
       $err['trace'] = $e->getTraceAsString();
     }
-    if (CRM_Utils_Array::value('is_transactional', $apiRequest)) {
+    if (!empty($apiRequest['is_transactional'])) {
       $transaction->rollback();
     }
     return $err;
@@ -175,10 +175,10 @@ function civicrm_api($entity, $action, $params, $extra = NULL) {
     }
     $data = array();
     $err = civicrm_api3_create_error($e->getMessage(), $data, $apiRequest, $e->getCode());
-    if (CRM_Utils_Array::value('debug', $apiRequest['params'])) {
+    if (!empty($apiRequest['params']['debug'])) {
       $err['trace'] = $e->getTraceAsString();
     }
-    if (CRM_Utils_Array::value('is_transactional', $apiRequest)) {
+    if (!empty($apiRequest['is_transactional'])) {
       $transaction->rollback();
     }
     return $err;
@@ -290,7 +290,7 @@ function _civicrm_api3_api_getfields(&$apiRequest) {
   if (strtolower($apiRequest['action'] == 'getfields')) {
     // the main param getfields takes is 'action' - however this param is not compatible with REST
     // so we accept 'api_action' as an alias of action on getfields
-    if (CRM_Utils_Array::value('api_action', $apiRequest['params'])) {
+    if (!empty($apiRequest['params']['api_action'])) {
     //  $apiRequest['params']['action'] = $apiRequest['params']['api_action'];
      // unset($apiRequest['params']['api_action']);
     }

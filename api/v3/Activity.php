@@ -54,7 +54,7 @@
  */
 function civicrm_api3_activity_create($params) {
 
-  if (!CRM_Utils_Array::value('id', $params)) {
+  if (empty($params['id'])) {
     // an update does not require any mandatory parameters
     civicrm_api3_verify_one_mandatory($params,
       NULL,
@@ -96,9 +96,9 @@ function civicrm_api3_activity_create($params) {
   $case_id           = '';
   $createRevision    = FALSE;
   $oldActivityValues = array();
-  if (CRM_Utils_Array::value('case_id', $params)) {
+  if (!empty($params['case_id'])) {
     $case_id = $params['case_id'];
-    if (CRM_Utils_Array::value('id', $params)) {
+    if (!empty($params['id'])) {
       $oldActivityParams = array('id' => $params['id']);
       if (!$oldActivityValues) {
         CRM_Activity_BAO_Activity::retrieve($oldActivityParams, $oldActivityValues);
@@ -408,9 +408,7 @@ SELECT  count(*)
   //if adding a new activity & date_time not set make it now
   // this should be managed by the wrapper layer & setting ['api.default'] in speces
   // needs testing
-  if (!CRM_Utils_Array::value('id', $params) &&
-    !CRM_Utils_Array::value('activity_date_time', $params)
-  ) {
+  if (empty($params['id']) && empty($params['activity_date_time'])) {
     $params['activity_date_time'] = CRM_Utils_Date::processDate(date('Y-m-d H:i:s'));
   }
 

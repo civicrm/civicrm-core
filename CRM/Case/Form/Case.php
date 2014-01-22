@@ -193,7 +193,7 @@ class CRM_Case_Form_Case extends CRM_Core_Form {
     $activityGroupTree = $this->_groupTree;
 
     // for case custom fields to populate with defaults
-    if (CRM_Utils_Array::value('hidden_custom', $_POST)) {
+    if (!empty($_POST['hidden_custom'])) {
       CRM_Custom_Form_CustomData::preProcess($this);
       CRM_Custom_Form_CustomData::buildQuickForm($this);
     }
@@ -370,8 +370,7 @@ class CRM_Case_Form_Case extends CRM_Core_Form {
       $className::beginPostProcess($this, $params );
     }
 
-    if (
-      CRM_Utils_Array::value('hidden_custom', $params) &&
+    if (!empty($params['hidden_custom']) &&
       !isset($params['custom'])
     ) {
       $customFields = array();
@@ -384,7 +383,7 @@ class CRM_Case_Form_Case extends CRM_Core_Form {
     }
 
     // 2. create/edit case
-    if (CRM_Utils_Array::value('case_type_id', $params)) {
+    if (!empty($params['case_type_id'])) {
       $caseType = CRM_Case_PseudoConstant::caseType('name');
       $params['case_type'] = $caseType[$params['case_type_id']];
       $params['subject'] = $params['activity_subject'];
@@ -418,7 +417,7 @@ class CRM_Case_Form_Case extends CRM_Core_Form {
     $session->pushUserContext($url);
 
     // 3. format activity custom data
-    if (CRM_Utils_Array::value('hidden_custom', $params)) {
+    if (!empty($params['hidden_custom'])) {
       $customFields = CRM_Core_BAO_CustomField::getFields('Activity', FALSE, FALSE, $this->_activityTypeId);
       $customFields = CRM_Utils_Array::crmArrayMerge($customFields,
         CRM_Core_BAO_CustomField::getFields('Activity', FALSE, FALSE,

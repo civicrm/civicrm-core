@@ -250,9 +250,7 @@ class CRM_Report_Form_Grant_Detail extends CRM_Report_Form {
       }
       if (array_key_exists('fields', $table)) {
         foreach ($table['fields'] as $fieldName => $field) {
-          if (CRM_Utils_Array::value('required', $field) ||
-            CRM_Utils_Array::value($fieldName, $this->_params['fields'])
-          ) {
+          if (!empty($field['required']) || !empty($this->_params['fields'][$fieldName])) {
 
             $select[] = "{$field['dbAlias']} as {$tableName}_{$fieldName}";
 
@@ -319,14 +317,14 @@ class CRM_Report_Form_Grant_Detail extends CRM_Report_Form {
 
   function groupBy() {
     $this->_groupBy = "";
-    if (CRM_Utils_Array::value('group_bys', $this->_params) &&
+    if (!empty($this->_params['group_bys']) &&
       is_array($this->_params['group_bys']) &&
       !empty($this->_params['group_bys'])
     ) {
       foreach ($this->_columns as $tableName => $table) {
         if (array_key_exists('group_bys', $table)) {
           foreach ($table['group_bys'] as $fieldName => $field) {
-            if (CRM_Utils_Array::value($fieldName, $this->_params['group_bys'])) {
+            if (!empty($this->_params['group_bys'][$fieldName])) {
               $this->_groupBy[] = $field['dbAlias'];
             }
           }

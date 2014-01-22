@@ -420,7 +420,7 @@ class CRM_UF_Page_Group extends CRM_Core_Page {
       $returnGroupTypes[$type] = $type;
     }
 
-    if (CRM_Utils_Array::value(1, $groupTypeParts)) {
+    if (!empty($groupTypeParts[1])) {
       foreach (explode(',', $groupTypeParts[1]) as $typeValue) {
         $groupTypeValues = $valueLabels = array();
         $valueParts = explode(':', $typeValue);

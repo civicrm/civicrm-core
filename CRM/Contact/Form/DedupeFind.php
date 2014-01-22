@@ -96,7 +96,7 @@ class CRM_Contact_Form_DedupeFind extends CRM_Admin_Form {
    */
   public function postProcess() {
     $values = $this->exportValues();
-    if (CRM_Utils_Array::value('_qf_DedupeFind_submit', $_POST)) {
+    if (!empty($_POST['_qf_DedupeFind_submit'])) {
       //used for cancel button
       CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/contact/deduperules', 'reset=1'));
       return;

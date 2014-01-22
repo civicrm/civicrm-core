@@ -56,7 +56,7 @@
  */
 function civicrm_api3_participant_create($params) {
   //check that event id is not an template - should be done @ BAO layer
-  if (CRM_Utils_Array::value('event_id', $params)) {
+  if (!empty($params['event_id'])) {
     $isTemplate = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $params['event_id'], 'is_template');
     if (!empty($isTemplate)) {
       return civicrm_api3_create_error(ts('Event templates are not meant to be registered'));
@@ -69,7 +69,7 @@ function civicrm_api3_participant_create($params) {
 
   $participantBAO = CRM_Event_BAO_Participant::create($params);
 
-  if(empty($params['price_set_id']) && empty($params['id']) && CRM_Utils_Array::value('fee_level', $params)){
+  if(empty($params['price_set_id']) && empty($params['id']) && !empty($params['fee_level'])){
     _civicrm_api3_participant_createlineitem($params, $participantBAO);
   }
   _civicrm_api3_object_to_array($participantBAO, $participant[$participantBAO->id]);

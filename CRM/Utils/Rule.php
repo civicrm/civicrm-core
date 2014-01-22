@@ -175,7 +175,7 @@ class CRM_Utils_Rule {
     }
 
     // CRM-9017 CiviContribute/CiviMember form with expiration date format 'm Y'
-    if (!$m && CRM_Utils_Array::value('m', $date)) {
+    if (!$m && !empty($date['m'])) {
       $m = CRM_Utils_Array::value('m', $date);
     }
 

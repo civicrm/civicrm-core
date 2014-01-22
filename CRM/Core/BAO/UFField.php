@@ -143,7 +143,7 @@ class CRM_Core_BAO_UFField extends CRM_Core_DAO_UFField {
     $ufField->location_type_id = (CRM_Utils_Array::value(2, $params['field_name'])) ? $params['field_name'][2] : 'NULL';
     $ufField->phone_type_id = CRM_Utils_Array::value(3, $params['field_name']);
 
-    if (CRM_Utils_Array::value('uf_field', $ids)) {
+    if (!empty($ids['uf_field'])) {
       $ufField->whereAdd("id <> " . CRM_Utils_Array::value('uf_field', $ids));
     }
 
@@ -252,7 +252,7 @@ WHERE cf.id IN (" . $customFieldIds . ") AND is_multiple = 1 LIMIT 0,1";
     // fix for CRM-316
     $oldWeight = NULL;
 
-    if (CRM_Utils_Array::value('field_id', $params)) {
+    if (!empty($params['field_id'])) {
       $oldWeight = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_UFField', $params['field_id'], 'weight', 'id');
     }
     $fieldValues = array('uf_group_id' => $params['group_id']);

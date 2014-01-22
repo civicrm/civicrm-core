@@ -157,9 +157,7 @@ class CRM_Contact_Form_Edit_Individual {
     $primaryID = CRM_Contact_Form_Contact::formRule($fields, $errors, $contactID);
 
     // make sure that firstName and lastName or a primary OpenID is set
-    if (!$primaryID && (!CRM_Utils_Array::value('first_name', $fields) ||
-        !CRM_Utils_Array::value('last_name', $fields)
-      )) {
+    if (!$primaryID && (empty($fields['first_name']) || empty($fields['last_name']))) {
       $errors['_qf_default'] = ts('First Name and Last Name OR an email OR an OpenID in the Primary Location should be set.');
     }
 

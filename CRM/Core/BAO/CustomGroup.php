@@ -88,7 +88,7 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
     //this is format when form get submit.
     $extendsChildType = CRM_Utils_Array::value(1, $params['extends']);
     //lets allow user to pass direct child type value, CRM-6893
-    if (CRM_Utils_Array::value('extends_entity_column_value', $params)) {
+    if (!empty($params['extends_entity_column_value'])) {
       $extendsChildType = $params['extends_entity_column_value'];
     }
     if (!CRM_Utils_System::isNull($extendsChildType)) {
@@ -129,7 +129,7 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
         'is_multiple'
       );
 
-      if ((CRM_Utils_Array::value('is_multiple', $params) || $isMultiple) &&
+      if ((!empty($params['is_multiple']) || $isMultiple) &&
         ($params['is_multiple'] != $isMultiple)
       ) {
         $oldTableName = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup',
@@ -1574,11 +1574,11 @@ ORDER BY civicrm_custom_group.weight,
           elseif ($field['data_type'] == 'Date') {
             if (!empty($value)) {
               $time = NULL;
-              if (CRM_Utils_Array::value('time_format', $field)) {
+              if (!empty($field['time_format'])) {
                 $time = CRM_Utils_Request::retrieve($fieldName . '_time', 'String', $form, FALSE, NULL, 'GET');
               }
               list($value, $time) = CRM_Utils_Date::setDateDefaults($value . ' ' . $time);
-              if (CRM_Utils_Array::value('time_format', $field)) {
+              if (!empty($field['time_format'])) {
                 $customValue[$fieldName . '_time'] = $time;
               }
             }
@@ -1923,7 +1923,7 @@ SELECT IF( EXISTS(SELECT name FROM civicrm_contact_type WHERE name like %1), 1, 
         break;
 
       case 'ContactReference':
-        if (CRM_Utils_Array::value('data', $values)) {
+        if (!empty($values['data'])) {
           $retValue = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $values['data'], 'display_name');
         }
         break;

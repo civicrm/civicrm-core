@@ -180,10 +180,10 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
     );
 
     foreach ($communicationType as $key => $value) {
-      if (CRM_Utils_Array::value($key, $defaults)) {
+      if (!empty($defaults[$key])) {
         foreach ($defaults[$key] as & $val) {
           CRM_Utils_Array::lookupValue($val, 'location_type', CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id', array('labelColumn' => 'display_name')), FALSE);
-          if (!CRM_Utils_Array::value('skip', $value)) {
+          if (empty($value['skip'])) {
             $daoName = $value['daoName'];
             $pseudoConst = $daoName::buildOptions($value['fieldName'], 'get');
             CRM_Utils_Array::lookupValue($val, $value['id'], $pseudoConst, FALSE);
@@ -193,7 +193,7 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
           foreach ($defaults[$key] as $blockId => $blockVal) {
             $idValue = $blockVal['id'];
             if ( $key == 'address' ) {
-              if ( CRM_Utils_Array::value( 'master_id', $blockVal ) ) {
+              if (!empty($blockVal['master_id'])) {
                 $idValue = $blockVal['master_id'];
               }
             }
@@ -210,13 +210,13 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
       }
     }
 
-    if (CRM_Utils_Array::value('gender_id', $defaults)) {
+    if (!empty($defaults['gender_id'])) {
       $defaults['gender_display'] = CRM_Core_PseudoConstant::getLabel('CRM_Contact_DAO_Contact', 'gender_id', $defaults['gender_id']);
     }
 
     $communicationStyle = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'communication_style_id');
     if (!empty($communicationStyle)) {
-      if (CRM_Utils_Array::value('communication_style_id', $defaults)) {
+      if (!empty($defaults['communication_style_id'])) {
         $defaults['communication_style_display'] = $communicationStyle[CRM_Utils_Array::value('communication_style_id', $defaults)];
       }
       else {
@@ -254,7 +254,7 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
     $sharedAddresses = array();
     $shareAddressContactNames = CRM_Contact_BAO_Contact_Utils::getAddressShareContactNames($defaults['address']);
     foreach ($defaults['address'] as $key => $addressValue) {
-      if (CRM_Utils_Array::value('master_id', $addressValue) &&
+      if (!empty($addressValue['master_id']) &&
         !$shareAddressContactNames[$addressValue['master_id']]['is_deleted']
       ) {
         $sharedAddresses[$key]['shared_address_display'] = array(
@@ -301,8 +301,7 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
     $components = CRM_Core_Component::getEnabledComponents();
 
     foreach ($components as $name => $component) {
-      if (
-        CRM_Utils_Array::value($name, $this->_viewOptions) &&
+      if (!empty($this->_viewOptions[$name]) &&
         CRM_Core_Permission::access($component->name)
       ) {
         $elem = $component->registerTab();
@@ -366,7 +365,7 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
     );
 
     foreach ($rest as $k => $v) {
-      if ($accessCiviCRM && CRM_Utils_Array::value($k, $this->_viewOptions)) {
+      if ($accessCiviCRM && !empty($this->_viewOptions[$k])) {
         $allTabs[] = $v + array(
           'id' => $k,
           'url' => CRM_Utils_System::url(

@@ -1231,7 +1231,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
     CRM_Utils_Hook::alterMailParams($mailParams, 'civimail');
 
     // CRM-10699 support custom email headers
-    if (CRM_Utils_Array::value('headers', $mailParams)) {
+    if (!empty($mailParams['headers'])) {
       $headers = array_merge($headers, $mailParams['headers']);
     }
     //cycle through mailParams and set headers array
@@ -1457,7 +1457,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
 
     $result = $mailing->save();
 
-    if (CRM_Utils_Array::value('mailing', $ids)) {
+    if (!empty($ids['mailing'])) {
       CRM_Utils_Hook::post('edit', 'Mailing', $mailing->id, $mailing);
     }
     else {
@@ -1565,8 +1565,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
     $mg = new CRM_Mailing_DAO_MailingGroup();
     foreach (array('groups', 'mailings') as $entity) {
       foreach (array('include', 'exclude', 'base') as $type) {
-        if (isset($params[$entity]) &&
-          CRM_Utils_Array::value($type, $params[$entity]) &&
+        if (isset($params[$entity]) && !empty($params[$entity][$type]) &&
           is_array($params[$entity][$type])) {
           foreach ($params[$entity][$type] as $entityId) {
             $mg->reset();
@@ -1920,7 +1919,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
       $report['event_totals']['queue'] = self::getRecipientsCount($mailing_id, $mailing_id);
     }
 
-    if (CRM_Utils_Array::value('queue', $report['event_totals'])) {
+    if (!empty($report['event_totals']['queue'])) {
       $report['event_totals']['delivered_rate'] = (100.0 * $report['event_totals']['delivered']) / $report['event_totals']['queue'];
       $report['event_totals']['bounce_rate'] = (100.0 * $report['event_totals']['bounce']) / $report['event_totals']['queue'];
       $report['event_totals']['unsubscribe_rate'] = (100.0 * $report['event_totals']['unsubscribe']) / $report['event_totals']['queue'];

@@ -39,7 +39,7 @@ class CRM_Event_Form_SearchEvent extends CRM_Core_Form {
     $defaults['eventsByDates'] = 0;
 
     $this->_showHide = new CRM_Core_ShowHideBlocks();
-    if (!CRM_Utils_Array::value('eventsByDates', $defaults)) {
+    if (empty($defaults['eventsByDates'])) {
       $this->_showHide->addHide('id_fromToDates');
     }
 

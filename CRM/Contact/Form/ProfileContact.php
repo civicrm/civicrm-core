@@ -101,10 +101,7 @@ class CRM_Contact_Form_ProfileContact {
     // add the form elements
     foreach ($honoreeProfileFields as $name => $field) {
       // If soft credit type is not chosen then make omit requiredness from honoree profile fields
-      if (count($form->_submitValues) &&
-        !CRM_Utils_Array::value('soft_credit_type_id', $form->_submitValues) &&
-        CRM_Utils_Array::value('is_required', $field)
-      ) {
+      if (count($form->_submitValues) && empty($form->_submitValues['soft_credit_type_id']) && !empty($field['is_required'])) {
         $field['is_required'] = FALSE;
       }
       CRM_Core_BAO_UFGroup::buildProfile($form, $field, CRM_Profile_Form::MODE_CREATE, NULL, FALSE, FALSE, NULL, $prefix);
@@ -114,7 +111,7 @@ class CRM_Contact_Form_ProfileContact {
   static function postProcess($form) {
     $params = $form->_params;
     $values = $form->_values;
-    if ($form->get('honor_block_is_active') && CRM_Utils_Array::value('soft_credit_type_id', $params)) {
+    if ($form->get('honor_block_is_active') && !empty($params['soft_credit_type_id'])) {
       $honorId = null;
 
       //check if there is any duplicate contact

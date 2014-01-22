@@ -354,7 +354,7 @@ class WebTest_Contribute_OfflineContributionTest extends CiviSeleniumTestCase {
       $this->type("non_deductible_amount", "{$nonDeductibleAmt}");
     }
 
-    if (CRM_Utils_Array::value('premium', $params)) {
+    if (!empty($params['premium'])) {
       //Premium section
       $this->click("Premium");
       $this->waitForElementPresent("fulfilled_date");

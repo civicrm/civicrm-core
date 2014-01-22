@@ -223,9 +223,8 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form {
   }
 
   function setDefaultValues() {
-    if (!CRM_Utils_Array::value('contribution_status',
-        $this->_defaults
-      )) {
+    if (empty($this->_defaults
+['contribution_status'])) {
       $this->_defaults['contribution_status'][1] = 1;
     }
     return $this->_defaults;

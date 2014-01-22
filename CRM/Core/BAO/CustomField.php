@@ -151,7 +151,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
 
     $indexExist = FALSE;
     //as during create if field is_searchable we had created index.
-    if (CRM_Utils_Array::value('id', $params)) {
+    if (!empty($params['id'])) {
       $indexExist = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomField', $params['id'], 'is_searchable');
     }
 
@@ -180,8 +180,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
           }
         }
         else {
-          if (CRM_Utils_Array::value('default_option', $params)
-            && isset($params['option_value'][$params['default_option']])
+          if (!empty($params['default_option']) && isset($params['option_value'][$params['default_option']])
           ) {
             $params['default_value'] = $params['option_value'][$params['default_option']];
           }
@@ -244,14 +243,14 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
     }
 
     // check for orphan option groups
-    if (CRM_Utils_Array::value('option_group_id', $params)) {
-      if (CRM_Utils_Array::value('id', $params)) {
+    if (!empty($params['option_group_id'])) {
+      if (!empty($params['id'])) {
         self::fixOptionGroups($params['id'], $params['option_group_id']);
       }
 
       // if we dont have a default value
       // retrive it from one of the other custom fields which use this option group
-      if (!CRM_Utils_Array::value('default_value', $params)) {
+      if (empty($params['default_value'])) {
         //don't insert only value separator as default value, CRM-4579
         $defaultValue = self::getOptionGroupDefault($params['option_group_id'],
           $params['html_type']
@@ -283,7 +282,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
     $customField->find(TRUE);
 
     //create/drop the index when we toggle the is_searchable flag
-    if (CRM_Utils_Array::value('id', $params)) {
+    if (!empty($params['id'])) {
       self::createField($customField, 'modify', $indexExist);
     }
     else {
@@ -619,7 +618,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
     foreach ($fields as $id => $values) {
       // for now we should not allow multiple fields in profile / export etc, hence unsetting
       if (!$search &&
-        (CRM_Utils_Array::value('is_multiple', $values) && !$withMultiple)
+        (!empty($values['is_multiple']) && !$withMultiple)
       ) {
         continue;
       }
@@ -1584,7 +1583,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
     }
 
     // return if field is a 'code' field
-    if (CRM_Utils_Array::value('is_view', $customFields[$customFieldId])) {
+    if (!empty($customFields[$customFieldId]['is_view'])) {
       return;
     }
 
@@ -2056,7 +2055,7 @@ AND    cf.id = %1";
       $customOptionGroup[$cacheKey] = NULL;
     }
 
-    if (!CRM_Utils_Array::value($cacheKey, $customOptionGroup)) {
+    if (empty($customOptionGroup[$cacheKey])) {
       $whereClause = '( g.is_active = 1 AND f.is_active = 1 )';
 
       //support for single as well as array format.

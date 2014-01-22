@@ -221,9 +221,7 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
       if (array_key_exists('fields', $table)) {
         foreach ($table['fields'] as $fieldName => $field) {
 
-          if (CRM_Utils_Array::value('required', $field) ||
-            CRM_Utils_Array::value($fieldName, $this->_params['fields'])
-          ) {
+          if (!empty($field['required']) || !empty($this->_params['fields'][$fieldName])) {
             if ($fieldName == 'total_amount') {
               $select[] = "SUM({$field['dbAlias']}) as {$tableName}_{$fieldName}";
 
@@ -250,7 +248,7 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
               $this->_columnHeaders["{$tableName}_{$fieldName}"]['type'] = CRM_Utils_Array::value('type', $field);
               $this->_columnHeaders["{$tableName}_{$fieldName}"]['title'] = $field['title'];
             }
-            if (CRM_Utils_Array::value('no_display', $field)) {
+            if (!empty($field['no_display'])) {
               $this->_columnHeaders["{$tableName}_{$fieldName}"]['no_display'] = TRUE;
             }
           }
@@ -371,7 +369,7 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
     $this->groupBy();
 
     $rows = $contactIds = array();
-    if (!CRM_Utils_Array::value('charts', $this->_params)) {
+    if (empty($this->_params['charts'])) {
       $this->limit();
       $getContacts = "SELECT SQL_CALC_FOUND_ROWS {$this->_aliases['civicrm_contact']}.id as cid {$this->_from} {$this->_where} GROUP BY {$this->_aliases['civicrm_contact']}.id {$this->_limit}";
 
@@ -384,8 +382,8 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
       $this->setPager();
     }
 
-    if (!empty($contactIds) || CRM_Utils_Array::value('charts', $this->_params)) {
-      if (CRM_Utils_Array::value('charts', $this->_params)) {
+    if (!empty($contactIds) || !empty($this->_params['charts'])) {
+      if (!empty($this->_params['charts'])) {
         $sql = "{$this->_select} {$this->_from} {$this->_where} {$this->_groupBy}";
       }
       else {

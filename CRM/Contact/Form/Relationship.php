@@ -161,7 +161,7 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
     $this->_allRelationshipNames = CRM_Core_PseudoConstant::relationshipType('name');
 
     // when custom data is included in this page
-    if (CRM_Utils_Array::value('hidden_custom', $_POST)) {
+    if (!empty($_POST['hidden_custom'])) {
       CRM_Custom_Form_CustomData::preProcess($this);
       CRM_Custom_Form_CustomData::buildQuickForm($this);
       CRM_Custom_Form_CustomData::setDefaultValues($this);
@@ -186,10 +186,10 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
     if ($this->_action & CRM_Core_Action::UPDATE) {
       if (!empty($this->_values)) {
         $defaults['relationship_type_id'] = $this->_rtypeId;
-        if (CRM_Utils_Array::value('start_date', $this->_values)) {
+        if (!empty($this->_values['start_date'])) {
           list($defaults['start_date']) = CRM_Utils_Date::setDateDefaults($this->_values['start_date']);
         }
-        if (CRM_Utils_Array::value('end_date', $this->_values)) {
+        if (!empty($this->_values['end_date'])) {
           list($defaults['end_date']) = CRM_Utils_Date::setDateDefaults($this->_values['end_date']);
         }
         $defaults['description'] = CRM_Utils_Array::value('description', $this->_values);
@@ -469,15 +469,13 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
     // store the submitted values in an array
     $params = $this->controller->exportValues($this->_name);
     $quickSave = FALSE;
-    if (CRM_Utils_Array::value('_qf_Relationship_refresh_save', $_POST) ||
-      CRM_Utils_Array::value('_qf_Relationship_refresh_savedetails', $_POST)
-    ) {
+    if (!empty($_POST['_qf_Relationship_refresh_save']) || !empty($_POST['_qf_Relationship_refresh_savedetails'])) {
       $quickSave = TRUE;
     }
 
     $this->set('searchDone', 0);
     $this->set('callAjax', FALSE);
-    if (CRM_Utils_Array::value('_qf_Relationship_refresh', $_POST) || $quickSave) {
+    if (!empty($_POST['_qf_Relationship_refresh']) || $quickSave) {
       if (is_numeric($params['contact_select_id'][1])) {
         if ($quickSave) {
           $params['contact_check'] = array($params['contact_select_id'][1] => 1);
@@ -520,7 +518,7 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
       //make sure we has to have employer id before firing queries, CRM-7306
       $employerId = CRM_Utils_Array::value('current_employee_id', $this->_values);
       $isDisabled = TRUE;
-      if (CRM_Utils_Array::value('is_active', $params)) {
+      if (!empty($params['is_active'])) {
         $isDisabled = FALSE;
       }
       $relChanged = TRUE;
@@ -538,12 +536,12 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
       $params['is_permission_b_a'] = CRM_Utils_Array::value('is_permission_b_a', $params, FALSE);
     }
     elseif ($quickSave) {
-      if (CRM_Utils_Array::value('add_current_employee', $params) &&
+      if (!empty($params['add_current_employee']) &&
         $this->_allRelationshipNames[$relationshipTypeId]['name_a_b'] == 'Employee of'
       ) {
         $params['employee_of'] = $params['contact_select_id'][1];
       }
-      elseif (CRM_Utils_Array::value('add_current_employer', $params) &&
+      elseif (!empty($params['add_current_employer']) &&
         $this->_allRelationshipNames[$relationshipTypeId]['name_b_a'] == 'Employer of'
       ) {
         $params['employer_of'] = array($params['contact_select_id'][1] => 1);
@@ -623,7 +621,7 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
         //fixes for CRM-7985
         //only if the relationship has been toggled to enable /disable
         if (CRM_Utils_Array::value('is_active', $params) != $this->_enabled) {
-          $active = CRM_Utils_Array::value('is_active', $params) ? CRM_Core_Action::ENABLE : CRM_Core_Action::DISABLE;
+          $active = !empty($params['is_active']) ? CRM_Core_Action::ENABLE : CRM_Core_Action::DISABLE;
           CRM_Contact_BAO_Relationship::disableEnableRelationship($this->_relationshipId, $active);
         }
       }
@@ -631,13 +629,11 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
     //handle current employee/employer relationship, CRM-3532
     if ($this->_allRelationshipNames[$relationshipTypeId]["name_{$this->_rtype}"] == 'Employee of') {
       $orgId = NULL;
-      if (CRM_Utils_Array::value('employee_of', $params)) {
+      if (!empty($params['employee_of'])) {
         $orgId = $params['employee_of'];
       }
       elseif ($this->_action & CRM_Core_Action::UPDATE) {
-        if (CRM_Utils_Array::value('is_current_employer', $params) &&
-          CRM_Utils_Array::value('is_active', $params)
-        ) {
+        if (!empty($params['is_current_employer']) && !empty($params['is_active'])) {
           if (CRM_Utils_Array::value('contactTarget', $ids) !=
             CRM_Utils_Array::value('current_employer_id', $this->_values)
           ) {
@@ -660,11 +656,11 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
     }
     elseif ($this->_allRelationshipNames[$relationshipTypeId]["name_{$this->_rtype}"] == 'Employer of') {
       $individualIds = array();
-      if (CRM_Utils_Array::value('employer_of', $params)) {
+      if (!empty($params['employer_of'])) {
         $individualIds = array_keys($params['employer_of']);
       }
       elseif ($this->_action & CRM_Core_Action::UPDATE) {
-        if (CRM_Utils_Array::value('is_current_employer', $params)) {
+        if (!empty($params['is_current_employer'])) {
           if (CRM_Utils_Array::value('contactTarget', $ids) !=
             CRM_Utils_Array::value('current_employee_id', $this->_values)
           ) {
@@ -710,8 +706,7 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
    */
   static function formRule($params, $files, $form) {
     // hack, no error check for refresh
-    if (CRM_Utils_Array::value('_qf_Relationship_refresh', $_POST) ||
-      CRM_Utils_Array::value('_qf_Relationship_refresh_save', $_POST) ||
+    if (!empty($_POST['_qf_Relationship_refresh']) || !empty($_POST['_qf_Relationship_refresh_save']) ||
       CRM_Utils_Array::value('_qf_Relationship_refresh_savedetails', $_POST)
     ) {
       return TRUE;
@@ -726,7 +721,7 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
 
     $errors = array();
     $employerId = NULL;
-    if (CRM_Utils_Array::value('contact_check', $params) && is_array($params['contact_check'])) {
+    if (!empty($params['contact_check']) && is_array($params['contact_check'])) {
       foreach ($params['contact_check'] as $cid => $dontCare) {
         $message = CRM_Contact_BAO_Relationship::checkValidRelationship($params, $ids, $cid);
         if ($message) {
@@ -748,7 +743,7 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
       }
     }
 
-    if (CRM_Utils_Array::value('employee_of', $params) &&
+    if (!empty($params['employee_of']) &&
       !$employerId
     ) {
       if ($form->_callAjax) {
@@ -759,8 +754,7 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
       }
     }
 
-    if (CRM_Utils_Array::value('employer_of', $params) &&
-      CRM_Utils_Array::value('contact_check', $params) &&
+    if (!empty($params['employer_of']) && !empty($params['contact_check']) &&
       array_diff(array_keys($params['employer_of']), array_keys($params['contact_check']))
     ) {
       if ($form->_callAjax) {
@@ -787,9 +781,7 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
     $errors = array();
 
     // check start and end date
-    if (CRM_Utils_Array::value('start_date', $params) &&
-      CRM_Utils_Array::value('end_date', $params)
-    ) {
+    if (!empty($params['start_date']) && !empty($params['end_date'])) {
       $start_date = CRM_Utils_Date::format(CRM_Utils_Array::value('start_date', $params));
       $end_date = CRM_Utils_Date::format(CRM_Utils_Array::value('end_date', $params));
       if ($start_date && $end_date && (int ) $end_date < (int ) $start_date) {
@@ -805,7 +797,7 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
       return;
     }
 
-    if (CRM_Utils_Array::value('store_contacts', $params)) {
+    if (!empty($params['store_contacts'])) {
       $storedContacts = array();
       foreach (explode(',', $params['store_contacts']) as $value) {
         if ($value) {
@@ -815,7 +807,7 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
       $params['contact_check'] = $storedContacts;
     }
 
-    if (CRM_Utils_Array::value('store_employers', $params)) {
+    if (!empty($params['store_employers'])) {
       $employeeContacts = array();
       foreach (explode(',', $params['store_employers']) as $value) {
         if ($value) {

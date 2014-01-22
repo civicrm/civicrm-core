@@ -92,21 +92,21 @@ class CRM_Contact_BAO_RelationshipType extends CRM_Contact_DAO_RelationshipType 
    */
   static function add(&$params, &$ids) {
     //to change name, CRM-3336
-    if (!CRM_Utils_Array::value('label_a_b', $params) && CRM_Utils_Array::value('name_a_b', $params)) {
+    if (empty($params['label_a_b']) && !empty($params['name_a_b'])) {
       $params['label_a_b'] = $params['name_a_b'];
     }
 
-    if (!CRM_Utils_Array::value('label_b_a', $params) && CRM_Utils_Array::value('name_b_a', $params)) {
+    if (empty($params['label_b_a']) && !empty($params['name_b_a'])) {
       $params['label_b_a'] = $params['name_b_a'];
     }
 
     // set label to name if it's not set - but *only* for
     // ADD action. CRM-3336 as part from (CRM-3522)
-    if (!CRM_Utils_Array::value('relationshipType', $ids)) {
-      if (!CRM_Utils_Array::value('name_a_b', $params) && CRM_Utils_Array::value('label_a_b', $params)) {
+    if (empty($ids['relationshipType'])) {
+      if (empty($params['name_a_b']) && !empty($params['label_a_b'])) {
         $params['name_a_b'] = $params['label_a_b'];
       }
-      if (!CRM_Utils_Array::value('name_b_a', $params) && CRM_Utils_Array::value('label_b_a', $params)) {
+      if (empty($params['name_b_a']) && !empty($params['label_b_a'])) {
         $params['name_b_a'] = $params['label_b_a'];
       }
     }

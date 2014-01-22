@@ -245,7 +245,7 @@ class CRM_Admin_Form_Preferences extends CRM_Core_Form {
       foreach ($groupValues as $settingName => $fieldValue) {
         switch ($fieldValue['html_type']) {
           case 'checkboxes':
-            if (CRM_Utils_Array::value($settingName, $this->_params) &&
+            if (!empty($this->_params[$settingName]) &&
               is_array($this->_params[$settingName])
             ) {
               $this->_config->$settingName = CRM_Core_DAO::VALUE_SEPARATOR . implode(CRM_Core_DAO::VALUE_SEPARATOR,
@@ -258,7 +258,7 @@ class CRM_Admin_Form_Preferences extends CRM_Core_Form {
             break;
 
           case 'checkbox':
-            $this->_config->$settingName = CRM_Utils_Array::value($settingName, $this->_params) ? 1 : 0;
+            $this->_config->$settingName = !empty($this->_params[$settingName]) ? 1 : 0;
             break;
 
           case 'text':

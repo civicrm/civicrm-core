@@ -217,7 +217,7 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
       $this->add('text', "test_{$field['name']}",
         $field['label'], $attributes[$field['name']]
       );
-      if (CRM_Utils_Array::value('rule', $field)) {
+      if (!empty($field['rule'])) {
         $this->addRule($field['name'], $field['msg'], $field['rule']);
         $this->addRule("test_{$field['name']}", $field['msg'], $field['rule']);
       }
@@ -336,7 +336,7 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
     $values = $this->controller->exportValues($this->_name);
     $domainID = CRM_Core_Config::domainID();
 
-    if (CRM_Utils_Array::value('is_default', $values)) {
+    if (!empty($values['is_default'])) {
       $query = "UPDATE civicrm_payment_processor SET is_default = 0 WHERE domain_id = $domainID";
       CRM_Core_DAO::executeQuery($query, CRM_Core_DAO::$_nullArray);
     }

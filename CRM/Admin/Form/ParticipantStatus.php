@@ -67,7 +67,7 @@ class CRM_Admin_Form_ParticipantStatus extends CRM_Admin_Form {
 
   function setDefaultValues() {
     $defaults = parent::setDefaultValues();
-    if (!CRM_Utils_Array::value('weight', $defaults)) {
+    if (empty($defaults['weight'])) {
       $defaults['weight'] = CRM_Utils_Weight::getDefaultWeight('CRM_Event_DAO_ParticipantStatusType');
     }
     $this->_isReserved = CRM_Utils_Array::value('is_reserved', $defaults);

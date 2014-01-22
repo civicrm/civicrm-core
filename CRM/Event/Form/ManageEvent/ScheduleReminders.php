@@ -233,7 +233,7 @@ class CRM_Event_Form_ManageEvent_ScheduleReminders extends CRM_Event_Form_Manage
    */
   static function formRule($fields) {
     $errors = array();
-    if (CRM_Utils_Array::value('is_active', $fields) &&
+    if (!empty($fields['is_active']) &&
       CRM_Utils_System::isNull($fields['subject'])
     ) {
       $errors['subject'] = ts('Subject is a required field.');
@@ -354,12 +354,12 @@ class CRM_Event_Form_ManageEvent_ScheduleReminders extends CRM_Event_Form_Manage
     //mail template is composed
     $composeParams = array();
     foreach ($composeFields as $key) {
-      if (CRM_Utils_Array::value($key, $values)) {
+      if (!empty($values[$key])) {
         $composeParams[$key] = $values[$key];
       }
     }
 
-    if (CRM_Utils_Array::value('updateTemplate', $composeParams)) {
+    if (!empty($composeParams['updateTemplate'])) {
       $templateParams = array(
         'msg_text' => $params['body_text'],
         'msg_html' => $params['body_html'],
@@ -372,7 +372,7 @@ class CRM_Event_Form_ManageEvent_ScheduleReminders extends CRM_Event_Form_Manage
       $msgTemplate = CRM_Core_BAO_MessageTemplate::add($templateParams);
     }
 
-    if (CRM_Utils_Array::value('saveTemplate', $composeParams)) {
+    if (!empty($composeParams['saveTemplate'])) {
       $templateParams = array(
         'msg_text' => $params['body_text'],
         'msg_html' => $params['body_html'],

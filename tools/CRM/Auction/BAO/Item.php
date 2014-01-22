@@ -97,7 +97,7 @@ class CRM_Auction_BAO_Item extends CRM_Auction_DAO_Auction {
   function add(&$params) {
     require_once 'CRM/Utils/Hook.php';
 
-    if (CRM_Utils_Array::value('id', $params)) {
+    if (!empty($params['id'])) {
       CRM_Utils_Hook::pre('edit', 'Auction_Item', $params['id'], $params);
     }
     else {
@@ -121,7 +121,7 @@ class CRM_Auction_BAO_Item extends CRM_Auction_DAO_Auction {
       $auction->id
     );
 
-    if (CRM_Utils_Array::value('id', $params)) {
+    if (!empty($params['id'])) {
       CRM_Utils_Hook::post('edit', 'Auction_Item', $auction->id, $auction);
     }
     else {

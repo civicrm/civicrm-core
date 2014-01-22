@@ -376,9 +376,7 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
       //build the common contact fields array.
       $fields['Contact'] = array();
       foreach ($fields['Individual'] as $key => $value) {
-        if (CRM_Utils_Array::value($key, $fields['Household']) &&
-            CRM_Utils_Array::value($key, $fields['Organization'])
-            ) {
+        if (!empty($fields['Household'][$key]) && !empty($fields['Organization'][$key])) {
           $fields['Contact'][$key] = $value;
           unset($fields['Organization'][$key],
                 $fields['Household'][$key],
@@ -1005,7 +1003,7 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
           }
           $contactType = $v[0];
         }
-        if (CRM_Utils_Array::value('1', $v)) {
+        if (!empty($v['1'])) {
           $fldName = $v[1];
           $v2 = CRM_Utils_Array::value('2', $v);
           if ($v2 && trim($v2)) {
@@ -1162,7 +1160,7 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
       $colCnt = 0;
       foreach ($value as $k => $v) {
 
-        if (CRM_Utils_Array::value('1', $v)) {
+        if (!empty($v['1'])) {
           $saveMappingFields = new CRM_Core_DAO_MappingField();
 
           $saveMappingFields->mapping_id = $mappingId;
@@ -1178,10 +1176,10 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
             $saveMappingFields->im_provider_id = CRM_Utils_Array::value('3', $v);
           }
 
-          if (CRM_Utils_Array::value('operator', $params)) {
+          if (!empty($params['operator'])) {
             $saveMappingFields->operator = CRM_Utils_Array::value($k, $params['operator'][$key]);
           }
-          if (CRM_Utils_Array::value('value', $params)) {
+          if (!empty($params['value'])) {
             $saveMappingFields->value = CRM_Utils_Array::value($k, $params['value'][$key]);
           }
           // Handle mapping for 'related contact' fields
@@ -1189,10 +1187,10 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
             list($id, $first, $second) = explode('_', CRM_Utils_Array::value('1', $v));
             if (($first == 'a' && $second == 'b') || ($first == 'b' && $second == 'a')) {
 
-              if (CRM_Utils_Array::value('2', $v)) {
+              if (!empty($v['2'])) {
                 $saveMappingFields->name = CRM_Utils_Array::value('2', $v);
               }
-              elseif (CRM_Utils_Array::value('4', $v)) {
+              elseif (!empty($v['4'])) {
                 $saveMappingFields->name = CRM_Utils_Array::value('4', $v);
               }
 

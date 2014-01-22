@@ -134,7 +134,7 @@ class CRM_Price_Page_Option extends CRM_Core_Page {
     $financialType = CRM_Contribute_PseudoConstant::financialType();
     foreach ($customOption as $id => $values) {
       $action = array_sum(array_keys($this->actionLinks()));
-      if( CRM_Utils_Array::value('financial_type_id', $values)){
+      if (!empty($values['financial_type_id'])){
         $customOption[$id]['financial_type_id'] = $financialType[$values['financial_type_id']];
       }
       // update enable/disable links depending on price_field properties.
@@ -149,7 +149,7 @@ class CRM_Price_Page_Option extends CRM_Core_Page {
           $action -= CRM_Core_Action::DISABLE;
         }
       }
-      if (CRM_Utils_Array::value('is_default', $customOption[$id])) {
+      if (!empty($customOption[$id]['is_default'])) {
         $customOption[$id]['is_default'] = '<img src="' . $config->resourceBase . 'i/check.gif" />';
       }
       else {

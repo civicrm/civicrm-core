@@ -123,7 +123,7 @@ class CRM_Contact_Form_Task_AddToOrganization extends CRM_Contact_Form_Task {
     $params = $this->controller->exportValues($this->_name);
 
     $this->set('searchDone', 0);
-    if (CRM_Utils_Array::value('_qf_AddToOrganization_refresh', $_POST)) {
+    if (!empty($_POST['_qf_AddToOrganization_refresh'])) {
       $searchParams['contact_type'] = array('Organization' => 'Organization');
       $searchParams['rel_contact'] = $params['name'];
       CRM_Contact_Form_Task_AddToHousehold::search($this, $searchParams);

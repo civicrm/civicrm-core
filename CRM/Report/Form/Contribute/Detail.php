@@ -375,8 +375,7 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
     // please note this will just add the order-by columns to select query, and not display in column-headers.
     // This is a solution to not throw fatal errors when there is a column in order-by, not present in select/display columns.
     foreach ($this->_orderByFields as $orderBy) {
-      if (!array_key_exists($orderBy['name'], $this->_params['fields'])
-        && !CRM_Utils_Array::value('section', $orderBy)) {
+      if (!array_key_exists($orderBy['name'], $this->_params['fields']) && empty($orderBy['section'])) {
         $this->_select .= ", {$orderBy['dbAlias']} as {$orderBy['tplField']}";
       }
     }
@@ -430,8 +429,7 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
                       {$this->_aliases['civicrm_email']}.is_primary = 1\n";
     }
     // include contribution note
-    if (CRM_Utils_Array::value('contribution_note', $this->_params['fields']) ||
-      CRM_Utils_Array::value('note_value', $this->_params)) {
+    if (!empty($this->_params['fields']['contribution_note']) || !empty($this->_params['note_value'])) {
       $this->_from.= "
             LEFT JOIN civicrm_note {$this->_aliases['civicrm_note']}
                       ON ( {$this->_aliases['civicrm_note']}.entity_table = 'civicrm_contribution' AND
@@ -439,7 +437,7 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
     }
     //for contribution batches
     if ($this->_allBatches &&
-      (CRM_Utils_Array::value('batch_id', $this->_params['fields']) || !empty($this->_params['bid_value']))) {
+      (!empty($this->_params['fields']['batch_id']) || !empty($this->_params['bid_value']))) {
       $this->_from .= "
                 LEFT JOIN civicrm_entity_financial_trxn tx ON (tx.entity_id = {$this->_aliases['civicrm_contribution']}.id AND
                    tx.entity_table = 'civicrm_contribution')
@@ -536,9 +534,7 @@ GROUP BY {$this->_aliases['civicrm_contribution']}.currency";
 
     $this->beginPostProcess();
 
-    if (CRM_Utils_Array::value('contribution_or_soft_value', $this->_params) == 'contributions_only' &&
-      CRM_Utils_Array::value('soft_credit_type_id', $this->_params['fields'])
-    ) {
+    if (CRM_Utils_Array::value('contribution_or_soft_value', $this->_params) == 'contributions_only' && !empty($this->_params['fields']['soft_credit_type_id'])) {
       unset($this->_params['fields']['soft_credit_type_id']);
       if (!empty($this->_params['soft_credit_type_id_value'])) {
         $this->_params['soft_credit_type_id_value'] = array();
@@ -666,8 +662,7 @@ UNION ALL
 
 
       // convert donor sort name to link
-      if (array_key_exists('civicrm_contact_sort_name', $row) &&
-        CRM_Utils_Array::value('civicrm_contact_sort_name', $rows[$rowNum]) &&
+      if (array_key_exists('civicrm_contact_sort_name', $row) && !empty($rows[$rowNum]['civicrm_contact_sort_name']) &&
         array_key_exists('civicrm_contact_id', $row)
       ) {
         $url = CRM_Utils_System::url("civicrm/contact/view",

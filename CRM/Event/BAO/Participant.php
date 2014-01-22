@@ -86,7 +86,7 @@ class CRM_Event_BAO_Participant extends CRM_Event_DAO_Participant {
    */
   static function &add(&$params) {
 
-    if (CRM_Utils_Array::value('id', $params)) {
+    if (!empty($params['id'])) {
       CRM_Utils_Hook::pre('edit', 'Participant', $params['id'], $params);
     }
     else {
@@ -94,15 +94,15 @@ class CRM_Event_BAO_Participant extends CRM_Event_DAO_Participant {
     }
 
     // converting dates to mysql format
-    if (CRM_Utils_Array::value('register_date', $params)) {
+    if (!empty($params['register_date'])) {
       $params['register_date'] = CRM_Utils_Date::isoToMysql($params['register_date']);
     }
 
-    if (CRM_Utils_Array::value('participant_fee_amount', $params)) {
+    if (!empty($params['participant_fee_amount'])) {
       $params['participant_fee_amount'] = CRM_Utils_Rule::cleanMoney($params['participant_fee_amount']);
     }
 
-    if (CRM_Utils_Array::value('fee_amount', $params)) {
+    if (!empty($params['fee_amount'])) {
       $params['fee_amount'] = CRM_Utils_Rule::cleanMoney($params['fee_amount']);
     }
 
@@ -112,7 +112,7 @@ class CRM_Event_BAO_Participant extends CRM_Event_DAO_Participant {
     }
 
     $participantBAO = new CRM_Event_BAO_Participant;
-    if (CRM_Utils_Array::value('id', $params)) {
+    if (!empty($params['id'])) {
       $participantBAO->id = CRM_Utils_Array::value('id', $params);
       $participantBAO->find(TRUE);
       $participantBAO->register_date = CRM_Utils_Date::isoToMysql($participantBAO->register_date);
@@ -141,7 +141,7 @@ class CRM_Event_BAO_Participant extends CRM_Event_DAO_Participant {
     // reset the group contact cache for this group
     CRM_Contact_BAO_GroupContactCache::remove();
 
-    if (CRM_Utils_Array::value('id', $params)) {
+    if (!empty($params['id'])) {
       CRM_Utils_Hook::post('edit', 'Participant', $participantBAO->id, $participantBAO);
     }
     else {
@@ -193,7 +193,7 @@ class CRM_Event_BAO_Participant extends CRM_Event_DAO_Participant {
     $transaction = new CRM_Core_Transaction();
     $status = NULL;
 
-    if (CRM_Utils_Array::value('id', $params)) {
+    if (!empty($params['id'])) {
       $status = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Participant', $params['id'], 'status_id');
     }
 
@@ -223,7 +223,7 @@ class CRM_Event_BAO_Participant extends CRM_Event_DAO_Participant {
     }
 
     // add custom field values
-    if (CRM_Utils_Array::value('custom', $params) &&
+    if (!empty($params['custom']) &&
       is_array($params['custom'])
     ) {
       CRM_Core_BAO_CustomValueTable::store($params['custom'], 'civicrm_participant', $participant->id);
@@ -231,7 +231,7 @@ class CRM_Event_BAO_Participant extends CRM_Event_DAO_Participant {
 
     //process note, CRM-7634
     $noteId = NULL;
-    if (CRM_Utils_Array::value('id', $params)) {
+    if (!empty($params['id'])) {
       $note = CRM_Core_BAO_Note::getNote($params['id'], 'civicrm_participant');
       $noteId = key($note);
     }
@@ -281,7 +281,7 @@ class CRM_Event_BAO_Participant extends CRM_Event_DAO_Participant {
     $transaction->commit();
 
     // do not add to recent items for import, CRM-4399
-    if (!CRM_Utils_Array::value('skipRecentView', $params)) {
+    if (empty($params['skipRecentView'])) {
 
       $url = CRM_Utils_System::url('civicrm/contact/view/participant',
         "action=view&reset=1&id={$participant->id}&cid={$participant->contact_id}&context=home"
@@ -1424,7 +1424,7 @@ UPDATE  civicrm_participant
 
     //don't send confirmation mail to additional
     //since only primary able to confirm registration.
-    if (CRM_Utils_Array::value('registered_by_id', $participantValues) &&
+    if (!empty($participantValues['registered_by_id']) &&
       $mailType == 'Confirm'
     ) {
       return $mailSent;
@@ -1447,9 +1447,7 @@ UPDATE  civicrm_participant
 
       //take a receipt from as event else domain.
       $receiptFrom = $domainValues['name'] . ' <' . $domainValues['email'] . '>';
-      if (CRM_Utils_Array::value('confirm_from_name', $eventDetails) &&
-        CRM_Utils_Array::value('confirm_from_email', $eventDetails)
-      ) {
+      if (!empty($eventDetails['confirm_from_name']) && !empty($eventDetails['confirm_from_email'])) {
         $receiptFrom = $eventDetails['confirm_from_name'] . ' <' . $eventDetails['confirm_from_email'] . '>';
       }
 
@@ -1743,7 +1741,7 @@ WHERE cpf.price_set_id = %1 AND cpfv.label LIKE %2";
       $relationTypeId = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Discounts Account is' "));
       $contributionParams['trxnParams']['from_financial_account_id'] = CRM_Contribute_PseudoConstant::financialAccountType(
         $contributionParams['contribution']->financial_type_id, $relationTypeId);
-      if (CRM_Utils_Array::value('from_financial_account_id', $contributionParams['trxnParams'])) {
+      if (!empty($contributionParams['trxnParams']['from_financial_account_id'])) {
         $contributionParams['trxnParams']['total_amount'] = $mainAmount - $contributionParams['total_amount'];
         $contributionParams['trxnParams']['payment_processor_id'] = $contributionParams['trxnParams']['payment_instrument_id'] =
           $contributionParams['trxnParams']['check_number'] = $contributionParams['trxnParams']['trxn_id'] =

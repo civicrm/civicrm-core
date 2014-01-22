@@ -348,7 +348,7 @@ class CRM_Event_Import_Form_MapField extends CRM_Import_Form_MapField {
       }
     }
 
-    if (CRM_Utils_Array::value('saveMapping', $fields)) {
+    if (!empty($fields['saveMapping'])) {
       $nameField = CRM_Utils_Array::value('saveMappingName', $fields);
       if (empty($nameField)) {
         $errors['saveMappingName'] = ts('Name is required to save Import Mapping');
@@ -419,7 +419,7 @@ class CRM_Event_Import_Form_MapField extends CRM_Import_Form_MapField {
     $this->set('loadMappingId', CRM_Utils_Array::value('mappingId', $params));
 
     //Updating Mapping Records
-    if (CRM_Utils_Array::value('updateMapping', $params)) {
+    if (!empty($params['updateMapping'])) {
 
       $mappingFields = new CRM_Core_DAO_MappingField();
       $mappingFields->mapping_id = $params['mappingId'];
@@ -449,7 +449,7 @@ class CRM_Event_Import_Form_MapField extends CRM_Import_Form_MapField {
     }
 
     //Saving Mapping Details and Records
-    if (CRM_Utils_Array::value('saveMapping', $params)) {
+    if (!empty($params['saveMapping'])) {
       $mappingParams = array(
         'name' => $params['saveMappingName'],
         'description' => $params['saveMappingDesc'],

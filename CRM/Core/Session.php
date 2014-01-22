@@ -179,7 +179,7 @@ class CRM_Core_Session {
       return;
     }
 
-    if (!CRM_Utils_Array::value($prefix, $this->_session[$this->_key])) {
+    if (empty($this->_session[$this->_key][$prefix])) {
       $this->_session[$this->_key][$prefix] = array();
     }
   }

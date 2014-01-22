@@ -223,12 +223,12 @@ class CRM_Campaign_Page_DashBoard extends CRM_Core_Page {
         }
         $campaignsData[$cmpid]['isActive'] = $isActive;
 
-        if (CRM_Utils_Array::value('start_date', $campaignsData[$cmpid])) {
+        if (!empty($campaignsData[$cmpid]['start_date'])) {
           $campaignsData[$cmpid]['start_date'] = CRM_Utils_Date::customFormat($campaignsData[$cmpid]['start_date'],
             $config->dateformatFull
           );
         }
-        if (CRM_Utils_Array::value('end_date', $campaignsData[$cmpid])) {
+        if (!empty($campaignsData[$cmpid]['end_date'])) {
           $campaignsData[$cmpid]['end_date'] = CRM_Utils_Date::customFormat($campaignsData[$cmpid]['end_date'],
             $config->dateformatFull
           );
@@ -287,7 +287,7 @@ class CRM_Campaign_Page_DashBoard extends CRM_Core_Page {
         $campaignId = CRM_Utils_Array::value('campaign_id', $survey);
         $surveysData[$sid]['campaign'] = CRM_Utils_Array::value($campaignId, $campaigns);
         $surveysData[$sid]['activity_type'] = $surveyType[$survey['activity_type_id']];
-        if (CRM_Utils_Array::value('release_frequency', $survey)) {
+        if (!empty($survey['release_frequency'])) {
           $surveysData[$sid]['release_frequency'] = $survey['release_frequency'] . ' Day(s)';
         }
 

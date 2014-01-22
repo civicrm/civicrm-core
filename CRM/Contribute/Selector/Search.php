@@ -391,7 +391,7 @@ class CRM_Contribute_Selector_Search extends CRM_Core_Selector_Base implements C
           $result->contact_sub_type : $result->contact_type, FALSE, $result->contact_id
       );
 
-      if (CRM_Utils_Array::value('amount_level', $row)) {
+      if (!empty($row['amount_level'])) {
         CRM_Event_BAO_Participant::fixEventLevel($row['amount_level']);
       }
 

@@ -127,13 +127,13 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
         $defaults['price'] = CRM_Utils_Money::format($defaults['amount'], NULL, '%a');
       }
 
-      if (CRM_Utils_Array::value('active_on', $defaults)) {
+      if (!empty($defaults['active_on'])) {
         list($defaults['active_on'],
           $defaults['active_on_time']
         ) = CRM_Utils_Date::setDateDefaults($defaults['active_on'], 'activityDateTime');
       }
 
-      if (CRM_Utils_Array::value('expire_on', $defaults)) {
+      if (!empty($defaults['expire_on'])) {
         list($defaults['expire_on'],
           $defaults['expire_on_time']
         ) = CRM_Utils_Date::setDateDefaults($defaults['expire_on'], 'activityDateTime');
@@ -489,7 +489,7 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
               $_flagOption = 1;
             }
           }
-          if (!$noLabel && !$noAmount && CRM_Utils_Array::value('option_financial_type_id', $fields) && $fields['option_financial_type_id'][$index] == '' && $fields['html_type'] != 'Text') {
+          if (!$noLabel && !$noAmount && !empty($fields['option_financial_type_id']) && $fields['option_financial_type_id'][$index] == '' && $fields['html_type'] != 'Text') {
             $errors["option_financial_type_id[{$index}]"] = ts('Financial Type is a Required field.');
           }
           if ($noLabel && !$noAmount) {
@@ -558,7 +558,7 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
           foreach ($memTypesIDS as $key => $val) {
             // see if any price field option values in this price field are for memberships with autorenew
             $memTypeDetails = CRM_Member_BAO_MembershipType::getMembershipTypeDetails($val);
-            if (CRM_Utils_Array::value('auto_renew', $memTypeDetails)) {
+            if (!empty($memTypeDetails['auto_renew'])) {
               $foundAutorenew = TRUE;
               break;
             }

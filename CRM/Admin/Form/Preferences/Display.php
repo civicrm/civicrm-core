@@ -211,7 +211,7 @@ class CRM_Admin_Form_Preferences_Display extends CRM_Admin_Form_Preferences {
 
     $this->_params = $this->controller->exportValues($this->_name);
 
-    if (CRM_Utils_Array::value('contact_edit_preferences', $this->_params)) {
+    if (!empty($this->_params['contact_edit_preferences'])) {
       $preferenceWeights = explode(',', $this->_params['contact_edit_preferences']);
       foreach ($preferenceWeights as $key => $val) {
         if (!$val) {

@@ -393,7 +393,7 @@ class CRM_Mailing_Form_Group extends CRM_Contact_Form_Task {
     foreach (
       array('name', 'group_id', 'search_id', 'search_args', 'campaign_id', 'dedupe_email') as $n
     ) {
-      if (CRM_Utils_Array::value($n, $values)) {
+      if (!empty($values[$n])) {
         $params[$n] = $values[$n];
       }
     }

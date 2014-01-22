@@ -92,7 +92,7 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
       foreach (array('status', 'membership_type') as $fld) {
         $membership[$dao->id][$fld] = CRM_Utils_Array::value($fld, $statusANDType[$dao->id]);
       }
-      if (CRM_Utils_Array::value('is_current_member', $statusANDType[$dao->id])) {
+      if (!empty($statusANDType[$dao->id]['is_current_member'])) {
         $membership[$dao->id]['active'] = TRUE;
       }
       if (empty($dao->owner_membership_id)) {
@@ -146,7 +146,7 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
       }
 
       //does membership have auto renew CRM-7137.
-      if (CRM_Utils_Array::value('contribution_recur_id', $membership[$dao->id]) &&
+      if (!empty($membership[$dao->id]['contribution_recur_id']) &&
         !CRM_Member_BAO_Membership::isSubscriptionCancelled($membership[$dao->id]['membership_id'])
       ) {
         $membership[$dao->id]['auto_renew'] = 1;

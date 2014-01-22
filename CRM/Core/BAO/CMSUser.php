@@ -343,7 +343,7 @@ class CRM_Core_BAO_CMSUser {
    *
    */
   static function formRule($fields, $files, $self) {
-    if (!CRM_Utils_Array::value('cms_create_account', $fields)) {
+    if (empty($fields['cms_create_account'])) {
       return TRUE;
     }
 

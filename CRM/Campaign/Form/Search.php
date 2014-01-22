@@ -293,9 +293,7 @@ class CRM_Campaign_Form_Search extends CRM_Core_Form {
 
       $currentTaskValue = CRM_Utils_Array::value($this->_operation, $taskMapping);
       $taskValue = array($currentTaskValue => $allTasks[$currentTaskValue]);
-      if ($this->_operation == 'interview' &&
-        CRM_Utils_Array::value('campaign_survey_id', $this->_formValues)
-      ) {
+      if ($this->_operation == 'interview' && !empty($this->_formValues['campaign_survey_id'])) {
         $activityTypes = CRM_Core_PseudoConstant::activityType(FALSE, TRUE, FALSE, 'label', TRUE);
 
         $surveyTypeId = CRM_Core_DAO::getFieldValue('CRM_Campaign_DAO_Survey',
@@ -437,7 +435,7 @@ class CRM_Campaign_Form_Search extends CRM_Core_Form {
     $interviewerId = CRM_Utils_Array::value('survey_interviewer_id', $this->_formValues);
     if ($interviewerId) {
       $this->set('interviewerId', $interviewerId);
-      if (!CRM_Utils_Array::value('survey_interviewer_name', $this->_formValues)) {
+      if (empty($this->_formValues['survey_interviewer_name'])) {
         $this->_formValues['survey_interviewer_name'] = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact',
           $interviewerId,
           'sort_name',
@@ -469,7 +467,7 @@ class CRM_Campaign_Form_Search extends CRM_Core_Form {
     }
 
     if ($this->_operation == 'reserve') {
-      if (CRM_Utils_Array::value('campaign_survey_id', $this->_formValues)) {
+      if (!empty($this->_formValues['campaign_survey_id'])) {
         $campaignId = CRM_Core_DAO::getFieldValue('CRM_Campaign_DAO_Survey',
           $this->_formValues['campaign_survey_id'],
           'campaign_id'

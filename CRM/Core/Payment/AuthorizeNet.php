@@ -100,7 +100,7 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
      * & giving it a change to act on the params array
      */
     $newParams = $params;
-    if (CRM_Utils_Array::value('is_recur', $params) &&
+    if (!empty($params['is_recur']) &&
       $params['contributionRecurID']
     ) {
       CRM_Utils_Hook::alterPaymentProcessorParams($this,
@@ -112,7 +112,7 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
       $this->_setParam($field, $value);
     }
 
-    if (CRM_Utils_Array::value('is_recur', $params) &&
+    if (!empty($params['is_recur']) &&
       $params['contributionRecurID']
     ) {
       $result = $this->doRecurPayment();
@@ -334,7 +334,7 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
     );
     //only impact of assigning this here is is can be used to cancel the subscription in an automated test
     // if it isn't cancelled a duplicate transaction error occurs
-    if (CRM_Utils_Array::value('subscriptionId', $responseFields)) {
+    if (!empty($responseFields['subscriptionId'])) {
       $this->_setParam('subscriptionId', $responseFields['subscriptionId']);
     }
   }

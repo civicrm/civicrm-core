@@ -355,7 +355,7 @@ class CRM_Event_Selector_Search extends CRM_Core_Selector_Base implements CRM_Co
 
       $row['showConfirmUrl'] = ($statusClass == 'Pending') ? TRUE : FALSE;
 
-      if (CRM_Utils_Array::value('participant_is_test', $row)) {
+      if (!empty($row['participant_is_test'])) {
         $row['participant_status'] .= ' (' . ts('test') . ')';
       }
 
@@ -392,7 +392,7 @@ class CRM_Event_Selector_Search extends CRM_Core_Selector_Base implements CRM_Co
 
       $row['paid'] = CRM_Event_BAO_Event::isMonetary($row['event_id']);
 
-      if (CRM_Utils_Array::value('participant_fee_level', $row)) {
+      if (!empty($row['participant_fee_level'])) {
         CRM_Event_BAO_Participant::fixEventLevel($row['participant_fee_level']);
       }
 

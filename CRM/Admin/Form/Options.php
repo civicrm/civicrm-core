@@ -325,13 +325,11 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
    */
   static function formRule($fields, $files, $self) {
     $errors = array();
-    if ($self->_gName == 'case_status' && !CRM_Utils_Array::value('grouping', $fields)) {
+    if ($self->_gName == 'case_status' && empty($fields['grouping'])) {
       $errors['grouping'] = ts('Status class is a required field');
     }
 
-    if (in_array($self->_gName, array('email_greeting', 'postal_greeting', 'addressee'))
-      && !CRM_Utils_Array::value('is_reserved', $self->_defaultValues)
-    ) {
+    if (in_array($self->_gName, array('email_greeting', 'postal_greeting', 'addressee')) && empty($self->_defaultValues['is_reserved'])) {
       $label               = $fields['label'];
       $condition           = " AND v.label = '{$label}' ";
       $values              = CRM_Core_OptionGroup::values($self->_gName, FALSE, FALSE, FALSE, $condition, 'filter');
@@ -353,7 +351,7 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
       }
 
       $formName = explode('"', $fields['label']);
-      if (!CRM_Utils_Array::value(1, $formName) || count($formName) != 3) {
+      if (empty($formName[1]) || count($formName) != 3) {
         $errors['label'] = ts('Please follow the proper format for From Email Address');
       }
     }
@@ -419,7 +417,7 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
       $optionValue = CRM_Core_OptionValue::addOptionValue($params, $groupParams, $this->_action, $this->_id);
 
       // CRM-11516
-      if (CRM_Utils_Array::value('financial_account_id', $params)) {
+      if (!empty($params['financial_account_id'])) {
         $relationTypeId = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Asset Account is' "));
         $params = array(
           'entity_table' => 'civicrm_option_value',

@@ -65,7 +65,7 @@ class CRM_Admin_Form_MessageTemplates extends CRM_Admin_Form {
   public function setDefaultValues() {
     $defaults = $this->_values;
 
-    if (!CRM_Utils_Array::value('pdf_format_id', $defaults)) {
+    if (empty($defaults['pdf_format_id'])) {
       $defaults['pdf_format_id'] = 'null';
     }
 

@@ -276,7 +276,7 @@ class CRM_Case_Form_Search extends CRM_Core_Form {
 
       $tasks = array('' => ts('- actions -')) + CRM_Case_Task::permissionedTaskTitles($permission);
 
-      if (CRM_Utils_Array::value('case_deleted', $this->_formValues)) {
+      if (!empty($this->_formValues['case_deleted'])) {
         unset($tasks[1]);
       }
       else {
@@ -357,7 +357,7 @@ class CRM_Case_Form_Search extends CRM_Core_Form {
       $this->_formValues['case_owner'] = 2;
     }
 
-    if (!CRM_Utils_Array::value('case_deleted', $this->_formValues)) {
+    if (empty($this->_formValues['case_deleted'])) {
       $this->_formValues['case_deleted'] = 0;
     }
     CRM_Core_BAO_CustomValue::fixFieldValueOfTypeMemo($this->_formValues);
