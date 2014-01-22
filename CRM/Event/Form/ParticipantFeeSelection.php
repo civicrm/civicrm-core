@@ -62,6 +62,12 @@ class CRM_Event_Form_ParticipantFeeSelection extends CRM_Core_Form {
 
   protected $_participantStatus = NULL;
 
+  protected $_paidAmount = NULL;
+
+  public $_isPaidEvent = NULL;
+
+  protected $contributionAmt = NULL;
+
   public function preProcess() {
     $this->_participantId = CRM_Utils_Request::retrieve('id', 'Positive', $this, TRUE);
     $this->_contactId = CRM_Utils_Request::retrieve('cid', 'Positive', $this, TRUE);
@@ -86,8 +92,9 @@ class CRM_Event_Form_ParticipantFeeSelection extends CRM_Core_Form {
     $this->assign('id', $this->_participantId);
 
     $paymentInfo = CRM_Contribute_BAO_Contribution::getPaymentInfo($this->_participantId, 'event');
+    $this->_paidAmount = $paymentInfo['paid'];
     $this->assign('paymentInfo', $paymentInfo);
-    CRM_Core_Resources::singleton()->addSetting(array('feePaid' => $paymentInfo['paid']));
+    CRM_Core_Resources::singleton()->addSetting(array('feePaid' => $this->_paidAmount));
 
     $title = "Change selections for {$this->_contributorDisplayName}";
     if ($title) {
@@ -195,16 +202,143 @@ class CRM_Event_Form_ParticipantFeeSelection extends CRM_Core_Form {
 
   public function postProcess() {
     $params = $this->controller->exportValues($this->_name);
-    $session = CRM_Core_Session::singleton();
+
+    $feeBlock = $this->_values['fee'];
+    $lineItems = $this->_values['line_items'];
+    CRM_Event_BAO_Participant::changeFeeSelections($params, $this->_participantId, $this->_contributionId, $feeBlock, $lineItems, $this->_paidAmount, $params['priceSetId']);
+    $this->contributionAmt = CRM_Core_DAO::getFieldValue('CRM_Contribute_BAO_Contribution', $this->_contributionId, 'total_amount');
+    // email sending
+    if (CRM_Utils_Array::value('send_receipt', $params)){
+      $fetchParticipantVals = array('id' => $this->_participantId);
+      CRM_Event_BAO_Participant::getValues($fetchParticipantVals, $participantDetails, CRM_Core_DAO::$_nullArray);
+      $participantParams = array_merge($params, $participantDetails[$this->_participantId]);
+      $mailSent = $this->emailReceipt($participantParams);
+    }
+
+    // update participant
+    CRM_Core_DAO::setFieldValue('CRM_Event_DAO_Participant', $this->_participantId, 'status_id', $params['status_id']);
+    if(!empty($params['note'])) {
+      $noteParams = array(
+        'entity_table' => 'civicrm_participant',
+        'note' => $params['note'],
+        'entity_id' => $this->_participantId,
+        'contact_id' => $this->_contactId,
+        'modified_date' => date('Ymd'),
+      );
+      CRM_Core_BAO_Note::add($noteParams);
+    }
+    CRM_Core_Session::setStatus(ts("The fee selection has been changed for this participant"), ts('Saved'), 'success');
+
     $buttonName = $this->controller->getButtonName();
     if ($buttonName == $this->getButtonName('upload', 'new')) {
+      $session = CRM_Core_Session::singleton();
       $session->replaceUserContext(CRM_Utils_System::url('civicrm/payment/add',
           "reset=1&action=add&component=event&id={$this->_participantId}&cid={$this->_contactId}"
         ));
     }
- }
+  }
 
-  static function emailReceipt(&$form, &$params) {
-    // email receipt sending
+  function emailReceipt(&$params) {
+    // offline receipt sending
+    if (array_key_exists($params['from_email_address'], $this->_fromEmails['from_email_id'])) {
+      $receiptFrom = $params['from_email_address'];
+    }
+
+    $this->assign('module', 'Event Registration');
+    //use of the message template below requires variables in different format
+    $event = $events = array();
+    $returnProperties = array('fee_label', 'start_date', 'end_date', 'is_show_location', 'title');
+
+    //get all event details.
+    CRM_Core_DAO::commonRetrieveAll('CRM_Event_DAO_Event', 'id', $params['event_id'], $events, $returnProperties);
+    $event = $events[$params['event_id']];
+    unset($event['start_date']);
+    unset($event['end_date']);
+
+    $role = CRM_Event_PseudoConstant::participantRole();
+    $participantRoles = CRM_Utils_Array::value('role_id', $params);
+    if (is_array($participantRoles)) {
+      $selectedRoles = array();
+      foreach (array_keys($participantRoles) as $roleId) {
+        $selectedRoles[] = $role[$roleId];
+      }
+      $event['participant_role'] = implode(', ', $selectedRoles);
+    }
+    else {
+      $event['participant_role'] = CRM_Utils_Array::value($participantRoles, $role);
+    }
+    $event['is_monetary'] = $this->_isPaidEvent;
+
+    if ($params['receipt_text']) {
+      $event['confirm_email_text'] = $params['receipt_text'];
+    }
+
+    $this->assign('isAmountzero', 1);
+    $this->assign('event', $event);
+
+    $this->assign('isShowLocation', $event['is_show_location']);
+    if (CRM_Utils_Array::value('is_show_location', $event) == 1) {
+      $locationParams = array(
+        'entity_id' => $params['event_id'],
+        'entity_table' => 'civicrm_event',
+      );
+      $location = CRM_Core_BAO_Location::getValues($locationParams, TRUE);
+      $this->assign('location', $location);
+    }
+
+    $status = CRM_Event_PseudoConstant::participantStatus();
+    if ($this->_isPaidEvent) {
+      $paymentInstrument = CRM_Contribute_PseudoConstant::paymentInstrument();
+      if (!$this->_mode) {
+        if (isset($params['payment_instrument_id'])) {
+          $this->assign('paidBy',
+            CRM_Utils_Array::value($params['payment_instrument_id'],
+              $paymentInstrument
+            )
+          );
+        }
+      }
+
+      $this->assign('totalAmount', $this->contributionAmt);
+
+      $this->assign('isPrimary', 1);
+      $this->assign('checkNumber', CRM_Utils_Array::value('check_number', $params));
+    }
+
+    $this->assign('register_date', $params['register_date']);
+    $template = CRM_Core_Smarty::singleton();
+
+    // Retrieve the name and email of the contact - this will be the TO for receipt email
+    list($this->_contributorDisplayName, $this->_contributorEmail, $this->_toDoNotEmail) = CRM_Contact_BAO_Contact::getContactDetails($this->_contactId);
+
+    $this->_contributorDisplayName = ($this->_contributorDisplayName == ' ') ? $this->_contributorEmail : $this->_contributorDisplayName;
+
+    $waitStatus = CRM_Event_PseudoConstant::participantStatus(NULL, "class = 'Waiting'");
+    if ($waitingStatus = CRM_Utils_Array::value($params['status_id'], $waitStatus)) {
+      $this->assign('isOnWaitlist', TRUE);
+    }
+    $this->assign('contactID', $this->_contactId);
+    $this->assign('participantID', $this->_participantId);
+
+    $sendTemplateParams = array(
+      'groupName' => 'msg_tpl_workflow_event',
+      'valueName' => 'event_offline_receipt',
+      'contactId' => $this->_contactId,
+      'isTest' => FALSE,
+      'PDFFilename' => ts('confirmation').'.pdf',
+    );
+
+    // try to send emails only if email id is present
+    // and the do-not-email option is not checked for that contact
+    if ($this->_contributorEmail && !$this->_toDoNotEmail) {
+      $sendTemplateParams['from'] = $receiptFrom;
+      $sendTemplateParams['toName'] = $this->_contributorDisplayName;
+      $sendTemplateParams['toEmail'] = $this->_contributorEmail;
+      $sendTemplateParams['cc'] = CRM_Utils_Array::value('cc', $this->_fromEmails);
+      $sendTemplateParams['bcc'] = CRM_Utils_Array::value('bcc', $this->_fromEmails);
+    }
+
+    list($mailSent, $subject, $message, $html) = CRM_Core_BAO_MessageTemplate::sendTemplate($sendTemplateParams);
+    return $mailSent;
   }
 }
