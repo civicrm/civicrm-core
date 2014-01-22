@@ -190,7 +190,7 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
         $defaults['default_value'] = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Country', $countryId);
       }
 
-      if ($defaults['data_type'] == 'ContactReference' && CRM_Utils_Array::value('filter', $defaults)) {
+      if ($defaults['data_type'] == 'ContactReference' && !empty($defaults['filter'])) {
         $contactRefFilter = 'Advance';
         if (strpos($defaults['filter'], 'action=lookup') !== FALSE &&
           strpos($defaults['filter'], 'group=') !== FALSE
@@ -215,7 +215,7 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
         $defaults['filter_selected'] = $contactRefFilter;
       }
 
-      if (CRM_Utils_Array::value('data_type', $defaults)) {
+      if (!empty($defaults['data_type'])) {
         $defaultDataType = array_search($defaults['data_type'],
           self::$_dataTypeKeys
         );
@@ -254,7 +254,7 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
       $defaults['is_view'] = 0;
     }
 
-    if (CRM_Utils_Array::value('html_type', $defaults)) {
+    if (!empty($defaults['html_type'])) {
       $dontShowLink = substr($defaults['html_type'], -14) == 'State/Province' || substr($defaults['html_type'], -7) == 'Country' ? 1 : 0;
     }
 
@@ -660,9 +660,7 @@ SELECT count(*)
           break;
 
         case 'ContactReference':
-          if ($fields['filter_selected'] == 'Advance' &&
-            CRM_Utils_Array::value('filter', $fields)
-          ) {
+          if ($fields['filter_selected'] == 'Advance' && !empty($fields['filter'])) {
             if (strpos($fields['filter'], 'entity=') !== FALSE) {
               $errors['filter'] = ts("Please do not include entity parameter (entity is always 'contact')");
             }
@@ -876,9 +874,7 @@ AND    option_group_id = %2";
     }
 
     // we can not set require and view at the same time.
-    if (CRM_Utils_Array::value('is_required', $fields) &&
-      CRM_Utils_Array::value('is_view', $fields)
-    ) {
+    if (!empty($fields['is_required']) && !empty($fields['is_view'])) {
       $errors['is_view'] = ts('Can not set this field Required and View Only at the same time.');
     }
 
@@ -910,7 +906,7 @@ AND    option_group_id = %2";
     //fix for 'is_search_range' field.
     if (in_array($dataTypeKey, array(
       1, 2, 3, 5))) {
-      if (!CRM_Utils_Array::value('is_searchable', $params)) {
+      if (empty($params['is_searchable'])) {
         $params['is_search_range'] = 0;
       }
     }
@@ -919,11 +915,11 @@ AND    option_group_id = %2";
     }
 
     $filter = 'null';
-    if ($dataTypeKey == 11 && CRM_Utils_Array::value('filter_selected', $params)) {
+    if ($dataTypeKey == 11 && !empty($params['filter_selected'])) {
       if ($params['filter_selected'] == 'Advance' && trim(CRM_Utils_Array::value('filter', $params))) {
         $filter = trim($params['filter']);
       }
-      elseif ($params['filter_selected'] == 'Group' && CRM_Utils_Array::value('group_id', $params)) {
+      elseif ($params['filter_selected'] == 'Group' && !empty($params['group_id'])) {
 
         $filter = 'action=lookup&group=' . implode(',', $params['group_id']);
       }

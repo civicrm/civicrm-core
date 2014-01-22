@@ -839,7 +839,7 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
 
       $cbValues = array();
       foreach ($groupValues as $key => $val) {
-        if (CRM_Utils_Array::value($val, $value)) {
+        if (!empty($value[$val])) {
           $cbValues[$key] = 1;
         }
       }
@@ -996,7 +996,7 @@ AND domain_id = %3
         }
       }
       // CRM-10931, If DB doesn't have any value, carry on with any default value thats already available
-      if (!isset($value) && CRM_Utils_Array::value($dao->name, $params)) {
+      if (!isset($value) && !empty($params[$dao->name])) {
         $value = $params[$dao->name];
       }
       $params[$dao->name] = $value;

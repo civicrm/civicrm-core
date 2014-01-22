@@ -112,7 +112,7 @@ class CRM_Contact_Form_DedupeRules extends CRM_Admin_Form {
 
     $disabled = array();
     $reserved = $this->add('checkbox', 'is_reserved', ts('Reserved?'));
-    if (CRM_Utils_Array::value('is_reserved', $this->_defaults)) {
+    if (!empty($this->_defaults['is_reserved'])) {
       $reserved->freeze();
       $disabled = array('disabled' => TRUE);
     }
@@ -154,13 +154,13 @@ class CRM_Contact_Form_DedupeRules extends CRM_Admin_Form {
    */
   static function formRule($fields, $files, $self) {
     $errors = array();
-    if (CRM_Utils_Array::value('is_reserved', $fields)) {
+    if (!empty($fields['is_reserved'])) {
       return TRUE;
     }
 
     $fieldSelected = FALSE;
     for ($count = 0; $count < self::RULES_COUNT; $count++) {
-      if (CRM_Utils_Array::value("where_$count", $fields)) {
+      if (!empty($fields["where_$count"])) {
         $fieldSelected = TRUE;
         break;
       }
@@ -240,11 +240,11 @@ UPDATE civicrm_dedupe_rule_group
     $daoObj = new CRM_Core_DAO();
     $database = $daoObj->database();
     for ($count = 0; $count < self::RULES_COUNT; $count++) {
-      if (!CRM_Utils_Array::value("where_$count", $values)) {
+      if (empty($values["where_$count"])) {
         continue;
       }
       list($table, $field) = explode('.', CRM_Utils_Array::value("where_$count", $values));
-      $length = CRM_Utils_Array::value("length_$count", $values) ? CRM_Utils_Array::value("length_$count", $values) : NULL;
+      $length = !empty($values["length_$count"]) ? CRM_Utils_Array::value("length_$count", $values) : NULL;
       $weight = $values["weight_$count"];
       if ($table and $field) {
         $ruleDao = new CRM_Dedupe_DAO_Rule();

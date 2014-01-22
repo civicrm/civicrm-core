@@ -211,17 +211,17 @@ class CRM_Admin_Form_Setting_Smtp extends CRM_Admin_Form_Setting {
    */
   static function formRule($fields) {
     if ($fields['outBound_option'] == CRM_Mailing_Config::OUTBOUND_OPTION_SMTP) {
-      if (!CRM_Utils_Array::value('smtpServer', $fields)) {
+      if (empty($fields['smtpServer'])) {
         $errors['smtpServer'] = 'SMTP Server name is a required field.';
       }
-      if (!CRM_Utils_Array::value('smtpPort', $fields)) {
+      if (empty($fields['smtpPort'])) {
         $errors['smtpPort'] = 'SMTP Port is a required field.';
       }
-      if (CRM_Utils_Array::value('smtpAuth', $fields)) {
-        if (!CRM_Utils_Array::value('smtpUsername', $fields)) {
+      if (!empty($fields['smtpAuth'])) {
+        if (empty($fields['smtpUsername'])) {
           $errors['smtpUsername'] = 'If your SMTP server requires authentication please provide a valid user name.';
         }
-        if (!CRM_Utils_Array::value('smtpPassword', $fields)) {
+        if (empty($fields['smtpPassword'])) {
           $errors['smtpPassword'] = 'If your SMTP server requires authentication, please provide a password.';
         }
       }

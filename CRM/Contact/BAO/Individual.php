@@ -101,7 +101,7 @@ class CRM_Contact_BAO_Individual extends CRM_Contact_DAO_Contact {
           $value = $individual->$dbName;
 
           // the db has name values
-          if ($value && CRM_Utils_Array::value('preserveDBName', $params)) {
+          if ($value && !empty($params['preserveDBName'])) {
             $useDBNames[] = $name;
           }
         }
@@ -109,12 +109,12 @@ class CRM_Contact_BAO_Individual extends CRM_Contact_DAO_Contact {
         foreach (array('prefix', 'suffix') as $name) {
           $dbName = "{$name}_id";
           $value = $individual->$dbName;
-          if ($value && CRM_Utils_Array::value('preserveDBName', $params)) {
+          if ($value && !empty($params['preserveDBName'])) {
             $useDBNames[] = $name;
           }
         }
 
-        if ($individual->formal_title && CRM_Utils_Array::value('preserveDBName', $params)) {
+        if ($individual->formal_title && !empty($params['preserveDBName'])) {
           $useDBNames[] = 'formal_title';
         }
 
@@ -200,7 +200,7 @@ class CRM_Contact_BAO_Individual extends CRM_Contact_DAO_Contact {
       );
       // make sure we have all the name fields.
       foreach ($nameParams as $name => $value) {
-        if (!CRM_Utils_Array::value($name, $formatted) && $value) {
+        if (empty($formatted[$name]) && $value) {
           $formatted[$name] = $value;
         }
       }
@@ -236,7 +236,7 @@ class CRM_Contact_BAO_Individual extends CRM_Contact_DAO_Contact {
     //start further check for email.
     if (empty($sortName) || empty($displayName)) {
       $email = NULL;
-      if (CRM_Utils_Array::value('email', $params) &&
+      if (!empty($params['email']) &&
         is_array($params['email'])
       ) {
         foreach ($params['email'] as $emailBlock) {

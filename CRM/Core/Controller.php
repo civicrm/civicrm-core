@@ -251,7 +251,7 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
     }
 
    // if the request has a reset value, initialize the controller session
-    if (CRM_Utils_Array::value('reset', $_GET)) {
+    if (!empty($_GET['reset'])) {
       $this->reset();
 
       // in this case we'll also cache the url as a hidden form variable, this allows us to
@@ -440,7 +440,7 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
       $title     = CRM_Utils_Array::value('title', $value);
       $options   = CRM_Utils_Array::value('options', $value);
       $stateName = CRM_Utils_String::getClassName($className);
-      if (CRM_Utils_Array::value('className', $value)) {
+      if (!empty($value['className'])) {
         $formName = $name;
       }
       else {

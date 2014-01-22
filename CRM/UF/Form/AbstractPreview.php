@@ -118,7 +118,7 @@ class CRM_UF_Form_AbstractPreview extends CRM_Core_Form {
    */
   public function buildQuickForm() {
     foreach ($this->_fields as $name => $field) {
-      if (!CRM_Utils_Array::value('is_view', $field)) {
+      if (empty($field['is_view'])) {
         CRM_Core_BAO_UFGroup::buildProfile($this, $field, CRM_Profile_Form::MODE_CREATE);
       }
     }

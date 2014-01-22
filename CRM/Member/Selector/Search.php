@@ -371,7 +371,7 @@ class CRM_Member_Selector_Search extends CRM_Core_Selector_Base implements CRM_C
       $row['campaign'] = CRM_Utils_Array::value($result->member_campaign_id, $allCampaigns);
       $row['campaign_id'] = $result->member_campaign_id;
 
-      if (CRM_Utils_Array::value('member_is_test', $row)) {
+      if (!empty($row['member_is_test'])) {
         $row['membership_type'] = $row['membership_type'] . " (test)";
       }
 

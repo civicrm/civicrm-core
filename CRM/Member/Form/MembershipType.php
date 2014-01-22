@@ -67,7 +67,7 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form {
     $defaults = parent::setDefaultValues();
 
     // get the member org display name
-    if ( $this->_id && CRM_Utils_Array::value('member_of_contact_id', $defaults)) {
+    if ( $this->_id && !empty($defaults['member_of_contact_id'])) {
       $this->assign('member_org_id', $defaults['member_of_contact_id']);
     }
 
@@ -398,9 +398,7 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form {
 
       $periods = array('fixed_period_start_day', 'fixed_period_rollover_day');
       foreach ($periods as $per) {
-        if (CRM_Utils_Array::value('M', $params[$per]) &&
-          CRM_Utils_Array::value('d', $params[$per])
-        ) {
+        if (!empty($params[$per]['M']) && !empty($params[$per]['d'])) {
           $mon          = $params[$per]['M'];
           $dat          = $params[$per]['d'];
           $mon          = ($mon < 10) ? '0' . $mon : $mon;

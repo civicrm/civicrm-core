@@ -132,7 +132,7 @@ class CRM_Contact_Page_AJAX {
     $config = CRM_Core_Config::singleton();
 
     $limit = 10;
-    if (CRM_Utils_Array::value('limit', $_GET)) {
+    if (!empty($_GET['limit'])) {
       $limit = CRM_Utils_Type::escape($_GET['limit'], 'Positive');
     }
 
@@ -171,7 +171,7 @@ class CRM_Contact_Page_AJAX {
 
     $contact = civicrm_api('Contact', 'Get', $params);
 
-    if (CRM_Utils_Array::value('is_error', $contact)) {
+    if (!empty($contact['is_error'])) {
       echo "$name|error\n";
       CRM_Utils_System::civiExit();
     }
@@ -180,7 +180,7 @@ class CRM_Contact_Page_AJAX {
     foreach ($contact['values'] as $value) {
       $view = array();
       foreach ($return as $fld) {
-        if (CRM_Utils_Array::value($fld, $value)) {
+        if (!empty($value[$fld])) {
           $view[] = $value[$fld];
         }
       }
@@ -223,7 +223,7 @@ class CRM_Contact_Page_AJAX {
       $whereClause = " WHERE ( sort_name LIKE '$strSearch' $includeNickName ) {$where} ";
     }
 
-    if (CRM_Utils_Array::value('limit', $_GET)) {
+    if (!empty($_GET['limit'])) {
       $limit = CRM_Utils_Type::escape($_GET['limit'], 'Positive');
     }
 
@@ -312,7 +312,7 @@ class CRM_Contact_Page_AJAX {
       $return = CRM_Contact_BAO_Relationship::create($relationParams, $relationIds);
 
       $status = 'process-relationship-fail';
-      if (CRM_Utils_Array::value(0, $return[4])) {
+      if (!empty($return[4][0])) {
         $relationshipID = $return[4][0];
         $status = 'process-relationship-success';
 
@@ -377,7 +377,7 @@ class CRM_Contact_Page_AJAX {
     }
     $name = CRM_Utils_Type::escape($name, 'String');
     $whereIdClause = '';
-    if (CRM_Utils_Array::value('id', $_GET)) {
+    if (!empty($_GET['id'])) {
       $json = TRUE;
       if (is_numeric($_GET['id'])) {
         $id = CRM_Utils_Type::escape($_GET['id'], 'Integer');
@@ -472,7 +472,7 @@ WHERE civicrm_contact.contact_type ='Household'
 AND household_name LIKE '%$contactName%' {$addStreet} {$addCity} {$whereIdClause} ORDER BY household_name ";
       }
       elseif ($relType) {
-        if (CRM_Utils_Array::value('case', $_GET)) {
+        if (!empty($_GET['case'])) {
           $query = "
 SELECT distinct(c.id), c.sort_name
 FROM civicrm_contact c
@@ -661,7 +661,7 @@ WHERE sort_name LIKE '%$name%'";
    *  Function to get email address of a contact
    */
   static function getContactEmail() {
-    if (CRM_Utils_Array::value('contact_id', $_REQUEST)) {
+    if (!empty($_REQUEST['contact_id'])) {
       $contactID = CRM_Utils_Type::escape($_REQUEST['contact_id'], 'Positive');
       list($displayName,
         $userEmail
@@ -1111,7 +1111,7 @@ LIMIT {$offset}, {$rowCount}
       $searchRows[$mainId]['dst'] = CRM_Utils_System::href($main['dstName'], 'civicrm/contact/view', "reset=1&cid={$main['dstID']}");
       $searchRows[$mainId]['weight'] = CRM_Utils_Array::value('weight', $main);
 
-      if (CRM_Utils_Array::value('canMerge', $main)) {
+      if (!empty($main['canMerge'])) {
         $mergeParams = "reset=1&cid={$main['srcID']}&oid={$main['dstID']}&action=update&rgid={$rgid}";
         if ($gid) {
           $mergeParams .= "&gid={$gid}";

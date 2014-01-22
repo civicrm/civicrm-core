@@ -111,12 +111,12 @@ class CRM_Admin_Form_RelationshipType extends CRM_Admin_Form {
       $baoName = $this->_BAOName;
       $baoName::retrieve($params, $defaults);
       $defaults['contact_types_a'] = CRM_Utils_Array::value('contact_type_a', $defaults);
-      if (CRM_Utils_Array::value('contact_sub_type_a', $defaults)) {
+      if (!empty($defaults['contact_sub_type_a'])) {
         $defaults['contact_types_a'] .= CRM_Core_DAO::VALUE_SEPARATOR . $defaults['contact_sub_type_a'];
       }
 
       $defaults['contact_types_b'] = $defaults['contact_type_b'];
-      if (CRM_Utils_Array::value('contact_sub_type_b', $defaults)) {
+      if (!empty($defaults['contact_sub_type_b'])) {
         $defaults['contact_types_b'] .= CRM_Core_DAO::VALUE_SEPARATOR . $defaults['contact_sub_type_b'];
       }
       return $defaults;

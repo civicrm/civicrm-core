@@ -588,10 +588,10 @@ WHERE name = %1";
   static function add($params) {
 
     // label or name
-    if (!CRM_Utils_Array::value('label', $params)) {
+    if (empty($params['label'])) {
       return;
     }
-    if (CRM_Utils_Array::value('parent_id', $params) &&
+    if (!empty($params['parent_id']) &&
       !CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_ContactType', $params['parent_id'])
     ) {
       return;
@@ -609,7 +609,7 @@ WHERE name = %1";
       $active      = $contactType->is_active;
     }
 
-    if (CRM_Utils_Array::value('id', $params)) {
+    if (!empty($params['id'])) {
       $params = array('name' => "New $contactName");
       $newParams = array(
         'label' => "New $contact",

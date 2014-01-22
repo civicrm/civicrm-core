@@ -196,7 +196,7 @@ class CRM_Activity_Page_AJAX {
 
     foreach ($caseRelationships as $key => $value) {
       //calculate roles that don't have relationships
-      if (CRM_Utils_Array::value($value['relation_type'], $caseRoles)) {
+      if (!empty($caseRoles[$value['relation_type']])) {
         //keep naming from careRoles array
         $caseRelationships[$key]['relation'] = $caseRoles[$value['relation_type']];
         unset($caseRoles[$value['relation_type']]);

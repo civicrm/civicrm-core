@@ -134,10 +134,10 @@ class CRM_Core_Component {
           // also set the smarty variables to the current component
           $template = CRM_Core_Smarty::singleton();
           $template->assign('activeComponent', $name);
-          if (CRM_Utils_Array::value('formTpl', $comp->info[$name])) {
+          if (!empty($comp->info[$name]['formTpl'])) {
             $template->assign('formTpl', $comp->info[$name]['formTpl']);
           }
-          if (CRM_Utils_Array::value('css', $comp->info[$name])) {
+          if (!empty($comp->info[$name]['css'])) {
             $styleSheets = '<style type="text/css">@import url(' . "{$config->resourceBase}css/{$comp->info[$name]['css']});</style>";
             CRM_Utils_System::addHTMLHead($styleSheet);
           }
@@ -313,7 +313,7 @@ class CRM_Core_Component {
 
     $tasks = array();
     foreach ($info as $name => $value) {
-      if (CRM_Utils_Array::value('task', $info[$name])) {
+      if (!empty($info[$name]['task'])) {
         $tasks += $info[$name]['task'];
       }
     }

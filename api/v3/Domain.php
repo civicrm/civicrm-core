@@ -48,7 +48,7 @@ function civicrm_api3_domain_get($params) {
   unset($params['version']);
 
   $bao = new CRM_Core_BAO_Domain();
-  if (CRM_Utils_Array::value('current_domain', $params)) {
+  if (!empty($params['current_domain'])) {
     $domainBAO = CRM_Core_Config::domainID();
     $params['id'] = $domainBAO;
   }

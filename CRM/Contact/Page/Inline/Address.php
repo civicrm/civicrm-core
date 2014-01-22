@@ -75,7 +75,7 @@ class CRM_Contact_Page_Inline_Address extends CRM_Core_Page {
       $sharedAddresses = array();
       $shareAddressContactNames = CRM_Contact_BAO_Contact_Utils::getAddressShareContactNames($currentAddressBlock['address']);
       foreach ($currentAddressBlock['address'] as $key => $addressValue) {
-        if (CRM_Utils_Array::value('master_id', $addressValue) &&
+        if (!empty($addressValue['master_id']) &&
           !$shareAddressContactNames[$addressValue['master_id']]['is_deleted']
         ) {
           $sharedAddresses[$key]['shared_address_display'] = array(

@@ -102,7 +102,7 @@ class CRM_Pledge_BAO_PledgeBlock extends CRM_Pledge_DAO_PledgeBlock {
    */
   static function add(&$params) {
 
-    if (CRM_Utils_Array::value('id', $params)) {
+    if (!empty($params['id'])) {
       CRM_Utils_Hook::pre('edit', 'PledgeBlock', $params['id'], $params);
     }
     else {
@@ -136,7 +136,7 @@ class CRM_Pledge_BAO_PledgeBlock extends CRM_Pledge_DAO_PledgeBlock {
     $pledgeBlock->copyValues($params);
     $result = $pledgeBlock->save();
 
-    if (CRM_Utils_Array::value('id', $params)) {
+    if (!empty($params['id'])) {
       CRM_Utils_Hook::post('edit', 'PledgeBlock', $pledgeBlock->id, $pledgeBlock);
     }
     else {
@@ -200,7 +200,7 @@ class CRM_Pledge_BAO_PledgeBlock extends CRM_Pledge_DAO_PledgeBlock {
    */
   static function buildPledgeBlock($form) {
     //build pledge payment fields.
-    if (CRM_Utils_Array::value('pledge_id', $form->_values)) {
+    if (!empty($form->_values['pledge_id'])) {
       //get all payments required details.
       $allPayments = array();
       $returnProperties = array('status_id', 'scheduled_date', 'scheduled_amount');
@@ -278,7 +278,7 @@ class CRM_Pledge_BAO_PledgeBlock extends CRM_Pledge_DAO_PledgeBlock {
       );
       $form->addElement('text', 'pledge_installments', ts('Installments'), array('size' => 3));
 
-      if (CRM_Utils_Array::value('is_pledge_interval', $pledgeBlock)) {
+      if (!empty($pledgeBlock['is_pledge_interval'])) {
         $form->assign('is_pledge_interval', CRM_Utils_Array::value('is_pledge_interval', $pledgeBlock));
         $form->addElement('text', 'pledge_frequency_interval', NULL, array('size' => 3));
       }
@@ -291,7 +291,7 @@ class CRM_Pledge_BAO_PledgeBlock extends CRM_Pledge_DAO_PledgeBlock {
       $frequencyUnits = CRM_Core_OptionGroup::values('recur_frequency_units');
       foreach ($freqUnitVals as $key => $val) {
         if (array_key_exists($val, $frequencyUnits)) {
-          $freqUnits[$val] = CRM_Utils_Array::value('is_pledge_interval', $pledgeBlock) ? "{$frequencyUnits[$val]}(s)" : $frequencyUnits[$val];
+          $freqUnits[$val] = !empty($pledgeBlock['is_pledge_interval']) ? "{$frequencyUnits[$val]}(s)" : $frequencyUnits[$val];
         }
       }
       $form->addElement('select', 'pledge_frequency_unit', NULL, $freqUnits);

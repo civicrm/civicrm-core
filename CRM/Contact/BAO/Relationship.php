@@ -132,9 +132,7 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
 
       $validContacts = TRUE;
       //validate contacts in update mode also.
-      if (CRM_Utils_Array::value('contact', $ids) &&
-        CRM_Utils_Array::value('contactTarget', $ids)
-      ) {
+      if (!empty($ids['contact']) && !empty($ids['contactTarget'])) {
         if (self::checkValidRelationship($params, $ids, $ids['contactTarget'])) {
           $validContacts = FALSE;
           $invalid++;
@@ -150,7 +148,7 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
     }
 
     // do not add to recent items for import, CRM-4399
-    if (!(CRM_Utils_Array::value('skipRecentView', $params) || $invalid || $duplicate)) {
+    if (!(!empty($params['skipRecentView']) || $invalid || $duplicate)) {
       $url = CRM_Utils_System::url('civicrm/contact/view/rel',
         "action=view&reset=1&id={$relationship->id}&cid={$relationship->contact_id_a}&context=home"
       );
@@ -257,7 +255,7 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
     $relationship->save();
 
     // add custom field values
-    if (CRM_Utils_Array::value('custom', $params)) {
+    if (!empty($params['custom'])) {
       CRM_Core_BAO_CustomValueTable::store($params['custom'], 'civicrm_relationship', $relationship->id);
     }
 
@@ -774,7 +772,7 @@ WHERE  relationship_type_id = " . CRM_Utils_Type::escape($type, 'Integer');
     $v = array();
 
     // get the specific number of relationship or all relationships.
-    if (CRM_Utils_Array::value('numRelationship', $params)) {
+    if (!empty($params['numRelationship'])) {
       $v['data'] = &CRM_Contact_BAO_Relationship::getRelationship($params['contact_id'], NULL, $params['numRelationship']);
     }
     else {
@@ -1296,10 +1294,10 @@ SELECT relationship_type_id, relationship_direction
         $membershipType = CRM_Member_BAO_MembershipType::getMembershipTypeDetails($membershipValues['membership_type_id']);
         // Check if contact's relationship type exists in membership type
         $relTypeDirs = array();
-        if (CRM_Utils_Array::value('relationship_type_id', $membershipType)) {
+        if (!empty($membershipType['relationship_type_id'])) {
           $relTypeIds = explode(CRM_Core_DAO::VALUE_SEPARATOR, $membershipType['relationship_type_id']);
         }
-        if (CRM_Utils_Array::value('relationship_direction', $membershipType)) {
+        if (!empty($membershipType['relationship_direction'])) {
           $relDirections = explode(CRM_Core_DAO::VALUE_SEPARATOR, $membershipType['relationship_direction']);
         }
         foreach ($relTypeIds as $key => $value) {
@@ -1326,7 +1324,7 @@ SELECT relationship_type_id, relationship_direction
             }
             foreach (array(
               'join_date', 'start_date', 'end_date') as $dateField) {
-              if (CRM_Utils_Array::value($dateField, $membershipValues)) {
+              if (!empty($membershipValues[$dateField])) {
                 $membershipValues[$dateField] = CRM_Utils_Date::processDate($membershipValues[$dateField]);
               }
             }

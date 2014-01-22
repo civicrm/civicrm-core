@@ -60,7 +60,7 @@ class CRM_Contact_Page_Inline_CommunicationPreferences extends CRM_Core_Page {
 
     $communicationStyle = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'communication_style_id');
     if (!empty($communicationStyle)) {
-      if (CRM_Utils_Array::value('communication_style_id', $defaults)) {
+      if (!empty($defaults['communication_style_id'])) {
         $defaults['communication_style_display'] = $communicationStyle[CRM_Utils_Array::value('communication_style_id', $defaults)];
       }
       else {

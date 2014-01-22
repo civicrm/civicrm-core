@@ -132,7 +132,7 @@ class CRM_Admin_Page_LabelFormats extends CRM_Core_Page_Basic {
     // Add action links to each of the Label Formats
     foreach ($labelFormatList as & $format) {
       $action = array_sum(array_keys($this->links()));
-      if (CRM_Utils_Array::value('is_reserved', $format)) {
+      if (!empty($format['is_reserved'])) {
         $action -= CRM_Core_Action::DELETE;
       }
 

@@ -183,9 +183,7 @@ class CRM_Report_Form_Mailing_Clicks extends CRM_Report_Form {
     foreach ($this->_columns as $tableName => $table) {
       if (array_key_exists('fields', $table)) {
         foreach ($table['fields'] as $fieldName => $field) {
-          if (CRM_Utils_Array::value('required', $field) ||
-            CRM_Utils_Array::value($fieldName, $this->_params['fields'])
-          ) {
+          if (!empty($field['required']) || !empty($this->_params['fields'][$fieldName])) {
             if ($tableName == 'civicrm_email') {
               $this->_emailField = TRUE;
             }
@@ -202,7 +200,7 @@ class CRM_Report_Form_Mailing_Clicks extends CRM_Report_Form {
       }
     }
 
-    if (CRM_Utils_Array::value('charts', $this->_params)) {
+    if (!empty($this->_params['charts'])) {
       $select[] = "COUNT(civicrm_mailing_event_trackable_url_open.id) as civicrm_mailing_click_count";
       $this->_columnHeaders["civicrm_mailing_click_count"]['title'] = ts('Click Count');
     }
@@ -250,7 +248,7 @@ class CRM_Report_Form_Mailing_Clicks extends CRM_Report_Form {
   function groupBy() {
 
     $this->_groupBy = '';
-    if (CRM_Utils_Array::value('charts', $this->_params)) {
+    if (!empty($this->_params['charts'])) {
       $this->_groupBy = " GROUP BY {$this->_aliases['civicrm_mailing']}.id";
     }
     else {

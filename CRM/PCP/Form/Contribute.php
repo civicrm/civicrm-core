@@ -73,7 +73,7 @@ class CRM_PCP_Form_Contribute extends CRM_Contribute_Form_ContributionPage {
       $this->assign('pageId', $this->_id);
     }
 
-    if (!CRM_Utils_Array::value('id', $defaults)) {
+    if (empty($defaults['id'])) {
       $defaults['target_entity_type'] = 'contribute';
       $defaults['is_approval_needed'] = 1;
       $defaults['is_tellfriend_enabled'] = 1;
@@ -113,14 +113,14 @@ class CRM_PCP_Form_Contribute extends CRM_Contribute_Form_ContributionPage {
    */
   public static function formRule($params, $files, $self) {
     $errors = array();
-    if (CRM_Utils_Array::value('is_active', $params)) {
+    if (!empty($params['is_active'])) {
 
-      if (CRM_Utils_Array::value('is_tellfriend_enabled', $params) &&
+      if (!empty($params['is_tellfriend_enabled']) &&
         (CRM_Utils_Array::value('tellfriend_limit', $params) <= 0)
       ) {
         $errors['tellfriend_limit'] = ts('if Tell Friend is enabled, Maximum recipients limit should be greater than zero.');
       }
-      if (!CRM_Utils_Array::value('supporter_profile_id', $params)) {
+      if (empty($params['supporter_profile_id'])) {
         $errors['supporter_profile_id'] = ts('Supporter profile is a required field.');
       }
       else {

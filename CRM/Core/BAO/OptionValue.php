@@ -51,7 +51,7 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
       self::setDefaults($params);
     }
     $ids = array();
-    if (CRM_Utils_Array::value('id', $params)) {
+    if (!empty($params['id'])) {
       $ids = array('optionValue' => $params['id']);
     }
     return  CRM_Core_BAO_OptionValue::add($params, $ids);
@@ -169,7 +169,7 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
     // these would be usefully set @ the api layer so they are visible to api users
     // complex defaults like the domain id below would make sense in the setDefauls function
     // but unclear what other ways this function is being used
-    if (!CRM_Utils_Array::value('optionValue', $ids)) {
+    if (empty($ids['optionValue'])) {
       $params['is_active'] = CRM_Utils_Array::value('is_active', $params, FALSE);
       $params['is_default'] = CRM_Utils_Array::value('is_default', $params, FALSE);
       $params['is_optgroup'] = CRM_Utils_Array::value('is_optgroup', $params, FALSE);
@@ -180,7 +180,7 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
     $optionValue = new CRM_Core_DAO_OptionValue();
     $optionValue->copyValues($params);
 
-    if (CRM_Utils_Array::value('is_default', $params)) {
+    if (!empty($params['is_default'])) {
       $query = 'UPDATE civicrm_option_value SET is_default = 0 WHERE  option_group_id = %1';
 
       // tweak default reset, and allow multiple default within group.

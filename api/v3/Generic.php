@@ -187,7 +187,7 @@ function civicrm_api3_generic_getvalue($apiRequest) {
   }
 
   // we only take "return=" as valid options
-  if (CRM_Utils_Array::value('return', $apiRequest['params'])) {
+  if (!empty($apiRequest['params']['return'])) {
     if (!isset($result['values'][0][$apiRequest['params']['return']])) {
       return civicrm_api3_create_error("field " . $apiRequest['params']['return'] . " unset or not existing", array('invalid_field' => $apiRequest['params']['return']));
     }

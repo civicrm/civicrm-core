@@ -48,7 +48,7 @@
  *
  */
 function civicrm_api3_dashboard_create($params) {
-  if (!CRM_Utils_Array::value('id', $params)) {
+  if (empty($params['id'])) {
     civicrm_api3_verify_one_mandatory($params,
       NULL,
       array(

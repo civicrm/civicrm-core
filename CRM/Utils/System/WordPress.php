@@ -542,7 +542,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
     $name  = $dao->escape(CRM_Utils_Array::value('name', $params));
     $email = $dao->escape(CRM_Utils_Array::value('mail', $params));
 
-    if (CRM_Utils_Array::value('name', $params)) {
+    if (!empty($params['name'])) {
       if (!validate_username($params['name'])) {
         $errors['cms_name'] = ts("Your username contains invalid characters");
       }
@@ -551,7 +551,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
       }
     }
 
-    if (CRM_Utils_Array::value('mail', $params)) {
+    if (!empty($params['mail'])) {
       if (!is_email($params['mail'])) {
         $errors[$emailName] = "Your email is invaid";
       }

@@ -79,7 +79,7 @@ class CRM_Campaign_BAO_Survey extends CRM_Campaign_DAO_Survey {
       return false;
     }
 
-    if (CRM_Utils_Array::value('is_default', $params)) {
+    if (!empty($params['is_default'])) {
       $query = "UPDATE civicrm_survey SET is_default = 0";
       CRM_Core_DAO::executeQuery($query, CRM_Core_DAO::$_nullArray);
     }
@@ -99,7 +99,7 @@ class CRM_Campaign_BAO_Survey extends CRM_Campaign_DAO_Survey {
     $dao->copyValues($params);
     $dao->save();
 
-    if (CRM_Utils_Array::value('custom', $params) &&
+    if (!empty($params['custom']) &&
       is_array($params['custom'])
     ) {
       CRM_Core_BAO_CustomValueTable::store($params['custom'], 'civicrm_survey', $dao->id);
@@ -124,7 +124,7 @@ class CRM_Campaign_BAO_Survey extends CRM_Campaign_DAO_Survey {
         'sortOrder' => 'desc',
       );
       foreach ($sortParams as $name => $default) {
-        if (CRM_Utils_Array::value($name, $params)) {
+        if (!empty($params[$name])) {
           $sortParams[$name] = $params[$name];
         }
       }
@@ -165,15 +165,15 @@ INNER JOIN civicrm_option_group grp ON ( activity_type.option_group_id = grp.id 
       $queryParams[1] = array($petitionTypeID, 'Positive');
     }
 
-    if (CRM_Utils_Array::value('title', $params)) {
+    if (!empty($params['title'])) {
       $where[] = "( survey.title LIKE %2 )";
       $queryParams[2] = array('%' . trim($params['title']) . '%', 'String');
     }
-    if (CRM_Utils_Array::value('campaign_id', $params)) {
+    if (!empty($params['campaign_id'])) {
       $where[] = '( survey.campaign_id = %3 )';
       $queryParams[3] = array($params['campaign_id'], 'Positive');
     }
-    if (CRM_Utils_Array::value('activity_type_id', $params)) {
+    if (!empty($params['activity_type_id'])) {
       $typeId = $params['activity_type_id'];
       if (is_array($params['activity_type_id'])) {
         $typeId = implode(' , ', $params['activity_type_id']);
@@ -812,7 +812,7 @@ INNER JOIN  civicrm_contact contact_a ON ( activityTarget.contact_id = contact_a
 
     $ids = array('id' => $surveyId);
     foreach ($voterLinks as $link) {
-      if (CRM_Utils_Array::value('qs', $link) &&
+      if (!empty($link['qs']) &&
         !CRM_Utils_System::isNull($link['qs'])
       ) {
         $urlPath = CRM_Utils_System::url(CRM_Core_Action::replace($link['url'], $ids),

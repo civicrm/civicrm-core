@@ -663,7 +663,7 @@ SELECT count(id)
         $classes = $link['class'];
       }
 
-      if (!CRM_Utils_Array::value($sectionName, $sectionsInfo)) {
+      if (empty($sectionsInfo[$sectionName])) {
         $classes = array();
         if (isset($link['class'])) {
           $classes = $link['class'];

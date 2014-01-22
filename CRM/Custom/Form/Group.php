@@ -135,7 +135,7 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
       $errors['title'] = ts('Custom group \'%1\' already exists in Database.', array(1 => $title));
     }
 
-    if (CRM_Utils_Array::value(1, $fields['extends'])) {
+    if (!empty($fields['extends'][1])) {
       if (in_array('', $fields['extends'][1]) && count($fields['extends'][1]) > 1) {
         $errors['extends'] = ts("Cannot combine other option with 'Any'.");
       }
@@ -151,7 +151,7 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
       $self->assign('showStyle', TRUE);
     }
 
-    if (CRM_Utils_Array::value('is_multiple', $fields)) {
+    if (!empty($fields['is_multiple'])) {
         $self->assign('showMultiple', TRUE);
     }
 
@@ -417,7 +417,7 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
       $defaults['is_active'] = $defaults['collapse_display'] = 1;
       $defaults['style'] = 'Inline';
     }
-    elseif (!CRM_Utils_Array::value('max_multiple', $defaults) && !$this->_isGroupEmpty) {
+    elseif (empty($defaults['max_multiple']) && !$this->_isGroupEmpty) {
       $this->assign('showMaxMultiple', FALSE);
     }
 

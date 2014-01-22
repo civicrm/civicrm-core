@@ -397,9 +397,7 @@ class CRM_Report_Form_Contact_Detail extends CRM_Report_Form {
     foreach ($this->_columns as $tableName => $table) {
       if (array_key_exists('fields', $table)) {
         foreach ($table['fields'] as $fieldName => $field) {
-          if (CRM_Utils_Array::value('required', $field) ||
-            CRM_Utils_Array::value($fieldName, $this->_params['fields'])
-          ) {
+          if (!empty($field['required']) || !empty($this->_params['fields'][$fieldName])) {
             //isolate the select clause compoenent wise
             if (in_array($table['alias'], $this->_component)) {
               $select[$table['alias']][] = "{$field['dbAlias']} as {$tableName}_{$fieldName}";
@@ -436,7 +434,7 @@ class CRM_Report_Form_Contact_Detail extends CRM_Report_Form {
     }
 
     foreach ($this->_component as $val) {
-      if (CRM_Utils_Array::value($val, $select)) {
+      if (!empty($select[$val])) {
         $this->_selectComponent[$val] = "SELECT " . implode(', ', $select[$val]) . " ";
         unset($select[$val]);
       }
@@ -486,7 +484,7 @@ class CRM_Report_Form_Contact_Detail extends CRM_Report_Form {
     $this->_from .= "{$group}";
 
     foreach ($this->_component as $val) {
-      if (CRM_Utils_Array::value('contribution_civireport', $this->_selectComponent)) {
+      if (!empty($this->_selectComponent['contribution_civireport'])) {
         $this->_formComponent['contribution_civireport'] = " FROM
                             civicrm_contact  {$this->_aliases['civicrm_contact']}
                             INNER JOIN civicrm_contribution       {$this->_aliases['civicrm_contribution']}
@@ -494,14 +492,14 @@ class CRM_Report_Form_Contact_Detail extends CRM_Report_Form {
                             {$group}
                     ";
       }
-      if (CRM_Utils_Array::value('membership_civireport', $this->_selectComponent)) {
+      if (!empty($this->_selectComponent['membership_civireport'])) {
         $this->_formComponent['membership_civireport'] = " FROM
                             civicrm_contact  {$this->_aliases['civicrm_contact']}
                             INNER JOIN civicrm_membership       {$this->_aliases['civicrm_membership']}
                                     ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_membership']}.contact_id
                             {$group} ";
       }
-      if (CRM_Utils_Array::value('participant_civireport', $this->_selectComponent)) {
+      if (!empty($this->_selectComponent['participant_civireport'])) {
         $this->_formComponent['participant_civireport'] = " FROM
                             civicrm_contact  {$this->_aliases['civicrm_contact']}
                             INNER JOIN civicrm_participant       {$this->_aliases['civicrm_participant']}
@@ -509,7 +507,7 @@ class CRM_Report_Form_Contact_Detail extends CRM_Report_Form {
                             {$group} ";
       }
 
-      if (CRM_Utils_Array::value('activity_civireport', $this->_selectComponent)) {
+      if (!empty($this->_selectComponent['activity_civireport'])) {
         $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
         $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
         $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
@@ -544,7 +542,7 @@ class CRM_Report_Form_Contact_Detail extends CRM_Report_Form {
                             civicrm_case_contact.case_id = civicrm_case.id ";
       }
 
-      if (CRM_Utils_Array::value('relationship_civireport', $this->_selectComponent)) {
+      if (!empty($this->_selectComponent['relationship_civireport'])) {
         $this->_formComponent['relationship_civireport'] = "FROM
                             civicrm_relationship {$this->_aliases['civicrm_relationship']}
 
@@ -605,7 +603,7 @@ class CRM_Report_Form_Contact_Detail extends CRM_Report_Form {
     $contribution     = $membership = $participant = NULL;
     $eligibleResult   = $rows = $tempArray = array();
     foreach ($this->_component as $val) {
-      if (CRM_Utils_Array::value($val, $this->_selectComponent) && ($val != 'activity_civireport' && $val != 'relationship_civireport')) {
+      if (!empty($this->_selectComponent[$val]) && ($val != 'activity_civireport' && $val != 'relationship_civireport')) {
         $sql = "{$this->_selectComponent[$val]} {$this->_formComponent[$val]}
                          WHERE    {$this->_aliases['civicrm_contact']}.id IN ( $selectedContacts )
                          GROUP BY {$this->_aliases['civicrm_contact']}.id,{$val}.id ";
@@ -631,7 +629,7 @@ class CRM_Report_Form_Contact_Detail extends CRM_Report_Form {
       }
     }
 
-    if (CRM_Utils_Array::value('relationship_civireport', $this->_selectComponent)) {
+    if (!empty($this->_selectComponent['relationship_civireport'])) {
 
       $relTypes = CRM_Contact_BAO_Relationship::getContactRelationshipType(NULL, 'null', NULL, NULL, TRUE);
 
@@ -671,7 +669,7 @@ class CRM_Report_Form_Contact_Detail extends CRM_Report_Form {
       }
     }
 
-    if (CRM_Utils_Array::value('activity_civireport', $this->_selectComponent)) {
+    if (!empty($this->_selectComponent['activity_civireport'])) {
 
       $componentClause = "civicrm_option_value.component_id IS NULL";
       $componentsIn    = NULL;

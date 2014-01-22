@@ -281,9 +281,7 @@ class CRM_Report_Form_Contribute_SoftCredit extends CRM_Report_Form {
     foreach ($this->_columns as $tableName => $table) {
       if (array_key_exists('fields', $table)) {
         foreach ($table['fields'] as $fieldName => $field) {
-          if (CRM_Utils_Array::value('required', $field) ||
-            CRM_Utils_Array::value($fieldName, $this->_params['fields'])
-          ) {
+          if (!empty($field['required']) || !empty($this->_params['fields'][$fieldName])) {
 
             // include email column if set
             if ($tableName == 'civicrm_email') {
@@ -304,7 +302,7 @@ class CRM_Report_Form_Contribute_SoftCredit extends CRM_Report_Form {
             }
 
             // only include statistics columns if set
-            if (CRM_Utils_Array::value('statistics', $field)) {
+            if (!empty($field['statistics'])) {
               foreach ($field['statistics'] as $stat => $label) {
                 switch (strtolower($stat)) {
                   case 'sum':

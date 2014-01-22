@@ -66,7 +66,7 @@ class CRM_Utils_Geocode_Google {
    */
   static function format(&$values, $stateName = FALSE) {
     // we need a valid country, else we ignore
-    if (!CRM_Utils_Array::value('country', $values)) {
+    if (empty($values['country'])) {
       return FALSE;
     }
 
@@ -74,7 +74,7 @@ class CRM_Utils_Geocode_Google {
 
     $add = '';
 
-    if (CRM_Utils_Array::value('street_address', $values)) {
+    if (!empty($values['street_address'])) {
       $add = urlencode(str_replace('', '+', $values['street_address']));
       $add .= ',+';
     }
@@ -85,8 +85,8 @@ class CRM_Utils_Geocode_Google {
       $add .= ',+';
     }
 
-    if (CRM_Utils_Array::value('state_province', $values)) {
-      if (CRM_Utils_Array::value('state_province_id', $values)) {
+    if (!empty($values['state_province'])) {
+      if (!empty($values['state_province_id'])) {
         $stateProvince = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_StateProvince', $values['state_province_id']);
       }
       else {
@@ -109,12 +109,12 @@ class CRM_Utils_Geocode_Google {
       }
     }
 
-    if (CRM_Utils_Array::value('postal_code', $values)) {
+    if (!empty($values['postal_code'])) {
       $add .= '+' . urlencode(str_replace('', '+', $values['postal_code']));
       $add .= ',+';
     }
 
-    if (CRM_Utils_Array::value('country', $values)) {
+    if (!empty($values['country'])) {
       $add .= '+' . urlencode(str_replace('', '+', $values['country']));
     }
 

@@ -380,7 +380,7 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
         $locationTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id');
 
         foreach ($this->_fields as $name => $field) {
-          if (CRM_Utils_Array::value('in_selector', $field) &&
+          if (!empty($field['in_selector']) &&
             !in_array($name, $skipFields)
           ) {
             if (strpos($name, '-') !== FALSE) {
@@ -552,8 +552,7 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
       $names = array();
       static $skipFields = array('group', 'tag');
       foreach ($this->_fields as $key => $field) {
-        if (
-          CRM_Utils_Array::value('in_selector', $field) &&
+        if (!empty($field['in_selector']) &&
           !in_array($key, $skipFields)
         ) {
           if (strpos($key, '-') !== FALSE) {
@@ -723,8 +722,7 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
       if ($output != CRM_Core_Selector_Controller::EXPORT) {
         $row['checkbox'] = CRM_Core_Form::CB_PREFIX . $result->contact_id;
 
-        if (CRM_Utils_Array::value('deleted_contacts', $this->_formValues)
-          && CRM_Core_Permission::check('access deleted contacts')
+        if (!empty($this->_formValues['deleted_contacts']) && CRM_Core_Permission::check('access deleted contacts')
         ) {
           $links = array(
             array(
@@ -761,8 +759,7 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
           );
         }
         elseif ((is_numeric(CRM_Utils_Array::value('geo_code_1', $row))) ||
-          ($config->mapGeoCoding &&
-            CRM_Utils_Array::value('city', $row) &&
+          ($config->mapGeoCoding && !empty($row['city']) &&
             CRM_Utils_Array::value('state_province', $row)
           )
         ) {
@@ -868,8 +865,7 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
 
 
     foreach ($rows as $id => & $row) {
-      if (CRM_Utils_Array::value('deleted_contacts', $this->_formValues)
-        && CRM_Core_Permission::check('access deleted contacts')
+      if (!empty($this->_formValues['deleted_contacts']) && CRM_Core_Permission::check('access deleted contacts')
       ) {
         $links = array(
           array(
@@ -905,8 +901,7 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
         );
       }
       elseif ((is_numeric(CRM_Utils_Array::value('geo_code_1', $row))) ||
-        ($config->mapGeoCoding &&
-          CRM_Utils_Array::value('city', $row) &&
+        ($config->mapGeoCoding && !empty($row['city']) &&
           CRM_Utils_Array::value('state_province', $row)
         )
       ) {
@@ -1080,7 +1075,7 @@ SELECT 'civicrm_contact', contact_a.id, contact_a.id, '$cacheKey', contact_a.dis
       );
 
       foreach ($defaultAddress as $columnName => $column) {
-        if (CRM_Utils_Array::value($columnName, $addressOptions)) {
+        if (!empty($addressOptions[$columnName])) {
           self::$_columnHeaders[$columnName] = $column;
         }
       }

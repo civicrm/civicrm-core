@@ -156,7 +156,7 @@ class CRM_Core_Page {
     }
 
     // if the request has a reset value, initialize the controller session
-    if (CRM_Utils_Array::value('reset', $_REQUEST)) {
+    if (!empty($_REQUEST['reset'])) {
       $this->reset();
     }
   }

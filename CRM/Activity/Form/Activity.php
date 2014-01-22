@@ -451,7 +451,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
     }
 
     // when custom data is included in this page
-    if (CRM_Utils_Array::value('hidden_custom', $_POST)) {
+    if (!empty($_POST['hidden_custom'])) {
       // we need to set it in the session for the below code to work
       // CRM-3014
       //need to assign custom data subtype to the template
@@ -540,7 +540,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
         }
       }
 
-      if (!CRM_Utils_Array::value('activity_date_time', $defaults)) {
+      if (empty($defaults['activity_date_time'])) {
         list($defaults['activity_date_time'], $defaults['activity_date_time_time']) = CRM_Utils_Date::setDateDefaults(NULL, 'activityDateTime');
       }
       elseif ($this->_action & CRM_Core_Action::UPDATE) {
@@ -613,11 +613,11 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
       $className = "CRM_{$this->_crmDir}_Form_Activity_{$this->_activityTypeFile}";
       $defaults += $className::setDefaultValues($this);
     }
-    if (!CRM_Utils_Array::value('priority_id', $defaults)) {
+    if (empty($defaults['priority_id'])) {
       $priority = CRM_Core_PseudoConstant::get('CRM_Activity_DAO_Activity', 'priority_id');
       $defaults['priority_id'] = array_search('Normal', $priority);
     }
-    if (!CRM_Utils_Array::value('status_id', $defaults)) {
+    if (empty($defaults['status_id'])) {
       $defaults['status_id'] = CRM_Core_OptionGroup::getDefaultValue('activity_status');
     }
     return $defaults;
@@ -701,14 +701,14 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
     }
 
     foreach ($this->_fields as $field => $values) {
-      if (CRM_Utils_Array::value($field, $this->_fields)) {
+      if (!empty($this->_fields[$field])) {
         $attribute = NULL;
-        if (CRM_Utils_Array::value('attributes', $values)) {
+        if (!empty($values['attributes'])) {
           $attribute = $values['attributes'];
         }
 
         $required = FALSE;
-        if (CRM_Utils_Array::value('required', $values)) {
+        if (!empty($values['required'])) {
           $required = TRUE;
         }
         if ($values['type'] == 'wysiwyg') {
@@ -937,9 +937,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
     }
 
     //Activity type is mandatory if creating new activity, CRM-4515
-    if (array_key_exists('activity_type_id', $fields) &&
-      !CRM_Utils_Array::value('activity_type_id', $fields)
-    ) {
+    if (array_key_exists('activity_type_id', $fields) && empty($fields['activity_type_id'])) {
       $errors['activity_type_id'] = ts('Activity Type is required field.');
     }
     //FIX me temp. comment
@@ -960,13 +958,11 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
       $errors['status_id'] = ts('You cannot record scheduled SMS activity.');
     }
 
-    if (CRM_Utils_Array::value('followup_activity_type_id', $fields) && !CRM_Utils_Array::value('followup_date', $fields)) {
+    if (!empty($fields['followup_activity_type_id']) && empty($fields['followup_date'])) {
       $errors['followup_date_time'] = ts('Followup date is a required field.');
     }
     //Activity type is mandatory if subject or follow-up date is specified for an Follow-up activity, CRM-4515
-    if ((CRM_Utils_Array::value('followup_activity_subject', $fields) || CRM_Utils_Array::value('followup_date', $fields)) &&
-      !CRM_Utils_Array::value('followup_activity_type_id', $fields)
-    ) {
+    if ((!empty($fields['followup_activity_subject']) || !empty($fields['followup_date'])) && empty($fields['followup_activity_type_id'])) {
       $errors['followup_activity_subject'] = ts('Follow-up Activity type is a required field.');
     }
     return $errors;
@@ -1003,11 +999,11 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
     }
 
     //set activity type id
-    if (!CRM_Utils_Array::value('activity_type_id', $params)) {
+    if (empty($params['activity_type_id'])) {
       $params['activity_type_id'] = $this->_activityTypeId;
     }
 
-    if (CRM_Utils_Array::value('hidden_custom', $params) &&
+    if (!empty($params['hidden_custom']) &&
       !isset($params['custom'])
     ) {
       $customFields = CRM_Core_BAO_CustomField::getFields('Activity', FALSE, FALSE,
@@ -1037,14 +1033,14 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
     }
 
     // assigning formated value to related variable
-    if (CRM_Utils_Array::value('assignee_contact_id', $params)) {
+    if (!empty($params['assignee_contact_id'])) {
       $params['assignee_contact_id'] = explode(',', $params['assignee_contact_id']);
     }
     else {
       $params['assignee_contact_id'] = array();
     }
       // civicrm-10043 - 14/12/13
-      if ( CRM_Utils_Array::value( 'followup_assignee_contact_id', $params ) ) {
+      if (!empty($params['followup_assignee_contact_id'])) {
           $params['followup_assignee_contact_id'] = explode( ',', $params['followup_assignee_contact_id'] );
      }
      else {
@@ -1076,7 +1072,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
     }
 
     $activity = array();
-    if (CRM_Utils_Array::value('is_multi_activity', $params) &&
+    if (!empty($params['is_multi_activity']) &&
       !CRM_Utils_Array::crmIsEmptyArray($params['target_contact_id'])
     ) {
       $targetContacts = $params['target_contact_id'];
@@ -1142,7 +1138,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
     $this->endPostProcess($params, $activity);
 
     // CRM-9590
-    if (CRM_Utils_Array::value('is_multi_activity', $params)) {
+    if (!empty($params['is_multi_activity'])) {
       $this->_activityIds[] = $activity->id;
     }
     else {
@@ -1152,7 +1148,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
     // create follow up activity if needed
     $followupStatus = '';
     $followupActivity = NULL;
-    if (CRM_Utils_Array::value('followup_activity_type_id', $params)) {
+    if (!empty($params['followup_activity_type_id'])) {
       $followupActivity = CRM_Activity_BAO_Activity::createFollowupActivity($activity->id, $params);
       $followupStatus = ts('A followup activity has been scheduled.');
     }
@@ -1219,7 +1215,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
 
     // set status message
     $subject = '';
-    if (CRM_Utils_Array::value('subject', $params)) {
+    if (!empty($params['subject'])) {
       $subject = "'" . $params['subject'] . "'";
     }
 

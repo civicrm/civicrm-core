@@ -88,7 +88,7 @@ class CRM_Admin_Form_OptionValue extends CRM_Admin_Form {
   function setDefaultValues() {
     $defaults = array();
     $defaults = parent::setDefaultValues();
-    if (!CRM_Utils_Array::value('weight', $defaults)) {
+    if (empty($defaults['weight'])) {
       $query = "SELECT max( `weight` ) as weight FROM `civicrm_option_value` where option_group_id=" . $this->_gid;
       $dao = new CRM_Core_DAO();
       $dao->query($query);
@@ -272,14 +272,14 @@ class CRM_Admin_Form_OptionValue extends CRM_Admin_Form {
       }
 
       //set defaultGreeting option in params to save default value as per contactOption-defaultValue mapping
-      if (CRM_Utils_Array::value('contactOptions', $params)) {
+      if (!empty($params['contactOptions'])) {
         $params['filter'] = CRM_Utils_Array::value('contactOptions', $params);
         $params['defaultGreeting'] = 1;
       }
 
       $optionValue = CRM_Core_BAO_OptionValue::add($params, $ids);
       // CRM-11516
-      if (CRM_Utils_Array::value('financial_account_id', $params)) {
+      if (!empty($params['financial_account_id'])) {
         $relationTypeId = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Asset Account is' "));
         $params = array(
           'entity_table' => 'civicrm_option_value',

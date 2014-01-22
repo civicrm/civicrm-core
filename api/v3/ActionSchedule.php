@@ -60,7 +60,7 @@ function civicrm_api3_action_schedule_get($params) {
  * {@getfields action_schedule_create}
  */
 function civicrm_api3_action_schedule_create($params) {
-  if (!CRM_Utils_Array::value('id', $params)) {
+  if (empty($params['id'])) {
     // an update does not require any mandatory parameters
     civicrm_api3_verify_one_mandatory($params,
       NULL,

@@ -82,7 +82,7 @@ class CRM_Case_StateMachine_Search extends CRM_Core_StateMachine {
   function taskName($controller, $formName = 'Search') {
     // total hack, check POST vars and then session to determine stuff
     // fix value if print button is pressed
-    if (CRM_Utils_Array::value('_qf_' . $formName . '_next_print', $_POST)) {
+    if (!empty($_POST['_qf_' . $formName . '_next_print'])) {
       $value = CRM_Case_Task::PRINT_CASES;
     }
     else {

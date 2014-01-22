@@ -221,9 +221,7 @@ class CRM_Report_Form_Contribute_OrganizationSummary extends CRM_Report_Form {
     foreach ($this->_columns as $tableName => $table) {
       if (array_key_exists('fields', $table)) {
         foreach ($table['fields'] as $fieldName => $field) {
-          if (CRM_Utils_Array::value('required', $field) ||
-            CRM_Utils_Array::value($fieldName, $this->_params['fields'])
-          ) {
+          if (!empty($field['required']) || !empty($this->_params['fields'][$fieldName])) {
             if ($tableName == 'civicrm_address') {
               $this->_addressField = TRUE;
             }
@@ -231,7 +229,7 @@ class CRM_Report_Form_Contribute_OrganizationSummary extends CRM_Report_Form {
               $this->_emailField = TRUE;
             }
 
-            if (CRM_Utils_Array::value('statistics', $field)) {
+            if (!empty($field['statistics'])) {
               foreach ($field['statistics'] as $stat => $label) {
                 $select[] = "{$field['dbAlias']} as {$tableName}_{$fieldName}_{$stat}";
                 $this->_columnHeaders["{$tableName}_{$fieldName}_{$stat}"]['title'] = $label;
@@ -380,7 +378,7 @@ class CRM_Report_Form_Contribute_OrganizationSummary extends CRM_Report_Form {
     $params = array('contact_type_b' => 'Organization', 'version' => 3);
     $typesA = &civicrm_api('relationship_type', 'get', $params);
 
-    if (!CRM_Utils_Array::value('is_error', $typesA)) {
+    if (empty($typesA['is_error'])) {
       foreach ($typesA['values'] as $rel) {
         $relationTypes[$rel['id']][$rel['id'] . '_b_a'] = $rel['label_b_a'];
       }
@@ -389,7 +387,7 @@ class CRM_Report_Form_Contribute_OrganizationSummary extends CRM_Report_Form {
     $params = array('contact_type_a' => 'Organization', 'version' => 3);
     $typesB = &civicrm_api('relationship_type', 'get', $params);
 
-    if (!CRM_Utils_Array::value('is_error', $typesB)) {
+    if (empty($typesB['is_error'])) {
       foreach ($typesB['values'] as $rel) {
         $relationTypes[$rel['id']][$rel['id'] . '_a_b'] = $rel['label_a_b'];
       }
@@ -449,10 +447,8 @@ class CRM_Report_Form_Contribute_OrganizationSummary extends CRM_Report_Form {
       }
 
       // convert Organization display name to links
-      if (array_key_exists('civicrm_contact_organization_organization_name', $row) &&
-        CRM_Utils_Array::value('civicrm_contact_organization_organization_name',
-          $rows[$rowNum]
-        ) &&
+      if (array_key_exists('civicrm_contact_organization_organization_name', $row) && !empty($rows[$rowNum]
+['civicrm_contact_organization_organization_name']) &&
         array_key_exists('civicrm_contact_organization_id', $row)
       ) {
         $url = CRM_Utils_System::url('civicrm/contact/view',

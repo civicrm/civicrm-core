@@ -741,7 +741,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form {
     }
 
     // show the context menu only when we’re not searching for deleted contacts; CRM-5673
-    if (!CRM_Utils_Array::value('deleted_contacts', $this->_formValues)) {
+    if (empty($this->_formValues['deleted_contacts'])) {
       $menuItems = CRM_Contact_BAO_Contact::contextMenu();
       $primaryActions = CRM_Utils_Array::value('primaryActions', $menuItems, array());
       $this->_contextMenu = CRM_Utils_Array::value('moreActions', $menuItems, array());
@@ -851,25 +851,19 @@ class CRM_Contact_Form_Search extends CRM_Core_Form {
     //get the button name
     $buttonName = $this->controller->getButtonName();
 
-    if (isset($this->_ufGroupID) &&
-      !CRM_Utils_Array::value('uf_group_id', $this->_formValues)
-    ) {
+    if (isset($this->_ufGroupID) && empty($this->_formValues['uf_group_id'])) {
       $this->_formValues['uf_group_id'] = $this->_ufGroupID;
     }
 
-    if (isset($this->_componentMode) &&
-      !CRM_Utils_Array::value('component_mode', $this->_formValues)
-    ) {
+    if (isset($this->_componentMode) && empty($this->_formValues['component_mode'])) {
       $this->_formValues['component_mode'] = $this->_componentMode;
     }
 
-    if (isset($this->_operator) &&
-      !CRM_Utils_Array::value('operator', $this->_formValues)
-    ) {
+    if (isset($this->_operator) && empty($this->_formValues['operator'])) {
       $this->_formValues['operator'] = $this->_operator;
     }
 
-    if (!CRM_Utils_Array::value('qfKey', $this->_formValues)) {
+    if (empty($this->_formValues['qfKey'])) {
       $this->_formValues['qfKey'] = $this->controller->_key;
     }
 

@@ -135,7 +135,7 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
       unset($_SESSION['messages']);
     }
 
-    if (CRM_Utils_Array::value('name', $params)) {
+    if (!empty($params['name'])) {
       if ($nameError = user_validate_name($params['name'])) {
         $errors['cms_name'] = $nameError;
       }
@@ -150,7 +150,7 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
       }
     }
 
-    if (CRM_Utils_Array::value('mail', $params)) {
+    if (!empty($params['mail'])) {
       if ($emailError = user_validate_mail($params['mail'])) {
         $errors[$emailName] = $emailError;
       }

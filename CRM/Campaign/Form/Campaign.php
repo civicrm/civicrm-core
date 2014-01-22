@@ -119,7 +119,7 @@ class CRM_Campaign_Form_Campaign extends CRM_Core_Form {
     }
 
     // when custom data is included in form.
-    if (CRM_Utils_Array::value('hidden_custom', $_POST)) {
+    if (!empty($_POST['hidden_custom'])) {
       $this->set('type', 'Campaign');
       $this->set('subType', CRM_Utils_Array::value('campaign_type_id', $_POST));
       $this->set('entityId', $this->_campaignId);

@@ -246,7 +246,7 @@ class CRM_Core_Invoke {
       }
 
       // check if ssl is set
-      if (CRM_Utils_Array::value('is_ssl', $item)) {
+      if (!empty($item['is_ssl'])) {
         CRM_Utils_System::redirectToSSL();
       }
 
@@ -259,7 +259,7 @@ class CRM_Core_Invoke {
       }
 
       $pageArgs = NULL;
-      if (CRM_Utils_Array::value('page_arguments', $item)) {
+      if (!empty($item['page_arguments'])) {
         $pageArgs = CRM_Core_Menu::getArrayForPathArgs($item['page_arguments']);
       }
 

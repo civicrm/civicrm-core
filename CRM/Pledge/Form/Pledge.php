@@ -180,7 +180,7 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
       return $defaults;
     }
 
-    if (CRM_Utils_Array::value('is_test', $defaults)) {
+    if (!empty($defaults['is_test'])) {
       $this->assign('is_test', TRUE);
     }
 
@@ -294,8 +294,7 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
         'id' => $type,
       );
       //see if we need to include this paneName in the current form
-      if ($this->_formType == $type ||
-        CRM_Utils_Array::value("hidden_{$type}", $_POST) ||
+      if ($this->_formType == $type || !empty($_POST["hidden_{$type}"]) ||
         CRM_Utils_Array::value("hidden_{$type}", $defaults)
       ) {
         $showAdditionalInfo = TRUE;
@@ -535,7 +534,7 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
     $formValues = $this->controller->exportValues($this->_name);
 
     // set the contact, when contact is selected
-    if (CRM_Utils_Array::value('contact_select_id', $formValues)) {
+    if (!empty($formValues['contact_select_id'])) {
       $this->_contactID = $formValues['contact_select_id'][1];
     }
 
@@ -576,13 +575,13 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
 
     $dates = array('create_date', 'start_date', 'acknowledge_date', 'cancel_date');
     foreach ($dates as $d) {
-      if ($this->_id && (!$this->_isPending) && CRM_Utils_Array::value($d, $this->_values)) {
+      if ($this->_id && (!$this->_isPending) && !empty($this->_values[$d])) {
         if ($d == 'start_date') {
           $params['scheduled_date'] = CRM_Utils_Date::processDate($this->_values[$d]);
         }
         $params[$d] = CRM_Utils_Date::processDate($this->_values[$d]);
       }
-      elseif (CRM_Utils_Array::value($d, $formValues) && !CRM_Utils_System::isNull($formValues[$d])) {
+      elseif (!empty($formValues[$d]) && !CRM_Utils_System::isNull($formValues[$d])) {
         if ($d == 'start_date') {
           $params['scheduled_date'] = CRM_Utils_Date::processDate($formValues[$d]);
         }
@@ -593,7 +592,7 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
       }
     }
 
-    if (CRM_Utils_Array::value('is_acknowledge', $formValues)) {
+    if (!empty($formValues['is_acknowledge'])) {
       $params['acknowledge_date'] = date('Y-m-d');
     }
 
@@ -605,7 +604,7 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
     $params['contact_id'] = $this->_contactID;
 
     //format custom data
-    if (CRM_Utils_Array::value('hidden_custom', $formValues)) {
+    if (!empty($formValues['hidden_custom'])) {
       $params['hidden_custom'] = 1;
 
       $customFields = CRM_Core_BAO_CustomField::getFields('Pledge');
@@ -635,7 +634,7 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
     }
 
     //handle Acknowledgment.
-    if (CRM_Utils_Array::value('is_acknowledge', $formValues) && $pledge->id) {
+    if (!empty($formValues['is_acknowledge']) && $pledge->id) {
 
       //calculate scheduled amount.
       $params['scheduled_amount'] = round($params['amount'] / $params['installments']);

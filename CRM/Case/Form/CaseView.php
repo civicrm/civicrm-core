@@ -358,7 +358,7 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
       }
 
       //calculate roles that don't have relationships
-      if (CRM_Utils_Array::value($value['relation_type'], $caseRoles)) {
+      if (!empty($caseRoles[$value['relation_type']])) {
         unset($caseRoles[$value['relation_type']]);
       }
     }
@@ -488,9 +488,7 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
     $session = CRM_Core_Session::singleton();
     $session->pushUserContext($url);
 
-    if (CRM_Utils_Array::value('timeline_id', $params) &&
-      CRM_Utils_Array::value('_qf_CaseView_next', $_POST)
-    ) {
+    if (!empty($params['timeline_id']) && !empty($_POST['_qf_CaseView_next'])) {
       $session            = CRM_Core_Session::singleton();
       $this->_uid         = $session->get('userID');
       $xmlProcessor       = new CRM_Case_XMLProcessor_Process();

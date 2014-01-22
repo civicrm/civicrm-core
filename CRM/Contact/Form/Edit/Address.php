@@ -137,12 +137,10 @@ class CRM_Contact_Form_Edit_Address {
       list($title, $attributes, $select) = $v;
 
       $nameWithoutID = strpos($name, '_id') !== FALSE ? substr($name, 0, -3) : $name;
-      if (!CRM_Utils_Array::value($nameWithoutID, $addressOptions)) {
+      if (empty($addressOptions[$nameWithoutID])) {
         $continue = TRUE;
         if (in_array($nameWithoutID, array(
-          'street_number', 'street_name', 'street_unit')) &&
-          CRM_Utils_Array::value('street_address_parsing', $addressOptions)
-        ) {
+          'street_number', 'street_name', 'street_unit')) && !empty($addressOptions['street_address_parsing'])) {
           $continue = FALSE;
         }
         if ($continue) {
@@ -219,7 +217,7 @@ class CRM_Contact_Form_Edit_Address {
     CRM_Core_BAO_Address::addStateCountryMap($stateCountryMap);
 
     $entityId = NULL;
-    if (!empty($form->_values['address']) && CRM_Utils_Array::value($blockId, $form->_values['address'])) {
+    if (!empty($form->_values['address']) && !empty($form->_values['address'][$blockId])) {
       $entityId = $form->_values['address'][$blockId]['id'];
     }
 
@@ -328,7 +326,7 @@ class CRM_Contact_Form_Edit_Address {
     }
 
     // check for state/county match if not report error to user.
-    if (CRM_Utils_Array::value('address', $fields) && is_array($fields['address'])) {
+    if (!empty($fields['address']) && is_array($fields['address'])) {
       foreach ($fields['address'] as $instance => $addressValues) {
 
         if (CRM_Utils_System::isNull($addressValues)) {
@@ -400,7 +398,7 @@ class CRM_Contact_Form_Edit_Address {
           }
         }
 
-        if (CRM_Utils_Array::value('use_shared_address', $addressValues) && !CRM_Utils_Array::value('master_id', $addressValues)) {
+        if (!empty($addressValues['use_shared_address']) && empty($addressValues['master_id'])) {
           $errors["address[$instance][use_shared_address]"] = ts('Please select valid shared contact or a contact with valid address.');
         }
       }
@@ -476,10 +474,8 @@ class CRM_Contact_Form_Edit_Address {
 
     // CRM-7296 freeze the select for state if address is shared with household
     // CRM-9070 freeze the select for state if it is view only
-    if (isset($form->_fields) &&
-      CRM_Utils_Array::value($stateElementName, $form->_fields) &&
-      (CRM_Utils_Array::value('is_shared', $form->_fields[$stateElementName]) ||
-        CRM_Utils_Array::value('is_view', $form->_fields[$stateElementName]))
+    if (isset($form->_fields) && !empty($form->_fields[$stateElementName]) &&
+      (!empty($form->_fields[$stateElementName]['is_shared']) || !empty($form->_fields[$stateElementName]['is_view']))
     ) {
       $stateSelect->freeze();
     }
@@ -508,7 +504,7 @@ class CRM_Contact_Form_Edit_Address {
       $shareAddressContactNames = CRM_Contact_BAO_Contact_Utils::getAddressShareContactNames($defaults['address']);
 
       foreach ($defaults['address'] as $key => $addressValue) {
-        if (CRM_Utils_Array::value('master_id', $addressValue) && !$shareAddressContactNames[$addressValue['master_id']]['is_deleted']) {
+        if (!empty($addressValue['master_id']) && !$shareAddressContactNames[$addressValue['master_id']]['is_deleted']) {
           $sharedAddresses[$key]['shared_address_display'] = array(
             'address' => $addressValue['display'],
             'name' => $shareAddressContactNames[$addressValue['master_id']]['name'],
@@ -563,14 +559,12 @@ class CRM_Contact_Form_Edit_Address {
 
         //hack to handle show/hide address fields.
         $parsedAddress = array();
-        if ($form->_contactId &&
-          CRM_Utils_Array::value('address', $_POST)
-          && is_array($_POST['address'])
+        if ($form->_contactId && !empty($_POST['address']) && is_array($_POST['address'])
         ) {
           foreach ($_POST['address'] as $cnt => $values) {
             $showField = 'streetAddress';
             foreach (array('street_number', 'street_name', 'street_unit') as $fld) {
-              if (CRM_Utils_Array::value($fld, $values)) {
+              if (!empty($values[$fld])) {
                 $showField = 'addressElements';
                 break;
               }

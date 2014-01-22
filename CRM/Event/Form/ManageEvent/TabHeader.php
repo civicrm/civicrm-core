@@ -40,7 +40,7 @@ class CRM_Event_Form_ManageEvent_TabHeader {
 
   static function build(&$form) {
     $tabs = $form->get('tabHeader');
-    if (!$tabs || !CRM_Utils_Array::value('reset', $_GET)) {
+    if (!$tabs || empty($_GET['reset'])) {
       $tabs = self::process($form);
       $form->set('tabHeader', $tabs);
     }
@@ -139,7 +139,7 @@ WHERE      e.id = %1
 
       case 'ScheduleReminders':
         $class = 'reminder';
-        $new = CRM_Utils_Array::value('new', $_GET) ? '&new=1' : '';
+        $new = !empty($_GET['new']) ? '&new=1' : '';
         break;
 
       default:
@@ -156,7 +156,7 @@ WHERE      e.id = %1
     }
 
     if ($eventID) {
-      $reset = CRM_Utils_Array::value('reset', $_GET) ? 'reset=1&' : '';
+      $reset = !empty($_GET['reset']) ? 'reset=1&' : '';
 
       foreach ($tabs as $key => $value) {
         if (!isset($tabs[$key]['qfKey'])) {

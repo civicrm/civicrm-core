@@ -153,10 +153,10 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
     _user_edit_validate(NULL, $params);
     $errors = form_get_errors();
     if ($errors) {
-      if (CRM_Utils_Array::value('name', $errors)) {
+      if (!empty($errors['name'])) {
         $errors['cms_name'] = $errors['name'];
       }
-      if (CRM_Utils_Array::value('mail', $errors)) {
+      if (!empty($errors['mail'])) {
         $errors[$emailName] = $errors['mail'];
       }
       // also unset drupal messages to avoid twice display of errors

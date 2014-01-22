@@ -59,7 +59,7 @@ class CRM_Contact_BAO_Contact_Utils {
       $params = array('name' => $contactType);
       CRM_Contact_BAO_ContactType::retrieve($params, $typeInfo);
 
-      if (CRM_Utils_Array::value('image_URL', $typeInfo)) {
+      if (!empty($typeInfo['image_URL'])) {
         $imageUrl = $typeInfo['image_URL'];
         $config = CRM_Core_Config::singleton();
 
@@ -848,9 +848,7 @@ Group By  componentId";
     $skipFields = array('is_primary', 'location_type_id', 'is_billing', 'master_id');
     foreach ($address as & $values) {
       // 2. check if master id exists, if not continue
-      if (!CRM_Utils_Array::value('master_id', $values) ||
-        !CRM_Utils_Array::value('use_shared_address', $values)
-      ) {
+      if (empty($values['master_id']) || empty($values['use_shared_address'])) {
         // we should unset master id when use uncheck share address for existing address
         $values['master_id'] = 'null';
         continue;
@@ -889,7 +887,7 @@ Group By  componentId";
     // get the list of master id's for address
     $masterAddressIds = array();
     foreach ($addresses as $key => $addressValue) {
-      if (CRM_Utils_Array::value('master_id', $addressValue)) {
+      if (!empty($addressValue['master_id'])) {
         $masterAddressIds[] = $addressValue['master_id'];
       }
     }

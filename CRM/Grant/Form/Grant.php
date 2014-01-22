@@ -105,7 +105,7 @@ class CRM_Grant_Form_Grant extends CRM_Core_Form {
     }
 
     // when custom data is included in this page
-    if (CRM_Utils_Array::value('hidden_custom', $_POST)) {
+    if (!empty($_POST['hidden_custom'])) {
       $this->set('type', 'Grant');
       $this->set('subType', CRM_Utils_Array::value('grant_type_id', $_POST));
       $this->set('entityId', $this->_id);
@@ -153,7 +153,7 @@ class CRM_Grant_Form_Grant extends CRM_Core_Form {
       );
 
       foreach ($dates as $key) {
-        if (CRM_Utils_Array::value($key, $defaults)) {
+        if (!empty($defaults[$key])) {
           list($defaults[$key]) = CRM_Utils_Date::setDateDefaults($defaults[$key]);
         }
       }
@@ -306,12 +306,12 @@ class CRM_Grant_Form_Grant extends CRM_Core_Form {
     // get the submitted form values.
     $params = $this->controller->exportValues($this->_name);
 
-    if (!CRM_Utils_Array::value('grant_report_received', $params)) {
+    if (empty($params['grant_report_received'])) {
       $params['grant_report_received'] = "null";
     }
 
     // set the contact, when contact is selected
-    if (CRM_Utils_Array::value('contact_select_id', $params)) {
+    if (!empty($params['contact_select_id'])) {
       $this->_contactID = $params['contact_select_id'][1];
     }
 
