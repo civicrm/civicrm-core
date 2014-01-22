@@ -256,11 +256,10 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
       $batchTotal += $value['total_amount'];
 
       //validate for soft credit fields
-      if (!empty($params['soft_credit_contact_select_id'][$key]) && !CRM_Utils_Array::value($key, $params['soft_credit_amount'])) {
+      if (!empty($params['soft_credit_contact_select_id'][$key]) && empty($params['soft_credit_amount'][$key])) {
         $errors["soft_credit_amount[$key]"] = ts('Please enter the soft credit amount.');
       }
-      if (!empty($params['soft_credit_amount']) && CRM_Utils_Array::value($key, $params['soft_credit_amount'])
-        && CRM_Utils_Rule::cleanMoney(CRM_Utils_Array::value($key, $params['soft_credit_amount'])) > CRM_Utils_Rule::cleanMoney($value['total_amount'])) {
+      if (!empty($params['soft_credit_amount']) && !empty($params['soft_credit_amount'][$key]) && CRM_Utils_Rule::cleanMoney(CRM_Utils_Array::value($key, $params['soft_credit_amount'])) > CRM_Utils_Rule::cleanMoney($value['total_amount'])) {
         $errors["soft_credit_amount[$key]"] = ts('Soft credit amount should not be greater than the total amount');
       }
 
@@ -417,7 +416,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
         $this->updateContactInfo($value);
 
         //build soft credit params
-        if (!empty($params['soft_credit_contact_select_id'][$key]) && CRM_Utils_Array::value($key, $params['soft_credit_amount'])) {
+        if (!empty($params['soft_credit_contact_select_id'][$key]) && !empty($params['soft_credit_amount'][$key])) {
           $value['soft_credit'][$key]['contact_id'] = $params['soft_credit_contact_select_id'][$key];
           $value['soft_credit'][$key]['amount'] = CRM_Utils_Rule::cleanMoney($params['soft_credit_amount'][$key]);
           $value['soft_credit'][$key]['soft_credit_type_id'] = $params['field'][$key]['soft_credit_type'];
@@ -477,7 +476,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
         //CRM-11529 for backoffice transactions
         //when financial_type_id is passed in form, update the
         //lineitems with the financial type selected in form
-        if (!empty($value['financial_type_id']) && CRM_Utils_Array::value($priceSetId, $lineItem)) {
+        if (!empty($value['financial_type_id']) && !empty($lineItem[$priceSetId])) {
           foreach ($lineItem[$priceSetId] as &$values) {
             $values['financial_type_id'] = $value['financial_type_id'];
           }
@@ -510,8 +509,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
         // end of premium
 
         //send receipt mail.
-        if ( $contribution->id &&
-          CRM_Utils_Array::value( 'send_receipt', $value ) ) {
+        if ( $contribution->id && !empty($value['send_receipt'])) {
             // add the domain email id
             $domainEmail = CRM_Core_BAO_Domain::getNameAndEmail();
             $domainEmail = "$domainEmail[0] <$domainEmail[1]>";
@@ -632,7 +630,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
         }
 
         // handle soft credit
-        if (is_array(CRM_Utils_Array::value('soft_credit_contact_select_id', $params)) && CRM_Utils_Array::value($key, $params['soft_credit_contact_select_id']) && CRM_Utils_Array::value($key, $params['soft_credit_amount'])) {
+        if (is_array(CRM_Utils_Array::value('soft_credit_contact_select_id', $params)) && !empty($params['soft_credit_contact_select_id'][$key]) && CRM_Utils_Array::value($key, $params['soft_credit_amount'])) {
           $value['soft_credit'][$key]['contact_id'] = $params['soft_credit_contact_select_id'][$key];
           $value['soft_credit'][$key]['amount'] = CRM_Utils_Rule::cleanMoney($params['soft_credit_amount'][$key]);
         }
@@ -687,7 +685,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
           //CRM-11529 for backoffice transactions
           //when financial_type_id is passed in form, update the
           //lineitems with the financial type selected in form
-          if (!empty($value['financial_type_id']) && CRM_Utils_Array::value($priceSetId, $lineItem)) {
+          if (!empty($value['financial_type_id']) && !empty($lineItem[$priceSetId])) {
             foreach ($lineItem[$priceSetId] as &$values) {
               $values['financial_type_id'] = $value['financial_type_id'];
             }
@@ -743,8 +741,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
         // end of premium
 
         //send receipt mail.
-        if ( $membership->id &&
-          CRM_Utils_Array::value( 'send_receipt', $value ) ) {
+        if ( $membership->id && !empty($value['send_receipt'])) {
 
             // add the domain email id
             $domainEmail = CRM_Core_BAO_Domain::getNameAndEmail();

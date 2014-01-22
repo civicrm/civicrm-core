@@ -304,9 +304,7 @@ class CRM_Report_Form_Case_Detail extends CRM_Report_Form {
           if ($tableName == 'civicrm_address') {
             $this->_addressField = TRUE;
           }
-          if (!empty($field['required']) ||
-            CRM_Utils_Array::value($fieldName, $this->_params['fields'])
-          ) {
+          if (!empty($field['required']) || !empty($this->_params['fields'][$fieldName])) {
             if ($tableName == 'civicrm_email') {
               $this->_emailField = TRUE;
             }
@@ -412,7 +410,7 @@ class CRM_Report_Form_Case_Detail extends CRM_Report_Form {
           else {
 
             $op = CRM_Utils_Array::value("{$fieldName}_op", $this->_params);
-            if ($fieldName == 'case_type_id' && CRM_Utils_Array::value('case_type_id_value', $this->_params)) {
+            if ($fieldName == 'case_type_id' && !empty($this->_params['case_type_id_value'])) {
               foreach ($this->_params['case_type_id_value'] as $key => $value) {
                 if (strpos($value, CRM_Core_DAO::VALUE_SEPARATOR) === FALSE) {
                   $value = CRM_Core_DAO::VALUE_SEPARATOR . $value . CRM_Core_DAO::VALUE_SEPARATOR;
@@ -550,8 +548,7 @@ class CRM_Report_Form_Case_Detail extends CRM_Report_Form {
       $this->_relField = TRUE;
     }
 
-    if (!empty($this->_params['activity_date_time_relative']) ||
-      CRM_Utils_Array::value('activity_date_time_from', $this->_params) ||
+    if (!empty($this->_params['activity_date_time_relative']) || !empty($this->_params['activity_date_time_from']) ||
       CRM_Utils_Array::value('activity_date_time_to', $this->_params)
     ) {
       $this->_activityLast = TRUE;
@@ -616,9 +613,7 @@ class CRM_Report_Form_Case_Detail extends CRM_Report_Form {
         }
         $entryFound = TRUE;
       }
-      if (array_key_exists('civicrm_activity_last_completed_last_completed_activity_subject', $row) &&
-        !CRM_Utils_Array::value('civicrm_activity_last_completed_last_completed_activity_subject', $row)
-      ) {
+      if (array_key_exists('civicrm_activity_last_completed_last_completed_activity_subject', $row) && empty($row['civicrm_activity_last_completed_last_completed_activity_subject'])) {
         $rows[$rowNum]['civicrm_activity_last_completed_last_completed_activity_subject'] = ts('(No Subject)');
         $entryFound = TRUE;
       }

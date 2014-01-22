@@ -303,7 +303,7 @@ WHERE ceft.entity_id = %1";
    * @static
    */
   static function createPremiumTrxn($params) {
-    if ((!CRM_Utils_Array::value('financial_type_id', $params) || !CRM_Utils_Array::value('contributionId', $params)) && !CRM_Utils_Array::value('oldPremium', $params)) {
+    if ((empty($params['financial_type_id']) || empty($params['contributionId'])) && empty($params['oldPremium'])) {
       return;
     }
 

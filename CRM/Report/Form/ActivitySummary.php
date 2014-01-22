@@ -235,9 +235,7 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
       }
       if (array_key_exists('fields', $table)) {
         foreach ($table['fields'] as $fieldName => $field) {
-          if (!empty($field['required']) ||
-            CRM_Utils_Array::value($fieldName, $this->_params['fields'])
-          ) {
+          if (!empty($field['required']) || !empty($this->_params['fields'][$fieldName])) {
             if ($tableName == 'civicrm_email') {
               $this->_emailField = TRUE;
             }
@@ -401,9 +399,7 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
               if (!empty($field['chart'])) {
                 $this->assign('chartSupported', TRUE);
               }
-              if (!empty($table['group_bys'][$fieldName]['frequency']) &&
-                CRM_Utils_Array::value($fieldName, $this->_params['group_bys_freq'])
-              ) {
+              if (!empty($table['group_bys'][$fieldName]['frequency']) && !empty($this->_params['group_bys_freq'][$fieldName])) {
 
                 $append = "YEAR({$field['dbAlias']}),";
                 if (in_array(strtolower($this->_params['group_bys_freq'][$fieldName]),
@@ -434,9 +430,7 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
     $contactFields = array('sort_name', 'email', 'phone');
     if (!empty($fields['group_bys'])) {
 
-      if (!empty($fields['group_bys']['activity_type_id']) &&
-        !CRM_Utils_Array::value('sort_name', $fields['group_bys'])
-      ) {
+      if (!empty($fields['group_bys']['activity_type_id']) && empty($fields['group_bys']['sort_name'])) {
         foreach ($fields['fields'] as $fieldName => $val) {
           if (in_array($fieldName, $contactFields)) {
             $errors['fields'] = ts("Please select GroupBy 'Contact' to display Contact Fields");

@@ -281,9 +281,7 @@ contribution_civireport2.total_amount_sum as contribution2_total_amount_sum',
     foreach ($this->_columns as $tableName => $table) {
       if (array_key_exists('fields', $table)) {
         foreach ($table['fields'] as $fieldName => $field) {
-          if (!empty($field['required']) ||
-            CRM_Utils_Array::value($fieldName, $this->_params['fields'])
-          ) {
+          if (!empty($field['required']) || !empty($this->_params['fields'][$fieldName])) {
             if (isset($field['clause'])) {
               $select[] = $field['clause'];
 
@@ -527,7 +525,7 @@ LEFT JOIN civicrm_temp_civireport_repeat2 {$this->_aliases['civicrm_contribution
       }
     }
 
-    if (!empty($fields['gid_value']) && CRM_Utils_Array::value('group_bys', $fields)) {
+    if (!empty($fields['gid_value']) && !empty($fields['group_bys'])) {
       if (!array_key_exists('id', $fields['group_bys'])) {
         $errors['gid_value'] = ts("Filter with Group only allow with group by Contact");
       }

@@ -365,7 +365,7 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
     );
 
     foreach ($rest as $k => $v) {
-      if ($accessCiviCRM && CRM_Utils_Array::value($k, $this->_viewOptions)) {
+      if ($accessCiviCRM && !empty($this->_viewOptions[$k])) {
         $allTabs[] = $v + array(
           'id' => $k,
           'url' => CRM_Utils_System::url(

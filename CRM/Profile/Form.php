@@ -882,7 +882,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
 
     $profileActivityTypes = CRM_Core_BAO_UFGroup::groupTypeValues($gid, 'Activity');
 
-    if ((CRM_Utils_Array::value('Activity', $profileActivityTypes) &&
+    if ((!empty($profileActivityTypes['Activity']) &&
         !in_array($activityDetails['activity_type_id'], $profileActivityTypes['Activity'])
       ) ||
       (!in_array($contactId, $activityDetails['assignee_contact']) &&
@@ -927,16 +927,14 @@ class CRM_Profile_Form extends CRM_Core_Form {
     }
 
     // dont check for duplicates during registration validation: CRM-375
-    if (!$register && !CRM_Utils_Array::value('_qf_Edit_upload_duplicate', $fields)) {
+    if (!$register && empty($fields['_qf_Edit_upload_duplicate'])) {
       // fix for CRM-3240
       if (!empty($fields['email-Primary'])) {
         $fields['email'] = CRM_Utils_Array::value('email-Primary', $fields);
       }
 
       // fix for CRM-6141
-      if (!empty($fields['phone-Primary-1']) &&
-        !CRM_Utils_Array::value('phone-Primary', $fields)
-      ) {
+      if (!empty($fields['phone-Primary-1']) && empty($fields['phone-Primary'])) {
         $fields['phone-Primary'] = $fields['phone-Primary-1'];
       }
 
@@ -1125,8 +1123,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
       );
       $details = $contactDetails[0][$this->_id];
     }
-    if (!(CRM_Utils_Array::value('addressee_id', $details) ||
-        CRM_Utils_Array::value('email_greeting_id', $details) ||
+    if (!(!empty($details['addressee_id']) || !empty($details['email_greeting_id']) ||
         CRM_Utils_Array::value('postal_greeting_id', $details)
       )) {
 
@@ -1219,8 +1216,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
         substr($groupTypes, 1, -1)
       );
       //filter group of mailing type and unset it from params
-      if (in_array(2, $groupType) &&
-        CRM_Utils_Array::value('email', $result) &&
+      if (in_array(2, $groupType) && !empty($result['email']) &&
         CRM_Core_BAO_UFGroup::isProfileAddToGroupDoubleOptin()
       ) {
         if (!count($contactGroup)) {

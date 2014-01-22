@@ -742,7 +742,7 @@ LIMIT 1;";
     }
     $input['is_test'] = $contribution->is_test;
     $input['net_amount'] = $contribution->net_amount;
-    if (!empty($input['fee_amount']) && CRM_Utils_Array::value('amount', $input)) {
+    if (!empty($input['fee_amount']) && !empty($input['amount'])) {
       $input['net_amount'] = $input['amount'] - $input['fee_amount'];
     }
 

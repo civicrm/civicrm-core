@@ -190,7 +190,7 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
         $defaults['default_value'] = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Country', $countryId);
       }
 
-      if ($defaults['data_type'] == 'ContactReference' && CRM_Utils_Array::value('filter', $defaults)) {
+      if ($defaults['data_type'] == 'ContactReference' && !empty($defaults['filter'])) {
         $contactRefFilter = 'Advance';
         if (strpos($defaults['filter'], 'action=lookup') !== FALSE &&
           strpos($defaults['filter'], 'group=') !== FALSE
@@ -660,9 +660,7 @@ SELECT count(*)
           break;
 
         case 'ContactReference':
-          if ($fields['filter_selected'] == 'Advance' &&
-            CRM_Utils_Array::value('filter', $fields)
-          ) {
+          if ($fields['filter_selected'] == 'Advance' && !empty($fields['filter'])) {
             if (strpos($fields['filter'], 'entity=') !== FALSE) {
               $errors['filter'] = ts("Please do not include entity parameter (entity is always 'contact')");
             }
@@ -876,9 +874,7 @@ AND    option_group_id = %2";
     }
 
     // we can not set require and view at the same time.
-    if (!empty($fields['is_required']) &&
-      CRM_Utils_Array::value('is_view', $fields)
-    ) {
+    if (!empty($fields['is_required']) && !empty($fields['is_view'])) {
       $errors['is_view'] = ts('Can not set this field Required and View Only at the same time.');
     }
 
@@ -919,11 +915,11 @@ AND    option_group_id = %2";
     }
 
     $filter = 'null';
-    if ($dataTypeKey == 11 && CRM_Utils_Array::value('filter_selected', $params)) {
+    if ($dataTypeKey == 11 && !empty($params['filter_selected'])) {
       if ($params['filter_selected'] == 'Advance' && trim(CRM_Utils_Array::value('filter', $params))) {
         $filter = trim($params['filter']);
       }
-      elseif ($params['filter_selected'] == 'Group' && CRM_Utils_Array::value('group_id', $params)) {
+      elseif ($params['filter_selected'] == 'Group' && !empty($params['group_id'])) {
 
         $filter = 'action=lookup&group=' . implode(',', $params['group_id']);
       }

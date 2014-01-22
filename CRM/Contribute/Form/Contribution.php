@@ -388,7 +388,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       }
     }
 
-    if (!$this->_id && !CRM_Utils_Array::value('receive_date', $defaults)) {
+    if (!$this->_id && empty($defaults['receive_date'])) {
       list($defaults['receive_date'],
         $defaults['receive_date_time']
         ) = CRM_Utils_Date::setDateDefaults(NULL, 'activityDateTime');
@@ -405,7 +405,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     $this->assign('totalAmount', CRM_Utils_Array::value('total_amount', $defaults));
 
     //inherit campaign from pledge.
-    if ($this->_ppID && CRM_Utils_Array::value('campaign_id', $this->_pledgeValues)) {
+    if ($this->_ppID && !empty($this->_pledgeValues['campaign_id'])) {
       $defaults['campaign_id'] = $this->_pledgeValues['campaign_id'];
     }
 
@@ -428,7 +428,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     // build price set form.
     $buildPriceSet = FALSE;
     if (empty($this->_lineItems) &&
-      ($this->_priceSetId || CRM_Utils_Array::value('price_set_id', $_POST))
+      ($this->_priceSetId || !empty($_POST['price_set_id']))
     ) {
       $buildPriceSet = TRUE;
       $getOnlyPriceSetElements = TRUE;
@@ -525,8 +525,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       );
 
       // see if we need to include this paneName in the current form
-      if ($this->_formType == $type ||
-        CRM_Utils_Array::value("hidden_{$type}", $_POST) ||
+      if ($this->_formType == $type || !empty($_POST["hidden_{$type}"]) ||
         CRM_Utils_Array::value("hidden_{$type}", $defaults)
       ) {
         $showAdditionalInfo = TRUE;
@@ -864,7 +863,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
 
     $softErrors = CRM_Contribute_Form_SoftCredit::formRule($fields, $errors, $self);
 
-    if (!empty($fields['total_amount']) && (CRM_Utils_Array::value('net_amount', $fields) || CRM_Utils_Array::value('fee_amount', $fields))) {
+    if (!empty($fields['total_amount']) && (!empty($fields['net_amount']) || !empty($fields['fee_amount']))) {
       $sum = CRM_Utils_Rule::cleanMoney($fields['net_amount']) + CRM_Utils_Rule::cleanMoney($fields['fee_amount']);
       if (CRM_Utils_Rule::cleanMoney($fields['total_amount']) != $sum) {
         $errors['total_amount'] = ts('The sum of fee amount and net amount must be equal to total amount');
@@ -950,7 +949,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       //CRM-10964
       $pId = ($this->_compId && $this->_context == 'participant') ? $this->_compId : CRM_Core_DAO::getFieldValue('CRM_Event_DAO_ParticipantPayment', $this->_id, 'participant_id', 'contribution_id');
     }
-    if (!$priceSetId && CRM_Utils_Array::value('total_amount', $submittedValues) && $this->_id) {
+    if (!$priceSetId && !empty($submittedValues['total_amount']) && $this->_id) {
       // 10117 update th line items for participants
       if ($pId) {
         $entityTable = 'participant';
@@ -975,7 +974,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       }
       $itemId = key($lineItems);
       $fieldType = NULL;
-      if ($itemId && CRM_Utils_Array::value('price_field_id', $lineItems[$itemId])) {
+      if ($itemId && !empty($lineItems[$itemId]['price_field_id'])) {
         $fieldType = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceField', $lineItems[$itemId]['price_field_id'], 'html_type');
       }
       $lineItems[$itemId]['unit_price'] = $lineItems[$itemId]['line_total'] = CRM_Utils_Rule::cleanMoney(CRM_Utils_Array::value('total_amount', $submittedValues));
@@ -992,8 +991,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     //CRM-11529 for quick config backoffice transactions
     //when financial_type_id is passed in form, update the
     //lineitems with the financial type selected in form
-    if ($isQuickConfig && CRM_Utils_Array::value('financial_type_id', $submittedValues)
-      && CRM_Utils_Array::value($this->_priceSetId, $lineItem)
+    if ($isQuickConfig && !empty($submittedValues['financial_type_id']) && CRM_Utils_Array::value($this->_priceSetId, $lineItem)
     ) {
       foreach ($lineItem[$this->_priceSetId] as &$values) {
         $values['financial_type_id'] = $submittedValues['financial_type_id'];
@@ -1198,7 +1196,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       }
 
       //send receipt mail.
-      if ($contribution->id && CRM_Utils_Array::value('is_email_receipt', $formValues)) {
+      if ($contribution->id && !empty($formValues['is_email_receipt'])) {
         $formValues['contact_id'] = $this->_contactID;
         $formValues['contribution_id'] = $contribution->id;
 
@@ -1333,7 +1331,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     $fields = array();
 
     // we need to retrieve email address
-    if ($this->_context == 'standalone' && CRM_Utils_Array::value('is_email_receipt', $submittedValues)) {
+    if ($this->_context == 'standalone' && !empty($submittedValues['is_email_receipt'])) {
       list($this->userDisplayName,
         $this->userEmail
         ) = CRM_Contact_BAO_Contact_Location::getEmailDetails($this->_contactID);
@@ -1558,9 +1556,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     }
 
     //send receipt mail.
-    if ($contribution->id &&
-      CRM_Utils_Array::value('is_email_receipt', $this->_params)
-    ) {
+    if ($contribution->id && !empty($this->_params['is_email_receipt'])) {
       $this->_params['trxn_id'] = CRM_Utils_Array::value('trxn_id', $result);
       $this->_params['contact_id'] = $this->_contactID;
       $this->_params['contribution_id'] = $contribution->id;

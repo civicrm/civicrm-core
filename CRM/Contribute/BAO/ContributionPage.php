@@ -55,8 +55,7 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
     $dao = new CRM_Contribute_DAO_ContributionPage();
     $dao->copyValues($params);
     $dao->save();
-    if ($financialTypeId && CRM_Utils_Array::value('financial_type_id', $params)
-      && $financialTypeId != $params['financial_type_id']) {
+    if ($financialTypeId && !empty($params['financial_type_id']) && $financialTypeId != $params['financial_type_id']) {
       CRM_Price_BAO_PriceFieldValue::updateFinancialType($params['id'], 'civicrm_contribution_page', $params['financial_type_id']);
     }
     return $dao;
@@ -119,7 +118,7 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
     $email = NULL;
     if (isset($values['custom_pre_id'])) {
       $preProfileType = CRM_Core_BAO_UFField::getProfileType($values['custom_pre_id']);
-      if ($preProfileType == 'Membership' && CRM_Utils_Array::value('membership_id', $values)) {
+      if ($preProfileType == 'Membership' && !empty($values['membership_id'])) {
         $params['custom_pre_id'] = array(
           array(
             'member_id',
@@ -130,7 +129,7 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
           ),
         );
       }
-      elseif ($preProfileType == 'Contribution' && CRM_Utils_Array::value('contribution_id', $values)) {
+      elseif ($preProfileType == 'Contribution' && !empty($values['contribution_id'])) {
         $params['custom_pre_id'] = array(
           array(
             'contribution_id',
@@ -147,7 +146,7 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
 
     if (isset($values['custom_post_id'])) {
       $postProfileType = CRM_Core_BAO_UFField::getProfileType($values['custom_post_id']);
-      if ($postProfileType == 'Membership' && CRM_Utils_Array::value('membership_id', $values)) {
+      if ($postProfileType == 'Membership' && !empty($values['membership_id'])) {
         $params['custom_post_id'] = array(
           array(
             'member_id',
@@ -158,7 +157,7 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
           ),
         );
       }
-      elseif ($postProfileType == 'Contribution' && CRM_Utils_Array::value('contribution_id', $values)) {
+      elseif ($postProfileType == 'Contribution' && !empty($values['contribution_id'])) {
         $params['custom_post_id'] = array(
           array(
             'contribution_id',
@@ -232,8 +231,7 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
       }
     }
 
-    if (!empty($values['is_email_receipt']) ||
-      CRM_Utils_Array::value('onbehalf_dupe_alert', $values) ||
+    if (!empty($values['is_email_receipt']) || !empty($values['onbehalf_dupe_alert']) ||
       $returnMessageText
     ) {
       $template = CRM_Core_Smarty::singleton();

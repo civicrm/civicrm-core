@@ -120,7 +120,7 @@ class CRM_Contribute_Form_Contribution_ThankYou extends CRM_Contribute_Form_Cont
 
     $params = $this->_params;
     $honor_block_is_active = $this->get('honor_block_is_active');
-    if ($honor_block_is_active && CRM_Utils_Array::value('soft_credit_type_id', $params)) {
+    if ($honor_block_is_active && !empty($params['soft_credit_type_id'])) {
       $honorName = null;
       $softCreditTypes = CRM_Core_OptionGroup::values("soft_credit_type", FALSE);
 
@@ -243,9 +243,7 @@ class CRM_Contribute_Form_Contribution_ThankYou extends CRM_Contribute_Form_Cont
             $defaults[$timeField] = $contact[$timeField];
           }
         }
-        elseif (in_array($name, array('addressee', 'email_greeting', 'postal_greeting'))
-          && CRM_Utils_Array::value($name . '_custom', $contact)
-        ) {
+        elseif (in_array($name, array('addressee', 'email_greeting', 'postal_greeting')) && !empty($contact[$name . '_custom'])) {
           $defaults[$name . '_custom'] = $contact[$name . '_custom'];
         }
       }

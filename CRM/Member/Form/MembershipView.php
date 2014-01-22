@@ -222,8 +222,7 @@ END AS 'relType'
 
       $this->assign('has_related', FALSE);
       // if membership can be granted, and we are the owner of the membership
-      if (!empty($membershipType['relationship_type_id']) && !CRM_Utils_Array::value('owner_membership_id', $values)
-      ) {
+      if (!empty($membershipType['relationship_type_id']) && empty($values['owner_membership_id'])) {
         // display related contacts/membership block
         $this->assign('has_related', TRUE);
         $this->assign('max_related', CRM_Utils_Array::value('max_related', $values, ts('Unlimited')));

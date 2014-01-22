@@ -831,7 +831,7 @@ if (!isset($_contact_memberships[$userid][$value['membership_type_id']])) {
 $_contact_memberships[$userid][$value['membership_type_id']] = CRM_Member_BAO_Membership::getContactMembership($userid, $value['membership_type_id'], FALSE);
 }
 $currentMembership = $_contact_memberships[$userid][$value['membership_type_id']];
-if (!empty($currentMembership) && !CRM_Utils_Array::value('end_date', $currentMembership)) {
+if (!empty($currentMembership) && empty($currentMembership['end_date'])) {
 unset($options[$key]);
 $checklifetime = TRUE;
 }

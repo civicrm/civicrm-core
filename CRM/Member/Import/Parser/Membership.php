@@ -161,7 +161,7 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
     $errorMessage = NULL;
 
     //To check whether start date or join date is provided
-    if (empty($params['membership_start_date']) && !CRM_Utils_Array::value('join_date', $params)) {
+    if (empty($params['membership_start_date']) && empty($params['join_date'])) {
       $errorMessage = 'Membership Start Date is required to create a memberships.';
       CRM_Contact_Import_Parser_Contact::addToErrorMsg('Start Date', $errorMessage);
     }
@@ -266,9 +266,7 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
       $params = &$this->getActiveFieldParams();
 
       //assign join date equal to start date if join date is not provided
-      if (empty($params['join_date']) &&
-        CRM_Utils_Array::value('membership_start_date', $params)
-      ) {
+      if (empty($params['join_date']) && !empty($params['membership_start_date'])) {
         $params['join_date'] = $params['membership_start_date'];
       }
 
@@ -359,9 +357,7 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
       else {
         //fix for CRM-2219 Update Membership
         // onDuplicate == CRM_Import_Parser::DUPLICATE_UPDATE
-        if (!empty($formatted['is_override']) &&
-          !CRM_Utils_Array::value('status_id', $formatted)
-        ) {
+        if (!empty($formatted['is_override']) && empty($formatted['status_id'])) {
           array_unshift($values, 'Required parameter missing: Status');
           return CRM_Import_Parser::ERROR;
         }

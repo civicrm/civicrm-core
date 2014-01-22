@@ -355,9 +355,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
 
     // form the name only if missing: CRM-627
     $nameParam = CRM_Utils_Array::value('name', $params, NULL);
-    if (!$nameParam &&
-      !CRM_Utils_Array::value('id', $params)
-    ) {
+    if (!$nameParam && empty($params['id'])) {
       $params['name'] = CRM_Utils_String::titleToVar($params['title']);
     }
 
@@ -709,8 +707,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
         $groupList[$id]['class'] = implode(' ', $value['class']);
 
         // append parent names if in search mode
-        if (empty($params['parent_id']) &&
-        CRM_Utils_Array::value( 'parents', $value ) ) {
+        if (empty($params['parent_id']) && !empty($value['parents'])) {
           $groupIds = explode(',', $value['parents']);
           $title = array();
           foreach($groupIds as $gId) {

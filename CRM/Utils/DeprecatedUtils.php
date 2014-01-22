@@ -1355,7 +1355,7 @@ function _civicrm_api3_deprecated_contact_check_params(
       }
     }
 
-    if (empty($params['contact_id']) && CRM_Utils_Array::value('id', $params)) {
+    if (empty($params['contact_id']) && !empty($params['id'])) {
       $valid = FALSE;
       $error = '';
       foreach ($fields as $field) {

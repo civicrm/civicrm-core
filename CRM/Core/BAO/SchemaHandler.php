@@ -235,9 +235,7 @@ ALTER TABLE {$tableName}
 
   static function buildForeignKeySQL(&$params, $separator, $prefix, $tableName) {
     $sql = NULL;
-    if (!empty($params['fk_table_name']) &&
-      CRM_Utils_Array::value('fk_field_name', $params)
-    ) {
+    if (!empty($params['fk_table_name']) && !empty($params['fk_field_name'])) {
       $sql .= $separator;
       $sql .= str_repeat(' ', 8);
       $sql .= $prefix;

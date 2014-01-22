@@ -260,7 +260,7 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
     $formValues = $form->controller->exportValues($form->getName());
 
     // process message template
-    if (!empty($formValues['saveTemplate']) || CRM_Utils_Array::value('updateTemplate', $formValues)) {
+    if (!empty($formValues['saveTemplate']) || !empty($formValues['updateTemplate'])) {
       $messageTemplate = array(
         'msg_text' => NULL,
         'msg_html' => $formValues['html_message'],

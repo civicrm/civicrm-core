@@ -256,9 +256,7 @@ class CRM_Core_BAO_Block {
           }
         }
         //lets allow to update primary w/ more cleanly.
-        if (!$resetPrimaryId &&
-          CRM_Utils_Array::value('is_primary', $value)
-        ) {
+        if (!$resetPrimaryId && !empty($value['is_primary'])) {
           $primaryId = TRUE;
           if (is_array($blockIds)) {
             foreach ($blockIds as $blockId => $blockValue) {
@@ -327,7 +325,7 @@ class CRM_Core_BAO_Block {
               if ($valueId) {
                 //assigned id as first come first serve basis
                 $value['id'] = $blockValue['id'];
-                if (!$primaryId && CRM_Utils_Array::value('is_primary', $blockValue)) {
+                if (!$primaryId && !empty($blockValue['is_primary'])) {
                   $value['is_primary'] = $blockValue['is_primary'];
                 }
                 unset($blockIds[$blockId]);
@@ -352,7 +350,7 @@ class CRM_Core_BAO_Block {
         continue;
       }
 
-      if ($isPrimary && CRM_Utils_Array::value('is_primary', $value)) {
+      if ($isPrimary && !empty($value['is_primary'])) {
         $contactFields['is_primary'] = $value['is_primary'];
         $isPrimary = FALSE;
       }
@@ -360,7 +358,7 @@ class CRM_Core_BAO_Block {
         $contactFields['is_primary'] = 0;
       }
 
-      if ($isBilling && CRM_Utils_Array::value('is_billing', $value)) {
+      if ($isBilling && !empty($value['is_billing'])) {
         $contactFields['is_billing'] = $value['is_billing'];
         $isBilling = FALSE;
       }

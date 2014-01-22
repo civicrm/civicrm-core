@@ -145,8 +145,7 @@ class CRM_Contact_Form_Search_Advanced extends CRM_Contact_Form_Search {
       );
 
       // see if we need to include this paneName in the current form
-      if ($this->_searchPane == $type ||
-        CRM_Utils_Array::value("hidden_{$type}", $_POST) ||
+      if ($this->_searchPane == $type || !empty($_POST["hidden_{$type}"]) ||
         CRM_Utils_Array::value("hidden_{$type}", $this->_formValues)
       ) {
         $allPanes[$name]['open'] = 'true';
@@ -261,7 +260,7 @@ class CRM_Contact_Form_Search_Advanced extends CRM_Contact_Form_Search {
       $this->_formValues = CRM_Contact_BAO_SavedSearch::getFormValues($this->_ssID);
     }
 
-    if (isset($this->_groupID) && !CRM_Utils_Array::value('group', $this->_formValues)) {
+    if (isset($this->_groupID) && empty($this->_formValues['group'])) {
       $this->_formValues['group'] = array($this->_groupID => 1);
     }
 

@@ -230,9 +230,7 @@ class CRM_Utils_Token {
   ) {
     $key = 'domain';
     if (
-      !$knownTokens ||
-      !CRM_Utils_Array::value($key, $knownTokens)
-    ) {
+      !$knownTokens || empty($knownTokens[$key])) {
       return $str;
     }
 
@@ -519,7 +517,7 @@ class CRM_Utils_Token {
     // so that we remove anything we do not recognize
     // I hope to move this step out of here soon and
     // then we will just iterate on a list of tokens that are passed to us
-    if (!$knownTokens || !CRM_Utils_Array::value($key, $knownTokens)) {
+    if (!$knownTokens || empty($knownTokens[$key])) {
       return $str;
     }
 
@@ -607,7 +605,7 @@ class CRM_Utils_Token {
     // so that we remove anything we do not recognize
     // I hope to move this step out of here soon and
     // then we will just iterate on a list of tokens that are passed to us
-    if (!$knownTokens || !CRM_Utils_Array::value($key, $knownTokens)) {
+    if (!$knownTokens || empty($knownTokens[$key])) {
       return $str;
     }
 
@@ -1367,7 +1365,7 @@ class CRM_Utils_Token {
    * @return string string with replacements made
    */
   public static function replaceEntityTokens($entity, $entityArray, $str, $knownTokens = array(), $escapeSmarty = FALSE) {
-    if (!$knownTokens || !CRM_Utils_Array::value($entity, $knownTokens)) {
+    if (!$knownTokens || empty($knownTokens[$entity])) {
       return $str;
     }
 
@@ -1389,7 +1387,7 @@ class CRM_Utils_Token {
     // I hope to move this step out of here soon and
     // then we will just iterate on a list of tokens that are passed to us
     $key = 'contribution';
-    if (!$knownTokens || !CRM_Utils_Array::value($key, $knownTokens)) {
+    if (!$knownTokens || empty($knownTokens[$key])) {
       return $str;
     }
 

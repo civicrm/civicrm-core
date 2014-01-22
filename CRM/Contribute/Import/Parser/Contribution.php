@@ -307,9 +307,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
 
     //import contribution record according to select contact type
     if ($onDuplicate == CRM_Import_Parser::DUPLICATE_SKIP &&
-      (CRM_Utils_Array::value('contribution_contact_id', $paramValues) ||
-        CRM_Utils_Array::value('external_identifier', $paramValues)
-      )
+      (!empty($paramValues['contribution_contact_id']) || !empty($paramValues['external_identifier']))
     ) {
       $paramValues['contact_type'] = $this->_contactType;
     }
@@ -353,8 +351,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
     else {
       //fix for CRM-2219 - Update Contribution
       // onDuplicate == CRM_Import_Parser::DUPLICATE_UPDATE
-      if (!empty($paramValues['invoice_id']) ||
-          CRM_Utils_Array::value('trxn_id', $paramValues) || $paramValues['contribution_id']) {
+      if (!empty($paramValues['invoice_id']) || !empty($paramValues['trxn_id']) || $paramValues['contribution_id']) {
         $dupeIds = array(
           'id' => CRM_Utils_Array::value('contribution_id', $paramValues),
           'trxn_id' => CRM_Utils_Array::value('trxn_id', $paramValues),
@@ -561,9 +558,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
    *  Function to process pledge payments
    */
   function processPledgePayments(&$formatted) {
-    if (!empty($formatted['pledge_payment_id']) &&
-      CRM_Utils_Array::value('pledge_id', $formatted)
-    ) {
+    if (!empty($formatted['pledge_payment_id']) && !empty($formatted['pledge_id'])) {
       //get completed status
       $completeStatusID = CRM_Core_OptionGroup::getValue('contribution_status', 'Completed', 'name');
 

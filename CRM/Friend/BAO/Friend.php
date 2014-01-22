@@ -191,7 +191,7 @@ class CRM_Friend_BAO_Friend extends CRM_Friend_DAO_Friend {
       );
       //if is_email_receipt is set then take receipt_from_email
       //as from_email
-      if (!empty($default['is_email_receipt']) && CRM_Utils_Array::value('receipt_from_email', $default)) {
+      if (!empty($default['is_email_receipt']) && !empty($default['receipt_from_email'])) {
         $mailParams['email_from'] = $default['receipt_from_email'];
       }
 
@@ -211,7 +211,7 @@ class CRM_Friend_BAO_Friend extends CRM_Friend_DAO_Friend {
 
       //if is_email_confirm is set then take confirm_from_email
       //as from_email
-      if (!empty($default['is_email_confirm']) && CRM_Utils_Array::value('confirm_from_email', $default)) {
+      if (!empty($default['is_email_confirm']) && !empty($default['confirm_from_email'])) {
         $mailParams['email_from'] = $default['confirm_from_email'];
       }
 

@@ -864,8 +864,7 @@ class CRM_Contribute_BAO_Query {
       $tables = array_merge(array('civicrm_contribution' => 1), $tables);
     }
 
-    if (!empty($tables['civicrm_contribution_product']) &&
-      !CRM_Utils_Array::value('civicrm_product', $tables)) {
+    if (!empty($tables['civicrm_contribution_product']) && empty($tables['civicrm_product'])) {
       $tables['civicrm_product'] = 1;
     }
   }

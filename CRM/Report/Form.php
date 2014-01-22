@@ -699,11 +699,8 @@ class CRM_Report_Form extends CRM_Core_Form {
           $this->_defaults['order_bys'] = array();
         }
         foreach ($table['order_bys'] as $fieldName => $field) {
-          if (!empty($field['default']) ||
-            CRM_Utils_Array::value('default_order', $field) ||
-            CRM_Utils_Array::value('default_is_section', $field) ||
-            CRM_Utils_Array::value('default_weight', $field)
-          ) {
+          if (!empty($field['default']) || !empty($field['default_order']) ||
+            CRM_Utils_Array::value('default_is_section', $field) || !empty($field['default_weight'])) {
             $order_by = array(
               'column' => $fieldName,
               'order' => CRM_Utils_Array::value('default_order', $field, 'ASC'),
@@ -838,7 +835,7 @@ class CRM_Report_Form extends CRM_Core_Form {
             }
 
             $colGroups[$tableName]['fields'][$fieldName] = CRM_Utils_Array::value('title', $field);
-            if ($groupTitle && !CRM_Utils_Array::value('group_title', $colGroups[$tableName])) {
+            if ($groupTitle && empty($colGroups[$tableName]['group_title'])) {
               $colGroups[$tableName]['group_title'] = $groupTitle;
             }
 
@@ -1827,9 +1824,7 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
             $this->_phoneField = TRUE;
           }
 
-          if (!empty($field['required']) ||
-            CRM_Utils_Array::value($fieldName, $this->_params['fields'])
-          ) {
+          if (!empty($field['required']) || !empty($this->_params['fields'][$fieldName])) {
 
             // 1. In many cases we want select clause to be built in slightly different way
             //    for a particular field of a particular type.
@@ -1915,8 +1910,7 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
             continue;
           }
 
-          if (!empty($this->_params['group_bys']) && CRM_Utils_Array::value($fieldName, $this->_params['group_bys'])
-               && !empty($this->_params['group_bys_freq'])) {
+          if (!empty($this->_params['group_bys']) && !empty($this->_params['group_bys'][$fieldName]) && !empty($this->_params['group_bys_freq'])) {
             switch (CRM_Utils_Array::value($fieldName, $this->_params['group_bys_freq'])) {
               case 'YEARWEEK':
                 $select[]       = "DATE_SUB({$field['dbAlias']}, INTERVAL WEEKDAY({$field['dbAlias']}) DAY) AS {$tableName}_{$fieldName}_start";
@@ -2165,7 +2159,7 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
       $this->_select .= ", {$section['dbAlias']} as {$alias}";
     }
 
-    if ($applyLimit && !CRM_Utils_Array::value('charts', $this->_params)) {
+    if ($applyLimit && empty($this->_params['charts'])) {
       $this->limit();
     }
     CRM_Utils_Hook::alterReportVar('sql', $this, $this);
@@ -2265,9 +2259,7 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
     foreach ($this->_columns as $tableName => $table) {
       if (array_key_exists('fields', $table)) {
         foreach ($table['fields'] as $fieldName => $field) {
-          if (!empty($field['required']) ||
-            CRM_Utils_Array::value($fieldName, $this->_params['fields'])
-          ) {
+          if (!empty($field['required']) || !empty($this->_params['fields'][$fieldName])) {
 
             $selectColumns["{$tableName}_{$fieldName}"] = 1;
           }
@@ -3014,9 +3006,7 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
           }
 
           //might be survey response field.
-          if (!empty($this->_params['fields']['survey_response']) &&
-            CRM_Utils_Array::value('isSurveyResponseField', $prop['fields'][$fieldAlias])
-          ) {
+          if (!empty($this->_params['fields']['survey_response']) && !empty($prop['fields'][$fieldAlias]['isSurveyResponseField'])) {
             return TRUE;
           }
         }
@@ -3133,9 +3123,7 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
       foreach ($this->_columns as $tableName => $table) {
         if (array_key_exists('fields', $table)) {
           foreach ($table['fields'] as $fieldName => $field) {
-            if (!empty($field['required']) ||
-              CRM_Utils_Array::value($fieldName, $this->_params['fields'])
-            ) {
+            if (!empty($field['required']) || !empty($this->_params['fields'][$fieldName])) {
               $this->_selectedTables[] = $tableName;
               break;
             }

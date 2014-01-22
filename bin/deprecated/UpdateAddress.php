@@ -224,9 +224,7 @@ WHERE      {$whereClause}
       $success = TRUE;
       // consider address is automatically parseable,
       // when we should found street_number and street_name
-      if (empty($parsedFields['street_name']) ||
-        !CRM_Utils_Array::value('street_number', $parsedFields)
-      ) {
+      if (empty($parsedFields['street_name']) || empty($parsedFields['street_number'])) {
         $success = FALSE;
       }
 

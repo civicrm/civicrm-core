@@ -250,9 +250,7 @@ class CRM_Report_Form_Grant_Detail extends CRM_Report_Form {
       }
       if (array_key_exists('fields', $table)) {
         foreach ($table['fields'] as $fieldName => $field) {
-          if (!empty($field['required']) ||
-            CRM_Utils_Array::value($fieldName, $this->_params['fields'])
-          ) {
+          if (!empty($field['required']) || !empty($this->_params['fields'][$fieldName])) {
 
             $select[] = "{$field['dbAlias']} as {$tableName}_{$fieldName}";
 

@@ -268,10 +268,7 @@ class CRM_Mailing_Form_Test extends CRM_Core_Form {
       );
     }
 
-    if (!empty($_POST['_qf_Import_refresh']) ||
-      CRM_Utils_Array::value('_qf_Test_next', $testParams) ||
-      !CRM_Utils_Array::value('sendtest', $testParams)
-    ) {
+    if (!empty($_POST['_qf_Import_refresh']) || !empty($testParams['_qf_Test_next']) || empty($testParams['sendtest'])) {
       $error = TRUE;
       return $error;
     }

@@ -1565,8 +1565,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
     $mg = new CRM_Mailing_DAO_MailingGroup();
     foreach (array('groups', 'mailings') as $entity) {
       foreach (array('include', 'exclude', 'base') as $type) {
-        if (isset($params[$entity]) &&
-          CRM_Utils_Array::value($type, $params[$entity]) &&
+        if (isset($params[$entity]) && !empty($params[$entity][$type]) &&
           is_array($params[$entity][$type])) {
           foreach ($params[$entity][$type] as $entityId) {
             $mg->reset();

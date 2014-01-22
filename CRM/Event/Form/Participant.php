@@ -407,8 +407,7 @@ class CRM_Event_Form_Participant extends CRM_Contact_Form_Task {
     }
 
     // when fee amount is included in form
-    if (!empty($_POST['hidden_feeblock']) || CRM_Utils_Array::value('send_receipt', $_POST)
-    ) {
+    if (!empty($_POST['hidden_feeblock']) || !empty($_POST['send_receipt'])) {
       CRM_Event_Form_EventFees::preProcess($this);
       CRM_Event_Form_EventFees::buildQuickForm($this);
       CRM_Event_Form_EventFees::setDefaultValues($this);
@@ -1008,8 +1007,7 @@ loadCampaign( {$this->_eID}, {$eventCampaigns} );
     }
 
     // validate contribution status for 'Failed'.
-    if ($self->_onlinePendingContributionId &&
-      CRM_Utils_Array::value('record_contribution', $values) &&
+    if ($self->_onlinePendingContributionId && !empty($values['record_contribution']) &&
       (CRM_Utils_Array::value('contribution_status_id', $values) ==
         array_search('Failed', CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name'))
       )
@@ -1019,8 +1017,7 @@ loadCampaign( {$this->_eID}, {$eventCampaigns} );
 
     // do the amount validations.
     //skip for update mode since amount is freeze, CRM-6052
-    if ((!$self->_id &&
-        !CRM_Utils_Array::value('total_amount', $values) &&
+    if ((!$self->_id && empty($values['total_amount']) &&
         empty($self->_values['line_items'])
       ) ||
       ($self->_id && !$self->_paymentId && isset($self->_values['line_items']) && is_array($self->_values['line_items']))
@@ -1130,8 +1127,7 @@ loadCampaign( {$this->_eID}, {$eventCampaigns} );
 
         $params['fee_level'] = $params['amount_level'];
         $contributionParams['total_amount'] = $params['amount'];
-        if ($this->_quickConfig && CRM_Utils_Array::value('total_amount', $params)
-          && $params['status_id'] != array_search('Partially paid', $participantStatus)) {
+        if ($this->_quickConfig && !empty($params['total_amount']) && $params['status_id'] != array_search('Partially paid', $participantStatus)) {
           $params['fee_amount'] = $params['total_amount'];
         } else {
           //fix for CRM-3086
@@ -1533,8 +1529,7 @@ loadCampaign( {$this->_eID}, {$eventCampaigns} );
           if (is_array($value) && $value != 'skip') {
             foreach ($value as $lineKey => $line) {
               //10117 update the line items for participants if contribution amount is recorded
-              if ($this->_quickConfig && CRM_Utils_Array::value('total_amount', $params )
-                && $params['status_id'] != array_search('Partially paid', $participantStatus)
+              if ($this->_quickConfig && !empty($params['total_amount']) && $params['status_id'] != array_search('Partially paid', $participantStatus)
               ) {
                 $line['unit_price'] = $line['line_total'] = $params['total_amount'];
               }
@@ -1549,9 +1544,7 @@ loadCampaign( {$this->_eID}, {$eventCampaigns} );
     $updateStatusMsg = NULL;
     //send mail when participant status changed, CRM-4326
     if ($this->_id && $this->_statusId &&
-      $this->_statusId != CRM_Utils_Array::value('status_id', $params) &&
-      CRM_Utils_Array::value('is_notify', $params)
-    ) {
+      $this->_statusId != CRM_Utils_Array::value('status_id', $params) && !empty($params['is_notify'])) {
 
       $updateStatusMsg = CRM_Event_BAO_Participant::updateStatusMessage($this->_id,
         $params['status_id'],

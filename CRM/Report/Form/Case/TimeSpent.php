@@ -181,8 +181,7 @@ class CRM_Report_Form_Case_TimeSpent extends CRM_Report_Form {
       if (array_key_exists('fields', $table)) {
         foreach ($table['fields'] as $fieldName => $field) {
           if (!empty($field['required']) ||
-            (CRM_Utils_Array::value($fieldName, $this->_params['fields'])
-              && ((!$this->has_grouping) || !in_array($fieldName, array('case_id', 'subject', 'status_id')))
+            (!empty($this->_params['fields'][$fieldName]) && ((!$this->has_grouping) || !in_array($fieldName, array('case_id', 'subject', 'status_id')))
             )
           ) {
 

@@ -316,9 +316,7 @@ class CRM_Report_Form_Contribute_Baykeeper extends CRM_Report_Form {
     foreach ($this->_columns as $tableName => $table) {
       if (array_key_exists('fields', $table)) {
         foreach ($table['fields'] as $fieldName => $field) {
-          if (!empty($field['required']) ||
-            CRM_Utils_Array::value($fieldName, $this->_params['fields'])
-          ) {
+          if (!empty($field['required']) || !empty($this->_params['fields'][$fieldName])) {
             if ($tableName == 'civicrm_address') {
               $this->_addressField = TRUE;
             }
@@ -583,8 +581,7 @@ class CRM_Report_Form_Contribute_Baykeeper extends CRM_Report_Form {
       }
 
       // convert display name to links
-      if (array_key_exists('civicrm_contact_display_name', $row) &&
-        CRM_Utils_Array::value('civicrm_contact_display_name', $rows[$rowNum]) &&
+      if (array_key_exists('civicrm_contact_display_name', $row) && !empty($rows[$rowNum]['civicrm_contact_display_name']) &&
         array_key_exists('civicrm_contact_id', $row)
       ) {
         $url = CRM_Utils_System::url("civicrm/contact/view",
@@ -596,8 +593,7 @@ class CRM_Report_Form_Contribute_Baykeeper extends CRM_Report_Form {
       }
 
       // convert soft credit id to link
-      if (array_key_exists('soft_credit_display_name', $row) &&
-        CRM_Utils_Array::value('soft_credit_display_name', $rows[$rowNum]) &&
+      if (array_key_exists('soft_credit_display_name', $row) && !empty($rows[$rowNum]['soft_credit_display_name']) &&
         array_key_exists('id', $row)
       ) {
         $url = CRM_Utils_System::url("civicrm/contact/view",
@@ -609,8 +605,7 @@ class CRM_Report_Form_Contribute_Baykeeper extends CRM_Report_Form {
       }
 
       // convert hon/mem contact to link
-      if (array_key_exists('civicrm_contact_hon_mem_display_name', $row) &&
-        CRM_Utils_Array::value('civicrm_contribution_honor_contact_id', $rows[$rowNum]) &&
+      if (array_key_exists('civicrm_contact_hon_mem_display_name', $row) && !empty($rows[$rowNum]['civicrm_contribution_honor_contact_id']) &&
         array_key_exists('civicrm_contribution_honor_contact_id', $row)
       ) {
         $url = CRM_Utils_System::url("civicrm/contact/view",
@@ -622,9 +617,7 @@ class CRM_Report_Form_Contribute_Baykeeper extends CRM_Report_Form {
       }
 
       // honor of/memory of type
-      if ($value = CRM_Utils_Array::value('civicrm_contribution_honor_type_id', $row) &&
-        CRM_Utils_Array::value('civicrm_contribution_honor_type_id', $rows[$rowNum])
-      ) {
+      if ($value = CRM_Utils_Array::value('civicrm_contribution_honor_type_id', $row) && !empty($rows[$rowNum]['civicrm_contribution_honor_type_id'])) {
         // rather than do a join, just change the output here, since there these values are pretty static
 
 

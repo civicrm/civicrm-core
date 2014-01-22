@@ -46,9 +46,7 @@ class CRM_Pledge_BAO_Query {
    * @access public
    */
   static function select(&$query) {
-    if (($query->_mode & CRM_Contact_BAO_Query::MODE_PLEDGE) ||
-      CRM_Utils_Array::value('pledge_id', $query->_returnProperties)
-    ) {
+    if (($query->_mode & CRM_Contact_BAO_Query::MODE_PLEDGE) || !empty($query->_returnProperties['pledge_id'])) {
       $query->_select['pledge_id'] = 'civicrm_pledge.id as pledge_id';
       $query->_element['pledge_id'] = 1;
       $query->_tables['civicrm_pledge'] = $query->_whereTables['civicrm_pledge'] = 1;
@@ -629,9 +627,7 @@ class CRM_Pledge_BAO_Query {
 
   static function tableNames(&$tables) {
     //add status table
-    if (!empty($tables['pledge_status']) ||
-      CRM_Utils_Array::value('civicrm_pledge_payment', $tables)
-    ) {
+    if (!empty($tables['pledge_status']) || !empty($tables['civicrm_pledge_payment'])) {
       $tables = array_merge(array('civicrm_pledge' => 1), $tables);
     }
   }

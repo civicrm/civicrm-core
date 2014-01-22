@@ -77,7 +77,7 @@ class CRM_Contribute_Form extends CRM_Core_Form {
         $baoName::retrieve($params, $defaults);
       }
     }
-    if ($this->_action == CRM_Core_Action::DELETE && CRM_Utils_Array::value('name', $defaults)) {
+    if ($this->_action == CRM_Core_Action::DELETE && !empty($defaults['name'])) {
       $this->assign('delName', $defaults['name']);
     }
     elseif ($this->_action == CRM_Core_Action::ADD) {
@@ -88,7 +88,7 @@ class CRM_Contribute_Form extends CRM_Core_Form {
 
     }
     elseif ($this->_action & CRM_Core_Action::UPDATE) {
-      if (!empty($defaults['contact_id']) || CRM_Utils_Array::value('created_id', $defaults)) {
+      if (!empty($defaults['contact_id']) || !empty($defaults['created_id'])) {
         $contactID = !empty($defaults['created_id']) ? $defaults['created_id'] : $defaults['contact_id'];
         $this->assign('created_id', $contactID);
         $this->assign('organisationId', $contactID);

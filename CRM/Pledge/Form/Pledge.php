@@ -294,8 +294,7 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
         'id' => $type,
       );
       //see if we need to include this paneName in the current form
-      if ($this->_formType == $type ||
-        CRM_Utils_Array::value("hidden_{$type}", $_POST) ||
+      if ($this->_formType == $type || !empty($_POST["hidden_{$type}"]) ||
         CRM_Utils_Array::value("hidden_{$type}", $defaults)
       ) {
         $showAdditionalInfo = TRUE;
@@ -576,7 +575,7 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
 
     $dates = array('create_date', 'start_date', 'acknowledge_date', 'cancel_date');
     foreach ($dates as $d) {
-      if ($this->_id && (!$this->_isPending) && CRM_Utils_Array::value($d, $this->_values)) {
+      if ($this->_id && (!$this->_isPending) && !empty($this->_values[$d])) {
         if ($d == 'start_date') {
           $params['scheduled_date'] = CRM_Utils_Date::processDate($this->_values[$d]);
         }

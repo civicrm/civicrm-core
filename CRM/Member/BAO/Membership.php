@@ -231,9 +231,7 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
     // To skip status calculation we should use 'skipStatusCal'.
     // eg pay later membership, membership update cron CRM-3984
 
-    if (empty($params['is_override']) &&
-      !CRM_Utils_Array::value('skipStatusCal', $params)
-    ) {
+    if (empty($params['is_override']) && empty($params['skipStatusCal'])) {
       $dates = array('start_date', 'end_date', 'join_date');
       $start_date = $end_date = $join_date = NULL; // declare these out of courtesy as IDEs don't pick up the setting of them below
       foreach ($dates as $date) {
@@ -244,9 +242,7 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
       $excludeIsAdmin = CRM_Utils_Array::value('exclude_is_admin', $params, FALSE);
 
       //CRM-3724 always skip is_admin if is_override != true.
-      if (!$excludeIsAdmin &&
-        !CRM_Utils_Array::value('is_override', $params)
-      ) {
+      if (!$excludeIsAdmin && empty($params['is_override'])) {
         $excludeIsAdmin = TRUE;
       }
 
@@ -309,7 +305,7 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
     }
 
     //record contribution for this membership
-    if (!empty($params['contribution_status_id']) && !CRM_Utils_Array::value('relate_contribution_id', $params)) {
+    if (!empty($params['contribution_status_id']) && empty($params['relate_contribution_id'])) {
       $memInfo = array_merge($params, array('membership_id' => $membership->id));
       $params['contribution'] = self::recordMembershipContribution($memInfo, $ids);
     }
@@ -329,9 +325,7 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
     // add activity record only during create mode and renew mode
     // also add activity if status changed CRM-3984 and CRM-2521
     if (empty($ids['membership']) ||
-      $activityType == 'Membership Renewal' ||
-      CRM_Utils_Array::value('createActivity', $params)
-    ) {
+      $activityType == 'Membership Renewal' || !empty($params['createActivity'])) {
       if (!empty($ids['membership'])) {
         $data = array();
         CRM_Core_DAO::commonRetrieveAll('CRM_Member_DAO_Membership',
@@ -1358,8 +1352,7 @@ AND civicrm_membership.is_test = %2";
     $index = !empty($memBlockDetails['is_separate_payment']) ? 2 : 1;
 
     if (empty($errors[$index])) {
-      if (isset($membershipParams['onbehalf']) &&
-        CRM_Utils_Array::value('member_campaign_id', $membershipParams['onbehalf'])) {
+      if (isset($membershipParams['onbehalf']) && !empty($membershipParams['onbehalf']['member_campaign_id'])) {
         $form->_params['campaign_id'] = $membershipParams['onbehalf']['member_campaign_id'];
       }
       if (is_array($membershipTypeID)) {
@@ -1530,14 +1523,11 @@ AND civicrm_membership.is_test = %2";
     //@todo this is a BAO function & should not inspect the form - the form should do this
     // & pass required params to the BAO
     if (CRM_Utils_Array::value('minimum_fee', $membershipTypeDetails) > 0.0) {
-      if (((isset($form->_contributeMode) && $form->_contributeMode == 'notify') ||
-          CRM_Utils_Array::value('is_pay_later', $form->_params) ||
-          (CRM_Utils_Array::value('is_recur', $form->_params)
-            && $form->_contributeMode == 'direct'
+      if (((isset($form->_contributeMode) && $form->_contributeMode == 'notify') || !empty($form->_params['is_pay_later']) ||
+          (!empty($form->_params['is_recur']) && $form->_contributeMode == 'direct'
           )
         ) &&
-        (($form->_values['is_monetary'] && $form->_amount > 0.0) ||
-         CRM_Utils_Array::value('separate_membership_payment', $form->_params) ||
+        (($form->_values['is_monetary'] && $form->_amount > 0.0) || !empty($form->_params['separate_membership_payment']) ||
          CRM_Utils_Array::value('record_contribution', $form->_params)
         )
       ) {
@@ -1689,7 +1679,7 @@ AND civicrm_membership.is_test = %2";
           if (!empty($form->_params['membership_source'])) {
             $memParams['source'] = $form->_params['membership_source'];
           }
-          elseif (property_exists($form, '_values') && CRM_Utils_Array::value('title', $form->_values)) {
+          elseif (property_exists($form, '_values') && !empty($form->_values['title'])) {
             $memParams['source'] = ts('Online Contribution:') . ' ' . $form->_values['title'];
           }
           else {
@@ -2690,9 +2680,7 @@ WHERE      civicrm_membership.is_test = 0";
 
 
     //insert payment record for this membership
-    if (empty($ids['contribution']) ||
-      CRM_Utils_Array::value('is_recur', $params)
-    ) {
+    if (empty($ids['contribution']) || !empty($params['is_recur'])) {
       $mpDAO = new CRM_Member_DAO_MembershipPayment();
       $mpDAO->membership_id = $membershipId;
       $mpDAO->contribution_id = $contribution->id;

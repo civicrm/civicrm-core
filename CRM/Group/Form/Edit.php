@@ -245,9 +245,7 @@ class CRM_Group_Form_Edit extends CRM_Core_Form {
 
     $groupTypes = CRM_Core_OptionGroup::values('group_type', TRUE);
     $config = CRM_Core_Config::singleton();
-    if (isset($this->_id) &&
-      CRM_Utils_Array::value('saved_search_id', $this->_groupValues)
-    ) {
+    if (isset($this->_id) && !empty($this->_groupValues['saved_search_id'])) {
       unset($groupTypes['Access Control']);
     }
 
@@ -266,9 +264,7 @@ class CRM_Group_Form_Edit extends CRM_Core_Form {
     $groupNames = CRM_Core_PseudoConstant::group();
 
     $parentGroups = $parentGroupElements = array();
-    if (isset($this->_id) &&
-      CRM_Utils_Array::value('parents', $this->_groupValues)
-    ) {
+    if (isset($this->_id) && !empty($this->_groupValues['parents'])) {
       $parentGroupIds = explode(',', $this->_groupValues['parents']);
       foreach ($parentGroupIds as $parentGroupId) {
         $parentGroups[$parentGroupId] = $groupNames[$parentGroupId];

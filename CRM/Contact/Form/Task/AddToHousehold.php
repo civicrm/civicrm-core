@@ -233,7 +233,7 @@ class CRM_Contact_Form_Task_AddToHousehold extends CRM_Contact_Form_Task {
       }
     }
 
-    if (!$contactTypeAdded && CRM_Utils_Array::value('contact_type', $params)) {
+    if (!$contactTypeAdded && !empty($params['contact_type'])) {
       $searchValues[] = array('contact_type', '=', $params['contact_type'], 0, 0);
     }
 

@@ -996,7 +996,7 @@ AND domain_id = %3
         }
       }
       // CRM-10931, If DB doesn't have any value, carry on with any default value thats already available
-      if (!isset($value) && CRM_Utils_Array::value($dao->name, $params)) {
+      if (!isset($value) && !empty($params[$dao->name])) {
         $value = $params[$dao->name];
       }
       $params[$dao->name] = $value;

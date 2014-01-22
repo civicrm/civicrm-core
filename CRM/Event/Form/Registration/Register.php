@@ -96,9 +96,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
     }
 
     $this->_allowWaitlist = FALSE;
-    if ($eventFull && !$this->_allowConfirmation &&
-      CRM_Utils_Array::value('has_waitlist', $this->_values['event'])
-    ) {
+    if ($eventFull && !$this->_allowConfirmation && !empty($this->_values['event']['has_waitlist'])) {
       $this->_allowWaitlist = TRUE;
       $this->_waitlistMsg = CRM_Utils_Array::value('waitlist_text', $this->_values['event']);
       if (!$this->_waitlistMsg) {
@@ -263,9 +261,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
     if ($this->_priceSetId && !empty($this->_feeBlock)) {
       foreach ($this->_feeBlock as $key => $val) {
         foreach ($val['options'] as $keys => $values) {
-          if ($values['is_default'] &&
-            !CRM_Utils_Array::value('is_full', $values)
-          ) {
+          if ($values['is_default'] && empty($values['is_full'])) {
 
             if ($val['html_type'] == 'CheckBox') {
               $this->_defaults["price_{$key}"][$keys] = 1;
@@ -365,13 +361,11 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
     }
 
     //hack to allow group to register w/ waiting
-    if ((CRM_Utils_Array::value('is_multiple_registrations', $this->_values['event']) ||
+    if ((!empty($this->_values['event']['is_multiple_registrations']) ||
         $this->_priceSetId
       ) &&
       !$this->_allowConfirmation &&
-      is_numeric($this->_availableRegistrations)
-      && CRM_Utils_Array::value('has_waitlist', $this->_values['event'])
-    ) {
+      is_numeric($this->_availableRegistrations) && !empty($this->_values['event']['has_waitlist'])) {
       $bypassPayment = TRUE;
       //case might be group become as a part of waitlist.
       //If not waitlist then they require admin approve.
@@ -500,8 +494,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
       $allAreBillingModeProcessors = FALSE;
     }
 
-    if (!$allAreBillingModeProcessors ||
-      CRM_Utils_Array::value('is_pay_later', $this->_values['event']) || $bypassPayment
+    if (!$allAreBillingModeProcessors || !empty($this->_values['event']['is_pay_later']) || $bypassPayment
     ) {
 
       //freeze button to avoid multiple calls.
@@ -668,9 +661,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
     $priceSetId = $form->get('priceSetId');
     if (!$priceSetId ||
       !is_array($priceSet) ||
-      empty($priceSet) ||
-      !CRM_Utils_Array::value('optionsMaxValueTotal', $priceSet)
-    ) {
+      empty($priceSet) || empty($priceSet['optionsMaxValueTotal'])) {
       return;
     }
 
@@ -734,9 +725,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
           $form->_allowConfirmation &&
           !empty($formattedPriceSetDefaults)
         ) {
-          if (empty($formattedPriceSetDefaults["price_{$field}"]) ||
-            !CRM_Utils_Array::value($opId, $formattedPriceSetDefaults["price_{$fieldId}"])
-          ) {
+          if (empty($formattedPriceSetDefaults["price_{$field}"]) || empty($formattedPriceSetDefaults["price_{$fieldId}"][$opId])) {
             $optionFullIds[$optId] = $optId;
             $isFull = TRUE;
           }
@@ -776,8 +765,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
       self::checkRegistration($fields, $self);
     }
     //check for availability of registrations.
-    if (!$self->_allowConfirmation &&
-      !CRM_Utils_Array::value('bypass_payment', $fields) &&
+    if (!$self->_allowConfirmation && empty($fields['bypass_payment']) &&
       is_numeric($self->_availableRegistrations) &&
       CRM_Utils_Array::value('additional_participants', $fields) >= $self->_availableRegistrations
     ) {
@@ -785,8 +773,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
     }
 
     // during confirmation don't allow to increase additional participants, CRM-4320
-    if ($self->_allowConfirmation &&
-      CRM_Utils_Array::value('additional_participants', $fields) &&
+    if ($self->_allowConfirmation && !empty($fields['additional_participants']) &&
       is_array($self->_additionalParticipantIds) &&
       $fields['additional_participants'] > count($self->_additionalParticipantIds)
     ) {
@@ -796,7 +783,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
     //don't allow to register w/ waiting if enough spaces available.
     if (!empty($fields['bypass_payment'])) {
       if (!is_numeric($self->_availableRegistrations) ||
-        (!CRM_Utils_Array::value('priceSetId', $fields) && CRM_Utils_Array::value('additional_participants', $fields) < $self->_availableRegistrations)
+        (empty($fields['priceSetId']) && CRM_Utils_Array::value('additional_participants', $fields) < $self->_availableRegistrations)
       ) {
         $errors['bypass_payment'] = ts("Oops. There are enough available spaces in this event. You can not add yourself to the waiting list.");
       }
@@ -854,8 +841,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
       if ($self->_paymentProcessor &&
         $self->_paymentProcessor['billing_mode'] & CRM_Core_Payment::BILLING_MODE_BUTTON
       ) {
-        if (!empty($fields[$self->_expressButtonName . '_x']) ||
-          CRM_Utils_Array::value($self->_expressButtonName . '_y', $fields) ||
+        if (!empty($fields[$self->_expressButtonName . '_x']) || !empty($fields[$self->_expressButtonName . '_y']) ||
           CRM_Utils_Array::value($self->_expressButtonName, $fields)
         ) {
           return empty($errors) ? TRUE : $errors;
@@ -883,13 +869,12 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
         $isZeroAmount = TRUE;
       }
 
-      if ($isZeroAmount && !($self->_forcePayement && CRM_Utils_Array::value('additional_participants', $fields))) {
+      if ($isZeroAmount && !($self->_forcePayement && !empty($fields['additional_participants']))) {
         $skipPaymentValidation = TRUE;
       }
 
       // also return if paylater mode or zero fees for valid members
-      if (!empty($fields['is_pay_later']) ||
-        CRM_Utils_Array::value('bypass_payment', $fields) ||
+      if (!empty($fields['is_pay_later']) || !empty($fields['bypass_payment']) ||
         $skipPaymentValidation ||
         (!$self->_allowConfirmation && ($self->_requireApproval || $self->_allowWaitlist))
       ) {
@@ -926,9 +911,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
       }
     }
 
-    if (!$email && !(CRM_Utils_Array::value('first_name', $fields) &&
-        CRM_Utils_Array::value('last_name', $fields)
-      )) {
+    if (!$email && !(!empty($fields['first_name']) && !empty($fields['last_name']))) {
       $defaults = $params = array('id' => $eventId);
       CRM_Event_BAO_Event::retrieve($params, $defaults);
       $message = ts("Mandatory fields (first name and last name, OR email address) are missing from this form.");
@@ -993,8 +976,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
     if (!empty($params['additional_participants'])) {
       $totalParticipants += $params['additional_participants'];
     }
-    if (!$this->_allowConfirmation &&
-      CRM_Utils_Array::value('bypass_payment', $params) &&
+    if (!$this->_allowConfirmation && !empty($params['bypass_payment']) &&
       is_numeric($this->_availableRegistrations) &&
       $totalParticipants > $this->_availableRegistrations
     ) {
@@ -1098,8 +1080,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
               $this->_expressButtonName . '_x',
               $this->_expressButtonName . '_y',
             )
-          ) &&
-            !CRM_Utils_Array::value('is_pay_later', $params) &&
+          ) && empty($params['is_pay_later']) &&
           !$this->_allowWaitlist &&
           !$this->_requireApproval
         ) {
@@ -1242,7 +1223,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
         // we dont store in userID in case the user is doing multiple
         // transactions etc
         // for things like tell a friend
-        if (!$this->getContactID() && CRM_Utils_Array::value('is_primary', $value)) {
+        if (!$this->getContactID() && !empty($value['is_primary'])) {
           $session->set('transaction.userID', $contactID);
         }
 

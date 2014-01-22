@@ -76,7 +76,7 @@ Class CRM_Campaign_BAO_Campaign extends CRM_Campaign_DAO_Campaign {
 
     $groupTableName = CRM_Contact_BAO_Group::getTableName();
 
-    if (isset($params['groups']) && CRM_Utils_Array::value('include', $params['groups']) && is_array($params['groups']['include'])) {
+    if (isset($params['groups']) && !empty($params['groups']['include']) && is_array($params['groups']['include'])) {
       foreach ($params['groups']['include'] as $entityId) {
         $dao               = new CRM_Campaign_DAO_CampaignGroup();
         $dao->campaign_id  = $campaign->id;

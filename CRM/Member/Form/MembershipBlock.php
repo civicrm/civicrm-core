@@ -251,7 +251,7 @@ class CRM_Member_Form_MembershipBlock extends CRM_Contribute_Form_ContributionPa
         }
       }
 
-      if ($contributionPageId && CRM_Utils_Array::value('member_price_set_id', $params) &&
+      if ($contributionPageId && !empty($params['member_price_set_id']) &&
         CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_ContributionPage', $contributionPageId, 'amount_block_is_active')) {
         $errors['member_price_set_id'] = ts('You cannot use Membership Price Sets with the Contribution Amounts section. However, a membership price set may include additional fields for non-membership options that requires an additional fee (e.g. magazine subscription) or an additional voluntary contribution.');
       }
@@ -291,7 +291,7 @@ class CRM_Member_Form_MembershipBlock extends CRM_Contribute_Form_ContributionPa
       if ($contributionPageId) {
         $amountBlock = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_ContributionPage', $contributionPageId, 'amount_block_is_active');
 
-        if (!$amountBlock && CRM_Utils_Array::value('is_separate_payment', $params)) {
+        if (!$amountBlock && !empty($params['is_separate_payment'])) {
           $errors['is_separate_payment'] = ts('Please enable the contribution amount section to use this option.');
         }
       }

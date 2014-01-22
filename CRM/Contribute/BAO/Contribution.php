@@ -126,7 +126,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
     }
 
     // CRM-13420, set payment instrument to default if payment_instrument_id is empty
-    if (!$contributionID && !CRM_Utils_Array::value('payment_instrument_id', $params)) {
+    if (!$contributionID && empty($params['payment_instrument_id'])) {
       $params['payment_instrument_id'] = key(CRM_Core_OptionGroup::values('payment_instrument',
         FALSE, FALSE, FALSE, 'AND is_default = 1'));
     }
@@ -140,7 +140,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
 
     // contribution status is missing, choose Completed as default status
     // do this for create mode only
-    if (empty($ids['contribution']) && !CRM_Utils_Array::value('contribution_status_id', $params)) {
+    if (empty($ids['contribution']) && empty($params['contribution_status_id'])) {
       $params['contribution_status_id'] = CRM_Core_OptionGroup::getValue('contribution_status', 'Completed', 'name');
     }
 
@@ -1322,11 +1322,7 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
     }
 
     // do check for required ids.
-    if (empty($componentDetails['membership']) &&
-      !CRM_Utils_Array::value('participant', $componentDetails) &&
-      !CRM_Utils_Array::value('pledge_payment', $componentDetails) ||
-      !CRM_Utils_Array::value('contact_id', $componentDetails)
-    ) {
+    if (empty($componentDetails['membership']) && empty($componentDetails['participant']) && empty($componentDetails['pledge_payment']) || empty($componentDetails['contact_id'])) {
       return $updateResult;
     }
 
@@ -2537,7 +2533,7 @@ WHERE  contribution_id = %1 ";
       }
 
       $totalAmount = CRM_Utils_Array::value('total_amount', $params);
-      if (!isset($totalAmount) && CRM_Utils_Array::value('prevContribution', $params)) {
+      if (!isset($totalAmount) && !empty($params['prevContribution'])) {
         $totalAmount = $params['total_amount'] = $params['prevContribution']->total_amount;
       }
 
@@ -2690,8 +2686,7 @@ WHERE  contribution_id = %1 ";
     }
 
     // when a fee is charged
-    if (!empty($params['fee_amount']) && (!CRM_Utils_Array::value('prevContribution', $params)
-      || $params['contribution']->fee_amount != $params['prevContribution']->fee_amount) && $skipRecords) {
+    if (!empty($params['fee_amount']) && (empty($params['prevContribution']) || $params['contribution']->fee_amount != $params['prevContribution']->fee_amount) && $skipRecords) {
       CRM_Core_BAO_FinancialTrxn::recordFees($params);
     }
 
@@ -2866,7 +2861,7 @@ WHERE  contribution_id = %1 ";
    * @static
    */
   static function checkStatusValidation($values, &$fields, &$errors) {
-    if (CRM_Utils_System::isNull($values) && CRM_Utils_Array::value('id', $fields)) {
+    if (CRM_Utils_System::isNull($values) && !empty($fields['id'])) {
       $values['contribution_status_id'] = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $fields['id'], 'contribution_status_id');
       if ($values['contribution_status_id'] == $fields['contribution_status_id']) {
         return FALSE;

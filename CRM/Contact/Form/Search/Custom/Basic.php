@@ -62,9 +62,7 @@ class CRM_Contact_Form_Search_Custom_Basic extends CRM_Contact_Form_Search_Custo
 
     foreach ($this->_columns as $name => $field) {
       if (in_array($field, array(
-        'street_address', 'city', 'state_province', 'postal_code', 'country')) &&
-        !CRM_Utils_Array::value($field, $addressOptions)
-      ) {
+        'street_address', 'city', 'state_province', 'postal_code', 'country')) && empty($addressOptions[$field])) {
         unset($this->_columns[$name]);
         continue;
       }

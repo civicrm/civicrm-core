@@ -298,7 +298,7 @@ AND li.entity_id = {$entityId})";
         $line['entity_id'] = $entityId;
         // if financial type is not set and if price field value is NOT NULL
         // get financial type id of price field value
-        if (!empty($line['price_field_value_id']) && !CRM_Utils_Array::value('financial_type_id', $line)) {
+        if (!empty($line['price_field_value_id']) && empty($line['financial_type_id'])) {
           $line['financial_type_id'] = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceFieldValue', $line['price_field_value_id'], 'financial_type_id');
         }
         $lineItems = CRM_Price_BAO_LineItem::create($line);

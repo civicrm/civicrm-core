@@ -270,9 +270,7 @@ class CRM_Report_Form_Member_Summary extends CRM_Report_Form {
 
       if (array_key_exists('fields', $table)) {
         foreach ($table['fields'] as $fieldName => $field) {
-          if (!empty($field['required']) ||
-            CRM_Utils_Array::value($fieldName, $this->_params['fields'])
-          ) {
+          if (!empty($field['required']) || !empty($this->_params['fields'][$fieldName])) {
 
             // only include statistics columns if set
             if (!empty($field['statistics'])) {
@@ -303,9 +301,7 @@ class CRM_Report_Form_Member_Summary extends CRM_Report_Form {
               }
             }
             elseif ($fieldName == 'membership_type_id') {
-              if (empty($this->_params['group_bys']['membership_type_id']) &&
-                CRM_Utils_Array::value('join_date', $this->_params['group_bys'])
-              ) {
+              if (empty($this->_params['group_bys']['membership_type_id']) && !empty($this->_params['group_bys']['join_date'])) {
                 $select[] = "GROUP_CONCAT(DISTINCT {$field['dbAlias']}  ORDER BY {$field['dbAlias']} ) as {$tableName}_{$fieldName}";
               }
               else {
@@ -366,9 +362,7 @@ class CRM_Report_Form_Member_Summary extends CRM_Report_Form {
               if (!empty($field['chart'])) {
                 $this->assign('chartSupported', TRUE);
               }
-              if (!empty($table['group_bys'][$fieldName]['frequency']) &&
-                CRM_Utils_Array::value($fieldName, $this->_params['group_bys_freq'])
-              ) {
+              if (!empty($table['group_bys'][$fieldName]['frequency']) && !empty($this->_params['group_bys_freq'][$fieldName])) {
 
                 $append = "YEAR({$field['dbAlias']}),";
                 if (in_array(strtolower($this->_params['group_bys_freq'][$fieldName]),
@@ -528,8 +522,7 @@ GROUP BY    {$this->_aliases['civicrm_contribution']}.currency
     $entryFound = FALSE;
     foreach ($rows as $rowNum => $row) {
       // make count columns point to detail report
-      if (!empty($this->_params['group_bys']['join_date']) &&
-        CRM_Utils_Array::value('civicrm_membership_join_date_start', $row) &&
+      if (!empty($this->_params['group_bys']['join_date']) && !empty($row['civicrm_membership_join_date_start']) &&
         $row['civicrm_membership_join_date_start'] &&
         $row['civicrm_membership_join_date_subtotal']
       ) {

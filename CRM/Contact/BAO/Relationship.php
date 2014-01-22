@@ -132,9 +132,7 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
 
       $validContacts = TRUE;
       //validate contacts in update mode also.
-      if (!empty($ids['contact']) &&
-        CRM_Utils_Array::value('contactTarget', $ids)
-      ) {
+      if (!empty($ids['contact']) && !empty($ids['contactTarget'])) {
         if (self::checkValidRelationship($params, $ids, $ids['contactTarget'])) {
           $validContacts = FALSE;
           $invalid++;
@@ -150,7 +148,7 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
     }
 
     // do not add to recent items for import, CRM-4399
-    if (!(CRM_Utils_Array::value('skipRecentView', $params) || $invalid || $duplicate)) {
+    if (!(!empty($params['skipRecentView']) || $invalid || $duplicate)) {
       $url = CRM_Utils_System::url('civicrm/contact/view/rel',
         "action=view&reset=1&id={$relationship->id}&cid={$relationship->contact_id_a}&context=home"
       );

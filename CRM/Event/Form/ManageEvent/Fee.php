@@ -201,9 +201,7 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
     $defaults['id'] = $eventId;
     if (!empty($totalLables)) {
       $maxKey = count($totalLables) - 1;
-      if (isset($maxKey) &&
-        CRM_Utils_Array::value('value', $totalLables[$maxKey])
-      ) {
+      if (isset($maxKey) && !empty($totalLables[$maxKey]['value'])) {
         foreach ($totalLables[$maxKey]['value'] as $i => $v) {
           if ($totalLables[$maxKey]['amount_id'][$i] == CRM_Utils_Array::value('default_discount_fee_id', $defaults)) {
             $defaults['discounted_default'] = $i;
@@ -749,7 +747,7 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
                   if (!empty($value['is_default'])) {
                     $fieldParams['default_option'] = $value['weight'];
                   }
-                  if (!empty($discountFieldIDs[$j]) && CRM_Utils_Array::value($value['weight'], $discountFieldIDs[$j])) {
+                  if (!empty($discountFieldIDs[$j]) && !empty($discountFieldIDs[$j][$value['weight']])) {
                     $fieldParams['option_id'][$value['weight']] = $discountFieldIDs[$j][$value['weight']];
                     unset($discountFieldIDs[$j][$value['weight']]);
                   }

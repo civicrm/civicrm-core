@@ -39,7 +39,7 @@
 class CRM_Contribute_Form_ContributionPage_TabHeader {
   static function build(&$form) {
     $tabs = $form->get('tabHeader');
-    if (!$tabs || !CRM_Utils_Array::value('reset', $_GET)) {
+    if (!$tabs || empty($_GET['reset'])) {
       $tabs = self::process($form);
       $form->set('tabHeader', $tabs);
     }

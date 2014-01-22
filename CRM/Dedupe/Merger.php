@@ -896,8 +896,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
           if ($value === 0 or $value === '0') {
             $value = $qfZeroBug;
           }
-          if (is_array($value) &&
-              !CRM_Utils_Array::value(1, $value)) {
+          if (is_array($value) && empty($value[1])) {
             $value[1] = NULL;
           }
           $elements[] = array('advcheckbox', "move_$field", NULL, NULL, NULL, $value);
@@ -1469,9 +1468,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     $viewOnlyCustomFields = array();
     foreach ($submitted as $key => $value) {
       $fid = (int) substr($key, 7);
-      if (array_key_exists($fid, $cFields) &&
-        CRM_Utils_Array::value('is_view', $cFields[$fid]['attributes'])
-      ) {
+      if (array_key_exists($fid, $cFields) && !empty($cFields[$fid]['attributes']['is_view'])) {
         $viewOnlyCustomFields[$key] = $value;
       }
     }

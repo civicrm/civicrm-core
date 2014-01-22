@@ -103,8 +103,7 @@ class CRM_Campaign_Form_Task_Interview extends CRM_Campaign_Form_Task {
 
     $orderClause = false;
     $buttonName  = $this->controller->getButtonName();
-    if ( $buttonName == '_qf_Interview_submit_orderBy' &&
-      CRM_Utils_Array::value('order_bys', $_POST) ) {
+    if ( $buttonName == '_qf_Interview_submit_orderBy' && !empty($_POST['order_bys'])) {
       $orderByParams = CRM_Utils_Array::value('order_bys', $_POST);
     }
     elseif ( CRM_Core_OptionGroup::getValue('activity_type','WalkList') == $this->_surveyDetails['activity_type_id'] ) {

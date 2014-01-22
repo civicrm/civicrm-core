@@ -349,7 +349,7 @@ class CRM_Export_BAO_Export {
       }
     }
 
-    if (!$selectAll && $componentTable && CRM_Utils_Array::value('additional_group', $exportParams)) {
+    if (!$selectAll && $componentTable && !empty($exportParams['additional_group'])) {
       // If an Additional Group is selected, then all contacts in that group are
       // added to the export set (filtering out duplicates).
       $query = "
@@ -545,8 +545,7 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
     $queryString = "$select $from $where $having";
 
     $groupBy = "";
-    if (!empty($returnProperties['tags']) ||
-      CRM_Utils_Array::value('groups', $returnProperties) ||
+    if (!empty($returnProperties['tags']) || !empty($returnProperties['groups']) ||
       CRM_Utils_Array::value('notes', $returnProperties) ||
       // CRM-9552
       ($queryMode & CRM_Contact_BAO_Query::MODE_CONTACTS && $query->_useGroupBy)

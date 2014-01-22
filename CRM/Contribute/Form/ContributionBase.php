@@ -302,7 +302,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
 
       //FIXME: to support multiple payment processors
       if ($isMonetary &&
-        (!$isPayLater || CRM_Utils_Array::value('payment_processor', $this->_values))
+        (!$isPayLater || !empty($this->_values['payment_processor']))
       ) {
         $ppID = CRM_Utils_Array::value('payment_processor', $this->_values);
         if (!$ppID) {
@@ -527,9 +527,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
     );
 
     $config = CRM_Core_Config::singleton();
-    if (isset($this->_values['is_recur']) &&
-      CRM_Utils_Array::value('is_recur', $this->_paymentProcessor)
-    ) {
+    if (isset($this->_values['is_recur']) && !empty($this->_paymentProcessor['is_recur'])) {
       $this->assign('is_recur_enabled', 1);
       $vars = array_merge($vars, array(
         'is_recur', 'frequency_interval', 'frequency_unit',

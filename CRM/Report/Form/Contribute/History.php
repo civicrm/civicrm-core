@@ -281,9 +281,7 @@ class CRM_Report_Form_Contribute_History extends CRM_Report_Form {
       if (array_key_exists('fields', $table)) {
         foreach ($table['fields'] as $fieldName => $field) {
 
-          if (!empty($field['required']) ||
-            CRM_Utils_Array::value($fieldName, $this->_params['fields'])
-          ) {
+          if (!empty($field['required']) || !empty($this->_params['fields'][$fieldName])) {
             if ($tableName == 'civicrm_address') {
               $this->_addressField = TRUE;
             }
@@ -306,11 +304,8 @@ class CRM_Report_Form_Contribute_History extends CRM_Report_Form {
               continue;
             }
             elseif ($fieldName == 'receive_date') {
-                if ((CRM_Utils_Array::value('this_year_op', $this->_params) == 'fiscal' &&
-                     CRM_Utils_Array::value('this_year_value', $this->_params)) ||
-                    (CRM_Utils_Array::value('other_year_op', $this->_params == 'fiscal') &&
-                      CRM_Utils_Array::value('other_year_value', $this->_params)
-                     )){
+                if ((CRM_Utils_Array::value('this_year_op', $this->_params) == 'fiscal' && !empty($this->_params['this_year_value'])) ||
+                    (CRM_Utils_Array::value('other_year_op', $this->_params == 'fiscal') && !empty($this->_params['other_year_value']))){
                     $select[] = self::fiscalYearOffset($field['dbAlias']) . " as {$tableName}_{$fieldName}";
                 }else{
                     $select[] = " YEAR(".$field['dbAlias'].")" . " as {$tableName}_{$fieldName}";
@@ -477,8 +472,7 @@ class CRM_Report_Form_Contribute_History extends CRM_Report_Form {
 
   static function formRule($fields, $files, $self) {
     $errors = array();
-    if (!empty($fields['this_year_value']) &&
-      CRM_Utils_Array::value('other_year_value', $fields) &&
+    if (!empty($fields['this_year_value']) && !empty($fields['other_year_value']) &&
       ($fields['this_year_value'] == $fields['other_year_value'])
     ) {
       $errors['other_year_value'] = ts("Value for filters 'This Year' and 'Other Years' can not be same.");
@@ -731,9 +725,7 @@ class CRM_Report_Form_Contribute_History extends CRM_Report_Form {
       }
 
       // Convert Display name into link
-      if (!empty($row['civicrm_contact_sort_name']) &&
-        CRM_Utils_Array::value('civicrm_contact_id', $row)
-      ) {
+      if (!empty($row['civicrm_contact_sort_name']) && !empty($row['civicrm_contact_id'])) {
         $url = CRM_Report_Utils_Report::getNextUrl('contribute/detail',
           'reset=1&force=1&id_op=eq&id_value=' . $row['civicrm_contact_id'],
           $this->_absoluteUrl, $this->_id

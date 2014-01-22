@@ -176,7 +176,7 @@ class CRM_Event_Import_Parser_Participant extends CRM_Event_Import_Parser {
 
     if (!(($index < 0) || ($this->_participantStatusIndex < 0))) {
       $errorRequired = !CRM_Utils_Array::value($this->_participantStatusIndex, $values);
-      if (empty($params['event_id']) && !CRM_Utils_Array::value('event_title', $params)) {
+      if (empty($params['event_id']) && empty($params['event_title'])) {
         CRM_Contact_Import_Parser_Contact::addToErrorMsg('Event', $missingField);
       }
       if (empty($params['participant_status_id'])) {
@@ -302,7 +302,7 @@ class CRM_Event_Import_Parser_Participant extends CRM_Event_Import_Parser {
       }
     }
 
-    if (!(CRM_Utils_Array::value('participant_role_id', $params) || CRM_Utils_Array::value('participant_role', $params))) {
+    if (!(!empty($params['participant_role_id']) || !empty($params['participant_role']))) {
       if (!empty($params['event_id'])) {
         $params['participant_role_id'] = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $params['event_id'], 'default_role_id');
       }

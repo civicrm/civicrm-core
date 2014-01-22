@@ -605,7 +605,7 @@ INNER JOIN   civicrm_contact contact ON ( contact.id = contrib.contact_id )
             $params['address'][1][$mapper['location'][$field]] = $info['VALUE'];
           }
           elseif (!empty($mapper['contact'][$field])) {
-            if ($newOrder && CRM_Utils_Array::value('structured-name', $newOrder['buyer-billing-address'])) {
+            if ($newOrder && !empty($newOrder['buyer-billing-address']['structured-name'])) {
               foreach ($newOrder['buyer-billing-address']['structured-name'] as $namePart => $nameValue) {
                 $params[$mapper['contact'][$namePart]] = $nameValue['VALUE'];
               }

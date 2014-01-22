@@ -105,7 +105,7 @@ class CRM_Report_Form_Extended extends CRM_Report_Form {
   }
 
   function postProcess() {
-    if (!empty($this->_aclTable) && CRM_Utils_Array::value($this->_aclTable, $this->_aliases)) {
+    if (!empty($this->_aclTable) && !empty($this->_aliases[$this->_aclTable])) {
       $this->buildACLClause($this->_aliases[$this->_aclTable]);
     }
     parent::postProcess();

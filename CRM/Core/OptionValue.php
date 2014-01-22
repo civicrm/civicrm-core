@@ -210,7 +210,7 @@ class CRM_Core_OptionValue {
     }
     $params['option_group_id'] = $optionGroupID;
 
-    if (($action & CRM_Core_Action::ADD) && !CRM_Utils_Array::value('value', $params)) {
+    if (($action & CRM_Core_Action::ADD) && empty($params['value'])) {
       $fieldValues = array('option_group_id' => $optionGroupID);
       // use the next available value
       /* CONVERT(value, DECIMAL) is used to convert varchar
@@ -226,7 +226,7 @@ class CRM_Core_OptionValue {
     }
 
     // set name to label if it's not set - but *only* for ADD action (CRM-3522)
-    if (($action & CRM_Core_Action::ADD) && !CRM_Utils_Array::value('name', $params) && $params['label']) {
+    if (($action & CRM_Core_Action::ADD) && empty($params['name']) && $params['label']) {
       $params['name'] = $params['label'];
     }
     if ($action & CRM_Core_Action::UPDATE) {

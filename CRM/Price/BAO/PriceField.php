@@ -121,8 +121,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
     for ($index = 1; $index <= $maxIndex; $index++) {
       if (array_key_exists('option_amount', $params) &&
         array_key_exists($index, $params['option_amount']) &&
-        (CRM_Utils_Array::value($index, CRM_Utils_Array::value('option_label', $params)) ||
-          CRM_Utils_Array::value('is_quick_config', $params)) &&
+        (CRM_Utils_Array::value($index, CRM_Utils_Array::value('option_label', $params)) || !empty($params['is_quick_config'])) &&
         !CRM_Utils_System::isNull($params['option_amount'][$index])
       ) {
         $options = array(
@@ -389,7 +388,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
           if (!empty($otherAmount['is_allow_other_amount']) && $field->name == 'contribution_amount') {
             $none = ts('Other Amount');
           }
-          elseif (!empty($qf->_membershipBlock) && !CRM_Utils_Array::value('is_required', $qf->_membershipBlock) && $field->name == 'membership_amount') {
+          elseif (!empty($qf->_membershipBlock) && empty($qf->_membershipBlock['is_required']) && $field->name == 'membership_amount') {
             $none = ts('No thank you');
           }
           else {

@@ -250,9 +250,7 @@ class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_
       $errors['title'] = ts("Please do not use '/' in Title");
     }
 
-    if (!empty($values['is_organization']) &&
-      !CRM_Utils_Array::value('onbehalf_profile_id', $values)
-    ) {
+    if (!empty($values['is_organization']) && empty($values['onbehalf_profile_id'])) {
       $errors['onbehalf_profile_id'] = ts('Please select a profile to collect organization information on this contribution page.');
     }
 
@@ -269,7 +267,7 @@ class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_
 
     //dont allow on behalf of save when
     //pre or post profile consists of membership fields
-    if ($contributionPageId && CRM_Utils_Array::value('is_organization', $values)) {
+    if ($contributionPageId && !empty($values['is_organization'])) {
       $ufJoinParams = array(
         'module' => 'CiviContribute',
         'entity_table' => 'civicrm_contribution_page',

@@ -100,7 +100,7 @@ class CRM_Event_Form_EventFees {
           }
         }
 
-        if ($form->_discountId && CRM_Utils_Array::value($defaults[$form->_pId]['discount_id'], $discounts)) {
+        if ($form->_discountId && !empty($discounts[$defaults[$form->_pId]['discount_id']])) {
           $form->assign('discount', $discounts[$defaults[$form->_pId]['discount_id']]);
         }
 
@@ -111,7 +111,7 @@ class CRM_Event_Form_EventFees {
     }
     else {
       $defaults[$form->_pId]['send_receipt'] = (strtotime(CRM_Utils_Array::value('start_date', $details[$form->_eventId])) >= time()) ? 1 : 0;
-      if ($form->_eventId && CRM_Utils_Array::value('confirm_email_text', $details[$form->_eventId])) {
+      if ($form->_eventId && !empty($details[$form->_eventId]['confirm_email_text'])) {
         //set receipt text
         $defaults[$form->_pId]['receipt_text'] = $details[$form->_eventId]['confirm_email_text'];
       }
@@ -199,13 +199,11 @@ class CRM_Event_Form_EventFees {
         }
       }
 
-      if ($form->_action == CRM_Core_Action::ADD && CRM_Utils_Array::value('fields', $form->_priceSet)) {
+      if ($form->_action == CRM_Core_Action::ADD && !empty($form->_priceSet['fields'])) {
         foreach ($form->_priceSet['fields'] as $key => $val) {
           foreach ($val['options'] as $keys => $values) {
             if ($values['is_default']) {
-              if (get_class($form) != 'CRM_Event_Form_Participant' &&
-                CRM_Utils_Array::value('is_full', $values)
-              ) {
+              if (get_class($form) != 'CRM_Event_Form_Participant' && !empty($values['is_full'])) {
                 continue;
               }
 

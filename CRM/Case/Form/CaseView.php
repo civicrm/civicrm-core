@@ -488,9 +488,7 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
     $session = CRM_Core_Session::singleton();
     $session->pushUserContext($url);
 
-    if (!empty($params['timeline_id']) &&
-      CRM_Utils_Array::value('_qf_CaseView_next', $_POST)
-    ) {
+    if (!empty($params['timeline_id']) && !empty($_POST['_qf_CaseView_next'])) {
       $session            = CRM_Core_Session::singleton();
       $this->_uid         = $session->get('userID');
       $xmlProcessor       = new CRM_Case_XMLProcessor_Process();
