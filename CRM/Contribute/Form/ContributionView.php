@@ -70,18 +70,6 @@ class CRM_Contribute_Form_ContributionView extends CRM_Core_Form {
       }
     }
 
-    if (!empty($values['honor_contact_id'])) {
-      $sql    = "SELECT display_name FROM civicrm_contact WHERE id = %1";
-      $params = array(1 => array($values['honor_contact_id'], 'Integer'));
-      $dao    = CRM_Core_DAO::executeQuery($sql, $params);
-      if ($dao->fetch()) {
-        $url = CRM_Utils_System::url('civicrm/contact/view', "reset=1&cid=$values[honor_contact_id]");
-        $values['honor_display'] = "<A href = $url>" . $dao->display_name . "</A>";
-      }
-      $honor = CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution', 'honor_type_id');
-      $values['honor_type'] = CRM_Utils_Array::value(CRM_Utils_Array::value('honor_type_id', $values), $honor);
-    }
-
     if (!empty($values['contribution_recur_id'])) {
       $sql    = "SELECT  installments, frequency_interval, frequency_unit FROM civicrm_contribution_recur WHERE id = %1";
       $params = array(1 => array($values['contribution_recur_id'], 'Integer'));

@@ -175,12 +175,6 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Core_Form {
 
     $this->assign('isOnline', $this->_online ? TRUE : FALSE);
 
-    //unset the honor type id:when delete the honor_contact_id
-    //and edit the contribution, honoree infomation pane open
-    //since honor_type_id is present
-    if (empty($values['honor_contact_id'])) {
-      unset($values['honor_type_id']);
-    }
     //to get note id
     $daoNote = new CRM_Core_BAO_Note();
     $daoNote->entity_table = 'civicrm_contribution';

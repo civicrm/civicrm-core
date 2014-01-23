@@ -41,48 +41,11 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
    * @static
    */
   static $_links = NULL;
-  static $_honorLinks = NULL;
   static $_recurLinks = NULL;
   public $_permission = NULL;
   public $_contactId = NULL;
   public $_crid = NULL;
 
-  /**
-   * This method returns the links that are given for honor search row.
-   * currently the links added for each row are
-   *
-   * - View
-   * - Edit
-   *
-   * @return array
-   * @access public
-   *
-   */
-  static function &honorLinks() {
-    if (!(self::$_honorLinks)) {
-      self::$_honorLinks = array(
-        CRM_Core_Action::VIEW => array(
-          'name' => ts('View'),
-          'url' => 'civicrm/contact/view/contribution',
-          'qs' => 'reset=1&id=%%id%%&cid=%%cid%%&honorId=%%honorId%%&action=view&context=%%cxt%%&selectedChild=contribute',
-          'title' => ts('View Contribution'),
-        ),
-        CRM_Core_Action::UPDATE => array(
-          'name' => ts('Edit'),
-          'url' => 'civicrm/contact/view/contribution',
-          'qs' => 'reset=1&action=update&id=%%id%%&cid=%%cid%%&honorId=%%honorId%%&context=%%cxt%%&subType=%%contributionType%%',
-          'title' => ts('Edit Contribution'),
-        ),
-        CRM_Core_Action::DELETE => array(
-          'name' => ts('Delete'),
-          'url' => 'civicrm/contact/view/contribution',
-          'qs' => 'reset=1&action=delete&id=%%id%%&cid=%%cid%%&honorId=%%honorId%%&context=%%cxt%%',
-          'title' => ts('Delete Contribution'),
-        ),
-      );
-    }
-    return self::$_honorLinks;
-  }
   //end of function
 
   /**
@@ -207,38 +170,6 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
       $this->assign('action', $this->_action);
       $this->assign('recurRows', $params);
       $this->assign('recur', TRUE);
-    }
-
-    //add honor block
-    // form all action links
-    $action = array_sum(array_keys($this->honorLinks()));
-
-    $params = array();
-    $params = CRM_Contribute_BAO_Contribution::getHonorContacts($this->_contactId);
-    if (!empty($params)) {
-      foreach ($params as $ids => $honorId) {
-        $params[$ids]['action'] = CRM_Core_Action::formLink(
-          self::honorLinks(),
-          $action,
-          array(
-            'cid' => $honorId['honorId'],
-            'id' => $ids,
-            'cxt' => 'contribution',
-            'contributionType' => $honorId['type_id'],
-            'honorId' => $this->_contactId,
-          ),
-          ts('more'),
-          FALSE,
-          'contribution.selector.honoree',
-          'Contribution',
-          $ids
-        );
-      }
-
-      // assign vars to templates
-      $this->assign('action', $this->_action);
-      $this->assign('honorRows', $params);
-      $this->assign('honor', TRUE);
     }
 
     //enable/disable soft credit records for test contribution
@@ -410,17 +341,8 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
         break;
 
       case 'contribution':
-        $honorId = CRM_Utils_Request::retrieve('honorId', 'Positive', $this, FALSE);
-
-        if ($honorId) {
-          $cid = $honorId;
-        }
-        else {
-          $cid = $this->_contactId;
-        }
-
         $url = CRM_Utils_System::url('civicrm/contact/view',
-          "reset=1&force=1&cid={$cid}&selectedChild=contribute"
+          "reset=1&force=1&cid={$this->_contactId}&selectedChild=contribute"
         );
         break;
 
