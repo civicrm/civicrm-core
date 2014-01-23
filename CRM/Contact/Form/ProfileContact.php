@@ -85,7 +85,7 @@ class CRM_Contact_Form_ProfileContact {
     $ufGroup = new CRM_Core_DAO_UFGroup();
     $ufGroup->id = $form->_honoreeProfileId;
     if (!$ufGroup->find(TRUE)) {
-      CRM_Core_Error::fatal(ts('Chosen honoree profile is for this contribution is disabled'));
+      CRM_Core_Error::fatal(ts('Chosen honoree profile for this contribution is disabled'));
     }
 
     $prefix = 'honor';
@@ -124,9 +124,9 @@ class CRM_Contact_Form_ProfileContact {
       }
 
       $honorId = CRM_Contact_BAO_Contact::createProfileContact(
-      $params['honor'], CRM_Core_DAO::$_nullArray,
-      $honorId, NULL,
-      $params['honoree_profile_id']
+        $params['honor'], CRM_Core_DAO::$_nullArray,
+        $honorId, NULL,
+        $params['honoree_profile_id']
       );
       $softParams = array();
       $softParams['contribution_id'] = $form->_contributionID;
