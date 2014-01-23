@@ -27,8 +27,11 @@
   {include file="CRM/Contribute/Form/AdditionalInfo/$formType.tpl"}
 {else}
 
+{if $paymentType eq 'refund'}
+<h3>{ts}New Event Refund{/ts}</h3>
+{else}
 <h3>{if $component eq 'event'}{if $contributionMode}{ts}Credit Card Event Payment{/ts}{else}{ts}New Event Payement{/ts}{/if}{/if}</h3>
-
+{/if}
 <div class="crm-block crm-form-block crm-payment-form-block">
 
   {if $contributionMode == 'test'}
@@ -48,7 +51,9 @@
       {if $contactId}
         {capture assign=ccModeLink}{crmURL p='civicrm/payment/add' q="reset=1&action=add&cid=`$contactId`&id=`$id`&component=`$component`&mode=live"}{/capture}
        {/if}
-      <span class="action-link crm-link-credit-card-mode">&nbsp;<a href="{$ccModeLink}">&raquo; {ts}submit credit card payment{/ts}</a>
+      {if $paymentType eq 'owed'}
+        <span class="action-link crm-link-credit-card-mode">&nbsp;<a href="{$ccModeLink}">&raquo; {ts}submit credit card payment{/ts}</a>
+      {/if}
     {/if}
   </div>
   <table class="form-layout-compressed">    

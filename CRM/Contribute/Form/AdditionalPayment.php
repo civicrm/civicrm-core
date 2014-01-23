@@ -99,9 +99,14 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
       CRM_Core_Error::fatal(ts('No payment information found for this record'));
     }
 
-    list($this->_contributorDisplayName, $this->_contributorEmail) = CRM_Contact_BAO_Contact_Location::getEmailDetails($this->_contactId);
     //set the payment mode - _mode property is defined in parent class
     $this->_mode = CRM_Utils_Request::retrieve('mode', 'String', $this);
+
+    if (!empty($this->_mode) && $this->_paymentType == 'refund') {
+      CRM_Core_Error::fatal(ts('Credit card payment is not for Refund payments use'));
+    }
+
+    list($this->_contributorDisplayName, $this->_contributorEmail) = CRM_Contact_BAO_Contact_Location::getEmailDetails($this->_contactId);
 
     $this->assignProcessors();
 
@@ -114,7 +119,7 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
     $this->assign('component', $this->_component);
     $this->assign('id', $this->_id);
     $this->assign('paymentType', $this->_paymentType);
-    $this->assign('paymentAmt', $paymentAmt);
+    $this->assign('paymentAmt', abs($paymentAmt));
 
     $this->_paymentProcessor = array('billing_mode' => 1);
 
@@ -297,7 +302,7 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
     if ($self->_paymentType == 'owed' && $fields['total_amount'] > $self->_owed) {
       $errors['total_amount'] = ts('Payment amount cannot be greater than owed amount');
     }
-    if ($self->_paymentType == 'refund' && $fields['total_amount'] != $self->_refund) {
+    if ($self->_paymentType == 'refund' && $fields['total_amount'] != abs($self->_refund)) {
       $errors['total_amount'] = ts('Refund amount should not differ');
     }
     $netAmt = $fields['total_amount'] - $fields['fee_amount'];
