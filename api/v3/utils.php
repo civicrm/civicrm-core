@@ -253,7 +253,13 @@ function civicrm_api3_create_success($values = 1, $params = array(
   else {
     $result['values'] = $values;
   }
-
+  if(!empty($params['options']) && !empty($params['options']['metadata'])) {
+    // we've made metadata an array but only supporting labels atm
+    if(in_array('fields', $params['options']['metadata'])) {
+      $fields = civicrm_api3($entity, 'getfields', array('action' => $action));
+      $result['metadata']['fields'] = $fields['values'];
+    }
+  }
   return array_merge($result, $extraReturnValues);
 }
 
@@ -967,7 +973,7 @@ function _civicrm_api3_basic_get($bao_name, &$params, $returnAsSuccess = TRUE, $
   $bao = new $bao_name();
   _civicrm_api3_dao_set_filter($bao, $params, TRUE,$entity);
   if ($returnAsSuccess) {
-      return civicrm_api3_create_success(_civicrm_api3_dao_to_array($bao, $params, FALSE, $entity), $params, $entity);
+      return civicrm_api3_create_success(_civicrm_api3_dao_to_array($bao, $params, FALSE, $entity), $params, $entity, 'get');
   }
   else {
     return _civicrm_api3_dao_to_array($bao, $params, FALSE, $entity);
