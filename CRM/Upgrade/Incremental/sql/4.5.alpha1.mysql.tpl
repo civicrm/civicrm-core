@@ -129,11 +129,12 @@ VALUES
 SELECT @uf_group_id_honoree_individual := max(id) from civicrm_uf_group where name = 'honoree_individual';
 
 INSERT INTO `civicrm_uf_field`
-      (`uf_group_id`, `field_name`, `is_required`, `is_reserved`, `weight`, `visibility`, `in_selector`, `is_searchable`, {localize field='label'}`label`{/localize}, field_type)
+      (`uf_group_id`, `field_name`, `is_required`, `is_reserved`, `weight`, `visibility`, `in_selector`, `is_searchable`, `location_type_id`, {localize field='label'}`label`{/localize}, field_type)
 VALUES
-      (@uf_group_id_honoree_individual, 'prefix_id',  0, 1, 1, 'User and User Admin Only', 0, 1, '{ts escape="sql"}Individual Prefix{/ts}', 'Individual'),
-      (@uf_group_id_honoree_individual, 'first_name', 0, 1, 2, 'User and User Admin Only', 0, 1, '{ts escape="sql"}First Name{/ts}',        'Individual'),
-      (@uf_group_id_honoree_individual, 'last_name',  0, 1, 3, 'User and User Admin Only', 0, 1, '{ts escape="sql"}Last Name{/ts}',         'Individual');
+      (@uf_group_id_honoree_individual, 'prefix_id',  0, 1, 1, 'User and User Admin Only', 0, 1, NULL, '{ts escape="sql"}Individual Prefix{/ts}', 'Individual'),
+      (@uf_group_id_honoree_individual, 'first_name', 0, 1, 2, 'User and User Admin Only', 0, 1, NULL, '{ts escape="sql"}First Name{/ts}',        'Individual'),
+      (@uf_group_id_honoree_individual, 'last_name',  0, 1, 3, 'User and User Admin Only', 0, 1, NULL, '{ts escape="sql"}Last Name{/ts}',         'Individual')
+      (@uf_group_id_honoree_individual, 'email',      0, 1, 4, 'User and User Admin Only', 0, 1, 1,    '{ts escape="sql"}Email Address{/ts}',     'Individual');
 
 ALTER TABLE `civicrm_uf_join`
   ADD COLUMN `module_data` varchar(255) COMMENT 'Json serialized array of data used by the ufjoin.module';

@@ -665,14 +665,6 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
       }
 
       $paymentParams['contactID'] = $this->_contributorContactID;
-      //CRM-10377 if payment is by an alternate contact then we need to set that person
-      // as the contact in the payment params
-      if ($this->_contributorContactID != $this->_contactID) {
-        if (CRM_Utils_Array::value('honor_type_id', $this->_params)) {
-          $paymentParams['honor_contact_id'] = $this->_contactID;
-          $paymentParams['honor_type_id'] = $this->_params['honor_type_id'];
-        }
-      }
 
       CRM_Core_Payment_Form::mapParams($this->_bltID, $this->_params, $paymentParams, TRUE);
 

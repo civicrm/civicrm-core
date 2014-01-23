@@ -54,6 +54,7 @@ class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_
    */
   function setDefaultValues() {
     $defaults = parent::setDefaultValues();
+    $soft_credit_types = CRM_Core_OptionGroup::values('soft_credit_type', TRUE, FALSE, FALSE, NULL, 'name');
 
     if ($this->_id) {
       $title = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_ContributionPage',
@@ -87,13 +88,29 @@ class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_
           }
         }
       }
+      else {
+        $ufGroupDAO = new CRM_Core_DAO_UFGroup();
+        $ufGroupDAO->name = 'honoree_individual';
+        if ($ufGroupDAO->find(TRUE)) {
+          $defaults['honoree_profile'] = $ufGroupDAO->id;
+        }
+        $defaults['soft_credit_types'] = array(
+          CRM_Utils_Array::value('in_honor_of', $soft_credit_types),
+          CRM_Utils_Array::value('in_memory_of', $soft_credit_types)
+        );
+      }
     }
     else {
       CRM_Utils_System::setTitle(ts('Title and Settings'));
-    }
-
-    if (!CRM_Utils_Array::value('soft_credit_types', $defaults)) {
-      $defaults['soft_credit_types'] = array(1, 2);
+      $ufGroupDAO = new CRM_Core_DAO_UFGroup();
+      $ufGroupDAO->name = 'honoree_individual';
+      if ($ufGroupDAO->find(TRUE)) {
+        $defaults['honoree_profile'] = $ufGroupDAO->id;
+      }
+      $defaults['soft_credit_types'] = array(
+        CRM_Utils_Array::value('in_honor_of', $soft_credit_types),
+        CRM_Utils_Array::value('in_memory_of', $soft_credit_types)
+      );
     }
 
     return $defaults;

@@ -195,8 +195,10 @@ class CRM_Core_Payment_BaseIPN {
       $this->addrecurLineItems($objects['contributionRecur']->id, $contribution->id, CRM_Core_DAO::$_nullArray);
     }
 
+    //add new soft credit against current contribution id and
     //copy initial contribution custom fields for recurring contributions
     if (CRM_Utils_Array::value('contributionRecur', $objects) && $objects['contributionRecur']->id) {
+      $this->addrecurSoftCredit($objects['contributionRecur']->id, $contribution->id);
       $this->copyCustomValues($objects['contributionRecur']->id, $contribution->id);
     }
 
@@ -266,8 +268,10 @@ class CRM_Core_Payment_BaseIPN {
       $this->addrecurLineItems($objects['contributionRecur']->id, $contribution->id, CRM_Core_DAO::$_nullArray);
     }
 
+    //add new soft credit against current $contribution and
     //copy initial contribution custom fields for recurring contributions
     if (CRM_Utils_Array::value('contributionRecur', $objects) && $objects['contributionRecur']->id) {
+      $this->addrecurSoftCredit($objects['contributionRecur']->id, $contribution->id);
       $this->copyCustomValues($objects['contributionRecur']->id, $contribution->id);
     }
 
@@ -517,6 +521,11 @@ LIMIT 1;";
       $input['prevContribution'] = CRM_Contribute_BAO_Contribution::getValues($contributionId, CRM_Core_DAO::$_nullArray, CRM_Core_DAO::$_nullArray);
     }
     $contribution->save();
+
+    //add new soft credit against current $contribution and
+    if (CRM_Utils_Array::value('contributionRecur', $objects) && $objects['contributionRecur']->id) {
+      $this->addrecurSoftCredit($objects['contributionRecur']->id, $contribution->id);
+    }
 
     //add lineitems for recurring payments
     if (CRM_Utils_Array::value('contributionRecur', $objects) && $objects['contributionRecur']->id && $addLineItems) {
@@ -890,6 +899,22 @@ LIMIT 1;";
           $dao             = CRM_Core_DAO::executeQuery($query, CRM_Core_DAO::$_nullArray);
         }
       }
+    }
+  }
+
+  // function to copy soft credit record of first recurring contribution
+  // and add new soft credit against $targetContributionId
+  function addrecurSoftCredit($recurId, $targetContributionId) {
+    $contriID = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $recurId, 'id', 'contribution_recur_id');
+
+    $soft_contribution = new CRM_Contribute_DAO_ContributionSoft();
+    $soft_contribution->contribution_id = $contriID;
+
+    //check if first recurring contribution has any associated soft credit
+    if ($soft_contribution->find(TRUE)) {
+      $soft_contribution->contribution_id = $targetContributionId;
+      unset($soft_contribution->id);
+      $soft_contribution->save();
     }
   }
 }
