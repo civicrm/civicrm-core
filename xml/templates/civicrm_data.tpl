@@ -1357,8 +1357,8 @@ INSERT INTO civicrm_uf_group
     (9,  'on_behalf_organization', 'Contact,Organization','{ts escape="sql"}On Behalf Of Organization{/ts}',  0,      1,           NULL),
     (10, 'contribution_batch_entry', 'Contribution', '{ts escape="sql"}Contribution Bulk Entry{/ts}' ,       0,      1,           NULL),
     (11, 'membership_batch_entry', 'Membership',     '{ts escape="sql"}Membership Bulk Entry{/ts}' ,         0,      1,           NULL),
-    (12, 'event_registration', 'Individual, Contact', '{ts escape="sql"}Your Registration Info{/ts}',         0,      0,           NULL),
-    (13, 'honoree_individual', 'Individual, Contact', '{ts escape="sql"}Honoree Individual{/ts}',             0,      1,           NULL);
+    (12, 'event_registration', 'Individual,Contact', '{ts escape="sql"}Your Registration Info{/ts}',         0,      0,           NULL),
+    (13, 'honoree_individual', 'Individual,Contact', '{ts escape="sql"}Honoree Individual{/ts}',             0,      1,           NULL);
 
 
 INSERT INTO civicrm_uf_join

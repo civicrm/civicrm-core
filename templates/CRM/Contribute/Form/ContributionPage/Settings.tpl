@@ -135,8 +135,15 @@
   </tr>
   <tr class="crm-contribution-contributionpage-settings-form-block-honor_soft_credit_types">
       <td class="label">
-          <a class="optionvalue-link" href="#"><span class="batch-edit"></span></a>
-          {$form.soft_credit_types.label}</td><td>{$form.soft_credit_types.html}
+          {$form.soft_credit_types.label}
+      </td>
+      <td>
+          <dt style="text-align:left;">{$form.soft_credit_types.html}</dt>
+          <dd>
+              <a class="optionvalue-link" href="#" title='Click to edit available soft credit types'>
+                  <span class="batch-edit"></span>
+              </a>
+          </dd>
       </td>
   </tr>
   <tr class="crm-contribution-contributionpage-custom-form-block-custom_pre_id">

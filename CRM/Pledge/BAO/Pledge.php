@@ -447,26 +447,36 @@ GROUP BY  currency
    */
   static function getHonorContacts($honorId) {
     $params = array();
-    $honorDAO = new CRM_Pledge_DAO_Pledge();
-    $honorDAO->honor_contact_id = $honorId;
+    $honorDAO = new CRM_Contribute_DAO_ContributionSoft();
+    $honorDAO->contact_id = $honorId;
     $honorDAO->find();
 
     //get all status.
     while ($honorDAO->fetch()) {
-      $params[$honorDAO->id] = array(
-        'honorId' => $honorDAO->contact_id,
-        'amount' => $honorDAO->amount,
-        'status' => CRM_Contribute_PseudoConstant::contributionStatus($honorDAO->status_id),
-        'create_date' => $honorDAO->create_date,
-        'acknowledge_date' => $honorDAO->acknowledge_date,
-        'type' => CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialType',
-          $honorDAO->financial_type_id, 'name'
-        ),
-        'display_name' => CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact',
-          $honorDAO->contact_id, 'display_name'
-        ),
-      );
+      $pledgePaymentDAO = new CRM_Pledge_DAO_PledgePayment();
+      $pledgePaymentDAO->contribution_id = $honorDAO->contribution_id;
+      if ($pledgePaymentDAO->find(TRUE)) {
+        $pledgeDAO = new CRM_Pledge_DAO_Pledge();
+        $pledgeDAO->id = $pledgePaymentDAO->pledge_id;
+        if ($pledgeDAO->find(TRUE)) {
+          $params[$pledgeDAO->id] = array(
+            'honor_type' => CRM_Core_OptionGroup::getLabel('soft_credit_type', $honorDAO->soft_credit_type_id, 'value'),
+            'honorId' => $pledgeDAO->contact_id,
+            'amount' => $pledgeDAO->amount,
+            'status' => CRM_Contribute_PseudoConstant::contributionStatus($pledgeDAO->status_id),
+            'create_date' => $pledgeDAO->create_date,
+            'acknowledge_date' => $pledgeDAO->acknowledge_date,
+            'type' => CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialType',
+              $pledgeDAO->financial_type_id, 'name'
+            ),
+            'display_name' => CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact',
+              $pledgeDAO->contact_id, 'display_name'
+            ),
+          );
+        }
+      }
     }
+
     return $params;
   }
 
