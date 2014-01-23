@@ -94,7 +94,7 @@ class CRM_Campaign_Form_Survey_Questions extends CRM_Campaign_Form_Survey {
       'ActivityType' => array($subTypeId),
     );
     $entities = array(
-      array('entity_name' => 'contact_1', 'entity_type' => 'IndividualModel'),
+      array('entity_name' => 'individual_1', 'entity_type' => 'IndividualModel'),
       array('entity_name' => 'activity_1', 'entity_type' => 'ActivityModel', 'entity_sub_type' => $subTypeId),
     );
     $this->addProfileSelector('contact_profile_id', ts('Contact Info'), $allowCoreTypes, $allowSubTypes, $entities);
