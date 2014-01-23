@@ -1882,6 +1882,8 @@ WHERE (li.entity_table = 'civicrm_participant' AND li.entity_id = {$participantI
       );
       $setId = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', 'default_contribution_amount', 'id', 'name');
       CRM_Price_BAO_LineItem::getLineItemArray($adjustPaymentLineParams);
+      $financialItemStatus = CRM_Core_PseudoConstant::get('CRM_Financial_DAO_FinancialItem', 'status_id');
+
       $defaultPriceSet = current(CRM_Price_BAO_PriceSet::getSetDetail($setId));
       $fieldID = key($defaultPriceSet['fields']);
       $adjustPaymentLineParams['line_item'][$setId][$fieldID]['entity_id'] = $updatedContribution->id;
@@ -1891,11 +1893,8 @@ WHERE (li.entity_table = 'civicrm_participant' AND li.entity_id = {$participantI
       // record financial item
       $financialItemStatus = CRM_Core_PseudoConstant::get('CRM_Financial_DAO_FinancialItem', 'status_id');
       $itemStatus = NULL;
-      if ($updatedContribution->contribution_status_id == array_search('Completed', $contributionStatuses)) {
+      if ($updatedContribution->contribution_status_id == array_search('Pending refund', $contributionStatuses)) {
         $itemStatus = array_search('Paid', $financialItemStatus);
-      }
-      elseif ($updatedContribution->contribution_status_id == array_search('Pending', $contributionStatuses)) {
-        $itemStatus = array_search('Unpaid', $financialItemStatus);
       }
       elseif ($updatedContribution->contribution_status_id == array_search('Partially paid', $contributionStatuses)) {
         $itemStatus = array_search('Partially paid', $financialItemStatus);
@@ -1913,7 +1912,7 @@ WHERE (li.entity_table = 'civicrm_participant' AND li.entity_id = {$participantI
       );
       CRM_Financial_BAO_FinancialItem::create($params, NULL, array('id' => $adjustedTrxn->id));
     }
-    //activity creation
+    //activity creation$contributionStatuses
     self::addActivityForSelection($participantId, 'Change Registration');
   }
 
