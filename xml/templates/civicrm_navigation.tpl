@@ -606,7 +606,7 @@ VALUES
     ( @domainID, 'http://documentation.civicrm.org',   '{ts escape="sql" skip="true"}Documentation{/ts}',      'Documentation',    NULL, 'AND', @adminHelplastID, '1', NULL, 1 ),
     ( @domainID, 'http://forum.civicrm.org',           '{ts escape="sql" skip="true"}Community Forums{/ts}',   'Community Forums', NULL, 'AND', @adminHelplastID, '1', NULL, 2 ),
     ( @domainID, 'http://civicrm.org/participate',     '{ts escape="sql" skip="true"}Participate{/ts}',        'Participate',      NULL, 'AND', @adminHelplastID, '1', NULL, 3 ),
-    ( @domainID, 'http://civicrm.org/aboutcivicrm',    '{ts escape="sql" skip="true"}About{/ts}',              'About',            NULL, 'AND', @adminHelplastID, '1', NULL, 4 );
+    ( @domainID, 'http://civicrm.org/what/whatiscivicrm', '{ts escape="sql" skip="true"}About{/ts}',              'About',            NULL, 'AND', @adminHelplastID, '1', NULL, 4 );
 
 INSERT INTO civicrm_navigation
     ( domain_id, url, label, name, permission, permission_operator, parent_id, is_active, has_separator, weight )
