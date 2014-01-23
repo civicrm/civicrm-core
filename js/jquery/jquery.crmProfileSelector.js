@@ -14,11 +14,11 @@
    * ...
    * cj('.crm-profile-selector').crmProfileSelector({
    *   groupTypeFilter: "Contact,Individual,Activity;;ActivityType:7",
-   *   entities: "contact_1:IndividualModel,activity_1:ActivityModel"
+   *   entities: "individual_1:IndividualModel,activity_1:ActivityModel"
    * });
    *
    * Note: The system does not currently support dynamic entities -- it only supports
-   * a couple of entities named "contact_1" and "activity_1". See also
+   * a couple of entities named "individual_1" and "activity_1". See also
    * CRM.UF.guessEntityName().
    */
   $.fn.crmProfileSelector = function(options) {

@@ -222,7 +222,7 @@ class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_
     );
 
     $entities = array(
-      array('entity_name' => 'contact_1',
+      array('entity_name' => 'individual_1',
         'entity_type' => 'IndividualModel'
       ),
       array('entity_name' => 'organization_1',
