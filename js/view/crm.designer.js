@@ -325,9 +325,13 @@
 
       paletteView.model.getRel('ufEntityCollection').each(function(ufEntityModel){
         _.each(ufEntityModel.getSections(), function(section, sectionKey){
+          var defaultValue = paletteView.selectedContactType;
+          if (!defaultValue) {
+            defaultValue = paletteView.model.getUFGroupModel();
+          }
 
           // set selected option as default, since we are rebuilding palette
-          paletteView.$('.crm-contact-types').val(ufEntityModel.attributes.entity_type).prop('selected','selected');
+          paletteView.$('.crm-contact-types').val(defaultValue).prop('selected','selected');
 
           var entitySection = ufEntityModel.get('entity_name') + '-' + sectionKey;
           var items = [];
@@ -403,6 +407,7 @@
       $('.crm-designer-palette-tree').jstree("search", $(event.target).val());
     },
     doSetPaletteEntity: function(event) {
+      this.selectedContactType = $('.crm-contact-types :selected').val();
       // loop through entity collection and remove non-valid entity section's
       var newUfEntityModels = [];
       this.model.getRel('ufEntityCollection').each(function(oldUfEntityModel){
