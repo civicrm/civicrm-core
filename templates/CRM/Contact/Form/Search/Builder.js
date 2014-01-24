@@ -171,30 +171,32 @@
 
   // Initialize display: Hide empty blocks & fields
   var newBlock = CRM.searchBuilder && CRM.searchBuilder.newBlock || 0;
-  $('.crm-search-block', '#Builder').each(function(blockNo) {
-    var block = $(this);
-    var empty = blockNo + 1 > newBlock;
-    var skippedRow = false;
-    $('tr:not(.crm-search-builder-add-row)', block).each(function(rowNo) {
-      var row = $(this);
-      if ($('select:first', row).val() === '') {
-        if (!skippedRow && (rowNo == 0 || blockNo + 1 == newBlock)) {
-          skippedRow = true;
+  function initialize() {
+    $('.crm-search-block', '#Builder').each(function(blockNo) {
+      var block = $(this);
+      var empty = blockNo + 1 > newBlock;
+      var skippedRow = false;
+      $('tr:not(.crm-search-builder-add-row)', block).each(function(rowNo) {
+        var row = $(this);
+        if ($('select:first', row).val() === '') {
+          if (!skippedRow && (rowNo == 0 || blockNo + 1 == newBlock)) {
+            skippedRow = true;
+          }
+          else {
+            row.hide();
+          }
         }
         else {
-          row.hide();
+          empty = false;
         }
-      }
-      else {
-        empty = false;
+      });
+      if (empty) {
+        block.hide();
       }
     });
-    if (empty) {
-      block.hide();
-    }
-  });
+  }
 
-  $('#Builder')
+  $('#crm-main-content-wrapper')
     // Reset and hide row
     .on('click', '.crm-reset-builder-row', function() {
       var row = $(this).closest('tr');
@@ -235,9 +237,13 @@
       }
       $(this).siblings('input').val(value);
     })
-  ;
+    .on('crmLoad', function() {
+      initialize();
+      $('select[id^=mapper][id$="_1"]', '#Builder').each(handleUserInputField);
+    });
 
   $().crmAccordions();
+  initialize();
 
   // Fetch initial options during page refresh - it's more efficient to bundle them in a single ajax request
   var initialFields = {}, fetchFields = false;

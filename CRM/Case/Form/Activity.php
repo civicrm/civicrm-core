@@ -321,7 +321,7 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
 
       $this->addGroup($checkBoxes, 'contact_check');
       $this->addElement('checkbox', 'toggleSelect', NULL, NULL,
-        array('onclick' => "return toggleCheckboxVals('contact_check',this);")
+        array('class' => 'select-rows')
       );
       $this->assign('searchRows', $this->_relatedContacts);
     }

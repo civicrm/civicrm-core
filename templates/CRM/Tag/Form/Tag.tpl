@@ -141,10 +141,3 @@
   <br />
 {include file="CRM/common/Tag.tpl" context="contactTab"}
 </div>
-
-{if $action eq 1 or $action eq 2 }
-<script type="text/javascript">
-  {* this function is called to change the color of selected row(s) *}
-  on_load_init_check("{$form.formName}");
-</script>
-{/if}

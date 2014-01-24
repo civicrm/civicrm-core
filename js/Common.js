@@ -172,202 +172,6 @@ function showHideByValue(trigger_field_id, trigger_value, target_element_id, tar
 }
 
 /**
- *
- * Function for checking ALL or unchecking ALL check boxes in a resultset page.
- *
- * @access public
- * @param fldPrefix - common string which precedes unique checkbox ID and identifies field as
- *                    belonging to the resultset's checkbox collection
- * @param object - checkbox
- * Sample usage: onClick="javascript:changeCheckboxValues('chk_', cj(this) );"
- *
- * @return
- */
-function toggleCheckboxVals(fldPrefix, object) {
-  var val = (object.id == 'toggleSelect' && cj(object).is(':checked'));
-  cj('Input[id*="' + fldPrefix + '"],Input[id*="toggleSelect"]').prop('checked', val);
-  // change the class of selected rows
-  on_load_init_checkboxes(object.form.name);
-}
-
-function countSelectedCheckboxes(fldPrefix, form) {
-  fieldCount = 0;
-  for (i = 0; i < form.elements.length; i++) {
-    fpLen = fldPrefix.length;
-    if (form.elements[i].type == 'checkbox' && form.elements[i].name.slice(0, fpLen) == fldPrefix && form.elements[i].checked == true) {
-      fieldCount++;
-    }
-  }
-  return fieldCount;
-}
-
-/**
- * Function to enable task action select
- */
-function toggleTaskAction(status) {
-  var radio_ts = document.getElementsByName('radio_ts');
-  if (!radio_ts[1]) {
-    radio_ts[0].checked = true;
-  }
-  if (radio_ts[0].checked || radio_ts[1].checked) {
-    status = true;
-  }
-
-  var formElements = ['task', 'Go', 'Print'];
-  for (var i = 0; i < formElements.length; i++) {
-    var element = document.getElementById(formElements[i]);
-    if (element) {
-      if (status) {
-        element.disabled = false;
-      }
-      else {
-        element.disabled = true;
-      }
-    }
-  }
-}
-
-/**
- * This function is used to check if any actio is selected and also to check if any contacts are checked.
- *
- * @access public
- * @param fldPrefix - common string which precedes unique checkbox ID and identifies field as
- *                    belonging to the resultset's checkbox collection
- * @param form - name of form that checkboxes are part of
- * Sample usage: onClick="javascript:checkPerformAction('chk_', myForm );"
- *
- */
-function checkPerformAction(fldPrefix, form, taskButton, selection) {
-  var cnt;
-  var gotTask = 0;
-
-  // taskButton TRUE means we don't need to check the 'task' field - it's a button-driven task
-  if (taskButton == 1) {
-    gotTask = 1;
-  }
-  else {
-    if (document.forms[form].task.selectedIndex) {
-      //force user to select all search contacts, CRM-3711
-      if (document.forms[form].task.value == 13 || document.forms[form].task.value == 14) {
-        var toggleSelect = document.getElementsByName('toggleSelect');
-        if (toggleSelect[0].checked || document.forms[form].radio_ts[0].checked) {
-          return true;
-        }
-        else {
-          alert("Please select all contacts for this action.\n\nTo use the entire set of search results, click the 'all records' radio button.");
-          return false;
-        }
-      }
-      gotTask = 1;
-    }
-  }
-
-  if (gotTask == 1) {
-    // If user wants to perform action on ALL records and we have a task, return (no need to check further)
-    if (document.forms[form].radio_ts[0].checked) {
-      return true;
-    }
-
-    cnt = (selection == 1) ? countSelections() : countSelectedCheckboxes(fldPrefix, document.forms[form]);
-    if (!cnt) {
-      alert("Please select one or more contacts for this action.\n\nTo use the entire set of search results, click the 'all records' radio button.");
-      return false;
-    }
-  }
-  else {
-    alert("Please select an action from the drop-down menu.");
-    return false;
-  }
-}
-
-/**
- * This function changes the style for a checkbox block when it is selected.
- *
- * @access public
- * @param chkName - it is name of the checkbox
- * @return null
- */
-function checkSelectedBox(chkName) {
-  var checkElement = cj('#' + chkName);
-  if (checkElement.prop('checked')) {
-    cj('input[value=ts_sel]:radio').prop('checked', true);
-    checkElement.parents('tr').addClass('crm-row-selected');
-  }
-  else {
-    checkElement.parents('tr').removeClass('crm-row-selected');
-  }
-}
-
-/**
- * This function is to show the row with  selected checkbox in different color
- * @param form - name of form that checkboxes are part of
- *
- * @access public
- * @return null
- */
-function on_load_init_checkboxes(form) {
-  var formName = form;
-  var fldPrefix = 'mark_x';
-  for (i = 0; i < document.forms[formName].elements.length; i++) {
-    fpLen = fldPrefix.length;
-    if (document.forms[formName].elements[i].type == 'checkbox' && document.forms[formName].elements[i].name.slice(0, fpLen) == fldPrefix) {
-      checkSelectedBox(document.forms[formName].elements[i].name, formName);
-    }
-  }
-}
-
-/**
- * Function to change the color of the class
- *
- * @param form - name of the form
- * @param rowid - id of the <tr>, <div> you want to change
- *
- * @access public
- * @return null
- */
-function changeRowColor(rowid, form) {
-  switch (document.getElementById(rowid).className) {
-    case 'even-row'          :
-      document.getElementById(rowid).className = 'selected even-row';
-      break;
-    case 'odd-row'           :
-      document.getElementById(rowid).className = 'selected odd-row';
-      break;
-    case 'selected even-row' :
-      document.getElementById(rowid).className = 'even-row';
-      break;
-    case 'selected odd-row'  :
-      document.getElementById(rowid).className = 'odd-row';
-      break;
-    case 'form-item'         :
-      document.getElementById(rowid).className = 'selected';
-      break;
-    case 'selected'          :
-      document.getElementById(rowid).className = 'form-item';
-  }
-}
-
-/**
- * This function is to show the row with  selected checkbox in different color
- * @param form - name of form that checkboxes are part of
- *
- * @access public
- * @return null
- */
-function on_load_init_check(form) {
-  for (i = 0; i < document.forms[form].elements.length; i++) {
-    if (( document.forms[form].elements[i].type == 'checkbox'
-      && document.forms[form].elements[i].checked == true )
-      || ( document.forms[form].elements[i].type == 'hidden'
-      && document.forms[form].elements[i].value == 1 )) {
-      var ss = document.forms[form].elements[i].id;
-      var row = 'rowid' + ss;
-      changeRowColor(row, form);
-    }
-  }
-}
-
-/**
  * reset all the radio buttons with a given name
  *
  * @param string fieldName
@@ -451,26 +255,23 @@ CRM.validate = CRM.validate || {
 
 (function ($, undefined) {
   "use strict";
-  $(document).ready(function () {
-    $().crmtooltip();
-    $('.crm-container table.row-highlight').on('change', 'input.select-row, input.select-rows', function () {
-      var target, table = $(this).closest('table');
-      if ($(this).hasClass('select-rows')) {
-        target = $('tbody tr', table);
-        $('input.select-row', table).prop('checked', $(this).prop('checked'));
-      }
-      else {
-        target = $(this).closest('tr');
-        $('input.select-rows', table).prop('checked', $(".select-row:not(':checked')", table).length < 1);
-      }
-      target.toggleClass('crm-row-selected', $(this).is(':checked'));
-    });
-    $('body').on('click', function (event) {
-      $('.btn-slide-active').removeClass('btn-slide-active').find('.panel').hide();
-      if ($(event.target).is('.btn-slide')) {
-        $(event.target).addClass('btn-slide-active').find('.panel').show();
-      }
-    });
+
+  $(document).on('crmLoad', function(e) {
+    $('table.row-highlight', e.target)
+      .off('.rowHighlight')
+      .on('change.rowHighlight', 'input.select-row, input.select-rows', function () {
+        var target, table = $(this).closest('table');
+        if ($(this).hasClass('select-rows')) {
+          target = $('tbody tr', table);
+          $('input.select-row', table).prop('checked', $(this).prop('checked'));
+        }
+        else {
+          target = $(this).closest('tr');
+          $('input.select-rows', table).prop('checked', $(".select-row:not(':checked')", table).length < 1);
+        }
+        target.toggleClass('crm-row-selected', $(this).is(':checked'));
+      })
+      .find('input.select-row:checked').parents('tr').addClass('crm-row-selected');
   });
 
   /**
@@ -1064,6 +865,14 @@ CRM.validate = CRM.validate || {
         ts('Done')
       );
       return false;
+    });
+
+    $().crmtooltip();
+    $('body').on('click', function (event) {
+      $('.btn-slide-active').removeClass('btn-slide-active').find('.panel').hide();
+      if ($(event.target).is('.btn-slide')) {
+        $(event.target).addClass('btn-slide-active').find('.panel').show();
+      }
     });
   });
 

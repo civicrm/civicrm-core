@@ -59,14 +59,6 @@ class CRM_Event_Form_Search extends CRM_Core_Form {
   protected $_searchButtonName;
 
   /**
-   * name of print button
-   *
-   * @var string
-   * @access protected
-   */
-  protected $_printButtonName;
-
-  /**
    * name of action button
    *
    * @var string
@@ -151,7 +143,6 @@ class CRM_Event_Form_Search extends CRM_Core_Form {
      * set the button names
      */
     $this->_searchButtonName = $this->getButtonName('refresh');
-    $this->_printButtonName = $this->getButtonName('next', 'print');
     $this->_actionButtonName = $this->getButtonName('next', 'action');
 
     $this->_done = FALSE;
@@ -243,14 +234,14 @@ class CRM_Event_Form_Search extends CRM_Core_Form {
      */
     $rows = $this->get('rows');
     if (is_array($rows)) {
-      CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'js/crm.livePage.js');
+      CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'js/crm.searchForm.js');
       $lineItems = $eventIds = array();
       if (!$this->_single) {
         $this->addElement('checkbox',
           'toggleSelect',
           NULL,
           NULL,
-          array('onclick' => "toggleTaskAction( true ); return toggleCheckboxVals('mark_x_',this);")
+          array('onclick' => "toggleTaskAction( true );", 'class' => 'select-rows')
         );
       }
       foreach ($rows as $row) {
@@ -258,7 +249,7 @@ class CRM_Event_Form_Search extends CRM_Core_Form {
         if (!$this->_single) {
           $this->addElement('checkbox', $row['checkbox'],
             NULL, NULL,
-            array('onclick' => "toggleTaskAction( true ); return checkSelectedBox('" . $row['checkbox'] . "');")
+            array('onclick' => "toggleTaskAction( true );", 'class' => 'select-row')
           );
         }
         if (CRM_Event_BAO_Event::usesPriceSet($row['event_id'])) {
@@ -321,19 +312,12 @@ class CRM_Event_Form_Search extends CRM_Core_Form {
         )
       );
 
-      $this->add('submit', $this->_printButtonName, ts('Print'),
-        array(
-          'class' => 'form-submit',
-          'onclick' => "return checkPerformAction('mark_x', '" . $this->getName() . "', 1);",
-        )
-      );
-
       // need to perform tasks on all or selected items ? using radio_ts(task selection) for it
       $this->addElement('radio', 'radio_ts', NULL, '', 'ts_sel',
         array('checked' => 'checked')
       );
       $this->addElement('radio', 'radio_ts', NULL, '', 'ts_all',
-        array('onclick' => $this->getName() . ".toggleSelect.checked = false; toggleCheckboxVals('mark_x_',this); toggleTaskAction( true );")
+        array('class' => 'select-rows', 'onclick' => $this->getName() . ".toggleSelect.checked = false; toggleTaskAction( true );")
       );
     }
 
@@ -399,7 +383,7 @@ class CRM_Event_Form_Search extends CRM_Core_Form {
     $this->set('queryParams', $this->_queryParams);
 
     $buttonName = $this->controller->getButtonName();
-    if ($buttonName == $this->_actionButtonName || $buttonName == $this->_printButtonName) {
+    if ($buttonName == $this->_actionButtonName) {
       // check actionName and if next, then do not repeat a search, since we are going to the next page
 
       // hack, make sure we reset the task values
