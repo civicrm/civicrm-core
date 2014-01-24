@@ -25,6 +25,10 @@
 <script type="text/template" id="palette_template">
   <div class="crm-designer-palette">
     <div class="crm-designer-palette-search">
+      <div class="crm-filter-objects">
+        <span>{ts}Field Type{/ts}: <select class="crm-contact-types"></select></span>
+      </div>
+      <hr>
       <input type="text" placeholder="{ts}Search Fields{/ts}" />
       <a class="crm-designer-palette-clear-search" href="#" title="{ts}Clear search{/ts}"><img src="{$config->resourceBase}i/close.png" class="action-icon" alt="X" /></a>
       <div class="crm-designer-palette-controls">
