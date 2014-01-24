@@ -77,11 +77,9 @@
     switch (field_type) {
       case 'Contact':
       case 'Individual':
-        return 'individual_1';
       case 'Organization':
-        return 'organization_1';
       case 'Household':
-        return 'household_1';
+        return 'contact_1';
       case 'Activity':
         return 'activity_1';
       case 'Contribution':
@@ -686,15 +684,24 @@
     },
     resetEntities: function() {
       var ufGroupModel = this;
+      var deleteFieldList = [];
       ufGroupModel.getRel('ufFieldCollection').each(function(ufFieldModel){
         if (!ufFieldModel.getFieldSchema()) {
-          CRM.alert(ts('The data model no longer includes field "%1"! All references to the field have been removed.', {
-            1: ufFieldModel.get('entity_name') + "." + ufFieldModel.get('field_name')
+          CRM.alert(ts('This profile no longer includes field "%1"! All references to the field have been removed.', {
+            1: ufFieldModel.get('label')
           }), '', 'alert', {expires: false});
-          ufFieldModel.destroyLocal();
+          deleteFieldList.push(ufFieldModel);
         }
       });
+
+      _.each(deleteFieldList, function(ufFieldModel) {
+        ufFieldModel.destroyLocal();
+      });
+
       this.getRel('paletteFieldCollection').reset(this.buildPaletteFields());
+
+      // reset to redraw the cancel after entity type is updated.
+      ufGroupModel.getRel('ufFieldCollection').reset(ufGroupModel.getRel('ufFieldCollection').toJSON());
     },
     /**
      *

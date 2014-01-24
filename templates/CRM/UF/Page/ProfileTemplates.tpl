@@ -26,7 +26,13 @@
   <div class="crm-designer-palette">
     <div class="crm-designer-palette-search">
       <div class="crm-filter-objects">
-        <span>{ts}Field Type{/ts}: <select class="crm-contact-types"></select></span>
+        <span>{ts}Field Type{/ts}:
+          <select class="crm-contact-types">
+          <option value="IndividualModel">{ts}Individual{/ts}</option>
+          <option value="OrganizationModel">{ts}Organization{/ts}</option>
+          <option value="HouseholdModel">{ts}Household{/ts}</option>
+          </select>
+        </span>
       </div>
       <hr>
       <input type="text" placeholder="{ts}Search Fields{/ts}" />
