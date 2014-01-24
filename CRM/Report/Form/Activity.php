@@ -223,11 +223,12 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
           array('title' => ts('Duration'),
             'type' => CRM_Utils_Type::T_INT,
           ),
+          'details' => array(
+            'title' => ts('Activity Details'),
+          )
         ),
-        'filters' =>
-        array(
-          'activity_date_time' =>
-          array(
+        'filters' => array(
+          'activity_date_time' => array(
             'default' => 'this.month',
             'operatorType' => CRM_Report_Form::OP_DATE,
           ),
@@ -243,9 +244,12 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Core_PseudoConstant::activityStatus(),
           ),
+          'details' => array(
+            'title' => ts('Activity Details'),
+            'type' => CRM_Utils_Type::T_TEXT,
+          )
         ),
-        'order_bys' =>
-        array(
+        'order_bys' => array(
           'activity_date_time' =>
           array('title' => ts('Activity Date'), 'default_weight' => '1', 'dbAlias' => 'civicrm_activity_activity_date_time'),
           'activity_type_id' =>
