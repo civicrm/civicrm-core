@@ -293,6 +293,7 @@
     openTreeNodes: [],
     events: {
       'keyup .crm-designer-palette-search input': 'doSearch',
+      'change .crm-contact-types': 'doSetPaletteEntity',
       'click .crm-designer-palette-clear-search': 'clearSearch',
       'click .crm-designer-palette-toggle': 'toggleAll',
       'click .crm-designer-palette-add button': 'doNewCustomFieldDialog',
@@ -324,6 +325,22 @@
 
       paletteView.model.getRel('ufEntityCollection').each(function(ufEntityModel){
         _.each(ufEntityModel.getSections(), function(section, sectionKey){
+
+          // build filter select
+          if (sectionKey == 'default') {
+            paletteView.$('.crm-contact-types').append('<option value="' + ufEntityModel.get('entity_name') + '">' + section.title + '</option>');
+          }
+
+          if (!paletteView.selectedContactType) {
+            paletteView.selectedContactType = paletteView.$('.crm-contact-types option:first').val();
+          }
+          // set selected option as default, since we are rebuilding palette
+          paletteView.$('.crm-contact-types').val(paletteView.selectedContactType).prop('selected','selected');
+
+          if (paletteView.selectedContactType != ufEntityModel.get('entity_name')) {
+            return true;
+          }
+
           var entitySection = ufEntityModel.get('entity_name') + '-' + sectionKey;
           var items = [];
           if (paletteFieldsByEntitySection[entitySection]) {
@@ -396,6 +413,10 @@
     },
     doSearch: function(event) {
       $('.crm-designer-palette-tree').jstree("search", $(event.target).val());
+    },
+    doSetPaletteEntity: function(event) {
+      this.selectedContactType = $('.crm-contact-types :selected').val();
+      this.render();
     },
     doAddToCanvas: function(event) {
       var paletteFieldModel = this.model.getRel('paletteFieldCollection').get($(event.currentTarget).attr('data-plm-cid'));
