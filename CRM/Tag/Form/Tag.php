@@ -86,14 +86,12 @@ class CRM_Tag_Form_Tag extends CRM_Core_Form {
     foreach ($allTag as $tagID => $varValue) {
       if (in_array($tagID, $entityTag)) {
         $tagAttribute = array(
-          'onclick' => "return changeRowColor(\"rowidtag_$tagID\")",
           'checked' => 'checked',
           'id' => "tag_{$tagID}",
         );
       }
       else {
         $tagAttribute = array(
-          'onclick' => "return changeRowColor(\"rowidtag_$tagID\")",
           'id' => "tag_{$tagID}",
         );
       }

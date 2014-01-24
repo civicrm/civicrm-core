@@ -161,7 +161,6 @@
     }
     var params = {getCount: cids.length};
     countSelections(params);
-    on_load_init_checkboxes("{/literal}{$form.formName}{literal}");
   });
 function countSelections(obj) {
   var label = cj('label[for*=ts_sel]');
@@ -177,7 +176,6 @@ function countSelections(obj) {
     }
     toggleTaskAction(obj.getCount);
   }
-  on_load_init_checkboxes("{/literal}{$form.formName}{literal}");
 }
 function toggleContactSelection(name, qfKey, selection) {
   var url = CRM.url('civicrm/ajax/markSelection');
