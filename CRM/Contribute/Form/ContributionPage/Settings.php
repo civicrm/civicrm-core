@@ -232,7 +232,6 @@ class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_
     $allowSubTypes = array();
 
     $this->addProfileSelector('honoree_profile', ts('Honoree Profile'), $allowCoreTypes, $allowSubTypes, $entities);
-    CRM_UF_Page_ProfileEditor::registerProfileScripts();
     CRM_UF_Page_ProfileEditor::registerSchemas(array('OrganizationModel','HouseholdModel'));
 
     if (!empty($this->_submitValues['honor_block_is_active'])) {
