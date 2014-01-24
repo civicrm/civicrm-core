@@ -115,7 +115,7 @@
             success: function(formData) {
               // Note: With chaining, API returns some extraneous keys that aren't part of UFGroupModel
               var ufGroupModel = new CRM.UF.UFGroupModel(_.pick(formData, _.keys(CRM.UF.UFGroupModel.prototype.schema)));
-              ufGroupModel.getRel('ufEntityCollection').reset(ufGroupModel.getUFGroupModel());
+              ufGroupModel.setUFGroupModel(ufGroupModel.getUFGroupModel(), profileSelectorView.options.ufEntities);
               ufGroupModel.getRel('ufFieldCollection').reset(_.values(formData["api.UFField.get"].values));
               options.onLoad(ufGroupModel);
             }
@@ -137,7 +137,7 @@
             success: function(formData) {
               // Note: With chaining, API returns some extraneous keys that aren't part of UFGroupModel
               var ufGroupModel = new CRM.UF.UFGroupModel(_.pick(formData, _.keys(CRM.UF.UFGroupModel.prototype.schema)));
-              ufGroupModel.getRel('ufEntityCollection').reset(ufGroupModel.getUFGroupModel());
+              ufGroupModel.setUFGroupModel(ufGroupModel.getUFGroupModel(), profileSelectorView.options.ufEntities);
               ufGroupModel.getRel('ufFieldCollection').reset(_.values(formData["api.UFField.get"].values));
               options.onLoad(ufGroupModel.deepCopy());
             }

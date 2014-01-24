@@ -692,14 +692,25 @@
       var ufEntityModel;
       _.each(profileType, function (ptype) {
         if ($.inArray(ptype, contactTypes) > -1) {
-          ufEntityModel = [
-            {'entity_name': 'contact_1', 'entity_type': ptype + 'Model'}
-          ];
+          ufEntityModel = ptype + 'Model';
           return true;
         }
       });
 
       return ufEntityModel;
+    },
+    setUFGroupModel: function(entityType, allEntityModels) {
+      var ufGroupModel = this;
+
+      var newUfEntityModels = [];
+      _.each(allEntityModels, function (values) {
+        if (values.entity_name == 'contact_1') {
+          values.entity_type = entityType;
+        }
+        newUfEntityModels.push(new CRM.UF.UFEntityModel(values));
+      });
+
+      ufGroupModel.getRel('ufEntityCollection').reset(newUfEntityModels);
     },
     resetEntities: function() {
       var ufGroupModel = this;
