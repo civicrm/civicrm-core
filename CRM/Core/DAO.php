@@ -1955,4 +1955,6 @@ EOS;
     return substr($string, 0, $length - 8) . "_{$md5string}";
   }
 
+  public static function setApiFilter($params) {}
+
 }

@@ -547,6 +547,50 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
     $this->assertEquals('Make-it-Happen Meeting', $result['values'][$result['id']]['subject']);
     $this->callAPISuccess('Activity', 'Delete', array('id' => $result['id']));
   }
+
+
+  /**
+   *  Test civicrm_activity_get() with filter target_contact_id
+   */
+  function testActivityGetTargetFilter() {
+    $params = $this->_params;
+    $contact1Params = array(
+      'first_name' => 'John',
+      'middle_name' => 'J.',
+      'last_name' => 'Anderson',
+      'prefix_id' => 3,
+      'suffix_id' => 3,
+      'email' => 'john_anderson@civicrm.org',
+      'contact_type' => 'Individual',
+    );
+
+    $contact1 = $this->individualCreate($contact1Params);
+    $contact2Params = array(
+      'first_name' => 'Michal',
+      'middle_name' => 'J.',
+      'last_name' => 'Anderson',
+      'prefix_id' => 3,
+      'suffix_id' => 3,
+      'email' => 'michal_anderson@civicrm.org',
+      'contact_type' => 'Individual',
+    );
+
+    $contact2 = $this->individualCreate($contact2Params);
+
+    $params['assignee_contact_id'] = array($contact1, $contact2);
+    $params['target_contact_id'] = array($contact2 => $contact2);
+    $activity = $this->callAPISuccess('Activity', 'Create', $params);
+
+    $activityget   = $this->callAPISuccess('Activity', 'get', array('id' => $activity['id'], 'target_contact_id' => $contact2,'return.target_contact_id' => 1));
+    $this->assertEquals($activity['id'], $activityget['id'], 'In line ' . __LINE__);
+    $this->assertEquals($contact2, $activityget['values'][$activityget['id']]['target_contact_id'][0], 'In line ' . __LINE__);
+
+    $activityget   = $this->callAPISuccess('activity', 'get', array('target_contact_id' => $this->_contactID,'return.target_contact_id' => 1,'id' => $activity['id']));
+    if ($activityget['count'] > 0) {
+      $this->assertNotEquals($contact2, $activityget['values'][$activityget['id']]['target_contact_id'][0], 'In line ' . __LINE__);
+    }
+  }
+
   /*
    * test that get functioning does filtering
    */
