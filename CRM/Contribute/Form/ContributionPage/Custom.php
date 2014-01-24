@@ -46,7 +46,7 @@ class CRM_Contribute_Form_ContributionPage_Custom extends CRM_Contribute_Form_Co
    */
   public function buildQuickForm() {
 
-    // Register 'contact_1'
+    // Register 'contact_1' model
     $entities = array();
     $entities[] = array('entity_name' => 'contact_1', 'entity_type' => 'IndividualModel');
     $allowCoreTypes = array_merge(array('Contact', 'Individual'), CRM_Contact_BAO_ContactType::subTypes('Individual'));

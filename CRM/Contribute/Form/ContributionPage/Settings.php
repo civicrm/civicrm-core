@@ -222,20 +222,17 @@ class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_
     );
 
     $entities = array(
-      array('entity_name' => 'contact_1',
-        'entity_type' => 'IndividualModel'
-      ),
-      array('entity_name' => 'organization_1',
-        'entity_type' => 'OrganizationModel'
-      ),
-      array('entity_name' => 'household_1',
-        'entity_type' => 'HouseholdModel'
+      array(
+        'entity_name' => 'contact_1',
+        'entity_type' => 'IndividualModel',
       ),
     );
+
     $allowCoreTypes = array_merge(array('Contact', 'Individual', 'Organization', 'Household'), CRM_Contact_BAO_ContactType::subTypes('Individual'));
     $allowSubTypes = array();
 
     $this->addProfileSelector('honoree_profile', ts('Honoree Profile'), $allowCoreTypes, $allowSubTypes, $entities);
+    CRM_UF_Page_ProfileEditor::registerSchemas(array('OrganizationModel','HouseholdModel'));
 
     if (!empty($this->_submitValues['honor_block_is_active'])) {
       $this->addRule('soft_credit_types', ts('At least one value must be selected if Honor Section is active'), 'required');
