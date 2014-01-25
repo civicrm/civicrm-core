@@ -24,24 +24,20 @@
  +--------------------------------------------------------------------+
 *}
 {* this template is used for adding/editing tags  *}
+{literal}
 <style>
-  .hit {ldelim}padding-left:10px;{rdelim}
-  .tree li {ldelim}padding-left:10px;{rdelim}
-  #Tag .tree .collapsable .hit {ldelim}background:url('{$config->resourceBase}i/menu-expanded.png') no-repeat left 8px;padding-left: 9px;cursor:pointer{rdelim}
-  #Tag .tree .expandable .hit {ldelim}background:url('{$config->resourceBase}i/menu-collapsed.png') no-repeat left 6px;padding-left: 9px;cursor:pointer{rdelim}
-  #Tag #tagtree .highlighted {ldelim}background-color:lightgrey;{rdelim}
+  #tagtree .highlighted > label {
+    background-color: #FEFD7B;
+  }
 </style>
 <script type="text/javascript">
-  (function($){ldelim}
+  (function($){{/literal}
     var entityID={$entityID};
     var entityTable='{$entityTable}';
     {literal}
     $(function() {
-      //unobsctructive elements are there to provide the function to those not having javascript, no need for the others
-      $(".unobstructive").hide();
-
       $("#tagtree ul input:checked").each (function(){
-        $(this).parents("li").children(".jstree-icon").addClass('highlighted');
+        $(this).closest("li").addClass('highlighted');
       });
 
       $("#tagtree input").change(function(){
@@ -49,6 +45,7 @@
         var op = (this.checked) ? 'create' : 'delete';
         var api = CRM.api3('entity_tag', op, {entity_table: entityTable, entity_id: entityID, tag_id: tagid});
         CRM.status({/literal}'{ts escape="js"}Saving...{/ts}', '{ts escape="js"}Saved{/ts}'{literal}, api);
+        $(this).closest("li").toggleClass('highlighted');
         CRM.updateContactSummaryTags();
       });
 
@@ -82,20 +79,6 @@
 </script>
 <div id="Tag" class="view-content">
   <h3>{if !$hideContext}{ts}Tags{/ts}{/if}</h3>
-  <p>
-  {if $action eq 16}
-    {if $permission EQ 'edit'}
-      {capture assign=crmURL}{crmURL p='civicrm/contact/view/tag' q='action=update'}{/capture}
-      <span class="unobstructive">{ts 1=$displayName 2=$crmURL}Current tags for <strong>%1</strong> are highlighted. You can add or remove tags from <a href='%2'>Edit Tags</a>.{/ts}</span>
-      {else}
-      {ts}Current tags are highlighted.{/ts}
-    {/if}
-    {else}
-    {if !$hideContext}
-      {ts}Mark or unmark the checkboxes, <span class="unobstructive">and click 'Update Tags' to modify tags.<span>{/ts}
-    {/if}
-  {/if}
-  </p>
   <div id="tagtree">
     <ul class="tree">
     {foreach from=$tree item="node" key="id"}
@@ -127,17 +110,6 @@
     {/foreach}
     </ul>
   </div>
-
-{* Show Edit Tags link if in View mode *}
-{if $permission EQ 'edit' AND $action eq 16}
-  </fieldset>
-  <div class="action-link unobstructive">
-    <a accesskey="N" href="{crmURL p='civicrm/contact/view/tag' q='action=update'}" class="button"><span><div class="icon edit-icon"></div>{ts}Edit Tags{/ts}</span></a>
-  </div>
-  {else}
-  <div class="form-item unobstructive">{$form.buttons.html}</div>
-  </fieldset>
-{/if}
   <br />
 {include file="CRM/common/Tag.tpl" context="contactTab"}
 </div>

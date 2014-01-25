@@ -65,7 +65,7 @@
             currentPage = {$pager->_response.currentPage},
             perPageCount = {$pager->_perPage},
             currentLocation = {$pager->_response.currentLocation|json_encode},
-            spinning = null;
+            spinning = null,
             refreshing = false;
           {literal}
           function refresh(url) {
