@@ -163,9 +163,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     }
 
     $config = CRM_Core_Config::singleton();
-    $resources = CRM_Core_Resources::singleton();
-    $resources->addScriptFile('civicrm', 'templates/CRM/Contribute/Form/SoftCredit.js');
-    $resources->addSetting(array('monetaryThousandSeparator' => $config->monetaryThousandSeparator));
 
     $this->_formType = CRM_Utils_Array::value('formType', $_GET);
 
