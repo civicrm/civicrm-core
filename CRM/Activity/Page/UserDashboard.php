@@ -46,7 +46,12 @@ class CRM_Activity_Page_UserDashboard extends CRM_Contact_Page_View_UserDashBoar
    */
   function listActivities() {
 
-    $controller = new CRM_Core_Controller_Simple('CRM_Activity_Form_Search', ts('Activities'));
+    $controller =
+      new CRM_Core_Controller_Simple(
+        'CRM_Activity_Form_Search', ts('Activities'),
+        NULL,
+        FALSE, FALSE, TRUE, FALSE
+      );
     $controller->setEmbedded(TRUE);
     $controller->reset();
     $controller->set('context', 'user');
