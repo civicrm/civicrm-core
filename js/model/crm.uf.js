@@ -682,7 +682,7 @@
       });
       return allMatched;
     },
-    getUFGroupModel: function() {
+    calculateContactEntityType: function() {
       var ufGroupModel = this;
 
       // set proper entity model based on selected profile
