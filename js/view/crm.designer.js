@@ -327,7 +327,7 @@
         _.each(ufEntityModel.getSections(), function(section, sectionKey){
           var defaultValue = paletteView.selectedContactType;
           if (!defaultValue) {
-            defaultValue = paletteView.model.getUFGroupModel();
+            defaultValue = paletteView.model.calculateContactEntityType();
           }
 
           // set selected option as default, since we are rebuilding palette
