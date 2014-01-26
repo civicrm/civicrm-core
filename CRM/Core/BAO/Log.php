@@ -84,8 +84,7 @@ class CRM_Core_BAO_Log extends CRM_Core_DAO_Log {
     }
 
     if (!$userID) {
-      $session = CRM_Core_Session::singleton();
-      $userID = $session->get('userID');
+      $userID = CRM_Core_DAO::singleValueQuery("SELECT @civicrm_user_id");
     }
 
     if (!$userID) {
