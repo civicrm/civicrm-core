@@ -78,6 +78,7 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
     $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this, TRUE);
     $this->_contactId = CRM_Utils_Request::retrieve('cid', 'Positive', $this, TRUE);
     $this->_component = CRM_Utils_Request::retrieve('component', 'String', $this, TRUE);
+
     $this->_fromEmails = CRM_Core_BAO_Email::getFromEmail();
     $this->_formType = CRM_Utils_Array::value('formType', $_GET);
 
@@ -86,6 +87,8 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
       $enitityType = 'participant';
       $this->_contributionId = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_ParticipantPayment', $this->_id, 'contribution_id', 'participant_id');
     }
+    $eventId = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Participant', $this->_id, 'event_id', 'id');
+    $this->_fromEmails = CRM_Event_BAO_Event::getFromEmailIds($eventId);
 
     $paymentInfo = CRM_Core_BAO_FinancialTrxn::getPartialPaymentWithType($this->_id, $enitityType);
     $paymentDetails = CRM_Contribute_BAO_Contribution::getPaymentInfo($this->_id, $this->_component);
@@ -248,7 +251,7 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
     //add receipt for offline contribution
     $this->addElement('checkbox', 'is_email_receipt', ts('Send Receipt?'));
 
-    $this->add('select', 'from_email_address', ts('Receipt From'), $this->_fromEmails);
+    $this->add('select', 'from_email_address', ts('Receipt From'), $this->_fromEmails['from_email_id']);
 
     $this->add('textarea', 'receipt_text', ts('Confirmation Message'));
 
@@ -350,6 +353,9 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
       $statusMsg = ts('The payment record has been processed.');
       if (!empty($submittedValues['is_email_receipt']) && $sendReceipt) {
         $statusMsg .= ' ' . ts('A receipt has been emailed to the contributor.');
+      }
+      if ($sendReceipt) {
+        $statusMsg .= ' ' . ts('Email has been sent successfully');
       }
       CRM_Core_Session::setStatus($statusMsg, ts('Saved'), 'success');
 
@@ -542,6 +548,10 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
       if (!empty($this->_params['is_email_receipt']) && $sendReceipt) {
         $statusMsg .= ' ' . ts('A receipt has been emailed to the contributor.');
       }
+      if ($sendReceipt) {
+        $statusMsg .= ' ' . ts('Email has been sent successfully');
+      }
+
       CRM_Core_Session::setStatus($statusMsg, ts('Complete'), 'success');
       $session->replaceUserContext(CRM_Utils_System::url('civicrm/contact/view',
           "reset=1&cid={$this->_contactId}&selectedChild=participant"
@@ -625,5 +635,6 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
       $sendTemplateParams['bcc'] = CRM_Utils_Array::value('bcc', $this->_fromEmails);
     }
     list($mailSent, $subject, $message, $html) = CRM_Core_BAO_MessageTemplate::sendTemplate($sendTemplateParams);
+    return $mailSent;
   }
 }

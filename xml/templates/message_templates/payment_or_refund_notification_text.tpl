@@ -1,12 +1,10 @@
 Dear {$contactDisplayName}
 {if $paymentConfig.confirm_email_text}
 {$paymentConfig.confirm_email_text}
-{else}
-{if $isRefund}
+{elseif $isRefund}
 {ts}A refund has been issued based on changes in your registration selections.{/ts}
 {else}
 {ts}A payment has been received.{/ts}
-{/if}
 {/if}
 
 {ts}Please print this confirmation for your records.{/ts}
@@ -36,7 +34,7 @@ Dear {$contactDisplayName}
 
 {ts}Thank-you. This completes your payment for {/ts}{if $component eq 'event'}{$event.event_title}{/if}.
 {/if}
-
+{/if}
 {if $receive_date}
 {ts}Transaction Date{/ts}: {$receive_date|crmDate}
 {/if}
@@ -70,8 +68,6 @@ Dear {$contactDisplayName}
 {$credit_card_type}
 {$credit_card_number}
 {ts}Expires{/ts}: {$credit_card_exp_date|truncate:7:''|crmDate}
-{/if}
-{/if}
 {/if}
 {if $component eq 'event'}
 ===============================================================================
