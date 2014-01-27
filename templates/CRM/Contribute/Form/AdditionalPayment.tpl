@@ -111,20 +111,22 @@
                 <span class="description">{ts 1=$email}Automatically email a receipt for this payment to %1?{/ts}</span>
               </td>
             </tr>
-            {elseif $context eq 'standalone' and $outBound_option != 2 }
-            <tr id="email-receipt" style="display:none;" class="crm-payment-form-block-is_email_receipt">
-              <td class="label">{$form.is_email_receipt.label}</td>
-              <td>{$form.is_email_receipt.html} <span class="description">{ts}Automatically email a receipt for this payment to {/ts}<span id="email-address"></span>?</span>
-              </td>
-            </tr>
           {/if}
           <tr id="fromEmail" class="crm-payment-form-block-receipt_date" style="display:none;">
             <td class="label">{$form.from_email_address.label}</td>
             <td>{$form.from_email_address.html}</td>
           </tr>
-          <tr class="crm-payment-form-block-fee_amount"><td class="label">{$form.fee_amount.label}</td><td{$valueStyle}>{$form.fee_amount.html|crmMoney:$currency:'XXX':'YYY'}<br />
+          <tr id='notice' class="crm-event-eventfees-form-block-receipt_text">
+            <td class="label">{$form.receipt_text.label}</td>
+            <td><span class="description">
+                {ts}Enter a message you want included at the beginning of the confirmation email. EXAMPLE: 'Thanks for registering for this event.'{/ts}
+                </span><br />
+                {$form.receipt_text.html|crmAddClass:huge}
+            </td>
+          </tr>   
+           <tr class="crm-payment-form-block-fee_amount"><td class="label">{$form.fee_amount.label}</td><td{$valueStyle}>{$form.fee_amount.html|crmMoney:$currency:'XXX':'YYY'}<br />
             <span class="description">{ts}Processing fee for this transaction (if applicable).{/ts}</span></td></tr>
-          <tr class="crm-payment-form-block-net_amount"><td class="label">{$form.net_amount.label}</td><td{$valueStyle}>{$form.net_amount.html|crmMoney:$currency:'':1}<br />
+           <tr class="crm-payment-form-block-net_amount"><td class="label">{$form.net_amount.label}</td><td{$valueStyle}>{$form.net_amount.html|crmMoney:$currency:'':1}<br />
             <span class="description">{ts}Net value of the payment (Total Amount minus Fee).{/ts}</span></td></tr>
         </table>
       </div>
@@ -153,9 +155,10 @@
     {literal}
     <script type="text/javascript">
 
-  var url = "{/literal}{$dataUrl}{literal}";
+    var url = "{/literal}{$dataUrl}{literal}";
 
       cj( function( ) {
+        showHideByValue( 'is_email_receipt', '', 'notice', 'table-row', 'radio', false );
         showHideByValue( 'is_email_receipt', '', 'fromEmail', 'table-row', 'radio', false );
       });
     {/literal}
@@ -164,7 +167,6 @@
 <br />
 <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
 </div>
-
   {literal}
   <script type="text/javascript">
   function verify( ) {
@@ -191,14 +193,16 @@
         if (cj('#is_email_receipt').attr( 'checked' )) {
           cj('#fromEmail').show( );
           cj('#receiptDate').hide( );
+          cj('#notice').show( );
         }
         else {
           cj('#fromEmail').hide( );
+          cj('#notice').hide( );
           cj('#receiptDate').show( );
         }
       }
 
-  // bind first click of accordion header to load crm-accordion-body with snippet
+    // bind first click of accordion header to load crm-accordion-body with snippet
     // everything else taken care of by cj().crm-accordions()
     cj(function() {
       cj('#adjust-option-type').hide();
