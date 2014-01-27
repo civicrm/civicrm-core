@@ -545,25 +545,6 @@ GROUP BY  currency
       $form->assign('payments', $payments);
     }
 
-    //assign honor fields.
-    $honor_block_is_active = FALSE;
-    //make sure we have values for it
-    if (!empty($params['honor_type_id']) &&
-      ((!empty($params['honor_first_name']) && !empty($params['honor_last_name'])) ||
-        (!empty($params['honor_email']))
-      )
-    ) {
-      $honor_block_is_active = TRUE;
-      $prefix = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'prefix_id');
-      $honor = CRM_Core_PseudoConstant::get('CRM_Pledge_DAO_Pledge', 'honor_type_id');
-      $form->assign('honor_type', $honor[$params['honor_type_id']]);
-      $form->assign('honor_prefix', $prefix[$params['honor_prefix_id']]);
-      $form->assign('honor_first_name', $params['honor_first_name']);
-      $form->assign('honor_last_name', $params['honor_last_name']);
-      $form->assign('honor_email', $params['honor_email']);
-    }
-    $form->assign('honor_block_is_active', $honor_block_is_active);
-
     //handle domain token values
     $domain = CRM_Core_BAO_Domain::getDomain();
     $tokens = array('domain' => array('name', 'phone', 'address', 'email'),

@@ -336,7 +336,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
       $softParams['soft_credit_type_id'] = CRM_Core_OptionGroup::getValue('soft_credit_type', 'pcp', 'name');
       CRM_Contribute_BAO_ContributionSoft::add($softParams);
     }
-    elseif (!empty($params['soft_credit'])) {
+    elseif (isset($params['soft_credit'])) {
       $softParams = $params['soft_credit'];
 
       if (!empty($softIDs)) {
