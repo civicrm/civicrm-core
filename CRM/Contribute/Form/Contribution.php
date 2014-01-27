@@ -139,6 +139,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
 
   protected $_formType;
   protected $_cdType;
+  public $_honoreeProfileType;
 
   /**
    * Function to set variables up before form is built
@@ -265,6 +266,10 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
 
       // omitting contactImage from title for now since the summary overlay css doesn't work outside of our crm-container
       CRM_Utils_System::setTitle(ts('Contribution from') . ' ' . $displayName);
+    }
+
+    if ($this->_id) {
+      CRM_Contribute_Form_SoftCredit::preprocess($this);
     }
   }
 
@@ -1013,8 +1018,13 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       }
     }
     else {
-      //build soft credit params
-      if (!empty($submittedValues['soft_credit_contact_select_id'])) {
+      $isEmpty = array_keys(array_flip($submittedValues['soft_credit_contact_select_id']));
+      if ($this->_id && count($isEmpty) == 1 && key($isEmpty) == NULL) {
+        //Delete existing soft credit records if soft credit list is empty on update
+        CRM_Contribute_BAO_ContributionSoft::del(array('contribution_id' => $this->_id));
+      }
+      else {
+        //build soft credit params
         $softParams = $softIDs =array();
         foreach ($submittedValues['soft_credit_contact_select_id'] as $key => $val) {
           if ($val && $submittedValues['soft_credit_amount'][$key]) {
@@ -1196,6 +1206,8 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       if ($contribution->id && !empty($formValues['is_email_receipt'])) {
         $formValues['contact_id'] = $this->_contactID;
         $formValues['contribution_id'] = $contribution->id;
+
+        $formValues += CRM_Contribute_BAO_ContributionSoft::getSoftContribution($contribution->id);
 
         // to get 'from email id' for send receipt
         $this->fromEmailId = $formValues['from_email_address'];
