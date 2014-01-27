@@ -1,4 +1,5 @@
 {* file to handle db changes in 4.5.alpha1 during upgrade *}
+{include file='../CRM/Upgrade/4.4.alpha1.msg_template/civicrm_msg_template.tpl'}
 
 ALTER TABLE `civicrm_contact`
   ADD COLUMN `formal_title` varchar(64) COMMENT 'Formal (academic or similar) title in front of name. (Prof., Dr. etc.)' AFTER `suffix_id`;
