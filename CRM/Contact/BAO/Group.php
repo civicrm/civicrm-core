@@ -674,9 +674,13 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
    * @param  array   $params associated array for params record id.
    *
    * @return array   $groupList associated array of group list
+   *  -rp = rowcount
+   *  -page= offset
+   *  @todo there seems little reason for the small number of functions that call this to pass in
+   *  params that then need to be translated in this function since they are coding them when calling
    * @access public
    */
-  public function getGroupListSelector(&$params) {
+  static public function getGroupListSelector(&$params) {
     // format the params
     $params['offset']   = ($params['page'] - 1) * $params['rp'];
     $params['rowCount'] = $params['rp'];
@@ -1043,7 +1047,7 @@ WHERE {$whereClause}";
     return CRM_Core_DAO::singleValueQuery($query, $params);
   }
 
-  function whereClause(&$params, $sortBy = TRUE, $excludeHidden = TRUE) {
+  static function whereClause(&$params, $sortBy = TRUE, $excludeHidden = TRUE) {
     $values = array();
     $clauses = array();
 
