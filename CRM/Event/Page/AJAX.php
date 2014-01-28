@@ -67,6 +67,7 @@ class CRM_Event_Page_AJAX {
         civicrm_event.title
 ";
     $dao = CRM_Core_DAO::executeQuery($query);
+    $results = array();
     while ($dao->fetch()) {
       $fields = array();
       foreach (array('title', 'city') as $field) {
@@ -77,10 +78,9 @@ class CRM_Event_Page_AJAX {
       if (isset($dao->start_date)) {
         array_push($fields, CRM_Utils_Date::customFormat($dao->start_date));
       }
-      $eventinfo = implode(' - ', $fields);
-      echo $elements = "$eventinfo|$dao->id\n";
+      $results[$dao->id] = implode(' - ', $fields);
     }
-    CRM_Utils_System::civiExit();
+    CRM_Core_Page_AJAX::autocompleteResults($results);
   }
 
   /**
@@ -104,10 +104,11 @@ AND {$whereClause}
 ORDER by v.weight";
 
     $dao = CRM_Core_DAO::executeQuery($query);
+    $results = array();
     while ($dao->fetch()) {
-      echo $elements = "$dao->label|$dao->value\n";
+      $results[$dao->value] = $dao->label;
     }
-    CRM_Utils_System::civiExit();
+    CRM_Core_Page_AJAX::autocompleteResults($results);
   }
 
   /**
@@ -131,10 +132,11 @@ LEFT JOIN civicrm_price_set_entity ce ON ce.price_set_id = cf.price_set_id
 WHERE ce.entity_table = 'civicrm_event' AND {$whereClause}
 GROUP BY cv.label";
     $dao = CRM_Core_DAO::executeQuery($query);
+    $results = array();
     while ($dao->fetch()) {
-      echo $elements = "$dao->label|$dao->id\n";
+      $results[$dao->id] = $dao->label;
     }
-    CRM_Utils_System::civiExit();
+    CRM_Core_Page_AJAX::autocompleteResults($results);
   }
 
   function eventList() {

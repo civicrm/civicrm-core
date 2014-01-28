@@ -60,12 +60,11 @@ class CRM_Case_Page_AJAX {
       $excludeCaseIds = explode(',', $excludeIdStr);
     }
     $unclosedCases = CRM_Case_BAO_Case::getUnclosedCases($params, $excludeCaseIds);
-
+    $results = array();
     foreach ($unclosedCases as $caseId => $details) {
-      echo $details['sort_name'] . ' (' . $details['case_type'] . ': ' . $details['case_subject'] . ') ' . "|$caseId|" . $details['contact_id'] . '|' . $details['case_type'] . '|' . $details['sort_name'] . "\n";
+      $results["$caseId|" . $details['contact_id'] . '|' . $details['case_type'] . '|' . $details['sort_name']] = $details['sort_name'] . ' (' . $details['case_type'] . ': ' . $details['case_subject'] . ')';
     }
-
-    CRM_Utils_System::civiExit();
+    CRM_Core_Page_AJAX::autocompleteResults($results);
   }
 
   function processCaseTags() {
