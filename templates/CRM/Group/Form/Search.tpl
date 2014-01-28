@@ -102,9 +102,8 @@ cj(function($) {
   });
   // Add livePage functionality
   $('#crm-container').on('click', 'a.button, a.action-item[href*="action=update"], a.action-item[href*="action=delete"]', function() {
-    CRM.loadForm($(this).attr('href'), {
-      openInline: 'a:not([href="#"])'
-    }).on('crmFormSuccess', function(e, data) {
+    CRM.loadForm($(this).attr('href'))
+      .on('crmFormSuccess', function(e, data) {
         // Refresh datatable when form completes
         $('#crm-group-selector').dataTable().fnDraw();
       });
