@@ -728,8 +728,8 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
 
         $groupList[$id]['is_parent'] = $value['is_parent'];
       }
-      return $groupList;
     }
+    return $groupList;
   }
 
   /**
