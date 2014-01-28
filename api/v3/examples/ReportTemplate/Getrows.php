@@ -47,6 +47,14 @@ function report_template_getrows_expectedresult(){
           'civicrm_country_name' => 'United States',
         ),
     ),
+  'title' => '',
+  'labels' => array(
+      'civicrm_contact_sort_name' => 'Contact Name',
+      'civicrm_contact_id' => 'Internal Contact ID',
+      'civicrm_address_street_address' => 'Street Address',
+      'civicrm_address_city' => 'City',
+      'civicrm_country_name' => 'Country',
+    ),
 );
 
   return $expectedResult;

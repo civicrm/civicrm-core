@@ -87,8 +87,8 @@ function civicrm_api3_report_template_delete($params) {
  * @access public
  */
 function civicrm_api3_report_template_getrows($params) {
-  list($rows, $instance) = _civicrm_api3_report_template_getrows($params);
-  return civicrm_api3_create_success($rows, $params, 'report_template');
+  list($rows, $instance, $labels) = _civicrm_api3_report_template_getrows($params);
+  return civicrm_api3_create_success($rows, $params, 'report_template', 'getrows', CRM_Core_DAO::$_nullObject, $labels);
 }
 
 function _civicrm_api3_report_template_getrows($params) {
@@ -113,13 +113,19 @@ function _civicrm_api3_report_template_getrows($params) {
   $reportInstance->setOffsetValue($options['offset']);
   $reportInstance->beginPostProcessCommon();
   $sql = $reportInstance->buildQuery();
-  $rows = array();
+  $rows = $metadata = array();
   $reportInstance->buildRows($sql, $rows);
-  return array($rows, $reportInstance);
+  $metadata['title'] = $reportInstance->getTitle();
+  foreach ($reportInstance->_columnHeaders as $key => $header) {
+    //would be better just to expect reports to provide titles but reports are not consistent
+    //NB I think these are already translated
+    $metadata['labels'][$key] = !empty($header['title']) ? $header['title'] : '';
+  }
+  return array($rows, $reportInstance, $metadata);
 }
 
 function civicrm_api3_report_template_getstatistics($params) {
-  list($rows, $reportInstance) = _civicrm_api3_report_template_getrows($params);
+  list($rows, $reportInstance, $labels) = _civicrm_api3_report_template_getrows($params);
   $stats = $reportInstance->statistics($rows);
   return civicrm_api3_create_success($stats, $params, 'report_template');
 }
