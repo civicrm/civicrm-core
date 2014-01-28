@@ -60,8 +60,13 @@ cj(function($){
     <td class='right'>{$paymentInfo.balance|crmMoney}</td>
   </tr>
 </table>
-{if $paymentInfo.balance > 0}
-  <a class="button" href='{crmURL p="civicrm/payment/add" q="reset=1&component=`$component`&id=`$id`&cid=`$cid`"}' title="{ts}Record Payment{/ts}"><span><div class="icon add-icon"></div> {ts}Record Payment{/ts}</span></a>
+{if $paymentInfo.balance}
+  {if $paymentInfo.balance > 0}
+     {assign var=paymentButtonName value='Record Payment'}
+  {elseif $paymentInfo.balance < 0}
+     {assign var=paymentButtonName value='Record Refund'}
+  {/if}
+  <a class="button" href='{crmURL p="civicrm/payment/add" q="reset=1&component=`$component`&id=`$id`&cid=`$cid`"}' title="{ts}{$paymentButtonName}{/ts}"><span><div class="icon add-icon"></div> {ts}{$paymentButtonName}{/ts}</span></a>
 {/if}
 {elseif $context eq 'transaction'}
   {if !empty($rows)}

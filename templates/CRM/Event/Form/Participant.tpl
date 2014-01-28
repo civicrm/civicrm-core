@@ -131,7 +131,6 @@
   // change the status to default 'partially paid' for partial payments
   var feeAmount;
   var userModifiedAmount;
-  var partiallyPaidStatusId = {/literal}{$partiallyPaidStatusId}{literal};
 
   cj('#total_amount')
    .focus(
@@ -145,7 +144,7 @@
       userModifiedAmount = cj(this).val();
       userModifiedAmount = parseInt(userModifiedAmount);
       if (userModifiedAmount < feeAmount) {
-        cj('#status_id').val(partiallyPaidStatusId);
+        cj('#status_id').val(CRM.partiallyPaidStatusId);
       }
     }
   );
@@ -154,7 +153,7 @@
     function(e) {
       var userSubmittedStatus = cj('#status_id').val();
       var statusLabel = cj('#status_id option:selected').text();
-      if (userModifiedAmount < feeAmount && userSubmittedStatus != partiallyPaidStatusId) {
+      if (userModifiedAmount < feeAmount && userSubmittedStatus != CRM.partiallyPaidStatusId) {
         var result = confirm('Payment amount is less than the amount owed. Expected participant status is \'Partially paid\'. Are you sure you want to set the participant status to ' + statusLabel + '? Click OK to continue, Cancel to change your entries.');
         if (result == false) {
           e.preventDefault();
