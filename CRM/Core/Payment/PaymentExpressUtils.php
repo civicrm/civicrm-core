@@ -67,7 +67,9 @@ function &_initCURL($query, $url) {
   curl_setopt($curl, CURLOPT_POSTFIELDSIZE, 0);
   curl_setopt($curl, CURLOPT_TIMEOUT, 30);
   curl_setopt($curl, CURLOPT_RETURNTRANSFER, TRUE);
-  curl_setopt($curl, CURLOPT_FOLLOWLOCATION, FALSE);
+  if (ini_get('open_basedir') == '' && ini_get('safe_mode') == 'Off') {
+    curl_setopt($curl, CURLOPT_FOLLOWLOCATION, FALSE);
+  }
   curl_setopt($curl, CURLOPT_HEADER, 0);
   curl_setopt($curl, CURLOPT_SSLVERSION, 3);
 
