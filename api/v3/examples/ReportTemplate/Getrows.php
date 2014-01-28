@@ -6,6 +6,12 @@
 function report_template_getrows_example(){
 $params = array(
   'report_id' => 'contact/summary',
+  'options' => array(
+      'metadata' => array(
+          '0' => 'labels',
+          '1' => 'title',
+        ),
+    ),
 );
 
 try{
@@ -45,6 +51,16 @@ function report_template_getrows_expectedresult(){
           'civicrm_address_street_address' => '15 Main St',
           'civicrm_address_city' => 'Collinsville',
           'civicrm_country_name' => 'United States',
+        ),
+    ),
+  'metadata' => array(
+      'title' => 'ERROR: Title is not Set',
+      'labels' => array(
+          'civicrm_contact_sort_name' => 'Contact Name',
+          'civicrm_contact_id' => 'Internal Contact ID',
+          'civicrm_address_street_address' => 'Street Address',
+          'civicrm_address_city' => 'City',
+          'civicrm_country_name' => 'Country',
         ),
     ),
 );
