@@ -874,6 +874,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
       $this->click('honor_block_is_active');
       $this->type('honor_block_title', "Honoree Section Title $hash");
       $this->type('honor_block_text', "Honoree Introductory Message $hash");
+      $this->select('crmasmSelect0', "label=Household");
     }
 
     // is confirm enabled? it starts out enabled, so uncheck it if false
@@ -1030,11 +1031,11 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
       $this->waitForElementPresent('_qf_Custom_next-bottom');
 
       if ($profilePreId) {
-        $this->select('custom_pre_id', "value={$profilePreId}");
+        $this->select('css=tr.crm-contribution-contributionpage-custom-form-block-custom_pre_id span.crm-profile-selector-select select', "value={$profilePreId}");
       }
 
       if ($profilePostId) {
-        $this->select('custom_post_id', "value={$profilePostId}");
+        $this->select('css=tr.crm-contribution-contributionpage-custom-form-block-custom_post_id span.crm-profile-selector-select select', "value={$profilePostId}");
       }
 
       $this->click('_qf_Custom_next-bottom');

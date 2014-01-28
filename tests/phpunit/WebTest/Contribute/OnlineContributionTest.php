@@ -106,12 +106,11 @@ class WebTest_Contribute_OnlineContributionTest extends CiviSeleniumTestCase {
 
     // Honoree Info
     $this->click("xpath=id('Main')/div[2]/fieldset/div[2]/div/label[text()='In Honor of']");
-    $this->waitForElementPresent("honor_email");
 
-    $this->select("honor_prefix_id", "label=Ms.");
-    $this->type("honor_first_name", $honorFirstName);
-    $this->type("honor_last_name", $honorLastName);
-    $this->type("honor_email", $honorEmail);
+    $this->select("honor[prefix_id]", "label=Ms.");
+    $this->type("honor[first_name]", $honorFirstName);
+    $this->type("honor[last_name]", $honorLastName);
+    $this->type("honor[email-1]", $honorEmail);
 
     //Credit Card Info
     $this->select("credit_card_type", "value=Visa");
@@ -151,9 +150,12 @@ class WebTest_Contribute_OnlineContributionTest extends CiviSeleniumTestCase {
       'Financial Type' => 'Donation',
       'Total Amount' => '100.00',
       'Contribution Status' => 'Completed',
-      'In Honor of' => $honorDisplayName
     );
     $this->webtestVerifyTabularData($expected);
+
+    //View Soft Credit record of type 'Honor of'
+    $this->waitForTextPresent($honorDisplayName);
+    $this->waitForTextPresent('100.00 (In Honor of)');
 
     // Check for Honoree contact created
     $this->click("css=input#sort_name_navigation");
@@ -215,7 +217,7 @@ class WebTest_Contribute_OnlineContributionTest extends CiviSeleniumTestCase {
       $widget,
       $pcp
     );
-    
+
     $this->openCiviPage("admin/contribute/amount", "reset=1&action=update&id=$pageId", '_qf_Amount_cancel-bottom');
     $this->type('label_1', "Label $hash");
     $this->type('value_1', 0);
@@ -223,7 +225,7 @@ class WebTest_Contribute_OnlineContributionTest extends CiviSeleniumTestCase {
 
     //Contribution using Contribution Options
     $this->_doContributionAndVerifyData($pageId);
-    
+
     //add priceset
     $this->openCiviPage("admin/price", "reset=1&action=add", '_qf_Set_next-bottom');
     $this->type('title', "Test Priceset $rand");
@@ -242,7 +244,7 @@ class WebTest_Contribute_OnlineContributionTest extends CiviSeleniumTestCase {
     $this->clickLink('_qf_Amount_upload_done-bottom');
 
     //Contribution using priceset
-    $this->_doContributionAndVerifyData($pageId, TRUE);   
+    $this->_doContributionAndVerifyData($pageId, TRUE);
   }
 
   function _doContributionAndVerifyData($pageId, $priceSet = FALSE) {
@@ -283,7 +285,7 @@ class WebTest_Contribute_OnlineContributionTest extends CiviSeleniumTestCase {
 
     $this->clickLink("_qf_Confirm_next-bottom", NULL);
 
-      
+
     //login to check contribution
 
     // Log in using webtestLogin() method
