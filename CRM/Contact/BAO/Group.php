@@ -676,7 +676,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
    * @return array   $groupList associated array of group list
    * @access public
    */
-  public function getGroupListSelector(&$params) {
+  static public function getGroupListSelector(&$params) {
     // format the params
     $params['offset']   = ($params['page'] - 1) * $params['rp'];
     $params['rowCount'] = $params['rp'];
@@ -1043,7 +1043,7 @@ WHERE {$whereClause}";
     return CRM_Core_DAO::singleValueQuery($query, $params);
   }
 
-  function whereClause(&$params, $sortBy = TRUE, $excludeHidden = TRUE) {
+  static function whereClause(&$params, $sortBy = TRUE, $excludeHidden = TRUE) {
     $values = array();
     $clauses = array();
 
