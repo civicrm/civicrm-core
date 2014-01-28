@@ -49,10 +49,11 @@
       'contribution_recurring_notify' => ts('Contributions - Recurring Start and End Notification',           array('escape' => 'sql')),
       'contribution_recurring_cancelled' => ts('Contributions - Recurring Cancellation Notification',         array('escape' => 'sql')),
       'contribution_recurring_billing' => ts('Contributions - Recurring Billing Updates',                     array('escape' => 'sql')),
-      'contribution_recurring_edit'    => ts('Contributions - Recurring Updates',                           array('escape' => 'sql')),
+      'contribution_recurring_edit'    => ts('Contributions - Recurring Updates',                             array('escape' => 'sql')),
       'pcp_notify'                    => ts('Personal Campaign Pages - Admin Notification',                   array('escape' => 'sql')),
       'pcp_status_change'             => ts('Personal Campaign Pages - Supporter Status Change Notification', array('escape' => 'sql')),
       'pcp_supporter_notify'          => ts('Personal Campaign Pages - Supporter Welcome',                    array('escape' => 'sql')),
+      'payment_or_refund_notification' => ts('Additional Payment Receipt or Refund Notification',             array('escape' => 'sql')),
     ),
     'event' => array(
       'event_offline_receipt' => ts('Events - Registration Confirmation and Receipt (off-line)', array('escape' => 'sql')),

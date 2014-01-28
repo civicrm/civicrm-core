@@ -406,7 +406,7 @@ WHERE ceft.entity_id = %1";
 
     if ($entityName == 'participant') {
       $contributionId = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_ParticipantPayment', $entityId, 'contribution_id', 'participant_id');
-      $financialTypeId = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $entityId, 'financial_type_id');
+      $financialTypeId = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $contributionId, 'financial_type_id');
 
       if ($contributionId && $financialTypeId) {
         $statusId = CRM_Core_OptionGroup::getValue('contribution_status', 'Completed', 'name');
@@ -423,7 +423,7 @@ FROM civicrm_financial_trxn ft
   LEFT JOIN civicrm_contribution c ON (eft.entity_id = c.id)
   LEFT JOIN civicrm_participant_payment pp ON (pp.contribution_id = c.id)
 WHERE pp.participant_id = {$entityId} AND ft.to_financial_account_id != {$toFinancialAccount}
-  AND ft.from_financial_account_id = {$toFinancialAccount} AND ft.status_id = {$statusId}
+  AND ft.status_id = {$statusId}
 ";
         $ftTotalAmt = CRM_Core_DAO::singleValueQuery($sqlFtTotalAmt);
         $value = 0;
