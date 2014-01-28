@@ -86,12 +86,7 @@ class CRM_Contact_Page_AJAX {
     }
 
     $result = civicrm_api('Contact', 'getquick', $params);
-    if (empty($result['is_error']) && !empty($result['values'])) {
-      foreach ($result['values'] as $key => $val) {
-        echo "{$val['data']}|{$val['id']}\n";
-      }
-    }
-    CRM_Utils_System::civiExit();
+    CRM_Core_Page_AJAX::autocompleteResults(CRM_Utils_Array::value('values', $result), 'data');
   }
 
   static function contactReference() {
@@ -105,8 +100,7 @@ class CRM_Contact_Page_AJAX {
     $fldValues        = array();
     CRM_Core_DAO::commonRetrieve('CRM_Core_DAO_CustomField', $params, $cf, $returnProperties);
     if (!$cf['id'] || !$cf['is_active'] || $cf['data_type'] != 'ContactReference') {
-      echo "$name|error\n";
-      CRM_Utils_System::civiExit();
+      CRM_Core_Page_AJAX::autocompleteResults(array('error' => $name));
     }
 
     if ($cf['filter']) {
@@ -118,8 +112,7 @@ class CRM_Contact_Page_AJAX {
       if (!empty($action) &&
         !in_array($action, array('get', 'lookup'))
       ) {
-        echo "$name|error\n";
-        CRM_Utils_System::civiExit();
+        CRM_Core_Page_AJAX::autocompleteResults(array('error' => $name));
       }
     }
 
@@ -172,11 +165,10 @@ class CRM_Contact_Page_AJAX {
     $contact = civicrm_api('Contact', 'Get', $params);
 
     if (!empty($contact['is_error'])) {
-      echo "$name|error\n";
-      CRM_Utils_System::civiExit();
+      CRM_Core_Page_AJAX::autocompleteResults(array('error' => $name));
     }
 
-    $contactList = '';
+    $contactList = array();
     foreach ($contact['values'] as $value) {
       $view = array();
       foreach ($return as $fld) {
@@ -184,14 +176,14 @@ class CRM_Contact_Page_AJAX {
           $view[] = $value[$fld];
         }
       }
-      echo $contactList = implode(' :: ', $view) . "|" . $value['id'] . "\n";
+      $contactList[$value['id']] = implode(' :: ', $view);
     }
 
     if (!$contactList) {
-      echo "$name|$name\n";
+      $contactList = array($name => $name);
     }
 
-    CRM_Utils_System::civiExit();
+    CRM_Core_Page_AJAX::autocompleteResults($contactList);
   }
 
   /**
@@ -241,12 +233,11 @@ class CRM_Contact_Page_AJAX {
         ";
 
     $dao = CRM_Core_DAO::executeQuery($query);
-
+    $results = array();
     while ($dao->fetch()) {
-      echo $pcpList = "$dao->data|$dao->id\n";
+      $results[$dao->id] = $dao->data;
     }
-
-    CRM_Utils_System::civiExit();
+    CRM_Core_Page_AJAX::autocompleteResults($results);
   }
 
   /**
@@ -258,14 +249,13 @@ class CRM_Contact_Page_AJAX {
     $label         = CRM_Utils_Type::escape($_GET['s'], 'String');
 
     $selectOption = CRM_Core_BAO_CustomOption::valuesByID($fieldID, $optionGroupID);
-
-    $completeList = NULL;
+    $results = array();
     foreach ($selectOption as $id => $value) {
       if (strtolower($label) == strtolower(substr($value, 0, strlen($label)))) {
-        echo $completeList = "$value|$id\n";
+        $results[$id] = $value;
       }
     }
-    CRM_Utils_System::civiExit();
+    CRM_Core_Page_AJAX::autocompleteResults($results);
   }
 
   static function relationship() {
@@ -349,13 +339,13 @@ class CRM_Contact_Page_AJAX {
     $name = str_replace('*', '%', $name);
 
     $elements = CRM_Contact_BAO_Relationship::getPermissionedEmployer($cid, $name);
-
+    $results = array();
     if (!empty($elements)) {
       foreach ($elements as $cid => $name) {
-        echo $element = $name['name'] . "|$cid\n";
+        $results[$cid] = $name['name'];
       }
     }
-    CRM_Utils_System::civiExit();
+    CRM_Core_Page_AJAX::autocompleteResults($results);
   }
 
 
@@ -366,7 +356,9 @@ class CRM_Contact_Page_AJAX {
   }
 
   /**
-   * Function for building contact combo box
+   * @deprecated
+   * Old quicksearch function. No longer used in core.
+   * @todo: Remove this function and associated menu entry in CiviCRM 5
    */
   static function search() {
     $json = TRUE;
