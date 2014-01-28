@@ -484,7 +484,9 @@ class CRM_Core_Payment_PayflowPro extends CRM_Core_Payment {
     // return into a variable
     curl_setopt($ch, CURLOPT_TIMEOUT, 90);
     // times out after 90 secs
-    curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 0);
+    if (ini_get('open_basedir') == '' && ini_get('safe_mode') == 'Off') {
+      curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 0);
+    }
     curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'verifySSL'));
     // this line makes it work under https
     curl_setopt($ch, CURLOPT_POSTFIELDS, $payflow_query);

@@ -222,7 +222,9 @@ class CRM_Core_Payment_FirstData extends CRM_Core_Payment {
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
     curl_setopt($ch, CURLOPT_TIMEOUT, 36000);
     // ensures any Location headers are followed
-    curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
+    if (ini_get('open_basedir') == '' && ini_get('safe_mode') == 'Off') {
+      curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
+    }
 
     // Send the data out over the wire
     //--------------------------------
