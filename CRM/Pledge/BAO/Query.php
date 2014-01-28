@@ -375,23 +375,6 @@ class CRM_Pledge_BAO_Query {
         $query->_tables['civicrm_pledge'] = $query->_whereTables['civicrm_pledge'] = 1;
         return;
 
-      case 'pledge_in_honor_of':
-        $strtolower = function_exists('mb_strtolower') ? 'mb_strtolower' : 'strtolower';
-        $name       = trim($value);
-        $newName    = str_replace(',', " ", $name);
-        $pieces     = explode(' ', $newName);
-        foreach ($pieces as $piece) {
-          $value = $strtolower(CRM_Core_DAO::escapeString(trim($piece)));
-          $value = "'%$value%'";
-          $sub[] = " ( pledge_contact_b.sort_name LIKE $value )";
-        }
-
-        $query->_where[$grouping][] = ' ( ' . implode('  OR ', $sub) . ' ) ';
-        $query->_qill[$grouping][] = ts('Honor name like - \'%1\'', array(1 => $name));
-        $query->_tables['pledge_contact_b'] = $query->_whereTables['pledge_contact_b'] = 1;
-        $query->_tables['civicrm_pledge'] = $query->_whereTables['civicrm_pledge'] = 1;
-        return;
-
       case 'pledge_id':
         $query->_where[$grouping][] = "civicrm_pledge.id $op $value";
         $query->_tables['civicrm_pledge'] = $query->_whereTables['civicrm_pledge'] = 1;
@@ -434,10 +417,6 @@ class CRM_Pledge_BAO_Query {
 
       case 'pledge_financial_type':
             $from .= " $side JOIN civicrm_financial_type ON civicrm_pledge.financial_type_id = civicrm_financial_type.id ";
-        break;
-
-      case 'pledge_contact_b':
-        $from .= " $side JOIN civicrm_contact pledge_contact_b ON (civicrm_pledge.honor_contact_id = pledge_contact_b.id )";
         break;
 
       case 'civicrm_pledge_payment':
@@ -581,9 +560,6 @@ class CRM_Pledge_BAO_Query {
         '' => ts('- any -')) +
         CRM_Contribute_PseudoConstant::contributionPage()
     );
-
-    //add fields for honor search
-    $form->addElement('text', 'pledge_in_honor_of', ts('In Honor Of'));
 
     //add fields for pledge frequency
     $form->add('text', 'pledge_frequency_interval', ts('Every'), array('size' => 8, 'maxlength' => 8));

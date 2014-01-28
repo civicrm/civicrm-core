@@ -59,6 +59,9 @@ class CRM_Upgrade_Incremental_php_FourFive {
    * @return void
    */
   function setPostUpgradeMessage(&$postUpgradeMessage, $rev) {
+    if ($rev == '4.5.alpha1') {
+      $postUpgradeMessage .= '<br /><br />' . ts('Default versions of the following System Workflow Message Templates have been modified to handle new functionality: <ul><li>Contributions - Receipt (off-line)</li><li>Contributions - Receipt (on-line)</li><li>Memberships - Receipt (on-line)</li><li>Pledges - Acknowledgement</li></ul> If you have modified these templates, please review the new default versions and implement updates as needed to your copies (Administer > Communications > Message Templates > System Workflow Messages).');
+    }
   }
 
   function upgrade_4_5_alpha1($rev) {

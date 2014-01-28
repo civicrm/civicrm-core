@@ -126,29 +126,7 @@ class CRM_Contribute_Form_Contribution_ThankYou extends CRM_Contribute_Form_Cont
 
       $this->assign('honor_block_is_active', $honor_block_is_active);
       $this->assign('soft_credit_type', $softCreditTypes[$params['soft_credit_type_id']]);
-      $profileContactType = CRM_Core_BAO_UFGroup::getContactType($params['honoree_profile_id']);
-      switch ($profileContactType) {
-        case 'Individual':
-          if (array_key_exists('prefix_id', $params['honor'])) {
-            $honorName = CRM_Utils_Array::value(CRM_Utils_Array::value('prefix_id',$params['honor']),
-              CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'prefix_id')
-            );
-          }
-          $honorName .= ' ' . $params['honor']['first_name'] . ' ' . $params['honor']['last_name'];
-          if (array_key_exists('suffix_id', $params['honor'])) {
-            $honorName .= ' ' . CRM_Utils_Array::value(CRM_Utils_Array::value('suffix_id',$params['honor']),
-              CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'suffix_id')
-            );
-          }
-          break;
-        case 'Organization':
-          $honorName = $params['honor']['organization_name'];
-          break;
-        case 'Household':
-          $honorName = $params['honor']['household_name'];
-          break;
-      }
-      $this->assign('honorName', $honorName);
+      CRM_Contribute_BAO_ContributionSoft::formatHonoreeProfileFields($this, $params['honor'], $params['honoree_profile_id']);
 
       $fieldTypes = array('Contact');
       $fieldTypes[]  = CRM_Core_BAO_UFGroup::getContactType($params['honoree_profile_id']);

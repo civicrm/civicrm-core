@@ -287,6 +287,15 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
         }
         self::buildCustomDisplay($postID, 'customPost', $userID, $template, $params['custom_post_id']);
       }
+      if (isset($values['honor'])) {
+        $honorValues = $values['honor'];
+        CRM_Contribute_BAO_ContributionSoft::formatHonoreeProfileFields(
+          $template,
+          $honorValues['honor_profile_values'],
+          $honorValues['honor_profile_id'],
+          $honorValues['honor_id']
+        );
+      }
 
       $title = isset($values['title']) ? $values['title'] : CRM_Contribute_PseudoConstant::contributionPage($values['contribution_page_id']);
 
@@ -489,7 +498,7 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
         'toName' => $displayName,
         'toEmail' => $email,
       );
-      //CRM-13811 
+      //CRM-13811
       if ($pageID) {
         $templatesParams['cc'] = CRM_Utils_Array::value('cc_receipt', $value[$pageID]);
         $templatesParams['bcc'] = CRM_Utils_Array::value('bcc_receipt', $value[$pageID]);

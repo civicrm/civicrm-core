@@ -324,19 +324,17 @@ class CRM_Contribute_Form_AdditionalInfo {
     }
 
     // retrieve individual prefix value for honoree
-    if (!empty($params['hidden_Honoree'])) {
-      $individualPrefix = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'prefix_id');
-      $honor = CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution', 'honor_type_id');
-      $params['honor_prefix'] = CRM_Utils_Array::value(CRM_Utils_Array::value('honor_prefix_id',
-          $params
-        ),
-        $individualPrefix
-      );
-      $params["honor_type"] = CRM_Utils_Array::value(CRM_Utils_Array::value('honor_type_id',
-          $params
-        ),
-        $honor
-      );
+    if (isset($params['soft_credit'])) {
+      $softCreditTypes = $softCredits = array();
+      foreach ($params['soft_credit'] as $key => $softCredit) {
+        $softCredits[$key] = array(
+          'Name' => $softCredit['contact_name'],
+          'Amount' => CRM_Utils_Money::format($softCredit['amount'], $softCredit['currency'])
+        );
+        $softCreditTypes[$key] = $softCredit['soft_credit_type_label'];
+      }
+      $form->assign('softCreditTypes', $softCreditTypes);
+      $form->assign('softCredits', $softCredits);
     }
 
     // retrieve premium product name and assigned fulfilled

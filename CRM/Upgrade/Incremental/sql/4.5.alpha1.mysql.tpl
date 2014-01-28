@@ -1,5 +1,7 @@
 {* file to handle db changes in 4.5.alpha1 during upgrade *}
 
+{include file='../CRM/Upgrade/4.5.alpha1.msg_template/civicrm_msg_template.tpl'}
+
 ALTER TABLE `civicrm_contact`
   ADD COLUMN `formal_title` varchar(64) COMMENT 'Formal (academic or similar) title in front of name. (Prof., Dr. etc.)' AFTER `suffix_id`;
 
@@ -126,14 +128,14 @@ INSERT INTO `civicrm_uf_group`
 VALUES
    ('honoree_individual', 'Individual, Contact', {localize}'{ts escape="sql"}Honoree Individual{/ts}'{/localize}, 0, 1);
 
-SELECT @uf_group_id_honoree_individual := max(id) from civicrm_uf_group where name = 'honoree_individual';
+SELECT @uf_group_id_honoree_individual := id from civicrm_uf_group where name = 'honoree_individual';
 
 INSERT INTO `civicrm_uf_field`
       (`uf_group_id`, `field_name`, `is_required`, `is_reserved`, `weight`, `visibility`, `in_selector`, `is_searchable`, `location_type_id`, {localize field='label'}`label`{/localize}, field_type)
 VALUES
       (@uf_group_id_honoree_individual, 'prefix_id',  0, 1, 1, 'User and User Admin Only', 0, 1, NULL, '{ts escape="sql"}Individual Prefix{/ts}', 'Individual'),
       (@uf_group_id_honoree_individual, 'first_name', 0, 1, 2, 'User and User Admin Only', 0, 1, NULL, '{ts escape="sql"}First Name{/ts}',        'Individual'),
-      (@uf_group_id_honoree_individual, 'last_name',  0, 1, 3, 'User and User Admin Only', 0, 1, NULL, '{ts escape="sql"}Last Name{/ts}',         'Individual')
+      (@uf_group_id_honoree_individual, 'last_name',  0, 1, 3, 'User and User Admin Only', 0, 1, NULL, '{ts escape="sql"}Last Name{/ts}',         'Individual'),
       (@uf_group_id_honoree_individual, 'email',      0, 1, 4, 'User and User Admin Only', 0, 1, 1,    '{ts escape="sql"}Email Address{/ts}',     'Individual');
 
 ALTER TABLE `civicrm_uf_join`
@@ -149,9 +151,11 @@ ALTER TABLE `civicrm_uf_join`
      ALTER TABLE civicrm_contribution_page DROP honor_block_text;
 {/if}
 
+ALTER TABLE civicrm_contribution DROP FOREIGN KEY `FK_civicrm_contribution_honor_contact_id`;
 ALTER TABLE civicrm_contribution DROP honor_contact_id;
 ALTER TABLE civicrm_contribution DROP honor_type_id;
 
+ALTER TABLE civicrm_pledge DROP FOREIGN KEY `FK_civicrm_pledge_honor_contact_id`;
 ALTER TABLE civicrm_pledge DROP honor_contact_id;
 ALTER TABLE civicrm_pledge DROP honor_type_id;
 

@@ -39,6 +39,33 @@
 class CRM_Contribute_Form_SoftCredit {
 
   /**
+   * Function to set variables up before form is built
+   *
+   * @return void
+   * @access static
+   */
+  static function preProcess(&$form) {
+    $contriDAO = new CRM_Contribute_DAO_Contribution();
+    $contriDAO->id = $form->_id;
+    $contriDAO->find(TRUE);
+    if ($contriDAO->contribution_page_id) {
+      $ufJoinParams = array(
+        'module' => 'soft_credit',
+        'entity_table' => 'civicrm_contribution_page',
+        'entity_id' => $contriDAO->contribution_page_id,
+      );
+      $profileId = CRM_Core_BAO_UFJoin::getUFGroupIds($ufJoinParams);
+
+      //check if any honree profile is enabled if yes then assign its profile type to $_honoreeProfileType
+      // which will be used to constraint soft-credit contact type in formRule, CRM-13981
+      if ($profileId[0]) {
+        $form->_honoreeProfileType = CRM_Core_BAO_UFGroup::getContactType($profileId[0]);
+      }
+    }
+  }
+
+
+  /**
    * Function used to build form element for soft credit block
    *
    * @param object   $form form object
@@ -197,7 +224,7 @@ class CRM_Contribute_Form_SoftCredit {
       foreach ($fields['soft_credit_amount'] as $key => $val) {
         if (!empty($fields['soft_credit_contact_select_id'][$key])) {
           if ($repeat[$fields['soft_credit_contact_select_id'][$key]] > 1) {
-            $errors["soft_credit_contact_select_id[$key]"] = ts('You cannot enter multiple soft credits for the same contact.');
+            $errors["soft_credit_contact[$key]"] = ts('You cannot enter multiple soft credits for the same contact.');
           }
           if ($self->_action == CRM_Core_Action::ADD && $fields['soft_credit_amount'][$key]
             && (CRM_Utils_Rule::cleanMoney($fields['soft_credit_amount'][$key]) > CRM_Utils_Rule::cleanMoney($fields['total_amount']))) {
@@ -206,9 +233,14 @@ class CRM_Contribute_Form_SoftCredit {
           if (empty($fields['soft_credit_amount'][$key])) {
             $errors["soft_credit_amount[$key]"] = ts('Please enter the soft credit amount.');
           }
+          $contactType = CRM_Contact_BAO_Contact::getContactType($fields['soft_credit_contact_select_id'][$key]);
+          if ($self->_honoreeProfileType && $self->_honoreeProfileType != $contactType) {
+            $errors["soft_credit_contact[$key]"] = ts('Please choose a contact of type %1', array(1 => $self->_honoreeProfileType));
+          }
         }
       }
     }
+
     return $errors;
   }
 }

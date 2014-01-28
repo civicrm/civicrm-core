@@ -110,7 +110,6 @@ class CRM_Contact_Form_ProfileContact {
 
   static function postProcess($form) {
     $params = $form->_params;
-    $values = $form->_values;
     if ($form->get('honor_block_is_active') && !empty($params['soft_credit_type_id'])) {
       $honorId = null;
 
@@ -140,6 +139,18 @@ class CRM_Contact_Form_ProfileContact {
         $softParams['amount'] = $contribution->total_amount;
       }
       CRM_Contribute_BAO_ContributionSoft::add($softParams);
+
+      if (CRM_Utils_Array::value('is_email_receipt', $form->_values)) {
+        $form->_values['honor'] = array(
+          'soft_credit_type' => CRM_Utils_Array::value(
+            $params['soft_credit_type_id'],
+            CRM_Core_OptionGroup::values("soft_credit_type")
+          ),
+          'honor_id' => $honorId,
+          'honor_profile_id' => $params['honoree_profile_id'],
+          'honor_profile_values' => $params['honor']
+        );
+      }
     }
   }
 }
