@@ -1,4 +1,5 @@
 {* file to handle db changes in 4.5.alpha1 during upgrade *}
+{include file='../CRM/Upgrade/4.4.alpha1.msg_template/civicrm_msg_template.tpl'}
 
 {include file='../CRM/Upgrade/4.5.alpha1.msg_template/civicrm_msg_template.tpl'}
 

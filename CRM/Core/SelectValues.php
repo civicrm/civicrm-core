@@ -589,6 +589,7 @@ class CRM_Core_SelectValues {
         '{event.fee_amount}' => ts('Event Fees'),
         '{event.info_url}' => ts('Event Info URL'),
         '{event.registration_url}' => ts('Event Registration URL'),
+        '{event.balance}' => ts('Event Balance')
       );
     }
     return $tokens;
