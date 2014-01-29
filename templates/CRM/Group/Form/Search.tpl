@@ -289,6 +289,9 @@ function showChildren( parent_id, showOrgInfo, group_id, levelClass) {
             }
             appendHTML += "<td>" + val.group_type + "</td>";
             appendHTML += "<td>" + val.visibility + "</td>";
+						if (showOrgInfo) {
+							appendHTML += "<td>" + val.org_info + "</td>";
+						}
             appendHTML += "<td>" + val.links + "</td>";
             appendHTML += "</tr>";
           });
