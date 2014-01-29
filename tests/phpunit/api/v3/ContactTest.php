@@ -596,7 +596,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
   }
 
   function testGetGroupIDFromContact() {
-    $groupId     = $this->groupCreate(NULL);
+    $groupId     = $this->groupCreate();
     $description = "Get all from group and display contacts";
     $subfile     = "GroupFilterUsingContactAPI";
     $params      = array(

@@ -49,7 +49,7 @@ class api_v3_GroupTest extends CiviUnitTestCase {
     $this->_apiversion = 3;
 
     parent::setUp();
-    $this->_groupID = $this->groupCreate(NULL, 3);
+    $this->_groupID = $this->groupCreate();
   }
 
   function tearDown() {
