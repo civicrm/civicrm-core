@@ -223,11 +223,12 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
           array('title' => ts('Duration'),
             'type' => CRM_Utils_Type::T_INT,
           ),
+          'details' => array(
+            'title' => ts('Activity Details'),
+          )
         ),
-        'filters' =>
-        array(
-          'activity_date_time' =>
-          array(
+        'filters' => array(
+          'activity_date_time' => array(
             'default' => 'this.month',
             'operatorType' => CRM_Report_Form::OP_DATE,
           ),
@@ -243,9 +244,12 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Core_PseudoConstant::activityStatus(),
           ),
+          'details' => array(
+            'title' => ts('Activity Details'),
+            'type' => CRM_Utils_Type::T_TEXT,
+          )
         ),
-        'order_bys' =>
-        array(
+        'order_bys' => array(
           'activity_date_time' =>
           array('title' => ts('Activity Date'), 'default_weight' => '1', 'dbAlias' => 'civicrm_activity_activity_date_time'),
           'activity_type_id' =>
@@ -665,6 +669,7 @@ GROUP BY civicrm_activity_id {$this->_having} {$this->_orderBy} {$this->_limit}"
     $viewLinks      = FALSE;
     $seperator      = CRM_Core_DAO::VALUE_SEPARATOR;
     $context        = CRM_Utils_Request::retrieve('context', 'String', $this, FALSE, 'report');
+    $actUrl         = '';
 
     if (CRM_Core_Permission::check('access CiviCRM')) {
       $viewLinks  = TRUE;
@@ -673,6 +678,34 @@ GROUP BY civicrm_activity_id {$this->_having} {$this->_orderBy} {$this->_limit}"
     }
 
     foreach ($rows as $rowNum => $row) {
+      // if we have an activity type, format the View Activity link for use in various columns
+      if ($viewLinks && array_key_exists('civicrm_activity_activity_type_id', $row)) {
+        // Check for target contact id(s) and use the first contact id in that list for view activity link if found,
+        // else use source contact id
+        if (!empty($rows[$rowNum]['civicrm_contact_contact_target_id'])) {
+          $targets = explode(';', $rows[$rowNum]['civicrm_contact_contact_target_id']);
+          $cid = $targets[0];
+        }
+        else {
+          $cid = $rows[$rowNum]['civicrm_contact_contact_source_id'];
+        }
+
+        $actActionLinks = CRM_Activity_Selector_Activity::actionLinks($row['civicrm_activity_activity_type_id'],
+          CRM_Utils_Array::value('civicrm_activity_source_record_id', $rows[$rowNum]),
+          FALSE,
+          $rows[$rowNum]['civicrm_activity_id']
+        );
+
+        $actLinkValues = array(
+          'id' => $rows[$rowNum]['civicrm_activity_id'],
+          'cid' => $cid,
+          'cxt' => $context,
+        );
+        $actUrl = CRM_Utils_System::url($actActionLinks[CRM_Core_Action::VIEW]['url'],
+          CRM_Core_Action::replace($actActionLinks[CRM_Core_Action::VIEW]['qs'], $actLinkValues), TRUE
+        );
+      }
+
       if (array_key_exists('civicrm_contact_contact_source', $row)) {
         if ($value = $row['civicrm_contact_contact_source_id']) {
           if ($viewLinks) {
@@ -733,31 +766,7 @@ GROUP BY civicrm_activity_id {$this->_having} {$this->_orderBy} {$this->_limit}"
         if ($value = $row['civicrm_activity_activity_type_id']) {
           $rows[$rowNum]['civicrm_activity_activity_type_id'] = $activityType[$value];
           if ($viewLinks) {
-            // Check for target contact id(s) and use the first contact id in that list for view activity link if found,
-            // else use source contact id
-            if (!empty($rows[$rowNum]['civicrm_contact_contact_target_id'])) {
-              $targets = explode(';', $rows[$rowNum]['civicrm_contact_contact_target_id']);
-              $cid = $targets[0];
-            }
-            else {
-              $cid = $rows[$rowNum]['civicrm_contact_contact_source_id'];
-            }
-
-            $actionLinks = CRM_Activity_Selector_Activity::actionLinks($row['civicrm_activity_activity_type_id'],
-              CRM_Utils_Array::value('civicrm_activity_source_record_id', $rows[$rowNum]),
-              FALSE,
-              $rows[$rowNum]['civicrm_activity_id']
-            );
-
-            $linkValues = array(
-              'id' => $rows[$rowNum]['civicrm_activity_id'],
-              'cid' => $cid,
-              'cxt' => $context,
-            );
-            $url = CRM_Utils_System::url($actionLinks[CRM_Core_Action::VIEW]['url'],
-              CRM_Core_Action::replace($actionLinks[CRM_Core_Action::VIEW]['qs'], $linkValues), TRUE
-            );
-            $rows[$rowNum]['civicrm_activity_activity_type_id_link'] = $url;
+            $rows[$rowNum]['civicrm_activity_activity_type_id_link'] = $actUrl;
             $rows[$rowNum]['civicrm_activity_activity_type_id_hover'] = $onHoverAct;
           }
           $entryFound = TRUE;
@@ -767,6 +776,17 @@ GROUP BY civicrm_activity_id {$this->_having} {$this->_orderBy} {$this->_limit}"
       if (array_key_exists('civicrm_activity_status_id', $row)) {
         if ($value = $row['civicrm_activity_status_id']) {
           $rows[$rowNum]['civicrm_activity_status_id'] = $activityStatus[$value];
+          $entryFound = TRUE;
+        }
+      }
+
+      if (array_key_exists('civicrm_activity_details', $row)) {
+        if ($value = $row['civicrm_activity_details']) {
+          $fullDetails = $rows[$rowNum]['civicrm_activity_details'];
+          $rows[$rowNum]['civicrm_activity_details'] = substr($fullDetails, 0, strrpos(substr($fullDetails, 0, 80), ' '));
+          if ($actUrl) {
+            $rows[$rowNum]['civicrm_activity_details'] .= " <a href='{$actUrl}' title='{$onHoverAct}'>(more)</a>"; 
+          }
           $entryFound = TRUE;
         }
       }
