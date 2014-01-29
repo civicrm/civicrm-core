@@ -88,29 +88,34 @@ $('#civicrm-menu').ready(function() {
     $(this).attr("tabIndex",i+2);
   });
 
-  var contactUrl = {/literal}"{crmURL p='civicrm/ajax/rest' q='className=CRM_Contact_Page_AJAX&fnName=getContactList&json=1&context=navigation' h=0 }"{literal};
-  $('#sort_name_navigation').autocomplete(contactUrl, {
-    width: 200,
-    selectFirst: false,
-    minChars: 1,
-    matchContains: true,
-    delay: 400,
-    max: {/literal}{crmSetting name="search_autocomplete_count" group="Search Preferences"}{literal},
-    extraParams:{
-      fieldName:function () {
-        return  $('input[name=quickSearchField]:checked').val();
+  $('#sort_name_navigation')
+    .crmAutocomplete({
+      source: function(request, response) {
+        var
+          option = $('input[name=quickSearchField]:checked'),
+          params = {
+            name: request.term,
+            field_name: option.val(),
+            table_name: option.attr("data-tablename")
+          };
+        CRM.api3('contact', 'getquick', params).done(function(result) {
+          var ret = [];
+          if (result.values) {
+            $.each(result.values, function(k, v) {
+              ret.push({value: v.id, label: v.data});
+            })
+          }
+          response(ret);
+        })
       },
-      tableName:function () {
-        return  $('input[name=quickSearchField]:checked').attr("data-tablename");
-      }
-    }
-  }).result(function(event, data, formatted) {
-        document.location = CRM.url('civicrm/contact/view', {reset: 1, cid: data[1]});
+      select: function (event, ui) {
+        document.location = CRM.url('civicrm/contact/view', {reset: 1, cid: ui.item.value});
         return false;
-      });
-  $('#sort_name_navigation').keydown(function() {
-    $.Menu.closeAll();
-  });
+      }
+    })
+    .keydown(function() {
+      $.Menu.closeAll();
+    });
   $('.crm-hidemenu').click(function() {
     $.Menu.closeAll();
     $('#civicrm-menu').slideUp();
@@ -131,7 +136,7 @@ $('#civicrm-menu').ready(function() {
     if (value === 'first_name' || value === 'last_name') {
       value = 'sort_name';
     }
-    $('#sort_name_navigation').attr({name: value, placeholder: label}).flushCache().focus();
+    $('#sort_name_navigation').attr({name: value, placeholder: label}).focus();
   });
   // check if there is only one contact and redirect to view page
   $('#id_search_block').on('submit', function() {
