@@ -111,6 +111,10 @@ $('#civicrm-menu').ready(function() {
       select: function (event, ui) {
         document.location = CRM.url('civicrm/contact/view', {reset: 1, cid: ui.item.value});
         return false;
+      },
+      create: function() {
+        // Place menu in front
+        $(this).crmAutocomplete('widget').css('z-index', (1 + $('#civicrm-menu').css('z-index')));
       }
     })
     .keydown(function() {
