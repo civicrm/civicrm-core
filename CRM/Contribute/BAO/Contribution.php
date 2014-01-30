@@ -2452,6 +2452,8 @@ WHERE  contribution_id = %1 ";
    */
   static function recordFinancialAccounts(&$params, $financialTrxnVals = NULL) {
     $skipRecords = $update = FALSE;
+    // in few scenarios we require the trxn record details which has got created
+    $return = NULL;
     $additionalParticipantId = array();
     $contributionStatuses = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
 
@@ -2670,8 +2672,9 @@ WHERE  contribution_id = %1 ";
       }
 
       if (!$update) {
-        //records finanical trxn and entity financial trxn
-        $financialTxn = CRM_Core_BAO_FinancialTrxn::create($trxnParams);
+        // records finanical trxn and entity financial trxn
+        // also make it available as return value
+        $return = $financialTxn = CRM_Core_BAO_FinancialTrxn::create($trxnParams);
         $params['entity_id'] = $financialTxn->id;
       }
     }
@@ -2703,9 +2706,7 @@ WHERE  contribution_id = %1 ";
     }
     unset($params['line_item']);
 
-    if (!$update) {
-      return $financialTxn;
-    }
+    return $return;
   }
 
   /**
