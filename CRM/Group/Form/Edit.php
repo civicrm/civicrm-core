@@ -183,8 +183,16 @@ class CRM_Group_Form_Edit extends CRM_Core_Form {
           //used in edit mode
           $this->_groupOrganizationID = $defaults['group_organization'];
         }
-
-        $this->assign('organizationID', CRM_Utils_Array::value('organization_id',$defaults));
+        if (!empty($defaults['organization_id'])) {
+          $result = civicrm_api3('contact', 'getquick', array(
+            'org' => 1,
+            'id' => $defaults['organization_id']
+          ));
+          $this->assign('organizationName', $result['values'][0]['data']);
+        }
+        else {
+          $this->assign('organizationName', '');
+        }
       }
     }
 

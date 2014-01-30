@@ -117,7 +117,7 @@
         <tr class="crm-group-form-block-organization">
             <td class="label">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{$form.organization.label}</td>
       <td>{$form.organization.html|crmAddClass:huge}
-          <div id="organization_address" style="font-size:10px"></div>
+          <div id="organization_address" style="font-size:10px">{$organizationName}</div>
       </td>
         </tr>
     </table>
@@ -151,26 +151,9 @@ cj('input[type=checkbox][name="group_type[{/literal}{$freezeMailignList}{literal
 cj('input[type=checkbox][name="group_type[{/literal}{$hideMailignList}{literal}]"]').hide();
 cj('label[for="group_type[{/literal}{$hideMailignList}{literal}]"]').hide();
 {/literal}{/if}{literal}
-{/literal}{if $organizationID}{literal}
-    cj(document).ready( function() {
-  //group organzation default setting
-  var dataUrl = "{/literal}{crmURL p='civicrm/ajax/search' h=0 q="org=1&id=$organizationID"}{literal}";
-  cj.ajax({
-          url     : dataUrl,
-          async   : false,
-          success : function(html){
-                      //fixme for showing address in div
-                      htmlText = html.split( '|' , 2);
-                      htmlDiv = htmlText[0].replace( /::/gi, ' ');
-          cj('#organization').val(htmlText[0]);
-                      cj('div#organization_address').html(htmlDiv);
-                    }
-  });
-    });
-{/literal}{/if}{literal}
 
-var dataUrl = "{/literal}{$groupOrgDataURL}{literal}";
-cj('#organization').autocomplete( dataUrl, {
+var dataUrl = "{/literal}{crmURL p='civicrm/ajax/rest' q='className=CRM_Contact_Page_AJAX&fnName=getContactList&json=1&org=1&context=groupcontact' h=0 }{literal}";
+cj('#organization').val(cj('#organization_address').text()).autocomplete( dataUrl, {
               width : 250, selectFirst : false, matchContains: true
               }).result( function(event, data, formatted) {
                                                        cj( "#organization_id" ).val( data[1] );
