@@ -2808,9 +2808,10 @@ div.grippie {
   height: 27px;
 }
 
-#civicrm-menu .ac_input,
+#civicrm-menu .ui-autocomplete-input,
+.crm-container .ui-autocomplete-input,
 .crm-container .ac_input {
-  background: white url(../i/magnify.gif) no-repeat scroll right center;
+  background: white url("../i/magnify.gif") no-repeat scroll right center;
   padding-right: 16px;
   /* so that text doesn't flow on top of icon */
 }
@@ -3821,7 +3822,8 @@ div.m ul#civicrm-menu,
 
 /* loader autocomplete */
 
-#civicrm-menu .ac_loading,
+#civicrm-menu .ui-autocomplete-loading,
+.crm-container .ui-autocomplete-loading,
 .crm-container .ac_loading {
   background: white url('../i/loading.gif') no-repeat right center;
 }
