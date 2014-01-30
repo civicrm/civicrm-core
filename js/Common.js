@@ -253,9 +253,13 @@ CRM.validate = CRM.validate || {
   functions: []
 };
 
+// https://github.com/ivaynberg/select2/pull/2090
+$.fn.select2.defaults.width = 'resolve';
+
 (function ($, undefined) {
   "use strict";
 
+  // Initialize widgets
   $(document).on('crmLoad', function(e) {
     $('table.row-highlight', e.target)
       .off('.rowHighlight')
@@ -272,6 +276,10 @@ CRM.validate = CRM.validate || {
         target.toggleClass('crm-row-selected', $(this).is(':checked'));
       })
       .find('input.select-row:checked').parents('tr').addClass('crm-row-selected');
+    $('.crm-select2', e.target).each(function() {
+      var options = $(this).data('select2') || {};
+      $(this).removeClass('crm-select2').select2(options);
+    });
   });
 
   /**
