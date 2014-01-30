@@ -209,6 +209,17 @@ class CRM_Utils_Check_Security {
     if ($upload_url = explode($filePathMarker, $config->imageUploadURL)) {
       if ($files = glob($config->uploadDir . '/*')) {
         foreach ($paths as $path) {
+          // Since we're here ...
+          $dir = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($path));
+          foreach ($dir as $name => $object) {
+            if (is_dir($name) && $name != '..') {
+              $nobrowse = realpath($name) . '/index.html';
+              if (!file_exists($nobrowse)) {
+                @file_put_contents($nobrowse, '');
+              }
+            }
+          }
+          // OK, now let's see if it's browseable.
           if ($dir_path = explode($filePathMarker, $path)) {
             $url = implode($filePathMarker, array($upload_url[0], $dir_path[1]));
             if ($files = glob($path . '/*')) {
