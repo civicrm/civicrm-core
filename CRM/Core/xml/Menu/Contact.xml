@@ -271,11 +271,6 @@
      <access_arguments>access CiviCRM</access_arguments>
 </item>
 <item>
-     <path>civicrm/ajax/contact</path>
-     <page_callback>CRM_Contact_Page_AJAX::contact</page_callback>
-     <access_arguments>access CiviCRM</access_arguments>
-</item>
-<item>
      <path>civicrm/ajax/custom</path>
      <page_callback>CRM_Contact_Page_AJAX::customField</page_callback>
      <access_arguments>access CiviCRM</access_arguments>

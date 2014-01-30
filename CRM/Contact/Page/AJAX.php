@@ -538,28 +538,6 @@ ORDER BY sort_name ";
   }
 
   /**
-   *
-   * Function to check how many contact exits in db for given criteria,
-   * if one then return contact id else null
-   */
-  static function contact() {
-    $name = CRM_Utils_Type::escape($_GET['name'], 'String');
-
-    $query = "
-SELECT id
-FROM civicrm_contact
-WHERE sort_name LIKE '%$name%'";
-
-    $dao = CRM_Core_DAO::executeQuery($query);
-    $dao->fetch();
-
-    if ($dao->N == 1) {
-      echo $dao->id;
-    }
-    CRM_Utils_System::civiExit();
-  }
-
-  /**
    * Function to delete custom value
    *
    */
