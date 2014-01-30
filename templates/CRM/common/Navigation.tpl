@@ -142,26 +142,13 @@ $('#civicrm-menu').ready(function() {
     }
     $('#sort_name_navigation').attr({name: value, placeholder: label}).focus();
   });
-  // check if there is only one contact and redirect to view page
+  // redirect to view page if there is only one contact
   $('#id_search_block').on('submit', function() {
-    var contactId, sortValue = $('#sort_name_navigation').val();
-    if (sortValue && $('#sort_name_navigation').attr('name') == 'sort_name') {
-      {/literal}{*
-      // FIXME: async:false == bad,
-      // we should just check the autocomplete results instead of firing a new request
-      // when we fix this, the civicrm/ajax/contact server-side callback can be removed as well
-      // also that would fix the fact that this only works with sort_name search
-      // (and we can remove the above conditional)
-      *}{literal}
-      var dataUrl = {/literal}"{crmURL p='civicrm/ajax/contact' h=0 q='name='}"{literal} + sortValue;
-      contactId = $.ajax({
-        url: dataUrl,
-        async: false
-      }).responseText;
-    }
-    if (contactId && !isNaN(parseInt(contactId))) {
-      var url = {/literal}"{crmURL p='civicrm/contact/view' h=0 q='reset=1&cid='}"{literal} + contactId;
-      this.action = url;
+    var $menu = $('#sort_name_navigation').crmAutocomplete('widget');
+    if ($('li.ui-menu-item', $menu).length === 1) {
+      var cid = $('li.ui-menu-item', $menu).data('ui-autocomplete-item').value;
+      document.location = CRM.url('civicrm/contact/view', {reset: 1, cid: cid});
+      return false;
     }
   });
 });
