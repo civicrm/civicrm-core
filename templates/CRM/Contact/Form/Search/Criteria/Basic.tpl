@@ -60,15 +60,6 @@
   {if $form.contact_type}
             <td><label>{ts}Contact Type(s){/ts}</label><br />
                 {$form.contact_type.html}
-                 {literal}
-          <script type="text/javascript">
-
-                cj("select#contact_type").crmasmSelect({
-                  respectParents: true
-                });
-
-            </script>
-          {/literal}
             </td>
   {else}
     <td>&nbsp;</td>
@@ -77,41 +68,23 @@
     <td>
       <div id='groupselect'><label>{ts}Group(s){/ts}<span class="crm-clear-link">(<a id='searchbygrouptype'>{ts}search by group type{/ts}</a>)</span></label>
         {$form.group.html}
-        {literal}
-        <script type="text/javascript">
-        cj("select#group").crmasmSelect({
-            respectParents: true
-        });
-
-
-        </script>
-        {/literal}
     </div>
     <div id='grouptypeselect'>
       <label>{ts}Group Type(s){/ts}<span class="crm-clear-link"> ( <a id='searchbygroup'>{ts}search by group{/ts}</a>)</span></label>
       {$form.group_type.html}
         {literal}
         <script type="text/javascript">
-        cj("select#group_type").crmasmSelect({
-            respectParents: true
-        });
-
-        function showGroupSearch(){
+        cj(function(){
+          function showGroupSearch(){
             cj('#grouptypeselect').hide();
             cj('#groupselect').show();
-            cj('#group_type').val('') ;
-            cj('#crmasmList2 li').remove();
-            cj('#crmasmSelect2').children().removeClass('asmOptionDisabled').prop('disabled', false);
-        }
-        function showGroupTypeSearch(){
+            cj('#group_type').select2('val', '');
+          }
+          function showGroupTypeSearch(){
             cj('#groupselect').hide();
             cj('#grouptypeselect').show();
-            cj('#group').val('') ;
-            cj('#crmasmList1 li').remove();
-            cj('#crmasmSelect1').children().removeClass('asmOptionDisabled').prop('disabled', false);
-        }
-
-        cj(function(){
+            cj('#group').select2('val', '');
+          }
           cj('#searchbygrouptype').click(function() {
               showGroupTypeSearch();
           });
@@ -143,15 +116,6 @@
     {if $form.contact_tags}
       <td><label>{ts}Select Tag(s){/ts}</label>
         {$form.contact_tags.html}
-        {literal}
-        <script type="text/javascript">
-
-        cj("select#contact_tags").crmasmSelect({
-            respectParents: true
-        });
-
-        </script>
-        {/literal}
       </td>
     {else}
       <td>&nbsp;</td>
@@ -203,10 +167,8 @@
       </table>
       {literal}
         <script type="text/javascript">
-          cj("select#privacy_options").crmasmSelect();
           cj("select#privacy_options").change(function() {
-            var items = cj(this).siblings('ul.crmasmList').find('li').length;
-            if (items > 1) {
+            if (cj(this).val() && cj(this).val().length > 1) {
               cj('#privacy-operator-wrapper').show();
             } else {
               cj('#privacy-operator-wrapper').hide();

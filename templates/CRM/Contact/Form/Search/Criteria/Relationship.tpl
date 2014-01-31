@@ -73,15 +73,4 @@
       </tr>
     {/if}
   </table>
-  {literal}
-    <script type="text/javascript">
-      cj("#relation_target_group").crmasmSelect({
-          addItemTarget: 'bottom',
-          animate: false,
-          highlight: true,
-          sortable: true,
-          respectParents: true
-      });
-    </script>
-  {/literal}
 </div>

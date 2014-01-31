@@ -493,8 +493,8 @@ class CRM_Activity_BAO_Query {
 
     $surveys = CRM_Campaign_BAO_Survey::getSurveys(TRUE, FALSE, FALSE, TRUE);
     if ($surveys) $form->add('select', 'activity_survey_id', ts('Survey / Petition'),
-      array(
-        '' => ts('- none -')) + $surveys, FALSE
+      array('' => ts('- none -')) + $surveys, FALSE,
+      array('class' => 'crm-select2')
     );
 
     $extends = array('Activity');
@@ -521,7 +521,9 @@ class CRM_Activity_BAO_Query {
       $buildEngagementLevel = TRUE;
       $form->add('select', 'activity_engagement_level',
         ts('Engagement Index'),
-        array('' => ts('- any -')) + CRM_Campaign_PseudoConstant::engagementLevel()
+        array('' => ts('- any -')) + CRM_Campaign_PseudoConstant::engagementLevel(),
+        FALSE,
+        array('class' => 'crm-select2')
       );
 
       // Add survey result field.
@@ -545,7 +547,7 @@ class CRM_Activity_BAO_Query {
         asort($resultOptions);
         $form->add('select', 'activity_result', ts("Survey Result"),
           $resultOptions, FALSE,
-          array('id' => 'activity_result', 'multiple' => 'multiple', 'title' => ts('- select -'))
+          array('id' => 'activity_result', 'multiple' => 'multiple', 'class' => 'crm-select2')
         );
       }
     }
