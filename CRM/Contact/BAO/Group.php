@@ -810,7 +810,6 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
       // it may be that this checking is now obsolete - or that what remains
       // should be removed to the whereClause (which is also accessed by getCount)
 
-      if ($permission) {
         $newLinks = $links;
         $values[$object->id] = array();
         CRM_Core_DAO::storeValues($object, $values[$object->id]);
@@ -909,7 +908,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
           $contactUrl = CRM_Utils_System::url('civicrm/contact/view', "reset=1&cid={$object->created_id}");
           $values[$object->id]['created_by'] = "<a href='{$contactUrl}'>{$object->created_by}</a>";
         }
-      }
+
     }
 
     return $values;
@@ -1152,6 +1151,10 @@ WHERE {$whereClause}";
       if (!empty( $groups)) {
         $groupList = implode( ', ', array_values( $groups ) );
         $clauses[] = "groups.id IN ( $groupList ) ";
+      }
+      else {
+        // they don't have view all contacts & they don't have permission to view any group
+        $clauses[] = " 0 = 1 ";
       }
     }
 
