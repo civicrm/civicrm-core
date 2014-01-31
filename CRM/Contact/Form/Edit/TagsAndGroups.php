@@ -111,7 +111,7 @@ class CRM_Contact_Form_Edit_TagsAndGroups {
             continue;
           }
           
-          if ($groupElementType == 'crmasmSelect') {
+          if ($groupElementType == 'select') {
             $groupsOptions[$id] = $group['title'];
           }
           else {
@@ -120,9 +120,9 @@ class CRM_Contact_Form_Edit_TagsAndGroups {
           }
         }
 
-        if ($groupElementType == 'crmasmSelect' && !empty($groupsOptions)) {
+        if ($groupElementType == 'select' && !empty($groupsOptions)) {
           $form->add('select', $fName, ts('%1', array(1 => $groupName)), $groupsOptions, FALSE,
-            array('id' => $fName, 'multiple' => 'multiple', 'title' => ts('- select -'))
+            array('id' => $fName, 'multiple' => 'multiple', 'class' => 'crm-select2')
           );
           $form->assign('groupCount', count($groupsOptions));
         }
@@ -190,7 +190,7 @@ class CRM_Contact_Form_Edit_TagsAndGroups {
       $contactGroup = CRM_Contact_BAO_GroupContact::getContactGroup($id, 'Added', NULL, FALSE, TRUE);
       if ($contactGroup) {
         foreach ($contactGroup as $group) {
-          if ($groupElementType == 'crmasmSelect') {
+          if ($groupElementType == 'select') {
             $defaults[$fName][] = $group['group_id'];
           }
           else {
@@ -242,7 +242,7 @@ class CRM_Contact_Form_Edit_TagsAndGroups {
         // set the group and tag ids
         $groupElementType = 'checkbox';
         if (CRM_Utils_System::getClassName($form) == 'CRM_Contact_Form_Contact') {
-          $groupElementType = 'crmasmSelect';
+          $groupElementType = 'select';
         }
         self::setDefaults($form->_contactId, $defaults, self::ALL, NULL, $groupElementType);
       }

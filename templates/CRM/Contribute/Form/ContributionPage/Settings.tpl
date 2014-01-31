@@ -222,12 +222,6 @@
       return false;
     })
 
-    cj("select#soft_credit_types").crmasmSelect({
-       addItemTarget: 'bottom',
-       animate: false,
-       highlight: true,
-       respectParents: true
-    });
  {/literal}
 </script>
 

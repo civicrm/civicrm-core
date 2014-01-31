@@ -538,6 +538,9 @@ class CRM_Core_Resources {
       "packages/jquery/jquery-ui/js/jquery-ui-1.10.3.custom$min.js",
       "packages/jquery/jquery-ui/css/black-tie/jquery-ui-1.10.3.custom$min.css",
         
+      "packages/jquery/plugins/select2/select2$min.js",
+      "packages/jquery/plugins/select2/select2.css",
+
       "packages/jquery/plugins/jquery.autocomplete.js",
       "packages/jquery/css/jquery.autocomplete.css",
 
@@ -572,7 +575,6 @@ class CRM_Core_Resources {
       "js/Common.js",
 
       "js/jquery/jquery.crmeditable.js",
-      "js/jquery/jquery.crmasmselect.js",
     );
 
     // Add localized jQuery UI files

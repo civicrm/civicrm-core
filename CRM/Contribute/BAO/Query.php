@@ -752,21 +752,23 @@ class CRM_Contribute_BAO_Query {
       ts('Currency Type'),
       array(
         '' => ts('- any -')) +
-      CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution', 'currency', array('labelColumn' => 'name'))
+      CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution', 'currency', array('labelColumn' => 'name')),
+      FALSE, array('class' => 'crm-select2')
     );
 
     // CRM-13848
     $form->add('select', 'financial_type_id',
       ts('Financial Type'),
       CRM_Contribute_PseudoConstant::financialType(), FALSE,
-        array('id' => 'financial_type_id', 'multiple' => 'multiple', 'title' => ts('- select -'))
+        array('id' => 'financial_type_id', 'multiple' => 'multiple', 'class' => 'crm-select2')
     );
 
     $form->add('select', 'contribution_page_id',
       ts('Contribution Page'),
       array(
         '' => ts('- any -')) +
-      CRM_Contribute_PseudoConstant::contributionPage()
+      CRM_Contribute_PseudoConstant::contributionPage(),
+      FALSE, array('class' => 'crm-select2')
     );
 
 
@@ -774,14 +776,16 @@ class CRM_Contribute_BAO_Query {
       ts('Payment Instrument'),
       array(
         '' => ts('- any -')) +
-      CRM_Contribute_PseudoConstant::paymentInstrument()
+      CRM_Contribute_PseudoConstant::paymentInstrument(),
+      FALSE, array('class' => 'crm-select2')
     );
 
     $form->add('select', 'contribution_pcp_made_through_id',
       ts('Personal Campaign Page'),
       array(
         '' => ts('- any -')) +
-      CRM_Contribute_PseudoConstant::pcPage()
+      CRM_Contribute_PseudoConstant::pcPage(),
+      FALSE, array('class' => 'crm-select2')
     );
 
     $status = array();
@@ -848,7 +852,9 @@ class CRM_Contribute_BAO_Query {
     if ( !empty( $batches ) ) {
       $form->add('select', 'contribution_batch_id',
         ts('Batch Name'),
-        array( '' => ts('- any -')) + $batches );
+        array('' => ts('- any -')) + $batches,
+        FALSE, array('class' => 'crm-select2')
+      );
     }
 
     $form->assign('validCiviContribute', TRUE);

@@ -39,12 +39,11 @@ class CRM_Contact_Form_Search_Criteria {
 
     if ($form->_searchOptions['contactType']) {
       // add checkboxes for contact type
-      $contact_type = array();
       $contactTypes = CRM_Contact_BAO_ContactType::getSelectElements();
 
       if ($contactTypes) {
         $form->add('select', 'contact_type', ts('Contact Type(s)'), $contactTypes, FALSE,
-          array('id' => 'contact_type', 'multiple' => 'multiple', 'title' => ts('- select -'))
+          array('id' => 'contact_type', 'multiple' => 'multiple', 'class' => 'crm-select2', 'style' => 'width: 100%;')
         );
       }
     }
@@ -56,11 +55,11 @@ class CRM_Contact_Form_Search_Criteria {
         $groupHierarchy = CRM_Contact_BAO_Group::getGroupsHierarchy($form->_group, NULL, '&nbsp;&nbsp;', TRUE);
 
         $form->add('select', 'group', ts('Groups'), $groupHierarchy, FALSE,
-          array('id' => 'group', 'multiple' => 'multiple', 'title' => ts('- select -'))
+          array('id' => 'group', 'multiple' => 'multiple', 'class' => 'crm-select2')
         );
         $groupOptions = CRM_Core_BAO_OptionValue::getOptionValuesAssocArrayFromName('group_type');
         $form->add('select', 'group_type', ts('Group Types'), $groupOptions, FALSE,
-            array('id' => 'group_type', 'multiple' => 'multiple', 'title' => ts('- select -'))
+          array('id' => 'group_type', 'multiple' => 'multiple', 'class' => 'crm-select2')
         );
         $form->add('hidden','group_search_selected','group');
       }
@@ -72,7 +71,7 @@ class CRM_Contact_Form_Search_Criteria {
 
       if ($contactTags) {
         $form->add('select', 'contact_tags', ts('Tags'), $contactTags, FALSE,
-          array('id' => 'contact_tags', 'multiple' => 'multiple', 'title' => ts('- select -'))
+          array('id' => 'contact_tags', 'multiple' => 'multiple', 'class' => 'crm-select2', 'style' => 'width: 100%;')
         );
       }
 
@@ -223,7 +222,7 @@ class CRM_Contact_Form_Search_Criteria {
       array(
         'id' => 'privacy_options',
         'multiple' => 'multiple',
-        'title' => ts('- select -'),
+        'class' => 'crm-select2',
       )
     );
 
@@ -255,7 +254,7 @@ class CRM_Contact_Form_Search_Criteria {
     $form->addGroup($commPreff, 'preferred_communication_method', ts('Preferred Communication Method'));
 
     //CRM-6138 Preferred Language
-    $form->add('select', 'preferred_language', ts('Preferred Language'), array('' => ts('- any -')) + CRM_Contact_BAO_Contact::buildOptions('preferred_language'));
+    $form->add('select', 'preferred_language', ts('Preferred Language'), array('' => ts('- any -')) + CRM_Contact_BAO_Contact::buildOptions('preferred_language'), FALSE, array('class' => 'crm-select2'));
 
     // Phone search
     $form->addElement('text', 'phone_numeric', ts('Phone Number'), CRM_Core_DAO::getAttribute('CRM_Core_DAO_Phone', 'phone'));
@@ -328,13 +327,13 @@ class CRM_Contact_Form_Search_Criteria {
           }
           else {
             //if not setdefault any country
-            $selectElements = array('' => ts('- any -')) + CRM_Core_PseudoConstant::$select();
+            $selectElements = CRM_Core_PseudoConstant::$select();
           }
-          $element = $form->addElement('select', $name, $title, $selectElements);
+          $element = $form->add('select', $name, $title, $selectElements, FALSE, array('class' => 'crm-select2'));
         }
         elseif ($select == 'country') {
           $selectElements = array('' => ts('- any -')) + CRM_Core_PseudoConstant::$select();
-          $element = $form->addElement('select', $name, $title, $selectElements);
+          $element = $form->add('select', $name, $title, $selectElements, FALSE, array('class' => 'crm-select2'));
         }
         elseif ($select == 'county') {
           if ( array_key_exists('state_province', $formValues) && !CRM_Utils_System::isNull($formValues['state_province'])) {
@@ -343,11 +342,11 @@ class CRM_Contact_Form_Search_Criteria {
           else {
             $selectElements = array('' => ts('- any -'));
           }
-          $element = $form->addElement('select', $name, $title, $selectElements);
+          $element = $form->add('select', $name, $title, $selectElements, FALSE, array('class' => 'crm-select2'));
         }
         else {
           $selectElements = array('' => ts('- any -')) + CRM_Core_PseudoConstant::$select();
-          $element = $form->addElement('select', $name, $title, $selectElements);
+          $element = $form->add('select', $name, $title, $selectElements, FALSE, array('class' => 'crm-select2'));
         }
         if ($multiSelect) {
           $element->setMultiple(TRUE);
@@ -377,7 +376,7 @@ class CRM_Contact_Form_Search_Criteria {
     $form->addRule('prox_distance', ts('Please enter positive number as a distance'), 'numeric');
 
     $worldRegions = array('' => ts('- any region -')) + CRM_Core_PseudoConstant::worldRegion();
-    $form->addElement('select', 'world_region', ts('World Region'), $worldRegions);
+    $form->add('select', 'world_region', ts('World Region'), $worldRegions, FALSE, array('class' => 'crm-select2'));
 
     // checkboxes for location type
     $location_type = array();
@@ -431,7 +430,7 @@ class CRM_Contact_Form_Search_Criteria {
 
     $allRelationshipType = array();
     $allRelationshipType = CRM_Contact_BAO_Relationship::getContactRelationshipType(NULL, NULL, NULL, NULL, TRUE);
-    $form->addElement('select', 'relation_type_id', ts('Relationship Type'), array('' => ts('- select -')) + $allRelationshipType);
+    $form->add('select', 'relation_type_id', ts('Relationship Type'), array('' => ts('- select -')) + $allRelationshipType, FALSE, array('class' => 'crm-select2'));
     $form->addElement('text', 'relation_target_name', ts('Target Contact'), CRM_Core_DAO::getAttribute('CRM_Contact_DAO_Contact', 'sort_name'));
     // relation status
     $relStatusOption = array(ts('Active '), ts('Inactive '), ts('All'));
@@ -445,7 +444,7 @@ class CRM_Contact_Form_Search_Criteria {
     //add the target group
     if ($form->_group) {
       $form->add('select', 'relation_target_group', ts('Target Contact(s) in Group'), $form->_group, FALSE,
-        array('id' => 'relation_target_group', 'multiple' => 'multiple', 'title' => ts('- select -'))
+        array('id' => 'relation_target_group', 'multiple' => 'multiple', 'class' => 'crm-select2')
       );
     }
     CRM_Core_Form_Date::buildDateRange($form, 'relation_start_date', 1, '_low', '_high', ts('From:'), FALSE, FALSE);

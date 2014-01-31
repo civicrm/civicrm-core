@@ -301,14 +301,14 @@ class CRM_Grant_BAO_Query {
 
     $grantType = CRM_Core_OptionGroup::values('grant_type');
     $form->add('select', 'grant_type_id', ts('Grant Type'),
-      array(
-        '' => ts('- any -')) + $grantType
+      array('' => ts('- any -')) + $grantType,
+      FALSE, array('class' => 'crm-select2')
     );
 
     $grantStatus = CRM_Core_OptionGroup::values('grant_status');
     $form->add('select', 'grant_status_id', ts('Grant Status'),
-      array(
-        '' => ts('- any -')) + $grantStatus
+      array('' => ts('- any -')) + $grantStatus,
+      FALSE, array('class' => 'crm-select2')
     );
 
     $form->addDate('grant_application_received_date_low', ts('App. Received Date - From'), FALSE, array('formatType' => 'searchDate'));

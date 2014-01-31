@@ -229,67 +229,6 @@ div.crm-container fieldset label{
   color: #3E3E3E;
 }
 
-/* crm advanced select styling */
-.crm-container .crmasmContainer,
-.crm-container .crmasmSelect,
-.crm-container .crmasmSelectCampaigns,
-.crm-container .crmtagContainer,
-.crm-container .crmtagSelect {
-  width: 160px;
-}
-
-.crm-container .crmasmSelect,
-.crm-container .crmtagSelect,
-.crm-container .crmasmSelectCampaigns {
-  padding: 2px;
-}
-
-.crm-container .crmasmSelect .child-1 {
-  padding-left: 1em;
-}
-.crm-container .crmasmSelect .child-2 {
-  padding-left: 2em;
-}
-
-.crm-container .crmasmHighlight,
-.crm-container .crmtagHighlight {
-  display: block;
-  padding: 2px 4px;
-  background-color: #EEF4B8;
-}
-
-.crm-container .crmasmList,
-.crm-container .crmtagList {
-  margin: 0px;
-  padding: 0px;
-}
-
-.crm-container .crmasmList li,
-.crm-container .crmtagList li {
-  background-color: #3E3E3E;
-  background-image: none;
-  padding: 2px 4px;
-  list-style-type: none;
-  margin: 1px 0px;
-  color: #F5F6F1;
-}
-
-.crm-container .crmasmListItem,
-.crm-container .crmtagListItem {
-  position: relative;
-}
-
-.crm-container .crmasmListItemRemove,
-.crm-container .crmtagListItemRemove {
-  padding: 5px;
-  position: absolute;
-  right: 5px;
-  top: 2px;
-  font-size: 11px;
-  margin: 0px;
-  padding: 0px;
-}
-
 .crm-container textarea {
   border: 1px solid #999;
 }
@@ -2811,7 +2750,7 @@ div.grippie {
 #civicrm-menu .ui-autocomplete-input,
 .crm-container .ui-autocomplete-input,
 .crm-container .ac_input {
-  background: white url("../i/magnify.gif") no-repeat scroll right center;
+  background: url("../packages/jquery/plugins/select2/select2.png") no-repeat scroll right -23px;
   padding-right: 16px;
   /* so that text doesn't flow on top of icon */
 }
@@ -3826,6 +3765,27 @@ div.m ul#civicrm-menu,
 .crm-container .ui-autocomplete-loading,
 .crm-container .ac_loading {
   background: white url('../i/loading.gif') no-repeat right center;
+}
+
+/* select2 */
+.crm-select2 {
+  width: 15em;
+}
+.crm-container .select2-container {
+  min-width: 15em !important;
+}
+/* Move background image into outer container so we can place an icon in the inner container */
+.crm-container .select2-container-multi {
+  background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, color-stop(1%, #eee), color-stop(15%, #fff));
+  background-image: -webkit-linear-gradient(top, #eee 1%, #fff 15%);
+  background-image: -moz-linear-gradient(top, #eee 1%, #fff 15%);
+  background-image: linear-gradient(top, #eee 1%, #fff 15%);
+}
+.crm-container .select2-container-multi .select2-choices {
+  background: url("../i/TreeMinus.gif") no-repeat scroll right 5px;
+}
+.crm-container .select2-container-multi.select2-container-active .select2-choices {
+  background: url("../packages/jquery/plugins/select2/select2.png") no-repeat scroll right -22px;
 }
 
 /* Special styling for specific form buttons */
