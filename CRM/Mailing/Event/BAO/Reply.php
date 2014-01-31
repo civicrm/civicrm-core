@@ -219,9 +219,9 @@ class CRM_Mailing_Event_BAO_Reply extends CRM_Mailing_Event_DAO_Reply {
     $eq = new CRM_Core_DAO();
     $eq->query(
       "SELECT     $contacts.preferred_mail_format as format,
-                    $email.email as email
-                    $queue.job_id as job_id
-                    $queue.hash as hash
+                  $email.email as email,
+                  $queue.job_id as job_id,
+                  $queue.hash as hash
         FROM        $contacts
         INNER JOIN  $queue ON $queue.contact_id = $contacts.id
         INNER JOIN  $email ON $queue.email_id = $email.id
