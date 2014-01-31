@@ -34,6 +34,10 @@
  */
 class CRM_Utils_Check_Security {
 
+  CONST
+    // How often to run checks and notify admins about issues.
+    CHECK_TIMER = 86400;
+
   /**
    * We only need one instance of this object, so we use the
    * singleton pattern and cache the instance in this variable
@@ -70,9 +74,12 @@ class CRM_Utils_Check_Security {
    */
   public function allChecks() {
     if (CRM_Core_Permission::check('administer CiviCRM')) {
-      CRM_Utils_Check_Security::singleton()->CheckLogFileIsNotAccessible();
-      CRM_Utils_Check_Security::singleton()->CheckUploadsAreNotAccessible();
-      CRM_Utils_Check_Security::singleton()->CheckDirectoriesAreNotBrowseable();
+      $session = CRM_Core_Session::singleton();
+      if ($session->timer('check_' . __CLASS__, self::CHECK_TIMER)) {
+        CRM_Utils_Check_Security::singleton()->CheckLogFileIsNotAccessible();
+        CRM_Utils_Check_Security::singleton()->CheckUploadsAreNotAccessible();
+        CRM_Utils_Check_Security::singleton()->CheckDirectoriesAreNotBrowseable();
+      }
     }
   }
 
@@ -115,8 +122,6 @@ class CRM_Utils_Check_Security {
           if ($log_path = explode('/files/', $log_filename)) {
             $url[] = $log_path[1];
             $log_url = implode('/files/', $url);
-            // Fake a log being internet-accessible.
-            // $log_url = 'https://gist.github.com/xurizaemon/2141ee4e042c273c8979/raw/3eda5da63b114e206c2516569f88a45305cb1469/CiviCRM.aabbccdd.log';
             $docs_url = 'http://wiki.civicrm.org/confluence/display/CRMDOC/Security/LogNotAccessible';
             if ($log = @file_get_contents($log_url)) {
               $msg = 'The <a href="%1">CiviCRM debug log</a> should not be downloadable.'
