@@ -617,19 +617,15 @@ INNER JOIN  civicrm_group grp ON ( grp.id = campgrp.entity_id )
       $pastCampaigns    = array_diff($campaigns, $currentCampaigns);
       $allCampaigns     = array();
       if (!empty($currentCampaigns)) {
-        $allCampaigns = array('current_campaign' => ts('Current Campaigns'));
-        foreach ($currentCampaigns as & $camp) $camp = "&nbsp;&nbsp;&nbsp;{$camp}";
-        $allCampaigns += $currentCampaigns;
+        $allCampaigns = array('crm_optgroup_current_campaign' => ts('Current Campaigns')) + $currentCampaigns;
       }
       if (!empty($pastCampaigns)) {
-        $allCampaigns += array('past_campaign' => ts('Past Campaigns'));
-        foreach ($pastCampaigns as & $camp) $camp = "&nbsp;&nbsp;&nbsp;{$camp}";
-        $allCampaigns += $pastCampaigns;
+        $allCampaigns += array('crm_optgroup_past_campaign' => ts('Past Campaigns')) + $pastCampaigns;
       }
 
       $showCampaignInSearch = TRUE;
       $form->add('select', $elementName, ts('Campaigns'), $allCampaigns, FALSE,
-        array('id' => 'campaigns', 'multiple' => 'multiple', 'title' => ts('- select -'))
+        array('id' => 'campaigns', 'multiple' => 'multiple', 'class' => 'crm-select2')
       );
     }
     $infoFields = array(

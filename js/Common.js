@@ -279,6 +279,11 @@ $.fn.select2.defaults.width = 'resolve';
       })
       .find('input.select-row:checked').parents('tr').addClass('crm-row-selected');
     $('.crm-select2', e.target).each(function() {
+      // quickform doesn't support optgroups so here's a hack :(
+      $('option[value^=crm_optgroup]', this).each(function() {
+        $(this).nextUntil('option[value^=crm_optgroup]').wrapAll('<optgroup label="' + $(this).text() + '" />');
+        $(this).remove();
+      });
       var options = $(this).data('select2') || {};
       $(this).removeClass('crm-select2').select2(options);
     });
