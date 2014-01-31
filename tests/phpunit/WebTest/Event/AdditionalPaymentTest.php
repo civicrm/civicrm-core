@@ -203,6 +203,14 @@ class WebTest_Event_AdditionalPaymentTest extends CiviSeleniumTestCase {
         'Check Number' => '1044',
       )
     );
+    $this->click('_qf_ContributionView_cancel-bottom');
+
+    // view transaction popup info check
+    $this->waitForElementPresent("xpath=//td[@id='payment-info']/table[@id='info']/tbody/tr[2]/td[2]/a");
+    $this->click("xpath=//td[@id='payment-info']/table[@id='info']/tbody/tr[2]/td[2]/a");
+    $this->waitForElementPresent("xpath=//table[@id='info']/tbody/tr/th[contains(text(), 'Amount')]/../../tr[2]/td[contains(text(), '$ 400.00')]/../../tr[3]/td[contains(text(), '$ 400.00')]");
+    $this->waitForElementPresent("xpath=//table[@id='info']/tbody/tr/th[3][contains(text(), 'Paid By')]/../../tr[2]/td[3][contains(text(), 'Check')]/../../tr[3]/td[3][contains(text(), 'Cash')]");
+    $this->waitForElementPresent("xpath=//table[@id='info']/tbody/tr/th[6][contains(text(), 'Status')]/../../tr[2]/td[6][contains(text(), 'Completed')]/../../tr[3]/td[6][contains(text(), 'Completed')]");
   }
 
   function _checkPaymentInfoTable($feeAmt, $amtPaid) {
