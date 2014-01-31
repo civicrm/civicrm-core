@@ -3828,6 +3828,18 @@ div.m ul#civicrm-menu,
   background: white url('../i/loading.gif') no-repeat right center;
 }
 
+/* select2 */
+/* Move background image into outer container so we can place an icon in the inner container */
+.crm-container .select2-container-multi {
+  background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, color-stop(1%, #eee), color-stop(15%, #fff));
+  background-image: -webkit-linear-gradient(top, #eee 1%, #fff 15%);
+  background-image: -moz-linear-gradient(top, #eee 1%, #fff 15%);
+  background-image: linear-gradient(top, #eee 1%, #fff 15%);
+}
+.crm-container .select2-container-multi .select2-choices {
+  background: url("../packages/jquery/plugins/select2/select2.png") no-repeat scroll right -22px;
+}
+
 /* Special styling for specific form buttons */
 #crm-container span.crm-button_qf_Main_upload input,
 #crm-container span.crm-button_qf_Confirm_next input,
