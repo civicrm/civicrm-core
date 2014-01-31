@@ -72,7 +72,7 @@
 {if $softCreditTypes and $softCredits}
 {foreach from=$softCreditTypes item=softCreditType key=n}
 ===========================================================
-{softCreditType}
+{$softCreditType}
 ===========================================================
 {foreach from=$softCredits.$n item=value key=label}
 {$label}: {$value}
