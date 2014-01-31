@@ -285,7 +285,7 @@ $.fn.select2.defaults.width = 'resolve';
         $(this).remove();
       });
       var options = $(this).data('select2') || {};
-      $(this).removeClass('crm-select2').select2(options);
+      $(this).select2(options).removeClass('crm-select2');
     });
   });
 

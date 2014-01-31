@@ -549,16 +549,14 @@ class CRM_Pledge_BAO_Query {
 
     $form->add('select', 'pledge_financial_type_id',
       ts( 'Financial Type' ),
-      array(
-        '' => ts('- select -')) +
-        CRM_Contribute_PseudoConstant::financialType()
+      array('' => ts('- select -')) + CRM_Contribute_PseudoConstant::financialType(),
+      FALSE, array('class' => 'crm-select2')
     );
 
     $form->add('select', 'pledge_contribution_page_id',
       ts('Contribution Page'),
-      array(
-        '' => ts('- any -')) +
-        CRM_Contribute_PseudoConstant::contributionPage()
+      array('' => ts('- any -')) + CRM_Contribute_PseudoConstant::contributionPage(),
+      FALSE, array('class' => 'crm-select2')
     );
 
     //add fields for pledge frequency
@@ -571,8 +569,7 @@ class CRM_Pledge_BAO_Query {
 
     $form->add('select', 'pledge_frequency_unit',
       ts('Pledge Frequency'),
-      array(
-        '' => ts('- any -')) + $freqUnitsDisplay
+      array('' => ts('- any -')) + $freqUnitsDisplay
     );
 
     // add all the custom  searchable fields

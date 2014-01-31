@@ -66,32 +66,9 @@
           </td>
           <td><label>{ts}Contact Type(s){/ts}</label><br />
             {$form.contact_type.html}
-            {literal}
-              <script type="text/javascript">
-                cj("select#contact_type").crmasmSelect({
-                  addItemTarget: 'bottom',
-                  animate: false,
-                  highlight: true,
-                  sortable: true,
-                  respectParents: true
-                });
-              </script>
-            {/literal}
           </td>
           <td><label>{ts}Group(s){/ts}</label>
             {$form.group.html}
-            {literal}
-              <script type="text/javascript">
-                cj("select#group").crmasmSelect({
-                  addItemTarget: 'bottom',
-                  animate: false,
-                  highlight: true,
-                  sortable: true,
-                  respectParents: true,
-                  selectClass:'campaignGroupsSelect'
-                });
-              </script>
-            {/literal}
           </td>
         </tr>
         <tr>
@@ -220,34 +197,24 @@ function buildCampaignGroups( surveyId ) {
     function( data ) {
       if ( data.status != 'success' ) return;
 
-      var selectName         = 'campaignGroupsSelect';
-      var groupSelect        = cj("select[id^=" + selectName + "]");
-      var groupSelectCountId  = cj( groupSelect ).attr( 'id' ).replace( selectName, '' );
-
       //first remove all groups for given survey.
-      cj( "#group" ).find('option').remove( );
-      cj( groupSelect ).find('option').remove( );
-      cj( '#crmasmContainer' + groupSelectCountId ).find( 'span' ).remove( );
-      cj( '#crmasmList' + groupSelectCountId ).find( 'li' ).remove( );
+      cj("#group").find('option').remove();
 
       var groups = data.groups;
 
       //build the new group options.
       var optCount = 0;
       for ( group in groups ) {
-        title = groups[group].title;
-        value = groups[group].value;
-        if ( !title ) continue;
-        var crmOptCount = 'asm' + groupSelectCountId + 'option' + optCount;
+        var title = groups[group].title;
+        var value = groups[group].value;
+        if ( !value ) continue;
 
         //add options to main group select.
-        cj( "#group" ).append( cj('<option></option>').val( value ).html( title ).attr( 'id', crmOptCount ) );
-
-        //add option to crm multi select ul.
-        cj( groupSelect ).append( cj('<option></option>').val(value).html(title).attr( 'rel', crmOptCount ) );
+        cj( "#group" ).append( cj('<option></option>').val( value ).html(title));
 
         optCount++;
       }
+      cj("#group").trigger('change');
     },
     'json');
 }

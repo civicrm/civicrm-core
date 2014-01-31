@@ -779,15 +779,14 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
     }
 
     // subtype is a common field. lets keep it here
-    $subtypes = CRM_Contact_BAO_ContactType::subTypePairs($this->_contactType);
+    $subtypes = CRM_Contact_BAO_Contact::buildOptions('contact_sub_type', 'create', array('contact_type' => $this->_contactType));
     if (!empty($subtypes)) {
       $sel = $this->add('select', 'contact_sub_type', ts('Contact Type'),
         $subtypes, FALSE,
         array(
           'id' => 'contact_sub_type',
           'multiple' => 'multiple',
-          'title' => '- ' . ts('select') . ' -',
-          'class' => $buildCustomData,
+          'class' => $buildCustomData . ' crm-select2',
         )
       );
     }
@@ -807,7 +806,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
 
     // build tags and groups
     CRM_Contact_Form_Edit_TagsAndGroups::buildQuickForm($this, 0, CRM_Contact_Form_Edit_TagsAndGroups::ALL,
-      FALSE, NULL, 'Group(s)', 'Tag(s)', NULL, 'crmasmSelect');
+      FALSE, NULL, 'Group(s)', 'Tag(s)', NULL, 'select');
 
     // build location blocks.
     CRM_Contact_Form_Edit_Lock::buildQuickForm($this);

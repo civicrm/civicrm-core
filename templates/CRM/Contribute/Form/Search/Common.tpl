@@ -41,7 +41,7 @@
   <td>
     <div class="float-left">
       <label>{ts}Payment Method{/ts}</label> <br />
-      {$form.contribution_payment_instrument_id.html}
+      {$form.contribution_payment_instrument_id.html|crmAddClass:twenty}
     </div>
     <div class="float-left" id="contribution_check_number_wrapper">
       {$form.contribution_check_number.label} <br />
@@ -119,18 +119,6 @@
   <td>
     <label>{ts}Financial Type{/ts}</label> <br />
     {$form.financial_type_id.html|crmAddClass:twenty}
-    {* CRM-13848 *}
-    {literal}
-    <script type="text/javascript">
-    cj("select#financial_type_id").crmasmSelect({
-      addItemTarget: 'bottom',
-      animate: false,
-      highlight: true,
-      sortable: true,
-      respectParents: true
-    });
-    </script>
-    {/literal}
   </td>
   <td>
     <label>{ts}Contribution Page{/ts}</label> <br />
@@ -164,7 +152,7 @@
 <tr>
   <td>
     <label>{ts}Currency{/ts}</label> <br />
-    {$form.contribution_currency_type.html}
+    {$form.contribution_currency_type.html|crmAddClass:twenty}
   </td>
   {if $form.contribution_batch_id.html }
     <td>

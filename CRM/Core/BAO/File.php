@@ -387,7 +387,7 @@
 
        if (!empty($tags)) {
          $form->add('select', "tag_$i", ts('Tags'), $tags, FALSE,
-           array('id' => "tags_$i", 'multiple' => 'multiple', 'title' => ts('- select -'))
+           array('id' => "tags_$i", 'multiple' => 'multiple', 'class' => 'crm-select2')
          );
        }
      }
