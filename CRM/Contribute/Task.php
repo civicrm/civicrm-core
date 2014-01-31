@@ -98,7 +98,7 @@ class CRM_Contribute_Task {
           'class' => 'CRM_Contribute_Form_Task_Status',
           'result' => TRUE,
         ),
-        7 => array('title' => ts('Print or Email Contribution Receipts'),
+        7 => array('title' => ts('Print or Email Contribution Receipts / Invoices'),
           'class' => 'CRM_Contribute_Form_Task_PDF',
           'result' => FALSE,
         ),
