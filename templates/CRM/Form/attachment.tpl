@@ -95,17 +95,6 @@
             {/if}
         {/section}
 
-        {literal}
-          <script type="text/javascript">
-            cj(".crm-attachment-tags select[multiple]").crmasmSelect({
-              addItemTarget: 'bottom',
-              animate: true,
-              highlight: true,
-              sortable: true,
-              respectParents: true
-            });
-          </script>
-        {/literal}
       {/if}
       {if $currentAttachmentInfo}
         <tr class="attachment-fieldset"><td colspan="2"></td></tr>

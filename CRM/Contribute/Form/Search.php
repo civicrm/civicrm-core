@@ -243,17 +243,16 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form {
     // multiselect for groups
     if ($this->_group) {
       $this->add('select', 'group', ts('Groups'), $this->_group, FALSE,
-        array('id' => 'group', 'multiple' => 'multiple', 'title' => ts('- select -'))
+        array('id' => 'group', 'multiple' => 'multiple', 'class' => 'crm-select2')
       );
     }
 
     // multiselect for tags
-    require_once 'CRM/Core/BAO/Tag.php';
     $contactTags = CRM_Core_BAO_Tag::getTags();
 
     if ($contactTags) {
       $this->add('select', 'contact_tags', ts('Tags'), $contactTags, FALSE,
-        array('id' => 'contact_tags', 'multiple' => 'multiple', 'title' => ts('- select -'))
+        array('id' => 'contact_tags', 'multiple' => 'multiple', 'class' => 'crm-select2')
       );
     }
 

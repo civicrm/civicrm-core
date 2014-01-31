@@ -112,17 +112,6 @@
     <tr class="crm-case-form-block-tag">
       <td class="label">{$form.tag.label}</td>
       <td class="view-value"><div class="crm-select-container">{$form.tag.html}</div>
-{literal}
-<script type="text/javascript">
-cj(".crm-case-form-block-tag select[multiple]").crmasmSelect({
-    addItemTarget: 'bottom',
-    animate: true,
-    highlight: true,
-    sortable: true,
-    respectParents: true
-});
-</script>
-{/literal}
       </td>
     </tr>
 {/if}

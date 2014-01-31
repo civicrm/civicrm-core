@@ -363,7 +363,7 @@ class CRM_Mailing_BAO_Query {
 
     if (!empty($mailings)) {
       $form->add('select', 'mailing_id', ts('Mailing Name(s)'), $mailings, FALSE,
-        array('id' => 'mailing_id', 'multiple' => 'multiple', 'title' => ts('- select -'))
+        array('id' => 'mailing_id', 'multiple' => 'multiple', 'class' => 'crm-select2')
       );
     }
 
@@ -383,7 +383,7 @@ class CRM_Mailing_BAO_Query {
       array('keyColumn' => 'id', 'labelColumn' => 'name')
     );
     $form->add('select', 'mailing_bounce_types', ts('Bounce Types'), $mailingBounceTypes, FALSE,
-      array('id' => 'mailing_bounce_types', 'multiple' => 'multiple', 'title' => ts('- select -'))
+      array('id' => 'mailing_bounce_types', 'multiple' => 'multiple', 'class' => 'crm-select2')
     );
 
     // event filters

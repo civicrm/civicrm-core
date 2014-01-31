@@ -575,7 +575,6 @@ class CRM_Core_Resources {
       "js/Common.js",
 
       "js/jquery/jquery.crmeditable.js",
-      "js/jquery/jquery.crmasmselect.js",
     );
 
     // Add localized jQuery UI files
