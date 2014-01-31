@@ -835,7 +835,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
 
     if (!empty($tags)) {
       $this->add('select', 'tag', ts('Tags'), $tags, FALSE,
-        array('id' => 'tags', 'multiple' => 'multiple', 'title' => ts('- select -'))
+        array('id' => 'tags', 'multiple' => 'multiple', 'class' => 'crm-select2')
       );
     }
 

@@ -8,31 +8,6 @@
 
     <td class="{$campaignTdClass}">{$form.$elementName.label}<br />
     <div class="crm-select-container">{$form.$elementName.html}</div>
-       {literal}
-       <script type="text/javascript">
-       cj( "select[name=" + "'" + {/literal}'{$elementName}[]'{literal} + "'" + "]" ).crmasmSelect({
-           addItemTarget: 'bottom',
-           animate: true,
-           highlight: true,
-           sortable: true,
-           respectParents: true,
-     selectClass:'crmasmSelectCampaigns'
-       });
-
-       //lets disable the current and past campaign options.
-       cj(function(){
-              cj( 'select[id^="'+ 'crmasmSelectCampaigns' +'"] option' ).each( function( ) {
-                   value = cj(this).val();
-                   if ( value == 'current_campaign' || value == 'past_campaign' ) {
-                        cj(this).css( 'color', 'black' );
-                        cj(this).prop( 'disabled', true );
-                        cj(this).prop( 'selected', false);
-                        cj(this).addClass( 'asmOptionDisabled' );
-                   }
-              });
-       });
-       </script>
-       {/literal}
     </td>
 </tr>
 

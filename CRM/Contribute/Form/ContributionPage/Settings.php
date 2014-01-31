@@ -217,7 +217,7 @@ class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_
       array(
         'id' => 'soft_credit_types',
         'multiple' => 'multiple',
-        'title' => '- ' . ts('select') . ' -',
+        'class' => 'crm-select2',
       )
     );
 

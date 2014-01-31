@@ -253,9 +253,15 @@ CRM.validate = CRM.validate || {
   functions: []
 };
 
+// Set select2 defaults
+$.fn.select2.defaults.minimumResultsForSearch = 10;
+// https://github.com/ivaynberg/select2/pull/2090
+$.fn.select2.defaults.width = 'resolve';
+
 (function ($, undefined) {
   "use strict";
 
+  // Initialize widgets
   $(document).on('crmLoad', function(e) {
     $('table.row-highlight', e.target)
       .off('.rowHighlight')
@@ -272,6 +278,15 @@ CRM.validate = CRM.validate || {
         target.toggleClass('crm-row-selected', $(this).is(':checked'));
       })
       .find('input.select-row:checked').parents('tr').addClass('crm-row-selected');
+    $('.crm-select2', e.target).each(function() {
+      // quickform doesn't support optgroups so here's a hack :(
+      $('option[value^=crm_optgroup]', this).each(function() {
+        $(this).nextUntil('option[value^=crm_optgroup]').wrapAll('<optgroup label="' + $(this).text() + '" />');
+        $(this).remove();
+      });
+      var options = $(this).data('select2') || {};
+      $(this).select2(options).removeClass('crm-select2');
+    });
   });
 
   /**

@@ -239,13 +239,6 @@
       return true;
     });
     {/literal}{/if}{literal}
-
-    $("select#contact_sub_type").crmasmSelect({
-      addItemTarget: 'bottom',
-      animate: false,
-      highlight: true,
-      respectParents: true
-    });
   });
 
 </script>

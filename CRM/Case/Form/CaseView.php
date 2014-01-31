@@ -425,7 +425,7 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
 
     if (!empty($allTags)) {
       $this->add('select', 'case_tag', ts('Tags'), $allTags, FALSE,
-        array('id' => 'tags', 'multiple' => 'multiple', 'title' => ts('- select -'))
+        array('id' => 'tags', 'multiple' => 'multiple', 'class' => 'crm-select2')
       );
 
       $tags = CRM_Core_BAO_EntityTag::getTag($this->_caseID, 'civicrm_case');

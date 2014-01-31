@@ -820,13 +820,6 @@ function addRole() {
 
 {literal}
 <script type="text/javascript">
-cj("#manageTags select[multiple]").crmasmSelect({
-  addItemTarget: 'bottom',
-  animate: true,
-  highlight: true,
-  sortable: true,
-  respectParents: true
-});
 
 cj("#manageTags").hide( );
 function addTags() {
