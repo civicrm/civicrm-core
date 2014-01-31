@@ -253,6 +253,8 @@ CRM.validate = CRM.validate || {
   functions: []
 };
 
+// Set select2 defaults
+$.fn.select2.defaults.minimumResultsForSearch = 10;
 // https://github.com/ivaynberg/select2/pull/2090
 $.fn.select2.defaults.width = 'resolve';
 
