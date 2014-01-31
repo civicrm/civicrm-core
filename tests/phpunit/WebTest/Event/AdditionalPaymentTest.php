@@ -30,7 +30,7 @@ class WebTest_Event_AdditionalPaymentTest extends CiviSeleniumTestCase {
     parent::setUp();
   }
 
-  // CRM-13964
+  // CRM-13964 and CRM-13965
   function testParticipantParitalPaymentInitiation() {
     // Log in using webtestLogin() method
     $this->webtestLogin();
@@ -120,14 +120,9 @@ class WebTest_Event_AdditionalPaymentTest extends CiviSeleniumTestCase {
       )
     );
 
-    // check the fee amount
-    $feeAmt = 800.00;
-    $this->assertElementContainsText("xpath=//td[@id='payment-info']/table[@id='info']/tbody/tr[2]/td", "$ {$feeAmt}", 'Missing text: appropriate fee amount');
-    // check paid amount
-    $amtPaid = 400.00;
-    $this->assertElementContainsText("xpath=//td[@id='payment-info']/table[@id='info']/tbody/tr[2]/td[2]/a", "$ {$amtPaid}", 'Missing text: appropriate fee amount');
-
-    // check contribution record as well
+    // check the fee amount and contribution amount
+    $this->_checkPaymentInfoTable(800.00, 400.00);
+    $balance = 800.00 - 400.00;
     //click through to the contribution view screen
     $this->click("xpath=id('ParticipantView')/div[2]/table[@class='selector']/tbody/tr[1]/td[8]/span/a[text()='View']");
     $this->waitForElementPresent('_qf_ContributionView_cancel-bottom');
@@ -142,5 +137,76 @@ class WebTest_Event_AdditionalPaymentTest extends CiviSeleniumTestCase {
         'Check Number' => '1044',
       )
     );
+
+    $this->click('_qf_ContributionView_cancel-top');
+    $this->waitForElementPresent("xpath=id('ParticipantView')/div[2]/table[@class='selector']/tbody/tr[1]/td[8]/span/a[text()='View']");
+    // make additional payment
+    // 1 - check for links presence on participant view and edit page
+    $this->assertElementPresent("xpath=id('Search')/table[@class='selector']/tbody/tr[1]/td[8]/span[2]/ul/li[2]/a[text()='Record Payment']");
+    $this->click("xpath=id('Search')/table[@class='selector']/tbody/tr[1]/td[8]/span/a[text()='View']");
+    $this->waitForElementPresent("xpath=id('ParticipantView')");
+    $this->assertElementPresent("xpath=id('ParticipantView')//td[@id='payment-info']/a/span[contains(text(), 'Record Payment')]");
+
+    $this->click("xpath=id('ParticipantView')//div[@class='action-link']/div/a/span[contains(text(), 'Edit')]");
+    $this->waitForElementPresent("xpath=id('Participant')");
+    $this->assertElementPresent("xpath=id('Participant')//td[@id='payment-info']/a/span[contains(text(), 'Record Payment')]");
+    $location = $this->getAttribute("xpath=id('Participant')//td[@id='payment-info']/a/span[contains(text(), 'Record Payment')]/../@href");
+
+    $this->open($location);
+    $this->waitForElementPresent("xpath=id('AdditionalPayment')");
+    $this->assertElementContainsText("xpath=id('AdditionalPayment')/h3", 'New Event Payment');
+
+    // input data
+    $this->select('financial_type_id', 'label=Donation');
+    // verify balance
+    $text = $this->getText("xpath=id('AdditionalPayment')/div[2]/table/tbody/tr[4]/td[2]");
+    $this->assertTrue((bool)preg_match("/{$balance}/", $text));
+
+    // check form rule error
+    $errorBalance = $balance + 1;
+    $this->type('total_amount', $errorBalance);
+    $this->select('payment_instrument_id', 'label=Cash');
+    $this->click('_qf_AdditionalPayment_upload-bottom');
+    $this->waitForText("xpath=//span[@id='totalAmount']/span", 'Payment amount cannot be greater than owed amount');
+    $this->type('total_amount', $balance);
+    $this->click('_qf_AdditionalPayment_upload-bottom');
+    $this->waitForText('crm-notification-container', 'The payment record has been processed.');
+
+    $this->waitForElementPresent("xpath=id('Search')/table[@class='selector']/tbody/tr[1]/td[8]/span/a[text()='View']");
+    $this->click("xpath=id('Search')/table[@class='selector']/tbody/tr[1]/td[8]/span/a[text()='View']");
+    $this->waitForElementPresent("_qf_ParticipantView_cancel-top");
+
+    $this->webtestVerifyTabularData(
+      array(
+        'Event' => 'Rain-forest Cup Youth Soccer Tournament',
+        'Participant Role' => 'Attendee',
+        'Status' => 'Registered',
+        'Event Source' => 'Event Partially Paid Webtest',
+      )
+    );
+    // check the fee amount and contribution amount
+    $this->_checkPaymentInfoTable(800.00, 800.00);
+
+    // check for not apprence of record payment button
+    $this->assertFalse($this->isElementPresent("xpath=id('ParticipantView')//td[@id='payment-info']/a/span[contains(text(), 'Record Payment')]"));
+
+    $this->click("xpath=id('ParticipantView')/div[2]/table[@class='selector']/tbody/tr[1]/td[8]/span/a[text()='View']");
+    $this->waitForElementPresent('_qf_ContributionView_cancel-bottom');
+
+    $this->webtestVerifyTabularData(
+      array(
+        'From' => $displayName,
+        'Financial Type' => 'Event Fee',
+        'Total Amount' => '$ 800.00',
+        'Contribution Status' => 'Completed',
+        'Paid By' => 'Check',
+        'Check Number' => '1044',
+      )
+    );
+  }
+
+  function _checkPaymentInfoTable($feeAmt, $amtPaid) {
+    $this->assertElementContainsText("xpath=//td[@id='payment-info']/table[@id='info']/tbody/tr[2]/td", "$ {$feeAmt}", 'Missing text: appropriate fee amount');
+    $this->assertElementContainsText("xpath=//td[@id='payment-info']/table[@id='info']/tbody/tr[2]/td[2]/a", "$ {$amtPaid}", 'Missing text: appropriate fee amount');
   }
 }
