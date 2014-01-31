@@ -164,9 +164,6 @@
   </script>
   {/literal}
   {/if}
-  {if $participantId}
-    {include file="CRM/Contribute/Page/PaymentInfo.tpl" show='event-payment'}
-  {/if}
   {include file="CRM/Event/Form/EventFees.tpl"}
 {elseif $cdType}
   {include file="CRM/Custom/Form/CustomData.tpl"}
@@ -325,6 +322,9 @@
     </div>
   </div>
   {if $action eq 1 or $action eq 2}
+    {if $participantId}
+      {include file="CRM/Contribute/Page/PaymentInfo.tpl" show='event-payment'}
+    {/if}
     {literal}
     <script type="text/javascript">
     // event select
