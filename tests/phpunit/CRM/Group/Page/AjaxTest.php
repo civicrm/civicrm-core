@@ -183,7 +183,6 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
     $_REQUEST = $this->_params;
     list($groups, $total) = CRM_Group_Page_AJAX::getGroupList();
     $this->assertEquals(0, count($groups));
-    $this->markTestIncomplete('The AJAX function returns an incorrect result - needs fixing');
     $this->assertEquals(0, $total, 'Total returned should be accurate based on permissions');
   }
   /**
@@ -196,7 +195,6 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
     $_REQUEST['status'] = 1;
     list($groups, $total) = CRM_Group_Page_AJAX::getGroupList();
     $this->assertEquals(0, count($groups));
-    $this->markTestIncomplete('The AJAX function returns an incorrect result - needs fixing');
     $this->assertEquals(0, $total, 'Total returned should be accurate based on permissions');
   }
   /**
@@ -209,7 +207,6 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
     $_REQUEST['status'] = 2;
     list($groups, $total) = CRM_Group_Page_AJAX::getGroupList();
     $this->assertEquals(0, count($groups));
-    $this->markTestIncomplete('The AJAX function returns an incorrect result - needs fixing');
     $this->assertEquals(0, $total, 'Total returned should be accurate based on permissions');
   }
 
@@ -223,7 +220,6 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
     $_REQUEST['status'] = 2;
     list($groups, $total) = CRM_Group_Page_AJAX::getGroupList();
     $this->assertEquals(0, count($groups));
-    $this->markTestIncomplete('The AJAX function returns an incorrect result - needs fixing');
     $this->assertEquals(0, $total, 'Total returned should be accurate based on permissions');
   }
 
