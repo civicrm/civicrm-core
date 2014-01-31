@@ -502,6 +502,7 @@ LIMIT 1;";
     $contribution->trxn_id = $input['trxn_id'];
     $contribution->receive_date = CRM_Utils_Date::isoToMysql($contribution->receive_date);
     $contribution->thankyou_date = CRM_Utils_Date::isoToMysql($contribution->thankyou_date);
+    $contribution->receipt_date = CRM_Utils_Date::isoToMysql($contribution->receipt_date);
     $contribution->cancel_date = 'null';
 
     if (CRM_Utils_Array::value('check_number', $input)) {
