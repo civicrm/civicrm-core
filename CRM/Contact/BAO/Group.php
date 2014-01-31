@@ -1030,6 +1030,8 @@ WHERE  id IN $groupIdString
   }
 
   static function getGroupCount(&$params) {
+    //@todo - this function returns an incorrect result for contacts with 'access civicrm' permission & no contact access
+    // as the where clause is empty
     $whereClause = self::whereClause($params, FALSE);
     $query = "SELECT COUNT(*) FROM civicrm_group groups";
 
