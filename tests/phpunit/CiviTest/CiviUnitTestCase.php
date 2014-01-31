@@ -2497,6 +2497,67 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
     );
   }
 
+  /**
+   * Set up an acl allowing contact to see 2 specified groups
+   *  - $this->_permissionedGroup & $this->_permissionedDisbaledGroup
+   *
+   *  You need to have precreated these groups & created the user e.g
+   *  $this->createLoggedInUser();
+   *   $this->_permissionedDisabledGroup = $this->groupCreate(array('title' => 'pick-me-disabled', 'is_active' => 0, 'name' => 'pick-me-disabled'));
+   *   $this->_permissionedGroup = $this->groupCreate(array('title' => 'pick-me-active', 'is_active' => 1, 'name' => 'pick-me-active'));
+   *
+   */
+  function setupACL() {
+    CRM_Core_Config::singleton()->userPermissionClass->permissions = array('access CiviCRM');
+    $optionGroupID = $this->callAPISuccessGetValue('option_group', array('return' => 'id', 'name' => 'acl_role'));
+    $optionValue = $this->callAPISuccess('option_value', 'create', array('option_group_id' => $optionGroupID,
+      'label' => 'pick me',
+      'value' => 55,
+    ));
+
+
+    CRM_Core_DAO::executeQuery("
+      TRUNCATE civicrm_acl_cache
+    ");
+
+    CRM_Core_DAO::executeQuery("
+      TRUNCATE civicrm_acl_contact_cache
+    ");
+
+
+    CRM_Core_DAO::executeQuery("
+    INSERT INTO civicrm_acl_entity_role (
+    `acl_role_id`, `entity_table`, `entity_id`
+    ) VALUES (55, 'civicrm_group', {$this->_permissionedGroup});
+    ");
+
+    CRM_Core_DAO::executeQuery("
+    INSERT INTO civicrm_acl (
+    `name`, `entity_table`, `entity_id`, `operation`, `object_table`, `object_id`, `is_active`
+    )
+    VALUES (
+    'view picked', 'civicrm_group', $this->_permissionedGroup , 'Edit', 'civicrm_saved_search', {$this->_permissionedGroup}, 1
+    );
+    ");
+
+    CRM_Core_DAO::executeQuery("
+    INSERT INTO civicrm_acl (
+    `name`, `entity_table`, `entity_id`, `operation`, `object_table`, `object_id`, `is_active`
+    )
+    VALUES (
+    'view picked', 'civicrm_group',  $this->_permissionedGroup, 'Edit', 'civicrm_saved_search', {$this->_permissionedDisabledGroup}, 1
+    );
+    ");
+    $this->_loggedInUser = CRM_Core_Session::singleton()->get('userID');
+    $this->callAPISuccess('group_contact', 'create', array(
+      'group_id' => $this->_permissionedGroup,
+      'contact_id' => $this->_loggedInUser,
+    ));
+    //flush cache
+    CRM_ACL_BAO_Cache::resetCache();
+      CRM_ACL_API::groupPermission('whatever', 9999, NULL, 'civicrm_saved_search', NULL, NULL, TRUE);
+  }
+
 /**
  * Create an instance of the paypal processor
  * @todo this isn't a great place to put it - but really it belongs on a class that extends
