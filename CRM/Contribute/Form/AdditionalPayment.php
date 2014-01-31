@@ -354,7 +354,7 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
       if (!empty($submittedValues['is_email_receipt']) && $sendReceipt) {
         $statusMsg .= ' ' . ts('A receipt has been emailed to the contributor.');
       }
-      if ($sendReceipt) {
+      if (isset($sendReceipt)) {
         $statusMsg .= ' ' . ts('Email has been sent successfully');
       }
       CRM_Core_Session::setStatus($statusMsg, ts('Saved'), 'success');
