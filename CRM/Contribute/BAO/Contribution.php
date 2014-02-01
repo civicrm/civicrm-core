@@ -2868,6 +2868,7 @@ WHERE  contribution_id = %1 ";
       'Cancelled' => array('Completed', 'Refunded'),
       'Completed' => array('Cancelled', 'Refunded'),
       'Pending' => array('Cancelled', 'Completed', 'Failed'),
+      'In Progress' => array('Cancelled', 'Completed', 'Failed'),
       'Refunded' => array('Cancelled', 'Completed')
     );
 
