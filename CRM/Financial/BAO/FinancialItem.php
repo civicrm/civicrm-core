@@ -79,10 +79,12 @@ class CRM_Financial_BAO_FinancialItem extends CRM_Financial_DAO_FinancialItem {
   static function add($lineItem, $contribution) {
     $contributionStatuses = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
     $financialItemStatus = CRM_Core_PseudoConstant::get('CRM_Financial_DAO_FinancialItem', 'status_id');
+    $itemStatus = NULL;
     if ($contribution->contribution_status_id == array_search('Completed', $contributionStatuses)) {
       $itemStatus = array_search('Paid', $financialItemStatus);
     }
-    elseif ($contribution->contribution_status_id == array_search('Pending', $contributionStatuses)) {
+    elseif ($contribution->contribution_status_id == array_search('Pending', $contributionStatuses) 
+      || $contribution->contribution_status_id == array_search('In Progress', $contributionStatuses)) {
       $itemStatus = array_search('Unpaid', $financialItemStatus);
     }
     $params = array(
