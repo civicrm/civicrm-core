@@ -252,7 +252,7 @@ class CRM_Contact_Form_Task_EmailCommon {
 
     $form->add('text', 'subject', ts('Subject'), 'size=50 maxlength=254', TRUE);
 
-    $form->add('select', 'fromEmailAddress', ts('From'), $form->_fromEmails, TRUE);
+    $form->add('select', 'fromEmailAddress', ts('From'), $form->_fromEmails, TRUE, array('class' => 'crm-select2 huge'));
 
     CRM_Mailing_BAO_Mailing::commonCompose($form);
 

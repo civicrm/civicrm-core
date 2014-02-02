@@ -510,10 +510,6 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
 
     // if we're editing...
     if (isset($this->_activityId)) {
-      $defaults['source_contact_qid'] = CRM_Utils_Array::value('source_contact_id',
-        $defaults);
-      $defaults['source_contact_id'] = CRM_Utils_Array::value('source_contact',
-        $defaults);
 
       if (!CRM_Utils_Array::crmIsEmptyArray($defaults['target_contact'])) {
         $target_contact_value = explode(';', trim($defaults['target_contact_value']));
@@ -573,9 +569,6 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
         $this->assign('assignee_contact_value',
           CRM_Utils_Array::value('assignee_contact_value', $defaults)
         );
-        $this->assign('source_contact_value',
-          CRM_Utils_Array::value('source_contact', $defaults)
-        );
       }
 
       // set default tags if exists
@@ -588,8 +581,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
       $this->_targetContactId = $this->_currentlyViewedContactId;
       $target_contact = array();
 
-      $defaults['source_contact_id'] = self::_getDisplayNameById($this->_sourceContactId);
-      $defaults['source_contact_qid'] = $this->_sourceContactId;
+      $defaults['source_contact_id'] = $this->_sourceContactId;
       if ($this->_context != 'standalone' && isset($this->_targetContactId)) {
         $target_contact[$this->_targetContactId] = self::_getDisplayNameById($this->_targetContactId);
       }
@@ -690,8 +682,8 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
     $element = & $this->add('select', 'activity_type_id', ts('Activity Type'),
       $this->_fields['followup_activity_type_id']['attributes'],
       FALSE, array(
-        'onchange' =>
-        "CRM.buildCustomData( 'Activity', this.value );",
+        'onchange' => "CRM.buildCustomData( 'Activity', this.value );",
+        'class' => 'crm-select2',
       )
     );
 
@@ -714,7 +706,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
         if ($values['type'] == 'wysiwyg') {
           $this->addWysiwyg($field, $values['label'], $attribute, $required);
         }
-        else {
+        elseif ($field != 'source_contact_id') {
           $this->add($values['type'], $field, $values['label'], $attribute, $required);
         }
       }
@@ -781,13 +773,6 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
     //add followup date
     $this->addDateTime('followup_date', ts('in'), FALSE, array('formatType' => 'activityDateTime'));
 
-    //autocomplete url
-    $dataUrl = CRM_Utils_System::url("civicrm/ajax/rest",
-      "className=CRM_Contact_Page_AJAX&fnName=getContactList&json=1&context=activity&reset=1",
-      FALSE, NULL, FALSE
-    );
-    $this->assign('dataUrl', $dataUrl);
-
     //tokeninput url
     $tokenUrl = CRM_Utils_System::url("civicrm/ajax/checkemail",
       "noemail=1",
@@ -795,36 +780,21 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
     );
     $this->assign('tokenUrl', $tokenUrl);
 
-    $admin = CRM_Core_Permission::check('administer CiviCRM');
-    //allow to edit source contact field field if context is civicase.
-    if ($this->_context == 'caseActivity') {
-      $admin = TRUE;
-    }
-
-    $this->assign('admin', $admin);
-
-    $sourceContactField = & $this->add($this->_fields['source_contact_id']['type'],
+    $sourceContactField = $this->addContactRef(
       'source_contact_id',
       $this->_fields['source_contact_id']['label'],
-      NULL,
-      $admin
+      array('class' => 'huge'),
+      TRUE
     );
+    // Only admins and case-workers can change the activity source
+    if (!CRM_Core_Permission::check('administer CiviCRM') && $this->_context != 'caseActivity') {
+      $sourceContactField->freeze();
+    }
 
-    $followupAssigneeContactField =& $this->add( 'text', 'followup_assignee_contact_id', ts('assignee') );
-
-    $this->add('hidden', 'source_contact_qid', '', array('id' => 'source_contact_qid'));
     CRM_Contact_Form_NewContact::buildQuickForm($this);
 
     $this->add('text', 'assignee_contact_id', ts('assignee'));
     $this->add( 'text', 'followup_assignee_contact_id', ts('assignee'));
-
-    if ($sourceContactField->getValue()) {
-      $this->assign('source_contact', $sourceContactField->getValue());
-    }
-    elseif ($this->_currentUserId) {
-      // we're setting currently LOGGED IN user as source for this activity
-      $this->assign('source_contact_value', self::_getDisplayNameById($this->_currentUserId));
-    }
 
     //need to assign custom data type and subtype to the template
     $this->assign('customDataType', 'Activity');
@@ -835,7 +805,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
 
     if (!empty($tags)) {
       $this->add('select', 'tag', ts('Tags'), $tags, FALSE,
-        array('id' => 'tags', 'multiple' => 'multiple', 'class' => 'crm-select2')
+        array('id' => 'tags', 'multiple' => 'multiple', 'class' => 'crm-select2 huge')
       );
     }
 
@@ -939,12 +909,6 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
     //Activity type is mandatory if creating new activity, CRM-4515
     if (array_key_exists('activity_type_id', $fields) && empty($fields['activity_type_id'])) {
       $errors['activity_type_id'] = ts('Activity Type is required field.');
-    }
-    //FIX me temp. comment
-    // make sure if associated contacts exist
-
-    if ($fields['source_contact_id'] && !is_numeric($fields['source_contact_qid'])) {
-      $errors['source_contact_id'] = ts('Source Contact non-existent!');
     }
 
     if (CRM_Utils_Array::value('activity_type_id', $fields) == 3 &&
@@ -1050,9 +1014,6 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
     // get ids for associated contacts
     if (!$params['source_contact_id']) {
       $params['source_contact_id'] = $this->_currentUserId;
-    }
-    else {
-      $params['source_contact_id'] = $this->_submitValues['source_contact_qid'];
     }
 
     if (isset($this->_activityId)) {
