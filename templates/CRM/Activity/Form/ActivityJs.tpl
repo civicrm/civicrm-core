@@ -56,22 +56,12 @@
 	}
 
   cj(function( ) {
-    {/literal}
-    {if $source_contact and $admin and $action neq 4}
-      {literal} cj( '#source_contact_id' ).val( "{/literal}{$source_contact}{literal}");{/literal}
-      {/if}
-      {literal}
-
-    var sourceDataUrl = "{/literal}{$dataUrl}{literal}";
     var tokenDataUrl_assignee  = "{/literal}{$tokenUrl}&context={$tokenContext}_assignee{literal}";
 
     var hintText = "{/literal}{ts escape='js'}Start typing a name or email address.{/ts}{literal}";
     cj( "#assignee_contact_id").tokenInput( tokenDataUrl_assignee, { prePopulate: assignee_contact, theme: 'facebook', hintText: hintText });
 		cj( "#followup_assignee_contact_id").tokenInput( tokenDataUrl_assignee, { prePopulate: followup_assignee_contact, theme: 'facebook', hintText: hintText });
     cj( 'ul.token-input-list-facebook, div.token-input-dropdown-facebook' ).css( 'width', '450px' );
-    cj('#source_contact_id').autocomplete( sourceDataUrl, { width : 180, selectFirst : false, hintText: hintText, matchContains: true, minChars: 1, max: {/literal}{crmSetting name="search_autocomplete_count" group="Search Preferences"}{literal}
-    }).result( function(event, data, formatted) { cj( "#source_contact_qid" ).val( data[1] );
-      }).bind( 'click', function( ) { if (!cj("#source_contact_id").val()) { cj( "#source_contact_qid" ).val(''); } });
   });
 
   /**

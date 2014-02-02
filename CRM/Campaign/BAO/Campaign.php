@@ -563,8 +563,9 @@ INNER JOIN  civicrm_group grp ON ( grp.id = campgrp.entity_id )
       $campaign = &$form->add('select',
         'campaign_id',
         ts('Campaign'),
-        array(
-          '' => ts('- select -')) + $campaigns
+        array('' => ts('- select -')) + $campaigns,
+        FALSE,
+        array('class' => 'crm-select2')
       );
       //lets freeze when user does not has access or campaign is disabled.
       if (!$isCampaignEnabled || !$hasAccessCampaign) {

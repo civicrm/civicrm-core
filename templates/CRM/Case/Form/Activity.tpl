@@ -100,7 +100,7 @@
     </tr>
     <tr class="crm-case-activity-form-block-assignee_contact_id">
       <td class="label">{ts}Assigned To{/ts}</td>
-      <td>{$form.assignee_contact_id.html}
+      <td>{$form.assignee_contact_id.html}<br />
         {edit}
           <span class="description">
           {ts}You can optionally assign this activity to someone.{/ts}

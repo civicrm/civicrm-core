@@ -138,7 +138,7 @@
           {$form.soft_credit_types.label}
       </td>
       <td>
-          <dt style="text-align:left;">{$form.soft_credit_types.html}</dt>
+          <dt style="text-align:left;">{$form.soft_credit_types.html|crmAddClass:huge}</dt>
           <dd>
               <a class="optionvalue-link" href="#" title='Click to edit available soft credit types'>
                   <span class="batch-edit"></span>
