@@ -261,6 +261,11 @@ CRM.validate = CRM.validate || {
   // https://github.com/ivaynberg/select2/pull/2090
   $.fn.select2.defaults.width = 'resolve';
 
+  // Workaround for https://github.com/ivaynberg/select2/issues/1246
+  $.ui.dialog.prototype._allowInteraction = function(e) {
+    return !!$(e.target).closest('.ui-dialog, .ui-datepicker, .select2-drop').length;
+  };
+
   // Initialize widgets
   $(document).on('crmLoad', function(e) {
     $('table.row-highlight', e.target)
