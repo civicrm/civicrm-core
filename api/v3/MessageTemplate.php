@@ -90,7 +90,6 @@ function civicrm_api3_message_template_get($params) {
  * Sends a template.
  */
 function civicrm_api3_message_template_send($params) {
-  require_once 'CRM/Core/BAO/MessageTemplates.php';
   CRM_Core_BAO_MessageTemplates::sendTemplate($params);
 }
 
