@@ -233,8 +233,73 @@ class org_civicrm_sms_clickatell extends CRM_SMS_Provider {
       if (array_key_exists('concat', $this->_providerInfo['api_params'])) {
         $postDataArray['concat'] = $this->_providerInfo['api_params']['concat'];
       }
-      //TODO:
-      $postDataArray['to']   = $header['To'];
+      
+      
+      $do_country_specific_validation = false; 
+     $params = array(
+		  'version' => 3,
+		  'sequential' => 1,
+		);
+	$result = civicrm_api('Domain', 'get', $params);
+	if($result['is_error']  == 0  && $result['count'] <> 0 ){
+	    $values = $result['values'];
+	    $addr = $values[0]['domain_address']; 
+	    $crm_country_id = $addr['country_id']; 
+	    
+	    $sql = "SELECT name as country_name from civicrm_country country 
+	            WHERE country.id = ".$crm_country_id; 
+	            
+	     $dao =   & CRM_Core_DAO::executeQuery(  $sql ,   CRM_Core_DAO::$_nullArray ) ;
+	     while($dao->fetch() ){
+	     		$country_name = $dao->country_name; 
+	     		if( $country_name == 'United States' || $country_name == 'Canada'){
+	     			$phone_system_country_code = "1"; 
+	     			$phone_number_expected_length_without_code = 10; 
+	     			
+	     			$do_country_specific_validation = true;
+	     		
+	     		}else if( $country_name == 'United Kingdom' ){
+	     		  // 
+	     		  	$phone_system_country_code = "44"; 
+	     		  	
+	     		
+	     		}else if( $country_name == 'Australia'){
+	     		  // ?
+	     		
+	     		}else{
+	     		
+	     		
+	     		}
+	     
+	     }
+	     $dao->free(); 
+	
+	}
+	
+	
+	
+	if($do_country_specific_validation){
+	// Get just the numeric portion of the number, ignore any non-numeric characters. 
+		preg_match_all('/\d+/', $header['To'] , $matches);	
+		$recipient_phone_number = implode( "", $matches[0] ) ; 
+	    
+		$recipient_phone_length = strlen($recipient_phone_number ) ;
+	    
+      // check that the length of the phone number is exactly what we expect when the phone number does NOT include the country code. 
+	      if(  ( $recipient_phone_length == $phone_number_expected_length_without_code) ){	      
+		    $recipient_phone_number =  $phone_system_country_code.$recipient_phone_number; 
+	      
+	      }
+      
+          // Give ClickaTell the new number  , which should include the country code now.     
+      	   $postDataArray['to']   =   $recipient_phone_number;    
+      
+      }else{
+            $postDataArray['to']   =  $header['To'];
+      
+      }
+      
+      
       $postDataArray['text'] = utf8_decode(substr($message, 0, 460)); // max of 460 characters, is probably not multi-lingual
       if (array_key_exists('mo', $this->_providerInfo['api_params'])) {
         $postDataArray['mo'] = $this->_providerInfo['api_params']['mo'];
