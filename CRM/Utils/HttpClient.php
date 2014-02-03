@@ -189,7 +189,7 @@ class CRM_Utils_HttpClient {
     curl_setopt($ch, CURLOPT_HEADER, FALSE);
     curl_setopt($ch, CURLOPT_ENCODING, 'gzip');
     curl_setopt($ch, CURLOPT_VERBOSE, 0);
-    if (ini_get('open_basedir') == '' && ini_get('safe_mode') == 'Off') {
+    if ($this->isRedirectSupported()) {
       curl_setopt($ch, CURLOPT_FOLLOWLOCATION, TRUE);
     }
     if ($this->connectionTimeout !== NULL) {
@@ -200,6 +200,10 @@ class CRM_Utils_HttpClient {
     }
 
     return array($ch, $caConfig);
+  }
+
+  public function isRedirectSupported() {
+    return ini_get('open_basedir') == '' && ini_get('safe_mode') == 'Off';
   }
 
 }
