@@ -1,7 +1,7 @@
 <?php
 /**
  * Test Generated example of using loc_block create API
- * *
+ * Create locBlock with existing entities *
  */
 function loc_block_create_example(){
 $params = array(

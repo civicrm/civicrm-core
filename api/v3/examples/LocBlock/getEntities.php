@@ -1,30 +1,16 @@
 <?php
 /**
- * Test Generated example of using loc_block createEntities API
- * Create entities and location block in 1 api call *
+ * Test Generated example of using loc_block get API
+ * Get entities and location block in 1 api call *
  */
-function loc_block_createentities_example(){
+function loc_block_get_example(){
 $params = array(
-  'email' => array(
-      'location_type_id' => 1,
-      'email' => 'test2@loc.block',
-    ),
-  'phone' => array(
-      'location_type_id' => 1,
-      'phone' => '987654321',
-    ),
-  'phone_2' => array(
-      'location_type_id' => 1,
-      'phone' => '456-7890',
-    ),
-  'address' => array(
-      'location_type_id' => 1,
-      'street_address' => '987654321',
-    ),
+  'id' => 3,
+  'return' => 'all',
 );
 
 try{
-  $result = civicrm_api3('loc_block', 'createEntities', $params);
+  $result = civicrm_api3('loc_block', 'get', $params);
 }
 catch (CiviCRM_API3_Exception $e) {
   // handle error here
@@ -40,7 +26,7 @@ return $result;
 /**
  * Function returns array of result expected from previous function
  */
-function loc_block_createentities_expectedresult(){
+function loc_block_get_expectedresult(){
 
   $expectedResult = array(
   'is_error' => 0,
@@ -49,6 +35,11 @@ function loc_block_createentities_expectedresult(){
   'id' => 3,
   'values' => array(
       '3' => array(
+          'id' => '3',
+          'address_id' => '3',
+          'email_id' => '4',
+          'phone_id' => '3',
+          'phone_2_id' => '4',
           'address' => array(
               'id' => '3',
               'location_type_id' => '1',
@@ -59,51 +50,29 @@ function loc_block_createentities_expectedresult(){
             ),
           'email' => array(
               'id' => '4',
-              'contact_id' => '',
               'location_type_id' => '1',
               'email' => 'test2@loc.block',
               'is_primary' => 0,
-              'is_billing' => '',
-              'on_hold' => '',
-              'is_bulkmail' => '',
-              'hold_date' => '',
-              'reset_date' => '',
-              'signature_text' => '',
-              'signature_html' => '',
+              'is_billing' => 0,
+              'on_hold' => 0,
+              'is_bulkmail' => 0,
             ),
           'phone' => array(
               'id' => '3',
-              'contact_id' => '',
               'location_type_id' => '1',
               'is_primary' => 0,
-              'is_billing' => '',
-              'mobile_provider_id' => '',
+              'is_billing' => 0,
               'phone' => '987654321',
-              'phone_ext' => '',
-              'phone_numeric' => '',
-              'phone_type_id' => '',
+              'phone_numeric' => '987654321',
             ),
           'phone_2' => array(
               'id' => '4',
-              'contact_id' => '',
               'location_type_id' => '1',
               'is_primary' => 0,
-              'is_billing' => '',
-              'mobile_provider_id' => '',
+              'is_billing' => 0,
               'phone' => '456-7890',
-              'phone_ext' => '',
-              'phone_numeric' => '',
-              'phone_type_id' => '',
+              'phone_numeric' => '4567890',
             ),
-          'id' => '3',
-          'address_id' => '3',
-          'email_id' => '4',
-          'phone_id' => '3',
-          'im_id' => '',
-          'address_2_id' => '',
-          'email_2_id' => '',
-          'phone_2_id' => '4',
-          'im_2_id' => '',
         ),
     ),
 );
