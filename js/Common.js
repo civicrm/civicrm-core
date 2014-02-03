@@ -290,6 +290,13 @@ CRM.validate = CRM.validate || {
         $(this).remove();
       });
       var options = $(this).data('select-params') || {};
+      // Set placeholder from markup if not specified
+      if ($(this).is('select:not([multiple])')) {
+        options.allowClear = options.allowClear !== undefined ? options.allowClear : !($(this).hasClass('required'));
+        if (options.placeHolder === undefined && $('option:first', this).val() === '') {
+          options.placeholderOption = 'first';
+        }
+      }
       // Api-based searching
       if ($(this).data('api-params')) {
         $(this).addClass('crm-ajax-select')
