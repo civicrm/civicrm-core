@@ -1220,7 +1220,20 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * @return HTML_QuickForm_Element
    */
   function addEntityRef($name, $label, $props = array(), $required = FALSE) {
-    $props['class'] = isset($props['class']) ? $props['class'] . ' crm-select2' : 'crm-select2';
+    $props['api'] = CRM_Utils_Array::value('api', $props, array());
+    // Merge in defaults for api params
+    $props['api'] += array(
+      'entity' => 'contact',
+      'key' => 'id',
+    );
+    $props['api'] += array(
+      'action' => $props['api']['entity'] == 'contact' ? 'getquick' : 'get',
+      'search' => 'name',
+      'label' => 'data',
+    );
+
+    $props['class'] = isset($props['class']) ? $props['class'] . ' ' : '';
+    $props['class'] .= "crm-select2 crm-{$props['api']['entity']}-ref-field";
 
     $props['select'] = CRM_Utils_Array::value('select', $props, array()) + array(
       'minimumInputLength' => 1,
@@ -1230,14 +1243,6 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       // Disabled pending https://github.com/ivaynberg/select2/pull/2092
       //'formatInputTooShort' => ts('Start typing a name or email address...'),
       //'formatNoMatches' => ts('No contacts found.'),
-    );
-
-    $props['api'] = CRM_Utils_Array::value('api', $props, array()) + array(
-      'entity' => 'contact',
-      'action' => 'getquick',
-      'search' => 'name',
-      'label' => 'data',
-      'key' => 'id',
     );
 
     $this->entityReferenceFields[] = $name;
@@ -1267,7 +1272,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
         $field->setValue($val);
       }
       if ($val) {
-        $data = $labels = array();
+        $data = array();
         $api = json_decode($field->getAttribute('data-api-params'), TRUE);
         $select = json_decode($field->getAttribute('data-select-params'), TRUE);
         // Support serialized values
@@ -1279,14 +1284,13 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
           $result = civicrm_api3($api['entity'], $api['action'], array('sequential' => 1, $api['key'] => $v));
           if (!empty($result['values'])) {
             $data[] = array('id' => $v, 'text' => $result['values'][0][$api['label']]);
-            $labels[] = $result['values'][0][$api['label']];
           }
         }
         if ($field->isFrozen()) {
           $field->removeAttribute('class');
-          $field->setValue(implode(', ', $labels));
         }
-        elseif ($data) {
+        if ($data) {
+          // Simplify array for single selects - makes client-side code simpler (but feels somehow wrong)
           if (empty($select['multiple'])) {
             $data = $data[0];
           }
