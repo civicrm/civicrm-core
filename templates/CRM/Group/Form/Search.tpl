@@ -305,6 +305,9 @@ function showChildren( parent_id, showOrgInfo, group_id, levelClass) {
             appendHTML += '<td><span class="crm-editable crmf-description" data-type="textarea">' + (val.group_description || '') + "</span></td>";
             appendHTML += "<td>" + val.group_type + "</td>";
             appendHTML += "<td>" + val.visibility + "</td>";
+						if (showOrgInfo) {
+							appendHTML += "<td>" + val.org_info + "</td>";
+						}
             appendHTML += "<td>" + val.links + "</td>";
             appendHTML += "</tr>";
           });

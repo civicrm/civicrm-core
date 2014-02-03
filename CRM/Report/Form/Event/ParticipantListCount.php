@@ -36,9 +36,12 @@
 class CRM_Report_Form_Event_ParticipantListCount extends CRM_Report_Form_Event {
 
   protected $_summary = NULL;
-
+  protected $_groupFilter = TRUE;
+  protected $_tagFilter = TRUE;
   protected $_customGroupExtends = array(
-    'Participant');
+    'Participant',
+    'Event',
+  );
 
   public $_drilldownReport = array('event/income' => 'Link to Detail Report');
   function __construct() {
