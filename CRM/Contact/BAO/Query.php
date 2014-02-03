@@ -1574,7 +1574,12 @@ class CRM_Contact_BAO_Query {
 
       case 'tag':
       case 'contact_tags':
-        $this->tag($values);
+        if($this->getWhereValues('tag_toggle', $values[3])) {
+          $this->tagExclusion($values);
+        }
+        else {
+          $this->tag($values);
+        }
         return;
 
       case 'note':
@@ -2812,6 +2817,46 @@ WHERE  id IN ( $groupIDs )
     }
   }
 
+  /**
+   * The purpose of this function is to specifically exclude contacts who have a specific tag
+   * (CRM-14157)
+   * We can't do a normal left join here as we want to consider all contacts and filter those without
+   * the tags rather than filter out the tags.
+   * So, we create a table with all contact ids & a boolean value as to whether they have the id or not
+   *
+   * Note that the code relating to 'all types' had already been copied twice. Since I didn't
+   * really understand what was going on I opted to simply only show this function if that
+   * code is not in play (no case tags defined). I think at the point where this option
+   * is to be made available to case tag users the 3 tag functions should be rationalised & have that duplicate code
+   * centralised
+   * @param unknown $values
+   */
+  function tagExclusion(&$values) {
+    list($name, $op, $value, $grouping, $wildcard) = $values;
+    $tagNames = CRM_Core_PseudoConstant::get('CRM_Core_BAO_EntityTag', 'tag_id', array('onlyActive' => FALSE));
+    $value = (array) $value;
+    foreach ($value as $id => $dontCare) {
+      $names[] = CRM_Utils_Array::value($id, $tagNames);
+    }
+    $names = implode(' ' . ts('or') . ' ', $names);
+    $value = implode(',', array_keys($value));
+
+    $etTable = "`civicrm_entity_tag-" . $value . "`";
+
+    $this->_tables[$etTable] =
+    $this->_whereTables[$etTable] =
+      "LEFT JOIN (
+        SELECT c.id, IF(ISNULL(tag_id), 0, 1) as has_tag
+        FROM civicrm_contact c
+        LEFT JOIN civicrm_entity_tag t ON t.entity_id = c.id
+          AND entity_table = 'civicrm_contact'
+          AND tag_id IN ( $value )
+        GROUP BY c.id
+        ) {$etTable} ON {$etTable}.id = contact_a.id ";
+    // we could offer .id = 1 too but that doesn't confer any known advantage over the existing code
+    $this->_where[$grouping][] = "{$etTable}.has_tag = 0";
+    $this->_qill[$grouping][] = ts('Not tagged as') . ' ' . $names;
+  }
   /**
    * all tag search specific
    *

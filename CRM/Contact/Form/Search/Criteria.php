@@ -102,6 +102,18 @@ class CRM_Contact_Form_Search_Criteria {
         $form->add('checkbox', 'all_tag_types', ts('Include tags used for %1', array(1 => $tagTypesText)));
         $form->add('hidden','tag_types_text', $tagTypesText);
       }
+      else {
+        // per CRM-14157 & function CRM_Contact_BAO_Query::tagExclusion
+        // we are not offering the 'exclude contact by tag' functionality to sites
+        // with multiple tag types at this stage due to avoid the complexity around that code
+        //@todo extend the option to find contacts without a specific tag to sites with non-contact
+        //tags
+        $options = array(
+          1 => ts('Include'),
+          2 => ts('Exclude Contacts with Selected Tag(s)'),
+        );
+        $form->addRadio('tag_toggle', ts('Tag Options'), $options);
+      }
     }
 
     // add text box for last name, first name, street name, city
@@ -132,7 +144,7 @@ class CRM_Contact_Form_Search_Criteria {
     $form->addYesNo('uf_user', ts('CMS User?'), TRUE);
 
     // tag all search
-    $form->add('text', 'tag_search', ts('All Tags'));
+    $form->add('text', 'tag_search', ts('Include Tags Like '));
 
     // add search profiles
 

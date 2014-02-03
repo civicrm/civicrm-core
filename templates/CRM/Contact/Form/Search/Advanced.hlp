@@ -82,6 +82,19 @@
     For example, you might want to find all individuals who are employees ('Employee of' relationship type) of organizations which are in your 'Corporate Sponsors' group.{/ts}</p>
 {/htxt}
 
+{htxt id="id-tag-toggle"}
+{ts}Tag Options{/ts}
+{/htxt}
+{htxt id="id-tag-toggle"}
+    <p>{ts}Contacts with any of the selected tags are INCLUDED in your search results by default. To specifically EXCLUDE people
+    with a given tag choose the 'Exclude' radio button.
+    {/ts}</p>
+    <p>{ts}
+     Tags selected in the search box are always INCLUDED. If you, for example, exclude people tagged as 'Volunteer' but include
+     {/ts}'Ad'{ts} you will return 'Volunteers who are not also {/ts}administrators{ts} or {/ts}advertisers'
+    <p>
+{/htxt}
+
 {htxt id="id-all-tags-title"}
 {ts}Tags{/ts}
 {/htxt}
