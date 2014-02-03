@@ -1231,6 +1231,31 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
+   * CRM-14151
+   * Test completing a transaction via the API
+   *
+   * For wierd caching-y reasons this test performs differently in isolation than with other
+   * tests.
+   */
+  function testCompleteTransactionWithReceiptDateSet() {
+    $mut = new CiviMailUtils( $this, true );
+    $this->createLoggedInUser();
+    $params = array_merge($this->_params, array('contribution_status_id' => 1,'receipt_date' => 'now'));
+    $contribution = $this->callAPISuccess('contribution','create', $params);
+    $apiResult = $this->callAPISuccess('contribution', 'completetransaction', array(
+      'id' => $contribution['id'],
+    )
+    );
+    $contribution = $this->callAPISuccess('contribution', 'get', array('id' => $contribution['id'], 'sequential' => 1,));
+    $this->assertEquals('Completed', $contribution['values'][0]['contribution_status']);
+    $mut->checkMailLog(array(
+      'Receipt - Contribution',
+      'Please print this confirmation for your records.',
+    ));
+    $mut->stop();
+  }
+
+  /**
    * Test completing a transaction with an event via the API
    *
    * Note that we are creating a logged in user because email goes out from

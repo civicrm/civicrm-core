@@ -633,13 +633,26 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       }
     }
     elseif ((!$this->_ppID && $this->_id) || !$this->_id) {
-      foreach (array(
-                 'Overdue',
-                 'In Progress'
-               ) as $suppress) {
-        unset($status[CRM_Utils_Array::key($suppress, $statusName)]);
+      $suppressFlag = FALSE;
+      if ($this->_id) {
+        $componentDetails = CRM_Contribute_BAO_Contribution::getComponentDetails($this->_id);
+        if (CRM_Utils_Array::value('membership', $componentDetails) || CRM_Utils_Array::value('participant', $componentDetails)) {
+          $suppressFlag = TRUE;
+        }
+      }
+      if (!$suppressFlag) {
+        foreach (array(
+                   'Overdue',
+                   'In Progress'
+                 ) as $suppress) {
+          unset($status[CRM_Utils_Array::key($suppress, $statusName)]);
+        }
+      }
+      else {
+        unset($status[CRM_Utils_Array::key('Overdue', $statusName)]);
       }
     }
+    
     if ($this->_id) {
       $contributionStatus = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $this->_id, 'contribution_status_id');
       $name = CRM_Utils_Array::value($contributionStatus, $statusName);
@@ -647,10 +660,12 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         case 'Completed':
         case 'Cancelled':
         case 'Refunded':
+          unset($status[CRM_Utils_Array::key('In Progress', $statusName)]);
           unset($status[CRM_Utils_Array::key('Pending', $statusName)]);
           unset($status[CRM_Utils_Array::key('Failed', $statusName)]);
           break;
         case 'Pending':
+        case 'In Progress':
           unset($status[CRM_Utils_Array::key('Refunded', $statusName)]);
           break;
         case 'Failed':
@@ -658,6 +673,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
                      'Pending',
                      'Refunded',
                      'Completed',
+                     'In Progress',
                      'Cancelled'
                    ) as $suppress) {
             unset($status[CRM_Utils_Array::key($suppress, $statusName)]);

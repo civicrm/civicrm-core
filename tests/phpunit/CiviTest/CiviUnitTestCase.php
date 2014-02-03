@@ -1460,9 +1460,8 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    * @return int groupId of created group
    *
    */
-  function groupCreate($params = NULL) {
-    if ($params === NULL) {
-      $params = array(
+  function groupCreate($params = array()) {
+    $params = array_merge(array(
         'name' => 'Test Group 1',
         'domain_id' => 1,
         'title' => 'New Test Group Created',
@@ -1473,8 +1472,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
           '1' => 1,
           '2' => 1,
         ),
-      );
-    }
+      ), $params);
 
     $result = $this->callAPISuccess('Group', 'create', $params);
     return $result['id'];

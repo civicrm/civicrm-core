@@ -2523,7 +2523,8 @@ WHERE  contribution_id = %1 ";
     if (CRM_Utils_Array::value('contribution_status_id', $params) != array_search('Failed', $contributionStatuses) &&
       !(CRM_Utils_Array::value('contribution_status_id', $params) == array_search('Pending', $contributionStatuses) && !$params['contribution']->is_pay_later)) {
       $skipRecords = TRUE;
-      if (CRM_Utils_Array::value('contribution_status_id', $params) == array_search('Pending', $contributionStatuses)) {
+      $pendingStatus = array(array_search('Pending', $contributionStatuses), array_search('In Progress', $contributionStatuses));
+      if (in_array(CRM_Utils_Array::value('contribution_status_id', $params), $pendingStatus)) {
         $relationTypeId = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Accounts Receivable Account is' "));
         $params['to_financial_account_id'] = CRM_Contribute_PseudoConstant::financialAccountType($params['financial_type_id'], $relationTypeId);
       }
@@ -2591,7 +2592,7 @@ WHERE  contribution_id = %1 ";
           $newFinancialAccount = CRM_Contribute_PseudoConstant::financialAccountType($params['financial_type_id'], $incomeTypeId);
           if ($oldFinancialAccount != $newFinancialAccount) {
             $params['total_amount'] = 0;
-            if ($params['contribution']->contribution_status_id == array_search('Pending', $contributionStatuses)) {
+            if (in_array($params['contribution']->contribution_status_id, $pendingStatus)) {
               $params['trxnParams']['to_financial_account_id'] = CRM_Contribute_PseudoConstant::financialAccountType(
                 $params['prevContribution']->financial_type_id, $relationTypeId);
             }
@@ -2630,7 +2631,7 @@ WHERE  contribution_id = %1 ";
             //check if status is changed from Pending to Completed
             // do not update payment instrument changes for Pending to Completed
             if (!($params['contribution']->contribution_status_id == array_search('Completed', $contributionStatuses) &&
-              $params['prevContribution']->contribution_status_id == array_search('Pending', $contributionStatuses))) {
+              in_array($params['prevContribution']->contribution_status_id, $pendingStatus))) {
               // for all other statuses create new financial records
               self::updateFinancialAccounts($params, 'changePaymentInstrument');
               $params['total_amount'] = $params['trxnParams']['total_amount'] = $trxnParams['total_amount'];
@@ -2723,8 +2724,9 @@ WHERE  contribution_id = %1 ";
     $itemAmount = $trxnID = NULL;
     //get all the statuses
     $contributionStatus = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
-    if ($params['prevContribution']->contribution_status_id == array_search('Pending', $contributionStatus) &&
-      $params['contribution']->contribution_status_id == array_search('Completed', $contributionStatus)
+    if (($params['prevContribution']->contribution_status_id == array_search('Pending', $contributionStatus) 
+      || $params['prevContribution']->contribution_status_id == array_search('In Progress', $contributionStatus)) 
+      && $params['contribution']->contribution_status_id == array_search('Completed', $contributionStatus)
       && $context == 'changePaymentInstrument') {
       return;
     }
@@ -2737,13 +2739,12 @@ WHERE  contribution_id = %1 ";
 
       if ($params['prevContribution']->contribution_status_id == array_search('Completed', $contributionStatus)
         && ($params['contribution']->contribution_status_id == array_search('Refunded', $contributionStatus)
-          || $params['contribution']->contribution_status_id == array_search('Cancelled', $contributionStatus))) {
-
+        || $params['contribution']->contribution_status_id == array_search('Cancelled', $contributionStatus))) {
         $params['trxnParams']['total_amount'] = - $params['total_amount'];
       }
-      elseif ($params['prevContribution']->contribution_status_id == array_search('Pending', $contributionStatus)
-        && $params['prevContribution']->is_pay_later) {
-        $financialTypeID = !empty($params['financial_type_id']) ? $params['financial_type_id'] : $params['prevContribution']->financial_type_id;
+      elseif (($params['prevContribution']->contribution_status_id == array_search('Pending', $contributionStatus)
+        && $params['prevContribution']->is_pay_later) || $params['prevContribution']->contribution_status_id == array_search('In Progress', $contributionStatus)) {
+        $financialTypeID = CRM_Utils_Array::value('financial_type_id', $params) ? $params['financial_type_id'] : $params['prevContribution']->financial_type_id;
         if ($params['contribution']->contribution_status_id == array_search('Cancelled', $contributionStatus)) {
           $params['trxnParams']['to_financial_account_id'] = NULL;
           $params['trxnParams']['total_amount'] = - $params['total_amount'];
@@ -2771,8 +2772,9 @@ WHERE  contribution_id = %1 ";
     $params['entity_id'] = $trxn->id;
 
     if ($context == 'changedStatus') {
-      if (($params['prevContribution']->contribution_status_id == array_search('Pending', $contributionStatus)) &&
-        ($params['contribution']->contribution_status_id == array_search('Completed', $contributionStatus))) {
+      if (($params['prevContribution']->contribution_status_id == array_search('Pending', $contributionStatus)
+        || $params['prevContribution']->contribution_status_id == array_search('In Progress', $contributionStatus)) 
+        && ($params['contribution']->contribution_status_id == array_search('Completed', $contributionStatus))) {
         $query = "UPDATE civicrm_financial_item SET status_id = %1 WHERE entity_id = %2 and entity_table = 'civicrm_line_item'";
         $sql = "SELECT id, amount FROM civicrm_financial_item WHERE entity_id = %1 and entity_table = 'civicrm_line_item'";
 
@@ -2878,6 +2880,7 @@ WHERE  contribution_id = %1 ";
       'Cancelled' => array('Completed', 'Refunded'),
       'Completed' => array('Cancelled', 'Refunded'),
       'Pending' => array('Cancelled', 'Completed', 'Failed'),
+      'In Progress' => array('Cancelled', 'Completed', 'Failed'),
       'Refunded' => array('Cancelled', 'Completed')
     );
 
