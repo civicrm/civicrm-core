@@ -1211,12 +1211,15 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * @param string $name
    * @param string $label
    * @param array $props mix of html and widget properties, including:
-   *   - required
-   *   - select - params to give to select2, notably "multiple"
-   *   - api - array of data for the api, keys include "entity", "action", "params", "search", "key", "label"
+   *   - select - params to give to select2 widget
+   *   - api - array of settings for the api, keys include "entity", "action", "params", "search", "key", "label"
+   *   - placeholder - string
+   *   - multiple - bool
+   *   - class, etc. - other html properties
+   * @param bool $required
    * @return HTML_QuickForm_Element
    */
-  function addContactRef($name, $label, $props = array(), $required = FALSE) {
+  function addEntityRef($name, $label, $props = array(), $required = FALSE) {
     $props['class'] = isset($props['class']) ? $props['class'] . ' crm-select2' : 'crm-select2';
 
     $props['select'] = CRM_Utils_Array::value('select', $props, array()) + array(
@@ -1237,7 +1240,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       'key' => 'id',
     );
 
-    $this->entityReferenceFields[$name] = $props;
+    $this->entityReferenceFields[] = $name;
     $this->formatReferenceFieldAttributes($props);
     return $this->add('text', $name, $label, $props, $required);
   }
@@ -1248,13 +1251,16 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   private function formatReferenceFieldAttributes(&$props) {
     $props['data-select-params'] = json_encode($props['select']);
     $props['data-api-params'] = json_encode($props['api']);
-    CRM_Utils_Array::remove($props, 'multiple', 'select', 'api');
+    CRM_Utils_Array::remove($props, 'multiple', 'select', 'api', 'placeholder');
   }
 
+  /**
+   * Convert IDs to values and format for display
+   */
   private function preprocessReferenceFields() {
-    foreach ($this->entityReferenceFields as $name => $props) {
-      $val = $this->getElementValue($name);
+    foreach ($this->entityReferenceFields as $name) {
       $field = $this->getElement($name);
+      $val = $field->getValue();
       // Support array values
       if (is_array($val)) {
         $val = implode(',', $val);
@@ -1262,16 +1268,18 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       }
       if ($val) {
         $data = $labels = array();
+        $api = json_decode($field->getAttribute('data-api-params'), TRUE);
+        $select = json_decode($field->getAttribute('data-select-params'), TRUE);
         // Support serialized values
         if (strpos($val, CRM_Core_DAO::VALUE_SEPARATOR) !== FALSE) {
           $val = str_replace(CRM_Core_DAO::VALUE_SEPARATOR, ',', trim($val, CRM_Core_DAO::VALUE_SEPARATOR));
           $field->setValue($val);
         }
         foreach (explode(',', $val) as $v) {
-          $result = civicrm_api3($props['api']['entity'], $props['api']['action'], array('sequential' => 1, $props['api']['key'] => $v));
+          $result = civicrm_api3($api['entity'], $api['action'], array('sequential' => 1, $api['key'] => $v));
           if (!empty($result['values'])) {
-            $data[] = array('id' => $v, 'text' => $result['values'][0][$props['api']['label']]);
-            $labels[] = $result['values'][0][$props['api']['label']];
+            $data[] = array('id' => $v, 'text' => $result['values'][0][$api['label']]);
+            $labels[] = $result['values'][0][$api['label']];
           }
         }
         if ($field->isFrozen()) {
@@ -1279,7 +1287,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
           $field->setValue(implode(', ', $labels));
         }
         elseif ($data) {
-          if (empty($props['select']['multiple'])) {
+          if (empty($select['multiple'])) {
             $data = $data[0];
           }
           $field->setAttribute('data-entity-value', json_encode($data));
