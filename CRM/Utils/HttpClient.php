@@ -189,7 +189,9 @@ class CRM_Utils_HttpClient {
     curl_setopt($ch, CURLOPT_HEADER, FALSE);
     curl_setopt($ch, CURLOPT_ENCODING, 'gzip');
     curl_setopt($ch, CURLOPT_VERBOSE, 0);
-    curl_setopt($ch, CURLOPT_FOLLOWLOCATION, TRUE);
+    if (ini_get('open_basedir') == '' && ini_get('safe_mode') == 'Off') {
+      curl_setopt($ch, CURLOPT_FOLLOWLOCATION, TRUE);
+    }
     if ($this->connectionTimeout !== NULL) {
       curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $this->connectionTimeout);
     }
