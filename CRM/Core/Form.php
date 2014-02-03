@@ -1207,15 +1207,21 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
-   * Create a single or multiple contact ref field
+   * Create a single or multiple entity ref field
    * @param string $name
    * @param string $label
    * @param array $props mix of html and widget properties, including:
-   *   - select - params to give to select2 widget
-   *   - api - array of settings for the api, keys include "entity", "action", "params", "search", "key", "label"
-   *   - placeholder - string
-   *   - multiple - bool
-   *   - class, etc. - other html properties
+   *  - select - params to give to select2 widget
+   *  - api - array of settings for the api:
+   *     - "entity" - defaults to contact
+   *     - "action" - defaults to get (getquick when entity is contact)
+   *     - "params" - additional params to pass to the api
+   *     - "key"    - what to store as this field's value - defaults to "id"
+   *     - "label"  - what to show to the user - defaults to "label"
+   *     - "search" - rarely used - only needed if search field is different from label field
+   *  - placeholder - string
+   *  - multiple - bool
+   *  - class, etc. - other html properties
    * @param bool $required
    * @return HTML_QuickForm_Element
    */
@@ -1228,8 +1234,11 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     );
     $props['api'] += array(
       'action' => $props['api']['entity'] == 'contact' ? 'getquick' : 'get',
-      'search' => 'name',
-      'label' => 'data',
+      'label' => $props['api']['entity'] == 'contact' ? 'data' : 'label',
+    );
+    // this can be ommitted for normal apis since search field is usually the same as label field. But getquick is bizarre.
+    $props['api'] += array(
+      'search' => $props['api']['entity'] == 'contact' ? 'name' : $props['api']['label'],
     );
 
     $props['class'] = isset($props['class']) ? $props['class'] . ' ' : '';
