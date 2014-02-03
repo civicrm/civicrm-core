@@ -262,7 +262,7 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
 
   public function buildQuickForm() {
     $this->_fields['source_contact_id']['label'] = ts('Reported By');
-    $this->_fields['status_id']['attributes'] = array('' => ts('- select -')) + CRM_Core_PseudoConstant::activityStatus();
+    unset($this->_fields['status_id']['attributes']['required']);
 
     if ($this->_caseType) {
       $xmlProcessor = new CRM_Case_XMLProcessor_Process();
@@ -401,9 +401,6 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
 
     // store the submitted values in an array
     $params = $this->controller->exportValues($this->_name);
-    if ($params['source_contact_id']) {
-      $params['source_contact_id'] = $params['source_contact_qid'];
-    }
 
     //set parent id if its edit mode
     if ($parentId = CRM_Utils_Array::value('parent_id', $this->_defaults)) {

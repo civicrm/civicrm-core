@@ -253,13 +253,18 @@ CRM.validate = CRM.validate || {
   functions: []
 };
 
-// Set select2 defaults
-$.fn.select2.defaults.minimumResultsForSearch = 10;
-// https://github.com/ivaynberg/select2/pull/2090
-$.fn.select2.defaults.width = 'resolve';
-
 (function ($, undefined) {
   "use strict";
+
+  // Set select2 defaults
+  $.fn.select2.defaults.minimumResultsForSearch = 10;
+  // https://github.com/ivaynberg/select2/pull/2090
+  $.fn.select2.defaults.width = 'resolve';
+
+  // Workaround for https://github.com/ivaynberg/select2/issues/1246
+  $.ui.dialog.prototype._allowInteraction = function(e) {
+    return !!$(e.target).closest('.ui-dialog, .ui-datepicker, .select2-drop').length;
+  };
 
   // Initialize widgets
   $(document).on('crmLoad', function(e) {
@@ -284,7 +289,35 @@ $.fn.select2.defaults.width = 'resolve';
         $(this).nextUntil('option[value^=crm_optgroup]').wrapAll('<optgroup label="' + $(this).text() + '" />');
         $(this).remove();
       });
-      var options = $(this).data('select2') || {};
+      var options = $(this).data('select-params') || {};
+      // Set placeholder from markup if not specified
+      if ($(this).is('select:not([multiple])')) {
+        options.allowClear = options.allowClear !== undefined ? options.allowClear : !($(this).hasClass('required'));
+        if (options.placeHolder === undefined && $('option:first', this).val() === '') {
+          options.placeholderOption = 'first';
+        }
+      }
+      // Api-based searching
+      if ($(this).data('api-params')) {
+        $(this).addClass('crm-ajax-select')
+        options.query = function(info) {
+          var api = $(info.element).data('api-params');
+          var params = api.params || {};
+          params[api.search] = info.term;
+          CRM.api3(api.entity, api.action, params).done(function(data) {
+            var results = {context: info.context, results: []};
+            if (typeof(data.values) === 'object') {
+              $.each(data.values, function(k, v) {
+                results.results.push({id: v[api.key], text: v[api.label]});
+              });
+            }
+            info.callback(results);
+          });
+        };
+        options.initSelection = function(el, callback) {
+          callback(el.data('entity-value'));
+        };
+      }
       $(this).select2(options).removeClass('crm-select2');
     });
   });

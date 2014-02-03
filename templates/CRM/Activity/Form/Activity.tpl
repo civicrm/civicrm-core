@@ -77,7 +77,7 @@
   <tr class="crm-activity-form-block-source_contact_id">
     <td class="label">{$form.source_contact_id.label}</td>
     <td class="view-value">
-      {if $admin and $action neq 4}{$form.source_contact_id.html} {else} {$source_contact_value} {/if}
+      {$form.source_contact_id.html}
     </td>
   </tr>
 
@@ -123,7 +123,7 @@
             <div class="icon swap-icon"></div>
           </span>
         </a>
-        {$form.assignee_contact_id.html}
+        {$form.assignee_contact_id.html}<br />
         {edit}
           <span class="description">{ts}You can optionally assign this activity to someone. Assigned activities will appear in their Activities listing at CiviCRM Home.{/ts}
           {if $activityAssigneeNotification}

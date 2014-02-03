@@ -2750,7 +2750,7 @@ div.grippie {
 #civicrm-menu .ui-autocomplete-input,
 .crm-container .ui-autocomplete-input,
 .crm-container .ac_input {
-  background: url("../packages/jquery/plugins/select2/select2.png") no-repeat scroll right -23px;
+  background: white url("../packages/jquery/plugins/select2/select2.png") no-repeat scroll right -23px;
   padding-right: 16px;
   /* so that text doesn't flow on top of icon */
 }
@@ -3774,18 +3774,29 @@ div.m ul#civicrm-menu,
 .crm-container .select2-container {
   min-width: 15em !important;
 }
-/* Move background image into outer container so we can place an icon in the inner container */
+/* Multi-selects: Move background image into outer container so we can place an icon in the inner container */
 .crm-container .select2-container-multi {
   background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, color-stop(1%, #eee), color-stop(15%, #fff));
   background-image: -webkit-linear-gradient(top, #eee 1%, #fff 15%);
   background-image: -moz-linear-gradient(top, #eee 1%, #fff 15%);
   background-image: linear-gradient(top, #eee 1%, #fff 15%);
 }
+/* Add arrow icon to multi-selects */
 .crm-container .select2-container-multi .select2-choices {
   background: url("../i/TreeMinus.gif") no-repeat scroll right 5px;
 }
-.crm-container .select2-container-multi.select2-container-active .select2-choices {
+/* Add search icon to ajax multi-selects and opened multi-selects */
+.crm-container .select2-container-multi.select2-container-active .select2-choices,
+.crm-container .select2-container-multi.crm-ajax-select .select2-choices {
   background: url("../packages/jquery/plugins/select2/select2.png") no-repeat scroll right -22px;
+}
+/* Add search icon to ajax single-selects */
+.crm-container .crm-ajax-select .select2-arrow b {
+  background-position: -39px -22px;
+}
+/* Restore normal icon when searchable field is open */
+.crm-container .select2-dropdown-open .select2-choice .select2-arrow b {
+  background-position: -18px 1px;
 }
 
 /* Special styling for specific form buttons */
