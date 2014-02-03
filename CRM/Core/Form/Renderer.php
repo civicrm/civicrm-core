@@ -95,9 +95,9 @@ class CRM_Core_Form_Renderer extends HTML_QuickForm_Renderer_ArraySmarty {
    *
    * @access private
    *
-   * @param  object    An HTML_QuickForm_element object
-   * @param  bool      Whether an element is required
-   * @param  string    Error associated with the element
+   * @param  $element HTML_QuickForm_element
+   * @param  $required bool - Whether an element is required
+   * @param  $error string - Error associated with the element
    *
    * @return array
    */
@@ -115,6 +115,13 @@ class CRM_Core_Form_Renderer extends HTML_QuickForm_Renderer_ArraySmarty {
       else {
         $el['label'] = "<label>{$el['label']}</label>";
       }
+    }
+
+    if (!empty($el['frozen'])) {
+      if ($element->getAttribute('data-api-params') && $element->getAttribute('data-entity-value')) {
+        $this->renderFrozenEntityRef($el, $element);
+      }
+      $el['html'] = '<div class="crm-frozen-field">' . $el['html'] . '</div>';
     }
 
     return $el;
@@ -172,6 +179,31 @@ class CRM_Core_Form_Renderer extends HTML_QuickForm_Renderer_ArraySmarty {
 
     $attributes['class'] = $class;
     $element->updateAttributes($attributes);
+  }
+
+  /**
+   * Render entity references as text.
+   * If user has permission, format as link (or now limited to contacts).
+   * @param $el array
+   * @param $field HTML_QuickForm_element
+   */
+  function renderFrozenEntityRef(&$el, $field) {
+    $api = json_decode($field->getAttribute('data-api-params'), TRUE);
+    $vals = json_decode($field->getAttribute('data-entity-value'), TRUE);
+    if (isset($vals['id'])) {
+      $vals = array($vals);
+    }
+    $display = array();
+    foreach ($vals as $val) {
+      // Format contact as link
+      if ($api['entity'] == 'contact' && CRM_Contact_BAO_Contact_Permission::allow($val['id'], CRM_Core_Permission::VIEW)) {
+        $url = CRM_Utils_System::url("civicrm/contact/view", array('reset' => 1, 'cid' => $val['id']));
+        $val['text'] = '<a href="' . $url . '" title="' . ts('View Contact') . '">' . $val['text'] . '</a>';
+      }
+      $display[] = $val['text'];
+    }
+
+    $el['html'] = implode('; ', $display) . '<input type="hidden" value="'. $field->getValue() . '" name="' . $field->getAttribute('name') . '">';
   }
 }
 // end CRM_Core_Form_Renderer
