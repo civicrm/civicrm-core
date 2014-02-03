@@ -796,6 +796,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     }
     return $result;
   }
+
   /**
    * This function exists to wrap api functions
    * so we can ensure they succeed, generate and example & throw exceptions without litterering the test with checks
@@ -805,6 +806,10 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    * @param array $params
    * @param string $function - pass this in to create a generated example
    * @param string $file - pass this in to create a generated example
+   * @param string $description
+   * @param string|null $subfile
+   * @param string|null $actionName
+   * @return array|int
    */
   function callAPIAndDocument($entity, $action, $params, $function, $file, $description = "", $subfile = NULL, $actionName = NULL){
     $params['version'] = $this->_apiversion;
