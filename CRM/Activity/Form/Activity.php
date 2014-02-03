@@ -780,7 +780,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
     );
     $this->assign('tokenUrl', $tokenUrl);
 
-    $sourceContactField = $this->addContactRef(
+    $sourceContactField = $this->addEntityRef(
       'source_contact_id',
       $this->_fields['source_contact_id']['label'],
       array('class' => 'huge'),
