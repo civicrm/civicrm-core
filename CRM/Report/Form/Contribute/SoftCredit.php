@@ -506,6 +506,18 @@ GROUP BY   {$this->_aliases['civicrm_contribution']}.currency
         $entryFound = TRUE;
       }
 
+      // convert soft credit contact name to link
+      if (array_key_exists('civicrm_contact_display_name_creditor', $row) && !empty($rows[$rowNum]['civicrm_contact_display_name_creditor']) &&
+        array_key_exists('civicrm_contact_id_creditor', $row)
+      ) {
+        $url = CRM_Utils_System::url("civicrm/contact/view",
+          'reset=1&cid=' . $row['civicrm_contact_id_creditor'],
+          $this->_absoluteUrl
+        );
+        $rows[$rowNum]['civicrm_contact_display_name_creditor_link'] = $url;
+        $rows[$rowNum]['civicrm_contact_display_name_creditor_hover'] = ts("view contact summary");
+      }
+
       // make subtotals look nicer
       if (array_key_exists('civicrm_contact_id_constituent', $row) &&
         !$row['civicrm_contact_id_constituent']
