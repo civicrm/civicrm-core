@@ -34,13 +34,10 @@ class CRM_Custom_Import_Form_MapField extends CRM_Contact_Import_Form_MapField {
       //showColNames needs to be true to show "Column Names" column
       $this->assign('showColNames', $skipColumnHeader);
       $this->assign('columnNames', $columnNames);
-      $this->assign('rowDisplayCount', 3);
       /* if we had a column header to skip, stash it for later */
       $this->_columnHeaders = $this->_dataValues[0];
     }
-    else {
-      $this->assign('rowDisplayCount', 2);
-    }
+    $this->assign('rowDisplayCount', 2);
     $this->assign('highlightedFields', $this->_highlightedFields);
   }
 
