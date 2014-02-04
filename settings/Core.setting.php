@@ -673,8 +673,6 @@ When enabled, statistics about your CiviCRM installation are reported anonymousl
     'group_name' => 'CiviCRM Preferences',
     'group' => 'core',
     'name' => 'run_checks',
-    'prefetch' => 0,
-    'config_only'=> 1,
     'type' => 'Boolean',
     'quick_form_type' => 'YesNo',
     'default' => 1,
