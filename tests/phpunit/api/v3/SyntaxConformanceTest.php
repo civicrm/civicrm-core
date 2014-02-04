@@ -340,7 +340,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
   public function testNotImplemented_get($Entity) {
     $result = civicrm_api($Entity, 'Get', array('version' => 3));
     $this->assertEquals(1, $result['is_error'], 'In line ' . __LINE__);
-    $this->assertContains("API ($Entity,Get) does not exist", $result['error_message']);
+    $this->assertContains("API ($Entity, Get) does not exist", $result['error_message']);
   }
 
   /**
@@ -567,7 +567,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
   public function testNotImplemented_create($Entity) {
     $result = civicrm_api($Entity, 'Create', array('version' => 3));
     $this->assertEquals(1, $result['is_error'], 'In line ' . __LINE__);
-    $this->assertContains("API ($Entity,Create) does not exist", $result['error_message']);
+    $this->assertContains("API ($Entity, Create) does not exist", $result['error_message']);
   }
 
   /**
@@ -767,7 +767,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     $nonExistantID = 151416349;
     $result = civicrm_api($Entity, 'Delete', array('version' => 3, 'id' => $nonExistantID));
     $this->assertEquals(1, $result['is_error'], 'In line ' . __LINE__);
-    $this->assertContains("API ($Entity,Delete) does not exist", $result['error_message']);
+    $this->assertContains("API ($Entity, Delete) does not exist", $result['error_message']);
   }
 
   /**
