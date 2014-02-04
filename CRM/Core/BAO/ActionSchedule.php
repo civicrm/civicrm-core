@@ -1059,6 +1059,12 @@ GROUP BY c.id
         elseif ($actionSchedule->repetition_frequency_unit == 'week') {
           $hrs = 24 * $actionSchedule->repetition_frequency_interval * 7;
         }
+        elseif ($actionSchedule->repetition_frequency_unit == 'month') {
+          $hrs = "24*(DATEDIFF(DATE_ADD(latest_log_time, INTERVAL 1 MONTH ), latest_log_time))";
+        }
+        elseif ($actionSchedule->repetition_frequency_unit == 'year') {
+          $hrs = "24*(DATEDIFF(DATE_ADD(latest_log_time, INTERVAL 1 YEAR ), latest_log_time))";
+        }
         else {
           $hrs = $actionSchedule->repetition_frequency_interval;
         }
