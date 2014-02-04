@@ -60,6 +60,22 @@ class CRM_Utils_Check_Security {
   }
 
   /**
+   * CMS have a different pattern to their default file path and URL.
+   *
+   * @TODO This function might be better shared in CRM_Utils_Check
+   * class, but that class doesn't yet exist.
+   */
+  static function getFilePathMarker() {
+    $config = CRM_Core_Config::singleton();
+    switch ($config->userFramework) {
+      case 'Joomla':
+        return '/media/';
+      default:
+        return '/files/';
+    }
+  }
+
+  /**
    * Run some sanity checks.
    *
    * This could become a hook so that CiviCRM can run both built-in
@@ -106,32 +122,25 @@ class CRM_Utils_Check_Security {
     $log = CRM_Core_Error::createDebugLogger();
     $log_filename = $log->_filename;
 
+    $config = CRM_Core_Config::singleton();
+    $filePathMarker = CRM_Utils_Check_Security::getFilePathMarker();
+
     // Hazard a guess at the URL of the logfile, based on common
     // CiviCRM layouts.
-    switch ($config->userFramework) {
-      // If other frameworks lay out differently, add them here.
-
-      // Drupal style - look for '/files/' and stitch the known paths
-      // (based on CIVICRM_TEMPLATE_COMPILEDIR and $config->uploadDir)
-      // together.
-      case 'Drupal':
-      case 'Drupal6':
-      default:
-        if ($upload_url = explode('/files/', $config->imageUploadURL)) {
-          $url[] = $upload_url[0];
-          if ($log_path = explode('/files/', $log_filename)) {
-            $url[] = $log_path[1];
-            $log_url = implode('/files/', $url);
-            $docs_url = 'http://wiki.civicrm.org/confluence/display/CRMDOC/Security/LogNotAccessible';
-            if ($log = @file_get_contents($log_url)) {
-              $msg = 'The <a href="%1">CiviCRM debug log</a> should not be downloadable.'
-                . '<br />' .
-                '<a href="%2">Read more about this warning</a>';
-              $msg = ts($msg, array(1 => $log_url, 2 => $docs_url));
-              CRM_Core_Session::setStatus($msg, ts('Security Warning'));
-            }
-          }
+    if ($upload_url = explode($filePathMarker, $config->imageUploadURL)) {
+      $url[] = $upload_url[0];
+      if ($log_path = explode($filePathMarker, $log_filename)) {
+        $url[] = $log_path[1];
+        $log_url = implode($filePathMarker, $url);
+        $docs_url = 'http://wiki.civicrm.org/confluence/display/CRMDOC/Security/LogNotAccessible';
+        if ($log = @file_get_contents($log_url)) {
+          $msg = 'The <a href="%1">CiviCRM debug log</a> should not be downloadable.'
+            . '<br />' .
+            '<a href="%2">Read more about this warning</a>';
+          $msg = ts($msg, array(1 => $log_url, 2 => $docs_url));
+          CRM_Core_Session::setStatus($msg, ts('Security Warning'));
         }
+      }
     }
   }
 
@@ -146,35 +155,30 @@ class CRM_Utils_Check_Security {
    * to search engines; it only means they can be requested directly.
    *
    * @see CRM-14091
+   *
+   * @TODO: Test with WordPress, Joomla.
    */
   public function CheckUploadsAreNotAccessible() {
     $config = CRM_Core_Config::singleton();
-    // @TODO: Test with WordPress, Joomla.
-    switch ($config->userFramework) {
-      // Drupal style - look for '/files/' and stitch the known paths
-      // (based on CIVICRM_TEMPLATE_COMPILEDIR and $config->uploadDir)
-      // together.
-      case 'Drupal':
-      case 'Drupal6':
-      default:
-        if ($upload_url = explode('/files/', $config->imageUploadURL)) {
-          if ($files = glob($config->uploadDir . '/*')) {
-            for ($i=0; $i<3; $i++) {
-              $f = array_rand($files);
-              if ($file_path = explode('/files/', $files[$f])) {
-                $url = implode('/files/', array($upload_url[0], $file_path[1]));
-                if ($file = @file_get_contents($url)) {
-                  $msg = 'Files in the upload directory should not be downloadable.'
-                    . '<br />' .
-                    '<a href="%2">Read more about this warning</a>';
-                  $docs_url = 'http://wiki.civicrm.org/confluence/display/CRMDOC/Security/UploadDirNotAccessible';
-                  $msg = ts($msg, array(1 => $docs_url));
-                  CRM_Core_Session::setStatus($msg, ts('Security Warning'));
-                }
-              }
+    $filePathMarker = CRM_Utils_Check_Security::getFilePathMarker();
+
+    if ($upload_url = explode($filePathMarker, $config->imageUploadURL)) {
+      if ($files = glob($config->uploadDir . '/*')) {
+        for ($i=0; $i<3; $i++) {
+          $f = array_rand($files);
+          if ($file_path = explode($filePathMarker, $files[$f])) {
+            $url = implode($filePathMarker, array($upload_url[0], $file_path[1]));
+            if ($file = @file_get_contents($url)) {
+              $msg = 'Files in the upload directory should not be downloadable.'
+                . '<br />' .
+                '<a href="%2">Read more about this warning</a>';
+              $docs_url = 'http://wiki.civicrm.org/confluence/display/CRMDOC/Security/UploadDirNotAccessible';
+              $msg = ts($msg, array(1 => $docs_url));
+              CRM_Core_Session::setStatus($msg, ts('Security Warning'));
             }
           }
         }
+      }
     }
   }
 
@@ -189,47 +193,41 @@ class CRM_Utils_Check_Security {
    * we'll probably match that).
    *
    * @see CRM-14091
+   *
+   * @TODO: Test with WordPress, Joomla.
    */
   public function CheckDirectoriesAreNotBrowseable() {
     $config = CRM_Core_Config::singleton();
     $log = CRM_Core_Error::createDebugLogger();
     $log_name = $log->_filename;
+    $filePathMarker = CRM_Utils_Check_Security::getFilePathMarker();
 
-    // @TODO: Test with WordPress, Joomla.
-    switch ($config->userFramework) {
-      // Drupal style - look for '/files/' and stitch the known paths
-      // (based on CIVICRM_TEMPLATE_COMPILEDIR and URL settings)
-      // together.
-      case 'Drupal':
-      case 'Drupal6':
-      default:
-        $paths = array(
-          $config->uploadDir,
-          dirname($log_name),
-        );
-        if ($upload_url = explode('/files/', $config->imageUploadURL)) {
-          if ($files = glob($config->uploadDir . '/*')) {
-            foreach ($paths as $path) {
-              if ($dir_path = explode('/files/', $path)) {
-                $url = implode('/files/', array($upload_url[0], $dir_path[1]));
-                if ($files = glob($path . '/*')) {
-                  if ($listing = @file_get_contents($url)) {
-                    foreach ($files as $file) {
-                      if (stristr($listing, $file)) {
-                        $msg = 'Directory <a href="%1">%2</a> may be browseable via the web.'
-                          . '<br />' .
-                          '<a href="%3">Read more about this warning</a>';
-                        $docs_url = 'http://wiki.civicrm.org/confluence/display/CRMDOC/Security/UploadDirNotAccessible';
-                        $msg = ts($msg, array(1 => $log_url, 2 => $path, 3 => $docs_url));
-                        CRM_Core_Session::setStatus($msg, ts('Security Warning'));
-                      }
-                    }
+    $paths = array(
+      $config->uploadDir,
+      dirname($log_name),
+    );
+    if ($upload_url = explode($filePathMarker, $config->imageUploadURL)) {
+      if ($files = glob($config->uploadDir . '/*')) {
+        foreach ($paths as $path) {
+          if ($dir_path = explode($filePathMarker, $path)) {
+            $url = implode($filePathMarker, array($upload_url[0], $dir_path[1]));
+            if ($files = glob($path . '/*')) {
+              if ($listing = @file_get_contents($url)) {
+                foreach ($files as $file) {
+                  if (stristr($listing, $file)) {
+                    $msg = 'Directory <a href="%1">%2</a> may be browseable via the web.'
+                      . '<br />' .
+                      '<a href="%3">Read more about this warning</a>';
+                    $docs_url = 'http://wiki.civicrm.org/confluence/display/CRMDOC/Security/UploadDirNotAccessible';
+                    $msg = ts($msg, array(1 => $log_url, 2 => $path, 3 => $docs_url));
+                    CRM_Core_Session::setStatus($msg, ts('Security Warning'));
                   }
                 }
               }
             }
           }
         }
+      }
     }
   }
 
