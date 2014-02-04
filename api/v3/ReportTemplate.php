@@ -87,11 +87,16 @@ function civicrm_api3_report_template_delete($params) {
  * @access public
  */
 function civicrm_api3_report_template_getrows($params) {
-  list($rows, $instance) = _civicrm_api3_report_template_getrows($params);
-  return civicrm_api3_create_success($rows, $params, 'report_template');
+  civicrm_api3_verify_one_mandatory($params, NULL, array('report_id', 'instance_id'));
+  list($rows, $instance, $labels) = _civicrm_api3_report_template_getrows($params);
+  return civicrm_api3_create_success($rows, $params, 'report_template', 'getrows', CRM_Core_DAO::$_nullObject, $labels);
 }
 
 function _civicrm_api3_report_template_getrows($params) {
+  if(empty($params['report_id'])) {
+    $params['report_id'] = civicrm_api3('report_instance', 'getvalue', array('id' => $params['instance_id'], 'return' => 'report_id'));
+  }
+
   $class = civicrm_api3('option_value', 'getvalue', array(
     'option_group_id' => 'report_template',
     'return' => 'name',
@@ -113,13 +118,19 @@ function _civicrm_api3_report_template_getrows($params) {
   $reportInstance->setOffsetValue($options['offset']);
   $reportInstance->beginPostProcessCommon();
   $sql = $reportInstance->buildQuery();
-  $rows = array();
+  $rows = $metadata = array();
   $reportInstance->buildRows($sql, $rows);
-  return array($rows, $reportInstance);
+  $metadata['title'] = $reportInstance->getTitle();
+  foreach ($reportInstance->_columnHeaders as $key => $header) {
+    //would be better just to expect reports to provide titles but reports are not consistent
+    //NB I think these are already translated
+    $metadata['labels'][$key] = !empty($header['title']) ? $header['title'] : '';
+  }
+  return array($rows, $reportInstance, $metadata);
 }
 
 function civicrm_api3_report_template_getstatistics($params) {
-  list($rows, $reportInstance) = _civicrm_api3_report_template_getrows($params);
+  list($rows, $reportInstance, $labels) = _civicrm_api3_report_template_getrows($params);
   $stats = $reportInstance->statistics($rows);
   return civicrm_api3_create_success($stats, $params, 'report_template');
 }
@@ -133,7 +144,6 @@ function civicrm_api3_report_template_getstatistics($params) {
  */
 function _civicrm_api3_report_template_getrows_spec(&$params) {
   $params['report_id'] = array(
-    'api.required' => TRUE,
     'title' => 'Report ID - eg. member/lapse',
   );
 }
