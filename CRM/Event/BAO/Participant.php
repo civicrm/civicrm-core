@@ -735,14 +735,9 @@ GROUP BY  participant.event_id
           'name' => 'participant_status',
         ));
 
-      $participantRole = array(
-        'participant_role' => array('title' => 'Participant Role',
-          'name' => 'participant_role',
-        ));
-
       $discountFields  = CRM_Core_DAO_Discount::export();
 
-      $fields = array_merge($participantFields, $participantStatus, $participantRole, $noteField, $discountFields);
+      $fields = array_merge($participantFields, $participantStatus, $noteField, $discountFields);
 
       // add custom data
       $fields = array_merge($fields, CRM_Core_BAO_CustomField::getFieldsForImport('Participant'));

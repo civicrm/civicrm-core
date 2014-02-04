@@ -86,7 +86,7 @@
   <field>
       <name>role_id</name>
       <uniqueName>participant_role_id</uniqueName>
-      <title>Participant Role Id</title>
+      <title>Participant Role</title>
       <pseudoconstant>
         <optionGroupName>participant_role</optionGroupName>
       </pseudoconstant>
@@ -94,7 +94,7 @@
       <import>true</import>
       <type>varchar</type>
       <length>128</length>
-      <export>false</export>
+      <export>true</export>
       <default>NULL</default>
       <comment>Participant role ID. Implicit FK to civicrm_option_value where option_group = participant_role.</comment>
       <add>1.7</add>

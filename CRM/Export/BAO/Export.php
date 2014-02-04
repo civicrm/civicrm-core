@@ -242,10 +242,6 @@ class CRM_Export_BAO_Export {
       }
       elseif ($exportMode == CRM_Export_Form_Select::EVENT_EXPORT) {
         $returnProperties['participant_id'] = 1;
-        if (CRM_Utils_Array::value('participant_role', $returnProperties)) {
-          unset($returnProperties['participant_role']);
-          $returnProperties['participant_role_id'] = 1;
-        }
       }
       elseif ($exportMode == CRM_Export_Form_Select::MEMBER_EXPORT) {
         $returnProperties['membership_id'] = 1;
