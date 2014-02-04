@@ -683,7 +683,7 @@ When enabled, statistics about your CiviCRM installation are reported anonymousl
     'is_domain' => 1,
     'is_contact' => 0,
     'description' => 'Run sanity checks on CiviCRM install to detect common misconfigurations.',
-    'help_text' => 'Set this to FALSE to ',
+    'help_text' => 'If unset, sanity checks will be disabled on this site.',
   ),
 
 );
