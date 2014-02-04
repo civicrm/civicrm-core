@@ -18,24 +18,26 @@ class CRM_Custom_Import_Form_MapField extends CRM_Contact_Import_Form_MapField {
     $this->_mapperFields = $this->get('fields');
     asort($this->_mapperFields);
     $this->_columnCount = $this->get('columnCount');
-    $this->_columnCount = $this->get('columnCount');
     $this->assign('columnCount', $this->_columnCount);
     $this->_dataValues = $this->get('dataValues');
-    $this->assign('dataValues', $this->_dataValues);
-    $this->_entity = $this->_multipleCustomData = $this->get('multipleCustomData');
 
+    //Seperate column names from actual values.
+    $columnNames = $this->_dataValues[0];
+    //actual values need to be in 2d array ($array[$i][$j]) format to be parsed by the template.
+    $dataValues[] = $this->_dataValues[1];
+    $this->assign('dataValues', $dataValues);
+
+    $this->_entity = $this->_multipleCustomData = $this->get('multipleCustomData');
     $skipColumnHeader   = $this->controller->exportValue('DataSource', 'skipColumnHeader');
     $this->_onDuplicate = $this->get('onDuplicate');
     if ($skipColumnHeader) {
-      $this->assign('skipColumnHeader', $skipColumnHeader);
-      $this->assign('rowDisplayCount', 3);
+      //showColNames needs to be true to show "Column Names" column
+      $this->assign('showColNames', $skipColumnHeader);
+      $this->assign('columnNames', $columnNames);
       /* if we had a column header to skip, stash it for later */
-
       $this->_columnHeaders = $this->_dataValues[0];
     }
-    else {
-      $this->assign('rowDisplayCount', 2);
-    }
+    $this->assign('rowDisplayCount', 2);
     $this->assign('highlightedFields', $this->_highlightedFields);
   }
 
