@@ -70,7 +70,7 @@ class api_v3_GroupContactTest extends CiviUnitTestCase {
       'visibility' => 'User and User Admin Only',
     );
 
-    $this->_groupId2 = $this->groupCreate();
+    $this->_groupId2 = $this->groupCreate($group);
     $params = array(
       'contact_id.1' => $this->_contactId,
       'group_id' => $this->_groupId2,
