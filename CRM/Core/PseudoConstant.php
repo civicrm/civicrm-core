@@ -222,7 +222,7 @@ class CRM_Core_PseudoConstant {
    * - fresh      boolean ignore cache entries and go back to DB
    * @param String $context: Context string
    *
-   * @return Array on success, FALSE on error.
+   * @return Array|bool - array on success, FALSE on error.
    *
    * @static
    */
@@ -276,20 +276,12 @@ class CRM_Core_PseudoConstant {
 
     // Core field: load schema
     $dao = new $daoName;
-    $fields = $dao->fields();
-    $fieldKeys = $dao->fieldKeys();
+    $fieldSpec = $dao->getFieldSpec($fieldName);
     $dao->free();
-
-    // Support "unique names" as well as sql names
-    $fieldKey = $fieldName;
-    if (empty($fields[$fieldKey])) {
-      $fieldKey = CRM_Utils_Array::value($fieldName, $fieldKeys);
-    }
     // If neither worked then this field doesn't exist. Return false.
-    if (empty($fields[$fieldKey])) {
+    if (empty($fieldSpec)) {
       return FALSE;
     }
-    $fieldSpec = $fields[$fieldKey];
 
     // If the field is an enum, explode the enum definition and return the array.
     if (isset($fieldSpec['enumValues'])) {

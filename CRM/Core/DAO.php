@@ -1842,6 +1842,26 @@ EOS;
   }
 
   /**
+   * @param $fieldName
+   * @return bool|array
+   */
+  function getFieldSpec($fieldName) {
+    $fields = $this->fields();
+    $fieldKeys = $this->fieldKeys();
+
+    // Support "unique names" as well as sql names
+    $fieldKey = $fieldName;
+    if (empty($fields[$fieldKey])) {
+      $fieldKey = CRM_Utils_Array::value($fieldName, $fieldKeys);
+    }
+    // If neither worked then this field doesn't exist. Return false.
+    if (empty($fields[$fieldKey])) {
+      return FALSE;
+    }
+    return $fields[$fieldKey];
+  }
+
+  /**
    * SQL version of api function to assign filters to the DAO based on the syntax
    * $field => array('IN' => array(4,6,9))
    * OR
