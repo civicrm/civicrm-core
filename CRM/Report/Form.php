@@ -378,7 +378,7 @@ class CRM_Report_Form extends CRM_Core_Form {
       if (empty($this->_instanceValues)) {
         CRM_Core_Error::fatal("Report could not be loaded.");
       }
-
+      $this->_title = $this->_instanceValues['title'];
       if (!empty($this->_instanceValues['permission']) &&
         (!(CRM_Core_Permission::check($this->_instanceValues['permission']) ||
           CRM_Core_Permission::check('administer Reports')
