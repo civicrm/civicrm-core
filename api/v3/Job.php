@@ -190,7 +190,7 @@ function civicrm_api3_job_send_reminder($params) {
     return civicrm_api3_create_error('Could not acquire lock, another EmailProcessor process is running');
   }
 
-  $result = CRM_Core_BAO_ActionSchedule::processQueue(CRM_Utils_Array::value('now', $params));
+  $result = CRM_Core_BAO_ActionSchedule::processQueue(CRM_Utils_Array::value('now', $params), $params);
   $lock->release();
 
   if ($result['is_error'] == 0) {
@@ -200,7 +200,20 @@ function civicrm_api3_job_send_reminder($params) {
     return civicrm_api3_create_error($result['messages']);
   }
 }
-
+/**
+ * Adjust metadata for "send_reminder" action
+ *
+ * The metadata is used for setting defaults, documentation & validation
+ * @param array $params array or parameters determined by getfields
+ */
+function _civicrm_api3_job_send_reminder(&$params) {
+  //@todo this function will now take all fields in action_schedule as params
+  // as it is calling the api fn to set the filters - update getfields to reflect
+  $params['id'] = array(
+    'type' => CRM_Utils_Type::T_INT,
+    'title' => 'Action Schedule ID'
+  );
+}
 /**
  * Execute a specific report instance and send the output via email
  *
