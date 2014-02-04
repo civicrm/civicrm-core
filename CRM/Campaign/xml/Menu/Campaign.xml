@@ -43,7 +43,6 @@
      <path>civicrm/admin/options/campaign_type</path>
      <title>Campaign Types</title>
      <desc>categorize your campaigns using campaign types.</desc>
-     <path_arguments>group=campaign_type</path_arguments>
      <page_callback>CRM_Admin_Page_Options</page_callback>
      <adminGroup>CiviCampaign</adminGroup>
      <icon>admin/small/05.png</icon>
@@ -54,7 +53,6 @@
      <path>civicrm/admin/options/campaign_status</path>
      <title>Campaign Status</title>
      <desc>Define statuses for campaign here.</desc>
-     <path_arguments>group=campaign_status</path_arguments>
      <page_callback>CRM_Admin_Page_Options</page_callback>
      <adminGroup>CiviCampaign</adminGroup>
      <icon>admin/small/05.png</icon>
@@ -65,7 +63,6 @@
      <path>civicrm/admin/options/engagement_index</path>
      <title>Engagement Index</title>
      <desc>Engagement levels.</desc>
-     <path_arguments>group=engagement_index</path_arguments>
      <page_callback>CRM_Admin_Page_Options</page_callback>
      <adminGroup>CiviCampaign</adminGroup>
      <icon>admin/small/05.png</icon>

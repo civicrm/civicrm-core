@@ -82,7 +82,6 @@
      <title>Event Types</title>
      <page_callback>CRM_Admin_Page_Options</page_callback>
      <desc>Use Event Types to categorize your events. Event feeds can be filtered by Event Type and participant searches can use Event Type as a criteria.</desc>
-     <path_arguments>group=event_type</path_arguments>
      <access_arguments>administer CiviCRM,access CiviEvent</access_arguments>
      <adminGroup>CiviEvent</adminGroup>
      <icon>admin/small/event_type.png</icon>
@@ -103,7 +102,6 @@
      <title>Participant Role</title>
      <page_callback>CRM_Admin_Page_Options</page_callback>
      <desc>Define participant roles for events here (e.g. Attendee, Host, Speaker...). You can then assign roles and search for participants by role.</desc>
-     <path_arguments>group=participant_role</path_arguments>
      <access_arguments>administer CiviCRM,access CiviEvent</access_arguments>
      <adminGroup>CiviEvent</adminGroup>
      <icon>admin/small/parti_role.png</icon>
@@ -113,7 +111,6 @@
      <path>civicrm/admin/options/participant_listing</path>
      <title>Participant Listing Templates</title>
      <desc>Template to control participant listing display.</desc>
-     <path_arguments>group=participant_listing</path_arguments>
      <page_callback>CRM_Admin_Page_Options</page_callback>
      <adminGroup>CiviEvent</adminGroup>
      <icon>admin/small/01.png</icon>

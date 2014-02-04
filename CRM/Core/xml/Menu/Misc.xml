@@ -20,7 +20,6 @@
   <item>
      <path>civicrm/admin/options/acl_role</path>
      <title>ACL Roles</title>
-     <path_arguments>group=acl_role</path_arguments>
      <page_callback>CRM_Admin_Page_Options</page_callback>
      <access_arguments>administer CiviCRM,access CiviCRM</access_arguments>
   </item>

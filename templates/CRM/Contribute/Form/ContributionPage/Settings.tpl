@@ -213,7 +213,7 @@
      }
      cj('.optionvalue-link').click(function() {
         {/literal}"{crmAPI var='result' entity='OptionGroup' action='get' sequential=1 name='soft_credit_type'}"{literal};
-        var postURL = {/literal}"{crmURL p='civicrm/admin/optionValue' q="gid="}{$result.id}"{literal};
+        var postURL = {/literal}"{crmURL p='civicrm/admin/options' q="gid="}{$result.id}"{literal};
         CRM.loadForm(postURL).on('crmFormSuccess', function(e, data) {
            cj('.ui-dialog a').click(function(){
            //Todo: inline edit facility for soft_credit_type option group in jquery popup dialog
