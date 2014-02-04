@@ -2589,16 +2589,16 @@ INNER JOIN  civicrm_option_group grp ON ( grp.id = val.option_group_id AND grp.n
     return self::getActivityContact($activityId, $sourceID);
   }
 
-  public static function setApiFilter(&$params, &$dao) {
+  function setApiFilter(&$params) {
     if (CRM_Utils_Array::value('target_contact_id', $params)) {
-      $dao->selectAdd();
+      $this->selectAdd();
       $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
       $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
       $obj = new CRM_Activity_BAO_ActivityContact();
       $params['return.target_contact_id'] = 1;
-      $dao->joinAdd($obj, 'LEFT');
-      $dao->selectAdd('civicrm_activity.*');
-      $dao->whereAdd(" civicrm_activity_contact.contact_id = {$params['target_contact_id']} AND civicrm_activity_contact.record_type_id = {$targetID}");
+      $this->joinAdd($obj, 'LEFT');
+      $this->selectAdd('civicrm_activity.*');
+      $this->whereAdd(" civicrm_activity_contact.contact_id = {$params['target_contact_id']} AND civicrm_activity_contact.record_type_id = {$targetID}");
     }
   }
 
