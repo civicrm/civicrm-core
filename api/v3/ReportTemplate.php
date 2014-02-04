@@ -88,8 +88,8 @@ function civicrm_api3_report_template_delete($params) {
  */
 function civicrm_api3_report_template_getrows($params) {
   civicrm_api3_verify_one_mandatory($params, NULL, array('report_id', 'instance_id'));
-  list($rows, $instance, $labels) = _civicrm_api3_report_template_getrows($params);
-  return civicrm_api3_create_success($rows, $params, 'report_template', 'getrows', CRM_Core_DAO::$_nullObject, $labels);
+  list($rows, $instance, $metadata) = _civicrm_api3_report_template_getrows($params);
+  return civicrm_api3_create_success($rows, $params, 'report_template', 'getrows', CRM_Core_DAO::$_nullObject, $metadata);
 }
 
 function _civicrm_api3_report_template_getrows($params) {
@@ -118,21 +118,29 @@ function _civicrm_api3_report_template_getrows($params) {
   $reportInstance->setOffsetValue($options['offset']);
   $reportInstance->beginPostProcessCommon();
   $sql = $reportInstance->buildQuery();
-  $rows = $metadata = array();
+  $rows = $metadata = $requiredMetadata  = array();
   $reportInstance->buildRows($sql, $rows);
-  $metadata['title'] = $reportInstance->getTitle();
-  foreach ($reportInstance->_columnHeaders as $key => $header) {
-    //would be better just to expect reports to provide titles but reports are not consistent
-    //NB I think these are already translated
-    $metadata['labels'][$key] = !empty($header['title']) ? $header['title'] : '';
+  $requiredMetadata = array();
+  if(isset($params['options']) && !empty($params['options']['metadata'])) {
+    $requiredMetadata = $params['options']['metadata'];
+    if(in_array('title', $requiredMetadata)) {
+      $metadata['metadata']['title'] = $reportInstance->getTitle();
+    }
+    if(in_array('labels', $requiredMetadata)) {
+      foreach ($reportInstance->_columnHeaders as $key => $header) {
+        //would be better just to expect reports to provide titles but reports are not consistent so we anticipate empty
+        //NB I think these are already translated
+        $metadata['metadata']['labels'][$key] = !empty($header['title']) ? $header['title'] : '';
+      }
+    }
   }
   return array($rows, $reportInstance, $metadata);
 }
 
 function civicrm_api3_report_template_getstatistics($params) {
-  list($rows, $reportInstance, $labels) = _civicrm_api3_report_template_getrows($params);
+  list($rows, $reportInstance, $metadata) = _civicrm_api3_report_template_getrows($params);
   $stats = $reportInstance->statistics($rows);
-  return civicrm_api3_create_success($stats, $params, 'report_template');
+  return civicrm_api3_create_success($stats, $params, 'report_template', 'getstatistics', CRM_Core_DAO::$_nullObject, $metadata);
 }
 /**
  * Retrieve rows from a report template
