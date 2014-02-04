@@ -90,11 +90,13 @@ class CRM_Utils_Check_Security {
    */
   public function allChecks() {
     if (CRM_Core_Permission::check('administer CiviCRM')) {
-      $session = CRM_Core_Session::singleton();
-      if ($session->timer('check_' . __CLASS__, self::CHECK_TIMER)) {
-        CRM_Utils_Check_Security::singleton()->CheckLogFileIsNotAccessible();
-        CRM_Utils_Check_Security::singleton()->CheckUploadsAreNotAccessible();
-        CRM_Utils_Check_Security::singleton()->CheckDirectoriesAreNotBrowseable();
+      if (CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'run_checks', NULL, TRUE)) {
+        $session = CRM_Core_Session::singleton();
+        if ($session->timer('check_' . __CLASS__, self::CHECK_TIMER)) {
+          CRM_Utils_Check_Security::singleton()->CheckLogFileIsNotAccessible();
+          CRM_Utils_Check_Security::singleton()->CheckUploadsAreNotAccessible();
+          CRM_Utils_Check_Security::singleton()->CheckDirectoriesAreNotBrowseable();
+        }
       }
     }
   }

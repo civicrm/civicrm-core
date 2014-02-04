@@ -668,4 +668,22 @@ When enabled, statistics about your CiviCRM installation are reported anonymousl
     'description' => 'Prevent the stylesheet "civicrm.css" from being loaded.',
     'help_text' => NULL,
   ),
+
+  'run_checks' => array(
+    'group_name' => 'CiviCRM Preferences',
+    'group' => 'core',
+    'name' => 'run_checks',
+    'prefetch' => 0,
+    'config_only'=> 1,
+    'type' => 'Boolean',
+    'quick_form_type' => 'YesNo',
+    'default' => 1,
+    'add' => '4.4',
+    'title' => 'Run CiviCRM checks.',
+    'is_domain' => 1,
+    'is_contact' => 0,
+    'description' => 'Run sanity checks on CiviCRM install to detect common misconfigurations.',
+    'help_text' => 'Set this to FALSE to ',
+  ),
+
 );
