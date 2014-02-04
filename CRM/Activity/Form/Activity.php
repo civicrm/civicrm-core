@@ -159,17 +159,11 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
       ),
       'status_id' => array(
         'type' => 'select',
-        'label' => ts('Status'),
-        'attributes' =>
-        CRM_Core_PseudoConstant::activityStatus(),
-        'required' => TRUE
+        'required' => TRUE,
       ),
       'priority_id' => array(
         'type' => 'select',
-        'label' => ts('Priority'),
-        'attributes' =>
-        CRM_Core_PseudoConstant::get('CRM_Activity_DAO_Activity', 'priority_id'),
-        'required' => TRUE
+        'required' => TRUE,
       ),
       'source_contact_id' => array(
         'type' => 'text',
@@ -694,17 +688,14 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
 
     foreach ($this->_fields as $field => $values) {
       if (!empty($this->_fields[$field])) {
-        $attribute = NULL;
-        if (!empty($values['attributes'])) {
-          $attribute = $values['attributes'];
-        }
+        $attribute = CRM_Utils_Array::value('attributes', $values);
+        $required = !empty($values['required']);
 
-        $required = FALSE;
-        if (!empty($values['required'])) {
-          $required = TRUE;
-        }
         if ($values['type'] == 'wysiwyg') {
           $this->addWysiwyg($field, $values['label'], $attribute, $required);
+        }
+        elseif ($values['type'] == 'select' && empty($attribute)) {
+          $this->addSelect('CRM_Activity_BAO_Activity', $field, array(), $required);
         }
         elseif ($field != 'source_contact_id') {
           $this->add($values['type'], $field, $values['label'], $attribute, $required);
