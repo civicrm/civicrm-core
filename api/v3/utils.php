@@ -559,6 +559,7 @@ function _civicrm_api3_dao_set_filter(&$dao, $params, $unique = TRUE, $entity) {
       $dao->selectAdd($allfields[$uniqueVal]);
     }
   }
+  $dao->setApiFilter($params);
 }
 
 /**
