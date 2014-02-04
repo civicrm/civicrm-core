@@ -194,5 +194,4 @@ VALUES
 
 -- CRM-13970
 UPDATE civicrm_navigation set url = 'civicrm/admin/options/from_email_address&reset=1' WHERE url LIKE 'civicrm/admin/options/from_email%';
-UPDATE civicrm_navigation set url = 'civicrm/admin/option_groups&reset=1' WHERE url LIKE 'civicrm/admin/options&%';
 UPDATE civicrm_navigation set url = CONCAT(SUBSTRING_INDEX(url, '&', 1), '&reset=1') WHERE url LIKE 'civicrm/admin/options/%';
