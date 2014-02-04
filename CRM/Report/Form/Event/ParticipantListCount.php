@@ -176,7 +176,7 @@ class CRM_Report_Form_Event_ParticipantListCount extends CRM_Report_Form_Event {
           array(
             'name' => 'role_id',
             'title' => ts('Participant Role'),
-            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
+            'operatorType' => CRM_Report_Form::OP_MULTISELECT_SEPARATOR,
             'options' => CRM_Event_PseudoConstant::participantRole(),
           ),
           'participant_register_date' => array('title' => ts('Registration Date'),
