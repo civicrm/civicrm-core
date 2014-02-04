@@ -142,4 +142,8 @@ AND        civicrm_contact.is_deleted = 0
     return $activityContact;
   }
 
+  function links() {
+    $link = array('activity_id' => 'civicrm_activity:id');
+    return $link;
+  }
 }
