@@ -117,7 +117,7 @@ class CRM_Core_Form_Renderer extends HTML_QuickForm_Renderer_ArraySmarty {
       }
     }
 
-    if ($element->getType() == 'select' && $element->getAttribute('data-option-group')) {
+    if ($element->getType() == 'select' && $element->getAttribute('data-option-group-url')) {
       $this->addOptionsEditLink($el, $element);
     }
 
@@ -216,7 +216,7 @@ class CRM_Core_Form_Renderer extends HTML_QuickForm_Renderer_ArraySmarty {
    */
   function addOptionsEditLink(&$el, $field) {
     if (CRM_Core_Permission::check('administer CiviCRM')) {
-      $el['html'] .= ' &nbsp; <a href="#" class="crm-edit-optionvalue-link" title="' . ts('Edit Options') . '" data-option-group="' . $field->getAttribute('data-option-group') . '"><span class="batch-edit"></span></a>';
+      $el['html'] .= ' &nbsp; <a href="#" class="crm-edit-optionvalue-link" title="' . ts('Edit Options') . '" data-option-group-url="' . $field->getAttribute('data-option-group-url') . '"><span class="batch-edit"></span></a>';
     }
   }
 }

@@ -904,6 +904,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   /**
    * Adds a select based on field metadata
    * TODO: This could be even more generic and widget type (select in this case) could also be read from metadata
+   * Perhaps a method like $form->bind($name) which would look up all metadata for named field
    * @param CRM_Core_DAO $baoName - string representing bao object
    * @param $name
    * @param array $props
@@ -922,25 +923,28 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     if (!empty($props['placeholder']) && empty($props['multiple'])) {
       $options = array('' => '') + $options;
     }
+    $bao = new $baoName;
     // Handle custom field
     if (strpos($name, 'custom_') === 0 && is_numeric($name[7])) {
       list(, $id) = explode('_', $name);
       $label = isset($props['label']) ? $props['label'] : CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomField', 'label', $id);
-      $props['data-option-group'] = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomField', 'option_group_id', $id);
+      $gid = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomField', 'option_group_id', $id);
+      $props['data-option-group-url'] = 'civicrm/admin/options/' . CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup', $gid);
     }
     // Core field
     else {
-      $bao = new $baoName;
       $meta = $bao->getFieldSpec($name);
-      $bao->free();
-      // Todo: localize
-      $label = CRM_Utils_Array::value('label', $props, $meta['title']);
+      $label = isset($props['label']) ? $props['label'] : ts($meta['title']);
       if (!empty($meta['pseudoconstant']['optionGroupName'])) {
-        $props['data-option-group'] = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup', $meta['pseudoconstant']['optionGroupName'], 'id', 'name');
+        $props['data-option-group-url'] = 'civicrm/admin/options/' . $meta['pseudoconstant']['optionGroupName'];
       }
     }
+    require_once 'api/api.php';
+    $props['data-api-entity'] = _civicrm_api_get_entity_name_from_dao($bao);
+    $bao->free();
     $props['class'] = isset($props['class']) ? $props['class'] . ' ' : '';
     $props['class'] .= "crm-select2";
+    CRM_Utils_Array::remove($props, 'label');
     return $this->add('select', $name, $label, $options, $required, $props);
   }
 
