@@ -68,8 +68,10 @@ class CRM_Report_Form_Case_Demographics extends CRM_Report_Form {
         ),
         'filters' =>
         array(
-          'sort_name' =>
-          array('title' => ts('Contact Name')),
+          'sort_name' => array(
+            'title' => ts('Contact Name'),
+            'operatorType' => CRM_Report_Form::OP_STRING,
+          ),
           'contact_type' =>
           array('title' => ts('Contact Type'),
             'operatorType' => CRM_Report_Form::OP_SELECT,
@@ -321,7 +323,7 @@ where (cg.extends='Contact' OR cg.extends='Individual' OR cg.extends_entity_colu
             $from     = CRM_Utils_Array::value("{$fieldName}_from", $this->_params);
             $to       = CRM_Utils_Array::value("{$fieldName}_to", $this->_params);
 
-            $clause = $this->dateClause($field['dbAlias'], $relative, $from, $to, CRM_Utils_type::T_DATE);
+            $clause = $this->dateClause($field['dbAlias'], $relative, $from, $to, CRM_Utils_Type::T_DATE);
           }
           else {
             $op = CRM_Utils_Array::value("{$fieldName}_op", $this->_params);
