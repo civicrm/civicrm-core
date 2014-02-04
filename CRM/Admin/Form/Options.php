@@ -53,7 +53,7 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
    * @var array
    * @static
    */
-  protected $_GName;
+  protected $_gLabel;
 
   /**
    * Function to pre-process
@@ -78,7 +78,7 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
     else {
       $this->_gName = $this->get('gName');
     }
-    $this->_GName = ucwords(str_replace('_', ' ', $this->_gName));
+    $this->_gLabel = ucwords(str_replace('_', ' ', $this->_gName));
     $url          = "civicrm/admin/options/{$this->_gName}";
     $params       = "group={$this->_gName}&reset=1";
 
@@ -93,7 +93,7 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
       $isInUse    = CRM_Core_DAO::singleValueQuery($sql, $queryParam);
       if ($isInUse) {
         $scriptURL = "<a href='" . CRM_Utils_System::docURL2('Update Greetings and Address Data for Contacts', TRUE, NULL, NULL, NULL, "wiki") . "'>" . ts('Learn more about a script that can automatically update contact addressee and greeting options.') . "</a>";
-        CRM_Core_Session::setStatus(ts('The selected %1 option has <strong>not been deleted</strong> because it is currently in use. Please update these contacts to use a different format before deleting this option. %2', array(1 => $this->_GName, 2 => $scriptURL)), ts('Sorry'), 'error');
+        CRM_Core_Session::setStatus(ts('The selected %1 option has <strong>not been deleted</strong> because it is currently in use. Please update these contacts to use a different format before deleting this option. %2', array(1 => $this->_gLabel, 2 => $scriptURL)), ts('Sorry'), 'error');
         $redirect = CRM_Utils_System::url($url, $params);
         CRM_Utils_System::redirect($redirect);
       }
@@ -376,10 +376,10 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
           CRM_Core_BAO_Phone::setOptionToNull(CRM_Utils_Array::value('value', $this->_defaultValues));
         }
 
-        CRM_Core_Session::setStatus(ts('Selected %1 type has been deleted.', array(1 => $this->_GName)), ts('Record Deleted'), 'success');
+        CRM_Core_Session::setStatus(ts('Selected %1 type has been deleted.', array(1 => $this->_gLabel)), ts('Record Deleted'), 'success');
       }
       else {
-        CRM_Core_Session::setStatus(ts('Selected %1 type has not been deleted.', array(1 => $this->_GName)), ts('Sorry'), 'error');
+        CRM_Core_Session::setStatus(ts('Selected %1 type has not been deleted.', array(1 => $this->_gLabel)), ts('Sorry'), 'error');
         CRM_Utils_Weight::correctDuplicateWeights('CRM_Core_DAO_OptionValue', $fieldValues);
       }
     }
@@ -428,7 +428,7 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
         CRM_Financial_BAO_FinancialTypeAccount::add($params);
       }
 
-      CRM_Core_Session::setStatus(ts('The %1 \'%2\' has been saved.', array(1 => $this->_GName, 2 => $optionValue->label)), ts('Saved'), 'success');
+      CRM_Core_Session::setStatus(ts('The %1 \'%2\' has been saved.', array(1 => $this->_gLabel, 2 => $optionValue->label)), ts('Saved'), 'success');
     }
   }
 }

@@ -60,7 +60,7 @@
   </index>
   <field>
       <name>activity_type_id</name>
-      <title>Activity Type ID</title>
+      <title>Activity Type</title>
       <import>true</import>
       <type>int unsigned</type>
       <required>true</required>
@@ -248,7 +248,7 @@
   <field>
       <name>status_id</name>
       <uniqueName>activity_status_id</uniqueName>
-      <title>Activity Status Id</title>
+      <title>Activity Status</title>
       <import>true</import>
       <export>false</export>
       <headerPattern>/(activity.)?status(.label$)?/i</headerPattern>

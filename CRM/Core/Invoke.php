@@ -307,7 +307,7 @@ class CRM_Core_Invoke {
         $title = CRM_Utils_Array::value('title', $item);
         if (strstr($item['page_callback'], '_Page')) {
           $object = new $item['page_callback'] ($title, $mode );
-          $object->urlPath = $_GET[$config->userFrameworkURLVar];
+          $object->urlPath = explode('/', $_GET[$config->userFrameworkURLVar]);
         }
         elseif (strstr($item['page_callback'], '_Controller')) {
           $addSequence = 'false';

@@ -107,7 +107,6 @@
      <path>civicrm/admin/options/activity_type</path>
      <title>Activity Types</title>
      <desc>CiviCRM has several built-in activity types (meetings, phone calls, emails sent). Track other types of interactions by creating custom activity types here.</desc>
-     <path_arguments>group=activity_type</path_arguments>
      <page_callback>CRM_Admin_Page_Options</page_callback>
      <adminGroup>Customize Data and Screens</adminGroup>
      <icon>admin/small/05.png</icon>
@@ -134,7 +133,6 @@
      <path>civicrm/admin/options/gender</path>
      <title>Gender Options</title>
      <desc>Options for assigning gender to individual contacts (e.g. Male, Female, Transgender).</desc>
-     <path_arguments>group=gender</path_arguments>
      <page_callback>CRM_Admin_Page_Options</page_callback>
      <adminGroup>Customize Data and Screens</adminGroup>
      <icon>admin/small/01.png</icon>
@@ -144,7 +142,6 @@
      <path>civicrm/admin/options/individual_prefix</path>
      <title>Individual Prefixes (Ms, Mr...)</title>
      <desc>Options for individual contact prefixes (e.g. Ms., Mr., Dr. etc.).</desc>
-     <path_arguments>group=individual_prefix</path_arguments>
      <page_callback>CRM_Admin_Page_Options</page_callback>
      <adminGroup>Customize Data and Screens</adminGroup>
      <icon>admin/small/title.png</icon>
@@ -154,7 +151,6 @@
      <path>civicrm/admin/options/individual_suffix</path>
      <title>Individual Suffixes (Jr, Sr...)</title>
      <desc>Options for individual contact suffixes (e.g. Jr., Sr. etc.).</desc>
-     <path_arguments>group=individual_suffix</path_arguments>
      <page_callback>CRM_Admin_Page_Options</page_callback>
      <adminGroup>Customize Data and Screens</adminGroup>
      <icon>admin/small/10.png</icon>
@@ -173,7 +169,6 @@
      <path>civicrm/admin/options/website_type</path>
      <title>Website Types</title>
      <desc>Options for assigning website types to contacts.</desc>
-     <path_arguments>group=website_type</path_arguments>
      <page_callback>CRM_Admin_Page_Options</page_callback>
      <adminGroup>Customize Data and Screens</adminGroup>
      <weight>65</weight>
@@ -182,7 +177,6 @@
      <path>civicrm/admin/options/instant_messenger_service</path>
      <title>Instant Messenger Services</title>
      <desc>List of IM services which can be used when recording screen-names for contacts.</desc>
-     <path_arguments>group=instant_messenger_service</path_arguments>
      <page_callback>CRM_Admin_Page_Options</page_callback>
      <adminGroup>Customize Data and Screens</adminGroup>
      <icon>admin/small/07.png</icon>
@@ -192,7 +186,6 @@
      <path>civicrm/admin/options/mobile_provider</path>
      <title>Mobile Phone Providers</title>
      <desc>List of mobile phone providers which can be assigned when recording contact phone numbers.</desc>
-     <path_arguments>group=mobile_provider</path_arguments>
      <page_callback>CRM_Admin_Page_Options</page_callback>
      <adminGroup>Customize Data and Screens</adminGroup>
      <icon>admin/small/08.png</icon>
@@ -203,7 +196,6 @@
     <title>Phone Type</title>
     <desc>Options for assigning phone type to contacts (e.g Phone,
     Mobile, Fax, Pager)</desc>
-    <path_arguments>group=phone_type</path_arguments>
     <page_callback>CRM_Admin_Page_Options</page_callback>
     <adminGroup>Customize Data and Screens</adminGroup>
     <icon>tel.gif</icon>
@@ -246,7 +238,6 @@
      <path>civicrm/admin/options/custom_search</path>
      <title>Manage Custom Searches</title>
      <desc>Developers and accidental techies with a bit of PHP and SQL knowledge can create new search forms to handle specific search and reporting needs which aren't covered by the built-in Advanced Search and Search Builder features.</desc>
-     <path_arguments>group=custom_search</path_arguments>
      <page_callback>CRM_Admin_Page_Options</page_callback>
      <adminGroup>Customize Data and Screens</adminGroup>
      <icon>admin/small/template.png</icon>
@@ -266,7 +257,6 @@
      <path>civicrm/admin/options/from_email_address</path>
      <title>From Email Addresses</title>
      <desc>List of Email Addresses which can be used when sending emails to contacts.</desc>
-     <path_arguments>group=from_email_address</path_arguments>
      <page_callback>CRM_Admin_Page_Options</page_callback>
      <adminGroup>Communications</adminGroup>
      <icon>admin/small/title.png</icon>
@@ -305,7 +295,6 @@
      <path>civicrm/admin/options/preferred_communication_method</path>
      <title>Preferred Communication Methods</title>
      <desc>One or more preferred methods of communication can be assigned to each contact. Customize the available options here.</desc>
-     <path_arguments>group=preferred_communication_method</path_arguments>
      <page_callback>CRM_Admin_Page_Options</page_callback>
      <adminGroup>Communications</adminGroup>
      <icon>admin/small/communication.png</icon>
@@ -333,7 +322,6 @@
      <path>civicrm/admin/options/communication_style</path>
      <title>Communication Style Options</title>
      <desc>Options for Communication Style selection.</desc>
-     <path_arguments>group=communication_style</path_arguments>
      <page_callback>CRM_Admin_Page_Options</page_callback>
      <adminGroup>Communications</adminGroup>
      <icon>admin/small/01.png</icon>
@@ -343,7 +331,6 @@
      <path>civicrm/admin/options/email_greeting</path>
      <title>Email Greeting Formats</title>
      <desc>Options for assigning email greetings to individual and household contacts.</desc>
-     <path_arguments>group=email_greeting</path_arguments>
      <page_callback>CRM_Admin_Page_Options</page_callback>
      <adminGroup>Communications</adminGroup>
      <icon>admin/small/01.png</icon>
@@ -353,7 +340,6 @@
      <path>civicrm/admin/options/postal_greeting</path>
      <title>Postal Greeting Formats</title>
      <desc>Options for assigning postal greetings to individual and household contacts.</desc>
-     <path_arguments>group=postal_greeting</path_arguments>
      <page_callback>CRM_Admin_Page_Options</page_callback>
      <adminGroup>Communications</adminGroup>
      <icon>admin/small/01.png</icon>
@@ -363,7 +349,6 @@
      <path>civicrm/admin/options/addressee</path>
      <title>Addressee Formats</title>
      <desc>Options for assigning addressee to individual, household and organization contacts.</desc>
-     <path_arguments>group=addressee</path_arguments>
      <page_callback>CRM_Admin_Page_Options</page_callback>
      <adminGroup>Communications</adminGroup>
      <icon>admin/small/01.png</icon>
@@ -397,7 +382,6 @@
      <path>civicrm/admin/options/languages</path>
      <title>Preferred Languages</title>
      <desc>Options for contact languages.</desc>
-     <path_arguments>group=languages</path_arguments>
      <page_callback>CRM_Admin_Page_Options</page_callback>
      <adminGroup>Localization</adminGroup>
      <icon>admin/small/36.png</icon>
@@ -535,7 +519,6 @@
      <path>civicrm/admin/options/safe_file_extension</path>
      <title>Safe File Extension Options</title>
      <desc>File Extensions that can be considered safe.</desc>
-     <path_arguments>group=safe_file_extension</path_arguments>
      <page_callback>CRM_Admin_Page_Options</page_callback>
      <adminGroup>System Settings</adminGroup>
      <icon>admin/small/01.png</icon>
@@ -545,7 +528,7 @@
      <path>civicrm/admin/options</path>
      <title>Option Groups</title>
      <desc>Access all meta-data option groups.</desc>
-     <page_callback>CRM_Admin_Page_OptionGroup</page_callback>
+     <page_callback>CRM_Admin_Page_Options</page_callback>
      <adminGroup>System Settings</adminGroup>
      <icon>admin/small/01.png</icon>
      <weight>105</weight>
@@ -631,7 +614,6 @@
      <path>civicrm/admin/options/grant_type</path>
      <title>Grant Types</title>
      <desc>List of types which can be assigned to Grants. (Enable CiviGrant from Administer > Systme Settings > Enable Components if you want to track grants.)</desc>
-     <path_arguments>group=grant_type</path_arguments>
      <page_callback>CRM_Admin_Page_Options</page_callback>
      <adminGroup>Option Lists</adminGroup>
      <icon>admin/small/grant_type.png</icon>
@@ -652,11 +634,6 @@
      <page_callback>CRM_Admin_Page_Admin</page_callback>
      <is_ssl>true</is_ssl>
      <weight>9000</weight>
-  </item>
-  <item>
-     <path>civicrm/admin/optionValue</path>
-     <title>Option Values</title>
-     <page_callback>CRM_Admin_Page_OptionValue</page_callback>
   </item>
   <item>
      <path>civicrm/ajax/menujs</path>
