@@ -118,6 +118,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
     $result = $this->callAPIAndDocument('report_template', 'getrows', array(
       'report_id' => 'contact/summary',
     ), __FUNCTION__, __FILE__, $description, 'Getrows', 'getrows');
+    $this->assertEquals('Contact Name', $result['labels']['civicrm_contact_sort_name']);
 
     //the second part of this test has been commented out because it relied on the db being reset to
     // it's base state

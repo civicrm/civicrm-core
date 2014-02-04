@@ -87,7 +87,7 @@ function civicrm_api($entity, $action, $params, $extra = NULL) {
       $result = isset($extra) ? $function($apiRequest['params'], $extra) : $function($apiRequest['params']);
     }
     else {
-      return civicrm_api3_create_error("API (" . $apiRequest['entity'] . "," . $apiRequest['action'] . ") does not exist (join the API team and implement it!)");
+      return civicrm_api3_create_error("API (" . $apiRequest['entity'] . ", " . $apiRequest['action'] . ") does not exist (join the API team and implement it!)");
     }
 
     // For output filtering, process $apiWrappers in reverse order
