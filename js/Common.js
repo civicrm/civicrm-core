@@ -247,6 +247,7 @@ function showHideRow(index) {
   return false;
 }
 
+CRM.utils = CRM.utils || {};
 CRM.strings = CRM.strings || {};
 CRM.validate = CRM.validate || {
   params: {},
@@ -264,6 +265,28 @@ CRM.validate = CRM.validate || {
   // Workaround for https://github.com/ivaynberg/select2/issues/1246
   $.ui.dialog.prototype._allowInteraction = function(e) {
     return !!$(e.target).closest('.ui-dialog, .ui-datepicker, .select2-drop').length;
+  };
+
+  /**
+   * Populate a select list, overwriting the existing options except for the placeholder.
+   * @param $el jquery collection - 1 or more select elements
+   * @param options array in format returned by api.getoptions
+   */
+  CRM.utils.setOptions = function($el, options) {
+    $el.each(function() {
+      var
+        $elect = $(this),
+        val = $elect.val() || [];
+      if (typeof(val) !== 'array') {
+        val = [val];
+      }
+      $elect.find('option[value!=""]').remove();
+      $.each(options, function(key, option) {
+        var selected = ($.inArray(''+option.key, val) > -1) ? 'selected="selected"' : '';
+        $elect.append('<option value="' + option.key + '"' + selected + '>' + option.value + '</option>');
+      });
+      $elect.trigger('change');
+    });
   };
 
   // Initialize widgets
@@ -907,26 +930,40 @@ CRM.validate = CRM.validate || {
     }
 
     // bind the event for image popup
-    $('body').on('click', 'a.crm-image-popup', function() {
-      var o = $('<div class="crm-container crm-custom-image-popup"><img src=' + $(this).attr('href') + '></div>');
+    $('body')
+      .on('click', 'a.crm-image-popup', function() {
+        var o = $('<div class="crm-container crm-custom-image-popup"><img src=' + $(this).attr('href') + '></div>');
 
-      CRM.confirm('',
-        {
-          title: ts('Preview'),
-          message: o
-        },
-        ts('Done')
-      );
-      return false;
-    });
+        CRM.confirm('',
+          {
+            title: ts('Preview'),
+            message: o
+          },
+          ts('Done')
+        );
+        return false;
+      })
 
+      .on('click', function (event) {
+        $('.btn-slide-active').removeClass('btn-slide-active').find('.panel').hide();
+        if ($(event.target).is('.btn-slide')) {
+          $(event.target).addClass('btn-slide-active').find('.panel').show();
+        }
+      })
+
+      .on('click', 'a.crm-edit-optionvalue-link', function() {
+        var url = $(this).data('option-group-url');
+        CRM.loadForm(CRM.url(url, {reset: 1}))
+          .on('dialogclose', function() {
+            var $elects = $('select[data-option-group-url="' + url + '"]');
+            CRM.api3($elects.data('api-entity'), 'getoptions', {sequential: 1, field: $elects.attr('name')})
+              .done(function(data) {
+                CRM.utils.setOptions($elects, data.values);
+              });
+          });
+        return false;
+      });
     $().crmtooltip();
-    $('body').on('click', function (event) {
-      $('.btn-slide-active').removeClass('btn-slide-active').find('.panel').hide();
-      if ($(event.target).is('.btn-slide')) {
-        $(event.target).addClass('btn-slide-active').find('.panel').show();
-      }
-    });
   });
 
   $.fn.crmAccordions = function (speed) {

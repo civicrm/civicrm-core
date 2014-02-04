@@ -194,7 +194,6 @@ SELECT  petition.id                         as id,
       $surveyInfo = CRM_Campaign_BAO_Petition::getSurveyInfo($params['sid']);
 
       // create activity
-      // activity status id (from /civicrm/admin/optionValue?reset=1&action=browse&gid=25)
       // 1-Schedule, 2-Completed
 
       $activityParams = array(

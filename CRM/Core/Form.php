@@ -901,25 +901,51 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     }
   }
 
-  function addSelect($name, $label, $prefix = NULL, $required = NULL, $extra = NULL, $select = '- select -') {
-    if ($prefix) {
-      $this->addElement('select', $name . '_id' . $prefix, $label,
-        array(
-          '' => $select) + CRM_Core_OptionGroup::values($name), $extra
-      );
-      if ($required) {
-        $this->addRule($name . '_id' . $prefix, ts('Please select %1', array(1 => $label)), 'required');
-      }
+  /**
+   * Adds a select based on field metadata
+   * TODO: This could be even more generic and widget type (select in this case) could also be read from metadata
+   * Perhaps a method like $form->bind($name) which would look up all metadata for named field
+   * @param CRM_Core_DAO $baoName - string representing bao object
+   * @param $name
+   * @param array $props
+   * @param bool $required
+   * @throws CRM_Core_Exception
+   * @return HTML_QuickForm_Element
+   */
+  function addSelect($baoName, $name, $props = array(), $required = FALSE) {
+    $options = $baoName::buildOptions($name, 'create');
+    if ($options === FALSE) {
+      throw new CRM_Core_Exception('No option list for field ' . $name);
     }
+    if (!array_key_exists('placeholder', $props)) {
+      $props['placeholder'] = $required ? ts('- select -') : ts('- none -');
+    }
+    if (!empty($props['placeholder']) && empty($props['multiple'])) {
+      $options = array('' => '') + $options;
+    }
+    $bao = new $baoName;
+    // Handle custom field
+    if (strpos($name, 'custom_') === 0 && is_numeric($name[7])) {
+      list(, $id) = explode('_', $name);
+      $label = isset($props['label']) ? $props['label'] : CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomField', 'label', $id);
+      $gid = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomField', 'option_group_id', $id);
+      $props['data-option-group-url'] = 'civicrm/admin/options/' . CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup', $gid);
+    }
+    // Core field
     else {
-      $this->addElement('select', $name . '_id', $label,
-        array(
-          '' => $select) + CRM_Core_OptionGroup::values($name), $extra
-      );
-      if ($required) {
-        $this->addRule($name . '_id', ts('Please select %1', array(1 => $label)), 'required');
+      $meta = $bao->getFieldSpec($name);
+      $label = isset($props['label']) ? $props['label'] : ts($meta['title']);
+      if (!empty($meta['pseudoconstant']['optionGroupName'])) {
+        $props['data-option-group-url'] = 'civicrm/admin/options/' . $meta['pseudoconstant']['optionGroupName'];
       }
     }
+    require_once 'api/api.php';
+    $props['data-api-entity'] = _civicrm_api_get_entity_name_from_dao($bao);
+    $bao->free();
+    $props['class'] = isset($props['class']) ? $props['class'] . ' ' : '';
+    $props['class'] .= "crm-select2";
+    CRM_Utils_Array::remove($props, 'label');
+    return $this->add('select', $name, $label, $options, $required, $props);
   }
 
   /**
@@ -1289,6 +1315,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
           $val = str_replace(CRM_Core_DAO::VALUE_SEPARATOR, ',', trim($val, CRM_Core_DAO::VALUE_SEPARATOR));
           $field->setValue($val);
         }
+        // TODO: we could fetch multiple values with array(IN => $val) but not all apis support this
         foreach (explode(',', $val) as $v) {
           $result = civicrm_api3($api['entity'], $api['action'], array('sequential' => 1, $api['key'] => $v));
           if (!empty($result['values'])) {
