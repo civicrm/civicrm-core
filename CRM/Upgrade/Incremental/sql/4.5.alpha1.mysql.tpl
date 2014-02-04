@@ -192,3 +192,7 @@ VALUES
    (@option_group_id_act, {localize}'{ts escape="sql"}Refund{/ts}'{/localize}, @option_group_id_act_val+2, 'Refund', NULL, 1, NULL, @option_group_id_act_wt+2, {localize}'{ts escape="sql"}Refund recorded for event or membership fee.{/ts}'{/localize}, 0, 1, 1, @contributeCompId, NULL),
    (@option_group_id_act, {localize}'{ts escape="sql"}Change Registration{/ts}'{/localize}, @option_group_id_act_val+3, 'Change Registration', NULL, 1, NULL, @option_group_id_act_wt+3, {localize}'{ts escape="sql"}Changes to an existing event registration.{/ts}'{/localize}, 0, 1, 1, @eventCompId, NULL);
 
+-- CRM-13970
+UPDATE civicrm_navigation set url = 'civicrm/admin/options/from_email_address&reset=1' WHERE url LIKE 'civicrm/admin/options/from_email%';
+UPDATE civicrm_navigation set url = 'civicrm/admin/option_groups&reset=1' WHERE url LIKE 'civicrm/admin/options&%';
+UPDATE civicrm_navigation set url = CONCAT(SUBSTRING_INDEX(url, '&', 1), '&reset=1') WHERE url LIKE 'civicrm/admin/options/%';
