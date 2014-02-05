@@ -617,9 +617,6 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
         elseif ($name == 'preferred_language') {
           $row[] = CRM_Core_PseudoConstant::getLabel('CRM_Contact_DAO_Contact', 'preferred_language', $result->$name);
         }
-        elseif (in_array(substr($name, 0, -3), array('gender', 'prefix', 'suffix'))) {
-          $row[] = CRM_Core_PseudoConstant::getLabel('CRM_Contact_DAO_Contact', $name, $result->$name);
-        }
         elseif ($multipleSelectFields &&
           array_key_exists($name, $multipleSelectFields)
         ) {
