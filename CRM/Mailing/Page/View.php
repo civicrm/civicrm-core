@@ -129,6 +129,16 @@ class CRM_Mailing_Page_View extends CRM_Core_Page {
     }
     else {
       $details = array('test');
+      //get tokens that are not contact specific resolved
+      $params  = array('contact_id' => 0);
+      $details = CRM_Utils_Token::getAnonymousTokenDetails($params,
+        $returnProperties,
+        TRUE, TRUE, NULL,
+        $this->_mailing->getFlattenedTokens(),
+        get_class($this)
+      );
+
+      $details = $details[0][0];
       $contactId = 0;
     }
     $mime = &$this->_mailing->compose(NULL, NULL, NULL, $contactId,
