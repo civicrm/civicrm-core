@@ -429,12 +429,13 @@ CRM.validate = CRM.validate || {
 
   var helpDisplay, helpPrevious;
   CRM.help = function (title, params, url) {
-    if (helpDisplay && helpDisplay.isOpen) {
-      helpDisplay.close();
+    if (helpDisplay && helpDisplay.close) {
       // If the same link is clicked twice, just close the display - todo use underscore method for this comparison
-      if (helpPrevious === JSON.stringify(params)) {
+      if (helpDisplay.isOpen && helpPrevious === JSON.stringify(params)) {
+        helpDisplay.close();
         return;
       }
+      helpDisplay.close();
     }
     helpPrevious = JSON.stringify(params);
     params.class_name = 'CRM_Core_Page_Inline_Help';
