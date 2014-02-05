@@ -92,12 +92,12 @@ class api_v3_WebsiteTest extends CiviUnitTestCase {
     $this->assertEquals(1, $checkDeleted['count'], 'In line ' . __LINE__);
   }
   /**
-   * Test retrieval of label metadata
+   * Test retrieval of metadata
    */
   public function testGetMetadata() {
     $result = $this->callAPIAndDocument($this->_entity, 'get', array(
       'options' => array('metadata' => array('fields')
-    )), __FUNCTION__, __FILE__, 'Demonostrates returning label metadata', 'GetWithLabelMetadata');
+    )), __FUNCTION__, __FILE__, 'Demonostrates returning field metadata', 'GetWithMetadata');
     $this->assertEquals('Website', $result['metadata']['fields']['url']['title']);
   }
   /**
