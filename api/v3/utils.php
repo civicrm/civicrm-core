@@ -48,7 +48,7 @@ function _civicrm_api3_initialize() {
 /**
  * Wrapper Function for civicrm_verify_mandatory to make it simple to pass either / or fields for checking
  *
- * @param array $params array of fields to check
+ * @param array $params array of fields to checkl
  * @param array $daoName string DAO to check for required fields (create functions only)
  * @param array $keyoptions
  *
@@ -253,8 +253,8 @@ function civicrm_api3_create_success($values = 1, $params = array(
   else {
     $result['values'] = $values;
   }
-  if(!empty($params['options']) && !empty($params['options']['metadata'])) {
-    // we've made metadata an array but only supporting labels atm
+  if(!empty($params['options']['metadata'])) {
+    // we've made metadata an array but only supporting 'fields' atm
     if(in_array('fields', $params['options']['metadata'])) {
       $fields = civicrm_api3($entity, 'getfields', array('action' => $action));
       $result['metadata']['fields'] = $fields['values'];
