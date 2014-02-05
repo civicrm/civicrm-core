@@ -195,6 +195,7 @@ class CRM_Core_Page {
     if (empty($_GET['snippet'])) {
       // Version check and intermittent alert to admins
       CRM_Utils_VersionCheck::singleton()->versionAlert();
+      CRM_Utils_Check_Security::singleton()->showPeriodicAlerts();
 
       // Debug msg once per hour
       if ($config->debug && CRM_Core_Permission::check('administer CiviCRM') && CRM_Core_Session::singleton()->timer('debug_alert', 3600)) {

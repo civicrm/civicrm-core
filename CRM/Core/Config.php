@@ -335,6 +335,7 @@ class CRM_Core_Config extends CRM_Core_Config_Variables {
         CRM_Utils_File::baseFilePath($this->templateCompileDir) .
         'ConfigAndLog' . DIRECTORY_SEPARATOR;
       CRM_Utils_File::createDir($this->configAndLogDir);
+      CRM_Utils_File::restrictAccess($this->configAndLogDir);
 
       // we're automatically prefixing compiled templates directories with country/language code
       global $tsLocale;
@@ -346,6 +347,7 @@ class CRM_Core_Config extends CRM_Core_Config_Variables {
       }
 
       CRM_Utils_File::createDir($this->templateCompileDir);
+      CRM_Utils_File::restrictAccess($this->templateCompileDir);
     }
     elseif ($loadFromDB) {
       echo 'You need to define CIVICRM_TEMPLATE_COMPILEDIR in civicrm.settings.php';
@@ -466,6 +468,7 @@ class CRM_Core_Config extends CRM_Core_Config_Variables {
         if (substr($this->templateCompileDir, -1 * strlen($value) - 1, -1) != $value) {
           $this->templateCompileDir .= CRM_Utils_File::addTrailingSlash($value);
           CRM_Utils_File::createDir($this->templateCompileDir);
+          CRM_Utils_File::restrictAccess($this->templateCompileDir);
         }
       }
 
@@ -623,7 +626,14 @@ class CRM_Core_Config extends CRM_Core_Config_Variables {
       // clean upload dir
       CRM_Utils_File::cleanDir($this->uploadDir);
       CRM_Utils_File::createDir($this->uploadDir);
-      CRM_Utils_File::restrictAccess($this->uploadDir);
+    }
+
+    // Whether we delete/create or simply preserve directories, we should
+    // certainly make sure the restrictions are enforced.
+    foreach (array($this->templateCompileDir, $this->uploadDir, $this->configAndLogDir) as $dir) {
+      if ($dir && is_dir($dir)) {
+        CRM_Utils_File::restrictAccess($dir);
+      }
     }
   }
 
