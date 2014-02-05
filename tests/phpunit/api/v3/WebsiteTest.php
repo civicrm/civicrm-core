@@ -90,6 +90,22 @@ class api_v3_WebsiteTest extends CiviUnitTestCase {
     $result = $this->callAPIFailure($this->_entity, 'delete', $deleteParams);
     $checkDeleted = $this->callAPISuccess($this->_entity, 'get', array());
     $this->assertEquals(1, $checkDeleted['count'], 'In line ' . __LINE__);
-}
+  }
+  /**
+   * Test retrieval of metadata
+   */
+  public function testGetMetadata() {
+    $result = $this->callAPIAndDocument($this->_entity, 'get', array(
+      'options' => array('metadata' => array('fields')
+    )), __FUNCTION__, __FILE__, 'Demonostrates returning field metadata', 'GetWithMetadata');
+    $this->assertEquals('Website', $result['metadata']['fields']['url']['title']);
+  }
+  /**
+   * Test retrieval of label metadata
+   */
+  public function testGetFields() {
+    $result = $this->callAPIAndDocument($this->_entity, 'getfields', array('action' => 'get'), __FUNCTION__, __FILE__);
+    $this->assertArrayKeyExists('url', $result['values']);
+  }
 }
 
