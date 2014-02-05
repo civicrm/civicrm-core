@@ -92,9 +92,9 @@ class CRM_Utils_Check_Security {
     if (CRM_Core_Permission::check('administer CiviCRM')) {
       $session = CRM_Core_Session::singleton();
       if ($session->timer('check_' . __CLASS__, self::CHECK_TIMER)) {
-        CRM_Utils_Check_Security::singleton()->CheckLogFileIsNotAccessible();
-        CRM_Utils_Check_Security::singleton()->CheckUploadsAreNotAccessible();
-        CRM_Utils_Check_Security::singleton()->CheckDirectoriesAreNotBrowseable();
+        CRM_Utils_Check_Security::singleton()->checkLogFileIsNotAccessible();
+        CRM_Utils_Check_Security::singleton()->checkUploadsAreNotAccessible();
+        CRM_Utils_Check_Security::singleton()->checkDirectoriesAreNotBrowseable();
       }
     }
   }
@@ -116,7 +116,7 @@ class CRM_Utils_Check_Security {
    *
    * @see CRM-14091
    */
-  public function CheckLogFileIsNotAccessible() {
+  public function checkLogFileIsNotAccessible() {
     $config = CRM_Core_Config::singleton();
 
     $log = CRM_Core_Error::createDebugLogger();
@@ -158,7 +158,7 @@ class CRM_Utils_Check_Security {
    *
    * @TODO: Test with WordPress, Joomla.
    */
-  public function CheckUploadsAreNotAccessible() {
+  public function checkUploadsAreNotAccessible() {
     $config = CRM_Core_Config::singleton();
     $filePathMarker = CRM_Utils_Check_Security::getFilePathMarker();
 
@@ -196,7 +196,7 @@ class CRM_Utils_Check_Security {
    *
    * @TODO: Test with WordPress, Joomla.
    */
-  public function CheckDirectoriesAreNotBrowseable() {
+  public function checkDirectoriesAreNotBrowseable() {
     $config = CRM_Core_Config::singleton();
     $log = CRM_Core_Error::createDebugLogger();
     $log_name = $log->_filename;
