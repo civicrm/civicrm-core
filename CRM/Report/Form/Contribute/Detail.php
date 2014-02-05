@@ -367,6 +367,9 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
     $this->_columnHeaders = array();
 
     parent::select();
+    //total_amount was affected by sum as it is considered as one of the stat field
+    //so it is been replaced with correct alias, CRM-13833
+    $this->_select = str_replace("sum({$this->_aliases['civicrm_contribution']}.total_amount)", "{$this->_aliases['civicrm_contribution']}.total_amount", $this->_select);
   }
 
   function orderBy() {
@@ -659,7 +662,9 @@ UNION ALL
         }
       }
 
-
+      if (CRM_Utils_Array::value('civicrm_contribution_contribution_or_soft', $rows[$rowNum]) == 'Contribution') {
+        unset($rows[$rowNum]['civicrm_contribution_soft_soft_credit_type_id']);
+      }
 
       // convert donor sort name to link
       if (array_key_exists('civicrm_contact_sort_name', $row) && !empty($rows[$rowNum]['civicrm_contact_sort_name']) &&
