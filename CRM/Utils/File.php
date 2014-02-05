@@ -400,6 +400,30 @@ HTACCESS;
   }
 
   /**
+   * Restrict remote users from browsing the given directory.
+   *
+   * @param $publicDir
+   */
+  static function restrictBrowsing($publicDir) {
+    // base dir
+    $nobrowse = realpath($publicDir) . '/index.html';
+    if (!file_exists($nobrowse)) {
+      @file_put_contents($nobrowse, '');
+    }
+
+    // child dirs
+    $dir = new RecursiveDirectoryIterator($publicDir);
+    foreach ($dir as $name => $object) {
+      if (is_dir($name) && $name != '..') {
+        $nobrowse = realpath($name) . '/index.html';
+        if (!file_exists($nobrowse)) {
+          @file_put_contents($nobrowse, '');
+        }
+      }
+    }
+  }
+
+  /**
    * Create the base file path from which all our internal directories are
    * offset. This is derived from the template compile directory set
    */
