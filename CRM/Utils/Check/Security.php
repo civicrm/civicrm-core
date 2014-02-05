@@ -224,51 +224,50 @@ class CRM_Utils_Check_Security {
    */
   public function checkDirectoriesAreNotBrowseable() {
     $messages = array();
-
     $config = CRM_Core_Config::singleton();
-    $log = CRM_Core_Error::createDebugLogger();
-    $log_name = $log->_filename;
-    $filePathMarker = $this->getFilePathMarker();
-
-    $paths = array(
-      $config->uploadDir,
-      dirname($log_name),
+    $publicDirs = array(
+      $config->imageUploadDir => $config->imageUploadURL,
     );
-    if ($upload_url = explode($filePathMarker, $config->imageUploadURL)) {
-      if ($files = glob($config->uploadDir . '/*')) {
-        foreach ($paths as $path) {
-          // Since we're here ...
-          $dir = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($path));
-          foreach ($dir as $name => $object) {
-            if (is_dir($name) && $name != '..') {
-              $nobrowse = realpath($name) . '/index.html';
-              if (!file_exists($nobrowse)) {
-                @file_put_contents($nobrowse, '');
-              }
-            }
-          }
-          // OK, now let's see if it's browseable.
-          if ($dir_path = explode($filePathMarker, $path)) {
-            $url = implode($filePathMarker, array($upload_url[0], $dir_path[1]));
-            if ($files = glob($path . '/*')) {
-              if ($listing = @file_get_contents($url)) {
-                foreach ($files as $file) {
-                  if (stristr($listing, $file)) {
-                    $msg = 'Directory <a href="%1">%2</a> may be browseable via the web.'
-                      . '<br />' .
-                      '<a href="%3">Read more about this warning</a>';
-                    $docs_url = $this->createDocUrl('checkDirectoriesAreNotBrowseable');
-                    $messages[] = ts($msg, array(1 => $log_url, 2 => $path, 3 => $docs_url));
-                  }
-                }
-              }
-            }
-          }
-        }
+
+    // Setup index.html files to prevent browsing
+    foreach ($publicDirs as $publicDir => $publicUrl) {
+      CRM_Utils_File::restrictBrowsing($publicDir);
+    }
+
+    // Test that $publicDir is not browsable
+    foreach ($publicDirs as $publicDir => $publicUrl) {
+      if ($this->isBrowsable($publicDir, $publicUrl)) {
+        $msg = 'Directory <a href="%1">%2</a> should not be browseable via the web.'
+          . '<br />' .
+          '<a href="%3">Read more about this warning</a>';
+        $docs_url = $this->createDocUrl('checkDirectoriesAreNotBrowseable');
+        $messages[] = ts($msg, array(1 => $publicDir, 2 => $publicDir, 3 => $docs_url));
       }
     }
 
     return $messages;
+  }
+
+  /**
+   * Determine whether $url is a public, browsable listing for $dir
+   *
+   * @param string $dir local dir path
+   * @param string $url public URL
+   * @return bool
+   */
+  public function isBrowsable($dir, $url) {
+    $result = FALSE;
+    $file = 'delete-this-' . CRM_Utils_String::createRandom(10, CRM_Utils_String::ALPHANUMERIC);
+
+    // this could be a new system with uploads yet -- so we'll make a file
+    file_put_contents("$dir/$file", "delete me");
+    $content = file_get_contents("$url");
+    if (stristr($content, $file)) {
+      $result = TRUE;
+    }
+    unlink("$dir/$file");
+
+    return $result;
   }
 
   public function createDocUrl($topic) {
