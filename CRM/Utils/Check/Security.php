@@ -82,7 +82,9 @@ class CRM_Utils_Check_Security {
     if (CRM_Core_Permission::check('administer CiviCRM')) {
       $session = CRM_Core_Session::singleton();
       if ($session->timer('check_' . __CLASS__, self::CHECK_TIMER)) {
-        $this->checkAll();
+        foreach ($this->checkAll() as $message) {
+          CRM_Core_Session::setStatus($message, ts('Security Warning'));
+        }
       }
     }
   }
@@ -97,13 +99,17 @@ class CRM_Utils_Check_Security {
    * We might even expose the results of these checks on the Wordpress
    * plugin status page or the Drupal admin/reports/status path.
    *
+   * @return array of messages
    * @see Drupal's hook_requirements() -
    * https://api.drupal.org/api/drupal/modules%21system%21system.api.php/function/hook_requirements
    */
   public function checkAll() {
-    CRM_Utils_Check_Security::singleton()->checkLogFileIsNotAccessible();
-    CRM_Utils_Check_Security::singleton()->checkUploadsAreNotAccessible();
-    CRM_Utils_Check_Security::singleton()->checkDirectoriesAreNotBrowseable();
+    $messages = array_merge(
+      CRM_Utils_Check_Security::singleton()->checkLogFileIsNotAccessible(),
+      CRM_Utils_Check_Security::singleton()->checkUploadsAreNotAccessible(),
+      CRM_Utils_Check_Security::singleton()->checkDirectoriesAreNotBrowseable()
+    );
+    return $messages;
   }
 
   /**
@@ -121,9 +127,12 @@ class CRM_Utils_Check_Security {
    * is browseable or visible to search engines; it means it can be
    * requested directly.
    *
+   * @return array of messages
    * @see CRM-14091
    */
   public function checkLogFileIsNotAccessible() {
+    $messages = array();
+
     $config = CRM_Core_Config::singleton();
 
     $log = CRM_Core_Error::createDebugLogger();
@@ -144,11 +153,12 @@ class CRM_Utils_Check_Security {
           $msg = 'The <a href="%1">CiviCRM debug log</a> should not be downloadable.'
             . '<br />' .
             '<a href="%2">Read more about this warning</a>';
-          $msg = ts($msg, array(1 => $log_url, 2 => $docs_url));
-          CRM_Core_Session::setStatus($msg, ts('Security Warning'));
+          $messages[] = ts($msg, array(1 => $log_url, 2 => $docs_url));
         }
       }
     }
+
+    return $messages;
   }
 
   /**
@@ -161,11 +171,14 @@ class CRM_Utils_Check_Security {
    * Being retrievable doesn't mean the files are browseable or visible
    * to search engines; it only means they can be requested directly.
    *
+   * @return array of messages
    * @see CRM-14091
    *
    * @TODO: Test with WordPress, Joomla.
    */
   public function checkUploadsAreNotAccessible() {
+    $messages = array();
+
     $config = CRM_Core_Config::singleton();
     $filePathMarker = $this->getFilePathMarker();
 
@@ -180,13 +193,14 @@ class CRM_Utils_Check_Security {
                 . '<br />' .
                 '<a href="%2">Read more about this warning</a>';
               $docs_url = 'http://wiki.civicrm.org/confluence/display/CRMDOC/Security/UploadDirNotAccessible';
-              $msg = ts($msg, array(1 => $docs_url));
-              CRM_Core_Session::setStatus($msg, ts('Security Warning'));
+              $messages[] = ts($msg, array(1 => $docs_url));
             }
           }
         }
       }
     }
+
+    return $messages;
   }
 
   /**
@@ -199,11 +213,14 @@ class CRM_Utils_Check_Security {
    * MAY trigger false positives (if you have files named 'a', 'e'
    * we'll probably match that).
    *
+   * @return array of messages
    * @see CRM-14091
    *
    * @TODO: Test with WordPress, Joomla.
    */
   public function checkDirectoriesAreNotBrowseable() {
+    $messages = array();
+
     $config = CRM_Core_Config::singleton();
     $log = CRM_Core_Error::createDebugLogger();
     $log_name = $log->_filename;
@@ -237,8 +254,7 @@ class CRM_Utils_Check_Security {
                       . '<br />' .
                       '<a href="%3">Read more about this warning</a>';
                     $docs_url = 'http://wiki.civicrm.org/confluence/display/CRMDOC/Security/UploadDirNotAccessible';
-                    $msg = ts($msg, array(1 => $log_url, 2 => $path, 3 => $docs_url));
-                    CRM_Core_Session::setStatus($msg, ts('Security Warning'));
+                    $messages[] = ts($msg, array(1 => $log_url, 2 => $path, 3 => $docs_url));
                   }
                 }
               }
@@ -247,6 +263,8 @@ class CRM_Utils_Check_Security {
         }
       }
     }
+
+    return $messages;
   }
 
 }
