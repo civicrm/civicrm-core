@@ -23,3 +23,6 @@ LEFT JOIN civicrm_entity_financial_trxn ceft_financial_item ON ceft_financial_it
 LEFT JOIN civicrm_financial_item cfi ON cfi.id = ceft_financial_item.entity_id
 SET to_financial_account_id = @accountrecievable, cfi.status_id = @financialstatus
 WHERE ceft.entity_table = 'civicrm_contribution' AND ceft_financial_item.entity_table = 'civicrm_financial_item' AND cft.status_id = @inprogressstatus AND cfi.status_id  IS NULL;
+
+{* CRM-14167 *}
+ALTER TABLE civicrm_activity_contact ADD INDEX index_record_type ( activity_id, record_type_id );
