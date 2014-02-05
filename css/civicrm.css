@@ -46,7 +46,7 @@ div.crm-container fieldset label{
   margin: 0em 0em 1em;
   border-collapse: collapse;
   width: 100%;
-  font-size: 12px;
+  font-size: 13px;
 }
 
 .crm-container table.criteria-group {
@@ -67,7 +67,7 @@ div.crm-container fieldset label{
   border-style: solid;
   border-width: 1px 1px 2px;
   color: #A7A7A7;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: bold;
   padding: 4px;
   text-align: left;
@@ -224,7 +224,7 @@ div.crm-container fieldset label{
 .crm-container .crm-form-block {
   padding: 4px;
   margin-bottom: 4px;
-  font-size: 12px;
+  font-size: 13px;
   background-color: #E6E6DC;
   color: #3E3E3E;
 }
@@ -293,11 +293,13 @@ div.crm-container fieldset label{
   width: 6em;
 }
 
-.crm-container input[type="text"],
+.crm-container input[type="text"].form-text,
+.crm-container input[type="text"].dateplugin,
 .crm-container input[type="password"] {
   border: 1px solid #999;
   vertical-align: middle;
-  padding-left: 1px;
+  padding: 1px 2px;
+  height: 1.8em;
 }
 
 .crm-container .form-submit {
@@ -819,7 +821,7 @@ div.crm-container fieldset label{
   background-color: #F1F8EB;
   border: 1px solid #B0D730;
   color: #3E3E3E;
-  font-size: 12px;
+  font-size: 13px;
   margin: 0 0 8px;
   padding: 4px;
 }
@@ -1007,7 +1009,7 @@ div.crm-container fieldset label{
 
 .crm-container #search-status {
   border: none;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: normal;
 }
 
@@ -1052,7 +1054,7 @@ div.crm-container fieldset label{
   border: medium none;
   color: #FFFFFF;
   margin-left: 5px;
-  font-size: 12px;
+  font-size: 13px;
   font-family: Verdana;
   padding: 2px 0 0 0px;
 }
@@ -1808,7 +1810,7 @@ div.grippie {
 
 #crm-container .ui-tabs-panel {
   padding: 4px;
-  font-size: 12px;
+  font-size: 13px;
 }
 
 #crm-container div.contact_details {
@@ -2233,7 +2235,7 @@ div.grippie {
   border: medium none;
   color: #FFF;
   cursor: pointer;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: normal;
   margin: 0 0 0 0px;
   padding: 1px 8px 2px 4px;
@@ -2256,7 +2258,7 @@ div.grippie {
   text-shadow: 0 1px 0 black;
   background: #70716B url(../i/crm-button-bg.gif) repeat-x top left;
   color: #FFF;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: normal;
   margin-right: 6px;
   padding: 2px 6px;
@@ -2669,7 +2671,7 @@ div.grippie {
 }
 
 .crm-container .crm-accordion-inner .crm-accordion-header {
-  font-size: 12px;
+  font-size: 13px;
 }
 
 .crm-container .crm-accordion-wrapper {
@@ -2832,7 +2834,7 @@ div a.helpicon:focus {
   z-index: 1000;
   padding-bottom: 10px;
   background: transparent url('../i/overlay-pointer.png') no-repeat bottom left;
-  font-size: 12px;
+  font-size: 13px;
   display: none;
 }
 
@@ -3421,7 +3423,7 @@ div#crm-container form {
 }
 
 /* Date plugin */
-#crm-container input.dateplugin {
+.crm-container input.dateplugin {
   background: white url(../i/cal.gif) no-repeat scroll right center;
   padding-right: 16px;
   /* so that text doesn't flow on top of icon */
@@ -3429,20 +3431,7 @@ div#crm-container form {
 }
 
 /* Date plugin */
-#crm-container div.batch-update {
-  overflow: visible;
-}
-
-/* Date plugin for profile in edit mode */
-.crm-container-snippet input.dateplugin {
-  background: white url(../i/cal.gif) no-repeat scroll right center;
-  padding-right: 16px;
-  /* so that text doesn't flow on top of icon */
-  width: 9em;
-}
-
-/* Date plugin for profile in edit mode */
-.crm-container-snippet div.batch-update {
+.crm-container div.batch-update {
   overflow: visible;
 }
 
@@ -3775,7 +3764,9 @@ div.m ul#civicrm-menu,
   min-width: 15em !important;
 }
 /* Multi-selects: Move background image into outer container so we can place an icon in the inner container */
-.crm-container .select2-container-multi {
+.crm-container .select2-container-multi,
+/* Also style other form inputs to match */
+.crm-container input.form-text {
   background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, color-stop(1%, #eee), color-stop(15%, #fff));
   background-image: -webkit-linear-gradient(top, #eee 1%, #fff 15%);
   background-image: -moz-linear-gradient(top, #eee 1%, #fff 15%);
@@ -4168,7 +4159,7 @@ div.m ul#civicrm-menu,
   margin-top: -4px;
   float: right;
   text-decoration: none;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: bold;
   text-shadow: 0 1px 1px #fff;
   padding: 2px;
