@@ -427,15 +427,19 @@ CRM.validate = CRM.validate || {
       .on('click', 'a.crm-summary-link', false);
   };
 
-  var h;
+  var helpDisplay, helpPrevious;
   CRM.help = function (title, params, url) {
-    h && h.close && h.close();
-    var options = {
-      expires: 0
-    };
-    h = CRM.alert('...', title, 'crm-help crm-msg-loading', options);
+    if (helpDisplay && helpDisplay.isOpen) {
+      helpDisplay.close();
+      // If the same link is clicked twice, just close the display - todo use underscore method for this comparison
+      if (helpPrevious === JSON.stringify(params)) {
+        return;
+      }
+    }
+    helpPrevious = JSON.stringify(params);
     params.class_name = 'CRM_Core_Page_Inline_Help';
     params.type = 'page';
+    helpDisplay = CRM.alert('...', title, 'crm-help crm-msg-loading', {expires: 0});
     $.ajax(url || CRM.url('civicrm/ajax/inline'),
       {
         data: params,
