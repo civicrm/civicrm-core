@@ -160,18 +160,18 @@ class CRM_Core_Form_Renderer extends HTML_QuickForm_Renderer_ArraySmarty {
 
     $class = $element->getAttribute('class');
     $type = $element->getType();
-    if (empty($class)) {
-      $class = 'form-' . $type;
-
+    if (!$class) {
       if ($type == 'text') {
         $size = $element->getAttribute('size');
         if (!empty($size)) {
           if (array_key_exists($size, self::$_sizeMapper)) {
-            $class = $class . ' ' . self::$_sizeMapper[$size];
+            $class .= ' ' . self::$_sizeMapper[$size];
           }
         }
       }
     }
+
+    $class .= ($class ? ' ' : '') . 'crm-form-' . $type;
 
     if ($required) {
       $class .= ' required';
