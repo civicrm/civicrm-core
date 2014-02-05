@@ -159,7 +159,7 @@
      <path>civicrm/event/manage</path>
      <title>Manage Events</title>
      <page_callback>CRM_Event_Page_ManageEvent</page_callback>
-     <access_arguments>access CiviCRM,access CiviEvent</access_arguments>
+     <access_arguments>access CiviEvent</access_arguments>
      <page_type>1</page_type>
      <is_ssl>true</is_ssl>
      <weight>820</weight>
@@ -231,7 +231,7 @@
      <path_arguments>action=add</path_arguments>
      <title>New Event</title>
      <page_callback>CRM_Event_Form_ManageEvent_EventInfo</page_callback>
-     <access_arguments>access CiviCRM,access CiviEvent</access_arguments>
+     <access_arguments>access CiviEvent</access_arguments>
      <weight>830</weight>
   </item>
   <item>
@@ -281,7 +281,7 @@
   <item>
      <path>civicrm/ajax/locBlock</path>
      <page_callback>CRM_Core_Page_AJAX_Location::getLocBlock</page_callback>
-     <access_arguments>access CiviCRM,access CiviEvent</access_arguments>
+     <access_arguments>access CiviEvent</access_arguments>
   </item>
   <item>
      <path>civicrm/ajax/eventlist</path>
