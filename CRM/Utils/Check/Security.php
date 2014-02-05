@@ -76,6 +76,18 @@ class CRM_Utils_Check_Security {
   }
 
   /**
+   * Execute "checkAll"
+   */
+  public function showPeriodicAlerts() {
+    if (CRM_Core_Permission::check('administer CiviCRM')) {
+      $session = CRM_Core_Session::singleton();
+      if ($session->timer('check_' . __CLASS__, self::CHECK_TIMER)) {
+        $this->checkAll();
+      }
+    }
+  }
+
+  /**
    * Run some sanity checks.
    *
    * This could become a hook so that CiviCRM can run both built-in
@@ -88,15 +100,10 @@ class CRM_Utils_Check_Security {
    * @see Drupal's hook_requirements() -
    * https://api.drupal.org/api/drupal/modules%21system%21system.api.php/function/hook_requirements
    */
-  public function allChecks() {
-    if (CRM_Core_Permission::check('administer CiviCRM')) {
-      $session = CRM_Core_Session::singleton();
-      if ($session->timer('check_' . __CLASS__, self::CHECK_TIMER)) {
-        CRM_Utils_Check_Security::singleton()->checkLogFileIsNotAccessible();
-        CRM_Utils_Check_Security::singleton()->checkUploadsAreNotAccessible();
-        CRM_Utils_Check_Security::singleton()->checkDirectoriesAreNotBrowseable();
-      }
-    }
+  public function checkAll() {
+    CRM_Utils_Check_Security::singleton()->checkLogFileIsNotAccessible();
+    CRM_Utils_Check_Security::singleton()->checkUploadsAreNotAccessible();
+    CRM_Utils_Check_Security::singleton()->checkDirectoriesAreNotBrowseable();
   }
 
   /**
