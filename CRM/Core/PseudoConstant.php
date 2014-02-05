@@ -618,7 +618,6 @@ class CRM_Core_PseudoConstant {
         $componentClause = " v.component_id IS NOT NULL";
       }
 
-      $groupingClause = " v.grouping IS NULL";
       $componentIds = array();
       $compInfo = CRM_Core_Component::getEnabledComponents();
 
@@ -647,7 +646,7 @@ class CRM_Core_PseudoConstant {
           $componentClause = " ( v.component_id IN ($componentIds ) )";
         }
       }
-      $condition = $condition . ' AND ' . $componentClause . ' AND ' . $groupingClause;
+      $condition = $condition . ' AND ' . $componentClause;
 
       self::$activityType[$index] = CRM_Core_OptionGroup::values('activity_type', FALSE, FALSE, FALSE, $condition, $returnColumn);
     }
