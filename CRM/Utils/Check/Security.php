@@ -188,7 +188,7 @@ class CRM_Utils_Check_Security {
 
     if ($upload_url = explode($filePathMarker, $config->imageUploadURL)) {
       if ($files = glob($config->uploadDir . '/*')) {
-        for ($i=0; $i<3; $i++) {
+        for ($i = 0; $i < 3; $i++) {
           $f = array_rand($files);
           if ($file_path = explode($filePathMarker, $files[$f])) {
             $url = implode($filePathMarker, array($upload_url[0], $file_path[1]));
