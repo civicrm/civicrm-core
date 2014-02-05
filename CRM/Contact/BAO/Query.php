@@ -5199,7 +5199,7 @@ AND   displayRelType.is_active = 1
           //preserve id value
           $idColumn = "{$key}_id";
           $dao->$idColumn = $val;
-          $dao->$key = CRM_Core_PseudoConstant::getLabel($baoName, $value['pseudoField'], $val);
+          $dao->$value['pseudoField'] = $dao->$key = CRM_Core_PseudoConstant::getLabel($baoName, $value['pseudoField'], $val);
         }
         elseif ($value['pseudoField'] == 'state_province_abbreviation') {
           $dao->$key = CRM_Core_PseudoConstant::stateProvinceAbbreviation($val);
