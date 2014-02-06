@@ -1,7 +1,0 @@
-name = Multi Currency Support for CiviCRM
-description = Multi Currency Support for a specific Event
-version = 3.4
-dependencies[] = civicrm
-package = CiviCRM
-core = 6.x
-php = 5.2
