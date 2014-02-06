@@ -958,7 +958,7 @@ CRM.validate = CRM.validate || {
 
       .on('click', 'a.crm-edit-optionvalue-link', function() {
         var url = $(this).data('option-group-url');
-        CRM.loadForm(CRM.url(url, {reset: 1}))
+        CRM.loadForm(CRM.url(url, {reset: 1}), {openInline: 'a:not("[href=#], .no-popup")'})
           .on('dialogclose', function() {
             var $elects = $('select[data-option-group-url="' + url + '"]');
             CRM.api3($elects.data('api-entity'), 'getoptions', {sequential: 1, field: $elects.data('api-field')})
