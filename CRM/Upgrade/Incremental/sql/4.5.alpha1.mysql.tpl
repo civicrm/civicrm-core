@@ -519,3 +519,10 @@ WHERE co.id IS NULL;
     WHERE v.name = 'Awaiting Information';
 {/if}
 
+-- CRM-14197 Add contribution_id to civicrm_line_item
+
+ALTER TABLE civicrm_line_item ADD contribution_id INT(10) NULL AFTER entity_id;
+
+ALTER TABLE civicrm_line_item
+ADD CONSTRAINT `FK_civicrm_contribution_id` FOREIGN KEY (`contribution_id`) REFERENCES civicrm_contribution (`id`) ON DELETE SET NULL;
+
