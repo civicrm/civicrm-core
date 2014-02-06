@@ -9,6 +9,7 @@
   <field>
       <name>id</name>
       <type>int unsigned</type>
+      <title>Website ID</title>
       <required>true</required>
       <comment>Unique Website ID</comment>
        <add>3.2</add>
@@ -19,6 +20,7 @@
   </primaryKey>
   <field>
       <name>contact_id</name>
+      <title>Contact</title>
       <type>int unsigned</type>
       <comment>FK to Contact ID</comment>
       <add>3.2</add>

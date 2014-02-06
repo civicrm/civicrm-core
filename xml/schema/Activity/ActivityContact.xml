@@ -71,5 +71,10 @@
     <unique>true</unique>
     <add>4.4</add>
   </index>
-
+  <index>
+    <name>index_record_type</name>
+    <fieldName>activity_id</fieldName>
+    <fieldName>record_type_id</fieldName>
+    <add>4.4</add>
+  </index>
 </table>
