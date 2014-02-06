@@ -695,7 +695,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
           $this->addWysiwyg($field, $values['label'], $attribute, $required);
         }
         elseif ($values['type'] == 'select' && empty($attribute)) {
-          $this->addSelect('CRM_Activity_BAO_Activity', $field, array(), $required);
+          $this->addSelect($field, array(), $required);
         }
         elseif ($field != 'source_contact_id') {
           $this->add($values['type'], $field, $values['label'], $attribute, $required);
@@ -712,7 +712,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
       CRM_Campaign_BAO_Campaign::accessCampaign()
     ) {
       $buildEngagementLevel = TRUE;
-      $this->addSelect('CRM_Activity_BAO_Activity', 'engagement_level');
+      $this->addSelect('engagement_level');
       $this->addRule('engagement_level',
         ts('Please enter the engagement index as a number (integers only).'),
         'positiveInteger'

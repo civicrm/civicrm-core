@@ -78,9 +78,9 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
     else {
       $this->_gName = $this->get('gName');
     }
-    $this->_gLabel = ucwords(str_replace('_', ' ', $this->_gName));
+    $this->_gLabel = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup', $this->_gid, 'title');
     $url          = "civicrm/admin/options/{$this->_gName}";
-    $params       = "group={$this->_gName}&reset=1";
+    $params       = "reset=1";
 
     if (($this->_action & CRM_Core_Action::DELETE) &&
       in_array($this->_gName, array('email_greeting', 'postal_greeting', 'addressee'))

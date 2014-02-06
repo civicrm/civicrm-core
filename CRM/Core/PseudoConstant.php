@@ -494,6 +494,32 @@ class CRM_Core_PseudoConstant {
   }
 
   /**
+   * Lookup the admin page at which a field's option list can be edited
+   * @param $fieldSpec
+   * @return string|null
+   */
+  static function getOptionEditUrl($fieldSpec) {
+    // If it's an option group, that's easy
+    if (!empty($fieldSpec['pseudoconstant']['optionGroupName'])) {
+      return 'civicrm/admin/options/' . $fieldSpec['pseudoconstant']['optionGroupName'];
+    }
+    // For everything else...
+    elseif (!empty($fieldSpec['pseudoconstant']['table'])) {
+      $daoName = CRM_Core_DAO_AllCoreTables::getClassForTable($fieldSpec['pseudoconstant']['table']);
+      if (!$daoName) {
+        return NULL;
+      }
+      // We don't have good mapping so have to do a bit of guesswork from the menu
+      list(, , , $ent) = explode('_', $daoName);
+      $sql = "SELECT path FROM civicrm_menu
+        WHERE page_callback LIKE '%CRM_Admin_Page_$ent%'
+        LIMIT 1";
+      return CRM_Core_Dao::singleValueQuery($sql);
+    }
+    return NULL;
+  }
+
+  /**
    * DEPRECATED generic populate method
    * All pseudoconstant functions that use this method are also deprecated.
    *
