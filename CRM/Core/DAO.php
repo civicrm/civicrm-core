@@ -1976,4 +1976,6 @@ EOS;
     return substr($string, 0, $length - 8) . "_{$md5string}";
   }
 
+  function setApiFilter(&$params) {}
+
 }

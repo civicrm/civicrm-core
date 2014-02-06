@@ -807,10 +807,13 @@ WHERE reminder.action_schedule_id = %1 AND reminder.action_date_time IS NULL
     }
   }
 
-  static function buildRecipientContacts($mappingID, $now) {
+  static function buildRecipientContacts($mappingID, $now, $params = array()) {
     $actionSchedule = new CRM_Core_DAO_ActionSchedule();
     $actionSchedule->mapping_id = $mappingID;
     $actionSchedule->is_active = 1;
+    if(!empty($params)) {
+      _civicrm_api3_dao_set_filter($actionSchedule, $params, FALSE, 'ActionSchedule');
+    }
     $actionSchedule->find();
 
     while ($actionSchedule->fetch()) {
@@ -1111,6 +1114,12 @@ GROUP BY c.id
         elseif ($actionSchedule->repetition_frequency_unit == 'week') {
           $hrs = 24 * $actionSchedule->repetition_frequency_interval * 7;
         }
+        elseif ($actionSchedule->repetition_frequency_unit == 'month') {
+          $hrs = "24*(DATEDIFF(DATE_ADD(latest_log_time, INTERVAL 1 MONTH ), latest_log_time))";
+        }
+        elseif ($actionSchedule->repetition_frequency_unit == 'year') {
+          $hrs = "24*(DATEDIFF(DATE_ADD(latest_log_time, INTERVAL 1 YEAR ), latest_log_time))";
+        }
         else {
           $hrs = $actionSchedule->repetition_frequency_interval;
         }
@@ -1209,12 +1218,12 @@ WHERE     m.owner_membership_id IS NOT NULL AND
     return NULL;
   }
 
-  static function processQueue($now = NULL) {
+  static function processQueue($now = NULL, $params = array()) {
     $now = $now ? CRM_Utils_Time::setTime($now) : CRM_Utils_Time::getTime();
 
     $mappings = self::getMapping();
     foreach ($mappings as $mappingID => $mapping) {
-      self::buildRecipientContacts($mappingID, $now);
+      self::buildRecipientContacts($mappingID, $now, $params);
       self::sendMailings($mappingID, $now);
     }
 
