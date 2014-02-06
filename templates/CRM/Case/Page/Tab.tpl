@@ -31,7 +31,7 @@
       <div class="icon inform-icon"></div>&nbsp;
          <strong>{ts}Oops, It looks like there are no active case types.{/ts}</strong>
            {if call_user_func(array('CRM_Core_Permission','check'), ' administer CiviCase')}
-             {capture assign=adminCaseTypeURL}{crmURL p='civicrm/admin/options/case_type' q='reset=1&group=case_type'}
+             {capture assign=adminCaseTypeURL}{crmURL p='civicrm/admin/options/case_type' q='reset=1'}
        {/capture}
              {ts 1=$adminCaseTypeURL 2=$adminCaseStatusURL}Enable <a href='%1'>case types</a>.{/ts}
            {/if}

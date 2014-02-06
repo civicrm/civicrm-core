@@ -53,7 +53,7 @@
         </tr>
         <tr><td colspan="2" class="separator"><strong>{ts}Use following steps if you need to control View and/or Edit permissions for specific contact groups, specific profiles or specific custom data fields.{/ts}</strong></td></tr>
     <tr>
-        <td class="nowrap"><a href="{crmURL p='civicrm/admin/options/acl_role' q="reset=1&group=acl_role"}" id="editACLRoles">&raquo; {ts}1. Manage Roles{/ts}</a></td>
+        <td class="nowrap"><a href="{crmURL p='civicrm/admin/options/acl_role' q="reset=1"}" id="editACLRoles">&raquo; {ts}1. Manage Roles{/ts}</a></td>
         <td>{ts}Each CiviCRM ACL Role is assigned a set of permissions. Use this link to create or edit the different roles needed for your site.{/ts}</td>
     </tr>
     <tr>
