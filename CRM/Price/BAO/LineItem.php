@@ -116,6 +116,7 @@ AND li.entity_id = {$entityId})";
     $selectClause = "
       SELECT    li.id,
       li.label,
+      li.contribution_id,
       li.qty,
       li.unit_price,
       li.line_total,
@@ -169,6 +170,7 @@ AND li.entity_id = {$entityId})";
         'html_type' => $dao->html_type,
         'description' => $dao->description,
         'entity_id' => $entityId,
+        'contribution_id' => $dao->contribution_id,
         'financial_type_id' => $dao->financial_type_id,
         'membership_type_id' => $dao->membership_type_id,
         'membership_num_terms' => $dao->membership_num_terms,
@@ -296,6 +298,12 @@ AND li.entity_id = {$entityId})";
       foreach ($values as $line) {
         $line['entity_table'] = $entityTable;
         $line['entity_id'] = $entityId;
+        if ($entityTable == 'civicrm_contribution') {
+          $line['contribution_id'] = $entityId;
+        }
+        else {
+          $line['contribution_id'] = $contributionDetails->id;
+        }
         // if financial type is not set and if price field value is NOT NULL
         // get financial type id of price field value
         if (!empty($line['price_field_value_id']) && empty($line['financial_type_id'])) {
