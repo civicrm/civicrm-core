@@ -40,12 +40,8 @@ function civicrm_api3_generic_getfields($apiRequest) {
   $action       = strtolower(CRM_Utils_Array::value('action', $apiRequest['params']));
   $sequential = empty($apiRequest['params']) ? 0 : 1;
   $apiOptions = CRM_Utils_Array::value('options', $apiRequest['params'], array());
-  if ($action == 'getvalue' || $action == 'getvalue' || $action == 'getcount') {
+  if (!$action || $action == 'getvalue' || $action == 'getcount') {
     $action = 'get';
-  }
-
-  if (empty($action)) {
-    $action='get';
   }
   // determines whether to use unique field names - seem comment block above
   $unique = TRUE;
@@ -239,7 +235,7 @@ function civicrm_api3_generic_getoptions($apiRequest) {
       $output[] = array('key' => $key, 'value' => $val);
     }
   }
-  return civicrm_api3_create_success($output);
+  return civicrm_api3_create_success($output, $apiRequest['params'], $apiRequest['entity'], 'getoptions');
 }
 
 /**

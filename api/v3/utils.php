@@ -181,8 +181,7 @@ function civicrm_api3_create_error($msg, $data = array(), &$dao = NULL) {
  *
  * @return array $result
  */
-function civicrm_api3_create_success($values = 1, $params = array(
-  ), $entity = NULL, $action = NULL, &$dao = NULL, $extraReturnValues = array()) {
+function civicrm_api3_create_success($values = 1, $params = array(), $entity = NULL, $action = NULL, &$dao = NULL, $extraReturnValues = array()) {
   $result = array();
   $result['is_error'] = 0;
   //lets set the ['id'] field if it's not set & we know what the entity is
@@ -256,7 +255,7 @@ function civicrm_api3_create_success($values = 1, $params = array(
   if(!empty($params['options']['metadata'])) {
     // we've made metadata an array but only supporting 'fields' atm
     if(in_array('fields', $params['options']['metadata'])) {
-      $fields = civicrm_api3($entity, 'getfields', array('action' => $action));
+      $fields = civicrm_api3($entity, 'getfields', array('action' => substr($action, 0, 3) == 'get' ? 'get' : 'create'));
       $result['metadata']['fields'] = $fields['values'];
     }
   }
