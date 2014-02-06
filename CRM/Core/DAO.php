@@ -929,8 +929,11 @@ FROM   civicrm_domain
    * execute a query and get the single result
    *
    * @param string $query query to be executed
+   * @param array $params
+   * @param bool $abort
+   * @param bool $i18nRewrite
+   * @return string|null the result of the query if any
    *
-   * @return string the result of the query
    * @static
    * @access public
    */
