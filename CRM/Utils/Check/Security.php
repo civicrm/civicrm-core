@@ -261,7 +261,7 @@ class CRM_Utils_Check_Security {
 
     // this could be a new system with uploads yet -- so we'll make a file
     file_put_contents("$dir/$file", "delete me");
-    $content = file_get_contents("$url");
+    $content = @file_get_contents("$url");
     if (stristr($content, $file)) {
       $result = TRUE;
     }
