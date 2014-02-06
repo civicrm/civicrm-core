@@ -219,7 +219,7 @@ class CRM_Mailing_Form_Upload extends CRM_Core_Form {
     $fromEmailAddress = CRM_Core_OptionGroup::values('from_email_address');
     if (empty($fromEmailAddress)) {
       //redirect user to enter from email address.
-      $url = CRM_Utils_System::url('civicrm/admin/options/from_email_address', 'group=from_email_address&action=add&reset=1');
+      $url = CRM_Utils_System::url('civicrm/admin/options/from_email_address', 'action=add&reset=1');
       $status = ts("There is no valid from email address present. You can add here <a href='%1'>Add From Email Address.</a>", array(1 => $url));
       $session->setStatus($status, ts('Notice'));
     }
