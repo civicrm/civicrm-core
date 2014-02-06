@@ -198,7 +198,9 @@ UPDATE civicrm_navigation set url = CONCAT(SUBSTRING_INDEX(url, '&', 1), '&reset
 
 -- Add contribution_id to civicrm_line_item
 
-ALTER TABLE civicrm_line_item ADD contribution_id INT(10) NULL AFTER entity_id;
+ALTER TABLE civicrm_line_item ADD contribution_id INT(10) COMMENT 'Formal (academic or similar) title in front of name. (Prof., Dr. etc.)' NULL AFTER entity_id;
+
+-- FK to civicrm_contribution
 
 ALTER TABLE civicrm_line_item
   ADD CONSTRAINT `FK_civicrm_contribution_id` FOREIGN KEY (`contribution_id`) REFERENCES civicrm_contribution (`id`) ON DELETE SET NULL;
