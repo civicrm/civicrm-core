@@ -912,18 +912,24 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * @throws CRM_Core_Exception
    * @return HTML_QuickForm_Element
    */
-  function addSelect($baoName, $name, $props = array(), $required = FALSE) {
-    $options = $baoName::buildOptions($name, 'create');
-    if ($options === FALSE) {
-      throw new CRM_Core_Exception('No option list for field ' . $name);
+  function addSelect($name, $props = array(), $required = FALSE) {
+    if (!isset($props['data-api-entity'])) {
+      $props['data-api-entity'] = CRM_Utils_Api::getEntityName($this);
     }
+    if (!isset($props['data-api-field'])) {
+      $props['data-api-field'] = strrpos($name, '[') ? rtrim(substr($name, 1 + strrpos($name, '[')), ']') : $name;
+    }
+    $options = civicrm_api3($props['data-api-entity'], 'getoptions', array(
+        'field' => $props['data-api-field'],
+      )
+    );
+    $options = $options['values'];
     if (!array_key_exists('placeholder', $props)) {
       $props['placeholder'] = $required ? ts('- select -') : ts('- none -');
     }
     if (!empty($props['placeholder']) && empty($props['multiple'])) {
       $options = array('' => '') + $options;
     }
-    $bao = new $baoName;
     // Handle custom field
     if (strpos($name, 'custom_') === 0 && is_numeric($name[7])) {
       list(, $id) = explode('_', $name);
@@ -933,15 +939,19 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     }
     // Core field
     else {
-      $meta = $bao->getFieldSpec($name);
-      $label = isset($props['label']) ? $props['label'] : ts($meta['title']);
-      if (!empty($meta['pseudoconstant']['optionGroupName'])) {
-        $props['data-option-group-url'] = 'civicrm/admin/options/' . $meta['pseudoconstant']['optionGroupName'];
+      $getFields = civicrm_api3($props['data-api-entity'], 'getfields');
+      foreach($getFields['values'] as $uniqueName => $fieldSpec) {
+        if (
+          $uniqueName === $props['data-api-field'] ||
+          CRM_Utils_Array::value('name', $fieldSpec) === $props['data-api-field'] ||
+          in_array($props['data-api-field'], CRM_Utils_Array::value('api.aliases', $fieldSpec, array()))
+        ) {
+          break;
+        }
       }
+      $label = isset($props['label']) ? $props['label'] : $fieldSpec['title'];
+      $props['data-option-group-url'] = CRM_Core_PseudoConstant::getOptionEditUrl($fieldSpec);
     }
-    require_once 'api/api.php';
-    $props['data-api-entity'] = _civicrm_api_get_entity_name_from_dao($bao);
-    $bao->free();
     $props['class'] = isset($props['class']) ? $props['class'] . ' ' : '';
     $props['class'] .= "crm-select2";
     CRM_Utils_Array::remove($props, 'label');

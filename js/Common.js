@@ -961,7 +961,7 @@ CRM.validate = CRM.validate || {
         CRM.loadForm(CRM.url(url, {reset: 1}))
           .on('dialogclose', function() {
             var $elects = $('select[data-option-group-url="' + url + '"]');
-            CRM.api3($elects.data('api-entity'), 'getoptions', {sequential: 1, field: $elects.attr('name')})
+            CRM.api3($elects.data('api-entity'), 'getoptions', {sequential: 1, field: $elects.data('api-field')})
               .done(function(data) {
                 CRM.utils.setOptions($elects, data.values);
               });

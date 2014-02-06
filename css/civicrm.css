@@ -3760,7 +3760,7 @@ div.m ul#civicrm-menu,
   width: 15em;
 }
 .crm-container .select2-container {
-  min-width: 15em !important;
+  min-width: 8em !important;
   font-size: 11px;
 }
 /* Style civi form inputs to match select2 */
@@ -3798,6 +3798,9 @@ div.m ul#civicrm-menu,
 }
 .crm-container .select2-search-choice-close {
   top: 2px;
+}
+.crm-container .select2-container .select2-choice abbr {
+  top: 6px;
 }
 /* Add search icon to ajax single-selects */
 .crm-container .crm-ajax-select .select2-arrow b {
