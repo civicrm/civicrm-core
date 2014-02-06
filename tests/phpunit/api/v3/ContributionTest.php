@@ -396,6 +396,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
 
     $lineItems = $this->callAPISuccess('line_item','get',array(
       'entity_id' => $contribution['id'],
+      'contribution_id' => $contribution['id'],
       'entity_table' => 'civicrm_contribution',
       'sequential' => 1,
     ));
@@ -424,18 +425,13 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->assertEquals($contribution['values'][$contribution['id']]['contribution_status_id'], 1, 'In line ' . __LINE__);
     $lineItems = $this->callAPISuccess('line_item','get',array(
       'entity_id' => $contribution['id'],
+      'contribution_id' => $contribution['id'],
       'entity_table' => 'civicrm_contribution',
       'sequential' => 1,
       ));
     $this->assertEquals(1, $lineItems['count']);
     $this->assertEquals($contribution['id'], $lineItems['values'][0]['entity_id']);
-    $this->assertEquals($contribution['id'], $lineItems['values'][0]['entity_id']);
-    $lineItems = $this->callAPISuccess('line_item','get',array(
-      'entity_id' => $contribution['id'],
-      'entity_table' => 'civicrm_contribution',
-      'sequential' => 1,
-    ));
-    $this->assertEquals(1, $lineItems['count']);
+    $this->assertEquals($contribution['id'], $lineItems['values'][0]['contribution_id']);
     $this->_checkFinancialRecords($contribution, 'offline');
     $this->contributionGetnCheck($params, $contribution['id']);
   }
@@ -694,10 +690,11 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       ));
     $this->assertEquals(1, $lineItems['count']);
     $this->assertEquals($contribution['id'], $lineItems['values'][0]['entity_id']);
-    $this->assertEquals($contribution['id'], $lineItems['values'][0]['entity_id']);
+    $this->assertEquals($contribution['id'], $lineItems['values'][0]['contribution_id']);
     $lineItems = $this->callAPISuccess('line_item','get',array(
 
         'entity_id' => $contribution['id'],
+        'contribution_id' => $contribution['id'],
         'entity_table' => 'civicrm_contribution',
         'sequential' => 1,
     ));
