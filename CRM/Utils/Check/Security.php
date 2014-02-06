@@ -256,10 +256,14 @@ class CRM_Utils_Check_Security {
    * @return bool
    */
   public function isBrowsable($dir, $url) {
+    if (empty($dir) || empty($url)) {
+      return FALSE;
+    }
+
     $result = FALSE;
     $file = 'delete-this-' . CRM_Utils_String::createRandom(10, CRM_Utils_String::ALPHANUMERIC);
 
-    // this could be a new system with uploads yet -- so we'll make a file
+    // this could be a new system with no uploads (yet) -- so we'll make a file
     file_put_contents("$dir/$file", "delete me");
     $content = @file_get_contents("$url");
     if (stristr($content, $file)) {
