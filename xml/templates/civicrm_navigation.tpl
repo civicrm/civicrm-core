@@ -383,12 +383,12 @@ INSERT INTO civicrm_navigation
 VALUES
     ( @domainID, 'civicrm/admin/options/gender&reset=1',                                                  '{ts escape="sql" skip="true"}Gender Options{/ts}',         'Gender Options',                           'administer CiviCRM', '',   @optionListlastID, '1', NULL,  1 ),
     ( @domainID, 'civicrm/admin/options/individual_prefix&reset=1',                            '{ts escape="sql" skip="true"}Individual Prefixes (Ms, Mr...){/ts}', 'Individual Prefixes (Ms, Mr...)', 'administer CiviCRM', '',   @optionListlastID, '1', NULL,  2 ),
-    ( @domainID, 'civicrm/admin/options/incivicrm/admin/options/instant_messenger_service&             '{ts escape="sql" skip="true"}Individual Suffixes (Jr, Sr...){/ts}', 'Individual Suffixes (Jr, Sr...)', 'administer CiviCRM', '',   @optionListlastID, '1', NULL,  3 ),
-    ( @domainID, 'civicrm/admin/options/instant_messenger_civicrm/admin/options/mobile_provider&kip="true"}Instant Messenger Services{/ts}',     'Instant Messenger Services',       'administer CiviCRM', '',   @optionListlastID, '1', NULL,  4 ),
+    ( @domainID, 'civicrm/admin/options/individual_suffix&reset=1',                            '{ts escape="sql" skip="true"}Individual Suffixes (Jr, Sr...){/ts}', 'Individual Suffixes (Jr, Sr...)', 'administer CiviCRM', '',   @optionListlastID, '1', NULL,  3 ),
+    ( @domainID, 'civicrm/admin/options/instant_messenger_service&reset=1',            '{ts escape="sql" skip="true"}Instant Messenger Services{/ts}',     'Instant Messenger Services',       'administer CiviCRM', '',   @optionListlastID, '1', NULL,  4 ),
     ( @domainID, 'civicrm/admin/locationType&reset=1',                                                                 '{ts escape="sql" skip="true"}Location Types (Home, Work...){/ts}', 'Location Types (Home, Work...)',   'administer CiviCRM', '',   @optionListlastID, '1', NULL,  5 ),
-    ( @domainID, 'civicrm/admin/options/mobile_provider&reset=1',             civicrm/admin/options/phone_type&e Providers{/ts}', 'Mobile Phone Providers',                   'administer CiviCRM', '',   @optionListlastID, '1', NULL,  6 ),
-    ( @domainID, 'civicrm/admin/options/phone_type&reset=1',                                          '{ts esccivicrm/admin/options/website_type&  'Phone Types',                              'administer CiviCRM', '',   @optionListlastID, '1', NULL,  7 ),
-    ( @domainID, 'civicrm/admin/options/website_type&reset=1',                                      '{ts escape="sql" skip=civicrm/admin/options/from_email_address&                           'administer CiviCRM', '',   @optionListlastID, '1', NULL,  8 );
+    ( @domainID, 'civicrm/admin/options/mobile_provider&reset=1',                                '{ts escape="sql" skip="true"}Mobile Phone Providers{/ts}', 'Mobile Phone Providers',                   'administer CiviCRM', '',   @optionListlastID, '1', NULL,  6 ),
+    ( @domainID, 'civicrm/admin/options/phone_type&reset=1',                                          '{ts escape="sql" skip="true"}Phone Types{/ts}',            'Phone Types',                              'administer CiviCRM', '',   @optionListlastID, '1', NULL,  7 ),
+    ( @domainID, 'civicrm/admin/options/website_type&reset=1',                                      '{ts escape="sql" skip="true"}Website Types{/ts}',          'Website Types',                            'administer CiviCRM', '',   @optionListlastID, '1', NULL,  8 );
 
 INSERT INTO civicrm_navigation
     ( domain_id, url, label, name, permission, permission_operator, parent_id, is_active, has_separator, weight )
@@ -400,16 +400,19 @@ INSERT INTO civicrm_navigation
     ( domain_id, url, label, name, permission, permission_operator, parent_id, is_active, has_separator, weight )
 VALUES
     ( @domainID, 'civicrm/admin/domain&action=update&reset=1',         '{ts escape="sql" skip="true"}Organization Address and Contact Info{/ts}', 'Organization Address and Contact Info',                                      'administer CiviCRM', '', @communicationslastID, '1', NULL, 1 ),
-    ( @domainID, 'civicrm/admin/options/from_email_address&reset=1', '{ts escape="sql" skip="true"}FROM Email Addresses{/ts}', 'FRcivicrm/admin/options/preferred_communication_method&   'administer CiviCRM', '', @communicationslastID, '1', NULL, 2 ),
+    ( @domainID, 'civicrm/admin/options/from_email_address&reset=1', '{ts escape="sql" skip="true"}FROM Email Addresses{/ts}', 'FROM Email Addresses',                                                 'administer CiviCRM', '', @communicationslastID, '1', NULL, 2 ),
     ( @domainID, 'civicrm/admin/messageTemplates&reset=1',             '{ts escape="sql" skip="true"}Message Templates{/ts}',      'Message Templates',                                                                         'administer CiviCRM', '', @communicationslastID, '1', NULL, 3 ),
     ( @domainID, 'civicrm/admin/scheduleReminders&reset=1',              '{ts escape="sql" skip="true"}Schedule Reminders{/ts}',    'Schedule Reminders',                                                                       'administer CiviCRM', '', @communicationslastID, '1', NULL, 4 ),
-    ( @domainID, 'civicrm/admin/options/preferred_communication_method&reset=1',  '{ts escape="sql" skip="true"}Preferred Communicacivicrm/admin/options/communication_style&cationslastID, '1', NULL, 5 ),
+    ( @domainID, 'civicrm/admin/options/preferred_communication_method&reset=1',  '{ts escape="sql" skip="true"}Preferred Communication Methods{/ts}', 'Preferred Communication Methods',  'administer CiviCRM', '', @communicationslastID, '1', NULL, 5 ),
     ( @domainID, 'civicrm/admin/labelFormats&reset=1',                                  '{ts escape="sql" skip="true"}Label Formats{/ts}',                 'Label Formats',                                                     'administer CiviCRM', '', @communicationslastID, '1', NULL, 6 ),
     ( @domainID, 'civicrm/admin/pdfFormats&reset=1',                                    '{ts escape="sql" skip="true"}Print Page (PDF) Formats{/ts}',      'Print Page (PDF) Formats',                                          'administer CiviCRM', '', @communicationslastID, '1', NULL, 7 ),
-    ( @domainID, 'civicrm/admin/options/communication_style&reset=1',   '{ts escape="sql" skip="true"}Communication Style Options{/ts}', 'Communication Style Options',                       civicrm/admin/options/email_greeting&8 ),
-    ( @domainID, 'civicrm/admin/options/email_greeting&reset=1',   '{ts escape="sql" skip="true"}Email Greeting Formats{/ts}',        'Email Greeting Formats',                                            'administer CiviCRM', 'civicrm/admin/options/postal_greeting& 'civicrm/admin/options/postal_greeting&reset=1', '{ts escape="sql" skip="true"}Postal Greeting Formats{/ts}',       'Postal Greeting Formats',                                           'administer CiviCRM', '', @communicationslacivicrm/admin/options/addressee&ns/addressee&reset=1',             '{ts escape="sql" skip="true"}Addressee Formats{/ts}',             'Addressee Formats',                                                 'administer CiviCRM', '', @communicationslastID, '1', NULL, 11 );
+    ( @domainID, 'civicrm/admin/options/communication_style&reset=1',   '{ts escape="sql" skip="true"}Communication Style Options{/ts}', 'Communication Style Options',                               'administer CiviCRM', '', @communicationslastID, '1', NULL, 8 ),
+    ( @domainID, 'civicrm/admin/options/email_greeting&reset=1',   '{ts escape="sql" skip="true"}Email Greeting Formats{/ts}',        'Email Greeting Formats',                                            'administer CiviCRM', '', @communicationslastID, '1', NULL, 9 ),
+    ( @domainID, 'civicrm/admin/options/postal_greeting&reset=1', '{ts escape="sql" skip="true"}Postal Greeting Formats{/ts}',       'Postal Greeting Formats',                                           'administer CiviCRM', '', @communicationslastID, '1', NULL, 10 ),
+    ( @domainID, 'civicrm/admin/options/addressee&reset=1',             '{ts escape="sql" skip="true"}Addressee Formats{/ts}',             'Addressee Formats',                                                 'administer CiviCRM', '', @communicationslastID, '1', NULL, 11 );
 
-INSEcivicrm/admin/options/languages& label, name, permission, permission_operator, parent_id, is_active, has_separator, weight )
+INSERT INTO civicrm_navigation
+    ( domain_id, url, label, name, permission, permission_operator, parent_id, is_active, has_separator, weight )
 VALUES
     ( @domainID, NULL, '{ts escape="sql" skip="true"}Localization{/ts}', 'Localization', 'administer CiviCRM', '', @adminlastID, '1', NULL, 6 );
 
@@ -423,7 +426,7 @@ VALUES
     ( @domainID, 'civicrm/admin/options/languages&reset=1', '{ts escape="sql" skip="true"}Preferred Language Options{/ts}', 'Preferred Language Options',       'administer CiviCRM', '', @locallastID, '1', NULL, 4 );
 
 INSERT INTO civicrm_navigation
-    ( domain_id, url, label, name, permission, civicrm/admin/options/safe_file_extension&eparator, weight )
+    ( domain_id, url, label, name, permission, permission_operator, parent_id, is_active, has_separator, weight )
 VALUES
     ( @domainID, NULL,                                                  '{ts escape="sql" skip="true"}Users and Permissions{/ts}',          'Users and Permissions',            'administer CiviCRM', '', @adminlastID, '1', NULL, 7 );
 
@@ -454,7 +457,7 @@ VALUES
     ( @domainID, 'civicrm/admin/setting/updateConfigBackend&reset=1',   '{ts escape="sql" skip="true"}Cleanup Caches and Update Paths{/ts}', 'Cleanup Caches and Update Paths', 'administer CiviCRM', '', @systemSettingslastID, '1', NULL, 9 ),
     ( @domainID, 'civicrm/admin/setting/uf&reset=1',                    '{ts escape="sql" skip="true"}CMS Database Integration{/ts}',    'CMS Integration',                     'administer CiviCRM', '', @systemSettingslastID, '1', NULL, 10 ),
     ( @domainID, 'civicrm/admin/options/safe_file_extension&reset=1', '{ts escape="sql" skip="true"}Safe File Extensions{/ts}', 'Safe File Extensions','administer CiviCRM', '',@systemSettingslastID, '1', NULL, 11 ),
-    ( @domainID, 'civicrm/admin/options?reset=1',                       '{tcivicrm/admin/options/campaign_type&                                 'administer CiviCRM', '', @systemSettingslastID, '1', NULL, 12 ),
+    ( @domainID, 'civicrm/admin/options?reset=1',                       '{ts escape="sql" skip="true"}Option Groups{/ts}', 'Option Groups',                                     'administer CiviCRM', '', @systemSettingslastID, '1', NULL, 12 ),
     ( @domainID, 'civicrm/admin/mapping&reset=1',                       '{ts escape="sql" skip="true"}Import/Export Mappings{/ts}', 'Import/Export Mappings',                   'administer CiviCRM', '', @systemSettingslastID, '1', NULL, 13 ),
     ( @domainID, 'civicrm/admin/setting/debug&reset=1',                 '{ts escape="sql" skip="true"}Debugging and Error Handling{/ts}','Debugging and Error Handling',        'administer CiviCRM', '', @systemSettingslastID, '1', NULL, 14 ),
     ( @domainID, 'civicrm/admin/setting/preferences/multisite&reset=1', '{ts escape="sql" skip="true"}Multi Site Settings{/ts}', 'Multi Site Settings',                         'administer CiviCRM', '', @systemSettingslastID, '1', NULL, 15 ),
@@ -474,9 +477,9 @@ INSERT INTO civicrm_navigation
 VALUES
     ( @domainID, 'civicrm/admin/campaign/surveyType&reset=1',                            '{ts escape="sql" skip="true"}Survey Types{/ts}',  'Survey Types', 'administer CiviCampaign',    '', @adminCampaignlastID, '1', NULL, 1 ),
     ( @domainID, 'civicrm/admin/options/campaign_type&reset=1',      '{ts escape="sql" skip="true"}Campaign Types{/ts}',  'Campaign Types', 'administer CiviCampaign',    '', @adminCampaignlastID, '1', NULL, 2 ),
-    ( @domainID, 'civicrm/admin/options/campaign_status&reset=1',  '{ts escape="sql" skip="truecivicrm/admin/options/engagement_index& CiviCampaign',    '', @adminCampaignlastID, '1', NULL, 3 ),
-    ( @domainID, 'civicrm/admin/options/engagement_index&reset=1', '{ts escape="sql" skip="true"}Engagement Icivicrm/admin/options/case_type&'', @adminCampaignlastID, '1', NULL, 4 ),
-    ( @domainID, 'civicrm/admin/setting/preferences/campaign&reset=1',                   '{ts escape="sql" skip="true"}CiviCampaign Component Settings{/ts}', 'Ccivicrm/admin/options/case_type& @adminCampaignlastID, '1', NULL, 5 );
+    ( @domainID, 'civicrm/admin/options/campaign_status&reset=1',  '{ts escape="sql" skip="true"}Campaign Status{/ts}',  'Campaign Status', 'administer CiviCampaign',    '', @adminCampaignlastID, '1', NULL, 3 ),
+    ( @domainID, 'civicrm/admin/options/engagement_index&reset=1', '{ts escape="sql" skip="true"}Engagement Index{/ts}',  'Engagement Index', 'administer CiviCampaign', '', @adminCampaignlastID, '1', NULL, 4 ),
+    ( @domainID, 'civicrm/admin/setting/preferences/campaign&reset=1',                   '{ts escape="sql" skip="true"}CiviCampaign Component Settings{/ts}', 'CiviCampaign Component Settings','administer CiviCampaign', '', @adminCampaignlastID, '1', NULL, 5 );
 
 INSERT INTO civicrm_navigation
     ( domain_id, url, label, name, permission, permission_operator, parent_id, is_active, has_separator, weight )
@@ -488,12 +491,14 @@ INSERT INTO civicrm_navigation
     ( domain_id, url, label, name, permission, permission_operator, parent_id, is_active, has_separator, weight )
 VALUES
     ( @domainID, 'civicrm/admin/options/case_type&reset=1',            '{ts escape="sql" skip="true"}Case Types{/ts}',      'Case Types',      'administer CiviCase', NULL, @adminCaselastID, '1', NULL, 1 ),
-    ( @domainID, 'civicrm/admin/options/redaction_rule&reset=1',  '{ts escape="sql" skip="true"}Redaction Rules{/ts}', 'Redaction Rules', 'administer CiviCase', NULL, @adminCaselastcivicrm/admin/options/case_status&min/options/case_status&reset=1',  '{ts escape="sql" skip="true"}Case Statuses{/ts}', 'Case Statuses', 'administer CiviCase', NULL, @adminCaselastID, '1', NULL, 3 ),
-    civicrm/admin/options/encounter_medium&=encounter_medium&reset=1',  '{ts escape="sql" skip="true"}Encounter Medium{/ts}', 'Encounter Medium', 'administer CiviCase', NULL, @adminCaselastID, '1', NULL, 4 );
+    ( @domainID, 'civicrm/admin/options/redaction_rule&reset=1',  '{ts escape="sql" skip="true"}Redaction Rules{/ts}', 'Redaction Rules', 'administer CiviCase', NULL, @adminCaselastID, '1', NULL, 2 ),
+    ( @domainID, 'civicrm/admin/options/case_status&reset=1',  '{ts escape="sql" skip="true"}Case Statuses{/ts}', 'Case Statuses', 'administer CiviCase', NULL, @adminCaselastID, '1', NULL, 3 ),
+    ( @domainID, 'civicrm/admin/options/encounter_medium&reset=1',  '{ts escape="sql" skip="true"}Encounter Medium{/ts}', 'Encounter Medium', 'administer CiviCase', NULL, @adminCaselastID, '1', NULL, 4 );
 
-INSERT INTO civicivicrm/admin/options/payment_instrument&rmission, permission_operator, parent_id, is_active, has_separator, weight )
+INSERT INTO civicrm_navigation
+    ( domain_id, url, label, name, permission, permission_operator, parent_id, is_active, has_separator, weight )
 VALUES
-    ( @domainID, NULL,  '{ts escape="sql" skip="true"}CiviContribute{/ts}', 'CiviContricivicrm/admin/options/payment_instrument&inlastID, '1', NULL, 11 );
+    ( @domainID, NULL,  '{ts escape="sql" skip="true"}CiviContribute{/ts}', 'CiviContribute', 'access CiviContribute,administer CiviCRM', 'AND', @adminlastID, '1', NULL, 11 );
 
 SET @adminContributelastID:=LAST_INSERT_ID();
 INSERT INTO civicrm_navigation
@@ -506,8 +511,10 @@ VALUES
     ( @domainID, 'civicrm/admin/financial/financialType&reset=1',      '{ts escape="sql" skip="true"}Financial Types{/ts}',         'Financial Types',        'access CiviContribute,administer CiviCRM', 'AND', @adminContributelastID, '1', NULL, 10),
     ( @domainID, 'civicrm/admin/financial/financialAccount&reset=1',      '{ts escape="sql" skip="true"}Financial Accounts{/ts}',         'Financial Accounts',        'access CiviContribute,administer CiviCRM', 'AND', @adminContributelastID, '1', NULL, 11),
     ( @domainID, 'civicrm/admin/options/payment_instrument&reset=1',  '{ts escape="sql" skip="true"}Payment Instruments{/ts}',    'Payment Instruments',   'access CiviContribute,administer CiviCRM', 'AND', @adminContributelastID, '1', NULL, 12 ),
-    ( @domainID, 'civicrm/admin/options/accept_creditcard&reset=1',    '{ts escape="sql" skip="true"}Accepted Credit Cards{/ts}',  'Accepted Credit Cards', 'access CiviContribute,administer Civcivicrm/admin/options/soft_credit_type&inID, 'civicrm/admin/options/soft_credit_type&reset=1', '{ts escape="sql" skip="true"}Soft Credit Types{/ts}', 'Soft Credit Types', 'access CiviContribute,administer CiviCRM', 'AND', @adminContributelastID, '1'civicrm/admin/options/event_type&=add',                  '{ts escape="sql" skip="true"}New Price Set{/ts}',              'New Price Set',             'access CiviContribute,administer CiviCRM', 'AND', @adminContributelastID, '1', NULL, 15 ),
-    ( @domainID, 'civicrm/admicivicrm/admin/options/event_type&" skip="true"}Manage Price Sets{/ts}',          'Manage Price Sets',         'access CiviContribute,administer CiviCRM', 'AND', @adminContributelastID, '1', NULL, 16 ),
+    ( @domainID, 'civicrm/admin/options/accept_creditcard&reset=1',    '{ts escape="sql" skip="true"}Accepted Credit Cards{/ts}',  'Accepted Credit Cards', 'access CiviContribute,administer CiviCRM', 'AND', @adminContributelastID, '1', NULL, 13 ),
+    ( @domainID, 'civicrm/admin/options/soft_credit_type&reset=1', '{ts escape="sql" skip="true"}Soft Credit Types{/ts}', 'Soft Credit Types', 'access CiviContribute,administer CiviCRM', 'AND', @adminContributelastID, '1', 1, 14  ),
+    ( @domainID, 'civicrm/admin/price&reset=1&action=add',                  '{ts escape="sql" skip="true"}New Price Set{/ts}',              'New Price Set',             'access CiviContribute,administer CiviCRM', 'AND', @adminContributelastID, '1', NULL, 15 ),
+    ( @domainID, 'civicrm/admin/price&reset=1',                             '{ts escape="sql" skip="true"}Manage Price Sets{/ts}',          'Manage Price Sets',         'access CiviContribute,administer CiviCRM', 'AND', @adminContributelastID, '1', NULL, 16 ),
     ( @domainID, 'civicrm/admin/paymentProcessor&reset=1',                  '{ts escape="sql" skip="true"}Payment Processors{/ts}',         'Payment Processors',        'administer CiviCRM', '',                          @adminContributelastID, '1', NULL, 17  );
 
 INSERT INTO civicrm_navigation
@@ -527,10 +534,10 @@ VALUES
     ( @domainID, 'civicrm/admin/price&reset=1',                            '{ts escape="sql" skip="true"}Manage Price Sets{/ts}',  'Manage Price Sets',                'access CiviEvent,administer CiviCRM', 'AND', @adminEventlastID, '1', 1,    6 ),
     ( @domainID, 'civicrm/admin/options/event_type&reset=1',  '{ts escape="sql" skip="true"}Event Types{/ts}',    'Event Types',                      'access CiviEvent,administer CiviCRM', 'AND', @adminEventlastID, '1', NULL, 7 ),
     ( @domainID, 'civicrm/admin/participant_status&reset=1',                   '{ts escape="sql" skip="true"}Participant Statuses{/ts}', 'Participant Statuses',       'access CiviEvent,administer CiviCRM', 'AND', @adminEventlastID, '1', NULL, 8 ),
-    ( @domainID, 'civicrm/admin/options/participant_role&civicrm/admin/options/participant_listing&t Roles{/ts}', 'Participant Roles',  'access CiviEvent,administer CiviCRM', 'AND', @adminEventlastID, '1', NULL, 9 ),
+    ( @domainID, 'civicrm/admin/options/participant_role&reset=1', '{ts escape="sql" skip="true"}Participant Roles{/ts}', 'Participant Roles',  'access CiviEvent,administer CiviCRM', 'AND', @adminEventlastID, '1', NULL, 9 ),
     ( @domainID, 'civicrm/admin/options/participant_listing&reset=1', '{ts escape="sql" skip="true"}Participant Listing Options{/ts}', 'Participant Listing Options', 'access CiviEvent,administer CiviCRM', 'AND', @adminEventlastID, '1', NULL, 10 ),
-    ( @domainID, 'civicrm/admin/badgelayout&reset=1',         civicrm/admin/options/grant_type&ayouts{/ts}', 'Event Name Badge Layouts', 'access CiviEvent,administer CiviCRM', 'AND', @adminEventlastID, '1', NULL, 11 ),
-    ( @domainID, 'civicrm/admin/paymentProcessor&reset=1',                  '{ts escape="sqcivicrm/admin/options/grant_type&        'administer CiviCRM', '',                     @adminEventlastID, '1', NULL, 12),
+    ( @domainID, 'civicrm/admin/badgelayout&reset=1',                       '{ts escape="sql" skip="true"}Event Name Badge Layouts{/ts}', 'Event Name Badge Layouts', 'access CiviEvent,administer CiviCRM', 'AND', @adminEventlastID, '1', NULL, 11 ),
+    ( @domainID, 'civicrm/admin/paymentProcessor&reset=1',                  '{ts escape="sql" skip="true"}Payment Processors{/ts}', 'Payment Processors',              'administer CiviCRM', '',                     @adminEventlastID, '1', NULL, 12),
     ( @domainID, 'civicrm/admin/setting/preferences/event&reset=1',         '{ts escape="sql" skip="true"}CiviEvent Component Settings{/ts}', 'CiviEvent Component Settings','access CiviEvent,administer CiviCRM', 'AND', @adminEventlastID, '1', NULL, 13 );
 
 INSERT INTO civicrm_navigation
