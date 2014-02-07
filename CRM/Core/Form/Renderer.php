@@ -137,9 +137,9 @@ class CRM_Core_Form_Renderer extends HTML_QuickForm_Renderer_ArraySmarty {
    *
    * @access private
    *
-   * @param  object    An HTML_QuickForm_element object
-   * @param  bool      Whether an element is required
-   * @param  string    Error associated with the element
+   * @param  $element  HTML_QuickForm_element object
+   * @param  $required bool      Whether an element is required
+   * @param  $error    string    Error associated with the element
    *
    * @return array
    * @static
@@ -164,14 +164,12 @@ class CRM_Core_Form_Renderer extends HTML_QuickForm_Renderer_ArraySmarty {
       if ($type == 'text') {
         $size = $element->getAttribute('size');
         if (!empty($size)) {
-          if (array_key_exists($size, self::$_sizeMapper)) {
-            $class .= ' ' . self::$_sizeMapper[$size];
-          }
+          $class = CRM_Utils_Array::value($size, self::$_sizeMapper);
         }
       }
     }
 
-    $class .= ($class ? ' ' : '') . 'crm-form-' . $type;
+    $class = ($class ? "$class " : '') . 'crm-form-' . $type;
 
     if ($required) {
       $class .= ' required';
@@ -216,7 +214,7 @@ class CRM_Core_Form_Renderer extends HTML_QuickForm_Renderer_ArraySmarty {
    */
   function addOptionsEditLink(&$el, $field) {
     if (CRM_Core_Permission::check('administer CiviCRM')) {
-      $el['html'] .= ' &nbsp; <a href="#" class="crm-edit-optionvalue-link" title="' . ts('Edit Options') . '" data-option-group-url="' . $field->getAttribute('data-option-group-url') . '"><span class="batch-edit"></span></a>';
+      $el['html'] .= ' <a href="#" class="crm-edit-optionvalue-link crm-hover-button" title="' . ts('Edit Options') . '" data-option-group-url="' . $field->getAttribute('data-option-group-url') . '"><span class="icon edit-icon"></span></a>';
     }
   }
 }

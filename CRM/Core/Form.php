@@ -919,11 +919,12 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     if (!isset($props['data-api-field'])) {
       $props['data-api-field'] = strrpos($name, '[') ? rtrim(substr($name, 1 + strrpos($name, '[')), ']') : $name;
     }
-    $options = civicrm_api3($props['data-api-entity'], 'getoptions', array(
+    $info = civicrm_api3($props['data-api-entity'], 'getoptions', array(
         'field' => $props['data-api-field'],
+        'options' => array('metadata' => array('fields'))
       )
     );
-    $options = $options['values'];
+    $options = $info['values'];
     if (!array_key_exists('placeholder', $props)) {
       $props['placeholder'] = $required ? ts('- select -') : ts('- none -');
     }
@@ -939,8 +940,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     }
     // Core field
     else {
-      $getFields = civicrm_api3($props['data-api-entity'], 'getfields');
-      foreach($getFields['values'] as $uniqueName => $fieldSpec) {
+      foreach($info['metadata']['fields'] as $uniqueName => $fieldSpec) {
         if (
           $uniqueName === $props['data-api-field'] ||
           CRM_Utils_Array::value('name', $fieldSpec) === $props['data-api-field'] ||
