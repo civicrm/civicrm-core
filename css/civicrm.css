@@ -2622,6 +2622,30 @@ div.grippie {
   background-position: -32px -32px;
 }
 
+/* Icon hover-buttons */
+.crm-container .crm-hover-button {
+  display: inline-block;
+}
+.crm-container .crm-hover-button:hover,
+.crm-container .crm-hover-button:active {
+  background: #ccc;
+  background-image: -webkit-gradient(linear, left bottom, left top, color-stop(0, #eee), color-stop(1, #ccc));
+  background-image: -webkit-linear-gradient(center bottom, #eee 0%, #ccc 100%);
+  background-image: -moz-linear-gradient(center bottom, #eee 0%, #ccc 100%);
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr = '#cccccc', endColorstr = '#eeeeee', GradientType = 0);
+  background-image: linear-gradient(top, #eee 0%, #ccc 100%);
+  border: 1px solid #AAAAAA;
+  border-radius: 4px;
+}
+.crm-container .crm-hover-button .icon {
+  margin-left: 3px;
+  margin-top: 2px;
+  vertical-align: middle;
+}
+.crm-container .crm-hover-button:hover .icon,
+.crm-container .crm-hover-button:active .icon {
+  background-image: url("../i/icons/jquery-ui-2786C2.png");
+}
 /* accordion styles */
 
 .crm-container .crm-accordion-header {
