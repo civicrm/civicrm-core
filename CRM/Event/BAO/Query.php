@@ -578,8 +578,8 @@ class CRM_Event_BAO_Query {
       $form->_participantRole = &$form->addElement('checkbox', "participant_role_id[$rId]", NULL, $rName);
     }
 
-    $form->addYesNo('participant_test', ts('Participant is a Test?'));
-    $form->addYesNo('participant_pay_later', ts('Participant is Pay Later?'));
+    $form->addYesNo('participant_test', ts('Participant is a Test?'), TRUE);
+    $form->addYesNo('participant_pay_later', ts('Participant is Pay Later?'), TRUE);
     $form->addElement('text', 'participant_fee_amount_low', ts('From'), array('size' => 8, 'maxlength' => 8));
     $form->addElement('text', 'participant_fee_amount_high', ts('To'), array('size' => 8, 'maxlength' => 8));
 

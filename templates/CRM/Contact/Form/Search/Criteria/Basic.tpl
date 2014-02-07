@@ -123,7 +123,7 @@
     {if $isTagset}
       <td colspan="2">{include file="CRM/common/Tag.tpl"}</td>
     {/if}
-    <td>{$form.tag_search.label}  {help id="id-all-tags"}<br />{$form.tag_search.html|crmReplace:class:big}</td>
+    <td>{$form.tag_search.label}  {help id="id-all-tags"}<br />{$form.tag_search.html}</td>
     {if ! $isTagset}
       <td colspan="2">&nbsp;</td>
     {/if}

@@ -130,7 +130,7 @@ class CRM_Core_Form_Renderer extends HTML_QuickForm_Renderer_ArraySmarty {
         $this->addOptionsEditLink($el, $element);
       }
 
-      if ($element->getType() == 'group' && strpos($el['html'], 'crm-form-radio')) {
+      if ($element->getType() == 'group' && $element->getAttribute('unselectable')) {
         $this->appendUnselectButton($el, $element);
       }
     }
@@ -235,7 +235,7 @@ class CRM_Core_Form_Renderer extends HTML_QuickForm_Renderer_ArraySmarty {
   function appendUnselectButton(&$el, $field) {
     // Initially hide if not needed
     // Note: visibility:hidden prevents layout jumping around unlike display:none
-    $display = $field->getValue() ? '' : ' style="visibility:hidden;"';
+    $display = $field->getValue() !== NULL ? '' : ' style="visibility:hidden;"';
     $el['html'] .= ' <a href="#" class="crm-hover-button crm-clear-link"' . $display . ' title="' . ts('Clear') . '"><span class="icon close-icon"></span></a>';
   }
 }
