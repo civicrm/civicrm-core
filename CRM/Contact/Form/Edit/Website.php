@@ -59,7 +59,7 @@ class CRM_Contact_Form_Edit_Website {
     $form->applyFilter('__ALL__', 'trim');
 
     //Website type select
-    $form->addElement('select', "website[$blockId][website_type_id]", '', CRM_Core_PseudoConstant::get('CRM_Core_DAO_Website', 'website_type_id'));
+    $form->addSelect("website[$blockId][website_type_id]", array('data-api-entity' => 'website', 'class' => 'six'));
 
     //Website box
     $form->addElement('text', "website[$blockId][url]", ts('Website'),
