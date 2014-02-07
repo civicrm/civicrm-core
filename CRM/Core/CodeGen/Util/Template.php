@@ -15,6 +15,8 @@ class CRM_Core_CodeGen_Util_Template {
   function __construct($filetype) {
     $this->compileDir = CRM_Core_CodeGen_Util_File::createTempDir('templates_c_');
 
+    $this->filetype = $filetype;
+
     // TODO use Core Smarty
     require_once 'Smarty/Smarty.class.php';
     $this->smarty = new Smarty();
