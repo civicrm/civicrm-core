@@ -4,7 +4,7 @@
   var ajaxFormParams = {
     dataType:'json',
     beforeSubmit: function(arr, $form, options) {
-      addCiviOverlay($form);
+      $form.block();
     },
     success: requestHandler,
     error: errorHandler
@@ -18,11 +18,11 @@
       data.reset = 1;
       o.addClass('form');
       $('.crm-edit-ready').removeClass('crm-edit-ready');
-      addCiviOverlay(o);
+      o.block();
       $.getJSON(CRM.url('civicrm/ajax/inline', data))
         .fail(errorHandler)
         .done(function(response) {
-          removeCiviOverlay(o);
+          o.unblock();
           o.css('overflow', 'hidden').wrapInner('<div class="inline-edit-hidden-content" style="display:none" />').append(response.content);
           // Smooth resizing
           var newHeight = $('.crm-container-snippet', o).height();
@@ -153,7 +153,7 @@
 
   function errorHandler(response) {
     CRM.alert(ts('Unable to reach the server. Please refresh this page in your browser and try again.'), ts('Network Error'), 'error');
-    removeCiviOverlay($('.crm-inline-edit.form form'));
+    $('.crm-inline-edit.form form').unblock();
   }
 
   $('document').ready(function() {

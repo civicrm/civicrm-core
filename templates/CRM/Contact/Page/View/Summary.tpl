@@ -30,9 +30,6 @@
 
   {include file="CRM/common/wysiwyg.tpl" includeWysiwygEditor=true}
 
-  {* include overlay js *}
-  {include file="CRM/common/overlay.tpl"}
-
   <div class="crm-summary-contactname-block crm-inline-edit-container">
     <div class="crm-summary-block" id="contactname-block">
       {include file="CRM/Contact/Page/Inline/ContactName.tpl"}
