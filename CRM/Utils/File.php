@@ -407,6 +407,10 @@ HTACCESS;
    * @param $publicDir
    */
   static function restrictBrowsing($publicDir) {
+    if (!is_dir($publicDir) || !is_writable($publicDir)) {
+      return;
+    }
+
     // base dir
     $nobrowse = realpath($publicDir) . '/index.html';
     if (!file_exists($nobrowse)) {
