@@ -256,7 +256,7 @@ class CRM_Utils_Check_Security {
    * @return bool
    */
   public function isBrowsable($dir, $url) {
-    if (empty($dir) || empty($url)) {
+    if (empty($dir) || empty($url) || !is_dir($dir)) {
       return FALSE;
     }
 
