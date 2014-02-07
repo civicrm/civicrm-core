@@ -98,7 +98,7 @@ cj( function( ) {
       var addressHTML = '';
       var postUrl = {/literal}"{crmURL p='civicrm/ajax/inline' h=0}"{literal};
 
-      addCiviOverlay('div.crm-address_' + blockNo);
+      $('div.crm-address_' + blockNo).block();
 
       cj.post( postUrl, {
         'contact_id': sharedContactId,
@@ -138,7 +138,7 @@ cj( function( ) {
               cj( '#shared-address-' + blockNo ).append( '<tr class="shared-address-list"><td></td><td>' + helpText + '</td></tr>');
             }
 
-            removeCiviOverlay('div.crm-address_' + blockNo);
+            cj('div.crm-address_' + blockNo).unblock();
           }
         },'json');
     });
