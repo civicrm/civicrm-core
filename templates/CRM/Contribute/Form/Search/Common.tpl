@@ -61,30 +61,18 @@
         <td>{$form.contribution_thankyou_date_is_not_null.label}</td>
         <td>
           {$form.contribution_thankyou_date_is_not_null.html}
-          <span class="crm-clear-link">
-            (<a href="#" onclick="unselectRadio('contribution_thankyou_date_is_not_null','{$form.formName}')">
-            {ts}clear{/ts}</a>)
-          </span>
         </td>
       </tr>
       <tr>
         <td>{$form.contribution_receipt_date_is_not_null.label}</td>
         <td>
           {$form.contribution_receipt_date_is_not_null.html}
-          <span class="crm-clear-link">
-            (<a href="#" onclick="unselectRadio('contribution_receipt_date_is_not_null','{$form.formName}')">
-            {ts}clear{/ts}</a>)
-          </span>
         </td>
       </tr>
       <tr>
         <td>{$form.contribution_test.label} {help id="is-test" file="CRM/Contact/Form/Search/Advanced"}</td>
         <td>
           {$form.contribution_test.html}
-          <span class="crm-clear-link">
-            (<a href="#" onclick="unselectRadio('contribution_test','{$form.formName}')">
-            {ts}clear{/ts}</a>)
-          </span>
         </td>
       </tr>
       </tbody>
@@ -97,18 +85,12 @@
         <td>{$form.contribution_pay_later.label}</td>
         <td>
           {$form.contribution_pay_later.html}
-            <span class="crm-clear-link">
-              (<a href="#" onclick="unselectRadio('contribution_pay_later','{$form.formName}'); return false;">{ts}clear{/ts}</a>)
-            </span>
         </td>
       </tr>
       <tr>
         <td>{$form.contribution_recurring.label}</td>
         <td>
           {$form.contribution_recurring.html}
-            <span class="crm-clear-link">
-              (<a href="#" onclick="unselectRadio('contribution_recurring','{$form.formName}'); return false;">{ts}clear{/ts}</a>)
-            </span>
         </td>
       </tr>
       </tbody>
@@ -143,9 +125,6 @@
   <td>
     {$form.contribution_pcp_display_in_roll.label}
     {$form.contribution_pcp_display_in_roll.html}
-      <span class="crm-clear-link">
-        (<a href="#" onclick="unselectRadio('contribution_pcp_display_in_roll','{$form.formName}'); return false;">{ts}clear{/ts}</a>)
-      </span>
   </td>
 </tr>
 

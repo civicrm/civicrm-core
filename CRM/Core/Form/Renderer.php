@@ -117,15 +117,22 @@ class CRM_Core_Form_Renderer extends HTML_QuickForm_Renderer_ArraySmarty {
       }
     }
 
-    if ($element->getType() == 'select' && $element->getAttribute('data-option-group-url')) {
-      $this->addOptionsEditLink($el, $element);
-    }
-
+    // Display-only (frozen) elements
     if (!empty($el['frozen'])) {
       if ($element->getAttribute('data-api-params') && $element->getAttribute('data-entity-value')) {
         $this->renderFrozenEntityRef($el, $element);
       }
       $el['html'] = '<div class="crm-frozen-field">' . $el['html'] . '</div>';
+    }
+    // Active form elements
+    else {
+      if ($element->getType() == 'select' && $element->getAttribute('data-option-group-url')) {
+        $this->addOptionsEditLink($el, $element);
+      }
+
+      if ($element->getType() == 'group' && strpos($el['html'], 'crm-form-radio')) {
+        $this->appendUnselectButton($el, $element);
+      }
     }
 
     return $el;
@@ -217,6 +224,16 @@ class CRM_Core_Form_Renderer extends HTML_QuickForm_Renderer_ArraySmarty {
       $el['html'] .= ' <a href="#" class="crm-edit-optionvalue-link crm-hover-button" title="' . ts('Edit Options') . '" data-option-group-url="' . $field->getAttribute('data-option-group-url') . '"><span class="icon edit-icon"></span></a>';
     }
   }
+
+  /**
+   * @param array $el
+   * @param HTML_QuickForm_element $field
+   */
+  function appendUnselectButton(&$el, $field) {
+    // Initially hide if not needed
+    // Note: visibility:hidden prevents layout jumping around unlike display:none
+    $display = $field->getValue() ? '' : ' style="visibility:hidden;"';
+    $el['html'] .= ' <a href="#" class="crm-hover-button crm-clear-link"' . $display . ' title="' . ts('Clear') . '"><span class="icon close-icon"></span></a>';
+  }
 }
-// end CRM_Core_Form_Renderer
 

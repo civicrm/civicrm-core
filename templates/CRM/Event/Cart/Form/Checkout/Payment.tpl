@@ -134,7 +134,6 @@
 <div class="crm-section {$form.payment_type.name}-section">
   <div class="label">{$form.payment_type.label}</div>
   <div class="content">{$form.payment_type.html}
-    <span class="crm-clear-link">(<a href="#" title="unselect" onclick="unselectRadio('payment_type', '{$form.formName}'); return false;">{ts}clear{/ts}</a>)</span>
   </div>
   <div class="clear"></div>
 </div>

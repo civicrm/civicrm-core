@@ -29,8 +29,7 @@
          {if $form.honor_type_id.html}
       <tr class="crm-contribution-form-block-honor_type_id">
          <td colspan="3">
-      {$form.honor_type_id.html}
-      <span class="crm-clear-link">(<a href="#" title="unselect" onclick="unselectRadio('honor_type_id', '{$form.formName}'); enableHonorType(); return false;">{ts}clear{/ts}</a>)</span><br />
+      {$form.honor_type_id.html}<br />
       <span class="description">{ts}Select an option to reveal honoree information fields.{/ts}</span>
          </td>
       </tr>

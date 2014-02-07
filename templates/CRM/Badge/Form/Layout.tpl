@@ -52,9 +52,8 @@
          <table>
            <tr>
             <td>{$form.image_1.html}
-             <span class="crm-clear-link">
-               (<a href="#" class="clear-image" imgname='image_1'>{ts}clear{/ts}</a>)
-             </span><br/>
+               <a href="#" class="crm-hover-button clear-image" title="{ts}Clear{/ts}"><span class="icon close-icon"></span></a>
+             <br/>
              <span class="description">{ts}Click above and select a file by double clicking on it.{/ts}</span>
             </td>
             <td>
@@ -73,9 +72,8 @@
          <table>
           <tr>
            <td>{$form.image_2.html}
-            <span class="crm-clear-link">
-              (<a href="#" class="clear-image" imgname='image_2'>{ts}clear{/ts}</a>)
-            </span><br/>
+              <a href="#" class="crm-hover-button clear-image" title="{ts}Clear{/ts}"><span class="icon close-icon"></span></a>
+            <br/>
             <span class="description">{ts}Click above and select a file by double clicking on it.{/ts}</span>
            </td>
            <td>

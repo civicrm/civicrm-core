@@ -50,10 +50,6 @@
     <br />{$form.member_source.html}
     <p>
     {$form.member_test.label} {help id="is-test" file="CRM/Contact/Form/Search/Advanced"} &nbsp;{$form.member_test.html}
-      <span class="crm-clear-link">
-        (<a href="#" title="unselect" onclick="unselectRadio('member_test', '{$form.formName}'); return false;" >
-        {ts}clear{/ts}</a>)
-      </span>
     </p>
   </td>
   <td>
@@ -61,24 +57,12 @@
     {$form.member_is_primary.label}
     {help id="id-member_is_primary" file="CRM/Member/Form/Search.hlp"}
     {$form.member_is_primary.html}
-      <span class="crm-clear-link">
-        (<a href="#" title="unselect" onclick="unselectRadio('member_is_primary', '{$form.formName}'); return false;" >
-        {ts}clear{/ts}</a>)
-      </span>
     </p>
     <p>
     {$form.member_pay_later.label}&nbsp;{$form.member_pay_later.html}
-      <span class="crm-clear-link">
-        (<a href="#" title="unselect" onclick="unselectRadio('member_pay_later', '{$form.formName}'); return false;" >
-        {ts}clear{/ts}</a>)
-      </span>
     </p>
     <p>
     {$form.member_auto_renew.label}&nbsp;{$form.member_auto_renew.html}
-      <span class="crm-clear-link">
-        (<a href="#" title="unselect" onclick="unselectRadio('member_auto_renew', '{$form.formName}'); return false;" >
-        {ts}clear{/ts}</a>)
-      </span>
     </p>
   </td>
 </tr>

@@ -33,7 +33,6 @@
    <td>
             {$form.is_deceased.label}<br />
            {$form.is_deceased.html}
-             <span class="crm-clear-link">(<a href="#" title="unselect" onclick="unselectRadio('is_deceased', 'Advanced'); return false;" >{ts}clear{/ts}</a>)</span>
          </td>
       </tr>
       <tr>
@@ -43,7 +42,7 @@
       <tr>
          <td>
             {$form.gender_id.label}<br />
-            {$form.gender_id.html}<span class="crm-clear-link">(<a href="#" title="unselect" onclick="unselectRadio('gender_id', 'Advanced'); return false;" >{ts}clear{/ts}</a>)</span>
+            {$form.gender_id.html}
          </td>
       </tr>
     </table>
