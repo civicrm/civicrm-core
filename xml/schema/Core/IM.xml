@@ -36,6 +36,11 @@
       <title>IM Location Type</title>
       <type>int unsigned</type>
       <comment>Which Location does this email belong to.</comment>
+      <pseudoconstant>
+          <table>civicrm_location_type</table>
+          <keyColumn>id</keyColumn>
+          <labelColumn>display_name</labelColumn>
+      </pseudoconstant>
        <add>2.0</add>
   </field>
   <index>
