@@ -796,8 +796,7 @@ div.crm-container fieldset label{
  */
 
 /* Inline form field 'post-help' and radio-button unselect */
-.crm-container .description,
-.crm-container .crm-clear-link {
+.crm-container .description {
   font-size: 0.9em;
   font-weight: normal;
   white-space: normal;
@@ -2212,10 +2211,6 @@ div.grippie {
   margin-left: 8px;
 }
 
-.crm-container .crm-clear-link {
-  margin-left: .5em;
-}
-
 #crm-container .crm-button {
   border: medium none;
   cursor: pointer;
@@ -2551,7 +2546,9 @@ div.grippie {
 .crm-container .play-icon {
   background-position: -3px -161px;
 }
-
+.crm-container .close-icon {
+  background-position: -82px -130px;
+}
 .crm-container .swap-icon {
   background-position: -82px -81px;
 }
@@ -2625,6 +2622,7 @@ div.grippie {
 /* Icon hover-buttons */
 .crm-container .crm-hover-button {
   display: inline-block;
+  border: 1px solid transparent;
 }
 .crm-container .crm-hover-button:hover,
 .crm-container .crm-hover-button:active {

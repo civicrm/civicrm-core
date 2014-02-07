@@ -66,11 +66,11 @@
   {/if}
   {if $form.group}
     <td>
-      <div id='groupselect'><label>{ts}Group(s){/ts}<span class="crm-clear-link">(<a id='searchbygrouptype'>{ts}search by group type{/ts}</a>)</span></label>
+      <div id='groupselect'><label>{ts}Group(s){/ts} <span class="description">(<a id='searchbygrouptype'>{ts}search by group type{/ts}</a>)</span></label>
         {$form.group.html}
     </div>
     <div id='grouptypeselect'>
-      <label>{ts}Group Type(s){/ts}<span class="crm-clear-link"> ( <a id='searchbygroup'>{ts}search by group{/ts}</a>)</span></label>
+      <label>{ts}Group Type(s){/ts} <span class="description"> (<a id='searchbygroup'>{ts}search by group{/ts}</a>)</span></label>
       {$form.group_type.html}
         {literal}
         <script type="text/javascript">
@@ -191,7 +191,7 @@
     </td>
     <td>
       {if $form.uf_user}
-          {$form.uf_user.label} {$form.uf_user.html} <span class="crm-clear-link">(<a href="#" title="unselect" onclick="unselectRadio('uf_user', 'Advanced'); return false;" >{ts}clear{/ts}</a>)</span>
+          {$form.uf_user.label} {$form.uf_user.html}
           <div class="description font-italic">
               {ts 1=$config->userFramework}Does the contact have a %1 Account?{/ts}
           </div>

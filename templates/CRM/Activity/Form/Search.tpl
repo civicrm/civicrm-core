@@ -104,9 +104,5 @@
       }
     }).change();
 
-    cj(".crm-clear-link").click(function () {
-      cj('.description .contact-name-option').hide();
-    });
-
   </script>
 {/literal}

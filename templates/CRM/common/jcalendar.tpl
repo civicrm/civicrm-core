@@ -64,7 +64,7 @@
 {/if}
 
 {if $action neq 1028}
-    <span class="crm-clear-link">(<a href="#" onclick="clearDateTime( '{$elementId}' ); return false;">{ts}clear{/ts}</a>)</span>
+    <a href="#" class="crm-hover-button" title="{ts}Clear{/ts}" onclick="clearDateTime( '{$elementId}' ); return false;"><span class="icon close-icon"></span></a>
 {/if}
 
 <script type="text/javascript">
