@@ -70,7 +70,7 @@ class CRM_Contribute_Form_ContributionPage_Amount extends CRM_Contribute_Form_Co
     //CRM-12055
     $this->add('text', 'amount_label', ts('Contribution Amounts Label'));
 
-    $default = array();
+    $default = array($this->createElement('radio', NULL, NULL, NULL, 0));
     $this->add('hidden', "price_field_id", '', array('id' => "price_field_id"));
     $this->add('hidden', "price_field_other", '', array('id' => "price_field_option"));
     for ($i = 1; $i <= self::NUM_OPTION; $i++) {

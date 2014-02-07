@@ -225,7 +225,7 @@ div.crm-container fieldset label{
 }
 
 .crm-container textarea,
-.crm-container .crm-form-multiselect {
+.crm-container select.crm-form-multiselect {
   border: 1px solid #999;
 }
 

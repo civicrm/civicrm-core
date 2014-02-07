@@ -773,14 +773,12 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     return self::$_template->get_template_vars($name);
   }
 
-  function &addRadio($name, $title, &$values, $attributes = NULL, $separator = NULL, $required = FALSE) {
+  function &addRadio($name, $title, $values, $attributes = array(), $separator = NULL, $required = FALSE) {
     $options = array();
-    if (empty($attributes)) {
-      $attributes = array('id_suffix' => $name);
-    }
-    else {
-      $attributes = array_merge($attributes, array('id_suffix' => $name));
-    }
+    $attributes = $attributes ? $attributes : array();
+    $unselectable = !empty($attributes['unselectable']);
+    unset($attributes['unselectable']);
+    $attributes += array('id_suffix' => $name);
     foreach ($values as $key => $var) {
       $options[] = $this->createElement('radio', NULL, NULL, $var, $key, $attributes);
     }
@@ -788,24 +786,22 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     if ($required) {
       $this->addRule($name, ts('%1 is a required field.', array(1 => $title)), 'required');
     }
+    if ($unselectable) {
+      $group->setAttribute('unselectable', TRUE);
+    }
     return $group;
   }
 
-  function addYesNo($id, $title, $dontKnow = NULL, $required = NULL, $attribute = NULL) {
-    if (empty($attribute)) {
-      $attribute = array('id_suffix' => $id);
-    }
-    else {
-      $attribute = array_merge($attribute, array('id_suffix' => $id));
-    }
+  function addYesNo($id, $title, $unselectable = FALSE, $required = NULL, $attributes = array()) {
+    $attributes += array('id_suffix' => $id);
     $choice   = array();
-    $choice[] = $this->createElement('radio', NULL, '11', ts('Yes'), '1', $attribute);
-    $choice[] = $this->createElement('radio', NULL, '11', ts('No'), '0', $attribute);
-    if ($dontKnow) {
-      $choice[] = $this->createElement('radio', NULL, '22', ts("Don't Know"), '2', $attribute);
-    }
-    $this->addGroup($choice, $id, $title);
+    $choice[] = $this->createElement('radio', NULL, '11', ts('Yes'), '1', $attributes);
+    $choice[] = $this->createElement('radio', NULL, '11', ts('No'), '0', $attributes);
 
+    $group = $this->addGroup($choice, $id, $title);
+    if ($unselectable) {
+      $group->setAttribute('unselectable', TRUE);
+    }
     if ($required) {
       $this->addRule($id, ts('%1 is a required field.', array(1 => $title)), 'required');
     }

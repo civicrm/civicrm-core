@@ -1873,9 +1873,12 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
       foreach ($gender as $key => $var) {
         $genderOptions[$key] = $form->createElement('radio', NULL, ts('Gender'), $var, $key);
       }
-      $form->addGroup($genderOptions, $name, $title);
+      $group = $form->addGroup($genderOptions, $name, $title);
       if ($required) {
         $form->addRule($name, ts('%1 is a required field.', array(1 => $title)), 'required');
+      }
+      else {
+        $group->setAttribute('unselectable', TRUE);
       }
     }
     elseif ($fieldName === 'prefix_id' || $fieldName === 'suffix_id') {

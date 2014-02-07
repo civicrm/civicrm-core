@@ -305,7 +305,7 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
         '' => ts('- none -')) + $price,
       NULL, array('onchange' => "return showHideByValue('price_set_id', '', 'map-field', 'block', 'select', false);")
     );
-    $default = array();
+    $default = array($this->createElement('radio', NULL, NULL, NULL, 0));
     $this->add('hidden', 'price_field_id', '', array('id' => 'price_field_id'));
     for ($i = 1; $i <= self::NUM_OPTION; $i++) {
       // label
