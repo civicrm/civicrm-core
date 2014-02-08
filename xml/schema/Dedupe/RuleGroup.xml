@@ -18,8 +18,8 @@
   </primaryKey>
   <field>
     <name>contact_type</name>
-    <type>enum</type>
-    <values>Individual, Organization, Household</values>
+    <type>varchar</type>
+    <length>12</length>
     <comment>The type of contacts this group applies to</comment>
     <add>1.8</add>
     <html>
@@ -43,8 +43,8 @@
   </field>
   <field>
     <name>used</name>
-    <type>enum</type>
-    <values>Unsupervised, Supervised, General</values>
+    <type>varchar</type>
+    <length>12</length>
     <required>true</required>
     <comment>Whether the rule should be used for cases where usage is Unsupervised, Supervised OR General(programatically)</comment>
     <add>4.3</add>
