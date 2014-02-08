@@ -358,21 +358,6 @@ class {$table.className} extends CRM_Core_DAO {ldelim}
       {rdelim}
 
 {if $table.hasEnum}
-    /**
-     * returns an array containing the enum fields of the {$table.name} table
-     *
-     * @return array (reference)  the array of enum fields
-     */
-    static function &getEnums() {ldelim}
-        static $enums = array(
-            {foreach from=$table.fields item=field}
-                {if $field.crmType == 'CRM_Utils_Type::T_ENUM'}
-                    '{$field.name}',
-                {/if}
-            {/foreach}
-        );
-        return $enums;
-    {rdelim}
 
     /**
      * returns a ts()-translated enum value for display purposes
