@@ -208,4 +208,9 @@ ALTER TABLE  `civicrm_membership_status` CHANGE  `start_event`  `start_event` VA
 ALTER TABLE  `civicrm_membership_status` CHANGE  `start_event_adjust_unit`  `start_event_adjust_unit` VARCHAR( 8 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL COMMENT  'Unit used for adjusting from start_event.';
 ALTER TABLE  `civicrm_membership_status` CHANGE  `end_event`  `end_event` VARCHAR( 12 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL COMMENT  'Event after which this status ends.';
 ALTER TABLE  `civicrm_membership_status` CHANGE  `end_event_adjust_unit`  `end_event_adjust_unit` VARCHAR( 8 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL COMMENT  'Unit used for adjusting from the ending event.';
+ALTER TABLE  `civicrm_mailing_job` CHANGE  `status`  `status` VARCHAR( 12 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL COMMENT  'The state of this job';
+ALTER TABLE  `civicrm_mailing_group` CHANGE  `group_type`  `group_type` VARCHAR( 8 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL COMMENT  'Are the members of the group included or excluded?.';
+ALTER TABLE  `civicrm_mailing` CHANGE  `visibility`  `visibility` VARCHAR( 40 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT  'User and User Admin Only' COMMENT  'In what context(s) is the mailing contents visible (online viewing)';
+ALTER TABLE  `civicrm_mailing_component` CHANGE  `component_type`  `component_type` VARCHAR( 12 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL COMMENT  'Type of Component.';
+ALTER TABLE  `civicrm_mailing_bounce_type` CHANGE  `name`  `name` VARCHAR( 8 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL COMMENT  'Type of bounce';
 
