@@ -371,7 +371,7 @@ class CRM_Contact_Form_Search_Criteria {
     CRM_Core_BAO_Address::addStateCountryMap($stateCountryMap);
 
     // extend addresses with proximity search
-    $form->addElement('text', 'prox_distance', ts('Find contacts within'));
+    $form->addElement('text', 'prox_distance', ts('Find contacts within'), array('class' => 'six'));
     $form->addElement('select', 'prox_distance_unit', NULL, array('miles' => ts('Miles'), 'kilos' => ts('Kilometers')));
 
     // is there another form rule that does decimals besides money ? ...
