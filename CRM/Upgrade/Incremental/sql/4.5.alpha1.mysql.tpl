@@ -219,5 +219,13 @@ ALTER TABLE  `civicrm_dedupe_rule_group` CHANGE  `used`  `used` VARCHAR( 12 ) CH
 ALTER TABLE  `civicrm_word_replacement` CHANGE  `match_type`  `match_type` VARCHAR( 16 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT  'wildcardMatch';
 ALTER TABLE  `civicrm_uf_field` CHANGE  `visibility`  `visibility` VARCHAR( 32 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT  'User and User Admin Only' COMMENT  'In what context(s) is this field visible.';
 ALTER TABLE  `civicrm_mapping_field` CHANGE  `operator`  `operator` VARCHAR( 16 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL COMMENT  'SQL WHERE operator for search-builder mapping fields (search criteria).';
+ALTER TABLE  `civicrm_job` CHANGE  `run_frequency`  `run_frequency` VARCHAR( 8 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT  'Daily' COMMENT  'Scheduled job run frequency.';
+ALTER TABLE  `civicrm_extension` CHANGE  `type`  `type` VARCHAR( 8 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL;
+ALTER TABLE  `civicrm_custom_group` CHANGE  `style`  `style` VARCHAR( 8 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL COMMENT  'Visual relationship between this form and its parent.';
+ALTER TABLE  `civicrm_custom_field` CHANGE  `data_type`  `data_type` VARCHAR( 16 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL COMMENT  'Controls location of data storage in extended_data table.';
+ALTER TABLE  `civicrm_custom_field` CHANGE  `html_type`  `html_type` VARCHAR( 32 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL COMMENT  'HTML types plus several built-in extended types.';
+ALTER TABLE  `civicrm_action_schedule` CHANGE  `start_action_unit`  `start_action_unit` VARCHAR( 8 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL COMMENT  'Time units for reminder.';
+ALTER TABLE  `civicrm_action_schedule` CHANGE  `repetition_frequency_unit`  `repetition_frequency_unit` VARCHAR( 8 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL COMMENT  'Time units for repetition of reminder.';
+ALTER TABLE  `civicrm_action_schedule` CHANGE  `end_frequency_unit`  `end_frequency_unit` VARCHAR( 8 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL COMMENT  'Time units till repetition of reminder.';
 
 

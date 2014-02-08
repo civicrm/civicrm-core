@@ -68,8 +68,8 @@
   </field>
   <field>
        <name>start_action_unit</name>
-       <type>enum</type>
-       <values>hour,day,week,month,year</values>
+       <type>varchar</type>
+       <length>8</length>
        <comment>Time units for reminder.</comment>
        <add>3.4</add>
        <html>
@@ -99,8 +99,8 @@
   </field>
   <field>
        <name>repetition_frequency_unit</name>
-       <type>enum</type>
-       <values>hour,day,week,month,year</values>
+       <type>varchar</type>
+       <length>8</length>
        <comment>Time units for repetition of reminder.</comment>
        <add>3.4</add>
        <html>
@@ -115,8 +115,8 @@
   </field>
   <field>
        <name>end_frequency_unit</name>
-       <type>enum</type>
-       <values>hour,day,week,month,year</values>
+       <type>varchar</type>
+       <length>8</length>
        <comment>Time units till repetition of reminder.</comment>
        <add>3.4</add>
        <html>

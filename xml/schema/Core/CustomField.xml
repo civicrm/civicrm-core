@@ -58,8 +58,8 @@
   </field>
   <field>
      <name>data_type</name>
-     <type>enum</type>
-     <values>String, Int, Float, Money, Memo, Date, Boolean, StateProvince, Country, File, Link, ContactReference</values>
+     <type>varchar</type>
+     <length>16</length>
      <required>true</required>
      <comment>Controls location of data storage in extended_data table.</comment>
      <add>1.1</add>
@@ -69,8 +69,8 @@
   </field>
   <field>
      <name>html_type</name>
-     <type>enum</type>
-     <values>Text, TextArea, Select, Multi-Select, AdvMulti-Select, Radio, CheckBox, Select Date, Select State/Province, Select Country, Multi-Select Country, Multi-Select State/Province, File, Link, RichTextEditor, Autocomplete-Select</values>
+     <type>varchar</type>
+     <length>32</length>
      <required>true</required>
      <comment>HTML types plus several built-in extended types.</comment>
      <add>1.1</add>
