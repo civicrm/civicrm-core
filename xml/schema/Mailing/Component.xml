@@ -23,8 +23,8 @@
   </field>
   <field>
        <name>component_type</name>
-       <type>enum</type>
-       <values>Header, Footer, Subscribe, Welcome, Unsubscribe, OptOut, Reply, Resubscribe</values>
+       <type>varchar</type>
+       <length>12</length>
        <comment>Type of Component.</comment>
        <html>
          <type>Select</type>

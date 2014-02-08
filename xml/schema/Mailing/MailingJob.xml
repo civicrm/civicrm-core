@@ -44,8 +44,8 @@
   </field>
   <field>
       <name>status</name>
-      <type>enum</type>
-      <values>Scheduled, Running, Complete, Paused, Canceled</values>
+      <type>varchar</type>
+      <length>12</length>
       <comment>The state of this job</comment>
       <html>
         <type>Select</type>
