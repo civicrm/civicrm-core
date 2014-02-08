@@ -955,6 +955,7 @@ CRM.validate = CRM.validate || {
       // Handle clear button for form elements
       .on('click', 'a.crm-clear-link', function() {
         $(this).css({visibility: 'hidden'}).siblings('.crm-form-radio:checked').prop('checked', false).change();
+        $(this).siblings('input:text').val('').change();
         return false;
       })
       .on('change', 'input.crm-form-radio:checked', function() {
