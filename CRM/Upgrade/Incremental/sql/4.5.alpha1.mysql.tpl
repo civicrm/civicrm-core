@@ -195,3 +195,17 @@ VALUES
 -- CRM-13970
 UPDATE civicrm_navigation set url = 'civicrm/admin/options/from_email_address&reset=1' WHERE url LIKE 'civicrm/admin/options/from_email%';
 UPDATE civicrm_navigation set url = CONCAT(SUBSTRING_INDEX(url, '&', 1), '&reset=1') WHERE url LIKE 'civicrm/admin/options/%';
+
+-- CRM-14181
+ALTER TABLE  civicrm_acl CHANGE  operation  operation VARCHAR( 8 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL COMMENT  'What operation does this ACL entry control?';
+ALTER TABLE  civicrm_campaign_group CHANGE  group_type  group_type VARCHAR( 8 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL COMMENT  'Type of Group.';
+ALTER TABLE  `civicrm_acl_contact_cache` CHANGE  `operation`  `operation` VARCHAR( 8 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL COMMENT  'What operation does this user have permission on?';
+ALTER TABLE  `civicrm_price_field` CHANGE  `html_type`  `html_type` VARCHAR( 12 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL;
+ALTER TABLE  `civicrm_pledge` CHANGE  `frequency_unit`  `frequency_unit` VARCHAR( 8 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT  'month' COMMENT  'Time units for recurrence of pledge payments.';
+ALTER TABLE  `civicrm_membership_type` CHANGE  `duration_unit`  `duration_unit` VARCHAR( 8 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL COMMENT  'Unit in which membership period is expressed.';
+ALTER TABLE  `civicrm_membership_type` CHANGE  `period_type`  `period_type` VARCHAR( 8 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL COMMENT 'Rolling membership period starts on signup date. Fixed membership periods start on fixed_period_start_day.';
+ALTER TABLE  `civicrm_membership_status` CHANGE  `start_event`  `start_event` VARCHAR( 12 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL COMMENT  'Event when this status starts.';
+ALTER TABLE  `civicrm_membership_status` CHANGE  `start_event_adjust_unit`  `start_event_adjust_unit` VARCHAR( 8 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL COMMENT  'Unit used for adjusting from start_event.';
+ALTER TABLE  `civicrm_membership_status` CHANGE  `end_event`  `end_event` VARCHAR( 12 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL COMMENT  'Event after which this status ends.';
+ALTER TABLE  `civicrm_membership_status` CHANGE  `end_event_adjust_unit`  `end_event_adjust_unit` VARCHAR( 8 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL COMMENT  'Unit used for adjusting from the ending event.';
+

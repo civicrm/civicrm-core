@@ -40,8 +40,8 @@
 
   <field>
     <name>group_type</name>
-    <type>enum</type>
-    <values>Include, Exclude</values>
+    <type>varchar</type>
+    <length>8</length>
     <default>NULL</default>
     <comment>Type of Group.</comment>
     <html>

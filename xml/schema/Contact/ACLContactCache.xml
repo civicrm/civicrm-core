@@ -46,8 +46,8 @@
   </foreignKey>
   <field>
       <name>operation</name>
-      <type>enum</type>
-      <values>All,View,Edit,Create,Delete,Grant,Revoke</values>
+      <type>varchar</type>
+      <length>8</length>
       <required>true</required>
       <comment>What operation does this user have permission on?</comment>
       <add>1.6</add>
