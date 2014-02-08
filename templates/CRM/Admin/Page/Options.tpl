@@ -72,7 +72,7 @@
 {if $rows}
 {if $action ne 1 and $action ne 2}
     <div class="action-link">
-        <a href="{crmURL q="group="|cat:$gName|cat:"&action=add&reset=1"}" class="button new-option"><span><div class="icon add-icon"></div>{ts 1=$gLabel}Add %1{/ts}</span></a>
+        <a href="{crmURL p="civicrm/admin/options/$gName" q='action=add&reset=1'}" class="button new-option"><span><div class="icon add-icon"></div>{ts 1=$gLabel}Add %1{/ts}</span></a>
     </div>
 {/if}
 <div id={$gName}>
@@ -155,14 +155,14 @@
 
         {if $action ne 1 and $action ne 2}
             <div class="action-link">
-                <a href="{crmURL q="group="|cat:$gName|cat:"&action=add&reset=1"}" class="button new-option"><span><div class="icon add-icon"></div>{ts 1=$gLabel}Add %1{/ts}</span></a>
+                <a href="{crmURL p="civicrm/admin/options/$gName" q='action=add&reset=1'}" class="button new-option"><span><div class="icon add-icon"></div>{ts 1=$gLabel}Add %1{/ts}</span></a>
             </div>
         {/if}
 </div>
 {else}
     <div class="messages status no-popup">
          <div class="icon inform-icon"></div>
-        {capture assign=crmURL}{crmURL  q="group="|cat:$gName|cat:"&action=add&reset=1"}{/capture}
+        {capture assign=crmURL}{crmURL p="civicrm/admin/options/$gName" q='action=add&reset=1'}{/capture}
         {ts 1=$crmURL}There are no option values entered. You can <a href='%1'>add one</a>.{/ts}
     </div>
 {/if}

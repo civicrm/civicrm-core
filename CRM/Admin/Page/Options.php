@@ -171,7 +171,7 @@ class CRM_Admin_Page_Options extends CRM_Core_Page_Basic {
         CRM_Core_Action::UPDATE => array(
           'name' => ts('Edit'),
           'url' => 'civicrm/admin/options/' . self::$_gName,
-          'qs' => 'group=' . self::$_gName . '&action=update&id=%%id%%&reset=1',
+          'qs' => 'action=update&id=%%id%%&reset=1',
           'title' => ts('Edit %1', array(1 => self::$_gName)),
         ),
         CRM_Core_Action::DISABLE => array(
@@ -187,7 +187,7 @@ class CRM_Admin_Page_Options extends CRM_Core_Page_Basic {
         CRM_Core_Action::DELETE => array(
           'name' => ts('Delete'),
           'url' => 'civicrm/admin/options/' . self::$_gName,
-          'qs' => 'group=' . self::$_gName . '&action=delete&id=%%id%%',
+          'qs' => 'action=delete&id=%%id%%',
           'title' => ts('Delete %1 Type', array(1 => self::$_gName)),
         ),
       );
