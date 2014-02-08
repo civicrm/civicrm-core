@@ -106,6 +106,13 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   public $ajaxResponse = array();
 
   /**
+   * Url path used to reach this page
+   *
+   * @var array
+   */
+  public $urlPath = array();
+
+  /**
    * Stores info about reference fields for preprocessing
    * Public so that hooks can access it
    *
@@ -924,7 +931,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     if (!array_key_exists('placeholder', $props)) {
       $props['placeholder'] = $required ? ts('- select -') : ts('- none -');
     }
-    if (!empty($props['placeholder']) && empty($props['multiple'])) {
+    if ($props['placeholder'] !== NULL && empty($props['multiple'])) {
       $options = array('' => '') + $options;
     }
     // Handle custom field
