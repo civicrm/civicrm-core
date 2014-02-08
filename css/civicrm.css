@@ -3769,7 +3769,7 @@ div.m ul#civicrm-menu,
   width: 15em;
 }
 .crm-container .select2-container {
-  min-width: 8em !important;
+  min-width: 6em !important;
   font-size: 11px;
 }
 /* Style civi form inputs to match select2 */
