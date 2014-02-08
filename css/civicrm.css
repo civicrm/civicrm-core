@@ -2438,7 +2438,8 @@ div.grippie {
 }
 
 .crm-container .button .icon,
-.crm-container .crm-button .icon {
+.crm-container .crm-button .icon,
+.crm-accordion-header .icon {
   background-image: url("../i/icons/jquery-ui-FFFFFF.png");
 }
 .crm-container .button:hover .icon,
@@ -2619,10 +2620,13 @@ div.grippie {
 .crm-container .crm-hover-button {
   display: inline-block;
   border: 1px solid transparent;
+  opacity: .7;
+}
+.crm-container .crm-accordion-header a.crm-hover-button {
+  opacity: 1;
 }
 .crm-container .crm-hover-button:hover,
 .crm-container .crm-hover-button:active {
-  background: #ccc;
   background-image: -webkit-gradient(linear, left bottom, left top, color-stop(0, #eee), color-stop(1, #ccc));
   background-image: -webkit-linear-gradient(center bottom, #eee 0%, #ccc 100%);
   background-image: -moz-linear-gradient(center bottom, #eee 0%, #ccc 100%);
@@ -2630,6 +2634,7 @@ div.grippie {
   background-image: linear-gradient(top, #eee 0%, #ccc 100%);
   border: 1px solid #AAAAAA;
   border-radius: 4px;
+  opacity: 1;
 }
 .crm-container .crm-hover-button .icon {
   margin-left: 3px;
@@ -2739,20 +2744,6 @@ div.grippie {
 
 .crm-container .crm-accordion-header.active:hover {
   background-color: #2E3471;
-}
-
-.crm-container .crm-accordion-header a.crm-close-accordion {
-  font-weight: normal !important;
-  float: right;
-  color: #FFF !important;
-}
-
-.crm-container .crm-accordion-header a.crm-close-accordion span {
-  visibility: hidden;
-}
-
-.crm-container .crm-accordion-header a.crm-close-accordion:hover span {
-  visibility: visible;
 }
 
 .crm-container .crm-master-accordion-header.crm-accordion-header:hover,

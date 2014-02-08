@@ -36,7 +36,7 @@
           $('form', o).validate(CRM.validate.params);
           ajaxFormParams.data = data;
           $('form', o).ajaxForm(ajaxFormParams);
-          o.trigger('crmFormLoad');
+          o.trigger('crmLoad').trigger('crmFormLoad');
         });
     }
   };
