@@ -212,5 +212,5 @@ ALTER TABLE  `civicrm_mailing_job` CHANGE  `status`  `status` VARCHAR( 12 ) CHAR
 ALTER TABLE  `civicrm_mailing_group` CHANGE  `group_type`  `group_type` VARCHAR( 8 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL COMMENT  'Are the members of the group included or excluded?.';
 ALTER TABLE  `civicrm_mailing` CHANGE  `visibility`  `visibility` VARCHAR( 40 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT  'User and User Admin Only' COMMENT  'In what context(s) is the mailing contents visible (online viewing)';
 ALTER TABLE  `civicrm_mailing_component` CHANGE  `component_type`  `component_type` VARCHAR( 12 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL COMMENT  'Type of Component.';
-ALTER TABLE  `civicrm_mailing_bounce_type` CHANGE  `name`  `name` VARCHAR( 8 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL COMMENT  'Type of bounce';
+ALTER TABLE  `civicrm_mailing_bounce_type` CHANGE  `name`  `name` VARCHAR( 12 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL COMMENT  'Type of bounce';
 
