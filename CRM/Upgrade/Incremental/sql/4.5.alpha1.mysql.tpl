@@ -227,5 +227,16 @@ ALTER TABLE  `civicrm_custom_field` CHANGE  `html_type`  `html_type` VARCHAR( 32
 ALTER TABLE  `civicrm_action_schedule` CHANGE  `start_action_unit`  `start_action_unit` VARCHAR( 8 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL COMMENT  'Time units for reminder.';
 ALTER TABLE  `civicrm_action_schedule` CHANGE  `repetition_frequency_unit`  `repetition_frequency_unit` VARCHAR( 8 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL COMMENT  'Time units for repetition of reminder.';
 ALTER TABLE  `civicrm_action_schedule` CHANGE  `end_frequency_unit`  `end_frequency_unit` VARCHAR( 8 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL COMMENT  'Time units till repetition of reminder.';
+ALTER TABLE  `civicrm_product` CHANGE  `period_type`  `period_type` VARCHAR( 8 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT  'rolling' COMMENT 'Rolling means we set start/end based on current day, fixed means we set start/end for current year or month(e.g. 1 year + fixed -> we would set start/end for 1/1/06 thru 12/31/06 for any premium chosen in 2006) ';
+ALTER TABLE  `civicrm_product` CHANGE  `duration_unit`  `duration_unit` VARCHAR( 8 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT  'year';
+ALTER TABLE  `civicrm_product` CHANGE  `frequency_unit`  `frequency_unit` VARCHAR( 8 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT  'month' COMMENT 'Frequency unit and interval allow option to store actual delivery frequency for a subscription or service.';
+ALTER TABLE  `civicrm_contribution_recur` CHANGE  `frequency_unit`  `frequency_unit` VARCHAR( 8 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT  'month' COMMENT  'Time units for recurrence of payment.';
+ALTER TABLE  `civicrm_subscription_history` CHANGE  `method`  `method` VARCHAR( 8 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL COMMENT  'How the (un)subscription was triggered';
+ALTER TABLE  `civicrm_subscription_history` CHANGE  `status`  `status` VARCHAR( 8 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL COMMENT  'The state of the contact within the group';
+ALTER TABLE  `civicrm_relationship_type` CHANGE  `contact_type_a`  `contact_type_a` VARCHAR( 12 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL COMMENT 'If defined, contact_a in a relationship of this type must be a specific contact_type.';
+ALTER TABLE  `civicrm_relationship_type` CHANGE  `contact_type_b`  `contact_type_b` VARCHAR( 12 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL COMMENT 'If defined, contact_b in a relationship of this type must be a specific contact_type.';
+ALTER TABLE  `civicrm_group_contact` CHANGE  `status`  `status` VARCHAR( 8 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL COMMENT  'status of contact relative to membership in group';
+ALTER TABLE  `civicrm_group` CHANGE  `visibility`  `visibility` VARCHAR( 24 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT  'User and User Admin Only' COMMENT  'In what context(s) is this field visible.';
+ALTER TABLE  `civicrm_contact` CHANGE  `preferred_mail_format`  `preferred_mail_format` VARCHAR( 8 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT  'Both' COMMENT  'What is the preferred mode of sending an email.';
 
 

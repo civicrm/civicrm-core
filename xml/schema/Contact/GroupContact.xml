@@ -59,9 +59,9 @@
   </foreignKey>
   <field>
        <name>status</name>
-       <type>enum</type>
+       <type>varchar</type>
+       <length>8</length>
        <title>Group Contact Status</title>
-       <values>Added, Removed, Pending</values>
        <comment>status of contact relative to membership in group</comment>
        <add>1.1</add>
        <html>
