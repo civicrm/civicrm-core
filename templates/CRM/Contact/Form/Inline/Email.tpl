@@ -70,14 +70,6 @@
     cj(function($) {
       // check first primary radio
       $('#Email_1_IsPrimary').prop('checked', true );
-
-      // error handling / show hideen elements duing form validation
-      $('tr[id^="Email_Block_"]' ).each( function() {
-          if( $(this).find('td:first span').length > 0 ) {
-            $(this).removeClass('hiddenElement');
-          }
-      });
     });
-
 </script>
 {/literal}

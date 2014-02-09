@@ -34,7 +34,6 @@
       <div class="crm-section {$form.soft_credit_type_id.name}-section">
         <div class="content" >
           {$form.soft_credit_type_id.html}
-          <span class="crm-clear-link">(<a href="#" title="unselect" onclick="unselectRadio('soft_credit_type_id', '{$form.formName}');enableHonorType(); return false;">{ts}clear{/ts}</a>)</span>
           <div class="description">{ts}Select an option to reveal honoree information fields.{/ts}</div>
         </div>
       </div>

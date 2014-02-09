@@ -33,7 +33,9 @@
  *
  */
 class CRM_Contact_Form_Search_Criteria {
-
+  /**
+   * @param $form CRM_Core_Form
+   */
   static function basic(&$form) {
     $form->addElement('hidden', 'hidden_basic', 1);
 
@@ -124,7 +126,7 @@ class CRM_Contact_Form_Search_Criteria {
     }
 
     // add checkbox for cms users only
-    $form->addYesNo('uf_user', ts('CMS User?'));
+    $form->addYesNo('uf_user', ts('CMS User?'), TRUE);
 
     // tag all search
     $form->add('text', 'tag_search', ts('All Tags'));
@@ -238,7 +240,7 @@ class CRM_Contact_Form_Search_Criteria {
       1 => ts('Exclude'),
       2 => ts('Include by Privacy Option(s)'),
     );
-    $form->addRadio('privacy_toggle', ts('Privacy Options'), $options);
+    $form->addRadio('privacy_toggle', ts('Privacy Options'), $options, NULL, NULL, TRUE);
 
     // preferred communication method
     $comm = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'preferred_communication_method');
@@ -369,7 +371,7 @@ class CRM_Contact_Form_Search_Criteria {
     CRM_Core_BAO_Address::addStateCountryMap($stateCountryMap);
 
     // extend addresses with proximity search
-    $form->addElement('text', 'prox_distance', ts('Find contacts within'));
+    $form->addElement('text', 'prox_distance', ts('Find contacts within'), array('class' => 'six'));
     $form->addElement('select', 'prox_distance_unit', NULL, array('miles' => ts('Miles'), 'kilos' => ts('Kilometers')));
 
     // is there another form rule that does decimals besides money ? ...
@@ -416,7 +418,7 @@ class CRM_Contact_Form_Search_Criteria {
     $form->addElement('text', 'changed_by', ts('Modified By'), NULL);
 
     $dates = array(1 => ts('Added'), 2 => ts('Modified'));
-    $form->addRadio('log_date', NULL, $dates, NULL, '<br />');
+    $form->addRadio('log_date', NULL, $dates, array('unselectable' => TRUE), '<br />');
 
     CRM_Core_Form_Date::buildDateRange($form, 'log_date', 1, '_low', '_high', ts('From'), FALSE, FALSE);
   }
@@ -483,7 +485,7 @@ class CRM_Contact_Form_Search_Criteria {
         array('id' => "civicrm_gender_{$var}_{$key}")
       );
     }
-    $form->addGroup($genderOptions, 'gender_id', ts('Gender'));
+    $form->addGroup($genderOptions, 'gender_id', ts('Gender'))->setAttribute('unselectable', TRUE);
 
     CRM_Core_Form_Date::buildDateRange($form, 'birth_date', 1, '_low', '_high', ts('From'), FALSE, FALSE, 'birth');
 
@@ -491,7 +493,7 @@ class CRM_Contact_Form_Search_Criteria {
 
 
     // radio button for is_deceased
-    $form->addYesNo( 'is_deceased', ts('Deceased'));
+    $form->addYesNo( 'is_deceased', ts('Deceased'), TRUE);
   }
 
   static function notes(&$form) {

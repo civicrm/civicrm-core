@@ -78,7 +78,7 @@
 <tr>
   <td>
   <br />
-  {$form.pledge_test.label} {help id="is-test" file="CRM/Contact/Form/Search/Advanced"} &nbsp; {$form.pledge_test.html} <span class="crm-clear-link">(<a href="#" onclick="unselectRadio('pledge_test','{$form.formName}'); return false;">{ts}clear{/ts}</a>)</span>
+  {$form.pledge_test.label} {help id="is-test" file="CRM/Contact/Form/Search/Advanced"} &nbsp; {$form.pledge_test.html}
   </td>
 </tr>
 <tr>

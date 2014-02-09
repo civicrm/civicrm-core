@@ -61,7 +61,7 @@ class CRM_Contact_Form_Edit_Phone {
     $form->applyFilter('__ALL__', 'trim');
 
     //phone type select
-    $form->addSelect("phone[$blockId][phone_type_id]", array('data-api-entity' => 'phone', 'class' => 'six'));
+    $form->addSelect("phone[$blockId][phone_type_id]", array('data-api-entity' => 'phone', 'class' => 'eight'));
 
     //main phone number with crm_phone class
     $form->add('text', "phone[$blockId][phone]", ts('Phone'), array_merge(CRM_Core_DAO::getAttribute('CRM_Core_DAO_Phone', 'phone'), array('class' => 'crm_phone twelve')));
@@ -70,7 +70,7 @@ class CRM_Contact_Form_Edit_Phone {
 
     if (isset($form->_contactType) || $blockEdit) {
       //Block type select
-      $form->addSelect("phone[$blockId][location_type_id]", array('data-api-entity' => 'phone', 'class' => 'six'));
+      $form->addSelect("phone[$blockId][location_type_id]", array('data-api-entity' => 'phone', 'class' => 'eight'));
 
       //is_Primary radio
       $js = array('id' => 'Phone_' . $blockId . '_IsPrimary', 'onClick' => 'singleSelect( this.id );');

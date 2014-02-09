@@ -66,20 +66,14 @@ class CRM_Contact_Form_Edit_Address {
     $form->applyFilter('__ALL__', 'trim');
 
     $js = array();
-    if ( !$inlineEdit ) {
-    $js = array('onChange' => 'checkLocation( this.id );');
+    if (!$inlineEdit) {
+      $js = array('onChange' => 'checkLocation( this.id );');
     }
 
-    $form->addElement('select',
-      "address[$blockId][location_type_id]",
-      ts('Location Type'),
-      array(
-        '' => ts('- select -')) + CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id'),
-        $js
-    );
+    $form->addSelect("address[$blockId][location_type_id]", array('data-api-entity' => 'address', 'class' => 'eight') + $js);
 
-    if ( !$inlineEdit ) {
-    $js = array('id' => 'Address_' . $blockId . '_IsPrimary', 'onClick' => 'singleSelect( this.id );');
+    if (!$inlineEdit) {
+      $js = array('id' => 'Address_' . $blockId . '_IsPrimary', 'onClick' => 'singleSelect( this.id );');
     }
     else {
       //make location type required for inline edit

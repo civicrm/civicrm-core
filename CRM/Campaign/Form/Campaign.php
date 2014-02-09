@@ -215,9 +215,6 @@ class CRM_Campaign_Form_Campaign extends CRM_Core_Form {
       return CRM_Custom_Form_CustomData::buildQuickForm($this);
     }
 
-    //campaign types.
-    $campaignTypes = CRM_Campaign_PseudoConstant::campaignType();
-
     //lets assign custom data type and subtype.
     $this->assign('customDataType', 'Campaign');
     $this->assign('entityID', $this->_campaignId);
@@ -238,18 +235,10 @@ class CRM_Campaign_Form_Campaign extends CRM_Core_Form {
     $this->addDateTime('end_date', ts('End Date'), FALSE, array('formatType' => 'activityDateTime'));
 
     // add campaign type
-    $this->add('select', 'campaign_type_id', ts('Campaign Type'),
-      array(
-        '' => ts('- select -')) + $campaignTypes, TRUE,
-      array('onChange' => "CRM.buildCustomData( 'Campaign', this.value );")
-    );
+    $this->addSelect('campaign_type_id', array('onChange' => "CRM.buildCustomData( 'Campaign', this.value );"), TRUE);
 
     // add campaign status
-    $campaignStatus = CRM_Campaign_PseudoConstant::campaignStatus();
-    $this->addElement('select', 'status_id', ts('Campaign Status'),
-      array(
-        '' => ts('- select -')) + $campaignStatus
-    );
+    $this->addSelect('status_id');
 
     // add External Identifire Element
     $this->add('text', 'external_identifier', ts('External Id'),

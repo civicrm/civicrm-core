@@ -172,22 +172,6 @@ function showHideByValue(trigger_field_id, trigger_value, target_element_id, tar
 }
 
 /**
- * reset all the radio buttons with a given name
- *
- * @param string fieldName
- * @param object form
- * @return null
- */
-function unselectRadio(fieldName, form) {
-  for (i = 0; i < document.forms[form].elements.length; i++) {
-    if (document.forms[form].elements[i].name == fieldName) {
-      document.forms[form].elements[i].checked = false;
-    }
-  }
-  return;
-}
-
-/**
  * Function to change button text and disable one it is clicked
  *
  * @param obj object - the button clicked
@@ -967,6 +951,15 @@ CRM.validate = CRM.validate || {
               });
           });
         return false;
+      })
+      // Handle clear button for form elements
+      .on('click', 'a.crm-clear-link', function() {
+        $(this).css({visibility: 'hidden'}).siblings('.crm-form-radio:checked').prop('checked', false).change();
+        $(this).siblings('input:text').val('').change();
+        return false;
+      })
+      .on('change', 'input.crm-form-radio:checked', function() {
+        $(this).siblings('.crm-clear-link').css({visibility: ''});
       });
     $().crmtooltip();
   });

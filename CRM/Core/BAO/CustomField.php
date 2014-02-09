@@ -753,6 +753,25 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
       $field->html_type = 'Text';
     }
 
+    // FIXME: Why are select state/country separate widget types?
+    if (in_array($field->html_type, array('Select', 'Multi-Select', 'Select State/Province', 'Multi-Select State/Province', 'Select Country', 'Multi-Select Country'))) {
+      $selectAttributes = array(
+        'data-crm-custom' => $dataCrmCustomVal,
+        'class' => 'crm-select2',
+      );
+      if (strpos($field->html_type, 'Multi') === 0) {
+        $selectAttributes['multiple'] = 'multiple';
+      }
+    }
+    // Add popup link for editing options. Normally this is handled by CRM_Core_Form->addSelect
+    if (in_array($field->html_type, array('Select', 'Multi-Select')) && !$search && CRM_Core_Permission::check('administer CiviCRM')) {
+      $selectAttributes += array(
+        'data-api-entity' => 'contact', // FIXME: This works because the getoptions api isn't picky about custom fields, but it's WRONG
+        'data-api-field' => 'custom_' . $field->id,
+        'data-option-group-url' => 'civicrm/admin/options/' . CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup', $field->option_group_id),
+      );
+    }
+
     if (!isset($label)) {
       $label = $field->label;
     }
@@ -844,15 +863,18 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
           foreach ($customOption as $v => $l) {
             $choice[] = $qf->createElement('radio', NULL, '', $l, (string)$v, $field->attributes);
           }
-          $qf->addGroup($choice, $elementName, $label);
+          $group = $qf->addGroup($choice, $elementName, $label);
         }
         else {
           $choice[] = $qf->createElement('radio', NULL, '', ts('Yes'), '1', $field->attributes);
           $choice[] = $qf->createElement('radio', NULL, '', ts('No'), '0', $field->attributes);
-          $qf->addGroup($choice, $elementName, $label);
+          $group = $qf->addGroup($choice, $elementName, $label);
         }
         if ($useRequired && !$search) {
           $qf->addRule($elementName, ts('%1 is a required field.', array(1 => $label)), 'required');
+        }
+        else {
+          $group->setAttribute('unselectable', TRUE);
         }
         break;
 
@@ -864,7 +886,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
           array(
             '' => ts('- select -')) + $selectOption,
           $useRequired && !$search,
-          $dataCrmCustomAttr
+          $selectAttributes
         );
         break;
 
@@ -909,7 +931,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
         ) {
           $selectOption['CiviCRM_OP_OR'] = ts('Select to match ANY; unselect to match ALL');
         }
-        $qf->addElement('select', $elementName, $label, $selectOption, array('size' => '5', 'multiple', 'data-crm-custom' => $dataCrmCustomVal));
+        $qf->addElement('select', $elementName, $label, $selectOption, $selectAttributes);
 
         if ($useRequired && !$search) {
           $qf->addRule($elementName, ts('%1 is a required field.', array(1 => $label)), 'required');
@@ -955,7 +977,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
         $stateOption = array('' => ts('- select -')) + CRM_Core_PseudoConstant::stateProvince();
         $qf->add('select', $elementName, $label, $stateOption,
           $useRequired && !$search,
-          $dataCrmCustomAttr
+          $selectAttributes
         );
         $qf->_stateCountryMap['state_province'][] = $elementName;
         break;
@@ -964,7 +986,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
         //Add Multi-select State/Province
         $stateOption = CRM_Core_PseudoConstant::stateProvince();
 
-        $qf->addElement('select', $elementName, $label, $stateOption, array('size' => '5', 'multiple', 'data-crm-custom' => $dataCrmCustomVal));
+        $qf->addElement('select', $elementName, $label, $stateOption, $selectAttributes);
         if ($useRequired && !$search) {
           $qf->addRule($elementName, ts('%1 is a required field.', array(1 => $label)), 'required');
         }
@@ -975,7 +997,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
         $countryOption = array('' => ts('- select -')) + CRM_Core_PseudoConstant::country();
         $qf->add('select', $elementName, $label, $countryOption,
           $useRequired && !$search,
-          $dataCrmCustomAttr
+          $selectAttributes
         );
         $qf->_stateCountryMap['country'][] = $elementName;
         break;
@@ -983,7 +1005,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
       case 'Multi-Select Country':
         //Add Country
         $countryOption = CRM_Core_PseudoConstant::country();
-        $qf->addElement('select', $elementName, $label, $countryOption, array('size' => '5', 'multiple', 'data-crm-custom' => $dataCrmCustomVal));
+        $qf->addElement('select', $elementName, $label, $countryOption, $selectAttributes);
         if ($useRequired && !$search) {
           $qf->addRule($elementName, ts('%1 is a required field.', array(1 => $label)), 'required');
         }

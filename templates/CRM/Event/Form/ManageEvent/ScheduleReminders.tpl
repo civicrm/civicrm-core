@@ -50,6 +50,7 @@
     {* added onload javascript for source contact*}
     {literal}
       <script type="text/javascript">
+        cj().crmAccordions();
       var recipient_manual = '';
       var recipient_manual_id = null;
       var toDataUrl = "{/literal}{crmURL p='civicrm/ajax/checkemail' q='id=1&noemail=1' h=0 }{literal}"; {/literal}

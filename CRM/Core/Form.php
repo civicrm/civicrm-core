@@ -106,6 +106,13 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   public $ajaxResponse = array();
 
   /**
+   * Url path used to reach this page
+   *
+   * @var array
+   */
+  public $urlPath = array();
+
+  /**
    * Stores info about reference fields for preprocessing
    * Public so that hooks can access it
    *
@@ -773,14 +780,12 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     return self::$_template->get_template_vars($name);
   }
 
-  function &addRadio($name, $title, &$values, $attributes = NULL, $separator = NULL, $required = FALSE) {
+  function &addRadio($name, $title, $values, $attributes = array(), $separator = NULL, $required = FALSE) {
     $options = array();
-    if (empty($attributes)) {
-      $attributes = array('id_suffix' => $name);
-    }
-    else {
-      $attributes = array_merge($attributes, array('id_suffix' => $name));
-    }
+    $attributes = $attributes ? $attributes : array();
+    $unselectable = !empty($attributes['unselectable']);
+    unset($attributes['unselectable']);
+    $attributes += array('id_suffix' => $name);
     foreach ($values as $key => $var) {
       $options[] = $this->createElement('radio', NULL, NULL, $var, $key, $attributes);
     }
@@ -788,24 +793,22 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     if ($required) {
       $this->addRule($name, ts('%1 is a required field.', array(1 => $title)), 'required');
     }
+    if ($unselectable) {
+      $group->setAttribute('unselectable', TRUE);
+    }
     return $group;
   }
 
-  function addYesNo($id, $title, $dontKnow = NULL, $required = NULL, $attribute = NULL) {
-    if (empty($attribute)) {
-      $attribute = array('id_suffix' => $id);
-    }
-    else {
-      $attribute = array_merge($attribute, array('id_suffix' => $id));
-    }
+  function addYesNo($id, $title, $unselectable = FALSE, $required = NULL, $attributes = array()) {
+    $attributes += array('id_suffix' => $id);
     $choice   = array();
-    $choice[] = $this->createElement('radio', NULL, '11', ts('Yes'), '1', $attribute);
-    $choice[] = $this->createElement('radio', NULL, '11', ts('No'), '0', $attribute);
-    if ($dontKnow) {
-      $choice[] = $this->createElement('radio', NULL, '22', ts("Don't Know"), '2', $attribute);
-    }
-    $this->addGroup($choice, $id, $title);
+    $choice[] = $this->createElement('radio', NULL, '11', ts('Yes'), '1', $attributes);
+    $choice[] = $this->createElement('radio', NULL, '11', ts('No'), '0', $attributes);
 
+    $group = $this->addGroup($choice, $id, $title);
+    if ($unselectable) {
+      $group->setAttribute('unselectable', TRUE);
+    }
     if ($required) {
       $this->addRule($id, ts('%1 is a required field.', array(1 => $title)), 'required');
     }
@@ -919,15 +922,16 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     if (!isset($props['data-api-field'])) {
       $props['data-api-field'] = strrpos($name, '[') ? rtrim(substr($name, 1 + strrpos($name, '[')), ']') : $name;
     }
-    $options = civicrm_api3($props['data-api-entity'], 'getoptions', array(
+    $info = civicrm_api3($props['data-api-entity'], 'getoptions', array(
         'field' => $props['data-api-field'],
+        'options' => array('metadata' => array('fields'))
       )
     );
-    $options = $options['values'];
+    $options = $info['values'];
     if (!array_key_exists('placeholder', $props)) {
       $props['placeholder'] = $required ? ts('- select -') : ts('- none -');
     }
-    if (!empty($props['placeholder']) && empty($props['multiple'])) {
+    if ($props['placeholder'] !== NULL && empty($props['multiple'])) {
       $options = array('' => '') + $options;
     }
     // Handle custom field
@@ -939,8 +943,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     }
     // Core field
     else {
-      $getFields = civicrm_api3($props['data-api-entity'], 'getfields');
-      foreach($getFields['values'] as $uniqueName => $fieldSpec) {
+      foreach($info['metadata']['fields'] as $uniqueName => $fieldSpec) {
         if (
           $uniqueName === $props['data-api-field'] ||
           CRM_Utils_Array::value('name', $fieldSpec) === $props['data-api-field'] ||
@@ -1227,11 +1230,12 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     $freezeCurrency  = FALSE
   ) {
     $currencies = CRM_Core_OptionGroup::values('currencies_enabled');
+    $options = array('class' => 'crm-select2 eight');
     if (!$required) {
-      $currencies = array(
-        '' => ts('- select -')) + $currencies;
+      $currencies = array('' => '') + $currencies;
+      $options['placeholder'] = ts('- none -');
     }
-    $ele = $this->add('select', $name, $label, $currencies, $required);
+    $ele = $this->add('select', $name, $label, $currencies, $required, $options);
     if ($freezeCurrency) {
       $ele->freeze();
     }

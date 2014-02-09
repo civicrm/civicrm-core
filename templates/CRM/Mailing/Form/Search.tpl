@@ -45,7 +45,6 @@
             <div class="crm-search-form-block-is_archive">
             {$form.is_archived.label}<br/>
             {$form.is_archived.html}
-            <span class="crm-clear-link">(<a href="#r">{ts}clear{/ts}</a>)</span>
             </div>
         </td>
         {if $form.mailing_status}
@@ -80,28 +79,18 @@
     var archiveOption = cj("input[name^='is_archived']:radio");
     cj('#status_unscheduled').change(function() {
       if (cj(this).prop('checked') ) {
-        archiveOption.prop('checked',false);
-        archiveOption.attr('readonly',true);
+        archiveOption.prop({checked: false, disabled: true}).change();
       } else {
-        archiveOption.attr('readonly',false);
+        archiveOption.prop('disabled', false);
       }
     }).trigger('change');
     archiveOption.change(function() {
       if (cj("input[name^='is_archived']:radio:checked").length) {
-        disableDraft();
+        cj('#status_unscheduled').prop({checked: false, disabled: true}).change();
       } else {
-        cj('#status_unscheduled').attr('readonly',false); 
+        cj('#status_unscheduled').prop('disabled', false);
       }
     }).trigger('change');
-    cj(".crm-search-form-block-is_archive .crm-clear-link a").click(function() {
-      archiveOption.prop('checked',false);
-      cj('#status_unscheduled').attr('readonly',false); 
-    });
   });
-
-  function disableDraft() {
-    cj('#status_unscheduled').prop('checked',false);
-    cj('#status_unscheduled').attr('readonly',true); 
-  } 
 </script>
 {/literal}

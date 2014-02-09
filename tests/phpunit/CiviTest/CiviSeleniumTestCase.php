@@ -1747,7 +1747,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
   }
 
   function addPaymentInstrument($label, $financialAccount) {
-    $this->openCiviPage('admin/options/payment_instrument', 'group=payment_instrument&action=add&reset=1', "_qf_Options_next-bottom");
+    $this->openCiviPage('admin/options/payment_instrument', 'action=add&reset=1', "_qf_Options_next-bottom");
     $this->type("label", $label);
     $this->select("financial_account_id", "value=$financialAccount");
     $this->click("_qf_Options_next-bottom");
