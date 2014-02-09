@@ -79,12 +79,7 @@ class CRM_Contact_Form_Edit_CommunicationPreferences {
     }
     $form->addGroup($commPreff, 'preferred_communication_method', ts('Preferred Method(s)'));
 
-    $form->add('select', 'preferred_language',
-      ts('Preferred Language'),
-      array(
-        '' => ts('- select -')) +
-      CRM_Contact_BAO_Contact::buildOptions('preferred_language')
-    );
+    $form->addSelect('preferred_language');
 
     if (!empty($privacyOptions)) {
       $commPreference['privacy'] = $privacyOptions;

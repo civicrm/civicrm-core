@@ -34,10 +34,6 @@
       </td>
       <td width="100%">
         {$form.log_date.html}
-        <span class="crm-clear-link">(<a href="#" title="unselect"
-                                         onclick="unselectRadio('log_date', '{$form.formName}');
-                                           return false;">{ts}clear{/ts}</a>)
-        </span>
         <br/>
       </td>
     </tr>

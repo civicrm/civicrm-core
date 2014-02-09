@@ -62,7 +62,7 @@
     $('.crm-search-value select', row).remove();
     $('input[id^=value]', row)
       .hide()
-      .after('<select class="form-select required" ' + multiSelect + '><option value="">' + ts('Loading') + '...</option></select>');
+      .after('<select class="crm-form-' + multiSelect.substr(0, 5) + 'select required" ' + multiSelect + '><option value="">' + ts('Loading') + '...</option></select>');
     
     fetchOptions(row, field);
   }

@@ -159,9 +159,6 @@ function checkResponse(responseText, statusText, xhr, $form) {
                   {/foreach}
                 </tr>
                 </table>
-                {if $field.html_type eq 'Radio' and $form.formName eq 'Edit' and $field.is_view neq 1 }
-                  &nbsp;<span class="crm-clear-link">(<a href="#" title="unselect" onclick="unselectRadio('{$n}', '{$form.formName}'); return false;">{ts}clear{/ts}</a>)</span>
-                {/if}
               {/strip}
             </div>
             <div class="clear"></div>
@@ -205,10 +202,7 @@ function checkResponse(responseText, statusText, xhr, $form) {
                 {else}
                   {$form.$n.html}
                 {/if}
-                {if (($n eq 'gender') or ($field.html_type eq 'Radio' and $form.formName eq 'Edit' and $field.is_required neq 1)) and
-                ($field.is_view neq 1)}
-                  &nbsp;<span class="crm-clear-link">(<a href="#" title="unselect" onclick="unselectRadio('{$n}', '{$form.formName}'); return false;">{ts}clear{/ts}</a>)</span>
-                  {elseif $field.html_type eq 'Autocomplete-Select'}
+                {if $field.html_type eq 'Autocomplete-Select'}
                   {if $field.data_type eq 'ContactReference'}
                     {include file="CRM/Custom/Form/ContactReference.tpl" element_name = $n}
                   {else}

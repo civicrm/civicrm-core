@@ -44,7 +44,7 @@ class CRM_Contact_Form_Edit_Individual {
    * This function provides the HTML form elements that are specific
    * to the Individual Contact Type
    *
-   * @param object $form form object
+   * @param CRM_Core_Form $form form object
    * @param int $inlineEditMode ( 1 for contact summary
    * top bar form and 2 for display name edit )
    *
@@ -63,7 +63,7 @@ class CRM_Contact_Form_Edit_Individual {
       //prefix
       $prefix = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'prefix_id');
       if (isset($nameFields['Prefix']) && !empty($prefix)) {
-        $form->addElement('select', 'prefix_id', ts('Prefix'), array('' => '') + $prefix);
+        $form->addSelect('prefix_id', array('class' => 'four', 'placeholder' => ' '));
       }
 
       $attributes = CRM_Core_DAO::getAttribute('CRM_Contact_DAO_Contact');
@@ -90,7 +90,7 @@ class CRM_Contact_Form_Edit_Individual {
       // suffix
       $suffix = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'suffix_id');
       if (isset($nameFields['Suffix']) && $suffix) {
-        $form->addElement('select', 'suffix_id', ts('Suffix'), array('' => '') + $suffix);
+        $form->addSelect('suffix_id', array('class' => 'four', 'placeholder' => ' '));
       }
     }
 

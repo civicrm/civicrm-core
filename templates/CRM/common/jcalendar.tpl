@@ -64,7 +64,7 @@
 {/if}
 
 {if $action neq 1028}
-    <span class="crm-clear-link">(<a href="#" onclick="clearDateTime( '{$elementId}' ); return false;">{ts}clear{/ts}</a>)</span>
+    <a href="#" class="crm-hover-button crm-clear-link" title="{ts}Clear{/ts}"><span class="icon close-icon"></span></a>
 {/if}
 
 <script type="text/javascript">
@@ -72,8 +72,9 @@
     cj( function() {
       {/literal}
       var element_date   = "#{$displayDate}";
+      var element_time  = "#{$elementId}_time";
       {if $timeElement}
-          var element_time  = "#{$timeElement}";
+          element_time  = "#{$timeElement}";
           var time_format   = cj( element_time ).attr('timeFormat');
           {literal}
               cj(element_time).timeEntry({ show24Hours : time_format, spinnerImage: '' });
@@ -137,18 +138,19 @@
       cj('.ui-datepicker-trigger').click( function( ) {
           hideYear( cj(this).prev() );
       });
-    });
-
-    function hideYear( element ) {
+      function hideYear( element ) {
         var format = cj( element ).attr('format');
         if ( format == 'dd-mm' || format == 'mm/dd' ) {
-            cj(".ui-datepicker-year").css( 'display', 'none' );
+          cj(".ui-datepicker-year").css('display', 'none');
         }
-    }
+      }
+      cj(alt_field + ',' + element_date + ',' + element_time).on('blur change', function() {
+        var vis = cj(alt_field).val() || cj(element_time).val() ? '' : 'hidden';
+        cj(this).siblings('.crm-clear-link').css('visibility', vis);
+      });
+      cj(alt_field).change();
+    });
 
-    function clearDateTime( element ) {
-        cj('input#' + element + ',input#' + element + '_time' + ',input#' + element + '_display').val('');
-    }
     {/literal}
 </script>
 {/strip}

@@ -196,7 +196,7 @@ Class CRM_Core_Form_Date {
   /**
    * This function is to build the date range - relative or absolute
    *
-   * @param Object  $form   the form object that we are operating on
+   * @param CRM_Core_Form  $form   the form object that we are operating on
    * @param string $fieldName
    * @param Array $selector array of option values to add
    * @param integer $count
@@ -212,8 +212,9 @@ Class CRM_Core_Form_Date {
     $form->add('select',
       "{$fieldName}_relative",
       ts('Relative Date Range'),
-        $selector,
-        $required
+      $selector,
+      $required,
+      array('class' => 'crm-select2')
       );
 
       $form->addDateRange($fieldName, $from, $to, $fromLabel, $dateFormat, FALSE, $displayTime);

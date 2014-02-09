@@ -801,11 +801,11 @@ class CRM_Contribute_BAO_Query {
     $form->addGroup($status, 'contribution_status_id', ts('Contribution Status'));
 
     // Add fields for thank you and receipt
-    $form->addYesNo('contribution_thankyou_date_is_not_null', ts('Thank-you sent?'));
-    $form->addYesNo('contribution_receipt_date_is_not_null', ts('Receipt sent?'));
+    $form->addYesNo('contribution_thankyou_date_is_not_null', ts('Thank-you sent?'), TRUE);
+    $form->addYesNo('contribution_receipt_date_is_not_null', ts('Receipt sent?'), TRUE);
 
-    $form->addYesNo('contribution_pay_later', ts('Contribution is Pay Later?'));
-    $form->addYesNo('contribution_recurring', ts('Contribution is Recurring?'));
+    $form->addYesNo('contribution_pay_later', ts('Contribution is Pay Later?'), TRUE);
+    $form->addYesNo('contribution_recurring', ts('Contribution is Recurring?'), TRUE);
 
     // Recurring contribution fields
     foreach (self::getRecurringFields() as $key => $label) {
@@ -816,7 +816,7 @@ class CRM_Contribute_BAO_Query {
       }
     }
 
-    $form->addYesNo('contribution_test', ts('Contribution is a Test?'));
+    $form->addYesNo('contribution_test', ts('Contribution is a Test?'), TRUE);
 
     // Add field for transaction ID search
     $form->addElement('text', 'contribution_transaction_id', ts("Transaction ID"));
@@ -824,7 +824,7 @@ class CRM_Contribute_BAO_Query {
     $form->addElement('text', 'contribution_check_number', ts('Check Number'));
 
     // Add field for pcp display in roll search
-    $form->addYesNo('contribution_pcp_display_in_roll', ts('Personal Campaign Page Honor Roll?'));
+    $form->addYesNo('contribution_pcp_display_in_roll', ts('Personal Campaign Page Honor Roll?'), TRUE);
 
     // Add all the custom searchable fields
     $contribution = array('Contribution');

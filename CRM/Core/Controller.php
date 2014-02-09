@@ -461,6 +461,9 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
       if ($options) {
         $$stateName->setOptions($options);
       }
+      if (property_exists($$stateName, 'urlPath')) {
+        $$stateName->urlPath = explode('/', $_GET[CRM_Core_Config::singleton()->userFrameworkURLVar]);
+      }
       $this->addPage($$stateName);
       $this->addAction($stateName, new HTML_QuickForm_Action_Direct());
 

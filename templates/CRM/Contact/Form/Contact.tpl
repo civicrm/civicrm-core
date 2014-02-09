@@ -39,9 +39,6 @@
     {include file="CRM/common/formButtons.tpl" location="top"}
     </div>
 
-    {* include overlay js *}
-    {include file="CRM/common/overlay.tpl"}
-
     <div class="crm-accordion-wrapper crm-contactDetails-accordion">
       <div class="crm-accordion-header">
         {ts}Contact Details{/ts}

@@ -520,7 +520,7 @@ class CRM_Pledge_BAO_Query {
     // pledge payment related dates
     CRM_Core_Form_Date::buildDateRange($form, 'pledge_payment_date', 1, '_low', '_high', ts('From'), FALSE);
 
-    $form->addYesNo('pledge_test', ts('Pledge is a Test?'));
+    $form->addYesNo('pledge_test', ts('Pledge is a Test?'), TRUE);
     $form->add('text', 'pledge_amount_low', ts('From'), array('size' => 8, 'maxlength' => 8));
     $form->addRule('pledge_amount_low', ts('Please enter a valid money value (e.g. %1).', array(1 => CRM_Utils_Money::format('9.99', ' '))), 'money');
 

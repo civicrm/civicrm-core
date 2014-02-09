@@ -197,11 +197,6 @@
         }
     });
 
-    cj('#absolute_date_display').parent( ).children('.crm-clear-link').children('a').click( function() {
-        cj('#relativeDate').show();
-        cj('#relativeDateRepeat').show();
-    });
-
     cj(function() {
         if (cj('#absolute_date_display').val()) {
             cj('#relativeDate').hide();
