@@ -1078,5 +1078,29 @@ UPDATE  civicrm_activity
 
     return $rtnMsg;
   }
+
+  /**
+   * Get options for a given field.
+   * @see CRM_Core_DAO::buildOptions
+   *
+   * @param String $fieldName
+   * @param String $context: @see CRM_Core_DAO::buildOptionsContext
+   * @param Array  $props: whatever is known about this dao object
+   *
+   * @return array|bool
+   */
+  public static function buildOptions($fieldName, $context = NULL, $props = array()) {
+    $params = array();
+    // Special logic for fields whose options depend on context or properties
+    switch ($fieldName) {
+      case 'activity_type_id':
+        $campaignCompId = CRM_Core_Component::getComponentID('CiviCampaign');
+        if ($campaignCompId) {
+          $params['condition'] = array("component_id={$campaignCompId}", "v.name != 'Petition'");
+        }
+        break;
+    }
+    return CRM_Core_PseudoConstant::get(__CLASS__, $fieldName, $params, $context);
+  }
 }
 
