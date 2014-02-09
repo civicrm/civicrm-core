@@ -506,18 +506,13 @@ function _civicrm_api3_greeting_format_params($params) {
 }
 
 /**
- * Contact quick search api
+ * Old contact quick search api
  *
- * @access public
+ * @deprecated
  *
  * {@example ContactGetquick.php 0}
  *
  */
-function civicrm_api3_contact_quicksearch($params) {
-  // kept as an alias for compatibility reasons.  CRM-11136
-  return civicrm_api3_contact_getquick($params);
-}
-
 function civicrm_api3_contact_getquick($params) {
   civicrm_api3_verify_mandatory($params, NULL, array('name'));
   $name = CRM_Utils_Type::escape(CRM_Utils_Array::value('name', $params), 'String');
