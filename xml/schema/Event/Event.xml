@@ -9,7 +9,7 @@
   <field>
     <name>id</name>
     <type>int unsigned</type>
-    <title>Event ID</title>
+    <title>Event</title>
     <required>true</required>
     <comment>Event</comment>
     <add>1.7</add>
@@ -64,7 +64,7 @@
     <name>event_type_id</name>
     <type>int unsigned</type>
     <uniqueName>event_type_id</uniqueName>
-    <title>Event Type ID</title>
+    <title>Event Type</title>
     <default>0</default>
     <pseudoconstant>
       <optionGroupName>event_type</optionGroupName>
@@ -84,8 +84,11 @@
     <name>participant_listing_id</name>
     <type>int unsigned</type>
     <uniqueName>participant_listing_id</uniqueName>
-    <title>Participant Listing ID</title>
+    <title>Participant Listing</title>
     <default>0</default>
+    <pseudoconstant>
+      <optionGroupName>participant_listing</optionGroupName>
+    </pseudoconstant>
     <comment>Should we expose the participant list? Implicit FK to civicrm_option_value where option_group = participant_listing.</comment>
     <add>2.0</add>
     <html>
@@ -221,7 +224,7 @@
   <field>
     <name>financial_type_id</name>
     <type>int unsigned</type>
-    <title>Financial Type ID</title>
+    <title>Financial Type</title>
     <default>NULL</default>
     <comment>Financial type assigned to paid event registrations for this event. Required if is_monetary is true.</comment>
     <pseudoconstant>
@@ -329,6 +332,9 @@
     <import>true</import>
     <type>int unsigned</type>
     <default>1</default>
+    <pseudoconstant>
+      <optionGroupName>participant_role</optionGroupName>
+    </pseudoconstant>
     <comment>Participant role ID. Implicit FK to civicrm_option_value where option_group = participant_role.</comment>
     <add>2.0</add>
     <html>
