@@ -57,7 +57,7 @@
   <field>
       <name>status_id</name>
       <uniqueName>participant_status_id</uniqueName>
-      <title>Participant Status Id</title>
+      <title>Participant Status</title>
       <headerPattern>/(participant.)?(status)$/i</headerPattern>
       <import>true</import>
       <type>int unsigned</type>
