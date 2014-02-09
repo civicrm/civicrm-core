@@ -59,7 +59,7 @@ class CRM_Contact_Form_Edit_Website {
     $form->applyFilter('__ALL__', 'trim');
 
     //Website type select
-    $form->addSelect("website[$blockId][website_type_id]", array('data-api-entity' => 'website', 'class' => 'six'));
+    $form->addSelect("website[$blockId][website_type_id]", array('data-api-entity' => 'website', 'class' => 'eight'));
 
     //Website box
     $form->addElement('text', "website[$blockId][url]", ts('Website'),

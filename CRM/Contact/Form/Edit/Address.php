@@ -70,7 +70,7 @@ class CRM_Contact_Form_Edit_Address {
       $js = array('onChange' => 'checkLocation( this.id );');
     }
 
-    $form->addSelect("address[$blockId][location_type_id]", array('data-api-entity' => 'address', 'class' => 'six') + $js);
+    $form->addSelect("address[$blockId][location_type_id]", array('data-api-entity' => 'address', 'class' => 'eight') + $js);
 
     if (!$inlineEdit) {
       $js = array('id' => 'Address_' . $blockId . '_IsPrimary', 'onClick' => 'singleSelect( this.id );');
