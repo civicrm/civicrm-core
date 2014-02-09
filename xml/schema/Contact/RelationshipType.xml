@@ -61,9 +61,9 @@
   </field>
   <field>
        <name>contact_type_a</name>
-       <type>enum</type>
        <title>Contact Type for Contact A</title>
-       <values>Individual, Organization, Household</values>
+       <type>varchar</type>
+       <length>12</length>
        <comment>If defined, contact_a in a relationship of this type must be a specific contact_type.</comment>
        <add>1.1</add>
        <html>
@@ -72,9 +72,9 @@
   </field>
   <field>
        <name>contact_type_b</name>
-       <type>enum</type>
        <title>Contact Type for Contact B</title>
-       <values>Individual, Organization, Household</values>
+       <type>varchar</type>
+       <length>12</length>
        <comment>If defined, contact_b in a relationship of this type must be a specific contact_type.</comment>
        <add>1.1</add>
        <html>

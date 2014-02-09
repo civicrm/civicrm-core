@@ -62,8 +62,8 @@
     </field>
     <field>
         <name>method</name>
-        <type>enum</type>
-        <values>Admin, Email, Web, API</values>
+        <type>varchar</type>
+        <length>8</length>
         <comment>How the (un)subscription was triggered</comment>
        <add>1.1</add>
        <html>
@@ -72,8 +72,8 @@
     </field>
     <field>
         <name>status</name>
-        <type>enum</type>
-        <values>Added, Removed, Pending, Deleted</values>
+        <type>varchar</type>
+        <length>8</length>
         <comment>The state of the contact within the group</comment>
        <add>1.1</add>
     </field>

@@ -315,8 +315,8 @@
   </field>
   <field>
        <name>preferred_mail_format</name>
-       <type>enum</type>
-       <values>Text, HTML, Both</values>
+       <type>varchar</type>
+       <length>8</length>
        <default>"Both"</default>
        <import>true</import>
        <headerPattern>/^p(ref\w*\s)?m(ail\s)?f(orm\w*)$/i</headerPattern>

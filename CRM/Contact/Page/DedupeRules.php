@@ -148,6 +148,7 @@ class CRM_Contact_Page_DedupeRules extends CRM_Core_Page_Basic {
     $dao->orderBy('contact_type,used ASC');
     $dao->find();
 
+    $dedupeRuleTypes = CRM_Core_SelectValues::getDedupeRuleTypes();
     while ($dao->fetch()) {
       $ruleGroups[$dao->contact_type][$dao->id] = array();
       CRM_Core_DAO::storeValues($dao, $ruleGroups[$dao->contact_type][$dao->id]);
@@ -174,9 +175,9 @@ class CRM_Contact_Page_DedupeRules extends CRM_Core_Page_Basic {
         'DedupeRule',
         $dao->id
       );
-      CRM_Dedupe_DAO_RuleGroup::addDisplayEnums($ruleGroups[$dao->contact_type][$dao->id]);
-    }
 
+      $ruleGroups[$dao->contact_type][$dao->id]['used_display'] = $dedupeRuleTypes[$ruleGroups[$dao->contact_type][$dao->id]['used']];
+    }
     $this->assign('brows', $ruleGroups);
   }
 
