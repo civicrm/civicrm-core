@@ -18,7 +18,7 @@
   </primaryKey>
   <field>
       <name>event_id</name>
-      <title>Event ID</title>
+      <title>Event</title>
       <type>int unsigned</type>
       <required>true</required>
       <comment>Event which this page belongs to.</comment>
