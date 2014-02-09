@@ -74,8 +74,6 @@ class CRM_Admin_Form_RelationshipType extends CRM_Admin_Form {
       CRM_Core_DAO::getAttribute('CRM_Contact_DAO_RelationshipType', 'description')
     );
 
-
-
     $contactTypes = CRM_Contact_BAO_ContactType::getSelectElements();
 
     // add select for contact type

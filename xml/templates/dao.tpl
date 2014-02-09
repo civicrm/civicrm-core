@@ -357,24 +357,6 @@ class {$table.className} extends CRM_Core_DAO {ldelim}
           return self::$_export;
       {rdelim}
 
-{if $table.hasEnum}
-
-    /**
-     * adds $value['foo_display'] for each $value['foo'] enum from {$table.name}
-     *
-     * @param array $values (reference)  the array up for enhancing
-     * @return void
-     */
-    static function addDisplayEnums(&$values) {ldelim}
-        $enumFields =& {$table.className}::getEnums();
-        foreach ($enumFields as $enum) {ldelim}
-            if (isset($values[$enum])) {ldelim}
-                $values[$enum.'_display'] = {$table.className}::tsEnum($enum, $values[$enum]);
-            {rdelim}
-        {rdelim}
-    {rdelim}
-{/if}
-
 {rdelim}
 
 
