@@ -78,8 +78,7 @@ function civicrm_api3_verify_one_mandatory($params, $daoName = NULL, $keyoptions
  *
  * @todo see notes on _civicrm_api3_check_required_fields regarding removing $daoName param
  */
-function civicrm_api3_verify_mandatory($params, $daoName = NULL, $keys = array(
-  ), $verifyDAO = TRUE) {
+function civicrm_api3_verify_mandatory($params, $daoName = NULL, $keys = array(), $verifyDAO = TRUE) {
 
   $unmatched = array();
   if ($daoName != NULL && $verifyDAO && empty($params['id'])) {
@@ -1390,8 +1389,7 @@ function _civicrm_api3_generic_replace_base_params($params) {
  *
  * @return array
  */
-function _civicrm_api_get_fields($entity, $unique = FALSE, &$params = array(
-  )) {
+function _civicrm_api_get_fields($entity, $unique = FALSE, &$params = array()) {
   $unsetIfEmpty = array('dataPattern', 'headerPattern', 'default', 'export', 'import');
   $dao = _civicrm_api3_get_DAO($entity);
   if (empty($dao)) {
