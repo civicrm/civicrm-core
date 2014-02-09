@@ -866,5 +866,20 @@ class CRM_Core_SelectValues {
     }
     return $barcodeTypes;
   }
+
+  /**
+   * dedupe rule types
+   */
+  static function getDedupeRuleTypes() {
+    static $dedupeRuleTypes = NULL;
+    if (!$dedupeRuleTypes) {
+      $dedupeRuleTypes = array(
+        'Unsupervised' => ts('Unsupervised'),
+        'Supervised' => ts('Supervised'),
+        'General' => ts('General'),
+      );
+    }
+    return $dedupeRuleTypes;
+  }
 }
 

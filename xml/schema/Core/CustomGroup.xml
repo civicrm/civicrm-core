@@ -67,8 +67,8 @@
 
   <field>
      <name>style</name>
-     <type>enum</type>
-     <values>Tab, Inline</values>
+     <type>varchar</type>
+     <length>8</length>
      <comment>Visual relationship between this form and its parent.</comment>
        <add>1.1</add>
        <html>

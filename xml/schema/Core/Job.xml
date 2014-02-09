@@ -33,8 +33,8 @@
   </foreignKey>
   <field>
        <name>run_frequency</name>
-       <type>enum</type>
-       <values>Hourly, Daily, Always</values>
+       <type>varchar</type>
+       <length>8</length>
        <default>"Daily"</default>
        <comment>Scheduled job run frequency.</comment>
        <add>4.1</add>

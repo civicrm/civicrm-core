@@ -357,65 +357,6 @@ class {$table.className} extends CRM_Core_DAO {ldelim}
           return self::$_export;
       {rdelim}
 
-{if $table.hasEnum}
-    /**
-     * returns an array containing the enum fields of the {$table.name} table
-     *
-     * @return array (reference)  the array of enum fields
-     */
-    static function &getEnums() {ldelim}
-        static $enums = array(
-            {foreach from=$table.fields item=field}
-                {if $field.crmType == 'CRM_Utils_Type::T_ENUM'}
-                    '{$field.name}',
-                {/if}
-            {/foreach}
-        );
-        return $enums;
-    {rdelim}
-
-    /**
-     * returns a ts()-translated enum value for display purposes
-     *
-     * @param string $field  the enum field in question
-     * @param string $value  the enum value up for translation
-     *
-     * @return string  the display value of the enum
-     */
-    static function tsEnum($field, $value) {ldelim}
-        static $translations = null;
-        if (!$translations) {ldelim}
-            $translations = array(
-                {foreach from=$table.fields item=field}
-                    {if $field.crmType == 'CRM_Utils_Type::T_ENUM'}
-                        '{$field.name}' => array(
-                            {foreach from=$field.values item=value}
-                                '{$value}' => ts('{$value}'),
-                            {/foreach}
-                        ),
-                    {/if}
-                {/foreach}
-            );
-        {rdelim}
-        return $translations[$field][$value];
-    {rdelim}
-
-    /**
-     * adds $value['foo_display'] for each $value['foo'] enum from {$table.name}
-     *
-     * @param array $values (reference)  the array up for enhancing
-     * @return void
-     */
-    static function addDisplayEnums(&$values) {ldelim}
-        $enumFields =& {$table.className}::getEnums();
-        foreach ($enumFields as $enum) {ldelim}
-            if (isset($values[$enum])) {ldelim}
-                $values[$enum.'_display'] = {$table.className}::tsEnum($enum, $values[$enum]);
-            {rdelim}
-        {rdelim}
-    {rdelim}
-{/if}
-
 {rdelim}
 
 

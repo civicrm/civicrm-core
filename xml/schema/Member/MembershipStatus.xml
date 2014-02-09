@@ -38,8 +38,8 @@
   </field>
   <field>
        <name>start_event</name>
-       <type>enum</type>
-       <values>start_date, end_date, join_date</values>
+       <type>varchar</type>
+       <length>12</length>
        <comment>Event when this status starts.</comment>
        <add>1.5</add>
        <html>
@@ -48,8 +48,8 @@
   </field>
   <field>
       <name>start_event_adjust_unit</name>
-      <type>enum</type>
-      <values>day, month, year</values>
+      <type>varchar</type>
+      <length>8</length>
       <comment>Unit used for adjusting from start_event.</comment>
       <add>1.5</add>
       <html>
@@ -64,8 +64,8 @@
   </field>
   <field>
       <name>end_event</name>
-      <type>enum</type>
-      <values>start_date, end_date, join_date</values>
+      <type>varchar</type>
+      <length>12</length>
       <comment>Event after which this status ends.</comment>
       <add>1.5</add>
       <html>
@@ -74,8 +74,8 @@
   </field>
   <field>
       <name>end_event_adjust_unit</name>
-      <type>enum</type>
-      <values>day, month, year</values>
+      <type>varchar</type>
+      <length>8</length>
       <comment>Unit used for adjusting from the ending event.</comment>
       <add>1.5</add>
       <html>

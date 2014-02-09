@@ -242,6 +242,7 @@ abstract class CRM_Core_Page_Basic extends CRM_Core_Page {
     }
 
 
+    $contactTypes = CRM_Contact_BAO_ContactType::getSelectElements();
     // find all objects
     $object->find();
     while ($object->fetch()) {
@@ -257,7 +258,10 @@ abstract class CRM_Core_Page_Basic extends CRM_Core_Page {
           $values[$object->id] = array();
           CRM_Core_DAO::storeValues($object, $values[$object->id]);
 
-          CRM_Contact_DAO_RelationshipType::addDisplayEnums($values[$object->id]);
+          if (is_a($object, 'CRM_Contact_DAO_RelationshipType')) {
+            $values[$object->id]['contact_type_a_display'] = $contactTypes[$values[$object->id]['contact_type_a']];
+            $values[$object->id]['contact_type_b_display'] = $contactTypes[$values[$object->id]['contact_type_b']];
+          }
 
           // populate action links
           $this->action($object, $action, $values[$object->id], $links, $permission);

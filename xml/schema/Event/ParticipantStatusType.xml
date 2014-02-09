@@ -39,8 +39,8 @@
   </field>
   <field>
     <name>class</name>
-    <type>enum</type>
-    <values>Positive, Pending, Waiting, Negative</values>
+    <type>varchar</type>
+    <length>8</length>
     <comment>the general group of status type this one belongs to</comment>
     <add>3.0</add>
     <html>

@@ -62,8 +62,8 @@
   </field>
   <field>
       <name>html_type</name>
-      <type>enum</type>
-      <values>Text, Select, Radio, CheckBox</values>
+      <type>varchar</type>
+      <length>12</length>
       <required>true</required>
       <add>1.8</add>
       <html>
