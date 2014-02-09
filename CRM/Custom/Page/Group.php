@@ -235,8 +235,9 @@ class CRM_Custom_Page_Group extends CRM_Core_Page {
     }
 
     $customGroupExtends = CRM_Core_SelectValues::customGroupExtends();
+    $customGroupStyle = CRM_Core_SelectValues::customGroupStyle();
     foreach ($customGroup as $key => $array) {
-      CRM_Core_DAO_CustomGroup::addDisplayEnums($customGroup[$key]);
+      $customGroup[$key]['style_display'] = $customGroupStyle[$customGroup[$key]['style']];
       $customGroup[$key]['extends_display'] = $customGroupExtends[$customGroup[$key]['extends']];
     }
 

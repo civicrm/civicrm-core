@@ -143,11 +143,12 @@ class CRM_UF_Page_Field extends CRM_Core_Page {
     $select['group'] = ts('Group(s)');
     $select['tag'] = ts('Tag(s)');
 
+    $visibility = CRM_Core_SelectValues::ufVisibility();
     while ($ufFieldBAO->fetch()) {
       $ufField[$ufFieldBAO->id] = array();
       $phoneType = $locType = '';
       CRM_Core_DAO::storeValues($ufFieldBAO, $ufField[$ufFieldBAO->id]);
-      CRM_Core_DAO_UFField::addDisplayEnums($ufField[$ufFieldBAO->id]);
+      $ufField[$ufFieldBAO->id]['visibility_display'] = $visibility[$ufFieldBAO->visibility];
 
       $ufField[$ufFieldBAO->id]['label'] = $ufFieldBAO->label;
 
