@@ -187,13 +187,6 @@ class CRM_Core_CodeGen_Specification {
     }
 
     $table['fields'] = &$fields;
-    $table['hasEnum'] = FALSE;
-    foreach ($table['fields'] as $field) {
-      if ($field['crmType'] == 'CRM_Utils_Type::T_ENUM') {
-        $table['hasEnum'] = TRUE;
-        break;
-      }
-    }
 
     if ($this->value('primaryKey', $tableXML)) {
       $this->getPrimaryKey($tableXML->primaryKey, $fields, $table);
@@ -257,28 +250,6 @@ class CRM_Core_CodeGen_Specification {
         $field['phpType'] = 'string';
         $field['crmType'] = 'CRM_Utils_Type::T_STRING';
         $field['size'] = $this->getSize($fieldXML);
-        break;
-
-      case 'enum':
-        $value               = (string ) $fieldXML->values;
-        $field['sqlType']    = 'enum(';
-        $field['values']     = array();
-        $field['enumValues'] = $value;
-        $values              = explode(',', $value);
-        $first               = TRUE;
-        foreach ($values as $v) {
-          $v = trim($v);
-          $field['values'][] = $v;
-
-          if (!$first) {
-            $field['sqlType'] .= ', ';
-          }
-          $first = FALSE;
-          $field['sqlType'] .= "'$v'";
-        }
-        $field['sqlType'] .= ')';
-        $field['phpType'] = $field['sqlType'];
-        $field['crmType'] = 'CRM_Utils_Type::T_ENUM';
         break;
 
       case 'text':

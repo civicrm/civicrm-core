@@ -283,14 +283,6 @@ class CRM_Core_PseudoConstant {
       return FALSE;
     }
 
-    // If the field is an enum, explode the enum definition and return the array.
-    if (isset($fieldSpec['enumValues'])) {
-      // use of a space after the comma is inconsistent in xml
-      $enumStr = str_replace(', ', ',', $fieldSpec['enumValues']);
-      $output = explode(',', $enumStr);
-      return array_combine($output, $output);
-    }
-
     elseif (!empty($fieldSpec['pseudoconstant'])) {
       $pseudoconstant = $fieldSpec['pseudoconstant'];
       // Merge params with schema defaults

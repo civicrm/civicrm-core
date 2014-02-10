@@ -250,7 +250,6 @@ function civicrm_api3_generic_getoptions($apiRequest) {
  * - the reason for this is that checking / transformation is done on pseudoconstants but
  * - if the field is an FK then mysql will enforce the data quality (& we have handling on failure)
  * @todo - if may be we should define a 'resolve' key on the psuedoconstant for when these rules are not fine enough
- * 3) if there is an 'enum' then it is split up into the relevant options
  *
  * This function is only split out for the purpose of code clarity / comment block documentation
  * @param array $metadata the array of metadata that will form the result of the getfields function
@@ -259,7 +258,7 @@ function civicrm_api3_generic_getoptions($apiRequest) {
  * @param array $fieldsToResolve anny field resolutions specifically requested
  */
 function _civicrm_api3_generic_get_metadata_options(&$metadata, $entity, $fieldname, $fieldSpec, $fieldsToResolve){
-  if(empty($fieldSpec['pseudoconstant']) && empty($fieldSpec['enumValues'])) {
+  if (empty($fieldSpec['pseudoconstant'])) {
     return;
   }
 
