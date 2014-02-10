@@ -908,22 +908,25 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * Adds a select based on field metadata
    * TODO: This could be even more generic and widget type (select in this case) could also be read from metadata
    * Perhaps a method like $form->bind($name) which would look up all metadata for named field
-   * @param CRM_Core_DAO $baoName - string representing bao object
-   * @param $name
-   * @param array $props
+   * @param $name - field name to go on the form
+   * @param array $props - mix of html attributes and special properties, namely
+   *   - entity (api entity name, can usually be inferred automatically from the form class)
+   *   - field (field name - only needed if different from name used on the form)
+   *   - option_url - path to edit this option list - usually retrieved automatically - set to NULL to disable link
+   *   - placeholder - set to NULL to disable
    * @param bool $required
    * @throws CRM_Core_Exception
    * @return HTML_QuickForm_Element
    */
   function addSelect($name, $props = array(), $required = FALSE) {
-    if (!isset($props['data-api-entity'])) {
-      $props['data-api-entity'] = CRM_Utils_Api::getEntityName($this);
+    if (!isset($props['entity'])) {
+      $props['entity'] = CRM_Utils_Api::getEntityName($this);
     }
-    if (!isset($props['data-api-field'])) {
-      $props['data-api-field'] = strrpos($name, '[') ? rtrim(substr($name, 1 + strrpos($name, '[')), ']') : $name;
+    if (!isset($props['field'])) {
+      $props['field'] = strrpos($name, '[') ? rtrim(substr($name, 1 + strrpos($name, '[')), ']') : $name;
     }
-    $info = civicrm_api3($props['data-api-entity'], 'getoptions', array(
-        'field' => $props['data-api-field'],
+    $info = civicrm_api3($props['entity'], 'getoptions', array(
+        'field' => $props['field'],
         'options' => array('metadata' => array('fields'))
       )
     );
@@ -945,9 +948,9 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     else {
       foreach($info['metadata']['fields'] as $uniqueName => $fieldSpec) {
         if (
-          $uniqueName === $props['data-api-field'] ||
-          CRM_Utils_Array::value('name', $fieldSpec) === $props['data-api-field'] ||
-          in_array($props['data-api-field'], CRM_Utils_Array::value('api.aliases', $fieldSpec, array()))
+          $uniqueName === $props['field'] ||
+          CRM_Utils_Array::value('name', $fieldSpec) === $props['field'] ||
+          in_array($props['field'], CRM_Utils_Array::value('api.aliases', $fieldSpec, array()))
         ) {
           break;
         }
@@ -955,9 +958,10 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       $label = isset($props['label']) ? $props['label'] : $fieldSpec['title'];
       $props['data-option-group-url'] = array_key_exists('option_url', $props) ? $props['option_url'] : $props['data-option-group-url'] = CRM_Core_PseudoConstant::getOptionEditUrl($fieldSpec);
     }
-    $props['class'] = isset($props['class']) ? $props['class'] . ' ' : '';
-    $props['class'] .= "crm-select2";
-    CRM_Utils_Array::remove($props, 'label', 'option_url');
+    $props['class'] = (isset($props['class']) ? $props['class'] . ' ' : '') . "crm-select2";
+    $props['data-api-entity'] = $props['entity'];
+    $props['data-api-field'] = $props['field'];
+    CRM_Utils_Array::remove($props, 'label', 'entity', 'field', 'option_url');
     return $this->add('select', $name, $label, $options, $required, $props);
   }
 
