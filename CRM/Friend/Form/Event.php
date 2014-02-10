@@ -44,7 +44,7 @@ class CRM_Friend_Form_Event extends CRM_Event_Form_ManageEvent {
    *
    * @var int
    */
-  private $_friendId;
+  public $_friendId;
 
   public function preProcess() {
     parent::preProcess();
@@ -95,6 +95,13 @@ class CRM_Friend_Form_Event extends CRM_Event_Form_ManageEvent {
    * @access public
    */
   public function buildQuickForm() {
+    if (isset($this->_id)) {
+      $defaults['entity_table'] = 'civicrm_event';
+      $defaults['entity_id'] = $this->_id;
+      CRM_Friend_BAO_Friend::getValues($defaults);
+      $this->_friendId = CRM_Utils_Array::value('id', $defaults);
+    }
+
     CRM_Friend_BAO_Friend::buildFriendForm($this);
     parent::buildQuickForm();
   }
