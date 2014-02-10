@@ -3824,6 +3824,9 @@ div.m ul#civicrm-menu,
 .crm-container .select2-container .select2-choice abbr {
   top: 6px;
 }
+.crm-container .select2-container .select2-choice > .select2-chosen {
+  font-size: 1.1em;
+}
 /* Add search icon to ajax single-selects */
 .crm-container .crm-ajax-select .select2-arrow b {
   background-position: -39px -22px;
