@@ -65,7 +65,7 @@ class CRM_Contact_Form_Edit_Email {
     $form->addRule("email[$blockId][email]", ts('Email is not valid.'), 'email');
     if (isset($form->_contactType) || $blockEdit) {
       //Block type
-      $form->addSelect("email[$blockId][location_type_id]", array('data-api-entity' => 'email', 'class' => 'eight'));
+      $form->addSelect("email[$blockId][location_type_id]", array('entity' => 'email', 'class' => 'eight'));
 
       $multipleBulk = CRM_Core_BAO_Email::isMultipleBulkMail();
 

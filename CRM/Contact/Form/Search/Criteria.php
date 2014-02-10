@@ -378,7 +378,7 @@ class CRM_Contact_Form_Search_Criteria {
     $form->addRule('prox_distance', ts('Please enter positive number as a distance'), 'numeric');
 
     $worldRegions = array('' => '') + CRM_Core_PseudoConstant::worldRegion();
-    $form->addSelect('world_region', array('data-api-entity' => 'address', 'placeholder' => ts('- any -'), 'option_url' => NULL));
+    $form->addSelect('world_region', array('entity' => 'address', 'placeholder' => ts('- any -'), 'option_url' => NULL));
 
     // checkboxes for location type
     $location_type = array();
