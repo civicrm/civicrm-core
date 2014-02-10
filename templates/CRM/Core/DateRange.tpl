@@ -28,13 +28,16 @@
 <td>{$form.$relativeName.html}</td>
 <td>
   <span class="crm-absolute-date-range">
-    {assign var=fromName   value=$fieldName|cat:$from}
-    {$form.$fromName.label}
-    {include file="CRM/common/jcalendar.tpl" elementName=$fromName}
-    &nbsp;&nbsp;
-    {assign var=toName   value=$fieldName|cat:$to}
-    {$form.$toName.label}
-    {include file="CRM/common/jcalendar.tpl" elementName=$toName}
+    <span class="crm-absolute-date-from">
+      {assign var=fromName   value=$fieldName|cat:$from}
+      {$form.$fromName.label}
+      {include file="CRM/common/jcalendar.tpl" elementName=$fromName}
+    </span>
+    <span class="crm-absolute-date-to">
+      {assign var=toName   value=$fieldName|cat:$to}
+      {$form.$toName.label}
+      {include file="CRM/common/jcalendar.tpl" elementName=$toName}
+    </span>
   </span>
   {literal}
     <script type="text/javascript">
