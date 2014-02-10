@@ -172,7 +172,7 @@ class CRM_Contact_Form_Edit_Address {
               $selectOptions = array('' => ts('- select -')) + CRM_Core_PseudoConstant::countyForState($form->getSubmitValue("address[{$blockId}][state_province_id]"));
             }
             elseif ($form->getSubmitValue("address[{$blockId}][county_id]")) {
-              $selectOptions = array('' => ts('- select a state -')) + CRM_Core_PseudoConstant::county();
+              $selectOptions = array('' => ts('- select -')) + CRM_Core_PseudoConstant::county();
             }
             else {
               $selectOptions = array('' => ts('- select a state -'));
