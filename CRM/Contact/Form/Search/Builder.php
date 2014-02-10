@@ -429,7 +429,7 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
     foreach ($entities as $entity) {
       $fields = civicrm_api3($entity, 'getfields');
       foreach ($fields['values'] as $field => $info) {
-        if (!empty($info['options']) || !empty($info['pseudoconstant']) || !empty($info['option_group_id']) || !empty($info['enumValues'])) {
+        if (!empty($info['options']) || !empty($info['pseudoconstant']) || !empty($info['option_group_id'])) {
           $options[$field] = $entity;
           if (substr($field, -3) == '_id') {
             $options[substr($field, 0, -3)] = $entity;
