@@ -4,12 +4,28 @@
  * Base class for UF system integrations
  */
 abstract class CRM_Utils_System_Base {
+
+  /**
+   * @var bool
+   *   TRUE, if the CMS is Drupal.
+   */
   var $is_drupal = FALSE;
+
+  /**
+   * @var bool
+   *   TRUE, if the CMS is Joomla!.
+   */
   var $is_joomla = FALSE;
+
+  /**
+   * @var bool
+   *   TRUE, if the CMS is WordPress.
+   */
   var $is_wordpress = FALSE;
 
-  /*
-   * Does the CMS allow CMS forms to be extended by hooks
+  /**
+   * @var bool
+   *   TRUE, if the CMS allows CMS forms to be extended by hooks.
    */
   var $supports_form_extensions = FALSE;
 
@@ -17,12 +33,14 @@ abstract class CRM_Utils_System_Base {
    * if we are using a theming system, invoke theme, else just print the
    * content
    *
-   * @param string  $content the content that will be themed
-   * @param boolean $print   are we displaying to the screen or bypassing theming?
-   * @param boolean $maintenance  for maintenance mode
+   * @param string $content the content that will be themed
+   * @param boolean $print are we displaying to the screen or bypassing theming?
+   * @param boolean $maintenance for maintenance mode
    *
-   * @return void           prints content on stdout
-   * @access public
+   * @throws Exception
+   * @return string|null
+   *   NULL, If $print is FALSE, and some other criteria match up.
+   *   The themed string, otherwise.
    */
   function theme(&$content, $print = FALSE, $maintenance = FALSE) {
     $ret = FALSE;
@@ -57,7 +75,7 @@ abstract class CRM_Utils_System_Base {
         require_once (ABSPATH . 'wp-admin/admin-header.php');
       }
       else {
-        // FIX ME: we need to figure out to replace civicrm content on the frontend pages
+        // FIXME: we need to figure out to replace civicrm content on the frontend pages
       }
     }
 
@@ -69,10 +87,16 @@ abstract class CRM_Utils_System_Base {
     }
   }
 
+  /**
+   * @return string
+   */
   function getDefaultBlockLocation() {
     return 'left';
   }
 
+  /**
+   * @return string
+   */
   function getVersion() {
     return 'Unknown';
   }
@@ -81,8 +105,11 @@ abstract class CRM_Utils_System_Base {
    * Format the url as per language Negotiation.
    *
    * @param string $url
+   * @param bool $addLanguagePart
+   * @param bool $removeLanguagePart
    *
-   * @return string $url, formatted url.
+   * @return string
+   *   Formatted url.
    * @static
    */
   function languageNegotiationURL(
@@ -96,7 +123,8 @@ abstract class CRM_Utils_System_Base {
   /**
    * Determine the location of the CMS root.
    *
-   * @return string|NULL local file system path to CMS root, or NULL if it cannot be determined
+   * @return string|null
+   *   Local file system path to CMS root, or NULL if it cannot be determined
    */
   function cmsRootPath() {
     return NULL;
@@ -115,7 +143,9 @@ abstract class CRM_Utils_System_Base {
   /**
    * Determine the native ID of the CMS user
    *
-   * @param $username
+   * @param string $username
+   *
+   * @throws CRM_Core_Exception
    * @return int|NULL
    */
   function getUfId($username) {
@@ -126,9 +156,8 @@ abstract class CRM_Utils_System_Base {
   /**
    * Set a init session with user object
    *
-   * @param array $data  array with user specific data
-   *
-   * @access public
+   * @param array $data
+   *   Array with user specific data
    */
   function setUserSession($data) {
     list($userID, $ufID) = $data;
@@ -147,7 +176,10 @@ abstract class CRM_Utils_System_Base {
 
   /**
    * Return default Site Settings
-   * @return array array
+   *
+   * @param string $dir
+   *
+   * @return array
    * - $url, (Joomla - non admin url)
    * - $siteName,
    * - $siteRoot
@@ -163,7 +195,7 @@ abstract class CRM_Utils_System_Base {
    * e.g. for drupal: records a watchdog message about the new session, saves the login timestamp,
    * calls hook_user op 'login' and generates a new session.
    *
-   * @param array params
+   * @param array $params
    *
    * FIXME: Document values accepted/required by $params
    */
@@ -184,11 +216,8 @@ abstract class CRM_Utils_System_Base {
 
   /**
    * Get timezone from CMS
-   * @return boolean|string
-   */
-  /**
-   * Get timezone from Drupal
-   * @return boolean|string
+   *
+   * @return string|false|null
    */
   function getTimeZoneOffset(){
     $timezone = $this->getTimeZoneString();
@@ -212,7 +241,9 @@ abstract class CRM_Utils_System_Base {
 
   /**
    * Over-ridable function to get timezone as a string eg.
-   * @return string Timezone e.g. 'America/Los_Angeles'
+   *
+   * @return string
+   *   Time zone, e.g. 'America/Los_Angeles'
    */
   function getTimeZoneString() {
     return NULL;
