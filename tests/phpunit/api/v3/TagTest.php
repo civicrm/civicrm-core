@@ -198,6 +198,7 @@ class api_v3_TagTest extends CiviUnitTestCase {
       'input' => $this->tag['name'],
     );
     $result = $this->callAPIAndDocument('tag', 'getlist', $params, __FUNCTION__, __FILE__);
+    $this->assertEquals($this->tag['id'], $result['values'][0]['id'], 'In line ' . __LINE__);
     $this->assertEquals($this->tag['description'], $result['values'][0]['description'], 'In line ' . __LINE__);
   }
 }

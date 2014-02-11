@@ -1319,20 +1319,15 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
           $field->setValue($val);
         }
         $result = civicrm_api3($entity, 'getlist', array('params' => array('id' => $val)));
-        if (!empty($result['values'])) {
-          foreach($result['values'] as $row) {
-            $data[] = array('id' => $row['id'], 'text' => $row['label']);
-          }
-        }
         if ($field->isFrozen()) {
           $field->removeAttribute('class');
         }
-        if ($data) {
+        if (!empty($result['values'])) {
           // Simplify array for single selects - makes client-side code simpler (but feels somehow wrong)
           if (empty($select['multiple'])) {
-            $data = $data[0];
+            $result['values'] = $result['values'][0];
           }
-          $field->setAttribute('data-entity-value', json_encode($data));
+          $field->setAttribute('data-entity-value', json_encode($result['values']));
         }
       }
     }
