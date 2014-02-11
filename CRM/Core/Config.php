@@ -277,7 +277,7 @@ class CRM_Core_Config extends CRM_Core_Config_Variables {
 
     $class = $this->userFrameworkClass;
     // redundant with _initVariables
-    $userSystem = $this->userSystem = new $class();
+    $this->userSystem = new $class();
 
     if ($userFramework == 'Joomla') {
       $this->userFrameworkURLVar = 'task';
@@ -308,7 +308,7 @@ class CRM_Core_Config extends CRM_Core_Config_Variables {
       $this->cleanURL = 0;
     }
 
-    $this->userFrameworkVersion = $userSystem->getVersion();
+    $this->userFrameworkVersion = $this->userSystem->getVersion();
 
     if ($userFramework == 'Joomla') {
       /** @var object|null $mainframe */
