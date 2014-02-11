@@ -56,9 +56,6 @@ class CRM_Contribute_Page_ContributionPage extends CRM_Core_Page {
   private static $_configureActionLinks;
   private static $_onlineContributionLinks;
 
-  // @todo Unused private field can be safely removed.
-  private static $_links = NULL;
-
   /**
    * @var CRM_Utils_Pager
    */
@@ -322,6 +319,8 @@ class CRM_Contribute_Page_ContributionPage extends CRM_Core_Page {
     }
     elseif ($action & CRM_Core_Action::COPY) {
       // @todo Unused local variable can be safely removed.
+      // But are there any side effects of CRM_Core_Session::singleton() that we
+      // need to preserve?
       $session = CRM_Core_Session::singleton();
       CRM_Core_Session::setStatus(ts('A copy of the contribution page has been created'), ts('Successfully Copied'), 'success');
       $this->copy();
@@ -398,6 +397,8 @@ AND         cp.page_type = 'contribute'
       $this
     );
     // @todo Unused local variable can be safely removed.
+    // But are there any side effects of CRM_Utils_Request::retrieve() that we
+    // need to preserve?
     $createdId = CRM_Utils_Request::retrieve('cid', 'Positive',
       $this, FALSE, 0
     );
@@ -678,12 +679,6 @@ ORDER BY LEFT(title, 1)
       $sectionName = CRM_Utils_Array::value('uniqueName', $link);
       if (!$sectionName) {
         continue;
-      }
-
-      // @todo Unused local variable can be safely removed.
-      $classes = array();
-      if (isset($link['class'])) {
-        $classes = $link['class'];
       }
 
       if (empty($sectionsInfo[$sectionName])) {
