@@ -253,7 +253,12 @@ class CRM_Core_Config_Variables extends CRM_Core_Config_Defaults {
   public $userFrameworkUsersTableName = 'users';
   public $userFrameworkClass = 'CRM_Utils_System_Drupal';
   public $userHookClass = 'CRM_Utils_Hook_Drupal';
+
+  /**
+   * @var string|CRM_Core_Permission_Base
+   */
   public $userPermissionClass = 'CRM_Core_Permission_Drupal';
+
   public $userFrameworkURLVar = 'q';
   public $userFrameworkDSN = NULL;
   public $userFrameworkBaseURL = NULL;

@@ -58,8 +58,14 @@ class CRM_Contribute_Page_ContributionPage extends CRM_Core_Page {
 
   private static $_links = NULL;
 
+  /**
+   * @var CRM_Utils_Pager
+   */
   protected $_pager = NULL;
 
+  /**
+   * @var string
+   */
   protected $_sortByCharacter;
 
   /**
@@ -268,7 +274,7 @@ class CRM_Contribute_Page_ContributionPage extends CRM_Core_Page {
    * type of action and executes that action.
    * Finally it calls the parent's run method.
    *
-   * @return void
+   * @return mixed
    */
   function run() {
     // get the requested action
@@ -381,8 +387,9 @@ AND         cp.page_type = 'contribute'
   /**
    * Browse all contribution pages
    *
-   * @return void
-   * @access public
+   * @param mixed $action
+   *   Unused parameter.
+   *
    * @static
    */
   function browse($action = NULL) {

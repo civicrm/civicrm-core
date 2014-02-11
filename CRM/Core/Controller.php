@@ -114,6 +114,8 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
 
   /**
    * QF response type
+   *
+   * @var string
    */
   public $_QFResponseType = 'html';
 
@@ -156,16 +158,16 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
   /**
    * All CRM single or multi page pages should inherit from this class.
    *
-   * @param string  title        descriptive title of the controller
-   * @param boolean whether      controller is modal
-   * @param string  scope        name of session if we want unique scope, used only by Controller_Simple
-   * @param boolean addSequence  should we add a unique sequence number to the end of the key
-   * @param boolean ignoreKey    should we not set a qfKey for this controller (for standalone forms)
+   * @param string $title
+   *   Descriptive title of the controller
+   * @param bool $modal
+   * @param mixed $mode
+   * @param string $scope
+   *   Name of session if we want unique scope, used only by Controller_Simple
+   * @param boolean $addSequence should we add a unique sequence number to the end of the key
+   * @param boolean $ignoreKey should we not set a qfKey for this controller (for standalone forms)
    *
-   * @access public
-   *
-   * @return void
-   *
+   * @internal param bool $whether controller is modal
    */
   function __construct(
     $title = NULL,
@@ -324,6 +326,7 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
    * This run is basically a composition of the original run and the
    * jump action
    *
+   * @return mixed
    */
   function run() {
     // the names of the action and page should be saved
