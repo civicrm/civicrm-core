@@ -1256,13 +1256,8 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * @param string $label
    * @param array $props mix of html and widget properties, including:
    *  - select - params to give to select2 widget
-   *  - api - array of settings for the api:
-   *     - "entity" - defaults to contact
-   *     - "action" - defaults to get (getquick when entity is contact)
-   *     - "params" - additional params to pass to the api
-   *     - "key"    - what to store as this field's value - defaults to "id"
-   *     - "label"  - what to show to the user - defaults to "label"
-   *     - "search" - rarely used - only needed if search field is different from label field
+   *  - entity - defaults to contact
+   *  - api - array of settings for the getlist api
    *  - placeholder - string
    *  - multiple - bool
    *  - class, etc. - other html properties
@@ -1270,23 +1265,12 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * @return HTML_QuickForm_Element
    */
   function addEntityRef($name, $label, $props = array(), $required = FALSE) {
+    // Default properties
     $props['api'] = CRM_Utils_Array::value('api', $props, array());
-    // Merge in defaults for api params
-    $props['api'] += array(
-      'entity' => 'contact',
-      'key' => 'id',
-    );
-    $props['api'] += array(
-      'action' => $props['api']['entity'] == 'contact' ? 'getquick' : 'get',
-      'label' => $props['api']['entity'] == 'contact' ? 'data' : 'label',
-    );
-    // this can be ommitted for normal apis since search field is usually the same as label field. But getquick is bizarre.
-    $props['api'] += array(
-      'search' => $props['api']['entity'] == 'contact' ? 'name' : $props['api']['label'],
-    );
+    $props['entity'] = CRM_Utils_Array::value('entity', $props, 'contact');
 
     $props['class'] = isset($props['class']) ? $props['class'] . ' ' : '';
-    $props['class'] .= "crm-select2 crm-{$props['api']['entity']}-ref-field";
+    $props['class'] .= "crm-select2 crm-form-entityref";
 
     $props['select'] = CRM_Utils_Array::value('select', $props, array()) + array(
       'minimumInputLength' => 1,
@@ -1308,8 +1292,9 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    */
   private function formatReferenceFieldAttributes(&$props) {
     $props['data-select-params'] = json_encode($props['select']);
-    $props['data-api-params'] = json_encode($props['api']);
-    CRM_Utils_Array::remove($props, 'multiple', 'select', 'api', 'placeholder');
+    $props['data-api-params'] = $props['api'] ? json_encode($props['api']) : NULL;
+    $props['data-api-entity'] = $props['entity'];
+    CRM_Utils_Array::remove($props, 'multiple', 'select', 'api', 'entity', 'placeholder');
   }
 
   /**
@@ -1326,18 +1311,17 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       }
       if ($val) {
         $data = array();
-        $api = json_decode($field->getAttribute('data-api-params'), TRUE);
+        $entity = $field->getAttribute('data-api-entity');
         $select = json_decode($field->getAttribute('data-select-params'), TRUE);
         // Support serialized values
         if (strpos($val, CRM_Core_DAO::VALUE_SEPARATOR) !== FALSE) {
           $val = str_replace(CRM_Core_DAO::VALUE_SEPARATOR, ',', trim($val, CRM_Core_DAO::VALUE_SEPARATOR));
           $field->setValue($val);
         }
-        // TODO: we could fetch multiple values with array(IN => $val) but not all apis support this
-        foreach (explode(',', $val) as $v) {
-          $result = civicrm_api3($api['entity'], $api['action'], array('sequential' => 1, $api['key'] => $v));
-          if (!empty($result['values'])) {
-            $data[] = array('id' => $v, 'text' => $result['values'][0][$api['label']]);
+        $result = civicrm_api3($entity, 'getlist', array('params' => array('id' => $val)));
+        if (!empty($result['values'])) {
+          foreach($result['values'] as $row) {
+            $data[] = array('id' => $row['id'], 'text' => $row['label']);
           }
         }
         if ($field->isFrozen()) {

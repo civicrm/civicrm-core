@@ -1862,6 +1862,10 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
         $action = empty($action) ? 'getfields' : $action;
         $entityAction = 'GetFields';
       }
+      elseif (strstr($function, 'GetList')) {
+        $action = empty($action) ? 'getlist' : $action;
+        $entityAction = 'GetList';
+      }
       elseif (strstr($function, 'Get')) {
         $action = empty($action) ? 'get' : $action;
         $entityAction = 'Get';
