@@ -738,6 +738,9 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
     }
 
     $input['count'] = FALSE;
+
+    // skip bulk activities in activity tab
+    $input['activity_type_exclude_id'][$bulkActivityTypeID] = $bulkActivityTypeID;
     list($sqlClause, $params) = self::getActivitySQLClause($input);
 
     $query = "{$insertSQL}
@@ -775,7 +778,7 @@ SELECT     ac.activity_id,
            c.sort_name,
            c.is_deleted
 FROM       {$activityTempTable}
-INNER JOIN civicrm_activity a ON ( a.id = {$activityTempTable}.activity_id AND a.activity_type_id != {$bulkActivityTypeID} )
+INNER JOIN civicrm_activity a ON ( a.id = {$activityTempTable}.activity_id  )
 INNER JOIN civicrm_activity_contact ac ON ( ac.activity_id = {$activityTempTable}.activity_id )
 INNER JOIN civicrm_contact c ON c.id = ac.contact_id
 ";
@@ -926,6 +929,14 @@ ORDER BY    fixed_sort_order
    * @static
    */
   static function &getActivitiesCount($input) {
+    // skip bulk activities in activity tab
+    $bulkActivityTypeID = CRM_Core_OptionGroup::getValue(
+      'activity_type',
+      'Bulk Email',
+      'name'
+    );
+    $input['activity_type_exclude_id'][$bulkActivityTypeID] = $bulkActivityTypeID;
+
     $input['count'] = TRUE;
     list($sqlClause, $params) = self::getActivitySQLClause($input);
 
