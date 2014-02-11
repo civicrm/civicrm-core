@@ -472,15 +472,15 @@ ORDER BY title asc
       $action += array_sum(array_keys(self::contributionLinks()));
 
       if ($dao->is_active) {
-        $action -= CRM_Core_Action::ENABLE;
+        $action -= (int)CRM_Core_Action::ENABLE;
       }
       else {
-        $action -= CRM_Core_Action::DISABLE;
+        $action -= (int)CRM_Core_Action::DISABLE;
       }
 
       //CRM-4418
       if (!$allowToDelete) {
-        $action -= CRM_Core_Action::DELETE;
+        $action -= (int)CRM_Core_Action::DELETE;
       }
 
       //build the configure links.
