@@ -71,8 +71,9 @@ class CRM_Core_Config extends CRM_Core_Config_Variables {
 
   /**
    * The connector module for the CMS/UF
+   * @todo Introduce an interface.
    *
-   * @var CRM_Util_System_{$uf}
+   * @var CRM_Utils_System_Base
    */
   public $userSystem = NULL;
 
