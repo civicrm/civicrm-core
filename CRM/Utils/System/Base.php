@@ -249,18 +249,18 @@ abstract class CRM_Utils_System_Base {
    */
   public function getTimeZoneOffset(){
     $timezone = $this->getTimeZoneString();
-    if($timezone){
+    if ($timezone) {
       $tzObj = new DateTimeZone($timezone);
       $dateTime = new DateTime("now", $tzObj);
       $tz = $tzObj->getOffset($dateTime);
 
-      if(empty($tz)){
-        return false;
+      if (empty($tz)) {
+        return FALSE;
       }
 
       $timeZoneOffset = sprintf("%02d:%02d", $tz / 3600, abs(($tz/60)%60));
 
-      if($timeZoneOffset > 0){
+      if ($timeZoneOffset > 0) {
         $timeZoneOffset = '+' . $timeZoneOffset;
       }
       return $timeZoneOffset;
