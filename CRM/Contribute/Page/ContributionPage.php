@@ -596,14 +596,12 @@ ORDER BY title asc
       $clauses[] = "title LIKE '" . strtolower(CRM_Core_DAO::escapeWildCardString($this->_sortByCharacter)) . "%'";
     }
 
-    // @todo Fatal typo: $campainIds vs $campaignIds.
-    $campainIds = $this->get('campaign_id');
-    if (!CRM_Utils_System::isNull($campainIds)) {
-      if (!is_array($campainIds)) {
-        // @todo Undefined variable $campaignIds, due to fatal typo above.
-        $campaignIds = array($campaignIds);
-      }
-      $clauses[] = '( campaign_id IN ( ' . implode(' , ', array_values($campainIds)) . ' ) )';
+    $campaignIds = $this->getCampaignIds();
+    if (count($campaignIds) > 1) {
+      $clauses[] = '( campaign_id IN ( ' . implode(' , ', $campaignIds) . ' ) )';
+    }
+    elseif (count($campaignIds) > 1) {
+      $clauses[] = '( campaign_id = ' . $campaignIds[0] . ')';
     }
 
     if (empty($clauses)) {
@@ -616,6 +614,23 @@ ORDER BY title asc
     }
 
     return implode(' AND ', $clauses);
+  }
+
+  /**
+   * Gets the campaign ids from the session.
+   *
+   * @return int[]
+   */
+  function getCampaignIds() {
+    // The unfiltered value from the session cannot be trusted, it needs to be
+    // processed to get a clean array of positive integers.
+    $ids = array();
+    foreach ((array)$this->get('campaign_id') as $id) {
+      if ((string)(int)$id === (string)$id && $id > 0) {
+        $ids[] = $id;
+      }
+    }
+    return $ids;
   }
 
   function pager($whereClause, $whereParams) {
