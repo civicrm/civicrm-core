@@ -65,6 +65,9 @@
        <type>varchar</type>
        <length>12</length>
        <comment>If defined, contact_a in a relationship of this type must be a specific contact_type.</comment>
+       <pseudoconstant>
+         <callback>CRM_Contact_BAO_ContactType::getSelectElements()</callback>
+       </pseudoconstant>
        <add>1.1</add>
        <html>
          <type>Select</type>
@@ -76,6 +79,9 @@
        <type>varchar</type>
        <length>12</length>
        <comment>If defined, contact_b in a relationship of this type must be a specific contact_type.</comment>
+       <pseudoconstant>
+         <callback>CRM_Contact_BAO_ContactType::getSelectElements()</callback>
+       </pseudoconstant>
        <add>1.1</add>
        <html>
         <type>Select</type>
