@@ -51,6 +51,7 @@ class CRM_Utils_Type {
     T_CCNUM      = 8192,
     T_MEDIUMBLOB = 16384;
 
+  // @todo What's the point of these constants? Backwards compatibility?
   const
     TWO       = 2,
     FOUR      = 4,
@@ -75,6 +76,9 @@ class CRM_Utils_Type {
    *   String identifying the data type, e.g. 'Int' or 'String'.
    */
   static function typeToString($type) {
+    // @todo Use constants in the case statements, e.g. "case T_INT:".
+    // @todo return directly, instead of assigning a value.
+    // @todo Use a lookup array, as a property or as a local variable.
     switch ($type) {
       case 1:
         $string = 'Int';
@@ -168,6 +172,8 @@ class CRM_Utils_Type {
         // Checked for multi valued state/country value
         if (is_array($data)) {
           $returnData = TRUE;
+          // @todo Reuse of the $data variable = asking for trouble.
+          // @todo This code will always return the last item in the array. Intended?
           foreach ($data as $data) {
             if (CRM_Utils_Rule::positiveInteger($data) || CRM_Core_DAO::escapeString($data)) {
               $returnData = TRUE;
@@ -243,6 +249,7 @@ class CRM_Utils_Type {
         break;
     }
 
+    // @todo Use exceptions instead of CRM_Core_Error::fatal().
     if ($abort) {
       $data = htmlentities($data);
       CRM_Core_Error::fatal("$data is not of the type $type");
