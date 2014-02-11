@@ -41,6 +41,9 @@ abstract class CRM_Utils_System_Base {
    * @return string|null
    *   NULL, If $print is FALSE, and some other criteria match up.
    *   The themed string, otherwise.
+   *
+   * @todo The return value is inconsistent.
+   * @todo Better to always return, and never print.
    */
   function theme(&$content, $print = FALSE, $maintenance = FALSE) {
     $ret = FALSE;
