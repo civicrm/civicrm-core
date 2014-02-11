@@ -122,6 +122,55 @@ class CRM_Contact_Form_Task_SaveSearch extends CRM_Contact_Form_Task {
       );
     }
 
+    //CRM-14190
+    $groupNames = CRM_Core_PseudoConstant::group();
+
+    $parentGroups = $parentGroupElements = array();
+    if (isset($this->_id) &&
+      CRM_Utils_Array::value('parents', $this->_groupValues)
+    ) {
+      $parentGroupIds = explode(',', $this->_groupValues['parents']);
+      foreach ($parentGroupIds as $parentGroupId) {
+        $parentGroups[$parentGroupId] = $groupNames[$parentGroupId];
+        if (array_key_exists($parentGroupId, $groupNames)) {
+          $parentGroupElements[$parentGroupId] = $groupNames[$parentGroupId];
+          $this->addElement('checkbox', "remove_parent_group_$parentGroupId",
+            $groupNames[$parentGroupId]
+          );
+        }
+      }
+    }
+    $this->assign_by_ref('parent_groups', $parentGroupElements);
+
+    if (isset($this->_id)) {
+      $potentialParentGroupIds = CRM_Contact_BAO_GroupNestingCache::getPotentialCandidates($this->_id,
+        $groupNames
+      );
+    }
+    else {
+      $potentialParentGroupIds = array_keys($groupNames);
+    }
+
+    $parentGroupSelectValues = array('' => '- ' . ts('select') . ' -');
+    foreach ($potentialParentGroupIds as $potentialParentGroupId) {
+      if (array_key_exists($potentialParentGroupId, $groupNames)) {
+        $parentGroupSelectValues[$potentialParentGroupId] = $groupNames[$potentialParentGroupId];
+      }
+    }
+
+    if (count($parentGroupSelectValues) > 1) {
+      if (CRM_Core_Permission::isMultisiteEnabled()) {
+        $required = empty($parentGroups) ? TRUE : FALSE;
+        $required = (($this->_id && CRM_Core_BAO_Domain::isDomainGroup($this->_id)) ||
+          !isset($this->_id)
+        ) ? FALSE : $required;
+      }
+      else {
+        $required = FALSE;
+      }
+      $this->add('select', 'parents', ts('Add Parent'), $parentGroupSelectValues, $required);
+    }
+
     // get the group id for the saved search
     $groupID = NULL;
     if (isset($this->_id)) {
@@ -208,6 +257,9 @@ class CRM_Contact_Form_Task_SaveSearch extends CRM_Contact_Form_Task {
     $params['saved_search_id'] = $savedSearch->id;
     $params['is_active'] = 1;
 
+    //CRM-14190
+    $params['parents'] = $formValues['parents'];
+
     if ($this->_id) {
       $params['id'] = CRM_Contact_BAO_SavedSearch::getName($this->_id, 'id');
     }
@@ -216,6 +268,11 @@ class CRM_Contact_Form_Task_SaveSearch extends CRM_Contact_Form_Task {
 
     // CRM-9464
     $this->_id = $savedSearch->id;
+
+    //CRM-14190
+    if ( !empty($formValues['parents']) ) {
+      CRM_Contact_BAO_GroupNestingCache::update();
+    }
   }
 }
 
