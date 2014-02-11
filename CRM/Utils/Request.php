@@ -40,24 +40,6 @@
 class CRM_Utils_Request {
 
   /**
-   * We only need one instance of this object. So we use the singleton
-   * pattern and cache the instance in this variable
-   *
-   * @var self
-   *
-   * @todo Unused private property can be safely removed.
-   */
-  static private $_singleton = NULL;
-
-  /**
-   * Constructor.
-   *
-   * @todo Empty constructor can be safely removed.
-   * @todo Class is not meant to be instantiated.
-   */
-  function __construct() {}
-
-  /**
    * Retrieve a value from the request (GET/POST/REQUEST)
    *
    * @param string $name
