@@ -99,6 +99,11 @@ class CRM_Core_Config extends CRM_Core_Config_Variables {
   public $initialized = 0;
 
   /**
+   * @var string
+   */
+  public $customPHPPathDir;
+
+  /**
    * the factory class used to instantiate our DB objects
    * @var string
    */
