@@ -929,5 +929,39 @@ class CRM_Core_SelectValues {
 
     return $premiumUnits;
   }
+
+  /**
+   * extension types
+   */
+  static function getExtensionTypes() {
+    static $extensionTypes = NULL;
+    if (!$extensionTypes) {
+      $extensionTypes = array(
+        'payment' => ts('Payment'),
+        'search' => ts('Search'),
+        'report' => ts('Report'),
+        'module' => ts('Module'),
+        'sms' => ts('SMS'),
+      );
+    }
+
+    return $extensionTypes;
+  }
+
+  /**
+   * job frequency
+   */
+  static function getJobFrequency() {
+    static $jobFrequency = NULL;
+    if (!$jobFrequency) {
+      $jobFrequency = array(
+        'Daily' => ts('Daily'),
+        'Hourly' => ts('Hourly'),
+        'Always' => ts('Every time cron job is run'),
+      );
+    }
+
+    return $jobFrequency;
+  }
 }
 
