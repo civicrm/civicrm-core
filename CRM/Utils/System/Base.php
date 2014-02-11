@@ -202,13 +202,13 @@ abstract class CRM_Utils_System_Base {
    *
    * FIXME: Document values accepted/required by $params
    */
-  function userLoginFinalize($params = array()){
+  function userLoginFinalize($params = array()) {
   }
 
   /**
    * Set timezone in mysql so that timestamp fields show the correct time
    */
-  function setMySQLTimeZone(){
+  function setMySQLTimeZone() {
     $timeZoneOffset = $this->getTimeZoneOffset();
     if($timeZoneOffset){
       $sql = "SET time_zone = '$timeZoneOffset'";
@@ -222,20 +222,20 @@ abstract class CRM_Utils_System_Base {
    *
    * @return string|false|null
    */
-  function getTimeZoneOffset(){
+  function getTimeZoneOffset() {
     $timezone = $this->getTimeZoneString();
-    if($timezone){
+    if ($timezone) {
       $tzObj = new DateTimeZone($timezone);
       $dateTime = new DateTime("now", $tzObj);
       $tz = $tzObj->getOffset($dateTime);
 
-      if(empty($tz)){
-        return false;
+      if (empty($tz)) {
+        return FALSE;
       }
 
       $timeZoneOffset = sprintf("%02d:%02d", $tz / 3600, abs(($tz/60)%60));
 
-      if($timeZoneOffset > 0){
+      if ($timeZoneOffset > 0) {
         $timeZoneOffset = '+' . $timeZoneOffset;
       }
       return $timeZoneOffset;

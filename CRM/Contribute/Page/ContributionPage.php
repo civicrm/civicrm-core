@@ -577,7 +577,7 @@ ORDER BY title asc
       }
     }
 
-        $value = $this->get( 'financial_type_id' );
+    $value = $this->get( 'financial_type_id' );
     $val = array();
     if ($value) {
       if (is_array($value)) {
@@ -589,12 +589,10 @@ ORDER BY title asc
         $type = implode(',', $val);
       }
       // @todo Variable 'type' might not have been defined.
-             $clauses[] = "financial_type_id IN ({$type})";
+      $clauses[] = "financial_type_id IN ({$type})";
     }
 
-    if ($sortBy &&
-      $this->_sortByCharacter !== NULL
-    ) {
+    if ($sortBy && $this->_sortByCharacter !== NULL) {
       $clauses[] = "title LIKE '" . strtolower(CRM_Core_DAO::escapeWildCardString($this->_sortByCharacter)) . "%'";
     }
 
@@ -633,8 +631,8 @@ ORDER BY title asc
 
     $query = "
 SELECT count(id)
-  FROM civicrm_contribution_page
- WHERE $whereClause";
+FROM civicrm_contribution_page
+WHERE $whereClause";
 
     $params['total'] = CRM_Core_DAO::singleValueQuery($query, $whereParams);
 
@@ -645,10 +643,10 @@ SELECT count(id)
   function pagerAtoZ($whereClause, $whereParams) {
 
     $query = "
-   SELECT DISTINCT UPPER(LEFT(title, 1)) as sort_name
-     FROM civicrm_contribution_page
-    WHERE $whereClause
- ORDER BY LEFT(title, 1)
+SELECT DISTINCT UPPER(LEFT(title, 1)) as sort_name
+FROM civicrm_contribution_page
+WHERE $whereClause
+ORDER BY LEFT(title, 1)
 ";
     $dao = CRM_Core_DAO::executeQuery($query, $whereParams);
 
@@ -657,7 +655,7 @@ SELECT count(id)
   }
 
   function formatConfigureLinks($sectionsInfo) {
-    //build the formatted configure links.
+    // build the formatted configure links.
     $formattedConfLinks = self::configureActionLinks();
     foreach ($formattedConfLinks as $act => & $link) {
       $sectionName = CRM_Utils_Array::value('uniqueName', $link);
