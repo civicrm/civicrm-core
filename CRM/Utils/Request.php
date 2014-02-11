@@ -44,11 +44,16 @@ class CRM_Utils_Request {
    * pattern and cache the instance in this variable
    *
    * @var self
+   *
+   * @todo Unused private property can be safely removed.
    */
   static private $_singleton = NULL;
 
   /**
-   * Class constructor
+   * Constructor.
+   *
+   * @todo Empty constructor can be safely removed.
+   * @todo Class is not meant to be instantiated.
    */
   public function __construct() {}
 
