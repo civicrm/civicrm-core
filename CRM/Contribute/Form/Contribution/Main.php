@@ -514,11 +514,11 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     }
     if ($this->_pcpId) {
       if ($pcpSupporter = CRM_PCP_BAO_PCP::displayName($this->_pcpId)) {
-        $pcp_supporter_text = ts('This contribution is being made thanks to effort of <strong>%1</strong>, who supports our campaign. ', array(1 => $pcpSupporter));
+        $pcp_supporter_text = ts('This contribution is being made thanks to the effort of <strong>%1</strong>, who supports our campaign.', array(1 => $pcpSupporter));
         // Only tell people that can also create a PCP if the contribution page has a non-empty value in the "Create Personal Campaign Page link" field.
         $text = CRM_PCP_BAO_PCP::getPcpBlockStatus($this->_id, 'contribute');
         if(!empty($text)) {
-          $pcp_supporter_text .= "You can support it as well - once you complete the donation, you will be able to create your own Personal Campaign Page!";
+          $pcp_supporter_text .= ts("You can support it as well - once you complete the donation, you will be able to create your own Personal Campaign Page!");
         }
         $this->assign('pcpSupporterText', $pcp_supporter_text);
       }
