@@ -761,12 +761,15 @@ function _civicrm_api3_get_unique_name_array(&$bao) {
  * @static void
  * @access public
  */
-function _civicrm_api3_dao_to_array($dao, $params = NULL, $uniqueFields = TRUE, $entity = "") {
+function _civicrm_api3_dao_to_array($dao, $params = NULL, $uniqueFields = TRUE, $entity = "", $autoFind = TRUE) {
   $result = array();
   if(isset($params['options']) && CRM_Utils_Array::value('is_count', $params['options'])) {
     return $dao->count();
   }
-  if (empty($dao) || !$dao->find()) {
+  if (empty($dao)) {
+    return array();
+  }
+  if ($autoFind && !$dao->find()) {
     return array();
   }
 

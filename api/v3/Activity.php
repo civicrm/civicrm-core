@@ -233,6 +233,21 @@ function civicrm_api3_activity_get($params) {
     $activities = _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params, FALSE);
   }
 
+  $activities = _civicrm_api3_activity_get_formatResult($params, $activities);
+  //legacy custom data get - so previous formatted response is still returned too
+  return civicrm_api3_create_success($activities, $params, 'activity', 'get');
+}
+
+/**
+ * Given a list of activities, append any extra data requested about the activities
+ *
+ * NOTE: Called by civicrm-core and CiviHR
+ *
+ * @param array $params API request parameters
+ * @param array $activities
+ * @return array new activities list
+ */
+function _civicrm_api3_activity_get_formatResult($params, $activities) {
   $returns = CRM_Utils_Array::value('return', $params, array());
   if (!is_array($returns)) {
     $returns = str_replace(' ', '', $returns);
@@ -274,11 +289,10 @@ function civicrm_api3_activity_get($params) {
     foreach ($activities as $activityId => $values) {
       _civicrm_api3_custom_data_get($activities[$activityId], 'Activity', $activityId, NULL, $values['activity_type_id']);
     }
+    return $activities;
   }
-  //legacy custom data get - so previous formatted response is still returned too
-  return civicrm_api3_create_success($activities, $params, 'activity', 'get');
+  return $activities;
 }
-
 
 
 /**
