@@ -74,6 +74,12 @@ abstract class CRM_Utils_System_Base {
       !$print &&
       $config->userFramework == 'WordPress'
     ) {
+      if (!function_exists('is_admin')) {
+        throw new \Exception('Function "is_admin()" is missing, even though WordPress is the user framework.');
+      }
+      if (!defined('ABSPATH')) {
+        throw new \Exception('Constant "ABSPATH" is not defined, even though WordPress is the user framework.');
+      }
       if (is_admin()) {
         require_once (ABSPATH . 'wp-admin/admin-header.php');
       }
