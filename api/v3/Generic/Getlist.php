@@ -72,7 +72,7 @@ function _civicrm_api3_generic_getList_defaults($entity, &$request) {
     'page_num' => 1,
     'input' => '',
     'image_field' => NULL,
-    'key_field' => 'id',
+    'id_field' => 'id',
     'params' => array(),
   );
   // Find main field from meta
@@ -101,8 +101,16 @@ function _civicrm_api3_generic_getList_defaults($entity, &$request) {
     ),
     'sequential' => 1,
   );
+  // When searching e.g. autocomplete
   if ($request['input']) {
     $params[$request['search_field']] = array('LIKE' => ($config->includeWildCardInName ? '%' : '') . $request['input'] . '%');
+  }
+  // When looking up a field e.g. displaying existing record
+  if (!empty($request['id'])) {
+    if (is_string($request['id']) && strpos(',', $request['id'])) {
+      $request['id'] = explode(',', $request['id']);
+    }
+    $params[$request['id_field']] = is_array($request['id']) ? array('IN' => $request['id']) : $request['id'];
   }
   $request['params'] += $params;
 }
@@ -113,9 +121,9 @@ function _civicrm_api3_generic_getList_defaults($entity, &$request) {
  * @param $request array
  */
 function _civicrm_api3_generic_getlist_params(&$request) {
-  $fieldsToReturn = array($request['key_field'], $request['label_field']);
-  $request['image_field'] && $fieldsToReturn[] = $request['image_field'];
-  $request['description_field'] && $fieldsToReturn[] = $request['description_field'];
+  $fieldsToReturn = array($request['id_field'], $request['label_field']);
+  !empty($request['image_field']) && $fieldsToReturn[] = $request['image_field'];
+  !empty($request['description_field']) && $fieldsToReturn[] = $request['description_field'];
   $request['params']['options']['return'] = $fieldsToReturn;
 }
 
@@ -132,7 +140,7 @@ function _civicrm_api3_generic_getlist_output($result, $request) {
   if (!empty($result['values'])) {
     foreach ($result['values'] as $row) {
       $output[] = array(
-        'key' => $row[$request['key_field']],
+        'id' => $row[$request['id_field']],
         'label' => $row[$request['label_field']],
         'description' => isset($request['description_field']) && isset($row[$request['description_field']]) ? $row[$request['description_field']] : NULL,
         'image' => isset($request['image_field']) && isset($row[$request['image_field']]) ? $row[$request['image_field']] : NULL,

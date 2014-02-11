@@ -304,18 +304,18 @@ CRM.validate = CRM.validate || {
           options.placeholderOption = 'first';
         }
       }
-      // Api-based searching
-      if ($(this).data('api-params')) {
+      // Autocomplete using the getlist api
+      if ($(this).data('api-entity') && $(this).hasClass('crm-form-entityref')) {
         $(this).addClass('crm-ajax-select')
         options.query = function(info) {
-          var api = $(info.element).data('api-params');
-          var params = api.params || {};
-          params[api.search] = info.term;
-          CRM.api3(api.entity, api.action, params).done(function(data) {
-            var results = {context: info.context, results: []};
+          var params = $(info.element).data('api-params') || {};
+          params.input = info.term;
+          params.page_num = info.page;
+          CRM.api3($(info.element).data('api-entity'), 'getlist', params).done(function(data) {
+            var results = {context: info.context, more: data.more_results, results: []};
             if (typeof(data.values) === 'object') {
               $.each(data.values, function(k, v) {
-                results.results.push({id: v[api.key], text: v[api.label]});
+                results.results.push({id: v.id, text: v.label});
               });
             }
             info.callback(results);
