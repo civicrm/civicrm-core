@@ -24,32 +24,58 @@
  +--------------------------------------------------------------------+
 *}
 <div class="crm-form-block crm-block crm-contact-task-createsmartgroup-form-block">
-<h3>{ts}Smart Group{/ts}</h3>
-    {if $qill[0]}
-        <div id="search-status">
-            <ul>
-                {foreach from=$qill[0] item=criteria}
-                    <li>{$criteria}</li>
-                {/foreach}
-            </ul>
-            <br />
-        </div>
-    {/if}
+  <h3>{ts}Smart Group{/ts}</h3>
+  {if $qill[0]}
+    <div id="search-status">
+      <ul>
+        {foreach from=$qill[0] item=criteria}
+          <li>{$criteria}</li>
+        {/foreach}
+      </ul>
+      <br />
+    </div>
+  {/if}
   <table class="form-layout-compressed">
-        <tr class="crm-contact-task-createsmartgroup-form-block-title">
-            <td class="label">{$form.title.label}</td>
-            <td>{$form.title.html}</td>
-        </tr>
-  <tr class="crm-contact-task-createsmartgroup-form-block-description">
-            <td class="label">{$form.description.label}</td>
-            <td>{$form.description.html}</td>
-        </tr>
-          {if $form.group_type}
-        <tr class="crm-contact-task-createsmartgroup-form-block-group_type">
-            <td class="label">{$form.group_type.label}</td>
-            <td>{$form.group_type.html}</td>
-        </tr>
-          {/if}
+    <tr class="crm-contact-task-createsmartgroup-form-block-title">
+      <td class="label">{$form.title.label}</td>
+      <td>{$form.title.html}</td>
+    </tr>
+    <tr class="crm-contact-task-createsmartgroup-form-block-description">
+      <td class="label">{$form.description.label}</td>
+      <td>{$form.description.html}</td>
+    </tr>
+    {if $form.group_type}
+      <tr class="crm-contact-task-createsmartgroup-form-block-group_type">
+        <td class="label">{$form.group_type.label}</td>
+        <td>{$form.group_type.html}</td>
+      </tr>
+    {/if}
   </table>
- <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
+
+  {*CRM-14190*}
+  {if $parent_groups|@count > 0 or $form.parents.html}
+    <h3>{ts}Parent Groups{/ts} {help id="id-group-parent" file="CRM/Group/Page/Group.hlp"}</h3>
+    {if $parent_groups|@count > 0}
+      <table class="form-layout-compressed">
+        <tr>
+          <td><label>{ts}Remove Parent?{/ts}</label></td>
+        </tr>
+        {foreach from=$parent_groups item=cgroup key=group_id}
+          {assign var="element_name" value="remove_parent_group_"|cat:$group_id}
+          <tr>
+            <td>&nbsp;&nbsp;{$form.$element_name.html}&nbsp;{$form.$element_name.label}</td>
+          </tr>
+        {/foreach}
+      </table>
+      <br />
+    {/if}
+    <table class="form-layout-compressed">
+      <tr class="crm-group-form-block-parents">
+        <td class="label">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{$form.parents.label}</td>
+        <td>{$form.parents.html|crmAddClass:huge}</td>
+      </tr>
+    </table>
+  {/if}
+
+  <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
 </div>
