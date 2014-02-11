@@ -66,12 +66,13 @@ class CRM_Utils_Type {
     HUGE      = 45;
 
   /**
-   * Convert Constant Data type to String
+   * Gets the string representation for a data type.
    *
-   * @param  $type       integer datatype
+   * @param int $type
+   *   Integer number identifying the data type.
    *
-   * @return string $string     String datatype respective to integer datatype@access public
-   * @static
+   * @return string
+   *   String identifying the data type, e.g. 'Int' or 'String'.
    */
   public static function typeToString($type) {
     switch ($type) {
@@ -138,14 +139,17 @@ class CRM_Utils_Type {
   }
 
   /**
-   * Verify that a variable is of a given type
+   * Verify that a variable is of a given type, and apply a bit of processing.
    *
-   * @param mixed   $data         The variable
-   * @param string  $type         The type
-   * @param boolean $abort        Should we abort if invalid
+   * @param mixed $data
+   *   The value to be verified/escaped.
+   * @param string $type
+   *   The type to verify against.
+   * @param boolean $abort
+   *   If TRUE, the operation will CRM_Core_Error::fatal() on invalid data.
    *
-   * @return mixed                The data, escaped if necessary
-   * @static
+   * @return mixed
+   *   The data, escaped if necessary.
    */
   public static function escape($data, $type, $abort = TRUE) {
     switch ($type) {
@@ -254,13 +258,17 @@ class CRM_Utils_Type {
   /**
    * Verify that a variable is of a given type
    *
-   * @param mixed   $data         The variable
-   * @param string  $type         The type
-   * @param boolean $abort        Should we abort if invalid
-   * @name string   $name    The name of the attribute
+   * @param mixed $data
+   *   The value to validate.
+   * @param string $type
+   *   The type to validate against.
+   * @param boolean $abort
+   *   If TRUE, the operation will CRM_Core_Error::fatal() on invalid data.
+   * @name string $name
+   *   The name of the attribute
    *
-   * @return mixed                The data, escaped if necessary
-   * @static
+   * @return mixed
+   *   The data, escaped if necessary
    */
   public static function validate($data, $type, $abort = TRUE, $name = 'One of parameters ') {
     switch ($type) {
