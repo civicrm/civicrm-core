@@ -24,6 +24,9 @@
     <length>8</length>
     <required>true</required>
     <comment></comment>
+    <pseudoconstant>
+      <callback>CRM_Core_SelectValues::pmf()</callback>
+    </pseudoconstant>
     <add>4.2</add>
     <html>
       <type>Select</type>

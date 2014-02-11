@@ -134,8 +134,8 @@ class CRM_Core_SelectValues {
     if (!$periodType) {
       $periodType = array(
         '' => ts('- select -'),
-        'rolling' => ts('rolling'),
-        'fixed' => ts('fixed'),
+        'rolling' => ts('Rolling'),
+        'fixed' => ts('Fixed'),
       );
     }
     return $periodType;
@@ -880,6 +880,54 @@ class CRM_Core_SelectValues {
       );
     }
     return $dedupeRuleTypes;
+  }
+
+  /**
+   * campaign group types
+   */
+  static function getCampaignGroupTypes() {
+    static $campaignGroupTypes = NULL;
+    if (!$campaignGroupTypes) {
+      $campaignGroupTypes = array(
+        'Include' => ts('Include'),
+        'Exclude' => ts('Exclude'),
+      );
+    }
+    return $campaignGroupTypes;
+  }
+
+  /**
+   * subscription history method
+   */
+  static function getSubscriptionHistoryMethods() {
+    static $subscriptionHistoryMethods = NULL;
+    if (!$subscriptionHistoryMethods) {
+      $subscriptionHistoryMethods = array(
+        'Admin' => ts('Admin'),
+        'Email' => ts('Email'),
+        'Web' => ts('Web'),
+        'API' => ts('API'),
+      );
+    }
+
+    return $subscriptionHistoryMethods;
+  }
+
+  /**
+   * premium units
+   */
+  static function getPremiumUnits() {
+    static $premiumUnits = NULL;
+    if (!$premiumUnits) {
+      $premiumUnits = array(
+        'day' => ts('Day'),
+        'week' => ts('Week'),
+        'month' => ts('Month'),
+        'year' => ts('Year'),
+      );
+    }
+
+    return $premiumUnits;
   }
 }
 
