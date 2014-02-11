@@ -43,9 +43,7 @@ class CRM_Utils_Request {
    * We only need one instance of this object. So we use the singleton
    * pattern and cache the instance in this variable
    *
-   * @var object
-   * @access private
-   * @static
+   * @var self
    */
   static private $_singleton = NULL;
 
@@ -57,17 +55,21 @@ class CRM_Utils_Request {
   /**
    * Retrieve a value from the request (GET/POST/REQUEST)
    *
-   * @param $name    name of the variable to be retrieved
-   * @param $type    type of the variable (see CRM_Utils_Type for details)
-   * @param $store   session scope where variable is stored
-   * @param $abort   is this variable required
-   * @param $default default value of the variable if not present
-   * @param $method  where should we look for the variable
+   * @param string $name
+   *   Name of the variable to be retrieved.
+   * @param string $type
+   *   Type of the variable (see CRM_Utils_Type for details).
+   * @param object $store
+   *   Session scope where variable is stored.
+   * @param bool $abort
+   *   TRUE, if the variable is required.
+   * @param mixed $default
+   *   Default value of the variable if not present.
+   * @param string $method
+   *   Where to look for the variable - 'GET', 'POST' or 'REQUEST'.
    *
-   * @return mixed the value of the variable
-   * @access public
-   * @static
-   *
+   * @return mixed
+   *   The value of the variable
    */
   static function retrieve($name, $type, &$store = NULL, $abort = FALSE, $default = NULL, $method = 'REQUEST') {
 

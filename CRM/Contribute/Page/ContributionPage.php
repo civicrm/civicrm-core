@@ -65,9 +65,9 @@ class CRM_Contribute_Page_ContributionPage extends CRM_Core_Page {
   /**
    * Get the action links for this page.
    *
-   * @return array $_actionLinks
-   *
-   */ function &actionLinks() {
+   * @return array
+   */
+  function &actionLinks() {
     // check if variable _actionsLinks is populated
     if (!isset(self::$_actionLinks)) {
       // helper variable for nicer formatting
@@ -107,8 +107,7 @@ class CRM_Contribute_Page_ContributionPage extends CRM_Core_Page {
   /**
    * Get the configure action links for this page.
    *
-   * @return array $_configureActionLinks
-   *
+   * @return array
    */
   function &configureActionLinks() {
     // check if variable _actionsLinks is populated
@@ -189,8 +188,7 @@ class CRM_Contribute_Page_ContributionPage extends CRM_Core_Page {
   /**
    * Get the online contribution links.
    *
-   * @return array $_onlineContributionLinks.
-   *
+   * @return array
    */
   function &onlineContributionLinks() {
     if (!isset(self::$_onlineContributionLinks)) {
@@ -221,8 +219,7 @@ class CRM_Contribute_Page_ContributionPage extends CRM_Core_Page {
   /**
    * Get the contributions links.
    *
-   * @return array $_contributionLinks
-   *
+   * @return array
    */
   function &contributionLinks() {
     if (!isset(self::$_contributionLinks)) {
@@ -272,8 +269,6 @@ class CRM_Contribute_Page_ContributionPage extends CRM_Core_Page {
    * Finally it calls the parent's run method.
    *
    * @return void
-   * @access public
-   *
    */
   function run() {
     // get the requested action
