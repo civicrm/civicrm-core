@@ -93,13 +93,13 @@
         <tr class="crm-friend-manage-form-block-thankyou_title">
            <td class="label">{$form.tf_thankyou_title.label}
          {if $action == 2}
-              {include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_tell_friend' field='tf_thankyou_title' id=$friendId}{/if}</td>
+              {include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_tell_friend' field='thankyou_title' id=$friendId}{/if}</td>
      <td>{$form.tf_thankyou_title.html}</td>
         </tr>
         <tr class="crm-friend-manage-form-block-thankyou_text">
      <td class="label">{$form.tf_thankyou_text.label}
          {if $action == 2}
-              {include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_tell_friend' field='tf_thankyou_text' id=$friendId}
+              {include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_tell_friend' field='thankyou_text' id=$friendId}
          {/if}
      </td>
      <td>{$form.tf_thankyou_text.html}<br />
