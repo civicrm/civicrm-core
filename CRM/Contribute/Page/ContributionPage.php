@@ -56,6 +56,7 @@ class CRM_Contribute_Page_ContributionPage extends CRM_Core_Page {
   private static $_configureActionLinks;
   private static $_onlineContributionLinks;
 
+  // @todo Unused private field can be safely removed.
   private static $_links = NULL;
 
   /**
@@ -320,6 +321,7 @@ class CRM_Contribute_Page_ContributionPage extends CRM_Core_Page {
       }
     }
     elseif ($action & CRM_Core_Action::COPY) {
+      // @todo Unused local variable can be safely removed.
       $session = CRM_Core_Session::singleton();
       CRM_Core_Session::setStatus(ts('A copy of the contribution page has been created'), ts('Successfully Copied'), 'success');
       $this->copy();
@@ -395,6 +397,7 @@ AND         cp.page_type = 'contribute'
       'String',
       $this
     );
+    // @todo Unused local variable can be safely removed.
     $createdId = CRM_Utils_Request::retrieve('cid', 'Positive',
       $this, FALSE, 0
     );
@@ -559,6 +562,7 @@ ORDER BY title asc
    * @return int|string
    */
   public function whereClause(&$params, $sortBy = TRUE) {
+    // @todo Unused local variable can be safely removed.
     $values    = $clauses = array();
     $title     = $this->get('title');
     $createdId = $this->get('cid');
@@ -588,7 +592,7 @@ ORDER BY title asc
         }
         $type = implode(',', $val);
       }
-
+      // @todo Variable 'type' might not have been defined.
              $clauses[] = "financial_type_id IN ({$type})";
     }
 
@@ -598,9 +602,11 @@ ORDER BY title asc
       $clauses[] = "title LIKE '" . strtolower(CRM_Core_DAO::escapeWildCardString($this->_sortByCharacter)) . "%'";
     }
 
+    // @todo Fatal typo: $campainIds vs $campaignIds.
     $campainIds = $this->get('campaign_id');
     if (!CRM_Utils_System::isNull($campainIds)) {
       if (!is_array($campainIds)) {
+        // @todo Undefined variable $campaignIds, due to fatal typo above.
         $campaignIds = array($campaignIds);
       }
       $clauses[] = '( campaign_id IN ( ' . implode(' , ', array_values($campainIds)) . ' ) )';
@@ -676,6 +682,7 @@ SELECT count(id)
         continue;
       }
 
+      // @todo Unused local variable can be safely removed.
       $classes = array();
       if (isset($link['class'])) {
         $classes = $link['class'];
