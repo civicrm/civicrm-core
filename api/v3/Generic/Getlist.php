@@ -122,8 +122,12 @@ function _civicrm_api3_generic_getList_defaults($entity, &$request) {
  */
 function _civicrm_api3_generic_getlist_params(&$request) {
   $fieldsToReturn = array($request['id_field'], $request['label_field']);
-  !empty($request['image_field']) && $fieldsToReturn[] = $request['image_field'];
-  !empty($request['description_field']) && $fieldsToReturn[] = $request['description_field'];
+  if (!empty($request['image_field'])) {
+    $fieldsToReturn[] = $request['image_field'];
+  }
+  if (!empty($request['description_field'])) {
+    $fieldsToReturn[] = $request['description_field'];
+  }
   $request['params']['options']['return'] = $fieldsToReturn;
 }
 
@@ -139,12 +143,17 @@ function _civicrm_api3_generic_getlist_output($result, $request) {
   $output = array();
   if (!empty($result['values'])) {
     foreach ($result['values'] as $row) {
-      $output[] = array(
+      $data = array(
         'id' => $row[$request['id_field']],
         'label' => $row[$request['label_field']],
-        'description' => isset($request['description_field']) && isset($row[$request['description_field']]) ? $row[$request['description_field']] : NULL,
-        'image' => isset($request['image_field']) && isset($row[$request['image_field']]) ? $row[$request['image_field']] : NULL,
       );
+      if (!empty($request['description_field'])) {
+        $data['description'] = isset($row[$request['description_field']]) ? $row[$request['description_field']] : '';
+      };
+      if (!empty($request['image_field'])) {
+        $data['image'] = isset($row[$request['image_field']]) ? $row[$request['image_field']] : '';
+      };
+      $output[] = $data;
     }
   }
   return $output;
