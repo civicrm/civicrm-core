@@ -94,10 +94,7 @@ class CRM_Admin_Form_Job extends CRM_Admin_Form {
       $attributes['api_action'], TRUE
     );
 
-    $this->add('select', 'run_frequency', ts('Run frequency'),
-      array('Daily' => ts('Daily'), 'Hourly' => ts('Hourly'), 'Always' => ts('Every time cron job is run'))
-    );
-
+    $this->add('select', 'run_frequency', ts('Run frequency'), CRM_Core_SelectValues::getJobFrequency());
 
     $this->add('textarea', 'parameters', ts('Command parameters'),
       "cols=50 rows=6"

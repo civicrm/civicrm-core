@@ -25,7 +25,7 @@
     <required>true</required>
     <comment></comment>
     <pseudoconstant>
-      <callback>CRM_Core_SelectValues::pmf()</callback>
+      <callback>CRM_Core_SelectValues::getExtensionTypes()</callback>
     </pseudoconstant>
     <add>4.2</add>
     <html>
