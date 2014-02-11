@@ -55,7 +55,7 @@
         <tr class="crm-friend-manage-form-block-tf_title">
      <td class="label">{$form.tf_title.label}
          {if $action == 2}
-              {include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_tell_friend' field='title' id=$id}
+              {include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_tell_friend' field='title' id=$friendId}
          {/if}
            </td>
      <td>{$form.tf_title.html}
@@ -64,7 +64,7 @@
         <tr class="crm-friend-manage-form-block-intro">
      <td class="label">{$form.intro.label}
          {if $action == 2}
-              {include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_tell_friend' field='intro' id=$id}
+              {include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_tell_friend' field='intro' id=$friendId}
          {/if}
      </td>
      <td>{$form.intro.html}<br />
@@ -75,7 +75,7 @@
         <tr class="crm-friend-manage-form-block-suggested_message">
      <td class="label">{$form.suggested_message.label}
          {if $action == 2}
-              {include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_tell_friend' field='suggested_message' id=$id}
+              {include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_tell_friend' field='suggested_message' id=$friendId}
          {/if}
      </td>
      <td>{$form.suggested_message.html}<br />
@@ -93,13 +93,13 @@
         <tr class="crm-friend-manage-form-block-thankyou_title">
            <td class="label">{$form.tf_thankyou_title.label}
          {if $action == 2}
-              {include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_tell_friend' field='tf_thankyou_title' id=$id}{/if}</td>
+              {include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_tell_friend' field='thankyou_title' id=$friendId}{/if}</td>
      <td>{$form.tf_thankyou_title.html}</td>
         </tr>
         <tr class="crm-friend-manage-form-block-thankyou_text">
      <td class="label">{$form.tf_thankyou_text.label}
          {if $action == 2}
-              {include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_tell_friend' field='tf_thankyou_text' id=$id}
+              {include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_tell_friend' field='thankyou_text' id=$friendId}
          {/if}
      </td>
      <td>{$form.tf_thankyou_text.html}<br />
