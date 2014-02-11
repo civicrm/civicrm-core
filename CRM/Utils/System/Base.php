@@ -87,6 +87,7 @@ abstract class CRM_Utils_System_Base {
     }
     else {
       print $out;
+      return NULL;
     }
   }
 
@@ -240,6 +241,7 @@ abstract class CRM_Utils_System_Base {
       }
       return $timeZoneOffset;
     }
+    return NULL;
   }
 
   /**
