@@ -3835,6 +3835,27 @@ div.m ul#civicrm-menu,
 .crm-container .select2-dropdown-open .select2-choice .select2-arrow b {
   background-position: -18px 1px;
 }
+/* Style autocomplete results */
+.select2-results table.crm-select2-row,
+.select2-results table.crm-select2-row tbody,
+.select2-results table.crm-select2-row tr,
+.select2-results table.crm-select2-row td {
+  border: 0 none;
+  padding: 0;
+  margin: 0;
+  border-collapse: collapse;
+}
+.select2-results table.crm-select2-row .crm-select2-row-label {
+  font-size: 1.1em;
+}
+.select2-results table.crm-select2-row .crm-select2-row-description {
+  font-size: 0.8em;
+  line-height: 1.5em;
+  color: #696969;
+}
+.select2-results .select2-highlighted table.crm-select2-row .crm-select2-row-description {
+  color: #f0f0f0;
+}
 
 /* Special styling for specific form buttons */
 #crm-container span.crm-button_qf_Main_upload input,

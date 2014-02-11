@@ -128,7 +128,7 @@ function _civicrm_api3_generic_getlist_params(&$request) {
   if (!empty($request['description_field'])) {
     $fieldsToReturn[] = $request['description_field'];
   }
-  $request['params']['options']['return'] = $fieldsToReturn;
+  $request['params']['return'] = $fieldsToReturn;
 }
 
 /**

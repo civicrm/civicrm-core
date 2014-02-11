@@ -276,9 +276,9 @@ CRM.validate = CRM.validate || {
   CRM.utils.formatSelect2Result = function(row) {
     var markup = '<table class="crm-select2-row"><tr>';
     if (row.image !== undefined) {
-      markup += '<td class="crm-select2-row-image"><img src="' + row.image + '"/></td>';
+      markup += '<td class="crm-select2-image"><img src="' + row.image + '"/></td>';
     }
-    markup += '<td class="crm-select2-row-content"><div class="crm-select2-row-label">' + row.label + '</div>';
+    markup += '<td><div class="crm-select2-row-label">' + row.label + '</div>';
     markup += '<div class="crm-select2-row-description">' + (row.description || '') + '</div>';
     markup += '</td></tr></table>';
     return markup;
