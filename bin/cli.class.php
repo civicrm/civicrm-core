@@ -201,7 +201,9 @@ class civicrm_cli {
     chdir($civicrm_root);
     require_once ('civicrm.config.php');
     // autoload
-    require_once $civicrm_root . '/CRM/Core/ClassLoader.php';
+    if ( !class_exists('CRM_Core_ClassLoader') ) {
+      require_once $civicrm_root . '/CRM/Core/ClassLoader.php';
+    }
     CRM_Core_ClassLoader::singleton()->register();
 
     $this->_config = CRM_Core_Config::singleton();
