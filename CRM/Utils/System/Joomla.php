@@ -456,6 +456,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
     require_once 'DB.php';
 
     $config = CRM_Core_Config::singleton();
+    $user = NULL;
 
     if ($loadCMSBootstrap) {
       $bootStrapParams = array();
@@ -471,41 +472,77 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
     jimport('joomla.application.component.helper');
     jimport('joomla.database.table');
 
-    $JUserTable = JTable::getInstance('User', 'JTable');
-
-    $db = $JUserTable->getDbo();
-    $query = $db->getQuery(TRUE);
-    $query->select('id, username, email, password');
-    $query->from($JUserTable->getTableName());
-    $query->where('(LOWER(username) = LOWER(\'' . $name . '\')) AND (block = 0)');
-    $db->setQuery($query, 0, 0);
-    $users = $db->loadAssocList();
-
-    $row = array();;
-    if (count($users)) {
-      $row = $users[0];
+    if ( !defined('JVERSION') ) {
+      $joomlaBase = dirname(dirname(dirname(dirname(dirname(dirname(dirname(dirname(__FILE__))))))));
+      require $joomlaBase . '/libraries/cms/version/version.php';
+      $jversion = new JVersion;
+      define('JVERSION', $jversion->getShortVersion());
     }
 
-    $user = NULL;
+    if ( version_compare(JVERSION, '2.5.18', 'lt') ||
+      ( version_compare(JVERSION, '3.0', 'ge') && version_compare(JVERSION, '3.2.2', 'lt') )
+    ) {
+      //old method for authenticating
+      $JUserTable = JTable::getInstance('User', 'JTable');
+
+      $db = $JUserTable->getDbo();
+      $query = $db->getQuery(TRUE);
+      $query->select('id, username, email, password');
+      $query->from($JUserTable->getTableName());
+      $query->where('(LOWER(username) = LOWER(\'' . $name . '\')) AND (block = 0)');
+      $db->setQuery($query, 0, 0);
+      $users = $db->loadAssocList();
+
+      $row = array();;
+      if (count($users)) {
+        $row = $users[0];
+      }
+
+      if (!empty($row)) {
+        $dbPassword = CRM_Utils_Array::value('password', $row);
+        $dbId = CRM_Utils_Array::value('id', $row);
+        $dbEmail = CRM_Utils_Array::value('email', $row);
+
+        // now check password
+        if (strpos($dbPassword, ':') === FALSE) {
+          if ($dbPassword != md5($password)) {
+            return FALSE;
+          }
+        }
+        else {
+          list($hash, $salt) = explode(':', $dbPassword);
+          $cryptpass = md5($password . $salt);
+          if ($hash != $cryptpass) {
+            return FALSE;
+          }
+        }
+      }
+    }
+    else {
+      //new authentication method (J2.5.18/3.2.2 and greater)
+      // Get a database object
+      $db = JFactory::getDbo();
+      $query = $db->getQuery(TRUE);
+
+      $query->select('id, password');
+      $query->from('#__users');
+      $query->where('username='.$db->quote($name));
+
+      $db->setQuery( $query );
+      $result = $db->loadObject();
+
+      if ($result) {
+        $match = JUserHelper::verifyPassword($password, $result->password, $result->id);
+
+        if ($match === TRUE) {
+          $jUser = JUser::getInstance($result->id); // Bring this in line with the rest of the system
+          $dbId = $row['id'] = $result->id;
+          $dbEmail = $row['email'] = $jUser->email;
+        }
+      }
+    }
+
     if (!empty($row)) {
-      $dbPassword = CRM_Utils_Array::value('password', $row);
-      $dbId       = CRM_Utils_Array::value('id', $row);
-      $dbEmail    = CRM_Utils_Array::value('email', $row);
-
-      // now check password
-      if (strpos($dbPassword, ':') === FALSE) {
-        if ($dbPassword != md5($password)) {
-          return FALSE;
-        }
-      }
-      else {
-        list($hash, $salt) = explode(':', $dbPassword);
-        $cryptpass = md5($password . $salt);
-        if ($hash != $cryptpass) {
-          return FALSE;
-        }
-      }
-
       CRM_Core_BAO_UFMatch::synchronizeUFMatch($user, $dbId, $dbEmail, 'Joomla');
       $contactID = CRM_Core_BAO_UFMatch::getContactId($dbId);
       if (!$contactID) {
