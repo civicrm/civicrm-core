@@ -520,12 +520,7 @@ class CRM_Activity_BAO_Query {
       CRM_Campaign_BAO_Campaign::accessCampaign()
     ) {
       $buildEngagementLevel = TRUE;
-      $form->add('select', 'activity_engagement_level',
-        ts('Engagement Index'),
-        array('' => ts('- any -')) + CRM_Campaign_PseudoConstant::engagementLevel(),
-        FALSE,
-        array('class' => 'crm-select2')
-      );
+      $form->addSelect('activity_engagement_level', array('entity' => 'activity', 'option_url' => NULL));
 
       // Add survey result field.
       $optionGroups  = CRM_Campaign_BAO_Survey::getResultSets( 'name' );

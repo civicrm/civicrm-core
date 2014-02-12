@@ -771,7 +771,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
     $sourceContactField = $this->addEntityRef(
       'source_contact_id',
       $this->_fields['source_contact_id']['label'],
-      array('class' => 'huge'),
+      array(),
       TRUE
     );
     // Only admins and case-workers can change the activity source

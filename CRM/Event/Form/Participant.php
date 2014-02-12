@@ -910,12 +910,7 @@ loadCampaign( {$this->_eID}, {$eventCampaigns} );
     $this->assign('notificationStatusIds', $notificationStatusIds);
 
     $this->_participantStatuses = CRM_Event_PseudoConstant::participantStatus(NULL, NULL, 'label');
-    $this->add('select', 'status_id', ts('Participant Status'),
-      array(
-        '' => ts('- select -')) + $this->_participantStatuses,
-      TRUE,
-      $checkCancelledJs
-    );
+    $this->addSelect('status_id', $checkCancelledJs, TRUE);
 
     $this->addElement('checkbox', 'is_notify', ts('Send Notification'), NULL);
 

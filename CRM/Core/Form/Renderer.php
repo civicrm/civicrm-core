@@ -179,7 +179,10 @@ class CRM_Core_Form_Renderer extends HTML_QuickForm_Renderer_ArraySmarty {
     if ($type == 'select' && $element->getAttribute('multiple')) {
       $type = 'multiselect';
     }
-    $class = ($class ? "$class " : '') . 'crm-form-' . $type;
+    // Add widget-specific class
+    if (!$class || strpos($class, 'crm-form-') === FALSE) {
+      $class = ($class ? "$class " : '') . 'crm-form-' . $type;
+    }
 
     if ($required) {
       $class .= ' required';

@@ -908,22 +908,25 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * Adds a select based on field metadata
    * TODO: This could be even more generic and widget type (select in this case) could also be read from metadata
    * Perhaps a method like $form->bind($name) which would look up all metadata for named field
-   * @param CRM_Core_DAO $baoName - string representing bao object
-   * @param $name
-   * @param array $props
+   * @param $name - field name to go on the form
+   * @param array $props - mix of html attributes and special properties, namely
+   *   - entity (api entity name, can usually be inferred automatically from the form class)
+   *   - field (field name - only needed if different from name used on the form)
+   *   - option_url - path to edit this option list - usually retrieved automatically - set to NULL to disable link
+   *   - placeholder - set to NULL to disable
    * @param bool $required
    * @throws CRM_Core_Exception
    * @return HTML_QuickForm_Element
    */
   function addSelect($name, $props = array(), $required = FALSE) {
-    if (!isset($props['data-api-entity'])) {
-      $props['data-api-entity'] = CRM_Utils_Api::getEntityName($this);
+    if (!isset($props['entity'])) {
+      $props['entity'] = CRM_Utils_Api::getEntityName($this);
     }
-    if (!isset($props['data-api-field'])) {
-      $props['data-api-field'] = strrpos($name, '[') ? rtrim(substr($name, 1 + strrpos($name, '[')), ']') : $name;
+    if (!isset($props['field'])) {
+      $props['field'] = strrpos($name, '[') ? rtrim(substr($name, 1 + strrpos($name, '[')), ']') : $name;
     }
-    $info = civicrm_api3($props['data-api-entity'], 'getoptions', array(
-        'field' => $props['data-api-field'],
+    $info = civicrm_api3($props['entity'], 'getoptions', array(
+        'field' => $props['field'],
         'options' => array('metadata' => array('fields'))
       )
     );
@@ -939,25 +942,26 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       list(, $id) = explode('_', $name);
       $label = isset($props['label']) ? $props['label'] : CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomField', 'label', $id);
       $gid = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomField', 'option_group_id', $id);
-      $props['data-option-group-url'] = 'civicrm/admin/options/' . CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup', $gid);
+      $props['data-option-group-url'] = array_key_exists('option_url', $props) ? $props['option_url'] : 'civicrm/admin/options/' . CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup', $gid);
     }
     // Core field
     else {
       foreach($info['metadata']['fields'] as $uniqueName => $fieldSpec) {
         if (
-          $uniqueName === $props['data-api-field'] ||
-          CRM_Utils_Array::value('name', $fieldSpec) === $props['data-api-field'] ||
-          in_array($props['data-api-field'], CRM_Utils_Array::value('api.aliases', $fieldSpec, array()))
+          $uniqueName === $props['field'] ||
+          CRM_Utils_Array::value('name', $fieldSpec) === $props['field'] ||
+          in_array($props['field'], CRM_Utils_Array::value('api.aliases', $fieldSpec, array()))
         ) {
           break;
         }
       }
       $label = isset($props['label']) ? $props['label'] : $fieldSpec['title'];
-      $props['data-option-group-url'] = CRM_Core_PseudoConstant::getOptionEditUrl($fieldSpec);
+      $props['data-option-group-url'] = array_key_exists('option_url', $props) ? $props['option_url'] : $props['data-option-group-url'] = CRM_Core_PseudoConstant::getOptionEditUrl($fieldSpec);
     }
-    $props['class'] = isset($props['class']) ? $props['class'] . ' ' : '';
-    $props['class'] .= "crm-select2";
-    CRM_Utils_Array::remove($props, 'label');
+    $props['class'] = (isset($props['class']) ? $props['class'] . ' ' : '') . "crm-select2";
+    $props['data-api-entity'] = $props['entity'];
+    $props['data-api-field'] = $props['field'];
+    CRM_Utils_Array::remove($props, 'label', 'entity', 'field', 'option_url');
     return $this->add('select', $name, $label, $options, $required, $props);
   }
 
@@ -1252,13 +1256,8 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * @param string $label
    * @param array $props mix of html and widget properties, including:
    *  - select - params to give to select2 widget
-   *  - api - array of settings for the api:
-   *     - "entity" - defaults to contact
-   *     - "action" - defaults to get (getquick when entity is contact)
-   *     - "params" - additional params to pass to the api
-   *     - "key"    - what to store as this field's value - defaults to "id"
-   *     - "label"  - what to show to the user - defaults to "label"
-   *     - "search" - rarely used - only needed if search field is different from label field
+   *  - entity - defaults to contact
+   *  - api - array of settings for the getlist api
    *  - placeholder - string
    *  - multiple - bool
    *  - class, etc. - other html properties
@@ -1266,23 +1265,12 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * @return HTML_QuickForm_Element
    */
   function addEntityRef($name, $label, $props = array(), $required = FALSE) {
+    // Default properties
     $props['api'] = CRM_Utils_Array::value('api', $props, array());
-    // Merge in defaults for api params
-    $props['api'] += array(
-      'entity' => 'contact',
-      'key' => 'id',
-    );
-    $props['api'] += array(
-      'action' => $props['api']['entity'] == 'contact' ? 'getquick' : 'get',
-      'label' => $props['api']['entity'] == 'contact' ? 'data' : 'label',
-    );
-    // this can be ommitted for normal apis since search field is usually the same as label field. But getquick is bizarre.
-    $props['api'] += array(
-      'search' => $props['api']['entity'] == 'contact' ? 'name' : $props['api']['label'],
-    );
+    $props['entity'] = CRM_Utils_Array::value('entity', $props, 'contact');
 
     $props['class'] = isset($props['class']) ? $props['class'] . ' ' : '';
-    $props['class'] .= "crm-select2 crm-{$props['api']['entity']}-ref-field";
+    $props['class'] .= "crm-select2 crm-form-entityref";
 
     $props['select'] = CRM_Utils_Array::value('select', $props, array()) + array(
       'minimumInputLength' => 1,
@@ -1304,8 +1292,9 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    */
   private function formatReferenceFieldAttributes(&$props) {
     $props['data-select-params'] = json_encode($props['select']);
-    $props['data-api-params'] = json_encode($props['api']);
-    CRM_Utils_Array::remove($props, 'multiple', 'select', 'api', 'placeholder');
+    $props['data-api-params'] = $props['api'] ? json_encode($props['api']) : NULL;
+    $props['data-api-entity'] = $props['entity'];
+    CRM_Utils_Array::remove($props, 'multiple', 'select', 'api', 'entity', 'placeholder');
   }
 
   /**
@@ -1322,29 +1311,23 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       }
       if ($val) {
         $data = array();
-        $api = json_decode($field->getAttribute('data-api-params'), TRUE);
+        $entity = $field->getAttribute('data-api-entity');
         $select = json_decode($field->getAttribute('data-select-params'), TRUE);
         // Support serialized values
         if (strpos($val, CRM_Core_DAO::VALUE_SEPARATOR) !== FALSE) {
           $val = str_replace(CRM_Core_DAO::VALUE_SEPARATOR, ',', trim($val, CRM_Core_DAO::VALUE_SEPARATOR));
           $field->setValue($val);
         }
-        // TODO: we could fetch multiple values with array(IN => $val) but not all apis support this
-        foreach (explode(',', $val) as $v) {
-          $result = civicrm_api3($api['entity'], $api['action'], array('sequential' => 1, $api['key'] => $v));
-          if (!empty($result['values'])) {
-            $data[] = array('id' => $v, 'text' => $result['values'][0][$api['label']]);
-          }
-        }
+        $result = civicrm_api3($entity, 'getlist', array('params' => array('id' => $val)));
         if ($field->isFrozen()) {
           $field->removeAttribute('class');
         }
-        if ($data) {
+        if (!empty($result['values'])) {
           // Simplify array for single selects - makes client-side code simpler (but feels somehow wrong)
           if (empty($select['multiple'])) {
-            $data = $data[0];
+            $result['values'] = $result['values'][0];
           }
-          $field->setAttribute('data-entity-value', json_encode($data));
+          $field->setAttribute('data-entity-value', json_encode($result['values']));
         }
       }
     }
