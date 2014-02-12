@@ -763,12 +763,12 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
         $selectAttributes['multiple'] = 'multiple';
       }
     }
-    // Add popup link for editing options. Normally this is handled by CRM_Core_Form->addSelect
+    // Add data so popup link. Normally this is handled by CRM_Core_Form->addSelect
     if (in_array($field->html_type, array('Select', 'Multi-Select')) && !$search && CRM_Core_Permission::check('administer CiviCRM')) {
       $selectAttributes += array(
         'data-api-entity' => 'contact', // FIXME: This works because the getoptions api isn't picky about custom fields, but it's WRONG
         'data-api-field' => 'custom_' . $field->id,
-        'data-option-group-url' => 'civicrm/admin/options/' . CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup', $field->option_group_id),
+        'data-option-edit-path' => 'civicrm/admin/options/' . CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup', $field->option_group_id),
       );
     }
 
