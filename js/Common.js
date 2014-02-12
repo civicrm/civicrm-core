@@ -269,7 +269,7 @@ CRM.validate = CRM.validate || {
         var selected = ($.inArray(''+option.key, val) > -1) ? 'selected="selected"' : '';
         $elect.append('<option value="' + option.key + '"' + selected + '>' + option.value + '</option>');
       });
-      $elect.trigger('change');
+      $elect.trigger('crmOptionsUpdated').trigger('change');
     });
   };
 
@@ -961,15 +961,19 @@ CRM.validate = CRM.validate || {
         }
       })
 
-      .on('click', 'a.crm-edit-optionvalue-link', function() {
-        var url = $(this).data('option-group-url');
-        CRM.loadForm(CRM.url(url, {reset: 1}), {openInline: 'a:not("[href=#], .no-popup")'})
+      .on('click', 'a.crm-option-edit-link', function() {
+        var link = $(this);
+        CRM.loadForm(this.href, {openInline: 'a:not("[href=#], .no-popup")'})
+          // Lots of things can happen once the form opens, this is the only event we can really rely on
           .on('dialogclose', function() {
-            var $elects = $('select[data-option-group-url="' + url + '"]');
-            CRM.api3($elects.data('api-entity'), 'getoptions', {sequential: 1, field: $elects.data('api-field')})
-              .done(function(data) {
-                CRM.utils.setOptions($elects, data.values);
-              });
+            link.trigger('crmOptionsEdited');
+            var $elects = $('select[data-option-edit-path="' + link.data('option-edit-path') + '"]');
+            if ($elects.data('api-entity') && $elects.data('api-field')) {
+              CRM.api3($elects.data('api-entity'), 'getoptions', {sequential: 1, field: $elects.data('api-field')})
+                .done(function(data) {
+                  CRM.utils.setOptions($elects, data.values);
+                });
+            }
           });
         return false;
       })
