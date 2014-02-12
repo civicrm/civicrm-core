@@ -52,8 +52,8 @@
       </tr>
 
       <tr class="crm-membership-type-form-block-member_org">
-        <td class="label">{$form.member_of_contact.label}</td>
-        <td><label>{$form.member_of_contact.html}</label><br />
+        <td class="label">{$form.member_of_contact_id.label}</td>
+        <td>{$form.member_of_contact_id.html}<br />
           <span class="description">{ts}Members assigned this membership type belong to which organization (e.g. this is for membership in 'Save the Whales - Northwest Chapter'). NOTE: This organization/group/chapter must exist as a CiviCRM Organization type contact.{/ts}</span>
         </td>
       </tr>
@@ -160,40 +160,6 @@
 {literal}
 <script type="text/javascript">
 cj(function(){
-  // start of member org autocomplete
-  var orgDataUrl = "{/literal}{$dataUrl}{literal}";
-  var hintText = "{/literal}{ts escape='js'}Type in a partial or complete name of an existing contact.{/ts}{literal}";
-  cj('#member_of_contact').autocomplete( orgDataUrl,
-    { width : 200, selectFirst : false, hintText: hintText, matchContains: true, minChars: 1, max: {/literal}{crmSetting name="search_autocomplete_count" group="Search Preferences"}{literal}
-  }).result(
-    function(event, data, formatted) {
-      ( parseInt( data[1] ) ) ? cj( "#member_of_contact_id" ).val( data[1] ) : cj( "#member_of_contact_id" ).val('');
-    }).bind('click', function( ) {
-      cj('#member_of_contact_id').val('');
-    });
-
-  {/literal}
-  {if $member_org}
-    {literal} cj('#member_of_contact').val( "{/literal}{$member_org}{literal}");{/literal}
-  {/if}
-
-  {* setdefault in edit mode *}
-  {if $action eq 2}
-    var memberOrgId = "{$member_org_id}";
-    {literal}
-    var dataUrl = "{/literal}{crmURL p='civicrm/ajax/rest' h=0
-    q="className=CRM_Contact_Page_AJAX&fnName=getContactList&json=1&context=contact&org=1&id=" }{literal}" + memberOrgId;
-
-    cj.ajax({
-      url     : dataUrl,
-      success : function(html){
-        htmlText = html.split( '|' , 2);
-        cj('input#member_of_contact').val(htmlText[0]);
-      }
-    });
-  {/literal}{/if}{literal}
-  // end of member org autocomplete
-
   showHidePeriodSettings();
   cj('#duration_unit').change(function(){
     showHidePeriodSettings();
