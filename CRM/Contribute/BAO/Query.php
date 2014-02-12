@@ -757,10 +757,8 @@ class CRM_Contribute_BAO_Query {
     );
 
     // CRM-13848
-    $form->add('select', 'financial_type_id',
-      ts('Financial Type'),
-      CRM_Contribute_PseudoConstant::financialType(), FALSE,
-        array('id' => 'financial_type_id', 'multiple' => 'multiple', 'class' => 'crm-select2')
+    $form->addSelect('financial_type_id',
+      array('entity' => 'contribution', 'multiple' => 'multiple', 'option_url' => NULL, 'placeholder' => ts('- any -'))
     );
 
     $form->add('select', 'contribution_page_id',
@@ -809,7 +807,7 @@ class CRM_Contribute_BAO_Query {
 
     // Recurring contribution fields
     foreach (self::getRecurringFields() as $key => $label) {
-      CRM_Core_Form_Date::buildDateRange($form, $key, 1, '_low', '_high', $label, FALSE);
+      CRM_Core_Form_Date::buildDateRange($form, $key, 1, '_low', '_high');
       // If data has been entered for a recurring field, tell the tpl layer to open the pane
       if (!empty($form->_formValues[$key . '_relative']) || !empty($form->_formValues[$key . '_low']) || !empty($form->_formValues[$key . '_high'])) {
         $form->assign('contribution_recur_pane_open', TRUE);

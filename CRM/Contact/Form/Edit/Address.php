@@ -70,7 +70,7 @@ class CRM_Contact_Form_Edit_Address {
       $js = array('onChange' => 'checkLocation( this.id );');
     }
 
-    $form->addSelect("address[$blockId][location_type_id]", array('data-api-entity' => 'address', 'class' => 'eight') + $js);
+    $form->addSelect("address[$blockId][location_type_id]", array('entity' => 'address', 'class' => 'eight') + $js);
 
     if (!$inlineEdit) {
       $js = array('id' => 'Address_' . $blockId . '_IsPrimary', 'onClick' => 'singleSelect( this.id );');
@@ -172,7 +172,7 @@ class CRM_Contact_Form_Edit_Address {
               $selectOptions = array('' => ts('- select -')) + CRM_Core_PseudoConstant::countyForState($form->getSubmitValue("address[{$blockId}][state_province_id]"));
             }
             elseif ($form->getSubmitValue("address[{$blockId}][county_id]")) {
-              $selectOptions = array('' => ts('- select a state -')) + CRM_Core_PseudoConstant::county();
+              $selectOptions = array('' => ts('- select -')) + CRM_Core_PseudoConstant::county();
             }
             else {
               $selectOptions = array('' => ts('- select a state -'));

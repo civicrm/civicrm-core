@@ -30,13 +30,16 @@
     function chainSelect(e) {
       var info = $(this).data('chainSelect');
       var val = info.target.val();
+      var multiple = info.target.attr('multiple');
       var placeholder = $(this).val() ? "{/literal}{ts escape='js'}Loading{/ts}{literal}..." : info.placeholder;
-      info.target.html('<option value="">' + placeholder + '</option>');
+      !multiple && info.target.html('<option value="">' + placeholder + '</option>');
       if ($(this).val()) {
         $.getJSON(info.callback, {_value: $(this).val()}, function(data) {
           var options = '';
           $.each(data, function() {
-            options += '<option value="' + this.value + '">' + this.name + '</option>';
+            if (!multiple || this.value) {
+              options += '<option value="' + this.value + '">' + this.name + '</option>';
+            }
           });
           info.target.html(options).val(val).trigger('change');
         });

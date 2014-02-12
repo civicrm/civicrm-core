@@ -111,13 +111,12 @@
   </table>
     {/if}
 
-    {if $form.organization}
+    {if $form.organization_id}
   <h3>{ts}Associated Organization{/ts} {help id="id-group-organization" file="CRM/Group/Page/Group.hlp"}</h3>
           <table class="form-layout-compressed">
         <tr class="crm-group-form-block-organization">
-            <td class="label">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{$form.organization.label}</td>
-      <td>{$form.organization.html|crmAddClass:huge}
-          <div id="organization_address" style="font-size:10px">{$organizationName}</div>
+            <td class="label">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{$form.organization_id.label}</td>
+      <td>{$form.organization_id.html|crmAddClass:huge}
       </td>
         </tr>
     </table>
@@ -151,15 +150,6 @@ cj('input[type=checkbox][name="group_type[{/literal}{$freezeMailignList}{literal
 cj('input[type=checkbox][name="group_type[{/literal}{$hideMailignList}{literal}]"]').hide();
 cj('label[for="group_type[{/literal}{$hideMailignList}{literal}]"]').hide();
 {/literal}{/if}{literal}
-
-var dataUrl = "{/literal}{crmURL p='civicrm/ajax/rest' q='className=CRM_Contact_Page_AJAX&fnName=getContactList&json=1&org=1&context=groupcontact' h=0 }{literal}";
-cj('#organization').val(cj('#organization_address').text()).autocomplete( dataUrl, {
-              width : 250, selectFirst : false, matchContains: true
-              }).result( function(event, data, formatted) {
-                                                       cj( "#organization_id" ).val( data[1] );
-                                                       htmlDiv = data[0].replace( /::/gi, ' ');
-                                                       cj('div#organization_address').html(htmlDiv);
-                  });
 </script>
 {/literal}
 </div>

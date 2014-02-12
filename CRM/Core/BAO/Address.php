@@ -1195,6 +1195,10 @@ SELECT is_primary,
           $params['condition'] = 'state_province_id IN (' . implode(',', (array) $props['state_province_id']) . ')';
         }
         break;
+      // Not a real field in this entity
+      case 'world_region':
+        return CRM_Core_PseudoConstant::worldRegion();
+        break;
     }
     return CRM_Core_PseudoConstant::get(__CLASS__, $fieldName, $params, $context);
   }

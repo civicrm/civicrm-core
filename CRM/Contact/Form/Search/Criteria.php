@@ -256,7 +256,7 @@ class CRM_Contact_Form_Search_Criteria {
     $form->addGroup($commPreff, 'preferred_communication_method', ts('Preferred Communication Method'));
 
     //CRM-6138 Preferred Language
-    $form->add('select', 'preferred_language', ts('Preferred Language'), array('' => ts('- any -')) + CRM_Contact_BAO_Contact::buildOptions('preferred_language'), FALSE, array('class' => 'crm-select2'));
+    $form->addSelect('preferred_language', array('class' => 'twenty', 'option_url' => NULL));
 
     // Phone search
     $form->addElement('text', 'phone_numeric', ts('Phone Number'), CRM_Core_DAO::getAttribute('CRM_Core_DAO_Phone', 'phone'));
@@ -377,8 +377,8 @@ class CRM_Contact_Form_Search_Criteria {
     // is there another form rule that does decimals besides money ? ...
     $form->addRule('prox_distance', ts('Please enter positive number as a distance'), 'numeric');
 
-    $worldRegions = array('' => ts('- any region -')) + CRM_Core_PseudoConstant::worldRegion();
-    $form->add('select', 'world_region', ts('World Region'), $worldRegions, FALSE, array('class' => 'crm-select2'));
+    $worldRegions = array('' => '') + CRM_Core_PseudoConstant::worldRegion();
+    $form->addSelect('world_region', array('entity' => 'address', 'placeholder' => ts('- any -'), 'option_url' => NULL));
 
     // checkboxes for location type
     $location_type = array();
