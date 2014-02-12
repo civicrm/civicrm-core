@@ -174,25 +174,8 @@ class CRM_Group_Form_Edit extends CRM_Core_Form {
         }
       }
 
-      if (CRM_Core_Permission::check('administer Multiple Organizations') &&
-        CRM_Core_Permission::isMultisiteEnabled()
-      ) {
+      if (CRM_Core_Permission::check('administer Multiple Organizations') && CRM_Core_Permission::isMultisiteEnabled()) {
         CRM_Contact_BAO_GroupOrganization::retrieve($this->_id, $defaults);
-
-        if (!empty($defaults['group_organization'])) {
-          //used in edit mode
-          $this->_groupOrganizationID = $defaults['group_organization'];
-        }
-        if (!empty($defaults['organization_id'])) {
-          $result = civicrm_api3('contact', 'getquick', array(
-            'org' => 1,
-            'id' => $defaults['organization_id']
-          ));
-          $this->assign('organizationName', $result['values'][0]['data']);
-        }
-        else {
-          $this->assign('organizationName', '');
-        }
       }
     }
 
@@ -314,15 +297,10 @@ class CRM_Group_Form_Edit extends CRM_Core_Form {
       }
       $this->add('select', 'parents', ts('Add Parent'), $parentGroupSelectValues, $required);
     }
-    if (CRM_Core_Permission::check('administer Multiple Organizations') &&
-      CRM_Core_Permission::isMultisiteEnabled()
-    ) {
+    if (CRM_Core_Permission::check('administer Multiple Organizations') && CRM_Core_Permission::isMultisiteEnabled()) {
       //group organization Element
-      $groupOrgDataURL = CRM_Utils_System::url('civicrm/ajax/search', 'org=1', FALSE, NULL, FALSE);
-      $this->assign('groupOrgDataURL', $groupOrgDataURL);
-
-      $this->addElement('text', 'organization', ts('Organization'), '');
-      $this->addElement('hidden', 'organization_id', '', array('id' => 'organization_id'));
+      $props = array('api' => array('params' => array('contact_type' => 'Organization')));
+      $this->addEntityRef('organization_id', ts('Organization'), $props);
     }
 
     // is_reserved property CRM-9936
