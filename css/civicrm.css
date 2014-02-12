@@ -171,7 +171,8 @@ div.crm-container fieldset label{
 .crm-container .big {
   width: 15em;
 }
-.crm-container .huge {
+.crm-container .huge,
+input.crm-form-entityref {
   width: 25em;
 }
 .crm-container .huge40 {
