@@ -106,6 +106,13 @@ class CRM_Admin_Form_Preferences_Mailing extends CRM_Admin_Form_Preferences {
           'weight' => 9,
           'description' => ts('Don\'t check for presence of mandatory tokens (domain address; unsubscribe/opt-out) before sending mailings. WARNING: Mandatory tokens are a safe-guard which facilitate compliance with the US CAN-SPAM Act. They should only be disabled if your organization adopts other mechanisms for compliance or if your organization is not subject to CAN-SPAM.'),
         ),
+        'dedupe_email_default' =>          
+        array(
+          'html_type' => 'checkbox',
+          'title' => ts('CiviMail dedupes e-mail addresses by default'),
+          'weight' => 10,
+          'description' => NULL,
+        ),
       ),
     );
 
