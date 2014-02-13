@@ -63,7 +63,7 @@
      <required>true</required>
      <comment>Controls location of data storage in extended_data table.</comment>
      <pseudoconstant>
-       <callback>CRM_Core_BAO_CustomField::dataType()</callback>
+       <callback>CRM_Core_BAO_CustomField::dataType</callback>
      </pseudoconstant>
      <add>1.1</add>
      <html>
@@ -77,7 +77,7 @@
      <required>true</required>
      <comment>HTML types plus several built-in extended types.</comment>
      <pseudoconstant>
-       <callback>CRM_Core_BAO_CustomField::dataToHtml()</callback>
+       <callback>CRM_Core_BAO_CustomField::dataToHtml</callback>
      </pseudoconstant>
      <add>1.1</add>
   </field>

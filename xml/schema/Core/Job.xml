@@ -38,7 +38,7 @@
        <default>"Daily"</default>
        <comment>Scheduled job run frequency.</comment>
        <pseudoconstant>
-         <callback>CRM_Core_SelectValues::getJobFrequency()</callback>
+         <callback>CRM_Core_SelectValues::getJobFrequency</callback>
        </pseudoconstant>
        <add>4.1</add>
        <html>

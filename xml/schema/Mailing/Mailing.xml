@@ -303,7 +303,7 @@
        <default>'User and User Admin Only'</default>
        <comment>In what context(s) is the mailing contents visible (online viewing)</comment>
        <pseudoconstant>
-         <callback>CRM_Core_SelectValues::ufVisibility(true)</callback>
+         <callback>CRM_Core_SelectValues::groupVisibility</callback>
        </pseudoconstant>
        <add>3.3</add>
        <html>

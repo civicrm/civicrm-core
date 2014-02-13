@@ -114,7 +114,7 @@
        <default>'User and User Admin Only'</default>
        <comment>In what context(s) is this field visible.</comment>
        <pseudoconstant>
-         <callback>CRM_Core_SelectValues::ufVisibility()</callback>
+         <callback>CRM_Core_SelectValues::ufVisibility</callback>
        </pseudoconstant>
        <add>1.1</add>
        <html>
