@@ -26,6 +26,9 @@
        <type>varchar</type>
        <length>12</length>
        <comment>Type of Component.</comment>
+       <pseudoconstant>
+         <callback>CRM_Core_SelectValues::mailingComponents</callback>
+       </pseudoconstant>
        <html>
          <type>Select</type>
        </html>

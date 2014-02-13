@@ -574,9 +574,7 @@ class CRM_Report_Form extends CRM_Core_Form {
                     break;
                   default:
                     if ($daoOrBaoName &&
-                      (array_key_exists('pseudoconstant', $this->_columns[$tableName][$fieldGrp][$fieldName])
-                        || array_key_exists('enumValues', $this->_columns[$tableName][$fieldGrp][$fieldName]))
-                    ) {
+                      array_key_exists('pseudoconstant', $this->_columns[$tableName][$fieldGrp][$fieldName])) {
                       // with multiple options operator-type is generally multi-select
                       $this->_columns[$tableName][$fieldGrp][$fieldName]['operatorType'] = CRM_Report_Form::OP_MULTISELECT;
                       if (!array_key_exists('options', $this->_columns[$tableName][$fieldGrp][$fieldName])) {

@@ -1677,7 +1677,7 @@ function _civicrm_api3_validate_string(&$params, &$fieldName, &$fieldInfo, $enti
         throw new Exception("Currency not a valid code: $value");
       }
     }
-    if (!empty($fieldInfo['pseudoconstant']) || !empty($fieldInfo['options']) || !empty($fieldInfo['enumValues'])) {
+    if (!empty($fieldInfo['pseudoconstant']) || !empty($fieldInfo['options'])) {
       _civicrm_api3_api_match_pseudoconstant($params, $entity, $fieldName, $fieldInfo);
     }
     // Check our field length
