@@ -280,6 +280,7 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
       'case_type',
       'payment_instrument',
       'communication_style',
+      'soft_credit_type',
     );
 
     if (in_array($this->_gName, $showIsDefaultGroups)) {
