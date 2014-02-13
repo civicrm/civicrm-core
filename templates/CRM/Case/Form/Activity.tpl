@@ -81,7 +81,7 @@
       <tr class="crm-case-activity-form-block-target_contact_id hide-block" id="with-contacts-widget">
         <td class="label font-size10pt">{ts}With Contact{/ts}</td>
         <td class="view-value">
-          {include file="CRM/Contact/Form/NewContact.tpl" noLabel=true skipBreak=true multiClient=true}
+          {$form.target_contact_id.html}
           <br/>
           <a href="#" class="crm-with-contact">
             &raquo; {if not $multiClient}{ts}With client{/ts}{else}{ts}With client(s){/ts}{/if}
@@ -96,10 +96,10 @@
     </tr>
     <tr class="crm-case-activity-form-block-source_contact_id">
       <td class="label">{$form.source_contact_id.label}</td>
-      <td class="view-value"> {if $admin}{$form.source_contact_id.html}{/if}</td>
+      <td class="view-value">{$form.source_contact_id.html}</td>
     </tr>
     <tr class="crm-case-activity-form-block-assignee_contact_id">
-      <td class="label">{ts}Assigned To{/ts}</td>
+      <td class="label">{$form.assignee_contact_id.label}</td>
       <td>{$form.assignee_contact_id.html}<br />
         {edit}
           <span class="description">
@@ -279,6 +279,7 @@
         cj('.crm-with-contact').click(function(){
           cj('#with-contacts-widget').toggle();
           cj('#with-clients').toggle();
+          return false;
         });
       });
     </script>
