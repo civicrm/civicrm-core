@@ -963,5 +963,69 @@ class CRM_Core_SelectValues {
 
     return $jobFrequency;
   }
+
+  /**
+   * Search builder operators
+   */
+  static function getSearchBuilderOperators() {
+    static $searchBuilderOperators = NULL;
+    if (!$searchBuilderOperators) {
+      $searchBuilderOperators = array(
+        '=' => '=',
+        '!=' => '≠',
+        '>' => '>',
+        '<' => '<',
+        '>=' => '≥',
+        '<=' => '≤',
+        'IN' => ts('In'),
+        'LIKE' => ts('Like'),
+        'RLIKE' => ts('Regex'),
+        'IS EMPTY' => ts('Is Empty'),
+        'IS NOT EMPTY' => ts('Not Empty'),
+        'IS NULL' => ts('Is Null'),
+        'IS NOT NULL' => ts('Not Null'),
+      );
+    }
+
+    return $searchBuilderOperators;
+  }
+
+  /**
+   * profile group types
+   *
+   * @static
+   */
+  static function getProfileGroupType() {
+    static $profileGroupType = NULL;
+    if (!$profileGroupType) {
+      $profileGroupType = array(
+        'Activity' => ts('Activities'),
+        'Contribution' => ts('Contributions'),
+        'Membership' => ts('Memberships'),
+        'Participant' => ts('Participants'),
+      );
+      $contactTypes = self::contactType();
+      $contactTypes       = !empty($contactTypes) ? array('Contact' => 'Contacts') + $contactTypes : array();
+      $profileGroupType = array_merge($contactTypes, $profileGroupType );
+    }
+    return $profileGroupType;
+  }
+
+
+  /**
+   * word replacement match type
+   */
+  static function getWordReplacementMatchType() {
+    static $wordReplacementMatchType = NULL;
+    if (!$wordReplacementMatchType) {
+      $wordReplacementMatchType = array(
+        'exactMatch' => ts('Exact Match'),
+        'wildcardMatch' => ts('Wildcard Match'),
+      );
+    }
+
+    return $jobFrequency;
+  }
+
 }
 

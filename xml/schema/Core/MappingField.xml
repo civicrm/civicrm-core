@@ -141,6 +141,9 @@
        <length>16</length>
        <type>enum</type>
        <comment>SQL WHERE operator for search-builder mapping fields (search criteria).</comment>
+       <pseudoconstant>
+         <callback>CRM_Core_SelectValues::getSearchBuilderOperators()</callback>
+       </pseudoconstant>
       <add>1.5</add>
       <html>
         <type>Select</type>
