@@ -285,6 +285,15 @@ class CRM_Core_PseudoConstant {
 
     elseif (!empty($fieldSpec['pseudoconstant'])) {
       $pseudoconstant = $fieldSpec['pseudoconstant'];
+
+      // if callback is specified..
+      if(!empty($pseudoconstant['callback'])) {
+        list($className, $fnName) = explode('::', $pseudoconstant['callback']);
+        if (method_exists($className, $fnName)) {
+          return call_user_func(array($className, $fnName));
+        }
+      }
+
       // Merge params with schema defaults
       $params += array(
         'condition' => CRM_Utils_Array::value('condition', $pseudoconstant, array()),
