@@ -354,7 +354,7 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
     /**
      *  Test civicrm_activity_create() using example code
      */
-    require_once 'api/v3/examples/ActivityCreate.php';
+    require_once 'api/v3/examples/Activity/Create.php';
     $result = activity_create_example();
     $expectedResult = activity_create_expectedresult();
     $this->assertEquals($result, $expectedResult);
