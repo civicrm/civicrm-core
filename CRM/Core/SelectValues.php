@@ -126,6 +126,18 @@ class CRM_Core_SelectValues {
   }
 
   /**
+   * membership type unit
+   * @static
+   */
+  static function membershipTypeUnitList( ) {
+    static $membershipTypeUnitList = NULL;
+    if (!$membershipTypeUnitList) {
+      $membershipTypeUnitList = self::unitList('duration');
+    }
+    return $membershipTypeUnitList;
+  }
+
+  /**
    * various pre defined period types
    * @static
    */
@@ -392,6 +404,19 @@ class CRM_Core_SelectValues {
       }
     }
     return $_visibility;
+  }
+
+  /**
+   * values for group form visibility options
+   *
+   * @static
+   */
+  static function groupVisibility() {
+    static $_groupVisibility = NULL;
+    if (!$_groupVisibility) {
+      $_groupVisibility = self::ufVisibility(true);
+    }
+    return $_groupVisibility;
   }
 
   /**

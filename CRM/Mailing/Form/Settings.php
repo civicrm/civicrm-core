@@ -121,9 +121,7 @@ class CRM_Mailing_Form_Settings extends CRM_Core_Form {
     $this->add('checkbox', 'auto_responder', ts('Auto-respond to Replies?'));
     $defaults['auto_responder'] = FALSE;
 
-    $this->add('select', 'visibility', ts('Mailing Visibility'),
-      CRM_Core_SelectValues::ufVisibility(TRUE), TRUE
-    );
+    $this->add('select', 'visibility', ts('Mailing Visibility'), CRM_Core_SelectValues::groupVisibility(), TRUE);
 
     $this->add('select', 'reply_id', ts('Auto-responder'),
       CRM_Mailing_PseudoConstant::component('Reply'), TRUE

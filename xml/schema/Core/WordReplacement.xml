@@ -54,7 +54,7 @@
        <length>16</length>
        <default>"wildcardMatch"</default>
        <pseudoconstant>
-         <callback>CRM_Core_SelectValues::getWordReplacementMatchType()</callback>
+         <callback>CRM_Core_SelectValues::getWordReplacementMatchType</callback>
        </pseudoconstant>
        <add>4.4</add>
        <html>

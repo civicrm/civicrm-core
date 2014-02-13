@@ -137,7 +137,7 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form {
     );
     $this->addRule('minimum_fee', ts('Please enter a monetary value for the Minimum Fee.'), 'money');
 
-    $this->addElement('select', 'duration_unit', ts('Duration'), CRM_Core_SelectValues::unitList('duration'));
+    $this->addElement('select', 'duration_unit', ts('Duration'), CRM_Core_SelectValues::membershipTypeUnitList());
 
     //period type
     $this->addElement('select', 'period_type', ts('Period Type'), CRM_Core_SelectValues::periodType());

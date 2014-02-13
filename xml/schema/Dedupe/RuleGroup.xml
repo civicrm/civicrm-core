@@ -54,7 +54,7 @@
     <required>true</required>
     <comment>Whether the rule should be used for cases where usage is Unsupervised, Supervised OR General(programatically)</comment>
     <pseudoconstant>
-      <callback>CRM_Core_SelectValues::getDedupeRuleTypes()</callback>
+      <callback>CRM_Core_SelectValues::getDedupeRuleTypes</callback>
     </pseudoconstant>
     <add>4.3</add>
     <html>
