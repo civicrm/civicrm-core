@@ -256,7 +256,8 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
     $this->add('textarea', 'receipt_text', ts('Confirmation Message'));
 
     // add various dates
-    $this->addDateTime('trxn_date', ts('Received'), FALSE, array('formatType' => 'activityDateTime'));
+    $dateLabel = ($this->_refund) ? 'Refund Date' : 'Received Date';
+    $this->addDateTime('trxn_date', ts('%1', array(1 => $dateLabel)), FALSE, array('formatType' => 'activityDateTime'));
 
     if ($this->_contactId && $this->_id) {
       if ($this->_component == 'event') {
@@ -315,11 +316,11 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
       $errors['total_amount'] = ts('Payment amount cannot be greater than owed amount');
     }
     if ($self->_paymentType == 'refund' && $fields['total_amount'] != abs($self->_refund)) {
-      $errors['total_amount'] = ts('Refund amount should not differ');
+      $errors['total_amount'] = ts('Refund amount must equal refund due amount.');
     }
     $netAmt = $fields['total_amount'] - $fields['fee_amount'];
     if (!empty($fields['net_amount']) && $netAmt != $fields['net_amount']) {
-      $errors['net_amount'] = ts('Net amount should be difference of payment amount and fee amount');
+      $errors['net_amount'] = ts('Net amount should be equal to the difference between payment amount and fee amount.');
     }
     return $errors;
   }
