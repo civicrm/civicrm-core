@@ -73,13 +73,13 @@
     <tr class="crm-payment-form-block-total_amount">
       <td class="label">{$form.total_amount.label}</td>
       <td>
-        <span id='totalAmount'>{$form.currency.html|crmAddClass:eight}&nbsp;{$form.total_amount.html|crmAddClass:eight}</span> {$paymentAmt}
+        <span id='totalAmount'>{$form.currency.html|crmAddClass:eight}&nbsp;{$form.total_amount.html|crmAddClass:eight}</span>&nbsp; <span class="status">{if $paymentType EQ 'refund'}{ts}Refund Due{/ts}{else}{ts}Balance Owed{/ts}{/if}:&nbsp;{$paymentAmt|crmMoney}</span>
       </td>
     </tr>
    </table>
     <div class="crm-accordion-wrapper crm-accordion_title-accordion crm-accordion-processed" id="paymentDetails_Information">
       <div class="crm-accordion-header">
-        {ts}Payment Details{/ts}
+        {if $paymentType EQ 'refund'}{ts}Refund Details{/ts}{else}{ts}Payment Details{/ts}{/if}
       </div>
       <div class="crm-accordion-body">
         <table class="form-layout-compressed" >
@@ -108,7 +108,7 @@
             <tr class="crm-payment-form-block-is_email_receipt">
               <td class="label">
                 {$form.is_email_receipt.label}</td><td>{$form.is_email_receipt.html}&nbsp;
-                <span class="description">{ts 1=$email}Automatically email a receipt for this payment to %1?{/ts}</span>
+                <span class="description">{ts 1=$email}Automatically email a receipt to %1?{/ts}</span>
               </td>
             </tr>
           {/if}
@@ -119,7 +119,7 @@
           <tr id='notice' class="crm-event-eventfees-form-block-receipt_text">
             <td class="label">{$form.receipt_text.label}</td>
             <td><span class="description">
-                {ts}Enter a message you want included at the beginning of the confirmation email. EXAMPLE: 'Thanks for registering for this event.'{/ts}
+                {ts}Enter a message you want included at the beginning of the confirmation email.{/ts}
                 </span><br />
                 {$form.receipt_text.html|crmAddClass:huge}
             </td>
