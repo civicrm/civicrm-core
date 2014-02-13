@@ -353,6 +353,8 @@ class CRM_Core_CodeGen_Specification {
         'nameColumn',
         // Where clause snippet (will be joined to the rest of the query with AND operator)
         'condition',
+        // callback funtion incase of static arrays
+        'callback',
       );
       foreach ($validOptions as $pseudoOption) {
         if(!empty($fieldXML->pseudoconstant->$pseudoOption)){
