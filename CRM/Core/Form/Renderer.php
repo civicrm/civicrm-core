@@ -126,7 +126,7 @@ class CRM_Core_Form_Renderer extends HTML_QuickForm_Renderer_ArraySmarty {
     }
     // Active form elements
     else {
-      if ($element->getType() == 'select' && $element->getAttribute('data-option-group-url')) {
+      if ($element->getType() == 'select' && $element->getAttribute('data-option-edit-path')) {
         $this->addOptionsEditLink($el, $element);
       }
 
@@ -227,7 +227,12 @@ class CRM_Core_Form_Renderer extends HTML_QuickForm_Renderer_ArraySmarty {
    */
   function addOptionsEditLink(&$el, $field) {
     if (CRM_Core_Permission::check('administer CiviCRM')) {
-      $el['html'] .= ' <a href="#" class="crm-edit-optionvalue-link crm-hover-button" title="' . ts('Edit Options') . '" data-option-group-url="' . $field->getAttribute('data-option-group-url') . '"><span class="icon edit-icon"></span></a>';
+      // NOTE: $path is used on the client-side to know which option lists need rebuilding,
+      // that's why we need that bit of data both in the link and in the form element
+      $path = $field->getAttribute('data-option-edit-path');
+      // NOTE: If we ever needed to support arguments in this link other than reset=1 we could split $path here if it contains a ?
+      $url = CRM_Utils_System::url($path, 'reset=1');
+      $el['html'] .= ' <a href="' . $url . '" class="crm-option-edit-link crm-hover-button" target="_blank" title="' . ts('Edit Options') . '" data-option-edit-path="' . $path . '"><span class="icon edit-icon"></span></a>';
     }
   }
 

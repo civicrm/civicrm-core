@@ -942,7 +942,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       list(, $id) = explode('_', $name);
       $label = isset($props['label']) ? $props['label'] : CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomField', 'label', $id);
       $gid = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomField', 'option_group_id', $id);
-      $props['data-option-group-url'] = array_key_exists('option_url', $props) ? $props['option_url'] : 'civicrm/admin/options/' . CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup', $gid);
+      $props['data-option-edit-path'] = array_key_exists('option_url', $props) ? $props['option_url'] : 'civicrm/admin/options/' . CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup', $gid);
     }
     // Core field
     else {
@@ -956,7 +956,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
         }
       }
       $label = isset($props['label']) ? $props['label'] : $fieldSpec['title'];
-      $props['data-option-group-url'] = array_key_exists('option_url', $props) ? $props['option_url'] : $props['data-option-group-url'] = CRM_Core_PseudoConstant::getOptionEditUrl($fieldSpec);
+      $props['data-option-edit-path'] = array_key_exists('option_url', $props) ? $props['option_url'] : $props['data-option-edit-path'] = CRM_Core_PseudoConstant::getOptionEditUrl($fieldSpec);
     }
     $props['class'] = (isset($props['class']) ? $props['class'] . ' ' : '') . "crm-select2";
     $props['data-api-entity'] = $props['entity'];
