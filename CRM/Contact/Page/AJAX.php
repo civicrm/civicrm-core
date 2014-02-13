@@ -52,7 +52,8 @@ class CRM_Contact_Page_AJAX {
       'tableName' => 'table_name',
       'context' => 'context',
       'rel' => 'rel',
-      'contact_sub_type' => 'contact_sub_type'
+      'contact_sub_type' => 'contact_sub_type',
+      'contact_type' => 'contact_type'
     );
     foreach ($whitelist as $key => $param) {
       if (!empty($_GET[$key])) {
