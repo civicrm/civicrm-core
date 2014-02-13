@@ -213,9 +213,6 @@ class {$table.className} extends CRM_Core_DAO {ldelim}
 {if $field.default}
                          'default'   => '{if ($field.default[0]=="'" or $field.default[0]=='"')}{$field.default|substring:1:-1}{else}{$field.default}{/if}',
 {/if} {* field.default *}
-{if $field.enumValues}
-                          'enumValues' => '{$field.enumValues}',
-{/if} {* field.enumValues *}
 
 {if $field.FKClassName}
                       'FKClassName' => '{$field.FKClassName}',

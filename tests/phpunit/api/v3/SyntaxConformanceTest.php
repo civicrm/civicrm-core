@@ -726,7 +726,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
         case CRM_Utils_Type::T_URL:
           $entity[$field] = 'warm.beer.com';
       }
-      if (!empty($specs['pseudoconstant']) || !empty($specs['enumValues'])) {
+      if (!empty($specs['pseudoconstant'])) {
         $options = $this->callAPISuccess($entityName, 'getoptions', array('context' => 'create', 'field' => $field));
         if (empty($options['values'])) {
         }

@@ -138,6 +138,10 @@
     <length>8</length>
     <default>'month'</default>
     <comment>Time units for recurrence of pledge payments.</comment>
+    <pseudoconstant>
+      <optionGroupName>recur_frequency_units</optionGroupName>
+      <keyColumn>name</keyColumn>
+    </pseudoconstant>
     <add>2.1</add>
     <html>
       <type>Select</type>

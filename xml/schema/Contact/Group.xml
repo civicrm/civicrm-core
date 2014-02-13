@@ -84,6 +84,9 @@
        <title>Group Visibility Setting</title>
        <default>'User and User Admin Only'</default>
        <comment>In what context(s) is this field visible.</comment>
+       <pseudoconstant>
+         <callback>CRM_Core_SelectValues::groupVisibility</callback>
+       </pseudoconstant>
        <add>1.2</add>
        <html>
          <type>Select</type>

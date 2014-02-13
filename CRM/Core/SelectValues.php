@@ -126,6 +126,18 @@ class CRM_Core_SelectValues {
   }
 
   /**
+   * membership type unit
+   * @static
+   */
+  static function membershipTypeUnitList( ) {
+    static $membershipTypeUnitList = NULL;
+    if (!$membershipTypeUnitList) {
+      $membershipTypeUnitList = self::unitList('duration');
+    }
+    return $membershipTypeUnitList;
+  }
+
+  /**
    * various pre defined period types
    * @static
    */
@@ -134,8 +146,8 @@ class CRM_Core_SelectValues {
     if (!$periodType) {
       $periodType = array(
         '' => ts('- select -'),
-        'rolling' => ts('rolling'),
-        'fixed' => ts('fixed'),
+        'rolling' => ts('Rolling'),
+        'fixed' => ts('Fixed'),
       );
     }
     return $periodType;
@@ -392,6 +404,19 @@ class CRM_Core_SelectValues {
       }
     }
     return $_visibility;
+  }
+
+  /**
+   * values for group form visibility options
+   *
+   * @static
+   */
+  static function groupVisibility() {
+    static $_groupVisibility = NULL;
+    if (!$_groupVisibility) {
+      $_groupVisibility = self::ufVisibility(true);
+    }
+    return $_groupVisibility;
   }
 
   /**
@@ -881,5 +906,184 @@ class CRM_Core_SelectValues {
     }
     return $dedupeRuleTypes;
   }
+
+  /**
+   * campaign group types
+   */
+  static function getCampaignGroupTypes() {
+    static $campaignGroupTypes = NULL;
+    if (!$campaignGroupTypes) {
+      $campaignGroupTypes = array(
+        'Include' => ts('Include'),
+        'Exclude' => ts('Exclude'),
+      );
+    }
+    return $campaignGroupTypes;
+  }
+
+  /**
+   * subscription history method
+   */
+  static function getSubscriptionHistoryMethods() {
+    static $subscriptionHistoryMethods = NULL;
+    if (!$subscriptionHistoryMethods) {
+      $subscriptionHistoryMethods = array(
+        'Admin' => ts('Admin'),
+        'Email' => ts('Email'),
+        'Web' => ts('Web'),
+        'API' => ts('API'),
+      );
+    }
+
+    return $subscriptionHistoryMethods;
+  }
+
+  /**
+   * premium units
+   */
+  static function getPremiumUnits() {
+    static $premiumUnits = NULL;
+    if (!$premiumUnits) {
+      $premiumUnits = array(
+        'day' => ts('Day'),
+        'week' => ts('Week'),
+        'month' => ts('Month'),
+        'year' => ts('Year'),
+      );
+    }
+
+    return $premiumUnits;
+  }
+
+  /**
+   * extension types
+   */
+  static function getExtensionTypes() {
+    static $extensionTypes = NULL;
+    if (!$extensionTypes) {
+      $extensionTypes = array(
+        'payment' => ts('Payment'),
+        'search' => ts('Search'),
+        'report' => ts('Report'),
+        'module' => ts('Module'),
+        'sms' => ts('SMS'),
+      );
+    }
+
+    return $extensionTypes;
+  }
+
+  /**
+   * job frequency
+   */
+  static function getJobFrequency() {
+    static $jobFrequency = NULL;
+    if (!$jobFrequency) {
+      $jobFrequency = array(
+        'Daily' => ts('Daily'),
+        'Hourly' => ts('Hourly'),
+        'Always' => ts('Every time cron job is run'),
+      );
+    }
+
+    return $jobFrequency;
+  }
+
+  /**
+   * Search builder operators
+   */
+  static function getSearchBuilderOperators() {
+    static $searchBuilderOperators = NULL;
+    if (!$searchBuilderOperators) {
+      $searchBuilderOperators = array(
+        '=' => '=',
+        '!=' => '≠',
+        '>' => '>',
+        '<' => '<',
+        '>=' => '≥',
+        '<=' => '≤',
+        'IN' => ts('In'),
+        'LIKE' => ts('Like'),
+        'RLIKE' => ts('Regex'),
+        'IS EMPTY' => ts('Is Empty'),
+        'IS NOT EMPTY' => ts('Not Empty'),
+        'IS NULL' => ts('Is Null'),
+        'IS NOT NULL' => ts('Not Null'),
+      );
+    }
+
+    return $searchBuilderOperators;
+  }
+
+  /**
+   * profile group types
+   *
+   * @static
+   */
+  static function getProfileGroupType() {
+    static $profileGroupType = NULL;
+    if (!$profileGroupType) {
+      $profileGroupType = array(
+        'Activity' => ts('Activities'),
+        'Contribution' => ts('Contributions'),
+        'Membership' => ts('Memberships'),
+        'Participant' => ts('Participants'),
+      );
+      $contactTypes = self::contactType();
+      $contactTypes       = !empty($contactTypes) ? array('Contact' => 'Contacts') + $contactTypes : array();
+      $profileGroupType = array_merge($contactTypes, $profileGroupType );
+    }
+    return $profileGroupType;
+  }
+
+
+  /**
+   * word replacement match type
+   */
+  static function getWordReplacementMatchType() {
+    static $wordReplacementMatchType = NULL;
+    if (!$wordReplacementMatchType) {
+      $wordReplacementMatchType = array(
+        'exactMatch' => ts('Exact Match'),
+        'wildcardMatch' => ts('Wildcard Match'),
+      );
+    }
+
+    return $jobFrequency;
+  }
+
+  /**
+   * mailing group types
+   */
+  static function getMailingGroupTypes() {
+    static $mailingGroupTypes = NULL;
+    if (!$mailingGroupTypes) {
+      $mailingGroupTypes = array(
+        'Include' => ts('Include'),
+        'Exclude' => ts('Exclude'),
+        'Base' => ts('Base'),
+      );
+    }
+    return $mailingGroupTypes;
+  }
+
+  /**
+   * Mailing Job Status
+   */
+  static function geMailingJobStatus() {
+    static $mailingJobStatus = NULL;
+    if (!$mailingJobStatus) {
+      $mailingJobStatus = array(
+        'Scheduled' => ts('Scheduled'),
+        'Running' => ts('Running'),
+        'Complete' => ts('Complete'),
+        'Paused' => ts('Paused'),
+        'Canceled' => ts('Canceled'),
+      );
+    }
+
+    return $mailingJobStatus;
+  }
+
 }
 

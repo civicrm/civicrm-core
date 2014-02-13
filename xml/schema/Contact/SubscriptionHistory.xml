@@ -65,6 +65,9 @@
         <type>varchar</type>
         <length>8</length>
         <comment>How the (un)subscription was triggered</comment>
+        <pseudoconstant>
+          <callback>CRM_Core_SelectValues::getSubscriptionHistoryMethods</callback>
+        </pseudoconstant>
        <add>1.1</add>
        <html>
          <type>Select</type>
@@ -75,6 +78,9 @@
         <type>varchar</type>
         <length>8</length>
         <comment>The state of the contact within the group</comment>
+        <pseudoconstant>
+          <callback>CRM_Core_SelectValues::groupContactStatus</callback>
+        </pseudoconstant>
        <add>1.1</add>
     </field>
     <field>

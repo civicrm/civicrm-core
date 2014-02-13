@@ -70,6 +70,9 @@
      <type>varchar</type>
      <length>8</length>
      <comment>Visual relationship between this form and its parent.</comment>
+     <pseudoconstant>
+       <callback>CRM_Core_SelectValues::customGroupStyle</callback>
+     </pseudoconstant>
        <add>1.1</add>
        <html>
          <type>Select</type>

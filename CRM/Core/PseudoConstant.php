@@ -284,16 +284,17 @@ class CRM_Core_PseudoConstant {
       return FALSE;
     }
 
-    // If the field is an enum, explode the enum definition and return the array.
-    if (isset($fieldSpec['enumValues'])) {
-      // use of a space after the comma is inconsistent in xml
-      $enumStr = str_replace(', ', ',', $fieldSpec['enumValues']);
-      $output = explode(',', $enumStr);
-      return array_combine($output, $output);
-    }
-
     elseif (!empty($fieldSpec['pseudoconstant'])) {
       $pseudoconstant = $fieldSpec['pseudoconstant'];
+
+      // if callback is specified..
+      if(!empty($pseudoconstant['callback'])) {
+        list($className, $fnName) = explode('::', $pseudoconstant['callback']);
+        if (method_exists($className, $fnName)) {
+          return call_user_func(array($className, $fnName));
+        }
+      }
+
       // Merge params with schema defaults
       $params += array(
         'condition' => CRM_Utils_Array::value('condition', $pseudoconstant, array()),
