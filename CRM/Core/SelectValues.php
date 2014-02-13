@@ -1027,5 +1027,38 @@ class CRM_Core_SelectValues {
     return $jobFrequency;
   }
 
+  /**
+   * mailing group types
+   */
+  static function getMailingGroupTypes() {
+    static $mailingGroupTypes = NULL;
+    if (!$mailingGroupTypes) {
+      $mailingGroupTypes = array(
+        'Include' => ts('Include'),
+        'Exclude' => ts('Exclude'),
+        'Base' => ts('Base'),
+      );
+    }
+    return $mailingGroupTypes;
+  }
+
+  /**
+   * Mailing Job Status
+   */
+  static function geMailingJobStatus() {
+    static $mailingJobStatus = NULL;
+    if (!$mailingJobStatus) {
+      $mailingJobStatus = array(
+        'Scheduled' => ts('Scheduled'),
+        'Running' => ts('Running'),
+        'Complete' => ts('Complete'),
+        'Paused' => ts('Paused'),
+        'Canceled' => ts('Canceled'),
+      );
+    }
+
+    return $mailingJobStatus;
+  }
+
 }
 
