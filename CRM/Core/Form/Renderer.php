@@ -119,7 +119,7 @@ class CRM_Core_Form_Renderer extends HTML_QuickForm_Renderer_ArraySmarty {
 
     // Display-only (frozen) elements
     if (!empty($el['frozen'])) {
-      if ($element->getAttribute('data-api-params') && $element->getAttribute('data-entity-value')) {
+      if ($element->getAttribute('data-api-entity') && $element->getAttribute('data-entity-value')) {
         $this->renderFrozenEntityRef($el, $element);
       }
       $el['html'] = '<div class="crm-frozen-field">' . $el['html'] . '</div>';
@@ -203,7 +203,7 @@ class CRM_Core_Form_Renderer extends HTML_QuickForm_Renderer_ArraySmarty {
    * @param $field HTML_QuickForm_element
    */
   function renderFrozenEntityRef(&$el, $field) {
-    $api = json_decode($field->getAttribute('data-api-params'), TRUE);
+    $entity = $field->getAttribute('data-api-entity');
     $vals = json_decode($field->getAttribute('data-entity-value'), TRUE);
     if (isset($vals['id'])) {
       $vals = array($vals);
@@ -211,11 +211,11 @@ class CRM_Core_Form_Renderer extends HTML_QuickForm_Renderer_ArraySmarty {
     $display = array();
     foreach ($vals as $val) {
       // Format contact as link
-      if ($api['entity'] == 'contact' && CRM_Contact_BAO_Contact_Permission::allow($val['id'], CRM_Core_Permission::VIEW)) {
+      if ($entity == 'contact' && CRM_Contact_BAO_Contact_Permission::allow($val['id'], CRM_Core_Permission::VIEW)) {
         $url = CRM_Utils_System::url("civicrm/contact/view", array('reset' => 1, 'cid' => $val['id']));
-        $val['text'] = '<a href="' . $url . '" title="' . ts('View Contact') . '">' . $val['text'] . '</a>';
+        $val['label'] = '<a href="' . $url . '" title="' . ts('View Contact') . '">' . $val['label'] . '</a>';
       }
-      $display[] = $val['text'];
+      $display[] = $val['label'];
     }
 
     $el['html'] = implode('; ', $display) . '<input type="hidden" value="'. $field->getValue() . '" name="' . $field->getAttribute('name') . '">';
