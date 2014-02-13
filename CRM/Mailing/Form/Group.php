@@ -100,6 +100,10 @@ class CRM_Mailing_Form_Group extends CRM_Contact_Form_Task {
     $continue = CRM_Utils_Request::retrieve('continue', 'String', $this, FALSE, NULL);
 
     $defaults = array();
+    $defaults['dedupe_email'] = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME,
+      'dedupe_email_default', NULL, FALSE
+    );
+
     if ($this->_mailingID) {
       // check that the user has permission to access mailing id
       CRM_Mailing_BAO_Mailing::checkPermission($this->_mailingID);
