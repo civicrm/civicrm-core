@@ -41,7 +41,8 @@ function civicrm_api3_generic_getList($apiRequest) {
   $fnName = "_civicrm_api3_{$entity}_getlist_params";
   $fnName = function_exists($fnName) ? $fnName : '_civicrm_api3_generic_getlist_params';
   $fnName($request);
-  
+
+  $request['params']['check_permissions'] = !empty($apiRequest['params']['check_permissions']);
   $result = civicrm_api3($entity, 'get', $request['params']);
 
   // Hey api, would you like to format the output?
