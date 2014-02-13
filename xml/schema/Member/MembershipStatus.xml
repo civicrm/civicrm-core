@@ -41,6 +41,9 @@
        <type>varchar</type>
        <length>12</length>
        <comment>Event when this status starts.</comment>
+       <pseudoconstant>
+         <callback>CRM_Core_SelectValues::eventDate()</callback>
+       </pseudoconstant>
        <add>1.5</add>
        <html>
          <type>Select</type>
@@ -51,6 +54,9 @@
       <type>varchar</type>
       <length>8</length>
       <comment>Unit used for adjusting from start_event.</comment>
+      <pseudoconstant>
+        <callback>CRM_Core_SelectValues::unitList()</callback>
+      </pseudoconstant>
       <add>1.5</add>
       <html>
         <type>Select</type>
@@ -67,6 +73,9 @@
       <type>varchar</type>
       <length>12</length>
       <comment>Event after which this status ends.</comment>
+      <pseudoconstant>
+        <callback>CRM_Core_SelectValues::eventDate()</callback>
+      </pseudoconstant>
       <add>1.5</add>
       <html>
         <type>Select</type>
@@ -77,6 +86,9 @@
       <type>varchar</type>
       <length>8</length>
       <comment>Unit used for adjusting from the ending event.</comment>
+      <pseudoconstant>
+        <callback>CRM_Core_SelectValues::unitList()</callback>
+      </pseudoconstant>
       <add>1.5</add>
       <html>
         <type>Select</type>
