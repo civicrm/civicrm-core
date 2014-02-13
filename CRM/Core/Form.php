@@ -1257,11 +1257,16 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * @param array $props mix of html and widget properties, including:
    *  - select - params to give to select2 widget
    *  - entity - defaults to contact
+   *  - create - can the user create a new entity on-the-fly?
+   *             Set to TRUE if entity is contact and you want the default profiles,
+   *             or pass in your own set of links. See output of CRM_Core_BAO_UFGroup::getCreateLinks for format
    *  - api - array of settings for the getlist api
    *  - placeholder - string
    *  - multiple - bool
    *  - class, etc. - other html properties
    * @param bool $required
+   *
+   * @access public
    * @return HTML_QuickForm_Element
    */
   function addEntityRef($name, $label, $props = array(), $required = FALSE) {
@@ -1272,15 +1277,30 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     $props['class'] = isset($props['class']) ? $props['class'] . ' ' : '';
     $props['class'] .= "crm-select2 crm-form-entityref";
 
-    $props['select'] = CRM_Utils_Array::value('select', $props, array()) + array(
+    if ($props['entity'] == 'contact' && isset($props['create']) && !(CRM_Core_Permission::check('edit all contacts') || CRM_Core_Permission::check('add contacts'))) {
+      unset($props['create']);
+    }
+    if ($props['entity'] == 'contact' && isset($props['create']) && $props['create'] === TRUE) {
+      if (empty($props['api']['params']['contact_type'])) {
+        $props['create'] = CRM_Core_BAO_UFGroup::getCreateLinks(array('new_individual', 'new_organization', 'new_household'));
+      }
+      else {
+        $props['create'] = CRM_Core_BAO_UFGroup::getCreateLinks('new_' . strtolower($props['api']['params']['contact_type']));
+      }
+    }
+
+    $defaults = array(
       'minimumInputLength' => 1,
       'multiple' => !empty($props['multiple']),
       'placeholder' => CRM_Utils_Array::value('placeholder', $props, $required ? ts('- select -') : ts('- none -')),
       'allowClear' => !$required,
-      // Disabled pending https://github.com/ivaynberg/select2/pull/2092
-      //'formatInputTooShort' => ts('Start typing a name or email address...'),
-      //'formatNoMatches' => ts('No contacts found.'),
+      'formatInputTooShort' => ts('Start typing a name...'),
+      'formatNoMatches' => ts('None found.'),
     );
+    if ($props['entity'] == 'contact' && CRM_Core_Config::singleton()->includeEmailInName) {
+      $defaults['formatInputTooShort'] = ts('Start typing a name or email...');
+    }
+    $props['select'] = CRM_Utils_Array::value('select', $props, array()) + $defaults;
 
     $this->entityReferenceFields[] = $name;
     $this->formatReferenceFieldAttributes($props);
@@ -1294,7 +1314,10 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     $props['data-select-params'] = json_encode($props['select']);
     $props['data-api-params'] = $props['api'] ? json_encode($props['api']) : NULL;
     $props['data-api-entity'] = $props['entity'];
-    CRM_Utils_Array::remove($props, 'multiple', 'select', 'api', 'entity', 'placeholder');
+    if (!empty($props['create'])) {
+      $props['data-create-links'] = json_encode($props['create']);
+    }
+    CRM_Utils_Array::remove($props, 'multiple', 'select', 'api', 'entity', 'placeholder', 'create');
   }
 
   /**

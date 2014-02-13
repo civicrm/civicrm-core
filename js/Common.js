@@ -283,6 +283,18 @@ CRM.validate = CRM.validate || {
     markup += '</td></tr></table>';
     return markup;
   };
+  
+  CRM.utils.formatSelect2CreateLinks = function($el) {
+    var markup = '';
+    $.each($el.data('create-links'), function(k, link) {
+      markup += ' <a class="crm-add-entity crm-hover-button" href="' + link.url + '">';
+      if (link.name) {
+        markup += '<span class="icon ' + link.name + '-icon"></span> ';
+      }
+      markup += link.label + '</a>';
+    });
+    return markup;
+  };
 
   // Initialize widgets
   $(document).on('crmLoad', function(e) {
@@ -308,7 +320,8 @@ CRM.validate = CRM.validate || {
         $(this).nextUntil('option[value^=crm_optgroup]').wrapAll('<optgroup label="' + $(this).text() + '" />');
         $(this).remove();
       });
-      var options = $el.data('select-params') || {};
+      // Get a copy of the data rather than a reference
+      var options = $.extend({}, $el.data('select-params') || {});
       // Set placeholder from markup if not specified
       if ($el.is('select:not([multiple])')) {
         options.allowClear = options.allowClear !== undefined ? options.allowClear : !($el.hasClass('required'));
@@ -319,7 +332,8 @@ CRM.validate = CRM.validate || {
       // Autocomplete using the getlist api
       if ($el.data('api-entity') && $el.hasClass('crm-form-entityref')) {
         $el.addClass('crm-ajax-select');
-        $.extend(options, {
+        var settings = {
+          // Use select2 ajax helper instead of CRM.api because it provides more value
           ajax: {
             url: CRM.url('civicrm/ajax/rest'),
             data: function (input, page_num) {
@@ -344,8 +358,35 @@ CRM.validate = CRM.validate || {
           initSelection: function(el, callback) {
             callback(el.data('entity-value'));
           }
-        });
+        };
+        if ($el.data('create-links')) {
+          options.formatInputTooShort = function() {
+            return $el.data('select-params').formatInputTooShort + ' ' + ts('or') + '<br />' + CRM.utils.formatSelect2CreateLinks($el);
+          };
+          options.formatNoMatches = function() {
+            return $el.data('select-params').formatNoMatches + '<br />' + CRM.utils.formatSelect2CreateLinks($el);
+          };
+          $el.on('select2-open', function() {
+            var $el = $(this);
+            $('#select2-drop').off('.crmEntity').on('click.crmEntity', 'a.crm-add-entity', function(e) {
+              $el.select2('close');
+              CRM.loadForm($(this).attr('href'), {
+                dialog: {width: 500, height: 'auto'}
+              }).on('crmFormSuccess', function(e, data) {
+                if ($el.select2('container').hasClass('select2-container-multi')) {
+                  var selection = $el.select2('data').push(data);
+                  $el.select2('data', selection);
+                } else {
+                  $el.select2('data', data);
+                }
+              });
+              return false;
+            });
+          });
+        }
+        options = $.extend(settings, options);
       }
+      options.dropdownCssClass = 'crm-container';
       $(this).select2(options).removeClass('crm-select2');
     });
   });

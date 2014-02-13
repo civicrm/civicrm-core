@@ -537,8 +537,8 @@ class CRM_Core_Resources {
       "packages/jquery/jquery-migrate-1.2.1.js",
       "packages/jquery/jquery-ui/js/jquery-ui-1.10.3.custom$min.js",
       "packages/jquery/jquery-ui/css/black-tie/jquery-ui-1.10.3.custom$min.css",
-        
-      "packages/jquery/plugins/select2/select2$min.js",
+
+      "packages/jquery/plugins/select2/select2.js", // No mini until release of select2 3.4.6
       "packages/jquery/plugins/select2/select2.css",
 
       "packages/jquery/plugins/jquery.autocomplete.js",
