@@ -29,3 +29,9 @@
 {htxt id="id-is_multi_activity"}
   <p>{ts}By default a single activity record will be created and linked to all the contacts listed above. However, if you think you might be editing the activity later - and entering different information for different contacts - check this box to create separate activity records.{/ts}</p>
 {/htxt}
+
+{htxt id="assignee_contact_id"}
+  <p>
+    {ts}You can optionally assign this activity to someone. Assigned activities will appear in their Activities listing at CiviCRM Home.{/ts}
+  </p>
+{/htxt}
