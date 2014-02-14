@@ -113,14 +113,6 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   public $urlPath = array();
 
   /**
-   * Stores info about reference fields for preprocessing
-   * Public so that hooks can access it
-   *
-   * @var array
-   */
-  public $entityReferenceFields = array();
-
-  /**
    * constants for attributes for various form elements
    * attempt to standardize on the number of variations that we
    * use of the below form elements
@@ -413,8 +405,6 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     // also call the hook function so any modules can set thier own custom defaults
     // the user can do both the form and set default values with this hook
     CRM_Utils_Hook::buildForm(get_class($this), $this);
-
-    $this->preprocessReferenceFields();
 
     $this->addRules();
   }
@@ -1302,7 +1292,6 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     }
     $props['select'] = CRM_Utils_Array::value('select', $props, array()) + $defaults;
 
-    $this->entityReferenceFields[] = $name;
     $this->formatReferenceFieldAttributes($props);
     return $this->add('text', $name, $label, $props, $required);
   }
@@ -1318,42 +1307,6 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       $props['data-create-links'] = json_encode($props['create']);
     }
     CRM_Utils_Array::remove($props, 'multiple', 'select', 'api', 'entity', 'placeholder', 'create');
-  }
-
-  /**
-   * Convert IDs to values and format for display
-   */
-  private function preprocessReferenceFields() {
-    foreach ($this->entityReferenceFields as $name) {
-      $field = $this->getElement($name);
-      $val = $field->getValue();
-      // Support array values
-      if (is_array($val)) {
-        $val = implode(',', $val);
-        $field->setValue($val);
-      }
-      if ($val) {
-        $data = array();
-        $entity = $field->getAttribute('data-api-entity');
-        $select = json_decode($field->getAttribute('data-select-params'), TRUE);
-        // Support serialized values
-        if (strpos($val, CRM_Core_DAO::VALUE_SEPARATOR) !== FALSE) {
-          $val = str_replace(CRM_Core_DAO::VALUE_SEPARATOR, ',', trim($val, CRM_Core_DAO::VALUE_SEPARATOR));
-          $field->setValue($val);
-        }
-        $result = civicrm_api3($entity, 'getlist', array('params' => array('id' => $val)));
-        if ($field->isFrozen()) {
-          $field->removeAttribute('class');
-        }
-        if (!empty($result['values'])) {
-          // Simplify array for single selects - makes client-side code simpler (but feels somehow wrong)
-          if (empty($select['multiple'])) {
-            $result['values'] = $result['values'][0];
-          }
-          $field->setAttribute('data-entity-value', json_encode($result['values']));
-        }
-      }
-    }
   }
 
   /**
