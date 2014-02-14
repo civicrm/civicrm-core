@@ -119,7 +119,7 @@ class CRM_Core_Form_Renderer extends HTML_QuickForm_Renderer_ArraySmarty {
 
     // Display-only (frozen) elements
     if (!empty($el['frozen'])) {
-      if ($element->getAttribute('data-api-params') && $element->getAttribute('data-entity-value')) {
+      if ($element->getAttribute('data-api-entity') && $element->getAttribute('data-entity-value')) {
         $this->renderFrozenEntityRef($el, $element);
       }
       $el['html'] = '<div class="crm-frozen-field">' . $el['html'] . '</div>';
@@ -183,6 +183,9 @@ class CRM_Core_Form_Renderer extends HTML_QuickForm_Renderer_ArraySmarty {
     if (!$class || strpos($class, 'crm-form-') === FALSE) {
       $class = ($class ? "$class " : '') . 'crm-form-' . $type;
     }
+    elseif (strpos($class, 'crm-form-entityref') !== FALSE) {
+      self::preProcessEntityRef($element);
+    }
 
     if ($required) {
       $class .= ' required';
@@ -197,13 +200,45 @@ class CRM_Core_Form_Renderer extends HTML_QuickForm_Renderer_ArraySmarty {
   }
 
   /**
+   * Convert IDs to values and format for display
+   */
+  static function preProcessEntityRef($field) {
+    $val = $field->getValue();
+    // Support array values
+    if (is_array($val)) {
+      $val = implode(',', $val);
+      $field->setValue($val);
+    }
+    if ($val) {
+      $entity = $field->getAttribute('data-api-entity');
+      $select = json_decode($field->getAttribute('data-select-params'), TRUE);
+      // Support serialized values
+      if (strpos($val, CRM_Core_DAO::VALUE_SEPARATOR) !== FALSE) {
+        $val = str_replace(CRM_Core_DAO::VALUE_SEPARATOR, ',', trim($val, CRM_Core_DAO::VALUE_SEPARATOR));
+        $field->setValue($val);
+      }
+      $result = civicrm_api3($entity, 'getlist', array('params' => array('id' => $val)));
+      if ($field->isFrozen()) {
+        $field->removeAttribute('class');
+      }
+      if (!empty($result['values'])) {
+        // Simplify array for single selects - makes client-side code simpler (but feels somehow wrong)
+        if (empty($select['multiple'])) {
+          $result['values'] = $result['values'][0];
+        }
+        $field->setAttribute('data-entity-value', json_encode($result['values']));
+      }
+    }
+  }
+
+  /**
    * Render entity references as text.
    * If user has permission, format as link (or now limited to contacts).
    * @param $el array
    * @param $field HTML_QuickForm_element
    */
   function renderFrozenEntityRef(&$el, $field) {
-    $api = json_decode($field->getAttribute('data-api-params'), TRUE);
+    $entity = $field->getAttribute('data-api-entity');
     $vals = json_decode($field->getAttribute('data-entity-value'), TRUE);
     if (isset($vals['id'])) {
       $vals = array($vals);
@@ -211,11 +246,11 @@ class CRM_Core_Form_Renderer extends HTML_QuickForm_Renderer_ArraySmarty {
     $display = array();
     foreach ($vals as $val) {
       // Format contact as link
-      if ($api['entity'] == 'contact' && CRM_Contact_BAO_Contact_Permission::allow($val['id'], CRM_Core_Permission::VIEW)) {
+      if ($entity == 'contact' && CRM_Contact_BAO_Contact_Permission::allow($val['id'], CRM_Core_Permission::VIEW)) {
         $url = CRM_Utils_System::url("civicrm/contact/view", array('reset' => 1, 'cid' => $val['id']));
-        $val['text'] = '<a href="' . $url . '" title="' . ts('View Contact') . '">' . $val['text'] . '</a>';
+        $val['label'] = '<a href="' . $url . '" title="' . ts('View Contact') . '">' . $val['label'] . '</a>';
       }
-      $display[] = $val['text'];
+      $display[] = $val['label'];
     }
 
     $el['html'] = implode('; ', $display) . '<input type="hidden" value="'. $field->getValue() . '" name="' . $field->getAttribute('name') . '">';
