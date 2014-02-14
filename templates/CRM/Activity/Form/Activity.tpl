@@ -93,22 +93,21 @@
   </tr>
 
   <tr class="crm-activity-form-block-assignee_contact_id">
-      <td class="label">{$form.assignee_contact_id.label}</td>
+      <td class="label">
+        {$form.assignee_contact_id.label}
+        {edit}{help id="assignee_contact_id" title=$form.assignee_contact_id.label}{/edit}
+      </td>
       <td>
         {$form.assignee_contact_id.html}
         {if $action neq 4}
-        <a href="#" class="crm-hover-button" id="swap_target_assignee" title="{ts}Swap Target and Assignee Contacts{/ts}" style="position:relative; bottom: 1em;">
-          <span><div class="icon swap-icon"></div></span>
-        </a>
-        {/if}
-        <br />
-        {edit}
-          <span class="description">{ts}You can optionally assign this activity to someone. Assigned activities will appear in their Activities listing at CiviCRM Home.{/ts}
+          <a href="#" class="crm-hover-button" id="swap_target_assignee" title="{ts}Swap Target and Assignee Contacts{/ts}" style="position:relative; bottom: 1em;">
+            <span><div class="icon swap-icon"></div></span>
+          </a>
           {if $activityAssigneeNotification}
-            <br />{ts}A copy of this activity will be emailed to each Assignee.{/ts}
+            <br />
+            <span class="description"><span class="icon email-icon"></span>{ts}A copy of this activity will be emailed to each Assignee.{/ts}</span>
           {/if}
-          </span>
-        {/edit}
+        {/if}
       </td>
   </tr>
 
@@ -229,11 +228,13 @@
               <td>{$form.followup_activity_subject.html|crmAddClass:huge}</td>
             </tr>
               <tr>
-                  <td class="label">{$form.followup_assignee_contact_id.label}</td>
-                  <td>{$form.followup_assignee_contact_id.html}
-                      {edit}<span class="description">{ts}You can optionally assign this activity to someone. Assigned activities will appear in their Activities listing at CiviCRM Home.{/ts}
-                          </span>
-                      {/edit}
+                  <td class="label">
+                    {$form.followup_assignee_contact_id.label}
+                    {edit}
+                    {/edit}
+                  </td>
+                  <td>
+                    {$form.followup_assignee_contact_id.html}
                   </td>
               </tr>
           </table>
