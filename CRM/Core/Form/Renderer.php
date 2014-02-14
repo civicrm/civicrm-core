@@ -183,6 +183,9 @@ class CRM_Core_Form_Renderer extends HTML_QuickForm_Renderer_ArraySmarty {
     if (!$class || strpos($class, 'crm-form-') === FALSE) {
       $class = ($class ? "$class " : '') . 'crm-form-' . $type;
     }
+    elseif (strpos($class, 'crm-form-entityref') !== FALSE) {
+      self::preProcessEntityRef($element);
+    }
 
     if ($required) {
       $class .= ' required';
@@ -194,6 +197,38 @@ class CRM_Core_Form_Renderer extends HTML_QuickForm_Renderer_ArraySmarty {
 
     $attributes['class'] = $class;
     $element->updateAttributes($attributes);
+  }
+
+  /**
+   * Convert IDs to values and format for display
+   */
+  static function preProcessEntityRef($field) {
+    $val = $field->getValue();
+    // Support array values
+    if (is_array($val)) {
+      $val = implode(',', $val);
+      $field->setValue($val);
+    }
+    if ($val) {
+      $entity = $field->getAttribute('data-api-entity');
+      $select = json_decode($field->getAttribute('data-select-params'), TRUE);
+      // Support serialized values
+      if (strpos($val, CRM_Core_DAO::VALUE_SEPARATOR) !== FALSE) {
+        $val = str_replace(CRM_Core_DAO::VALUE_SEPARATOR, ',', trim($val, CRM_Core_DAO::VALUE_SEPARATOR));
+        $field->setValue($val);
+      }
+      $result = civicrm_api3($entity, 'getlist', array('params' => array('id' => $val)));
+      if ($field->isFrozen()) {
+        $field->removeAttribute('class');
+      }
+      if (!empty($result['values'])) {
+        // Simplify array for single selects - makes client-side code simpler (but feels somehow wrong)
+        if (empty($select['multiple'])) {
+          $result['values'] = $result['values'][0];
+        }
+        $field->setAttribute('data-entity-value', json_encode($result['values']));
+      }
+    }
   }
 
   /**
