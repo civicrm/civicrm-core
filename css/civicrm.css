@@ -2491,15 +2491,15 @@ div.grippie {
 }
 
 .crm-container .vcard-icon {
-  background-position: -35px -81px;
+  background-position: -32px -80px;
 }
 
 .crm-container .print-icon {
-  background-position: -162px -97px;
+  background-position: -160px -96px;
 }
 
 .crm-container .dashboard-icon {
-  background-position: -194px -129px;
+  background-position: -192px -128px;
 }
 
 .crm-container .new_individual-icon,
@@ -2518,7 +2518,7 @@ div.grippie {
 }
 
 .crm-container .dropdown-icon {
-  background-position: -46px -32px;
+  background-position: -48px -32px;
   float: right;
 }
 
@@ -2530,31 +2530,31 @@ div.grippie {
   background-position: 0 -144px;
 }
 .crm-container .check-icon {
-  background-position: -66px -146px;
+  background-position: -64px -144px;
 }
 .crm-container .refresh-icon {
-  background-position: -65px -81px;
+  background-position: -64px -80px;
 }
 .crm-container .settings-icon {
-  background-position: -178px -114px;
+  background-position: -176px -112px;
 }
 .crm-container .search-icon {
-  background-position: -161px -114px;
+  background-position: -160px -112px;
 }
 .crm-container .email-icon {
-  background-position: -81px -98px;
+  background-position: -80px -96px;
 }
 .crm-container .preview-icon {
-  background-position: -227px -129px;
+  background-position: -224px -128px;
 }
 .crm-container .play-icon {
-  background-position: -3px -161px;
+  background-position: 0 -160px;
 }
 .crm-container .close-icon {
   background-position: -80px -128px;
 }
 .crm-container .swap-icon {
-  background-position: -82px -81px;
+  background-position: -80px -80px;
 }
 
 #crm-container .geotag {
