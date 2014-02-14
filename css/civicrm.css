@@ -2458,7 +2458,7 @@ div.grippie {
   background-image: url("../i/icons/jquery-ui-8A1F11.png")}
 
 .crm-container .edit-icon {
-  background-position: -66px -114px;
+  background-position: -64px -114px;
 }
 .crm-container .previous-icon {
   background-position: -82px -161px;
@@ -2491,28 +2491,34 @@ div.grippie {
 }
 
 .crm-container .vcard-icon {
-  background-position: -35px -81px;
+  background-position: -32px -80px;
 }
 
 .crm-container .print-icon {
-  background-position: -162px -97px;
+  background-position: -160px -96px;
 }
 
 .crm-container .dashboard-icon {
-  background-position: -194px -129px;
+  background-position: -192px -128px;
 }
 
+.crm-container .new_individual-icon,
 .crm-container .user-record-icon {
-  background-position: -145px -98px;
+  background-position: -144px -96px;
 }
-
+.crm-container .new_household-icon {
+  background-position: 0 -112px;
+}
+.crm-container .new_organization-icon {
+  background-position: -112px -112px;
+}
 .crm-container .inform-icon {
   background-position: -16px -144px;
   margin-right: 5px;
 }
 
 .crm-container .dropdown-icon {
-  background-position: -46px -32px;
+  background-position: -48px -32px;
   float: right;
 }
 
@@ -2524,31 +2530,31 @@ div.grippie {
   background-position: 0 -144px;
 }
 .crm-container .check-icon {
-  background-position: -66px -146px;
+  background-position: -64px -144px;
 }
 .crm-container .refresh-icon {
-  background-position: -65px -81px;
+  background-position: -64px -80px;
 }
 .crm-container .settings-icon {
-  background-position: -178px -114px;
+  background-position: -176px -112px;
 }
 .crm-container .search-icon {
-  background-position: -161px -114px;
+  background-position: -160px -112px;
 }
 .crm-container .email-icon {
-  background-position: -81px -98px;
+  background-position: -80px -96px;
 }
 .crm-container .preview-icon {
-  background-position: -227px -129px;
+  background-position: -224px -128px;
 }
 .crm-container .play-icon {
-  background-position: -3px -161px;
+  background-position: 0 -160px;
 }
 .crm-container .close-icon {
-  background-position: -82px -130px;
+  background-position: -80px -128px;
 }
 .crm-container .swap-icon {
-  background-position: -82px -81px;
+  background-position: -80px -80px;
 }
 
 #crm-container .geotag {
@@ -2618,16 +2624,20 @@ div.grippie {
 }
 
 /* Icon hover-buttons */
-.crm-container .crm-hover-button {
+.crm-container a.crm-hover-button {
   display: inline-block;
   border: 1px solid transparent;
+  text-decoration: none;
+  font-size: .8em;
+  color: #000;
+  padding: 1px 2px;
   opacity: .7;
 }
 .crm-container .crm-accordion-header a.crm-hover-button {
   opacity: 1;
 }
-.crm-container .crm-hover-button:hover,
-.crm-container .crm-hover-button:active {
+.crm-container a.crm-hover-button:hover,
+.crm-container a.crm-hover-button:active {
   background-image: -webkit-gradient(linear, left bottom, left top, color-stop(0, #eee), color-stop(1, #ccc));
   background-image: -webkit-linear-gradient(center bottom, #eee 0%, #ccc 100%);
   background-image: -moz-linear-gradient(center bottom, #eee 0%, #ccc 100%);
@@ -2636,6 +2646,7 @@ div.grippie {
   border: 1px solid #AAAAAA;
   border-radius: 4px;
   opacity: 1;
+  color: #2786C2;
 }
 .crm-container .crm-hover-button .icon {
   margin-left: 3px;
@@ -3837,25 +3848,33 @@ div.m ul#civicrm-menu,
   background-position: -18px 1px;
 }
 /* Style autocomplete results */
-.select2-results table.crm-select2-row,
-.select2-results table.crm-select2-row tbody,
-.select2-results table.crm-select2-row tr,
-.select2-results table.crm-select2-row td {
+.crm-container .select2-results table.crm-select2-row,
+.crm-container .select2-results table.crm-select2-row tbody,
+.crm-container .select2-results table.crm-select2-row tr,
+.crm-container .select2-results table.crm-select2-row td {
   border: 0 none;
   padding: 0;
   margin: 0;
   border-collapse: collapse;
 }
-.select2-results table.crm-select2-row .crm-select2-row-label {
+.crm-container .select2-results table.crm-select2-row .crm-select2-row-label {
   font-size: 1.1em;
 }
-.select2-results table.crm-select2-row .crm-select2-row-description {
+.crm-container .select2-results table.crm-select2-row .crm-select2-row-description {
   font-size: 0.8em;
   line-height: 1.5em;
   color: #696969;
 }
-.select2-results .select2-highlighted table.crm-select2-row .crm-select2-row-description {
+.crm-container .select2-results .select2-highlighted table.crm-select2-row .crm-select2-row-description {
   color: #f0f0f0;
+}
+.crm-container .select2-results td.crm-select2-icon {
+  width: 20px;
+}
+.crm-container .select2-results td.crm-select2-icon .crm-icon {
+  width: 16px;
+  height: 16px;
+  margin: 0;
 }
 
 /* Special styling for specific form buttons */

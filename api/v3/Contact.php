@@ -923,6 +923,7 @@ function _civicrm_api3_contact_getlist_params(&$request) {
   if(!in_array($searchField, $list)) {
     $list[] = $searchField;
   }
+  $list[] = 'contact_type';
   $request['params']['return'] = $list;
   $request['params']['options']['sort'] = 'sort_name';
   // Contact api doesn't support array(LIKE => 'foo') syntax
@@ -947,14 +948,17 @@ function _civicrm_api3_contact_getlist_output($result, $request) {
       );
       $description = array();
       foreach ($request['params']['return'] as $item) {
-        if (!strpos($item, '_name') && !empty($row[$item])) {
+        if (!strpos($item, '_name') && $item != 'contact_type' && !empty($row[$item])) {
           $description[] = $row[$item];
         }
       }
       $data['description'] = implode(' :: ', $description);
       if (!empty($request['image_field'])) {
         $data['image'] = isset($row[$request['image_field']]) ? $row[$request['image_field']] : '';
-      };
+      }
+      else {
+        $data['icon_class'] = $row['contact_type'];
+      }
       $output[] = $data;
     }
   }

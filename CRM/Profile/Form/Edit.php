@@ -305,6 +305,10 @@ SELECT module
   public function postProcess() {
     parent::postProcess();
 
+    $displayName = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $this->_id, 'display_name');
+    $sortName = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $this->_id, 'sort_name');
+    $this->ajaxResponse['label'] = $sortName;
+
     // this is special case when we create contact using Dialog box
     if ($this->_context == 'dialog') {
       //replace the session stack for redirecting user to contact summary if new contact is created.
@@ -312,8 +316,6 @@ SELECT module
       $session = CRM_Core_Session::singleton();
       $session->replaceUserContext($contactViewURL);
 
-      $displayName = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $this->_id, 'display_name');
-      $sortName = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $this->_id, 'sort_name');
       $returnArray = array(
         'contactID' => $this->_id,
         'displayName' => $displayName,
