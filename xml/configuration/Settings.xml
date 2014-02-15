@@ -7,7 +7,7 @@
   <!-- Set this to 1 if you want case activity emails to be redacted -->
         <RedactActivityEmail>0</RedactActivityEmail>
   <!-- Set this to 1 if you want to allow multiple clients to be associated with a single case -->
-  <AllowMultipleCaseClients>0</AllowMultipleCaseClients>
+  <AllowMultipleCaseClients>1</AllowMultipleCaseClients>
   <!-- Set this to 1 if you want to have activity types on Manage Case
   screen sorted in XML file order, default is alphabetical -->
   <NaturalActivityTypeSort>0</NaturalActivityTypeSort>
