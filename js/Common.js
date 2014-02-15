@@ -364,10 +364,12 @@ CRM.validate = CRM.validate || {
         };
         if ($el.data('create-links')) {
           options.formatInputTooShort = function() {
-            return $el.data('select-params').formatInputTooShort + ' ' + ts('or') + '<br />' + CRM.utils.formatSelect2CreateLinks($el);
+            var txt = $el.data('select-params').formatInputTooShort || $.fn.select2.defaults.formatInputTooShort;
+            return txt + ' ' + ts('or') + '<br />' + CRM.utils.formatSelect2CreateLinks($el);
           };
           options.formatNoMatches = function() {
-            return $el.data('select-params').formatNoMatches + '<br />' + CRM.utils.formatSelect2CreateLinks($el);
+            var txt = $el.data('select-params').formatNoMatches || $.fn.select2.defaults.formatNoMatches;
+            return txt + '<br />' + CRM.utils.formatSelect2CreateLinks($el);
           };
           $el.on('select2-open', function() {
             var $el = $(this);
