@@ -50,7 +50,7 @@ class CRM_Case_Form_Activity_OpenCase {
   static function preProcess(&$form) {
     //get multi client case configuration
     $xmlProcessorProcess = new CRM_Case_XMLProcessor_Process();
-    $form->_allowMultiClient = (bool)$xmlProcessorProcess->getAllowMultipleCaseClients();
+    $form->_allowMultiClient = (bool) $xmlProcessorProcess->getAllowMultipleCaseClients();
 
     if ($form->_context == 'caseActivity') {
       $contactID = CRM_Utils_Request::retrieve('cid', 'Positive', $form);
@@ -131,32 +131,30 @@ class CRM_Case_Form_Activity_OpenCase {
     return $defaults;
   }
 
+  /**
+   * @param CRM_Case_Form_Case $form
+   */
   static function buildQuickForm(&$form) {
     if ($form->_context == 'caseActivity') {
       return;
     }
     if ($form->_context == 'standalone') {
-      CRM_Contact_Form_NewContact::buildQuickForm($form);
+      $form->addEntityRef('client_id', ts('Client'), array('create' => TRUE, 'multiple' => $form->_allowMultiClient), TRUE);
     }
 
-    $caseType = array('' => '-select-') + CRM_Case_PseudoConstant::caseType();
-    $element = $form->add('select', 'case_type_id', ts('Case Type'),
-      $caseType, TRUE, array(
-        'onchange' =>
-        "CRM.buildCustomData( 'Case', this.value );",
-      )
+    $element = $form->addSelect(
+      'case_type_id',
+      array('onchange' => "CRM.buildCustomData('Case', this.value);"),
+      TRUE
     );
 
     if ($form->_caseTypeId) {
       $element->freeze();
     }
 
-    $caseStatus = CRM_Case_PseudoConstant::caseStatus();
-    $form->add('select', 'status_id', ts('Case Status'),
-      $caseStatus, TRUE
-    );
+    $form->addSelect('status_id', array(), TRUE);
 
-    $form->add('text', 'duration', ts('Duration'), array('size' => 4, 'maxlength' => 8));
+    $form->add('text', 'duration', ts('Activity Duration'), array('size' => 4, 'maxlength' => 8));
     $form->addRule('duration', ts('Please enter the duration as number of minutes (integers only).'), 'positiveInteger');
 
     if ($form->_currentlyViewedContactId) {
@@ -166,9 +164,7 @@ class CRM_Case_Form_Activity_OpenCase {
 
     $form->addDate('start_date', ts('Case Start Date'), TRUE, array('formatType' => 'activityDateTime'));
 
-    $form->add('select', 'medium_id', ts('Medium'),
-      CRM_Case_PseudoConstant::encounterMedium(), TRUE
-    );
+    $form->addSelect('medium_id', array('entity' => 'activity'), TRUE);
 
     // calling this field activity_location to prevent conflict with contact location fields
     $form->add('text', 'activity_location', ts('Location'), CRM_Core_DAO::getAttribute('CRM_Activity_DAO_Activity', 'location'));
@@ -206,14 +202,9 @@ class CRM_Case_Form_Activity_OpenCase {
       return;
     }
 
-    // set the contact, when contact is selected
-    if (isset($params['contact_select_id']) && !empty($params['contact_select_id'][1])) {
-      $params['contact_id'] = $params['contact_select_id'][1];
-      $form->_currentlyViewedContactId = $params['contact_id'];
-    }
-    elseif ($form->_allowMultiClient && $form->_context != 'case') {
-      $clients = explode(',', $params['contact'][1]);
-      $form->_currentlyViewedContactId = $clients[0];
+    if ($form->_context == 'standalone') {
+      $params['client_id'] = explode(',', $params['client_id']);
+      $form->_currentlyViewedContactId = $params['client_id'][0];
     }
 
     // for open case start date should be set to current date
@@ -252,19 +243,6 @@ class CRM_Case_Form_Activity_OpenCase {
     }
 
     $errors = array();
-
-    if (!$form->_allowMultiClient) {
-      //check if contact is selected in standalone mode
-      if (isset($fields['contact_select_id'][1]) && !$fields['contact_select_id'][1]) {
-        $errors['contact[1]'] = ts('Please select a contact or create new contact');
-      }
-    }
-    else {
-      //check selected contact for multi client option
-      if (isset($fields['contact'][1]) && !$fields['contact'][1]) {
-        $errors['contact[1]'] = ts('Please select a valid contact or create new contact');
-      }
-    }
     return $errors;
   }
 
@@ -295,11 +273,10 @@ class CRM_Case_Form_Activity_OpenCase {
     }
 
     // 1. create case-contact
-    if ($isMultiClient && $form->_context != 'case') {
-      $client = explode(',', $params['contact'][1]);
-      foreach ($client as $key => $cliId) {
+    if ($isMultiClient && $form->_context == 'standalone') {
+      foreach ($params['client_id'] as $cliId) {
         if (empty($cliId)) {
-          CRM_Core_Error::fatal('contact_id cannot be empty');
+          CRM_Core_Error::fatal('client_id cannot be empty');
         }
         $contactParams = array(
           'case_id' => $params['case_id'],
@@ -314,14 +291,13 @@ class CRM_Case_Form_Activity_OpenCase {
         'contact_id' => $form->_currentlyViewedContactId,
       );
       CRM_Case_BAO_Case::addCaseToContact($contactParams);
-      $client = $form->_currentlyViewedContactId;
     }
 
     // 2. initiate xml processor
     $xmlProcessor = new CRM_Case_XMLProcessor_Process();
 
     $xmlProcessorParams = array(
-      'clientID' => $client,
+      'clientID' => $form->_currentlyViewedContactId,
       'creatorID' => $form->_currentUserId,
       'standardTimeline' => 1,
       'activityTypeName' => 'Open Case',
