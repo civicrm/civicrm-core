@@ -446,6 +446,8 @@ class CRM_Core_Resources {
       $url = CRM_Utils_System::url('civicrm/example', 'placeholder', FALSE, NULL, FALSE);
       $js = "CRM.url('init', '$url');\n";
       $js .= "CRM.formatMoney('init', " . json_encode(CRM_Utils_Money::format(1234.56)) . ");";
+
+      $this->addLocalization($js);
       $this->addScript($js, $jsWeight++, $region);
 
       // Add global settings
@@ -520,6 +522,19 @@ class CRM_Core_Resources {
       $this->cache->set($ext, $stringsByFile);
     }
     $this->addString($stringsByFile[$file]);
+  }
+
+  /**
+   * Add inline scripts needed to localize js widgets
+   * @param string $js
+   */
+  function addLocalization(&$js) {
+    $js .= '
+      $.fn.select2.defaults.formatNoMatches = ' . json_encode(ts('None found.')) . ';
+      $.fn.select2.defaults.formatLoadMore = ' . json_encode(ts('Loading...')) . ';
+      $.fn.select2.defaults.formatSearching = ' . json_encode(ts('Searching...')) . ';
+      $.fn.select2.defaults.formatInputTooShort = ' . json_encode(ts('Enter search term...')) . ';
+    ';
   }
 
   /**
