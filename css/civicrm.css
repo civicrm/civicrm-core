@@ -2572,29 +2572,34 @@ div.grippie {
   /* for accessibility reason, put the name of the type/subtype in the icon div (it will be hidden and replaced by the icon) */
 }
 
+.select2-results .select2-highlighted .Individual-icon,
 .crm-container .Individual-icon {
   background-position: 0px 0px;
+}
+.select2-results .select2-highlighted .Organization-icon,
+.crm-container .Organization-icon {
+  background-position: -48px 0px;
+}
+.select2-results .select2-highlighted .Household-icon,
+.crm-container .Household-icon {
+  background-position: -32px 0px;
 }
 .crm-container .Group-icon {
   background-position: -16px 0px;
 }
-.crm-container .Household-icon {
-  background-position: -32px 0px;
-}
-
+.select2-results .Individual-icon,
 .crm-container .Individual-subtype-icon {
   background-position: 0px -48px;
 }
+.select2-results .Household-icon,
 .crm-container .Household-subtype-icon {
   background-position: -32px -48px;
 }
+.select2-results .Organization-icon,
 .crm-container .Organization-subtype-icon {
   background-position: -48px -48px;
 }
 
-.crm-container .Organization-icon {
-  background-position: -48px 0px;
-}
 .crm-container .Activity-icon {
   background-position: -64px 0px;
 }
@@ -2630,7 +2635,7 @@ div.grippie {
   text-decoration: none;
   font-size: .8em;
   color: #000;
-  padding: 1px 2px;
+  padding: 1px 2px 1px 0;
   opacity: .7;
 }
 .crm-container .crm-accordion-header a.crm-hover-button {
@@ -3875,6 +3880,18 @@ div.m ul#civicrm-menu,
   width: 16px;
   height: 16px;
   margin: 0;
+}
+.crm-container .select2-results {
+  padding: 0;
+}
+.crm-container .select2-results li.select2-no-results {
+  padding-left: 4px;
+  padding-top: 4px;
+  margin-left: 4px;
+}
+.crm-container .select2-results li {
+  margin: 0;
+  padding: 0;
 }
 
 /* Special styling for specific form buttons */
