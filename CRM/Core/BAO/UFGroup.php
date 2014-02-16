@@ -3257,7 +3257,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
    */
   static function getCreateLinks($profiles, $appendProfiles = array()) {
     $profiles = (array) $profiles;
-    $toGet = array_merge($profiles, $appendProfiles);
+    $toGet = array_merge($profiles, (array) $appendProfiles);
     $retrieved = civicrm_api3('uf_group', 'get', array(
       'name' => array('IN' => $toGet),
       'is_active' => 1,
