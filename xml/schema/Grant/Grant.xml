@@ -94,7 +94,7 @@
   <field>
     <name>grant_type_id</name>
     <type>int unsigned</type>
-    <title>Grant Type Id</title>
+    <title>Grant Type</title>
     <pseudoconstant>
       <optionGroupName>grant_type</optionGroupName>
     </pseudoconstant>
@@ -196,7 +196,7 @@
   <field>
     <name>status_id</name>
     <type>int unsigned</type>
-    <title>Grant Status Id</title>
+    <title>Grant Status</title>
     <uniqueName>grant_status_id</uniqueName>
     <required>true</required>
     <import>true</import>
