@@ -1249,7 +1249,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    *  - entity - defaults to contact
    *  - create - can the user create a new entity on-the-fly?
    *             Set to TRUE if entity is contact and you want the default profiles,
-   *             or pass in your own set of links. See output of CRM_Core_BAO_UFGroup::getCreateLinks for format
+   *             or pass in your own set of links. @see CRM_Core_BAO_UFGroup::getCreateLinks for format
    *  - api - array of settings for the getlist api
    *  - placeholder - string
    *  - multiple - bool

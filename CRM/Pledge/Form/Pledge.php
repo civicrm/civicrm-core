@@ -276,7 +276,7 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
     }
 
     if ($this->_context == 'standalone') {
-      CRM_Contact_Form_NewContact::buildQuickForm($this);
+      $this->addEntityRef('contact_id', ts('Contact'), array('create' => TRUE), TRUE);
     }
 
     $showAdditionalInfo = FALSE;
@@ -492,11 +492,6 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
   static function formRule($fields, $files, $self) {
     $errors = array();
 
-    //check if contact is selected in standalone mode
-    if (isset($fields['contact_select_id'][1]) && !$fields['contact_select_id'][1]) {
-      $errors['contact[1]'] = ts('Please select a contact or create new contact');
-    }
-
     if ($fields['amount'] <= 0) {
       $errors['amount'] = ts('Total Pledge Amount should be greater than zero.');
     }
@@ -534,11 +529,10 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
     $formValues = $this->controller->exportValues($this->_name);
 
     // set the contact, when contact is selected
-    if (!empty($formValues['contact_select_id'])) {
-      $this->_contactID = $formValues['contact_select_id'][1];
+    if (!empty($formValues['contact_id'])) {
+      $this->_contactID = $formValues['contact_id'];
     }
 
-    $config = CRM_Core_Config::singleton();
     $session = CRM_Core_Session::singleton();
 
     //get All Payments status types.
@@ -549,7 +543,7 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
       'frequency_interval',
       'frequency_day',
       'installments',
-                         'financial_type_id',
+      'financial_type_id',
       'initial_reminder_day',
       'max_reminders',
       'additional_reminder_day',
