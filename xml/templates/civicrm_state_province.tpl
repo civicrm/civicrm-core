@@ -2435,7 +2435,7 @@ INSERT INTO civicrm_state_province (id, country_id, abbreviation, name) VALUES
 (3976, 1154, "STL", "Southland"),
 (3977, 1154, "TKI", "Taranaki"),
 (3978, 1154, "TAS", "Tasman"),
-(3979, 1154, "WKO", "waikato"),
+(3979, 1154, "WKO", "Waikato"),
 (3980, 1154, "WGN", "Wellington"),
 (3981, 1154, "WTC", "West Coast"),
 (3982, 1162, "DA", "Ad Dakhillyah"),
