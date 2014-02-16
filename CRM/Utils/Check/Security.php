@@ -153,7 +153,8 @@ class CRM_Utils_Check_Security {
         $url[] = $log_path[1];
         $log_url = implode($filePathMarker, $url);
         $docs_url = $this->createDocUrl('checkLogFileIsNotAccessible');
-        if ($log = @file_get_contents($log_url)) {
+        $headers = @get_headers($log_url);
+        if (stripos($headers[0], '200')) {
           $msg = 'The <a href="%1">CiviCRM debug log</a> should not be downloadable.'
             . '<br />' .
             '<a href="%2">Read more about this warning</a>';
@@ -192,7 +193,8 @@ class CRM_Utils_Check_Security {
           $f = array_rand($files);
           if ($file_path = explode($filePathMarker, $files[$f])) {
             $url = implode($filePathMarker, array($upload_url[0], $file_path[1]));
-            if ($file = @file_get_contents($url)) {
+            $headers = @get_headers($url);
+            if (stripos($headers[0], '200')) {
               $msg = 'Files in the upload directory should not be downloadable.'
                 . '<br />' .
                 '<a href="%1">Read more about this warning</a>';
