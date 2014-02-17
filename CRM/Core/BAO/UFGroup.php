@@ -2036,7 +2036,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
       $form->addElement('checkbox', $name, $title);
     }
     elseif ($fieldName == 'soft_credit') {
-      CRM_Contact_Form_NewContact::buildQuickForm($form, $rowNumber, NULL, FALSE, 'soft_credit_');
+      $form->addEntityRef("soft_credit_contact_id[$rowNumber]", ts('Soft Credit To'), array('create' => TRUE));
       $form->addMoney("soft_credit_amount[{$rowNumber}]", ts('Amount'), FALSE, NULL, FALSE);
     }
     elseif ($fieldName == 'product_name') {
