@@ -123,7 +123,7 @@ function showHideByValue(trigger_field_id, trigger_value, target_element_id, tar
 
   if (field_type == 'select') {
     var trigger = trigger_value.split("|");
-    var selectedOptionValue = document.getElementById(trigger_field_id).options[document.getElementById(trigger_field_id).selectedIndex].value;
+    var selectedOptionValue = cj('#' + trigger_field_id).val();
 
     var target = target_element_id.split("|");
     for (var j = 0; j < target.length; j++) {
@@ -150,7 +150,7 @@ function showHideByValue(trigger_field_id, trigger_value, target_element_id, tar
     if (field_type == 'radio') {
       var target = target_element_id.split("|");
       for (var j = 0; j < target.length; j++) {
-        if (document.getElementsByName(trigger_field_id)[0].checked) {
+        if (cj('[name="' + trigger_field_id + '"]').is(':checked')) {
           if (invert) {
             cj('#' + target[j]).hide();
           }
