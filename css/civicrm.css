@@ -2458,25 +2458,25 @@ div.grippie {
   background-image: url("../i/icons/jquery-ui-8A1F11.png")}
 
 .crm-container .edit-icon {
-  background-position: -64px -114px;
+  background-position: -64px -112px;
 }
 .crm-container .previous-icon {
-  background-position: -82px -161px;
+  background-position: -80px -160px;
 }
 .crm-container .next-icon {
-  background-position: -66px -161px;
+  background-position: -64px -160px;
 }
 .crm-container .add-icon {
-  background-position: -2px -193px;
+  background-position: 0 -192px;
 }
 .crm-container .back-icon {
-  background-position: -2px -65px;
+  background-position: 0 -64px;
 }
 .crm-container .delete-icon {
-  background-position: -179px -99px;
+  background-position: -176px -96px;
 }
 .crm-container .details-icon {
-  background-position: -129px -112px;
+  background-position: -128px -112px;
 }
 .crm-container .button:hover .delete-icon {
   background-image: url("../i/icons/jquery-ui-8A1F11.png")!important;
@@ -2655,8 +2655,8 @@ div.grippie {
 }
 .crm-container .crm-hover-button .icon {
   margin-left: 3px;
-  margin-top: 2px;
-  vertical-align: middle;
+  position: relative;
+  top: 2px;
 }
 .crm-container .crm-hover-button:hover .icon,
 .crm-container .crm-hover-button:active .icon {
