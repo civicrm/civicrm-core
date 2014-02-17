@@ -123,7 +123,7 @@
        <name>soft_credit_type_id</name>
        <type>int unsigned</type>
        <default>NULL</default>
-       <title>Soft Credit Type ID</title>
+       <title>Soft Credit Type</title>
        <pseudoconstant>
          <optionGroupName>soft_credit_type</optionGroupName>
        </pseudoconstant>
