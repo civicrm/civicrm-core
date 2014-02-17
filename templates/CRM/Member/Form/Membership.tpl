@@ -84,11 +84,12 @@
           <tr>
             <td class="font-size12pt label"><strong>{ts}Member{/ts}</strong></td><td class="font-size12pt"><strong>{$displayName}</strong></td>
           </tr>
-          {else}
+        {else}
           {if !$membershipMode and !$emailExists and $outBound_option != 2}
             {assign var='profileCreateCallback' value=1 }
           {/if}
-        {include file="CRM/Contact/Form/NewContact.tpl"}
+          <td class="label">{$form.contact_id.label}</td>
+          <td>{$form.contact_id.html}</td>
         {/if}
         {if $membershipMode}
           <tr><td class="label">{$form.payment_processor_id.label}</td><td>{$form.payment_processor_id.html}</td></tr>
@@ -183,12 +184,13 @@
               <td>&nbsp;</td>
               <td>
                 <table class="compressed">
-                  <tr class="crm-membership-form-block-honor-type">
+                  <tr class="crm-membership-form-block-soft-credit-type">
                     <td class="label">{$form.soft_credit_type.label}</td>
                     <td>{$form.soft_credit_type.html}</td>
                   </tr>
-                  <tr id ='contributionContact' class="crm-membership-form-block-contribution-type">
-                  {include file="CRM/Contact/Form/NewContact.tpl"}
+                  <tr class="crm-membership-form-block-soft-credit-contact-id">
+                    <td class="label">{$form.soft_credit_contact_id.label}</td>
+                    <td>{$form.soft_credit_contact_id.html}</td>
                   </tr>
                 </table>
               </td>
@@ -217,12 +219,13 @@
                   <td>&nbsp;</td>
                   <td>
                     <table class="compressed">
-                      <tr class="crm-membership-form-block-honor-type">
+                      <tr class="crm-membership-form-block-soft-credit-type">
                         <td class="label">{$form.soft_credit_type_id.label}</td>
                         <td>{$form.soft_credit_type_id.html}</td>
                       </tr>
-                      <tr id ='contributionContact' class="crm-membership-form-block-contribution-type">
-                      {include file="CRM/Contact/Form/NewContact.tpl"}
+                      <tr class="crm-membership-form-block-soft-credit-contact-id">
+                        <td class="label">{$form.soft_credit_contact_id.label}</td>
+                        <td>{$form.soft_credit_contact_id.html}</td>
                       </tr>
                     </table>
                   </td>
