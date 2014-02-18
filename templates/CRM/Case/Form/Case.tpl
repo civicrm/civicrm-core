@@ -61,7 +61,8 @@
     </tr>
 {elseif !$clientName and $action eq 1}
     {if $context eq 'standalone'}
-        {include file="CRM/Contact/Form/NewContact.tpl"}
+      <td class="label">{$form.client_id.label}</td>
+      <td class="view-value">{$form.client_id.html}</td>
     {/if}
 {/if}
 {* activity fields *}
@@ -103,7 +104,7 @@
       <td class="label">{$form.duration.label}</td>
       <td class="view-value">
         {$form.duration.html}
-         <span class="description">{ts}Total time spent on this activity (in minutes).{/ts}</span>
+         <span class="description">{ts}minutes{/ts}</span>
       </td>
     </tr>
 {/if}

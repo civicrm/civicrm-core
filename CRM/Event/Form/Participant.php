@@ -722,7 +722,7 @@ SELECT civicrm_custom_group.name as name,
       $urlPath = 'civicrm/contact/view/participant';
       $urlParams = "reset=1&cid={$this->_contactId}&context=participant";
       if ($this->_context == 'standalone') {
-        CRM_Contact_Form_NewContact::buildQuickForm($this);
+        $this->addEntityRef('contact_id', ts('Contact'), array('create' => TRUE), TRUE);
         $urlParams = 'reset=1&context=standalone';
         $urlPath = 'civicrm/participant/add';
       }
@@ -982,10 +982,6 @@ loadCampaign( {$this->_eID}, {$eventCampaigns} );
     }
 
     $errorMsg = array();
-    //check if contact is selected in standalone mode
-    if (isset($values['contact_select_id'][1]) && !$values['contact_select_id'][1]) {
-      $errorMsg['contact[1]'] = ts('Please select a contact or create new contact');
-    }
 
     if (!empty($values['payment_processor_id'])) {
       // make sure that credit card number and cvv are valid
@@ -1055,8 +1051,8 @@ loadCampaign( {$this->_eID}, {$eventCampaigns} );
 
     $participantStatus = CRM_Event_PseudoConstant::participantStatus();
     // set the contact, when contact is selected
-    if (!empty($params['contact_select_id'])) {
-      $this->_contactId = $params['contact_select_id'][1];
+    if (!empty($params['contact_id'])) {
+      $this->_contactId = $params['contact_id'];
     }
     if ($this->_priceSetId && $isQuickConfig = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $this->_priceSetId, 'is_quick_config')) {
       $this->_quickConfig = $isQuickConfig;

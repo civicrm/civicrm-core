@@ -123,7 +123,7 @@ function showHideByValue(trigger_field_id, trigger_value, target_element_id, tar
 
   if (field_type == 'select') {
     var trigger = trigger_value.split("|");
-    var selectedOptionValue = document.getElementById(trigger_field_id).options[document.getElementById(trigger_field_id).selectedIndex].value;
+    var selectedOptionValue = cj('#' + trigger_field_id).val();
 
     var target = target_element_id.split("|");
     for (var j = 0; j < target.length; j++) {
@@ -150,7 +150,7 @@ function showHideByValue(trigger_field_id, trigger_value, target_element_id, tar
     if (field_type == 'radio') {
       var target = target_element_id.split("|");
       for (var j = 0; j < target.length; j++) {
-        if (document.getElementsByName(trigger_field_id)[0].checked) {
+        if (cj('[name="' + trigger_field_id + '"]').is(':checked')) {
           if (invert) {
             cj('#' + target[j]).hide();
           }
@@ -364,10 +364,12 @@ CRM.validate = CRM.validate || {
         };
         if ($el.data('create-links')) {
           options.formatInputTooShort = function() {
-            return $el.data('select-params').formatInputTooShort + ' ' + ts('or') + '<br />' + CRM.utils.formatSelect2CreateLinks($el);
+            var txt = $el.data('select-params').formatInputTooShort || $.fn.select2.defaults.formatInputTooShort;
+            return txt + ' ' + ts('or') + '<br />' + CRM.utils.formatSelect2CreateLinks($el);
           };
           options.formatNoMatches = function() {
-            return $el.data('select-params').formatNoMatches + '<br />' + CRM.utils.formatSelect2CreateLinks($el);
+            var txt = $el.data('select-params').formatNoMatches || $.fn.select2.defaults.formatNoMatches;
+            return txt + '<br />' + CRM.utils.formatSelect2CreateLinks($el);
           };
           $el.on('select2-open', function() {
             var $el = $(this);

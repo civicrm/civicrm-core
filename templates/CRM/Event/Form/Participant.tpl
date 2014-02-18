@@ -218,7 +218,10 @@
             {if !$participantMode and !$email and $outBound_option != 2 }
               {assign var='profileCreateCallback' value=1}
             {/if}
-          {include file="CRM/Contact/Form/NewContact.tpl"}
+            <tr class="crm-participant-form-contact-id">
+              <td class="label">{$form.contact_id.label}</td>
+              <td>{$form.contact_id.html}</td>
+            </tr>
           {/if}
           {if $action EQ 2}
             {if $additionalParticipants} {* Display others registered by this participant *}

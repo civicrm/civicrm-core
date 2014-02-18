@@ -73,7 +73,7 @@
         <div class="compressed crm-grid-cell"><span class="batch-edit"></span></div>
         {* contact select/create option*}
         <div class="compressed crm-grid-cell">
-          {include file="CRM/Contact/Form/NewContact.tpl" blockNo = $rowNumber noLabel=true prefix="primary_" newContactCallback="updateContactInfo($rowNumber, 'primary_')"}
+          {$form.primary_contact_id.$rowNumber.html|crmAddClass:big}
         </div>
 
         {if $batchType eq 2 }
@@ -90,7 +90,7 @@
             </div>
           {elseif $n eq 'soft_credit'}
             <div class="compressed crm-grid-cell">
-              {include file="CRM/Contact/Form/NewContact.tpl" blockNo = $rowNumber noLabel=true prefix="soft_credit_"}
+              {$form.soft_credit_contact_id.$rowNumber.html|crmAddClass:big}
               {$form.soft_credit_amount.$rowNumber.label}&nbsp;{$form.soft_credit_amount.$rowNumber.html|crmAddClass:eight}
             </div>
           {elseif in_array( $fields.$n.html_type, array('Radio', 'CheckBox'))}

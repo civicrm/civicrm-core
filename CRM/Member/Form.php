@@ -168,13 +168,13 @@ class CRM_Member_Form extends CRM_Core_Form {
    * then they weill differ
    *
    * @param $formValues array values from form. The important values we are looking for are
-   *  - contact_select_id[1]
-   *  - contribution_contact_select_id[1]
+   *  - contact_id
+   *  - soft_credit_contact_id
    */
   function storeContactFields($formValues){
     // in a 'standalone form' (contact id not in the url) the contact will be in the form values
-    if (!empty($formValues['contact_select_id'])) {
-      $this->_contactID = $formValues['contact_select_id'][1];
+    if (!empty($formValues['contact_id'])) {
+      $this->_contactID = $formValues['contact_id'];
     }
 
     list($this->_memberDisplayName,
@@ -183,8 +183,8 @@ class CRM_Member_Form extends CRM_Core_Form {
 
     //CRM-10375 Where the payer differs to the member the payer should get the email.
     // here we store details in order to do that
-    if (!empty($formValues['contribution_contact_select_id']) && !empty($formValues['contribution_contact_select_id']['1'])) {
-      $this->_receiptContactId = $this->_contributorContactID = $formValues['contribution_contact_select_id'][1];
+    if (!empty($formValues['soft_credit_contact_id'])) {
+      $this->_receiptContactId = $this->_contributorContactID = $formValues['soft_credit_contact_id'];
        list( $this->_contributorDisplayName,
          $this->_contributorEmail ) = CRM_Contact_BAO_Contact_Location::getEmailDetails( $this->_contributorContactID );
     }
