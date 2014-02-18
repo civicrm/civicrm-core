@@ -194,7 +194,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
     $contactTypes = array('Contact', 'Individual', 'Household', 'Organization');
     $contactReturnProperties = array();
     for ($rowNumber = 1; $rowNumber <= $this->_batchInfo['item_count']; $rowNumber++) {
-      $this->addEntityRef("primary_contact_id[{$rowNumber}]", '', array('create' => TRUE));
+      $this->addEntityRef("primary_contact_id[{$rowNumber}]", '', array('create' => TRUE, 'placeholder' => ts('- select -')));
 
       // special field specific to membership batch udpate
       if ($this->_batchInfo['type_id'] == 2) {
