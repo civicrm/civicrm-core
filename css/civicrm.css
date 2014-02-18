@@ -4306,6 +4306,7 @@ span.crm-status-icon {
 /* Public Pages */
 
 #crm-container.crm-public input[type="text"],
+#crm-container.crm-public input[type="password"],
 #crm-container.crm-public select {
   font-size: 15px;
   padding: 5px;
