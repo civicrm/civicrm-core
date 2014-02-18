@@ -704,19 +704,6 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
     //add followup date
     $this->addDateTime('followup_date', ts('in'), FALSE, array('formatType' => 'activityDateTime'));
 
-    //tokeninput url
-    $tokenUrl = CRM_Utils_System::url("civicrm/ajax/checkemail",
-      "noemail=1",
-      FALSE, NULL, FALSE
-    );
-    $this->assign('tokenUrl', $tokenUrl);
-
-    $sourceContactField = $this->addEntityRef(
-      'source_contact_id',
-      $this->_fields['source_contact_id']['label'],
-      array(),
-      TRUE
-    );
     // Only admins and case-workers can change the activity source
     if (!CRM_Core_Permission::check('administer CiviCRM') && $this->_context != 'caseActivity') {
       $this->getElement('source_contact_id')->freeze();
