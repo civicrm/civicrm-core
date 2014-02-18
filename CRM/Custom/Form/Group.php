@@ -421,6 +421,10 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
       $this->assign('showMaxMultiple', FALSE);
     }
 
+    if (($this->_action & CRM_Core_Action::UPDATE) && $defaults['is_multiple']) {
+      $defaults['collapse_display'] = 0;
+    }
+
     if (isset($defaults['extends'])) {
       $extends = $defaults['extends'];
       unset($defaults['extends']);

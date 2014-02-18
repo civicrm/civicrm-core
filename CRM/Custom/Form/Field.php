@@ -261,6 +261,10 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
     if (isset($dontShowLink)) {
       $this->assign('dontShowLink', $dontShowLink);
     }
+    if (CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $this->_gid, 'is_multiple', 'id')) {
+      $defaults['in_selector'] = 1;
+    }
+
     return $defaults;
   }
 
@@ -304,6 +308,11 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
       '&nbsp;&nbsp;&nbsp;'
     );
     $sel->setOptions(array($dt, $it));
+
+    if (CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $this->_gid, 'is_multiple')) {
+      $this->add('checkbox', 'in_selector', ts('Display in Table?'));
+    }
+
     if ($this->_action == CRM_Core_Action::UPDATE) {
       $this->freeze('data_type');
     }
