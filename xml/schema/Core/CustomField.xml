@@ -238,6 +238,13 @@
        <comment>Stores Contact Get API params contact reference custom fields. May be used for other filters in the future.</comment>
        <add>4.1</add>
   </field>
+  <field>
+    <name>in_selector</name>
+    <type>boolean</type>
+    <default>0</default>
+    <comment>Should the multi-record custom field values be displayed in tab table listing</comment>
+    <add>4.5</add>
+  </field>
   <index>
     <name>UI_label_custom_group_id</name>
     <fieldName>label</fieldName>

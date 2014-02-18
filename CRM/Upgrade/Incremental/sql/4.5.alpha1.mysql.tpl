@@ -242,3 +242,12 @@ ALTER TABLE  `civicrm_contact` CHANGE  `preferred_mail_format`  `preferred_mail_
 -- CRM-14183
 INSERT INTO civicrm_state_province (country_id, abbreviation, name) VALUES (1157, "PL", "Plateau");
 UPDATE civicrm_state_province SET name = "Abuja Federal Capital Territory" WHERE name = "Abuja Capital Territory";
+
+-- CRM-13992
+ALTER TABLE `civicrm_custom_field`
+  ADD COLUMN `in_selector` tinyint(4) DEFAULT '0' COMMENT 'Should the multi-record custom field values be displayed in tab table listing';
+UPDATE civicrm_custom_field cf
+  LEFT JOIN civicrm_custom_group cg
+    ON cf.custom_group_id = cg.id
+  SET cf.in_selector = 1
+  WHERE cg.is_multiple = 1 AND cf.html_type != 'TextArea';

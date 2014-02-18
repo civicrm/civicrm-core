@@ -277,6 +277,7 @@ class CRM_Core_SelectValues {
       $customGroupStyle = array(
         'Tab' => ts('Tab'),
         'Inline' => ts('Inline'),
+        'Tab with table' => ts('Tab with table')
       );
     }
     return $customGroupStyle;
