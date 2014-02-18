@@ -122,7 +122,7 @@ class api_v3_UFMatchTest extends CiviUnitTestCase {
    *  Test civicrm_activity_create() using example code
    */
   function testUFMatchGetExample() {
-    require_once 'api/v3/examples/UFMatchGet.php';
+    require_once 'api/v3/examples/UFMatch/Get.php';
     $result = UF_match_get_example();
     $expectedResult = UF_match_get_expectedresult();
     $this->assertEquals($result, $expectedResult);
