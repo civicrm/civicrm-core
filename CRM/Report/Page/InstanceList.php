@@ -58,6 +58,13 @@ class CRM_Report_Page_InstanceList extends CRM_Core_Page {
   protected $_compID = NULL;
 
   /**
+   * ID of grouping if report list is filtered
+   *
+   * @var int
+   **/
+  protected $_grouping = NULL;
+
+  /**
    * ID of parent report template if list is filtered by template
    *
    * @var int
@@ -102,10 +109,17 @@ class CRM_Report_Page_InstanceList extends CRM_Core_Page {
         }
       }
     }
+    elseif ($this->grouping) {
+      $report .= " AND v.grouping = '{$this->grouping}' ";
+    }
 
     $sql = "
-        SELECT inst.id, inst.title, inst.report_id, inst.description, v.label,
-               ifnull( SUBSTRING(comp.name, 5), 'Contact' ) as compName
+        SELECT inst.id, inst.title, inst.report_id, inst.description, v.label, v.grouping,
+        CASE
+          WHEN comp.name IS NOT NULL THEN SUBSTRING(comp.name, 5)
+          WHEN v.grouping IS NOT NULL THEN v.grouping
+          ELSE 'Contact'
+          END as compName
           FROM civicrm_option_group g
           LEFT JOIN civicrm_option_value v
                  ON v.option_group_id = g.id AND
@@ -133,7 +147,7 @@ class CRM_Report_Page_InstanceList extends CRM_Core_Page {
       }
 
       $enabled = in_array("Civi{$dao->compName}", $config->enableComponents);
-      if ($dao->compName == 'Contact') {
+      if ($dao->compName == 'Contact' || $dao->compName == $dao->grouping) {
         $enabled = TRUE;
       }
       //filter report listings by permissions
@@ -171,6 +185,8 @@ class CRM_Report_Page_InstanceList extends CRM_Core_Page {
     //Filters by source report template or by component
     $this->ovID   = CRM_Utils_Request::retrieve('ovid', 'Positive', $this);
     $this->compID = CRM_Utils_Request::retrieve('compid', 'Positive', $this);
+    $this->grouping = CRM_Utils_Request::retrieve('grp', 'String', $this);
+    
     $rows   = $this->info();
 
     $this->assign('list', $rows);
