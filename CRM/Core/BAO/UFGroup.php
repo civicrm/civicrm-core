@@ -2036,7 +2036,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
       $form->addElement('checkbox', $name, $title);
     }
     elseif ($fieldName == 'soft_credit') {
-      CRM_Contact_Form_NewContact::buildQuickForm($form, $rowNumber, NULL, FALSE, 'soft_credit_');
+      $form->addEntityRef("soft_credit_contact_id[$rowNumber]", ts('Soft Credit To'), array('create' => TRUE));
       $form->addMoney("soft_credit_amount[{$rowNumber}]", ts('Amount'), FALSE, NULL, FALSE);
     }
     elseif ($fieldName == 'product_name') {
@@ -3257,7 +3257,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
    */
   static function getCreateLinks($profiles, $appendProfiles = array()) {
     $profiles = (array) $profiles;
-    $toGet = array_merge($profiles, $appendProfiles);
+    $toGet = array_merge($profiles, (array) $appendProfiles);
     $retrieved = civicrm_api3('uf_group', 'get', array(
       'name' => array('IN' => $toGet),
       'is_active' => 1,

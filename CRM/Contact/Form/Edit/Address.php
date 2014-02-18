@@ -288,14 +288,9 @@ class CRM_Contact_Form_Edit_Address {
       // shared address
       $form->addElement('checkbox', "address[$blockId][use_shared_address]", NULL, ts('Use another contact\'s address'));
 
-      // get the reserved for address
-      $profileId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_UFGroup', 'shared_address', 'id', 'name');
-
-      if (!$profileId) {
-        CRM_Core_Error::fatal(ts('Your install is missing required "Shared Address" profile.'));
-      }
-
-      CRM_Contact_Form_NewContact::buildQuickForm($form, $blockId, array($profileId));
+      // Override the default profile links to add address form
+      $profileLinks = CRM_Core_BAO_UFGroup::getCreateLinks(array('new_individual', 'new_organization', 'new_household'), 'shared_address');
+      $form->addEntityRef("address[$blockId][master_contact_id]", ts('Share With'), array('create' => $profileLinks));
     }
   }
 
