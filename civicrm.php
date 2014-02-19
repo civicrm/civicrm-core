@@ -410,6 +410,10 @@ class CiviCRM_For_WordPress {
    * Also called by add_shortcode_includes() and _civicrm_update_user()
    */
   public function invoke() {
+  
+    if ( !in_the_loop() AND empty($_REQUEST['snippet']) ) {
+      return;
+    }
 
     static $alreadyInvoked = FALSE;
     if ( $alreadyInvoked ) {
