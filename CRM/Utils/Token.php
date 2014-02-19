@@ -1020,6 +1020,9 @@ class CRM_Utils_Token {
    * @param  array   $extraParams      extra params
    * @param  array   $tokens           the list of tokens we've extracted from the content
    * @param  int     $jobID            the mailing list jobID - this is a legacy param
+   * @param array    $extraContactDetails extra contact details to be added before hooks are called.
+   *   This allows hooks to get information as to the membership being tokenised (note that membership
+   *   tokens call this function once per membership so the ids don't clash)
    *
    * @return array
    * @access public
@@ -1032,7 +1035,8 @@ class CRM_Utils_Token {
     $extraParams      = NULL,
     $tokens           = array(),
     $className        = NULL,
-    $jobID            = NULL
+    $jobID            = NULL,
+    $extraContactDetails = array()
   ) {
     if (empty($contactIDs)) {
       // putting a fatal here so we can track if/when this happens
@@ -1122,9 +1126,15 @@ class CRM_Utils_Token {
             $contactDetails[$contactID][$val] = $contactDetails[$contactID]["{$val}_display"];
           }
         }
+        if(array_key_exists($contactID, $extraContactDetails)) {
+          $contactDetails[$contactID] = array_merge($contactDetails[$contactID], $extraContactDetails[$contactID]);
+        }
+      }
+      elseif (array_key_exists($contactID, $extraContactDetails)) {
+        $contactDetails[$contactID] = $extraContactDetails[$contactID];
+
       }
     }
-
     // also call a hook and get token details
     CRM_Utils_Hook::tokenValues($details[0],
       $contactIDs,
