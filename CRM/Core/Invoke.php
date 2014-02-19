@@ -117,8 +117,13 @@ class CRM_Core_Invoke {
       $kernel = new AppKernel('dev', true);
       $kernel->loadClassCache();
       $response = $kernel->handle(Symfony\Component\HttpFoundation\Request::createFromGlobals());
-      // $response->send();
-      return $response->getContent();
+      if (preg_match(':^text/html:', $response->headers->get('Content-Type'))) {
+        // let the CMS handle the trappings
+        return $response->getContent();
+      } else {
+        $response->send();
+        exit();
+      }
     }
   }
   /**
