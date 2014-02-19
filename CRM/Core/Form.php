@@ -1459,7 +1459,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       $profiles[] = $this->_values['custom_pre_id'];
     }
     if($this->_values['custom_post_id']) {
-      $profiles[] = $this->_values['custom_post_id'];
+      $profiles = $profiles + (array) $this->_values['custom_post_id'];
     }
     if($onlinePaymentProcessorEnabled) {
       $profiles[] = 'billing';
