@@ -411,7 +411,7 @@ class CiviCRM_For_WordPress {
    */
   public function invoke() {
   
-    if ( !in_the_loop() AND empty($_REQUEST['snippet']) ) {
+    if ( !in_the_loop() && !is_admin() && empty($_REQUEST['snippet']) ) {
       return;
     }
 
