@@ -55,6 +55,9 @@ class CRM_GenCode_Util_File {
     }
 
     $newTempDir = $tempDir . '/' . $prefix . rand(1, 10000);
+    if (function_exists('posix_geteuid')) {
+      $newTempDir .= '_' . posix_geteuid();
+    }
 
     if (file_exists($newTempDir)) {
       self::removeDir($newTempDir);
