@@ -17,9 +17,6 @@ date_default_timezone_set('UTC'); // avoid php warnings if timezone is not set -
 
 define('CIVICRM_UF', 'Drupal');
 
-// this should be true if you want to generate entities instead of DAO
-define('CIVICRM_GEN_ENTITY', FALSE);
-
 require_once 'CRM/Core/ClassLoader.php';
 CRM_Core_ClassLoader::singleton()->register();
 
