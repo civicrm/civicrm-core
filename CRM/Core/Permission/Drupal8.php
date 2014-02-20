@@ -27,11 +27,15 @@
 
 /**
  *
- * @package CiviCRM_Hook
+ * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2013
- * $Id: $
+ * $Id$
  *
  */
-class CRM_Utils_Hook_Drupal6 extends CRM_Utils_Hook_DrupalBase {
-}
 
+/**
+ *
+ */
+class CRM_Core_Permission_Drupal8 extends CRM_Core_Permission_DrupalBase{
+
+}

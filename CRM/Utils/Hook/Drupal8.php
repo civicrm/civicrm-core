@@ -32,6 +32,6 @@
  * $Id: $
  *
  */
-class CRM_Utils_Hook_Drupal6 extends CRM_Utils_Hook_DrupalBase {
-}
+class CRM_Utils_Hook_Drupal8 extends CRM_Utils_Hook_DrupalBase {
 
+}

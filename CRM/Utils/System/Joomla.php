@@ -665,6 +665,34 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
   }
 
   /**
+   * Get currently logged in user unique identifier - this tends to be the email address or user name.
+   *
+   * @return string $userID logged in user unique identifier
+   */
+  function getLoggedInUniqueIdentifier() {
+    $user = JFactory::getUser();
+    return $this->getUniqueIdentifierFromUserObject($user);
+  }
+  /**
+   * Get User ID from UserFramework system (Joomla)
+   * @param object $user object as described by the CMS
+   * @return mixed <NULL, number>
+   */
+  function getUserIDFromUserObject($user) {
+    return !empty($user->id) ? $user->id : NULL;
+  }
+
+  /**
+   * Get Unique Identifier from UserFramework system (CMS)
+   * @param object $user object as described by the User Framework
+   * @return mixed $uniqueIdentifer Unique identifier from the user Framework system
+   *
+   */
+  function getUniqueIdentifierFromUserObject($user) {
+    return ($user->guest) ? NULL : $user->email;
+  }
+
+  /**
    * Get a list of all installed modules, including enabled and disabled ones
    *
    * @return array CRM_Core_Module
