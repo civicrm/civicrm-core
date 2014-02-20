@@ -649,6 +649,15 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
   }
 
   /**
+   * Get User ID from UserFramework system (Joomla)
+   * @param object $user object as described by the CMS
+   * @return mixed <NULL, number>
+   */
+  function getUserIDFromUserObject($user) {
+    return !empty($user->id) ? $user->id : NULL;
+  }
+
+  /**
    * Get a list of all installed modules, including enabled and disabled ones
    *
    * @return array CRM_Core_Module

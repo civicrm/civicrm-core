@@ -198,4 +198,13 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
       }
     }
   }
+
+  /**
+   * Get User ID from UserFramework system (Drupal)
+   * @param object $user object as described by the CMS
+   * @return mixed <NULL, number>
+   */
+  function getUserIDFromUserObject($user) {
+    return !empty($user->uid) ? $user->uid : NULL;
+  }
 }

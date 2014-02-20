@@ -595,6 +595,15 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
   }
 
   /**
+   * Get User ID from UserFramework system (Joomla)
+   * @param object $user object as described by the CMS
+   * @return mixed <NULL, number>
+   */
+  function getUserIDFromUserObject($user) {
+    return !empty($user->ID) ? $user->ID : NULL;
+  }
+
+  /**
    * Get user login URL for hosting CMS (method declared in each CMS system class)
    *
    * @param string $destination - if present, add destination to querystring (works for Drupal only)

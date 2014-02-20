@@ -217,5 +217,37 @@ abstract class CRM_Utils_System_Base {
   function getTimeZoneString() {
     return NULL;
   }
+  /**
+   * Get User ID from UserFramework system (CMS)
+   * @param object $user object as described by the User Framework
+   * @return mixed <NULL, number>
+   *
+   */
+  function getUserIDFromUserObject($user) {}
+
+  /**
+   * Get currently logged in user uf id.
+   *
+   * @return int $userID logged in user uf id.
+   */
+  function getLoggedInUfID() {}
+
+  /**
+   * return a UFID (user account ID from the UserFramework / CMS system being based on the user object
+   * passed, defaulting to the logged in user if not passed. Note that ambiguous situation occurs
+   * in CRM_Core_BAO_UFMatch::synchronize - a cleaner approach would seem to be resolving the user id before calling
+   * the function
+   *
+   * Note there is already a function getUFId which takes $username as a param - we could add $user
+   * as a second param to it but it seems messy - just overloading it because the name is taken
+   * @param string $user
+   * @return int $ufid - user ID of UF System
+   */
+  function getBestUFID($user = NULL) {
+    if($user) {
+      return $this->getUserIDFromUserObject($user);
+    }
+    return $this->getLoggedInUfID();
+  }
 }
 
