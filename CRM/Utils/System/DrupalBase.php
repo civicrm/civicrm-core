@@ -227,4 +227,11 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
     global $user;
     return $this->getUniqueIdentifierFromUserObject($user);
   }
+
+  /**
+   * Action to take when access is not permitted
+   */
+  function permissionDenied() {
+    drupal_access_denied();
+  }
 }
