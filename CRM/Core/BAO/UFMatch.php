@@ -72,26 +72,15 @@ class CRM_Core_BAO_UFMatch extends CRM_Core_DAO_UFMatch {
    * @static
    */
   static function synchronize(&$user, $update, $uf, $ctype, $isLogin = FALSE) {
-    $config = CRM_Core_Config::singleton();
+    $userSystem = CRM_Core_Config::singleton()->userSystem;
     $session = CRM_Core_Session::singleton();
     if (!is_object($session)) {
       CRM_Core_Error::fatal('wow, session is not an object?');
       return;
     }
-    $userSystemID = $config->userSystem->getBestUFID($user);
 
-    if ($config->userSystem->is_drupal) {
-      $mail  = 'mail';
-    }
-    elseif ($uf == 'Joomla') {
-      $mail  = 'email';
-    }
-    elseif ($uf == 'WordPress') {
-      $mail  = 'user_email';
-    }
-    else {
-      CRM_Core_Error::statusBounce(ts('Please set the user framework variable'));
-    }
+    $userSystemID = $userSystem->getBestUFID($user);
+    $uniqId = $userSystem->getBestUFUniqueIdentifier($user);
 
     // if the id of the object is zero (true for anon users in drupal)
     // have we already processed this user, if so early
@@ -123,8 +112,6 @@ class CRM_Core_BAO_UFMatch extends CRM_Core_DAO_UFMatch {
     if ($userSystemID == 0) {
       return;
     }
-
-    $uniqId = $user->$mail;
 
     $ufmatch = self::synchronizeUFMatch($user, $userSystemID, $uniqId, $uf, NULL, $ctype, $isLogin);
     if (!$ufmatch) {
