@@ -47,17 +47,24 @@ class CRM_Utils_System {
   static $title = '';
 
   /**
-   * Compose a new url string from the current url string
+   * Compose a new url string from the current url string.
+   *
    * Used by all the framework components, specifically,
    * pager, sort and qfc
    *
-   * @param string $urlVar the url variable being considered (i.e. crmPageID, crmSortID etc)
-   * @param boolean $includeReset - should we include or ignore the reset GET string (if present)
-   * @param boolean $includeForce - should we include or ignore the force GET string (if present)
-   * @param string  $path - the path to use for the new url
-   * @param string  $absolute - do we need a absolute or relative URL?
+   * @param string $urlVar
+   *   The url variable being considered (i.e. crmPageID, crmSortID etc).
+   * @param bool $includeReset
+   *   (optional) Whether to include the reset GET string (if present).
+   * @param bool $includeForce
+   *   (optional) Whether to include the force GET string (if present).
+   * @param string $path 
+   *   (optional) The path to use for the new url.
+   * @param string $absolute 
+   *   (optional) Whether to return an absolute URL.
    *
-   * @return string the url fragment
+   * @return string
+   *   The URL fragment.
    * @access public
    */
   static function makeURL($urlVar, $includeReset = FALSE, $includeForce = TRUE, $path = NULL, $absolute = FALSE) {
@@ -78,14 +85,20 @@ class CRM_Utils_System {
   }
 
   /**
-   * get the query string and clean it up. Strip some variables that should not
-   * be propagated, specically variable like 'reset'. Also strip any side-affect
-   * actions (i.e. export)
+   * Get the query string and clean it up.
+   *
+   * Strips some variables that should not be propagated, specically variables
+   * like 'reset'. Also strips any side-affect actions (e.g. export).
    *
    * This function is copied mostly verbatim from Pager.php (_getLinksUrl)
    *
-   * @param string  $urlVar       the url variable being considered (i.e. crmPageID, crmSortID etc)
-   * @param boolean $includeReset should we include the reset var (generally this variable should be skipped)
+   * @param string $urlVar
+   *   The URL variable being considered (e.g. crmPageID, crmSortID etc).
+   * @param bool $includeReset
+   *   (optional) Whether to include the reset var (generally this variable
+   *   should be skipped)
+   * @param bool $includeForce
+   * @param bool $skipUFVar
    *
    * @return string
    * @access public
@@ -157,12 +170,15 @@ class CRM_Utils_System {
   }
 
   /**
-   * if we are using a theming system, invoke theme, else just print the
-   * content
+   * If we are using a theming system, invoke theme, else just print the
+   * content.
    *
-   * @param string  $content the content that will be themed
-   * @param boolean $print   are we displaying to the screen or bypassing theming?
-   * @param boolean $maintenance  for maintenance mode
+   * @param string $content
+   *   The content that will be themed.
+   * @param bool $print 
+   *   (optional) Are we displaying to the screen or bypassing theming?
+   * @param bool $maintenance
+   *   (optional) For maintenance mode.
    *
    * @return void           prints content on stdout
    * @access public
@@ -178,10 +194,10 @@ class CRM_Utils_System {
   }
 
   /**
-   * Generate a query string if input is an array
+   * Generate a query string if input is an array.
    *
-   * @param mixed $query: array or string
-   * @return str
+   * @param array|string $query
+   * @return string
    *
    * @static
    */
@@ -197,19 +213,24 @@ class CRM_Utils_System {
   }
 
   /**
-   * Generate an internal CiviCRM URL
+   * Generate an internal CiviCRM URL.
    *
-   * @param $path     string   The path being linked to, such as "civicrm/add"
-   * @param $query    mixed    A query string to append to the link, or an array of key-value pairs
-   * @param $absolute boolean  Whether to force the output to be an absolute link (beginning with http:).
-   *                           Useful for links that will be displayed outside the site, such as in an
-   *                           RSS feed.
-   * @param $fragment string   A fragment identifier (named anchor) to append to the link.
+   * @param string $path
+   *   The path being linked to, such as "civicrm/add".
+   * @param array|string $query
+   *   A query string to append to the link, or an array of key-value pairs.
+   * @param bool $absolute
+   *   Whether to force the output to be an absolute link (beginning with a
+   *   URI-scheme such as http:). Useful for links that will be displayed
+   *   outside the site, such as in an RSS feed.
+   * @param string $fragment
+   *   A fragment identifier (named anchor) to append to the link.
    *
    * @param bool $htmlize
    * @param bool $frontend
    * @param bool $forceBackend
-   * @return string            an HTML string containing a link to the given path.
+   * @return string
+   *   An HTML string containing a link to the given path.
    * @access public
    * @static
    */
@@ -270,9 +291,10 @@ class CRM_Utils_System {
   }
 
   /**
-   * this function is called from a template to compose a url
+   * This function is called from a template to compose a url.
    *
-   * @param array $params list of parameters
+   * @param array $params
+   *   List of parameters.
    *
    * @return string url
    * @access public
@@ -296,7 +318,7 @@ class CRM_Utils_System {
   }
 
   /**
-   * sets the title of the page
+   * Sets the title of the page.
    *
    * @param string $title
    * @param string $pageTitle
@@ -312,13 +334,15 @@ class CRM_Utils_System {
   }
 
   /**
-   * figures and sets the userContext. Uses the referer if valid
-   * else uses the default
+   * Figures and sets the userContext.
    *
-   * @param array  $names   refererer should match any str in this array
-   * @param string $default the default userContext if no match found
+   * Uses the referer if valid else uses the default.
    *
-   * @return void
+   * @param array $names
+   *   Refererer should match any str in this array.
+   * @param string $default
+   *   (optional) The default userContext if no match found.
+   *
    * @access public
    */
   static function setUserContext($names, $default = NULL) {
@@ -342,11 +366,13 @@ class CRM_Utils_System {
   }
 
   /**
-   * gets a class name for an object
+   * Gets a class name for an object.
    *
-   * @param  object $object      - object whose class name is needed
+   * @param object $object
+   *   Object whose class name is needed.
    *
-   * @return string $className   - class name
+   * @return string
+   *   The class name of the object.
    *
    * @access public
    * @static
@@ -356,11 +382,11 @@ class CRM_Utils_System {
   }
 
   /**
-   * redirect to another url
+   * Redirect to another URL.
    *
-   * @param string $url the url to goto
+   * @param string $url
+   *   The URL to provide to the browser via the Location header.
    *
-   * @return void
    * @access public
    * @static
    */
@@ -377,12 +403,18 @@ class CRM_Utils_System {
   }
 
   /**
-   * use a html based file with javascript embedded to redirect to another url
+   * Redirect to another URL using JavaScript.
+   *
+   * Use an html based file with javascript embedded to redirect to another url
    * This prevent the too many redirect errors emitted by various browsers
    *
-   * @param string $url the url to goto
+   * @param string $url
+   *   (optional) The destination URL.
+   * @param string $title
+   *   (optional) The page title to use for the redirect page.
+   * @param string $message
+   *   (optional) The message to provide in the body of the redirect page.
    *
-   * @return void
    * @access public
    * @static
    */
@@ -420,12 +452,10 @@ class CRM_Utils_System {
   }
 
   /**
-   * Append an additional breadcrumb tag to the existing breadcrumb
+   * Append an additional breadcrumb tag to the existing breadcrumbs.
    *
-   * @param string $title
-   * @param string $url
+   * @param $breadCrumbs
    *
-   * @return void
    * @access public
    * @static
    */
@@ -435,9 +465,8 @@ class CRM_Utils_System {
   }
 
   /**
-   * Reset an additional breadcrumb tag to the existing breadcrumb
+   * Reset an additional breadcrumb tag to the existing breadcrumb.
    *
-   * @return void
    * @access public
    * @static
    */
@@ -447,11 +476,10 @@ class CRM_Utils_System {
   }
 
   /**
-   * Append a string to the head of the html file
+   * Append a string to the head of the HTML file.
    *
-   * @param string $head the new string to be appended
+   * @param string $bc
    *
-   * @return void
    * @access public
    * @static
    */
@@ -461,11 +489,13 @@ class CRM_Utils_System {
   }
 
   /**
-   * figure out the post url for the form
+   * Determine the post URL for a form
    *
-   * @param the default action if one is pre-specified
+   * @param $action
+   *   The default action if one is pre-specified.
    *
-   * @return string the url to post the form
+   * @return string
+   *   The URL to post the form.
    * @access public
    * @static
    */
@@ -475,10 +505,9 @@ class CRM_Utils_System {
   }
 
   /**
-   * rewrite various system urls to https
+   * Rewrite various system URLs to https.
    *
-   * @return void
-   * access public
+   * @access public
    * @static
    */
   static function mapConfigToSSL() {
@@ -494,9 +523,7 @@ class CRM_Utils_System {
   }
 
   /**
-   * Get the base URL from the system
-   *
-   * @param
+   * Get the base URL of the system.
    *
    * @return string
    * @access public
@@ -507,6 +534,9 @@ class CRM_Utils_System {
     return $config->userFrameworkBaseURL;
   }
 
+  /**
+   * @static
+   */
   static function authenticateAbort($message, $abort) {
     if ($abort) {
       echo $message;
@@ -517,6 +547,11 @@ class CRM_Utils_System {
     }
   }
 
+  /**
+   * @param bool $abort
+   *   (optional) Whether to exit; defaults to true.
+   * @static
+   */
   static function authenticateKey($abort = TRUE) {
     // also make sure the key is sent and is valid
     $key = trim(CRM_Utils_Array::value('key', $_REQUEST));
@@ -556,9 +591,12 @@ class CRM_Utils_System {
     return TRUE;
   }
 
+  /**
+   * @return bool
+   * @static
+   */
   static function authenticateScript($abort = TRUE, $name = NULL, $pass = NULL, $storeInSession = TRUE, $loadCMSBootstrap = TRUE, $requireKey = TRUE) {
-    // auth to make sure the user has a login/password to do a shell
-    // operation
+    // auth to make sure the user has a login/password to do a shell operation
     // later on we'll link this to acl's
     if (!$name) {
       $name = trim(CRM_Utils_Array::value('name', $_REQUEST));
@@ -603,25 +641,31 @@ class CRM_Utils_System {
   }
 
   /**
-   * Authenticate the user against the uf db
+   * Authenticate the user against the uf db.
    *
-   * @param string $name     the user name
-   * @param string $password the password for the above user name
+   * In case of succesful authentication, returns an array consisting of
+   * (contactID, ufID, unique string). Returns FALSE if authentication is
+   * unsuccessful.
    *
-   * @return mixed false if no auth
-   *               array(
-      contactID, ufID, unique string ) if success
+   * @param string $name
+   *   The username.
+   * @param string $password
+   *   The password.
+   * @param bool $loadCMSBootstrap
+   * @param $realPath
+   *
+   * @return false|array
    * @access public
    * @static
    */
   static function authenticate($name, $password, $loadCMSBootstrap = FALSE, $realPath = NULL) {
     $config = CRM_Core_Config::singleton();
 
-    // before we do any loading, lets start the session and write to it
-    // we typically call authenticate only when we need to bootstrap the CMS directly via Civi
-    // and hence bypass the normal CMS auth and bootstrap process
-    // typically done in cli and cron scripts
-    // CRM-12648
+    /* Before we do any loading, let's start the session and write to it.
+     * We typically call authenticate only when we need to bootstrap the CMS
+     * directly via Civi and hence bypass the normal CMS auth and bootstrap
+     * process typically done in CLI and cron scripts. See: CRM-12648
+     */
     $session = CRM_Core_Session::singleton();
     $session->set( 'civicrmInitSession', TRUE );
 
@@ -630,9 +674,10 @@ class CRM_Utils_System {
   }
 
   /**
-   * Set a message in the UF to display to a user
+   * Set a message in the UF to display to a user.
    *
-   * @param string $name     the message to set
+   * @param string $message
+   *   The message to set.
    *
    * @access public
    * @static
@@ -643,7 +688,14 @@ class CRM_Utils_System {
   }
 
 
-
+  /**
+   * Determine whether a value is null-ish.
+   *
+   * @param $value
+   *   The value to check for null.
+   * @return bool
+   * @static
+   */
   static function isNull($value) {
     // FIXME: remove $value = 'null' string test when we upgrade our DAO code to handle passing null in a better way.
     if (!isset($value) || $value === NULL || $value === '' || $value === 'null') {
@@ -660,6 +712,17 @@ class CRM_Utils_System {
     return FALSE;
   }
 
+  /**
+   * Obscure all but the last few digits of a credit card number.
+   *
+   * @param string $number
+   *   The credit card number to obscure.
+   * @param int $keep
+   *   (optional) The number of digits to preserve unmodified.
+   * @return string
+   *   The obscured credit card number.
+   * @static
+   */
   static function mungeCreditCard($number, $keep = 4) {
     $number = trim($number);
     if (empty($number)) {
@@ -669,7 +732,12 @@ class CRM_Utils_System {
     return substr_replace($number, $replace, 0, -$keep);
   }
 
-  /** parse php modules from phpinfo */
+  /** 
+   * Determine which PHP modules are loaded.
+   *
+   * @return array
+   * @static
+   */
   public static function parsePHPModules() {
     ob_start();
     phpinfo(INFO_MODULES);
@@ -703,12 +771,21 @@ class CRM_Utils_System {
     return $vModules;
   }
 
-  /** get a module setting */
+  /**
+   * Get a setting from a loaded PHP module.
+   *
+   * @static
+   */
   public static function getModuleSetting($pModuleName, $pSetting) {
     $vModules = self::parsePHPModules();
     return $vModules[$pModuleName][$pSetting];
   }
 
+  /**
+   * @param $title
+   *   (optional)
+   * @static
+   */
   static function memory($title = NULL) {
     static $pid = NULL;
     if (!$pid) {
@@ -723,6 +800,14 @@ class CRM_Utils_System {
     return $memory;
   }
 
+  /**
+   * @param string $name
+   * @param string $mimeType
+   * @param $buffer
+   * @param string $ext
+   * @param bool $output
+   * @static
+   */
   static function download($name, $mimeType, &$buffer,
     $ext = NULL,
     $output = TRUE
@@ -756,6 +841,9 @@ class CRM_Utils_System {
     }
   }
 
+  /**
+   * @static
+   */
   static function xMemory($title = NULL, $log = FALSE) {
     $mem = (float ) xdebug_memory_usage() / (float )(1024);
     $mem = number_format($mem, 5) . ", " . time();
@@ -770,6 +858,11 @@ class CRM_Utils_System {
     }
   }
 
+  /**
+   * @param string $url
+   *   The URL to operate on.
+   * @static
+   */
   static function fixURL($url) {
     $components = parse_url($url);
 
@@ -783,11 +876,12 @@ class CRM_Utils_System {
   }
 
   /**
-   * make sure the callback is valid in the current context
+   * Make sure a callback is valid in the current context.
    *
-   * @param string $callback the name of the function
+   * @param string $callback
+   *   Name of the function to check.
    *
-   * @return boolean
+   * @return bool
    * @static
    */
   static function validCallback($callback) {
@@ -823,9 +917,17 @@ class CRM_Utils_System {
   }
 
   /**
-   * This serves as a wrapper to the php explode function
-   * we expect exactly $limit arguments in return, and if we dont
-   * get them, we pad it with null
+   * Like PHP's built-in explode(), but always return an array of $limit items.
+   *
+   * This serves as a wrapper to the PHP explode() function. In the event that
+   * PHP's explode() returns an array with fewer than $limit elements, pad
+   * the end of the array with NULLs.
+   *
+   * @param string $separator
+   * @param string $string
+   * @param int $limit
+   * @return string[]
+   * @static
    */
   static function explode($separator, $string, $limit) {
     $result = explode($separator, $string, $limit);
@@ -835,6 +937,13 @@ class CRM_Utils_System {
     return $result;
   }
 
+  /**
+   * @param string $url
+   *   The URL to check.
+   * @param bool $addCookie
+   *   (optional)
+   * @static
+   */
   static function checkURL($url, $addCookie = FALSE) {
     // make a GET request to $url
     $ch = curl_init($url);
@@ -850,6 +959,19 @@ class CRM_Utils_System {
     return curl_exec($ch);
   }
 
+  /**
+   * Assert that we are running on a particular PHP version.
+   *
+   * @param int $ver
+   *   The major version of PHP that is required.
+   * @param bool $abort
+   *   (optional) Whether to fatally abort if the version requirement is not 
+   *   met. Defaults to TRUE.
+   * @return bool
+   *   Returns TRUE if the requirement is met, FALSE if the requirement is not
+   *   met and we're not aborting due to the failed requirement.
+   * @static
+   */
   static function checkPHPVersion($ver = 5, $abort = TRUE) {
     $phpVersion = substr(PHP_VERSION, 0, 1);
     if ($phpVersion >= $ver) {
@@ -864,6 +986,10 @@ class CRM_Utils_System {
     return FALSE;
   }
 
+  /**
+   * @return string
+   * @static
+   */
   static function formatWikiURL($string, $encode = FALSE) {
     $items = explode(' ', trim($string), 2);
     if (count($items) == 2) {
@@ -878,6 +1004,10 @@ class CRM_Utils_System {
     return "<a href=\"$url\">$title</a>";
   }
 
+  /**
+   * @param string $url
+   * @static
+   */
   static function urlEncode($url) {
     $items = parse_url($url);
     if ($items === FALSE) {
@@ -909,9 +1039,10 @@ class CRM_Utils_System {
   }
 
   /**
-   * Function to return the latest civicrm version.
+   * Return the running civicrm version.
    *
-   * @return string civicrm version
+   * @return string
+   *   civicrm version
    * @access public
    */
   static function version() {
@@ -949,10 +1080,22 @@ class CRM_Utils_System {
     return $version;
   }
 
+  /**
+   * Determines whether a string is a valid CiviCRM version string.
+   *
+   * @param string $version
+   *   Version string to be checked.
+   * @return bool
+   * @static
+   */
   static function isVersionFormatValid($version) {
     return preg_match("/^(\d{1,2}\.){2,3}(\d{1,2}|(alpha|beta)\d{1,2})(\.upgrade)?$/", $version);
   }
 
+  /**
+   * Wraps or emulates PHP's getallheaders() function.
+   * @static
+   */
   static function getAllHeaders() {
     if (function_exists('getallheaders')) {
       return getallheaders();
@@ -976,6 +1119,9 @@ class CRM_Utils_System {
     return $headers;
   }
 
+  /**
+   * @static
+   */
   static function getRequestHeaders() {
     if (function_exists('apache_request_headers')) {
       return apache_request_headers();
@@ -986,9 +1132,12 @@ class CRM_Utils_System {
   }
 
   /**
-   * Check and determine is this is an SSL request
-   * Note that we inline this function in install/civicrm.php, so if
-   * you change this function, please go and change the code in the install script
+   * Determine whether this is an SSL request.
+   *
+   * Note that we inline this function in install/civicrm.php, so if you change
+   * this function, please go and change the code in the install script as well.
+   *
+   * @static
    */
   static function isSSL( ) {
     return
@@ -997,6 +1146,9 @@ class CRM_Utils_System {
         strtolower($_SERVER['HTTPS']) != 'off') ? true : false;
   }
 
+  /**
+   * @static
+   */
   static function redirectToSSL($abort = FALSE) {
     $config = CRM_Core_Config::singleton();
     $req_headers = self::getRequestHeaders();
@@ -1024,10 +1176,15 @@ class CRM_Utils_System {
   /*
    * Get logged in user's IP address.
    *
-   * Get IP address from HTTP Header. If the CMS is Drupal then use the Drupal function
-   * as this also handles reverse proxies (based on proper configuration in settings.php)
+   * Get IP address from HTTP REMOTE_ADDR header. If the CMS is Drupal then use
+   * the Drupal function as this also handles reverse proxies (based on proper
+   * configuration in settings.php)
    *
-   * @return string ip address of logged in user
+   * @param bool $strictIPV4
+   *   (optional) Whether to return only IPv4 addresses.
+   *
+   * @return string
+   *   IP address of logged in user.
    */
   static function ipAddress($strictIPV4 = TRUE) {
     $address = CRM_Utils_Array::value('REMOTE_ADDR', $_SERVER);
@@ -1056,20 +1213,24 @@ class CRM_Utils_System {
   }
 
   /**
-   * Returns you the referring / previous page url
+   * Get the referring / previous page URL.
    *
-   * @return string the previous page url
+   * @return string
+   *   The previous page URL
    * @access public
+   * @static
    */
   static function refererPath() {
     return CRM_Utils_Array::value('HTTP_REFERER', $_SERVER);
   }
 
   /**
-   * Returns default documentation URL base
+   * Get the documentation base URL.
    *
-   * @return string documentation url
+   * @return string
+   *   Base URL of the CRM documentation.
    * @access public
+   * @static
    */
   static function getDocBaseURL() {
     // FIXME: move this to configuration at some stage
@@ -1077,10 +1238,11 @@ class CRM_Utils_System {
   }
 
   /**
-   * Returns wiki (alternate) documentation URL base
+   * Returns wiki (alternate) documentation URL base.
    *
    * @return string documentation url
    * @access public
+   * @static
    */
   static function getWikiBaseURL() {
     // FIXME: move this to configuration at some stage
@@ -1089,17 +1251,26 @@ class CRM_Utils_System {
 
   /**
    * Returns URL or link to documentation page, based on provided parameters.
+   *
    * For use in PHP code.
-   * WARNING: Always returns URL, if ts function is not defined ($URLonly has no effect).
+   * WARNING: Always returns URL, if ts function is not defined ($URLonly has
+   * no effect).
    *
-   * @param string  $page    Title of documentation wiki page
-   * @param boolean $URLonly Whether function should return URL only or whole link (default)
-   * @param string  $text    Text of HTML link (no effect if $URLonly = false)
-   * @param string  $title   Tooltip text for HTML link (no effect if $URLonly = false)
-   * @param string  $style   Style attribute value for HTML link (no effect if $URLonly = false)
+   * @param string $page
+   *   Title of documentation wiki page.
+   * @param boolean $URLonly
+   *   (optional) Whether to return URL only or full HTML link (default).
+   * @param string $text
+   *   (optional) Text of HTML link (no effect if $URLonly = false).
+   * @param string $title
+   *   (optional) Tooltip text for HTML link (no effect if $URLonly = false)
+   * @param string $style
+   *   (optional) Style attribute value for HTML link (no effect if $URLonly = false)
    *
-   * @return string URL or link to documentation page, based on provided parameters
+   * @return string
+   *   URL or link to documentation page, based on provided parameters.
    * @access public
+   * @static
    */
   static function docURL2($page, $URLonly = FALSE, $text = NULL, $title = NULL, $style = NULL, $resource = NULL) {
     // if ts function doesn't exist, it means that CiviCRM hasn't been fully initialised yet -
@@ -1127,12 +1298,16 @@ class CRM_Utils_System {
 
   /**
    * Returns URL or link to documentation page, based on provided parameters.
+   *
    * For use in templates code.
    *
-   * @param array $params An array of parameters (see CRM_Utils_System::docURL2 method for names)
+   * @param array $params
+   *   An array of parameters (see CRM_Utils_System::docURL2 method for names)
    *
-   * @return string URL or link to documentation page, based on provided parameters
+   * @return string
+   *   URL or link to documentation page, based on provided parameters.
    * @access public
+   * @static
    */
   static function docURL($params) {
 
@@ -1174,7 +1349,9 @@ class CRM_Utils_System {
   /**
    * Get the locale set in the hosting CMS
    *
-   * @return string  the used locale or null for none
+   * @return string
+   *   The used locale or null for none.
+   * @static
    */
   static function getUFLocale() {
     $config = CRM_Core_Config::singleton();
@@ -1182,13 +1359,16 @@ class CRM_Utils_System {
   }
 
   /**
-   * Execute external or internal urls and return server response
+   * Execute external or internal URLs and return server response.
    *
-   *  @param string   $url request url
-   *  @param boolean  $addCookie  should be true to access internal urls
+   * @param string $url
+   *   Request URL.
+   * @param bool $addCookie
+   *   Whether to provide a cookie. Should be true to access internal URLs.
    *
-   *  @return string  $response response from url
-   *  @static
+   * @return string
+   *   Response from URL.
+   * @static
    */
   static function getServerResponse($url, $addCookie = TRUE) {
     CRM_Core_Error::ignoreException();
@@ -1217,6 +1397,9 @@ class CRM_Utils_System {
     return $response;
   }
 
+  /**
+   * @static
+   */
   static function isDBVersionValid(&$errorMessage) {
     $dbVersion = CRM_Core_BAO_Domain::version();
 
@@ -1259,6 +1442,13 @@ class CRM_Utils_System {
     return TRUE;
   }
 
+  /**
+   * Exit with provided exit code.
+   *
+   * @param int $status
+   *   (optional) Code with which to exit.
+   * @static
+   */
   static function civiExit($status = 0) {
     // move things to CiviCRM cache as needed
     CRM_Core_Session::storeSessionObjects();
@@ -1267,8 +1457,7 @@ class CRM_Utils_System {
   }
 
   /**
-   * Reset the various system caches and some important
-   * static variables
+   * Reset the various system caches and some important static variables.
    */
   static function flushCache( ) {
     // flush out all cache entries so we can reload new data
@@ -1300,10 +1489,15 @@ class CRM_Utils_System {
   }
 
   /**
-   * load cms bootstrap
+   * Load CMS bootstrap.
    *
-   * @param $params   array with uid name and pass
-   * @param $loadUser boolean load user or not
+   * @param array $params
+   *   Array with uid name and pass
+   * @param bool $loadUser
+   *   Boolean load user or not.
+   * @param bool $throwError
+   * @param $realPath
+   * @static
    */
   static function loadBootStrap($params = array(
     ), $loadUser = TRUE, $throwError = TRUE, $realPath = NULL) {
@@ -1315,9 +1509,10 @@ class CRM_Utils_System {
   }
 
   /**
-   * check is user logged in.
+   * Check if user is logged in.
    *
-   * @return boolean.
+   * @return bool
+   * @static
    */
   public static function isUserLoggedIn() {
     $config = CRM_Core_Config::singleton();
@@ -1327,13 +1522,18 @@ class CRM_Utils_System {
   /**
    * Get current logged in user id.
    *
-   * @return int ufId, currently logged in user uf id.
+   * @return int
+   *   ufId, currently logged in user uf id.
+   * @static
    */
   public static function getLoggedInUfID() {
     $config = CRM_Core_Config::singleton();
     return $config->userSystem->getLoggedInUfID();
   }
 
+  /**
+   * @static
+   */
   static function baseCMSURL() {
     static $_baseURL = NULL;
     if (!$_baseURL) {
@@ -1374,6 +1574,13 @@ class CRM_Utils_System {
     return $_baseURL;
   }
 
+  /**
+   * Given a URL, return a relative URL if possible.
+   *
+   * @param string $url
+   * @return string
+   * @static
+   */
   static function relativeURL($url) {
     // check if url is relative, if so return immediately
     if (substr($url, 0, 4) != 'http') {
@@ -1393,6 +1600,14 @@ class CRM_Utils_System {
     return $url;
   }
 
+  /**
+   * Produce an absolute URL from a possibly-relative URL.
+   *
+   * @param string $url
+   * @param bool $remoteLanguagePart
+   * @return string
+   * @static
+   */
   static function absoluteURL($url, $removeLanguagePart = FALSE) {
     // check if url is already absolute, if so return immediately
     if (substr($url, 0, 4) == 'http') {
