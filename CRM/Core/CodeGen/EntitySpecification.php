@@ -152,7 +152,6 @@ class CRM_Core_CodeGen_EntitySpecification {
     $klass = trim((string ) $tableXML->class);
     $base = $this->value('base', $tableXML);
     $sourceFile = "xml/schema/{$base}/{$klass}.xml";
-    //$daoPath = "{$base}/DAO/";
     $daoPath = "{$base}" . DIRECTORY_SEPARATOR;
     $pre = str_replace('/', '_', $daoPath);
     $this->classNames[$name] = $pre . $klass;
@@ -167,13 +166,11 @@ class CRM_Core_CodeGen_EntitySpecification {
 
     $table = array(
       'name' => $name,
-      //'base' => $daoPath,
-      'base' => 'src2'. DIRECTORY_SEPARATOR .str_replace('CRM', 'Civi', $daoPath),
+      'base' => str_replace('CRM', 'Civi', $daoPath),
       'sourceFile' => $sourceFile,
       'fileName' => $klass . '.php',
       'objectName' => $klass,
       'labelName' => substr($name, 8),
-      //'className' => $this->classNames[$name],
       'className' => $klass,
       'attributes_simple' => trim($database['tableAttributes_simple']),
       'attributes_modern' => trim($database['tableAttributes_modern']),
