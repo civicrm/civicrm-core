@@ -108,6 +108,9 @@ class CRM_Core_CodeGen_EntitySpecification {
         echo "$ftable is not a valid foreign key table in $name\n";
         continue;
       }
+
+      $tables[$name]['fields'][$fkey]['propertyName'] = str_replace('Id', '', $tables[$name]['fields'][$fkey]['propertyName']);
+      $tables[$name]['fields'][$fkey]['functionName'] = str_replace('Id', '', $tables[$name]['fields'][$fkey]['functionName']);
       $tables[$name]['foreignKey'][$fkey]['className'] = $classNames[$ftable];
       $tables[$name]['foreignKey'][$fkey]['fileName'] = str_replace('_', '/', $classNames[$ftable]) . '.php';
       $tables[$name]['fields'][$fkey]['FKClassName'] = $classNames[$ftable];
@@ -192,9 +195,10 @@ class CRM_Core_CodeGen_EntitySpecification {
     }
 
     $table['fields'] = &$fields;
-    $table['hasEnum'] = FALSE;
     foreach ($table['fields'] as &$field) {
-      $field['propertyName'] = lcfirst(str_replace(' ', '', ucwords(str_replace('_', ' ', $field['name']))));
+      $propertyName = $field['name'];
+      $field['functionName'] = str_replace(' ', '', ucwords(str_replace('_', ' ', $propertyName)));
+      $field['propertyName'] = lcfirst(str_replace(' ', '', ucwords(str_replace('_', ' ', $propertyName))));
 
       $field['columnInfo'] = '@ORM\Column(name="' . $field['name'] . '", type="' . $field['phpType'] . '"';
 
@@ -213,13 +217,6 @@ class CRM_Core_CodeGen_EntitySpecification {
 
       $field['columnType'] = $field['phpType'];
       $field['columnJoin'] = '';
-
-      /*
-       * FIX ME: if needed
-      if ($field['crmType'] == 'CRM_Utils_Type::T_ENUM') {
-        $table['hasEnum'] = TRUE;
-        break;
-      }*/
 
     }
 
@@ -244,8 +241,6 @@ class CRM_Core_CodeGen_EntitySpecification {
     if ($this->value('foreignKey', $tableXML)) {
       $foreign = array();
       foreach ($tableXML->foreignKey as $foreignXML) {
-        // print_r($foreignXML);
-
         if ($this->value('drop', $foreignXML, 0) > 0 and $this->value('drop', $foreignXML, 0) <= $this->buildVersion) {
           continue;
         }
@@ -384,6 +379,7 @@ class CRM_Core_CodeGen_EntitySpecification {
       default:
         $field['sqlType'] = $field['phpType'] = $type;
         if ($type == 'int unsigned') {
+          $field['phpType'] = 'integer';
           $field['crmType'] = 'CRM_Utils_Type::T_INT';
         }
         else {
