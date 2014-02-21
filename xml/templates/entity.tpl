@@ -83,7 +83,7 @@ class {$table.className} extends \Civi\Core\Entity {ldelim}
    * @param {$field.phpType} ${$field.propertyName}
    * @return {$table.className}
    */
-  public function set{$field.propertyName}(${$field.propertyName}) {ldelim}
+  public function set{$field.functionName}(${$field.propertyName}) {ldelim}
     $this->{$field.propertyName} = ${$field.propertyName};
     return $this;
   {rdelim}
@@ -93,7 +93,7 @@ class {$table.className} extends \Civi\Core\Entity {ldelim}
    *
    * @return string
    */
-  public function get{$field.propertyName}() {ldelim}
+  public function get{$field.functionName}() {ldelim}
     return $this->{$field.propertyName};
   {rdelim}
 {/foreach}
