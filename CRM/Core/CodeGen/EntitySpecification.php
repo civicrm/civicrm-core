@@ -95,6 +95,11 @@ class CRM_Core_CodeGen_EntitySpecification {
       'civicrm_price_set_entity',
       'civicrm_tell_friend',
       'civicrm_uf_join',
+      // case table's are skipped to prevent syntax error generated due "Case" reserved word
+      'civicrm_case',
+      'civicrm_case_activity',
+      'civicrm_case_contact',
+      'civicrm_relationship',
     );
 
     $tables = array();
