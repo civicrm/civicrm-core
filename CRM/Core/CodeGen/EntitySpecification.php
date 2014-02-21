@@ -77,6 +77,7 @@ class CRM_Core_CodeGen_EntitySpecification {
   function getTables($dbXML, &$database) {
     // skip entity generation for tables where manual changes are needed.
     $skipTables = array(
+      // these tables needs sepecial handling for entiti_table, entity_id
       'civicrm_acl_entity_role',
       'civicrm_action_log',
       'civicrm_campaign_group',
