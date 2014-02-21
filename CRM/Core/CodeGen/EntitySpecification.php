@@ -75,10 +75,35 @@ class CRM_Core_CodeGen_EntitySpecification {
   }
 
   function getTables($dbXML, &$database) {
+    // skip entity generation for tables where manual changes are needed.
+    $skipTables = array(
+      'civicrm_acl_entity_role',
+      'civicrm_action_log',
+      'civicrm_campaign_group',
+      'civicrm_entity_batch',
+      'civicrm_entity_file',
+      'civicrm_entity_financial_account',
+      'civicrm_entity_financial_trxn',
+      'civicrm_entity_tag',
+      'civicrm_line_item',
+      'civicrm_log',
+      'civicrm_mailing_group',
+      'civicrm_note',
+      'civicrm_pcp_block',
+      'civicrm_pledge_block',
+      'civicrm_prevnext_cache',
+      'civicrm_price_set_entity',
+      'civicrm_tell_friend',
+      'civicrm_uf_join',
+    );
+
     $tables = array();
     foreach ($dbXML->tables as $tablesXML) {
       foreach ($tablesXML->table as $tableXML) {
-        if ($this->value('drop', $tableXML, 0) > 0 and $this->value('drop', $tableXML, 0) <= $this->buildVersion) {
+        if (($this->value('drop', $tableXML, 0) > 0 AND $this->value('drop', $tableXML, 0) <= $this->buildVersion)
+          OR in_array($tableXML->name, $skipTables)
+        ) {
+          echo "Skipping entity generation for " .$tableXML->name . "\n";
           continue;
         }
 
@@ -118,7 +143,13 @@ class CRM_Core_CodeGen_EntitySpecification {
       $targetEntity = str_replace('CRM', 'Civi', str_replace('_', '\\', $classNames[$ftable]));
       $tables[$name]['fields'][$fkey]['columnType'] = '\\' . $targetEntity;
       $tables[$name]['fields'][$fkey]['columnInfo'] = '@ORM\ManyToOne(targetEntity="' . $targetEntity . '")';
-      $tables[$name]['fields'][$fkey]['columnJoin'] = '@ORM\JoinColumns({@ORM\JoinColumn(name="' . $tables[$name]['foreignKey'][$fkey]['name'] . '", referencedColumnName="' . $tables[$name]['foreignKey'][$fkey]['key'] . '")})';
+      $tables[$name]['fields'][$fkey]['columnJoin'] = '@ORM\JoinColumns({@ORM\JoinColumn(name="' . $tables[$name]['foreignKey'][$fkey]['name'] . '", referencedColumnName="' . $tables[$name]['foreignKey'][$fkey]['key'] . '"';
+
+      if (!empty($tables[$name]['foreignKey'][$fkey]['onDelete'])) {
+        $tables[$name]['fields'][$fkey]['columnJoin'] .= ', onDelete="' . $tables[$name]['foreignKey'][$fkey]['onDelete'] . '"';
+      }
+
+      $tables[$name]['fields'][$fkey]['columnJoin'] .= ')})';
 
       $tables[$name]['fields'][$fkey]['setFunctionInput'] = "{$tables[$name]['fields'][$fkey]['columnType']} \${$tables[$name]['fields'][$fkey]['propertyName']} = null";
     }
@@ -215,12 +246,16 @@ class CRM_Core_CodeGen_EntitySpecification {
         $field['columnInfo'] .= ', nullable=true';
       }
 
+      if (!empty($field['default'])) {
+        $field['default'] = str_replace("'", "", $field['default']);
+      }
+
       $field['columnInfo'] .= ')';
 
       $field['columnType'] = $field['phpType'];
       $field['columnJoin'] = '';
 
-      $field['setFunctionInput'] = $field['propertyName'];
+      $field['setFunctionInput'] = '$' . $field['propertyName'];
     }
 
     if ($this->value('primaryKey', $tableXML)) {
