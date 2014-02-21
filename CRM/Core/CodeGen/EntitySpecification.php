@@ -119,6 +119,8 @@ class CRM_Core_CodeGen_EntitySpecification {
       $tables[$name]['fields'][$fkey]['columnType'] = '\\' . $targetEntity;
       $tables[$name]['fields'][$fkey]['columnInfo'] = '@ORM\ManyToOne(targetEntity="' . $targetEntity . '")';
       $tables[$name]['fields'][$fkey]['columnJoin'] = '@ORM\JoinColumns({@ORM\JoinColumn(name="' . $tables[$name]['foreignKey'][$fkey]['name'] . '", referencedColumnName="' . $tables[$name]['foreignKey'][$fkey]['key'] . '")})';
+
+      $tables[$name]['fields'][$fkey]['setFunctionInput'] = "{$tables[$name]['fields'][$fkey]['columnType']} \${$tables[$name]['fields'][$fkey]['propertyName']} = null";
     }
   }
 
@@ -218,6 +220,7 @@ class CRM_Core_CodeGen_EntitySpecification {
       $field['columnType'] = $field['phpType'];
       $field['columnJoin'] = '';
 
+      $field['setFunctionInput'] = $field['propertyName'];
     }
 
     if ($this->value('primaryKey', $tableXML)) {
