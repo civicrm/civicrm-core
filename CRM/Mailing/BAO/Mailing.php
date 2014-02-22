@@ -2389,16 +2389,6 @@ LEFT JOIN civicrm_mailing_group g ON g.mailing_id   = m.id
     //get the tokens.
     $tokens = CRM_Core_SelectValues::contactTokens();
 
-    //token selector for subject
-    //CRM-5058
-    $form->add('select', 'token3', ts('Insert Token'),
-      $tokens, FALSE,
-      array(
-        'size' => "5",
-        'multiple' => TRUE,
-        'onclick' => "return tokenReplText(this);",
-      )
-    );
     $className = CRM_Utils_System::getClassName($form);
     if ($className == 'CRM_Mailing_Form_Upload') {
       $tokens = array_merge(CRM_Core_SelectValues::mailingTokens(), $tokens);
@@ -2413,27 +2403,7 @@ LEFT JOIN civicrm_mailing_group g ON g.mailing_id   = m.id
     }
 
     //sorted in ascending order tokens by ignoring word case
-    natcasesort($tokens);
-    $form->assign('tokens', json_encode($tokens));
-
-    $form->add('select', 'token1', ts('Insert Tokens'),
-      $tokens, FALSE,
-      array(
-        'size' => "5",
-        'multiple' => TRUE,
-        'onclick' => "return tokenReplText(this);",
-      )
-    );
-
-    $form->add('select', 'token2', ts('Insert Tokens'),
-      $tokens, FALSE,
-      array(
-        'size' => "5",
-        'multiple' => TRUE,
-        'onclick' => "return tokenReplHtml(this);",
-      )
-    );
-
+    $form->assign('tokens', CRM_Utils_Token::formatTokensForDisplay($tokens));
 
     $form->_templates = CRM_Core_BAO_MessageTemplate::getMessageTemplates(FALSE);
     if (!empty($form->_templates)) {
@@ -2498,19 +2468,7 @@ LEFT JOIN civicrm_mailing_group g ON g.mailing_id   = m.id
       $tokens = array_merge($form->listTokens(), $tokens);
     }
 
-    //sorted in ascending order tokens by ignoring word case
-    natcasesort($tokens);
-
-    $form->assign('tokens', json_encode($tokens));
-
-    $form->add('select', 'token1', ts('Insert Tokens'),
-      $tokens, FALSE,
-      array(
-        'size' => "5",
-        'multiple' => TRUE,
-        'onchange' => "return tokenReplHtml(this);",
-      )
-    );
+    $form->assign('tokens', CRM_Utils_Token::formatTokensForDisplay($tokens));
 
     $form->_templates = CRM_Core_BAO_MessageTemplate::getMessageTemplates(FALSE);
     if (!empty($form->_templates)) {
