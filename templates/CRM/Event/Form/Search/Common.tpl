@@ -24,7 +24,7 @@
  +--------------------------------------------------------------------+
 *}
 <tr>
-  <td class="crm-event-form-block-event_name"> {$form.event_name.label}  <br />{$form.event_name.html|crmAddClass:huge} </td>
+  <td class="crm-event-form-block-event_id"> {$form.event_id.label}  <br />{$form.event_id.html|crmAddClass:huge} </td>
   <td class="crm-event-form-block-event_type_id"> {$form.event_type_id.label}<br />{$form.event_type_id.html} </td>
 </tr>
 <tr>
@@ -89,12 +89,7 @@ campaignTrClass='' campaignTdClass='crm-event-form-block-participant_campaign_id
 
 {literal}
 <script type="text/javascript">
-var eventUrl = "{/literal}{$dataURLEvent}{literal}";
 var feeUrl   = "{/literal}{$dataURLEventFee}{literal}";
-
-cj('#event_name').autocomplete( eventUrl, { width : 280, selectFirst : false, matchContains: true
-}).result( function(event, data, formatted) { cj( "input#event_id" ).val( data[1] );
-  }).bind( 'click', function( ) { cj( "input#event_id" ).val(''); });
 
 cj('#participant_fee_level').autocomplete( feeUrl, { width : 180, selectFirst : false, matchContains: true
 }).result(function(event, data, formatted) { cj( "input#participant_fee_id" ).val( data[1] );

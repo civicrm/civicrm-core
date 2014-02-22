@@ -543,24 +543,19 @@ class CRM_Event_BAO_Query {
    * @param CRM_Core_Form $form
    */
   static function buildSearchForm(&$form) {
-    $dataURLEvent = CRM_Utils_System::url('civicrm/ajax/event',
-      "reset=1",
-      FALSE, NULL, FALSE
-    );
-    $dataURLEventType = CRM_Utils_System::url('civicrm/ajax/eventType',
-      "reset=1",
-      FALSE, NULL, FALSE
-    );
     $dataURLEventFee = CRM_Utils_System::url('civicrm/ajax/eventFee',
       "reset=1",
       FALSE, NULL, FALSE
     );
 
-    $form->assign('dataURLEvent', $dataURLEvent);
-    $form->assign('dataURLEventType', $dataURLEventType);
     $form->assign('dataURLEventFee', $dataURLEventFee);
 
-    $eventId        = &$form->add('text', 'event_name', ts('Event Name'));
+    $eventId = $form->addEntityRef('event_id', ts('Event Name'), array(
+        'entity' => 'event',
+        'placeholder' => ts('- any -'),
+        'select' => array('minimumInputLength' => 0),
+      )
+    );
     $eventType = $form->addEntityRef('event_type_id', ts('Event Type'), array(
         'entity' => 'option_value',
         'placeholder' => ts('- any -'),
@@ -573,7 +568,6 @@ class CRM_Event_BAO_Query {
     $participantFee = &$form->add('text', 'participant_fee_level', ts('Fee Level'));
 
     //elements for assigning value operation
-    $eventNameId      = &$form->add('hidden', 'event_id', '', array('id' => 'event_id'));
     $participantFeeId = &$form->add('hidden', 'participant_fee_id', '', array('id' => 'participant_fee_id'));
 
     CRM_Core_Form_Date::buildDateRange($form, 'event', 1, '_start_date_low', '_end_date_high', ts('From'), FALSE);
