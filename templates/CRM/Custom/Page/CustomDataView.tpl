@@ -29,7 +29,7 @@
   {foreach from=$customValues item=cd_edit key=cvID}
     <table class="no-border">
       {assign var='index' value=$groupId|cat:"_$cvID"}
-      {if ($editOwnCustomData and $showEdit) or ($showEdit and $editCustomData and $groupId)}
+      {if $multiRecordDisplay neq 'single' and (($editOwnCustomData and $showEdit) or ($showEdit and $editCustomData and $groupId))}
         <tr>
           <td>
             <a
@@ -40,19 +40,21 @@
         </tr>
       {/if}
       {assign var="showEdit" value=0}
-      <tr id="statusmessg_{$index}" class="hiddenElement">
-        <td><span class="success-status"></span></td>
-      </tr>
+      {if $multiRecordDisplay neq 'single'}
+        <tr id="statusmessg_{$index}" class="hiddenElement">
+          <td><span class="success-status"></span></td>
+        </tr>
+      {/if}
       <tr>
         <td id="{$cd_edit.name}_{$index}" class="section-shown form-item">
-          <div class="crm-accordion-wrapper {if $cd_edit.collapse_display eq 0 or $skipTitle} {else}collapsed{/if}">
+          <div {if $multiRecordDisplay neq 'single'} class="crm-accordion-wrapper {if $cd_edit.collapse_display eq 0 or $skipTitle} {else}collapsed{/if}"{/if}>
             {if !$skipTitle}
               <div class="crm-accordion-header">
                 {$cd_edit.title}
               </div>
             {/if}
-            <div class="crm-accordion-body">
-              {if $groupId and $cvID and $editCustomData}
+            <div {if $multiRecordDisplay neq 'single'} class="crm-accordion-body" {/if}>
+              {if $groupId and $cvID and $editCustomData and $multiRecordDisplay neq 'single'}
                 <div class="crm-submit-buttons">
                   <a href="#"
                      onclick="showDelete( {$cvID}, '{$cd_edit.name}_{$index}', {$customGroupId}, {$contactId} ); return false;"
@@ -62,11 +64,11 @@
                 </div>
               {/if}
               {foreach from=$cd_edit.fields item=element key=field_id}
-                <table class="crm-info-panel">
+                <table class="crm-info-panel crm-section">
                   <tr>
                     {if $element.options_per_line != 0}
                       <td class="label">{$element.field_title}</td>
-                      <td class="html-adjust">
+                      <td class="html-adjust content">
                         {* sort by fails for option per line. Added a variable to iterate through the element array*}
                         {foreach from=$element.field_value item=val}
                           {$val}
@@ -77,25 +79,25 @@
                       <td class="label">{$element.field_title}</td>
                       {if $element.field_type == 'File'}
                         {if $element.field_value.displayURL}
-                          <td class="html-adjust">
+                          <td class="html-adjust content">
                             <a href="{$element.field_value.displayURL}" class='crm-image-popup'>
                               <img src="{$element.field_value.displayURL}" height="100" width="100">
                             </a>
                           </td>
                         {else}
-                          <td class="html-adjust">
+                          <td class="html-adjust content">
                             <a href="{$element.field_value.fileURL}">{$element.field_value.fileName}</a>
                           </td>
                         {/if}
                       {else}
                         {if $element.field_data_type == 'Money'}
                           {if $element.field_type == 'Text'}
-                            <td class="html-adjust">{$element.field_value|crmMoney}</td>
+                            <td class="html-adjust content">{$element.field_value|crmMoney}</td>
                           {else}
-                            <td class="html-adjust">{$element.field_value}</td>
+                            <td class="html-adjust content">{$element.field_value}</td>
                           {/if}
                         {else}
-                          <td class="html-adjust">
+                          <td class="html-adjust content">
                             {if $element.contact_ref_id}
                             <a href='{crmURL p="civicrm/contact/view" q="reset=1&cid=`$element.contact_ref_id`"}'>
                               {/if}

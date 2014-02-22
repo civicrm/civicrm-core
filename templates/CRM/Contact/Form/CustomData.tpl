@@ -26,7 +26,11 @@
 {* this template is used for building tabbed custom data *}
 {if $cdType }
     {include file="CRM/Custom/Form/CustomData.tpl"}
+{if $multiRecordDisplay eq 'single'}
+    <div class="html-adjust">{$form.buttons.html}</div>
+{/if}
 {else}
+{debug}
     <div id="customData"></div>
     <div class="html-adjust">{$form.buttons.html}</div>
 
