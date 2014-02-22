@@ -101,6 +101,7 @@ class CRM_Contact_Form_CustomData extends CRM_Core_Form {
    */
   public $_groupID;
 
+  public $_multiRecordDisplay;
   /**
    * pre processing work done here.
    *
@@ -115,13 +116,22 @@ class CRM_Contact_Form_CustomData extends CRM_Core_Form {
    */
   function preProcess() {
     $this->_cdType = CRM_Utils_Array::value('type', $_GET);
-
     $this->assign('cdType', FALSE);
-    if ($this->_cdType) {
-      $this->assign('cdType', TRUE);
-      return CRM_Custom_Form_CustomData::preProcess($this);
+    $this->_multiRecordDisplay = CRM_Utils_Request::retrieve('multiRecordDisplay', 'String', $this);
+    if ($this->_cdType || $this->_multiRecordDisplay == 'single') {
+      if ($this->_cdType) {
+        $this->assign('cdType', TRUE);
+      }
+      // NOTE : group id is not stored in session from within CRM_Custom_Form_CustomData::preProcess func
+      // this is due to some condition inside it which restricts it from saving in session
+      // so doing this for multi record edit action
+      CRM_Custom_Form_CustomData::preProcess($this);
+      if ($this->_multiRecordDisplay) {
+        $this->_groupID = CRM_Utils_Request::retrieve('groupID', 'Positive', $this);
+        $this->_tableID = $this->_entityId;
+      }
+      return;
     }
-
     $this->_groupID = CRM_Utils_Request::retrieve('groupID', 'Positive', $this, TRUE);
     $this->_tableID = CRM_Utils_Request::retrieve('tableId', 'Positive', $this, TRUE);
 
@@ -149,7 +159,29 @@ class CRM_Contact_Form_CustomData extends CRM_Core_Form {
    * @access public
    */
   public function buildQuickForm() {
-    if ($this->_cdType) {
+    if ($this->_cdType || $this->_multiRecordDisplay == 'single') {
+      // buttons display for multi-valued fields to perform independednt actions
+      if ($this->_multiRecordDisplay) {
+        $isMultiple = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup',
+          $this->_groupID,
+          'is_multiple'
+        );
+        if ($isMultiple) {
+          $this->assign('multiRecordDisplay', $this->_multiRecordDisplay);
+          $this->addButtons(array(
+              array(
+                'type' => 'upload',
+                'name' => ts('Save'),
+                'isDefault' => TRUE,
+              ),
+              array(
+                'type' => 'cancel',
+                'name' => ts('Cancel'),
+              ),
+            )
+          );
+        }
+      }
       return CRM_Custom_Form_CustomData::buildQuickForm($this);
     }
 
@@ -181,7 +213,7 @@ class CRM_Contact_Form_CustomData extends CRM_Core_Form {
    * @return array the default array reference
    */
   function setDefaultValues() {
-    if ($this->_cdType) {
+    if ($this->_cdType || $this->_multiRecordDisplay == 'single') {
       $customDefaultValue = CRM_Custom_Form_CustomData::setDefaultValues($this);
       return $customDefaultValue;
     }
@@ -231,4 +263,3 @@ class CRM_Contact_Form_CustomData extends CRM_Core_Form {
     CRM_Contact_BAO_GroupContactCache::remove();
   }
 }
-

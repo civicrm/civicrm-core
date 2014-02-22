@@ -27,7 +27,9 @@
 {if $action eq 0 or $action eq 1 or $action eq 2 or $recordActivity}
   {include file="CRM/Contact/Form/CustomData.tpl" mainEdit=$mainEditForm}
 {/if}
-
+{if $displayStyle eq 'tableOriented'}
+   {include file='CRM/Profile/Page/MultipleRecordFieldsListing.tpl' showListing=1 dontShowTitle=1 pageViewType='customDataView'}
+{else}
 {strip}
   {if $action eq 16 or $action eq 4} {* Browse or View actions *}
     <div class="form-item">
@@ -51,4 +53,5 @@
     {* hide and display the appropriate blocks as directed by the php code *}
     on_load_init_blocks(showBlocks, hideBlocks);
   </script>
+{/if}
 {/if}
