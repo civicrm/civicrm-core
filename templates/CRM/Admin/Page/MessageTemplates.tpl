@@ -87,6 +87,9 @@
 
 {if $rows and $action ne 2 and $action ne 4}
 
+  {* include wysiwyg related files*}
+  {include file="CRM/common/wysiwyg.tpl" includeWysiwygEditor=true}
+
   <div id='mainTabContainer'>
     <ul>
       <li id='tab_user'>    <a href='#user'     title='{ts}User-driven Messages{/ts}'>    {ts}User-driven Messages{/ts}    </a></li>

@@ -3893,6 +3893,19 @@ div.m ul#civicrm-menu,
   margin: 0;
   padding: 0;
 }
+.crm-container .crm-action-menu .select2-default span.select2-chosen {
+  color: #2786C2;
+}
+.crm-container .crm-action-menu .select2-default span.select2-chosen:before {
+  background: url("../i/icons/jquery-ui-2786C2.png") no-repeat scroll -64px -112px;
+  content: "";
+  display: inline-block;
+  height: 16px;
+  width: 16px;
+  margin-right: 3px;
+  position: relative;
+  top: 3px;
+}
 
 /* Special styling for specific form buttons */
 #crm-container span.crm-button_qf_Main_upload input,
