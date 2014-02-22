@@ -84,34 +84,6 @@ class CRM_Event_Page_AJAX {
   }
 
   /**
-   * Function for building Event Type combo box
-   */
-  function eventType() {
-    $name = trim(CRM_Utils_Type::escape($_GET['s'], 'String'));
-    if (!$name) {
-      $name = '%';
-    }
-    $whereClause = " v.label LIKE '$name%' ";
-
-    $query = "
-SELECT v.label ,v.value
-FROM   civicrm_option_value v,
-       civicrm_option_group g
-WHERE  v.option_group_id = g.id
-AND g.name = 'event_type'
-AND v.is_active = 1
-AND {$whereClause}
-ORDER by v.weight";
-
-    $dao = CRM_Core_DAO::executeQuery($query);
-    $results = array();
-    while ($dao->fetch()) {
-      $results[$dao->value] = $dao->label;
-    }
-    CRM_Core_Page_AJAX::autocompleteResults($results);
-  }
-
-  /**
    * Function for building EventFee combo box
    */
   function eventFee() {
