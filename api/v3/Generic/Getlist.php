@@ -73,7 +73,7 @@ function _civicrm_api3_generic_getList_defaults($entity, &$request) {
     'page_num' => 1,
     'input' => '',
     'image_field' => NULL,
-    'id_field' => 'id',
+    'id_field' => $entity == 'option_value' ? 'value' : 'id',
     'params' => array(),
   );
   // Find main field from meta
