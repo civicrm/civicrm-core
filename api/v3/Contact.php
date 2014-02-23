@@ -923,8 +923,9 @@ function _civicrm_api3_contact_getlist_params(&$request) {
   if(!in_array($searchField, $list)) {
     $list[] = $searchField;
   }
+  $request['description_field'] = $list;
   $list[] = 'contact_type';
-  $request['params']['return'] = $list;
+  $request['params']['return'] = array_unique(array_merge($list, $request['extra']));
   $request['params']['options']['sort'] = 'sort_name';
   // Contact api doesn't support array(LIKE => 'foo') syntax
   $request['params'][$request['search_field']] = $request['input'];
@@ -948,8 +949,8 @@ function _civicrm_api3_contact_getlist_output($result, $request) {
         'label' => $row[$request['label_field']],
         'description' => array(),
       );
-      foreach ($request['params']['return'] as $item) {
-        if (!strpos($item, '_name') && $item != 'contact_type' && !in_array($item, $addressFields) && !empty($row[$item])) {
+      foreach ($request['description_field'] as $item) {
+        if (!strpos($item, '_name') && !in_array($item, $addressFields) && !empty($row[$item])) {
           $data['description'][] = $row[$item];
         }
       }
@@ -967,6 +968,9 @@ function _civicrm_api3_contact_getlist_output($result, $request) {
       }
       else {
         $data['icon_class'] = $row['contact_type'];
+      }
+      foreach ($request['extra'] as $field) {
+        $data['extra'][$field] = isset($row[$field]) ? $row[$field] : NULL;
       }
       $output[] = $data;
     }
