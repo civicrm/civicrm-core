@@ -272,16 +272,19 @@ CRM.validate = CRM.validate || {
   };
 
   CRM.utils.formatSelect2Result = function(row) {
-    var markup = '<table class="crm-select2-row"><tr>';
+    var markup = '<div class="crm-select2-row">';
     if (row.image !== undefined) {
-      markup += '<td class="crm-select2-image"><img src="' + row.image + '"/></td>';
+      markup += '<div class="crm-select2-image"><img src="' + row.image + '"/></div>';
     }
     else if (row.icon_class) {
-      markup += '<td class="crm-select2-icon"><div class="crm-icon ' + row.icon_class + '-icon"></div></td>';
+      markup += '<div class="crm-select2-icon"><div class="crm-icon ' + row.icon_class + '-icon"></div></div>';
     }
-    markup += '<td><div class="crm-select2-row-label">' + row.label + '</div>';
-    markup += '<div class="crm-select2-row-description">' + (row.description || '') + '</div>';
-    markup += '</td></tr></table>';
+    markup += '<div><div class="crm-select2-row-label">' + row.label + '</div>';
+    markup += '<div class="crm-select2-row-description">';
+    $.each(row.description || [], function(k, text) {
+      markup += '<p>' + text + '</p>';
+    });
+    markup += '</div></div></div>';
     return markup;
   };
   

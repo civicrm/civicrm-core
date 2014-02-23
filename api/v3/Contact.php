@@ -941,18 +941,27 @@ function _civicrm_api3_contact_getlist_params(&$request) {
 function _civicrm_api3_contact_getlist_output($result, $request) {
   $output = array();
   if (!empty($result['values'])) {
+    $addressFields = array_intersect(array('street_address', 'city', 'state_province', 'country'), $request['params']['return']);
     foreach ($result['values'] as $row) {
       $data = array(
         'id' => $row[$request['id_field']],
         'label' => $row[$request['label_field']],
+        'description' => array(),
       );
-      $description = array();
       foreach ($request['params']['return'] as $item) {
-        if (!strpos($item, '_name') && $item != 'contact_type' && !empty($row[$item])) {
-          $description[] = $row[$item];
+        if (!strpos($item, '_name') && $item != 'contact_type' && !in_array($item, $addressFields) && !empty($row[$item])) {
+          $data['description'][] = $row[$item];
         }
       }
-      $data['description'] = implode(' :: ', $description);
+      $address = array();
+      foreach($addressFields as $item) {
+        if (!empty($row[$item])) {
+          $address[] = $row[$item];
+        }
+      }
+      if ($address) {
+        $data['description'][] = implode(' ', $address);
+      }
       if (!empty($request['image_field'])) {
         $data['image'] = isset($row[$request['image_field']]) ? $row[$request['image_field']] : '';
       }
