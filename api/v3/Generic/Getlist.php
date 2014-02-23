@@ -149,7 +149,7 @@ function _civicrm_api3_generic_getlist_output($result, $request) {
         'label' => $row[$request['label_field']],
       );
       if (!empty($request['description_field'])) {
-        $data['description'] = isset($row[$request['description_field']]) ? $row[$request['description_field']] : '';
+        $data['description'] = !empty($row[$request['description_field']]) ? array($row[$request['description_field']]) : NULL;
       };
       if (!empty($request['image_field'])) {
         $data['image'] = isset($row[$request['image_field']]) ? $row[$request['image_field']] : '';
