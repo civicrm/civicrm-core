@@ -1994,6 +1994,7 @@ LEFT  JOIN  civicrm_line_item lineItem ON ( lineItem.entity_id    = participant.
                                        AND  lineItem.entity_table = 'civicrm_participant' )
 LEFT  JOIN  civicrm_price_field_value value ON ( value.id = lineItem.price_field_value_id AND value.count )
      WHERE  ( participant.event_id = %1 )
+            AND participant.is_test = 0
             {$extraWhereClause}
   GROUP BY  participant.event_id";
 
