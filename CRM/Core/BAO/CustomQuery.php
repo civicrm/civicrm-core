@@ -104,7 +104,7 @@ class CRM_Core_BAO_CustomQuery {
 
   /**
    * This stores custom data group types and tables that it extends
-   *
+   * @todo add comments explaining why survey & campaign are missing from this
    * @var array
    * @static
    */
@@ -272,44 +272,23 @@ SELECT label, value
         $joinTable = 'contact_a';
       }
       elseif ($field['extends'] == 'civicrm_contribution') {
-        $joinTable = 'civicrm_contribution';
+        $joinTable = $field['extends'];
       }
-      elseif ($field['extends'] == 'civicrm_participant') {
-        $joinTable = 'civicrm_participant';
+      elseif (in_array($field['extends'], self::$extendsMap)) {
+        $joinTable = $field['extends'];
       }
-      elseif ($field['extends'] == 'civicrm_membership') {
-        $joinTable = 'civicrm_membership';
+      else {
+        return;
       }
-      elseif ($field['extends'] == 'civicrm_pledge') {
-        $joinTable = 'civicrm_pledge';
+      $this->_tables[$name] = "\nLEFT JOIN $name ON $name.entity_id = $joinTable.id";
+      if ($this->_ids[$id]) {
+        $this->_whereTables[$name] = $this->_tables[$name];
       }
-      elseif ($field['extends'] == 'civicrm_activity') {
-        $joinTable = 'civicrm_activity';
+      if ($joinTable != 'contact_a') {
+         $this->_whereTables[$joinTable] = $this->_tables[$joinTable] = 1;
       }
-      elseif ($field['extends'] == 'civicrm_relationship') {
-        $joinTable = 'civicrm_relationship';
-      }
-      elseif ($field['extends'] == 'civicrm_grant') {
-        $joinTable = 'civicrm_grant';
-      }
-      elseif ($field['extends'] == 'civicrm_address') {
-        $joinTable = 'civicrm_address';
-      }
-      elseif ($field['extends'] == 'civicrm_case') {
-        $joinTable = 'civicrm_case';
-      }
-
-      if ($joinTable) {
-        $this->_tables[$name] = "\nLEFT JOIN $name ON $name.entity_id = $joinTable.id";
-        if ($this->_ids[$id]) {
-          $this->_whereTables[$name] = $this->_tables[$name];
-        }
-        if ($joinTable != 'contact_a') {
-          $this->_whereTables[$joinTable] = $this->_tables[$joinTable] = 1;
-        }
-        elseif ($this->_contactSearch) {
-          CRM_Contact_BAO_Query::$_openedPanes[ts('Custom Fields')] = TRUE;
-        }
+      elseif ($this->_contactSearch) {
+        CRM_Contact_BAO_Query::$_openedPanes[ts('Custom Fields')] = TRUE;
       }
     }
   }
