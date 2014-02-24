@@ -215,7 +215,7 @@ class CRM_Event_BAO_Query {
       if (substr($query->_params[$id][0], 0, 6) == 'event_' ||
         substr($query->_params[$id][0], 0, 12) == 'participant_'
       ) {
-        if ($query->_mode == CRM_Contact_BAO_QUERY::MODE_CONTACTS) {
+        if ($query->_mode == CRM_Contact_BAO_Query::MODE_CONTACTS) {
           $query->_useDistinct = TRUE;
         }
         $grouping = $query->_params[$id][3];
@@ -561,14 +561,14 @@ class CRM_Event_BAO_Query {
     $form->assign('dataURLEventType', $dataURLEventType);
     $form->assign('dataURLEventFee', $dataURLEventFee);
 
-    $eventId        = &$form->add('text', 'event_name', ts('Event Name'));
-    $eventType      = &$form->add('text', 'event_type', ts('Event Type'));
-    $participantFee = &$form->add('text', 'participant_fee_level', ts('Fee Level'));
+    $form->add('text', 'event_name', ts('Event Name'));
+    $form->add('text', 'event_type', ts('Event Type'));
+    $form->add('text', 'participant_fee_level', ts('Fee Level'));
 
     //elements for assigning value operation
-    $eventNameId      = &$form->add('hidden', 'event_id', '', array('id' => 'event_id'));
-    $eventTypeId      = &$form->add('hidden', 'event_type_id', '', array('id' => 'event_type_id'));
-    $participantFeeId = &$form->add('hidden', 'participant_fee_id', '', array('id' => 'participant_fee_id'));
+    $form->add('hidden', 'event_id', '', array('id' => 'event_id'));
+    $form->add('hidden', 'event_type_id', '', array('id' => 'event_type_id'));
+    $form->add('hidden', 'participant_fee_id', '', array('id' => 'participant_fee_id'));
 
     CRM_Core_Form_Date::buildDateRange($form, 'event', 1, '_start_date_low', '_end_date_high', ts('From'), FALSE);
 

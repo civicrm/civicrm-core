@@ -1721,7 +1721,7 @@ SELECT IF( EXISTS(SELECT name FROM civicrm_contact_type WHERE name like %1), 1, 
       // add field information
       foreach ($value['fields'] as $k => $properties) {
         $properties['element_name'] = "custom_{$k}_-{$groupCount}";
-        if (isset($properties['customValue']) && !CRM_Utils_system::isNull($properties['customValue'])) {
+        if (isset($properties['customValue']) && !CRM_Utils_System::isNull($properties['customValue'])) {
           if (isset($properties['customValue'][$groupCount])) {
             $properties['element_name'] = "custom_{$k}_{$properties['customValue'][$groupCount]['id']}";
             $formattedGroupTree[$key]['table_id'] = $properties['customValue'][$groupCount]['id'];
