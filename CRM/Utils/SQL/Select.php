@@ -31,6 +31,7 @@
  *    - to disable any preprocessing, simply omit the variable list
  *  - Variables may be individual values or arrays; arrays are imploded with commas
  *  - Conditionals are AND'd; if you need OR's, do it yourself
+ *  - Use classes/functions with documentation (rather than undocumented array-trees)
  */
 class CRM_Utils_SQL_Select {
   private $selects = array();
@@ -40,27 +41,44 @@ class CRM_Utils_SQL_Select {
   private $groupBys = array();
   private $havings = array();
   private $orderBys = array();
+  private $limit = NULL;
+  private $offset = NULL;
 
   /**
    * Create a new SELECT query
    *
-   * @param $from
+   * @param string $from table-name and optional alias
    * @return CRM_Utils_SQL_Select
    */
   public static function from($from) {
     return new self($from);
   }
 
+  /**
+   * Create a new SELECT query
+   *
+   * @param string $from table-name and optional alias
+   */
   public function __construct($from) {
     $this->from = $from;
   }
 
+  /**
+   * Add a new JOIN clause
+   *
+   * @param string $name the effective alias of the joined table
+   * @param string $expr the complete join expression (eg "INNER JOIN mytable myalias ON mytable.id = maintable.foo_id")
+   * @param array|null $args
+   * @return CRM_Utils_SQL_Select
+   */
   public function join($name, $expr, $args = NULL) {
     $this->joins[$name] = $this->interpolate($expr, $args);
     return $this;
   }
 
   /**
+   * Specify the column(s)/value(s) to return by adding to the SELECT clause
+   *
    * @param string|array $exprs list of SQL expressions
    * @param null|array $args use NULL to disable interpolation; use an array of variables to enable
    * @return CRM_Utils_SQL_Select
@@ -74,6 +92,8 @@ class CRM_Utils_SQL_Select {
   }
 
   /**
+   * Limit results by adding extra condition(s) to the WHERE clause
+   *
    * @param string|array $exprs list of SQL expressions
    * @param null|array $args use NULL to disable interpolation; use an array of variables to enable
    * @return CRM_Utils_SQL_Select
@@ -87,6 +107,8 @@ class CRM_Utils_SQL_Select {
   }
 
   /**
+   * Group results by adding extra items to the GROUP BY clause
+   *
    * @param string|array $exprs list of SQL expressions
    * @param null|array $args use NULL to disable interpolation; use an array of variables to enable
    * @return CRM_Utils_SQL_Select
@@ -100,6 +122,8 @@ class CRM_Utils_SQL_Select {
   }
 
   /**
+   * Limit results by adding extra condition(s) to the HAVING clause
+   *
    * @param string|array $exprs list of SQL expressions
    * @param null|array $args use NULL to disable interpolation; use an array of variables to enable
    * @return CRM_Utils_SQL_Select
@@ -113,6 +137,8 @@ class CRM_Utils_SQL_Select {
   }
 
   /**
+   * Sort results by adding extra items to the ORDER BY clause
+   *
    * @param string|array $exprs list of SQL expressions
    * @param null|array $args use NULL to disable interpolation; use an array of variables to enable
    * @return CRM_Utils_SQL_Select
@@ -122,6 +148,26 @@ class CRM_Utils_SQL_Select {
     foreach ($exprs as $expr) {
       $this->orderBys[$expr] = $this->interpolate($expr, $args);
     }
+    return $this;
+  }
+
+  /**
+   * Set a limit on the number of records to return
+   *
+   * @param int $limit
+   * @param int $offset
+   * @return CRM_Utils_SQL_Select
+   * @throws CRM_Core_Exception
+   */
+  public function limit($limit, $offset = 0) {
+    if ($limit !== NULL && !is_numeric($limit)) {
+      throw new CRM_Core_Exception("Illegal limit");
+    }
+    if ($offset !== NULL && !is_numeric($offset)) {
+      throw new CRM_Core_Exception("Illegal offset");
+    }
+    $this->limit = $limit;
+    $this->offset = $offset;
     return $this;
   }
 
@@ -173,6 +219,10 @@ class CRM_Utils_SQL_Select {
     }
   }
 
+  /**
+   * @param string|NULL $value
+   * @return string SQL expression, e.g. "it\'s great" (with-quotes) or NULL (without-quotes)
+   */
   protected function escapeString($value) {
     return $value === NULL ? 'NULL' : '"' . CRM_Core_DAO::escapeString($value) . '"';
   }
@@ -202,6 +252,12 @@ class CRM_Utils_SQL_Select {
     }
     if ($this->orderBys) {
       $sql .= 'ORDER BY ' . implode(', ', $this->orderBys) . "\n";
+    }
+    if ($this->limit !== NULL) {
+      $sql .= 'LIMIT ' . $this->limit . "\n";
+      if ($this->offset !== NULL) {
+        $sql .= 'OFFSET ' . $this->offset . "\n";
+      }
     }
     return $sql;
   }
