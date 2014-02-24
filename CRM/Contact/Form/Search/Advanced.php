@@ -90,7 +90,7 @@ class CRM_Contact_Form_Search_Advanced extends CRM_Contact_Form_Search {
 
     //check if there are any custom data searchable fields
     $groupDetails = array();
-    $extends = array_merge(array('Contact', 'Individual', 'Household', 'Organization'),
+    $extends = array_merge(array('Contact', 'Individual', 'Household', 'Organization', 'Group'),
       CRM_Contact_BAO_ContactType::subTypes()
     );
     $groupDetails = CRM_Core_BAO_CustomGroup::getGroupDetail(NULL, TRUE,
@@ -100,6 +100,11 @@ class CRM_Contact_Form_Search_Advanced extends CRM_Contact_Form_Search {
     if (empty($groupDetails)) {
       unset($paneNames[ts('Custom Fields')]);
     }
+
+    $separatePaneCustomGroups = array('Address');
+    $groupDetails = array_merge((array) $groupDetails, CRM_Core_BAO_CustomGroup::getGroupDetail(NULL, TRUE,
+      $separatePaneCustomGroups)
+    );
 
     foreach ($paneNames as $name => $type) {
       if (!$this->_searchOptions[$type]) {
