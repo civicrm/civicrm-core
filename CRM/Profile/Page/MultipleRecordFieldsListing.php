@@ -115,6 +115,7 @@ class CRM_Profile_Page_MultipleRecordFieldsListing extends CRM_Core_Page_Basic {
         $links[CRM_Core_Action::DELETE]['url'] = 'civicrm/profile/edit';
         $links[CRM_Core_Action::DELETE]['qs'] = "reset=1&id=%%id%%&recordId=%%recordId%%&gid=%%gid%%&multiRecord={$delete}&snippet=1&context=multiProfileDialog&onPopupClose=%%onPopupClose%%";
       }
+      // NOTE : links for DELETE action for customDataView is handled in browse
 
       self::$_links[$this->_pageViewType] = $links;
     }
@@ -258,7 +259,7 @@ class CRM_Profile_Page_MultipleRecordFieldsListing extends CRM_Core_Page_Basic {
       // and $cgcount is used to build new record url
       $cgcount = 1;
       if ($result && !empty($result)) {
-        $links = self::links($this->_pageViewType);
+        $links = self::links();
         if ($this->_pageViewType == 'profileDataView') {
           $pageCheckSum = $this->get('pageCheckSum');
           if ($pageCheckSum) {
@@ -290,10 +291,16 @@ class CRM_Profile_Page_MultipleRecordFieldsListing extends CRM_Core_Page_Basic {
                 $actionParams['recId'] = $recId;
                 $actionParams['type'] = $this->_contactType;
                 $actionParams['cgcount'] = $cgcount;
+
+                // DELETE action links
+                $links[CRM_Core_Action::DELETE]['url'] = '#';
+                $links[CRM_Core_Action::DELETE]['extra'] = " onclick='showDeleteInDialog({$recId}, {$this->_customGroupId}, {$this->_contactId})' ";
+                $links[CRM_Core_Action::DELETE]['class'] = 'ignore-jshref';
               }
               if (!empty($pageCheckSum)) {
                 $actionParams['cs'] = $pageCheckSum;
               }
+
               $value['action'] = CRM_Core_Action::formLink(
                 $links,
                 $linkAction,

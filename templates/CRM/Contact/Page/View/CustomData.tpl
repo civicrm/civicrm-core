@@ -28,7 +28,47 @@
   {include file="CRM/Contact/Form/CustomData.tpl" mainEdit=$mainEditForm}
 {/if}
 {if $displayStyle eq 'tableOriented'}
-   {include file='CRM/Profile/Page/MultipleRecordFieldsListing.tpl' showListing=1 dontShowTitle=1 pageViewType='customDataView'}
+  {include file='CRM/Profile/Page/MultipleRecordFieldsListing.tpl' showListing=1 dontShowTitle=1 pageViewType='customDataView'}
+  {literal}
+  <script type="text/javascript">
+    function showDeleteInDialog(valueID, groupID, contactID) {
+      var confirmText = '{/literal}{ts escape='js'}Are you sure you want to delete this record?{/ts}{literal}';
+      cj('#browseValues').after("<div id='delete-record'></div>");
+        cj('#delete-record').html(confirmText).dialog({
+          title: "{/literal}{ts escape='js'}Delete Record{/ts}{literal}",
+          modal: true,
+          width: 680,
+          overlay: {
+            opacity: 0.5,
+            background: "black"
+          },
+
+          buttons: {
+          {/literal}"{ts escape='js'}Cancel{/ts}"{literal}: function() {
+            cj(this).dialog("close");
+            cj('#delete-record').html('');
+          },
+          {/literal}"{ts escape='js'}OK{/ts}{literal}": function() {
+            deleteCustomValueRec(valueID, groupID, contactID);
+            window.setTimeout(function(){window.location.reload( )}, 1000);
+          }
+        }
+        });
+    }
+
+    function deleteCustomValueRec(valueID, groupID, contactID) {
+      var postUrl = {/literal}"{crmURL p='civicrm/ajax/customvalue' h=0 }"{literal};
+      cj.ajax({
+        type: "POST",
+        data: "valueID=" + valueID + "&groupID=" + groupID + "&contactId=" + contactID + "&key={/literal}{crmKey name='civicrm/ajax/customvalue'}{literal}",
+        url: postUrl,
+        success: function (html) {
+          CRM.alert('', '{/literal}{ts escape="js"}Record Deleted{/ts}{literal}', 'success');
+        }
+      });
+    }
+  </script>
+  {/literal}
 {else}
 {strip}
   {if $action eq 16 or $action eq 4} {* Browse or View actions *}

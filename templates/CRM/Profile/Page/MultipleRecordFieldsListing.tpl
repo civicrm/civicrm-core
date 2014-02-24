@@ -68,7 +68,7 @@
 
   {if !$reachedMax}
     {if $pageViewType eq 'customDataView'}
-      <a accesskey="N" href="{crmURL p='civicrm/contact/view/cd/edit' q="reset=1&snippet=1&type=$ctype&groupID=$customGroupId&entityID=$contactId&cgcount=$cgcount&multiRecordDisplay=single"}" 
+      <a accesskey="N" title="{ts 1=$customGroupTitle}Add %1 Record{/ts}" href="{crmURL p='civicrm/contact/view/cd/edit' q="reset=1&snippet=1&type=$ctype&groupID=$customGroupId&entityID=$contactId&cgcount=$cgcount&multiRecordDisplay=single"}" 
        class="button action-item"><span><div class="icon add-icon"></div>{ts 1=$customGroupTitle}Add %1 Record{/ts}</span></a>
     {else}
       <a accesskey="N" href="{crmURL p='civicrm/profile/edit' q="reset=1&id=`$contactId`&multiRecord=add&gid=`$gid`&snippet=1&context=multiProfileDialog&onPopupClose=`$onPopupClose`"}"
@@ -119,7 +119,7 @@
 
       var profileName = {/literal}"{$ufGroupName}"{literal};
       cj('.action-item').each(function () {
-        if (!cj(this).attr('jshref')) {
+        if (!cj(this).attr('jshref') && !cj(this).hasClass('ignore-jshref')) {
           cj(this).attr('jshref', cj(this).attr('href'));
           cj(this).attr('href', '#browseValues');
         }
@@ -136,7 +136,9 @@
       cj(actionItemHeirarchy).click(function () {
         dataURL = cj(this).attr('jshref');
         dialogTitle = cj(this).attr('title');
-        formDialog(profileName, dataURL, dialogTitle);
+        if (!cj(this).hasClass('ignore-jshref')) {
+          formDialog(profileName, dataURL, dialogTitle);
+        }
       });
     });
     </script>
