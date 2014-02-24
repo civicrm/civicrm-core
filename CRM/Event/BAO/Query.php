@@ -590,7 +590,8 @@ class CRM_Event_BAO_Query {
     $form->addRule('participant_fee_amount_low', ts('Please enter a valid money value.'), 'money');
     $form->addRule('participant_fee_amount_high', ts('Please enter a valid money value.'), 'money');
     // add all the custom  searchable fields
-    $extends = array('Participant');
+    $extends = array('Participant', 'Event');
+    //@todo CRM-14265 I have added Event here - there remains a question as to whether & how they should be visually separated
     $groupDetails = CRM_Core_BAO_CustomGroup::getGroupDetail(NULL, TRUE, $extends);
     if ($groupDetails) {
       $form->assign('participantGroupTree', $groupDetails);
