@@ -51,6 +51,32 @@ class CRM_Utils_SQL_SelectTest extends CiviUnitTestCase {
     $this->assertLike('SELECT * FROM foo GROUP BY bar_id HAVING (count(id) > 2) AND (sum(id) > 10) AND (avg(id) < 10)', $select->toSQL());
   }
 
+  function testOrderByPlain() {
+    $select = CRM_Utils_SQL_Select::from('foo bar')
+      ->orderBy('first asc')
+      ->orderBy(array('second desc', 'third'));
+    $this->assertLike('SELECT * FROM foo bar ORDER BY first asc, second desc, third', $select->toSQL());
+  }
+
+  function testLimit_defaultOffset() {
+    $select = CRM_Utils_SQL_Select::from('foo bar')
+      ->limit(20);
+    $this->assertLike('SELECT * FROM foo bar LIMIT 20 OFFSET 0', $select->toSQL());
+  }
+
+  function testLimit_withOffset() {
+    $select = CRM_Utils_SQL_Select::from('foo bar')
+      ->limit(20, 60);
+    $this->assertLike('SELECT * FROM foo bar LIMIT 20 OFFSET 60', $select->toSQL());
+  }
+
+  function testLimit_disable() {
+    $select = CRM_Utils_SQL_Select::from('foo bar')
+      ->limit(20, 60)
+      ->limit(NULL, NULL);
+    $this->assertLike('SELECT * FROM foo bar', $select->toSQL());
+  }
+
   function testBig() {
     $select = CRM_Utils_SQL_Select::from('foo')
       ->select('foo.id')
@@ -58,14 +84,18 @@ class CRM_Utils_SQL_SelectTest extends CiviUnitTestCase {
       ->join('rel2', 'LEFT JOIN rel2_table rel2 ON foo.id = rel2.foo_id')
       ->where('foo.type = @type', array('@type' => 'mytype'))
       ->groupBy("foo.id")
-      ->having('sum(rel1.stat) > 10');
+      ->having('sum(rel1.stat) > 10')
+      ->orderBy('rel2.whiz')
+      ->limit(100, 300);
     $this->assertLike(
       "SELECT foo.id FROM foo"
         . " INNER JOIN rel1_table rel1 ON foo.id = rel1.foo_id"
         . " LEFT JOIN rel2_table rel2 ON foo.id = rel2.foo_id "
         . " WHERE (foo.type = \"mytype\")"
         . " GROUP BY foo.id"
-        . " HAVING (sum(rel1.stat) > 10)",
+        . " HAVING (sum(rel1.stat) > 10)"
+        . " ORDER BY rel2.whiz"
+        . " LIMIT 100 OFFSET 300",
       $select->toSQL()
     );
   }
