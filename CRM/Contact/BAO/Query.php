@@ -769,13 +769,13 @@ class CRM_Contact_BAO_Query {
                   $this->_select[$name] = "contact_a.{$fieldName}  as `$name`";
                 }
               }
-              elseif (in_array($tName, array('state_province', 'country', 'county'))) {
-                $this->_pseudoConstantsSelect[$pf]['select'] = "{$field['where']} as `$name`";
-                $this->_pseudoConstantsSelect[$pf]['element'] = $name;
-                if ($tName == 'state_province') {
-                  $this->_pseudoConstantsSelect[$tName]['select'] = "{$field['where']} as `$name`";
-                  $this->_pseudoConstantsSelect[$tName]['element'] = $name;
-                }
+              elseif (in_array($tName, array('country', 'county'))) {
+                $this->_pseudoConstantsSelect[$name]['select'] = "{$field['where']} as `$name`";
+                $this->_pseudoConstantsSelect[$name]['element'] = $name;
+              }
+              elseif ($tName == 'state_province') {
+                $this->_pseudoConstantsSelect[$tName]['select'] = "{$field['where']} as `$name`";
+                $this->_pseudoConstantsSelect[$tName]['element'] = $name;
               }
               else {
                 $this->_select[$name] = "{$field['where']} as `$name`";
