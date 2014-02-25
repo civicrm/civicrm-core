@@ -752,17 +752,22 @@ SELECT civicrm_custom_group.name as name,
     $this->add('hidden', 'past_event');
 
     $events = array();
-    if ( $this->_eID ) {
-      $eventEndDate = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $this->_eID,'end_date');
+    $pastval = 0;
+
+    if ($this->_eID) {
+      $eventEndDate = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $this->_eID, 'end_date');
+      $pastval = 1;
     }
-    $this->assign('past', 0);
+    else {
+      $pastval = $this->getElementValue('past_event');
+    }
+    $this->assign('past', $pastval);
+
     if ($this->_action & CRM_Core_Action::UPDATE) {
       $events = CRM_Event_BAO_Event::getEvents(1, FALSE, FALSE);
     }
-    elseif ($this->getElementValue('past_event') || (isset($eventEndDate) && (CRM_Utils_Date::currentDBDate() > CRM_Utils_Date::processDate($eventEndDate)))) {
-      $pastval = $this->getElementValue('past_event');
+    elseif ($pastval || (isset($eventEndDate) && (CRM_Utils_Date::currentDBDate() > CRM_Utils_Date::processDate($eventEndDate)))) {
       $events = CRM_Event_BAO_Event::getEvents($pastval);
-      $this->assign('past', $pastval);
     }
     else {
       $events = CRM_Event_BAO_Event::getEvents();
