@@ -158,36 +158,7 @@ class CRM_Admin_Form_MessageTemplates extends CRM_Admin_Form {
     //get the tokens.
     $tokens = CRM_Core_SelectValues::contactTokens();
 
-    //sorted in ascending order tokens by ignoring word case
-    natcasesort($tokens);
-    $this->assign('tokens', json_encode($tokens));
-
-    $this->add('select', 'token1', ts('Insert Tokens'),
-      $tokens, FALSE,
-      array(
-        'size' => "5",
-        'multiple' => TRUE,
-        'onchange' => "return tokenReplText(this);",
-      )
-    );
-
-    $this->add('select', 'token2', ts('Insert Tokens'),
-      $tokens, FALSE,
-      array(
-        'size' => "5",
-        'multiple' => TRUE,
-        'onchange' => "return tokenReplHtml(this);",
-      )
-    );
-
-    $this->add('select', 'token3', ts('Insert Tokens'),
-      $tokens, FALSE,
-      array(
-        'size' => "5",
-        'multiple' => TRUE,
-        'onchange' => "return tokenReplText(this);",
-      )
-    );
+    $this->assign('tokens', CRM_Utils_Token::formatTokensForDisplay($tokens));
 
     $this->add('textarea', 'msg_text', ts('Text Message'),
       "cols=50 rows=6"

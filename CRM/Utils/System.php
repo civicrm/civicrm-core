@@ -1310,7 +1310,7 @@ class CRM_Utils_System {
       return $link;
     }
     else {
-      return "<a href=\"{$link}\" $style target=\"_blank\" title=\"{$params['title']}\">{$params['text']}</a>";
+      return "<a href=\"{$link}\" $style target=\"_blank\" class=\"crm-doc-link no-popup\" title=\"{$params['title']}\">{$params['text']}</a>";
     }
   }
 

@@ -84,17 +84,10 @@
     {$form.html_message.label}
 </div><!-- /.crm-accordion-header -->
  <div class="crm-accordion-body">
-  {if $action neq 4}
-  <span class="helpIcon" id="helphtml">
-  <a href="#" onClick="return showToken('Html', 1);">{$form.token1.label}</a>
-  {help id="id-token-html" file="CRM/Contact/Form/Task/Email.hlp" tplFile=$tplFile isAdmin=$isAdmin editor=$editor}
-  <div id="tokenHtml" style="display:none;">
-      <input style="border:1px solid #999999;" type="text" id="filter1" size="20" name="filter1" onkeyup="filter(this, 1)"/><br />
-      <span class="description">{ts}Begin typing to filter list of tokens{/ts}</span><br/>
-      {$form.token1.html}
-  </div>
-  </span>
-  {/if}
+   <div class="helpIcon" id="helphtml">
+     <input class="crm-token-selector big" data-field="html_message" />
+     {help id="id-token-html" tplFile=$tplFile isAdmin=$isAdmin editor=$editor file="CRM/Contact/Form/Task/Email.hlp"}
+   </div>
     <div class="clear"></div>
     <div class='html'>
   {if $editor EQ 'textarea'}
@@ -133,41 +126,6 @@ var currentHeight;
 var currentMetric = document.getElementById('metric').value;
 showBindFormatChkBox();
 selectPaper( document.getElementById('paper_size').value );
-
-function tokenReplHtml ( )
-{
-    var token1 = cj("#token1").val( )[0];
-    var editor = {/literal}"{$editor}"{literal};
-    if ( editor == "tinymce" ) {
-        var content= tinyMCE.get('html_message').getContent() +token1;
-        tinyMCE.get('html_message').setContent(content);
-    } else if ( editor == "joomlaeditor" ) {
-        tinyMCE.execCommand('mceInsertContent',false, token1);
-        var msg       = document.getElementById(html_message).value;
-        var cursorlen = document.getElementById(html_message).selectionStart;
-        var textlen   = msg.length;
-        document.getElementById(html_message).value = msg.substring(0, cursorlen) + token1 + msg.substring(cursorlen, textlen);
-        var cursorPos = (cursorlen + token1.length);
-        document.getElementById(html_message).selectionStart = cursorPos;
-        document.getElementById(html_message).selectionEnd   = cursorPos;
-        document.getElementById(html_message).focus();
-  } else if ( editor == "ckeditor" ) {
-        oEditor = CKEDITOR.instances[html_message];
-        oEditor.insertHtml(token1.toString() );
-    } else if ( editor == "drupalwysiwyg" ) {
-        Drupal.wysiwyg.instances[html_message].insert(token1.toString());
-    } else {
-    var msg       = document.getElementById(html_message).value;
-        var cursorlen = document.getElementById(html_message).selectionStart;
-        var textlen   = msg.length;
-        document.getElementById(html_message).value = msg.substring(0, cursorlen) + token1 + msg.substring(cursorlen, textlen);
-        var cursorPos = (cursorlen + token1.length);
-        document.getElementById(html_message).selectionStart = cursorPos;
-        document.getElementById(html_message).selectionEnd   = cursorPos;
-        document.getElementById(html_message).focus();
-    }
-    verify();
-}
 
 function showBindFormatChkBox()
 {
