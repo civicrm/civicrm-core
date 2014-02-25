@@ -158,7 +158,7 @@ GROUP BY cv.label";
   /**
    * Function to get default participant role
    */
-  function participantRole() {
+  static function participantRole() {
     $eventID = $_GET['eventId'];
 
     $defaultRoleId = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event',

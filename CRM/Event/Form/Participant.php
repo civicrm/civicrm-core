@@ -577,7 +577,7 @@ SELECT civicrm_custom_group.name as name,
       if (CRM_Utils_Array::value('event_id', $defaults[$this->_id])) {
         $contributionTypeId = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event',
           $defaults[$this->_id]['event_id'],
-          'financial_type_id' 
+          'financial_type_id'
         );
         if ($contributionTypeId) {
           $defaults[$this->_id]['financial_type_id'] = $contributionTypeId;
