@@ -123,7 +123,7 @@ cj(function($) {
             ajax: {
               url: tagUrl,
               data: function(term) {
-                return {s: term, fromId: tag.id};
+                return {term: term, fromId: tag.id};
               },
               results: function(response) {
                 return {results: response};

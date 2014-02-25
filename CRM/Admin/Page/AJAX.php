@@ -291,7 +291,7 @@ class CRM_Admin_Page_AJAX {
   }
 
   static function mergeTagList() {
-    $name = CRM_Utils_Type::escape($_GET['s'], 'String');
+    $name = CRM_Utils_Type::escape($_GET['term'], 'String');
     $fromId = CRM_Utils_Type::escape($_GET['fromId'], 'Integer');
     $limit = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'search_autocomplete_count', NULL, 10);
 
