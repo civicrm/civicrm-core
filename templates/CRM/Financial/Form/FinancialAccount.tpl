@@ -43,8 +43,8 @@
       <td class="html-adjust">{$form.description.html}</td>
     </tr>
     <tr class="crm-contribution-form-block-organisation_name">
-      <td class="label">{$form.contact_name.label}&nbsp;{help id="id-financial-owner" file="CRM/Contact/Form/Contact.hlp"}</td>
-      <td class="html-adjust">{$form.contact_name.html|crmReplace:class:twenty}<br />
+      <td class="label">{$form.contact_id.label}&nbsp;{help id="id-financial-owner" file="CRM/Contact/Form/Contact.hlp"}</td>
+      <td class="html-adjust">{$form.contact_id.html}<br />
         <span class="description">{ts}Use this field to indicate the organization that owns this account.{/ts}</span>
       </td>
     </tr>
@@ -96,43 +96,3 @@
 {/if}
   <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="botttom"}</div>
 </div>
-
-{literal}
-<script type="text/javascript">
-var dataUrl        = "{/literal}{$dataURL}{literal}";
-cj('#contact_name').autocomplete( dataUrl, {
-  width        : 250,
-  selectFirst  : false,
-  matchCase    : true,
-  matchContains: true,
-  max: {/literal}{crmSetting name="search_autocomplete_count" group="Search Preferences"}{literal}
-}).result( function(event, data, formatted) {
-  ( parseInt( data[1] ) ) ? cj( "#contact_id" ).val( data[1] ) : cj( "#contact_id" ).val('');
-});
-
-// remove current account owner id when current owner removed.
-cj("form").submit(function() {
-  if (!cj('#contact_name').val()) cj( "#contact_id" ).val('');
-});
-
-//current employer default setting
-var employerId = "{/literal}{$organisationId}{literal}";
-if ( employerId ) {
-  var dataUrl = "{/literal}{crmURL p='civicrm/ajax/rest' h=0 q="className=CRM_Contact_Page_AJAX&fnName=getContactList&json=1&context=contact&org=1&id=" }{literal}" + employerId ;
-  cj.ajax({
-    url     : dataUrl,
-    async   : false,
-    success : function(html){
-      //fixme for showing address in div
-      htmlText = html.split( '|' , 2);
-      cj('input#contact_name').val(htmlText[0]);
-      cj('input#contact_id').val(htmlText[1]);
-    }
-  });
-}
-
-cj("input#contact_name").click( function( ) {
-  cj("input#contact_id").val('');
-});
-</script>
-{/literal}
