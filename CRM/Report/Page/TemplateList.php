@@ -63,7 +63,7 @@ SELECT  v.id, v.value, v.label, v.description, v.component_id,
     ELSE 'Contact'
     END as component_name,
         v.grouping,
-        inst.id as instance_id 
+        inst.id as instance_id
 FROM    civicrm_option_value v
 INNER JOIN civicrm_option_group g
         ON (v.option_group_id = g.id AND g.name = 'report_template')

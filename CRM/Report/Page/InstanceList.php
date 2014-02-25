@@ -57,7 +57,13 @@ class CRM_Report_Page_InstanceList extends CRM_Core_Page {
   **/
   protected $_compID = NULL;
 
+  /**
+   * ID of grouping if report list is filtered
+   *
+   * @var int
+   **/
   protected $_grouping = NULL;
+
   /**
    * ID of parent report template if list is filtered by template
    *
@@ -110,11 +116,11 @@ class CRM_Report_Page_InstanceList extends CRM_Core_Page {
 
     $sql = "
         SELECT inst.id, inst.title, inst.report_id, inst.description, v.label, v.grouping,
-CASE
-    WHEN comp.name IS NOT NULL THEN SUBSTRING(comp.name, 5)
-    WHEN v.grouping IS NOT NULL THEN v.grouping
-    ELSE 'Contact'
-    END as compName
+        CASE
+          WHEN comp.name IS NOT NULL THEN SUBSTRING(comp.name, 5)
+          WHEN v.grouping IS NOT NULL THEN v.grouping
+          ELSE 'Contact'
+          END as compName
           FROM civicrm_option_group g
           LEFT JOIN civicrm_option_value v
                  ON v.option_group_id = g.id AND
