@@ -102,6 +102,8 @@ class CRM_Contact_Form_CustomData extends CRM_Core_Form {
   public $_groupID;
 
   public $_multiRecordDisplay;
+
+  public $_copyValueId;
   /**
    * pre processing work done here.
    *
@@ -129,6 +131,7 @@ class CRM_Contact_Form_CustomData extends CRM_Core_Form {
       if ($this->_multiRecordDisplay) {
         $this->_groupID = CRM_Utils_Request::retrieve('groupID', 'Positive', $this);
         $this->_tableID = $this->_entityId;
+        $this->_copyValueId = CRM_Utils_Request::retrieve('copyValueId', 'Positive', $this);
       }
       return;
     }
@@ -168,10 +171,11 @@ class CRM_Contact_Form_CustomData extends CRM_Core_Form {
         );
         if ($isMultiple) {
           $this->assign('multiRecordDisplay', $this->_multiRecordDisplay);
+          $saveButtonName = $this->_copyValueId ? 'Save a Copy': 'Save';
           $this->addButtons(array(
               array(
                 'type' => 'upload',
-                'name' => ts('Save'),
+                'name' => ts('%1', array(1 => $saveButtonName)),
                 'isDefault' => TRUE,
               ),
               array(
@@ -214,7 +218,28 @@ class CRM_Contact_Form_CustomData extends CRM_Core_Form {
    */
   function setDefaultValues() {
     if ($this->_cdType || $this->_multiRecordDisplay == 'single') {
-      $customDefaultValue = CRM_Custom_Form_CustomData::setDefaultValues($this);
+      if ($this->_copyValueId) {
+        // cached tree is fetched
+        $groupTree = &CRM_Core_BAO_CustomGroup::getTree($this->_type,
+          $this,
+          $this->_entityId,
+          $this->_groupID
+        );
+        $valueIdDefaults = array();
+        $groupTreeValueId = CRM_Core_BAO_CustomGroup::formatGroupTree($groupTree, $this->_copyValueId, $this);
+        CRM_Core_BAO_CustomGroup::setDefaults($groupTreeValueId, $valueIdDefaults, FALSE, FALSE, $this->get('action'));
+        $tableId = $groupTreeValueId[$this->_groupID]['table_id'];
+        foreach ($valueIdDefaults as $valueIdElementName => $value) {
+          // build defaults for COPY action for new record saving
+          $valueIdElementNamePieces = explode('_', $valueIdElementName);
+          $valueIdElementNamePieces[2] = "-{$this->_groupCount}";
+          $elementName = implode('_', $valueIdElementNamePieces);
+          $customDefaultValue[$elementName] = $value;
+        }
+      }
+      else {
+        $customDefaultValue = CRM_Custom_Form_CustomData::setDefaultValues($this);
+      }
       return $customDefaultValue;
     }
 

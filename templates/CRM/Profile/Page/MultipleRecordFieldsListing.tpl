@@ -68,7 +68,7 @@
 
   {if !$reachedMax}
     {if $pageViewType eq 'customDataView'}
-      <a accesskey="N" title="{ts 1=$customGroupTitle}Add %1 Record{/ts}" href="{crmURL p='civicrm/contact/view/cd/edit' q="reset=1&snippet=1&type=$ctype&groupID=$customGroupId&entityID=$contactId&cgcount=$cgcount&multiRecordDisplay=single"}" 
+      <br/><a accesskey="N" title="{ts 1=$customGroupTitle}Add %1 Record{/ts}" href="{crmURL p='civicrm/contact/view/cd/edit' q="reset=1&snippet=1&type=$ctype&groupID=$customGroupId&entityID=$contactId&cgcount=$cgcount&multiRecordDisplay=single"}" 
        class="button action-item"><span><div class="icon add-icon"></div>{ts 1=$customGroupTitle}Add %1 Record{/ts}</span></a>
     {else}
       <a accesskey="N" href="{crmURL p='civicrm/profile/edit' q="reset=1&id=`$contactId`&multiRecord=add&gid=`$gid`&snippet=1&context=multiProfileDialog&onPopupClose=`$onPopupClose`"}"
@@ -110,8 +110,11 @@
               }
             });
             cj('.action-link').hide();
-            if (pageViewType != 'customDataView') {
-              cj('#profile-dialog #crm-profile-block .edit-value label').css('display', 'inline');
+            if (pageViewType == 'customDataView') {
+              var labelElement = cj('#custom-record-dialog .html-adjust label').css('display', 'inline');
+            }
+            else {
+              var labelElement = cj('#profile-dialog #crm-profile-block .edit-value label').css('display', 'inline');
             }
           }
         });
