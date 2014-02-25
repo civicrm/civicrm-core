@@ -287,10 +287,12 @@ AND    reset_date IS NULL
     $contactID       = $session->get('userID');
     $fromEmailValues = array();
 
-    // add the domain email id
-    $domainEmail = CRM_Core_BAO_Domain::getNameAndEmail();
-    $domainEmail = "$domainEmail[0] <$domainEmail[1]>";
-    $fromEmailValues[$domainEmail] = htmlspecialchars($domainEmail);
+    // add all configured FROM email addresses
+    $domainFrom = CRM_Core_OptionGroup::values('from_email_address');
+    foreach (array_keys($domainFrom) as $k) {
+      $domainEmail = $domainFrom[$k];
+      $fromEmailValues[$domainEmail] = htmlspecialchars($domainEmail);
+    }
 
     // add logged in user's active email ids
     if ($contactID) {
