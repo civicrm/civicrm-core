@@ -131,8 +131,7 @@
     }
 
   // change the status to default 'partially paid' for partial payments
-  var feeAmount;
-  var userModifiedAmount;
+  var feeAmount, userModifiedAmount;
 
   cj('#total_amount')
    .focus(
@@ -409,147 +408,147 @@
             dataUrl += '&discountId=' + discountId;
           }
 
-          cj.ajax({
+          $.ajax({
             url: dataUrl,
             async: false,
             global: false,
             success: function ( html ) {
-              cj("#feeBlock").html( html );
+              $("#feeBlock").html( html );
             }
           });
 
-          cj("#feeBlock").ajaxStart(function(){
-            cj(".disable-buttons input").prop('disabled', true);
+          $("#feeBlock").ajaxStart(function(){
+            $(".disable-buttons input").prop('disabled', true);
           });
 
-          cj("#feeBlock").ajaxStop(function(){
-            cj(".disable-buttons input").prop('disabled', false);
+          $("#feeBlock").ajaxStop(function(){
+            $(".disable-buttons input").prop('disabled', false);
           });
 
           //show event real full as well as waiting list message.
-          if ( cj("#hidden_eventFullMsg").val( ) ) {
-            cj( "#eventFullMsg" ).show( ).html( cj("#hidden_eventFullMsg" ).val( ) );
+          if ( $("#hidden_eventFullMsg").val( ) ) {
+            $( "#eventFullMsg" ).show( ).html( $("#hidden_eventFullMsg" ).val( ) );
           }
           else {
-            cj( "#eventFullMsg" ).hide( );
+            $( "#eventFullMsg" ).hide( );
           }
         }
 
         var roleGroupMapper = {/literal}{$participantRoleIds|@json_encode}{literal};
 
-    function showCustomData( type, subType, subName ) {
-      var dataUrl = {/literal}"{crmURL p=$urlPath h=0 q='snippet=4&type='}"{literal} + type;
-      var roleid = "role_id_"+subType;
-      var loadData = false;
+        function showCustomData( type, subType, subName ) {
+          var dataUrl = {/literal}"{crmURL p=$urlPath h=0 q='snippet=4&type='}"{literal} + type;
+          var roleid = "role_id_"+subType;
+          var loadData = false;
 
-      if ( document.getElementById( roleid ).checked == true ) {
-        if ( roleGroupMapper[subType] ) {
-          var splitGroup = roleGroupMapper[subType].split(",");
-          for ( i = 0; i < splitGroup.length; i++ ) {
-            var roleCustomGroupId = splitGroup[i];
-            if ( cj( '#'+roleCustomGroupId ).length > 0 ) {
-              cj( '#'+roleCustomGroupId ).remove( );
+          if ( document.getElementById( roleid ).checked == true ) {
+            if ( roleGroupMapper[subType] ) {
+              var splitGroup = roleGroupMapper[subType].split(",");
+              for ( i = 0; i < splitGroup.length; i++ ) {
+                var roleCustomGroupId = splitGroup[i];
+                if ( $( '#'+roleCustomGroupId ).length > 0 ) {
+                  $( '#'+roleCustomGroupId ).remove( );
+                }
+              }
+              loadData = true;
             }
           }
-          loadData = true;
-        }
-      }
-      else {
-        var groupUnload = [];
-        var x = 0;
+          else {
+            var groupUnload = [];
+            var x = 0;
 
-        if ( roleGroupMapper[0] ) {
-          var splitGroup = roleGroupMapper[0].split(",");
-          for ( x = 0; x < splitGroup.length; x++ ) {
-            groupUnload[x] = splitGroup[x];
-          }
-        }
-
-        for ( var i in roleGroupMapper ) {
-          if ( ( i > 0 ) && ( document.getElementById( "role_id_"+i ).checked ) ) {
-            var splitGroup = roleGroupMapper[i].split(",");
-            for ( j = 0; j < splitGroup.length; j++ ) {
-              groupUnload[x+j+1] = splitGroup[j];
+            if ( roleGroupMapper[0] ) {
+              var splitGroup = roleGroupMapper[0].split(",");
+              for ( x = 0; x < splitGroup.length; x++ ) {
+                groupUnload[x] = splitGroup[x];
+              }
             }
-          }
-        }
 
-        if ( roleGroupMapper[subType] ) {
-          var splitGroup = roleGroupMapper[subType].split(",");
-          for ( i = 0; i < splitGroup.length; i++ ) {
-            var roleCustomGroupId = splitGroup[i];
-            if ( cj( '#'+roleCustomGroupId ).length > 0 ) {
-              if ( cj.inArray( roleCustomGroupId, groupUnload ) == -1  ) {
-                cj( '#'+roleCustomGroupId ).remove( );
+            for ( var i in roleGroupMapper ) {
+              if ( ( i > 0 ) && ( document.getElementById( "role_id_"+i ).checked ) ) {
+                var splitGroup = roleGroupMapper[i].split(",");
+                for ( j = 0; j < splitGroup.length; j++ ) {
+                  groupUnload[x+j+1] = splitGroup[j];
+                }
+              }
+            }
+
+            if ( roleGroupMapper[subType] ) {
+              var splitGroup = roleGroupMapper[subType].split(",");
+              for ( i = 0; i < splitGroup.length; i++ ) {
+                var roleCustomGroupId = splitGroup[i];
+                if ( $( '#'+roleCustomGroupId ).length > 0 ) {
+                  if ( $.inArray( roleCustomGroupId, groupUnload ) == -1  ) {
+                    $( '#'+roleCustomGroupId ).remove( );
+                  }
+                }
               }
             }
           }
+
+          if ( !( loadData ) ) {
+            return false;
+          }
+
+          if ( subType ) {
+            dataUrl += '&subType=' + subType;
+          }
+
+          if ( subName ) {
+            dataUrl += '&subName=' + subName;
+            $( '#customData' + subName ).show( );
+          }
+          else {
+            $( '#customData' ).show( );
+          }
+
+          {/literal}
+          {if $urlPathVar}
+            dataUrl += '&{$urlPathVar}';
+          {/if}
+          {if $groupID}
+            dataUrl += '&groupID=' + '{$groupID}';
+          {/if}
+          {if $qfKey}
+            dataUrl += '&qfKey=' + '{$qfKey}';
+          {/if}
+          {if $entityID}
+            dataUrl += '&entityID=' + '{$entityID}';
+          {/if}
+
+          {literal}
+
+          if ( subName && subName != 'null' ) {
+            var fname = '#customData' + subName;
+          }
+          else {
+            var fname = '#customData';
+          }
+
+          var response = $.ajax({url: dataUrl,
+            async: false
+          }).responseText;
+
+          if ( subType != 'null' ) {
+            if ( document.getElementById(roleid).checked == true ) {
+              var response_text = '<div style="display:block;" id = '+subType+'_chk >'+response+'</div>';
+              $( fname ).append(response_text);
+            }
+            else {
+              $('#'+subType+'_chk').remove();
+            }
+          }
         }
-      }
 
-      if ( !( loadData ) ) {
-        return false;
-      }
-
-      if ( subType ) {
-        dataUrl += '&subType=' + subType;
-      }
-
-      if ( subName ) {
-        dataUrl += '&subName=' + subName;
-        cj( '#customData' + subName ).show( );
-      }
-      else {
-        cj( '#customData' ).show( );
-      }
-
-      {/literal}
-      {if $urlPathVar}
-        dataUrl += '&{$urlPathVar}';
-      {/if}
-      {if $groupID}
-        dataUrl += '&groupID=' + '{$groupID}';
-      {/if}
-      {if $qfKey}
-        dataUrl += '&qfKey=' + '{$qfKey}';
-      {/if}
-      {if $entityID}
-        dataUrl += '&entityID=' + '{$entityID}';
-      {/if}
-
-      {literal}
-
-      if ( subName && subName != 'null' ) {
-        var fname = '#customData' + subName;
-      }
-      else {
-        var fname = '#customData';
-      }
-
-      var response = cj.ajax({url: dataUrl,
-        async: false
-      }).responseText;
-
-      if ( subType != 'null' ) {
-        if ( document.getElementById(roleid).checked == true ) {
-          var response_text = '<div style="display:block;" id = '+subType+'_chk >'+response+'</div>';
-          cj( fname ).append(response_text);
-        }
-        else {
-          cj('#'+subType+'_chk').remove();
-        }
-      }
-    }
-
-      {/literal}
-      CRM.buildCustomData( '{$customDataType}', 'null', 'null' );
-      {if $eventID}
-        CRM.buildCustomData( '{$customDataType}', {$eventID}, {$eventNameCustomDataTypeID} );
-      {/if}
-      {if $eventTypeID}
-        CRM.buildCustomData( '{$customDataType}', {$eventTypeID}, {$eventTypeCustomDataTypeID} );
-      {/if}
-      {literal}
+        {/literal}
+        CRM.buildCustomData( '{$customDataType}', 'null', 'null' );
+        {if $eventID}
+          CRM.buildCustomData( '{$customDataType}', {$eventID}, {$eventNameCustomDataTypeID} );
+        {/if}
+        {if $eventTypeID}
+          CRM.buildCustomData( '{$customDataType}', {$eventTypeID}, {$eventTypeCustomDataTypeID} );
+        {/if}
+        {literal}
 
       });
     </script>
