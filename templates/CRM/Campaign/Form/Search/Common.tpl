@@ -49,10 +49,10 @@
 
           {if $showInterviewer}
             <td class="font-size12pt">
-              {$form.survey_interviewer_name.label}
+              {$form.survey_interviewer_id.label}
             </td>
             <td class="font-size12pt ">
-              {$form.survey_interviewer_name.html}
+              {$form.survey_interviewer_id.html}
             </td>
           {/if}
 
@@ -165,23 +165,6 @@
     {/if}
     {literal}
   });
-
-//load interviewer autocomplete.
-var interviewerDataUrl = "{/literal}{$dataUrl}{literal}";
-var hintText = "{/literal}{ts escape='js'}Type in a partial or complete name of an existing contact.{/ts}{literal}";
-cj( "#survey_interviewer_name" ).autocomplete( interviewerDataUrl,
-  { width : 256,
-    selectFirst : false,
-    hintText: hintText,
-    matchContains: true,
-    minChars: 1
-  }
-).result( function( event, data, formatted ) {
-    cj( "#survey_interviewer_id" ).val( data[1] );
-  }).bind( 'click', function( ) {
-    cj( "#survey_interviewer_id" ).val('');
-  });
-
 
 function buildCampaignGroups( surveyId ) {
   if ( !surveyId ) surveyId = cj("#campaign_survey_id").val( );
