@@ -1531,4 +1531,39 @@ class CRM_Utils_Token {
     );
   }
 
+  /**
+   * Formats a token list for the select2 widget
+   * @param $tokens
+   * @return array
+   */
+  static function formatTokensForDisplay($tokens) {
+    $sorted = $output = array();
+
+    // Sort in ascending order by ignoring word case
+    natcasesort($tokens);
+
+    // Attempt to place tokens into optgroups
+    // TODO: These groupings could be better and less hackish. Getting them pre-grouped from upstream would be nice.
+    foreach ($tokens as $k => $v) {
+      // Check to see if this token is already in a group e.g. for custom fields
+      $split = explode(' :: ', $v);
+      if (!empty($split[1])) {
+        $sorted[$split[1]][] = array('id' => $k, 'text' => $split[0]);
+      }
+      // Group by entity
+      else {
+        $split = explode('.', trim($k, '{}'));
+        $entity = isset($split[1]) ? ucfirst($split[0]) : 'Contact';
+        $sorted[ts($entity)][] = array('id' => $k, 'text' => $v);
+      }
+    }
+
+    ksort($sorted);
+    foreach ($sorted as $k => $v) {
+      $output[] = array('text' => $k, 'children' => $v);
+    }
+
+    return $output;
+  }
+
 }

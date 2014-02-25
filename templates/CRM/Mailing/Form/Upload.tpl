@@ -52,14 +52,10 @@
   <td>{$form.template.html}</td>
     </tr>
     <tr class="crm-mailing-upload-form-block-subject"><td class="label">{$form.subject.label}</td>
-        <td colspan="2">{$form.subject.html|crmAddClass:huge}
-                        <a href="#" onClick="return showToken('Subject', 3);">{$form.token3.label}</a>
-                        {help id="id-token-subject" file="CRM/Contact/Form/Task/Email.hlp"}
-                        <div id='tokenSubject' style="display:none">
-                           <input style="border:1px solid #999999;" type="text" id="filter3" size="20" name="filter3" onkeyup="filter(this, 3)"/><br />
-                           <span class="description">{ts}Begin typing to filter list of tokens{/ts}</span><br/>
-                           {$form.token3.html}
-                        </div>
+        <td colspan="2">
+          {$form.subject.html|crmAddClass:huge}&nbsp;
+          <input class="crm-token-selector big" data-field="subject" />
+          {help id="id-token-subject" tplFile=$tplFile isAdmin=$isAdmin file="CRM/Contact/Form/Task/Email.hlp"}
         </td>
     </tr>
     <tr class="crm-mailing-upload-form-block-upload_type"><td></td><td colspan="2">{$form.upload_type.label} {$form.upload_type.html} {help id="upload-compose"}</td></tr>
