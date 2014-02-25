@@ -10,7 +10,7 @@ class CRM_Core_CodeGen_DAO extends CRM_Core_CodeGen_BaseTask {
 
   function generateDAOs() {
     foreach (array_keys($this->tables) as $name) {
-      echo "Generating DAO " . $this->tables[$name]['fileName'] . " for $name \n";
+      echo "Generating $name as " . $this->tables[$name]['fileName'] . "\n";
 
       if (empty($this->tables[$name]['base'])) {
         echo "No base defined for $name, skipping output generation\n";

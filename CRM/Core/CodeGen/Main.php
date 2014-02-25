@@ -95,14 +95,6 @@ Alternatively you can get a version of CiviCRM that matches your PHP version
     // TODO: This configuration can be manipulated dynamically.
     $components = $this->getTasks();
     foreach ($components as $component) {
-      // special handling for entity generation
-      if ($component == 'CRM_Core_CodeGen_Entity') {
-        $specification = new CRM_Core_CodeGen_EntitySpecification();
-        $specification->parse($this->schemaPath, $this->buildVersion);
-        $this->database = $specification->database;
-        $this->tables = $specification->tables;
-      }
-
       $task = new $component($this);
 
       if (is_a($task, 'CRM_Core_CodeGen_ITask')) {
@@ -126,7 +118,6 @@ Alternatively you can get a version of CiviCRM that matches your PHP version
       'CRM_Core_CodeGen_DAO',
       'CRM_Core_CodeGen_Test',
       'CRM_Core_CodeGen_I18n',
-      'CRM_Core_CodeGen_Entity',
     );
     return $components;
   }
