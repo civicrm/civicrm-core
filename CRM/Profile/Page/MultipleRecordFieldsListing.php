@@ -76,46 +76,52 @@ class CRM_Profile_Page_MultipleRecordFieldsListing extends CRM_Core_Page_Basic {
       $update = array_search(CRM_Core_Action::UPDATE, CRM_Core_Action::$_names);
       $delete = array_search(CRM_Core_Action::DELETE, CRM_Core_Action::$_names);
 
+      // names and titles
       $links[CRM_Core_Action::VIEW] = array(
         'name' => ts('View'),
         'title' => ts('View %1', array( 1 => $this->_customGroupTitle . ' record')),
       );
-
-      if ($this->_pageViewType == 'profileDataView') {
-        $links[CRM_Core_Action::VIEW]['url'] = 'civicrm/profile/view';
-        $links[CRM_Core_Action::VIEW]['qs'] = "reset=1&id=%%id%%&recordId=%%recordId%%&gid=%%gid%%&multiRecord={$view}&snippet=1&context=multiProfileDialog&onPopupClose=%%onPopupClose%%";
-      }
-      elseif ($this->_pageViewType == 'customDataView') {
-        // custom data specific view links
-        $links[CRM_Core_Action::VIEW]['url'] = 'civicrm/contact/view/cd';
-        $links[CRM_Core_Action::VIEW]['qs'] = 'reset=1&snippet=1&gid=%%gid%%&cid=%%cid%%&recId=%%recId%%&multiRecordDisplay=single';
-      }
 
       $links[CRM_Core_Action::UPDATE] = array(
         'name' => ts('Edit'),
         'title' => ts('Edit %1', array( 1 => $this->_customGroupTitle . ' record')),
       );
 
-      if ($this->_pageViewType == 'profileDataView') {
-        $links[CRM_Core_Action::UPDATE]['url'] = 'civicrm/profile/edit';
-        $links[CRM_Core_Action::UPDATE]['qs'] = "reset=1&id=%%id%%&recordId=%%recordId%%&gid=%%gid%%&multiRecord={$update}&snippet=1&context=multiProfileDialog&onPopupClose=%%onPopupClose%%";
-      }
-      elseif ($this->_pageViewType == 'customDataView') {
-        // custom data specific update links
-        $links[CRM_Core_Action::UPDATE]['url'] = 'civicrm/contact/view/cd/edit';
-        $links[CRM_Core_Action::UPDATE]['qs'] = 'reset=1&snippet=1&type=%%type%%&groupID=%%groupID%%&entityID=%%entityID%%&cgcount=%%cgcount%%&multiRecordDisplay=single';
-      }
-
       $links[CRM_Core_Action::DELETE] = array(
         'name' => ts('Delete'),
         'title' => ts('Delete %1', array( 1 => $this->_customGroupTitle . ' record')),
       );
 
+      // urls and queryStrings
       if ($this->_pageViewType == 'profileDataView') {
+        $links[CRM_Core_Action::VIEW]['url'] = 'civicrm/profile/view';
+        $links[CRM_Core_Action::VIEW]['qs'] = "reset=1&id=%%id%%&recordId=%%recordId%%&gid=%%gid%%&multiRecord={$view}&snippet=1&context=multiProfileDialog&onPopupClose=%%onPopupClose%%";
+
+        $links[CRM_Core_Action::UPDATE]['url'] = 'civicrm/profile/edit';
+        $links[CRM_Core_Action::UPDATE]['qs'] = "reset=1&id=%%id%%&recordId=%%recordId%%&gid=%%gid%%&multiRecord={$update}&snippet=1&context=multiProfileDialog&onPopupClose=%%onPopupClose%%";
+
         $links[CRM_Core_Action::DELETE]['url'] = 'civicrm/profile/edit';
         $links[CRM_Core_Action::DELETE]['qs'] = "reset=1&id=%%id%%&recordId=%%recordId%%&gid=%%gid%%&multiRecord={$delete}&snippet=1&context=multiProfileDialog&onPopupClose=%%onPopupClose%%";
+
       }
-      // NOTE : links for DELETE action for customDataView is handled in browse
+      elseif ($this->_pageViewType == 'customDataView') {
+        // custom data specific view links
+        $links[CRM_Core_Action::VIEW]['url'] = 'civicrm/contact/view/cd';
+        $links[CRM_Core_Action::VIEW]['qs'] = 'reset=1&snippet=1&gid=%%gid%%&cid=%%cid%%&recId=%%recId%%&multiRecordDisplay=single';
+
+        // custom data specific update links
+        $links[CRM_Core_Action::UPDATE]['url'] = 'civicrm/contact/view/cd/edit';
+        $links[CRM_Core_Action::UPDATE]['qs'] = 'reset=1&snippet=1&type=%%type%%&groupID=%%groupID%%&entityID=%%entityID%%&cgcount=%%cgcount%%&multiRecordDisplay=single';
+        // NOTE : links for DELETE action for customDataView is handled in browse
+
+        // copy action
+        $links[CRM_Core_Action::COPY] = array(
+          'name' => ts('Copy'),
+          'title' => ts('Copy %1', array( 1 => $this->_customGroupTitle . ' record')),
+          'url' => 'civicrm/contact/view/cd/edit',
+          'qs' => 'reset=1&snippet=1&type=%%type%%&groupID=%%groupID%%&entityID=%%entityID%%&cgcount=%%newCgCount%%&multiRecordDisplay=single&copyValueId=%%cgcount%%'
+        );
+      }
 
       self::$_links[$this->_pageViewType] = $links;
     }
@@ -269,6 +275,11 @@ class CRM_Profile_Page_MultipleRecordFieldsListing extends CRM_Core_Page_Basic {
           }
         }
         $linkAction = array_sum(array_keys($this->links()));
+
+        if ($reached) {
+          unset($links[CRM_Core_Action::COPY]);
+        }
+        $newCgCount = (!$reached) ? count($result) + 1 : NULL;
         foreach ($result as $recId => &$value) {
           foreach ($value as $fieldId => &$val) {
             if (is_numeric($fieldId)) {
@@ -291,6 +302,7 @@ class CRM_Profile_Page_MultipleRecordFieldsListing extends CRM_Core_Page_Basic {
                 $actionParams['recId'] = $recId;
                 $actionParams['type'] = $this->_contactType;
                 $actionParams['cgcount'] = $cgcount;
+                $actionParams['newCgCount'] = $newCgCount;
 
                 // DELETE action links
                 $links[CRM_Core_Action::DELETE]['url'] = '#';

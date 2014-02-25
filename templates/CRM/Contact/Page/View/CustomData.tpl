@@ -50,7 +50,6 @@
           },
           {/literal}"{ts escape='js'}OK{/ts}{literal}": function() {
             deleteCustomValueRec(valueID, groupID, contactID);
-            window.setTimeout(function(){window.location.reload( )}, 1000);
           }
         }
         });
@@ -63,7 +62,7 @@
         data: "valueID=" + valueID + "&groupID=" + groupID + "&contactId=" + contactID + "&key={/literal}{crmKey name='civicrm/ajax/customvalue'}{literal}",
         url: postUrl,
         success: function (html) {
-          CRM.alert('', '{/literal}{ts escape="js"}Record Deleted{/ts}{literal}', 'success');
+          window.location.reload( );
         }
       });
     }
