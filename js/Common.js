@@ -241,8 +241,6 @@ CRM.validate = CRM.validate || {
 (function ($, undefined) {
   "use strict";
 
-  // Set select2 defaults
-  $.fn.select2.defaults.minimumResultsForSearch = 10;
   // https://github.com/ivaynberg/select2/pull/2090
   $.fn.select2.defaults.width = 'resolve';
 
@@ -274,16 +272,19 @@ CRM.validate = CRM.validate || {
   };
 
   CRM.utils.formatSelect2Result = function(row) {
-    var markup = '<table class="crm-select2-row"><tr>';
+    var markup = '<div class="crm-select2-row">';
     if (row.image !== undefined) {
-      markup += '<td class="crm-select2-image"><img src="' + row.image + '"/></td>';
+      markup += '<div class="crm-select2-image"><img src="' + row.image + '"/></div>';
     }
     else if (row.icon_class) {
-      markup += '<td class="crm-select2-icon"><div class="crm-icon ' + row.icon_class + '-icon"></div></td>';
+      markup += '<div class="crm-select2-icon"><div class="crm-icon ' + row.icon_class + '-icon"></div></div>';
     }
-    markup += '<td><div class="crm-select2-row-label">' + row.label + '</div>';
-    markup += '<div class="crm-select2-row-description">' + (row.description || '') + '</div>';
-    markup += '</td></tr></table>';
+    markup += '<div><div class="crm-select2-row-label">' + row.label + '</div>';
+    markup += '<div class="crm-select2-row-description">';
+    $.each(row.description || [], function(k, text) {
+      markup += '<p>' + text + '</p>';
+    });
+    markup += '</div></div></div>';
     return markup;
   };
   
@@ -317,21 +318,21 @@ CRM.validate = CRM.validate || {
       })
       .find('input.select-row:checked').parents('tr').addClass('crm-row-selected');
     $('.crm-select2', e.target).each(function() {
-      var $el = $(this);
+      var $el = $(this), options = {};
       // quickform doesn't support optgroups so here's a hack :(
       $('option[value^=crm_optgroup]', this).each(function() {
         $(this).nextUntil('option[value^=crm_optgroup]').wrapAll('<optgroup label="' + $(this).text() + '" />');
         $(this).remove();
       });
-      // Get a copy of the data rather than a reference
-      var options = $.extend({}, $el.data('select-params') || {});
-      // Set placeholder from markup if not specified
+      // Defaults for single-selects
       if ($el.is('select:not([multiple])')) {
-        options.allowClear = options.allowClear !== undefined ? options.allowClear : !($el.hasClass('required'));
-        if (options.placeHolder === undefined && $('option:first', this).val() === '') {
+        options.minimumResultsForSearch = 10;
+        options.allowClear = !($el.hasClass('required'));
+        if ($('option:first', this).val() === '') {
           options.placeholderOption = 'first';
         }
       }
+      $.extend(options, $el.data('select-params') || {});
       // Autocomplete using the getlist api
       if ($el.data('api-entity') && $el.hasClass('crm-form-entityref')) {
         $el.addClass('crm-ajax-select');
