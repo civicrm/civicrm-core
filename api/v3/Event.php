@@ -231,3 +231,50 @@ function _civicrm_api3_event_getisfull(&$event, $event_id) {
   $event[$event_id]['is_full'] = $event[$event_id]['available_places'] == 0 ? 1 : 0;
 }
 
+
+/**
+ * Overrides _civicrm_api3_generic_getlist_params.
+ *
+ * @param $request array
+ */
+function _civicrm_api3_event_getlist_params(&$request) {
+  $fieldsToReturn = array('start_date', 'event_type_id', 'title', 'summary');
+  $request['params']['return'] = array_unique(array_merge($fieldsToReturn, $request['extra']));
+  $request['params']['options']['sort'] = 'start_date DESC';
+  $request['params'] += array(
+    'is_template' => 0,
+    'is_active' => 1,
+  );
+}
+
+/**
+ * Overrides _civicrm_api3_generic_getlist_output
+ *
+ * @param $result array
+ * @param $request array
+ *
+ * @return array
+ */
+function _civicrm_api3_event_getlist_output($result, $request) {
+  $output = array();
+  if (!empty($result['values'])) {
+    foreach ($result['values'] as $row) {
+      $data = array(
+        'id' => $row[$request['id_field']],
+        'label' => $row[$request['label_field']],
+        'description' => array(CRM_Core_Pseudoconstant::getLabel('CRM_Event_BAO_Event', 'event_type_id', $row['event_type_id'])),
+      );
+      if (!empty($row['start_date'])) {
+        $data['description'][0] .= ': ' . CRM_Utils_Date::customFormat($row['start_date']);
+      }
+      if (!empty($row['summary'])) {
+        $data['description'][] = $row['summary'];
+      }
+      foreach ($request['extra'] as $field) {
+        $data['extra'][$field] = isset($row[$field]) ? $row[$field] : NULL;
+      }
+      $output[] = $data;
+    }
+  }
+  return $output;
+}

@@ -261,16 +261,6 @@
      <weight>4</weight>
   </item>
   <item>
-     <path>civicrm/ajax/event</path>
-     <page_callback>CRM_Event_Page_AJAX::event</page_callback>
-     <access_arguments>access CiviCRM,access CiviEvent</access_arguments>
-  </item>
-  <item>
-     <path>civicrm/ajax/eventType</path>
-     <page_callback>CRM_Event_Page_AJAX::eventType</page_callback>
-     <access_arguments>access CiviCRM,access CiviEvent</access_arguments>
-  </item>
-  <item>
      <path>civicrm/ajax/eventFee</path>
      <page_callback>CRM_Event_Page_AJAX::eventFee</page_callback>
      <access_arguments>access CiviCRM,access CiviEvent</access_arguments>
@@ -279,11 +269,6 @@
      <path>civicrm/ajax/locBlock</path>
      <page_callback>CRM_Core_Page_AJAX_Location::getLocBlock</page_callback>
      <access_arguments>access CiviEvent</access_arguments>
-  </item>
-  <item>
-     <path>civicrm/ajax/eventlist</path>
-     <page_callback>CRM_Event_Page_AJAX::eventList</page_callback>
-     <access_arguments>access CiviCRM,access CiviEvent</access_arguments>
   </item>
   <item>
     <path>civicrm/ajax/event/add_participant_to_cart</path>

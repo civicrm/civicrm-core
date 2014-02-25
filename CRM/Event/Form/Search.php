@@ -445,36 +445,7 @@ class CRM_Event_Form_Search extends CRM_Core_Form {
    * @access public
    * @see valid_date
    */
-  function addRules() {
-    $this->addFormRule(array('CRM_Event_Form_Search', 'formRule'));
-  }
-
-  /**
-   * global validation rules for the form
-   *
-   * @param array $fields posted values of the form
-   * @param array $errors list of errors to be posted back to the form
-   *
-   * @return void
-   * @static
-   * @access public
-   */
-  static function formRule($fields) {
-    $errors = array();
-
-    if ($fields['event_name'] && !is_numeric($fields['event_id'])) {
-      $errors['event_id'] = ts('Please select valid event.');
-    }
-
-    if ($fields['event_type'] && !is_numeric($fields['event_type_id'])) {
-      $errors['event_type'] = ts('Please select valid event type.');
-    }
-    if (!empty($errors)) {
-      return $errors;
-    }
-
-    return TRUE;
-  }
+  function addRules() {}
 
   /**
    * Set the default form values
