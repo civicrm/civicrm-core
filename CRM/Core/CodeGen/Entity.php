@@ -1,29 +1,29 @@
 <?php
 
 /**
- * Create DAO ORM classes.
+ * Create ORM entities
  */
-class CRM_Core_CodeGen_DAO extends CRM_Core_CodeGen_BaseTask {
+class CRM_Core_CodeGen_Entity extends CRM_Core_CodeGen_BaseTask {
   function run() {
-    $this->generateDAOs();
+    $this->generateEntitys();
   }
 
-  function generateDAOs() {
+  function generateEntitys() {
     foreach (array_keys($this->tables) as $name) {
-      echo "Generating DAO " . $this->tables[$name]['fileName'] . " for $name \n";
+      echo "Generating entity " . $this->tables[$name]['fileName'] ." for $name \n";
 
       if (empty($this->tables[$name]['base'])) {
         echo "No base defined for $name, skipping output generation\n";
         continue;
       }
 
-      $template = new CRM_Core_CodeGen_Util_Template('php');
+      $template = new CRM_Core_CodeGen_Util_Template('');
       $template->assign('table', $this->tables[$name]);
 
       $directory = $this->config->phpCodePath . $this->tables[$name]['base'];
       CRM_Core_CodeGen_Util_File::createDir($directory);
 
-      $template->run('dao.tpl', $directory . $this->tables[$name]['fileName']);
+      $template->run('entity.tpl', $directory . $this->tables[$name]['fileName']);
     }
   }
 }
