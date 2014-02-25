@@ -75,10 +75,41 @@ class CRM_Core_CodeGen_EntitySpecification {
   }
 
   function getTables($dbXML, &$database) {
+    // skip entity generation for tables where manual changes are needed.
+    $skipTables = array(
+      // these tables needs sepecial handling for entiti_table, entity_id
+      'civicrm_acl_entity_role',
+      'civicrm_action_log',
+      'civicrm_campaign_group',
+      'civicrm_entity_batch',
+      'civicrm_entity_file',
+      'civicrm_entity_financial_account',
+      'civicrm_entity_financial_trxn',
+      'civicrm_entity_tag',
+      'civicrm_line_item',
+      'civicrm_log',
+      'civicrm_mailing_group',
+      'civicrm_note',
+      'civicrm_pcp_block',
+      'civicrm_pledge_block',
+      'civicrm_prevnext_cache',
+      'civicrm_price_set_entity',
+      'civicrm_tell_friend',
+      'civicrm_uf_join',
+      // case table's are skipped to prevent syntax error generated due "Case" reserved word
+      'civicrm_case',
+      'civicrm_case_activity',
+      'civicrm_case_contact',
+      'civicrm_relationship',
+    );
+
     $tables = array();
     foreach ($dbXML->tables as $tablesXML) {
       foreach ($tablesXML->table as $tableXML) {
-        if ($this->value('drop', $tableXML, 0) > 0 and $this->value('drop', $tableXML, 0) <= $this->buildVersion) {
+        if (($this->value('drop', $tableXML, 0) > 0 AND $this->value('drop', $tableXML, 0) <= $this->buildVersion)
+          OR in_array($tableXML->name, $skipTables)
+        ) {
+          echo "Skipping entity generation for " .$tableXML->name . "\n";
           continue;
         }
 
@@ -108,6 +139,9 @@ class CRM_Core_CodeGen_EntitySpecification {
         echo "$ftable is not a valid foreign key table in $name\n";
         continue;
       }
+
+      $tables[$name]['fields'][$fkey]['propertyName'] = str_replace('Id', '', $tables[$name]['fields'][$fkey]['propertyName']);
+      $tables[$name]['fields'][$fkey]['functionName'] = str_replace('Id', '', $tables[$name]['fields'][$fkey]['functionName']);
       $tables[$name]['foreignKey'][$fkey]['className'] = $classNames[$ftable];
       $tables[$name]['foreignKey'][$fkey]['fileName'] = str_replace('_', '/', $classNames[$ftable]) . '.php';
       $tables[$name]['fields'][$fkey]['FKClassName'] = $classNames[$ftable];
@@ -115,7 +149,15 @@ class CRM_Core_CodeGen_EntitySpecification {
       $targetEntity = str_replace('CRM', 'Civi', str_replace('_', '\\', $classNames[$ftable]));
       $tables[$name]['fields'][$fkey]['columnType'] = '\\' . $targetEntity;
       $tables[$name]['fields'][$fkey]['columnInfo'] = '@ORM\ManyToOne(targetEntity="' . $targetEntity . '")';
-      $tables[$name]['fields'][$fkey]['columnJoin'] = '@ORM\JoinColumns({@ORM\JoinColumn(name="' . $tables[$name]['foreignKey'][$fkey]['name'] . '", referencedColumnName="' . $tables[$name]['foreignKey'][$fkey]['key'] . '")})';
+      $tables[$name]['fields'][$fkey]['columnJoin'] = '@ORM\JoinColumns({@ORM\JoinColumn(name="' . $tables[$name]['foreignKey'][$fkey]['name'] . '", referencedColumnName="' . $tables[$name]['foreignKey'][$fkey]['key'] . '"';
+
+      if (!empty($tables[$name]['foreignKey'][$fkey]['onDelete'])) {
+        $tables[$name]['fields'][$fkey]['columnJoin'] .= ', onDelete="' . $tables[$name]['foreignKey'][$fkey]['onDelete'] . '"';
+      }
+
+      $tables[$name]['fields'][$fkey]['columnJoin'] .= ')})';
+
+      $tables[$name]['fields'][$fkey]['setFunctionInput'] = "{$tables[$name]['fields'][$fkey]['columnType']} \${$tables[$name]['fields'][$fkey]['propertyName']} = null";
     }
   }
 
@@ -152,7 +194,6 @@ class CRM_Core_CodeGen_EntitySpecification {
     $klass = trim((string ) $tableXML->class);
     $base = $this->value('base', $tableXML);
     $sourceFile = "xml/schema/{$base}/{$klass}.xml";
-    //$daoPath = "{$base}/DAO/";
     $daoPath = "{$base}" . DIRECTORY_SEPARATOR;
     $pre = str_replace('/', '_', $daoPath);
     $this->classNames[$name] = $pre . $klass;
@@ -167,13 +208,11 @@ class CRM_Core_CodeGen_EntitySpecification {
 
     $table = array(
       'name' => $name,
-      //'base' => $daoPath,
-      'base' => 'src2'. DIRECTORY_SEPARATOR .str_replace('CRM', 'Civi', $daoPath),
+      'base' => str_replace('CRM', 'Civi', $daoPath),
       'sourceFile' => $sourceFile,
       'fileName' => $klass . '.php',
       'objectName' => $klass,
       'labelName' => substr($name, 8),
-      //'className' => $this->classNames[$name],
       'className' => $klass,
       'attributes_simple' => trim($database['tableAttributes_simple']),
       'attributes_modern' => trim($database['tableAttributes_modern']),
@@ -195,9 +234,10 @@ class CRM_Core_CodeGen_EntitySpecification {
     }
 
     $table['fields'] = &$fields;
-    $table['hasEnum'] = FALSE;
     foreach ($table['fields'] as &$field) {
-      $field['propertyName'] = lcfirst(str_replace(' ', '', ucwords(str_replace('_', ' ', $field['name']))));
+      $propertyName = $field['name'];
+      $field['functionName'] = str_replace(' ', '', ucwords(str_replace('_', ' ', $propertyName)));
+      $field['propertyName'] = lcfirst(str_replace(' ', '', ucwords(str_replace('_', ' ', $propertyName))));
 
       $field['columnInfo'] = '@ORM\Column(name="' . $field['name'] . '", type="' . $field['phpType'] . '"';
 
@@ -212,18 +252,16 @@ class CRM_Core_CodeGen_EntitySpecification {
         $field['columnInfo'] .= ', nullable=true';
       }
 
+      if (!empty($field['default'])) {
+        $field['default'] = str_replace("'", "", $field['default']);
+      }
+
       $field['columnInfo'] .= ')';
 
       $field['columnType'] = $field['phpType'];
       $field['columnJoin'] = '';
 
-      /*
-       * FIX ME: if needed
-      if ($field['crmType'] == 'CRM_Utils_Type::T_ENUM') {
-        $table['hasEnum'] = TRUE;
-        break;
-      }*/
-
+      $field['setFunctionInput'] = '$' . $field['propertyName'];
     }
 
     if ($this->value('primaryKey', $tableXML)) {
@@ -247,8 +285,6 @@ class CRM_Core_CodeGen_EntitySpecification {
     if ($this->value('foreignKey', $tableXML)) {
       $foreign = array();
       foreach ($tableXML->foreignKey as $foreignXML) {
-        // print_r($foreignXML);
-
         if ($this->value('drop', $foreignXML, 0) > 0 and $this->value('drop', $foreignXML, 0) <= $this->buildVersion) {
           continue;
         }
@@ -387,6 +423,7 @@ class CRM_Core_CodeGen_EntitySpecification {
       default:
         $field['sqlType'] = $field['phpType'] = $type;
         if ($type == 'int unsigned') {
+          $field['phpType'] = 'integer';
           $field['crmType'] = 'CRM_Utils_Type::T_INT';
         }
         else {
