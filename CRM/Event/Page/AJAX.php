@@ -66,38 +66,5 @@ GROUP BY cv.label";
     CRM_Core_Page_AJAX::autocompleteResults($results);
   }
 
-  function eventList() {
-    $listparams = CRM_Utils_Array::value('listall', $_REQUEST, 1);
-    $events = CRM_Event_BAO_Event::getEvents($listparams);
-
-    $elements = array(array('name' => ts('- select -'),
-        'value' => '',
-      ));
-    foreach ($events as $id => $name) {
-      $elements[] = array(
-        'name' => $name,
-        'value' => $id,
-      );
-    }
-
-    echo json_encode($elements);
-    CRM_Utils_System::civiExit();
-  }
-
-  /**
-   * Function to get default participant role
-   */
-  function participantRole() {
-    $eventID = $_GET['eventId'];
-
-    $defaultRoleId = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event',
-      $eventID,
-      'default_role_id',
-      'id'
-    );
-    $participantRole = array('role' => $defaultRoleId);
-    echo json_encode($participantRole);
-    CRM_Utils_System::civiExit();
-  }
 }
 
