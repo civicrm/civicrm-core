@@ -2208,6 +2208,11 @@ div.grippie {
   margin-left: 8px;
 }
 
+.crm-container .crm-clear-link {
+  margin-left: .5em;
+}
+
+.crm-container .crm-button,
 #crm-container .crm-button {
   border: medium none;
   cursor: pointer;
@@ -2219,6 +2224,8 @@ div.grippie {
   padding: 0px 4px;
   cursor: pointer;
 }
+
+.crm-container .crm-button input,
 #crm-container .crm-button input {
   background: none;
   _background: #6C6C6C;
@@ -2231,10 +2238,14 @@ div.grippie {
   margin: 0 0 0 0px;
   padding: 1px 8px 2px 4px;
 }
+
+.crm-container .crm-button-type-cancel,
+.crm-container .crm-button-type-back,
 #crm-container .crm-button-type-cancel,
 #crm-container .crm-button-type-back {
   margin-left: 20px;
 }
+.crm-container .crm-button-type-cancel input,
 #crm-container .crm-button-type-cancel input {
   color: #E6E6DC!important;
 }
@@ -2243,6 +2254,7 @@ div.grippie {
 .crm-container a.button:link,
 .crm-container a.button:visited,
 .crm-container input.form-submit,
+.crm-container .crm-button,
 #crm-container input[type=button],
 #crm-container input.form-submit-inline,
 #crm-container .crm-button {
@@ -2258,6 +2270,7 @@ div.grippie {
   border: 1px solid #3e3e3e;
 }
 
+.crm-container .crm-button,
 #crm-container .crm-button {
   padding: 1px;
 }
@@ -2268,6 +2281,9 @@ div.grippie {
   padding: 2px 6px;
 }
 
+.crm-container .crm-button input[type=button],
+.crm-container .crm-button input.form-submit,
+.crm-container .crm-button input.form-submit-inline,
 #crm-container .crm-button input[type=button],
 #crm-container .crm-button input.form-submit,
 #crm-container .crm-button input.form-submit-inline {

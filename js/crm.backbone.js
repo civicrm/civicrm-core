@@ -117,11 +117,16 @@
     _.defaults(ModelClass.prototype, {
       crmEntityName: crmEntityName,
       crmActions: {}, // map: string backboneActionName => string serverSideActionName
+      crmReturn: null, // array: list of fields to return
       toCrmAction: function(action) {
         return this.crmActions[action] ? this.crmActions[action] : action;
       },
       toCrmCriteria: function() {
-        return (this.get('id')) ? {id: this.get('id')} : {};
+        var result = (this.get('id')) ? {id: this.get('id')} : {};
+        if (this.crmReturn != null) {
+          result.return = this.crmReturn;
+        }
+        return result;
       },
       duplicate: function() {
         var newModel = new ModelClass(this.toJSON());
@@ -317,7 +322,13 @@
         return this.crmActions[action] ? this.crmActions[action] : action;
       },
       toCrmCriteria: function() {
-        return (this.crmCriteria) ? _.extend({}, this.crmCriteria) : {};
+        var result = (this.crmCriteria) ? _.extend({}, this.crmCriteria) : {};
+        if (this.crmReturn != null) {
+          result.return = this.crmReturn;
+        } else if (this.model && this.model.prototype.crmReturn != null) {
+          result.return = this.model.prototype.crmReturn;
+        }
+        return result;
       },
 
       /**
