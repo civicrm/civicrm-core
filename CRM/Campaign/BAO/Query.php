@@ -401,11 +401,11 @@ INNER JOIN  civicrm_custom_group grp on fld.custom_group_id = grp.id
     //campaign has some contact groups, don't
     //allow to search the contacts those are not
     //in given campaign groups ( ie not in constituents )
-    $groupJs = NULL;
+    $props = array('class' => 'crm-select2');
     if ($form->get('searchVoterFor') == 'reserve') {
-      $groupJs = array('onChange' => "buildCampaignGroups( );return false;");
+      $props['onChange'] = "buildCampaignGroups( );return false;";
     }
-    $form->add('select', 'campaign_survey_id', ts('Survey'), $surveys, TRUE, $groupJs);
+    $form->add('select', 'campaign_survey_id', ts('Survey'), $surveys, TRUE, $props);
   }
 
   /*
