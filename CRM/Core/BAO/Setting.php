@@ -637,13 +637,10 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
     if ($settingsMetadata === NULL) {
       $settingsMetadata = CRM_Core_BAO_Cache::getItem('CiviCRM setting Spec', 'All', $componentID);
       if (empty($settingsMetadata)) {
-        $settingsMetadata = array();
         global $civicrm_root;
         $metaDataFolders = array($civicrm_root. '/settings');
         CRM_Utils_Hook::alterSettingsFolders($metaDataFolders);
-        foreach ($metaDataFolders as $metaDataFolder) {
-          $settingsMetadata = $settingsMetadata + self::loadSettingsMetaData($metaDataFolder);
-        }
+        $settingsMetadata = self::loadSettingsMetaDataFolders($metaDataFolders);
         CRM_Core_BAO_Cache::setItem($settingsMetadata,'CiviCRM setting Spec', 'All', $componentID);
       }
       $cached = 0;
@@ -665,6 +662,24 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
     }
     return $settingsMetadata;
 
+  }
+
+  /**
+   * Load the settings files defined in a series of folders
+   * @param array $metaDataFolders list of folder paths
+   * @return array
+   */
+  public static function loadSettingsMetaDataFolders($metaDataFolders) {
+    $settingsMetadata = array();
+    $loadedFolders = array();
+    foreach ($metaDataFolders as $metaDataFolder) {
+      $realFolder = realpath($metaDataFolder);
+      if (is_dir($realFolder) && !isset($loadedFolders[$realFolder])) {
+        $loadedFolders[$realFolder] = TRUE;
+        $settingsMetadata = $settingsMetadata + self::loadSettingsMetaData($metaDataFolder);
+      }
+    }
+    return $settingsMetadata;
   }
 
   /**
