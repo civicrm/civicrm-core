@@ -34,6 +34,7 @@
     {if !$single and $context eq 'Search' }
         <th scope="col" title="Select Rows">{$form.toggleSelect.html}</th>
     {/if}
+    {assign var="softCreditColumns" value=0}
     {foreach from=$columnHeaders item=header}
         <th scope="col">
         {if $header.sort}
@@ -41,11 +42,14 @@
           {$sort->_response.$key.link}
         {else}
           {$header.name}
-        {/if}
+	  {/if}
         </th>
+	{if $header.name eq "Soft Credit For"}
+	  {assign var='softCreditColumns' value=1}
+	{/if}
     {/foreach}
   </tr>
-  </thead>
+  </thead> 
 
   {counter start=0 skip=1 print=false}
   {foreach from=$rows item=row}
@@ -74,6 +78,11 @@
         {/if}
     </td>
     <td class="crm-contribution-product_name">{$row.product_name}</td>
+    {if $softCreditColumns}
+      <td class="crm-contribution-soft_credit_name">{$row.contribution_soft_credit_name}</td>
+      <td class="right bold crm-contribution-soft_credit_amount"><span class="nowrap">{$row.contribution_soft_credit_amount|crmMoney:$row.currency}</span></td>
+      <td class="crm-contribution-soft_credit_type">{$row.contribution_soft_credit_type}</td>
+    {/if}
     <td>{$row.action|replace:'xx':$row.contribution_id}</td>
   </tr>
   {/foreach}
