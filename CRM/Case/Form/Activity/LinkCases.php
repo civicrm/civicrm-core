@@ -112,9 +112,7 @@ class CRM_Case_Form_Activity_LinkCases {
    *
    * @return void
    */
-  static function beginPostProcess(&$form, &$params) {
-    $params['id'] = $params['case_id'];
-  }
+  static function beginPostProcess(&$form, &$params) {}
 
   /**
    * Function to process the form
