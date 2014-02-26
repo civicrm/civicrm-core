@@ -25,26 +25,14 @@
 *}
 {* CiviCase -  view case screen*}
 
-{* here we are showing related cases w/ jquery dialog *}
 <div class="crm-block crm-form-block crm-case-caseview-form-block">
+
+{* here we are showing related cases w/ jquery dialog *}
 {if $showRelatedCases}
-<table class="report">
-  <tr class="columnheader">
-    <th>{ts}Client Name{/ts}</th>
-    <th>{ts}Case Type{/ts}</th>
-    <th></th>
-  </tr>
+  {include file="CRM/Case/Form/ViewRelatedCases.tpl"}
 
-  {foreach from=$relatedCases item=row key=caseId}
-    <tr>
-      <td class="crm-case-caseview-client_name label">{$row.client_name}</td>
-      <td class="crm-case-caseview-case_type label">{$row.case_type}</td>
-      <td class="label">{$row.links}</td>
-    </tr>
-  {/foreach}
-</table>
-
-  {else}
+{* Main case view *}
+{else}
 
 <h3>{ts}Summary{/ts}</h3>
 <table class="report">
@@ -307,7 +295,7 @@
     cj("#dialog").show( );
 
     cj("#dialog").dialog({
-      title: "Add Client to the Case",
+      title: "{/literal}{ts escape="js"}Add Client to the Case{/ts}{literal}",
       modal: true,
       bgiframe: true,
       close  : function(event, ui) { cj("#rel_contact").unautocomplete( ); },
@@ -334,7 +322,7 @@
         var contactID = cj("#rel_contact_id").val( );
 
         if ( !cj("#rel_contact").val( ) || !contactID ) {
-          cj("#rel_contact").crmError('{/literal}{ts escape="js"}Select valid contact from the list{/ts}{literal}.');
+          cj("#rel_contact").crmError('{/literal}{ts escape="js"}Select valid contact from the list.{/ts}{literal}');
           return false;
         }
         cj.post( postUrl, {contactID: contactID,caseID: caseID,
