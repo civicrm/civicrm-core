@@ -465,10 +465,9 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
    * @static
    */
   static function getDisplayAndImage($id, $type = FALSE) {
-    $sql = "
-SELECT    civicrm_contact.display_name as display_name,
-          civicrm_contact.contact_type as contact_type,
-          civicrm_contact.contact_sub_type as contact_sub_type,
+    //CRM-14276 added the * on the civicrm_contact table so that we have all the contact info available
+		$sql = "
+SELECT    civicrm_contact.*,
           civicrm_email.email          as email
 FROM      civicrm_contact
 LEFT JOIN civicrm_email ON civicrm_email.contact_id = civicrm_contact.id
@@ -486,8 +485,26 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
 
       // use email if display_name is empty
       if (empty($dao->display_name)) {
-        $dao->display_name = $dao->email;
-      }
+        $display_name = $dao->email;
+      } else {
+				$display_name = $dao->display_name;
+			}
+
+			/**
+       * Issue CRM-14276
+       * Add a hook for altering the display name
+       * 
+       * hook_civicrm_contact_get_displayname(&$display_name, $objContact)
+       * @param String &$disply_name
+       * @param int $contactId
+       * @param object $objContact the contact object
+       */
+      $hooks = CRM_Utils_Hook::singleton();
+      $hooks->invoke(3,
+        $display_name, $id, $dao, CRM_Utils_Hook::$_nullObject, CRM_Utils_Hook::$_nullObject,
+        'civicrm_contact_get_displayname'
+      );
+
       return $type ? array(
         $dao->display_name, $image,
         $dao->contact_type, $dao->contact_sub_type, $imageUrl,
