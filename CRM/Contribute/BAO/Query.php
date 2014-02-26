@@ -355,6 +355,39 @@ class CRM_Contribute_BAO_Query {
         // default option: $value == 'only_contribs'
         return;
 
+      case 'contribution_soft_credit_type_id':
+        $names = array();
+        $softCreditTypes = CRM_Core_OptionGroup::values("soft_credit_type");
+        if (is_array($value)) {
+          $val = array();
+          foreach ($value as $k => $v) {
+            if ($v) {
+              $val[$k] = $v;
+              $names[] = $softCreditTypes[$v];
+            }
+          }
+          $scTypes = (count($val) > 0) ? implode(',', $val) : '';
+          if ($scTypes) {
+            $op = 'IN';
+            $scTypes = "({$scTypes})";
+          }
+        }
+        else {
+          $op = '=';
+          $scTypes = $value;
+          $names[] = $softCreditTypes[$value];
+        }
+        $query->_qill[$grouping][]  = ts('Contribution Status %1', array(1 => $op)) . " '" . implode("' " . ts('or') . " '", $names) . "'";
+        $query->_where[$grouping][] = 
+          CRM_Contact_BAO_Query::buildClause(
+            "civicrm_contribution_soft.soft_credit_type_id",
+            $op,
+            $scTypes,
+            "Integer"
+          );
+        $query->_tables['civicrm_contribution_soft'] = $query->_whereTables['civicrm_contribution_soft'] = 1;
+        return;
+
       case 'contribution_payment_instrument_id':
       case 'contribution_payment_instrument':
         $pi = $value;
@@ -882,13 +915,21 @@ class CRM_Contribute_BAO_Query {
 
     // Soft credit related fields
     $options = array(
-      'only_scredits' => ts('Soft Credits Only'),
       'only_contribs' => ts('Contributions Only'),
+      'only_scredits' => ts('Soft Credits Only'),
       'both'          => ts('Both'),
     );
     $form->add('select', 'contribution_or_softcredits', ts('Contributions OR Soft Credits?'), $options, FALSE, array('class' => "crm-select2"));
-    $form->addSelect('soft_credit_type_id', 
-      array('entity' => 'contribution_soft', 'multiple' => 'multiple', 'option_url' => NULL, 'placeholder' => ts('- any -')));
+    $form->addSelect(
+      'contribution_soft_credit_type_id', 
+      array(
+        'entity'      => 'contribution_soft', 
+        'field'       => 'soft_credit_type_id', 
+        'multiple'    => 'multiple', 
+        'option_url'  => NULL, 
+        'placeholder' => ts('- any -')
+      )
+    );
 
     // Add all the custom searchable fields
     $contribution = array('Contribution');

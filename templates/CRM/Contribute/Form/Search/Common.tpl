@@ -133,8 +133,8 @@
     {$form.contribution_or_softcredits.html}
   </td>
   <td>
-    {$form.soft_credit_type_id.label} <br />
-    {$form.soft_credit_type_id.html|crmAddClass:twenty}
+    {$form.contribution_soft_credit_type_id.label} <br />
+    {$form.contribution_soft_credit_type_id.html|crmAddClass:twenty}
   </td>
 </tr>
 
