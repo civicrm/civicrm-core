@@ -135,7 +135,7 @@ registration process.{/ts}
 
 {if $balanceAmount}{ts}Total Paid{/ts}{else}{ts}Total Amount{/ts}{/if}: {$totalAmount|crmMoney} {if $hookDiscount.message}({$hookDiscount.message}){/if}
 
-{if $balanceAmount }
+{if $balanceAmount}
 {ts}Balance{/ts}: {$balanceAmount|crmMoney}
 {/if}
 

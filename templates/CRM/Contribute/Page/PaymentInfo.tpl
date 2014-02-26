@@ -100,4 +100,11 @@ cj(function($){
     {ts 1=$entity}No additional payments found for this %1 record{/ts}
   {/if}
 {/if}
-{$returnButton}
+
+{if $context eq 'transaction'}
+<div class="action-link">
+ <div class="crm-submit-buttons">
+   <span class="crm-button crm-button-type-cancel crm-button_qf_Participant_cancel"><a href="javascript:void(0);"><input  type="submit" id="_qf_Participant_cancel-top" value="Done" name="_qf_Participant_cancel" class="cancel paymentInfo form-submit crm-form-submit"></a></span>
+ </div>
+</div>
+{/if}

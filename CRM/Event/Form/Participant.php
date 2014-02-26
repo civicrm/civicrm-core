@@ -670,7 +670,7 @@ SELECT civicrm_custom_group.name as name,
     $participantStatuses = CRM_Event_PseudoConstant::participantStatus();
     $partiallyPaidStatusId = array_search('Partially paid', $participantStatuses);
     CRM_Core_Resources::singleton()->addSetting(array('partiallyPaidStatusId' => $partiallyPaidStatusId));
-	$this->assign('partiallyPaidStatusId',$partiallyPaidStatusId);
+	  $this->assign('partiallyPaidStatusId', $partiallyPaidStatusId);
     if ($this->_showFeeBlock) {
       return CRM_Event_Form_EventFees::buildQuickForm($this);
     }
@@ -1488,7 +1488,7 @@ loadCampaign( {$this->_eID}, {$eventCampaigns} );
             $contributionParams['partial_amount_pay'] = $params['total_amount'];
             // balance amount
             $balanceAmount = (isset($contributionParams['partial_payment_total']) && isset($contributionParams['partial_amount_pay'])) ? (floatval($contributionParams['partial_payment_total']-$contributionParams['partial_amount_pay'])) : 0;
-			$this->assign('balanceAmount', $balanceAmount );
+            $this->assign('balanceAmount', $balanceAmount);
           }
         }
         if ($this->_single) {
