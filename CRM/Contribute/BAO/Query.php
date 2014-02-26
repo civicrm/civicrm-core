@@ -148,6 +148,20 @@ class CRM_Contribute_BAO_Query {
       $query->_tables['civicrm_contribution_soft_contact'] = 1;
     }
 
+    if (!empty($query->_returnProperties['soft_credit_amount'])) {
+      $query->_select['contribution_soft_credit_amount'] = "civicrm_contribution_soft.amount as contribution_soft_credit_amount";
+      $query->_element['contribution_soft_credit_amount'] = 1;
+      $query->_tables['civicrm_contribution'] = 1;
+      $query->_tables['civicrm_contribution_soft'] = 1;
+    }
+
+    if (!empty($query->_returnProperties['soft_credit_type'])) {
+      $query->_select['contribution_soft_credit_type'] = "contribution_softcredit_type.label as contribution_soft_credit_type";
+      $query->_element['contribution_soft_credit_type'] = 1;
+      $query->_tables['civicrm_contribution'] = 1;
+      $query->_tables['contribution_softcredit_type'] = 1;
+    }
+
     if (!empty($query->_returnProperties['soft_credit_email'])) {
       $query->_select['contribution_soft_credit_email'] = "soft_email.email as contribution_soft_credit_email";
       $query->_element['contribution_soft_credit_email'] = 1;
@@ -327,6 +341,18 @@ class CRM_Contribute_BAO_Query {
         $query->_where[$grouping][] = "civicrm_contribution_soft.pcp_id = $pcPage";
         $query->_qill[$grouping][] = ts('Personal Campaign Page - %1', array(1 => $pcpages[$pcPage]));
         $query->_tables['civicrm_contribution_soft'] = $query->_whereTables['civicrm_contribution_soft'] = 1;
+        return;
+
+      case 'contribution_or_softcredits':
+        if ($value == 'only_scredits') {
+          $query->_where[$grouping][] = "civicrm_contribution_soft.id IS NOT NULL";
+          $query->_qill[$grouping][] = ts('Contributions OR Soft Credits? - Soft Credits Only');
+          $query->_tables['civicrm_contribution_soft'] = $query->_whereTables['civicrm_contribution_soft'] = 1;
+        } else if ($value == 'both') {
+          $query->_qill[$grouping][] = ts('Contributions OR Soft Credits? - Both');
+          $query->_tables['civicrm_contribution_soft'] = $query->_whereTables['civicrm_contribution_soft'] = 1;
+        }
+        // default option: $value == 'only_contribs'
         return;
 
       case 'contribution_payment_instrument_id':
@@ -623,6 +649,14 @@ class CRM_Contribute_BAO_Query {
                                AND option_group_contribution_status.id = contribution_status.option_group_id ) ";
         break;
 
+      case 'contribution_softcredit_type':
+        $from  = " $side JOIN civicrm_option_group option_group_contribution_softcredit_type ON 
+          (option_group_contribution_softcredit_type.name = 'soft_credit_type')";
+        $from .= " $side JOIN civicrm_option_value contribution_softcredit_type ON 
+          ( civicrm_contribution_soft.soft_credit_type_id = contribution_softcredit_type.value
+          AND option_group_contribution_softcredit_type.id = contribution_softcredit_type.option_group_id )";
+        break;
+
       case 'contribution_note':
         $from .= " $side JOIN civicrm_note ON ( civicrm_note.entity_table = 'civicrm_contribution' AND
                                                     civicrm_contribution.id = civicrm_note.entity_id )";
@@ -671,7 +705,21 @@ class CRM_Contribute_BAO_Query {
     return $from;
   }
 
-  static function defaultReturnProperties($mode, $includeCustomFields = TRUE) {
+  static function isIncludeSoftCredits($queryParams = array()) {
+    foreach (array_keys($queryParams) as $id) {
+      if (empty($queryParams[$id][0])) {
+        continue;
+      }
+      if ($queryParams[$id][0] == 'contribution_or_softcredits' && 
+        ($queryParams[$id][2] == 'only_scredits' || 
+        $queryParams[$id][2] == 'both')) {
+          return TRUE;
+      }
+    }
+    return FALSE;
+  }
+
+  static function defaultReturnProperties($mode, $includeCustomFields = TRUE, $includeSoftCredits = FALSE) {
     $properties = NULL;
     if ($mode & CRM_Contact_BAO_Query::MODE_CONTRIBUTE) {
       $properties = array(
@@ -710,9 +758,17 @@ class CRM_Contribute_BAO_Query {
         'amount_level' => 1,
         'contribution_note' => 1,
         'contribution_batch' => 1,
-        'contribution_campaign_id' => 1
+        'contribution_campaign_id' => 1,
       );
-
+      if ($includeSoftCredits) {
+        $properties = array_merge(
+          $properties, array(
+            'soft_credit_name'   => 1,
+            'soft_credit_amount' => 1,
+            'soft_credit_type'   => 1,
+          )
+        );
+      }
       if ($includeCustomFields) {
         // also get all the custom contribution properties
         $fields = CRM_Core_BAO_CustomField::getFieldsForImport('Contribution');
@@ -823,6 +879,16 @@ class CRM_Contribute_BAO_Query {
 
     // Add field for pcp display in roll search
     $form->addYesNo('contribution_pcp_display_in_roll', ts('Personal Campaign Page Honor Roll?'), TRUE);
+
+    // Soft credit related fields
+    $options = array(
+      'only_scredits' => ts('Soft Credits Only'),
+      'only_contribs' => ts('Contributions Only'),
+      'both'          => ts('Both'),
+    );
+    $form->add('select', 'contribution_or_softcredits', ts('Contributions OR Soft Credits?'), $options, FALSE, array('class' => "crm-select2"));
+    $form->addSelect('soft_credit_type_id', 
+      array('entity' => 'contribution_soft', 'multiple' => 'multiple', 'option_url' => NULL, 'placeholder' => ts('- any -')));
 
     // Add all the custom searchable fields
     $contribution = array('Contribution');

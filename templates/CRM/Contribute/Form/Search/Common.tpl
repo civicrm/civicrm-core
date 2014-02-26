@@ -127,6 +127,16 @@
     {$form.contribution_pcp_display_in_roll.html}
   </td>
 </tr>
+<tr>
+  <td>
+    {$form.contribution_or_softcredits.label} <br />
+    {$form.contribution_or_softcredits.html}
+  </td>
+  <td>
+    {$form.soft_credit_type_id.label} <br />
+    {$form.soft_credit_type_id.html|crmAddClass:twenty}
+  </td>
+</tr>
 
 <tr>
   <td>
