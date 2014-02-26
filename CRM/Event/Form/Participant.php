@@ -670,7 +670,7 @@ SELECT civicrm_custom_group.name as name,
     $participantStatuses = CRM_Event_PseudoConstant::participantStatus();
     $partiallyPaidStatusId = array_search('Partially paid', $participantStatuses);
     CRM_Core_Resources::singleton()->addSetting(array('partiallyPaidStatusId' => $partiallyPaidStatusId));
-
+	$this->assign('partiallyPaidStatusId',$partiallyPaidStatusId);
     if ($this->_showFeeBlock) {
       return CRM_Event_Form_EventFees::buildQuickForm($this);
     }
@@ -910,9 +910,22 @@ loadCampaign( {$this->_eID}, {$eventCampaigns} );
     $this->assign('notificationStatusIds', $notificationStatusIds);
 
     $this->_participantStatuses = CRM_Event_PseudoConstant::participantStatus(NULL, NULL, 'label');
-    $this->addSelect('status_id', $checkCancelledJs, TRUE);
-
-    $this->addElement('checkbox', 'is_notify', ts('Send Notification'), NULL);
+    $participantStatuses = $this->addSelect('status_id', $checkCancelledJs, TRUE);
+    
+    $enableCart = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::EVENT_PREFERENCES_NAME,
+      'enable_cart'
+    );
+    $pendingInCartStatusId  = CRM_Utils_Array::key( "Pending in cart" , $this->_participantStatuses );
+    if (!$enableCart) {
+	  $statusOptions		 = & $participantStatuses->_options;	
+	  foreach($statusOptions as $key =>$option){
+		$status_id = $option['attr']['value'];
+		if ($status_id == $pendingInCartStatusId) {
+		  unset($statusOptions[$key]);
+		}
+	  }
+	}
+	$this->addElement('checkbox', 'is_notify', ts('Send Notification'), NULL);
 
     $this->add('text', 'source', ts('Event Source'));
     $noteAttributes = CRM_Core_DAO::getAttribute('CRM_Core_DAO_Note');
@@ -1473,6 +1486,9 @@ loadCampaign( {$this->_eID}, {$eventCampaigns} );
             $contributionParams['partial_payment_total'] = $amountOwed;
             // the actual amount paid
             $contributionParams['partial_amount_pay'] = $params['total_amount'];
+            // balance amount
+            $balanceAmount = (isset($contributionParams['partial_payment_total']) && isset($contributionParams['partial_amount_pay'])) ? (floatval($contributionParams['partial_payment_total']-$contributionParams['partial_amount_pay'])) : 0;
+			$this->assign('balanceAmount', $balanceAmount );
           }
         }
         if ($this->_single) {
@@ -1608,7 +1624,7 @@ loadCampaign( {$this->_eID}, {$eventCampaigns} );
             );
           }
         }
-
+        
         $this->assign('totalAmount', $contributionParams['total_amount']);
 
         $this->assign('isPrimary', 1);

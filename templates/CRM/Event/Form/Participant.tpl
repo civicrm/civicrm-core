@@ -143,20 +143,24 @@
     function() {
       userModifiedAmount = cj(this).val();
       userModifiedAmount = parseInt(userModifiedAmount);
+      var partiallyPaidStatusId = {/literal}{$partiallyPaidStatusId}{literal};
       if (userModifiedAmount < feeAmount) {
-        cj('#status_id').val(CRM.partiallyPaidStatusId);
+        cj('#status_id').select2('val', partiallyPaidStatusId);
       }
     }
   );
 
-  cj('#Participant').submit(
+  cj('#Participant').on("click",'.validate',
     function(e) {
       var userSubmittedStatus = cj('#status_id').val();
       var statusLabel = cj('#status_id option:selected').text();
-      if (userModifiedAmount < feeAmount && userSubmittedStatus != CRM.partiallyPaidStatusId) {
-        var result = confirm('Payment amount is less than the amount owed. Expected participant status is \'Partially paid\'. Are you sure you want to set the participant status to ' + statusLabel + '? Click OK to continue, Cancel to change your entries.');
+      var partiallyPaidStatusId = {/literal}{$partiallyPaidStatusId}{literal};
+      if (userModifiedAmount < feeAmount && userSubmittedStatus != partiallyPaidStatusId) {
+        var msg = "{/literal}{ts escape="js" 1="%1"}Payment amount is less than the amount owed. Expected participant status is 'Partially paid'. Are you sure you want to set the participant status to %1? Click OK to continue, Cancel to change your entries.{/ts}{literal}";
+        var result = confirm(ts(msg, {1: statusLabel}));
         if (result == false) {
           e.preventDefault();
+          return false;
         }
       }
     }
@@ -455,12 +459,10 @@
 
     function buildParticipantRole( eventID ) {
       var dataUrl = "{/literal}{crmURL p='civicrm/ajax/rest' q='className=CRM_Event_Page_AJAX&fnName=participantRole&json=1&context=participant' h=0 }"{literal};
-
-      if ( !eventId ) {
+      if ( !eventID ) {
         var eventId  = document.getElementById( 'event_id' ).value;
       }
-
-      if ( eventId ) {
+      if ( eventID ) {
         dataUrl = dataUrl + '&eventId=' + eventID;
       }
 

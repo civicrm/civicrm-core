@@ -23,6 +23,7 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
+{$returnButton}
 {if $show eq 'event-payment'}
 {literal}
 <script type='text/javascript'>
@@ -99,3 +100,4 @@ cj(function($){
     {ts 1=$entity}No additional payments found for this %1 record{/ts}
   {/if}
 {/if}
+{$returnButton}

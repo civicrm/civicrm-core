@@ -47,14 +47,22 @@ class CRM_Contribute_Page_PaymentInfo extends CRM_Core_Page {
   }
 
   function browse() {
+	$referrerUrl = CRM_Utils_System::refererPath();  
     $getTrxnInfo = $this->_context == 'transaction' ? TRUE : FALSE;
     $paymentInfo = CRM_Contribute_BAO_Contribution::getPaymentInfo($this->_id, $this->_component, $getTrxnInfo);
     if ($this->_context == 'payment_info') {
       $this->assign('paymentInfo', $paymentInfo);
     }
     else {
+	  $returnButton =
+	  '<div class="action-link">
+	     <div class="crm-submit-buttons">
+	       <span class="crm-button crm-button-type-cancel crm-button_qf_Participant_cancel"><a href='.$referrerUrl.'><input  type="submit" id="_qf_Participant_cancel-top" value="Done" name="_qf_Participant_cancel" class="cancel paymentInfo form-submit crm-form-submit"></a></span>
+	     </div>
+	   </div>';	
       $rows = CRM_Utils_Array::value('transaction', $paymentInfo);
       $this->assign('rows', $rows);
+      $this->assign('returnButton', $returnButton);
     }
   }
 
