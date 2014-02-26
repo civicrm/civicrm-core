@@ -653,7 +653,7 @@ SELECT civicrm_custom_group.name as name,
       }
       $defaults[$this->_id]['event_id'] = $eventID;
     }
-    if ($eventID) {
+    if (!empty($eventID)) {
       $this->_eventTypeId = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $eventID, 'event_type_id', 'id');
     }
     //these should take precedence so we state them last
