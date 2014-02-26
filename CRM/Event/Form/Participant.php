@@ -670,7 +670,7 @@ SELECT civicrm_custom_group.name as name,
     $participantStatuses = CRM_Event_PseudoConstant::participantStatus();
     $partiallyPaidStatusId = array_search('Partially paid', $participantStatuses);
     CRM_Core_Resources::singleton()->addSetting(array('partiallyPaidStatusId' => $partiallyPaidStatusId));
-	  $this->assign('partiallyPaidStatusId', $partiallyPaidStatusId);
+	 $this->assign('partiallyPaidStatusId', $partiallyPaidStatusId);
     if ($this->_showFeeBlock) {
       return CRM_Event_Form_EventFees::buildQuickForm($this);
     }
