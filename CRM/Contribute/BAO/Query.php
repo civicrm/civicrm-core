@@ -140,7 +140,7 @@ class CRM_Contribute_BAO_Query {
     }
 
     // LCD 716
-    if (!empty($query->_returnProperties['soft_credit_name'])) {
+    if (!empty($query->_returnProperties['contribution_soft_credit_name'])) {
       $query->_select['contribution_soft_credit_name'] = "civicrm_contact_d.display_name as contribution_soft_credit_name";
       $query->_element['contribution_soft_credit_name'] = 1;
       $query->_tables['civicrm_contribution'] = 1;
@@ -148,21 +148,28 @@ class CRM_Contribute_BAO_Query {
       $query->_tables['civicrm_contribution_soft_contact'] = 1;
     }
 
-    if (!empty($query->_returnProperties['soft_credit_amount'])) {
+    if (!empty($query->_returnProperties['contribution_soft_credit_amount'])) {
       $query->_select['contribution_soft_credit_amount'] = "civicrm_contribution_soft.amount as contribution_soft_credit_amount";
       $query->_element['contribution_soft_credit_amount'] = 1;
       $query->_tables['civicrm_contribution'] = 1;
       $query->_tables['civicrm_contribution_soft'] = 1;
     }
 
-    if (!empty($query->_returnProperties['soft_credit_type'])) {
+    if (!empty($query->_returnProperties['contribution_soft_credit_type'])) {
       $query->_select['contribution_soft_credit_type'] = "contribution_softcredit_type.label as contribution_soft_credit_type";
       $query->_element['contribution_soft_credit_type'] = 1;
       $query->_tables['civicrm_contribution'] = 1;
       $query->_tables['contribution_softcredit_type'] = 1;
     }
 
-    if (!empty($query->_returnProperties['soft_credit_email'])) {
+    if (!empty($query->_returnProperties['contribution_soft_credit_contribution_id'])) {
+      $query->_select['contribution_soft_credit_contribution_id'] = "civicrm_contribution_soft.contribution_id as contribution_soft_credit_contribution_id";
+      $query->_element['contribution_soft_credit_contribution_id'] = 1;
+      $query->_tables['civicrm_contribution'] = 1;
+      $query->_tables['civicrm_contribution_soft'] = 1;
+    }
+
+    if (!empty($query->_returnProperties['contribution_soft_credit_email'])) {
       $query->_select['contribution_soft_credit_email'] = "soft_email.email as contribution_soft_credit_email";
       $query->_element['contribution_soft_credit_email'] = 1;
       $query->_tables['civicrm_contribution'] = 1;
@@ -171,7 +178,7 @@ class CRM_Contribute_BAO_Query {
       $query->_tables['civicrm_contribution_soft_email'] = 1;
     }
 
-    if (!empty($query->_returnProperties['soft_credit_phone'])) {
+    if (!empty($query->_returnProperties['contribution_soft_credit_phone'])) {
       $query->_select['contribution_soft_credit_email'] = "soft_phone.phone as contribution_soft_credit_phone";
       $query->_element['contribution_soft_credit_phone'] = 1;
       $query->_tables['civicrm_contribution'] = 1;
@@ -796,9 +803,10 @@ class CRM_Contribute_BAO_Query {
       if ($includeSoftCredits) {
         $properties = array_merge(
           $properties, array(
-            'soft_credit_name'   => 1,
-            'soft_credit_amount' => 1,
-            'soft_credit_type'   => 1,
+            'contribution_soft_credit_name'   => 1,
+            'contribution_soft_credit_amount' => 1,
+            'contribution_soft_credit_type'   => 1,
+            'contribution_soft_credit_contribution_id' => 1,
           )
         );
       }
