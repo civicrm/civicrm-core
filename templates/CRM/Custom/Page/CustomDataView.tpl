@@ -146,15 +146,19 @@
             </div>
           {else}
             <div class="content">
+             {if $element.field_value}
               <a href="{$element.field_value.fileURL}">{$element.field_value.fileName}</a>
+             {else}
+              <br/>
+             {/if}
             </div>
           {/if}
           {else}
             {if $element.field_data_type == 'Money'}
               {if $element.field_type == 'Text'}
-                 <div class="content">{$element.field_value|crmMoney}</div>
+                 <div class="content">{if $element.field_value}{$element.field_value|crmMoney}{else}<br/>{/if}</div>
               {else}
-                 <div class="content">{$element.field_value}</div>
+                 <div class="content">{if $element.field_value}{$element.field_value}{else}<br/>{/if}</div>
               {/if}
             {else}
               <div class="content">
@@ -164,7 +168,7 @@
                 {if $element.field_data_type == 'Memo'}
                   {$element.field_value|nl2br}
                 {else}
-                  {$element.field_value}
+                  {if $element.field_value}{$element.field_value} {else}<br/>{/if}
                 {/if}
                 {if $element.contact_ref_id}
                   </a>
@@ -173,6 +177,7 @@
             {/if}
           {/if}
        {/if}
+     </div>
    {/foreach}
 {/if}
   {/foreach}

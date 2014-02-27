@@ -42,14 +42,26 @@
                 <th>{ts}{$head}{/ts}</th>
               {/foreach}
               <th></th>
+              {foreach from=$dateFields key=fieldId item=v}
+                <th class='hiddenElement'></th>
+              {/foreach}
             </tr>
             </thead>
             {foreach from=$records key=recId item=rows}
               <tr class="{cycle values="odd-row,even-row"}">
                 {foreach from=$headers key=hrecId item=head}
-                  <td>{$rows.$hrecId}</td>
+                  {if $dateFieldsVals.$hrecId.$recId}
+                    <td>{$rows.$hrecId|crmDate:"%b %d, %Y %l:%M %P"}</td>
+                  {else}
+                    <td>{$rows.$hrecId}</td>
+                  {/if}
                 {/foreach}
                 <td>{$rows.action}</td>
+                {foreach from=$dateFieldsVals key=fid item=rec}
+                  {if $rec.$recId}
+                    <td class='crm-field-{$fid}_date hiddenElement'>{$rec.$recId}</td>
+                  {/if}
+                {/foreach}
               </tr>
             {/foreach}
           </table>
@@ -90,7 +102,7 @@
             cj('#' + dialogId).show().html(content).dialog({
               title: dialogTitle,
               modal: true,
-              width: 680,
+              width: 750,
               overlay: {
                 opacity: 0.5,
                 background: "black"

@@ -31,7 +31,7 @@
   {include file='CRM/Profile/Page/MultipleRecordFieldsListing.tpl' showListing=1 dontShowTitle=1 pageViewType='customDataView'}
   {literal}
   <script type="text/javascript">
-    function showDeleteInDialog(valueID, groupID, contactID) {
+    function showDeleteInDialog(valueID, groupID, contactID, redirectUrl) {
       var confirmText = '{/literal}{ts escape='js'}Are you sure you want to delete this record?{/ts}{literal}';
       cj('#browseValues').after("<div id='delete-record'></div>");
         cj('#delete-record').html(confirmText).dialog({
@@ -49,20 +49,20 @@
             cj('#delete-record').html('');
           },
           {/literal}"{ts escape='js'}OK{/ts}{literal}": function() {
-            deleteCustomValueRec(valueID, groupID, contactID);
+            deleteCustomValueRec(valueID, groupID, contactID, redirectUrl);
           }
         }
         });
     }
 
-    function deleteCustomValueRec(valueID, groupID, contactID) {
+    function deleteCustomValueRec(valueID, groupID, contactID, redirectUrl) {
       var postUrl = {/literal}"{crmURL p='civicrm/ajax/customvalue' h=0 }"{literal};
       cj.ajax({
         type: "POST",
         data: "valueID=" + valueID + "&groupID=" + groupID + "&contactId=" + contactID + "&key={/literal}{crmKey name='civicrm/ajax/customvalue'}{literal}",
         url: postUrl,
         success: function (html) {
-          window.location.reload( );
+          window.location.href = redirectUrl;
         }
       });
     }
