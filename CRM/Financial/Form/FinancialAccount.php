@@ -87,9 +87,6 @@ class CRM_Financial_Form_FinancialAccount extends CRM_Contribute_Form {
    */
   public function buildQuickForm( ) {
     parent::buildQuickForm( );
-    $dataURL = CRM_Utils_System::url('civicrm/ajax/rest',
-      'className=CRM_Contact_Page_AJAX&fnName=getContactList&json=1&context=contact&org=1', FALSE, NULL, FALSE);
-    $this->assign('dataURL', $dataURL);
 
     if ($this->_action & CRM_Core_Action::DELETE) {
       return;
@@ -104,8 +101,7 @@ class CRM_Financial_Form_FinancialAccount extends CRM_Contribute_Form {
     $this->add('text', 'description', ts('Description'), $attributes['description']);
     $this->add('text', 'accounting_code', ts('Accounting Code'), $attributes['accounting_code']);
     $elementAccounting = $this->add('text', 'account_type_code', ts('Account Type Code'), $attributes['account_type_code']);
-    $this->add('text', 'contact_name', ts('Owner'), $attributes['name']);
-    $this->add('hidden', 'contact_id', '', array('id' => 'contact_id'));
+    $this->addEntityRef('contact_id', ts('Owner'), array('api' => array('params' => array('contact_type' => 'Organization')), 'create' => TRUE));
     $this->add('text', 'tax_rate', ts('Tax Rate'), $attributes['tax_rate']);
     $this->add('checkbox', 'is_deductible', ts('Tax-Deductible?'));
     $elementActive = $this->add('checkbox', 'is_active', ts('Enabled?'));
@@ -166,7 +162,6 @@ class CRM_Financial_Form_FinancialAccount extends CRM_Contribute_Form {
     $defaults = parent::setDefaultValues();
     if ($this->_action & CRM_Core_Action::ADD) {
       $defaults['contact_id'] = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Domain', CRM_Core_Config::domainID(), 'contact_id');
-      $defaults['contact_name'] = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $defaults['contact_id'], 'sort_name');
     }
     return $defaults;
   }
@@ -196,5 +191,3 @@ class CRM_Financial_Form_FinancialAccount extends CRM_Contribute_Form {
     }
   }
 }
-
-

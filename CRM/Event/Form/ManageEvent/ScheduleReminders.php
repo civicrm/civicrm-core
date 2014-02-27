@@ -196,13 +196,6 @@ class CRM_Event_Form_ManageEvent_ScheduleReminders extends CRM_Event_Form_Manage
     );
     $recipientListing->setMultiple(TRUE);
 
-    //auto-complete url
-    $dataUrl = CRM_Utils_System::url('civicrm/ajax/rest',
-      "className=CRM_Contact_Page_AJAX&fnName=getContactList&json=1&context=activity&reset=1",
-      FALSE, NULL, FALSE
-    );
-
-    $this->assign('dataUrl', $dataUrl);
     //token input url
     $tokenUrl = CRM_Utils_System::url('civicrm/ajax/checkemail',
       'noemail=1',

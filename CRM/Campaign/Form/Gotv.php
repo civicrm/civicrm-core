@@ -138,11 +138,6 @@ class CRM_Campaign_Form_Gotv extends CRM_Core_Form {
       );
 
       $defaults['survey_interviewer_id'] = $cid;
-      $defaults['survey_interviewer_name'] = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact',
-        $cid,
-        'sort_name',
-        'id'
-      );
     }
     if ($this->_surveyId) {
       $defaults['campaign_survey_id'] = $this->_surveyId;

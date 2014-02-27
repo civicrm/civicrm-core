@@ -600,6 +600,7 @@ CRM.validate = CRM.validate || {
    *  passing in a function instead of an object is a shortcut for a sinlgle button labeled "Continue"
    * @param options {object|void} Override defaults, keys include 'title', 'message',
    *  see jQuery.dialog for full list of available params
+   * @param cancelLabel {string}
    */
   CRM.confirm = function (buttons, options, cancelLabel) {
     var dialog, callbacks = {};
@@ -629,8 +630,9 @@ CRM.validate = CRM.validate || {
     }
     $.each(callbacks, function (label, callback) {
       settings.buttons[label] = function () {
-        callback.call(dialog);
-        dialog.dialog('close');
+        if (callback.call(dialog) !== false) {
+          dialog.dialog('close');
+        }
       };
     });
     dialog = $('<div class="crm-container crm-confirm-dialog"></div>')

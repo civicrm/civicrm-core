@@ -23,33 +23,19 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
-{* Search form and results for voters *}
-{include file='CRM/Campaign/Form/Search/Common.tpl' context='search'}
+{* Ajax-loaded list of related cases *}
+<table class="report">
+  <tr class="columnheader">
+    <th>{ts}Client Name{/ts}</th>
+    <th>{ts}Case Type{/ts}</th>
+    <th></th>
+  </tr>
 
-{if $rowsEmpty || $rows}
-<div class="crm-content-block">
-{if $rowsEmpty}
-    {include file="CRM/Campaign/Form/Search/EmptyResults.tpl"}
-{/if}
-
-{if $rows}
-    {* Search request has returned 1 or more matching rows. Display results and collapse the search criteria fieldset. *}
-    {assign var="showBlock" value="'searchForm_show'"}
-    {assign var="hideBlock" value="'searchForm'"}
-
-    {* Search request has returned 1 or more matching rows. *}
-    <fieldset>
-
-       {* This section handles form elements for action task select and submit *}
-       {include file="CRM/common/searchResultTasks.tpl" context="Campaign"}
-
-       {* This section displays the rows along and includes the paging controls *}
-       <p></p>
-       {include file="CRM/Campaign/Form/Selector.tpl" context="Search"}
-
-    </fieldset>
-    {* END Actions/Results section *}
-
-{/if}
-</div>
-{/if}
+  {foreach from=$relatedCases item=row key=caseId}
+    <tr>
+      <td class="crm-case-caseview-client_name label">{$row.client_name}</td>
+      <td class="crm-case-caseview-case_type label">{$row.case_type}</td>
+      <td class="label">{$row.links}</td>
+    </tr>
+  {/foreach}
+</table>
