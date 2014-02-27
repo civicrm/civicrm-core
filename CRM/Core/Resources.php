@@ -553,6 +553,8 @@ class CRM_Core_Resources {
       "packages/jquery/jquery-ui/js/jquery-ui-1.10.3.custom$min.js",
       "packages/jquery/jquery-ui/css/black-tie/jquery-ui-1.10.3.custom$min.css",
 
+      "packages/backbone/lodash.underscore$min.js",
+
       "packages/jquery/plugins/select2/select2.js", // No mini until release of select2 3.4.6
       "packages/jquery/plugins/select2/select2.css",
 
