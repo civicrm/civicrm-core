@@ -1,6 +1,4 @@
 {* file to handle db changes in 4.5.alpha1 during upgrade *}
-{include file='../CRM/Upgrade/4.4.alpha1.msg_template/civicrm_msg_template.tpl'}
-
 {include file='../CRM/Upgrade/4.5.alpha1.msg_template/civicrm_msg_template.tpl'}
 
 ALTER TABLE `civicrm_contact`
@@ -251,3 +249,5 @@ UPDATE civicrm_custom_field cf
     ON cf.custom_group_id = cg.id
   SET cf.in_selector = 1
   WHERE cg.is_multiple = 1 AND cf.html_type != 'TextArea';
+ALTER TABLE `civicrm_custom_group`
+ CHANGE COLUMN `style` `style` varchar(15) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Visual relationship between this form and its parent.';

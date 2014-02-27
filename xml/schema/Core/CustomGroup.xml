@@ -64,7 +64,6 @@
      <comment>linking custom group for dynamic object</comment>
      <add>1.6</add>
   </field>
-
   <field>
      <name>style</name>
      <type>varchar</type>

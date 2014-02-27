@@ -171,6 +171,8 @@ class CRM_Profile_Page_MultipleRecordFieldsListing extends CRM_Core_Page_Basic {
    * @access public
    */
   function browse() {
+    $dateFields = NULL;
+    $dateFieldsVals = NULL;
     if ($this->_pageViewType == 'profileDataView' && $this->_profileId) {
       $fields = CRM_Core_BAO_UFGroup::getFields($this->_profileId, FALSE, NULL,
         NULL, NULL,
@@ -225,6 +227,9 @@ class CRM_Profile_Page_MultipleRecordFieldsListing extends CRM_Core_Page_Basic {
         $param = array('id' => $fieldIDs[$key]);
         $returnValues = array( );
         CRM_Core_DAO::commonRetrieve('CRM_Core_DAO_CustomField', $param, $returnValues, $returnProperities);
+        if ($returnValues['data_type'] == 'Date') {
+          $dateFields[$fieldIDs[$key]] = 1;
+        }
 
         $optionValuePairs = CRM_Core_BAO_CustomOption::getCustomOption($fieldIDs[$key]);
         if (!empty($optionValuePairs)) {
@@ -284,7 +289,14 @@ class CRM_Profile_Page_MultipleRecordFieldsListing extends CRM_Core_Page_Basic {
           foreach ($value as $fieldId => &$val) {
             if (is_numeric($fieldId)) {
               $customValue = &$val;
-              $customValue = CRM_Core_BAO_CustomField::getDisplayValue($customValue, $fieldId, $options);
+              if (array_key_exists($fieldId, $dateFields)) {
+                // formated date capture value capture
+                $dateFieldsVals[$fieldId][$recId] = CRM_Core_BAO_CustomField::getDisplayValue($customValue, $fieldId, $options);
+              }
+              else {
+                // assign to $result
+                $customValue = CRM_Core_BAO_CustomField::getDisplayValue($customValue, $fieldId, $options);
+              }
               if (!$customValue) {
                 $customValue = "";
               }
@@ -305,8 +317,9 @@ class CRM_Profile_Page_MultipleRecordFieldsListing extends CRM_Core_Page_Basic {
                 $actionParams['newCgCount'] = $newCgCount;
 
                 // DELETE action links
+                $redirectUrl = CRM_Core_Session::singleton()->readUserContext();
                 $links[CRM_Core_Action::DELETE]['url'] = '#';
-                $links[CRM_Core_Action::DELETE]['extra'] = " onclick='showDeleteInDialog({$recId}, {$this->_customGroupId}, {$this->_contactId})' ";
+                $links[CRM_Core_Action::DELETE]['extra'] = " onclick=' var ru = \"{$redirectUrl}\"; showDeleteInDialog({$recId}, {$this->_customGroupId}, {$this->_contactId}, ru)' ";
                 $links[CRM_Core_Action::DELETE]['class'] = 'ignore-jshref';
               }
               if (!empty($pageCheckSum)) {
@@ -336,6 +349,8 @@ class CRM_Profile_Page_MultipleRecordFieldsListing extends CRM_Core_Page_Basic {
         $headers[$fieldID] = ($this->_pageViewType == 'profileDataView') ? $customGroupInfo[$fieldID]['fieldLabel'] : $fieldLabels[$fieldID]['label'];
       }
     }
+    $this->assign('dateFields', $dateFields);
+    $this->assign('dateFieldsVals',$dateFieldsVals);
     $this->assign('cgcount', $cgcount);
     $this->assign('customGroupTitle', $this->_customGroupTitle);
     $this->assign('headers', $headers);
