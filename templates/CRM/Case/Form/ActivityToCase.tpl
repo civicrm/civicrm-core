@@ -27,11 +27,9 @@
 {if !empty($buildCaseActivityForm)}
   <div class="crm-block crm-form-block crm-case-activitytocase-form-block">
     <table class="form-layout">
-      <tr class="crm-case-activitytocase-form-block-unclosed_cases">
-        <td class="label">{$form.unclosed_cases.label}</td>
-        <td>{$form.unclosed_cases.html}<br />
-          <span class="description">{ts}Begin typing client name for a list of open cases.{/ts}</span>
-        </td>
+      <tr class="crm-case-activitytocase-form-block-unclosed_case_id">
+        <td class="label">{$form.unclosed_case_id.label}</td>
+        <td>{$form.unclosed_case_id.html}</td>
       </tr>
       <tr class="crm-case-activitytocase-form-block-target_contact_id">
         <td class="label">{$form.target_contact_id.label}</td>
@@ -51,16 +49,25 @@
     var target_contact_id = '';
     var selectedCaseId = '';
     var contactId = '';
-
-    var unclosedCaseUrl = {/literal}"{crmURL p='civicrm/case/ajax/unclosed' h=0 q='excludeCaseIds='}{$currentCaseId}"{literal};
-    cj( "#unclosed_cases" ).autocomplete( unclosedCaseUrl, { width : 250, selectFirst : false, matchContains:true
-    }).result( function(event, data, formatted) {
-      cj( "#unclosed_case_id" ).val( data[1] );
-      contactId = data[2];
-      selectedCaseId = data[1];
-    }).bind( 'click', function( ) {
-      cj( "#unclosed_case_id" ).val('');
-      contactId = selectedCaseId = '';
+    cj(function($) {
+      $('input[name=unclosed_case_id]', '#fileOnCaseDialog').select2({
+        placeholder: {/literal}'{ts escape="js"}- select case -{/ts}'{literal},
+        minimumInputLength: 1,
+        ajax: {
+          url: {/literal}"{crmURL p='civicrm/case/ajax/unclosed' h=0}"{literal},
+          data: function(term) {
+            return {term: term, excludeCaseIds: "{/literal}{$currentCaseId}{literal}"};
+          },
+          results: function(response) {
+            return {results: response};
+          }
+        }
+      }).change(function() {
+        if ($(this).val()) {
+          selectedCaseId = $(this).val();
+          contactId = $(this).select2('data').extra.contact_id;
+        }
+      });
     });
     {/literal}
     {if $targetContactValues}
