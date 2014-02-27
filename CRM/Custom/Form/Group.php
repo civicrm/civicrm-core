@@ -156,7 +156,7 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
     }
 
     if (empty($fields['is_multiple']) && $fields['style'] == 'Tab with table') {
-      $errors['style'] = ts("Display Style 'Tab with table' is only supported for multiple custom data set'");
+      $errors['style'] = ts("Display Style 'Tab with table' is only supported for multiple-record custom field sets.");
     }
 
     //checks the given custom set doesnot start with digit
