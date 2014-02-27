@@ -23,7 +23,6 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
-{$returnButton}
 {if $show eq 'event-payment'}
 {literal}
 <script type='text/javascript'>
