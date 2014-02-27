@@ -670,7 +670,7 @@ SELECT civicrm_custom_group.name as name,
     $participantStatuses = CRM_Event_PseudoConstant::participantStatus();
     $partiallyPaidStatusId = array_search('Partially paid', $participantStatuses);
     CRM_Core_Resources::singleton()->addSetting(array('partiallyPaidStatusId' => $partiallyPaidStatusId));
-	 $this->assign('partiallyPaidStatusId', $partiallyPaidStatusId);
+    $this->assign('partiallyPaidStatusId', $partiallyPaidStatusId);
     if ($this->_showFeeBlock) {
       return CRM_Event_Form_EventFees::buildQuickForm($this);
     }
@@ -911,20 +911,20 @@ loadCampaign( {$this->_eID}, {$eventCampaigns} );
 
     $this->_participantStatuses = CRM_Event_PseudoConstant::participantStatus(NULL, NULL, 'label');
     $participantStatuses = $this->addSelect('status_id', $checkCancelledJs, TRUE);
-    
+
     $enableCart = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::EVENT_PREFERENCES_NAME,
       'enable_cart'
     );
     $pendingInCartStatusId  = CRM_Utils_Array::key( "Pending in cart" , $this->_participantStatuses );
     if (!$enableCart) {
-	  $statusOptions		 = & $participantStatuses->_options;	
-	  foreach($statusOptions as $key =>$option){
-		$status_id = $option['attr']['value'];
-		if ($status_id == $pendingInCartStatusId) {
-		  unset($statusOptions[$key]);
-		}
-	  }
-	}
+      $statusOptions = & $participantStatuses->_options;
+      foreach($statusOptions as $key =>$option){
+        $status_id = $option['attr']['value'];
+        if ($status_id == $pendingInCartStatusId) {
+          unset($statusOptions[$key]);
+        }
+      }
+    }
 	$this->addElement('checkbox', 'is_notify', ts('Send Notification'), NULL);
 
     $this->add('text', 'source', ts('Event Source'));

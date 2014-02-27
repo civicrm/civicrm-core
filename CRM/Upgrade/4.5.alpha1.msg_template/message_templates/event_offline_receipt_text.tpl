@@ -139,7 +139,6 @@ registration process.{/ts}
 {ts}Balance{/ts}: {$balanceAmount|crmMoney}
 {/if}
 
-
 {if $pricesetFieldsCount }
       {assign var="count" value= 0}
       {foreach from=$lineItem item=pcount}

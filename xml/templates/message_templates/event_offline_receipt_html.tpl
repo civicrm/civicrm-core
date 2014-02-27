@@ -220,7 +220,7 @@ registration process.{/ts}</p>
       {if $isPrimary}
        <tr>
         <td {$labelStyle}>
-	  {if $balanceAmount}		
+      {if $balanceAmount}		
          {ts}Total Paid{/ts}
       {else}   
          {ts}Total Amount{/ts}
@@ -230,17 +230,16 @@ registration process.{/ts}</p>
          {$totalAmount|crmMoney} {if $hookDiscount.message}({$hookDiscount.message}){/if}
         </td>
        </tr>
-       {if $balanceAmount}
+      {if $balanceAmount}
        <tr>
         <td {$labelStyle}>
-
          {ts}Balance{/ts}
         </td>
         <td {$valueStyle}>
          {$balanceAmount|crmMoney}
         </td>
        </tr>
-       {/if}
+      {/if}
        {if $pricesetFieldsCount }
      <tr>
        <td {$labelStyle}>
