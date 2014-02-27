@@ -133,14 +133,12 @@ class CRM_Contact_Form_DedupeRules extends CRM_Admin_Form {
     }
 
     $this->add('text', 'threshold', ts("Weight Threshold to Consider Contacts 'Matching':"), $attributes);
-    $this->addButtons(array(
-      array('type' => 'next', 'name' => ts('Save'), 'isDefault' => TRUE),
-      array('type' => 'cancel', 'name' => ts('Cancel')),
-    ));
 
     $this->assign('contact_type', $this->_contactType);
 
     $this->addFormRule(array('CRM_Contact_Form_DedupeRules', 'formRule'), $this);
+
+    parent::buildQuickForm();
   }
 
   /**
