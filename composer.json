@@ -1,0 +1,9 @@
+{
+  "autoload": {
+    "psr-0": {"Civi\\": ["Civi/", "tests/phpunit/"]}
+  },
+  "minimum-stability" : "dev",
+  "require": {
+    "doctrine/orm": "2.4.*"
+  }
+}
