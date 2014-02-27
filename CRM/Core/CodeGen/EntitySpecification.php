@@ -77,7 +77,7 @@ class CRM_Core_CodeGen_EntitySpecification {
   function getTables($dbXML, &$database) {
     // skip entity generation for tables where manual changes are needed.
     $skipTables = array(
-      // these tables needs sepecial handling for entiti_table, entity_id
+      // these tables needs special handling for entity_table, entity_id
       'civicrm_acl_entity_role',
       'civicrm_action_log',
       'civicrm_campaign_group',
@@ -209,6 +209,7 @@ class CRM_Core_CodeGen_EntitySpecification {
     $table = array(
       'name' => $name,
       'base' => str_replace('CRM', 'Civi', $daoPath),
+      'namespace' => str_replace('/', '\\', str_replace('CRM', 'Civi', $base)),
       'sourceFile' => $sourceFile,
       'fileName' => $klass . '.php',
       'objectName' => $klass,
