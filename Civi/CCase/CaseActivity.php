@@ -60,7 +60,7 @@ class CaseActivity extends \Civi\Core\Entity {
   /**
    * @var \Civi\CCase\CCase
    *
-   * @ORM\ManyToOne(targetEntity="Civi\Case\Case")
+   * @ORM\ManyToOne(targetEntity="Civi\CCase\CCase")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="case_id", referencedColumnName="id", onDelete="CASCADE")})
    */
   private $case;
