@@ -36,6 +36,8 @@
 
 namespace Civi\Core;
 
+require_once 'Civi/Core/Entity.php';
+
 use Doctrine\ORM\Mapping as ORM;
 
 /**
