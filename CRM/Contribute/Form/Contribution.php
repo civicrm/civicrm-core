@@ -1315,6 +1315,11 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         "reset=1&action=add&context={$this->_context}&cid={$this->_contactID}"
       ));
     }
+
+    //store contribution ID if not yet set (on create)
+    if ( empty($this->_id) && !empty($contribution->id) ) {
+      $this->_id = $contribution->id;
+    }
   }
 
   public function processCreditCard($submittedValues, $config, $session, $pId, $lineItem) {
