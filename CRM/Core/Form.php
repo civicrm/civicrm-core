@@ -1284,7 +1284,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     $defaults = array(
       'minimumInputLength' => 1,
       'multiple' => !empty($props['multiple']),
-      'placeholder' => CRM_Utils_Array::value('placeholder', $props, $required ? ts('- select -') : ts('- none -')),
+      'placeholder' => CRM_Utils_Array::value('placeholder', $props, $required ? ts('- select %1 -', array(1 => ts($props['entity']))) : ts('- none -')),
       'allowClear' => !$required,
     );
     if ($props['entity'] == 'contact') {

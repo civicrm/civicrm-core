@@ -212,13 +212,6 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
     $recipientListing->setMultiple(TRUE);
     $this->add('hidden', 'is_recipient_listing', empty($recipientListingOptions) ? FALSE : TRUE, array('id' => 'is_recipient_listing'));
 
-    //auto-complete url
-    $dataUrl = CRM_Utils_System::url('civicrm/ajax/rest',
-      'className=CRM_Contact_Page_AJAX&fnName=getContactList&json=1&context=activity&reset=1',
-      FALSE, NULL, FALSE
-    );
-
-    $this->assign('dataUrl', $dataUrl);
     //token input url
     $tokenUrl = CRM_Utils_System::url('civicrm/ajax/checkemail',
       'noemail=1',
