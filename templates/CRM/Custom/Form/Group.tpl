@@ -146,9 +146,11 @@ cj(function($) {
   function showRange(onFormLoad) {
     if(cj("#is_multiple :checked").length) {
       cj("tr#multiple").show();
-      cj("select#style option[value='Tab']").prop("selected", true);
+      cj('#collapse_display').prop('checked', '');
+      cj("select#style option[value='Tab with table']").prop("selected", true);
     }
     else {
+      cj('#collapse_display').prop('checked', 'checked');
       cj("tr#multiple").hide();
       if (!onFormLoad) {
         cj("select#style option[value='Inline']").prop("selected", true);
