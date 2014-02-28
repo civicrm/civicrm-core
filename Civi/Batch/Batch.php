@@ -178,9 +178,9 @@ class Batch extends \Civi\Core\Entity {
   private $exportedDate;
   
   /**
-   * @var longtext
+   * @var text
    *
-   * @ORM\Column(name="data", type="longtext", nullable=true)
+   * @ORM\Column(name="data", type="text", nullable=true)
    * 
    */
   private $data;
@@ -497,7 +497,7 @@ class Batch extends \Civi\Core\Entity {
   /**
    * Set data
    *
-   * @param longtext $data
+   * @param text $data
    * @return Batch
    */
   public function setData($data) {
@@ -508,7 +508,7 @@ class Batch extends \Civi\Core\Entity {
   /**
    * Get data
    *
-   * @return longtext
+   * @return text
    */
   public function getData() {
     return $this->data;

@@ -43,7 +43,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * EntityRole
  *
- * @ORM\Table(name="civicrm_acl_entity_role", indexes={@ORM\Index(name="index_role", columns={"acl_role_id"}),@ORM\Index(name="index_entity", columns={"entity_table,entity_id"})})
+ * @ORM\Table(name="civicrm_acl_entity_role", indexes={@ORM\Index(name="index_role", columns={"acl_role_id"}),@ORM\Index(name="index_entity", columns={"entity_table","entity_id"})})
  * @ORM\Entity
  */
 class EntityRole extends \Civi\Core\Entity {

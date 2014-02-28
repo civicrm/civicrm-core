@@ -66,9 +66,9 @@ class JobLog extends \Civi\Core\Entity {
   private $domain;
   
   /**
-   * @var timestamp
+   * @var datetime
    *
-   * @ORM\Column(name="run_time", type="timestamp", nullable=true)
+   * @ORM\Column(name="run_time", type="datetime", nullable=true)
    * 
    */
   private $runTime;
@@ -145,7 +145,7 @@ class JobLog extends \Civi\Core\Entity {
   /**
    * Set runTime
    *
-   * @param timestamp $runTime
+   * @param datetime $runTime
    * @return JobLog
    */
   public function setRunTime($runTime) {
@@ -156,7 +156,7 @@ class JobLog extends \Civi\Core\Entity {
   /**
    * Get runTime
    *
-   * @return timestamp
+   * @return datetime
    */
   public function getRunTime() {
     return $this->runTime;

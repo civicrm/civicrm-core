@@ -43,7 +43,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * GroupOrganization
  *
- * @ORM\Table(name="civicrm_group_organization", uniqueConstraints={@ORM\UniqueConstraint(name="UI_group_organization", columns={"group_id,organization_id"})}, indexes={@ORM\Index(name="FK_civicrm_group_organization_group_id", columns={"group_id"}),@ORM\Index(name="FK_civicrm_group_organization_organization_id", columns={"organization_id"})})
+ * @ORM\Table(name="civicrm_group_organization", uniqueConstraints={@ORM\UniqueConstraint(name="UI_group_organization", columns={"group_id","organization_id"})}, indexes={@ORM\Index(name="FK_civicrm_group_organization_group_id", columns={"group_id"}),@ORM\Index(name="FK_civicrm_group_organization_organization_id", columns={"organization_id"})})
  * @ORM\Entity
  */
 class GroupOrganization extends \Civi\Core\Entity {

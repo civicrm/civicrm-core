@@ -43,7 +43,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * Discount
  *
- * @ORM\Table(name="civicrm_discount", indexes={@ORM\Index(name="index_entity", columns={"entity_table,entity_id"}),@ORM\Index(name="index_entity_option_id", columns={"entity_table,entity_id,price_set_id"}),@ORM\Index(name="FK_civicrm_discount_price_set_id", columns={"price_set_id"})})
+ * @ORM\Table(name="civicrm_discount", indexes={@ORM\Index(name="index_entity", columns={"entity_table","entity_id"}),@ORM\Index(name="index_entity_option_id", columns={"entity_table","entity_id","price_set_id"}),@ORM\Index(name="FK_civicrm_discount_price_set_id", columns={"price_set_id"})})
  * @ORM\Entity
  */
 class Discount extends \Civi\Core\Entity {

@@ -162,9 +162,9 @@ class Product extends \Civi\Core\Entity {
   private $periodType = 'rolling';
   
   /**
-   * @var int
+   * @var integer
    *
-   * @ORM\Column(name="fixed_period_start_day", type="int", nullable=false)
+   * @ORM\Column(name="fixed_period_start_day", type="integer", nullable=false)
    * 
    */
   private $fixedPeriodStartDay = '0101';
@@ -178,9 +178,9 @@ class Product extends \Civi\Core\Entity {
   private $durationUnit = 'year';
   
   /**
-   * @var int
+   * @var integer
    *
-   * @ORM\Column(name="duration_interval", type="int", nullable=true)
+   * @ORM\Column(name="duration_interval", type="integer", nullable=true)
    * 
    */
   private $durationInterval;
@@ -194,9 +194,9 @@ class Product extends \Civi\Core\Entity {
   private $frequencyUnit = 'month';
   
   /**
-   * @var int
+   * @var integer
    *
-   * @ORM\Column(name="frequency_interval", type="int", nullable=true)
+   * @ORM\Column(name="frequency_interval", type="integer", nullable=true)
    * 
    */
   private $frequencyInterval;
@@ -473,7 +473,7 @@ class Product extends \Civi\Core\Entity {
   /**
    * Set fixedPeriodStartDay
    *
-   * @param int $fixedPeriodStartDay
+   * @param integer $fixedPeriodStartDay
    * @return Product
    */
   public function setFixedPeriodStartDay($fixedPeriodStartDay) {
@@ -484,7 +484,7 @@ class Product extends \Civi\Core\Entity {
   /**
    * Get fixedPeriodStartDay
    *
-   * @return int
+   * @return integer
    */
   public function getFixedPeriodStartDay() {
     return $this->fixedPeriodStartDay;
@@ -513,7 +513,7 @@ class Product extends \Civi\Core\Entity {
   /**
    * Set durationInterval
    *
-   * @param int $durationInterval
+   * @param integer $durationInterval
    * @return Product
    */
   public function setDurationInterval($durationInterval) {
@@ -524,7 +524,7 @@ class Product extends \Civi\Core\Entity {
   /**
    * Get durationInterval
    *
-   * @return int
+   * @return integer
    */
   public function getDurationInterval() {
     return $this->durationInterval;
@@ -553,7 +553,7 @@ class Product extends \Civi\Core\Entity {
   /**
    * Set frequencyInterval
    *
-   * @param int $frequencyInterval
+   * @param integer $frequencyInterval
    * @return Product
    */
   public function setFrequencyInterval($frequencyInterval) {
@@ -564,7 +564,7 @@ class Product extends \Civi\Core\Entity {
   /**
    * Get frequencyInterval
    *
-   * @return int
+   * @return integer
    */
   public function getFrequencyInterval() {
     return $this->frequencyInterval;

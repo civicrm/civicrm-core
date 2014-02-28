@@ -74,9 +74,9 @@ class Persistent extends \Civi\Core\Entity {
   private $name;
   
   /**
-   * @var longtext
+   * @var text
    *
-   * @ORM\Column(name="data", type="longtext", nullable=true)
+   * @ORM\Column(name="data", type="text", nullable=true)
    * 
    */
   private $data;
@@ -141,7 +141,7 @@ class Persistent extends \Civi\Core\Entity {
   /**
    * Set data
    *
-   * @param longtext $data
+   * @param text $data
    * @return Persistent
    */
   public function setData($data) {
@@ -152,7 +152,7 @@ class Persistent extends \Civi\Core\Entity {
   /**
    * Get data
    *
-   * @return longtext
+   * @return text
    */
   public function getData() {
     return $this->data;

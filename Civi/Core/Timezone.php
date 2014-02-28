@@ -82,9 +82,9 @@ class Timezone extends \Civi\Core\Entity {
   private $gmt;
   
   /**
-   * @var int
+   * @var integer
    *
-   * @ORM\Column(name="offset", type="int", nullable=true)
+   * @ORM\Column(name="offset", type="integer", nullable=true)
    * 
    */
   private $offset;
@@ -169,7 +169,7 @@ class Timezone extends \Civi\Core\Entity {
   /**
    * Set offset
    *
-   * @param int $offset
+   * @param integer $offset
    * @return Timezone
    */
   public function setOffset($offset) {
@@ -180,7 +180,7 @@ class Timezone extends \Civi\Core\Entity {
   /**
    * Get offset
    *
-   * @return int
+   * @return integer
    */
   public function getOffset() {
     return $this->offset;

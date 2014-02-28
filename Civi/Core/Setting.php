@@ -43,7 +43,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * Setting
  *
- * @ORM\Table(name="civicrm_setting", indexes={@ORM\Index(name="index_group_name", columns={"group_name,name"}),@ORM\Index(name="FK_civicrm_setting_domain_id", columns={"domain_id"}),@ORM\Index(name="FK_civicrm_setting_contact_id", columns={"contact_id"}),@ORM\Index(name="FK_civicrm_setting_component_id", columns={"component_id"}),@ORM\Index(name="FK_civicrm_setting_created_id", columns={"created_id"})})
+ * @ORM\Table(name="civicrm_setting", indexes={@ORM\Index(name="index_group_name", columns={"group_name","name"}),@ORM\Index(name="FK_civicrm_setting_domain_id", columns={"domain_id"}),@ORM\Index(name="FK_civicrm_setting_contact_id", columns={"contact_id"}),@ORM\Index(name="FK_civicrm_setting_component_id", columns={"component_id"}),@ORM\Index(name="FK_civicrm_setting_created_id", columns={"created_id"})})
  * @ORM\Entity
  */
 class Setting extends \Civi\Core\Entity {

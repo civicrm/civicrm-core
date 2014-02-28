@@ -43,7 +43,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * CaseContact
  *
- * @ORM\Table(name="civicrm_case_contact", indexes={@ORM\Index(name="UI_case_contact_id", columns={"case_id,contact_id"}),@ORM\Index(name="FK_civicrm_case_contact_case_id", columns={"case_id"}),@ORM\Index(name="FK_civicrm_case_contact_contact_id", columns={"contact_id"})})
+ * @ORM\Table(name="civicrm_case_contact", indexes={@ORM\Index(name="UI_case_contact_id", columns={"case_id","contact_id"}),@ORM\Index(name="FK_civicrm_case_contact_case_id", columns={"case_id"}),@ORM\Index(name="FK_civicrm_case_contact_contact_id", columns={"contact_id"})})
  * @ORM\Entity
  */
 class CaseContact extends \Civi\Core\Entity {

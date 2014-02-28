@@ -74,17 +74,17 @@ class PreferencesDate extends \Civi\Core\Entity {
   private $description;
   
   /**
-   * @var int
+   * @var integer
    *
-   * @ORM\Column(name="start", type="int", nullable=true)
+   * @ORM\Column(name="start", type="integer", nullable=true)
    * 
    */
   private $start;
   
   /**
-   * @var int
+   * @var integer
    *
-   * @ORM\Column(name="end", type="int", nullable=true)
+   * @ORM\Column(name="end", type="integer", nullable=true)
    * 
    */
   private $end;
@@ -157,7 +157,7 @@ class PreferencesDate extends \Civi\Core\Entity {
   /**
    * Set start
    *
-   * @param int $start
+   * @param integer $start
    * @return PreferencesDate
    */
   public function setStart($start) {
@@ -168,7 +168,7 @@ class PreferencesDate extends \Civi\Core\Entity {
   /**
    * Get start
    *
-   * @return int
+   * @return integer
    */
   public function getStart() {
     return $this->start;
@@ -177,7 +177,7 @@ class PreferencesDate extends \Civi\Core\Entity {
   /**
    * Set end
    *
-   * @param int $end
+   * @param integer $end
    * @return PreferencesDate
    */
   public function setEnd($end) {
@@ -188,7 +188,7 @@ class PreferencesDate extends \Civi\Core\Entity {
   /**
    * Get end
    *
-   * @return int
+   * @return integer
    */
   public function getEnd() {
     return $this->end;

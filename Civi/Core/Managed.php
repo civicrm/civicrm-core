@@ -43,7 +43,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * Managed
  *
- * @ORM\Table(name="civicrm_managed", indexes={@ORM\Index(name="UI_managed_module_name", columns={"module,name"}),@ORM\Index(name="UI_managed_entity", columns={"entity_type,entity_id"})})
+ * @ORM\Table(name="civicrm_managed", indexes={@ORM\Index(name="UI_managed_module_name", columns={"module","name"}),@ORM\Index(name="UI_managed_entity", columns={"entity_type","entity_id"})})
  * @ORM\Entity
  */
 class Managed extends \Civi\Core\Entity {

@@ -98,9 +98,9 @@ class UFField extends \Civi\Core\Entity {
   private $isRequired = '0';
   
   /**
-   * @var int
+   * @var integer
    *
-   * @ORM\Column(name="weight", type="int", nullable=false)
+   * @ORM\Column(name="weight", type="integer", nullable=false)
    * 
    */
   private $weight = '1';
@@ -305,7 +305,7 @@ class UFField extends \Civi\Core\Entity {
   /**
    * Set weight
    *
-   * @param int $weight
+   * @param integer $weight
    * @return UFField
    */
   public function setWeight($weight) {
@@ -316,7 +316,7 @@ class UFField extends \Civi\Core\Entity {
   /**
    * Get weight
    *
-   * @return int
+   * @return integer
    */
   public function getWeight() {
     return $this->weight;

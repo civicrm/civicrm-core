@@ -43,7 +43,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * PriceSetEntity
  *
- * @ORM\Table(name="civicrm_price_set_entity", uniqueConstraints={@ORM\UniqueConstraint(name="UI_entity", columns={"entity_table,entity_id"})}, indexes={@ORM\Index(name="FK_civicrm_price_set_entity_price_set_id", columns={"price_set_id"})})
+ * @ORM\Table(name="civicrm_price_set_entity", uniqueConstraints={@ORM\UniqueConstraint(name="UI_entity", columns={"entity_table","entity_id"})}, indexes={@ORM\Index(name="FK_civicrm_price_set_entity_price_set_id", columns={"price_set_id"})})
  * @ORM\Entity
  */
 class PriceSetEntity extends \Civi\Core\Entity {

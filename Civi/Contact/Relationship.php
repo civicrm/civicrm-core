@@ -145,7 +145,7 @@ class Relationship extends \Civi\Core\Entity {
   public function getId() {
     return $this->id;
   }
-    
+
   /**
    * Set contactA
    *
@@ -165,7 +165,7 @@ class Relationship extends \Civi\Core\Entity {
   public function getContactA() {
     return $this->contactA;
   }
-  
+
   /**
    * Set contactB
    *
@@ -185,7 +185,7 @@ class Relationship extends \Civi\Core\Entity {
   public function getContactB() {
     return $this->contactB;
   }
-  
+
   /**
    * Set relationshipType
    *
@@ -205,7 +205,7 @@ class Relationship extends \Civi\Core\Entity {
   public function getRelationshipType() {
     return $this->relationshipType;
   }
-  
+
   /**
    * Set startDate
    *
@@ -225,7 +225,7 @@ class Relationship extends \Civi\Core\Entity {
   public function getStartDate() {
     return $this->startDate;
   }
-  
+
   /**
    * Set endDate
    *
@@ -245,7 +245,7 @@ class Relationship extends \Civi\Core\Entity {
   public function getEndDate() {
     return $this->endDate;
   }
-  
+
   /**
    * Set isActive
    *
@@ -265,7 +265,7 @@ class Relationship extends \Civi\Core\Entity {
   public function getIsActive() {
     return $this->isActive;
   }
-  
+
   /**
    * Set description
    *
@@ -285,7 +285,7 @@ class Relationship extends \Civi\Core\Entity {
   public function getDescription() {
     return $this->description;
   }
-  
+
   /**
    * Set isPermissionAB
    *
@@ -305,7 +305,7 @@ class Relationship extends \Civi\Core\Entity {
   public function getIsPermissionAB() {
     return $this->isPermissionAB;
   }
-  
+
   /**
    * Set isPermissionBA
    *

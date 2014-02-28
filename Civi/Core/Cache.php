@@ -43,7 +43,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * Cache
  *
- * @ORM\Table(name="civicrm_cache", uniqueConstraints={@ORM\UniqueConstraint(name="UI_group_path_date", columns={"group_name,path,created_date"})}, indexes={@ORM\Index(name="FK_civicrm_cache_component_id", columns={"component_id"})})
+ * @ORM\Table(name="civicrm_cache", uniqueConstraints={@ORM\UniqueConstraint(name="UI_group_path_date", columns={"group_name","path","created_date"})}, indexes={@ORM\Index(name="FK_civicrm_cache_component_id", columns={"component_id"})})
  * @ORM\Entity
  */
 class Cache extends \Civi\Core\Entity {
@@ -74,9 +74,9 @@ class Cache extends \Civi\Core\Entity {
   private $path;
   
   /**
-   * @var longtext
+   * @var text
    *
-   * @ORM\Column(name="data", type="longtext", nullable=true)
+   * @ORM\Column(name="data", type="text", nullable=true)
    * 
    */
   private $data;
@@ -157,7 +157,7 @@ class Cache extends \Civi\Core\Entity {
   /**
    * Set data
    *
-   * @param longtext $data
+   * @param text $data
    * @return Cache
    */
   public function setData($data) {
@@ -168,7 +168,7 @@ class Cache extends \Civi\Core\Entity {
   /**
    * Get data
    *
-   * @return longtext
+   * @return text
    */
   public function getData() {
     return $this->data;

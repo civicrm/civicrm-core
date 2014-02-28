@@ -43,7 +43,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * PledgeBlock
  *
- * @ORM\Table(name="civicrm_pledge_block", indexes={@ORM\Index(name="index_entity", columns={"entity_table,entity_id"})})
+ * @ORM\Table(name="civicrm_pledge_block", indexes={@ORM\Index(name="index_entity", columns={"entity_table","entity_id"})})
  * @ORM\Entity
  */
 class PledgeBlock extends \Civi\Core\Entity {

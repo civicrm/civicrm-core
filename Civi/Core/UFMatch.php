@@ -43,7 +43,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * UFMatch
  *
- * @ORM\Table(name="civicrm_uf_match", uniqueConstraints={@ORM\UniqueConstraint(name="UI_uf_name_domain_id", columns={"uf_name,domain_id"}),@ORM\UniqueConstraint(name="UI_contact_domain_id", columns={"contact_id,domain_id"})}, indexes={@ORM\Index(name="I_civicrm_uf_match_uf_id", columns={"uf_id"}),@ORM\Index(name="FK_civicrm_uf_match_domain_id", columns={"domain_id"}),@ORM\Index(name="FK_civicrm_uf_match_contact_id", columns={"contact_id"})})
+ * @ORM\Table(name="civicrm_uf_match", uniqueConstraints={@ORM\UniqueConstraint(name="UI_uf_name_domain_id", columns={"uf_name","domain_id"}),@ORM\UniqueConstraint(name="UI_contact_domain_id", columns={"contact_id","domain_id"})}, indexes={@ORM\Index(name="I_civicrm_uf_match_uf_id", columns={"uf_id"}),@ORM\Index(name="FK_civicrm_uf_match_domain_id", columns={"domain_id"}),@ORM\Index(name="FK_civicrm_uf_match_contact_id", columns={"contact_id"})})
  * @ORM\Entity
  */
 class UFMatch extends \Civi\Core\Entity {

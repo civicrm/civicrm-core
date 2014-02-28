@@ -43,7 +43,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * WordReplacement
  *
- * @ORM\Table(name="civicrm_word_replacement", uniqueConstraints={@ORM\UniqueConstraint(name="UI_domain_find", columns={"domain_id,find_word"})}, indexes={@ORM\Index(name="FK_civicrm_word_replacement_domain_id", columns={"domain_id"})})
+ * @ORM\Table(name="civicrm_word_replacement", uniqueConstraints={@ORM\UniqueConstraint(name="UI_domain_find", columns={"domain_id","find_word"})}, indexes={@ORM\Index(name="FK_civicrm_word_replacement_domain_id", columns={"domain_id"})})
  * @ORM\Entity
  */
 class WordReplacement extends \Civi\Core\Entity {

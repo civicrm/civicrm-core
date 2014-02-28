@@ -122,17 +122,17 @@ class MailingJob extends \Civi\Core\Entity {
   private $parent = 'NULL';
   
   /**
-   * @var int
+   * @var integer
    *
-   * @ORM\Column(name="job_offset", type="int", nullable=false)
+   * @ORM\Column(name="job_offset", type="integer", nullable=false)
    * 
    */
   private $jobOffset = '0';
   
   /**
-   * @var int
+   * @var integer
    *
-   * @ORM\Column(name="job_limit", type="int", nullable=false)
+   * @ORM\Column(name="job_limit", type="integer", nullable=false)
    * 
    */
   private $jobLimit = '0';
@@ -309,7 +309,7 @@ class MailingJob extends \Civi\Core\Entity {
   /**
    * Set jobOffset
    *
-   * @param int $jobOffset
+   * @param integer $jobOffset
    * @return MailingJob
    */
   public function setJobOffset($jobOffset) {
@@ -320,7 +320,7 @@ class MailingJob extends \Civi\Core\Entity {
   /**
    * Get jobOffset
    *
-   * @return int
+   * @return integer
    */
   public function getJobOffset() {
     return $this->jobOffset;
@@ -329,7 +329,7 @@ class MailingJob extends \Civi\Core\Entity {
   /**
    * Set jobLimit
    *
-   * @param int $jobLimit
+   * @param integer $jobLimit
    * @return MailingJob
    */
   public function setJobLimit($jobLimit) {
@@ -340,7 +340,7 @@ class MailingJob extends \Civi\Core\Entity {
   /**
    * Get jobLimit
    *
-   * @return int
+   * @return integer
    */
   public function getJobLimit() {
     return $this->jobLimit;

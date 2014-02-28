@@ -43,7 +43,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * ActivityContact
  *
- * @ORM\Table(name="civicrm_activity_contact", uniqueConstraints={@ORM\UniqueConstraint(name="UI_activity_contact", columns={"contact_id,activity_id,record_type_id"})}, indexes={@ORM\Index(name="index_record_type", columns={"activity_id,record_type_id"}),@ORM\Index(name="FK_civicrm_activity_contact_activity_id", columns={"activity_id"}),@ORM\Index(name="FK_civicrm_activity_contact_contact_id", columns={"contact_id"})})
+ * @ORM\Table(name="civicrm_activity_contact", uniqueConstraints={@ORM\UniqueConstraint(name="UI_activity_contact", columns={"contact_id","activity_id","record_type_id"})}, indexes={@ORM\Index(name="index_record_type", columns={"activity_id","record_type_id"}),@ORM\Index(name="FK_civicrm_activity_contact_activity_id", columns={"activity_id"}),@ORM\Index(name="FK_civicrm_activity_contact_contact_id", columns={"contact_id"})})
  * @ORM\Entity
  */
 class ActivityContact extends \Civi\Core\Entity {

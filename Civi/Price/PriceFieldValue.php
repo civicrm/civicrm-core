@@ -114,9 +114,9 @@ class PriceFieldValue extends \Civi\Core\Entity {
   private $maxValue = 'NULL';
   
   /**
-   * @var int
+   * @var integer
    *
-   * @ORM\Column(name="weight", type="int", nullable=false)
+   * @ORM\Column(name="weight", type="integer", nullable=false)
    * 
    */
   private $weight = '1';
@@ -321,7 +321,7 @@ class PriceFieldValue extends \Civi\Core\Entity {
   /**
    * Set weight
    *
-   * @param int $weight
+   * @param integer $weight
    * @return PriceFieldValue
    */
   public function setWeight($weight) {
@@ -332,7 +332,7 @@ class PriceFieldValue extends \Civi\Core\Entity {
   /**
    * Get weight
    *
-   * @return int
+   * @return integer
    */
   public function getWeight() {
     return $this->weight;

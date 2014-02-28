@@ -90,9 +90,9 @@ class Rule extends \Civi\Core\Entity {
   private $ruleLength;
   
   /**
-   * @var int
+   * @var integer
    *
-   * @ORM\Column(name="rule_weight", type="int", nullable=true)
+   * @ORM\Column(name="rule_weight", type="integer", nullable=true)
    * 
    */
   private $ruleWeight;
@@ -189,7 +189,7 @@ class Rule extends \Civi\Core\Entity {
   /**
    * Set ruleWeight
    *
-   * @param int $ruleWeight
+   * @param integer $ruleWeight
    * @return Rule
    */
   public function setRuleWeight($ruleWeight) {
@@ -200,7 +200,7 @@ class Rule extends \Civi\Core\Entity {
   /**
    * Get ruleWeight
    *
-   * @return int
+   * @return integer
    */
   public function getRuleWeight() {
     return $this->ruleWeight;

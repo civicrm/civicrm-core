@@ -126,7 +126,7 @@ Alternatively you can get a version of CiviCRM that matches your PHP version
       'CRM_Core_CodeGen_DAO',
       'CRM_Core_CodeGen_Test',
       'CRM_Core_CodeGen_I18n',
-      'CRM_Core_CodeGen_Entity',
+      //'CRM_Core_CodeGen_Entity', // need to uncomment this for entity generation
     );
     return $components;
   }

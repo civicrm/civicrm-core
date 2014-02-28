@@ -66,9 +66,9 @@ class RuleGroup extends \Civi\Core\Entity {
   private $contactType;
   
   /**
-   * @var int
+   * @var integer
    *
-   * @ORM\Column(name="threshold", type="int", nullable=true)
+   * @ORM\Column(name="threshold", type="integer", nullable=true)
    * 
    */
   private $threshold;
@@ -137,7 +137,7 @@ class RuleGroup extends \Civi\Core\Entity {
   /**
    * Set threshold
    *
-   * @param int $threshold
+   * @param integer $threshold
    * @return RuleGroup
    */
   public function setThreshold($threshold) {
@@ -148,7 +148,7 @@ class RuleGroup extends \Civi\Core\Entity {
   /**
    * Get threshold
    *
-   * @return int
+   * @return integer
    */
   public function getThreshold() {
     return $this->threshold;

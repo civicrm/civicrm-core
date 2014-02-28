@@ -82,9 +82,9 @@ class ContributionProduct extends \Civi\Core\Entity {
   private $productOption;
   
   /**
-   * @var int
+   * @var integer
    *
-   * @ORM\Column(name="quantity", type="int", nullable=true)
+   * @ORM\Column(name="quantity", type="integer", nullable=true)
    * 
    */
   private $quantity;
@@ -201,7 +201,7 @@ class ContributionProduct extends \Civi\Core\Entity {
   /**
    * Set quantity
    *
-   * @param int $quantity
+   * @param integer $quantity
    * @return ContributionProduct
    */
   public function setQuantity($quantity) {
@@ -212,7 +212,7 @@ class ContributionProduct extends \Civi\Core\Entity {
   /**
    * Get quantity
    *
-   * @return int
+   * @return integer
    */
   public function getQuantity() {
     return $this->quantity;

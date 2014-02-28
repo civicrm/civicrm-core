@@ -82,9 +82,9 @@ class File extends \Civi\Core\Entity {
   private $uri;
   
   /**
-   * @var mediumblob
+   * @var blob
    *
-   * @ORM\Column(name="document", type="mediumblob", nullable=true)
+   * @ORM\Column(name="document", type="blob", nullable=true)
    * 
    */
   private $document;
@@ -177,7 +177,7 @@ class File extends \Civi\Core\Entity {
   /**
    * Set document
    *
-   * @param mediumblob $document
+   * @param blob $document
    * @return File
    */
   public function setDocument($document) {
@@ -188,7 +188,7 @@ class File extends \Civi\Core\Entity {
   /**
    * Get document
    *
-   * @return mediumblob
+   * @return blob
    */
   public function getDocument() {
     return $this->document;

@@ -43,7 +43,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * Note
  *
- * @ORM\Table(name="civicrm_note", indexes={@ORM\Index(name="index_entity", columns={"entity_table,entity_id"}),@ORM\Index(name="FK_civicrm_note_contact_id", columns={"contact_id"})})
+ * @ORM\Table(name="civicrm_note", indexes={@ORM\Index(name="index_entity", columns={"entity_table","entity_id"}),@ORM\Index(name="FK_civicrm_note_contact_id", columns={"contact_id"})})
  * @ORM\Entity
  */
 class Note extends \Civi\Core\Entity {

@@ -74,17 +74,17 @@ class MessageTemplate extends \Civi\Core\Entity {
   private $msgSubject;
   
   /**
-   * @var longtext
+   * @var text
    *
-   * @ORM\Column(name="msg_text", type="longtext", nullable=true)
+   * @ORM\Column(name="msg_text", type="text", nullable=true)
    * 
    */
   private $msgText;
   
   /**
-   * @var longtext
+   * @var text
    *
-   * @ORM\Column(name="msg_html", type="longtext", nullable=true)
+   * @ORM\Column(name="msg_html", type="text", nullable=true)
    * 
    */
   private $msgHtml;
@@ -181,7 +181,7 @@ class MessageTemplate extends \Civi\Core\Entity {
   /**
    * Set msgText
    *
-   * @param longtext $msgText
+   * @param text $msgText
    * @return MessageTemplate
    */
   public function setMsgText($msgText) {
@@ -192,7 +192,7 @@ class MessageTemplate extends \Civi\Core\Entity {
   /**
    * Get msgText
    *
-   * @return longtext
+   * @return text
    */
   public function getMsgText() {
     return $this->msgText;
@@ -201,7 +201,7 @@ class MessageTemplate extends \Civi\Core\Entity {
   /**
    * Set msgHtml
    *
-   * @param longtext $msgHtml
+   * @param text $msgHtml
    * @return MessageTemplate
    */
   public function setMsgHtml($msgHtml) {
@@ -212,7 +212,7 @@ class MessageTemplate extends \Civi\Core\Entity {
   /**
    * Get msgHtml
    *
-   * @return longtext
+   * @return text
    */
   public function getMsgHtml() {
     return $this->msgHtml;

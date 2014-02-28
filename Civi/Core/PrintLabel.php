@@ -98,9 +98,9 @@ class PrintLabel extends \Civi\Core\Entity {
   private $labelTypeId;
   
   /**
-   * @var longtext
+   * @var text
    *
-   * @ORM\Column(name="data", type="longtext", nullable=true)
+   * @ORM\Column(name="data", type="text", nullable=true)
    * 
    */
   private $data;
@@ -249,7 +249,7 @@ class PrintLabel extends \Civi\Core\Entity {
   /**
    * Set data
    *
-   * @param longtext $data
+   * @param text $data
    * @return PrintLabel
    */
   public function setData($data) {
@@ -260,7 +260,7 @@ class PrintLabel extends \Civi\Core\Entity {
   /**
    * Get data
    *
-   * @return longtext
+   * @return text
    */
   public function getData() {
     return $this->data;

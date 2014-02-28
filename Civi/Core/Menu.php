@@ -43,7 +43,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * Menu
  *
- * @ORM\Table(name="civicrm_menu", uniqueConstraints={@ORM\UniqueConstraint(name="UI_path_domain_id", columns={"path,domain_id"})}, indexes={@ORM\Index(name="FK_civicrm_menu_domain_id", columns={"domain_id"}),@ORM\Index(name="FK_civicrm_menu_component_id", columns={"component_id"})})
+ * @ORM\Table(name="civicrm_menu", uniqueConstraints={@ORM\UniqueConstraint(name="UI_path_domain_id", columns={"path","domain_id"})}, indexes={@ORM\Index(name="FK_civicrm_menu_domain_id", columns={"domain_id"}),@ORM\Index(name="FK_civicrm_menu_component_id", columns={"component_id"})})
  * @ORM\Entity
  */
 class Menu extends \Civi\Core\Entity {
@@ -186,25 +186,25 @@ class Menu extends \Civi\Core\Entity {
   private $isSsl;
   
   /**
-   * @var int
+   * @var integer
    *
-   * @ORM\Column(name="weight", type="int", nullable=false)
+   * @ORM\Column(name="weight", type="integer", nullable=false)
    * 
    */
   private $weight = '1';
   
   /**
-   * @var int
+   * @var integer
    *
-   * @ORM\Column(name="type", type="int", nullable=false)
+   * @ORM\Column(name="type", type="integer", nullable=false)
    * 
    */
   private $type = '1';
   
   /**
-   * @var int
+   * @var integer
    *
-   * @ORM\Column(name="page_type", type="int", nullable=false)
+   * @ORM\Column(name="page_type", type="integer", nullable=false)
    * 
    */
   private $pageType = '1';
@@ -549,7 +549,7 @@ class Menu extends \Civi\Core\Entity {
   /**
    * Set weight
    *
-   * @param int $weight
+   * @param integer $weight
    * @return Menu
    */
   public function setWeight($weight) {
@@ -560,7 +560,7 @@ class Menu extends \Civi\Core\Entity {
   /**
    * Get weight
    *
-   * @return int
+   * @return integer
    */
   public function getWeight() {
     return $this->weight;
@@ -569,7 +569,7 @@ class Menu extends \Civi\Core\Entity {
   /**
    * Set type
    *
-   * @param int $type
+   * @param integer $type
    * @return Menu
    */
   public function setType($type) {
@@ -580,7 +580,7 @@ class Menu extends \Civi\Core\Entity {
   /**
    * Get type
    *
-   * @return int
+   * @return integer
    */
   public function getType() {
     return $this->type;
@@ -589,7 +589,7 @@ class Menu extends \Civi\Core\Entity {
   /**
    * Set pageType
    *
-   * @param int $pageType
+   * @param integer $pageType
    * @return Menu
    */
   public function setPageType($pageType) {
@@ -600,7 +600,7 @@ class Menu extends \Civi\Core\Entity {
   /**
    * Get pageType
    *
-   * @return int
+   * @return integer
    */
   public function getPageType() {
     return $this->pageType;
