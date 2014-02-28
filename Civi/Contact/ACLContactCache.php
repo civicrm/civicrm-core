@@ -43,7 +43,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * ACLContactCache
  *
- * @ORM\Table(name="civicrm_acl_contact_cache", uniqueConstraints={@ORM\UniqueConstraint(name="UI_user_contact_operation", columns={"user_id,contact_id,operation"})}, indexes={@ORM\Index(name="FK_civicrm_acl_contact_cache_user_id", columns={"user_id"}),@ORM\Index(name="FK_civicrm_acl_contact_cache_contact_id", columns={"contact_id"})})
+ * @ORM\Table(name="civicrm_acl_contact_cache", uniqueConstraints={@ORM\UniqueConstraint(name="UI_user_contact_operation", columns={"user_id","contact_id","operation"})}, indexes={@ORM\Index(name="FK_civicrm_acl_contact_cache_user_id", columns={"user_id"}),@ORM\Index(name="FK_civicrm_acl_contact_cache_contact_id", columns={"contact_id"})})
  * @ORM\Entity
  */
 class ACLContactCache extends \Civi\Core\Entity {

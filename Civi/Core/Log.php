@@ -43,7 +43,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * Log
  *
- * @ORM\Table(name="civicrm_log", indexes={@ORM\Index(name="index_entity", columns={"entity_table,entity_id"}),@ORM\Index(name="FK_civicrm_log_modified_id", columns={"modified_id"})})
+ * @ORM\Table(name="civicrm_log", indexes={@ORM\Index(name="index_entity", columns={"entity_table","entity_id"}),@ORM\Index(name="FK_civicrm_log_modified_id", columns={"modified_id"})})
  * @ORM\Entity
  */
 class Log extends \Civi\Core\Entity {

@@ -43,7 +43,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * Exception
  *
- * @ORM\Table(name="civicrm_dedupe_exception", uniqueConstraints={@ORM\UniqueConstraint(name="UI_contact_id1_contact_id2", columns={"contact_id1,contact_id2"})}, indexes={@ORM\Index(name="FK_civicrm_dedupe_exception_contact_id1", columns={"contact_id1"}),@ORM\Index(name="FK_civicrm_dedupe_exception_contact_id2", columns={"contact_id2"})})
+ * @ORM\Table(name="civicrm_dedupe_exception", uniqueConstraints={@ORM\UniqueConstraint(name="UI_contact_id1_contact_id2", columns={"contact_id1","contact_id2"})}, indexes={@ORM\Index(name="FK_civicrm_dedupe_exception_contact_id1", columns={"contact_id1"}),@ORM\Index(name="FK_civicrm_dedupe_exception_contact_id2", columns={"contact_id2"})})
  * @ORM\Entity
  */
 class Exception extends \Civi\Core\Entity {

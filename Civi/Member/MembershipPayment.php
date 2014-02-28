@@ -43,7 +43,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * MembershipPayment
  *
- * @ORM\Table(name="civicrm_membership_payment", uniqueConstraints={@ORM\UniqueConstraint(name="UI_contribution_membership", columns={"contribution_id,membership_id"})}, indexes={@ORM\Index(name="FK_civicrm_membership_payment_membership_id", columns={"membership_id"}),@ORM\Index(name="FK_civicrm_membership_payment_contribution_id", columns={"contribution_id"})})
+ * @ORM\Table(name="civicrm_membership_payment", uniqueConstraints={@ORM\UniqueConstraint(name="UI_contribution_membership", columns={"contribution_id","membership_id"})}, indexes={@ORM\Index(name="FK_civicrm_membership_payment_membership_id", columns={"membership_id"}),@ORM\Index(name="FK_civicrm_membership_payment_contribution_id", columns={"contribution_id"})})
  * @ORM\Entity
  */
 class MembershipPayment extends \Civi\Core\Entity {

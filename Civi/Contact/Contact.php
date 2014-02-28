@@ -43,7 +43,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * Contact
  *
- * @ORM\Table(name="civicrm_contact", uniqueConstraints={@ORM\UniqueConstraint(name="UI_external_identifier", columns={"external_identifier"})}, indexes={@ORM\Index(name="index_contact_type", columns={"contact_type"}),@ORM\Index(name="index_contact_sub_type", columns={"contact_sub_type"}),@ORM\Index(name="index_sort_name", columns={"sort_name"}),@ORM\Index(name="index_preferred_communication_method", columns={"preferred_communication_method"}),@ORM\Index(name="index_hash", columns={"hash"}),@ORM\Index(name="index_api_key", columns={"api_key"}),@ORM\Index(name="index_first_name", columns={"first_name"}),@ORM\Index(name="index_last_name", columns={"last_name"}),@ORM\Index(name="UI_prefix", columns={"prefix_id"}),@ORM\Index(name="UI_suffix", columns={"suffix_id"}),@ORM\Index(name="index_communication_style_id", columns={"communication_style_id"}),@ORM\Index(name="UI_gender", columns={"gender_id"}),@ORM\Index(name="index_household_name", columns={"household_name"}),@ORM\Index(name="index_organization_name", columns={"organization_name"}),@ORM\Index(name="index_is_deleted_sort_name", columns={"is_deleted,sort_name,id"}),@ORM\Index(name="FK_civicrm_contact_primary_contact_id", columns={"primary_contact_id"}),@ORM\Index(name="FK_civicrm_contact_employer_id", columns={"employer_id"})})
+ * @ORM\Table(name="civicrm_contact", uniqueConstraints={@ORM\UniqueConstraint(name="UI_external_identifier", columns={"external_identifier"})}, indexes={@ORM\Index(name="index_contact_type", columns={"contact_type"}),@ORM\Index(name="index_contact_sub_type", columns={"contact_sub_type"}),@ORM\Index(name="index_sort_name", columns={"sort_name"}),@ORM\Index(name="index_preferred_communication_method", columns={"preferred_communication_method"}),@ORM\Index(name="index_hash", columns={"hash"}),@ORM\Index(name="index_api_key", columns={"api_key"}),@ORM\Index(name="index_first_name", columns={"first_name"}),@ORM\Index(name="index_last_name", columns={"last_name"}),@ORM\Index(name="UI_prefix", columns={"prefix_id"}),@ORM\Index(name="UI_suffix", columns={"suffix_id"}),@ORM\Index(name="index_communication_style_id", columns={"communication_style_id"}),@ORM\Index(name="UI_gender", columns={"gender_id"}),@ORM\Index(name="index_household_name", columns={"household_name"}),@ORM\Index(name="index_organization_name", columns={"organization_name"}),@ORM\Index(name="index_is_deleted_sort_name", columns={"is_deleted","sort_name","id"}),@ORM\Index(name="FK_civicrm_contact_primary_contact_id", columns={"primary_contact_id"}),@ORM\Index(name="FK_civicrm_contact_employer_id", columns={"employer_id"})})
  * @ORM\Entity
  */
 class Contact extends \Civi\Core\Entity {
@@ -450,17 +450,17 @@ class Contact extends \Civi\Core\Entity {
   private $isDeleted = '0';
   
   /**
-   * @var timestamp
+   * @var datetime
    *
-   * @ORM\Column(name="created_date", type="timestamp", nullable=false)
+   * @ORM\Column(name="created_date", type="datetime", nullable=false)
    * 
    */
   private $createdDate = 'NULL';
   
   /**
-   * @var timestamp
+   * @var datetime
    *
-   * @ORM\Column(name="modified_date", type="timestamp", nullable=false)
+   * @ORM\Column(name="modified_date", type="datetime", nullable=false)
    * 
    */
   private $modifiedDate = 'CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP';
@@ -1457,7 +1457,7 @@ class Contact extends \Civi\Core\Entity {
   /**
    * Set createdDate
    *
-   * @param timestamp $createdDate
+   * @param datetime $createdDate
    * @return Contact
    */
   public function setCreatedDate($createdDate) {
@@ -1468,7 +1468,7 @@ class Contact extends \Civi\Core\Entity {
   /**
    * Get createdDate
    *
-   * @return timestamp
+   * @return datetime
    */
   public function getCreatedDate() {
     return $this->createdDate;
@@ -1477,7 +1477,7 @@ class Contact extends \Civi\Core\Entity {
   /**
    * Set modifiedDate
    *
-   * @param timestamp $modifiedDate
+   * @param datetime $modifiedDate
    * @return Contact
    */
   public function setModifiedDate($modifiedDate) {
@@ -1488,7 +1488,7 @@ class Contact extends \Civi\Core\Entity {
   /**
    * Get modifiedDate
    *
-   * @return timestamp
+   * @return datetime
    */
   public function getModifiedDate() {
     return $this->modifiedDate;

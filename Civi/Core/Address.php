@@ -98,9 +98,9 @@ class Address extends \Civi\Core\Entity {
   private $streetAddress;
   
   /**
-   * @var int
+   * @var integer
    *
-   * @ORM\Column(name="street_number", type="int", nullable=true)
+   * @ORM\Column(name="street_number", type="integer", nullable=true)
    * 
    */
   private $streetNumber;
@@ -393,7 +393,7 @@ class Address extends \Civi\Core\Entity {
   /**
    * Set streetNumber
    *
-   * @param int $streetNumber
+   * @param integer $streetNumber
    * @return Address
    */
   public function setStreetNumber($streetNumber) {
@@ -404,7 +404,7 @@ class Address extends \Civi\Core\Entity {
   /**
    * Get streetNumber
    *
-   * @return int
+   * @return integer
    */
   public function getStreetNumber() {
     return $this->streetNumber;

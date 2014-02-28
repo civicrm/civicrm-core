@@ -43,7 +43,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * QueueItem
  *
- * @ORM\Table(name="civicrm_queue_item", indexes={@ORM\Index(name="index_queueids", columns={"queue_name,weight,id"})})
+ * @ORM\Table(name="civicrm_queue_item", indexes={@ORM\Index(name="index_queueids", columns={"queue_name","weight","id"})})
  * @ORM\Entity
  */
 class QueueItem extends \Civi\Core\Entity {
@@ -66,9 +66,9 @@ class QueueItem extends \Civi\Core\Entity {
   private $queueName;
   
   /**
-   * @var int
+   * @var integer
    *
-   * @ORM\Column(name="weight", type="int", nullable=true)
+   * @ORM\Column(name="weight", type="integer", nullable=true)
    * 
    */
   private $weight;
@@ -129,7 +129,7 @@ class QueueItem extends \Civi\Core\Entity {
   /**
    * Set weight
    *
-   * @param int $weight
+   * @param integer $weight
    * @return QueueItem
    */
   public function setWeight($weight) {
@@ -140,7 +140,7 @@ class QueueItem extends \Civi\Core\Entity {
   /**
    * Get weight
    *
-   * @return int
+   * @return integer
    */
   public function getWeight() {
     return $this->weight;

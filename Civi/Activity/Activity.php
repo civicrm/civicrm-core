@@ -234,9 +234,9 @@ class Activity extends \Civi\Core\Entity {
   private $engagementLevel;
   
   /**
-   * @var int
+   * @var integer
    *
-   * @ORM\Column(name="weight", type="int", nullable=true)
+   * @ORM\Column(name="weight", type="integer", nullable=true)
    * 
    */
   private $weight;
@@ -693,7 +693,7 @@ class Activity extends \Civi\Core\Entity {
   /**
    * Set weight
    *
-   * @param int $weight
+   * @param integer $weight
    * @return Activity
    */
   public function setWeight($weight) {
@@ -704,7 +704,7 @@ class Activity extends \Civi\Core\Entity {
   /**
    * Get weight
    *
-   * @return int
+   * @return integer
    */
   public function getWeight() {
     return $this->weight;

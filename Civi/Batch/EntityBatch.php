@@ -43,7 +43,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * EntityBatch
  *
- * @ORM\Table(name="civicrm_entity_batch", uniqueConstraints={@ORM\UniqueConstraint(name="UI_batch_entity", columns={"batch_id,entity_id,entity_table"})}, indexes={@ORM\Index(name="index_entity", columns={"entity_table,entity_id"}),@ORM\Index(name="FK_civicrm_entity_batch_batch_id", columns={"batch_id"})})
+ * @ORM\Table(name="civicrm_entity_batch", uniqueConstraints={@ORM\UniqueConstraint(name="UI_batch_entity", columns={"batch_id","entity_id","entity_table"})}, indexes={@ORM\Index(name="index_entity", columns={"entity_table","entity_id"}),@ORM\Index(name="FK_civicrm_entity_batch_batch_id", columns={"batch_id"})})
  * @ORM\Entity
  */
 class EntityBatch extends \Civi\Core\Entity {

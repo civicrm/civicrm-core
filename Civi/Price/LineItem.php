@@ -43,7 +43,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * LineItem
  *
- * @ORM\Table(name="civicrm_line_item", uniqueConstraints={@ORM\UniqueConstraint(name="UI_line_item_value", columns={"entity_table,entity_id,price_field_value_id,price_field_id"})}, indexes={@ORM\Index(name="index_entity", columns={"entity_table,entity_id"}),@ORM\Index(name="FK_civicrm_line_item_price_field_id", columns={"price_field_id"}),@ORM\Index(name="FK_civicrm_line_item_price_field_value_id", columns={"price_field_value_id"}),@ORM\Index(name="FK_civicrm_line_item_financial_type_id", columns={"financial_type_id"})})
+ * @ORM\Table(name="civicrm_line_item", uniqueConstraints={@ORM\UniqueConstraint(name="UI_line_item_value", columns={"entity_table","entity_id","price_field_value_id","price_field_id"})}, indexes={@ORM\Index(name="index_entity", columns={"entity_table","entity_id"}),@ORM\Index(name="FK_civicrm_line_item_price_field_id", columns={"price_field_id"}),@ORM\Index(name="FK_civicrm_line_item_price_field_value_id", columns={"price_field_value_id"}),@ORM\Index(name="FK_civicrm_line_item_financial_type_id", columns={"financial_type_id"})})
  * @ORM\Entity
  */
 class LineItem extends \Civi\Core\Entity {

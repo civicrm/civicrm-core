@@ -43,7 +43,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * UFJoin
  *
- * @ORM\Table(name="civicrm_uf_join", indexes={@ORM\Index(name="index_entity", columns={"entity_table,entity_id"}),@ORM\Index(name="FK_civicrm_uf_join_uf_group_id", columns={"uf_group_id"})})
+ * @ORM\Table(name="civicrm_uf_join", indexes={@ORM\Index(name="index_entity", columns={"entity_table","entity_id"}),@ORM\Index(name="FK_civicrm_uf_join_uf_group_id", columns={"uf_group_id"})})
  * @ORM\Entity
  */
 class UFJoin extends \Civi\Core\Entity {
@@ -90,9 +90,9 @@ class UFJoin extends \Civi\Core\Entity {
   private $entityId;
   
   /**
-   * @var int
+   * @var integer
    *
-   * @ORM\Column(name="weight", type="int", nullable=false)
+   * @ORM\Column(name="weight", type="integer", nullable=false)
    * 
    */
   private $weight = '1';
@@ -205,7 +205,7 @@ class UFJoin extends \Civi\Core\Entity {
   /**
    * Set weight
    *
-   * @param int $weight
+   * @param integer $weight
    * @return UFJoin
    */
   public function setWeight($weight) {
@@ -216,7 +216,7 @@ class UFJoin extends \Civi\Core\Entity {
   /**
    * Get weight
    *
-   * @return int
+   * @return integer
    */
   public function getWeight() {
     return $this->weight;

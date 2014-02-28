@@ -43,7 +43,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * FinancialItem
  *
- * @ORM\Table(name="civicrm_financial_item", uniqueConstraints={@ORM\UniqueConstraint(name="UI_id", columns={"id"})}, indexes={@ORM\Index(name="IX_created_date", columns={"created_date"}),@ORM\Index(name="IX_transaction_date", columns={"transaction_date"}),@ORM\Index(name="IX_entity", columns={"entity_table,entity_id"}),@ORM\Index(name="FK_civicrm_financial_item_contact_id", columns={"contact_id"}),@ORM\Index(name="FK_civicrm_financial_item_financial_account_id", columns={"financial_account_id"})})
+ * @ORM\Table(name="civicrm_financial_item", uniqueConstraints={@ORM\UniqueConstraint(name="UI_id", columns={"id"})}, indexes={@ORM\Index(name="IX_created_date", columns={"created_date"}),@ORM\Index(name="IX_transaction_date", columns={"transaction_date"}),@ORM\Index(name="IX_entity", columns={"entity_table","entity_id"}),@ORM\Index(name="FK_civicrm_financial_item_contact_id", columns={"contact_id"}),@ORM\Index(name="FK_civicrm_financial_item_financial_account_id", columns={"financial_account_id"})})
  * @ORM\Entity
  */
 class FinancialItem extends \Civi\Core\Entity {
@@ -58,9 +58,9 @@ class FinancialItem extends \Civi\Core\Entity {
   private $id;
     
   /**
-   * @var timestamp
+   * @var datetime
    *
-   * @ORM\Column(name="created_date", type="timestamp", nullable=false)
+   * @ORM\Column(name="created_date", type="datetime", nullable=false)
    * 
    */
   private $createdDate = 'CURRENT_TIMESTAMP';
@@ -149,7 +149,7 @@ class FinancialItem extends \Civi\Core\Entity {
   /**
    * Set createdDate
    *
-   * @param timestamp $createdDate
+   * @param datetime $createdDate
    * @return FinancialItem
    */
   public function setCreatedDate($createdDate) {
@@ -160,7 +160,7 @@ class FinancialItem extends \Civi\Core\Entity {
   /**
    * Get createdDate
    *
-   * @return timestamp
+   * @return datetime
    */
   public function getCreatedDate() {
     return $this->createdDate;

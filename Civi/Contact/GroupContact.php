@@ -43,7 +43,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * GroupContact
  *
- * @ORM\Table(name="civicrm_group_contact", uniqueConstraints={@ORM\UniqueConstraint(name="UI_contact_group", columns={"contact_id,group_id"})}, indexes={@ORM\Index(name="FK_civicrm_group_contact_group_id", columns={"group_id"}),@ORM\Index(name="FK_civicrm_group_contact_contact_id", columns={"contact_id"}),@ORM\Index(name="FK_civicrm_group_contact_location_id", columns={"location_id"}),@ORM\Index(name="FK_civicrm_group_contact_email_id", columns={"email_id"})})
+ * @ORM\Table(name="civicrm_group_contact", uniqueConstraints={@ORM\UniqueConstraint(name="UI_contact_group", columns={"contact_id","group_id"})}, indexes={@ORM\Index(name="FK_civicrm_group_contact_group_id", columns={"group_id"}),@ORM\Index(name="FK_civicrm_group_contact_contact_id", columns={"contact_id"}),@ORM\Index(name="FK_civicrm_group_contact_location_id", columns={"location_id"}),@ORM\Index(name="FK_civicrm_group_contact_email_id", columns={"email_id"})})
  * @ORM\Entity
  */
 class GroupContact extends \Civi\Core\Entity {

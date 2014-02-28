@@ -43,7 +43,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * EntityTag
  *
- * @ORM\Table(name="civicrm_entity_tag", uniqueConstraints={@ORM\UniqueConstraint(name="UI_entity_id_entity_table_tag_id", columns={"entity_id,entity_table,tag_id"})}, indexes={@ORM\Index(name="FK_civicrm_entity_tag_tag_id", columns={"tag_id"})})
+ * @ORM\Table(name="civicrm_entity_tag", uniqueConstraints={@ORM\UniqueConstraint(name="UI_entity_id_entity_table_tag_id", columns={"entity_id","entity_table","tag_id"})}, indexes={@ORM\Index(name="FK_civicrm_entity_tag_tag_id", columns={"tag_id"})})
  * @ORM\Entity
  */
 class EntityTag extends \Civi\Core\Entity {

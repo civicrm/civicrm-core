@@ -43,7 +43,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * CustomGroup
  *
- * @ORM\Table(name="civicrm_custom_group", uniqueConstraints={@ORM\UniqueConstraint(name="UI_title_extends", columns={"title,extends"}),@ORM\UniqueConstraint(name="UI_name_extends", columns={"name,extends"})}, indexes={@ORM\Index(name="FK_civicrm_custom_group_created_id", columns={"created_id"})})
+ * @ORM\Table(name="civicrm_custom_group", uniqueConstraints={@ORM\UniqueConstraint(name="UI_title_extends", columns={"title","extends"}),@ORM\UniqueConstraint(name="UI_name_extends", columns={"name","extends"})}, indexes={@ORM\Index(name="FK_civicrm_custom_group_created_id", columns={"created_id"})})
  * @ORM\Entity
  */
 class CustomGroup extends \Civi\Core\Entity {
@@ -130,9 +130,9 @@ class CustomGroup extends \Civi\Core\Entity {
   private $helpPost;
   
   /**
-   * @var int
+   * @var integer
    *
-   * @ORM\Column(name="weight", type="int", nullable=false)
+   * @ORM\Column(name="weight", type="integer", nullable=false)
    * 
    */
   private $weight = '1';
@@ -401,7 +401,7 @@ class CustomGroup extends \Civi\Core\Entity {
   /**
    * Set weight
    *
-   * @param int $weight
+   * @param integer $weight
    * @return CustomGroup
    */
   public function setWeight($weight) {
@@ -412,7 +412,7 @@ class CustomGroup extends \Civi\Core\Entity {
   /**
    * Get weight
    *
-   * @return int
+   * @return integer
    */
   public function getWeight() {
     return $this->weight;

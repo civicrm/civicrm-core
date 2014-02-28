@@ -43,7 +43,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * StateProvince
  *
- * @ORM\Table(name="civicrm_state_province", uniqueConstraints={@ORM\UniqueConstraint(name="UI_name_country_id", columns={"name,country_id"})}, indexes={@ORM\Index(name="FK_civicrm_state_province_country_id", columns={"country_id"})})
+ * @ORM\Table(name="civicrm_state_province", uniqueConstraints={@ORM\UniqueConstraint(name="UI_name_country_id", columns={"name","country_id"})}, indexes={@ORM\Index(name="FK_civicrm_state_province_country_id", columns={"country_id"})})
  * @ORM\Entity
  */
 class StateProvince extends \Civi\Core\Entity {

@@ -43,7 +43,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * EntityFile
  *
- * @ORM\Table(name="civicrm_entity_file", indexes={@ORM\Index(name="index_entity", columns={"entity_table,entity_id"}),@ORM\Index(name="index_entity_file_id", columns={"entity_table,entity_id,file_id"}),@ORM\Index(name="FK_civicrm_entity_file_file_id", columns={"file_id"})})
+ * @ORM\Table(name="civicrm_entity_file", indexes={@ORM\Index(name="index_entity", columns={"entity_table","entity_id"}),@ORM\Index(name="index_entity_file_id", columns={"entity_table","entity_id","file_id"}),@ORM\Index(name="FK_civicrm_entity_file_file_id", columns={"file_id"})})
  * @ORM\Entity
  */
 class EntityFile extends \Civi\Core\Entity {

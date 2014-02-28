@@ -114,9 +114,9 @@ class MembershipLog extends \Civi\Core\Entity {
   private $membershipType;
   
   /**
-   * @var int
+   * @var integer
    *
-   * @ORM\Column(name="max_related", type="int", nullable=true)
+   * @ORM\Column(name="max_related", type="integer", nullable=true)
    * 
    */
   private $maxRelated;
@@ -273,7 +273,7 @@ class MembershipLog extends \Civi\Core\Entity {
   /**
    * Set maxRelated
    *
-   * @param int $maxRelated
+   * @param integer $maxRelated
    * @return MembershipLog
    */
   public function setMaxRelated($maxRelated) {
@@ -284,7 +284,7 @@ class MembershipLog extends \Civi\Core\Entity {
   /**
    * Get maxRelated
    *
-   * @return int
+   * @return integer
    */
   public function getMaxRelated() {
     return $this->maxRelated;

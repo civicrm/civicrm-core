@@ -154,17 +154,17 @@ class Mailing extends \Civi\Core\Entity {
   private $subject;
   
   /**
-   * @var longtext
+   * @var text
    *
-   * @ORM\Column(name="body_text", type="longtext", nullable=true)
+   * @ORM\Column(name="body_text", type="text", nullable=true)
    * 
    */
   private $bodyText;
   
   /**
-   * @var longtext
+   * @var text
    *
-   * @ORM\Column(name="body_html", type="longtext", nullable=true)
+   * @ORM\Column(name="body_html", type="text", nullable=true)
    * 
    */
   private $bodyHtml;
@@ -282,9 +282,9 @@ class Mailing extends \Civi\Core\Entity {
   private $approvalStatusId;
   
   /**
-   * @var longtext
+   * @var text
    *
-   * @ORM\Column(name="approval_note", type="longtext", nullable=true)
+   * @ORM\Column(name="approval_note", type="text", nullable=true)
    * 
    */
   private $approvalNote;
@@ -581,7 +581,7 @@ class Mailing extends \Civi\Core\Entity {
   /**
    * Set bodyText
    *
-   * @param longtext $bodyText
+   * @param text $bodyText
    * @return Mailing
    */
   public function setBodyText($bodyText) {
@@ -592,7 +592,7 @@ class Mailing extends \Civi\Core\Entity {
   /**
    * Get bodyText
    *
-   * @return longtext
+   * @return text
    */
   public function getBodyText() {
     return $this->bodyText;
@@ -601,7 +601,7 @@ class Mailing extends \Civi\Core\Entity {
   /**
    * Set bodyHtml
    *
-   * @param longtext $bodyHtml
+   * @param text $bodyHtml
    * @return Mailing
    */
   public function setBodyHtml($bodyHtml) {
@@ -612,7 +612,7 @@ class Mailing extends \Civi\Core\Entity {
   /**
    * Get bodyHtml
    *
-   * @return longtext
+   * @return text
    */
   public function getBodyHtml() {
     return $this->bodyHtml;
@@ -901,7 +901,7 @@ class Mailing extends \Civi\Core\Entity {
   /**
    * Set approvalNote
    *
-   * @param longtext $approvalNote
+   * @param text $approvalNote
    * @return Mailing
    */
   public function setApprovalNote($approvalNote) {
@@ -912,7 +912,7 @@ class Mailing extends \Civi\Core\Entity {
   /**
    * Get approvalNote
    *
-   * @return longtext
+   * @return text
    */
   public function getApprovalNote() {
     return $this->approvalNote;

@@ -43,7 +43,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * CustomField
  *
- * @ORM\Table(name="civicrm_custom_field", uniqueConstraints={@ORM\UniqueConstraint(name="UI_label_custom_group_id", columns={"label,custom_group_id"}),@ORM\UniqueConstraint(name="UI_name_custom_group_id", columns={"name,custom_group_id"})}, indexes={@ORM\Index(name="FK_civicrm_custom_field_custom_group_id", columns={"custom_group_id"})})
+ * @ORM\Table(name="civicrm_custom_field", uniqueConstraints={@ORM\UniqueConstraint(name="UI_label_custom_group_id", columns={"label","custom_group_id"}),@ORM\UniqueConstraint(name="UI_name_custom_group_id", columns={"name","custom_group_id"})}, indexes={@ORM\Index(name="FK_civicrm_custom_field_custom_group_id", columns={"custom_group_id"})})
  * @ORM\Entity
  */
 class CustomField extends \Civi\Core\Entity {
@@ -130,9 +130,9 @@ class CustomField extends \Civi\Core\Entity {
   private $isSearchRange = '0';
   
   /**
-   * @var int
+   * @var integer
    *
-   * @ORM\Column(name="weight", type="int", nullable=false)
+   * @ORM\Column(name="weight", type="integer", nullable=false)
    * 
    */
   private $weight = '1';
@@ -210,17 +210,17 @@ class CustomField extends \Civi\Core\Entity {
   private $textLength;
   
   /**
-   * @var int
+   * @var integer
    *
-   * @ORM\Column(name="start_date_years", type="int", nullable=true)
+   * @ORM\Column(name="start_date_years", type="integer", nullable=true)
    * 
    */
   private $startDateYears;
   
   /**
-   * @var int
+   * @var integer
    *
-   * @ORM\Column(name="end_date_years", type="int", nullable=true)
+   * @ORM\Column(name="end_date_years", type="integer", nullable=true)
    * 
    */
   private $endDateYears;
@@ -473,7 +473,7 @@ class CustomField extends \Civi\Core\Entity {
   /**
    * Set weight
    *
-   * @param int $weight
+   * @param integer $weight
    * @return CustomField
    */
   public function setWeight($weight) {
@@ -484,7 +484,7 @@ class CustomField extends \Civi\Core\Entity {
   /**
    * Get weight
    *
-   * @return int
+   * @return integer
    */
   public function getWeight() {
     return $this->weight;
@@ -673,7 +673,7 @@ class CustomField extends \Civi\Core\Entity {
   /**
    * Set startDateYears
    *
-   * @param int $startDateYears
+   * @param integer $startDateYears
    * @return CustomField
    */
   public function setStartDateYears($startDateYears) {
@@ -684,7 +684,7 @@ class CustomField extends \Civi\Core\Entity {
   /**
    * Get startDateYears
    *
-   * @return int
+   * @return integer
    */
   public function getStartDateYears() {
     return $this->startDateYears;
@@ -693,7 +693,7 @@ class CustomField extends \Civi\Core\Entity {
   /**
    * Set endDateYears
    *
-   * @param int $endDateYears
+   * @param integer $endDateYears
    * @return CustomField
    */
   public function setEndDateYears($endDateYears) {
@@ -704,7 +704,7 @@ class CustomField extends \Civi\Core\Entity {
   /**
    * Get endDateYears
    *
-   * @return int
+   * @return integer
    */
   public function getEndDateYears() {
     return $this->endDateYears;

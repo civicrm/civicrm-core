@@ -90,9 +90,9 @@ class MembershipStatus extends \Civi\Core\Entity {
   private $startEventAdjustUnit;
   
   /**
-   * @var int
+   * @var integer
    *
-   * @ORM\Column(name="start_event_adjust_interval", type="int", nullable=true)
+   * @ORM\Column(name="start_event_adjust_interval", type="integer", nullable=true)
    * 
    */
   private $startEventAdjustInterval;
@@ -114,9 +114,9 @@ class MembershipStatus extends \Civi\Core\Entity {
   private $endEventAdjustUnit;
   
   /**
-   * @var int
+   * @var integer
    *
-   * @ORM\Column(name="end_event_adjust_interval", type="int", nullable=true)
+   * @ORM\Column(name="end_event_adjust_interval", type="integer", nullable=true)
    * 
    */
   private $endEventAdjustInterval;
@@ -138,9 +138,9 @@ class MembershipStatus extends \Civi\Core\Entity {
   private $isAdmin;
   
   /**
-   * @var int
+   * @var integer
    *
-   * @ORM\Column(name="weight", type="int", nullable=true)
+   * @ORM\Column(name="weight", type="integer", nullable=true)
    * 
    */
   private $weight;
@@ -261,7 +261,7 @@ class MembershipStatus extends \Civi\Core\Entity {
   /**
    * Set startEventAdjustInterval
    *
-   * @param int $startEventAdjustInterval
+   * @param integer $startEventAdjustInterval
    * @return MembershipStatus
    */
   public function setStartEventAdjustInterval($startEventAdjustInterval) {
@@ -272,7 +272,7 @@ class MembershipStatus extends \Civi\Core\Entity {
   /**
    * Get startEventAdjustInterval
    *
-   * @return int
+   * @return integer
    */
   public function getStartEventAdjustInterval() {
     return $this->startEventAdjustInterval;
@@ -321,7 +321,7 @@ class MembershipStatus extends \Civi\Core\Entity {
   /**
    * Set endEventAdjustInterval
    *
-   * @param int $endEventAdjustInterval
+   * @param integer $endEventAdjustInterval
    * @return MembershipStatus
    */
   public function setEndEventAdjustInterval($endEventAdjustInterval) {
@@ -332,7 +332,7 @@ class MembershipStatus extends \Civi\Core\Entity {
   /**
    * Get endEventAdjustInterval
    *
-   * @return int
+   * @return integer
    */
   public function getEndEventAdjustInterval() {
     return $this->endEventAdjustInterval;
@@ -381,7 +381,7 @@ class MembershipStatus extends \Civi\Core\Entity {
   /**
    * Set weight
    *
-   * @param int $weight
+   * @param integer $weight
    * @return MembershipStatus
    */
   public function setWeight($weight) {
@@ -392,7 +392,7 @@ class MembershipStatus extends \Civi\Core\Entity {
   /**
    * Get weight
    *
-   * @return int
+   * @return integer
    */
   public function getWeight() {
     return $this->weight;

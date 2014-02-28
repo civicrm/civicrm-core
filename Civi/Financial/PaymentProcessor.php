@@ -43,7 +43,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * PaymentProcessor
  *
- * @ORM\Table(name="civicrm_payment_processor", uniqueConstraints={@ORM\UniqueConstraint(name="UI_name_test_domain_id", columns={"name,is_test,domain_id"})}, indexes={@ORM\Index(name="FK_civicrm_payment_processor_domain_id", columns={"domain_id"}),@ORM\Index(name="FK_civicrm_payment_processor_payment_processor_type_id", columns={"payment_processor_type_id"})})
+ * @ORM\Table(name="civicrm_payment_processor", uniqueConstraints={@ORM\UniqueConstraint(name="UI_name_test_domain_id", columns={"name","is_test","domain_id"})}, indexes={@ORM\Index(name="FK_civicrm_payment_processor_domain_id", columns={"domain_id"}),@ORM\Index(name="FK_civicrm_payment_processor_payment_processor_type_id", columns={"payment_processor_type_id"})})
  * @ORM\Entity
  */
 class PaymentProcessor extends \Civi\Core\Entity {

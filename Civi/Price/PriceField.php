@@ -114,9 +114,9 @@ class PriceField extends \Civi\Core\Entity {
   private $helpPost;
   
   /**
-   * @var int
+   * @var integer
    *
-   * @ORM\Column(name="weight", type="int", nullable=false)
+   * @ORM\Column(name="weight", type="integer", nullable=false)
    * 
    */
   private $weight = '1';
@@ -337,7 +337,7 @@ class PriceField extends \Civi\Core\Entity {
   /**
    * Set weight
    *
-   * @param int $weight
+   * @param integer $weight
    * @return PriceField
    */
   public function setWeight($weight) {
@@ -348,7 +348,7 @@ class PriceField extends \Civi\Core\Entity {
   /**
    * Get weight
    *
-   * @return int
+   * @return integer
    */
   public function getWeight() {
     return $this->weight;

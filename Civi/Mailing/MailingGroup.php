@@ -90,9 +90,9 @@ class MailingGroup extends \Civi\Core\Entity {
   private $entityId;
   
   /**
-   * @var int
+   * @var integer
    *
-   * @ORM\Column(name="search_id", type="int", nullable=true)
+   * @ORM\Column(name="search_id", type="integer", nullable=true)
    * 
    */
   private $searchId;
@@ -197,7 +197,7 @@ class MailingGroup extends \Civi\Core\Entity {
   /**
    * Set searchId
    *
-   * @param int $searchId
+   * @param integer $searchId
    * @return MailingGroup
    */
   public function setSearchId($searchId) {
@@ -208,7 +208,7 @@ class MailingGroup extends \Civi\Core\Entity {
   /**
    * Get searchId
    *
-   * @return int
+   * @return integer
    */
   public function getSearchId() {
     return $this->searchId;

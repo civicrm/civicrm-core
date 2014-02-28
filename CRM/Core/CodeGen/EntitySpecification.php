@@ -314,11 +314,14 @@ class CRM_Core_CodeGen_EntitySpecification {
     if (!empty($table['index'])) {
       $uniqueElements = array();
       foreach($table['index'] as $value) {
+        foreach ($value['field'] as &$elem) {
+          $elem = '"' .$elem . '"';
+        }
         if (isset($value['unique'])) {
-          $uniqueElements[] = '@ORM\UniqueConstraint(name="' . $value['name'] . '", columns={"' . implode(',', $value['field']) . '"})';
+          $uniqueElements[] = '@ORM\UniqueConstraint(name="' . $value['name'] . '", columns={' . implode(',', $value['field']) . '})';
         }
         else {
-          $indexElements[] = '@ORM\Index(name="' . $value['name'] . '", columns={"' . implode(',', $value['field']) . '"})';
+          $indexElements[] = '@ORM\Index(name="' . $value['name'] . '", columns={' . implode(',', $value['field']) . '})';
         }
       }
     }
@@ -364,26 +367,15 @@ class CRM_Core_CodeGen_EntitySpecification {
         $field['size'] = $this->getSize($fieldXML);
         break;
 
-      case 'enum':
-        $value               = (string ) $fieldXML->values;
-        $field['sqlType']    = 'enum(';
-        $field['values']     = array();
-        $field['enumValues'] = $value;
-        $values              = explode(',', $value);
-        $first               = TRUE;
-        foreach ($values as $v) {
-          $v = trim($v);
-          $field['values'][] = $v;
+      case 'mediumblob':
+        $field['sqlType'] = $field['phpType'] = 'blob';
+        $field['crmType'] = 'CRM_Utils_Type::T_' . strtoupper($type);
+        $field['length']  = '16777215';
+        break;
 
-          if (!$first) {
-            $field['sqlType'] .= ', ';
-          }
-          $first = FALSE;
-          $field['sqlType'] .= "'$v'";
-        }
-        $field['sqlType'] .= ')';
-        $field['phpType'] = $field['sqlType'];
-        $field['crmType'] = 'CRM_Utils_Type::T_ENUM';
+      case 'longtext':
+        $field['sqlType'] = $field['phpType'] = 'text';
+        $field['crmType'] = 'CRM_Utils_Type::T_' . strtoupper($type);
         break;
 
       case 'text':
@@ -393,10 +385,10 @@ class CRM_Core_CodeGen_EntitySpecification {
         $field['rows'] = isset($fieldXML->html) ? $this->value('rows', $fieldXML->html) : NULL;
         $field['cols'] = isset($fieldXML->html) ? $this->value('cols', $fieldXML->html) : NULL;
         break;
-        break;
 
+      case 'timestamp':
       case 'datetime':
-        $field['sqlType'] = $field['phpType'] = $type;
+        $field['sqlType'] = $field['phpType'] = 'datetime';
         $field['crmType'] = 'CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME';
         break;
 
@@ -423,7 +415,7 @@ class CRM_Core_CodeGen_EntitySpecification {
 
       default:
         $field['sqlType'] = $field['phpType'] = $type;
-        if ($type == 'int unsigned') {
+        if (in_array($type, array('int unsigned', 'int'))) {
           $field['phpType'] = 'integer';
           $field['crmType'] = 'CRM_Utils_Type::T_INT';
         }

@@ -43,7 +43,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * GroupContactCache
  *
- * @ORM\Table(name="civicrm_group_contact_cache", uniqueConstraints={@ORM\UniqueConstraint(name="UI_contact_group", columns={"contact_id,group_id"})}, indexes={@ORM\Index(name="FK_civicrm_group_contact_cache_group_id", columns={"group_id"}),@ORM\Index(name="FK_civicrm_group_contact_cache_contact_id", columns={"contact_id"})})
+ * @ORM\Table(name="civicrm_group_contact_cache", uniqueConstraints={@ORM\UniqueConstraint(name="UI_contact_group", columns={"contact_id","group_id"})}, indexes={@ORM\Index(name="FK_civicrm_group_contact_cache_group_id", columns={"group_id"}),@ORM\Index(name="FK_civicrm_group_contact_cache_contact_id", columns={"contact_id"})})
  * @ORM\Entity
  */
 class GroupContactCache extends \Civi\Core\Entity {

@@ -43,7 +43,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * PrevNextCache
  *
- * @ORM\Table(name="civicrm_prevnext_cache", indexes={@ORM\Index(name="index_all", columns={"cacheKey,entity_id1,entity_id2,entity_table,is_selected"})})
+ * @ORM\Table(name="civicrm_prevnext_cache", indexes={@ORM\Index(name="index_all", columns={"cacheKey","entity_id1","entity_id2","entity_table","is_selected"})})
  * @ORM\Entity
  */
 class PrevNextCache extends \Civi\Core\Entity {
@@ -90,9 +90,9 @@ class PrevNextCache extends \Civi\Core\Entity {
   private $cacheKey;
   
   /**
-   * @var longtext
+   * @var text
    *
-   * @ORM\Column(name="data", type="longtext", nullable=true)
+   * @ORM\Column(name="data", type="text", nullable=true)
    * 
    */
   private $data;
@@ -197,7 +197,7 @@ class PrevNextCache extends \Civi\Core\Entity {
   /**
    * Set data
    *
-   * @param longtext $data
+   * @param text $data
    * @return PrevNextCache
    */
   public function setData($data) {
@@ -208,7 +208,7 @@ class PrevNextCache extends \Civi\Core\Entity {
   /**
    * Get data
    *
-   * @return longtext
+   * @return text
    */
   public function getData() {
     return $this->data;

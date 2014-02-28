@@ -218,17 +218,17 @@ class ActionSchedule extends \Civi\Core\Entity {
   private $recipientListing;
   
   /**
-   * @var longtext
+   * @var text
    *
-   * @ORM\Column(name="body_text", type="longtext", nullable=true)
+   * @ORM\Column(name="body_text", type="text", nullable=true)
    * 
    */
   private $bodyText;
   
   /**
-   * @var longtext
+   * @var text
    *
-   * @ORM\Column(name="body_html", type="longtext", nullable=true)
+   * @ORM\Column(name="body_html", type="text", nullable=true)
    * 
    */
   private $bodyHtml;
@@ -709,7 +709,7 @@ class ActionSchedule extends \Civi\Core\Entity {
   /**
    * Set bodyText
    *
-   * @param longtext $bodyText
+   * @param text $bodyText
    * @return ActionSchedule
    */
   public function setBodyText($bodyText) {
@@ -720,7 +720,7 @@ class ActionSchedule extends \Civi\Core\Entity {
   /**
    * Get bodyText
    *
-   * @return longtext
+   * @return text
    */
   public function getBodyText() {
     return $this->bodyText;
@@ -729,7 +729,7 @@ class ActionSchedule extends \Civi\Core\Entity {
   /**
    * Set bodyHtml
    *
-   * @param longtext $bodyHtml
+   * @param text $bodyHtml
    * @return ActionSchedule
    */
   public function setBodyHtml($bodyHtml) {
@@ -740,7 +740,7 @@ class ActionSchedule extends \Civi\Core\Entity {
   /**
    * Get bodyHtml
    *
-   * @return longtext
+   * @return text
    */
   public function getBodyHtml() {
     return $this->bodyHtml;

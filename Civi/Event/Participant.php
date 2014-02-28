@@ -186,9 +186,9 @@ class Participant extends \Civi\Core\Entity {
   private $cart;
   
   /**
-   * @var int
+   * @var integer
    *
-   * @ORM\Column(name="must_wait", type="int", nullable=true)
+   * @ORM\Column(name="must_wait", type="integer", nullable=true)
    * 
    */
   private $mustWait;
@@ -525,7 +525,7 @@ class Participant extends \Civi\Core\Entity {
   /**
    * Set mustWait
    *
-   * @param int $mustWait
+   * @param integer $mustWait
    * @return Participant
    */
   public function setMustWait($mustWait) {
@@ -536,7 +536,7 @@ class Participant extends \Civi\Core\Entity {
   /**
    * Get mustWait
    *
-   * @return int
+   * @return integer
    */
   public function getMustWait() {
     return $this->mustWait;

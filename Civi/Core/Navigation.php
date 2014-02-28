@@ -130,9 +130,9 @@ class Navigation extends \Civi\Core\Entity {
   private $hasSeparator;
   
   /**
-   * @var int
+   * @var integer
    *
-   * @ORM\Column(name="weight", type="int", nullable=true)
+   * @ORM\Column(name="weight", type="integer", nullable=true)
    * 
    */
   private $weight;
@@ -329,7 +329,7 @@ class Navigation extends \Civi\Core\Entity {
   /**
    * Set weight
    *
-   * @param int $weight
+   * @param integer $weight
    * @return Navigation
    */
   public function setWeight($weight) {
@@ -340,7 +340,7 @@ class Navigation extends \Civi\Core\Entity {
   /**
    * Get weight
    *
-   * @return int
+   * @return integer
    */
   public function getWeight() {
     return $this->weight;

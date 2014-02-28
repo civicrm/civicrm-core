@@ -43,7 +43,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * PledgePayment
  *
- * @ORM\Table(name="civicrm_pledge_payment", indexes={@ORM\Index(name="index_contribution_pledge", columns={"contribution_id,pledge_id"}),@ORM\Index(name="index_status", columns={"status_id"}),@ORM\Index(name="FK_civicrm_pledge_payment_pledge_id", columns={"pledge_id"}),@ORM\Index(name="FK_civicrm_pledge_payment_contribution_id", columns={"contribution_id"})})
+ * @ORM\Table(name="civicrm_pledge_payment", indexes={@ORM\Index(name="index_contribution_pledge", columns={"contribution_id","pledge_id"}),@ORM\Index(name="index_status", columns={"status_id"}),@ORM\Index(name="FK_civicrm_pledge_payment_pledge_id", columns={"pledge_id"}),@ORM\Index(name="FK_civicrm_pledge_payment_contribution_id", columns={"contribution_id"})})
  * @ORM\Entity
  */
 class PledgePayment extends \Civi\Core\Entity {

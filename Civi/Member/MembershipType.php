@@ -114,9 +114,9 @@ class MembershipType extends \Civi\Core\Entity {
   private $durationUnit;
   
   /**
-   * @var int
+   * @var integer
    *
-   * @ORM\Column(name="duration_interval", type="int", nullable=true)
+   * @ORM\Column(name="duration_interval", type="integer", nullable=true)
    * 
    */
   private $durationInterval;
@@ -130,17 +130,17 @@ class MembershipType extends \Civi\Core\Entity {
   private $periodType;
   
   /**
-   * @var int
+   * @var integer
    *
-   * @ORM\Column(name="fixed_period_start_day", type="int", nullable=true)
+   * @ORM\Column(name="fixed_period_start_day", type="integer", nullable=true)
    * 
    */
   private $fixedPeriodStartDay;
   
   /**
-   * @var int
+   * @var integer
    *
-   * @ORM\Column(name="fixed_period_rollover_day", type="int", nullable=true)
+   * @ORM\Column(name="fixed_period_rollover_day", type="integer", nullable=true)
    * 
    */
   private $fixedPeriodRolloverDay;
@@ -162,9 +162,9 @@ class MembershipType extends \Civi\Core\Entity {
   private $relationshipDirection;
   
   /**
-   * @var int
+   * @var integer
    *
-   * @ORM\Column(name="max_related", type="int", nullable=true)
+   * @ORM\Column(name="max_related", type="integer", nullable=true)
    * 
    */
   private $maxRelated;
@@ -178,9 +178,9 @@ class MembershipType extends \Civi\Core\Entity {
   private $visibility;
   
   /**
-   * @var int
+   * @var integer
    *
-   * @ORM\Column(name="weight", type="int", nullable=true)
+   * @ORM\Column(name="weight", type="integer", nullable=true)
    * 
    */
   private $weight;
@@ -369,7 +369,7 @@ class MembershipType extends \Civi\Core\Entity {
   /**
    * Set durationInterval
    *
-   * @param int $durationInterval
+   * @param integer $durationInterval
    * @return MembershipType
    */
   public function setDurationInterval($durationInterval) {
@@ -380,7 +380,7 @@ class MembershipType extends \Civi\Core\Entity {
   /**
    * Get durationInterval
    *
-   * @return int
+   * @return integer
    */
   public function getDurationInterval() {
     return $this->durationInterval;
@@ -409,7 +409,7 @@ class MembershipType extends \Civi\Core\Entity {
   /**
    * Set fixedPeriodStartDay
    *
-   * @param int $fixedPeriodStartDay
+   * @param integer $fixedPeriodStartDay
    * @return MembershipType
    */
   public function setFixedPeriodStartDay($fixedPeriodStartDay) {
@@ -420,7 +420,7 @@ class MembershipType extends \Civi\Core\Entity {
   /**
    * Get fixedPeriodStartDay
    *
-   * @return int
+   * @return integer
    */
   public function getFixedPeriodStartDay() {
     return $this->fixedPeriodStartDay;
@@ -429,7 +429,7 @@ class MembershipType extends \Civi\Core\Entity {
   /**
    * Set fixedPeriodRolloverDay
    *
-   * @param int $fixedPeriodRolloverDay
+   * @param integer $fixedPeriodRolloverDay
    * @return MembershipType
    */
   public function setFixedPeriodRolloverDay($fixedPeriodRolloverDay) {
@@ -440,7 +440,7 @@ class MembershipType extends \Civi\Core\Entity {
   /**
    * Get fixedPeriodRolloverDay
    *
-   * @return int
+   * @return integer
    */
   public function getFixedPeriodRolloverDay() {
     return $this->fixedPeriodRolloverDay;
@@ -489,7 +489,7 @@ class MembershipType extends \Civi\Core\Entity {
   /**
    * Set maxRelated
    *
-   * @param int $maxRelated
+   * @param integer $maxRelated
    * @return MembershipType
    */
   public function setMaxRelated($maxRelated) {
@@ -500,7 +500,7 @@ class MembershipType extends \Civi\Core\Entity {
   /**
    * Get maxRelated
    *
-   * @return int
+   * @return integer
    */
   public function getMaxRelated() {
     return $this->maxRelated;
@@ -529,7 +529,7 @@ class MembershipType extends \Civi\Core\Entity {
   /**
    * Set weight
    *
-   * @param int $weight
+   * @param integer $weight
    * @return MembershipType
    */
   public function setWeight($weight) {
@@ -540,7 +540,7 @@ class MembershipType extends \Civi\Core\Entity {
   /**
    * Get weight
    *
-   * @return int
+   * @return integer
    */
   public function getWeight() {
     return $this->weight;
