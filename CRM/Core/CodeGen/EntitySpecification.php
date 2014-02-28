@@ -102,7 +102,7 @@ class CRM_Core_CodeGen_EntitySpecification {
       'civicrm_case_contact',
       'civicrm_relationship',
     );
-
+    //$skipTables = array();
     $tables = array();
     foreach ($dbXML->tables as $tablesXML) {
       foreach ($tablesXML->table as $tableXML) {
@@ -549,10 +549,10 @@ class CRM_Core_CodeGen_EntitySpecification {
     // populate fields
     foreach ($indexXML->fieldName as $v) {
       $fieldName = (string)($v);
-      $length = (string)($v['length']);
-      if (strlen($length) > 0) {
-        $fieldName = "$fieldName($length)";
-      }
+//      $length = (string)($v['length']);
+//      if (strlen($length) > 0) {
+//        $fieldName = "$fieldName($length)";
+//      }
       $index['field'][] = $fieldName;
     }
 
