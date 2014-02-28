@@ -242,3 +242,10 @@ ALTER TABLE  `civicrm_contact` CHANGE  `preferred_mail_format`  `preferred_mail_
 -- CRM-14183
 INSERT INTO civicrm_state_province (country_id, abbreviation, name) VALUES (1157, "PL", "Plateau");
 UPDATE civicrm_state_province SET name = "Abuja Federal Capital Territory" WHERE name = "Abuja Capital Territory";
+
+-- add 'Sales Tax Account is' as financial account relationship
+SELECT @option_group_id_arel           := max(id) from civicrm_option_group where name = 'account_relationship';
+INSERT INTO
+   `civicrm_option_value` (`option_group_id`, {localize field='label'}label{/localize}, `value`, `name`, `grouping`, `filter`, `is_default`, `weight`, {localize field='description'}`description`{/localize}, `is_optgroup`, `is_reserved`, `is_active`, `component_id`, `visibility_id`)
+VALUES
+(@option_group_id_arel, {localize}'{ts escape="sql"}Sales Tax Account is{/ts}'{/localize}, 10, 'Sales Tax Account is', NULL, 0, 0, 10, {localize}'Sales Tax Account is'{/localize}, 0, 1, 1, 2, NULL);
