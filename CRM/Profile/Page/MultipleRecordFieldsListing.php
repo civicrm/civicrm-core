@@ -289,7 +289,7 @@ class CRM_Profile_Page_MultipleRecordFieldsListing extends CRM_Core_Page_Basic {
           foreach ($value as $fieldId => &$val) {
             if (is_numeric($fieldId)) {
               $customValue = &$val;
-              if (array_key_exists($fieldId, $dateFields)) {
+              if (!empty($dateFields) && array_key_exists($fieldId, $dateFields)) {
                 // formated date capture value capture
                 $dateFieldsVals[$fieldId][$recId] = CRM_Core_BAO_CustomField::getDisplayValue($customValue, $fieldId, $options);
               }
