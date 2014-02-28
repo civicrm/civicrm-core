@@ -187,17 +187,11 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
     // lets try to get it from the session and/or the request vars
     // we do this early on in case there is a fatal error in retrieving the
     // key and/or session
-    $this->_entryURL = CRM_Utils_Request::retrieve(
-      'entryURL',
-      'String',
-      $this,
-      FALSE,
-      NULL,
-      $_REQUEST
-    );
+    $this->_entryURL =
+      CRM_Utils_Request::retrieve('entryURL', 'String', $this);
 
     // add a unique validable key to the name
-    $name         = CRM_Utils_System::getClassName($this);
+    $name = CRM_Utils_System::getClassName($this);
     if ($name == 'CRM_Core_Controller_Simple' && !empty($scope)) {
       // use form name if we have, since its a lot better and
       // definitely different for different forms
