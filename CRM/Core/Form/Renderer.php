@@ -235,13 +235,14 @@ class CRM_Core_Form_Renderer extends HTML_QuickForm_Renderer_ArraySmarty {
 
   /**
    * Render entity references as text.
-   * If user has permission, format as link (or now limited to contacts).
+   * If user has permission, format as link (for now limited to contacts).
    * @param $el array
    * @param $field HTML_QuickForm_element
    */
   function renderFrozenEntityRef(&$el, $field) {
     $entity = $field->getAttribute('data-api-entity');
     $vals = json_decode($field->getAttribute('data-entity-value'), TRUE);
+    // Hack for single-entity @see self::preProcessEntityRef
     if (isset($vals['id'])) {
       $vals = array($vals);
     }
@@ -250,7 +251,7 @@ class CRM_Core_Form_Renderer extends HTML_QuickForm_Renderer_ArraySmarty {
       // Format contact as link
       if ($entity == 'contact' && CRM_Contact_BAO_Contact_Permission::allow($val['id'], CRM_Core_Permission::VIEW)) {
         $url = CRM_Utils_System::url("civicrm/contact/view", array('reset' => 1, 'cid' => $val['id']));
-        $val['label'] = '<a href="' . $url . '" title="' . ts('View Contact') . '">' . $val['label'] . '</a>';
+        $val['label'] = '<a class="view-' . $entity . ' no-popup" href="' . $url . '" title="' . ts('View Contact') . '">' . $val['label'] . '</a>';
       }
       $display[] = $val['label'];
     }

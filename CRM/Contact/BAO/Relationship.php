@@ -1496,36 +1496,6 @@ AND cc.sort_name LIKE '%$name%'";
     return $contacts;
   }
 
-  static function getValidContactTypeList($relType) {
-    // string looks like 4_a_b
-    $rel_parts           = explode('_', $relType);
-    $allRelationshipType = CRM_Core_PseudoConstant::relationshipType('label');
-    $contactProfiles     = CRM_Core_BAO_UFGroup::getReservedProfiles('Contact', NULL);
-
-    if ($rel_parts[1] == 'a') {
-      $leftType = $allRelationshipType[$rel_parts[0]]['contact_type_b'];
-    }
-    else {
-      $leftType = $allRelationshipType[$rel_parts[0]]['contact_type_a'];
-    }
-
-    // Handle 'All Contacts' contact type for left side of relationship ($leftType is empty in this case)
-    // In this case all reserved profiles are available
-    if ($leftType == '') {
-      $contactTypes = $contactProfiles;
-    } else {
-      $contactTypes = array();
-      foreach ($contactProfiles as $key => $value) {
-        $groupTypes = CRM_Core_BAO_UFGroup::profileGroups($key);
-        if (in_array($leftType, $groupTypes)) {
-          $contactTypes = array($key => $value);
-        }
-      }
-    }
-
-    return $contactTypes;
-  }
-
   /**
    * Merge relationships from otherContact to mainContact
    * Called during contact merge operation

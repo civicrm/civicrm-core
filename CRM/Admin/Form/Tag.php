@@ -54,20 +54,6 @@ class CRM_Admin_Form_Tag extends CRM_Admin_Form {
         CRM_Utils_System::redirect($url);
         return TRUE;
       }
-      else {
-        $this->addButtons(array(
-            array(
-              'type' => 'next',
-              'name' => ts('Delete'),
-              'isDefault' => TRUE,
-            ),
-            array(
-              'type' => 'cancel',
-              'name' => ts('Cancel'),
-            ),
-          )
-        );
-      }
     }
     else {
       $this->_isTagSet = CRM_Utils_Request::retrieve('tagset', 'Positive', $this);
@@ -128,8 +114,8 @@ class CRM_Admin_Form_Tag extends CRM_Admin_Form {
       }
       $this->assign('adminReservedTags', $adminReservedTags);
 
-      parent::buildQuickForm();
     }
+    parent::buildQuickForm();
   }
 
   /**

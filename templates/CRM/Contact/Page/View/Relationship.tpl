@@ -50,8 +50,8 @@
         <tr>
             <th>{ts}Relationship{/ts}</th>
             <th></th>
-            <th id="start_date">{ts}Start{/ts}</th>
-            <th id="end_date">{ts}End{/ts}</th>
+            <th id="tr-active-start_date">{ts}Start{/ts}</th>
+            <th id="tr-active-end_date">{ts}End{/ts}</th>
             <th>{ts}City{/ts}</th>
             <th>{ts}State/Prov{/ts}</th>
             <th>{ts}Email{/ts}</th>
@@ -62,13 +62,6 @@
         </tr>
         </thead>
         {foreach from=$currentRelationships item=rel}
-            {*assign var = "rtype" value = "" }
-            {if $rel.contact_a eq $contactId }
-                {assign var = "rtype" value = "a_b" }
-            {else}
-                {assign var = "rtype" value = "b_a" }
-            {/if*}
-
             <tr id="relationship-{$rel.id}" class="crm-entity {cycle values="odd-row,even-row"} row-relationship {if $rel.is_permission_a_b eq 1 or $rel.is_permission_b_a eq 1}row-highlight{/if}">
 
             {if $relationshipTabContext}
@@ -98,8 +91,8 @@
                 <td>{$rel.email}</td>
                 <td>{$rel.phone}</td>
                 <td class="nowrap">{$rel.action|replace:'xx':$rel.id}</td>
-                <td class="start_date hiddenElement">{$rel.start_date|crmDate}</td>
-                <td class="end_date hiddenElement">{$rel.end_date|crmDate}</td>
+                <td class="tr-active-start_date hiddenElement">{$rel.start_date|crmDate}</td>
+                <td class="tr-active-end_date hiddenElement">{$rel.end_date|crmDate}</td>
             </tr>
         {/foreach}
         </table>
@@ -145,8 +138,8 @@
         <tr>
             <th>{ts}Relationship{/ts}</th>
             <th></th>
-            <th id="dis-start_date">{ts}Start{/ts}</th>
-            <th id="dis-end_date">{ts}End{/ts}</th>
+            <th id="tr-inactive-start_date">{ts}Start{/ts}</th>
+            <th id="tr-inactive-end_date">{ts}End{/ts}</th>
             <th>{ts}City{/ts}</th>
             <th>{ts}State/Prov{/ts}</th>
             <th>{ts}Email{/ts}</th>
@@ -176,8 +169,8 @@
             <td>{$rel.email}</td>
             <td>{$rel.phone}</td>
             <td class="nowrap">{$rel.action|replace:'xx':$rel.id}</td>
-            <td class="dis-start_date hiddenElement">{$rel.start_date|crmDate}</td>
-            <td class="dis-end_date hiddenElement">{$rel.end_date|crmDate}</td>
+            <td class="tr-inactive-start_date hiddenElement">{$rel.start_date|crmDate}</td>
+            <td class="tr-inactive-end_date hiddenElement">{$rel.end_date|crmDate}</td>
           </tr>
         {/foreach}
         </table>
