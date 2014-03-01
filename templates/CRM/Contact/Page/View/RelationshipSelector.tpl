@@ -71,6 +71,7 @@
         {sClass: 'crm-contact-relationship-email'},
         {sClass: 'crm-contact-relationship-phone'},
         {sClass: 'crm-contact-relationship-links', bSortable: false},
+        {sClass: 'hiddenElement', bSortable: false}
       ],
       "bProcessing": true,
       "sPaginationType": "full_numbers",
@@ -78,7 +79,7 @@
       "bServerSide": true,
       "bJQueryUI": true,
       "sAjaxSource": sourceUrl,
-      "iDisplayLength": 5,
+      "iDisplayLength": 25,
       "oLanguage": {
         "sZeroRecords": ZeroRecordText,
         "sProcessing": {/literal}"{ts escape='js'}Processing...{/ts}"{literal},
@@ -100,6 +101,10 @@
           CRM.tabHeader.updateCount(cj('#tab_rel'), currentoTable.fnSettings().fnRecordsTotal());
         }
         {/literal}{/if}{literal}
+      },
+      "fnRowCallback": function( nRow, aData, iDisplayIndex, iDisplayIndexFull) {
+        cj(nRow).addClass('crm-entity');
+        cj(nRow).attr('id', 'relationship-'+ aData[9]);
       }
     });
   }

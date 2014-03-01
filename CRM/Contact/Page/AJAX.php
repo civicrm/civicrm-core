@@ -1200,6 +1200,7 @@ LIMIT {$offset}, {$rowCount}
       6 => 'email',
       7 => 'phone',
       8 => 'links',
+      9 => '',
     );
 
     $sEcho     = CRM_Utils_Type::escape($_REQUEST['sEcho'], 'Integer');
@@ -1233,6 +1234,7 @@ LIMIT {$offset}, {$rowCount}
       'email',
       'phone',
       'links',
+      'id',
     );
 
     echo CRM_Utils_JSON::encodeDataTableSelector($relationships, $sEcho, $iTotal, $iFilteredTotal, $selectorElements);
