@@ -271,6 +271,94 @@ CRM.validate = CRM.validate || {
     });
   };
 
+  /**
+   * Select2 api leaves something to be desired. To alter options on-the-fly often requires re-rendering the whole thing.
+   * So making this function public in case anyone needs it.
+   */
+  CRM.utils.buildSelect2Element = function() {
+    var $el = $(this);
+    var options = {};
+    // quickform doesn't support optgroups so here's a hack :(
+    $('option[value^=crm_optgroup]', this).each(function() {
+      $(this).nextUntil('option[value^=crm_optgroup]').wrapAll('<optgroup label="' + $(this).text() + '" />');
+      $(this).remove();
+    });
+    // Defaults for single-selects
+    if ($el.is('select:not([multiple])')) {
+      options.minimumResultsForSearch = 10;
+      options.allowClear = !($el.hasClass('required'));
+      if ($('option:first', this).val() === '') {
+        options.placeholderOption = 'first';
+      }
+    }
+    $.extend(options, $el.data('select-params') || {});
+    // Autocomplete using the getlist api
+    if ($el.data('api-entity') && $el.hasClass('crm-form-entityref')) {
+      $el.addClass('crm-ajax-select');
+      var settings = {
+        // Use select2 ajax helper instead of CRM.api because it provides more value
+        ajax: {
+          url: CRM.url('civicrm/ajax/rest'),
+          data: function (input, page_num) {
+            var params = $el.data('api-params') || {};
+            params.input = input;
+            params.page_num = page_num;
+            return {
+              entity: $el.data('api-entity'),
+              action: 'getlist',
+              json: JSON.stringify(params)
+            };
+          },
+          results: function(data) {
+            return {more: data.more_results, results: data.values || []};
+          }
+        },
+        formatResult: CRM.utils.formatSelect2Result,
+        formatSelection: function(row) {
+          return row.label;
+        },
+        escapeMarkup: function (m) {return m;},
+        initSelection: function(el, callback) {
+          callback(el.data('entity-value'));
+        }
+      };
+      if ($el.data('create-links')) {
+        options.formatInputTooShort = function() {
+          var txt = $el.data('select-params').formatInputTooShort || $.fn.select2.defaults.formatInputTooShort;
+          if ($el.data('create-links').length) {
+            txt += ' ' + ts('or') + '<br />' + CRM.utils.formatSelect2CreateLinks($el);
+          }
+          return txt;
+        };
+        options.formatNoMatches = function() {
+          var txt = $el.data('select-params').formatNoMatches || $.fn.select2.defaults.formatNoMatches;
+          return txt + '<br />' + CRM.utils.formatSelect2CreateLinks($el);
+        };
+        $el.on('select2-open', function() {
+          var $el = $(this);
+          $('#select2-drop').off('.crmEntity').on('click.crmEntity', 'a.crm-add-entity', function(e) {
+            $el.select2('close');
+            CRM.loadForm($(this).attr('href'), {
+              dialog: {width: 500, height: 'auto'}
+            }).on('crmFormSuccess', function(e, data) {
+              if ($el.select2('container').hasClass('select2-container-multi')) {
+                var selection = $el.select2('data');
+                selection.push(data);
+                $el.select2('data', selection);
+              } else {
+                $el.select2('data', data);
+              }
+            });
+            return false;
+          });
+        });
+      }
+      options = $.extend(settings, options);
+    }
+    options.dropdownCssClass = 'crm-container';
+    $(this).select2(options).removeClass('crm-select2');
+  };
+
   CRM.utils.formatSelect2Result = function(row) {
     var markup = '<div class="crm-select2-row">';
     if (row.image !== undefined) {
@@ -317,85 +405,7 @@ CRM.validate = CRM.validate || {
         target.toggleClass('crm-row-selected', $(this).is(':checked'));
       })
       .find('input.select-row:checked').parents('tr').addClass('crm-row-selected');
-    $('.crm-select2', e.target).each(function() {
-      var $el = $(this), options = {};
-      // quickform doesn't support optgroups so here's a hack :(
-      $('option[value^=crm_optgroup]', this).each(function() {
-        $(this).nextUntil('option[value^=crm_optgroup]').wrapAll('<optgroup label="' + $(this).text() + '" />');
-        $(this).remove();
-      });
-      // Defaults for single-selects
-      if ($el.is('select:not([multiple])')) {
-        options.minimumResultsForSearch = 10;
-        options.allowClear = !($el.hasClass('required'));
-        if ($('option:first', this).val() === '') {
-          options.placeholderOption = 'first';
-        }
-      }
-      $.extend(options, $el.data('select-params') || {});
-      // Autocomplete using the getlist api
-      if ($el.data('api-entity') && $el.hasClass('crm-form-entityref')) {
-        $el.addClass('crm-ajax-select');
-        var settings = {
-          // Use select2 ajax helper instead of CRM.api because it provides more value
-          ajax: {
-            url: CRM.url('civicrm/ajax/rest'),
-            data: function (input, page_num) {
-              var params = $el.data('api-params') || {};
-              params.input = input;
-              params.page_num = page_num;
-              return {
-                entity: $el.data('api-entity'),
-                action: 'getlist',
-                json: JSON.stringify(params)
-              };
-            },
-            results: function(data) {
-              return {more: data.more_results, results: data.values || []};
-            }
-          },
-          formatResult: CRM.utils.formatSelect2Result,
-          formatSelection: function(row) {
-            return row.label;
-          },
-          escapeMarkup: function (m) {return m;},
-          initSelection: function(el, callback) {
-            callback(el.data('entity-value'));
-          }
-        };
-        if ($el.data('create-links')) {
-          options.formatInputTooShort = function() {
-            var txt = $el.data('select-params').formatInputTooShort || $.fn.select2.defaults.formatInputTooShort;
-            return txt + ' ' + ts('or') + '<br />' + CRM.utils.formatSelect2CreateLinks($el);
-          };
-          options.formatNoMatches = function() {
-            var txt = $el.data('select-params').formatNoMatches || $.fn.select2.defaults.formatNoMatches;
-            return txt + '<br />' + CRM.utils.formatSelect2CreateLinks($el);
-          };
-          $el.on('select2-open', function() {
-            var $el = $(this);
-            $('#select2-drop').off('.crmEntity').on('click.crmEntity', 'a.crm-add-entity', function(e) {
-              $el.select2('close');
-              CRM.loadForm($(this).attr('href'), {
-                dialog: {width: 500, height: 'auto'}
-              }).on('crmFormSuccess', function(e, data) {
-                if ($el.select2('container').hasClass('select2-container-multi')) {
-                  var selection = $el.select2('data');
-                  selection.push(data);
-                  $el.select2('data', selection);
-                } else {
-                  $el.select2('data', data);
-                }
-              });
-              return false;
-            });
-          });
-        }
-        options = $.extend(settings, options);
-      }
-      options.dropdownCssClass = 'crm-container';
-      $(this).select2(options).removeClass('crm-select2');
-    });
+    $('.crm-select2', e.target).each(CRM.utils.buildSelect2Element);
   });
 
   /**
