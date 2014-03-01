@@ -1692,6 +1692,7 @@ AND cc.sort_name LIKE '%$name%'";
         $contactRelationships[$relationshipId]['email'] = $values['email'];
         $contactRelationships[$relationshipId]['phone'] = $values['phone'];
         $contactRelationships[$relationshipId]['links'] = $values['action'];
+        $contactRelationships[$relationshipId]['id'] = $values['id'];
       }
     }
     return $contactRelationships;
