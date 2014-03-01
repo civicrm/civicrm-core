@@ -55,7 +55,12 @@
     var context = {/literal}"{$context}"{literal};
     var sourceUrl = {/literal}'{crmURL p="civicrm/ajax/contactrelationships" h=0 q="context=$context&cid=$contactId"}'{literal};
 
-    var ZeroRecordText = {/literal}'{ts escape="js"}No matches found.{/ts}'{literal};
+    if (context == 'user') {
+      var ZeroRecordText = {/literal}'{ts escape="js"}There are no related contacts / organizations on record for you.{/ts}'{literal};
+    }
+    else {
+      var ZeroRecordText = {/literal}'{ts escape="js"}There are no Relationships entered for this contact.{/ts}'{literal};
+    }
 
     {/literal}{$context}{literal}oTable = cj('#crm-contact-relationship-selector-' + context).dataTable({
       "bFilter": false,
