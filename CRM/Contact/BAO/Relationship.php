@@ -971,7 +971,7 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
       }
 
       $offset = 0;
-      if (!empty($params['offset'])) {
+      if (!empty($params['offset']) && $params['offset'] > 0) {
         $offset = $params['offset'];
       }
 
