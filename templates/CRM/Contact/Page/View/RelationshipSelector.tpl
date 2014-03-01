@@ -58,8 +58,11 @@
     if (context == 'user') {
       var ZeroRecordText = {/literal}'{ts escape="js"}There are no related contacts / organizations on record for you.{/ts}'{literal};
     }
+    else if (context == 'past') {
+      var ZeroRecordText = {/literal}'{ts escape="js"}There are no past / disabled relationships for this contact.{/ts}'{literal};
+    }
     else {
-      var ZeroRecordText = {/literal}'{ts escape="js"}There are no Relationships entered for this contact.{/ts}'{literal};
+      var ZeroRecordText = {/literal}'{ts escape="js"}There are no relationships entered for this contact.{/ts}'{literal};
     }
 
     {/literal}{$context}{literal}oTable = cj('#crm-contact-relationship-selector-' + context).dataTable({
