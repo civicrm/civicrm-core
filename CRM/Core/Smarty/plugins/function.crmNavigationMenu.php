@@ -58,12 +58,11 @@ function smarty_function_crmNavigationMenu($params, &$smarty) {
     if ($contactID) {
       // These params force the browser to refresh the js file when switching user, domain, or language
       // We don't put them as a query string because some browsers will refuse to cache a page with a ? in the url
-      // We end the string with .js to trick apache mods into sending pro-caching headers
       // @see CRM_Admin_Page_AJAX::getNavigationMenu
       $lang = $config->lcMessages;
       $domain = CRM_Core_Config::domainID();
       $key = CRM_Core_BAO_Navigation::getCacheKey($contactID);
-      $src = CRM_Utils_System::url("civicrm/ajax/menujs/$contactID/$lang/$domain/$key.js");
+      $src = CRM_Utils_System::url("civicrm/ajax/menujs/$contactID/$lang/$domain/$key");
       return '<script type="text/javascript" src="' . $src . '"></script>';
     }
   }
