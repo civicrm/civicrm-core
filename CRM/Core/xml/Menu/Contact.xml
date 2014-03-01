@@ -409,4 +409,9 @@
   <title>Activities</title>
   <page_callback>CRM_Contact_Form_Task_SMS</page_callback>
 </item>
+  <item>
+    <path>civicrm/ajax/contactrelationships</path>
+    <page_callback>CRM_Contact_Page_AJAX::getContactRelationships</page_callback>
+    <access_arguments>access CiviCRM</access_arguments>
+  </item>
 </menu>
