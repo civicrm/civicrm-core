@@ -1639,21 +1639,41 @@ AND cc.sort_name LIKE '%$name%'";
     }
     $mask = CRM_Core_Action::mask($permissions);
 
+    if ($params['context'] != 'user') {
+      $links = CRM_Contact_Page_View_Relationship::links();
+      $permissionedContacts = FALSE;
+    }
+    else {
+      $links = CRM_Contact_Page_View_UserDashBoard::links();
+      $permissionedContacts = TRUE;
+      $mask = NULL;
+    }
     // get contact relationships
     $relationships = CRM_Contact_BAO_Relationship::getRelationship($params['contact_id'],
       $relationshipStatus,
       $params['rp'], 0, 0,
-      CRM_Contact_Page_View_Relationship::links(), $mask,
-      FALSE,
+      $links, $mask,
+      $permissionedContacts,
       $params
     );
 
     $contactRelationships = array();
+    $params['total'] = 0;
     if (!empty($relationships)) {
-      // add total
-      $params['total'] = CRM_Contact_BAO_Relationship::getRelationship($params['contact_id'],
-        $relationshipStatus,
-        0, 1);
+      // get the total relationships
+      if ($params['context'] != 'user') {
+        $params['total'] = CRM_Contact_BAO_Relationship::getRelationship($params['contact_id'],
+        $relationshipStatus, 0, 1, 0, NULL, NULL, $permissionedContacts);
+      }
+      else {
+        // FIX ME: we cannot directly determine total permissioned relationship, hence re-fire query
+        $permissionedRelationships = CRM_Contact_BAO_Relationship::getRelationship($params['contact_id'],
+          $relationshipStatus,
+          0, 0, 0,
+          NULL, NULL, TRUE
+        );
+        $params['total'] = count($permissionedRelationships);
+      }
 
       // format params
       foreach ($relationships as $relationshipId => $values) {
@@ -1667,7 +1687,7 @@ AND cc.sort_name LIKE '%$name%'";
           'civicrm/contact/view/rel',
           "action=view&reset=1&cid={$values['contact_id_a']}&id={$values['id']}&rtype={$values['rtype']}");
 
-        if ($params['context'] != 'past') {
+        if ($params['context'] == 'current') {
           if (($params['contact_id'] == $values['contact_id_a'] AND $values['is_permission_a_b'] == 1) OR
             ($params['contact_id'] == $values['contact_id_b'] AND $values['is_permission_b_a'] == 1)
           ) {
