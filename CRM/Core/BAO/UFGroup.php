@@ -3209,49 +3209,6 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
   }
 
   /**
-   * Function to retrieve reserved profiles
-   *
-   * @param string $name name if the reserve profile
-   * @param array $extraProfiles associated array of profile id's that needs to merge
-   *
-   * @return array $reservedProfiles returns associated array
-   * @static
-   */
-  static function getReservedProfiles($type = 'Contact', $extraProfiles = NULL) {
-    $reservedProfiles = array();
-    $profileNames = array();
-    if ($type == 'Contact') {
-      if (CRM_Contact_BAO_ContactType::isActive('Individual')) {
-        $profileNames[] = '"new_individual"';
-      }
-      if (CRM_Contact_BAO_ContactType::isActive('Household')) {
-        $profileNames[] = '"new_household"';
-      }
-      if (CRM_Contact_BAO_ContactType::isActive('Organization')) {
-        $profileNames[] = '"new_organization"';
-      }
-    }
-    if (!empty($profileNames)) {
-      $whereClause = 'name IN ( ' . implode(',', $profileNames) . ' ) AND is_reserved = 1';
-    }
-    else {
-      $whereClause = 'is_reserved = 1';
-    }
-
-    $query = "SELECT id, title FROM civicrm_uf_group WHERE {$whereClause}";
-
-    $dao = CRM_Core_DAO::executeQuery($query);
-    while ($dao->fetch()) {
-      $key = $dao->id;
-      if ($extraProfiles) {
-        $key .= ',' . implode(',', $extraProfiles);
-      }
-      $reservedProfiles[$key] = $dao->title;
-    }
-    return $reservedProfiles;
-  }
-
-  /**
    * @param array|string $profiles - name of profile(s) to create links for
    * @param array $appendProfiles - name of profile(s) to append to each link
    */
