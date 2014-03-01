@@ -1123,23 +1123,6 @@ LIMIT {$offset}, {$rowCount}
     CRM_Utils_System::civiExit();
   }
 
-  static function relationshipContactTypeList() {
-    $relType = CRM_Utils_Array::value('relType', $_REQUEST);
-
-    $types = CRM_Contact_BAO_Relationship::getValidContactTypeList($relType);
-
-    $elements = array();
-    foreach ($types as $key => $label) {
-      $elements[] = array(
-        'name' => $label,
-        'value' => $key,
-      );
-    }
-
-    echo json_encode($elements);
-    CRM_Utils_System::civiExit();
-  }
-
   static function selectUnselectContacts() {
     $name         = CRM_Utils_Array::value('name', $_REQUEST);
     $cacheKey     = CRM_Utils_Array::value('qfKey', $_REQUEST);
