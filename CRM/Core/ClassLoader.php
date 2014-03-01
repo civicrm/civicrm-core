@@ -108,6 +108,8 @@ class CRM_Core_ClassLoader {
     }
 
     $this->_registered = TRUE;
+
+    require_once dirname(dirname(__DIR__)) . '/vendor/autoload.php';
   }
 
   function loadClass($class) {
