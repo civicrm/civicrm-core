@@ -167,7 +167,7 @@ INSERT INTO civicrm_msg_template
         To use CiviMail:
         <ul>
           <li><a href="http://book.civicrm.org/user/advanced-configuration/email-system-configuration/">Configure your Email System</a>.</li>
-          <li>Make sure your web hosting provider allows outgoing bulk mail, and see if they have a restriction on quantity.  If they don\'t allow bulk mail, consider <a href="http://wiki.civicrm.org/confluence/display/CRM/Hosting+provider+information">finding a new host</a>.</li>
+          <li>Make sure your web hosting provider allows outgoing bulk mail, and see if they have a restriction on quantity.  If they don\'t allow bulk mail, consider <a href="https://civicrm.org/providers/hosting">finding a new host</a>.</li>
         </ul>
         Sincerely,
         <br /><br />
