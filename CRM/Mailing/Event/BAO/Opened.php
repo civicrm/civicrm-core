@@ -160,6 +160,47 @@ class CRM_Mailing_Event_BAO_Opened extends CRM_Mailing_Event_DAO_Opened {
   }
 
   /**
+   * Get opened count for each mailing for a given set of mailing IDs and a specific contact
+   *
+   * @param int $mailingIDs   IDs of the mailing (comma separated)
+   * @param int $contactID    ID of the contact
+   *
+   * @return array            Count per mailing ID
+   * @access public
+   * @static
+   */
+  public static function getMailingContactCount($mailingIDs, $contactID) {
+    $dao = new CRM_Core_DAO();
+    $openedCount = array();
+
+    $open = self::getTableName();
+    $queue = CRM_Mailing_Event_BAO_Queue::getTableName();
+    $job = CRM_Mailing_BAO_MailingJob::getTableName();
+    $mailingIDs = implode(',', $mailingIDs);
+
+    $query = "
+      SELECT $job.mailing_id as mailingID, COUNT($open.id) as opened
+      FROM $open
+      INNER JOIN $queue
+        ON  $open.event_queue_id = $queue.id
+        AND $queue.contact_id = $contactID
+      INNER JOIN $job
+        ON  $queue.job_id = $job.id
+        AND $job.is_test = 0
+      WHERE $job.mailing_id IN ({$mailingIDs})
+      GROUP BY civicrm_mailing_job.mailing_id
+    ";
+
+    $dao->query($query);
+
+    while ( $dao->fetch() ) {
+      $openedCount[$dao->mailingID] = $dao->opened;
+    }
+
+    return $openedCount;
+  }
+
+  /**
    * Get rows for the event browser
    *
    * @param int $mailing_id       ID of the mailing
