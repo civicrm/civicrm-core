@@ -32,16 +32,8 @@
     function refresh() {
       // Call native refresh method on ajax datatables
       if ($.fn.DataTable.fnIsDataTable($table[0]) && $table.dataTable().fnSettings().sAjaxSource) {
-        $table.unblock().dataTable().fnDraw();
-
-        // incase of more than 1 datatables on same page, refresh remaining datatables
-        $('table.dataTable').each(function () {
-          var currentTable = $(this);
-          if (currentTable.prop('id') != $table.prop('id')) {
-            if ($.fn.DataTable.fnIsDataTable(currentTable[0]) && currentTable.dataTable().fnSettings().sAjaxSource) {
-              currentTable.dataTable().fnDraw();
-            }
-          }
+        $.each($.fn.dataTable.fnTables(), function() {
+          $(this).dataTable().fnSettings().sAjaxSource && $(this).unblock().dataTable().fnDraw();
         });
       }
       // Otherwise refresh the content area using crmSnippet
