@@ -3223,7 +3223,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
         if (in_array($profile['name'], $profiles)) {
           $links[] = array(
             'label' => $profile['title'],
-            'url' => CRM_Utils_System::url('civicrm/profile/create', 'reset=1&gid=' . $id),
+            'url' => CRM_Utils_System::url('civicrm/profile/create', 'reset=1&context=dialog&&gid=' . $id),
             'name' => $profile['name'],
           );
         }
