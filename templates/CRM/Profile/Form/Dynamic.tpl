@@ -205,8 +205,6 @@ function checkResponse(responseText, statusText, xhr, $form) {
                 {if $field.html_type eq 'Autocomplete-Select'}
                   {if $field.data_type eq 'ContactReference'}
                     {include file="CRM/Custom/Form/ContactReference.tpl" element_name = $n}
-                  {else}
-                    {include file="CRM/Custom/Form/AutoComplete.tpl" element_name = $n}
                   {/if}
                 {/if}
               {/if}
@@ -297,58 +295,7 @@ cj(document).ready(function(){
   cj('#selector tr:odd ').addClass('even-row');
 });
 {/literal}
-{if $context eq 'dialog'}
-{literal}
-  var options = {
-      beforeSubmit:  showRequest
-  };
-
-  // bind form using 'ajaxForm'
-  cj('#Edit').ajaxForm( options );
-
-   // FIXME - this is improper use of jquery.form
-   // Do not use this code as an example
-  function showRequest(formData, jqForm, options) {
-    // formData is an array; here we use $.param to convert it to a string to display it
-    // but the form plugin does this for you automatically when it submits the data
-    var queryString = cj.param(formData);
-    queryString = queryString + '&snippet=5&gid=' + {/literal}"{$profileID}"{literal};
-    var postUrl = {/literal}"{crmURL p='civicrm/profile/create' h=0 }"{literal};
-    var blockNo = {/literal}{if $blockNo}{$blockNo}{else}null{/if}{literal};
-    var prefix  = {/literal}"{$prefix}"{literal};
-    var response = cj.ajax({
-      type: "POST",
-      url: postUrl,
-      async: false, // FIXME
-      data: queryString,
-      dataType: "json",
-      success: function( response ) {
-        if ( response.newContactSuccess ) {
-          cj('#' + prefix + 'contact_' + blockNo ).val( response.sortName ).focus( );
-          if ( typeof(allowMultiClient) != "undefined" ) {
-            if ( allowMultiClient ) {
-              cj('#' + prefix + 'contact_' + blockNo).tokenInput("add", {id: response.contactID, name: response.sortName });
-            }
-          }
-          cj('input[name="' + prefix + 'contact_select_id[' + blockNo +']"]').val( response.contactID );
-          CRM.alert(response.displayName + {/literal}'{ts escape="js"} has been created.{/ts}', '{ts escape="js"}Contact Saved{/ts}'{literal}, 'success');
-          cj('#contact-dialog-' + prefix + blockNo ).dialog('close');
-        }
-      }
-    }).responseText;
-
-    cj('#contact-dialog-' + prefix + blockNo).html( response );
-
-    // FIXME - we have used jquery.form very incorrectly
-    // and are now preventing it from doing what it's supposed to do
-    return false;
-  }
-
-{/literal}
-{/if}
-{literal}
 </script>
-{/literal}
 
 {/crmRegion}
 </div> {* end crm-profile-NAME *}

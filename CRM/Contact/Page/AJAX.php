@@ -241,24 +241,6 @@ class CRM_Contact_Page_AJAX {
     CRM_Core_Page_AJAX::autocompleteResults($results);
   }
 
-  /**
-   * Function to fetch the values
-   */
-  static function autocomplete() {
-    $fieldID       = CRM_Utils_Type::escape($_GET['cfid'], 'Integer');
-    $optionGroupID = CRM_Utils_Type::escape($_GET['ogid'], 'Integer');
-    $label         = CRM_Utils_Type::escape($_GET['s'], 'String');
-
-    $selectOption = CRM_Core_BAO_CustomOption::valuesByID($fieldID, $optionGroupID);
-    $results = array();
-    foreach ($selectOption as $id => $value) {
-      if (strtolower($label) == strtolower(substr($value, 0, strlen($label)))) {
-        $results[$id] = $value;
-      }
-    }
-    CRM_Core_Page_AJAX::autocompleteResults($results);
-  }
-
   static function relationship() {
     $relType         = CRM_Utils_Array::value('rel_type', $_REQUEST);
     $relContactID    = CRM_Utils_Array::value('rel_contact', $_REQUEST);

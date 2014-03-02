@@ -411,12 +411,7 @@ SELECT label, value
                 );
               }
               else {
-                if ($field['html_type'] == 'Autocomplete-Select') {
-                  $wildcard = FALSE;
-                  $val = array_search($value, $this->_options[$field['id']]);
-                }
-                elseif (in_array($field['html_type'], array(
-                  'Select', 'Radio'))) {
+                if (in_array($field['html_type'], array('Select', 'Radio', 'Autocomplete-Select'))) {
                   $wildcard = FALSE;
                   $val = CRM_Utils_Type::escape($value, 'String');
                 }

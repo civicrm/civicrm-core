@@ -565,10 +565,7 @@ class CRM_Event_BAO_Query {
         ),
       )
     );
-    $participantFee = &$form->add('text', 'participant_fee_level', ts('Fee Level'));
-
-    //elements for assigning value operation
-    $participantFeeId = &$form->add('hidden', 'participant_fee_id', '', array('id' => 'participant_fee_id'));
+    $form->add('text', 'participant_fee_id', ts('Fee Level'), array('class' => 'big crm-ajax-select'));
 
     CRM_Core_Form_Date::buildDateRange($form, 'event', 1, '_start_date_low', '_end_date_high', ts('From'), FALSE);
 
