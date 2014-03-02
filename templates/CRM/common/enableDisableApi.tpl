@@ -38,9 +38,8 @@
         $('table.dataTable').each(function () {
           var currentTable = $(this);
           if (currentTable.prop('id') != $table.prop('id')) {
-            currentTable.block();
             if ($.fn.DataTable.fnIsDataTable(currentTable[0]) && currentTable.dataTable().fnSettings().sAjaxSource) {
-              $(this).unblock().dataTable().fnDraw();
+              currentTable.dataTable().fnDraw();
             }
           }
         });
