@@ -79,6 +79,7 @@
         {sClass: 'crm-contact-relationship-email'},
         {sClass: 'crm-contact-relationship-phone'},
         {sClass: 'crm-contact-relationship-links', bSortable: false},
+        {sClass: 'hiddenElement', bSortable: false},
         {sClass: 'hiddenElement', bSortable: false}
       ],
       "bProcessing": true,
@@ -111,8 +112,13 @@
         {/literal}{/if}{literal}
       },
       "fnRowCallback": function( nRow, aData, iDisplayIndex, iDisplayIndexFull) {
-        cj(nRow).addClass('crm-entity');
         cj(nRow).attr('id', 'relationship-'+ aData[9]);
+        if (aData[10] == 0) {
+          cj(nRow).addClass('crm-entity disabled');
+        }
+        else {
+          cj(nRow).addClass('crm-entity');
+        }
       }
     });
   }

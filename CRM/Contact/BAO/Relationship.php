@@ -1713,6 +1713,7 @@ AND cc.sort_name LIKE '%$name%'";
         $contactRelationships[$relationshipId]['phone'] = $values['phone'];
         $contactRelationships[$relationshipId]['links'] = $values['action'];
         $contactRelationships[$relationshipId]['id'] = $values['id'];
+        $contactRelationships[$relationshipId]['is_active'] = $values['is_active'];
       }
     }
     return $contactRelationships;
