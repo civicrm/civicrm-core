@@ -70,6 +70,7 @@ class CRM_Core_ClassLoader {
     if ($this->_registered) {
       return;
     }
+    $civicrm_base_path = dirname(dirname(__DIR__));
 
     require_once dirname(dirname(__DIR__)) . '/vendor/autoload.php';
 
@@ -83,7 +84,7 @@ class CRM_Core_ClassLoader {
     // the files might not exists, in which case we skip loading the file
     // if you change the below, please test on Joomla and also PCP pages
     $includeHTMLPurifier = TRUE;
-    $htmlPurifierPath = dirname(__FILE__) . '/../../packages/IDS/vendors/htmlpurifier/HTMLPurifier/Bootstrap.php';
+    $htmlPurifierPath = "$civicrm_base_path/packages/IDS/vendors/htmlpurifier/HTMLPurifier/Bootstrap.php";
     if (
       class_exists('HTMLPurifier_Bootstrap') ||
       !file_exists($htmlPurifierPath)
@@ -102,7 +103,15 @@ class CRM_Core_ClassLoader {
     }
 
     $this->_registered = TRUE;
-
+    $packages_path = implode(DIRECTORY_SEPARATOR, array($civicrm_base_path, 'packages'));
+    $include_paths = array(
+      '.',
+      $civicrm_base_path,
+      $packages_path
+    );
+    $include_paths = implode(PATH_SEPARATOR, $include_paths);
+    set_include_path($include_paths . PATH_SEPARATOR . get_include_path());
+    require_once "$civicrm_base_path/vendor/autoload.php";
   }
 
   function loadClass($class) {

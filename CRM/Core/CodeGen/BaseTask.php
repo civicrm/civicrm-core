@@ -10,6 +10,5 @@ abstract class CRM_Core_CodeGen_BaseTask implements CRM_Core_CodeGen_ITask {
   // eventually be made into a first-class object.
   function setConfig($config) {
     $this->config = $config;
-    $this->tables = $this->config->tables;
   }
 }

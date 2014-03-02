@@ -1,0 +1,13 @@
+#!/usr/bin/env php
+<?php
+
+define('CIVICRM_TEMPLATE_COMPILEDIR', '/tmp/templates_c');
+$civicrm_base_dir = dirname(__DIR__);
+$bootstrap_path = implode(DIRECTORY_SEPARATOR, array($civicrm_base_dir, 'config', 'bootstrap.php'));
+require_once($bootstrap_path);
+
+use Symfony\Component\Console\Application;
+
+$application = new Application();
+$application->add(new \Civi\Tools\CodeGen());
+$application->run();

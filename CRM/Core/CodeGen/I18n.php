@@ -13,19 +13,20 @@ class CRM_Core_CodeGen_I18n extends CRM_Core_CodeGen_BaseTask {
     // CRM-7161: generate install/langs.php from the languages template
     // grep it for enabled languages and create a 'xx_YY' => 'Language name' $langs mapping
     $matches = array();
-    preg_match_all('/, 1, \'([a-z][a-z]_[A-Z][A-Z])\', \'..\', \{localize\}\'\{ts escape="sql"\}(.+)\{\/ts\}\'\{\/localize\}, /', file_get_contents('templates/languages.tpl'), $matches);
+    $languages_file_path = CRM_Utils_Path::join($this->config->civicrm_root_path, 'xml', 'templates', 'languages.tpl');
+    preg_match_all('/, 1, \'([a-z][a-z]_[A-Z][A-Z])\', \'..\', \{localize\}\'\{ts escape="sql"\}(.+)\{\/ts\}\'\{\/localize\}, /', file_get_contents($languages_file_path), $matches);
     $langs = array();
     for ($i = 0; $i < count($matches[0]); $i++) {
       $langs[$matches[1][$i]] = $matches[2][$i];
     }
-    file_put_contents('../install/langs.php', "<?php \$langs = " . var_export($langs, true) . ";");
+    $install_file_path = CRM_Utils_Path::join($this->config->civicrm_root_path, 'install', 'langs.php');
+    file_put_contents($install_file_path, "<?php \$langs = " . var_export($langs, true) . ";");
   }
 
   function generateSchemaStructure() {
-    echo "Generating CRM_Core_I18n_SchemaStructure...\n";
     $columns = array();
     $indices = array();
-    foreach ($this->tables as $table) {
+    foreach ($this->config->doctrine->dao_metadata as $table) {
       if ($table['localizable']) {
         $columns[$table['name']] = array();
       }
@@ -46,11 +47,10 @@ class CRM_Core_CodeGen_I18n extends CRM_Core_CodeGen_BaseTask {
       }
     }
 
-    $template = new CRM_Core_CodeGen_Util_Template('php');
+    $template = new CRM_Core_CodeGen_Util_Template($this->config, 'php');
 
     $template->assign('columns', $columns);
     $template->assign('indices', $indices);
-
     $template->run('schema_structure.tpl', $this->config->phpCodePath . "/CRM/Core/I18n/SchemaStructure.php");
   }
 }

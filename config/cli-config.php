@@ -35,12 +35,12 @@
 
 require_once 'bootstrap.php';
 
-$civicrm_root = dirname(__DIR__);
-chdir($civicrm_root);
-require_once ('civicrm.config.php');
-// autoload
-require_once $civicrm_root . '/CRM/Core/ClassLoader.php';
-CRM_Core_ClassLoader::singleton()->register();
+$civicrm_root_path = dirname(__DIR__);
+$civicrm_config_path = CRM_Utils_Path::join($civicrm_root_path, 'civicrm.config.php');
+$packages_path = CRM_Utils_Path::join($civicrm_root_path, 'packages');
+set_include_path(get_include_path() . PATH_SEPARATOR . $packages_path);
+require_once($civicrm_config_path);
+
 
 $entity_manager = CRM_DB_EntityManager::singleton();
 $platform = $entity_manager->getConnection()->getDatabasePlatform();

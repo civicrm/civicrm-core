@@ -1,6 +1,7 @@
 <?php
 
 class CRM_Core_CodeGen_Util_Template {
+  public $config;
   protected $filetype;
 
   protected $smarty;
@@ -12,7 +13,8 @@ class CRM_Core_CodeGen_Util_Template {
   /**
    * @param string $filetype
    */
-  function __construct($filetype) {
+  function __construct($config, $filetype) {
+    $this->config = $config;
     $this->compileDir = CRM_Core_CodeGen_Util_File::createTempDir('templates_c_');
 
     $this->filetype = $filetype;
@@ -20,7 +22,7 @@ class CRM_Core_CodeGen_Util_Template {
     // TODO use Core Smarty
     require_once 'Smarty/Smarty.class.php';
     $this->smarty = new Smarty();
-    $this->smarty->template_dir = './templates';
+    $this->smarty->template_dir = $this->config->xmlTemplatePath;
     $this->smarty->plugins_dir = self::$smartyPluginDirs;
     $this->smarty->compile_dir = $this->compileDir;
     $this->smarty->clear_all_cache();

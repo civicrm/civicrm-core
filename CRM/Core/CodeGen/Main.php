@@ -1,6 +1,9 @@
 <?php
 
 class CRM_Core_CodeGen_Main {
+  public $civicrm_root_path;
+  public $doctrine;
+  public $specification;
   var $buildVersion;
   var $db_version;
   var $cms; // drupal, joomla, wordpress
@@ -21,30 +24,34 @@ class CRM_Core_CodeGen_Main {
    * @var string|NULL a digest of the inputs to the code-generator (eg the properties and source files)
    */
   var $digest;
+  public $xmlTemplatePath;
 
-  function __construct($CoreDAOCodePath, $sqlCodePath, $phpCodePath, $tplCodePath, $smartyPluginDirs, $argCms, $argVersion, $schemaPath, $digestPath) {
-    $this->CoreDAOCodePath = $CoreDAOCodePath;
-    $this->sqlCodePath = $sqlCodePath;
-    $this->phpCodePath = $phpCodePath;
-    $this->tplCodePath = $tplCodePath;
-    $this->digestPath = $digestPath;
+  function __construct($options = array()) {
+    date_default_timezone_set('UTC');
+    $this->civicrm_root_path = dirname(dirname(dirname(__DIR__)));
+    $this->CoreDAOCodePath = CRM_Utils_Path::join($this->civicrm_root_path, 'CRM', 'Core', 'DAO');
+    $this->sqlCodePath = CRM_Utils_Path::join($this->civicrm_root_path, 'sql');
+    $this->phpCodePath = $this->civicrm_root_path;
+    $this->tplCodePath = CRM_Utils_Path::join($this->civicrm_root_path, 'templates');
+    $this->digestPath = CRM_Utils_Array::value('digest-path', $options);
     $this->digest = NULL;
-
-    // default cms is 'drupal', if not specified
-    $this->cms = isset($argCms) ? strtolower($argCms) : 'drupal';
-
-    CRM_Core_CodeGen_Util_Template::$smartyPluginDirs = $smartyPluginDirs;
-
-    $versionFile        = "version.xml";
-    $versionXML         = CRM_Core_CodeGen_Util_Xml::parse($versionFile);
-    $this->db_version         = $versionXML->version_no;
-    $this->buildVersion = preg_replace('/^(\d{1,2}\.\d{1,2})\.(\d{1,2}|\w{4,7})$/i', '$1', $this->db_version);
-    if (isset($argVersion)) {
-      // change the version to that explicitly passed, if any
-      $this->db_version = $argVersion;
+    $this->xmlTemplatePath = CRM_Utils_Path::join($this->civicrm_root_path, 'xml', 'templates');
+    $this->cms = CRM_Utils_Array::value('cms', $options, 'Drupal');
+    $this->schemaPath = CRM_Utils_Path::join($this->civicrm_root_path, 'xml', 'schema', 'Schema.xml');
+    $this->schemaPath = CRM_Utils_Array::value('schema-path', $options, $this->schemaPath);
+    define('CIVICRM_UF', $this->cms);
+    CRM_Core_CodeGen_Util_Template::$smartyPluginDirs = array(
+      CRM_Utils_Path::join($this->civicrm_root_path, 'packages', 'Smarty', 'plugins'),
+      CRM_Utils_Path::join($this->civicrm_root_path, 'CRM', 'Core', 'Smarty', 'plugins'),
+    );
+    if (array_key_exists('civi-version', $options)) {
+      $this->db_version = $options['civi-version'];
+    } else {
+      $version_file_path = CRM_Utils_Path::join($this->civicrm_root_path, 'xml', "version.xml");
+      $versionXML = CRM_Core_CodeGen_Util_Xml::parse($version_file_path);
+      $this->db_version = $versionXML->version_no;
     }
-
-    $this->schemaPath = $schemaPath;
+    $this->buildVersion = preg_replace('/^(\d{1,2}\.\d{1,2})\.(\d{1,2}|\w{4,7})$/i', '$1', $this->db_version);
   }
 
   /**
@@ -62,7 +69,6 @@ class CRM_Core_CodeGen_Main {
       unlink($this->digestPath);
     }
 
-    echo "\ncivicrm_domain.version := ". $this->db_version . "\n\n";
     if ($this->buildVersion < 1.1) {
       echo "The Database is not compatible for this version";
       exit();
@@ -78,11 +84,10 @@ Alternatively you can get a version of CiviCRM that matches your PHP version
       exit();
     }
 
-    $specification = new CRM_Core_CodeGen_Specification();
-    $specification->parse($this->schemaPath, $this->buildVersion);
-    # cheese:
-    $this->database = $specification->database;
-    $this->tables = $specification->tables;
+    $this->specification = new CRM_Core_CodeGen_Specification();
+    $this->specification->parse($this->schemaPath, $this->buildVersion);
+    $this->doctrine = new CRM_Core_CodeGen_Doctrine();
+    $this->doctrine->load();
 
     $this->runAllTasks();
 
