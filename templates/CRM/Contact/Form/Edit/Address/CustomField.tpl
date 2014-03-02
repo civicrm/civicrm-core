@@ -96,8 +96,6 @@
         {assign var="element_name" value="address[$blockId][$element_name]" }
                     {if $element.data_type eq 'ContactReference'}
                       {include file="CRM/Custom/Form/ContactReference.tpl"}
-                    {else}
-                      {include file="CRM/Custom/Form/AutoComplete.tpl"}
                     {/if}
                 {/if}
             </td>
