@@ -40,9 +40,10 @@ class CRM_Event_Page_AJAX {
 
   /**
    * Function for building EventFee combo box
+   * FIXME: This ajax callback could be eliminated in favor of an entityRef field but the priceFieldValue api doesn't currently support filtering on entity_table
    */
   function eventFee() {
-    $name = trim(CRM_Utils_Type::escape($_GET['s'], 'String'));
+    $name = trim(CRM_Utils_Type::escape($_GET['term'], 'String'));
 
     if (!$name) {
       $name = '%';
@@ -61,9 +62,10 @@ GROUP BY cv.label";
     $dao = CRM_Core_DAO::executeQuery($query);
     $results = array();
     while ($dao->fetch()) {
-      $results[$dao->id] = $dao->label;
+      $results[] = array('id' => $dao->id, 'text' => $dao->label);
     }
-    CRM_Core_Page_AJAX::autocompleteResults($results);
+    echo json_encode($results);
+    CRM_Utils_System::civiExit();
   }
 
 }

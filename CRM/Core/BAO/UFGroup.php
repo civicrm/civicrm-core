@@ -1098,7 +1098,7 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
                   $cfID,
                   $options
                 );
-                if ($htmlType == 'Autocomplete-Select') {
+                if ($field['data_type'] == 'ContactReference') {
                   $params[$index] = $values[$index];
                 }
                 if (CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomField',
@@ -2320,9 +2320,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
                   }
                 }
                 else {
-                  $label = CRM_Core_BAO_CustomOption::getOptionLabel($customFieldId, $details[$name]);
-                  $defaults[$fldName . '_id'] = $details[$name];
-                  $defaults[$fldName] = $label;
+                  $defaults[$fldName] = $details[$name];
                 }
                 break;
 
@@ -3225,7 +3223,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
         if (in_array($profile['name'], $profiles)) {
           $links[] = array(
             'label' => $profile['title'],
-            'url' => CRM_Utils_System::url('civicrm/profile/create', 'reset=1&gid=' . $id),
+            'url' => CRM_Utils_System::url('civicrm/profile/create', 'reset=1&context=dialog&&gid=' . $id),
             'name' => $profile['name'],
           );
         }

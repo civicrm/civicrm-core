@@ -682,7 +682,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
    *
    * @param int   $fieldID  the custom field ID
    *
-   * @return object $field  the field object
+   * @return CRM_Core_DAO_CustomField $field  the field object
    * @static
    * public
    */
@@ -714,7 +714,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
   /**
    * This function for building custom fields
    *
-   * @param object  $qf             form object (reference)
+   * @param CRM_Core_Form  $qf             form object (reference)
    * @param string  $elementName    name of the custom field
    * @param boolean $inactiveNeeded
    * @param boolean $userRequired   true if required else false
@@ -753,6 +753,8 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
     if ($field->html_type == 'TextArea' && $search) {
       $field->html_type = 'Text';
     }
+    
+    $placeholder = $search ? ts('- any -') : ($useRequired ? ts('- select -') : ts('- none -'));
 
     // FIXME: Why are select state/country separate widget types?
     if (in_array($field->html_type, array('Select', 'Multi-Select', 'Select State/Province', 'Multi-Select State/Province', 'Select Country', 'Multi-Select Country'))) {
@@ -884,8 +886,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
           $field->option_group_id
         );
         $qf->add('select', $elementName, $label,
-          array(
-            '' => ts('- select -')) + $selectOption,
+          array('' => $placeholder) + $selectOption,
           $useRequired && !$search,
           $selectAttributes
         );
@@ -975,7 +976,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
 
       case 'Select State/Province':
         //Add State
-        $stateOption = array('' => ts('- select -')) + CRM_Core_PseudoConstant::stateProvince();
+        $stateOption = array('' => $placeholder) + CRM_Core_PseudoConstant::stateProvince();
         $qf->add('select', $elementName, $label, $stateOption,
           $useRequired && !$search,
           $selectAttributes
@@ -995,7 +996,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
 
       case 'Select Country':
         //Add Country
-        $countryOption = array('' => ts('- select -')) + CRM_Core_PseudoConstant::country();
+        $countryOption = array('' => $placeholder) + CRM_Core_PseudoConstant::country();
         $qf->add('select', $elementName, $label, $countryOption,
           $useRequired && !$search,
           $selectAttributes
@@ -1021,18 +1022,18 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
         break;
 
       case 'Autocomplete-Select':
-        $qf->add('text', $elementName, $label, $field->attributes,
-          $useRequired && !$search
-        );
-
-        $hiddenEleName = $elementName . '_id';
-        if (substr($elementName, -1) == ']') {
-          $hiddenEleName = substr($elementName, 0, -1) . '_id]';
-        }
-        $qf->addElement('hidden', $hiddenEleName, '', array('id' => str_replace(array(']', '['), array('', '_'), $hiddenEleName)));
-
         static $customUrls = array();
         if ($field->data_type == 'ContactReference') {
+          $qf->add('text', $elementName, $label, $field->attributes,
+            $useRequired && !$search
+          );
+
+          $hiddenEleName = $elementName . '_id';
+          if (substr($elementName, -1) == ']') {
+            $hiddenEleName = substr($elementName, 0, -1) . '_id]';
+          }
+          $qf->addElement('hidden', $hiddenEleName, '', array('id' => str_replace(array(']', '['), array('', '_'), $hiddenEleName)));
+
           //$urlParams = "className=CRM_Contact_Page_AJAX&fnName=getContactList&json=1&reset=1&context=customfield&id={$field->id}";
           $urlParams = "context=customfield&id={$field->id}";
 
@@ -1045,16 +1046,24 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
           $qf->addRule($elementName, ts('Select a valid contact for %1.', array(1 => $label)), 'validContact', $actualElementValue);
         }
         else {
-          $customUrls[$elementName] = CRM_Utils_System::url('civicrm/ajax/auto',
-            "reset=1&ogid={$field->option_group_id}&cfid={$field->id}",
-            FALSE, NULL, FALSE
+          $attributes = array();
+          // Fixme: why is this a string in the first place???
+          if ($field->attributes) {
+            foreach(explode(' ', $field->attributes) as $at) {
+              if (strpos($at, '=')) {
+                list($k, $v) = explode('=', $at);
+                $attributes[$k] = trim($v, ' "');
+              }
+            }
+          }
+          $attributes += array(
+            'entity' => 'option_value',
+            'placeholder' => $placeholder,
+            'api' => array(
+              'params' => array('option_group_id' => $field->option_group_id),
+            ),
           );
-          $qf->addRule($elementName, ts('Select a valid value for %1.', array(1 => $label)),
-            'autocomplete', array(
-              'fieldID' => $field->id,
-              'optionGroupID' => $field->option_group_id,
-            )
-          );
+          $qf->addEntityRef($elementName, $label, $attributes, $useRequired && !$search);
         }
 
         $qf->assign('customUrls', $customUrls);
@@ -1475,9 +1484,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
           }
         }
         else {
-          $label = CRM_Core_BAO_CustomOption::getOptionLabel($customField->id, $value);
-          $defaults[$elementName . '_id'] = $value;
-          $defaults[$elementName] = $label;
+          $defaults[$elementName] = $value;
         }
         break;
 
