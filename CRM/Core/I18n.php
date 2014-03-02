@@ -463,6 +463,11 @@ function ts($text, $params = array()) {
     $config = CRM_Core_Config::singleton();
   }
 
+  // Allow lazy programmers to pass a string instead of an array
+  if (is_string($params)) {
+    $params = array(1 => $params);
+  }
+
   global $tsLocale;
   if (!$i18n or $locale != $tsLocale) {
     $i18n = CRM_Core_I18n::singleton();
