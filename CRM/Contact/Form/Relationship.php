@@ -261,8 +261,9 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
           'entity_id' => $this->_relationshipId,
           'entity_table' => 'civicrm_relationship',
           'limit' => 1,
+          'version' => 3
         );
-        $note = civicrm_api3('note' ,'getsingle', $noteParams);
+        $note = civicrm_api('Note' ,'getsingle', $noteParams);
         $defaults['note'] = CRM_Utils_Array::value('note', $note);
       }
     }
