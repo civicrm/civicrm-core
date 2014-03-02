@@ -1328,9 +1328,7 @@ ORDER BY civicrm_custom_group.weight,
               }
             }
             else {
-              $label = CRM_Core_BAO_CustomOption::getOptionLabel($field['id'], $value);
-              $defaults[$hiddenEleName] = $value;
-              $defaults[$elementName] = $label;
+              $defaults[$elementName] = $value;
             }
             break;
 
