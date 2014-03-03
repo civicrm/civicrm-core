@@ -56,7 +56,3 @@
   {include file="CRM/common/enableDisableApi.tpl"}
 {/if} {* close of custom data else*}
 
-{if !empty($searchRows) }
-  {*include custom data js file*}
-  {include file="CRM/common/customData.tpl"}
-{/if}
