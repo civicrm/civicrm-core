@@ -1259,7 +1259,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * @access public
    * @return HTML_QuickForm_Element
    */
-  function addEntityRef($name, $label, $props = array(), $required = FALSE) {
+  function addEntityRef($name, $label = '', $props = array(), $required = FALSE) {
     $config = CRM_Core_Config::singleton();
     // Default properties
     $props['api'] = CRM_Utils_Array::value('api', $props, array());

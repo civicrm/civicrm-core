@@ -341,12 +341,14 @@ CRM.validate = CRM.validate || {
             CRM.loadForm($(this).attr('href'), {
               dialog: {width: 500, height: 'auto'}
             }).on('crmFormSuccess', function(e, data) {
-              if ($el.select2('container').hasClass('select2-container-multi')) {
-                var selection = $el.select2('data');
-                selection.push(data);
-                $el.select2('data', selection);
-              } else {
-                $el.select2('data', data);
+              if (data.status === 'success' && data.id) {
+                if ($el.select2('container').hasClass('select2-container-multi')) {
+                  var selection = $el.select2('data');
+                  selection.push(data);
+                  $el.select2('data', selection, true);
+                } else {
+                  $el.select2('data', data, true);
+                }
               }
             });
             return false;
@@ -964,6 +966,8 @@ CRM.validate = CRM.validate || {
           return false;
         });
       }
+      // For convenience, focus the first field
+      $('input[type=text], textarea, select', this).filter(':visible').first().focus();
     });
     return widget;
   };
