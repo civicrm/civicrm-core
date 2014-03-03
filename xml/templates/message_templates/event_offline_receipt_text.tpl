@@ -131,9 +131,13 @@ registration process.{/ts}
 {foreach from=$amount item=amnt key=level}{$amnt.amount|crmMoney} {$amnt.label}
 {/foreach}
 {/if}
-{if $isPrimary }
+{if $isPrimary}
 
-{ts}Total Amount{/ts}: {$totalAmount|crmMoney} {if $hookDiscount.message}({$hookDiscount.message}){/if}
+{if $balanceAmount}{ts}Total Paid{/ts}{else}{ts}Total Amount{/ts}{/if}: {$totalAmount|crmMoney} {if $hookDiscount.message}({$hookDiscount.message}){/if}
+
+{if $balanceAmount}
+{ts}Balance{/ts}: {$balanceAmount|crmMoney}
+{/if}
 
 {if $pricesetFieldsCount }
       {assign var="count" value= 0}
