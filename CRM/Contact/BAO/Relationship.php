@@ -382,10 +382,6 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
       ) {
         $relationshipType[$key . '_a_b'] = $value["{$column}_a_b"];
       }
-      elseif (empty($value['contact_type_b'])) {
-        // case contact_type_b is "all contacts", CRM-9877
-        $relationshipType[$key . '_a_b'] = $value["{$column}_a_b"];
-      }
 
       if (((!$value['contact_type_b']) ||
           $value['contact_type_b'] == $contactType
@@ -404,10 +400,6 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
           )
         )
       ) {
-        $relationshipType[$key . '_b_a'] = $value["{$column}_b_a"];
-      }
-      elseif (empty($value['contact_type_a'])) {
-        // case contact_type_a is "all contacts", CRM-9877
         $relationshipType[$key . '_b_a'] = $value["{$column}_b_a"];
       }
 
