@@ -146,7 +146,7 @@
       userModifiedAmount = cj(this).val();
       userModifiedAmount = parseInt(userModifiedAmount);
       if (userModifiedAmount < feeAmount) {
-        cj('#status_id').select2('val', partiallyPaidStatusId);
+        cj('#status_id').val(partiallyPaidStatusId).change();
       }
     }
   );
