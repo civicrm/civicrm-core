@@ -245,16 +245,6 @@
      <page_callback>CRM_Dashlet_Page_Blog</page_callback>
   </item>
   <item>
-    <path>civicrm/ajax/state</path>
-    <page_callback>CRM_Core_Page_AJAX_Location::state</page_callback>
-    <access_arguments>access CiviCRM</access_arguments>
-  </item>
-  <item>
-    <path>civicrm/ajax/country</path>
-    <page_callback>CRM_Core_Page_AJAX_Location::country</page_callback>
-    <access_arguments>access CiviCRM</access_arguments>
-  </item>
-  <item>
     <path>civicrm/ajax/search</path>
     <page_callback>CRM_Contact_Page_AJAX::search</page_callback>
     <access_arguments>access CiviCRM</access_arguments>
