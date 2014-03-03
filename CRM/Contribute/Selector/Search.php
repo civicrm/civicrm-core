@@ -198,8 +198,12 @@ class CRM_Contribute_Selector_Search extends CRM_Core_Selector_Base implements C
       NULL, FALSE, FALSE,
       CRM_Contact_BAO_Query::MODE_CONTRIBUTE
     );
-    $this->_query->_distinctComponentClause = " civicrm_contribution.id";
-    $this->_query->_groupByComponentClause = " GROUP BY civicrm_contribution.id ";
+    if ($this->_includeSoftCredits) {
+      $this->_query->_rowCountClause = " count(civicrm_contribution.id)";
+    } else {
+      $this->_query->_distinctComponentClause = " civicrm_contribution.id";
+      $this->_query->_groupByComponentClause = " GROUP BY civicrm_contribution.id ";
+    }
   }
   //end of constructor
 
