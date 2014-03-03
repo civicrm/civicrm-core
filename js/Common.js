@@ -964,6 +964,8 @@ CRM.validate = CRM.validate || {
           return false;
         });
       }
+      // For convenience, focus the first field
+      $('input[type=text], textarea, select', this).filter(':visible').first().focus();
     });
     return widget;
   };
