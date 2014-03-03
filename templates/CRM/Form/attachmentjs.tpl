@@ -5,7 +5,8 @@
   }
 
   function showDeleteAttachment(fileName, postURLData, fileID, divName, divFile) {
-    var confirmMsg = '<div>{/literal}{ts escape="js"}Are you sure you want to delete attachment: {/ts}{literal}' + fileName + '&nbsp; <a href="#" onclick="deleteAttachment( \'' + postURLData + '\',' + fileID + ',\'' + divName + '\', \'' + divFile + '\' ); return false;" style="text-decoration: underline;">{/literal}</div><div>{ts escape='js'}Yes{/ts}{literal}</a>&nbsp;&nbsp;&nbsp;<a href="#" onclick="hideStatusAttachment( \'' + divName + '\' ); return false;" style="text-decoration: underline;">{/literal}{ts escape='js'}No{/ts}{literal}</a></div>';
+    var confirmMsg = '<div>{/literal}{ts escape="js"}Are you sure you want to delete attachment: {/ts}{literal}' 
+    + fileName + '&nbsp; <a href="#" onclick="deleteAttachment( \'' + postURLData + '\',' + fileID + ',\'' + divName + '\', \'' + divFile + '\' ); return false;" style="text-decoration: underline;">{/literal}<\/div><div>{ts escape='js'}Yes{/ts}{literal}<\/a>&nbsp;&nbsp;&nbsp;<a href="#" onclick="hideStatusAttachment( \'' + divName + '\' ); return false;" style="text-decoration: underline;">{/literal}{ts escape='js'}No{/ts}{literal}<\/a></\div>';
     cj(divName).show().html(confirmMsg);
   }
 
