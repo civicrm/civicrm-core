@@ -332,6 +332,10 @@
     {if $participantId}
       {include file="CRM/Contribute/Page/PaymentInfo.tpl" show='event-payment'}
     {/if}
+
+    {*include custom data js file*}
+    {include file="CRM/common/customData.tpl"}
+
     <script type="text/javascript">
       {literal}
       cj(function($) {
@@ -553,9 +557,6 @@
       });
     </script>
     {/literal}
-
-    {*include custom data js file*}
-    {include file="CRM/common/customData.tpl"}
 
     {* jscript to warn if unsaved form field changes *}
     {include file="CRM/common/formNavigate.tpl"}
