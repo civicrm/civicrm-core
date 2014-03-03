@@ -289,9 +289,8 @@ class CRM_Core_Invoke {
 
       $result = NULL;
       if (is_array($item['page_callback'])) {
-        $newArgs = explode('/', $_GET[$config->userFrameworkURLVar]);
         require_once (str_replace('_', DIRECTORY_SEPARATOR, $item['page_callback'][0]) . '.php');
-        $result = call_user_func($item['page_callback'], $newArgs);
+        $result = call_user_func($item['page_callback']);
       }
       elseif (strstr($item['page_callback'], '_Form')) {
         $wrapper = new CRM_Utils_Wrapper();
