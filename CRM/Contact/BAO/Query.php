@@ -323,6 +323,8 @@ class CRM_Contact_BAO_Query {
    */
   public $_distinctComponentClause;
 
+  public $_rowCountClause;
+
   /**
    * use groupBy component clause for component searches
    *
@@ -1240,7 +1242,9 @@ class CRM_Contact_BAO_Query {
    */
   function query($count = FALSE, $sortByChar = FALSE, $groupContacts = FALSE) {
     if ($count) {
-      if (isset($this->_distinctComponentClause)) {
+      if (isset($this->_rowCountClause)) {
+        $select = "SELECT {$this->_rowCountClause}";
+      } else if (isset($this->_distinctComponentClause)) {
         // we add distinct to get the right count for components
         // for the more complex result set, we use GROUP BY the same id
         // CRM-9630

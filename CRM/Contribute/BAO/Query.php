@@ -42,6 +42,8 @@ class CRM_Contribute_BAO_Query {
    */
   static $_contributionFields = NULL;
 
+  static $_contribOrSoftCredit = "only_contribs";
+
   /**
    * Function get the import/export fields for contribution
    *
@@ -191,6 +193,8 @@ class CRM_Contribute_BAO_Query {
 
   static function where(&$query) {
     $grouping = NULL;
+
+    self::isIncludeSoftCredits($query->_params);
     foreach (array_keys($query->_params) as $id) {
       if (empty($query->_params[$id][0])) {
         continue;
@@ -352,8 +356,12 @@ class CRM_Contribute_BAO_Query {
 
       case 'contribution_or_softcredits':
         if ($value == 'only_scredits') {
-          $query->_where[$grouping][] = "civicrm_contribution_soft.id IS NOT NULL";
+          $query->_where[$grouping][] = "contribution_search_scredit_combined.scredit_id IS NOT NULL";
           $query->_qill[$grouping][] = ts('Contributions OR Soft Credits? - Soft Credits Only');
+          $query->_tables['civicrm_contribution_soft'] = $query->_whereTables['civicrm_contribution_soft'] = 1;
+        } else if ($value == 'both_related') {
+          $query->_where[$grouping][] = "contribution_search_scredit_combined.filter_id IS NOT NULL";
+          $query->_qill[$grouping][] = ts('Contributions OR Soft Credits? - Related To Each Other');
           $query->_tables['civicrm_contribution_soft'] = $query->_whereTables['civicrm_contribution_soft'] = 1;
         } else if ($value == 'both') {
           $query->_qill[$grouping][] = ts('Contributions OR Soft Credits? - Both');
@@ -638,9 +646,14 @@ class CRM_Contribute_BAO_Query {
   static function from($name, $mode, $side) {
     $from = NULL;
     switch ($name) {
-      case 'civicrm_contribution':
-        $from = " $side JOIN civicrm_contribution ON civicrm_contribution.contact_id = contact_a.id ";
-        break;
+    case 'civicrm_contribution':
+      $from = " $side JOIN civicrm_contribution ON civicrm_contribution.contact_id = contact_a.id ";
+      if (in_array(self::$_contribOrSoftCredit, array("only_scredits", "both_related", "both"))) {
+        // switch the from table if its only soft credit search
+        $from  = " $side JOIN contribution_search_scredit_combined ON contribution_search_scredit_combined.contact_id = contact_a.id ";
+        $from .= " $side JOIN civicrm_contribution ON civicrm_contribution.id = contribution_search_scredit_combined.id ";
+      }
+      break;
 
       case 'civicrm_contribution_recur':
         if ($mode == 1) {
@@ -713,11 +726,20 @@ class CRM_Contribute_BAO_Query {
         break;
 
       case 'civicrm_contribution_soft':
-        $from = " $side JOIN civicrm_contribution_soft ON civicrm_contribution_soft.contribution_id = civicrm_contribution.id";
+        if (in_array(self::$_contribOrSoftCredit, array("only_scredits", "both_related", "both"))) {
+          $from = " $side JOIN civicrm_contribution_soft ON civicrm_contribution_soft.id = contribution_search_scredit_combined.scredit_id";
+        } else {
+          $from = " $side JOIN civicrm_contribution_soft ON civicrm_contribution_soft.contribution_id = civicrm_contribution.id";
+        }
         break;
 
       case 'civicrm_contribution_soft_contact':
-        $from .= " $side JOIN civicrm_contact civicrm_contact_d ON (civicrm_contribution_soft.contact_id = civicrm_contact_d.id )";
+        if (in_array(self::$_contribOrSoftCredit, array("only_scredits", "both_related", "both"))) {
+          $from .= " $side JOIN civicrm_contact civicrm_contact_d ON (civicrm_contribution.contact_id = civicrm_contact_d.id ) 
+            AND contribution_search_scredit_combined.scredit_id IS NOT NULL";
+        } else {
+          $from .= " $side JOIN civicrm_contact civicrm_contact_d ON (civicrm_contribution_soft.contact_id = civicrm_contact_d.id )";
+        }
         break;
 
       case 'civicrm_contribution_soft_email':
@@ -751,10 +773,19 @@ class CRM_Contribute_BAO_Query {
         continue;
       }
       if ($queryParams[$id][0] == 'contribution_or_softcredits' && 
-        ($queryParams[$id][2] == 'only_scredits' || 
-        $queryParams[$id][2] == 'both')) {
+        in_array($queryParams[$id][2], array("only_scredits", "both_related", "both"))) {
+          $tempQuery = "
+            CREATE TEMPORARY TABLE IF NOT EXISTS contribution_search_scredit_combined AS 
+               SELECT con.id as id, con.contact_id, cso.id as filter_id, NULL as scredit_id 
+                 FROM civicrm_contribution con
+            LEFT JOIN civicrm_contribution_soft cso ON con.id = cso.contribution_id 
+            UNION ALL
+               SELECT scredit.contribution_id as id, scredit.contact_id, scredit.id as filter_id, scredit.id as scredit_id 
+                 FROM civicrm_contribution_soft as scredit";
+          CRM_Core_DAO::executeQuery($tempQuery);
+          self::$_contribOrSoftCredit = $queryParams[$id][2];
           return TRUE;
-      }
+        }
     }
     return FALSE;
   }
@@ -923,8 +954,9 @@ class CRM_Contribute_BAO_Query {
 
     // Soft credit related fields
     $options = array(
-      'only_contribs' => ts('Contributions Only'),
+      'both_related'  => ts('Related To Each Other'),
       'only_scredits' => ts('Soft Credits Only'),
+      'only_contribs' => ts('Contributions Only'),
       'both'          => ts('Both'),
     );
     $form->add('select', 'contribution_or_softcredits', ts('Contributions OR Soft Credits?'), $options, FALSE, array('class' => "crm-select2"));
