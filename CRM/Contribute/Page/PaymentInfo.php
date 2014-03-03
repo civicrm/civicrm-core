@@ -52,10 +52,6 @@ class CRM_Contribute_Page_PaymentInfo extends CRM_Core_Page {
     if ($this->_context == 'payment_info') {
       $this->assign('paymentInfo', $paymentInfo);
     }
-    else {
-      $rows = CRM_Utils_Array::value('transaction', $paymentInfo);
-      $this->assign('rows', $rows);
-    }
   }
 
   function run() {

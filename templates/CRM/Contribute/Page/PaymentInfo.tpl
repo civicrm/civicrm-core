@@ -54,7 +54,7 @@ cj(function($){
     <td>{$paymentInfo.total|crmMoney}</td>
     <td class='right'>
       {if $paymentInfo.paid > 0}
-        <a class='action-item' href='{crmURL p="civicrm/payment/view" q="action=browse&cid=`$cid`&id=`$paymentInfo.id`&component=`$paymentInfo.component`&context=transaction"}'>{$paymentInfo.paid|crmMoney}<br/>>> view payments</a>
+        <a class='action-item' href='{crmURL p="civicrm/payment" q="view=transaction&cid=`$cid`&id=`$paymentInfo.id`&component=`$paymentInfo.component`&action=browse"}'>{$paymentInfo.paid|crmMoney}<br/>>> view payments</a>
       {/if}
     </td>
     <td class='right'>{$paymentInfo.balance|crmMoney}</td>
@@ -66,36 +66,6 @@ cj(function($){
   {elseif $paymentInfo.balance < 0}
      {assign var=paymentButtonName value='Record Refund'}
   {/if}
-  <a class="button" href='{crmURL p="civicrm/payment/add" q="reset=1&component=`$component`&id=`$id`&cid=`$cid`"}' title="{ts}{$paymentButtonName}{/ts}"><span><div class="icon add-icon"></div> {ts}{$paymentButtonName}{/ts}</span></a>
+  <a class="button" href='{crmURL p="civicrm/payment" q="action=add&reset=1&component=`$component`&id=`$id`&cid=`$cid`"}' title="{ts}{$paymentButtonName}{/ts}"><span><div class="icon add-icon"></div> {ts}{$paymentButtonName}{/ts}</span></a>
 {/if}
-{elseif $context eq 'transaction'}
-  {if !empty($rows)}
-   <table id='info'>
-     <tr class="columnheader">
-       <th>{ts}Amount{/ts}</th>
-       <th>{ts}Type{/ts}</th>
-       <th>{ts}Paid By{/ts}</th>
-       <th>{ts}Received{/ts}</th>
-       <th>{ts}Transaction ID{/ts}</th>
-       <th>{ts}Status{/ts}</th>
-     </tr>
-     {foreach from=$rows item=row}
-     <tr>
-       <td>{$row.total_amount|crmMoney}</td>
-       <td>{$row.financial_type}</td>
-       <td>{$row.payment_instrument}</td>
-       <td>{$row.receive_date|crmDate}</td>
-       <td>{$row.trxn_id}</td>
-       <td>{$row.status}</td>
-     </tr>
-     {/foreach}
-    <table>
-  {else}
-     {if $component eq 'event'}
-       {assign var='entity' value='participant'}
-     {else}
-       {assign var='entity' value=$component}
-     {/if}
-    {ts 1=$entity}No additional payments found for this %1 record{/ts}
-  {/if}
 {/if}

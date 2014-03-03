@@ -74,11 +74,26 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
 
   protected $_fromEmails = NULL;
 
+  protected $_view = NULL;
+
+  public $_action = NULL;
+
   public function preProcess() {
     $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this, TRUE);
     $this->_contactId = CRM_Utils_Request::retrieve('cid', 'Positive', $this, TRUE);
     $this->_component = CRM_Utils_Request::retrieve('component', 'String', $this, TRUE);
+    $this->_view = CRM_Utils_Request::retrieve('view', 'String', $this, FALSE);
+    $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE);
+    $this->assign('component', $this->_component);
+    $this->assign('id', $this->_id);
 
+    if ($this->_view == 'transaction' && ($this->_action & CRM_Core_Action::BROWSE)) {
+      $paymentInfo = CRM_Contribute_BAO_Contribution::getPaymentInfo($this->_id, $this->_component, TRUE);
+      $transactionRows = $paymentInfo['transaction'];
+      $this->assign('transaction', TRUE);
+      $this->assign('rows', $transactionRows);
+      return;
+    }
     $this->_fromEmails = CRM_Core_BAO_Email::getFromEmail();
     $this->_formType = CRM_Utils_Array::value('formType', $_GET);
 
@@ -126,8 +141,6 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
 
     $this->assign('contributionMode', $this->_mode);
     $this->assign('contactId', $this->_contactId);
-    $this->assign('component', $this->_component);
-    $this->assign('id', $this->_id);
     $this->assign('paymentType', $this->_paymentType);
     $this->assign('paymentAmt', abs($paymentAmt));
 
@@ -140,6 +153,9 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
   }
 
   public function setDefaultValues() {
+    if ($this->_view == 'transaction' && ($this->_action & CRM_Core_Action::BROWSE)) {
+      return;
+    }
     if ($this->_mode) {
       $defaults = $this->_values;
 
@@ -165,6 +181,18 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
   }
 
   public function buildQuickForm() {
+    if ($this->_view == 'transaction' && ($this->_action & CRM_Core_Action::BROWSE)) {
+      $this->addButtons(array(
+          array(
+            'type' => 'cancel',
+            'name' => ts('Done'),
+            'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
+            'isDefault' => TRUE,
+          ),
+        )
+      );
+      return;
+    }
     $ccPane = NULL;
     if ($this->_mode) {
       if (CRM_Utils_Array::value('payment_type', $this->_processors) & CRM_Core_Payment::PAYMENT_TYPE_DIRECT_DEBIT
