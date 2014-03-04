@@ -90,6 +90,12 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
     if ($this->_view == 'transaction' && ($this->_action & CRM_Core_Action::BROWSE)) {
       $paymentInfo = CRM_Contribute_BAO_Contribution::getPaymentInfo($this->_id, $this->_component, TRUE);
       $transactionRows = $paymentInfo['transaction'];
+      $title = ts('View Payment');
+      if ($this->_component == 'event') {
+        $info = CRM_Event_BAO_Participant::participantDetails($this->_id);
+        $title .= " - {$info['title']}";
+      }
+      CRM_Utils_System::setTitle($title);
       $this->assign('transaction', TRUE);
       $this->assign('rows', $transactionRows);
       return;
