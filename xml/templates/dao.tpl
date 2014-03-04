@@ -183,6 +183,9 @@ class {$table.className} extends CRM_Core_DAO {ldelim}
 {if $field.length}
                       'maxlength' => {$field.length},
 {/if} {* field.length *}
+{if $field.precision}
+                      'precision'      => array({$field.precision}),
+{/if}
 {if $field.size}
                       'size'      => {$field.size},
 {/if} {* field.size *}
