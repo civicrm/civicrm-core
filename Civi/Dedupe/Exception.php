@@ -51,7 +51,7 @@ class Exception extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, unsigned=true)
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -120,6 +120,49 @@ class Exception extends \Civi\Core\Entity {
    */
   public function getContact2() {
     return $this->contact2;
+  }
+
+  /**
+   * returns all the column names of this table
+   *
+   * @access public
+   * @return array
+   */
+  static function &fields( ) {
+    if ( !self::$_fields) {
+      self::$_fields = array (
+      
+              'id' => array(
+      
+        'name' => 'id',
+        'type' => CRM_Utils_Type::T_INT,
+                        'required' => true,
+                                             
+                                    
+                          ),
+      
+              'contact_id1' => array(
+      
+        'name' => 'contact_id1',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('First Dupe Contact ID'),
+                                                     
+                                    
+                'FKClassName' => 'CRM_Contact_Contact',
+                          ),
+      
+              'contact_id2' => array(
+      
+        'name' => 'contact_id2',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Second Dupe Contact ID'),
+                                                     
+                                    
+                'FKClassName' => 'CRM_Contact_Contact',
+                          ),
+             );
+    }
+    return self::$_fields;
   }
 
 }

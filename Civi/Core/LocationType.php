@@ -51,7 +51,7 @@ class LocationType extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, unsigned=true)
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -260,6 +260,97 @@ class LocationType extends \Civi\Core\Entity {
    */
   public function getIsDefault() {
     return $this->isDefault;
+  }
+
+  /**
+   * returns all the column names of this table
+   *
+   * @access public
+   * @return array
+   */
+  static function &fields( ) {
+    if ( !self::$_fields) {
+      self::$_fields = array (
+      
+              'id' => array(
+      
+        'name' => 'id',
+        'type' => CRM_Utils_Type::T_INT,
+                        'required' => true,
+                                             
+                                    
+                          ),
+      
+              'name' => array(
+      
+        'name' => 'name',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Location Type'),
+                                 'maxlength' => 64,
+                         'size' => CRM_Utils_Type::BIG,
+                           
+                                    
+                          ),
+      
+              'display_name' => array(
+      
+        'name' => 'display_name',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Display Name'),
+                                 'maxlength' => 64,
+                         'size' => CRM_Utils_Type::BIG,
+                           
+                                    
+                          ),
+      
+              'vcard_name' => array(
+      
+        'name' => 'vcard_name',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('vCard Location Type'),
+                                 'maxlength' => 64,
+                         'size' => CRM_Utils_Type::BIG,
+                           
+                                    
+                          ),
+      
+              'description' => array(
+      
+        'name' => 'description',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Description'),
+                                 'maxlength' => 255,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                                    
+                          ),
+      
+              'is_reserved' => array(
+      
+        'name' => 'is_reserved',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                                                     
+                                    
+                          ),
+      
+              'is_active' => array(
+      
+        'name' => 'is_active',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                                                     
+                                    
+                          ),
+      
+              'is_default' => array(
+      
+        'name' => 'is_default',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                                                     
+                                    
+                          ),
+             );
+    }
+    return self::$_fields;
   }
 
 }

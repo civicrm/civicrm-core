@@ -51,7 +51,7 @@ class CampaignGroup extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, unsigned=true)
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -84,7 +84,7 @@ class CampaignGroup extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="entity_id", type="integer", nullable=false)
+   * @ORM\Column(name="entity_id", type="integer", unsigned=true, nullable=false)
    * 
    */
   private $entityId = 'NULL';
@@ -176,6 +176,80 @@ class CampaignGroup extends \Civi\Core\Entity {
    */
   public function getEntityId() {
     return $this->entityId;
+  }
+
+  /**
+   * returns all the column names of this table
+   *
+   * @access public
+   * @return array
+   */
+  static function &fields( ) {
+    if ( !self::$_fields) {
+      self::$_fields = array (
+      
+              'id' => array(
+      
+        'name' => 'id',
+        'type' => CRM_Utils_Type::T_INT,
+                        'required' => true,
+                                             
+                                    
+                          ),
+      
+              'campaign_id' => array(
+      
+        'name' => 'campaign_id',
+        'type' => CRM_Utils_Type::T_INT,
+                        'required' => true,
+                                             
+                                    
+                'FKClassName' => 'CRM_Campaign_Campaign',
+                                     'pseudoconstant' => array(
+                                'table' => 'civicrm_campaign',
+                      'keyColumn' => 'id',
+                      'labelColumn' => 'title',
+                    )
+                 ),
+      
+              'group_type' => array(
+      
+        'name' => 'group_type',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Group Type'),
+                                 'maxlength' => 8,
+                         'size' => CRM_Utils_Type::EIGHT,
+                           
+                                           'default' => 'NULL',
+         
+                                     'pseudoconstant' => array(
+                                '0' => 'not in database',
+                    )
+                 ),
+      
+              'entity_table' => array(
+      
+        'name' => 'entity_table',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Entity Table'),
+                                 'maxlength' => 64,
+                         'size' => CRM_Utils_Type::BIG,
+                           
+                                           'default' => 'NULL',
+         
+                          ),
+      
+              'entity_id' => array(
+      
+        'name' => 'entity_id',
+        'type' => CRM_Utils_Type::T_INT,
+                                                     
+                                           'default' => 'NULL',
+         
+                          ),
+             );
+    }
+    return self::$_fields;
   }
 
 }

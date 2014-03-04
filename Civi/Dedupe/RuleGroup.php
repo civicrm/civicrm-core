@@ -51,7 +51,7 @@ class RuleGroup extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, unsigned=true)
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -68,7 +68,7 @@ class RuleGroup extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="threshold", type="integer", nullable=true)
+   * @ORM\Column(name="threshold", type="integer", unsigned=true, nullable=true)
    * 
    */
   private $threshold;
@@ -232,6 +232,101 @@ class RuleGroup extends \Civi\Core\Entity {
    */
   public function getIsReserved() {
     return $this->isReserved;
+  }
+
+  /**
+   * returns all the column names of this table
+   *
+   * @access public
+   * @return array
+   */
+  static function &fields( ) {
+    if ( !self::$_fields) {
+      self::$_fields = array (
+      
+              'id' => array(
+      
+        'name' => 'id',
+        'type' => CRM_Utils_Type::T_INT,
+                        'required' => true,
+                                             
+                                    
+                          ),
+      
+              'contact_type' => array(
+      
+        'name' => 'contact_type',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Contact Type'),
+                                 'maxlength' => 12,
+                         'size' => CRM_Utils_Type::TWELVE,
+                           
+                                    
+                                     'pseudoconstant' => array(
+                                'table' => 'civicrm_contact_type',
+                      'keyColumn' => 'name',
+                      'labelColumn' => 'label',
+                      'condition' => 'parent_id IS NULL',
+                    )
+                 ),
+      
+              'threshold' => array(
+      
+        'name' => 'threshold',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Threshold'),
+                        'required' => true,
+                                             
+                                    
+                          ),
+      
+              'used' => array(
+      
+        'name' => 'used',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Used'),
+                        'required' => true,
+                         'maxlength' => 12,
+                         'size' => CRM_Utils_Type::TWELVE,
+                           
+                                    
+                                     'pseudoconstant' => array(
+                                '0' => 'not in database',
+                    )
+                 ),
+      
+              'name' => array(
+      
+        'name' => 'name',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Name'),
+                                 'maxlength' => 64,
+                         'size' => CRM_Utils_Type::BIG,
+                           
+                                    
+                          ),
+      
+              'title' => array(
+      
+        'name' => 'title',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Title'),
+                                 'maxlength' => 255,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                                    
+                          ),
+      
+              'is_reserved' => array(
+      
+        'name' => 'is_reserved',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                                                     
+                                    
+                          ),
+             );
+    }
+    return self::$_fields;
   }
 
 }

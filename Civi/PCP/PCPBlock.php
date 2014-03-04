@@ -51,7 +51,7 @@ class PCPBlock extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, unsigned=true)
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -68,7 +68,7 @@ class PCPBlock extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="entity_id", type="integer", nullable=true)
+   * @ORM\Column(name="entity_id", type="integer", unsigned=true, nullable=true)
    * 
    */
   private $entityId;
@@ -84,7 +84,7 @@ class PCPBlock extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="target_entity_id", type="integer", nullable=true)
+   * @ORM\Column(name="target_entity_id", type="integer", unsigned=true, nullable=true)
    * 
    */
   private $targetEntityId;
@@ -116,7 +116,7 @@ class PCPBlock extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="tellfriend_limit", type="integer", nullable=false)
+   * @ORM\Column(name="tellfriend_limit", type="integer", unsigned=true, nullable=false)
    * 
    */
   private $tellfriendLimit = 'NULL';
@@ -372,6 +372,142 @@ class PCPBlock extends \Civi\Core\Entity {
    */
   public function getNotifyEmail() {
     return $this->notifyEmail;
+  }
+
+  /**
+   * returns all the column names of this table
+   *
+   * @access public
+   * @return array
+   */
+  static function &fields( ) {
+    if ( !self::$_fields) {
+      self::$_fields = array (
+      
+              'id' => array(
+      
+        'name' => 'id',
+        'type' => CRM_Utils_Type::T_INT,
+                        'required' => true,
+                                             
+                                    
+                          ),
+      
+              'entity_table' => array(
+      
+        'name' => 'entity_table',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Entity Table'),
+                                 'maxlength' => 64,
+                         'size' => CRM_Utils_Type::BIG,
+                           
+                                    
+                          ),
+      
+              'entity_id' => array(
+      
+        'name' => 'entity_id',
+        'type' => CRM_Utils_Type::T_INT,
+                        'required' => true,
+                                             
+                                    
+                          ),
+      
+              'target_entity_type' => array(
+      
+        'name' => 'target_entity_type',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Target Entity Type'),
+                        'required' => true,
+                         'maxlength' => 255,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                                           'default' => 'contribute',
+         
+                          ),
+      
+              'target_entity_id' => array(
+      
+        'name' => 'target_entity_id',
+        'type' => CRM_Utils_Type::T_INT,
+                        'required' => true,
+                                             
+                                    
+                          ),
+      
+              'supporter_profile_id' => array(
+      
+        'name' => 'supporter_profile_id',
+        'type' => CRM_Utils_Type::T_INT,
+                                                     
+                                           'default' => 'NULL',
+         
+                'FKClassName' => 'CRM_Core_UFGroup',
+                          ),
+      
+              'is_approval_needed' => array(
+      
+        'name' => 'is_approval_needed',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                                                     
+                                           'default' => 'NULL',
+         
+                          ),
+      
+              'is_tellfriend_enabled' => array(
+      
+        'name' => 'is_tellfriend_enabled',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                                                     
+                                           'default' => 'NULL',
+         
+                          ),
+      
+              'tellfriend_limit' => array(
+      
+        'name' => 'tellfriend_limit',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Tellfriend Limit'),
+                                                     
+                                           'default' => 'NULL',
+         
+                          ),
+      
+              'link_text' => array(
+      
+        'name' => 'link_text',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Link Text'),
+                                 'maxlength' => 255,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                                           'default' => 'NULL',
+         
+                          ),
+      
+              'is_active' => array(
+      
+        'name' => 'is_active',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                                                     
+                                           'default' => '1',
+         
+                          ),
+      
+              'notify_email' => array(
+      
+        'name' => 'notify_email',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Notify Email'),
+                                 'maxlength' => 255,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                                           'default' => 'NULL',
+         
+                          ),
+             );
+    }
+    return self::$_fields;
   }
 
 }

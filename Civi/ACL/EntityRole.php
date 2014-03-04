@@ -51,7 +51,7 @@ class EntityRole extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, unsigned=true)
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -60,7 +60,7 @@ class EntityRole extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="acl_role_id", type="integer", nullable=true)
+   * @ORM\Column(name="acl_role_id", type="integer", unsigned=true, nullable=true)
    * 
    */
   private $aclRoleId;
@@ -76,7 +76,7 @@ class EntityRole extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="entity_id", type="integer", nullable=true)
+   * @ORM\Column(name="entity_id", type="integer", unsigned=true, nullable=true)
    * 
    */
   private $entityId;
@@ -176,6 +176,67 @@ class EntityRole extends \Civi\Core\Entity {
    */
   public function getIsActive() {
     return $this->isActive;
+  }
+
+  /**
+   * returns all the column names of this table
+   *
+   * @access public
+   * @return array
+   */
+  static function &fields( ) {
+    if ( !self::$_fields) {
+      self::$_fields = array (
+      
+              'id' => array(
+      
+        'name' => 'id',
+        'type' => CRM_Utils_Type::T_INT,
+                        'required' => true,
+                                             
+                                    
+                          ),
+      
+              'acl_role_id' => array(
+      
+        'name' => 'acl_role_id',
+        'type' => CRM_Utils_Type::T_INT,
+                        'required' => true,
+                                             
+                                    
+                          ),
+      
+              'entity_table' => array(
+      
+        'name' => 'entity_table',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Entity Table'),
+                        'required' => true,
+                         'maxlength' => 64,
+                         'size' => CRM_Utils_Type::BIG,
+                           
+                                    
+                          ),
+      
+              'entity_id' => array(
+      
+        'name' => 'entity_id',
+        'type' => CRM_Utils_Type::T_INT,
+                        'required' => true,
+                                             
+                                    
+                          ),
+      
+              'is_active' => array(
+      
+        'name' => 'is_active',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                                                     
+                                    
+                          ),
+             );
+    }
+    return self::$_fields;
   }
 
 }

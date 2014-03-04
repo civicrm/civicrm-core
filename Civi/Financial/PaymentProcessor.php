@@ -51,7 +51,7 @@ class PaymentProcessor extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, unsigned=true)
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -188,7 +188,7 @@ class PaymentProcessor extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="billing_mode", type="integer", nullable=true)
+   * @ORM\Column(name="billing_mode", type="integer", unsigned=true, nullable=true)
    * 
    */
   private $billingMode;
@@ -204,7 +204,7 @@ class PaymentProcessor extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="payment_type", type="integer", nullable=false)
+   * @ORM\Column(name="payment_type", type="integer", unsigned=true, nullable=false)
    * 
    */
   private $paymentType = '1';
@@ -596,6 +596,221 @@ class PaymentProcessor extends \Civi\Core\Entity {
    */
   public function getPaymentType() {
     return $this->paymentType;
+  }
+
+  /**
+   * returns all the column names of this table
+   *
+   * @access public
+   * @return array
+   */
+  static function &fields( ) {
+    if ( !self::$_fields) {
+      self::$_fields = array (
+      
+              'id' => array(
+      
+        'name' => 'id',
+        'type' => CRM_Utils_Type::T_INT,
+                        'required' => true,
+                                             
+                                    
+                          ),
+      
+              'domain_id' => array(
+      
+        'name' => 'domain_id',
+        'type' => CRM_Utils_Type::T_INT,
+                        'required' => true,
+                                             
+                                    
+                'FKClassName' => 'CRM_Core_Domain',
+                          ),
+      
+              'name' => array(
+      
+        'name' => 'name',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Payment Processor'),
+                                 'maxlength' => 64,
+                         'size' => CRM_Utils_Type::BIG,
+                           
+                                    
+                          ),
+      
+              'description' => array(
+      
+        'name' => 'description',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Description'),
+                                 'maxlength' => 255,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                                    
+                          ),
+      
+              'payment_processor_type_id' => array(
+      
+        'name' => 'payment_processor_type_id',
+        'type' => CRM_Utils_Type::T_INT,
+                                                     
+                                    
+                'FKClassName' => 'CRM_Financial_PaymentProcessorType',
+                          ),
+      
+              'is_active' => array(
+      
+        'name' => 'is_active',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                                                     
+                                    
+                          ),
+      
+              'is_default' => array(
+      
+        'name' => 'is_default',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                                                     
+                                    
+                          ),
+      
+              'is_test' => array(
+      
+        'name' => 'is_test',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                                                     
+                                    
+                          ),
+      
+              'user_name' => array(
+      
+        'name' => 'user_name',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('User Name'),
+                                 'maxlength' => 255,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                                    
+                          ),
+      
+              'password' => array(
+      
+        'name' => 'password',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Password'),
+                                 'maxlength' => 255,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                                    
+                          ),
+      
+              'signature' => array(
+      
+        'name' => 'signature',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Signature'),
+                                 'maxlength' => 255,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                                    
+                          ),
+      
+              'url_site' => array(
+      
+        'name' => 'url_site',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Site URL'),
+                                 'maxlength' => 255,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                                    
+                          ),
+      
+              'url_api' => array(
+      
+        'name' => 'url_api',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('API URL'),
+                                 'maxlength' => 255,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                                    
+                          ),
+      
+              'url_recur' => array(
+      
+        'name' => 'url_recur',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Recurring Payments URL'),
+                                 'maxlength' => 255,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                                    
+                          ),
+      
+              'url_button' => array(
+      
+        'name' => 'url_button',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Button URL'),
+                                 'maxlength' => 255,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                                    
+                          ),
+      
+              'subject' => array(
+      
+        'name' => 'subject',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Subject'),
+                                 'maxlength' => 255,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                                    
+                          ),
+      
+              'class_name' => array(
+      
+        'name' => 'class_name',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Suffix for PHP clas name implementation'),
+                                 'maxlength' => 255,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                                    
+                          ),
+      
+              'billing_mode' => array(
+      
+        'name' => 'billing_mode',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Billing Mode'),
+                        'required' => true,
+                                             
+                                    
+                          ),
+      
+              'is_recur' => array(
+      
+        'name' => 'is_recur',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                                                     
+                                    
+                          ),
+      
+              'payment_type' => array(
+      
+        'name' => 'payment_type',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Payment Type'),
+                                                     
+                                           'default' => '1',
+         
+                          ),
+             );
+    }
+    return self::$_fields;
   }
 
 }

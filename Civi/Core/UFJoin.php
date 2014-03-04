@@ -51,7 +51,7 @@ class UFJoin extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, unsigned=true)
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -84,7 +84,7 @@ class UFJoin extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="entity_id", type="integer", nullable=true)
+   * @ORM\Column(name="entity_id", type="integer", unsigned=true, nullable=true)
    * 
    */
   private $entityId;
@@ -92,7 +92,7 @@ class UFJoin extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="weight", type="integer", nullable=false)
+   * @ORM\Column(name="weight", type="integer", unsigned=true, nullable=false)
    * 
    */
   private $weight = '1';
@@ -260,6 +260,106 @@ class UFJoin extends \Civi\Core\Entity {
    */
   public function getModuleData() {
     return $this->moduleData;
+  }
+
+  /**
+   * returns all the column names of this table
+   *
+   * @access public
+   * @return array
+   */
+  static function &fields( ) {
+    if ( !self::$_fields) {
+      self::$_fields = array (
+      
+              'id' => array(
+      
+        'name' => 'id',
+        'type' => CRM_Utils_Type::T_INT,
+                        'required' => true,
+                                             
+                                    
+                          ),
+      
+              'is_active' => array(
+      
+        'name' => 'is_active',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                                                     
+                                           'default' => '1',
+         
+                          ),
+      
+              'module' => array(
+      
+        'name' => 'module',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Module'),
+                        'required' => true,
+                         'maxlength' => 64,
+                         'size' => CRM_Utils_Type::BIG,
+                           
+                                    
+                          ),
+      
+              'entity_table' => array(
+      
+        'name' => 'entity_table',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Entity Table'),
+                                 'maxlength' => 64,
+                         'size' => CRM_Utils_Type::BIG,
+                           
+                                    
+                          ),
+      
+              'entity_id' => array(
+      
+        'name' => 'entity_id',
+        'type' => CRM_Utils_Type::T_INT,
+                                                     
+                                    
+                          ),
+      
+              'weight' => array(
+      
+        'name' => 'weight',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Weight'),
+                        'required' => true,
+                                             
+                                           'default' => '1',
+         
+                          ),
+      
+              'uf_group_id' => array(
+      
+        'name' => 'uf_group_id',
+        'type' => CRM_Utils_Type::T_INT,
+                        'required' => true,
+                                             
+                                    
+                'FKClassName' => 'CRM_Core_UFGroup',
+                                     'pseudoconstant' => array(
+                                'table' => 'civicrm_uf_group',
+                      'keyColumn' => 'id',
+                      'labelColumn' => 'title',
+                    )
+                 ),
+      
+              'module_data' => array(
+      
+        'name' => 'module_data',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Module Data'),
+                                 'maxlength' => 255,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                                    
+                          ),
+             );
+    }
+    return self::$_fields;
   }
 
 }

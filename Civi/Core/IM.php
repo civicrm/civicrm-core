@@ -51,7 +51,7 @@ class IM extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, unsigned=true)
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -68,7 +68,7 @@ class IM extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="location_type_id", type="integer", nullable=true)
+   * @ORM\Column(name="location_type_id", type="integer", unsigned=true, nullable=true)
    * 
    */
   private $locationTypeId;
@@ -84,7 +84,7 @@ class IM extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="provider_id", type="integer", nullable=true)
+   * @ORM\Column(name="provider_id", type="integer", unsigned=true, nullable=true)
    * 
    */
   private $providerId;
@@ -232,6 +232,97 @@ class IM extends \Civi\Core\Entity {
    */
   public function getIsBilling() {
     return $this->isBilling;
+  }
+
+  /**
+   * returns all the column names of this table
+   *
+   * @access public
+   * @return array
+   */
+  static function &fields( ) {
+    if ( !self::$_fields) {
+      self::$_fields = array (
+      
+              'id' => array(
+      
+        'name' => 'id',
+        'type' => CRM_Utils_Type::T_INT,
+                        'required' => true,
+                                             
+                                    
+                          ),
+      
+              'contact_id' => array(
+      
+        'name' => 'contact_id',
+        'type' => CRM_Utils_Type::T_INT,
+                                                     
+                                    
+                'FKClassName' => 'CRM_Contact_Contact',
+                          ),
+      
+              'location_type_id' => array(
+      
+        'name' => 'location_type_id',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('IM Location Type'),
+                                                     
+                                    
+                                     'pseudoconstant' => array(
+                                'table' => 'civicrm_location_type',
+                      'keyColumn' => 'id',
+                      'labelColumn' => 'display_name',
+                    )
+                 ),
+      
+              'name' => array(
+      
+        'name' => 'name',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('IM Screen Name'),
+                                 'maxlength' => 64,
+                         'size' => CRM_Utils_Type::BIG,
+                           
+                'import' => true,
+        'where' => 'civicrm_im.name',
+        'headerPattern' => '/I(nstant )?M(ess.*)?|screen(\s+)?name/i',
+        'dataPattern' => '/^[A-Za-z][0-9A-Za-z]{20,}$/',
+                         'export' => true,
+                                   
+                          ),
+      
+              'provider_id' => array(
+      
+        'name' => 'provider_id',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('IM Provider'),
+                                                     
+                                    
+                                     'pseudoconstant' => array(
+                                'optionGroupName' => 'instant_messenger_service',
+                    )
+                 ),
+      
+              'is_primary' => array(
+      
+        'name' => 'is_primary',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                'title' => ts('Is IM Primary?'),
+                                                     
+                                    
+                          ),
+      
+              'is_billing' => array(
+      
+        'name' => 'is_billing',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                                                     
+                                    
+                          ),
+             );
+    }
+    return self::$_fields;
   }
 
 }

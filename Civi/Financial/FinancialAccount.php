@@ -51,7 +51,7 @@ class FinancialAccount extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, unsigned=true)
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -76,7 +76,7 @@ class FinancialAccount extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="financial_account_type_id", type="integer", nullable=false)
+   * @ORM\Column(name="financial_account_type_id", type="integer", unsigned=true, nullable=false)
    * 
    */
   private $financialAccountTypeId = '3';
@@ -456,6 +456,172 @@ class FinancialAccount extends \Civi\Core\Entity {
    */
   public function getIsDefault() {
     return $this->isDefault;
+  }
+
+  /**
+   * returns all the column names of this table
+   *
+   * @access public
+   * @return array
+   */
+  static function &fields( ) {
+    if ( !self::$_fields) {
+      self::$_fields = array (
+      
+              'id' => array(
+      
+        'name' => 'id',
+        'type' => CRM_Utils_Type::T_INT,
+                        'required' => true,
+                                             
+                                    
+                          ),
+      
+              'name' => array(
+      
+        'name' => 'name',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Name'),
+                        'required' => true,
+                         'maxlength' => 255,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                                    
+                          ),
+      
+              'financial_account_contact_id' => array(
+      
+        'name' => 'contact_id',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Contact ID'),
+                                                     
+                                    
+                'FKClassName' => 'CRM_Contact_Contact',
+                          ),
+      
+              'financial_account_type_id' => array(
+      
+        'name' => 'financial_account_type_id',
+        'type' => CRM_Utils_Type::T_INT,
+                        'required' => true,
+                                             
+                                           'default' => '3',
+         
+                                     'pseudoconstant' => array(
+                                'optionGroupName' => 'financial_account_type',
+                    )
+                 ),
+      
+              'accounting_code' => array(
+      
+        'name' => 'accounting_code',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Accounting Code'),
+                                 'maxlength' => 64,
+                         'size' => CRM_Utils_Type::BIG,
+                           
+                         'export' => true,
+                'where' => 'civicrm_financial_account.accounting_code',
+        'headerPattern' => '',
+        'dataPattern' => '',
+                                   
+                          ),
+      
+              'account_type_code' => array(
+      
+        'name' => 'account_type_code',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Account Type Code'),
+                                 'maxlength' => 64,
+                         'size' => CRM_Utils_Type::BIG,
+                           
+                         'export' => true,
+                'where' => 'civicrm_financial_account.account_type_code',
+        'headerPattern' => '',
+        'dataPattern' => '',
+                                   
+                          ),
+      
+              'description' => array(
+      
+        'name' => 'description',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Description'),
+                                 'maxlength' => 255,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                                    
+                          ),
+      
+              'parent_id' => array(
+      
+        'name' => 'parent_id',
+        'type' => CRM_Utils_Type::T_INT,
+                                                     
+                                    
+                'FKClassName' => 'CRM_Financial_FinancialAccount',
+                          ),
+      
+              'is_header_account' => array(
+      
+        'name' => 'is_header_account',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                                                     
+                                    
+                          ),
+      
+              'is_deductible' => array(
+      
+        'name' => 'is_deductible',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                                                     
+                                           'default' => '1',
+         
+                          ),
+      
+              'is_tax' => array(
+      
+        'name' => 'is_tax',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                                                     
+                                    
+                          ),
+      
+              'tax_rate' => array(
+      
+        'name' => 'tax_rate',
+        'type' => CRM_Utils_Type::T_MONEY,
+                'title' => ts('Tax Rate'),
+                                                     
+                                    
+                          ),
+      
+              'is_reserved' => array(
+      
+        'name' => 'is_reserved',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                                                     
+                                    
+                          ),
+      
+              'is_active' => array(
+      
+        'name' => 'is_active',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                                                     
+                                    
+                          ),
+      
+              'is_default' => array(
+      
+        'name' => 'is_default',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                                                     
+                                    
+                          ),
+             );
+    }
+    return self::$_fields;
   }
 
 }

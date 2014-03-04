@@ -51,7 +51,7 @@ class ContributionSoft extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, unsigned=true)
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -124,7 +124,7 @@ class ContributionSoft extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="soft_credit_type_id", type="integer", nullable=false)
+   * @ORM\Column(name="soft_credit_type_id", type="integer", unsigned=true, nullable=false)
    * 
    */
   private $softCreditTypeId = 'NULL';
@@ -316,6 +316,150 @@ class ContributionSoft extends \Civi\Core\Entity {
    */
   public function getSoftCreditTypeId() {
     return $this->softCreditTypeId;
+  }
+
+  /**
+   * returns all the column names of this table
+   *
+   * @access public
+   * @return array
+   */
+  static function &fields( ) {
+    if ( !self::$_fields) {
+      self::$_fields = array (
+      
+              'contribution_soft_id' => array(
+      
+        'name' => 'id',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Soft Contribution ID'),
+                        'required' => true,
+                                             
+                'import' => true,
+        'where' => 'civicrm_contribution_soft.id',
+        'headerPattern' => '',
+        'dataPattern' => '',
+                         'export' => true,
+                                   
+                          ),
+      
+              'contribution_id' => array(
+      
+        'name' => 'contribution_id',
+        'type' => CRM_Utils_Type::T_INT,
+                        'required' => true,
+                                             
+                                    
+                'FKClassName' => 'CRM_Contribute_Contribution',
+                          ),
+      
+              'contribution_soft_contact_id' => array(
+      
+        'name' => 'contact_id',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Contact ID'),
+                        'required' => true,
+                                             
+                'import' => true,
+        'where' => 'civicrm_contribution_soft.contact_id',
+        'headerPattern' => '/contact(.?id)?/i',
+        'dataPattern' => '/^\d+$/',
+                         'export' => true,
+                                   
+                'FKClassName' => 'CRM_Contact_Contact',
+                          ),
+      
+              'amount' => array(
+      
+        'name' => 'amount',
+        'type' => CRM_Utils_Type::T_MONEY,
+                'title' => ts('Amount'),
+                        'required' => true,
+                                             
+                'import' => true,
+        'where' => 'civicrm_contribution_soft.amount',
+        'headerPattern' => '/total(.?am(ou)?nt)?/i',
+        'dataPattern' => '/^\d+(\.\d{2})?$/',
+                         'export' => true,
+                                   
+                          ),
+      
+              'currency' => array(
+      
+        'name' => 'currency',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Currency'),
+                                 'maxlength' => 3,
+                         'size' => CRM_Utils_Type::FOUR,
+                           
+                                           'default' => 'NULL',
+         
+                                     'pseudoconstant' => array(
+                                'table' => 'civicrm_currency',
+                      'keyColumn' => 'name',
+                      'labelColumn' => 'full_name',
+                      'nameColumn' => 'numeric_code',
+                    )
+                 ),
+      
+              'pcp_id' => array(
+      
+        'name' => 'pcp_id',
+        'type' => CRM_Utils_Type::T_INT,
+                                                     
+                                           'default' => 'NULL',
+         
+                'FKClassName' => 'CRM_PCP_PCP',
+                          ),
+      
+              'pcp_display_in_roll' => array(
+      
+        'name' => 'pcp_display_in_roll',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                'title' => ts('Pcp Display In Roll'),
+                                                     
+                                    
+                          ),
+      
+              'pcp_roll_nickname' => array(
+      
+        'name' => 'pcp_roll_nickname',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Pcp Roll Nickname'),
+                                 'maxlength' => 255,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                                           'default' => 'NULL',
+         
+                          ),
+      
+              'pcp_personal_note' => array(
+      
+        'name' => 'pcp_personal_note',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Pcp Personal Note'),
+                                 'maxlength' => 255,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                                           'default' => 'NULL',
+         
+                          ),
+      
+              'soft_credit_type_id' => array(
+      
+        'name' => 'soft_credit_type_id',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Soft Credit Type'),
+                                                     
+                                           'default' => 'NULL',
+         
+                                     'pseudoconstant' => array(
+                                'optionGroupName' => 'soft_credit_type',
+                    )
+                 ),
+             );
+    }
+    return self::$_fields;
   }
 
 }

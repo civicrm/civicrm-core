@@ -51,7 +51,7 @@ class PriceFieldValue extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, unsigned=true)
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -100,7 +100,7 @@ class PriceFieldValue extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="count", type="integer", nullable=false)
+   * @ORM\Column(name="count", type="integer", unsigned=true, nullable=false)
    * 
    */
   private $count = 'NULL';
@@ -108,7 +108,7 @@ class PriceFieldValue extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="max_value", type="integer", nullable=false)
+   * @ORM\Column(name="max_value", type="integer", unsigned=true, nullable=false)
    * 
    */
   private $maxValue = 'NULL';
@@ -116,7 +116,7 @@ class PriceFieldValue extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="weight", type="integer", nullable=false)
+   * @ORM\Column(name="weight", type="integer", unsigned=true, nullable=false)
    * 
    */
   private $weight = '1';
@@ -132,7 +132,7 @@ class PriceFieldValue extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="membership_num_terms", type="integer", nullable=false)
+   * @ORM\Column(name="membership_num_terms", type="integer", unsigned=true, nullable=false)
    * 
    */
   private $membershipNumTerms = 'NULL';
@@ -456,6 +456,174 @@ class PriceFieldValue extends \Civi\Core\Entity {
    */
   public function getDeductibleAmount() {
     return $this->deductibleAmount;
+  }
+
+  /**
+   * returns all the column names of this table
+   *
+   * @access public
+   * @return array
+   */
+  static function &fields( ) {
+    if ( !self::$_fields) {
+      self::$_fields = array (
+      
+              'id' => array(
+      
+        'name' => 'id',
+        'type' => CRM_Utils_Type::T_INT,
+                        'required' => true,
+                                             
+                                    
+                          ),
+      
+              'price_field_id' => array(
+      
+        'name' => 'price_field_id',
+        'type' => CRM_Utils_Type::T_INT,
+                        'required' => true,
+                                             
+                                    
+                'FKClassName' => 'CRM_Price_PriceField',
+                          ),
+      
+              'name' => array(
+      
+        'name' => 'name',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Name'),
+                                 'maxlength' => 255,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                                    
+                          ),
+      
+              'label' => array(
+      
+        'name' => 'label',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Label'),
+                                 'maxlength' => 255,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                                    
+                          ),
+      
+              'description' => array(
+      
+        'name' => 'description',
+        'type' => CRM_Utils_Type::T_TEXT,
+                'title' => ts('Description'),
+                                                   'rows' => 2,
+                         'cols' => 60,
+         
+                                           'default' => 'NULL',
+         
+                          ),
+      
+              'amount' => array(
+      
+        'name' => 'amount',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Amount'),
+                        'required' => true,
+                         'maxlength' => 512,
+                         'size' => CRM_Utils_Type::EIGHT,
+                           
+                                    
+                          ),
+      
+              'count' => array(
+      
+        'name' => 'count',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Count'),
+                                                     
+                                           'default' => 'NULL',
+         
+                          ),
+      
+              'max_value' => array(
+      
+        'name' => 'max_value',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Max Value'),
+                                                     
+                                           'default' => 'NULL',
+         
+                          ),
+      
+              'weight' => array(
+      
+        'name' => 'weight',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Weight'),
+                                                     
+                                           'default' => '1',
+         
+                          ),
+      
+              'membership_type_id' => array(
+      
+        'name' => 'membership_type_id',
+        'type' => CRM_Utils_Type::T_INT,
+                                                     
+                                           'default' => 'NULL',
+         
+                'FKClassName' => 'CRM_Member_MembershipType',
+                          ),
+      
+              'membership_num_terms' => array(
+      
+        'name' => 'membership_num_terms',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Membership Num Terms'),
+                                                     
+                                           'default' => 'NULL',
+         
+                          ),
+      
+              'is_default' => array(
+      
+        'name' => 'is_default',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                                                     
+                                    
+                          ),
+      
+              'is_active' => array(
+      
+        'name' => 'is_active',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                                                     
+                                           'default' => '1',
+         
+                          ),
+      
+              'financial_type_id' => array(
+      
+        'name' => 'financial_type_id',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Financial Type'),
+                                                     
+                                           'default' => 'NULL',
+         
+                'FKClassName' => 'CRM_Financial_FinancialType',
+                          ),
+      
+              'deductible_amount' => array(
+      
+        'name' => 'deductible_amount',
+        'type' => CRM_Utils_Type::T_MONEY,
+                'title' => ts('Deductible Amount'),
+                        'required' => true,
+                                             
+                                           'default' => '0.0',
+         
+                          ),
+             );
+    }
+    return self::$_fields;
   }
 
 }

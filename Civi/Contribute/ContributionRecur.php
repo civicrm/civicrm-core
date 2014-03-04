@@ -51,7 +51,7 @@ class ContributionRecur extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, unsigned=true)
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -92,7 +92,7 @@ class ContributionRecur extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="frequency_interval", type="integer", nullable=true)
+   * @ORM\Column(name="frequency_interval", type="integer", unsigned=true, nullable=true)
    * 
    */
   private $frequencyInterval;
@@ -100,7 +100,7 @@ class ContributionRecur extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="installments", type="integer", nullable=true)
+   * @ORM\Column(name="installments", type="integer", unsigned=true, nullable=true)
    * 
    */
   private $installments;
@@ -172,7 +172,7 @@ class ContributionRecur extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="contribution_status_id", type="integer", nullable=false)
+   * @ORM\Column(name="contribution_status_id", type="integer", unsigned=true, nullable=false)
    * 
    */
   private $contributionStatusId = '1';
@@ -188,7 +188,7 @@ class ContributionRecur extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="cycle_day", type="integer", nullable=false)
+   * @ORM\Column(name="cycle_day", type="integer", unsigned=true, nullable=false)
    * 
    */
   private $cycleDay = '1';
@@ -204,7 +204,7 @@ class ContributionRecur extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="failure_count", type="integer", nullable=false)
+   * @ORM\Column(name="failure_count", type="integer", unsigned=true, nullable=false)
    * 
    */
   private $failureCount = '0';
@@ -244,7 +244,7 @@ class ContributionRecur extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="payment_instrument_id", type="integer", nullable=true)
+   * @ORM\Column(name="payment_instrument_id", type="integer", unsigned=true, nullable=true)
    * 
    */
   private $paymentInstrumentId;
@@ -792,6 +792,335 @@ class ContributionRecur extends \Civi\Core\Entity {
    */
   public function getIsEmailReceipt() {
     return $this->isEmailReceipt;
+  }
+
+  /**
+   * returns all the column names of this table
+   *
+   * @access public
+   * @return array
+   */
+  static function &fields( ) {
+    if ( !self::$_fields) {
+      self::$_fields = array (
+      
+              'id' => array(
+      
+        'name' => 'id',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Recurring Contribution ID'),
+                        'required' => true,
+                                             
+                                    
+                          ),
+      
+              'contact_id' => array(
+      
+        'name' => 'contact_id',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Contact ID'),
+                        'required' => true,
+                                             
+                                    
+                'FKClassName' => 'CRM_Contact_Contact',
+                          ),
+      
+              'amount' => array(
+      
+        'name' => 'amount',
+        'type' => CRM_Utils_Type::T_MONEY,
+                'title' => ts('Amount'),
+                        'required' => true,
+                                             
+                                    
+                          ),
+      
+              'currency' => array(
+      
+        'name' => 'currency',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Currency'),
+                                 'maxlength' => 3,
+                         'size' => CRM_Utils_Type::FOUR,
+                           
+                                           'default' => 'NULL',
+         
+                                     'pseudoconstant' => array(
+                                'table' => 'civicrm_currency',
+                      'keyColumn' => 'name',
+                      'labelColumn' => 'full_name',
+                      'nameColumn' => 'numeric_code',
+                    )
+                 ),
+      
+              'frequency_unit' => array(
+      
+        'name' => 'frequency_unit',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Frequency Unit'),
+                                 'maxlength' => 8,
+                         'size' => CRM_Utils_Type::EIGHT,
+                           
+                                           'default' => 'month',
+         
+                                     'pseudoconstant' => array(
+                                'optionGroupName' => 'recur_frequency_units',
+                      'keyColumn' => 'name',
+                    )
+                 ),
+      
+              'frequency_interval' => array(
+      
+        'name' => 'frequency_interval',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Interval (number of units)'),
+                        'required' => true,
+                                             
+                                    
+                          ),
+      
+              'installments' => array(
+      
+        'name' => 'installments',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Number of Installments'),
+                                                     
+                                    
+                          ),
+      
+              'start_date' => array(
+      
+        'name' => 'start_date',
+        'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
+                'title' => ts('Recurring Contribution Started Date'),
+                        'required' => true,
+                                             
+                                    
+                          ),
+      
+              'create_date' => array(
+      
+        'name' => 'create_date',
+        'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
+                'title' => ts('Recurring Contribution Created Date'),
+                        'required' => true,
+                                             
+                                    
+                          ),
+      
+              'modified_date' => array(
+      
+        'name' => 'modified_date',
+        'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
+                'title' => ts('Recurring Contribution Modified Date'),
+                                                     
+                                    
+                          ),
+      
+              'cancel_date' => array(
+      
+        'name' => 'cancel_date',
+        'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
+                'title' => ts('Recurring Contribution Cancel Date'),
+                                                     
+                                    
+                          ),
+      
+              'end_date' => array(
+      
+        'name' => 'end_date',
+        'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
+                'title' => ts('Recurring Contribution End Date'),
+                                                     
+                                    
+                          ),
+      
+              'processor_id' => array(
+      
+        'name' => 'processor_id',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Payment Processor'),
+                                 'maxlength' => 255,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                                    
+                          ),
+      
+              'trxn_id' => array(
+      
+        'name' => 'trxn_id',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Transaction ID'),
+                                 'maxlength' => 255,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                                    
+                          ),
+      
+              'invoice_id' => array(
+      
+        'name' => 'invoice_id',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Invoice ID'),
+                                 'maxlength' => 255,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                                    
+                          ),
+      
+              'contribution_status_id' => array(
+      
+        'name' => 'contribution_status_id',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Recurring Contribution Status'),
+                                                     
+                'import' => true,
+        'where' => 'civicrm_contribution_recur.contribution_status_id',
+        'headerPattern' => '',
+        'dataPattern' => '',
+                         'export' => true,
+                                          'default' => '1',
+         
+                                     'pseudoconstant' => array(
+                                'optionGroupName' => 'contribution_status',
+                    )
+                 ),
+      
+              'is_test' => array(
+      
+        'name' => 'is_test',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                'title' => ts('Test'),
+                                                     
+                'import' => true,
+        'where' => 'civicrm_contribution_recur.is_test',
+        'headerPattern' => '',
+        'dataPattern' => '',
+                         'export' => true,
+                                   
+                          ),
+      
+              'cycle_day' => array(
+      
+        'name' => 'cycle_day',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Number of Cycle Day'),
+                        'required' => true,
+                                             
+                                           'default' => '1',
+         
+                          ),
+      
+              'next_sched_contribution_date' => array(
+      
+        'name' => 'next_sched_contribution_date',
+        'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
+                'title' => ts('Next Scheduled Contribution Date'),
+                                                     
+                                    
+                          ),
+      
+              'failure_count' => array(
+      
+        'name' => 'failure_count',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Number of Failures'),
+                                                     
+                                    
+                          ),
+      
+              'failure_retry_date' => array(
+      
+        'name' => 'failure_retry_date',
+        'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
+                'title' => ts('Retry Failed Attempt Date'),
+                                                     
+                                    
+                          ),
+      
+              'auto_renew' => array(
+      
+        'name' => 'auto_renew',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                'title' => ts('Auto Renew'),
+                        'required' => true,
+                                             
+                                    
+                          ),
+      
+              'payment_processor_id' => array(
+      
+        'name' => 'payment_processor_id',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Payment Processor'),
+                                                     
+                                    
+                'FKClassName' => 'CRM_Financial_PaymentProcessor',
+                          ),
+      
+              'financial_type_id' => array(
+      
+        'name' => 'financial_type_id',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Financial Type'),
+                                                     
+                         'export' => false,
+                'where' => 'civicrm_contribution_recur.financial_type_id',
+        'headerPattern' => '',
+        'dataPattern' => '',
+                                   
+                'FKClassName' => 'CRM_Financial_FinancialType',
+                                     'pseudoconstant' => array(
+                                'table' => 'civicrm_financial_type',
+                      'keyColumn' => 'id',
+                      'labelColumn' => 'name',
+                    )
+                 ),
+      
+              'payment_instrument_id' => array(
+      
+        'name' => 'payment_instrument_id',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Payment Instrument'),
+                                                     
+                                    
+                                     'pseudoconstant' => array(
+                                'optionGroupName' => 'payment_instrument',
+                    )
+                 ),
+      
+              'contribution_campaign_id' => array(
+      
+        'name' => 'campaign_id',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Campaign'),
+                                                     
+                'import' => true,
+        'where' => 'civicrm_contribution_recur.campaign_id',
+        'headerPattern' => '',
+        'dataPattern' => '',
+                         'export' => true,
+                                   
+                'FKClassName' => 'CRM_Campaign_Campaign',
+                                     'pseudoconstant' => array(
+                                'table' => 'civicrm_campaign',
+                      'keyColumn' => 'id',
+                      'labelColumn' => 'title',
+                    )
+                 ),
+      
+              'is_email_receipt' => array(
+      
+        'name' => 'is_email_receipt',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                'title' => ts('Send email Receipt?'),
+                                                     
+                                           'default' => '1',
+         
+                          ),
+             );
+    }
+    return self::$_fields;
   }
 
 }

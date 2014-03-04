@@ -51,7 +51,7 @@ class Dashboard extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, unsigned=true)
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -156,7 +156,7 @@ class Dashboard extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="weight", type="integer", nullable=false)
+   * @ORM\Column(name="weight", type="integer", unsigned=true, nullable=false)
    * 
    */
   private $weight = '0';
@@ -428,6 +428,156 @@ class Dashboard extends \Civi\Core\Entity {
    */
   public function getWeight() {
     return $this->weight;
+  }
+
+  /**
+   * returns all the column names of this table
+   *
+   * @access public
+   * @return array
+   */
+  static function &fields( ) {
+    if ( !self::$_fields) {
+      self::$_fields = array (
+      
+              'id' => array(
+      
+        'name' => 'id',
+        'type' => CRM_Utils_Type::T_INT,
+                        'required' => true,
+                                             
+                                    
+                          ),
+      
+              'domain_id' => array(
+      
+        'name' => 'domain_id',
+        'type' => CRM_Utils_Type::T_INT,
+                        'required' => true,
+                                             
+                                    
+                'FKClassName' => 'CRM_Core_Domain',
+                          ),
+      
+              'name' => array(
+      
+        'name' => 'name',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Dashlet Name'),
+                                 'maxlength' => 64,
+                         'size' => CRM_Utils_Type::BIG,
+                           
+                                    
+                          ),
+      
+              'label' => array(
+      
+        'name' => 'label',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Label'),
+                                 'maxlength' => 255,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                                    
+                          ),
+      
+              'url' => array(
+      
+        'name' => 'url',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Url'),
+                                 'maxlength' => 255,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                                    
+                          ),
+      
+              'permission' => array(
+      
+        'name' => 'permission',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Permission'),
+                                 'maxlength' => 255,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                                    
+                          ),
+      
+              'permission_operator' => array(
+      
+        'name' => 'permission_operator',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Permission Operator'),
+                                 'maxlength' => 3,
+                         'size' => CRM_Utils_Type::FOUR,
+                           
+                                    
+                          ),
+      
+              'column_no' => array(
+      
+        'name' => 'column_no',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                'title' => ts('Column No'),
+                                                     
+                                    
+                          ),
+      
+              'is_minimized' => array(
+      
+        'name' => 'is_minimized',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                                                     
+                                    
+                          ),
+      
+              'fullscreen_url' => array(
+      
+        'name' => 'fullscreen_url',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Fullscreen Url'),
+                                 'maxlength' => 255,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                                    
+                          ),
+      
+              'is_fullscreen' => array(
+      
+        'name' => 'is_fullscreen',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                                                     
+                                           'default' => '1',
+         
+                          ),
+      
+              'is_active' => array(
+      
+        'name' => 'is_active',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                                                     
+                                    
+                          ),
+      
+              'is_reserved' => array(
+      
+        'name' => 'is_reserved',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                                                     
+                                    
+                          ),
+      
+              'weight' => array(
+      
+        'name' => 'weight',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Weight'),
+                                                     
+                                    
+                          ),
+             );
+    }
+    return self::$_fields;
   }
 
 }

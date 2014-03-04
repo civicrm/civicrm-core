@@ -51,7 +51,7 @@ class BounceType extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, unsigned=true)
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -76,7 +76,7 @@ class BounceType extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="hold_threshold", type="integer", nullable=true)
+   * @ORM\Column(name="hold_threshold", type="integer", unsigned=true, nullable=true)
    * 
    */
   private $holdThreshold;
@@ -148,6 +148,62 @@ class BounceType extends \Civi\Core\Entity {
    */
   public function getHoldThreshold() {
     return $this->holdThreshold;
+  }
+
+  /**
+   * returns all the column names of this table
+   *
+   * @access public
+   * @return array
+   */
+  static function &fields( ) {
+    if ( !self::$_fields) {
+      self::$_fields = array (
+      
+              'id' => array(
+      
+        'name' => 'id',
+        'type' => CRM_Utils_Type::T_INT,
+                        'required' => true,
+                                             
+                                    
+                          ),
+      
+              'name' => array(
+      
+        'name' => 'name',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Name'),
+                        'required' => true,
+                         'maxlength' => 8,
+                         'size' => CRM_Utils_Type::EIGHT,
+                           
+                                    
+                          ),
+      
+              'description' => array(
+      
+        'name' => 'description',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Description'),
+                                 'maxlength' => 255,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                                    
+                          ),
+      
+              'hold_threshold' => array(
+      
+        'name' => 'hold_threshold',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Hold Threshold'),
+                        'required' => true,
+                                             
+                                    
+                          ),
+             );
+    }
+    return self::$_fields;
   }
 
 }

@@ -51,7 +51,7 @@ class Domain extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, unsigned=true)
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -260,6 +260,102 @@ class Domain extends \Civi\Core\Entity {
    */
   public function getLocaleCustomStrings() {
     return $this->localeCustomStrings;
+  }
+
+  /**
+   * returns all the column names of this table
+   *
+   * @access public
+   * @return array
+   */
+  static function &fields( ) {
+    if ( !self::$_fields) {
+      self::$_fields = array (
+      
+              'id' => array(
+      
+        'name' => 'id',
+        'type' => CRM_Utils_Type::T_INT,
+                        'required' => true,
+                                             
+                                    
+                          ),
+      
+              'name' => array(
+      
+        'name' => 'name',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Name'),
+                                 'maxlength' => 64,
+                         'size' => CRM_Utils_Type::BIG,
+                           
+                                    
+                          ),
+      
+              'description' => array(
+      
+        'name' => 'description',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Description'),
+                                 'maxlength' => 255,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                                    
+                          ),
+      
+              'config_backend' => array(
+      
+        'name' => 'config_backend',
+        'type' => CRM_Utils_Type::T_TEXT,
+                'title' => ts('Config Backend'),
+                                                   'rows' => 20,
+                         'cols' => 80,
+         
+                                    
+                          ),
+      
+              'version' => array(
+      
+        'name' => 'version',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Version'),
+                                 'maxlength' => 32,
+                         'size' => CRM_Utils_Type::MEDIUM,
+                           
+                                    
+                          ),
+      
+              'contact_id' => array(
+      
+        'name' => 'contact_id',
+        'type' => CRM_Utils_Type::T_INT,
+                                                     
+                                    
+                'FKClassName' => 'CRM_Contact_Contact',
+                          ),
+      
+              'locales' => array(
+      
+        'name' => 'locales',
+        'type' => CRM_Utils_Type::T_TEXT,
+                'title' => ts('Locales'),
+                                                     
+                                    
+                          ),
+      
+              'locale_custom_strings' => array(
+      
+        'name' => 'locale_custom_strings',
+        'type' => CRM_Utils_Type::T_TEXT,
+                'title' => ts('Locale Custom Strings'),
+                                                   'rows' => 20,
+                         'cols' => 80,
+         
+                                    
+                          ),
+             );
+    }
+    return self::$_fields;
   }
 
 }

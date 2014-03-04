@@ -51,7 +51,7 @@ class ActivityContact extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, unsigned=true)
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -76,7 +76,7 @@ class ActivityContact extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="record_type_id", type="integer", nullable=true)
+   * @ORM\Column(name="record_type_id", type="integer", unsigned=true, nullable=true)
    * 
    */
   private $recordTypeId;
@@ -148,6 +148,69 @@ class ActivityContact extends \Civi\Core\Entity {
    */
   public function getRecordTypeId() {
     return $this->recordTypeId;
+  }
+
+  /**
+   * returns all the column names of this table
+   *
+   * @access public
+   * @return array
+   */
+  static function &fields( ) {
+    if ( !self::$_fields) {
+      self::$_fields = array (
+      
+              'id' => array(
+      
+        'name' => 'id',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Activity Contact ID'),
+                        'required' => true,
+                                             
+                                    
+                          ),
+      
+              'activity_id' => array(
+      
+        'name' => 'activity_id',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Activity ID'),
+                        'required' => true,
+                                             
+                                    
+                'FKClassName' => 'CRM_Activity_Activity',
+                          ),
+      
+              'contact_id' => array(
+      
+        'name' => 'contact_id',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Contact ID (match to contact)'),
+                        'required' => true,
+                                             
+                'import' => true,
+        'where' => 'civicrm_activity_contact.contact_id',
+        'headerPattern' => '',
+        'dataPattern' => '',
+                         'export' => true,
+                                   
+                'FKClassName' => 'CRM_Contact_Contact',
+                          ),
+      
+              'record_type_id' => array(
+      
+        'name' => 'record_type_id',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Record Type ID'),
+                                                     
+                                    
+                                     'pseudoconstant' => array(
+                                'optionGroupName' => 'activity_contacts',
+                    )
+                 ),
+             );
+    }
+    return self::$_fields;
   }
 
 }

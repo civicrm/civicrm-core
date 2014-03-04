@@ -51,7 +51,7 @@ class Spool extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, unsigned=true)
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -232,6 +232,84 @@ class Spool extends \Civi\Core\Entity {
    */
   public function getRemovedAt() {
     return $this->removedAt;
+  }
+
+  /**
+   * returns all the column names of this table
+   *
+   * @access public
+   * @return array
+   */
+  static function &fields( ) {
+    if ( !self::$_fields) {
+      self::$_fields = array (
+      
+              'id' => array(
+      
+        'name' => 'id',
+        'type' => CRM_Utils_Type::T_INT,
+                        'required' => true,
+                                             
+                                    
+                          ),
+      
+              'job_id' => array(
+      
+        'name' => 'job_id',
+        'type' => CRM_Utils_Type::T_INT,
+                        'required' => true,
+                                             
+                                    
+                'FKClassName' => 'CRM_Mailing_MailingJob',
+                          ),
+      
+              'recipient_email' => array(
+      
+        'name' => 'recipient_email',
+        'type' => CRM_Utils_Type::T_TEXT,
+                'title' => ts('Recipient Email'),
+                                                     
+                                    
+                          ),
+      
+              'headers' => array(
+      
+        'name' => 'headers',
+        'type' => CRM_Utils_Type::T_TEXT,
+                'title' => ts('Headers'),
+                                                     
+                                    
+                          ),
+      
+              'body' => array(
+      
+        'name' => 'body',
+        'type' => CRM_Utils_Type::T_TEXT,
+                'title' => ts('Body'),
+                                                     
+                                    
+                          ),
+      
+              'added_at' => array(
+      
+        'name' => 'added_at',
+        'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
+                'title' => ts('Added At'),
+                                                     
+                                    
+                          ),
+      
+              'removed_at' => array(
+      
+        'name' => 'removed_at',
+        'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
+                'title' => ts('Removed At'),
+                                                     
+                                    
+                          ),
+             );
+    }
+    return self::$_fields;
   }
 
 }

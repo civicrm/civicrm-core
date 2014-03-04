@@ -51,7 +51,7 @@ class ActionSchedule extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, unsigned=true)
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -108,7 +108,7 @@ class ActionSchedule extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="start_action_offset", type="integer", nullable=true)
+   * @ORM\Column(name="start_action_offset", type="integer", unsigned=true, nullable=true)
    * 
    */
   private $startActionOffset;
@@ -156,7 +156,7 @@ class ActionSchedule extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="repetition_frequency_interval", type="integer", nullable=true)
+   * @ORM\Column(name="repetition_frequency_interval", type="integer", unsigned=true, nullable=true)
    * 
    */
   private $repetitionFrequencyInterval;
@@ -172,7 +172,7 @@ class ActionSchedule extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="end_frequency_interval", type="integer", nullable=true)
+   * @ORM\Column(name="end_frequency_interval", type="integer", unsigned=true, nullable=true)
    * 
    */
   private $endFrequencyInterval;
@@ -904,6 +904,354 @@ class ActionSchedule extends \Civi\Core\Entity {
    */
   public function getSmsProvider() {
     return $this->smsProvider;
+  }
+
+  /**
+   * returns all the column names of this table
+   *
+   * @access public
+   * @return array
+   */
+  static function &fields( ) {
+    if ( !self::$_fields) {
+      self::$_fields = array (
+      
+              'id' => array(
+      
+        'name' => 'id',
+        'type' => CRM_Utils_Type::T_INT,
+                        'required' => true,
+                                             
+                                    
+                          ),
+      
+              'name' => array(
+      
+        'name' => 'name',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Name'),
+                                 'maxlength' => 64,
+                         'size' => CRM_Utils_Type::BIG,
+                           
+                                    
+                          ),
+      
+              'title' => array(
+      
+        'name' => 'title',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Title'),
+                                 'maxlength' => 64,
+                         'size' => CRM_Utils_Type::BIG,
+                           
+                                    
+                          ),
+      
+              'recipient' => array(
+      
+        'name' => 'recipient',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Recipient'),
+                                 'maxlength' => 64,
+                         'size' => CRM_Utils_Type::BIG,
+                           
+                                    
+                          ),
+      
+              'limit_to' => array(
+      
+        'name' => 'limit_to',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                'title' => ts('Limit To'),
+                                                     
+                                           'default' => '1',
+         
+                          ),
+      
+              'entity_value' => array(
+      
+        'name' => 'entity_value',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Entity Value'),
+                                 'maxlength' => 64,
+                         'size' => CRM_Utils_Type::BIG,
+                           
+                                    
+                          ),
+      
+              'entity_status' => array(
+      
+        'name' => 'entity_status',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Entity Status'),
+                                 'maxlength' => 64,
+                         'size' => CRM_Utils_Type::BIG,
+                           
+                                    
+                          ),
+      
+              'start_action_offset' => array(
+      
+        'name' => 'start_action_offset',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Start Action Offset'),
+                                                     
+                                    
+                          ),
+      
+              'start_action_unit' => array(
+      
+        'name' => 'start_action_unit',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Start Action Unit'),
+                                 'maxlength' => 8,
+                         'size' => CRM_Utils_Type::EIGHT,
+                           
+                                    
+                                     'pseudoconstant' => array(
+                                'optionGroupName' => 'recur_frequency_units',
+                      'keyColumn' => 'name',
+                    )
+                 ),
+      
+              'start_action_condition' => array(
+      
+        'name' => 'start_action_condition',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Start Action Condition'),
+                                 'maxlength' => 32,
+                         'size' => CRM_Utils_Type::MEDIUM,
+                           
+                                    
+                          ),
+      
+              'start_action_date' => array(
+      
+        'name' => 'start_action_date',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Start Action Date'),
+                                 'maxlength' => 64,
+                         'size' => CRM_Utils_Type::BIG,
+                           
+                                    
+                          ),
+      
+              'is_repeat' => array(
+      
+        'name' => 'is_repeat',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                'title' => ts('Repeat?'),
+                                                     
+                                    
+                          ),
+      
+              'repetition_frequency_unit' => array(
+      
+        'name' => 'repetition_frequency_unit',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Repetition Frequency Unit'),
+                                 'maxlength' => 8,
+                         'size' => CRM_Utils_Type::EIGHT,
+                           
+                                    
+                                     'pseudoconstant' => array(
+                                'optionGroupName' => 'recur_frequency_units',
+                      'keyColumn' => 'name',
+                    )
+                 ),
+      
+              'repetition_frequency_interval' => array(
+      
+        'name' => 'repetition_frequency_interval',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Repetition Frequency Interval'),
+                                                     
+                                    
+                          ),
+      
+              'end_frequency_unit' => array(
+      
+        'name' => 'end_frequency_unit',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('End Frequency Unit'),
+                                 'maxlength' => 8,
+                         'size' => CRM_Utils_Type::EIGHT,
+                           
+                                    
+                                     'pseudoconstant' => array(
+                                'optionGroupName' => 'recur_frequency_units',
+                      'keyColumn' => 'name',
+                    )
+                 ),
+      
+              'end_frequency_interval' => array(
+      
+        'name' => 'end_frequency_interval',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('End Frequency Interval'),
+                                                     
+                                    
+                          ),
+      
+              'end_action' => array(
+      
+        'name' => 'end_action',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('End Action'),
+                                 'maxlength' => 32,
+                         'size' => CRM_Utils_Type::MEDIUM,
+                           
+                                    
+                          ),
+      
+              'end_date' => array(
+      
+        'name' => 'end_date',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('End Date'),
+                                 'maxlength' => 64,
+                         'size' => CRM_Utils_Type::BIG,
+                           
+                                    
+                          ),
+      
+              'is_active' => array(
+      
+        'name' => 'is_active',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                                                     
+                                           'default' => '1',
+         
+                          ),
+      
+              'recipient_manual' => array(
+      
+        'name' => 'recipient_manual',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Recipient Manual'),
+                                 'maxlength' => 128,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                                    
+                          ),
+      
+              'recipient_listing' => array(
+      
+        'name' => 'recipient_listing',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Recipient Listing'),
+                                 'maxlength' => 128,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                                    
+                          ),
+      
+              'body_text' => array(
+      
+        'name' => 'body_text',
+        'type' => CRM_Utils_Type::T_LONGTEXT,
+                'title' => ts('Body Text'),
+                                                     
+                                    
+                          ),
+      
+              'body_html' => array(
+      
+        'name' => 'body_html',
+        'type' => CRM_Utils_Type::T_LONGTEXT,
+                'title' => ts('Body Html'),
+                                                     
+                                    
+                          ),
+      
+              'subject' => array(
+      
+        'name' => 'subject',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Subject'),
+                                 'maxlength' => 128,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                                    
+                          ),
+      
+              'record_activity' => array(
+      
+        'name' => 'record_activity',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                'title' => ts('Record Activity'),
+                                                     
+                                           'default' => 'NULL',
+         
+                          ),
+      
+              'mapping_id' => array(
+      
+        'name' => 'mapping_id',
+        'type' => CRM_Utils_Type::T_INT,
+                                                     
+                                    
+                'FKClassName' => 'CRM_Core_ActionMapping',
+                          ),
+      
+              'group_id' => array(
+      
+        'name' => 'group_id',
+        'type' => CRM_Utils_Type::T_INT,
+                                                     
+                                    
+                'FKClassName' => 'CRM_Contact_Group',
+                                     'pseudoconstant' => array(
+                                'table' => 'civicrm_group',
+                      'keyColumn' => 'id',
+                      'labelColumn' => 'title',
+                    )
+                 ),
+      
+              'msg_template_id' => array(
+      
+        'name' => 'msg_template_id',
+        'type' => CRM_Utils_Type::T_INT,
+                                                     
+                                    
+                'FKClassName' => 'CRM_Core_MessageTemplate',
+                          ),
+      
+              'absolute_date' => array(
+      
+        'name' => 'absolute_date',
+        'type' => CRM_Utils_Type::T_DATE,
+                'title' => ts('Absolute Date'),
+                                                     
+                                    
+                          ),
+      
+              'mode' => array(
+      
+        'name' => 'mode',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Message Mode'),
+                                 'maxlength' => 128,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                                           'default' => 'Email',
+         
+                                     'pseudoconstant' => array(
+                                'optionGroupName' => 'msg_mode',
+                    )
+                 ),
+      
+              'sms_provider_id' => array(
+      
+        'name' => 'sms_provider_id',
+        'type' => CRM_Utils_Type::T_INT,
+                                                     
+                                    
+                'FKClassName' => 'CRM_SMS_Provider',
+                          ),
+             );
+    }
+    return self::$_fields;
   }
 
 }

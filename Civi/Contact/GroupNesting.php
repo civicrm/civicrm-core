@@ -51,7 +51,7 @@ class GroupNesting extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, unsigned=true)
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -120,6 +120,49 @@ class GroupNesting extends \Civi\Core\Entity {
    */
   public function getParentGroup() {
     return $this->parentGroup;
+  }
+
+  /**
+   * returns all the column names of this table
+   *
+   * @access public
+   * @return array
+   */
+  static function &fields( ) {
+    if ( !self::$_fields) {
+      self::$_fields = array (
+      
+              'id' => array(
+      
+        'name' => 'id',
+        'type' => CRM_Utils_Type::T_INT,
+                        'required' => true,
+                                             
+                                    
+                          ),
+      
+              'child_group_id' => array(
+      
+        'name' => 'child_group_id',
+        'type' => CRM_Utils_Type::T_INT,
+                        'required' => true,
+                                             
+                                    
+                'FKClassName' => 'CRM_Contact_Group',
+                          ),
+      
+              'parent_group_id' => array(
+      
+        'name' => 'parent_group_id',
+        'type' => CRM_Utils_Type::T_INT,
+                        'required' => true,
+                                             
+                                    
+                'FKClassName' => 'CRM_Contact_Group',
+                          ),
+             );
+    }
+    return self::$_fields;
   }
 
 }

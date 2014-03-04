@@ -51,7 +51,7 @@ class Tag extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, unsigned=true)
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -316,6 +316,123 @@ class Tag extends \Civi\Core\Entity {
    */
   public function getCreatedDate() {
     return $this->createdDate;
+  }
+
+  /**
+   * returns all the column names of this table
+   *
+   * @access public
+   * @return array
+   */
+  static function &fields( ) {
+    if ( !self::$_fields) {
+      self::$_fields = array (
+      
+              'id' => array(
+      
+        'name' => 'id',
+        'type' => CRM_Utils_Type::T_INT,
+                        'required' => true,
+                                             
+                                    
+                          ),
+      
+              'name' => array(
+      
+        'name' => 'name',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Tag Name'),
+                        'required' => true,
+                         'maxlength' => 64,
+                         'size' => CRM_Utils_Type::BIG,
+                           
+                                    
+                          ),
+      
+              'description' => array(
+      
+        'name' => 'description',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Description'),
+                                 'maxlength' => 255,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                                    
+                          ),
+      
+              'parent_id' => array(
+      
+        'name' => 'parent_id',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Parent Tag'),
+                                                     
+                                           'default' => 'NULL',
+         
+                'FKClassName' => 'CRM_Core_Tag',
+                          ),
+      
+              'is_selectable' => array(
+      
+        'name' => 'is_selectable',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                                                     
+                                           'default' => '1',
+         
+                          ),
+      
+              'is_reserved' => array(
+      
+        'name' => 'is_reserved',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                'title' => ts('Reserved'),
+                                                     
+                                    
+                          ),
+      
+              'is_tagset' => array(
+      
+        'name' => 'is_tagset',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                'title' => ts('Tagset'),
+                                                     
+                                    
+                          ),
+      
+              'used_for' => array(
+      
+        'name' => 'used_for',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Used For'),
+                                 'maxlength' => 64,
+                         'size' => CRM_Utils_Type::BIG,
+                           
+                                           'default' => 'NULL',
+         
+                                     'pseudoconstant' => array(
+                                'optionGroupName' => 'tag_used_for',
+                    )
+                 ),
+      
+              'created_id' => array(
+      
+        'name' => 'created_id',
+        'type' => CRM_Utils_Type::T_INT,
+                                                     
+                                    
+                'FKClassName' => 'CRM_Contact_Contact',
+                          ),
+      
+              'created_date' => array(
+      
+        'name' => 'created_date',
+        'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
+                'title' => ts('Tag Created Date'),
+                                                     
+                                    
+                          ),
+             );
+    }
+    return self::$_fields;
   }
 
 }

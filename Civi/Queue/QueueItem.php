@@ -51,7 +51,7 @@ class QueueItem extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, unsigned=true)
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -68,7 +68,7 @@ class QueueItem extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="weight", type="integer", nullable=true)
+   * @ORM\Column(name="weight", type="integer", unsigned=true, nullable=true)
    * 
    */
   private $weight;
@@ -204,6 +204,79 @@ class QueueItem extends \Civi\Core\Entity {
    */
   public function getData() {
     return $this->data;
+  }
+
+  /**
+   * returns all the column names of this table
+   *
+   * @access public
+   * @return array
+   */
+  static function &fields( ) {
+    if ( !self::$_fields) {
+      self::$_fields = array (
+      
+              'id' => array(
+      
+        'name' => 'id',
+        'type' => CRM_Utils_Type::T_INT,
+                        'required' => true,
+                                             
+                                    
+                          ),
+      
+              'queue_name' => array(
+      
+        'name' => 'queue_name',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Queue Name'),
+                        'required' => true,
+                         'maxlength' => 64,
+                         'size' => CRM_Utils_Type::BIG,
+                           
+                                    
+                          ),
+      
+              'weight' => array(
+      
+        'name' => 'weight',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Weight'),
+                        'required' => true,
+                                             
+                                    
+                          ),
+      
+              'submit_time' => array(
+      
+        'name' => 'submit_time',
+        'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
+                'title' => ts('Submit Time'),
+                        'required' => true,
+                                             
+                                    
+                          ),
+      
+              'release_time' => array(
+      
+        'name' => 'release_time',
+        'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
+                'title' => ts('Release Time'),
+                                                     
+                                    
+                          ),
+      
+              'data' => array(
+      
+        'name' => 'data',
+        'type' => CRM_Utils_Type::T_TEXT,
+                'title' => ts('Queue item datas'),
+                                                     
+                                    
+                          ),
+             );
+    }
+    return self::$_fields;
   }
 
 }

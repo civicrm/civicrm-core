@@ -51,7 +51,7 @@ class Component extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, unsigned=true)
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -260,6 +260,103 @@ class Component extends \Civi\Core\Entity {
    */
   public function getIsActive() {
     return $this->isActive;
+  }
+
+  /**
+   * returns all the column names of this table
+   *
+   * @access public
+   * @return array
+   */
+  static function &fields( ) {
+    if ( !self::$_fields) {
+      self::$_fields = array (
+      
+              'id' => array(
+      
+        'name' => 'id',
+        'type' => CRM_Utils_Type::T_INT,
+                        'required' => true,
+                                             
+                                    
+                          ),
+      
+              'name' => array(
+      
+        'name' => 'name',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Component Name'),
+                                 'maxlength' => 64,
+                         'size' => CRM_Utils_Type::BIG,
+                           
+                                    
+                          ),
+      
+              'component_type' => array(
+      
+        'name' => 'component_type',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Component Type'),
+                                 'maxlength' => 12,
+                         'size' => CRM_Utils_Type::TWELVE,
+                           
+                                    
+                                     'pseudoconstant' => array(
+                                '0' => 'not in database',
+                    )
+                 ),
+      
+              'subject' => array(
+      
+        'name' => 'subject',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Subject'),
+                                 'maxlength' => 255,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                                    
+                          ),
+      
+              'body_html' => array(
+      
+        'name' => 'body_html',
+        'type' => CRM_Utils_Type::T_TEXT,
+                'title' => ts('Body Html'),
+                                                   'rows' => 8,
+                         'cols' => 80,
+         
+                                    
+                          ),
+      
+              'body_text' => array(
+      
+        'name' => 'body_text',
+        'type' => CRM_Utils_Type::T_TEXT,
+                'title' => ts('Body Text'),
+                                                   'rows' => 8,
+                         'cols' => 80,
+         
+                                    
+                          ),
+      
+              'is_default' => array(
+      
+        'name' => 'is_default',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                                                     
+                                    
+                          ),
+      
+              'is_active' => array(
+      
+        'name' => 'is_active',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                                                     
+                                    
+                          ),
+             );
+    }
+    return self::$_fields;
   }
 
 }

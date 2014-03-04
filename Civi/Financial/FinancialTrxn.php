@@ -51,7 +51,7 @@ class FinancialTrxn extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, unsigned=true)
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -132,7 +132,7 @@ class FinancialTrxn extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="status_id", type="integer", nullable=true)
+   * @ORM\Column(name="status_id", type="integer", unsigned=true, nullable=true)
    * 
    */
   private $statusId;
@@ -148,7 +148,7 @@ class FinancialTrxn extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="payment_instrument_id", type="integer", nullable=true)
+   * @ORM\Column(name="payment_instrument_id", type="integer", unsigned=true, nullable=true)
    * 
    */
   private $paymentInstrumentId;
@@ -428,6 +428,185 @@ class FinancialTrxn extends \Civi\Core\Entity {
    */
   public function getCheckNumber() {
     return $this->checkNumber;
+  }
+
+  /**
+   * returns all the column names of this table
+   *
+   * @access public
+   * @return array
+   */
+  static function &fields( ) {
+    if ( !self::$_fields) {
+      self::$_fields = array (
+      
+              'id' => array(
+      
+        'name' => 'id',
+        'type' => CRM_Utils_Type::T_INT,
+                        'required' => true,
+                                             
+                                    
+                          ),
+      
+              'from_financial_account_id' => array(
+      
+        'name' => 'from_financial_account_id',
+        'type' => CRM_Utils_Type::T_INT,
+                                                     
+                                    
+                'FKClassName' => 'CRM_Financial_FinancialAccount',
+                                     'pseudoconstant' => array(
+                                'table' => 'civicrm_financial_account',
+                      'keyColumn' => 'id',
+                      'labelColumn' => 'name',
+                    )
+                 ),
+      
+              'to_financial_account_id' => array(
+      
+        'name' => 'to_financial_account_id',
+        'type' => CRM_Utils_Type::T_INT,
+                                                     
+                                    
+                'FKClassName' => 'CRM_Financial_FinancialAccount',
+                                     'pseudoconstant' => array(
+                                'table' => 'civicrm_financial_account',
+                      'keyColumn' => 'id',
+                      'labelColumn' => 'name',
+                    )
+                 ),
+      
+              'trxn_date' => array(
+      
+        'name' => 'trxn_date',
+        'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
+                'title' => ts('Trxn Date'),
+                                                     
+                                           'default' => 'NULL',
+         
+                          ),
+      
+              'total_amount' => array(
+      
+        'name' => 'total_amount',
+        'type' => CRM_Utils_Type::T_MONEY,
+                'title' => ts('Total Amount'),
+                        'required' => true,
+                                             
+                                    
+                          ),
+      
+              'fee_amount' => array(
+      
+        'name' => 'fee_amount',
+        'type' => CRM_Utils_Type::T_MONEY,
+                'title' => ts('Fee Amount'),
+                                                     
+                                    
+                          ),
+      
+              'net_amount' => array(
+      
+        'name' => 'net_amount',
+        'type' => CRM_Utils_Type::T_MONEY,
+                'title' => ts('Net Amount'),
+                                                     
+                                    
+                          ),
+      
+              'currency' => array(
+      
+        'name' => 'currency',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Currency'),
+                                 'maxlength' => 3,
+                         'size' => CRM_Utils_Type::FOUR,
+                           
+                'import' => true,
+        'where' => 'civicrm_financial_trxn.currency',
+        'headerPattern' => '/cur(rency)?/i',
+        'dataPattern' => '/^[A-Z]{3}$/',
+                         'export' => true,
+                                          'default' => 'NULL',
+         
+                                     'pseudoconstant' => array(
+                                'table' => 'civicrm_currency',
+                      'keyColumn' => 'name',
+                      'labelColumn' => 'full_name',
+                      'nameColumn' => 'numeric_code',
+                    )
+                 ),
+      
+              'trxn_id' => array(
+      
+        'name' => 'trxn_id',
+        'type' => CRM_Utils_Type::T_STRING,
+                                 'maxlength' => 255,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                                    
+                          ),
+      
+              'trxn_result_code' => array(
+      
+        'name' => 'trxn_result_code',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Trxn Result Code'),
+                                 'maxlength' => 255,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                                    
+                          ),
+      
+              'status_id' => array(
+      
+        'name' => 'status_id',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Financial Transaction Status Id'),
+                                                     
+                'import' => true,
+        'where' => 'civicrm_financial_trxn.status_id',
+        'headerPattern' => '/status/i',
+        'dataPattern' => '',
+                         'export' => true,
+                                   
+                          ),
+      
+              'payment_processor_id' => array(
+      
+        'name' => 'payment_processor_id',
+        'type' => CRM_Utils_Type::T_INT,
+                                                     
+                                    
+                'FKClassName' => 'CRM_Financial_PaymentProcessor',
+                          ),
+      
+              'financial_trxn_payment_instrument_id' => array(
+      
+        'name' => 'payment_instrument_id',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Payment Instrument'),
+                                                     
+                                    
+                                     'pseudoconstant' => array(
+                                'optionGroupName' => 'payment_instrument',
+                    )
+                 ),
+      
+              'financial_trxn_check_number' => array(
+      
+        'name' => 'check_number',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Check Number'),
+                                 'maxlength' => 255,
+                         'size' => CRM_Utils_Type::SIX,
+                           
+                                    
+                          ),
+             );
+    }
+    return self::$_fields;
   }
 
 }

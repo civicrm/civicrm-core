@@ -51,7 +51,7 @@ class EntityFinancialAccount extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, unsigned=true)
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -68,7 +68,7 @@ class EntityFinancialAccount extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="entity_id", type="integer", nullable=true)
+   * @ORM\Column(name="entity_id", type="integer", unsigned=true, nullable=true)
    * 
    */
   private $entityId;
@@ -76,7 +76,7 @@ class EntityFinancialAccount extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="account_relationship", type="integer", nullable=true)
+   * @ORM\Column(name="account_relationship", type="integer", unsigned=true, nullable=true)
    * 
    */
   private $accountRelationship;
@@ -176,6 +176,83 @@ class EntityFinancialAccount extends \Civi\Core\Entity {
    */
   public function getFinancialAccount() {
     return $this->financialAccount;
+  }
+
+  /**
+   * returns all the column names of this table
+   *
+   * @access public
+   * @return array
+   */
+  static function &fields( ) {
+    if ( !self::$_fields) {
+      self::$_fields = array (
+      
+              'id' => array(
+      
+        'name' => 'id',
+        'type' => CRM_Utils_Type::T_INT,
+                        'required' => true,
+                                             
+                                    
+                          ),
+      
+              'entity_table' => array(
+      
+        'name' => 'entity_table',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Entity Table'),
+                        'required' => true,
+                         'maxlength' => 64,
+                         'size' => CRM_Utils_Type::BIG,
+                           
+                'import' => true,
+        'where' => 'civicrm_entity_financial_account.entity_table',
+        'headerPattern' => '',
+        'dataPattern' => '',
+                         'export' => true,
+                                   
+                          ),
+      
+              'entity_id' => array(
+      
+        'name' => 'entity_id',
+        'type' => CRM_Utils_Type::T_INT,
+                        'required' => true,
+                                             
+                                    
+                          ),
+      
+              'account_relationship' => array(
+      
+        'name' => 'account_relationship',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Account Relationship'),
+                        'required' => true,
+                                             
+                                    
+                                     'pseudoconstant' => array(
+                                'optionGroupName' => 'account_relationship',
+                    )
+                 ),
+      
+              'financial_account_id' => array(
+      
+        'name' => 'financial_account_id',
+        'type' => CRM_Utils_Type::T_INT,
+                        'required' => true,
+                                             
+                                    
+                'FKClassName' => 'CRM_Financial_FinancialAccount',
+                                     'pseudoconstant' => array(
+                                'table' => 'civicrm_financial_account',
+                      'keyColumn' => 'id',
+                      'labelColumn' => 'name',
+                    )
+                 ),
+             );
+    }
+    return self::$_fields;
   }
 
 }

@@ -51,7 +51,7 @@ class PrevNextCache extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, unsigned=true)
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -68,7 +68,7 @@ class PrevNextCache extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="entity_id1", type="integer", nullable=true)
+   * @ORM\Column(name="entity_id1", type="integer", unsigned=true, nullable=true)
    * 
    */
   private $entityId1;
@@ -76,7 +76,7 @@ class PrevNextCache extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="entity_id2", type="integer", nullable=true)
+   * @ORM\Column(name="entity_id2", type="integer", unsigned=true, nullable=true)
    * 
    */
   private $entityId2;
@@ -232,6 +232,88 @@ class PrevNextCache extends \Civi\Core\Entity {
    */
   public function getIsSelected() {
     return $this->isSelected;
+  }
+
+  /**
+   * returns all the column names of this table
+   *
+   * @access public
+   * @return array
+   */
+  static function &fields( ) {
+    if ( !self::$_fields) {
+      self::$_fields = array (
+      
+              'id' => array(
+      
+        'name' => 'id',
+        'type' => CRM_Utils_Type::T_INT,
+                        'required' => true,
+                                             
+                                    
+                          ),
+      
+              'entity_table' => array(
+      
+        'name' => 'entity_table',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Entity Table'),
+                                 'maxlength' => 64,
+                         'size' => CRM_Utils_Type::BIG,
+                           
+                                    
+                          ),
+      
+              'entity_id1' => array(
+      
+        'name' => 'entity_id1',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Entity Id1'),
+                        'required' => true,
+                                             
+                                    
+                          ),
+      
+              'entity_id2' => array(
+      
+        'name' => 'entity_id2',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Entity Id2'),
+                        'required' => true,
+                                             
+                                    
+                          ),
+      
+              'cacheKey' => array(
+      
+        'name' => 'cacheKey',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Cachekey'),
+                                 'maxlength' => 255,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                                    
+                          ),
+      
+              'data' => array(
+      
+        'name' => 'data',
+        'type' => CRM_Utils_Type::T_LONGTEXT,
+                'title' => ts('Data'),
+                                                     
+                                    
+                          ),
+      
+              'is_selected' => array(
+      
+        'name' => 'is_selected',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                                                     
+                                    
+                          ),
+             );
+    }
+    return self::$_fields;
   }
 
 }

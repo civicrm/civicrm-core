@@ -51,7 +51,7 @@ class PriceField extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, unsigned=true)
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -116,7 +116,7 @@ class PriceField extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="weight", type="integer", nullable=false)
+   * @ORM\Column(name="weight", type="integer", unsigned=true, nullable=false)
    * 
    */
   private $weight = '1';
@@ -132,7 +132,7 @@ class PriceField extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="options_per_line", type="integer", nullable=false)
+   * @ORM\Column(name="options_per_line", type="integer", unsigned=true, nullable=false)
    * 
    */
   private $optionsPerLine = '1';
@@ -180,7 +180,7 @@ class PriceField extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="visibility_id", type="integer", nullable=false)
+   * @ORM\Column(name="visibility_id", type="integer", unsigned=true, nullable=false)
    * 
    */
   private $visibilityId = '1';
@@ -512,6 +512,198 @@ class PriceField extends \Civi\Core\Entity {
    */
   public function getVisibilityId() {
     return $this->visibilityId;
+  }
+
+  /**
+   * returns all the column names of this table
+   *
+   * @access public
+   * @return array
+   */
+  static function &fields( ) {
+    if ( !self::$_fields) {
+      self::$_fields = array (
+      
+              'id' => array(
+      
+        'name' => 'id',
+        'type' => CRM_Utils_Type::T_INT,
+                        'required' => true,
+                                             
+                                    
+                          ),
+      
+              'price_set_id' => array(
+      
+        'name' => 'price_set_id',
+        'type' => CRM_Utils_Type::T_INT,
+                        'required' => true,
+                                             
+                                    
+                'FKClassName' => 'CRM_Price_PriceSet',
+                          ),
+      
+              'name' => array(
+      
+        'name' => 'name',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Name'),
+                        'required' => true,
+                         'maxlength' => 255,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                                    
+                          ),
+      
+              'label' => array(
+      
+        'name' => 'label',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Label'),
+                        'required' => true,
+                         'maxlength' => 255,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                                    
+                          ),
+      
+              'html_type' => array(
+      
+        'name' => 'html_type',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Html Type'),
+                        'required' => true,
+                         'maxlength' => 12,
+                         'size' => CRM_Utils_Type::TWELVE,
+                           
+                                    
+                                     'pseudoconstant' => array(
+                                '0' => 'not in database',
+                    )
+                 ),
+      
+              'is_enter_qty' => array(
+      
+        'name' => 'is_enter_qty',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                                                     
+                                    
+                          ),
+      
+              'help_pre' => array(
+      
+        'name' => 'help_pre',
+        'type' => CRM_Utils_Type::T_TEXT,
+                'title' => ts('Help Pre'),
+                                                   'rows' => 4,
+                         'cols' => 80,
+         
+                                    
+                          ),
+      
+              'help_post' => array(
+      
+        'name' => 'help_post',
+        'type' => CRM_Utils_Type::T_TEXT,
+                'title' => ts('Help Post'),
+                                                   'rows' => 4,
+                         'cols' => 80,
+         
+                                    
+                          ),
+      
+              'weight' => array(
+      
+        'name' => 'weight',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Weight'),
+                                                     
+                                           'default' => '1',
+         
+                          ),
+      
+              'is_display_amounts' => array(
+      
+        'name' => 'is_display_amounts',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                                                     
+                                           'default' => '1',
+         
+                          ),
+      
+              'options_per_line' => array(
+      
+        'name' => 'options_per_line',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Options Per Line'),
+                                                     
+                                           'default' => '1',
+         
+                          ),
+      
+              'is_active' => array(
+      
+        'name' => 'is_active',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                                                     
+                                           'default' => '1',
+         
+                          ),
+      
+              'is_required' => array(
+      
+        'name' => 'is_required',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                                                     
+                                           'default' => '1',
+         
+                          ),
+      
+              'active_on' => array(
+      
+        'name' => 'active_on',
+        'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
+                'title' => ts('Active On'),
+                                                     
+                                           'default' => 'NULL',
+         
+                          ),
+      
+              'expire_on' => array(
+      
+        'name' => 'expire_on',
+        'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
+                'title' => ts('Expire On'),
+                                                     
+                                           'default' => 'NULL',
+         
+                          ),
+      
+              'javascript' => array(
+      
+        'name' => 'javascript',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Javascript'),
+                                 'maxlength' => 255,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                                    
+                          ),
+      
+              'visibility_id' => array(
+      
+        'name' => 'visibility_id',
+        'type' => CRM_Utils_Type::T_INT,
+                                                     
+                                           'default' => '1',
+         
+                                     'pseudoconstant' => array(
+                                'optionGroupName' => 'visibility',
+                    )
+                 ),
+             );
+    }
+    return self::$_fields;
   }
 
 }

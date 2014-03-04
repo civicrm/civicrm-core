@@ -51,7 +51,7 @@ class Extension extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, unsigned=true)
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -260,6 +260,129 @@ class Extension extends \Civi\Core\Entity {
    */
   public function getIsActive() {
     return $this->isActive;
+  }
+
+  /**
+   * returns all the column names of this table
+   *
+   * @access public
+   * @return array
+   */
+  static function &fields( ) {
+    if ( !self::$_fields) {
+      self::$_fields = array (
+      
+              'id' => array(
+      
+        'name' => 'id',
+        'type' => CRM_Utils_Type::T_INT,
+                        'required' => true,
+                                             
+                                    
+                          ),
+      
+              'type' => array(
+      
+        'name' => 'type',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Type'),
+                        'required' => true,
+                         'maxlength' => 8,
+                         'size' => CRM_Utils_Type::EIGHT,
+                           
+                                    
+                                     'pseudoconstant' => array(
+                                '0' => 'not in database',
+                    )
+                 ),
+      
+              'full_name' => array(
+      
+        'name' => 'full_name',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Key'),
+                        'required' => true,
+                         'maxlength' => 255,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                                    
+                          ),
+      
+              'name' => array(
+      
+        'name' => 'name',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Name'),
+                                 'maxlength' => 255,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                'import' => true,
+        'where' => 'civicrm_extension.name',
+        'headerPattern' => '',
+        'dataPattern' => '',
+                         'export' => true,
+                                   
+                          ),
+      
+              'label' => array(
+      
+        'name' => 'label',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Label'),
+                                 'maxlength' => 255,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                'import' => true,
+        'where' => 'civicrm_extension.label',
+        'headerPattern' => '',
+        'dataPattern' => '',
+                         'export' => true,
+                                   
+                          ),
+      
+              'file' => array(
+      
+        'name' => 'file',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('File'),
+                                 'maxlength' => 255,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                'import' => true,
+        'where' => 'civicrm_extension.file',
+        'headerPattern' => '',
+        'dataPattern' => '',
+                         'export' => true,
+                                   
+                          ),
+      
+              'schema_version' => array(
+      
+        'name' => 'schema_version',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Schema Version'),
+                                 'maxlength' => 63,
+                         'size' => CRM_Utils_Type::BIG,
+                           
+                'import' => true,
+        'where' => 'civicrm_extension.schema_version',
+        'headerPattern' => '',
+        'dataPattern' => '',
+                         'export' => true,
+                                   
+                          ),
+      
+              'is_active' => array(
+      
+        'name' => 'is_active',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                                                     
+                                           'default' => '1',
+         
+                          ),
+             );
+    }
+    return self::$_fields;
   }
 
 }

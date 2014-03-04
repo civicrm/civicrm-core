@@ -51,7 +51,7 @@ class Pledge extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, unsigned=true)
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -116,7 +116,7 @@ class Pledge extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="frequency_interval", type="integer", nullable=false)
+   * @ORM\Column(name="frequency_interval", type="integer", unsigned=true, nullable=false)
    * 
    */
   private $frequencyInterval = '1';
@@ -124,7 +124,7 @@ class Pledge extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="frequency_day", type="integer", nullable=false)
+   * @ORM\Column(name="frequency_day", type="integer", unsigned=true, nullable=false)
    * 
    */
   private $frequencyDay = '3';
@@ -132,7 +132,7 @@ class Pledge extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="installments", type="integer", nullable=false)
+   * @ORM\Column(name="installments", type="integer", unsigned=true, nullable=false)
    * 
    */
   private $installments = '1';
@@ -188,7 +188,7 @@ class Pledge extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="max_reminders", type="integer", nullable=false)
+   * @ORM\Column(name="max_reminders", type="integer", unsigned=true, nullable=false)
    * 
    */
   private $maxReminders = '1';
@@ -196,7 +196,7 @@ class Pledge extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="initial_reminder_day", type="integer", nullable=false)
+   * @ORM\Column(name="initial_reminder_day", type="integer", unsigned=true, nullable=false)
    * 
    */
   private $initialReminderDay = '5';
@@ -204,7 +204,7 @@ class Pledge extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="additional_reminder_day", type="integer", nullable=false)
+   * @ORM\Column(name="additional_reminder_day", type="integer", unsigned=true, nullable=false)
    * 
    */
   private $additionalReminderDay = '5';
@@ -212,7 +212,7 @@ class Pledge extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="status_id", type="integer", nullable=true)
+   * @ORM\Column(name="status_id", type="integer", unsigned=true, nullable=true)
    * 
    */
   private $statusId;
@@ -680,6 +680,301 @@ class Pledge extends \Civi\Core\Entity {
    */
   public function getCampaign() {
     return $this->campaign;
+  }
+
+  /**
+   * returns all the column names of this table
+   *
+   * @access public
+   * @return array
+   */
+  static function &fields( ) {
+    if ( !self::$_fields) {
+      self::$_fields = array (
+      
+              'pledge_id' => array(
+      
+        'name' => 'id',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Pledge ID'),
+                        'required' => true,
+                                             
+                'import' => true,
+        'where' => 'civicrm_pledge.id',
+        'headerPattern' => '',
+        'dataPattern' => '',
+                         'export' => true,
+                                   
+                          ),
+      
+              'pledge_contact_id' => array(
+      
+        'name' => 'contact_id',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Contact ID'),
+                        'required' => true,
+                                             
+                'import' => true,
+        'where' => 'civicrm_pledge.contact_id',
+        'headerPattern' => '',
+        'dataPattern' => '',
+                         'export' => true,
+                                   
+                'FKClassName' => 'CRM_Contact_Contact',
+                          ),
+      
+              'pledge_financial_type_id' => array(
+      
+        'name' => 'financial_type_id',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Type'),
+                                                     
+                                    
+                'FKClassName' => 'CRM_Financial_FinancialType',
+                          ),
+      
+              'pledge_contribution_page_id' => array(
+      
+        'name' => 'contribution_page_id',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Pledge Contribution Page'),
+                                                     
+                                    
+                'FKClassName' => 'CRM_Contribute_ContributionPage',
+                          ),
+      
+              'pledge_amount' => array(
+      
+        'name' => 'amount',
+        'type' => CRM_Utils_Type::T_MONEY,
+                'title' => ts('Total Pledged'),
+                        'required' => true,
+                                             
+                'import' => true,
+        'where' => 'civicrm_pledge.amount',
+        'headerPattern' => '',
+        'dataPattern' => '',
+                         'export' => true,
+                                   
+                          ),
+      
+              'pledge_original_installment_amount' => array(
+      
+        'name' => 'original_installment_amount',
+        'type' => CRM_Utils_Type::T_MONEY,
+                'title' => ts('Original Installment Amount'),
+                        'required' => true,
+                                             
+                                    
+                          ),
+      
+              'currency' => array(
+      
+        'name' => 'currency',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Pledge Currency'),
+                                 'maxlength' => 3,
+                         'size' => CRM_Utils_Type::FOUR,
+                           
+                                           'default' => 'NULL',
+         
+                                     'pseudoconstant' => array(
+                                'table' => 'civicrm_currency',
+                      'keyColumn' => 'name',
+                      'labelColumn' => 'full_name',
+                      'nameColumn' => 'numeric_code',
+                    )
+                 ),
+      
+              'pledge_frequency_unit' => array(
+      
+        'name' => 'frequency_unit',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Pledge Frequency Unit'),
+                                 'maxlength' => 8,
+                         'size' => CRM_Utils_Type::EIGHT,
+                           
+                                           'default' => 'month',
+         
+                                     'pseudoconstant' => array(
+                                'optionGroupName' => 'recur_frequency_units',
+                      'keyColumn' => 'name',
+                    )
+                 ),
+      
+              'pledge_frequency_interval' => array(
+      
+        'name' => 'frequency_interval',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Pledge Frequency Interval'),
+                        'required' => true,
+                                             
+                                           'default' => '1',
+         
+                          ),
+      
+              'frequency_day' => array(
+      
+        'name' => 'frequency_day',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Pledge day'),
+                        'required' => true,
+                                             
+                                           'default' => '3',
+         
+                          ),
+      
+              'installments' => array(
+      
+        'name' => 'installments',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Pledge Number of Installments'),
+                                                     
+                                           'default' => '1',
+         
+                          ),
+      
+              'start_date' => array(
+      
+        'name' => 'start_date',
+        'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
+                'title' => ts('Pledge Start Date'),
+                        'required' => true,
+                                             
+                                    
+                          ),
+      
+              'pledge_create_date' => array(
+      
+        'name' => 'create_date',
+        'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
+                'title' => ts('Pledge Made'),
+                        'required' => true,
+                                             
+                'import' => true,
+        'where' => 'civicrm_pledge.create_date',
+        'headerPattern' => '',
+        'dataPattern' => '',
+                         'export' => true,
+                                   
+                          ),
+      
+              'acknowledge_date' => array(
+      
+        'name' => 'acknowledge_date',
+        'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
+                'title' => ts('Pledge Acknowledged'),
+                                                     
+                                    
+                          ),
+      
+              'modified_date' => array(
+      
+        'name' => 'modified_date',
+        'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
+                'title' => ts('Pledge Modified Date'),
+                                                     
+                                    
+                          ),
+      
+              'cancel_date' => array(
+      
+        'name' => 'cancel_date',
+        'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
+                'title' => ts('Pledge Cancelled Date'),
+                                                     
+                                    
+                          ),
+      
+              'end_date' => array(
+      
+        'name' => 'end_date',
+        'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
+                'title' => ts('Pledge End Date'),
+                                                     
+                                    
+                          ),
+      
+              'max_reminders' => array(
+      
+        'name' => 'max_reminders',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Maximum Number of Reminders'),
+                                                     
+                                           'default' => '1',
+         
+                          ),
+      
+              'initial_reminder_day' => array(
+      
+        'name' => 'initial_reminder_day',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Initial Reminder Day'),
+                                                     
+                                           'default' => '5',
+         
+                          ),
+      
+              'additional_reminder_day' => array(
+      
+        'name' => 'additional_reminder_day',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Additional Reminder Days'),
+                                                     
+                                           'default' => '5',
+         
+                          ),
+      
+              'pledge_status_id' => array(
+      
+        'name' => 'status_id',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Pledge Status Id'),
+                                                     
+                'import' => true,
+        'where' => 'civicrm_pledge.status_id',
+        'headerPattern' => '',
+        'dataPattern' => '',
+                         'export' => false,
+                                   
+                          ),
+      
+              'pledge_is_test' => array(
+      
+        'name' => 'is_test',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                'title' => ts('Test'),
+                                                     
+                'import' => true,
+        'where' => 'civicrm_pledge.is_test',
+        'headerPattern' => '',
+        'dataPattern' => '',
+                         'export' => true,
+                                   
+                          ),
+      
+              'pledge_campaign_id' => array(
+      
+        'name' => 'campaign_id',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Campaign'),
+                                                     
+                'import' => true,
+        'where' => 'civicrm_pledge.campaign_id',
+        'headerPattern' => '',
+        'dataPattern' => '',
+                         'export' => true,
+                                   
+                'FKClassName' => 'CRM_Campaign_Campaign',
+                                     'pseudoconstant' => array(
+                                'table' => 'civicrm_campaign',
+                      'keyColumn' => 'id',
+                      'labelColumn' => 'title',
+                    )
+                 ),
+             );
+    }
+    return self::$_fields;
   }
 
 }

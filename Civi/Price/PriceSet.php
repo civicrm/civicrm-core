@@ -51,7 +51,7 @@ class PriceSet extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, unsigned=true)
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -372,6 +372,143 @@ class PriceSet extends \Civi\Core\Entity {
    */
   public function getIsReserved() {
     return $this->isReserved;
+  }
+
+  /**
+   * returns all the column names of this table
+   *
+   * @access public
+   * @return array
+   */
+  static function &fields( ) {
+    if ( !self::$_fields) {
+      self::$_fields = array (
+      
+              'id' => array(
+      
+        'name' => 'id',
+        'type' => CRM_Utils_Type::T_INT,
+                        'required' => true,
+                                             
+                                    
+                          ),
+      
+              'domain_id' => array(
+      
+        'name' => 'domain_id',
+        'type' => CRM_Utils_Type::T_INT,
+                                                     
+                                    
+                'FKClassName' => 'CRM_Core_Domain',
+                          ),
+      
+              'name' => array(
+      
+        'name' => 'name',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Name'),
+                        'required' => true,
+                         'maxlength' => 255,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                                    
+                          ),
+      
+              'title' => array(
+      
+        'name' => 'title',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Title'),
+                        'required' => true,
+                         'maxlength' => 255,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                                    
+                          ),
+      
+              'is_active' => array(
+      
+        'name' => 'is_active',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                                                     
+                                           'default' => '1',
+         
+                          ),
+      
+              'help_pre' => array(
+      
+        'name' => 'help_pre',
+        'type' => CRM_Utils_Type::T_TEXT,
+                'title' => ts('Help Pre'),
+                                                   'rows' => 4,
+                         'cols' => 80,
+         
+                                    
+                          ),
+      
+              'help_post' => array(
+      
+        'name' => 'help_post',
+        'type' => CRM_Utils_Type::T_TEXT,
+                'title' => ts('Help Post'),
+                                                   'rows' => 4,
+                         'cols' => 80,
+         
+                                    
+                          ),
+      
+              'javascript' => array(
+      
+        'name' => 'javascript',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Javascript'),
+                                 'maxlength' => 64,
+                         'size' => CRM_Utils_Type::BIG,
+                           
+                                    
+                          ),
+      
+              'extends' => array(
+      
+        'name' => 'extends',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Extends'),
+                        'required' => true,
+                         'maxlength' => 255,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                                    
+                          ),
+      
+              'financial_type_id' => array(
+      
+        'name' => 'financial_type_id',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Financial Type'),
+                                                     
+                                           'default' => 'NULL',
+         
+                'FKClassName' => 'CRM_Financial_FinancialType',
+                          ),
+      
+              'is_quick_config' => array(
+      
+        'name' => 'is_quick_config',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                                                     
+                                    
+                          ),
+      
+              'is_reserved' => array(
+      
+        'name' => 'is_reserved',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                                                     
+                                    
+                          ),
+             );
+    }
+    return self::$_fields;
   }
 
 }

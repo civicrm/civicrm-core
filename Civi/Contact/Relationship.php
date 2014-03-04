@@ -51,7 +51,7 @@ class Relationship extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, unsigned=true)
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -145,7 +145,7 @@ class Relationship extends \Civi\Core\Entity {
   public function getId() {
     return $this->id;
   }
-
+    
   /**
    * Set contactA
    *
@@ -165,7 +165,7 @@ class Relationship extends \Civi\Core\Entity {
   public function getContactA() {
     return $this->contactA;
   }
-
+  
   /**
    * Set contactB
    *
@@ -185,7 +185,7 @@ class Relationship extends \Civi\Core\Entity {
   public function getContactB() {
     return $this->contactB;
   }
-
+  
   /**
    * Set relationshipType
    *
@@ -205,7 +205,7 @@ class Relationship extends \Civi\Core\Entity {
   public function getRelationshipType() {
     return $this->relationshipType;
   }
-
+  
   /**
    * Set startDate
    *
@@ -225,7 +225,7 @@ class Relationship extends \Civi\Core\Entity {
   public function getStartDate() {
     return $this->startDate;
   }
-
+  
   /**
    * Set endDate
    *
@@ -245,7 +245,7 @@ class Relationship extends \Civi\Core\Entity {
   public function getEndDate() {
     return $this->endDate;
   }
-
+  
   /**
    * Set isActive
    *
@@ -265,7 +265,7 @@ class Relationship extends \Civi\Core\Entity {
   public function getIsActive() {
     return $this->isActive;
   }
-
+  
   /**
    * Set description
    *
@@ -285,7 +285,7 @@ class Relationship extends \Civi\Core\Entity {
   public function getDescription() {
     return $this->description;
   }
-
+  
   /**
    * Set isPermissionAB
    *
@@ -305,7 +305,7 @@ class Relationship extends \Civi\Core\Entity {
   public function getIsPermissionAB() {
     return $this->isPermissionAB;
   }
-
+  
   /**
    * Set isPermissionBA
    *
@@ -344,6 +344,131 @@ class Relationship extends \Civi\Core\Entity {
    */
   public function getCase() {
     return $this->case;
+  }
+
+  /**
+   * returns all the column names of this table
+   *
+   * @access public
+   * @return array
+   */
+  static function &fields( ) {
+    if ( !self::$_fields) {
+      self::$_fields = array (
+      
+              'id' => array(
+      
+        'name' => 'id',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Relationship ID'),
+                        'required' => true,
+                                             
+                                    
+                          ),
+      
+              'contact_id_a' => array(
+      
+        'name' => 'contact_id_a',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Contact A ID'),
+                        'required' => true,
+                                             
+                                    
+                'FKClassName' => 'CRM_Contact_Contact',
+                          ),
+      
+              'contact_id_b' => array(
+      
+        'name' => 'contact_id_b',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Contact B ID'),
+                        'required' => true,
+                                             
+                                    
+                'FKClassName' => 'CRM_Contact_Contact',
+                          ),
+      
+              'relationship_type_id' => array(
+      
+        'name' => 'relationship_type_id',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Relationship Type ID'),
+                        'required' => true,
+                                             
+                                    
+                'FKClassName' => 'CRM_Contact_RelationshipType',
+                          ),
+      
+              'start_date' => array(
+      
+        'name' => 'start_date',
+        'type' => CRM_Utils_Type::T_DATE,
+                'title' => ts('Relationship Start Date'),
+                                                     
+                                    
+                          ),
+      
+              'end_date' => array(
+      
+        'name' => 'end_date',
+        'type' => CRM_Utils_Type::T_DATE,
+                'title' => ts('Relationship End Date'),
+                                                     
+                                    
+                          ),
+      
+              'is_active' => array(
+      
+        'name' => 'is_active',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                'title' => ts('Relationship Is Active'),
+                                                     
+                                           'default' => '1',
+         
+                          ),
+      
+              'description' => array(
+      
+        'name' => 'description',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Relationship Description'),
+                                 'maxlength' => 255,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                                    
+                          ),
+      
+              'is_permission_a_b' => array(
+      
+        'name' => 'is_permission_a_b',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                'title' => ts('Contact A has Permission Over Contact B'),
+                                                     
+                                    
+                          ),
+      
+              'is_permission_b_a' => array(
+      
+        'name' => 'is_permission_b_a',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                'title' => ts('Contact B has Permission Over Contact A'),
+                                                     
+                                    
+                          ),
+      
+              'case_id' => array(
+      
+        'name' => 'case_id',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Relationship Case ID'),
+                                                     
+                                           'default' => 'NULL',
+         
+                'FKClassName' => 'CRM_Case_Case',
+                          ),
+             );
+    }
+    return self::$_fields;
   }
 
 }

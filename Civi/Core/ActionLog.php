@@ -51,7 +51,7 @@ class ActionLog extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, unsigned=true)
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -68,7 +68,7 @@ class ActionLog extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="entity_id", type="integer", nullable=true)
+   * @ORM\Column(name="entity_id", type="integer", unsigned=true, nullable=true)
    * 
    */
   private $entityId;
@@ -116,7 +116,7 @@ class ActionLog extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="repetition_number", type="integer", nullable=true)
+   * @ORM\Column(name="repetition_number", type="integer", unsigned=true, nullable=true)
    * 
    */
   private $repetitionNumber;
@@ -288,6 +288,103 @@ class ActionLog extends \Civi\Core\Entity {
    */
   public function getRepetitionNumber() {
     return $this->repetitionNumber;
+  }
+
+  /**
+   * returns all the column names of this table
+   *
+   * @access public
+   * @return array
+   */
+  static function &fields( ) {
+    if ( !self::$_fields) {
+      self::$_fields = array (
+      
+              'id' => array(
+      
+        'name' => 'id',
+        'type' => CRM_Utils_Type::T_INT,
+                        'required' => true,
+                                             
+                                    
+                          ),
+      
+              'contact_id' => array(
+      
+        'name' => 'contact_id',
+        'type' => CRM_Utils_Type::T_INT,
+                                                     
+                                    
+                'FKClassName' => 'CRM_Contact_Contact',
+                          ),
+      
+              'entity_id' => array(
+      
+        'name' => 'entity_id',
+        'type' => CRM_Utils_Type::T_INT,
+                        'required' => true,
+                                             
+                                    
+                          ),
+      
+              'entity_table' => array(
+      
+        'name' => 'entity_table',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Entity Table'),
+                                 'maxlength' => 255,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                                    
+                          ),
+      
+              'action_schedule_id' => array(
+      
+        'name' => 'action_schedule_id',
+        'type' => CRM_Utils_Type::T_INT,
+                        'required' => true,
+                                             
+                                    
+                'FKClassName' => 'CRM_Core_ActionSchedule',
+                          ),
+      
+              'action_date_time' => array(
+      
+        'name' => 'action_date_time',
+        'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
+                'title' => ts('Action Date Time'),
+                                                     
+                                    
+                          ),
+      
+              'is_error' => array(
+      
+        'name' => 'is_error',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                                                     
+                                    
+                          ),
+      
+              'message' => array(
+      
+        'name' => 'message',
+        'type' => CRM_Utils_Type::T_TEXT,
+                'title' => ts('Message'),
+                                                     
+                                    
+                          ),
+      
+              'repetition_number' => array(
+      
+        'name' => 'repetition_number',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Repetition Number'),
+                                                     
+                                    
+                          ),
+             );
+    }
+    return self::$_fields;
   }
 
 }

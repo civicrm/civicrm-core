@@ -51,7 +51,7 @@ class MembershipType extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, unsigned=true)
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -116,7 +116,7 @@ class MembershipType extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="duration_interval", type="integer", nullable=true)
+   * @ORM\Column(name="duration_interval", type="integer", unsigned=true, nullable=true)
    * 
    */
   private $durationInterval;
@@ -132,7 +132,7 @@ class MembershipType extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="fixed_period_start_day", type="integer", nullable=true)
+   * @ORM\Column(name="fixed_period_start_day", type="integer", unsigned=true, nullable=true)
    * 
    */
   private $fixedPeriodStartDay;
@@ -140,7 +140,7 @@ class MembershipType extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="fixed_period_rollover_day", type="integer", nullable=true)
+   * @ORM\Column(name="fixed_period_rollover_day", type="integer", unsigned=true, nullable=true)
    * 
    */
   private $fixedPeriodRolloverDay;
@@ -164,7 +164,7 @@ class MembershipType extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="max_related", type="integer", nullable=true)
+   * @ORM\Column(name="max_related", type="integer", unsigned=true, nullable=true)
    * 
    */
   private $maxRelated;
@@ -180,7 +180,7 @@ class MembershipType extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="weight", type="integer", nullable=true)
+   * @ORM\Column(name="weight", type="integer", unsigned=true, nullable=true)
    * 
    */
   private $weight;
@@ -624,6 +624,244 @@ class MembershipType extends \Civi\Core\Entity {
    */
   public function getIsActive() {
     return $this->isActive;
+  }
+
+  /**
+   * returns all the column names of this table
+   *
+   * @access public
+   * @return array
+   */
+  static function &fields( ) {
+    if ( !self::$_fields) {
+      self::$_fields = array (
+      
+              'id' => array(
+      
+        'name' => 'id',
+        'type' => CRM_Utils_Type::T_INT,
+                        'required' => true,
+                                             
+                                    
+                          ),
+      
+              'domain_id' => array(
+      
+        'name' => 'domain_id',
+        'type' => CRM_Utils_Type::T_INT,
+                        'required' => true,
+                                             
+                                    
+                'FKClassName' => 'CRM_Core_Domain',
+                          ),
+      
+              'membership_type' => array(
+      
+        'name' => 'name',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Membership Type'),
+                                 'maxlength' => 128,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                'import' => true,
+        'where' => 'civicrm_membership_type.name',
+        'headerPattern' => '',
+        'dataPattern' => '',
+                         'export' => true,
+                                   
+                          ),
+      
+              'description' => array(
+      
+        'name' => 'description',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Description'),
+                                 'maxlength' => 255,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                                    
+                          ),
+      
+              'member_of_contact_id' => array(
+      
+        'name' => 'member_of_contact_id',
+        'type' => CRM_Utils_Type::T_INT,
+                        'required' => true,
+                                             
+                                    
+                'FKClassName' => 'CRM_Contact_Contact',
+                          ),
+      
+              'financial_type_id' => array(
+      
+        'name' => 'financial_type_id',
+        'type' => CRM_Utils_Type::T_INT,
+                        'required' => true,
+                                             
+                                    
+                'FKClassName' => 'CRM_Financial_FinancialType',
+                          ),
+      
+              'minimum_fee' => array(
+      
+        'name' => 'minimum_fee',
+        'type' => CRM_Utils_Type::T_MONEY,
+                'title' => ts('Minimum Fee'),
+                                                     
+                                    
+                          ),
+      
+              'duration_unit' => array(
+      
+        'name' => 'duration_unit',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Duration Unit'),
+                                 'maxlength' => 8,
+                         'size' => CRM_Utils_Type::EIGHT,
+                           
+                                    
+                                     'pseudoconstant' => array(
+                                '0' => 'not in database',
+                    )
+                 ),
+      
+              'duration_interval' => array(
+      
+        'name' => 'duration_interval',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Duration Interval'),
+                                                     
+                                    
+                          ),
+      
+              'period_type' => array(
+      
+        'name' => 'period_type',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Period Type'),
+                                 'maxlength' => 8,
+                         'size' => CRM_Utils_Type::EIGHT,
+                           
+                                    
+                                     'pseudoconstant' => array(
+                                '0' => 'not in database',
+                    )
+                 ),
+      
+              'fixed_period_start_day' => array(
+      
+        'name' => 'fixed_period_start_day',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Fixed Period Start Day'),
+                                                     
+                                    
+                          ),
+      
+              'fixed_period_rollover_day' => array(
+      
+        'name' => 'fixed_period_rollover_day',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Fixed Period Rollover Day'),
+                                                     
+                                    
+                          ),
+      
+              'relationship_type_id' => array(
+      
+        'name' => 'relationship_type_id',
+        'type' => CRM_Utils_Type::T_STRING,
+                                 'maxlength' => 64,
+                         'size' => CRM_Utils_Type::BIG,
+                           
+                                    
+                          ),
+      
+              'relationship_direction' => array(
+      
+        'name' => 'relationship_direction',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Relationship Direction'),
+                                 'maxlength' => 128,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                                    
+                          ),
+      
+              'max_related' => array(
+      
+        'name' => 'max_related',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Max Related'),
+                                                     
+                                    
+                          ),
+      
+              'visibility' => array(
+      
+        'name' => 'visibility',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Visible'),
+                                 'maxlength' => 64,
+                         'size' => CRM_Utils_Type::BIG,
+                           
+                                    
+                                     'pseudoconstant' => array(
+                                'optionGroupName' => 'visibility',
+                    )
+                 ),
+      
+              'weight' => array(
+      
+        'name' => 'weight',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Weight'),
+                                                     
+                                    
+                          ),
+      
+              'receipt_text_signup' => array(
+      
+        'name' => 'receipt_text_signup',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Receipt Text Signup'),
+                                 'maxlength' => 255,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                                    
+                          ),
+      
+              'receipt_text_renewal' => array(
+      
+        'name' => 'receipt_text_renewal',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Receipt Text Renewal'),
+                                 'maxlength' => 255,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                                    
+                          ),
+      
+              'auto_renew' => array(
+      
+        'name' => 'auto_renew',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                'title' => ts('Auto Renew'),
+                                                     
+                                    
+                          ),
+      
+              'is_active' => array(
+      
+        'name' => 'is_active',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                'title' => ts('Is Active'),
+                                                     
+                                           'default' => '1',
+         
+                          ),
+             );
+    }
+    return self::$_fields;
   }
 
 }

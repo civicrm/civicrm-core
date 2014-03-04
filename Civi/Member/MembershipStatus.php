@@ -51,7 +51,7 @@ class MembershipStatus extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, unsigned=true)
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -92,7 +92,7 @@ class MembershipStatus extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="start_event_adjust_interval", type="integer", nullable=true)
+   * @ORM\Column(name="start_event_adjust_interval", type="integer", unsigned=true, nullable=true)
    * 
    */
   private $startEventAdjustInterval;
@@ -116,7 +116,7 @@ class MembershipStatus extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="end_event_adjust_interval", type="integer", nullable=true)
+   * @ORM\Column(name="end_event_adjust_interval", type="integer", unsigned=true, nullable=true)
    * 
    */
   private $endEventAdjustInterval;
@@ -140,7 +140,7 @@ class MembershipStatus extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="weight", type="integer", nullable=true)
+   * @ORM\Column(name="weight", type="integer", unsigned=true, nullable=true)
    * 
    */
   private $weight;
@@ -456,6 +456,185 @@ class MembershipStatus extends \Civi\Core\Entity {
    */
   public function getIsReserved() {
     return $this->isReserved;
+  }
+
+  /**
+   * returns all the column names of this table
+   *
+   * @access public
+   * @return array
+   */
+  static function &fields( ) {
+    if ( !self::$_fields) {
+      self::$_fields = array (
+      
+              'id' => array(
+      
+        'name' => 'id',
+        'type' => CRM_Utils_Type::T_INT,
+                        'required' => true,
+                                             
+                                    
+                          ),
+      
+              'membership_status' => array(
+      
+        'name' => 'name',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Membership Status'),
+                                 'maxlength' => 128,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                'import' => true,
+        'where' => 'civicrm_membership_status.name',
+        'headerPattern' => '',
+        'dataPattern' => '',
+                         'export' => true,
+                                   
+                          ),
+      
+              'label' => array(
+      
+        'name' => 'label',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Label'),
+                                 'maxlength' => 128,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                                    
+                          ),
+      
+              'start_event' => array(
+      
+        'name' => 'start_event',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Start Event'),
+                                 'maxlength' => 12,
+                         'size' => CRM_Utils_Type::TWELVE,
+                           
+                                    
+                                     'pseudoconstant' => array(
+                                '0' => 'not in database',
+                    )
+                 ),
+      
+              'start_event_adjust_unit' => array(
+      
+        'name' => 'start_event_adjust_unit',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Start Event Adjust Unit'),
+                                 'maxlength' => 8,
+                         'size' => CRM_Utils_Type::EIGHT,
+                           
+                                    
+                                     'pseudoconstant' => array(
+                                '0' => 'not in database',
+                    )
+                 ),
+      
+              'start_event_adjust_interval' => array(
+      
+        'name' => 'start_event_adjust_interval',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Start Event Adjust Interval'),
+                                                     
+                                    
+                          ),
+      
+              'end_event' => array(
+      
+        'name' => 'end_event',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('End Event'),
+                                 'maxlength' => 12,
+                         'size' => CRM_Utils_Type::TWELVE,
+                           
+                                    
+                                     'pseudoconstant' => array(
+                                '0' => 'not in database',
+                    )
+                 ),
+      
+              'end_event_adjust_unit' => array(
+      
+        'name' => 'end_event_adjust_unit',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('End Event Adjust Unit'),
+                                 'maxlength' => 8,
+                         'size' => CRM_Utils_Type::EIGHT,
+                           
+                                    
+                                     'pseudoconstant' => array(
+                                '0' => 'not in database',
+                    )
+                 ),
+      
+              'end_event_adjust_interval' => array(
+      
+        'name' => 'end_event_adjust_interval',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('End Event Adjust Interval'),
+                                                     
+                                    
+                          ),
+      
+              'is_current_member' => array(
+      
+        'name' => 'is_current_member',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                'title' => ts('Current Membership?'),
+                                                     
+                                    
+                          ),
+      
+              'is_admin' => array(
+      
+        'name' => 'is_admin',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                'title' => ts('Admin Assigned Only?'),
+                                                     
+                                    
+                          ),
+      
+              'weight' => array(
+      
+        'name' => 'weight',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Weight'),
+                                                     
+                                    
+                          ),
+      
+              'is_default' => array(
+      
+        'name' => 'is_default',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                'title' => ts('Default Status?'),
+                                                     
+                                    
+                          ),
+      
+              'is_active' => array(
+      
+        'name' => 'is_active',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                'title' => ts('Is Active'),
+                                                     
+                                           'default' => '1',
+         
+                          ),
+      
+              'is_reserved' => array(
+      
+        'name' => 'is_reserved',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                'title' => ts('Is Reserved'),
+                                                     
+                                    
+                          ),
+             );
+    }
+    return self::$_fields;
   }
 
 }

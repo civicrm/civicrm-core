@@ -51,7 +51,7 @@ class OptionValue extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, unsigned=true)
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -100,7 +100,7 @@ class OptionValue extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="filter", type="integer", nullable=true)
+   * @ORM\Column(name="filter", type="integer", unsigned=true, nullable=true)
    * 
    */
   private $filter;
@@ -116,7 +116,7 @@ class OptionValue extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="weight", type="integer", nullable=true)
+   * @ORM\Column(name="weight", type="integer", unsigned=true, nullable=true)
    * 
    */
   private $weight;
@@ -172,7 +172,7 @@ class OptionValue extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="visibility_id", type="integer", nullable=false)
+   * @ORM\Column(name="visibility_id", type="integer", unsigned=true, nullable=false)
    * 
    */
   private $visibilityId = 'NULL';
@@ -484,6 +484,190 @@ class OptionValue extends \Civi\Core\Entity {
    */
   public function getVisibilityId() {
     return $this->visibilityId;
+  }
+
+  /**
+   * returns all the column names of this table
+   *
+   * @access public
+   * @return array
+   */
+  static function &fields( ) {
+    if ( !self::$_fields) {
+      self::$_fields = array (
+      
+              'id' => array(
+      
+        'name' => 'id',
+        'type' => CRM_Utils_Type::T_INT,
+                        'required' => true,
+                                             
+                                    
+                          ),
+      
+              'option_group_id' => array(
+      
+        'name' => 'option_group_id',
+        'type' => CRM_Utils_Type::T_INT,
+                        'required' => true,
+                                             
+                                    
+                'FKClassName' => 'CRM_Core_OptionGroup',
+                                     'pseudoconstant' => array(
+                                'table' => 'civicrm_option_group',
+                      'keyColumn' => 'id',
+                      'labelColumn' => 'name',
+                    )
+                 ),
+      
+              'label' => array(
+      
+        'name' => 'label',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Option Label'),
+                        'required' => true,
+                         'maxlength' => 255,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                                    
+                          ),
+      
+              'value' => array(
+      
+        'name' => 'value',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Option Value'),
+                        'required' => true,
+                         'maxlength' => 512,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                                    
+                          ),
+      
+              'name' => array(
+      
+        'name' => 'name',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Option Name'),
+                                 'maxlength' => 255,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                'import' => true,
+        'where' => 'civicrm_option_value.name',
+        'headerPattern' => '',
+        'dataPattern' => '',
+                         'export' => true,
+                                   
+                          ),
+      
+              'grouping' => array(
+      
+        'name' => 'grouping',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Option Grouping Name'),
+                                 'maxlength' => 255,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                                    
+                          ),
+      
+              'filter' => array(
+      
+        'name' => 'filter',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Filter'),
+                                                     
+                                    
+                          ),
+      
+              'is_default' => array(
+      
+        'name' => 'is_default',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                                                     
+                                    
+                          ),
+      
+              'weight' => array(
+      
+        'name' => 'weight',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Weight'),
+                        'required' => true,
+                                             
+                                    
+                          ),
+      
+              'description' => array(
+      
+        'name' => 'description',
+        'type' => CRM_Utils_Type::T_TEXT,
+                'title' => ts('Description'),
+                                                   'rows' => 8,
+                         'cols' => 60,
+         
+                                    
+                          ),
+      
+              'is_optgroup' => array(
+      
+        'name' => 'is_optgroup',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                                                     
+                                    
+                          ),
+      
+              'is_reserved' => array(
+      
+        'name' => 'is_reserved',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                                                     
+                                    
+                          ),
+      
+              'is_active' => array(
+      
+        'name' => 'is_active',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                                                     
+                                           'default' => '1',
+         
+                          ),
+      
+              'component_id' => array(
+      
+        'name' => 'component_id',
+        'type' => CRM_Utils_Type::T_INT,
+                                                     
+                                    
+                'FKClassName' => 'CRM_Core_Component',
+                                     'pseudoconstant' => array(
+                                'table' => 'civicrm_component',
+                      'keyColumn' => 'id',
+                      'labelColumn' => 'name',
+                    )
+                 ),
+      
+              'domain_id' => array(
+      
+        'name' => 'domain_id',
+        'type' => CRM_Utils_Type::T_INT,
+                                                     
+                                    
+                'FKClassName' => 'CRM_Core_Domain',
+                          ),
+      
+              'visibility_id' => array(
+      
+        'name' => 'visibility_id',
+        'type' => CRM_Utils_Type::T_INT,
+                                                     
+                                           'default' => 'NULL',
+         
+                          ),
+             );
+    }
+    return self::$_fields;
   }
 
 }

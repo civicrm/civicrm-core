@@ -51,7 +51,7 @@ class TrackableURLOpen extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, unsigned=true)
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -148,6 +148,59 @@ class TrackableURLOpen extends \Civi\Core\Entity {
    */
   public function getTimeStamp() {
     return $this->timeStamp;
+  }
+
+  /**
+   * returns all the column names of this table
+   *
+   * @access public
+   * @return array
+   */
+  static function &fields( ) {
+    if ( !self::$_fields) {
+      self::$_fields = array (
+      
+              'id' => array(
+      
+        'name' => 'id',
+        'type' => CRM_Utils_Type::T_INT,
+                        'required' => true,
+                                             
+                                    
+                          ),
+      
+              'event_queue_id' => array(
+      
+        'name' => 'event_queue_id',
+        'type' => CRM_Utils_Type::T_INT,
+                        'required' => true,
+                                             
+                                    
+                'FKClassName' => 'CRM_Mailing_Event_Queue',
+                          ),
+      
+              'trackable_url_id' => array(
+      
+        'name' => 'trackable_url_id',
+        'type' => CRM_Utils_Type::T_INT,
+                        'required' => true,
+                                             
+                                    
+                'FKClassName' => 'CRM_Mailing_TrackableURL',
+                          ),
+      
+              'time_stamp' => array(
+      
+        'name' => 'time_stamp',
+        'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
+                'title' => ts('Time Stamp'),
+                        'required' => true,
+                                             
+                                    
+                          ),
+             );
+    }
+    return self::$_fields;
   }
 
 }

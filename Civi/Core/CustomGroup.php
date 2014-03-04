@@ -51,7 +51,7 @@ class CustomGroup extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, unsigned=true)
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -84,7 +84,7 @@ class CustomGroup extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="extends_entity_column_id", type="integer", nullable=false)
+   * @ORM\Column(name="extends_entity_column_id", type="integer", unsigned=true, nullable=false)
    * 
    */
   private $extendsEntityColumnId = 'NULL';
@@ -100,7 +100,7 @@ class CustomGroup extends \Civi\Core\Entity {
   /**
    * @var string
    *
-   * @ORM\Column(name="style", type="string", length=8, nullable=true)
+   * @ORM\Column(name="style", type="string", length=15, nullable=true)
    * 
    */
   private $style;
@@ -108,7 +108,7 @@ class CustomGroup extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="collapse_display", type="integer", nullable=false)
+   * @ORM\Column(name="collapse_display", type="integer", unsigned=true, nullable=false)
    * 
    */
   private $collapseDisplay = '0';
@@ -132,7 +132,7 @@ class CustomGroup extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="weight", type="integer", nullable=false)
+   * @ORM\Column(name="weight", type="integer", unsigned=true, nullable=false)
    * 
    */
   private $weight = '1';
@@ -164,7 +164,7 @@ class CustomGroup extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="min_multiple", type="integer", nullable=true)
+   * @ORM\Column(name="min_multiple", type="integer", unsigned=true, nullable=true)
    * 
    */
   private $minMultiple;
@@ -172,7 +172,7 @@ class CustomGroup extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="max_multiple", type="integer", nullable=true)
+   * @ORM\Column(name="max_multiple", type="integer", unsigned=true, nullable=true)
    * 
    */
   private $maxMultiple;
@@ -180,7 +180,7 @@ class CustomGroup extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="collapse_adv_display", type="integer", nullable=false)
+   * @ORM\Column(name="collapse_adv_display", type="integer", unsigned=true, nullable=false)
    * 
    */
   private $collapseAdvDisplay = '0';
@@ -596,6 +596,220 @@ class CustomGroup extends \Civi\Core\Entity {
    */
   public function getIsReserved() {
     return $this->isReserved;
+  }
+
+  /**
+   * returns all the column names of this table
+   *
+   * @access public
+   * @return array
+   */
+  static function &fields( ) {
+    if ( !self::$_fields) {
+      self::$_fields = array (
+      
+              'id' => array(
+      
+        'name' => 'id',
+        'type' => CRM_Utils_Type::T_INT,
+                        'required' => true,
+                                             
+                                    
+                          ),
+      
+              'name' => array(
+      
+        'name' => 'name',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Name'),
+                                 'maxlength' => 64,
+                         'size' => CRM_Utils_Type::BIG,
+                           
+                                    
+                          ),
+      
+              'title' => array(
+      
+        'name' => 'title',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Title'),
+                        'required' => true,
+                         'maxlength' => 64,
+                         'size' => CRM_Utils_Type::BIG,
+                           
+                                    
+                          ),
+      
+              'extends' => array(
+      
+        'name' => 'extends',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Extends'),
+                                 'maxlength' => 255,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                                           'default' => 'Contact',
+         
+                          ),
+      
+              'extends_entity_column_id' => array(
+      
+        'name' => 'extends_entity_column_id',
+        'type' => CRM_Utils_Type::T_INT,
+                                                     
+                                           'default' => 'NULL',
+         
+                          ),
+      
+              'extends_entity_column_value' => array(
+      
+        'name' => 'extends_entity_column_value',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Extends Entity Column Value'),
+                                 'maxlength' => 255,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                                    
+                          ),
+      
+              'style' => array(
+      
+        'name' => 'style',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Style'),
+                                 'maxlength' => 15,
+                         'size' => CRM_Utils_Type::TWELVE,
+                           
+                                    
+                                     'pseudoconstant' => array(
+                                '0' => 'not in database',
+                    )
+                 ),
+      
+              'collapse_display' => array(
+      
+        'name' => 'collapse_display',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Collapse Display'),
+                                                     
+                                    
+                          ),
+      
+              'help_pre' => array(
+      
+        'name' => 'help_pre',
+        'type' => CRM_Utils_Type::T_TEXT,
+                'title' => ts('Help Pre'),
+                                                   'rows' => 4,
+                         'cols' => 80,
+         
+                                    
+                          ),
+      
+              'help_post' => array(
+      
+        'name' => 'help_post',
+        'type' => CRM_Utils_Type::T_TEXT,
+                'title' => ts('Help Post'),
+                                                   'rows' => 4,
+                         'cols' => 80,
+         
+                                    
+                          ),
+      
+              'weight' => array(
+      
+        'name' => 'weight',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Weight'),
+                        'required' => true,
+                                             
+                                           'default' => '1',
+         
+                          ),
+      
+              'is_active' => array(
+      
+        'name' => 'is_active',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                                                     
+                                    
+                          ),
+      
+              'table_name' => array(
+      
+        'name' => 'table_name',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Table Name'),
+                                 'maxlength' => 255,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                                    
+                          ),
+      
+              'is_multiple' => array(
+      
+        'name' => 'is_multiple',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                                                     
+                                    
+                          ),
+      
+              'min_multiple' => array(
+      
+        'name' => 'min_multiple',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Min Multiple'),
+                                                     
+                                    
+                          ),
+      
+              'max_multiple' => array(
+      
+        'name' => 'max_multiple',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Max Multiple'),
+                                                     
+                                    
+                          ),
+      
+              'collapse_adv_display' => array(
+      
+        'name' => 'collapse_adv_display',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Collapse Adv Display'),
+                                                     
+                                    
+                          ),
+      
+              'created_id' => array(
+      
+        'name' => 'created_id',
+        'type' => CRM_Utils_Type::T_INT,
+                                                     
+                                    
+                'FKClassName' => 'CRM_Contact_Contact',
+                          ),
+      
+              'created_date' => array(
+      
+        'name' => 'created_date',
+        'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
+                'title' => ts('Custom Group Created Date'),
+                                                     
+                                    
+                          ),
+      
+              'is_reserved' => array(
+      
+        'name' => 'is_reserved',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                                                     
+                                    
+                          ),
+             );
+    }
+    return self::$_fields;
   }
 
 }

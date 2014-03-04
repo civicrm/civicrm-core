@@ -51,7 +51,7 @@ class PremiumsProduct extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, unsigned=true)
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -76,7 +76,7 @@ class PremiumsProduct extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="weight", type="integer", nullable=true)
+   * @ORM\Column(name="weight", type="integer", unsigned=true, nullable=true)
    * 
    */
   private $weight;
@@ -176,6 +176,70 @@ class PremiumsProduct extends \Civi\Core\Entity {
    */
   public function getFinancialType() {
     return $this->financialType;
+  }
+
+  /**
+   * returns all the column names of this table
+   *
+   * @access public
+   * @return array
+   */
+  static function &fields( ) {
+    if ( !self::$_fields) {
+      self::$_fields = array (
+      
+              'id' => array(
+      
+        'name' => 'id',
+        'type' => CRM_Utils_Type::T_INT,
+                        'required' => true,
+                                             
+                                    
+                          ),
+      
+              'premiums_id' => array(
+      
+        'name' => 'premiums_id',
+        'type' => CRM_Utils_Type::T_INT,
+                        'required' => true,
+                                             
+                                    
+                'FKClassName' => 'CRM_Contribute_Premium',
+                          ),
+      
+              'product_id' => array(
+      
+        'name' => 'product_id',
+        'type' => CRM_Utils_Type::T_INT,
+                        'required' => true,
+                                             
+                                    
+                'FKClassName' => 'CRM_Contribute_Product',
+                          ),
+      
+              'weight' => array(
+      
+        'name' => 'weight',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Weight'),
+                        'required' => true,
+                                             
+                                    
+                          ),
+      
+              'financial_type_id' => array(
+      
+        'name' => 'financial_type_id',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Financial Type'),
+                                                     
+                                           'default' => 'NULL',
+         
+                'FKClassName' => 'CRM_Financial_FinancialType',
+                          ),
+             );
+    }
+    return self::$_fields;
   }
 
 }

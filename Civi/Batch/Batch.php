@@ -51,7 +51,7 @@ class Batch extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, unsigned=true)
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -124,7 +124,7 @@ class Batch extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="status_id", type="integer", nullable=true)
+   * @ORM\Column(name="status_id", type="integer", unsigned=true, nullable=true)
    * 
    */
   private $statusId;
@@ -132,7 +132,7 @@ class Batch extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="type_id", type="integer", nullable=true)
+   * @ORM\Column(name="type_id", type="integer", unsigned=true, nullable=true)
    * 
    */
   private $typeId;
@@ -140,7 +140,7 @@ class Batch extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="mode_id", type="integer", nullable=true)
+   * @ORM\Column(name="mode_id", type="integer", unsigned=true, nullable=true)
    * 
    */
   private $modeId;
@@ -156,7 +156,7 @@ class Batch extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="item_count", type="integer", nullable=true)
+   * @ORM\Column(name="item_count", type="integer", unsigned=true, nullable=true)
    * 
    */
   private $itemCount;
@@ -164,7 +164,7 @@ class Batch extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="payment_instrument_id", type="integer", nullable=true)
+   * @ORM\Column(name="payment_instrument_id", type="integer", unsigned=true, nullable=true)
    * 
    */
   private $paymentInstrumentId;
@@ -512,6 +512,188 @@ class Batch extends \Civi\Core\Entity {
    */
   public function getData() {
     return $this->data;
+  }
+
+  /**
+   * returns all the column names of this table
+   *
+   * @access public
+   * @return array
+   */
+  static function &fields( ) {
+    if ( !self::$_fields) {
+      self::$_fields = array (
+      
+              'id' => array(
+      
+        'name' => 'id',
+        'type' => CRM_Utils_Type::T_INT,
+                        'required' => true,
+                                             
+                                    
+                          ),
+      
+              'name' => array(
+      
+        'name' => 'name',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Name'),
+                                 'maxlength' => 64,
+                         'size' => CRM_Utils_Type::BIG,
+                           
+                                    
+                          ),
+      
+              'title' => array(
+      
+        'name' => 'title',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Title'),
+                                 'maxlength' => 64,
+                         'size' => CRM_Utils_Type::BIG,
+                           
+                                    
+                          ),
+      
+              'description' => array(
+      
+        'name' => 'description',
+        'type' => CRM_Utils_Type::T_TEXT,
+                'title' => ts('Description'),
+                                                   'rows' => 4,
+                         'cols' => 80,
+         
+                                    
+                          ),
+      
+              'created_id' => array(
+      
+        'name' => 'created_id',
+        'type' => CRM_Utils_Type::T_INT,
+                                                     
+                                    
+                'FKClassName' => 'CRM_Contact_Contact',
+                          ),
+      
+              'created_date' => array(
+      
+        'name' => 'created_date',
+        'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
+                'title' => ts('Created Date'),
+                                                     
+                                    
+                          ),
+      
+              'modified_id' => array(
+      
+        'name' => 'modified_id',
+        'type' => CRM_Utils_Type::T_INT,
+                                                     
+                                    
+                'FKClassName' => 'CRM_Contact_Contact',
+                          ),
+      
+              'modified_date' => array(
+      
+        'name' => 'modified_date',
+        'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
+                'title' => ts('Modified Date'),
+                                                     
+                                    
+                          ),
+      
+              'saved_search_id' => array(
+      
+        'name' => 'saved_search_id',
+        'type' => CRM_Utils_Type::T_INT,
+                                                     
+                                    
+                'FKClassName' => 'CRM_Contact_SavedSearch',
+                          ),
+      
+              'status_id' => array(
+      
+        'name' => 'status_id',
+        'type' => CRM_Utils_Type::T_INT,
+                        'required' => true,
+                                             
+                                    
+                                     'pseudoconstant' => array(
+                                'optionGroupName' => 'batch_status',
+                    )
+                 ),
+      
+              'type_id' => array(
+      
+        'name' => 'type_id',
+        'type' => CRM_Utils_Type::T_INT,
+                                                     
+                                    
+                                     'pseudoconstant' => array(
+                                'optionGroupName' => 'batch_type',
+                    )
+                 ),
+      
+              'mode_id' => array(
+      
+        'name' => 'mode_id',
+        'type' => CRM_Utils_Type::T_INT,
+                                                     
+                                    
+                                     'pseudoconstant' => array(
+                                'optionGroupName' => 'batch_mode',
+                    )
+                 ),
+      
+              'total' => array(
+      
+        'name' => 'total',
+        'type' => CRM_Utils_Type::T_MONEY,
+                'title' => ts('Total'),
+                                                     
+                                    
+                          ),
+      
+              'item_count' => array(
+      
+        'name' => 'item_count',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Item Count'),
+                                                     
+                                    
+                          ),
+      
+              'payment_instrument_id' => array(
+      
+        'name' => 'payment_instrument_id',
+        'type' => CRM_Utils_Type::T_INT,
+                                                     
+                                    
+                                     'pseudoconstant' => array(
+                                'optionGroupName' => 'payment_instrument',
+                    )
+                 ),
+      
+              'exported_date' => array(
+      
+        'name' => 'exported_date',
+        'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
+                'title' => ts('Exported Date'),
+                                                     
+                                    
+                          ),
+      
+              'data' => array(
+      
+        'name' => 'data',
+        'type' => CRM_Utils_Type::T_LONGTEXT,
+                'title' => ts('Data'),
+                                                     
+                                    
+                          ),
+             );
+    }
+    return self::$_fields;
   }
 
 }

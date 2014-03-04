@@ -51,7 +51,7 @@ class Provider extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, unsigned=true)
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -92,7 +92,7 @@ class Provider extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="api_type", type="integer", nullable=true)
+   * @ORM\Column(name="api_type", type="integer", unsigned=true, nullable=true)
    * 
    */
   private $apiType;
@@ -316,6 +316,119 @@ class Provider extends \Civi\Core\Entity {
    */
   public function getIsActive() {
     return $this->isActive;
+  }
+
+  /**
+   * returns all the column names of this table
+   *
+   * @access public
+   * @return array
+   */
+  static function &fields( ) {
+    if ( !self::$_fields) {
+      self::$_fields = array (
+      
+              'id' => array(
+      
+        'name' => 'id',
+        'type' => CRM_Utils_Type::T_INT,
+                        'required' => true,
+                                             
+                                    
+                          ),
+      
+              'name' => array(
+      
+        'name' => 'name',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Name'),
+                                 'maxlength' => 64,
+                         'size' => CRM_Utils_Type::BIG,
+                           
+                                    
+                          ),
+      
+              'title' => array(
+      
+        'name' => 'title',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Title'),
+                                 'maxlength' => 64,
+                         'size' => CRM_Utils_Type::BIG,
+                           
+                                    
+                          ),
+      
+              'username' => array(
+      
+        'name' => 'username',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Username'),
+                                 'maxlength' => 255,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                                    
+                          ),
+      
+              'password' => array(
+      
+        'name' => 'password',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Password'),
+                                 'maxlength' => 255,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                                    
+                          ),
+      
+              'api_type' => array(
+      
+        'name' => 'api_type',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Api Type'),
+                        'required' => true,
+                                             
+                                    
+                          ),
+      
+              'api_url' => array(
+      
+        'name' => 'api_url',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Api Url'),
+                                 'maxlength' => 128,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                                    
+                          ),
+      
+              'api_params' => array(
+      
+        'name' => 'api_params',
+        'type' => CRM_Utils_Type::T_TEXT,
+                'title' => ts('Api Params'),
+                                                     
+                                    
+                          ),
+      
+              'is_default' => array(
+      
+        'name' => 'is_default',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                                                     
+                                    
+                          ),
+      
+              'is_active' => array(
+      
+        'name' => 'is_active',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                                                     
+                                    
+                          ),
+             );
+    }
+    return self::$_fields;
   }
 
 }

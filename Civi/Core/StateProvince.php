@@ -51,7 +51,7 @@ class StateProvince extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, unsigned=true)
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -148,6 +148,66 @@ class StateProvince extends \Civi\Core\Entity {
    */
   public function getCountry() {
     return $this->country;
+  }
+
+  /**
+   * returns all the column names of this table
+   *
+   * @access public
+   * @return array
+   */
+  static function &fields( ) {
+    if ( !self::$_fields) {
+      self::$_fields = array (
+      
+              'id' => array(
+      
+        'name' => 'id',
+        'type' => CRM_Utils_Type::T_INT,
+                        'required' => true,
+                                             
+                                    
+                          ),
+      
+              'name' => array(
+      
+        'name' => 'name',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('State'),
+                                 'maxlength' => 64,
+                         'size' => CRM_Utils_Type::BIG,
+                           
+                'import' => true,
+        'where' => 'civicrm_state_province.name',
+        'headerPattern' => '/state|prov(ince)?/i',
+        'dataPattern' => '/[A-Z]{2}/',
+                         'export' => true,
+                                   
+                          ),
+      
+              'abbreviation' => array(
+      
+        'name' => 'abbreviation',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('State Abbreviation'),
+                                 'maxlength' => 4,
+                         'size' => CRM_Utils_Type::FOUR,
+                           
+                                    
+                          ),
+      
+              'country_id' => array(
+      
+        'name' => 'country_id',
+        'type' => CRM_Utils_Type::T_INT,
+                        'required' => true,
+                                             
+                                    
+                'FKClassName' => 'CRM_Core_Country',
+                          ),
+             );
+    }
+    return self::$_fields;
   }
 
 }

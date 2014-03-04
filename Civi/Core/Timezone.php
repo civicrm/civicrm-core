@@ -51,7 +51,7 @@ class Timezone extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, unsigned=true)
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -84,7 +84,7 @@ class Timezone extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="offset", type="integer", nullable=true)
+   * @ORM\Column(name="offset", type="integer", unsigned=true, nullable=true)
    * 
    */
   private $offset;
@@ -204,6 +204,81 @@ class Timezone extends \Civi\Core\Entity {
    */
   public function getCountry() {
     return $this->country;
+  }
+
+  /**
+   * returns all the column names of this table
+   *
+   * @access public
+   * @return array
+   */
+  static function &fields( ) {
+    if ( !self::$_fields) {
+      self::$_fields = array (
+      
+              'id' => array(
+      
+        'name' => 'id',
+        'type' => CRM_Utils_Type::T_INT,
+                        'required' => true,
+                                             
+                                    
+                          ),
+      
+              'name' => array(
+      
+        'name' => 'name',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Name'),
+                                 'maxlength' => 64,
+                         'size' => CRM_Utils_Type::BIG,
+                           
+                                    
+                          ),
+      
+              'abbreviation' => array(
+      
+        'name' => 'abbreviation',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Abbreviation'),
+                                 'maxlength' => 3,
+                         'size' => CRM_Utils_Type::FOUR,
+                           
+                                    
+                          ),
+      
+              'gmt' => array(
+      
+        'name' => 'gmt',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Gmt'),
+                                 'maxlength' => 64,
+                         'size' => CRM_Utils_Type::BIG,
+                           
+                                    
+                          ),
+      
+              'offset' => array(
+      
+        'name' => 'offset',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Offset'),
+                                                     
+                                    
+                          ),
+      
+              'country_id' => array(
+      
+        'name' => 'country_id',
+        'type' => CRM_Utils_Type::T_INT,
+                        'required' => true,
+                                             
+                                    
+                'FKClassName' => 'CRM_Core_Country',
+                          ),
+             );
+    }
+    return self::$_fields;
   }
 
 }

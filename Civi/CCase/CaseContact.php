@@ -51,14 +51,14 @@ class CaseContact extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, unsigned=true)
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
   private $id;
     
   /**
-   * @var \Civi\Case\Case
+   * @var \Civi\CCase\CCase
    *
    * @ORM\ManyToOne(targetEntity="Civi\CCase\CCase")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="case_id", referencedColumnName="id", onDelete="CASCADE")})
@@ -120,6 +120,49 @@ class CaseContact extends \Civi\Core\Entity {
    */
   public function getContact() {
     return $this->contact;
+  }
+
+  /**
+   * returns all the column names of this table
+   *
+   * @access public
+   * @return array
+   */
+  static function &fields( ) {
+    if ( !self::$_fields) {
+      self::$_fields = array (
+      
+              'id' => array(
+      
+        'name' => 'id',
+        'type' => CRM_Utils_Type::T_INT,
+                        'required' => true,
+                                             
+                                    
+                          ),
+      
+              'case_id' => array(
+      
+        'name' => 'case_id',
+        'type' => CRM_Utils_Type::T_INT,
+                        'required' => true,
+                                             
+                                    
+                'FKClassName' => 'CRM_Case_Case',
+                          ),
+      
+              'case_contact_id' => array(
+      
+        'name' => 'contact_id',
+        'type' => CRM_Utils_Type::T_INT,
+                        'required' => true,
+                                             
+                                    
+                'FKClassName' => 'CRM_Contact_Contact',
+                          ),
+             );
+    }
+    return self::$_fields;
   }
 
 }

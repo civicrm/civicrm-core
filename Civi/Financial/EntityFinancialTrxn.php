@@ -51,7 +51,7 @@ class EntityFinancialTrxn extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, unsigned=true)
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -68,7 +68,7 @@ class EntityFinancialTrxn extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="entity_id", type="integer", nullable=true)
+   * @ORM\Column(name="entity_id", type="integer", unsigned=true, nullable=true)
    * 
    */
   private $entityId;
@@ -176,6 +176,79 @@ class EntityFinancialTrxn extends \Civi\Core\Entity {
    */
   public function getAmount() {
     return $this->amount;
+  }
+
+  /**
+   * returns all the column names of this table
+   *
+   * @access public
+   * @return array
+   */
+  static function &fields( ) {
+    if ( !self::$_fields) {
+      self::$_fields = array (
+      
+              'id' => array(
+      
+        'name' => 'id',
+        'type' => CRM_Utils_Type::T_INT,
+                        'required' => true,
+                                             
+                                    
+                          ),
+      
+              'entity_table' => array(
+      
+        'name' => 'entity_table',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Entity Table'),
+                        'required' => true,
+                         'maxlength' => 64,
+                         'size' => CRM_Utils_Type::BIG,
+                           
+                'import' => true,
+        'where' => 'civicrm_entity_financial_trxn.entity_table',
+        'headerPattern' => '',
+        'dataPattern' => '',
+                         'export' => true,
+                                   
+                          ),
+      
+              'entity_id' => array(
+      
+        'name' => 'entity_id',
+        'type' => CRM_Utils_Type::T_INT,
+                        'required' => true,
+                                             
+                                    
+                          ),
+      
+              'financial_trxn_id' => array(
+      
+        'name' => 'financial_trxn_id',
+        'type' => CRM_Utils_Type::T_INT,
+                                                     
+                                    
+                'FKClassName' => 'CRM_Financial_FinancialTrxn',
+                          ),
+      
+              'amount' => array(
+      
+        'name' => 'amount',
+        'type' => CRM_Utils_Type::T_MONEY,
+                'title' => ts('Amount'),
+                        'required' => true,
+                                             
+                'import' => true,
+        'where' => 'civicrm_entity_financial_trxn.amount',
+        'headerPattern' => '/amount/i',
+        'dataPattern' => '/^\d+(\.\d{2})?$/',
+                         'export' => true,
+                                   
+                          ),
+             );
+    }
+    return self::$_fields;
   }
 
 }

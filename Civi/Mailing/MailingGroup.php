@@ -51,7 +51,7 @@ class MailingGroup extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, unsigned=true)
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -84,7 +84,7 @@ class MailingGroup extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="entity_id", type="integer", nullable=true)
+   * @ORM\Column(name="entity_id", type="integer", unsigned=true, nullable=true)
    * 
    */
   private $entityId;
@@ -92,7 +92,7 @@ class MailingGroup extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="search_id", type="integer", nullable=true)
+   * @ORM\Column(name="search_id", type="integer", unsigned=true, nullable=true)
    * 
    */
   private $searchId;
@@ -232,6 +232,91 @@ class MailingGroup extends \Civi\Core\Entity {
    */
   public function getSearchArgs() {
     return $this->searchArgs;
+  }
+
+  /**
+   * returns all the column names of this table
+   *
+   * @access public
+   * @return array
+   */
+  static function &fields( ) {
+    if ( !self::$_fields) {
+      self::$_fields = array (
+      
+              'id' => array(
+      
+        'name' => 'id',
+        'type' => CRM_Utils_Type::T_INT,
+                        'required' => true,
+                                             
+                                    
+                          ),
+      
+              'mailing_id' => array(
+      
+        'name' => 'mailing_id',
+        'type' => CRM_Utils_Type::T_INT,
+                        'required' => true,
+                                             
+                                    
+                'FKClassName' => 'CRM_Mailing_Mailing',
+                          ),
+      
+              'group_type' => array(
+      
+        'name' => 'group_type',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Group Type'),
+                                 'maxlength' => 8,
+                         'size' => CRM_Utils_Type::EIGHT,
+                           
+                                    
+                                     'pseudoconstant' => array(
+                                '0' => 'not in database',
+                    )
+                 ),
+      
+              'entity_table' => array(
+      
+        'name' => 'entity_table',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Entity Table'),
+                        'required' => true,
+                         'maxlength' => 64,
+                         'size' => CRM_Utils_Type::BIG,
+                           
+                                    
+                          ),
+      
+              'entity_id' => array(
+      
+        'name' => 'entity_id',
+        'type' => CRM_Utils_Type::T_INT,
+                        'required' => true,
+                                             
+                                    
+                          ),
+      
+              'search_id' => array(
+      
+        'name' => 'search_id',
+        'type' => CRM_Utils_Type::T_INT,
+                                                     
+                                    
+                          ),
+      
+              'search_args' => array(
+      
+        'name' => 'search_args',
+        'type' => CRM_Utils_Type::T_TEXT,
+                'title' => ts('Search Args'),
+                                                     
+                                    
+                          ),
+             );
+    }
+    return self::$_fields;
   }
 
 }

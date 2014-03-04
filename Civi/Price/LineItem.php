@@ -51,7 +51,7 @@ class LineItem extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, unsigned=true)
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -68,7 +68,7 @@ class LineItem extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="entity_id", type="integer", nullable=true)
+   * @ORM\Column(name="entity_id", type="integer", unsigned=true, nullable=true)
    * 
    */
   private $entityId;
@@ -92,7 +92,7 @@ class LineItem extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="qty", type="integer", nullable=true)
+   * @ORM\Column(name="qty", type="integer", unsigned=true, nullable=true)
    * 
    */
   private $qty;
@@ -116,7 +116,7 @@ class LineItem extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="participant_count", type="integer", nullable=false)
+   * @ORM\Column(name="participant_count", type="integer", unsigned=true, nullable=false)
    * 
    */
   private $participantCount = 'NULL';
@@ -372,6 +372,143 @@ class LineItem extends \Civi\Core\Entity {
    */
   public function getDeductibleAmount() {
     return $this->deductibleAmount;
+  }
+
+  /**
+   * returns all the column names of this table
+   *
+   * @access public
+   * @return array
+   */
+  static function &fields( ) {
+    if ( !self::$_fields) {
+      self::$_fields = array (
+      
+              'id' => array(
+      
+        'name' => 'id',
+        'type' => CRM_Utils_Type::T_INT,
+                        'required' => true,
+                                             
+                                    
+                          ),
+      
+              'entity_table' => array(
+      
+        'name' => 'entity_table',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Entity Table'),
+                        'required' => true,
+                         'maxlength' => 64,
+                         'size' => CRM_Utils_Type::BIG,
+                           
+                                    
+                          ),
+      
+              'entity_id' => array(
+      
+        'name' => 'entity_id',
+        'type' => CRM_Utils_Type::T_INT,
+                        'required' => true,
+                                             
+                                    
+                          ),
+      
+              'price_field_id' => array(
+      
+        'name' => 'price_field_id',
+        'type' => CRM_Utils_Type::T_INT,
+                                                     
+                                    
+                'FKClassName' => 'CRM_Price_PriceField',
+                          ),
+      
+              'label' => array(
+      
+        'name' => 'label',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Label'),
+                                 'maxlength' => 255,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                                           'default' => 'NULL',
+         
+                          ),
+      
+              'qty' => array(
+      
+        'name' => 'qty',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Qty'),
+                        'required' => true,
+                                             
+                                    
+                          ),
+      
+              'unit_price' => array(
+      
+        'name' => 'unit_price',
+        'type' => CRM_Utils_Type::T_MONEY,
+                'title' => ts('Unit Price'),
+                        'required' => true,
+                                             
+                                    
+                          ),
+      
+              'line_total' => array(
+      
+        'name' => 'line_total',
+        'type' => CRM_Utils_Type::T_MONEY,
+                'title' => ts('Line Total'),
+                        'required' => true,
+                                             
+                                    
+                          ),
+      
+              'participant_count' => array(
+      
+        'name' => 'participant_count',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Participant Count'),
+                                                     
+                                           'default' => 'NULL',
+         
+                          ),
+      
+              'price_field_value_id' => array(
+      
+        'name' => 'price_field_value_id',
+        'type' => CRM_Utils_Type::T_INT,
+                                                     
+                                           'default' => 'NULL',
+         
+                'FKClassName' => 'CRM_Price_PriceFieldValue',
+                          ),
+      
+              'financial_type_id' => array(
+      
+        'name' => 'financial_type_id',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Financial Type'),
+                                                     
+                                           'default' => 'NULL',
+         
+                'FKClassName' => 'CRM_Financial_FinancialType',
+                          ),
+      
+              'deductible_amount' => array(
+      
+        'name' => 'deductible_amount',
+        'type' => CRM_Utils_Type::T_MONEY,
+                'title' => ts('Deductible Amount'),
+                        'required' => true,
+                                             
+                                           'default' => '0.0',
+         
+                          ),
+             );
+    }
+    return self::$_fields;
   }
 
 }

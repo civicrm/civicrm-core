@@ -51,7 +51,7 @@ class Website extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, unsigned=true)
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -76,7 +76,7 @@ class Website extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="website_type_id", type="integer", nullable=true)
+   * @ORM\Column(name="website_type_id", type="integer", unsigned=true, nullable=true)
    * 
    */
   private $websiteTypeId;
@@ -148,6 +148,68 @@ class Website extends \Civi\Core\Entity {
    */
   public function getWebsiteTypeId() {
     return $this->websiteTypeId;
+  }
+
+  /**
+   * returns all the column names of this table
+   *
+   * @access public
+   * @return array
+   */
+  static function &fields( ) {
+    if ( !self::$_fields) {
+      self::$_fields = array (
+      
+              'id' => array(
+      
+        'name' => 'id',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Website ID'),
+                        'required' => true,
+                                             
+                                    
+                          ),
+      
+              'contact_id' => array(
+      
+        'name' => 'contact_id',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Contact'),
+                                                     
+                                    
+                'FKClassName' => 'CRM_Contact_Contact',
+                          ),
+      
+              'url' => array(
+      
+        'name' => 'url',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Website'),
+                                 'maxlength' => 128,
+                         'size' => CRM_Utils_Type::BIG,
+                           
+                'import' => true,
+        'where' => 'civicrm_website.url',
+        'headerPattern' => '/Website/i',
+        'dataPattern' => '/^[A-Za-z][0-9A-Za-z]{20,}$/',
+                         'export' => true,
+                                   
+                          ),
+      
+              'website_type_id' => array(
+      
+        'name' => 'website_type_id',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Website Type'),
+                                                     
+                                    
+                                     'pseudoconstant' => array(
+                                'optionGroupName' => 'website_type',
+                    )
+                 ),
+             );
+    }
+    return self::$_fields;
   }
 
 }

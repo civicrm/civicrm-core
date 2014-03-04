@@ -51,7 +51,7 @@ class SubscriptionHistory extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, unsigned=true)
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -232,6 +232,102 @@ class SubscriptionHistory extends \Civi\Core\Entity {
    */
   public function getTracking() {
     return $this->tracking;
+  }
+
+  /**
+   * returns all the column names of this table
+   *
+   * @access public
+   * @return array
+   */
+  static function &fields( ) {
+    if ( !self::$_fields) {
+      self::$_fields = array (
+      
+              'id' => array(
+      
+        'name' => 'id',
+        'type' => CRM_Utils_Type::T_INT,
+                        'required' => true,
+                                             
+                                    
+                          ),
+      
+              'contact_id' => array(
+      
+        'name' => 'contact_id',
+        'type' => CRM_Utils_Type::T_INT,
+                        'required' => true,
+                                             
+                                    
+                'FKClassName' => 'CRM_Contact_Contact',
+                          ),
+      
+              'group_id' => array(
+      
+        'name' => 'group_id',
+        'type' => CRM_Utils_Type::T_INT,
+                                                     
+                                    
+                'FKClassName' => 'CRM_Contact_Group',
+                                     'pseudoconstant' => array(
+                                'table' => 'civicrm_group',
+                      'keyColumn' => 'id',
+                      'labelColumn' => 'title',
+                    )
+                 ),
+      
+              'date' => array(
+      
+        'name' => 'date',
+        'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
+                'title' => ts('Date'),
+                        'required' => true,
+                                             
+                                    
+                          ),
+      
+              'method' => array(
+      
+        'name' => 'method',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Method'),
+                                 'maxlength' => 8,
+                         'size' => CRM_Utils_Type::EIGHT,
+                           
+                                    
+                                     'pseudoconstant' => array(
+                                '0' => 'not in database',
+                    )
+                 ),
+      
+              'status' => array(
+      
+        'name' => 'status',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Status'),
+                                 'maxlength' => 8,
+                         'size' => CRM_Utils_Type::EIGHT,
+                           
+                                    
+                                     'pseudoconstant' => array(
+                                '0' => 'not in database',
+                    )
+                 ),
+      
+              'tracking' => array(
+      
+        'name' => 'tracking',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Tracking'),
+                                 'maxlength' => 255,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                                    
+                          ),
+             );
+    }
+    return self::$_fields;
   }
 
 }
