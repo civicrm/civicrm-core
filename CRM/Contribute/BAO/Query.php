@@ -194,7 +194,7 @@ class CRM_Contribute_BAO_Query {
   static function where(&$query) {
     $grouping = NULL;
 
-    self::isIncludeSoftCredits($query->_params);
+    self::initializeAnySoftCreditClause($query);
     foreach (array_keys($query->_params) as $id) {
       if (empty($query->_params[$id][0])) {
         continue;
@@ -767,13 +767,32 @@ class CRM_Contribute_BAO_Query {
     return $from;
   }
 
-  static function isIncludeSoftCredits($queryParams = array()) {
-    foreach (array_keys($queryParams) as $id) {
-      if (empty($queryParams[$id][0])) {
-        continue;
+  static function initializeAnySoftCreditClause(&$query) {
+    if (self::initializeAnySoftCreditsVars($query->_params)) {
+      if ($query->_mode & CRM_Contact_BAO_Query::MODE_CONTRIBUTE) {
+        unset($query->_distinctComponentClause, $query->_groupByComponentClause);
+        $query->_rowCountClause = " count(civicrm_contribution.id)";
       }
-      if ($queryParams[$id][0] == 'contribution_or_softcredits' && 
-        in_array($queryParams[$id][2], array("only_scredits", "both_related", "both"))) {
+    }
+  }
+
+  static function initializeAnySoftCreditsVars($queryParams = array()) {
+    static $tempTableFilled = FALSE;
+    if (!empty($queryParams)) {
+      foreach (array_keys($queryParams) as $id) {
+        if (empty($queryParams[$id][0])) {
+          continue;
+        }
+        if ($queryParams[$id][0] == 'contribution_or_softcredits' && 
+          in_array($queryParams[$id][2], array("only_scredits", "both_related", "both"))) {
+            self::$_contribOrSoftCredit = $queryParams[$id][2];
+          }
+      }
+    }
+    if (in_array(self::$_contribOrSoftCredit, 
+      array("only_scredits", "both_related", "both"))) {
+        CRM_Core_Error::backtrace( 'backtrace', TRUE );
+        if (!$tempTableFilled) {
           $tempQuery = "
             CREATE TEMPORARY TABLE IF NOT EXISTS contribution_search_scredit_combined AS 
                SELECT con.id as id, con.contact_id, cso.id as filter_id, NULL as scredit_id 
@@ -783,14 +802,14 @@ class CRM_Contribute_BAO_Query {
                SELECT scredit.contribution_id as id, scredit.contact_id, scredit.id as filter_id, scredit.id as scredit_id 
                  FROM civicrm_contribution_soft as scredit";
           CRM_Core_DAO::executeQuery($tempQuery);
-          self::$_contribOrSoftCredit = $queryParams[$id][2];
-          return TRUE;
+          $tempTableFilled = TRUE;
         }
-    }
+        return TRUE;
+      }
     return FALSE;
   }
 
-  static function defaultReturnProperties($mode, $includeCustomFields = TRUE, $includeSoftCredits = FALSE) {
+  static function defaultReturnProperties($mode, $includeCustomFields = TRUE) {
     $properties = NULL;
     if ($mode & CRM_Contact_BAO_Query::MODE_CONTRIBUTE) {
       $properties = array(
@@ -831,7 +850,7 @@ class CRM_Contribute_BAO_Query {
         'contribution_batch' => 1,
         'contribution_campaign_id' => 1,
       );
-      if ($includeSoftCredits) {
+      if (self::initializeAnySoftCreditsVars()) {
         $properties = array_merge(
           $properties, array(
             'contribution_soft_credit_name'   => 1,
