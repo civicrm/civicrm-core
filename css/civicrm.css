@@ -2208,6 +2208,11 @@ div.grippie {
   margin-left: 8px;
 }
 
+.crm-container .crm-clear-link {
+  margin-left: .5em;
+}
+
+.crm-container .crm-button,
 #crm-container .crm-button {
   border: medium none;
   cursor: pointer;
@@ -2219,6 +2224,8 @@ div.grippie {
   padding: 0px 4px;
   cursor: pointer;
 }
+
+.crm-container .crm-button input,
 #crm-container .crm-button input {
   background: none;
   _background: #6C6C6C;
@@ -2231,10 +2238,14 @@ div.grippie {
   margin: 0 0 0 0px;
   padding: 1px 8px 2px 4px;
 }
+
+.crm-container .crm-button-type-cancel,
+.crm-container .crm-button-type-back,
 #crm-container .crm-button-type-cancel,
 #crm-container .crm-button-type-back {
   margin-left: 20px;
 }
+.crm-container .crm-button-type-cancel input,
 #crm-container .crm-button-type-cancel input {
   color: #E6E6DC!important;
 }
@@ -2243,6 +2254,7 @@ div.grippie {
 .crm-container a.button:link,
 .crm-container a.button:visited,
 .crm-container input.form-submit,
+.crm-container .crm-button,
 #crm-container input[type=button],
 #crm-container input.form-submit-inline,
 #crm-container .crm-button {
@@ -2258,6 +2270,7 @@ div.grippie {
   border: 1px solid #3e3e3e;
 }
 
+.crm-container .crm-button,
 #crm-container .crm-button {
   padding: 1px;
 }
@@ -2268,6 +2281,9 @@ div.grippie {
   padding: 2px 6px;
 }
 
+.crm-container .crm-button input[type=button],
+.crm-container .crm-button input.form-submit,
+.crm-container .crm-button input.form-submit-inline,
 #crm-container .crm-button input[type=button],
 #crm-container .crm-button input.form-submit,
 #crm-container .crm-button input.form-submit-inline {
@@ -2458,25 +2474,25 @@ div.grippie {
   background-image: url("../i/icons/jquery-ui-8A1F11.png")}
 
 .crm-container .edit-icon {
-  background-position: -64px -114px;
+  background-position: -64px -112px;
 }
 .crm-container .previous-icon {
-  background-position: -82px -161px;
+  background-position: -80px -160px;
 }
 .crm-container .next-icon {
-  background-position: -66px -161px;
+  background-position: -64px -160px;
 }
 .crm-container .add-icon {
-  background-position: -2px -193px;
+  background-position: 0 -192px;
 }
 .crm-container .back-icon {
-  background-position: -2px -65px;
+  background-position: 0 -64px;
 }
 .crm-container .delete-icon {
-  background-position: -179px -99px;
+  background-position: -176px -96px;
 }
 .crm-container .details-icon {
-  background-position: -129px -112px;
+  background-position: -128px -112px;
 }
 .crm-container .button:hover .delete-icon {
   background-image: url("../i/icons/jquery-ui-8A1F11.png")!important;
@@ -2572,29 +2588,34 @@ div.grippie {
   /* for accessibility reason, put the name of the type/subtype in the icon div (it will be hidden and replaced by the icon) */
 }
 
+.select2-results .select2-highlighted .Individual-icon,
 .crm-container .Individual-icon {
   background-position: 0px 0px;
+}
+.select2-results .select2-highlighted .Organization-icon,
+.crm-container .Organization-icon {
+  background-position: -48px 0px;
+}
+.select2-results .select2-highlighted .Household-icon,
+.crm-container .Household-icon {
+  background-position: -32px 0px;
 }
 .crm-container .Group-icon {
   background-position: -16px 0px;
 }
-.crm-container .Household-icon {
-  background-position: -32px 0px;
-}
-
+.select2-results .Individual-icon,
 .crm-container .Individual-subtype-icon {
   background-position: 0px -48px;
 }
+.select2-results .Household-icon,
 .crm-container .Household-subtype-icon {
   background-position: -32px -48px;
 }
+.select2-results .Organization-icon,
 .crm-container .Organization-subtype-icon {
   background-position: -48px -48px;
 }
 
-.crm-container .Organization-icon {
-  background-position: -48px 0px;
-}
 .crm-container .Activity-icon {
   background-position: -64px 0px;
 }
@@ -2630,7 +2651,7 @@ div.grippie {
   text-decoration: none;
   font-size: .8em;
   color: #000;
-  padding: 1px 2px;
+  padding: 1px 2px 1px 0;
   opacity: .7;
 }
 .crm-container .crm-accordion-header a.crm-hover-button {
@@ -2650,8 +2671,8 @@ div.grippie {
 }
 .crm-container .crm-hover-button .icon {
   margin-left: 3px;
-  margin-top: 2px;
-  vertical-align: middle;
+  position: relative;
+  top: 2px;
 }
 .crm-container .crm-hover-button:hover .icon,
 .crm-container .crm-hover-button:active .icon {
@@ -3848,33 +3869,61 @@ div.m ul#civicrm-menu,
   background-position: -18px 1px;
 }
 /* Style autocomplete results */
-.crm-container .select2-results table.crm-select2-row,
-.crm-container .select2-results table.crm-select2-row tbody,
-.crm-container .select2-results table.crm-select2-row tr,
-.crm-container .select2-results table.crm-select2-row td {
-  border: 0 none;
+.crm-container .select2-results {
+  padding: 0;
+}
+.crm-container .select2-results li,
+.crm-container .select2-results .crm-select2-row,
+.crm-container .select2-results .crm-select2-row .crm-select2-row-description p {
   padding: 0;
   margin: 0;
-  border-collapse: collapse;
 }
-.crm-container .select2-results table.crm-select2-row .crm-select2-row-label {
+.crm-container .select2-results .crm-select2-row .crm-select2-row-label {
   font-size: 1.1em;
 }
-.crm-container .select2-results table.crm-select2-row .crm-select2-row-description {
+.crm-container .select2-results .crm-select2-row .crm-select2-row-description p {
   font-size: 0.8em;
   line-height: 1.5em;
   color: #696969;
+  width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
-.crm-container .select2-results .select2-highlighted table.crm-select2-row .crm-select2-row-description {
+.crm-container .select2-results .select2-highlighted .crm-select2-row .crm-select2-row-description p {
   color: #f0f0f0;
 }
-.crm-container .select2-results td.crm-select2-icon {
+.crm-container .select2-results .crm-select2-icon {
   width: 20px;
+  height: 100%;
+  float: left;
 }
-.crm-container .select2-results td.crm-select2-icon .crm-icon {
+.crm-container .select2-results .crm-select2-icon .crm-icon {
   width: 16px;
   height: 16px;
   margin: 0;
+}
+.crm-container .select2-results li.select2-no-results {
+  padding-left: 4px;
+  padding-top: 4px;
+  margin-left: 4px;
+}
+.crm-container .select2-results li {
+  margin: 0;
+  padding: 0;
+}
+.crm-container .crm-action-menu .select2-default span.select2-chosen {
+  color: #2786C2;
+}
+.crm-container .crm-action-menu .select2-default span.select2-chosen:before {
+  background: url("../i/icons/jquery-ui-2786C2.png") no-repeat scroll -64px -112px;
+  content: "";
+  display: inline-block;
+  height: 16px;
+  width: 16px;
+  margin-right: 3px;
+  position: relative;
+  top: 3px;
 }
 
 /* Special styling for specific form buttons */
@@ -4306,6 +4355,7 @@ span.crm-status-icon {
 /* Public Pages */
 
 #crm-container.crm-public input[type="text"],
+#crm-container.crm-public input[type="password"],
 #crm-container.crm-public select {
   font-size: 15px;
   padding: 5px;

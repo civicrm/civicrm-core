@@ -50,7 +50,7 @@ function event_getsingle_expectedresult(){
   'is_multiple_registrations' => 0,
   'allow_same_participant_emails' => 0,
   'is_template' => 0,
-  'created_date' => '2014-01-20 10:55:46',
+  'created_date' => '2014-02-13 00:22:14',
   'is_share' => '1',
   'available_places' => 0,
   'is_full' => '1',
@@ -64,16 +64,16 @@ function event_getsingle_expectedresult(){
 * This example has been generated from the API test suite. The test that created it is called
 *
 * testGetSingleReturnIsFull and can be found in
-* http://svn.civicrm.org/civicrm/trunk/tests/phpunit/CiviTest/api/v3/EventTest.php
+* https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/EventTest.php
 *
 * You can see the outcome of the API tests at
-* http://tests.dev.civicrm.org/trunk/results-api_v3
+* https://test.civicrm.org/job/CiviCRM-master-git/
 *
 * To Learn about the API read
-* http://book.civicrm.org/developer/current/techniques/api/
+* http://wiki.civicrm.org/confluence/display/CRMDOC/Using+the+API
 *
-* and review the wiki at
-* http://wiki.civicrm.org/confluence/display/CRMDOC/CiviCRM+Public+APIs
+* Browse the api on your own site with the api explorer
+* http://MYSITE.ORG/path/to/civicrm/api/explorer
 *
 * Read more about testing here
 * http://wiki.civicrm.org/confluence/display/CRM/Testing

@@ -151,18 +151,11 @@ class CRM_Contact_Page_View_UserDashBoard extends CRM_Core_Page {
     if (!empty($this->_userOptions['Permissioned Orgs'])) {
       $dashboardElements[] = array(
         'class' => 'crm-dashboard-permissionedOrgs',
-        'templatePath' => 'CRM/Contact/Page/View/Relationship.tpl',
+        'templatePath' => 'CRM/Contact/Page/View/RelationshipSelector.tpl',
         'sectionTitle' => ts('Your Contacts / Organizations'),
         'weight' => 40,
       );
 
-      $links = self::links();
-      $currentRelationships = CRM_Contact_BAO_Relationship::getRelationship($this->_contactId,
-        CRM_Contact_BAO_Relationship::CURRENT,
-        0, 0, 0,
-        $links, NULL, TRUE
-      );
-      $this->assign('currentRelationships', $currentRelationships);
     }
 
     if (!empty($this->_userOptions['PCP'])) {

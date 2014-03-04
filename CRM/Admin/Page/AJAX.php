@@ -291,9 +291,9 @@ class CRM_Admin_Page_AJAX {
   }
 
   static function mergeTagList() {
-    $name   = CRM_Utils_Type::escape($_GET['s'], 'String');
+    $name = CRM_Utils_Type::escape($_GET['term'], 'String');
     $fromId = CRM_Utils_Type::escape($_GET['fromId'], 'Integer');
-    $limit  = CRM_Utils_Type::escape($_GET['limit'], 'Integer');
+    $limit = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'search_autocomplete_count', NULL, 10);
 
     // build used-for clause to be used in main query
     $usedForTagA = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Tag', $fromId, 'used_for');
@@ -317,20 +317,25 @@ WHERE  t1.id <> {$fromId} AND
        ({$usedForClause})
 LIMIT $limit";
     $dao = CRM_Core_DAO::executeQuery($query);
+    $result = array();
 
     while ($dao->fetch()) {
-      $warning = 0;
+      $row = array(
+        'id' => $dao->id,
+        'text' => ($dao->parent ? "{$dao->parent} :: " : '') . $dao->name,
+      );
+      // Add warning about used_for types
       if (!empty($dao->used_for)) {
         $usedForTagB = explode(',', $dao->used_for);
         sort($usedForTagB);
         $usedForDiff = array_diff($usedForTagA, $usedForTagB);
         if (!empty($usedForDiff)) {
-          $warning = 1;
+          $row['warning'] = TRUE;
         }
       }
-      $tag = addcslashes($dao->name, '"') . "|{$dao->id}|{$warning}\n";
-      echo $tag = $dao->parent ? (addcslashes($dao->parent, '"') . ' :: ' . $tag) : $tag;
+      $result[] = $row;
     }
+    print json_encode($result);
     CRM_Utils_System::civiExit();
   }
 
@@ -486,6 +491,10 @@ LIMIT $limit";
       }
       $result['tagB_used_for'] = implode(', ', $result['tagB_used_for']);
     }
+
+    $result['message'] = ts('"%1" has been merged with "%2". All records previously tagged "%1" are now tagged "%2".',
+      array(1 => $result['tagA'], 2 => $result['tagB'])
+    );
 
     echo json_encode($result);
     CRM_Utils_System::civiExit();

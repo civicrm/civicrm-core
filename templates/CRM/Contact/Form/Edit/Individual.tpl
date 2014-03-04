@@ -120,9 +120,8 @@ cj(function($) {
 
   <tr>
     <td colspan="2">
-      {$form.current_employer.label}&nbsp;{help id="id-current-employer" file="CRM/Contact/Form/Contact.hlp"}<br />
-      {$form.current_employer.html|crmAddClass:twenty}
-      <div id="employer_address" style="display:none;"></div>
+      {$form.employer_id.label}&nbsp;{help id="id-current-employer" file="CRM/Contact/Form/Contact.hlp"}<br />
+      {$form.employer_id.html}
     </td>
     <td>
       {$form.job_title.label}<br />
@@ -140,5 +139,3 @@ cj(function($) {
     </td>
   </tr>
 </table>
-
-{include file="CRM/Contact/Form/CurrentEmployer.tpl"}

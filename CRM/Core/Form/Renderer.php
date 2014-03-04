@@ -212,12 +212,14 @@ class CRM_Core_Form_Renderer extends HTML_QuickForm_Renderer_ArraySmarty {
     if ($val) {
       $entity = $field->getAttribute('data-api-entity');
       $select = json_decode($field->getAttribute('data-select-params'), TRUE);
+      $api = json_decode($field->getAttribute('data-api-params'), TRUE);
+      $params = CRM_Utils_Array::value('params', $api, array());
       // Support serialized values
       if (strpos($val, CRM_Core_DAO::VALUE_SEPARATOR) !== FALSE) {
         $val = str_replace(CRM_Core_DAO::VALUE_SEPARATOR, ',', trim($val, CRM_Core_DAO::VALUE_SEPARATOR));
         $field->setValue($val);
       }
-      $result = civicrm_api3($entity, 'getlist', array('params' => array('id' => $val)));
+      $result = civicrm_api3($entity, 'getlist', array('id' => $val, 'params' => $params));
       if ($field->isFrozen()) {
         $field->removeAttribute('class');
       }
@@ -233,13 +235,14 @@ class CRM_Core_Form_Renderer extends HTML_QuickForm_Renderer_ArraySmarty {
 
   /**
    * Render entity references as text.
-   * If user has permission, format as link (or now limited to contacts).
+   * If user has permission, format as link (for now limited to contacts).
    * @param $el array
    * @param $field HTML_QuickForm_element
    */
   function renderFrozenEntityRef(&$el, $field) {
     $entity = $field->getAttribute('data-api-entity');
     $vals = json_decode($field->getAttribute('data-entity-value'), TRUE);
+    // Hack for single-entity @see self::preProcessEntityRef
     if (isset($vals['id'])) {
       $vals = array($vals);
     }
@@ -248,7 +251,7 @@ class CRM_Core_Form_Renderer extends HTML_QuickForm_Renderer_ArraySmarty {
       // Format contact as link
       if ($entity == 'contact' && CRM_Contact_BAO_Contact_Permission::allow($val['id'], CRM_Core_Permission::VIEW)) {
         $url = CRM_Utils_System::url("civicrm/contact/view", array('reset' => 1, 'cid' => $val['id']));
-        $val['label'] = '<a href="' . $url . '" title="' . ts('View Contact') . '">' . $val['label'] . '</a>';
+        $val['label'] = '<a class="view-' . $entity . ' no-popup" href="' . $url . '" title="' . ts('View Contact') . '">' . $val['label'] . '</a>';
       }
       $display[] = $val['label'];
     }

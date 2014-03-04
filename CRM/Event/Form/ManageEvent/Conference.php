@@ -64,13 +64,6 @@ class CRM_Event_Form_ManageEvent_Conference extends CRM_Event_Form_ManageEvent {
 
     CRM_Event_BAO_Event::retrieve($params, $defaults);
 
-    if (isset($defaults['parent_event_id'])) {
-      $params = array('id' => $defaults['parent_event_id']);
-      $r_defaults = array();
-      $parent_event = CRM_Event_BAO_Event::retrieve($params, $r_defaults);
-      $defaults['parent_event_name'] = $parent_event->title;
-    }
-
     $defaults = array_merge($defaults, $parentDefaults);
     $defaults['id'] = $eventId;
 
@@ -94,8 +87,12 @@ class CRM_Event_Form_ManageEvent_Conference extends CRM_Event_Form_ManageEvent {
       FALSE
     );
 
-    $this->addElement('text', 'parent_event_name', ts('Parent Event'));
-    $this->addElement('hidden', 'parent_event_id');
+    $this->addEntityRef('parent_event_id', ts('Parent Event'),  array(
+        'entity' => 'event',
+        'placeholder' => ts('- any -'),
+        'select' => array('minimumInputLength' => 0),
+      )
+    );
 
     parent::buildQuickForm();
   }

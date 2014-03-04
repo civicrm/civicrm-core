@@ -257,6 +257,11 @@ class CRM_Friend_BAO_Friend extends CRM_Friend_DAO_Friend {
     $form->add('text', 'tf_thankyou_title', ts('Thank-you Title'), CRM_Core_DAO::getAttribute('CRM_Friend_DAO_Friend', 'thankyou_title'), TRUE);
 
     $form->addWysiwyg('tf_thankyou_text', ts('Thank-you Message'), CRM_Core_DAO::getAttribute('CRM_Friend_DAO_Friend', 'thankyou_text'), TRUE);
+
+    if ($form->_friendId) {
+      // CRM-14200 the i18n dialogs need this for translation
+      $form->assign('friendId', $form->_friendId);
+    }
   }
 
   /**

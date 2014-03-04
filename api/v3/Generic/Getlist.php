@@ -73,8 +73,10 @@ function _civicrm_api3_generic_getList_defaults($entity, &$request) {
     'page_num' => 1,
     'input' => '',
     'image_field' => NULL,
-    'id_field' => 'id',
+    'id_field' => $entity == 'option_value' ? 'value' : 'id',
+    'description_field' => array(),
     'params' => array(),
+    'extra' => array(),
   );
   // Find main field from meta
   foreach (array('sort_name', 'title', 'label', 'name') as $field) {
@@ -83,10 +85,10 @@ function _civicrm_api3_generic_getList_defaults($entity, &$request) {
       break;
     }
   }
+  // Find fields to be used for the description
   foreach (array('description') as $field) {
     if (isset($fields[$field])) {
-      $defaults['description_field'] = $field;
-      break;
+      $defaults['description_field'][] = $field;
     }
   }
   $resultsPerPage = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'search_autocomplete_count', NULL, 10);
@@ -127,9 +129,9 @@ function _civicrm_api3_generic_getlist_params(&$request) {
     $fieldsToReturn[] = $request['image_field'];
   }
   if (!empty($request['description_field'])) {
-    $fieldsToReturn[] = $request['description_field'];
+    $fieldsToReturn = array_merge($fieldsToReturn, (array) $request['description_field']);
   }
-  $request['params']['return'] = $fieldsToReturn;
+  $request['params']['return'] = array_unique(array_merge($fieldsToReturn, $request['extra']));
 }
 
 /**
@@ -149,11 +151,19 @@ function _civicrm_api3_generic_getlist_output($result, $request) {
         'label' => $row[$request['label_field']],
       );
       if (!empty($request['description_field'])) {
-        $data['description'] = isset($row[$request['description_field']]) ? $row[$request['description_field']] : '';
+        $data['description'] = array();
+        foreach ((array) $request['description_field'] as $field) {
+          if (!empty($row[$field])) {
+            $data['description'][] = $row[$field];
+          }
+        }
       };
       if (!empty($request['image_field'])) {
         $data['image'] = isset($row[$request['image_field']]) ? $row[$request['image_field']] : '';
-      };
+      }
+      foreach ($request['extra'] as $field) {
+        $data['extra'][$field] = isset($row[$field]) ? $row[$field] : NULL;
+      }
       $output[] = $data;
     }
   }

@@ -32,10 +32,9 @@
   <div class="crm-clear">  
     {if $contactType eq 'Individual'}
     <div class="crm-summary-row">
-      <div class="crm-label">{$form.current_employer.label}&nbsp;{help id="id-current-employer" file="CRM/Contact/Form/Contact.hlp"}</div>
+      <div class="crm-label">{$form.employer_id.label}&nbsp;{help id="id-current-employer" file="CRM/Contact/Form/Contact.hlp"}</div>
       <div class="crm-content">
-        {$form.current_employer.html}
-        <div id="employer_address" style="display:none;"></div>
+        {$form.employer_id.html|crmAddClass:big}
       </div>
     </div>
     <div class="crm-summary-row">
@@ -63,7 +62,3 @@
     </div>
   </div> <!-- end of main -->
 </div>
-
-{if $contactType eq 'Individual'}
-  {include file="CRM/Contact/Form/CurrentEmployer.tpl"}
-{/if}

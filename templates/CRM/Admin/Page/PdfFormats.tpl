@@ -25,14 +25,13 @@
  +--------------------------------------------------------------------+
 *}
 {* this template is for configuring PDF Page Formats *}
-<div class="help">
-    {capture assign="messageTemplatesURL"}{crmURL p="civicrm/admin/messageTemplates" q="reset=1"}{/capture}
-    {ts 1=$messageTemplatesURL}You can configure one or more PDF Page Formats for your CiviCRM installation. PDF Page Formats may be assigned to <strong><a href="%1">Message Templates</a></strong> to use when creating PDF letters.{/ts}
-</div>
 {if $action eq 1 or $action eq 2 or $action eq 8}
    {include file="CRM/Admin/Form/PdfFormats.tpl"}
 {else}
-
+  <div class="help">
+    {capture assign="messageTemplatesURL"}{crmURL p="civicrm/admin/messageTemplates" q="reset=1"}{/capture}
+    {ts 1=$messageTemplatesURL}You can configure one or more PDF Page Formats for your CiviCRM installation. PDF Page Formats may be assigned to <strong><a href="%1">Message Templates</a></strong> to use when creating PDF letters.{/ts}
+  </div>
 {if $rows}
     <div id="ltype">
         {strip}
@@ -64,8 +63,8 @@
 {else}
     <div class="messages status no-popup">
       <div class="icon inform-icon"></div>
-        {capture assign=crmURL}{crmURL p='civicrm/admin/pdfFormats' q="action=add&reset=1"}{/capture}
-        {ts 1=$crmURL}There are no PDF Page Formats configured. You can <a href='%1'>add one</a>.{/ts}
+        {capture assign=link}href="{crmURL q="action=add&reset=1"}" class="action-item action-item-first"{/capture}
+        {ts 1=$link}There are no PDF Page Formats configured. You can <a %1>add one</a>.{/ts}
     </div>
 {/if}
     <div class="spacer"></div>

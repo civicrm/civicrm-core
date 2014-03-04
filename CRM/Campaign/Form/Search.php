@@ -419,18 +419,10 @@ class CRM_Campaign_Form_Search extends CRM_Core_Form {
     $interviewerId = CRM_Utils_Array::value('survey_interviewer_id', $this->_formValues);
     if ($interviewerId) {
       $this->set('interviewerId', $interviewerId);
-      if (empty($this->_formValues['survey_interviewer_name'])) {
-        $this->_formValues['survey_interviewer_name'] = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact',
-          $interviewerId,
-          'sort_name',
-          'id'
-        );
-      }
     }
 
     //format multi-select group and contact types.
-    foreach (array(
-      'group', 'contact_type') as $param) {
+    foreach (array('group', 'contact_type') as $param) {
       if ($this->_force) {
         continue;
       }
@@ -528,11 +520,6 @@ class CRM_Campaign_Form_Search extends CRM_Core_Form {
       CRM_Utils_System::civiExit();
     }
     $this->_formValues['survey_interviewer_id'] = $cid;
-    $this->_formValues['survey_interviewer_name'] = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact',
-      $cid,
-      'sort_name',
-      'id'
-    );
     //get all in defaults.
     $this->_defaults = $this->_formValues;
     $this->_limit = CRM_Utils_Request::retrieve('limit', 'Positive', $this);

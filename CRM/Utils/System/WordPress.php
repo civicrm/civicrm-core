@@ -578,6 +578,13 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
     return $isloggedIn;
   }
 
+  function getLoggedInUserObject() {
+    if (function_exists('is_user_logged_in') &&
+    is_user_logged_in()) {
+      global $current_user;
+    }
+    return $current_user;
+  }
   /**
    * Get currently logged in user uf id.
    *
@@ -585,13 +592,37 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
    */
   public function getLoggedInUfID() {
     $ufID = NULL;
-    if (function_exists('is_user_logged_in') &&
-      is_user_logged_in()
-    ) {
-      global $current_user;
-      $ufID = $current_user->ID;
-    }
-    return $ufID;
+    $current_user = $this->getLoggedInUserObject();
+    return isset($current_user->ID) ? $current_user->ID : NULL;
+  }
+
+  /**
+   * Get currently logged in user unique identifier - this tends to be the email address or user name.
+   *
+   * @return string $userID logged in user unique identifier
+   */
+  function getLoggedInUniqueIdentifier() {
+    $user = $this->getLoggedInUserObject();
+    return $this->getUniqueIdentifierFromUserObject($user);
+  }
+
+  /**
+   * Get User ID from UserFramework system (Joomla)
+   * @param object $user object as described by the CMS
+   * @return mixed <NULL, number>
+   */
+  function getUserIDFromUserObject($user) {
+    return !empty($user->ID) ? $user->ID : NULL;
+  }
+
+  /**
+   * Get Unique Identifier from UserFramework system (CMS)
+   * @param object $user object as described by the User Framework
+   * @return mixed $uniqueIdentifer Unique identifier from the user Framework system
+   *
+   */
+  function getUniqueIdentifierFromUserObject($user) {
+    return empty($user->user_email) ? NULL : $user->user_email;
   }
 
   /**

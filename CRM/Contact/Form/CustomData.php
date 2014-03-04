@@ -101,6 +101,9 @@ class CRM_Contact_Form_CustomData extends CRM_Core_Form {
    */
   public $_groupID;
 
+  public $_multiRecordDisplay;
+
+  public $_copyValueId;
   /**
    * pre processing work done here.
    *
@@ -115,13 +118,23 @@ class CRM_Contact_Form_CustomData extends CRM_Core_Form {
    */
   function preProcess() {
     $this->_cdType = CRM_Utils_Array::value('type', $_GET);
-
     $this->assign('cdType', FALSE);
-    if ($this->_cdType) {
-      $this->assign('cdType', TRUE);
-      return CRM_Custom_Form_CustomData::preProcess($this);
+    $this->_multiRecordDisplay = CRM_Utils_Request::retrieve('multiRecordDisplay', 'String', $this);
+    if ($this->_cdType || $this->_multiRecordDisplay == 'single') {
+      if ($this->_cdType) {
+        $this->assign('cdType', TRUE);
+      }
+      // NOTE : group id is not stored in session from within CRM_Custom_Form_CustomData::preProcess func
+      // this is due to some condition inside it which restricts it from saving in session
+      // so doing this for multi record edit action
+      CRM_Custom_Form_CustomData::preProcess($this);
+      if ($this->_multiRecordDisplay) {
+        $this->_groupID = CRM_Utils_Request::retrieve('groupID', 'Positive', $this);
+        $this->_tableID = $this->_entityId;
+        $this->_copyValueId = CRM_Utils_Request::retrieve('copyValueId', 'Positive', $this);
+      }
+      return;
     }
-
     $this->_groupID = CRM_Utils_Request::retrieve('groupID', 'Positive', $this, TRUE);
     $this->_tableID = CRM_Utils_Request::retrieve('tableId', 'Positive', $this, TRUE);
 
@@ -149,7 +162,30 @@ class CRM_Contact_Form_CustomData extends CRM_Core_Form {
    * @access public
    */
   public function buildQuickForm() {
-    if ($this->_cdType) {
+    if ($this->_cdType || $this->_multiRecordDisplay == 'single') {
+      // buttons display for multi-valued fields to perform independednt actions
+      if ($this->_multiRecordDisplay) {
+        $isMultiple = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup',
+          $this->_groupID,
+          'is_multiple'
+        );
+        if ($isMultiple) {
+          $this->assign('multiRecordDisplay', $this->_multiRecordDisplay);
+          $saveButtonName = $this->_copyValueId ? 'Save a Copy': 'Save';
+          $this->addButtons(array(
+              array(
+                'type' => 'upload',
+                'name' => ts('%1', array(1 => $saveButtonName)),
+                'isDefault' => TRUE,
+              ),
+              array(
+                'type' => 'cancel',
+                'name' => ts('Cancel'),
+              ),
+            )
+          );
+        }
+      }
       return CRM_Custom_Form_CustomData::buildQuickForm($this);
     }
 
@@ -181,8 +217,29 @@ class CRM_Contact_Form_CustomData extends CRM_Core_Form {
    * @return array the default array reference
    */
   function setDefaultValues() {
-    if ($this->_cdType) {
-      $customDefaultValue = CRM_Custom_Form_CustomData::setDefaultValues($this);
+    if ($this->_cdType || $this->_multiRecordDisplay == 'single') {
+      if ($this->_copyValueId) {
+        // cached tree is fetched
+        $groupTree = &CRM_Core_BAO_CustomGroup::getTree($this->_type,
+          $this,
+          $this->_entityId,
+          $this->_groupID
+        );
+        $valueIdDefaults = array();
+        $groupTreeValueId = CRM_Core_BAO_CustomGroup::formatGroupTree($groupTree, $this->_copyValueId, $this);
+        CRM_Core_BAO_CustomGroup::setDefaults($groupTreeValueId, $valueIdDefaults, FALSE, FALSE, $this->get('action'));
+        $tableId = $groupTreeValueId[$this->_groupID]['table_id'];
+        foreach ($valueIdDefaults as $valueIdElementName => $value) {
+          // build defaults for COPY action for new record saving
+          $valueIdElementNamePieces = explode('_', $valueIdElementName);
+          $valueIdElementNamePieces[2] = "-{$this->_groupCount}";
+          $elementName = implode('_', $valueIdElementNamePieces);
+          $customDefaultValue[$elementName] = $value;
+        }
+      }
+      else {
+        $customDefaultValue = CRM_Custom_Form_CustomData::setDefaultValues($this);
+      }
       return $customDefaultValue;
     }
 
@@ -231,4 +288,3 @@ class CRM_Contact_Form_CustomData extends CRM_Core_Form {
     CRM_Contact_BAO_GroupContactCache::remove();
   }
 }
-

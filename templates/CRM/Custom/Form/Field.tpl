@@ -156,7 +156,11 @@ function custom_option_html_type( ) {
     {/if}
             </td>
         </tr>
-        <tr class="crm-custom-field-form-block-text_length"  id="textLength" {if !( $action eq 1 || $action eq 2 ) && ($form.data_type.value.0.0 != 0)}class="hide-block"{/if}>
+       <tr class='crm-custom-field-form-block-in_selector'>
+          <td class='label'>{$form.in_selector.label}</td>
+          <td class='html-adjust'>{$form.in_selector.html} {help id="id-in_selector"}</td>
+       </tr>
+       <tr class="crm-custom-field-form-block-text_length"  id="textLength" {if !( $action eq 1 || $action eq 2 ) && ($form.data_type.value.0.0 != 0)}class="hide-block"{/if}>
             <td class="label">{$form.text_length.label}</td>
             <td class="html-adjust">{$form.text_length.html}</td>
         </tr>

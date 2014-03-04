@@ -722,7 +722,7 @@ SELECT civicrm_custom_group.name as name,
       $urlPath = 'civicrm/contact/view/participant';
       $urlParams = "reset=1&cid={$this->_contactId}&context=participant";
       if ($this->_context == 'standalone') {
-        CRM_Contact_Form_NewContact::buildQuickForm($this);
+        $this->addEntityRef('contact_id', ts('Contact'), array('create' => TRUE), TRUE);
         $urlParams = 'reset=1&context=standalone';
         $urlPath = 'civicrm/participant/add';
       }
@@ -752,87 +752,21 @@ SELECT civicrm_custom_group.name as name,
 
     $this->assign('refreshURL', $url);
 
-    $this->add('hidden', 'past_event');
-
-    $events = array();
-    if ( $this->_eID ) {
-      $eventEndDate = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $this->_eID,'end_date');
-    }
-    $this->assign('past', 0);
-    if ($this->_action & CRM_Core_Action::UPDATE) {
-      $events = CRM_Event_BAO_Event::getEvents(1, FALSE, FALSE);
-    }
-    elseif ($this->getElementValue('past_event') || (isset($eventEndDate) && (CRM_Utils_Date::currentDBDate() > CRM_Utils_Date::processDate($eventEndDate)))) {
-      $pastval = $this->getElementValue('past_event');
-      $events = CRM_Event_BAO_Event::getEvents($pastval);
-      $this->assign('past', $pastval);
-    }
-    else {
-      $events = CRM_Event_BAO_Event::getEvents();
-    }
+    $eventFieldParams = array(
+      'entity' => 'event',
+      'select' => array('minimumInputLength' => 0),
+      'api' => array(
+        'extra' => array('campaign_id', 'default_role_id', 'event_type_id'),
+      )
+    );
 
     if ($this->_mode) {
-      //unset the event which are not monetary when credit card
-      //event registration is used
-      foreach ($events as $key => $val) {
-        $isPaid = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $key, 'is_monetary');
-        if (!$isPaid) {
-          unset($events[$key]);
-        }
-      }
+      // exclude events which are not monetary when credit card registration is used
+      $eventFieldParams['api']['params']['is_monetary'] = 1;
       $this->add('select', 'payment_processor_id', ts('Payment Processor'), $this->_processors, TRUE);
     }
 
-    // build array(event -> eventType) mapper
-    $query = "
-SELECT     civicrm_event.id as id, civicrm_event.event_type_id as event_type_id
-FROM       civicrm_event
-WHERE      civicrm_event.is_template IS NULL OR civicrm_event.is_template = 0";
-    $dao = CRM_Core_DAO::executeQuery($query);
-    $eventAndTypeMapping = array();
-    while ($dao->fetch()) {
-      $eventAndTypeMapping[$dao->id] = $dao->event_type_id;
-    }
-    $eventAndTypeMapping = json_encode($eventAndTypeMapping);
-    // building of mapping ends --
-
-    //inherit the campaign from event.
-    $eventCampaigns = array();
-    $allEventIds = array_keys($events);
-    if (!empty($allEventIds)) {
-      CRM_Core_PseudoConstant::populate($eventCampaigns,
-        'CRM_Event_DAO_Event',
-        TRUE, 'campaign_id'
-      );
-    }
-    $eventCampaigns = json_encode($eventCampaigns);
-
-    $element = $this->add('select', 'event_id', ts('Event'),
-      array(
-        '' => ts('- select -')) + $events,
-      TRUE,
-      array('onchange' => "buildFeeBlock( this.value ); CRM.buildCustomData( 'Participant', this.value, {$this->_eventNameCustomDataTypeID} ); buildParticipantRole( this.value ); buildEventTypeCustomData( this.value, {$this->_eventTypeCustomDataTypeID}, '{$eventAndTypeMapping}' ); loadCampaign( this.value, {$eventCampaigns} );", 'class' => 'huge')
-    );
-
-    // CRM-6111
-    // note that embedding JS within PHP files is quite awful, IMO
-    // but we do the same for the onChange element and this form is complex
-    // and i did not want to break it late in the 3.2 cycle
-    $preloadJSSnippet = NULL;
-    if (!empty($_GET['reset']) && $this->_eID) {
-      $preloadJSSnippet = "
-cj(function() {
-cj('#event_id').val( '{$this->_eID}' );
-buildFeeBlock( {$this->_eID} );
-CRM.buildCustomData( 'Participant', {$this->_eID}, {$this->_eventNameCustomDataTypeID} );
-buildEventTypeCustomData( {$this->_eID}, {$this->_eventTypeCustomDataTypeID}, '{$eventAndTypeMapping}' );
-loadCampaign( {$this->_eID}, {$eventCampaigns} );
-});
-";
-    }
-
-    $this->assign('preloadJSSnippet', $preloadJSSnippet);
-
+    $element = $this->addEntityRef('event_id', ts('Event'), $eventFieldParams, TRUE);
 
     //frozen the field fix for CRM-4171
     if ($this->_action & CRM_Core_Action::UPDATE && $this->_id) {
@@ -865,9 +799,7 @@ loadCampaign( {$this->_eID}, {$eventCampaigns} );
     $roleids = CRM_Event_PseudoConstant::participantRole();
 
     foreach ($roleids as $rolekey => $rolevalue) {
-      $roleTypes[] = $this->createElement('checkbox', $rolekey, NULL, $rolevalue,
-        array('onclick' => "showCustomData( 'Participant', {$rolekey}, {$this->_roleCustomDataTypeID} );")
-      );
+      $roleTypes[] = $this->createElement('checkbox', $rolekey, NULL, $rolevalue);
     }
 
     $this->addGroup($roleTypes, 'role_id', ts('Participant Role'));
@@ -982,10 +914,6 @@ loadCampaign( {$this->_eID}, {$eventCampaigns} );
     }
 
     $errorMsg = array();
-    //check if contact is selected in standalone mode
-    if (isset($values['contact_select_id'][1]) && !$values['contact_select_id'][1]) {
-      $errorMsg['contact[1]'] = ts('Please select a contact or create new contact');
-    }
 
     if (!empty($values['payment_processor_id'])) {
       // make sure that credit card number and cvv are valid
@@ -1055,8 +983,8 @@ loadCampaign( {$this->_eID}, {$eventCampaigns} );
 
     $participantStatus = CRM_Event_PseudoConstant::participantStatus();
     // set the contact, when contact is selected
-    if (!empty($params['contact_select_id'])) {
-      $this->_contactId = $params['contact_select_id'][1];
+    if (!empty($params['contact_id'])) {
+      $this->_contactId = $params['contact_id'];
     }
     if ($this->_priceSetId && $isQuickConfig = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $this->_priceSetId, 'is_quick_config')) {
       $this->_quickConfig = $isQuickConfig;
