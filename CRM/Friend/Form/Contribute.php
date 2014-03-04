@@ -44,7 +44,7 @@ class CRM_Friend_Form_Contribute extends CRM_Contribute_Form_ContributionPage {
    *
    * @var int
    */
-  private $_friendId;
+  public $_friendId;
 
   public function preProcess() {
     parent::preProcess();
@@ -93,6 +93,13 @@ class CRM_Friend_Form_Contribute extends CRM_Contribute_Form_ContributionPage {
    * @access public
    */
   public function buildQuickForm() {
+    if (isset($this->_id)) {
+      $defaults['entity_table'] = 'civicrm_contribution_page';
+      $defaults['entity_id'] = $this->_id;
+      CRM_Friend_BAO_Friend::getValues($defaults);
+      $this->_friendId = CRM_Utils_Array::value('id', $defaults);
+    }
+
     CRM_Friend_BAO_Friend::buildFriendForm($this);
     parent::buildQuickForm();
   }

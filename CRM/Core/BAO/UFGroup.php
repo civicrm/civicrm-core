@@ -1098,7 +1098,7 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
                   $cfID,
                   $options
                 );
-                if ($htmlType == 'Autocomplete-Select') {
+                if ($field['data_type'] == 'ContactReference') {
                   $params[$index] = $values[$index];
                 }
                 if (CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomField',
@@ -2036,7 +2036,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
       $form->addElement('checkbox', $name, $title);
     }
     elseif ($fieldName == 'soft_credit') {
-      CRM_Contact_Form_NewContact::buildQuickForm($form, $rowNumber, NULL, FALSE, 'soft_credit_');
+      $form->addEntityRef("soft_credit_contact_id[$rowNumber]", ts('Soft Credit To'), array('create' => TRUE));
       $form->addMoney("soft_credit_amount[{$rowNumber}]", ts('Amount'), FALSE, NULL, FALSE);
     }
     elseif ($fieldName == 'product_name') {
@@ -2320,9 +2320,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
                   }
                 }
                 else {
-                  $label = CRM_Core_BAO_CustomOption::getOptionLabel($customFieldId, $details[$name]);
-                  $defaults[$fldName . '_id'] = $details[$name];
-                  $defaults[$fldName] = $label;
+                  $defaults[$fldName] = $details[$name];
                 }
                 break;
 
@@ -3209,55 +3207,12 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
   }
 
   /**
-   * Function to retrieve reserved profiles
-   *
-   * @param string $name name if the reserve profile
-   * @param array $extraProfiles associated array of profile id's that needs to merge
-   *
-   * @return array $reservedProfiles returns associated array
-   * @static
-   */
-  static function getReservedProfiles($type = 'Contact', $extraProfiles = NULL) {
-    $reservedProfiles = array();
-    $profileNames = array();
-    if ($type == 'Contact') {
-      if (CRM_Contact_BAO_ContactType::isActive('Individual')) {
-        $profileNames[] = '"new_individual"';
-      }
-      if (CRM_Contact_BAO_ContactType::isActive('Household')) {
-        $profileNames[] = '"new_household"';
-      }
-      if (CRM_Contact_BAO_ContactType::isActive('Organization')) {
-        $profileNames[] = '"new_organization"';
-      }
-    }
-    if (!empty($profileNames)) {
-      $whereClause = 'name IN ( ' . implode(',', $profileNames) . ' ) AND is_reserved = 1';
-    }
-    else {
-      $whereClause = 'is_reserved = 1';
-    }
-
-    $query = "SELECT id, title FROM civicrm_uf_group WHERE {$whereClause}";
-
-    $dao = CRM_Core_DAO::executeQuery($query);
-    while ($dao->fetch()) {
-      $key = $dao->id;
-      if ($extraProfiles) {
-        $key .= ',' . implode(',', $extraProfiles);
-      }
-      $reservedProfiles[$key] = $dao->title;
-    }
-    return $reservedProfiles;
-  }
-
-  /**
    * @param array|string $profiles - name of profile(s) to create links for
    * @param array $appendProfiles - name of profile(s) to append to each link
    */
   static function getCreateLinks($profiles, $appendProfiles = array()) {
     $profiles = (array) $profiles;
-    $toGet = array_merge($profiles, $appendProfiles);
+    $toGet = array_merge($profiles, (array) $appendProfiles);
     $retrieved = civicrm_api3('uf_group', 'get', array(
       'name' => array('IN' => $toGet),
       'is_active' => 1,
@@ -3268,7 +3223,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
         if (in_array($profile['name'], $profiles)) {
           $links[] = array(
             'label' => $profile['title'],
-            'url' => CRM_Utils_System::url('civicrm/profile/create', 'reset=1&gid=' . $id),
+            'url' => CRM_Utils_System::url('civicrm/profile/create', 'reset=1&context=dialog&&gid=' . $id),
             'name' => $profile['name'],
           );
         }

@@ -122,6 +122,9 @@ class CRM_Contact_Form_Task_SaveSearch extends CRM_Contact_Form_Task {
       );
     }
 
+    //CRM-14190
+    CRM_Group_Form_Edit::buildParentGroups($this);
+
     // get the group id for the saved search
     $groupID = NULL;
     if (isset($this->_id)) {
@@ -208,6 +211,9 @@ class CRM_Contact_Form_Task_SaveSearch extends CRM_Contact_Form_Task {
     $params['saved_search_id'] = $savedSearch->id;
     $params['is_active'] = 1;
 
+    //CRM-14190
+    $params['parents'] = $formValues['parents'];
+
     if ($this->_id) {
       $params['id'] = CRM_Contact_BAO_SavedSearch::getName($this->_id, 'id');
     }
@@ -216,6 +222,11 @@ class CRM_Contact_Form_Task_SaveSearch extends CRM_Contact_Form_Task {
 
     // CRM-9464
     $this->_id = $savedSearch->id;
+
+    //CRM-14190
+    if ( !empty($formValues['parents']) ) {
+      CRM_Contact_BAO_GroupNestingCache::update();
+    }
   }
 }
 

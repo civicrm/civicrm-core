@@ -446,6 +446,8 @@ class CRM_Core_Resources {
       $url = CRM_Utils_System::url('civicrm/example', 'placeholder', FALSE, NULL, FALSE);
       $js = "CRM.url('init', '$url');\n";
       $js .= "CRM.formatMoney('init', " . json_encode(CRM_Utils_Money::format(1234.56)) . ");";
+
+      $this->addLocalization($js);
       $this->addScript($js, $jsWeight++, $region);
 
       // Add global settings
@@ -523,6 +525,19 @@ class CRM_Core_Resources {
   }
 
   /**
+   * Add inline scripts needed to localize js widgets
+   * @param string $js
+   */
+  function addLocalization(&$js) {
+    $js .= '
+      $.fn.select2.defaults.formatNoMatches = ' . json_encode(ts('None found.')) . ';
+      $.fn.select2.defaults.formatLoadMore = ' . json_encode(ts('Loading...')) . ';
+      $.fn.select2.defaults.formatSearching = ' . json_encode(ts('Searching...')) . ';
+      $.fn.select2.defaults.formatInputTooShort = ' . json_encode(ts('Enter search term...')) . ';
+    ';
+  }
+
+  /**
    * List of core resources we add to every CiviCRM page
    *
    * @return array
@@ -537,6 +552,8 @@ class CRM_Core_Resources {
       "packages/jquery/jquery-migrate-1.2.1.js",
       "packages/jquery/jquery-ui/js/jquery-ui-1.10.3.custom$min.js",
       "packages/jquery/jquery-ui/css/black-tie/jquery-ui-1.10.3.custom$min.css",
+
+      "packages/backbone/lodash.underscore$min.js",
 
       "packages/jquery/plugins/select2/select2.js", // No mini until release of select2 3.4.6
       "packages/jquery/plugins/select2/select2.css",

@@ -835,6 +835,7 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
 
                 if (!empty($type[1])) {
                   $fldValue .= "-" . $type[1];
+                  $daoField .= "-" . $type[1];
                 }
 
                 // CRM-3157: localise country, region (both have ‘country’ context) and state_province (‘province’ context)

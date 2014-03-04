@@ -25,7 +25,19 @@
 *}
 {* this template is used for building tabbed custom data *}
 {if $cdType }
-    {include file="CRM/Custom/Form/CustomData.tpl"}
+   {include file="CRM/Custom/Form/CustomData.tpl"}
+   {if $multiRecordDisplay eq 'single'}
+     <div class="html-adjust">{$form.buttons.html}</div>
+     {* for form rule handling *}
+     {include file="CRM/Form/validate.tpl"}
+     {literal}
+     <script type='text/javascript'>
+       cj(function($) {
+         $('#custom-record-dialog .crm-container-snippet #CustomData').validate(CRM.validate.params);
+       });
+     </script>
+     {/literal}
+   {/if}
 {else}
     <div id="customData"></div>
     <div class="html-adjust">{$form.buttons.html}</div>
@@ -33,8 +45,7 @@
     {*include custom data js file*}
     {include file="CRM/common/customData.tpl"}
 
-
-  {if $customValueCount }
+  {if $customValueCount}
     {literal}
     <script type="text/javascript">
       var customValueCount = {/literal}"{$customValueCount}"{literal};

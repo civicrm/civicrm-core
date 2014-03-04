@@ -239,6 +239,11 @@ class CRM_Report_Form_Event_ParticipantListing extends CRM_Report_Form_Event {
         ),
         'order_bys' =>
         array(
+          'participant_register_date' =>
+          array('title' => ts('Registration Date'),
+            'default_weight' => '1',
+            'default_order' => 'ASC',
+          ),
           'event_id' =>
           array('title' => ts('Event'), 'default_weight' => '1', 'default_order' => 'ASC'),
         ),

@@ -31,16 +31,10 @@
   </div><!-- /.crm-accordion-header -->
  <div class="crm-accordion-body">
  <div id='char-count-message'></div>
- <span class="helpIcon" id="helptext">
-  <a href="#" onClick="return showToken('Text', 1);">{$form.token1.label}</a>
-  {help id="id-token-text" file="CRM/Contact/Form/Task/SMS.hlp"}
-  <div id='tokenText' style="display:none">
-      <input  style="border:1px solid #999999;" type="text" id="filter1" size="20" name="filter1" onkeyup="filter(this, 1)"/><br />
-      <span class="description">{ts}Begin typing to filter list of tokens{/ts}</span><br/>
-      {$form.token1.html}
-  </div>
-    </span>
-    <div class="clear"></div>
+   <div class="helpIcon" id="helptext">
+     <input class="crm-token-selector big" data-field="text_message" />
+     {help id="id-token-text" tplFile=$tplFile file="CRM/Contact/Form/Task/SMS.hlp"}
+   </div>
     <div class='text'>
   {$form.text_message.html}<br />
     </div>

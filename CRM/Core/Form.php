@@ -1249,7 +1249,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    *  - entity - defaults to contact
    *  - create - can the user create a new entity on-the-fly?
    *             Set to TRUE if entity is contact and you want the default profiles,
-   *             or pass in your own set of links. See output of CRM_Core_BAO_UFGroup::getCreateLinks for format
+   *             or pass in your own set of links. @see CRM_Core_BAO_UFGroup::getCreateLinks for format
    *  - api - array of settings for the getlist api
    *  - placeholder - string
    *  - multiple - bool
@@ -1259,7 +1259,8 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * @access public
    * @return HTML_QuickForm_Element
    */
-  function addEntityRef($name, $label, $props = array(), $required = FALSE) {
+  function addEntityRef($name, $label = '', $props = array(), $required = FALSE) {
+    $config = CRM_Core_Config::singleton();
     // Default properties
     $props['api'] = CRM_Utils_Array::value('api', $props, array());
     $props['entity'] = CRM_Utils_Array::value('entity', $props, 'contact');
@@ -1270,6 +1271,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     if ($props['entity'] == 'contact' && isset($props['create']) && !(CRM_Core_Permission::check('edit all contacts') || CRM_Core_Permission::check('add contacts'))) {
       unset($props['create']);
     }
+    // Convenient shortcut to passing in array create links
     if ($props['entity'] == 'contact' && isset($props['create']) && $props['create'] === TRUE) {
       if (empty($props['api']['params']['contact_type'])) {
         $props['create'] = CRM_Core_BAO_UFGroup::getCreateLinks(array('new_individual', 'new_organization', 'new_household'));
@@ -1282,13 +1284,11 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     $defaults = array(
       'minimumInputLength' => 1,
       'multiple' => !empty($props['multiple']),
-      'placeholder' => CRM_Utils_Array::value('placeholder', $props, $required ? ts('- select -') : ts('- none -')),
+      'placeholder' => CRM_Utils_Array::value('placeholder', $props, $required ? ts('- select %1 -', array(1 => ts($props['entity']))) : ts('- none -')),
       'allowClear' => !$required,
-      'formatInputTooShort' => ts('Start typing a name...'),
-      'formatNoMatches' => ts('None found.'),
     );
-    if ($props['entity'] == 'contact' && CRM_Core_Config::singleton()->includeEmailInName) {
-      $defaults['formatInputTooShort'] = ts('Start typing a name or email...');
+    if ($props['entity'] == 'contact') {
+      $defaults['formatInputTooShort'] = $config->includeEmailInName ? ts('Start typing a name or email...') : ts('Start typing a name...');
     }
     $props['select'] = CRM_Utils_Array::value('select', $props, array()) + $defaults;
 

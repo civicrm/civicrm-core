@@ -515,10 +515,8 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
       //CRM-10223 - allow contribution to be recorded against different contact
       // causes a conflict in standalone mode so skip in standalone for now
       $this->addElement('checkbox', 'contribution_contact', ts('Record Payment from a Different Contact?'));
-      $this->add('select', 'soft_credit_type_id', ts('Membership payment is : '),
-        array('' => ts('- Select - ')) + CRM_Core_OptionGroup::values("soft_credit_type", FALSE));
-      require_once 'CRM/Contact/Form/NewContact.php';
-      CRM_Contact_Form_NewContact::buildQuickForm($this,1, null, false,'contribution_');
+      $this->addSelect('soft_credit_type_id', array('entity' => 'contribution_soft'));
+      $this->addEntityRef('soft_credit_contact_id', ts('Payment From'), array('create' => TRUE));
   }
     }
 

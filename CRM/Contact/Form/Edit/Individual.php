@@ -106,11 +106,12 @@ class CRM_Contact_Form_Edit_Individual {
       $form->addElement('text', 'job_title', ts('Job Title'), $attributes['job_title'], 'size="30"');
 
       //Current Employer Element
-      $employerDataURL = CRM_Utils_System::url('civicrm/ajax/rest', 'className=CRM_Contact_Page_AJAX&fnName=getContactList&json=1&context=contact&org=1&employee_id=' . $form->_contactId, FALSE, NULL, FALSE);
-      $form->assign('employerDataURL', $employerDataURL);
-
-      $form->addElement('text', 'current_employer', ts('Current Employer'), '');
-      $form->addElement('hidden', 'current_employer_id', '', array('id' => 'current_employer_id'));
+      $props = array(
+        'api' => array('params' => array('contact_type' => 'Organization')),
+        'create' => TRUE,
+      );
+      $form->addEntityRef('employer_id', ts('Current Employer'), $props);
+      $attributes['source']['class'] = 'big';
       $form->addElement('text', 'contact_source', ts('Source'), CRM_Utils_Array::value('source', $attributes));
     }
 

@@ -32,7 +32,9 @@
     function refresh() {
       // Call native refresh method on ajax datatables
       if ($.fn.DataTable.fnIsDataTable($table[0]) && $table.dataTable().fnSettings().sAjaxSource) {
-        $table.unblock().dataTable().fnDraw();
+        $.each($.fn.dataTable.fnTables(), function() {
+          $(this).dataTable().fnSettings().sAjaxSource && $(this).unblock().dataTable().fnDraw();
+        });
       }
       // Otherwise refresh the content area using crmSnippet
       else {

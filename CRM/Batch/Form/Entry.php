@@ -194,7 +194,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
     $contactTypes = array('Contact', 'Individual', 'Household', 'Organization');
     $contactReturnProperties = array();
     for ($rowNumber = 1; $rowNumber <= $this->_batchInfo['item_count']; $rowNumber++) {
-      CRM_Contact_Form_NewContact::buildQuickForm($this, $rowNumber, NULL, TRUE, 'primary_', ts('Contact'));
+      $this->addEntityRef("primary_contact_id[{$rowNumber}]", '', array('create' => TRUE, 'placeholder' => ts('- select -')));
 
       // special field specific to membership batch udpate
       if ($this->_batchInfo['type_id'] == 2) {
@@ -256,7 +256,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
       $batchTotal += $value['total_amount'];
 
       //validate for soft credit fields
-      if (!empty($params['soft_credit_contact_select_id'][$key]) && empty($params['soft_credit_amount'][$key])) {
+      if (!empty($params['soft_credit_contact_id'][$key]) && empty($params['soft_credit_amount'][$key])) {
         $errors["soft_credit_amount[$key]"] = ts('Please enter the soft credit amount.');
       }
       if (!empty($params['soft_credit_amount']) && !empty($params['soft_credit_amount'][$key]) && CRM_Utils_Rule::cleanMoney(CRM_Utils_Array::value($key, $params['soft_credit_amount'])) > CRM_Utils_Rule::cleanMoney($value['total_amount'])) {
@@ -267,16 +267,6 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
       if ( $self->_batchInfo['type_id'] == 2 ) {
         if (empty($value['membership_type'][1])) {
           $errors["field[$key][membership_type]"] = ts('Membership type is a required field.');
-        }
-      }
-    }
-
-    // if contact name is set for a row using autocomplete widget then make sure contact id exists, CRM-13078
-    // I was not able to replicate this on my local but adding this check and hopefully it will fix the issue.
-    if (!empty($params['primary_contact'])) {
-      foreach($params['primary_contact'] as $rowIndex => $contactName) {
-        if (empty($params['primary_contact_select_id'][$rowIndex])) {
-          $errors['primary_contact['.$rowIndex.']'] = ts('Please select a valid contact.');
         }
       }
     }
@@ -406,18 +396,18 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
     if (isset($params['field'])) {
       foreach ($params['field'] as $key => $value) {
         // if contact is not selected we should skip the row
-        if (empty($params['primary_contact_select_id'][$key])) {
+        if (empty($params['primary_contact_id'][$key])) {
           continue;
         }
 
-        $value['contact_id'] = CRM_Utils_Array::value($key, $params['primary_contact_select_id']);
+        $value['contact_id'] = CRM_Utils_Array::value($key, $params['primary_contact_id']);
 
         // update contact information
         $this->updateContactInfo($value);
 
         //build soft credit params
-        if (!empty($params['soft_credit_contact_select_id'][$key]) && !empty($params['soft_credit_amount'][$key])) {
-          $value['soft_credit'][$key]['contact_id'] = $params['soft_credit_contact_select_id'][$key];
+        if (!empty($params['soft_credit_contact_id'][$key]) && !empty($params['soft_credit_amount'][$key])) {
+          $value['soft_credit'][$key]['contact_id'] = $params['soft_credit_contact_id'][$key];
           $value['soft_credit'][$key]['amount'] = CRM_Utils_Rule::cleanMoney($params['soft_credit_amount'][$key]);
           $value['soft_credit'][$key]['soft_credit_type_id'] = $params['field'][$key]['soft_credit_type'];
         }
@@ -554,11 +544,11 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
       $customFields = array();
       foreach ($params['field'] as $key => $value) {
         // if contact is not selected we should skip the row
-        if (empty($params['primary_contact_select_id'][$key])) {
+        if (empty($params['primary_contact_id'][$key])) {
           continue;
         }
 
-        $value['contact_id'] = CRM_Utils_Array::value($key, $params['primary_contact_select_id']);
+        $value['contact_id'] = CRM_Utils_Array::value($key, $params['primary_contact_id']);
 
         // update contact information
         $this->updateContactInfo($value);
@@ -630,8 +620,8 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
         }
 
         // handle soft credit
-        if (is_array(CRM_Utils_Array::value('soft_credit_contact_select_id', $params)) && !empty($params['soft_credit_contact_select_id'][$key]) && CRM_Utils_Array::value($key, $params['soft_credit_amount'])) {
-          $value['soft_credit'][$key]['contact_id'] = $params['soft_credit_contact_select_id'][$key];
+        if (is_array(CRM_Utils_Array::value('soft_credit_contact_id', $params)) && !empty($params['soft_credit_contact_id'][$key]) && CRM_Utils_Array::value($key, $params['soft_credit_amount'])) {
+          $value['soft_credit'][$key]['contact_id'] = $params['soft_credit_contact_id'][$key];
           $value['soft_credit'][$key]['amount'] = CRM_Utils_Rule::cleanMoney($params['soft_credit_amount'][$key]);
         }
 

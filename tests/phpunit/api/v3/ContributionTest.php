@@ -628,19 +628,19 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $description = "Demonstrates creating contribution with SoftCredit";
     $subfile     = "ContributionCreateWithSoftCredit";
     $contact2    = $this->callAPISuccess('Contact', 'create', array('display_name' => 'superman', 'contact_type' => 'Individual'));
-    $params      = $this->_params + array(
-      'soft_credit_to' => $contact2['id'],
-
+    $softparams  =  array(
+      'contact_id' => $contact2['id'],
+      'amount' => 50,
+      'soft_credit_type_id' => 3
     );
 
+    $params      = $this->_params + array('soft_credit' => array(1 => $softparams));
     $contribution = $this->callAPIAndDocument('contribution', 'create', $params, __FUNCTION__, __FILE__, $description, $subfile);
-    //     $result = $this->callAPISuccess('contribution','get', array('return'=> 'soft_credit_to', 'sequential' => 1));
-    //     $this->assertEquals($contact2['id'], $result['values'][$result['id']]['soft_credit_to']) ;
-    //    well - the above doesn't work yet so lets do SQL
-    $query = "SELECT count(*) FROM civicrm_contribution_soft WHERE contact_id = " . $contact2['id'];
+    $result = $this->callAPISuccess('contribution','get', array('return'=> 'soft_credit', 'sequential' => 1));
 
-    $count = CRM_Core_DAO::singleValueQuery($query);
-    $this->assertEquals(1, $count);
+    $this->assertEquals($softparams['contact_id'], $result['values'][0]['soft_credit'][1]['contact_id']);
+    $this->assertEquals($softparams['amount'], $result['values'][0]['soft_credit'][1]['amount']);
+    $this->assertEquals($softparams['soft_credit_type_id'], $result['values'][0]['soft_credit'][1]['soft_credit_type']);
 
     $this->callAPISuccess('contribution', 'delete', array('id' => $contribution['id']));
     $this->callAPISuccess('contact', 'delete', array('id' => $contact2['id']));
@@ -653,7 +653,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     //make sure at least on page exists since there is a truncate in tear down
     $page = $this->callAPISuccess('contribution_page', 'create', $this->_pageParams);
     $this->assertAPISuccess($page);
-    require_once 'api/v3/examples/ContributionCreate.php';
+    require_once 'api/v3/examples/Contribution/Create.php';
     $result         = contribution_create_example();
     $this->assertAPISuccess($result);
     $contributionId = $result['id'];

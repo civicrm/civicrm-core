@@ -355,6 +355,7 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
         'date_format',
         'time_format',
         'option_group_id',
+        'in_selector'
       ),
       'civicrm_custom_group' =>
       array(
@@ -836,7 +837,7 @@ ORDER BY civicrm_custom_group.weight,
    * @static
    *
    */
-  public static function &getGroupDetail($groupId = NULL, $searchable = NULL, &$extends = NULL) {
+  public static function &getGroupDetail($groupId = NULL, $searchable = NULL, &$extends = NULL, $inSelector = NULL) {
     // create a new tree
     $groupTree = array();
     $select = $from = $where = $orderBy = '';
@@ -868,6 +869,7 @@ ORDER BY civicrm_custom_group.weight,
         'column_name',
         'is_view',
         'option_group_id',
+        'in_selector',
       ),
       'civicrm_custom_group' =>
       array(
@@ -881,6 +883,7 @@ ORDER BY civicrm_custom_group.weight,
         'extends',
         'extends_entity_column_value',
         'table_name',
+        'is_multiple',
       ),
     );
 
@@ -906,6 +909,10 @@ ORDER BY civicrm_custom_group.weight,
 
     if ($searchable) {
       $where .= " AND civicrm_custom_field.is_searchable = 1";
+    }
+
+    if ($inSelector) {
+      $where .= " AND civicrm_custom_field.in_selector = 1 AND civicrm_custom_group.is_multiple = 1 ";
     }
 
     if ($extends) {
@@ -979,8 +986,8 @@ ORDER BY civicrm_custom_group.weight,
     // for Group's
     $customGroupDAO = new CRM_Core_DAO_CustomGroup();
 
-    // get only 'Tab' groups
-    $customGroupDAO->whereAdd("style = 'Tab'");
+    // get 'Tab' and 'Tab with table' groups
+    $customGroupDAO->whereAdd("style IN ('Tab', 'Tab with table')");
     $customGroupDAO->whereAdd("is_active = 1");
 
     // add whereAdd for entity type
@@ -1321,9 +1328,7 @@ ORDER BY civicrm_custom_group.weight,
               }
             }
             else {
-              $label = CRM_Core_BAO_CustomOption::getOptionLabel($field['id'], $value);
-              $defaults[$hiddenEleName] = $value;
-              $defaults[$elementName] = $label;
+              $defaults[$elementName] = $value;
             }
             break;
 
@@ -1770,9 +1775,8 @@ SELECT IF( EXISTS(SELECT name FROM civicrm_contact_type WHERE name like %1), 1, 
    *  @param array   $groupTree associated array
    *  @param boolean $returnCount true if customValue count needs to be returned
    */
-  static function buildCustomDataView(&$form, &$groupTree, $returnCount = FALSE, $gID = NULL, $prefix = NULL) {
+  static function buildCustomDataView(&$form, &$groupTree, $returnCount = FALSE, $gID = NULL, $prefix = NULL, $customValueId = NULL) {
     $details = array();
-
     foreach ($groupTree as $key => $group) {
       if ($key === 'info') {
         continue;
@@ -1782,6 +1786,9 @@ SELECT IF( EXISTS(SELECT name FROM civicrm_contact_type WHERE name like %1), 1, 
         $groupID = $group['id'];
         if (!empty($properties['customValue'])) {
           foreach ($properties['customValue'] as $values) {
+            if (!empty($customValueId) && $customValueId != $values['id']) {
+              continue;
+            }
             $details[$groupID][$values['id']]['title'] = CRM_Utils_Array::value('title', $group);
             $details[$groupID][$values['id']]['name'] = CRM_Utils_Array::value('name', $group);
             $details[$groupID][$values['id']]['help_pre'] = CRM_Utils_Array::value('help_pre', $group);
@@ -2222,6 +2229,5 @@ SELECT  civicrm_custom_group.id as groupID, civicrm_custom_group.title as groupT
     }
     return $multipleGroup;
   }
-
  }
 

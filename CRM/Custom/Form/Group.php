@@ -155,6 +155,10 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
         $self->assign('showMultiple', TRUE);
     }
 
+    if (empty($fields['is_multiple']) && $fields['style'] == 'Tab with table') {
+      $errors['style'] = ts("Display Style 'Tab with table' is only supported for multiple-record custom field sets.");
+    }
+
     //checks the given custom set doesnot start with digit
     $title = $fields['title'];
     if (!empty($title)) {
@@ -419,6 +423,10 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
     }
     elseif (empty($defaults['max_multiple']) && !$this->_isGroupEmpty) {
       $this->assign('showMaxMultiple', FALSE);
+    }
+
+    if (($this->_action & CRM_Core_Action::UPDATE) && !empty($defaults['is_multiple'])) {
+      $defaults['collapse_display'] = 0;
     }
 
     if (isset($defaults['extends'])) {

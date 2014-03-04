@@ -211,7 +211,7 @@
     <td class="label">{$form.duration.label}</td>
     <td class="view-value">
       {$form.duration.html}
-      <span class="description">{ts}Total time spent on this activity (in minutes).{/ts}
+      <span class="description">{ts}minutes{/ts}
     </td>
   </tr>
   {* Suppress activity status and priority for changes to status, case type and start date. PostProc will force status to completed. *}
