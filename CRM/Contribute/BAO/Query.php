@@ -371,7 +371,7 @@ class CRM_Contribute_BAO_Query {
           $query->_tables['civicrm_contribution_soft'] = $query->_whereTables['civicrm_contribution_soft'] = 1;
         } else if ($value == 'both_related') {
           $query->_where[$grouping][] = "contribution_search_scredit_combined.filter_id IS NOT NULL";
-          $query->_qill[$grouping][] = ts('Contributions OR Soft Credits? - Related To Each Other');
+          $query->_qill[$grouping][] = ts('Contributions OR Soft Credits? - Both But Related');
           $query->_tables['civicrm_contribution_soft'] = $query->_whereTables['civicrm_contribution_soft'] = 1;
         } else if ($value == 'both') {
           $query->_qill[$grouping][] = ts('Contributions OR Soft Credits? - Both');
@@ -982,9 +982,9 @@ class CRM_Contribute_BAO_Query {
 
     // Soft credit related fields
     $options = array(
-      'both_related'  => ts('Related To Each Other'),
-      'only_scredits' => ts('Soft Credits Only'),
       'only_contribs' => ts('Contributions Only'),
+      'only_scredits' => ts('Soft Credits Only'),
+      'both_related'  => ts('Both But Related'),
       'both'          => ts('Both'),
     );
     $form->add('select', 'contribution_or_softcredits', ts('Contributions OR Soft Credits?'), $options, FALSE, array('class' => "crm-select2"));
