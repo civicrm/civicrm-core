@@ -24,9 +24,6 @@
  +--------------------------------------------------------------------+
 *}
 {if $transaction}
- <div class="crm-submit-buttons">
-    {include file="CRM/common/formButtons.tpl"}
- </div>
   {if !empty($rows)}
    <table id='info'>
      <tr class="columnheader">
@@ -41,7 +38,7 @@
      <tr>
        <td>{$row.total_amount|crmMoney}</td>
        <td>{$row.financial_type}</td>
-       <td>{$row.payment_instrument}</td>
+       <td>{$row.payment_instrument}{if $row.check_number} (#{$row.check_number}){/if}</td>
        <td>{$row.receive_date|crmDate}</td>
        <td>{$row.trxn_id}</td>
        <td>{$row.status}</td>
@@ -56,6 +53,9 @@
      {/if}
     {ts 1=$entity}No additional payments found for this %1 record{/ts}
   {/if}
+ <div class="crm-submit-buttons">
+    {include file="CRM/common/formButtons.tpl"}
+ </div>
 {elseif $formType}
   {include file="CRM/Contribute/Form/AdditionalInfo/$formType.tpl"}
 {else}

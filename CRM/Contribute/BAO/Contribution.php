@@ -3156,7 +3156,7 @@ WHERE eft.financial_trxn_id = {$trxnId}
     $rows = array();
     if ($getTrxnInfo && $baseTrxnId) {
       $sql = "
-SELECT ft.total_amount, con.financial_type_id, ft.payment_instrument_id, ft.trxn_date, ft.trxn_id, ft.status_id
+SELECT ft.total_amount, con.financial_type_id, ft.payment_instrument_id, ft.trxn_date, ft.trxn_id, ft.status_id, ft.check_number
 FROM civicrm_contribution con
   LEFT JOIN civicrm_entity_financial_trxn eft ON (eft.entity_id = con.id AND eft.entity_table = 'civicrm_contribution')
   LEFT JOIN civicrm_financial_trxn ft ON ft.id = eft.financial_trxn_id
@@ -3164,18 +3164,23 @@ WHERE ft.id != {$baseTrxnId} AND con.id = {$contributionId}
 ";
       $resultDAO = CRM_Core_DAO::executeQuery($sql);
 
+      $statuses = CRM_Contribute_PseudoConstant::contributionStatus();
+      $financialTypes = CRM_Contribute_PseudoConstant::financialType();
       while($resultDAO->fetch()) {
-        $paymentInstrument = CRM_Contribute_PseudoConstant::paymentInstrument();
-        $statuses = CRM_Contribute_PseudoConstant::contributionStatus();
-        $financialTypes = CRM_Contribute_PseudoConstant::financialType();
-        $rows[] = array(
+        $paidByLabel = CRM_Core_PseudoConstant::getLabel('CRM_Core_BAO_FinancialTrxn', 'payment_instrument_id', $resultDAO->payment_instrument_id);
+        $paidByName = CRM_Core_PseudoConstant::getName('CRM_Core_BAO_FinancialTrxn', 'payment_instrument_id', $resultDAO->payment_instrument_id);
+        $val = array(
           'total_amount' => $resultDAO->total_amount,
           'financial_type' => $financialTypes[$resultDAO->financial_type_id],
-          'payment_instrument' => $paymentInstrument[$resultDAO->payment_instrument_id],
+          'payment_instrument' => $paidByLabel,
           'receive_date' => $resultDAO->trxn_date,
           'trxn_id' => $resultDAO->trxn_id,
           'status' => $statuses[$resultDAO->status_id],
         );
+        if ($paidByName == 'Check') {
+          $val['check_number'] = $resultDAO->check_number;
+        }
+        $rows[] = $val;
       }
       $info['transaction'] = $rows;
     }
