@@ -51,7 +51,7 @@ class County extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, unsigned=true)
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -148,6 +148,66 @@ class County extends \Civi\Core\Entity {
    */
   public function getStateProvince() {
     return $this->stateProvince;
+  }
+
+  /**
+   * returns all the column names of this table
+   *
+   * @access public
+   * @return array
+   */
+  static function &fields( ) {
+    if ( !self::$_fields) {
+      self::$_fields = array (
+      
+              'id' => array(
+      
+        'name' => 'id',
+        'type' => CRM_Utils_Type::T_INT,
+                        'required' => true,
+                                             
+                                    
+                          ),
+      
+              'name' => array(
+      
+        'name' => 'name',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('County'),
+                                 'maxlength' => 64,
+                         'size' => CRM_Utils_Type::BIG,
+                           
+                'import' => true,
+        'where' => 'civicrm_county.name',
+        'headerPattern' => '/county/i',
+        'dataPattern' => '/[A-Z]{2}/',
+                         'export' => true,
+                                   
+                          ),
+      
+              'abbreviation' => array(
+      
+        'name' => 'abbreviation',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('County Abbreviation'),
+                                 'maxlength' => 4,
+                         'size' => CRM_Utils_Type::FOUR,
+                           
+                                    
+                          ),
+      
+              'state_province_id' => array(
+      
+        'name' => 'state_province_id',
+        'type' => CRM_Utils_Type::T_INT,
+                        'required' => true,
+                                             
+                                    
+                'FKClassName' => 'CRM_Core_StateProvince',
+                          ),
+             );
+    }
+    return self::$_fields;
   }
 
 }

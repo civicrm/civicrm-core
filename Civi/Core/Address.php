@@ -51,7 +51,7 @@ class Address extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, unsigned=true)
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -68,7 +68,7 @@ class Address extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="location_type_id", type="integer", nullable=true)
+   * @ORM\Column(name="location_type_id", type="integer", unsigned=true, nullable=true)
    * 
    */
   private $locationTypeId;
@@ -100,7 +100,7 @@ class Address extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="street_number", type="integer", nullable=true)
+   * @ORM\Column(name="street_number", type="integer", unsigned=true, nullable=true)
    * 
    */
   private $streetNumber;
@@ -848,6 +848,402 @@ class Address extends \Civi\Core\Entity {
    */
   public function getMaster() {
     return $this->master;
+  }
+
+  /**
+   * returns all the column names of this table
+   *
+   * @access public
+   * @return array
+   */
+  static function &fields( ) {
+    if ( !self::$_fields) {
+      self::$_fields = array (
+      
+              'id' => array(
+      
+        'name' => 'id',
+        'type' => CRM_Utils_Type::T_INT,
+                        'required' => true,
+                                             
+                                    
+                          ),
+      
+              'contact_id' => array(
+      
+        'name' => 'contact_id',
+        'type' => CRM_Utils_Type::T_INT,
+                                                     
+                                    
+                'FKClassName' => 'CRM_Contact_Contact',
+                          ),
+      
+              'location_type_id' => array(
+      
+        'name' => 'location_type_id',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Address Location Type'),
+                                                     
+                                    
+                                     'pseudoconstant' => array(
+                                'table' => 'civicrm_location_type',
+                      'keyColumn' => 'id',
+                      'labelColumn' => 'display_name',
+                    )
+                 ),
+      
+              'is_primary' => array(
+      
+        'name' => 'is_primary',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                'title' => ts('Is Address Primary?'),
+                                                     
+                                    
+                          ),
+      
+              'is_billing' => array(
+      
+        'name' => 'is_billing',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                                                     
+                                    
+                          ),
+      
+              'street_address' => array(
+      
+        'name' => 'street_address',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Street Address'),
+                                 'maxlength' => 96,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                'import' => true,
+        'where' => 'civicrm_address.street_address',
+        'headerPattern' => '/(street|address)/i',
+        'dataPattern' => '/^(\d{1,5}( [0-9A-Za-z]+)+)$|^(P\.?O\.\? Box \d{1,5})$/i',
+                         'export' => true,
+                                   
+                          ),
+      
+              'street_number' => array(
+      
+        'name' => 'street_number',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Street Number'),
+                                                     
+                         'export' => true,
+                'where' => 'civicrm_address.street_number',
+        'headerPattern' => '',
+        'dataPattern' => '',
+                                   
+                          ),
+      
+              'street_number_suffix' => array(
+      
+        'name' => 'street_number_suffix',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Street Number Suffix'),
+                                 'maxlength' => 8,
+                         'size' => CRM_Utils_Type::EIGHT,
+                           
+                         'export' => true,
+                'where' => 'civicrm_address.street_number_suffix',
+        'headerPattern' => '',
+        'dataPattern' => '',
+                                   
+                          ),
+      
+              'street_number_predirectional' => array(
+      
+        'name' => 'street_number_predirectional',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Street Number Predirectional'),
+                                 'maxlength' => 8,
+                         'size' => CRM_Utils_Type::EIGHT,
+                           
+                                    
+                          ),
+      
+              'street_name' => array(
+      
+        'name' => 'street_name',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Street Name'),
+                                 'maxlength' => 64,
+                         'size' => CRM_Utils_Type::BIG,
+                           
+                         'export' => true,
+                'where' => 'civicrm_address.street_name',
+        'headerPattern' => '',
+        'dataPattern' => '',
+                                   
+                          ),
+      
+              'street_type' => array(
+      
+        'name' => 'street_type',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Street Type'),
+                                 'maxlength' => 8,
+                         'size' => CRM_Utils_Type::EIGHT,
+                           
+                                    
+                          ),
+      
+              'street_number_postdirectional' => array(
+      
+        'name' => 'street_number_postdirectional',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Street Number Postdirectional'),
+                                 'maxlength' => 8,
+                         'size' => CRM_Utils_Type::EIGHT,
+                           
+                                    
+                          ),
+      
+              'street_unit' => array(
+      
+        'name' => 'street_unit',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Street Unit'),
+                                 'maxlength' => 16,
+                         'size' => CRM_Utils_Type::TWELVE,
+                           
+                         'export' => true,
+                'where' => 'civicrm_address.street_unit',
+        'headerPattern' => '',
+        'dataPattern' => '',
+                                   
+                          ),
+      
+              'supplemental_address_1' => array(
+      
+        'name' => 'supplemental_address_1',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Supplemental Address 1'),
+                                 'maxlength' => 96,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                'import' => true,
+        'where' => 'civicrm_address.supplemental_address_1',
+        'headerPattern' => '/(supplemental(\s)?)?address(\s\d+)?/i',
+        'dataPattern' => '/unit|ap(ar)?t(ment)?\s(\d|\w)+/i',
+                         'export' => true,
+                                   
+                          ),
+      
+              'supplemental_address_2' => array(
+      
+        'name' => 'supplemental_address_2',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Supplemental Address 2'),
+                                 'maxlength' => 96,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                'import' => true,
+        'where' => 'civicrm_address.supplemental_address_2',
+        'headerPattern' => '/(supplemental(\s)?)?address(\s\d+)?/i',
+        'dataPattern' => '/unit|ap(ar)?t(ment)?\s(\d|\w)+/i',
+                         'export' => true,
+                                   
+                          ),
+      
+              'supplemental_address_3' => array(
+      
+        'name' => 'supplemental_address_3',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Supplemental Address 3'),
+                                 'maxlength' => 96,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                                    
+                          ),
+      
+              'city' => array(
+      
+        'name' => 'city',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('City'),
+                                 'maxlength' => 64,
+                         'size' => CRM_Utils_Type::BIG,
+                           
+                'import' => true,
+        'where' => 'civicrm_address.city',
+        'headerPattern' => '/city/i',
+        'dataPattern' => '/^[A-Za-z]+(\.?)(\s?[A-Za-z]+){0,2}$/',
+                         'export' => true,
+                                   
+                          ),
+      
+              'county_id' => array(
+      
+        'name' => 'county_id',
+        'type' => CRM_Utils_Type::T_INT,
+                                                     
+                                    
+                'FKClassName' => 'CRM_Core_County',
+                                     'pseudoconstant' => array(
+                                'table' => 'civicrm_county',
+                      'keyColumn' => 'id',
+                      'labelColumn' => 'name',
+                    )
+                 ),
+      
+              'state_province_id' => array(
+      
+        'name' => 'state_province_id',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('State'),
+                                                     
+                                    
+                'FKClassName' => 'CRM_Core_StateProvince',
+                                     'pseudoconstant' => array(
+                                'table' => 'civicrm_state_province',
+                      'keyColumn' => 'id',
+                      'labelColumn' => 'name',
+                    )
+                 ),
+      
+              'postal_code_suffix' => array(
+      
+        'name' => 'postal_code_suffix',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Postal Code Suffix'),
+                                 'maxlength' => 12,
+                         'size' => CRM_Utils_Type::TWELVE,
+                           
+                'import' => true,
+        'where' => 'civicrm_address.postal_code_suffix',
+        'headerPattern' => '/p(ostal)\sc(ode)\ss(uffix)/i',
+        'dataPattern' => '/\d?\d{4}(-\d{4})?/',
+                         'export' => true,
+                                   
+                          ),
+      
+              'postal_code' => array(
+      
+        'name' => 'postal_code',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Postal Code'),
+                                 'maxlength' => 12,
+                         'size' => CRM_Utils_Type::TWELVE,
+                           
+                'import' => true,
+        'where' => 'civicrm_address.postal_code',
+        'headerPattern' => '/postal|zip/i',
+        'dataPattern' => '/\d?\d{4}(-\d{4})?/',
+                         'export' => true,
+                                   
+                          ),
+      
+              'usps_adc' => array(
+      
+        'name' => 'usps_adc',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Usps Adc'),
+                                 'maxlength' => 32,
+                         'size' => CRM_Utils_Type::MEDIUM,
+                           
+                                    
+                          ),
+      
+              'country_id' => array(
+      
+        'name' => 'country_id',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Country'),
+                                                     
+                                    
+                'FKClassName' => 'CRM_Core_Country',
+                                     'pseudoconstant' => array(
+                                'table' => 'civicrm_country',
+                      'keyColumn' => 'id',
+                      'labelColumn' => 'name',
+                      'nameColumn' => 'iso_code',
+                    )
+                 ),
+      
+              'geo_code_1' => array(
+      
+        'name' => 'geo_code_1',
+        'type' => CRM_Utils_Type::T_FLOAT,
+                'title' => ts('Geo Code 1'),
+                                                     
+                'import' => true,
+        'where' => 'civicrm_address.geo_code_1',
+        'headerPattern' => '/geo/i',
+        'dataPattern' => '',
+                         'export' => true,
+                                   
+                          ),
+      
+              'geo_code_2' => array(
+      
+        'name' => 'geo_code_2',
+        'type' => CRM_Utils_Type::T_FLOAT,
+                'title' => ts('Geo Code 2'),
+                                                     
+                'import' => true,
+        'where' => 'civicrm_address.geo_code_2',
+        'headerPattern' => '/geo/i',
+        'dataPattern' => '',
+                         'export' => true,
+                                   
+                          ),
+      
+              'manual_geo_code' => array(
+      
+        'name' => 'manual_geo_code',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                'title' => ts('Manual Geo Code'),
+                                                     
+                                    
+                          ),
+      
+              'timezone' => array(
+      
+        'name' => 'timezone',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Timezone'),
+                                 'maxlength' => 8,
+                         'size' => CRM_Utils_Type::EIGHT,
+                           
+                                    
+                          ),
+      
+              'address_name' => array(
+      
+        'name' => 'name',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Address Name'),
+                                 'maxlength' => 255,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                'import' => true,
+        'where' => 'civicrm_address.name',
+        'headerPattern' => '/^location|(l(ocation\s)?name)$/i',
+        'dataPattern' => '/^\w+$/',
+                         'export' => true,
+                                   
+                          ),
+      
+              'master_id' => array(
+      
+        'name' => 'master_id',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Master Address Belongs To'),
+                                                     
+                'import' => true,
+        'where' => 'civicrm_address.master_id',
+        'headerPattern' => '',
+        'dataPattern' => '',
+                         'export' => true,
+                                   
+                'FKClassName' => 'CRM_Core_Address',
+                          ),
+             );
+    }
+    return self::$_fields;
   }
 
 }

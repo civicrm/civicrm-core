@@ -51,7 +51,7 @@ class Menu extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, unsigned=true)
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -188,7 +188,7 @@ class Menu extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="weight", type="integer", nullable=false)
+   * @ORM\Column(name="weight", type="integer", unsigned=true, nullable=false)
    * 
    */
   private $weight = '1';
@@ -196,7 +196,7 @@ class Menu extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="type", type="integer", nullable=false)
+   * @ORM\Column(name="type", type="integer", unsigned=true, nullable=false)
    * 
    */
   private $type = '1';
@@ -204,7 +204,7 @@ class Menu extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="page_type", type="integer", nullable=false)
+   * @ORM\Column(name="page_type", type="integer", unsigned=true, nullable=false)
    * 
    */
   private $pageType = '1';
@@ -624,6 +624,229 @@ class Menu extends \Civi\Core\Entity {
    */
   public function getSkipBreadcrumb() {
     return $this->skipBreadcrumb;
+  }
+
+  /**
+   * returns all the column names of this table
+   *
+   * @access public
+   * @return array
+   */
+  static function &fields( ) {
+    if ( !self::$_fields) {
+      self::$_fields = array (
+      
+              'id' => array(
+      
+        'name' => 'id',
+        'type' => CRM_Utils_Type::T_INT,
+                        'required' => true,
+                                             
+                                    
+                          ),
+      
+              'domain_id' => array(
+      
+        'name' => 'domain_id',
+        'type' => CRM_Utils_Type::T_INT,
+                        'required' => true,
+                                             
+                                    
+                'FKClassName' => 'CRM_Core_Domain',
+                          ),
+      
+              'path' => array(
+      
+        'name' => 'path',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Path'),
+                                 'maxlength' => 255,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                                    
+                          ),
+      
+              'path_arguments' => array(
+      
+        'name' => 'path_arguments',
+        'type' => CRM_Utils_Type::T_TEXT,
+                'title' => ts('Path Arguments'),
+                                                     
+                                    
+                          ),
+      
+              'title' => array(
+      
+        'name' => 'title',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Title'),
+                                 'maxlength' => 255,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                                    
+                          ),
+      
+              'access_callback' => array(
+      
+        'name' => 'access_callback',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Access Callback'),
+                                 'maxlength' => 255,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                                    
+                          ),
+      
+              'access_arguments' => array(
+      
+        'name' => 'access_arguments',
+        'type' => CRM_Utils_Type::T_TEXT,
+                'title' => ts('Access Arguments'),
+                                                     
+                                    
+                          ),
+      
+              'page_callback' => array(
+      
+        'name' => 'page_callback',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Page Callback'),
+                                 'maxlength' => 255,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                                    
+                          ),
+      
+              'page_arguments' => array(
+      
+        'name' => 'page_arguments',
+        'type' => CRM_Utils_Type::T_TEXT,
+                'title' => ts('Page Arguments'),
+                                                     
+                                    
+                          ),
+      
+              'breadcrumb' => array(
+      
+        'name' => 'breadcrumb',
+        'type' => CRM_Utils_Type::T_TEXT,
+                'title' => ts('Breadcrumb'),
+                                                     
+                                    
+                          ),
+      
+              'return_url' => array(
+      
+        'name' => 'return_url',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Return Url'),
+                                 'maxlength' => 255,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                                    
+                          ),
+      
+              'return_url_args' => array(
+      
+        'name' => 'return_url_args',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Return Url Args'),
+                                 'maxlength' => 255,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                                    
+                          ),
+      
+              'component_id' => array(
+      
+        'name' => 'component_id',
+        'type' => CRM_Utils_Type::T_INT,
+                                                     
+                                    
+                'FKClassName' => 'CRM_Core_Component',
+                                     'pseudoconstant' => array(
+                                'table' => 'civicrm_component',
+                      'keyColumn' => 'id',
+                      'labelColumn' => 'name',
+                    )
+                 ),
+      
+              'is_active' => array(
+      
+        'name' => 'is_active',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                                                     
+                                    
+                          ),
+      
+              'is_public' => array(
+      
+        'name' => 'is_public',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                                                     
+                                    
+                          ),
+      
+              'is_exposed' => array(
+      
+        'name' => 'is_exposed',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                                                     
+                                    
+                          ),
+      
+              'is_ssl' => array(
+      
+        'name' => 'is_ssl',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                                                     
+                                    
+                          ),
+      
+              'weight' => array(
+      
+        'name' => 'weight',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Weight'),
+                        'required' => true,
+                                             
+                                           'default' => '1',
+         
+                          ),
+      
+              'type' => array(
+      
+        'name' => 'type',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Type'),
+                        'required' => true,
+                                             
+                                           'default' => '1',
+         
+                          ),
+      
+              'page_type' => array(
+      
+        'name' => 'page_type',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Page Type'),
+                        'required' => true,
+                                             
+                                           'default' => '1',
+         
+                          ),
+      
+              'skipBreadcrumb' => array(
+      
+        'name' => 'skipBreadcrumb',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                'title' => ts('Skipbreadcrumb'),
+                                                     
+                                    
+                          ),
+             );
+    }
+    return self::$_fields;
   }
 
 }

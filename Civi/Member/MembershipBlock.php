@@ -51,7 +51,7 @@ class MembershipBlock extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, unsigned=true)
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -400,6 +400,149 @@ class MembershipBlock extends \Civi\Core\Entity {
    */
   public function getIsActive() {
     return $this->isActive;
+  }
+
+  /**
+   * returns all the column names of this table
+   *
+   * @access public
+   * @return array
+   */
+  static function &fields( ) {
+    if ( !self::$_fields) {
+      self::$_fields = array (
+      
+              'id' => array(
+      
+        'name' => 'id',
+        'type' => CRM_Utils_Type::T_INT,
+                        'required' => true,
+                                             
+                                    
+                          ),
+      
+              'entity_table' => array(
+      
+        'name' => 'entity_table',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Entity Table'),
+                                 'maxlength' => 64,
+                         'size' => CRM_Utils_Type::BIG,
+                           
+                                    
+                          ),
+      
+              'entity_id' => array(
+      
+        'name' => 'entity_id',
+        'type' => CRM_Utils_Type::T_INT,
+                        'required' => true,
+                                             
+                                    
+                'FKClassName' => 'CRM_Contribute_ContributionPage',
+                          ),
+      
+              'membership_types' => array(
+      
+        'name' => 'membership_types',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Membership Types'),
+                                 'maxlength' => 255,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                                    
+                          ),
+      
+              'membership_type_default' => array(
+      
+        'name' => 'membership_type_default',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Membership Type Default'),
+                                                     
+                                    
+                'FKClassName' => 'CRM_Member_MembershipType',
+                          ),
+      
+              'display_min_fee' => array(
+      
+        'name' => 'display_min_fee',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                'title' => ts('Display Min Fee'),
+                                                     
+                                           'default' => '1',
+         
+                          ),
+      
+              'is_separate_payment' => array(
+      
+        'name' => 'is_separate_payment',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                                                     
+                                           'default' => '1',
+         
+                          ),
+      
+              'new_title' => array(
+      
+        'name' => 'new_title',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('New Title'),
+                                 'maxlength' => 255,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                                    
+                          ),
+      
+              'new_text' => array(
+      
+        'name' => 'new_text',
+        'type' => CRM_Utils_Type::T_TEXT,
+                'title' => ts('New Text'),
+                                                     
+                                    
+                          ),
+      
+              'renewal_title' => array(
+      
+        'name' => 'renewal_title',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Renewal Title'),
+                                 'maxlength' => 255,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                                    
+                          ),
+      
+              'renewal_text' => array(
+      
+        'name' => 'renewal_text',
+        'type' => CRM_Utils_Type::T_TEXT,
+                'title' => ts('Renewal Text'),
+                                                     
+                                    
+                          ),
+      
+              'is_required' => array(
+      
+        'name' => 'is_required',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                'title' => ts('Is Required'),
+                                                     
+                                    
+                          ),
+      
+              'is_active' => array(
+      
+        'name' => 'is_active',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                'title' => ts('Is Active'),
+                                                     
+                                           'default' => '1',
+         
+                          ),
+             );
+    }
+    return self::$_fields;
   }
 
 }

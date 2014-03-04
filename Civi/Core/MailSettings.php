@@ -51,7 +51,7 @@ class MailSettings extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, unsigned=true)
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -60,7 +60,7 @@ class MailSettings extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="domain_id", type="integer", nullable=true)
+   * @ORM\Column(name="domain_id", type="integer", unsigned=true, nullable=true)
    * 
    */
   private $domainId;
@@ -124,7 +124,7 @@ class MailSettings extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="port", type="integer", nullable=true)
+   * @ORM\Column(name="port", type="integer", unsigned=true, nullable=true)
    * 
    */
   private $port;
@@ -428,6 +428,165 @@ class MailSettings extends \Civi\Core\Entity {
    */
   public function getSource() {
     return $this->source;
+  }
+
+  /**
+   * returns all the column names of this table
+   *
+   * @access public
+   * @return array
+   */
+  static function &fields( ) {
+    if ( !self::$_fields) {
+      self::$_fields = array (
+      
+              'id' => array(
+      
+        'name' => 'id',
+        'type' => CRM_Utils_Type::T_INT,
+                        'required' => true,
+                                             
+                                    
+                          ),
+      
+              'domain_id' => array(
+      
+        'name' => 'domain_id',
+        'type' => CRM_Utils_Type::T_INT,
+                        'required' => true,
+                                             
+                                    
+                          ),
+      
+              'name' => array(
+      
+        'name' => 'name',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Name'),
+                                 'maxlength' => 255,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                                    
+                          ),
+      
+              'is_default' => array(
+      
+        'name' => 'is_default',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                                                     
+                                    
+                          ),
+      
+              'domain' => array(
+      
+        'name' => 'domain',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Domain'),
+                                 'maxlength' => 255,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                                    
+                          ),
+      
+              'localpart' => array(
+      
+        'name' => 'localpart',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Localpart'),
+                                 'maxlength' => 255,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                                    
+                          ),
+      
+              'return_path' => array(
+      
+        'name' => 'return_path',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Return Path'),
+                                 'maxlength' => 255,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                                    
+                          ),
+      
+              'protocol' => array(
+      
+        'name' => 'protocol',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Protocol'),
+                                 'maxlength' => 255,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                                    
+                                     'pseudoconstant' => array(
+                                'optionGroupName' => 'mail_protocol',
+                    )
+                 ),
+      
+              'server' => array(
+      
+        'name' => 'server',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Server'),
+                                 'maxlength' => 255,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                                    
+                          ),
+      
+              'port' => array(
+      
+        'name' => 'port',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Port'),
+                                                     
+                                    
+                          ),
+      
+              'username' => array(
+      
+        'name' => 'username',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Username'),
+                                 'maxlength' => 255,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                                    
+                          ),
+      
+              'password' => array(
+      
+        'name' => 'password',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Password'),
+                                 'maxlength' => 255,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                                    
+                          ),
+      
+              'is_ssl' => array(
+      
+        'name' => 'is_ssl',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                                                     
+                                    
+                          ),
+      
+              'source' => array(
+      
+        'name' => 'source',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Source'),
+                                 'maxlength' => 255,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                                    
+                          ),
+             );
+    }
+    return self::$_fields;
   }
 
 }

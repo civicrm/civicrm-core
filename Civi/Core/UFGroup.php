@@ -51,7 +51,7 @@ class UFGroup extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, unsigned=true)
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -680,6 +680,245 @@ class UFGroup extends \Civi\Core\Entity {
    */
   public function getIsProximitySearch() {
     return $this->isProximitySearch;
+  }
+
+  /**
+   * returns all the column names of this table
+   *
+   * @access public
+   * @return array
+   */
+  static function &fields( ) {
+    if ( !self::$_fields) {
+      self::$_fields = array (
+      
+              'id' => array(
+      
+        'name' => 'id',
+        'type' => CRM_Utils_Type::T_INT,
+                        'required' => true,
+                                             
+                                    
+                          ),
+      
+              'is_active' => array(
+      
+        'name' => 'is_active',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                                                     
+                                           'default' => '1',
+         
+                          ),
+      
+              'group_type' => array(
+      
+        'name' => 'group_type',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Group Type'),
+                                 'maxlength' => 255,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                'import' => true,
+        'where' => 'civicrm_uf_group.group_type',
+        'headerPattern' => '',
+        'dataPattern' => '',
+                         'export' => true,
+                                   
+                                     'pseudoconstant' => array(
+                                '0' => 'not in database',
+                    )
+                 ),
+      
+              'title' => array(
+      
+        'name' => 'title',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Title'),
+                        'required' => true,
+                         'maxlength' => 64,
+                         'size' => CRM_Utils_Type::BIG,
+                           
+                                    
+                          ),
+      
+              'description' => array(
+      
+        'name' => 'description',
+        'type' => CRM_Utils_Type::T_TEXT,
+                'title' => ts('Profile Description'),
+                                                   'rows' => 2,
+                         'cols' => 60,
+         
+                                    
+                          ),
+      
+              'help_pre' => array(
+      
+        'name' => 'help_pre',
+        'type' => CRM_Utils_Type::T_TEXT,
+                'title' => ts('Help Pre'),
+                                                   'rows' => 4,
+                         'cols' => 80,
+         
+                                    
+                          ),
+      
+              'help_post' => array(
+      
+        'name' => 'help_post',
+        'type' => CRM_Utils_Type::T_TEXT,
+                'title' => ts('Help Post'),
+                                                   'rows' => 4,
+                         'cols' => 80,
+         
+                                    
+                          ),
+      
+              'limit_listings_group_id' => array(
+      
+        'name' => 'limit_listings_group_id',
+        'type' => CRM_Utils_Type::T_INT,
+                                                     
+                                    
+                'FKClassName' => 'CRM_Contact_Group',
+                          ),
+      
+              'post_URL' => array(
+      
+        'name' => 'post_URL',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Post Url'),
+                                 'maxlength' => 255,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                                    
+                          ),
+      
+              'add_to_group_id' => array(
+      
+        'name' => 'add_to_group_id',
+        'type' => CRM_Utils_Type::T_INT,
+                                                     
+                                    
+                'FKClassName' => 'CRM_Contact_Group',
+                          ),
+      
+              'add_captcha' => array(
+      
+        'name' => 'add_captcha',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                'title' => ts('Add Captcha'),
+                                                     
+                                    
+                          ),
+      
+              'is_map' => array(
+      
+        'name' => 'is_map',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                                                     
+                                    
+                          ),
+      
+              'is_edit_link' => array(
+      
+        'name' => 'is_edit_link',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                                                     
+                                    
+                          ),
+      
+              'is_uf_link' => array(
+      
+        'name' => 'is_uf_link',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                                                     
+                                    
+                          ),
+      
+              'is_update_dupe' => array(
+      
+        'name' => 'is_update_dupe',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                                                     
+                                    
+                          ),
+      
+              'cancel_URL' => array(
+      
+        'name' => 'cancel_URL',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Cancel Url'),
+                                 'maxlength' => 255,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                                    
+                          ),
+      
+              'is_cms_user' => array(
+      
+        'name' => 'is_cms_user',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                                                     
+                                    
+                          ),
+      
+              'notify' => array(
+      
+        'name' => 'notify',
+        'type' => CRM_Utils_Type::T_TEXT,
+                'title' => ts('Notify'),
+                                                     
+                                    
+                          ),
+      
+              'is_reserved' => array(
+      
+        'name' => 'is_reserved',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                                                     
+                                    
+                          ),
+      
+              'name' => array(
+      
+        'name' => 'name',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Name'),
+                                 'maxlength' => 64,
+                         'size' => CRM_Utils_Type::BIG,
+                           
+                                    
+                          ),
+      
+              'created_id' => array(
+      
+        'name' => 'created_id',
+        'type' => CRM_Utils_Type::T_INT,
+                                                     
+                                    
+                'FKClassName' => 'CRM_Contact_Contact',
+                          ),
+      
+              'created_date' => array(
+      
+        'name' => 'created_date',
+        'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
+                'title' => ts('UF Group Created Date'),
+                                                     
+                                    
+                          ),
+      
+              'is_proximity_search' => array(
+      
+        'name' => 'is_proximity_search',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                                                     
+                                    
+                          ),
+             );
+    }
+    return self::$_fields;
   }
 
 }

@@ -51,7 +51,7 @@ class Product extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, unsigned=true)
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -164,7 +164,7 @@ class Product extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="fixed_period_start_day", type="integer", nullable=false)
+   * @ORM\Column(name="fixed_period_start_day", type="integer", unsigned=true, nullable=false)
    * 
    */
   private $fixedPeriodStartDay = '0101';
@@ -180,7 +180,7 @@ class Product extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="duration_interval", type="integer", nullable=true)
+   * @ORM\Column(name="duration_interval", type="integer", unsigned=true, nullable=true)
    * 
    */
   private $durationInterval;
@@ -196,7 +196,7 @@ class Product extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="frequency_interval", type="integer", nullable=true)
+   * @ORM\Column(name="frequency_interval", type="integer", unsigned=true, nullable=true)
    * 
    */
   private $frequencyInterval;
@@ -568,6 +568,239 @@ class Product extends \Civi\Core\Entity {
    */
   public function getFrequencyInterval() {
     return $this->frequencyInterval;
+  }
+
+  /**
+   * returns all the column names of this table
+   *
+   * @access public
+   * @return array
+   */
+  static function &fields( ) {
+    if ( !self::$_fields) {
+      self::$_fields = array (
+      
+              'id' => array(
+      
+        'name' => 'id',
+        'type' => CRM_Utils_Type::T_INT,
+                        'required' => true,
+                                             
+                                    
+                          ),
+      
+              'product_name' => array(
+      
+        'name' => 'name',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Product Name'),
+                        'required' => true,
+                         'maxlength' => 255,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                         'export' => true,
+                'where' => 'civicrm_product.name',
+        'headerPattern' => '',
+        'dataPattern' => '',
+                                   
+                          ),
+      
+              'description' => array(
+      
+        'name' => 'description',
+        'type' => CRM_Utils_Type::T_TEXT,
+                'title' => ts('Description'),
+                                                     
+                                    
+                          ),
+      
+              'sku' => array(
+      
+        'name' => 'sku',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('SKU'),
+                                 'maxlength' => 50,
+                         'size' => CRM_Utils_Type::BIG,
+                           
+                         'export' => true,
+                'where' => 'civicrm_product.sku',
+        'headerPattern' => '',
+        'dataPattern' => '',
+                                   
+                          ),
+      
+              'options' => array(
+      
+        'name' => 'options',
+        'type' => CRM_Utils_Type::T_TEXT,
+                'title' => ts('Options'),
+                                                     
+                                    
+                          ),
+      
+              'image' => array(
+      
+        'name' => 'image',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Image'),
+                                 'maxlength' => 255,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                                    
+                          ),
+      
+              'thumbnail' => array(
+      
+        'name' => 'thumbnail',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Thumbnail'),
+                                 'maxlength' => 255,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                                    
+                          ),
+      
+              'price' => array(
+      
+        'name' => 'price',
+        'type' => CRM_Utils_Type::T_MONEY,
+                'title' => ts('Price'),
+                                                     
+                                    
+                          ),
+      
+              'currency' => array(
+      
+        'name' => 'currency',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Currency'),
+                                 'maxlength' => 3,
+                         'size' => CRM_Utils_Type::FOUR,
+                           
+                                           'default' => 'NULL',
+         
+                                     'pseudoconstant' => array(
+                                'table' => 'civicrm_currency',
+                      'keyColumn' => 'name',
+                      'labelColumn' => 'full_name',
+                      'nameColumn' => 'numeric_code',
+                    )
+                 ),
+      
+              'financial_type_id' => array(
+      
+        'name' => 'financial_type_id',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Financial Type'),
+                                                     
+                                           'default' => 'NULL',
+         
+                'FKClassName' => 'CRM_Financial_FinancialType',
+                          ),
+      
+              'min_contribution' => array(
+      
+        'name' => 'min_contribution',
+        'type' => CRM_Utils_Type::T_MONEY,
+                'title' => ts('Minimum Contribution'),
+                                                     
+                                    
+                          ),
+      
+              'cost' => array(
+      
+        'name' => 'cost',
+        'type' => CRM_Utils_Type::T_MONEY,
+                'title' => ts('Cost'),
+                                                     
+                                    
+                          ),
+      
+              'is_active' => array(
+      
+        'name' => 'is_active',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                'title' => ts('Is Active'),
+                        'required' => true,
+                                             
+                                    
+                          ),
+      
+              'period_type' => array(
+      
+        'name' => 'period_type',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Period Type'),
+                                 'maxlength' => 8,
+                         'size' => CRM_Utils_Type::EIGHT,
+                           
+                                           'default' => 'rolling',
+         
+                                     'pseudoconstant' => array(
+                                '0' => 'not in database',
+                    )
+                 ),
+      
+              'fixed_period_start_day' => array(
+      
+        'name' => 'fixed_period_start_day',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Fixed Period Start Day'),
+                                                     
+                                           'default' => '0101',
+         
+                          ),
+      
+              'duration_unit' => array(
+      
+        'name' => 'duration_unit',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Duration Unit'),
+                                 'maxlength' => 8,
+                         'size' => CRM_Utils_Type::EIGHT,
+                           
+                                           'default' => 'year',
+         
+                                     'pseudoconstant' => array(
+                                '0' => 'not in database',
+                    )
+                 ),
+      
+              'duration_interval' => array(
+      
+        'name' => 'duration_interval',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Duration Interval'),
+                                                     
+                                    
+                          ),
+      
+              'frequency_unit' => array(
+      
+        'name' => 'frequency_unit',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Frequency Unit'),
+                                 'maxlength' => 8,
+                         'size' => CRM_Utils_Type::EIGHT,
+                           
+                                           'default' => 'month',
+         
+                                     'pseudoconstant' => array(
+                                '0' => 'not in database',
+                    )
+                 ),
+      
+              'frequency_interval' => array(
+      
+        'name' => 'frequency_interval',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Frequency Interval'),
+                                                     
+                                    
+                          ),
+             );
+    }
+    return self::$_fields;
   }
 
 }

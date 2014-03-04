@@ -51,7 +51,7 @@ class Group extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, unsigned=true)
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -596,6 +596,220 @@ class Group extends \Civi\Core\Entity {
    */
   public function getModified() {
     return $this->modified;
+  }
+
+  /**
+   * returns all the column names of this table
+   *
+   * @access public
+   * @return array
+   */
+  static function &fields( ) {
+    if ( !self::$_fields) {
+      self::$_fields = array (
+      
+              'id' => array(
+      
+        'name' => 'id',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Group ID'),
+                        'required' => true,
+                                             
+                                    
+                          ),
+      
+              'name' => array(
+      
+        'name' => 'name',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Group Name'),
+                                 'maxlength' => 64,
+                         'size' => CRM_Utils_Type::BIG,
+                           
+                                    
+                          ),
+      
+              'title' => array(
+      
+        'name' => 'title',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Group Title'),
+                                 'maxlength' => 64,
+                         'size' => CRM_Utils_Type::BIG,
+                           
+                                    
+                          ),
+      
+              'description' => array(
+      
+        'name' => 'description',
+        'type' => CRM_Utils_Type::T_TEXT,
+                'title' => ts('Group Description'),
+                                                   'rows' => 2,
+                         'cols' => 60,
+         
+                                    
+                          ),
+      
+              'source' => array(
+      
+        'name' => 'source',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Group Source'),
+                                 'maxlength' => 64,
+                         'size' => CRM_Utils_Type::BIG,
+                           
+                                    
+                          ),
+      
+              'saved_search_id' => array(
+      
+        'name' => 'saved_search_id',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Saved Search ID'),
+                                                     
+                                    
+                'FKClassName' => 'CRM_Contact_SavedSearch',
+                          ),
+      
+              'is_active' => array(
+      
+        'name' => 'is_active',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                'title' => ts('Group Enabled'),
+                                                     
+                                    
+                          ),
+      
+              'visibility' => array(
+      
+        'name' => 'visibility',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Group Visibility Setting'),
+                                 'maxlength' => 24,
+                         'size' => CRM_Utils_Type::MEDIUM,
+                           
+                                           'default' => 'User and User Admin Only',
+         
+                                     'pseudoconstant' => array(
+                                '0' => 'not in database',
+                    )
+                 ),
+      
+              'where_clause' => array(
+      
+        'name' => 'where_clause',
+        'type' => CRM_Utils_Type::T_TEXT,
+                'title' => ts('Group Where Clause'),
+                                                     
+                                    
+                          ),
+      
+              'select_tables' => array(
+      
+        'name' => 'select_tables',
+        'type' => CRM_Utils_Type::T_TEXT,
+                'title' => ts('Tables For Select Clause'),
+                                                     
+                                    
+                          ),
+      
+              'where_tables' => array(
+      
+        'name' => 'where_tables',
+        'type' => CRM_Utils_Type::T_TEXT,
+                'title' => ts('Tables For Where Clause'),
+                                                     
+                                    
+                          ),
+      
+              'group_type' => array(
+      
+        'name' => 'group_type',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Group Type'),
+                                 'maxlength' => 128,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                                    
+                          ),
+      
+              'cache_date' => array(
+      
+        'name' => 'cache_date',
+        'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
+                'title' => ts('Group Cache Date'),
+                                                     
+                                    
+                          ),
+      
+              'refresh_date' => array(
+      
+        'name' => 'refresh_date',
+        'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
+                'title' => ts('Next Group Refresh Time'),
+                                                     
+                                    
+                          ),
+      
+              'parents' => array(
+      
+        'name' => 'parents',
+        'type' => CRM_Utils_Type::T_TEXT,
+                'title' => ts('Group Parents'),
+                                                     
+                                    
+                          ),
+      
+              'children' => array(
+      
+        'name' => 'children',
+        'type' => CRM_Utils_Type::T_TEXT,
+                'title' => ts('Group Children'),
+                                                     
+                                    
+                          ),
+      
+              'is_hidden' => array(
+      
+        'name' => 'is_hidden',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                'title' => ts('Group is Hidden'),
+                                                     
+                                    
+                          ),
+      
+              'is_reserved' => array(
+      
+        'name' => 'is_reserved',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                'title' => ts('Group is Reserved'),
+                                                     
+                                    
+                          ),
+      
+              'created_id' => array(
+      
+        'name' => 'created_id',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Group Created By'),
+                                                     
+                                    
+                'FKClassName' => 'CRM_Contact_Contact',
+                          ),
+      
+              'modified_id' => array(
+      
+        'name' => 'modified_id',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Group Modified By'),
+                                                     
+                                    
+                'FKClassName' => 'CRM_Contact_Contact',
+                          ),
+             );
+    }
+    return self::$_fields;
   }
 
 }

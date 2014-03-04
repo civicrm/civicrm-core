@@ -51,7 +51,7 @@ class Activity extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, unsigned=true)
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -60,7 +60,7 @@ class Activity extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="source_record_id", type="integer", nullable=true)
+   * @ORM\Column(name="source_record_id", type="integer", unsigned=true, nullable=true)
    * 
    */
   private $sourceRecordId;
@@ -68,7 +68,7 @@ class Activity extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="activity_type_id", type="integer", nullable=false)
+   * @ORM\Column(name="activity_type_id", type="integer", unsigned=true, nullable=false)
    * 
    */
   private $activityTypeId = '1';
@@ -92,7 +92,7 @@ class Activity extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="duration", type="integer", nullable=true)
+   * @ORM\Column(name="duration", type="integer", unsigned=true, nullable=true)
    * 
    */
   private $duration;
@@ -132,7 +132,7 @@ class Activity extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="status_id", type="integer", nullable=true)
+   * @ORM\Column(name="status_id", type="integer", unsigned=true, nullable=true)
    * 
    */
   private $statusId;
@@ -140,7 +140,7 @@ class Activity extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="priority_id", type="integer", nullable=true)
+   * @ORM\Column(name="priority_id", type="integer", unsigned=true, nullable=true)
    * 
    */
   private $priorityId;
@@ -164,7 +164,7 @@ class Activity extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="medium_id", type="integer", nullable=false)
+   * @ORM\Column(name="medium_id", type="integer", unsigned=true, nullable=false)
    * 
    */
   private $mediumId = 'NULL';
@@ -228,7 +228,7 @@ class Activity extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="engagement_level", type="integer", nullable=true)
+   * @ORM\Column(name="engagement_level", type="integer", unsigned=true, nullable=true)
    * 
    */
   private $engagementLevel;
@@ -236,7 +236,7 @@ class Activity extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="weight", type="integer", nullable=true)
+   * @ORM\Column(name="weight", type="integer", unsigned=true, nullable=true)
    * 
    */
   private $weight;
@@ -708,6 +708,342 @@ class Activity extends \Civi\Core\Entity {
    */
   public function getWeight() {
     return $this->weight;
+  }
+
+  /**
+   * returns all the column names of this table
+   *
+   * @access public
+   * @return array
+   */
+  static function &fields( ) {
+    if ( !self::$_fields) {
+      self::$_fields = array (
+      
+              'activity_id' => array(
+      
+        'name' => 'id',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Activity ID'),
+                        'required' => true,
+                                             
+                'import' => true,
+        'where' => 'civicrm_activity.id',
+        'headerPattern' => '',
+        'dataPattern' => '',
+                         'export' => true,
+                                   
+                          ),
+      
+              'source_record_id' => array(
+      
+        'name' => 'source_record_id',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Source Record'),
+                                                     
+                                    
+                          ),
+      
+              'activity_type_id' => array(
+      
+        'name' => 'activity_type_id',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Activity Type'),
+                        'required' => true,
+                                             
+                'import' => true,
+        'where' => 'civicrm_activity.activity_type_id',
+        'headerPattern' => '/(activity.)?type(.id$)/i',
+        'dataPattern' => '',
+                         'export' => false,
+                                          'default' => '1',
+         
+                                     'pseudoconstant' => array(
+                                'optionGroupName' => 'activity_type',
+                    )
+                 ),
+      
+              'activity_subject' => array(
+      
+        'name' => 'subject',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Subject'),
+                                 'maxlength' => 255,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                'import' => true,
+        'where' => 'civicrm_activity.subject',
+        'headerPattern' => '/(activity.)?subject/i',
+        'dataPattern' => '',
+                         'export' => true,
+                                   
+                          ),
+      
+              'activity_date_time' => array(
+      
+        'name' => 'activity_date_time',
+        'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
+                'title' => ts('Activity Date'),
+                                                     
+                'import' => true,
+        'where' => 'civicrm_activity.activity_date_time',
+        'headerPattern' => '/(activity.)?date(.time$)?/i',
+        'dataPattern' => '',
+                         'export' => true,
+                                   
+                          ),
+      
+              'activity_duration' => array(
+      
+        'name' => 'duration',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Duration'),
+                                                     
+                'import' => true,
+        'where' => 'civicrm_activity.duration',
+        'headerPattern' => '/(activity.)?duration(s)?$/i',
+        'dataPattern' => '',
+                         'export' => true,
+                                   
+                          ),
+      
+              'activity_location' => array(
+      
+        'name' => 'location',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Location'),
+                                 'maxlength' => 255,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                'import' => true,
+        'where' => 'civicrm_activity.location',
+        'headerPattern' => '/(activity.)?location$/i',
+        'dataPattern' => '',
+                         'export' => true,
+                                   
+                          ),
+      
+              'phone_id' => array(
+      
+        'name' => 'phone_id',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Phone (called) ID'),
+                                                     
+                                    
+                'FKClassName' => 'CRM_Core_Phone',
+                          ),
+      
+              'phone_number' => array(
+      
+        'name' => 'phone_number',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Phone (called) Number'),
+                                 'maxlength' => 64,
+                         'size' => CRM_Utils_Type::BIG,
+                           
+                                    
+                          ),
+      
+              'activity_details' => array(
+      
+        'name' => 'details',
+        'type' => CRM_Utils_Type::T_TEXT,
+                'title' => ts('Details'),
+                                                   'rows' => 8,
+                         'cols' => 60,
+         
+                'import' => true,
+        'where' => 'civicrm_activity.details',
+        'headerPattern' => '/(activity.)?detail(s)?$/i',
+        'dataPattern' => '',
+                         'export' => true,
+                                   
+                          ),
+      
+              'activity_status_id' => array(
+      
+        'name' => 'status_id',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Activity Status'),
+                                                     
+                'import' => true,
+        'where' => 'civicrm_activity.status_id',
+        'headerPattern' => '/(activity.)?status(.label$)?/i',
+        'dataPattern' => '',
+                         'export' => false,
+                                   
+                                     'pseudoconstant' => array(
+                                'optionGroupName' => 'activity_status',
+                    )
+                 ),
+      
+              'priority_id' => array(
+      
+        'name' => 'priority_id',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Priority'),
+                                                     
+                                    
+                                     'pseudoconstant' => array(
+                                'optionGroupName' => 'priority',
+                    )
+                 ),
+      
+              'parent_id' => array(
+      
+        'name' => 'parent_id',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Parent Activity Id'),
+                                                     
+                                    
+                'FKClassName' => 'CRM_Activity_Activity',
+                          ),
+      
+              'activity_is_test' => array(
+      
+        'name' => 'is_test',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                'title' => ts('Test'),
+                                                     
+                'import' => true,
+        'where' => 'civicrm_activity.is_test',
+        'headerPattern' => '/(is.)?test(.activity)?/i',
+        'dataPattern' => '',
+                         'export' => true,
+                                   
+                          ),
+      
+              'activity_medium_id' => array(
+      
+        'name' => 'medium_id',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Activity Medium'),
+                                                     
+                                           'default' => 'NULL',
+         
+                                     'pseudoconstant' => array(
+                                'optionGroupName' => 'encounter_medium',
+                    )
+                 ),
+      
+              'is_auto' => array(
+      
+        'name' => 'is_auto',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                'title' => ts('Auto'),
+                                                     
+                                    
+                          ),
+      
+              'relationship_id' => array(
+      
+        'name' => 'relationship_id',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Relationship Id'),
+                                                     
+                                           'default' => 'NULL',
+         
+                'FKClassName' => 'CRM_Contact_Relationship',
+                          ),
+      
+              'is_current_revision' => array(
+      
+        'name' => 'is_current_revision',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                'title' => ts('Is this activity a current revision in versioning chain?'),
+                                                     
+                'import' => true,
+        'where' => 'civicrm_activity.is_current_revision',
+        'headerPattern' => '/(is.)?(current.)?(revision|version(ing)?)/i',
+        'dataPattern' => '',
+                         'export' => true,
+                                          'default' => '1',
+         
+                          ),
+      
+              'original_id' => array(
+      
+        'name' => 'original_id',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Original Activity ID '),
+                                                     
+                                    
+                'FKClassName' => 'CRM_Activity_Activity',
+                          ),
+      
+              'activity_result' => array(
+      
+        'name' => 'result',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Result'),
+                                 'maxlength' => 255,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                                    
+                          ),
+      
+              'activity_is_deleted' => array(
+      
+        'name' => 'is_deleted',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                'title' => ts('Activity is in the Trash'),
+                                                     
+                'import' => true,
+        'where' => 'civicrm_activity.is_deleted',
+        'headerPattern' => '/(activity.)?(trash|deleted)/i',
+        'dataPattern' => '',
+                         'export' => true,
+                                   
+                          ),
+      
+              'activity_campaign_id' => array(
+      
+        'name' => 'campaign_id',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Campaign'),
+                                                     
+                'import' => true,
+        'where' => 'civicrm_activity.campaign_id',
+        'headerPattern' => '',
+        'dataPattern' => '',
+                         'export' => true,
+                                   
+                'FKClassName' => 'CRM_Campaign_Campaign',
+                                     'pseudoconstant' => array(
+                                'table' => 'civicrm_campaign',
+                      'keyColumn' => 'id',
+                      'labelColumn' => 'title',
+                    )
+                 ),
+      
+              'activity_engagement_level' => array(
+      
+        'name' => 'engagement_level',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Engagement Index'),
+                                                     
+                'import' => true,
+        'where' => 'civicrm_activity.engagement_level',
+        'headerPattern' => '',
+        'dataPattern' => '',
+                         'export' => true,
+                                   
+                                     'pseudoconstant' => array(
+                                'optionGroupName' => 'engagement_index',
+                    )
+                 ),
+      
+              'weight' => array(
+      
+        'name' => 'weight',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Weight'),
+                                                     
+                                    
+                          ),
+             );
+    }
+    return self::$_fields;
   }
 
 }

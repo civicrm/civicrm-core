@@ -51,7 +51,7 @@ class PledgeBlock extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, unsigned=true)
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -68,7 +68,7 @@ class PledgeBlock extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="entity_id", type="integer", nullable=true)
+   * @ORM\Column(name="entity_id", type="integer", unsigned=true, nullable=true)
    * 
    */
   private $entityId;
@@ -92,7 +92,7 @@ class PledgeBlock extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="max_reminders", type="integer", nullable=false)
+   * @ORM\Column(name="max_reminders", type="integer", unsigned=true, nullable=false)
    * 
    */
   private $maxReminders = '1';
@@ -100,7 +100,7 @@ class PledgeBlock extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="initial_reminder_day", type="integer", nullable=false)
+   * @ORM\Column(name="initial_reminder_day", type="integer", unsigned=true, nullable=false)
    * 
    */
   private $initialReminderDay = '5';
@@ -108,7 +108,7 @@ class PledgeBlock extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="additional_reminder_day", type="integer", nullable=false)
+   * @ORM\Column(name="additional_reminder_day", type="integer", unsigned=true, nullable=false)
    * 
    */
   private $additionalReminderDay = '5';
@@ -260,6 +260,99 @@ class PledgeBlock extends \Civi\Core\Entity {
    */
   public function getAdditionalReminderDay() {
     return $this->additionalReminderDay;
+  }
+
+  /**
+   * returns all the column names of this table
+   *
+   * @access public
+   * @return array
+   */
+  static function &fields( ) {
+    if ( !self::$_fields) {
+      self::$_fields = array (
+      
+              'id' => array(
+      
+        'name' => 'id',
+        'type' => CRM_Utils_Type::T_INT,
+                        'required' => true,
+                                             
+                                    
+                          ),
+      
+              'entity_table' => array(
+      
+        'name' => 'entity_table',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Entity Table'),
+                                 'maxlength' => 64,
+                         'size' => CRM_Utils_Type::BIG,
+                           
+                                    
+                          ),
+      
+              'entity_id' => array(
+      
+        'name' => 'entity_id',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Entity Id'),
+                        'required' => true,
+                                             
+                                    
+                          ),
+      
+              'pledge_frequency_unit' => array(
+      
+        'name' => 'pledge_frequency_unit',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Pledge Frequency Unit'),
+                                 'maxlength' => 128,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                                    
+                          ),
+      
+              'is_pledge_interval' => array(
+      
+        'name' => 'is_pledge_interval',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                                                     
+                                    
+                          ),
+      
+              'max_reminders' => array(
+      
+        'name' => 'max_reminders',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Maximum Number of Reminders'),
+                                                     
+                                           'default' => '1',
+         
+                          ),
+      
+              'initial_reminder_day' => array(
+      
+        'name' => 'initial_reminder_day',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Initial Reminder Day'),
+                                                     
+                                           'default' => '5',
+         
+                          ),
+      
+              'additional_reminder_day' => array(
+      
+        'name' => 'additional_reminder_day',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Additional Reminder Days'),
+                                                     
+                                           'default' => '5',
+         
+                          ),
+             );
+    }
+    return self::$_fields;
   }
 
 }

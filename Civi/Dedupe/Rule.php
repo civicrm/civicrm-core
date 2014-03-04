@@ -51,7 +51,7 @@ class Rule extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, unsigned=true)
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -84,7 +84,7 @@ class Rule extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="rule_length", type="integer", nullable=true)
+   * @ORM\Column(name="rule_length", type="integer", unsigned=true, nullable=true)
    * 
    */
   private $ruleLength;
@@ -92,7 +92,7 @@ class Rule extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="rule_weight", type="integer", nullable=true)
+   * @ORM\Column(name="rule_weight", type="integer", unsigned=true, nullable=true)
    * 
    */
   private $ruleWeight;
@@ -204,6 +204,82 @@ class Rule extends \Civi\Core\Entity {
    */
   public function getRuleWeight() {
     return $this->ruleWeight;
+  }
+
+  /**
+   * returns all the column names of this table
+   *
+   * @access public
+   * @return array
+   */
+  static function &fields( ) {
+    if ( !self::$_fields) {
+      self::$_fields = array (
+      
+              'id' => array(
+      
+        'name' => 'id',
+        'type' => CRM_Utils_Type::T_INT,
+                        'required' => true,
+                                             
+                                    
+                          ),
+      
+              'dedupe_rule_group_id' => array(
+      
+        'name' => 'dedupe_rule_group_id',
+        'type' => CRM_Utils_Type::T_INT,
+                        'required' => true,
+                                             
+                                    
+                'FKClassName' => 'CRM_Dedupe_RuleGroup',
+                          ),
+      
+              'rule_table' => array(
+      
+        'name' => 'rule_table',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Rule Table'),
+                        'required' => true,
+                         'maxlength' => 64,
+                         'size' => CRM_Utils_Type::BIG,
+                           
+                                    
+                          ),
+      
+              'rule_field' => array(
+      
+        'name' => 'rule_field',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Rule Field'),
+                        'required' => true,
+                         'maxlength' => 64,
+                         'size' => CRM_Utils_Type::BIG,
+                           
+                                    
+                          ),
+      
+              'rule_length' => array(
+      
+        'name' => 'rule_length',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Rule Length'),
+                                                     
+                                    
+                          ),
+      
+              'rule_weight' => array(
+      
+        'name' => 'rule_weight',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Rule Weight'),
+                        'required' => true,
+                                             
+                                    
+                          ),
+             );
+    }
+    return self::$_fields;
   }
 
 }

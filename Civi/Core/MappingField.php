@@ -51,7 +51,7 @@ class MappingField extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, unsigned=true)
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -84,7 +84,7 @@ class MappingField extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="column_number", type="integer", nullable=true)
+   * @ORM\Column(name="column_number", type="integer", unsigned=true, nullable=true)
    * 
    */
   private $columnNumber;
@@ -100,7 +100,7 @@ class MappingField extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="phone_type_id", type="integer", nullable=true)
+   * @ORM\Column(name="phone_type_id", type="integer", unsigned=true, nullable=true)
    * 
    */
   private $phoneTypeId;
@@ -108,7 +108,7 @@ class MappingField extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="im_provider_id", type="integer", nullable=true)
+   * @ORM\Column(name="im_provider_id", type="integer", unsigned=true, nullable=true)
    * 
    */
   private $imProviderId;
@@ -116,7 +116,7 @@ class MappingField extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="website_type_id", type="integer", nullable=true)
+   * @ORM\Column(name="website_type_id", type="integer", unsigned=true, nullable=true)
    * 
    */
   private $websiteTypeId;
@@ -140,7 +140,7 @@ class MappingField extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="grouping", type="integer", nullable=false)
+   * @ORM\Column(name="grouping", type="integer", unsigned=true, nullable=false)
    * 
    */
   private $grouping = '1';
@@ -428,6 +428,170 @@ class MappingField extends \Civi\Core\Entity {
    */
   public function getValue() {
     return $this->value;
+  }
+
+  /**
+   * returns all the column names of this table
+   *
+   * @access public
+   * @return array
+   */
+  static function &fields( ) {
+    if ( !self::$_fields) {
+      self::$_fields = array (
+      
+              'id' => array(
+      
+        'name' => 'id',
+        'type' => CRM_Utils_Type::T_INT,
+                        'required' => true,
+                                             
+                                    
+                          ),
+      
+              'mapping_id' => array(
+      
+        'name' => 'mapping_id',
+        'type' => CRM_Utils_Type::T_INT,
+                        'required' => true,
+                                             
+                                    
+                'FKClassName' => 'CRM_Core_Mapping',
+                          ),
+      
+              'name' => array(
+      
+        'name' => 'name',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Name'),
+                                 'maxlength' => 255,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                                    
+                          ),
+      
+              'contact_type' => array(
+      
+        'name' => 'contact_type',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Contact Type'),
+                                 'maxlength' => 64,
+                         'size' => CRM_Utils_Type::BIG,
+                           
+                                    
+                                     'pseudoconstant' => array(
+                                'table' => 'civicrm_contact_type',
+                      'keyColumn' => 'name',
+                      'labelColumn' => 'label',
+                    )
+                 ),
+      
+              'column_number' => array(
+      
+        'name' => 'column_number',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Column Number'),
+                        'required' => true,
+                                             
+                                    
+                          ),
+      
+              'location_type_id' => array(
+      
+        'name' => 'location_type_id',
+        'type' => CRM_Utils_Type::T_INT,
+                                                     
+                                    
+                'FKClassName' => 'CRM_Core_LocationType',
+                          ),
+      
+              'phone_type_id' => array(
+      
+        'name' => 'phone_type_id',
+        'type' => CRM_Utils_Type::T_INT,
+                                                     
+                                    
+                          ),
+      
+              'im_provider_id' => array(
+      
+        'name' => 'im_provider_id',
+        'type' => CRM_Utils_Type::T_INT,
+                                                     
+                                    
+                                     'pseudoconstant' => array(
+                                'optionGroupName' => 'instant_messenger_service',
+                    )
+                 ),
+      
+              'website_type_id' => array(
+      
+        'name' => 'website_type_id',
+        'type' => CRM_Utils_Type::T_INT,
+                                                     
+                                    
+                                     'pseudoconstant' => array(
+                                'optionGroupName' => 'website_type',
+                    )
+                 ),
+      
+              'relationship_type_id' => array(
+      
+        'name' => 'relationship_type_id',
+        'type' => CRM_Utils_Type::T_INT,
+                                                     
+                                    
+                'FKClassName' => 'CRM_Contact_RelationshipType',
+                          ),
+      
+              'relationship_direction' => array(
+      
+        'name' => 'relationship_direction',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Relationship Direction'),
+                                 'maxlength' => 6,
+                         'size' => CRM_Utils_Type::SIX,
+                           
+                                    
+                          ),
+      
+              'grouping' => array(
+      
+        'name' => 'grouping',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Grouping'),
+                                                     
+                                           'default' => '1',
+         
+                          ),
+      
+              'operator' => array(
+      
+        'name' => 'operator',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Operator'),
+                                 'maxlength' => 16,
+                         'size' => CRM_Utils_Type::TWELVE,
+                           
+                                    
+                                     'pseudoconstant' => array(
+                                '0' => 'not in database',
+                    )
+                 ),
+      
+              'value' => array(
+      
+        'name' => 'value',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Value'),
+                                 'maxlength' => 255,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                                    
+                          ),
+             );
+    }
+    return self::$_fields;
   }
 
 }

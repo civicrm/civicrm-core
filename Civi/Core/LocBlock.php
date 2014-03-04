@@ -51,7 +51,7 @@ class LocBlock extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, unsigned=true)
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -288,6 +288,101 @@ class LocBlock extends \Civi\Core\Entity {
    */
   public function getIm2() {
     return $this->im2;
+  }
+
+  /**
+   * returns all the column names of this table
+   *
+   * @access public
+   * @return array
+   */
+  static function &fields( ) {
+    if ( !self::$_fields) {
+      self::$_fields = array (
+      
+              'id' => array(
+      
+        'name' => 'id',
+        'type' => CRM_Utils_Type::T_INT,
+                        'required' => true,
+                                             
+                                    
+                          ),
+      
+              'address_id' => array(
+      
+        'name' => 'address_id',
+        'type' => CRM_Utils_Type::T_INT,
+                                                     
+                                    
+                'FKClassName' => 'CRM_Core_Address',
+                          ),
+      
+              'email_id' => array(
+      
+        'name' => 'email_id',
+        'type' => CRM_Utils_Type::T_INT,
+                                                     
+                                    
+                'FKClassName' => 'CRM_Core_Email',
+                          ),
+      
+              'phone_id' => array(
+      
+        'name' => 'phone_id',
+        'type' => CRM_Utils_Type::T_INT,
+                                                     
+                                    
+                'FKClassName' => 'CRM_Core_Phone',
+                          ),
+      
+              'im_id' => array(
+      
+        'name' => 'im_id',
+        'type' => CRM_Utils_Type::T_INT,
+                                                     
+                                    
+                'FKClassName' => 'CRM_Core_IM',
+                          ),
+      
+              'address_2_id' => array(
+      
+        'name' => 'address_2_id',
+        'type' => CRM_Utils_Type::T_INT,
+                                                     
+                                    
+                'FKClassName' => 'CRM_Core_Address',
+                          ),
+      
+              'email_2_id' => array(
+      
+        'name' => 'email_2_id',
+        'type' => CRM_Utils_Type::T_INT,
+                                                     
+                                    
+                'FKClassName' => 'CRM_Core_Email',
+                          ),
+      
+              'phone_2_id' => array(
+      
+        'name' => 'phone_2_id',
+        'type' => CRM_Utils_Type::T_INT,
+                                                     
+                                    
+                'FKClassName' => 'CRM_Core_Phone',
+                          ),
+      
+              'im_2_id' => array(
+      
+        'name' => 'im_2_id',
+        'type' => CRM_Utils_Type::T_INT,
+                                                     
+                                    
+                'FKClassName' => 'CRM_Core_IM',
+                          ),
+             );
+    }
+    return self::$_fields;
   }
 
 }

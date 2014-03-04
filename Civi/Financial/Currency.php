@@ -51,7 +51,7 @@ class Currency extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, unsigned=true)
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -176,6 +176,83 @@ class Currency extends \Civi\Core\Entity {
    */
   public function getFullName() {
     return $this->fullName;
+  }
+
+  /**
+   * returns all the column names of this table
+   *
+   * @access public
+   * @return array
+   */
+  static function &fields( ) {
+    if ( !self::$_fields) {
+      self::$_fields = array (
+      
+              'id' => array(
+      
+        'name' => 'id',
+        'type' => CRM_Utils_Type::T_INT,
+                        'required' => true,
+                                             
+                                    
+                          ),
+      
+              'name' => array(
+      
+        'name' => 'name',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Currency'),
+                                 'maxlength' => 64,
+                         'size' => CRM_Utils_Type::BIG,
+                           
+                'import' => true,
+        'where' => 'civicrm_currency.name',
+        'headerPattern' => '',
+        'dataPattern' => '',
+                         'export' => true,
+                                   
+                          ),
+      
+              'symbol' => array(
+      
+        'name' => 'symbol',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Symbol'),
+                                 'maxlength' => 8,
+                         'size' => CRM_Utils_Type::EIGHT,
+                           
+                                    
+                          ),
+      
+              'numeric_code' => array(
+      
+        'name' => 'numeric_code',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Numeric Code'),
+                                 'maxlength' => 3,
+                         'size' => CRM_Utils_Type::FOUR,
+                           
+                'import' => true,
+        'where' => 'civicrm_currency.numeric_code',
+        'headerPattern' => '',
+        'dataPattern' => '',
+                         'export' => true,
+                                   
+                          ),
+      
+              'full_name' => array(
+      
+        'name' => 'full_name',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Full Name'),
+                                 'maxlength' => 64,
+                         'size' => CRM_Utils_Type::BIG,
+                           
+                                    
+                          ),
+             );
+    }
+    return self::$_fields;
   }
 
 }

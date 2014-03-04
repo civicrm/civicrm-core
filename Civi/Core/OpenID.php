@@ -51,7 +51,7 @@ class OpenID extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, unsigned=true)
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -68,7 +68,7 @@ class OpenID extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="location_type_id", type="integer", nullable=true)
+   * @ORM\Column(name="location_type_id", type="integer", unsigned=true, nullable=true)
    * 
    */
   private $locationTypeId;
@@ -204,6 +204,83 @@ class OpenID extends \Civi\Core\Entity {
    */
   public function getIsPrimary() {
     return $this->isPrimary;
+  }
+
+  /**
+   * returns all the column names of this table
+   *
+   * @access public
+   * @return array
+   */
+  static function &fields( ) {
+    if ( !self::$_fields) {
+      self::$_fields = array (
+      
+              'id' => array(
+      
+        'name' => 'id',
+        'type' => CRM_Utils_Type::T_INT,
+                        'required' => true,
+                                             
+                                    
+                          ),
+      
+              'contact_id' => array(
+      
+        'name' => 'contact_id',
+        'type' => CRM_Utils_Type::T_INT,
+                                                     
+                                    
+                'FKClassName' => 'CRM_Contact_Contact',
+                          ),
+      
+              'location_type_id' => array(
+      
+        'name' => 'location_type_id',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('OpenID Location Type'),
+                                                     
+                                    
+                          ),
+      
+              'openid' => array(
+      
+        'name' => 'openid',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('OpenID'),
+                                 'maxlength' => 255,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                'import' => true,
+        'where' => 'civicrm_openid.openid',
+        'headerPattern' => '/^Open.?ID|u(niq\w*)?.?ID/i',
+        'dataPattern' => '/^[\w\/\:\.]+$/',
+                         'export' => true,
+                                 'rule' => 'url',
+                  
+                          ),
+      
+              'allowed_to_login' => array(
+      
+        'name' => 'allowed_to_login',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                'title' => ts('Allowed To Login'),
+                        'required' => true,
+                                             
+                                    
+                          ),
+      
+              'is_primary' => array(
+      
+        'name' => 'is_primary',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                'title' => ts('Is OpenID Primary?'),
+                                                     
+                                    
+                          ),
+             );
+    }
+    return self::$_fields;
   }
 
 }

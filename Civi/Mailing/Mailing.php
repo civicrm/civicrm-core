@@ -51,7 +51,7 @@ class Mailing extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, unsigned=true)
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -100,7 +100,7 @@ class Mailing extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="resubscribe_id", type="integer", nullable=true)
+   * @ORM\Column(name="resubscribe_id", type="integer", unsigned=true, nullable=true)
    * 
    */
   private $resubscribeId;
@@ -276,7 +276,7 @@ class Mailing extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="approval_status_id", type="integer", nullable=true)
+   * @ORM\Column(name="approval_status_id", type="integer", unsigned=true, nullable=true)
    * 
    */
   private $approvalStatusId;
@@ -1016,6 +1016,356 @@ class Mailing extends \Civi\Core\Entity {
    */
   public function getSmsProvider() {
     return $this->smsProvider;
+  }
+
+  /**
+   * returns all the column names of this table
+   *
+   * @access public
+   * @return array
+   */
+  static function &fields( ) {
+    if ( !self::$_fields) {
+      self::$_fields = array (
+      
+              'id' => array(
+      
+        'name' => 'id',
+        'type' => CRM_Utils_Type::T_INT,
+                        'required' => true,
+                                             
+                                    
+                          ),
+      
+              'domain_id' => array(
+      
+        'name' => 'domain_id',
+        'type' => CRM_Utils_Type::T_INT,
+                                                     
+                                    
+                'FKClassName' => 'CRM_Core_Domain',
+                          ),
+      
+              'header_id' => array(
+      
+        'name' => 'header_id',
+        'type' => CRM_Utils_Type::T_INT,
+                                                     
+                                    
+                'FKClassName' => 'CRM_Mailing_Component',
+                          ),
+      
+              'footer_id' => array(
+      
+        'name' => 'footer_id',
+        'type' => CRM_Utils_Type::T_INT,
+                                                     
+                                    
+                'FKClassName' => 'CRM_Mailing_Component',
+                          ),
+      
+              'reply_id' => array(
+      
+        'name' => 'reply_id',
+        'type' => CRM_Utils_Type::T_INT,
+                                                     
+                                    
+                'FKClassName' => 'CRM_Mailing_Component',
+                          ),
+      
+              'unsubscribe_id' => array(
+      
+        'name' => 'unsubscribe_id',
+        'type' => CRM_Utils_Type::T_INT,
+                                                     
+                                    
+                'FKClassName' => 'CRM_Mailing_Component',
+                          ),
+      
+              'resubscribe_id' => array(
+      
+        'name' => 'resubscribe_id',
+        'type' => CRM_Utils_Type::T_INT,
+                                                     
+                                    
+                          ),
+      
+              'optout_id' => array(
+      
+        'name' => 'optout_id',
+        'type' => CRM_Utils_Type::T_INT,
+                                                     
+                                    
+                'FKClassName' => 'CRM_Mailing_Component',
+                          ),
+      
+              'name' => array(
+      
+        'name' => 'name',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Name'),
+                                 'maxlength' => 128,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                                    
+                          ),
+      
+              'from_name' => array(
+      
+        'name' => 'from_name',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('From Name'),
+                                 'maxlength' => 128,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                                    
+                          ),
+      
+              'from_email' => array(
+      
+        'name' => 'from_email',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('From Email'),
+                                 'maxlength' => 128,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                                    
+                          ),
+      
+              'replyto_email' => array(
+      
+        'name' => 'replyto_email',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Replyto Email'),
+                                 'maxlength' => 128,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                                    
+                          ),
+      
+              'subject' => array(
+      
+        'name' => 'subject',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Subject'),
+                                 'maxlength' => 128,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                                    
+                          ),
+      
+              'body_text' => array(
+      
+        'name' => 'body_text',
+        'type' => CRM_Utils_Type::T_LONGTEXT,
+                'title' => ts('Body Text'),
+                                                     
+                                    
+                          ),
+      
+              'body_html' => array(
+      
+        'name' => 'body_html',
+        'type' => CRM_Utils_Type::T_LONGTEXT,
+                'title' => ts('Body Html'),
+                                                     
+                                    
+                          ),
+      
+              'url_tracking' => array(
+      
+        'name' => 'url_tracking',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                'title' => ts('Url Tracking'),
+                                                     
+                                    
+                          ),
+      
+              'forward_replies' => array(
+      
+        'name' => 'forward_replies',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                'title' => ts('Forward Replies'),
+                                                     
+                                    
+                          ),
+      
+              'auto_responder' => array(
+      
+        'name' => 'auto_responder',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                'title' => ts('Auto Responder'),
+                                                     
+                                    
+                          ),
+      
+              'open_tracking' => array(
+      
+        'name' => 'open_tracking',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                'title' => ts('Open Tracking'),
+                                                     
+                                    
+                          ),
+      
+              'is_completed' => array(
+      
+        'name' => 'is_completed',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                                                     
+                                    
+                          ),
+      
+              'msg_template_id' => array(
+      
+        'name' => 'msg_template_id',
+        'type' => CRM_Utils_Type::T_INT,
+                                                     
+                                    
+                'FKClassName' => 'CRM_Core_MessageTemplate',
+                          ),
+      
+              'override_verp' => array(
+      
+        'name' => 'override_verp',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                'title' => ts('Override Verp'),
+                                                     
+                                    
+                          ),
+      
+              'created_id' => array(
+      
+        'name' => 'created_id',
+        'type' => CRM_Utils_Type::T_INT,
+                                                     
+                                    
+                'FKClassName' => 'CRM_Contact_Contact',
+                          ),
+      
+              'created_date' => array(
+      
+        'name' => 'created_date',
+        'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
+                'title' => ts('Mailing Created Date'),
+                                                     
+                                    
+                          ),
+      
+              'scheduled_id' => array(
+      
+        'name' => 'scheduled_id',
+        'type' => CRM_Utils_Type::T_INT,
+                                                     
+                                    
+                'FKClassName' => 'CRM_Contact_Contact',
+                          ),
+      
+              'scheduled_date' => array(
+      
+        'name' => 'scheduled_date',
+        'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
+                'title' => ts('Mailing Scheduled Date'),
+                                                     
+                                    
+                          ),
+      
+              'approver_id' => array(
+      
+        'name' => 'approver_id',
+        'type' => CRM_Utils_Type::T_INT,
+                                                     
+                                    
+                'FKClassName' => 'CRM_Contact_Contact',
+                          ),
+      
+              'approval_date' => array(
+      
+        'name' => 'approval_date',
+        'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
+                'title' => ts('Mailing Approved Date'),
+                                                     
+                                    
+                          ),
+      
+              'approval_status_id' => array(
+      
+        'name' => 'approval_status_id',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Approval Status'),
+                                                     
+                                    
+                                     'pseudoconstant' => array(
+                                'optionGroupName' => 'mail_approval_status',
+                    )
+                 ),
+      
+              'approval_note' => array(
+      
+        'name' => 'approval_note',
+        'type' => CRM_Utils_Type::T_LONGTEXT,
+                'title' => ts('Approval Note'),
+                                                     
+                                    
+                          ),
+      
+              'is_archived' => array(
+      
+        'name' => 'is_archived',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                                                     
+                                    
+                          ),
+      
+              'visibility' => array(
+      
+        'name' => 'visibility',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Visibility'),
+                                 'maxlength' => 40,
+                         'size' => CRM_Utils_Type::BIG,
+                           
+                                           'default' => 'User and User Admin Only',
+         
+                                     'pseudoconstant' => array(
+                                '0' => 'not in database',
+                    )
+                 ),
+      
+              'campaign_id' => array(
+      
+        'name' => 'campaign_id',
+        'type' => CRM_Utils_Type::T_INT,
+                                                     
+                                    
+                'FKClassName' => 'CRM_Campaign_Campaign',
+                                     'pseudoconstant' => array(
+                                'table' => 'civicrm_campaign',
+                      'keyColumn' => 'id',
+                      'labelColumn' => 'title',
+                    )
+                 ),
+      
+              'dedupe_email' => array(
+      
+        'name' => 'dedupe_email',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                'title' => ts('Dedupe Email'),
+                                                     
+                                    
+                          ),
+      
+              'sms_provider_id' => array(
+      
+        'name' => 'sms_provider_id',
+        'type' => CRM_Utils_Type::T_INT,
+                                                     
+                                    
+                'FKClassName' => 'CRM_SMS_Provider',
+                          ),
+             );
+    }
+    return self::$_fields;
   }
 
 }

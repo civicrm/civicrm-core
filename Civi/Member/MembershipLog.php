@@ -51,7 +51,7 @@ class MembershipLog extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, unsigned=true)
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -116,7 +116,7 @@ class MembershipLog extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="max_related", type="integer", nullable=true)
+   * @ORM\Column(name="max_related", type="integer", unsigned=true, nullable=true)
    * 
    */
   private $maxRelated;
@@ -288,6 +288,104 @@ class MembershipLog extends \Civi\Core\Entity {
    */
   public function getMaxRelated() {
     return $this->maxRelated;
+  }
+
+  /**
+   * returns all the column names of this table
+   *
+   * @access public
+   * @return array
+   */
+  static function &fields( ) {
+    if ( !self::$_fields) {
+      self::$_fields = array (
+      
+              'id' => array(
+      
+        'name' => 'id',
+        'type' => CRM_Utils_Type::T_INT,
+                        'required' => true,
+                                             
+                                    
+                          ),
+      
+              'membership_id' => array(
+      
+        'name' => 'membership_id',
+        'type' => CRM_Utils_Type::T_INT,
+                        'required' => true,
+                                             
+                                    
+                'FKClassName' => 'CRM_Member_Membership',
+                          ),
+      
+              'status_id' => array(
+      
+        'name' => 'status_id',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Membership Status'),
+                        'required' => true,
+                                             
+                                    
+                'FKClassName' => 'CRM_Member_MembershipStatus',
+                          ),
+      
+              'start_date' => array(
+      
+        'name' => 'start_date',
+        'type' => CRM_Utils_Type::T_DATE,
+                'title' => ts('Start Date'),
+                                                     
+                                    
+                          ),
+      
+              'end_date' => array(
+      
+        'name' => 'end_date',
+        'type' => CRM_Utils_Type::T_DATE,
+                'title' => ts('End Date'),
+                                                     
+                                    
+                          ),
+      
+              'modified_id' => array(
+      
+        'name' => 'modified_id',
+        'type' => CRM_Utils_Type::T_INT,
+                                                     
+                                    
+                'FKClassName' => 'CRM_Contact_Contact',
+                          ),
+      
+              'modified_date' => array(
+      
+        'name' => 'modified_date',
+        'type' => CRM_Utils_Type::T_DATE,
+                'title' => ts('Membership Change Date'),
+                                                     
+                                    
+                          ),
+      
+              'membership_type_id' => array(
+      
+        'name' => 'membership_type_id',
+        'type' => CRM_Utils_Type::T_INT,
+                                                     
+                                    
+                'FKClassName' => 'CRM_Member_MembershipType',
+                          ),
+      
+              'max_related' => array(
+      
+        'name' => 'max_related',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Max Related'),
+                                                     
+                                    
+                          ),
+             );
+    }
+    return self::$_fields;
   }
 
 }

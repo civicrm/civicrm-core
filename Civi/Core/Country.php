@@ -51,7 +51,7 @@ class Country extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, unsigned=true)
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -288,6 +288,116 @@ class Country extends \Civi\Core\Entity {
    */
   public function getIsProvinceAbbreviated() {
     return $this->isProvinceAbbreviated;
+  }
+
+  /**
+   * returns all the column names of this table
+   *
+   * @access public
+   * @return array
+   */
+  static function &fields( ) {
+    if ( !self::$_fields) {
+      self::$_fields = array (
+      
+              'id' => array(
+      
+        'name' => 'id',
+        'type' => CRM_Utils_Type::T_INT,
+                        'required' => true,
+                                             
+                                    
+                          ),
+      
+              'name' => array(
+      
+        'name' => 'name',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Country'),
+                                 'maxlength' => 64,
+                         'size' => CRM_Utils_Type::BIG,
+                           
+                'import' => true,
+        'where' => 'civicrm_country.name',
+        'headerPattern' => '/country/i',
+        'dataPattern' => '/^[A-Z][a-z]+\.?(\s+[A-Z][a-z]+){0,3}$/',
+                         'export' => true,
+                                   
+                          ),
+      
+              'iso_code' => array(
+      
+        'name' => 'iso_code',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Iso Code'),
+                                 'maxlength' => 2,
+                         'size' => CRM_Utils_Type::TWO,
+                           
+                                    
+                          ),
+      
+              'country_code' => array(
+      
+        'name' => 'country_code',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Country Code'),
+                                 'maxlength' => 4,
+                         'size' => CRM_Utils_Type::FOUR,
+                           
+                                    
+                          ),
+      
+              'address_format_id' => array(
+      
+        'name' => 'address_format_id',
+        'type' => CRM_Utils_Type::T_INT,
+                                                     
+                                    
+                'FKClassName' => 'CRM_Core_AddressFormat',
+                          ),
+      
+              'idd_prefix' => array(
+      
+        'name' => 'idd_prefix',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Idd Prefix'),
+                                 'maxlength' => 4,
+                         'size' => CRM_Utils_Type::FOUR,
+                           
+                                    
+                          ),
+      
+              'ndd_prefix' => array(
+      
+        'name' => 'ndd_prefix',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Ndd Prefix'),
+                                 'maxlength' => 4,
+                         'size' => CRM_Utils_Type::FOUR,
+                           
+                                    
+                          ),
+      
+              'region_id' => array(
+      
+        'name' => 'region_id',
+        'type' => CRM_Utils_Type::T_INT,
+                        'required' => true,
+                                             
+                                    
+                'FKClassName' => 'CRM_Core_Worldregion',
+                          ),
+      
+              'is_province_abbreviated' => array(
+      
+        'name' => 'is_province_abbreviated',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                                                     
+                                    
+                          ),
+             );
+    }
+    return self::$_fields;
   }
 
 }

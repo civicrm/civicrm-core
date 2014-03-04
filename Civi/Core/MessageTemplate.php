@@ -51,7 +51,7 @@ class MessageTemplate extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, unsigned=true)
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -100,7 +100,7 @@ class MessageTemplate extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="workflow_id", type="integer", nullable=true)
+   * @ORM\Column(name="workflow_id", type="integer", unsigned=true, nullable=true)
    * 
    */
   private $workflowId;
@@ -316,6 +316,111 @@ class MessageTemplate extends \Civi\Core\Entity {
    */
   public function getPdfFormat() {
     return $this->pdfFormat;
+  }
+
+  /**
+   * returns all the column names of this table
+   *
+   * @access public
+   * @return array
+   */
+  static function &fields( ) {
+    if ( !self::$_fields) {
+      self::$_fields = array (
+      
+              'id' => array(
+      
+        'name' => 'id',
+        'type' => CRM_Utils_Type::T_INT,
+                        'required' => true,
+                                             
+                                    
+                          ),
+      
+              'msg_title' => array(
+      
+        'name' => 'msg_title',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Msg Title'),
+                                 'maxlength' => 255,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                                    
+                          ),
+      
+              'msg_subject' => array(
+      
+        'name' => 'msg_subject',
+        'type' => CRM_Utils_Type::T_TEXT,
+                'title' => ts('Msg Subject'),
+                                                     
+                                    
+                          ),
+      
+              'msg_text' => array(
+      
+        'name' => 'msg_text',
+        'type' => CRM_Utils_Type::T_LONGTEXT,
+                'title' => ts('Msg Text'),
+                                                     
+                                    
+                          ),
+      
+              'msg_html' => array(
+      
+        'name' => 'msg_html',
+        'type' => CRM_Utils_Type::T_LONGTEXT,
+                'title' => ts('Msg Html'),
+                                                     
+                                    
+                          ),
+      
+              'is_active' => array(
+      
+        'name' => 'is_active',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                'title' => ts('Is Active'),
+                                                     
+                                           'default' => '1',
+         
+                          ),
+      
+              'workflow_id' => array(
+      
+        'name' => 'workflow_id',
+        'type' => CRM_Utils_Type::T_INT,
+                                                     
+                                    
+                          ),
+      
+              'is_default' => array(
+      
+        'name' => 'is_default',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                                                     
+                                           'default' => '1',
+         
+                          ),
+      
+              'is_reserved' => array(
+      
+        'name' => 'is_reserved',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                                                     
+                                    
+                          ),
+      
+              'pdf_format_id' => array(
+      
+        'name' => 'pdf_format_id',
+        'type' => CRM_Utils_Type::T_INT,
+                                                     
+                                    
+                'FKClassName' => 'CRM_Core_OptionValue',
+                          ),
+             );
+    }
+    return self::$_fields;
   }
 
 }

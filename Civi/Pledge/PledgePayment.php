@@ -51,7 +51,7 @@ class PledgePayment extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, unsigned=true)
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -116,7 +116,7 @@ class PledgePayment extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="reminder_count", type="integer", nullable=false)
+   * @ORM\Column(name="reminder_count", type="integer", unsigned=true, nullable=false)
    * 
    */
   private $reminderCount = '0';
@@ -124,7 +124,7 @@ class PledgePayment extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="status_id", type="integer", nullable=true)
+   * @ORM\Column(name="status_id", type="integer", unsigned=true, nullable=true)
    * 
    */
   private $statusId;
@@ -316,6 +316,158 @@ class PledgePayment extends \Civi\Core\Entity {
    */
   public function getStatusId() {
     return $this->statusId;
+  }
+
+  /**
+   * returns all the column names of this table
+   *
+   * @access public
+   * @return array
+   */
+  static function &fields( ) {
+    if ( !self::$_fields) {
+      self::$_fields = array (
+      
+              'pledge_payment_id' => array(
+      
+        'name' => 'id',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Payment ID'),
+                        'required' => true,
+                                             
+                'import' => true,
+        'where' => 'civicrm_pledge_payment.id',
+        'headerPattern' => '',
+        'dataPattern' => '',
+                         'export' => true,
+                                   
+                          ),
+      
+              'pledge_id' => array(
+      
+        'name' => 'pledge_id',
+        'type' => CRM_Utils_Type::T_INT,
+                        'required' => true,
+                                             
+                                    
+                'FKClassName' => 'CRM_Pledge_Pledge',
+                          ),
+      
+              'contribution_id' => array(
+      
+        'name' => 'contribution_id',
+        'type' => CRM_Utils_Type::T_INT,
+                                                     
+                                    
+                'FKClassName' => 'CRM_Contribute_Contribution',
+                          ),
+      
+              'pledge_payment_scheduled_amount' => array(
+      
+        'name' => 'scheduled_amount',
+        'type' => CRM_Utils_Type::T_MONEY,
+                'title' => ts('Scheduled Amount'),
+                        'required' => true,
+                                             
+                'import' => true,
+        'where' => 'civicrm_pledge_payment.scheduled_amount',
+        'headerPattern' => '',
+        'dataPattern' => '',
+                         'export' => true,
+                                   
+                          ),
+      
+              'pledge_payment_actual_amount' => array(
+      
+        'name' => 'actual_amount',
+        'type' => CRM_Utils_Type::T_MONEY,
+                'title' => ts('Actual Amount'),
+                                                     
+                'import' => true,
+        'where' => 'civicrm_pledge_payment.actual_amount',
+        'headerPattern' => '',
+        'dataPattern' => '',
+                         'export' => true,
+                                   
+                          ),
+      
+              'currency' => array(
+      
+        'name' => 'currency',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Currency'),
+                                 'maxlength' => 3,
+                         'size' => CRM_Utils_Type::FOUR,
+                           
+                                           'default' => 'NULL',
+         
+                                     'pseudoconstant' => array(
+                                'table' => 'civicrm_currency',
+                      'keyColumn' => 'name',
+                      'labelColumn' => 'full_name',
+                      'nameColumn' => 'numeric_code',
+                    )
+                 ),
+      
+              'pledge_payment_scheduled_date' => array(
+      
+        'name' => 'scheduled_date',
+        'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
+                'title' => ts('Scheduled Date'),
+                        'required' => true,
+                                             
+                'import' => true,
+        'where' => 'civicrm_pledge_payment.scheduled_date',
+        'headerPattern' => '',
+        'dataPattern' => '',
+                         'export' => true,
+                                   
+                          ),
+      
+              'pledge_payment_reminder_date' => array(
+      
+        'name' => 'reminder_date',
+        'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
+                'title' => ts('Last Reminder'),
+                                                     
+                'import' => true,
+        'where' => 'civicrm_pledge_payment.reminder_date',
+        'headerPattern' => '',
+        'dataPattern' => '',
+                         'export' => true,
+                                   
+                          ),
+      
+              'pledge_payment_reminder_count' => array(
+      
+        'name' => 'reminder_count',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Reminders Sent'),
+                                                     
+                'import' => true,
+        'where' => 'civicrm_pledge_payment.reminder_count',
+        'headerPattern' => '',
+        'dataPattern' => '',
+                         'export' => true,
+                                   
+                          ),
+      
+              'pledge_payment_status_id' => array(
+      
+        'name' => 'status_id',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Payment Status'),
+                                                     
+                'import' => true,
+        'where' => 'civicrm_pledge_payment.status_id',
+        'headerPattern' => '',
+        'dataPattern' => '',
+                         'export' => false,
+                                   
+                          ),
+             );
+    }
+    return self::$_fields;
   }
 
 }

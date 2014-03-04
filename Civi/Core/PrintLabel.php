@@ -51,7 +51,7 @@ class PrintLabel extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, unsigned=true)
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -92,7 +92,7 @@ class PrintLabel extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="label_type_id", type="integer", nullable=true)
+   * @ORM\Column(name="label_type_id", type="integer", unsigned=true, nullable=true)
    * 
    */
   private $labelTypeId;
@@ -344,6 +344,131 @@ class PrintLabel extends \Civi\Core\Entity {
    */
   public function getCreated() {
     return $this->created;
+  }
+
+  /**
+   * returns all the column names of this table
+   *
+   * @access public
+   * @return array
+   */
+  static function &fields( ) {
+    if ( !self::$_fields) {
+      self::$_fields = array (
+      
+              'id' => array(
+      
+        'name' => 'id',
+        'type' => CRM_Utils_Type::T_INT,
+                        'required' => true,
+                                             
+                                    
+                          ),
+      
+              'title' => array(
+      
+        'name' => 'title',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Title'),
+                                 'maxlength' => 255,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                                    
+                          ),
+      
+              'name' => array(
+      
+        'name' => 'name',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Name'),
+                                 'maxlength' => 255,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                                    
+                          ),
+      
+              'description' => array(
+      
+        'name' => 'description',
+        'type' => CRM_Utils_Type::T_TEXT,
+                'title' => ts('Description'),
+                                                     
+                                    
+                          ),
+      
+              'label_format_name' => array(
+      
+        'name' => 'label_format_name',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Label Format Name'),
+                                 'maxlength' => 255,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                                    
+                                     'pseudoconstant' => array(
+                                'optionGroupName' => 'name_badge',
+                    )
+                 ),
+      
+              'label_type_id' => array(
+      
+        'name' => 'label_type_id',
+        'type' => CRM_Utils_Type::T_INT,
+                                                     
+                                    
+                                     'pseudoconstant' => array(
+                                'optionGroupName' => 'label_type',
+                    )
+                 ),
+      
+              'data' => array(
+      
+        'name' => 'data',
+        'type' => CRM_Utils_Type::T_LONGTEXT,
+                'title' => ts('Data'),
+                                                     
+                                    
+                          ),
+      
+              'is_default' => array(
+      
+        'name' => 'is_default',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                                                     
+                                           'default' => '1',
+         
+                          ),
+      
+              'is_active' => array(
+      
+        'name' => 'is_active',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                                                     
+                                           'default' => '1',
+         
+                          ),
+      
+              'is_reserved' => array(
+      
+        'name' => 'is_reserved',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                                                     
+                                           'default' => '1',
+         
+                          ),
+      
+              'created_id' => array(
+      
+        'name' => 'created_id',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Created By Contact ID'),
+                                                     
+                                    
+                'FKClassName' => 'CRM_Contact_Contact',
+                          ),
+             );
+    }
+    return self::$_fields;
   }
 
 }

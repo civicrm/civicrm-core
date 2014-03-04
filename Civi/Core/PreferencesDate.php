@@ -51,7 +51,7 @@ class PreferencesDate extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, unsigned=true)
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -76,7 +76,7 @@ class PreferencesDate extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="start", type="integer", nullable=true)
+   * @ORM\Column(name="start", type="integer", unsigned=true, nullable=true)
    * 
    */
   private $start;
@@ -84,7 +84,7 @@ class PreferencesDate extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="end", type="integer", nullable=true)
+   * @ORM\Column(name="end", type="integer", unsigned=true, nullable=true)
    * 
    */
   private $end;
@@ -232,6 +232,94 @@ class PreferencesDate extends \Civi\Core\Entity {
    */
   public function getTimeFormat() {
     return $this->timeFormat;
+  }
+
+  /**
+   * returns all the column names of this table
+   *
+   * @access public
+   * @return array
+   */
+  static function &fields( ) {
+    if ( !self::$_fields) {
+      self::$_fields = array (
+      
+              'id' => array(
+      
+        'name' => 'id',
+        'type' => CRM_Utils_Type::T_INT,
+                        'required' => true,
+                                             
+                                    
+                          ),
+      
+              'name' => array(
+      
+        'name' => 'name',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Name'),
+                        'required' => true,
+                         'maxlength' => 64,
+                         'size' => CRM_Utils_Type::BIG,
+                           
+                                    
+                          ),
+      
+              'description' => array(
+      
+        'name' => 'description',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Description'),
+                                 'maxlength' => 255,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                                    
+                          ),
+      
+              'start' => array(
+      
+        'name' => 'start',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Start'),
+                        'required' => true,
+                                             
+                                    
+                          ),
+      
+              'end' => array(
+      
+        'name' => 'end',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('End'),
+                        'required' => true,
+                                             
+                                    
+                          ),
+      
+              'date_format' => array(
+      
+        'name' => 'date_format',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Date Format'),
+                                 'maxlength' => 64,
+                         'size' => CRM_Utils_Type::BIG,
+                           
+                                    
+                          ),
+      
+              'time_format' => array(
+      
+        'name' => 'time_format',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Time Format'),
+                                 'maxlength' => 64,
+                         'size' => CRM_Utils_Type::BIG,
+                           
+                                    
+                          ),
+             );
+    }
+    return self::$_fields;
   }
 
 }

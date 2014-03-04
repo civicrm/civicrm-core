@@ -51,7 +51,7 @@ class Persistent extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, unsigned=true)
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -176,6 +176,71 @@ class Persistent extends \Civi\Core\Entity {
    */
   public function getIsConfig() {
     return $this->isConfig;
+  }
+
+  /**
+   * returns all the column names of this table
+   *
+   * @access public
+   * @return array
+   */
+  static function &fields( ) {
+    if ( !self::$_fields) {
+      self::$_fields = array (
+      
+              'id' => array(
+      
+        'name' => 'id',
+        'type' => CRM_Utils_Type::T_INT,
+                        'required' => true,
+                                             
+                                    
+                          ),
+      
+              'context' => array(
+      
+        'name' => 'context',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Context'),
+                        'required' => true,
+                         'maxlength' => 255,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                                    
+                          ),
+      
+              'name' => array(
+      
+        'name' => 'name',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Name'),
+                        'required' => true,
+                         'maxlength' => 255,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                                    
+                          ),
+      
+              'data' => array(
+      
+        'name' => 'data',
+        'type' => CRM_Utils_Type::T_LONGTEXT,
+                'title' => ts('Data'),
+                                                     
+                                    
+                          ),
+      
+              'is_config' => array(
+      
+        'name' => 'is_config',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                        'required' => true,
+                                             
+                                    
+                          ),
+             );
+    }
+    return self::$_fields;
   }
 
 }

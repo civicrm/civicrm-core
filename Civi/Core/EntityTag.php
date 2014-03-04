@@ -51,7 +51,7 @@ class EntityTag extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, unsigned=true)
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -68,7 +68,7 @@ class EntityTag extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="entity_id", type="integer", nullable=true)
+   * @ORM\Column(name="entity_id", type="integer", unsigned=true, nullable=true)
    * 
    */
   private $entityId;
@@ -148,6 +148,67 @@ class EntityTag extends \Civi\Core\Entity {
    */
   public function getTag() {
     return $this->tag;
+  }
+
+  /**
+   * returns all the column names of this table
+   *
+   * @access public
+   * @return array
+   */
+  static function &fields( ) {
+    if ( !self::$_fields) {
+      self::$_fields = array (
+      
+              'id' => array(
+      
+        'name' => 'id',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Entity Tag ID'),
+                        'required' => true,
+                                             
+                                    
+                          ),
+      
+              'entity_table' => array(
+      
+        'name' => 'entity_table',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Entity Table'),
+                                 'maxlength' => 64,
+                         'size' => CRM_Utils_Type::BIG,
+                           
+                                    
+                          ),
+      
+              'entity_id' => array(
+      
+        'name' => 'entity_id',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Entity ID'),
+                        'required' => true,
+                                             
+                                    
+                          ),
+      
+              'tag_id' => array(
+      
+        'name' => 'tag_id',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Tag ID'),
+                        'required' => true,
+                                             
+                                    
+                'FKClassName' => 'CRM_Core_Tag',
+                                     'pseudoconstant' => array(
+                                'table' => 'civicrm_tag',
+                      'keyColumn' => 'id',
+                      'labelColumn' => 'name',
+                    )
+                 ),
+             );
+    }
+    return self::$_fields;
   }
 
 }

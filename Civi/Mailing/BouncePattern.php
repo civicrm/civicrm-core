@@ -51,7 +51,7 @@ class BouncePattern extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, unsigned=true)
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -120,6 +120,50 @@ class BouncePattern extends \Civi\Core\Entity {
    */
   public function getPattern() {
     return $this->pattern;
+  }
+
+  /**
+   * returns all the column names of this table
+   *
+   * @access public
+   * @return array
+   */
+  static function &fields( ) {
+    if ( !self::$_fields) {
+      self::$_fields = array (
+      
+              'id' => array(
+      
+        'name' => 'id',
+        'type' => CRM_Utils_Type::T_INT,
+                        'required' => true,
+                                             
+                                    
+                          ),
+      
+              'bounce_type_id' => array(
+      
+        'name' => 'bounce_type_id',
+        'type' => CRM_Utils_Type::T_INT,
+                        'required' => true,
+                                             
+                                    
+                'FKClassName' => 'CRM_Mailing_BounceType',
+                          ),
+      
+              'pattern' => array(
+      
+        'name' => 'pattern',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Pattern'),
+                                 'maxlength' => 255,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                                    
+                          ),
+             );
+    }
+    return self::$_fields;
   }
 
 }

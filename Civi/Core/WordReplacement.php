@@ -51,7 +51,7 @@ class WordReplacement extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, unsigned=true)
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -204,6 +204,85 @@ class WordReplacement extends \Civi\Core\Entity {
    */
   public function getDomain() {
     return $this->domain;
+  }
+
+  /**
+   * returns all the column names of this table
+   *
+   * @access public
+   * @return array
+   */
+  static function &fields( ) {
+    if ( !self::$_fields) {
+      self::$_fields = array (
+      
+              'id' => array(
+      
+        'name' => 'id',
+        'type' => CRM_Utils_Type::T_INT,
+                        'required' => true,
+                                             
+                                    
+                          ),
+      
+              'find_word' => array(
+      
+        'name' => 'find_word',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Find Word'),
+                                 'maxlength' => 255,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                                    
+                          ),
+      
+              'replace_word' => array(
+      
+        'name' => 'replace_word',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Replace Word'),
+                                 'maxlength' => 255,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                                    
+                          ),
+      
+              'is_active' => array(
+      
+        'name' => 'is_active',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                'title' => ts('Word Replacement is Active'),
+                                                     
+                                           'default' => '1',
+         
+                          ),
+      
+              'match_type' => array(
+      
+        'name' => 'match_type',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Match Type'),
+                                 'maxlength' => 16,
+                         'size' => CRM_Utils_Type::TWELVE,
+                           
+                                           'default' => 'wildcardMatch',
+         
+                                     'pseudoconstant' => array(
+                                '0' => 'not in database',
+                    )
+                 ),
+      
+              'domain_id' => array(
+      
+        'name' => 'domain_id',
+        'type' => CRM_Utils_Type::T_INT,
+                                                     
+                                    
+                'FKClassName' => 'CRM_Core_Domain',
+                          ),
+             );
+    }
+    return self::$_fields;
   }
 
 }

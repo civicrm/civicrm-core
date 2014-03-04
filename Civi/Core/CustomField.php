@@ -51,7 +51,7 @@ class CustomField extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, unsigned=true)
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -132,7 +132,7 @@ class CustomField extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="weight", type="integer", nullable=false)
+   * @ORM\Column(name="weight", type="integer", unsigned=true, nullable=false)
    * 
    */
   private $weight = '1';
@@ -196,7 +196,7 @@ class CustomField extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="options_per_line", type="integer", nullable=true)
+   * @ORM\Column(name="options_per_line", type="integer", unsigned=true, nullable=true)
    * 
    */
   private $optionsPerLine;
@@ -204,7 +204,7 @@ class CustomField extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="text_length", type="integer", nullable=true)
+   * @ORM\Column(name="text_length", type="integer", unsigned=true, nullable=true)
    * 
    */
   private $textLength;
@@ -212,7 +212,7 @@ class CustomField extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="start_date_years", type="integer", nullable=true)
+   * @ORM\Column(name="start_date_years", type="integer", unsigned=true, nullable=true)
    * 
    */
   private $startDateYears;
@@ -220,7 +220,7 @@ class CustomField extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="end_date_years", type="integer", nullable=true)
+   * @ORM\Column(name="end_date_years", type="integer", unsigned=true, nullable=true)
    * 
    */
   private $endDateYears;
@@ -236,7 +236,7 @@ class CustomField extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="time_format", type="integer", nullable=true)
+   * @ORM\Column(name="time_format", type="integer", unsigned=true, nullable=true)
    * 
    */
   private $timeFormat;
@@ -244,7 +244,7 @@ class CustomField extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="note_columns", type="integer", nullable=true)
+   * @ORM\Column(name="note_columns", type="integer", unsigned=true, nullable=true)
    * 
    */
   private $noteColumns;
@@ -252,7 +252,7 @@ class CustomField extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="note_rows", type="integer", nullable=true)
+   * @ORM\Column(name="note_rows", type="integer", unsigned=true, nullable=true)
    * 
    */
   private $noteRows;
@@ -268,7 +268,7 @@ class CustomField extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="option_group_id", type="integer", nullable=true)
+   * @ORM\Column(name="option_group_id", type="integer", unsigned=true, nullable=true)
    * 
    */
   private $optionGroupId;
@@ -280,6 +280,14 @@ class CustomField extends \Civi\Core\Entity {
    * 
    */
   private $filter;
+  
+  /**
+   * @var boolean
+   *
+   * @ORM\Column(name="in_selector", type="boolean", nullable=false)
+   * 
+   */
+  private $inSelector = '0';
 
   /**
    * Get id
@@ -848,6 +856,343 @@ class CustomField extends \Civi\Core\Entity {
    */
   public function getFilter() {
     return $this->filter;
+  }
+  
+  /**
+   * Set inSelector
+   *
+   * @param boolean $inSelector
+   * @return CustomField
+   */
+  public function setInSelector($inSelector) {
+    $this->inSelector = $inSelector;
+    return $this;
+  }
+
+  /**
+   * Get inSelector
+   *
+   * @return boolean
+   */
+  public function getInSelector() {
+    return $this->inSelector;
+  }
+
+  /**
+   * returns all the column names of this table
+   *
+   * @access public
+   * @return array
+   */
+  static function &fields( ) {
+    if ( !self::$_fields) {
+      self::$_fields = array (
+      
+              'id' => array(
+      
+        'name' => 'id',
+        'type' => CRM_Utils_Type::T_INT,
+                        'required' => true,
+                                             
+                                    
+                          ),
+      
+              'custom_group_id' => array(
+      
+        'name' => 'custom_group_id',
+        'type' => CRM_Utils_Type::T_INT,
+                        'required' => true,
+                                             
+                                    
+                'FKClassName' => 'CRM_Core_CustomGroup',
+                                     'pseudoconstant' => array(
+                                'table' => 'civicrm_custom_group',
+                      'keyColumn' => 'id',
+                      'labelColumn' => 'title',
+                    )
+                 ),
+      
+              'name' => array(
+      
+        'name' => 'name',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Name'),
+                                 'maxlength' => 64,
+                         'size' => CRM_Utils_Type::BIG,
+                           
+                                    
+                          ),
+      
+              'label' => array(
+      
+        'name' => 'label',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Label'),
+                        'required' => true,
+                         'maxlength' => 255,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                                    
+                          ),
+      
+              'data_type' => array(
+      
+        'name' => 'data_type',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Data Type'),
+                        'required' => true,
+                         'maxlength' => 16,
+                         'size' => CRM_Utils_Type::TWELVE,
+                           
+                                    
+                                     'pseudoconstant' => array(
+                                '0' => 'not in database',
+                    )
+                 ),
+      
+              'html_type' => array(
+      
+        'name' => 'html_type',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Html Type'),
+                        'required' => true,
+                         'maxlength' => 32,
+                         'size' => CRM_Utils_Type::MEDIUM,
+                           
+                                    
+                                     'pseudoconstant' => array(
+                                '0' => 'not in database',
+                    )
+                 ),
+      
+              'default_value' => array(
+      
+        'name' => 'default_value',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Default Value'),
+                                 'maxlength' => 255,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                                    
+                          ),
+      
+              'is_required' => array(
+      
+        'name' => 'is_required',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                                                     
+                                    
+                          ),
+      
+              'is_searchable' => array(
+      
+        'name' => 'is_searchable',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                                                     
+                                    
+                          ),
+      
+              'is_search_range' => array(
+      
+        'name' => 'is_search_range',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                                                     
+                                    
+                          ),
+      
+              'weight' => array(
+      
+        'name' => 'weight',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Weight'),
+                        'required' => true,
+                                             
+                                           'default' => '1',
+         
+                          ),
+      
+              'help_pre' => array(
+      
+        'name' => 'help_pre',
+        'type' => CRM_Utils_Type::T_TEXT,
+                'title' => ts('Help Pre'),
+                                                     
+                                    
+                          ),
+      
+              'help_post' => array(
+      
+        'name' => 'help_post',
+        'type' => CRM_Utils_Type::T_TEXT,
+                'title' => ts('Help Post'),
+                                                     
+                                    
+                          ),
+      
+              'mask' => array(
+      
+        'name' => 'mask',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Mask'),
+                                 'maxlength' => 64,
+                         'size' => CRM_Utils_Type::BIG,
+                           
+                                    
+                          ),
+      
+              'attributes' => array(
+      
+        'name' => 'attributes',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Attributes'),
+                                 'maxlength' => 255,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                                    
+                          ),
+      
+              'javascript' => array(
+      
+        'name' => 'javascript',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Javascript'),
+                                 'maxlength' => 255,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                                    
+                          ),
+      
+              'is_active' => array(
+      
+        'name' => 'is_active',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                                                     
+                                    
+                          ),
+      
+              'is_view' => array(
+      
+        'name' => 'is_view',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                                                     
+                                    
+                          ),
+      
+              'options_per_line' => array(
+      
+        'name' => 'options_per_line',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Options Per Line'),
+                                                     
+                                    
+                          ),
+      
+              'text_length' => array(
+      
+        'name' => 'text_length',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Text Length'),
+                                                     
+                                    
+                          ),
+      
+              'start_date_years' => array(
+      
+        'name' => 'start_date_years',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Start Date Years'),
+                                                     
+                                    
+                          ),
+      
+              'end_date_years' => array(
+      
+        'name' => 'end_date_years',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('End Date Years'),
+                                                     
+                                    
+                          ),
+      
+              'date_format' => array(
+      
+        'name' => 'date_format',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Date Format'),
+                                 'maxlength' => 64,
+                         'size' => CRM_Utils_Type::BIG,
+                           
+                                    
+                          ),
+      
+              'time_format' => array(
+      
+        'name' => 'time_format',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Time Format'),
+                                                     
+                                    
+                          ),
+      
+              'note_columns' => array(
+      
+        'name' => 'note_columns',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Note Columns'),
+                                                     
+                                    
+                          ),
+      
+              'note_rows' => array(
+      
+        'name' => 'note_rows',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Note Rows'),
+                                                     
+                                    
+                          ),
+      
+              'column_name' => array(
+      
+        'name' => 'column_name',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Column Name'),
+                                 'maxlength' => 255,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                                    
+                          ),
+      
+              'option_group_id' => array(
+      
+        'name' => 'option_group_id',
+        'type' => CRM_Utils_Type::T_INT,
+                                                     
+                                    
+                          ),
+      
+              'filter' => array(
+      
+        'name' => 'filter',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Filter'),
+                                 'maxlength' => 255,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                                    
+                          ),
+      
+              'in_selector' => array(
+      
+        'name' => 'in_selector',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                'title' => ts('In Selector'),
+                                                     
+                                    
+                          ),
+             );
+    }
+    return self::$_fields;
   }
 
 }

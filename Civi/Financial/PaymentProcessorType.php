@@ -51,7 +51,7 @@ class PaymentProcessorType extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, unsigned=true)
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -204,7 +204,7 @@ class PaymentProcessorType extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="billing_mode", type="integer", nullable=true)
+   * @ORM\Column(name="billing_mode", type="integer", unsigned=true, nullable=true)
    * 
    */
   private $billingMode;
@@ -220,7 +220,7 @@ class PaymentProcessorType extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="payment_type", type="integer", nullable=false)
+   * @ORM\Column(name="payment_type", type="integer", unsigned=true, nullable=false)
    * 
    */
   private $paymentType = '1';
@@ -652,6 +652,252 @@ class PaymentProcessorType extends \Civi\Core\Entity {
    */
   public function getPaymentType() {
     return $this->paymentType;
+  }
+
+  /**
+   * returns all the column names of this table
+   *
+   * @access public
+   * @return array
+   */
+  static function &fields( ) {
+    if ( !self::$_fields) {
+      self::$_fields = array (
+      
+              'id' => array(
+      
+        'name' => 'id',
+        'type' => CRM_Utils_Type::T_INT,
+                        'required' => true,
+                                             
+                                    
+                          ),
+      
+              'name' => array(
+      
+        'name' => 'name',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Payment Processor variable name to be used in code'),
+                                 'maxlength' => 64,
+                         'size' => CRM_Utils_Type::BIG,
+                           
+                                    
+                          ),
+      
+              'title' => array(
+      
+        'name' => 'title',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Payment Processor Title'),
+                                 'maxlength' => 127,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                                    
+                          ),
+      
+              'description' => array(
+      
+        'name' => 'description',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Description'),
+                                 'maxlength' => 255,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                                    
+                          ),
+      
+              'is_active' => array(
+      
+        'name' => 'is_active',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                                                     
+                                    
+                          ),
+      
+              'is_default' => array(
+      
+        'name' => 'is_default',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                                                     
+                                    
+                          ),
+      
+              'user_name_label' => array(
+      
+        'name' => 'user_name_label',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Label for User Name if used'),
+                                 'maxlength' => 255,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                                    
+                          ),
+      
+              'password_label' => array(
+      
+        'name' => 'password_label',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Label for password'),
+                                 'maxlength' => 255,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                                    
+                          ),
+      
+              'signature_label' => array(
+      
+        'name' => 'signature_label',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Label for Signature'),
+                                 'maxlength' => 255,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                                    
+                          ),
+      
+              'subject_label' => array(
+      
+        'name' => 'subject_label',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Label for Subject'),
+                                 'maxlength' => 255,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                                    
+                          ),
+      
+              'class_name' => array(
+      
+        'name' => 'class_name',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Suffix for PHP clas name implementation'),
+                                 'maxlength' => 255,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                                    
+                          ),
+      
+              'url_site_default' => array(
+      
+        'name' => 'url_site_default',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Default Live Site URL'),
+                                 'maxlength' => 255,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                                    
+                          ),
+      
+              'url_api_default' => array(
+      
+        'name' => 'url_api_default',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Default API Site URL'),
+                                 'maxlength' => 255,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                                    
+                          ),
+      
+              'url_recur_default' => array(
+      
+        'name' => 'url_recur_default',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Default Live Recurring Payments URL'),
+                                 'maxlength' => 255,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                                    
+                          ),
+      
+              'url_button_default' => array(
+      
+        'name' => 'url_button_default',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Default Live Button URL'),
+                                 'maxlength' => 255,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                                    
+                          ),
+      
+              'url_site_test_default' => array(
+      
+        'name' => 'url_site_test_default',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Default Test Site URL'),
+                                 'maxlength' => 255,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                                    
+                          ),
+      
+              'url_api_test_default' => array(
+      
+        'name' => 'url_api_test_default',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Default Test API URL'),
+                                 'maxlength' => 255,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                                    
+                          ),
+      
+              'url_recur_test_default' => array(
+      
+        'name' => 'url_recur_test_default',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Default Test Recurring Payment URL'),
+                                 'maxlength' => 255,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                                    
+                          ),
+      
+              'url_button_test_default' => array(
+      
+        'name' => 'url_button_test_default',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Default Test Button URL'),
+                                 'maxlength' => 255,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                                    
+                          ),
+      
+              'billing_mode' => array(
+      
+        'name' => 'billing_mode',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Billing Mode'),
+                        'required' => true,
+                                             
+                                    
+                                     'pseudoconstant' => array(
+                                '0' => 'not in database',
+                    )
+                 ),
+      
+              'is_recur' => array(
+      
+        'name' => 'is_recur',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                                                     
+                                    
+                          ),
+      
+              'payment_type' => array(
+      
+        'name' => 'payment_type',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Payment Type'),
+                                                     
+                                           'default' => '1',
+         
+                          ),
+             );
+    }
+    return self::$_fields;
   }
 
 }

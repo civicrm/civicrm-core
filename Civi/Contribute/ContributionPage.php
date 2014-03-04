@@ -51,7 +51,7 @@ class ContributionPage extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, unsigned=true)
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -212,7 +212,7 @@ class ContributionPage extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="default_amount_id", type="integer", nullable=true)
+   * @ORM\Column(name="default_amount_id", type="integer", unsigned=true, nullable=true)
    * 
    */
   private $defaultAmountId;
@@ -1324,6 +1324,480 @@ class ContributionPage extends \Civi\Core\Entity {
    */
   public function getIsShare() {
     return $this->isShare;
+  }
+
+  /**
+   * returns all the column names of this table
+   *
+   * @access public
+   * @return array
+   */
+  static function &fields( ) {
+    if ( !self::$_fields) {
+      self::$_fields = array (
+      
+              'id' => array(
+      
+        'name' => 'id',
+        'type' => CRM_Utils_Type::T_INT,
+                        'required' => true,
+                                             
+                                    
+                          ),
+      
+              'title' => array(
+      
+        'name' => 'title',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Contribution Page Title'),
+                                 'maxlength' => 255,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                                    
+                          ),
+      
+              'intro_text' => array(
+      
+        'name' => 'intro_text',
+        'type' => CRM_Utils_Type::T_TEXT,
+                'title' => ts('Contribution Page Introduction Text'),
+                                                   'rows' => 6,
+                         'cols' => 50,
+         
+                                    
+                          ),
+      
+              'financial_type_id' => array(
+      
+        'name' => 'financial_type_id',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Financial Type'),
+                                                     
+                                    
+                'FKClassName' => 'CRM_Financial_FinancialType',
+                                     'pseudoconstant' => array(
+                                'table' => 'civicrm_financial_type',
+                      'keyColumn' => 'id',
+                      'labelColumn' => 'name',
+                    )
+                 ),
+      
+              'payment_processor' => array(
+      
+        'name' => 'payment_processor',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Payment Processor'),
+                                 'maxlength' => 128,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                                    
+                                     'pseudoconstant' => array(
+                                'table' => 'civicrm_payment_processor',
+                      'keyColumn' => 'id',
+                      'labelColumn' => 'name',
+                    )
+                 ),
+      
+              'is_credit_card_only' => array(
+      
+        'name' => 'is_credit_card_only',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                                                     
+                                    
+                          ),
+      
+              'is_monetary' => array(
+      
+        'name' => 'is_monetary',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                                                     
+                                           'default' => '1',
+         
+                          ),
+      
+              'is_recur' => array(
+      
+        'name' => 'is_recur',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                                                     
+                                    
+                          ),
+      
+              'is_confirm_enabled' => array(
+      
+        'name' => 'is_confirm_enabled',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                                                     
+                                           'default' => '1',
+         
+                          ),
+      
+              'recur_frequency_unit' => array(
+      
+        'name' => 'recur_frequency_unit',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Recur Frequency Unit'),
+                                 'maxlength' => 128,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                                    
+                          ),
+      
+              'is_recur_interval' => array(
+      
+        'name' => 'is_recur_interval',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                                                     
+                                    
+                          ),
+      
+              'is_recur_installments' => array(
+      
+        'name' => 'is_recur_installments',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                                                     
+                                    
+                          ),
+      
+              'is_pay_later' => array(
+      
+        'name' => 'is_pay_later',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                                                     
+                                    
+                          ),
+      
+              'pay_later_text' => array(
+      
+        'name' => 'pay_later_text',
+        'type' => CRM_Utils_Type::T_TEXT,
+                'title' => ts('Pay Later Text'),
+                                                     
+                                    
+                          ),
+      
+              'pay_later_receipt' => array(
+      
+        'name' => 'pay_later_receipt',
+        'type' => CRM_Utils_Type::T_TEXT,
+                'title' => ts('Pay Later Receipt'),
+                                                     
+                                    
+                          ),
+      
+              'is_partial_payment' => array(
+      
+        'name' => 'is_partial_payment',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                                                     
+                                    
+                          ),
+      
+              'initial_amount_label' => array(
+      
+        'name' => 'initial_amount_label',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Initial Amount Label'),
+                                 'maxlength' => 255,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                                    
+                          ),
+      
+              'initial_amount_help_text' => array(
+      
+        'name' => 'initial_amount_help_text',
+        'type' => CRM_Utils_Type::T_TEXT,
+                'title' => ts('Initial Amount Help Text'),
+                                                     
+                                    
+                          ),
+      
+              'min_initial_amount' => array(
+      
+        'name' => 'min_initial_amount',
+        'type' => CRM_Utils_Type::T_MONEY,
+                'title' => ts('Min Initial Amount'),
+                                                     
+                                    
+                          ),
+      
+              'is_allow_other_amount' => array(
+      
+        'name' => 'is_allow_other_amount',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                                                     
+                                    
+                          ),
+      
+              'default_amount_id' => array(
+      
+        'name' => 'default_amount_id',
+        'type' => CRM_Utils_Type::T_INT,
+                                                     
+                                    
+                          ),
+      
+              'min_amount' => array(
+      
+        'name' => 'min_amount',
+        'type' => CRM_Utils_Type::T_MONEY,
+                'title' => ts('Min Amount'),
+                                                     
+                                    
+                          ),
+      
+              'max_amount' => array(
+      
+        'name' => 'max_amount',
+        'type' => CRM_Utils_Type::T_MONEY,
+                'title' => ts('Max Amount'),
+                                                     
+                                    
+                          ),
+      
+              'goal_amount' => array(
+      
+        'name' => 'goal_amount',
+        'type' => CRM_Utils_Type::T_MONEY,
+                'title' => ts('Goal Amount'),
+                                                     
+                                    
+                          ),
+      
+              'thankyou_title' => array(
+      
+        'name' => 'thankyou_title',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Thank-you Title'),
+                                 'maxlength' => 255,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                                    
+                          ),
+      
+              'thankyou_text' => array(
+      
+        'name' => 'thankyou_text',
+        'type' => CRM_Utils_Type::T_TEXT,
+                'title' => ts('Thank-you Text'),
+                                                   'rows' => 8,
+                         'cols' => 60,
+         
+                                    
+                          ),
+      
+              'thankyou_footer' => array(
+      
+        'name' => 'thankyou_footer',
+        'type' => CRM_Utils_Type::T_TEXT,
+                'title' => ts('Thank-you Footer'),
+                                                   'rows' => 8,
+                         'cols' => 60,
+         
+                                    
+                          ),
+      
+              'is_for_organization' => array(
+      
+        'name' => 'is_for_organization',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                                                     
+                                    
+                          ),
+      
+              'for_organization' => array(
+      
+        'name' => 'for_organization',
+        'type' => CRM_Utils_Type::T_TEXT,
+                'title' => ts('On Behalf Of Organization'),
+                                                   'rows' => 2,
+                         'cols' => 50,
+         
+                                    
+                          ),
+      
+              'is_email_receipt' => array(
+      
+        'name' => 'is_email_receipt',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                                                     
+                                    
+                          ),
+      
+              'receipt_from_name' => array(
+      
+        'name' => 'receipt_from_name',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Receipt From Name'),
+                                 'maxlength' => 255,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                                    
+                          ),
+      
+              'receipt_from_email' => array(
+      
+        'name' => 'receipt_from_email',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Receipt From Email'),
+                                 'maxlength' => 255,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                                    
+                          ),
+      
+              'cc_receipt' => array(
+      
+        'name' => 'cc_receipt',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Cc Receipt'),
+                                 'maxlength' => 255,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                                    
+                          ),
+      
+              'bcc_receipt' => array(
+      
+        'name' => 'bcc_receipt',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Bcc Receipt'),
+                                 'maxlength' => 255,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                                    
+                          ),
+      
+              'receipt_text' => array(
+      
+        'name' => 'receipt_text',
+        'type' => CRM_Utils_Type::T_TEXT,
+                'title' => ts('Receipt Text'),
+                                                   'rows' => 6,
+                         'cols' => 50,
+         
+                                    
+                          ),
+      
+              'is_active' => array(
+      
+        'name' => 'is_active',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                                                     
+                                    
+                          ),
+      
+              'footer_text' => array(
+      
+        'name' => 'footer_text',
+        'type' => CRM_Utils_Type::T_TEXT,
+                'title' => ts('Footer Text'),
+                                                   'rows' => 6,
+                         'cols' => 50,
+         
+                                    
+                          ),
+      
+              'amount_block_is_active' => array(
+      
+        'name' => 'amount_block_is_active',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                                                     
+                                           'default' => '1',
+         
+                          ),
+      
+              'honor_block_is_active' => array(
+      
+        'name' => 'honor_block_is_active',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                                                     
+                                    
+                          ),
+      
+              'start_date' => array(
+      
+        'name' => 'start_date',
+        'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
+                'title' => ts('Contribution Page Start Date'),
+                                                     
+                                    
+                          ),
+      
+              'end_date' => array(
+      
+        'name' => 'end_date',
+        'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
+                'title' => ts('Contribution Page End Date'),
+                                                     
+                                    
+                          ),
+      
+              'created_id' => array(
+      
+        'name' => 'created_id',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Contribution Page Created By'),
+                                                     
+                                    
+                'FKClassName' => 'CRM_Contact_Contact',
+                          ),
+      
+              'created_date' => array(
+      
+        'name' => 'created_date',
+        'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
+                'title' => ts('Contribution Page Created Date'),
+                                                     
+                                    
+                          ),
+      
+              'currency' => array(
+      
+        'name' => 'currency',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Contribution Page Currency'),
+                                 'maxlength' => 3,
+                         'size' => CRM_Utils_Type::FOUR,
+                           
+                                           'default' => 'NULL',
+         
+                                     'pseudoconstant' => array(
+                                'table' => 'civicrm_currency',
+                      'keyColumn' => 'name',
+                      'labelColumn' => 'full_name',
+                      'nameColumn' => 'numeric_code',
+                    )
+                 ),
+      
+              'campaign_id' => array(
+      
+        'name' => 'campaign_id',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Contribution Page Campaign ID'),
+                                                     
+                                    
+                'FKClassName' => 'CRM_Campaign_Campaign',
+                                     'pseudoconstant' => array(
+                                'table' => 'civicrm_campaign',
+                      'keyColumn' => 'id',
+                      'labelColumn' => 'title',
+                    )
+                 ),
+      
+              'is_share' => array(
+      
+        'name' => 'is_share',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                'title' => ts('Is Contribution Page Shared?'),
+                                                     
+                                           'default' => '1',
+         
+                          ),
+             );
+    }
+    return self::$_fields;
   }
 
 }

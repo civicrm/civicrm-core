@@ -51,7 +51,7 @@ class ParticipantPayment extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, unsigned=true)
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -120,6 +120,51 @@ class ParticipantPayment extends \Civi\Core\Entity {
    */
   public function getContribution() {
     return $this->contribution;
+  }
+
+  /**
+   * returns all the column names of this table
+   *
+   * @access public
+   * @return array
+   */
+  static function &fields( ) {
+    if ( !self::$_fields) {
+      self::$_fields = array (
+      
+              'id' => array(
+      
+        'name' => 'id',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Payment ID'),
+                        'required' => true,
+                                             
+                                    
+                          ),
+      
+              'participant_id' => array(
+      
+        'name' => 'participant_id',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Participant ID'),
+                        'required' => true,
+                                             
+                                    
+                'FKClassName' => 'CRM_Event_Participant',
+                          ),
+      
+              'contribution_id' => array(
+      
+        'name' => 'contribution_id',
+        'type' => CRM_Utils_Type::T_INT,
+                        'required' => true,
+                                             
+                                    
+                'FKClassName' => 'CRM_Contribute_Contribution',
+                          ),
+             );
+    }
+    return self::$_fields;
   }
 
 }

@@ -51,7 +51,7 @@ class UFMatch extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, unsigned=true)
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -68,7 +68,7 @@ class UFMatch extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="uf_id", type="integer", nullable=true)
+   * @ORM\Column(name="uf_id", type="integer", unsigned=true, nullable=true)
    * 
    */
   private $ufId;
@@ -204,6 +204,79 @@ class UFMatch extends \Civi\Core\Entity {
    */
   public function getLanguage() {
     return $this->language;
+  }
+
+  /**
+   * returns all the column names of this table
+   *
+   * @access public
+   * @return array
+   */
+  static function &fields( ) {
+    if ( !self::$_fields) {
+      self::$_fields = array (
+      
+              'id' => array(
+      
+        'name' => 'id',
+        'type' => CRM_Utils_Type::T_INT,
+                        'required' => true,
+                                             
+                                    
+                          ),
+      
+              'domain_id' => array(
+      
+        'name' => 'domain_id',
+        'type' => CRM_Utils_Type::T_INT,
+                        'required' => true,
+                                             
+                                    
+                'FKClassName' => 'CRM_Core_Domain',
+                          ),
+      
+              'uf_id' => array(
+      
+        'name' => 'uf_id',
+        'type' => CRM_Utils_Type::T_INT,
+                        'required' => true,
+                                             
+                                    
+                          ),
+      
+              'uf_name' => array(
+      
+        'name' => 'uf_name',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Uf Name'),
+                                 'maxlength' => 128,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                                    
+                          ),
+      
+              'contact_id' => array(
+      
+        'name' => 'contact_id',
+        'type' => CRM_Utils_Type::T_INT,
+                                                     
+                                    
+                'FKClassName' => 'CRM_Contact_Contact',
+                          ),
+      
+              'language' => array(
+      
+        'name' => 'language',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Language'),
+                                 'maxlength' => 5,
+                         'size' => CRM_Utils_Type::SIX,
+                           
+                                    
+                          ),
+             );
+    }
+    return self::$_fields;
   }
 
 }

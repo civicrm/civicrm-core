@@ -51,7 +51,7 @@ class ACL extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, unsigned=true)
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -84,7 +84,7 @@ class ACL extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="entity_id", type="integer", nullable=true)
+   * @ORM\Column(name="entity_id", type="integer", unsigned=true, nullable=true)
    * 
    */
   private $entityId;
@@ -108,7 +108,7 @@ class ACL extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="object_id", type="integer", nullable=true)
+   * @ORM\Column(name="object_id", type="integer", unsigned=true, nullable=true)
    * 
    */
   private $objectId;
@@ -124,7 +124,7 @@ class ACL extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="acl_id", type="integer", nullable=true)
+   * @ORM\Column(name="acl_id", type="integer", unsigned=true, nullable=true)
    * 
    */
   private $aclId;
@@ -344,6 +344,132 @@ class ACL extends \Civi\Core\Entity {
    */
   public function getIsActive() {
     return $this->isActive;
+  }
+
+  /**
+   * returns all the column names of this table
+   *
+   * @access public
+   * @return array
+   */
+  static function &fields( ) {
+    if ( !self::$_fields) {
+      self::$_fields = array (
+      
+              'id' => array(
+      
+        'name' => 'id',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('ACL ID'),
+                        'required' => true,
+                                             
+                                    
+                          ),
+      
+              'name' => array(
+      
+        'name' => 'name',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('ACL Name'),
+                                 'maxlength' => 64,
+                         'size' => CRM_Utils_Type::BIG,
+                           
+                                    
+                          ),
+      
+              'deny' => array(
+      
+        'name' => 'deny',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                'title' => ts('Deny'),
+                        'required' => true,
+                                             
+                                    
+                          ),
+      
+              'entity_table' => array(
+      
+        'name' => 'entity_table',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Entity Table'),
+                        'required' => true,
+                         'maxlength' => 64,
+                         'size' => CRM_Utils_Type::BIG,
+                           
+                                    
+                          ),
+      
+              'entity_id' => array(
+      
+        'name' => 'entity_id',
+        'type' => CRM_Utils_Type::T_INT,
+                                                     
+                                    
+                          ),
+      
+              'operation' => array(
+      
+        'name' => 'operation',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Operation'),
+                        'required' => true,
+                         'maxlength' => 8,
+                         'size' => CRM_Utils_Type::EIGHT,
+                           
+                                    
+                                     'pseudoconstant' => array(
+                                '0' => 'not in database',
+                    )
+                 ),
+      
+              'object_table' => array(
+      
+        'name' => 'object_table',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Object Table'),
+                                 'maxlength' => 64,
+                         'size' => CRM_Utils_Type::BIG,
+                           
+                                    
+                          ),
+      
+              'object_id' => array(
+      
+        'name' => 'object_id',
+        'type' => CRM_Utils_Type::T_INT,
+                                                     
+                                    
+                          ),
+      
+              'acl_table' => array(
+      
+        'name' => 'acl_table',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Acl Table'),
+                                 'maxlength' => 64,
+                         'size' => CRM_Utils_Type::BIG,
+                           
+                                    
+                          ),
+      
+              'acl_id' => array(
+      
+        'name' => 'acl_id',
+        'type' => CRM_Utils_Type::T_INT,
+                                                     
+                                    
+                          ),
+      
+              'is_active' => array(
+      
+        'name' => 'is_active',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                                                     
+                                    
+                          ),
+             );
+    }
+    return self::$_fields;
   }
 
 }

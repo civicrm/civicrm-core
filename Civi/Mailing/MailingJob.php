@@ -51,7 +51,7 @@ class MailingJob extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, unsigned=true)
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -124,7 +124,7 @@ class MailingJob extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="job_offset", type="integer", nullable=false)
+   * @ORM\Column(name="job_offset", type="integer", unsigned=true, nullable=false)
    * 
    */
   private $jobOffset = '0';
@@ -132,7 +132,7 @@ class MailingJob extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="job_limit", type="integer", nullable=false)
+   * @ORM\Column(name="job_limit", type="integer", unsigned=true, nullable=false)
    * 
    */
   private $jobLimit = '0';
@@ -344,6 +344,127 @@ class MailingJob extends \Civi\Core\Entity {
    */
   public function getJobLimit() {
     return $this->jobLimit;
+  }
+
+  /**
+   * returns all the column names of this table
+   *
+   * @access public
+   * @return array
+   */
+  static function &fields( ) {
+    if ( !self::$_fields) {
+      self::$_fields = array (
+      
+              'id' => array(
+      
+        'name' => 'id',
+        'type' => CRM_Utils_Type::T_INT,
+                        'required' => true,
+                                             
+                                    
+                          ),
+      
+              'mailing_id' => array(
+      
+        'name' => 'mailing_id',
+        'type' => CRM_Utils_Type::T_INT,
+                        'required' => true,
+                                             
+                                    
+                'FKClassName' => 'CRM_Mailing_Mailing',
+                          ),
+      
+              'scheduled_date' => array(
+      
+        'name' => 'scheduled_date',
+        'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
+                'title' => ts('Scheduled Date'),
+                                                     
+                                    
+                          ),
+      
+              'start_date' => array(
+      
+        'name' => 'start_date',
+        'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
+                'title' => ts('Start Date'),
+                                                     
+                                    
+                          ),
+      
+              'end_date' => array(
+      
+        'name' => 'end_date',
+        'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
+                'title' => ts('End Date'),
+                                                     
+                                    
+                          ),
+      
+              'status' => array(
+      
+        'name' => 'status',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Status'),
+                                 'maxlength' => 12,
+                         'size' => CRM_Utils_Type::TWELVE,
+                           
+                                    
+                                     'pseudoconstant' => array(
+                                '0' => 'not in database',
+                    )
+                 ),
+      
+              'is_test' => array(
+      
+        'name' => 'is_test',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                                                     
+                                    
+                          ),
+      
+              'job_type' => array(
+      
+        'name' => 'job_type',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Job Type'),
+                                 'maxlength' => 255,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                                    
+                          ),
+      
+              'parent_id' => array(
+      
+        'name' => 'parent_id',
+        'type' => CRM_Utils_Type::T_INT,
+                                                     
+                                           'default' => 'NULL',
+         
+                'FKClassName' => 'CRM_Mailing_MailingJob',
+                          ),
+      
+              'job_offset' => array(
+      
+        'name' => 'job_offset',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Job Offset'),
+                                                     
+                                    
+                          ),
+      
+              'job_limit' => array(
+      
+        'name' => 'job_limit',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Job Limit'),
+                                                     
+                                    
+                          ),
+             );
+    }
+    return self::$_fields;
   }
 
 }

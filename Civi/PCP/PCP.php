@@ -51,7 +51,7 @@ class PCP extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, unsigned=true)
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -68,7 +68,7 @@ class PCP extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="status_id", type="integer", nullable=true)
+   * @ORM\Column(name="status_id", type="integer", unsigned=true, nullable=true)
    * 
    */
   private $statusId;
@@ -108,7 +108,7 @@ class PCP extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="page_id", type="integer", nullable=true)
+   * @ORM\Column(name="page_id", type="integer", unsigned=true, nullable=true)
    * 
    */
   private $pageId;
@@ -124,7 +124,7 @@ class PCP extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="pcp_block_id", type="integer", nullable=true)
+   * @ORM\Column(name="pcp_block_id", type="integer", unsigned=true, nullable=true)
    * 
    */
   private $pcpBlockId;
@@ -132,7 +132,7 @@ class PCP extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="is_thermometer", type="integer", nullable=false)
+   * @ORM\Column(name="is_thermometer", type="integer", unsigned=true, nullable=false)
    * 
    */
   private $isThermometer = '0';
@@ -140,7 +140,7 @@ class PCP extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="is_honor_roll", type="integer", nullable=false)
+   * @ORM\Column(name="is_honor_roll", type="integer", unsigned=true, nullable=false)
    * 
    */
   private $isHonorRoll = '0';
@@ -456,6 +456,179 @@ class PCP extends \Civi\Core\Entity {
    */
   public function getIsActive() {
     return $this->isActive;
+  }
+
+  /**
+   * returns all the column names of this table
+   *
+   * @access public
+   * @return array
+   */
+  static function &fields( ) {
+    if ( !self::$_fields) {
+      self::$_fields = array (
+      
+              'pcp_id' => array(
+      
+        'name' => 'id',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Personal Campaign Page ID'),
+                        'required' => true,
+                                             
+                                    
+                          ),
+      
+              'pcp_contact_id' => array(
+      
+        'name' => 'contact_id',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Contact ID'),
+                        'required' => true,
+                                             
+                                    
+                'FKClassName' => 'CRM_Contact_Contact',
+                          ),
+      
+              'status_id' => array(
+      
+        'name' => 'status_id',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Personal Campaign Page Status'),
+                        'required' => true,
+                                             
+                                    
+                                     'pseudoconstant' => array(
+                                'optionGroupName' => 'pcp_status',
+                    )
+                 ),
+      
+              'title' => array(
+      
+        'name' => 'title',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Personal Campaign Page Title'),
+                                 'maxlength' => 255,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                                           'default' => 'NULL',
+         
+                          ),
+      
+              'intro_text' => array(
+      
+        'name' => 'intro_text',
+        'type' => CRM_Utils_Type::T_TEXT,
+                'title' => ts('Intro Text'),
+                                                     
+                                           'default' => 'NULL',
+         
+                          ),
+      
+              'page_text' => array(
+      
+        'name' => 'page_text',
+        'type' => CRM_Utils_Type::T_TEXT,
+                'title' => ts('Page Text'),
+                                                     
+                                           'default' => 'NULL',
+         
+                          ),
+      
+              'donate_link_text' => array(
+      
+        'name' => 'donate_link_text',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Donate Link Text'),
+                                 'maxlength' => 255,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                                           'default' => 'NULL',
+         
+                          ),
+      
+              'page_id' => array(
+      
+        'name' => 'page_id',
+        'type' => CRM_Utils_Type::T_INT,
+                        'required' => true,
+                                             
+                                    
+                          ),
+      
+              'page_type' => array(
+      
+        'name' => 'page_type',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('PCP Page Type'),
+                                 'maxlength' => 64,
+                         'size' => CRM_Utils_Type::BIG,
+                           
+                                           'default' => 'contribute',
+         
+                          ),
+      
+              'pcp_block_id' => array(
+      
+        'name' => 'pcp_block_id',
+        'type' => CRM_Utils_Type::T_INT,
+                        'required' => true,
+                                             
+                                    
+                          ),
+      
+              'is_thermometer' => array(
+      
+        'name' => 'is_thermometer',
+        'type' => CRM_Utils_Type::T_INT,
+                                                     
+                                    
+                          ),
+      
+              'is_honor_roll' => array(
+      
+        'name' => 'is_honor_roll',
+        'type' => CRM_Utils_Type::T_INT,
+                                                     
+                                    
+                          ),
+      
+              'goal_amount' => array(
+      
+        'name' => 'goal_amount',
+        'type' => CRM_Utils_Type::T_MONEY,
+                'title' => ts('Goal Amount'),
+                                                     
+                                    
+                          ),
+      
+              'currency' => array(
+      
+        'name' => 'currency',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Currency'),
+                                 'maxlength' => 3,
+                         'size' => CRM_Utils_Type::FOUR,
+                           
+                                           'default' => 'NULL',
+         
+                                     'pseudoconstant' => array(
+                                'table' => 'civicrm_currency',
+                      'keyColumn' => 'name',
+                      'labelColumn' => 'full_name',
+                      'nameColumn' => 'numeric_code',
+                    )
+                 ),
+      
+              'is_active' => array(
+      
+        'name' => 'is_active',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                                                     
+                                    
+                          ),
+             );
+    }
+    return self::$_fields;
   }
 
 }

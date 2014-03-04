@@ -51,7 +51,7 @@ class RelationshipType extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, unsigned=true)
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -372,6 +372,154 @@ class RelationshipType extends \Civi\Core\Entity {
    */
   public function getIsActive() {
     return $this->isActive;
+  }
+
+  /**
+   * returns all the column names of this table
+   *
+   * @access public
+   * @return array
+   */
+  static function &fields( ) {
+    if ( !self::$_fields) {
+      self::$_fields = array (
+      
+              'id' => array(
+      
+        'name' => 'id',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Relationship Type ID'),
+                        'required' => true,
+                                             
+                                    
+                          ),
+      
+              'name_a_b' => array(
+      
+        'name' => 'name_a_b',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Relationship Type Name A to B'),
+                                 'maxlength' => 64,
+                         'size' => CRM_Utils_Type::BIG,
+                           
+                                    
+                          ),
+      
+              'label_a_b' => array(
+      
+        'name' => 'label_a_b',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Relationship Type Label A to B'),
+                                 'maxlength' => 64,
+                         'size' => CRM_Utils_Type::BIG,
+                           
+                                    
+                          ),
+      
+              'name_b_a' => array(
+      
+        'name' => 'name_b_a',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Relationship Type Name B to A'),
+                                 'maxlength' => 64,
+                         'size' => CRM_Utils_Type::BIG,
+                           
+                                    
+                          ),
+      
+              'label_b_a' => array(
+      
+        'name' => 'label_b_a',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Relationship Type Label B to A'),
+                                 'maxlength' => 64,
+                         'size' => CRM_Utils_Type::BIG,
+                           
+                                    
+                          ),
+      
+              'description' => array(
+      
+        'name' => 'description',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Relationship Description'),
+                                 'maxlength' => 255,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                                    
+                          ),
+      
+              'contact_type_a' => array(
+      
+        'name' => 'contact_type_a',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Contact Type for Contact A'),
+                                 'maxlength' => 12,
+                         'size' => CRM_Utils_Type::TWELVE,
+                           
+                                    
+                                     'pseudoconstant' => array(
+                                '0' => 'not in database',
+                    )
+                 ),
+      
+              'contact_type_b' => array(
+      
+        'name' => 'contact_type_b',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Contact Type for Contact B'),
+                                 'maxlength' => 12,
+                         'size' => CRM_Utils_Type::TWELVE,
+                           
+                                    
+                                     'pseudoconstant' => array(
+                                '0' => 'not in database',
+                    )
+                 ),
+      
+              'contact_sub_type_a' => array(
+      
+        'name' => 'contact_sub_type_a',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Contact Subtype A'),
+                                 'maxlength' => 64,
+                         'size' => CRM_Utils_Type::BIG,
+                           
+                                    
+                          ),
+      
+              'contact_sub_type_b' => array(
+      
+        'name' => 'contact_sub_type_b',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Contact Subtype B'),
+                                 'maxlength' => 64,
+                         'size' => CRM_Utils_Type::BIG,
+                           
+                                    
+                          ),
+      
+              'is_reserved' => array(
+      
+        'name' => 'is_reserved',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                'title' => ts('Relationship Type is Reserved'),
+                                                     
+                                    
+                          ),
+      
+              'is_active' => array(
+      
+        'name' => 'is_active',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                'title' => ts('Relationship Type is Active'),
+                                                     
+                                           'default' => '1',
+         
+                          ),
+             );
+    }
+    return self::$_fields;
   }
 
 }

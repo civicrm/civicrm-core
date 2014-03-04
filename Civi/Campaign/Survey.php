@@ -51,7 +51,7 @@ class Survey extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, unsigned=true)
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -76,7 +76,7 @@ class Survey extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="activity_type_id", type="integer", nullable=false)
+   * @ORM\Column(name="activity_type_id", type="integer", unsigned=true, nullable=false)
    * 
    */
   private $activityTypeId = 'NULL';
@@ -100,7 +100,7 @@ class Survey extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="release_frequency", type="integer", nullable=false)
+   * @ORM\Column(name="release_frequency", type="integer", unsigned=true, nullable=false)
    * 
    */
   private $releaseFrequency = 'NULL';
@@ -108,7 +108,7 @@ class Survey extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="max_number_of_contacts", type="integer", nullable=false)
+   * @ORM\Column(name="max_number_of_contacts", type="integer", unsigned=true, nullable=false)
    * 
    */
   private $maxNumberOfContacts = 'NULL';
@@ -116,7 +116,7 @@ class Survey extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="default_number_of_contacts", type="integer", nullable=false)
+   * @ORM\Column(name="default_number_of_contacts", type="integer", unsigned=true, nullable=false)
    * 
    */
   private $defaultNumberOfContacts = 'NULL';
@@ -172,7 +172,7 @@ class Survey extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="result_id", type="integer", nullable=false)
+   * @ORM\Column(name="result_id", type="integer", unsigned=true, nullable=false)
    * 
    */
   private $resultId = 'NULL';
@@ -596,6 +596,234 @@ class Survey extends \Civi\Core\Entity {
    */
   public function getIsShare() {
     return $this->isShare;
+  }
+
+  /**
+   * returns all the column names of this table
+   *
+   * @access public
+   * @return array
+   */
+  static function &fields( ) {
+    if ( !self::$_fields) {
+      self::$_fields = array (
+      
+              'id' => array(
+      
+        'name' => 'id',
+        'type' => CRM_Utils_Type::T_INT,
+                        'required' => true,
+                                             
+                                    
+                          ),
+      
+              'title' => array(
+      
+        'name' => 'title',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Survey Title'),
+                        'required' => true,
+                         'maxlength' => 255,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                'import' => true,
+        'where' => 'civicrm_survey.title',
+        'headerPattern' => '',
+        'dataPattern' => '',
+                         'export' => true,
+                                   
+                          ),
+      
+              'campaign_id' => array(
+      
+        'name' => 'campaign_id',
+        'type' => CRM_Utils_Type::T_INT,
+                                                     
+                                           'default' => 'NULL',
+         
+                'FKClassName' => 'CRM_Campaign_Campaign',
+                                     'pseudoconstant' => array(
+                                'table' => 'civicrm_campaign',
+                      'keyColumn' => 'id',
+                      'labelColumn' => 'title',
+                    )
+                 ),
+      
+              'activity_type_id' => array(
+      
+        'name' => 'activity_type_id',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Activity Type ID'),
+                                                     
+                'import' => true,
+        'where' => 'civicrm_survey.activity_type_id',
+        'headerPattern' => '',
+        'dataPattern' => '',
+                         'export' => true,
+                                          'default' => 'NULL',
+         
+                                     'pseudoconstant' => array(
+                                'optionGroupName' => 'activity_type',
+                    )
+                 ),
+      
+              'recontact_interval' => array(
+      
+        'name' => 'recontact_interval',
+        'type' => CRM_Utils_Type::T_TEXT,
+                'title' => ts('Recontact Interval'),
+                                                   'rows' => 20,
+                         'cols' => 80,
+         
+                                    
+                          ),
+      
+              'instructions' => array(
+      
+        'name' => 'instructions',
+        'type' => CRM_Utils_Type::T_TEXT,
+                'title' => ts('Instructions'),
+                                                   'rows' => 20,
+                         'cols' => 80,
+         
+                                    
+                          ),
+      
+              'release_frequency' => array(
+      
+        'name' => 'release_frequency',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Release Frequency'),
+                                                     
+                                           'default' => 'NULL',
+         
+                          ),
+      
+              'max_number_of_contacts' => array(
+      
+        'name' => 'max_number_of_contacts',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Maximum number of contacts'),
+                                                     
+                                           'default' => 'NULL',
+         
+                          ),
+      
+              'default_number_of_contacts' => array(
+      
+        'name' => 'default_number_of_contacts',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Default number of contacts'),
+                                                     
+                                           'default' => 'NULL',
+         
+                          ),
+      
+              'is_active' => array(
+      
+        'name' => 'is_active',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                                                     
+                                           'default' => '1',
+         
+                          ),
+      
+              'is_default' => array(
+      
+        'name' => 'is_default',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                                                     
+                                    
+                          ),
+      
+              'created_id' => array(
+      
+        'name' => 'created_id',
+        'type' => CRM_Utils_Type::T_INT,
+                                                     
+                                    
+                'FKClassName' => 'CRM_Contact_Contact',
+                          ),
+      
+              'created_date' => array(
+      
+        'name' => 'created_date',
+        'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
+                'title' => ts('Campaign Created Date'),
+                                                     
+                                    
+                          ),
+      
+              'last_modified_id' => array(
+      
+        'name' => 'last_modified_id',
+        'type' => CRM_Utils_Type::T_INT,
+                                                     
+                                    
+                'FKClassName' => 'CRM_Contact_Contact',
+                          ),
+      
+              'last_modified_date' => array(
+      
+        'name' => 'last_modified_date',
+        'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
+                'title' => ts('Last Modified Date'),
+                                                     
+                                    
+                          ),
+      
+              'result_id' => array(
+      
+        'name' => 'result_id',
+        'type' => CRM_Utils_Type::T_INT,
+                                                     
+                                           'default' => 'NULL',
+         
+                          ),
+      
+              'bypass_confirm' => array(
+      
+        'name' => 'bypass_confirm',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                'title' => ts('Bypass Confirm'),
+                                                     
+                                    
+                          ),
+      
+              'thankyou_title' => array(
+      
+        'name' => 'thankyou_title',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Thank-you Title'),
+                                 'maxlength' => 255,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                                    
+                          ),
+      
+              'thankyou_text' => array(
+      
+        'name' => 'thankyou_text',
+        'type' => CRM_Utils_Type::T_TEXT,
+                'title' => ts('Thank-you Text'),
+                                                   'rows' => 8,
+                         'cols' => 60,
+         
+                                    
+                          ),
+      
+              'is_share' => array(
+      
+        'name' => 'is_share',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                'title' => ts('Is shared through social media'),
+                                                     
+                                           'default' => '1',
+         
+                          ),
+             );
+    }
+    return self::$_fields;
   }
 
 }

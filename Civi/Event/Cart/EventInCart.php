@@ -51,7 +51,7 @@ class EventInCart extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, unsigned=true)
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -120,6 +120,47 @@ class EventInCart extends \Civi\Core\Entity {
    */
   public function getEventCart() {
     return $this->eventCart;
+  }
+
+  /**
+   * returns all the column names of this table
+   *
+   * @access public
+   * @return array
+   */
+  static function &fields( ) {
+    if ( !self::$_fields) {
+      self::$_fields = array (
+      
+              'event_in_cart_id' => array(
+      
+        'name' => 'id',
+        'type' => CRM_Utils_Type::T_INT,
+                        'required' => true,
+                                             
+                                    
+                          ),
+      
+              'event_id' => array(
+      
+        'name' => 'event_id',
+        'type' => CRM_Utils_Type::T_INT,
+                                                     
+                                    
+                'FKClassName' => 'CRM_Event_Event',
+                          ),
+      
+              'event_cart_id' => array(
+      
+        'name' => 'event_cart_id',
+        'type' => CRM_Utils_Type::T_INT,
+                                                     
+                                    
+                'FKClassName' => 'CRM_Event_Cart_Cart',
+                          ),
+             );
+    }
+    return self::$_fields;
   }
 
 }

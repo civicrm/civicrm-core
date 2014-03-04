@@ -51,7 +51,7 @@ class Cache extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, unsigned=true)
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -232,6 +232,93 @@ class Cache extends \Civi\Core\Entity {
    */
   public function getExpiredDate() {
     return $this->expiredDate;
+  }
+
+  /**
+   * returns all the column names of this table
+   *
+   * @access public
+   * @return array
+   */
+  static function &fields( ) {
+    if ( !self::$_fields) {
+      self::$_fields = array (
+      
+              'id' => array(
+      
+        'name' => 'id',
+        'type' => CRM_Utils_Type::T_INT,
+                        'required' => true,
+                                             
+                                    
+                          ),
+      
+              'group_name' => array(
+      
+        'name' => 'group_name',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Group Name'),
+                        'required' => true,
+                         'maxlength' => 32,
+                         'size' => CRM_Utils_Type::MEDIUM,
+                           
+                                    
+                          ),
+      
+              'path' => array(
+      
+        'name' => 'path',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Path'),
+                                 'maxlength' => 255,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                                    
+                          ),
+      
+              'data' => array(
+      
+        'name' => 'data',
+        'type' => CRM_Utils_Type::T_LONGTEXT,
+                'title' => ts('Data'),
+                                                     
+                                    
+                          ),
+      
+              'component_id' => array(
+      
+        'name' => 'component_id',
+        'type' => CRM_Utils_Type::T_INT,
+                                                     
+                                    
+                'FKClassName' => 'CRM_Core_Component',
+                                     'pseudoconstant' => array(
+                                'table' => 'civicrm_component',
+                      'keyColumn' => 'id',
+                      'labelColumn' => 'name',
+                    )
+                 ),
+      
+              'created_date' => array(
+      
+        'name' => 'created_date',
+        'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
+                'title' => ts('Created Date'),
+                                                     
+                                    
+                          ),
+      
+              'expired_date' => array(
+      
+        'name' => 'expired_date',
+        'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
+                'title' => ts('Expired Date'),
+                                                     
+                                    
+                          ),
+             );
+    }
+    return self::$_fields;
   }
 
 }

@@ -51,7 +51,7 @@ class File extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, unsigned=true)
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -60,7 +60,7 @@ class File extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="file_type_id", type="integer", nullable=true)
+   * @ORM\Column(name="file_type_id", type="integer", unsigned=true, nullable=true)
    * 
    */
   private $fileTypeId;
@@ -232,6 +232,89 @@ class File extends \Civi\Core\Entity {
    */
   public function getUploadDate() {
     return $this->uploadDate;
+  }
+
+  /**
+   * returns all the column names of this table
+   *
+   * @access public
+   * @return array
+   */
+  static function &fields( ) {
+    if ( !self::$_fields) {
+      self::$_fields = array (
+      
+              'id' => array(
+      
+        'name' => 'id',
+        'type' => CRM_Utils_Type::T_INT,
+                        'required' => true,
+                                             
+                                    
+                          ),
+      
+              'file_type_id' => array(
+      
+        'name' => 'file_type_id',
+        'type' => CRM_Utils_Type::T_INT,
+                                                     
+                                    
+                          ),
+      
+              'mime_type' => array(
+      
+        'name' => 'mime_type',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Mime Type'),
+                                 'maxlength' => 255,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                                    
+                          ),
+      
+              'uri' => array(
+      
+        'name' => 'uri',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Uri'),
+                                 'maxlength' => 255,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                                    
+                          ),
+      
+              'document' => array(
+      
+        'name' => 'document',
+        'type' => CRM_Utils_Type::T_MEDIUMBLOB,
+                'title' => ts('Document'),
+                                 'maxlength' => 16777215,
+                                    
+                                    
+                          ),
+      
+              'description' => array(
+      
+        'name' => 'description',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Description'),
+                                 'maxlength' => 255,
+                         'size' => CRM_Utils_Type::HUGE,
+                           
+                                    
+                          ),
+      
+              'upload_date' => array(
+      
+        'name' => 'upload_date',
+        'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
+                'title' => ts('Upload Date'),
+                                                     
+                                    
+                          ),
+             );
+    }
+    return self::$_fields;
   }
 
 }

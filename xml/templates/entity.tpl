@@ -51,7 +51,7 @@ class {$table.className} extends \Civi\Core\Entity {ldelim}
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, unsigned=true)
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -99,6 +99,84 @@ class {$table.className} extends \Civi\Core\Entity {ldelim}
     return $this->{$field.propertyName};
   {rdelim}
 {/foreach}
+
+  /**
+   * returns all the column names of this table
+   *
+   * @access public
+   * @return array
+   */
+  static function &fields( ) {ldelim}
+    if ( !self::$_fields) {ldelim}
+      self::$_fields = array (
+      {foreach from=$table.fields item=field}
+
+      {if $field.uniqueName}
+        '{$field.uniqueName}' => array(
+      {else}
+        '{$field.name}' => array(
+      {/if}
+
+        'name' => '{$field.name}',
+        'type' => {$field.crmType},
+        {if $field.title}
+        'title' => ts('{$field.title}'),
+        {/if}
+        {if $field.required}
+        'required' => {$field.required},
+        {/if} {* field.required *}
+        {if $field.length}
+        'maxlength' => {$field.length},
+        {/if} {* field.length *}
+        {if $field.size}
+        'size' => {$field.size},
+        {/if} {* field.size *}
+        {if $field.rows}
+        'rows' => {$field.rows},
+        {/if} {* field.rows *}
+        {if $field.cols}
+        'cols' => {$field.cols},
+        {/if} {* field.cols *}
+
+        {if $field.import}
+        'import' => {$field.import},
+        'where' => '{$table.name}.{$field.name}',
+        'headerPattern' => '{$field.headerPattern}',
+        'dataPattern' => '{$field.dataPattern}',
+        {/if} {* field.import *}
+        {if $field.export}
+        'export' => {$field.export},
+        {if ! $field.import}
+        'where' => '{$table.name}.{$field.name}',
+        'headerPattern' => '{$field.headerPattern}',
+        'dataPattern' => '{$field.dataPattern}',
+        {/if}
+        {/if} {* field.export *}
+        {if $field.rule}
+        'rule' => '{$field.rule}',
+        {/if} {* field.rule *}
+        {if $field.default}
+        'default' => '{if ($field.default[0]=="'" or $field.default[0]=='"')}{$field.default|substring:1:-1}{else}{$field.default}{/if}',
+        {/if} {* field.default *}
+
+        {if $field.FKClassName}
+        'FKClassName' => '{$field.FKClassName}',
+        {/if} {* field.FKClassName *}
+        {if $field.pseudoconstant}
+          {assign var=pseudoOptions value=$field.pseudoconstant}
+          'pseudoconstant' => array(
+          {*{$pseudoOptions|@print_array}*}
+          {foreach from=$pseudoOptions key=optionKey item=optionValue}
+            '{$optionKey}' => '{$optionValue}',
+          {/foreach}
+          )
+        {/if} {* field.pseudoconstant *}
+        ),
+      {/foreach} {* table.fields *}
+      );
+    {rdelim}
+    return self::$_fields;
+  {rdelim}
 
 {rdelim}
 

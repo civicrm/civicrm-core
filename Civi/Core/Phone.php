@@ -51,7 +51,7 @@ class Phone extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, unsigned=true)
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -68,7 +68,7 @@ class Phone extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="location_type_id", type="integer", nullable=true)
+   * @ORM\Column(name="location_type_id", type="integer", unsigned=true, nullable=true)
    * 
    */
   private $locationTypeId;
@@ -92,7 +92,7 @@ class Phone extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="mobile_provider_id", type="integer", nullable=true)
+   * @ORM\Column(name="mobile_provider_id", type="integer", unsigned=true, nullable=true)
    * 
    */
   private $mobileProviderId;
@@ -124,7 +124,7 @@ class Phone extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="phone_type_id", type="integer", nullable=true)
+   * @ORM\Column(name="phone_type_id", type="integer", unsigned=true, nullable=true)
    * 
    */
   private $phoneTypeId;
@@ -316,6 +316,132 @@ class Phone extends \Civi\Core\Entity {
    */
   public function getPhoneTypeId() {
     return $this->phoneTypeId;
+  }
+
+  /**
+   * returns all the column names of this table
+   *
+   * @access public
+   * @return array
+   */
+  static function &fields( ) {
+    if ( !self::$_fields) {
+      self::$_fields = array (
+      
+              'id' => array(
+      
+        'name' => 'id',
+        'type' => CRM_Utils_Type::T_INT,
+                        'required' => true,
+                                             
+                                    
+                          ),
+      
+              'contact_id' => array(
+      
+        'name' => 'contact_id',
+        'type' => CRM_Utils_Type::T_INT,
+                                                     
+                                    
+                'FKClassName' => 'CRM_Contact_Contact',
+                          ),
+      
+              'location_type_id' => array(
+      
+        'name' => 'location_type_id',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Phone Location Type'),
+                                                     
+                                    
+                                     'pseudoconstant' => array(
+                                'table' => 'civicrm_location_type',
+                      'keyColumn' => 'id',
+                      'labelColumn' => 'display_name',
+                    )
+                 ),
+      
+              'is_primary' => array(
+      
+        'name' => 'is_primary',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                'title' => ts('Is Phone Primary?'),
+                                                     
+                                    
+                          ),
+      
+              'is_billing' => array(
+      
+        'name' => 'is_billing',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+                                                     
+                                    
+                          ),
+      
+              'mobile_provider_id' => array(
+      
+        'name' => 'mobile_provider_id',
+        'type' => CRM_Utils_Type::T_INT,
+                                                     
+                                    
+                          ),
+      
+              'phone' => array(
+      
+        'name' => 'phone',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Phone'),
+                                 'maxlength' => 32,
+                         'size' => CRM_Utils_Type::MEDIUM,
+                           
+                'import' => true,
+        'where' => 'civicrm_phone.phone',
+        'headerPattern' => '/phone/i',
+        'dataPattern' => '/^[\d\(\)\-\.\s]+$/',
+                         'export' => true,
+                                   
+                          ),
+      
+              'phone_ext' => array(
+      
+        'name' => 'phone_ext',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Phone Extension'),
+                                 'maxlength' => 16,
+                         'size' => CRM_Utils_Type::FOUR,
+                           
+                'import' => true,
+        'where' => 'civicrm_phone.phone_ext',
+        'headerPattern' => '/extension/i',
+        'dataPattern' => '/^\d+$/',
+                         'export' => true,
+                                   
+                          ),
+      
+              'phone_numeric' => array(
+      
+        'name' => 'phone_numeric',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Phone Numeric'),
+                                 'maxlength' => 32,
+                         'size' => CRM_Utils_Type::MEDIUM,
+                           
+                                    
+                          ),
+      
+              'phone_type_id' => array(
+      
+        'name' => 'phone_type_id',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Phone Type'),
+                                                     
+                                    
+                                     'pseudoconstant' => array(
+                                'optionGroupName' => 'phone_type',
+                    )
+                 ),
+             );
+    }
+    return self::$_fields;
   }
 
 }

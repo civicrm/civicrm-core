@@ -51,7 +51,7 @@ class SavedSearch extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, unsigned=true)
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -76,7 +76,7 @@ class SavedSearch extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="search_custom_id", type="integer", nullable=true)
+   * @ORM\Column(name="search_custom_id", type="integer", unsigned=true, nullable=true)
    * 
    */
   private $searchCustomId;
@@ -232,6 +232,87 @@ class SavedSearch extends \Civi\Core\Entity {
    */
   public function getWhereTables() {
     return $this->whereTables;
+  }
+
+  /**
+   * returns all the column names of this table
+   *
+   * @access public
+   * @return array
+   */
+  static function &fields( ) {
+    if ( !self::$_fields) {
+      self::$_fields = array (
+      
+              'id' => array(
+      
+        'name' => 'id',
+        'type' => CRM_Utils_Type::T_INT,
+                        'required' => true,
+                                             
+                                    
+                          ),
+      
+              'form_values' => array(
+      
+        'name' => 'form_values',
+        'type' => CRM_Utils_Type::T_TEXT,
+                'title' => ts('Submitted Form Values'),
+                                                     
+                'import' => true,
+        'where' => 'civicrm_saved_search.form_values',
+        'headerPattern' => '',
+        'dataPattern' => '',
+                         'export' => true,
+                                   
+                          ),
+      
+              'mapping_id' => array(
+      
+        'name' => 'mapping_id',
+        'type' => CRM_Utils_Type::T_INT,
+                                                     
+                                    
+                'FKClassName' => 'CRM_Core_Mapping',
+                          ),
+      
+              'search_custom_id' => array(
+      
+        'name' => 'search_custom_id',
+        'type' => CRM_Utils_Type::T_INT,
+                                                     
+                                    
+                          ),
+      
+              'where_clause' => array(
+      
+        'name' => 'where_clause',
+        'type' => CRM_Utils_Type::T_TEXT,
+                'title' => ts('Where Clause'),
+                                                     
+                                    
+                          ),
+      
+              'select_tables' => array(
+      
+        'name' => 'select_tables',
+        'type' => CRM_Utils_Type::T_TEXT,
+                'title' => ts('Select Tables'),
+                                                     
+                                    
+                          ),
+      
+              'where_tables' => array(
+      
+        'name' => 'where_tables',
+        'type' => CRM_Utils_Type::T_TEXT,
+                'title' => ts('Where Tables'),
+                                                     
+                                    
+                          ),
+             );
+    }
+    return self::$_fields;
   }
 
 }

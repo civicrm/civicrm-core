@@ -51,7 +51,7 @@ class GroupContact extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, unsigned=true)
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -204,6 +204,91 @@ class GroupContact extends \Civi\Core\Entity {
    */
   public function getEmail() {
     return $this->email;
+  }
+
+  /**
+   * returns all the column names of this table
+   *
+   * @access public
+   * @return array
+   */
+  static function &fields( ) {
+    if ( !self::$_fields) {
+      self::$_fields = array (
+      
+              'id' => array(
+      
+        'name' => 'id',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Group Contact ID'),
+                        'required' => true,
+                                             
+                                    
+                          ),
+      
+              'group_id' => array(
+      
+        'name' => 'group_id',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Group ID'),
+                        'required' => true,
+                                             
+                                    
+                'FKClassName' => 'CRM_Contact_Group',
+                                     'pseudoconstant' => array(
+                                'table' => 'civicrm_group',
+                      'keyColumn' => 'id',
+                      'labelColumn' => 'title',
+                    )
+                 ),
+      
+              'contact_id' => array(
+      
+        'name' => 'contact_id',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Contact ID'),
+                        'required' => true,
+                                             
+                                    
+                'FKClassName' => 'CRM_Contact_Contact',
+                          ),
+      
+              'status' => array(
+      
+        'name' => 'status',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Group Contact Status'),
+                                 'maxlength' => 8,
+                         'size' => CRM_Utils_Type::EIGHT,
+                           
+                                    
+                                     'pseudoconstant' => array(
+                                '0' => 'not in database',
+                    )
+                 ),
+      
+              'location_id' => array(
+      
+        'name' => 'location_id',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Group Contact Location'),
+                                                     
+                                    
+                'FKClassName' => 'CRM_Core_LocBlock',
+                          ),
+      
+              'email_id' => array(
+      
+        'name' => 'email_id',
+        'type' => CRM_Utils_Type::T_INT,
+                'title' => ts('Group Contact Email'),
+                                                     
+                                    
+                'FKClassName' => 'CRM_Core_Email',
+                          ),
+             );
+    }
+    return self::$_fields;
   }
 
 }

@@ -51,7 +51,7 @@ class ActionMapping extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, unsigned=true)
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -288,6 +288,117 @@ class ActionMapping extends \Civi\Core\Entity {
    */
   public function getEntityRecipient() {
     return $this->entityRecipient;
+  }
+
+  /**
+   * returns all the column names of this table
+   *
+   * @access public
+   * @return array
+   */
+  static function &fields( ) {
+    if ( !self::$_fields) {
+      self::$_fields = array (
+      
+              'id' => array(
+      
+        'name' => 'id',
+        'type' => CRM_Utils_Type::T_INT,
+                        'required' => true,
+                                             
+                                    
+                          ),
+      
+              'entity' => array(
+      
+        'name' => 'entity',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Entity'),
+                                 'maxlength' => 64,
+                         'size' => CRM_Utils_Type::BIG,
+                           
+                                    
+                          ),
+      
+              'entity_value' => array(
+      
+        'name' => 'entity_value',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Entity Value'),
+                                 'maxlength' => 64,
+                         'size' => CRM_Utils_Type::BIG,
+                           
+                                    
+                          ),
+      
+              'entity_value_label' => array(
+      
+        'name' => 'entity_value_label',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Entity Value Label'),
+                                 'maxlength' => 64,
+                         'size' => CRM_Utils_Type::BIG,
+                           
+                                    
+                          ),
+      
+              'entity_status' => array(
+      
+        'name' => 'entity_status',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Entity Status'),
+                                 'maxlength' => 64,
+                         'size' => CRM_Utils_Type::BIG,
+                           
+                                    
+                          ),
+      
+              'entity_status_label' => array(
+      
+        'name' => 'entity_status_label',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Entity Status Label'),
+                                 'maxlength' => 64,
+                         'size' => CRM_Utils_Type::BIG,
+                           
+                                    
+                          ),
+      
+              'entity_date_start' => array(
+      
+        'name' => 'entity_date_start',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Entity Date Start'),
+                                 'maxlength' => 64,
+                         'size' => CRM_Utils_Type::BIG,
+                           
+                                    
+                          ),
+      
+              'entity_date_end' => array(
+      
+        'name' => 'entity_date_end',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Entity Date End'),
+                                 'maxlength' => 64,
+                         'size' => CRM_Utils_Type::BIG,
+                           
+                                    
+                          ),
+      
+              'entity_recipient' => array(
+      
+        'name' => 'entity_recipient',
+        'type' => CRM_Utils_Type::T_STRING,
+                'title' => ts('Entity Recipient'),
+                                 'maxlength' => 64,
+                         'size' => CRM_Utils_Type::BIG,
+                           
+                                    
+                          ),
+             );
+    }
+    return self::$_fields;
   }
 
 }
