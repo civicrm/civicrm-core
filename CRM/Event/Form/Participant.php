@@ -452,7 +452,6 @@ class CRM_Event_Form_Participant extends CRM_Contact_Form_Task {
     }
     $this->set('onlinePendingContributionId', $this->_onlinePendingContributionId);
     $roleIds = CRM_Event_PseudoConstant::participantRole();
-
     if (!empty($roleIds)) {
       $query = "
 SELECT civicrm_custom_group.name as name,
@@ -669,7 +668,7 @@ SELECT civicrm_custom_group.name as name,
     CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'js/crm.livePage.js');
     $participantStatuses = CRM_Event_PseudoConstant::participantStatus();
     $partiallyPaidStatusId = array_search('Partially paid', $participantStatuses);
-    CRM_Core_Resources::singleton()->addSetting(array('partiallyPaidStatusId' => $partiallyPaidStatusId));
+    $this->assign('partiallyPaidStatusId', $partiallyPaidStatusId);
 
     if ($this->_showFeeBlock) {
       return CRM_Event_Form_EventFees::buildQuickForm($this);
@@ -842,7 +841,20 @@ SELECT civicrm_custom_group.name as name,
     $this->assign('notificationStatusIds', $notificationStatusIds);
 
     $this->_participantStatuses = CRM_Event_PseudoConstant::participantStatus(NULL, NULL, 'label');
-    $this->addSelect('status_id', $checkCancelledJs, TRUE);
+    $participantStatuses = $this->addSelect('status_id', $checkCancelledJs, TRUE);
+    $enableCart = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::EVENT_PREFERENCES_NAME,
+      'enable_cart'
+    );
+    $pendingInCartStatusId  = CRM_Utils_Array::key( "Pending in cart" , $this->_participantStatuses );
+    if (!$enableCart) {
+      $statusOptions = & $participantStatuses->_options;
+      foreach($statusOptions as $key =>$option){
+        $status_id = $option['attr']['value'];
+        if ($status_id == $pendingInCartStatusId) {
+          unset($statusOptions[$key]);
+        }
+      }
+    }
 
     $this->addElement('checkbox', 'is_notify', ts('Send Notification'), NULL);
 
@@ -1538,7 +1550,11 @@ SELECT civicrm_custom_group.name as name,
         }
 
         $this->assign('totalAmount', $contributionParams['total_amount']);
-
+        if (isset($contributionParams['partial_payment_total'])) {
+          // balance amount
+          $balanceAmount = $contributionParams['partial_payment_total'] - $contributionParams['partial_amount_pay'];
+          $this->assign('balanceAmount', $balanceAmount );
+        }
         $this->assign('isPrimary', 1);
         $this->assign('checkNumber', CRM_Utils_Array::value('check_number', $params));
       }

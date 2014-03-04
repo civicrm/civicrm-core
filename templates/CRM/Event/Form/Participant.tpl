@@ -132,6 +132,7 @@
 
   // change the status to default 'partially paid' for partial payments
   var feeAmount, userModifiedAmount;
+  var partiallyPaidStatusId = {/literal}{$partiallyPaidStatusId}{literal};
 
   cj('#total_amount')
    .focus(
@@ -145,19 +146,20 @@
       userModifiedAmount = cj(this).val();
       userModifiedAmount = parseInt(userModifiedAmount);
       if (userModifiedAmount < feeAmount) {
-        cj('#status_id').val(CRM.partiallyPaidStatusId);
+        cj('#status_id').val(partiallyPaidStatusId).change();
       }
     }
   );
 
-  cj('#Participant').submit(
+  cj('#Participant').on("click",'.validate',
     function(e) {
       var userSubmittedStatus = cj('#status_id').val();
       var statusLabel = cj('#status_id option:selected').text();
-      if (userModifiedAmount < feeAmount && userSubmittedStatus != CRM.partiallyPaidStatusId) {
-        var result = confirm('Payment amount is less than the amount owed. Expected participant status is \'Partially paid\'. Are you sure you want to set the participant status to ' + statusLabel + '? Click OK to continue, Cancel to change your entries.');
+      if (userModifiedAmount < feeAmount && userSubmittedStatus != partiallyPaidStatusId) {
+        var msg = "{/literal}{ts escape="js" 1="%1"}Payment amount is less than the amount owed. Expected participant status is 'Partially paid'. Are you sure you want to set the participant status to %1? Click OK to continue, Cancel to change your entries.{/ts}{literal}";
+        var result = confirm(ts(msg, {1: statusLabel}));
         if (result == false) {
-          e.preventDefault();
+          return false;
         }
       }
     }
@@ -439,14 +441,13 @@
         }
 
         var roleGroupMapper = {/literal}{$participantRoleIds|@json_encode}{literal};
-
         function showCustomData( type, subType, subName ) {
           var dataUrl = {/literal}"{crmURL p=$urlPath h=0 q='snippet=4&type='}"{literal} + type;
           var roleid = "role_id_"+subType;
           var loadData = false;
 
           if ( document.getElementById( roleid ).checked == true ) {
-            if ( roleGroupMapper[subType] ) {
+            if ( typeof roleGroupMapper !== 'undefined' && roleGroupMapper[subType] ) {
               var splitGroup = roleGroupMapper[subType].split(",");
               for ( i = 0; i < splitGroup.length; i++ ) {
                 var roleCustomGroupId = splitGroup[i];
