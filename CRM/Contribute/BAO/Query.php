@@ -368,13 +368,16 @@ class CRM_Contribute_BAO_Query {
         if ($value == 'only_scredits') {
           $query->_where[$grouping][] = "contribution_search_scredit_combined.scredit_id IS NOT NULL";
           $query->_qill[$grouping][] = ts('Contributions OR Soft Credits? - Soft Credits Only');
+          $query->_tables['civicrm_contribution'] = $query->_whereTables['civicrm_contribution'] = 1;
           $query->_tables['civicrm_contribution_soft'] = $query->_whereTables['civicrm_contribution_soft'] = 1;
         } else if ($value == 'both_related') {
           $query->_where[$grouping][] = "contribution_search_scredit_combined.filter_id IS NOT NULL";
           $query->_qill[$grouping][] = ts('Contributions OR Soft Credits? - Both But Related');
+          $query->_tables['civicrm_contribution'] = $query->_whereTables['civicrm_contribution'] = 1;
           $query->_tables['civicrm_contribution_soft'] = $query->_whereTables['civicrm_contribution_soft'] = 1;
         } else if ($value == 'both') {
           $query->_qill[$grouping][] = ts('Contributions OR Soft Credits? - Both');
+          $query->_tables['civicrm_contribution'] = $query->_whereTables['civicrm_contribution'] = 1;
           $query->_tables['civicrm_contribution_soft'] = $query->_whereTables['civicrm_contribution_soft'] = 1;
         }
         // default option: $value == 'only_contribs'
@@ -780,8 +783,9 @@ class CRM_Contribute_BAO_Query {
   static function initializeAnySoftCreditClause(&$query) {
     if (self::isSoftCreditOptionEnabled($query->_params)) {
       if ($query->_mode & CRM_Contact_BAO_Query::MODE_CONTRIBUTE) {
-        unset($query->_distinctComponentClause, $query->_groupByComponentClause);
+        unset($query->_distinctComponentClause);
         $query->_rowCountClause = " count(civicrm_contribution.id)";
+        $query->_groupByComponentClause = " GROUP BY contribution_search_scredit_combined.id, contribution_search_scredit_combined.contact_id, contribution_search_scredit_combined.scredit_id ";
       }
     }
   }
