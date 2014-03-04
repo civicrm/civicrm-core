@@ -79,7 +79,7 @@
     </td>
     <td class="crm-contribution-product_name">{$row.product_name}</td>
     {if $softCreditColumns}
-      <td class="crm-contribution-soft_credit_name">{$row.contribution_soft_credit_name}</td>
+    <td class="crm-contribution-soft_credit_name"><a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=`$row.contribution_soft_credit_contact_id`"}">{$row.contribution_soft_credit_name}</a></td>
       <td class="right bold crm-contribution-soft_credit_amount"><span class="nowrap">{$row.contribution_soft_credit_amount|crmMoney:$row.currency}</span></td>
       <td class="crm-contribution-soft_credit_type">{$row.contribution_soft_credit_type}</td>
     {/if}

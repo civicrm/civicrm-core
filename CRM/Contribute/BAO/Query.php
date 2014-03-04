@@ -145,9 +145,19 @@ class CRM_Contribute_BAO_Query {
     if (!empty($query->_returnProperties['contribution_soft_credit_name'])) {
       $query->_select['contribution_soft_credit_name'] = "civicrm_contact_d.display_name as contribution_soft_credit_name";
       $query->_element['contribution_soft_credit_name'] = 1;
+
+      // also include contact id. Will help build hyperlinks
+      $query->_select['contribution_soft_credit_contact_id']  = "civicrm_contact_d.id as contribution_soft_credit_contact_id";
+      $query->_element['contribution_soft_credit_contact_id'] = 1;
+
       $query->_tables['civicrm_contribution'] = 1;
       $query->_tables['civicrm_contribution_soft'] = 1;
       $query->_tables['civicrm_contribution_soft_contact'] = 1;
+    }
+
+    if (!empty($query->_returnProperties['contribution_soft_credit_contact_id'])) {
+      $query->_tables['civicrm_contribution'] = 1;
+      $query->_tables['civicrm_contribution_soft'] = 1;
     }
 
     if (!empty($query->_returnProperties['contribution_soft_credit_amount'])) {
@@ -768,7 +778,7 @@ class CRM_Contribute_BAO_Query {
   }
 
   static function initializeAnySoftCreditClause(&$query) {
-    if (self::initializeAnySoftCreditsVars($query->_params)) {
+    if (self::isSoftCreditOptionEnabled($query->_params)) {
       if ($query->_mode & CRM_Contact_BAO_Query::MODE_CONTRIBUTE) {
         unset($query->_distinctComponentClause, $query->_groupByComponentClause);
         $query->_rowCountClause = " count(civicrm_contribution.id)";
@@ -776,7 +786,7 @@ class CRM_Contribute_BAO_Query {
     }
   }
 
-  static function initializeAnySoftCreditsVars($queryParams = array()) {
+  static function isSoftCreditOptionEnabled($queryParams = array()) {
     static $tempTableFilled = FALSE;
     if (!empty($queryParams)) {
       foreach (array_keys($queryParams) as $id) {
@@ -791,7 +801,6 @@ class CRM_Contribute_BAO_Query {
     }
     if (in_array(self::$_contribOrSoftCredit, 
       array("only_scredits", "both_related", "both"))) {
-        CRM_Core_Error::backtrace( 'backtrace', TRUE );
         if (!$tempTableFilled) {
           $tempQuery = "
             CREATE TEMPORARY TABLE IF NOT EXISTS contribution_search_scredit_combined AS 
@@ -850,7 +859,7 @@ class CRM_Contribute_BAO_Query {
         'contribution_batch' => 1,
         'contribution_campaign_id' => 1,
       );
-      if (self::initializeAnySoftCreditsVars()) {
+      if (self::isSoftCreditOptionEnabled()) {
         $properties = array_merge(
           $properties, array(
             'contribution_soft_credit_name'   => 1,

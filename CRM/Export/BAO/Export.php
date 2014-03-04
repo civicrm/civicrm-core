@@ -562,7 +562,7 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
 
     switch ($exportMode) {
       case CRM_Export_Form_Select::CONTRIBUTE_EXPORT:
-        if (!CRM_Contribute_BAO_Query::initializeAnySoftCreditsVars()) {
+        if (!CRM_Contribute_BAO_Query::isSoftCreditOptionEnabled()) {
           // apply group-by only when no soft credit columns are included
           $groupBy = 'GROUP BY civicrm_contribution.id';
         }

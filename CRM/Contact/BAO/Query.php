@@ -4537,6 +4537,32 @@ SELECT COUNT( conts.total_amount ) as total_count,
       $summary['total']['amount'] = $summary['total']['avg'] = 0;
     }
 
+    // soft credit summary
+    if (CRM_Contribute_BAO_Query::isSoftCreditOptionEnabled()) {
+      $softCreditWhere = "{$completedWhere} AND civicrm_contribution_soft.id IS NOT NULL";
+      $query = "
+        $select FROM (
+          SELECT civicrm_contribution_soft.amount as total_amount, civicrm_contribution_soft.currency $from $softCreditWhere
+          GROUP BY civicrm_contribution_soft.id
+        ) as conts
+        GROUP BY currency";
+      $dao = CRM_Core_DAO::executeQuery($query);
+      $summary['soft_credit']['count'] = 0;
+      $summary['soft_credit']['amount'] = $summary['soft_credit']['avg'] = array();
+      while ($dao->fetch()) {
+        $summary['soft_credit']['count'] += $dao->total_count;
+        $summary['soft_credit']['amount'][] = CRM_Utils_Money::format($dao->total_amount, $dao->currency);
+        $summary['soft_credit']['avg'][] = CRM_Utils_Money::format($dao->total_avg, $dao->currency);
+      }
+      if (!empty($summary['soft_credit']['amount'])) {
+        $summary['soft_credit']['amount'] = implode(',&nbsp;', $summary['soft_credit']['amount']);
+        $summary['soft_credit']['avg'] = implode(',&nbsp;', $summary['soft_credit']['avg']);
+      }
+      else {
+        $summary['soft_credit']['amount'] = $summary['soft_credit']['avg'] = 0;
+      }
+    }
+
     // hack $select
     //@todo  - this could be one query using the IF in mysql - eg
     //  SELECT sum(total_completed), sum(count_completed), sum(count_cancelled), sum(total_cancelled) FROM (
