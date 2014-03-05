@@ -1260,13 +1260,12 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * @return HTML_QuickForm_Element
    */
   function addEntityRef($name, $label = '', $props = array(), $required = FALSE) {
+    require_once "api/api.php";
     $config = CRM_Core_Config::singleton();
     // Default properties
     $props['api'] = CRM_Utils_Array::value('api', $props, array());
-    $props['entity'] = CRM_Utils_Array::value('entity', $props, 'contact');
-
-    $props['class'] = isset($props['class']) ? $props['class'] . ' ' : '';
-    $props['class'] .= "crm-select2 crm-form-entityref";
+    $props['entity'] = _civicrm_api_get_entity_name_from_camel(CRM_Utils_Array::value('entity', $props, 'contact'));
+    $props['class'] = ltrim(CRM_Utils_Array::value('class', $props, '') . ' crm-form-entityref');
 
     if ($props['entity'] == 'contact' && isset($props['create']) && !(CRM_Core_Permission::check('edit all contacts') || CRM_Core_Permission::check('add contacts'))) {
       unset($props['create']);
@@ -1281,14 +1280,11 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       }
     }
 
-    $defaults = array(
-      'minimumInputLength' => 1,
-      'multiple' => !empty($props['multiple']),
-      'placeholder' => CRM_Utils_Array::value('placeholder', $props, $required ? ts('- select %1 -', array(1 => ts($props['entity']))) : ts('- none -')),
-      'allowClear' => !$required,
-    );
-    if ($props['entity'] == 'contact') {
-      $defaults['formatInputTooShort'] = $config->includeEmailInName ? ts('Start typing a name or email...') : ts('Start typing a name...');
+    $props['placeholder'] = CRM_Utils_Array::value('placeholder', $props, $required ? ts('- select %1 -', array(1 => ts(str_replace('_', ' ', $props['entity'])))) : ts('- none -'));
+
+    $defaults = array();
+    if (!empty($props['multiple'])) {
+      $defaults['multiple'] = TRUE;
     }
     $props['select'] = CRM_Utils_Array::value('select', $props, array()) + $defaults;
 
@@ -1306,7 +1302,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     if (!empty($props['create'])) {
       $props['data-create-links'] = json_encode($props['create']);
     }
-    CRM_Utils_Array::remove($props, 'multiple', 'select', 'api', 'entity', 'placeholder', 'create');
+    CRM_Utils_Array::remove($props, 'multiple', 'select', 'api', 'entity', 'create');
   }
 
   /**
