@@ -241,6 +241,7 @@ CRM.validate = CRM.validate || {
 (function ($, undefined) {
   "use strict";
 
+  $.fn.select2.defaults.dropdownCssClass = 'crm-container';
   // https://github.com/ivaynberg/select2/pull/2090
   $.fn.select2.defaults.width = 'resolve';
 
@@ -253,16 +254,18 @@ CRM.validate = CRM.validate || {
    * Populate a select list, overwriting the existing options except for the placeholder.
    * @param $el jquery collection - 1 or more select elements
    * @param options array in format returned by api.getoptions
+   * @param removePlaceholder bool
    */
-  CRM.utils.setOptions = function($el, options) {
+  CRM.utils.setOptions = function($el, options, removePlaceholder) {
     $el.each(function() {
       var
         $elect = $(this),
-        val = $elect.val() || [];
+        val = $elect.val() || [],
+        opts = removePlaceholder ? '' : '[value!=""]';
       if (typeof(val) !== 'array') {
         val = [val];
       }
-      $elect.find('option[value!=""]').remove();
+      $elect.find('option' + opts).remove();
       $.each(options, function(key, option) {
         var selected = ($.inArray(''+option.key, val) > -1) ? 'selected="selected"' : '';
         $elect.append('<option value="' + option.key + '"' + selected + '>' + option.value + '</option>');
@@ -357,7 +360,6 @@ CRM.validate = CRM.validate || {
       }
       options = $.extend(settings, options);
     }
-    options.dropdownCssClass = 'crm-container';
     $(this).select2(options).removeClass('crm-select2');
   };
 
