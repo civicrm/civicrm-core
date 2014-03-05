@@ -3,7 +3,7 @@
         "This file locks the dependencies of your project to a known state",
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
     ],
-    "hash": "67a5a11db701c7ca33257aa67f0f7a4e",
+    "hash": "7ef94c70b08e0de2aca9331d7c624ec6",
     "packages": [
         {
             "name": "doctrine/annotations",
@@ -11,12 +11,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/doctrine/annotations.git",
-                "reference": "088ea3b5dfbe52adf7b12623caa897e9ee1d795e"
+                "reference": "316b956b70c0ceab28ba0817fc3343624aa83b56"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/doctrine/annotations/zipball/088ea3b5dfbe52adf7b12623caa897e9ee1d795e",
-                "reference": "088ea3b5dfbe52adf7b12623caa897e9ee1d795e",
+                "url": "https://api.github.com/repos/doctrine/annotations/zipball/316b956b70c0ceab28ba0817fc3343624aa83b56",
+                "reference": "316b956b70c0ceab28ba0817fc3343624aa83b56",
                 "shasum": ""
             },
             "require": {
@@ -75,7 +75,7 @@
                 "docblock",
                 "parser"
             ],
-            "time": "2014-02-23 21:16:16"
+            "time": "2014-03-03 13:00:20"
         },
         {
             "name": "doctrine/cache",
@@ -660,12 +660,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/schmittjoh/serializer.git",
-                "reference": "955a880b324423c0aa652440336f6cba8695ad92"
+                "reference": "d980279bba4b76ab927f67a61f63a6932220aa13"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/schmittjoh/serializer/zipball/955a880b324423c0aa652440336f6cba8695ad92",
-                "reference": "955a880b324423c0aa652440336f6cba8695ad92",
+                "url": "https://api.github.com/repos/schmittjoh/serializer/zipball/d980279bba4b76ab927f67a61f63a6932220aa13",
+                "reference": "d980279bba4b76ab927f67a61f63a6932220aa13",
                 "shasum": ""
             },
             "require": {
@@ -722,7 +722,7 @@
                 "serialization",
                 "xml"
             ],
-            "time": "2014-02-27 16:35:03"
+            "time": "2014-03-04 10:46:39"
         },
         {
             "name": "phpcollection/phpcollection",
@@ -830,12 +830,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/Console.git",
-                "reference": "afee08520a971c0f073bff89e1d456405e244c37"
+                "reference": "563254c27e37efb65aae587286602ae6f5f18acd"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/Console/zipball/afee08520a971c0f073bff89e1d456405e244c37",
-                "reference": "afee08520a971c0f073bff89e1d456405e244c37",
+                "url": "https://api.github.com/repos/symfony/Console/zipball/563254c27e37efb65aae587286602ae6f5f18acd",
+                "reference": "563254c27e37efb65aae587286602ae6f5f18acd",
                 "shasum": ""
             },
             "require": {
@@ -876,7 +876,7 @@
             ],
             "description": "Symfony Console Component",
             "homepage": "http://symfony.com",
-            "time": "2014-02-18 15:41:30"
+            "time": "2014-03-03 13:53:19"
         },
         {
             "name": "symfony/dependency-injection",
@@ -885,12 +885,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/DependencyInjection.git",
-                "reference": "a919d8dae7a564afccc88e6413c88e299b277982"
+                "reference": "559204868da6340a49e7f88dee00a530913fa6c6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/DependencyInjection/zipball/a919d8dae7a564afccc88e6413c88e299b277982",
-                "reference": "a919d8dae7a564afccc88e6413c88e299b277982",
+                "url": "https://api.github.com/repos/symfony/DependencyInjection/zipball/559204868da6340a49e7f88dee00a530913fa6c6",
+                "reference": "559204868da6340a49e7f88dee00a530913fa6c6",
                 "shasum": ""
             },
             "require": {
@@ -934,7 +934,7 @@
             ],
             "description": "Symfony DependencyInjection Component",
             "homepage": "http://symfony.com",
-            "time": "2014-02-11 10:29:24"
+            "time": "2014-03-01 17:25:29"
         },
         {
             "name": "symfony/expression-language",
@@ -943,12 +943,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/expression-language.git",
-                "reference": "a21aba4f8de6dd355dd812cae8af5c38760dc4a6"
+                "reference": "d955750d9c7bf5b1c32629333e973de0c583d70b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/expression-language/zipball/a21aba4f8de6dd355dd812cae8af5c38760dc4a6",
-                "reference": "a21aba4f8de6dd355dd812cae8af5c38760dc4a6",
+                "url": "https://api.github.com/repos/symfony/expression-language/zipball/d955750d9c7bf5b1c32629333e973de0c583d70b",
+                "reference": "d955750d9c7bf5b1c32629333e973de0c583d70b",
                 "shasum": ""
             },
             "require": {
@@ -983,7 +983,59 @@
             ],
             "description": "Symfony ExpressionLanguage Component",
             "homepage": "http://symfony.com",
-            "time": "2014-02-11 13:52:21"
+            "time": "2014-03-03 12:53:01"
+        },
+        {
+            "name": "symfony/http-foundation",
+            "version": "2.3.x-dev",
+            "target-dir": "Symfony/Component/HttpFoundation",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/HttpFoundation.git",
+                "reference": "7432d14a05f627371cce49ade94e79761e757b2f"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/HttpFoundation/zipball/7432d14a05f627371cce49ade94e79761e757b2f",
+                "reference": "7432d14a05f627371cce49ade94e79761e757b2f",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.3"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "2.3-dev"
+                }
+            },
+            "autoload": {
+                "psr-0": {
+                    "Symfony\\Component\\HttpFoundation\\": ""
+                },
+                "classmap": [
+                    "Symfony/Component/HttpFoundation/Resources/stubs"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Fabien Potencier",
+                    "email": "fabien@symfony.com",
+                    "homepage": "http://fabien.potencier.org",
+                    "role": "Lead Developer"
+                },
+                {
+                    "name": "Symfony Community",
+                    "homepage": "http://symfony.com/contributors"
+                }
+            ],
+            "description": "Symfony HttpFoundation Component",
+            "homepage": "http://symfony.com",
+            "time": "2014-03-04 07:33:02"
         },
         {
             "name": "willdurand/hateoas",
