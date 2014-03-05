@@ -99,10 +99,6 @@
     <tr>
       <td class='label'>{ts}Event{/ts}</td><td>{$eventName}</td>
     </tr>
-    <tr class="crm-payment-form-block-contribution_type_id crm-payment-form-block-financial_type_id">
-      <td class="label">{$form.financial_type_id.label}</td><td{$valueStyle}>{$form.financial_type_id.html}&nbsp;
-      </td>
-    </tr>
     <tr class="crm-payment-form-block-total_amount">
       <td class="label">{$form.total_amount.label}</td>
       <td>
