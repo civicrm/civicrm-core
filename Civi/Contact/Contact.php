@@ -49,7 +49,7 @@ use Hateoas\Configuration\Annotation as Hateoas;
  *
  * @Hateoas\Relation("self",
  *   href = @Hateoas\Route(
- *     "contact_get",
+ *     "Contact_get",
  *     parameters = { "id" = "expr(object.getId())" },
  *     absolute = true,
  *     generator = "civi"

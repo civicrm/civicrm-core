@@ -39,18 +39,32 @@ namespace Civi\Core;
 require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
+use Hateoas\Configuration\Annotation as Hateoas;
+use Civi\API\Annotation as CiviAPI;
+use JMS\Serializer\Annotation as JMS;
 
 /**
  * Worldregion
  *
+ * @CiviAPI\Entity("WorldRegion", slug="world-region")
+ * @CiviAPI\Permission(get="access CiviCRM")
  * @ORM\Table(name="civicrm_worldregion")
  * @ORM\Entity
+ * @Hateoas\Relation("self",
+ *   href = @Hateoas\Route(
+ *     "WorldRegion_get",
+ *     parameters = { "id" = "expr(object.getId())" },
+ *     absolute = true,
+ *     generator = "civi"
+ *   )
+ * )
  */
 class Worldregion extends \Civi\Core\Entity {
 
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="id", type="integer", nullable=false)
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
@@ -60,6 +74,7 @@ class Worldregion extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="name", type="string", length=128, nullable=true)
    * 
    */
