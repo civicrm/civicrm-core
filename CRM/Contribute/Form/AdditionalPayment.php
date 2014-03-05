@@ -182,8 +182,17 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
       CRM_Core_BAO_Address::fixAllStateSelects($this, $defaults);
     }
 
+    if (empty($defaults['trxn_date']) && empty($defaults['trxn_date_time'])) {
+      list($defaults['trxn_date'],
+        $defaults['trxn_date_time']
+      ) = CRM_Utils_Date::setDateDefaults(
+        CRM_Utils_Array::value('register_date', $defaults), 'activityDateTime'
+      );
+    }
+
     // Set $newCredit variable in template to control whether link to credit card mode is included
     CRM_Core_Payment::allowBackofficeCreditCard($this);
+    return $defaults;
   }
 
   public function buildQuickForm() {
@@ -258,11 +267,6 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
     $attributes = CRM_Core_DAO::getAttribute('CRM_Financial_DAO_FinancialTrxn');
 
     $this->add('select', 'payment_processor_id', ts('Payment Processor'), $this->_processors, NULL);
-    $this->add('select', 'financial_type_id',
-      ts('Financial Type'),
-      array('' => ts('- select -')) + CRM_Contribute_PseudoConstant::financialType(),
-      TRUE
-    );
     $label = ($this->_refund) ? 'Refund Amount' : 'Payment Amount';
     $this->addMoney('total_amount',
       ts('%1', array(1 => $label)),
@@ -389,9 +393,7 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
       if (!empty($submittedValues['is_email_receipt']) && $sendReceipt) {
         $statusMsg .= ' ' . ts('A receipt has been emailed to the contributor.');
       }
-      if (isset($sendReceipt)) {
-        $statusMsg .= ' ' . ts('Email has been sent successfully');
-      }
+
       CRM_Core_Session::setStatus($statusMsg, ts('Saved'), 'success');
 
       $session = CRM_Core_Session::singleton();
@@ -510,12 +512,6 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
     $paymentParams = $this->_params;
     $paymentParams['contactID'] = $this->_contactId;
     CRM_Core_Payment_Form::mapParams($this->_bltID, $this->_params, $paymentParams, TRUE);
-
-    $contributionType = new CRM_Financial_DAO_FinancialType();
-    $contributionType->id = $params['financial_type_id'];
-    if (!$contributionType->find(TRUE)) {
-      CRM_Core_Error::fatal('Could not find a system table');
-    }
 
     // add some financial type details to the params list
     // if folks need to use it

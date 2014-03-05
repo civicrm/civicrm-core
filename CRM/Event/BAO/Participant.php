@@ -1912,7 +1912,7 @@ WHERE (li.entity_table = 'civicrm_participant' AND li.entity_id = {$participantI
       );
       CRM_Financial_BAO_FinancialItem::create($params, NULL, array('id' => $adjustedTrxn->id));
     }
-    //activity creation$contributionStatuses
+    //activity creation
     self::addActivityForSelection($participantId, 'Change Registration');
   }
 
