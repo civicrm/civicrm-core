@@ -29,9 +29,7 @@
 {/if}
 {literal}
 <script type="text/javascript">
-var CRM = CRM || {};
-CRM.buildCustomData = function( type, subType, subName, cgCount, groupID, isMultiple )
-{
+CRM.buildCustomData = function( type, subType, subName, cgCount, groupID, isMultiple ) {
   var dataUrl = {/literal}"{crmURL p=$urlPath h=0 q='snippet=4&type='}"{literal} + type;
 
   if ( subType ) {
@@ -108,12 +106,12 @@ CRM.buildCustomData = function( type, subType, subName, cgCount, groupID, isMult
           cj('textarea', this).each(function() {
             cj(this).text(cj(this).val());
           });
-          cj('option:selected', this).prop('selected', true);
-          cj('option:not(:selected)', this).prop('selected', false);
+          cj('option:selected', this).attr('selected', 'selected');
+          cj('option:not(:selected)', this).removeAttr('selected');
           storage[id] = cj(this).detach();
         }
       });
-      target.html(response);
+      target.html(response).trigger('crmLoad');
       target.children().each(function() {
         var id = cj(this).attr('id');
         if (id && storage[id]) {
