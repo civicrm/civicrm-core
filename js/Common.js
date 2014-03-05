@@ -277,27 +277,45 @@ CRM.validate = CRM.validate || {
   /**
    * Select2 api leaves something to be desired. To alter options on-the-fly often requires re-rendering the whole thing.
    * So making this function public in case anyone needs it.
+   * @param options object
    */
-  CRM.utils.buildSelect2Element = function() {
-    var $el = $(this);
-    var options = {};
-    // quickform doesn't support optgroups so here's a hack :(
-    $('option[value^=crm_optgroup]', this).each(function() {
-      $(this).nextUntil('option[value^=crm_optgroup]').wrapAll('<optgroup label="' + $(this).text() + '" />');
-      $(this).remove();
-    });
-    // Defaults for single-selects
-    if ($el.is('select:not([multiple])')) {
-      options.minimumResultsForSearch = 10;
-      options.allowClear = !($el.hasClass('required'));
-      if ($('option:first', this).val() === '') {
-        options.placeholderOption = 'first';
+  $.fn.crmSelect2 = function(options) {
+    return $(this).each(function () {
+      var
+        $el = $(this),
+        defaults = {allowClear: !$el.hasClass('required')};
+      // quickform doesn't support optgroups so here's a hack :(
+      $('option[value^=crm_optgroup]', this).each(function () {
+        $(this).nextUntil('option[value^=crm_optgroup]').wrapAll('<optgroup label="' + $(this).text() + '" />');
+        $(this).remove();
+      });
+      // Defaults for single-selects
+      if ($el.is('select:not([multiple])')) {
+        defaults.minimumResultsForSearch = 10;
+        if ($('option:first', this).val() === '') {
+          defaults.placeholderOption = 'first';
+        }
       }
-    }
-    $.extend(options, $el.data('select-params') || {});
-    // Autocomplete using the getlist api
-    if ($el.data('api-entity') && $el.hasClass('crm-form-entityref')) {
-      $el.addClass('crm-ajax-select');
+      $el.select2($.extend(defaults, $el.data('select-params') || {}, options || {}));
+    });
+  };
+
+  /**
+   * Initialize a select2 autocomplete using the getlist api
+   * @param options object
+   */
+  $.fn.crmEntityRef = function(options) {
+    options = options || {};
+    options.select = options.select || {};
+    return $(this).each(function() {
+      var
+        $el = $(this),
+        entity = options.entity || $el.data('api-entity') || 'contact',
+        selectParams = {};
+      $el.data('api-entity', entity);
+      $el.data('select-params', $.extend({}, $el.data('select-params') || {}, options.select));
+      $el.data('api-params', $.extend({}, $el.data('api-params') || {}, options.api));
+      $el.addClass('crm-ajax-select crm-' + entity + '-ref');
       var settings = {
         // Use select2 ajax helper instead of CRM.api because it provides more value
         ajax: {
@@ -316,28 +334,45 @@ CRM.validate = CRM.validate || {
             return {more: data.more_results, results: data.values || []};
           }
         },
+        minimumInputLength: 1,
         formatResult: CRM.utils.formatSelect2Result,
         formatSelection: function(row) {
           return row.label;
         },
         escapeMarkup: function (m) {return m;},
-        initSelection: function(el, callback) {
-          callback(el.data('entity-value'));
+        initSelection: function($el, callback) {
+          var
+            multiple = !!$el.data('select-params').multiple,
+            val = $el.val(),
+            stored = $el.data('entity-value') || [];
+          if (val === '') {
+            return;
+          }
+          // If we already have this data, just return it
+          if (!_.xor(val.split(','), _.pluck(stored, 'id')).length) {
+            callback(multiple ? stored : stored[0]);
+          } else {
+            var params = $el.data('api-params') || {};
+            params.id = val;
+            CRM.api3($el.data('api-entity'), 'getlist', params).done(function(result) {
+              callback(multiple ? result.values : result.values[0])
+            });
+          }
         }
       };
       if ($el.data('create-links')) {
-        options.formatInputTooShort = function() {
-          var txt = $el.data('select-params').formatInputTooShort || $.fn.select2.defaults.formatInputTooShort;
+        selectParams.formatInputTooShort = function() {
+          var txt = $el.data('select-params').formatInputTooShort || $.fn.select2.defaults.formatInputTooShort.call(this);
           if ($el.data('create-links').length) {
             txt += ' ' + ts('or') + '<br />' + CRM.utils.formatSelect2CreateLinks($el);
           }
           return txt;
         };
-        options.formatNoMatches = function() {
+        selectParams.formatNoMatches = function() {
           var txt = $el.data('select-params').formatNoMatches || $.fn.select2.defaults.formatNoMatches;
           return txt + '<br />' + CRM.utils.formatSelect2CreateLinks($el);
         };
-        $el.on('select2-open', function() {
+        $el.off('.createLinks').on('select2-open.createLinks', function() {
           var $el = $(this);
           $('#select2-drop').off('.crmEntity').on('click.crmEntity', 'a.crm-add-entity', function(e) {
             $el.select2('close');
@@ -358,9 +393,8 @@ CRM.validate = CRM.validate || {
           });
         });
       }
-      options = $.extend(settings, options);
-    }
-    $(this).select2(options).removeClass('crm-select2');
+      $el.crmSelect2($.extend(settings, $el.data('select-params'), selectParams));
+    });
   };
 
   CRM.utils.formatSelect2Result = function(row) {
@@ -409,7 +443,8 @@ CRM.validate = CRM.validate || {
         target.toggleClass('crm-row-selected', $(this).is(':checked'));
       })
       .find('input.select-row:checked').parents('tr').addClass('crm-row-selected');
-    $('.crm-select2', e.target).each(CRM.utils.buildSelect2Element);
+    $('.crm-select2:not(.select2-offscreen)', e.target).crmSelect2();
+    $('.crm-form-entityref:not(.select2-offscreen)', e.target).crmEntityRef();
   });
 
   /**

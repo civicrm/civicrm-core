@@ -529,12 +529,17 @@ class CRM_Core_Resources {
    * @param string $js
    */
   function addLocalization(&$js) {
-    $js .= '
-      $.fn.select2.defaults.formatNoMatches = ' . json_encode(ts('None found.')) . ';
-      $.fn.select2.defaults.formatLoadMore = ' . json_encode(ts('Loading...')) . ';
-      $.fn.select2.defaults.formatSearching = ' . json_encode(ts('Searching...')) . ';
-      $.fn.select2.defaults.formatInputTooShort = ' . json_encode(ts('Enter search term...')) . ';
-    ';
+    $config = CRM_Core_Config::singleton();
+    
+    // Localize select2 strings
+    $contactSearch = json_encode($config->includeEmailInName ? ts('Start typing a name or email...') : ts('Start typing a name...'));
+    $otherSearch = json_encode(ts('Enter search term...'));
+    $js .= "
+      $.fn.select2.defaults.formatNoMatches = " . json_encode(ts("None found.")) . ";
+      $.fn.select2.defaults.formatLoadMore = " . json_encode(ts("Loading...")) . ";
+      $.fn.select2.defaults.formatSearching = " . json_encode(ts("Searching...")) . ";
+      $.fn.select2.defaults.formatInputTooShort = function(){return cj(this).data('api-entity') == 'contact' ? $contactSearch : $otherSearch};
+    ";
   }
 
   /**
@@ -553,7 +558,7 @@ class CRM_Core_Resources {
       "packages/jquery/jquery-ui/js/jquery-ui-1.10.3.custom$min.js",
       "packages/jquery/jquery-ui/css/black-tie/jquery-ui-1.10.3.custom$min.css",
 
-      "packages/backbone/lodash.underscore$min.js",
+      "packages/backbone/lodash.compat$min.js",
 
       "packages/jquery/plugins/select2/select2.js", // No mini until release of select2 3.4.6
       "packages/jquery/plugins/select2/select2.css",
