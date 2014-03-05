@@ -67,17 +67,14 @@ class CRM_Contact_Form_Edit_Address {
 
     $js = array();
     if (!$inlineEdit) {
-      $js = array('onChange' => 'checkLocation( this.id );');
+      $js = array('onChange' => 'checkLocation( this.id );', 'placeholder' => NULL);
     }
 
-    $form->addSelect("address[$blockId][location_type_id]", array('entity' => 'address', 'class' => 'eight', 'placeholder' => NULL) + $js);
+    //make location type required for inline edit
+    $form->addSelect("address[$blockId][location_type_id]", array('entity' => 'address', 'class' => 'eight') + $js, $inlineEdit);
 
     if (!$inlineEdit) {
       $js = array('id' => 'Address_' . $blockId . '_IsPrimary', 'onClick' => 'singleSelect( this.id );');
-    }
-    else {
-      //make location type required for inline edit
-      $form->addRule( "address[$blockId][location_type_id]", ts('%1 is a required field.', array(1 => ts('Location Type'))), 'required');
     }
 
     $form->addElement(
@@ -88,8 +85,8 @@ class CRM_Contact_Form_Edit_Address {
       $js
     );
 
-    if ( !$inlineEdit ) {
-    $js = array('id' => 'Address_' . $blockId . '_IsBilling', 'onClick' => 'singleSelect( this.id );');
+    if (!$inlineEdit) {
+      $js = array('id' => 'Address_' . $blockId . '_IsBilling', 'onClick' => 'singleSelect( this.id );');
     }
 
     $form->addElement(
