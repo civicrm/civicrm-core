@@ -377,7 +377,7 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
       $this->processCreditCard($submittedValues);
     }
     else {
-      $result = CRM_Contribute_BAO_Contribution::recordAdditionPayment($this->_contributionId, $submittedValues, $this->_paymentType, $participantId);
+      $result = CRM_Contribute_BAO_Contribution::recordAdditionalPayment($this->_contributionId, $submittedValues, $this->_paymentType, $participantId);
 
       // email sending
       if (!empty($result) && !empty($submittedValues['is_email_receipt'])) {
@@ -568,7 +568,7 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
     }
 
     // process the additional payment
-    $trxnRecord = CRM_Contribute_BAO_Contribution::recordAdditionPayment($this->_contributionId, $submittedValues, $this->_paymentType, $participantId);
+    $trxnRecord = CRM_Contribute_BAO_Contribution::recordAdditionalPayment($this->_contributionId, $submittedValues, $this->_paymentType, $participantId);
 
     if ($trxnRecord->id && !empty($this->_params['is_email_receipt'])) {
       $sendReceipt = $this->emailReceipt($this->_params);

@@ -2956,7 +2956,7 @@ WHERE  contribution_id = %1 ";
     return FALSE;
   }
 
-  static function recordAdditionPayment($contributionId, $trxnsData, $paymentType = 'owed', $participantId = NULL) {
+  static function recordAdditionalPayment($contributionId, $trxnsData, $paymentType = 'owed', $participantId = NULL) {
     $statusId = CRM_Core_OptionGroup::getValue('contribution_status', 'Completed', 'name');
     $getInfoOf['id'] = $contributionId;
     $defaults = array();
