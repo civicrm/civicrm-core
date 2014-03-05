@@ -154,6 +154,13 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
   public $_entryURL = NULL;
 
   /**
+   * The full request
+   *
+   * @var Symfony\Component\HttpFoundation\Request
+   */
+  public $request;
+
+  /**
    * All CRM single or multi page pages should inherit from this class.
    *
    * @param string  title        descriptive title of the controller

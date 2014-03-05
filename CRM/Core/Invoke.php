@@ -69,7 +69,7 @@ class CRM_Core_Invoke {
         self::init($args);
         self::hackStandalone($args);
         $item = self::getItem($args);
-        return self::runItem($item);
+        return self::sendResponse(self::runItem($item));
       }
       catch (CRM_Core_EXCEPTION $e) {
         $params = $e->getErrorData();
@@ -117,15 +117,33 @@ class CRM_Core_Invoke {
       $kernel = new AppKernel('dev', true);
       $kernel->loadClassCache();
       $response = $kernel->handle(Symfony\Component\HttpFoundation\Request::createFromGlobals());
-      if (preg_match(':^text/html:', $response->headers->get('Content-Type'))) {
-        // let the CMS handle the trappings
-        return $response->getContent();
-      } else {
-        $response->send();
-        exit();
-      }
+      return self::sendResponse($response);
     }
   }
+
+  /**
+   * Send a response in a CMS-sensitive way. This means either returning HTML content to the CMS
+   * (for additional formatting) or short-circuiting the CMS entirely.
+   *
+   * @param string|\Symfony\Component\HttpFoundation\Response $response
+   * @return string If the response is HTML, return the raw HTML. Otherwise, use the $response->send() and exit().
+   */
+  static function sendResponse($response) {
+    if (!$response || is_scalar($response)) {
+      return (string)$response;
+    }
+
+    if (!$response->headers->has('Content-Type') || preg_match(':^text/html:', $response->headers->get('Content-Type'))) {
+      // let the CMS handle the trappings
+      // TODO: adapt headers, etc from $response to CMS API
+      return $response->getContent();
+    }
+    else {
+      $response->send();
+      CRM_Utils_System::civiExit(0);
+    }
+  }
+
   /**
    * Hackish support /civicrm/menu/rebuild
    *
@@ -213,7 +231,7 @@ class CRM_Core_Invoke {
    * Given a menu item, call the appropriate controller and return the response
    *
    * @param array $item see CRM_Core_Menu
-   * @return string, HTML
+   * @return string|Response, HTML or Symfony\Component\HttpFoundation\Response
    */
   static public function runItem($item) {
     $config = CRM_Core_Config::singleton();
@@ -289,8 +307,11 @@ class CRM_Core_Invoke {
 
       $result = NULL;
       if (is_array($item['page_callback'])) {
-        require_once (str_replace('_', DIRECTORY_SEPARATOR, $item['page_callback'][0]) . '.php');
-        $result = call_user_func($item['page_callback']);
+        if ($item['page_callback']{0} !== '\\') {
+          // Legacy class-loading for PHP 5.2 namespaces;  not sure it's needed, but counter-productive for PHP 5.3 namespaces
+          require_once (str_replace('_', DIRECTORY_SEPARATOR, $item['page_callback'][0]) . '.php');
+        }
+        $result = call_user_func($item['page_callback'], Symfony\Component\HttpFoundation\Request::createFromGlobals());
       }
       elseif (strstr($item['page_callback'], '_Form')) {
         $wrapper = new CRM_Utils_Wrapper();
@@ -302,18 +323,22 @@ class CRM_Core_Invoke {
       }
       else {
         $newArgs = explode('/', $_GET[$config->userFrameworkURLVar]);
-        require_once (str_replace('_', DIRECTORY_SEPARATOR, $item['page_callback']) . '.php');
+        if ($item['page_callback']{0} !== '\\') {
+          // Legacy class-loading for PHP 5.2 namespaces;  not sure it's needed, but counter-productive for PHP 5.3 namespaces
+          require_once (str_replace('_', DIRECTORY_SEPARATOR, $item['page_callback']) . '.php');
+        }
         $mode = 'null';
         if (isset($pageArgs['mode'])) {
           $mode = $pageArgs['mode'];
           unset($pageArgs['mode']);
         }
         $title = CRM_Utils_Array::value('title', $item);
-        if (strstr($item['page_callback'], '_Page')) {
+        if (strstr($item['page_callback'], '_Page') || strstr($item['page_callback'], '\\Page\\')) {
           $object = new $item['page_callback'] ($title, $mode );
+          $object->request = Symfony\Component\HttpFoundation\Request::createFromGlobals();
           $object->urlPath = explode('/', $_GET[$config->userFrameworkURLVar]);
         }
-        elseif (strstr($item['page_callback'], '_Controller')) {
+        elseif (strstr($item['page_callback'], '_Controller') || strstr($item['page_callback'], '\\Controller\\')) {
           $addSequence = 'false';
           if (isset($pageArgs['addSequence'])) {
             $addSequence = $pageArgs['addSequence'];
@@ -321,6 +346,7 @@ class CRM_Core_Invoke {
             unset($pageArgs['addSequence']);
           }
           $object = new $item['page_callback'] ($title, true, $mode, null, $addSequence );
+          $object->request = Symfony\Component\HttpFoundation\Request::createFromGlobals();
         }
         else {
           CRM_Core_Error::fatal();

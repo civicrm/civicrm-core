@@ -119,6 +119,13 @@ class CRM_Core_Page {
   public $urlPath = array();
 
   /**
+   * The full request
+   *
+   * @var Symfony\Component\HttpFoundation\Request
+   */
+  public $request;
+
+  /**
    * class constructor
    *
    * @param string $title title of the page
