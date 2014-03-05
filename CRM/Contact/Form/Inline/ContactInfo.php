@@ -59,17 +59,7 @@ class CRM_Contact_Form_Inline_ContactInfo extends CRM_Contact_Form_Inline {
    * @access public
    */
   public function setDefaultValues() {
-    $defaults = parent::setDefaultValues();
-
-    if ($this->_contactType == 'Individual') {
-      // set current employer details
-      $currentEmployer = CRM_Contact_BAO_Relationship::getCurrentEmployer(array($this->_contactId));
-      $defaults['current_employer_id'] = CRM_Utils_Array::value('org_id', $currentEmployer[$this->_contactId]);
-
-      $this->assign('currentEmployer', CRM_Utils_Array::value('current_employer_id', $defaults));
-    }
-
-    return $defaults;
+    return parent::setDefaultValues();
   }
 
   /**
