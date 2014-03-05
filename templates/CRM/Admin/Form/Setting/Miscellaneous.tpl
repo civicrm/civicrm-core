@@ -115,7 +115,7 @@
         <tr class="crm-miscellaneous-form-block-recaptchaOptions">
             <td class="label">{$form.recaptchaOptions.label}</td>
             <td>{$form.recaptchaOptions.html}<br />
-                <span class="description">{ts}You can specify the reCAPTCHA theme options as an comma seperated data.(eg: theme:'blackglass', lang : 'fr' ).<br />You can check the available options for reCAPTCHA here <a href="http://code.google.com/apis/recaptcha/docs/customization.html" "target=_blank">Customizing the Look and Feel of reCAPTCHA</a>.{/ts}</span></td>
+              <span class="description">{ts}You can specify the reCAPTCHA theme options as comma separated data.(eg: theme:'blackglass', lang : 'fr' ).<br />Check the available options for reCAPTCHA here: <a href="https://developers.google.com/recaptcha/docs/customization" target="_blank">Customizing the Look and Feel of reCAPTCHA</a>.{/ts}</span></td>
         </tr>
         </table>
            <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
