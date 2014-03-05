@@ -144,7 +144,7 @@ class Container {
     return \Hateoas\HateoasBuilder::create()
       ->setCacheDir($cacheDir)
       ->setDebug(TRUE)
-      ->setUrlGenerator('civi', new \Civi\API\RestUrlGenerator())
+      ->setUrlGenerator('civi', new \Civi\Core\RestUrlGenerator())
       ->build();
   }
 }
