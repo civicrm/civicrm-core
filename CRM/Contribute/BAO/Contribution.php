@@ -3081,28 +3081,20 @@ WHERE eft.financial_trxn_id = {$trxnId}
       }
       $activityType = ($paymentType == 'refund') ? 'Refund' : 'Payment';
 
-      // creation of activity
-      $activity = new CRM_Activity_DAO_Activity();
-      $activity->source_record_id = $financialTrxn->id;
-      $activity->activity_type_id = CRM_Core_OptionGroup::getValue('activity_type',
-        $activityType,
-        'name'
-      );
-      if (!$activity->find(TRUE)) {
-        self::addActivityForPayment($entityObj, $financialTrxn, $activityType, $component);
-      }
+      self::addActivityForPayment($entityObj, $financialTrxn, $activityType, $component, $contributionId);
     }
     return $financialTrxn;
   }
 
-  static function addActivityForPayment($entityObj, $trxnObj, $activityType, $component) {
+  static function addActivityForPayment($entityObj, $trxnObj, $activityType, $component, $contributionId) {
     if ($component == 'event') {
       $date = CRM_Utils_Date::isoToMysql($trxnObj->trxn_date);
       $paymentAmount = CRM_Utils_Money::format($trxnObj->total_amount, $trxnObj->currency);
       $eventTitle = CRM_Core_DAO::getFieldValue('CRM_Event_BAO_Event', $entityObj->event_id, 'title');
       $subject = "{$paymentAmount} - Offline {$activityType} for {$eventTitle}";
       $targetCid = $entityObj->contact_id;
-      $srcRecId = $trxnObj->id;
+      // source record id would be the contribution id
+      $srcRecId = $contributionId;
     }
 
     // activity params

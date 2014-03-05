@@ -162,6 +162,7 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
     if ($this->_view == 'transaction' && ($this->_action & CRM_Core_Action::BROWSE)) {
       return;
     }
+    $defaults = array( );
     if ($this->_mode) {
       $defaults = $this->_values;
 
