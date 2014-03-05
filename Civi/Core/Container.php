@@ -59,15 +59,15 @@ class Container {
 //      }
 //    }
 
-    $container->setDefinition('annotation_driver', new Definition(
+    $container->setDefinition('annotation_reader', new Definition(
       '\Doctrine\ORM\Mapping\Driver\AnnotationDriver',
       array('%civicrm_base_path%', '%cache_dir%/cache/annotations')
     ))
-      ->setFactoryService(self::SELF)->setFactoryMethod('createAnnotationDriver');
+      ->setFactoryService(self::SELF)->setFactoryMethod('createAnnotationReader');
 
     $container->setDefinition('doctrine_configuration', new Definition(
       '\Doctrine\ORM\Configuration',
-      array(new Reference('annotation_driver'))
+      array('%civicrm_base_path%', new Reference('annotation_reader'))
     ))
       ->setFactoryService(self::SELF)->setFactoryMethod('createDoctrineConfiguration');
 
@@ -76,6 +76,11 @@ class Container {
       array(new Reference('doctrine_configuration'))
     ))
       ->setFactoryService(self::SELF)->setFactoryMethod('createEntityManager');
+
+    $container->setDefinition('civi_api_registry', new Definition(
+      '\Civi\API\Registry',
+      array(new Reference('doctrine_configuration'), new Reference('annotation_reader'))
+    ));
 
     $container->setDefinition('hateoas', new Definition(
       '\Hateoas\Hateoas',
@@ -89,9 +94,9 @@ class Container {
   /**
    * @param string $civicrm_base_path
    * @param string $annotation_cache_path
-   * @return \Doctrine\ORM\Mapping\Driver\AnnotationDriver
+   * @return \Doctrine\Common\Annotations\Reader
    */
-  public function createAnnotationDriver($civicrm_base_path, $annotation_cache_path) {
+  public function createAnnotationReader($civicrm_base_path, $annotation_cache_path) {
     \CRM_Utils_Path::mkdir_p_if_not_exists($annotation_cache_path);
 
     AnnotationRegistry::registerFile(
@@ -100,20 +105,24 @@ class Container {
     AnnotationRegistry::registerAutoloadNamespace('Hateoas\Configuration\Annotation',
       \CRM_Utils_Path::join($civicrm_base_path, 'vendor', 'willdurand', 'hateoas', 'src')
     );
+    AnnotationRegistry::registerAutoloadNamespace('Civi',
+      \CRM_Utils_Path::join($civicrm_base_path)
+    );
 
     $annotation_reader = new AnnotationReader();
     $file_cache_reader = new FileCacheReader($annotation_reader, $annotation_cache_path, TRUE);
-    $metadata_path = \CRM_Utils_Path::join($civicrm_base_path, 'Civi');
-    $driver = new AnnotationDriver($file_cache_reader, $metadata_path);
 
-    return $driver;
+    return $file_cache_reader;
   }
 
   /**
-   * @param \Doctrine\ORM\Mapping\Driver\AnnotationDriver $driver
+   * @param \Doctrine\Common\Annotations\Reader $annotation_reader
    * @return \Doctrine\ORM\Configuration
    */
-  public function createDoctrineConfiguration($driver) {
+  public function createDoctrineConfiguration($civicrm_base_path, $annotation_reader) {
+    $metadata_path = \CRM_Utils_Path::join($civicrm_base_path, 'Civi');
+    $driver = new AnnotationDriver($annotation_reader, $metadata_path);
+
     // FIXME Doesn't seem like a good idea to use filesystem as the query cache
 //    $doctrine_cache_path = \CRM_Utils_Path::join(dirname(CIVICRM_TEMPLATE_COMPILEDIR), 'cache', 'doctrine');
 //    \CRM_Utils_Path::mkdir_p_if_not_exists($doctrine_cache_path);
@@ -144,7 +153,7 @@ class Container {
     return \Hateoas\HateoasBuilder::create()
       ->setCacheDir($cacheDir)
       ->setDebug(TRUE)
-      ->setUrlGenerator('civi', new \Civi\Core\RestUrlGenerator())
+      ->setUrlGenerator('civi', new \Civi\API\RestUrlGenerator())
       ->build();
   }
 }
