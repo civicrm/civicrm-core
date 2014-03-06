@@ -323,6 +323,8 @@ class CRM_Contact_BAO_Query {
    */
   public $_distinctComponentClause;
 
+  public $_rowCountClause;
+
   /**
    * use groupBy component clause for component searches
    *
@@ -1240,7 +1242,9 @@ class CRM_Contact_BAO_Query {
    */
   function query($count = FALSE, $sortByChar = FALSE, $groupContacts = FALSE) {
     if ($count) {
-      if (isset($this->_distinctComponentClause)) {
+      if (isset($this->_rowCountClause)) {
+        $select = "SELECT {$this->_rowCountClause}";
+      } else if (isset($this->_distinctComponentClause)) {
         // we add distinct to get the right count for components
         // for the more complex result set, we use GROUP BY the same id
         // CRM-9630
@@ -4531,6 +4535,32 @@ SELECT COUNT( conts.total_amount ) as total_count,
     }
     else {
       $summary['total']['amount'] = $summary['total']['avg'] = 0;
+    }
+
+    // soft credit summary
+    if (CRM_Contribute_BAO_Query::isSoftCreditOptionEnabled()) {
+      $softCreditWhere = "{$completedWhere} AND civicrm_contribution_soft.id IS NOT NULL";
+      $query = "
+        $select FROM (
+          SELECT civicrm_contribution_soft.amount as total_amount, civicrm_contribution_soft.currency $from $softCreditWhere
+          GROUP BY civicrm_contribution_soft.id
+        ) as conts
+        GROUP BY currency";
+      $dao = CRM_Core_DAO::executeQuery($query);
+      $summary['soft_credit']['count'] = 0;
+      $summary['soft_credit']['amount'] = $summary['soft_credit']['avg'] = array();
+      while ($dao->fetch()) {
+        $summary['soft_credit']['count'] += $dao->total_count;
+        $summary['soft_credit']['amount'][] = CRM_Utils_Money::format($dao->total_amount, $dao->currency);
+        $summary['soft_credit']['avg'][] = CRM_Utils_Money::format($dao->total_avg, $dao->currency);
+      }
+      if (!empty($summary['soft_credit']['amount'])) {
+        $summary['soft_credit']['amount'] = implode(',&nbsp;', $summary['soft_credit']['amount']);
+        $summary['soft_credit']['avg'] = implode(',&nbsp;', $summary['soft_credit']['avg']);
+      }
+      else {
+        $summary['soft_credit']['amount'] = $summary['soft_credit']['avg'] = 0;
+      }
     }
 
     // hack $select
