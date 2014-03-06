@@ -95,8 +95,7 @@
         </tr>
         <tr class="crm-relationship-form-block-related_contact_id">
           <td class="label">{$form.related_contact_id.label}</td>
-          {* remove crm-select2 class - hack to prevent widget from being initialized so we can mess with it first *}
-          <td>{$form.related_contact_id.html|crmReplace:class:'crm-form-entityref'}</td>
+          <td>{$form.related_contact_id.html}</td>
         </tr>
         <tr class="crm-relationship-form-block-is_current_employer" style="display:none;">
           <td class="label">{$form.is_current_employer.label}</td>
@@ -151,13 +150,12 @@
         $('[name=relationship_type_id]', $form).change(function() {
           var
             val = $(this).val(),
-            $contactField = $('[name=related_contact_id][type=text].crm-form-entityref', $form);
+            $contactField = $('#related_contact_id[type=text]', $form);
           if (!val && $contactField.length) {
             $contactField
               .prop('disabled', true)
-              .attr('placeholder', {/literal}'{ts escape='js'}- first select relationship type -{/ts}'{literal});
-            // Re-render select2 element
-            CRM.utils.buildSelect2Element.call($contactField);
+              .attr('placeholder', {/literal}'{ts escape='js'}- first select relationship type -{/ts}'{literal})
+              .change();
           }
           else if (val) {
             var
@@ -169,28 +167,21 @@
               contact_sub_type = relationshipData[rType]['contact_sub_type_' + target];
             // ContactField only exists for ADD action, not update
             if ($contactField.length) {
-              var
-                profiles = $.parseJSON($contactField.attr('data-create-links')),
-                placeholder = {/literal}'{ts escape='js' 1=%1}- select %1 -{/ts}'{literal},
-                params = {params: {}};
+              var api = {params: {}};
               if (contact_type) {
-                profiles = _.where(profiles, {name: 'new_' + contact_type.toLowerCase()});
-                params.params.contact_type = contact_type;
+                api.params.contact_type = contact_type;
               }
               if (contact_sub_type) {
-                params.params.contact_sub_type = contact_sub_type;
-                // Todo: pass sub-type to new contact profile otherwise relationship create will fail. Disabling it completely for now.
-                profiles = [];
+                api.params.contact_sub_type = contact_sub_type;
               }
+              // Todo: pass sub-type to new contact profile otherwise relationship create will fail. Disabling it completely for now.
+              $contactField.data('create-links', !contact_sub_type);
               $contactField
                 .val('')
                 .prop('disabled', false)
-                .data('create-links', profiles)
-                .data('api-params', params)
-                .attr('placeholder', relationshipData[rType]['placeholder_' + target]);
-
-              // Re-render select2 element
-              CRM.utils.buildSelect2Element.call($contactField);
+                .data('api-params', api)
+                .attr('placeholder', relationshipData[rType]['placeholder_' + target])
+                .change();
             }
 
             // Show/hide employer field
