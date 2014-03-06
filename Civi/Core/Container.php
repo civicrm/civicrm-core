@@ -82,6 +82,11 @@ class Container {
       array(new Reference('doctrine_configuration'), new Reference('annotation_reader'))
     ));
 
+    $container->setDefinition('civi_api_security', new Definition(
+      '\Civi\API\Security',
+      array(new Reference('annotation_reader'))
+    ));
+
     $container->setDefinition('hateoas', new Definition(
       '\Hateoas\Hateoas',
       array('%cache_dir%/cache/hateoas')
@@ -107,6 +112,9 @@ class Container {
     );
     AnnotationRegistry::registerAutoloadNamespace('Civi',
       \CRM_Utils_Path::join($civicrm_base_path)
+    );
+    AnnotationRegistry::registerAutoloadNamespace('JMS\Serializer',
+      \CRM_Utils_Path::join($civicrm_base_path, 'vendor', 'jms', 'serializer', 'src')
     );
 
     $annotation_reader = new AnnotationReader();
