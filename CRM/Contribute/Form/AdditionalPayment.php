@@ -604,6 +604,10 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
     }
 
     // process the additional payment
+    $participantId = NULL;
+    if ($this->_component == 'event') {
+      $participantId = $this->_id;
+    }
     $trxnRecord = CRM_Contribute_BAO_Contribution::recordAdditionalPayment($this->_contributionId, $submittedValues, $this->_paymentType, $participantId);
 
     if ($trxnRecord->id && !empty($this->_params['is_email_receipt'])) {
