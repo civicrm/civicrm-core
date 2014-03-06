@@ -313,7 +313,7 @@ class CRM_Export_BAO_Export {
           $componentReturnProperties = 
             array_merge(
               $componentReturnProperties, 
-              CRM_Contribute_BAO_Query::softCreditReturnProperties());
+              CRM_Contribute_BAO_Query::softCreditReturnProperties(TRUE));
         }
         $returnProperties = array_merge($returnProperties, $componentReturnProperties);
 
