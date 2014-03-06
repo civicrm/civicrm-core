@@ -211,7 +211,6 @@ class CRM_Core_Form_Renderer extends HTML_QuickForm_Renderer_ArraySmarty {
     }
     if ($val) {
       $entity = $field->getAttribute('data-api-entity');
-      $select = json_decode($field->getAttribute('data-select-params'), TRUE);
       $api = json_decode($field->getAttribute('data-api-params'), TRUE);
       $params = CRM_Utils_Array::value('params', $api, array());
       // Support serialized values
@@ -224,10 +223,6 @@ class CRM_Core_Form_Renderer extends HTML_QuickForm_Renderer_ArraySmarty {
         $field->removeAttribute('class');
       }
       if (!empty($result['values'])) {
-        // Simplify array for single selects - makes client-side code simpler (but feels somehow wrong)
-        if (empty($select['multiple'])) {
-          $result['values'] = $result['values'][0];
-        }
         $field->setAttribute('data-entity-value', json_encode($result['values']));
       }
     }
@@ -242,10 +237,6 @@ class CRM_Core_Form_Renderer extends HTML_QuickForm_Renderer_ArraySmarty {
   function renderFrozenEntityRef(&$el, $field) {
     $entity = $field->getAttribute('data-api-entity');
     $vals = json_decode($field->getAttribute('data-entity-value'), TRUE);
-    // Hack for single-entity @see self::preProcessEntityRef
-    if (isset($vals['id'])) {
-      $vals = array($vals);
-    }
     $display = array();
     foreach ($vals as $val) {
       // Format contact as link

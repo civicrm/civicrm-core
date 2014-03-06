@@ -3210,7 +3210,11 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
    * @param array|string $profiles - name of profile(s) to create links for
    * @param array $appendProfiles - name of profile(s) to append to each link
    */
-  static function getCreateLinks($profiles, $appendProfiles = array()) {
+  static function getCreateLinks($profiles = '', $appendProfiles = array()) {
+    // Default to contact profiles
+    if (!$profiles) {
+      $profiles = array('new_individual', 'new_organization', 'new_household');
+    }
     $profiles = (array) $profiles;
     $toGet = array_merge($profiles, (array) $appendProfiles);
     $retrieved = civicrm_api3('uf_group', 'get', array(
@@ -3223,8 +3227,9 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
         if (in_array($profile['name'], $profiles)) {
           $links[] = array(
             'label' => $profile['title'],
-            'url' => CRM_Utils_System::url('civicrm/profile/create', 'reset=1&context=dialog&&gid=' . $id),
-            'name' => $profile['name'],
+            'url' => CRM_Utils_System::url('civicrm/profile/create', "reset=1&context=dialog&gid=$id",
+              NULL, NULL, FALSE, NULL, FALSE) ,
+            'type' => ucfirst(str_replace('new_', '', $profile['name'])),
           );
         }
         else {
