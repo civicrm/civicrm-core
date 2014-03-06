@@ -51,7 +51,7 @@ class MappingField extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false, unsigned=true)
+   * @ORM\Column(name="id", type="integer", nullable=false)
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -84,7 +84,7 @@ class MappingField extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="column_number", type="integer", unsigned=true, nullable=true)
+   * @ORM\Column(name="column_number", type="integer", nullable=true)
    * 
    */
   private $columnNumber;
@@ -100,7 +100,7 @@ class MappingField extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="phone_type_id", type="integer", unsigned=true, nullable=true)
+   * @ORM\Column(name="phone_type_id", type="integer", nullable=true)
    * 
    */
   private $phoneTypeId;
@@ -108,7 +108,7 @@ class MappingField extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="im_provider_id", type="integer", unsigned=true, nullable=true)
+   * @ORM\Column(name="im_provider_id", type="integer", nullable=true)
    * 
    */
   private $imProviderId;
@@ -116,7 +116,7 @@ class MappingField extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="website_type_id", type="integer", unsigned=true, nullable=true)
+   * @ORM\Column(name="website_type_id", type="integer", nullable=true)
    * 
    */
   private $websiteTypeId;
@@ -140,7 +140,7 @@ class MappingField extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="grouping", type="integer", unsigned=true, nullable=false)
+   * @ORM\Column(name="grouping", type="integer", nullable=false)
    * 
    */
   private $grouping = '1';

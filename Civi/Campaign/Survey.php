@@ -51,7 +51,7 @@ class Survey extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false, unsigned=true)
+   * @ORM\Column(name="id", type="integer", nullable=false)
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -76,7 +76,7 @@ class Survey extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="activity_type_id", type="integer", unsigned=true, nullable=false)
+   * @ORM\Column(name="activity_type_id", type="integer", nullable=false)
    * 
    */
   private $activityTypeId = 'NULL';
@@ -100,7 +100,7 @@ class Survey extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="release_frequency", type="integer", unsigned=true, nullable=false)
+   * @ORM\Column(name="release_frequency", type="integer", nullable=false)
    * 
    */
   private $releaseFrequency = 'NULL';
@@ -108,7 +108,7 @@ class Survey extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="max_number_of_contacts", type="integer", unsigned=true, nullable=false)
+   * @ORM\Column(name="max_number_of_contacts", type="integer", nullable=false)
    * 
    */
   private $maxNumberOfContacts = 'NULL';
@@ -116,7 +116,7 @@ class Survey extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="default_number_of_contacts", type="integer", unsigned=true, nullable=false)
+   * @ORM\Column(name="default_number_of_contacts", type="integer", nullable=false)
    * 
    */
   private $defaultNumberOfContacts = 'NULL';
@@ -172,7 +172,7 @@ class Survey extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="result_id", type="integer", unsigned=true, nullable=false)
+   * @ORM\Column(name="result_id", type="integer", nullable=false)
    * 
    */
   private $resultId = 'NULL';

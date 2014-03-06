@@ -51,7 +51,7 @@ class ActionSchedule extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false, unsigned=true)
+   * @ORM\Column(name="id", type="integer", nullable=false)
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -108,7 +108,7 @@ class ActionSchedule extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="start_action_offset", type="integer", unsigned=true, nullable=true)
+   * @ORM\Column(name="start_action_offset", type="integer", nullable=true)
    * 
    */
   private $startActionOffset;
@@ -156,7 +156,7 @@ class ActionSchedule extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="repetition_frequency_interval", type="integer", unsigned=true, nullable=true)
+   * @ORM\Column(name="repetition_frequency_interval", type="integer", nullable=true)
    * 
    */
   private $repetitionFrequencyInterval;
@@ -172,7 +172,7 @@ class ActionSchedule extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="end_frequency_interval", type="integer", unsigned=true, nullable=true)
+   * @ORM\Column(name="end_frequency_interval", type="integer", nullable=true)
    * 
    */
   private $endFrequencyInterval;

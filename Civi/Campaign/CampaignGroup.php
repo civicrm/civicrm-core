@@ -51,7 +51,7 @@ class CampaignGroup extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false, unsigned=true)
+   * @ORM\Column(name="id", type="integer", nullable=false)
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -84,7 +84,7 @@ class CampaignGroup extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="entity_id", type="integer", unsigned=true, nullable=false)
+   * @ORM\Column(name="entity_id", type="integer", nullable=false)
    * 
    */
   private $entityId = 'NULL';

@@ -51,7 +51,7 @@ class OptionValue extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false, unsigned=true)
+   * @ORM\Column(name="id", type="integer", nullable=false)
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -100,7 +100,7 @@ class OptionValue extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="filter", type="integer", unsigned=true, nullable=true)
+   * @ORM\Column(name="filter", type="integer", nullable=true)
    * 
    */
   private $filter;
@@ -116,7 +116,7 @@ class OptionValue extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="weight", type="integer", unsigned=true, nullable=true)
+   * @ORM\Column(name="weight", type="integer", nullable=true)
    * 
    */
   private $weight;
@@ -172,7 +172,7 @@ class OptionValue extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="visibility_id", type="integer", unsigned=true, nullable=false)
+   * @ORM\Column(name="visibility_id", type="integer", nullable=false)
    * 
    */
   private $visibilityId = 'NULL';

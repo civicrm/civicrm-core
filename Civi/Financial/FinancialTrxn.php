@@ -51,7 +51,7 @@ class FinancialTrxn extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false, unsigned=true)
+   * @ORM\Column(name="id", type="integer", nullable=false)
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -132,7 +132,7 @@ class FinancialTrxn extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="status_id", type="integer", unsigned=true, nullable=true)
+   * @ORM\Column(name="status_id", type="integer", nullable=true)
    * 
    */
   private $statusId;
@@ -148,7 +148,7 @@ class FinancialTrxn extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="payment_instrument_id", type="integer", unsigned=true, nullable=true)
+   * @ORM\Column(name="payment_instrument_id", type="integer", nullable=true)
    * 
    */
   private $paymentInstrumentId;

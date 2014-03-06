@@ -51,7 +51,7 @@ class Batch extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false, unsigned=true)
+   * @ORM\Column(name="id", type="integer", nullable=false)
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -124,7 +124,7 @@ class Batch extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="status_id", type="integer", unsigned=true, nullable=true)
+   * @ORM\Column(name="status_id", type="integer", nullable=true)
    * 
    */
   private $statusId;
@@ -132,7 +132,7 @@ class Batch extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="type_id", type="integer", unsigned=true, nullable=true)
+   * @ORM\Column(name="type_id", type="integer", nullable=true)
    * 
    */
   private $typeId;
@@ -140,7 +140,7 @@ class Batch extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="mode_id", type="integer", unsigned=true, nullable=true)
+   * @ORM\Column(name="mode_id", type="integer", nullable=true)
    * 
    */
   private $modeId;
@@ -156,7 +156,7 @@ class Batch extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="item_count", type="integer", unsigned=true, nullable=true)
+   * @ORM\Column(name="item_count", type="integer", nullable=true)
    * 
    */
   private $itemCount;
@@ -164,7 +164,7 @@ class Batch extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="payment_instrument_id", type="integer", unsigned=true, nullable=true)
+   * @ORM\Column(name="payment_instrument_id", type="integer", nullable=true)
    * 
    */
   private $paymentInstrumentId;

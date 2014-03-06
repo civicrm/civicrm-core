@@ -51,7 +51,7 @@ class IM extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false, unsigned=true)
+   * @ORM\Column(name="id", type="integer", nullable=false)
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -68,7 +68,7 @@ class IM extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="location_type_id", type="integer", unsigned=true, nullable=true)
+   * @ORM\Column(name="location_type_id", type="integer", nullable=true)
    * 
    */
   private $locationTypeId;
@@ -84,7 +84,7 @@ class IM extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="provider_id", type="integer", unsigned=true, nullable=true)
+   * @ORM\Column(name="provider_id", type="integer", nullable=true)
    * 
    */
   private $providerId;

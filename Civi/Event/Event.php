@@ -51,7 +51,7 @@ class Event extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false, unsigned=true)
+   * @ORM\Column(name="id", type="integer", nullable=false)
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -84,7 +84,7 @@ class Event extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="event_type_id", type="integer", unsigned=true, nullable=false)
+   * @ORM\Column(name="event_type_id", type="integer", nullable=false)
    * 
    */
   private $eventTypeId = '0';
@@ -92,7 +92,7 @@ class Event extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="participant_listing_id", type="integer", unsigned=true, nullable=false)
+   * @ORM\Column(name="participant_listing_id", type="integer", nullable=false)
    * 
    */
   private $participantListingId = '0';
@@ -156,7 +156,7 @@ class Event extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="max_participants", type="integer", unsigned=true, nullable=false)
+   * @ORM\Column(name="max_participants", type="integer", nullable=false)
    * 
    */
   private $maxParticipants = 'NULL';
@@ -180,7 +180,7 @@ class Event extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="financial_type_id", type="integer", unsigned=true, nullable=false)
+   * @ORM\Column(name="financial_type_id", type="integer", nullable=false)
    * 
    */
   private $financialTypeId = 'NULL';
@@ -236,7 +236,7 @@ class Event extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="default_role_id", type="integer", unsigned=true, nullable=false)
+   * @ORM\Column(name="default_role_id", type="integer", nullable=false)
    * 
    */
   private $defaultRoleId = '1';
@@ -332,7 +332,7 @@ class Event extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="default_fee_id", type="integer", unsigned=true, nullable=true)
+   * @ORM\Column(name="default_fee_id", type="integer", nullable=true)
    * 
    */
   private $defaultFeeId;
@@ -340,7 +340,7 @@ class Event extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="default_discount_fee_id", type="integer", unsigned=true, nullable=true)
+   * @ORM\Column(name="default_discount_fee_id", type="integer", nullable=true)
    * 
    */
   private $defaultDiscountFeeId;
@@ -460,7 +460,7 @@ class Event extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="expiration_time", type="integer", unsigned=true, nullable=true)
+   * @ORM\Column(name="expiration_time", type="integer", nullable=true)
    * 
    */
   private $expirationTime;
@@ -540,7 +540,7 @@ class Event extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="parent_event_id", type="integer", unsigned=true, nullable=false)
+   * @ORM\Column(name="parent_event_id", type="integer", nullable=false)
    * 
    */
   private $parentEventId = 'NULL';
@@ -548,7 +548,7 @@ class Event extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="slot_label_id", type="integer", unsigned=true, nullable=false)
+   * @ORM\Column(name="slot_label_id", type="integer", nullable=false)
    * 
    */
   private $slotLabelId = 'NULL';

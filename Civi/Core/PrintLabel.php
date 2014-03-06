@@ -51,7 +51,7 @@ class PrintLabel extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false, unsigned=true)
+   * @ORM\Column(name="id", type="integer", nullable=false)
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -92,7 +92,7 @@ class PrintLabel extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="label_type_id", type="integer", unsigned=true, nullable=true)
+   * @ORM\Column(name="label_type_id", type="integer", nullable=true)
    * 
    */
   private $labelTypeId;

@@ -51,7 +51,7 @@ class Timezone extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false, unsigned=true)
+   * @ORM\Column(name="id", type="integer", nullable=false)
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -84,7 +84,7 @@ class Timezone extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="offset", type="integer", unsigned=true, nullable=true)
+   * @ORM\Column(name="offset", type="integer", nullable=true)
    * 
    */
   private $offset;

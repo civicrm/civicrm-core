@@ -51,7 +51,7 @@ class PriceField extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false, unsigned=true)
+   * @ORM\Column(name="id", type="integer", nullable=false)
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -116,7 +116,7 @@ class PriceField extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="weight", type="integer", unsigned=true, nullable=false)
+   * @ORM\Column(name="weight", type="integer", nullable=false)
    * 
    */
   private $weight = '1';
@@ -132,7 +132,7 @@ class PriceField extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="options_per_line", type="integer", unsigned=true, nullable=false)
+   * @ORM\Column(name="options_per_line", type="integer", nullable=false)
    * 
    */
   private $optionsPerLine = '1';
@@ -180,7 +180,7 @@ class PriceField extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="visibility_id", type="integer", unsigned=true, nullable=false)
+   * @ORM\Column(name="visibility_id", type="integer", nullable=false)
    * 
    */
   private $visibilityId = '1';

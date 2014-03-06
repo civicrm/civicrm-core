@@ -51,7 +51,7 @@ class Rule extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false, unsigned=true)
+   * @ORM\Column(name="id", type="integer", nullable=false)
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -84,7 +84,7 @@ class Rule extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="rule_length", type="integer", unsigned=true, nullable=true)
+   * @ORM\Column(name="rule_length", type="integer", nullable=true)
    * 
    */
   private $ruleLength;
@@ -92,7 +92,7 @@ class Rule extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="rule_weight", type="integer", unsigned=true, nullable=true)
+   * @ORM\Column(name="rule_weight", type="integer", nullable=true)
    * 
    */
   private $ruleWeight;

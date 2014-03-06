@@ -51,7 +51,7 @@ class CustomField extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false, unsigned=true)
+   * @ORM\Column(name="id", type="integer", nullable=false)
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -132,7 +132,7 @@ class CustomField extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="weight", type="integer", unsigned=true, nullable=false)
+   * @ORM\Column(name="weight", type="integer", nullable=false)
    * 
    */
   private $weight = '1';
@@ -196,7 +196,7 @@ class CustomField extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="options_per_line", type="integer", unsigned=true, nullable=true)
+   * @ORM\Column(name="options_per_line", type="integer", nullable=true)
    * 
    */
   private $optionsPerLine;
@@ -204,7 +204,7 @@ class CustomField extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="text_length", type="integer", unsigned=true, nullable=true)
+   * @ORM\Column(name="text_length", type="integer", nullable=true)
    * 
    */
   private $textLength;
@@ -212,7 +212,7 @@ class CustomField extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="start_date_years", type="integer", unsigned=true, nullable=true)
+   * @ORM\Column(name="start_date_years", type="integer", nullable=true)
    * 
    */
   private $startDateYears;
@@ -220,7 +220,7 @@ class CustomField extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="end_date_years", type="integer", unsigned=true, nullable=true)
+   * @ORM\Column(name="end_date_years", type="integer", nullable=true)
    * 
    */
   private $endDateYears;
@@ -236,7 +236,7 @@ class CustomField extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="time_format", type="integer", unsigned=true, nullable=true)
+   * @ORM\Column(name="time_format", type="integer", nullable=true)
    * 
    */
   private $timeFormat;
@@ -244,7 +244,7 @@ class CustomField extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="note_columns", type="integer", unsigned=true, nullable=true)
+   * @ORM\Column(name="note_columns", type="integer", nullable=true)
    * 
    */
   private $noteColumns;
@@ -252,7 +252,7 @@ class CustomField extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="note_rows", type="integer", unsigned=true, nullable=true)
+   * @ORM\Column(name="note_rows", type="integer", nullable=true)
    * 
    */
   private $noteRows;
@@ -268,7 +268,7 @@ class CustomField extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="option_group_id", type="integer", unsigned=true, nullable=true)
+   * @ORM\Column(name="option_group_id", type="integer", nullable=true)
    * 
    */
   private $optionGroupId;
