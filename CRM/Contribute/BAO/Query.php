@@ -796,10 +796,9 @@ class CRM_Contribute_BAO_Query {
         if (empty($queryParams[$id][0])) {
           continue;
         }
-        if ($queryParams[$id][0] == 'contribution_or_softcredits' && 
-          in_array($queryParams[$id][2], array("only_scredits", "both_related", "both"))) {
-            self::$_contribOrSoftCredit = $queryParams[$id][2];
-          }
+        if ($queryParams[$id][0] == 'contribution_or_softcredits') {
+          self::$_contribOrSoftCredit = $queryParams[$id][2];
+        }
       }
     }
     if (in_array(self::$_contribOrSoftCredit, 
