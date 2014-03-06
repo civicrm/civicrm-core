@@ -48,12 +48,16 @@
     <td {$valueStyle}>
       {$totalAmount|crmMoney}
     </td>
+  </tr>
+  <tr>
     <td {$labelStyle}>
       {ts}You Paid{/ts}
     </td>
     <td {$valueStyle}>
       {$totalPaid|crmMoney}
     </td>
+  </tr>
+  <tr>
     <td {$labelStyle}>
       {ts}Refund Amount{/ts}
     </td>
