@@ -143,7 +143,7 @@ class CRM_Contribute_BAO_Query {
 
     // LCD 716
     if (!empty($query->_returnProperties['contribution_soft_credit_name'])) {
-      $query->_select['contribution_soft_credit_name'] = "civicrm_contact_d.display_name as contribution_soft_credit_name";
+      $query->_select['contribution_soft_credit_name'] = "civicrm_contact_d.sort_name as contribution_soft_credit_name";
       $query->_element['contribution_soft_credit_name'] = 1;
 
       // also include contact id. Will help build hyperlinks
@@ -372,7 +372,7 @@ class CRM_Contribute_BAO_Query {
           $query->_tables['civicrm_contribution_soft'] = $query->_whereTables['civicrm_contribution_soft'] = 1;
         } else if ($value == 'both_related') {
           $query->_where[$grouping][] = "contribution_search_scredit_combined.filter_id IS NOT NULL";
-          $query->_qill[$grouping][] = ts('Contributions OR Soft Credits? - Both But Related');
+          $query->_qill[$grouping][] = ts('Contributions OR Soft Credits? - Soft Credits with related Hard Credit');
           $query->_tables['civicrm_contribution'] = $query->_whereTables['civicrm_contribution'] = 1;
           $query->_tables['civicrm_contribution_soft'] = $query->_whereTables['civicrm_contribution_soft'] = 1;
         } else if ($value == 'both') {
@@ -405,7 +405,7 @@ class CRM_Contribute_BAO_Query {
           $scTypes = $value;
           $names[] = $softCreditTypes[$value];
         }
-        $query->_qill[$grouping][]  = ts('Contribution Status %1', array(1 => $op)) . " '" . implode("' " . ts('or') . " '", $names) . "'";
+        $query->_qill[$grouping][]  = ts('Soft Credit Type %1', array(1 => $op)) . " '" . implode("' " . ts('or') . " '", $names) . "'";
         $query->_where[$grouping][] = 
           CRM_Contact_BAO_Query::buildClause(
             "civicrm_contribution_soft.soft_credit_type_id",
@@ -806,11 +806,14 @@ class CRM_Contribute_BAO_Query {
     if (in_array(self::$_contribOrSoftCredit, 
       array("only_scredits", "both_related", "both"))) {
         if (!$tempTableFilled) {
+          // build a temp table which is union of contributions and soft credits
+          // note: group-by in first part ensures uniqueness in counts
           $tempQuery = "
             CREATE TEMPORARY TABLE IF NOT EXISTS contribution_search_scredit_combined AS 
                SELECT con.id as id, con.contact_id, cso.id as filter_id, NULL as scredit_id 
                  FROM civicrm_contribution con
-            LEFT JOIN civicrm_contribution_soft cso ON con.id = cso.contribution_id 
+            LEFT JOIN civicrm_contribution_soft cso ON con.id = cso.contribution_id
+             GROUP BY id, contact_id, scredit_id
             UNION ALL
                SELECT scredit.contribution_id as id, scredit.contact_id, scredit.id as filter_id, scredit.id as scredit_id 
                  FROM civicrm_contribution_soft as scredit";
@@ -820,6 +823,18 @@ class CRM_Contribute_BAO_Query {
         return TRUE;
       }
     return FALSE;
+  }
+
+  static function softCreditReturnProperties($isExportMode = False) {
+    $properties = array(
+      'contribution_soft_credit_name'   => 1,
+      'contribution_soft_credit_amount' => 1,
+      'contribution_soft_credit_type'   => 1,
+    );
+    if ($isExportMode) {
+      $properties['contribution_soft_credit_contribution_id'] = 1;
+    }
+    return $properties;
   }
 
   static function defaultReturnProperties($mode, $includeCustomFields = TRUE) {
@@ -864,14 +879,7 @@ class CRM_Contribute_BAO_Query {
         'contribution_campaign_id' => 1,
       );
       if (self::isSoftCreditOptionEnabled()) {
-        $properties = array_merge(
-          $properties, array(
-            'contribution_soft_credit_name'   => 1,
-            'contribution_soft_credit_amount' => 1,
-            'contribution_soft_credit_type'   => 1,
-            'contribution_soft_credit_contribution_id' => 1,
-          )
-        );
+        $properties = array_merge($properties, self::softCreditReturnProperties());
       }
       if ($includeCustomFields) {
         // also get all the custom contribution properties
@@ -988,7 +996,7 @@ class CRM_Contribute_BAO_Query {
     $options = array(
       'only_contribs' => ts('Contributions Only'),
       'only_scredits' => ts('Soft Credits Only'),
-      'both_related'  => ts('Both But Related'),
+      'both_related'  => ts('Soft Credits with related Hard Credit'),
       'both'          => ts('Both'),
     );
     $form->add('select', 'contribution_or_softcredits', ts('Contributions OR Soft Credits?'), $options, FALSE, array('class' => "crm-select2"));
