@@ -55,6 +55,18 @@
 </tr>
 <tr>
   <td>
+    {$form.contribution_or_softcredits.label} <br />
+    {$form.contribution_or_softcredits.html}
+  </td>
+  <td>
+    <div class="float-left" id="contribution_soft_credit_type_wrapper">
+      {$form.contribution_soft_credit_type_id.label} <br />
+      {$form.contribution_soft_credit_type_id.html|crmAddClass:twenty}
+    </div>  
+  </td>
+</tr>
+<tr>
+  <td>
     <table style="width:auto">
       <tbody>
       <tr>
@@ -165,6 +177,15 @@ campaignTrClass='' campaignTdClass=''}
     else {
       cj('#contribution_check_number_wrapper').hide();
       cj('#contribution_check_number').val('');
+    }
+  }).change();
+  cj('#contribution_or_softcredits').change(function() {
+    if (cj(this).val() == 'only_contribs') {
+      cj('#contribution_soft_credit_type_wrapper').hide();
+      cj('#contribution_soft_credit_type_id').val('');
+    }
+    else {
+      cj('#contribution_soft_credit_type_wrapper').show();
     }
   }).change();
 </script>

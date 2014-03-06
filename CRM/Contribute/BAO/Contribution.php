@@ -592,8 +592,35 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
         )
       );
 
+      $softCreditFields = array(
+        'contribution_soft_credit_name' => array(
+          'name' => 'contribution_soft_credit_name',
+          'title' => 'Soft Credit For',
+          'where' => 'civicrm_contact_d.display_name',
+          'data_type' => CRM_Utils_Type::T_STRING
+        ),
+        'contribution_soft_credit_amount' => array(
+          'name' => 'contribution_soft_credit_amount',
+          'title' => 'Soft Credit Amount',
+          'where' => 'civicrm_contribution_soft.amount',
+          'data_type' => CRM_Utils_Type::T_MONEY
+        ),
+        'contribution_soft_credit_type' => array(
+          'name' => 'contribution_soft_credit_type',
+          'title' => 'Soft Credit Type',
+          'where' => 'contribution_softcredit_type.label',
+          'data_type' => CRM_Utils_Type::T_STRING
+        ),
+        'contribution_soft_credit_contribution_id' => array(
+          'name' => 'contribution_soft_credit_contribution_id',
+          'title' => 'Soft Credit For Contribution ID',
+          'where' => 'civicrm_contribution_soft.contribution_id',
+          'data_type' => CRM_Utils_Type::T_INT
+        ),
+      );
+
       $fields = array_merge($impFields, $typeField, $contributionStatus, $optionField, $expFieldProduct,
-        $expFieldsContrib, $contributionNote, $contributionRecurId, $extraFields, $financialAccount,
+        $expFieldsContrib, $contributionNote, $contributionRecurId, $extraFields, $softCreditFields, $financialAccount,
         CRM_Core_BAO_CustomField::getFieldsForImport('Contribution')
       );
 
@@ -857,26 +884,26 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = civicrm_contribution.conta
         'headerPattern' => '/^honor_type_label$/i',
         'where' => 'honor_type.label',
       ),
-      'soft_credit_name' => array(
-        'name' => 'soft_credit_name',
+      'contribution_soft_credit_name' => array(
+        'name' => 'contribution_soft_credit_name',
         'title' => 'Soft Credit Name',
         'headerPattern' => '/^soft_credit_name$/i',
         'where' => 'civicrm_contact_d.display_name',
       ),
-      'soft_credit_email' => array(
-        'name' => 'soft_credit_email',
+      'contribution_soft_credit_email' => array(
+        'name' => 'contribution_soft_credit_email',
         'title' => 'Soft Credit Email',
         'headerPattern' => '/^soft_credit_email$/i',
         'where' => 'soft_email.email',
       ),
-      'soft_credit_phone' => array(
-        'name' => 'soft_credit_phone',
+      'contribution_soft_credit_phone' => array(
+        'name' => 'contribution_soft_credit_phone',
         'title' => 'Soft Credit Phone',
         'headerPattern' => '/^soft_credit_phone$/i',
         'where' => 'soft_phone.phone',
       ),
-      'soft_credit_contact_id' => array(
-        'name' => 'soft_credit_contact_id',
+      'contribution_soft_credit_contact_id' => array(
+        'name' => 'contribution_soft_credit_contact_id',
         'title' => 'Soft Credit Contact ID',
         'headerPattern' => '/^soft_credit_contact_id$/i',
         'where' => 'civicrm_contribution_soft.contact_id',
