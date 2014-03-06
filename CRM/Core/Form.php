@@ -1270,15 +1270,6 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     if ($props['entity'] == 'contact' && isset($props['create']) && !(CRM_Core_Permission::check('edit all contacts') || CRM_Core_Permission::check('add contacts'))) {
       unset($props['create']);
     }
-    // Convenient shortcut to passing in array create links
-    if ($props['entity'] == 'contact' && isset($props['create']) && $props['create'] === TRUE) {
-      if (empty($props['api']['params']['contact_type'])) {
-        $props['create'] = CRM_Core_BAO_UFGroup::getCreateLinks(array('new_individual', 'new_organization', 'new_household'));
-      }
-      else {
-        $props['create'] = CRM_Core_BAO_UFGroup::getCreateLinks('new_' . strtolower($props['api']['params']['contact_type']));
-      }
-    }
 
     $props['placeholder'] = CRM_Utils_Array::value('placeholder', $props, $required ? ts('- select %1 -', array(1 => ts(str_replace('_', ' ', $props['entity'])))) : ts('- none -'));
 
