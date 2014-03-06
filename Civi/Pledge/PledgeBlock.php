@@ -51,7 +51,7 @@ class PledgeBlock extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false, unsigned=true)
+   * @ORM\Column(name="id", type="integer", nullable=false)
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -68,7 +68,7 @@ class PledgeBlock extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="entity_id", type="integer", unsigned=true, nullable=true)
+   * @ORM\Column(name="entity_id", type="integer", nullable=true)
    * 
    */
   private $entityId;
@@ -92,7 +92,7 @@ class PledgeBlock extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="max_reminders", type="integer", unsigned=true, nullable=false)
+   * @ORM\Column(name="max_reminders", type="integer", nullable=false)
    * 
    */
   private $maxReminders = '1';
@@ -100,7 +100,7 @@ class PledgeBlock extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="initial_reminder_day", type="integer", unsigned=true, nullable=false)
+   * @ORM\Column(name="initial_reminder_day", type="integer", nullable=false)
    * 
    */
   private $initialReminderDay = '5';
@@ -108,7 +108,7 @@ class PledgeBlock extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="additional_reminder_day", type="integer", unsigned=true, nullable=false)
+   * @ORM\Column(name="additional_reminder_day", type="integer", nullable=false)
    * 
    */
   private $additionalReminderDay = '5';

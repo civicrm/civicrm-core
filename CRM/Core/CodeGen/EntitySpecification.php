@@ -245,9 +245,6 @@ class CRM_Core_CodeGen_EntitySpecification {
       if ($field['phpType'] == 'string') {
         $field['columnInfo'] .= ', length=' . $field['length'];
       }
-      elseif ($field['phpType'] == 'integer') {
-        $field['columnInfo'] .= ', unsigned=true';
-      }
 
       if (isset($field['default'])) {
         $field['columnInfo'] .= ', nullable=false';

@@ -51,7 +51,7 @@ class PrevNextCache extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false, unsigned=true)
+   * @ORM\Column(name="id", type="integer", nullable=false)
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -68,7 +68,7 @@ class PrevNextCache extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="entity_id1", type="integer", unsigned=true, nullable=true)
+   * @ORM\Column(name="entity_id1", type="integer", nullable=true)
    * 
    */
   private $entityId1;
@@ -76,7 +76,7 @@ class PrevNextCache extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="entity_id2", type="integer", unsigned=true, nullable=true)
+   * @ORM\Column(name="entity_id2", type="integer", nullable=true)
    * 
    */
   private $entityId2;

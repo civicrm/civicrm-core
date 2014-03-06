@@ -51,7 +51,7 @@ class ContributionRecur extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false, unsigned=true)
+   * @ORM\Column(name="id", type="integer", nullable=false)
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -92,7 +92,7 @@ class ContributionRecur extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="frequency_interval", type="integer", unsigned=true, nullable=true)
+   * @ORM\Column(name="frequency_interval", type="integer", nullable=true)
    * 
    */
   private $frequencyInterval;
@@ -100,7 +100,7 @@ class ContributionRecur extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="installments", type="integer", unsigned=true, nullable=true)
+   * @ORM\Column(name="installments", type="integer", nullable=true)
    * 
    */
   private $installments;
@@ -172,7 +172,7 @@ class ContributionRecur extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="contribution_status_id", type="integer", unsigned=true, nullable=false)
+   * @ORM\Column(name="contribution_status_id", type="integer", nullable=false)
    * 
    */
   private $contributionStatusId = '1';
@@ -188,7 +188,7 @@ class ContributionRecur extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="cycle_day", type="integer", unsigned=true, nullable=false)
+   * @ORM\Column(name="cycle_day", type="integer", nullable=false)
    * 
    */
   private $cycleDay = '1';
@@ -204,7 +204,7 @@ class ContributionRecur extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="failure_count", type="integer", unsigned=true, nullable=false)
+   * @ORM\Column(name="failure_count", type="integer", nullable=false)
    * 
    */
   private $failureCount = '0';
@@ -244,7 +244,7 @@ class ContributionRecur extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="payment_instrument_id", type="integer", unsigned=true, nullable=true)
+   * @ORM\Column(name="payment_instrument_id", type="integer", nullable=true)
    * 
    */
   private $paymentInstrumentId;

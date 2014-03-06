@@ -51,7 +51,7 @@ class PCPBlock extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false, unsigned=true)
+   * @ORM\Column(name="id", type="integer", nullable=false)
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -68,7 +68,7 @@ class PCPBlock extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="entity_id", type="integer", unsigned=true, nullable=true)
+   * @ORM\Column(name="entity_id", type="integer", nullable=true)
    * 
    */
   private $entityId;
@@ -84,7 +84,7 @@ class PCPBlock extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="target_entity_id", type="integer", unsigned=true, nullable=true)
+   * @ORM\Column(name="target_entity_id", type="integer", nullable=true)
    * 
    */
   private $targetEntityId;
@@ -116,7 +116,7 @@ class PCPBlock extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="tellfriend_limit", type="integer", unsigned=true, nullable=false)
+   * @ORM\Column(name="tellfriend_limit", type="integer", nullable=false)
    * 
    */
   private $tellfriendLimit = 'NULL';

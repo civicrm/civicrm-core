@@ -51,7 +51,7 @@ class CustomGroup extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false, unsigned=true)
+   * @ORM\Column(name="id", type="integer", nullable=false)
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -84,7 +84,7 @@ class CustomGroup extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="extends_entity_column_id", type="integer", unsigned=true, nullable=false)
+   * @ORM\Column(name="extends_entity_column_id", type="integer", nullable=false)
    * 
    */
   private $extendsEntityColumnId = 'NULL';
@@ -108,7 +108,7 @@ class CustomGroup extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="collapse_display", type="integer", unsigned=true, nullable=false)
+   * @ORM\Column(name="collapse_display", type="integer", nullable=false)
    * 
    */
   private $collapseDisplay = '0';
@@ -132,7 +132,7 @@ class CustomGroup extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="weight", type="integer", unsigned=true, nullable=false)
+   * @ORM\Column(name="weight", type="integer", nullable=false)
    * 
    */
   private $weight = '1';
@@ -164,7 +164,7 @@ class CustomGroup extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="min_multiple", type="integer", unsigned=true, nullable=true)
+   * @ORM\Column(name="min_multiple", type="integer", nullable=true)
    * 
    */
   private $minMultiple;
@@ -172,7 +172,7 @@ class CustomGroup extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="max_multiple", type="integer", unsigned=true, nullable=true)
+   * @ORM\Column(name="max_multiple", type="integer", nullable=true)
    * 
    */
   private $maxMultiple;
@@ -180,7 +180,7 @@ class CustomGroup extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="collapse_adv_display", type="integer", unsigned=true, nullable=false)
+   * @ORM\Column(name="collapse_adv_display", type="integer", nullable=false)
    * 
    */
   private $collapseAdvDisplay = '0';

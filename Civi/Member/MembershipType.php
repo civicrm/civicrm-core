@@ -51,7 +51,7 @@ class MembershipType extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false, unsigned=true)
+   * @ORM\Column(name="id", type="integer", nullable=false)
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -116,7 +116,7 @@ class MembershipType extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="duration_interval", type="integer", unsigned=true, nullable=true)
+   * @ORM\Column(name="duration_interval", type="integer", nullable=true)
    * 
    */
   private $durationInterval;
@@ -132,7 +132,7 @@ class MembershipType extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="fixed_period_start_day", type="integer", unsigned=true, nullable=true)
+   * @ORM\Column(name="fixed_period_start_day", type="integer", nullable=true)
    * 
    */
   private $fixedPeriodStartDay;
@@ -140,7 +140,7 @@ class MembershipType extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="fixed_period_rollover_day", type="integer", unsigned=true, nullable=true)
+   * @ORM\Column(name="fixed_period_rollover_day", type="integer", nullable=true)
    * 
    */
   private $fixedPeriodRolloverDay;
@@ -164,7 +164,7 @@ class MembershipType extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="max_related", type="integer", unsigned=true, nullable=true)
+   * @ORM\Column(name="max_related", type="integer", nullable=true)
    * 
    */
   private $maxRelated;
@@ -180,7 +180,7 @@ class MembershipType extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="weight", type="integer", unsigned=true, nullable=true)
+   * @ORM\Column(name="weight", type="integer", nullable=true)
    * 
    */
   private $weight;

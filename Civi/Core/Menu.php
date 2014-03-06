@@ -51,7 +51,7 @@ class Menu extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false, unsigned=true)
+   * @ORM\Column(name="id", type="integer", nullable=false)
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -188,7 +188,7 @@ class Menu extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="weight", type="integer", unsigned=true, nullable=false)
+   * @ORM\Column(name="weight", type="integer", nullable=false)
    * 
    */
   private $weight = '1';
@@ -196,7 +196,7 @@ class Menu extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="type", type="integer", unsigned=true, nullable=false)
+   * @ORM\Column(name="type", type="integer", nullable=false)
    * 
    */
   private $type = '1';
@@ -204,7 +204,7 @@ class Menu extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="page_type", type="integer", unsigned=true, nullable=false)
+   * @ORM\Column(name="page_type", type="integer", nullable=false)
    * 
    */
   private $pageType = '1';
