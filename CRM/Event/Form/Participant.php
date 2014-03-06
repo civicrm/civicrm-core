@@ -841,20 +841,14 @@ SELECT civicrm_custom_group.name as name,
     $this->assign('notificationStatusIds', $notificationStatusIds);
 
     $this->_participantStatuses = CRM_Event_PseudoConstant::participantStatus(NULL, NULL, 'label');
-    $participantStatuses = $this->addSelect('status_id', $checkCancelledJs, TRUE);
+    $this->addSelect('status_id', $checkCancelledJs, TRUE);
+
     $enableCart = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::EVENT_PREFERENCES_NAME,
       'enable_cart'
     );
-    $pendingInCartStatusId  = CRM_Utils_Array::key( "Pending in cart" , $this->_participantStatuses );
-    if (!$enableCart) {
-      $statusOptions = & $participantStatuses->_options;
-      foreach($statusOptions as $key =>$option){
-        $status_id = $option['attr']['value'];
-        if ($status_id == $pendingInCartStatusId) {
-          unset($statusOptions[$key]);
-        }
-      }
-    }
+    $pendingInCartStatusId = array_search('Pending in cart', $participantStatusName);
+    $this->assign('pendingInCartStatusId', $pendingInCartStatusId);
+    $this->assign('enableCart', $enableCart);
 
     $this->addElement('checkbox', 'is_notify', ts('Send Notification'), NULL);
 
@@ -1062,7 +1056,9 @@ SELECT civicrm_custom_group.name as name,
 
         $params['fee_level'] = $params['amount_level'];
         $contributionParams['total_amount'] = $params['amount'];
-        if ($this->_quickConfig && !empty($params['total_amount']) && $params['status_id'] != array_search('Partially paid', $participantStatus)) {
+        if ($this->_quickConfig && !empty($params['total_amount']) &&
+          ($params['status_id'] != array_search('Partially paid', $participantStatus) &&
+            $params['status_id'] != array_search('Pending refund', $participantStatus))) {
           $params['fee_amount'] = $params['total_amount'];
         } else {
           //fix for CRM-3086
@@ -1415,6 +1411,10 @@ SELECT civicrm_custom_group.name as name,
             $contributionParams['partial_amount_pay'] = $params['total_amount'];
           }
         }
+        elseif ($params['status_id'] == array_search('Pending refund', $participantStatus)) {
+          $totalPaid = $params['total_amount'];
+          $updatedAmt = $amountOwed;
+        }
         if ($this->_single) {
           if (empty($ids)) {
             $ids = array();
@@ -1464,7 +1464,9 @@ SELECT civicrm_custom_group.name as name,
           if (is_array($value) && $value != 'skip') {
             foreach ($value as $lineKey => $line) {
               //10117 update the line items for participants if contribution amount is recorded
-              if ($this->_quickConfig && !empty($params['total_amount']) && $params['status_id'] != array_search('Partially paid', $participantStatus)
+              if ($this->_quickConfig && !empty($params['total_amount']) &&
+                ($params['status_id'] != array_search('Partially paid', $participantStatus) &&
+                  $params['status_id'] != array_search('Pending refund', $participantStatus))
               ) {
                 $line['unit_price'] = $line['line_total'] = $params['total_amount'];
               }
@@ -1476,6 +1478,13 @@ SELECT civicrm_custom_group.name as name,
       }
     }
 
+    // record adjusted trxn entry for refund case
+    if ($this->_isPaidEvent && $params['status_id'] == array_search('Pending refund', $participantStatus) &&
+      !empty($totalPaid) && !empty($updatedAmt)) {
+      $contributionDetail = $contributions[0];
+      $contributionId = $contributionDetail->id;
+      CRM_Event_BAO_Participant::recordAdjustedAmt($updatedAmt, $totalPaid, $contributionId);
+    }
     $updateStatusMsg = NULL;
     //send mail when participant status changed, CRM-4326
     if ($this->_id && $this->_statusId &&
@@ -1752,4 +1761,3 @@ SELECT civicrm_custom_group.name as name,
     }
   }
 }
-

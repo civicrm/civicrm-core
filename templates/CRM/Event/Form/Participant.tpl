@@ -344,6 +344,10 @@
 
         var $form = $('form#{/literal}{$form.formName}{literal}');
 
+        // don't show cart related statuses if it's disabled
+        var pendingInCartStatusId = {/literal}{$pendingInCartStatusId}{literal};
+        $("#status_id option[value='" + pendingInCartStatusId + "']").remove();
+
         // Handle event selection
         $('#event_id', $form).change(function() {
           var eventId = $(this).val();
