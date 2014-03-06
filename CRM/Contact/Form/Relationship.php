@@ -419,6 +419,7 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
 
     // Boolean fields (checkboxes) are nonexistant when submitted if unchecked - cast them to boolean
     // FIXME: Dear Quickform, this sucks.
+    $params['is_current_employer'] = !empty($params['is_current_employer']);
     $params['is_active'] = !empty($params['is_active']);
     $params['is_permission_a_b'] = !empty($params['is_permission_a_b']);
     $params['is_permission_b_a'] = !empty($params['is_permission_b_a']);
