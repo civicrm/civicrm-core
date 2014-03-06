@@ -902,8 +902,10 @@ CRM.validate = CRM.validate || {
       $('<div id="'+ settings.target.substring(1) +'"><div class="crm-loading-element">' + ts('Loading') + '...</div></div>').dialog(settings.dialog);
     }
     if (settings.dialog && !settings.dialog.title) {
-      $(settings.target).on('crmLoad', function(event, data) {
-        data.title && $(this).dialog('option', 'title', data.title);
+      $(settings.target).on('crmLoad', function(e, data) {
+        if (e.target === $(settings.target)[0] && data && data.title) {
+          $(this).dialog('option', 'title', data.title);
+        }
       });
     }
     $(settings.target).crmSnippet(settings).crmSnippet('refresh');
