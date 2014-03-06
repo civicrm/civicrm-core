@@ -28,7 +28,7 @@
 {/if}
 
 {strip}
-<table class="selector">
+<table class="selector row-highlight">
 <thead class="sticky">
 {if ! $single and $context eq 'Search' }
   <th scope="col" title="Select Rows">{$form.toggleSelect.html}</th>
