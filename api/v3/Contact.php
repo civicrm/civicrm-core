@@ -928,7 +928,9 @@ function _civicrm_api3_contact_getlist_params(&$request) {
   $request['params']['return'] = array_unique(array_merge($list, $request['extra']));
   $request['params']['options']['sort'] = 'sort_name';
   // Contact api doesn't support array(LIKE => 'foo') syntax
-  $request['params'][$request['search_field']] = $request['input'];
+  if (!empty($request['input'])) {
+    $request['params'][$request['search_field']] = $request['input'];
+  }
 }
 
 /**
