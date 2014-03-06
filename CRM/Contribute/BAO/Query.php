@@ -665,6 +665,7 @@ class CRM_Contribute_BAO_Query {
         // switch the from table if its only soft credit search
         $from  = " $side JOIN contribution_search_scredit_combined ON contribution_search_scredit_combined.contact_id = contact_a.id ";
         $from .= " $side JOIN civicrm_contribution ON civicrm_contribution.id = contribution_search_scredit_combined.id ";
+        $from .= " $side JOIN civicrm_contribution_soft ON civicrm_contribution_soft.id = contribution_search_scredit_combined.scredit_id";
       }
       break;
 
@@ -739,9 +740,7 @@ class CRM_Contribute_BAO_Query {
         break;
 
       case 'civicrm_contribution_soft':
-        if (in_array(self::$_contribOrSoftCredit, array("only_scredits", "both_related", "both"))) {
-          $from = " $side JOIN civicrm_contribution_soft ON civicrm_contribution_soft.id = contribution_search_scredit_combined.scredit_id";
-        } else {
+        if (!in_array(self::$_contribOrSoftCredit, array("only_scredits", "both_related", "both"))) {
           $from = " $side JOIN civicrm_contribution_soft ON civicrm_contribution_soft.contribution_id = civicrm_contribution.id";
         }
         break;
