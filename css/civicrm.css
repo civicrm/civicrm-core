@@ -2518,14 +2518,14 @@ div.grippie {
   background-position: -192px -128px;
 }
 
-.crm-container .new_individual-icon,
+.crm-container .Individual-profile-icon,
 .crm-container .user-record-icon {
   background-position: -144px -96px;
 }
-.crm-container .new_household-icon {
+.crm-container .Household-profile-icon {
   background-position: 0 -112px;
 }
-.crm-container .new_organization-icon {
+.crm-container .Organization-profile-icon {
   background-position: -112px -112px;
 }
 .crm-container .inform-icon {

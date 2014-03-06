@@ -540,6 +540,11 @@ class CRM_Core_Resources {
       $.fn.select2.defaults.formatSearching = " . json_encode(ts("Searching...")) . ";
       $.fn.select2.defaults.formatInputTooShort = function(){return cj(this).data('api-entity') == 'contact' ? $contactSearch : $otherSearch};
     ";
+
+    // Contact create profiles with localized names
+    if (CRM_Core_Permission::check('edit all contacts') || CRM_Core_Permission::check('add contacts')) {
+      $this->addSetting(array('profile' => array('contactCreate' => CRM_Core_BAO_UFGroup::getCreateLinks())));
+    }
   }
 
   /**

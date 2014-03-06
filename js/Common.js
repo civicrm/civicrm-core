@@ -315,6 +315,7 @@ CRM.validate = CRM.validate || {
       $el.data('api-entity', entity);
       $el.data('select-params', $.extend({}, $el.data('select-params') || {}, options.select));
       $el.data('api-params', $.extend({}, $el.data('api-params') || {}, options.api));
+      $el.data('create-links', options.create || $el.data('create-links'));
       $el.addClass('crm-ajax-select crm-' + entity + '-ref');
       var settings = {
         // Use select2 ajax helper instead of CRM.api because it provides more value
@@ -335,7 +336,7 @@ CRM.validate = CRM.validate || {
           }
         },
         minimumInputLength: 1,
-        formatResult: CRM.utils.formatSelect2Result,
+        formatResult: formatSelect2Result,
         formatSelection: function(row) {
           return row.label;
         },
@@ -363,14 +364,14 @@ CRM.validate = CRM.validate || {
       if ($el.data('create-links')) {
         selectParams.formatInputTooShort = function() {
           var txt = $el.data('select-params').formatInputTooShort || $.fn.select2.defaults.formatInputTooShort.call(this);
-          if ($el.data('create-links').length) {
-            txt += ' ' + ts('or') + '<br />' + CRM.utils.formatSelect2CreateLinks($el);
+          if ($el.data('create-links')) {
+            txt += ' ' + ts('or') + '<br />' + formatSelect2CreateLinks($el);
           }
           return txt;
         };
         selectParams.formatNoMatches = function() {
           var txt = $el.data('select-params').formatNoMatches || $.fn.select2.defaults.formatNoMatches;
-          return txt + '<br />' + CRM.utils.formatSelect2CreateLinks($el);
+          return txt + '<br />' + formatSelect2CreateLinks($el);
         };
         $el.off('.createLinks').on('select2-open.createLinks', function() {
           var $el = $(this);
@@ -397,7 +398,7 @@ CRM.validate = CRM.validate || {
     });
   };
 
-  CRM.utils.formatSelect2Result = function(row) {
+  function formatSelect2Result(row) {
     var markup = '<div class="crm-select2-row">';
     if (row.image !== undefined) {
       markup += '<div class="crm-select2-image"><img src="' + row.image + '"/></div>';
@@ -412,19 +413,26 @@ CRM.validate = CRM.validate || {
     });
     markup += '</div></div></div>';
     return markup;
-  };
-  
-  CRM.utils.formatSelect2CreateLinks = function($el) {
+  }
+
+  function formatSelect2CreateLinks($el) {
+    var
+      createLinks = $el.data('create-links'),
+      api = $el.data('api-params') || {},
+      type = api.params ? api.params.contact_type : null;
+    if (createLinks === true) {
+      createLinks = type ? _.where(CRM.profile.contactCreate, {type: type}) : CRM.profile.contactCreate;
+    }
     var markup = '';
-    $.each($el.data('create-links'), function(k, link) {
+    _.each(createLinks, function(link) {
       markup += ' <a class="crm-add-entity crm-hover-button" href="' + link.url + '">';
-      if (link.name) {
-        markup += '<span class="icon ' + link.name + '-icon"></span> ';
+      if (link.type) {
+        markup += '<span class="icon ' + link.type + '-profile-icon"></span> ';
       }
       markup += link.label + '</a>';
     });
     return markup;
-  };
+  }
 
   // Initialize widgets
   $(document).on('crmLoad', function(e) {
