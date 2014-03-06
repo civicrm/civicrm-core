@@ -47,7 +47,7 @@
     {include file="CRM/common/pagerAToZ.tpl"}
 
     {strip}
-    <table class="selector">
+    <table class="selector row-highlight">
       <thead class="sticky">
       {foreach from=$columnHeaders item=header}
         <th>
