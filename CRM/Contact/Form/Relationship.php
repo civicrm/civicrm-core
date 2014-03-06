@@ -482,7 +482,7 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
     }
 
     // Save notes
-    if ($this->action & CRM_Core_Action::UPDATE || $params['note']) {
+    if ($this->_action & CRM_Core_Action::UPDATE || $params['note']) {
       foreach ($relationshipIds as $id) {
         $noteParams = array(
           'entity_id' => $id,
