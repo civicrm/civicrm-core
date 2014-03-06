@@ -275,8 +275,7 @@ CRM.validate = CRM.validate || {
   };
 
   /**
-   * Select2 api leaves something to be desired. To alter options on-the-fly often requires re-rendering the whole thing.
-   * So making this function public in case anyone needs it.
+   * Wrapper around select2 initialization function; supplies defaults
    * @param options object
    */
   $.fn.crmSelect2 = function(options) {
