@@ -1829,10 +1829,21 @@ WHERE (li.entity_table = 'civicrm_participant' AND li.entity_id = {$participantI
       // ensure entity_financial_trxn table has a linking of it.
       $prevItem = CRM_Financial_BAO_FinancialItem::add($lineObj, $contributionObj);
     }
+
     // insert new 'adjusted amount' transaction entry and update contribution entry.
     // ensure entity_financial_trxn table has a linking of it.
     $updatedAmount = $params['amount'];
+    self::recordAdjustedAmt($updatedAmount, $paidAmount, $contributionId);
+
+    //activity creation
+    self::addActivityForSelection($participantId, 'Change Registration');
+  }
+
+  static function recordAdjustedAmt($updatedAmount, $paidAmount, $contributionId) {
     $balanceAmt = $updatedAmount - $paidAmount;
+    $contributionStatuses = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
+    $partiallyPaidStatusId = array_search('Partially paid', $contributionStatuses);
+    $pendngRefundStatusId = array_search('Pending refund', $contributionStatuses);
 
     if ($balanceAmt) {
       if ($balanceAmt > 0) {
@@ -1899,6 +1910,20 @@ WHERE (li.entity_table = 'civicrm_participant' AND li.entity_id = {$participantI
       elseif ($updatedContribution->contribution_status_id == array_search('Partially paid', $contributionStatuses)) {
         $itemStatus = array_search('Partially paid', $financialItemStatus);
       }
+
+      $financialAccountId = NULL;
+      if ($adjustPaymentLine->financial_type_id) {
+        $searchParams = array(
+          'entity_table'         => 'civicrm_financial_type',
+          'entity_id'            => $adjustPaymentLine->financial_type_id,
+          'account_relationship' => 1
+        );
+
+        $result = array();
+        CRM_Financial_BAO_FinancialTypeAccount::retrieve($searchParams, $result);
+        $financialAccountId = CRM_Utils_Array::value('financial_account_id', $result);
+      }
+
       $params = array(
         'transaction_date'  => CRM_Utils_Date::isoToMysql($updatedContribution->receive_date),
         'contact_id'        => $updatedContribution->contact_id,
@@ -1908,12 +1933,10 @@ WHERE (li.entity_table = 'civicrm_participant' AND li.entity_id = {$participantI
         'entity_id'         => $adjustPaymentLine->id,
         'description'       => ( $adjustPaymentLine->qty != 1 ? $lineItem->qty . ' of ' : ''). ' ' . $adjustPaymentLine->label,
         'status_id'         => $itemStatus,
-        'financial_account_id' => $prevItem->financial_account_id
+        'financial_account_id' => $financialAccountId
       );
       CRM_Financial_BAO_FinancialItem::create($params, NULL, array('id' => $adjustedTrxn->id));
     }
-    //activity creation$contributionStatuses
-    self::addActivityForSelection($participantId, 'Change Registration');
   }
 
   static function addActivityForSelection($participantId, $activityType) {
