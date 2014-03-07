@@ -156,6 +156,7 @@ class CRM_Campaign_Page_SurveyType extends CRM_Core_Page_Basic {
    */
   function browse() {
     CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'js/crm.livePage.js');
+    $this->assign('includeWysiwygEditor', TRUE);
 
     $campaingCompId = CRM_Core_Component::getComponentID('CiviCampaign');
     $groupParams    = array('name' => $this->_gName);
