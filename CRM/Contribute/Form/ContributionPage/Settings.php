@@ -205,16 +205,13 @@ class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_
 
     $this->add('textarea', 'honor_block_text', ts('Honoree Introductory Message'), array('rows' => 2, 'cols' => 50));
 
-    $softCreditTypes = &$this->add('select', 'soft_credit_types',
-      ts('Honor Types'),
-      CRM_Core_OptionGroup::values("soft_credit_type", FALSE),
-      FALSE,
-      array(
-        'id' => 'soft_credit_types',
-        'multiple' => 'multiple',
-        'class' => 'crm-select2',
-      )
-    );
+    $this->addSelect('soft_credit_types', array(
+      'label' => ts('Honor Types'),
+      'entity' => 'ContributionSoft',
+      'field' => 'soft_credit_type_id',
+      'multiple' => TRUE,
+      'class' => 'huge'
+    ));
 
     $entities = array(
       array(
