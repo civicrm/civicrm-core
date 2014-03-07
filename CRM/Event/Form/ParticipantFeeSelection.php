@@ -237,6 +237,13 @@ class CRM_Event_Form_ParticipantFeeSelection extends CRM_Core_Form {
   }
 
   function emailReceipt(&$params) {
+    $updatedLineItem = CRM_Price_BAO_LineItem::getLineItems($this->_participantId, 'participant');
+    $lineItem = array();
+    if ($updatedLineItem) {
+      $lineItem[] = $updatedLineItem;
+    }
+    $this->assign('lineItem', empty($lineItem) ? FALSE : $lineItem);
+
     // offline receipt sending
     if (array_key_exists($params['from_email_address'], $this->_fromEmails['from_email_id'])) {
       $receiptFrom = $params['from_email_address'];
