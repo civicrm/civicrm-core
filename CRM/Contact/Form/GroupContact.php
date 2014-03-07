@@ -102,7 +102,7 @@ class CRM_Contact_Form_GroupContact extends CRM_Core_Form {
         $msg = ts('Add to a group');
       }
 
-      $this->add('select', 'group_id', $msg, $groupSelect, TRUE);
+      $this->add('select', 'group_id', $msg, $groupSelect, TRUE, array('class' => 'crm-select2'));
 
       $this->addButtons(array(
           array(
