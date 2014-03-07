@@ -2457,6 +2457,8 @@ div.grippie {
 .crm-container .button .icon,
 .crm-container .crm-button .icon,
 .crm-accordion-header .icon {
+  position: relative;
+  top: -2px;
   background-image: url("../i/icons/jquery-ui-FFFFFF.png");
 }
 .crm-container .button:hover .icon,
@@ -2469,10 +2471,8 @@ div.grippie {
 }
 
 .crm-container .dark-icon {
-  background-image: url("../packages/jquery/jquery-ui/css/black-tie/images/ui-icons_222222_256x240.png")}
-.crm-container .red-icon {
-  background-image: url("../i/icons/jquery-ui-8A1F11.png")}
-
+  background-image: url("../packages/jquery/jquery-ui/css/black-tie/images/ui-icons_222222_256x240.png")
+}
 .crm-container .edit-icon {
   background-position: -64px -112px;
 }
@@ -2494,8 +2494,9 @@ div.grippie {
 .crm-container .details-icon {
   background-position: -128px -112px;
 }
+.crm-container .red-icon,
 .crm-container .button:hover .delete-icon {
-  background-image: url("../i/icons/jquery-ui-8A1F11.png")!important;
+  background-image: url("../i/icons/jquery-ui-8A1F11.png");
 }
 
 .crm-container .restore-icon {
@@ -2656,6 +2657,8 @@ div.grippie {
 }
 .crm-container .crm-accordion-header a.crm-hover-button {
   opacity: 1;
+  position: relative;
+  top: -4px;
 }
 .crm-container a.crm-hover-button:hover,
 .crm-container a.crm-hover-button:active {

@@ -360,15 +360,15 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
       $contactField->freeze();
     }
 
-    $this->add('checkbox', 'is_current_employer', $this->_contactType == 'Organization' ? ts('Current Employee') : ts('Current Employer'));
+    $this->add('advcheckbox', 'is_current_employer', $this->_contactType == 'Organization' ? ts('Current Employee') : ts('Current Employer'));
 
     $this->addDate('start_date', ts('Start Date'), FALSE, array('formatType' => 'searchDate'));
     $this->addDate('end_date', ts('End Date'), FALSE, array('formatType' => 'searchDate'));
 
-    $this->add('checkbox', 'is_active', ts('Enabled?'));
+    $this->add('advcheckbox', 'is_active', ts('Enabled?'));
 
-    $this->add('checkbox', 'is_permission_a_b');
-    $this->add('checkbox', 'is_permission_b_a');
+    $this->add('advcheckbox', 'is_permission_a_b');
+    $this->add('advcheckbox', 'is_permission_b_a');
 
     $this->add('text', 'description', ts('Description'), CRM_Core_DAO::getAttribute('CRM_Contact_DAO_Relationship', 'description'));
 
@@ -417,30 +417,24 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
 
     $ids = array('contact' => $this->_contactId);
 
-    // Boolean fields (checkboxes) are nonexistant when submitted if unchecked - cast them to boolean
-    // FIXME: Dear Quickform, this sucks.
-    $params['is_current_employer'] = !empty($params['is_current_employer']);
-    $params['is_active'] = !empty($params['is_active']);
-    $params['is_permission_a_b'] = !empty($params['is_permission_a_b']);
-    $params['is_permission_b_a'] = !empty($params['is_permission_b_a']);
-
-
     $relationshipTypeId = str_replace(array('_', 'a', 'b'), '', $params['relationship_type_id']);
+
+    // Update mode (always single)
     if ($this->_action & CRM_Core_Action::UPDATE) {
       $ids['relationship'] = $this->_relationshipId;
       $relation = CRM_Contact_BAO_Relationship::getContactIds($this->_relationshipId);
       $ids['contactTarget'] = ($relation->contact_id_a == $this->_contactId) ? $relation->contact_id_b : $relation->contact_id_a;
 
-      // if relationship type changes, relationship is disabled, or "current employer" is unchecked,
-      // clear the current employer. CRM-3235.
-      $isDisabled = !$params['is_active'] || !$params['is_current_employer'];
-      $relChanged = $relationshipTypeId != $this->_values['relationship_type_id'];
-      if ($this->_isCurrentEmployer && ($isDisabled || $relChanged)) {
-        CRM_Contact_BAO_Contact_Utils::clearCurrentEmployer($this->_values['contact_id_a']);
+      if ($this->_isCurrentEmployer) {
+        // if relationship type changes, relationship is disabled, or "current employer" is unchecked,
+        // clear the current employer. CRM-3235.
+        $relChanged = $relationshipTypeId != $this->_values['relationship_type_id'];
+        if (!$params['is_active'] || !$params['is_current_employer'] || $relChanged) {
+          CRM_Contact_BAO_Contact_Utils::clearCurrentEmployer($this->_values['contact_id_a']);
+        }
       }
-
     }
-    // Create mode - save 1 or more new relationships
+    // Create mode (could be 1 or more relationships)
     else {
       // Fill up this weird param with contact ids like the weird relationship bao expects
       $params['contact_check'] = array_fill_keys(explode(',', $params['related_contact_id']), 1);
