@@ -2983,7 +2983,7 @@ WHERE  contribution_id = %1 ";
     return FALSE;
   }
 
-  static function recordAdditionPayment($contributionId, $trxnsData, $paymentType = 'owed', $participantId = NULL) {
+  static function recordAdditionalPayment($contributionId, $trxnsData, $paymentType = 'owed', $participantId = NULL) {
     $statusId = CRM_Core_OptionGroup::getValue('contribution_status', 'Completed', 'name');
     $getInfoOf['id'] = $contributionId;
     $defaults = array();
@@ -3061,6 +3061,8 @@ WHERE eft.financial_trxn_id = {$trxnId}
       $trxnsData['trxn_date'] = !empty($trxnsData['trxn_date']) ? $trxnsData['trxn_date'] : date('YmdHis');
       $trxnsData['total_amount'] = - $trxnsData['total_amount'];
 
+      $relationTypeId = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Accounts Receivable Account is' "));
+      $trxnsData['from_financial_account_id'] = CRM_Contribute_PseudoConstant::financialAccountType($contributionDAO->financial_type_id, $relationTypeId);
       $trxnsData['status_id'] = CRM_Core_OptionGroup::getValue('contribution_status', 'Refunded', 'name');
       // record the entry
       $financialTrxn = CRM_Contribute_BAO_Contribution::recordFinancialAccounts($params, $trxnsData);
@@ -3108,28 +3110,20 @@ WHERE eft.financial_trxn_id = {$trxnId}
       }
       $activityType = ($paymentType == 'refund') ? 'Refund' : 'Payment';
 
-      // creation of activity
-      $activity = new CRM_Activity_DAO_Activity();
-      $activity->source_record_id = $financialTrxn->id;
-      $activity->activity_type_id = CRM_Core_OptionGroup::getValue('activity_type',
-        $activityType,
-        'name'
-      );
-      if (!$activity->find(TRUE)) {
-        self::addActivityForPayment($entityObj, $financialTrxn, $activityType, $component);
-      }
+      self::addActivityForPayment($entityObj, $financialTrxn, $activityType, $component, $contributionId);
     }
     return $financialTrxn;
   }
 
-  static function addActivityForPayment($entityObj, $trxnObj, $activityType, $component) {
+  static function addActivityForPayment($entityObj, $trxnObj, $activityType, $component, $contributionId) {
     if ($component == 'event') {
       $date = CRM_Utils_Date::isoToMysql($trxnObj->trxn_date);
       $paymentAmount = CRM_Utils_Money::format($trxnObj->total_amount, $trxnObj->currency);
       $eventTitle = CRM_Core_DAO::getFieldValue('CRM_Event_BAO_Event', $entityObj->event_id, 'title');
       $subject = "{$paymentAmount} - Offline {$activityType} for {$eventTitle}";
       $targetCid = $entityObj->contact_id;
-      $srcRecId = $trxnObj->id;
+      // source record id would be the contribution id
+      $srcRecId = $contributionId;
     }
 
     // activity params
@@ -3159,21 +3153,22 @@ WHERE eft.financial_trxn_id = {$trxnId}
     CRM_Activity_BAO_Activity::create($activityParams);
   }
 
-  function getPaymentInfo($id, $component, $getTrxnInfo = FALSE) {
+  function getPaymentInfo($id, $component, $getTrxnInfo = FALSE, $usingLineTotal = FALSE) {
     if ($component == 'event') {
       $entity = 'participant';
       $entityTable = 'civicrm_participant';
       $contributionId = CRM_Core_DAO::getFieldValue('CRM_Event_BAO_ParticipantPayment', $id, 'contribution_id', 'participant_id');
     }
     $total = CRM_Core_BAO_FinancialTrxn::getBalanceTrxnAmt($contributionId);
-    $baseTrxnId = NULL;
-    if (empty($total)) {
+    $baseTrxnId = !empty($total['trxn_id']) ? $total['trxn_id'] : NULL;
+    if (empty($total) || $usingLineTotal) {
       $total = CRM_Price_BAO_LineItem::getLineTotal($id, $entityTable);
     }
     else {
       $baseTrxnId = $total['trxn_id'];
       $total = $total['total_amount'];
     }
+
     $paymentBalance = CRM_Core_BAO_FinancialTrxn::getPartialPaymentWithType($id, $entity, FALSE, $total);
     $info['total'] = $total;
     $info['paid'] = $total - $paymentBalance;

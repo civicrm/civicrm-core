@@ -83,7 +83,7 @@ class CRM_Financial_BAO_FinancialItem extends CRM_Financial_DAO_FinancialItem {
     if ($contribution->contribution_status_id == array_search('Completed', $contributionStatuses)) {
       $itemStatus = array_search('Paid', $financialItemStatus);
     }
-    elseif ($contribution->contribution_status_id == array_search('Pending', $contributionStatuses) 
+    elseif ($contribution->contribution_status_id == array_search('Pending', $contributionStatuses)
       || $contribution->contribution_status_id == array_search('In Progress', $contributionStatuses)) {
       $itemStatus = array_search('Unpaid', $financialItemStatus);
     }
