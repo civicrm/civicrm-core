@@ -292,10 +292,11 @@
       })
       // Handle action links in popup
       .on('click', '.crm-contact_actions-list a, .crm-contact_activities-list a', function() {
-        var tabName = $(this).data('tab') || 'summary';
-        var $tab = $('#tab_' + tabName);
-        var $panel = $('#' + $tab.attr('aria-controls'));
-        var url = $(this).attr('href');
+        var
+          tabName = $(this).data('tab') || 'summary',
+          $tab = $('#tab_' + tabName),
+          $panel = $('#' + $tab.attr('aria-controls')),
+          url = $(this).attr('href');
         if (url !== '#') {
           CRM.loadForm(url)
             .on('crmFormSuccess', function() {
