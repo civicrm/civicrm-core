@@ -138,12 +138,7 @@
           {$form.soft_credit_types.label}
       </td>
       <td>
-          <dt style="text-align:left;">{$form.soft_credit_types.html|crmAddClass:huge}</dt>
-          <dd>
-              <a class="optionvalue-link" href="#" title='Click to edit available soft credit types'>
-                  <span class="batch-edit"></span>
-              </a>
-          </dd>
+        {$form.soft_credit_types.html}
       </td>
   </tr>
   <tr class="crm-contribution-contributionpage-custom-form-block-custom_pre_id">
@@ -211,17 +206,6 @@
             document.getElementById("honor").style.display = "none";
         }
      }
-     cj('.optionvalue-link').click(function() {
-        {/literal}"{crmAPI var='result' entity='OptionGroup' action='get' sequential=1 name='soft_credit_type'}"{literal};
-        var postURL = {/literal}"{crmURL p='civicrm/admin/options' q="gid="}{$result.id}"{literal};
-        CRM.loadForm(postURL).on('crmFormSuccess', function(e, data) {
-           cj('.ui-dialog a').click(function(){
-           //Todo: inline edit facility for soft_credit_type option group in jquery popup dialog
-           });
-        });
-      return false;
-    })
-
  {/literal}
 </script>
 
