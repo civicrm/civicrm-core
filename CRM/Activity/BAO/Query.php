@@ -470,7 +470,7 @@ class CRM_Activity_BAO_Query {
       2 => ts('Assigned to'),
       1 => ts('Added by'),
     );
-    $form->addRadio('activity_role', NULL, $activityRoles, array('unselectable' => TRUE));
+    $form->addRadio('activity_role', NULL, $activityRoles, array('allowClear' => TRUE));
     $form->setDefaults(array('activity_role' => 3));
     $activityStatus = CRM_Core_PseudoConstant::activityStatus();
     foreach ($activityStatus as $activityStatusID => $activityStatusName) {

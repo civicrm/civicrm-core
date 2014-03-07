@@ -773,8 +773,8 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   function &addRadio($name, $title, $values, $attributes = array(), $separator = NULL, $required = FALSE) {
     $options = array();
     $attributes = $attributes ? $attributes : array();
-    $unselectable = !empty($attributes['unselectable']);
-    unset($attributes['unselectable']);
+    $allowClear = !empty($attributes['allowClear']);
+    unset($attributes['allowClear']);
     $attributes += array('id_suffix' => $name);
     foreach ($values as $key => $var) {
       $options[] = $this->createElement('radio', NULL, NULL, $var, $key, $attributes);
@@ -783,21 +783,21 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     if ($required) {
       $this->addRule($name, ts('%1 is a required field.', array(1 => $title)), 'required');
     }
-    if ($unselectable) {
-      $group->setAttribute('unselectable', TRUE);
+    if ($allowClear) {
+      $group->setAttribute('allowClear', TRUE);
     }
     return $group;
   }
 
-  function addYesNo($id, $title, $unselectable = FALSE, $required = NULL, $attributes = array()) {
+  function addYesNo($id, $title, $allowClear = FALSE, $required = NULL, $attributes = array()) {
     $attributes += array('id_suffix' => $id);
     $choice   = array();
     $choice[] = $this->createElement('radio', NULL, '11', ts('Yes'), '1', $attributes);
     $choice[] = $this->createElement('radio', NULL, '11', ts('No'), '0', $attributes);
 
     $group = $this->addGroup($choice, $id, $title);
-    if ($unselectable) {
-      $group->setAttribute('unselectable', TRUE);
+    if ($allowClear) {
+      $group->setAttribute('allowClear', TRUE);
     }
     if ($required) {
       $this->addRule($id, ts('%1 is a required field.', array(1 => $title)), 'required');
