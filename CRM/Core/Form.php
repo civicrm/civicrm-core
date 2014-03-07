@@ -904,6 +904,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    *   - field (field name - only needed if different from name used on the form)
    *   - option_url - path to edit this option list - usually retrieved automatically - set to NULL to disable link
    *   - placeholder - set to NULL to disable
+   *   - multiple - bool
    * @param bool $required
    * @throws CRM_Core_Exception
    * @return HTML_QuickForm_Element
@@ -915,6 +916,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     if (!isset($props['field'])) {
       $props['field'] = strrpos($name, '[') ? rtrim(substr($name, 1 + strrpos($name, '[')), ']') : $name;
     }
+    $props['multiple'] = !empty($props['multiple']) ? 'multiple' : NULL;
     $info = civicrm_api3($props['entity'], 'getoptions', array(
         'field' => $props['field'],
         'options' => array('metadata' => array('fields'))
@@ -924,7 +926,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     if (!array_key_exists('placeholder', $props)) {
       $props['placeholder'] = $required ? ts('- select -') : ts('- none -');
     }
-    if ($props['placeholder'] !== NULL && empty($props['multiple'])) {
+    if ($props['placeholder'] !== NULL && !$props['multiple']) {
       $options = array('' => '') + $options;
     }
     // Handle custom field
