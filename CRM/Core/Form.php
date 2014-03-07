@@ -1250,7 +1250,9 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    *  - create - can the user create a new entity on-the-fly?
    *             Set to TRUE if entity is contact and you want the default profiles,
    *             or pass in your own set of links. @see CRM_Core_BAO_UFGroup::getCreateLinks for format
-   *  - api - array of settings for the getlist api
+   *             note that permissions are checked automatically
+   *  - api - array of settings for the getlist api wrapper
+   *          note that it accepts a 'params' setting which will be passed to the underlying api
    *  - placeholder - string
    *  - multiple - bool
    *  - class, etc. - other html properties

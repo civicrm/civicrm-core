@@ -1,45 +1,14 @@
-/*
- +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
- |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
- +--------------------------------------------------------------------+
- */
-
-/**
- * @file: global functions for CiviCRM
- * FIXME: We are moving away from using global functions. DO NOT ADD MORE.
- * @see CRM object - the better alternative to adding global functions
- */
-
+// https://civicrm.org/licensing
 var CRM = CRM || {};
 var cj = jQuery;
 
 /**
  * Short-named function for string translation, defined in global scope so it's available everywhere.
  *
- * @param  $text   string  string for translating
- * @param  $params object  key:value of additional parameters
+ * @param text string for translating
+ * @param params object key:value of additional parameters
  *
- * @return         string  the translated string
+ * @return string
  */
 function ts(text, params) {
   "use strict";
@@ -62,11 +31,10 @@ function ts(text, params) {
  *  a list of 'blocks to show' and 'blocks to hide' and the template passes these parameters to
  *  this function.
  *
- * @access public
+ * @deprecated
  * @param  showBlocks Array of element Id's to be displayed
  * @param  hideBlocks Array of element Id's to be hidden
  * @param elementType Value to set display style to for showBlocks (e.g. 'block' or 'table-row' or ...)
- * @return none
  */
 function on_load_init_blocks(showBlocks, hideBlocks, elementType) {
   if (elementType == null) {
@@ -102,14 +70,13 @@ function on_load_init_blocks(showBlocks, hideBlocks, elementType) {
  *  This function is called when we need to show or hide a related form element (target_element)
  *  based on the value (trigger_value) of another form field (trigger_field).
  *
- * @access public
+ * @deprecated
  * @param  trigger_field_id     HTML id of field whose onchange is the trigger
  * @param  trigger_value        List of integers - option value(s) which trigger show-element action for target_field
  * @param  target_element_id    HTML id of element to be shown or hidden
  * @param  target_element_type  Type of element to be shown or hidden ('block' or 'table-row')
  * @param  field_type           Type of element radio/select
  * @param  invert               Boolean - if true, we HIDE target on value match; if false, we SHOW target on value match
- * @return none
  */
 function showHideByValue(trigger_field_id, trigger_value, target_element_id, target_element_type, field_type, invert) {
   if (target_element_type == null) {
@@ -173,11 +140,11 @@ function showHideByValue(trigger_field_id, trigger_value, target_element_id, tar
 
 /**
  * Function to change button text and disable one it is clicked
- *
+ * @deprecated
  * @param obj object - the button clicked
  * @param formID string - the id of the form being submitted
  * @param string procText - button text after user clicks it
- * @return null
+ * @return bool
  */
 var submitcount = 0;
 /* Changes button label on submit, and disables button after submit for newer browsers.
@@ -203,7 +170,9 @@ function submitOnce(obj, formId, procText) {
     }
   }
 }
-
+/**
+ * @deprecated
+ */
 function popUp(URL) {
   day = new Date();
   id = day.getTime();
@@ -212,8 +181,8 @@ function popUp(URL) {
 
 /**
  * Function to show / hide the row in optionFields
- *
- * @param element name index, that whose innerHTML is to hide else will show the hidden row.
+ * @deprecated
+ * @param index string, element whose innerHTML is to hide else will show the hidden row.
  */
 function showHideRow(index) {
   if (index) {
@@ -275,7 +244,7 @@ CRM.validate = CRM.validate || {
   };
 
   /**
-   * Wrapper around select2 initialization function; supplies defaults
+   * Wrapper for select2 initialization function; supplies defaults
    * @param options object
    */
   $.fn.crmSelect2 = function(options) {
@@ -300,7 +269,7 @@ CRM.validate = CRM.validate || {
   };
 
   /**
-   * Initialize a select2 autocomplete using the getlist api
+   * @see CRM_Core_Form::addEntityRef for docs
    * @param options object
    */
   $.fn.crmEntityRef = function(options) {
