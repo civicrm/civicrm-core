@@ -155,7 +155,7 @@ function searchSurveys( qfKey )
       if ( qfKey ) dataUrl = dataUrl + '&qfKey=' + qfKey;
 
       cj.get( dataUrl, null, function( surveyList ) {
-        cj( '#surveyList' ).html( surveyList );
+        cj( '#surveyList' ).html( surveyList ).trigger('crmLoad');
 
         //collapse the search form.
         var searchFormName = '#search_form_' + {/literal}'{$searchFor}'{literal};
