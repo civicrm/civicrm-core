@@ -222,7 +222,10 @@ class CRM_Event_Form_Participant extends CRM_Contact_Form_Task {
     // check the current path, if search based, then dont get participantID
     // CRM-5792
     $path = CRM_Utils_System::currentPath();
-    if (strpos($path, 'civicrm/contact/search') === 0) {
+    if (
+      strpos($path, 'civicrm/contact/search') === 0 ||
+      strpos($path, 'civicrm/group/search') === 0
+      ) {
       $this->_id = NULL;
     }
     else {
