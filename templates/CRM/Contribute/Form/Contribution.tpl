@@ -385,7 +385,7 @@
         cj('div.'+id).html(loading);
         cj.ajax({
           url    : url,
-          success: function(data) { cj('div.'+id).html(data); }
+          success: function(data) { cj('div.'+id).html(data).trigger('crmLoad'); }
         });
       }
     }
@@ -583,7 +583,7 @@ function buildAmount( priceSetId ) {
     async: false
   }).responseText;
 
-  cj( fname ).show( ).html( response );
+  cj( fname ).show( ).html( response ).trigger('crmLoad');
   // freeze total amount text field.
   cj( "#total_amount").val('');
 

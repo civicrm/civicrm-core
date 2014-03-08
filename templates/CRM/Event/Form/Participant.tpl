@@ -423,7 +423,7 @@
             async: false,
             global: false,
             success: function ( html ) {
-              $("#feeBlock").html( html );
+              $("#feeBlock").html( html ).trigger('crmLoad');
             }
           });
 
@@ -541,7 +541,7 @@
           if ( subType != 'null' ) {
             if ( document.getElementById(roleid).checked == true ) {
               var response_text = '<div style="display:block;" id = '+subType+'_chk >'+response+'</div>';
-              $( fname ).append(response_text);
+              $( fname ).append(response_text).trigger('crmLoad');
             }
             else {
               $('#'+subType+'_chk').remove();

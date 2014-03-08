@@ -107,7 +107,7 @@ function searchVoters( qfKey )
       if ( qfKey ) dataUrl = dataUrl + '&qfKey=' + qfKey;
 
       cj.get( dataUrl, null, function( voterList ) {
-        cj( '#voterList' ).html( voterList );
+        cj( '#voterList' ).html( voterList ).trigger('crmLoad');
 
         //collapse the search form.
         var searchFormName = '#search_form_' + {/literal}'{$searchVoterFor}'{literal};

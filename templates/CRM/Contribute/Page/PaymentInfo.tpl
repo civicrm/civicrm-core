@@ -32,7 +32,7 @@ cj(function($){
      url: dataUrl,
      async: false,
      success: function(html) {
-       cj("#payment-info").html(html);
+       cj("#payment-info").html(html).trigger('crmLoad');
      }
    });
 
