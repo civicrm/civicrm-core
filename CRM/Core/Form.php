@@ -220,9 +220,13 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    *
    */
   function &add($type, $name, $label = '',
-    $attributes = '', $required = FALSE, $javascript = NULL
+    $attributes = '', $required = FALSE, $extra = NULL
   ) {
-    $element = $this->addElement($type, $name, $label, $attributes, $javascript);
+    // Normalize this property
+    if ($type == 'select' && !empty($extra['multiple'])) {
+      $extra['multiple'] = 'multiple';
+    }
+    $element = $this->addElement($type, $name, $label, $attributes, $extra);
     if (HTML_QuickForm::isError($element)) {
       CRM_Core_Error::fatal(HTML_QuickForm::errorMessage($element));
     }
@@ -916,7 +920,6 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     if (!isset($props['field'])) {
       $props['field'] = strrpos($name, '[') ? rtrim(substr($name, 1 + strrpos($name, '[')), ']') : $name;
     }
-    $props['multiple'] = !empty($props['multiple']) ? 'multiple' : NULL;
     $info = civicrm_api3($props['entity'], 'getoptions', array(
         'field' => $props['field'],
         'options' => array('metadata' => array('fields'))
@@ -926,7 +929,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     if (!array_key_exists('placeholder', $props)) {
       $props['placeholder'] = $required ? ts('- select -') : ts('- none -');
     }
-    if ($props['placeholder'] !== NULL && !$props['multiple']) {
+    if ($props['placeholder'] !== NULL && empty($props['multiple'])) {
       $options = array('' => '') + $options;
     }
     // Handle custom field
