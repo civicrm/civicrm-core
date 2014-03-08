@@ -21,14 +21,15 @@ require_once 'CRM/Core/ClassLoader.php';
 CRM_Core_ClassLoader::singleton()->register();
 
 $genCode = new CRM_GenCode_Main(
-  '../CRM/Core/DAO/',                                                 // $CoreDAOCodePath
-  '../sql/',                                                          // $sqlCodePath
-  '../',                                                              // $phpCodePath
-  '../templates/',                                                    // $tplCodePath
-  array('../packages/Smarty/plugins', '../CRM/Core/Smarty/plugins'),  // smarty plugin dirs
-  @$argv[3],                                                          // cms
-  empty($argv[2]) ? NULL : $argv[2],                                  // db version
-  empty($argv[1]) ? 'schema/Schema.xml' : $argv[1]                    // schem afile
+  '../CRM/Core/DAO/',                                                         // $CoreDAOCodePath
+  '../sql/',                                                                  // $sqlCodePath
+  '../',                                                                      // $phpCodePath
+  '../templates/',                                                            // $tplCodePath
+  array('../packages/Smarty/plugins', '../CRM/Core/Smarty/plugins'),          // smarty plugin dirs
+  @$argv[3],                                                                  // cms
+  empty($argv[2]) ? NULL : $argv[2],                                          // db version
+  empty($argv[1]) ? 'schema/Schema.xml' : $argv[1],                           // schema file
+  getenv('CIVICRM_GENCODE_DIGEST') ? getenv('CIVICRM_GENCODE_DIGEST') : NULL  // path to digest file
 );
 $genCode->main();
 
@@ -66,6 +67,51 @@ class CRM_GenCode_Util_File {
 
     return $newTempDir;
   }
+
+  /**
+   * Calculate a cumulative digest based on a collection of files
+   *
+   * @param array $files list of file names (strings)
+   * @param callable $digest a one-way hash function (string => string)
+   * @return string
+   */
+  static function digestAll($files, $digest = 'md5') {
+    $buffer = '';
+    foreach ($files as $file) {
+      $buffer .= $digest(file_get_contents($file));
+    }
+    return $digest($buffer);
+  }
+
+  /**
+   * Find the path to the main Civi source tree
+   *
+   * @return string
+   * @throws RuntimeException
+   */
+  static function findCoreSourceDir() {
+    $path = str_replace(DIRECTORY_SEPARATOR, '/', __DIR__);
+    if (!preg_match(':(.*)/xml:', $path, $matches)) {
+      throw new RuntimeException("Failed to determine path of code-gen");
+    }
+
+    return $matches[1];
+  }
+
+  /**
+   * Find files in several directories using several filename patterns
+   *
+   * @param array $pairs each item is an array(0 => $searchBaseDir, 1 => $filePattern)
+   * @return array of file paths
+   */
+  static function findManyFiles($pairs) {
+    $files = array();
+    foreach ($pairs as $pair) {
+      list ($dir, $pattern) = $pair;
+      $files = array_merge($files, CRM_Utils_File::findFiles($dir, $pattern));
+    }
+    return $files;
+  }
 }
 
 class CRM_GenCode_Main {
@@ -81,14 +127,27 @@ class CRM_GenCode_Main {
   var $tplCodePath;
   var $schemaPath; // ex: schema/Schema.xml
 
+  /**
+   * @var string|NULL path in which to store a marker that indicates the last execution of
+   * GenCode. If a matching marker already exists, GenCode doesn't run.
+   */
+  var $digestPath;
+
+  /**
+   * @var string|NULL a digest of the inputs to the code-generator (eg the properties and source files)
+   */
+  var $digest;
+
   var $smarty;
 
-  function __construct($CoreDAOCodePath, $sqlCodePath, $phpCodePath, $tplCodePath, $smartyPluginDirs, $argCms, $argVersion, $schemaPath) {
+  function __construct($CoreDAOCodePath, $sqlCodePath, $phpCodePath, $tplCodePath, $smartyPluginDirs, $argCms, $argVersion, $schemaPath, $digestPath) {
     $this->CoreDAOCodePath = $CoreDAOCodePath;
     $this->sqlCodePath = $sqlCodePath;
     $this->phpCodePath = $phpCodePath;
     $this->tplCodePath = $tplCodePath;
     $this->cms = $argCms;
+    $this->digestPath = $digestPath;
+    $this->digest = NULL;
 
     require_once 'Smarty/Smarty.class.php';
     $this->smarty = new Smarty();
@@ -137,6 +196,17 @@ class CRM_GenCode_Main {
    *
    */
   function main() {
+    if (!empty($this->digestPath) && file_exists($this->digestPath) && $this->hasExpectedFiles()) {
+      if ($this->getDigest() === file_get_contents($this->digestPath)) {
+        echo "GenCode has previously executed. To force execution, please (a) omit CIVICRM_GENCODE_DIGEST\n";
+        echo "or (b) remove {$this->digestPath} or (c) call GenCode with new parameters.\n";
+        exit();
+      }
+      // Once we start GenCode, the old build is invalid
+      unlink($this->digestPath);
+    }
+
+
     echo "\ncivicrm_domain.version := ". $this->db_version . "\n\n";
     if ($this->buildVersion < 1.1) {
       echo "The Database is not compatible for this version";
@@ -208,6 +278,10 @@ Alternatively you can get a version of CiviCRM that matches your PHP version
     $this->generateInstallLangs();
     $this->generateDAOs($tables);
     $this->generateSchemaStructure($tables);
+
+    if (!empty($this->digestPath)) {
+      file_put_contents($this->digestPath, $this->getDigest());
+    }
   }
 
   function generateListAll($tables) {
@@ -1001,5 +1075,56 @@ Alternatively you can get a version of CiviCRM that matches your PHP version
     $this->smarty->clear_all_assign();
     $this->smarty->clear_all_cache();
     $this->smarty->assign('generated', "DO NOT EDIT.  Generated by " . basename(__FILE__));
+  }
+
+
+  /**
+   * Compute a digest based on the inputs to the code-generator (ie the properties
+   * of the codegen and the source files loaded by the codegen).
+   *
+   * @return string
+   */
+  function getDigest() {
+    if ($this->digest === NULL) {
+      $srcDir = CRM_GenCode_Util_File::findCoreSourceDir();
+      $files = CRM_GenCode_Util_File::findManyFiles(array(
+        // array("$srcDir/CRM/Core/CodeGen", '*.php'),
+        array("$srcDir/xml", "*.php"),
+        array("$srcDir/xml", "*.tpl"),
+        array("$srcDir/xml", "*.xml"),
+      ));
+
+      $properties = var_export(array(
+        CRM_GenCode_Util_File::digestAll($files),
+        $this->buildVersion,
+        $this->db_version,
+        $this->cms,
+        $this->CoreDAOCodePath,
+        $this->sqlCodePath,
+        $this->phpCodePath,
+        $this->tplCodePath,
+        $this->schemaPath,
+        // $this->getTasks(),
+      ), TRUE);
+
+      $this->digest = md5($properties);
+    }
+    return $this->digest;
+  }
+
+  function getExpectedFiles() {
+    return array(
+      $this->sqlCodePath . '/civicrm.mysql',
+      $this->phpCodePath . '/CRM/Contact/DAO/Contact.php',
+    );
+  }
+
+  function hasExpectedFiles() {
+    foreach ($this->getExpectedFiles() as $file) {
+      if (!file_exists($file)) {
+        return FALSE;
+      }
+    }
+    return TRUE;
   }
 }
