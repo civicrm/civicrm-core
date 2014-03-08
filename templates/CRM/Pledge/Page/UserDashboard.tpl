@@ -121,7 +121,7 @@ function buildPaymentDetails( pledgeId, contactId )
                dataType: "html",
                timeout : 5000, //Time in milliseconds
                success : function( data ){
-                              cj( '#paymentDetails' + pledgeId ).html( data );
+                              cj( '#paymentDetails' + pledgeId ).html( data ).trigger('crmLoad');
                          },
                error   : function( XMLHttpRequest, textStatus, errorThrown ) {
                                  console.error( 'Error: '+ textStatus );

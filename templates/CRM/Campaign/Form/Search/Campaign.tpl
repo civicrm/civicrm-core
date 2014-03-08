@@ -166,7 +166,7 @@
     }
 
     cj.get(dataUrl, null, function (campaignList) {
-      cj('#campaignList').html(campaignList);
+      cj('#campaignList').html(campaignList).trigger('crmLoad');
 
       //collapse the search form.
       var searchFormName = '#search_form_' + {/literal}'{$searchFor}'{literal};
