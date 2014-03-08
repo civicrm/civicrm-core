@@ -223,7 +223,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     $attributes = '', $required = FALSE, $extra = NULL
   ) {
     // Normalize this property
-    if ($type == 'select' && !empty($extra['multiple'])) {
+    if ($type == 'select' && is_array($extra) && !empty($extra['multiple'])) {
       $extra['multiple'] = 'multiple';
     }
     $element = $this->addElement($type, $name, $label, $attributes, $extra);
