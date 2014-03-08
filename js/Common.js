@@ -235,11 +235,11 @@ CRM.validate = CRM.validate || {
         val = [val];
       }
       $elect.find('option' + opts).remove();
-      $.each(options, function(key, option) {
+      _.each(options, function(option) {
         var selected = ($.inArray(''+option.key, val) > -1) ? 'selected="selected"' : '';
         $elect.append('<option value="' + option.key + '"' + selected + '>' + option.value + '</option>');
       });
-      $elect.trigger('crmOptionsUpdated').trigger('change');
+      $elect.trigger('crmOptionsUpdated', $.extend({}, options)).trigger('change');
     });
   };
 
