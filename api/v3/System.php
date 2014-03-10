@@ -67,5 +67,35 @@ function civicrm_api3_system_flush($params) {
 function _civicrm_api3_system_flush_spec(&$params){
   $params['triggers'] = array('title' => 'rebuild triggers (boolean)');
   $params['session'] = array('title' => 'refresh sessions (boolean)');
+}
 
+/**
+ * System.Check API specification (optional)
+ * This is used for documentation and validation.
+ *
+ * @param array $spec description of fields supported by this API call
+ * @return void
+ * @see http://wiki.civicrm.org/confluence/display/CRM/API+Architecture+Standards
+ */
+function _civicrm_api3_system_check_spec(&$spec) {
+  // $spec['magicword']['api.required'] = 1;
+}
+
+/**
+ * System.Check API
+ *
+ * @param array $params
+ * @return array API result descriptor; return items are alert codes/messages
+ * @see civicrm_api3_create_success
+ * @see civicrm_api3_create_error
+ * @throws API_Exception
+ */
+function civicrm_api3_system_check($params) {
+  $returnValues = array();
+  foreach (CRM_Utils_Check_Security::singleton()->checkAll() as $message) {
+    $returnValues[] = $message->toArray();
+  }
+
+  // Spec: civicrm_api3_create_success($values = 1, $params = array(), $entity = NULL, $action = NULL)
+  return civicrm_api3_create_success($returnValues, $params, 'System', 'Check');
 }
