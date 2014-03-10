@@ -203,11 +203,25 @@ class CRM_Contact_BAO_ProximityQuery {
         $distance
       );
 
+    // DONT consider NAN values (which is returned by rad2deg php function)
+    // for checking BETWEEN geo_code's criteria as it throws obvious 'NAN' field not found DB: Error
+    $geoCodeWhere = array();
+    if (!is_nan($minLatitude)) {
+      $geoCodeWhere[] = "{$tablePrefix}.geo_code_1  >= $minLatitude ";
+    }
+    if (!is_nan($maxLatitude)) {
+      $geoCodeWhere[] = "{$tablePrefix}.geo_code_1  <= $maxLatitude ";
+    }
+    if (!is_nan($minLongitude)) {
+      $geoCodeWhere[] = "{$tablePrefix}.geo_code_2 >= $minLongitude ";
+    }
+    if (!is_nan($maxLongitude)) {
+      $geoCodeWhere[] = "{$tablePrefix}.geo_code_2 <= $maxLongitude ";
+    }
+    $geoCodeWhereClause = implode(' AND ', $geoCodeWhere);
+
     $where = "
-{$tablePrefix}.geo_code_1  >= $minLatitude  AND
-{$tablePrefix}.geo_code_1  <= $maxLatitude  AND
-{$tablePrefix}.geo_code_2 >= $minLongitude AND
-{$tablePrefix}.geo_code_2 <= $maxLongitude AND
+{$geoCodeWhereClause} AND
 ACOS(
     COS(RADIANS({$tablePrefix}.geo_code_1)) *
     COS(RADIANS($latitude)) *
@@ -216,7 +230,6 @@ ACOS(
     SIN(RADIANS($latitude))
   ) * 6378137  <= $distance
 ";
-
     return $where;
   }
 
