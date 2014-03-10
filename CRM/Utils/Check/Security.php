@@ -79,7 +79,9 @@ class CRM_Utils_Check_Security {
    * Execute "checkAll"
    */
   public function showPeriodicAlerts() {
-    if (CRM_Core_Permission::check('administer CiviCRM')) {
+    if (CRM_Core_Permission::check('administer CiviCRM')
+      && CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'securityAlert', NULL, TRUE)
+    ) {
       $session = CRM_Core_Session::singleton();
       if ($session->timer('check_' . __CLASS__, self::CHECK_TIMER)) {
 
