@@ -90,7 +90,7 @@ class CRM_Utils_Check_Security {
         $config->cleanup(0, FALSE);
 
         foreach ($this->checkAll() as $message) {
-          CRM_Core_Session::setStatus($message, ts('Security Warning'));
+          CRM_Core_Session::setStatus($message->getMessage(), ts('Security Warning'));
         }
       }
     }
@@ -160,7 +160,10 @@ class CRM_Utils_Check_Security {
           $msg = 'The <a href="%1">CiviCRM debug log</a> should not be downloadable.'
             . '<br />' .
             '<a href="%2">Read more about this warning</a>';
-          $messages[] = ts($msg, array(1 => $log_url, 2 => $docs_url));
+          $messages[] = new CRM_Utils_Check_Message(
+            'checkLogFileIsNotAccessible',
+            ts($msg, array(1 => $log_url, 2 => $docs_url))
+          );
         }
       }
     }
@@ -201,7 +204,10 @@ class CRM_Utils_Check_Security {
                 . '<br />' .
                 '<a href="%1">Read more about this warning</a>';
               $docs_url = $this->createDocUrl('checkUploadsAreNotAccessible');
-              $messages[] = ts($msg, array(1 => $docs_url));
+              $messages[] = new CRM_Utils_Check_Message(
+                'checkUploadsAreNotAccessible',
+                ts($msg, array(1 => $docs_url))
+              );
             }
           }
         }
@@ -245,7 +251,10 @@ class CRM_Utils_Check_Security {
           . '<br />' .
           '<a href="%3">Read more about this warning</a>';
         $docs_url = $this->createDocUrl('checkDirectoriesAreNotBrowseable');
-        $messages[] = ts($msg, array(1 => $publicDir, 2 => $publicDir, 3 => $docs_url));
+        $messages[] = new CRM_Utils_Check_Message(
+          'checkDirectoriesAreNotBrowseable',
+          ts($msg, array(1 => $publicDir, 2 => $publicDir, 3 => $docs_url))
+        );
       }
     }
 
