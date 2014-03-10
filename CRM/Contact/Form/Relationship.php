@@ -44,77 +44,77 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
    *
    * @var int
    */
-  protected $_relationshipId;
+  public $_relationshipId;
 
   /**
    * The contact id, used when add/edit relationship
    *
    * @var int
    */
-  protected $_contactId;
+  public $_contactId;
 
   /**
    * This is a string which is either a_b or  b_a  used to determine the relationship between to contacts
    *
    */
-  protected $_rtype;
+  public $_rtype;
 
   /**
    * This is a string which is used to determine the relationship between to contacts
    *
    */
-  protected $_rtypeId;
+  public $_rtypeId;
 
   /**
    * Display name of contact a
    *
    */
-  protected $_display_name_a;
+  public $_display_name_a;
 
   /**
    * Display name of contact b
    *
    */
-  protected $_display_name_b;
+  public $_display_name_b;
 
   /**
    * The relationship type id
    *
    * @var int
    */
-  protected $_relationshipTypeId;
+  public $_relationshipTypeId;
 
   /**
    * an array of all relationship names
    *
    * @var array
    */
-  protected $_allRelationshipNames;
+  public $_allRelationshipNames;
 
   /**
    * @var bool
    */
-  protected $_enabled;
+  public $_enabled;
 
   /**
    * @var bool
    */
-  protected $_isCurrentEmployer;
+  public $_isCurrentEmployer;
 
   /**
    * @var string
    */
-  protected $_contactType;
+  public $_contactType;
 
   /**
    * The relationship values if Updating relationship
    */
-  protected $_values;
+  public $_values;
 
   /**
    * casid if it called from case context
    */
-  protected $_caseId;
+  public $_caseId;
 
   /**
    * @var mixed
@@ -327,7 +327,7 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
     // Metadata needed on clientside
     $contactTypes = CRM_Contact_BAO_ContactType::contactTypeInfo(TRUE);
     $jsData = array();
-    // Filter it down to just what we need to keep the dom small
+    // Get just what we need to keep the dom small
     $whatWeWant = array_flip(array('contact_type_a', 'contact_type_b', 'contact_sub_type_a', 'contact_sub_type_b'));
     foreach($this->_allRelationshipNames as $id => $vals) {
       if ($vals['name_a_b'] === 'Employee of') {
@@ -439,7 +439,7 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
       // Fill up this weird param with contact ids like the weird relationship bao expects
       $params['contact_check'] = array_fill_keys(explode(',', $params['related_contact_id']), 1);
       if (!$this->_rtype) {
-        list(, $this->_rtype) = explode('_', $relationshipTypeId, 2);
+        list(, $this->_rtype) = explode('_', $params['relationship_type_id'], 2);
       }
     }
     $params['start_date'] = CRM_Utils_Date::processDate($params['start_date'], NULL, TRUE);
