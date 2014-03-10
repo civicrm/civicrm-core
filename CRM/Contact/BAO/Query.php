@@ -715,15 +715,19 @@ class CRM_Contact_BAO_Query {
               // also get the id of the tableName
               $tName = substr($tableName, 8);
               if (in_array($tName, array('country', 'state_province', 'county'))) {
-                $pf = ($tName == 'state_province') ? 'state_province_name' : $name;
-                $this->_pseudoConstantsSelect[$pf] =
-                  array('pseudoField' => "{$tName}_id", 'idCol' => "{$tName}_id", 'bao' => 'CRM_Core_BAO_Address',
-                    'table' => "civicrm_{$tName}", 'join' => " LEFT JOIN civicrm_{$tName} ON civicrm_address.{$tName}_id = civicrm_{$tName}.id ");
-
                 if ($tName == 'state_province') {
+                  $this->_pseudoConstantsSelect['state_province_name'] =
+                    array('pseudoField' => "{$tName}", 'idCol' => "{$tName}_id", 'bao' => 'CRM_Core_BAO_Address',
+                     'table' => "civicrm_{$tName}", 'join' => " LEFT JOIN civicrm_{$tName} ON civicrm_address.{$tName}_id = civicrm_{$tName}.id ");
+
                   $this->_pseudoConstantsSelect[$tName] =
                     array('pseudoField' => 'state_province_abbreviation', 'idCol' => "{$tName}_id",
                       'table' => "civicrm_{$tName}", 'join' => " LEFT JOIN civicrm_{$tName} ON civicrm_address.{$tName}_id = civicrm_{$tName}.id ");
+                }
+                else {
+                  $this->_pseudoConstantsSelect[$name] =
+                  array('pseudoField' => "{$tName}_id", 'idCol' => "{$tName}_id", 'bao' => 'CRM_Core_BAO_Address',
+                  'table' => "civicrm_{$tName}", 'join' => " LEFT JOIN civicrm_{$tName} ON civicrm_address.{$tName}_id = civicrm_{$tName}.id ");
                 }
 
                 $this->_select["{$tName}_id"] = "civicrm_address.{$tName}_id as {$tName}_id";
@@ -765,13 +769,13 @@ class CRM_Contact_BAO_Query {
                   $this->_select[$name] = "contact_a.{$fieldName}  as `$name`";
                 }
               }
-              elseif (in_array($tName, array('state_province', 'country', 'county'))) {
-                $this->_pseudoConstantsSelect[$pf]['select'] = "{$field['where']} as `$name`";
-                $this->_pseudoConstantsSelect[$pf]['element'] = $name;
-                if ($tName == 'state_province') {
-                  $this->_pseudoConstantsSelect[$tName]['select'] = "{$field['where']} as `$name`";
-                  $this->_pseudoConstantsSelect[$tName]['element'] = $name;
-                }
+              elseif (in_array($tName, array('country', 'county'))) {
+                $this->_pseudoConstantsSelect[$name]['select'] = "{$field['where']} as `$name`";
+                $this->_pseudoConstantsSelect[$name]['element'] = $name;
+              }
+              elseif ($tName == 'state_province') {
+                $this->_pseudoConstantsSelect[$tName]['select'] = "{$field['where']} as `$name`";
+                $this->_pseudoConstantsSelect[$tName]['element'] = $name;
               }
               else {
                 $this->_select[$name] = "{$field['where']} as `$name`";
