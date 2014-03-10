@@ -95,7 +95,7 @@
        <comment>If defined, contact_sub_type_a in a relationship of this type must be a specific contact_sub_type.</comment>
        <add>3.1</add>
        <html>
-        <type>Multi-Select</type>
+        <type>Select</type>
       </html>
   </field>
   <field>
@@ -106,7 +106,7 @@
        <comment>If defined, contact_sub_type_b in a relationship of this type must be a specific contact_sub_type.</comment>
        <add>3.1</add>
        <html>
-        <type>Multi-Select</type>
+        <type>Select</type>
       </html>
   </field>
   <field>
