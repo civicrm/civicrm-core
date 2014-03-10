@@ -70,21 +70,19 @@
   /**
    * Function to check activity status in relavent to activity date
    *
-   * @param element message JSON object.
+   * @param message JSON object.
    */
   function activityStatus(message) {
-    var date =  cj("#activity_date_time_display").datepicker('getDate');
-    if (date) {
+    var activityDate =  cj("#activity_date_time_display").datepicker('getDate');
+    if (activityDate) {
       var
-        now = new Date(),
-        time = cj("#activity_date_time_time").timeEntry('getTime') || date,
-        activityStatusId = cj('#status_id').val(),
-        d = date.toString().split(' '),
-        activityDate = new Date(d[0] + ' ' + d[1] + ' ' + d[2] + ' ' + d[3] + ' ' + time.toTimeString());
-      if (activityStatusId == 2 && now < activityDate) {
+        // Ignore time, only compare dates
+        today = new Date().setHours(0,0,0,0),
+        activityStatusId = cj('#status_id').val();
+      if (activityStatusId == 2 && today < activityDate) {
         return confirm(message.completed);
       }
-      else if (activityStatusId == 1 && now >= activityDate) {
+      else if (activityStatusId == 1 && today > activityDate) {
         return confirm(message.scheduled);
       }
     }
