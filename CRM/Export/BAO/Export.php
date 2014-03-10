@@ -821,9 +821,6 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
           elseif ($field == 'pledge_next_pay_amount') {
             $row[$field] = $dao->pledge_next_pay_amount + $dao->pledge_outstanding_amount;
           }
-          elseif (in_array(substr($field, 0, -3), array('gender', 'prefix', 'suffix'))) {
-            $row[$field] = CRM_Core_PseudoConstant::getLabel('CRM_Contact_DAO_Contact', $field, $dao->$field);
-          }
           elseif (is_array($value) && $field == 'location') {
             // fix header for location type case
             foreach ($value as $ltype => $val) {
