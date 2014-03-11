@@ -12,7 +12,7 @@
 
   function crmFormInline(o) {
     var data = o.data('edit-params');
-    if (o.is('.crm-edit-ready .crm-inline-edit') && data) {
+    if (o.is('.crm-edit-ready .crm-inline-edit') && data && data.class_name.length) {
       o.animate({height: '+=50px'}, 200);
       data.snippet = 6;
       data.reset = 1;
