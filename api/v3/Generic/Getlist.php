@@ -50,12 +50,13 @@ function civicrm_api3_generic_getList($apiRequest) {
   $fnName = function_exists($fnName) ? $fnName : '_civicrm_api3_generic_getlist_output';
   $values = $fnName($result, $request);
 
+  $last = $request['params']['limit'] - 1;
   $output = array(
     // If we have an extra result then this is not the last page
-    'more_results' => isset($values[10]),
+    'more_results' => isset($values[$last]),
     'page_num' => $request['page_num'],
   );
-  unset($values[10]);
+  unset($values[$last]);
 
   return civicrm_api3_create_success($values, $request['params'], $entity, 'getlist', CRM_Core_DAO::$_nullObject, $output);
 }
