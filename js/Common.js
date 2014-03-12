@@ -547,35 +547,45 @@ CRM.validate = CRM.validate || {
     );
   };
   /**
-   * @param startMsg string
-   * @param endMsg string|function
+   * @param options object|string
    * @param deferred optional jQuery deferred object
    * @return jQuery deferred object - if not supplied a new one will be created
    */
-  var fadeOut;
-  CRM.status = function(startMsg, endMsg, deferred) {
-    var $bar = $('#civicrm-menu');
-    if (!$bar.length) {
-      console && console.log && console.log('CRM.status called on a page with no menubar');
-      return;
+  CRM.status = function(options, deferred) {
+    // For simple usage without async operations you can pass in a string. 2nd param can be 'success' or 'error'
+    if (typeof options === 'string') {
+      return CRM.status({start: options, success: options, error: options})[deferred === 'error' ? 'reject' : 'resolve']();
     }
-    $('.crm-menubar-status-container', $bar).remove();
-    fadeOut && window.clearTimeout(fadeOut);
-    $bar.append('<li class="crm-menubar-status-container status-busy"><div class="crm-menubar-status-progressbar"><div class="crm-menubar-status-msg">' + startMsg + '</div></div></li>');
-    $('.crm-menubar-status-container', $bar).css('min-width', $('.crm-menubar-status-container', $bar).width());
-    deferred || (deferred = new $.Deferred());
-    deferred.done(function(data) {
-      var msg = typeof(endMsg) === 'function' ? endMsg(data) : endMsg;
-      $('.crm-menubar-status-container', $bar).removeClass('status-busy').addClass('status-done').show().find('.crm-menubar-status-msg').html(msg);
-      if (msg) {
-        fadeOut = window.setTimeout(function() {
-          $('.crm-menubar-status-container', $bar).fadeOut('slow');
+    var opts = $.extend({
+      start: ts('Saving...'),
+      success: ts('Saved.'),
+      error: function() {
+        CRM.alert(ts('Sorry an error occurred and your information was not saved'), ts('Error'));
+      }
+    }, options || {});
+    var $msg = $('<div class="crm-status-box-outer status-start"><div class="crm-status-box-inner"><div class="crm-status-box-msg">' + opts.start + '</div></div></div>')
+      .appendTo('body');
+    $msg.css('min-width', $msg.width());
+    function handle(status, data) {
+      var endMsg = typeof(opts[status]) === 'function' ? opts[status](data) : opts[status];
+      if (endMsg) {
+        $msg.removeClass('status-start').addClass('status-' + status).find('.crm-status-box-msg').html(endMsg);
+        window.setTimeout(function() {
+          $msg.fadeOut('slow', function() {$msg.remove()});
         }, 2000);
       } else {
-        $('.crm-menubar-status-container', $bar).hide();
+        $msg.remove();
       }
-    });
-    return deferred;
+    }
+    return (deferred || new $.Deferred())
+      .done(function(data) {
+        // If the server returns an error msg call the error handler
+        var status = $.isPlainObject(data) && (data.is_error || data.status === 'error') ? 'error' : 'success';
+        handle(status, data);
+      })
+      .fail(function(data) {
+        handle('error', data);
+      });
   };
 
   /**
