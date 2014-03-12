@@ -43,8 +43,7 @@
       $("#tagtree input").change(function(){
         var tagid = this.id.replace("check_", "");
         var op = (this.checked) ? 'create' : 'delete';
-        var api = CRM.api3('entity_tag', op, {entity_table: entityTable, entity_id: entityID, tag_id: tagid});
-        CRM.status({/literal}'{ts escape="js"}Saving...{/ts}', '{ts escape="js"}Saved{/ts}'{literal}, api);
+        var api = CRM.api3('entity_tag', op, {entity_table: entityTable, entity_id: entityID, tag_id: tagid}, true);
         $(this).closest("li").toggleClass('highlighted');
         CRM.updateContactSummaryTags();
       });
