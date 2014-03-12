@@ -156,6 +156,18 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Core_Form {
   protected $_formType;
   protected $_cdType;
 
+  public function showRecordLinkMesssage($id) {
+    $statusId = CRM_Core_DAO::getFieldValue('CRM_Contribute_BAO_Contribution', $id, 'contribution_status_id');
+    if (CRM_Contribute_PseudoConstant::contributionStatus($statusId, 'name') == 'Partially paid') {
+      if ($pid = CRM_Core_DAO::getFieldValue('CRM_Event_BAO_ParticipantPayment', $id, 'participant_id', 'contribution_id')) {
+        $recordPaymentLink = CRM_Utils_System::url('civicrm/payment',
+          "reset=1&id={$pid}&cid={$this->_contactID}&action=add&component=event"
+        );
+        CRM_Core_Session::setStatus(ts('Please use the <a href="%1">Record Payment</a> form if you have received an additional payment for this Partially paid contribution record.', array(1 => $recordPaymentLink)), ts('Notice'), 'alert');
+      }
+    }
+  }
+
   public function buildValuesAndAssignOnline_Note_Type($id, &$values) {
     $ids = array();
     $params = array('id' => $id);

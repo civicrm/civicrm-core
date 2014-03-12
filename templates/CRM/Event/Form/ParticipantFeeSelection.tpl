@@ -193,13 +193,15 @@ cj(function(){
 <script type='text/javascript'>
 cj(function($){
   cj('.total_amount-section').remove(); 
-  
+
   cj('#ParticipantFeeSelection').submit(function(e) {
+    var partiallyPaid = {/literal}{$partiallyPaid}{literal};
+    var pendingRefund = {/literal}{$pendingRefund}{literal};
     var statusId = cj('#status_id').val();
-    var statusLabel = cj('#status_id option:selected').text(); 
+    var statusLabel = cj('#status_id option:selected').text();
     var balanceFee = cj('#balance-fee').text();
     balanceFee = parseFloat(balanceFee.replace(/[^0-9-.]/g, ''));
-  
+
     if (balanceFee > 0 && statusId != partiallyPaid) {
       var result = confirm('Balance is owing for the updated selections. Expected participant status is \'Partially paid\'. Are you sure you want to set the participant status to ' + statusLabel + ' ? Click OK to continue, Cancel to change your entries.');
       if (result == false) {
