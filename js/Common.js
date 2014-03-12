@@ -431,7 +431,7 @@ CRM.validate = CRM.validate || {
       }
     })
     .on('dialogclose', function(e) {
-      if ($('.ui-dialog .modal-dialog').length < 1) {
+      if ($('.ui-dialog .modal-dialog').not(e.target).length < 1) {
         $('body').css({overflow: ''});
       }
     });
