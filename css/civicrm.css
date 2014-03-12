@@ -2789,10 +2789,6 @@ div.grippie {
 }
 
 /* civicrm admin menu */
-#civicrm-menu {
-  height: 27px;
-}
-
 #civicrm-menu .ui-autocomplete-input,
 .crm-container .ui-autocomplete-input,
 .crm-container .ac_input {
@@ -2816,28 +2812,33 @@ div.grippie {
   padding: 2px 16px 3px 2px;
 }
 
-/* Status message bar */
-#civicrm-menu .crm-menubar-status-container {
-  position: absolute;
-  right: 2px;
+/* Status message box */
+.crm-status-box-outer {
+  position: fixed;
+  z-index: 9999;
+  right: 0;
   top: 0;
-  border-top: 1px solid #1B1B1B;
 }
 
-#civicrm-menu .crm-menubar-status-progressbar {
-  padding: 3px 14px;
-  font-size: 14px !important;
-  font-weight: bold;
-  background: rgba(142, 136, 0, 0.9);
-  text-align: center;
-}
-
-#civicrm-menu .status-busy {
+.crm-status-box-outer.status-start {
   background: #F8FF03 url("../packages/jquery/jquery-ui/css/black-tie/images/animated-overlay.gif");
 }
 
-#civicrm-menu .status-done .crm-menubar-status-progressbar {
-  background: rgba(41, 152, 32, 0.7);
+.crm-status-box-outer .crm-status-box-inner {
+  padding: 3px 14px;
+  font-size: 13px !important;
+  color: #eee;
+  font-weight: bold;
+  text-align: center;
+  background: rgba(94, 91, 31, 0.9);
+}
+
+.crm-status-box-outer.status-success .crm-status-box-inner {
+  background: rgba(30, 143, 36, 0.7);
+}
+
+.crm-status-box-outer.status-error .crm-status-box-inner {
+  background: rgba(255, 7, 0, 0.7);
 }
 
 /* Pop-up help icon - eliminate forced line break */
