@@ -114,7 +114,7 @@ $('#civicrm-menu').ready(function() {
       },
       create: function() {
         // Place menu in front
-        $(this).crmAutocomplete('widget').css('z-index', (1 + $('#civicrm-menu').css('z-index')));
+        $(this).crmAutocomplete('widget').css('z-index', (1 + parseInt($('#civicrm-menu').css('z-index'))));
       }
     })
     .keydown(function() {

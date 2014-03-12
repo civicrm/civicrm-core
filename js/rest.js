@@ -84,7 +84,7 @@ var CRM = CRM || {};
   /**
    * AJAX api
    */
-  CRM.api3 = function(entity, action, params) {
+  CRM.api3 = function(entity, action, params, status) {
     if (typeof(entity) === 'string') {
       params = {
         entity: entity,
@@ -98,12 +98,16 @@ var CRM = CRM || {};
         json: JSON.stringify(entity)
       }
     }
-    return $.ajax({
+    var ajax = $.ajax({
       url: CRM.url('civicrm/ajax/rest'),
       dataType: 'json',
       data: params,
       type: params.action.indexOf('get') < 0 ? 'POST' : 'GET'
     });
+    if (status) {
+      CRM.status(status === true ? {} : status, ajax);
+    }
+    return ajax;
   };
 
   /**
