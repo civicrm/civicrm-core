@@ -34,6 +34,8 @@
 class CRM_Upgrade_Incremental_php_FourFour {
   const BATCH_SIZE = 5000;
 
+  const MAX_WORD_REPLACEMENT_SIZE = 255;
+
   function verifyPreDBstate(&$errors) {
     return TRUE;
   }
@@ -49,6 +51,20 @@ class CRM_Upgrade_Incremental_php_FourFour {
    * @return void
    */
   function setPreUpgradeMessage(&$preUpgradeMessage, $rev, $currentVer = NULL) {
+    if ($rev == '4.4.beta1') {
+      $apiCalls = self::getConfigArraysAsAPIParams(FALSE);
+      $oversizedEntries = 0;
+      foreach ($apiCalls as $params) {
+        if (!self::isValidWordReplacement($params)) {
+          $oversizedEntries++;
+        }
+      }
+      if ($oversizedEntries > 0) {
+        $preUpgradeMessage .= '<br/>' . ts("WARNING: There are %1 word-replacement entries which will not be valid in v4.4+ (eg with over 255 characters). They will be dropped during upgrade. For details, consult the CiviCRM log.", array(
+          1 => $oversizedEntries
+        ));
+      }
+    }
   }
 
   /**
@@ -541,7 +557,7 @@ CREATE TABLE IF NOT EXISTS `civicrm_word_replacement` (
   public static function rebuildWordReplacementTable() {
     civicrm_api3('word_replacement', 'replace', array(
       'options' => array('match' => array('domain_id', 'find_word')),
-      'values' => self::getConfigArraysAsAPIParams(FALSE),
+      'values' => array_filter(self::getConfigArraysAsAPIParams(FALSE), array(__CLASS__, 'isValidWordReplacement')),
     ));
     CRM_Core_BAO_WordReplacement::rebuild();
   }
@@ -577,5 +593,17 @@ CREATE TABLE IF NOT EXISTS `civicrm_word_replacement` (
     }
 
     return TRUE;
+  }
+
+  /**
+   * @param array $params
+   * @return bool TRUE if $params is valid
+   */
+  static function isValidWordReplacement($params) {
+    $result = strlen($params['find_word']) <= self::MAX_WORD_REPLACEMENT_SIZE && strlen($params['replace_word']) > self::MAX_WORD_REPLACEMENT_SIZE;
+    if (!$result) {
+      CRM_Core_Error::debug_var('invalidWordReplacement', $params);
+    }
+    return $result;
   }
 }
