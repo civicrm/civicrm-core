@@ -167,6 +167,7 @@
   </script>
   {/literal}
   {/if}
+
   {include file="CRM/Event/Form/EventFees.tpl"}
 
 {* Ajax callback for custom data snippet *}
@@ -405,6 +406,12 @@
 
           {literal}
           var eventId = $('#event_id').val();
+
+          {/literal}{if $action eq 2}{literal}
+            if (typeof eventId == 'undefined') {
+              var eventId = $('[name=event_id]').val();
+            }
+          {/literal}{/if}{literal}
 
           if (eventId) {
             dataUrl += '&eventId=' + eventId;

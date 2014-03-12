@@ -1835,6 +1835,11 @@ WHERE (li.entity_table = 'civicrm_participant' AND li.entity_id = {$participantI
     $updatedAmount = $params['amount'];
     self::recordAdjustedAmt($updatedAmount, $paidAmount, $contributionId);
 
+    // update participant fee_amount column
+    $partUpdateFeeAmt['id'] = $participantId;
+    $partUpdateFeeAmt['fee_amount'] = $params['amount'];
+    self::add($partUpdateFeeAmt);
+
     //activity creation
     self::addActivityForSelection($participantId, 'Change Registration');
   }

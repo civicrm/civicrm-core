@@ -111,7 +111,7 @@ AND li.entity_id = {$entityId})";
    *
    * @return array of line items
    */
-  static function getLineItems($entityId, $entity = 'participant', $isQuick = NULL) {
+  static function getLineItems($entityId, $entity = 'participant', $isQuick = NULL , $isQtyZero = TRUE) {
     $selectClause = $whereClause = $fromClause = NULL;
     $selectClause = "
       SELECT    li.id,
@@ -141,6 +141,11 @@ AND li.entity_id = {$entityId})";
       $fromClause .= " LEFT JOIN civicrm_price_set cps on cps.id = pf.price_set_id ";
       $whereClause .= " and cps.is_quick_config = 0";
     }
+
+    if (!$isQtyZero) {
+      $whereClause .= " and li.qty != 0";
+    }
+
     $lineItems = array();
 
     if (!$entityId || !$entity || !$fromClause) {
