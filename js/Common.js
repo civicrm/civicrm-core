@@ -403,25 +403,38 @@ CRM.validate = CRM.validate || {
   }
 
   // Initialize widgets
-  $(document).on('crmLoad', function(e) {
-    $('table.row-highlight', e.target)
-      .off('.rowHighlight')
-      .on('change.rowHighlight', 'input.select-row, input.select-rows', function () {
-        var target, table = $(this).closest('table');
-        if ($(this).hasClass('select-rows')) {
-          target = $('tbody tr', table);
-          $('input.select-row', table).prop('checked', $(this).prop('checked'));
-        }
-        else {
-          target = $(this).closest('tr');
-          $('input.select-rows', table).prop('checked', $(".select-row:not(':checked')", table).length < 1);
-        }
-        target.toggleClass('crm-row-selected', $(this).is(':checked'));
-      })
-      .find('input.select-row:checked').parents('tr').addClass('crm-row-selected');
-    $('.crm-select2:not(.select2-offscreen)', e.target).crmSelect2();
-    $('.crm-form-entityref:not(.select2-offscreen)', e.target).crmEntityRef();
-  });
+  $(document)
+    .on('crmLoad', function(e) {
+      $('table.row-highlight', e.target)
+        .off('.rowHighlight')
+        .on('change.rowHighlight', 'input.select-row, input.select-rows', function () {
+          var target, table = $(this).closest('table');
+          if ($(this).hasClass('select-rows')) {
+            target = $('tbody tr', table);
+            $('input.select-row', table).prop('checked', $(this).prop('checked'));
+          }
+          else {
+            target = $(this).closest('tr');
+            $('input.select-rows', table).prop('checked', $(".select-row:not(':checked')", table).length < 1);
+          }
+          target.toggleClass('crm-row-selected', $(this).is(':checked'));
+        })
+        .find('input.select-row:checked').parents('tr').addClass('crm-row-selected');
+      $('.crm-select2:not(.select2-offscreen)', e.target).crmSelect2();
+      $('.crm-form-entityref:not(.select2-offscreen)', e.target).crmEntityRef();
+    })
+    // Modal dialogs should disable scrollbars
+    .on('dialogopen', function(e) {
+      if ($(e.target).dialog('option', 'modal')) {
+        $(e.target).addClass('modal-dialog');
+        $('body').css({overflow: 'hidden'});
+      }
+    })
+    .on('dialogclose', function(e) {
+      if ($('.ui-dialog .modal-dialog').length < 1) {
+        $('body').css({overflow: ''});
+      }
+    });
 
   /**
    * Function to make multiselect boxes behave as fields in small screens
@@ -857,10 +870,7 @@ CRM.validate = CRM.validate || {
       settings.dialog = {
         modal: true,
         width: '65%',
-        height: parseInt($(window).height() * .75),
-        close: function() {
-          $(this).dialog('destroy').remove();
-        }
+        height: parseInt($(window).height() * .75)
       };
     }
     options && $.extend(true, settings, options);
@@ -868,6 +878,9 @@ CRM.validate = CRM.validate || {
     // Create new dialog
     if (settings.dialog) {
       $('<div id="'+ settings.target.substring(1) +'"><div class="crm-loading-element">' + ts('Loading') + '...</div></div>').dialog(settings.dialog);
+      $(settings.target).on('dialogclose', function() {
+        $(this).dialog('destroy').remove();
+      });
     }
     if (settings.dialog && !settings.dialog.title) {
       $(settings.target).on('crmLoad', function(e, data) {
