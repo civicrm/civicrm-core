@@ -321,8 +321,7 @@ CRM.validate = CRM.validate || {
           if (!_.xor(val.split(','), _.pluck(stored, 'id')).length) {
             callback(multiple ? stored : stored[0]);
           } else {
-            var params = $el.data('api-params') || {};
-            params.id = val;
+            var params = $.extend({}, $el.data('api-params') || {}, {id: val});
             CRM.api3($el.data('api-entity'), 'getlist', params).done(function(result) {
               callback(multiple ? result.values : result.values[0])
             });
@@ -1054,17 +1053,23 @@ CRM.validate = CRM.validate || {
       })
 
       .on('click', 'a.crm-option-edit-link', function() {
-        var link = $(this);
+        var
+          link = $(this),
+          optionsChanged = false;
         CRM.loadForm(this.href, {openInline: 'a:not("[href=#], .no-popup")'})
-          // Lots of things can happen once the form opens, this is the only event we can really rely on
+          .on('crmFormSuccess', function() {
+            optionsChanged = true;
+          })
           .on('dialogclose', function() {
-            link.trigger('crmOptionsEdited');
-            var $elects = $('select[data-option-edit-path="' + link.data('option-edit-path') + '"]');
-            if ($elects.data('api-entity') && $elects.data('api-field')) {
-              CRM.api3($elects.data('api-entity'), 'getoptions', {sequential: 1, field: $elects.data('api-field')})
-                .done(function(data) {
-                  CRM.utils.setOptions($elects, data.values);
-                });
+            if (optionsChanged) {
+              link.trigger('crmOptionsEdited');
+              var $elects = $('select[data-option-edit-path="' + link.data('option-edit-path') + '"]');
+              if ($elects.data('api-entity') && $elects.data('api-field')) {
+                CRM.api3($elects.data('api-entity'), 'getoptions', {sequential: 1, field: $elects.data('api-field')})
+                  .done(function (data) {
+                    CRM.utils.setOptions($elects, data.values);
+                  });
+              }
             }
           });
         return false;
