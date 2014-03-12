@@ -1815,7 +1815,7 @@ SET li.qty = 0,
     fi.amount = 0.00,
     eft.amount = 0.00
 WHERE (li.entity_table = 'civicrm_participant' AND li.entity_id = {$participantId}) AND
-      (price_field_value_id NOT IN ({$submittedFieldValues}) OR price_field_id NOT IN ({$submittedFields}))
+      (price_field_value_id NOT IN ({$submittedFieldValues}))
 ";
       CRM_Core_DAO::executeQuery($updateLineItem);
     }
