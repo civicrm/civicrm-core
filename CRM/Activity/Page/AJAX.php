@@ -419,8 +419,9 @@ class CRM_Activity_Page_AJAX {
       1 => 'subject',
       2 => 'source_contact_name',
       3 => '',
-      4 => 'activity_date_time',
-      5 => 'status_id',
+      4 => '',
+      5 => 'activity_date_time',
+      6 => 'status_id',
     );
 
     $sEcho = CRM_Utils_Type::escape($_REQUEST['sEcho'], 'Integer');
