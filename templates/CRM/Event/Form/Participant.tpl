@@ -345,8 +345,15 @@
         var $form = $('form#{/literal}{$form.formName}{literal}');
 
         // don't show cart related statuses if it's disabled
-        var pendingInCartStatusId = {/literal}{$pendingInCartStatusId}{literal};
-        $("#status_id option[value='" + pendingInCartStatusId + "']").remove();
+        {/literal}{if !$enableCart}{literal}
+          var pendingInCartStatusId = {/literal}{$pendingInCartStatusId}{literal};
+          $("#status_id option[value='" + pendingInCartStatusId + "']").remove();
+        {/literal}{/if}{literal}
+
+        {/literal}{if $action eq 1}{literal}
+          var pendingRefundStatusId = {/literal}{$pendingRefundStatusId}{literal};
+          $("#status_id option[value='" + pendingRefundStatusId + "']").remove();
+        {/literal}{/if}{literal}
 
         // Handle event selection
         $('#event_id', $form).change(function() {
