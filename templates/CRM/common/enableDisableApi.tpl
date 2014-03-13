@@ -91,7 +91,7 @@
 
     // Because this is an inline script it may get added to the document more than once, so remove handler before adding
     $('body')
-      .off('click', '.action-item.crm-enable-disable')
+      .off('click', '.crm-enable-disable')
       .on('click', '.action-item.crm-enable-disable', enableDisable);
   });
 </script>
