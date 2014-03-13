@@ -682,6 +682,7 @@ class CRM_Utils_System {
       return TRUE;
     }
     if (is_array($value)) {
+      // @todo Reuse of the $value variable = asking for trouble.
       foreach ($value as $key => $value) {
         if (!self::isNull($value)) {
           return FALSE;

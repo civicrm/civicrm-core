@@ -33,7 +33,7 @@
  *
  */
 class CRM_Utils_Type {
-  CONST
+  const
     T_INT        = 1,
     T_STRING     = 2,
     T_ENUM       = 2,
@@ -51,7 +51,8 @@ class CRM_Utils_Type {
     T_CCNUM      = 8192,
     T_MEDIUMBLOB = 16384;
 
-  CONST
+  // @todo What's the point of these constants? Backwards compatibility?
+  const
     TWO       = 2,
     FOUR      = 4,
     SIX       = 6,
@@ -66,16 +67,18 @@ class CRM_Utils_Type {
     HUGE      = 45;
 
   /**
-   * Convert Constant Data type to String
+   * Gets the string representation for a data type.
    *
-   * @param  $type       integer datatype
+   * @param int $type
+   *   Integer number identifying the data type.
    *
-   * @return $string     String datatype respective to integer datatype
-   *
-   * @access public
-   * @static
+   * @return string
+   *   String identifying the data type, e.g. 'Int' or 'String'.
    */
   static function typeToString($type) {
+    // @todo Use constants in the case statements, e.g. "case T_INT:".
+    // @todo return directly, instead of assigning a value.
+    // @todo Use a lookup array, as a property or as a local variable.
     switch ($type) {
       case 1:
         $string = 'Int';
@@ -140,15 +143,17 @@ class CRM_Utils_Type {
   }
 
   /**
-   * Verify that a variable is of a given type
+   * Verify that a variable is of a given type, and apply a bit of processing.
    *
-   * @param mixed   $data         The variable
-   * @param string  $type         The type
-   * @param boolean $abort        Should we abort if invalid
+   * @param mixed $data
+   *   The value to be verified/escaped.
+   * @param string $type
+   *   The type to verify against.
+   * @param boolean $abort
+   *   If TRUE, the operation will CRM_Core_Error::fatal() on invalid data.
    *
-   * @return mixed                The data, escaped if necessary
-   * @access public
-   * @static
+   * @return mixed
+   *   The data, escaped if necessary.
    */
   public static function escape($data, $type, $abort = TRUE) {
     switch ($type) {
@@ -167,6 +172,8 @@ class CRM_Utils_Type {
         // Checked for multi valued state/country value
         if (is_array($data)) {
           $returnData = TRUE;
+          // @todo Reuse of the $data variable = asking for trouble.
+          // @todo This code will always return the last item in the array. Intended?
           foreach ($data as $data) {
             if (CRM_Utils_Rule::positiveInteger($data) || CRM_Core_DAO::escapeString($data)) {
               $returnData = TRUE;
@@ -242,6 +249,7 @@ class CRM_Utils_Type {
         break;
     }
 
+    // @todo Use exceptions instead of CRM_Core_Error::fatal().
     if ($abort) {
       $data = htmlentities($data);
       CRM_Core_Error::fatal("$data is not of the type $type");
@@ -252,14 +260,17 @@ class CRM_Utils_Type {
   /**
    * Verify that a variable is of a given type
    *
-   * @param mixed   $data         The variable
-   * @param string  $type         The type
-   * @param boolean $abort        Should we abort if invalid
-   * @name string   $name    The name of the attribute
+   * @param mixed $data
+   *   The value to validate.
+   * @param string $type
+   *   The type to validate against.
+   * @param boolean $abort
+   *   If TRUE, the operation will CRM_Core_Error::fatal() on invalid data.
+   * @name string $name
+   *   The name of the attribute
    *
-   * @return mixed                The data, escaped if necessary
-   * @access public
-   * @static
+   * @return mixed
+   *   The data, escaped if necessary
    */
   public static function validate($data, $type, $abort = TRUE, $name = 'One of parameters ') {
     switch ($type) {

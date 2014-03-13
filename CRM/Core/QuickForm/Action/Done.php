@@ -53,11 +53,12 @@ class CRM_Core_QuickForm_Action_Done extends CRM_Core_QuickForm_Action {
    * and if success, call post process
    * when done processing pop to user context
    *
-   * @param  object    $page       CRM_Core_Form the current form-page
-   * @param  string    $actionName Current action name, as one Action object can serve multiple actions
+   * @param CRM_Core_Form $page
+   *   The current form-page
+   * @param string $actionName
+   *   Current action name, as one Action object can serve multiple actions.
    *
    * @return void
-   * @access public
    */
   function perform(&$page, $actionName) {
     $page->isFormBuilt() or $page->buildForm();
