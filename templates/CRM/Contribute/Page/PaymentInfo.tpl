@@ -27,16 +27,18 @@
 {literal}
 <script type='text/javascript'>
 cj(function($){
-  var dataUrl = {/literal}'{crmURL p="civicrm/payment/view" h=0 q="action=browse&id=$participantId&cid=`$contactId`&component=event&context=payment_info&snippet=4"}'{literal};
-  cj.ajax({
-     url: dataUrl,
-     async: false,
-     success: function(html) {
-       cj("#payment-info").html(html).trigger('crmLoad');
-     }
-   });
+  if (cj("#payment-info").length) {
+    var dataUrl = {/literal}'{crmURL p="civicrm/payment/view" h=0 q="action=browse&id=$participantId&cid=`$contactId`&component=event&context=payment_info&snippet=4"}'{literal};
+    cj.ajax({
+      url: dataUrl,
+      async: false,
+      success: function(html) {
+        cj("#payment-info").html(html).trigger('crmLoad');
+      }
+    });
 
-  cj('.total_amount-section').remove();
+    cj('.total_amount-section').remove();
+  }
 });
 </script>
 {/literal}
