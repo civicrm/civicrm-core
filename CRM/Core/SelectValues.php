@@ -186,30 +186,6 @@ class CRM_Core_SelectValues {
   }
 
   /**
-   * Extended property (custom field) data types
-   * @static
-   */
-  static function &customDataType() {
-    static $customDataType = NULL;
-    if (!$customDataType) {
-      $customDataType = array(
-        '' => ts('- select -'),
-        'String' => ts('Text'),
-        'Int' => ts('Integer'),
-        'Float' => ts('Decimal Number'),
-        'Money' => ts('Money'),
-        'Text' => ts('Memo'),
-        'Date' => ts('Date'),
-        'File' => ts('File'),
-        'Boolean' => ts('Yes/No'),
-        'Link' => ts('Link'),
-        'Auto-complete' => ts('Auto-complete'),
-      );
-    }
-    return $customDataType;
-  }
-
-  /**
    * Custom form field types
    * @static
    */
@@ -223,12 +199,16 @@ class CRM_Core_SelectValues {
         'Select' => ts('Drop-down (select list)'),
         'Radio' => ts('Radio buttons'),
         'Checkbox' => ts('Checkbox(es)'),
-        'Select Date' => ts('Date selector'),
+        'Date' => ts('Select Date'),
         'File' => ts('File'),
-        'Select State / Province' => ts('State / Province selector'),
-        'Select Country' => ts('Country selector'),
+        'StateProvince' => ts('Select State/Province'),
+        'Country' => ts('Select Country'),
         'RichTextEditor' => ts('Rich Text Editor'),
-        'Auto-complete' => ts('Contact Reference'),
+        'Autocomplete-Select' => ts('Autocomplete-Select'),
+        'Multi-Select' => ts('Multi-Select'),
+        'AdvMulti-Select' => ts('AdvMulti-Select'),
+        'Link' => ts('Link'),
+        'ContactReference' => ts('Autocomplete Select'),
       );
     }
     return $customHtmlType;
