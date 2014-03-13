@@ -1,8 +1,9 @@
-{*
+<?php
+/*
  +--------------------------------------------------------------------+
  | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -22,43 +23,52 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*}
-{$form.oplock_ts.html}
-<div class="crm-inline-edit-form">
-  <div class="crm-inline-button">
-    {include file="CRM/common/formButtons.tpl"}
-  </div>
+*/
 
-  <div class="crm-clear">  
-    {if $contactType eq 'Individual'}
-    <div class="crm-summary-row">
-      <div class="crm-label">{$form.employer_id.label}&nbsp;{help id="id-current-employer" file="CRM/Contact/Form/Contact.hlp"}</div>
-      <div class="crm-content">
-        {$form.employer_id.html|crmAddClass:big}
-      </div>
-    </div>
-    <div class="crm-summary-row">
-      <div class="crm-label">{$form.job_title.label}</div>
-      <div class="crm-content">{$form.job_title.html}</div>
-    </div>
-    {/if}
-    <div class="crm-summary-row">
-      <div class="crm-label">{$form.nick_name.label}</div>
-      <div class="crm-content">{$form.nick_name.html}</div>
-    </div>
-    {if $contactType eq 'Organization'}
-    <div class="crm-summary-row">
-      <div class="crm-label">{$form.legal_name.label}</div>
-      <div class="crm-content">{$form.legal_name.html}</div>
-    </div>
-    <div class="crm-summary-row">
-      <div class="crm-label">{$form.sic_code.label}</div>
-      <div class="crm-content">{$form.sic_code.html}</div>
-    </div>
-    {/if}
-    <div class="crm-summary-row">
-      <div class="crm-label">{$form.contact_source.label}</div>
-      <div class="crm-content">{$form.contact_source.html}</div>
-    </div>
-  </div> <!-- end of main -->
-</div>
+/**
+ *
+ * @package CRM
+ * @copyright CiviCRM LLC (c) 2004-2014
+ * $Id: $
+ *
+ */
+class CRM_Utils_Check_Message {
+  /**
+   * @var string
+   */
+  private $name;
+
+  /**
+   * @var string
+   */
+  private $message;
+
+  function __construct($name, $message) {
+    $this->name = $name;
+    $this->message = $message;
+  }
+
+  /**
+   * @return string
+   */
+  function getName() {
+    return $this->name;
+  }
+
+  /**
+   * @return string
+   */
+  function getMessage() {
+    return $this->message;
+  }
+
+  /**
+   * @return array
+   */
+  function toArray() {
+    return array(
+      'name' => $this->name,
+      'message' => $this->message,
+    );
+  }
+}

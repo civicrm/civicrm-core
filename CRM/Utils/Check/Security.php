@@ -79,7 +79,9 @@ class CRM_Utils_Check_Security {
    * Execute "checkAll"
    */
   public function showPeriodicAlerts() {
-    if (CRM_Core_Permission::check('administer CiviCRM')) {
+    if (CRM_Core_Permission::check('administer CiviCRM')
+      && CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'securityAlert', NULL, TRUE)
+    ) {
       $session = CRM_Core_Session::singleton();
       if ($session->timer('check_' . __CLASS__, self::CHECK_TIMER)) {
 
@@ -88,7 +90,7 @@ class CRM_Utils_Check_Security {
         $config->cleanup(0, FALSE);
 
         foreach ($this->checkAll() as $message) {
-          CRM_Core_Session::setStatus($message, ts('Security Warning'));
+          CRM_Core_Session::setStatus($message->getMessage(), ts('Security Warning'));
         }
       }
     }
@@ -153,11 +155,15 @@ class CRM_Utils_Check_Security {
         $url[] = $log_path[1];
         $log_url = implode($filePathMarker, $url);
         $docs_url = $this->createDocUrl('checkLogFileIsNotAccessible');
-        if ($log = @file_get_contents($log_url)) {
+        $headers = @get_headers($log_url);
+        if (stripos($headers[0], '200')) {
           $msg = 'The <a href="%1">CiviCRM debug log</a> should not be downloadable.'
             . '<br />' .
             '<a href="%2">Read more about this warning</a>';
-          $messages[] = ts($msg, array(1 => $log_url, 2 => $docs_url));
+          $messages[] = new CRM_Utils_Check_Message(
+            'checkLogFileIsNotAccessible',
+            ts($msg, array(1 => $log_url, 2 => $docs_url))
+          );
         }
       }
     }
@@ -192,12 +198,16 @@ class CRM_Utils_Check_Security {
           $f = array_rand($files);
           if ($file_path = explode($filePathMarker, $files[$f])) {
             $url = implode($filePathMarker, array($upload_url[0], $file_path[1]));
-            if ($file = @file_get_contents($url)) {
+            $headers = @get_headers($url);
+            if (stripos($headers[0], '200')) {
               $msg = 'Files in the upload directory should not be downloadable.'
                 . '<br />' .
                 '<a href="%1">Read more about this warning</a>';
               $docs_url = $this->createDocUrl('checkUploadsAreNotAccessible');
-              $messages[] = ts($msg, array(1 => $docs_url));
+              $messages[] = new CRM_Utils_Check_Message(
+                'checkUploadsAreNotAccessible',
+                ts($msg, array(1 => $docs_url))
+              );
             }
           }
         }
@@ -241,7 +251,10 @@ class CRM_Utils_Check_Security {
           . '<br />' .
           '<a href="%3">Read more about this warning</a>';
         $docs_url = $this->createDocUrl('checkDirectoriesAreNotBrowseable');
-        $messages[] = ts($msg, array(1 => $publicDir, 2 => $publicDir, 3 => $docs_url));
+        $messages[] = new CRM_Utils_Check_Message(
+          'checkDirectoriesAreNotBrowseable',
+          ts($msg, array(1 => $publicDir, 2 => $publicDir, 3 => $docs_url))
+        );
       }
     }
 
