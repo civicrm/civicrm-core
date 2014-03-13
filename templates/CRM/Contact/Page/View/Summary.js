@@ -298,21 +298,19 @@
         var
           tabName = $(this).data('tab') || 'summary',
           $tab = $('#tab_' + tabName),
-          $panel = $('#' + $tab.attr('aria-controls')),
           url = $(this).attr('href');
-        if (url !== '#') {
+        $('#crm-contact-actions-list').hide();
+        if (url === '#') {
+          CRM.tabHeader.focus($tab);
+          return false;
+        } else if (CRM.config.ajax_popups_enabled) {
           CRM.loadForm(url)
             .on('crmFormSuccess', function() {
-              if ($panel.data('civiCrmSnippet')) {
-                $panel.crmSnippet('refresh');
-              }
-              $('#mainTabContainer').tabs('option', 'active', $tab.prevAll().length);
+              CRM.tabHeader.resetTab($tab);
+              CRM.tabHeader.focus($tab);
             });
-        } else {
-          $('#mainTabContainer').tabs('option', 'active', $tab.prevAll().length);
+          return false;
         }
-        $('#crm-contact-actions-list').hide();
-        return false;
       });
     $(document)
       // Actions menu
