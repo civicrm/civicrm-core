@@ -82,13 +82,13 @@
       // Delete an address
       if (o.hasClass('address') && !o.hasClass('add-new') && !response.addressId) {
         o.parent().remove();
-        CRM.alert('', ts('Address Deleted'), 'success');
+        CRM.status(ts('Address Deleted'));
       }
       else {
         // Reload this block plus all dependent blocks
         var update = $.merge([o], dependent);
         _.each(update, reloadBlock);
-        CRM.alert('', ts('Saved'), 'success');
+        CRM.status(ts('Saved'));
       }
       // Update changelog tab and contact footer
       if (response.changeLog.count) {
@@ -257,7 +257,7 @@
          CRM.confirm(function() {
             CRM.api('address', 'delete', {id: $block.data('edit-params').aid}, {success:
               function(data) {
-                CRM.alert('', ts('Address Deleted'), 'success');
+                CRM.status(ts('Address Deleted'));
                 $('.crm-inline-edit-container').addClass('crm-edit-ready');
                 $block.remove();
               }
