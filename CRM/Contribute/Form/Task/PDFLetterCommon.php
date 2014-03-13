@@ -29,10 +29,19 @@ class CRM_Contribute_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDF
     $skipOnHold = isset($form->skipOnHold) ? $form->skipOnHold : FALSE;
     $skipDeceased = isset($form->skipDeceased) ? $form->skipDeceased : TRUE;
 
-    foreach ($form->getVar('_contributionIds') as $item => $contributionId) {
+    $contributionIDs = $form->getVar('_contributionIds');
+    if ($form->_includesSoftCredits) {
+      $contributionIDs = $form->getVar('_contributionContactIds');
+    }
 
+    foreach ($contributionIDs as $item => $contributionId) {
       // get contact information
-      $contactId = civicrm_api("Contribution", "getvalue", array('version' => '3', 'id' => $contributionId, 'return' => 'contact_id'));
+      if ($form->_includesSoftCredits) {
+        list($contactId) = explode('-', $item);
+        $contactId = (int) $contactId;
+      } else {
+        $contactId = civicrm_api("Contribution", "getvalue", array('version' => '3', 'id' => $contributionId, 'return' => 'contact_id'));
+      }
       $params = array('contact_id' => $contactId);
 
       list($contact) = CRM_Utils_Token::getTokenDetails($params,
