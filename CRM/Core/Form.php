@@ -443,6 +443,10 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
         $attrs = array_merge($js, $attrs);
       }
 
+      if ($button['type'] === 'cancel') {
+        $attrs['class'] .= ' cancel';
+      }
+
       if ($button['type'] === 'reset') {
         $prevnext[] = $this->createElement($button['type'], 'reset', $button['name'], $attrs);
       }
@@ -454,8 +458,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
           $buttonName = $this->getButtonName($button['type']);
         }
 
-        if (in_array($button['type'], array(
-          'next', 'upload')) && $button['name'] === 'Save') {
+        if (in_array($button['type'], array('next', 'upload', 'done')) && $button['name'] === ts('Save')) {
           $attrs = array_merge($attrs, (array('accesskey' => 'S')));
         }
         $prevnext[] = $this->createElement('submit', $buttonName, $button['name'], $attrs);
