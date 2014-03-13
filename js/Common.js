@@ -348,6 +348,7 @@ CRM.validate = CRM.validate || {
               dialog: {width: 500, height: 'auto'}
             }).on('crmFormSuccess', function(e, data) {
               if (data.status === 'success' && data.id) {
+                CRM.status(ts('%1 Created', {1: data.label}));
                 if ($el.select2('container').hasClass('select2-container-multi')) {
                   var selection = $el.select2('data');
                   selection.push(data);
@@ -547,9 +548,7 @@ CRM.validate = CRM.validate || {
     );
   };
   /**
-   * @param options object|string
-   * @param deferred optional jQuery deferred object
-   * @return jQuery deferred object - if not supplied a new one will be created
+   * @see https://wiki.civicrm.org/confluence/display/CRMDOC/Notification+Reference
    */
   CRM.status = function(options, deferred) {
     // For simple usage without async operations you can pass in a string. 2nd param is optional string 'error' if this is not a success msg.
@@ -589,12 +588,7 @@ CRM.validate = CRM.validate || {
   };
 
   /**
-   * @param string text Displayable message
-   * @param string title Displayable title
-   * @param string type 'alert'|'info'|'success'|'error' (default: 'alert')
-   * @param {object} options
-   * @return {*}
-   * @see http://wiki.civicrm.org/confluence/display/CRM/Notifications+in+CiviCRM
+   * @see https://wiki.civicrm.org/confluence/display/CRMDOC/Notification+Reference
    */
   CRM.alert = function (text, title, type, options) {
     type = type || 'alert';
@@ -641,13 +635,7 @@ CRM.validate = CRM.validate || {
   };
 
   /**
-   * Prompt the user for confirmation.
-   *
-   * @param buttons {object|function} key|value pairs where key == button label and value == callback function
-   *  passing in a function instead of an object is a shortcut for a sinlgle button labeled "Continue"
-   * @param options {object|void} Override defaults, keys include 'title', 'message',
-   *  see jQuery.dialog for full list of available params
-   * @param cancelLabel {string}
+   * @see https://wiki.civicrm.org/confluence/display/CRMDOC/Notification+Reference
    */
   CRM.confirm = function (buttons, options, cancelLabel) {
     var dialog, callbacks = {};
@@ -690,8 +678,7 @@ CRM.validate = CRM.validate || {
   };
 
   /**
-   * Sets an error message
-   * If called for a form item, title and removal condition will be handled automatically
+   * @see https://wiki.civicrm.org/confluence/display/CRMDOC/Notification+Reference
    */
   $.fn.crmError = function (text, title, options) {
     title = title || '';
@@ -767,6 +754,9 @@ CRM.validate = CRM.validate || {
     });
   }
 
+  /**
+   * @see https://wiki.civicrm.org/confluence/display/CRMDOC/Ajax+Pages+and+Forms
+   */
   $.widget('civi.crmSnippet', {
     options: {
       url: null,
@@ -870,6 +860,9 @@ CRM.validate = CRM.validate || {
   });
 
   var dialogCount = 0;
+  /**
+   * @see https://wiki.civicrm.org/confluence/display/CRMDOC/Ajax+Pages+and+Forms
+   */
   CRM.loadPage = function(url, options) {
     var settings = {
       target: '#crm-ajax-dialog-' + (dialogCount++),
@@ -901,7 +894,9 @@ CRM.validate = CRM.validate || {
     $(settings.target).crmSnippet(settings).crmSnippet('refresh');
     return $(settings.target);
   };
-
+  /**
+   * @see https://wiki.civicrm.org/confluence/display/CRMDOC/Ajax+Pages+and+Forms
+   */
   CRM.loadForm = function(url, options) {
     var settings = {
       crmForm: {
@@ -1027,6 +1022,7 @@ CRM.validate = CRM.validate || {
 
   /**
    * Temporary stub to get around name conflict with legacy jQuery.autocomplete plugin
+   * FIXME: Remove this before 4.5 release
    */
   $.widget('civi.crmAutocomplete', $.ui.autocomplete, {});
 
