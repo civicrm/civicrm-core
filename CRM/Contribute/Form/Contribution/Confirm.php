@@ -363,13 +363,12 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $this->assignToTemplate();
 
     $params = $this->_params;
-    $honor_block_is_active = $this->get('honor_block_is_active');
     // make sure we have values for it
-    if ($honor_block_is_active && !empty($params['soft_credit_type_id'])) {
+    if ($this->_honor_block_is_active && !empty($params['soft_credit_type_id'])) {
       $honorName = null;
       $softCreditTypes = CRM_Core_OptionGroup::values("soft_credit_type", FALSE);
 
-      $this->assign('honor_block_is_active', $honor_block_is_active);
+      $this->assign('honor_block_is_active', $this->_honor_block_is_active);
       $this->assign('soft_credit_type', $softCreditTypes[$params['soft_credit_type_id']]);
       CRM_Contribute_BAO_ContributionSoft::formatHonoreeProfileFields($this, $params['honor'], $params['honoree_profile_id']);
 

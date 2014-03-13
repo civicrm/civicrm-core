@@ -1030,7 +1030,7 @@ class CRM_Contact_BAO_Query {
           }
 
           foreach ($this->_params as $id => $values) {
-            if ($values[0] == $nm ||
+            if ((is_array($values) && $values[0] == $nm) ||
               (in_array($elementName, array('phone', 'im'))
                 && (strpos($values[0], $nm) !== FALSE)
               )

@@ -110,7 +110,7 @@ class CRM_Contact_Form_ProfileContact {
 
   static function postProcess($form) {
     $params = $form->_params;
-    if ($form->get('honor_block_is_active') && !empty($params['soft_credit_type_id'])) {
+    if ($form->_honor_block_is_active && !empty($params['soft_credit_type_id'])) {
       $honorId = null;
 
       //check if there is any duplicate contact

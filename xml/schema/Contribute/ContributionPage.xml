@@ -348,12 +348,6 @@
     <add>1.5</add>
   </field>
   <field>
-    <name>honor_block_is_active</name>
-    <type>boolean</type>
-    <comment>Should this contribution have the honor  block enabled?</comment>
-    <add>1.6</add>
-  </field>
-  <field>
     <name>start_date</name>
     <type>datetime</type>
     <title>Contribution Page Start Date</title>

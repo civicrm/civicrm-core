@@ -149,6 +149,7 @@ ALTER TABLE `civicrm_uf_join`
      ALTER TABLE civicrm_contribution_page DROP honor_block_title;
      ALTER TABLE civicrm_contribution_page DROP honor_block_text;
 {/if}
+ALTER TABLE civicrm_contribution_page DROP honor_block_is_active;
 
 ALTER TABLE civicrm_contribution DROP FOREIGN KEY `FK_civicrm_contribution_honor_contact_id`;
 ALTER TABLE civicrm_contribution DROP honor_contact_id;
