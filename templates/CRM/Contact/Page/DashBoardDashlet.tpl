@@ -99,7 +99,7 @@
          success: function( content ) {
            $("#civicrm-dashboard, #crm-dashboard-configure, .show-refresh, #empty-message").hide();
            $('.show-done').show();
-           $("#configure-dashlet").show().html(content);
+           $("#configure-dashlet").show().html(content).trigger('crmLoad');
          }
       });
       return false;
