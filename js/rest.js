@@ -150,13 +150,13 @@ var CRM = CRM || {};
       case "setvalue":
       case "replace":
         settings.success = function() {
-          CRM.alert('', ts('Saved'), 'success');
+          CRM.status(ts('Saved'));
           return true;
         };
         break;
       case "delete":
         settings.success = function() {
-          CRM.alert('', ts('Removed'), 'success');
+          CRM.status(ts('Removed'));
           return true;
         };
     }
