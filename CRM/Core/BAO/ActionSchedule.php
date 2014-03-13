@@ -760,6 +760,9 @@ WHERE reminder.action_schedule_id = %1 AND reminder.action_date_time IS NULL
     $actionSchedule->mapping_id = $mappingID;
     $actionSchedule->is_active = 1;
     if(!empty($params)) {
+      if(!array_key_exists('rowCount', $params)) {
+        $params['rowCount'] = NULL;
+      }
       _civicrm_api3_dao_set_filter($actionSchedule, $params, FALSE, 'ActionSchedule');
     }
     $actionSchedule->find();
