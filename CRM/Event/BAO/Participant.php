@@ -1788,12 +1788,17 @@ WHERE cpf.price_set_id = %1 AND cpfv.label LIKE %2";
     }
     $insertLines = $submittedLineItems;
     $submittedFieldValueIds = array_keys($submittedLineItems);
-
+    $updateLines = array();
     foreach ($previousLineItems as $id => $previousLineItem) {
       // check through the submitted items if the previousItem exists,
       // if found in submitted items, do not use it for new item creations
       if (in_array($previousLineItem['price_field_value_id'], $submittedFieldValueIds)) {
-        unset($insertLines[$previousLineItem['price_field_value_id']]);
+        // for updating the line items i.e. use-case - once deselect-option selecting again
+        if ($previousLineItem['qty'] == 0) {
+          $updateLines[$previousLineItem['price_field_value_id']]['qty'] = $submittedLineItems[$previousLineItem['price_field_value_id']]['qty'];
+          $updateLines[$previousLineItem['price_field_value_id']]['line_total'] = $submittedLineItems[$previousLineItem['price_field_value_id']]['line_total'];
+          unset($insertLines[$previousLineItem['price_field_value_id']]);
+        }
       }
     }
 
@@ -1815,6 +1820,25 @@ WHERE (li.entity_table = 'civicrm_participant' AND li.entity_id = {$participantI
       (price_field_value_id NOT IN ({$submittedFieldValues}))
 ";
       CRM_Core_DAO::executeQuery($updateLineItem);
+    }
+
+    if (!empty($updateLines)) {
+      foreach ($updateLines as $valueId => $vals) {
+        $updateLineItem = "
+UPDATE civicrm_line_item li
+INNER JOIN civicrm_financial_item fi
+   ON (li.id = fi.entity_id AND fi.entity_table = 'civicrm_line_item')
+INNER JOIN civicrm_entity_financial_trxn eft
+   ON (eft.entity_id = fi.id AND eft.entity_table = 'civicrm_financial_item')
+SET li.qty = {$vals['qty']},
+    li.line_total = {$vals['line_total']},
+    fi.amount = {$vals['line_total']},
+    eft.amount = {$vals['line_total']}
+WHERE (li.entity_table = 'civicrm_participant' AND li.entity_id = {$participantId}) AND
+      (price_field_value_id = {$valueId})
+";
+        CRM_Core_DAO::executeQuery($updateLineItem);
+      }
     }
 
     // insert new 'adjusted amount' transaction entry and update contribution entry.

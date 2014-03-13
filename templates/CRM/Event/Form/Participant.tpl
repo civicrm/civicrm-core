@@ -296,7 +296,7 @@
             <span class="description">{ts}Source for this registration (if applicable).{/ts}</span></td>
           </tr>
         </table>
-       {if $participantId}
+       {if $participantId and $hasPayment}
         <table class='form-layout'>
           <tr>
             <td class='label'>{ts}Fees{/ts}</td>
@@ -332,7 +332,7 @@
   </div>
   {* JS block for ADD or UPDATE actions only *}
   {if $action eq 1 or $action eq 2}
-    {if $participantId}
+    {if $participantId and $hasPayment}
       {include file="CRM/Contribute/Page/PaymentInfo.tpl" show='event-payment'}
     {/if}
 

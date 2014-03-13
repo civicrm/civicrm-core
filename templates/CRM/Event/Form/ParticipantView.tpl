@@ -99,7 +99,7 @@
         <td class="label">{ts}Event Source{/ts}</td><td>{$source}&nbsp;</td>
       </tr>
     {/if}
-    {if $participantId}
+    {if $participantId and $hasPayment}
       <tr>
         <td class='label'>{ts}Fees{/ts}</td>
         <td id='payment-info'></td>
@@ -110,7 +110,9 @@
             {if $lineItem}
                 <td class="label">{ts}Selections{/ts}</td>
                 <td>{include file="CRM/Price/Page/LineItem.tpl" context="Event"}
+                {if $hasPayment}
                    <a class="button" href='{crmURL p="civicrm/event/participant/feeselection" q="reset=1&id=`$participantId`&cid=`$contactId`&action=update"}' title="{ts}Change Selections{/ts}"><span><div class="icon edit-icon"></div> {ts}Change Selections{/ts}</span></a>
+                {/if}
                 </td>
             {else}
                 <td class="label">{ts}Event Level{/ts}</td>
@@ -124,7 +126,7 @@
       {/if}
     {/foreach}
     </table>
-    {if $participantId}
+    {if $participantId and $hasPayment}
       {include file="CRM/Contribute/Page/PaymentInfo.tpl" show='event-payment'}
     {/if}
     {include file="CRM/Custom/Page/CustomDataView.tpl"}
