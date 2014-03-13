@@ -515,6 +515,10 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
           CRM_Contact_BAO_Relationship::disableEnableRelationship($this->_relationshipId, $active);
         }
       }
+      // Refresh contact tabs with related data
+      $this->ajaxResponse['updateTabs'] = array(
+        '#tab_member' => CRM_Contact_BAO_Contact::getCountComponent('membership', $this->_contactId),
+      );
     }
     // Set current employee/employer relationship, CRM-3532
     if ($params['is_current_employer'] && $this->_allRelationshipNames[$relationshipTypeId]["name_a_b"] == 'Employee of') {
