@@ -198,7 +198,7 @@ class CRM_Core_SelectValues {
         'TextArea' => ts('Multi-line text box (textarea)'),
         'Select' => ts('Drop-down (select list)'),
         'Radio' => ts('Radio buttons'),
-        'Checkbox' => ts('Checkbox(es)'),
+        'CheckBox' => ts('Checkbox(es)'),
         'Date' => ts('Select Date'),
         'File' => ts('File'),
         'StateProvince' => ts('Select State/Province'),
@@ -257,7 +257,7 @@ class CRM_Core_SelectValues {
       $customGroupStyle = array(
         'Tab' => ts('Tab'),
         'Inline' => ts('Inline'),
-        'Tab with table' => ts('Tab with table')
+        'Tab with table' => ts('Tab with table'),
       );
     }
     return $customGroupStyle;
@@ -1051,7 +1051,7 @@ class CRM_Core_SelectValues {
   /**
    * Mailing Job Status
    */
-  static function geMailingJobStatus() {
+  static function getMailingJobStatus() {
     static $mailingJobStatus = NULL;
     if (!$mailingJobStatus) {
       $mailingJobStatus = array(
@@ -1066,5 +1066,17 @@ class CRM_Core_SelectValues {
     return $mailingJobStatus;
   }
 
+  /**
+   * Frequency unit for schedule reminders
+   */
+  static function getScheduleReminderFrequencyUnits() {
+    static $scheduleReminderFrequencyUnits = NULL;
+    if (!$scheduleReminderFrequencyUnits) {
+      $scheduleReminderFrequencyUnits = array(
+          'hour' => ts('hour')) + CRM_Core_OptionGroup::values('recur_frequency_units');
+    }
+
+    return $scheduleReminderFrequencyUnits;
+  }
 }
 
