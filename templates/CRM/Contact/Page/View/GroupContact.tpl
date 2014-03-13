@@ -199,11 +199,8 @@
         params.status = status;
       }
       // This api is weird - 'delete' actually works for updating as well as deleting
-      CRM.api('group_contact', 'delete', params, {success: function() {
-        refresh();
-        // Normally you wouldn't put a variable within ts() but this works due to smarty hack below
-        CRM.alert('', ts(status), 'success');
-      }});
+      // Normally you wouldn't put a variable within ts() but this works due to smarty hack below
+      CRM.api3('group_contact', 'delete', params, {success: ts(status)}).done(refresh);
     }
     $('.view-contact-groups a.action-item').click(function() {
       that = this;

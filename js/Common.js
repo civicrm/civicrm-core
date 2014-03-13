@@ -348,6 +348,7 @@ CRM.validate = CRM.validate || {
               dialog: {width: 500, height: 'auto'}
             }).on('crmFormSuccess', function(e, data) {
               if (data.status === 'success' && data.id) {
+                CRM.status(ts('%1 Created', {1: data.label}));
                 if ($el.select2('container').hasClass('select2-container-multi')) {
                   var selection = $el.select2('data');
                   selection.push(data);

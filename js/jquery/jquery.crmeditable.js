@@ -68,7 +68,7 @@
       },
       success: function(entity, field, value, data) {
         var $i = $(this);
-        CRM.alert('', ts('Saved'), 'success');
+        CRM.status(ts('Saved'));
         $i.removeClass('crm-editable-saving crm-error');
         $i.html(value);
       }
