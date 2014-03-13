@@ -42,11 +42,7 @@
  *
  */
 function civicrm_api3_action_schedule_get($params) {
-  $bao = new CRM_Core_BAO_ActionSchedule();
-  _civicrm_api3_dao_set_filter($bao, $params, true, 'ActionSchedule');
-  $actionSchedules = _civicrm_api3_dao_to_array($bao, $params, true,'ActionSchedule');
-
-  return civicrm_api3_create_success($actionSchedules, $params, 'action_schedule', 'get', $bao);
+  return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params, 'action_schedule');
 }
 
 
@@ -60,33 +56,11 @@ function civicrm_api3_action_schedule_get($params) {
  * {@getfields action_schedule_create}
  */
 function civicrm_api3_action_schedule_create($params) {
-  if (empty($params['id'])) {
-    // an update does not require any mandatory parameters
-    civicrm_api3_verify_one_mandatory($params,
-      NULL,
-      array(
-        'title','mapping_id', 'entity_status', 'entity_value',
-      )
-    );
-  }
-
-  $ids = array();
-  if (isset($params['id']) && !CRM_Utils_Rule::integer($params['id'])) {
-    return civicrm_api3_create_error('Invalid value for ID');
-  }
-
+  civicrm_api3_verify_one_mandatory($params, NULL, array('start_action_date', 'absolute_date'));
   if (!array_key_exists('name', $params) && !array_key_exists('id', $params)) {
     $params['name'] = CRM_Utils_String::munge($params['title']);
   }
-
-  $actionSchedule = new CRM_Core_BAO_ActionSchedule();
-  $actionSchedule = CRM_Core_BAO_ActionSchedule::add($params, $ids);
-
-  $actSchedule = array();
-
-  _civicrm_api3_object_to_array($actionSchedule, $actSchedule[$actionSchedule->id]);
-
-  return civicrm_api3_create_success($actSchedule, $params, 'action_schedule', 'create', $actionSchedule);
+  return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params, 'action_schedule');
 }
 
 /**
@@ -96,7 +70,10 @@ function civicrm_api3_action_schedule_create($params) {
  * @param array $params array or parameters determined by getfields
  */
 function _civicrm_api3_action_schedule_create_spec(&$params) {
-  unset($params['version']);
+  $params['title']['api.required'] = TRUE;
+  $params['mapping_id']['api.required'] = TRUE;
+//  $params['entity_status']['api.required'] = TRUE;
+  $params['entity_value']['api.required'] = TRUE;
 }
 
 /**
