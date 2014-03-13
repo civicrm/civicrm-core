@@ -105,7 +105,16 @@ var CRM = CRM || {};
       type: params.action.indexOf('get') < 0 ? 'POST' : 'GET'
     });
     if (status) {
-      CRM.status(status === true ? {} : status, ajax);
+      // Default status messages
+      if (status === true) {
+        status = {success: params.action === 'delete' ? ts('Removed') : ts('Saved')};
+        if (params.action.indexOf('get') === 0) {
+          status.start = ts('Loading...');
+          status.success = null;
+        }
+      }
+      var messages = status === true ? {} : status;
+      CRM.status(status, ajax);
     }
     return ajax;
   };

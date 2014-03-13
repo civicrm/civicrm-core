@@ -392,7 +392,7 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
         $urlString = 'civicrm/contact/search/custom';
         if ($action == CRM_Core_Action::UPDATE) {
           if ($form->_contactId) {
-            $urlParams .= '&cid=' . $this->_contactId;
+            $urlParams .= '&cid=' . $form->_contactId;
           }
           $keyName = '&key';
           $urlParams .= '&context=fulltext&action=view';
