@@ -195,6 +195,16 @@
           fields).{/ts} {help id="id-editor_id"}
       </td>
     </tr>
+    <tr class="crm-preferences-display-form-block-ajax_popups_enabled">
+      <td class="label">{$form.ajax_popups_enabled.label}</td>
+      <td>{$form.ajax_popups_enabled.html}</td>
+    </tr>
+    <tr class="crm-preferences-display-form-block-description">
+      <td>&nbsp;</td>
+      <td class="description">
+        {ts}If you disable this option, the CiviCRM interface will be limited to traditional browsing. Opening a form will refresh the page rather than opening a popup dialog.{/ts}
+      </td>
+    </tr>
     <tr class="crm-preferences-display-form-block-display_name_format">
       <td class="label">{$form.display_name_format.label}</td>
       <td>{$form.display_name_format.html}</td>

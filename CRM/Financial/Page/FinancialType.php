@@ -132,7 +132,9 @@ class CRM_Financial_Page_FinancialType extends CRM_Core_Page_Basic {
    * @static
    */
   function browse() {
-    CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'js/crm.livePage.js');
+    if (CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'ajax_popups_enabled', NULL, TRUE)) {
+      CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'js/crm.livePage.js');
+    }
     // get all financial types sorted by weight
     $financialType = array();
     $dao = new CRM_Financial_DAO_FinancialType();

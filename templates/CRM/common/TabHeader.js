@@ -29,7 +29,7 @@ cj(function($) {
             })
           });
         }
-        if (ui.tab.hasClass('livePage')) {
+        if (ui.tab.hasClass('livePage') && CRM.config.ajax_popups_enabled) {
           ui.panel
             .off('click.crmLivePage')
             .on('click.crmLivePage', 'a.button, a.action-item', function() {
@@ -76,6 +76,14 @@ cj(function($) {
 (function($) {
   // Utility functions
   CRM.tabHeader = CRM.tabHeader || {};
+
+  /**
+   * Make a given tab the active one
+   * @param tab jQuery selector
+   */
+  CRM.tabHeader.focus = function(tab) {
+    $('#mainTabContainer').tabs('option', 'active', $(tab).prevAll().length);
+  };
 
   /**
    * @param tab jQuery selector

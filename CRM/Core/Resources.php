@@ -455,6 +455,9 @@ class CRM_Core_Resources {
         'userFramework' => $config->userFramework,
         'resourceBase' => $config->resourceBase,
         'lcMessages' => $config->lcMessages,
+        'ajax_popups_enabled' => (bool) CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
+          'ajax_popups_enabled', NULL, TRUE
+        )
       );
       $this->addSetting(array('config' => $settings));
 

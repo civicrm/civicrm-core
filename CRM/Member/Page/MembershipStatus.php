@@ -134,7 +134,9 @@ class CRM_Member_Page_MembershipStatus extends CRM_Core_Page_Basic {
    * @static
    */
   function browse() {
-    CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'js/crm.livePage.js');
+    if (CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'ajax_popups_enabled', NULL, TRUE)) {
+      CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'js/crm.livePage.js');
+    }
     // get all custom groups sorted by weight
     $membershipStatus = array();
     $dao = new CRM_Member_DAO_MembershipStatus();
