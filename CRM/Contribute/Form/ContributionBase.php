@@ -187,6 +187,14 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
 
   public $_action;
 
+ /**
+   * Is honor block is enabled for this contribution?
+   *
+   * @var boolean
+   * @protected
+   */
+  public $_honor_block_is_active = FALSE;
+
   /**
    * Function to set variables up before form is built
    *
@@ -207,6 +215,9 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
 
     // this was used prior to the cleverer this_>getContactID - unsure now
     $this->_userID = $session->get('userID');
+
+    //Check if honor block is enabled for current contribution
+    $this->_honor_block_is_active = (boolean) CRM_Core_DAO::getFieldValue('CRM_Core_DAO_UFJoin', $this->_id, 'is_active', 'entity_id');
 
     $this->_contactID = $this->_membershipContactID = $this->getContactID();
     $this->_mid = NULL;
@@ -353,7 +364,6 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
       // this avoids getting E_NOTICE errors in php
       $setNullFields = array(
         'amount_block_is_active',
-        'honor_block_is_active',
         'is_allow_other_amount',
         'footer_text',
       );
@@ -676,7 +686,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
       if ($fields) {
         // unset any email-* fields since we already collect it, CRM-2888
         foreach (array_keys($fields) as $fieldName) {
-          if (substr($fieldName, 0, 6) == 'email-') {
+          if (substr($fieldName, 0, 6) == 'email-' && $profileContactType != 'honor') {
             unset($fields[$fieldName]);
           }
         }

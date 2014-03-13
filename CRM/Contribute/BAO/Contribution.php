@@ -2251,27 +2251,18 @@ WHERE  contribution_id = %1 ";
       $template->assign('useForMember', true);
     }
     //assign honor infomation to receiptmessage
-    $honorID = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution',
-      $this->id,
-      'honor_contact_id'
-    );
-    if (!empty($honorID)) {
+    $softRecord = CRM_Contribute_BAO_ContributionSoft::getSoftContribution($this->id);
 
-      $honorDefault = $honorIds = array();
-      $honorIds['contribution'] = $this->id;
-      $idParams = array('id' => $honorID, 'contact_id' => $honorID);
-      CRM_Contact_BAO_Contact::retrieve($idParams, $honorDefault, $honorIds);
-      $honorType = CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution', 'honor_type_id');
+    if (isset($softRecord['soft_credit'])) {
+      $values['honor'] = array(
+        'honor_profile_values' => array(),
+        'honor_profile_id' => CRM_Core_DAO::getFieldValue('CRM_Core_DAO_UFJoin', $values['id'], 'uf_group_id', 'entity_id'),
+        'honor_id' => $softRecord['soft_credit'][1]['contact_id'],
+      );
+      $softCreditTypes = CRM_Core_OptionGroup::values('soft_credit_type');
 
-      $template->assign('honor_block_is_active', 1);
-      if (!empty($honorDefault['prefix_id'])) {
-        $prefix = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'prefix_id');
-        $template->assign('honor_prefix', $prefix[$honorDefault['prefix_id']]);
-      }
-      $template->assign('honor_first_name', CRM_Utils_Array::value('first_name', $honorDefault));
-      $template->assign('honor_last_name', CRM_Utils_Array::value('last_name', $honorDefault));
-      $template->assign('honor_email', CRM_Utils_Array::value('email', $honorDefault['email'][1]));
-      $template->assign('honor_type', $honorType[$this->honor_type_id]);
+      $template->assign('soft_credit_type',  $softRecord['soft_credit'][1]['soft_credit_type_label']);
+      $template->assign('honor_block_is_active', CRM_Core_DAO::getFieldValue('CRM_Core_DAO_UFJoin', $values['id'], 'is_active', 'entity_id'));
     }
 
     $dao = new CRM_Contribute_DAO_ContributionProduct();
@@ -2751,8 +2742,8 @@ WHERE  contribution_id = %1 ";
     $itemAmount = $trxnID = NULL;
     //get all the statuses
     $contributionStatus = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
-    if (($params['prevContribution']->contribution_status_id == array_search('Pending', $contributionStatus) 
-      || $params['prevContribution']->contribution_status_id == array_search('In Progress', $contributionStatus)) 
+    if (($params['prevContribution']->contribution_status_id == array_search('Pending', $contributionStatus)
+      || $params['prevContribution']->contribution_status_id == array_search('In Progress', $contributionStatus))
       && $params['contribution']->contribution_status_id == array_search('Completed', $contributionStatus)
       && $context == 'changePaymentInstrument') {
       return;
@@ -2800,7 +2791,7 @@ WHERE  contribution_id = %1 ";
 
     if ($context == 'changedStatus') {
       if (($params['prevContribution']->contribution_status_id == array_search('Pending', $contributionStatus)
-        || $params['prevContribution']->contribution_status_id == array_search('In Progress', $contributionStatus)) 
+        || $params['prevContribution']->contribution_status_id == array_search('In Progress', $contributionStatus))
         && ($params['contribution']->contribution_status_id == array_search('Completed', $contributionStatus))) {
         $query = "UPDATE civicrm_financial_item SET status_id = %1 WHERE entity_id = %2 and entity_table = 'civicrm_line_item'";
         $sql = "SELECT id, amount FROM civicrm_financial_item WHERE entity_id = %1 and entity_table = 'civicrm_line_item'";
