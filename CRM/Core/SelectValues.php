@@ -372,27 +372,16 @@ class CRM_Core_SelectValues {
    *
    * @static
    */
-  static function ufVisibility($isGroup = FALSE) {
-    $key = 'uf';
-    if ($isGroup) {
-      $key = 'group';
-    }
-
+  static function ufVisibility() {
+    static $_visibility = array();
     if (!$_visibility) {
-      static $_visibility = array();
-    }
-
-    if (!isset($_visibility[$key])) {
-      $_visibility[$key] = array(
+      $_visibility = array(
         'User and User Admin Only' => ts('User and User Admin Only'),
         'Public Pages' => ts('Public Pages'),
         'Public Pages and Listings' => ts('Public Pages and Listings'),
       );
-      if ($isGroup) {
-        unset($_visibility[$key]['Public Pages and Listings']);
-      }
     }
-    return $_visibility[$key];
+    return $_visibility;
   }
 
   /**
@@ -403,7 +392,10 @@ class CRM_Core_SelectValues {
   static function groupVisibility() {
     static $_groupVisibility = NULL;
     if (!$_groupVisibility) {
-      $_groupVisibility = self::ufVisibility(true);
+      $_groupVisibility = array(
+        'User and User Admin Only' => ts('User and User Admin Only'),
+        'Public Pages' => ts('Public Pages'),
+      );
     }
     return $_groupVisibility;
   }
