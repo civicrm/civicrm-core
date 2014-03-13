@@ -121,10 +121,6 @@
 </tr>
 <tr>
   <td>
-    {$form.contribution_in_honor_of.label} <br />
-    {$form.contribution_in_honor_of.html|crmAddClass:twenty}
-  </td>
-  <td>
     {$form.contribution_source.label} <br />
     {$form.contribution_source.html|crmAddClass:twenty}
   </td>

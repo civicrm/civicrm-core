@@ -311,9 +311,16 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
     $profileContactType = CRM_Core_BAO_UFGroup::getContactType($honoreeprofileId);
     $profileFields = CRM_Core_BAO_UFGroup::getFields($honoreeprofileId);
     $honoreeProfileFields = $values = array();
+    $honorName = NULL;
 
     if ($honorId) {
       CRM_Core_BAO_UFGroup::getValues($honorId, $profileFields, $values, FALSE, $params);
+      if (empty($params)) {
+        foreach ($profileFields as $name => $field) {
+          $title = $field['title'];
+          $params[$field['name']] = $values[$title];
+        }
+      }
     }
 
     //remove name related fields and construct name string with prefix/suffix
