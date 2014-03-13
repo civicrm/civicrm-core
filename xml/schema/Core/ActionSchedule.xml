@@ -72,8 +72,7 @@
        <length>8</length>
        <comment>Time units for reminder.</comment>
        <pseudoconstant>
-         <optionGroupName>recur_frequency_units</optionGroupName>
-         <keyColumn>name</keyColumn>
+        <callback>CRM_Core_SelectValues::getScheduleReminderFrequencyUnits</callback>
        </pseudoconstant>
        <add>3.4</add>
        <html>
@@ -107,8 +106,7 @@
        <length>8</length>
        <comment>Time units for repetition of reminder.</comment>
        <pseudoconstant>
-         <optionGroupName>recur_frequency_units</optionGroupName>
-         <keyColumn>name</keyColumn>
+         <callback>CRM_Core_SelectValues::getScheduleReminderFrequencyUnits</callback>
        </pseudoconstant>
        <add>3.4</add>
        <html>
@@ -127,8 +125,7 @@
        <length>8</length>
        <comment>Time units till repetition of reminder.</comment>
        <pseudoconstant>
-         <optionGroupName>recur_frequency_units</optionGroupName>
-         <keyColumn>name</keyColumn>
+         <callback>CRM_Core_SelectValues::getScheduleReminderFrequencyUnits</callback>
        </pseudoconstant>
        <add>3.4</add>
        <html>
