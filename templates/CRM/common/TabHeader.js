@@ -54,10 +54,6 @@ cj(function($) {
               if (typeof(data.tabCount) !== 'undefined') {
                 CRM.tabHeader.updateCount(ui.tab, data.tabCount);
               }
-              if ($.isPlainObject(data.updateTabs)) {
-                $.each(data.updateTabs, CRM.tabHeader.updateCount);
-                $.each(data.updateTabs, CRM.tabHeader.resetTab);
-              }
               if (typeof(data.tabValid) !== 'undefined') {
                 var method = data.tabValid ? 'removeClass' : 'addClass';
                 ui.tab[method]('disabled');
@@ -69,6 +65,13 @@ cj(function($) {
       e.preventDefault();
     })
     .tabs(tabSettings);
+  // Any load/submit event could potentially call for tabs to refresh.
+  $(document).on('crmLoad.tabInfo crmFormSuccess.tabInfo', function(e, data) {
+    if (data && $.isPlainObject(data.updateTabs)) {
+      $.each(data.updateTabs, CRM.tabHeader.updateCount);
+      $.each(data.updateTabs, CRM.tabHeader.resetTab);
+    }
+  });
 });
 (function($) {
   // Utility functions
