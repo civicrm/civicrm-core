@@ -54,6 +54,10 @@ cj(function($) {
               if (typeof(data.tabCount) !== 'undefined') {
                 CRM.tabHeader.updateCount(ui.tab, data.tabCount);
               }
+              if ($.isPlainObject(data.updateTabs)) {
+                $.each(data.updateTabs, CRM.tabHeader.updateCount);
+                $.each(data.updateTabs, CRM.tabHeader.resetTab);
+              }
               if (typeof(data.tabValid) !== 'undefined') {
                 var method = data.tabValid ? 'removeClass' : 'addClass';
                 ui.tab[method]('disabled');
@@ -69,6 +73,20 @@ cj(function($) {
 (function($) {
   // Utility functions
   CRM.tabHeader = CRM.tabHeader || {};
+
+  /**
+   * @param tab jQuery selector
+   * @returns panel jQuery object
+   */
+  CRM.tabHeader.getTabPanel = function(tab) {
+    return $('#' + $(tab).attr('aria-controls'));
+  };
+
+  /**
+   * Update the counter in a tab
+   * @param tab jQuery selector
+   * @param count number
+   */
   CRM.tabHeader.updateCount = function(tab, count) {
     var oldClass = $(tab).attr('class').match(/(crm-count-\d+)/);
     if (oldClass) {
@@ -77,5 +95,18 @@ cj(function($) {
     $(tab)
       .addClass('crm-count-' + count)
       .find('a em').html('' + count);
-  }
+  };
+
+  /**
+   * Clears tab content so that it will be refreshed next time the user clicks on it
+   * @param tab
+   */
+  CRM.tabHeader.resetTab = function(tab) {
+    var $panel = CRM.tabHeader.getTabPanel(tab);
+    if ($(tab).hasClass('ui-tabs-active')) {
+      $panel.crmSnippet('refresh');
+    } else {
+      $panel.data("civiCrmSnippet") && $panel.crmSnippet('destroy');
+    }
+  };
 })(cj);

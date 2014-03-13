@@ -431,6 +431,8 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
         $relChanged = $relationshipTypeId != $this->_values['relationship_type_id'];
         if (!$params['is_active'] || !$params['is_current_employer'] || $relChanged) {
           CRM_Contact_BAO_Contact_Utils::clearCurrentEmployer($this->_values['contact_id_a']);
+          // Refresh contact summary if in ajax mode
+          $this->ajaxResponse['reloadBlocks'] = array('#crm-contactinfo-content');
         }
       }
     }
@@ -523,6 +525,8 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
         $employerParams[$rel->contact_id_a] = $rel->contact_id_b;
       }
       CRM_Contact_BAO_Contact_Utils::setCurrentEmployer($employerParams);
+      // Refresh contact summary if in ajax mode
+      $this->ajaxResponse['reloadBlocks'] = array('#crm-contactinfo-content');
     }
   }
 
