@@ -552,13 +552,13 @@ CRM.validate = CRM.validate || {
    * @return jQuery deferred object - if not supplied a new one will be created
    */
   CRM.status = function(options, deferred) {
-    // For simple usage without async operations you can pass in a string. 2nd param can be 'success' or 'error'
+    // For simple usage without async operations you can pass in a string. 2nd param is optional string 'error' if this is not a success msg.
     if (typeof options === 'string') {
       return CRM.status({start: options, success: options, error: options})[deferred === 'error' ? 'reject' : 'resolve']();
     }
     var opts = $.extend({
       start: ts('Saving...'),
-      success: ts('Saved.'),
+      success: ts('Saved'),
       error: function() {
         CRM.alert(ts('Sorry an error occurred and your information was not saved'), ts('Error'));
       }
