@@ -236,6 +236,9 @@ class CRM_Event_Form_Participant extends CRM_Contact_Form_Task {
       $this->_paymentId = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_ParticipantPayment',
         $this->_id, 'id', 'participant_id'
       );
+
+      $this->assign('hasPayment', $this->_paymentId);
+
       // CRM-12615 - Get payment information from the primary registration
       if ((!$this->_paymentId) && ($this->_action == CRM_Core_Action::UPDATE)) {
         $registered_by_id = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Participant',
