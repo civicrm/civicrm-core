@@ -158,14 +158,16 @@ registration process.{/ts}</p>
        {/if}
       {/foreach}
      {/if}
+	 
      {if $event.is_public} 
-     <tr>
-      <td colspan="2" {$valueStyle}>
-       {capture assign=icalFeed}{crmURL p='civicrm/event/ical' q="reset=1&id=`$event.id`" h=0 a=1 fe=1}{/capture}
-       <a href="{$icalFeed}">{ts}Download iCalendar File{/ts}</a>
-      </td>
-     </tr>
+      <tr>
+       <td colspan="2" {$valueStyle}>
+        {capture assign=icalFeed}{crmURL p='civicrm/event/ical' q="reset=1&id=`$event.id`" h=0 a=1 fe=1}{/capture}
+        <a href="{$icalFeed}">{ts}Download iCalendar File{/ts}</a>
+       </td>
+      </tr>
      {/if}
+	 
     {if $event.is_share}
         <tr>
             <td colspan="2" {$valueStyle}>
