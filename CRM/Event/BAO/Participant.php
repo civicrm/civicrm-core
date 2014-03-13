@@ -1776,9 +1776,6 @@ WHERE cpf.price_set_id = %1 AND cpfv.label LIKE %2";
     $contributionStatuses = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
     $partiallyPaidStatusId = array_search('Partially paid', $contributionStatuses);
     $pendngRefundStatusId = array_search('Pending refund', $contributionStatuses);
-    $fetchCon = array('id' => $contributionId);
-    $contributionObj = CRM_Contribute_BAO_Contribution::retrieve($fetchCon, CRM_Core_DAO::$_nullArray, CRM_Core_DAO::$_nullArray);
-
     $previousLineItems = CRM_Price_BAO_LineItem::getLineItems($participantId, 'participant');
     CRM_Price_BAO_PriceSet::processAmount($feeBlock,
       $params, $lineItems
@@ -1815,10 +1812,17 @@ SET li.qty = 0,
     fi.amount = 0.00,
     eft.amount = 0.00
 WHERE (li.entity_table = 'civicrm_participant' AND li.entity_id = {$participantId}) AND
-      (price_field_value_id NOT IN ({$submittedFieldValues}) OR price_field_id NOT IN ({$submittedFields}))
+      (price_field_value_id NOT IN ({$submittedFieldValues}))
 ";
       CRM_Core_DAO::executeQuery($updateLineItem);
     }
+
+    // insert new 'adjusted amount' transaction entry and update contribution entry.
+    // ensure entity_financial_trxn table has a linking of it.
+    $updatedAmount = $params['amount'];
+    self::recordAdjustedAmt($updatedAmount, $paidAmount, $contributionId);
+    $fetchCon = array('id' => $contributionId);
+    $updatedContribution = CRM_Contribute_BAO_Contribution::retrieve($fetchCon, CRM_Core_DAO::$_nullArray, CRM_Core_DAO::$_nullArray);
 
     // insert new line items
     foreach ($insertLines as $valueId => $lineParams) {
@@ -1827,13 +1831,13 @@ WHERE (li.entity_table = 'civicrm_participant' AND li.entity_id = {$participantI
       $lineObj = CRM_Price_BAO_LineItem::create($lineParams);
       // insert financial items
       // ensure entity_financial_trxn table has a linking of it.
-      $prevItem = CRM_Financial_BAO_FinancialItem::add($lineObj, $contributionObj);
+      $prevItem = CRM_Financial_BAO_FinancialItem::add($lineObj, $updatedContribution);
     }
 
-    // insert new 'adjusted amount' transaction entry and update contribution entry.
-    // ensure entity_financial_trxn table has a linking of it.
-    $updatedAmount = $params['amount'];
-    self::recordAdjustedAmt($updatedAmount, $paidAmount, $contributionId);
+    // update participant fee_amount column
+    $partUpdateFeeAmt['id'] = $participantId;
+    $partUpdateFeeAmt['fee_amount'] = $params['amount'];
+    self::add($partUpdateFeeAmt);
 
     //activity creation
     self::addActivityForSelection($participantId, 'Change Registration');
