@@ -492,6 +492,7 @@ class CRM_Report_Form_Member_ContributionDetail extends CRM_Report_Form {
               LEFT  JOIN civicrm_membership_status {$this->_aliases['civicrm_membership_status']}
                           ON {$this->_aliases['civicrm_membership_status']}.id =
                              {$this->_aliases['civicrm_membership']}.status_id
+                             {$this->_aclFrom}
 ";
 
     //for premiums
@@ -562,10 +563,10 @@ class CRM_Report_Form_Member_ContributionDetail extends CRM_Report_Form {
 
     $fillTemp = "
           INSERT INTO civireport_membership_contribution_detail (contribution_id, contact_id, membership_id)
-          SELECT contribution.id, contact.id, m.id
+          SELECT contribution.id, {$this->_aliases['civicrm_contact']}.id, m.id
           FROM civicrm_contribution contribution
-          INNER JOIN civicrm_contact contact
-                ON contact.id = contribution.contact_id AND contribution.is_test = 0
+          INNER JOIN civicrm_contact {$this->_aliases['civicrm_contact']}
+                ON {$this->_aliases['civicrm_contact']}.id = contribution.contact_id AND contribution.is_test = 0
           {$this->_aclFrom}
           LEFT JOIN civicrm_membership_payment mp
                 ON contribution.id = mp.contribution_id
