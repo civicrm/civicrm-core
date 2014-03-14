@@ -59,14 +59,17 @@
 {/if}
 {$communityMessages}
 <div class="crm-submit-buttons">
-<a href="#" id="crm-dashboard-configure" class="button show-add">
-  <span><div class="icon settings-icon"></div>{ts}Configure Your Dashboard{/ts}</span></a>
+<a href="#" id="crm-dashboard-configure" class="crm-hover-button show-add">
+  <span class="icon settings-icon"></span> {ts}Configure Your Dashboard{/ts}
+</a>
 
 <a style="display:none;" href="{crmURL p="civicrm/dashboard" q="reset=1"}" class="button show-done" style="margin-left: 6px;">
-  <span><div class="icon check-icon"></div>{ts}Done{/ts}</span></a>
+  <span><div class="icon check-icon"></div> {ts}Done{/ts}</span>
+</a>
 
-<a style="float:right;" href="{crmURL p="civicrm/dashboard" q="reset=1&resetCache=1"}" class="button show-refresh" style="margin-left: 6px;">
-  <span> <div class="icon refresh-icon"></div>{ts}Refresh Dashboard Data{/ts}</span></a>
+<a style="float:right;" href="{crmURL p="civicrm/dashboard" q="reset=1&resetCache=1"}" class="crm-hover-button show-refresh" style="margin-left: 6px;">
+  <span class="icon refresh-icon"></span> {ts}Refresh Dashboard Data{/ts}
+</a>
 
 </div>
 <div class="clear"></div>
@@ -96,7 +99,7 @@
          success: function( content ) {
            $("#civicrm-dashboard, #crm-dashboard-configure, .show-refresh, #empty-message").hide();
            $('.show-done').show();
-           $("#configure-dashlet").show().html(content);
+           $("#configure-dashlet").show().html(content).trigger('crmLoad');
          }
       });
       return false;

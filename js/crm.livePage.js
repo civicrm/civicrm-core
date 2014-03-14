@@ -12,9 +12,7 @@ cj(function($) {
       if (url === '#' || $(this).attr('onclick') || $(this).hasClass('no-popup')) {
         return;
       }
-      CRM.loadForm(url, {
-        openInline: 'a:not("[href=#], .no-popup")'
-      }).on('crmFormSuccess', function(e, data) {
+      CRM.loadForm(url).on('crmFormSuccess', function(e, data) {
         // Refresh page when form completes
         $('#crm-main-content-wrapper').crmSnippet('refresh');
       });

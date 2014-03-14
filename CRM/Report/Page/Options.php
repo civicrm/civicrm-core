@@ -39,6 +39,8 @@
  */
 class CRM_Report_Page_Options extends CRM_Core_Page_Basic {
 
+  public $useLivePageJS = TRUE;
+
   /**
    * The action links that we need to display for the browse screen
    *
@@ -165,7 +167,6 @@ class CRM_Report_Page_Options extends CRM_Core_Page_Basic {
    * @static
    */
   function browse() {
-    CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'js/crm.livePage.js');
     $groupParams = array('name' => self::$_gName);
     $optionValue = CRM_Core_OptionValue::getRows($groupParams, $this->links(), 'weight');
     $gName       = self::$_gName;

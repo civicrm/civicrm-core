@@ -43,6 +43,8 @@
  */
 class CRM_Custom_Page_Field extends CRM_Core_Page {
 
+  public $useLivePageJS = TRUE;
+
   /**
    * The group id of the field
    *
@@ -124,7 +126,6 @@ class CRM_Custom_Page_Field extends CRM_Core_Page {
    * @access public
    */
   function browse() {
-    CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'js/crm.livePage.js');
     $customField = array();
     $customFieldBAO = new CRM_Core_BAO_CustomField();
 

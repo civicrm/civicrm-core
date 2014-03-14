@@ -39,6 +39,8 @@
  */
 class CRM_Admin_Page_LabelFormats extends CRM_Core_Page_Basic {
 
+  public $useLivePageJS = TRUE;
+
   /**
    * The action links that we need to display for the browse screen
    *
@@ -124,7 +126,6 @@ class CRM_Admin_Page_LabelFormats extends CRM_Core_Page_Basic {
    * @static
    */
   function browse($action = NULL) {
-    CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'js/crm.livePage.js');
     // Get list of configured Label Formats
     $labelFormatList= CRM_Core_BAO_LabelFormat::getList();
     $nameFormatList= CRM_Core_BAO_LabelFormat::getList(false, 'name_badge');

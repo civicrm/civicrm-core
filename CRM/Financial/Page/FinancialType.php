@@ -37,6 +37,8 @@
  * Page for displaying list of financial types
  */
 class CRM_Financial_Page_FinancialType extends CRM_Core_Page_Basic {
+
+  public $useLivePageJS = TRUE;
   /**
    * The action links that we need to display for the browse screen
    *
@@ -132,7 +134,6 @@ class CRM_Financial_Page_FinancialType extends CRM_Core_Page_Basic {
    * @static
    */
   function browse() {
-    CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'js/crm.livePage.js');
     // get all financial types sorted by weight
     $financialType = array();
     $dao = new CRM_Financial_DAO_FinancialType();

@@ -75,7 +75,7 @@
       {else}
         {capture assign=ccModeLink}{crmURL p='civicrm/contact/view/contribution' q="reset=1&action=add&context=standalone&mode=live"}{/capture}
       {/if}
-      <span class="action-link crm-link-credit-card-mode">&nbsp;<a href="{$ccModeLink}">&raquo; {ts}submit credit card contribution{/ts}</a>
+      <span class="action-link crm-link-credit-card-mode">&nbsp;<a class="open-inline crm-hover-button" href="{$ccModeLink}">&raquo; {ts}submit credit card contribution{/ts}</a></span>
     {/if}
   </div>
   {if $isOnline}{assign var=valueStyle value=" class='view-value'"}{else}{assign var=valueStyle value=""}{/if}

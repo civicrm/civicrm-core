@@ -38,6 +38,8 @@
  */
 class CRM_Campaign_Page_Campaign extends CRM_Core_Page {
 
+  public $useLivePageJS = TRUE;
+
   /**
    * The action links that we need to display for the browse screen
    *
@@ -84,7 +86,6 @@ class CRM_Campaign_Page_Campaign extends CRM_Core_Page {
   }
 
   function browse() {
-    CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'js/crm.livePage.js');
 
     $campaigns = CRM_Campaign_BAO_Campaign::getCampaignSummary();
 

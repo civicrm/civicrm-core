@@ -38,6 +38,8 @@
  */
 class CRM_Campaign_Page_Survey extends CRM_Core_Page {
 
+  public $useLivePageJS = TRUE;
+
   private static $_actionLinks;
 
   function &actionLinks() {
@@ -73,7 +75,6 @@ class CRM_Campaign_Page_Survey extends CRM_Core_Page {
   }
 
   function browse() {
-    CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'js/crm.livePage.js');
 
     $surveys = CRM_Campaign_BAO_Survey::getSurveySummary();
 
