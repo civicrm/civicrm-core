@@ -71,45 +71,16 @@ class CRM_Core_ClassLoader {
       return;
     }
 
-    // we do this to prevent a autoloader errors with joomla / 3rd party packages
-    // use absolute path since we dont know the content of include_path as yet
-    // CRM-11304
-
-    // since HTML Purifier could potentially be loaded / used by other modules / components
-    // lets check it its already loaded
-    // we also check if the bootstrap file exists since during install of a drupal distro profile
-    // the files might not exists, in which case we skip loading the file
-    // if you change the below, please test on Joomla and also PCP pages
-    $includeHTMLPurifier = TRUE;
-    $htmlPurifierPath = dirname(__FILE__) . '/../../packages/IDS/vendors/htmlpurifier/HTMLPurifier/Bootstrap.php';
-    if (
-      class_exists('HTMLPurifier_Bootstrap') ||
-      !file_exists($htmlPurifierPath)
-    ) {
-      $includeHTMLPurifier = FALSE;
-    }
-    else {
-      require_once $htmlPurifierPath;
-    }
-
-    if (version_compare(PHP_VERSION, '5.3.0') >= 0) {
-      spl_autoload_register(array($this, 'loadClass'), TRUE, $prepend);
-      if ($includeHTMLPurifier) {
-        spl_autoload_register(array('HTMLPurifier_Bootstrap', 'autoload'), TRUE, $prepend);
-      }
-    }
-    else {
-      // http://www.php.net/manual/de/function.spl-autoload-register.php#107362
-      // "when specifying the third parameter (prepend), the function will fail badly in PHP 5.2"
-      spl_autoload_register(array($this, 'loadClass'), TRUE);
-      if ($includeHTMLPurifier) {
-        spl_autoload_register(array('HTMLPurifier_Bootstrap', 'autoload'), TRUE);
-      }
-    }
+    $this->registerAutoloaderCallback(array($this, 'loadClass'));
+    $this->initHtmlPurifier($prepend);
 
     $this->_registered = TRUE;
   }
 
+  /**
+   * @param string $class
+   *   Name of the class to be loaded.
+   */
   function loadClass($class) {
     if (
       // Only load classes that clearly belong to CiviCRM.
@@ -125,6 +96,79 @@ class CRM_Core_ClassLoader {
       // down the chain cannot try to find the file if we fail.
       require_once ($file);
     }
+  }
+
+  /**
+   * Register a callback on the autoload stack.
+   *
+   * @param callback $callback
+   * @param bool $prepend
+   *   TRUE, if the callback should be prepended instead of appended.
+   *   This parameter will be ignored in PHP versions prior to 5.3.
+   */
+  private function registerAutoloaderCallback($callback, $prepend = FALSE) {
+    if (version_compare(PHP_VERSION, '5.3.0') >= 0) {
+      spl_autoload_register($callback, TRUE, $prepend);
+    }
+    else {
+      // http://www.php.net/manual/de/function.spl-autoload-register.php#107362
+      // "when specifying the third parameter (prepend), the function will fail badly in PHP 5.2"
+      spl_autoload_register($callback, TRUE);
+    }
+  }
+
+  /**
+   * Include the main file and register the class loader for HTMLPurifier.
+   *
+   * @param bool $prepend
+   *   TRUE, if the callback should be prepended instead of appended.
+   *   This parameter will be ignored in PHP versions prior to 5.3.
+   */
+  private function initHtmlPurifier($prepend) {
+
+    if (class_exists('HTMLPurifier_Bootstrap')) {
+      // HTMLPurifier is already initialized, e.g. by the Drupal module.
+      return;
+    }
+
+    $htmlPurifierPath = $this->getHtmlPurifierPath();
+    if (FALSE === $htmlPurifierPath) {
+      // No HTMLPurifier available, e.g. during installation.
+      return;
+    }
+    require_once $htmlPurifierPath;
+
+    $this->registerAutoloaderCallback(array('HTMLPurifier_Bootstrap', 'autoload'), $prepend);
+  }
+
+  /**
+   * @return string|false
+   *   Path to the file where the class HTMLPurifier_Bootstrap is defined, or
+   *   FALSE, if such a file does not exist.
+   */
+  private function getHtmlPurifierPath() {
+
+    if (1
+      && function_exists('libraries_get_path')
+      && ($path = libraries_get_path('htmlpurifier'))
+      && file_exists($file = $path . '/library/HTMLPurifier/Bootstrap.php')
+    ) {
+      // We are in Drupal 7, and the HTMLPurifier module is installed.
+      // Use Drupal's HTMLPurifier path, to avoid conflicts.
+      // @todo Verify that we are really in Drupal 7, and not in some other
+      // environment that happens to provide a 'libraries_get_path()' function.
+      return $file;
+    }
+
+    // we do this to prevent a autoloader errors with joomla / 3rd party packages
+    // Use absolute path, since we don't know the content of include_path yet.
+    // CRM-11304
+    $file = dirname(__FILE__) . '/../../packages/IDS/vendors/htmlpurifier/HTMLPurifier/Bootstrap.php';
+    if (file_exists($file)) {
+      return $file;
+    }
+
+    return FALSE;
   }
 }
 
