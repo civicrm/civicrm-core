@@ -532,11 +532,9 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     // Is new contact created?
     if ($lname) {
       $this->waitForText("xpath=//div[@id='$selectId']","$lname, $fname");
-      $this->assertTrue($this->isTextPresent("$lname, $fname"), "Status message didn't show up after saving!");
     }
     else {
       $this->waitForText("xpath=//div[@id='$selectId']","$fname");
-      $this->assertTrue($this->isTextPresent("$fname"), "Status message didn't show up after saving!");
     }
   }
 
