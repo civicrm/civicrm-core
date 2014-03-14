@@ -154,7 +154,7 @@ class CRM_Contribute_Task {
    * @return array set of tasks that are valid for the user
    * @access public
    */
-  static function &permissionedTaskTitles($permission) {
+  static function &permissionedTaskTitles($permission, $softCreditFiltering = FALSE) {
     $tasks = array();
     if (($permission == CRM_Core_Permission::EDIT)
       || CRM_Core_Permission::check('edit contributions')
@@ -172,6 +172,9 @@ class CRM_Contribute_Task {
       if (CRM_Core_Permission::check('delete in CiviContribute')) {
         $tasks[1] = self::$_tasks[1]['title'];
       }
+    }
+    if ($softCreditFiltering) {
+      unset($tasks[4], $tasks[7]);
     }
     return $tasks;
   }
