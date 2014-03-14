@@ -90,6 +90,10 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
     // We hide the payment fields if the event is full or requires approval,
     // and the current user has not yet been approved CRM-12279
     $noFees = (($eventFull || $this->_requireApproval) && !$this->_allowConfirmation);
+
+    //Used to remove price fields if not necessary 
+    $this->noFees = $noFees;
+
     CRM_Contribute_Form_Contribution_Main::preProcessPaymentOptions($this, $noFees);
     if ($this->_snippet) {
       return;
@@ -535,6 +539,9 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
    * @static
    */
   static public function buildAmount(&$form, $required = TRUE, $discountId = NULL) {
+    //keep prices from showing up when there is a waitlist
+    if($form->noFees)
+        return;
     //if payment done, no need to build the fee block.
     if (!empty($form->_paymentId)) {
       //fix to diaplay line item in update mode.
