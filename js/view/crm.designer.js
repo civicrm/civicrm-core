@@ -676,15 +676,12 @@
             var buttons = {};
             buttons[$link.text()] = function() {
               var form2 = CRM.loadForm($link.attr('href'), {
-                cancelButton: '.cancel.form-submit, #done',
                 openInline: 'a.action-item:not([href="#"])',
                 dialog: {
                   width: '60%',
-                  height: parseInt($(window).height() * .8)
+                  height: '70%'
                 }
-              }).on('crmLoad', function() {
-                  $('#done', this).removeAttr('onclick');
-                });
+              });
             }
             $(this).dialog('option', 'buttons', buttons);
           }

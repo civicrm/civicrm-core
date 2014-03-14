@@ -874,13 +874,17 @@ CRM.validate = CRM.validate || {
       settings.dialog = {
         modal: true,
         width: '65%',
-        height: parseInt($(window).height() * .75)
+        height: '75%'
       };
     }
     options && $.extend(true, settings, options);
     settings.url = url;
     // Create new dialog
     if (settings.dialog) {
+      // HACK: jQuery UI doesn't support relative height
+      if (settings.dialog.height && settings.dialog.height.indexOf('%') > 0) {
+        settings.dialog.height = parseInt($(window).height() * (parseFloat(settings.dialog.height)/100), 10);
+      }
       $('<div id="'+ settings.target.substring(1) +'"><div class="crm-loading-element">' + ts('Loading') + '...</div></div>').dialog(settings.dialog);
       $(settings.target).on('dialogclose', function() {
         $(this).crmSnippet('destroy').dialog('destroy').remove();
@@ -920,13 +924,6 @@ CRM.validate = CRM.validate || {
         }
       }
     };
-    // Hack to make delete dialogs smaller
-    if (url.indexOf('/delete') > 0 || url.indexOf('action=delete') > 0) {
-      settings.dialog = {
-        width: 400,
-        height: 300
-      };
-    }
     // Move options that belong to crmForm. Others will be passed through to crmSnippet
     options && $.each(options, function(key, value) {
       if (typeof(settings.crmForm[key]) !== 'undefined') {
@@ -1005,6 +1002,36 @@ CRM.validate = CRM.validate || {
     });
     return widget;
   };
+  /**
+   * @see https://wiki.civicrm.org/confluence/display/CRMDOC/Ajax+Pages+and+Forms
+   */
+  $.fn.crmPopup = function(listeners) {
+    var $el = this.first(),
+      url = $el.attr('href'),
+      popup = $el.data('popup-type') === 'page' ? CRM.loadPage : CRM.loadForm,
+      settings = $el.data('popup-settings') || {};
+    settings.dialog = settings.dialog || {};
+    if (!CRM.ajax_popups_enabled || !url || url.charAt(0) === '#' || $el.attr('onclick') || $el.hasClass('no-popup')) {
+      return false;
+    }
+    // Hack to make delete dialogs smaller
+    if ($el.hasClass('small-popup') || url.indexOf('/delete') > 0 || url.indexOf('action=delete') > 0) {
+      settings.dialog.width = 400;
+      settings.dialog.height = 300;
+    }
+    else if ($el.hasClass('medium-popup')) {
+      settings.dialog.width = '50%';
+      settings.dialog.height = '50%';
+    }
+    else if ($el.hasClass('huge-popup')) {
+      settings.dialog.height = '95%';
+    }
+    var dialog = popup(url, settings);
+    $.each(listeners || {}, function(k, v) {
+      dialog.on(k, v);
+    });
+    return dialog;
+  };
 
   // Preprocess all cj ajax calls to display messages
   $(document).ajaxSuccess(function(event, xhr, settings) {
@@ -1064,11 +1091,11 @@ CRM.validate = CRM.validate || {
         var
           link = $(this),
           optionsChanged = false;
-        CRM.loadForm(this.href, {openInline: 'a:not("[href=#], .no-popup")'})
-          .on('crmFormSuccess', function() {
+        return !link.crmPopup({
+          crmFormSuccess: function() {
             optionsChanged = true;
-          })
-          .on('dialogclose', function() {
+          },
+          dialogclose: function() {
             if (optionsChanged) {
               link.trigger('crmOptionsEdited');
               var $elects = $('select[data-option-edit-path="' + link.data('option-edit-path') + '"]');
@@ -1079,8 +1106,8 @@ CRM.validate = CRM.validate || {
                   });
               }
             }
-          });
-        return false;
+          }
+        });
       })
       // Handle clear button for form elements
       .on('click', 'a.crm-clear-link', function() {

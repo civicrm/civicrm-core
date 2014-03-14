@@ -372,6 +372,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form {
    */
   function buildQuickForm() {
     CRM_Core_Resources::singleton()
+      ->addScriptFile('civicrm', 'js/crm.livePage.js')
       ->addScriptFile('civicrm', 'js/crm.searchForm.js')
       // jsTree is needed for tags popup
       ->addScriptFile('civicrm', 'packages/jquery/plugins/jstree/jquery.jstree.js', 0, 'html-header', FALSE)
