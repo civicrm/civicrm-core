@@ -26,12 +26,6 @@
 <tr>
   <td colspan="2">
     {$form.activity_role.html}
-    <span class="crm-clear-link">
-      (<a href="#" title="unselect"
-          onclick="unselectRadio('activity_role', '{$form.formName}');
-            return false;">
-        {ts}clear{/ts}
-      </a>)
     </span>
   </td>
 </tr>
@@ -103,15 +97,21 @@
   <td colspan="2">
     {$form.activity_test.label} {help id="is-test" file="CRM/Contact/Form/Search/Advanced"}
     &nbsp; {$form.activity_test.html}
-    <span class="crm-clear-link">
-      (<a href="#" onclick="unselectRadio('activity_test','{$form.formName}'); return false;">{ts}clear{/ts}</a>)
-    </span>
   </td>
 </tr>
-
-<tr>
-  <td colspan="3">{include file="CRM/common/Tag.tpl" tagsetType='activity'}</td>
-</tr>
+{if $buildSurveyResult }
+	<tr>
+	  <td id="activityResult">
+	    <label>{$form.activity_result.label}</label><br />
+	    {$form.activity_result.html}
+	  </td>
+		<td colspan="2">{include file="CRM/common/Tag.tpl" tagsetType='activity'}</td>
+	</tr>
+{else}
+	<tr>
+		<td colspan="3">{include file="CRM/common/Tag.tpl" tagsetType='activity'}</td>
+	</tr>
+{/if}
 
 {* campaign in activity search *}
 {include file="CRM/Campaign/Form/addCampaignToComponent.tpl"

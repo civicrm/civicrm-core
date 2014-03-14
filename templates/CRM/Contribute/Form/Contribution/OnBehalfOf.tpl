@@ -108,10 +108,6 @@
             {if $fieldName eq 'organization_name'}
               <div id="id-onbehalf-orgname-help" class="description">{ts}Start typing the name of an organization that you have saved previously to use it again. Otherwise click "Enter a new organization" above.{/ts}</div>
             {/if}
-            {if !empty($onBehalfOfFields.$fieldName.html_type)  && $onBehalfOfFields.$fieldName.html_type eq 'Autocomplete-Select'}
-              {assign var=elementName value=onbehalf[$fieldName]}
-            {include file="CRM/Custom/Form/AutoComplete.tpl" element_name=$elementName}
-            {/if}
             {if $onBehalfOfFields.$fieldName.name|substr:0:5 eq 'phone'}
               {assign var="phone_ext_field" value=$onBehalfOfFields.$fieldName.name|replace:'phone':'phone_ext'}
               {if $form.onbehalf.$phone_ext_field.html}
@@ -129,8 +125,9 @@
   {/foreach}
 </div>
 <div>{$form.mode.html}</div>
+</fieldset>
 {/if}
-
+{if empty($snippet)}
 {literal}
 <script type="text/javascript">
   cj( "div#id-onbehalf-orgname-help").hide( );
@@ -138,17 +135,16 @@
   showOnBehalf({/literal}"{$onBehalfRequired}"{literal});
 
   cj( "#mode" ).hide( );
-  cj( "#mode" ).attr( 'checked', 'checked' );
-  if ( cj( "#mode" ).attr( 'checked' ) && !{/literal}"{$reset}"{literal} ) {
+  cj( "#mode" ).prop('checked', true );
+  if ( cj( "#mode" ).prop('checked' ) && !{/literal}"{$reset}"{literal} ) {
     $text = ' {/literal}{ts escape="js"}Use existing organization{/ts}{literal} ';
     cj( "#createNewOrg" ).text( $text );
-    cj( "#mode" ).removeAttr( 'checked' );
+    cj( "#mode" ).prop('checked', false );
   }
 
 function showOnBehalf(onBehalfRequired) {
-  if ( cj( "#is_for_organization" ).attr( 'checked' ) || onBehalfRequired ) {
-    var urlPath = {/literal}"{crmURL p=$urlPath h=0 q='snippet=4&onbehalf=1'}";
-    urlPath += "{$urlParams}";
+  if ( cj( "#is_for_organization" ).prop( 'checked' ) || onBehalfRequired ) {
+    var urlPath = {/literal}"{crmURL p=$urlPath h=0 q="snippet=4&onbehalf=1&id=$contributionPageID&qfKey=$qfKey"}";
     {if $mode eq 'test'}
       urlPath += '&action=preview';
     {/if}
@@ -156,15 +152,8 @@ function showOnBehalf(onBehalfRequired) {
       urlPath += '&reset={$reset}';
     {/if}{literal}
     cj("#onBehalfOfOrg").show();
-    if (cj("#onBehalfOfOrg *").length < 1) {
-      cj.ajax({
-        url     : urlPath,
-        global  : false,
-        async   : false,
-        success : function ( content ) {
-          cj( "#onBehalfOfOrg" ).html( content );
-        }
-      });
+    if (cj("fieldset", '#onBehalfOfOrg').length < 1) {
+      cj('#onBehalfOfOrg').load(urlPath);
     }
   }
   else {
@@ -186,20 +175,20 @@ function resetValues( filter ) {
     });
   }
   cj("#select_org tr td").find( 'input[type=radio], input[type=checkbox]' ).each(function( ) {
-    cj(this).attr('checked', false);
+    cj(this).prop('checked', false);
   });
 }
 
 function createNew( ) {
-  if (cj("#mode").attr('checked')) {
+  if (cj("#mode").prop('checked')) {
     var textMessage = ' {/literal}{ts escape="js"}Use existing organization{/ts}{literal} ';
     cj("#onbehalf_organization_name").removeAttr('readonly');
-    cj("#mode").removeAttr('checked');
+    cj("#mode").prop('checked', false);
     resetValues( false );
   }
   else {
     var textMessage = ' {/literal}{ts escape="js"}Enter a new organization{/ts}{literal} ';
-    cj("#mode").attr('checked', 'checked');
+    cj("#mode").prop('checked', true);
     setOrgName( );
   }
   cj("#createNewOrg").text(textMessage);
@@ -225,17 +214,17 @@ function setLocationDetails(contactID) {
       for (var ele in data) {
         if (data[ele].type == 'Radio') {
           if (data[ele].value) {
-            cj("input[name='"+ ele +"']").filter("[value=" + data[ele].value + "]").attr('checked', 'checked');
+            cj("input[name='"+ ele +"']").filter("[value=" + data[ele].value + "]").prop('checked', true);
           }
         }
         else if (data[ele].type == 'CheckBox') {
           if (data[ele].value) {
-            cj("input[name='"+ ele +"']").attr('checked','checked');
+            cj("input[name='"+ ele +"']").prop('checked','checked');
           }
         }
         else if (data[ele].type == 'Multi-Select') {
           for (var selectedOption in data[ele].value) {
-            cj('#' + ele + " option[value='" + selectedOption + "']").attr('selected', 'selected');
+            cj('#' + ele + " option[value='" + selectedOption + "']").prop('selected', true);
           }
         }
         else if (data[ele].type == 'Autocomplete-Select') {
@@ -318,4 +307,4 @@ function selectCreateOrg( orgOption, reset ) {
 {/if}
 
 </script>
-</fieldset>
+{/if}

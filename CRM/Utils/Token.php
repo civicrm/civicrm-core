@@ -230,9 +230,7 @@ class CRM_Utils_Token {
   ) {
     $key = 'domain';
     if (
-      !$knownTokens ||
-      !CRM_Utils_Array::value($key, $knownTokens)
-    ) {
+      !$knownTokens || empty($knownTokens[$key])) {
       return $str;
     }
 
@@ -267,7 +265,7 @@ class CRM_Utils_Token {
       $value = NULL;
       /* Construct the address token */
 
-      if (CRM_Utils_Array::value($token, $loc)) {
+      if (!empty($loc[$token])) {
         if ($html) {
           $value = $loc[$token][1]['display'];
           $value = str_replace("\n", '<br />', $value);
@@ -285,7 +283,7 @@ class CRM_Utils_Token {
       /* Construct the phone and email tokens */
 
       $value = NULL;
-      if (CRM_Utils_Array::value($token, $loc)) {
+      if (!empty($loc[$token])) {
         foreach ($loc[$token] as $index => $entity) {
           $value = $entity[$token];
           break;
@@ -519,7 +517,7 @@ class CRM_Utils_Token {
     // so that we remove anything we do not recognize
     // I hope to move this step out of here soon and
     // then we will just iterate on a list of tokens that are passed to us
-    if (!$knownTokens || !CRM_Utils_Array::value($key, $knownTokens)) {
+    if (!$knownTokens || empty($knownTokens[$key])) {
       return $str;
     }
 
@@ -607,7 +605,7 @@ class CRM_Utils_Token {
     // so that we remove anything we do not recognize
     // I hope to move this step out of here soon and
     // then we will just iterate on a list of tokens that are passed to us
-    if (!$knownTokens || !CRM_Utils_Array::value($key, $knownTokens)) {
+    if (!$knownTokens || empty($knownTokens[$key])) {
       return $str;
     }
 
@@ -1124,7 +1122,7 @@ class CRM_Utils_Token {
         //special case for greeting replacement
         foreach (array(
           'email_greeting', 'postal_greeting', 'addressee') as $val) {
-          if (CRM_Utils_Array::value($val, $contactDetails[$contactID])) {
+          if (!empty($contactDetails[$contactID][$val])) {
             $contactDetails[$contactID][$val] = $contactDetails[$contactID]["{$val}_display"];
           }
         }
@@ -1141,6 +1139,39 @@ class CRM_Utils_Token {
     return $details;
   }
 
+  /**
+   * Call hooks on tokens for anonymous users - contact id is set to 0 - this allows non-contact
+   * specific tokens to be rendered
+   *
+   * @param array $contactIDs - this should always be array(0) or its not anonymous - left to keep signature same
+   * as main fn
+   * @param string $returnProperties
+   * @param boolean $skipOnHold
+   * @param boolean $skipDeceased
+   * @param string $extraParams
+   * @param array $tokens
+   * @param string $className sent as context to the hook
+   * @param string $jobID
+   * @return array contactDetails with hooks swapped out
+   */
+  function getAnonymousTokenDetails($contactIDs = array(0),
+    $returnProperties = NULL,
+    $skipOnHold       = TRUE,
+    $skipDeceased     = TRUE,
+    $extraParams      = NULL,
+    $tokens           = array(),
+    $className        = NULL,
+    $jobID            = NULL) {
+    $details = array(0 => array());
+      // also call a hook and get token details
+      CRM_Utils_Hook::tokenValues($details[0],
+      $contactIDs,
+      $jobID,
+      $tokens,
+      $className
+    );
+    return $details;
+  }
   /**
    * gives required details of contribuion in an indexed array format so we
    * can iterate in a nice loop and do token evaluation
@@ -1181,18 +1212,18 @@ class CRM_Utils_Token {
         CRM_Core_DAO::storeValues($dao, $details[$dao->id]);
 
         // do the necessary transformation
-        if (CRM_Utils_Array::value('payment_instrument_id', $details[$dao->id])) {
+        if (!empty($details[$dao->id]['payment_instrument_id'])) {
           $piId = $details[$dao->id]['payment_instrument_id'];
           $pis = CRM_Contribute_PseudoConstant::paymentInstrument();
           $details[$dao->id]['payment_instrument'] = $pis[$piId];
         }
-        if (CRM_Utils_Array::value('campaign_id', $details[$dao->id])) {
+        if (!empty($details[$dao->id]['campaign_id'])) {
           $campaignId = $details[$dao->id]['campaign_id'];
           $campaigns = CRM_Campaign_BAO_Campaign::getCampaigns($campaignId);
           $details[$dao->id]['campaign'] = $campaigns[$campaignId];
         }
 
-        if (CRM_Utils_Array::value('financial_type_id', $details[$dao->id])) {
+        if (!empty($details[$dao->id]['financial_type_id'])) {
           $financialtypeId = $details[$dao->id]['financial_type_id'];
           $ftis = CRM_Contribute_PseudoConstant::financialType();
           $details[$dao->id]['financial_type'] = $ftis[$financialtypeId];
@@ -1367,7 +1398,7 @@ class CRM_Utils_Token {
    * @return string string with replacements made
    */
   public static function replaceEntityTokens($entity, $entityArray, $str, $knownTokens = array(), $escapeSmarty = FALSE) {
-    if (!$knownTokens || !CRM_Utils_Array::value($entity, $knownTokens)) {
+    if (!$knownTokens || empty($knownTokens[$entity])) {
       return $str;
     }
 
@@ -1389,7 +1420,7 @@ class CRM_Utils_Token {
     // I hope to move this step out of here soon and
     // then we will just iterate on a list of tokens that are passed to us
     $key = 'contribution';
-    if (!$knownTokens || !CRM_Utils_Array::value($key, $knownTokens)) {
+    if (!$knownTokens || empty($knownTokens[$key])) {
       return $str;
     }
 
@@ -1498,6 +1529,41 @@ class CRM_Utils_Token {
       'gender' => 'gender_id',
       'communication_style' => 'communication_style_id',
     );
+  }
+
+  /**
+   * Formats a token list for the select2 widget
+   * @param $tokens
+   * @return array
+   */
+  static function formatTokensForDisplay($tokens) {
+    $sorted = $output = array();
+
+    // Sort in ascending order by ignoring word case
+    natcasesort($tokens);
+
+    // Attempt to place tokens into optgroups
+    // TODO: These groupings could be better and less hackish. Getting them pre-grouped from upstream would be nice.
+    foreach ($tokens as $k => $v) {
+      // Check to see if this token is already in a group e.g. for custom fields
+      $split = explode(' :: ', $v);
+      if (!empty($split[1])) {
+        $sorted[$split[1]][] = array('id' => $k, 'text' => $split[0]);
+      }
+      // Group by entity
+      else {
+        $split = explode('.', trim($k, '{}'));
+        $entity = isset($split[1]) ? ucfirst($split[0]) : 'Contact';
+        $sorted[ts($entity)][] = array('id' => $k, 'text' => $v);
+      }
+    }
+
+    ksort($sorted);
+    foreach ($sorted as $k => $v) {
+      $output[] = array('text' => $k, 'children' => $v);
+    }
+
+    return $output;
   }
 
 }

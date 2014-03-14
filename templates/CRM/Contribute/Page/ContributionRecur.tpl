@@ -24,7 +24,8 @@
  +--------------------------------------------------------------------+
 *}
 
-{include file="CRM/common/enableDisable.tpl"}
+{include file="CRM/common/enableDisableApi.tpl"}
+{include file="CRM/common/crmeditable.tpl"}
 
 {if $action eq 4} {* when action is view *}
     {if $recur}
@@ -50,13 +51,13 @@
             <tr><td class="label">{ts}Auto Renew?{/ts}</td><td>{if $recur.auto_renew}{ts}Yes{/ts}{else}{ts}No{/ts}{/if}</td></tr>
             {if $recur.payment_processor}<tr><td class="label">{ts}Payment Processor{/ts}</td><td>{$recur.payment_processor}</td></tr>{/if}
           </table>
-          <div class="crm-submit-buttons"><input type="button" name='cancel' value="{ts}Done{/ts}" onclick="location.href='{crmURL p='civicrm/contact/view' q='action=browse&selectedChild=contribute'}';"/></div>
+          <div class="crm-submit-buttons"><a class="button cancel form-submit" href="{crmURL p='civicrm/contact/view' q='action=browse&selectedChild=contribute'}">{ts}Done{/ts}</a></div>
         </div>
     {/if}
 {/if}
 {if $recurRows}
     {strip}
-    <table class="selector">
+    <table class="selector row-highlight">
         <tr class="columnheader">
             <th scope="col">{ts}Amount{/ts}</th>
             <th scope="col">{ts}Frequency{/ts}</th>
@@ -68,7 +69,7 @@
 
         {foreach from=$recurRows item=row}
             {assign var=id value=$row.id}
-            <tr id="row_{$row.id}" class="{cycle values="even-row,odd-row"}{if NOT $row.is_active} disabled{/if}">
+            <tr id="contribution_recur-{$row.id}" class="crm-entity {cycle values="even-row,odd-row"}{if NOT $row.is_active} disabled{/if}">
                 <td>{$row.amount|crmMoney}{if $row.is_test} ({ts}test{/ts}){/if}</td>
                 <td>{ts}Every{/ts} {$row.frequency_interval} {$row.frequency_unit} </td>
                 <td>{$row.start_date|crmDate}</td>

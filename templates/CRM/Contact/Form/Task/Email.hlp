@@ -29,7 +29,7 @@
 {htxt id="id-from_email"}
 <p>{ts}By default, CiviCRM uses the primary email address of the logged in user as the FROM address when sending emails to contacts. However, users with Administer CiviCRM permission can configure one or more general email addresses that can be selected as an alternative. EXAMPLE: "Client Services" &lt;clientservices@example.org&gt;{/ts}</p>
 {if $params.isAdmin}
-    {capture assign="fromConfig"}{crmURL p="civicrm/admin/options/from_email_address" q="group=from_email_address&reset=1"}{/capture}
+    {capture assign="fromConfig"}{crmURL p="civicrm/admin/options/from_email_address" q="reset=1"}{/capture}
     <p>{ts 1=$fromConfig}Go to <a href='%1'>Administer CiviCRM &raquo; Communications &raquo; FROM Email Addresses</a> to add or edit general email addresses. Make sure these email addresses are valid email accounts with your email service provider.{/ts}</p>
 {/if}
 {/htxt}

@@ -97,10 +97,10 @@ class CRM_Event_PseudoConstant extends CRM_Core_PseudoConstant {
    *
    * @access public
    *
-   * @return array - array reference of all events if any
+   * @return array - array of all events if any
    * @static
    */
-  public static function &event($id = NULL, $all = FALSE, $condition = NULL) {
+  public static function event($id = NULL, $all = FALSE, $condition = NULL) {
     $key = "{$id}_{$all}_{$condition}";
 
     if (!isset(self::$event[$key])) {

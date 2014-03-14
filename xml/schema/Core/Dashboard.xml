@@ -30,6 +30,14 @@
         <add>3.1</add>
     </foreignKey>
     <field>
+      <name>name</name>
+      <type>varchar</type>
+      <title>Dashlet Name</title>
+      <length>64</length>
+      <comment>Internal name of dashlet.</comment>
+      <add>4.4</add>
+    </field>
+    <field>
         <name>label</name>
         <type>varchar</type>
         <length>255</length>

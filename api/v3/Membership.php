@@ -112,11 +112,11 @@ function civicrm_api3_membership_create($params) {
   $action = CRM_Core_Action::ADD;
   // we need user id during add mode
     $ids = array ();
-    if(CRM_Utils_Array::value('contact_id', $params)) {
+    if (!empty($params['contact_id'])) {
       $ids['userId'] = $params['contact_id'];
     }
   //for edit membership id should be present
-  if (CRM_Utils_Array::value('id', $params)) {
+  if (!empty($params['id'])) {
     $ids['membership'] = $params['id'];
     $action = CRM_Core_Action::UPDATE;
   }
@@ -192,7 +192,7 @@ function civicrm_api3_membership_get($params) {
   }
   $activeOnly = CRM_Utils_Array::value('active_only', $params, $activeOnly);
 
-  if (CRM_Utils_Array::value('contact_id', $params) && !is_array($params['contact_id'])) {
+  if (!empty($params['contact_id']) && !is_array($params['contact_id'])) {
     $membershipValues = _civicrm_api3_membership_get_customv2behaviour($params, $membershipTypeId, $activeOnly );
   }
   else {
@@ -250,7 +250,7 @@ function _civicrm_api3_membership_relationsship_get_customv2behaviour(&$params, 
 
     $membershipValues[$membershipId]['membership_name'] = $membershipType['name'];
 
-    if (CRM_Utils_Array::value('relationship_type_id', $membershipType)) {
+    if (!empty($membershipType['relationship_type_id'])) {
       $relationships[$membershipType['relationship_type_id']] = $membershipId;
     }
 

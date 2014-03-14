@@ -387,13 +387,13 @@
 
        if (!empty($tags)) {
          $form->add('select', "tag_$i", ts('Tags'), $tags, FALSE,
-           array('id' => "tags_$i", 'multiple' => 'multiple', 'title' => ts('- select -'))
+           array('id' => "tags_$i", 'multiple' => 'multiple', 'class' => 'crm-select2')
          );
        }
      }
 
      // build tagset widget
-     CRM_Core_Form_Tag::buildQuickForm($form, $parentNames, 'civicrm_file', NULL, FALSE, TRUE, FALSE);
+     CRM_Core_Form_Tag::buildQuickForm($form, $parentNames, 'civicrm_file', NULL, TRUE, TRUE, FALSE);
    }
 
    /**
@@ -431,7 +431,7 @@
    ) {
 
      // delete current attachments if applicable
-     if ($entityID && CRM_Utils_Array::value('is_delete_attachment', $formValues)) {
+     if ($entityID && !empty($formValues['is_delete_attachment'])) {
        CRM_Core_BAO_File::deleteEntityFile($entityTable, $entityID);
      }
 

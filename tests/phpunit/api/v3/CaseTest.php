@@ -47,7 +47,7 @@ class api_v3_CaseTest extends CiviUnitTestCase {
   protected $caseStatusGroup;
   protected $caseTypeGroup;
   protected $optionValues;
-  public $_eNoticeCompliant = TRUE;
+
   /**
    *  Test setup for every test
    *

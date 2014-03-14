@@ -51,7 +51,7 @@ class CRM_Case_Form_Activity_ChangeCaseStatus {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   static function setDefaultValues(&$form) {
     $defaults = array();
@@ -97,7 +97,7 @@ class CRM_Case_Form_Activity_ChangeCaseStatus {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   static function beginPostProcess(&$form, &$params) {
     $params['id'] = CRM_Utils_Array::value('case_id', $params);
@@ -108,15 +108,13 @@ class CRM_Case_Form_Activity_ChangeCaseStatus {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   static function endPostProcess(&$form, &$params, $activity) {
     $groupingValues = CRM_Core_OptionGroup::values('case_status', FALSE, TRUE, FALSE, NULL, 'value');
 
     // Set case end_date if we're closing the case. Clear end_date if we're (re)opening it.
-    if (CRM_Utils_Array::value($params['case_status_id'], $groupingValues) == 'Closed'
-      && CRM_Utils_Array::value('activity_date_time', $params)
-    ) {
+    if (CRM_Utils_Array::value($params['case_status_id'], $groupingValues) == 'Closed' && !empty($params['activity_date_time'])) {
       $params['end_date'] = $params['activity_date_time'];
 
       // End case-specific relationships (roles)

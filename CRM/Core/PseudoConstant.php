@@ -205,6 +205,7 @@ class CRM_Core_PseudoConstant {
   /**
    * Low-level option getter, rarely accessed directly.
    * NOTE: Rather than calling this function directly use CRM_*_BAO_*::buildOptions()
+   * @see http://wiki.civicrm.org/confluence/display/CRMDOC/Pseudoconstant+%28option+list%29+Reference
    *
    * @param String $daoName
    * @param String $fieldName
@@ -222,7 +223,7 @@ class CRM_Core_PseudoConstant {
    * - fresh      boolean ignore cache entries and go back to DB
    * @param String $context: Context string
    *
-   * @return Array on success, FALSE on error.
+   * @return Array|bool - array on success, FALSE on error.
    *
    * @static
    */
@@ -276,31 +277,24 @@ class CRM_Core_PseudoConstant {
 
     // Core field: load schema
     $dao = new $daoName;
-    $fields = $dao->fields();
-    $fieldKeys = $dao->fieldKeys();
+    $fieldSpec = $dao->getFieldSpec($fieldName);
     $dao->free();
-
-    // Support "unique names" as well as sql names
-    $fieldKey = $fieldName;
-    if (empty($fields[$fieldKey])) {
-      $fieldKey = CRM_Utils_Array::value($fieldName, $fieldKeys);
-    }
     // If neither worked then this field doesn't exist. Return false.
-    if (empty($fields[$fieldKey])) {
+    if (empty($fieldSpec)) {
       return FALSE;
-    }
-    $fieldSpec = $fields[$fieldKey];
-
-    // If the field is an enum, explode the enum definition and return the array.
-    if (isset($fieldSpec['enumValues'])) {
-      // use of a space after the comma is inconsistent in xml
-      $enumStr = str_replace(', ', ',', $fieldSpec['enumValues']);
-      $output = explode(',', $enumStr);
-      return array_combine($output, $output);
     }
 
     elseif (!empty($fieldSpec['pseudoconstant'])) {
       $pseudoconstant = $fieldSpec['pseudoconstant'];
+
+      // if callback is specified..
+      if(!empty($pseudoconstant['callback'])) {
+        list($className, $fnName) = explode('::', $pseudoconstant['callback']);
+        if (method_exists($className, $fnName)) {
+          return call_user_func(array($className, $fnName));
+        }
+      }
+
       // Merge params with schema defaults
       $params += array(
         'condition' => CRM_Utils_Array::value('condition', $pseudoconstant, array()),
@@ -499,6 +493,33 @@ class CRM_Core_PseudoConstant {
       return FALSE;
     }
     return CRM_Utils_Array::key($value, $values);
+  }
+
+  /**
+   * Lookup the admin page at which a field's option list can be edited
+   * @param $fieldSpec
+   * @return string|null
+   */
+  static function getOptionEditUrl($fieldSpec) {
+    // If it's an option group, that's easy
+    if (!empty($fieldSpec['pseudoconstant']['optionGroupName'])) {
+      return 'civicrm/admin/options/' . $fieldSpec['pseudoconstant']['optionGroupName'];
+    }
+    // For everything else...
+    elseif (!empty($fieldSpec['pseudoconstant']['table'])) {
+      $daoName = CRM_Core_DAO_AllCoreTables::getClassForTable($fieldSpec['pseudoconstant']['table']);
+      if (!$daoName) {
+        return NULL;
+      }
+      // We don't have good mapping so have to do a bit of guesswork from the menu
+      list(, $parent, , $child) = explode('_', $daoName);
+      $sql = "SELECT path FROM civicrm_menu
+        WHERE page_callback LIKE '%CRM_Admin_Page_$child%' OR page_callback LIKE '%CRM_{$parent}_Page_$child%'
+        ORDER BY page_callback
+        LIMIT 1";
+      return CRM_Core_Dao::singleValueQuery($sql);
+    }
+    return NULL;
   }
 
   /**

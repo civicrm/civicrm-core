@@ -73,36 +73,42 @@ class CRM_Activity_Task {
   static function &tasks() {
     if (!(self::$_tasks)) {
       self::$_tasks = array(
-        1 => array('title' => ts('Delete Activities'),
+        1 => array(
+          'title' => ts('Delete Activities'),
           'class' => 'CRM_Activity_Form_Task_Delete',
           'result' => FALSE,
         ),
-        2 => array('title' => ts('Print Activities'),
+        2 => array(
+          'title' => ts('Print Selected Rows'),
           'class' => 'CRM_Activity_Form_Task_Print',
           'result' => FALSE,
         ),
-        3 => array('title' => ts('Export Activities'),
+        3 => array(
+          'title' => ts('Export Activities'),
           'class' => array(
             'CRM_Export_Form_Select',
             'CRM_Export_Form_Map',
           ),
           'result' => FALSE,
         ),
-        4 => array('title' => ts('Batch Update Activities Via Profile'),
+        4 => array(
+          'title' => ts('Batch Update Activities Via Profile'),
           'class' => array(
             'CRM_Activity_Form_Task_PickProfile',
             'CRM_Activity_Form_Task_Batch',
           ),
           'result' => FALSE,
         ),
-        5 => array('title' => ts('Send Email to Contacts'),
+        5 => array(
+          'title' => ts('Send Email to Contacts'),
           'class' => array(
             'CRM_Activity_Form_Task_PickOption',
             'CRM_Activity_Form_Task_Email',
           ),
           'result' => FALSE,
         ),
-        6 => array('title' => ts('Send Reply SMS To Contacts'),
+        6 => array(
+          'title' => ts('Send Reply SMS To Contacts'),
           'class' => 'CRM_Activity_Form_Task_SMS',
           'result' => FALSE,
         ),
@@ -122,7 +128,8 @@ class CRM_Activity_Task {
       if (in_array('CiviCase', $config->enableComponents)) {
         if ( CRM_Core_Permission::check('access all cases and activities') ||
           CRM_Core_Permission::check('access my cases and activities') ) {
-          self::$_tasks[6] = array('title' => ts('File on Case'),
+          self::$_tasks[6] = array(
+            'title' => ts('File on Case'),
             'class' => 'CRM_Activity_Form_Task_FileOnCase',
             'result' => FALSE,
           );
@@ -151,10 +158,7 @@ class CRM_Activity_Task {
     self::tasks();
     $titles = array();
     foreach (self::$_tasks as $id => $value) {
-      // skip Print Activity task
-      if ($id != 2) {
-        $titles[$id] = $value['title'];
-      }
+      $titles[$id] = $value['title'];
     }
     return $titles;
   }

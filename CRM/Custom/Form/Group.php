@@ -135,7 +135,7 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
       $errors['title'] = ts('Custom group \'%1\' already exists in Database.', array(1 => $title));
     }
 
-    if (CRM_Utils_Array::value(1, $fields['extends'])) {
+    if (!empty($fields['extends'][1])) {
       if (in_array('', $fields['extends'][1]) && count($fields['extends'][1]) > 1) {
         $errors['extends'] = ts("Cannot combine other option with 'Any'.");
       }
@@ -151,8 +151,12 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
       $self->assign('showStyle', TRUE);
     }
 
-    if (CRM_Utils_Array::value('is_multiple', $fields)) {
+    if (!empty($fields['is_multiple'])) {
         $self->assign('showMultiple', TRUE);
+    }
+
+    if (empty($fields['is_multiple']) && $fields['style'] == 'Tab with table') {
+      $errors['style'] = ts("Display Style 'Tab with table' is only supported for multiple-record custom field sets.");
     }
 
     //checks the given custom set doesnot start with digit
@@ -417,8 +421,12 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
       $defaults['is_active'] = $defaults['collapse_display'] = 1;
       $defaults['style'] = 'Inline';
     }
-    elseif (!CRM_Utils_Array::value('max_multiple', $defaults) && !$this->_isGroupEmpty) {
+    elseif (empty($defaults['max_multiple']) && !$this->_isGroupEmpty) {
       $this->assign('showMaxMultiple', FALSE);
+    }
+
+    if (($this->_action & CRM_Core_Action::UPDATE) && !empty($defaults['is_multiple'])) {
+      $defaults['collapse_display'] = 0;
     }
 
     if (isset($defaults['extends'])) {

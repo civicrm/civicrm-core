@@ -154,14 +154,14 @@ class CRM_Core_OptionValue {
         $dao->id
       );
 
-      if (CRM_Utils_Array::value('component_id', $optionValue[$dao->id])) {
+      if (!empty($optionValue[$dao->id]['component_id'])) {
         $optionValue[$dao->id]['component_name'] = $componentNames[$optionValue[$dao->id]['component_id']];
       }
       else {
         $optionValue[$dao->id]['component_name'] = 'Contact';
       }
 
-      if (CRM_Utils_Array::value('visibility_id', $optionValue[$dao->id])) {
+      if (!empty($optionValue[$dao->id]['visibility_id'])) {
         $optionValue[$dao->id]['visibility_label'] = $visibilityLabels[$optionValue[$dao->id]['visibility_id']];
       }
     }
@@ -210,7 +210,7 @@ class CRM_Core_OptionValue {
     }
     $params['option_group_id'] = $optionGroupID;
 
-    if (($action & CRM_Core_Action::ADD) && !CRM_Utils_Array::value('value', $params)) {
+    if (($action & CRM_Core_Action::ADD) && empty($params['value'])) {
       $fieldValues = array('option_group_id' => $optionGroupID);
       // use the next available value
       /* CONVERT(value, DECIMAL) is used to convert varchar
@@ -226,7 +226,7 @@ class CRM_Core_OptionValue {
     }
 
     // set name to label if it's not set - but *only* for ADD action (CRM-3522)
-    if (($action & CRM_Core_Action::ADD) && !CRM_Utils_Array::value('name', $params) && $params['label']) {
+    if (($action & CRM_Core_Action::ADD) && empty($params['name']) && $params['label']) {
       $params['name'] = $params['label'];
     }
     if ($action & CRM_Core_Action::UPDATE) {
@@ -349,11 +349,11 @@ class CRM_Core_OptionValue {
     if (!empty($query->_params) || !empty($query->_returnProperties)) {
       $field = self::getFields();
       foreach ($field as $name => $values) {
-        if (CRM_Utils_Array::value('pseudoconstant', $values)) {
+        if (!empty($values['pseudoconstant'])) {
           continue;
         }
         list($tableName, $fieldName) = explode('.', $values['where']);
-        if (CRM_Utils_Array::value($name, $query->_returnProperties)) {
+        if (!empty($query->_returnProperties[$name])) {
           $query->_select["{$name}_id"] = "{$name}.value as {$name}_id";
           $query->_element["{$name}_id"] = 1;
           $query->_select[$name] = "{$name}.{$fieldName} as $name";

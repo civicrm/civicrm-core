@@ -23,6 +23,9 @@
     <length>64</length>
     <comment>Variable name/programmatic handle for this batch.</comment>
     <add>3.3</add>
+    <html>
+      <type>Text</type>
+    </html>
   </field>
   <index>
     <name>UI_name</name>
@@ -46,15 +49,20 @@
     <localizable>true</localizable>
     <comment>Friendly Name.</comment>
     <add>4.2</add>
+    <html>
+      <type>Text</type>
+    </html>
   </field>
   <field>
     <name>description</name>
     <type>text</type>
     <comment>Description of this batch set.</comment>
     <localizable>true</localizable>
-    <htmlType>textarea</htmlType>
-    <rows>4</rows>
-    <cols>80</cols>
+    <html>
+      <type>TextArea</type>
+      <rows>4</rows>
+      <cols>80</cols>
+    </html>
     <add>3.3</add>
   </field>
   <field>
@@ -75,6 +83,9 @@
     <type>datetime</type>
     <comment>When was this item created</comment>
     <add>3.3</add>
+    <html>
+      <type>Select Date</type>
+    </html>
   </field>
   <field>
     <name>modified_id</name>
@@ -100,6 +111,9 @@
     <type>int unsigned</type>
     <comment>FK to Saved Search ID</comment>
     <add>4.1</add>
+    <html>
+      <type>Autocomplete-Select</type>
+    </html>
   </field>
   <foreignKey>
     <name>saved_search_id</name>
@@ -117,6 +131,9 @@
     <pseudoconstant>
       <optionGroupName>batch_status</optionGroupName>
     </pseudoconstant>
+    <html>
+      <type>Select</type>
+    </html>
   </field>
   <field>
     <name>type_id</name>
@@ -126,6 +143,9 @@
     <pseudoconstant>
       <optionGroupName>batch_type</optionGroupName>
     </pseudoconstant>
+    <html>
+      <type>Select</type>
+    </html>
   </field>
   <field>
     <name>mode_id</name>
@@ -135,18 +155,27 @@
     <pseudoconstant>
       <optionGroupName>batch_mode</optionGroupName>
     </pseudoconstant>
+    <html>
+      <type>Select</type>
+    </html>
   </field>
   <field>
     <name>total</name>
     <type>decimal</type>
     <comment>Total amount for this batch.</comment>
     <add>4.2</add>
+    <html>
+      <type>Text</type>
+    </html>
   </field>
   <field>
     <name>item_count</name>
     <type>int unsigned</type>
     <comment>Number of items in a batch.</comment>
     <add>4.2</add>
+    <html>
+      <type>Text</type>
+    </html>
   </field>
   <field>
     <name>payment_instrument_id</name>
@@ -155,6 +184,9 @@
     <pseudoconstant>
       <optionGroupName>payment_instrument</optionGroupName>
     </pseudoconstant>
+    <html>
+      <type>Select</type>
+    </html>
     <add>4.3</add>
   </field>
   <field>

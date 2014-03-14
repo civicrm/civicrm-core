@@ -183,6 +183,102 @@ class WebTest_Contribute_StandaloneAddTest extends CiviSeleniumTestCase {
     }
   }
 
+  function testfinancialTypeSearch() {
+    $this->webtestLogin();
+
+    $financialType = array(
+      'name' => 'Financial type' . substr(sha1(rand()), 0, 7),
+      'is_reserved' => FALSE,
+      'is_deductible' => FALSE,
+    );
+    
+    $this->addeditFinancialType($financialType);
+    $this->addStandaloneContribution($financialType);
+    $this->addStandaloneContribution($financialType);
+
+    $this->openCiviPage("contribute/search", "reset=1", "_qf_Search_refresh");
+    // select group
+    $this->select("crmasmSelect2", "label={$financialType['name']}");
+    $this->clickLink("_qf_Search_refresh");
+    $this->assertElementContainsText("xpath=//div[@id='search-status']/table/tbody/tr[1]/td[1]", "2 Result");
+    $this->assertElementContainsText("xpath=//div[@id='search-status']/table/tbody/tr[1]/td[2]", "Financial Type IN {$financialType['name']}");
+    
+    $this->openCiviPage("contact/search/advanced", "reset=1", "_qf_Advanced_refresh-top");
+    $this->click('CiviContribute');
+    $this->waitForElementPresent("crmasmSelect5");
+    
+    // select group
+    $this->select("crmasmSelect5", "label={$financialType['name']}");
+    $this->clickLink("_qf_Advanced_refresh-top");
+    $this->assertElementContainsText("xpath=//div[@id='search-status']//table/tbody/tr[1]/td[1]", "2 Contacts");
+    $this->assertElementContainsText("xpath=//div[@id='search-status']//table/tbody/tr[1]/td[2]", "Financial Type IN {$financialType['name']}");
+  }
+
+  function addStandaloneContribution($financialType) {
+    
+    $this->openCiviPage("contribute/add", "reset=1&context=standalone", "_qf_Contribution_upload");
+
+    // create new contact using dialog
+    $firstName = substr(sha1(rand()), 0, 7);
+    $this->webtestNewDialogContact($firstName, "Contributor", $firstName . "@example.com");
+
+    // select financial type
+    $this->select("financial_type_id", "label={$financialType['name']}");
+
+    // fill in Received Date
+    $this->webtestFillDate('receive_date');
+
+    // source
+    $this->type("source", "Mailer 1");
+
+    // total amount
+    $this->type("total_amount", "100");
+
+    // select payment instrument type = Check and enter chk number
+    $this->select("payment_instrument_id", "value=4");
+    $this->waitForElementPresent("check_number");
+    $this->type("check_number", "check #1041");
+
+    $this->type("trxn_id", "P20901X1" . rand(100, 10000));
+
+    //Additional Detail section
+    $this->click("AdditionalDetail");
+    $this->waitForElementPresent("thankyou_date");
+
+    $this->type("note", "This is a test note.");
+    $this->type("non_deductible_amount", "10");
+    $this->type("fee_amount", "0");
+    $this->type("net_amount", "0");
+    $this->type("invoice_id", time());
+    $this->webtestFillDate('thankyou_date');
+
+    // Clicking save.
+    $this->click("_qf_Contribution_upload");
+    $this->waitForPageToLoad($this->getTimeoutMsec());
+
+    // Is status message correct?
+    $this->assertTrue($this->isTextPresent("The contribution record has been saved."), "Status message didn't show up after saving!");
+
+    // verify if Membership is created
+    $this->waitForElementPresent("xpath=//div[@id='Contributions']//table//tbody/tr[1]/td[8]/span/a[text()='View']");
+
+    //click through to the Membership view screen
+    $this->click("xpath=//div[@id='Contributions']//table/tbody/tr[1]/td[8]/span/a[text()='View']");
+    $this->waitForElementPresent("_qf_ContributionView_cancel-bottom");
+
+    $expected = array(
+      'Financial Type' => $financialType['name'],
+      'Total Amount' => '$ 100.00',
+      'Contribution Status' => 'Completed',
+      'Paid By' => 'Check',
+      'Check Number' => 'check #1041',
+    );
+
+    foreach ($expected as $label => $value) {
+      $this->verifyText("xpath=id('ContributionView')/div[2]/table[1]/tbody//tr/td[1][text()='$label']/../td[2]", preg_quote($value));
+    }
+  }
+
   function testAjaxCustomGroupLoad() {
     $this->webtestLogin();
     $triggerElement = array('name' => 'financial_type_id', 'type' => 'select');

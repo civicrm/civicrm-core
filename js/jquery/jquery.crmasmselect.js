@@ -212,7 +212,7 @@
 
 				// select the firm item from the regular select that we created
 
-				$select.children(":eq(0)").attr("selected", true); 
+				$select.children(":eq(0)").prop("selected", true);
 			}
 
 			function disableSelectOption($option) {
@@ -222,8 +222,8 @@
 				// we apply a class that reproduces the disabled look in other browsers
 
 				$option.addClass(options.optionDisabledClass)
-					.attr("selected", false)
-					.attr("disabled", true);
+					.prop("selected", false)
+					.prop("disabled", true);
 
 				if(options.hideWhenAdded) $option.hide();
 				if($.browser.msie) $select.hide().show(); // this forces IE to update display
@@ -234,7 +234,7 @@
 				// given an already disabled select option, enable it
 
 				$option.removeClass(options.optionDisabledClass)
-					.attr("disabled", false);
+					.prop("disabled", false);
 
 				if(options.hideWhenAdded) $option.show();
 				if($.browser.msie) $select.hide().show(); // this forces IE to update display
@@ -271,7 +271,7 @@
 
 				if(!buildingSelect) {
 					if($O.is(":selected")) return; // already have it
-					$O.attr('selected', true); 
+					$O.prop('selected', true);
 				}
 
 				if(options.addItemTarget == 'top' && !buildingSelect) {
@@ -333,7 +333,7 @@
 				if(highlightItem == undefined) var highlightItem = true; 
 				var $O = $('#' + optionId); 
 
-				$O.attr('selected', false); 
+				$O.prop('selected', false);
 				$item = $ol.children("li[rel=" + optionId + "]");
 
 				dropListItemHide($item); 

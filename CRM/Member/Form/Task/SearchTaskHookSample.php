@@ -74,7 +74,7 @@ WHERE      mem.id IN ( $memberIDs )";
   /**
    * Function to actually build the form
    *
-   * @return None
+   * @return void
    * @access public
    */
   public function buildQuickForm() {

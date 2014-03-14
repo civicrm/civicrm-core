@@ -48,7 +48,7 @@ class api_v3_ContributionSoftTest extends CiviUnitTestCase {
   protected $_entity = 'Contribution';
   public $debug = 0;
   protected $_params;
-  public $_eNoticeCompliant = TRUE;
+
 
   function setUp() {
     parent::setUp();

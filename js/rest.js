@@ -84,6 +84,45 @@ var CRM = CRM || {};
   /**
    * AJAX api
    */
+  CRM.api3 = function(entity, action, params, status) {
+    if (typeof(entity) === 'string') {
+      params = {
+        entity: entity,
+        action: action.toLowerCase(),
+        json: JSON.stringify(params || {})
+      };
+    } else {
+      params = {
+        entity: 'api3',
+        action: 'call',
+        json: JSON.stringify(entity)
+      }
+    }
+    var ajax = $.ajax({
+      url: CRM.url('civicrm/ajax/rest'),
+      dataType: 'json',
+      data: params,
+      type: params.action.indexOf('get') < 0 ? 'POST' : 'GET'
+    });
+    if (status) {
+      // Default status messages
+      if (status === true) {
+        status = {success: params.action === 'delete' ? ts('Removed') : ts('Saved')};
+        if (params.action.indexOf('get') === 0) {
+          status.start = ts('Loading...');
+          status.success = null;
+        }
+      }
+      var messages = status === true ? {} : status;
+      CRM.status(status, ajax);
+    }
+    return ajax;
+  };
+
+  /**
+   * @deprecated
+   * AJAX api
+   */
   CRM.api = function(entity, action, params, options) {
     // Default settings
     var settings = {
@@ -111,13 +150,13 @@ var CRM = CRM || {};
       case "setvalue":
       case "replace":
         settings.success = function() {
-          CRM.alert('', ts('Saved'), 'success');
+          CRM.status(ts('Saved'));
           return true;
         };
         break;
       case "delete":
         settings.success = function() {
-          CRM.alert('', ts('Removed'), 'success');
+          CRM.status(ts('Removed'));
           return true;
         };
     }
@@ -145,79 +184,5 @@ var CRM = CRM || {};
     console && console.log && console.log('Calling crmAPI from jQuery is deprecated. Please use CRM.api() instead.');
     return CRM.api.call(this, entity, action, params, options);
   };
-
-  /**
-   * FIXME: This function is not documented, is not used anywhere in the codebase, and doesn't
-   * clearly differentiate field elements which store the "contact id" versus the "contact label".
-   * My guess is that it's designed more for "quick-search" and less for "CRUD forms".
-   *
-   * @param params
-   * @param options
-   * @return {*}
-   */
-  $.fn.crmAutocomplete = function (params, options) {
-    if (typeof params == 'undefined') params = {};
-    if (typeof options == 'undefined') options = {};
-    params = $().extend({
-      rowCount:35,
-      json:1,
-      entity:'Contact',
-      action:'getquick',
-      sequential:1
-    }, params);
-
-    options = $().extend({}, {
-        field :'name',
-        skip : ['id','contact_id','contact_type','contact_is_deleted',"email_id",'address_id', 'country_id'],
-        result: function(data){
-        return false;
-      },
-      formatItem: function(data,i,max,value,term){
-        var tmp = [];
-        for (attr in data) {
-          if ($.inArray (attr, options.skip) == -1 && data[attr]) {
-            tmp.push(data[attr]);
-          }
-        }
-        return  tmp.join(' :: ');
-      },
-      parse: function (data){
-             var acd = new Array();
-             for(cid in data.values){
-               delete data.values[cid]["data"];// to be removed once quicksearch doesn't return data
-               acd.push({ data:data.values[cid], value:data.values[cid].sort_name, result:data.values[cid].sort_name });
-             }
-             return acd;
-      },
-      delay:100,
-        width:250,
-      minChars:1
-      }, options
-    );
-    var contactUrl = CRM.url('civicrm/ajax/rest', params);
-
-    return this.each(function() {
-      var selector = this;
-      if (typeof $.fn.autocomplete != 'function')
-        $.fn.autocomplete = cj.fn.autocomplete;//to work around the fubar cj
-        var extraP = {};
-        extraP [options.field] = function () {return $(selector).val();};
-        $(this).autocomplete( contactUrl, {
-          extraParams:extraP,
-          formatItem: function(data,i,max,value,term){
-            return options.formatItem(data,i,max,value,term);
-          },
-          parse: function(data){ return options.parse(data);},
-          width: options.width,
-          delay:options.delay,
-          max:25,
-          dataType:'json',
-          minChars:options.minChars,
-          selectFirst: true
-       }).result(function(event, data, formatted) {
-            options.result(data);
-        });
-     });
-   }
 
 })(jQuery, CRM);

@@ -84,7 +84,7 @@ class CRM_Case_Form_Task_Delete extends CRM_Case_Form_Task {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   public function postProcess() {
     $deletedCases = 0;

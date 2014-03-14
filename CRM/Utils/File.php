@@ -380,11 +380,11 @@ class CRM_Utils_File {
    *
    * @param string $dir  the directory to be secured
    */
-  static function restrictAccess($dir) {
+  static function restrictAccess($dir, $overwrite = FALSE) {
     // note: empty value for $dir can play havoc, since that might result in putting '.htaccess' to root dir
     // of site, causing site to stop functioning.
     // FIXME: we should do more checks here -
-    if (!empty($dir)) {
+    if (!empty($dir) && is_dir($dir)) {
       $htaccess = <<<HTACCESS
 <Files "*">
   Order allow,deny
@@ -393,8 +393,38 @@ class CRM_Utils_File {
 
 HTACCESS;
       $file = $dir . '.htaccess';
-      if (file_put_contents($file, $htaccess) === FALSE) {
-        CRM_Core_Error::movedSiteError($file);
+      if ($overwrite || !file_exists($file)) {
+        if (file_put_contents($file, $htaccess) === FALSE) {
+          CRM_Core_Error::movedSiteError($file);
+        }
+      }
+    }
+  }
+
+  /**
+   * Restrict remote users from browsing the given directory.
+   *
+   * @param $publicDir
+   */
+  static function restrictBrowsing($publicDir) {
+    if (!is_dir($publicDir) || !is_writable($publicDir)) {
+      return;
+    }
+
+    // base dir
+    $nobrowse = realpath($publicDir) . '/index.html';
+    if (!file_exists($nobrowse)) {
+      @file_put_contents($nobrowse, '');
+    }
+
+    // child dirs
+    $dir = new RecursiveDirectoryIterator($publicDir);
+    foreach ($dir as $name => $object) {
+      if (is_dir($name) && $name != '..') {
+        $nobrowse = realpath($name) . '/index.html';
+        if (!file_exists($nobrowse)) {
+          @file_put_contents($nobrowse, '');
+        }
       }
     }
   }

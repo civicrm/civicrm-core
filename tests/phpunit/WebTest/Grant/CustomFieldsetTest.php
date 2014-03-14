@@ -49,7 +49,7 @@ class WebTest_Grant_CustomFieldsetTest extends CiviSeleniumTestCase {
     $rand = substr(sha1(rand()), 0, 7);
 
     // Add new Grant Type
-    $this->openCiviPage('admin/options/grant_type', 'group=grant_type&reset=1');
+    $this->openCiviPage('admin/options/grant_type', 'reset=1');
     $this->click("css=#grant_type > div.action-link > #new > span");
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $grantType = 'GrantType' . $rand;

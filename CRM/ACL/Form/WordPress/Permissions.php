@@ -102,7 +102,7 @@ class CRM_ACL_Form_WordPress_Permissions extends CRM_Core_Form {
    * Function to process the form
    *
    * @access public
-   * @return None
+   * @return void
    */
   public function postProcess() {
     $params = $this->controller->exportValues($this->_name);

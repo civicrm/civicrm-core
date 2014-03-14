@@ -111,12 +111,15 @@ class CRM_Utils_Address_BatchUpdate {
   function processContacts(&$config, $processGeocode, $parseStreetAddress) {
     // build where clause.
     $clause = array('( c.id = a.contact_id )');
+    $params = array();
     if ($this->start) {
-      $clause[] = "( c.id >= $this->start )";
+      $clause[] = "( c.id >= %1 )";
+      $params[1] = array($this->start, 'Integer');
     }
 
     if ($this->end) {
-      $clause[] = "( c.id <= $this->end )";
+      $clause[] = "( c.id <= %2 )";
+      $params[2] = array($this->end, 'Integer');
     }
 
     if ($processGeocode) {
@@ -145,8 +148,7 @@ class CRM_Utils_Address_BatchUpdate {
 
     $totalGeocoded = $totalAddresses = $totalAddressParsed = 0;
 
-    $dao = CRM_Core_DAO::executeQuery($query, CRM_Core_DAO::$_nullArray);
-
+    $dao = CRM_Core_DAO::executeQuery($query, $params);
     if ($processGeocode) {
       require_once (str_replace('_', DIRECTORY_SEPARATOR, $config->geocodeMethod) . '.php');
     }
@@ -211,9 +213,7 @@ class CRM_Utils_Address_BatchUpdate {
         $success = TRUE;
         // consider address is automatically parseable,
         // when we should found street_number and street_name
-        if (!CRM_Utils_Array::value('street_name', $parsedFields) ||
-          !CRM_Utils_Array::value('street_number', $parsedFields)
-        ) {
+        if (empty($parsedFields['street_name']) || empty($parsedFields['street_number'])) {
           $success = FALSE;
         }
 

@@ -78,7 +78,7 @@
         {/if}
 
         {strip}
-        <table class="selector" summary="{ts}Search results listings.{/ts}">
+        <table class="selector row-highlight" summary="{ts}Search results listings.{/ts}">
             <thead class="sticky">
                 <th scope="col" title="Select All Rows">{$form.toggleSelect.html}</th>
                 {foreach from=$columnHeaders item=header}
@@ -113,11 +113,6 @@
         </table>
         {/strip}
 
-        <script type="text/javascript">
-        {* this function is called to change the color of selected row(s) *}
-        var fname = "{$form.formName}";
-        on_load_init_checkboxes(fname);
-        </script>
 
         {include file="CRM/common/pager.tpl" location="bottom"}
 

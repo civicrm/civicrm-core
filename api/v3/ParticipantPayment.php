@@ -58,7 +58,7 @@
 function civicrm_api3_participant_payment_create($params) {
 
   $ids = array();
-  if (CRM_Utils_Array::value('id', $params)) {
+  if (!empty($params['id'])) {
     $ids['id'] = $params['id'];
   }
   $participantPayment = CRM_Event_BAO_ParticipantPayment::create($params, $ids);

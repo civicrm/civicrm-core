@@ -108,16 +108,15 @@ class CRM_Contact_Form_Inline_OpenID extends CRM_Contact_Form_Inline {
    */
   static function formRule($fields, $errors) {
     $hasData = $hasPrimary = $errors = array();
-    if (CRM_Utils_Array::value('openid', $fields) && is_array($fields['openid'])) {
+    if (!empty($fields['openid']) && is_array($fields['openid'])) {
       foreach ($fields['openid'] as $instance => $blockValues) {
         $dataExists = CRM_Contact_Form_Contact::blockDataExists($blockValues);
 
         if ($dataExists) {
           $hasData[] = $instance;
-          if (CRM_Utils_Array::value('is_primary', $blockValues)) {
+          if (!empty($blockValues['is_primary'])) {
             $hasPrimary[] = $instance;
-            if (!$primaryID &&
-              CRM_Utils_Array::value('openid', $blockValues)) {
+            if (!$primaryID && !empty($blockValues['openid'])) {
                 $primaryID = $blockValues['openid'];
             }
           }

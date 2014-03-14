@@ -97,7 +97,6 @@ class CRM_Admin_Page_Extensions extends CRM_Core_Page_Basic {
           'name' => ts('Disable'),
           'url' => 'civicrm/admin/extensions',
           'qs' => 'action=disable&id=%%id%%&key=%%key%%',
-          'ref' => 'disable-action',
           'title' => ts('Disable'),
         ),
         CRM_Core_Action::DELETE => array(

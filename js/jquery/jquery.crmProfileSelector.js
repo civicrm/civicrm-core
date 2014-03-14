@@ -54,14 +54,13 @@
     });
   };
 
-  // FIXME: this needs a better place to live
-  CRM.scanProfileSelectors = function() {
-    $('.crm-profile-selector').each(function(){
+  $('#crm-container').on('crmLoad', function() {
+    $('.crm-profile-selector:not(.rendered)', this).addClass('rendered').each(function() {
       $(this).crmProfileSelector({
         groupTypeFilter: $(this).attr('data-group-type'),
         entities: $(this).data('entities')
       });
     });
-  };
+  });
 
 })(cj);

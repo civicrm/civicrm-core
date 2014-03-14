@@ -196,6 +196,7 @@ class CRM_Core_DAO extends DB_DataObject {
    */
   function initialize() {
     $this->_connect();
+    $this->query("SET NAMES utf8");
   }
 
   /**
@@ -260,7 +261,7 @@ class CRM_Core_DAO extends DB_DataObject {
     if ($fields) {
       foreach ($fields as $name => $value) {
         $table[$value['name']] = $value['type'];
-        if (CRM_Utils_Array::value('required', $value)) {
+        if (!empty($value['required'])) {
           $table[$value['name']] += self::DB_DAO_NOTNULL;
         }
       }
@@ -928,8 +929,11 @@ FROM   civicrm_domain
    * execute a query and get the single result
    *
    * @param string $query query to be executed
+   * @param array $params
+   * @param bool $abort
+   * @param bool $i18nRewrite
+   * @return string|null the result of the query if any
    *
-   * @return string the result of the query
    * @static
    * @access public
    */
@@ -1085,13 +1089,13 @@ FROM   civicrm_domain
         $fieldsToSuffix  = array();
         $fieldsToReplace = array();
       }
-      if (CRM_Utils_Array::value('prefix', $fieldsFix)) {
+      if (!empty($fieldsFix['prefix'])) {
         $fieldsToPrefix = $fieldsFix['prefix'];
       }
-      if (CRM_Utils_Array::value('suffix', $fieldsFix)) {
+      if (!empty($fieldsFix['suffix'])) {
         $fieldsToSuffix = $fieldsFix['suffix'];
       }
-      if (CRM_Utils_Array::value('replace', $fieldsFix)) {
+      if (!empty($fieldsFix['replace'])) {
         $fieldsToReplace = $fieldsFix['replace'];
       }
 
@@ -1295,6 +1299,10 @@ SELECT contact_id
             //skip the FK if it is not required
             // if it's contact id we should create even if not required
             // we'll have a go @ fetching first though
+            // we WILL create campaigns though for so tests with a campaign pseudoconstant will complete
+            if($FKClassName === 'CRM_Campaign_DAO_Campaign' && $daoName != $FKClassName) {
+              $required = TRUE;
+            }
             if (!$required && $dbName != 'contact_id') {
               $fkDAO = new $FKClassName;
               if($fkDAO->find(TRUE)){
@@ -1331,7 +1339,12 @@ SELECT contact_id
             case CRM_Utils_Type::T_INT:
             case CRM_Utils_Type::T_FLOAT:
             case CRM_Utils_Type::T_MONEY:
-              $object->$dbName = $counter;
+              if (isset($value['precision'])) {
+                // $object->$dbName = CRM_Utils_Number::createRandomDecimal($value['precision']);
+                $object->$dbName = CRM_Utils_Number::createTruncatedDecimal($counter, $value['precision']);
+              } else {
+                $object->$dbName = $counter;
+              }
               break;
 
             case CRM_Utils_Type::T_BOOLEAN:
@@ -1348,7 +1361,12 @@ SELECT contact_id
 
             case CRM_Utils_Type::T_DATE:
             case CRM_Utils_Type::T_TIMESTAMP:
+            case CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME:
               $object->$dbName = '19700101';
+              if($dbName == 'end_date') {
+                // put this in the future
+                $object->$dbName = '20200101';
+              }
               break;
 
             case CRM_Utils_Type::T_TIME:
@@ -1370,26 +1388,10 @@ SELECT contact_id
             case CRM_Utils_Type::T_LONGTEXT:
             case CRM_Utils_Type::T_EMAIL:
             default:
-              if (isset($value['enumValues'])) {
-                if (isset($value['default'])) {
-                  $object->$dbName = $value['default'];
-                }
-                else {
-                  if (is_array($value['enumValues'])) {
-                    $object->$dbName = $value['enumValues'][0];
-                  }
-                  else {
-                    $defaultValues = explode(',', $value['enumValues']);
-                    $object->$dbName = $defaultValues[0];
-                  }
-                }
-              }
-              else {
-                $object->$dbName = $dbName . '_' . $counter;
-                $maxlength = CRM_Utils_Array::value('maxlength', $value);
-                if ($maxlength > 0 && strlen($object->$dbName) > $maxlength) {
-                  $object->$dbName = substr($object->$dbName, 0, $value['maxlength']);
-                }
+              $object->$dbName = $dbName . '_' . $counter;
+              $maxlength = CRM_Utils_Array::value('maxlength', $value);
+              if ($maxlength > 0 && strlen($object->$dbName) > $maxlength) {
+                $object->$dbName = substr($object->$dbName, 0, $value['maxlength']);
               }
           }
         }
@@ -1797,7 +1799,7 @@ EOS;
   public function getOptionLabels() {
     $fields = $this->fields();
     if ($fields === NULL) {
-      throw new exception ('Cannot call getOptionLabels on CRM_Core_DAO');
+      throw new Exception ('Cannot call getOptionLabels on CRM_Core_DAO');
     }
     foreach ($fields as $field) {
       $name = CRM_Utils_Array::value('name', $field);
@@ -1826,9 +1828,29 @@ EOS;
     );
     // Validation: enforce uniformity of this param
     if ($context !== NULL && !isset($contexts[$context])) {
-      throw new exception("'$context' is not a valid context for buildOptions.");
+      throw new Exception("'$context' is not a valid context for buildOptions.");
     }
     return $contexts;
+  }
+
+  /**
+   * @param $fieldName
+   * @return bool|array
+   */
+  function getFieldSpec($fieldName) {
+    $fields = $this->fields();
+    $fieldKeys = $this->fieldKeys();
+
+    // Support "unique names" as well as sql names
+    $fieldKey = $fieldName;
+    if (empty($fields[$fieldKey])) {
+      $fieldKey = CRM_Utils_Array::value($fieldName, $fieldKeys);
+    }
+    // If neither worked then this field doesn't exist. Return false.
+    if (empty($fields[$fieldKey])) {
+      return FALSE;
+    }
+    return $fields[$fieldKey];
   }
 
   /**
@@ -1876,7 +1898,7 @@ EOS;
           case 'BETWEEN':
           case 'NOT BETWEEN':
             if (empty($criteria[0]) || empty($criteria[1])) {
-              throw new exception("invalid criteria for $operator");
+              throw new Exception("invalid criteria for $operator");
             }
             if(!$returnSanitisedArray) {
               return (sprintf('%s ' . $operator . ' "%s" AND "%s"', $fieldName, CRM_Core_DAO::escapeString($criteria[0]), CRM_Core_DAO::escapeString($criteria[1])));
@@ -1890,7 +1912,7 @@ EOS;
           case 'IN':
           case 'NOT IN':
             if (empty($criteria)) {
-              throw new exception("invalid criteria for $operator");
+              throw new Exception("invalid criteria for $operator");
             }
             $escapedCriteria = array_map(array(
               'CRM_Core_DAO',
@@ -1945,5 +1967,7 @@ EOS;
     $md5string = substr(md5($string), 0, 8);
     return substr($string, 0, $length - 8) . "_{$md5string}";
   }
+
+  function setApiFilter(&$params) {}
 
 }

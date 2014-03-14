@@ -307,9 +307,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
 
     //import contribution record according to select contact type
     if ($onDuplicate == CRM_Import_Parser::DUPLICATE_SKIP &&
-      (CRM_Utils_Array::value('contribution_contact_id', $paramValues) ||
-        CRM_Utils_Array::value('external_identifier', $paramValues)
-      )
+      (!empty($paramValues['contribution_contact_id']) || !empty($paramValues['external_identifier']))
     ) {
       $paramValues['contact_type'] = $this->_contactType;
     }
@@ -321,12 +319,12 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
     elseif (!empty($params['soft_credit'])) {
       $paramValues['contact_type'] = $this->_contactType;
     }
-    elseif (CRM_Utils_Array::value('pledge_payment', $paramValues)) {
+    elseif (!empty($paramValues['pledge_payment'])) {
       $paramValues['contact_type'] = $this->_contactType;
     }
 
     //need to pass $onDuplicate to check import mode.
-    if (CRM_Utils_Array::value('pledge_payment', $paramValues)) {
+    if (!empty($paramValues['pledge_payment'])) {
       $paramValues['onDuplicate'] = $onDuplicate;
     }
     require_once 'CRM/Utils/DeprecatedUtils.php';
@@ -353,8 +351,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
     else {
       //fix for CRM-2219 - Update Contribution
       // onDuplicate == CRM_Import_Parser::DUPLICATE_UPDATE
-      if (CRM_Utils_Array::value('invoice_id',$paramValues) ||
-          CRM_Utils_Array::value('trxn_id', $paramValues) || $paramValues['contribution_id']) {
+      if (!empty($paramValues['invoice_id']) || !empty($paramValues['trxn_id']) || $paramValues['contribution_id']) {
         $dupeIds = array(
           'id' => CRM_Utils_Array::value('contribution_id', $paramValues),
           'trxn_id' => CRM_Utils_Array::value('trxn_id', $paramValues),
@@ -371,7 +368,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
             'Contribution'
           );
           //process note
-          if (CRM_Utils_Array::value('note', $paramValues)) {
+          if (!empty($paramValues['note'])) {
             $noteID = array();
             $contactID = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $ids['contribution'], 'contact_id');
             $daoNote = new CRM_Core_BAO_Note();
@@ -392,7 +389,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
           }
 
           //need to check existing soft credit contribution, CRM-3968
-          if (CRM_Utils_Array::value('soft_credit_to', $formatted)) {
+          if (!empty($formatted['soft_credit_to'])) {
             $dupeSoftCredit = array(
               'contact_id' => $formatted['soft_credit_to'],
               'contribution_id' => $ids['contribution'],
@@ -400,7 +397,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
 
             //FIX ME: Need to fix this logic
             $existingSoftCredit = CRM_Contribute_BAO_ContributionSoft::getSoftContribution($dupeSoftCredit['contribution_id']);
-            if (CRM_Utils_Array::value('soft_credit_id', $existingSoftCredit)) {
+            if (!empty($existingSoftCredit['soft_credit_id'])) {
               $formatted['softID'] = $existingSoftCredit['soft_credit_id'];
             }
           }
@@ -409,7 +406,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
           $this->_newContributions[] = $newContribution->id;
 
           //return soft valid since we need to show how soft credits were added
-          if (CRM_Utils_Array::value('soft_credit_to', $formatted)) {
+          if (!empty($formatted['soft_credit_to'])) {
             return CRM_Contribute_Import_Parser::SOFT_CREDIT;
           }
 
@@ -475,7 +472,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
           $formatted['contribution_id'] = $newContribution['id'];
 
           //return soft valid since we need to show how soft credits were added
-          if (CRM_Utils_Array::value('soft_credit_to', $formatted)) {
+          if (!empty($formatted['soft_credit_to'])) {
             return CRM_Contribute_Import_Parser::SOFT_CREDIT;
           }
 
@@ -505,7 +502,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
           }
         }
 
-        if (CRM_Utils_Array::value('external_identifier', $params)) {
+        if (!empty($params['external_identifier'])) {
           if ($disp) {
             $disp .= "AND {$params['external_identifier']}";
           }
@@ -519,7 +516,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
       }
     }
     else {
-      if (CRM_Utils_Array::value('external_identifier', $paramValues)) {
+      if (!empty($paramValues['external_identifier'])) {
         $checkCid = new CRM_Contact_DAO_Contact();
         $checkCid->external_identifier = $paramValues['external_identifier'];
         $checkCid->find(TRUE);
@@ -546,7 +543,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
       $formatted['contribution_id'] = $newContribution['id'];
 
       //return soft valid since we need to show how soft credits were added
-      if (CRM_Utils_Array::value('soft_credit_to', $formatted)) {
+      if (!empty($formatted['soft_credit_to'])) {
         return CRM_Contribute_Import_Parser::SOFT_CREDIT;
       }
 
@@ -561,9 +558,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
    *  Function to process pledge payments
    */
   function processPledgePayments(&$formatted) {
-    if (CRM_Utils_Array::value('pledge_payment_id', $formatted) &&
-      CRM_Utils_Array::value('pledge_id', $formatted)
-    ) {
+    if (!empty($formatted['pledge_payment_id']) && !empty($formatted['pledge_id'])) {
       //get completed status
       $completeStatusID = CRM_Core_OptionGroup::getValue('contribution_status', 'Completed', 'name');
 

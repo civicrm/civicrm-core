@@ -271,7 +271,7 @@ function civicrm_api3_profile_submit($params) {
     );
   }
 
-  if (CRM_Utils_Array::value('add_to_group_id', $ufGroupDetails)) {
+  if (!empty($ufGroupDetails['add_to_group_id'])) {
     $contactIds = array($params['contact_id']);
     CRM_Contact_BAO_GroupContact::addContactsToGroup($contactIds,
       $ufGroupDetails['add_to_group_id']
@@ -531,6 +531,7 @@ function _civicrm_api3_buildprofile_submitfields($profileID, $optionsBehaviour =
       'soft_credit' => 'soft_credit_to',
       'group' => 'group_id',
       'tag' => 'tag_id',
+      'soft_credit_type' => 'soft_credit_type_id',
     );
 
     if(array_key_exists($ufFieldTaleFieldName, $hardCodedEntityFields)) {
@@ -580,8 +581,10 @@ function _civicrm_api3_buildprofile_submitfields($profileID, $optionsBehaviour =
         if(isset($profileFields[$profileID][$entityfield])) {
           unset($profileFields[$profileID][$entityfield]);
         }
-        // we will make the mixed case version (e.g. of 'Primary') an alias
-        $profileFields[$profileID][$fieldName]['api.aliases'][] = $entityfield;
+        if(!in_array($entityfield, $profileFields[$profileID][$fieldName]['api.aliases'])) {
+          // we will make the mixed case version (e.g. of 'Primary') an alias
+          $profileFields[$profileID][$fieldName]['api.aliases'][] = $entityfield;
+        }
       }
       /**
        * putting this on hold -this would cause the api to set the default - but could have unexpected behaviour
@@ -662,6 +665,7 @@ function _civicrm_api3_map_profile_fields_to_entity(&$field) {
     'check_number' => 'contribution',
     'contribution_status_id' => 'contribution',
     'soft_credit' => 'contribution',
+    'soft_credit_type' => 'contribution_soft',
     'group' => 'group_contact',
     'tag' => 'entity_tag',
    );

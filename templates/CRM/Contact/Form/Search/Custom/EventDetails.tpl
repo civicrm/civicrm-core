@@ -134,11 +134,6 @@
         </table>
         {/strip}
 
-        <script type="text/javascript">
-            {* this function is called to change the color of selected row(s) *}
-            on_load_init_checkboxes("{$form.formName}");
-        </script>
-
         {include file="CRM/common/pager.tpl" location="bottom"}
 
         </p>

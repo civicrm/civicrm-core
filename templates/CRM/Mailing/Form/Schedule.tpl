@@ -87,11 +87,11 @@ cj(function() {
 cj(function() {
    cj('#start_date_display').change( function( ) {
        if ( cj(this).val( ) ) {
-          cj('#now').attr( 'checked', false );
+          cj('#now').prop('checked', false );
        }
    });
    cj('#now').change( function( ) { 
-       if ( cj('#now').attr('checked', true ) ) {
+       if ( cj('#now').prop('checked', true ) ) {
           cj('#start_date_display').val( '' );
           cj('#start_date').val( '' );
           cj('#start_date_time').val( '' );

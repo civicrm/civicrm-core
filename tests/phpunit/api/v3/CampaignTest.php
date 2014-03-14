@@ -31,7 +31,7 @@ class api_v3_CampaignTest extends CiviUnitTestCase {
   protected $_apiversion;
   protected $params;
   protected $id;
-  public $_eNoticeCompliant = TRUE;
+
   public $DBResetRequired = FALSE;
 
   function setUp() {

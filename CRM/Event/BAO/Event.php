@@ -91,9 +91,9 @@ class CRM_Event_BAO_Event extends CRM_Event_DAO_Event {
   static function add(&$params) {
     CRM_Utils_System::flushCache();
     $financialTypeId = NULL;
-    if (CRM_Utils_Array::value('id', $params)) {
+    if (!empty($params['id'])) {
       CRM_Utils_Hook::pre('edit', 'Event', $params['id'], $params);
-      if (!CRM_Utils_Array::value('skipFinancialType', $params)) {
+      if (empty($params['skipFinancialType'])) {
         $financialTypeId = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $params['id'], 'financial_type_id');
       }
     }
@@ -106,14 +106,13 @@ class CRM_Event_BAO_Event extends CRM_Event_DAO_Event {
     $event->copyValues($params);
     $result = $event->save();
 
-    if (CRM_Utils_Array::value('id', $params)) {
+    if (!empty($params['id'])) {
       CRM_Utils_Hook::post('edit', 'Event', $event->id, $event);
     }
     else {
       CRM_Utils_Hook::post('create', 'Event', $event->id, $event);
     }
-    if ($financialTypeId && CRM_Utils_Array::value('financial_type_id', $params)
-      && $financialTypeId != $params['financial_type_id']) {
+    if ($financialTypeId && !empty($params['financial_type_id']) && $financialTypeId != $params['financial_type_id']) {
       CRM_Price_BAO_PriceFieldValue::updateFinancialType($params['id'], 'civicrm_event', $params['financial_type_id']);
     }
     return $result;
@@ -166,7 +165,7 @@ class CRM_Event_BAO_Event extends CRM_Event_DAO_Event {
 
     CRM_Core_BAO_Log::add($logParams);
 
-    if (CRM_Utils_Array::value('custom', $params) &&
+    if (!empty($params['custom']) &&
       is_array($params['custom'])
     ) {
       CRM_Core_BAO_CustomValueTable::store($params['custom'], 'civicrm_event', $event->id);
@@ -796,7 +795,7 @@ WHERE civicrm_event.is_active = 1
 
     $baseURL = parse_url($config->userFrameworkBaseURL);
     $url = "@" . $baseURL['host'];
-    if (CRM_Utils_Array::value('path', $baseURL)) {
+    if (!empty($baseURL['path'])) {
       $url .= substr($baseURL['path'], 0, -1);
     }
 
@@ -885,7 +884,7 @@ WHERE civicrm_event.is_active = 1
     $locBlockId = CRM_Utils_Array::value('loc_block_id', $eventValues);
 
     $fieldsFix = ($afterCreate) ? array( ) : array('prefix' => array('title' => ts('Copy of') . ' '));
-    if (!CRM_Utils_Array::value('is_show_location', $eventValues)) {
+    if (empty($eventValues['is_show_location'])) {
       $fieldsFix['prefix']['is_show_location'] = 0;
     }
 
@@ -1068,7 +1067,7 @@ WHERE civicrm_event.is_active = 1
         $preProfileID = CRM_Utils_Array::value('custom_pre_id', $values);
         $postProfileID = CRM_Utils_Array::value('custom_post_id', $values);
 
-        if (CRM_Utils_Array::value('additionalParticipant', $values['params'])) {
+        if (!empty($values['params']['additionalParticipant'])) {
           $preProfileID = CRM_Utils_Array::value('additional_custom_pre_id', $values, $preProfileID );
           $postProfileID = CRM_Utils_Array::value('additional_custom_post_id', $values, $postProfileID );
         }
@@ -1106,7 +1105,7 @@ WHERE civicrm_event.is_active = 1
 
         // CRM-13890 : NOTE wait list condition need to be given so that
         // wait list message is shown properly in email i.e. WRT online event registration template
-        if (empty($tplParams['participant_status']) && !CRM_Utils_Array::value('isOnWaitlist', $values['params'])) {
+        if (empty($tplParams['participant_status']) && empty($values['params']['isOnWaitlist'])) {
           $statusId = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Participant', $participantId, 'status_id', 'id');
           $tplParams['participant_status'] = CRM_Event_PseudoConstant::participantStatus($statusId, NULL, 'label');
         }
@@ -1130,7 +1129,7 @@ WHERE civicrm_event.is_active = 1
         if ($lineItem = CRM_Utils_Array::value('lineItem', $values)) {
           // check if additional prticipant, if so filter only to relevant ones
           // CRM-9902
-          if (CRM_Utils_Array::value('additionalParticipant', $values['params'])) {
+          if (!empty($values['params']['additionalParticipant'])) {
             $ownLineItems = array( );
             foreach ( $lineItem as $liKey => $liValue ) {
               $firstElement = array_pop( $liValue );
@@ -1158,7 +1157,7 @@ WHERE civicrm_event.is_active = 1
           );
         }
         else {
-          $sendTemplateParams['from'] = CRM_Utils_Array::value('confirm_from_name', $values['event']) . " <{$values['event']['confirm_from_email']}>";
+          $sendTemplateParams['from'] = CRM_Utils_Array::value('confirm_from_name', $values['event']) . " <" . CRM_Utils_Array::value('confirm_from_email', $values['event']) . ">";
           $sendTemplateParams['toName'] = $displayName;
           $sendTemplateParams['toEmail'] = $email;
           $sendTemplateParams['autoSubmitted'] = TRUE;
@@ -1178,7 +1177,7 @@ WHERE civicrm_event.is_active = 1
    * Function to add the custom fields OR array of participant's
    * profile info
    *
-   * @return None
+   * @return void
    * @access public
    */
   static function buildCustomDisplay($id,
@@ -1358,7 +1357,7 @@ WHERE civicrm_event.is_active = 1
    * @param array $groupTitle Profile Group Title.
    * @param array $values formatted array of key value
    *
-   * @return None
+   * @return void
    * @access public
    * @static
    */
@@ -1377,7 +1376,7 @@ WHERE civicrm_event.is_active = 1
       }
 
       foreach ($fields as $v) {
-        if (CRM_Utils_Array::value('groupTitle', $v)) {
+        if (!empty($v['groupTitle'])) {
           $groupTitle['groupTitle'] = $v['groupTitle'];
           break;
         }
@@ -1823,7 +1822,7 @@ WHERE  ce.loc_block_id = $locBlockId";
       $alreadyRegistered = self::checkRegistration($params);
     }
 
-    if (CRM_Utils_Array::value('allow_same_participant_emails', $values['event']) ||
+    if (!empty($values['event']['allow_same_participant_emails']) ||
       !$alreadyRegistered
     ) {
       return TRUE;
@@ -1839,7 +1838,7 @@ WHERE  ce.loc_block_id = $locBlockId";
    */
   static function checkRegistration($params) {
     $alreadyRegistered = FALSE;
-    if (!CRM_Utils_Array::value('contact_id', $params)) {
+    if (empty($params['contact_id'])) {
       return $alreadyRegistered;
     }
 
@@ -1942,9 +1941,7 @@ WHERE  ce.loc_block_id = $locBlockId";
       $eventEmail       = array();
 
       CRM_Core_DAO::commonRetrieve('CRM_Event_DAO_Event', $params, $eventEmail, $returnProperties);
-      if (CRM_Utils_Array::value('confirm_from_name', $eventEmail)
-        && CRM_Utils_Array::value('confirm_from_email', $eventEmail)
-      ) {
+      if (!empty($eventEmail['confirm_from_name']) && !empty($eventEmail['confirm_from_email'])) {
         $eventEmailId = "{$eventEmail['confirm_from_name']} <{$eventEmail['confirm_from_email']}>";
 
         $fromEmailValues['from_email_id'][$eventEmailId] = htmlspecialchars($eventEmailId);
@@ -1997,6 +1994,7 @@ LEFT  JOIN  civicrm_line_item lineItem ON ( lineItem.entity_id    = participant.
                                        AND  lineItem.entity_table = 'civicrm_participant' )
 LEFT  JOIN  civicrm_price_field_value value ON ( value.id = lineItem.price_field_value_id AND value.count )
      WHERE  ( participant.event_id = %1 )
+            AND participant.is_test = 0
             {$extraWhereClause}
   GROUP BY  participant.event_id";
 
@@ -2057,6 +2055,28 @@ LEFT  JOIN  civicrm_price_field_value value ON ( value.id = lineItem.price_field
       $params[2] = array($eventCampaignID, 'Integer');
     }
     CRM_Core_DAO::executeQuery($query, $params);
+  }
+
+  /**
+   * Get options for a given field.
+   * @see CRM_Core_DAO::buildOptions
+   *
+   * @param String $fieldName
+   * @param String $context: @see CRM_Core_DAO::buildOptionsContext
+   * @param Array  $props: whatever is known about this dao object
+   *
+   * @return array|bool
+   */
+  public static function buildOptions($fieldName, $context = NULL, $props = array()) {
+    $params = array();
+    // Special logic for fields whose options depend on context or properties
+    switch ($fieldName) {
+      case 'financial_type_id':
+        // Fixme - this is going to ignore context, better to get conditions, add params, and call PseudoConstant::get
+        return CRM_Financial_BAO_FinancialType::getIncomeFinancialType();
+        break;
+    }
+    return CRM_Core_PseudoConstant::get(__CLASS__, $fieldName, $params, $context);
   }
 }
 

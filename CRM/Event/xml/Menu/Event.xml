@@ -82,7 +82,6 @@
      <title>Event Types</title>
      <page_callback>CRM_Admin_Page_Options</page_callback>
      <desc>Use Event Types to categorize your events. Event feeds can be filtered by Event Type and participant searches can use Event Type as a criteria.</desc>
-     <path_arguments>group=event_type</path_arguments>
      <access_arguments>administer CiviCRM,access CiviEvent</access_arguments>
      <adminGroup>CiviEvent</adminGroup>
      <icon>admin/small/event_type.png</icon>
@@ -103,7 +102,6 @@
      <title>Participant Role</title>
      <page_callback>CRM_Admin_Page_Options</page_callback>
      <desc>Define participant roles for events here (e.g. Attendee, Host, Speaker...). You can then assign roles and search for participants by role.</desc>
-     <path_arguments>group=participant_role</path_arguments>
      <access_arguments>administer CiviCRM,access CiviEvent</access_arguments>
      <adminGroup>CiviEvent</adminGroup>
      <icon>admin/small/parti_role.png</icon>
@@ -113,7 +111,6 @@
      <path>civicrm/admin/options/participant_listing</path>
      <title>Participant Listing Templates</title>
      <desc>Template to control participant listing display.</desc>
-     <path_arguments>group=participant_listing</path_arguments>
      <page_callback>CRM_Admin_Page_Options</page_callback>
      <adminGroup>CiviEvent</adminGroup>
      <icon>admin/small/01.png</icon>
@@ -264,16 +261,6 @@
      <weight>4</weight>
   </item>
   <item>
-     <path>civicrm/ajax/event</path>
-     <page_callback>CRM_Event_Page_AJAX::event</page_callback>
-     <access_arguments>access CiviCRM,access CiviEvent</access_arguments>
-  </item>
-  <item>
-     <path>civicrm/ajax/eventType</path>
-     <page_callback>CRM_Event_Page_AJAX::eventType</page_callback>
-     <access_arguments>access CiviCRM,access CiviEvent</access_arguments>
-  </item>
-  <item>
      <path>civicrm/ajax/eventFee</path>
      <page_callback>CRM_Event_Page_AJAX::eventFee</page_callback>
      <access_arguments>access CiviCRM,access CiviEvent</access_arguments>
@@ -281,12 +268,7 @@
   <item>
      <path>civicrm/ajax/locBlock</path>
      <page_callback>CRM_Core_Page_AJAX_Location::getLocBlock</page_callback>
-     <access_arguments>access CiviCRM,access CiviEvent</access_arguments>
-  </item>
-  <item>
-     <path>civicrm/ajax/eventlist</path>
-     <page_callback>CRM_Event_Page_AJAX::eventList</page_callback>
-     <access_arguments>access CiviCRM,access CiviEvent</access_arguments>
+     <access_arguments>access CiviEvent</access_arguments>
   </item>
   <item>
     <path>civicrm/ajax/event/add_participant_to_cart</path>
@@ -329,5 +311,11 @@
     <access_callback>1</access_callback>
     <is_public>true</is_public>
     <is_ssl>false</is_ssl>
+  </item>
+  <item>
+    <path>civicrm/event/participant/feeselection</path>
+    <title>Change Registration Selections</title>
+    <page_callback>CRM_Event_Form_ParticipantFeeSelection</page_callback>
+    <access_arguments>access CiviEvent</access_arguments>
   </item>
 </menu>

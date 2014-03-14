@@ -65,6 +65,9 @@
     <pseudoconstant>
       <optionGroupName>mail_protocol</optionGroupName>
     </pseudoconstant>
+    <html>
+      <type>Select</type>
+    </html>
   </field>
   <field>
     <name>server</name>

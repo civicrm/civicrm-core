@@ -163,7 +163,7 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Core_Form {
 
     $config = CRM_Core_Config::singleton();
     // set default country from config if no country set
-    if (!CRM_Utils_Array::value("billing_country_id-{$this->_bltID}", $this->_defaults)) {
+    if (empty($this->_defaults["billing_country_id-{$this->_bltID}"])) {
       $this->_defaults["billing_country_id-{$this->_bltID}"] = $config->defaultContactCountry;
     }
 
@@ -176,7 +176,7 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Core_Form {
   /**
    * Function to build the form
    *
-   * @return None
+   * @return void
    * @access public
    */
   public function buildQuickForm() {
@@ -317,7 +317,7 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Core_Form {
 
       // format new billing name
       $name = $processorParams['first_name'];
-      if (CRM_Utils_Array::value('middle_name', $processorParams)) {
+      if (!empty($processorParams['middle_name'])) {
         $name .= " {$processorParams['middle_name']}";
       }
       $name .= ' ' . $processorParams['last_name'];
@@ -326,7 +326,7 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Core_Form {
 
       // format old billing name
       $name = $this->_defaults['first_name'];
-      if (CRM_Utils_Array::value('middle_name', $this->_defaults)) {
+      if (!empty($this->_defaults['middle_name'])) {
         $name .= " {$this->_defaults['middle_name']}";
       }
       $name .= ' ' . $this->_defaults['last_name'];

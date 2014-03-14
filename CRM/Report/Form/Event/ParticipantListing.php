@@ -39,8 +39,10 @@ class CRM_Report_Form_Event_ParticipantListing extends CRM_Report_Form_Event {
 
   protected $_contribField = FALSE;
   protected $_lineitemField = FALSE;
+  protected $_groupFilter = TRUE;
+  protected $_tagFilter = TRUE;
 
-  protected $_customGroupExtends = array('Participant', 'Contact', 'Individual',);
+  protected $_customGroupExtends = array('Participant', 'Contact', 'Individual', 'Event');
 
   public $_drilldownReport = array('event/income' => 'Link to Detail Report');
 
@@ -237,6 +239,11 @@ class CRM_Report_Form_Event_ParticipantListing extends CRM_Report_Form_Event {
         ),
         'order_bys' =>
         array(
+          'participant_register_date' =>
+          array('title' => ts('Registration Date'),
+            'default_weight' => '1',
+            'default_order' => 'ASC',
+          ),
           'event_id' =>
           array('title' => ts('Event'), 'default_weight' => '1', 'default_order' => 'ASC'),
         ),
@@ -418,8 +425,7 @@ GROUP BY  cv.label
     $this->_columnHeaders = array();
 
     //add blank column at the Start
-    if (array_key_exists('options', $this->_params) &&
-      CRM_Utils_Array::value('blank_column_begin', $this->_params['options'])) {
+    if (array_key_exists('options', $this->_params) && !empty($this->_params['options']['blank_column_begin'])) {
       $select[] = " '' as blankColumnBegin";
       $this->_columnHeaders['blankColumnBegin']['title'] = '_ _ _ _';
     }
@@ -429,9 +435,7 @@ GROUP BY  cv.label
       }
       if (array_key_exists('fields', $table)) {
         foreach ($table['fields'] as $fieldName => $field) {
-          if (CRM_Utils_Array::value('required', $field) ||
-            CRM_Utils_Array::value($fieldName, $this->_params['fields'])
-          ) {
+          if (!empty($field['required']) || !empty($this->_params['fields'][$fieldName])) {
             if ($tableName == 'civicrm_contribution') {
               $this->_contribField = TRUE;
             }
@@ -552,6 +556,10 @@ GROUP BY  cv.label
     }
   }
 
+  function groupBy(){
+    $this->_groupBy = "GROUP BY {$this->_aliases['civicrm_participant']}.id";
+  }
+
   function postProcess() {
 
     // get ready with post process params
@@ -565,6 +573,7 @@ GROUP BY  cv.label
 
     // build array of result based on column headers. This method also allows
     // modifying column headers before using it to build result set i.e $rows.
+    $rows = array();
     $this->buildRows($sql, $rows);
 
     // format result set.

@@ -29,10 +29,6 @@
 
 require_once 'CiviTest/CiviUnitTestCase.php';
 class CRM_Core_CommunityMessagesTest extends CiviUnitTestCase {
-  //@todo make BAO enotice compliant  & remove the line below
-  // WARNING - NEVER COPY & PASTE $_eNoticeCompliant = FALSE
-  // new test classes should be compliant.
-  public $_eNoticeCompliant = FALSE;
   /**
    * @var CRM_Utils_Cache_Interface
    */
@@ -321,7 +317,7 @@ class CRM_Core_CommunityMessagesTest extends CiviUnitTestCase {
     $freq = array(); // array($message => $count)
     for ($i = 0; $i < $trials; $i++) {
       $message = $communityMessages->pick();
-      $freq[$message['markup']]++;
+      $freq[$message['markup']] = CRM_Utils_Array::value($message['markup'], $freq, 0) + 1;
     }
 
     // assert the probabilities
@@ -348,7 +344,7 @@ class CRM_Core_CommunityMessagesTest extends CiviUnitTestCase {
     $freq = array(); // array($message => $count)
     for ($i = 0; $i < $trials; $i++) {
       $message = $communityMessages->pick();
-      $freq[$message['markup']]++;
+      $freq[$message['markup']] = CRM_Utils_Array::value($message['markup'], $freq, 0) + 1;
     }
 
     $this->assertEquals($trials, $freq['<h1>Two</h1>']);

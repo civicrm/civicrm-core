@@ -73,7 +73,7 @@ class CRM_Mailing_Form_Schedule extends CRM_Core_Form {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   function setDefaultValues() {
     $defaults = array();

@@ -201,7 +201,7 @@ abstract class CRM_Utils_System_Base {
         return false;
       }
 
-      $timeZoneOffset = sprintf("%02d:%02d", $tz / 3600, ($tz/60)%60 );
+      $timeZoneOffset = sprintf("%02d:%02d", $tz / 3600, abs(($tz/60)%60));
 
       if($timeZoneOffset > 0){
         $timeZoneOffset = '+' . $timeZoneOffset;
@@ -216,6 +216,70 @@ abstract class CRM_Utils_System_Base {
    */
   function getTimeZoneString() {
     return NULL;
+  }
+
+  /**
+   * Get Unique Identifier from UserFramework system (CMS)
+   * @param object $user object as described by the User Framework
+   * @return mixed $uniqueIdentifer Unique identifier from the user Framework system
+   *
+   */
+  function getUniqueIdentifierFromUserObject($user) {}
+
+  /**
+   * Get User ID from UserFramework system (CMS)
+   * @param object $user object as described by the User Framework
+   * @return mixed <NULL, number>
+   *
+   */
+  function getUserIDFromUserObject($user) {}
+
+  /**
+   * Get currently logged in user uf id.
+   *
+   * @return int $userID logged in user uf id.
+   */
+  function getLoggedInUfID() {}
+
+  /**
+   * Get currently logged in user unique identifier - this tends to be the email address or user name.
+   *
+   * @return string $userID logged in user unique identifier
+   */
+  function getLoggedInUniqueIdentifier() {}
+
+  /**
+   * return a UFID (user account ID from the UserFramework / CMS system being based on the user object
+   * passed, defaulting to the logged in user if not passed. Note that ambiguous situation occurs
+   * in CRM_Core_BAO_UFMatch::synchronize - a cleaner approach would seem to be resolving the user id before calling
+   * the function
+   *
+   * Note there is already a function getUFId which takes $username as a param - we could add $user
+   * as a second param to it but it seems messy - just overloading it because the name is taken
+   * @param object $user
+   * @return int $ufid - user ID of UF System
+   */
+  function getBestUFID($user = NULL) {
+    if($user) {
+      return $this->getUserIDFromUserObject($user);
+    }
+    return $this->getLoggedInUfID();
+  }
+
+  /**
+   * return a unique identifier (usually an email address or username) from the UserFramework / CMS system being based on the user object
+   * passed, defaulting to the logged in user if not passed. Note that ambiguous situation occurs
+   * in CRM_Core_BAO_UFMatch::synchronize - a cleaner approach would seem to be resolving the unique identifier before calling
+   * the function
+   *
+   * @param object $user
+   * @return string $uniqueIdentifier - unique identifier from the UF System
+   */
+  function getBestUFUniqueIdentifier($user = NULL) {
+    if($user) {
+      return $this->getUniqueIdentifierFromUserObject($user);
+    }
+    return $this->getLoggedInUniqueIdentifier();
   }
 }
 

@@ -187,17 +187,11 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
     // lets try to get it from the session and/or the request vars
     // we do this early on in case there is a fatal error in retrieving the
     // key and/or session
-    $this->_entryURL = CRM_Utils_Request::retrieve(
-      'entryURL',
-      'String',
-      $this,
-      FALSE,
-      NULL,
-      $_REQUEST
-    );
+    $this->_entryURL =
+      CRM_Utils_Request::retrieve('entryURL', 'String', $this);
 
     // add a unique validable key to the name
-    $name         = CRM_Utils_System::getClassName($this);
+    $name = CRM_Utils_System::getClassName($this);
     if ($name == 'CRM_Core_Controller_Simple' && !empty($scope)) {
       // use form name if we have, since its a lot better and
       // definitely different for different forms
@@ -251,7 +245,7 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
     }
 
    // if the request has a reset value, initialize the controller session
-    if (CRM_Utils_Array::value('reset', $_GET)) {
+    if (!empty($_GET['reset'])) {
       $this->reset();
 
       // in this case we'll also cache the url as a hidden form variable, this allows us to
@@ -440,7 +434,7 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
       $title     = CRM_Utils_Array::value('title', $value);
       $options   = CRM_Utils_Array::value('options', $value);
       $stateName = CRM_Utils_String::getClassName($className);
-      if (CRM_Utils_Array::value('className', $value)) {
+      if (!empty($value['className'])) {
         $formName = $name;
       }
       else {
@@ -460,6 +454,9 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
       }
       if ($options) {
         $$stateName->setOptions($options);
+      }
+      if (property_exists($$stateName, 'urlPath')) {
+        $$stateName->urlPath = explode('/', $_GET[CRM_Core_Config::singleton()->userFrameworkURLVar]);
       }
       $this->addPage($$stateName);
       $this->addAction($stateName, new HTML_QuickForm_Action_Direct());

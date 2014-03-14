@@ -55,14 +55,12 @@ class CRM_Admin_Page_ParticipantStatus extends CRM_Core_Page_Basic {
         ),
         CRM_Core_Action::DISABLE => array(
           'name' => ts('Disable'),
-          'extra' => 'onclick = "enableDisable( %%id%%,\'' . 'CRM_Event_BAO_ParticipantStatusType' . '\',\'' . 'enable-disable' . '\' );"',
-          'ref' => 'disable-action',
+          'ref' => 'crm-enable-disable',
           'title' => ts('Disable Status'),
         ),
         CRM_Core_Action::ENABLE => array(
           'name' => ts('Enable'),
-          'extra' => 'onclick = "enableDisable( %%id%%,\'' . 'CRM_Event_BAO_ParticipantStatusType' . '\',\'' . 'disable-enable' . '\' );"',
-          'ref' => 'enable-action',
+          'ref' => 'crm-enable-disable',
           'title' => ts('Enable Status'),
         ),
       );
@@ -71,6 +69,7 @@ class CRM_Admin_Page_ParticipantStatus extends CRM_Core_Page_Basic {
   }
 
   function browse() {
+    CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'js/crm.livePage.js');
     $statusTypes = array();
 
     $dao = new CRM_Event_DAO_ParticipantStatusType;

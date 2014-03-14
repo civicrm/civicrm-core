@@ -38,8 +38,8 @@ class api_v3_ActionScheduleTest extends CiviUnitTestCase {
   protected $_entity = 'action_schedule';
   protected $_apiversion = 3;
 
-  public $_eNoticeCompliant = TRUE;
-  
+
+
   /**
    *  Test setup for every test
    *
@@ -65,83 +65,83 @@ class api_v3_ActionScheduleTest extends CiviUnitTestCase {
     $this->quickCleanup($tablesToTruncate, TRUE);
   }
 
-  
+
   function testSimpleActionScheduleCreate() {
-  	$oldCount = CRM_Core_DAO::singleValueQuery('select count(*) from civicrm_action_schedule');
-  	$activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
-  	$assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
-  	$targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
-  	$scheduledStatus = CRM_Core_OptionGroup::getValue('activity_status', 'Scheduled', 'name');
-  	$mappingId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_ActionMapping', 'activity_type', 'id', 'entity_value');
-  	$activityTypeId = CRM_Core_OptionGroup::getValue('activity_type', "Meeting", 'name');
-  	$title = "simpleActionSchedule".substr(sha1(rand()), 0, 7);
-  	$params = array(
+    $oldCount = CRM_Core_DAO::singleValueQuery('select count(*) from civicrm_action_schedule');
+    $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
+    $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
+    $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
+    $scheduledStatus = CRM_Core_OptionGroup::getValue('activity_status', 'Scheduled', 'name');
+    $mappingId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_ActionMapping', 'activity_type', 'id', 'entity_value');
+    $activityTypeId = CRM_Core_OptionGroup::getValue('activity_type', "Meeting", 'name');
+    $title = "simpleActionSchedule".substr(sha1(rand()), 0, 7);
+    $params = array(
       'title' => $title,
-  	  'recipient' => $assigneeID,
-  	  'limit_to' => 1,
-  	  'entity_value' => $activityTypeId,
-  	  'entity_status' => $scheduledStatus,
-  	  'is_active' => 1,
-  	  'record_activity' => 1,
-  	  'mapping_id' => $mappingId,
+      'recipient' => $assigneeID,
+      'limit_to' => 1,
+      'entity_value' => $activityTypeId,
+      'entity_status' => $scheduledStatus,
+      'is_active' => 1,
+      'record_activity' => 1,
+      'mapping_id' => $mappingId,
     );
-  	$actionSchedule = $this->callAPISuccess('action_schedule', 'create', $params);
-  	$this->assertTrue(is_numeric($actionSchedule['id']), "In line " . __LINE__);
-  	$this->assertTrue($actionSchedule['id'] > 0, "In line " . __LINE__);
-  	$newCount = CRM_Core_DAO::singleValueQuery('select count(*) from civicrm_action_schedule');
-  	$this->assertEquals($oldCount+1, $newCount);
+    $actionSchedule = $this->callAPISuccess('action_schedule', 'create', $params);
+    $this->assertTrue(is_numeric($actionSchedule['id']), "In line " . __LINE__);
+    $this->assertTrue($actionSchedule['id'] > 0, "In line " . __LINE__);
+    $newCount = CRM_Core_DAO::singleValueQuery('select count(*) from civicrm_action_schedule');
+    $this->assertEquals($oldCount+1, $newCount);
   }
-  
+
   /**
    * check if required fields are not passed
    */
   function testActionScheduleCreateWithoutRequired() {
-  	$params = array(
-  			'subject' => 'this case should fail',
-  			'scheduled_date_time' => date('Ymd'),
-  	);
-  	$result = $this->callAPIFailure('activity', 'create', $params);
-  }
-  
-  function testActionScheduleWithScheduledDatesCreate() {
-  	$oldCount = CRM_Core_DAO::singleValueQuery('select count(*) from civicrm_action_schedule');
-  	$activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
-  	$assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
-  	$targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
-  	$scheduledStatus = CRM_Core_OptionGroup::getValue('activity_status', 'Scheduled', 'name');
-  	$mappingId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_ActionMapping', 'activity_type', 'id', 'entity_value');
-  	$activityTypeId = CRM_Core_OptionGroup::getValue('activity_type', "Meeting", 'name');
-  	$title = "simpleActionSchedule".substr(sha1(rand()), 0, 7);
-  	$params = array(
-      'title' => $title,
-  	  'recipient' => $assigneeID,
-  	  'limit_to' => 1,
-  	  'entity_value' => $activityTypeId,
-  	  'entity_status' => $scheduledStatus,
-  	  'is_active' => 1,
-  	  'record_activity' => 1,
-  	  'mapping_id' => $mappingId,
-  	  'start_action_offset' => 3,
-  	  'start_action_unit' => 'day',
-  	  'start_action_condition' => 'before',
-  	  'start_action_date' => 'activity_date_time',
-  	  'is_repeat' => 1,
-  	  'repetition_frequency_unit'=> 'day',
-  	  'repetition_frequency_interval' => 3,
-  	  'end_frequency_unit' => 'hour',
-  	  'end_frequency_interval' => 0,
-  	  'end_action' => 'before',
-  	  'end_date' => 'activity_date_time',
-  	  'body_html' => 'Test description',
-  	  'subject' => 'Test subject'
+    $params = array(
+        'subject' => 'this case should fail',
+        'scheduled_date_time' => date('Ymd'),
     );
-  	$actionSchedule = $this->callAPISuccess('action_schedule', 'create', $params);
-  	$this->assertTrue(is_numeric($actionSchedule['id']), "In line " . __LINE__);
-  	$this->assertTrue($actionSchedule['id'] > 0, "In line " . __LINE__);
-  	$this->assertEquals($actionSchedule['values'][$actionSchedule['id']]['start_action_offset'][0], $params['start_action_offset']);
-  	$newCount = CRM_Core_DAO::singleValueQuery('select count(*) from civicrm_action_schedule');
-  	$this->assertEquals($oldCount+1, $newCount);
-  	
+    $result = $this->callAPIFailure('activity', 'create', $params);
+  }
+
+  function testActionScheduleWithScheduledDatesCreate() {
+    $oldCount = CRM_Core_DAO::singleValueQuery('select count(*) from civicrm_action_schedule');
+    $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
+    $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
+    $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
+    $scheduledStatus = CRM_Core_OptionGroup::getValue('activity_status', 'Scheduled', 'name');
+    $mappingId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_ActionMapping', 'activity_type', 'id', 'entity_value');
+    $activityTypeId = CRM_Core_OptionGroup::getValue('activity_type', "Meeting", 'name');
+    $title = "simpleActionSchedule".substr(sha1(rand()), 0, 7);
+    $params = array(
+      'title' => $title,
+      'recipient' => $assigneeID,
+      'limit_to' => 1,
+      'entity_value' => $activityTypeId,
+      'entity_status' => $scheduledStatus,
+      'is_active' => 1,
+      'record_activity' => 1,
+      'mapping_id' => $mappingId,
+      'start_action_offset' => 3,
+      'start_action_unit' => 'day',
+      'start_action_condition' => 'before',
+      'start_action_date' => 'activity_date_time',
+      'is_repeat' => 1,
+      'repetition_frequency_unit'=> 'day',
+      'repetition_frequency_interval' => 3,
+      'end_frequency_unit' => 'hour',
+      'end_frequency_interval' => 0,
+      'end_action' => 'before',
+      'end_date' => 'activity_date_time',
+      'body_html' => 'Test description',
+      'subject' => 'Test subject'
+    );
+    $actionSchedule = $this->callAPISuccess('action_schedule', 'create', $params);
+    $this->assertTrue(is_numeric($actionSchedule['id']), "In line " . __LINE__);
+    $this->assertTrue($actionSchedule['id'] > 0, "In line " . __LINE__);
+    $this->assertEquals($actionSchedule['values'][$actionSchedule['id']]['start_action_offset'][0], $params['start_action_offset']);
+    $newCount = CRM_Core_DAO::singleValueQuery('select count(*) from civicrm_action_schedule');
+    $this->assertEquals($oldCount+1, $newCount);
+
   }
 
 }

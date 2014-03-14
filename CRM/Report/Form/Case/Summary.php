@@ -179,9 +179,7 @@ class CRM_Report_Form_Case_Summary extends CRM_Report_Form {
     foreach ($this->_columns as $tableName => $table) {
       if (array_key_exists('fields', $table)) {
         foreach ($table['fields'] as $fieldName => $field) {
-          if (CRM_Utils_Array::value('required', $field) ||
-            CRM_Utils_Array::value($fieldName, $this->_params['fields'])
-          ) {
+          if (!empty($field['required']) || !empty($this->_params['fields'][$fieldName])) {
 
             if ($tableName == 'civicrm_relationship_type') {
               $this->_relField = TRUE;
@@ -322,9 +320,7 @@ inner join civicrm_contact $c2 on ${c2}.id=${ccc}.contact_id
         }
       }
 
-      if (array_key_exists('civicrm_case_case_type_id', $row) &&
-        CRM_Utils_Array::value('civicrm_case_case_type_id', $rows[$rowNum])
-      ) {
+      if (array_key_exists('civicrm_case_case_type_id', $row) && !empty($rows[$rowNum]['civicrm_case_case_type_id'])) {
         $value   = $row['civicrm_case_case_type_id'];
         $typeIds = explode(CRM_Core_DAO::VALUE_SEPARATOR, $value);
         $value   = array();
@@ -338,9 +334,7 @@ inner join civicrm_contact $c2 on ${c2}.id=${ccc}.contact_id
       }
 
       // convert Case ID and Subject to links to Manage Case
-      if (array_key_exists('civicrm_case_id', $row) &&
-        CRM_Utils_Array::value('civicrm_c2_id', $rows[$rowNum])
-      ) {
+      if (array_key_exists('civicrm_case_id', $row) && !empty($rows[$rowNum]['civicrm_c2_id'])) {
         $url = CRM_Utils_System::url("civicrm/contact/view/case",
           'reset=1&action=view&cid=' . $row['civicrm_c2_id'] . '&id=' . $row['civicrm_case_id'],
           $this->_absoluteUrl
@@ -349,9 +343,7 @@ inner join civicrm_contact $c2 on ${c2}.id=${ccc}.contact_id
         $rows[$rowNum]['civicrm_case_id_hover'] = ts("Manage Case");
         $entryFound = TRUE;
       }
-      if (array_key_exists('civicrm_case_subject', $row) &&
-        CRM_Utils_Array::value('civicrm_c2_id', $rows[$rowNum])
-      ) {
+      if (array_key_exists('civicrm_case_subject', $row) && !empty($rows[$rowNum]['civicrm_c2_id'])) {
         $url = CRM_Utils_System::url("civicrm/contact/view/case",
           'reset=1&action=view&cid=' . $row['civicrm_c2_id'] . '&id=' . $row['civicrm_case_id'],
           $this->_absoluteUrl

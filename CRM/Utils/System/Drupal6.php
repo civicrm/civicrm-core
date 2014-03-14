@@ -153,10 +153,10 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
     _user_edit_validate(NULL, $params);
     $errors = form_get_errors();
     if ($errors) {
-      if (CRM_Utils_Array::value('name', $errors)) {
+      if (!empty($errors['name'])) {
         $errors['cms_name'] = $errors['name'];
       }
-      if (CRM_Utils_Array::value('mail', $errors)) {
+      if (!empty($errors['mail'])) {
         $errors[$emailName] = $errors['mail'];
       }
       // also unset drupal messages to avoid twice display of errors
@@ -437,81 +437,6 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
   }
 
   /**
-   * Generate an internal CiviCRM URL (copied from DRUPAL/includes/common.inc#url)
-   *
-   * @param $path     string   The path being linked to, such as "civicrm/add"
-   * @param $query    string   A query string to append to the link.
-   * @param $absolute boolean  Whether to force the output to be an absolute link (beginning with http:).
-   *                           Useful for links that will be displayed outside the site, such as in an
-   *                           RSS feed.
-   * @param $fragment string   A fragment identifier (named anchor) to append to the link.
-   * @param $htmlize  boolean  whether to convert to html eqivalant
-   * @param $frontend boolean  a gross joomla hack
-   *
-   * @return string            an HTML string containing a link to the given path.
-   * @access public
-   *
-   */
-  function url($path = NULL, $query = NULL, $absolute = FALSE,
-    $fragment = NULL, $htmlize = TRUE,
-    $frontend = FALSE
-  ) {
-    $config = CRM_Core_Config::singleton();
-    $script = 'index.php';
-
-    $path = CRM_Utils_String::stripPathChars($path);
-
-    if (isset($fragment)) {
-      $fragment = '#' . $fragment;
-    }
-
-    if (!isset($config->useFrameworkRelativeBase)) {
-      $base = parse_url($config->userFrameworkBaseURL);
-      $config->useFrameworkRelativeBase = $base['path'];
-    }
-    $base = $absolute ? $config->userFrameworkBaseURL : $config->useFrameworkRelativeBase;
-
-    $separator = $htmlize ? '&amp;' : '&';
-
-    if (!$config->cleanURL) {
-      if (isset($path)) {
-        if (isset($query)) {
-          return $base . $script . '?q=' . $path . $separator . $query . $fragment;
-        }
-        else {
-          return $base . $script . '?q=' . $path . $fragment;
-        }
-      }
-      else {
-        if (isset($query)) {
-          return $base . $script . '?' . $query . $fragment;
-        }
-        else {
-          return $base . $fragment;
-        }
-      }
-    }
-    else {
-      if (isset($path)) {
-        if (isset($query)) {
-          return $base . $path . '?' . $query . $fragment;
-        }
-        else {
-          return $base . $path . $fragment;
-        }
-      }
-      else {
-        if (isset($query)) {
-          return $base . $script . '?' . $query . $fragment;
-        }
-        else {
-          return $base . $fragment;
-        }
-      }
-    }
-  }
-
-  /**
    * Authenticate the user against the drupal db
    *
    * @param string $name     the user name
@@ -628,10 +553,6 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
    */
   function setMessage($message) {
     drupal_set_message($message);
-  }
-
-  function permissionDenied() {
-    drupal_access_denied();
   }
 
   function logout() {

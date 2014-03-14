@@ -97,11 +97,11 @@ class CRM_Core_Page_AJAX {
    */
   static function setIsQuickConfig() {
     $id = $context = NULL;
-    if (CRM_Utils_Array::value('id', $_REQUEST)) {
+    if (!empty($_REQUEST['id'])) {
       $id = CRM_Utils_Type::escape($_REQUEST['id'], 'Integer');
     }
 
-    if (CRM_Utils_Array::value('context', $_REQUEST)) {
+    if (!empty($_REQUEST['context'])) {
       $context = CRM_Utils_Type::escape($_REQUEST['context'], 'String');
     }
     // return false if $id is null and
@@ -193,6 +193,27 @@ class CRM_Core_Page_AJAX {
     echo json_encode($response);
     if (!$xhr) {
       echo '</textarea>';
+    }
+    CRM_Utils_System::civiExit();
+  }
+
+  /**
+   * Send autocomplete results to the client. Input can be a simple or nested array.
+   * @param array $results - If nested array, also provide:
+   * @param string $val - array key to use as the value
+   * @param string $key - array key to use as the key
+   */
+  static function autocompleteResults($results, $val='label', $key='id') {
+    $output = array();
+    if (is_array($results)) {
+      foreach ($results as $k => $v) {
+        if (is_array($v)) {
+          echo $v[$val] . '|' . $v[$key] . "\n";
+        }
+        else {
+          echo "$v|$k\n";
+        }
+      }
     }
     CRM_Utils_System::civiExit();
   }

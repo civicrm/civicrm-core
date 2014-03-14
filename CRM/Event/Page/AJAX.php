@@ -39,82 +39,11 @@
 class CRM_Event_Page_AJAX {
 
   /**
-   * Function for building Event combo box
-   */
-  function event() {
-    $name = trim(CRM_Utils_Type::escape($_GET['s'], 'String'));
-    if (!$name) {
-      $name = '%';
-    }
-    $whereClause = " title LIKE '$name%' AND ( civicrm_event.is_template IS NULL OR civicrm_event.is_template = 0 )";
-    $includeOld = CRM_Utils_Request::retrieve('includeOld', 'Boolean', CRM_Core_DAO::$_nullObject, FALSE, TRUE);
-    if (!$includeOld) {
-      $whereClause .= " AND ( end_date IS NULL OR end_date >= NOW() )";
-    }
-    $query = "
-      SELECT civicrm_event.title AS title,
-        civicrm_event.id AS id,
-        civicrm_address.city AS city,
-        civicrm_event.start_date
-      FROM civicrm_event
-        LEFT JOIN civicrm_loc_block ON
-          civicrm_event.loc_block_id = civicrm_loc_block.id
-        LEFT JOIN civicrm_address ON
-          civicrm_loc_block.address_id = civicrm_address.id
-      WHERE
-        {$whereClause}
-      ORDER BY
-        civicrm_event.title
-";
-    $dao = CRM_Core_DAO::executeQuery($query);
-    while ($dao->fetch()) {
-      $fields = array();
-      foreach (array('title', 'city') as $field) {
-        if (isset($dao->$field)) {
-          array_push($fields, $dao->$field);
-        }
-      }
-      if (isset($dao->start_date)) {
-        array_push($fields, CRM_Utils_Date::customFormat($dao->start_date));
-      }
-      $eventinfo = implode(' - ', $fields);
-      echo $elements = "$eventinfo|$dao->id\n";
-    }
-    CRM_Utils_System::civiExit();
-  }
-
-  /**
-   * Function for building Event Type combo box
-   */
-  function eventType() {
-    $name = trim(CRM_Utils_Type::escape($_GET['s'], 'String'));
-    if (!$name) {
-      $name = '%';
-    }
-    $whereClause = " v.label LIKE '$name%' ";
-
-    $query = "
-SELECT v.label ,v.value
-FROM   civicrm_option_value v,
-       civicrm_option_group g
-WHERE  v.option_group_id = g.id
-AND g.name = 'event_type'
-AND v.is_active = 1
-AND {$whereClause}
-ORDER by v.weight";
-
-    $dao = CRM_Core_DAO::executeQuery($query);
-    while ($dao->fetch()) {
-      echo $elements = "$dao->label|$dao->value\n";
-    }
-    CRM_Utils_System::civiExit();
-  }
-
-  /**
    * Function for building EventFee combo box
+   * FIXME: This ajax callback could be eliminated in favor of an entityRef field but the priceFieldValue api doesn't currently support filtering on entity_table
    */
   function eventFee() {
-    $name = trim(CRM_Utils_Type::escape($_GET['s'], 'String'));
+    $name = trim(CRM_Utils_Type::escape($_GET['term'], 'String'));
 
     if (!$name) {
       $name = '%';
@@ -131,44 +60,13 @@ LEFT JOIN civicrm_price_set_entity ce ON ce.price_set_id = cf.price_set_id
 WHERE ce.entity_table = 'civicrm_event' AND {$whereClause}
 GROUP BY cv.label";
     $dao = CRM_Core_DAO::executeQuery($query);
+    $results = array();
     while ($dao->fetch()) {
-      echo $elements = "$dao->label|$dao->id\n";
+      $results[] = array('id' => $dao->id, 'text' => $dao->label);
     }
+    echo json_encode($results);
     CRM_Utils_System::civiExit();
   }
 
-  function eventList() {
-    $listparams = CRM_Utils_Array::value('listall', $_REQUEST, 1);
-    $events = CRM_Event_BAO_Event::getEvents($listparams);
-
-    $elements = array(array('name' => ts('- select -'),
-        'value' => '',
-      ));
-    foreach ($events as $id => $name) {
-      $elements[] = array(
-        'name' => $name,
-        'value' => $id,
-      );
-    }
-
-    echo json_encode($elements);
-    CRM_Utils_System::civiExit();
-  }
-
-  /**
-   * Function to get default participant role
-   */
-  function participantRole() {
-    $eventID = $_GET['eventId'];
-
-    $defaultRoleId = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event',
-      $eventID,
-      'default_role_id',
-      'id'
-    );
-    $participantRole = array('role' => $defaultRoleId);
-    echo json_encode($participantRole);
-    CRM_Utils_System::civiExit();
-  }
 }
 

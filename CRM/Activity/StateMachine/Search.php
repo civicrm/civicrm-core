@@ -77,13 +77,7 @@ class CRM_Activity_StateMachine_Search extends CRM_Core_StateMachine {
    */
   function taskName($controller, $formName = 'Search') {
     // total hack, check POST vars and then session to determine stuff
-    // fix value if print button is pressed
-    if (CRM_Utils_Array::value('_qf_' . $formName . '_next_print', $_POST)) {
-      $value = CRM_Activity_Task::PRINT_ACTIVITIES;
-    }
-    else {
-      $value = CRM_Utils_Array::value('task', $_POST);
-    }
+    $value = CRM_Utils_Array::value('task', $_POST);
     if (!isset($value)) {
       $value = $this->_controller->get('task');
     }

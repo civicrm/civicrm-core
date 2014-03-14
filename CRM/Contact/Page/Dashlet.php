@@ -42,7 +42,7 @@ class CRM_Contact_Page_Dashlet extends CRM_Core_Page {
   /**
    * Run dashboard
    *
-   * @return none
+   * @return void
    * @access public
    */
   function run() {

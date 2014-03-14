@@ -213,7 +213,7 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   function setDefaultValues() {
     $defaults = array();
@@ -241,7 +241,7 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
   /**
    * Function to build the form
    *
-   * @return None
+   * @return void
    * @access public
    */
   public function buildQuickForm() {
@@ -338,7 +338,7 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
       }
 
       CRM_Core_Session::setStatus(ts("'%1' information has been saved.",
-          array(1 => ($subPage == 'friend') ? 'Friend' : $className)
+          array(1 => CRM_Utils_Array::value('title', CRM_Utils_Array::value($subPage, $this->get('tabHeader')), $className))
         ), ts('Saved'), 'success');
 
       $config = CRM_Core_Config::singleton();
@@ -350,21 +350,17 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
           CRM_Event_BAO_Event::updateParticipantCampaignID($eventID, $newCampaignID);
         }
       }
-
+      $this->postProcessHook();
       if ($this->controller->getButtonName('submit') == "_qf_{$className}_upload_done") {
         if ($this->_isTemplate) {
-          CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/admin/eventTemplate',
-              'reset=1'
-            ));
+          CRM_Core_Session::singleton()->pushUserContext(CRM_Utils_System::url('civicrm/admin/eventTemplate', 'reset=1'));
         }
         else {
-          CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/event/manage',
-              'reset=1'
-            ));
+          CRM_Core_Session::singleton()->pushUserContext(CRM_Utils_System::url('civicrm/event/manage', 'reset=1'));
         }
       }
       else {
-        CRM_Utils_System::redirect(CRM_Utils_System::url("civicrm/event/manage/{$subPage}",
+        CRM_Core_Session::singleton()->pushUserContext(CRM_Utils_System::url("civicrm/event/manage/{$subPage}",
             "action=update&reset=1&id={$this->_id}"
           ));
       }
@@ -372,10 +368,7 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
   }
 
   function getTemplateFileName() {
-    if ($this->controller->getPrint() == CRM_Core_Smarty::PRINT_NOFORM ||
-      $this->getVar('_id') <= 0 ||
-      ($this->_action & CRM_Core_Action::DELETE)
-    ) {
+    if ($this->controller->getPrint() || $this->getVar('_id') <= 0 || $this->_action & CRM_Core_Action::DELETE) {
       return parent::getTemplateFileName();
     }
     else {

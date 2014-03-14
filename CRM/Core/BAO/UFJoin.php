@@ -96,7 +96,7 @@ class CRM_Core_BAO_UFJoin extends CRM_Core_DAO_UFJoin {
    * @static
    */
   public static function findJoinEntryId(&$params) {
-    if (CRM_Utils_Array::value('id', $params)) {
+    if (!empty($params['id'])) {
       return $params['id'];
     }
 

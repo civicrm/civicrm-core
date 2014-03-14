@@ -164,7 +164,7 @@ WHERE     pledge_id = %1
    * @static
    */
   static function add($params) {
-    if (CRM_Utils_Array::value('id', $params)) {
+    if (!empty($params['id'])) {
       CRM_Utils_Hook::pre('edit', 'PledgePayment', $params['id'], $params);
     }
     else {
@@ -182,7 +182,7 @@ WHERE     pledge_id = %1
 
     $result = $payment->save();
 
-    if (CRM_Utils_Array::value('id', $params)) {
+    if (!empty($params['id'])) {
       CRM_Utils_Hook::post('edit', 'PledgePayment', $payment->id, $payment);
     }
     else {

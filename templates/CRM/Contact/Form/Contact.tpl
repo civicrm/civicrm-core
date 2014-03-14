@@ -39,9 +39,6 @@
     {include file="CRM/common/formButtons.tpl" location="top"}
     </div>
 
-    {* include overlay js *}
-    {include file="CRM/common/overlay.tpl"}
-
     <div class="crm-accordion-wrapper crm-contactDetails-accordion">
       <div class="crm-accordion-header">
         {ts}Contact Details{/ts}
@@ -239,13 +236,6 @@
       return true;
     });
     {/literal}{/if}{literal}
-
-    $("select#contact_sub_type").crmasmSelect({
-      addItemTarget: 'bottom',
-      animate: false,
-      highlight: true,
-      respectParents: true
-    });
   });
 
 </script>

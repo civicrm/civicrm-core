@@ -82,14 +82,12 @@ class CRM_Custom_Page_Group extends CRM_Core_Page {
         ),
         CRM_Core_Action::DISABLE => array(
           'name' => ts('Disable'),
-          'extra' => 'onclick = "enableDisable( %%id%%,\'' . 'CRM_Core_BAO_CustomGroup' . '\',\'' . 'enable-disable' . '\' );"',
-          'ref' => 'disable-action',
+          'ref' => 'crm-enable-disable',
           'title' => ts('Disable Custom Set'),
         ),
         CRM_Core_Action::ENABLE => array(
           'name' => ts('Enable'),
-          'extra' => 'onclick = "enableDisable( %%id%%,\'' . 'CRM_Core_BAO_CustomGroup' . '\',\'' . 'disable-enable' . '\' );"',
-          'ref' => 'enable-action',
+          'ref' => 'crm-enable-disable',
           'title' => ts('Enable Custom Set'),
         ),
         CRM_Core_Action::DELETE => array(
@@ -237,8 +235,9 @@ class CRM_Custom_Page_Group extends CRM_Core_Page {
     }
 
     $customGroupExtends = CRM_Core_SelectValues::customGroupExtends();
+    $customGroupStyle = CRM_Core_SelectValues::customGroupStyle();
     foreach ($customGroup as $key => $array) {
-      CRM_Core_DAO_CustomGroup::addDisplayEnums($customGroup[$key]);
+      $customGroup[$key]['style_display'] = $customGroupStyle[$customGroup[$key]['style']];
       $customGroup[$key]['extends_display'] = $customGroupExtends[$customGroup[$key]['extends']];
     }
 

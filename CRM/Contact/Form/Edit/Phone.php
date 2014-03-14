@@ -61,16 +61,16 @@ class CRM_Contact_Form_Edit_Phone {
     $form->applyFilter('__ALL__', 'trim');
 
     //phone type select
-    $form->addElement('select', "phone[$blockId][phone_type_id]", ts('Phone'), CRM_Core_PseudoConstant::get('CRM_Core_DAO_Phone', 'phone_type_id'));
+    $form->addSelect("phone[$blockId][phone_type_id]", array('entity' => 'phone', 'class' => 'eight', 'placeholder' => NULL));
 
     //main phone number with crm_phone class
-    $form->addElement('text', "phone[$blockId][phone]", ts('Phone'), array_merge(CRM_Core_DAO::getAttribute('CRM_Core_DAO_Phone', 'phone'), array('class' => 'crm_phone twelve')));
+    $form->add('text', "phone[$blockId][phone]", ts('Phone'), array_merge(CRM_Core_DAO::getAttribute('CRM_Core_DAO_Phone', 'phone'), array('class' => 'crm_phone twelve')));
     // phone extension
     $form->addElement('text', "phone[$blockId][phone_ext]", ts('Extension'), CRM_Core_DAO::getAttribute('CRM_Core_DAO_Phone', 'phone_ext'));
 
     if (isset($form->_contactType) || $blockEdit) {
       //Block type select
-      $form->addElement('select', "phone[$blockId][location_type_id]", '', CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id'));
+      $form->addSelect("phone[$blockId][location_type_id]", array('entity' => 'phone', 'class' => 'eight', 'placeholder' => NULL));
 
       //is_Primary radio
       $js = array('id' => 'Phone_' . $blockId . '_IsPrimary', 'onClick' => 'singleSelect( this.id );');

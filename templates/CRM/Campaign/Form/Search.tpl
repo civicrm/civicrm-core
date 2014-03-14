@@ -53,28 +53,3 @@
 {/if}
 </div>
 {/if}
-{literal}
-<script type="text/javascript">
-    cj(function() {
-      cj().crmAccordions();
-    });
-
-  //load interviewer autocomplete.
-  var interviewerDataUrl = "{/literal}{$dataUrl}{literal}";
-  var hintText = "{/literal}{ts escape='js'}Type in a partial or complete name of an existing contact.{/ts}{literal}";
-  cj( "#survey_interviewer_name" ).autocomplete( interviewerDataUrl,
-                                                 { width : 256,
-                                                   selectFirst : false,
-                                                   hintText: hintText,
-                                                   matchContains: true,
-                                                   minChars: 1
-                                                  }
-                                                 ).result( function( event, data, formatted ) {
-                                      cj( "#survey_interviewer_id" ).val( data[1] );
-                                                         }).bind( 'click', function( ) {
-                                                              cj( "#survey_interviewer_id" ).val('');
-                                                         });
-
-
-</script>
-{/literal}

@@ -179,7 +179,7 @@ class CRM_Core_Session {
       return;
     }
 
-    if (!CRM_Utils_Array::value($prefix, $this->_session[$this->_key])) {
+    if (empty($this->_session[$this->_key][$prefix])) {
       $this->_session[$this->_key][$prefix] = array();
     }
   }
@@ -496,7 +496,7 @@ class CRM_Core_Session {
     if (!isset(self::$_singleton->_session[self::$_singleton->_key]['status'])) {
       self::$_singleton->_session[self::$_singleton->_key]['status'] = array();
     }
-    if ($text) {
+    if ($text || $title) {
       if ($options['unique']) {
         foreach (self::$_singleton->_session[self::$_singleton->_key]['status'] as $msg) {
           if ($msg['text'] == $text && $msg['title'] == $title) {

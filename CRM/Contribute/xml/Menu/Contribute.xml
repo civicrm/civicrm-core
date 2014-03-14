@@ -122,6 +122,15 @@
     <weight>580</weight>
   </item>
   <item>
+    <path>civicrm/payment</path>
+    <title>New Payment</title>
+    <page_callback>CRM_Contribute_Form_AdditionalPayment</page_callback>
+    <path_arguments>action=add</path_arguments>
+    <access_arguments>access CiviContribute</access_arguments>
+    <page_type>1</page_type>
+    <component>CiviContribute</component>
+  </item>
+  <item>
     <path>civicrm/admin/financial/financialAccount</path>
     <title>Financial Accounts</title>
     <page_callback>CRM_Financial_Page_FinancialAccount</page_callback>
@@ -135,7 +144,6 @@
     <title>Payment Instruments</title>
     <page_callback>CRM_Admin_Page_Options</page_callback>
     <desc>You may choose to record the payment instrument used for each contribution. Common payment methods are installed by default (e.g. Check, Cash, Credit Card...). If your site requires additional payment methods, add them here.</desc>
-    <path_arguments>group=payment_instrument</path_arguments>
     <adminGroup>CiviContribute</adminGroup>
     <icon>admin/small/payment_instruments.png</icon>
     <weight>380</weight>
@@ -145,7 +153,6 @@
     <title>Accepted Credit Cards</title>
     <page_callback>CRM_Admin_Page_Options</page_callback>
     <desc>Credit card options that will be offered to contributors using your Online Contribution pages.</desc>
-    <path_arguments>group=accept_creditcard</path_arguments>
     <adminGroup>CiviContribute</adminGroup>
     <icon>admin/small/accepted_creditcards.png</icon>
     <weight>395</weight>
@@ -155,7 +162,6 @@
     <title>Soft Credit Types</title>
     <page_callback>CRM_Admin_Page_Options</page_callback>
     <desc>Soft Credit Types that will be offered to contributors during soft credit contribution</desc>
-    <path_arguments>group=soft_credit_type</path_arguments>
     <adminGroup>CiviContribute</adminGroup>
     <icon>admin/small/soft_credit_type.png</icon>
   </item>
@@ -281,5 +287,14 @@
     <title>Accounting Batch Export</title>
     <page_callback>CRM_Financial_Form_Export</page_callback>
     <weight>610</weight>
+  </item>
+  <item>
+    <path>civicrm/payment/view</path>
+    <title>View Payment</title>
+    <page_callback>CRM_Contribute_Page_PaymentInfo</page_callback>
+    <path_arguments>action=view</path_arguments>
+    <access_arguments>access CiviContribute</access_arguments>
+    <page_type>1</page_type>
+    <component>CiviContribute</component>
   </item>
 </menu>

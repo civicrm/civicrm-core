@@ -50,7 +50,8 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
    *
    */
   function createUser(&$params, $mail) {
-    $form_state = array();
+    $form_state = form_state_defaults();
+
     $form_state['input'] = array(
       'name' => $params['cms_name'],
       'mail' => $params[$mail],
@@ -135,7 +136,7 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
       unset($_SESSION['messages']);
     }
 
-    if (CRM_Utils_Array::value('name', $params)) {
+    if (!empty($params['name'])) {
       if ($nameError = user_validate_name($params['name'])) {
         $errors['cms_name'] = $nameError;
       }
@@ -150,7 +151,7 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
       }
     }
 
-    if (CRM_Utils_Array::value('mail', $params)) {
+    if (!empty($params['mail'])) {
       if ($emailError = user_validate_mail($params['mail'])) {
         $errors[$emailName] = $emailError;
       }
@@ -435,80 +436,6 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
     return $this->url($_GET['q']);
   }
 
-  /**
-   * Generate an internal CiviCRM URL (copied from DRUPAL/includes/common.inc#url)
-   *
-   * @param $path     string   The path being linked to, such as "civicrm/add"
-   * @param $query    string   A query string to append to the link.
-   * @param $absolute boolean  Whether to force the output to be an absolute link (beginning with http:).
-   *                           Useful for links that will be displayed outside the site, such as in an
-   *                           RSS feed.
-   * @param $fragment string   A fragment identifier (named anchor) to append to the link.
-   * @param $htmlize  boolean  whether to convert to html eqivalant
-   * @param $frontend boolean  a gross joomla hack
-   *
-   * @return string            an HTML string containing a link to the given path.
-   * @access public
-   *
-   */
-  function url($path = NULL, $query = NULL, $absolute = FALSE,
-    $fragment = NULL, $htmlize = TRUE,
-    $frontend = FALSE, $forceBackend = FALSE
-  ) {
-    $config = CRM_Core_Config::singleton();
-    $script = 'index.php';
-
-    $path = CRM_Utils_String::stripPathChars($path);
-
-    if (isset($fragment)) {
-      $fragment = '#' . $fragment;
-    }
-
-    if (!isset($config->useFrameworkRelativeBase)) {
-      $base = parse_url($config->userFrameworkBaseURL);
-      $config->useFrameworkRelativeBase = $base['path'];
-    }
-    $base = $absolute ? $config->userFrameworkBaseURL : $config->useFrameworkRelativeBase;
-
-    $separator = $htmlize ? '&amp;' : '&';
-
-    if (!$config->cleanURL) {
-      if (isset($path)) {
-        if (isset($query)) {
-          return $base . $script . '?q=' . $path . $separator . $query . $fragment;
-        }
-        else {
-          return $base . $script . '?q=' . $path . $fragment;
-        }
-      }
-      else {
-        if (isset($query)) {
-          return $base . $script . '?' . $query . $fragment;
-        }
-        else {
-          return $base . $fragment;
-        }
-      }
-    }
-    else {
-      if (isset($path)) {
-        if (isset($query)) {
-          return $base . $path . '?' . $query . $fragment;
-        }
-        else {
-          return $base . $path . $fragment;
-        }
-      }
-      else {
-        if (isset($query)) {
-          return $base . $script . '?' . $query . $fragment;
-        }
-        else {
-          return $base . $fragment;
-        }
-      }
-    }
-  }
 
   /**
    * Authenticate the user against the drupal db
@@ -652,10 +579,6 @@ AND    u.status = 1
    */
   function setMessage($message) {
     drupal_set_message($message);
-  }
-
-  function permissionDenied() {
-    drupal_access_denied();
   }
 
   function logout() {

@@ -34,7 +34,7 @@
             <div class="crm-section {$element.name}-section">
             {if ($element.html_type eq 'CheckBox' || $element.html_type == 'Radio') && $element.options_per_line}
               {assign var="element_name" value="price_"|cat:$field_id}
-	        <div class="label">{$form.$element_name.label}</div>
+          <div class="label">{$form.$element_name.label}</div>
                 <div class="content {$element.name}-content">
                 {assign var="rowCount" value="1"}
                 {assign var="count" value="1"}
@@ -65,7 +65,7 @@
                 <div class="content {$element.name}-content">{$form.$element_name.html}
                   {if $element.is_display_amounts && $element.html_type eq 'Text'}
                     <span class="price-field-amount">
-                      x {foreach item=option from=$element.options}{$option.amount|crmMoney}{/foreach}
+                      {foreach item=option from=$element.options}{$option.amount|crmMoney}{/foreach}
                     </span>
                   {/if}
                       {if $element.help_post}<br /><span class="description">{$element.help_post}</span>{/if}
@@ -82,8 +82,7 @@
     {/if}
 
 {* Include the total calculation widget if this is NOT a quickconfig event/contribution page. *}
-{if !$quickConfig}
+{if !$quickConfig and !$dontInclCal}
     {include file="CRM/Price/Form/Calculate.tpl"}
 {/if}
-
 </div>

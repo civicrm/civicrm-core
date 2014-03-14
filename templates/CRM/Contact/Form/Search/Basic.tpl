@@ -72,3 +72,4 @@
     <div class="spacer">&nbsp;</div>
 {/if}
 </div>
+{*include file="CRM/common/searchJs.tpl"*}

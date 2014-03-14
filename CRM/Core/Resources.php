@@ -428,28 +428,17 @@ class CRM_Core_Resources {
       $this->addedCoreResources[$region] = TRUE;
       $config = CRM_Core_Config::singleton();
 
-      // Add resources from jquery.files.tpl
-      $files = self::parseTemplate('CRM/common/jquery.files.tpl');
+      // Add resources from coreResourceList
+      $files = $this->coreResourceList();
       $jsWeight = -9999;
-      foreach ($files as $file => $type) {
-        if ($type == 'js') {
+      foreach ($files as $file) {
+        if (substr($file, -2) == 'js') {
           // Don't bother  looking for ts() calls in packages, there aren't any
           $translate = (substr($file, 0, 9) != 'packages/');
           $this->addScriptFile('civicrm', $file, $jsWeight++, $region, $translate);
         }
-        elseif ($type == 'css') {
+        else {
           $this->addStyleFile('civicrm', $file, -100, $region);
-        }
-      }
-
-      // Add localized calendar js
-      // Search for i18n file in order of specificity (try fr-CA, then fr)
-      list($lang) = explode('_', $config->lcMessages);
-      foreach (array(str_replace('_', '-', $config->lcMessages), $lang) as $language) {
-        $localizationFile = "packages/jquery/jquery-ui-1.9.0/development-bundle/ui/i18n/jquery.ui.datepicker-{$language}.js";
-        if ($this->getPath('civicrm', $localizationFile)) {
-          $this->addScriptFile('civicrm', $localizationFile, $jsWeight++, $region, FALSE);
-          break;
         }
       }
 
@@ -457,6 +446,8 @@ class CRM_Core_Resources {
       $url = CRM_Utils_System::url('civicrm/example', 'placeholder', FALSE, NULL, FALSE);
       $js = "CRM.url('init', '$url');\n";
       $js .= "CRM.formatMoney('init', " . json_encode(CRM_Utils_Money::format(1234.56)) . ");";
+
+      $this->addLocalization($js);
       $this->addScript($js, $jsWeight++, $region);
 
       // Add global settings
@@ -534,20 +525,98 @@ class CRM_Core_Resources {
   }
 
   /**
-   * Read resource files from a template
-   *
-   * @param $tpl (str) template file name
-   * @return array: filename => filetype
+   * Add inline scripts needed to localize js widgets
+   * @param string $js
    */
-  static function parseTemplate($tpl) {
-    $items = array();
-    $template = CRM_Core_Smarty::singleton();
-    $buffer = $template->fetch($tpl);
-    $lines = preg_split('/\s+/', $buffer);
-    foreach ($lines as $line) {
-      $line = trim($line);
-      if ($line) {
-        $items[$line] = substr($line, 1 + strrpos($line, '.'));
+  function addLocalization(&$js) {
+    $config = CRM_Core_Config::singleton();
+    
+    // Localize select2 strings
+    $contactSearch = json_encode($config->includeEmailInName ? ts('Start typing a name or email...') : ts('Start typing a name...'));
+    $otherSearch = json_encode(ts('Enter search term...'));
+    $js .= "
+      $.fn.select2.defaults.formatNoMatches = " . json_encode(ts("None found.")) . ";
+      $.fn.select2.defaults.formatLoadMore = " . json_encode(ts("Loading...")) . ";
+      $.fn.select2.defaults.formatSearching = " . json_encode(ts("Searching...")) . ";
+      $.fn.select2.defaults.formatInputTooShort = function(){return cj(this).data('api-entity') == 'contact' ? $contactSearch : $otherSearch};
+    ";
+
+    // Contact create profiles with localized names
+    if (CRM_Core_Permission::check('edit all contacts') || CRM_Core_Permission::check('add contacts')) {
+      $this->addSetting(array('profile' => array('contactCreate' => CRM_Core_BAO_UFGroup::getCreateLinks())));
+    }
+  }
+
+  /**
+   * List of core resources we add to every CiviCRM page
+   *
+   * @return array
+   */
+  public function coreResourceList() {
+    $config = CRM_Core_Config::singleton();
+    // Use minified files for production, uncompressed in debug mode
+    $min = $config->debug ? '' : '.min';
+
+    $items = array(
+      "packages/jquery/jquery-1.10.2$min.js",
+      "packages/jquery/jquery-migrate-1.2.1.js",
+      "packages/jquery/jquery-ui/js/jquery-ui-1.10.3.custom$min.js",
+      "packages/jquery/jquery-ui/css/black-tie/jquery-ui-1.10.3.custom$min.css",
+
+      "packages/backbone/lodash.compat$min.js",
+
+      "jquery/plugins/jquery.mousewheel$min.js",
+
+      "packages/jquery/plugins/select2/select2.js", // No mini until release of select2 3.4.6
+      "packages/jquery/plugins/select2/select2.css",
+
+      "packages/jquery/plugins/jquery.autocomplete.js",
+      "packages/jquery/css/jquery.autocomplete.css",
+
+      "packages/jquery/plugins/jquery.menu$min.js",
+      "packages/jquery/css/menu.css",
+
+      "packages/jquery/plugins/jquery.tableHeader.js",
+
+      "packages/jquery/plugins/jquery.textarearesizer.js",
+
+      "packages/jquery/plugins/jquery.form$min.js",
+
+      "packages/jquery/plugins/jquery.tokeninput$min.js",
+      "packages/jquery/css/token-input-facebook.css",
+
+      "packages/jquery/plugins/jquery.timeentry$min.js",
+
+      "packages/jquery/plugins/DataTables/media/js/jquery.dataTables$min.js",
+
+      "packages/jquery/plugins/jquery.FormNavigate$min.js",
+
+      "packages/jquery/plugins/jquery.validate$min.js",
+      "packages/jquery/plugins/jquery.ui.datepicker.validation.pack.js",
+
+      "packages/jquery/plugins/jquery.jeditable$min.js",
+
+      "packages/jquery/plugins/jquery.blockUI$min.js",
+
+      "packages/jquery/plugins/jquery.notify$min.js",
+
+      "js/rest.js",
+      "js/Common.js",
+
+      "js/jquery/jquery.crmeditable.js",
+    );
+
+    // Add localized jQuery UI files
+    if ($config->lcMessages && $config->lcMessages != 'en_US') {
+      // Search for i18n file in order of specificity (try fr-CA, then fr)
+      list($lang) = explode('_', $config->lcMessages);
+      $path = "packages/jquery/jquery-ui/development-bundle/ui/" . ($min ? 'minified/' : '') . "i18n";
+      foreach (array(str_replace('_', '-', $config->lcMessages), $lang) as $language) {
+        $localizationFile = "$path/jquery.ui.datepicker-{$language}{$min}.js";
+        if ($this->getPath('civicrm', $localizationFile)) {
+          $items[] = $localizationFile;
+          break;
+        }
       }
     }
     return $items;

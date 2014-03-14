@@ -154,6 +154,9 @@
       <required>true</required>
       <comment>Billing Mode</comment>
       <pseudoconstant>true</pseudoconstant>
+<html>
+  <type>Select</type>
+</html>
       <add>1.8</add>
   </field>
   <field>

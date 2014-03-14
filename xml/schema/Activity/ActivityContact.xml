@@ -54,10 +54,13 @@
     <name>record_type_id</name>
     <type>int unsigned</type>
     <title>Record Type ID</title>
-    <comment>The record type id for this row</comment>
+    <comment>Contents vary depending on the activity type. Code using custom activities may use this field as they choose fit.</comment>
     <pseudoconstant>
       <optionGroupName>activity_contacts</optionGroupName>
     </pseudoconstant>
+    <html>
+      <type>Select</type>
+    </html>
     <add>4.4</add>
   </field>
   <index>
@@ -68,5 +71,10 @@
     <unique>true</unique>
     <add>4.4</add>
   </index>
-
+  <index>
+    <name>index_record_type</name>
+    <fieldName>activity_id</fieldName>
+    <fieldName>record_type_id</fieldName>
+    <add>4.4</add>
+  </index>
 </table>

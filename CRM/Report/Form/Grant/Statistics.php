@@ -248,9 +248,7 @@ class CRM_Report_Form_Grant_Statistics extends CRM_Report_Form {
 
       if (array_key_exists('fields', $table)) {
         foreach ($table['fields'] as $fieldName => $field) {
-          if (CRM_Utils_Array::value('required', $field) ||
-            CRM_Utils_Array::value($fieldName, $this->_params['fields'])
-          ) {
+          if (!empty($field['required']) || !empty($this->_params['fields'][$fieldName])) {
 
             $select[] = "{$field['dbAlias']} as {$tableName}_{$fieldName}";
 
@@ -335,14 +333,14 @@ WHERE {$this->_aliases['civicrm_grant']}.amount_total IS NOT NULL
   function groupBy() {
     $this->_groupBy = '';
 
-    if (CRM_Utils_Array::value('fields', $this->_params) &&
+    if (!empty($this->_params['fields']) &&
       is_array($this->_params['fields']) &&
       !empty($this->_params['fields'])
     ) {
       foreach ($this->_columns as $tableName => $table) {
         if (array_key_exists('fields', $table)) {
           foreach ($table['fields'] as $fieldName => $field) {
-            if (CRM_Utils_Array::value($fieldName, $this->_params['fields'])) {
+            if (!empty($this->_params['fields'][$fieldName])) {
               $this->_groupBy[] = $field['dbAlias'];
             }
           }
@@ -421,11 +419,11 @@ SELECT COUNT({$this->_aliases['civicrm_grant']}.id) as count ,
     }
 
     foreach ($rows as $key => $values) {
-      if (CRM_Utils_Array::value('civicrm_grant_grant_report_received', $values)) {
+      if (!empty($values['civicrm_grant_grant_report_received'])) {
         $grantReportsReceived++;
       }
 
-      if (CRM_Utils_Array::value('civicrm_grant_grant_type_id', $values)) {
+      if (!empty($values['civicrm_grant_grant_type_id'])) {
         $grantType = CRM_Utils_Array::value($values['civicrm_grant_grant_type_id'], $grantTypes);
         $grantStatistics['civicrm_grant_grant_type_id']['title'] = ts('By Grant Type');
         self::getStatistics($grantStatistics['civicrm_grant_grant_type_id'], $grantType, $values,

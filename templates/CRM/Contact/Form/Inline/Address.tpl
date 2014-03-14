@@ -83,7 +83,7 @@
       cj('.crm-inline-edit.address').each(function() {
         if (ok && cj(this).data('location-type-id') == lt) {
           var label = cj('option:selected', ele).text();
-          ele.val('');
+          ele.select2('val', '');
           ele.crmError(label + "{/literal} {ts escape='js'}has already been assigned to another address. Please select another location for this address.{/ts}"{literal});
           ok = false;
         }

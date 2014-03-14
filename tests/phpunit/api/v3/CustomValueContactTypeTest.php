@@ -39,7 +39,7 @@ class api_v3_CustomValueContactTypeTest extends CiviUnitTestCase {
   protected $_apiversion =3;
   protected $CustomGroupIndividual;
   protected $individualStudent;
-  public $_eNoticeCompliant = TRUE;
+
 
   function get_info() {
     return array(

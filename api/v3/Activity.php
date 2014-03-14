@@ -54,7 +54,7 @@
  */
 function civicrm_api3_activity_create($params) {
 
-  if (!CRM_Utils_Array::value('id', $params)) {
+  if (empty($params['id'])) {
     // an update does not require any mandatory parameters
     civicrm_api3_verify_one_mandatory($params,
       NULL,
@@ -96,9 +96,9 @@ function civicrm_api3_activity_create($params) {
   $case_id           = '';
   $createRevision    = FALSE;
   $oldActivityValues = array();
-  if (CRM_Utils_Array::value('case_id', $params)) {
+  if (!empty($params['case_id'])) {
     $case_id = $params['case_id'];
-    if (CRM_Utils_Array::value('id', $params)) {
+    if (!empty($params['id'])) {
       $oldActivityParams = array('id' => $params['id']);
       if (!$oldActivityValues) {
         CRM_Activity_BAO_Activity::retrieve($oldActivityParams, $oldActivityValues);
@@ -233,6 +233,21 @@ function civicrm_api3_activity_get($params) {
     $activities = _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params, FALSE);
   }
 
+  $activities = _civicrm_api3_activity_get_formatResult($params, $activities);
+  //legacy custom data get - so previous formatted response is still returned too
+  return civicrm_api3_create_success($activities, $params, 'activity', 'get');
+}
+
+/**
+ * Given a list of activities, append any extra data requested about the activities
+ *
+ * NOTE: Called by civicrm-core and CiviHR
+ *
+ * @param array $params API request parameters
+ * @param array $activities
+ * @return array new activities list
+ */
+function _civicrm_api3_activity_get_formatResult($params, $activities) {
   $returns = CRM_Utils_Array::value('return', $params, array());
   if (!is_array($returns)) {
     $returns = str_replace(' ', '', $returns);
@@ -274,11 +289,10 @@ function civicrm_api3_activity_get($params) {
     foreach ($activities as $activityId => $values) {
       _civicrm_api3_custom_data_get($activities[$activityId], 'Activity', $activityId, NULL, $values['activity_type_id']);
     }
+    return $activities;
   }
-  //legacy custom data get - so previous formatted response is still returned too
-  return civicrm_api3_create_success($activities, $params, 'activity', 'get');
+  return $activities;
 }
-
 
 
 /**
@@ -369,12 +383,12 @@ SELECT  count(*)
   // this should be handled by wrapper layer & probably the api would already manage it
   //correctly by doing pseudoconstant validation
   // needs testing
-  $activityTypes = CRM_Core_PseudoConstant::activityType(TRUE, TRUE, FALSE, 'name', TRUE);
+  $activityTypes = CRM_Activity_BAO_Activity::buildOptions('activity_type_id', 'validate');
   $activityName  = CRM_Utils_Array::value('activity_name', $params);
   $activityName  = ucfirst($activityName);
   $activityLabel = CRM_Utils_Array::value('activity_label', $params);
   if ($activityLabel) {
-    $activityTypes = CRM_Core_PseudoConstant::activityType(TRUE, TRUE, FALSE, 'label', TRUE);
+    $activityTypes = CRM_Activity_BAO_Activity::buildOptions('activity_type_id', 'create');
   }
 
   $activityTypeId = CRM_Utils_Array::value('activity_type_id', $params);
@@ -408,9 +422,7 @@ SELECT  count(*)
   //if adding a new activity & date_time not set make it now
   // this should be managed by the wrapper layer & setting ['api.default'] in speces
   // needs testing
-  if (!CRM_Utils_Array::value('id', $params) &&
-    !CRM_Utils_Array::value('activity_date_time', $params)
-  ) {
+  if (empty($params['id']) && empty($params['activity_date_time'])) {
     $params['activity_date_time'] = CRM_Utils_Date::processDate(date('Y-m-d H:i:s'));
   }
 

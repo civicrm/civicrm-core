@@ -34,8 +34,11 @@
   <field>
       <name>msg_text</name>
       <type>longtext</type>
-      <rows>10</rows>
-      <cols>75</cols>
+      <html>
+          <type>TextArea</type>
+          <rows>10</rows>
+          <cols>75</cols>
+      </html>
       <comment>Text formatted message</comment>
       <add>1.6</add>
       <!-- type changed from TEXT to LONGTEXT in 4.3 -->
@@ -43,8 +46,11 @@
   <field>
       <name>msg_html</name>
       <type>longtext</type>
-      <rows>10</rows>
-      <cols>75</cols>
+      <html>
+          <type>RichTextEditor</type>
+          <rows>10</rows>
+          <cols>75</cols>
+      </html>
       <comment>HTML formatted message</comment>
       <add>1.6</add>
       <!-- type changed from TEXT to LONGTEXT in 4.3 -->

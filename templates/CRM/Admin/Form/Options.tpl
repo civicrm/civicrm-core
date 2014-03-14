@@ -24,13 +24,13 @@
  +--------------------------------------------------------------------+
 *}
 {* this template is used for adding/editing options *}
-<h3>{if $action eq 1}{ts 1=$GName}New %1 Option{/ts}{elseif $action eq 8}{ts 1=$GName}Delete %1 Option{/ts}{else}{ts 1=$GName}Edit %1 Option{/ts}{/if}</h3>
+<h3>{if $action eq 1}{ts 1=$gLabel}New %1 Option{/ts}{elseif $action eq 8}{ts 1=$gLabel}Delete %1 Option{/ts}{else}{ts 1=$gLabel}Edit %1 Option{/ts}{/if}</h3>
 <div class="crm-block crm-form-block crm-admin-options-form-block">
 <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
   {if $action eq 8}
       <div class="messages status no-popup">
         <div class="icon inform-icon"></div>
-             {ts 1=$GName}WARNING: Deleting this option will result in the loss of all %1 related records which use the option.{/ts} {ts}This may mean the loss of a substantial amount of data, and the action cannot be undone.{/ts} {ts}Do you want to continue?{/ts}
+             {ts 1=$gLabel}WARNING: Deleting this option will result in the loss of all %1 related records which use the option.{/ts} {ts}This may mean the loss of a substantial amount of data, and the action cannot be undone.{/ts} {ts}Do you want to continue?{/ts}
       </div>
     {else}
     <table class="form-layout-compressed">

@@ -53,7 +53,7 @@
     {/if}
     {$navigation}
   </ul>
-{/strip}{/capture}// Generated {$timeGenerated}
+{/strip}{/capture}// <script> Generated {$timeGenerated}
 {literal}
 (function($) {
   var menuMarkup = {/literal}{$menuMarkup|@json_encode};
@@ -88,28 +88,50 @@ $('#civicrm-menu').ready(function() {
     $(this).attr("tabIndex",i+2);
   });
 
-  var contactUrl = {/literal}"{crmURL p='civicrm/ajax/rest' q='className=CRM_Contact_Page_AJAX&fnName=getContactList&json=1&context=navigation' h=0 }"{literal};
-  $('#sort_name_navigation').autocomplete(contactUrl, {
-    width: 200,
-    selectFirst: false,
-    minChars: 1,
-    matchContains: true,
-    delay: 400,
-    max: {/literal}{crmSetting name="search_autocomplete_count" group="Search Preferences"}{literal},
-    extraParams:{
-      fieldName:function () {
-        return  $('input[name=quickSearchField]:checked').val();
+  $('#sort_name_navigation')
+    .crmAutocomplete({
+      source: function(request, response) {
+        var
+          option = $('input[name=quickSearchField]:checked'),
+          params = {
+            name: request.term,
+            field_name: option.val(),
+            table_name: option.attr("data-tablename")
+          };
+        CRM.api3('contact', 'getquick', params).done(function(result) {
+          var ret = [];
+          if (result.values) {
+            $.each(result.values, function(k, v) {
+              ret.push({value: v.id, label: v.data});
+            })
+          }
+          response(ret);
+        })
       },
-      tableName:function () {
-        return  $('input[name=quickSearchField]:checked').attr("data-tablename");
+      select: function (event, ui) {
+        document.location = CRM.url('civicrm/contact/view', {reset: 1, cid: ui.item.value});
+        return false;
+      },
+      create: function() {
+        // Place menu in front
+        $(this).crmAutocomplete('widget').css('z-index', $('#civicrm-menu').css('z-index'));
       }
-    }
-  }).result(function(event, data, formatted) {
-        document.location = CRM.url('civicrm/contact/view', {reset: 1, cid: data[1]});
+    })
+    .keydown(function() {
+      $.Menu.closeAll();
+    });
+  $('.crm-hidemenu').click(function() {
+    $.Menu.closeAll();
+    $('#civicrm-menu').slideUp();
+    var alert = CRM.alert({/literal}'<a href="#" id="crm-restore-menu">{ts escape='js'}Restore Menu{/ts}</a>', "{ts escape='js'}CiviCRM Menu Hidden{/ts}"{literal});
+    $('#crm-notification-container')
+      .off('.hideMenu')
+      .on('click.hideMenu', '#crm-restore-menu', function() {
+        alert.close();
+        $('#civicrm-menu').slideDown();
         return false;
       });
-  $('#sort_name_navigation').keydown(function() {
-    $.Menu.closeAll();
+    return false;
   });
   $('.crm-quickSearchField').click(function() {
     var label = $(this).text();
@@ -118,30 +140,17 @@ $('#civicrm-menu').ready(function() {
     if (value === 'first_name' || value === 'last_name') {
       value = 'sort_name';
     }
-    $('#sort_name_navigation').attr({name: value, placeholder: label}).flushCache().focus();
+    $('#sort_name_navigation').attr({name: value, placeholder: label}).focus();
   });
-  // check if there is only one contact and redirect to view page
+  // redirect to view page if there is only one contact
   $('#id_search_block').on('submit', function() {
-    var contactId, sortValue = $('#sort_name_navigation').val();
-    if (sortValue && $('#sort_name_navigation').attr('name') == 'sort_name') {
-      {/literal}{*
-      // FIXME: async:false == bad,
-      // we should just check the autocomplete results instead of firing a new request
-      // when we fix this, the civicrm/ajax/contact server-side callback can be removed as well
-      // also that would fix the fact that this only works with sort_name search
-      // (and we can remove the above conditional)
-      *}{literal}
-      var dataUrl = {/literal}"{crmURL p='civicrm/ajax/contact' h=0 q='name='}"{literal} + sortValue;
-      contactId = $.ajax({
-        url: dataUrl,
-        async: false
-      }).responseText;
-    }
-    if (contactId && !isNaN(parseInt(contactId))) {
-      var url = {/literal}"{crmURL p='civicrm/contact/view' h=0 q='reset=1&cid='}"{literal} + contactId;
-      this.action = url;
+    var $menu = $('#sort_name_navigation').crmAutocomplete('widget');
+    if ($('li.ui-menu-item', $menu).length === 1) {
+      var cid = $('li.ui-menu-item', $menu).data('ui-autocomplete-item').value;
+      document.location = CRM.url('civicrm/contact/view', {reset: 1, cid: cid});
+      return false;
     }
   });
 });
-$('#civicrm-menu').menu({arrowSrc: CRM.config.resourceBase + 'packages/jquery/css/images/arrow.png'});
+$('#civicrm-menu').menuBar({arrowSrc: CRM.config.resourceBase + 'packages/jquery/css/images/arrow.png'});
 })(cj);{/literal}

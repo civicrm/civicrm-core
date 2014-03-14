@@ -73,19 +73,13 @@ class CRM_Admin_Page_ContactType extends CRM_Core_Page_Basic {
         CRM_Core_Action::DISABLE =>
         array(
           'name' => ts('Disable'),
-          'extra' => 'onclick = "enableDisable( %%id%%,\'' .
-          'CRM_Contact_BAO_ContactType' . '\',\'' . 'enable-disable' .
-          '\' );"',
-          'ref' => 'disable-action',
+          'ref' => 'crm-enable-disable',
           'title' => ts('Disable Contact Type'),
         ),
         CRM_Core_Action::ENABLE =>
         array(
           'name' => ts('Enable'),
-          'extra' => 'onclick = "enableDisable( %%id%%,\'' .
-          'CRM_Contact_BAO_ContactType' . '\',\'' . 'disable-enable' .
-          '\' );"',
-          'ref' => 'enable-action',
+          'ref' => 'crm-enable-disable',
           'title' => ts('Enable Contact Type'),
         ),
         CRM_Core_Action::DELETE =>
@@ -111,15 +105,16 @@ class CRM_Admin_Page_ContactType extends CRM_Core_Page_Basic {
   }
 
   function browse() {
+    CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'js/crm.livePage.js');
     $rows = CRM_Contact_BAO_ContactType::contactTypeInfo(TRUE);
     foreach ($rows as $key => $value) {
       $mask = NULL;
-      if (CRM_Utils_Array::value('is_reserved', $value)) {
+      if (!empty($value['is_reserved'])) {
         $mask = CRM_Core_Action::UPDATE;
       }
       else {
         $mask -= CRM_Core_Action::DELETE - 2;
-        if (CRM_Utils_Array::value('is_active', $value)) {
+        if (!empty($value['is_active'])) {
           $mask -= CRM_Core_Action::ENABLE;
         }
         else {

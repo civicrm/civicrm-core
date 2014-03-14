@@ -73,7 +73,7 @@ class CRM_Case_Form_Task_Restore extends CRM_Case_Form_Task {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   public function postProcess() {
     $restoredCases = 0;

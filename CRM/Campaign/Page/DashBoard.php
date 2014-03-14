@@ -67,14 +67,12 @@ class CRM_Campaign_Page_DashBoard extends CRM_Core_Page {
         CRM_Core_Action::DISABLE => array(
           'name' => ts('Disable'),
           'title' => ts('Disable Campaign'),
-          'extra' => 'onclick = "enableDisable( %%id%%,\'' . 'CRM_Campaign_BAO_Campaign' . '\',\'' . 'enable-disable' . '\',\'' . NULL . '\',\'' . 'campaign_row' . '\' );"',
-          'ref' => 'disable-action',
+          'ref' => 'crm-enable-disable',
         ),
         CRM_Core_Action::ENABLE => array(
           'name' => ts('Enable'),
           'title' => ts('Enable Campaign'),
-          'extra' => 'onclick = "enableDisable( %%id%%,\'' . 'CRM_Campaign_BAO_Campaign' . '\',\'' . 'disable-enable' . '\',\'' . NULL . '\',\'' . 'campaign_row' . '\' );"',
-          'ref' => 'enable-action',
+          'ref' => 'crm-enable-disable',
         ),
         CRM_Core_Action::DELETE => array(
           'name' => ts('Delete'),
@@ -100,14 +98,12 @@ class CRM_Campaign_Page_DashBoard extends CRM_Core_Page {
         ),
         CRM_Core_Action::DISABLE => array(
           'name' => ts('Disable'),
-          'extra' => 'onclick = "enableDisable( %%id%%,\'' . 'CRM_Campaign_BAO_Survey' . '\',\'' . 'enable-disable' . '\',\'' . NULL . '\',\'' . 'survey_row' . '\' );"',
-          'ref' => 'disable-action',
+          'ref' => 'crm-enable-disable',
           'title' => ts('Disable Survey'),
         ),
         CRM_Core_Action::ENABLE => array(
           'name' => ts('Enable'),
-          'extra' => 'onclick = "enableDisable( %%id%%,\'' . 'CRM_Campaign_BAO_Survey' . '\',\'' . 'disable-enable' . '\',\'' . NULL . '\',\'' . 'survey_row' . '\' );"',
-          'ref' => 'enable-action',
+          'ref' => 'crm-enable-disable',
           'title' => ts('Enable Survey'),
         ),
         CRM_Core_Action::DELETE => array(
@@ -133,14 +129,12 @@ class CRM_Campaign_Page_DashBoard extends CRM_Core_Page {
       );
       self::$_petitionActionLinks[CRM_Core_Action::DISABLE] = array(
         'name' => ts('Disable'),
-        'extra' => 'onclick = "enableDisable( %%id%%,\'' . 'CRM_Campaign_BAO_Survey' . '\',\'' . 'enable-disable' . '\',\'' . NULL . '\',\'' . 'petition_row' . '\' );"',
-        'ref' => 'disable-action',
+        'ref' => 'crm-enable-disable',
         'title' => ts('Disable Petition'),
       );
       self::$_petitionActionLinks[CRM_Core_Action::ENABLE] = array(
         'name' => ts('Enable'),
-        'extra' => 'onclick = "enableDisable( %%id%%,\'' . 'CRM_Campaign_BAO_Survey' . '\',\'' . 'disable-enable' . '\',\'' . NULL . '\',\'' . 'petition_row' . '\' );"',
-        'ref' => 'enable-action',
+        'ref' => 'crm-enable-disable',
         'title' => ts('Enable Petition'),
       );
       self::$_petitionActionLinks[CRM_Core_Action::DELETE] = array(
@@ -229,12 +223,12 @@ class CRM_Campaign_Page_DashBoard extends CRM_Core_Page {
         }
         $campaignsData[$cmpid]['isActive'] = $isActive;
 
-        if (CRM_Utils_Array::value('start_date', $campaignsData[$cmpid])) {
+        if (!empty($campaignsData[$cmpid]['start_date'])) {
           $campaignsData[$cmpid]['start_date'] = CRM_Utils_Date::customFormat($campaignsData[$cmpid]['start_date'],
             $config->dateformatFull
           );
         }
-        if (CRM_Utils_Array::value('end_date', $campaignsData[$cmpid])) {
+        if (!empty($campaignsData[$cmpid]['end_date'])) {
           $campaignsData[$cmpid]['end_date'] = CRM_Utils_Date::customFormat($campaignsData[$cmpid]['end_date'],
             $config->dateformatFull
           );
@@ -293,7 +287,7 @@ class CRM_Campaign_Page_DashBoard extends CRM_Core_Page {
         $campaignId = CRM_Utils_Array::value('campaign_id', $survey);
         $surveysData[$sid]['campaign'] = CRM_Utils_Array::value($campaignId, $campaigns);
         $surveysData[$sid]['activity_type'] = $surveyType[$survey['activity_type_id']];
-        if (CRM_Utils_Array::value('release_frequency', $survey)) {
+        if (!empty($survey['release_frequency'])) {
           $surveysData[$sid]['release_frequency'] = $survey['release_frequency'] . ' Day(s)';
         }
 
@@ -426,30 +420,30 @@ class CRM_Campaign_Page_DashBoard extends CRM_Core_Page {
   }
 
   function browse() {
-    $this->_tabs = array('campaign' => ts('Campaigns'),
+    $this->_tabs = array(
+      'campaign' => ts('Campaigns'),
       'survey' => ts('Surveys'),
       'petition' => ts('Petitions'),
     );
 
     $subPageType = CRM_Utils_Request::retrieve('type', 'String', $this);
     if ($subPageType) {
+      if (!isset($this->_tabs[$subPageType])) {
+        CRM_Utils_System::permissionDenied();
+      }
       //load the data in tabs.
       $this->{'browse' . ucfirst($subPageType)}();
+      $this->assign('subPageType', ucfirst($subPageType));
     }
     else {
       //build the tabs.
       $this->buildTabs();
     }
-    $this->assign('subPageType', $subPageType);
-
-    //give focus to proper tab.
-    $selectedTabIndex = array_search(strtolower(CRM_Utils_Array::value('subPage', $_GET, 'campaign')),
-      array_keys($this->_tabs)
-    );
-    if (!$selectedTabIndex) {
-      $selectedTabIndex = array_search('campaign', array_keys($this->_tabs));
-    }
-    $this->assign('selectedTabIndex', $selectedTabIndex);
+    CRM_Core_Resources::singleton()
+      ->addScriptFile('civicrm', 'templates/CRM/common/TabHeader.js')
+      ->addSetting(array('tabSettings' => array(
+        'active' => strtolower(CRM_Utils_Array::value('subPage', $_GET, 'campaign')),
+      )));
   }
 
   function run() {
@@ -465,14 +459,14 @@ class CRM_Campaign_Page_DashBoard extends CRM_Core_Page {
   function buildTabs() {
     $allTabs = array();
     foreach ($this->_tabs as $name => $title) {
-      $allTabs[] = array(
-        'id' => $name,
+      $allTabs[$name] = array(
         'title' => $title,
-        'url' => CRM_Utils_System::url('civicrm/campaign', "reset=1&type=$name&snippet=1"),
+        'valid' => TRUE,
+        'active' => TRUE,
+        'link' => CRM_Utils_System::url('civicrm/campaign', "reset=1&type=$name"),
       );
     }
-
-    $this->assign('allTabs', $allTabs);
+    $this->assign('tabHeader', $allTabs);
   }
 }
 

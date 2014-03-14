@@ -34,14 +34,13 @@ cj( function($) {
       cj(this).parent().parent().hide();
     }
   });
-  if (!cj('#override_verp').attr('checked')){
+  if (!cj('#override_verp').prop('checked')){
     cj('.crm-mailing-settings-form-block-forward_replies,.crm-mailing-settings-form-block-auto_responder').hide();
   }
   cj('#override_verp').click(function(){
       cj('.crm-mailing-settings-form-block-forward_replies,.crm-mailing-settings-form-block-auto_responder').toggle();
-       if (!cj('#override_verp').attr('checked')) {
-             cj('#forward_replies').attr('checked',false);
-             cj('#auto_responder').attr('checked',false);
+       if (!cj('#override_verp').prop('checked')) {
+             cj('#forward_replies, #auto_responder').prop('checked', false);
            }
     });
 

@@ -103,7 +103,7 @@ else {
 
   // check if the script is being used for civimail processing or email to
   // activity processing.
-  $isCiviMail = CRM_Utils_Array::value('emailtoactivity', $_REQUEST) ? FALSE : TRUE;
+  $isCiviMail = !empty($_REQUEST['emailtoactivity']) ? FALSE : TRUE;
   CRM_Utils_Mail_EmailProcessor::process($isCiviMail);
 
   $lock->release();

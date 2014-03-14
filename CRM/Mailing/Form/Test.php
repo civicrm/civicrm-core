@@ -61,7 +61,7 @@ class CRM_Mailing_Form_Test extends CRM_Core_Form {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   function setDefaultValues() {
     $count = $this->get('count');
@@ -202,7 +202,7 @@ class CRM_Mailing_Form_Test extends CRM_Core_Form {
       $urlString = 'civicrm/contact/' . $fragment;
     }
     $emails = NULL;
-    if (CRM_Utils_Array::value('sendtest', $testParams)) {
+    if (!empty($testParams['sendtest'])) {
       if (!($testParams['test_group'] || $testParams['test_email'])) {
         CRM_Core_Session::setStatus(ts('You did not provide an email address or select a group.'), ts('Test not sent.'), 'error');
         $error = TRUE;
@@ -228,7 +228,7 @@ class CRM_Mailing_Form_Test extends CRM_Core_Form {
       }
     }
 
-    if (CRM_Utils_Array::value('_qf_Test_submit', $testParams)) {
+    if (!empty($testParams['_qf_Test_submit'])) {
       //when user perform mailing from search context
       //redirect it to search result CRM-3711.
       if ($ssID && $self->_searchBasedMailing) {
@@ -260,7 +260,7 @@ class CRM_Mailing_Form_Test extends CRM_Core_Form {
       }
     }
 
-    if (CRM_Utils_Array::value('_qf_Test_next', $testParams) &&
+    if (!empty($testParams['_qf_Test_next']) &&
       $self->get('count') <= 0) {
       return array(
         '_qf_default' =>
@@ -268,10 +268,7 @@ class CRM_Mailing_Form_Test extends CRM_Core_Form {
       );
     }
 
-    if (CRM_Utils_Array::value('_qf_Import_refresh', $_POST) ||
-      CRM_Utils_Array::value('_qf_Test_next', $testParams) ||
-      !CRM_Utils_Array::value('sendtest', $testParams)
-    ) {
+    if (!empty($_POST['_qf_Import_refresh']) || !empty($testParams['_qf_Test_next']) || empty($testParams['sendtest'])) {
       $error = TRUE;
       return $error;
     }
@@ -345,7 +342,7 @@ ORDER BY   e.is_bulkmail DESC, e.is_primary DESC
       $isComplete = CRM_Mailing_BAO_MailingJob::runJobs($testParams);
     }
 
-    if (CRM_Utils_Array::value('sendtest', $testParams)) {
+    if (!empty($testParams['sendtest'])) {
       $status = NULL;
       if (CRM_Mailing_Info::workflowEnabled()) {
         if ((

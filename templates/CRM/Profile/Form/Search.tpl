@@ -87,9 +87,6 @@
                 {/foreach}
               </tr>
               </table>
-              {if $field.html_type eq 'Radio' and $form.formName eq 'Search'}
-                <span class="crm-clear-link">(<a href="#" title="unselect" onclick="unselectRadio('{$n}', '{$form.formName}'); return false;">{ts}clear{/ts}</a>)</span>
-              {/if}
             {/strip}
           </td>
         </tr>
@@ -122,13 +119,9 @@
               {else}
                 {$form.$n.html}
               {/if}
-              {if ($n eq 'gender') or ($field.html_type eq 'Radio' and $form.formName eq 'Search')}
-                <span class="crm-clear-link">(<a href="#" title="unselect" onclick="unselectRadio('{$n}', '{$form.formName}'); return false;">{ts}clear{/ts}</a>)</span>
-              {elseif $field.html_type eq 'Autocomplete-Select'}
+              {if $field.html_type eq 'Autocomplete-Select'}
                 {if $field.data_type eq 'ContactReference'}
                   {include file="CRM/Custom/Form/ContactReference.tpl" element_name = $n}
-                {else}
-                  {include file="CRM/Custom/Form/AutoComplete.tpl" element_name = $n}
                 {/if}
               {/if}
             </td>

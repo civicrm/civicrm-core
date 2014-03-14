@@ -46,7 +46,7 @@ class CRM_Upgrade_Incremental_php_ThreeFour {
       $formValues = unserialize($instances->form_values);
 
       // replace display_name fields by sort_name
-      if (CRM_Utils_Array::value('fields', $formValues) && isset($formValues['fields']['display_name'])) {
+      if (!empty($formValues['fields']) && isset($formValues['fields']['display_name'])) {
         $formValues['fields']['sort_name'] = $formValues['fields']['display_name'];
         unset($formValues['fields']['display_name']);
       }

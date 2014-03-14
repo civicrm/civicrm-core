@@ -232,9 +232,7 @@ class CRM_Report_Form_Member_Lapse extends CRM_Report_Form {
     foreach ($this->_columns as $tableName => $table) {
       if (array_key_exists('fields', $table)) {
         foreach ($table['fields'] as $fieldName => $field) {
-          if (CRM_Utils_Array::value('required', $field) ||
-            CRM_Utils_Array::value($fieldName, $this->_params['fields'])
-          ) {
+          if (!empty($field['required']) || !empty($this->_params['fields'][$fieldName])) {
             // to include optional columns address ,email and phone only if checked
             if ($tableName == 'civicrm_address') {
               $this->_addressField = TRUE;
@@ -395,7 +393,7 @@ class CRM_Report_Form_Member_Lapse extends CRM_Report_Form {
 
         $repeatFound = FALSE;
         foreach ($row as $colName => $colVal) {
-          if (CRM_Utils_Array::value($colName, $checkList) &&
+          if (!empty($checkList[$colName]) &&
             is_array($checkList[$colName]) &&
             in_array($colVal, $checkList[$colName])
           ) {

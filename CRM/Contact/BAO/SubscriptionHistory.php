@@ -63,7 +63,7 @@ class CRM_Contact_BAO_SubscriptionHistory extends CRM_Contact_DAO_SubscriptionHi
    *
    * @param int $id       The contact id
    *
-   * @return none
+   * @return void
    * @access public
    * @static
    */

@@ -198,11 +198,9 @@ class CRM_Report_Form_Contribute_TopDonor extends CRM_Report_Form {
     foreach ($this->_columns as $tableName => $table) {
       if (array_key_exists('fields', $table)) {
         foreach ($table['fields'] as $fieldName => $field) {
-          if (CRM_Utils_Array::value('required', $field) ||
-            CRM_Utils_Array::value($fieldName, $this->_params['fields'])
-          ) {
+          if (!empty($field['required']) || !empty($this->_params['fields'][$fieldName])) {
             // only include statistics columns if set
-            if (CRM_Utils_Array::value('statistics', $field)) {
+            if (!empty($field['statistics'])) {
               foreach ($field['statistics'] as $stat => $label) {
                 switch (strtolower($stat)) {
                   case 'sum':
@@ -238,7 +236,7 @@ class CRM_Report_Form_Contribute_TopDonor extends CRM_Report_Form {
         }
       }
     }
-    
+
     $this->_select = " SELECT * FROM ( SELECT " . implode(', ', $select) . " ";
   }
 
@@ -262,21 +260,21 @@ class CRM_Report_Form_Contribute_TopDonor extends CRM_Report_Form {
   function from() {
     $this->_from = "
         FROM civicrm_contact {$this->_aliases['civicrm_contact']} {$this->_aclFrom}
-	       	 INNER JOIN civicrm_contribution {$this->_aliases['civicrm_contribution']}
-		             ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_contribution']}.contact_id AND {$this->_aliases['civicrm_contribution']}.is_test = 0
+            INNER JOIN civicrm_contribution {$this->_aliases['civicrm_contribution']}
+                ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_contribution']}.contact_id AND {$this->_aliases['civicrm_contribution']}.is_test = 0
              LEFT  JOIN civicrm_email  {$this->_aliases['civicrm_email']}
                          ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_email']}.contact_id
                          AND {$this->_aliases['civicrm_email']}.is_primary = 1
              LEFT  JOIN civicrm_phone  {$this->_aliases['civicrm_phone']}
                          ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_phone']}.contact_id AND
                             {$this->_aliases['civicrm_phone']}.is_primary = 1
-	";
+  ";
     $this->addAddressFromClause();
   }
 
   function where() {
     $clauses = array();
-    $this->_tempClause = $this->_outerCluase = '';
+    $this->_tempClause = $this->_outerCluase = $this->_groupLimit = '';
     foreach ($this->_columns as $tableName => $table) {
       if (array_key_exists('filters', $table)) {
         foreach ($table['filters'] as $fieldName => $field) {
@@ -306,6 +304,7 @@ class CRM_Report_Form_Contribute_TopDonor extends CRM_Report_Form {
             if ($fieldName == 'total_range') {
               $value = CRM_Utils_Array::value("total_range_value", $this->_params);
               $this->_outerCluase = " WHERE (( @rows := @rows + 1) <= {$value}) ";
+              $this->_groupLimit = " LIMIT {$value}";
             }
             else {
               $clauses[] = $clause;
@@ -381,7 +380,7 @@ class CRM_Report_Form_Contribute_TopDonor extends CRM_Report_Form {
       $sql = "
 {$this->_select} {$this->_from}  {$this->_where} {$this->_groupBy}
 ORDER BY civicrm_contribution_total_amount_sum DESC
-) as abc {$this->_outerCluase}";
+) as abc {$this->_groupLimit}";
       $dao = CRM_Core_DAO::executeQuery($sql);
 
       $contact_ids = array();
@@ -434,9 +433,7 @@ ORDER BY civicrm_contribution_total_amount_sum DESC
         $rows[$rowNum]['civicrm_donor_rank'] = $rank++;
         // convert display name to links
         if (array_key_exists('civicrm_contact_display_name', $row) &&
-          array_key_exists('civicrm_contact_id', $row) &&
-            CRM_Utils_Array::value('civicrm_contribution_currency', $row)
-        ) {
+          array_key_exists('civicrm_contact_id', $row) && !empty($row['civicrm_contribution_currency'])) {
           $url = CRM_Report_Utils_Report::getNextUrl('contribute/detail',
             'reset=1&force=1&id_op=eq&id_value=' . $row['civicrm_contact_id'] . "&currency_value=" . $row['civicrm_contribution_currency'],
             $this->_absoluteUrl, $this->_id, $this->_drilldownReport

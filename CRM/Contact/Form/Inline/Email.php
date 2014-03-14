@@ -108,13 +108,13 @@ class CRM_Contact_Form_Inline_Email extends CRM_Contact_Form_Inline {
    */
   static function formRule($fields, $errors) {
     $hasData = $hasPrimary = $errors = array();
-    if (CRM_Utils_Array::value('email', $fields) && is_array($fields['email'])) {
+    if (!empty($fields['email']) && is_array($fields['email'])) {
       foreach ($fields['email'] as $instance => $blockValues) {
         $dataExists = CRM_Contact_Form_Contact::blockDataExists($blockValues);
 
         if ($dataExists) {
           $hasData[] = $instance;
-          if (CRM_Utils_Array::value('is_primary', $blockValues)) {
+          if (!empty($blockValues['is_primary'])) {
             $hasPrimary[] = $instance;
             }
           }

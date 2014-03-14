@@ -40,7 +40,7 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
   protected $hookClass = NULL;
   public $DBResetRequired = FALSE;
 
-  public $_eNoticeCompliant = TRUE;
+
 
   protected $_entity;
 

@@ -39,7 +39,7 @@
 /**
  * Get CiviCRM Action Schedule details
  * {@getfields action_schedule_create}
- * 
+ *
  */
 function civicrm_api3_action_schedule_get($params) {
   $bao = new CRM_Core_BAO_ActionSchedule();
@@ -56,11 +56,11 @@ function civicrm_api3_action_schedule_get($params) {
  * @param array $params
  *
  * @return array
- * 
+ *
  * {@getfields action_schedule_create}
  */
 function civicrm_api3_action_schedule_create($params) {
-  if (!CRM_Utils_Array::value('id', $params)) {
+  if (empty($params['id'])) {
     // an update does not require any mandatory parameters
     civicrm_api3_verify_one_mandatory($params,
       NULL,
@@ -69,23 +69,23 @@ function civicrm_api3_action_schedule_create($params) {
       )
     );
   }
-  
+
   $ids = array();
   if (isset($params['id']) && !CRM_Utils_Rule::integer($params['id'])) {
     return civicrm_api3_create_error('Invalid value for ID');
   }
-  
+
   if (!array_key_exists('name', $params) && !array_key_exists('id', $params)) {
-  	$params['name'] = CRM_Utils_String::munge($params['title']);
-  }  	
-  
+    $params['name'] = CRM_Utils_String::munge($params['title']);
+  }
+
   $actionSchedule = new CRM_Core_BAO_ActionSchedule();
   $actionSchedule = CRM_Core_BAO_ActionSchedule::add($params, $ids);
-	
+
   $actSchedule = array();
-	
+
   _civicrm_api3_object_to_array($actionSchedule, $actSchedule[$actionSchedule->id]);
-	
+
   return civicrm_api3_create_success($actSchedule, $params, 'action_schedule', 'create', $actionSchedule);
 }
 

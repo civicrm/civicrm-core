@@ -75,7 +75,7 @@ class CRM_Financial_Form_BatchTransaction extends CRM_Contribute_Form {
   /**
    * Function to build the form
    *
-   * @return None
+   * @return void
    * @access public
    */
   public function buildQuickForm() {
@@ -106,14 +106,14 @@ class CRM_Financial_Form_BatchTransaction extends CRM_Contribute_Form {
     // multiselect for groups
     if ($this->_group) {
       $this->add('select', 'group', ts('Groups'), $this->_group, FALSE,
-        array('id' => 'group', 'multiple' => 'multiple', 'title' => ts('- select -'))
+        array('id' => 'group', 'multiple' => 'multiple', 'class' => 'crm-select2')
       );
     }
     $contactTags = CRM_Core_BAO_Tag::getTags();
 
     if ($contactTags) {
       $this->add('select', 'contact_tags', ts('Tags'), $contactTags, FALSE,
-        array('id' => 'contact_tags', 'multiple' => 'multiple', 'title' => ts('- select -'))
+        array('id' => 'contact_tags', 'multiple' => 'multiple', 'class' => 'crm-select2')
       );
     }
     CRM_Contribute_BAO_Query::buildSearchForm($this);

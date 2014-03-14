@@ -123,7 +123,7 @@ class CRM_Financial_Form_FinancialTypeAccount extends CRM_Contribute_Form {
   /**
    * Function to build the form
    *
-   * @return None
+   * @return void
    * @access public
    */
   public function buildQuickForm() {
@@ -177,7 +177,7 @@ class CRM_Financial_Form_FinancialTypeAccount extends CRM_Contribute_Form {
     }
 
     if ($this->_action == CRM_Core_Action::ADD) {
-      if (CRM_Utils_Array::value('account_relationship', $this->_submitValues) || CRM_Utils_Array::value('financial_account_id', $this->_submitValues)) {
+      if (!empty($this->_submitValues['account_relationship']) || !empty($this->_submitValues['financial_account_id'])) {
         $financialAccountType = array(
            '5' => 5, //expense
            '3' => 1, //AR relation
@@ -272,7 +272,7 @@ class CRM_Financial_Form_FinancialTypeAccount extends CRM_Contribute_Form {
     if (CRM_Utils_Array::value('financial_account_id', $values) == 'select') {
       $errorMsg['financial_account_id'] = 'Financial Account is a required field.';
     }
-    if (CRM_Utils_Array::value('account_relationship', $values) && CRM_Utils_Array::value('financial_account_id', $values)) {
+    if (!empty($values['account_relationship']) && !empty($values['financial_account_id'])) {
       $params = array(
         'account_relationship' => $values['account_relationship'],
         'entity_id'            => $self->_aid
@@ -308,7 +308,7 @@ class CRM_Financial_Form_FinancialTypeAccount extends CRM_Contribute_Form {
    * Function to process the form
    *
    * @access public
-   * @return None
+   * @return void
    */
   public function postProcess() {
     if ($this->_action & CRM_Core_Action::DELETE) {

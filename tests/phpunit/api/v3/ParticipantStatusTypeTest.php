@@ -31,7 +31,7 @@ class api_v3_ParticipantStatusTypeTest extends CiviUnitTestCase {
   protected $_apiversion;
   protected $params;
   protected $id;
-  public $_eNoticeCompliant = TRUE;
+
 
   public $DBResetRequired = FALSE;
 

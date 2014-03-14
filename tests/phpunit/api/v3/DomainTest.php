@@ -44,7 +44,7 @@ class api_v3_DomainTest extends CiviUnitTestCase {
 
   protected $_apiversion = 3;
   protected $params;
-  public $_eNoticeCompliant = TRUE;
+
 
   /**
    *  Constructor

@@ -336,9 +336,7 @@ class CRM_Core_Permission {
     if (!empty($permissionedEvents)) {
       return array_search($eventID, $permissionedEvents) === FALSE ? NULL : $eventID;
     }
-    else {
-      return $eventID;
-    }
+    return NULL;
   }
 
   static function eventClause($type = CRM_Core_Permission::VIEW, $prefix = NULL) {
@@ -552,6 +550,7 @@ class CRM_Core_Permission {
       'delete all manual batches' => $prefix . ts('delete all manual batches'),
       'export own manual batches' => $prefix . ts('export own manual batches'),
       'export all manual batches' => $prefix . ts('export all manual batches'),
+      'administer payment processors' => $prefix . ts('administer payment processors'),
     );
 
     return $permissions;

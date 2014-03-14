@@ -101,7 +101,7 @@ class CRM_Financial_BAO_FinancialAccount extends CRM_Financial_DAO_FinancialAcco
     $params['is_tax'] = CRM_Utils_Array::value('is_tax', $params, FALSE);
     $params['is_header_account'] = CRM_Utils_Array::value('is_header_account', $params, FALSE);
     $params['is_default'] = CRM_Utils_Array::value('is_default', $params, FALSE);
-    if (CRM_Utils_Array::value('is_default', $params)) {
+    if (!empty($params['is_default'])) {
       $query = 'UPDATE civicrm_financial_account SET is_default = 0 WHERE financial_account_type_id = %1';
       $queryParams = array(1 => array($params['financial_account_type_id'], 'Integer'));
       CRM_Core_DAO::executeQuery($query, $queryParams);

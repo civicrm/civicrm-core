@@ -60,7 +60,8 @@
   {include file="CRM/common/pager.tpl" location="top"}
   {include file="CRM/common/pagerAToZ.tpl"}
   {* handle enable/disable actions*}
-  {include file="CRM/common/enableDisable.tpl"}
+  {include file="CRM/common/enableDisableApi.tpl"}
+  {include file="CRM/common/crmeditable.tpl"}
   {include file="CRM/common/jsortable.tpl"}
     <table id="options" class="display">
       <thead>
@@ -83,7 +84,7 @@
       </thead>
       {foreach from=$rows key=keys item=row}
         {if $keys neq 'tab'}
-          <tr id="row_{$row.id}" class="{if NOT $row.is_active} disabled{/if}">
+          <tr id="event-{$row.id}" class="crm-entity {if NOT $row.is_active} disabled{/if}">
           <td class="crm-event_{$row.id}">
             <a href="{crmURL p='civicrm/event/info' q="id=`$row.id`&reset=1"}"
                title="{ts}View event info page{/ts}" class="bold">{$row.title}</a>&nbsp;&nbsp;({ts}ID:{/ts} {$row.id})

@@ -151,7 +151,7 @@ class CRM_Utils_Sort {
    * @access public
    */
   function orderBy() {
-    if (!CRM_Utils_Array::value($this->_currentSortID, $this->_vars)) {
+    if (empty($this->_vars[$this->_currentSortID])) {
       return '';
     }
 

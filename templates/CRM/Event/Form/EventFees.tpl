@@ -35,8 +35,14 @@
       {if $action eq 2 and $hasPayment} {* Updating *}
             {if $lineItem}
                 <tr class="crm-event-eventfees-form-block-line_items">
-                    <td class="label">{ts}Event Fees{/ts}</td>
+                    <td class="label">{ts}Selections{/ts}</td>
                     <td>{include file="CRM/Price/Page/LineItem.tpl" context="Event"}</td>
+                </tr>
+                <tr>
+                  <td></td>
+                  <td>
+                    <a class="button" href='{crmURL p="civicrm/event/participant/feeselection" q="reset=1&id=`$participantId`&cid=`$contactId`&action=update"}' title="{ts}Change Selections{/ts}"><span><div class="icon edit-icon"></div> {ts}Change Selections{/ts}</span></a>
+                  </td>
                 </tr>
             {else}
                 <tr class="crm-event-eventfees-form-block-event_level">
@@ -245,7 +251,7 @@ function checkEmail( ) {
        cj("#contribution_status_id").val( cStatusId );
 
        //unset value for send receipt check box.
-       cj("#send_receipt").attr( "checked", false );
+       cj("#send_receipt").prop("checked", false );
        cj("#send_confirmation_receipt").hide( );
 
        // set receive data to null.

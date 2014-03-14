@@ -153,7 +153,7 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
     );
 
     $query = '
-    SELECT ccs.id, pcp_id, pcp_display_in_roll, pcp_roll_nickname, pcp_personal_note, amount, contact_id, c.display_name, ccs.soft_credit_type_id
+    SELECT ccs.id, pcp_id, pcp_display_in_roll, pcp_roll_nickname, pcp_personal_note, currency, amount, contact_id, c.display_name, ccs.soft_credit_type_id
     FROM civicrm_contribution_soft ccs INNER JOIN civicrm_contact c on c.id = ccs.contact_id
     WHERE contribution_id = %1;
     ';
@@ -174,6 +174,7 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
       $softContribution['soft_credit'][$count] = array(
         'contact_id' => $dao->contact_id,
         'soft_credit_id' => $dao->id,
+        'currency' => $dao->currency,
         'amount' => $dao->amount,
         'contact_name' => $dao->display_name,
         'soft_credit_type' => $dao->soft_credit_type_id,
@@ -296,6 +297,73 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
       }
     }
     return $result;
+  }
+
+  /*
+   *  Function to assign honor profile fields to template/form, if $honorId (as soft-credit's contact_id)
+   *  is passed  then  whole honoreeprofile fields with title/value assoc array assigned or only honoreeName
+   *  is assigned
+   *
+   *  @static
+   */
+
+  static function formatHonoreeProfileFields($form, $params, $honoreeprofileId, $honorId = NULL) {
+    $profileContactType = CRM_Core_BAO_UFGroup::getContactType($honoreeprofileId);
+    $profileFields = CRM_Core_BAO_UFGroup::getFields($honoreeprofileId);
+    $honoreeProfileFields = $values = array();
+    $honorName = NULL;
+
+    if ($honorId) {
+      CRM_Core_BAO_UFGroup::getValues($honorId, $profileFields, $values, FALSE, $params);
+      if (empty($params)) {
+        foreach ($profileFields as $name => $field) {
+          $title = $field['title'];
+          $params[$field['name']] = $values[$title];
+        }
+      }
+    }
+
+    //remove name related fields and construct name string with prefix/suffix
+    //which will be later assigned to template
+    switch ($profileContactType) {
+      case 'Individual':
+        if (array_key_exists('prefix_id', $params)) {
+          $honorName = CRM_Utils_Array::value(CRM_Utils_Array::value('prefix_id', $params),
+            CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'prefix_id')
+          );
+          unset($profileFields['prefix_id']);
+        }
+          $honorName .= ' ' . $params['first_name'] . ' ' . $params['last_name'];
+          unset($profileFields['first_name']);
+          unset($profileFields['last_name']);
+          if (array_key_exists('suffix_id', $params)) {
+            $honorName .= ' ' . CRM_Utils_Array::value(CRM_Utils_Array::value('suffix_id', $params),
+              CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'suffix_id')
+            );
+            unset($profileFields['suffix_id']);
+          }
+          break;
+        case 'Organization':
+          $honorName = $params['organization_name'];
+          unset($profileFields['organization_name']);
+          break;
+        case 'Household':
+          $honorName = $params['household_name'];
+          unset($profileFields['household_name']);
+          break;
+    }
+
+    if ($honorId) {
+      $honoreeProfileFields['Name'] = $honorName;
+      foreach ($profileFields as $name => $field) {
+        $title = $field['title'];
+        $honoreeProfileFields[$title] = $values[$title];
+      }
+      $form->assign('honoreeProfile', $honoreeProfileFields);
+    }
+    else {
+      $form->assign('honorName', $honorName);
+    }
   }
 }
 

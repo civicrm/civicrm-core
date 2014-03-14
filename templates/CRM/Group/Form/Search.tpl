@@ -86,18 +86,28 @@
 </table>
 
 {* handle enable/disable actions*}
-{include file="CRM/common/enableDisable.tpl"}
+{include file="CRM/common/enableDisableApi.tpl"}
+{include file="CRM/common/crmeditable.tpl"}
 
 {literal}
 <script type="text/javascript">
-cj( function() {
+cj(function($) {
   // for CRM-11310 and CRM-10635 : processing just parent groups on initial display
   // passing '1' for parentsOnlyArg to show parent child heirarchy structure display
   // on initial load of manage group page and
   // also to handle search filtering for initial load of same page.
   buildGroupSelector(true, 1);
-  cj('#_qf_Search_refresh').click( function() {
+  $('#_qf_Search_refresh').click( function() {
     buildGroupSelector( true );
+  });
+  // Add livePage functionality
+  $('#crm-container').on('click', 'a.button, a.action-item[href*="action=update"], a.action-item[href*="action=delete"]', function() {
+    CRM.loadForm($(this).attr('href'))
+      .on('crmFormSuccess', function(e, data) {
+        // Refresh datatable when form completes
+        $('#crm-group-selector').dataTable().fnDraw();
+      });
+    return false;
   });
 });
 
@@ -161,7 +171,17 @@ function buildGroupSelector( filterSearch, parentsOnlyArg ) {
                             "sLast":     {/literal}"{ts escape='js'}Last{/ts}"{literal}
                         }
                     },
-        "fnDrawCallback": function() { setSelectorClass( parentsOnly, showOrgInfo ); },
+        "fnRowCallback": function(nRow, aData, iDisplayIndex, iDisplayIndexFull) {
+          var id = cj('td:eq(1)', nRow).text();
+          cj(nRow).addClass('crm-entity').attr('data-entity', 'group').attr('data-id', id);
+          cj('td:eq(0)', nRow).wrapInner('<span class="crm-editable crmf-name" />');
+          cj('td:eq(3)', nRow).wrapInner('<span class="crm-editable crmf-description" data-type="textarea" />');
+          return nRow;
+        },
+        "fnDrawCallback": function() {
+          setSelectorClass( parentsOnly, showOrgInfo );
+          cj('.crm-editable').crmEditable();
+        },
         "fnServerData": function ( sSource, aoData, fnCallback ) {
             aoData.push( {name:'showOrgInfo', value: showOrgInfo },
                          {name:'parentsOnly', value: parentsOnly }
@@ -273,26 +293,27 @@ function showChildren( parent_id, showOrgInfo, group_id, levelClass) {
         "success": function(response){
           var appendHTML = '';
           cj.each( response, function( i, val ) {
-            appendHTML += '<tr id="row_'+ val.group_id +'_'+parent_id+'" class="parent_is_' + parent_id + ' crm-row-child ' + val.class + '">';
+            appendHTML += '<tr id="row_'+ val.group_id +'_'+parent_id+'" data-entity="group" data-id="'+ val.group_id +'" class="crm-entity parent_is_' + parent_id + ' crm-row-child ' + val.class + '">';
             if ( val.is_parent ) {
-              appendHTML += '<td class="crm-group-name ' + levelClass + '">' + '{/literal}<span class="collapsed show-children" title="{ts}show child groups{/ts}"/></span>{literal}' + val.group_name + '</td>';
+              appendHTML += '<td class="crm-group-name ' + levelClass + '">' + '{/literal}<span class="collapsed show-children" title="{ts}show child groups{/ts}"/></span>{literal}<span class="crm-editable crmf-name">' + val.group_name + '</span></td>';
             }
             else {
-              appendHTML += '<td class="crm-group-name ' + levelClass + '"><span class="crm-no-children"></span>' + val.group_name + '</td>';
+              appendHTML += '<td class="crm-group-name ' + levelClass + '"><span class="crm-no-children"></span><span class="crm-editable crmf-name">' + val.group_name + '</span></td>';
             }
             appendHTML += "<td>" + val.group_id + "</td>";
             appendHTML += "<td>" + val.created_by + "</td>";
-            if (val.group_description) {
-              appendHTML += "<td>" + val.group_description + "</td>";
-            } else {
-              appendHTML += "<td>&nbsp;</td>";
-            }
+            appendHTML += '<td><span class="crm-editable crmf-description" data-type="textarea">' + (val.group_description || '') + "</span></td>";
             appendHTML += "<td>" + val.group_type + "</td>";
             appendHTML += "<td>" + val.visibility + "</td>";
+						if (showOrgInfo) {
+							appendHTML += "<td>" + val.org_info + "</td>";
+						}
             appendHTML += "<td>" + val.links + "</td>";
             appendHTML += "</tr>";
           });
           cj( rowID ).after( appendHTML );
+          cj( rowID ).next().trigger('crmLoad');
+          cj('.crm-editable').crmEditable();
         }
     } );
   }

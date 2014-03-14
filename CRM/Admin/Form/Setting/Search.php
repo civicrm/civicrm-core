@@ -46,7 +46,7 @@ class CRM_Admin_Form_Setting_Search extends CRM_Admin_Form_Setting {
   /**
    * Function to build the form
    *
-   * @return None
+   * @return void
    * @access public
    */
   public function buildQuickForm() {
@@ -67,8 +67,7 @@ class CRM_Admin_Form_Setting_Search extends CRM_Admin_Form_Setting {
     $profiles = CRM_Core_BAO_UFGroup::getProfiles($types);
 
     $this->add('select', 'defaultSearchProfileID', ts('Default Contact Search Profile'),
-      array(
-        '' => ts('- select -')) + $profiles
+      array('' => ts('- none -')) + $profiles, FALSE, array('class' => 'crm-select2 huge')
     );
 
     // Autocomplete for Contact Search (quick search etc.)

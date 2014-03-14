@@ -78,7 +78,7 @@ class CRM_Activity_Form_ActivityView extends CRM_Core_Form {
     $this->assign('activityTypeName', $activityTypeName);
     $this->assign('activityTypeDescription', $activityTypeDescription);
 
-    if (CRM_Utils_Array::value('mailingId', $defaults)) {
+    if (!empty($defaults['mailingId'])) {
       $this->_mailing_id = CRM_Utils_Array::value('source_record_id', $defaults);
       $mailingReport = CRM_Mailing_BAO_Mailing::report($this->_mailing_id, TRUE);
       CRM_Mailing_BAO_Mailing::getMailingContent($mailingReport, $this);
@@ -115,13 +115,13 @@ class CRM_Activity_Form_ActivityView extends CRM_Core_Form {
   /**
    * Function to build the form
    *
-   * @return None
+   * @return void
    * @access public
    */
   public function buildQuickForm() {
     $this->addButtons(array(
         array(
-          'type' => 'next',
+          'type' => 'cancel',
           'name' => ts('Done'),
           'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
           'isDefault' => TRUE,

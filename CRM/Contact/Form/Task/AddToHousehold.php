@@ -58,7 +58,7 @@ class CRM_Contact_Form_Task_AddToHousehold extends CRM_Contact_Form_Task {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   function buildQuickForm() {
 
@@ -114,7 +114,7 @@ class CRM_Contact_Form_Task_AddToHousehold extends CRM_Contact_Form_Task {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   public function postProcess() {
 
@@ -122,7 +122,7 @@ class CRM_Contact_Form_Task_AddToHousehold extends CRM_Contact_Form_Task {
     $params = $this->controller->exportValues($this->_name);
 
     $this->set('searchDone', 0);
-    if (CRM_Utils_Array::value('_qf_AddToHousehold_refresh', $_POST)) {
+    if (!empty($_POST['_qf_AddToHousehold_refresh'])) {
       $searchParams['contact_type'] = array('Household' => 'Household');
       $searchParams['rel_contact'] = $params['name'];
       self::search($this, $searchParams);
@@ -182,13 +182,13 @@ class CRM_Contact_Form_Task_AddToHousehold extends CRM_Contact_Form_Task {
    *
    * @access public
    *
-   * @return None
+   * @return void
    *
    */
   function search(&$form, &$params) {
     //max records that will be listed
     $searchValues = array();
-    if (CRM_Utils_Array::value('rel_contact', $params)) {
+    if (!empty($params['rel_contact'])) {
       if (isset($params['rel_contact_id']) &&
         is_numeric($params['rel_contact_id'])
       ) {
@@ -205,7 +205,7 @@ class CRM_Contact_Form_Task_AddToHousehold extends CRM_Contact_Form_Task {
       $excludedContactIds[] = $form->_contactId;
     }
 
-    if (CRM_Utils_Array::value('relationship_type_id', $params)) {
+    if (!empty($params['relationship_type_id'])) {
       $relationshipType = new CRM_Contact_DAO_RelationshipType();
       list($rid, $direction) = explode('_', $params['relationship_type_id'], 2);
 
@@ -233,7 +233,7 @@ class CRM_Contact_Form_Task_AddToHousehold extends CRM_Contact_Form_Task {
       }
     }
 
-    if (!$contactTypeAdded && CRM_Utils_Array::value('contact_type', $params)) {
+    if (!$contactTypeAdded && !empty($params['contact_type'])) {
       $searchValues[] = array('contact_type', '=', $params['contact_type'], 0, 0);
     }
 

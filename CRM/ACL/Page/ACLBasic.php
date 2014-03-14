@@ -180,7 +180,7 @@ ORDER BY entity_id
           $dao->entity_id
         );
       }
-      elseif (CRM_Utils_Array::value($dao->object_table, $permissions)) {
+      elseif (!empty($permissions[$dao->object_table])) {
         $acl[$dao->entity_id]['object_table'] .= ", {$permissions[$dao->object_table]}";
       }
     }

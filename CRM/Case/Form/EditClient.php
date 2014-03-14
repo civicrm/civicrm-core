@@ -78,7 +78,7 @@ class CRM_Case_Form_EditClient extends CRM_Core_Form {
   /**
    * Function to build the form
    *
-   * @return None
+   * @return void
    * @access public
    */
   public function buildQuickForm() {

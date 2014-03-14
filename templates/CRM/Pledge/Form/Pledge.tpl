@@ -59,10 +59,13 @@
    {else}
       <table class="form-layout-compressed">
         {if $context eq 'standalone'}
-      {if !$email and $outBound_option != 2}
-        {assign var='profileCreateCallback' value=1 }
-      {/if}
-            {include file="CRM/Contact/Form/NewContact.tpl"}
+          {if !$email and $outBound_option != 2}
+            {assign var='profileCreateCallback' value=1 }
+          {/if}
+          <tr class="crm-pledge-form-contact-id">
+            <td class="label">{$form.contact_id.label}</td>
+            <td>{$form.contact_id.html}</td>
+          </tr>
         {else}
           <tr class="crm-pledge-form-block-displayName">
               <td class="font-size12pt right"><strong>{ts}Pledge by{/ts}</strong></td>
@@ -171,7 +174,7 @@ function loadPanes( id ) {
       cj('div.'+id).html(loading);
       cj.ajax({
           url    : url,
-          success: function(data) { cj('div.'+id).html(data); }
+          success: function(data) { cj('div.'+id).html(data).trigger('crmLoad'); }
           });
       }
   }

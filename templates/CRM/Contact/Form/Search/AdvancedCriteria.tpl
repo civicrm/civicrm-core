@@ -86,23 +86,14 @@ cj(function($) {
   * Loads snippet based on id of crm-accordion-header
   */
   function loadPanes(id) {
-    var url = "{/literal}{crmURL p='civicrm/contact/search/advanced' q="snippet=1&qfKey=`$qfKey`&searchPane=" h=0}{literal}" + id;
+    var url = "{/literal}{crmURL p='civicrm/contact/search/advanced' q="qfKey=`$qfKey`&searchPane=" h=0}{literal}" + id;
     var header = $('#' + id);
     var body = $('.crm-accordion-body.' + id);
     if (header.length > 0 && body.length > 0 && !body.html()) {
       body.html('<div class="crm-loading-element"><span class="loading-text">{/literal}{ts escape='js'}Loading{/ts}{literal}...</span></div>');
-      header.append('{/literal}<a href="#" class="crm-close-accordion" title="{ts escape='js'}Remove from search criteria{/ts}"><span>{ts escape='js'}Reset{/ts}</span> &nbsp;<img src="{$config->resourceBase}i/close.png" /></a>{literal}');
+      header.append('{/literal}<a href="#" class="crm-close-accordion crm-hover-button css_right" title="{ts escape='js'}Remove from search criteria{/ts}"><span class="icon close-icon"></span></a>{literal}');
       header.addClass('active');
-      $.ajax({
-        url : url,
-        success: function(data) {
-          body.html(data);
-        },
-        error: function() {
-          CRM.alert({/literal}'{ts escape="js"}Sorry, could not load the requested information from the server.{/ts}', '{ts escape="js"}Network Error{/ts}'{literal});
-          $('.crm-close-accordion', header).click();
-        }
-      });
+      CRM.loadPage(url, {target: body, block: false});
     }
   }
 });

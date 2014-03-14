@@ -203,7 +203,7 @@
     },
     onUfChanged: function(isUfUnsaved) {
       if (isUfUnsaved) {
-        this.$('.crm-designer-save').removeAttr('style').removeAttr('disabled');
+        this.$('.crm-designer-save').removeAttr('style').prop('disabled', false);
       }
     },
     doSave: function(event) {
@@ -293,6 +293,7 @@
     openTreeNodes: [],
     events: {
       'keyup .crm-designer-palette-search input': 'doSearch',
+      'change .crm-contact-types': 'doSetPaletteEntity',
       'click .crm-designer-palette-clear-search': 'clearSearch',
       'click .crm-designer-palette-toggle': 'toggleAll',
       'click .crm-designer-palette-add button': 'doNewCustomFieldDialog',
@@ -324,6 +325,14 @@
 
       paletteView.model.getRel('ufEntityCollection').each(function(ufEntityModel){
         _.each(ufEntityModel.getSections(), function(section, sectionKey){
+          var defaultValue = paletteView.selectedContactType;
+          if (!defaultValue) {
+            defaultValue = paletteView.model.calculateContactEntityType();
+          }
+
+          // set selected option as default, since we are rebuilding palette
+          paletteView.$('.crm-contact-types').val(defaultValue).prop('selected','selected');
+
           var entitySection = ufEntityModel.get('entity_name') + '-' + sectionKey;
           var items = [];
           if (paletteFieldsByEntitySection[entitySection]) {
@@ -397,6 +406,19 @@
     doSearch: function(event) {
       $('.crm-designer-palette-tree').jstree("search", $(event.target).val());
     },
+    doSetPaletteEntity: function(event) {
+      this.selectedContactType = $('.crm-contact-types :selected').val();
+      // loop through entity collection and remove non-valid entity section's
+      var newUfEntityModels = [];
+      this.model.getRel('ufEntityCollection').each(function(oldUfEntityModel){
+        var values = oldUfEntityModel.toJSON();
+        if (values.entity_name == 'contact_1') {
+          values.entity_type = $('.crm-contact-types :selected').val();
+        }
+        newUfEntityModels.push(new CRM.UF.UFEntityModel(values));
+      });
+      this.model.getRel('ufEntityCollection').reset(newUfEntityModels);
+    },
     doAddToCanvas: function(event) {
       var paletteFieldModel = this.model.getRel('paletteFieldCollection').get($(event.currentTarget).attr('data-plm-cid'));
       paletteFieldModel.addToUFCollection(this.model.getRel('ufFieldCollection'));
@@ -453,7 +475,9 @@
       var paletteFieldCollection = this.model.getRel('paletteFieldCollection');
       var paletteFieldModel = paletteFieldCollection.getFieldByName(ufFieldModel.get('entity_name'), ufFieldModel.get('field_name'));
       var isAddable = ufFieldCollection.isAddable(ufFieldModel);
-      this.$('[data-plm-cid='+paletteFieldModel.cid+']').toggleClass('disabled', !isAddable);
+      if (paletteFieldModel) {
+        this.$('[data-plm-cid='+paletteFieldModel.cid+']').toggleClass('disabled', !isAddable);
+      }
     },
     toggleAll: function(event) {
       if ($('.crm-designer-palette-search input').val() == '') {
@@ -481,13 +505,15 @@
       this.model.getRel('ufFieldCollection')
         .on('add', this.updatePlaceholder, this)
         .on('remove', this.updatePlaceholder, this)
-        .on('add', this.addUFFieldView, this);
+        .on('add', this.addUFFieldView, this)
+        .on('reset', this.render, this);
     },
     onClose: function() {
       this.model.getRel('ufFieldCollection')
         .off('add', this.updatePlaceholder, this)
         .off('remove', this.updatePlaceholder, this)
-        .off('add', this.addUFFieldView, this);
+        .off('add', this.addUFFieldView, this)
+        .off('reset', this.render, this);
     },
     render: function() {
       var ufFieldCanvasView = this;
@@ -651,7 +677,7 @@
             buttons[$link.text()] = function() {
               var form2 = CRM.loadForm($link.attr('href'), {
                 cancelButton: '.cancel.form-submit, #done',
-                openInline: 'a.action-item:not(".enable-action, .disable-action")',
+                openInline: 'a.action-item:not([href="#"])',
                 dialog: {
                   width: '60%',
                   height: parseInt($(window).height() * .8)
@@ -763,7 +789,6 @@
       this.form.commit();
       this.$('.field-is_multi_summary').toggle(this.options.fieldSchema.civiIsMultiple ? true : false);
       this.$('.field-in_selector').toggle(this.model.isInSelectorAllowed());
-      // this.$(':input').attr('disabled', this.model.get("is_reserved") == 1);
 
       if (!this.model.isInSelectorAllowed() && this.model.get('in_selector') != "0") {
         this.model.set('in_selector', "0");

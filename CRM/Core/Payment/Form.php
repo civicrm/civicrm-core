@@ -306,7 +306,7 @@ class CRM_Core_Payment_Form {
   /**
    * Function to add all the direct debit fields
    *
-   * @return None
+   * @return void
    * @access public
    */
   function buildDirectDebit(&$form, $useRequired = FALSE) {

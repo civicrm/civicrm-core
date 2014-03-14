@@ -137,12 +137,13 @@
                     <td>&nbsp;</td>
                     <td>
                       <table class="compressed">
-                        <tr class="crm-membership-form-block-honor-type">
-                          <td class="label">{$form.honor_type_id.label}</td>
-                          <td>{$form.honor_type_id.html}</td>
+                        <tr class="crm-membership-form-block-soft-credit-type">
+                          <td class="label">{$form.soft_credit_type_id.label}</td>
+                          <td>{$form.soft_credit_type_id.html}</td>
                         </tr>
-                        <tr id='contributionContact' class="crm-membership-form-block-contribution-type">
-                          {include file="CRM/Contact/Form/NewContact.tpl"}
+                        <tr class="crm-membership-form-block-soft-credit-contact-id">
+                          <td class="label">{$form.soft_credit_contact_id.label}</td>
+                          <td>{$form.soft_credit_contact_id.html}</td>
                         </tr>
                       </table>
                     </td>
@@ -206,12 +207,13 @@
             <td>&nbsp;</td>
             <td>
               <table class="form-layout-compressed">
-                <tr class="crm-membership-form-block-honor-type">
-                  <td class="label">{$form.honor_type_id.label}</td>
-                  <td>{$form.honor_type_id.html}</td>
+                <tr class="crm-membership-form-block-soft-credit-type">
+                  <td class="label">{$form.soft_credit_type_id.label}</td>
+                  <td>{$form.soft_credit_type_id.html}</td>
                 </tr>
-                <tr id='contributionContact' class="crm-membership-form-block-contribution-type">
-                  {include file="CRM/Contact/Form/NewContact.tpl"}
+                <tr class="crm-membership-form-soft-credit-contact-id">
+                  <td class="label">{$form.soft_credit_contact_id.label}</td>
+                  <td>{$form.soft_credit_contact_id.html}</td>
                 </tr>
               </table>
             </td>
@@ -339,7 +341,7 @@
 
     cj(function () {
       cj('#record_contribution').click(function () {
-        if (cj(this).attr('checked')) {
+        if (cj(this).prop('checked')) {
           cj('#recordContribution').show();
           setPaymentBlock(true);
         }
@@ -371,11 +373,11 @@
 
       if (!checkboxEvent) {
         if (allMemberships[memType]['total_amount_numeric'] > 0) {
-          cj('#record_contribution').attr('checked', 'checked');
+          cj('#record_contribution').prop('checked', true);
           cj('#recordContribution').show();
         }
         else {
-          cj('#record_contribution').removeAttr('checked');
+          cj('#record_contribution').prop('checked', false);
           cj('#recordContribution').hide();
         }
       }
@@ -398,7 +400,7 @@
 
     function setDifferentContactBlock() {
       //get the
-      if (cj('#contribution_contact').attr('checked')) {
+      if (cj('#contribution_contact').prop('checked')) {
         cj('#record-different-contact').show();
       }
       else {

@@ -156,7 +156,7 @@ class CRM_Grant_BAO_Grant extends CRM_Grant_DAO_Grant {
    */
   static function add(&$params, &$ids) {
 
-    if (CRM_Utils_Array::value('grant_id', $ids)) {
+    if (!empty($ids['grant_id'])) {
       CRM_Utils_Hook::pre('edit', 'Grant', $ids['grant_id'], $params);
     }
     else {
@@ -205,7 +205,7 @@ class CRM_Grant_BAO_Grant extends CRM_Grant_DAO_Grant {
     );
 
     $grantTypes = CRM_Core_PseudoConstant::get('CRM_Grant_DAO_Grant', 'grant_type_id');
-    if (!CRM_Utils_Array::value('skipRecentView', $params)) {
+    if (empty($params['skipRecentView'])) {
       if(!isset($grant->contact_id) || !isset($grant->grant_type_id)){
         $grant->find(TRUE);
       }
@@ -234,7 +234,7 @@ class CRM_Grant_BAO_Grant extends CRM_Grant_DAO_Grant {
       );
     }
 
-    if (CRM_Utils_Array::value('grant', $ids)) {
+    if (!empty($ids['grant'])) {
       CRM_Utils_Hook::post('edit', 'Grant', $grant->id, $grant);
     }
     else {
@@ -269,7 +269,7 @@ class CRM_Grant_BAO_Grant extends CRM_Grant_DAO_Grant {
     if (!$id) {
       $id = CRM_Utils_Array::value('contact_id', $params);
     }
-    if (CRM_Utils_Array::value('note', $params) || CRM_Utils_Array::value('id', CRM_Utils_Array::value('note',$ids))) {
+    if (!empty($params['note']) || CRM_Utils_Array::value('id', CRM_Utils_Array::value('note',$ids))) {
       $noteParams = array(
         'entity_table' => 'civicrm_grant',
         'note' => $params['note'] = $params['note'] ? $params['note'] : "null",
@@ -291,7 +291,7 @@ class CRM_Grant_BAO_Grant extends CRM_Grant_DAO_Grant {
     CRM_Core_BAO_Log::add($logParams);
 
     // add custom field values
-    if (CRM_Utils_Array::value('custom', $params) && is_array($params['custom'])) {
+    if (!empty($params['custom']) && is_array($params['custom'])) {
       CRM_Core_BAO_CustomValueTable::store($params['custom'], 'civicrm_grant', $grant->id);
     }
 

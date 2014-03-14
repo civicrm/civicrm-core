@@ -121,5 +121,29 @@ class CRM_Utils_Request {
 
     return $value;
   }
+
+  /**
+   * This is a replacement for $_REQUEST which includes $_GET/$_POST
+   * but excludes $_COOKIE / $_ENV / $_SERVER.
+   *
+   * @param string $method
+   * @return array
+   * @throws CRM_Core_Exception
+   */
+  static function exportValues() {
+    // For more discussion of default $_REQUEST handling, see:
+    // http://www.php.net/manual/en/reserved.variables.request.php
+    // http://www.php.net/manual/en/ini.core.php#ini.request-order
+    // http://www.php.net/manual/en/ini.core.php#ini.variables-order
+
+    $result = array();
+    if ($_GET) {
+      $result = array_merge($result, $_GET);
+    }
+    if ($_POST) {
+      $result = array_merge($result, $_POST);
+    }
+    return $result;
+  }
 }
 

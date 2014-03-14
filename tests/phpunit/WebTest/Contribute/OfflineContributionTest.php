@@ -42,7 +42,7 @@ class WebTest_Contribute_OfflineContributionTest extends CiviSeleniumTestCase {
     $this->webtestAddContact($softCreditFname, $softCreditLname, FALSE);
 
     //financial account for check
-    $this->openCiviPage("admin/options/payment_instrument", "group=payment_instrument&reset=1");
+    $this->openCiviPage("admin/options/payment_instrument", "reset=1");
     $financialAccount = $this->getText("xpath=//div[@id='payment_instrument']/div[2]/table/tbody//tr/td[1][text()='Check']/../td[3]");
 
     // Add new Financial Account
@@ -354,7 +354,7 @@ class WebTest_Contribute_OfflineContributionTest extends CiviSeleniumTestCase {
       $this->type("non_deductible_amount", "{$nonDeductibleAmt}");
     }
 
-    if (CRM_Utils_Array::value('premium', $params)) {
+    if (!empty($params['premium'])) {
       //Premium section
       $this->click("Premium");
       $this->waitForElementPresent("fulfilled_date");

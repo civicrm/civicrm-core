@@ -86,6 +86,9 @@ class CRM_Contribute_Form_Task_PDFLetter extends CRM_Contribute_Form_Task {
       CRM_Activity_BAO_Activity::retrieve($params, $defaults);
       $defaults['html_message'] = $defaults['details'];
     }
+    else {
+      $defaults['thankyou_update'] = 1;
+    }
     $defaults = $defaults + CRM_Contact_Form_Task_PDFLetterCommon::setDefaultValues();
     return $defaults;
   }
@@ -111,7 +114,7 @@ class CRM_Contribute_Form_Task_PDFLetter extends CRM_Contribute_Form_Task {
 
     // Group options for tokens are not yet implemented. dgg
     $options = array(ts('Contact'), ts('Recurring'));
-    $this->addRadio('is_group_by', ts('Grouping contributions in one letter based on'), $options, array(), "<br/>", FALSE);
+    $this->addRadio('is_group_by', ts('Grouping contributions in one letter based on'), $options, array('allowClear' => TRUE), "<br/>", FALSE);
 
     $this->addButtons(array(
         array(
@@ -133,7 +136,7 @@ class CRM_Contribute_Form_Task_PDFLetter extends CRM_Contribute_Form_Task {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   public function postProcess() {
     // TODO: rewrite using contribution token and one letter by contribution

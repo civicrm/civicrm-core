@@ -77,14 +77,12 @@ class CRM_Contribute_Page_ManagePremiums extends CRM_Core_Page_Basic {
         ),
         CRM_Core_Action::DISABLE => array(
           'name' => ts('Disable'),
-          'extra' => 'onclick = "enableDisable( %%id%%,\'' . 'CRM_Contribute_BAO_ManagePremiums' . '\',\'' . 'enable-disable' . '\' );"',
-          'ref' => 'disable-action',
+          'ref' => 'crm-enable-disable',
           'title' => ts('Disable Premium'),
         ),
         CRM_Core_Action::ENABLE => array(
           'name' => ts('Enable'),
-          'extra' => 'onclick = "enableDisable( %%id%%,\'' . 'CRM_Contribute_BAO_ManagePremiums' . '\',\'' . 'disable-enable' . '\' );"',
-          'ref' => 'enable-action',
+          'ref' => 'crm-enable-disable',
           'title' => ts('Enable Premium'),
         ),
         CRM_Core_Action::DELETE => array(
@@ -143,6 +141,7 @@ class CRM_Contribute_Page_ManagePremiums extends CRM_Core_Page_Basic {
    * @static
    */
   function browse() {
+    CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'js/crm.livePage.js');
     // get all custom groups sorted by weight
     $premiums = array();
     $dao = new CRM_Contribute_DAO_Product();
@@ -165,7 +164,7 @@ class CRM_Contribute_Page_ManagePremiums extends CRM_Core_Page_Basic {
 
       $premiums[$dao->id]['action'] = CRM_Core_Action::formLink(self::links(),
         $action,
-        array('id' => $dao->id)),
+        array('id' => $dao->id),
         ts('more'),
         FALSE,
         'premium.manage.row',

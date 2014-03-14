@@ -61,7 +61,7 @@ class CRM_Member_Page_UserDashboard extends CRM_Contact_Page_View_UserDashBoard 
         'status', 'membership_type') as $fld) {
         $membership[$dao->id][$fld] = CRM_Utils_Array::value($fld, $statusANDType[$dao->id]);
       }
-      if (CRM_Utils_Array::value('is_current_member', $statusANDType[$dao->id])) {
+      if (!empty($statusANDType[$dao->id]['is_current_member'])) {
         $membership[$dao->id]['active'] = TRUE;
       }
 

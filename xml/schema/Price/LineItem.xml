@@ -66,6 +66,9 @@
     <!-- changed to not required in 4.2.3 -->
     <comment>descriptive label for item - from price_field_value.label</comment>
     <add>1.7</add>
+    <html>
+      <type>Text</type>
+    </html>
   </field>
   <field>
     <name>qty</name>
@@ -73,6 +76,9 @@
     <required>true</required>
     <comment>How many items ordered</comment>
     <add>1.7</add>
+    <html>
+      <type>Text</type>
+    </html>
   </field>
   <field>
     <name>unit_price</name>
@@ -80,6 +86,9 @@
     <required>true</required>
     <comment>price of each item</comment>
     <add>1.7</add>
+    <html>
+      <type>Text</type>
+    </html>
   </field>
   <field>
     <name>line_total</name>
@@ -92,8 +101,12 @@
     <name>participant_count</name>
     <type>int unsigned</type>
     <default>NULL</default>
-    <comment>Participant count for field</comment>
+    <comment>Participant count for fiel
+    <html>
+      <type>Text</type>
+    </html>d</comment>
     <add>3.2</add>
+    
   </field>
   <index>
     <name>index_entity</name>
@@ -130,6 +143,9 @@
     <default>NULL</default>
     <comment>FK to Financial Type.</comment>
     <add>4.3</add>
+    <html>
+      <type>Select</type>
+    </html>
   </field>
   <foreignKey>
     <name>financial_type_id</name>
@@ -148,6 +164,9 @@
     <required>true</required>
     <comment>Tax-deductible portion of the amount</comment>
     <add>4.3</add>
+    <html>
+      <type>Text</type>
+    </html>
   </field>
 </table>
 

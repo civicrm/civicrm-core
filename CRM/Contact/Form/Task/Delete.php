@@ -198,7 +198,7 @@ class CRM_Contact_Form_Task_Delete extends CRM_Contact_Form_Task {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   public function postProcess() {
     $session = CRM_Core_Session::singleton();

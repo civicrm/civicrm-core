@@ -29,6 +29,8 @@
 {if $action eq 1 or $action eq 2 or $action eq 8 or $action eq 16384}
    {include file="CRM/Admin/Form/ScheduleReminders.tpl"}
 {else}
+{* include wysiwyg related files*}
+{include file="CRM/common/wysiwyg.tpl" includeWysiwygEditor=true}
 {capture assign=schedRemindersDocLink}{docURL page="user/current/email/scheduled-reminders/"}{/capture}
 <div class="help">
   {ts}Scheduled reminders allow you to automatically send messages to contacts regarding their memberships, participation in events, or other activities.{/ts} {$schedRemindersDocLink}
@@ -45,8 +47,8 @@
 {else}
     <div class="messages status no-popup">
       <div class="icon inform-icon"></div>
-        {capture assign=crmURL}{crmURL p='civicrm/admin/scheduleReminders' q="action=add&reset=1"}{/capture}
-        {ts 1=$crmURL}There are no Scheduled Reminders configured. You can <a href='%1'>add one</a>.{/ts}
+        {capture assign=crmURL}href="{crmURL p='civicrm/admin/scheduleReminders' q="action=add&reset=1"}" class="action-item"{/capture}
+        {ts 1=$crmURL}There are no Scheduled Reminders configured. You can <a %1>add one</a>.{/ts}
     </div>
 {/if}
 {/if}

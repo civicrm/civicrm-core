@@ -281,9 +281,7 @@ class CRM_Report_Form_Contribute_SoftCredit extends CRM_Report_Form {
     foreach ($this->_columns as $tableName => $table) {
       if (array_key_exists('fields', $table)) {
         foreach ($table['fields'] as $fieldName => $field) {
-          if (CRM_Utils_Array::value('required', $field) ||
-            CRM_Utils_Array::value($fieldName, $this->_params['fields'])
-          ) {
+          if (!empty($field['required']) || !empty($this->_params['fields'][$fieldName])) {
 
             // include email column if set
             if ($tableName == 'civicrm_email') {
@@ -304,7 +302,7 @@ class CRM_Report_Form_Contribute_SoftCredit extends CRM_Report_Form {
             }
 
             // only include statistics columns if set
-            if (CRM_Utils_Array::value('statistics', $field)) {
+            if (!empty($field['statistics'])) {
               foreach ($field['statistics'] as $stat => $label) {
                 switch (strtolower($stat)) {
                   case 'sum':
@@ -506,6 +504,18 @@ GROUP BY   {$this->_aliases['civicrm_contribution']}.currency
         $rows[$rowNum]['civicrm_contact_display_name_constituent_link'] = $url;
         $rows[$rowNum]['civicrm_contact_display_name_constituent_hover'] = ts('List all direct contribution(s) from this contact.');
         $entryFound = TRUE;
+      }
+
+      // convert soft credit contact name to link
+      if (array_key_exists('civicrm_contact_display_name_creditor', $row) && !empty($rows[$rowNum]['civicrm_contact_display_name_creditor']) &&
+        array_key_exists('civicrm_contact_id_creditor', $row)
+      ) {
+        $url = CRM_Utils_System::url("civicrm/contact/view",
+          'reset=1&cid=' . $row['civicrm_contact_id_creditor'],
+          $this->_absoluteUrl
+        );
+        $rows[$rowNum]['civicrm_contact_display_name_creditor_link'] = $url;
+        $rows[$rowNum]['civicrm_contact_display_name_creditor_hover'] = ts("view contact summary");
       }
 
       // make subtotals look nicer

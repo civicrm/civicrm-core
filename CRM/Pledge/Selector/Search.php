@@ -329,7 +329,7 @@ class CRM_Pledge_Selector_Search extends CRM_Core_Selector_Base {
         $pledgeStatuses
       );
       // append (test) to status label
-      if (CRM_Utils_Array::value('pledge_is_test', $row)) {
+      if (!empty($row['pledge_is_test'])) {
         $row['pledge_status'] .= ' (test)';
       }
 

@@ -60,7 +60,7 @@ function civicrm_api3_contribution_create(&$params) {
       'amount' => $params['total_amount']));
   }
 
-  if (CRM_Utils_Array::value('id', $params) && CRM_Utils_Array::value('contribution_status_id', $params)) {
+  if (!empty($params['id']) && !empty($params['contribution_status_id'])) {
     $error = array();
     //throw error for invalid status change such as setting completed back to pending
     //@todo this sort of validation belongs in the BAO not the API - if it is not an OK
@@ -83,6 +83,7 @@ function _civicrm_api3_contribution_create_spec(&$params) {
   $params['contact_id']['api.required'] = 1;
   $params['total_amount']['api.required'] = 1;
   $params['payment_instrument_id']['api.aliases'] = array('payment_instrument');
+  $params['receive_date']['api.default'] = 'now';
   $params['payment_processor'] = array(
     'name' => 'payment_processor',
     'title' => 'Payment Processor ID',
@@ -142,7 +143,7 @@ function _civicrm_api3_contribution_create_spec(&$params) {
  */
 function civicrm_api3_contribution_delete($params) {
 
-  $contributionID = CRM_Utils_Array::value('contribution_id', $params) ? $params['contribution_id'] : $params['id'];
+  $contributionID = !empty($params['contribution_id']) ? $params['contribution_id'] : $params['id'];
   if (CRM_Contribute_BAO_Contribution::deleteContribution($contributionID)) {
     return civicrm_api3_create_success(array($contributionID => 1));
   }

@@ -41,6 +41,9 @@
       <type>varchar</type>
       <length>255</length>
       <localizable>true</localizable>
+      <html>
+          <type>Text</type>
+        </html>
       <add>2.0</add>
   </field>
   <field>
@@ -48,6 +51,9 @@
       <type>text</type>
       <localizable>true</localizable>
       <comment>Introductory message to contributor or participant displayed on the Tell a Friend form.</comment>
+      <html>
+        <type>Text</type>
+      </html>
       <add>2.0</add>
   </field>
   <field>
@@ -55,6 +61,9 @@
       <type>text</type>
       <localizable>true</localizable>
       <comment>Suggested message to friends, provided as default on the Tell A Friend form.</comment>
+      <html>
+          <type>Text</type>
+        </html>
       <add>2.0</add>
   </field>
   <field>
@@ -63,6 +72,9 @@
       <length>255</length>
       <import>true</import>
       <comment>URL for general info about the organization - included in the email sent to friends.</comment>
+      <html>
+          <type>Text</type>
+        </html>
       <add>2.0</add>
   </field>
   <field>
@@ -71,6 +83,9 @@
       <length>255</length>
       <localizable>true</localizable>
       <comment>Text for Tell a Friend thank you page header and HTML title.</comment>
+      <html>
+          <type>Text</type>
+      </html>
       <add>2.0</add>
   </field>
   <field>
@@ -79,10 +94,16 @@
       <localizable>true</localizable>
       <comment>Thank you message displayed on success page.</comment>
       <add>2.0</add>
+      <html>
+          <type>Text</type>
+        </html>
   </field>
   <field>
     <name>is_active</name>
     <type>boolean</type>
     <add>2.0</add>
+    <html>
+      <type>CheckBox</type>
+    </html>
   </field>
 </table>

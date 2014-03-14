@@ -5,7 +5,7 @@
  * This class allows to consume the API, either from within a module that knows civicrm already:
  *
  * @code
- *   require_once('api/class/api.php');
+ *   require_once('api/class.api.php');
  *   $api = new civicrm_api3();
  * @endcode
  *
@@ -20,7 +20,9 @@
  * or to query a remote server via the rest api
  *
  * @code
- *   $api = new civicrm_api3 (array ('server' => 'http://example.org','api_key'=>'theusersecretkey','key'=>'thesitesecretkey'));
+ *   $api = new civicrm_api3 (array ('server' => 'http://example.org',
+ *                                   'api_key'=>'theusersecretkey',
+ *                                   'key'=>'thesitesecretkey'));
  * @endcode
  *
  * No matter how initialised and if civicrm is local or remote, you use the class the same way.

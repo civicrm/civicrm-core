@@ -74,20 +74,8 @@
   </tr>
   <tr>
     <td colspan="2">
-     {* Hide export and print buttons in 'Add Members to Group' context. *}
+     {* Hide export button in 'Add Members to Group' context. *}
      {if $context NEQ 'amtg'}
-        {if $action eq 512}
-          <ul>   
-          {$form._qf_Advanced_next_print.html}&nbsp; &nbsp;
-        {elseif $action eq 8192}
-          {$form._qf_Builder_next_print.html}&nbsp; &nbsp;
-        {elseif $action eq 16384}
-          {* since this does not really work for a non standard search
-          {$form._qf_Custom_next_print.html}&nbsp; &nbsp;
-          *}
-        {else}
-            {$form._qf_Basic_next_print.html}&nbsp; &nbsp;
-        {/if}
         {$form.task.html}
      {/if}
      {if $action eq 512}
@@ -106,6 +94,8 @@
 
 {literal}
 <script type="text/javascript">
-toggleTaskAction( );
+cj(function() {
+  toggleTaskAction( );
+});
 </script>
 {/literal}

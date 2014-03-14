@@ -148,6 +148,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
 
     //  create test database
     self::$utils = new Utils($GLOBALS['mysql_host'],
+      $GLOBALS['mysql_port'],
       $GLOBALS['mysql_user'],
       $GLOBALS['mysql_pass']
     );
@@ -406,6 +407,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    */
   function foreignKeyChecksOff() {
     self::$utils = new Utils($GLOBALS['mysql_host'],
+      $GLOBALS['mysql_port'],
       $GLOBALS['mysql_user'],
       $GLOBALS['mysql_pass']
     );
@@ -580,7 +582,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   function assertAttributesEquals($expectedValues, $actualValues, $message = NULL) {
     foreach ($expectedValues as $paramName => $paramValue) {
       if (isset($actualValues[$paramName])) {
-        $this->assertEquals($paramValue, $actualValues[$paramName], "Value Mismatch On $paramName - value 1 is $paramValue  value 2 is {$actualValues[$paramName]}");
+        $this->assertEquals($paramValue, $actualValues[$paramName], "Value Mismatch On $paramName - value 1 is " . print_r($paramValue, TRUE) . "  value 2 is " . print_r($actualValues[$paramName], TRUE) );
       }
       else {
         $this->fail("Attribute '$paramName' not present in actual array.");
@@ -794,6 +796,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     }
     return $result;
   }
+
   /**
    * This function exists to wrap api functions
    * so we can ensure they succeed, generate and example & throw exceptions without litterering the test with checks
@@ -803,6 +806,10 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    * @param array $params
    * @param string $function - pass this in to create a generated example
    * @param string $file - pass this in to create a generated example
+   * @param string $description
+   * @param string|null $subfile
+   * @param string|null $actionName
+   * @return array|int
    */
   function callAPIAndDocument($entity, $action, $params, $function, $file, $description = "", $subfile = NULL, $actionName = NULL){
     $params['version'] = $this->_apiversion;
@@ -908,9 +915,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    */
   private function _contactCreate($params) {
     $result = $this->callAPISuccess('contact', 'create', $params);
-    if (CRM_Utils_Array::value('is_error', $result) ||
-      !CRM_Utils_Array::value('id', $result)
-    ) {
+    if (!empty($result['is_error']) || empty($result['id'])) {
       throw new Exception('Could not create test contact, with message: ' . CRM_Utils_Array::value('error_message', $result) . "\nBacktrace:" . CRM_Utils_Array::value('trace', $result));
     }
     return $result['id'];
@@ -1460,9 +1465,8 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    * @return int groupId of created group
    *
    */
-  function groupCreate($params = NULL) {
-    if ($params === NULL) {
-      $params = array(
+  function groupCreate($params = array()) {
+    $params = array_merge(array(
         'name' => 'Test Group 1',
         'domain_id' => 1,
         'title' => 'New Test Group Created',
@@ -1473,8 +1477,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
           '1' => 1,
           '2' => 1,
         ),
-      );
-    }
+      ), $params);
 
     $result = $this->callAPISuccess('Group', 'create', $params);
     return $result['id'];
@@ -1809,6 +1812,17 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   }
 
   /**
+   * Enable CiviCampaign Component
+   */
+  function enableCiviCampaign() {
+    CRM_Core_BAO_ConfigSetting::enableComponent('CiviCampaign');
+    // force reload of config object
+    $config = CRM_Core_Config::singleton(TRUE, TRUE);
+    //flush cache by calling with reset
+    $activityTypes = CRM_Core_PseudoConstant::activityType(TRUE, TRUE, TRUE, 'name', TRUE);
+  }
+
+  /**
    * Create test generated example in api/v3/examples.
    * To turn this off (e.g. on the server) set
    * define(DONT_DOCUMENT_TEST_CONFIG ,1);
@@ -1847,6 +1861,10 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
       elseif (strstr($function, 'GetFields')) {
         $action = empty($action) ? 'getfields' : $action;
         $entityAction = 'GetFields';
+      }
+      elseif (strstr($function, 'GetList')) {
+        $action = empty($action) ? 'getlist' : $action;
+        $entityAction = 'GetList';
       }
       elseif (strstr($function, 'Get')) {
         $action = empty($action) ? 'get' : $action;
@@ -1905,21 +1923,15 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
 
     $smarty->assign('action', $action);
     if (empty($subfile)) {
-      if (file_exists('../tests/templates/documentFunction.tpl')) {
-        $f = fopen("../api/v3/examples/$entity$entityAction.php", "w");
-        fwrite($f, $smarty->fetch('../tests/templates/documentFunction.tpl'));
-        fclose($f);
-      }
+      $subfile = $entityAction;
     }
-    else {
-      if (file_exists('../tests/templates/documentFunction.tpl')) {
-        if (!is_dir("../api/v3/examples/$entity")) {
-          mkdir("../api/v3/examples/$entity");
-        }
-        $f = fopen("../api/v3/examples/$entity/$subfile.php", "w+b");
-        fwrite($f, $smarty->fetch('../tests/templates/documentFunction.tpl'));
-        fclose($f);
+    if (file_exists('../tests/templates/documentFunction.tpl')) {
+      if (!is_dir("../api/v3/examples/$entity")) {
+        mkdir("../api/v3/examples/$entity");
       }
+      $f = fopen("../api/v3/examples/$entity/$subfile.php", "w+b");
+      fwrite($f, $smarty->fetch('../tests/templates/documentFunction.tpl'));
+      fclose($f);
     }
   }
 
@@ -1987,9 +1999,13 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
           }
           if(in_array($key, $keysToUnset)) {
             unset($values[$key]);
+            break;
           }
           if(array_key_exists($key, $fieldsToChange) && !empty($value)) {
             $value = $fieldsToChange[$key];
+          }
+          if(is_string($value)) {
+            $value =  addslashes($value);
           }
         }
     }
@@ -2177,7 +2193,7 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
     if (array_key_exists('id', $unformattedArray)) {
       unset($unformattedArray['id']);
     }
-    if (CRM_Utils_Array::value('values', $unformattedArray) && is_array($unformattedArray['values'])) {
+    if (!empty($unformattedArray['values']) && is_array($unformattedArray['values'])) {
       foreach ($unformattedArray['values'] as $key => $value) {
         if (is_Array($value)) {
           foreach ($value as $k => $v) {

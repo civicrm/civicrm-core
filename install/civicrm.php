@@ -123,6 +123,9 @@ function civicrm_source($dsn, $fileName, $lineMode = FALSE) {
   if (PEAR::isError($db)) {
     die("Cannot open $dsn: " . $db->getMessage());
   }
+  $db->query("SET NAMES utf8");
+
+  $db->query("SET NAMES utf8");
 
   if (!$lineMode) {
     $string = file_get_contents($fileName);

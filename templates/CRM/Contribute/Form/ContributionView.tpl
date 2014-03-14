@@ -186,13 +186,6 @@
     </tr>
   {/if}
 
-  {if $honor_display}
-    <tr>
-      <td class="label">{$honor_type}</td>
-      <td>{$honor_display}&nbsp;</td>
-    </tr>
-  {/if}
-
   {if $thankyou_date}
     <tr>
       <td class="label">{ts}Thank-you Sent{/ts}</td>

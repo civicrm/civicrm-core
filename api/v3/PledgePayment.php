@@ -56,7 +56,7 @@
 function civicrm_api3_pledge_payment_create($params) {
 
   $paymentParams = $params;
-  if (empty($params['id']) && !CRM_Utils_Array::value('option.create_new', $params)) {
+  if (empty($params['id']) && empty($params['option.create_new'])) {
     $paymentDetails = CRM_Pledge_BAO_PledgePayment::getOldestPledgePayment($params['pledge_id']);
     if (empty($paymentDetails)) {
       return civicrm_api3_create_error("There are no unmatched payment on this pledge. Pass in the pledge_payment id to specify one or 'option.create_new' to create one");

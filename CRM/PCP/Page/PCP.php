@@ -183,26 +183,26 @@ class CRM_PCP_Page_PCP extends CRM_Core_Page_Basic {
     $whereClause = NULL;
 
     if (!empty($_POST) || !empty($_GET['page_type'])) {
-      if (CRM_Utils_Array::value('status_id', $_POST)) {
+      if (!empty($_POST['status_id'])) {
         $whereClause = ' AND cp.status_id = %1';
         $params['1'] = array($_POST['status_id'], 'Integer');
       }
 
-      if (CRM_Utils_Array::value('page_type', $_POST)) {
+      if (!empty($_POST['page_type'])) {
         $whereClause .= ' AND cp.page_type = %2';
         $params['2'] = array($_POST['page_type'], 'String');
       }
-      elseif (CRM_Utils_Array::value('page_type', $_GET)) {
+      elseif (!empty($_GET['page_type'])) {
         $whereClause .= ' AND cp.page_type = %2';
         $params['2'] = array($_GET['page_type'], 'String');
       }
 
-      if (CRM_Utils_Array::value('page_id', $_POST)) {
+      if (!empty($_POST['page_id'])) {
         $whereClause .= ' AND cp.page_id = %4 AND cp.page_type = "contribute"';
         $params['4'] = array($_POST['page_id'], 'Integer');
       }
 
-      if (CRM_Utils_Array::value('event_id', $_POST)) {
+      if (!empty($_POST['event_id'])) {
         $whereClause .= ' AND cp.page_id = %5 AND cp.page_type = "event"';
         $params['5'] = array($_POST['event_id'], 'Integer');
       }

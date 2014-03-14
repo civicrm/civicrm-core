@@ -59,14 +59,10 @@
 
     eval( 'tokenClass = { tokenList: "token-input-list-facebook", token: "token-input-token-facebook", tokenDelete: "token-input-delete-token-facebook", selectedToken: "token-input-selected-token-facebook", highlightedToken: "token-input-highlighted-token-facebook", dropdown: "token-input-dropdown-facebook", dropdownItem: "token-input-dropdown-item-facebook", dropdownItem2: "token-input-dropdown-item2-facebook", selectedDropdownItem: "token-input-selected-dropdown-item-facebook", inputToken: "token-input-input-token-facebook" } ');
 
-    var sourceDataUrl = "{/literal}{$dataUrl}{literal}";
     var tokenDataUrl  = "{/literal}{$tokenUrl}{literal}";
     var hintText = "{/literal}{ts escape='js'}Type in a partial or complete name of an existing recipient.{/ts}{literal}";
     cj( "#recipient_manual_id").tokenInput( tokenDataUrl, { prePopulate: recipient_manual, classes: tokenClass, hintText: hintText });
     cj( 'ul.token-input-list-facebook, div.token-input-dropdown-facebook' ).css( 'width', '450px' );
-    cj('#source_contact_id').autocomplete( sourceDataUrl, { width : 180, selectFirst : false, hintText: hintText, matchContains: true, minChars: 1
-                                }).result( function(event, data, formatted) {
-                                }).bind( 'click', function( ) {  });
     });
     </script>
     {/literal}
@@ -122,8 +118,16 @@
         <td class="label">{$form.group_id.label}</td>
         <td>{$form.group_id.html}</td>
     </tr>
+    <tr id="msgMode" class="crm-scheduleReminder-form-block-mode">
+      <td class="label">{$form.mode.label}</td>
+      <td>{$form.mode.html}</td>
+    </tr>
+    <tr id="smsProvider" class="crm-scheduleReminder-form-block-sms_provider_id">
+      <td class="label">{$form.sms_provider_id.label}</td>
+      <td>{$form.sms_provider_id.html}</td>
+    </tr>
   </table>
-  <fieldset id="compose_id"><legend>{ts}Email{/ts}</legend>
+  <fieldset id="compose_id"><legend>{$title}</legend>
      <table id="email-field-table" class="form-layout-compressed">
         <tr class="crm-scheduleReminder-form-block-active">
            <td class="label"></td>
@@ -139,13 +143,9 @@
         </tr>
 
   </table>
-        {include file="CRM/Contact/Form/Task/EmailCommon.tpl" upload=1 noAttach=1}
+    <div id="email">{include file="CRM/Contact/Form/Task/EmailCommon.tpl" upload=1 noAttach=1}</div>
+    <div id="sms">{include file="CRM/Contact/Form/Task/SMSCommon.tpl" upload=1 noAttach=1}</div>
   </fieldset>
-
-{/if}
-
-<div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
-</div>
 
 {include file="CRM/common/showHideByFieldValue.tpl"
     trigger_field_id    = "is_repeat"
@@ -193,11 +193,6 @@
         }
     });
 
-    cj('#absolute_date_display').parent( ).children('.crm-clear-link').children('a').click( function() {
-        cj('#relativeDate').show();
-        cj('#relativeDateRepeat').show();
-    });
-
     cj(function() {
         if (cj('#absolute_date_display').val()) {
             cj('#relativeDate').hide();
@@ -212,16 +207,56 @@
          });
      });
 
-    cj(function() {
-       if ( cj('#is_recipient_listing').val( ) ) {
-           cj('#recipientList').show();
-       } else {
-           cj('#recipientList').hide();
-       }
-       cj('#recipient').change( function( ) {
-           populateRecipient();
-       });
-     });
+  cj(function () {
+    loadMsgBox();
+    cj('#mode').change(function () {
+      loadMsgBox();
+    });
+
+    showHideLimitTo();
+    cj('#entity_0').change(function () {
+      showHideLimitTo();
+    });
+  });
+
+  function loadMsgBox() {
+    if (cj('#mode').val() == 'Email' || cj('#mode').val() == 0){
+      cj('#sms').hide();
+      cj('#smsProvider').hide();
+      cj('#email').show();
+    }
+    else if (cj('#mode').val() == 'SMS'){
+      cj('#email').hide();
+      cj('#sms').show();
+      cj('#smsProvider').show();
+    }
+    else if (cj('#mode').val() == 'User_Preference'){
+        cj('#email').show();
+        cj('#sms').show();
+        cj('#smsProvider').show();
+      }
+  }
+
+  function showHideLimitTo() {
+    if (cj('#entity_0').val() == 1) {
+      cj('#limit_to').hide();
+    }
+    else {
+      cj('#limit_to').show();
+    }
+  }
+
+  cj(function () {
+    if (cj('#is_recipient_listing').val()) {
+      cj('#recipientList').show();
+    }
+    else {
+      cj('#recipientList').hide();
+    }
+    cj('#recipient').change(function () {
+      populateRecipient();
+    });
+  });
 
      function populateRecipient( ) {
          var recipient = cj("#recipient option:selected").val();
@@ -289,3 +324,8 @@
 
  </script>
  {/literal}
+
+{/if}
+
+ <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
+</div>

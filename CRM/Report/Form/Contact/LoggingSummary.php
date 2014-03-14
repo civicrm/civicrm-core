@@ -165,7 +165,7 @@ class CRM_Report_Form_Contact_LoggingSummary extends CRM_Logging_ReportSummary {
           CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $row['log_civicrm_entity_altered_contact_id'], 'is_deleted') !== '0';
       }
 
-      if (CRM_Utils_Array::value('log_civicrm_entity_altered_contact', $row) &&
+      if (!empty($row['log_civicrm_entity_altered_contact']) &&
         !$isDeleted[$row['log_civicrm_entity_altered_contact_id']]) {
         $row['log_civicrm_entity_altered_contact_link'] =
           CRM_Utils_System::url('civicrm/contact/view', 'reset=1&cid=' . $row['log_civicrm_entity_altered_contact_id']);
@@ -201,6 +201,12 @@ class CRM_Report_Form_Contact_LoggingSummary extends CRM_Logging_ReportSummary {
         if ($this->cid) {
           $q .= '&cid=' . $this->cid;
         }
+        $q .= (!empty($row['log_civicrm_entity_altered_contact'])) ?
+          '&alteredName='.$row['log_civicrm_entity_altered_contact'] : '';
+        $q .= (!empty($row['altered_by_contact_display_name'])) ?
+          '&alteredBy='.$row['altered_by_contact_display_name'] : '';
+        $q .= (!empty($row['log_civicrm_entity_log_user_id'])) ?
+          '&alteredById='.$row['log_civicrm_entity_log_user_id'] : '';
 
         $url1 = CRM_Report_Utils_Report::getNextUrl('logging/contact/detail', "{$q}&snippet=4&section=2&layout=overlay", FALSE, TRUE);
         $url2 = CRM_Report_Utils_Report::getNextUrl('logging/contact/detail', "{$q}&section=2", FALSE, TRUE);
@@ -237,7 +243,7 @@ class CRM_Report_Form_Contact_LoggingSummary extends CRM_Logging_ReportSummary {
 INNER JOIN civicrm_contact modified_contact_civireport
         ON (entity_log_civireport.{$detail['fk']} = modified_contact_civireport.id {$clause})";
 
-    if (CRM_Utils_Array::value('joins', $detail)) {
+    if (!empty($detail['joins'])) {
       $clause = CRM_Utils_Array::value('entity_table', $detail);
       $clause = $clause ? "AND fk_table.entity_table = 'civicrm_contact'" : null;
       $joinClause = "

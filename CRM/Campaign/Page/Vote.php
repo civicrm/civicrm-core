@@ -86,10 +86,11 @@ class CRM_Campaign_Page_Vote extends CRM_Core_Page {
     }
     $this->assign('subPageType', $subPageType);
 
-    //give focus to proper tab.
-    $this->assign('selectedTabIndex', array_search(CRM_Utils_Array::value('subPage', $_GET, 'reserve'),
-        array_keys($this->_tabs)
-      ));
+    CRM_Core_Resources::singleton()
+      ->addScriptFile('civicrm', 'templates/CRM/common/TabHeader.js')
+      ->addSetting(array('tabSettings' => array(
+        'active' => strtolower(CRM_Utils_Array::value('subPage', $_GET, 'reserve')),
+      )));
   }
 
   function run() {
@@ -99,39 +100,29 @@ class CRM_Campaign_Page_Vote extends CRM_Core_Page {
   }
 
   function buildTabs() {
-    //check for required permissions.
-    $superUser = FALSE;
-    if (CRM_Core_Permission::check('manage campaign') ||
-      CRM_Core_Permission::check('administer CiviCampaign')
-    ) {
-      $superUser = TRUE;
-    }
-
     $allTabs = array();
     foreach ($this->_tabs as $name => $title) {
-      if (!$superUser &&
-        !CRM_Core_Permission::check("{$name} campaign contacts")
-      ) {
+      // check for required permissions.
+      if (!CRM_Core_Permission::check(array(array('manage campaign', 'administer CiviCampaign', "{$name} campaign contacts")))) {
         continue;
       }
 
-      $urlParams = "type={$name}&snippet=1";
+      $urlParams = "type={$name}";
       if ($this->_surveyId) {
         $urlParams .= "&sid={$this->_surveyId}";
       }
       if ($this->_interviewerId) {
         $urlParams .= "&cid={$this->_interviewerId}";
       }
-      $allTabs[] = array(
-        'id' => $name,
+      $allTabs[$name] = array(
         'title' => $title,
-        'url' => CRM_Utils_System::url('civicrm/campaign/vote',
-          $urlParams
-        ),
+        'valid' => TRUE,
+        'active' => TRUE,
+        'link' => CRM_Utils_System::url('civicrm/campaign/vote', $urlParams),
       );
     }
 
-    $this->assign('allTabs', empty($allTabs) ? FALSE : $allTabs);
+    $this->assign('tabHeader', empty($allTabs) ? FALSE : $allTabs);
   }
 }
 

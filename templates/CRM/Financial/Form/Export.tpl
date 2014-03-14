@@ -53,7 +53,7 @@
 {literal}
 <script type="text/javascript">
   cj(function(){
-    cj('input[name="export_format"]').filter('[value=IIF]').attr('checked', true);
+    cj('input[name="export_format"]').filter('[value=IIF]').prop('checked', true);
     cj('#_qf_Export_next').click(function(){
       cj(this).hide();
       cj('#_qf_Export_cancel').val('{/literal}{ts}Done{/ts}{literal}');

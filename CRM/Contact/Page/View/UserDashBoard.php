@@ -111,7 +111,7 @@ class CRM_Contact_Page_View_UserDashBoard extends CRM_Core_Page {
   /**
    * Function to build user dashboard
    *
-   * @return none
+   * @return void
    * @access public
    */
   function buildUserDashBoard() {
@@ -131,7 +131,7 @@ class CRM_Contact_Page_View_UserDashBoard extends CRM_Core_Page {
         continue;
       }
 
-      if (CRM_Utils_Array::value($name, $this->_userOptions) &&
+      if (!empty($this->_userOptions[$name]) &&
         (CRM_Core_Permission::access($component->name) ||
           CRM_Core_Permission::check($elem['perm'][0])
         )
@@ -148,24 +148,17 @@ class CRM_Contact_Page_View_UserDashBoard extends CRM_Core_Page {
       }
     }
 
-    if (CRM_Utils_Array::value('Permissioned Orgs', $this->_userOptions)) {
+    if (!empty($this->_userOptions['Permissioned Orgs'])) {
       $dashboardElements[] = array(
         'class' => 'crm-dashboard-permissionedOrgs',
-        'templatePath' => 'CRM/Contact/Page/View/Relationship.tpl',
+        'templatePath' => 'CRM/Contact/Page/View/RelationshipSelector.tpl',
         'sectionTitle' => ts('Your Contacts / Organizations'),
         'weight' => 40,
       );
 
-      $links = self::links();
-      $currentRelationships = CRM_Contact_BAO_Relationship::getRelationship($this->_contactId,
-        CRM_Contact_BAO_Relationship::CURRENT,
-        0, 0, 0,
-        $links, NULL, TRUE
-      );
-      $this->assign('currentRelationships', $currentRelationships);
     }
 
-    if (CRM_Utils_Array::value('PCP', $this->_userOptions)) {
+    if (!empty($this->_userOptions['PCP'])) {
       $dashboardElements[] = array(
         'class' => 'crm-dashboard-pcp',
         'templatePath' => 'CRM/Contribute/Page/PcpUserDashboard.tpl',
@@ -177,7 +170,7 @@ class CRM_Contact_Page_View_UserDashBoard extends CRM_Core_Page {
       $this->assign('pcpInfo', $pcpInfo);
     }
 
-    if (CRM_Utils_Array::value('Assigned Activities', $this->_userOptions)) {
+    if (!empty($this->_userOptions['Assigned Activities'])) {
       // Assigned Activities section
       $dashboardElements[] = array(
         'class' => 'crm-dashboard-assignedActivities',
@@ -192,7 +185,7 @@ class CRM_Contact_Page_View_UserDashBoard extends CRM_Core_Page {
     usort($dashboardElements, array('CRM_Utils_Sort', 'cmpFunc'));
     $this->assign('dashboardElements', $dashboardElements);
 
-    if (CRM_Utils_Array::value('Groups', $this->_userOptions)) {
+    if (!empty($this->_userOptions['Groups'])) {
       $this->assign('showGroup', TRUE);
       //build group selector
       $gContact = new CRM_Contact_Page_View_UserDashBoard_GroupContact();
@@ -206,7 +199,7 @@ class CRM_Contact_Page_View_UserDashBoard extends CRM_Core_Page {
   /**
    * perform actions and display for user dashboard
    *
-   * @return none
+   * @return void
    *
    * @access public
    */

@@ -24,7 +24,7 @@
  +--------------------------------------------------------------------+
 *}
 {capture assign=aclURL}{crmURL p='civicrm/acl' q='reset=1'}{/capture}
-{capture assign=rolesURL}{crmURL p='civicrm/admin/options/acl_role' q='group=acl_role&reset=1'}{/capture}
+{capture assign=rolesURL}{crmURL p='civicrm/admin/options/acl_role' q='reset=1'}{/capture}
 {capture assign=docLink}{docURL page='user/initial-set-up/access-control' text='Access Control Documentation'}{/capture}
 
 <div id="help" class="crm-block">
@@ -41,7 +41,7 @@
 <div id="ltype">
     {strip}
   {* handle enable/disable actions*}
-   {include file="CRM/common/enableDisable.tpl"}
+   {include file="CRM/common/enableDisableApi.tpl"}
     {include file="CRM/common/jsortable.tpl"}
     <table id="options" class="display">
         <thead>
@@ -54,7 +54,7 @@
         </thead>
         <tbody>
         {foreach from=$rows item=row}
-      <tr id="row_{$row.id}"class="{cycle values="odd-row,even-row"} {$row.class} crm-acl_entity_role {if NOT $row.is_active} disabled{/if}">
+      <tr id="acl_role-{$row.id}" class="{cycle values="odd-row,even-row"} {$row.class} crm-acl_entity_role crm-entity {if NOT $row.is_active} disabled{/if}">
           <td class="crm-acl_entity_role-acl_role">{$row.acl_role}</td>
           <td class="crm-acl_entity_role-entity">{$row.entity}</td>
           <td class="crm-acl_entity_role-is_active" id="row_{$row.id}_status">{if $row.is_active eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>

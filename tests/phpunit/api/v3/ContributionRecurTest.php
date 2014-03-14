@@ -41,7 +41,7 @@ class api_v3_ContributionRecurTest extends CiviUnitTestCase {
   protected $params;
   protected $ids = array();
   protected $_entity = 'contribution_recur';
-  public $_eNoticeCompliant = TRUE;
+
   public $DBResetRequired = FALSE;
 
   function setUp() {

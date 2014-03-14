@@ -32,14 +32,14 @@
       };
       switch (method) {
         case 'read':
-          CRM.api(model.crmEntityName, 'get', model.toCrmCriteria(), apiOptions);
+          CRM.api(model.crmEntityName, model.toCrmAction('get'), model.toCrmCriteria(), apiOptions);
           break;
         // replace all entities matching "x.crmCriteria" with new entities in "x.models"
         case 'crm-replace':
           var params = this.toCrmCriteria();
           params.version = 3;
           params.values = this.toJSON();
-          CRM.api(model.crmEntityName, 'replace', params, apiOptions);
+          CRM.api(model.crmEntityName, model.toCrmAction('replace'), params, apiOptions);
           break;
         default:
           apiOptions.error({is_error: 1, error_message: "CRM.Backbone.sync(" + method + ") not implemented for collections"});
@@ -74,9 +74,9 @@
           params.options || (params.options = {});
           params.options.reload = 1;
           if (!model._isDuplicate) {
-            CRM.api(model.crmEntityName, 'create', params, apiOptions);
+            CRM.api(model.crmEntityName, model.toCrmAction('create'), params, apiOptions);
           } else {
-            CRM.api(model.crmEntityName, 'duplicate', params, apiOptions);
+            CRM.api(model.crmEntityName, model.toCrmAction('duplicate'), params, apiOptions);
           }
           break;
         case 'read':
@@ -87,7 +87,7 @@
             apiOptions.error({is_error: 1, error_message: 'Missing ID for ' + model.crmEntityName});
             return;
           }
-          CRM.api(model.crmEntityName, apiAction, params, apiOptions);
+          CRM.api(model.crmEntityName, model.toCrmAction(apiAction), params, apiOptions);
           break;
         default:
           apiOptions.error({is_error: 1, error_message: "CRM.Backbone.sync(" + method + ") not implemented for models"});
@@ -116,8 +116,17 @@
     // Defaults - if specified in ModelClass, preserve
     _.defaults(ModelClass.prototype, {
       crmEntityName: crmEntityName,
+      crmActions: {}, // map: string backboneActionName => string serverSideActionName
+      crmReturn: null, // array: list of fields to return
+      toCrmAction: function(action) {
+        return this.crmActions[action] ? this.crmActions[action] : action;
+      },
       toCrmCriteria: function() {
-        return (this.get('id')) ? {id: this.get('id')} : {};
+        var result = (this.get('id')) ? {id: this.get('id')} : {};
+        if (this.crmReturn != null) {
+          result.return = this.crmReturn;
+        }
+        return result;
       },
       duplicate: function() {
         var newModel = new ModelClass(this.toJSON());
@@ -277,7 +286,7 @@
    * });
    * CRM.Backbone.extendCollection(ContactCollection);
    *
-   * // Use class
+   * // Use class (with passive criteria)
    * var c = new ContactCollection([], {
    *   crmCriteria: {contact_type: 'Organization'}
    * });
@@ -285,7 +294,20 @@
    * c.get(123).set('property', 'value');
    * c.get(456).setDeleted(true);
    * c.save();
+   *
+   * // Use class (with active criteria)
+   * var criteriaModel = new SomeModel({
+   *     contact_type: 'Organization'
+   * });
+   * var c = new ContactCollection([], {
+   *   crmCriteriaModel: criteriaModel
+   * });
+   * c.fetch();
+   * c.get(123).set('property', 'value');
+   * c.get(456).setDeleted(true);
+   * c.save();
    * @endcode
+   *
    *
    * @param Class CollectionClass
    * @see tests/qunit/crm-backbone
@@ -295,9 +317,39 @@
     // Defaults - if specified in CollectionClass, preserve
     _.defaults(CollectionClass.prototype, {
       crmEntityName: CollectionClass.prototype.model.prototype.crmEntityName,
-      toCrmCriteria: function() {
-        return (this.crmCriteria) ? _.extend({}, this.crmCriteria) : {};
+      crmActions: {}, // map: string backboneActionName => string serverSideActionName
+      toCrmAction: function(action) {
+        return this.crmActions[action] ? this.crmActions[action] : action;
       },
+      toCrmCriteria: function() {
+        var result = (this.crmCriteria) ? _.extend({}, this.crmCriteria) : {};
+        if (this.crmReturn != null) {
+          result.return = this.crmReturn;
+        } else if (this.model && this.model.prototype.crmReturn != null) {
+          result.return = this.model.prototype.crmReturn;
+        }
+        return result;
+      },
+
+      /**
+       * Get an object which represents this collection's criteria
+       * as a live model. Any changes to the model will be applied
+       * to the collection, and the collection will be refreshed.
+       *
+       * @param criteriaModelClass
+       */
+      setCriteriaModel: function(criteriaModel) {
+        var collection = this;
+        this.crmCriteria = criteriaModel.toJSON();
+        this.listenTo(criteriaModel, 'change', function() {
+          collection.crmCriteria = criteriaModel.toJSON();
+          collection.debouncedFetch();
+        });
+      },
+
+      debouncedFetch: _.debounce(function() {
+        this.fetch({reset: true});
+      }, 100),
 
       /**
        * Reconcile the server's collection with the client's collection.
@@ -327,8 +379,13 @@
       sync: CRM.Backbone.sync,
       initialize: function(models, options) {
         options || (options = {});
-        if (options.crmCriteria) {
+        if (options.crmCriteriaModel) {
+          this.setCriteriaModel(options.crmCriteriaModel);
+        } else if (options.crmCriteria) {
           this.crmCriteria = options.crmCriteria;
+        }
+        if (options.crmActions) {
+          this.crmActions = _.extend(this.crmActions, options.crmActions);
         }
         if (origInit) {
           return origInit.apply(this, arguments);

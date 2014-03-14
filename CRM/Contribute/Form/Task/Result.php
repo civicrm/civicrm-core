@@ -51,7 +51,7 @@ class CRM_Contribute_Form_Task_Result extends CRM_Contribute_Form_Task {
   /**
    * Function to actually build the form
    *
-   * @return None
+   * @return void
    * @access public
    */
   public function buildQuickForm() {

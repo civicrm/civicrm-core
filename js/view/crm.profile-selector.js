@@ -63,7 +63,7 @@
       this.doPreview();
     },
     toggleButtons: function() {
-      this.$('.crm-profile-selector-edit,.crm-profile-selector-copy').attr('disabled', !this.hasUfGroupId());
+      this.$('.crm-profile-selector-edit,.crm-profile-selector-copy').prop('disabled', !this.hasUfGroupId());
     },
     hasUfGroupId: function() {
       return (this.getUfGroupId() && this.getUfGroupId() != '') ? true : false;
@@ -115,7 +115,7 @@
             success: function(formData) {
               // Note: With chaining, API returns some extraneous keys that aren't part of UFGroupModel
               var ufGroupModel = new CRM.UF.UFGroupModel(_.pick(formData, _.keys(CRM.UF.UFGroupModel.prototype.schema)));
-              ufGroupModel.getRel('ufEntityCollection').reset(profileSelectorView.options.ufEntities);
+              ufGroupModel.setUFGroupModel(ufGroupModel.calculateContactEntityType(), profileSelectorView.options.ufEntities);
               ufGroupModel.getRel('ufFieldCollection').reset(_.values(formData["api.UFField.get"].values));
               options.onLoad(ufGroupModel);
             }
@@ -137,7 +137,7 @@
             success: function(formData) {
               // Note: With chaining, API returns some extraneous keys that aren't part of UFGroupModel
               var ufGroupModel = new CRM.UF.UFGroupModel(_.pick(formData, _.keys(CRM.UF.UFGroupModel.prototype.schema)));
-              ufGroupModel.getRel('ufEntityCollection').reset(profileSelectorView.options.ufEntities);
+              ufGroupModel.setUFGroupModel(ufGroupModel.calculateContactEntityType(), profileSelectorView.options.ufEntities);
               ufGroupModel.getRel('ufFieldCollection').reset(_.values(formData["api.UFField.get"].values));
               options.onLoad(ufGroupModel.deepCopy());
             }

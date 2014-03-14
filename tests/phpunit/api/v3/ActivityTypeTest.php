@@ -35,7 +35,7 @@ require_once 'CiviTest/CiviUnitTestCase.php';
 
 class api_v3_ActivityTypeTest extends CiviUnitTestCase {
   protected $_apiversion;
-  public $_eNoticeCompliant = TRUE;
+
 
   function get_info() {
     return array(

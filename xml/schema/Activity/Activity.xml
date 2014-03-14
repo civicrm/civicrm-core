@@ -15,6 +15,7 @@
       <required>true</required>
       <comment>Unique  Other Activity ID</comment>
        <add>1.1</add>
+       
   </field>
   <primaryKey>
        <name>id</name>
@@ -59,7 +60,7 @@
   </index>
   <field>
       <name>activity_type_id</name>
-      <title>Activity Type ID</title>
+      <title>Activity Type</title>
       <import>true</import>
       <type>int unsigned</type>
       <required>true</required>
@@ -71,6 +72,9 @@
       <pseudoconstant>
         <optionGroupName>activity_type</optionGroupName>
       </pseudoconstant>
+      <html>
+        <type>Select</type>
+      </html>            
   </field>
   <index>
        <name>UI_activity_type_id</name>
@@ -106,6 +110,9 @@
        <comment>The subject/purpose/short description of the activity.</comment>
        <import>true</import>
        <headerPattern>/(activity.)?subject/i</headerPattern>
+       <html>
+        <type>Text</type>
+       </html>
        <add>1.1</add>
        <modify>2.0</modify>
   </field>
@@ -125,6 +132,9 @@
        <type>datetime</type>
        <headerPattern>/(activity.)?date(.time$)?/i</headerPattern>
        <comment>Date and time this activity is scheduled to occur. Formerly named scheduled_date_time.</comment>
+       <html>
+            <type>Select Date</type>
+      </html>
        <add>2.0</add>
   </field>
   <field>
@@ -159,6 +169,9 @@
       <headerPattern>/(activity.)?duration(s)?$/i</headerPattern>
       <comment>Planned or actual duration of activity expressed in minutes. Conglomerate of former duration_hours and duration_minutes.</comment>
       <add>2.0</add>
+      <html>
+            <type>Text</type>
+      </html>
   </field>
 
   <field>
@@ -170,6 +183,9 @@
       <length>255</length>
       <headerPattern>/(activity.)?location$/i</headerPattern>
       <comment>Location of the activity (optional, open text).</comment>
+      <html>
+            <type>Text</type>
+      </html>
       <add>1.1</add>
   </field>
 
@@ -179,6 +195,9 @@
       <title>Phone (called) ID</title>
       <comment>Phone ID of the number called (optional - used if an existing phone number is selected).</comment>
       <add>2.0</add>
+      <html>
+        <type>Autocomplete-Select</type>
+      </html>
   </field>
   <foreignKey>
        <name>phone_id</name>
@@ -194,6 +213,9 @@
       <type>varchar</type>
       <length>64</length>
       <comment>Phone number in case the number does not exist in the civicrm_phone table.</comment>
+      <html>
+            <type>Text</type>
+      </html>
       <add>2.0</add>
   </field>
 
@@ -203,10 +225,13 @@
       <title>Details</title>
       <import>true</import>
       <type>text</type>
-      <rows>8</rows>
-      <cols>60</cols>
       <headerPattern>/(activity.)?detail(s)?$/i</headerPattern>
       <comment>Details about the activity (agenda, notes, etc).</comment>
+      <html>
+          <type>RichTextEditor</type>
+          <rows>8</rows>
+          <cols>60</cols>
+      </html>
       <add>1.1</add>
   </field>
 
@@ -223,7 +248,7 @@
   <field>
       <name>status_id</name>
       <uniqueName>activity_status_id</uniqueName>
-      <title>Activity Status Id</title>
+      <title>Activity Status</title>
       <import>true</import>
       <export>false</export>
       <headerPattern>/(activity.)?status(.label$)?/i</headerPattern>
@@ -233,6 +258,9 @@
       <pseudoconstant>
         <optionGroupName>activity_status</optionGroupName>
       </pseudoconstant>
+      <html>
+        <type>Select</type>
+      </html>      
   </field>
   <field>
       <name>priority_id</name>
@@ -243,6 +271,9 @@
       <pseudoconstant>
         <optionGroupName>priority</optionGroupName>
       </pseudoconstant>
+      <html>
+        <type>Select</type>
+      </html>
   </field>
   <field>
       <name>parent_id</name>
@@ -268,6 +299,9 @@
        <import>true</import>
        <headerPattern>/(is.)?test(.activity)?/i</headerPattern>
        <add>2.0</add>
+       <html>
+         <type>Select</type>
+       </html>
   </field>
   <field>
       <name>medium_id</name>
@@ -279,6 +313,9 @@
       <pseudoconstant>
         <optionGroupName>encounter_medium</optionGroupName>
       </pseudoconstant>
+      <html>
+        <type>Select</type>
+      </html>
       <add>2.2</add>
   </field>
   <index>
@@ -315,6 +352,9 @@
        <import>true</import>
        <headerPattern>/(is.)?(current.)?(revision|version(ing)?)/i</headerPattern>
        <add>2.2</add>
+       <html>
+         <type>CheckBox</type>
+       </html>
   </field>
   <index>
        <name>index_is_current_revision</name>
@@ -348,6 +388,9 @@
        <title>Result</title>
        <length>255</length>
        <comment>Currently being used to store result id for survey activity, FK to option value.</comment>
+       <html>
+            <type>Text</type>
+      </html>
        <add>3.3</add>
   </field>
   <field>
@@ -359,6 +402,9 @@
        <import>true</import>
        <headerPattern>/(activity.)?(trash|deleted)/i</headerPattern>
        <add>2.2</add>
+       <html>
+         <type>Text</type>
+       </html>
   </field>
   <index>
        <name>index_is_deleted</name>
@@ -369,10 +415,18 @@
        <name>campaign_id</name>
        <uniqueName>activity_campaign_id</uniqueName>
        <type>int unsigned</type>
-       <title>Campaign ID</title>
+       <title>Campaign</title>
        <import>true</import>
        <comment>The campaign for which this activity has been triggered.</comment>
+       <pseudoconstant>
+          <table>civicrm_campaign</table>
+          <keyColumn>id</keyColumn>
+          <labelColumn>title</labelColumn>
+       </pseudoconstant>
        <add>3.4</add>
+       <html>
+         <type>CheckBox</type>
+       </html>
   </field>
   <foreignKey>
        <name>campaign_id</name>
@@ -390,11 +444,17 @@
       <pseudoconstant>
         <optionGroupName>engagement_index</optionGroupName>
       </pseudoconstant>
+      <html>
+        <type>Select</type>
+      </html>
       <add>3.4</add>
   </field>
   <field>
       <name>weight</name>
       <type>int</type>
       <add>4.1</add>
+      <html>
+         <type>Text</type>
+      </html>
   </field>
 </table>

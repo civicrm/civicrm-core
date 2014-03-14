@@ -519,7 +519,7 @@ class CRM_Utils_Array {
         } else {
           $keyvalue = $record->{$key};
         }
-        if (!is_array($node[$keyvalue])) {
+        if (isset($node[$keyvalue]) && !is_array($node[$keyvalue])) {
           $node[$keyvalue] = array();
         }
         $node = &$node[$keyvalue];
@@ -634,6 +634,49 @@ class CRM_Utils_Array {
       return ($key && array_key_exists($key, $list)) ? $list[$key] : $default;
     }
     return $default;
+  }
+
+  /**
+   * Generate the Cartesian product of zero or more vectors
+   *
+   * @param array $dimensions list of dimensions to multiply; each key is a dimension name; each value is a vector
+   * @param array $template a base set of values included in every output
+   * @return array each item is a distinct combination of values from $dimensions
+   *
+   * For example, the product of
+   * {
+   *   fg => {red, blue},
+   *   bg => {white, black}
+   * }
+   * would be
+   * {
+   *   {fg => red, bg => white},
+   *   {fg => red, bg => black},
+   *   {fg => blue, bg => white},
+   *   {fg => blue, bg => black}
+   * }
+   */
+  static function product($dimensions, $template = array()) {
+    if (empty($dimensions)) {
+      return array($template);
+    }
+
+    foreach ($dimensions as $key => $value) {
+      $firstKey = $key;
+      $firstValues = $value;
+      break;
+    }
+    unset($dimensions[$key]);
+
+    $results = array();
+    foreach ($firstValues as $firstValue) {
+      foreach (self::product($dimensions, $template) as $result) {
+        $result[$firstKey] = $firstValue;
+        $results[] = $result;
+      }
+    }
+
+    return $results;
   }
 }
 

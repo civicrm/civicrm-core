@@ -23,15 +23,15 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
-<div class="view-content">
+<div class="view-content view-contact-groups">
   {if $groupCount eq 0}
     <div class="messages status no-popup">
       <div class="icon inform-icon"></div>
       &nbsp;{ts}This contact does not currently belong to any groups.{/ts}
     </div>
+  {else}
+    {include file="CRM/common/jsortable.tpl"}
   {/if}
-
-  {include file="CRM/common/jsortable.tpl"}
 
   {* Include 'add to new group' form if session has edit contact permissions *}
   {if $permission EQ 'edit'}
@@ -53,7 +53,7 @@
         </tr>
         </thead>
         {foreach from=$groupIn item=row}
-          <tr id="grp_{$row.id}" class="{cycle values="odd-row,even-row"}">
+          <tr id="group_contact-{$row.id}" class="crm-entity {cycle values="odd-row,even-row"}">
             <td class="bold">
               <a href="{crmURL p='civicrm/group/search' q="reset=1&force=1&context=smog&gid=`$row.group_id`"}">
                 {$row.title}
@@ -63,16 +63,10 @@
             <td>{$row.in_date|crmDate}</td>
             <td>
               {if $permission EQ 'edit'}
-              <a href="{crmURL p='civicrm/contact/view/group' q="gcid=`$row.id`&action=delete&st=o"}"
-                onclick="return confirm('{ts 1=$displayName 2=$row.title}Are you sure you want to remove %1 from %2?{/ts}');"
-                title="{ts}Remove contact from this group (status in this group will be changed to 'Removed').{/ts}">
-                [ {ts}Remove{/ts} ]</a>
-              {/if}
-              {if $permission EQ 'edit'}
-                <a href="{crmURL p='civicrm/contact/view/group' q="gcid=`$row.id`&action=delete&st=d"}"
-                onclick="return confirm('{ts 1=$displayName 2=$row.title}Are you sure you want to delete %1 from %2?{/ts}');"
-                title="{ts}Remove contact from this group AND delete their group status record.{/ts}">[ {ts}Delete{/ts}
-                ]</a>
+                <a class="action-item action-item-first" href="#Removed" title="{ts 1=$displayName 2=$row.title}Remove %1 from %2? (status in this group will be changed to 'Removed').{/ts}">
+                  {ts}Remove{/ts}</a>
+                <a class="action-item" href="#Deleted" title="{ts 1=$displayName 2=$row.title}Delete %1 from %2? (remove contact AND delete their record of having been in this group).{/ts}">
+                  {ts}Delete{/ts}</a>
               {/if}
             </td>
           </tr>
@@ -82,19 +76,19 @@
   {/if}
 
   {if $contactSmartGroupSettings neq 3}
-  <div class="accordion ui-accordion ui-widget ui-helper-reset">
-    <div class="crm-accordion-wrapper crm-ajax-accordion crm-smartgroup-accordion {if $contactSmartGroupSettings eq 1}collapsed{/if}">
-      <div class="crm-accordion-header" id="crm-contact_smartgroup" contact_id="{$contactId}">
-        {ts}Smart Groups{/ts}
+    <div class="accordion ui-accordion ui-widget ui-helper-reset">
+      <div class="crm-accordion-wrapper crm-ajax-accordion crm-smartgroup-accordion {if $contactSmartGroupSettings eq 1}collapsed{/if}">
+        <div class="crm-accordion-header" id="crm-contact_smartgroup" contact_id="{$contactId}">
+          {ts}Smart Groups{/ts}
+        </div>
+        <!-- /.crm-accordion-header -->
+        <div class="crm-accordion-body">
+          <div class="crm-contact_smartgroup"></div>
+        </div>
+        <!-- /.crm-accordion-body -->
       </div>
-      <!-- /.crm-accordion-header -->
-      <div class="crm-accordion-body">
-        <div class="crm-contact_smartgroup"></div>
-      </div>
-      <!-- /.crm-accordion-body -->
+      <!-- /.crm-accordion-wrapper -->
     </div>
-    <!-- /.crm-accordion-wrapper -->
-  </div>
   {/if}
 
   {if $groupPending}
@@ -112,7 +106,7 @@
         </tr>
         </thead>
         {foreach from=$groupPending item=row}
-          <tr class="{cycle values="odd-row,even-row"}">
+          <tr id="group_contact-{$row.id}" class="crm-entity {cycle values="odd-row,even-row"}">
             <td class="bold">
               <a href="{crmURL p='civicrm/group/search' q="reset=1&force=1&context=smog&gid=`$row.group_id`"}">
                 {$row.title}
@@ -122,16 +116,10 @@
             <td>{$row.pending_date|crmDate}</td>
             <td>
               {if $permission EQ 'edit'}
-              <a href="{crmURL p='civicrm/contact/view/group' q="gcid=`$row.id`&action=delete&st=o"}"
-                onclick="return confirm('{ts 1=$displayName 2=$row.title}Are you sure you want to remove %1 from %2?{/ts}');"
-                title="{ts}Remove contact from this group (status in this group will be changed to 'Removed').{/ts}">
-                [ {ts}Remove{/ts} ]</a>
-              {/if}
-              {if $permission EQ 'edit'}
-              <a href="{crmURL p='civicrm/contact/view/group' q="gcid=`$row.id`&action=delete&st=d"}"
-                onclick="return confirm('{ts 1=$displayName 2=$row.title}Are you sure you want to delete %1 from %2?{/ts}');"
-                title="{ts}Delete the group status record (this group will no longer be listed under Pending Groups).{/ts}">
-                [ {ts}Delete{/ts} ]</a>
+                <a class="action-item action-item-first" href="#Removed" title="{ts 1=$displayName 2=$row.title}Remove %1 from %2? (status in this group will be changed to 'Removed').{/ts}">
+                  {ts}Remove{/ts}</a>
+                <a class="action-item" href="#Deleted" title="{ts 1=$displayName 2=$row.title}Delete %1 from %2? (this group will no longer be listed under Pending Groups){/ts}">
+                  {ts}Delete{/ts}</a>
               {/if}
             </td>
           </tr>
@@ -156,7 +144,7 @@
         </tr>
         </thead>
         {foreach from=$groupOut item=row}
-          <tr class="{cycle values="odd-row,even-row"}">
+          <tr id="group_contact-{$row.id}" class="crm-entity {cycle values="odd-row,even-row"}">
             <td class="bold">
               <a href="{crmURL p='civicrm/group/search' q="reset=1&force=1&context=smog&gid=`$row.group_id`"}">
                 {$row.title}
@@ -166,14 +154,10 @@
             <td>{$row.date_added|crmDate}</td>
             <td>{$row.out_date|crmDate}</td>
             <td>{if $permission EQ 'edit'}
-              <a href="{crmURL p='civicrm/contact/view/group' q="gcid=`$row.id`&action=delete&st=i"}"
-                onclick="return confirm('{ts 1=$displayName 2=$row.title}Are you sure you want to add %1 back into %2?{/ts}');">
-                [ {ts}Rejoin Group{/ts} ]</a>{/if}
-              {if $permission EQ 'edit'}
-              <a href="{crmURL p='civicrm/contact/view/group' q="gcid=`$row.id`&action=delete&st=d"}"
-                onclick="return confirm('{ts 1=$displayName 2=$row.title}Are you sure you want to delete %1 from %2?{/ts}');"
-                title="{ts}Delete the group status record (this group will no longer be listed under Past Groups).{/ts}">
-                [ {ts}Delete{/ts} ]</a>{/if}
+                <a class="action-item action-item-first" href="#Added" title="{ts 1=$displayName 2=$row.title}Add %1 back into %2?{/ts}">
+                  {ts}Rejoin Group{/ts}</a>
+              <a class="action-item" href="#Deleted" title="{ts 1=$displayName 2=$row.title}Delete %1 from %2? (this group will no longer be listed under Past Groups).{/ts}">
+                {ts}Delete{/ts}</a>{/if}
             </td>
           </tr>
         {/foreach}
@@ -185,34 +169,48 @@
 
 {literal}
 <script type="text/javascript">
-  // bind first click of accordion header to load crm-accordion-body with snippet
-  // everything else taken care of by cj().crm-accordions()
-  cj(function () {
-    cj('.crm-ajax-accordion .crm-accordion-header').one('click', function () {
-      loadPanes(cj(this));
-    });
-    cj('.crm-ajax-accordion:not(.collapsed) .crm-accordion-header').each(function (index) {
-      loadPanes(cj(this));
+  cj(function($) {
+    // load panes function calls for snippet based on id of crm-accordion-header
+    function loadPanes() {
+      var id = $(this).attr('id');
+      var contactId = $(this).attr('contact_id');
+      if (!$('div.' + id).html()) {
+        var loading = '<img src="{/literal}{$config->resourceBase}i/loading.gif{literal}" alt="{/literal}{ts escape='js'}loading{/ts}{literal}" />&nbsp;{/literal}{ts escape='js'}Loading{/ts}{literal}...';
+        $('div.' + id).html(loading).load(CRM.url('civicrm/contact/view/smartgroup', {snippet: 4, cid: contactId}));
+      }
+    }
+    // bind first click of accordion header to load crm-accordion-body with snippet
+    $('.view-contact-groups .crm-ajax-accordion.collapsed .crm-accordion-header').one('click', loadPanes);
+    $('.view-contact-groups .crm-ajax-accordion:not(.collapsed) .crm-accordion-header').each(loadPanes);
+    // Handle enable/delete links
+    var that;
+    function refresh() {
+      $(that).closest('.crm-ajax-container, #crm-main-content-wrapper').crmSnippet().crmSnippet('refresh');
+    }
+    function enableDisableGroup() {
+      var params = {
+        id: $(that).closest('.crm-entity').attr('id').split('-')[1],
+        method: 'Admin'
+      };
+      var status = that.href.split('#')[1];
+      if (status === 'Deleted') {
+        params.skip_undelete = true;
+      } else {
+        params.status = status;
+      }
+      // This api is weird - 'delete' actually works for updating as well as deleting
+      // Normally you wouldn't put a variable within ts() but this works due to smarty hack below
+      CRM.api3('group_contact', 'delete', params, {success: ts(status)}).done(refresh);
+    }
+    $('.view-contact-groups a.action-item').click(function() {
+      that = this;
+      CRM.confirm(enableDisableGroup, {message: this.title});
+      return false;
     });
   });
-
-  // load panes function calls for snippet based on id of crm-accordion-header
-  function loadPanes(paneObj) {
-    var id = paneObj.attr('id');
-    var contactId = paneObj.attr('contact_id');
-
-    var dataUrl = CRM.url('civicrm/contact/view/smartgroup', 'snippet=4&cid=' + contactId);
-
-    if (!cj('div.' + id).html()) {
-      var loading = '<img src="{/literal}{$config->resourceBase}i/loading.gif{literal}" alt="{/literal}{ts escape='js'}loading{/ts}{literal}" />&nbsp;{/literal}{ts escape='js'}Loading{/ts}{literal}...';
-      cj('div.' + id).html(loading);
-      cj.ajax({
-        url: dataUrl,
-        success: function (data) {
-          cj('div.' + id).html(data);
-        }
-      });
-    }
-  }
+  {/literal}
+  // Hack to ensure status msg is properly translated
+  CRM.strings.Added = "{ts escape='js'}Added{/ts}";
+  CRM.strings.Removed = "{ts escape='js'}Removed{/ts}";
+  CRM.strings.Deleted = "{ts escape='js'}Deleted{/ts}";
 </script>
-{/literal}

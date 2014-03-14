@@ -26,7 +26,7 @@
 {* this template is used for the dropdown menu of the "Actions" button on contacts. *}
 
 <div id="crm-contact-actions-wrapper" data-edit-params='{ldelim}"cid": "{$contactId}", "class_name": "CRM_Contact_Page_Inline_Actions"{rdelim}'>
-  <a id="crm-contact-actions-link" class="button"><span><div class="icon dropdown-icon"></div>{ts}Actions{/ts}</span></a>
+  <a id="crm-contact-actions-link" href="#" class="button"><span><div class="icon dropdown-icon"></div>{ts}Actions{/ts}</span></a>
     <div class="ac_results" id="crm-contact-actions-list">
       <div class="crm-contact-actions-list-inner">
         <div class="crm-contact_activities-list">
@@ -70,9 +70,9 @@
         <div class="crm-contact_actions-list">
         <ul class="contact-actions">
           {foreach from=$actionsMenuList.moreActions item='row'}
-          {if $row.href}
+          {if !empty($row.href) or !empty($row.tab)}
           <li class="crm-action-{$row.ref}">
-            <a href="{$row.href}&cid={$contactId}" title="{$row.title}">{$row.title}</a>
+            <a href="{if !empty($row.href)}{$row.href}&cid={$contactId}{else}#{/if}" title="{$row.title}" data-tab="{$row.tab}">{$row.title}</a>
           </li>
           {/if}
         {/foreach}
@@ -85,17 +85,4 @@
     </div>
   </div>
 {literal}
-<script type="text/javascript">
-
-cj('#crm-contact-actions-list').click(function(event){
-    event.stopPropagation();
-});
-
-cj('#crm-contact-actions-link').click(function(event) {
-  cj('#crm-contact-actions-list').toggle();
-  event.stopPropagation();
-  return false;
-});
-
-</script>
 {/literal}

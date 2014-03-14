@@ -241,7 +241,7 @@ class CRM_Report_Form_Pledge_Summary extends CRM_Report_Form {
                                {$this->_aliases['civicrm_email']}.is_primary = 1\n";
     }
 
-    if(CRM_Utils_Array::value('total_paid', $this->_params['fields'])){
+    if (!empty($this->_params['fields']['total_paid'])){
       $this->_from .= "
         LEFT JOIN civicrm_pledge_payment {$this->_aliases['civicrm_pledge_payment']} ON
           {$this->_aliases['civicrm_pledge']}.id = {$this->_aliases['civicrm_pledge_payment']}.pledge_id
@@ -260,14 +260,12 @@ class CRM_Report_Form_Pledge_Summary extends CRM_Report_Form {
       foreach ($this->_columns as $tableName => $table) {
         if (array_key_exists('group_bys', $table)) {
           foreach ($table['group_bys'] as $fieldName => $field) {
-            if (CRM_Utils_Array::value($fieldName, $this->_params['group_bys'])) {
-              if (CRM_Utils_Array::value('chart', $field)) {
+            if (!empty($this->_params['group_bys'][$fieldName])) {
+              if (!empty($field['chart'])) {
                 $this->assign('chartSupported', TRUE);
               }
 
-              if (CRM_Utils_Array::value('frequency', $table['group_bys'][$fieldName]) &&
-                CRM_Utils_Array::value($fieldName, $this->_params['group_bys_freq'])
-              ) {
+              if (!empty($table['group_bys'][$fieldName]['frequency']) && !empty($this->_params['group_bys_freq'][$fieldName])) {
 
                 $append = "YEAR({$field['dbAlias']}),";
                 if (in_array(strtolower($this->_params['group_bys_freq'][$fieldName]),

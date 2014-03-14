@@ -46,7 +46,7 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
   protected $_customGroupId = NULL;
   protected $_customFieldId = NULL;
   protected $_params;
-  public $_eNoticeCompliant = TRUE;
+
   protected $_entity;
   function get_info() {
     return array(

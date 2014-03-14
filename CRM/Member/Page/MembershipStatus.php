@@ -71,14 +71,12 @@ class CRM_Member_Page_MembershipStatus extends CRM_Core_Page_Basic {
         ),
         CRM_Core_Action::DISABLE => array(
           'name' => ts('Disable'),
-          'extra' => 'onclick = "enableDisable( %%id%%,\'' . 'CRM_Member_BAO_MembershipStatus' . '\',\'' . 'enable-disable' . '\' );"',
-          'ref' => 'disable-action',
+          'ref' => 'crm-enable-disable',
           'title' => ts('Disable Membership Status'),
         ),
         CRM_Core_Action::ENABLE => array(
           'name' => ts('Enable'),
-          'extra' => 'onclick = "enableDisable( %%id%%,\'' . 'CRM_Member_BAO_MembershipStatus' . '\',\'' . 'disable-enable' . '\' );"',
-          'ref' => 'enable-action',
+          'ref' => 'crm-enable-disable',
           'title' => ts('Enable Membership Status'),
         ),
         CRM_Core_Action::DELETE => array(
@@ -136,6 +134,7 @@ class CRM_Member_Page_MembershipStatus extends CRM_Core_Page_Basic {
    * @static
    */
   function browse() {
+    CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'js/crm.livePage.js');
     // get all custom groups sorted by weight
     $membershipStatus = array();
     $dao = new CRM_Member_DAO_MembershipStatus();

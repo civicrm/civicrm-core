@@ -85,13 +85,11 @@ class CRM_Contribute_Page_ContributionPage extends CRM_Core_Page {
         CRM_Core_Action::DISABLE => array(
           'name' => ts('Disable'),
           'title' => ts('Disable'),
-          'extra' => 'onclick = "enableDisable( %%id%%,\'' . 'CRM_Contribute_BAO_ContributionPage' . '\',\'' . 'enable-disable' . '\' );"',
-          'ref' => 'disable-action',
+          'ref' => 'crm-enable-disable',
         ),
         CRM_Core_Action::ENABLE => array(
           'name' => ts('Enable'),
-          'extra' => 'onclick = "enableDisable( %%id%%,\'' . 'CRM_Contribute_BAO_ContributionPage' . '\',\'' . 'disable-enable' . '\' );"',
-          'ref' => 'enable-action',
+          'ref' => 'crm-enable-disable',
           'title' => ts('Enable'),
         ),
         CRM_Core_Action::DELETE => array(
@@ -230,10 +228,9 @@ class CRM_Contribute_Page_ContributionPage extends CRM_Core_Page {
     if (!isset(self::$_contributionLinks)) {
       //get contribution dates.
       $dates = CRM_Contribute_BAO_Contribution::getContributionDates();
-      foreach (array(
-        'now', 'yearDate', 'monthDate') as $date) {
-        $$date = $dates[$date];
-      }
+      $now = $dates['now'];
+      $yearDate = $dates['yearDate'];
+      $monthDate = $dates['monthDate'];
       $yearNow = $yearDate + 10000;
 
       $urlString = 'civicrm/contribute/search';
@@ -665,7 +662,7 @@ SELECT count(id)
         $classes = $link['class'];
       }
 
-      if (!CRM_Utils_Array::value($sectionName, $sectionsInfo)) {
+      if (empty($sectionsInfo[$sectionName])) {
         $classes = array();
         if (isset($link['class'])) {
           $classes = $link['class'];

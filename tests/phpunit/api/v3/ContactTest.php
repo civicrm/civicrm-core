@@ -46,7 +46,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
   protected $_apiversion;
   protected $_entity;
   protected $_params;
-  public $_eNoticeCompliant = TRUE;
+
   protected $_contactID;
   protected $_financialTypeId =1;
 
@@ -578,13 +578,25 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $params = array('return' => 'custom_' . $ids['custom_field_id'], 'id' => $result['id']);
     $check = $this->callAPIAndDocument($this->_entity, 'get', $params, __FUNCTION__, __FILE__, $description, $subfile);
 
-    $this->assertEquals("custom string", $check['values'][$check['id']]['custom_' . $ids['custom_field_id']], ' in line ' . __LINE__);
+    $this->assertEquals("custom string", $check['values'][$check['id']]['custom_' . $ids['custom_field_id']]);
     $this->customFieldDelete($ids['custom_field_id']);
     $this->customGroupDelete($ids['custom_group_id']);
   }
 
+  /**
+   * Check that address name is returned if required
+   */
+  function testGetReturnAddressName () {
+    $contactID = $this->individualCreate();
+    $this->callAPISuccess('address', 'create', array('contact_id' => $contactID, 'address_name' => 'My house', 'location_type_id' => 'Home', 'street_address' => '1 my road'));
+    $result = $this->callAPISuccessGetSingle('contact', array('return' => 'address_name, street_address', 'id' => $contactID));
+    $this->assertEquals('1 my road', $result['street_address']);
+    $this->assertEquals('My house', $result['address_name']);
+
+  }
+
   function testGetGroupIDFromContact() {
-    $groupId     = $this->groupCreate(NULL);
+    $groupId     = $this->groupCreate();
     $description = "Get all from group and display contacts";
     $subfile     = "GroupFilterUsingContactAPI";
     $params      = array(
@@ -883,7 +895,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
       'home_url' => 'http://www.example.org',
 
     );
-    $getResult = $this->callAPISuccess('Contact', 'Get', array());
+
     $result    = $this->callAPISuccess('Contact', 'Update', $params);
     $getResult = $this->callAPISuccess('Contact', 'Get', $params);
     unset($params['contact_id']);
@@ -958,15 +970,14 @@ class api_v3_ContactTest extends CiviUnitTestCase {
 
     $result = $this->callAPISuccess('Contact', 'Update', $params);
 
-    //  Check updated civicrm_contact against expected
-    $expected = new PHPUnit_Extensions_Database_DataSet_XMLDataSet(
-      dirname(__FILE__) . '/dataset/contact_hld_upd.xml'
+    $expected = array(
+      'contact_type' => 'Household',
+      'is_opt_out' => 0,
+      'sort_name' => 'ABC household',
+      'display_name' => 'ABC household',
+      'nick_name' => 'ABC House',
     );
-    $actual = new PHPUnit_Extensions_Database_DataSet_QueryDataset(
-      $this->_dbconn
-    );
-    $actual->addTable('civicrm_contact');
-    $expected->matches($actual);
+    $this->getAndCheck($expected, $result['id'], 'contact');
   }
 
   /**
@@ -1086,20 +1097,14 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    *  Test civicrm_contact_get() with default return properties
    */
   public function testContactGetRetDefault() {
-    //  Insert a row in civicrm_contact creating contact 17
-    $op = new PHPUnit_Extensions_Database_Operation_Insert();
-    $op->execute($this->_dbconn,
-      new PHPUnit_Extensions_Database_DataSet_XMLDataSet(
-        dirname(__FILE__) . '/dataset/contact_17.xml'
-      )
-    );
+    $contactID = $this->individualCreate();
     $params = array(
-      'contact_id' => 17,
+      'contact_id' => $contactID,
       'sort' => 'first_name',
     );
     $result = $this->callAPISuccess('contact', 'get', $params);
-    $this->assertEquals(17, $result['values'][17]['contact_id'], "In line " . __LINE__);
-    $this->assertEquals('Test', $result['values'][17]['first_name'], "In line " . __LINE__);
+    $this->assertEquals($contactID, $result['values'][$contactID]['contact_id']);
+    $this->assertEquals('Anthony', $result['values'][$contactID]['first_name']);
   }
 
   /**

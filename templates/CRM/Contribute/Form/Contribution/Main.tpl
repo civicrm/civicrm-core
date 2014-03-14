@@ -23,9 +23,12 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
+{* Callback snippet: On-behalf profile *}
+{if $snippet and !empty($isOnBehalfCallback)}
+  {include file="CRM/Contribute/Form/Contribution/OnBehalfOf.tpl" context="front-end"}
 
 {* Callback snippet: Load payment processor *}
-{if $snippet}
+{elseif $snippet}
 {include file="CRM/Core/BillingBlock.tpl" context="front-end"}
   {if $is_monetary}
   {* Put PayPal Express button after customPost block since it's the submit button in this case. *}
@@ -182,7 +185,7 @@
 
   {if $is_for_organization}
   <div id='onBehalfOfOrg' class="crm-section">
-    {include file=CRM/Contribute/Form/Contribution/OnBehalfOf.tpl}
+    {include file="CRM/Contribute/Form/Contribution/OnBehalfOf.tpl"}
   </div>
   {/if}
 
@@ -192,44 +195,9 @@
 
   {if $honor_block_is_active}
   <fieldset class="crm-group honor_block-group">
-    <legend>{$honor_block_title}</legend>
-    <div class="crm-section honor_block_text-section">
-      {$honor_block_text}
-    </div>
-    {if $form.honor_type_id.html}
-      <div class="crm-section {$form.honor_type_id.name}-section">
-        <div class="content" >
-          {$form.honor_type_id.html}
-          <span class="crm-clear-link">(<a href="#" title="unselect" onclick="unselectRadio('honor_type_id', '{$form.formName}');enableHonorType(); return false;">{ts}clear{/ts}</a>)</span>
-          <div class="description">{ts}Select an option to reveal honoree information fields.{/ts}</div>
-        </div>
-      </div>
-    {/if}
+    {include file="CRM/Contribute/Form/SoftCredit.tpl"}
     <div id="honorType" class="honoree-name-email-section">
-      <div class="crm-section {$form.honor_prefix_id.name}-section">
-        <div class="content">{$form.honor_prefix_id.html}</div>
-      </div>
-      <div class="crm-section {$form.honor_first_name.name}-section">
-        <div class="label">{$form.honor_first_name.label}</div>
-        <div class="content">
-          {$form.honor_first_name.html}
-        </div>
-        <div class="clear"></div>
-      </div>
-      <div class="crm-section {$form.honor_last_name.name}-section">
-        <div class="label">{$form.honor_last_name.label}</div>
-        <div class="content">
-          {$form.honor_last_name.html}
-        </div>
-        <div class="clear"></div>
-      </div>
-      <div id="honorTypeEmail" class="crm-section {$form.honor_email.name}-section">
-        <div class="label">{$form.honor_email.label}</div>
-        <div class="content">
-          {$form.honor_email.html}
-        </div>
-        <div class="clear"></div>
-      </div>
+      {include file="CRM/UF/Form/Block.tpl" fields=$honoreeProfileFields mode=8 prefix='honor'}
     </div>
   </fieldset>
   {/if}
@@ -359,7 +327,7 @@
       //disabled auto renew settings.
     var allowAutoRenew = {/literal}'{$allowAutoRenewMembership}'{literal};
       if ( allowAutoRenew && cj("#auto_renew") ) {
-        cj("#auto_renew").attr( 'checked', false );
+        cj("#auto_renew").prop('checked', false );
         cj('#allow_auto_renew').hide( );
       }
     }
@@ -367,19 +335,19 @@
 
   {/literal}
   {if $relatedOrganizationFound and $reset}
-    cj( "#is_for_organization" ).attr( 'checked', true );
+    cj( "#is_for_organization" ).prop('checked', true );
     showOnBehalf(false);
   {elseif $onBehalfRequired}
     showOnBehalf(true);
   {/if}
 
-  {if $honor_block_is_active AND $form.honor_type_id.html}
+  {if $honor_block_is_active AND $form.soft_credit_type_id.html}
     enableHonorType();
   {/if}
   {literal}
 
   function enableHonorType( ) {
-    var element = document.getElementsByName("honor_type_id");
+    var element = document.getElementsByName("soft_credit_type_id");
     for (var i = 0; i < element.length; i++ ) {
       var isHonor = false;
       if ( element[i].checked == true ) {
@@ -392,10 +360,6 @@
       cj('#honorTypeEmail').show();
     }
     else {
-      document.getElementById('honor_first_name').value = '';
-      document.getElementById('honor_last_name').value  = '';
-      document.getElementById('honor_email').value      = '';
-      document.getElementById('honor_prefix_id').value  = '';
       cj('#honorType').hide();
       cj('#honorTypeEmail').hide();
     }

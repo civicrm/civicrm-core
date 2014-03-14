@@ -59,7 +59,7 @@ class CRM_Contact_BAO_Contact_Utils {
       $params = array('name' => $contactType);
       CRM_Contact_BAO_ContactType::retrieve($params, $typeInfo);
 
-      if (CRM_Utils_Array::value('image_URL', $typeInfo)) {
+      if (!empty($typeInfo['image_URL'])) {
         $imageUrl = $typeInfo['image_URL'];
         $config = CRM_Core_Config::singleton();
 
@@ -259,44 +259,8 @@ UNION
    * @access public
    * @static
    */
-  static function createCurrentEmployerRelationship($contactID, $organization, $previousEmployerID = NULL) {
-    $organizationId = NULL;
-
-    // if organization id is passed.
-    if (is_numeric($organization)) {
-      $organizationId = $organization;
-    }
-    else {
-      $orgName = explode('::', $organization);
-      trim($orgName[0]);
-
-      $organizationParams = array();
-      $organizationParams['organization_name'] = $orgName[0];
-
-      $dedupeParams = CRM_Dedupe_Finder::formatParams($organizationParams, 'Organization');
-
-      $dedupeParams['check_permission'] = FALSE;
-      $dupeIDs = CRM_Dedupe_Finder::dupesByParams($dedupeParams, 'Organization', 'Supervised');
-
-      if (is_array($dupeIDs) && !empty($dupeIDs)) {
-        // we should create relationship only w/ first org CRM-4193
-        foreach ($dupeIDs as $orgId) {
-          $organizationId = $orgId;
-          break;
-        }
-      }
-      else {
-        //create new organization
-        $newOrg = array(
-          'contact_type' => 'Organization',
-          'organization_name' => trim($orgName[0]),
-        );
-        $org = CRM_Contact_BAO_Contact::create($newOrg);
-        $organizationId = $org->id;
-      }
-    }
-
-    if ($organizationId) {
+  static function createCurrentEmployerRelationship($contactID, $organizationId, $previousEmployerID = NULL) {
+    if ($organizationId && is_numeric($organizationId)) {
       $cid = array('contact' => $contactID);
 
       // get the relationship type id of "Employee of"
@@ -848,9 +812,7 @@ Group By  componentId";
     $skipFields = array('is_primary', 'location_type_id', 'is_billing', 'master_id');
     foreach ($address as & $values) {
       // 2. check if master id exists, if not continue
-      if (!CRM_Utils_Array::value('master_id', $values) ||
-        !CRM_Utils_Array::value('use_shared_address', $values)
-      ) {
+      if (empty($values['master_id']) || empty($values['use_shared_address'])) {
         // we should unset master id when use uncheck share address for existing address
         $values['master_id'] = 'null';
         continue;
@@ -889,7 +851,7 @@ Group By  componentId";
     // get the list of master id's for address
     $masterAddressIds = array();
     foreach ($addresses as $key => $addressValue) {
-      if (CRM_Utils_Array::value('master_id', $addressValue)) {
+      if (!empty($addressValue['master_id'])) {
         $masterAddressIds[] = $addressValue['master_id'];
       }
     }
@@ -989,8 +951,12 @@ Group By  componentId";
         $sql = "SELECT DISTINCT id, $idFldName FROM civicrm_contact WHERE contact_type = %1 ";
       }
       else {
-        $sql = "SELECT DISTINCT id, $idFldName FROM civicrm_contact WHERE contact_type = %1
-                     AND ( {$idFldName} IS NULL OR ( {$idFldName} IS NOT NULL AND {$displayFldName} IS NULL ) ) ";
+        $sql = "
+          SELECT DISTINCT id, $idFldName
+          FROM civicrm_contact
+          WHERE contact_type = %1
+          AND ({$idFldName} IS NULL
+          OR ( {$idFldName} IS NOT NULL AND ({$displayFldName} IS NULL OR {$displayFldName} = '')) )";
       }
 
       $dao = CRM_Core_DAO::executeQuery($sql, array(1 => array($contactType, 'String')));

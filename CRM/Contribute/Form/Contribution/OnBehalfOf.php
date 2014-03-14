@@ -172,9 +172,7 @@ class CRM_Contribute_Form_Contribution_OnBehalfOf {
           }
         }
         elseif (in_array($prefixName, array(
-          'organization_name', 'email')) &&
-          !CRM_Utils_Array::value('is_required', $field)
-        ) {
+          'organization_name', 'email')) && empty($field['is_required'])) {
           $field['is_required'] = 1;
         }
 

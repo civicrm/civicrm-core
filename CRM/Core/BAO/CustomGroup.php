@@ -88,7 +88,7 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
     //this is format when form get submit.
     $extendsChildType = CRM_Utils_Array::value(1, $params['extends']);
     //lets allow user to pass direct child type value, CRM-6893
-    if (CRM_Utils_Array::value('extends_entity_column_value', $params)) {
+    if (!empty($params['extends_entity_column_value'])) {
       $extendsChildType = $params['extends_entity_column_value'];
     }
     if (!CRM_Utils_System::isNull($extendsChildType)) {
@@ -129,7 +129,7 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
         'is_multiple'
       );
 
-      if ((CRM_Utils_Array::value('is_multiple', $params) || $isMultiple) &&
+      if ((!empty($params['is_multiple']) || $isMultiple) &&
         ($params['is_multiple'] != $isMultiple)
       ) {
         $oldTableName = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup',
@@ -355,6 +355,7 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
         'date_format',
         'time_format',
         'option_group_id',
+        'in_selector'
       ),
       'civicrm_custom_group' =>
       array(
@@ -836,7 +837,7 @@ ORDER BY civicrm_custom_group.weight,
    * @static
    *
    */
-  public static function &getGroupDetail($groupId = NULL, $searchable = NULL, &$extends = NULL) {
+  public static function &getGroupDetail($groupId = NULL, $searchable = NULL, &$extends = NULL, $inSelector = NULL) {
     // create a new tree
     $groupTree = array();
     $select = $from = $where = $orderBy = '';
@@ -868,6 +869,7 @@ ORDER BY civicrm_custom_group.weight,
         'column_name',
         'is_view',
         'option_group_id',
+        'in_selector',
       ),
       'civicrm_custom_group' =>
       array(
@@ -881,6 +883,7 @@ ORDER BY civicrm_custom_group.weight,
         'extends',
         'extends_entity_column_value',
         'table_name',
+        'is_multiple',
       ),
     );
 
@@ -906,6 +909,10 @@ ORDER BY civicrm_custom_group.weight,
 
     if ($searchable) {
       $where .= " AND civicrm_custom_field.is_searchable = 1";
+    }
+
+    if ($inSelector) {
+      $where .= " AND civicrm_custom_field.in_selector = 1 AND civicrm_custom_group.is_multiple = 1 ";
     }
 
     if ($extends) {
@@ -979,8 +986,8 @@ ORDER BY civicrm_custom_group.weight,
     // for Group's
     $customGroupDAO = new CRM_Core_DAO_CustomGroup();
 
-    // get only 'Tab' groups
-    $customGroupDAO->whereAdd("style = 'Tab'");
+    // get 'Tab' and 'Tab with table' groups
+    $customGroupDAO->whereAdd("style IN ('Tab', 'Tab with table')");
     $customGroupDAO->whereAdd("is_active = 1");
 
     // add whereAdd for entity type
@@ -1321,9 +1328,7 @@ ORDER BY civicrm_custom_group.weight,
               }
             }
             else {
-              $label = CRM_Core_BAO_CustomOption::getOptionLabel($field['id'], $value);
-              $defaults[$hiddenEleName] = $value;
-              $defaults[$elementName] = $label;
+              $defaults[$elementName] = $value;
             }
             break;
 
@@ -1574,11 +1579,11 @@ ORDER BY civicrm_custom_group.weight,
           elseif ($field['data_type'] == 'Date') {
             if (!empty($value)) {
               $time = NULL;
-              if (CRM_Utils_Array::value('time_format', $field)) {
+              if (!empty($field['time_format'])) {
                 $time = CRM_Utils_Request::retrieve($fieldName . '_time', 'String', $form, FALSE, NULL, 'GET');
               }
               list($value, $time) = CRM_Utils_Date::setDateDefaults($value . ' ' . $time);
-              if (CRM_Utils_Array::value('time_format', $field)) {
+              if (!empty($field['time_format'])) {
                 $customValue[$fieldName . '_time'] = $time;
               }
             }
@@ -1770,9 +1775,8 @@ SELECT IF( EXISTS(SELECT name FROM civicrm_contact_type WHERE name like %1), 1, 
    *  @param array   $groupTree associated array
    *  @param boolean $returnCount true if customValue count needs to be returned
    */
-  static function buildCustomDataView(&$form, &$groupTree, $returnCount = FALSE, $gID = NULL, $prefix = NULL) {
+  static function buildCustomDataView(&$form, &$groupTree, $returnCount = FALSE, $gID = NULL, $prefix = NULL, $customValueId = NULL) {
     $details = array();
-
     foreach ($groupTree as $key => $group) {
       if ($key === 'info') {
         continue;
@@ -1782,6 +1786,9 @@ SELECT IF( EXISTS(SELECT name FROM civicrm_contact_type WHERE name like %1), 1, 
         $groupID = $group['id'];
         if (!empty($properties['customValue'])) {
           foreach ($properties['customValue'] as $values) {
+            if (!empty($customValueId) && $customValueId != $values['id']) {
+              continue;
+            }
             $details[$groupID][$values['id']]['title'] = CRM_Utils_Array::value('title', $group);
             $details[$groupID][$values['id']]['name'] = CRM_Utils_Array::value('name', $group);
             $details[$groupID][$values['id']]['help_pre'] = CRM_Utils_Array::value('help_pre', $group);
@@ -1923,7 +1930,7 @@ SELECT IF( EXISTS(SELECT name FROM civicrm_contact_type WHERE name like %1), 1, 
         break;
 
       case 'ContactReference':
-        if (CRM_Utils_Array::value('data', $values)) {
+        if (!empty($values['data'])) {
           $retValue = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $values['data'], 'display_name');
         }
         break;
@@ -2212,5 +2219,15 @@ SELECT  civicrm_custom_group.id as groupID, civicrm_custom_group.title as groupT
     return $hasReachedMax;
   }
 
+  static function getMultipleFieldGroup() {
+    $multipleGroup = array();
+    $dao = new CRM_Core_DAO_CustomGroup();
+    $dao->is_multiple = 1 ;
+    $dao->find();
+    while($dao->fetch()) {
+      $multipleGroup[$dao->id] = $dao->title;
+    }
+    return $multipleGroup;
+  }
  }
 

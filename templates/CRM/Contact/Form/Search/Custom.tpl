@@ -81,7 +81,7 @@
         {/if}
 
         {strip}
-        <table class="selector" summary="{ts}Search results listings.{/ts}">
+        <table class="selector row-highlight" summary="{ts}Search results listings.{/ts}">
             <thead class="sticky">
                 <tr>
                 <th scope="col" title="Select All Rows">{$form.toggleSelect.html}</th>
@@ -117,12 +117,6 @@
             {/foreach}
         </table>
         {/strip}
-
-        <script type="text/javascript">
-        {* this function is called to change the color of selected row(s) *}
-        var fname = "{$form.formName}";
-        on_load_init_checkboxes(fname);
-        </script>
 
         {include file="CRM/common/pager.tpl" location="bottom"}
 
@@ -171,13 +165,12 @@ function toggleContactSelection( name, qfKey, selection ){
     cj.post( Url, {  qfKey: qfKey , variableType: 'multiple' , action: 'unselect' } );
     {/literal}
     {foreach from=$rows item=row}{literal}
-      cj("#{/literal}{$row.checkbox}{literal}").removeAttr('checked');{/literal}
+      cj("#{/literal}{$row.checkbox}{literal}").prop('checked', false);{/literal}
     {/foreach}
     {literal}
-    cj("#toggleSelect").removeAttr('checked');
-    var formName = "{/literal}{$form.formName}{literal}";
-    on_load_init_checkboxes(formName);
+    cj("#toggleSelect").prop('checked', false);
   }
+  return false;
 }
 </script>
 

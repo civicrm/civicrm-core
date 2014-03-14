@@ -66,6 +66,7 @@ class CRM_Grant_Page_Tab extends CRM_Contact_Page_View {
     if ($this->_contactId) {
       $displayName = CRM_Contact_BAO_Contact::displayName($this->_contactId);
       $this->assign('displayName', $displayName);
+      $this->ajaxResponse['tabCount'] = CRM_Contact_BAO_Contact::getCountComponent('grant', $this->_contactId);
     }
   }
 

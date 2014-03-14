@@ -32,7 +32,7 @@ class api_v3_MembershipTypeTest extends CiviUnitTestCase {
   protected $_contributionTypeID;
   protected $_apiversion;
   protected $_entity = 'MembershipType';
-  public $_eNoticeCompliant = TRUE;
+
 
   function get_info() {
     return array(

@@ -89,9 +89,7 @@ class CRM_Contact_Form_Edit_CustomData {
 
     //build custom data.
     $contactSubType = NULL;
-    if (CRM_Utils_Array::value("hidden_custom", $_POST) &&
-      CRM_Utils_Array::value('contact_sub_type', $_POST)
-    ) {
+    if (!empty($_POST["hidden_custom"]) && !empty($_POST['contact_sub_type'])) {
       $contactSubType = $_POST['contact_sub_type'];
     }
     else {
@@ -107,7 +105,7 @@ class CRM_Contact_Form_Edit_CustomData {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   static function setDefaultValues(&$form, &$defaults) {
     $defaults += CRM_Custom_Form_CustomData::setDefaultValues($form);

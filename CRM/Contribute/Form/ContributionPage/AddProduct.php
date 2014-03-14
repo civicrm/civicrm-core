@@ -47,7 +47,7 @@ class CRM_Contribute_Form_ContributionPage_AddProduct extends CRM_Contribute_For
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   public function preProcess() {
     parent::preProcess();

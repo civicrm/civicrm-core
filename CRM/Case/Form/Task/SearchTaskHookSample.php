@@ -75,7 +75,7 @@ WHERE cs.id IN ( {$caseIDs} )";
   /**
    * Function to actually build the form
    *
-   * @return None
+   * @return void
    * @access public
    */
   public function buildQuickForm() {

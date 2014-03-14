@@ -74,7 +74,7 @@ class CRM_Contact_Form_Location {
   /**
    * Function to build the form
    *
-   * @return None
+   * @return void
    * @access public
    */
   static function buildQuickForm(&$form) {
@@ -88,10 +88,10 @@ class CRM_Contact_Form_Location {
       $name = strtolower($blockName);
 
       $instances = array(1);
-      if (CRM_Utils_Array::value($name, $_POST) && is_array($_POST[$name])) {
+      if (!empty($_POST[$name]) && is_array($_POST[$name])) {
         $instances = array_keys($_POST[$name]);
       }
-      elseif (property_exists($form, '_values') && CRM_Utils_Array::value($name, $form->_values) && is_array($form->_values[$name])) {
+      elseif (property_exists($form, '_values') && !empty($form->_values[$name]) && is_array($form->_values[$name])) {
         $instances = array_keys($form->_values[$name]);
       }
 

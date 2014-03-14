@@ -37,7 +37,7 @@
     <table class="form-layout-compressed">
       <tr><td class="label-left">{$form.thankyou_update.html} {$form.thankyou_update.label}</td><td></td></tr>
       <tr><td class="label-left">{$form.receipt_update.html} {$form.receipt_update.label}</td><td></td></tr>
-      <!--tr><td class="label-left">{$form.is_group_by.label} (<a href="#" title="unselect" onclick="unselectRadio('is_group_by'); return false;" >{ts}clear{/ts}</a>)</td><td>{$form.is_group_by.html}</td></tr-->
+      <!--tr><td class="label-left">{$form.is_group_by.label}</td><td>{$form.is_group_by.html}</td></tr-->
     </table>
   </div><!-- /.crm-accordion-body -->
 </div><!-- /.crm-accordion-wrapper -->

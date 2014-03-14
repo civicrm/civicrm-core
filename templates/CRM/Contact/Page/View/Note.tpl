@@ -38,7 +38,7 @@
                {include file="CRM/Form/attachment.tpl"}
             {/if}
           </table>
-          <div class="crm-submit-buttons"><input type="button" name='cancel' value="{ts}Done{/ts}" onclick="location.href='{crmURL p='civicrm/contact/view' q='action=browse&selectedChild=note'}';"/></div>
+          <div class="crm-submit-buttons"><input type="submit" class='cancel form-submit' value="{ts}Done{/ts}"/></div>
 
         {if $comments}
         <fieldset>
@@ -108,7 +108,7 @@
 
 {/if}
 
-{if $permission EQ 'edit' AND ($action eq 16 or $action eq 4 or $action eq 8)}
+{if $permission EQ 'edit' AND ($action eq 16)}
    <div class="action-link">
    <a accesskey="N" href="{crmURL p='civicrm/contact/view/note' q="cid=`$contactId`&action=add"}" class="button"><span><div class="icon add-icon"></div>{ts}Add Note{/ts}</span></a>
    </div>
@@ -116,7 +116,7 @@
 {/if}
 <div class="crm-content-block">
 
-{if $notes}
+{if $notes and $action eq 16}
 
 <script type="text/javascript">
     var commentAction = '{$commentAction|escape:quotes}'
@@ -178,6 +178,7 @@
                         + response['values'][i].modified_date
                         + '</td><td>'
                         + '<a href="'+ urlTemplate + response['values'][i].createdById +'">'+ response['values'][i].createdBy +'</a>'
+                        + '</td><td>' // FIXME: attachments
                         + '</td><td>'+ commentAction.replace(/{cid}/g, response['values'][i].createdById).replace(/{id}/g, response['values'][i].id) +'</td></tr>'
 
                     commentRows['cnote_'+ noteId][response['values'][i].id] = str;
@@ -280,11 +281,11 @@
     {/strip}
  </div>
 </div>
-{elseif ! ($action eq 1)}
+{elseif ($action eq 16)}
    <div class="messages status no-popup">
         <div class="icon inform-icon"></div>
-        {capture assign=crmURL}{crmURL p='civicrm/contact/view/note' q="cid=`$contactId`&action=add"}{/capture}
-        {ts 1=$crmURL}There are no Notes for this contact. You can <a accesskey="N" href='%1'>add one</a>.{/ts}
+        {capture assign=link}class="action-item action-item-first" accesskey="N" href="{crmURL p='civicrm/contact/view/note' q="cid=`$contactId`&action=add"}"{/capture}
+        {ts 1=$link}There are no Notes for this contact. You can <a %1>add one</a>.{/ts}
    </div>
 {/if}
 </div>

@@ -78,7 +78,7 @@ class CRM_Member_Form_Task_Delete extends CRM_Member_Form_Task {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   public function postProcess() {
     $deletedMembers = 0;

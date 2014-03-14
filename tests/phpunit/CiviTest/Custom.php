@@ -3,6 +3,7 @@ class Custom extends CiviUnitTestCase {
   /**
    * Helper function to create Custom Group
    *
+   * @deprecated - use functions on test case parent class
    * @return object of created group
    */
   static function createGroup($group, $extends = NULL, $isMultiple = FALSE) {
@@ -50,16 +51,16 @@ class Custom extends CiviUnitTestCase {
 
   /**
    * Helper function to create Custom Field
-   *
+   * @deprecated use parent object create fn
    * @return object of created field
    */
   static function createField($params, $fields = NULL) {
     if (empty($params)) {
       $params = array(
         'custom_group_id' => $fields['groupId'],
-        'label' => empty($fields['label']) ? 'test_' . $fields['dataType'] : $fields['label'],
-        'html_type' => $fields['htmlType'],
-        'data_type' => $fields['dataType'],
+        'label' => empty($fields['label']) ? 'test_' . CRM_Utils_Array::value('dataType', $fields) : $fields['label'],
+        'html_type' => CRM_Utils_Array::value('htmlType', $fields),
+        'data_type' => CRM_Utils_Array::value('dataType', $fields),
         'weight' => 4,
         'is_required' => 1,
         'is_searchable' => 0,
@@ -86,7 +87,7 @@ class Custom extends CiviUnitTestCase {
 
   /**
    * Helper function to delete custom field
-   *
+   * @deprecated use function on parent class
    * @param  object of Custom Field to delete
    */
   static function deleteField($params) {
@@ -96,7 +97,7 @@ class Custom extends CiviUnitTestCase {
 
   /**
    * Helper function to delete custom group
-   *
+   * @deprecated use function on parent class
    * @param  object Custom Group to delete
    * @return boolean true if Group deleted, false otherwise
    */

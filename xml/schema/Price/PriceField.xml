@@ -38,6 +38,9 @@
       <required>true</required>
       <comment>Variable name/programmatic handle for this field.</comment>
       <add>1.8</add>
+      <html>
+        <type>Text</type>
+      </html>
   </field>
   <index>
       <name>index_name</name>
@@ -52,14 +55,23 @@
       <required>true</required>
       <localizable>true</localizable>
       <comment>Text for form field label (also friendly name for administering this field).</comment>
+      <html>
+        <type>Text</type>
+      </html>
       <add>1.8</add>
   </field>
   <field>
       <name>html_type</name>
-      <type>enum</type>
-      <values>Text, Select, Radio, CheckBox</values>
+      <type>varchar</type>
+      <length>12</length>
       <required>true</required>
+      <pseudoconstant>
+        <callback>CRM_Price_BAO_PriceField::htmlTypes</callback>
+      </pseudoconstant>
       <add>1.8</add>
+      <html>
+        <type>Select</type>
+      </html>
   </field>
   <field>
       <name>is_enter_qty</name>
@@ -67,15 +79,20 @@
       <default>0</default>
       <comment>Enter a quantity for this field?</comment>
       <add>1.8</add>
+      <html>
+         <type>CheckBox</type>
+       </html>
   </field>
   <field>
       <name>help_pre</name>
       <type>text</type>
       <localizable>true</localizable>
       <comment>Description and/or help text to display before this field.</comment>
-      <htmlType>textarea</htmlType>
-      <rows>4</rows>
-      <cols>80</cols>
+      <html>
+        <type>TextArea</type>
+        <rows>4</rows>
+        <cols>80</cols>
+      </html>
       <add>1.8</add>
   </field>
   <field>
@@ -83,9 +100,11 @@
       <type>text</type>
       <localizable>true</localizable>
       <comment>Description and/or help text to display after this field.</comment>
-      <htmlType>textarea</htmlType>
-      <rows>4</rows>
-      <cols>80</cols>
+      <html>
+        <type>TextArea</type>
+        <rows>4</rows>
+        <cols>80</cols>
+      </html>
       <add>1.8</add>
   </field>
   <field>
@@ -94,12 +113,18 @@
       <default>1</default>
       <comment>Order in which the fields should appear</comment>
       <add>1.8</add>
+      <html>
+        <type>Select</type>
+      </html>
   </field>
   <field>
       <name>is_display_amounts</name>
       <type>boolean</type>
       <default>1</default>
       <comment>Should the price be displayed next to the label for each option?</comment>
+      <html>
+         <type>CheckBox</type>
+       </html>
   </field>
   <field>
       <name>options_per_line</name>
@@ -107,6 +132,9 @@
       <default>1</default>
       <comment>number of options per line for checkbox and radio</comment>
       <add>1.8</add>
+      <html>
+        <type>Text</type>
+      </html>
   </field>
   <field>
       <name>is_active</name>
@@ -114,6 +142,9 @@
       <comment>Is this price field active</comment>
       <default>1</default>
       <add>1.8</add>
+      <html>
+         <type>CheckBox</type>
+       </html>
   </field>
   <field>
       <name>is_required</name>
@@ -121,6 +152,9 @@
       <comment>Is this price field required (value must be > 1)</comment>
       <default>1</default>
       <add>1.8</add>
+      <html>
+         <type>CheckBox</type>
+       </html>
   </field>
   <field>
       <name>active_on</name>
@@ -128,6 +162,9 @@
       <default>NULL</default>
       <comment>If non-zero, do not show this field before the date specified</comment>
       <add>1.8</add>
+      <html>
+         <type>CheckBox</type>
+       </html>
   </field>
   <field>
       <name>expire_on</name>
@@ -135,6 +172,9 @@
       <default>NULL</default>
       <comment>If non-zero, do not show this field after the date specified</comment>
       <add>1.8</add>
+      <html>
+        <type>Select Date</type>
+    </html>
   </field>
   <field>
       <name>javascript</name>
@@ -142,6 +182,9 @@
       <length>255</length>
       <comment>Optional scripting attributes for field</comment>
       <add>1.8</add>
+      <html>
+        <type>Text</type>
+      </html>
   </field>
   <field>
       <name>visibility_id</name>
@@ -152,6 +195,9 @@
       <pseudoconstant>
         <optionGroupName>visibility</optionGroupName>
       </pseudoconstant>
+      <html>
+        <type>Select</type>
+      </html>
    </field>
    <field>
       <name>count</name>

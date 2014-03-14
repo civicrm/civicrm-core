@@ -41,50 +41,7 @@
   <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
 
     {* added onload javascript for source contact*}
-    {literal}
-    <script type="text/javascript">
-    var assignee_contact = '';
-
-    {/literal}
-    {if $assignee_contact}
-    var assignee_contact = {$assignee_contact};
-    {/if}
-
-    {literal}
-    var assignee_contact_id = null;
-    //loop to set the value of cc and bcc if form rule.
-    var toDataUrl = "{/literal}{crmURL p='civicrm/ajax/checkemail' q='id=1&noemail=1' h=0 }{literal}"; {/literal}
-    {foreach from=","|explode:"assignee" key=key item=element}
-      {assign var=currentElement value=`$element`_contact_id}
-      {if $form.$currentElement.value}
-        {literal} var {/literal}{$currentElement}{literal} = cj.ajax({ url: toDataUrl + "&cid={/literal}{$form.$currentElement.value}{literal}", async: false }).responseText;{/literal}
-      {/if}
-    {/foreach}
-    {literal}
-
-    if ( assignee_contact_id ) {
-      eval( 'assignee_contact = ' + assignee_contact_id );
-    }
-
-    cj(function( ) {
-      {/literal}
-      {if $source_contact and $admin and $action neq 4}
-        {literal} cj( '#source_contact_id' ).val( "{/literal}{$source_contact}{literal}");{/literal}
-      {/if}
-      {literal}
-
-      var sourceDataUrl = "{/literal}{$dataUrl}{literal}";
-      var tokenDataUrl_assignee  = "{/literal}{$tokenUrl}&context=case_activity_assignee{literal}";
-
-      var hintText = "{/literal}{ts escape='js'}Type in a partial or complete name or email address of an existing contact.{/ts}{literal}";
-      cj( "#assignee_contact_id").tokenInput( tokenDataUrl_assignee, { prePopulate: assignee_contact, theme: 'facebook', hintText: hintText });
-      cj( 'ul.token-input-list-facebook, div.token-input-dropdown-facebook' ).css( 'width', '450px' );
-      cj( "#source_contact_id").autocomplete( sourceDataUrl, { width : 180, selectFirst : false, matchContains:true
-      }).result( function(event, data, formatted) { cj( "#source_contact_qid" ).val( data[1] );
-        }).bind( 'click', function( ) { cj( "#source_contact_qid" ).val(''); });
-    });
-  </script>
-  {/literal}
+    {include file="CRM/Activity/Form/ActivityJs.tpl" tokenContext="case_activity"}
 
   {/if}
 
@@ -124,7 +81,7 @@
       <tr class="crm-case-activity-form-block-target_contact_id hide-block" id="with-contacts-widget">
         <td class="label font-size10pt">{ts}With Contact{/ts}</td>
         <td class="view-value">
-          {include file="CRM/Contact/Form/NewContact.tpl" noLabel=true skipBreak=true multiClient=true}
+          {$form.target_contact_id.html}
           <br/>
           <a href="#" class="crm-with-contact">
             &raquo; {if not $multiClient}{ts}With client{/ts}{else}{ts}With client(s){/ts}{/if}
@@ -139,19 +96,18 @@
     </tr>
     <tr class="crm-case-activity-form-block-source_contact_id">
       <td class="label">{$form.source_contact_id.label}</td>
-      <td class="view-value"> {if $admin}{$form.source_contact_id.html}{/if}</td>
+      <td class="view-value">{$form.source_contact_id.html}</td>
     </tr>
     <tr class="crm-case-activity-form-block-assignee_contact_id">
-      <td class="label">{ts}Assigned To{/ts}</td>
+      <td class="label">
+        {$form.assignee_contact_id.label}
+        {edit}{help id="assignee_contact_id" title=$form.assignee_contact_id.label file="CRM/Activity/Form/Activity"}{/edit}
+      </td>
       <td>{$form.assignee_contact_id.html}
-        {edit}
-          <span class="description">
-          {ts}You can optionally assign this activity to someone.{/ts}
-          {if $activityAssigneeNotification}
-            <br />{ts}A copy of this activity will be emailed to each Assignee.{/ts}
-          {/if}
-          </span>
-        {/edit}
+        {if $activityAssigneeNotification}
+          <br />
+          <span class="description"><span class="icon email-icon"></span>{ts}A copy of this activity will be emailed to each Assignee.{/ts}</span>
+        {/if}
       </td>
     </tr>
 
@@ -255,7 +211,7 @@
     <td class="label">{$form.duration.label}</td>
     <td class="view-value">
       {$form.duration.html}
-      <span class="description">{ts}Total time spent on this activity (in minutes).{/ts}
+      <span class="description">{ts}minutes{/ts}
     </td>
   </tr>
   {* Suppress activity status and priority for changes to status, case type and start date. PostProc will force status to completed. *}
@@ -272,19 +228,8 @@
     {if $form.tag.html}
     <tr class="crm-case-activity-form-block-tag">
       <td class="label">{$form.tag.label}</td>
-      <td class="view-value"><div class="crm-select-container">{$form.tag.html}</div>
-        {literal}
-          <script type="text/javascript">
-            cj(".crm-case-activity-form-block-tag select[multiple]").crmasmSelect({
-              addItemTarget: 'bottom',
-              animate: true,
-              highlight: true,
-              sortable: true,
-              respectParents: true
-            });
-          </script>
-        {/literal}
-
+      <td class="view-value">
+        <div class="crm-select-container">{$form.tag.html}</div>
       </td>
     </tr>
     {/if}
@@ -333,6 +278,7 @@
         cj('.crm-with-contact').click(function(){
           cj('#with-contacts-widget').toggle();
           cj('#with-clients').toggle();
+          return false;
         });
       });
     </script>

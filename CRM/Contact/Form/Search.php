@@ -116,14 +116,6 @@ class CRM_Contact_Form_Search extends CRM_Core_Form {
    */
   protected $_searchButtonName;
 
-    /**
-   * name of print button
-   *
-   * @var string
-   * @access protected
-   */
-  protected $_printButtonName;
-
   /**
    * name of action button
    *
@@ -379,6 +371,11 @@ class CRM_Contact_Form_Search extends CRM_Core_Form {
    * @return void
    */
   function buildQuickForm() {
+    CRM_Core_Resources::singleton()
+      ->addScriptFile('civicrm', 'js/crm.searchForm.js')
+      // jsTree is needed for tags popup
+      ->addScriptFile('civicrm', 'packages/jquery/plugins/jstree/jquery.jstree.js', 0, 'html-header', FALSE)
+      ->addStyleFile('civicrm', 'packages/jquery/plugins/jstree/themes/default/style.css', 0, 'html-header');
     $permission = CRM_Core_Permission::getPermission();
     // some tasks.. what do we want to do with the selected contacts ?
     $tasks = array('' => ts('- actions -'));
@@ -520,24 +517,24 @@ class CRM_Contact_Form_Search extends CRM_Core_Form {
 
     $this->assign_by_ref('selectedContactIds', $selectedContactIds);
 
-    $allRowsRadio = $this->addElement('radio', 'radio_ts', NULL, '', 'ts_all', array('onclick' => $this->getName() . ".toggleSelect.checked = false; toggleCheckboxVals('mark_x_', this);toggleTaskAction( true );toggleContactSelection( 'resetSel', '{$qfKeyParam}', 'reset' );"));
+    $allRowsRadio = $this->addElement('radio', 'radio_ts', NULL, '', 'ts_all', array('class' => 'select-rows', 'onclick' => $this->getName() . ".toggleSelect.checked = false; toggleTaskAction( true );toggleContactSelection( 'resetSel', '{$qfKeyParam}', 'reset' );"));
     $this->assign('ts_all_id', $allRowsRadio->_attributes['id']);
 
     /*
-         * add form checkboxes for each row. This is needed out here to conform to QF protocol
-         * of all elements being declared in builQuickForm
-         */
+     * add form checkboxes for each row. This is needed out here to conform to QF protocol
+     * of all elements being declared in builQuickForm
+     */
 
     $rows = $this->get('rows');
 
     if (is_array($rows)) {
-      $this->addElement('checkbox', 'toggleSelect', NULL, NULL, array('onclick' => "toggleTaskAction( true );  toggleCheckboxVals('mark_x_',this);return toggleContactSelection( 'toggleSelect', '" . $qfKeyParam . "' , 'multiple' );"));
+      $this->addElement('checkbox', 'toggleSelect', NULL, NULL, array('class' => 'select-rows', 'onclick' => "toggleTaskAction( true ); toggleContactSelection( 'toggleSelect', '" . $qfKeyParam . "' , 'multiple' );"));
 
       $unselectedContactIds = array();
       foreach ($rows as $row) {
         $this->addElement('checkbox', $row['checkbox'],
           NULL, NULL,
-          array('onclick' => "toggleContactSelection( '" . $row['checkbox'] . "', '" . $qfKeyParam . "' , 'single' );toggleTaskAction( true ); return checkSelectedBox('" . $row['checkbox'] . "');")
+          array('onclick' => "toggleContactSelection( '" . $row['checkbox'] . "', '" . $qfKeyParam . "' , 'single' );toggleTaskAction( true );", 'class' => 'select-row')
         );
 
         if (!in_array($row['contact_id'], $selectedContactIds)) {
@@ -554,14 +551,6 @@ class CRM_Contact_Form_Search extends CRM_Core_Form {
           'name' => ts('Search'),
           'isDefault' => TRUE,
         ),
-      )
-    );
-
-    $this->add('submit', $this->_printButtonName, ts('Print'),
-      array(
-        'class' => 'form-submit',
-        'id' => 'Print',
-        'onclick' => "return checkPerformAction('mark_x', '" . $this->getName() . "', 1, 1);",
       )
     );
 
@@ -605,10 +594,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form {
      * set the button names
      */
     $this->_searchButtonName = $this->getButtonName('refresh');
-    $this->_printButtonName = $this->getButtonName('next', 'print');
     $this->_actionButtonName = $this->getButtonName('next', 'action');
-
-    $this->assign('printButtonName', $this->_printButtonName);
 
     $this->assign('actionButtonName', $this->_actionButtonName);
 
@@ -744,7 +730,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form {
     }
 
     // show the context menu only when we’re not searching for deleted contacts; CRM-5673
-    if (!CRM_Utils_Array::value('deleted_contacts', $this->_formValues)) {
+    if (empty($this->_formValues['deleted_contacts'])) {
       $menuItems = CRM_Contact_BAO_Contact::contextMenu();
       $primaryActions = CRM_Utils_Array::value('primaryActions', $menuItems, array());
       $this->_contextMenu = CRM_Utils_Array::value('moreActions', $menuItems, array());
@@ -854,25 +840,19 @@ class CRM_Contact_Form_Search extends CRM_Core_Form {
     //get the button name
     $buttonName = $this->controller->getButtonName();
 
-    if (isset($this->_ufGroupID) &&
-      !CRM_Utils_Array::value('uf_group_id', $this->_formValues)
-    ) {
+    if (isset($this->_ufGroupID) && empty($this->_formValues['uf_group_id'])) {
       $this->_formValues['uf_group_id'] = $this->_ufGroupID;
     }
 
-    if (isset($this->_componentMode) &&
-      !CRM_Utils_Array::value('component_mode', $this->_formValues)
-    ) {
+    if (isset($this->_componentMode) && empty($this->_formValues['component_mode'])) {
       $this->_formValues['component_mode'] = $this->_componentMode;
     }
 
-    if (isset($this->_operator) &&
-      !CRM_Utils_Array::value('operator', $this->_formValues)
-    ) {
+    if (isset($this->_operator) && empty($this->_formValues['operator'])) {
       $this->_formValues['operator'] = $this->_operator;
     }
 
-    if (!CRM_Utils_Array::value('qfKey', $this->_formValues)) {
+    if (empty($this->_formValues['qfKey'])) {
       $this->_formValues['qfKey'] = $this->controller->_key;
     }
 
@@ -885,7 +865,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form {
     $this->set('queryParams', $this->_params);
     $this->set('returnProperties', $this->_returnProperties);
 
-    if ($buttonName == $this->_actionButtonName || $buttonName == $this->_printButtonName) {
+    if ($buttonName == $this->_actionButtonName) {
       // check actionName and if next, then do not repeat a search, since we are going to the next page
       // hack, make sure we reset the task values
       $stateMachine = $this->controller->getStateMachine();

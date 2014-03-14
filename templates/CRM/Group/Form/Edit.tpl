@@ -27,8 +27,8 @@
 <div class="crm-block crm-form-block crm-group-form-block">
     <div id="help">
   {if $action eq 2}
-      {capture assign=crmURL}{crmURL p="civicrm/group/search" q="reset=1&force=1&context=smog&gid=`$group.id`"}{/capture}
-      {ts 1=$crmURL}You can edit the Name and Description for this group here. Click <a href='%1'>Contacts in this Group</a> to view, add or remove contacts in this group.{/ts}
+      {capture assign=crmURL}class="no-popup" href="{crmURL p="civicrm/group/search" q="reset=1&force=1&context=smog&gid=`$group.id`"}"{/capture}
+      {ts 1=$crmURL}You can edit the Name and Description for this group here. Click <a %1>Contacts in this Group</a> to view, add or remove contacts in this group.{/ts}
   {else}
       {ts}Enter a unique name and a description for your new group here. Then click 'Continue' to find contacts to add to your new group.{/ts}
   {/if}
@@ -87,37 +87,15 @@
   </tr>
     </table>
 
-    {if $parent_groups|@count > 0 or $form.parents.html}
-  <h3>{ts}Parent Groups{/ts} {help id="id-group-parent" file="CRM/Group/Page/Group.hlp"}</h3>
-        {if $parent_groups|@count > 0}
-      <table class="form-layout-compressed">
-    <tr>
-        <td><label>{ts}Remove Parent?{/ts}</label></td>
-    </tr>
-    {foreach from=$parent_groups item=cgroup key=group_id}
-        {assign var="element_name" value="remove_parent_group_"|cat:$group_id}
-        <tr>
-      <td>&nbsp;&nbsp;{$form.$element_name.html}&nbsp;{$form.$element_name.label}</td>
-        </tr>
-    {/foreach}
-      </table>
-      <br />
-        {/if}
-        <table class="form-layout-compressed">
-      <tr class="crm-group-form-block-parents">
-          <td class="label">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{$form.parents.label}</td>
-          <td>{$form.parents.html|crmAddClass:huge}</td>
-      </tr>
-  </table>
-    {/if}
+  {*CRM-14190*}
+  {include file="CRM/Group/Form/ParentGroups.tpl"}
 
-    {if $form.organization}
+    {if $form.organization_id}
   <h3>{ts}Associated Organization{/ts} {help id="id-group-organization" file="CRM/Group/Page/Group.hlp"}</h3>
           <table class="form-layout-compressed">
         <tr class="crm-group-form-block-organization">
-            <td class="label">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{$form.organization.label}</td>
-      <td>{$form.organization.html|crmAddClass:huge}
-          <div id="organization_address" style="font-size:10px"></div>
+            <td class="label">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{$form.organization_id.label}</td>
+      <td>{$form.organization_id.html|crmAddClass:huge}
       </td>
         </tr>
     </table>
@@ -126,15 +104,15 @@
     <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
     {if $action neq 1}
   <div class="action-link">
-      <a href="{$crmURL}">&raquo; {ts}Contacts in this Group{/ts}</a>
+      <a class="no-popup" href="{$crmURL}">&raquo; {ts}Contacts in this Group{/ts}</a>
       {if $group.saved_search_id}
           <br />
     {if $group.mapping_id}
-        <a href="{crmURL p="civicrm/contact/search/builder" q="reset=1&force=1&ssID=`$group.saved_search_id`"}">&raquo; {ts}Edit Smart Group Criteria{/ts}</a>
+        <a class="no-popup" href="{crmURL p="civicrm/contact/search/builder" q="reset=1&force=1&ssID=`$group.saved_search_id`"}">&raquo; {ts}Edit Smart Group Criteria{/ts}</a>
     {elseif $group.search_custom_id}
-                    <a href="{crmURL p="civicrm/contact/search/custom" q="reset=1&force=1&ssID=`$group.saved_search_id`"}">&raquo; {ts}Edit Smart Group Criteria{/ts}</a>
+                    <a class="no-popup" href="{crmURL p="civicrm/contact/search/custom" q="reset=1&force=1&ssID=`$group.saved_search_id`"}">&raquo; {ts}Edit Smart Group Criteria{/ts}</a>
     {else}
-        <a href="{crmURL p="civicrm/contact/search/advanced" q="reset=1&force=1&ssID=`$group.saved_search_id`"}">&raquo; {ts}Edit Smart Group Criteria{/ts}</a>
+        <a class="no-popup" href="{crmURL p="civicrm/contact/search/advanced" q="reset=1&force=1&ssID=`$group.saved_search_id`"}">&raquo; {ts}Edit Smart Group Criteria{/ts}</a>
     {/if}
 
       {/if}
@@ -145,38 +123,12 @@
 {literal}
 <script type="text/javascript">
 {/literal}{if $freezeMailignList}{literal}
-cj('input[type=checkbox][name="group_type[{/literal}{$freezeMailignList}{literal}]"]').attr('disabled',true);
+cj('input[type=checkbox][name="group_type[{/literal}{$freezeMailignList}{literal}]"]').prop('disabled',true);
 {/literal}{/if}{literal}
 {/literal}{if $hideMailignList}{literal}
 cj('input[type=checkbox][name="group_type[{/literal}{$hideMailignList}{literal}]"]').hide();
 cj('label[for="group_type[{/literal}{$hideMailignList}{literal}]"]').hide();
 {/literal}{/if}{literal}
-{/literal}{if $organizationID}{literal}
-    cj(document).ready( function() {
-  //group organzation default setting
-  var dataUrl = "{/literal}{crmURL p='civicrm/ajax/search' h=0 q="org=1&id=$organizationID"}{literal}";
-  cj.ajax({
-          url     : dataUrl,
-          async   : false,
-          success : function(html){
-                      //fixme for showing address in div
-                      htmlText = html.split( '|' , 2);
-                      htmlDiv = htmlText[0].replace( /::/gi, ' ');
-          cj('#organization').val(htmlText[0]);
-                      cj('div#organization_address').html(htmlDiv);
-                    }
-  });
-    });
-{/literal}{/if}{literal}
-
-var dataUrl = "{/literal}{$groupOrgDataURL}{literal}";
-cj('#organization').autocomplete( dataUrl, {
-              width : 250, selectFirst : false, matchContains: true
-              }).result( function(event, data, formatted) {
-                                                       cj( "#organization_id" ).val( data[1] );
-                                                       htmlDiv = data[0].replace( /::/gi, ' ');
-                                                       cj('div#organization_address').html(htmlDiv);
-                  });
 </script>
 {/literal}
 </div>

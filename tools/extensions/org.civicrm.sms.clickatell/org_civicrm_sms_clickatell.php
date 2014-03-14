@@ -133,7 +133,9 @@ class org_civicrm_sms_clickatell extends CRM_SMS_Provider {
     curl_setopt($this->_ch, CURLOPT_TIMEOUT, 20);
     curl_setopt($this->_ch, CURLOPT_VERBOSE, 1);
     curl_setopt($this->_ch, CURLOPT_FAILONERROR, 1);
-    curl_setopt($this->_ch, CURLOPT_FOLLOWLOCATION, 1);
+    if (ini_get('open_basedir') == '' && ini_get('safe_mode') == 'Off') {
+      curl_setopt($this->_ch, CURLOPT_FOLLOWLOCATION, 1);
+    }
     curl_setopt($this->_ch, CURLOPT_COOKIEJAR, "/dev/null");
     curl_setopt($this->_ch, CURLOPT_SSL_VERIFYHOST, 2);
     curl_setopt($this->_ch, CURLOPT_USERAGENT, 'CiviCRM - http://civicrm.org/');
@@ -235,7 +237,7 @@ class org_civicrm_sms_clickatell extends CRM_SMS_Provider {
       }
       //TODO:
       $postDataArray['to']   = $header['To'];
-      $postDataArray['text'] = substr($message, 0, 460); // max of 460 characters, is probably not multi-lingual
+      $postDataArray['text'] = utf8_decode(substr($message, 0, 460)); // max of 460 characters, is probably not multi-lingual
       if (array_key_exists('mo', $this->_providerInfo['api_params'])) {
         $postDataArray['mo'] = $this->_providerInfo['api_params']['mo'];
       }

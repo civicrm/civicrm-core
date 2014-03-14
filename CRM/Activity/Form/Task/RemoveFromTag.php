@@ -89,7 +89,7 @@ class CRM_Activity_Form_Task_RemoveFromTag extends CRM_Activity_Form_Task {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   public function postProcess() {
     //get the submitted values in an array
@@ -98,12 +98,12 @@ class CRM_Activity_Form_Task_RemoveFromTag extends CRM_Activity_Form_Task {
     $activityTags = $tagList = array();
 
     // check if contact tags exists
-    if (CRM_Utils_Array::value('tag', $params)) {
+    if (!empty($params['tag'])) {
       $activityTags = $params['tag'];
     }
 
     // check if tags are selected from taglists
-    if (CRM_Utils_Array::value('activity_taglist', $params)) {
+    if (!empty($params['activity_taglist'])) {
       foreach ($params['activity_taglist'] as $val) {
         if ($val) {
           if (is_numeric($val)) {

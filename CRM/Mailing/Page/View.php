@@ -75,7 +75,7 @@ class CRM_Mailing_Page_View extends CRM_Core_Page {
    *
    * @return void
    */
-  function run($id = NULL, $contact_id = NULL, $print = TRUE) {
+  function run($id = NULL, $contactID = NULL, $print = TRUE) {
     if (is_numeric($id)) {
       $this->_mailingID = $id;
     }
@@ -117,19 +117,31 @@ class CRM_Mailing_Page_View extends CRM_Core_Page {
     if (isset($this->_contactID)) {
       //get details of contact with token value including Custom Field Token Values.CRM-3734
       $returnProperties = $this->_mailing->getReturnProperties();
-      $params           = array('contact_id' => $this->_contactID);
-      $details          = CRM_Utils_Token::getTokenDetails($params,
+      $params = array('contact_id' => $this->_contactID);
+      $details = CRM_Utils_Token::getTokenDetails($params,
+        $returnProperties,
+        FALSE, TRUE, NULL,
+        $this->_mailing->getFlattenedTokens(),
+        get_class($this)
+      );
+      $details = $details[0][$this->_contactID];
+      $contactId = $this->_contactID;
+    }
+    else {
+      $details = array('test');
+      //get tokens that are not contact specific resolved
+      $params  = array('contact_id' => 0);
+      $details = CRM_Utils_Token::getAnonymousTokenDetails($params,
         $returnProperties,
         TRUE, TRUE, NULL,
         $this->_mailing->getFlattenedTokens(),
         get_class($this)
       );
-      $details = $details[0][$this->_contactID];
+
+      $details = $details[0][0];
+      $contactId = 0;
     }
-    else {
-      $details = array('test');
-    }
-    $mime = &$this->_mailing->compose(NULL, NULL, NULL, 0,
+    $mime = &$this->_mailing->compose(NULL, NULL, NULL, $contactId,
       $this->_mailing->from_email,
       $this->_mailing->from_email,
       TRUE, $details, $attachments

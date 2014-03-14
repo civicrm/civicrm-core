@@ -57,7 +57,7 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
   /**
    * Function to actually build the form
    *
-   * @return None
+   * @return void
    * @access public
    */
   public function preProcess() {
@@ -146,7 +146,7 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
    * @access public
    */
   static function formRule($values, $files, $self) {
-    if (CRM_Utils_Array::value('addMore', $values) || CRM_Utils_Array::value('addBlock', $values)) {
+    if (!empty($values['addMore']) || !empty($values['addBlock'])) {
       return TRUE;
     }
     $fields = self::fields();
@@ -358,7 +358,7 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
       $this->_formValues = $this->controller->exportValues($this->_name);
 
       // set the group if group is submitted
-      if (CRM_Utils_Array::value('uf_group_id', $this->_formValues)) {
+      if (!empty($this->_formValues['uf_group_id'])) {
         $this->set('id', $this->_formValues['uf_group_id']);
       }
       else {
@@ -393,12 +393,13 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
   }
 
   static function fields() {
-    return array_merge(
+    $fields = array_merge(
       CRM_Contact_BAO_Contact::exportableFields('All', FALSE, TRUE),
       CRM_Core_Component::getQueryFields(),
       CRM_Contact_BAO_Query_Hook::singleton()->getFields(),
       CRM_Activity_BAO_Activity::exportableFields()
     );
+    return $fields;
   }
 
   /**
@@ -418,6 +419,7 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
       'payment_instrument' => 'contribution',
       'membership_status' => 'membership',
       'membership_type' => 'membership',
+      'member_campaign_id' => 'membership',
       'member_is_test' => 'yesno',
       'member_is_pay_later' => 'yesno',
       'is_override' => 'yesno',
@@ -427,7 +429,7 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
     foreach ($entities as $entity) {
       $fields = civicrm_api3($entity, 'getfields');
       foreach ($fields['values'] as $field => $info) {
-        if (!empty($info['options']) || !empty($info['pseudoconstant']) || !empty($info['option_group_id']) || !empty($info['enumValues'])) {
+        if (!empty($info['options']) || !empty($info['pseudoconstant']) || !empty($info['option_group_id'])) {
           $options[$field] = $entity;
           if (substr($field, -3) == '_id') {
             $options[substr($field, 0, -3)] = $entity;

@@ -43,24 +43,12 @@ class CRM_Badge_Form_Layout extends CRM_Admin_Form {
   /**
    * Function to build the form
    *
-   * @return None
+   * @return void
    * @access public
    */
   public function buildQuickForm() {
     if ($this->_action & CRM_Core_Action::DELETE) {
-      $this->addButtons(array(
-          array(
-            'type' => 'next',
-            'name' => ts('Delete'),
-            'isDefault' => TRUE,
-          ),
-          array(
-            'type' => 'cancel',
-            'name' => ts('Cancel'),
-          ),
-        )
-      );
-      return;
+      return parent::buildQuickForm();
     }
 
     $config = CRM_Core_Config::singleton();
@@ -163,7 +151,7 @@ class CRM_Badge_Form_Layout extends CRM_Admin_Form {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   function setDefaultValues() {
     if (isset($this->_id)) {
@@ -191,7 +179,7 @@ class CRM_Badge_Form_Layout extends CRM_Admin_Form {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   public function postProcess() {
     if ($this->_action & CRM_Core_Action::DELETE) {

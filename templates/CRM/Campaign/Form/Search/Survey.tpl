@@ -40,7 +40,8 @@
   <div id="survey-result-set-dialog" class="hiddenElement"></div>
 
   {* load survey selector *}
-  {include file="CRM/common/enableDisable.tpl"}
+  {include file="CRM/common/enableDisableApi.tpl"}
+  {include file="CRM/common/crmeditable.tpl"}
 
   {literal}
   <script type="text/javascript">
@@ -154,7 +155,7 @@ function searchSurveys( qfKey )
       if ( qfKey ) dataUrl = dataUrl + '&qfKey=' + qfKey;
 
       cj.get( dataUrl, null, function( surveyList ) {
-        cj( '#surveyList' ).html( surveyList );
+        cj( '#surveyList' ).html( surveyList ).trigger('crmLoad');
 
         //collapse the search form.
         var searchFormName = '#search_form_' + {/literal}'{$searchFor}'{literal};

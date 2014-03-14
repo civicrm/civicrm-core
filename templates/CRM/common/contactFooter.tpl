@@ -31,10 +31,11 @@
     {if $action NEQ 2}&nbsp; &nbsp;{ts}CiviCRM ID{/ts}:&nbsp;{$contactId}{/if}
   </span>
   {if !empty($lastModified)}
-    {ts}Last Change by{/ts} <a href="{crmURL p='civicrm/contact/view' q="action=view&reset=1&cid=`$lastModified.id`"}">{$lastModified.name}</a> ({$lastModified.date|crmDate}) &nbsp;
+    {ts}Last Change by{/ts}: <a href="{crmURL p='civicrm/contact/view' q="action=view&reset=1&cid=`$lastModified.id`"}">{$lastModified.name}</a> ({$lastModified.date|crmDate}) &nbsp;
     {if !empty($changeLog)}
       <a href="{crmURL p='civicrm/contact/view' q="reset=1&action=browse&selectedChild=log&cid=`$contactId`"}" class="crm-log-view">&raquo; {ts}View Change Log{/ts}</a>
     {/if}
   {/if}
+	{if !empty($created_date)}<div class="contact-created-date">{ts}Created{/ts}: {$created_date|crmDate}</div>{/if}
 </div>
 {/strip}

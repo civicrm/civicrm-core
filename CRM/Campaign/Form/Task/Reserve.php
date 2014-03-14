@@ -212,7 +212,7 @@ class CRM_Campaign_Form_Task_Reserve extends CRM_Campaign_Form_Task {
   static function formRule($fields, $files, $self) {
     $errors = array();
     $invalidGroupName = FALSE;
-    if (CRM_Utils_Array::value('newGroupName', $fields)) {
+    if (!empty($fields['newGroupName'])) {
       $title  = trim($fields['newGroupName']);
       $name   = CRM_Utils_String::titleToVar($title);
       $query  = 'select count(*) from civicrm_group where name like %1 OR title like %2';
@@ -234,7 +234,7 @@ class CRM_Campaign_Form_Task_Reserve extends CRM_Campaign_Form_Task {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   public function postProcess() {
     //add reservation.

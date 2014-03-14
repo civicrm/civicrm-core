@@ -24,8 +24,8 @@
  +--------------------------------------------------------------------+
 *}
 <tr>
-  <td class="crm-event-form-block-event_type"> {$form.event_name.label}  <br />{$form.event_name.html|crmAddClass:huge} </td>
-  <td class="crm-event-form-block-event_type"> {$form.event_type.label}<br />{$form.event_type.html} </td>
+  <td class="crm-event-form-block-event_id"> {$form.event_id.label}  <br />{$form.event_id.html|crmAddClass:huge} </td>
+  <td class="crm-event-form-block-event_type_id"> {$form.event_type_id.label}<br />{$form.event_type_id.html} </td>
 </tr>
 <tr>
   <td colspan="2"><label>{ts}Event Dates{/ts}</label></td>
@@ -59,20 +59,14 @@
   <td class="crm-event-form-block-participant_test">
   {$form.participant_test.label} {help id="is-test" file="CRM/Contact/Form/Search/Advanced"}
     &nbsp; {$form.participant_test.html}
-    <span class="crm-clear-link">
-      (<a href="#" onclick="unselectRadio('participant_test','{$form.formName}'); return false;">{ts}clear{/ts}</a>)
-    </span>
   </td>
   <td class="crm-event-form-block-participant_pay_later">
   {$form.participant_pay_later.label} {$form.participant_pay_later.html}
-    <span class="crm-clear-link">
-      (<a href="#" onclick="unselectRadio('participant_pay_later','{$form.formName}'); return false;">{ts}clear{/ts}</a>)
-    </span>
   </td>
 </tr>
 <tr>
-  <td class="crm-event-form-block-participant_fee_level">
-    {$form.participant_fee_level.label}<br />{$form.participant_fee_level.html}
+  <td class="crm-event-form-block-participant_fee_id">
+    {$form.participant_fee_id.label}<br />{$form.participant_fee_id.html}
   </td>
   <td class="crm-event-form-block-participant_fee_amount">
     <label>{ts}Fee Amount{/ts}</label><br />
@@ -95,20 +89,27 @@ campaignTrClass='' campaignTdClass='crm-event-form-block-participant_campaign_id
 
 {literal}
 <script type="text/javascript">
-var eventUrl = "{/literal}{$dataURLEvent}{literal}";
-var typeUrl  = "{/literal}{$dataURLEventType}{literal}";
-var feeUrl   = "{/literal}{$dataURLEventFee}{literal}";
-
-cj('#event_name').autocomplete( eventUrl, { width : 280, selectFirst : false, matchContains: true
-}).result( function(event, data, formatted) { cj( "input#event_id" ).val( data[1] );
-  }).bind( 'click', function( ) { cj( "input#event_id" ).val(''); });
-
-cj('#event_type').autocomplete( typeUrl, { width : 180, selectFirst : false, matchContains: true
-}).result(function(event, data, formatted) { cj( "input#event_type_id" ).val( data[1] );
-  }).bind( 'click', function( ) { cj( "input#event_type_id" ).val(''); });
-
-cj('#participant_fee_level').autocomplete( feeUrl, { width : 180, selectFirst : false, matchContains: true
-}).result(function(event, data, formatted) { cj( "input#participant_fee_id" ).val( data[1] );
-  }).bind( 'click', function( ) { cj( "input#participant_fee_id" ).val(''); });
+cj(function($) {
+  // FIXME: This could be much simpler as an entityRef field but the priceFieldValue api doesn't currently support the filters we need
+  $('#participant_fee_id').select2({
+    placeholder: {/literal}'{ts escape="js"}- any -{/ts}'{literal},
+    minimumInputLength: 1,
+    allowClear: true,
+    ajax: {
+      url: "{/literal}{$dataURLEventFee}{literal}",
+      data: function(term) {
+        return {term: term};
+      },
+      results: function(response) {
+        return {results: response};
+      }
+    },
+    initSelection: function(el, callback) {
+      CRM.api3('price_field_value', 'getsingle', {id: $(el).val()}).done(function(data) {
+        callback({id: data.id, text: data.label});
+      });
+    }
+  });
+});
 </script>
 {/literal}

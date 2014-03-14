@@ -147,7 +147,7 @@ AND    {$this->_componentClause}";
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   public function postProcess() {
     // get all the details needed to generate a receipt
@@ -179,11 +179,8 @@ AND    {$this->_componentClause}";
       list($contactDetails) = CRM_Utils_Token::getTokenDetails($this->_contactIds, $returnProperties, FALSE, FALSE);
       $suppressedEmails = 0;
       foreach ($contactDetails as $id => $values) {
-        if (empty($values['email']) ||
-          CRM_Utils_Array::value('do_not_email', $values) ||
-          CRM_Utils_Array::value('is_deceased', $values) ||
-          CRM_Utils_Array::value('on_hold', $values)
-        ) {
+        if (empty($values['email']) || !empty($values['do_not_email']) ||
+          CRM_Utils_Array::value('is_deceased', $values) || !empty($values['on_hold'])) {
           $suppressedEmails++;
           $excludeContactIds[] = $values['contact_id'];
         }

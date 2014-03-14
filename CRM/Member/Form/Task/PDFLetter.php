@@ -90,7 +90,7 @@ class CRM_Member_Form_Task_PDFLetter extends CRM_Member_Form_Task {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   public function postProcess() {
     // TODO: rewrite using contribution token and one letter by contribution

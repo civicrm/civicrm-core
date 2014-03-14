@@ -92,7 +92,7 @@ class CRM_Core_BAO_CustomOption {
     $optionValues = CRM_Core_BAO_OptionValue::getOptionValuesArray($optionGroupID);
 
     foreach ($optionValues as $id => $value) {
-      if (!$inactiveNeeded && !CRM_Utils_Array::value('is_active', $value)) {
+      if (!$inactiveNeeded && empty($value['is_active'])) {
         continue;
       }
 

@@ -53,9 +53,11 @@
        <name>description</name>
        <type>text</type>
        <title>Profile Description</title>
-       <htmlType>textarea</htmlType>
-       <rows>2</rows>
-       <cols>60</cols>
+       <html>
+         <type>TextArea</type>
+         <rows>2</rows>
+         <cols>60</cols>
+       </html>
        <comment>Optional verbose description of the profile.</comment>
        <add>4.4</add>
   </field>
@@ -72,9 +74,11 @@
      <type>text</type>
      <localizable>true</localizable>
      <comment>Description and/or help text to display before fields in form.</comment>
-     <htmlType>textarea</htmlType>
-     <rows>4</rows>
-     <cols>80</cols>
+     <html>
+       <type>TextArea</type>
+       <rows>4</rows>
+       <cols>80</cols>
+     </html>
      <add>1.2</add>
   </field>
   <field>
@@ -82,9 +86,11 @@
      <type>text</type>
      <localizable>true</localizable>
      <comment>Description and/or help text to display after fields in form.</comment>
-     <htmlType>textarea</htmlType>
-     <rows>4</rows>
-     <cols>80</cols>
+     <html>
+       <type>TextArea</type>
+       <rows>4</rows>
+       <cols>80</cols>
+     </html>
      <add>1.2</add>
   </field>
   <field>

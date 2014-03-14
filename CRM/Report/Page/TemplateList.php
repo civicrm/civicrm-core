@@ -39,7 +39,7 @@
  */
 class CRM_Report_Page_TemplateList extends CRM_Core_Page {
 
-  public static function &info($compID = NULL) {
+  public static function &info($compID = NULL, $grouping = NULL) {
     $all = CRM_Utils_Request::retrieve('all', 'Boolean', CRM_Core_DAO::$_nullObject,
       FALSE, NULL, 'GET'
     );
@@ -52,10 +52,18 @@ class CRM_Report_Page_TemplateList extends CRM_Core_Page {
         $compClause = " AND v.component_id = {$compID} ";
       }
     }
-
+    elseif ($grouping) {
+      $compClause = " AND v.grouping = '{$grouping}' ";
+    }
     $sql = "
 SELECT  v.id, v.value, v.label, v.description, v.component_id,
-        inst.id as instance_id, ifnull( SUBSTRING(comp.name, 5), 'Contact' ) as component_name
+  CASE
+    WHEN comp.name IS NOT NULL THEN SUBSTRING(comp.name, 5)
+    WHEN v.grouping IS NOT NULL THEN v.grouping
+    ELSE 'Contact'
+    END as component_name,
+        v.grouping,
+        inst.id as instance_id
 FROM    civicrm_option_value v
 INNER JOIN civicrm_option_group g
         ON (v.option_group_id = g.id AND g.name = 'report_template')
@@ -74,7 +82,7 @@ LEFT  JOIN civicrm_component comp
     $rows   = array();
     $config = CRM_Core_Config::singleton();
     while ($dao->fetch()) {
-      if ($dao->component_name != 'Contact' &&
+      if ($dao->component_name != 'Contact' && $dao->component_name != $dao->grouping &&
         !in_array("Civi{$dao->component_name}", $config->enableComponents)
       ) {
         continue;
@@ -99,7 +107,8 @@ LEFT  JOIN civicrm_component comp
    */
   function run() {
     $compID = CRM_Utils_Request::retrieve('compid', 'Positive', $this);
-    $rows = self::info($compID);
+    $grouping = CRM_Utils_Request::retrieve('grp', 'String', $this);
+    $rows = self::info($compID, $grouping);
     $this->assign('list', $rows);
 
     return parent::run();

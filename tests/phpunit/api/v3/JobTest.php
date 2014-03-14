@@ -38,7 +38,7 @@
 require_once 'CiviTest/CiviUnitTestCase.php';
 class api_v3_JobTest extends CiviUnitTestCase {
   protected $_apiversion = 3;
-  public $_eNoticeCompliant = TRUE;
+
   public $DBResetRequired = FALSE;
   public $_entity = 'Job';
   public $_params = array();

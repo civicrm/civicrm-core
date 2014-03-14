@@ -95,7 +95,7 @@ class CRM_Financial_BAO_FinancialTypeAccount extends CRM_Financial_DAO_EntityFin
     else {
       $financialTypeAccount->id = CRM_Utils_Array::value('entityFinancialAccount', $ids);
     }
-    if (CRM_Utils_Array::value('entityFinancialAccount', $ids)) {
+    if (!empty($ids['entityFinancialAccount'])) {
       $financialTypeAccount->id = $ids['entityFinancialAccount'];
     }
     $financialTypeAccount->copyValues($params);

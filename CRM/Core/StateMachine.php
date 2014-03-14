@@ -267,7 +267,7 @@ class CRM_Core_StateMachine {
 
     $this->_pageNames = array();
     foreach ($pages as $tempName => $value) {
-      if (CRM_Utils_Array::value('className', $value)) {
+      if (!empty($value['className'])) {
         $this->_pageNames[] = $tempName;
       }
       else {

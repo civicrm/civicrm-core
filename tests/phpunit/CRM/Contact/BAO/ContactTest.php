@@ -3,7 +3,6 @@ require_once 'CiviTest/CiviUnitTestCase.php';
 require_once 'CiviTest/Contact.php';
 require_once 'CiviTest/Custom.php';
 class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
-  public $_eNoticeCompliant = FALSE;
   function get_info() {
     return array(
       'name' => 'Contact BAOs',
@@ -1522,26 +1521,23 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
     $customGroup = Custom::createGroup(array(), 'Individual');
     $this->assertNotNull($customGroup);
     $fields = array(
-      'groupId' => $customGroup->id,
+      'custom_group_id' => $customGroup->id,
       'data_type' => 'String',
       'html_type' => 'Text',
     );
-    $customField = Custom::createField(array(), $fields);
-    $this->assertNotNull($customField);
-
+    $customField = $this->customFieldCreate($fields);
+    $customField = $customField['values'][$customField['id']];
     $test = $this;
     $this->_testTimestamps(array(
       'INSERT' => function ($contactId) use ($test, $customGroup, $customField) {
-        $result = civicrm_api('contact', 'create', array(
-          'version' => 3,
+        $result = civicrm_api3('contact', 'create', array(
           'contact_id' => $contactId,
-          'custom_' . $customField->id => 'test-1',
+          'custom_' . $customField['id'] => 'test-1',
         ));
-        $test->assertAPISuccess($result);
       },
       'UPDATE' => function ($contactId) use ($test, $customGroup, $customField) {
         CRM_Core_DAO::executeQuery(
-          "UPDATE {$customGroup->table_name} SET {$customField->column_name} = 'test-2' WHERE entity_id = %1",
+          "UPDATE {$customGroup->table_name} SET {$customField['column_name']} = 'test-2' WHERE entity_id = %1",
           array(1 => array($contactId, 'Integer'))
         );
       },

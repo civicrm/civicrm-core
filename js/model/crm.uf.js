@@ -78,6 +78,7 @@
       case 'Contact':
       case 'Individual':
       case 'Organization':
+      case 'Household':
         return 'contact_1';
       case 'Activity':
         return 'activity_1';
@@ -207,7 +208,12 @@
     },
     isInSelectorAllowed: function() {
       var visibility = _.first(_.where(VISIBILITY, {val: this.get('visibility')}));
-      return visibility.isInSelectorAllowed;
+      if (visibility) {
+        return visibility.isInSelectorAllowed;
+      }
+      else {
+        return false;
+      }
     },
     getFieldSchema: function() {
       return this.getRel('ufGroupModel').getFieldSchema(this.get('entity_name'), this.get('field_name'));
@@ -676,17 +682,56 @@
       });
       return allMatched;
     },
-    resetEntities: function() {
+    calculateContactEntityType: function() {
       var ufGroupModel = this;
-      ufGroupModel.getRel('ufFieldCollection').each(function(ufFieldModel){
-        if (!ufFieldModel.getFieldSchema()) {
-          CRM.alert(ts('The data model no longer includes field "%1"! All references to the field have been removed.', {
-            1: ufFieldModel.get('entity_name') + "." + ufFieldModel.get('field_name')
-          }), '', 'alert', {expires: false});
-          ufFieldModel.destroyLocal();
+
+      // set proper entity model based on selected profile
+      var contactTypes = ['Individual', 'Household', 'Organization'];
+      var profileType = ufGroupModel.get('group_type');
+      profileType = profileType.split(',');
+      var ufEntityModel;
+      _.each(profileType, function (ptype) {
+        if ($.inArray(ptype, contactTypes) > -1) {
+          ufEntityModel = ptype + 'Model';
+          return true;
         }
       });
+
+      return ufEntityModel;
+    },
+    setUFGroupModel: function(entityType, allEntityModels) {
+      var ufGroupModel = this;
+
+      var newUfEntityModels = [];
+      _.each(allEntityModels, function (values) {
+        if (values.entity_name == 'contact_1') {
+          values.entity_type = entityType;
+        }
+        newUfEntityModels.push(new CRM.UF.UFEntityModel(values));
+      });
+
+      ufGroupModel.getRel('ufEntityCollection').reset(newUfEntityModels);
+    },
+    resetEntities: function() {
+      var ufGroupModel = this;
+      var deleteFieldList = [];
+      ufGroupModel.getRel('ufFieldCollection').each(function(ufFieldModel){
+        if (!ufFieldModel.getFieldSchema()) {
+          CRM.alert(ts('This profile no longer includes field "%1"! All references to the field have been removed.', {
+            1: ufFieldModel.get('label')
+          }), '', 'alert', {expires: false});
+          deleteFieldList.push(ufFieldModel);
+        }
+      });
+
+      _.each(deleteFieldList, function(ufFieldModel) {
+        ufFieldModel.destroyLocal();
+      });
+
       this.getRel('paletteFieldCollection').reset(this.buildPaletteFields());
+
+      // reset to redraw the cancel after entity type is updated.
+      ufGroupModel.getRel('ufFieldCollection').reset(ufGroupModel.getRel('ufFieldCollection').toJSON());
     },
     /**
      *

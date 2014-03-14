@@ -373,7 +373,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
       $this->assign('multiRecordFieldListing', $multiRecordFieldListing);
 
       // is profile double-opt in?
-      if (CRM_Utils_Array::value('group', $this->_fields) &&
+      if (!empty($this->_fields['group']) &&
         CRM_Core_BAO_UFGroup::isProfileDoubleOptin()
       ) {
         $emailField = FALSE;
@@ -556,7 +556,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
       return;
     }
 
-    if (CRM_Utils_Array::value('image_URL', $this->_defaults)) {
+    if (!empty($this->_defaults['image_URL'])) {
       list($imageWidth, $imageHeight) = getimagesize($this->_defaults['image_URL']);
       list($imageThumbWidth, $imageThumbHeight) = CRM_Contact_BAO_Contact::getThumbSize($imageWidth, $imageHeight);
       $this->assign("imageWidth", $imageWidth);
@@ -882,7 +882,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
 
     $profileActivityTypes = CRM_Core_BAO_UFGroup::groupTypeValues($gid, 'Activity');
 
-    if ((CRM_Utils_Array::value('Activity', $profileActivityTypes) &&
+    if ((!empty($profileActivityTypes['Activity']) &&
         !in_array($activityDetails['activity_type_id'], $profileActivityTypes['Activity'])
       ) ||
       (!in_array($contactId, $activityDetails['assignee_contact']) &&
@@ -927,16 +927,14 @@ class CRM_Profile_Form extends CRM_Core_Form {
     }
 
     // dont check for duplicates during registration validation: CRM-375
-    if (!$register && !CRM_Utils_Array::value('_qf_Edit_upload_duplicate', $fields)) {
+    if (!$register && empty($fields['_qf_Edit_upload_duplicate'])) {
       // fix for CRM-3240
-      if (CRM_Utils_Array::value('email-Primary', $fields)) {
+      if (!empty($fields['email-Primary'])) {
         $fields['email'] = CRM_Utils_Array::value('email-Primary', $fields);
       }
 
       // fix for CRM-6141
-      if (CRM_Utils_Array::value('phone-Primary-1', $fields) &&
-        !CRM_Utils_Array::value('phone-Primary', $fields)
-      ) {
+      if (!empty($fields['phone-Primary-1']) && empty($fields['phone-Primary'])) {
         $fields['phone-Primary'] = $fields['phone-Primary-1'];
       }
 
@@ -1089,11 +1087,11 @@ class CRM_Profile_Form extends CRM_Core_Form {
 
     //if the delete record button is clicked
     if ($this->_deleteButtonName) {
-      if (CRM_Utils_Array::value($this->_deleteButtonName, $_POST) && $this->_recordId) {
+      if (!empty($_POST[$this->_deleteButtonName]) && $this->_recordId) {
         $filterParams['id'] = $this->_customGroupId;
         $returnProperities = array('is_multiple', 'table_name');
         CRM_Core_DAO::commonRetrieve("CRM_Core_DAO_CustomGroup", $filterParams, $returnValues, $returnProperities);
-        if (CRM_Utils_Array::value('is_multiple', $returnValues)) {
+        if (!empty($returnValues['is_multiple'])) {
           if ($tableName = CRM_Utils_Array::value('table_name', $returnValues)) {
             $sql = "DELETE FROM {$tableName} WHERE id = %1 AND entity_id = %2";
             $sqlParams = array(
@@ -1108,7 +1106,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
       }
     }
     CRM_Utils_Hook::processProfile($this->_ufGroupName);
-    if (CRM_Utils_Array::value('image_URL', $params)) {
+    if (!empty($params['image_URL'])) {
       CRM_Contact_BAO_Contact::processImageParams($params);
     }
 
@@ -1125,8 +1123,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
       );
       $details = $contactDetails[0][$this->_id];
     }
-    if (!(CRM_Utils_Array::value('addressee_id', $details) ||
-        CRM_Utils_Array::value('email_greeting_id', $details) ||
+    if (!(!empty($details['addressee_id']) || !empty($details['email_greeting_id']) ||
         CRM_Utils_Array::value('postal_greeting_id', $details)
       )) {
 
@@ -1167,11 +1164,11 @@ class CRM_Profile_Form extends CRM_Core_Form {
 
     //array of group id, subscribed by contact
     $contactGroup = array();
-    if (CRM_Utils_Array::value('group', $params) &&
+    if (!empty($params['group']) &&
       CRM_Core_BAO_UFGroup::isProfileDoubleOptin()
     ) {
       $groupSubscribed = array();
-      if (CRM_Utils_Array::value('email', $result)) {
+      if (!empty($result['email'])) {
         if ($this->_id) {
           $contactGroups = new CRM_Contact_DAO_GroupContact();
           $contactGroups->contact_id = $this->_id;
@@ -1208,7 +1205,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
     }
 
     $addToGroupId = NULL;
-    if (CRM_Utils_Array::value('add_to_group', $params)) {
+    if (!empty($params['add_to_group'])) {
       $addToGroupId = $params['add_to_group'];
 
       //run same check whether group is a mailing list
@@ -1219,8 +1216,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
         substr($groupTypes, 1, -1)
       );
       //filter group of mailing type and unset it from params
-      if (in_array(2, $groupType) &&
-        CRM_Utils_Array::value('email', $result) &&
+      if (in_array(2, $groupType) && !empty($result['email']) &&
         CRM_Core_BAO_UFGroup::isProfileAddToGroupDoubleOptin()
       ) {
         if (!count($contactGroup)) {
@@ -1273,7 +1269,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
           if (isset($params['activity_date_time'])) {
             $activityParams['activity_date_time'] = CRM_Utils_Date::processDate($params['activity_date_time'], $params['activity_date_time_time']);
           }
-          if (CRM_Utils_Array::value($fieldName, $params) && isset($params["{$fieldName}_id"])) {
+          if (!empty($params[$fieldName]) && isset($params["{$fieldName}_id"])) {
             $activityParams[$fieldName] = $params["{$fieldName}_id"];
           }
         }
@@ -1327,7 +1323,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
     }
 
     //create CMS user (if CMS user option is selected in profile)
-    if (CRM_Utils_Array::value('cms_create_account', $params) &&
+    if (!empty($params['cms_create_account']) &&
       $this->_mode == self::MODE_CREATE
     ) {
       $params['contactID'] = $this->_id;

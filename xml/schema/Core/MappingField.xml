@@ -48,6 +48,9 @@
          <keyColumn>name</keyColumn>
          <labelColumn>label</labelColumn>
        </pseudoconstant>
+       <html>
+         <type>Select</type>
+       </html>
       <add>1.2</add>
   </field>
   <field>
@@ -91,6 +94,9 @@
       <pseudoconstant>
         <optionGroupName>instant_messenger_service</optionGroupName>
       </pseudoconstant>
+      <html>
+        <type>Select</type>
+      </html>
   </field>
   <field>
        <name>website_type_id</name>
@@ -100,6 +106,9 @@
        <pseudoconstant>
          <optionGroupName>website_type</optionGroupName>
        </pseudoconstant>
+       <html>
+         <type>Select</type>
+       </html>
   </field>
   <field>
        <name>relationship_type_id</name>
@@ -128,11 +137,17 @@
   </field>
   <field>
        <name>operator</name>
+       <type>varchar</type>
+       <length>16</length>
        <type>enum</type>
-       <values>&#61;, !&#61;, &#62;, &#60;, &#62;&#61;, &#60;&#61;,
-       IN, NOT IN, LIKE, NOT LIKE, IS NULL, IS NOT NULL, IS NOT EMPTY, IS EMPTY</values>
        <comment>SQL WHERE operator for search-builder mapping fields (search criteria).</comment>
+       <pseudoconstant>
+         <callback>CRM_Core_SelectValues::getSearchBuilderOperators</callback>
+       </pseudoconstant>
       <add>1.5</add>
+      <html>
+        <type>Select</type>
+      </html>
   </field>
   <field>
        <name>value</name>

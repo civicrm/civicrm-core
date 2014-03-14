@@ -105,18 +105,18 @@
 
   function deleteCustomValue( valueID, elementID, groupID, contactID ) {
     var postUrl = {/literal}"{crmURL p='civicrm/ajax/customvalue' h=0 }"{literal};
-    cj.ajax({
+    var request = cj.ajax({
       type: "POST",
       data:  "valueID=" + valueID + "&groupID=" + groupID +"&contactId=" + contactID + "&key={/literal}{crmKey name='civicrm/ajax/customvalue'}{literal}",
       url: postUrl,
       success: function(html){
         cj('#'+ elementID).hide();
         hideStatus(valueID, groupID);
-        CRM.alert('', '{/literal}{ts escape="js"}Record Deleted{/ts}{literal}', 'success');
         var element = cj( '.ui-tabs-nav #tab_custom_' + groupID + ' a' );
         cj(element).html(cj(element).attr('title') + ' ('+ html+') ');
       }
     });
+    CRM.status({success: '{/literal}{ts escape="js"}Record Deleted{/ts}{literal}'}, request);
   }
   {/literal}
 </script>

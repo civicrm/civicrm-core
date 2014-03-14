@@ -138,6 +138,7 @@ class CRM_Extension_Manager {
         $tgtPath = $this->fullContainer->getPath($newInfo->key);
         if (! CRM_Utils_File::isChildPath($this->defaultContainer->getBaseDir(), $tgtPath)) {
           // force installation in the default-container
+          $oldPath = $tgtPath;
           $tgtPath = $this->defaultContainer->getBaseDir() . DIRECTORY_SEPARATOR . $newInfo->key;
           CRM_Core_Session::setStatus(ts('A copy of the extension (%1) is in a system folder (%2). The system copy will be preserved, but the new copy will be used.', array(
             1 => $newInfo->key,
@@ -157,7 +158,7 @@ class CRM_Extension_Manager {
         $oldInfo = $typeManager = NULL;
         break;
       default:
-        throw new CRM_Extension_Exception("Cannot install or enable extension: $key");
+        throw new CRM_Extension_Exception("Cannot install or enable extension: {$newInfo->key}");
     }
 
     // move the code!
@@ -182,7 +183,7 @@ class CRM_Extension_Manager {
         $typeManager->onPostReplace($oldInfo, $newInfo);
         break;
       default:
-        throw new CRM_Extension_Exception("Cannot install or enable extension: $key");
+        throw new CRM_Extension_Exception("Cannot install or enable extension: {$newInfo->key}");
     }
 
     $this->refresh();

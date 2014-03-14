@@ -211,24 +211,24 @@ class CRM_Report_Form_Instance {
       $defaults['report_header'] = CRM_Utils_Array::value('header', $defaults);
       $defaults['report_footer'] = CRM_Utils_Array::value('footer', $defaults);
 
-      if (CRM_Utils_Array::value('navigation_id', $defaults)) {
+      if (!empty($defaults['navigation_id'])) {
         //get the default navigation parent id
         $params = array('id' => $defaults['navigation_id']);
         CRM_Core_BAO_Navigation::retrieve($params, $navigationDefaults);
         $defaults['is_navigation'] = 1;
         $defaults['parent_id'] = CRM_Utils_Array::value('parent_id', $navigationDefaults);
 
-        if (CRM_Utils_Array::value('is_active', $navigationDefaults)) {
+        if (!empty($navigationDefaults['is_active'])) {
           $form->assign('is_navigation', TRUE);
         }
 
-        if (CRM_Utils_Array::value('id', $navigationDefaults)) {
+        if (!empty($navigationDefaults['id'])) {
           $form->_navigation['id'] = $navigationDefaults['id'];
           $form->_navigation['parent_id'] = $navigationDefaults['parent_id'];
         }
       }
 
-      if (CRM_Utils_Array::value('grouprole', $defaults)) {
+      if (!empty($defaults['grouprole'])) {
         foreach (explode(CRM_Core_DAO::VALUE_SEPARATOR, $defaults['grouprole']) as $value) {
           $grouproles[] = $value;
         }
@@ -241,7 +241,7 @@ class CRM_Report_Form_Instance {
   }
 
   static function postProcess(&$form, $redirect = TRUE) {
-    $params     = $form->getVar('_params');
+    $params = $form->getVar('_params');
     $instanceID = $form->getVar('_id');
 
     if ($isNew = $form->getVar('_createNew')) {
@@ -251,8 +251,16 @@ class CRM_Report_Form_Instance {
       $instanceID = NULL; //unset $instanceID so a new copy would be created
     }
     $params['instance_id'] = $instanceID;
-    if (CRM_Utils_Array::value('is_navigation', $params)) {
+    if (!empty($params['is_navigation'])) {
       $params['navigation'] = $form->_navigation;
+    }
+    elseif ($instanceID){
+      //delete navigation if exists
+      $navId = CRM_Core_DAO::getFieldValue('CRM_Report_DAO_ReportInstance', $instanceID, 'navigation_id', 'id');
+      if ($navId) {
+        CRM_Core_BAO_Navigation::processDelete($navId);
+        CRM_Core_BAO_Navigation::resetNavigation();
+      }
     }
 
     // make a copy of params

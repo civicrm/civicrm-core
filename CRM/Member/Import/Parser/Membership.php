@@ -161,7 +161,7 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
     $errorMessage = NULL;
 
     //To check whether start date or join date is provided
-    if (!CRM_Utils_Array::value('membership_start_date', $params) && !CRM_Utils_Array::value('join_date', $params)) {
+    if (empty($params['membership_start_date']) && empty($params['join_date'])) {
       $errorMessage = 'Membership Start Date is required to create a memberships.';
       CRM_Contact_Import_Parser_Contact::addToErrorMsg('Start Date', $errorMessage);
     }
@@ -266,9 +266,7 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
       $params = &$this->getActiveFieldParams();
 
       //assign join date equal to start date if join date is not provided
-      if (!CRM_Utils_Array::value('join_date', $params) &&
-        CRM_Utils_Array::value('membership_start_date', $params)
-      ) {
+      if (empty($params['join_date']) && !empty($params['membership_start_date'])) {
         $params['join_date'] = $params['membership_start_date'];
       }
 
@@ -359,9 +357,7 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
       else {
         //fix for CRM-2219 Update Membership
         // onDuplicate == CRM_Import_Parser::DUPLICATE_UPDATE
-        if (CRM_Utils_Array::value('is_override', $formatted) &&
-          !CRM_Utils_Array::value('status_id', $formatted)
-        ) {
+        if (!empty($formatted['is_override']) && empty($formatted['status_id'])) {
           array_unshift($values, 'Required parameter missing: Status');
           return CRM_Import_Parser::ERROR;
         }
@@ -371,7 +367,7 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
           $dao->id = $formatValues['membership_id'];
           $dates   = array('join_date', 'start_date', 'end_date');
           foreach ($dates as $v) {
-                      if (!CRM_Utils_Array::value( $v, $formatted )) {
+                      if (empty($formatted[$v])) {
               $formatted[$v] = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_Membership', $formatValues['membership_id'], $v);
             }
           }
@@ -438,7 +434,7 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
             //fix for CRM-3570, exclude the statuses those having is_admin = 1
             //now user can import is_admin if is override is true.
             $excludeIsAdmin = FALSE;
-            if (!CRM_Utils_Array::value('is_override', $formatted)) {
+            if (empty($formatted['is_override'])) {
               $formatted['exclude_is_admin'] = $excludeIsAdmin = TRUE;
             }
             $calcStatus = CRM_Member_BAO_MembershipStatus::getMembershipStatusByDate($startDate,
@@ -448,10 +444,10 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
               $excludeIsAdmin
             );
 
-            if (!CRM_Utils_Array::value('status_id', $formatted)) {
+            if (empty($formatted['status_id'])) {
               $formatted['status_id'] = $calcStatus['id'];
             }
-            elseif (!CRM_Utils_Array::value('is_override', $formatted)) {
+            elseif (empty($formatted['is_override'])) {
               if (empty($calcStatus)) {
                 array_unshift($values, 'Status in import row (' . $formatValues['status_id'] . ') does not match calculated status based on your configured Membership Status Rules. Record was not imported.');
                 return CRM_Import_Parser::ERROR;
@@ -490,7 +486,7 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
             }
           }
 
-          if (CRM_Utils_Array::value('external_identifier', $params)) {
+          if (!empty($params['external_identifier'])) {
             if ($disp) {
               $disp .= "AND {$params['external_identifier']}";
             }
@@ -504,7 +500,7 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
         }
       }
       else {
-        if (CRM_Utils_Array::value('external_identifier', $formatValues)) {
+        if (!empty($formatValues['external_identifier'])) {
           $checkCid = new CRM_Contact_DAO_Contact();
           $checkCid->external_identifier = $formatValues['external_identifier'];
           $checkCid->find(TRUE);
@@ -526,7 +522,7 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
         //fix for CRM-3570, exclude the statuses those having is_admin = 1
         //now user can import is_admin if is override is true.
         $excludeIsAdmin = FALSE;
-        if (!CRM_Utils_Array::value('is_override', $formatted)) {
+        if (empty($formatted['is_override'])) {
           $formatted['exclude_is_admin'] = $excludeIsAdmin = TRUE;
         }
         $calcStatus = CRM_Member_BAO_MembershipStatus::getMembershipStatusByDate($startDate,
@@ -535,10 +531,10 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
           'today',
           $excludeIsAdmin
         );
-        if (!CRM_Utils_Array::value('status_id', $formatted)) {
+        if (empty($formatted['status_id'])) {
           $formatted['status_id'] = CRM_Utils_Array::value('id', $calcStatus);
         }
-        elseif (!CRM_Utils_Array::value('is_override', $formatted)) {
+        elseif (empty($formatted['is_override'])) {
           if (empty($calcStatus)) {
             array_unshift($values, 'Status in import row (' . CRM_Utils_Array::value('status_id', $formatValues) . ') does not match calculated status based on your configured Membership Status Rules. Record was not imported.');
             return CRM_Import_Parser::ERROR;
@@ -689,7 +685,7 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
           CRM_Member_PseudoConstant::membershipType()
           );
           if ($membershipTypeId) {
-            if (CRM_Utils_Array::value('membership_type_id', $values) &&
+            if (!empty($values['membership_type_id']) &&
               $membershipTypeId != $values['membership_type_id']
             ) {
               throw new Exception('Mismatched membership Type and Membership Type Id');
@@ -713,7 +709,7 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
           CRM_Member_PseudoConstant::membershipStatus()
           );
           if ($membershipStatusId) {
-            if (CRM_Utils_Array::value('status_id', $values) &&
+            if (!empty($values['status_id']) &&
               $membershipStatusId != $values['status_id']
             ) {
               throw new Exception('Mismatched membership Status and Membership Status Id');

@@ -107,7 +107,7 @@ function searchVoters( qfKey )
       if ( qfKey ) dataUrl = dataUrl + '&qfKey=' + qfKey;
 
       cj.get( dataUrl, null, function( voterList ) {
-        cj( '#voterList' ).html( voterList );
+        cj( '#voterList' ).html( voterList ).trigger('crmLoad');
 
         //collapse the search form.
         var searchFormName = '#search_form_' + {/literal}'{$searchVoterFor}'{literal};
@@ -175,7 +175,7 @@ function processVoterData( element, operation )
   if ( operation == 'release' ) {
          data['operation']   = operation;
   data['activity_id'] = cj( element ).val( );
-  data['isDelete']    = cj( element ).attr( 'checked') ? 1:0;
+  data['isDelete']    = cj( element ).prop('checked') ? 1:0;
   } else if ( operation == 'reserve' ) {
         var interviewerId           = cj( '#survey_interviewer_id' ).val( );
         data['operation']           = operation;
@@ -183,11 +183,11 @@ function processVoterData( element, operation )
   data['target_contact_id']   = cj( element ).val( );
         data['source_contact_id']   = interviewerId;
         data['assignee_contact_id'] = interviewerId;
-  data['isReserved']          = cj( element ).attr( 'checked') ? 1:0;
+  data['isReserved']          = cj( element ).prop('checked') ? 1:0;
   } else if ( operation == 'gotv' ) {
          data['operation']   = operation;
   data['activity_id'] = cj( element ).val( );
-  data['hasVoted']    = cj( element ).attr( 'checked') ? 1: 0;
+  data['hasVoted']    = cj( element ).prop('checked') ? 1: 0;
   }
   data['surveyTitle'] = {/literal}'{$surveyTitle|escape:javascript}'{literal};
 
@@ -204,11 +204,11 @@ function processVoterData( element, operation )
        cj( msgId ).fadeIn('slow').fadeOut('slow');
        if ( operation == 'release' ) {
                  msg = '{/literal}{ts escape='js'}Save as voted.{/ts}{literal}';
-           var isDeleted = cj( element ).attr( 'checked') ? 1:0;
+           var isDeleted = cj( element ).prop('checked') ? 1:0;
            if ( !isDeleted ) msg = '{/literal}{ts escape='js'}Save as non voted.{/ts}{literal}';
        } else if ( operation == 'gotv' ) {
            msg = '{/literal}{ts escape='js'}Vote Recorded.{/ts}{literal}';
-           var hasVoted = cj( element ).attr( 'checked') ? 1:0;
+           var hasVoted = cj( element ).prop('checked') ? 1:0;
            var trObject = cj( '[id^="survey_activity['+ cj( element ).val() +']"]' ).parents('tr' );
            var methodName = 'addClass';
            if ( !hasVoted ) {
@@ -217,7 +217,7 @@ function processVoterData( element, operation )
            }
            eval( 'trObject.' + methodName + "( 'name disabled' )" );
        } else if ( operation == 'reserve' ) {
-           if ( cj( element ).attr( 'checked') ) {
+           if ( cj( element ).prop('checked') ) {
                msg = '{/literal}{ts escape='js'}Reserved.{/ts}{literal}';
            } else {
                msg = '{/literal}{ts escape='js'}Released.{/ts}{literal}';

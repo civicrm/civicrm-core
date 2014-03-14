@@ -85,6 +85,19 @@ class CRM_Campaign_BAO_Query {
         }
       }
     }
+    // CRM-13810 Translate campaign_id to label for search builder
+    if (is_array($query->_select)) {
+      foreach($query->_select as $field => $queryString) {
+        if (substr($field, -11) == 'campaign_id') {
+          $query->_pseudoConstantsSelect[$field] = array(
+            'pseudoField' => 'campaign_id',
+            'idCol' => $field,
+            'bao' => 'CRM_Activity_BAO_Activity',
+          );
+        }
+      }
+    }
+
 
     //get survey clause in force,
     //only when we have survey id.
@@ -136,7 +149,7 @@ class CRM_Campaign_BAO_Query {
 
     $grouping = NULL;
     foreach (array_keys($query->_params) as $id) {
-      if ($query->_mode == CRM_Contact_BAO_QUERY::MODE_CONTACTS) {
+      if ($query->_mode == CRM_Contact_BAO_Query::MODE_CONTACTS) {
         $query->_useDistinct = TRUE;
       }
 
@@ -181,13 +194,7 @@ class CRM_Campaign_BAO_Query {
         return;
 
       case 'survey_interviewer_id':
-        $surveyInterviewerName = NULL;
-        foreach ($query->_params as $paramValues) {
-          if (CRM_Utils_Array::value(0, $paramValues) == 'survey_interviewer_name') {
-            $surveyInterviewerName = CRM_Utils_Array::value(2, $paramValues);
-            break;
-          }
-        }
+        $surveyInterviewerName = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $value, 'sort_name');
         $query->_qill[$grouping][] = ts('Survey Interviewer - %1', array(1 => $surveyInterviewerName));
         $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause('civicrm_activity_assignment.contact_id',
           $op, $value, 'Integer'
@@ -298,6 +305,7 @@ civicrm_activity_assignment.record_type_id = $assigneeID ) ";
    *
    * @access public
    *
+   * @param CRM_Core_Form $form
    * @return void
    * @static
    */
@@ -318,11 +326,11 @@ civicrm_activity_assignment.record_type_id = $assigneeID ) ";
 
     $contactTypes = CRM_Contact_BAO_ContactType::getSelectElements();
     $form->add('select', 'contact_type', ts('Contact Type(s)'), $contactTypes, FALSE,
-      array('id' => 'contact_type', 'multiple' => 'multiple', 'title' => ts('- select -'))
+      array('id' => 'contact_type', 'multiple' => 'multiple', 'class' => 'crm-select2')
     );
     $groups = CRM_Core_PseudoConstant::group();
     $form->add('select', 'group', ts('Groups'), $groups, FALSE,
-      array('id' => 'group', 'multiple' => 'multiple', 'title' => ts('- select -'))
+      array('id' => 'group', 'multiple' => 'multiple', 'class' => 'crm-select2')
     );
 
     $showInterviewer = FALSE;
@@ -334,32 +342,20 @@ civicrm_activity_assignment.record_type_id = $assigneeID ) ";
     if ($showInterviewer ||
       $className == 'CRM_Campaign_Form_Gotv'
     ) {
-      //autocomplete url
-      $dataUrl = CRM_Utils_System::url('civicrm/ajax/rest',
-        'className=CRM_Contact_Page_AJAX&fnName=getContactList&json=1&reset=1',
-        FALSE, NULL, FALSE
-      );
 
-      $form->assign('dataUrl', $dataUrl);
-      $form->add('text', 'survey_interviewer_name', ts('Interviewer'));
-      $form->add('hidden', 'survey_interviewer_id', '', array('id' => 'survey_interviewer_id'));
+      $form->addEntityRef('survey_interviewer_id', ts('Interviewer'), array('class' => 'big'));
 
       $userId = NULL;
       if (isset($form->_interviewerId) && $form->_interviewerId) {
         $userId = $form->_interviewerId;
       }
       if (!$userId) {
-        $session = CRM_core_Session::singleton();
+        $session = CRM_Core_Session::singleton();
         $userId = $session->get('userID');
       }
       if ($userId) {
         $defaults = array();
         $defaults['survey_interviewer_id'] = $userId;
-        $defaults['survey_interviewer_name'] = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact',
-          $userId,
-          'sort_name',
-          'id'
-        );
         $form->setDefaults($defaults);
       }
     }
@@ -405,11 +401,11 @@ INNER JOIN  civicrm_custom_group grp on fld.custom_group_id = grp.id
     //campaign has some contact groups, don't
     //allow to search the contacts those are not
     //in given campaign groups ( ie not in constituents )
-    $groupJs = NULL;
+    $props = array('class' => 'crm-select2');
     if ($form->get('searchVoterFor') == 'reserve') {
-      $groupJs = array('onChange' => "buildCampaignGroups( );return false;");
+      $props['onChange'] = "buildCampaignGroups( );return false;";
     }
-    $form->add('select', 'campaign_survey_id', ts('Survey'), $surveys, TRUE, $groupJs);
+    $form->add('select', 'campaign_survey_id', ts('Survey'), $surveys, TRUE, $props);
   }
 
   /*
@@ -427,7 +423,6 @@ INNER JOIN  civicrm_custom_group grp on fld.custom_group_id = grp.id
       return $voterClause;
     }
     $surveyId       = CRM_Utils_Array::value('campaign_survey_id', $params);
-    $interviewerId  = CRM_Utils_Array::value('survey_interviewer_id', $params);
     $searchVoterFor = CRM_Utils_Array::value('campaign_search_voter_for', $params);
 
     //get the survey activities.

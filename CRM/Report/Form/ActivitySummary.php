@@ -186,7 +186,7 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
     foreach ($this->_columns as $tableName => $table) {
       if (array_key_exists('group_bys', $table)) {
         foreach ($table['group_bys'] as $fieldName => $field) {
-          if (CRM_Utils_Array::value($fieldName, $this->_params['group_bys'])) {
+          if (!empty($this->_params['group_bys'][$fieldName])) {
 
             switch (CRM_Utils_Array::value($fieldName, $this->_params['group_bys_freq'])) {
               case 'YEARWEEK':
@@ -218,7 +218,7 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
                 $field['title'] = 'Quarter';
                 break;
             }
-            if (CRM_Utils_Array::value($fieldName, $this->_params['group_bys_freq'])) {
+            if (!empty($this->_params['group_bys_freq'][$fieldName])) {
               $this->_interval = $field['title'];
               $this->_columnHeaders["{$tableName}_{$fieldName}_start"]['title'] = $field['title'] . ' Beginning';
               $this->_columnHeaders["{$tableName}_{$fieldName}_start"]['type'] = $field['type'];
@@ -235,16 +235,14 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
       }
       if (array_key_exists('fields', $table)) {
         foreach ($table['fields'] as $fieldName => $field) {
-          if (CRM_Utils_Array::value('required', $field) ||
-            CRM_Utils_Array::value($fieldName, $this->_params['fields'])
-          ) {
+          if (!empty($field['required']) || !empty($this->_params['fields'][$fieldName])) {
             if ($tableName == 'civicrm_email') {
               $this->_emailField = TRUE;
             }
             if ($tableName == 'civicrm_phone') {
               $this->_phoneField = TRUE;
             }
-            if (CRM_Utils_Array::value('statistics', $field)) {
+            if (!empty($field['statistics'])) {
               foreach ($field['statistics'] as $stat => $label) {
                 switch (strtolower($stat)) {
                   case 'count':
@@ -264,7 +262,7 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
               }
             }
             elseif ($fieldName == 'activity_type_id') {
-              if (!CRM_Utils_Array::value('activity_type_id', $this->_params['group_bys'])) {
+              if (empty($this->_params['group_bys']['activity_type_id'])) {
                 $select[] = "GROUP_CONCAT(DISTINCT {$field['dbAlias']}  ORDER BY {$field['dbAlias']} ) as {$tableName}_{$fieldName}";
               }
               else {
@@ -397,13 +395,11 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
       foreach ($this->_columns as $tableName => $table) {
         if (array_key_exists('group_bys', $table)) {
           foreach ($table['group_bys'] as $fieldName => $field) {
-            if (CRM_Utils_Array::value($fieldName, $this->_params['group_bys'])) {
-              if (CRM_Utils_Array::value('chart', $field)) {
+            if (!empty($this->_params['group_bys'][$fieldName])) {
+              if (!empty($field['chart'])) {
                 $this->assign('chartSupported', TRUE);
               }
-              if (CRM_Utils_Array::value('frequency', $table['group_bys'][$fieldName]) &&
-                CRM_Utils_Array::value($fieldName, $this->_params['group_bys_freq'])
-              ) {
+              if (!empty($table['group_bys'][$fieldName]['frequency']) && !empty($this->_params['group_bys_freq'][$fieldName])) {
 
                 $append = "YEAR({$field['dbAlias']}),";
                 if (in_array(strtolower($this->_params['group_bys_freq'][$fieldName]),
@@ -432,11 +428,9 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
   function formRule($fields, $files, $self) {
     $errors = array();
     $contactFields = array('sort_name', 'email', 'phone');
-    if (CRM_Utils_Array::value('group_bys', $fields)) {
+    if (!empty($fields['group_bys'])) {
 
-      if (CRM_Utils_Array::value('activity_type_id', $fields['group_bys']) &&
-        !CRM_Utils_Array::value('sort_name', $fields['group_bys'])
-      ) {
+      if (!empty($fields['group_bys']['activity_type_id']) && empty($fields['group_bys']['sort_name'])) {
         foreach ($fields['fields'] as $fieldName => $val) {
           if (in_array($fieldName, $contactFields)) {
             $errors['fields'] = ts("Please select GroupBy 'Contact' to display Contact Fields");
@@ -445,8 +439,8 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
         }
       }
 
-      if (CRM_Utils_Array::value('activity_date_time', $fields['group_bys'])) {
-        if (CRM_Utils_Array::value('sort_name', $fields['group_bys'])) {
+      if (!empty($fields['group_bys']['activity_date_time'])) {
+        if (!empty($fields['group_bys']['sort_name'])) {
           $errors['fields'] = ts("Please do not select GroupBy 'Activity Date' with GroupBy 'Contact'");
         }
         else {

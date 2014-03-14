@@ -78,7 +78,6 @@ class CRM_Admin_Page_Tag extends CRM_Core_Page_Basic {
         CRM_Core_Action::FOLLOWUP => array(
           'name' => ts('Merge'),
           'class' => 'merge_tag',
-          'url' => 'javascript:',
           'title' => ts('Merge Tag'),
         ),
       );
@@ -135,6 +134,7 @@ class CRM_Admin_Page_Tag extends CRM_Core_Page_Basic {
    * override function browse()
    */
   function browse($action = NULL, $sort = NULL) {
+    CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'js/crm.livePage.js');
     $adminTagSet = FALSE;
     if (CRM_Core_Permission::check('administer Tagsets')) {
       $adminTagSet = TRUE;

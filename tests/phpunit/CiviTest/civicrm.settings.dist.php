@@ -42,10 +42,10 @@ require_once "DB.php";
 $dsninfo = DB::parseDSN(CIVICRM_DSN);
 
 $GLOBALS['mysql_host'] = $dsninfo['hostspec'];
+$GLOBALS['mysql_port'] = @$dsninfo['port'];
 $GLOBALS['mysql_user'] = $dsninfo['username'];
 $GLOBALS['mysql_pass'] = $dsninfo['password'];
 $GLOBALS['mysql_db'] = $dsninfo['database'];
-
 
 /**
  * Content Management System (CMS) Host:

@@ -29,6 +29,7 @@
 <script type="text/javascript" src="{$config->resourceBase}packages/jquery/plugins/jquery-fieldselection.js"></script>
 
 <script type="text/javascript">
+cj('form#{$form.formName}').data('tokens', {$tokens|@json_encode});
 var text_message = null;
 var html_message = null;
 var isPDF        = false;
@@ -286,61 +287,65 @@ if ( isMailing ) {
   {literal}
 }
 
-function tokenReplText(element) {
-  var token     = cj("#"+element.id).val( )[0];
-  if ( element.id == 'token3' ) {
-    ( isMailing ) ? text_message = "subject" : text_message = "msg_subject";
-  }
-  else if ( element.id == 'token1' ) {
-    ( isMailing ) ? text_message = "text_message" : text_message = "msg_text";
+cj(function($) {
+  function insertToken() {
+    var
+      token = $(this).val(),
+      field = $(this).data('field');
+    if (field === 'html_message') {
+      tokenReplHtml(token);
+    } else {
+      $('#' + field).replaceSelection(token);
+    }
+    $(this).select2('val', '');
+    if (isMailing) {
+      verify();
+    }
   }
 
-  cj( "#"+ text_message ).replaceSelection( token );
-
-  if ( isMailing ) {
-    verify();
-  }
-}
-
-function tokenReplHtml() {
-  var token2     = cj("#token2").val( )[0];
-  var editor     = {/literal}"{$editor}"{literal};
-  if ( editor == "tinymce" ) {
-    tinyMCE.execInstanceCommand('html_message',"mceInsertContent",false, token2 );
-  }
-  else if ( editor == "joomlaeditor" ) {
-    tinyMCE.execCommand('mceInsertContent',false, token2);
-    var msg       = document.getElementById(html_message).value;
-    var cursorlen = document.getElementById(html_message).selectionStart;
-    var textlen   = msg.length;
-    document.getElementById(html_message).value = msg.substring(0, cursorlen) + token2 + msg.substring(cursorlen, textlen);
-    var cursorPos = (cursorlen + token2.length);
-    document.getElementById(html_message).selectionStart = cursorPos;
-    document.getElementById(html_message).selectionEnd   = cursorPos;
-    document.getElementById(html_message).focus();
-  }
-  else if ( editor == "ckeditor" ) {
-    oEditor = CKEDITOR.instances[html_message];
-    oEditor.insertHtml(token2.toString() );
-  }
-  else if ( editor == "drupalwysiwyg" ) {
-    if (Drupal.wysiwyg.instances[html_message].insert) {
-      Drupal.wysiwyg.instances[html_message].insert(token2.toString() );
+  function tokenReplHtml(token) {
+    var editor     = {/literal}"{$editor}"{literal};
+    if ( editor == "tinymce" ) {
+      tinyMCE.execInstanceCommand('html_message',"mceInsertContent",false, token );
+    }
+    else if ( editor == "joomlaeditor" ) {
+      tinyMCE.execCommand('mceInsertContent',false, token);
+      var msg       = document.getElementById(html_message).value;
+      var cursorlen = document.getElementById(html_message).selectionStart;
+      var textlen   = msg.length;
+      document.getElementById(html_message).value = msg.substring(0, cursorlen) + token + msg.substring(cursorlen, textlen);
+      var cursorPos = (cursorlen + token.length);
+      document.getElementById(html_message).selectionStart = cursorPos;
+      document.getElementById(html_message).selectionEnd   = cursorPos;
+      document.getElementById(html_message).focus();
+    }
+    else if ( editor == "ckeditor" ) {
+      oEditor = CKEDITOR.instances[html_message];
+      oEditor.insertHtml(token.toString() );
+    }
+    else if ( editor == "drupalwysiwyg" ) {
+      if (Drupal.wysiwyg.instances[html_message].insert) {
+        Drupal.wysiwyg.instances[html_message].insert(token.toString() );
+      }
+      else {
+        alert("Sorry, your editor doesn't support this function yet.");
+      }
     }
     else {
-      alert("Sorry, your editor doesn't support this function yet.");
+      cj( "#"+ html_message ).replaceSelection( token );
     }
   }
-  else {
-    cj( "#"+ html_message ).replaceSelection( token2 );
-  }
 
-  if ( isMailing ) {
-    verify();
-  }
-}
+  // Initialize token selector widgets
+  var form = $('#{/literal}{$form.formName}{literal}');
+  $('input.crm-token-selector', form)
+    .addClass('crm-action-menu')
+    .change(insertToken)
+    .select2({
+      data: form.data('tokens'),
+      placeholder: '{/literal}{ts escape='js'}Insert Token{/ts}{literal}'
+    });
 
-cj(function() {
   cj('.accordion .head').addClass( "ui-accordion-header ui-helper-reset ui-state-default ui-corner-all ");
   cj('.resizable-textarea textarea').css( 'width', '99%' );
   cj('.grippie').css( 'margin-right', '3px');
@@ -365,105 +370,63 @@ cj(function() {
   if ( !isMailing ) {
     cj("div.text").show();
   }
-});
 
-{/literal}{include file="CRM/common/Filter.tpl"}{literal}
-function showToken(element, id ) {
-  initFilter(id);
-  cj("#token"+id).css({"width":"290px", "size":"8"});
-  var tokenTitle = {/literal}'{ts escape="js"}Select Token{/ts}'{literal};
-  cj("#token"+element ).show( ).dialog({
-    title       : tokenTitle,
-    modal       : true,
-    width       : '310px',
-    resizable   : false,
-    bgiframe    : false,
-    overlay     : { opacity: 0.5, background: "black" },
-    beforeclose : function(event, ui) { cj(this).dialog("destroy"); },
-    buttons     : {
-      "Done": function() {
-        cj(this).dialog("close");
-        //focus on editor/textarea after token selection
-        if (element == 'Text') {
-          cj('#' + text_message).focus();
+  function setSignature() {
+    var emailID = $("#fromEmailAddress").val( );
+    if ( !isNaN( emailID ) ) {
+      var dataUrl = {/literal}"{crmURL p='civicrm/ajax/signature' h=0 }"{literal};
+      $.post( dataUrl, {emailID: emailID}, function( data ) {
+        var editor     = {/literal}"{$editor}"{literal};
+
+        if (data.signature_text) {
+          // get existing text & html and append signatue
+          var textMessage =  $("#"+ text_message).val( ) + '\n\n--\n' + data.signature_text;
+
+          // append signature
+          $("#"+ text_message).val( textMessage );
         }
-        else if (element == 'Html' ) {
-          switch ({/literal}"{$editor}"{literal}) {
-            case 'ckeditor': { oEditor = CKEDITOR.instances[html_message]; oEditor.focus(); break;}
-            case 'tinymce'  : { tinyMCE.get(html_message).focus(); break; }
-            case 'joomlaeditor' : { tinyMCE.get(html_message).focus(); break; }
-            default         : { cj("#"+ html_message).focus(); break; }
+
+        if ( data.signature_html ) {
+          var htmlMessage =  $("#"+ html_message).val( ) + '<br/><br/>--<br/>' + data.signature_html;
+
+          // set wysiwg editor
+          if ( editor == "ckeditor" ) {
+            oEditor = CKEDITOR.instances[html_message];
+            var htmlMessage = oEditor.getData( ) + '<br/><br/>--' + data.signature_html;
+            oEditor.setData( htmlMessage  );
+          }
+          else if ( editor == "tinymce" ) {
+            tinyMCE.execInstanceCommand('html_message',"mceInsertContent",false, htmlMessage);
+          }
+          else if ( editor == "drupalwysiwyg" ) {
+            if (Drupal.wysiwyg.instances[html_message].setContent) {
+              Drupal.wysiwyg.instances[html_message].setContent(htmlMessage);
+            }
+            // @TODO: Remove this when http://drupal.org/node/614146 drops
+            else if (Drupal.wysiwyg.instances[html_message].insert) {
+              alert("Please note your editor doesn't completely support this function. You may need to clear the contents of the editor prior to choosing a new template.");
+              Drupal.wysiwyg.instances[html_message].insert(htmlMessage);
+            }
+            else {
+              alert("Sorry, your editor doesn't support this function yet.");
+            }
+          }
+          else {
+            $("#"+ html_message).val(htmlMessage);
           }
         }
-        else if (element == 'Subject') {
-          var subject = null;
-          ( isMailing ) ? subject = "subject" : subject = "msg_subject";
-          cj('#'+subject).focus();
-        }
-      }
+      }, 'json');
     }
-  });
-  return false;
-}
-
-cj(function() {
+  }
   if (!cj().find('div.crm-error').text()) {
     cj(window).load(function () {
       setSignature();
     });
   }
-
   cj("#fromEmailAddress").change( function( ) {
     setSignature( );
   });
 });
 
-function setSignature( ) {
-  var emailID = cj("#fromEmailAddress").val( );
-  if ( !isNaN( emailID ) ) {
-    var dataUrl = {/literal}"{crmURL p='civicrm/ajax/signature' h=0 }"{literal};
-    cj.post( dataUrl, {emailID: emailID}, function( data ) {
-      var editor     = {/literal}"{$editor}"{literal};
-
-      if (data.signature_text) {
-        // get existing text & html and append signatue
-        var textMessage =  cj("#"+ text_message).val( ) + '\n\n--\n' + data.signature_text;
-
-        // append signature
-        cj("#"+ text_message).val( textMessage );
-      }
-
-      if ( data.signature_html ) {
-        var htmlMessage =  cj("#"+ html_message).val( ) + '<br/><br/>--<br/>' + data.signature_html;
-
-        // set wysiwg editor
-        if ( editor == "ckeditor" ) {
-          oEditor = CKEDITOR.instances[html_message];
-          var htmlMessage = oEditor.getData( ) + '<br/><br/>--' + data.signature_html;
-          oEditor.setData( htmlMessage  );
-        }
-        else if ( editor == "tinymce" ) {
-          tinyMCE.execInstanceCommand('html_message',"mceInsertContent",false, htmlMessage);
-        }
-        else if ( editor == "drupalwysiwyg" ) {
-          if (Drupal.wysiwyg.instances[html_message].setContent) {
-            Drupal.wysiwyg.instances[html_message].setContent(htmlMessage);
-          }
-          // @TODO: Remove this when http://drupal.org/node/614146 drops
-          else if (Drupal.wysiwyg.instances[html_message].insert) {
-            alert("Please note your editor doesn't completely support this function. You may need to clear the contents of the editor prior to choosing a new template.");
-            Drupal.wysiwyg.instances[html_message].insert(htmlMessage);
-          }
-          else {
-            alert("Sorry, your editor doesn't support this function yet.");
-          }
-        }
-        else {
-          cj("#"+ html_message).val(htmlMessage);
-        }
-      }
-    }, 'json');
-  }
-}
 </script>
 {/literal}

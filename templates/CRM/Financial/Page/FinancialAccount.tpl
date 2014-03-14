@@ -28,7 +28,7 @@
 {else}
   <div id="help">
     {capture assign="typeLink"}{crmURL p="civicrm/admin/financial/financialType" q="reset=1"}{/capture}
-    {capture assign="paymentLink"}{crmURL p="civicrm/admin/options/payment_instrument" q="group=payment_instrument&reset=1"}{/capture}
+    {capture assign="paymentLink"}{crmURL p="civicrm/admin/options/payment_instrument" q="reset=1"}{/capture}
     {capture assign="premiumLink"}{crmURL p="civicrm/admin/contribute/managePremiums" q="reset=1"}{/capture}
     <p>{ts 1=$typeLink 2=$paymentLink 3=$premiumLink}Financial accounts correspond to those in your accounting system.  <a href="%1">Financial types</a>, <a href="%2">payment instruments</a>, and <a href="%3">premiums</a> are associated with financial accounts so that they can result in the proper double-entry transactions to export to your accounting system.{/ts}</p>
   </div>
@@ -45,7 +45,8 @@
       <div class="form-item">
       {strip}
       {* handle enable/disable actions*}
-       {include file="CRM/common/enableDisable.tpl"}
+       {include file="CRM/common/enableDisableApi.tpl"}
+       {include file="CRM/common/crmeditable.tpl"}
       <table id="crm-financial_accounts" class="display">
          <thead class="sticky">
           <th>{ts}Name{/ts}</th>
@@ -59,10 +60,10 @@
           <th></th>
         </thead>
         {foreach from=$rows item=row}
-        <tr id="row_{$row.id}"class="{cycle values="odd-row,even-row"} {$row.class}{if NOT $row.is_active} disabled{/if}">
-        <td>{$row.name}</td>
-        <td>{$row.description}</td>
-        <td>{$row.accounting_code}</td>
+        <tr id="financial_account-{$row.id}" class="crm-entity {cycle values="odd-row,even-row"} {$row.class}{if NOT $row.is_active} disabled{/if}">
+        <td class="crm-editable" data-field="name">{$row.name}</td>
+        <td class="crm-editable" data-field="description" data-type="textarea">{$row.description}</td>
+        <td class="crm-editable" data-field="accounting_code">{$row.accounting_code}</td>
         <td>{$row.financial_account_type_id}{if $row.account_type_code} ({$row.account_type_code}){/if}</td>
         <td>{if $row.is_deductible eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
         <td>{if $row.is_reserved eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>

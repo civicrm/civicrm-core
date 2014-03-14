@@ -238,16 +238,13 @@ class CRM_Core_Action {
 
         $frontend = (isset($link['fe'])) ? TRUE : FALSE;
 
-        $urlPath = NULL;
-        if (CRM_Utils_Array::value('qs', $link) &&
-          !CRM_Utils_System::isNull($link['qs'])
-        ) {
+        if (isset($link['qs']) && !CRM_Utils_System::isNull($link['qs'])) {
           $urlPath = CRM_Utils_System::url(self::replace($link['url'], $values),
             self::replace($link['qs'], $values), TRUE, NULL, TRUE, $frontend
           );
         }
         else {
-          $urlPath = CRM_Utils_Array::value('url', $link);
+          $urlPath = CRM_Utils_Array::value('url', $link, '#');
         }
 
         $classes = 'action-item';
@@ -268,26 +265,17 @@ class CRM_Core_Action {
           $classes .= ' ' . strtolower($className);
         }
 
-        $linkClasses = 'class = "' . $classes . '"';
+        $linkClasses = 'class="' . $classes . '"';
 
-        if ($urlPath) {
-          if ($frontend) {
-            $extra .= "target=_blank";
-          }
-          $url[] = sprintf('<a href="%s" %s title="%s"' . $extra . '>%s</a>',
-            $urlPath,
-            $linkClasses,
-            CRM_Utils_Array::value('title', $link),
-            $link['name']
-          );
+        if ($urlPath !== '#' && $frontend) {
+          $extra .= ' target="_blank"';
         }
-        else {
-          $url[] = sprintf('<a title="%s"  %s ' . $extra . '>%s</a>',
-            CRM_Utils_Array::value('title', $link),
-            $linkClasses,
-            $link['name']
-          );
-        }
+        $url[] = sprintf('<a href="%s" %s title="%s" ' . $extra . '>%s</a>',
+          $urlPath,
+          $linkClasses,
+          CRM_Utils_Array::value('title', $link),
+          $link['name']
+        );
       }
     }
 

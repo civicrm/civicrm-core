@@ -35,7 +35,6 @@ require_once 'CiviTest/CiviUnitTestCase.php';
  */
 class api_v3_GroupOrganizationTest extends CiviUnitTestCase {
   protected $_apiversion;
-  public $_eNoticeCompliant = True;
 
   function get_info() {
     return array(
@@ -54,7 +53,7 @@ class api_v3_GroupOrganizationTest extends CiviUnitTestCase {
   protected function setUp() {
     $this->_apiversion = 3;
     parent::setUp();
-    $this->_groupID = $this->groupCreate(NULL);
+    $this->_groupID = $this->groupCreate();
 
     $this->_orgID = $this->organizationCreate(NULL);
   }

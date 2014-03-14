@@ -55,7 +55,7 @@ class CRM_Contribute_Page_ContributionRecur extends CRM_Core_Page {
       $values = array();
       CRM_Core_DAO::storeValues($recur, $values);
       // if there is a payment processor ID, get the name of the payment processor
-      if (CRM_Utils_Array::value('payment_processor_id', $values)) {
+      if (!empty($values['payment_processor_id'])) {
         $values['payment_processor'] = CRM_Core_DAO::getFieldValue(
           'CRM_Financial_DAO_PaymentProcessor',
           $values['payment_processor_id'],
@@ -63,7 +63,7 @@ class CRM_Contribute_Page_ContributionRecur extends CRM_Core_Page {
         );
       }
       // get contribution status label
-      if (CRM_Utils_Array::value('contribution_status_id', $values)) {
+      if (!empty($values['contribution_status_id'])) {
         $values['contribution_status'] = CRM_Core_OptionGroup::getLabel('contribution_status', $values['contribution_status_id']);
       }
 

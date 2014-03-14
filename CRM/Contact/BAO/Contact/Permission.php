@@ -104,7 +104,7 @@ WHERE contact_a.id = %1 AND $permission";
     }
 
     if (!$force) {
-      if (CRM_Utils_Array::value($userID, $_processed)) {
+      if (!empty($_processed[$userID])) {
         return;
       }
 

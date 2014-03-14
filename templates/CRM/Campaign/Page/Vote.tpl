@@ -30,43 +30,23 @@
 {elseif $subPageType eq 'reserve'}
    {* build the ajax search and voters reserve interface here *}
    {include file='CRM/Campaign/Form/Gotv.tpl'}
-{elseif $allTabs}
- {* build normal page *}
- <div id="mainTabContainer" class="ui-tabs ui-widget ui-widget-content ui-corner-all">
-     <ul class="crm-vote-tabs-list">
-           {foreach from=$allTabs key=tabName item=tabValue}
-           <li id="tab_{$tabValue.id}" class="crm-tab-button ui-corner-bottom">
-              <a href="{$tabValue.url}" title="{$tabValue.title}"><span></span>{$tabValue.title}</a>
-           </li>
-           {/foreach}
-     </ul>
- </div>
- <div class="spacer"></div>
+{elseif $tabHeader}
+  {include file="CRM/common/TabHeader.tpl"}
+  <script type="text/javascript">
+    {* very crude refresh of tabs - fixme: use datatable native refresh method *}
+    {literal}
+    cj(function($) {
+      $('#mainTabContainer').on('tabsbeforeactivate', function(e, ui) {
+        // fixme - can't search more than once! Uncomment this code, switching tabs gives qfkey error.
+        //if (ui.newTab.is('#tab_reserve')) {
+          //$('.searchVoter.button').click();
+          ui.oldPanel.data('civiCrmSnippet') && ui.oldPanel.crmSnippet('destroy');
+        //}
+      });
+    });
+    {/literal}
+  </script>
 
-{literal}
-<script type="text/javascript">
-
-//explicitly stop spinner
-function stopSpinner( ) {
-  cj('li.crm-tab-button').each(function(){ cj(this).find('span').text(' ');})
-}
-
-cj(document).ready( function( ) {
-     {/literal}
-     var spinnerImage = '<img src="{$config->resourceBase}i/loading.gif" style="width:10px;height:10px"/>';
-     {literal}
-
-     var selectedTabIndex = {/literal}{$selectedTabIndex}{literal};
-     cj("#mainTabContainer").tabs( {
-                             selected: selectedTabIndex,
-                             spinner: spinnerImage,
-                 cache: false,
-                 load: stopSpinner
-               });
-});
-
-</script>
-{/literal}
 {else}
  <div class="messages status no-popup">
      <div class="icon inform-icon"></div>

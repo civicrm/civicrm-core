@@ -30,18 +30,9 @@
 {/if}
     <table class="form-layout-compressed{if $context EQ 'profile'} crm-profile-tagsandgroups{/if}">
       <tr>
-       {if $groupElementType eq 'crmasmSelect'}
+       {if $groupElementType eq 'select'}
           <td><span class="label">{if $title}{$form.group.label}{/if}</span>
             {$form.group.html}
-            {literal}	
-            <script type="text/javascript">
-             cj(function(){
-               cj("select#group").crmasmSelect({
-                 respectParents: true
-               });
-             });
-             </script>
-             {/literal}
           </td>
       {/if}
       {foreach key=key item=item from=$tagGroup}

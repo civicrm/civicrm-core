@@ -39,50 +39,7 @@
     <div class="crm-block crm-form-block crm-activity-form-block">
   {/if}
   {* added onload javascript for source contact*}
-  {literal}
-  <script type="text/javascript">
-  var assignee_contact = '';
-
-  {/literal}
-  {if $assignee_contact}
-    var assignee_contact = {$assignee_contact};
-  {/if}
-  {literal}
-
-  //loop to set the value of cc and bcc if form rule.
-  var assignee_contact_id = null;
-  var toDataUrl = "{/literal}{crmURL p='civicrm/ajax/checkemail' q='id=1&noemail=1' h=0 }{literal}"; {/literal}
-  {foreach from=","|explode:"assignee" key=key item=element}
-    {assign var=currentElement value=`$element`_contact_id}
-    {if $form.$currentElement.value }
-      {literal} var {/literal}{$currentElement}{literal} = cj.ajax({ url: toDataUrl + "&cid={/literal}{$form.$currentElement.value}{literal}", async: false }).responseText;{/literal}
-    {/if}
-  {/foreach}
-  {literal}
-
-  if ( assignee_contact_id ) {
-    eval( 'assignee_contact = ' + assignee_contact_id );
-  }
-
-  cj(function( ) {
-    {/literal}
-    {if $source_contact and $admin and $action neq 4}
-      {literal} cj( '#source_contact_id' ).val( "{/literal}{$source_contact}{literal}");{/literal}
-    {/if}
-    {literal}
-
-    var sourceDataUrl = "{/literal}{$dataUrl}{literal}";
-    var tokenDataUrl_assignee  = "{/literal}{$tokenUrl}&context=activity_assignee{literal}";
-    var hintText = "{/literal}{ts escape='js'}Type in a partial or complete name of an existing contact.{/ts}{literal}";
-    cj( "#assignee_contact_id").tokenInput( tokenDataUrl_assignee, { prePopulate: assignee_contact, theme: 'facebook', hintText: hintText });
-    cj( 'ul.token-input-list-facebook, div.token-input-dropdown-facebook' ).css( 'width', '450px' );
-    cj('#source_contact_id').autocomplete( sourceDataUrl, { width : 180, selectFirst : false, hintText: hintText, matchContains: true, minChars: 1, max: {/literal}{crmSetting name="search_autocomplete_count" group="Search Preferences"}{literal}
-    }).result( function(event, data, formatted) { cj( "#source_contact_qid" ).val( data[1] );
-      }).bind( 'click', function( ) { if (!cj("#source_contact_id").val()) { cj( "#source_contact_qid" ).val(''); } });
-  });
-  </script>
-
-  {/literal}
+  {include file="CRM/Activity/Form/ActivityJs.tpl" tokenContext="activity"}
   {if !$action or ( $action eq 1 ) or ( $action eq 2 ) }
   <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
   {/if}
@@ -120,62 +77,38 @@
   <tr class="crm-activity-form-block-source_contact_id">
     <td class="label">{$form.source_contact_id.label}</td>
     <td class="view-value">
-      {if $admin and $action neq 4}{$form.source_contact_id.html} {else} {$source_contact_value} {/if}
+      {$form.source_contact_id.html}
     </td>
   </tr>
 
   <tr class="crm-activity-form-block-target_contact_id">
-    {if $single eq false}
-      <td class="label">{ts}With Contact(s){/ts}</td>
-      <td class="view-value" style="white-space: normal">
-        {$with|escape}
-        <br/>
-        {$form.is_multi_activity.html}&nbsp;{$form.is_multi_activity.label} {help id="id-is_multi_activity"}
-      </td>
-      {elseif $action neq 4}
-      <td class="label">{ts}With Contact{/ts}</td>
+      <td class="label">{$form.target_contact_id.label}</td>
       <td class="view-value">
-        {include file="CRM/Contact/Form/NewContact.tpl" noLabel=true skipBreak=true multiClient=true parent="activity" showNewSelect=true}
+        {$form.target_contact_id.html}
         {if $action eq 1}
         <br/>
         {$form.is_multi_activity.html}&nbsp;{$form.is_multi_activity.label} {help id="id-is_multi_activity"}
         {/if}
       </td>
-      {else}
-      <td class="label">{ts}With Contact{/ts}</td>
-      <td class="view-value" style="white-space: normal">
-        {foreach from=$target_contact key=id item=name}
-          <a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=$id"}">{$name}</a>;&nbsp;
-        {/foreach}
-      </td>
-    {/if}
   </tr>
 
   <tr class="crm-activity-form-block-assignee_contact_id">
-    {if $action eq 4}
-      <td class="label">{ts}Assigned To{/ts}</td><td class="view-value">
-      {foreach from=$assignee_contact key=id item=name}
-        <a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=$id"}">{$name}</a>;&nbsp;
-      {/foreach}
-    </td>
-      {else}
-      <td class="label">{ts}Assigned To{/ts}</td>
-      <td>
-        <a href="#" class="button" id="swap_target_assignee" title="{ts}Swap Target and Assignee Contacts{/ts}" style="float:right;">
-          <span>
-            <div class="icon swap-icon"></div>
-          </span>
-        </a>
-        {$form.assignee_contact_id.html}
-        {edit}
-          <span class="description">{ts}You can optionally assign this activity to someone. Assigned activities will appear in their Activities listing at CiviCRM Home.{/ts}
-          {if $activityAssigneeNotification}
-            <br />{ts}A copy of this activity will be emailed to each Assignee.{/ts}
-          {/if}
-          </span>
-        {/edit}
+      <td class="label">
+        {$form.assignee_contact_id.label}
+        {edit}{help id="assignee_contact_id" title=$form.assignee_contact_id.label}{/edit}
       </td>
-    {/if}
+      <td>
+        {$form.assignee_contact_id.html}
+        {if $action neq 4}
+          <a href="#" class="crm-hover-button" id="swap_target_assignee" title="{ts}Swap Target and Assignee Contacts{/ts}" style="position:relative; bottom: 1em;">
+            <span><div class="icon swap-icon"></div></span>
+          </a>
+          {if $activityAssigneeNotification}
+            <br />
+            <span class="description"><span class="icon email-icon"></span>{ts}A copy of this activity will be emailed to each Assignee.{/ts}</span>
+          {/if}
+        {/if}
+      </td>
   </tr>
 
   {if $activityTypeFile}
@@ -213,7 +146,7 @@
     <td class="label">{$form.duration.label}</td>
     <td class="view-value">
       {$form.duration.html}
-      {if $action neq 4}<span class="description">{ts}Total time spent on this activity (in minutes).{/ts}{/if}
+      {if $action neq 4}<span class="description">{ts}minutes{/ts}{/if}
     </td>
   </tr>
   <tr class="crm-activity-form-block-status_id">
@@ -244,18 +177,8 @@
   {if $form.tag.html}
   <tr class="crm-activity-form-block-tag">
     <td class="label">{$form.tag.label}</td>
-    <td class="view-value"><div class="crm-select-container">{$form.tag.html}</div>
-      {literal}
-        <script type="text/javascript">
-          cj(".crm-activity-form-block-tag select[multiple]").crmasmSelect({
-            addItemTarget: 'bottom',
-            animate: true,
-            highlight: true,
-            sortable: true,
-            respectParents: true
-          });
-        </script>
-      {/literal}
+    <td class="view-value">
+      <div class="crm-select-container">{$form.tag.html}</div>
     </td>
   </tr>
   {/if}
@@ -304,12 +227,22 @@
               <td class="label">{$form.followup_activity_subject.label}</td>
               <td>{$form.followup_activity_subject.html|crmAddClass:huge}</td>
             </tr>
+              <tr>
+                  <td class="label">
+                    {$form.followup_assignee_contact_id.label}
+                    {edit}
+                    {/edit}
+                  </td>
+                  <td>
+                    {$form.followup_assignee_contact_id.html}
+                  </td>
+              </tr>
           </table>
         </div><!-- /.crm-accordion-body -->
       </div><!-- /.crm-accordion-wrapper -->
       {literal}
         <script type="text/javascript">
-          cj(function() {
+          cj(function($) {
             cj().crmAccordions();
             cj('.crm-accordion-body').each( function() {
               //open tab if form rule throws error
@@ -317,19 +250,13 @@
                 cj(this).parent('.collapsed').crmAccordionToggle();
               }
             });
-          });
-          cj('#swap_target_assignee').click( function() {
-            var assignees = cj('input#assignee_contact_id').tokenInput("get");
-            var targets = cj('input#contact_1').tokenInput("get");
-            cj('#assignee_contact_id').tokenInput("clear");
-            cj('#contact_1').tokenInput("clear");
-            cj(assignees).each( function() {
-              cj('#contact_1').tokenInput("add", this);
+            $('#swap_target_assignee').click(function() {
+              var assignees = $('#assignee_contact_id').select2("data");
+              var targets = $('#target_contact_id').select2("data");
+              $('#assignee_contact_id').select2("data", targets);
+              $('#target_contact_id').select2("data", assignees);
+              return false;
             });
-            cj(targets).each( function() {
-              cj('#assignee_contact_id').tokenInput("add", this);
-            });
-            return false;
           });
         </script>
       {/literal}

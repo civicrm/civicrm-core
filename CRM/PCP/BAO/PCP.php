@@ -365,7 +365,7 @@ WHERE pcp.id = %1 AND cc.contribution_status_id =1 AND cc.is_test = 0";
    *
    * @param object $form form object
    *
-   * @return None
+   * @return void
    * @access public
    */
   public static function buildPCPForm($form) {
@@ -511,11 +511,11 @@ WHERE pcp.id = %1 AND cc.contribution_status_id =1 AND cc.is_test = 0";
       $statusMessage = ts('The Personal Campaign Page you have just visited is currently %1. However you can still support the campaign here.', array(1 => $pcpStatus[$pcpInfo['status_id']]));
       CRM_Core_Error::statusBounce($statusMessage, $url);
     }
-    elseif (!CRM_Utils_Array::value('is_active', $pcpBlock)) {
+    elseif (empty($pcpBlock['is_active'])) {
       $statusMessage = ts('Personal Campaign Pages are currently not enabled for this contribution page. However you can still support the campaign here.');
       CRM_Core_Error::statusBounce($statusMessage, $url);
     }
-    elseif (!CRM_Utils_Array::value('is_active', $pcpInfo)) {
+    elseif (empty($pcpInfo['is_active'])) {
       $statusMessage = ts('The Personal Campaign Page you have just visited is currently inactive. However you can still support the campaign here.');
       CRM_Core_Error::statusBounce($statusMessage, $url);
     }

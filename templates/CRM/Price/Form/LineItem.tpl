@@ -84,7 +84,7 @@
 {literal}
 <script type="text/javascript">
 cj(document).ready(function(){
-  cj('.distribute').live('blur', function() {
+  cj(document).on('blur', '.distribute', function() {
    var totalAmount = 0;
    cj('.distribute').each(function (){
    if(cj(this).val( ).length > 0){

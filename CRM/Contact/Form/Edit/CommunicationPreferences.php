@@ -79,12 +79,7 @@ class CRM_Contact_Form_Edit_CommunicationPreferences {
     }
     $form->addGroup($commPreff, 'preferred_communication_method', ts('Preferred Method(s)'));
 
-    $form->add('select', 'preferred_language',
-      ts('Preferred Language'),
-      array(
-        '' => ts('- select -')) +
-      CRM_Contact_BAO_Contact::buildOptions('preferred_language')
-    );
+    $form->addSelect('preferred_language');
 
     if (!empty($privacyOptions)) {
       $commPreference['privacy'] = $privacyOptions;
@@ -152,9 +147,7 @@ class CRM_Contact_Form_Edit_CommunicationPreferences {
     $greetings = self::getGreetingFields($self->_contactType);
     foreach ($greetings as $greeting => $details) {
       $customizedValue = CRM_Core_OptionGroup::getValue($greeting, 'Customized', 'name');
-      if (CRM_Utils_Array::value($details['field'], $fields) == $customizedValue
-        && !CRM_Utils_Array::value($details['customField'], $fields)
-      ) {
+      if (CRM_Utils_Array::value($details['field'], $fields) == $customizedValue && empty($fields[$details['customField']])) {
         $errors[$details['customField']] = ts('Custom  %1 is a required field if %1 is of type Customized.',
           array(1 => $details['label'])
         );
@@ -169,12 +162,13 @@ class CRM_Contact_Form_Edit_CommunicationPreferences {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   static function setDefaultValues(&$form, &$defaults) {
 
     if (!empty($defaults['preferred_language'])) {
-      $defaults['preferred_language'] = CRM_Core_PseudoConstant::getKey('CRM_Contact_DAO_Contact', 'preferred_language', $defaults['preferred_language']);
+      $languages = CRM_Contact_BAO_Contact::buildOptions('preferred_language');
+      $defaults['preferred_language'] = CRM_Utils_Array::key($defaults['preferred_language'], $languages);
     }
 
     // CRM-7119: set preferred_language to default if unset
@@ -210,7 +204,7 @@ class CRM_Contact_Form_Edit_CommunicationPreferences {
   /**
    *  set array of greeting fields
    *
-   * @return None
+   * @return void
    * @access public
    */
   static function getGreetingFields($contactType) {

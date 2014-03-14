@@ -267,9 +267,7 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
     foreach ($this->_columns as $tableName => $table) {
       if (array_key_exists('fields', $table)) {
         foreach ($table['fields'] as $fieldName => $field) {
-          if (CRM_Utils_Array::value('required', $field) ||
-            CRM_Utils_Array::value($fieldName, $this->_params['fields'])
-          ) {
+          if (!empty($field['required']) || !empty($this->_params['fields'][$fieldName])) {
 
             if ($fieldName == 'email_a') {
               $this->_emailField_a = TRUE;
@@ -415,7 +413,7 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
           }
 
           if (!empty($clause)) {
-            if (CRM_Utils_Array::value('having', $field)) {
+            if (!empty($field['having'])) {
               $havingClauses[] = $clause;
             }
             else {
@@ -455,7 +453,7 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
     elseif (CRM_Utils_Array::value('is_active_value', $this->_params) == '0') {
       $relStatus = 'Is equal to Inactive';
     }
-    if (CRM_Utils_Array::value('filters', $statistics)) {
+    if (!empty($statistics['filters'])) {
       foreach ($statistics['filters'] as $id => $value) {
         //for displaying relationship type filter
         if ($value['title'] == 'Relationship') {
@@ -507,7 +505,7 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
 
     $this->relationType = NULL;
     $relType = array();
-    if (CRM_Utils_Array::value('relationship_type_id_value', $this->_params)) {
+    if (!empty($this->_params['relationship_type_id_value'])) {
       $relType = explode('_', $this->_params['relationship_type_id_value']);
 
       $this->relationType = $relType[1] . '_' . $relType[2];

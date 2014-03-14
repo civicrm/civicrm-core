@@ -157,11 +157,11 @@
                 </td>
             </tr>
             {/if}
-	    	    
-	    <tr class="crm-contribution-form-block-amount_label">
+
+      <tr class="crm-contribution-form-block-amount_label">
               <th scope="row" class="label" width="20%">{$form.amount_label.label}<span class="marker"> *</span></th>
-	      <td>{$form.amount_label.html}</td>
-	    </tr>
+        <td>{$form.amount_label.html}</td>
+      </tr>
             <tr class="crm-contribution-form-block-is_allow_other_amount"><th scope="row" class="label" width="20%">{$form.is_allow_other_amount.label}</th>
             <td>{$form.is_allow_other_amount.html}<br />
             <span class="description">{ts}Check this box if you want to give users the option to enter their own contribution amount. Your page will then include a text field labeled <strong>Other Amount</strong>.{/ts}</span></td></tr>
@@ -180,7 +180,7 @@
                 <fieldset><legend>{ts}Fixed Contribution Options{/ts}</legend>
                     {ts}Use the table below to enter up to ten fixed contribution amounts. These will be presented as a list of radio button options. Both the label and dollar amount will be displayed.{/ts}{if $isQuick}{ts} Click <a id='quickconfig' href='#'>here</a> if you want to configure the Fixed Contribution Options below as part of a Price Set, with the added flexibility and complexity that entails.{/ts}{/if}<br />
                     <table id="map-field-table">
-                        <tr class="columnheader" ><th scope="column">{ts}Contribution Label{/ts}</th><th scope="column">{ts}Amount{/ts}</th><th scope="column">{ts}Default?{/ts}<br /><span class="crm-clear-link">(<a href="#" title="unselect" onclick="unselectRadio('default', 'Amount'); return false;" >{ts}clear{/ts}</a>)</span></th></tr>
+                        <tr class="columnheader" ><th scope="column">{ts}Contribution Label{/ts}</th><th scope="column">{ts}Amount{/ts}</th><th scope="column">{ts}Default?{/ts}<br />{$form.default.0.html}</th></tr>
                         {section name=loop start=1 loop=11}
                             {assign var=idx value=$smarty.section.loop.index}
                             <tr><td class="even-row">{$form.label.$idx.html}</td><td>{$form.value.$idx.html|crmMoney}</td><td class="even-row">{$form.default.$idx.html}</td></tr>
@@ -208,7 +208,7 @@
         function checked_payment_processors() {
             var ids = [];
             cj('.crm-contribution-contributionpage-amount-form-block-payment_processor input[type="checkbox"]').each(function(){
-                if(cj(this).attr('checked')) {
+                if(cj(this).prop('checked')) {
                     var id = cj(this).attr('id').split('_')[2];
         ids.push(id);
                 }
@@ -260,7 +260,7 @@
 
   function payLater(chkbox) {
     var elementId = 'payLaterFields';
-    if (cj('#' + chkbox).attr('checked')) {
+    if (cj('#' + chkbox).prop('checked')) {
       cj('#' + elementId).show();
     } else {
       cj('#' + elementId).hide();
@@ -280,7 +280,7 @@
            } else {
                cj('#amountFields').show();
            }
-           cj("#amount_block_is_active").attr( 'checked', true );
+           cj("#amount_block_is_active").prop('checked', true );
       break;
 
       case 'is_pledge_active' :
@@ -289,7 +289,7 @@
                if ( priceSetID ) cj( "#price_set_id" ).val( '' );
              cj('#amountFields').show();
                  }
-           cj("#amount_block_is_active").attr( 'checked', true );
+           cj("#amount_block_is_active").prop('checked', true );
       break;
 
          case 'amount_block_is_active' :
@@ -321,8 +321,8 @@
         if(display) {
             cj( '#recurringContribution' ).show( );
         } else {
-            if ( cj( '#is_recur' ).attr( 'checked' ) ) {
-                cj( '#is_recur' ).removeAttr("checked");
+            if ( cj( '#is_recur' ).prop('checked' ) ) {
+                cj( '#is_recur' ).prop('checked', false);
                 cj( '#recurFields' ).hide( );
             }
             cj( '#recurringContribution' ).hide( );

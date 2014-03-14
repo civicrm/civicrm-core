@@ -92,7 +92,7 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
       foreach (array('status', 'membership_type') as $fld) {
         $membership[$dao->id][$fld] = CRM_Utils_Array::value($fld, $statusANDType[$dao->id]);
       }
-      if (CRM_Utils_Array::value('is_current_member', $statusANDType[$dao->id])) {
+      if (!empty($statusANDType[$dao->id]['is_current_member'])) {
         $membership[$dao->id]['active'] = TRUE;
       }
       if (empty($dao->owner_membership_id)) {
@@ -146,7 +146,7 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
       }
 
       //does membership have auto renew CRM-7137.
-      if (CRM_Utils_Array::value('contribution_recur_id', $membership[$dao->id]) &&
+      if (!empty($membership[$dao->id]['contribution_recur_id']) &&
         !CRM_Member_BAO_Membership::isSubscriptionCancelled($membership[$dao->id]['membership_id'])
       ) {
         $membership[$dao->id]['auto_renew'] = 1;
@@ -205,6 +205,13 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
     if ($this->_contactId) {
       $displayName = CRM_Contact_BAO_Contact::displayName($this->_contactId);
       $this->assign('displayName', $displayName);
+      $this->ajaxResponse['tabCount'] = CRM_Contact_BAO_Contact::getCountComponent('membership', $this->_contactId);
+      // Refresh other tabs with related data
+      $this->ajaxResponse['updateTabs'] = array(
+        '#tab_contribute' => CRM_Contact_BAO_Contact::getCountComponent('contribution', $this->_contactId),
+        '#tab_activity' => CRM_Contact_BAO_Contact::getCountComponent('activity', $this->_contactId),
+        '#tab_rel' => CRM_Contact_BAO_Contact::getCountComponent('rel', $this->_contactId),
+      );
     }
   }
 
@@ -391,7 +398,7 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
         $urlString = 'civicrm/contact/search/custom';
         if ($action == CRM_Core_Action::UPDATE) {
           if ($form->_contactId) {
-            $urlParams .= '&cid=' . $this->_contactId;
+            $urlParams .= '&cid=' . $form->_contactId;
           }
           $keyName = '&key';
           $urlParams .= '&context=fulltext&action=view';

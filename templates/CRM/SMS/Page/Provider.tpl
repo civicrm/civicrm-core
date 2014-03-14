@@ -42,8 +42,9 @@
 <div id="ltype">
     {strip}
         {* handle enable/disable actions*}
-       {include file="CRM/common/enableDisable.tpl"}
-        <br/><table class="selector">
+       {include file="CRM/common/enableDisableApi.tpl"}
+       {include file="CRM/common/crmeditable.tpl"}
+        <br/><table class="selector row-highlight">
         <tr class="columnheader">
             <th >{ts}Provider Details{/ts}</th>
             <th >{ts}Username{/ts}</th>
@@ -51,7 +52,7 @@
             <th >{ts}Action{/ts}</th>
         </tr>
         {foreach from=$rows item=row}
-        <tr id="row_{$row.id}" class="crm-provider {cycle values="odd-row,even-row"} {$row.class}{if NOT $row.is_active} disabled{/if}">
+        <tr id="sms_provider-{$row.id}" class="crm-entity {cycle values="odd-row,even-row"} {$row.class}{if NOT $row.is_active} disabled{/if}">
             <td class="crm-provider-name"><strong>{$row.name}</strong> ({$row.title})<br/>
                 {ts}API Type:{/ts} {$row.api_type}<br/>
                 {ts}API Url:{/ts} {$row.api_url}<br/>

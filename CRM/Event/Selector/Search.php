@@ -355,13 +355,32 @@ class CRM_Event_Selector_Search extends CRM_Core_Selector_Base implements CRM_Co
 
       $row['showConfirmUrl'] = ($statusClass == 'Pending') ? TRUE : FALSE;
 
-      if (CRM_Utils_Array::value('participant_is_test', $row)) {
+      if (!empty($row['participant_is_test'])) {
         $row['participant_status'] .= ' (' . ts('test') . ')';
       }
 
       $row['checkbox'] = CRM_Core_Form::CB_PREFIX . $result->participant_id;
+      $links = self::links($this->_key, $this->_context, $this->_compContext);
 
-      $row['action'] = CRM_Core_Action::formLink(self::links($this->_key, $this->_context, $this->_compContext),
+      if ($statusTypes[$row['participant_status_id']] == 'Partially paid') {
+        $links[CRM_Core_Action::ADD] = array(
+          'name' => ts('Record Payment'),
+          'url' => 'civicrm/payment',
+          'qs' => 'reset=1&id=%%id%%&cid=%%cid%%&action=add&component=event',
+          'title' => ts('Record Payment'),
+        );
+      }
+
+      if ($statusTypes[$row['participant_status_id']] == 'Pending refund') {
+        $links[CRM_Core_Action::ADD] = array(
+          'name' => ts('Record Refund'),
+          'url' => 'civicrm/payment',
+          'qs' => 'reset=1&id=%%id%%&cid=%%cid%%&action=add&component=event',
+          'title' => ts('Record Refund'),
+        );
+      }
+
+      $row['action'] = CRM_Core_Action::formLink($links,
         $mask,
         array(
           'id' => $result->participant_id,
@@ -382,7 +401,7 @@ class CRM_Event_Selector_Search extends CRM_Core_Selector_Base implements CRM_Co
 
       $row['paid'] = CRM_Event_BAO_Event::isMonetary($row['event_id']);
 
-      if (CRM_Utils_Array::value('participant_fee_level', $row)) {
+      if (!empty($row['participant_fee_level'])) {
         CRM_Event_BAO_Participant::fixEventLevel($row['participant_fee_level']);
       }
 

@@ -133,7 +133,7 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
     }
 
     // Preload libraries required by the "Profiles" tab
-    $schemas = array('IndividualModel', 'ContributionModel');
+    $schemas = array('IndividualModel', 'OrganizationModel', 'ContributionModel');
     if (in_array('CiviMember', CRM_Core_Config::singleton()->enableComponents)) {
       $schemas[] = 'MembershipModel';
     }
@@ -218,16 +218,16 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
       $this->freeze();
       $this->addElement('button', 'done', ts('Done'), array('onclick' => "location.href='civicrm/admin/custom/group?reset=1&action=browse'"));
     }
-    
+
     // don't show option for contribution amounts section if membership price set
     // this flag is sent to template
-    
+
     $membershipBlock = new CRM_Member_DAO_MembershipBlock();
     $membershipBlock->entity_table = 'civicrm_contribution_page';
     $membershipBlock->entity_id = $this->_id;
     $membershipBlock->is_active = 1;
     $hasMembershipBlk = FALSE;
-    if ($membershipBlock->find(TRUE) && 
+    if ($membershipBlock->find(TRUE) &&
       ($setID = CRM_Price_BAO_PriceSet::getFor('civicrm_contribution_page', $this->_id, NULL, 1))
     ) {
       $extends = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $setID, 'extends');
@@ -280,7 +280,7 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
       foreach ($pledgeBlock as $key) {
         $defaults[$key] = CRM_Utils_Array::value($key, $pledgeBlockDefaults);
       }
-      if (CRM_Utils_Array::value('pledge_frequency_unit', $pledgeBlockDefaults)) {
+      if (!empty($pledgeBlockDefaults['pledge_frequency_unit'])) {
         $defaults['pledge_frequency_unit'] = array_fill_keys(explode(CRM_Core_DAO::VALUE_SEPARATOR,
             $pledgeBlockDefaults['pledge_frequency_unit']
           ), '1');
@@ -299,11 +299,11 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
         $defaults['price_set_id'] = $this->_priceSetID;
       }
 
-      if (CRM_Utils_Array::value('end_date', $defaults)) {
+      if (!empty($defaults['end_date'])) {
         list($defaults['end_date'], $defaults['end_date_time']) = CRM_Utils_Date::setDateDefaults($defaults['end_date']);
       }
 
-      if (CRM_Utils_Array::value('start_date', $defaults)) {
+      if (!empty($defaults['start_date'])) {
         list($defaults['start_date'], $defaults['start_date_time']) = CRM_Utils_Date::setDateDefaults($defaults['start_date']);
       }
     }
@@ -317,7 +317,7 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
       $defaults['for_organization'] = ts('I am contributing on behalf of an organization.');
     }
 
-    if (CRM_Utils_Array::value('recur_frequency_unit', $defaults)) {
+    if (!empty($defaults['recur_frequency_unit'])) {
       $defaults['recur_frequency_unit'] = array_fill_keys(explode(CRM_Core_DAO::VALUE_SEPARATOR,
           $defaults['recur_frequency_unit']
         ), '1');
@@ -327,7 +327,7 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
       $defaults['recur_frequency_unit'] = array('month' => 1);
     }
 
-    if (CRM_Utils_Array::value('is_for_organization', $defaults)) {
+    if (!empty($defaults['is_for_organization'])) {
       $defaults['is_organization'] = 1;
     }
     else {
@@ -436,8 +436,7 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
   }
 
   function getTemplateFileName() {
-    if ($this->controller->getPrint() == CRM_Core_Smarty::PRINT_NOFORM ||
-      $this->getVar('_id') <= 0 ||
+    if ($this->controller->getPrint() || $this->getVar('_id') <= 0 ||
       ($this->_action & CRM_Core_Action::DELETE) ||
       (CRM_Utils_String::getClassName($this->_name) == 'AddProduct')
     ) {

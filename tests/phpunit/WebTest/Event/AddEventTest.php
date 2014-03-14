@@ -797,11 +797,113 @@ WHERE c1.entity_table  = 'civicrm_contribution' AND c1.entity_id = %1 AND cfi.st
     $dao->fetch();
     $this->assertEquals('2', $dao->civicrm_contribution, 'civicrm_financial_trxn count does not match');
     $this->assertEquals('8', $dao->civicrm_financial_item, 'civicrm_financial_item count does not match');
-    $query = "SELECT COUNT(cft.id) civicrm_financial_trxn FROM civicrm_entity_financial_trxn ceft 
-INNER JOIN civicrm_financial_trxn cft ON ceft.financial_trxn_id = cft.id 
+    $query = "SELECT COUNT(cft.id) civicrm_financial_trxn FROM civicrm_entity_financial_trxn ceft
+INNER JOIN civicrm_financial_trxn cft ON ceft.financial_trxn_id = cft.id
 WHERE ceft.entity_id = %1 AND ceft.entity_table = 'civicrm_contribution'";
     $dao = CRM_Core_DAO::executeQuery($query, $params);
     $dao->fetch();
     $this->assertEquals('2', $dao->civicrm_financial_trxn, 'civicrm_financial_trxn count does not match');
   }
+
+  function testEventApprovalRegistration() {
+    $this->webtestLogin();
+
+    //Participant Status
+    $this->openCiviPage("admin/participant_status", "reset=1&action=browse");
+    $this->_testEnableParticipantStatuses('Awaiting approval');
+    $this->isElementPresent("xpath=//td[@class='crm-particpant-label'][contains(text(), 'Awaiting approval')]/../td[9]/span/a[2][text()='Disable']");
+    $this->_testEnableParticipantStatuses('Pending from approval');
+    $this->isElementPresent("xpath=//td[@class='crm-particpant-label'][contains(text(), 'Pending from approval')]/../td[9]/span/a[2][text()='Disable']");
+    $this->_testEnableParticipantStatuses('Rejected');
+    $this->isElementPresent("xpath=//td[@class='crm-particpant-label'][contains(text(), 'Rejected')]/../td[9]/span/a[2][text()='Disable']");
+
+    //Create New Event
+
+    $this->openCiviPage('event/add', 'reset=1&action=add', '_qf_EventInfo_upload-bottom');
+    $eventTitle = 'My Conference - ' . substr(sha1(rand()), 0, 7);
+    $email = 'Smith' . substr(sha1(rand()), 0, 7) . '@example.com';
+    $eventDescription = 'Here is a description for this conference.';
+    $this->select('event_type_id', 'value=1');
+
+    // Attendee role s/b selected now.
+    $this->select('default_role_id', 'value=1');
+    // Enter Event Title, Summary and Description
+    $this->type('title', $eventTitle);
+    $this->type('summary', 'This is a great conference. Sign up now!');
+
+    // Type description in ckEditor (fieldname, text to type, editor)
+    $this->fillRichTextField('description', $eventDescription );
+    $this->type('max_participants', '50');
+    $this->click('is_map');
+    $this->click('_qf_EventInfo_upload-bottom');
+
+    // Wait for Location tab form to load
+    $this->waitForPageToLoad($this->getTimeoutMsec());
+
+    // Go to Fees tab
+    $this->click('link=Fees');
+    $id = $this->urlArg('id');
+    $this->waitForElementPresent('_qf_Fee_upload-bottom');
+    $this->click('CIVICRM_QFID_1_is_monetary');
+    $processorName = 'Test Processor';
+    $this->click("xpath=//tr[@class='crm-event-manage-fee-form-block-payment_processor']/td[2]/label[text()='$processorName']");
+    $this->select('financial_type_id','label=Event Fee');
+    $this->type("label[1]",'Junior Stars');
+    $this->type("value[1]",'500.00');
+    $this->type("label[2]",'Super Stars');
+    $this->type("value[2]",'1000.00');
+    $this->check('default');
+    $this->click('_qf_Fee_upload-bottom');
+    $this->waitForPageToLoad($this->getTimeoutMsec());
+
+    // intro text for registration page
+    $registerIntro = 'Fill in all the fields below and click Continue.';
+
+   // Go to Online Registration tab
+   $this->click('link=Online Registration');
+   $this->waitForElementPresent('_qf_Registration_upload-bottom');
+   $this->check('is_online_registration');
+   $this->assertChecked('is_online_registration');
+
+   //Requires Approvel
+   $this->check('requires_approval');
+   $this->assertChecked('requires_approval');
+   $this->click('_qf_Registration_upload-bottom');
+   $this->waitForPageToLoad($this->getTimeoutMsec());
+   $this->waitForTextPresent("'Registration' information has been saved.");
+
+   // verify event input on info page
+   // start at Manage Events listing
+   $this->openCiviPage('event/manage', 'reset=1');
+   $this->click("link=$eventTitle");
+   $this->waitForPageToLoad($this->getTimeoutMsec());
+   $firstName = substr(sha1(rand()), 0, 7);
+   $this->webtestAddContact($firstName, 'Anderson', TRUE);
+   $contactName = "Anderson, $firstName";
+   $displayName = "$firstName Anderson";
+   $this->openCiviPage("event/register", "reset=1&id=$id", '_qf_Register_upload-bottom');
+   $this->type('first_name',$firstName);
+
+   //fill in last name
+   $lastName = 'Recuron'.substr(sha1(rand()), 0, 7);
+   $this->type('last_name', $contactName);
+   $email = $firstName . '@example.com';
+   $this->type('email-Primary', $email);
+   $this->click('_qf_Register_upload');
+   $this->waitForElementPresent("_qf_Confirm_next");
+   $this->click('_qf_Confirm_next');
+    $this->waitForPageToLoad($this->getTimeoutMsec());
+   $this->waitForElementPresent("xpath=//div[@class='section']");
+   $this->assertTextPresent("Thank You for Registering");
+
+  }
+
+ function _testEnableParticipantStatuses($status) {
+   // enable participant status
+   if ($this->isElementPresent("xpath=//td[@class='crm-particpant-label'][contains(text(), '{$status}')]/../td[9]/span/a[2][text()='Enable']")){
+     $this->click("xpath=//td[@class='crm-particpant-label'][contains(text(), '{$status}')]/../td[9]/span/a[2][text()='Enable']");
+     $this->waitForElementPresent("xpath=//div[@class='ui-dialog-buttonset']");
+     $this->click("xpath=//div[@class='ui-dialog-buttonset']/button[2]");
+   }
+ }
 }

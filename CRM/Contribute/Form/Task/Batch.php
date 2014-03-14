@@ -159,13 +159,13 @@ class CRM_Contribute_Form_Task_Batch extends CRM_Contribute_Form_Task {
       foreach ($this->_fields as $name => $field) {
         if ($customFieldID = CRM_Core_BAO_CustomField::getKeyID($name)) {
           $customValue = CRM_Utils_Array::value($customFieldID, $customFields);
-          if (CRM_Utils_Array::value('extends_entity_column_value', $customValue)) {
+          if (!empty($customValue['extends_entity_column_value'])) {
             $entityColumnValue = explode(CRM_Core_DAO::VALUE_SEPARATOR,
               $customValue['extends_entity_column_value']
             );
           }
 
-          if (CRM_Utils_Array::value($typeId, $entityColumnValue) ||
+          if (!empty($entityColumnValue[$typeId]) ||
             CRM_Utils_System::isNull($entityColumnValue[$typeId])
           ) {
             CRM_Core_BAO_UFGroup::buildProfile($this, $field, NULL, $contributionId);
@@ -195,7 +195,7 @@ class CRM_Contribute_Form_Task_Batch extends CRM_Contribute_Form_Task {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   function setDefaultValues() {
     if (empty($this->_fields)) {
@@ -216,7 +216,7 @@ class CRM_Contribute_Form_Task_Batch extends CRM_Contribute_Form_Task {
    *
    * @access public
    *
-   * @return None
+   * @return void
    */
   public function postProcess() {
     $params = $this->exportValues();
@@ -241,15 +241,15 @@ class CRM_Contribute_Form_Task_Batch extends CRM_Contribute_Form_Task {
             $value[$val] = CRM_Utils_Date::processDate($value[$val]);
           }
         }
-        if (CRM_Utils_Array::value('financial_type', $value)) {
+        if (!empty($value['financial_type'])) {
           $value['financial_type_id'] = $value['financial_type'];
         }
 
-        if (CRM_Utils_Array::value('payment_instrument', $value)) {
+        if (!empty($value['payment_instrument'])) {
           $value['payment_instrument_id'] = $value['payment_instrument'];
         }
 
-        if (CRM_Utils_Array::value('contribution_source', $value)) {
+        if (!empty($value['contribution_source'])) {
           $value['source'] = $value['contribution_source'];
         }
 
@@ -258,7 +258,7 @@ class CRM_Contribute_Form_Task_Batch extends CRM_Contribute_Form_Task {
         $contribution = CRM_Contribute_BAO_Contribution::add($value, $ids);
 
         // add custom field values
-        if (CRM_Utils_Array::value('custom', $value) &&
+        if (!empty($value['custom']) &&
           is_array($value['custom'])
         ) {
           CRM_Core_BAO_CustomValueTable::store($value['custom'], 'civicrm_contribution', $contribution->id);

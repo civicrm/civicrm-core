@@ -500,6 +500,7 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
       'IDS_request_uri',
       'IDS_user_agent',
       'check_permissions',
+      'options',
     );
     $settingParams = array_diff_key($params, array_fill_keys($ignoredParams, TRUE));
     $getFieldsParams = array('version' => 3);
@@ -630,17 +631,16 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
       $cacheString .= "_{$filterField}_{$filterString}";
     }
     $cached = 1;
+    // the caching into 'All' seems to be a duplicate of caching to
+    // settingsMetadata__ - I think the reason was to cache all settings as defined & then those altered by a hook
     $settingsMetadata = CRM_Core_BAO_Cache::getItem('CiviCRM setting Specs', $cacheString, $componentID);
     if ($settingsMetadata === NULL) {
       $settingsMetadata = CRM_Core_BAO_Cache::getItem('CiviCRM setting Spec', 'All', $componentID);
       if (empty($settingsMetadata)) {
-        $settingsMetadata = array();
         global $civicrm_root;
         $metaDataFolders = array($civicrm_root. '/settings');
         CRM_Utils_Hook::alterSettingsFolders($metaDataFolders);
-        foreach ($metaDataFolders as $metaDataFolder) {
-          $settingsMetadata = $settingsMetadata + self::loadSettingsMetaData($metaDataFolder);
-        }
+        $settingsMetadata = self::loadSettingsMetaDataFolders($metaDataFolders);
         CRM_Core_BAO_Cache::setItem($settingsMetadata,'CiviCRM setting Spec', 'All', $componentID);
       }
       $cached = 0;
@@ -662,6 +662,24 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
     }
     return $settingsMetadata;
 
+  }
+
+  /**
+   * Load the settings files defined in a series of folders
+   * @param array $metaDataFolders list of folder paths
+   * @return array
+   */
+  public static function loadSettingsMetaDataFolders($metaDataFolders) {
+    $settingsMetadata = array();
+    $loadedFolders = array();
+    foreach ($metaDataFolders as $metaDataFolder) {
+      $realFolder = realpath($metaDataFolder);
+      if (is_dir($realFolder) && !isset($loadedFolders[$realFolder])) {
+        $loadedFolders[$realFolder] = TRUE;
+        $settingsMetadata = $settingsMetadata + self::loadSettingsMetaData($metaDataFolder);
+      }
+    }
+    return $settingsMetadata;
   }
 
   /**
@@ -837,7 +855,7 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
 
       $cbValues = array();
       foreach ($groupValues as $key => $val) {
-        if (CRM_Utils_Array::value($val, $value)) {
+        if (!empty($value[$val])) {
           $cbValues[$key] = 1;
         }
       }
@@ -994,7 +1012,7 @@ AND domain_id = %3
         }
       }
       // CRM-10931, If DB doesn't have any value, carry on with any default value thats already available
-      if (!isset($value) && CRM_Utils_Array::value($dao->name, $params)) {
+      if (!isset($value) && !empty($params[$dao->name])) {
         $value = $params[$dao->name];
       }
       $params[$dao->name] = $value;

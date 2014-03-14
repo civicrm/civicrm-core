@@ -77,7 +77,7 @@ class CRM_Campaign_Form_Petition extends CRM_Core_Form {
     }
 
     // when custom data is included in this page
-    if (CRM_Utils_Array::value('hidden_custom', $_POST)) {
+    if (!empty($_POST['hidden_custom'])) {
       CRM_Custom_Form_CustomData::preProcess($this);
       CRM_Custom_Form_CustomData::buildQuickForm($this);
     }
@@ -341,13 +341,13 @@ WHERE  $whereClause
     if ($this->_surveyId) {
       CRM_Core_BAO_UFJoin::deleteAll($ufJoinParams);
     }
-    if (CRM_Utils_Array::value('profile_id', $params)) {
+    if (!empty($params['profile_id'])) {
       $ufJoinParams['weight'] = 1;
       $ufJoinParams['uf_group_id'] = $params['profile_id'];
       CRM_Core_BAO_UFJoin::create($ufJoinParams);
     }
 
-    if (CRM_Utils_Array::value('contact_profile_id', $params)) {
+    if (!empty($params['contact_profile_id'])) {
       $ufJoinParams['weight'] = 2;
       $ufJoinParams['uf_group_id'] = $params['contact_profile_id'];
       CRM_Core_BAO_UFJoin::create($ufJoinParams);

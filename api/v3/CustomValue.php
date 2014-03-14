@@ -206,14 +206,14 @@ function civicrm_api3_custom_value_get($params) {
         $n = $idArray[2];
         $id = $fieldNumber . "." . $idArray[2];
       }
-      if (CRM_Utils_Array::value('format.field_names', $params)) {
+      if (!empty($params['format.field_names'])) {
         $id = $info['field_name'];
       }
       else {
         $id = $fieldNumber;
       }
       $values[$id]['entity_id'] = $getParams['entityID'];
-      if (CRM_Utils_Array::value('entityType', $getParams)) {
+      if (!empty($getParams['entityType'])) {
         $values[$n]['entity_table'] = $getParams['entityType'];
       }
       //set 'latest' -useful for multi fields but set for single for consistency

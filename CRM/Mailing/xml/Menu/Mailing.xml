@@ -31,10 +31,9 @@
     <weight>410</weight>
   </item>
   <item>
-    <path>civicrm/admin/options/from_email</path>
+    <path>civicrm/admin/options/from_email_address/civimail</path>
     <title>From Email Addresses</title>
     <desc>List of Email Addresses which can be used when sending emails to contacts.</desc>
-    <path_arguments>group=from_email_address</path_arguments>
     <page_callback>CRM_Admin_Page_Options</page_callback>
     <adminGroup>CiviMail</adminGroup>
     <icon>admin/small/title.png</icon>

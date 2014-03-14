@@ -67,7 +67,7 @@ class CRM_Core_BAO_WordReplacement extends CRM_Core_DAO_WordReplacement {
   static function getWordReplacement($reset = NULL) {
     static $wordReplacement = NULL;
     if (!$wordReplacement || $reset) {
-      $wordReplacement = new CRM_Core_BAO_WordRepalcement();
+      $wordReplacement = new CRM_Core_BAO_WordReplacement();
       $wordReplacement->id = CRM_Core_Config::wordReplacementID();
       if (!$wordReplacement->find(TRUE)) {
         CRM_Core_Error::fatal();
@@ -152,9 +152,10 @@ WHERE  domain_id = %1
 
     while ($dao->fetch()) {
       if ($dao->is_active==1) {
-      	$overrides['enabled'][$dao->match_type][$dao->find_word] = $dao->replace_word;
-      }	else {
-      	$overrides['disabled'][$dao->match_type][$dao->find_word] = $dao->replace_word;
+        $overrides['enabled'][$dao->match_type][$dao->find_word] = $dao->replace_word;
+      }
+      else {
+        $overrides['disabled'][$dao->match_type][$dao->find_word] = $dao->replace_word;
       }
     }
     $config = CRM_Core_Config::singleton();
@@ -228,19 +229,19 @@ WHERE  domain_id = %1
           $wordMatchArray = array();
           // Traverse Language array
           foreach ($localeCustomArray as $localCustomData) {
-          	// Traverse status array "enabled" "disabled"
-          	foreach ($localCustomData as $status => $matchTypes) {
-          		$params["is_active"] = ($status == "enabled")?TRUE:FALSE;
-          		// Traverse Match Type array "wildcardMatch" "exactMatch"
-          		foreach ($matchTypes as $matchType => $words) {
-          			$params["match_type"] = $matchType;
-          			foreach ($words as $word => $replace) {
-          				$params["find_word"] = $word;
-          				$params["replace_word"] = $replace;
-          				$wordReplacementCreateParams[] = $params;
-          			}
-          		}
-          	}
+          // Traverse status array "enabled" "disabled"
+            foreach ($localCustomData as $status => $matchTypes) {
+              $params["is_active"] = ($status == "enabled")?TRUE:FALSE;
+              // Traverse Match Type array "wildcardMatch" "exactMatch"
+              foreach ($matchTypes as $matchType => $words) {
+                $params["match_type"] = $matchType;
+                foreach ($words as $word => $replace) {
+                  $params["find_word"] = $word;
+                  $params["replace_word"] = $replace;
+                  $wordReplacementCreateParams[] = $params;
+                }
+              }
+            }
           }
         }
       }
