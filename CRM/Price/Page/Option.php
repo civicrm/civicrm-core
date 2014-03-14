@@ -43,6 +43,8 @@
  */
 class CRM_Price_Page_Option extends CRM_Core_Page {
 
+  public $useLivePageJS = TRUE;
+
   /**
    * The field id of the option
    *
@@ -127,9 +129,6 @@ class CRM_Price_Page_Option extends CRM_Core_Page {
    * @access public
    */
   function browse() {
-    if (CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'ajax_popups_enabled', NULL, TRUE)) {
-      CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'js/crm.livePage.js');
-    }
     $customOption = array();
     CRM_Price_BAO_PriceFieldValue::getValues($this->_fid, $customOption);
     $config = CRM_Core_Config::singleton();

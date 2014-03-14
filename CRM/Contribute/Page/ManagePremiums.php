@@ -38,6 +38,8 @@
  */
 class CRM_Contribute_Page_ManagePremiums extends CRM_Core_Page_Basic {
 
+  public $useLivePageJS = TRUE;
+
   /**
    * The action links that we need to display for the browse screen
    *
@@ -141,9 +143,6 @@ class CRM_Contribute_Page_ManagePremiums extends CRM_Core_Page_Basic {
    * @static
    */
   function browse() {
-    if (CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'ajax_popups_enabled', NULL, TRUE)) {
-      CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'js/crm.livePage.js');
-    }
     // get all custom groups sorted by weight
     $premiums = array();
     $dao = new CRM_Contribute_DAO_Product();

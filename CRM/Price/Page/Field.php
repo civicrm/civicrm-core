@@ -43,6 +43,8 @@
  */
 class CRM_Price_Page_Field extends CRM_Core_Page {
 
+  public $useLivePageJS = TRUE;
+
   /**
    * The price set group id of the field
    *
@@ -122,9 +124,6 @@ class CRM_Price_Page_Field extends CRM_Core_Page {
    * @access public
    */
   function browse() {
-    if (CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'ajax_popups_enabled', NULL, TRUE)) {
-      CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'js/crm.livePage.js');
-    }
     $priceField    = array();
     $priceFieldBAO = new CRM_Price_BAO_PriceField();
 

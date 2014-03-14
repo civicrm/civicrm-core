@@ -38,6 +38,8 @@
  */
 class CRM_Admin_Page_RelationshipType extends CRM_Core_Page_Basic {
 
+  public $useLivePageJS = TRUE;
+
   /**
    * The action links that we need to display for the browse screen
    *
@@ -61,9 +63,6 @@ class CRM_Admin_Page_RelationshipType extends CRM_Core_Page_Basic {
    * @return array (reference) of action links
    */
   function &links() {
-    if (CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'ajax_popups_enabled', NULL, TRUE)) {
-      CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'js/crm.livePage.js');
-    }
     if (!(self::$_links)) {
       self::$_links = array(
         CRM_Core_Action::VIEW => array(
