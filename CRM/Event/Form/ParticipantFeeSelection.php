@@ -108,7 +108,7 @@ class CRM_Event_Form_ParticipantFeeSelection extends CRM_Core_Form {
     CRM_Event_BAO_Participant::getValues($params, $defaults, $ids);
     $priceSetId = CRM_Price_BAO_PriceSet::getFor('civicrm_event', $this->_eventId);
 
-    $priceSetValues = CRM_Event_Form_EventFees::setDefaultPriceSet($this->_participantId, $this->_eventId);
+    $priceSetValues = CRM_Event_Form_EventFees::setDefaultPriceSet($this->_participantId, $this->_eventId, FALSE);
     if (!empty($priceSetValues)) {
       $defaults[$this->_participantId] = array_merge($defaults[$this->_participantId], $priceSetValues);
     }
