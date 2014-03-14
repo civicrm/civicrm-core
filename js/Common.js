@@ -832,6 +832,7 @@ CRM.validate = CRM.validate || {
     refresh: function() {
       var that = this;
       var url = this._formatUrl(this.options.url);
+      this.options.crmForm && $('form', this.element).ajaxFormUnbind();
       this.options.block && $('.blockOverlay', this.element).length < 1 && this.element.block();
       $.getJSON(url, function(data) {
         if (typeof(data) != 'object' || typeof(data.content) != 'string') {
@@ -853,6 +854,7 @@ CRM.validate = CRM.validate || {
     },
     _destroy: function() {
       this.element.removeClass('crm-ajax-container');
+      this.options.crmForm && $('form', this.element).ajaxFormUnbind();
       if (this._originalContent !== null) {
         this.element.empty().append(this._originalContent);
       }
@@ -881,7 +883,7 @@ CRM.validate = CRM.validate || {
     if (settings.dialog) {
       $('<div id="'+ settings.target.substring(1) +'"><div class="crm-loading-element">' + ts('Loading') + '...</div></div>').dialog(settings.dialog);
       $(settings.target).on('dialogclose', function() {
-        $(this).dialog('destroy').remove();
+        $(this).crmSnippet('destroy').dialog('destroy').remove();
       });
     }
     if (settings.dialog && !settings.dialog.title) {
@@ -905,7 +907,7 @@ CRM.validate = CRM.validate || {
         validate: true,
         refreshAction: ['next_new', 'submit_savenext'],
         cancelButton: '.cancel.form-submit',
-        openInline: 'a.button:not("[href=#], .no-popup")',
+        openInline: 'a.open-inline, a.button:not("[href=#], .no-popup")',
         onCancel: function(event) {},
         onError: function(data) {
           var $el = $(this);
@@ -935,9 +937,9 @@ CRM.validate = CRM.validate || {
       }
     });
 
-    var widget = CRM.loadPage(url, settings);
+    var widget = CRM.loadPage(url, settings).off('.crmForm');
 
-    widget.on('crmFormLoad', function(event, data) {
+    widget.on('crmFormLoad.crmForm', function(event, data) {
       var $el = $(this);
       var settings = $el.crmSnippet('option', 'crmForm');
       settings.cancelButton && $(settings.cancelButton, this).click(function(event) {

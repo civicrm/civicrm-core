@@ -39,6 +39,8 @@
  */
 class CRM_Event_Form_ParticipantView extends CRM_Core_Form {
 
+  public $useLivePageJS = TRUE;
+
   /**
    * Function to set variables up before form is built
    *
@@ -208,7 +210,6 @@ class CRM_Event_Form_ParticipantView extends CRM_Core_Form {
    * @access public
    */
   public function buildQuickForm() {
-    CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'js/crm.livePage.js');
     $this->addButtons(array(
         array(
           'type' => 'cancel',

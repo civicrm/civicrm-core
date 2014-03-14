@@ -38,6 +38,8 @@
  */
 class CRM_Admin_Page_MessageTemplates extends CRM_Core_Page_Basic {
 
+  public $useLivePageJS = TRUE;
+
   /**
    * The action links that we need to display for the browse screen
    *
@@ -223,7 +225,6 @@ class CRM_Admin_Page_MessageTemplates extends CRM_Core_Page_Basic {
    * @access public
    */
   function browse() {
-    CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'js/crm.livePage.js');
     $action = func_num_args() ? func_get_arg(0) : NULL;
     if ($this->_action & CRM_Core_Action::ADD) {
       return;

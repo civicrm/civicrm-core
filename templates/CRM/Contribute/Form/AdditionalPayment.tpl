@@ -85,7 +85,7 @@
         {capture assign=ccModeLink}{crmURL p='civicrm/payment/add' q="reset=1&action=add&cid=`$contactId`&id=`$id`&component=`$component`&mode=live"}{/capture}
        {/if}
       {if $paymentType eq 'owed'}
-        <span class="action-link crm-link-credit-card-mode">&nbsp;<a href="{$ccModeLink}">&raquo; {ts}submit credit card payment{/ts}</a>
+        <span class="action-link crm-link-credit-card-mode">&nbsp;<a class="open-inline crm-hover-button" href="{$ccModeLink}">&raquo; {ts}submit credit card payment{/ts}</a></span>
       {/if}
     {/if}
   </div>
