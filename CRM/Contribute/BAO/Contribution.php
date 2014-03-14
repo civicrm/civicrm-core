@@ -3034,12 +3034,13 @@ WHERE eft.entity_table = 'civicrm_contribution'
         $financialItemStatus = CRM_Core_PseudoConstant::get('CRM_Financial_DAO_FinancialItem', 'status_id');
         $paidStatus = array_search('Paid', $financialItemStatus);
 
+        $baseTrxnId = CRM_Core_BAO_FinancialTrxn::getFinancialTrxnId($contributionId);
         $sqlFinancialItemUpdate = "
 UPDATE civicrm_financial_item fi
   LEFT JOIN civicrm_entity_financial_trxn eft
     ON (eft.entity_id = fi.id AND eft.entity_table = 'civicrm_financial_item')
 SET status_id = {$paidStatus}
-WHERE eft.financial_trxn_id = {$trxnId}
+WHERE eft.financial_trxn_id IN ({$trxnId}, {$baseTrxnId['financialTrxnId']})
 ";
         CRM_Core_DAO::executeQuery($sqlFinancialItemUpdate);
       }
@@ -3152,6 +3153,15 @@ WHERE eft.financial_trxn_id = {$trxnId}
     }
     $total = CRM_Core_BAO_FinancialTrxn::getBalanceTrxnAmt($contributionId);
     $baseTrxnId = !empty($total['trxn_id']) ? $total['trxn_id'] : NULL;
+    $isBalance = NULL;
+    if ($baseTrxnId) {
+      $isBalance = TRUE;
+    }
+    else {
+      $baseTrxnId = CRM_Core_BAO_FinancialTrxn::getFinancialTrxnId($contributionId);
+      $baseTrxnId = $baseTrxnId['financialTrxnId'];
+      $isBalance = FALSE;
+    }
     if (empty($total) || $usingLineTotal) {
       $total = CRM_Price_BAO_LineItem::getLineTotal($id, $entityTable);
     }
@@ -3173,8 +3183,14 @@ SELECT ft.total_amount, con.financial_type_id, ft.payment_instrument_id, ft.trxn
 FROM civicrm_contribution con
   LEFT JOIN civicrm_entity_financial_trxn eft ON (eft.entity_id = con.id AND eft.entity_table = 'civicrm_contribution')
   LEFT JOIN civicrm_financial_trxn ft ON ft.id = eft.financial_trxn_id
-WHERE ft.id != {$baseTrxnId} AND con.id = {$contributionId}
+WHERE con.id = {$contributionId}
 ";
+
+      // conditioned WHERE clause
+      if ($isBalance) {
+        // if balance trxn exists don't include details of it in transaction info
+        $sql .= " AND ft.id != {$baseTrxnId} ";
+      }
       $resultDAO = CRM_Core_DAO::executeQuery($sql);
 
       $statuses = CRM_Contribute_PseudoConstant::contributionStatus();
