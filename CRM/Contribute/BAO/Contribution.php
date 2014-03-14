@@ -2974,6 +2974,14 @@ WHERE  contribution_id = %1 ";
     return FALSE;
   }
 
+
+  /*
+   * Function to record additional payment for partial and refund contributions
+   *
+   * @param integer $contributionId : is the invoice contribution id (got created after processing participant payment)
+   * @param array $trxnData : to take user provided input of transaction details.
+   * @param string $paymentType 'owed' for purpose of recording partial payments, 'refund' for purpose of recording refund payments
+   */
   static function recordAdditionalPayment($contributionId, $trxnsData, $paymentType = 'owed', $participantId = NULL) {
     $statusId = CRM_Core_OptionGroup::getValue('contribution_status', 'Completed', 'name');
     $getInfoOf['id'] = $contributionId;
