@@ -28,12 +28,13 @@
 {/if}
 
 {strip}
-<table class="selector">
+<table class="selector row-highlight">
   <thead class="sticky">
   <tr>
     {if !$single and $context eq 'Search' }
         <th scope="col" title="Select Rows">{$form.toggleSelect.html}</th>
     {/if}
+    {assign var="softCreditColumns" value=0}
     {foreach from=$columnHeaders item=header}
         <th scope="col">
         {if $header.sort}
@@ -41,11 +42,14 @@
           {$sort->_response.$key.link}
         {else}
           {$header.name}
-        {/if}
+	  {/if}
         </th>
+	{if $header.name eq "Soft Credit For"}
+	  {assign var='softCreditColumns' value=1}
+	{/if}
     {/foreach}
   </tr>
-  </thead>
+  </thead> 
 
   {counter start=0 skip=1 print=false}
   {foreach from=$rows item=row}
@@ -58,11 +62,18 @@
     <td>{$row.contact_type}</td>
       <td><a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=`$row.contact_id`"}">{$row.sort_name}</a></td>
     {/if}
-    <td class="right bold crm-contribution-amount"><span class="nowrap">{$row.total_amount|crmMoney:$row.currency}</span> {if $row.amount_level }<br /> ({$row.amount_level}){/if}
-    {if $row.contribution_recur_id}
-     <br /> {ts}(Recurring Contribution){/ts}
+    {if $row.contribution_soft_credit_amount}
+      <td class="right bold crm-contribution-amount">&nbsp;</td>
+    {else}
+      <td class="right bold crm-contribution-amount"><span class="nowrap">{$row.total_amount|crmMoney:$row.currency}</span> {if $row.amount_level }<br /> ({$row.amount_level}){/if}
+      {if $row.contribution_recur_id}
+	<br /> {ts}(Recurring Contribution){/ts}
+      {/if}
+      </td>
     {/if}
-    </td>
+    {if $softCreditColumns}
+      <td class="right bold crm-contribution-soft_credit_amount"><span class="nowrap">{$row.contribution_soft_credit_amount|crmMoney:$row.currency}</span></td>
+    {/if}
     <td class="crm-contribution-type crm-contribution-type_{$row.financial_type_id} crm-financial-type crm-financial-type_{$row.financial_type_id}">{$row.financial_type}</td>
     <td class="crm-contribution-source">{$row.contribution_source}</td>
     <td class="crm-contribution-receive_date">{$row.receive_date|crmDate}</td>
@@ -74,6 +85,10 @@
         {/if}
     </td>
     <td class="crm-contribution-product_name">{$row.product_name}</td>
+    {if $softCreditColumns}
+      <td class="crm-contribution-soft_credit_name"><a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=`$row.contribution_soft_credit_contact_id`"}">{$row.contribution_soft_credit_name}</a></td>
+      <td class="crm-contribution-soft_credit_type">{$row.contribution_soft_credit_type}</td>
+    {/if}
     <td>{$row.action|replace:'xx':$row.contribution_id}</td>
   </tr>
   {/foreach}

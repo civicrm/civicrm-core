@@ -114,7 +114,7 @@ class CRM_Contribute_Form_Task_PDFLetter extends CRM_Contribute_Form_Task {
 
     // Group options for tokens are not yet implemented. dgg
     $options = array(ts('Contact'), ts('Recurring'));
-    $this->addRadio('is_group_by', ts('Grouping contributions in one letter based on'), $options, array(), "<br/>", FALSE);
+    $this->addRadio('is_group_by', ts('Grouping contributions in one letter based on'), $options, array('allowClear' => TRUE), "<br/>", FALSE);
 
     $this->addButtons(array(
         array(

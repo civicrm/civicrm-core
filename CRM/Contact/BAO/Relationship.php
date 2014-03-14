@@ -382,10 +382,6 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
       ) {
         $relationshipType[$key . '_a_b'] = $value["{$column}_a_b"];
       }
-      elseif (empty($value['contact_type_b'])) {
-        // case contact_type_b is "all contacts", CRM-9877
-        $relationshipType[$key . '_a_b'] = $value["{$column}_a_b"];
-      }
 
       if (((!$value['contact_type_b']) ||
           $value['contact_type_b'] == $contactType
@@ -404,10 +400,6 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
           )
         )
       ) {
-        $relationshipType[$key . '_b_a'] = $value["{$column}_b_a"];
-      }
-      elseif (empty($value['contact_type_a'])) {
-        // case contact_type_a is "all contacts", CRM-9877
         $relationshipType[$key . '_b_a'] = $value["{$column}_b_a"];
       }
 
@@ -875,7 +867,8 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
         $where .= ' AND civicrm_relationship.contact_id_b = ' . CRM_Utils_Type::escape($contactId, 'Positive');
       }
       else {
-        $where .= ' AND civicrm_relationship.contact_id_a = ' . CRM_Utils_Type::escape($contactId, 'Positive');
+        $where .= ' AND civicrm_relationship.contact_id_a = ' . CRM_Utils_Type::escape($contactId, 'Positive') . '
+                    AND civicrm_relationship.contact_id_a != civicrm_relationship.contact_id_b ';
       }
     }
     if ($relationshipId) {
@@ -963,15 +956,24 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
 
     $order = $limit = '';
     if (!$count) {
-      $order = ' ORDER BY civicrm_relationship_type_id, sort_name ';
+      if (empty($params['sort'])) {
+        $order = ' ORDER BY civicrm_relationship_type_id, sort_name ';
+      }
+      else {
+        $order = " ORDER BY {$params['sort']} ";
+      }
+
+      $offset = 0;
+      if (!empty($params['offset']) && $params['offset'] > 0) {
+        $offset = $params['offset'];
+      }
 
       if ($numRelationship) {
-        $limit = " LIMIT 0, $numRelationship";
+        $limit = " LIMIT {$offset}, $numRelationship";
       }
     }
 
     // building the query string
-    $queryString = '';
     $queryString = $select1 . $from1 . $where1 . $select2 . $from2 . $where2 . $order . $limit;
 
     $relationship = new CRM_Contact_DAO_Relationship();
@@ -1496,36 +1498,6 @@ AND cc.sort_name LIKE '%$name%'";
     return $contacts;
   }
 
-  static function getValidContactTypeList($relType) {
-    // string looks like 4_a_b
-    $rel_parts           = explode('_', $relType);
-    $allRelationshipType = CRM_Core_PseudoConstant::relationshipType('label');
-    $contactProfiles     = CRM_Core_BAO_UFGroup::getReservedProfiles('Contact', NULL);
-
-    if ($rel_parts[1] == 'a') {
-      $leftType = $allRelationshipType[$rel_parts[0]]['contact_type_b'];
-    }
-    else {
-      $leftType = $allRelationshipType[$rel_parts[0]]['contact_type_a'];
-    }
-
-    // Handle 'All Contacts' contact type for left side of relationship ($leftType is empty in this case)
-    // In this case all reserved profiles are available
-    if ($leftType == '') {
-      $contactTypes = $contactProfiles;
-    } else {
-      $contactTypes = array();
-      foreach ($contactProfiles as $key => $value) {
-        $groupTypes = CRM_Core_BAO_UFGroup::profileGroups($key);
-        if (in_array($leftType, $groupTypes)) {
-          $contactTypes = array($key => $value);
-        }
-      }
-    }
-
-    return $contactTypes;
-  }
-
   /**
    * Merge relationships from otherContact to mainContact
    * Called during contact merge operation
@@ -1629,5 +1601,116 @@ AND cc.sort_name LIKE '%$name%'";
       }
     }
   }
+
+
+  /**
+   * This function is a wrapper for contact relationship selector
+   *
+   * @param  array   $params associated array for params record id.
+   *
+   * @return array   $contactRelationships associated array of contact relationships
+   * @access public
+   */
+  public static function getContactRelationshipSelector(&$params) {
+    // format the params
+    $params['offset']   = ($params['page'] - 1) * $params['rp'];
+    $params['sort']     = CRM_Utils_Array::value('sortBy', $params);
+
+    if ($params['context'] == 'past') {
+      $relationshipStatus = CRM_Contact_BAO_Relationship::INACTIVE;
+    }
+    else {
+      $relationshipStatus = CRM_Contact_BAO_Relationship::CURRENT;
+    }
+
+    // check logged in user for permission
+    $page = new CRM_Core_Page();
+    CRM_Contact_Page_View::checkUserPermission($page, $params['contact_id']);
+    $permissions = array($page->_permission);
+    if ($page->_permission == CRM_Core_Permission::EDIT) {
+      $permissions[] = CRM_Core_Permission::DELETE;
+    }
+    $mask = CRM_Core_Action::mask($permissions);
+
+    if ($params['context'] != 'user') {
+      $links = CRM_Contact_Page_View_Relationship::links();
+      $permissionedContacts = FALSE;
+    }
+    else {
+      $links = CRM_Contact_Page_View_UserDashBoard::links();
+      $permissionedContacts = TRUE;
+      $mask = NULL;
+    }
+    // get contact relationships
+    $relationships = CRM_Contact_BAO_Relationship::getRelationship($params['contact_id'],
+      $relationshipStatus,
+      $params['rp'], 0, 0,
+      $links, $mask,
+      $permissionedContacts,
+      $params
+    );
+
+    $contactRelationships = array();
+    $params['total'] = 0;
+    if (!empty($relationships)) {
+      // get the total relationships
+      if ($params['context'] != 'user') {
+        $params['total'] = CRM_Contact_BAO_Relationship::getRelationship($params['contact_id'],
+        $relationshipStatus, 0, 1, 0, NULL, NULL, $permissionedContacts);
+      }
+      else {
+        // FIX ME: we cannot directly determine total permissioned relationship, hence re-fire query
+        $permissionedRelationships = CRM_Contact_BAO_Relationship::getRelationship($params['contact_id'],
+          $relationshipStatus,
+          0, 0, 0,
+          NULL, NULL, TRUE
+        );
+        $params['total'] = count($permissionedRelationships);
+      }
+
+      // format params
+      foreach ($relationships as $relationshipId => $values) {
+        $contactRelationships[$relationshipId]['name'] = CRM_Utils_System::href(
+          $values['name'],
+          'civicrm/contact/view',
+          "reset=1&cid={$values['contact_id_b']}");
+
+        $contactRelationships[$relationshipId]['relation'] = CRM_Utils_System::href(
+          $values['relation'],
+          'civicrm/contact/view/rel',
+          "action=view&reset=1&cid={$values['contact_id_a']}&id={$values['id']}&rtype={$values['rtype']}");
+
+        if ($params['context'] == 'current') {
+          if (($params['contact_id'] == $values['contact_id_a'] AND $values['is_permission_a_b'] == 1) OR
+            ($params['contact_id'] == $values['contact_id_b'] AND $values['is_permission_b_a'] == 1)
+          ) {
+            $contactRelationships[$relationshipId]['name'] .= '<span id="permission-a-b" class="crm-marker permission-relationship"> *</span>';
+          }
+
+          if (($values['cid'] == $values['contact_id_a'] AND $values['is_permission_a_b'] == 1) OR
+            ($values['cid'] == $values['contact_id_b'] AND $values['is_permission_b_a'] == 1)
+          ) {
+            $contactRelationships[$relationshipId]['relation'] .= '<span id="permission-b-a" class="crm-marker permission-relationship"> *</span>';
+          }
+        }
+
+        if (!empty($values['description'])) {
+          $contactRelationships[$relationshipId]['relation'] .= "<p class='description'>{$values['description']}</p>";
+        }
+
+        $contactRelationships[$relationshipId]['start_date'] = CRM_Utils_Date::customFormat($values['start_date']);
+        $contactRelationships[$relationshipId]['end_date'] = CRM_Utils_Date::customFormat($values['end_date']);
+        $contactRelationships[$relationshipId]['city'] = $values['city'];
+        $contactRelationships[$relationshipId]['state'] = $values['state'];
+        $contactRelationships[$relationshipId]['email'] = $values['email'];
+        $contactRelationships[$relationshipId]['phone'] = $values['phone'];
+        $contactRelationships[$relationshipId]['links'] = $values['action'];
+        $contactRelationships[$relationshipId]['id'] = $values['id'];
+        $contactRelationships[$relationshipId]['is_active'] = $values['is_active'];
+      }
+    }
+    return $contactRelationships;
+  }
+
 }
 

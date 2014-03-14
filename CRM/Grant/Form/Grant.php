@@ -194,23 +194,14 @@ class CRM_Grant_Form_Grant extends CRM_Core_Form {
     }
 
     $attributes = CRM_Core_DAO::getAttribute('CRM_Grant_DAO_Grant');
-    $grantType = CRM_Core_OptionGroup::values('grant_type');
-    $this->add('select', 'grant_type_id', ts('Grant Type'),
-      array(
-        '' => ts('- select -')) + $grantType, TRUE,
-      array('onChange' => "CRM.buildCustomData( 'Grant', this.value );")
-    );
+    $this->addSelect('grant_type_id', array('onChange' => "CRM.buildCustomData( 'Grant', this.value );"), TRUE);
 
     //need to assign custom data type and subtype to the template
     $this->assign('customDataType', 'Grant');
     $this->assign('customDataSubType', $this->_grantType);
     $this->assign('entityID', $this->_id);
 
-    $grantStatus = CRM_Core_OptionGroup::values('grant_status');
-    $this->add('select', 'status_id', ts('Grant Status'),
-      array(
-        '' => ts('- select -')) + $grantStatus, TRUE
-    );
+    $this->addSelect('status_id', array(), TRUE);
 
     $this->addDate('application_received_date', ts('Application Received'), FALSE, array('formatType' => 'custom'));
     $this->addDate('decision_date', ts('Grant Decision'), FALSE, array('formatType' => 'custom'));
@@ -259,31 +250,8 @@ class CRM_Grant_Form_Grant extends CRM_Core_Form {
     );
 
     if ($this->_context == 'standalone') {
-      CRM_Contact_Form_NewContact::buildQuickForm($this);
-      $this->addFormRule(array('CRM_Grant_Form_Grant', 'formRule'), $this);
+      $this->addEntityRef('contact_id', ts('Applicant'), array('create' => TRUE), TRUE);
     }
-  }
-
-  /**
-   * global form rule
-   *
-   * @param array $fields  the input form values
-   * @param array $files   the uploaded files if any
-   * @param array $options additional user data
-   *
-   * @return true if no errors, else array of errors
-   * @access public
-   * @static
-   */
-  static function formRule($fields, $files, $self) {
-    $errors = array();
-
-    //check if contact is selected in standalone mode
-    if (isset($fields['contact_select_id'][1]) && !$fields['contact_select_id'][1]) {
-      $errors['contact[1]'] = ts('Please select a contact or create new contact');
-    }
-
-    return $errors;
   }
 
   /**
@@ -311,8 +279,8 @@ class CRM_Grant_Form_Grant extends CRM_Core_Form {
     }
 
     // set the contact, when contact is selected
-    if (!empty($params['contact_select_id'])) {
-      $this->_contactID = $params['contact_select_id'][1];
+    if ($this->_context == 'standalone') {
+      $this->_contactID = $params['contact_id'];
     }
 
     $params['contact_id'] = $this->_contactID;

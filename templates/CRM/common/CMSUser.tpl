@@ -56,6 +56,7 @@
              <div class="content">
                {$form.cms_pass.html}
              </div>
+             <div class="clear"></div>
              <div class="label">
                <label for="crm_confirm_pass-section">{$form.cms_confirm_pass.label}</label>
              </div>

@@ -34,7 +34,6 @@
       <div class="crm-section {$form.soft_credit_type_id.name}-section">
         <div class="content" >
           {$form.soft_credit_type_id.html}
-          <span class="crm-clear-link">(<a href="#" title="unselect" onclick="unselectRadio('soft_credit_type_id', '{$form.formName}');enableHonorType(); return false;">{ts}clear{/ts}</a>)</span>
           <div class="description">{ts}Select an option to reveal honoree information fields.{/ts}</div>
         </div>
       </div>
@@ -46,28 +45,21 @@
     {assign var='rowNumber' value=$smarty.section.i.index}
     <tr id="soft-credit-row-{$rowNumber}"
         class="crm-contribution-form-block-soft_credit_to {if $rowNumber gte $showSoftCreditRow}hiddenElement{/if}">
-      <td class="label">{ts}Select Contact{/ts}</td>
       <td>
-        {assign var='createNewStatus' value=true}
-        {if !$showCreateNew and $rowNumber lt $showSoftCreditRow}
-          {assign var='createNewStatus' value=false}
-        {/if}
-        {include file="CRM/Contact/Form/NewContact.tpl" noLabel=true skipBreak=true blockNo=$rowNumber
-        prefix="soft_credit_" showNewSelect=$createNewStatus focus=false}
+        {$form.soft_credit_contact_id.$rowNumber.label}&nbsp;{$form.soft_credit_contact_id.$rowNumber.html|crmAddClass:twenty}
       </td>
       <td>
         {$form.soft_credit_amount.$rowNumber.label}&nbsp;{$form.soft_credit_amount.$rowNumber.html|crmAddClass:eight}
       </td>
       <td>
-        {$form.soft_credit_type.$rowNumber.label}&nbsp;{$form.soft_credit_type.$rowNumber.html|crmAddClass:eight}
-        &nbsp;<a class="delete-link" row-no={$rowNumber} href="#">{ts}delete{/ts}</a>
+        {$form.soft_credit_type.$rowNumber.label}&nbsp;{$form.soft_credit_type.$rowNumber.html}
+        &nbsp;<a class="crm-hover-button soft-credit-delete-link" href="#"><span class="icon delete-icon"></span></a>
       </td>
     </tr>
   {/section}
   <tr>
-    <td></td>
     <td>
-      <a href="#" id="addMoreSoftCredit">{ts}add another soft credit{/ts}</a>
+      <a href="#" class="crm-hover-button" id="addMoreSoftCredit"><span class="icon add-icon"></span> {ts}another soft credit{/ts}</a>
     </td>
   </tr>
 </table>
@@ -102,33 +94,14 @@
         $("#pcp_made_through_id" ).val( data[1]);
       });
 
-    var rowCnt = 1;
-    $('input[name^="soft_credit_contact_select_id["]').each(function(){
-      if ($(this).val()){
-        var dataUrl = CRM.url('civicrm/ajax/rest',
-          'className=CRM_Contact_Page_AJAX&fnName=getContactList&json=1&context=contact&id=' + $(this).val());
-        $.ajax({
-          url     : dataUrl,
-          async   : false,
-          success : function(html){
-            htmlText = html.split( '|' , 2);
-            $('#soft_credit_contact_' + rowCnt).val(htmlText[0]);
-            rowCnt++;
-          }
-        });
-      }
-    });
-
     $('.crm-soft-credit-block tr span').each(function () {
       if ($(this).hasClass('crm-error')) {
         $(this).parents('tr').show();
       }
     });
 
-    $('.delete-link').click(function(){
-      var row = $(this).attr('row-no');
-      $('#soft-credit-row-' + row).hide().find('input').val('');
-      $('input[name="soft_credit_contact_select_id['+row+']"]').val('');
+    $('.soft-credit-delete-link').click(function(){
+      $(this).closest('tr').hide().find('input').val('').change();
       return false;
     });
 

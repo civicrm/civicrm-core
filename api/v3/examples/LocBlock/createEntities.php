@@ -1,9 +1,9 @@
 <?php
 /**
- * Test Generated example of using loc_block create API
- * Create entities and locBlock in 1 api call *
+ * Test Generated example of using loc_block createEntities API
+ * Create entities and location block in 1 api call *
  */
-function loc_block_create_example(){
+function loc_block_createentities_example(){
 $params = array(
   'email' => array(
       'location_type_id' => 1,
@@ -24,7 +24,7 @@ $params = array(
 );
 
 try{
-  $result = civicrm_api3('loc_block', 'create', $params);
+  $result = civicrm_api3('loc_block', 'createEntities', $params);
 }
 catch (CiviCRM_API3_Exception $e) {
   // handle error here
@@ -40,7 +40,7 @@ return $result;
 /**
  * Function returns array of result expected from previous function
  */
-function loc_block_create_expectedresult(){
+function loc_block_createentities_expectedresult(){
 
   $expectedResult = array(
   'is_error' => 0,
@@ -116,16 +116,16 @@ function loc_block_create_expectedresult(){
 * This example has been generated from the API test suite. The test that created it is called
 *
 * testCreateLocBlockEntities and can be found in
-* http://svn.civicrm.org/civicrm/trunk/tests/phpunit/CiviTest/api/v3/LocBlockTest.php
+* https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/LocBlockTest.php
 *
 * You can see the outcome of the API tests at
-* http://tests.dev.civicrm.org/trunk/results-api_v3
+* https://test.civicrm.org/job/CiviCRM-master-git/
 *
 * To Learn about the API read
-* http://book.civicrm.org/developer/current/techniques/api/
+* http://wiki.civicrm.org/confluence/display/CRMDOC/Using+the+API
 *
-* and review the wiki at
-* http://wiki.civicrm.org/confluence/display/CRMDOC/CiviCRM+Public+APIs
+* Browse the api on your own site with the api explorer
+* http://MYSITE.ORG/path/to/civicrm/api/explorer
 *
 * Read more about testing here
 * http://wiki.civicrm.org/confluence/display/CRM/Testing

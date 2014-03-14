@@ -25,26 +25,14 @@
 *}
 {* CiviCase -  view case screen*}
 
-{* here we are showing related cases w/ jquery dialog *}
 <div class="crm-block crm-form-block crm-case-caseview-form-block">
+
+{* here we are showing related cases w/ jquery dialog *}
 {if $showRelatedCases}
-<table class="report">
-  <tr class="columnheader">
-    <th>{ts}Client Name{/ts}</th>
-    <th>{ts}Case Type{/ts}</th>
-    <th></th>
-  </tr>
+  {include file="CRM/Case/Form/ViewRelatedCases.tpl"}
 
-  {foreach from=$relatedCases item=row key=caseId}
-    <tr>
-      <td class="crm-case-caseview-client_name label">{$row.client_name}</td>
-      <td class="crm-case-caseview-case_type label">{$row.case_type}</td>
-      <td class="label">{$row.links}</td>
-    </tr>
-  {/foreach}
-</table>
-
-  {else}
+{* Main case view *}
+{else}
 
 <h3>{ts}Summary{/ts}</h3>
 <table class="report">
@@ -55,7 +43,7 @@
         {foreach from=$caseRoles.client item=client name=clients}
           <a href="{crmURL p='civicrm/contact/view' q="action=view&reset=1&cid=`$client.contact_id`"}" title="{ts}view contact record{/ts}">{$client.display_name}</a>{if not $smarty.foreach.clients.last}, &nbsp; {/if}
         {/foreach}
-        <a href="#" title="{ts}add new client to the case{/ts}" onclick="addClient( );return false;">
+        <a href="#" class="crm-hover-button" title="{ts}add new client to the case{/ts}" onclick="addClient( );return false;">
           <span class="icon edit-icon"></span>
         </a>
         {if $hasRelatedCases}
@@ -93,13 +81,13 @@
       <span class="crm-case-summary-label">{ts}Subject{/ts}:</span>&nbsp;{$caseDetails.case_subject}
     </td>
     <td class="crm-case-caseview-case_type label">
-      <span class="crm-case-summary-label">{ts}Type{/ts}:</span>&nbsp;{$caseDetails.case_type}&nbsp;<a href="{crmURL p='civicrm/case/activity' q="action=add&reset=1&cid=`$contactId`&caseid=`$caseId`&selectedChild=activity&atype=`$changeCaseTypeId`"}" title="{ts}Change case type (creates activity record){/ts}"><span class="icon edit-icon"></span></a>
+      <span class="crm-case-summary-label">{ts}Type{/ts}:</span>&nbsp;{$caseDetails.case_type}&nbsp;<a class="crm-hover-button"  href="{crmURL p='civicrm/case/activity' q="action=add&reset=1&cid=`$contactId`&caseid=`$caseId`&selectedChild=activity&atype=`$changeCaseTypeId`"}" title="{ts}Change case type (creates activity record){/ts}"><span class="icon edit-icon"></span></a>
     </td>
     <td class="crm-case-caseview-case_status label">
-      <span class="crm-case-summary-label">{ts}Status{/ts}:</span>&nbsp;{$caseDetails.case_status}&nbsp;<a href="{crmURL p='civicrm/case/activity' q="action=add&reset=1&cid=`$contactId`&caseid=`$caseId`&selectedChild=activity&atype=`$changeCaseStatusId`"}" title="{ts}Change case status (creates activity record){/ts}"><span class="icon edit-icon"></span></a>
+      <span class="crm-case-summary-label">{ts}Status{/ts}:</span>&nbsp;{$caseDetails.case_status}&nbsp;<a class="crm-hover-button"  href="{crmURL p='civicrm/case/activity' q="action=add&reset=1&cid=`$contactId`&caseid=`$caseId`&selectedChild=activity&atype=`$changeCaseStatusId`"}" title="{ts}Change case status (creates activity record){/ts}"><span class="icon edit-icon"></span></a>
     </td>
     <td class="crm-case-caseview-case_start_date label">
-      <span class="crm-case-summary-label">{ts}Open Date{/ts}:</span>&nbsp;{$caseDetails.case_start_date|crmDate}&nbsp;<a href="{crmURL p='civicrm/case/activity' q="action=add&reset=1&cid=`$contactId`&caseid=`$caseId`&selectedChild=activity&atype=`$changeCaseStartDateId`"}" title="{ts}Change case start date (creates activity record){/ts}"><span class="icon edit-icon"></span></a>
+      <span class="crm-case-summary-label">{ts}Open Date{/ts}:</span>&nbsp;{$caseDetails.case_start_date|crmDate}&nbsp;<a class="crm-hover-button"  href="{crmURL p='civicrm/case/activity' q="action=add&reset=1&cid=`$contactId`&caseid=`$caseId`&selectedChild=activity&atype=`$changeCaseStartDateId`"}" title="{ts}Change case start date (creates activity record){/ts}"><span class="icon edit-icon"></span></a>
     </td>
     <td class="crm-case-caseview-{$caseID} label">
       <span class="crm-case-summary-label">{ts}ID{/ts}:</span>&nbsp;{$caseID}
@@ -307,7 +295,7 @@
     cj("#dialog").show( );
 
     cj("#dialog").dialog({
-      title: "Add Client to the Case",
+      title: "{/literal}{ts escape="js"}Add Client to the Case{/ts}{literal}",
       modal: true,
       bgiframe: true,
       close  : function(event, ui) { cj("#rel_contact").unautocomplete( ); },
@@ -334,7 +322,7 @@
         var contactID = cj("#rel_contact_id").val( );
 
         if ( !cj("#rel_contact").val( ) || !contactID ) {
-          cj("#rel_contact").crmError('{/literal}{ts escape="js"}Select valid contact from the list{/ts}{literal}.');
+          cj("#rel_contact").crmError('{/literal}{ts escape="js"}Select valid contact from the list.{/ts}{literal}');
           return false;
         }
         cj.post( postUrl, {contactID: contactID,caseID: caseID,

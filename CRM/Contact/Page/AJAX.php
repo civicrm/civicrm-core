@@ -52,7 +52,8 @@ class CRM_Contact_Page_AJAX {
       'tableName' => 'table_name',
       'context' => 'context',
       'rel' => 'rel',
-      'contact_sub_type' => 'contact_sub_type'
+      'contact_sub_type' => 'contact_sub_type',
+      'contact_type' => 'contact_type'
     );
     foreach ($whitelist as $key => $param) {
       if (!empty($_GET[$key])) {
@@ -236,24 +237,6 @@ class CRM_Contact_Page_AJAX {
     $results = array();
     while ($dao->fetch()) {
       $results[$dao->id] = $dao->data;
-    }
-    CRM_Core_Page_AJAX::autocompleteResults($results);
-  }
-
-  /**
-   * Function to fetch the values
-   */
-  static function autocomplete() {
-    $fieldID       = CRM_Utils_Type::escape($_GET['cfid'], 'Integer');
-    $optionGroupID = CRM_Utils_Type::escape($_GET['ogid'], 'Integer');
-    $label         = CRM_Utils_Type::escape($_GET['s'], 'String');
-
-    $selectOption = CRM_Core_BAO_CustomOption::valuesByID($fieldID, $optionGroupID);
-    $results = array();
-    foreach ($selectOption as $id => $value) {
-      if (strtolower($label) == strtolower(substr($value, 0, strlen($label)))) {
-        $results[$id] = $value;
-      }
     }
     CRM_Core_Page_AJAX::autocompleteResults($results);
   }
@@ -907,114 +890,6 @@ LIMIT {$offset}, {$rowCount}
     CRM_Utils_System::civiExit();
   }
 
-  static function relationshipContacts() {
-    $searchValues = $searchRows = array();
-    $addCount = 0;
-
-    $relType          = CRM_Utils_Type::escape($_REQUEST['relType'], 'String');
-    $typeName         = isset($_REQUEST['typeName']) ? CRM_Utils_Type::escape($_REQUEST['typeName'], 'String') : '';
-    $relContact       = CRM_Utils_Type::escape($_REQUEST['relContact'], 'String');
-    $currentContactId = CRM_Utils_Type::escape($_REQUEST['cid'], 'Integer');
-
-    if (in_array($typeName, array(
-      'Employee of', 'Employer of'))) {
-      $addCount = 1;
-    }
-
-    $sortMapper = array(
-      1 => 'sort_name', (2 + $addCount) => 'city', (3 + $addCount) => 'state_province',
-      (4 + $addCount) => 'email', (5 + $addCount) => 'phone',
-    );
-
-    $sEcho     = CRM_Utils_Type::escape($_REQUEST['sEcho'], 'Integer');
-    $offset    = isset($_REQUEST['iDisplayStart']) ? CRM_Utils_Type::escape($_REQUEST['iDisplayStart'], 'Integer') : 0;
-    $rowCount  = isset($_REQUEST['iDisplayLength']) ? CRM_Utils_Type::escape($_REQUEST['iDisplayLength'], 'Integer') : 25;
-    $sort      = isset($_REQUEST['iSortCol_0']) ? $sortMapper[CRM_Utils_Type::escape($_REQUEST['iSortCol_0'], 'Integer')] : 'sort_name';
-    $sortOrder = isset($_REQUEST['sSortDir_0']) ? CRM_Utils_Type::escape($_REQUEST['sSortDir_0'], 'String') : 'asc';
-
-    $searchValues[] = array('sort_name', 'LIKE', $relContact, 0, 1);
-
-    list($rid, $direction) = explode('_', $relType, 2);
-
-    $relationshipType = new CRM_Contact_DAO_RelationshipType();
-
-    $relationshipType->id = $rid;
-    if ($relationshipType->find(TRUE)) {
-      if ($direction == 'a_b') {
-        $type = $relationshipType->contact_type_b;
-        $subType = $relationshipType->contact_sub_type_b;
-      }
-      else {
-        $type = $relationshipType->contact_type_a;
-        $subType = $relationshipType->contact_sub_type_a;
-      }
-
-      if ($type == 'Individual' || $type == 'Organization' || $type == 'Household') {
-        $searchValues[] = array('contact_type', '=', $type, 0, 0);
-      }
-
-      if ($subType) {
-        $searchValues[] = array('contact_sub_type', '=', $subType, 0, 0);
-      }
-    }
-
-    // exclude current contact
-    $searchValues[] = array('contact_id', '!=', $currentContactId, 0, 0);
-
-    $query       = new CRM_Contact_BAO_Query($searchValues);
-    $searchCount = $query->searchQuery(0, 0, NULL, TRUE);
-    $iTotal      = $searchCount;
-
-    if ($searchCount > 0) {
-      // get the result of the search
-      $result = $query->searchQuery($offset, $rowCount, $sort, FALSE, FALSE,
-        FALSE, FALSE, FALSE, NULL, $sortOrder
-      );
-
-      $config = CRM_Core_Config::singleton();
-
-      while ($result->fetch()) {
-        $query->convertToPseudoNames($result);
-        $contactID = $result->contact_id;
-        $typeImage = CRM_Contact_BAO_Contact_Utils::getImage($result->contact_sub_type ?
-          $result->contact_sub_type : $result->contact_type,
-          FALSE, $contactID
-        );
-
-        $searchRows[$contactID]['id'] = $contactID;
-        $searchRows[$contactID]['name'] = $typeImage . ' ' . $result->sort_name;
-        $searchRows[$contactID]['city'] = $result->city;
-        $searchRows[$contactID]['state'] = $result->state_province;
-        $searchRows[$contactID]['email'] = $result->email;
-        $searchRows[$contactID]['phone'] = $result->phone;
-      }
-    }
-
-    foreach ($searchRows as $cid => $row) {
-      $searchRows[$cid]['check'] = '<input type="checkbox" id="contact_check[' . $cid . ']" name="contact_check[' . $cid . ']" value=' . $cid . ' />';
-
-      if ($typeName == 'Employee of') {
-        $searchRows[$cid]['employee_of'] = '<input type="radio" name="employee_of" value=' . $cid . ' >';
-      }
-      elseif ($typeName == 'Employer of') {
-        $searchRows[$cid]['employer_of'] = '<input type="checkbox"  name="employer_of[' . $cid . ']" value=' . $cid . ' />';
-      }
-    }
-
-    $selectorElements = array('check', 'name');
-    if ($typeName == 'Employee of') {
-      $selectorElements[] = 'employee_of';
-    }
-    elseif ($typeName == 'Employer of') {
-      $selectorElements[] = 'employer_of';
-    }
-    $selectorElements = array_merge($selectorElements, array('city', 'state', 'email', 'phone'));
-
-    $iFilteredTotal = $iTotal;
-    echo CRM_Utils_JSON::encodeDataTableSelector($searchRows, $sEcho, $iTotal, $iFilteredTotal, $selectorElements);
-    CRM_Utils_System::civiExit();
-  }
-
   /**
    * Function to process dupes.
    *
@@ -1122,23 +997,6 @@ LIMIT {$offset}, {$rowCount}
     CRM_Utils_System::civiExit();
   }
 
-  static function relationshipContactTypeList() {
-    $relType = CRM_Utils_Array::value('relType', $_REQUEST);
-
-    $types = CRM_Contact_BAO_Relationship::getValidContactTypeList($relType);
-
-    $elements = array();
-    foreach ($types as $key => $label) {
-      $elements[] = array(
-        'name' => $label,
-        'value' => $key,
-      );
-    }
-
-    echo json_encode($elements);
-    CRM_Utils_System::civiExit();
-  }
-
   static function selectUnselectContacts() {
     $name         = CRM_Utils_Array::value('name', $_REQUEST);
     $cacheKey     = CRM_Utils_Array::value('qfKey', $_REQUEST);
@@ -1196,6 +1054,66 @@ LIMIT {$offset}, {$rowCount}
     }
 
     echo json_encode($addressVal);
+    CRM_Utils_System::civiExit();
+  }
+
+  /**
+   * Function to retrieve contact relationships
+   */
+  public static function getContactRelationships() {
+    $contactID = CRM_Utils_Type::escape($_GET['cid'], 'Integer');
+    $context = CRM_Utils_Type::escape($_GET['context'], 'String');
+
+    $sortMapper = array(
+      0 => 'relation',
+      1 => 'sort_name',
+      2 => 'start_date',
+      3 => 'end_date',
+      4 => 'city',
+      5 => 'state',
+      6 => 'email',
+      7 => 'phone',
+      8 => 'links',
+      9 => '',
+      10 => '',
+    );
+
+    $sEcho     = CRM_Utils_Type::escape($_REQUEST['sEcho'], 'Integer');
+    $offset    = isset($_REQUEST['iDisplayStart']) ? CRM_Utils_Type::escape($_REQUEST['iDisplayStart'], 'Integer') : 0;
+    $rowCount  = isset($_REQUEST['iDisplayLength']) ? CRM_Utils_Type::escape($_REQUEST['iDisplayLength'], 'Integer') : 25;
+    $sort      = isset($_REQUEST['iSortCol_0']) ? CRM_Utils_Array::value(CRM_Utils_Type::escape($_REQUEST['iSortCol_0'], 'Integer'), $sortMapper) : NULL;
+    $sortOrder = isset($_REQUEST['sSortDir_0']) ? CRM_Utils_Type::escape($_REQUEST['sSortDir_0'], 'String') : 'asc';
+
+    $params = $_POST;
+    if ($sort && $sortOrder) {
+      $params['sortBy'] = $sort . ' ' . $sortOrder;
+    }
+
+    $params['page'] = ($offset / $rowCount) + 1;
+    $params['rp'] = $rowCount;
+
+    $params['contact_id'] = $contactID;
+    $params['context'] = $context;
+
+    // get the contact relationships
+    $relationships = CRM_Contact_BAO_Relationship::getContactRelationshipSelector($params);
+
+    $iFilteredTotal = $iTotal = $params['total'];
+    $selectorElements = array(
+      'relation',
+      'name',
+      'start_date',
+      'end_date',
+      'city',
+      'state',
+      'email',
+      'phone',
+      'links',
+      'id',
+      'is_active',
+    );
+
+    echo CRM_Utils_JSON::encodeDataTableSelector($relationships, $sEcho, $iTotal, $iFilteredTotal, $selectorElements);
     CRM_Utils_System::civiExit();
   }
 }

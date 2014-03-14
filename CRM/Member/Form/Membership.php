@@ -546,7 +546,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
     }
 
     if ($this->_context == 'standalone') {
-      CRM_Contact_Form_NewContact::buildQuickForm($this);
+      $this->addEntityRef('contact_id', ts('Contact'), array('create' => TRUE), TRUE);
     }
 
     $selOrgMemType[0][0] = $selMemTypeOrg[0] = ts('- select -');
@@ -771,9 +771,8 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
       //CRM-10223 - allow contribution to be recorded against different contact
       // causes a conflict in standalone mode so skip in standalone for now
       $this->addElement('checkbox', 'is_different_contribution_contact', ts('Record Payment from a Different Contact?'));
-      $this->add('select', 'soft_credit_type_id', ts('Membership payment is : '),
-        array('' => ts('- Select - ')) + CRM_Core_OptionGroup::values("soft_credit_type", FALSE));
-      CRM_Contact_Form_NewContact::buildQuickForm($this, 1, NULL, FALSE, 'contribution_');
+      $this->addSelect('soft_credit_type_id', array('entity' => 'contribution_soft'));
+      $this->addEntityRef('soft_credit_contact_id', ts('Payment From'), array('create' => TRUE));
     }
 
     $this->addElement('checkbox',
@@ -912,11 +911,6 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
           $errors['_qf_default'] = ts('Please do not select more than one membership associated with the same organization.');
         }
       }
-    }
-
-    //check if contact is selected in standalone mode
-    if (isset($params['contact_select_id'][1]) && !$params['contact_select_id'][1]) {
-      $errors['contact[1]'] = ts('Please select a contact or create new contact');
     }
 
     if (!empty($errors)) {

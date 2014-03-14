@@ -16,13 +16,10 @@
     </primaryKey>
     <field>
         <name>name</name>
-        <type>enum</type>
-        <values>AOL, Away, DNS, Host, Inactive, Invalid, Loop, Quota, Relay, Spam, Syntax, Unknown</values>
+        <type>varchar</type>
+        <length>8</length>
         <required>true</required>
         <comment>Type of bounce</comment>
-        <html>
-          <type>Select</type>
-        </html>
     </field>
     <field>
         <name>description</name>

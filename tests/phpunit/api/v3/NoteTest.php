@@ -279,7 +279,7 @@ class api_v3_NoteTest extends CiviUnitTestCase {
  *  Test civicrm_activity_create() using example code
  */
 function testNoteCreateExample() {
-  require_once 'api/v3/examples/NoteCreate.php';
+  require_once 'api/v3/examples/Note/Create.php';
   $result = UF_match_get_example();
   $expectedResult = UF_match_get_expectedresult();
   $this->assertEquals($result, $expectedResult);

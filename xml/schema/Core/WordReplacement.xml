@@ -50,9 +50,12 @@
   </index>
   <field>
        <name>match_type</name>
-       <type>enum</type>
-       <values>wildcardMatch, exactMatch</values>
+       <type>varchar</type>
+       <length>16</length>
        <default>"wildcardMatch"</default>
+       <pseudoconstant>
+         <callback>CRM_Core_SelectValues::getWordReplacementMatchType</callback>
+       </pseudoconstant>
        <add>4.4</add>
        <html>
          <type>Select</type>

@@ -231,6 +231,7 @@ class CRM_Member_BAO_Query {
             $query->_qill[$grouping][] = ts('Membership is a Test');
           }
         }
+        $query->_tables['civicrm_membership'] = $query->_whereTables['civicrm_membership'] = 1;
         return;
 
       case 'member_auto_renew':
@@ -424,10 +425,10 @@ class CRM_Member_BAO_Query {
 
     CRM_Core_Form_Date::buildDateRange($form, 'member_end_date', 1, '_low', '_high', ts('From'), FALSE);
 
-    $form->addYesNo('member_is_primary', ts('Primary Member?'));
-    $form->addYesNo('member_pay_later', ts('Pay Later?'));
-    $form->addYesNo('member_auto_renew', ts('Auto-Renew?'));
-    $form->addYesNo('member_test', ts('Membership is a Test?'));
+    $form->addYesNo('member_is_primary', ts('Primary Member?'), TRUE);
+    $form->addYesNo('member_pay_later', ts('Pay Later?'), TRUE);
+    $form->addYesNo('member_auto_renew', ts('Auto-Renew?'), TRUE);
+    $form->addYesNo('member_test', ts('Membership is a Test?'), TRUE);
 
     // add all the custom  searchable fields
     $extends = array('Membership');

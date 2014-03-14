@@ -2338,7 +2338,7 @@ INSERT INTO civicrm_state_province (id, country_id, abbreviation, name) VALUES
 (3879, 1156, "S", "Tahoua"),
 (3880, 1156, "6", "Tillaberi"),
 (3881, 1156, "7", "Zinder"),
-(3882, 1157, "FC", "Abuja Capital Territory"),
+(3882, 1157, "FC", "Abuja Federal Capital Territory"),
 (3883, 1157, "AB", "Abia"),
 (3884, 1157, "AD", "Adamawa"),
 (3885, 1157, "AK", "Akwa Ibom"),
@@ -2435,7 +2435,7 @@ INSERT INTO civicrm_state_province (id, country_id, abbreviation, name) VALUES
 (3976, 1154, "STL", "Southland"),
 (3977, 1154, "TKI", "Taranaki"),
 (3978, 1154, "TAS", "Tasman"),
-(3979, 1154, "WKO", "waikato"),
+(3979, 1154, "WKO", "Waikato"),
 (3980, 1154, "WGN", "Wellington"),
 (3981, 1154, "WTC", "West Coast"),
 (3982, 1162, "DA", "Ad Dakhillyah"),
@@ -3903,4 +3903,7 @@ INSERT INTO civicrm_state_province (id, country_id, abbreviation, name) VALUES
 -- CRM-13314 Added States for Uruguay
 (NULL, 1229, "FL", "Florida"),
 (NULL, 1229, "RN", "Rio Negro"),
-(NULL, 1229, "SJ", "San Jose");
+(NULL, 1229, "SJ", "San Jose"),
+
+-- Added Nigeria States(CRM-14183)
+(NULL, 1157, "PL", "Plateau");

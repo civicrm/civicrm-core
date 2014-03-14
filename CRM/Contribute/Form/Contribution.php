@@ -228,6 +228,9 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $this->preProcessPledge();
     }
 
+    if ($this->_id) {
+      $this->showRecordLinkMesssage($this->_id);
+    }
     $this->_values = array();
 
     // current contribution id
@@ -592,7 +595,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     $this->assign('entityID', $this->_id);
 
     if ($this->_context == 'standalone') {
-      CRM_Contact_Form_NewContact::buildQuickForm($this);
+      $this->addEntityRef('contact_id', ts('Contact'), array('create' => TRUE), TRUE);
     }
 
     $attributes = CRM_Core_DAO::getAttribute('CRM_Contribute_DAO_Contribution');
@@ -860,11 +863,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
   static function formRule($fields, $files, $self) {
     $errors = array();
 
-    //check if contact is selected in standalone mode
-    if (isset($fields['contact_select_id'][1]) && !$fields['contact_select_id'][1]) {
-      $errors['contact[1]'] = ts('Please select a contact or create new contact');
-    }
-
     //check for Credit Card Contribution.
     if ($self->_mode) {
       if (empty($fields['payment_processor_id'])) {
@@ -1034,7 +1032,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       }
     }
     else {
-      $isEmpty = array_keys(array_flip($submittedValues['soft_credit_contact_select_id']));
+      $isEmpty = array_keys(array_flip($submittedValues['soft_credit_contact_id']));
       if ($this->_id && count($isEmpty) == 1 && key($isEmpty) == NULL) {
         //Delete existing soft credit records if soft credit list is empty on update
         CRM_Contribute_BAO_ContributionSoft::del(array('contribution_id' => $this->_id));
@@ -1042,7 +1040,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       else {
         //build soft credit params
         $softParams = $softIDs =array();
-        foreach ($submittedValues['soft_credit_contact_select_id'] as $key => $val) {
+        foreach ($submittedValues['soft_credit_contact_id'] as $key => $val) {
           if ($val && $submittedValues['soft_credit_amount'][$key]) {
             $softParams[$key]['contact_id'] = $val;
             $softParams[$key]['amount'] = CRM_Utils_Rule::cleanMoney($submittedValues['soft_credit_amount'][$key]);
@@ -1056,8 +1054,8 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     }
 
     // set the contact, when contact is selected
-    if (!empty($submittedValues['contact_select_id'])) {
-      $this->_contactID = $submittedValues['contact_select_id'][1];
+    if (!empty($submittedValues['contact_id'])) {
+      $this->_contactID = $submittedValues['contact_id'];
     }
 
     $config = CRM_Core_Config::singleton();
@@ -1319,6 +1317,11 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $session->replaceUserContext(CRM_Utils_System::url('civicrm/contact/view/contribution',
         "reset=1&action=add&context={$this->_context}&cid={$this->_contactID}"
       ));
+    }
+
+    //store contribution ID if not yet set (on create)
+    if ( empty($this->_id) && !empty($contribution->id) ) {
+      $this->_id = $contribution->id;
     }
   }
 

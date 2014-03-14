@@ -106,9 +106,12 @@
   </field>
   <field>
     <name>duration_unit</name>
-    <type>enum</type>
-    <values>day, month, year, lifetime</values>
+    <type>varchar</type>
+    <length>8</length>
     <comment>Unit in which membership period is expressed.</comment>
+    <pseudoconstant>
+      <callback>CRM_Core_SelectValues::membershipTypeUnitList</callback>
+    </pseudoconstant>
     <add>1.5</add>
     <html>
       <type>Select</type>
@@ -122,9 +125,12 @@
   </field>
   <field>
     <name>period_type</name>
-    <type>enum</type>
-    <values>rolling, fixed</values>
+    <type>varchar</type>
+    <length>8</length>
     <comment>Rolling membership period starts on signup date. Fixed membership periods start on fixed_period_start_day.</comment>
+    <pseudoconstant>
+      <callback>CRM_Core_SelectValues::periodType</callback>
+    </pseudoconstant>
     <add>1.5</add>
   </field>
   <field>

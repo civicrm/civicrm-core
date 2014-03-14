@@ -64,13 +64,11 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
   public function preProcess() {
     parent::preProcess();
     $session = CRM_Core_Session::singleton();
-    if (!$this->_gName) {
-      $this->_gName = CRM_Utils_Request::retrieve('group', 'String', $this, FALSE, 0);
-      $this->_gid = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup',
-        $this->_gName,
-        'id',
-        'name'
-      );
+    if (!$this->_gName && !empty($this->urlPath[3])) {
+      $this->_gName = $this->urlPath[3];
+    }
+    if (!$this->_gName && !empty($_GET['gid'])) {
+      $this->_gName = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup', (int) $_GET['gid'], 'name');
     }
     if ($this->_gName) {
       $this->set('gName', $this->_gName);
@@ -78,6 +76,11 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
     else {
       $this->_gName = $this->get('gName');
     }
+    $this->_gid = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup',
+      $this->_gName,
+      'id',
+      'name'
+    );
     $this->_gLabel = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup', $this->_gid, 'title');
     $url          = "civicrm/admin/options/{$this->_gName}";
     $params       = "reset=1";
@@ -280,6 +283,7 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
       'case_type',
       'payment_instrument',
       'communication_style',
+      'soft_credit_type',
     );
 
     if (in_array($this->_gName, $showIsDefaultGroups)) {

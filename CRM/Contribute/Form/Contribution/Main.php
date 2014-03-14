@@ -111,7 +111,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     }
     $this->assign('onBehalfRequired', $this->_onBehalfRequired);
 
-    if (!empty($this->_values['honor_block_is_active'])) {
+    if ($this->_honor_block_is_active) {
       CRM_Contact_Form_ProfileContact::preprocess($this);
     }
 
@@ -259,7 +259,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
         }
       }
 
-      if (!empty($this->_values['honor_block_is_active']) && count($completedContributionIds)) {
+      if ($this->_honor_block_is_active && count($completedContributionIds)) {
         $softCredit = array();
         foreach ($completedContributionIds as $id) {
           $softCredit = CRM_Contribute_BAO_ContributionSoft::getSoftContribution($id);
@@ -494,9 +494,8 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     }
 
     //add honor block
-    if ($this->_values['honor_block_is_active']) {
+    if ($this->_honor_block_is_active) {
       $this->assign('honor_block_is_active', TRUE);
-      $this->set('honor_block_is_active', TRUE);
 
       //build soft-credit section
       CRM_Contribute_Form_SoftCredit::buildQuickForm($this);
@@ -546,11 +545,11 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     }
     if ($this->_pcpId) {
       if ($pcpSupporter = CRM_PCP_BAO_PCP::displayName($this->_pcpId)) {
-        $pcp_supporter_text = ts('This contribution is being made thanks to effort of <strong>%1</strong>, who supports our campaign. ', array(1 => $pcpSupporter));
+        $pcp_supporter_text = ts('This contribution is being made thanks to the effort of <strong>%1</strong>, who supports our campaign.', array(1 => $pcpSupporter));
         // Only tell people that can also create a PCP if the contribution page has a non-empty value in the "Create Personal Campaign Page link" field.
         $text = CRM_PCP_BAO_PCP::getPcpBlockStatus($this->_id, 'contribute');
         if(!empty($text)) {
-          $pcp_supporter_text .= "You can support it as well - once you complete the donation, you will be able to create your own Personal Campaign Page!";
+          $pcp_supporter_text .= ts("You can support it as well - once you complete the donation, you will be able to create your own Personal Campaign Page!");
         }
         $this->assign('pcpSupporterText', $pcp_supporter_text);
       }
@@ -1162,7 +1161,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     //If the membership & contribution is used in contribution page & not seperate payment
     $fieldId = $memPresent = $membershipLabel = $fieldOption = $is_quick_config = NULL;
     $proceFieldAmount = 0;
-    if ($this->_separateMembershipPayment == 0) {
+    if (property_exists($this, '_separateMembershipPayment') && $this->_separateMembershipPayment == 0) {
       $is_quick_config = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $this->_priceSetId, 'is_quick_config');
       if ($is_quick_config) {
         foreach ($this->_priceSet['fields'] as $fieldKey => $fieldVal) {

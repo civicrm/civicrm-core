@@ -126,7 +126,7 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
     }
 
     //get the frequency units.
-    $this->_freqUnits = array('hour' => 'hour') + CRM_Core_OptionGroup::values('recur_frequency_units');
+    $this->_freqUnits = CRM_Core_SelectValues::getScheduleReminderFrequencyUnits();
 
     //pass the mapping ID in UPDATE mode
     $mappings = CRM_Core_BAO_ActionSchedule::getMapping($mappingID);
@@ -212,13 +212,6 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
     $recipientListing->setMultiple(TRUE);
     $this->add('hidden', 'is_recipient_listing', empty($recipientListingOptions) ? FALSE : TRUE, array('id' => 'is_recipient_listing'));
 
-    //auto-complete url
-    $dataUrl = CRM_Utils_System::url('civicrm/ajax/rest',
-      'className=CRM_Contact_Page_AJAX&fnName=getContactList&json=1&context=activity&reset=1',
-      FALSE, NULL, FALSE
-    );
-
-    $this->assign('dataUrl', $dataUrl);
     //token input url
     $tokenUrl = CRM_Utils_System::url('civicrm/ajax/checkemail',
       'noemail=1',
@@ -273,7 +266,7 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
     }
 
     if (!CRM_Utils_System::isNull($fields['absolute_date'])) {
-      if (CRM_Utils_Date::format(CRM_Utils_Date::processDate($fields['absolute_date'], NULL)) < CRM_Utils_Date::format(date('YmdHi00'))) {
+      if (CRM_Utils_Date::format(CRM_Utils_Date::processDate($fields['absolute_date'], NULL)) < CRM_Utils_Date::format(date('Ymd'))) {
         $errors['absolute_date'] = ts('Absolute date cannot be earlier than the current time.');
       }
     }

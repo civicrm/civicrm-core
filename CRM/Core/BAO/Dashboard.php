@@ -42,12 +42,13 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
    * Get the list of dashlets enabled by admin
    *
    * @param boolean $all all or only active
+   * @param boolean $checkPermission all or only authorized for the current user
    *
    * @return array $widgets  array of dashlets
    * @access public
    * @static
    */
-  static function getDashlets($all = TRUE) {
+  static function getDashlets($all = TRUE, $checkPermission = TRUE) {
     $dashlets = array();
     $dao = new CRM_Core_DAO_Dashboard();
 
@@ -59,7 +60,7 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
 
     $dao->find();
     while ($dao->fetch()) {
-      if (!self::checkPermission($dao->permission, $dao->permission_operator)) {
+      if ($checkPermission && !self::checkPermission($dao->permission, $dao->permission_operator)) {
         continue;
       }
 

@@ -27,7 +27,48 @@
 {if $action eq 0 or $action eq 1 or $action eq 2 or $recordActivity}
   {include file="CRM/Contact/Form/CustomData.tpl" mainEdit=$mainEditForm}
 {/if}
+{if $displayStyle eq 'tableOriented'}
+  {include file='CRM/Profile/Page/MultipleRecordFieldsListing.tpl' showListing=1 dontShowTitle=1 pageViewType='customDataView'}
+  {literal}
+  <script type="text/javascript">
+    function showDeleteInDialog(valueID, groupID, contactID, redirectUrl) {
+      var confirmText = '{/literal}{ts escape='js'}Are you sure you want to delete this record?{/ts}{literal}';
+      cj('#browseValues').after("<div id='delete-record'></div>");
+        cj('#delete-record').html(confirmText).dialog({
+          title: "{/literal}{ts escape='js'}Delete Record{/ts}{literal}",
+          modal: true,
+          width: 680,
+          overlay: {
+            opacity: 0.5,
+            background: "black"
+          },
 
+          buttons: {
+          {/literal}"{ts escape='js'}Cancel{/ts}"{literal}: function() {
+            cj(this).dialog("close");
+            cj('#delete-record').html('');
+          },
+          {/literal}"{ts escape='js'}OK{/ts}{literal}": function() {
+            deleteCustomValueRec(valueID, groupID, contactID, redirectUrl);
+          }
+        }
+        });
+    }
+
+    function deleteCustomValueRec(valueID, groupID, contactID, redirectUrl) {
+      var postUrl = {/literal}"{crmURL p='civicrm/ajax/customvalue' h=0 }"{literal};
+      cj.ajax({
+        type: "POST",
+        data: "valueID=" + valueID + "&groupID=" + groupID + "&contactId=" + contactID + "&key={/literal}{crmKey name='civicrm/ajax/customvalue'}{literal}",
+        url: postUrl,
+        success: function (html) {
+          window.location.href = redirectUrl;
+        }
+      });
+    }
+  </script>
+  {/literal}
+{else}
 {strip}
   {if $action eq 16 or $action eq 4} {* Browse or View actions *}
     <div class="form-item">
@@ -51,4 +92,5 @@
     {* hide and display the appropriate blocks as directed by the php code *}
     on_load_init_blocks(showBlocks, hideBlocks);
   </script>
+{/if}
 {/if}

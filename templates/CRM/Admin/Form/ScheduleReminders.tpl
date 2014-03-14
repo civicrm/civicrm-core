@@ -59,14 +59,10 @@
 
     eval( 'tokenClass = { tokenList: "token-input-list-facebook", token: "token-input-token-facebook", tokenDelete: "token-input-delete-token-facebook", selectedToken: "token-input-selected-token-facebook", highlightedToken: "token-input-highlighted-token-facebook", dropdown: "token-input-dropdown-facebook", dropdownItem: "token-input-dropdown-item-facebook", dropdownItem2: "token-input-dropdown-item2-facebook", selectedDropdownItem: "token-input-selected-dropdown-item-facebook", inputToken: "token-input-input-token-facebook" } ');
 
-    var sourceDataUrl = "{/literal}{$dataUrl}{literal}";
     var tokenDataUrl  = "{/literal}{$tokenUrl}{literal}";
     var hintText = "{/literal}{ts escape='js'}Type in a partial or complete name of an existing recipient.{/ts}{literal}";
     cj( "#recipient_manual_id").tokenInput( tokenDataUrl, { prePopulate: recipient_manual, classes: tokenClass, hintText: hintText });
     cj( 'ul.token-input-list-facebook, div.token-input-dropdown-facebook' ).css( 'width', '450px' );
-    cj('#source_contact_id').autocomplete( sourceDataUrl, { width : 180, selectFirst : false, hintText: hintText, matchContains: true, minChars: 1
-                                }).result( function(event, data, formatted) {
-                                }).bind( 'click', function( ) {  });
     });
     </script>
     {/literal}
@@ -195,11 +191,6 @@
             cj('#relativeDate').show();
             cj('#relativeDateRepeat').show();
         }
-    });
-
-    cj('#absolute_date_display').parent( ).children('.crm-clear-link').children('a').click( function() {
-        cj('#relativeDate').show();
-        cj('#relativeDateRepeat').show();
     });
 
     cj(function() {

@@ -442,17 +442,17 @@ WHERE   cas.entity_value = $id AND
         foreach ($matches[1] as $token) {
           list($type, $name) = preg_split('/\./', $token, 2);
           if ($name) {
-            if (!isset($subjectToken['contact'])) {
-              $subjectToken['contact'] = array();
+            if (!isset($subjectToken[$type])) {
+              $subjectToken[$type] = array();
             }
-            $subjectToken['contact'][] = $name;
+            $subjectToken[$type][] = $name;
           }
         }
       }
 
       $messageSubject = CRM_Utils_Token::replaceContactTokens($body_subject, $contact, FALSE, $subjectToken);
-      $messageSubject = CRM_Utils_Token::replaceDomainTokens($messageSubject, $domain, TRUE, $tokens[$value]);
-      $messageSubject = CRM_Utils_Token::replaceComponentTokens($messageSubject, $contact, $tokens[$value], TRUE);
+      $messageSubject = CRM_Utils_Token::replaceDomainTokens($messageSubject, $domain, TRUE, $subjectToken);
+      $messageSubject = CRM_Utils_Token::replaceComponentTokens($messageSubject, $contact, $subjectToken, TRUE);
       $messageSubject = CRM_Utils_Token::replaceHookTokens($messageSubject, $contact, $categories, TRUE);
 
       $messageSubject = $smarty->fetch("string:{$messageSubject}");
@@ -731,7 +731,12 @@ WHERE reminder.action_schedule_id = %1 AND reminder.action_date_time IS NULL
           }
           elseif ($field == 'balance') {
             $info = CRM_Contribute_BAO_Contribution::getPaymentInfo($dao->entityID, 'event');
-            $entityTokenParams["{$tokenEntity}." . $field] = CRM_Utils_Array::value('balance', $info);
+            $balancePay = CRM_Utils_Array::value('balance', $info);
+            $balancePay = CRM_Utils_Money::format($balancePay);
+            $entityTokenParams["{$tokenEntity}." . $field] = $balancePay;
+          }
+          elseif ($field == 'fee_amount') {
+            $entityTokenParams["{$tokenEntity}." . $field] = CRM_Utils_Money::format($dao->$field);
           }
           else {
             $entityTokenParams["{$tokenEntity}." . $field] = $dao->$field;

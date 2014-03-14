@@ -63,8 +63,8 @@
         {/if}
         <tr>
           <td class="label">{$form.attachFile_1.label}</td>
-          <td>{$form.attachFile_1.html}&nbsp;{$form.attachDesc_1.html}<span class="crm-clear-link">(<a href="#" onclick="clearAttachment( '#attachFile_1', '#attachDesc_1' ); return false;">{ts}clear{/ts}</a>)</span><br />
-            <span class="description">{ts}Browse to the <strong>file</strong> you want to upload.{/ts}{if $maxAttachments GT 1} {ts 1=$maxAttachments}You can have a maximum of %1 attachment(s).{/ts}{/if} Each file must be less than {$config->maxFileSize}M in size. You can also add a short description.</span>
+          <td>{$form.attachFile_1.html}&nbsp;{$form.attachDesc_1.html}<a href="#" class="crm-hover-button" title="{ts}Clear{/ts}" onclick="clearAttachment( '#attachFile_1', '#attachDesc_1' ); return false;"><span class="icon close-icon"></span></a><br />
+            <span class="description">{ts}Browse to the <strong>file</strong> you want to upload.{/ts}{if $maxAttachments GT 1} {ts 1=$maxAttachments}You can have a maximum of %1 attachment(s).{/ts}{/if} {ts 1=$config->maxFileSize}Each file must be less than %1M in size. You can also add a short description.{/ts}</span>
           </td>
         </tr>
         {if $form.tag_1.html}
@@ -84,7 +84,7 @@
             <tr class="attachment-fieldset"><td colspan="2"></td></tr>
             <tr>
                 <td class="label">{$form.attachFile_1.label}</td>
-                <td>{$form.$attachName.html}&nbsp;{$form.$attachDesc.html}<span class="crm-clear-link">(<a href="#" onclick="clearAttachment( '#{$attachName}' ); return false;">{ts}clear{/ts}</a>)</span></td>
+                <td>{$form.$attachName.html}&nbsp;{$form.$attachDesc.html}<a href="#" class="crm-hover-button" title="{ts}Clear{/ts}" onclick="clearAttachment( '#{$attachName}' ); return false;"><span class="icon close-icon"></span></a></td>
             </tr>
             <tr>
               <td></td>

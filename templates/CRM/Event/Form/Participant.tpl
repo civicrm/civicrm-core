@@ -24,6 +24,8 @@
  +--------------------------------------------------------------------+
 *}
 {* This template is used for adding/editing/deleting offline Event Registrations *}
+
+{* Ajax callback for showing event fee snippet *}
 {if $showFeeBlock}
   {if $priceSet}
   <div id='validate_pricefield' class='messages crm-error hiddenElement'></div>
@@ -129,8 +131,8 @@
     }
 
   // change the status to default 'partially paid' for partial payments
-  var feeAmount;
-  var userModifiedAmount;
+  var feeAmount, userModifiedAmount;
+  var partiallyPaidStatusId = {/literal}{$partiallyPaidStatusId}{literal};
 
   cj('#total_amount')
    .focus(
@@ -144,19 +146,20 @@
       userModifiedAmount = cj(this).val();
       userModifiedAmount = parseInt(userModifiedAmount);
       if (userModifiedAmount < feeAmount) {
-        cj('#status_id').val(CRM.partiallyPaidStatusId);
+        cj('#status_id').val(partiallyPaidStatusId).change();
       }
     }
   );
 
-  cj('#Participant').submit(
+  cj('#Participant').on("click",'.validate',
     function(e) {
       var userSubmittedStatus = cj('#status_id').val();
       var statusLabel = cj('#status_id option:selected').text();
-      if (userModifiedAmount < feeAmount && userSubmittedStatus != CRM.partiallyPaidStatusId) {
-        var result = confirm('Payment amount is less than the amount owed. Expected participant status is \'Partially paid\'. Are you sure you want to set the participant status to ' + statusLabel + '? Click OK to continue, Cancel to change your entries.');
+      if (userModifiedAmount < feeAmount && userSubmittedStatus != partiallyPaidStatusId) {
+        var msg = "{/literal}{ts escape="js" 1="%1"}Payment amount is less than the amount owed. Expected participant status is 'Partially paid'. Are you sure you want to set the participant status to %1? Click OK to continue, Cancel to change your entries.{/ts}{literal}";
+        var result = confirm(ts(msg, {1: statusLabel}));
         if (result == false) {
-          e.preventDefault();
+          return false;
         }
       }
     }
@@ -164,9 +167,14 @@
   </script>
   {/literal}
   {/if}
+
   {include file="CRM/Event/Form/EventFees.tpl"}
+
+{* Ajax callback for custom data snippet *}
 {elseif $cdType}
   {include file="CRM/Custom/Form/CustomData.tpl"}
+
+{* Main event form template *}
 {else}
   {if $participantMode == 'test' }
     {assign var=registerMode value="TEST"}
@@ -218,7 +226,10 @@
             {if !$participantMode and !$email and $outBound_option != 2 }
               {assign var='profileCreateCallback' value=1}
             {/if}
-          {include file="CRM/Contact/Form/NewContact.tpl"}
+            <tr class="crm-participant-form-contact-id">
+              <td class="label">{$form.contact_id.label}</td>
+              <td>{$form.contact_id.html}</td>
+            </tr>
           {/if}
           {if $action EQ 2}
             {if $additionalParticipants} {* Display others registered by this participant *}
@@ -248,19 +259,17 @@
             </tr>
           {/if}
           <tr class="crm-participant-form-block-event_id">
-            <td class="label">{$form.event_id.label}</td><td class="view-value bold">{$form.event_id.html}&nbsp;
-            {if $action eq 1}<span id='past-event-section'>
-              <br />&raquo; <span id="showing-event-info"></span>
-            {/if}
-            {if $is_test}
-              {ts}(test){/ts}
-            {/if}
-          </td>
+            <td class="label">{$form.event_id.label}</td>
+            <td class="view-value">
+              {$form.event_id.html}
+              {if $is_test}
+                {ts}(test){/ts}
+              {/if}
+            </td>
           </tr>
 
         {* CRM-7362 --add campaign *}
-        {include file="CRM/Campaign/Form/addCampaignToComponent.tpl"
-        campaignTrClass="crm-participant-form-block-campaign_id"}
+        {include file="CRM/Campaign/Form/addCampaignToComponent.tpl" campaignTrClass="crm-participant-form-block-campaign_id"}
 
           <tr class="crm-participant-form-block-role_id">
             <td class="label">{$form.role_id.label}</td>
@@ -287,7 +296,7 @@
             <span class="description">{ts}Source for this registration (if applicable).{/ts}</span></td>
           </tr>
         </table>
-       {if $participantId}
+       {if $participantId and $hasPayment}
         <table class='form-layout'>
           <tr>
             <td class='label'>{ts}Fees{/ts}</td>
@@ -321,306 +330,257 @@
       <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
     </div>
   </div>
+  {* JS block for ADD or UPDATE actions only *}
   {if $action eq 1 or $action eq 2}
-    {if $participantId}
+    {if $participantId and $hasPayment}
       {include file="CRM/Contribute/Page/PaymentInfo.tpl" show='event-payment'}
     {/if}
-    {literal}
+
+    {*include custom data js file*}
+    {include file="CRM/common/customData.tpl"}
+
     <script type="text/javascript">
-    // event select
-    function buildSelect( selectID, listallVal ) {
-      var elementID = '#' + selectID;
-      cj( elementID ).html('');
-      var postUrl = "{/literal}{crmURL p='civicrm/ajax/eventlist' h=0}{literal}";
-      cj.post( postUrl, {listall:listallVal}, function ( response ) {
-        response = eval( response );
-        for (i = 0; i < response.length; i++) {
-          cj( elementID ).get(0).add(new Option(response[i].name, response[i].value), document.all ? i : null);
-        }
-        getShowEventInfo(listallVal);
-        cj('input[name="past_event"]').val(listallVal);
-        cj("#feeBlock").html( '' );
-      });
-    }
-
-    {/literal}
-    {if $action eq 1}getShowEventInfo({$past});{/if}
-    {literal}
-
-    function getShowEventInfo (listallVal) {
-      switch(listallVal) {
-        case 1:
-          cj('#showing-event-info').html({/literal}'{ts}Showing all events: show{/ts}'{literal}+' <a href="#" onclick="buildSelect(\'event_id\', 0); return false;">'+{/literal}'{ts}current and future{/ts}'{literal}+'</a> | <a href="#" onclick="buildSelect(\'event_id\', 2); return false;">'+{/literal}'{ts}past three months{/ts}'{literal}+'</a>');
-          break;
-        case 2:
-          cj('#showing-event-info').html({/literal}'{ts}Showing events since three months ago: show{/ts}'{literal}+' <a href="#" onclick="buildSelect(\'event_id\', 0); return false;">'+{/literal}'{ts}current and future{/ts}'{literal}+'</a> | <a href="#" onclick="buildSelect(\'event_id\', 1); return false;">'+{/literal}'{ts}all{/ts}'{literal}+'</a>');
-          break;
-        default:
-          cj('#showing-event-info').html({/literal}'{ts}Showing current and future events: show{/ts}'{literal}+' <a href="#" onclick="buildSelect(\'event_id\', 2); return false;">'+{/literal}'{ts}past three months{/ts}'{literal}+'</a> | <a href="#" onclick="buildSelect(\'event_id\', 1); return false;">'+{/literal}'{ts}all{/ts}'{literal}+'</a>');
-          break;
-      }
-    }
-    {/literal}
-
-    {if $preloadJSSnippet}
-      {$preloadJSSnippet}
-    {else}
-      //build fee block
-      buildFeeBlock( );
-    {/if}
-
-    {literal}
-    //build discount block
-    if ( document.getElementById('discount_id') ) {
-      var discountId  = document.getElementById('discount_id').value;
-      if ( discountId ) {
-        var eventId  = document.getElementById('event_id').value;
-        buildFeeBlock( eventId, discountId );
-      }
-    }
-
-    function buildFeeBlock( eventId, discountId )  {
-      var dataUrl = {/literal}"{crmURL p=$urlPath h=0 q='snippet=4'}";
-      dataUrl = dataUrl + '&qfKey=' + '{$qfKey}'
-
-      {if $urlPathVar}
-        dataUrl = dataUrl + '&' + '{$urlPathVar}'
-      {/if}
-
       {literal}
-      if ( !eventId ) {
-        var eventId  = document.getElementById('event_id').value;
-      }
+      cj(function($) {
 
-      if ( eventId) {
-        dataUrl = dataUrl + '&eventId=' + eventId;
-      }
-      else {
-        cj('#eventFullMsg').hide( );
-        cj('#feeBlock').html('');
-        return;
-      }
+        var $form = $('form#{/literal}{$form.formName}{literal}');
 
-      var participantId  = "{/literal}{$participantId}{literal}";
+        // don't show cart related statuses if it's disabled
+        {/literal}{if !$enableCart}{literal}
+          var pendingInCartStatusId = {/literal}{$pendingInCartStatusId}{literal};
+          $("#status_id option[value='" + pendingInCartStatusId + "']").remove();
+        {/literal}{/if}{literal}
 
-      if ( participantId ) {
-        dataUrl = dataUrl + '&participantId=' + participantId;
-      }
+        {/literal}{if $action eq 1}{literal}
+          var pendingRefundStatusId = {/literal}{$pendingRefundStatusId}{literal};
+          $("#status_id option[value='" + pendingRefundStatusId + "']").remove();
+        {/literal}{/if}{literal}
 
-      if ( discountId ) {
-        dataUrl = dataUrl + '&discountId=' + discountId;
-      }
+        // Handle event selection
+        $('#event_id', $form).change(function() {
+          var eventId = $(this).val();
+          if (!eventId) {
+            return;
+          }
+          var info = $(this).select2('data').extra;
 
-      cj.ajax({
-        url: dataUrl,
-        async: false,
-        global: false,
-        success: function ( html ) {
-          cj("#feeBlock").html( html );
+          // Set role from default
+          $('[name^=role_id]:checkbox', $form).each(function() {
+            var check = $(this).is('[name="role_id[' + info.default_role_id + ']"]');
+            if (check !== $(this).prop('checked')) {
+              $(this).prop('checked', check).change();
+            }
+          });
+
+          // Set campaign default
+          $('#campaign_id', $form).select2('val', info.campaign_id);
+
+          // Event and event-type custom data
+          CRM.buildCustomData('Participant', eventId, {/literal}{$eventNameCustomDataTypeID}{literal});
+          CRM.buildCustomData('Participant', info.event_type_id, {/literal}{$eventTypeCustomDataTypeID}{literal});
+
+          buildFeeBlock();
+        });
+
+        // Handle participant role selection
+        $('[name^=role_id]:checkbox', $form).change(function() {
+          var roleId = $(this).attr('name').replace(/role_id\[|\]/g, '');
+          showCustomData('Participant', roleId, {/literal}{$roleCustomDataTypeID}{literal});
+        });
+        $('[name^=role_id]:checked', $form).change();
+
+        buildFeeBlock();
+
+        //build discount block
+        if ($('#discount_id', $form).val()) {
+          buildFeeBlock($('#discount_id', $form).val());
         }
-      });
 
-      cj("#feeBlock").ajaxStart(function(){
-        cj(".disable-buttons input").prop('disabled', true);
-      });
+        //build fee block
+        function buildFeeBlock(discountId)  {
+          var dataUrl = {/literal}"{crmURL p=$urlPath h=0 q="snippet=4&qfKey=$qfKey"}";
 
-      cj("#feeBlock").ajaxStop(function(){
-        cj(".disable-buttons input").prop('disabled', false);
-      });
+          {if $urlPathVar}
+          dataUrl += '&' + '{$urlPathVar}';
+          {/if}
 
-      //show event real full as well as waiting list message.
-      if ( cj("#hidden_eventFullMsg").val( ) ) {
-        cj( "#eventFullMsg" ).show( ).html( cj("#hidden_eventFullMsg" ).val( ) );
-      }
-      else {
-        cj( "#eventFullMsg" ).hide( );
-      }
-    }
+          {literal}
+          var eventId = $('#event_id').val();
 
-  </script>
-  {/literal}
+          {/literal}{if $action eq 2}{literal}
+            if (typeof eventId == 'undefined') {
+              var eventId = $('[name=event_id]').val();
+            }
+          {/literal}{/if}{literal}
 
-  {*include custom data js file*}
-  {include file="CRM/common/customData.tpl"}
-  {literal}
-  <script type="text/javascript">
-    var roleGroupMapper = new Array( );
-    {/literal}
-    {foreach from=$participantRoleIds item="grps" key="rlId"}
-    {literal}
-      roleGroupMapper[{/literal}{$rlId}{literal}] = '{/literal}{$grps}{literal}';
-    {/literal}
-    {/foreach}
-    {literal}
+          if (eventId) {
+            dataUrl += '&eventId=' + eventId;
+          }
+          else {
+            $('#eventFullMsg').hide( );
+            $('#feeBlock').html('');
+            return;
+          }
 
-    function buildParticipantRole( eventID ) {
-      var dataUrl = "{/literal}{crmURL p='civicrm/ajax/rest' q='className=CRM_Event_Page_AJAX&fnName=participantRole&json=1&context=participant' h=0 }"{literal};
+          var participantId  = "{/literal}{$participantId}{literal}";
 
-      if ( !eventId ) {
-        var eventId  = document.getElementById( 'event_id' ).value;
-      }
+          if (participantId) {
+            dataUrl += '&participantId=' + participantId;
+          }
 
-      if ( eventId ) {
-        dataUrl = dataUrl + '&eventId=' + eventID;
-      }
+          if (discountId) {
+            dataUrl += '&discountId=' + discountId;
+          }
 
-      cj.ajax({
-        url: dataUrl,
-        async: false,
-        global: false,
-        dataType: "json",
-        success: function ( response ) {
-          if ( response.role ) {
+          $.ajax({
+            url: dataUrl,
+            async: false,
+            global: false,
+            success: function ( html ) {
+              $("#feeBlock").html( html ).trigger('crmLoad');
+            }
+          });
+
+          $("#feeBlock").ajaxStart(function(){
+            $(".disable-buttons input").prop('disabled', true);
+          });
+
+          $("#feeBlock").ajaxStop(function(){
+            $(".disable-buttons input").prop('disabled', false);
+          });
+
+          //show event real full as well as waiting list message.
+          if ( $("#hidden_eventFullMsg").val( ) ) {
+            $( "#eventFullMsg" ).show( ).html( $("#hidden_eventFullMsg" ).val( ) );
+          }
+          else {
+            $( "#eventFullMsg" ).hide( );
+          }
+        }
+
+        var roleGroupMapper = {/literal}{$participantRoleIds|@json_encode}{literal};
+        function showCustomData( type, subType, subName ) {
+          var dataUrl = {/literal}"{crmURL p=$urlPath h=0 q='snippet=4&type='}"{literal} + type;
+          var roleid = "role_id_"+subType;
+          var loadData = false;
+
+          if ( document.getElementById( roleid ).checked == true ) {
+            if ( typeof roleGroupMapper !== 'undefined' && roleGroupMapper[subType] ) {
+              var splitGroup = roleGroupMapper[subType].split(",");
+              for ( i = 0; i < splitGroup.length; i++ ) {
+                var roleCustomGroupId = splitGroup[i];
+                if ( $( '#'+roleCustomGroupId ).length > 0 ) {
+                  $( '#'+roleCustomGroupId ).remove( );
+                }
+              }
+              loadData = true;
+            }
+          }
+          else {
+            var groupUnload = [];
+            var x = 0;
+
+            if ( roleGroupMapper[0] ) {
+              var splitGroup = roleGroupMapper[0].split(",");
+              for ( x = 0; x < splitGroup.length; x++ ) {
+                groupUnload[x] = splitGroup[x];
+              }
+            }
+
             for ( var i in roleGroupMapper ) {
-              if ( i != 0 ) {
-                if ( i == response.role ) {
-                  document.getElementById("role_id_" +i  ).checked = true;
+              if ( ( i > 0 ) && ( document.getElementById( "role_id_"+i ).checked ) ) {
+                var splitGroup = roleGroupMapper[i].split(",");
+                for ( j = 0; j < splitGroup.length; j++ ) {
+                  groupUnload[x+j+1] = splitGroup[j];
                 }
-                else {
-                  document.getElementById("role_id_" +i  ).checked = false;
+              }
+            }
+
+            if ( roleGroupMapper[subType] ) {
+              var splitGroup = roleGroupMapper[subType].split(",");
+              for ( i = 0; i < splitGroup.length; i++ ) {
+                var roleCustomGroupId = splitGroup[i];
+                if ( $( '#'+roleCustomGroupId ).length > 0 ) {
+                  if ( $.inArray( roleCustomGroupId, groupUnload ) == -1  ) {
+                    $( '#'+roleCustomGroupId ).remove( );
+                  }
                 }
-                showCustomData( 'Participant', i, {/literal} {$roleCustomDataTypeID} {literal} );
               }
             }
           }
-        }
-      });
-    }
 
-    function showCustomData( type, subType, subName ) {
-      var dataUrl = {/literal}"{crmURL p=$urlPath h=0 q='snippet=4&type='}"{literal} + type;
-      var roleid = "role_id_"+subType;
-      var loadData = false;
+          if ( !( loadData ) ) {
+            return false;
+          }
 
-      if ( document.getElementById( roleid ).checked == true ) {
-        if ( roleGroupMapper[subType] ) {
-          var splitGroup = roleGroupMapper[subType].split(",");
-          for ( i = 0; i < splitGroup.length; i++ ) {
-            var roleCustomGroupId = splitGroup[i];
-            if ( cj( '#'+roleCustomGroupId ).length > 0 ) {
-              cj( '#'+roleCustomGroupId ).remove( );
+          if ( subType ) {
+            dataUrl += '&subType=' + subType;
+          }
+
+          if ( subName ) {
+            dataUrl += '&subName=' + subName;
+            $( '#customData' + subName ).show( );
+          }
+          else {
+            $( '#customData' ).show( );
+          }
+
+          {/literal}
+          {if $urlPathVar}
+            dataUrl += '&{$urlPathVar}';
+          {/if}
+          {if $groupID}
+            dataUrl += '&groupID=' + '{$groupID}';
+          {/if}
+          {if $qfKey}
+            dataUrl += '&qfKey=' + '{$qfKey}';
+          {/if}
+          {if $entityID}
+            dataUrl += '&entityID=' + '{$entityID}';
+          {/if}
+
+          {literal}
+
+          if ( subName && subName != 'null' ) {
+            var fname = '#customData' + subName;
+          }
+          else {
+            var fname = '#customData';
+          }
+
+          var response = $.ajax({url: dataUrl,
+            async: false
+          }).responseText;
+
+          if ( subType != 'null' ) {
+            if ( document.getElementById(roleid).checked == true ) {
+              var response_text = '<div style="display:block;" id = '+subType+'_chk >'+response+'</div>';
+              $( fname ).append(response_text).trigger('crmLoad');
+            }
+            else {
+              $('#'+subType+'_chk').remove();
             }
           }
-          loadData = true;
-        }
-      }
-      else {
-        var groupUnload = new Array( );
-        var x = 0;
-
-        if ( roleGroupMapper[0] ) {
-          var splitGroup = roleGroupMapper[0].split(",");
-          for ( x = 0; x < splitGroup.length; x++ ) {
-            groupUnload[x] = splitGroup[x];
-          }
         }
 
-        for ( var i in roleGroupMapper ) {
-          if ( ( i > 0 ) && ( document.getElementById( "role_id_"+i ).checked ) ) {
-            var splitGroup = roleGroupMapper[i].split(",");
-            for ( j = 0; j < splitGroup.length; j++ ) {
-              groupUnload[x+j+1] = splitGroup[j];
-            }
-          }
-        }
-
-        if ( roleGroupMapper[subType] ) {
-          var splitGroup = roleGroupMapper[subType].split(",");
-          for ( i = 0; i < splitGroup.length; i++ ) {
-            var roleCustomGroupId = splitGroup[i];
-            if ( cj( '#'+roleCustomGroupId ).length > 0 ) {
-              if ( cj.inArray( roleCustomGroupId, groupUnload ) == -1  ) {
-                cj( '#'+roleCustomGroupId ).remove( );
-              }
-            }
-          }
-        }
-      }
-
-      if ( !( loadData ) ) {
-        return false;
-      }
-
-      if ( subType ) {
-        dataUrl = dataUrl + '&subType=' + subType;
-      }
-
-      if ( subName ) {
-        dataUrl = dataUrl + '&subName=' + subName;
-        cj( '#customData' + subName ).show( );
-      }
-      else {
-        cj( '#customData' ).show( );
-      }
-
-      {/literal}
-      {if $urlPathVar}
-        dataUrl = dataUrl + '&' + '{$urlPathVar}'
-      {/if}
-      {if $groupID}
-        dataUrl = dataUrl + '&groupID=' + '{$groupID}'
-      {/if}
-      {if $qfKey}
-        dataUrl = dataUrl + '&qfKey=' + '{$qfKey}'
-      {/if}
-      {if $entityID}
-        dataUrl = dataUrl + '&entityID=' + '{$entityID}'
-      {/if}
-
-      {literal}
-
-      if ( subName && subName != 'null' ) {
-        var fname = '#customData' + subName;
-      }
-      else {
-        var fname = '#customData';
-      }
-
-      var response = cj.ajax({url: dataUrl,
-        async: false
-      }).responseText;
-
-      if ( subType != 'null' ) {
-        if ( document.getElementById(roleid).checked == true ) {
-          var response_text = '<div style="display:block;" id = '+subType+'_chk >'+response+'</div>';
-          cj( fname ).append(response_text);
-        }
-        else {
-          cj('#'+subType+'_chk').remove();
-        }
-      }
-    }
-
-    cj(function() {
-      {/literal}
-      CRM.buildCustomData( '{$customDataType}', 'null', 'null' );
-      {literal}
-      for ( var i in roleGroupMapper ) {
-        if ( ( i > 0 ) && ( document.getElementById( "role_id_"+i ).checked ) ) {
         {/literal}
-        showCustomData( '{$customDataType}', i, {$roleCustomDataTypeID} );
+        CRM.buildCustomData( '{$customDataType}', 'null', 'null' );
+        {if $eventID}
+          CRM.buildCustomData( '{$customDataType}', {$eventID}, {$eventNameCustomDataTypeID} );
+        {/if}
+        {if $eventTypeID}
+          CRM.buildCustomData( '{$customDataType}', {$eventTypeID}, {$eventTypeCustomDataTypeID} );
+        {/if}
         {literal}
-        }
-      }
-      {/literal}
-      {if $eventID}
-        CRM.buildCustomData( '{$customDataType}', {$eventID}, {$eventNameCustomDataTypeID} );
-      {/if}
-      {if $eventTypeID}
-        CRM.buildCustomData( '{$customDataType}', {$eventTypeID}, {$eventTypeCustomDataTypeID} );
-      {/if}
-      {literal}
 
-      //call pane js
-      cj().crmAccordions();
-    });
+      });
     </script>
     {/literal}
 
+    {* jscript to warn if unsaved form field changes *}
+    {include file="CRM/common/formNavigate.tpl"}
   {/if}
 
-  {* include jscript to warn if unsaved form field changes *}
-  {include file="CRM/common/formNavigate.tpl"}
 
 <script type="text/javascript">
   {literal}
@@ -639,15 +599,6 @@
     }
   }
 
-  function buildEventTypeCustomData( eventID, eventTypeCustomDataTypeID, eventAndTypeMapping ) {
-    var mapping = eval('(' + eventAndTypeMapping + ')');
-    CRM.buildCustomData( 'Participant', mapping[eventID], eventTypeCustomDataTypeID );
-  }
-
-  function loadCampaign( eventId, campaigns ) {
-    cj( "#campaign_id" ).val( campaigns[eventId] );
-  }
-
   {/literal}
   {if $profileCreateCallback}
     {literal}
@@ -658,14 +609,12 @@
     }
     {/literal}
   {/if}
-</script>
-{literal}
-<script type="text/javascript">
+  {literal}
   cj(function() {
     cj().crmAccordions();
   });
+  {/literal}
 </script>
-{/literal}
 
 {/if} {* end of main event block*}
 

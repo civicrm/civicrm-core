@@ -18,9 +18,15 @@
   </primaryKey>
   <field>
     <name>contact_type</name>
-    <type>enum</type>
-    <values>Individual, Organization, Household</values>
+    <type>varchar</type>
+    <length>12</length>
     <comment>The type of contacts this group applies to</comment>
+    <pseudoconstant>
+      <table>civicrm_contact_type</table>
+      <keyColumn>name</keyColumn>
+      <labelColumn>label</labelColumn>
+      <condition>parent_id IS NULL</condition>
+    </pseudoconstant>
     <add>1.8</add>
     <html>
       <type>Select</type>
@@ -43,10 +49,13 @@
   </field>
   <field>
     <name>used</name>
-    <type>enum</type>
-    <values>Unsupervised, Supervised, General</values>
+    <type>varchar</type>
+    <length>12</length>
     <required>true</required>
     <comment>Whether the rule should be used for cases where usage is Unsupervised, Supervised OR General(programatically)</comment>
+    <pseudoconstant>
+      <callback>CRM_Core_SelectValues::getDedupeRuleTypes</callback>
+    </pseudoconstant>
     <add>4.3</add>
     <html>
       <type>Select</type>

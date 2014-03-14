@@ -56,7 +56,7 @@ class CRM_Contact_Form_DedupeRules extends CRM_Admin_Form {
       CRM_Utils_System::permissionDenied();
       CRM_Utils_System::civiExit();
     }
-    $this->_options = array(ts('Unsupervised'), ts('Supervised'), ts('General'));
+    $this->_options = CRM_Core_SelectValues::getDedupeRuleTypes();
     $this->_rgid = CRM_Utils_Request::retrieve('id', 'Positive', $this, FALSE, 0);
     $this->_contactType = CRM_Utils_Request::retrieve('contact_type', 'String', $this, FALSE, 0);
     if ($this->_rgid) {
@@ -133,14 +133,12 @@ class CRM_Contact_Form_DedupeRules extends CRM_Admin_Form {
     }
 
     $this->add('text', 'threshold', ts("Weight Threshold to Consider Contacts 'Matching':"), $attributes);
-    $this->addButtons(array(
-      array('type' => 'next', 'name' => ts('Save'), 'isDefault' => TRUE),
-      array('type' => 'cancel', 'name' => ts('Cancel')),
-    ));
 
     $this->assign('contact_type', $this->_contactType);
 
     $this->addFormRule(array('CRM_Contact_Form_DedupeRules', 'formRule'), $this);
+
+    parent::buildQuickForm();
   }
 
   /**
@@ -188,16 +186,16 @@ class CRM_Contact_Form_DedupeRules extends CRM_Admin_Form {
     $values = $this->exportValues();
 
     //FIXME: Handle logic to replace is_default column by usage
-    $used = CRM_Utils_Array::value('used', $values, FALSE);
     // reset used column to General (since there can only
     // be one 'Supervised' or 'Unsupervised' rule)
-    if ($this->_options[$used] != 'General') {
+    if ($values['used'] != 'General') {
       $query = "
 UPDATE civicrm_dedupe_rule_group
    SET used = 'General'
  WHERE contact_type = %1
    AND used = %2";
-      $queryParams = array(1 => array($this->_contactType, 'String'),
+      $queryParams = array(
+        1 => array($this->_contactType, 'String'),
         2 => array($this->_options[$used], 'String'),
       );
 
@@ -211,7 +209,7 @@ UPDATE civicrm_dedupe_rule_group
 
     $rgDao->title        = $values['title'];
     $rgDao->is_reserved  = CRM_Utils_Array::value('is_reserved', $values, FALSE);
-    $rgDao->used         = $this->_options[$values['used']];
+    $rgDao->used         = $values['used'];
     $rgDao->contact_type = $this->_contactType;
     $rgDao->threshold    = $values['threshold'];
     $rgDao->save();

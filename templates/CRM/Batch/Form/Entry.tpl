@@ -57,10 +57,12 @@
       {/if}
       {foreach from=$fields item=field key=fieldName}
         <div class="crm-grid-cell">
+          {if $field.name|substr:0:11 ne 'soft_credit'}
           <img src="{$config->resourceBase}i/copy.png"
                alt="{ts 1=$field.title}Click to copy %1 from row one to all rows.{/ts}"
                fname="{$field.name}" class="action-icon"
-               title="{ts}Click here to copy the value in row one to ALL rows.{/ts}"/>{$field.title}
+               title="{ts}Click here to copy the value in row one to ALL rows.{/ts}"/>
+          {/if}{$field.title}
         </div>
       {/foreach}
     </div>
@@ -71,7 +73,7 @@
         <div class="compressed crm-grid-cell"><span class="batch-edit"></span></div>
         {* contact select/create option*}
         <div class="compressed crm-grid-cell">
-          {include file="CRM/Contact/Form/NewContact.tpl" blockNo = $rowNumber noLabel=true prefix="primary_" newContactCallback="updateContactInfo($rowNumber, 'primary_')"}
+          {$form.primary_contact_id.$rowNumber.html|crmAddClass:big}
         </div>
 
         {if $batchType eq 2 }
@@ -88,7 +90,7 @@
             </div>
           {elseif $n eq 'soft_credit'}
             <div class="compressed crm-grid-cell">
-              {include file="CRM/Contact/Form/NewContact.tpl" blockNo = $rowNumber noLabel=true prefix="soft_credit_"}
+              {$form.soft_credit_contact_id.$rowNumber.html|crmAddClass:big}
               {$form.soft_credit_amount.$rowNumber.label}&nbsp;{$form.soft_credit_amount.$rowNumber.html|crmAddClass:eight}
             </div>
           {elseif in_array( $fields.$n.html_type, array('Radio', 'CheckBox'))}

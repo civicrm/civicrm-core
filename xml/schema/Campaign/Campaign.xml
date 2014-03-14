@@ -88,7 +88,7 @@
 
   <field>
       <name>campaign_type_id</name>
-      <title>Campaign Type ID</title>
+      <title>Campaign Type</title>
       <type>int unsigned</type>
       <default>NULL</default>
       <comment>Campaign Type ID.Implicit FK to civicrm_option_value where option_group = campaign_type</comment>
@@ -109,7 +109,7 @@
 
    <field>
       <name>status_id</name>
-      <title>Campaign Status ID</title>
+      <title>Campaign Status</title>
       <type>int unsigned</type>
       <default>NULL</default>
       <comment>Campaign status ID.Implicit FK to civicrm_option_value where option_group = campaign_status</comment>

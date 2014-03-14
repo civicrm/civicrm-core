@@ -40,21 +40,27 @@ function display(totalfee) {
 
   // populate the balance amount div
   // change the status selections according to updated selections
-  populatebalanceFee(totalEventFee);
+  populatebalanceFee(totalfee);
 }
 
 function populatebalanceFee(updatedAmt) {
+  // assign statuses
+  var partiallyPaid = {/literal}{$partiallyPaid}{literal};
+  var pendingRefund = {/literal}{$pendingRefund}{literal};
+  var participantStatus = {/literal}{$participantStatus}{literal};
+  var feePaid = {/literal}{$feePaid}{literal};
+
   // calculate the balance amount using total paid and updated amount
-  var balanceAmt = updatedAmt - CRM.feePaid;
+  var balanceAmt = updatedAmt - feePaid;
   // change the status selections according to updated selections
   if (balanceAmt > 0) {
-    cj('#status_id').val(CRM.partiallyPaid);
+    cj('#status_id').val(partiallyPaid);
   }
   else if(balanceAmt < 0) {
-    cj('#status_id').val(CRM.pendingRefund);
+    cj('#status_id').val(pendingRefund);
   }
   else if(balanceAmt == 0) {
-    cj('#status_id').val(CRM.participantStatus);
+    cj('#status_id').val(participantStatus);
   }
 
   balanceAmt = formatMoney(balanceAmt, 2, seperator, thousandMarker);
@@ -62,16 +68,22 @@ function populatebalanceFee(updatedAmt) {
 }
 
 cj(function(){
+  // assign statuses
+  var partiallyPaid = {/literal}{$partiallyPaid}{literal};
+  var pendingRefund = {/literal}{$pendingRefund}{literal};
+  var participantStatus = {/literal}{$participantStatus}{literal};
+  var feePaid = {/literal}{$feePaid}{literal};
+
   var updatedFeeUnFormatted = cj('#pricevalue').text();
   var updatedAmt = parseFloat(updatedFeeUnFormatted.replace(/[^0-9-.]/g, ''));
-  var balanceAmt = updatedAmt - CRM.feePaid;
+  var balanceAmt = updatedAmt - feePaid;
 
   // change the status selections according to updated selections
   if (balanceAmt > 0) {
-    cj('#status_id').val(CRM.partiallyPaid);
+    cj('#status_id').val(partiallyPaid);
   } 
   else if(balanceAmt < 0) {
-    cj('#status_id').val(CRM.pendingRefund);
+    cj('#status_id').val(pendingRefund);
   } 
 });
 
@@ -117,7 +129,7 @@ cj(function(){
          <div class='crm-section'> 
          <div class='label'>{ts}Updated Fee(s){/ts}</div><div id="pricevalue" class='content updated-fee'></div>
          <div class='label'>{ts}Total Paid{/ts}</div>
-         <div class='content'><a class='action-item' href='{crmURL p="civicrm/payment/view" q="action=browse&cid=`$contactId`&id=`$paymentInfo.id`&component=`$paymentInfo.component`&context=transaction"}'>{$paymentInfo.paid|crmMoney}<br/>>> view payments</a>
+         <div class='content'><a class='action-item' href='{crmURL p="civicrm/payment" q="view=transaction&action=browse&cid=`$contactId`&id=`$paymentInfo.id`&component=`$paymentInfo.component`&context=transaction"}'>{$paymentInfo.paid|crmMoney}<br/>>> view payments</a>
          </div>
          <div class='label'><strong>{ts}Balance Owed{/ts}</strong></div><div class='content'><strong id='balance-fee'></strong></div>
           </div>
@@ -181,20 +193,22 @@ cj(function(){
 <script type='text/javascript'>
 cj(function($){
   cj('.total_amount-section').remove(); 
-  
+
   cj('#ParticipantFeeSelection').submit(function(e) {
+    var partiallyPaid = {/literal}{$partiallyPaid}{literal};
+    var pendingRefund = {/literal}{$pendingRefund}{literal};
     var statusId = cj('#status_id').val();
-    var statusLabel = cj('#status_id option:selected').text(); 
+    var statusLabel = cj('#status_id option:selected').text();
     var balanceFee = cj('#balance-fee').text();
     balanceFee = parseFloat(balanceFee.replace(/[^0-9-.]/g, ''));
-  
-    if (balanceFee > 0 && statusId != CRM.partiallyPaid) {
+
+    if (balanceFee > 0 && statusId != partiallyPaid) {
       var result = confirm('Balance is owing for the updated selections. Expected participant status is \'Partially paid\'. Are you sure you want to set the participant status to ' + statusLabel + ' ? Click OK to continue, Cancel to change your entries.');
       if (result == false) {
         e.preventDefault();
       }
     }
-    else if (balanceFee < 0 && statusId != CRM.pendingRefund) {
+    else if (balanceFee < 0 && statusId != pendingRefund) {
       var result = confirm('Balance is overpaid for the updated selections. Expected participant status is \'Pending refund\'. Are you sure you want to set the participant status to ' + statusLabel + ' ? Click OK to continue, Cancel to change your entries');
       if (result == false) {
         e.preventDefault();

@@ -1776,9 +1776,6 @@ WHERE cpf.price_set_id = %1 AND cpfv.label LIKE %2";
     $contributionStatuses = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
     $partiallyPaidStatusId = array_search('Partially paid', $contributionStatuses);
     $pendngRefundStatusId = array_search('Pending refund', $contributionStatuses);
-    $fetchCon = array('id' => $contributionId);
-    $contributionObj = CRM_Contribute_BAO_Contribution::retrieve($fetchCon, CRM_Core_DAO::$_nullArray, CRM_Core_DAO::$_nullArray);
-
     $previousLineItems = CRM_Price_BAO_LineItem::getLineItems($participantId, 'participant');
     CRM_Price_BAO_PriceSet::processAmount($feeBlock,
       $params, $lineItems
@@ -1791,12 +1788,17 @@ WHERE cpf.price_set_id = %1 AND cpfv.label LIKE %2";
     }
     $insertLines = $submittedLineItems;
     $submittedFieldValueIds = array_keys($submittedLineItems);
-
+    $updateLines = array();
     foreach ($previousLineItems as $id => $previousLineItem) {
       // check through the submitted items if the previousItem exists,
       // if found in submitted items, do not use it for new item creations
       if (in_array($previousLineItem['price_field_value_id'], $submittedFieldValueIds)) {
-        unset($insertLines[$previousLineItem['price_field_value_id']]);
+        // for updating the line items i.e. use-case - once deselect-option selecting again
+        if ($previousLineItem['qty'] == 0) {
+          $updateLines[$previousLineItem['price_field_value_id']]['qty'] = $submittedLineItems[$previousLineItem['price_field_value_id']]['qty'];
+          $updateLines[$previousLineItem['price_field_value_id']]['line_total'] = $submittedLineItems[$previousLineItem['price_field_value_id']]['line_total'];
+          unset($insertLines[$previousLineItem['price_field_value_id']]);
+        }
       }
     }
 
@@ -1815,10 +1817,36 @@ SET li.qty = 0,
     fi.amount = 0.00,
     eft.amount = 0.00
 WHERE (li.entity_table = 'civicrm_participant' AND li.entity_id = {$participantId}) AND
-      (price_field_value_id NOT IN ({$submittedFieldValues}) OR price_field_id NOT IN ({$submittedFields}))
+      (price_field_value_id NOT IN ({$submittedFieldValues}))
 ";
       CRM_Core_DAO::executeQuery($updateLineItem);
     }
+
+    if (!empty($updateLines)) {
+      foreach ($updateLines as $valueId => $vals) {
+        $updateLineItem = "
+UPDATE civicrm_line_item li
+INNER JOIN civicrm_financial_item fi
+   ON (li.id = fi.entity_id AND fi.entity_table = 'civicrm_line_item')
+INNER JOIN civicrm_entity_financial_trxn eft
+   ON (eft.entity_id = fi.id AND eft.entity_table = 'civicrm_financial_item')
+SET li.qty = {$vals['qty']},
+    li.line_total = {$vals['line_total']},
+    fi.amount = {$vals['line_total']},
+    eft.amount = {$vals['line_total']}
+WHERE (li.entity_table = 'civicrm_participant' AND li.entity_id = {$participantId}) AND
+      (price_field_value_id = {$valueId})
+";
+        CRM_Core_DAO::executeQuery($updateLineItem);
+      }
+    }
+
+    // insert new 'adjusted amount' transaction entry and update contribution entry.
+    // ensure entity_financial_trxn table has a linking of it.
+    $updatedAmount = $params['amount'];
+    self::recordAdjustedAmt($updatedAmount, $paidAmount, $contributionId);
+    $fetchCon = array('id' => $contributionId);
+    $updatedContribution = CRM_Contribute_BAO_Contribution::retrieve($fetchCon, CRM_Core_DAO::$_nullArray, CRM_Core_DAO::$_nullArray);
 
     // insert new line items
     foreach ($insertLines as $valueId => $lineParams) {
@@ -1827,12 +1855,23 @@ WHERE (li.entity_table = 'civicrm_participant' AND li.entity_id = {$participantI
       $lineObj = CRM_Price_BAO_LineItem::create($lineParams);
       // insert financial items
       // ensure entity_financial_trxn table has a linking of it.
-      $prevItem = CRM_Financial_BAO_FinancialItem::add($lineObj, $contributionObj);
+      $prevItem = CRM_Financial_BAO_FinancialItem::add($lineObj, $updatedContribution);
     }
-    // insert new 'adjusted amount' transaction entry and update contribution entry.
-    // ensure entity_financial_trxn table has a linking of it.
-    $updatedAmount = $params['amount'];
+
+    // update participant fee_amount column
+    $partUpdateFeeAmt['id'] = $participantId;
+    $partUpdateFeeAmt['fee_amount'] = $params['amount'];
+    self::add($partUpdateFeeAmt);
+
+    //activity creation
+    self::addActivityForSelection($participantId, 'Change Registration');
+  }
+
+  static function recordAdjustedAmt($updatedAmount, $paidAmount, $contributionId) {
     $balanceAmt = $updatedAmount - $paidAmount;
+    $contributionStatuses = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
+    $partiallyPaidStatusId = array_search('Partially paid', $contributionStatuses);
+    $pendngRefundStatusId = array_search('Pending refund', $contributionStatuses);
 
     if ($balanceAmt) {
       if ($balanceAmt > 0) {
@@ -1899,6 +1938,20 @@ WHERE (li.entity_table = 'civicrm_participant' AND li.entity_id = {$participantI
       elseif ($updatedContribution->contribution_status_id == array_search('Partially paid', $contributionStatuses)) {
         $itemStatus = array_search('Partially paid', $financialItemStatus);
       }
+
+      $financialAccountId = NULL;
+      if ($adjustPaymentLine->financial_type_id) {
+        $searchParams = array(
+          'entity_table'         => 'civicrm_financial_type',
+          'entity_id'            => $adjustPaymentLine->financial_type_id,
+          'account_relationship' => 1
+        );
+
+        $result = array();
+        CRM_Financial_BAO_FinancialTypeAccount::retrieve($searchParams, $result);
+        $financialAccountId = CRM_Utils_Array::value('financial_account_id', $result);
+      }
+
       $params = array(
         'transaction_date'  => CRM_Utils_Date::isoToMysql($updatedContribution->receive_date),
         'contact_id'        => $updatedContribution->contact_id,
@@ -1908,12 +1961,10 @@ WHERE (li.entity_table = 'civicrm_participant' AND li.entity_id = {$participantI
         'entity_id'         => $adjustPaymentLine->id,
         'description'       => ( $adjustPaymentLine->qty != 1 ? $lineItem->qty . ' of ' : ''). ' ' . $adjustPaymentLine->label,
         'status_id'         => $itemStatus,
-        'financial_account_id' => $prevItem->financial_account_id
+        'financial_account_id' => $financialAccountId
       );
       CRM_Financial_BAO_FinancialItem::create($params, NULL, array('id' => $adjustedTrxn->id));
     }
-    //activity creation$contributionStatuses
-    self::addActivityForSelection($participantId, 'Change Registration');
   }
 
   static function addActivityForSelection($participantId, $activityType) {

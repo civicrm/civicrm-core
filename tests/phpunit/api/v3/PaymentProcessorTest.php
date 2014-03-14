@@ -103,7 +103,7 @@ class api_v3_PaymentProcessorTest extends CiviUnitTestCase {
    * Test  using example code
    */
   function testPaymentProcessorCreateExample() {
-    require_once 'api/v3/examples/PaymentProcessorCreate.php';
+    require_once 'api/v3/examples/PaymentProcessor/Create.php';
     $result = payment_processor_create_example();
     $expectedResult = payment_processor_create_expectedresult();
     $this->assertAPISuccess($result);

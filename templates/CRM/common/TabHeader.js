@@ -50,12 +50,14 @@ cj(function($) {
         ui.panel
           .off('.tabInfo')
           .on('crmLoad.tabInfo crmFormSuccess.tabInfo', function(e, data) {
-            if (typeof(data.tabCount) !== 'undefined') {
-              CRM.tabHeader.updateCount(ui.tab, data.tabCount);
-            }
-            if (typeof(data.tabValid) !== 'undefined') {
-              var method = data.tabValid ? 'removeClass' : 'addClass';
-              ui.tab[method]('disabled');
+            if (data) {
+              if (typeof(data.tabCount) !== 'undefined') {
+                CRM.tabHeader.updateCount(ui.tab, data.tabCount);
+              }
+              if (typeof(data.tabValid) !== 'undefined') {
+                var method = data.tabValid ? 'removeClass' : 'addClass';
+                ui.tab[method]('disabled');
+              }
             }
           });
         CRM[method]($('a', ui.tab).attr('href'), params);
@@ -63,10 +65,31 @@ cj(function($) {
       e.preventDefault();
     })
     .tabs(tabSettings);
+  // Any load/submit event could potentially call for tabs to refresh.
+  $(document).on('crmLoad.tabInfo crmFormSuccess.tabInfo', function(e, data) {
+    if (data && $.isPlainObject(data.updateTabs)) {
+      $.each(data.updateTabs, CRM.tabHeader.updateCount);
+      $.each(data.updateTabs, CRM.tabHeader.resetTab);
+    }
+  });
 });
 (function($) {
   // Utility functions
   CRM.tabHeader = CRM.tabHeader || {};
+
+  /**
+   * @param tab jQuery selector
+   * @returns panel jQuery object
+   */
+  CRM.tabHeader.getTabPanel = function(tab) {
+    return $('#' + $(tab).attr('aria-controls'));
+  };
+
+  /**
+   * Update the counter in a tab
+   * @param tab jQuery selector
+   * @param count number
+   */
   CRM.tabHeader.updateCount = function(tab, count) {
     var oldClass = $(tab).attr('class').match(/(crm-count-\d+)/);
     if (oldClass) {
@@ -75,5 +98,18 @@ cj(function($) {
     $(tab)
       .addClass('crm-count-' + count)
       .find('a em').html('' + count);
-  }
+  };
+
+  /**
+   * Clears tab content so that it will be refreshed next time the user clicks on it
+   * @param tab
+   */
+  CRM.tabHeader.resetTab = function(tab) {
+    var $panel = CRM.tabHeader.getTabPanel(tab);
+    if ($(tab).hasClass('ui-tabs-active')) {
+      $panel.crmSnippet('refresh');
+    } else {
+      $panel.data("civiCrmSnippet") && $panel.crmSnippet('destroy');
+    }
+  };
 })(cj);

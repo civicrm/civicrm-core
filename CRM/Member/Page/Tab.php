@@ -206,6 +206,12 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
       $displayName = CRM_Contact_BAO_Contact::displayName($this->_contactId);
       $this->assign('displayName', $displayName);
       $this->ajaxResponse['tabCount'] = CRM_Contact_BAO_Contact::getCountComponent('membership', $this->_contactId);
+      // Refresh other tabs with related data
+      $this->ajaxResponse['updateTabs'] = array(
+        '#tab_contribute' => CRM_Contact_BAO_Contact::getCountComponent('contribution', $this->_contactId),
+        '#tab_activity' => CRM_Contact_BAO_Contact::getCountComponent('activity', $this->_contactId),
+        '#tab_rel' => CRM_Contact_BAO_Contact::getCountComponent('rel', $this->_contactId),
+      );
     }
   }
 
@@ -392,7 +398,7 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
         $urlString = 'civicrm/contact/search/custom';
         if ($action == CRM_Core_Action::UPDATE) {
           if ($form->_contactId) {
-            $urlParams .= '&cid=' . $this->_contactId;
+            $urlParams .= '&cid=' . $form->_contactId;
           }
           $keyName = '&key';
           $urlParams .= '&context=fulltext&action=view';

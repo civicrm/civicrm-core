@@ -282,13 +282,11 @@ SELECT module
       'isDefault' => TRUE,
     );
 
-    if ($this->_context != 'dialog') {
-      $buttons[] = array(
-        'type' => 'cancel',
-        'name' => ts('Cancel'),
-        'isDefault' => TRUE,
-      );
-    }
+    $buttons[] = array(
+      'type' => 'cancel',
+      'name' => ts('Cancel'),
+      'isDefault' => TRUE,
+    );
 
     $this->addButtons($buttons);
 
@@ -305,28 +303,12 @@ SELECT module
   public function postProcess() {
     parent::postProcess();
 
-    // this is special case when we create contact using Dialog box
-    if ($this->_context == 'dialog') {
-      //replace the session stack for redirecting user to contact summary if new contact is created.
-      $contactViewURL = CRM_Utils_System::url('civicrm/contact/view', "reset=1&cid={$this->_id}", FALSE, NULL, FALSE);
-      $session = CRM_Core_Session::singleton();
-      $session->replaceUserContext($contactViewURL);
+    $displayName = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $this->_id, 'display_name');
+    $sortName = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $this->_id, 'sort_name');
+    $this->ajaxResponse['label'] = $sortName;
 
-      $displayName = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $this->_id, 'display_name');
-      $sortName = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $this->_id, 'sort_name');
-      $returnArray = array(
-        'contactID' => $this->_id,
-        'displayName' => $displayName,
-        'sortName' => $sortName,
-        'newContactSuccess' => TRUE,
-      );
-
-      echo json_encode($returnArray);
-      CRM_Utils_System::civiExit();
-    }
-
-    //for delete record handling
-    if (empty($_POST[$this->_deleteButtonName])) {
+    // When saving (not deleting) and not in an ajax popup
+    if (empty($_POST[$this->_deleteButtonName]) && $this->_context != 'dialog') {
       CRM_Core_Session::setStatus(ts('Your information has been saved.'), ts('Thank you.'), 'success');
     }
 

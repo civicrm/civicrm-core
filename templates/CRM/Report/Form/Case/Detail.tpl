@@ -308,7 +308,7 @@ function viewCase( caseId ,contactId ) {
                          dataType: "html",
                          timeout : 5000, //Time in milliseconds
                          success : function( data ){
-                             cj( "#casedetails").html( data );
+                             cj( "#casedetails").html( data ).trigger('crmLoad');
                        },
                    });
     },

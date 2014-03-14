@@ -82,57 +82,33 @@
   </tr>
 
   <tr class="crm-activity-form-block-target_contact_id">
-    {if $single eq false}
-      <td class="label">{ts}With Contact(s){/ts}</td>
-      <td class="view-value" style="white-space: normal">
-        {$with|escape}
-        <br/>
-        {$form.is_multi_activity.html}&nbsp;{$form.is_multi_activity.label} {help id="id-is_multi_activity"}
-      </td>
-      {elseif $action neq 4}
-      <td class="label">{ts}With Contact{/ts}</td>
+      <td class="label">{$form.target_contact_id.label}</td>
       <td class="view-value">
-        {include file="CRM/Contact/Form/NewContact.tpl" noLabel=true skipBreak=true multiClient=true parent="activity" showNewSelect=true}
+        {$form.target_contact_id.html}
         {if $action eq 1}
         <br/>
         {$form.is_multi_activity.html}&nbsp;{$form.is_multi_activity.label} {help id="id-is_multi_activity"}
         {/if}
       </td>
-      {else}
-      <td class="label">{ts}With Contact{/ts}</td>
-      <td class="view-value" style="white-space: normal">
-        {foreach from=$target_contact key=id item=name}
-          <a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=$id"}">{$name}</a>;&nbsp;
-        {/foreach}
-      </td>
-    {/if}
   </tr>
 
   <tr class="crm-activity-form-block-assignee_contact_id">
-    {if $action eq 4}
-      <td class="label">{ts}Assigned To{/ts}</td><td class="view-value">
-      {foreach from=$assignee_contact key=id item=name}
-        <a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=$id"}">{$name}</a>;&nbsp;
-      {/foreach}
-    </td>
-      {else}
-      <td class="label">{ts}Assigned To{/ts}</td>
-      <td>
-        <a href="#" class="button" id="swap_target_assignee" title="{ts}Swap Target and Assignee Contacts{/ts}" style="float:right;">
-          <span>
-            <div class="icon swap-icon"></div>
-          </span>
-        </a>
-        {$form.assignee_contact_id.html}<br />
-        {edit}
-          <span class="description">{ts}You can optionally assign this activity to someone. Assigned activities will appear in their Activities listing at CiviCRM Home.{/ts}
-          {if $activityAssigneeNotification}
-            <br />{ts}A copy of this activity will be emailed to each Assignee.{/ts}
-          {/if}
-          </span>
-        {/edit}
+      <td class="label">
+        {$form.assignee_contact_id.label}
+        {edit}{help id="assignee_contact_id" title=$form.assignee_contact_id.label}{/edit}
       </td>
-    {/if}
+      <td>
+        {$form.assignee_contact_id.html}
+        {if $action neq 4}
+          <a href="#" class="crm-hover-button" id="swap_target_assignee" title="{ts}Swap Target and Assignee Contacts{/ts}" style="position:relative; bottom: 1em;">
+            <span><div class="icon swap-icon"></div></span>
+          </a>
+          {if $activityAssigneeNotification}
+            <br />
+            <span class="description"><span class="icon email-icon"></span>{ts}A copy of this activity will be emailed to each Assignee.{/ts}</span>
+          {/if}
+        {/if}
+      </td>
   </tr>
 
   {if $activityTypeFile}
@@ -170,7 +146,7 @@
     <td class="label">{$form.duration.label}</td>
     <td class="view-value">
       {$form.duration.html}
-      {if $action neq 4}<span class="description">{ts}Total time spent on this activity (in minutes).{/ts}{/if}
+      {if $action neq 4}<span class="description">{ts}minutes{/ts}{/if}
     </td>
   </tr>
   <tr class="crm-activity-form-block-status_id">
@@ -252,11 +228,13 @@
               <td>{$form.followup_activity_subject.html|crmAddClass:huge}</td>
             </tr>
               <tr>
-                  <td class="label">{ts}Assign To{/ts}</td>
-                  <td>{$form.followup_assignee_contact_id.html}
-                      {edit}<span class="description">{ts}You can optionally assign this activity to someone. Assigned activities will appear in their Activities listing at CiviCRM Home.{/ts}
-                          </span>
-                      {/edit}
+                  <td class="label">
+                    {$form.followup_assignee_contact_id.label}
+                    {edit}
+                    {/edit}
+                  </td>
+                  <td>
+                    {$form.followup_assignee_contact_id.html}
                   </td>
               </tr>
           </table>
@@ -264,7 +242,7 @@
       </div><!-- /.crm-accordion-wrapper -->
       {literal}
         <script type="text/javascript">
-          cj(function() {
+          cj(function($) {
             cj().crmAccordions();
             cj('.crm-accordion-body').each( function() {
               //open tab if form rule throws error
@@ -272,19 +250,13 @@
                 cj(this).parent('.collapsed').crmAccordionToggle();
               }
             });
-          });
-          cj('#swap_target_assignee').click( function() {
-            var assignees = cj('input#assignee_contact_id').tokenInput("get");
-            var targets = cj('input#contact_1').tokenInput("get");
-            cj('#assignee_contact_id').tokenInput("clear");
-            cj('#contact_1').tokenInput("clear");
-            cj(assignees).each( function() {
-              cj('#contact_1').tokenInput("add", this);
+            $('#swap_target_assignee').click(function() {
+              var assignees = $('#assignee_contact_id').select2("data");
+              var targets = $('#target_contact_id').select2("data");
+              $('#assignee_contact_id').select2("data", targets);
+              $('#target_contact_id').select2("data", assignees);
+              return false;
             });
-            cj(targets).each( function() {
-              cj('#assignee_contact_id').tokenInput("add", this);
-            });
-            return false;
           });
         </script>
       {/literal}

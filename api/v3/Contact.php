@@ -506,18 +506,13 @@ function _civicrm_api3_greeting_format_params($params) {
 }
 
 /**
- * Contact quick search api
+ * Old contact quick search api
  *
- * @access public
+ * @deprecated
  *
  * {@example ContactGetquick.php 0}
  *
  */
-function civicrm_api3_contact_quicksearch($params) {
-  // kept as an alias for compatibility reasons.  CRM-11136
-  return civicrm_api3_contact_getquick($params);
-}
-
 function civicrm_api3_contact_getquick($params) {
   civicrm_api3_verify_mandatory($params, NULL, array('name'));
   $name = CRM_Utils_Type::escape(CRM_Utils_Array::value('name', $params), 'String');
@@ -653,6 +648,11 @@ function civicrm_api3_contact_getquick($params) {
   if (!empty($params['contact_sub_type'])) {
     $contactSubType = CRM_Utils_Type::escape($params['contact_sub_type'], 'String');
     $where .= " AND cc.contact_sub_type = '{$contactSubType}'";
+  }
+
+  if (!empty($params['contact_type'])) {
+    $contactType = CRM_Utils_Type::escape($params['contact_type'], 'String');
+    $where .= " AND cc.contact_type LIKE '{$contactType}'";
   }
 
   //set default for current_employer or return contact with particular id
@@ -889,3 +889,93 @@ WHERE     $whereClause
   return civicrm_api3_create_success($contacts, $params, 'contact', 'get_by_location', $dao);
 }
 
+
+/**
+ * Overrides _civicrm_api3_generic_getlist_params.
+ *
+ * @param $request array
+ */
+function _civicrm_api3_contact_getlist_params(&$request) {
+  // get the autocomplete options from settings
+  $acpref = explode(CRM_Core_DAO::VALUE_SEPARATOR,
+    CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
+      'contact_autocomplete_options'
+    )
+  );
+
+  // get the option values for contact autocomplete
+  $acOptions = CRM_Core_OptionGroup::values('contact_autocomplete_options', FALSE, FALSE, FALSE, NULL, 'name');
+
+  $list = array();
+  foreach ($acpref as $value) {
+    if ($value && !empty($acOptions[$value])) {
+      $list[] = $acOptions[$value];
+    }
+  }
+  // If we are doing quicksearch by a field other than name, make sure that field is added to results
+  $field_name = CRM_Utils_String::munge($request['search_field']);
+  // Unique name contact_id = id
+  if ($field_name == 'contact_id') {
+    $field_name = 'id';
+  }
+  // phone_numeric should be phone
+  $searchField = str_replace('_numeric', '', $field_name);
+  if(!in_array($searchField, $list)) {
+    $list[] = $searchField;
+  }
+  $request['description_field'] = $list;
+  $list[] = 'contact_type';
+  $request['params']['return'] = array_unique(array_merge($list, $request['extra']));
+  $request['params']['options']['sort'] = 'sort_name';
+  // Contact api doesn't support array(LIKE => 'foo') syntax
+  if (!empty($request['input'])) {
+    $request['params'][$request['search_field']] = $request['input'];
+  }
+}
+
+/**
+ * Overrides _civicrm_api3_generic_getlist_output
+ *
+ * @param $result array
+ * @param $request array
+ *
+ * @return array
+ */
+function _civicrm_api3_contact_getlist_output($result, $request) {
+  $output = array();
+  if (!empty($result['values'])) {
+    $addressFields = array_intersect(array('street_address', 'city', 'state_province', 'country'), $request['params']['return']);
+    foreach ($result['values'] as $row) {
+      $data = array(
+        'id' => $row[$request['id_field']],
+        'label' => $row[$request['label_field']],
+        'description' => array(),
+      );
+      foreach ($request['description_field'] as $item) {
+        if (!strpos($item, '_name') && !in_array($item, $addressFields) && !empty($row[$item])) {
+          $data['description'][] = $row[$item];
+        }
+      }
+      $address = array();
+      foreach($addressFields as $item) {
+        if (!empty($row[$item])) {
+          $address[] = $row[$item];
+        }
+      }
+      if ($address) {
+        $data['description'][] = implode(' ', $address);
+      }
+      if (!empty($request['image_field'])) {
+        $data['image'] = isset($row[$request['image_field']]) ? $row[$request['image_field']] : '';
+      }
+      else {
+        $data['icon_class'] = $row['contact_type'];
+      }
+      foreach ($request['extra'] as $field) {
+        $data['extra'][$field] = isset($row[$field]) ? $row[$field] : NULL;
+      }
+      $output[] = $data;
+    }
+  }
+  return $output;
+}

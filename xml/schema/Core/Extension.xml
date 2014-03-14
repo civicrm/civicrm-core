@@ -20,10 +20,13 @@
   <field>
     <name>type</name>
     <title>Type</title>
-    <type>enum</type>
-    <values>payment, search, report, module, sms</values>
+    <type>varchar</type>
+    <length>8</length>
     <required>true</required>
     <comment></comment>
+    <pseudoconstant>
+      <callback>CRM_Core_SelectValues::getExtensionTypes</callback>
+    </pseudoconstant>
     <add>4.2</add>
     <html>
       <type>Select</type>

@@ -1339,7 +1339,12 @@ SELECT contact_id
             case CRM_Utils_Type::T_INT:
             case CRM_Utils_Type::T_FLOAT:
             case CRM_Utils_Type::T_MONEY:
-              $object->$dbName = $counter;
+              if (isset($value['precision'])) {
+                // $object->$dbName = CRM_Utils_Number::createRandomDecimal($value['precision']);
+                $object->$dbName = CRM_Utils_Number::createTruncatedDecimal($counter, $value['precision']);
+              } else {
+                $object->$dbName = $counter;
+              }
               break;
 
             case CRM_Utils_Type::T_BOOLEAN:
@@ -1383,26 +1388,10 @@ SELECT contact_id
             case CRM_Utils_Type::T_LONGTEXT:
             case CRM_Utils_Type::T_EMAIL:
             default:
-              if (isset($value['enumValues'])) {
-                if (isset($value['default'])) {
-                  $object->$dbName = $value['default'];
-                }
-                else {
-                  if (is_array($value['enumValues'])) {
-                    $object->$dbName = $value['enumValues'][0];
-                  }
-                  else {
-                    $defaultValues = explode(',', $value['enumValues']);
-                    $object->$dbName = $defaultValues[0];
-                  }
-                }
-              }
-              else {
-                $object->$dbName = $dbName . '_' . $counter;
-                $maxlength = CRM_Utils_Array::value('maxlength', $value);
-                if ($maxlength > 0 && strlen($object->$dbName) > $maxlength) {
-                  $object->$dbName = substr($object->$dbName, 0, $value['maxlength']);
-                }
+              $object->$dbName = $dbName . '_' . $counter;
+              $maxlength = CRM_Utils_Array::value('maxlength', $value);
+              if ($maxlength > 0 && strlen($object->$dbName) > $maxlength) {
+                $object->$dbName = substr($object->$dbName, 0, $value['maxlength']);
               }
           }
         }

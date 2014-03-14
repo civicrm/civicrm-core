@@ -137,8 +137,12 @@ class CRM_Event_Form_ManageEvent_ScheduleReminders extends CRM_Event_Form_Manage
 
     $this->assign('recipientMapping', json_encode($recipientMapping));
 
-    $entity = $this->add('select', 'entity', ts('Recipient(s)'), $sel3[$this->_mappingID][0], TRUE);
-    $entity->setMultiple(TRUE);
+    // Fixme: hack to adjust the output of CRM_Core_BAO_ActionSchedule::getSelection so it looks nice with the jQuery.select2 plugin
+    // TODO: fix this upstream
+    $options = $sel3[$this->_mappingID][0];
+    $attributes = array('multiple' => 'multiple', 'class' => 'crm-select2 huge', 'placeholder' => $options[0]);
+    unset($options[0]);
+    $entity = $this->add('select', 'entity', ts('Recipient(s)'), $options, TRUE, $attributes);
 
     //get the frequency units.
     $this->_freqUnits = array('hour' => 'hour') + CRM_Core_OptionGroup::values('recur_frequency_units');
@@ -185,20 +189,13 @@ class CRM_Event_Form_ManageEvent_ScheduleReminders extends CRM_Event_Form_Manage
     $this->add('select', 'limit_to', ts('Limit Options'), $limitOptions);
 
     $this->add('select', 'recipient', ts('Recipients'), $sel5[$recipient],
-      FALSE, array('onClick' => "showHideByValue('recipient','manual','recipientManual','table-row','select',false); showHideByValue('recipient','group','recipientGroup','table-row','select',false);")
+      FALSE, array('onchange' => "showHideByValue('recipient','manual','recipientManual','table-row','select',false); showHideByValue('recipient','group','recipientGroup','table-row','select',false);")
     );
     $recipientListing = $this->add('select', 'recipient_listing', ts('Recipient Listing'),
-      $sel3[$this->_mappingID][0]
+      $sel3[$this->_mappingID][0], FALSE, array('class' => 'crm-select2 huge')
     );
     $recipientListing->setMultiple(TRUE);
 
-    //auto-complete url
-    $dataUrl = CRM_Utils_System::url('civicrm/ajax/rest',
-      "className=CRM_Contact_Page_AJAX&fnName=getContactList&json=1&context=activity&reset=1",
-      FALSE, NULL, FALSE
-    );
-
-    $this->assign('dataUrl', $dataUrl);
     //token input url
     $tokenUrl = CRM_Utils_System::url('civicrm/ajax/checkemail',
       'noemail=1',
@@ -207,8 +204,8 @@ class CRM_Event_Form_ManageEvent_ScheduleReminders extends CRM_Event_Form_Manage
     $this->assign('tokenUrl', $tokenUrl);
     $this->add('text', 'recipient_manual_id', ts('Manual Recipients'));
 
-    $this->addElement('select', 'group_id', ts('Group'),
-      CRM_Core_PseudoConstant::staticGroup()
+    $this->add('select', 'group_id', ts('Group'),
+      CRM_Core_PseudoConstant::staticGroup(), FALSE, array('class' => 'crm-select2 huge')
     );
 
     CRM_Mailing_BAO_Mailing::commonCompose($this);

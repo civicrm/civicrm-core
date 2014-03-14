@@ -174,25 +174,8 @@ class CRM_Group_Form_Edit extends CRM_Core_Form {
         }
       }
 
-      if (CRM_Core_Permission::check('administer Multiple Organizations') &&
-        CRM_Core_Permission::isMultisiteEnabled()
-      ) {
+      if (CRM_Core_Permission::check('administer Multiple Organizations') && CRM_Core_Permission::isMultisiteEnabled()) {
         CRM_Contact_BAO_GroupOrganization::retrieve($this->_id, $defaults);
-
-        if (!empty($defaults['group_organization'])) {
-          //used in edit mode
-          $this->_groupOrganizationID = $defaults['group_organization'];
-        }
-        if (!empty($defaults['organization_id'])) {
-          $result = civicrm_api3('contact', 'getquick', array(
-            'org' => 1,
-            'id' => $defaults['organization_id']
-          ));
-          $this->assign('organizationName', $result['values'][0]['data']);
-        }
-        else {
-          $this->assign('organizationName', '');
-        }
       }
     }
 
@@ -265,64 +248,15 @@ class CRM_Group_Form_Edit extends CRM_Core_Form {
       );
     }
 
-    $this->add('select', 'visibility', ts('Visibility'),
-      CRM_Core_SelectValues::ufVisibility(TRUE), TRUE
-    );
+    $this->add('select', 'visibility', ts('Visibility'), CRM_Core_SelectValues::groupVisibility(), TRUE);
 
-    $groupNames = CRM_Core_PseudoConstant::group();
+    //CRM-14190
+    $parentGroups = self::buildParentGroups($this);
 
-    $parentGroups = $parentGroupElements = array();
-    if (isset($this->_id) && !empty($this->_groupValues['parents'])) {
-      $parentGroupIds = explode(',', $this->_groupValues['parents']);
-      foreach ($parentGroupIds as $parentGroupId) {
-        $parentGroups[$parentGroupId] = $groupNames[$parentGroupId];
-        if (array_key_exists($parentGroupId, $groupNames)) {
-          $parentGroupElements[$parentGroupId] = $groupNames[$parentGroupId];
-          $this->addElement('checkbox', "remove_parent_group_$parentGroupId",
-            $groupNames[$parentGroupId]
-          );
-        }
-      }
-    }
-    $this->assign_by_ref('parent_groups', $parentGroupElements);
-
-    if (isset($this->_id)) {
-      $potentialParentGroupIds = CRM_Contact_BAO_GroupNestingCache::getPotentialCandidates($this->_id,
-        $groupNames
-      );
-    }
-    else {
-      $potentialParentGroupIds = array_keys($groupNames);
-    }
-
-    $parentGroupSelectValues = array('' => '- ' . ts('select') . ' -');
-    foreach ($potentialParentGroupIds as $potentialParentGroupId) {
-      if (array_key_exists($potentialParentGroupId, $groupNames)) {
-        $parentGroupSelectValues[$potentialParentGroupId] = $groupNames[$potentialParentGroupId];
-      }
-    }
-
-    if (count($parentGroupSelectValues) > 1) {
-      if (CRM_Core_Permission::isMultisiteEnabled()) {
-        $required = empty($parentGroups) ? TRUE : FALSE;
-        $required = (($this->_id && CRM_Core_BAO_Domain::isDomainGroup($this->_id)) ||
-          !isset($this->_id)
-        ) ? FALSE : $required;
-      }
-      else {
-        $required = FALSE;
-      }
-      $this->add('select', 'parents', ts('Add Parent'), $parentGroupSelectValues, $required);
-    }
-    if (CRM_Core_Permission::check('administer Multiple Organizations') &&
-      CRM_Core_Permission::isMultisiteEnabled()
-    ) {
+    if (CRM_Core_Permission::check('administer Multiple Organizations') && CRM_Core_Permission::isMultisiteEnabled()) {
       //group organization Element
-      $groupOrgDataURL = CRM_Utils_System::url('civicrm/ajax/search', 'org=1', FALSE, NULL, FALSE);
-      $this->assign('groupOrgDataURL', $groupOrgDataURL);
-
-      $this->addElement('text', 'organization', ts('Organization'), '');
-      $this->addElement('hidden', 'organization_id', '', array('id' => 'organization_id'));
+      $props = array('api' => array('params' => array('contact_type' => 'Organization')));
+      $this->addEntityRef('organization_id', ts('Organization'), $props);
     }
 
     // is_reserved property CRM-9936
@@ -462,8 +396,8 @@ WHERE  title = %1
       $group = CRM_Contact_BAO_Group::create($params);
 
       /*
-             * Remove any parent groups requested to be removed
-             */
+       * Remove any parent groups requested to be removed
+       */
 
       if (!empty($this->_groupValues['parents'])) {
         $parentGroupIds = explode(',', $this->_groupValues['parents']);
@@ -494,6 +428,66 @@ WHERE  title = %1
     if ($updateNestingCache) {
       CRM_Contact_BAO_GroupNestingCache::update();
     }
+  }
+
+  /*
+   * Build parent groups form elements
+   *
+   * @obj form object passed by reference
+   *
+   * @return parent groups array
+   * @static
+   * @access public
+   */
+  static function buildParentGroups( &$obj ) {
+    $groupNames = CRM_Core_PseudoConstant::group();
+    $parentGroups = $parentGroupElements = array();
+    if (isset($obj->_id) &&
+      CRM_Utils_Array::value('parents', $obj->_groupValues)
+    ) {
+      $parentGroupIds = explode(',', $obj->_groupValues['parents']);
+      foreach ($parentGroupIds as $parentGroupId) {
+        $parentGroups[$parentGroupId] = $groupNames[$parentGroupId];
+        if (array_key_exists($parentGroupId, $groupNames)) {
+          $parentGroupElements[$parentGroupId] = $groupNames[$parentGroupId];
+          $obj->addElement('checkbox', "remove_parent_group_$parentGroupId",
+            $groupNames[$parentGroupId]
+          );
+        }
+      }
+    }
+    $obj->assign_by_ref('parent_groups', $parentGroupElements);
+
+    if (isset($obj->_id)) {
+      $potentialParentGroupIds = CRM_Contact_BAO_GroupNestingCache::getPotentialCandidates($obj->_id,
+        $groupNames
+      );
+    }
+    else {
+      $potentialParentGroupIds = array_keys($groupNames);
+    }
+
+    $parentGroupSelectValues = array('' => '- ' . ts('select') . ' -');
+    foreach ($potentialParentGroupIds as $potentialParentGroupId) {
+      if (array_key_exists($potentialParentGroupId, $groupNames)) {
+        $parentGroupSelectValues[$potentialParentGroupId] = $groupNames[$potentialParentGroupId];
+      }
+    }
+
+    if (count($parentGroupSelectValues) > 1) {
+      if (CRM_Core_Permission::isMultisiteEnabled()) {
+        $required = empty($parentGroups) ? TRUE : FALSE;
+        $required = (($obj->_id && CRM_Core_BAO_Domain::isDomainGroup($obj->_id)) ||
+          !isset($obj->_id)
+        ) ? FALSE : $required;
+      }
+      else {
+        $required = FALSE;
+      }
+      $obj->add('select', 'parents', ts('Add Parent'), $parentGroupSelectValues, $required);
+    }
+
+    return $parentGroups;
   }
 }
 

@@ -57,7 +57,7 @@ class CRM_Contact_Form_Edit_Demographics {
         array('id' => "civicrm_gender_{$var}_{$key}")
       );
     }
-    $form->addGroup($genderOptions, 'gender_id', ts('Gender'));
+    $form->addGroup($genderOptions, 'gender_id', ts('Gender'))->setAttribute('allowClear', TRUE);
 
     $form->addDate('birth_date', ts('Date of Birth'), FALSE, array('formatType' => 'birth'));
 

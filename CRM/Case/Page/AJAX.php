@@ -41,30 +41,26 @@ class CRM_Case_Page_AJAX {
    * Retrieve unclosed cases.
    */
   static function unclosedCases() {
-    $criteria = explode('-', CRM_Utils_Type::escape(CRM_Utils_Array::value('s', $_GET), 'String'));
-
-    $limit = CRM_Utils_Array::value('limit', $_GET);
-    if ($limit) {
-      $limit = CRM_Utils_Type::escape($limit, 'Integer');
-    }
-
     $params = array(
-      'limit' => $limit,
-      'case_type' => trim(CRM_Utils_Array::value(1, $criteria)),
-      'sort_name' => trim(CRM_Utils_Array::value(0, $criteria)),
+      'limit' => CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'search_autocomplete_count', NULL, 10),
+      'sort_name' => CRM_Utils_Type::escape(CRM_Utils_Array::value('term', $_GET, ''), 'String'),
     );
 
     $excludeCaseIds = array();
-    if ($caseIdStr = CRM_Utils_Array::value('excludeCaseIds', $_GET)) {
-      $excludeIdStr = CRM_Utils_Type::escape($caseIdStr, 'String');
-      $excludeCaseIds = explode(',', $excludeIdStr);
+    if (!empty($_GET['excludeCaseIds'])) {
+      $excludeCaseIds = explode(',', CRM_Utils_Type::escape($_GET['excludeCaseIds'], 'String'));
     }
     $unclosedCases = CRM_Case_BAO_Case::getUnclosedCases($params, $excludeCaseIds);
     $results = array();
     foreach ($unclosedCases as $caseId => $details) {
-      $results["$caseId|" . $details['contact_id'] . '|' . $details['case_type'] . '|' . $details['sort_name']] = $details['sort_name'] . ' (' . $details['case_type'] . ': ' . $details['case_subject'] . ')';
+      $results[] = array(
+        'id' => $caseId,
+        'text' => $details['sort_name'] . ' (' . $details['case_type'] . ': ' . $details['case_subject'] . ')',
+        'extra' => $details,
+      );
     }
-    CRM_Core_Page_AJAX::autocompleteResults($results);
+    print json_encode($results);
+    CRM_Utils_System::civiExit();
   }
 
   function processCaseTags() {

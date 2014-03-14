@@ -187,13 +187,6 @@ class CRM_Core_CodeGen_Specification {
     }
 
     $table['fields'] = &$fields;
-    $table['hasEnum'] = FALSE;
-    foreach ($table['fields'] as $field) {
-      if ($field['crmType'] == 'CRM_Utils_Type::T_ENUM') {
-        $table['hasEnum'] = TRUE;
-        break;
-      }
-    }
 
     if ($this->value('primaryKey', $tableXML)) {
       $this->getPrimaryKey($tableXML->primaryKey, $fields, $table);
@@ -259,28 +252,6 @@ class CRM_Core_CodeGen_Specification {
         $field['size'] = $this->getSize($fieldXML);
         break;
 
-      case 'enum':
-        $value               = (string ) $fieldXML->values;
-        $field['sqlType']    = 'enum(';
-        $field['values']     = array();
-        $field['enumValues'] = $value;
-        $values              = explode(',', $value);
-        $first               = TRUE;
-        foreach ($values as $v) {
-          $v = trim($v);
-          $field['values'][] = $v;
-
-          if (!$first) {
-            $field['sqlType'] .= ', ';
-          }
-          $first = FALSE;
-          $field['sqlType'] .= "'$v'";
-        }
-        $field['sqlType'] .= ')';
-        $field['phpType'] = $field['sqlType'];
-        $field['crmType'] = 'CRM_Utils_Type::T_ENUM';
-        break;
-
       case 'text':
         $field['sqlType'] = $field['phpType'] = $type;
         $field['crmType'] = 'CRM_Utils_Type::T_' . strtoupper($type);
@@ -308,6 +279,7 @@ class CRM_Core_CodeGen_Specification {
         $field['sqlType'] = 'decimal(' . $length . ')';
         $field['phpType'] = 'float';
         $field['crmType'] = 'CRM_Utils_Type::T_MONEY';
+        $field['precision'] = $length;
         break;
 
       case 'float':
@@ -382,6 +354,8 @@ class CRM_Core_CodeGen_Specification {
         'nameColumn',
         // Where clause snippet (will be joined to the rest of the query with AND operator)
         'condition',
+        // callback funtion incase of static arrays
+        'callback',
       );
       foreach ($validOptions as $pseudoOption) {
         if(!empty($fieldXML->pseudoconstant->$pseudoOption)){

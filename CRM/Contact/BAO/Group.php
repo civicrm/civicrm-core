@@ -811,6 +811,8 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
     $allTypes = CRM_Core_OptionGroup::values('group_type');
     $values = array();
 
+    $visibility = CRM_Core_SelectValues::ufVisibility();
+
     while ($object->fetch()) {
       $permission = CRM_Contact_BAO_Group::checkPermission($object->id, $object->title);
       //@todo CRM-12209 introduced an ACL check in the whereClause function
@@ -861,9 +863,8 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
 
         $action = $action & CRM_Core_Action::mask($groupPermissions);
 
-        $values[$object->id]['visibility'] = CRM_Contact_DAO_Group::tsEnum('visibility',
-          $values[$object->id]['visibility']
-        );
+        $values[$object->id]['visibility'] = $visibility[$values[$object->id]['visibility']];
+
         if (isset($values[$object->id]['group_type'])) {
           $groupTypes = explode(CRM_Core_DAO::VALUE_SEPARATOR,
             substr($values[$object->id]['group_type'], 1, -1)

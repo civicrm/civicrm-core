@@ -62,9 +62,12 @@
   </field>
   <field>
       <name>html_type</name>
-      <type>enum</type>
-      <values>Text, Select, Radio, CheckBox</values>
+      <type>varchar</type>
+      <length>12</length>
       <required>true</required>
+      <pseudoconstant>
+        <callback>CRM_Price_BAO_PriceField::htmlTypes</callback>
+      </pseudoconstant>
       <add>1.8</add>
       <html>
         <type>Select</type>

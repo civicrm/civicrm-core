@@ -82,7 +82,7 @@ Class CRM_Campaign_BAO_Campaign extends CRM_Campaign_DAO_Campaign {
         $dao->campaign_id  = $campaign->id;
         $dao->entity_table = $groupTableName;
         $dao->entity_id    = $entityId;
-        $dao->group_type   = 'include';
+        $dao->group_type   = 'Include';
         $dao->save();
         $dao->free();
       }

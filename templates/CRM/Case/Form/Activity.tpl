@@ -81,7 +81,7 @@
       <tr class="crm-case-activity-form-block-target_contact_id hide-block" id="with-contacts-widget">
         <td class="label font-size10pt">{ts}With Contact{/ts}</td>
         <td class="view-value">
-          {include file="CRM/Contact/Form/NewContact.tpl" noLabel=true skipBreak=true multiClient=true}
+          {$form.target_contact_id.html}
           <br/>
           <a href="#" class="crm-with-contact">
             &raquo; {if not $multiClient}{ts}With client{/ts}{else}{ts}With client(s){/ts}{/if}
@@ -96,19 +96,18 @@
     </tr>
     <tr class="crm-case-activity-form-block-source_contact_id">
       <td class="label">{$form.source_contact_id.label}</td>
-      <td class="view-value"> {if $admin}{$form.source_contact_id.html}{/if}</td>
+      <td class="view-value">{$form.source_contact_id.html}</td>
     </tr>
     <tr class="crm-case-activity-form-block-assignee_contact_id">
-      <td class="label">{ts}Assigned To{/ts}</td>
-      <td>{$form.assignee_contact_id.html}<br />
-        {edit}
-          <span class="description">
-          {ts}You can optionally assign this activity to someone.{/ts}
-          {if $activityAssigneeNotification}
-            <br />{ts}A copy of this activity will be emailed to each Assignee.{/ts}
-          {/if}
-          </span>
-        {/edit}
+      <td class="label">
+        {$form.assignee_contact_id.label}
+        {edit}{help id="assignee_contact_id" title=$form.assignee_contact_id.label file="CRM/Activity/Form/Activity"}{/edit}
+      </td>
+      <td>{$form.assignee_contact_id.html}
+        {if $activityAssigneeNotification}
+          <br />
+          <span class="description"><span class="icon email-icon"></span>{ts}A copy of this activity will be emailed to each Assignee.{/ts}</span>
+        {/if}
       </td>
     </tr>
 
@@ -212,7 +211,7 @@
     <td class="label">{$form.duration.label}</td>
     <td class="view-value">
       {$form.duration.html}
-      <span class="description">{ts}Total time spent on this activity (in minutes).{/ts}
+      <span class="description">{ts}minutes{/ts}
     </td>
   </tr>
   {* Suppress activity status and priority for changes to status, case type and start date. PostProc will force status to completed. *}
@@ -279,6 +278,7 @@
         cj('.crm-with-contact').click(function(){
           cj('#with-contacts-widget').toggle();
           cj('#with-clients').toggle();
+          return false;
         });
       });
     </script>

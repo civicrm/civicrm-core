@@ -58,10 +58,13 @@
   </field>
   <field>
      <name>data_type</name>
-     <type>enum</type>
-     <values>String, Int, Float, Money, Memo, Date, Boolean, StateProvince, Country, File, Link, ContactReference</values>
+     <type>varchar</type>
+     <length>16</length>
      <required>true</required>
      <comment>Controls location of data storage in extended_data table.</comment>
+     <pseudoconstant>
+       <callback>CRM_Core_BAO_CustomField::dataType</callback>
+     </pseudoconstant>
      <add>1.1</add>
      <html>
        <type>Select</type>
@@ -69,10 +72,13 @@
   </field>
   <field>
      <name>html_type</name>
-     <type>enum</type>
-     <values>Text, TextArea, Select, Multi-Select, AdvMulti-Select, Radio, CheckBox, Select Date, Select State/Province, Select Country, Multi-Select Country, Multi-Select State/Province, File, Link, RichTextEditor, Autocomplete-Select</values>
+     <type>varchar</type>
+     <length>32</length>
      <required>true</required>
      <comment>HTML types plus several built-in extended types.</comment>
+     <pseudoconstant>
+       <callback>CRM_Core_SelectValues::customHtmlType</callback>
+     </pseudoconstant>
      <add>1.1</add>
   </field>
   <field>
@@ -231,6 +237,13 @@
        <length>255</length>
        <comment>Stores Contact Get API params contact reference custom fields. May be used for other filters in the future.</comment>
        <add>4.1</add>
+  </field>
+  <field>
+    <name>in_selector</name>
+    <type>boolean</type>
+    <default>0</default>
+    <comment>Should the multi-record custom field values be displayed in tab table listing</comment>
+    <add>4.5</add>
   </field>
   <index>
     <name>UI_label_custom_group_id</name>

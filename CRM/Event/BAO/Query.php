@@ -539,32 +539,33 @@ class CRM_Event_BAO_Query {
     return $properties;
   }
 
+  /**
+   * @param CRM_Core_Form $form
+   */
   static function buildSearchForm(&$form) {
-    $dataURLEvent = CRM_Utils_System::url('civicrm/ajax/event',
-      "reset=1",
-      FALSE, NULL, FALSE
-    );
-    $dataURLEventType = CRM_Utils_System::url('civicrm/ajax/eventType',
-      "reset=1",
-      FALSE, NULL, FALSE
-    );
     $dataURLEventFee = CRM_Utils_System::url('civicrm/ajax/eventFee',
       "reset=1",
       FALSE, NULL, FALSE
     );
 
-    $form->assign('dataURLEvent', $dataURLEvent);
-    $form->assign('dataURLEventType', $dataURLEventType);
     $form->assign('dataURLEventFee', $dataURLEventFee);
 
-    $eventId        = &$form->add('text', 'event_name', ts('Event Name'));
-    $eventType      = &$form->add('text', 'event_type', ts('Event Type'));
-    $participantFee = &$form->add('text', 'participant_fee_level', ts('Fee Level'));
-
-    //elements for assigning value operation
-    $eventNameId      = &$form->add('hidden', 'event_id', '', array('id' => 'event_id'));
-    $eventTypeId      = &$form->add('hidden', 'event_type_id', '', array('id' => 'event_type_id'));
-    $participantFeeId = &$form->add('hidden', 'participant_fee_id', '', array('id' => 'participant_fee_id'));
+    $eventId = $form->addEntityRef('event_id', ts('Event Name'), array(
+        'entity' => 'event',
+        'placeholder' => ts('- any -'),
+        'select' => array('minimumInputLength' => 0),
+      )
+    );
+    $eventType = $form->addEntityRef('event_type_id', ts('Event Type'), array(
+        'entity' => 'option_value',
+        'placeholder' => ts('- any -'),
+        'select' => array('minimumInputLength' => 0),
+        'api' => array(
+          'params' => array('option_group_id' => 'event_type'),
+        ),
+      )
+    );
+    $form->add('text', 'participant_fee_id', ts('Fee Level'), array('class' => 'big crm-ajax-select'));
 
     CRM_Core_Form_Date::buildDateRange($form, 'event', 1, '_start_date_low', '_end_date_high', ts('From'), FALSE);
 
@@ -578,8 +579,8 @@ class CRM_Event_BAO_Query {
       $form->_participantRole = &$form->addElement('checkbox', "participant_role_id[$rId]", NULL, $rName);
     }
 
-    $form->addYesNo('participant_test', ts('Participant is a Test?'));
-    $form->addYesNo('participant_pay_later', ts('Participant is Pay Later?'));
+    $form->addYesNo('participant_test', ts('Participant is a Test?'), TRUE);
+    $form->addYesNo('participant_pay_later', ts('Participant is Pay Later?'), TRUE);
     $form->addElement('text', 'participant_fee_amount_low', ts('From'), array('size' => 8, 'maxlength' => 8));
     $form->addElement('text', 'participant_fee_amount_high', ts('To'), array('size' => 8, 'maxlength' => 8));
 

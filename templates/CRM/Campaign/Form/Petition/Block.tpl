@@ -111,20 +111,11 @@
                       {include file="CRM/common/jcalendar.tpl" elementName=$n}
             {else}
                {$form.$n.html}
-               {if $n eq 'gender' && $form.$fieldName.frozen neq true}
-                  <span class="crm-clear-link">(<a href="#" title="unselect" onclick="unselectRadio('{$n}', '{$form.formName}');return false;">{ts}clear{/ts}</a>)</span>
-               {/if}
              {/if}
              {*CRM-4564*}
-             {if $field.html_type eq 'Radio' && $form.$fieldName.frozen neq true && $field.is_required neq 1}
-                 <span style="line-height: .75em; margin-top: 1px;">
-                  <span class="crm-clear-link">(<a href="#" title="unselect" onclick="unselectRadio('{$n}', '{$form.formName}');return false;">{ts}clear{/ts}</a>)</span>
-                 </span>
-             {elseif $field.html_type eq 'Autocomplete-Select'}
+             {if $field.html_type eq 'Autocomplete-Select'}
            {if $field.data_type eq 'ContactReference'}
                      {include file="CRM/Custom/Form/ContactReference.tpl" element_name = $n}
-                 {else}
-               {include file="CRM/Custom/Form/AutoComplete.tpl" element_name = $n}
                  {/if}
              {/if}
              {* Show explanatory text for field if not in 'view' or 'preview' modes *}

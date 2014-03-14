@@ -312,6 +312,7 @@ function showChildren( parent_id, showOrgInfo, group_id, levelClass) {
             appendHTML += "</tr>";
           });
           cj( rowID ).after( appendHTML );
+          cj( rowID ).next().trigger('crmLoad');
           cj('.crm-editable').crmEditable();
         }
     } );

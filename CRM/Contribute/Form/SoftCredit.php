@@ -68,13 +68,13 @@ class CRM_Contribute_Form_SoftCredit {
   /**
    * Function used to build form element for soft credit block
    *
-   * @param object   $form form object
+   * @param CRM_Core_Form $form
    * @access public
    *
    * @return void
    */
   static function buildQuickForm(&$form) {
-    if ($form->_mode == 'live' && !empty($form->_values['honor_block_is_active'])) {
+    if ($form->_mode == 'live' && $form->_honor_block_is_active) {
       $ufJoinDAO = new CRM_Core_DAO_UFJoin();
       $ufJoinDAO->module = 'soft_credit';
       $ufJoinDAO->entity_id = $form->_id;
@@ -97,12 +97,10 @@ class CRM_Contribute_Form_SoftCredit {
         return $form;
     }
 
-    $prefix = 'soft_credit_';
     // by default generate 5 blocks
     $item_count = 6;
 
     $showSoftCreditRow = 2;
-    $showCreateNew = TRUE;
     if ($form->_action & CRM_Core_Action::UPDATE) {
       $form->_softCreditInfo = CRM_Contribute_BAO_ContributionSoft::getSoftContribution($form->_id, TRUE);
     }
@@ -124,23 +122,17 @@ class CRM_Contribute_Form_SoftCredit {
       if (!empty($form->_softCreditInfo['soft_credit'])) {
         $showSoftCreditRow = count($form->_softCreditInfo['soft_credit']);
         $showSoftCreditRow++;
-        $showCreateNew = FALSE;
       }
     }
 
     for ($rowNumber = 1; $rowNumber <= $item_count; $rowNumber++) {
-      CRM_Contact_Form_NewContact::buildQuickForm($form, $rowNumber, NULL, FALSE, $prefix);
+      $form->addEntityRef("soft_credit_contact_id[{$rowNumber}]", ts('Contact'), array('create' => TRUE));
 
-      $form->addMoney("{$prefix}amount[{$rowNumber}]", ts('Amount'), FALSE, NULL, FALSE);
+      $form->addMoney("soft_credit_amount[{$rowNumber}]", ts('Amount'), FALSE, NULL, FALSE);
 
-      $form->add('select', "{$prefix}type[{$rowNumber}]",
-        ts( 'Soft Credit Type' ),
-        array(
-          '' => ts('- select -')) +
-          CRM_Core_OptionGroup::values("{$prefix}type", FALSE)
-      );
+      $form->addSelect("soft_credit_type[{$rowNumber}]", array('entity' => 'contribution_soft', 'field' => 'soft_credit_type_id', 'label' => ts('Type')));
       if (!empty($form->_softCreditInfo['soft_credit'][$rowNumber]['soft_credit_id'])) {
-        $form->add('hidden', "{$prefix}id[{$rowNumber}]",
+        $form->add('hidden', "soft_credit_id[{$rowNumber}]",
           $form->_softCreditInfo['soft_credit'][$rowNumber]['soft_credit_id']);
       }
     }
@@ -162,9 +154,8 @@ class CRM_Contribute_Form_SoftCredit {
     }
     $form->assign('showSoftCreditRow', $showSoftCreditRow);
     $form->assign('rowCount', $item_count);
-    $form->assign('showCreateNew', $showCreateNew);
     $form->addElement('hidden', 'sct_default_id',
-      CRM_Core_OptionGroup::getDefaultValue("{$prefix}type"),
+      CRM_Core_OptionGroup::getDefaultValue("soft_credit_type"),
       array('id' => 'sct_default_id')
     );
 
@@ -181,7 +172,7 @@ class CRM_Contribute_Form_SoftCredit {
     if (!empty($form->_softCreditInfo['soft_credit'])) {
       foreach ($form->_softCreditInfo['soft_credit'] as $key => $value) {
         $defaults["soft_credit_amount[$key]"] = CRM_Utils_Money::format($value['amount'], NULL, '%a');
-        $defaults["soft_credit_contact_select_id[$key]"] = $value['contact_id'];
+        $defaults["soft_credit_contact_id[$key]"] = $value['contact_id'];
         $defaults["soft_credit_type[$key]"] = $value['soft_credit_type'];
       }
     }
@@ -220,10 +211,10 @@ class CRM_Contribute_Form_SoftCredit {
     }
 
     if (!empty($fields['soft_credit_amount'])) {
-      $repeat = array_count_values($fields['soft_credit_contact_select_id']);
+      $repeat = array_count_values($fields['soft_credit_contact_id']);
       foreach ($fields['soft_credit_amount'] as $key => $val) {
-        if (!empty($fields['soft_credit_contact_select_id'][$key])) {
-          if ($repeat[$fields['soft_credit_contact_select_id'][$key]] > 1) {
+        if (!empty($fields['soft_credit_contact_id'][$key])) {
+          if ($repeat[$fields['soft_credit_contact_id'][$key]] > 1) {
             $errors["soft_credit_contact[$key]"] = ts('You cannot enter multiple soft credits for the same contact.');
           }
           if ($self->_action == CRM_Core_Action::ADD && $fields['soft_credit_amount'][$key]
@@ -233,7 +224,7 @@ class CRM_Contribute_Form_SoftCredit {
           if (empty($fields['soft_credit_amount'][$key])) {
             $errors["soft_credit_amount[$key]"] = ts('Please enter the soft credit amount.');
           }
-          $contactType = CRM_Contact_BAO_Contact::getContactType($fields['soft_credit_contact_select_id'][$key]);
+          $contactType = CRM_Contact_BAO_Contact::getContactType($fields['soft_credit_contact_id'][$key]);
           if ($self->_honoreeProfileType && $self->_honoreeProfileType != $contactType) {
             $errors["soft_credit_contact[$key]"] = ts('Please choose a contact of type %1', array(1 => $self->_honoreeProfileType));
           }

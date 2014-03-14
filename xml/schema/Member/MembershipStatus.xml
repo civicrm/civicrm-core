@@ -38,9 +38,12 @@
   </field>
   <field>
        <name>start_event</name>
-       <type>enum</type>
-       <values>start_date, end_date, join_date</values>
+       <type>varchar</type>
+       <length>12</length>
        <comment>Event when this status starts.</comment>
+       <pseudoconstant>
+         <callback>CRM_Core_SelectValues::eventDate</callback>
+       </pseudoconstant>
        <add>1.5</add>
        <html>
          <type>Select</type>
@@ -48,9 +51,12 @@
   </field>
   <field>
       <name>start_event_adjust_unit</name>
-      <type>enum</type>
-      <values>day, month, year</values>
+      <type>varchar</type>
+      <length>8</length>
       <comment>Unit used for adjusting from start_event.</comment>
+      <pseudoconstant>
+        <callback>CRM_Core_SelectValues::unitList</callback>
+      </pseudoconstant>
       <add>1.5</add>
       <html>
         <type>Select</type>
@@ -64,9 +70,12 @@
   </field>
   <field>
       <name>end_event</name>
-      <type>enum</type>
-      <values>start_date, end_date, join_date</values>
+      <type>varchar</type>
+      <length>12</length>
       <comment>Event after which this status ends.</comment>
+      <pseudoconstant>
+        <callback>CRM_Core_SelectValues::eventDate</callback>
+      </pseudoconstant>
       <add>1.5</add>
       <html>
         <type>Select</type>
@@ -74,9 +83,12 @@
   </field>
   <field>
       <name>end_event_adjust_unit</name>
-      <type>enum</type>
-      <values>day, month, year</values>
+      <type>varchar</type>
+      <length>8</length>
       <comment>Unit used for adjusting from the ending event.</comment>
+      <pseudoconstant>
+        <callback>CRM_Core_SelectValues::unitList</callback>
+      </pseudoconstant>
       <add>1.5</add>
       <html>
         <type>Select</type>

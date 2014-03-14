@@ -90,8 +90,10 @@ class CRM_Core_BAO_FinancialTrxn extends CRM_Financial_DAO_FinancialTrxn {
     $relationTypeId = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Accounts Receivable Account is' "));
     $toFinancialAccount = CRM_Contribute_PseudoConstant::financialAccountType($contributionFinancialTypeId, $relationTypeId);
     $q = "SELECT ft.id, ft.total_amount FROM civicrm_financial_trxn ft INNER JOIN civicrm_entity_financial_trxn eft ON (eft.financial_trxn_id = ft.id AND eft.entity_table = 'civicrm_contribution') WHERE eft.entity_id = %1 AND ft.to_financial_account_id = %2";
+
     $p[1] = array($contributionId, 'Integer');
     $p[2] = array($toFinancialAccount, 'Integer');
+
     $balanceAmtDAO = CRM_Core_DAO::executeQuery($q, $p);
     $ret = array();
     while($balanceAmtDAO->fetch()) {
@@ -410,6 +412,8 @@ WHERE ceft.entity_id = %1";
 
       if ($contributionId && $financialTypeId) {
         $statusId = CRM_Core_OptionGroup::getValue('contribution_status', 'Completed', 'name');
+        $refundStatusId = CRM_Core_OptionGroup::getValue('contribution_status', 'Refunded', 'name');
+
         $relationTypeId = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Accounts Receivable Account is' "));
         $toFinancialAccount = CRM_Contribute_PseudoConstant::financialAccountType($financialTypeId, $relationTypeId);
 
@@ -423,7 +427,7 @@ FROM civicrm_financial_trxn ft
   LEFT JOIN civicrm_contribution c ON (eft.entity_id = c.id)
   LEFT JOIN civicrm_participant_payment pp ON (pp.contribution_id = c.id)
 WHERE pp.participant_id = {$entityId} AND ft.to_financial_account_id != {$toFinancialAccount}
-  AND ft.status_id = {$statusId}
+  AND ft.status_id IN ({$statusId}, {$refundStatusId})
 ";
         $ftTotalAmt = CRM_Core_DAO::singleValueQuery($sqlFtTotalAmt);
         $value = 0;

@@ -57,7 +57,7 @@
 {/if}
 {if $recurRows}
     {strip}
-    <table class="selector">
+    <table class="selector row-highlight">
         <tr class="columnheader">
             <th scope="col">{ts}Amount{/ts}</th>
             <th scope="col">{ts}Frequency{/ts}</th>

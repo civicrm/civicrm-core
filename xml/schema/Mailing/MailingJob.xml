@@ -44,9 +44,12 @@
   </field>
   <field>
       <name>status</name>
-      <type>enum</type>
-      <values>Scheduled, Running, Complete, Paused, Canceled</values>
+      <type>varchar</type>
+      <length>12</length>
       <comment>The state of this job</comment>
+      <pseudoconstant>
+        <callback>CRM_Core_SelectValues::getMailingJobStatus</callback>
+      </pseudoconstant>
       <html>
         <type>Select</type>
       </html>

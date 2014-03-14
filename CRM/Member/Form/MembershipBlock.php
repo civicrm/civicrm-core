@@ -162,7 +162,7 @@ class CRM_Member_Form_MembershipBlock extends CRM_Contribute_Form_ContributionPa
         $this->assign('auto_renew', $this->_renewOption);
       }
       $this->addGroup($membership, 'membership_type', ts('Membership Types'));
-      $this->addGroup($membershipDefault, 'membership_type_default', ts('Membership Types Default'));
+      $this->addGroup($membershipDefault, 'membership_type_default', ts('Membership Types Default'))->setAttribute('allowClear', TRUE);
 
       $this->addFormRule(array('CRM_Member_Form_MembershipBlock', 'formRule'), $this->_id);
     }

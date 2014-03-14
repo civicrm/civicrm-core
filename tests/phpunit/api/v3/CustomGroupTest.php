@@ -174,13 +174,14 @@ class api_v3_CustomGroupTest extends CiviUnitTestCase {
    */
   function testCustomGroupGetFields() {
     $params = array(
-        'options' => array('get_options' => 'style'),
+      'options' => array('get_options' => 'style'),
     );
 
     $result = $this->callAPISuccess('custom_group', 'getfields', $params);
     $expected = array(
       'Tab' => 'Tab',
       'Inline' => 'Inline',
+      'Tab with table' => 'Tab with table',
     );
     $this->assertEquals($expected, $result['values']['style']['options']);
   }

@@ -61,10 +61,14 @@
   <field>
     <name>frequency_unit</name>
     <title>Frequency Unit</title>
-    <type>enum</type>
-    <values>day,week,month,year</values>
+    <type>varchar</type>
+    <length>8</length>
     <default>'month'</default>
     <comment>Time units for recurrence of payment.</comment>
+    <pseudoconstant>
+      <optionGroupName>recur_frequency_units</optionGroupName>
+      <keyColumn>name</keyColumn>
+    </pseudoconstant>
     <add>1.6</add>
     <html>
       <type>Select</type>

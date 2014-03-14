@@ -181,22 +181,16 @@ class CRM_Event_Form_ManageEvent_EventInfo extends CRM_Event_Form_ManageEvent {
         CRM_Core_Session::setStatus(ts('If you find that you are creating multiple events with similar settings, you may want to use the <a href="%1">Event Templates</a> feature to streamline your workflow.', array(1 => $url)), ts('Tip'), 'info');
       }
       if (!CRM_Utils_System::isNull($eventTemplates)) {
-        $this->add('select', 'template_id', ts('From Template'), array('' => ts('- select -')) + $eventTemplates);
+        $this->add('select', 'template_id', ts('From Template'), array('' => ts('- select -')) + $eventTemplates, FALSE, array('class' => 'crm-select2 huge'));
       }
     }
 
     // add event title, make required if this is not a template
     $this->add('text', 'title', ts('Event Title'), $attributes['event_title'], !$this->_isTemplate);
 
-    $event = CRM_Core_OptionGroup::values('event_type');
-
-    $this->add('select',
-      'event_type_id',
-      ts('Event Type'),
-      array(
-        '' => ts('- select -')) + $event,
-      TRUE,
-      array('onChange' => "CRM.buildCustomData( 'Event', this.value );")
+    $this->addSelect('event_type_id',
+      array('onChange' => "CRM.buildCustomData( 'Event', this.value );"),
+      TRUE
     );
 
     //CRM-7362 --add campaigns.
@@ -206,22 +200,9 @@ class CRM_Event_Form_ManageEvent_EventInfo extends CRM_Event_Form_ManageEvent {
     }
     CRM_Campaign_BAO_Campaign::addCampaign($this, $campaignId);
 
-    $participantRole = CRM_Core_OptionGroup::values('participant_role');
-    $this->add('select',
-      'default_role_id',
-      ts('Participant Role'),
-      $participantRole,
-      TRUE
-    );
+    $this->addSelect('default_role_id', array(), TRUE);
 
-    $participantListing = CRM_Core_OptionGroup::values('participant_listing');
-    $this->add('select',
-      'participant_listing_id',
-      ts('Participant Listing'),
-      array(
-        '' => ts('Disabled')) + $participantListing,
-      FALSE
-    );
+    $this->addSelect('participant_listing_id', array('placeholder' => ts('Disabled')));
 
     $this->add('textarea', 'summary', ts('Event Summary'), $attributes['summary']);
     $this->addWysiwyg('description', ts('Complete Description'), $attributes['event_description']);

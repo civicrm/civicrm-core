@@ -1994,6 +1994,7 @@ LEFT  JOIN  civicrm_line_item lineItem ON ( lineItem.entity_id    = participant.
                                        AND  lineItem.entity_table = 'civicrm_participant' )
 LEFT  JOIN  civicrm_price_field_value value ON ( value.id = lineItem.price_field_value_id AND value.count )
      WHERE  ( participant.event_id = %1 )
+            AND participant.is_test = 0
             {$extraWhereClause}
   GROUP BY  participant.event_id";
 
@@ -2054,6 +2055,28 @@ LEFT  JOIN  civicrm_price_field_value value ON ( value.id = lineItem.price_field
       $params[2] = array($eventCampaignID, 'Integer');
     }
     CRM_Core_DAO::executeQuery($query, $params);
+  }
+
+  /**
+   * Get options for a given field.
+   * @see CRM_Core_DAO::buildOptions
+   *
+   * @param String $fieldName
+   * @param String $context: @see CRM_Core_DAO::buildOptionsContext
+   * @param Array  $props: whatever is known about this dao object
+   *
+   * @return array|bool
+   */
+  public static function buildOptions($fieldName, $context = NULL, $props = array()) {
+    $params = array();
+    // Special logic for fields whose options depend on context or properties
+    switch ($fieldName) {
+      case 'financial_type_id':
+        // Fixme - this is going to ignore context, better to get conditions, add params, and call PseudoConstant::get
+        return CRM_Financial_BAO_FinancialType::getIncomeFinancialType();
+        break;
+    }
+    return CRM_Core_PseudoConstant::get(__CLASS__, $fieldName, $params, $context);
   }
 }
 

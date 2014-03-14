@@ -198,7 +198,7 @@ class CRM_Dedupe_Merger {
         'civicrm_activity_contact' => array('contact_id'),
         'civicrm_case_contact' => array('contact_id'),
         'civicrm_contact' => array('primary_contact_id'),
-        'civicrm_contribution' => array('contact_id', 'honor_contact_id'),
+        'civicrm_contribution' => array('contact_id'),
         'civicrm_contribution_page' => array('created_id'),
         'civicrm_contribution_recur' => array('contact_id'),
         'civicrm_contribution_soft' => array('contact_id'),
@@ -879,12 +879,14 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
           if ($label === '1') {
             $label = ts('[x]');
           }
-        } elseif ($field == 'individual_prefix' || $field == 'prefix_id') {
-          $label = CRM_Utils_Array::value('prefix', $contact);
+        }
+        elseif ($field == 'individual_prefix' || $field == 'prefix_id') {
+          $label = CRM_Utils_Array::value('individual_prefix', $contact);
           $value = CRM_Utils_Array::value('prefix_id', $contact);
           $field = 'prefix_id';
-        } elseif ($field == 'individual_suffix' || $field == 'suffix_id') {
-          $label = CRM_Utils_Array::value('suffix', $contact);
+        }
+        elseif ($field == 'individual_suffix' || $field == 'suffix_id') {
+          $label = CRM_Utils_Array::value('individual_suffix', $contact);
           $value = CRM_Utils_Array::value('suffix_id', $contact);
           $field = 'suffix_id';
         }
@@ -1517,6 +1519,14 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
           $submitted['current_employer'] = '';
         }
         unset($submitted['current_employer_id']);
+      }
+
+      //CRM-14312 include prefix/suffix from mainId if not overridden for proper construction of display/sort name
+      if ( !isset($submitted['prefix_id']) && !empty($migrationInfo['main_details']['prefix_id']) ) {
+        $submitted['prefix_id'] = $migrationInfo['main_details']['prefix_id'];
+      }
+      if ( !isset($submitted['suffix_id']) && !empty($migrationInfo['main_details']['suffix_id']) ) {
+        $submitted['suffix_id'] = $migrationInfo['main_details']['suffix_id'];
       }
 
       CRM_Contact_BAO_Contact::createProfileContact($submitted, CRM_Core_DAO::$_nullArray, $mainId);

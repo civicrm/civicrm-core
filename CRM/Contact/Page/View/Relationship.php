@@ -143,36 +143,7 @@ class CRM_Contact_Page_View_Relationship extends CRM_Core_Page {
    * @access public
    */
   function browse() {
-    $links = self::links();
-
-    //CRM-4418, handling edit and delete separately.
-    $permissions = array($this->_permission);
-    if ($this->_permission == CRM_Core_Permission::EDIT) {
-      //previously delete was subset of edit
-      //so for consistency lets grant delete also.
-      $permissions[] = CRM_Core_Permission::DELETE;
-    }
-    $mask = CRM_Core_Action::mask($permissions);
-
-    $currentRelationships = CRM_Contact_BAO_Relationship::getRelationship($this->_contactId,
-      CRM_Contact_BAO_Relationship::CURRENT,
-      0, 0, 0,
-      $links, $mask
-    );
-
-    $inactiveRelationships = CRM_Contact_BAO_Relationship::getRelationship($this->_contactId,
-      CRM_Contact_BAO_Relationship::INACTIVE,
-      0, 0, 0,
-      $links, $mask
-    );
-
-    $this->assign('currentRelationships', $currentRelationships);
-    // to show the 'Current Relationships' title and links only when viewed
-    // from relationship tab, not from dashboard
-    $this->assign('relationshipTabContext', TRUE);
-    $this->assign('inactiveRelationships', $inactiveRelationships);
-
-    $this->ajaxResponse['tabCount'] = count($currentRelationships);
+    // do nothing :) we are using datatable for rendering relationship selectors
   }
 
   /**

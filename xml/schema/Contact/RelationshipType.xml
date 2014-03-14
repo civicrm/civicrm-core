@@ -61,10 +61,13 @@
   </field>
   <field>
        <name>contact_type_a</name>
-       <type>enum</type>
        <title>Contact Type for Contact A</title>
-       <values>Individual, Organization, Household</values>
+       <type>varchar</type>
+       <length>12</length>
        <comment>If defined, contact_a in a relationship of this type must be a specific contact_type.</comment>
+       <pseudoconstant>
+         <callback>CRM_Contact_BAO_ContactType::getSelectElements</callback>
+       </pseudoconstant>
        <add>1.1</add>
        <html>
          <type>Select</type>
@@ -72,10 +75,13 @@
   </field>
   <field>
        <name>contact_type_b</name>
-       <type>enum</type>
        <title>Contact Type for Contact B</title>
-       <values>Individual, Organization, Household</values>
+       <type>varchar</type>
+       <length>12</length>
        <comment>If defined, contact_b in a relationship of this type must be a specific contact_type.</comment>
+       <pseudoconstant>
+         <callback>CRM_Contact_BAO_ContactType::getSelectElements</callback>
+       </pseudoconstant>
        <add>1.1</add>
        <html>
         <type>Select</type>
@@ -89,7 +95,7 @@
        <comment>If defined, contact_sub_type_a in a relationship of this type must be a specific contact_sub_type.</comment>
        <add>3.1</add>
        <html>
-        <type>Multi-Select</type>
+        <type>Select</type>
       </html>
   </field>
   <field>
@@ -100,7 +106,7 @@
        <comment>If defined, contact_sub_type_b in a relationship of this type must be a specific contact_sub_type.</comment>
        <add>3.1</add>
        <html>
-        <type>Multi-Select</type>
+        <type>Select</type>
       </html>
   </field>
   <field>

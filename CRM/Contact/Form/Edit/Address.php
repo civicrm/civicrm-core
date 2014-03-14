@@ -66,24 +66,15 @@ class CRM_Contact_Form_Edit_Address {
     $form->applyFilter('__ALL__', 'trim');
 
     $js = array();
-    if ( !$inlineEdit ) {
-    $js = array('onChange' => 'checkLocation( this.id );');
+    if (!$inlineEdit) {
+      $js = array('onChange' => 'checkLocation( this.id );', 'placeholder' => NULL);
     }
 
-    $form->addElement('select',
-      "address[$blockId][location_type_id]",
-      ts('Location Type'),
-      array(
-        '' => ts('- select -')) + CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id'),
-        $js
-    );
+    //make location type required for inline edit
+    $form->addSelect("address[$blockId][location_type_id]", array('entity' => 'address', 'class' => 'eight') + $js, $inlineEdit);
 
-    if ( !$inlineEdit ) {
-    $js = array('id' => 'Address_' . $blockId . '_IsPrimary', 'onClick' => 'singleSelect( this.id );');
-    }
-    else {
-      //make location type required for inline edit
-      $form->addRule( "address[$blockId][location_type_id]", ts('%1 is a required field.', array(1 => ts('Location Type'))), 'required');
+    if (!$inlineEdit) {
+      $js = array('id' => 'Address_' . $blockId . '_IsPrimary', 'onClick' => 'singleSelect( this.id );');
     }
 
     $form->addElement(
@@ -94,8 +85,8 @@ class CRM_Contact_Form_Edit_Address {
       $js
     );
 
-    if ( !$inlineEdit ) {
-    $js = array('id' => 'Address_' . $blockId . '_IsBilling', 'onClick' => 'singleSelect( this.id );');
+    if (!$inlineEdit) {
+      $js = array('id' => 'Address_' . $blockId . '_IsBilling', 'onClick' => 'singleSelect( this.id );');
     }
 
     $form->addElement(
@@ -178,7 +169,7 @@ class CRM_Contact_Form_Edit_Address {
               $selectOptions = array('' => ts('- select -')) + CRM_Core_PseudoConstant::countyForState($form->getSubmitValue("address[{$blockId}][state_province_id]"));
             }
             elseif ($form->getSubmitValue("address[{$blockId}][county_id]")) {
-              $selectOptions = array('' => ts('- select a state -')) + CRM_Core_PseudoConstant::county();
+              $selectOptions = array('' => ts('- select -')) + CRM_Core_PseudoConstant::county();
             }
             else {
               $selectOptions = array('' => ts('- select a state -'));
@@ -294,14 +285,9 @@ class CRM_Contact_Form_Edit_Address {
       // shared address
       $form->addElement('checkbox', "address[$blockId][use_shared_address]", NULL, ts('Use another contact\'s address'));
 
-      // get the reserved for address
-      $profileId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_UFGroup', 'shared_address', 'id', 'name');
-
-      if (!$profileId) {
-        CRM_Core_Error::fatal(ts('Your install is missing required "Shared Address" profile.'));
-      }
-
-      CRM_Contact_Form_NewContact::buildQuickForm($form, $blockId, array($profileId));
+      // Override the default profile links to add address form
+      $profileLinks = CRM_Core_BAO_UFGroup::getCreateLinks(array('new_individual', 'new_organization', 'new_household'), 'shared_address');
+      $form->addEntityRef("address[$blockId][master_contact_id]", ts('Share With'), array('create' => $profileLinks));
     }
   }
 

@@ -171,7 +171,8 @@ div.crm-container fieldset label{
 .crm-container .big {
   width: 15em;
 }
-.crm-container .huge {
+.crm-container .huge,
+input.crm-form-entityref {
   width: 25em;
 }
 .crm-container .huge40 {
@@ -216,11 +217,6 @@ div.crm-container fieldset label{
   background-color: #B0B0B0;
 }
 
-.crm-container select {
-  vertical-align: middle;
-  border: 1px solid #999;
-}
-
 .crm-container .crm-form-block {
   padding: 4px;
   margin-bottom: 4px;
@@ -229,7 +225,8 @@ div.crm-container fieldset label{
   color: #3E3E3E;
 }
 
-.crm-container textarea {
+.crm-container textarea,
+.crm-container select.crm-form-multiselect {
   border: 1px solid #999;
 }
 
@@ -796,8 +793,7 @@ div.crm-container fieldset label{
  */
 
 /* Inline form field 'post-help' and radio-button unselect */
-.crm-container .description,
-.crm-container .crm-clear-link {
+.crm-container .description {
   font-size: 0.9em;
   font-weight: normal;
   white-space: normal;
@@ -2216,6 +2212,7 @@ div.grippie {
   margin-left: .5em;
 }
 
+.crm-container .crm-button,
 #crm-container .crm-button {
   border: medium none;
   cursor: pointer;
@@ -2227,6 +2224,8 @@ div.grippie {
   padding: 0px 4px;
   cursor: pointer;
 }
+
+.crm-container .crm-button input,
 #crm-container .crm-button input {
   background: none;
   _background: #6C6C6C;
@@ -2239,10 +2238,14 @@ div.grippie {
   margin: 0 0 0 0px;
   padding: 1px 8px 2px 4px;
 }
+
+.crm-container .crm-button-type-cancel,
+.crm-container .crm-button-type-back,
 #crm-container .crm-button-type-cancel,
 #crm-container .crm-button-type-back {
   margin-left: 20px;
 }
+.crm-container .crm-button-type-cancel input,
 #crm-container .crm-button-type-cancel input {
   color: #E6E6DC!important;
 }
@@ -2251,6 +2254,7 @@ div.grippie {
 .crm-container a.button:link,
 .crm-container a.button:visited,
 .crm-container input.form-submit,
+.crm-container .crm-button,
 #crm-container input[type=button],
 #crm-container input.form-submit-inline,
 #crm-container .crm-button {
@@ -2266,6 +2270,7 @@ div.grippie {
   border: 1px solid #3e3e3e;
 }
 
+.crm-container .crm-button,
 #crm-container .crm-button {
   padding: 1px;
 }
@@ -2276,6 +2281,9 @@ div.grippie {
   padding: 2px 6px;
 }
 
+.crm-container .crm-button input[type=button],
+.crm-container .crm-button input.form-submit,
+.crm-container .crm-button input.form-submit-inline,
 #crm-container .crm-button input[type=button],
 #crm-container .crm-button input.form-submit,
 #crm-container .crm-button input.form-submit-inline {
@@ -2447,7 +2455,10 @@ div.grippie {
 }
 
 .crm-container .button .icon,
-.crm-container .crm-button .icon {
+.crm-container .crm-button .icon,
+.crm-accordion-header .icon {
+  position: relative;
+  top: -2px;
   background-image: url("../i/icons/jquery-ui-FFFFFF.png");
 }
 .crm-container .button:hover .icon,
@@ -2460,33 +2471,32 @@ div.grippie {
 }
 
 .crm-container .dark-icon {
-  background-image: url("../packages/jquery/jquery-ui/css/black-tie/images/ui-icons_222222_256x240.png")}
-.crm-container .red-icon {
-  background-image: url("../i/icons/jquery-ui-8A1F11.png")}
-
+  background-image: url("../packages/jquery/jquery-ui/css/black-tie/images/ui-icons_222222_256x240.png")
+}
 .crm-container .edit-icon {
-  background-position: -66px -114px;
+  background-position: -64px -112px;
 }
 .crm-container .previous-icon {
-  background-position: -82px -161px;
+  background-position: -80px -160px;
 }
 .crm-container .next-icon {
-  background-position: -66px -161px;
+  background-position: -64px -160px;
 }
 .crm-container .add-icon {
-  background-position: -2px -193px;
+  background-position: 0 -192px;
 }
 .crm-container .back-icon {
-  background-position: -2px -65px;
+  background-position: 0 -64px;
 }
 .crm-container .delete-icon {
-  background-position: -179px -99px;
+  background-position: -176px -96px;
 }
 .crm-container .details-icon {
-  background-position: -129px -112px;
+  background-position: -128px -112px;
 }
+.crm-container .red-icon,
 .crm-container .button:hover .delete-icon {
-  background-image: url("../i/icons/jquery-ui-8A1F11.png")!important;
+  background-image: url("../i/icons/jquery-ui-8A1F11.png");
 }
 
 .crm-container .restore-icon {
@@ -2498,28 +2508,34 @@ div.grippie {
 }
 
 .crm-container .vcard-icon {
-  background-position: -35px -81px;
+  background-position: -32px -80px;
 }
 
 .crm-container .print-icon {
-  background-position: -162px -97px;
+  background-position: -160px -96px;
 }
 
 .crm-container .dashboard-icon {
-  background-position: -194px -129px;
+  background-position: -192px -128px;
 }
 
+.crm-container .Individual-profile-icon,
 .crm-container .user-record-icon {
-  background-position: -145px -98px;
+  background-position: -144px -96px;
 }
-
+.crm-container .Household-profile-icon {
+  background-position: 0 -112px;
+}
+.crm-container .Organization-profile-icon {
+  background-position: -112px -112px;
+}
 .crm-container .inform-icon {
   background-position: -16px -144px;
   margin-right: 5px;
 }
 
 .crm-container .dropdown-icon {
-  background-position: -46px -32px;
+  background-position: -48px -32px;
   float: right;
 }
 
@@ -2531,29 +2547,31 @@ div.grippie {
   background-position: 0 -144px;
 }
 .crm-container .check-icon {
-  background-position: -66px -146px;
+  background-position: -64px -144px;
 }
 .crm-container .refresh-icon {
-  background-position: -65px -81px;
+  background-position: -64px -80px;
 }
 .crm-container .settings-icon {
-  background-position: -178px -114px;
+  background-position: -176px -112px;
 }
 .crm-container .search-icon {
-  background-position: -161px -114px;
+  background-position: -160px -112px;
 }
 .crm-container .email-icon {
-  background-position: -81px -98px;
+  background-position: -80px -96px;
 }
 .crm-container .preview-icon {
-  background-position: -227px -129px;
+  background-position: -224px -128px;
 }
 .crm-container .play-icon {
-  background-position: -3px -161px;
+  background-position: 0 -160px;
 }
-
+.crm-container .close-icon {
+  background-position: -80px -128px;
+}
 .crm-container .swap-icon {
-  background-position: -82px -81px;
+  background-position: -80px -80px;
 }
 
 #crm-container .geotag {
@@ -2571,29 +2589,34 @@ div.grippie {
   /* for accessibility reason, put the name of the type/subtype in the icon div (it will be hidden and replaced by the icon) */
 }
 
+.select2-results .select2-highlighted .Individual-icon,
 .crm-container .Individual-icon {
   background-position: 0px 0px;
+}
+.select2-results .select2-highlighted .Organization-icon,
+.crm-container .Organization-icon {
+  background-position: -48px 0px;
+}
+.select2-results .select2-highlighted .Household-icon,
+.crm-container .Household-icon {
+  background-position: -32px 0px;
 }
 .crm-container .Group-icon {
   background-position: -16px 0px;
 }
-.crm-container .Household-icon {
-  background-position: -32px 0px;
-}
-
+.select2-results .Individual-icon,
 .crm-container .Individual-subtype-icon {
   background-position: 0px -48px;
 }
+.select2-results .Household-icon,
 .crm-container .Household-subtype-icon {
   background-position: -32px -48px;
 }
+.select2-results .Organization-icon,
 .crm-container .Organization-subtype-icon {
   background-position: -48px -48px;
 }
 
-.crm-container .Organization-icon {
-  background-position: -48px 0px;
-}
 .crm-container .Activity-icon {
   background-position: -64px 0px;
 }
@@ -2622,6 +2645,42 @@ div.grippie {
   background-position: -32px -32px;
 }
 
+/* Icon hover-buttons */
+.crm-container a.crm-hover-button {
+  display: inline-block;
+  border: 1px solid transparent;
+  text-decoration: none;
+  font-size: .8em;
+  color: #000;
+  padding: 1px 2px 1px 0;
+  opacity: .7;
+}
+.crm-container .crm-accordion-header a.crm-hover-button {
+  opacity: 1;
+  position: relative;
+  top: -4px;
+}
+.crm-container a.crm-hover-button:hover,
+.crm-container a.crm-hover-button:active {
+  background-image: -webkit-gradient(linear, left bottom, left top, color-stop(0, #eee), color-stop(1, #ccc));
+  background-image: -webkit-linear-gradient(center bottom, #eee 0%, #ccc 100%);
+  background-image: -moz-linear-gradient(center bottom, #eee 0%, #ccc 100%);
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr = '#cccccc', endColorstr = '#eeeeee', GradientType = 0);
+  background-image: linear-gradient(top, #eee 0%, #ccc 100%);
+  border: 1px solid #AAAAAA;
+  border-radius: 4px;
+  opacity: 1;
+  color: #2786C2;
+}
+.crm-container .crm-hover-button .icon {
+  margin-left: 3px;
+  position: relative;
+  top: 2px;
+}
+.crm-container .crm-hover-button:hover .icon,
+.crm-container .crm-hover-button:active .icon {
+  background-image: url("../i/icons/jquery-ui-2786C2.png");
+}
 /* accordion styles */
 
 .crm-container .crm-accordion-header {
@@ -2723,20 +2782,6 @@ div.grippie {
   background-color: #2E3471;
 }
 
-.crm-container .crm-accordion-header a.crm-close-accordion {
-  font-weight: normal !important;
-  float: right;
-  color: #FFF !important;
-}
-
-.crm-container .crm-accordion-header a.crm-close-accordion span {
-  visibility: hidden;
-}
-
-.crm-container .crm-accordion-header a.crm-close-accordion:hover span {
-  visibility: visible;
-}
-
 .crm-container .crm-master-accordion-header.crm-accordion-header:hover,
 .crm-container .crm-collapsible .collapsible-title:hover {
   background-color: transparent;
@@ -2744,10 +2789,6 @@ div.grippie {
 }
 
 /* civicrm admin menu */
-#civicrm-menu {
-  height: 27px;
-}
-
 #civicrm-menu .ui-autocomplete-input,
 .crm-container .ui-autocomplete-input,
 .crm-container .ac_input {
@@ -2771,28 +2812,33 @@ div.grippie {
   padding: 2px 16px 3px 2px;
 }
 
-/* Status message bar */
-#civicrm-menu .crm-menubar-status-container {
-  position: absolute;
-  right: 2px;
+/* Status message box */
+.crm-status-box-outer {
+  position: fixed;
+  z-index: 9999;
+  right: 0;
   top: 0;
-  border-top: 1px solid #1B1B1B;
 }
 
-#civicrm-menu .crm-menubar-status-progressbar {
-  padding: 3px 14px;
-  font-size: 14px !important;
-  font-weight: bold;
-  background: rgba(142, 136, 0, 0.9);
-  text-align: center;
-}
-
-#civicrm-menu .status-busy {
+.crm-status-box-outer.status-start {
   background: #F8FF03 url("../packages/jquery/jquery-ui/css/black-tie/images/animated-overlay.gif");
 }
 
-#civicrm-menu .status-done .crm-menubar-status-progressbar {
-  background: rgba(41, 152, 32, 0.7);
+.crm-status-box-outer .crm-status-box-inner {
+  padding: 3px 14px;
+  font-size: 13px !important;
+  color: #eee;
+  font-weight: bold;
+  text-align: center;
+  background: rgba(94, 91, 31, 0.9);
+}
+
+.crm-status-box-outer.status-success .crm-status-box-inner {
+  background: rgba(30, 143, 36, 0.7);
+}
+
+.crm-status-box-outer.status-error .crm-status-box-inner {
+  background: rgba(255, 7, 0, 0.7);
 }
 
 /* Pop-up help icon - eliminate forced line break */
@@ -3760,7 +3806,7 @@ div.m ul#civicrm-menu,
   width: 15em;
 }
 .crm-container .select2-container {
-  min-width: 8em !important;
+  min-width: 6em !important;
   font-size: 11px;
 }
 /* Style civi form inputs to match select2 */
@@ -3769,6 +3815,19 @@ div.m ul#civicrm-menu,
   background-image: -webkit-linear-gradient(top, #eee 1%, #fff 15%);
   background-image: -moz-linear-gradient(top, #eee 1%, #fff 15%);
   background-image: linear-gradient(top, #eee 1%, #fff 15%);
+}
+.crm-container select.crm-form-select {
+  border: 1px solid #aaa;
+  color: #444;
+  height: 2.2em;
+  padding: 4px;
+  border-radius: 4px;
+  background-color: #fff;
+  background-image: -webkit-gradient(linear, left bottom, left top, color-stop(0, #eee), color-stop(0.5, #fff));
+  background-image: -webkit-linear-gradient(center bottom, #eee 0%, #fff 50%);
+  background-image: -moz-linear-gradient(center bottom, #eee 0%, #fff 50%);
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr = '#ffffff', endColorstr = '#eeeeee', GradientType = 0);
+  background-image: linear-gradient(top, #fff 0%, #eee 50%);
 }
 /* Add arrow icon to multi-selects */
 .crm-container .select2-container-multi .select2-choices:before {
@@ -3802,6 +3861,9 @@ div.m ul#civicrm-menu,
 .crm-container .select2-container .select2-choice abbr {
   top: 6px;
 }
+.crm-container .select2-container .select2-choice > .select2-chosen {
+  font-size: 1.1em;
+}
 /* Add search icon to ajax single-selects */
 .crm-container .crm-ajax-select .select2-arrow b {
   background-position: -39px -22px;
@@ -3809,6 +3871,63 @@ div.m ul#civicrm-menu,
 /* Restore normal icon when searchable field is open */
 .crm-container .select2-dropdown-open .select2-choice .select2-arrow b {
   background-position: -18px 1px;
+}
+/* Style autocomplete results */
+.crm-container .select2-results {
+  padding: 0;
+}
+.crm-container .select2-results li,
+.crm-container .select2-results .crm-select2-row,
+.crm-container .select2-results .crm-select2-row .crm-select2-row-description p {
+  padding: 0;
+  margin: 0;
+}
+.crm-container .select2-results .crm-select2-row .crm-select2-row-label {
+  font-size: 1.1em;
+}
+.crm-container .select2-results .crm-select2-row .crm-select2-row-description p {
+  font-size: 0.8em;
+  line-height: 1.5em;
+  color: #696969;
+  width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.crm-container .select2-results .select2-highlighted .crm-select2-row .crm-select2-row-description p {
+  color: #f0f0f0;
+}
+.crm-container .select2-results .crm-select2-icon {
+  width: 20px;
+  height: 100%;
+  float: left;
+}
+.crm-container .select2-results .crm-select2-icon .crm-icon {
+  width: 16px;
+  height: 16px;
+  margin: 0;
+}
+.crm-container .select2-results li.select2-no-results {
+  padding-left: 4px;
+  padding-top: 4px;
+  margin-left: 4px;
+}
+.crm-container .select2-results li {
+  margin: 0;
+  padding: 0;
+}
+.crm-container .crm-action-menu .select2-default span.select2-chosen {
+  color: #2786C2;
+}
+.crm-container .crm-action-menu .select2-default span.select2-chosen:before {
+  background: url("../i/icons/jquery-ui-2786C2.png") no-repeat scroll -64px -112px;
+  content: "";
+  display: inline-block;
+  height: 16px;
+  width: 16px;
+  margin-right: 3px;
+  position: relative;
+  top: 3px;
 }
 
 /* Special styling for specific form buttons */
@@ -4240,6 +4359,7 @@ span.crm-status-icon {
 /* Public Pages */
 
 #crm-container.crm-public input[type="text"],
+#crm-container.crm-public input[type="password"],
 #crm-container.crm-public select {
   font-size: 15px;
   padding: 5px;

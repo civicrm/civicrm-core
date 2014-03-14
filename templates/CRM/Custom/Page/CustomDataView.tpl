@@ -27,6 +27,7 @@
 {assign var="showEdit" value=1}
 {foreach from=$viewCustomData item=customValues key=customGroupId}
   {foreach from=$customValues item=cd_edit key=cvID}
+{if $multiRecordDisplay neq 'single'}
     <table class="no-border">
       {assign var='index' value=$groupId|cat:"_$cvID"}
       {if ($editOwnCustomData and $showEdit) or ($showEdit and $editCustomData and $groupId)}
@@ -40,9 +41,9 @@
         </tr>
       {/if}
       {assign var="showEdit" value=0}
-      <tr id="statusmessg_{$index}" class="hiddenElement">
-        <td><span class="success-status"></span></td>
-      </tr>
+        <tr id="statusmessg_{$index}" class="hiddenElement">
+          <td><span class="success-status"></span></td>
+        </tr>
       <tr>
         <td id="{$cd_edit.name}_{$index}" class="section-shown form-item">
           <div class="crm-accordion-wrapper {if $cd_edit.collapse_display eq 0 or $skipTitle} {else}collapsed{/if}">
@@ -122,6 +123,63 @@
         </td>
       </tr>
     </table>
+{else}
+   {foreach from=$cd_edit.fields item=element key=field_id}
+     <div class="crm-section">
+      {if $element.options_per_line != 0}
+          <div class="label">{$element.field_title}</div>
+          <div class="content">
+          {* sort by fails for option per line. Added a variable to iterate through the element array*}
+          {foreach from=$element.field_value item=val}
+             {$val}
+             <br/>
+          {/foreach}
+          </div>
+       {else}
+          <div class="label">{$element.field_title}</div>
+          {if $element.field_type == 'File'}
+          {if $element.field_value.displayURL}
+            <div class="content">
+              <a href="{$element.field_value.displayURL}" class='crm-image-popup'>
+               <img src="{$element.field_value.displayURL}" height="100" width="100">
+              </a>
+            </div>
+          {else}
+            <div class="content">
+             {if $element.field_value}
+              <a href="{$element.field_value.fileURL}">{$element.field_value.fileName}</a>
+             {else}
+              <br/>
+             {/if}
+            </div>
+          {/if}
+          {else}
+            {if $element.field_data_type == 'Money'}
+              {if $element.field_type == 'Text'}
+                 <div class="content">{if $element.field_value}{$element.field_value|crmMoney}{else}<br/>{/if}</div>
+              {else}
+                 <div class="content">{if $element.field_value}{$element.field_value}{else}<br/>{/if}</div>
+              {/if}
+            {else}
+              <div class="content">
+                {if $element.contact_ref_id}
+                  <a href='{crmURL p="civicrm/contact/view" q="reset=1&cid=`$element.contact_ref_id`"}'>
+                {/if}
+                {if $element.field_data_type == 'Memo'}
+                  {$element.field_value|nl2br}
+                {else}
+                  {if $element.field_value}{$element.field_value} {else}<br/>{/if}
+                {/if}
+                {if $element.contact_ref_id}
+                  </a>
+                {/if}
+              </div>
+            {/if}
+          {/if}
+       {/if}
+     </div>
+   {/foreach}
+{/if}
   {/foreach}
 {/foreach}
 {literal}
@@ -143,19 +201,19 @@
       cj('tr#statusmessg_' + groupID + '_' + valueID).show().children().find('span').html(confirmMsg);
     }
     function deleteCustomValue(valueID, elementID, groupID, contactID) {
-      var postUrl = {/literal}"{crmURL p='civicrm/ajax/customvalue' h=0 }"{literal};
-      cj.ajax({
+      var postUrl = {/literal}"{crmURL p='civicrm/ajax/customvalue' h=0 }"{literal},
+      request = cj.ajax({
         type: "POST",
         data: "valueID=" + valueID + "&groupID=" + groupID + "&contactId=" + contactID + "&key={/literal}{crmKey name='civicrm/ajax/customvalue'}{literal}",
         url: postUrl,
         success: function (html) {
           cj('#' + elementID).hide();
           hideStatus(valueID, groupID);
-          CRM.alert('', '{/literal}{ts escape="js"}Record Deleted{/ts}{literal}', 'success');
           var element = cj('.ui-tabs-nav #tab_custom_' + groupID + ' a');
           cj(element).html(cj(element).attr('title') + ' (' + html + ') ');
         }
       });
+      CRM.status({success: '{/literal}{ts escape="js"}Record Deleted{/ts}{literal}'}, request);
     }
     {/literal}
   </script>

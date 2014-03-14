@@ -84,7 +84,7 @@ var CRM = CRM || {};
   /**
    * AJAX api
    */
-  CRM.api3 = function(entity, action, params) {
+  CRM.api3 = function(entity, action, params, status) {
     if (typeof(entity) === 'string') {
       params = {
         entity: entity,
@@ -98,12 +98,25 @@ var CRM = CRM || {};
         json: JSON.stringify(entity)
       }
     }
-    return $.ajax({
+    var ajax = $.ajax({
       url: CRM.url('civicrm/ajax/rest'),
       dataType: 'json',
       data: params,
       type: params.action.indexOf('get') < 0 ? 'POST' : 'GET'
     });
+    if (status) {
+      // Default status messages
+      if (status === true) {
+        status = {success: params.action === 'delete' ? ts('Removed') : ts('Saved')};
+        if (params.action.indexOf('get') === 0) {
+          status.start = ts('Loading...');
+          status.success = null;
+        }
+      }
+      var messages = status === true ? {} : status;
+      CRM.status(status, ajax);
+    }
+    return ajax;
   };
 
   /**
@@ -137,13 +150,13 @@ var CRM = CRM || {};
       case "setvalue":
       case "replace":
         settings.success = function() {
-          CRM.alert('', ts('Saved'), 'success');
+          CRM.status(ts('Saved'));
           return true;
         };
         break;
       case "delete":
         settings.success = function() {
-          CRM.alert('', ts('Removed'), 'success');
+          CRM.status(ts('Removed'));
           return true;
         };
     }

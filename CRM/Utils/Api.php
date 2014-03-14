@@ -41,15 +41,20 @@ class CRM_Utils_Api {
 
     // If that didn't work, try a different pattern
     if (!$shortName) {
-      list(, $entity) = explode('_', $className);
-      $daoName = "CRM_{$entity}_DAO_$entity";
+      list(, $parent, , $child) = explode('_', $className);
+      $daoName = "CRM_{$parent}_DAO_$child";
       $shortName = CRM_Core_DAO_AllCoreTables::getBriefName($daoName);
     }
 
     // If that didn't work, try a different pattern
     if (!$shortName) {
-      list(, , , $entity) = explode('_', $className);
-      $daoName = "CRM_Core_DAO_$entity";
+      $daoName = "CRM_{$parent}_DAO_$parent";
+      $shortName = CRM_Core_DAO_AllCoreTables::getBriefName($daoName);
+    }
+
+    // If that didn't work, try a different pattern
+    if (!$shortName) {
+      $daoName = "CRM_Core_DAO_$child";
       $shortName = CRM_Core_DAO_AllCoreTables::getBriefName($daoName);
     }
     if (!$shortName) {

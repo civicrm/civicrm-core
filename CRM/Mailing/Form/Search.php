@@ -59,7 +59,7 @@ class CRM_Mailing_Form_Search extends CRM_Core_Form {
       $this->addElement('checkbox', "mailing_status[$status]", NULL, $status);
     }
     $this->addElement('checkbox', 'status_unscheduled', NULL, 'Draft / Unscheduled');
-    $this->addYesNo('is_archived', ts('Mailing is Archived'));
+    $this->addYesNo('is_archived', ts('Mailing is Archived'), TRUE);
 
     if ($parent->_sms) {
       $this->addElement('hidden', 'sms', $parent->_sms);

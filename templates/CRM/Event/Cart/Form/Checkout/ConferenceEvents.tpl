@@ -12,7 +12,6 @@
     <div class="slot_options">
       <ul class="indented">
         {$form.$field_name.html}
-        <span class="crm-clear-link">(<a href="#" title="unselect" onclick="unselectRadio('{$field_name}', '{$form.formName}'); return false;">{ts}clear{/ts}</a>)</span>
       </ul>
     </div>
   </fieldset>

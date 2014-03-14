@@ -61,10 +61,13 @@
     </dynamicForeignKey>
     <field>
         <name>operation</name>
-        <type>enum</type>
-        <values>All,View,Edit,Create,Delete,Grant,Revoke,Search</values>
+        <type>varchar</type>
+        <length>8</length>
         <required>true</required>
         <comment>What operation does this ACL entry control?</comment>
+        <pseudoconstant>
+          <callback>CRM_ACL_BAO_ACL::operation</callback>
+        </pseudoconstant>
         <html>
           <type>Select</type>
         </html>

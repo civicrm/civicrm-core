@@ -71,6 +71,7 @@
         <p>{$event.intro_text}</p>
       </div>
     {/if}
+
     {include file="CRM/common/cidzero.tpl"}
     {if $pcpSupporterText}
       <div class="crm-section pcpSupporterText-section">
@@ -90,6 +91,12 @@
         <div class="clear"></div>
       </div>
     {/if}
+
+    {* User account registration option. Displays if enabled for one of the profiles on this page. *}
+    {include file="CRM/common/CMSUser.tpl"}
+
+    {* Display "Top of page" profile immediately after the introductory text *}
+    {include file="CRM/UF/Form/Block.tpl" fields=$customPre}
 
     {if $priceSet}
       {if ! $quickConfig}<fieldset id="priceset" class="crm-group priceset-group">
@@ -133,11 +140,6 @@
         </div>
       </fieldset>
     {/if}
-
-    {* User account registration option. Displays if enabled for one of the profiles on this page. *}
-    {include file="CRM/common/CMSUser.tpl"}
-
-    {include file="CRM/UF/Form/Block.tpl" fields=$customPre}
 
     {if $form.payment_processor.label}
       <fieldset class="crm-group payment_options-group" style="display:none;">

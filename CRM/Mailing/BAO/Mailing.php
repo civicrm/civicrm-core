@@ -1110,6 +1110,11 @@ ORDER BY   civicrm_email.is_bulkmail DESC
     if ($contactDetails) {
       $contact = $contactDetails;
     }
+    elseif ($contactId === 0) {
+      //anonymous user
+      $contact = array();
+      CRM_Utils_Hook::tokenValues($contact, $contactId, $job_id);
+    }
     else {
       $params = array(array('contact_id', '=', $contactId, 0, 0));
       list($contact, $_) = CRM_Contact_BAO_Query::apiQuery($params);
@@ -2389,16 +2394,6 @@ LEFT JOIN civicrm_mailing_group g ON g.mailing_id   = m.id
     //get the tokens.
     $tokens = CRM_Core_SelectValues::contactTokens();
 
-    //token selector for subject
-    //CRM-5058
-    $form->add('select', 'token3', ts('Insert Token'),
-      $tokens, FALSE,
-      array(
-        'size' => "5",
-        'multiple' => TRUE,
-        'onclick' => "return tokenReplText(this);",
-      )
-    );
     $className = CRM_Utils_System::getClassName($form);
     if ($className == 'CRM_Mailing_Form_Upload') {
       $tokens = array_merge(CRM_Core_SelectValues::mailingTokens(), $tokens);
@@ -2413,27 +2408,7 @@ LEFT JOIN civicrm_mailing_group g ON g.mailing_id   = m.id
     }
 
     //sorted in ascending order tokens by ignoring word case
-    natcasesort($tokens);
-    $form->assign('tokens', json_encode($tokens));
-
-    $form->add('select', 'token1', ts('Insert Tokens'),
-      $tokens, FALSE,
-      array(
-        'size' => "5",
-        'multiple' => TRUE,
-        'onclick' => "return tokenReplText(this);",
-      )
-    );
-
-    $form->add('select', 'token2', ts('Insert Tokens'),
-      $tokens, FALSE,
-      array(
-        'size' => "5",
-        'multiple' => TRUE,
-        'onclick' => "return tokenReplHtml(this);",
-      )
-    );
-
+    $form->assign('tokens', CRM_Utils_Token::formatTokensForDisplay($tokens));
 
     $form->_templates = CRM_Core_BAO_MessageTemplate::getMessageTemplates(FALSE);
     if (!empty($form->_templates)) {
@@ -2498,19 +2473,7 @@ LEFT JOIN civicrm_mailing_group g ON g.mailing_id   = m.id
       $tokens = array_merge($form->listTokens(), $tokens);
     }
 
-    //sorted in ascending order tokens by ignoring word case
-    natcasesort($tokens);
-
-    $form->assign('tokens', json_encode($tokens));
-
-    $form->add('select', 'token1', ts('Insert Tokens'),
-      $tokens, FALSE,
-      array(
-        'size' => "5",
-        'multiple' => TRUE,
-        'onchange' => "return tokenReplHtml(this);",
-      )
-    );
+    $form->assign('tokens', CRM_Utils_Token::formatTokensForDisplay($tokens));
 
     $form->_templates = CRM_Core_BAO_MessageTemplate::getMessageTemplates(FALSE);
     if (!empty($form->_templates)) {
@@ -2784,8 +2747,8 @@ AND        m.id = %1
 
     //CRM-12814
     if (!empty($mailings)) {
-      $openCounts = CRM_Mailing_Event_BAO_Opened::getMailingTotalCount(array_keys($mailings));
-      $clickCounts = CRM_Mailing_Event_BAO_TrackableURLOpen::getMailingTotalCount(array_keys($mailings));
+      $openCounts = CRM_Mailing_Event_BAO_Opened::getMailingContactCount(array_keys($mailings), $params['contact_id']);
+      $clickCounts = CRM_Mailing_Event_BAO_TrackableURLOpen::getMailingContactCount(array_keys($mailings), $params['contact_id']);
     }
 
     // format params and add links
@@ -2802,8 +2765,10 @@ AND        m.id = %1
         "reset=1&cid={$values['creator_id']}");
 
       //CRM-12814
-      $contactMailings[$mailingId]['openstats'] = ts('Opens') . ': ' . $openCounts[$values['mailing_id']] .
-        '<br />' . ts('Clicks') . ': ' . $clickCounts[$values['mailing_id']];
+      $contactMailings[$mailingId]['openstats'] = "Opens: ".
+        CRM_Utils_Array::value($values['mailing_id'], $openCounts, 0).
+        "<br />Clicks: ".
+        CRM_Utils_Array::value($values['mailing_id'], $clickCounts, 0);
 
       $actionLinks = array(
         CRM_Core_Action::VIEW => array(

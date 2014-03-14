@@ -88,8 +88,8 @@
       {if !$contributionMode and !$email and $outBound_option != 2}
         {assign var='profileCreateCallback' value=1 }
       {/if}
-      {* note that if we are using multiple instances of NewContact always pass values for blockNo and prefix *}
-      {include file="CRM/Contact/Form/NewContact.tpl" blockNo=1 prefix=''}
+      <td class="label">{$form.contact_id.label}</td>
+      <td>{$form.contact_id.html}</td>
     {/if}
     {if $contributionMode}
     <tr class="crm-contribution-form-block-payment_processor_id"><td class="label nowrap">{$form.payment_processor_id.label}<span class="marker"> * </span></td><td>{$form.payment_processor_id.html}</td></tr>
@@ -385,7 +385,7 @@
         cj('div.'+id).html(loading);
         cj.ajax({
           url    : url,
-          success: function(data) { cj('div.'+id).html(data); }
+          success: function(data) { cj('div.'+id).html(data).trigger('crmLoad'); }
         });
       }
     }
@@ -583,7 +583,7 @@ function buildAmount( priceSetId ) {
     async: false
   }).responseText;
 
-  cj( fname ).show( ).html( response );
+  cj( fname ).show( ).html( response ).trigger('crmLoad');
   // freeze total amount text field.
   cj( "#total_amount").val('');
 

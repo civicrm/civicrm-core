@@ -32,65 +32,6 @@
  * $Id: $
  *
  */
-class CRM_Utils_Hook_Drupal6 extends CRM_Utils_Hook {
-
-  /**
-   * @var bool
-   */
-  private $isBuilt = FALSE;
-
-  /**
-   * @var array(string)
-   */
-  private $allModules = NULL;
-
-  /**
-   * @var array(string)
-   */
-  private $civiModules = NULL;
-
-  /**
-   * @var array(string)
-   */
-  private $drupalModules = NULL;
-
-  function invoke($numParams,
-    &$arg1, &$arg2, &$arg3, &$arg4, &$arg5, &$arg6,
-    $fnSuffix
-  ) {
-
-    $this->buildModuleList();
-
-    return $this->runHooks($this->allModules, $fnSuffix,
-      $numParams, $arg1, $arg2, $arg3, $arg4, $arg5, $arg6
-    );
-  }
-
-  /**
-   * Build the list of modules to be processed for hooks.
-   */
-  function buildModuleList() {
-    if ($this->isBuilt === FALSE) {
-      if ($this->drupalModules === NULL) {
-        if (function_exists('module_list')) {
-          // copied from user_module_invoke
-          $this->drupalModules = module_list();
-        }
-      }
-
-      if ($this->civiModules === NULL) {
-        $this->civiModules = array();
-        $this->requireCiviModules($this->civiModules);
-      }
-
-      $this->allModules = array_merge((array)$this->drupalModules, (array)$this->civiModules);
-      if ($this->drupalModules !== NULL && $this->civiModules !== NULL) {
-        // both CRM and CMS have bootstrapped, so this is the final list
-        $this->isBuilt = TRUE;
-      }
-    }
-  }
+class CRM_Utils_Hook_Drupal6 extends CRM_Utils_Hook_DrupalBase {
 }
-
-
 

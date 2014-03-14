@@ -29,24 +29,29 @@
   cj(function($) {
     var $row, $table, info, enabled, fieldLabel;
 
+    function successMsg() {
+      {/literal} {* client-side variable substitutions in smarty are AWKWARD! *}
+      var msg = enabled ? '{ts escape="js" 1="<em>%1</em>"}%1 Disabled{/ts}' : '{ts escape="js" 1="<em>%1</em>"}%1 Enabled{/ts}'{literal};
+      return ts(msg, {1: fieldLabel});
+    }
+
     function refresh() {
       // Call native refresh method on ajax datatables
       if ($.fn.DataTable.fnIsDataTable($table[0]) && $table.dataTable().fnSettings().sAjaxSource) {
-        $table.unblock().dataTable().fnDraw();
+        $.each($.fn.dataTable.fnTables(), function() {
+          $(this).dataTable().fnSettings().sAjaxSource && $(this).unblock().dataTable().fnDraw();
+        });
       }
       // Otherwise refresh the content area using crmSnippet
       else {
         $row.closest('.crm-ajax-container, #crm-main-content-wrapper').crmSnippet().crmSnippet('refresh');
       }
-      {/literal} {* client-side variable substitutions in smarty are AWKWARD! *}
-      var msg = enabled ? '{ts escape="js" 1="<em>%1</em>"}%1 Disabled{/ts}' : '{ts escape="js" 1="<em>%1</em>"}%1 Enabled{/ts}'{literal};
-      CRM.alert('', ts(msg, {1: fieldLabel}), 'success');
     }
 
     function save() {
       $table = $row.closest('table');
       $table.block();
-      CRM.api(info.entity, 'setvalue', {id: info.id, field: 'is_active', value: enabled ? 0 : 1}, {success: refresh});
+      CRM.api3(info.entity, 'setvalue', {id: info.id, field: 'is_active', value: enabled ? 0 : 1}, {success: successMsg}).done(refresh);
       if (enabled) {
         $(this).dialog('close');
       }
@@ -86,7 +91,7 @@
 
     // Because this is an inline script it may get added to the document more than once, so remove handler before adding
     $('body')
-      .off('click', '.action-item.crm-enable-disable')
+      .off('click', '.crm-enable-disable')
       .on('click', '.action-item.crm-enable-disable', enableDisable);
   });
 </script>

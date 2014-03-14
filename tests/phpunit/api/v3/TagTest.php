@@ -191,5 +191,17 @@ class api_v3_TagTest extends CiviUnitTestCase {
     $result      = $this->callAPIAndDocument('tag', 'getfields', $params, __FUNCTION__, __FILE__, $description, NULL, 'getfields');
     $this->assertEquals('civicrm_contact', $result['values']['used_for']['api.default']);
   }
+
+  function testTagGetList() {
+    $description = "Demonstrates use of api.getlist for autocomplete and quicksearch applications";
+    $params = array(
+      'input' => $this->tag['name'],
+      'extra' => array('used_for')
+    );
+    $result = $this->callAPIAndDocument('tag', 'getlist', $params, __FUNCTION__, __FILE__, $description);
+    $this->assertEquals($this->tag['id'], $result['values'][0]['id'], 'In line ' . __LINE__);
+    $this->assertEquals($this->tag['description'], $result['values'][0]['description'][0], 'In line ' . __LINE__);
+    $this->assertEquals($this->tag['used_for'], $result['values'][0]['extra']['used_for'], 'In line ' . __LINE__);
+  }
 }
 

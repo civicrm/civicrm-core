@@ -28,7 +28,7 @@
 {/if}
 
 {strip}
-<table class="selector">
+<table class="selector row-highlight">
   <thead class="sticky">
   <tr class="columnheader">
   {if ! $single and $context eq 'Search' }

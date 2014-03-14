@@ -129,12 +129,7 @@ class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_
     $attributes = CRM_Core_DAO::getAttribute('CRM_Contribute_DAO_ContributionPage');
 
     // financial Type
-    $financialType = CRM_Financial_BAO_FinancialType::getIncomeFinancialType();
-    $this->add('select', 'financial_type_id',
-      ts('Financial Type'),
-      $financialType,
-      TRUE
-    );
+    $this->addSelect('financial_type_id', array(), TRUE);
 
     // name
     $this->add('text', 'title', ts('Title'), $attributes['title'], TRUE);
@@ -210,16 +205,13 @@ class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_
 
     $this->add('textarea', 'honor_block_text', ts('Honoree Introductory Message'), array('rows' => 2, 'cols' => 50));
 
-    $softCreditTypes = &$this->add('select', 'soft_credit_types',
-      ts('Honor Types'),
-      CRM_Core_OptionGroup::values("soft_credit_type", FALSE),
-      FALSE,
-      array(
-        'id' => 'soft_credit_types',
-        'multiple' => 'multiple',
-        'class' => 'crm-select2',
-      )
-    );
+    $this->addSelect('soft_credit_types', array(
+      'label' => ts('Honor Types'),
+      'entity' => 'ContributionSoft',
+      'field' => 'soft_credit_type_id',
+      'multiple' => TRUE,
+      'class' => 'huge'
+    ));
 
     $entities = array(
       array(

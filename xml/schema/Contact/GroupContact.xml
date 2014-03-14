@@ -59,10 +59,13 @@
   </foreignKey>
   <field>
        <name>status</name>
-       <type>enum</type>
+       <type>varchar</type>
+       <length>8</length>
        <title>Group Contact Status</title>
-       <values>Added, Removed, Pending</values>
        <comment>status of contact relative to membership in group</comment>
+       <pseudoconstant>
+         <callback>CRM_Core_SelectValues::groupContactStatus</callback>
+       </pseudoconstant>
        <add>1.1</add>
        <html>
          <type>Select</type>

@@ -66,11 +66,6 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form {
   public function setDefaultValues() {
     $defaults = parent::setDefaultValues();
 
-    // get the member org display name
-    if ( $this->_id && !empty($defaults['member_of_contact_id'])) {
-      $this->assign('member_org_id', $defaults['member_of_contact_id']);
-    }
-
     //finding default weight to be put
     if (!isset($defaults['weight']) || (!$defaults['weight'])) {
       $defaults['weight'] = CRM_Utils_Weight::getDefaultWeight('CRM_Member_DAO_MembershipType');
@@ -137,7 +132,7 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form {
     );
     $this->addRule('minimum_fee', ts('Please enter a monetary value for the Minimum Fee.'), 'money');
 
-    $this->addElement('select', 'duration_unit', ts('Duration'), CRM_Core_SelectValues::unitList('duration'));
+    $this->addElement('select', 'duration_unit', ts('Duration'), CRM_Core_SelectValues::membershipTypeUnitList());
 
     //period type
     $this->addElement('select', 'period_type', ts('Period Type'), CRM_Core_SelectValues::periodType());
@@ -146,18 +141,8 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form {
       CRM_Core_DAO::getAttribute('CRM_Member_DAO_MembershipType', 'duration_interval')
     );
 
-    $dataUrl = CRM_Utils_System::url(
-      "civicrm/ajax/rest",
-      "className=CRM_Contact_Page_AJAX&fnName=getContactList&json=1&context=membershipType&reset=1&org=1",
-      FALSE, NULL, FALSE
-    );
-    $this->assign('dataUrl', $dataUrl);
-
-    $memberOrg = &$this->add('text', 'member_of_contact', ts('Membership Organization'), NULL, TRUE);
-    $this->add('hidden', 'member_of_contact_id', '', array('id' => 'member_of_contact_id'));
-    if ($memberOrg->getValue()) {
-      $this->assign('member_org', $memberOrg->getValue());
-    }
+    $props = array('api' => array('params' => array('contact_type' => 'Organization')));
+    $this->addEntityRef('member_of_contact_id', ts('Membership Organization'), $props, TRUE);
 
     //start day
     $this->add('date', 'fixed_period_start_day', ts('Fixed Period Start Day'),
@@ -237,10 +222,6 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form {
 
     if (!$params['name']) {
       $errors['name'] = ts('Please enter a membership type name.');
-    }
-
-    if ($params['member_of_contact'] && !is_numeric($params['member_of_contact_id'])) {
-      $errors['member_of_contact'] = ts('Please select valid organization contact.');
     }
 
     if (empty( $params['financial_type_id'] ) ) {

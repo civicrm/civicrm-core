@@ -34,7 +34,7 @@
   {include file="CRM/common/pager.tpl" location="top"}
 
   {strip}
-    <table class="selector">
+    <table class="selector row-highlight">
       <tr class="columnheader">
       {foreach from=$columnHeaders item=header}
         <th scope="col">

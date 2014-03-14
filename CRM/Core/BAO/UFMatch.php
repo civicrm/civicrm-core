@@ -72,34 +72,15 @@ class CRM_Core_BAO_UFMatch extends CRM_Core_DAO_UFMatch {
    * @static
    */
   static function synchronize(&$user, $update, $uf, $ctype, $isLogin = FALSE) {
-    $config = CRM_Core_Config::singleton();
+    $userSystem = CRM_Core_Config::singleton()->userSystem;
     $session = CRM_Core_Session::singleton();
     if (!is_object($session)) {
       CRM_Core_Error::fatal('wow, session is not an object?');
       return;
     }
 
-    if ($config->userSystem->is_drupal) {
-      $key   = 'uid';
-      $login = 'name';
-      $mail  = 'mail';
-    }
-    elseif ($uf == 'Joomla') {
-      $key   = 'id';
-      $login = 'username';
-      $mail  = 'email';
-      if (!isset($user->id) || !isset($user->email)) {
-        $user = JFactory::getUser();
-      }
-    }
-    elseif ($uf == 'WordPress') {
-      $key   = 'ID';
-      $login = 'user_login';
-      $mail  = 'user_email';
-    }
-    else {
-      CRM_Core_Error::statusBounce(ts('Please set the user framework variable'));
-    }
+    $userSystemID = $userSystem->getBestUFID($user);
+    $uniqId = $userSystem->getBestUFUniqueIdentifier($user);
 
     // if the id of the object is zero (true for anon users in drupal)
     // have we already processed this user, if so early
@@ -107,7 +88,7 @@ class CRM_Core_BAO_UFMatch extends CRM_Core_DAO_UFMatch {
     $userID = $session->get('userID');
     $ufID = $session->get('ufID');
 
-    if (!$update && $ufID == $user->$key) {
+    if (!$update && $ufID == $userSystemID) {
       return;
     }
 
@@ -115,7 +96,7 @@ class CRM_Core_BAO_UFMatch extends CRM_Core_DAO_UFMatch {
     $isUserLoggedIn = CRM_Utils_System::isUserLoggedIn();
 
     // reset the session if we are a different user
-    if ($ufID && $ufID != $user->$key) {
+    if ($ufID && $ufID != $userSystemID) {
       $session->reset();
 
       //get logged in user ids, and set to session.
@@ -128,15 +109,11 @@ class CRM_Core_BAO_UFMatch extends CRM_Core_DAO_UFMatch {
     }
 
     // return early
-    if ($user->$key == 0) {
+    if ($userSystemID == 0) {
       return;
     }
 
-    if (!isset($uniqId) || !$uniqId) {
-      $uniqId = $user->$mail;
-    }
-
-    $ufmatch = self::synchronizeUFMatch($user, $user->$key, $uniqId, $uf, NULL, $ctype, $isLogin);
+    $ufmatch = self::synchronizeUFMatch($user, $userSystemID, $uniqId, $uf, NULL, $ctype, $isLogin);
     if (!$ufmatch) {
       return;
     }

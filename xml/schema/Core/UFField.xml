@@ -109,10 +109,13 @@
   </field>
   <field>
        <name>visibility</name>
-       <type>enum</type>
-       <values>User and User Admin Only,Public Pages,Public Pages and Listings</values>
+       <type>varchar</type>
+       <length>32</length>
        <default>'User and User Admin Only'</default>
        <comment>In what context(s) is this field visible.</comment>
+       <pseudoconstant>
+         <callback>CRM_Core_SelectValues::ufVisibility</callback>
+       </pseudoconstant>
        <add>1.1</add>
        <html>
          <type>Select</type>

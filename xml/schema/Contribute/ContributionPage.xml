@@ -56,6 +56,7 @@
   </foreignKey>
   <field>
     <name>financial_type_id</name>
+    <title>Financial Type</title>
     <type>int unsigned</type>
     <comment>default financial type assigned to contributions submitted via this page, e.g. Contribution, Campaign Contribution</comment>
     <pseudoconstant>
@@ -345,12 +346,6 @@
     <comment>Is this property active?</comment>
     <default>1</default>
     <add>1.5</add>
-  </field>
-  <field>
-    <name>honor_block_is_active</name>
-    <type>boolean</type>
-    <comment>Should this contribution have the honor  block enabled?</comment>
-    <add>1.6</add>
   </field>
   <field>
     <name>start_date</name>

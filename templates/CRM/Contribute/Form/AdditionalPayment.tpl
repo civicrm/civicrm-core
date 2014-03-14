@@ -23,7 +23,40 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
-{if $formType}
+{if $transaction}
+  {if !empty($rows)}
+   <table id='info'>
+     <tr class="columnheader">
+       <th>{ts}Amount{/ts}</th>
+       <th>{ts}Type{/ts}</th>
+       <th>{ts}Paid By{/ts}</th>
+       <th>{ts}Received{/ts}</th>
+       <th>{ts}Transaction ID{/ts}</th>
+       <th>{ts}Status{/ts}</th>
+     </tr>
+     {foreach from=$rows item=row}
+     <tr>
+       <td>{$row.total_amount|crmMoney}</td>
+       <td>{$row.financial_type}</td>
+       <td>{$row.payment_instrument}{if $row.check_number} (#{$row.check_number}){/if}</td>
+       <td>{$row.receive_date|crmDate}</td>
+       <td>{$row.trxn_id}</td>
+       <td>{$row.status}</td>
+     </tr>
+     {/foreach}
+    <table>
+  {else}
+     {if $component eq 'event'}
+       {assign var='entity' value='participant'}
+     {else}
+       {assign var='entity' value=$component}
+     {/if}
+    {ts 1=$entity}No additional payments found for this %1 record{/ts}
+  {/if}
+ <div class="crm-submit-buttons">
+    {include file="CRM/common/formButtons.tpl"}
+ </div>
+{elseif $formType}
   {include file="CRM/Contribute/Form/AdditionalInfo/$formType.tpl"}
 {else}
 
@@ -66,20 +99,16 @@
     <tr>
       <td class='label'>{ts}Event{/ts}</td><td>{$eventName}</td>
     </tr>
-    <tr class="crm-payment-form-block-contribution_type_id crm-payment-form-block-financial_type_id">
-      <td class="label">{$form.financial_type_id.label}</td><td{$valueStyle}>{$form.financial_type_id.html}&nbsp;
-      </td>
-    </tr>
     <tr class="crm-payment-form-block-total_amount">
       <td class="label">{$form.total_amount.label}</td>
       <td>
-        <span id='totalAmount'>{$form.currency.html|crmAddClass:eight}&nbsp;{$form.total_amount.html|crmAddClass:eight}</span> {$paymentAmt}
+        <span id='totalAmount'>{$form.currency.html|crmAddClass:eight}&nbsp;{$form.total_amount.html|crmAddClass:eight}</span>&nbsp; <span class="status">{if $paymentType EQ 'refund'}{ts}Refund Due{/ts}{else}{ts}Balance Owed{/ts}{/if}:&nbsp;{$paymentAmt|crmMoney}</span>
       </td>
     </tr>
    </table>
     <div class="crm-accordion-wrapper crm-accordion_title-accordion crm-accordion-processed" id="paymentDetails_Information">
       <div class="crm-accordion-header">
-        {ts}Payment Details{/ts}
+        {if $paymentType EQ 'refund'}{ts}Refund Details{/ts}{else}{ts}Payment Details{/ts}{/if}
       </div>
       <div class="crm-accordion-body">
         <table class="form-layout-compressed" >
@@ -108,7 +137,7 @@
             <tr class="crm-payment-form-block-is_email_receipt">
               <td class="label">
                 {$form.is_email_receipt.label}</td><td>{$form.is_email_receipt.html}&nbsp;
-                <span class="description">{ts 1=$email}Automatically email a receipt for this payment to %1?{/ts}</span>
+                <span class="description">{ts 1=$email}Automatically email a receipt to %1?{/ts}</span>
               </td>
             </tr>
           {/if}
@@ -119,7 +148,7 @@
           <tr id='notice' class="crm-event-eventfees-form-block-receipt_text">
             <td class="label">{$form.receipt_text.label}</td>
             <td><span class="description">
-                {ts}Enter a message you want included at the beginning of the confirmation email. EXAMPLE: 'Thanks for registering for this event.'{/ts}
+                {ts}Enter a message you want included at the beginning of the confirmation email.{/ts}
                 </span><br />
                 {$form.receipt_text.html|crmAddClass:huge}
             </td>
@@ -229,7 +258,7 @@
         cj('div.'+id).html(loading);
         cj.ajax({
           url    : url,
-          success: function(data) { cj('div.'+id).html(data); }
+          success: function(data) { cj('div.'+id).html(data).trigger('crmLoad'); }
         });
       }
     }

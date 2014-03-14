@@ -29,9 +29,12 @@
   </foreignKey>
   <field>
        <name>group_type</name>
-       <type>enum</type>
-       <values>Include, Exclude, Base</values>
+       <type>varchar</type>
+       <length>8</length>
        <comment>Are the members of the group included or excluded?.</comment>
+       <pseudoconstant>
+         <callback>CRM_Core_SelectValues::getMailingGroupTypes</callback>
+       </pseudoconstant>
        <html>
          <type>Select</type>
        </html>

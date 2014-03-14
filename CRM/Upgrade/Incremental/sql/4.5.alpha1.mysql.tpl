@@ -1,6 +1,4 @@
 {* file to handle db changes in 4.5.alpha1 during upgrade *}
-{include file='../CRM/Upgrade/4.4.alpha1.msg_template/civicrm_msg_template.tpl'}
-
 {include file='../CRM/Upgrade/4.5.alpha1.msg_template/civicrm_msg_template.tpl'}
 
 ALTER TABLE `civicrm_contact`
@@ -151,6 +149,7 @@ ALTER TABLE `civicrm_uf_join`
      ALTER TABLE civicrm_contribution_page DROP honor_block_title;
      ALTER TABLE civicrm_contribution_page DROP honor_block_text;
 {/if}
+ALTER TABLE civicrm_contribution_page DROP honor_block_is_active;
 
 ALTER TABLE civicrm_contribution DROP FOREIGN KEY `FK_civicrm_contribution_honor_contact_id`;
 ALTER TABLE civicrm_contribution DROP honor_contact_id;
@@ -195,3 +194,61 @@ VALUES
 -- CRM-13970
 UPDATE civicrm_navigation set url = 'civicrm/admin/options/from_email_address&reset=1' WHERE url LIKE 'civicrm/admin/options/from_email%';
 UPDATE civicrm_navigation set url = CONCAT(SUBSTRING_INDEX(url, '&', 1), '&reset=1') WHERE url LIKE 'civicrm/admin/options/%';
+
+-- CRM-14181
+ALTER TABLE  civicrm_acl CHANGE  operation  operation VARCHAR( 8 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL COMMENT  'What operation does this ACL entry control?';
+ALTER TABLE  civicrm_campaign_group CHANGE  group_type  group_type VARCHAR( 8 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL COMMENT  'Type of Group.';
+ALTER TABLE  `civicrm_acl_contact_cache` CHANGE  `operation`  `operation` VARCHAR( 8 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL COMMENT  'What operation does this user have permission on?';
+ALTER TABLE  `civicrm_price_field` CHANGE  `html_type`  `html_type` VARCHAR( 12 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL;
+ALTER TABLE  `civicrm_pledge` CHANGE  `frequency_unit`  `frequency_unit` VARCHAR( 8 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT  'month' COMMENT  'Time units for recurrence of pledge payments.';
+ALTER TABLE  `civicrm_membership_type` CHANGE  `duration_unit`  `duration_unit` VARCHAR( 8 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL COMMENT  'Unit in which membership period is expressed.';
+ALTER TABLE  `civicrm_membership_type` CHANGE  `period_type`  `period_type` VARCHAR( 8 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL COMMENT 'Rolling membership period starts on signup date. Fixed membership periods start on fixed_period_start_day.';
+ALTER TABLE  `civicrm_membership_status` CHANGE  `start_event`  `start_event` VARCHAR( 12 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL COMMENT  'Event when this status starts.';
+ALTER TABLE  `civicrm_membership_status` CHANGE  `start_event_adjust_unit`  `start_event_adjust_unit` VARCHAR( 8 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL COMMENT  'Unit used for adjusting from start_event.';
+ALTER TABLE  `civicrm_membership_status` CHANGE  `end_event`  `end_event` VARCHAR( 12 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL COMMENT  'Event after which this status ends.';
+ALTER TABLE  `civicrm_membership_status` CHANGE  `end_event_adjust_unit`  `end_event_adjust_unit` VARCHAR( 8 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL COMMENT  'Unit used for adjusting from the ending event.';
+ALTER TABLE  `civicrm_mailing_job` CHANGE  `status`  `status` VARCHAR( 12 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL COMMENT  'The state of this job';
+ALTER TABLE  `civicrm_mailing_group` CHANGE  `group_type`  `group_type` VARCHAR( 8 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL COMMENT  'Are the members of the group included or excluded?.';
+ALTER TABLE  `civicrm_mailing` CHANGE  `visibility`  `visibility` VARCHAR( 40 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT  'User and User Admin Only' COMMENT  'In what context(s) is the mailing contents visible (online viewing)';
+ALTER TABLE  `civicrm_mailing_component` CHANGE  `component_type`  `component_type` VARCHAR( 12 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL COMMENT  'Type of Component.';
+ALTER TABLE  `civicrm_mailing_bounce_type` CHANGE  `name`  `name` VARCHAR( 12 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL COMMENT  'Type of bounce';
+ALTER TABLE  `civicrm_participant_status_type` CHANGE  `class`  `class` VARCHAR( 8 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL COMMENT  'the general group of status type this one belongs to';
+ALTER TABLE  `civicrm_dedupe_rule_group` CHANGE  `contact_type`  `contact_type` VARCHAR( 12 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL COMMENT  'The type of contacts this group applies to';
+ALTER TABLE  `civicrm_dedupe_rule_group` CHANGE  `used`  `used` VARCHAR( 12 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL COMMENT 'Whether the rule should be used for cases where usage is Unsupervised, Supervised OR General(programatically)';
+ALTER TABLE  `civicrm_word_replacement` CHANGE  `match_type`  `match_type` VARCHAR( 16 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT  'wildcardMatch';
+ALTER TABLE  `civicrm_uf_field` CHANGE  `visibility`  `visibility` VARCHAR( 32 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT  'User and User Admin Only' COMMENT  'In what context(s) is this field visible.';
+ALTER TABLE  `civicrm_mapping_field` CHANGE  `operator`  `operator` VARCHAR( 16 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL COMMENT  'SQL WHERE operator for search-builder mapping fields (search criteria).';
+ALTER TABLE  `civicrm_job` CHANGE  `run_frequency`  `run_frequency` VARCHAR( 8 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT  'Daily' COMMENT  'Scheduled job run frequency.';
+ALTER TABLE  `civicrm_extension` CHANGE  `type`  `type` VARCHAR( 8 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL;
+ALTER TABLE  `civicrm_custom_group` CHANGE  `style`  `style` VARCHAR( 8 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL COMMENT  'Visual relationship between this form and its parent.';
+ALTER TABLE  `civicrm_custom_field` CHANGE  `data_type`  `data_type` VARCHAR( 16 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL COMMENT  'Controls location of data storage in extended_data table.';
+ALTER TABLE  `civicrm_custom_field` CHANGE  `html_type`  `html_type` VARCHAR( 32 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL COMMENT  'HTML types plus several built-in extended types.';
+ALTER TABLE  `civicrm_action_schedule` CHANGE  `start_action_unit`  `start_action_unit` VARCHAR( 8 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL COMMENT  'Time units for reminder.';
+ALTER TABLE  `civicrm_action_schedule` CHANGE  `repetition_frequency_unit`  `repetition_frequency_unit` VARCHAR( 8 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL COMMENT  'Time units for repetition of reminder.';
+ALTER TABLE  `civicrm_action_schedule` CHANGE  `end_frequency_unit`  `end_frequency_unit` VARCHAR( 8 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL COMMENT  'Time units till repetition of reminder.';
+ALTER TABLE  `civicrm_product` CHANGE  `period_type`  `period_type` VARCHAR( 8 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT  'rolling' COMMENT 'Rolling means we set start/end based on current day, fixed means we set start/end for current year or month(e.g. 1 year + fixed -> we would set start/end for 1/1/06 thru 12/31/06 for any premium chosen in 2006) ';
+ALTER TABLE  `civicrm_product` CHANGE  `duration_unit`  `duration_unit` VARCHAR( 8 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT  'year';
+ALTER TABLE  `civicrm_product` CHANGE  `frequency_unit`  `frequency_unit` VARCHAR( 8 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT  'month' COMMENT 'Frequency unit and interval allow option to store actual delivery frequency for a subscription or service.';
+ALTER TABLE  `civicrm_contribution_recur` CHANGE  `frequency_unit`  `frequency_unit` VARCHAR( 8 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT  'month' COMMENT  'Time units for recurrence of payment.';
+ALTER TABLE  `civicrm_subscription_history` CHANGE  `method`  `method` VARCHAR( 8 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL COMMENT  'How the (un)subscription was triggered';
+ALTER TABLE  `civicrm_subscription_history` CHANGE  `status`  `status` VARCHAR( 8 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL COMMENT  'The state of the contact within the group';
+ALTER TABLE  `civicrm_relationship_type` CHANGE  `contact_type_a`  `contact_type_a` VARCHAR( 12 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL COMMENT 'If defined, contact_a in a relationship of this type must be a specific contact_type.';
+ALTER TABLE  `civicrm_relationship_type` CHANGE  `contact_type_b`  `contact_type_b` VARCHAR( 12 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL COMMENT 'If defined, contact_b in a relationship of this type must be a specific contact_type.';
+ALTER TABLE  `civicrm_group_contact` CHANGE  `status`  `status` VARCHAR( 8 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL COMMENT  'status of contact relative to membership in group';
+ALTER TABLE  `civicrm_group` CHANGE  `visibility`  `visibility` VARCHAR( 24 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT  'User and User Admin Only' COMMENT  'In what context(s) is this field visible.';
+ALTER TABLE  `civicrm_contact` CHANGE  `preferred_mail_format`  `preferred_mail_format` VARCHAR( 8 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT  'Both' COMMENT  'What is the preferred mode of sending an email.';
+
+-- CRM-14183
+INSERT INTO civicrm_state_province (country_id, abbreviation, name) VALUES (1157, "PL", "Plateau");
+UPDATE civicrm_state_province SET name = "Abuja Federal Capital Territory" WHERE name = "Abuja Capital Territory";
+
+-- CRM-13992
+ALTER TABLE `civicrm_custom_field`
+  ADD COLUMN `in_selector` tinyint(4) DEFAULT '0' COMMENT 'Should the multi-record custom field values be displayed in tab table listing';
+UPDATE civicrm_custom_field cf
+  LEFT JOIN civicrm_custom_group cg
+    ON cf.custom_group_id = cg.id
+  SET cf.in_selector = 1
+  WHERE cg.is_multiple = 1 AND cf.html_type != 'TextArea';
+ALTER TABLE `civicrm_custom_group`
+ CHANGE COLUMN `style` `style` varchar(15) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Visual relationship between this form and its parent.';

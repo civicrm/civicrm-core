@@ -64,11 +64,11 @@
                       }
                     }
                     if (!skipEntityAction) {
-                      CRM.alert('', '{/literal}{ts escape='js'}Removed{/ts}{literal}', 'success');
+                      CRM.status('{/literal}{ts escape='js'}Removed{/ts}{literal}');
                     }
                   }
                   else {
-                    CRM.alert('', '{/literal}{ts escape='js'}Saved{/ts}{literal}', 'success');
+                    CRM.status('{/literal}{ts escape='js'}Saved{/ts}{literal}');
                   }
                   if ( response.action == 'select' ) {
                     setVal    = valArray;

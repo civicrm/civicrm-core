@@ -445,6 +445,7 @@ class CRM_Activity_BAO_Query {
    *
    * @access public
    *
+   * @param $form CRM_Core_Form
    * @return void
    * @static
    */
@@ -469,13 +470,13 @@ class CRM_Activity_BAO_Query {
       2 => ts('Assigned to'),
       1 => ts('Added by'),
     );
-    $form->addRadio('activity_role', NULL, $activityRoles);
+    $form->addRadio('activity_role', NULL, $activityRoles, array('allowClear' => TRUE));
     $form->setDefaults(array('activity_role' => 3));
     $activityStatus = CRM_Core_PseudoConstant::activityStatus();
     foreach ($activityStatus as $activityStatusID => $activityStatusName) {
       $activity_status[] = $form->createElement('checkbox', $activityStatusID, NULL, $activityStatusName);
     }
-    $form->addGroup($activity_status, 'activity_status', ts('Activity Status'));
+    $form->addGroup($activity_status, 'activity_status', ts('Activity Status'), TRUE);
     $form->setDefaults(array('activity_status[1]' => 1, 'activity_status[2]' => 1));
     $form->addElement('text', 'activity_subject', ts('Subject'), CRM_Core_DAO::getAttribute('CRM_Contact_DAO_Contact', 'sort_name'));
     $form->addYesNo('activity_test', ts('Activity is a Test?'));
@@ -519,12 +520,7 @@ class CRM_Activity_BAO_Query {
       CRM_Campaign_BAO_Campaign::accessCampaign()
     ) {
       $buildEngagementLevel = TRUE;
-      $form->add('select', 'activity_engagement_level',
-        ts('Engagement Index'),
-        array('' => ts('- any -')) + CRM_Campaign_PseudoConstant::engagementLevel(),
-        FALSE,
-        array('class' => 'crm-select2')
-      );
+      $form->addSelect('activity_engagement_level', array('entity' => 'activity', 'option_url' => NULL));
 
       // Add survey result field.
       $optionGroups  = CRM_Campaign_BAO_Survey::getResultSets( 'name' );

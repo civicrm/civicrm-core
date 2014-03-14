@@ -41,12 +41,6 @@ class CRM_Admin_Form_Preferences_Display extends CRM_Admin_Form_Preferences {
   function preProcess() {
     CRM_Utils_System::setTitle(ts('Settings - Display Preferences'));
 
-    if (defined('CIVICRM_ACTIVITY_ASSIGNEE_MAIL') && CIVICRM_ACTIVITY_ASSIGNEE_MAIL) {
-      CRM_Core_Session::setStatus(ts('Your civicrm.settings.php file contains CIVICRM_ACTIVITY_ASSIGNEE_MAIL but this
-      constant is no longer used. Please remove this from your config file and set your "Notify Activity Assignees"
-      preference below.'), ts("Deprecated Constant"), "alert");
-    }
-
     $this->_varNames = array(
       CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME =>
       array(

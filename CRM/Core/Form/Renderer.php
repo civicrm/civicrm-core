@@ -117,15 +117,22 @@ class CRM_Core_Form_Renderer extends HTML_QuickForm_Renderer_ArraySmarty {
       }
     }
 
-    if ($element->getType() == 'select' && $element->getAttribute('data-option-group-url')) {
-      $this->addOptionsEditLink($el, $element);
-    }
-
+    // Display-only (frozen) elements
     if (!empty($el['frozen'])) {
-      if ($element->getAttribute('data-api-params') && $element->getAttribute('data-entity-value')) {
+      if ($element->getAttribute('data-api-entity') && $element->getAttribute('data-entity-value')) {
         $this->renderFrozenEntityRef($el, $element);
       }
       $el['html'] = '<div class="crm-frozen-field">' . $el['html'] . '</div>';
+    }
+    // Active form elements
+    else {
+      if ($element->getType() == 'select' && $element->getAttribute('data-option-edit-path')) {
+        $this->addOptionsEditLink($el, $element);
+      }
+
+      if ($element->getType() == 'group' && $element->getAttribute('allowClear')) {
+        $this->appendUnselectButton($el, $element);
+      }
     }
 
     return $el;
@@ -137,9 +144,9 @@ class CRM_Core_Form_Renderer extends HTML_QuickForm_Renderer_ArraySmarty {
    *
    * @access private
    *
-   * @param  object    An HTML_QuickForm_element object
-   * @param  bool      Whether an element is required
-   * @param  string    Error associated with the element
+   * @param  $element  HTML_QuickForm_element object
+   * @param  $required bool      Whether an element is required
+   * @param  $error    string    Error associated with the element
    *
    * @return array
    * @static
@@ -164,14 +171,21 @@ class CRM_Core_Form_Renderer extends HTML_QuickForm_Renderer_ArraySmarty {
       if ($type == 'text') {
         $size = $element->getAttribute('size');
         if (!empty($size)) {
-          if (array_key_exists($size, self::$_sizeMapper)) {
-            $class .= ' ' . self::$_sizeMapper[$size];
-          }
+          $class = CRM_Utils_Array::value($size, self::$_sizeMapper);
         }
       }
     }
 
-    $class .= ($class ? ' ' : '') . 'crm-form-' . $type;
+    if ($type == 'select' && $element->getAttribute('multiple')) {
+      $type = 'multiselect';
+    }
+    // Add widget-specific class
+    if (!$class || strpos($class, 'crm-form-') === FALSE) {
+      $class = ($class ? "$class " : '') . 'crm-form-' . $type;
+    }
+    elseif (strpos($class, 'crm-form-entityref') !== FALSE) {
+      self::preProcessEntityRef($element);
+    }
 
     if ($required) {
       $class .= ' required';
@@ -186,25 +200,51 @@ class CRM_Core_Form_Renderer extends HTML_QuickForm_Renderer_ArraySmarty {
   }
 
   /**
+   * Convert IDs to values and format for display
+   */
+  static function preProcessEntityRef($field) {
+    $val = $field->getValue();
+    // Support array values
+    if (is_array($val)) {
+      $val = implode(',', $val);
+      $field->setValue($val);
+    }
+    if ($val) {
+      $entity = $field->getAttribute('data-api-entity');
+      $api = json_decode($field->getAttribute('data-api-params'), TRUE);
+      $params = CRM_Utils_Array::value('params', $api, array());
+      // Support serialized values
+      if (strpos($val, CRM_Core_DAO::VALUE_SEPARATOR) !== FALSE) {
+        $val = str_replace(CRM_Core_DAO::VALUE_SEPARATOR, ',', trim($val, CRM_Core_DAO::VALUE_SEPARATOR));
+        $field->setValue($val);
+      }
+      $result = civicrm_api3($entity, 'getlist', array('id' => $val, 'params' => $params));
+      if ($field->isFrozen()) {
+        $field->removeAttribute('class');
+      }
+      if (!empty($result['values'])) {
+        $field->setAttribute('data-entity-value', json_encode($result['values']));
+      }
+    }
+  }
+
+  /**
    * Render entity references as text.
-   * If user has permission, format as link (or now limited to contacts).
+   * If user has permission, format as link (for now limited to contacts).
    * @param $el array
    * @param $field HTML_QuickForm_element
    */
   function renderFrozenEntityRef(&$el, $field) {
-    $api = json_decode($field->getAttribute('data-api-params'), TRUE);
+    $entity = $field->getAttribute('data-api-entity');
     $vals = json_decode($field->getAttribute('data-entity-value'), TRUE);
-    if (isset($vals['id'])) {
-      $vals = array($vals);
-    }
     $display = array();
     foreach ($vals as $val) {
       // Format contact as link
-      if ($api['entity'] == 'contact' && CRM_Contact_BAO_Contact_Permission::allow($val['id'], CRM_Core_Permission::VIEW)) {
+      if ($entity == 'contact' && CRM_Contact_BAO_Contact_Permission::allow($val['id'], CRM_Core_Permission::VIEW)) {
         $url = CRM_Utils_System::url("civicrm/contact/view", array('reset' => 1, 'cid' => $val['id']));
-        $val['text'] = '<a href="' . $url . '" title="' . ts('View Contact') . '">' . $val['text'] . '</a>';
+        $val['label'] = '<a class="view-' . $entity . ' no-popup" href="' . $url . '" title="' . ts('View Contact') . '">' . $val['label'] . '</a>';
       }
-      $display[] = $val['text'];
+      $display[] = $val['label'];
     }
 
     $el['html'] = implode('; ', $display) . '<input type="hidden" value="'. $field->getValue() . '" name="' . $field->getAttribute('name') . '">';
@@ -216,9 +256,24 @@ class CRM_Core_Form_Renderer extends HTML_QuickForm_Renderer_ArraySmarty {
    */
   function addOptionsEditLink(&$el, $field) {
     if (CRM_Core_Permission::check('administer CiviCRM')) {
-      $el['html'] .= ' &nbsp; <a href="#" class="crm-edit-optionvalue-link" title="' . ts('Edit Options') . '" data-option-group-url="' . $field->getAttribute('data-option-group-url') . '"><span class="batch-edit"></span></a>';
+      // NOTE: $path is used on the client-side to know which option lists need rebuilding,
+      // that's why we need that bit of data both in the link and in the form element
+      $path = $field->getAttribute('data-option-edit-path');
+      // NOTE: If we ever needed to support arguments in this link other than reset=1 we could split $path here if it contains a ?
+      $url = CRM_Utils_System::url($path, 'reset=1');
+      $el['html'] .= ' <a href="' . $url . '" class="crm-option-edit-link crm-hover-button" target="_blank" title="' . ts('Edit Options') . '" data-option-edit-path="' . $path . '"><span class="icon edit-icon"></span></a>';
     }
   }
+
+  /**
+   * @param array $el
+   * @param HTML_QuickForm_element $field
+   */
+  function appendUnselectButton(&$el, $field) {
+    // Initially hide if not needed
+    // Note: visibility:hidden prevents layout jumping around unlike display:none
+    $display = $field->getValue() !== NULL ? '' : ' style="visibility:hidden;"';
+    $el['html'] .= ' <a href="#" class="crm-hover-button crm-clear-link"' . $display . ' title="' . ts('Clear') . '"><span class="icon close-icon"></span></a>';
+  }
 }
-// end CRM_Core_Form_Renderer
 

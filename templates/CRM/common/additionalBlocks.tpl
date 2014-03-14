@@ -80,9 +80,7 @@ function buildAdditionalBlocks( blockName, className ) {
         async   : false,
         success : function(html){
             cj(fname).after(html);
-            if ((typeof(Drupal) != 'undefined') && Drupal.attachBehaviors) {
-              Drupal.attachBehaviors(cj('#' + blockName + '_Block_'+ currentInstance)[0]);
-            }
+            cj(fname).next().trigger('crmLoad');
         }
     });
 

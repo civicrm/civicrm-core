@@ -205,6 +205,7 @@ class CRM_Core_PseudoConstant {
   /**
    * Low-level option getter, rarely accessed directly.
    * NOTE: Rather than calling this function directly use CRM_*_BAO_*::buildOptions()
+   * @see http://wiki.civicrm.org/confluence/display/CRMDOC/Pseudoconstant+%28option+list%29+Reference
    *
    * @param String $daoName
    * @param String $fieldName
@@ -283,16 +284,17 @@ class CRM_Core_PseudoConstant {
       return FALSE;
     }
 
-    // If the field is an enum, explode the enum definition and return the array.
-    if (isset($fieldSpec['enumValues'])) {
-      // use of a space after the comma is inconsistent in xml
-      $enumStr = str_replace(', ', ',', $fieldSpec['enumValues']);
-      $output = explode(',', $enumStr);
-      return array_combine($output, $output);
-    }
-
     elseif (!empty($fieldSpec['pseudoconstant'])) {
       $pseudoconstant = $fieldSpec['pseudoconstant'];
+
+      // if callback is specified..
+      if(!empty($pseudoconstant['callback'])) {
+        list($className, $fnName) = explode('::', $pseudoconstant['callback']);
+        if (method_exists($className, $fnName)) {
+          return call_user_func(array($className, $fnName));
+        }
+      }
+
       // Merge params with schema defaults
       $params += array(
         'condition' => CRM_Utils_Array::value('condition', $pseudoconstant, array()),
@@ -510,9 +512,10 @@ class CRM_Core_PseudoConstant {
         return NULL;
       }
       // We don't have good mapping so have to do a bit of guesswork from the menu
-      list(, , , $ent) = explode('_', $daoName);
+      list(, $parent, , $child) = explode('_', $daoName);
       $sql = "SELECT path FROM civicrm_menu
-        WHERE page_callback LIKE '%CRM_Admin_Page_$ent%'
+        WHERE page_callback LIKE '%CRM_Admin_Page_$child%' OR page_callback LIKE '%CRM_{$parent}_Page_$child%'
+        ORDER BY page_callback
         LIMIT 1";
       return CRM_Core_Dao::singleValueQuery($sql);
     }

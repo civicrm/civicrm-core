@@ -137,10 +137,13 @@
   </field>
   <field>
        <name>operator</name>
+       <type>varchar</type>
+       <length>16</length>
        <type>enum</type>
-       <values>&#61;, !&#61;, &#62;, &#60;, &#62;&#61;, &#60;&#61;,
-       IN, NOT IN, LIKE, NOT LIKE, IS NULL, IS NOT NULL, IS NOT EMPTY, IS EMPTY</values>
        <comment>SQL WHERE operator for search-builder mapping fields (search criteria).</comment>
+       <pseudoconstant>
+         <callback>CRM_Core_SelectValues::getSearchBuilderOperators</callback>
+       </pseudoconstant>
       <add>1.5</add>
       <html>
         <type>Select</type>
