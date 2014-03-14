@@ -390,5 +390,74 @@ class CRM_Contact_Form_Task extends CRM_Core_Form {
       )
     );
   }
+
+  /**
+   * replace ids of household members in $this->_contactIds with the id of their household.
+   * CRM-8338
+   *
+   * @access public
+   *
+   * @return void
+   */
+  public function mergeContactIdsByHousehold() {
+    if (empty($this->_contactIds)) {
+      return;
+    }
+
+    $contactRelationshipTypes = CRM_Contact_BAO_Relationship::getContactRelationshipType(
+      NULL,
+      NULL,
+      NULL,
+      NULL,
+      TRUE,
+      'name',
+      FALSE
+    );
+
+    // Get Head of Household & Household Member relationships
+    $relationKeyMOH = CRM_Utils_Array::key('Household Member of', $contactRelationshipTypes);
+    $relationKeyHOH = CRM_Utils_Array::key('Head of Household for', $contactRelationshipTypes);
+    $householdRelationshipTypes = array(
+      $relationKeyMOH => $contactRelationshipTypes[$relationKeyMOH],
+      $relationKeyHOH => $contactRelationshipTypes[$relationKeyHOH],
+    );
+
+    $relID = implode(',', $this->_contactIds);
+
+    foreach ($householdRelationshipTypes as $rel => $dnt) {
+      list($id, $direction) = explode('_', $rel, 2);
+      // identify the relationship direction
+      $contactA = 'contact_id_a';
+      $contactB = 'contact_id_b';
+      if ($direction == 'b_a') {
+        $contactA = 'contact_id_b';
+        $contactB = 'contact_id_a';
+      }
+
+      // Find related households.
+      $relationSelect      = "SELECT contact_household.id as household_id, {$contactA} as refContact ";
+      $relationFrom = " FROM civicrm_contact contact_household
+              INNER JOIN civicrm_relationship crel ON crel.{$contactB} = contact_household.id AND crel.relationship_type_id = {$id} ";
+
+      // Check for active relationship status only.
+      $today               = date('Ymd');
+      $relationActive      = " AND (crel.is_active = 1 AND ( crel.end_date is NULL OR crel.end_date >= {$today} ) )";
+      $relationWhere       = " WHERE contact_household.is_deleted = 0  AND crel.{$contactA} IN ( {$relID} ) {$relationActive}";
+      $relationGroupBy     = " GROUP BY crel.{$contactA}";
+      $relationQueryString = "$relationSelect $relationFrom $relationWhere $relationGroupBy";
+
+      $householdsDAO = CRM_Core_DAO::executeQuery($relationQueryString);
+      while ($householdsDAO->fetch()) {
+        // Remove contact's id from $this->_contactIds and replace with their household's id.
+        foreach (array_keys($this->_contactIds, $householdsDAO->refContact) as $idKey) {
+          unset($this->_contactIds[$idKey]);
+        }
+        if (!in_array($householdsDAO->household_id, $this->_contactIds)) {
+          $this->_contactIds[] = $householdsDAO->household_id;
+        }
+      }
+      $householdsDAO->free();
+    }
+  }
 }
 
