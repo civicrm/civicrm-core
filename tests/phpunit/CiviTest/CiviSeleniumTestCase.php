@@ -501,21 +501,14 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
   /**
    */
   function webtestNewDialogContact($fname = 'Anthony', $lname = 'Anderson', $email = 'anthony@anderson.biz',
-                                   $type = 4, $selectId = 'profiles_1', $row = 1, $prefix = '') {
+                                   $type = 4, $selectId = 's2id_contact_id', $row = 1, $prefix = '') {
     // 4 - Individual profile
     // 5 - Organization profile
     // 6 - Household profile
     $profile = array('4' => 'New Individual', '5' => 'New Organisation', '6' => 'New Household');
-    $this->clickAt("xpath=//div[@id='$selectId']/a/span[@class='select2-chosen']");
+    $this->clickAt("xpath=//div[@id='$selectId']/a");
     $this->click("xpath=//li[@class='select2-no-results']//a[contains(text(),' $profile[$type]')]");
 
-    // create new contact using dialog
-    if (!$prefix) {
-      $this->waitForElementPresent("css=div#contact_id_{$row}");
-    }
-    else {
-      $this->waitForElementPresent("css=div#s2id_{$prefix}_contact_id_{$row}");
-    }
     $this->waitForElementPresent('_qf_Edit_next');
 
     switch ($type) {
@@ -538,11 +531,11 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
 
     // Is new contact created?
     if ($lname) {
-      sleep(2);
+      $this->waitForText("xpath=//div[@id='$selectId']","$lname, $fname");
       $this->assertTrue($this->isTextPresent("$lname, $fname"), "Status message didn't show up after saving!");
     }
     else {
-      sleep(2);
+      $this->waitForText("xpath=//div[@id='$selectId']","$fname");
       $this->assertTrue($this->isTextPresent("$fname"), "Status message didn't show up after saving!");
     }
   }
