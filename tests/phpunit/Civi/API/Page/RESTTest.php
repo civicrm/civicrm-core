@@ -90,9 +90,7 @@ class RESTTest extends \CiviUnitTestCase {
   function testGetItem_InsufficientPermission_DefaultJson() {
     $this->apiSecurityGrantedPermissions = array('access AJAX API'); // missing: access CiviCRM
     $response = $this->request('GET', 'civicrm/rest/world-region/3');
-    $this->assertResponse($response, 403, 'application/json');
-    $actual = json_decode($response->getContent(), TRUE);
-    $this->assertTrue(isset($actual['error']) && is_string($actual['error']));
+    $this->assertErrorResponse($response, 403, 'application/json');
   }
 
   function testGetCollection_DefaultJson() {
@@ -111,9 +109,7 @@ class RESTTest extends \CiviUnitTestCase {
   function testGetCollection_InsufficientPermission_DefaultJson() {
     $this->apiSecurityGrantedPermissions = array('access AJAX API'); // missing: access CiviCRM
     $response = $this->request('GET', 'civicrm/rest/world-region');
-    $this->assertResponse($response, 403, 'application/json');
-    $actual = json_decode($response->getContent(), TRUE);
-    $this->assertTrue(isset($actual['error']) && is_string($actual['error']));
+    $this->assertErrorResponse($response, 403, 'application/json');
   }
 
   function testGetCollection_Xml() {
@@ -174,9 +170,7 @@ class RESTTest extends \CiviUnitTestCase {
     $response = $this->request('POST', 'civicrm/rest/world-region', array(), array(), json_encode(array(
       'name' => 'Middle Earth',
     )));
-    $this->assertResponse($response, 403, 'application/json');
-    $actual = json_decode($response->getContent(), TRUE);
-    $this->assertTrue(isset($actual['error']) && is_string($actual['error']));
+    $this->assertErrorResponse($response, 403, 'application/json');
   }
 
   function testCreateItem_Xml() {
@@ -220,9 +214,7 @@ class RESTTest extends \CiviUnitTestCase {
 
     $this->apiSecurityGrantedPermissions = array('access AJAX API', 'access CiviCRM'); // missing: administer CiviCRM
     $response = $this->request('DELETE', 'civicrm/rest/world-region/' . $region->getId());
-    $this->assertResponse($response, 403, 'application/json');
-    $actual = json_decode($response->getContent(), TRUE);
-    $this->assertTrue(isset($actual['error']) && is_string($actual['error']));
+    $this->assertErrorResponse($response, 403, 'application/json');
   }
 
   function testDeleteInvalidItem_DefaultJson() {
@@ -278,5 +270,12 @@ class RESTTest extends \CiviUnitTestCase {
   function assertResponse(Response $response, $expectedCode, $expectedMimeType) {
     $this->assertEquals($expectedCode, $response->getStatusCode());
     $this->assertEquals($expectedMimeType, $response->headers->get('Content-type'));
+  }
+
+  function assertErrorResponse(Response $response, $expectedCode, $expectedMimeType) {
+    $this->assertEquals($expectedCode, $response->getStatusCode());
+    $this->assertEquals($expectedMimeType, $response->headers->get('Content-type'));
+    $actual = json_decode($response->getContent(), TRUE);
+    $this->assertTrue(isset($actual['error']) && is_string($actual['error']));
   }
 }
