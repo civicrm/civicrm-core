@@ -40,6 +40,8 @@
  */
 class CRM_Event_Form_Participant extends CRM_Contact_Form_Task {
 
+  public $useLivePageJS = TRUE;
+
   /**
    * the values for the contribution db object
    *
@@ -671,9 +673,6 @@ SELECT civicrm_custom_group.name as name,
    * @access public
    */
   public function buildQuickForm() {
-    if (CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'ajax_popups_enabled', NULL, TRUE)) {
-      CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'js/crm.livePage.js');
-    }
     $participantStatuses = CRM_Event_PseudoConstant::participantStatus();
     $partiallyPaidStatusId = array_search('Partially paid', $participantStatuses);
     $this->assign('partiallyPaidStatusId', $partiallyPaidStatusId);

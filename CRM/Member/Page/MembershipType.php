@@ -46,6 +46,8 @@ class CRM_Member_Page_MembershipType extends CRM_Core_Page {
    */
   static $_links = NULL;
 
+  public $useLivePageJS = TRUE;
+
   /**
    * Get action Links
    *
@@ -108,9 +110,6 @@ class CRM_Member_Page_MembershipType extends CRM_Core_Page {
    * @static
    */
   function browse() {
-    if (CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'ajax_popups_enabled', NULL, TRUE)) {
-      CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'js/crm.livePage.js');
-    }
     // get all membership types sorted by weight
     $membershipType = array();
     $dao = new CRM_Member_DAO_MembershipType();

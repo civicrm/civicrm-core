@@ -33,6 +33,8 @@
  *
  */
 class CRM_Admin_Page_ParticipantStatus extends CRM_Core_Page_Basic {
+
+  public $useLivePageJS = TRUE;
   function getBAOName() {
     return 'CRM_Event_BAO_ParticipantStatusType';
   }
@@ -69,9 +71,6 @@ class CRM_Admin_Page_ParticipantStatus extends CRM_Core_Page_Basic {
   }
 
   function browse() {
-    if (CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'ajax_popups_enabled', NULL, TRUE)) {
-      CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'js/crm.livePage.js');
-    }
     $statusTypes = array();
 
     $dao = new CRM_Event_DAO_ParticipantStatusType;
