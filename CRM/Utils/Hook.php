@@ -1495,7 +1495,6 @@ abstract class CRM_Utils_Hook {
    * @return mixed
    */
   static function dashboard_defaults($availableDashlets, &$defaultDashlets) {
-    // @todo Required parameter $fnSuffix missing. Too few parameters?
-    return self::singleton()->invoke(2, $availableDashlets, $defaultDashlets, self::$_nullObject, self::$_nullObject, self::$_nullObject, 'civicrm_dashboard_defaults');
+    return self::singleton()->invoke(2, $availableDashlets, $defaultDashlets, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, 'civicrm_dashboard_defaults');
   }
 }
