@@ -1,10 +1,15 @@
 {
   "autoload": {
-    "psr-0": {"Civi\\": ["./", "tests/phpunit/"]}
+    "psr-0": {
+      "CRM_": "./",
+      "Civi\\": ["./", "tests/phpunit/"]
+    }
   },
   "minimum-stability" : "dev",
   "require": {
     "doctrine/orm": "2.4.*",
-    "symfony/dependency-injection": "2.3.*"
+    "symfony/dependency-injection": "2.3.*",
+    "symfony/http-foundation": "2.3.*",
+    "willdurand/hateoas": "2.1.*"
   }
 }

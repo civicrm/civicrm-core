@@ -71,6 +71,8 @@ class CRM_Core_ClassLoader {
       return;
     }
 
+    require_once dirname(dirname(__DIR__)) . '/vendor/autoload.php';
+
     // we do this to prevent a autoloader errors with joomla / 3rd party packages
     // use absolute path since we dont know the content of include_path as yet
     // CRM-11304
@@ -92,24 +94,15 @@ class CRM_Core_ClassLoader {
       require_once $htmlPurifierPath;
     }
 
-    if (version_compare(PHP_VERSION, '5.3.0') >= 0) {
-      spl_autoload_register(array($this, 'loadClass'), TRUE, $prepend);
-      if ($includeHTMLPurifier) {
-        spl_autoload_register(array('HTMLPurifier_Bootstrap', 'autoload'), TRUE, $prepend);
-      }
-    }
-    else {
-      // http://www.php.net/manual/de/function.spl-autoload-register.php#107362
-      // "when specifying the third parameter (prepend), the function will fail badly in PHP 5.2"
-      spl_autoload_register(array($this, 'loadClass'), TRUE);
-      if ($includeHTMLPurifier) {
-        spl_autoload_register(array('HTMLPurifier_Bootstrap', 'autoload'), TRUE);
-      }
+    // TODO Remove this autoloader. For civicrm-core and civicrm-packages, the composer autoloader works fine.
+    // Extensions rely on include_path-based autoloading
+    spl_autoload_register(array($this, 'loadClass'), TRUE, $prepend);
+    if ($includeHTMLPurifier) {
+      spl_autoload_register(array('HTMLPurifier_Bootstrap', 'autoload'), TRUE, $prepend);
     }
 
     $this->_registered = TRUE;
 
-    require_once dirname(dirname(__DIR__)) . '/vendor/autoload.php';
   }
 
   function loadClass($class) {
@@ -125,7 +118,9 @@ class CRM_Core_ClassLoader {
       // "require_once" is nice because it's simple and throws
       // intelligible errors.  The down side is that autoloaders
       // down the chain cannot try to find the file if we fail.
-      require_once ($file);
+      if (file_exists($file)) {
+        require_once ($file);
+      }
     }
   }
 }

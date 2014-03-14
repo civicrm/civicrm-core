@@ -170,4 +170,11 @@
     <title>ProfileEditor</title>
     <access_arguments>access CiviCRM</access_arguments>
   </item>
+  <item>
+    <path>civicrm/rest</path>
+    <page_callback>\Civi\API\Page\REST</page_callback>
+    <page_type>4</page_type>
+    <title>REST</title>
+    <access_arguments>access CiviCRM</access_arguments>
+  </item>
 </menu>
