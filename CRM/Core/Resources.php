@@ -429,9 +429,8 @@ class CRM_Core_Resources {
       $config = CRM_Core_Config::singleton();
 
       // Add resources from coreResourceList
-      $files = $this->coreResourceList();
       $jsWeight = -9999;
-      foreach ($files as $file) {
+      foreach ($this->coreResourceList() as $file) {
         if (substr($file, -2) == 'js') {
           // Don't bother  looking for ts() calls in packages, there aren't any
           $translate = (substr($file, 0, 9) != 'packages/');
