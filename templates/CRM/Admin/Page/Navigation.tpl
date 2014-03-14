@@ -157,12 +157,13 @@
       });
     });
     cj('#new-menu-item a.button').click(function() {
-      CRM.loadForm(this.href).on('crmFormSuccess', function() {
-        cj("#navigation-tree").jstree('refresh');
-        cj("#reset-menu").show( );
+      return !$(this).crmPopup({
+        crmFormSuccess: function() {
+          cj("#navigation-tree").jstree('refresh');
+          cj("#reset-menu").show( );
+        }
       });
-      return false;
-    })
+    });
   });
 </script>
 {/literal}

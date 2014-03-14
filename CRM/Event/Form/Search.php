@@ -234,6 +234,7 @@ class CRM_Event_Form_Search extends CRM_Core_Form {
      */
     $rows = $this->get('rows');
     if (is_array($rows)) {
+      CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'js/crm.livePage.js');
       CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'js/crm.searchForm.js');
       $lineItems = $eventIds = array();
       if (!$this->_single) {
