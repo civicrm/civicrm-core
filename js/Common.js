@@ -1005,32 +1005,36 @@ CRM.validate = CRM.validate || {
   /**
    * @see https://wiki.civicrm.org/confluence/display/CRMDOC/Ajax+Pages+and+Forms
    */
-  $.fn.crmPopup = function(listeners) {
-    var $el = this.first(),
+  CRM.popup = function() {
+    var $el = $(this).first(),
       url = $el.attr('href'),
       popup = $el.data('popup-type') === 'page' ? CRM.loadPage : CRM.loadForm,
-      settings = $el.data('popup-settings') || {};
+      settings = $el.data('popup-settings') || {},
+      triggers = {dialogclose: 'crmPopupClose', crmLoad: 'crmPopupLoad', crmFormSuccess: 'crmPopupFormSuccess'};
     settings.dialog = settings.dialog || {};
-    if (!CRM.ajax_popups_enabled || !url || url.charAt(0) === '#' || $el.attr('onclick') || $el.hasClass('no-popup')) {
-      return false;
+    if (!CRM.config.ajax_popups_enabled || !url || url.charAt(0) === '#' || $el.attr('onclick') || $el.hasClass('no-popup')) {
+      return;
     }
-    // Hack to make delete dialogs smaller
+    // Sized based on css class with hack to make delete dialogs smaller
     if ($el.hasClass('small-popup') || url.indexOf('/delete') > 0 || url.indexOf('action=delete') > 0) {
       settings.dialog.width = 400;
       settings.dialog.height = 300;
     }
     else if ($el.hasClass('medium-popup')) {
-      settings.dialog.width = '50%';
-      settings.dialog.height = '50%';
+      settings.dialog.width = settings.dialog.height = '50%';
     }
     else if ($el.hasClass('huge-popup')) {
       settings.dialog.height = '95%';
     }
     var dialog = popup(url, settings);
-    $.each(listeners || {}, function(k, v) {
-      dialog.on(k, v);
+    // Trigger events from the dialog on the original link element
+    $el.trigger('crmPopupOpen', [dialog]);
+    $.each(triggers, function(event, target) {
+      dialog.on(event, function(e, data) {
+        $el.trigger(target, [dialog, data]);
+      });
     });
-    return dialog;
+    return false;
   };
 
   // Preprocess all cj ajax calls to display messages
@@ -1056,6 +1060,7 @@ CRM.validate = CRM.validate || {
   $.widget('civi.crmAutocomplete', $.ui.autocomplete, {});
 
   $(function () {
+    var optionsChanged;
     // Trigger crmLoad on initial content for consistency. It will also be triggered for ajax-loaded content.
     $('.crm-container').trigger('crmLoad');
 
@@ -1087,28 +1092,24 @@ CRM.validate = CRM.validate || {
         }
       })
 
-      .on('click', 'a.crm-option-edit-link', function() {
-        var
-          link = $(this),
-          optionsChanged = false;
-        return !link.crmPopup({
-          crmFormSuccess: function() {
-            optionsChanged = true;
-          },
-          dialogclose: function() {
-            if (optionsChanged) {
-              link.trigger('crmOptionsEdited');
-              var $elects = $('select[data-option-edit-path="' + link.data('option-edit-path') + '"]');
-              if ($elects.data('api-entity') && $elects.data('api-field')) {
-                CRM.api3($elects.data('api-entity'), 'getoptions', {sequential: 1, field: $elects.data('api-field')})
-                  .done(function (data) {
-                    CRM.utils.setOptions($elects, data.values);
-                  });
-              }
-            }
-          }
-        });
+      // Edit option lists
+      .on('click', 'a.crm-option-edit-link', CRM.popup)
+      .on('crmPopupOpen crmPopupFormSuccess', 'a.crm-option-edit-link', function(e) {
+        optionsChanged = e.type === 'crmPopupFormSuccess';
       })
+      .on('crmPopupClose', 'a.crm-option-edit-link', function() {
+        if (optionsChanged) {
+          link.trigger('crmOptionsEdited');
+          var $elects = $('select[data-option-edit-path="' + link.data('option-edit-path') + '"]');
+          if ($elects.data('api-entity') && $elects.data('api-field')) {
+            CRM.api3($elects.data('api-entity'), 'getoptions', {sequential: 1, field: $elects.data('api-field')})
+              .done(function (data) {
+                CRM.utils.setOptions($elects, data.values);
+              });
+          }
+        }
+      })
+
       // Handle clear button for form elements
       .on('click', 'a.crm-clear-link', function() {
         $(this).css({visibility: 'hidden'}).siblings('.crm-form-radio:checked').prop('checked', false).change();
@@ -1118,6 +1119,7 @@ CRM.validate = CRM.validate || {
       .on('change', 'input.crm-form-radio:checked', function() {
         $(this).siblings('.crm-clear-link').css({visibility: ''});
       });
+
     $().crmtooltip();
   });
 

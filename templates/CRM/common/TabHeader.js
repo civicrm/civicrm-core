@@ -32,13 +32,10 @@ cj(function($) {
         if (ui.tab.hasClass('livePage') && CRM.config.ajax_popups_enabled) {
           ui.panel
             .off('click.crmLivePage')
-            .on('click.crmLivePage', 'a.button, a.action-item', function() {
-              return !$(this).crmPopup({
-                crmFormSuccess: function() {
-                  // Refresh panel when form completes
-                  ui.panel.crmSnippet('refresh');
-                }
-              });
+            .on('click.crmLivePage', 'a.button, a.action-item', CRM.popup)
+            .on('crmPopupFormSuccess.crmLivePage', 'a.button, a.action-item', function() {
+              // Refresh panel when form completes
+              ui.panel.crmSnippet('refresh');
             });
         }
         ui.panel

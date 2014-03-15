@@ -101,14 +101,12 @@ cj(function($) {
     buildGroupSelector( true );
   });
   // Add livePage functionality
-  $('#crm-container').on('click', 'a.button, a.action-item[href*="action=update"], a.action-item[href*="action=delete"]', function() {
-    return !$(this).crmPopup({
-      crmFormSuccess: function() {
+  $('#crm-container')
+    .on('click', 'a.button, a.action-item[href*="action=update"], a.action-item[href*="action=delete"]', CRM.popup)
+    .on('crmPopupFormSuccess', 'a.button, a.action-item[href*="action=update"], a.action-item[href*="action=delete"]', function() {
         // Refresh datatable when form completes
         $('#crm-group-selector').dataTable().fnDraw();
-      }
     });
-  });
 });
 
 function buildGroupSelector( filterSearch, parentsOnlyArg ) {
