@@ -398,7 +398,7 @@
         });
       }
       // For convenience, focus the first field
-      $('input[type=text], textarea, select', this).filter(':visible').first().focus();
+      $('input[type=text], textarea, select', this).filter(':visible').first().not('.dateplugin').focus();
     });
     return widget;
   };
