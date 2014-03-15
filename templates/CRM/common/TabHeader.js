@@ -29,7 +29,7 @@ cj(function($) {
             })
           });
         }
-        if (ui.tab.hasClass('livePage') && CRM.config.ajax_popups_enabled) {
+        if (ui.tab.hasClass('livePage') && CRM.config.ajaxPopupsEnabled) {
           ui.panel
             .off('click.crmLivePage')
             .on('click.crmLivePage', 'a.button, a.action-item', CRM.popup)
