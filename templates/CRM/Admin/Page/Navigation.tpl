@@ -52,7 +52,7 @@
     }
   </style>
   <script type="text/javascript">
-  cj(function () {
+  cj(function($) {
     cj("#navigation-tree").jstree({
     plugins : [ "themes", "json_data", "dnd","ui", "crrm","contextmenu" ],
     json_data  : {
@@ -156,14 +156,12 @@
           });
       });
     });
-    cj('#new-menu-item a.button').click(function() {
-      return !$(this).crmPopup({
-        crmFormSuccess: function() {
-          cj("#navigation-tree").jstree('refresh');
-          cj("#reset-menu").show( );
-        }
+    $('#new-menu-item a.button')
+      .on('click', CRM.popup)
+      .on('crmPopupFormSuccess', function() {
+          $("#navigation-tree").jstree('refresh');
+          $("#reset-menu").show();
       });
-    });
   });
 </script>
 {/literal}
