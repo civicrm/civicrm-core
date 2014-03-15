@@ -42,48 +42,53 @@ class REST extends \CRM_Core_Page {
 
 
   function run() {
-    if (count($this->urlPath) == 4) {
-      list ($civicrm, $rest, $entity, $id) = $this->urlPath;
-    }
-    elseif (count($this->urlPath) == 3) {
-      list ($civicrm, $rest, $entity) = $this->urlPath;
-      $id = NULL;
-    }
-    else {
-      return $this->createError(400, 'Wrong number of items in path');
-    }
+    try {
+      if (count($this->urlPath) == 4) {
+        list ($civicrm, $rest, $entity, $id) = $this->urlPath;
+      }
+      elseif (count($this->urlPath) == 3) {
+        list ($civicrm, $rest, $entity) = $this->urlPath;
+        $id = NULL;
+      }
+      else {
+        return $this->createError(400, 'Wrong number of items in path');
+      }
 
-    if ($civicrm != 'civicrm' || $rest != 'rest') {
-      return $this->createError(400, 'Invalid path prefix');
-    }
+      if ($civicrm != 'civicrm' || $rest != 'rest') {
+        return $this->createError(400, 'Invalid path prefix');
+      }
 
-    $entityClass = $this->apiRegistry->getClassBySlug($entity);
-    if ($entityClass === NULL) {
-      return $this->createError(404, 'Invalid entity');
-    }
+      $entityClass = $this->apiRegistry->getClassBySlug($entity);
+      if ($entityClass === NULL) {
+        return $this->createError(404, 'Invalid entity');
+      }
 
-    switch ($this->request->getMethod()) {
-      case 'GET':
-        if ($id) {
-          return $this->getItem($entityClass, $id);
-        }
-        else {
-          return $this->getCollection($entityClass);
-        }
-        break;
-      case 'POST':
-        if (!$id) {
-          return $this->createItem($entityClass);
-        }
-        break;
-      case 'DELETE':
-        if ($id) {
-          return $this->deleteItem($entityClass, $id);
-        }
-        break;
-      default:
+      switch ($this->request->getMethod()) {
+        case 'GET':
+          if ($id) {
+            return $this->getItem($entityClass, $id);
+          }
+          else {
+            return $this->getCollection($entityClass);
+          }
+          break;
+        case 'POST':
+          if (!$id) {
+            return $this->createItem($entityClass);
+          }
+          break;
+        case 'DELETE':
+          if ($id) {
+            return $this->deleteItem($entityClass, $id);
+          }
+          break;
+        default:
+      }
+      return $this->createError(405);
+    } catch (\Exception $e) {
+      \CRM_Core_Error::debug_log_message(\CRM_Core_Error::formatTextException($e));
+      return $this->createError(500, $e->getMessage());
     }
-    return $this->createError(405);
   }
 
   /**
