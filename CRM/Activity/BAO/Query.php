@@ -188,32 +188,26 @@ class CRM_Activity_BAO_Query {
 
     switch ($name) {
       case 'activity_type_id':
+      case 'activity_type':
         $types = CRM_Core_PseudoConstant::activityType(TRUE, TRUE, FALSE, 'label', TRUE);
-
         //get the component activity types.
         $compActTypes = CRM_Core_PseudoConstant::activityType(TRUE, TRUE, FALSE, 'label', TRUE, TRUE);
 
         $clause = array();
-        if (is_array($value)) {
-          foreach ($value as $id => $dontCare) {
-            if (array_key_exists($id, $types) && $dontCare) {
-              $clause[] = "'" . CRM_Utils_Type::escape($types[$id], 'String') . "'";
-              if (array_key_exists($id, $compActTypes)) {
-                CRM_Contact_BAO_Query::$_considerCompActivities = TRUE;
-              }
-            }
-          }
-          $activityTypes = implode(',', array_keys($value));
-        }
-        else {
-          $clause[] = "'" . CRM_Utils_Type::escape($value, 'String') . "'";
-          $activityTypes = $value;
-          if (array_key_exists($value, $compActTypes)) {
+        
+        $activityTypeIds = self::buildWhereAndQill($value, $types, $clause, $op);
+
+        foreach ($activityTypeIds as $activityTypeId) {
+          if (array_key_exists($activityTypeId, $compActTypes)) {
             CRM_Contact_BAO_Query::$_considerCompActivities = TRUE;
+            break;
           }
         }
-        $query->_where[$grouping][] = ' civicrm_activity.activity_type_id IN (' . $activityTypes . ')';
-        $query->_qill[$grouping][] = ts('Activity Type') . ' ' . implode(' ' . ts('or') . ' ', $clause);
+        
+        $query->_qill[$grouping][] = ts('Activity Type %1 ', array(1 => $op)) . implode(' ' . ts('or') . ' ', $clause);
+        $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause('civicrm_activity.activity_type_id',
+          $op, $value, "Integer"
+        );
         break;
 
       case 'activity_survey_id':
@@ -262,18 +256,11 @@ class CRM_Activity_BAO_Query {
       case 'activity_status':
         $status = CRM_Core_PseudoConstant::activityStatus();
         $clause = array();
-        if (is_array($value)) {
-          foreach ($value as $k => $v) {
-            if ($k) {
-              $clause[] = "'" . CRM_Utils_Type::escape($status[$k], 'String') . "'";
-            }
-          }
-        }
-        else {
-          $clause[] = "'" . CRM_Utils_Type::escape($value, 'String') . "'";
-        }
-        $query->_where[$grouping][] = ' civicrm_activity.status_id IN (' . implode(',', array_keys($value)) . ')';
-        $query->_qill[$grouping][] = ts('Activity Status') . ' - ' . implode(' ' . ts('or') . ' ', $clause);
+        self::buildWhereAndQill($value, $status, $clause, $op);
+        $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause("civicrm_activity.status_id",
+          $op, $value, "Integer"
+        );
+        $query->_qill[$grouping][] = ts('Activity Status %1 ', array(1 => $op)) . implode(' ' . ts('or') . ' ', $clause);
         break;
 
       case 'activity_subject':
@@ -596,6 +583,35 @@ class CRM_Activity_BAO_Query {
     }
 
     return $properties;
+  }
+  
+  static function buildWhereAndQill(&$value, $pseudoconstantType, &$clause, &$op) {
+    $matches = $val = array();
+    if (is_array($value)) {
+      foreach ($value as $k => $v) {
+        if ($k) {
+          $val[] = $k;
+        }
+      }
+      
+      if (count($val) > 0) {
+        // Overwrite $value so it works with an IN where statement.
+        $op = 'IN';
+        $value = '(' . implode(',', $val) . ')';
+      }
+      else {
+        // If we somehow have an empty array, just return
+        return;
+      }
+      $matches[0] = $val;
+    }
+    else {
+      preg_match_all('/\d+/', $value, $matches);
+    }
+    foreach ($matches[0] as $qill) {
+      $clause[] = CRM_Utils_Array::value($qill, $pseudoconstantType);
+    }
+    return $matches[0];
   }
 }
 
