@@ -25,9 +25,9 @@ class RESTTest extends \CiviUnitTestCase {
   private $apiSecurityGrantedPermissions;
 
   /**
-   * @var int
+   * @var array(string $table => int $id)
    */
-  private $maxWorldRegionID;
+  private $maxIds;
 
   /**
    * @var array (string $name => mixed $value);
@@ -35,7 +35,8 @@ class RESTTest extends \CiviUnitTestCase {
   private $fixtures;
 
   function setUp() {
-    $this->maxWorldRegionID = \CRM_Core_DAO::singleValueQuery('SELECT max(id) FROM civicrm_worldregion');
+    $this->maxIds['civicrm_worldregion'] = \CRM_Core_DAO::singleValueQuery('SELECT max(id) FROM civicrm_worldregion');
+    $this->maxIds['civicrm_location_type'] = \CRM_Core_DAO::singleValueQuery('SELECT max(id) FROM civicrm_location_type');
     $this->fixtures['Middle East'] = array(
       'id' => 3,
       'name' => 'Middle East and North Africa',
@@ -56,9 +57,9 @@ class RESTTest extends \CiviUnitTestCase {
   }
 
   function tearDown() {
-    if ($this->maxWorldRegionID) {
-      \CRM_Core_DAO::executeQuery('DELETE FROM civicrm_worldregion WHERE id > %1', array(
-        1 => array($this->maxWorldRegionID, 'Positive')
+    foreach ($this->maxIds as $table => $maxId) {
+      \CRM_Core_DAO::executeQuery("DELETE FROM $table WHERE id > %1", array(
+        1 => array($maxId, 'Positive')
       ));
     }
     parent::tearDown();
@@ -197,6 +198,98 @@ class RESTTest extends \CiviUnitTestCase {
     $this->assertDBQuery(1, 'SELECT count(*) FROM civicrm_worldregion WHERE name = "Middle Earth"');
   }
 
+  function testUpdateItem_PATCH_DefaultJson() {
+    $item = $this->createCampusLocationType();
+    $this->assertDBQuery(1, 'SELECT count(*) FROM civicrm_location_type WHERE display_name = "Campus"');
+    $id = $item->getId();
+
+    $response = $this->request('PATCH', 'civicrm/rest/location-type/' . $item->getId(), array(), array(),
+      json_encode(array(
+        'display_name' => 'On Campus',
+      ))
+    );
+    $this->assertResponse($response, 200, 'application/json');
+    $actual = json_decode($response->getContent(), TRUE);
+    $this->assertEquals(1, count($actual));
+    $this->assertDBQuery(0, 'SELECT count(*) FROM civicrm_location_type WHERE display_name = "Campus"');
+    $this->assertDBQuery(1, 'SELECT count(*) FROM civicrm_location_type WHERE display_name = "On Campus" AND name = "Campus" AND id = %1', array(1 => array($id, 'Positive')));
+  }
+
+  function testUpdateItem_POST_DefaultJson() {
+    $item = $this->createCampusLocationType();
+    $this->assertDBQuery(1, 'SELECT count(*) FROM civicrm_location_type WHERE display_name = "Campus"');
+    $id = $item->getId();
+
+    $response = $this->request('POST', 'civicrm/rest/location-type/' . $item->getId(), array(), array(),
+      json_encode(array(
+        'display_name' => 'On Campus',
+      ))
+    );
+    $this->assertResponse($response, 200, 'application/json');
+    $actual = json_decode($response->getContent(), TRUE);
+    $this->assertEquals(1, count($actual));
+    $this->assertDBQuery(0, 'SELECT count(*) FROM civicrm_location_type WHERE display_name = "Campus"');
+    $this->assertDBQuery(1, 'SELECT count(*) FROM civicrm_location_type WHERE display_name = "On Campus" AND name = "Campus" AND id = %1', array(1 => array($id, 'Positive')));
+  }
+
+  function testUpdateItem_PATCH_OptionalId_DefaultJson() {
+    $item = $this->createCampusLocationType();
+    $this->assertDBQuery(1, 'SELECT count(*) FROM civicrm_location_type WHERE display_name = "Campus"');
+    $id = $item->getId();
+
+    $response = $this->request('PATCH', 'civicrm/rest/location-type/' . $item->getId(), array(), array(),
+      json_encode(array(
+        'id' => $item->getId(),
+        'display_name' => 'On Campus',
+      ))
+    );
+    $this->assertResponse($response, 200, 'application/json');
+    $actual = json_decode($response->getContent(), TRUE);
+    $this->assertEquals(1, count($actual));
+    $this->assertDBQuery(0, 'SELECT count(*) FROM civicrm_location_type WHERE display_name = "Campus"');
+    $this->assertDBQuery(1, 'SELECT count(*) FROM civicrm_location_type WHERE display_name = "On Campus" AND name = "Campus" AND id = %1', array(1 => array($id, 'Positive')));
+  }
+
+  // TODO testUpdateItem_Xml
+
+  function testUpdateItem_PATCH_InsufficientPermission_DefaultJson() {
+    $region = $this->createMiddleEarth();
+    $this->assertDBQuery(1, 'SELECT count(*) FROM civicrm_worldregion WHERE name = "Middle Earth"');
+
+    $this->apiSecurityGrantedPermissions = array('access AJAX API', 'access CiviCRM'); // missing: administer CiviCRM
+    $response = $this->request('PATCH', 'civicrm/rest/world-region/' . $region->getId());
+    $this->assertErrorResponse($response, 403, 'application/json');
+  }
+
+  function testUpdateItem_PATCH_MismatchedId_DefaultJson() {
+    $firstLocation = \CRM_DB_EntityManager::singleton()->find('Civi\Core\LocationType', 1);
+    $originalLocationName = $firstLocation->getDisplayName();
+    $campusLocation = $this->createCampusLocationType();
+
+    $this->assertDBQuery($originalLocationName, 'SELECT display_name FROM civicrm_location_type WHERE id = %1', array(1 => array($firstLocation->getId(), 'Positive'))); // unchanged
+    $this->assertDBQuery('Campus', 'SELECT display_name FROM civicrm_location_type WHERE id = %1', array(1 => array($campusLocation->getId(), 'Positive')));
+
+    $response = $this->request('PATCH', 'civicrm/rest/location-type/' . $campusLocation->getId(), array(), array(),
+      json_encode(array(
+        'id' => $firstLocation->getId(), // Mismatched
+        'display_name' => 'On Campus',
+      ))
+    );
+    $this->assertErrorResponse($response, 500, 'application/json');
+
+    $this->assertDBQuery($originalLocationName, 'SELECT display_name FROM civicrm_location_type WHERE id = %1', array(1 => array($firstLocation->getId(), 'Positive'))); // unchanged
+    $this->assertDBQuery('Campus', 'SELECT display_name FROM civicrm_location_type WHERE id = %1', array(1 => array($campusLocation->getId(), 'Positive'))); // unchanged
+  }
+
+  function testUpdateInvalidItem_PATCH_DefaultJson() {
+    $response = $this->request('PATCH', 'civicrm/rest/location-type/123456789', array(), array(),
+      json_encode(array(
+        'display_name' => 'Does Not Exist',
+      ))
+    );
+    $this->assertErrorResponse($response, 404, 'application/json');
+  }
+
   function testDeleteItem_DefaultJson() {
     $region = $this->createMiddleEarth();
     $this->assertDBQuery(1, 'SELECT count(*) FROM civicrm_worldregion WHERE name = "Middle Earth"');
@@ -265,6 +358,22 @@ class RESTTest extends \CiviUnitTestCase {
     $em->persist($region);
     $em->flush();
     return $region;
+  }
+
+  /**
+   * @return \Civi\Core\LocationType
+   */
+  function createCampusLocationType() {
+    $item = new \Civi\Core\LocationType();
+    $item->setName("Campus");
+    $item->setDescription("On-campus address");
+    $item->setDisplayName("Campus");
+    $item->setIsActive(TRUE);
+    $item->setVcardName('CAMPUS');
+    $em = \CRM_DB_EntityManager::singleton();
+    $em->persist($item);
+    $em->flush();
+    return $item;
   }
 
   function assertResponse(Response $response, $expectedCode, $expectedMimeType) {

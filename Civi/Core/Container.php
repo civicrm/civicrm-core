@@ -89,7 +89,7 @@ class Container {
 
     $container->setDefinition('hateoas', new Definition(
       '\Hateoas\Hateoas',
-      array('%cache_dir%/cache/hateoas')
+      array('%cache_dir%/cache/hateoas', new Reference('entity_manager'))
     ))
       ->setFactoryService(self::SELF)->setFactoryMethod('createHateoas');
 
@@ -155,10 +155,18 @@ class Container {
 
   /**
    * @param string $cacheDir
+   * @param \Doctrine\ORM\EntityManager $entity_manager
    * @return \Hateoas\Hateoas
    */
-  public function createHateoas($cacheDir) {
-    return \Hateoas\HateoasBuilder::create()
+  public function createHateoas($cacheDir, $entity_manager) {
+    $propertyNamingStrategy = new \JMS\Serializer\Naming\SerializedNameAnnotationStrategy(new \JMS\Serializer\Naming\CamelCaseNamingStrategy());
+
+    $serializerBuilder = \JMS\Serializer\SerializerBuilder::create();
+    $serializerBuilder->setPropertyNamingStrategy($propertyNamingStrategy);
+    $serializerBuilder->setObjectConstructor(
+      new \Civi\API\InitializedObjectConstructor(new \JMS\Serializer\Construction\UnserializeObjectConstructor(), $entity_manager, $propertyNamingStrategy)
+    );
+    return \Hateoas\HateoasBuilder::create($serializerBuilder)
       ->setCacheDir($cacheDir)
       ->setDebug(TRUE)
       ->setUrlGenerator('civi', new \Civi\API\RestUrlGenerator())

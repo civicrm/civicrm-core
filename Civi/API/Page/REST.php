@@ -3,6 +3,8 @@ namespace Civi\API\Page;
 use Civi\API\Annotation\Permission;
 use Civi\API\AuthorizationCheck;
 use Civi\Core\Container;
+use JMS\Serializer\Serializer;
+use JMS\Serializer\DeserializationContext;
 use Symfony\Component\HttpFoundation\Response;
 use Doctrine\Common\Collections\Criteria;
 
@@ -75,6 +77,14 @@ class REST extends \CRM_Core_Page {
         case 'POST':
           if (!$id) {
             return $this->createItem($entityClass);
+          }
+          else {
+            return $this->updateItem($entityClass, $id);
+          }
+          break;
+        case 'PATCH':
+          if ($id) {
+            return $this->updateItem($entityClass, $id);
           }
           break;
         case 'DELETE':
@@ -149,6 +159,38 @@ class REST extends \CRM_Core_Page {
     $em->flush($obj);
     return $this->createResponse(200, array($obj));
   }
+
+  /**
+   * @param string $entityClass
+   * @param mixed $id
+   * @return \Symfony\Component\HttpFoundation\Response
+   */
+  public function updateItem($entityClass, $id) {
+    $em = \CRM_DB_EntityManager::singleton();
+    $item = $em->find($entityClass, $id);
+    if ($item) {
+      if (!$this->apiSecurity->check(new AuthorizationCheck($entityClass, Permission::CREATE, array($item)))) {
+        return $this->createError(403);
+      }
+
+      $context = new DeserializationContext();
+      $context->attributes->set('target', $item);
+      $this->hateoas->deserialize($this->request->getContent(), $entityClass, $this->getRequestFormat(), $context);
+
+      if (!$this->apiSecurity->check(new AuthorizationCheck($entityClass, Permission::CREATE, array($item)))) {
+        return $this->createError(403);
+      }
+
+      $em->flush($item);
+
+      // Return success as long as post-condition is OK ("$id does not exist")
+      return $this->createResponse(200, array($item));
+    }
+    else {
+      return $this->createError(404);
+    }
+  }
+
 
   /**
    * @param string $entityClass
