@@ -41,7 +41,7 @@
     <div class="crm-summary-row">
       <div class="crm-label">{$form.job_title.label}</div>
       <div class="crm-content">{$form.job_title.html}</div>
-    <div>
+    </div>
     {/if}
     <div class="crm-summary-row">
       <div class="crm-label">{$form.nick_name.label}</div>

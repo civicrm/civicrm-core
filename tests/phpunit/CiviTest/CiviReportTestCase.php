@@ -106,20 +106,37 @@ class CiviReportTestCase extends CiviUnitTestCase {
   public function assertCsvArraysEqual($expectedCsvArray, $actualCsvArray) {
     // TODO provide better debug output
 
+    $flatData = "\n===== EXPECTED DATA ====\n"
+      . $this->flattenCsvArray($expectedCsvArray)
+      . "\n===== ACTUAL DATA ====\n"
+      . $this->flattenCsvArray($actualCsvArray);
+
     $this->assertEquals(
       count($actualCsvArray),
       count($expectedCsvArray),
-      'Arrays have different number of rows; in line ' . __LINE__
+      'Arrays have different number of rows; in line ' . __LINE__ . '; data: ' . $flatData
     );
 
     foreach ($actualCsvArray as $intKey => $strVal) {
+      $rowData = var_export(array(
+        'expected' => $expectedCsvArray[$intKey],
+        'actual'  => $actualCsvArray[$intKey],
+      ), TRUE);
       $this->assertNotNull($expectedCsvArray[$intKey], 'In line ' . __LINE__);
       $this->assertEquals(
         count($actualCsvArray[$intKey]),
         count($expectedCsvArray[$intKey]),
-        'Arrays have different number of columns at row ' . $intKey . '; in line ' . __LINE__
+        'Arrays have different number of columns at row ' . $intKey . '; in line ' . __LINE__. '; data: ' . $rowData
       );
       $this->assertEquals($expectedCsvArray[$intKey], $strVal);
     }
+  }
+
+  public function flattenCsvArray($rows) {
+    $result = '';
+    foreach ($rows as $row) {
+      $result .= implode(',', $row) . "\n";
+    }
+    return $result;
   }
 }

@@ -231,6 +231,7 @@ class CRM_Member_BAO_Query {
             $query->_qill[$grouping][] = ts('Membership is a Test');
           }
         }
+        $query->_tables['civicrm_membership'] = $query->_whereTables['civicrm_membership'] = 1;
         return;
 
       case 'member_auto_renew':

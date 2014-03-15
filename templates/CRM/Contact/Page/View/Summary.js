@@ -43,6 +43,7 @@
 
   function requestHandler(response) {
     var o = $('div.crm-inline-edit.form');
+    $('form', o).ajaxFormUnbind();
 
     if (response.status == 'save' || response.status == 'cancel') {
       o.trigger('crmFormSuccess', [response]);
@@ -99,7 +100,6 @@
     }
     else {
       // Handle formRule error
-      $('form', o).ajaxForm('destroy');
       $('.crm-container-snippet', o).replaceWith(response.content);
       $('form', o).validate(CRM.validate.params);
       $('form', o).ajaxForm(ajaxFormParams);
@@ -211,6 +211,7 @@
       // Inline edit form cancel button
       .on('click', '.crm-inline-edit :submit[name$=cancel]', function() {
         var container = $(this).closest('.crm-inline-edit.form');
+        $('form', container).ajaxFormUnbind();
         $('.inline-edit-hidden-content', container).nextAll().remove();
         $('.inline-edit-hidden-content > *:first-child', container).unwrap();
         container.removeClass('form');

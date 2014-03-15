@@ -1436,14 +1436,7 @@ AND civicrm_membership.is_test = %2";
         }
       }
       $message = ts('Payment Processor Error message') . ': ' . implode('<br/>', $message);
-      // Redirect the form in case of error
-      // @todo this redirect in the BAO layer is really bad & should be moved to the form layer
-      // however since we have no idea how (if) this is triggered we can't safely move / remove it
-      $errorParams = array(
-        'legacy_redirect_path' => 'civicrm/contribute/transact',
-        'legacy_redirect_query' => "_qf_Main_display=true&qfKey={$form->_params['qfKey']}",
-      );
-      throw new CRM_Core_Exception($message, 0, $errorParams);
+      throw new CRM_Core_Exception($message);
     }
 
     // CRM-7851
