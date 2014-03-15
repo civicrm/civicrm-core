@@ -1793,11 +1793,12 @@ WHERE cpf.price_set_id = %1 AND cpfv.label LIKE %2";
       // check through the submitted items if the previousItem exists,
       // if found in submitted items, do not use it for new item creations
       if (in_array($previousLineItem['price_field_value_id'], $submittedFieldValueIds)) {
+        // if submitted line items are existing don't fire INSERT query
+        unset($insertLines[$previousLineItem['price_field_value_id']]);
         // for updating the line items i.e. use-case - once deselect-option selecting again
         if ($previousLineItem['qty'] == 0) {
           $updateLines[$previousLineItem['price_field_value_id']]['qty'] = $submittedLineItems[$previousLineItem['price_field_value_id']]['qty'];
           $updateLines[$previousLineItem['price_field_value_id']]['line_total'] = $submittedLineItems[$previousLineItem['price_field_value_id']]['line_total'];
-          unset($insertLines[$previousLineItem['price_field_value_id']]);
         }
       }
     }
