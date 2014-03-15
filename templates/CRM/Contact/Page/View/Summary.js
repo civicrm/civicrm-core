@@ -303,7 +303,7 @@
         if (url === '#') {
           CRM.tabHeader.focus($tab);
           return false;
-        } else if (CRM.config.ajax_popups_enabled) {
+        } else if (CRM.config.ajaxPopupsEnabled) {
           CRM.loadForm(url)
             .on('crmFormSuccess', function() {
               CRM.tabHeader.resetTab($tab);
