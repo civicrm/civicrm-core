@@ -2646,7 +2646,7 @@ div.grippie {
 }
 
 /* Icon hover-buttons */
-.crm-container a.crm-hover-button {
+.crm-container .crm-hover-button {
   display: inline-block;
   border: 1px solid transparent;
   text-decoration: none;
@@ -2655,13 +2655,13 @@ div.grippie {
   padding: 1px 2px 1px 0;
   opacity: .7;
 }
-.crm-container .crm-accordion-header a.crm-hover-button {
+.crm-container .crm-accordion-header .crm-hover-button {
   opacity: 1;
   position: relative;
   top: -4px;
 }
-.crm-container a.crm-hover-button:hover,
-.crm-container a.crm-hover-button:active {
+.crm-container .crm-hover-button:hover,
+.crm-container .crm-hover-button:active {
   background-image: -webkit-gradient(linear, left bottom, left top, color-stop(0, #eee), color-stop(1, #ccc));
   background-image: -webkit-linear-gradient(center bottom, #eee 0%, #ccc 100%);
   background-image: -moz-linear-gradient(center bottom, #eee 0%, #ccc 100%);

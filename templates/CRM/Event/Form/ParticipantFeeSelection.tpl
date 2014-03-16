@@ -129,7 +129,7 @@ cj(function(){
          <div class='crm-section'> 
          <div class='label'>{ts}Updated Fee(s){/ts}</div><div id="pricevalue" class='content updated-fee'></div>
          <div class='label'>{ts}Total Paid{/ts}</div>
-         <div class='content'><a class='action-item' href='{crmURL p="civicrm/payment" q="view=transaction&action=browse&cid=`$contactId`&id=`$paymentInfo.id`&component=`$paymentInfo.component`&context=transaction"}'>{$paymentInfo.paid|crmMoney}<br/>>> view payments</a>
+         <div class='content'><a class="crm-popup medium-popup" href='{crmURL p="civicrm/payment" q="view=transaction&action=browse&cid=`$contactId`&id=`$paymentInfo.id`&component=`$paymentInfo.component`&context=transaction"}'>{$paymentInfo.paid|crmMoney}<br/><span class="crm-hover-button">&raquo; view payments</span></a>
          </div>
          <div class='label'><strong>{ts}Balance Owed{/ts}</strong></div><div class='content'><strong id='balance-fee'></strong></div>
           </div>
@@ -144,7 +144,7 @@ cj(function(){
        <tr class="crm-event-eventfees-form-block-send_receipt">
           <td class="label">{ts}Send Confirmation{/ts}</td>
           <td>{$form.send_receipt.html}<br>
-             <span class="description">{ts 1=$email'}Automatically email a confirmation to %1?{/ts}</span>
+             <span class="description">{ts 1=$email}Automatically email a confirmation to %1?{/ts}</span>
           </td>
        </tr>
        <tr id="from-email" class="crm-event-eventfees-form-block-from_email_address">
