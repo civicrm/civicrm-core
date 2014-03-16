@@ -355,7 +355,7 @@
       if (settings.validate) {
         $("form", this).validate(typeof(settings.validate) == 'object' ? settings.validate : CRM.validate.params);
       }
-      $("form", this).ajaxForm($.extend({
+      $("form:not('[data-no-ajax-submit=true]')", this).ajaxForm($.extend({
         url: data.url.replace(/reset=1[&]?/, ''),
         dataType: 'json',
         success: function(response) {

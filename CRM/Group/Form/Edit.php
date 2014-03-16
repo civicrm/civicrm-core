@@ -225,6 +225,11 @@ class CRM_Group_Form_Edit extends CRM_Core_Form {
       return;
     }
 
+    // We want the "new group" form to redirect the user
+    if ($this->_action == CRM_Core_Action::ADD) {
+      $this->preventAjaxSubmit();
+    }
+
     $this->applyFilter('__ALL__', 'trim');
     $this->add('text', 'title', ts('Name') . ' ',
       CRM_Core_DAO::getAttribute('CRM_Contact_DAO_Group', 'title'), TRUE
@@ -467,7 +472,7 @@ WHERE  title = %1
       $potentialParentGroupIds = array_keys($groupNames);
     }
 
-    $parentGroupSelectValues = array('' => '- ' . ts('select') . ' -');
+    $parentGroupSelectValues = array('' => '- ' . ts('select group') . ' -');
     foreach ($potentialParentGroupIds as $potentialParentGroupId) {
       if (array_key_exists($potentialParentGroupId, $groupNames)) {
         $parentGroupSelectValues[$potentialParentGroupId] = $groupNames[$potentialParentGroupId];
@@ -484,7 +489,7 @@ WHERE  title = %1
       else {
         $required = FALSE;
       }
-      $obj->add('select', 'parents', ts('Add Parent'), $parentGroupSelectValues, $required);
+      $obj->add('select', 'parents', ts('Add Parent'), $parentGroupSelectValues, $required, array('class' => 'crm-select2'));
     }
 
     return $parentGroups;
