@@ -311,7 +311,7 @@
         validate: true,
         refreshAction: ['next_new', 'submit_savenext'],
         cancelButton: '.cancel.form-submit',
-        openInline: 'a.open-inline, a.button:not("[href=#], .no-popup")',
+        openInline: 'a.open-inline, a.button:not("[href=#], .no-popup, .crm-popup")',
         onCancel: function(event) {},
         onError: function(data) {
           var $el = $(this);
@@ -425,7 +425,7 @@
       settings.dialog.width = settings.dialog.height = '50%';
     }
     else if ($el.hasClass('huge-popup')) {
-      settings.dialog.height = '95%';
+      settings.dialog.height = '90%';
     }
     var dialog = popup(url, settings);
     // Trigger events from the dialog on the original link element
