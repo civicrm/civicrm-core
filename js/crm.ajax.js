@@ -267,7 +267,9 @@
     }
   });
 
-  var dialogCount = 0;
+  var dialogCount = 0,
+    exclude = '[href^=#], [href^=javascript], [onclick], .no-popup, .cancel';
+
   CRM.loadPage = function(url, options) {
     var settings = {
       target: '#crm-ajax-dialog-' + (dialogCount++),
@@ -310,8 +312,8 @@
         autoClose: true,
         validate: true,
         refreshAction: ['next_new', 'submit_savenext'],
-        cancelButton: '.cancel.form-submit',
-        openInline: 'a.open-inline, a.button:not("[href=#], .no-popup, .crm-popup")',
+        cancelButton: '.cancel',
+        openInline: 'a.open-inline, a.button, a.action-item',
         onCancel: function(event) {},
         onError: function(data) {
           var $el = $(this);
@@ -392,7 +394,7 @@
       }, settings.ajaxForm));
       if (settings.openInline) {
         settings.autoClose = $el.crmSnippet('isOriginalUrl');
-        $(settings.openInline, this).click(function(event) {
+        $(settings.openInline, this).not(exclude + ', .crm-popup').click(function(event) {
           $el.crmSnippet('option', 'url', $(this).attr('href')).crmSnippet('refresh');
           return false;
         });
@@ -413,7 +415,7 @@
       settings = $el.data('popup-settings') || {},
       triggers = {dialogclose: 'crmPopupClose', crmLoad: 'crmPopupLoad', crmFormSuccess: 'crmPopupFormSuccess'};
     settings.dialog = settings.dialog || {};
-    if (!CRM.config.ajaxPopupsEnabled || !url || url.charAt(0) === '#' || $el.attr('onclick') || $el.hasClass('no-popup')) {
+    if (!CRM.config.ajaxPopupsEnabled || !url || $el.is(exclude)) {
       return;
     }
     // Sized based on css class
