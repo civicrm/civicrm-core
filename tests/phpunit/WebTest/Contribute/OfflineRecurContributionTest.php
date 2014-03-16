@@ -88,8 +88,8 @@ class WebTest_Contribute_OfflineRecurContributionTest extends CiviSeleniumTestCa
     $this->click('contribution_test');
     $this->click('_qf_Search_refresh');
 
-    $this->waitForElementPresent('css=#contributionSearch table tbody tr td span a.action-item-first');
-    $this->click('css=#contributionSearch table tbody tr td span a.action-item-first');
+    $this->waitForElementPresent('css=#contributionSearch table tbody tr td span a.action-item:first-child');
+    $this->click('css=#contributionSearch table tbody tr td span a.action-item:first-child');
     $this->waitForElementPresent('_qf_ContributionView_cancel-bottom');
 
     // View Recurring Contribution Record
