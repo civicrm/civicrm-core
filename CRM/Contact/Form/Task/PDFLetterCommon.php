@@ -69,11 +69,14 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
   /**
    * Build the form
    *
-   * @access public
+   * @var CRM_Core_Form $form
    *
    * @return void
    */
   static function buildQuickForm(&$form) {
+    // This form outputs a file so should never be submitted via ajax
+    $form->preventAjaxSubmit();
+
     //Added for CRM-12682: Add activity subject and campaign fields
     CRM_Campaign_BAO_Campaign::addCampaign($form);
     $form->add(
