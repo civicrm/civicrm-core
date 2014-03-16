@@ -2496,7 +2496,8 @@ div.grippie {
   background-position: -128px -112px;
 }
 .crm-container .red-icon,
-.crm-container .button:hover .delete-icon {
+.crm-container a:hover .icon.delete-icon,
+.crm-container span:hover .icon.delete-icon {
   background-image: url("../i/icons/jquery-ui-8A1F11.png");
 }
 
@@ -2647,7 +2648,8 @@ div.grippie {
 }
 
 /* Icon hover-buttons */
-.crm-container .crm-hover-button {
+.crm-container .crm-hover-button,
+.crm-container a.crm-hover-button {
   display: inline-block;
   border: 1px solid transparent;
   text-decoration: none;
@@ -2669,7 +2671,8 @@ div.grippie {
   top: -4px;
 }
 .crm-container .crm-hover-button:hover,
-.crm-container .crm-hover-button:active {
+.crm-container a.crm-hover-button:hover,
+.crm-container a.crm-hover-button:active {
   background-image: -webkit-gradient(linear, left bottom, left top, color-stop(0, #eee), color-stop(1, #ccc));
   background-image: -webkit-linear-gradient(center bottom, #eee 0%, #ccc 100%);
   background-image: -moz-linear-gradient(center bottom, #eee 0%, #ccc 100%);
