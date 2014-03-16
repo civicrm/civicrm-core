@@ -231,8 +231,7 @@ class CRM_Core_Action {
 
     $url = array();
 
-    $firstLink = TRUE;
-    foreach ($seqLinks as $link) {
+    foreach ($seqLinks as $i => $link) {
       if (!$mask || !array_key_exists('bit', $link) || ($mask & $link['bit'])) {
         $extra = isset($link['extra']) ? self::replace($link['extra'], $values) : NULL;
 
@@ -247,46 +246,40 @@ class CRM_Core_Action {
           $urlPath = CRM_Utils_Array::value('url', $link, '#');
         }
 
-        $classes = 'action-item';
-        if ($firstLink) {
-          $firstLink = FALSE;
-          $classes .= " action-item-first";
-        }
+        $classes = 'action-item crm-hover-button';
         if (isset($link['ref'])) {
           $classes .= ' ' . strtolower($link['ref']);
         }
 
         //get the user specified classes in.
         if (isset($link['class'])) {
-          $className = $link['class'];
-          if (is_array($className)) {
-            $className = implode(' ', $className);
-          }
+          $className = is_array($link['class']) ? implode(' ', $link['class']) : $link['class'];
           $classes .= ' ' . strtolower($className);
         }
-
-        $linkClasses = 'class="' . $classes . '"';
 
         if ($urlPath !== '#' && $frontend) {
           $extra .= ' target="_blank"';
         }
-        $url[] = sprintf('<a href="%s" %s title="%s" ' . $extra . '>%s</a>',
+        // Hack to make delete dialogs smaller
+        if (strpos($urlPath, '/delete') || strpos($urlPath, 'action=delete')) {
+          $classes .= " small-popup";
+        }
+        $url[] = sprintf('<a href="%s" class="%s" %s' . $extra . '>%s</a>',
           $urlPath,
-          $linkClasses,
-          CRM_Utils_Array::value('title', $link),
+          $classes,
+          !empty($link['title']) ? "title='{$link['title']}' " : '',
           $link['name']
         );
       }
     }
 
 
-    $result = '';
     $mainLinks = $url;
     if ($enclosedAllInSingleUL) {
       $allLinks = '';
       CRM_Utils_String::append($allLinks, '</li><li>', $mainLinks);
       $allLinks = "{$extraULName}<ul class='panel'><li>{$allLinks}</li></ul>";
-      $result = "<span class='btn-slide'>{$allLinks}</span>";
+      $result = "<span class='btn-slide crm-hover-button'>{$allLinks}</span>";
     }
     else {
       $extra = '';
@@ -299,7 +292,7 @@ class CRM_Core_Action {
       $resultLinks = '';
       CRM_Utils_String::append($resultLinks, '', $mainLinks);
       if ($extra) {
-        $result = "<span>{$resultLinks}</span><span class='btn-slide'>{$extra}</span>";
+        $result = "<span>{$resultLinks}</span><span class='btn-slide crm-hover-button'>{$extra}</span>";
       }
       else {
         $result = "<span>{$resultLinks}</span>";

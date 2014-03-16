@@ -63,7 +63,7 @@
 {else}
     <div class="messages status no-popup">
       <div class="icon inform-icon"></div>
-        {capture assign=link}href="{crmURL q="action=add&reset=1"}" class="action-item action-item-first"{/capture}
+        {capture assign=link}href="{crmURL q="action=add&reset=1"}" class="action-item"{/capture}
         {ts 1=$link}There are no PDF Page Formats configured. You can <a %1>add one</a>.{/ts}
     </div>
 {/if}

@@ -37,11 +37,11 @@
     {if $action ne 1 and $action ne 2 and $permission EQ 'edit'}
         <div id="help">
             {if $permission EQ 'edit'}
-              {capture assign="link"}class="action-item action-item-first" href="{$newURL}"{/capture}
+              {capture assign="link"}class="action-item" href="{$newURL}"{/capture}
               {ts 1=$link}Click <a %1>Add Membership</a> to record a new membership.{/ts}
               {if $newCredit}
                 {capture assign=newCreditURL}{crmURL p="civicrm/contact/view/membership" q="reset=1&action=add&cid=`$contactId`&context=membership&mode=live"}{/capture}
-                {capture assign="link"}class="action-item action-item-first" href="{$newCreditURL}"{/capture}
+                {capture assign="link"}class="action-item" href="{$newCreditURL}"{/capture}
                 {ts 1=$link}Click <a %1>Submit Credit Card Membership</a> to process a Membership on behalf of the member using their credit card.{/ts}
                 {/if}
             {else}

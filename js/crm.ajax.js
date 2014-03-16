@@ -285,7 +285,7 @@
     // Create new dialog
     if (settings.dialog) {
       // HACK: jQuery UI doesn't support relative height
-      if (settings.dialog.height && settings.dialog.height.indexOf('%') > 0) {
+      if (typeof settings.dialog.height === 'string' && settings.dialog.height.indexOf('%') > 0) {
         settings.dialog.height = parseInt($(window).height() * (parseFloat(settings.dialog.height)/100), 10);
       }
       $('<div id="'+ settings.target.substring(1) +'"><div class="crm-loading-element">' + ts('Loading') + '...</div></div>').dialog(settings.dialog);
@@ -416,8 +416,8 @@
     if (!CRM.config.ajaxPopupsEnabled || !url || url.charAt(0) === '#' || $el.attr('onclick') || $el.hasClass('no-popup')) {
       return;
     }
-    // Sized based on css class with hack to make delete dialogs smaller
-    if ($el.hasClass('small-popup') || url.indexOf('/delete') > 0 || url.indexOf('action=delete') > 0) {
+    // Sized based on css class
+    if ($el.hasClass('small-popup')) {
       settings.dialog.width = 400;
       settings.dialog.height = 300;
     }
@@ -437,4 +437,9 @@
     });
     return false;
   };
+
+  $(function($) {
+    $('body').on('click', 'a.crm-popup', CRM.popup);
+  });
+
 }(jQuery, CRM));
