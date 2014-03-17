@@ -315,17 +315,6 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
       }
     }
 
-    $this->add('text', 'change_client_id', ts('Assign to another Client'));
-    $this->add('hidden', 'contact_id', '', array('id' => 'contact_id'));
-    $this->addElement('submit',
-      $this->getButtonName('next', 'edit_client'),
-      ts('Reassign Case'),
-      array(
-        'class' => 'form-submit-inline',
-        'onclick' => "return checkSelection( this );",
-      )
-    );
-
     $activityStatus = CRM_Core_PseudoConstant::activityStatus();
     $this->add('select', 'status_id', ts('Status'), array("" => ts(' - any status - ')) + $activityStatus);
 
@@ -518,16 +507,6 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
       //redirect user to main case view.
       $url = CRM_Utils_System::url('civicrm/contact/view/case',
         "reset=1&action=view&cid={$this->_contactID}&id={$mainCaseId}&show=1"
-      );
-      $session = CRM_Core_Session::singleton();
-      $session->pushUserContext($url);
-    }
-    elseif ($buttonName == '_qf_CaseView_next_edit_client') {
-      $mainCaseId = CRM_Case_BAO_Case::mergeCases($params['contact_id'], $this->_caseID, $this->_contactID, NULL, TRUE);
-
-      // user context
-      $url = CRM_Utils_System::url('civicrm/contact/view/case',
-        "reset=1&action=view&cid={$params['contact_id']}&id={$mainCaseId[0]}&show=1"
       );
       $session = CRM_Core_Session::singleton();
       $session->pushUserContext($url);
