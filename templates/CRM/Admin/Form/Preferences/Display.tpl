@@ -195,9 +195,9 @@
           fields).{/ts} {help id="id-editor_id"}
       </td>
     </tr>
-    <tr class="crm-preferences-display-form-block-ajax_popups_enabled">
-      <td class="label">{$form.ajax_popups_enabled.label}</td>
-      <td>{$form.ajax_popups_enabled.html}</td>
+    <tr class="crm-preferences-display-form-block-ajaxPopupsEnabled">
+      <td class="label">{$form.ajaxPopupsEnabled.label}</td>
+      <td>{$form.ajaxPopupsEnabled.html}</td>
     </tr>
     <tr class="crm-preferences-display-form-block-description">
       <td>&nbsp;</td>

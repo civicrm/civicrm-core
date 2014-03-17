@@ -95,6 +95,11 @@ class CRM_Core_Resources {
   protected $cacheCodeKey = NULL;
 
   /**
+   * @var bool
+   */
+  public $ajaxPopupsEnabled;
+
+  /**
    * Get or set the single instance of CRM_Core_Resources
    *
    * @param $instance CRM_Core_Resources, new copy of the manager
@@ -134,6 +139,9 @@ class CRM_Core_Resources {
     if (!$this->cacheCode) {
       $this->resetCacheCode();
     }
+    $this->ajaxPopupsEnabled = (bool) CRM_Core_BAO_Setting::getItem(
+      CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'ajaxPopupsEnabled', NULL, TRUE
+    );
   }
 
   /**
@@ -454,9 +462,7 @@ class CRM_Core_Resources {
         'userFramework' => $config->userFramework,
         'resourceBase' => $config->resourceBase,
         'lcMessages' => $config->lcMessages,
-        'ajax_popups_enabled' => (bool) CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
-          'ajax_popups_enabled', NULL, TRUE
-        )
+        'ajaxPopupsEnabled' => $this->ajaxPopupsEnabled,
       );
       $this->addSetting(array('config' => $settings));
 
@@ -593,8 +599,8 @@ class CRM_Core_Resources {
       "packages/jquery/plugins/jquery.validate$min.js",
       "packages/jquery/plugins/jquery.ui.datepicker.validation.pack.js",
 
-      "js/rest.js",
       "js/Common.js",
+      "js/crm.ajax.js",
     );
 
     // These scripts are only needed by back-office users
@@ -609,6 +615,11 @@ class CRM_Core_Resources {
       // TODO: tokeninput is deprecated in favor of select2 and will be removed soon
       $items[] = "packages/jquery/plugins/jquery.tokeninput$min.js";
       $items[] = "packages/jquery/css/token-input-facebook.css";
+    }
+
+    // Enable administrators to edit option lists in a dialog
+    if (CRM_Core_Permission::check('administer CiviCRM') && $this->ajaxPopupsEnabled) {
+      $items[] = "js/crm.optionEdit.js";
     }
 
     // Add localized jQuery UI files
