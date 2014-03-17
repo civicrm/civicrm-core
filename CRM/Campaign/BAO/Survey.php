@@ -818,7 +818,7 @@ INNER JOIN  civicrm_contact contact_a ON ( activityTarget.contact_id = contact_a
         $urlPath = CRM_Utils_System::url(CRM_Core_Action::replace($link['url'], $ids),
           CRM_Core_Action::replace($link['qs'], $ids)
         );
-        $menuLinks[] = sprintf('<a href="%s" class="action-item" title="%s">%s</a>',
+        $menuLinks[] = sprintf('<a href="%s" class="action-item crm-hover-button" title="%s">%s</a>',
           $urlPath,
           CRM_Utils_Array::value('title', $link),
           $link['title']
@@ -830,7 +830,7 @@ INNER JOIN  civicrm_contact contact_a ON ( activityTarget.contact_id = contact_a
       $allLinks = '';
       CRM_Utils_String::append($allLinks, '</li><li>', $menuLinks);
       $allLinks = "$extraULName <ul id='panel_{$extraLinksName}_xx' class='panel'><li>{$allLinks}</li></ul>";
-      $menuLinks = "<span class='btn-slide' id={$extraLinksName}_xx>{$allLinks}</span>";
+      $menuLinks = "<span class='btn-slide crm-hover-button' id={$extraLinksName}_xx>{$allLinks}</span>";
     }
 
     return $menuLinks;

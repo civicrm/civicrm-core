@@ -205,10 +205,10 @@ return array (
     'description' => null,
     'help_text' => null,
   ),
-  'ajax_popups_enabled' => array(
+  'ajaxPopupsEnabled' => array(
     'group_name' => 'CiviCRM Preferences',
     'group' => 'core',
-    'name' => 'ajax_popups_enabled',
+    'name' => 'ajaxPopupsEnabled',
     'type' => 'Boolean',
     'quick_form_type' => 'YesNo',
     'default' => 1,

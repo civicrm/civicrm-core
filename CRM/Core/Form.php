@@ -1523,5 +1523,21 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       return array();
     }
   }
+
+  /**
+   * Sets form attribute
+   * @see CRM.loadForm
+   */
+  function preventAjaxSubmit() {
+    $this->setAttribute('data-no-ajax-submit', 'true');
+  }
+
+  /**
+   * Sets form attribute
+   * @see CRM.loadForm
+   */
+  function allowAjaxSubmit() {
+    $this->removeAttribute('data-no-ajax-submit');
+  }
 }
 

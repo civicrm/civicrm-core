@@ -1633,21 +1633,57 @@ editor specific classes
   line-height: 15px;
 }
 
-/* Styles for Action Items &  Action Link pop-up */
-.crm-container .action-item {
-  padding: 0px 5px;
-  border-left: 1px solid #CCC;
-  white-space: nowrap;
-}
 .crm-container .action-item-wrap {
   padding: 0px 5px;
   border-left: 1px solid #CCC;
   white-space: normal;
 }
-.crm-container .action-item-first {
-  border-left: none;
-  /* last action item should not have right hand border */}
 
+/* Hover-buttons */
+.crm-container span.crm-hover-button,
+.crm-container a.crm-hover-button {
+  display: inline-block;
+  white-space: nowrap;
+  border: 1px solid transparent;
+  text-decoration: none;
+  font-size: .8em;
+  color: #000;
+  padding: 1px 2px 1px 0;
+  opacity: .7;
+}
+.crm-container a.crm-hover-button.action-item,
+.crm-container .crm-hover-button.btn-slide {
+  font-size: .9em;
+  padding: 3px 5px;
+  opacity: 1;
+}
+.crm-container .crm-accordion-header .crm-hover-button {
+  opacity: 1;
+  position: relative;
+  top: -4px;
+}
+.crm-container .crm-hover-button:hover,
+.crm-container a.crm-hover-button:hover,
+.crm-container a.crm-hover-button:active {
+  background-image: -webkit-gradient(linear, left bottom, left top, color-stop(0, #eee), color-stop(1, #ccc));
+  background-image: -webkit-linear-gradient(center bottom, #eee 0%, #ccc 100%);
+  background-image: -moz-linear-gradient(center bottom, #eee 0%, #ccc 100%);
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr = '#cccccc', endColorstr = '#eeeeee', GradientType = 0);
+  background-image: linear-gradient(top, #eee 0%, #ccc 100%);
+  border: 1px solid #AAAAAA;
+  border-radius: 4px;
+  opacity: 1;
+  color: #2786C2;
+}
+.crm-container .crm-hover-button .icon {
+  margin-left: 3px;
+  position: relative;
+  top: 2px;
+}
+.crm-container .crm-hover-button:hover .icon,
+.crm-container .crm-hover-button:active .icon {
+  background-image: url("../i/icons/jquery-ui-2786C2.png");
+}
 
 /* theming for panel and context menus */
 .crm-container td ul.panel li {
@@ -1694,17 +1730,24 @@ editor specific classes
 
 .crm-container .btn-slide {
   text-align: left;
-  text-decoration: none;
-  border: none;
   cursor: pointer;
   position: relative;
-  padding: 0px 14px 0 5px;
-  background: url("../i/TreePlus.gif") no-repeat right 1px;
   white-space: nowrap;
-  z-index: 2;
+  padding-right: 15px !important;
+}
+.crm-container .btn-slide:after {
+  content: "";
+  display: block;
+  height: 15px;
+  position: absolute;
+  right: 2px;
+  top: 3px;
+  width: 15px;
+  background: url("../i/TreePlus.gif") no-repeat right 1px;
 }
 
-.crm-container .btn-slide-active {
+
+.crm-container .btn-slide-active .panel {
   z-index: 10;
 }
 
@@ -1720,7 +1763,6 @@ editor specific classes
   text-decoration: none;
   padding: 4px;
   display: block;
-  border: none;
   cursor: pointer;
 }
 
@@ -2495,7 +2537,8 @@ div.grippie {
   background-position: -128px -112px;
 }
 .crm-container .red-icon,
-.crm-container .button:hover .delete-icon {
+.crm-container a:hover .icon.delete-icon,
+.crm-container span:hover .icon.delete-icon {
   background-image: url("../i/icons/jquery-ui-8A1F11.png");
 }
 
@@ -2645,42 +2688,6 @@ div.grippie {
   background-position: -32px -32px;
 }
 
-/* Icon hover-buttons */
-.crm-container a.crm-hover-button {
-  display: inline-block;
-  border: 1px solid transparent;
-  text-decoration: none;
-  font-size: .8em;
-  color: #000;
-  padding: 1px 2px 1px 0;
-  opacity: .7;
-}
-.crm-container .crm-accordion-header a.crm-hover-button {
-  opacity: 1;
-  position: relative;
-  top: -4px;
-}
-.crm-container a.crm-hover-button:hover,
-.crm-container a.crm-hover-button:active {
-  background-image: -webkit-gradient(linear, left bottom, left top, color-stop(0, #eee), color-stop(1, #ccc));
-  background-image: -webkit-linear-gradient(center bottom, #eee 0%, #ccc 100%);
-  background-image: -moz-linear-gradient(center bottom, #eee 0%, #ccc 100%);
-  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr = '#cccccc', endColorstr = '#eeeeee', GradientType = 0);
-  background-image: linear-gradient(top, #eee 0%, #ccc 100%);
-  border: 1px solid #AAAAAA;
-  border-radius: 4px;
-  opacity: 1;
-  color: #2786C2;
-}
-.crm-container .crm-hover-button .icon {
-  margin-left: 3px;
-  position: relative;
-  top: 2px;
-}
-.crm-container .crm-hover-button:hover .icon,
-.crm-container .crm-hover-button:active .icon {
-  background-image: url("../i/icons/jquery-ui-2786C2.png");
-}
 /* accordion styles */
 
 .crm-container .crm-accordion-header {

@@ -56,7 +56,8 @@ cj(function($){
     <td>{$paymentInfo.total|crmMoney}</td>
     <td class='right'>
       {if $paymentInfo.paid > 0}
-        <a class='action-item' href='{crmURL p="civicrm/payment" q="view=transaction&cid=`$cid`&id=`$paymentInfo.id`&component=`$paymentInfo.component`&action=browse"}'>{$paymentInfo.paid|crmMoney}<br/>>> view payments</a>
+        {$paymentInfo.paid|crmMoney}<br/>
+        <a class="crm-hover-button crm-popup medium-popup" href='{crmURL p="civicrm/payment" q="view=transaction&cid=`$cid`&id=`$paymentInfo.id`&component=`$paymentInfo.component`&action=browse"}'>&raquo; {ts}view payments{/ts}</a>
       {/if}
     </td>
     <td class='right'>{$paymentInfo.balance|crmMoney}</td>

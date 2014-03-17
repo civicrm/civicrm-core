@@ -228,6 +228,7 @@ class CRM_Grant_Form_Search extends CRM_Core_Form {
 
     $rows = $this->get('rows');
     if (is_array($rows)) {
+      CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'js/crm.livePage.js');
       CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'js/crm.searchForm.js');
       if (!$this->_single) {
         $this->addElement('checkbox', 'toggleSelect', NULL, NULL, array('onchange' => "toggleTaskAction( true );", 'class' => 'select-rows'));
