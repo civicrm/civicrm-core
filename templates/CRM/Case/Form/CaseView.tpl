@@ -130,10 +130,8 @@
 
   {if call_user_func(array('CRM_Core_Permission','giveMeAllACLs'))}
     <tr class="crm-case-caseview-form-block-change_client_id">
-      <td colspan='2'><a href="#" onClick='cj("#change_client").toggle( ); return false;'>{ts}Assign to Another Contact{/ts}</a>
-          <span id='change_client' class='hide-block'>
-            {$form.change_client_id.html|crmAddClass:twenty}&nbsp;{$form._qf_CaseView_next_edit_client.html}
-          </span>
+      <td colspan='2'>
+        <a class="crm-popup" href="{crmURL p='civicrm/contact/view/case/editClient' h=0 q="reset=1&action=update&id=$caseID&cid=$contactID"}"><span class="icon swap-icon"></span> {ts}Assign to Another Contact{/ts}</a>
       </td>
     </tr>
   {/if}
@@ -282,12 +280,6 @@
 
 {literal}
 <script type="text/javascript">
-  var selectedContact = '';
-  var caseID = {/literal}"{$caseID}"{literal};
-  var contactUrl = {/literal}"{crmURL p='civicrm/ajax/rest' q='className=CRM_Contact_Page_AJAX&fnName=getContactList&json=1&context=newcontact' h=0 }"{literal};
-  cj( "#change_client_id").autocomplete( contactUrl, { width : 250, selectFirst : false, matchContains:true
-  }).result( function(event, data, formatted) { cj( "#contact_id" ).val( data[1] ); selectedContact = data[0];
-    }).bind( 'click', function( ) { cj( "#contact_id" ).val(''); });
 
   cj("#dialog").hide( );
 
@@ -945,8 +937,6 @@ function checkSelection( field ) {
   var successAction     = '';
   var forceValidation   = false;
 
-  var clientName = new Array( );
-  clientName = selectedContact.split('::');
   var fName = field.name;
 
   switch ( fName )  {
@@ -977,18 +967,7 @@ function checkSelection( field ) {
     validationMessage = '{/literal}{ts escape="js"}Please select a case from the list to merge with.{/ts}{literal}';
     validationField   = 'merge_case_id';
     break;
-
-  case '_qf_CaseView_next_edit_client' :
-    validationMessage = '{/literal}{ts escape="js"}Please select a client for this case.{/ts}{literal}';
-    if ( cj('#contact_id').val( ) == '{/literal}{$contactID}{literal}' ) {
-      forceValidation = true;
-      validationMessage = '{/literal}{ts 1="'+clientName[0]+'"}%1 is already assigned to this case. Please select some other client for this case.{/ts}{literal}';
-    }
-    validationField   = 'change_client_id';
-    successAction     = "confirm( '{/literal}{ts 1="'+clientName[0]+'"}Are you sure you want to reassign this case and all related activities and relationships to %1?{/ts}{literal}' )";
-    break;
   }
-
   if ( forceValidation || ( document.getElementById( validationField ).value == '' ) ) {
     cj('#'+validationField).crmError(validationMessage);
     return false;
