@@ -126,12 +126,6 @@
 </table>
 {/strip}
 
-{*include activity view js file*}
-{include file="CRM/common/activityView.tpl"}
-<div id="view-activity" style="display:none;">
-     <div id="activity-content"></div>
-</div>
-
 {if $context EQ 'Search'}
     {include file="CRM/common/pager.tpl" location="bottom"}
 {/if}

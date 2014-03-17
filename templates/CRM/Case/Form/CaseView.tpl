@@ -468,9 +468,6 @@
     });
   }
 
-cj(function(){
-   cj("#view-activity").hide( );
-});
 </script>
 {/literal}
 
@@ -875,17 +872,11 @@ function addTags() {
 
 {/if} {* end of tag block*}
 
-{*include activity view js file*}
-{include file="CRM/common/activityView.tpl"}
-
 <div class="crm-accordion-wrapper crm-case_activities-accordion  crm-case-activities-block">
   <div class="crm-accordion-header">
     {ts}Activities{/ts}
   </div>
   <div id="activities" class="crm-accordion-body">
-    <div id="view-activity">
-      <div id="activity-content"></div>
-    </div>
     <div class="crm-accordion-wrapper crm-accordion-inner crm-search_filters-accordion collapsed">
       <div class="crm-accordion-header">
         {ts}Search Filters{/ts}</a>
