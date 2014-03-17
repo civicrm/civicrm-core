@@ -351,6 +351,10 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
       foreach ($softParams as $softParam) {
         $softParam['contribution_id'] = $contribution->id;
         $softParam['currency'] = $contribution->currency;
+        //case during Contribution Import when we assign soft contribution amount as contribution's total_amount by default
+        if (empty($softParam['amount'])) {
+          $softParam['amount'] = $contribution->total_amount;
+        }
         CRM_Contribute_BAO_ContributionSoft::add($softParam);
       }
     }
@@ -2254,15 +2258,31 @@ WHERE  contribution_id = %1 ";
     $softRecord = CRM_Contribute_BAO_ContributionSoft::getSoftContribution($this->id);
 
     if (isset($softRecord['soft_credit'])) {
-      $values['honor'] = array(
-        'honor_profile_values' => array(),
-        'honor_profile_id' => CRM_Core_DAO::getFieldValue('CRM_Core_DAO_UFJoin', $values['id'], 'uf_group_id', 'entity_id'),
-        'honor_id' => $softRecord['soft_credit'][1]['contact_id'],
-      );
-      $softCreditTypes = CRM_Core_OptionGroup::values('soft_credit_type');
+      //if id of contribution page is present
+      if (!empty($values['id'])) {
+        $values['honor'] = array(
+          'honor_profile_values' => array(),
+          'honor_profile_id' => CRM_Core_DAO::getFieldValue('CRM_Core_DAO_UFJoin', $values['id'], 'uf_group_id', 'entity_id'),
+          'honor_id' => $softRecord['soft_credit'][1]['contact_id'],
+        );
+        $softCreditTypes = CRM_Core_OptionGroup::values('soft_credit_type');
 
-      $template->assign('soft_credit_type',  $softRecord['soft_credit'][1]['soft_credit_type_label']);
-      $template->assign('honor_block_is_active', CRM_Core_DAO::getFieldValue('CRM_Core_DAO_UFJoin', $values['id'], 'is_active', 'entity_id'));
+        $template->assign('soft_credit_type',  $softRecord['soft_credit'][1]['soft_credit_type_label']);
+        $template->assign('honor_block_is_active', CRM_Core_DAO::getFieldValue('CRM_Core_DAO_UFJoin', $values['id'], 'is_active', 'entity_id'));
+      }
+      else {
+        //offline contribution
+        $softCreditTypes = $softCredits = array();
+        foreach ($softRecord['soft_credit'] as $key => $softCredit) {
+          $softCreditTypes[$key] = $softCredit['soft_credit_type_label'];
+          $softCredits[$key] = array(
+            'Name' => $softCredit['contact_name'],
+            'Amount' => CRM_Utils_Money::format($softCredit['amount'], $softCredit['currency'])
+          );
+        }
+        $template->assign('softCreditTypes', $softCreditTypes);
+        $template->assign('softCredits', $softCredits);
+      }
     }
 
     $dao = new CRM_Contribute_DAO_ContributionProduct();
