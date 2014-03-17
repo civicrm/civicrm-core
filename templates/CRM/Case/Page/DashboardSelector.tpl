@@ -151,3 +151,5 @@ function hideCaseActivities( caseId , type, context ) {
 
 </script>
 {/literal}
+
+{include file="CRM/Case/Form/ActivityChangeStatusJs.tpl"}

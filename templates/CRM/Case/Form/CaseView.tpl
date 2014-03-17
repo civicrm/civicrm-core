@@ -1105,3 +1105,5 @@ function printCaseReport( ) {
 
 {/if} {* view related cases if end *}
 </div>
+
+{include file="CRM/Case/Form/ActivityChangeStatusJs.tpl"}
