@@ -87,3 +87,5 @@ cj(function() {
 </script>
 {/literal}
 {/if}
+
+{include file="CRM/Case/Form/ActivityChangeStatusJs.tpl"}
