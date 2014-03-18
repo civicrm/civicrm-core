@@ -268,12 +268,10 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
   public static function toBeSkipped_getlimit() {
     $entitiesWithout = array(
       'Case',//case api has non-std mandatory fields one of (case_id, contact_id, activity_id, contact_id)
-      'Contact', // existing behaviour on NULL = rtn all
       'Contribution', //existing behaviour = fatal if 0 limit applied as offset of null is put in the query
       'EntityTag', // non-standard api - has inappropriate mandatory fields & doesn't implement limit
       'Event', // failed 'check that a 5 limit returns 5' - probably is_template field is wrong or something, or could be limit doesn't work right
       'Extension', // can't handle creating 25
-      'Group', // // existing behaviour on NULL = rtn all
       'MailingGroup', // no get call on MailingGroup
       'Note', // fails on 5 limit - probably a set up problem
       'Participant', //existing behaviour = fatal if 0 limit applied as null offset in sql
@@ -520,18 +518,18 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     $cases = array(); // each case is array(0 => $inputtedApiOptions, 1 => $expectedResultCount)
     $cases[] = array(
       array('options' => array('limit' => NULL)),
-      0,
-      'check that a NULL limit returns 0',
+      30,
+      'check that a NULL limit returns unlimited',
     );
     $cases[] = array(
       array('options' => array('limit' => FALSE)),
-      0,
-      'check that a FALSE limit returns 0',
+      30,
+      'check that a FALSE limit returns unlimited',
     );
     $cases[] = array(
       array('options' => array('limit' => 0)),
-      0,
-      'check that a 0 limit returns 0',
+      30,
+      'check that a 0 limit returns unlimited',
     );
     $cases[] = array(
       array('options' => array('limit' => 5)),
@@ -557,29 +555,36 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
 
     // each case is array(0 => $inputtedApiOptions, 1 => $expectedResultCount)
     foreach ($cases as $case) {
-      $result = $this->callAPISuccess($entityName, 'get', $case[0]);
-      $this->assertEquals($case[1], $result['count'], $case[2]);
-      $this->assertEquals($case[1], count($result['values']));
+      $this->checkLimitAgainstExpected($entityName, $case[0], $case[1], $case[2]);
 
       //non preferred / legacy syntax
       if(isset($case[0]['options']['limit'])) {
-        $result = $this->callAPISuccess($entityName, 'get', array('rowCount' => $case[0]['options']['limit']));
-        $this->assertEquals($case[1], $result['count'], $case[2]);
-        $this->assertEquals($case[1], count($result['values']));
-
-        //non preferred / legacy syntax
-        $result = $this->callAPISuccess($entityName, 'get', array('option_limit' => $case[0]['options']['limit']));
-        $this->assertEquals($case[1], $result['count'], $case[2]);
-        $this->assertEquals($case[1], count($result['values']));
-
-        //non preferred / legacy syntax
-        $result = $this->callAPISuccess($entityName, 'get', array('option.limit' => $case[0]['options']['limit']));
-        $this->assertEquals($case[1], $result['count'], $case[2]);
-        $this->assertEquals($case[1], count($result['values']));
+        $this->checkLimitAgainstExpected($entityName, array('rowCount' => $case[0]['options']['limit']), $case[1], $case[2]);
+        $this->checkLimitAgainstExpected($entityName, array('option_limit' => $case[0]['options']['limit']), $case[1], $case[2]);
+        $this->checkLimitAgainstExpected($entityName, array('option.limit' => $case[0]['options']['limit']), $case[1], $case[2]);
       }
     }
   }
 
+  /**
+   * Check that get fetches an appropriate number of results
+   *
+   * @param string $entityName Name of entity to test
+   * @param unknown $params
+   * @param unknown $limit
+   * @param unknown $message
+   */
+  function checkLimitAgainstExpected($entityName, $params, $limit, $message) {
+    $result = $this->callAPISuccess($entityName, 'get', $params);
+    if($limit == 30) {
+      $this->assertGreaterThanOrEqual($limit, $result['count'], $message);
+      $this->assertGreaterThanOrEqual($limit, $result['count'], $message);
+    }
+    else {
+      $this->assertEquals($limit, $result['count'], $message);
+      $this->assertEquals($limit, count($result['values']), $message);
+    }
+  }
   /**
    * Create two entities and make sure we can fetch them individually by ID (e.g. using "contact_id=>2"
    * or "group_id=>4")
