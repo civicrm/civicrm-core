@@ -253,6 +253,10 @@ class CRM_Core_CodeGen_EntitySpecification {
         $field['columnInfo'] .= ', nullable=true';
       }
 
+      if ($field['phpType'] == 'integer') {
+        $field['columnInfo'] .= ', options={"unsigned":true}';
+      }
+
       if (!empty($field['default'])) {
         $field['default'] = str_replace("'", "", $field['default']);
       }
