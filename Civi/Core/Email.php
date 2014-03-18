@@ -65,6 +65,7 @@ class Email extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
@@ -74,6 +75,7 @@ class Email extends \Civi\Core\Entity {
   /**
    * @var \Civi\Contact\Contact
    *
+   * @JMS\Type("\Civi\Contact\Contact")
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Contact")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="contact_id", referencedColumnName="id", onDelete="CASCADE")})
    */
@@ -82,6 +84,7 @@ class Email extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="location_type_id", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
@@ -90,6 +93,7 @@ class Email extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="email", type="string", length=254, nullable=true)
    * 
    */
@@ -98,6 +102,7 @@ class Email extends \Civi\Core\Entity {
   /**
    * @var boolean
    *
+   * @JMS\Type("boolean")
    * @ORM\Column(name="is_primary", type="boolean", nullable=false)
    * 
    */
@@ -106,6 +111,7 @@ class Email extends \Civi\Core\Entity {
   /**
    * @var boolean
    *
+   * @JMS\Type("boolean")
    * @ORM\Column(name="is_billing", type="boolean", nullable=false)
    * 
    */
@@ -114,6 +120,7 @@ class Email extends \Civi\Core\Entity {
   /**
    * @var boolean
    *
+   * @JMS\Type("boolean")
    * @ORM\Column(name="on_hold", type="boolean", nullable=false)
    * 
    */
@@ -122,6 +129,7 @@ class Email extends \Civi\Core\Entity {
   /**
    * @var boolean
    *
+   * @JMS\Type("boolean")
    * @ORM\Column(name="is_bulkmail", type="boolean", nullable=false)
    * 
    */
@@ -130,6 +138,7 @@ class Email extends \Civi\Core\Entity {
   /**
    * @var datetime
    *
+   * @JMS\Type("datetime")
    * @ORM\Column(name="hold_date", type="datetime", nullable=true)
    * 
    */
@@ -138,6 +147,7 @@ class Email extends \Civi\Core\Entity {
   /**
    * @var datetime
    *
+   * @JMS\Type("datetime")
    * @ORM\Column(name="reset_date", type="datetime", nullable=true)
    * 
    */
@@ -146,6 +156,7 @@ class Email extends \Civi\Core\Entity {
   /**
    * @var text
    *
+   * @JMS\Type("text")
    * @ORM\Column(name="signature_text", type="text", nullable=false)
    * 
    */
@@ -154,6 +165,7 @@ class Email extends \Civi\Core\Entity {
   /**
    * @var text
    *
+   * @JMS\Type("text")
    * @ORM\Column(name="signature_html", type="text", nullable=false)
    * 
    */

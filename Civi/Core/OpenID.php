@@ -65,6 +65,7 @@ class OpenID extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
@@ -74,6 +75,7 @@ class OpenID extends \Civi\Core\Entity {
   /**
    * @var \Civi\Contact\Contact
    *
+   * @JMS\Type("\Civi\Contact\Contact")
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Contact")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="contact_id", referencedColumnName="id", onDelete="CASCADE")})
    */
@@ -82,6 +84,7 @@ class OpenID extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="location_type_id", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
@@ -90,6 +93,7 @@ class OpenID extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="openid", type="string", length=255, nullable=true)
    * 
    */
@@ -98,6 +102,7 @@ class OpenID extends \Civi\Core\Entity {
   /**
    * @var boolean
    *
+   * @JMS\Type("boolean")
    * @ORM\Column(name="allowed_to_login", type="boolean", nullable=false)
    * 
    */
@@ -106,6 +111,7 @@ class OpenID extends \Civi\Core\Entity {
   /**
    * @var boolean
    *
+   * @JMS\Type("boolean")
    * @ORM\Column(name="is_primary", type="boolean", nullable=false)
    * 
    */

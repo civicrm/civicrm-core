@@ -65,6 +65,7 @@ class Job extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
@@ -74,6 +75,7 @@ class Job extends \Civi\Core\Entity {
   /**
    * @var \Civi\Core\Domain
    *
+   * @JMS\Type("\Civi\Core\Domain")
    * @ORM\ManyToOne(targetEntity="Civi\Core\Domain")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="domain_id", referencedColumnName="id")})
    */
@@ -82,6 +84,7 @@ class Job extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="run_frequency", type="string", length=8, nullable=false)
    * 
    */
@@ -90,6 +93,7 @@ class Job extends \Civi\Core\Entity {
   /**
    * @var datetime
    *
+   * @JMS\Type("datetime")
    * @ORM\Column(name="last_run", type="datetime", nullable=false)
    * 
    */
@@ -98,6 +102,7 @@ class Job extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="name", type="string", length=255, nullable=true)
    * 
    */
@@ -106,6 +111,7 @@ class Job extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="description", type="string", length=255, nullable=true)
    * 
    */
@@ -114,6 +120,7 @@ class Job extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="api_entity", type="string", length=255, nullable=true)
    * 
    */
@@ -122,6 +129,7 @@ class Job extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="api_action", type="string", length=255, nullable=true)
    * 
    */
@@ -130,6 +138,7 @@ class Job extends \Civi\Core\Entity {
   /**
    * @var text
    *
+   * @JMS\Type("text")
    * @ORM\Column(name="parameters", type="text", nullable=true)
    * 
    */
@@ -138,6 +147,7 @@ class Job extends \Civi\Core\Entity {
   /**
    * @var boolean
    *
+   * @JMS\Type("boolean")
    * @ORM\Column(name="is_active", type="boolean", nullable=true)
    * 
    */

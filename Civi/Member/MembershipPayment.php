@@ -65,6 +65,7 @@ class MembershipPayment extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
@@ -74,6 +75,7 @@ class MembershipPayment extends \Civi\Core\Entity {
   /**
    * @var \Civi\Member\Membership
    *
+   * @JMS\Type("\Civi\Member\Membership")
    * @ORM\ManyToOne(targetEntity="Civi\Member\Membership")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="membership_id", referencedColumnName="id", onDelete="CASCADE")})
    */
@@ -82,6 +84,7 @@ class MembershipPayment extends \Civi\Core\Entity {
   /**
    * @var \Civi\Contribute\Contribution
    *
+   * @JMS\Type("\Civi\Contribute\Contribution")
    * @ORM\ManyToOne(targetEntity="Civi\Contribute\Contribution")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="contribution_id", referencedColumnName="id", onDelete="CASCADE")})
    */

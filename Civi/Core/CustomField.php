@@ -65,6 +65,7 @@ class CustomField extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
@@ -74,6 +75,7 @@ class CustomField extends \Civi\Core\Entity {
   /**
    * @var \Civi\Core\CustomGroup
    *
+   * @JMS\Type("\Civi\Core\CustomGroup")
    * @ORM\ManyToOne(targetEntity="Civi\Core\CustomGroup")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="custom_group_id", referencedColumnName="id", onDelete="CASCADE")})
    */
@@ -82,6 +84,7 @@ class CustomField extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="name", type="string", length=64, nullable=true)
    * 
    */
@@ -90,6 +93,7 @@ class CustomField extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="label", type="string", length=255, nullable=true)
    * 
    */
@@ -98,6 +102,7 @@ class CustomField extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="data_type", type="string", length=16, nullable=true)
    * 
    */
@@ -106,6 +111,7 @@ class CustomField extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="html_type", type="string", length=32, nullable=true)
    * 
    */
@@ -114,6 +120,7 @@ class CustomField extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="default_value", type="string", length=255, nullable=true)
    * 
    */
@@ -122,6 +129,7 @@ class CustomField extends \Civi\Core\Entity {
   /**
    * @var boolean
    *
+   * @JMS\Type("boolean")
    * @ORM\Column(name="is_required", type="boolean", nullable=true)
    * 
    */
@@ -130,6 +138,7 @@ class CustomField extends \Civi\Core\Entity {
   /**
    * @var boolean
    *
+   * @JMS\Type("boolean")
    * @ORM\Column(name="is_searchable", type="boolean", nullable=true)
    * 
    */
@@ -138,6 +147,7 @@ class CustomField extends \Civi\Core\Entity {
   /**
    * @var boolean
    *
+   * @JMS\Type("boolean")
    * @ORM\Column(name="is_search_range", type="boolean", nullable=false)
    * 
    */
@@ -146,6 +156,7 @@ class CustomField extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="weight", type="integer", nullable=false, options={"unsigned":true})
    * 
    */
@@ -154,6 +165,7 @@ class CustomField extends \Civi\Core\Entity {
   /**
    * @var text
    *
+   * @JMS\Type("text")
    * @ORM\Column(name="help_pre", type="text", nullable=true)
    * 
    */
@@ -162,6 +174,7 @@ class CustomField extends \Civi\Core\Entity {
   /**
    * @var text
    *
+   * @JMS\Type("text")
    * @ORM\Column(name="help_post", type="text", nullable=true)
    * 
    */
@@ -170,6 +183,7 @@ class CustomField extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="mask", type="string", length=64, nullable=true)
    * 
    */
@@ -178,6 +192,7 @@ class CustomField extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="attributes", type="string", length=255, nullable=true)
    * 
    */
@@ -186,6 +201,7 @@ class CustomField extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="javascript", type="string", length=255, nullable=true)
    * 
    */
@@ -194,6 +210,7 @@ class CustomField extends \Civi\Core\Entity {
   /**
    * @var boolean
    *
+   * @JMS\Type("boolean")
    * @ORM\Column(name="is_active", type="boolean", nullable=true)
    * 
    */
@@ -202,6 +219,7 @@ class CustomField extends \Civi\Core\Entity {
   /**
    * @var boolean
    *
+   * @JMS\Type("boolean")
    * @ORM\Column(name="is_view", type="boolean", nullable=true)
    * 
    */
@@ -210,6 +228,7 @@ class CustomField extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="options_per_line", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
@@ -218,6 +237,7 @@ class CustomField extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="text_length", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
@@ -226,6 +246,7 @@ class CustomField extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="start_date_years", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
@@ -234,6 +255,7 @@ class CustomField extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="end_date_years", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
@@ -242,6 +264,7 @@ class CustomField extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="date_format", type="string", length=64, nullable=true)
    * 
    */
@@ -250,6 +273,7 @@ class CustomField extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="time_format", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
@@ -258,6 +282,7 @@ class CustomField extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="note_columns", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
@@ -266,6 +291,7 @@ class CustomField extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="note_rows", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
@@ -274,6 +300,7 @@ class CustomField extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="column_name", type="string", length=255, nullable=true)
    * 
    */
@@ -282,6 +309,7 @@ class CustomField extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="option_group_id", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
@@ -290,6 +318,7 @@ class CustomField extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="filter", type="string", length=255, nullable=true)
    * 
    */
@@ -298,6 +327,7 @@ class CustomField extends \Civi\Core\Entity {
   /**
    * @var boolean
    *
+   * @JMS\Type("boolean")
    * @ORM\Column(name="in_selector", type="boolean", nullable=false)
    * 
    */

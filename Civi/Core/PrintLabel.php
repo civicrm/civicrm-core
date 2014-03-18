@@ -65,6 +65,7 @@ class PrintLabel extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
@@ -74,6 +75,7 @@ class PrintLabel extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="title", type="string", length=255, nullable=true)
    * 
    */
@@ -82,6 +84,7 @@ class PrintLabel extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="name", type="string", length=255, nullable=true)
    * 
    */
@@ -90,6 +93,7 @@ class PrintLabel extends \Civi\Core\Entity {
   /**
    * @var text
    *
+   * @JMS\Type("text")
    * @ORM\Column(name="description", type="text", nullable=true)
    * 
    */
@@ -98,6 +102,7 @@ class PrintLabel extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="label_format_name", type="string", length=255, nullable=true)
    * 
    */
@@ -106,6 +111,7 @@ class PrintLabel extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="label_type_id", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
@@ -114,6 +120,7 @@ class PrintLabel extends \Civi\Core\Entity {
   /**
    * @var text
    *
+   * @JMS\Type("text")
    * @ORM\Column(name="data", type="text", nullable=true)
    * 
    */
@@ -122,6 +129,7 @@ class PrintLabel extends \Civi\Core\Entity {
   /**
    * @var boolean
    *
+   * @JMS\Type("boolean")
    * @ORM\Column(name="is_default", type="boolean", nullable=false)
    * 
    */
@@ -130,6 +138,7 @@ class PrintLabel extends \Civi\Core\Entity {
   /**
    * @var boolean
    *
+   * @JMS\Type("boolean")
    * @ORM\Column(name="is_active", type="boolean", nullable=false)
    * 
    */
@@ -138,6 +147,7 @@ class PrintLabel extends \Civi\Core\Entity {
   /**
    * @var boolean
    *
+   * @JMS\Type("boolean")
    * @ORM\Column(name="is_reserved", type="boolean", nullable=false)
    * 
    */
@@ -146,6 +156,7 @@ class PrintLabel extends \Civi\Core\Entity {
   /**
    * @var \Civi\Contact\Contact
    *
+   * @JMS\Type("\Civi\Contact\Contact")
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Contact")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="created_id", referencedColumnName="id", onDelete="SET NULL")})
    */

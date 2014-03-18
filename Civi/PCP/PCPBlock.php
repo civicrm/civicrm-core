@@ -65,6 +65,7 @@ class PCPBlock extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
@@ -74,6 +75,7 @@ class PCPBlock extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="entity_table", type="string", length=64, nullable=true)
    * 
    */
@@ -82,6 +84,7 @@ class PCPBlock extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="entity_id", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
@@ -90,6 +93,7 @@ class PCPBlock extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="target_entity_type", type="string", length=255, nullable=false)
    * 
    */
@@ -98,6 +102,7 @@ class PCPBlock extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="target_entity_id", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
@@ -106,6 +111,7 @@ class PCPBlock extends \Civi\Core\Entity {
   /**
    * @var \Civi\Core\UFGroup
    *
+   * @JMS\Type("\Civi\Core\UFGroup")
    * @ORM\ManyToOne(targetEntity="Civi\Core\UFGroup")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="supporter_profile_id", referencedColumnName="id", onDelete="SET NULL")})
    */
@@ -114,6 +120,7 @@ class PCPBlock extends \Civi\Core\Entity {
   /**
    * @var boolean
    *
+   * @JMS\Type("boolean")
    * @ORM\Column(name="is_approval_needed", type="boolean", nullable=false)
    * 
    */
@@ -122,6 +129,7 @@ class PCPBlock extends \Civi\Core\Entity {
   /**
    * @var boolean
    *
+   * @JMS\Type("boolean")
    * @ORM\Column(name="is_tellfriend_enabled", type="boolean", nullable=false)
    * 
    */
@@ -130,6 +138,7 @@ class PCPBlock extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="tellfriend_limit", type="integer", nullable=false, options={"unsigned":true})
    * 
    */
@@ -138,6 +147,7 @@ class PCPBlock extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="link_text", type="string", length=255, nullable=false)
    * 
    */
@@ -146,6 +156,7 @@ class PCPBlock extends \Civi\Core\Entity {
   /**
    * @var boolean
    *
+   * @JMS\Type("boolean")
    * @ORM\Column(name="is_active", type="boolean", nullable=false)
    * 
    */
@@ -154,6 +165,7 @@ class PCPBlock extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="notify_email", type="string", length=255, nullable=false)
    * 
    */

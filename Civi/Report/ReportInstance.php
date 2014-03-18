@@ -65,6 +65,7 @@ class ReportInstance extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
@@ -74,6 +75,7 @@ class ReportInstance extends \Civi\Core\Entity {
   /**
    * @var \Civi\Core\Domain
    *
+   * @JMS\Type("\Civi\Core\Domain")
    * @ORM\ManyToOne(targetEntity="Civi\Core\Domain")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="domain_id", referencedColumnName="id")})
    */
@@ -82,6 +84,7 @@ class ReportInstance extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="title", type="string", length=255, nullable=true)
    * 
    */
@@ -90,6 +93,7 @@ class ReportInstance extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="report_id", type="string", length=64, nullable=true)
    * 
    */
@@ -98,6 +102,7 @@ class ReportInstance extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="name", type="string", length=255, nullable=true)
    * 
    */
@@ -106,6 +111,7 @@ class ReportInstance extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="args", type="string", length=255, nullable=true)
    * 
    */
@@ -114,6 +120,7 @@ class ReportInstance extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="description", type="string", length=255, nullable=true)
    * 
    */
@@ -122,6 +129,7 @@ class ReportInstance extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="permission", type="string", length=255, nullable=true)
    * 
    */
@@ -130,6 +138,7 @@ class ReportInstance extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="grouprole", type="string", length=1024, nullable=true)
    * 
    */
@@ -138,6 +147,7 @@ class ReportInstance extends \Civi\Core\Entity {
   /**
    * @var text
    *
+   * @JMS\Type("text")
    * @ORM\Column(name="form_values", type="text", nullable=true)
    * 
    */
@@ -146,6 +156,7 @@ class ReportInstance extends \Civi\Core\Entity {
   /**
    * @var boolean
    *
+   * @JMS\Type("boolean")
    * @ORM\Column(name="is_active", type="boolean", nullable=true)
    * 
    */
@@ -154,6 +165,7 @@ class ReportInstance extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="email_subject", type="string", length=255, nullable=true)
    * 
    */
@@ -162,6 +174,7 @@ class ReportInstance extends \Civi\Core\Entity {
   /**
    * @var text
    *
+   * @JMS\Type("text")
    * @ORM\Column(name="email_to", type="text", nullable=true)
    * 
    */
@@ -170,6 +183,7 @@ class ReportInstance extends \Civi\Core\Entity {
   /**
    * @var text
    *
+   * @JMS\Type("text")
    * @ORM\Column(name="email_cc", type="text", nullable=true)
    * 
    */
@@ -178,6 +192,7 @@ class ReportInstance extends \Civi\Core\Entity {
   /**
    * @var text
    *
+   * @JMS\Type("text")
    * @ORM\Column(name="header", type="text", nullable=true)
    * 
    */
@@ -186,6 +201,7 @@ class ReportInstance extends \Civi\Core\Entity {
   /**
    * @var text
    *
+   * @JMS\Type("text")
    * @ORM\Column(name="footer", type="text", nullable=true)
    * 
    */
@@ -194,6 +210,7 @@ class ReportInstance extends \Civi\Core\Entity {
   /**
    * @var \Civi\Core\Navigation
    *
+   * @JMS\Type("\Civi\Core\Navigation")
    * @ORM\ManyToOne(targetEntity="Civi\Core\Navigation")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="navigation_id", referencedColumnName="id", onDelete="SET NULL")})
    */
@@ -202,6 +219,7 @@ class ReportInstance extends \Civi\Core\Entity {
   /**
    * @var \Civi\Report\ReportInstance
    *
+   * @JMS\Type("\Civi\Report\ReportInstance")
    * @ORM\ManyToOne(targetEntity="Civi\Report\ReportInstance")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="drilldown_id", referencedColumnName="id", onDelete="SET NULL")})
    */
@@ -210,6 +228,7 @@ class ReportInstance extends \Civi\Core\Entity {
   /**
    * @var boolean
    *
+   * @JMS\Type("boolean")
    * @ORM\Column(name="is_reserved", type="boolean", nullable=false)
    * 
    */

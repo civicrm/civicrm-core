@@ -65,6 +65,7 @@ class {$table.className} extends \Civi\Core\Entity {ldelim}
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="id", type="integer", nullable=false, options={ldelim}"unsigned":true{rdelim} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
@@ -76,6 +77,7 @@ class {$table.className} extends \Civi\Core\Entity {ldelim}
   /**
    * @var {$field.columnType}
    *
+   * @JMS\Type("{$field.columnType}")
    * {$field.columnInfo}
    * {$field.columnJoin}
    */

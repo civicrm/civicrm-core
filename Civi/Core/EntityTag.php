@@ -65,6 +65,7 @@ class EntityTag extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
@@ -74,6 +75,7 @@ class EntityTag extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="entity_table", type="string", length=64, nullable=true)
    * 
    */
@@ -82,6 +84,7 @@ class EntityTag extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="entity_id", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
@@ -90,6 +93,7 @@ class EntityTag extends \Civi\Core\Entity {
   /**
    * @var \Civi\Core\Tag
    *
+   * @JMS\Type("\Civi\Core\Tag")
    * @ORM\ManyToOne(targetEntity="Civi\Core\Tag")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="tag_id", referencedColumnName="id", onDelete="CASCADE")})
    */

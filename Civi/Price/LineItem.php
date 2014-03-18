@@ -65,6 +65,7 @@ class LineItem extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
@@ -74,6 +75,7 @@ class LineItem extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="entity_table", type="string", length=64, nullable=true)
    * 
    */
@@ -82,6 +84,7 @@ class LineItem extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="entity_id", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
@@ -90,6 +93,7 @@ class LineItem extends \Civi\Core\Entity {
   /**
    * @var \Civi\Price\PriceField
    *
+   * @JMS\Type("\Civi\Price\PriceField")
    * @ORM\ManyToOne(targetEntity="Civi\Price\PriceField")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="price_field_id", referencedColumnName="id", onDelete="SET NULL")})
    */
@@ -98,6 +102,7 @@ class LineItem extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="label", type="string", length=255, nullable=false)
    * 
    */
@@ -106,6 +111,7 @@ class LineItem extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="qty", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
@@ -114,6 +120,7 @@ class LineItem extends \Civi\Core\Entity {
   /**
    * @var float
    *
+   * @JMS\Type("float")
    * @ORM\Column(name="unit_price", type="float", nullable=true)
    * 
    */
@@ -122,6 +129,7 @@ class LineItem extends \Civi\Core\Entity {
   /**
    * @var float
    *
+   * @JMS\Type("float")
    * @ORM\Column(name="line_total", type="float", nullable=true)
    * 
    */
@@ -130,6 +138,7 @@ class LineItem extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="participant_count", type="integer", nullable=false, options={"unsigned":true})
    * 
    */
@@ -138,6 +147,7 @@ class LineItem extends \Civi\Core\Entity {
   /**
    * @var \Civi\Price\PriceFieldValue
    *
+   * @JMS\Type("\Civi\Price\PriceFieldValue")
    * @ORM\ManyToOne(targetEntity="Civi\Price\PriceFieldValue")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="price_field_value_id", referencedColumnName="id", onDelete="SET NULL")})
    */
@@ -146,6 +156,7 @@ class LineItem extends \Civi\Core\Entity {
   /**
    * @var \Civi\Financial\FinancialType
    *
+   * @JMS\Type("\Civi\Financial\FinancialType")
    * @ORM\ManyToOne(targetEntity="Civi\Financial\FinancialType")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="financial_type_id", referencedColumnName="id", onDelete="SET NULL")})
    */
@@ -154,6 +165,7 @@ class LineItem extends \Civi\Core\Entity {
   /**
    * @var float
    *
+   * @JMS\Type("float")
    * @ORM\Column(name="deductible_amount", type="float", nullable=false)
    * 
    */

@@ -65,6 +65,7 @@ class Premium extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
@@ -74,6 +75,7 @@ class Premium extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="entity_table", type="string", length=64, nullable=true)
    * 
    */
@@ -82,6 +84,7 @@ class Premium extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="entity_id", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
@@ -90,6 +93,7 @@ class Premium extends \Civi\Core\Entity {
   /**
    * @var boolean
    *
+   * @JMS\Type("boolean")
    * @ORM\Column(name="premiums_active", type="boolean", nullable=false)
    * 
    */
@@ -98,6 +102,7 @@ class Premium extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="premiums_intro_title", type="string", length=255, nullable=true)
    * 
    */
@@ -106,6 +111,7 @@ class Premium extends \Civi\Core\Entity {
   /**
    * @var text
    *
+   * @JMS\Type("text")
    * @ORM\Column(name="premiums_intro_text", type="text", nullable=true)
    * 
    */
@@ -114,6 +120,7 @@ class Premium extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="premiums_contact_email", type="string", length=100, nullable=true)
    * 
    */
@@ -122,6 +129,7 @@ class Premium extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="premiums_contact_phone", type="string", length=50, nullable=true)
    * 
    */
@@ -130,6 +138,7 @@ class Premium extends \Civi\Core\Entity {
   /**
    * @var boolean
    *
+   * @JMS\Type("boolean")
    * @ORM\Column(name="premiums_display_min_contribution", type="boolean", nullable=true)
    * 
    */
@@ -138,6 +147,7 @@ class Premium extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="premiums_nothankyou_label", type="string", length=255, nullable=true)
    * 
    */
@@ -146,6 +156,7 @@ class Premium extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="premiums_nothankyou_position", type="integer", nullable=false, options={"unsigned":true})
    * 
    */

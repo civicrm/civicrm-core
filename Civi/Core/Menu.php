@@ -65,6 +65,7 @@ class Menu extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
@@ -74,6 +75,7 @@ class Menu extends \Civi\Core\Entity {
   /**
    * @var \Civi\Core\Domain
    *
+   * @JMS\Type("\Civi\Core\Domain")
    * @ORM\ManyToOne(targetEntity="Civi\Core\Domain")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="domain_id", referencedColumnName="id")})
    */
@@ -82,6 +84,7 @@ class Menu extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="path", type="string", length=255, nullable=true)
    * 
    */
@@ -90,6 +93,7 @@ class Menu extends \Civi\Core\Entity {
   /**
    * @var text
    *
+   * @JMS\Type("text")
    * @ORM\Column(name="path_arguments", type="text", nullable=true)
    * 
    */
@@ -98,6 +102,7 @@ class Menu extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="title", type="string", length=255, nullable=true)
    * 
    */
@@ -106,6 +111,7 @@ class Menu extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="access_callback", type="string", length=255, nullable=true)
    * 
    */
@@ -114,6 +120,7 @@ class Menu extends \Civi\Core\Entity {
   /**
    * @var text
    *
+   * @JMS\Type("text")
    * @ORM\Column(name="access_arguments", type="text", nullable=true)
    * 
    */
@@ -122,6 +129,7 @@ class Menu extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="page_callback", type="string", length=255, nullable=true)
    * 
    */
@@ -130,6 +138,7 @@ class Menu extends \Civi\Core\Entity {
   /**
    * @var text
    *
+   * @JMS\Type("text")
    * @ORM\Column(name="page_arguments", type="text", nullable=true)
    * 
    */
@@ -138,6 +147,7 @@ class Menu extends \Civi\Core\Entity {
   /**
    * @var text
    *
+   * @JMS\Type("text")
    * @ORM\Column(name="breadcrumb", type="text", nullable=true)
    * 
    */
@@ -146,6 +156,7 @@ class Menu extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="return_url", type="string", length=255, nullable=true)
    * 
    */
@@ -154,6 +165,7 @@ class Menu extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="return_url_args", type="string", length=255, nullable=true)
    * 
    */
@@ -162,6 +174,7 @@ class Menu extends \Civi\Core\Entity {
   /**
    * @var \Civi\Core\Component
    *
+   * @JMS\Type("\Civi\Core\Component")
    * @ORM\ManyToOne(targetEntity="Civi\Core\Component")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="component_id", referencedColumnName="id")})
    */
@@ -170,6 +183,7 @@ class Menu extends \Civi\Core\Entity {
   /**
    * @var boolean
    *
+   * @JMS\Type("boolean")
    * @ORM\Column(name="is_active", type="boolean", nullable=true)
    * 
    */
@@ -178,6 +192,7 @@ class Menu extends \Civi\Core\Entity {
   /**
    * @var boolean
    *
+   * @JMS\Type("boolean")
    * @ORM\Column(name="is_public", type="boolean", nullable=true)
    * 
    */
@@ -186,6 +201,7 @@ class Menu extends \Civi\Core\Entity {
   /**
    * @var boolean
    *
+   * @JMS\Type("boolean")
    * @ORM\Column(name="is_exposed", type="boolean", nullable=true)
    * 
    */
@@ -194,6 +210,7 @@ class Menu extends \Civi\Core\Entity {
   /**
    * @var boolean
    *
+   * @JMS\Type("boolean")
    * @ORM\Column(name="is_ssl", type="boolean", nullable=true)
    * 
    */
@@ -202,6 +219,7 @@ class Menu extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="weight", type="integer", nullable=false, options={"unsigned":true})
    * 
    */
@@ -210,6 +228,7 @@ class Menu extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="type", type="integer", nullable=false, options={"unsigned":true})
    * 
    */
@@ -218,6 +237,7 @@ class Menu extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="page_type", type="integer", nullable=false, options={"unsigned":true})
    * 
    */
@@ -226,6 +246,7 @@ class Menu extends \Civi\Core\Entity {
   /**
    * @var boolean
    *
+   * @JMS\Type("boolean")
    * @ORM\Column(name="skipBreadcrumb", type="boolean", nullable=true)
    * 
    */

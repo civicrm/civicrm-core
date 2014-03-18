@@ -65,6 +65,7 @@ class Participant extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
@@ -74,6 +75,7 @@ class Participant extends \Civi\Core\Entity {
   /**
    * @var \Civi\Contact\Contact
    *
+   * @JMS\Type("\Civi\Contact\Contact")
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Contact")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="contact_id", referencedColumnName="id", onDelete="CASCADE")})
    */
@@ -82,6 +84,7 @@ class Participant extends \Civi\Core\Entity {
   /**
    * @var \Civi\Event\Event
    *
+   * @JMS\Type("\Civi\Event\Event")
    * @ORM\ManyToOne(targetEntity="Civi\Event\Event")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="event_id", referencedColumnName="id", onDelete="CASCADE")})
    */
@@ -90,6 +93,7 @@ class Participant extends \Civi\Core\Entity {
   /**
    * @var \Civi\Event\ParticipantStatusType
    *
+   * @JMS\Type("\Civi\Event\ParticipantStatusType")
    * @ORM\ManyToOne(targetEntity="Civi\Event\ParticipantStatusType")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="status_id", referencedColumnName="id")})
    */
@@ -98,6 +102,7 @@ class Participant extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="role_id", type="string", length=128, nullable=false)
    * 
    */
@@ -106,6 +111,7 @@ class Participant extends \Civi\Core\Entity {
   /**
    * @var datetime
    *
+   * @JMS\Type("datetime")
    * @ORM\Column(name="register_date", type="datetime", nullable=true)
    * 
    */
@@ -114,6 +120,7 @@ class Participant extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="source", type="string", length=128, nullable=true)
    * 
    */
@@ -122,6 +129,7 @@ class Participant extends \Civi\Core\Entity {
   /**
    * @var text
    *
+   * @JMS\Type("text")
    * @ORM\Column(name="fee_level", type="text", nullable=true)
    * 
    */
@@ -130,6 +138,7 @@ class Participant extends \Civi\Core\Entity {
   /**
    * @var boolean
    *
+   * @JMS\Type("boolean")
    * @ORM\Column(name="is_test", type="boolean", nullable=false)
    * 
    */
@@ -138,6 +147,7 @@ class Participant extends \Civi\Core\Entity {
   /**
    * @var boolean
    *
+   * @JMS\Type("boolean")
    * @ORM\Column(name="is_pay_later", type="boolean", nullable=false)
    * 
    */
@@ -146,6 +156,7 @@ class Participant extends \Civi\Core\Entity {
   /**
    * @var float
    *
+   * @JMS\Type("float")
    * @ORM\Column(name="fee_amount", type="float", nullable=true)
    * 
    */
@@ -154,6 +165,7 @@ class Participant extends \Civi\Core\Entity {
   /**
    * @var \Civi\Event\Participant
    *
+   * @JMS\Type("\Civi\Event\Participant")
    * @ORM\ManyToOne(targetEntity="Civi\Event\Participant")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="registered_by_id", referencedColumnName="id", onDelete="SET NULL")})
    */
@@ -162,6 +174,7 @@ class Participant extends \Civi\Core\Entity {
   /**
    * @var \Civi\Core\Discount
    *
+   * @JMS\Type("\Civi\Core\Discount")
    * @ORM\ManyToOne(targetEntity="Civi\Core\Discount")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="discount_id", referencedColumnName="id", onDelete="SET NULL")})
    */
@@ -170,6 +183,7 @@ class Participant extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="fee_currency", type="string", length=3, nullable=false)
    * 
    */
@@ -178,6 +192,7 @@ class Participant extends \Civi\Core\Entity {
   /**
    * @var \Civi\Campaign\Campaign
    *
+   * @JMS\Type("\Civi\Campaign\Campaign")
    * @ORM\ManyToOne(targetEntity="Civi\Campaign\Campaign")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="campaign_id", referencedColumnName="id", onDelete="SET NULL")})
    */
@@ -186,6 +201,7 @@ class Participant extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="discount_amount", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
@@ -194,6 +210,7 @@ class Participant extends \Civi\Core\Entity {
   /**
    * @var \Civi\Event\Cart\Cart
    *
+   * @JMS\Type("\Civi\Event\Cart\Cart")
    * @ORM\ManyToOne(targetEntity="Civi\Event\Cart\Cart")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="cart_id", referencedColumnName="id", onDelete="SET NULL")})
    */
@@ -202,6 +219,7 @@ class Participant extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="must_wait", type="integer", nullable=true, options={"unsigned":true})
    * 
    */

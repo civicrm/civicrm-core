@@ -65,6 +65,7 @@ class Relationship extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
@@ -74,6 +75,7 @@ class Relationship extends \Civi\Core\Entity {
   /**
    * @var \Civi\Contact\Contact
    *
+   * @JMS\Type("\Civi\Contact\Contact")
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Contact")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="contact_id_a", referencedColumnName="id", onDelete="CASCADE")})
    */
@@ -82,6 +84,7 @@ class Relationship extends \Civi\Core\Entity {
   /**
    * @var \Civi\Contact\Contact
    *
+   * @JMS\Type("\Civi\Contact\Contact")
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Contact")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="contact_id_b", referencedColumnName="id", onDelete="CASCADE")})
    */
@@ -90,6 +93,7 @@ class Relationship extends \Civi\Core\Entity {
   /**
    * @var \Civi\Contact\RelationshipType
    *
+   * @JMS\Type("\Civi\Contact\RelationshipType")
    * @ORM\ManyToOne(targetEntity="Civi\Contact\RelationshipType")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="relationship_type_id", referencedColumnName="id", onDelete="CASCADE")})
    */
@@ -98,6 +102,7 @@ class Relationship extends \Civi\Core\Entity {
   /**
    * @var date
    *
+   * @JMS\Type("date")
    * @ORM\Column(name="start_date", type="date", nullable=true)
    * 
    */
@@ -106,6 +111,7 @@ class Relationship extends \Civi\Core\Entity {
   /**
    * @var date
    *
+   * @JMS\Type("date")
    * @ORM\Column(name="end_date", type="date", nullable=true)
    * 
    */
@@ -114,6 +120,7 @@ class Relationship extends \Civi\Core\Entity {
   /**
    * @var boolean
    *
+   * @JMS\Type("boolean")
    * @ORM\Column(name="is_active", type="boolean", nullable=false)
    * 
    */
@@ -122,6 +129,7 @@ class Relationship extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="description", type="string", length=255, nullable=true)
    * 
    */
@@ -130,6 +138,7 @@ class Relationship extends \Civi\Core\Entity {
   /**
    * @var boolean
    *
+   * @JMS\Type("boolean")
    * @ORM\Column(name="is_permission_a_b", type="boolean", nullable=false)
    * 
    */
@@ -138,6 +147,7 @@ class Relationship extends \Civi\Core\Entity {
   /**
    * @var boolean
    *
+   * @JMS\Type("boolean")
    * @ORM\Column(name="is_permission_b_a", type="boolean", nullable=false)
    * 
    */
@@ -146,6 +156,7 @@ class Relationship extends \Civi\Core\Entity {
   /**
    * @var \Civi\CCase\CCase
    *
+   * @JMS\Type("\Civi\CCase\CCase")
    * @ORM\ManyToOne(targetEntity="Civi\CCase\CCase")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="case_id", referencedColumnName="id", onDelete="CASCADE")})
    */

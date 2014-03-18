@@ -65,6 +65,7 @@ class MailSettings extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
@@ -74,6 +75,7 @@ class MailSettings extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="domain_id", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
@@ -82,6 +84,7 @@ class MailSettings extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="name", type="string", length=255, nullable=true)
    * 
    */
@@ -90,6 +93,7 @@ class MailSettings extends \Civi\Core\Entity {
   /**
    * @var boolean
    *
+   * @JMS\Type("boolean")
    * @ORM\Column(name="is_default", type="boolean", nullable=true)
    * 
    */
@@ -98,6 +102,7 @@ class MailSettings extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="domain", type="string", length=255, nullable=true)
    * 
    */
@@ -106,6 +111,7 @@ class MailSettings extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="localpart", type="string", length=255, nullable=true)
    * 
    */
@@ -114,6 +120,7 @@ class MailSettings extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="return_path", type="string", length=255, nullable=true)
    * 
    */
@@ -122,6 +129,7 @@ class MailSettings extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="protocol", type="string", length=255, nullable=true)
    * 
    */
@@ -130,6 +138,7 @@ class MailSettings extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="server", type="string", length=255, nullable=true)
    * 
    */
@@ -138,6 +147,7 @@ class MailSettings extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="port", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
@@ -146,6 +156,7 @@ class MailSettings extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="username", type="string", length=255, nullable=true)
    * 
    */
@@ -154,6 +165,7 @@ class MailSettings extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="password", type="string", length=255, nullable=true)
    * 
    */
@@ -162,6 +174,7 @@ class MailSettings extends \Civi\Core\Entity {
   /**
    * @var boolean
    *
+   * @JMS\Type("boolean")
    * @ORM\Column(name="is_ssl", type="boolean", nullable=true)
    * 
    */
@@ -170,6 +183,7 @@ class MailSettings extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="source", type="string", length=255, nullable=true)
    * 
    */

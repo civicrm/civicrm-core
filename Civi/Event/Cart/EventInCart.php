@@ -65,6 +65,7 @@ class EventInCart extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
@@ -74,6 +75,7 @@ class EventInCart extends \Civi\Core\Entity {
   /**
    * @var \Civi\Event\Event
    *
+   * @JMS\Type("\Civi\Event\Event")
    * @ORM\ManyToOne(targetEntity="Civi\Event\Event")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="event_id", referencedColumnName="id", onDelete="CASCADE")})
    */
@@ -82,6 +84,7 @@ class EventInCart extends \Civi\Core\Entity {
   /**
    * @var \Civi\Event\Cart\Cart
    *
+   * @JMS\Type("\Civi\Event\Cart\Cart")
    * @ORM\ManyToOne(targetEntity="Civi\Event\Cart\Cart")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="event_cart_id", referencedColumnName="id", onDelete="CASCADE")})
    */

@@ -65,6 +65,7 @@ class ParticipantStatusType extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
@@ -74,6 +75,7 @@ class ParticipantStatusType extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="name", type="string", length=64, nullable=true)
    * 
    */
@@ -82,6 +84,7 @@ class ParticipantStatusType extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="label", type="string", length=255, nullable=true)
    * 
    */
@@ -90,6 +93,7 @@ class ParticipantStatusType extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="class", type="string", length=8, nullable=true)
    * 
    */
@@ -98,6 +102,7 @@ class ParticipantStatusType extends \Civi\Core\Entity {
   /**
    * @var boolean
    *
+   * @JMS\Type("boolean")
    * @ORM\Column(name="is_reserved", type="boolean", nullable=true)
    * 
    */
@@ -106,6 +111,7 @@ class ParticipantStatusType extends \Civi\Core\Entity {
   /**
    * @var boolean
    *
+   * @JMS\Type("boolean")
    * @ORM\Column(name="is_active", type="boolean", nullable=false)
    * 
    */
@@ -114,6 +120,7 @@ class ParticipantStatusType extends \Civi\Core\Entity {
   /**
    * @var boolean
    *
+   * @JMS\Type("boolean")
    * @ORM\Column(name="is_counted", type="boolean", nullable=true)
    * 
    */
@@ -122,6 +129,7 @@ class ParticipantStatusType extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="weight", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
@@ -130,6 +138,7 @@ class ParticipantStatusType extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="visibility_id", type="integer", nullable=true, options={"unsigned":true})
    * 
    */

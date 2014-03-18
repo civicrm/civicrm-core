@@ -65,6 +65,7 @@ class Tag extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
@@ -74,6 +75,7 @@ class Tag extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="name", type="string", length=64, nullable=true)
    * 
    */
@@ -82,6 +84,7 @@ class Tag extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="description", type="string", length=255, nullable=true)
    * 
    */
@@ -90,6 +93,7 @@ class Tag extends \Civi\Core\Entity {
   /**
    * @var \Civi\Core\Tag
    *
+   * @JMS\Type("\Civi\Core\Tag")
    * @ORM\ManyToOne(targetEntity="Civi\Core\Tag")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="parent_id", referencedColumnName="id")})
    */
@@ -98,6 +102,7 @@ class Tag extends \Civi\Core\Entity {
   /**
    * @var boolean
    *
+   * @JMS\Type("boolean")
    * @ORM\Column(name="is_selectable", type="boolean", nullable=false)
    * 
    */
@@ -106,6 +111,7 @@ class Tag extends \Civi\Core\Entity {
   /**
    * @var boolean
    *
+   * @JMS\Type("boolean")
    * @ORM\Column(name="is_reserved", type="boolean", nullable=false)
    * 
    */
@@ -114,6 +120,7 @@ class Tag extends \Civi\Core\Entity {
   /**
    * @var boolean
    *
+   * @JMS\Type("boolean")
    * @ORM\Column(name="is_tagset", type="boolean", nullable=false)
    * 
    */
@@ -122,6 +129,7 @@ class Tag extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="used_for", type="string", length=64, nullable=false)
    * 
    */
@@ -130,6 +138,7 @@ class Tag extends \Civi\Core\Entity {
   /**
    * @var \Civi\Contact\Contact
    *
+   * @JMS\Type("\Civi\Contact\Contact")
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Contact")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="created_id", referencedColumnName="id", onDelete="SET NULL")})
    */
@@ -138,6 +147,7 @@ class Tag extends \Civi\Core\Entity {
   /**
    * @var datetime
    *
+   * @JMS\Type("datetime")
    * @ORM\Column(name="created_date", type="datetime", nullable=true)
    * 
    */

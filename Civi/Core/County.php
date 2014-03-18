@@ -65,6 +65,7 @@ class County extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
@@ -74,6 +75,7 @@ class County extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="name", type="string", length=64, nullable=true)
    * 
    */
@@ -82,6 +84,7 @@ class County extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="abbreviation", type="string", length=4, nullable=true)
    * 
    */
@@ -90,6 +93,7 @@ class County extends \Civi\Core\Entity {
   /**
    * @var \Civi\Core\StateProvince
    *
+   * @JMS\Type("\Civi\Core\StateProvince")
    * @ORM\ManyToOne(targetEntity="Civi\Core\StateProvince")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="state_province_id", referencedColumnName="id")})
    */

@@ -65,6 +65,7 @@ class Setting extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
@@ -74,6 +75,7 @@ class Setting extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="group_name", type="string", length=64, nullable=true)
    * 
    */
@@ -82,6 +84,7 @@ class Setting extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="name", type="string", length=255, nullable=true)
    * 
    */
@@ -90,6 +93,7 @@ class Setting extends \Civi\Core\Entity {
   /**
    * @var text
    *
+   * @JMS\Type("text")
    * @ORM\Column(name="value", type="text", nullable=true)
    * 
    */
@@ -98,6 +102,7 @@ class Setting extends \Civi\Core\Entity {
   /**
    * @var \Civi\Core\Domain
    *
+   * @JMS\Type("\Civi\Core\Domain")
    * @ORM\ManyToOne(targetEntity="Civi\Core\Domain")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="domain_id", referencedColumnName="id", onDelete="CASCADE")})
    */
@@ -106,6 +111,7 @@ class Setting extends \Civi\Core\Entity {
   /**
    * @var \Civi\Contact\Contact
    *
+   * @JMS\Type("\Civi\Contact\Contact")
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Contact")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="contact_id", referencedColumnName="id", onDelete="CASCADE")})
    */
@@ -114,6 +120,7 @@ class Setting extends \Civi\Core\Entity {
   /**
    * @var boolean
    *
+   * @JMS\Type("boolean")
    * @ORM\Column(name="is_domain", type="boolean", nullable=true)
    * 
    */
@@ -122,6 +129,7 @@ class Setting extends \Civi\Core\Entity {
   /**
    * @var \Civi\Core\Component
    *
+   * @JMS\Type("\Civi\Core\Component")
    * @ORM\ManyToOne(targetEntity="Civi\Core\Component")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="component_id", referencedColumnName="id")})
    */
@@ -130,6 +138,7 @@ class Setting extends \Civi\Core\Entity {
   /**
    * @var datetime
    *
+   * @JMS\Type("datetime")
    * @ORM\Column(name="created_date", type="datetime", nullable=true)
    * 
    */
@@ -138,6 +147,7 @@ class Setting extends \Civi\Core\Entity {
   /**
    * @var \Civi\Contact\Contact
    *
+   * @JMS\Type("\Civi\Contact\Contact")
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Contact")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="created_id", referencedColumnName="id", onDelete="SET NULL")})
    */

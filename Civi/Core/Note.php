@@ -65,6 +65,7 @@ class Note extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
@@ -74,6 +75,7 @@ class Note extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="entity_table", type="string", length=64, nullable=true)
    * 
    */
@@ -82,6 +84,7 @@ class Note extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="entity_id", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
@@ -90,6 +93,7 @@ class Note extends \Civi\Core\Entity {
   /**
    * @var text
    *
+   * @JMS\Type("text")
    * @ORM\Column(name="note", type="text", nullable=true)
    * 
    */
@@ -98,6 +102,7 @@ class Note extends \Civi\Core\Entity {
   /**
    * @var \Civi\Contact\Contact
    *
+   * @JMS\Type("\Civi\Contact\Contact")
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Contact")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="contact_id", referencedColumnName="id", onDelete="SET NULL")})
    */
@@ -106,6 +111,7 @@ class Note extends \Civi\Core\Entity {
   /**
    * @var date
    *
+   * @JMS\Type("date")
    * @ORM\Column(name="modified_date", type="date", nullable=true)
    * 
    */
@@ -114,6 +120,7 @@ class Note extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="subject", type="string", length=255, nullable=true)
    * 
    */
@@ -122,6 +129,7 @@ class Note extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="privacy", type="string", length=255, nullable=true)
    * 
    */

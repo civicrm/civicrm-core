@@ -65,6 +65,7 @@ class SubscriptionHistory extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
@@ -74,6 +75,7 @@ class SubscriptionHistory extends \Civi\Core\Entity {
   /**
    * @var \Civi\Contact\Contact
    *
+   * @JMS\Type("\Civi\Contact\Contact")
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Contact")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="contact_id", referencedColumnName="id", onDelete="CASCADE")})
    */
@@ -82,6 +84,7 @@ class SubscriptionHistory extends \Civi\Core\Entity {
   /**
    * @var \Civi\Contact\Group
    *
+   * @JMS\Type("\Civi\Contact\Group")
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Group")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="group_id", referencedColumnName="id", onDelete="CASCADE")})
    */
@@ -90,6 +93,7 @@ class SubscriptionHistory extends \Civi\Core\Entity {
   /**
    * @var datetime
    *
+   * @JMS\Type("datetime")
    * @ORM\Column(name="date", type="datetime", nullable=true)
    * 
    */
@@ -98,6 +102,7 @@ class SubscriptionHistory extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="method", type="string", length=8, nullable=true)
    * 
    */
@@ -106,6 +111,7 @@ class SubscriptionHistory extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="status", type="string", length=8, nullable=true)
    * 
    */
@@ -114,6 +120,7 @@ class SubscriptionHistory extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="tracking", type="string", length=255, nullable=true)
    * 
    */

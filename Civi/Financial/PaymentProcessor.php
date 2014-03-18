@@ -65,6 +65,7 @@ class PaymentProcessor extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
@@ -74,6 +75,7 @@ class PaymentProcessor extends \Civi\Core\Entity {
   /**
    * @var \Civi\Core\Domain
    *
+   * @JMS\Type("\Civi\Core\Domain")
    * @ORM\ManyToOne(targetEntity="Civi\Core\Domain")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="domain_id", referencedColumnName="id")})
    */
@@ -82,6 +84,7 @@ class PaymentProcessor extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="name", type="string", length=64, nullable=true)
    * 
    */
@@ -90,6 +93,7 @@ class PaymentProcessor extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="description", type="string", length=255, nullable=true)
    * 
    */
@@ -98,6 +102,7 @@ class PaymentProcessor extends \Civi\Core\Entity {
   /**
    * @var \Civi\Financial\PaymentProcessorType
    *
+   * @JMS\Type("\Civi\Financial\PaymentProcessorType")
    * @ORM\ManyToOne(targetEntity="Civi\Financial\PaymentProcessorType")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="payment_processor_type_id", referencedColumnName="id")})
    */
@@ -106,6 +111,7 @@ class PaymentProcessor extends \Civi\Core\Entity {
   /**
    * @var boolean
    *
+   * @JMS\Type("boolean")
    * @ORM\Column(name="is_active", type="boolean", nullable=true)
    * 
    */
@@ -114,6 +120,7 @@ class PaymentProcessor extends \Civi\Core\Entity {
   /**
    * @var boolean
    *
+   * @JMS\Type("boolean")
    * @ORM\Column(name="is_default", type="boolean", nullable=true)
    * 
    */
@@ -122,6 +129,7 @@ class PaymentProcessor extends \Civi\Core\Entity {
   /**
    * @var boolean
    *
+   * @JMS\Type("boolean")
    * @ORM\Column(name="is_test", type="boolean", nullable=true)
    * 
    */
@@ -130,6 +138,7 @@ class PaymentProcessor extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="user_name", type="string", length=255, nullable=true)
    * 
    */
@@ -138,6 +147,7 @@ class PaymentProcessor extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="password", type="string", length=255, nullable=true)
    * 
    */
@@ -146,6 +156,7 @@ class PaymentProcessor extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="signature", type="string", length=255, nullable=true)
    * 
    */
@@ -154,6 +165,7 @@ class PaymentProcessor extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="url_site", type="string", length=255, nullable=true)
    * 
    */
@@ -162,6 +174,7 @@ class PaymentProcessor extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="url_api", type="string", length=255, nullable=true)
    * 
    */
@@ -170,6 +183,7 @@ class PaymentProcessor extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="url_recur", type="string", length=255, nullable=true)
    * 
    */
@@ -178,6 +192,7 @@ class PaymentProcessor extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="url_button", type="string", length=255, nullable=true)
    * 
    */
@@ -186,6 +201,7 @@ class PaymentProcessor extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="subject", type="string", length=255, nullable=true)
    * 
    */
@@ -194,6 +210,7 @@ class PaymentProcessor extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="class_name", type="string", length=255, nullable=true)
    * 
    */
@@ -202,6 +219,7 @@ class PaymentProcessor extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="billing_mode", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
@@ -210,6 +228,7 @@ class PaymentProcessor extends \Civi\Core\Entity {
   /**
    * @var boolean
    *
+   * @JMS\Type("boolean")
    * @ORM\Column(name="is_recur", type="boolean", nullable=true)
    * 
    */
@@ -218,6 +237,7 @@ class PaymentProcessor extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="payment_type", type="integer", nullable=false, options={"unsigned":true})
    * 
    */

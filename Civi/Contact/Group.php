@@ -65,6 +65,7 @@ class Group extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
@@ -74,6 +75,7 @@ class Group extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="name", type="string", length=64, nullable=true)
    * 
    */
@@ -82,6 +84,7 @@ class Group extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="title", type="string", length=64, nullable=true)
    * 
    */
@@ -90,6 +93,7 @@ class Group extends \Civi\Core\Entity {
   /**
    * @var text
    *
+   * @JMS\Type("text")
    * @ORM\Column(name="description", type="text", nullable=true)
    * 
    */
@@ -98,6 +102,7 @@ class Group extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="source", type="string", length=64, nullable=true)
    * 
    */
@@ -106,6 +111,7 @@ class Group extends \Civi\Core\Entity {
   /**
    * @var \Civi\Contact\SavedSearch
    *
+   * @JMS\Type("\Civi\Contact\SavedSearch")
    * @ORM\ManyToOne(targetEntity="Civi\Contact\SavedSearch")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="saved_search_id", referencedColumnName="id", onDelete="SET NULL")})
    */
@@ -114,6 +120,7 @@ class Group extends \Civi\Core\Entity {
   /**
    * @var boolean
    *
+   * @JMS\Type("boolean")
    * @ORM\Column(name="is_active", type="boolean", nullable=true)
    * 
    */
@@ -122,6 +129,7 @@ class Group extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="visibility", type="string", length=24, nullable=false)
    * 
    */
@@ -130,6 +138,7 @@ class Group extends \Civi\Core\Entity {
   /**
    * @var text
    *
+   * @JMS\Type("text")
    * @ORM\Column(name="where_clause", type="text", nullable=true)
    * 
    */
@@ -138,6 +147,7 @@ class Group extends \Civi\Core\Entity {
   /**
    * @var text
    *
+   * @JMS\Type("text")
    * @ORM\Column(name="select_tables", type="text", nullable=true)
    * 
    */
@@ -146,6 +156,7 @@ class Group extends \Civi\Core\Entity {
   /**
    * @var text
    *
+   * @JMS\Type("text")
    * @ORM\Column(name="where_tables", type="text", nullable=true)
    * 
    */
@@ -154,6 +165,7 @@ class Group extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="group_type", type="string", length=128, nullable=true)
    * 
    */
@@ -162,6 +174,7 @@ class Group extends \Civi\Core\Entity {
   /**
    * @var datetime
    *
+   * @JMS\Type("datetime")
    * @ORM\Column(name="cache_date", type="datetime", nullable=true)
    * 
    */
@@ -170,6 +183,7 @@ class Group extends \Civi\Core\Entity {
   /**
    * @var datetime
    *
+   * @JMS\Type("datetime")
    * @ORM\Column(name="refresh_date", type="datetime", nullable=true)
    * 
    */
@@ -178,6 +192,7 @@ class Group extends \Civi\Core\Entity {
   /**
    * @var text
    *
+   * @JMS\Type("text")
    * @ORM\Column(name="parents", type="text", nullable=true)
    * 
    */
@@ -186,6 +201,7 @@ class Group extends \Civi\Core\Entity {
   /**
    * @var text
    *
+   * @JMS\Type("text")
    * @ORM\Column(name="children", type="text", nullable=true)
    * 
    */
@@ -194,6 +210,7 @@ class Group extends \Civi\Core\Entity {
   /**
    * @var boolean
    *
+   * @JMS\Type("boolean")
    * @ORM\Column(name="is_hidden", type="boolean", nullable=false)
    * 
    */
@@ -202,6 +219,7 @@ class Group extends \Civi\Core\Entity {
   /**
    * @var boolean
    *
+   * @JMS\Type("boolean")
    * @ORM\Column(name="is_reserved", type="boolean", nullable=false)
    * 
    */
@@ -210,6 +228,7 @@ class Group extends \Civi\Core\Entity {
   /**
    * @var \Civi\Contact\Contact
    *
+   * @JMS\Type("\Civi\Contact\Contact")
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Contact")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="created_id", referencedColumnName="id", onDelete="SET NULL")})
    */
@@ -218,6 +237,7 @@ class Group extends \Civi\Core\Entity {
   /**
    * @var \Civi\Contact\Contact
    *
+   * @JMS\Type("\Civi\Contact\Contact")
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Contact")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="modified_id", referencedColumnName="id", onDelete="SET NULL")})
    */

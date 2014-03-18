@@ -65,6 +65,7 @@ class LocBlock extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
@@ -74,6 +75,7 @@ class LocBlock extends \Civi\Core\Entity {
   /**
    * @var \Civi\Core\Address
    *
+   * @JMS\Type("\Civi\Core\Address")
    * @ORM\ManyToOne(targetEntity="Civi\Core\Address")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="address_id", referencedColumnName="id", onDelete="SET NULL")})
    */
@@ -82,6 +84,7 @@ class LocBlock extends \Civi\Core\Entity {
   /**
    * @var \Civi\Core\Email
    *
+   * @JMS\Type("\Civi\Core\Email")
    * @ORM\ManyToOne(targetEntity="Civi\Core\Email")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="email_id", referencedColumnName="id", onDelete="SET NULL")})
    */
@@ -90,6 +93,7 @@ class LocBlock extends \Civi\Core\Entity {
   /**
    * @var \Civi\Core\Phone
    *
+   * @JMS\Type("\Civi\Core\Phone")
    * @ORM\ManyToOne(targetEntity="Civi\Core\Phone")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="phone_id", referencedColumnName="id", onDelete="SET NULL")})
    */
@@ -98,6 +102,7 @@ class LocBlock extends \Civi\Core\Entity {
   /**
    * @var \Civi\Core\IM
    *
+   * @JMS\Type("\Civi\Core\IM")
    * @ORM\ManyToOne(targetEntity="Civi\Core\IM")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="im_id", referencedColumnName="id", onDelete="SET NULL")})
    */
@@ -106,6 +111,7 @@ class LocBlock extends \Civi\Core\Entity {
   /**
    * @var \Civi\Core\Address
    *
+   * @JMS\Type("\Civi\Core\Address")
    * @ORM\ManyToOne(targetEntity="Civi\Core\Address")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="address_2_id", referencedColumnName="id", onDelete="SET NULL")})
    */
@@ -114,6 +120,7 @@ class LocBlock extends \Civi\Core\Entity {
   /**
    * @var \Civi\Core\Email
    *
+   * @JMS\Type("\Civi\Core\Email")
    * @ORM\ManyToOne(targetEntity="Civi\Core\Email")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="email_2_id", referencedColumnName="id", onDelete="SET NULL")})
    */
@@ -122,6 +129,7 @@ class LocBlock extends \Civi\Core\Entity {
   /**
    * @var \Civi\Core\Phone
    *
+   * @JMS\Type("\Civi\Core\Phone")
    * @ORM\ManyToOne(targetEntity="Civi\Core\Phone")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="phone_2_id", referencedColumnName="id", onDelete="SET NULL")})
    */
@@ -130,6 +138,7 @@ class LocBlock extends \Civi\Core\Entity {
   /**
    * @var \Civi\Core\IM
    *
+   * @JMS\Type("\Civi\Core\IM")
    * @ORM\ManyToOne(targetEntity="Civi\Core\IM")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="im_2_id", referencedColumnName="id", onDelete="SET NULL")})
    */

@@ -65,6 +65,7 @@ class PledgePayment extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
@@ -74,6 +75,7 @@ class PledgePayment extends \Civi\Core\Entity {
   /**
    * @var \Civi\Pledge\Pledge
    *
+   * @JMS\Type("\Civi\Pledge\Pledge")
    * @ORM\ManyToOne(targetEntity="Civi\Pledge\Pledge")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="pledge_id", referencedColumnName="id", onDelete="CASCADE")})
    */
@@ -82,6 +84,7 @@ class PledgePayment extends \Civi\Core\Entity {
   /**
    * @var \Civi\Contribute\Contribution
    *
+   * @JMS\Type("\Civi\Contribute\Contribution")
    * @ORM\ManyToOne(targetEntity="Civi\Contribute\Contribution")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="contribution_id", referencedColumnName="id", onDelete="CASCADE")})
    */
@@ -90,6 +93,7 @@ class PledgePayment extends \Civi\Core\Entity {
   /**
    * @var float
    *
+   * @JMS\Type("float")
    * @ORM\Column(name="scheduled_amount", type="float", nullable=true)
    * 
    */
@@ -98,6 +102,7 @@ class PledgePayment extends \Civi\Core\Entity {
   /**
    * @var float
    *
+   * @JMS\Type("float")
    * @ORM\Column(name="actual_amount", type="float", nullable=true)
    * 
    */
@@ -106,6 +111,7 @@ class PledgePayment extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="currency", type="string", length=3, nullable=false)
    * 
    */
@@ -114,6 +120,7 @@ class PledgePayment extends \Civi\Core\Entity {
   /**
    * @var datetime
    *
+   * @JMS\Type("datetime")
    * @ORM\Column(name="scheduled_date", type="datetime", nullable=true)
    * 
    */
@@ -122,6 +129,7 @@ class PledgePayment extends \Civi\Core\Entity {
   /**
    * @var datetime
    *
+   * @JMS\Type("datetime")
    * @ORM\Column(name="reminder_date", type="datetime", nullable=true)
    * 
    */
@@ -130,6 +138,7 @@ class PledgePayment extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="reminder_count", type="integer", nullable=false, options={"unsigned":true})
    * 
    */
@@ -138,6 +147,7 @@ class PledgePayment extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="status_id", type="integer", nullable=true, options={"unsigned":true})
    * 
    */

@@ -65,6 +65,7 @@ class UFField extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
@@ -74,6 +75,7 @@ class UFField extends \Civi\Core\Entity {
   /**
    * @var \Civi\Core\UFGroup
    *
+   * @JMS\Type("\Civi\Core\UFGroup")
    * @ORM\ManyToOne(targetEntity="Civi\Core\UFGroup")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="uf_group_id", referencedColumnName="id", onDelete="CASCADE")})
    */
@@ -82,6 +84,7 @@ class UFField extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="field_name", type="string", length=64, nullable=true)
    * 
    */
@@ -90,6 +93,7 @@ class UFField extends \Civi\Core\Entity {
   /**
    * @var boolean
    *
+   * @JMS\Type("boolean")
    * @ORM\Column(name="is_active", type="boolean", nullable=false)
    * 
    */
@@ -98,6 +102,7 @@ class UFField extends \Civi\Core\Entity {
   /**
    * @var boolean
    *
+   * @JMS\Type("boolean")
    * @ORM\Column(name="is_view", type="boolean", nullable=false)
    * 
    */
@@ -106,6 +111,7 @@ class UFField extends \Civi\Core\Entity {
   /**
    * @var boolean
    *
+   * @JMS\Type("boolean")
    * @ORM\Column(name="is_required", type="boolean", nullable=false)
    * 
    */
@@ -114,6 +120,7 @@ class UFField extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="weight", type="integer", nullable=false, options={"unsigned":true})
    * 
    */
@@ -122,6 +129,7 @@ class UFField extends \Civi\Core\Entity {
   /**
    * @var text
    *
+   * @JMS\Type("text")
    * @ORM\Column(name="help_post", type="text", nullable=true)
    * 
    */
@@ -130,6 +138,7 @@ class UFField extends \Civi\Core\Entity {
   /**
    * @var text
    *
+   * @JMS\Type("text")
    * @ORM\Column(name="help_pre", type="text", nullable=true)
    * 
    */
@@ -138,6 +147,7 @@ class UFField extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="visibility", type="string", length=32, nullable=false)
    * 
    */
@@ -146,6 +156,7 @@ class UFField extends \Civi\Core\Entity {
   /**
    * @var boolean
    *
+   * @JMS\Type("boolean")
    * @ORM\Column(name="in_selector", type="boolean", nullable=false)
    * 
    */
@@ -154,6 +165,7 @@ class UFField extends \Civi\Core\Entity {
   /**
    * @var boolean
    *
+   * @JMS\Type("boolean")
    * @ORM\Column(name="is_searchable", type="boolean", nullable=false)
    * 
    */
@@ -162,6 +174,7 @@ class UFField extends \Civi\Core\Entity {
   /**
    * @var \Civi\Core\LocationType
    *
+   * @JMS\Type("\Civi\Core\LocationType")
    * @ORM\ManyToOne(targetEntity="Civi\Core\LocationType")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="location_type_id", referencedColumnName="id", onDelete="SET NULL")})
    */
@@ -170,6 +183,7 @@ class UFField extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="phone_type_id", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
@@ -178,6 +192,7 @@ class UFField extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="label", type="string", length=255, nullable=true)
    * 
    */
@@ -186,6 +201,7 @@ class UFField extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="field_type", type="string", length=255, nullable=true)
    * 
    */
@@ -194,6 +210,7 @@ class UFField extends \Civi\Core\Entity {
   /**
    * @var boolean
    *
+   * @JMS\Type("boolean")
    * @ORM\Column(name="is_reserved", type="boolean", nullable=true)
    * 
    */
@@ -202,6 +219,7 @@ class UFField extends \Civi\Core\Entity {
   /**
    * @var boolean
    *
+   * @JMS\Type("boolean")
    * @ORM\Column(name="is_multi_summary", type="boolean", nullable=false)
    * 
    */

@@ -65,6 +65,7 @@ class SavedSearch extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
@@ -74,6 +75,7 @@ class SavedSearch extends \Civi\Core\Entity {
   /**
    * @var text
    *
+   * @JMS\Type("text")
    * @ORM\Column(name="form_values", type="text", nullable=true)
    * 
    */
@@ -82,6 +84,7 @@ class SavedSearch extends \Civi\Core\Entity {
   /**
    * @var \Civi\Core\Mapping
    *
+   * @JMS\Type("\Civi\Core\Mapping")
    * @ORM\ManyToOne(targetEntity="Civi\Core\Mapping")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="mapping_id", referencedColumnName="id")})
    */
@@ -90,6 +93,7 @@ class SavedSearch extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="search_custom_id", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
@@ -98,6 +102,7 @@ class SavedSearch extends \Civi\Core\Entity {
   /**
    * @var text
    *
+   * @JMS\Type("text")
    * @ORM\Column(name="where_clause", type="text", nullable=true)
    * 
    */
@@ -106,6 +111,7 @@ class SavedSearch extends \Civi\Core\Entity {
   /**
    * @var text
    *
+   * @JMS\Type("text")
    * @ORM\Column(name="select_tables", type="text", nullable=true)
    * 
    */
@@ -114,6 +120,7 @@ class SavedSearch extends \Civi\Core\Entity {
   /**
    * @var text
    *
+   * @JMS\Type("text")
    * @ORM\Column(name="where_tables", type="text", nullable=true)
    * 
    */

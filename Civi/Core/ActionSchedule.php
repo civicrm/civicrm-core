@@ -65,6 +65,7 @@ class ActionSchedule extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
@@ -74,6 +75,7 @@ class ActionSchedule extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="name", type="string", length=64, nullable=true)
    * 
    */
@@ -82,6 +84,7 @@ class ActionSchedule extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="title", type="string", length=64, nullable=true)
    * 
    */
@@ -90,6 +93,7 @@ class ActionSchedule extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="recipient", type="string", length=64, nullable=true)
    * 
    */
@@ -98,6 +102,7 @@ class ActionSchedule extends \Civi\Core\Entity {
   /**
    * @var boolean
    *
+   * @JMS\Type("boolean")
    * @ORM\Column(name="limit_to", type="boolean", nullable=false)
    * 
    */
@@ -106,6 +111,7 @@ class ActionSchedule extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="entity_value", type="string", length=64, nullable=true)
    * 
    */
@@ -114,6 +120,7 @@ class ActionSchedule extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="entity_status", type="string", length=64, nullable=true)
    * 
    */
@@ -122,6 +129,7 @@ class ActionSchedule extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="start_action_offset", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
@@ -130,6 +138,7 @@ class ActionSchedule extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="start_action_unit", type="string", length=8, nullable=true)
    * 
    */
@@ -138,6 +147,7 @@ class ActionSchedule extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="start_action_condition", type="string", length=32, nullable=true)
    * 
    */
@@ -146,6 +156,7 @@ class ActionSchedule extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="start_action_date", type="string", length=64, nullable=true)
    * 
    */
@@ -154,6 +165,7 @@ class ActionSchedule extends \Civi\Core\Entity {
   /**
    * @var boolean
    *
+   * @JMS\Type("boolean")
    * @ORM\Column(name="is_repeat", type="boolean", nullable=false)
    * 
    */
@@ -162,6 +174,7 @@ class ActionSchedule extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="repetition_frequency_unit", type="string", length=8, nullable=true)
    * 
    */
@@ -170,6 +183,7 @@ class ActionSchedule extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="repetition_frequency_interval", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
@@ -178,6 +192,7 @@ class ActionSchedule extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="end_frequency_unit", type="string", length=8, nullable=true)
    * 
    */
@@ -186,6 +201,7 @@ class ActionSchedule extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="end_frequency_interval", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
@@ -194,6 +210,7 @@ class ActionSchedule extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="end_action", type="string", length=32, nullable=true)
    * 
    */
@@ -202,6 +219,7 @@ class ActionSchedule extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="end_date", type="string", length=64, nullable=true)
    * 
    */
@@ -210,6 +228,7 @@ class ActionSchedule extends \Civi\Core\Entity {
   /**
    * @var boolean
    *
+   * @JMS\Type("boolean")
    * @ORM\Column(name="is_active", type="boolean", nullable=false)
    * 
    */
@@ -218,6 +237,7 @@ class ActionSchedule extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="recipient_manual", type="string", length=128, nullable=true)
    * 
    */
@@ -226,6 +246,7 @@ class ActionSchedule extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="recipient_listing", type="string", length=128, nullable=true)
    * 
    */
@@ -234,6 +255,7 @@ class ActionSchedule extends \Civi\Core\Entity {
   /**
    * @var text
    *
+   * @JMS\Type("text")
    * @ORM\Column(name="body_text", type="text", nullable=true)
    * 
    */
@@ -242,6 +264,7 @@ class ActionSchedule extends \Civi\Core\Entity {
   /**
    * @var text
    *
+   * @JMS\Type("text")
    * @ORM\Column(name="body_html", type="text", nullable=true)
    * 
    */
@@ -250,6 +273,7 @@ class ActionSchedule extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="subject", type="string", length=128, nullable=true)
    * 
    */
@@ -258,6 +282,7 @@ class ActionSchedule extends \Civi\Core\Entity {
   /**
    * @var boolean
    *
+   * @JMS\Type("boolean")
    * @ORM\Column(name="record_activity", type="boolean", nullable=false)
    * 
    */
@@ -266,6 +291,7 @@ class ActionSchedule extends \Civi\Core\Entity {
   /**
    * @var \Civi\Core\ActionMapping
    *
+   * @JMS\Type("\Civi\Core\ActionMapping")
    * @ORM\ManyToOne(targetEntity="Civi\Core\ActionMapping")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="mapping_id", referencedColumnName="id", onDelete="SET NULL")})
    */
@@ -274,6 +300,7 @@ class ActionSchedule extends \Civi\Core\Entity {
   /**
    * @var \Civi\Contact\Group
    *
+   * @JMS\Type("\Civi\Contact\Group")
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Group")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="group_id", referencedColumnName="id", onDelete="SET NULL")})
    */
@@ -282,6 +309,7 @@ class ActionSchedule extends \Civi\Core\Entity {
   /**
    * @var \Civi\Core\MessageTemplate
    *
+   * @JMS\Type("\Civi\Core\MessageTemplate")
    * @ORM\ManyToOne(targetEntity="Civi\Core\MessageTemplate")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="msg_template_id", referencedColumnName="id", onDelete="SET NULL")})
    */
@@ -290,6 +318,7 @@ class ActionSchedule extends \Civi\Core\Entity {
   /**
    * @var date
    *
+   * @JMS\Type("date")
    * @ORM\Column(name="absolute_date", type="date", nullable=true)
    * 
    */
@@ -298,6 +327,7 @@ class ActionSchedule extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="mode", type="string", length=128, nullable=false)
    * 
    */
@@ -306,6 +336,7 @@ class ActionSchedule extends \Civi\Core\Entity {
   /**
    * @var \Civi\SMS\Provider
    *
+   * @JMS\Type("\Civi\SMS\Provider")
    * @ORM\ManyToOne(targetEntity="Civi\SMS\Provider")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="sms_provider_id", referencedColumnName="id", onDelete="SET NULL")})
    */

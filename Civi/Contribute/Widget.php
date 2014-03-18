@@ -65,6 +65,7 @@ class Widget extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
@@ -74,6 +75,7 @@ class Widget extends \Civi\Core\Entity {
   /**
    * @var \Civi\Contribute\ContributionPage
    *
+   * @JMS\Type("\Civi\Contribute\ContributionPage")
    * @ORM\ManyToOne(targetEntity="Civi\Contribute\ContributionPage")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="contribution_page_id", referencedColumnName="id", onDelete="CASCADE")})
    */
@@ -82,6 +84,7 @@ class Widget extends \Civi\Core\Entity {
   /**
    * @var boolean
    *
+   * @JMS\Type("boolean")
    * @ORM\Column(name="is_active", type="boolean", nullable=true)
    * 
    */
@@ -90,6 +93,7 @@ class Widget extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="title", type="string", length=255, nullable=true)
    * 
    */
@@ -98,6 +102,7 @@ class Widget extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="url_logo", type="string", length=255, nullable=true)
    * 
    */
@@ -106,6 +111,7 @@ class Widget extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="button_title", type="string", length=255, nullable=true)
    * 
    */
@@ -114,6 +120,7 @@ class Widget extends \Civi\Core\Entity {
   /**
    * @var text
    *
+   * @JMS\Type("text")
    * @ORM\Column(name="about", type="text", nullable=true)
    * 
    */
@@ -122,6 +129,7 @@ class Widget extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="url_homepage", type="string", length=255, nullable=true)
    * 
    */
@@ -130,6 +138,7 @@ class Widget extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="color_title", type="string", length=10, nullable=true)
    * 
    */
@@ -138,6 +147,7 @@ class Widget extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="color_button", type="string", length=10, nullable=true)
    * 
    */
@@ -146,6 +156,7 @@ class Widget extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="color_bar", type="string", length=10, nullable=true)
    * 
    */
@@ -154,6 +165,7 @@ class Widget extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="color_main_text", type="string", length=10, nullable=true)
    * 
    */
@@ -162,6 +174,7 @@ class Widget extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="color_main", type="string", length=10, nullable=true)
    * 
    */
@@ -170,6 +183,7 @@ class Widget extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="color_main_bg", type="string", length=10, nullable=true)
    * 
    */
@@ -178,6 +192,7 @@ class Widget extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="color_bg", type="string", length=10, nullable=true)
    * 
    */
@@ -186,6 +201,7 @@ class Widget extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="color_about_link", type="string", length=10, nullable=true)
    * 
    */
@@ -194,6 +210,7 @@ class Widget extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="color_homepage_link", type="string", length=10, nullable=true)
    * 
    */

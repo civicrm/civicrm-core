@@ -65,6 +65,7 @@ class MessageTemplate extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
@@ -74,6 +75,7 @@ class MessageTemplate extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="msg_title", type="string", length=255, nullable=true)
    * 
    */
@@ -82,6 +84,7 @@ class MessageTemplate extends \Civi\Core\Entity {
   /**
    * @var text
    *
+   * @JMS\Type("text")
    * @ORM\Column(name="msg_subject", type="text", nullable=true)
    * 
    */
@@ -90,6 +93,7 @@ class MessageTemplate extends \Civi\Core\Entity {
   /**
    * @var text
    *
+   * @JMS\Type("text")
    * @ORM\Column(name="msg_text", type="text", nullable=true)
    * 
    */
@@ -98,6 +102,7 @@ class MessageTemplate extends \Civi\Core\Entity {
   /**
    * @var text
    *
+   * @JMS\Type("text")
    * @ORM\Column(name="msg_html", type="text", nullable=true)
    * 
    */
@@ -106,6 +111,7 @@ class MessageTemplate extends \Civi\Core\Entity {
   /**
    * @var boolean
    *
+   * @JMS\Type("boolean")
    * @ORM\Column(name="is_active", type="boolean", nullable=false)
    * 
    */
@@ -114,6 +120,7 @@ class MessageTemplate extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="workflow_id", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
@@ -122,6 +129,7 @@ class MessageTemplate extends \Civi\Core\Entity {
   /**
    * @var boolean
    *
+   * @JMS\Type("boolean")
    * @ORM\Column(name="is_default", type="boolean", nullable=false)
    * 
    */
@@ -130,6 +138,7 @@ class MessageTemplate extends \Civi\Core\Entity {
   /**
    * @var boolean
    *
+   * @JMS\Type("boolean")
    * @ORM\Column(name="is_reserved", type="boolean", nullable=true)
    * 
    */
@@ -138,6 +147,7 @@ class MessageTemplate extends \Civi\Core\Entity {
   /**
    * @var \Civi\Core\OptionValue
    *
+   * @JMS\Type("\Civi\Core\OptionValue")
    * @ORM\ManyToOne(targetEntity="Civi\Core\OptionValue")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="pdf_format_id", referencedColumnName="id", onDelete="SET NULL")})
    */

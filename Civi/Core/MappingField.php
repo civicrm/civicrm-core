@@ -65,6 +65,7 @@ class MappingField extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
@@ -74,6 +75,7 @@ class MappingField extends \Civi\Core\Entity {
   /**
    * @var \Civi\Core\Mapping
    *
+   * @JMS\Type("\Civi\Core\Mapping")
    * @ORM\ManyToOne(targetEntity="Civi\Core\Mapping")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="mapping_id", referencedColumnName="id")})
    */
@@ -82,6 +84,7 @@ class MappingField extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="name", type="string", length=255, nullable=true)
    * 
    */
@@ -90,6 +93,7 @@ class MappingField extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="contact_type", type="string", length=64, nullable=true)
    * 
    */
@@ -98,6 +102,7 @@ class MappingField extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="column_number", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
@@ -106,6 +111,7 @@ class MappingField extends \Civi\Core\Entity {
   /**
    * @var \Civi\Core\LocationType
    *
+   * @JMS\Type("\Civi\Core\LocationType")
    * @ORM\ManyToOne(targetEntity="Civi\Core\LocationType")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="location_type_id", referencedColumnName="id")})
    */
@@ -114,6 +120,7 @@ class MappingField extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="phone_type_id", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
@@ -122,6 +129,7 @@ class MappingField extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="im_provider_id", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
@@ -130,6 +138,7 @@ class MappingField extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="website_type_id", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
@@ -138,6 +147,7 @@ class MappingField extends \Civi\Core\Entity {
   /**
    * @var \Civi\Contact\RelationshipType
    *
+   * @JMS\Type("\Civi\Contact\RelationshipType")
    * @ORM\ManyToOne(targetEntity="Civi\Contact\RelationshipType")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="relationship_type_id", referencedColumnName="id")})
    */
@@ -146,6 +156,7 @@ class MappingField extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="relationship_direction", type="string", length=6, nullable=true)
    * 
    */
@@ -154,6 +165,7 @@ class MappingField extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="grouping", type="integer", nullable=false, options={"unsigned":true})
    * 
    */
@@ -162,6 +174,7 @@ class MappingField extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="operator", type="string", length=16, nullable=true)
    * 
    */
@@ -170,6 +183,7 @@ class MappingField extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="value", type="string", length=255, nullable=true)
    * 
    */

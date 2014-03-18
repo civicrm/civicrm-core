@@ -65,6 +65,7 @@ class BouncePattern extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
@@ -74,6 +75,7 @@ class BouncePattern extends \Civi\Core\Entity {
   /**
    * @var \Civi\Mailing\BounceType
    *
+   * @JMS\Type("\Civi\Mailing\BounceType")
    * @ORM\ManyToOne(targetEntity="Civi\Mailing\BounceType")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="bounce_type_id", referencedColumnName="id", onDelete="CASCADE")})
    */
@@ -82,6 +84,7 @@ class BouncePattern extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="pattern", type="string", length=255, nullable=true)
    * 
    */

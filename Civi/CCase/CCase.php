@@ -65,6 +65,7 @@ class CCase extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
@@ -74,6 +75,7 @@ class CCase extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="case_type_id", type="string", length=128, nullable=true)
    * 
    */
@@ -82,6 +84,7 @@ class CCase extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="subject", type="string", length=128, nullable=true)
    * 
    */
@@ -90,6 +93,7 @@ class CCase extends \Civi\Core\Entity {
   /**
    * @var date
    *
+   * @JMS\Type("date")
    * @ORM\Column(name="start_date", type="date", nullable=true)
    * 
    */
@@ -98,6 +102,7 @@ class CCase extends \Civi\Core\Entity {
   /**
    * @var date
    *
+   * @JMS\Type("date")
    * @ORM\Column(name="end_date", type="date", nullable=true)
    * 
    */
@@ -106,6 +111,7 @@ class CCase extends \Civi\Core\Entity {
   /**
    * @var text
    *
+   * @JMS\Type("text")
    * @ORM\Column(name="details", type="text", nullable=true)
    * 
    */
@@ -114,6 +120,7 @@ class CCase extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="status_id", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
@@ -122,6 +129,7 @@ class CCase extends \Civi\Core\Entity {
   /**
    * @var boolean
    *
+   * @JMS\Type("boolean")
    * @ORM\Column(name="is_deleted", type="boolean", nullable=false)
    * 
    */

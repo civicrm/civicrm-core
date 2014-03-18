@@ -65,6 +65,7 @@ class Survey extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
@@ -74,6 +75,7 @@ class Survey extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="title", type="string", length=255, nullable=true)
    * 
    */
@@ -82,6 +84,7 @@ class Survey extends \Civi\Core\Entity {
   /**
    * @var \Civi\Campaign\Campaign
    *
+   * @JMS\Type("\Civi\Campaign\Campaign")
    * @ORM\ManyToOne(targetEntity="Civi\Campaign\Campaign")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="campaign_id", referencedColumnName="id", onDelete="SET NULL")})
    */
@@ -90,6 +93,7 @@ class Survey extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="activity_type_id", type="integer", nullable=false, options={"unsigned":true})
    * 
    */
@@ -98,6 +102,7 @@ class Survey extends \Civi\Core\Entity {
   /**
    * @var text
    *
+   * @JMS\Type("text")
    * @ORM\Column(name="recontact_interval", type="text", nullable=true)
    * 
    */
@@ -106,6 +111,7 @@ class Survey extends \Civi\Core\Entity {
   /**
    * @var text
    *
+   * @JMS\Type("text")
    * @ORM\Column(name="instructions", type="text", nullable=true)
    * 
    */
@@ -114,6 +120,7 @@ class Survey extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="release_frequency", type="integer", nullable=false, options={"unsigned":true})
    * 
    */
@@ -122,6 +129,7 @@ class Survey extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="max_number_of_contacts", type="integer", nullable=false, options={"unsigned":true})
    * 
    */
@@ -130,6 +138,7 @@ class Survey extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="default_number_of_contacts", type="integer", nullable=false, options={"unsigned":true})
    * 
    */
@@ -138,6 +147,7 @@ class Survey extends \Civi\Core\Entity {
   /**
    * @var boolean
    *
+   * @JMS\Type("boolean")
    * @ORM\Column(name="is_active", type="boolean", nullable=false)
    * 
    */
@@ -146,6 +156,7 @@ class Survey extends \Civi\Core\Entity {
   /**
    * @var boolean
    *
+   * @JMS\Type("boolean")
    * @ORM\Column(name="is_default", type="boolean", nullable=false)
    * 
    */
@@ -154,6 +165,7 @@ class Survey extends \Civi\Core\Entity {
   /**
    * @var \Civi\Contact\Contact
    *
+   * @JMS\Type("\Civi\Contact\Contact")
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Contact")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="created_id", referencedColumnName="id", onDelete="SET NULL")})
    */
@@ -162,6 +174,7 @@ class Survey extends \Civi\Core\Entity {
   /**
    * @var datetime
    *
+   * @JMS\Type("datetime")
    * @ORM\Column(name="created_date", type="datetime", nullable=true)
    * 
    */
@@ -170,6 +183,7 @@ class Survey extends \Civi\Core\Entity {
   /**
    * @var \Civi\Contact\Contact
    *
+   * @JMS\Type("\Civi\Contact\Contact")
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Contact")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="last_modified_id", referencedColumnName="id", onDelete="SET NULL")})
    */
@@ -178,6 +192,7 @@ class Survey extends \Civi\Core\Entity {
   /**
    * @var datetime
    *
+   * @JMS\Type("datetime")
    * @ORM\Column(name="last_modified_date", type="datetime", nullable=true)
    * 
    */
@@ -186,6 +201,7 @@ class Survey extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="result_id", type="integer", nullable=false, options={"unsigned":true})
    * 
    */
@@ -194,6 +210,7 @@ class Survey extends \Civi\Core\Entity {
   /**
    * @var boolean
    *
+   * @JMS\Type("boolean")
    * @ORM\Column(name="bypass_confirm", type="boolean", nullable=false)
    * 
    */
@@ -202,6 +219,7 @@ class Survey extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="thankyou_title", type="string", length=255, nullable=true)
    * 
    */
@@ -210,6 +228,7 @@ class Survey extends \Civi\Core\Entity {
   /**
    * @var text
    *
+   * @JMS\Type("text")
    * @ORM\Column(name="thankyou_text", type="text", nullable=true)
    * 
    */
@@ -218,6 +237,7 @@ class Survey extends \Civi\Core\Entity {
   /**
    * @var boolean
    *
+   * @JMS\Type("boolean")
    * @ORM\Column(name="is_share", type="boolean", nullable=false)
    * 
    */

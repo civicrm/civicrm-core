@@ -65,6 +65,7 @@ class ContributionSoft extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
@@ -74,6 +75,7 @@ class ContributionSoft extends \Civi\Core\Entity {
   /**
    * @var \Civi\Contribute\Contribution
    *
+   * @JMS\Type("\Civi\Contribute\Contribution")
    * @ORM\ManyToOne(targetEntity="Civi\Contribute\Contribution")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="contribution_id", referencedColumnName="id", onDelete="CASCADE")})
    */
@@ -82,6 +84,7 @@ class ContributionSoft extends \Civi\Core\Entity {
   /**
    * @var \Civi\Contact\Contact
    *
+   * @JMS\Type("\Civi\Contact\Contact")
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Contact")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="contact_id", referencedColumnName="id", onDelete="CASCADE")})
    */
@@ -90,6 +93,7 @@ class ContributionSoft extends \Civi\Core\Entity {
   /**
    * @var float
    *
+   * @JMS\Type("float")
    * @ORM\Column(name="amount", type="float", nullable=true)
    * 
    */
@@ -98,6 +102,7 @@ class ContributionSoft extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="currency", type="string", length=3, nullable=false)
    * 
    */
@@ -106,6 +111,7 @@ class ContributionSoft extends \Civi\Core\Entity {
   /**
    * @var \Civi\PCP\PCP
    *
+   * @JMS\Type("\Civi\PCP\PCP")
    * @ORM\ManyToOne(targetEntity="Civi\PCP\PCP")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="pcp_id", referencedColumnName="id", onDelete="SET NULL")})
    */
@@ -114,6 +120,7 @@ class ContributionSoft extends \Civi\Core\Entity {
   /**
    * @var boolean
    *
+   * @JMS\Type("boolean")
    * @ORM\Column(name="pcp_display_in_roll", type="boolean", nullable=false)
    * 
    */
@@ -122,6 +129,7 @@ class ContributionSoft extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="pcp_roll_nickname", type="string", length=255, nullable=false)
    * 
    */
@@ -130,6 +138,7 @@ class ContributionSoft extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="pcp_personal_note", type="string", length=255, nullable=false)
    * 
    */
@@ -138,6 +147,7 @@ class ContributionSoft extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="soft_credit_type_id", type="integer", nullable=false, options={"unsigned":true})
    * 
    */

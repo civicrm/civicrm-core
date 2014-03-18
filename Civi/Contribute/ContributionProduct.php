@@ -65,6 +65,7 @@ class ContributionProduct extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
@@ -74,6 +75,7 @@ class ContributionProduct extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="product_id", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
@@ -82,6 +84,7 @@ class ContributionProduct extends \Civi\Core\Entity {
   /**
    * @var \Civi\Contribute\Contribution
    *
+   * @JMS\Type("\Civi\Contribute\Contribution")
    * @ORM\ManyToOne(targetEntity="Civi\Contribute\Contribution")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="contribution_id", referencedColumnName="id", onDelete="CASCADE")})
    */
@@ -90,6 +93,7 @@ class ContributionProduct extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="product_option", type="string", length=255, nullable=true)
    * 
    */
@@ -98,6 +102,7 @@ class ContributionProduct extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="quantity", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
@@ -106,6 +111,7 @@ class ContributionProduct extends \Civi\Core\Entity {
   /**
    * @var date
    *
+   * @JMS\Type("date")
    * @ORM\Column(name="fulfilled_date", type="date", nullable=true)
    * 
    */
@@ -114,6 +120,7 @@ class ContributionProduct extends \Civi\Core\Entity {
   /**
    * @var date
    *
+   * @JMS\Type("date")
    * @ORM\Column(name="start_date", type="date", nullable=true)
    * 
    */
@@ -122,6 +129,7 @@ class ContributionProduct extends \Civi\Core\Entity {
   /**
    * @var date
    *
+   * @JMS\Type("date")
    * @ORM\Column(name="end_date", type="date", nullable=true)
    * 
    */
@@ -130,6 +138,7 @@ class ContributionProduct extends \Civi\Core\Entity {
   /**
    * @var text
    *
+   * @JMS\Type("text")
    * @ORM\Column(name="comment", type="text", nullable=true)
    * 
    */
@@ -138,6 +147,7 @@ class ContributionProduct extends \Civi\Core\Entity {
   /**
    * @var \Civi\Financial\FinancialType
    *
+   * @JMS\Type("\Civi\Financial\FinancialType")
    * @ORM\ManyToOne(targetEntity="Civi\Financial\FinancialType")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="financial_type_id", referencedColumnName="id", onDelete="SET NULL")})
    */

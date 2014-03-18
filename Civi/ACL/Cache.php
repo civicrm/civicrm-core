@@ -65,6 +65,7 @@ class Cache extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
@@ -74,6 +75,7 @@ class Cache extends \Civi\Core\Entity {
   /**
    * @var \Civi\Contact\Contact
    *
+   * @JMS\Type("\Civi\Contact\Contact")
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Contact")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="contact_id", referencedColumnName="id", onDelete="CASCADE")})
    */
@@ -82,6 +84,7 @@ class Cache extends \Civi\Core\Entity {
   /**
    * @var \Civi\ACL\ACL
    *
+   * @JMS\Type("\Civi\ACL\ACL")
    * @ORM\ManyToOne(targetEntity="Civi\ACL\ACL")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="acl_id", referencedColumnName="id", onDelete="CASCADE")})
    */
@@ -90,6 +93,7 @@ class Cache extends \Civi\Core\Entity {
   /**
    * @var date
    *
+   * @JMS\Type("date")
    * @ORM\Column(name="modified_date", type="date", nullable=true)
    * 
    */

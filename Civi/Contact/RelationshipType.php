@@ -65,6 +65,7 @@ class RelationshipType extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
@@ -74,6 +75,7 @@ class RelationshipType extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="name_a_b", type="string", length=64, nullable=true)
    * 
    */
@@ -82,6 +84,7 @@ class RelationshipType extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="label_a_b", type="string", length=64, nullable=true)
    * 
    */
@@ -90,6 +93,7 @@ class RelationshipType extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="name_b_a", type="string", length=64, nullable=true)
    * 
    */
@@ -98,6 +102,7 @@ class RelationshipType extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="label_b_a", type="string", length=64, nullable=true)
    * 
    */
@@ -106,6 +111,7 @@ class RelationshipType extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="description", type="string", length=255, nullable=true)
    * 
    */
@@ -114,6 +120,7 @@ class RelationshipType extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="contact_type_a", type="string", length=12, nullable=true)
    * 
    */
@@ -122,6 +129,7 @@ class RelationshipType extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="contact_type_b", type="string", length=12, nullable=true)
    * 
    */
@@ -130,6 +138,7 @@ class RelationshipType extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="contact_sub_type_a", type="string", length=64, nullable=true)
    * 
    */
@@ -138,6 +147,7 @@ class RelationshipType extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="contact_sub_type_b", type="string", length=64, nullable=true)
    * 
    */
@@ -146,6 +156,7 @@ class RelationshipType extends \Civi\Core\Entity {
   /**
    * @var boolean
    *
+   * @JMS\Type("boolean")
    * @ORM\Column(name="is_reserved", type="boolean", nullable=true)
    * 
    */
@@ -154,6 +165,7 @@ class RelationshipType extends \Civi\Core\Entity {
   /**
    * @var boolean
    *
+   * @JMS\Type("boolean")
    * @ORM\Column(name="is_active", type="boolean", nullable=false)
    * 
    */

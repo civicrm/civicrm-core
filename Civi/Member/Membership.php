@@ -65,6 +65,7 @@ class Membership extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
@@ -74,6 +75,7 @@ class Membership extends \Civi\Core\Entity {
   /**
    * @var \Civi\Contact\Contact
    *
+   * @JMS\Type("\Civi\Contact\Contact")
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Contact")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="contact_id", referencedColumnName="id", onDelete="CASCADE")})
    */
@@ -82,6 +84,7 @@ class Membership extends \Civi\Core\Entity {
   /**
    * @var \Civi\Member\MembershipType
    *
+   * @JMS\Type("\Civi\Member\MembershipType")
    * @ORM\ManyToOne(targetEntity="Civi\Member\MembershipType")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="membership_type_id", referencedColumnName="id", onDelete="CASCADE")})
    */
@@ -90,6 +93,7 @@ class Membership extends \Civi\Core\Entity {
   /**
    * @var date
    *
+   * @JMS\Type("date")
    * @ORM\Column(name="join_date", type="date", nullable=true)
    * 
    */
@@ -98,6 +102,7 @@ class Membership extends \Civi\Core\Entity {
   /**
    * @var date
    *
+   * @JMS\Type("date")
    * @ORM\Column(name="start_date", type="date", nullable=true)
    * 
    */
@@ -106,6 +111,7 @@ class Membership extends \Civi\Core\Entity {
   /**
    * @var date
    *
+   * @JMS\Type("date")
    * @ORM\Column(name="end_date", type="date", nullable=true)
    * 
    */
@@ -114,6 +120,7 @@ class Membership extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="source", type="string", length=128, nullable=true)
    * 
    */
@@ -122,6 +129,7 @@ class Membership extends \Civi\Core\Entity {
   /**
    * @var \Civi\Member\MembershipStatus
    *
+   * @JMS\Type("\Civi\Member\MembershipStatus")
    * @ORM\ManyToOne(targetEntity="Civi\Member\MembershipStatus")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="status_id", referencedColumnName="id", onDelete="CASCADE")})
    */
@@ -130,6 +138,7 @@ class Membership extends \Civi\Core\Entity {
   /**
    * @var boolean
    *
+   * @JMS\Type("boolean")
    * @ORM\Column(name="is_override", type="boolean", nullable=true)
    * 
    */
@@ -138,6 +147,7 @@ class Membership extends \Civi\Core\Entity {
   /**
    * @var \Civi\Member\Membership
    *
+   * @JMS\Type("\Civi\Member\Membership")
    * @ORM\ManyToOne(targetEntity="Civi\Member\Membership")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="owner_membership_id", referencedColumnName="id", onDelete="SET NULL")})
    */
@@ -146,6 +156,7 @@ class Membership extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="max_related", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
@@ -154,6 +165,7 @@ class Membership extends \Civi\Core\Entity {
   /**
    * @var boolean
    *
+   * @JMS\Type("boolean")
    * @ORM\Column(name="is_test", type="boolean", nullable=false)
    * 
    */
@@ -162,6 +174,7 @@ class Membership extends \Civi\Core\Entity {
   /**
    * @var boolean
    *
+   * @JMS\Type("boolean")
    * @ORM\Column(name="is_pay_later", type="boolean", nullable=false)
    * 
    */
@@ -170,6 +183,7 @@ class Membership extends \Civi\Core\Entity {
   /**
    * @var \Civi\Contribute\ContributionRecur
    *
+   * @JMS\Type("\Civi\Contribute\ContributionRecur")
    * @ORM\ManyToOne(targetEntity="Civi\Contribute\ContributionRecur")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="contribution_recur_id", referencedColumnName="id", onDelete="SET NULL")})
    */
@@ -178,6 +192,7 @@ class Membership extends \Civi\Core\Entity {
   /**
    * @var \Civi\Campaign\Campaign
    *
+   * @JMS\Type("\Civi\Campaign\Campaign")
    * @ORM\ManyToOne(targetEntity="Civi\Campaign\Campaign")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="campaign_id", referencedColumnName="id", onDelete="SET NULL")})
    */

@@ -65,6 +65,7 @@ class EntityFinancialAccount extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
@@ -74,6 +75,7 @@ class EntityFinancialAccount extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="entity_table", type="string", length=64, nullable=true)
    * 
    */
@@ -82,6 +84,7 @@ class EntityFinancialAccount extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="entity_id", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
@@ -90,6 +93,7 @@ class EntityFinancialAccount extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="account_relationship", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
@@ -98,6 +102,7 @@ class EntityFinancialAccount extends \Civi\Core\Entity {
   /**
    * @var \Civi\Financial\FinancialAccount
    *
+   * @JMS\Type("\Civi\Financial\FinancialAccount")
    * @ORM\ManyToOne(targetEntity="Civi\Financial\FinancialAccount")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="financial_account_id", referencedColumnName="id", onDelete="RESTRICT")})
    */

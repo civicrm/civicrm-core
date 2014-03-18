@@ -65,6 +65,7 @@ class Contribution extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
@@ -74,6 +75,7 @@ class Contribution extends \Civi\Core\Entity {
   /**
    * @var \Civi\Contact\Contact
    *
+   * @JMS\Type("\Civi\Contact\Contact")
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Contact")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="contact_id", referencedColumnName="id", onDelete="CASCADE")})
    */
@@ -82,6 +84,7 @@ class Contribution extends \Civi\Core\Entity {
   /**
    * @var \Civi\Financial\FinancialType
    *
+   * @JMS\Type("\Civi\Financial\FinancialType")
    * @ORM\ManyToOne(targetEntity="Civi\Financial\FinancialType")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="financial_type_id", referencedColumnName="id")})
    */
@@ -90,6 +93,7 @@ class Contribution extends \Civi\Core\Entity {
   /**
    * @var \Civi\Contribute\ContributionPage
    *
+   * @JMS\Type("\Civi\Contribute\ContributionPage")
    * @ORM\ManyToOne(targetEntity="Civi\Contribute\ContributionPage")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="contribution_page_id", referencedColumnName="id", onDelete="SET NULL")})
    */
@@ -98,6 +102,7 @@ class Contribution extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="payment_instrument_id", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
@@ -106,6 +111,7 @@ class Contribution extends \Civi\Core\Entity {
   /**
    * @var datetime
    *
+   * @JMS\Type("datetime")
    * @ORM\Column(name="receive_date", type="datetime", nullable=true)
    * 
    */
@@ -114,6 +120,7 @@ class Contribution extends \Civi\Core\Entity {
   /**
    * @var float
    *
+   * @JMS\Type("float")
    * @ORM\Column(name="non_deductible_amount", type="float", nullable=false)
    * 
    */
@@ -122,6 +129,7 @@ class Contribution extends \Civi\Core\Entity {
   /**
    * @var float
    *
+   * @JMS\Type("float")
    * @ORM\Column(name="total_amount", type="float", nullable=true)
    * 
    */
@@ -130,6 +138,7 @@ class Contribution extends \Civi\Core\Entity {
   /**
    * @var float
    *
+   * @JMS\Type("float")
    * @ORM\Column(name="fee_amount", type="float", nullable=true)
    * 
    */
@@ -138,6 +147,7 @@ class Contribution extends \Civi\Core\Entity {
   /**
    * @var float
    *
+   * @JMS\Type("float")
    * @ORM\Column(name="net_amount", type="float", nullable=true)
    * 
    */
@@ -146,6 +156,7 @@ class Contribution extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="trxn_id", type="string", length=255, nullable=true)
    * 
    */
@@ -154,6 +165,7 @@ class Contribution extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="invoice_id", type="string", length=255, nullable=true)
    * 
    */
@@ -162,6 +174,7 @@ class Contribution extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="currency", type="string", length=3, nullable=false)
    * 
    */
@@ -170,6 +183,7 @@ class Contribution extends \Civi\Core\Entity {
   /**
    * @var datetime
    *
+   * @JMS\Type("datetime")
    * @ORM\Column(name="cancel_date", type="datetime", nullable=true)
    * 
    */
@@ -178,6 +192,7 @@ class Contribution extends \Civi\Core\Entity {
   /**
    * @var text
    *
+   * @JMS\Type("text")
    * @ORM\Column(name="cancel_reason", type="text", nullable=true)
    * 
    */
@@ -186,6 +201,7 @@ class Contribution extends \Civi\Core\Entity {
   /**
    * @var datetime
    *
+   * @JMS\Type("datetime")
    * @ORM\Column(name="receipt_date", type="datetime", nullable=true)
    * 
    */
@@ -194,6 +210,7 @@ class Contribution extends \Civi\Core\Entity {
   /**
    * @var datetime
    *
+   * @JMS\Type("datetime")
    * @ORM\Column(name="thankyou_date", type="datetime", nullable=true)
    * 
    */
@@ -202,6 +219,7 @@ class Contribution extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="source", type="string", length=255, nullable=true)
    * 
    */
@@ -210,6 +228,7 @@ class Contribution extends \Civi\Core\Entity {
   /**
    * @var text
    *
+   * @JMS\Type("text")
    * @ORM\Column(name="amount_level", type="text", nullable=true)
    * 
    */
@@ -218,6 +237,7 @@ class Contribution extends \Civi\Core\Entity {
   /**
    * @var \Civi\Contribute\ContributionRecur
    *
+   * @JMS\Type("\Civi\Contribute\ContributionRecur")
    * @ORM\ManyToOne(targetEntity="Civi\Contribute\ContributionRecur")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="contribution_recur_id", referencedColumnName="id", onDelete="SET NULL")})
    */
@@ -226,6 +246,7 @@ class Contribution extends \Civi\Core\Entity {
   /**
    * @var boolean
    *
+   * @JMS\Type("boolean")
    * @ORM\Column(name="is_test", type="boolean", nullable=false)
    * 
    */
@@ -234,6 +255,7 @@ class Contribution extends \Civi\Core\Entity {
   /**
    * @var boolean
    *
+   * @JMS\Type("boolean")
    * @ORM\Column(name="is_pay_later", type="boolean", nullable=false)
    * 
    */
@@ -242,6 +264,7 @@ class Contribution extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="contribution_status_id", type="integer", nullable=false, options={"unsigned":true})
    * 
    */
@@ -250,6 +273,7 @@ class Contribution extends \Civi\Core\Entity {
   /**
    * @var \Civi\Core\Address
    *
+   * @JMS\Type("\Civi\Core\Address")
    * @ORM\ManyToOne(targetEntity="Civi\Core\Address")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="address_id", referencedColumnName="id", onDelete="SET NULL")})
    */
@@ -258,6 +282,7 @@ class Contribution extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="check_number", type="string", length=255, nullable=true)
    * 
    */
@@ -266,6 +291,7 @@ class Contribution extends \Civi\Core\Entity {
   /**
    * @var \Civi\Campaign\Campaign
    *
+   * @JMS\Type("\Civi\Campaign\Campaign")
    * @ORM\ManyToOne(targetEntity="Civi\Campaign\Campaign")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="campaign_id", referencedColumnName="id", onDelete="SET NULL")})
    */

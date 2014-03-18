@@ -65,6 +65,7 @@ class Country extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
@@ -74,6 +75,7 @@ class Country extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="name", type="string", length=64, nullable=true)
    * 
    */
@@ -82,6 +84,7 @@ class Country extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="iso_code", type="string", length=2, nullable=true)
    * 
    */
@@ -90,6 +93,7 @@ class Country extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="country_code", type="string", length=4, nullable=true)
    * 
    */
@@ -98,6 +102,7 @@ class Country extends \Civi\Core\Entity {
   /**
    * @var \Civi\Core\AddressFormat
    *
+   * @JMS\Type("\Civi\Core\AddressFormat")
    * @ORM\ManyToOne(targetEntity="Civi\Core\AddressFormat")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="address_format_id", referencedColumnName="id")})
    */
@@ -106,6 +111,7 @@ class Country extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="idd_prefix", type="string", length=4, nullable=true)
    * 
    */
@@ -114,6 +120,7 @@ class Country extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="ndd_prefix", type="string", length=4, nullable=true)
    * 
    */
@@ -122,6 +129,7 @@ class Country extends \Civi\Core\Entity {
   /**
    * @var \Civi\Core\Worldregion
    *
+   * @JMS\Type("\Civi\Core\Worldregion")
    * @ORM\ManyToOne(targetEntity="Civi\Core\Worldregion")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="region_id", referencedColumnName="id")})
    */
@@ -130,6 +138,7 @@ class Country extends \Civi\Core\Entity {
   /**
    * @var boolean
    *
+   * @JMS\Type("boolean")
    * @ORM\Column(name="is_province_abbreviated", type="boolean", nullable=false)
    * 
    */

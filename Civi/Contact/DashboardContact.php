@@ -65,6 +65,7 @@ class DashboardContact extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
@@ -74,6 +75,7 @@ class DashboardContact extends \Civi\Core\Entity {
   /**
    * @var \Civi\Core\Dashboard
    *
+   * @JMS\Type("\Civi\Core\Dashboard")
    * @ORM\ManyToOne(targetEntity="Civi\Core\Dashboard")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="dashboard_id", referencedColumnName="id", onDelete="CASCADE")})
    */
@@ -82,6 +84,7 @@ class DashboardContact extends \Civi\Core\Entity {
   /**
    * @var \Civi\Contact\Contact
    *
+   * @JMS\Type("\Civi\Contact\Contact")
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Contact")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="contact_id", referencedColumnName="id", onDelete="CASCADE")})
    */
@@ -90,6 +93,7 @@ class DashboardContact extends \Civi\Core\Entity {
   /**
    * @var boolean
    *
+   * @JMS\Type("boolean")
    * @ORM\Column(name="column_no", type="boolean", nullable=false)
    * 
    */
@@ -98,6 +102,7 @@ class DashboardContact extends \Civi\Core\Entity {
   /**
    * @var boolean
    *
+   * @JMS\Type("boolean")
    * @ORM\Column(name="is_minimized", type="boolean", nullable=false)
    * 
    */
@@ -106,6 +111,7 @@ class DashboardContact extends \Civi\Core\Entity {
   /**
    * @var boolean
    *
+   * @JMS\Type("boolean")
    * @ORM\Column(name="is_fullscreen", type="boolean", nullable=false)
    * 
    */
@@ -114,6 +120,7 @@ class DashboardContact extends \Civi\Core\Entity {
   /**
    * @var boolean
    *
+   * @JMS\Type("boolean")
    * @ORM\Column(name="is_active", type="boolean", nullable=false)
    * 
    */
@@ -122,6 +129,7 @@ class DashboardContact extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="weight", type="integer", nullable=false, options={"unsigned":true})
    * 
    */
@@ -130,6 +138,7 @@ class DashboardContact extends \Civi\Core\Entity {
   /**
    * @var text
    *
+   * @JMS\Type("text")
    * @ORM\Column(name="content", type="text", nullable=true)
    * 
    */
@@ -138,6 +147,7 @@ class DashboardContact extends \Civi\Core\Entity {
   /**
    * @var datetime
    *
+   * @JMS\Type("datetime")
    * @ORM\Column(name="created_date", type="datetime", nullable=true)
    * 
    */

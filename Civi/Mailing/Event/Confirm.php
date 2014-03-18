@@ -65,6 +65,7 @@ class Confirm extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
@@ -74,6 +75,7 @@ class Confirm extends \Civi\Core\Entity {
   /**
    * @var \Civi\Mailing\Event\Subscribe
    *
+   * @JMS\Type("\Civi\Mailing\Event\Subscribe")
    * @ORM\ManyToOne(targetEntity="Civi\Mailing\Event\Subscribe")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="event_subscribe_id", referencedColumnName="id", onDelete="CASCADE")})
    */
@@ -82,6 +84,7 @@ class Confirm extends \Civi\Core\Entity {
   /**
    * @var datetime
    *
+   * @JMS\Type("datetime")
    * @ORM\Column(name="time_stamp", type="datetime", nullable=true)
    * 
    */

@@ -65,6 +65,7 @@ class Mailing extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
@@ -74,6 +75,7 @@ class Mailing extends \Civi\Core\Entity {
   /**
    * @var \Civi\Core\Domain
    *
+   * @JMS\Type("\Civi\Core\Domain")
    * @ORM\ManyToOne(targetEntity="Civi\Core\Domain")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="domain_id", referencedColumnName="id", onDelete="SET NULL")})
    */
@@ -82,6 +84,7 @@ class Mailing extends \Civi\Core\Entity {
   /**
    * @var \Civi\Mailing\Component
    *
+   * @JMS\Type("\Civi\Mailing\Component")
    * @ORM\ManyToOne(targetEntity="Civi\Mailing\Component")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="header_id", referencedColumnName="id", onDelete="SET NULL")})
    */
@@ -90,6 +93,7 @@ class Mailing extends \Civi\Core\Entity {
   /**
    * @var \Civi\Mailing\Component
    *
+   * @JMS\Type("\Civi\Mailing\Component")
    * @ORM\ManyToOne(targetEntity="Civi\Mailing\Component")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="footer_id", referencedColumnName="id", onDelete="SET NULL")})
    */
@@ -98,6 +102,7 @@ class Mailing extends \Civi\Core\Entity {
   /**
    * @var \Civi\Mailing\Component
    *
+   * @JMS\Type("\Civi\Mailing\Component")
    * @ORM\ManyToOne(targetEntity="Civi\Mailing\Component")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="reply_id", referencedColumnName="id", onDelete="SET NULL")})
    */
@@ -106,6 +111,7 @@ class Mailing extends \Civi\Core\Entity {
   /**
    * @var \Civi\Mailing\Component
    *
+   * @JMS\Type("\Civi\Mailing\Component")
    * @ORM\ManyToOne(targetEntity="Civi\Mailing\Component")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="unsubscribe_id", referencedColumnName="id", onDelete="SET NULL")})
    */
@@ -114,6 +120,7 @@ class Mailing extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="resubscribe_id", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
@@ -122,6 +129,7 @@ class Mailing extends \Civi\Core\Entity {
   /**
    * @var \Civi\Mailing\Component
    *
+   * @JMS\Type("\Civi\Mailing\Component")
    * @ORM\ManyToOne(targetEntity="Civi\Mailing\Component")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="optout_id", referencedColumnName="id", onDelete="SET NULL")})
    */
@@ -130,6 +138,7 @@ class Mailing extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="name", type="string", length=128, nullable=true)
    * 
    */
@@ -138,6 +147,7 @@ class Mailing extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="from_name", type="string", length=128, nullable=true)
    * 
    */
@@ -146,6 +156,7 @@ class Mailing extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="from_email", type="string", length=128, nullable=true)
    * 
    */
@@ -154,6 +165,7 @@ class Mailing extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="replyto_email", type="string", length=128, nullable=true)
    * 
    */
@@ -162,6 +174,7 @@ class Mailing extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="subject", type="string", length=128, nullable=true)
    * 
    */
@@ -170,6 +183,7 @@ class Mailing extends \Civi\Core\Entity {
   /**
    * @var text
    *
+   * @JMS\Type("text")
    * @ORM\Column(name="body_text", type="text", nullable=true)
    * 
    */
@@ -178,6 +192,7 @@ class Mailing extends \Civi\Core\Entity {
   /**
    * @var text
    *
+   * @JMS\Type("text")
    * @ORM\Column(name="body_html", type="text", nullable=true)
    * 
    */
@@ -186,6 +201,7 @@ class Mailing extends \Civi\Core\Entity {
   /**
    * @var boolean
    *
+   * @JMS\Type("boolean")
    * @ORM\Column(name="url_tracking", type="boolean", nullable=true)
    * 
    */
@@ -194,6 +210,7 @@ class Mailing extends \Civi\Core\Entity {
   /**
    * @var boolean
    *
+   * @JMS\Type("boolean")
    * @ORM\Column(name="forward_replies", type="boolean", nullable=true)
    * 
    */
@@ -202,6 +219,7 @@ class Mailing extends \Civi\Core\Entity {
   /**
    * @var boolean
    *
+   * @JMS\Type("boolean")
    * @ORM\Column(name="auto_responder", type="boolean", nullable=true)
    * 
    */
@@ -210,6 +228,7 @@ class Mailing extends \Civi\Core\Entity {
   /**
    * @var boolean
    *
+   * @JMS\Type("boolean")
    * @ORM\Column(name="open_tracking", type="boolean", nullable=true)
    * 
    */
@@ -218,6 +237,7 @@ class Mailing extends \Civi\Core\Entity {
   /**
    * @var boolean
    *
+   * @JMS\Type("boolean")
    * @ORM\Column(name="is_completed", type="boolean", nullable=true)
    * 
    */
@@ -226,6 +246,7 @@ class Mailing extends \Civi\Core\Entity {
   /**
    * @var \Civi\Core\MessageTemplate
    *
+   * @JMS\Type("\Civi\Core\MessageTemplate")
    * @ORM\ManyToOne(targetEntity="Civi\Core\MessageTemplate")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="msg_template_id", referencedColumnName="id", onDelete="SET NULL")})
    */
@@ -234,6 +255,7 @@ class Mailing extends \Civi\Core\Entity {
   /**
    * @var boolean
    *
+   * @JMS\Type("boolean")
    * @ORM\Column(name="override_verp", type="boolean", nullable=false)
    * 
    */
@@ -242,6 +264,7 @@ class Mailing extends \Civi\Core\Entity {
   /**
    * @var \Civi\Contact\Contact
    *
+   * @JMS\Type("\Civi\Contact\Contact")
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Contact")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="created_id", referencedColumnName="id", onDelete="SET NULL")})
    */
@@ -250,6 +273,7 @@ class Mailing extends \Civi\Core\Entity {
   /**
    * @var datetime
    *
+   * @JMS\Type("datetime")
    * @ORM\Column(name="created_date", type="datetime", nullable=true)
    * 
    */
@@ -258,6 +282,7 @@ class Mailing extends \Civi\Core\Entity {
   /**
    * @var \Civi\Contact\Contact
    *
+   * @JMS\Type("\Civi\Contact\Contact")
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Contact")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="scheduled_id", referencedColumnName="id", onDelete="SET NULL")})
    */
@@ -266,6 +291,7 @@ class Mailing extends \Civi\Core\Entity {
   /**
    * @var datetime
    *
+   * @JMS\Type("datetime")
    * @ORM\Column(name="scheduled_date", type="datetime", nullable=true)
    * 
    */
@@ -274,6 +300,7 @@ class Mailing extends \Civi\Core\Entity {
   /**
    * @var \Civi\Contact\Contact
    *
+   * @JMS\Type("\Civi\Contact\Contact")
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Contact")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="approver_id", referencedColumnName="id", onDelete="SET NULL")})
    */
@@ -282,6 +309,7 @@ class Mailing extends \Civi\Core\Entity {
   /**
    * @var datetime
    *
+   * @JMS\Type("datetime")
    * @ORM\Column(name="approval_date", type="datetime", nullable=true)
    * 
    */
@@ -290,6 +318,7 @@ class Mailing extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="approval_status_id", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
@@ -298,6 +327,7 @@ class Mailing extends \Civi\Core\Entity {
   /**
    * @var text
    *
+   * @JMS\Type("text")
    * @ORM\Column(name="approval_note", type="text", nullable=true)
    * 
    */
@@ -306,6 +336,7 @@ class Mailing extends \Civi\Core\Entity {
   /**
    * @var boolean
    *
+   * @JMS\Type("boolean")
    * @ORM\Column(name="is_archived", type="boolean", nullable=false)
    * 
    */
@@ -314,6 +345,7 @@ class Mailing extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="visibility", type="string", length=40, nullable=false)
    * 
    */
@@ -322,6 +354,7 @@ class Mailing extends \Civi\Core\Entity {
   /**
    * @var \Civi\Campaign\Campaign
    *
+   * @JMS\Type("\Civi\Campaign\Campaign")
    * @ORM\ManyToOne(targetEntity="Civi\Campaign\Campaign")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="campaign_id", referencedColumnName="id", onDelete="SET NULL")})
    */
@@ -330,6 +363,7 @@ class Mailing extends \Civi\Core\Entity {
   /**
    * @var boolean
    *
+   * @JMS\Type("boolean")
    * @ORM\Column(name="dedupe_email", type="boolean", nullable=false)
    * 
    */
@@ -338,6 +372,7 @@ class Mailing extends \Civi\Core\Entity {
   /**
    * @var \Civi\SMS\Provider
    *
+   * @JMS\Type("\Civi\SMS\Provider")
    * @ORM\ManyToOne(targetEntity="Civi\SMS\Provider")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="sms_provider_id", referencedColumnName="id", onDelete="SET NULL")})
    */

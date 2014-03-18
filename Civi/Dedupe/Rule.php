@@ -65,6 +65,7 @@ class Rule extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
@@ -74,6 +75,7 @@ class Rule extends \Civi\Core\Entity {
   /**
    * @var \Civi\Dedupe\RuleGroup
    *
+   * @JMS\Type("\Civi\Dedupe\RuleGroup")
    * @ORM\ManyToOne(targetEntity="Civi\Dedupe\RuleGroup")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="dedupe_rule_group_id", referencedColumnName="id")})
    */
@@ -82,6 +84,7 @@ class Rule extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="rule_table", type="string", length=64, nullable=true)
    * 
    */
@@ -90,6 +93,7 @@ class Rule extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="rule_field", type="string", length=64, nullable=true)
    * 
    */
@@ -98,6 +102,7 @@ class Rule extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="rule_length", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
@@ -106,6 +111,7 @@ class Rule extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="rule_weight", type="integer", nullable=true, options={"unsigned":true})
    * 
    */

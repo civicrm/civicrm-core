@@ -65,6 +65,7 @@ class Spool extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
@@ -74,6 +75,7 @@ class Spool extends \Civi\Core\Entity {
   /**
    * @var \Civi\Mailing\MailingJob
    *
+   * @JMS\Type("\Civi\Mailing\MailingJob")
    * @ORM\ManyToOne(targetEntity="Civi\Mailing\MailingJob")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="job_id", referencedColumnName="id", onDelete="CASCADE")})
    */
@@ -82,6 +84,7 @@ class Spool extends \Civi\Core\Entity {
   /**
    * @var text
    *
+   * @JMS\Type("text")
    * @ORM\Column(name="recipient_email", type="text", nullable=true)
    * 
    */
@@ -90,6 +93,7 @@ class Spool extends \Civi\Core\Entity {
   /**
    * @var text
    *
+   * @JMS\Type("text")
    * @ORM\Column(name="headers", type="text", nullable=true)
    * 
    */
@@ -98,6 +102,7 @@ class Spool extends \Civi\Core\Entity {
   /**
    * @var text
    *
+   * @JMS\Type("text")
    * @ORM\Column(name="body", type="text", nullable=true)
    * 
    */
@@ -106,6 +111,7 @@ class Spool extends \Civi\Core\Entity {
   /**
    * @var datetime
    *
+   * @JMS\Type("datetime")
    * @ORM\Column(name="added_at", type="datetime", nullable=true)
    * 
    */
@@ -114,6 +120,7 @@ class Spool extends \Civi\Core\Entity {
   /**
    * @var datetime
    *
+   * @JMS\Type("datetime")
    * @ORM\Column(name="removed_at", type="datetime", nullable=true)
    * 
    */

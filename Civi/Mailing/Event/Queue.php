@@ -65,6 +65,7 @@ class Queue extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
@@ -74,6 +75,7 @@ class Queue extends \Civi\Core\Entity {
   /**
    * @var \Civi\Mailing\MailingJob
    *
+   * @JMS\Type("\Civi\Mailing\MailingJob")
    * @ORM\ManyToOne(targetEntity="Civi\Mailing\MailingJob")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="job_id", referencedColumnName="id", onDelete="CASCADE")})
    */
@@ -82,6 +84,7 @@ class Queue extends \Civi\Core\Entity {
   /**
    * @var \Civi\Core\Email
    *
+   * @JMS\Type("\Civi\Core\Email")
    * @ORM\ManyToOne(targetEntity="Civi\Core\Email")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="email_id", referencedColumnName="id", onDelete="CASCADE")})
    */
@@ -90,6 +93,7 @@ class Queue extends \Civi\Core\Entity {
   /**
    * @var \Civi\Contact\Contact
    *
+   * @JMS\Type("\Civi\Contact\Contact")
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Contact")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="contact_id", referencedColumnName="id", onDelete="CASCADE")})
    */
@@ -98,6 +102,7 @@ class Queue extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="hash", type="string", length=255, nullable=true)
    * 
    */
@@ -106,6 +111,7 @@ class Queue extends \Civi\Core\Entity {
   /**
    * @var \Civi\Core\Phone
    *
+   * @JMS\Type("\Civi\Core\Phone")
    * @ORM\ManyToOne(targetEntity="Civi\Core\Phone")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="phone_id", referencedColumnName="id", onDelete="CASCADE")})
    */

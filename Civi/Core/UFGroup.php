@@ -65,6 +65,7 @@ class UFGroup extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
@@ -74,6 +75,7 @@ class UFGroup extends \Civi\Core\Entity {
   /**
    * @var boolean
    *
+   * @JMS\Type("boolean")
    * @ORM\Column(name="is_active", type="boolean", nullable=false)
    * 
    */
@@ -82,6 +84,7 @@ class UFGroup extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="group_type", type="string", length=255, nullable=true)
    * 
    */
@@ -90,6 +93,7 @@ class UFGroup extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="title", type="string", length=64, nullable=true)
    * 
    */
@@ -98,6 +102,7 @@ class UFGroup extends \Civi\Core\Entity {
   /**
    * @var text
    *
+   * @JMS\Type("text")
    * @ORM\Column(name="description", type="text", nullable=true)
    * 
    */
@@ -106,6 +111,7 @@ class UFGroup extends \Civi\Core\Entity {
   /**
    * @var text
    *
+   * @JMS\Type("text")
    * @ORM\Column(name="help_pre", type="text", nullable=true)
    * 
    */
@@ -114,6 +120,7 @@ class UFGroup extends \Civi\Core\Entity {
   /**
    * @var text
    *
+   * @JMS\Type("text")
    * @ORM\Column(name="help_post", type="text", nullable=true)
    * 
    */
@@ -122,6 +129,7 @@ class UFGroup extends \Civi\Core\Entity {
   /**
    * @var \Civi\Contact\Group
    *
+   * @JMS\Type("\Civi\Contact\Group")
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Group")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="limit_listings_group_id", referencedColumnName="id", onDelete="SET NULL")})
    */
@@ -130,6 +138,7 @@ class UFGroup extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="post_URL", type="string", length=255, nullable=true)
    * 
    */
@@ -138,6 +147,7 @@ class UFGroup extends \Civi\Core\Entity {
   /**
    * @var \Civi\Contact\Group
    *
+   * @JMS\Type("\Civi\Contact\Group")
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Group")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="add_to_group_id", referencedColumnName="id", onDelete="SET NULL")})
    */
@@ -146,6 +156,7 @@ class UFGroup extends \Civi\Core\Entity {
   /**
    * @var boolean
    *
+   * @JMS\Type("boolean")
    * @ORM\Column(name="add_captcha", type="boolean", nullable=false)
    * 
    */
@@ -154,6 +165,7 @@ class UFGroup extends \Civi\Core\Entity {
   /**
    * @var boolean
    *
+   * @JMS\Type("boolean")
    * @ORM\Column(name="is_map", type="boolean", nullable=false)
    * 
    */
@@ -162,6 +174,7 @@ class UFGroup extends \Civi\Core\Entity {
   /**
    * @var boolean
    *
+   * @JMS\Type("boolean")
    * @ORM\Column(name="is_edit_link", type="boolean", nullable=false)
    * 
    */
@@ -170,6 +183,7 @@ class UFGroup extends \Civi\Core\Entity {
   /**
    * @var boolean
    *
+   * @JMS\Type("boolean")
    * @ORM\Column(name="is_uf_link", type="boolean", nullable=false)
    * 
    */
@@ -178,6 +192,7 @@ class UFGroup extends \Civi\Core\Entity {
   /**
    * @var boolean
    *
+   * @JMS\Type("boolean")
    * @ORM\Column(name="is_update_dupe", type="boolean", nullable=false)
    * 
    */
@@ -186,6 +201,7 @@ class UFGroup extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="cancel_URL", type="string", length=255, nullable=true)
    * 
    */
@@ -194,6 +210,7 @@ class UFGroup extends \Civi\Core\Entity {
   /**
    * @var boolean
    *
+   * @JMS\Type("boolean")
    * @ORM\Column(name="is_cms_user", type="boolean", nullable=false)
    * 
    */
@@ -202,6 +219,7 @@ class UFGroup extends \Civi\Core\Entity {
   /**
    * @var text
    *
+   * @JMS\Type("text")
    * @ORM\Column(name="notify", type="text", nullable=true)
    * 
    */
@@ -210,6 +228,7 @@ class UFGroup extends \Civi\Core\Entity {
   /**
    * @var boolean
    *
+   * @JMS\Type("boolean")
    * @ORM\Column(name="is_reserved", type="boolean", nullable=true)
    * 
    */
@@ -218,6 +237,7 @@ class UFGroup extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="name", type="string", length=64, nullable=true)
    * 
    */
@@ -226,6 +246,7 @@ class UFGroup extends \Civi\Core\Entity {
   /**
    * @var \Civi\Contact\Contact
    *
+   * @JMS\Type("\Civi\Contact\Contact")
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Contact")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="created_id", referencedColumnName="id", onDelete="SET NULL")})
    */
@@ -234,6 +255,7 @@ class UFGroup extends \Civi\Core\Entity {
   /**
    * @var datetime
    *
+   * @JMS\Type("datetime")
    * @ORM\Column(name="created_date", type="datetime", nullable=true)
    * 
    */
@@ -242,6 +264,7 @@ class UFGroup extends \Civi\Core\Entity {
   /**
    * @var boolean
    *
+   * @JMS\Type("boolean")
    * @ORM\Column(name="is_proximity_search", type="boolean", nullable=false)
    * 
    */

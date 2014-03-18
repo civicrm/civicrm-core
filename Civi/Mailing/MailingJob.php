@@ -65,6 +65,7 @@ class MailingJob extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
@@ -74,6 +75,7 @@ class MailingJob extends \Civi\Core\Entity {
   /**
    * @var \Civi\Mailing\Mailing
    *
+   * @JMS\Type("\Civi\Mailing\Mailing")
    * @ORM\ManyToOne(targetEntity="Civi\Mailing\Mailing")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="mailing_id", referencedColumnName="id", onDelete="CASCADE")})
    */
@@ -82,6 +84,7 @@ class MailingJob extends \Civi\Core\Entity {
   /**
    * @var datetime
    *
+   * @JMS\Type("datetime")
    * @ORM\Column(name="scheduled_date", type="datetime", nullable=true)
    * 
    */
@@ -90,6 +93,7 @@ class MailingJob extends \Civi\Core\Entity {
   /**
    * @var datetime
    *
+   * @JMS\Type("datetime")
    * @ORM\Column(name="start_date", type="datetime", nullable=true)
    * 
    */
@@ -98,6 +102,7 @@ class MailingJob extends \Civi\Core\Entity {
   /**
    * @var datetime
    *
+   * @JMS\Type("datetime")
    * @ORM\Column(name="end_date", type="datetime", nullable=true)
    * 
    */
@@ -106,6 +111,7 @@ class MailingJob extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="status", type="string", length=12, nullable=true)
    * 
    */
@@ -114,6 +120,7 @@ class MailingJob extends \Civi\Core\Entity {
   /**
    * @var boolean
    *
+   * @JMS\Type("boolean")
    * @ORM\Column(name="is_test", type="boolean", nullable=false)
    * 
    */
@@ -122,6 +129,7 @@ class MailingJob extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="job_type", type="string", length=255, nullable=true)
    * 
    */
@@ -130,6 +138,7 @@ class MailingJob extends \Civi\Core\Entity {
   /**
    * @var \Civi\Mailing\MailingJob
    *
+   * @JMS\Type("\Civi\Mailing\MailingJob")
    * @ORM\ManyToOne(targetEntity="Civi\Mailing\MailingJob")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="parent_id", referencedColumnName="id", onDelete="CASCADE")})
    */
@@ -138,6 +147,7 @@ class MailingJob extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="job_offset", type="integer", nullable=false, options={"unsigned":true})
    * 
    */
@@ -146,6 +156,7 @@ class MailingJob extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="job_limit", type="integer", nullable=false, options={"unsigned":true})
    * 
    */

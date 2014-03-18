@@ -65,6 +65,7 @@ class FinancialTrxn extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
@@ -74,6 +75,7 @@ class FinancialTrxn extends \Civi\Core\Entity {
   /**
    * @var \Civi\Financial\FinancialAccount
    *
+   * @JMS\Type("\Civi\Financial\FinancialAccount")
    * @ORM\ManyToOne(targetEntity="Civi\Financial\FinancialAccount")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="from_financial_account_id", referencedColumnName="id")})
    */
@@ -82,6 +84,7 @@ class FinancialTrxn extends \Civi\Core\Entity {
   /**
    * @var \Civi\Financial\FinancialAccount
    *
+   * @JMS\Type("\Civi\Financial\FinancialAccount")
    * @ORM\ManyToOne(targetEntity="Civi\Financial\FinancialAccount")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="to_financial_account_id", referencedColumnName="id")})
    */
@@ -90,6 +93,7 @@ class FinancialTrxn extends \Civi\Core\Entity {
   /**
    * @var datetime
    *
+   * @JMS\Type("datetime")
    * @ORM\Column(name="trxn_date", type="datetime", nullable=false)
    * 
    */
@@ -98,6 +102,7 @@ class FinancialTrxn extends \Civi\Core\Entity {
   /**
    * @var float
    *
+   * @JMS\Type("float")
    * @ORM\Column(name="total_amount", type="float", nullable=true)
    * 
    */
@@ -106,6 +111,7 @@ class FinancialTrxn extends \Civi\Core\Entity {
   /**
    * @var float
    *
+   * @JMS\Type("float")
    * @ORM\Column(name="fee_amount", type="float", nullable=true)
    * 
    */
@@ -114,6 +120,7 @@ class FinancialTrxn extends \Civi\Core\Entity {
   /**
    * @var float
    *
+   * @JMS\Type("float")
    * @ORM\Column(name="net_amount", type="float", nullable=true)
    * 
    */
@@ -122,6 +129,7 @@ class FinancialTrxn extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="currency", type="string", length=3, nullable=false)
    * 
    */
@@ -130,6 +138,7 @@ class FinancialTrxn extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="trxn_id", type="string", length=255, nullable=true)
    * 
    */
@@ -138,6 +147,7 @@ class FinancialTrxn extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="trxn_result_code", type="string", length=255, nullable=true)
    * 
    */
@@ -146,6 +156,7 @@ class FinancialTrxn extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="status_id", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
@@ -154,6 +165,7 @@ class FinancialTrxn extends \Civi\Core\Entity {
   /**
    * @var \Civi\Financial\PaymentProcessor
    *
+   * @JMS\Type("\Civi\Financial\PaymentProcessor")
    * @ORM\ManyToOne(targetEntity="Civi\Financial\PaymentProcessor")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="payment_processor_id", referencedColumnName="id", onDelete="SET NULL")})
    */
@@ -162,6 +174,7 @@ class FinancialTrxn extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="payment_instrument_id", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
@@ -170,6 +183,7 @@ class FinancialTrxn extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="check_number", type="string", length=255, nullable=true)
    * 
    */

@@ -65,6 +65,7 @@ class Forward extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
@@ -74,6 +75,7 @@ class Forward extends \Civi\Core\Entity {
   /**
    * @var \Civi\Mailing\Event\Queue
    *
+   * @JMS\Type("\Civi\Mailing\Event\Queue")
    * @ORM\ManyToOne(targetEntity="Civi\Mailing\Event\Queue")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="event_queue_id", referencedColumnName="id", onDelete="CASCADE")})
    */
@@ -82,6 +84,7 @@ class Forward extends \Civi\Core\Entity {
   /**
    * @var \Civi\Mailing\Event\Queue
    *
+   * @JMS\Type("\Civi\Mailing\Event\Queue")
    * @ORM\ManyToOne(targetEntity="Civi\Mailing\Event\Queue")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="dest_queue_id", referencedColumnName="id", onDelete="SET NULL")})
    */
@@ -90,6 +93,7 @@ class Forward extends \Civi\Core\Entity {
   /**
    * @var datetime
    *
+   * @JMS\Type("datetime")
    * @ORM\Column(name="time_stamp", type="datetime", nullable=true)
    * 
    */

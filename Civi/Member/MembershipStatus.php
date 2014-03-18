@@ -65,6 +65,7 @@ class MembershipStatus extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
@@ -74,6 +75,7 @@ class MembershipStatus extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="name", type="string", length=128, nullable=true)
    * 
    */
@@ -82,6 +84,7 @@ class MembershipStatus extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="label", type="string", length=128, nullable=true)
    * 
    */
@@ -90,6 +93,7 @@ class MembershipStatus extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="start_event", type="string", length=12, nullable=true)
    * 
    */
@@ -98,6 +102,7 @@ class MembershipStatus extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="start_event_adjust_unit", type="string", length=8, nullable=true)
    * 
    */
@@ -106,6 +111,7 @@ class MembershipStatus extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="start_event_adjust_interval", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
@@ -114,6 +120,7 @@ class MembershipStatus extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="end_event", type="string", length=12, nullable=true)
    * 
    */
@@ -122,6 +129,7 @@ class MembershipStatus extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="end_event_adjust_unit", type="string", length=8, nullable=true)
    * 
    */
@@ -130,6 +138,7 @@ class MembershipStatus extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="end_event_adjust_interval", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
@@ -138,6 +147,7 @@ class MembershipStatus extends \Civi\Core\Entity {
   /**
    * @var boolean
    *
+   * @JMS\Type("boolean")
    * @ORM\Column(name="is_current_member", type="boolean", nullable=true)
    * 
    */
@@ -146,6 +156,7 @@ class MembershipStatus extends \Civi\Core\Entity {
   /**
    * @var boolean
    *
+   * @JMS\Type("boolean")
    * @ORM\Column(name="is_admin", type="boolean", nullable=true)
    * 
    */
@@ -154,6 +165,7 @@ class MembershipStatus extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="weight", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
@@ -162,6 +174,7 @@ class MembershipStatus extends \Civi\Core\Entity {
   /**
    * @var boolean
    *
+   * @JMS\Type("boolean")
    * @ORM\Column(name="is_default", type="boolean", nullable=true)
    * 
    */
@@ -170,6 +183,7 @@ class MembershipStatus extends \Civi\Core\Entity {
   /**
    * @var boolean
    *
+   * @JMS\Type("boolean")
    * @ORM\Column(name="is_active", type="boolean", nullable=false)
    * 
    */
@@ -178,6 +192,7 @@ class MembershipStatus extends \Civi\Core\Entity {
   /**
    * @var boolean
    *
+   * @JMS\Type("boolean")
    * @ORM\Column(name="is_reserved", type="boolean", nullable=false)
    * 
    */

@@ -65,6 +65,7 @@ class MembershipBlock extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
@@ -74,6 +75,7 @@ class MembershipBlock extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="entity_table", type="string", length=64, nullable=true)
    * 
    */
@@ -82,6 +84,7 @@ class MembershipBlock extends \Civi\Core\Entity {
   /**
    * @var \Civi\Contribute\ContributionPage
    *
+   * @JMS\Type("\Civi\Contribute\ContributionPage")
    * @ORM\ManyToOne(targetEntity="Civi\Contribute\ContributionPage")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="entity_id", referencedColumnName="id")})
    */
@@ -90,6 +93,7 @@ class MembershipBlock extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="membership_types", type="string", length=255, nullable=true)
    * 
    */
@@ -98,6 +102,7 @@ class MembershipBlock extends \Civi\Core\Entity {
   /**
    * @var \Civi\Member\MembershipType
    *
+   * @JMS\Type("\Civi\Member\MembershipType")
    * @ORM\ManyToOne(targetEntity="Civi\Member\MembershipType")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="membership_type_default", referencedColumnName="id")})
    */
@@ -106,6 +111,7 @@ class MembershipBlock extends \Civi\Core\Entity {
   /**
    * @var boolean
    *
+   * @JMS\Type("boolean")
    * @ORM\Column(name="display_min_fee", type="boolean", nullable=false)
    * 
    */
@@ -114,6 +120,7 @@ class MembershipBlock extends \Civi\Core\Entity {
   /**
    * @var boolean
    *
+   * @JMS\Type("boolean")
    * @ORM\Column(name="is_separate_payment", type="boolean", nullable=false)
    * 
    */
@@ -122,6 +129,7 @@ class MembershipBlock extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="new_title", type="string", length=255, nullable=true)
    * 
    */
@@ -130,6 +138,7 @@ class MembershipBlock extends \Civi\Core\Entity {
   /**
    * @var text
    *
+   * @JMS\Type("text")
    * @ORM\Column(name="new_text", type="text", nullable=true)
    * 
    */
@@ -138,6 +147,7 @@ class MembershipBlock extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="renewal_title", type="string", length=255, nullable=true)
    * 
    */
@@ -146,6 +156,7 @@ class MembershipBlock extends \Civi\Core\Entity {
   /**
    * @var text
    *
+   * @JMS\Type("text")
    * @ORM\Column(name="renewal_text", type="text", nullable=true)
    * 
    */
@@ -154,6 +165,7 @@ class MembershipBlock extends \Civi\Core\Entity {
   /**
    * @var boolean
    *
+   * @JMS\Type("boolean")
    * @ORM\Column(name="is_required", type="boolean", nullable=false)
    * 
    */
@@ -162,6 +174,7 @@ class MembershipBlock extends \Civi\Core\Entity {
   /**
    * @var boolean
    *
+   * @JMS\Type("boolean")
    * @ORM\Column(name="is_active", type="boolean", nullable=false)
    * 
    */

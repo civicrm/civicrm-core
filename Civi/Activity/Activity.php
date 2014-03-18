@@ -65,6 +65,7 @@ class Activity extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
@@ -74,6 +75,7 @@ class Activity extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="source_record_id", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
@@ -82,6 +84,7 @@ class Activity extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="activity_type_id", type="integer", nullable=false, options={"unsigned":true})
    * 
    */
@@ -90,6 +93,7 @@ class Activity extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="subject", type="string", length=255, nullable=true)
    * 
    */
@@ -98,6 +102,7 @@ class Activity extends \Civi\Core\Entity {
   /**
    * @var datetime
    *
+   * @JMS\Type("datetime")
    * @ORM\Column(name="activity_date_time", type="datetime", nullable=true)
    * 
    */
@@ -106,6 +111,7 @@ class Activity extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="duration", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
@@ -114,6 +120,7 @@ class Activity extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="location", type="string", length=255, nullable=true)
    * 
    */
@@ -122,6 +129,7 @@ class Activity extends \Civi\Core\Entity {
   /**
    * @var \Civi\Core\Phone
    *
+   * @JMS\Type("\Civi\Core\Phone")
    * @ORM\ManyToOne(targetEntity="Civi\Core\Phone")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="phone_id", referencedColumnName="id", onDelete="SET NULL")})
    */
@@ -130,6 +138,7 @@ class Activity extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="phone_number", type="string", length=64, nullable=true)
    * 
    */
@@ -138,6 +147,7 @@ class Activity extends \Civi\Core\Entity {
   /**
    * @var text
    *
+   * @JMS\Type("text")
    * @ORM\Column(name="details", type="text", nullable=true)
    * 
    */
@@ -146,6 +156,7 @@ class Activity extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="status_id", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
@@ -154,6 +165,7 @@ class Activity extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="priority_id", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
@@ -162,6 +174,7 @@ class Activity extends \Civi\Core\Entity {
   /**
    * @var \Civi\Activity\Activity
    *
+   * @JMS\Type("\Civi\Activity\Activity")
    * @ORM\ManyToOne(targetEntity="Civi\Activity\Activity")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="parent_id", referencedColumnName="id", onDelete="CASCADE")})
    */
@@ -170,6 +183,7 @@ class Activity extends \Civi\Core\Entity {
   /**
    * @var boolean
    *
+   * @JMS\Type("boolean")
    * @ORM\Column(name="is_test", type="boolean", nullable=false)
    * 
    */
@@ -178,6 +192,7 @@ class Activity extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="medium_id", type="integer", nullable=false, options={"unsigned":true})
    * 
    */
@@ -186,6 +201,7 @@ class Activity extends \Civi\Core\Entity {
   /**
    * @var boolean
    *
+   * @JMS\Type("boolean")
    * @ORM\Column(name="is_auto", type="boolean", nullable=false)
    * 
    */
@@ -194,6 +210,7 @@ class Activity extends \Civi\Core\Entity {
   /**
    * @var \Civi\Contact\Relationship
    *
+   * @JMS\Type("\Civi\Contact\Relationship")
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Relationship")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="relationship_id", referencedColumnName="id", onDelete="SET NULL")})
    */
@@ -202,6 +219,7 @@ class Activity extends \Civi\Core\Entity {
   /**
    * @var boolean
    *
+   * @JMS\Type("boolean")
    * @ORM\Column(name="is_current_revision", type="boolean", nullable=false)
    * 
    */
@@ -210,6 +228,7 @@ class Activity extends \Civi\Core\Entity {
   /**
    * @var \Civi\Activity\Activity
    *
+   * @JMS\Type("\Civi\Activity\Activity")
    * @ORM\ManyToOne(targetEntity="Civi\Activity\Activity")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="original_id", referencedColumnName="id", onDelete="CASCADE")})
    */
@@ -218,6 +237,7 @@ class Activity extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="result", type="string", length=255, nullable=true)
    * 
    */
@@ -226,6 +246,7 @@ class Activity extends \Civi\Core\Entity {
   /**
    * @var boolean
    *
+   * @JMS\Type("boolean")
    * @ORM\Column(name="is_deleted", type="boolean", nullable=false)
    * 
    */
@@ -234,6 +255,7 @@ class Activity extends \Civi\Core\Entity {
   /**
    * @var \Civi\Campaign\Campaign
    *
+   * @JMS\Type("\Civi\Campaign\Campaign")
    * @ORM\ManyToOne(targetEntity="Civi\Campaign\Campaign")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="campaign_id", referencedColumnName="id", onDelete="SET NULL")})
    */
@@ -242,6 +264,7 @@ class Activity extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="engagement_level", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
@@ -250,6 +273,7 @@ class Activity extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="weight", type="integer", nullable=true, options={"unsigned":true})
    * 
    */

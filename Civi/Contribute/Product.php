@@ -65,6 +65,7 @@ class Product extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
@@ -74,6 +75,7 @@ class Product extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="name", type="string", length=255, nullable=true)
    * 
    */
@@ -82,6 +84,7 @@ class Product extends \Civi\Core\Entity {
   /**
    * @var text
    *
+   * @JMS\Type("text")
    * @ORM\Column(name="description", type="text", nullable=true)
    * 
    */
@@ -90,6 +93,7 @@ class Product extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="sku", type="string", length=50, nullable=true)
    * 
    */
@@ -98,6 +102,7 @@ class Product extends \Civi\Core\Entity {
   /**
    * @var text
    *
+   * @JMS\Type("text")
    * @ORM\Column(name="options", type="text", nullable=true)
    * 
    */
@@ -106,6 +111,7 @@ class Product extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="image", type="string", length=255, nullable=true)
    * 
    */
@@ -114,6 +120,7 @@ class Product extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="thumbnail", type="string", length=255, nullable=true)
    * 
    */
@@ -122,6 +129,7 @@ class Product extends \Civi\Core\Entity {
   /**
    * @var float
    *
+   * @JMS\Type("float")
    * @ORM\Column(name="price", type="float", nullable=true)
    * 
    */
@@ -130,6 +138,7 @@ class Product extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="currency", type="string", length=3, nullable=false)
    * 
    */
@@ -138,6 +147,7 @@ class Product extends \Civi\Core\Entity {
   /**
    * @var \Civi\Financial\FinancialType
    *
+   * @JMS\Type("\Civi\Financial\FinancialType")
    * @ORM\ManyToOne(targetEntity="Civi\Financial\FinancialType")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="financial_type_id", referencedColumnName="id", onDelete="SET NULL")})
    */
@@ -146,6 +156,7 @@ class Product extends \Civi\Core\Entity {
   /**
    * @var float
    *
+   * @JMS\Type("float")
    * @ORM\Column(name="min_contribution", type="float", nullable=true)
    * 
    */
@@ -154,6 +165,7 @@ class Product extends \Civi\Core\Entity {
   /**
    * @var float
    *
+   * @JMS\Type("float")
    * @ORM\Column(name="cost", type="float", nullable=true)
    * 
    */
@@ -162,6 +174,7 @@ class Product extends \Civi\Core\Entity {
   /**
    * @var boolean
    *
+   * @JMS\Type("boolean")
    * @ORM\Column(name="is_active", type="boolean", nullable=true)
    * 
    */
@@ -170,6 +183,7 @@ class Product extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="period_type", type="string", length=8, nullable=false)
    * 
    */
@@ -178,6 +192,7 @@ class Product extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="fixed_period_start_day", type="integer", nullable=false, options={"unsigned":true})
    * 
    */
@@ -186,6 +201,7 @@ class Product extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="duration_unit", type="string", length=8, nullable=false)
    * 
    */
@@ -194,6 +210,7 @@ class Product extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="duration_interval", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
@@ -202,6 +219,7 @@ class Product extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="frequency_unit", type="string", length=8, nullable=false)
    * 
    */
@@ -210,6 +228,7 @@ class Product extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="frequency_interval", type="integer", nullable=true, options={"unsigned":true})
    * 
    */

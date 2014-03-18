@@ -65,6 +65,7 @@ class Cache extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
@@ -74,6 +75,7 @@ class Cache extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="group_name", type="string", length=32, nullable=true)
    * 
    */
@@ -82,6 +84,7 @@ class Cache extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="path", type="string", length=255, nullable=true)
    * 
    */
@@ -90,6 +93,7 @@ class Cache extends \Civi\Core\Entity {
   /**
    * @var text
    *
+   * @JMS\Type("text")
    * @ORM\Column(name="data", type="text", nullable=true)
    * 
    */
@@ -98,6 +102,7 @@ class Cache extends \Civi\Core\Entity {
   /**
    * @var \Civi\Core\Component
    *
+   * @JMS\Type("\Civi\Core\Component")
    * @ORM\ManyToOne(targetEntity="Civi\Core\Component")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="component_id", referencedColumnName="id")})
    */
@@ -106,6 +111,7 @@ class Cache extends \Civi\Core\Entity {
   /**
    * @var datetime
    *
+   * @JMS\Type("datetime")
    * @ORM\Column(name="created_date", type="datetime", nullable=true)
    * 
    */
@@ -114,6 +120,7 @@ class Cache extends \Civi\Core\Entity {
   /**
    * @var datetime
    *
+   * @JMS\Type("datetime")
    * @ORM\Column(name="expired_date", type="datetime", nullable=true)
    * 
    */

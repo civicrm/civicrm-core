@@ -65,6 +65,7 @@ class GroupNesting extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
@@ -74,6 +75,7 @@ class GroupNesting extends \Civi\Core\Entity {
   /**
    * @var \Civi\Contact\Group
    *
+   * @JMS\Type("\Civi\Contact\Group")
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Group")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="child_group_id", referencedColumnName="id", onDelete="CASCADE")})
    */
@@ -82,6 +84,7 @@ class GroupNesting extends \Civi\Core\Entity {
   /**
    * @var \Civi\Contact\Group
    *
+   * @JMS\Type("\Civi\Contact\Group")
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Group")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="parent_group_id", referencedColumnName="id", onDelete="CASCADE")})
    */

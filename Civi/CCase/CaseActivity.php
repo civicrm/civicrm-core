@@ -65,6 +65,7 @@ class CaseActivity extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
@@ -74,6 +75,7 @@ class CaseActivity extends \Civi\Core\Entity {
   /**
    * @var \Civi\CCase\CCase
    *
+   * @JMS\Type("\Civi\CCase\CCase")
    * @ORM\ManyToOne(targetEntity="Civi\CCase\CCase")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="case_id", referencedColumnName="id", onDelete="CASCADE")})
    */
@@ -82,6 +84,7 @@ class CaseActivity extends \Civi\Core\Entity {
   /**
    * @var \Civi\Activity\Activity
    *
+   * @JMS\Type("\Civi\Activity\Activity")
    * @ORM\ManyToOne(targetEntity="Civi\Activity\Activity")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="activity_id", referencedColumnName="id", onDelete="CASCADE")})
    */

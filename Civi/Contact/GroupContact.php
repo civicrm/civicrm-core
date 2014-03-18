@@ -65,6 +65,7 @@ class GroupContact extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
@@ -74,6 +75,7 @@ class GroupContact extends \Civi\Core\Entity {
   /**
    * @var \Civi\Contact\Group
    *
+   * @JMS\Type("\Civi\Contact\Group")
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Group")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="group_id", referencedColumnName="id", onDelete="CASCADE")})
    */
@@ -82,6 +84,7 @@ class GroupContact extends \Civi\Core\Entity {
   /**
    * @var \Civi\Contact\Contact
    *
+   * @JMS\Type("\Civi\Contact\Contact")
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Contact")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="contact_id", referencedColumnName="id", onDelete="CASCADE")})
    */
@@ -90,6 +93,7 @@ class GroupContact extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="status", type="string", length=8, nullable=true)
    * 
    */
@@ -98,6 +102,7 @@ class GroupContact extends \Civi\Core\Entity {
   /**
    * @var \Civi\Core\LocBlock
    *
+   * @JMS\Type("\Civi\Core\LocBlock")
    * @ORM\ManyToOne(targetEntity="Civi\Core\LocBlock")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="location_id", referencedColumnName="id", onDelete="SET NULL")})
    */
@@ -106,6 +111,7 @@ class GroupContact extends \Civi\Core\Entity {
   /**
    * @var \Civi\Core\Email
    *
+   * @JMS\Type("\Civi\Core\Email")
    * @ORM\ManyToOne(targetEntity="Civi\Core\Email")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="email_id", referencedColumnName="id")})
    */

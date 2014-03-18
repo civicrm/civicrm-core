@@ -65,6 +65,7 @@ class MembershipType extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
@@ -74,6 +75,7 @@ class MembershipType extends \Civi\Core\Entity {
   /**
    * @var \Civi\Core\Domain
    *
+   * @JMS\Type("\Civi\Core\Domain")
    * @ORM\ManyToOne(targetEntity="Civi\Core\Domain")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="domain_id", referencedColumnName="id")})
    */
@@ -82,6 +84,7 @@ class MembershipType extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="name", type="string", length=128, nullable=true)
    * 
    */
@@ -90,6 +93,7 @@ class MembershipType extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="description", type="string", length=255, nullable=true)
    * 
    */
@@ -98,6 +102,7 @@ class MembershipType extends \Civi\Core\Entity {
   /**
    * @var \Civi\Contact\Contact
    *
+   * @JMS\Type("\Civi\Contact\Contact")
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Contact")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="member_of_contact_id", referencedColumnName="id", onDelete="RESTRICT")})
    */
@@ -106,6 +111,7 @@ class MembershipType extends \Civi\Core\Entity {
   /**
    * @var \Civi\Financial\FinancialType
    *
+   * @JMS\Type("\Civi\Financial\FinancialType")
    * @ORM\ManyToOne(targetEntity="Civi\Financial\FinancialType")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="financial_type_id", referencedColumnName="id")})
    */
@@ -114,6 +120,7 @@ class MembershipType extends \Civi\Core\Entity {
   /**
    * @var float
    *
+   * @JMS\Type("float")
    * @ORM\Column(name="minimum_fee", type="float", nullable=false)
    * 
    */
@@ -122,6 +129,7 @@ class MembershipType extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="duration_unit", type="string", length=8, nullable=true)
    * 
    */
@@ -130,6 +138,7 @@ class MembershipType extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="duration_interval", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
@@ -138,6 +147,7 @@ class MembershipType extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="period_type", type="string", length=8, nullable=true)
    * 
    */
@@ -146,6 +156,7 @@ class MembershipType extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="fixed_period_start_day", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
@@ -154,6 +165,7 @@ class MembershipType extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="fixed_period_rollover_day", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
@@ -162,6 +174,7 @@ class MembershipType extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="relationship_type_id", type="string", length=64, nullable=true)
    * 
    */
@@ -170,6 +183,7 @@ class MembershipType extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="relationship_direction", type="string", length=128, nullable=true)
    * 
    */
@@ -178,6 +192,7 @@ class MembershipType extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="max_related", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
@@ -186,6 +201,7 @@ class MembershipType extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="visibility", type="string", length=64, nullable=true)
    * 
    */
@@ -194,6 +210,7 @@ class MembershipType extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="weight", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
@@ -202,6 +219,7 @@ class MembershipType extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="receipt_text_signup", type="string", length=255, nullable=true)
    * 
    */
@@ -210,6 +228,7 @@ class MembershipType extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="receipt_text_renewal", type="string", length=255, nullable=true)
    * 
    */
@@ -218,6 +237,7 @@ class MembershipType extends \Civi\Core\Entity {
   /**
    * @var boolean
    *
+   * @JMS\Type("boolean")
    * @ORM\Column(name="auto_renew", type="boolean", nullable=false)
    * 
    */
@@ -226,6 +246,7 @@ class MembershipType extends \Civi\Core\Entity {
   /**
    * @var boolean
    *
+   * @JMS\Type("boolean")
    * @ORM\Column(name="is_active", type="boolean", nullable=false)
    * 
    */

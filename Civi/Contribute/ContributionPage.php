@@ -65,6 +65,7 @@ class ContributionPage extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
@@ -74,6 +75,7 @@ class ContributionPage extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="title", type="string", length=255, nullable=true)
    * 
    */
@@ -82,6 +84,7 @@ class ContributionPage extends \Civi\Core\Entity {
   /**
    * @var text
    *
+   * @JMS\Type("text")
    * @ORM\Column(name="intro_text", type="text", nullable=true)
    * 
    */
@@ -90,6 +93,7 @@ class ContributionPage extends \Civi\Core\Entity {
   /**
    * @var \Civi\Financial\FinancialType
    *
+   * @JMS\Type("\Civi\Financial\FinancialType")
    * @ORM\ManyToOne(targetEntity="Civi\Financial\FinancialType")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="financial_type_id", referencedColumnName="id")})
    */
@@ -98,6 +102,7 @@ class ContributionPage extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="payment_processor", type="string", length=128, nullable=true)
    * 
    */
@@ -106,6 +111,7 @@ class ContributionPage extends \Civi\Core\Entity {
   /**
    * @var boolean
    *
+   * @JMS\Type("boolean")
    * @ORM\Column(name="is_credit_card_only", type="boolean", nullable=false)
    * 
    */
@@ -114,6 +120,7 @@ class ContributionPage extends \Civi\Core\Entity {
   /**
    * @var boolean
    *
+   * @JMS\Type("boolean")
    * @ORM\Column(name="is_monetary", type="boolean", nullable=false)
    * 
    */
@@ -122,6 +129,7 @@ class ContributionPage extends \Civi\Core\Entity {
   /**
    * @var boolean
    *
+   * @JMS\Type("boolean")
    * @ORM\Column(name="is_recur", type="boolean", nullable=false)
    * 
    */
@@ -130,6 +138,7 @@ class ContributionPage extends \Civi\Core\Entity {
   /**
    * @var boolean
    *
+   * @JMS\Type("boolean")
    * @ORM\Column(name="is_confirm_enabled", type="boolean", nullable=false)
    * 
    */
@@ -138,6 +147,7 @@ class ContributionPage extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="recur_frequency_unit", type="string", length=128, nullable=true)
    * 
    */
@@ -146,6 +156,7 @@ class ContributionPage extends \Civi\Core\Entity {
   /**
    * @var boolean
    *
+   * @JMS\Type("boolean")
    * @ORM\Column(name="is_recur_interval", type="boolean", nullable=false)
    * 
    */
@@ -154,6 +165,7 @@ class ContributionPage extends \Civi\Core\Entity {
   /**
    * @var boolean
    *
+   * @JMS\Type("boolean")
    * @ORM\Column(name="is_recur_installments", type="boolean", nullable=false)
    * 
    */
@@ -162,6 +174,7 @@ class ContributionPage extends \Civi\Core\Entity {
   /**
    * @var boolean
    *
+   * @JMS\Type("boolean")
    * @ORM\Column(name="is_pay_later", type="boolean", nullable=false)
    * 
    */
@@ -170,6 +183,7 @@ class ContributionPage extends \Civi\Core\Entity {
   /**
    * @var text
    *
+   * @JMS\Type("text")
    * @ORM\Column(name="pay_later_text", type="text", nullable=true)
    * 
    */
@@ -178,6 +192,7 @@ class ContributionPage extends \Civi\Core\Entity {
   /**
    * @var text
    *
+   * @JMS\Type("text")
    * @ORM\Column(name="pay_later_receipt", type="text", nullable=true)
    * 
    */
@@ -186,6 +201,7 @@ class ContributionPage extends \Civi\Core\Entity {
   /**
    * @var boolean
    *
+   * @JMS\Type("boolean")
    * @ORM\Column(name="is_partial_payment", type="boolean", nullable=false)
    * 
    */
@@ -194,6 +210,7 @@ class ContributionPage extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="initial_amount_label", type="string", length=255, nullable=true)
    * 
    */
@@ -202,6 +219,7 @@ class ContributionPage extends \Civi\Core\Entity {
   /**
    * @var text
    *
+   * @JMS\Type("text")
    * @ORM\Column(name="initial_amount_help_text", type="text", nullable=true)
    * 
    */
@@ -210,6 +228,7 @@ class ContributionPage extends \Civi\Core\Entity {
   /**
    * @var float
    *
+   * @JMS\Type("float")
    * @ORM\Column(name="min_initial_amount", type="float", nullable=true)
    * 
    */
@@ -218,6 +237,7 @@ class ContributionPage extends \Civi\Core\Entity {
   /**
    * @var boolean
    *
+   * @JMS\Type("boolean")
    * @ORM\Column(name="is_allow_other_amount", type="boolean", nullable=false)
    * 
    */
@@ -226,6 +246,7 @@ class ContributionPage extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="default_amount_id", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
@@ -234,6 +255,7 @@ class ContributionPage extends \Civi\Core\Entity {
   /**
    * @var float
    *
+   * @JMS\Type("float")
    * @ORM\Column(name="min_amount", type="float", nullable=true)
    * 
    */
@@ -242,6 +264,7 @@ class ContributionPage extends \Civi\Core\Entity {
   /**
    * @var float
    *
+   * @JMS\Type("float")
    * @ORM\Column(name="max_amount", type="float", nullable=true)
    * 
    */
@@ -250,6 +273,7 @@ class ContributionPage extends \Civi\Core\Entity {
   /**
    * @var float
    *
+   * @JMS\Type("float")
    * @ORM\Column(name="goal_amount", type="float", nullable=true)
    * 
    */
@@ -258,6 +282,7 @@ class ContributionPage extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="thankyou_title", type="string", length=255, nullable=true)
    * 
    */
@@ -266,6 +291,7 @@ class ContributionPage extends \Civi\Core\Entity {
   /**
    * @var text
    *
+   * @JMS\Type("text")
    * @ORM\Column(name="thankyou_text", type="text", nullable=true)
    * 
    */
@@ -274,6 +300,7 @@ class ContributionPage extends \Civi\Core\Entity {
   /**
    * @var text
    *
+   * @JMS\Type("text")
    * @ORM\Column(name="thankyou_footer", type="text", nullable=true)
    * 
    */
@@ -282,6 +309,7 @@ class ContributionPage extends \Civi\Core\Entity {
   /**
    * @var boolean
    *
+   * @JMS\Type("boolean")
    * @ORM\Column(name="is_for_organization", type="boolean", nullable=false)
    * 
    */
@@ -290,6 +318,7 @@ class ContributionPage extends \Civi\Core\Entity {
   /**
    * @var text
    *
+   * @JMS\Type("text")
    * @ORM\Column(name="for_organization", type="text", nullable=true)
    * 
    */
@@ -298,6 +327,7 @@ class ContributionPage extends \Civi\Core\Entity {
   /**
    * @var boolean
    *
+   * @JMS\Type("boolean")
    * @ORM\Column(name="is_email_receipt", type="boolean", nullable=false)
    * 
    */
@@ -306,6 +336,7 @@ class ContributionPage extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="receipt_from_name", type="string", length=255, nullable=true)
    * 
    */
@@ -314,6 +345,7 @@ class ContributionPage extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="receipt_from_email", type="string", length=255, nullable=true)
    * 
    */
@@ -322,6 +354,7 @@ class ContributionPage extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="cc_receipt", type="string", length=255, nullable=true)
    * 
    */
@@ -330,6 +363,7 @@ class ContributionPage extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="bcc_receipt", type="string", length=255, nullable=true)
    * 
    */
@@ -338,6 +372,7 @@ class ContributionPage extends \Civi\Core\Entity {
   /**
    * @var text
    *
+   * @JMS\Type("text")
    * @ORM\Column(name="receipt_text", type="text", nullable=true)
    * 
    */
@@ -346,6 +381,7 @@ class ContributionPage extends \Civi\Core\Entity {
   /**
    * @var boolean
    *
+   * @JMS\Type("boolean")
    * @ORM\Column(name="is_active", type="boolean", nullable=true)
    * 
    */
@@ -354,6 +390,7 @@ class ContributionPage extends \Civi\Core\Entity {
   /**
    * @var text
    *
+   * @JMS\Type("text")
    * @ORM\Column(name="footer_text", type="text", nullable=true)
    * 
    */
@@ -362,6 +399,7 @@ class ContributionPage extends \Civi\Core\Entity {
   /**
    * @var boolean
    *
+   * @JMS\Type("boolean")
    * @ORM\Column(name="amount_block_is_active", type="boolean", nullable=false)
    * 
    */
@@ -370,6 +408,7 @@ class ContributionPage extends \Civi\Core\Entity {
   /**
    * @var boolean
    *
+   * @JMS\Type("boolean")
    * @ORM\Column(name="honor_block_is_active", type="boolean", nullable=true)
    * 
    */
@@ -378,6 +417,7 @@ class ContributionPage extends \Civi\Core\Entity {
   /**
    * @var datetime
    *
+   * @JMS\Type("datetime")
    * @ORM\Column(name="start_date", type="datetime", nullable=true)
    * 
    */
@@ -386,6 +426,7 @@ class ContributionPage extends \Civi\Core\Entity {
   /**
    * @var datetime
    *
+   * @JMS\Type("datetime")
    * @ORM\Column(name="end_date", type="datetime", nullable=true)
    * 
    */
@@ -394,6 +435,7 @@ class ContributionPage extends \Civi\Core\Entity {
   /**
    * @var \Civi\Contact\Contact
    *
+   * @JMS\Type("\Civi\Contact\Contact")
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Contact")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="created_id", referencedColumnName="id", onDelete="SET NULL")})
    */
@@ -402,6 +444,7 @@ class ContributionPage extends \Civi\Core\Entity {
   /**
    * @var datetime
    *
+   * @JMS\Type("datetime")
    * @ORM\Column(name="created_date", type="datetime", nullable=true)
    * 
    */
@@ -410,6 +453,7 @@ class ContributionPage extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="currency", type="string", length=3, nullable=false)
    * 
    */
@@ -418,6 +462,7 @@ class ContributionPage extends \Civi\Core\Entity {
   /**
    * @var \Civi\Campaign\Campaign
    *
+   * @JMS\Type("\Civi\Campaign\Campaign")
    * @ORM\ManyToOne(targetEntity="Civi\Campaign\Campaign")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="campaign_id", referencedColumnName="id", onDelete="SET NULL")})
    */
@@ -426,6 +471,7 @@ class ContributionPage extends \Civi\Core\Entity {
   /**
    * @var boolean
    *
+   * @JMS\Type("boolean")
    * @ORM\Column(name="is_share", type="boolean", nullable=false)
    * 
    */

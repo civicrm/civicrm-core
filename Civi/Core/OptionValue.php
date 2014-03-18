@@ -65,6 +65,7 @@ class OptionValue extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
@@ -74,6 +75,7 @@ class OptionValue extends \Civi\Core\Entity {
   /**
    * @var \Civi\Core\OptionGroup
    *
+   * @JMS\Type("\Civi\Core\OptionGroup")
    * @ORM\ManyToOne(targetEntity="Civi\Core\OptionGroup")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="option_group_id", referencedColumnName="id", onDelete="CASCADE")})
    */
@@ -82,6 +84,7 @@ class OptionValue extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="label", type="string", length=255, nullable=true)
    * 
    */
@@ -90,6 +93,7 @@ class OptionValue extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="value", type="string", length=512, nullable=true)
    * 
    */
@@ -98,6 +102,7 @@ class OptionValue extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="name", type="string", length=255, nullable=true)
    * 
    */
@@ -106,6 +111,7 @@ class OptionValue extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="grouping", type="string", length=255, nullable=true)
    * 
    */
@@ -114,6 +120,7 @@ class OptionValue extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="filter", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
@@ -122,6 +129,7 @@ class OptionValue extends \Civi\Core\Entity {
   /**
    * @var boolean
    *
+   * @JMS\Type("boolean")
    * @ORM\Column(name="is_default", type="boolean", nullable=false)
    * 
    */
@@ -130,6 +138,7 @@ class OptionValue extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="weight", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
@@ -138,6 +147,7 @@ class OptionValue extends \Civi\Core\Entity {
   /**
    * @var text
    *
+   * @JMS\Type("text")
    * @ORM\Column(name="description", type="text", nullable=true)
    * 
    */
@@ -146,6 +156,7 @@ class OptionValue extends \Civi\Core\Entity {
   /**
    * @var boolean
    *
+   * @JMS\Type("boolean")
    * @ORM\Column(name="is_optgroup", type="boolean", nullable=false)
    * 
    */
@@ -154,6 +165,7 @@ class OptionValue extends \Civi\Core\Entity {
   /**
    * @var boolean
    *
+   * @JMS\Type("boolean")
    * @ORM\Column(name="is_reserved", type="boolean", nullable=false)
    * 
    */
@@ -162,6 +174,7 @@ class OptionValue extends \Civi\Core\Entity {
   /**
    * @var boolean
    *
+   * @JMS\Type("boolean")
    * @ORM\Column(name="is_active", type="boolean", nullable=false)
    * 
    */
@@ -170,6 +183,7 @@ class OptionValue extends \Civi\Core\Entity {
   /**
    * @var \Civi\Core\Component
    *
+   * @JMS\Type("\Civi\Core\Component")
    * @ORM\ManyToOne(targetEntity="Civi\Core\Component")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="component_id", referencedColumnName="id")})
    */
@@ -178,6 +192,7 @@ class OptionValue extends \Civi\Core\Entity {
   /**
    * @var \Civi\Core\Domain
    *
+   * @JMS\Type("\Civi\Core\Domain")
    * @ORM\ManyToOne(targetEntity="Civi\Core\Domain")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="domain_id", referencedColumnName="id")})
    */
@@ -186,6 +201,7 @@ class OptionValue extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="visibility_id", type="integer", nullable=false, options={"unsigned":true})
    * 
    */

@@ -65,6 +65,7 @@ class FinancialAccount extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
@@ -74,6 +75,7 @@ class FinancialAccount extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="name", type="string", length=255, nullable=true)
    * 
    */
@@ -82,6 +84,7 @@ class FinancialAccount extends \Civi\Core\Entity {
   /**
    * @var \Civi\Contact\Contact
    *
+   * @JMS\Type("\Civi\Contact\Contact")
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Contact")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="contact_id", referencedColumnName="id", onDelete="SET NULL")})
    */
@@ -90,6 +93,7 @@ class FinancialAccount extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="financial_account_type_id", type="integer", nullable=false, options={"unsigned":true})
    * 
    */
@@ -98,6 +102,7 @@ class FinancialAccount extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="accounting_code", type="string", length=64, nullable=true)
    * 
    */
@@ -106,6 +111,7 @@ class FinancialAccount extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="account_type_code", type="string", length=64, nullable=true)
    * 
    */
@@ -114,6 +120,7 @@ class FinancialAccount extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="description", type="string", length=255, nullable=true)
    * 
    */
@@ -122,6 +129,7 @@ class FinancialAccount extends \Civi\Core\Entity {
   /**
    * @var \Civi\Financial\FinancialAccount
    *
+   * @JMS\Type("\Civi\Financial\FinancialAccount")
    * @ORM\ManyToOne(targetEntity="Civi\Financial\FinancialAccount")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="parent_id", referencedColumnName="id")})
    */
@@ -130,6 +138,7 @@ class FinancialAccount extends \Civi\Core\Entity {
   /**
    * @var boolean
    *
+   * @JMS\Type("boolean")
    * @ORM\Column(name="is_header_account", type="boolean", nullable=false)
    * 
    */
@@ -138,6 +147,7 @@ class FinancialAccount extends \Civi\Core\Entity {
   /**
    * @var boolean
    *
+   * @JMS\Type("boolean")
    * @ORM\Column(name="is_deductible", type="boolean", nullable=false)
    * 
    */
@@ -146,6 +156,7 @@ class FinancialAccount extends \Civi\Core\Entity {
   /**
    * @var boolean
    *
+   * @JMS\Type("boolean")
    * @ORM\Column(name="is_tax", type="boolean", nullable=false)
    * 
    */
@@ -154,6 +165,7 @@ class FinancialAccount extends \Civi\Core\Entity {
   /**
    * @var float
    *
+   * @JMS\Type("float")
    * @ORM\Column(name="tax_rate", type="float", nullable=true)
    * 
    */
@@ -162,6 +174,7 @@ class FinancialAccount extends \Civi\Core\Entity {
   /**
    * @var boolean
    *
+   * @JMS\Type("boolean")
    * @ORM\Column(name="is_reserved", type="boolean", nullable=true)
    * 
    */
@@ -170,6 +183,7 @@ class FinancialAccount extends \Civi\Core\Entity {
   /**
    * @var boolean
    *
+   * @JMS\Type("boolean")
    * @ORM\Column(name="is_active", type="boolean", nullable=true)
    * 
    */
@@ -178,6 +192,7 @@ class FinancialAccount extends \Civi\Core\Entity {
   /**
    * @var boolean
    *
+   * @JMS\Type("boolean")
    * @ORM\Column(name="is_default", type="boolean", nullable=true)
    * 
    */

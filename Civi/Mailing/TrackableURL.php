@@ -65,6 +65,7 @@ class TrackableURL extends \Civi\Core\Entity {
   /**
    * @var integer
    *
+   * @JMS\Type("integer")
    * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
@@ -74,6 +75,7 @@ class TrackableURL extends \Civi\Core\Entity {
   /**
    * @var string
    *
+   * @JMS\Type("string")
    * @ORM\Column(name="url", type="string", length=255, nullable=true)
    * 
    */
@@ -82,6 +84,7 @@ class TrackableURL extends \Civi\Core\Entity {
   /**
    * @var \Civi\Mailing\Mailing
    *
+   * @JMS\Type("\Civi\Mailing\Mailing")
    * @ORM\ManyToOne(targetEntity="Civi\Mailing\Mailing")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="mailing_id", referencedColumnName="id", onDelete="CASCADE")})
    */
