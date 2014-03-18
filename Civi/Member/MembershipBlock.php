@@ -39,19 +39,33 @@ namespace Civi\Member;
 require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
+use Hateoas\Configuration\Annotation as Hateoas;
+use Civi\API\Annotation as CiviAPI;
+use JMS\Serializer\Annotation as JMS;
 
 /**
  * MembershipBlock
  *
+ * @CiviAPI\Entity("MembershipBlock")
+ * @CiviAPI\Permission()
  * @ORM\Table(name="civicrm_membership_block", indexes={@ORM\Index(name="FK_civicrm_membership_block_entity_id", columns={"entity_id"}),@ORM\Index(name="FK_civicrm_membership_block_membership_type_default", columns={"membership_type_default"})})
  * @ORM\Entity
+ * @Hateoas\Relation("self",
+ *   href = @Hateoas\Route(
+ *    "MembershipBlock_get",
+ *    parameters = { "id" = "expr(object.getId())" },
+ *    absolute = true,
+ *    generator = "civi"
+ *  )
+ * )
+ *
  */
 class MembershipBlock extends \Civi\Core\Entity {
 
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */

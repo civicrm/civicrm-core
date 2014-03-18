@@ -39,19 +39,33 @@ namespace Civi\Price;
 require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
+use Hateoas\Configuration\Annotation as Hateoas;
+use Civi\API\Annotation as CiviAPI;
+use JMS\Serializer\Annotation as JMS;
 
 /**
  * LineItem
  *
+ * @CiviAPI\Entity("LineItem")
+ * @CiviAPI\Permission()
  * @ORM\Table(name="civicrm_line_item", uniqueConstraints={@ORM\UniqueConstraint(name="UI_line_item_value", columns={"entity_table","entity_id","price_field_value_id","price_field_id"})}, indexes={@ORM\Index(name="index_entity", columns={"entity_table","entity_id"}),@ORM\Index(name="FK_civicrm_line_item_price_field_id", columns={"price_field_id"}),@ORM\Index(name="FK_civicrm_line_item_price_field_value_id", columns={"price_field_value_id"}),@ORM\Index(name="FK_civicrm_line_item_financial_type_id", columns={"financial_type_id"})})
  * @ORM\Entity
+ * @Hateoas\Relation("self",
+ *   href = @Hateoas\Route(
+ *    "LineItem_get",
+ *    parameters = { "id" = "expr(object.getId())" },
+ *    absolute = true,
+ *    generator = "civi"
+ *  )
+ * )
+ *
  */
 class LineItem extends \Civi\Core\Entity {
 
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -68,7 +82,7 @@ class LineItem extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="entity_id", type="integer", nullable=true)
+   * @ORM\Column(name="entity_id", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
   private $entityId;
@@ -92,7 +106,7 @@ class LineItem extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="qty", type="integer", nullable=true)
+   * @ORM\Column(name="qty", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
   private $qty;
@@ -116,7 +130,7 @@ class LineItem extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="participant_count", type="integer", nullable=false)
+   * @ORM\Column(name="participant_count", type="integer", nullable=false, options={"unsigned":true})
    * 
    */
   private $participantCount = 'NULL';

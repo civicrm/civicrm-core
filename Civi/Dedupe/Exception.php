@@ -39,19 +39,33 @@ namespace Civi\Dedupe;
 require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
+use Hateoas\Configuration\Annotation as Hateoas;
+use Civi\API\Annotation as CiviAPI;
+use JMS\Serializer\Annotation as JMS;
 
 /**
  * Exception
  *
+ * @CiviAPI\Entity("Exception")
+ * @CiviAPI\Permission()
  * @ORM\Table(name="civicrm_dedupe_exception", uniqueConstraints={@ORM\UniqueConstraint(name="UI_contact_id1_contact_id2", columns={"contact_id1","contact_id2"})}, indexes={@ORM\Index(name="FK_civicrm_dedupe_exception_contact_id1", columns={"contact_id1"}),@ORM\Index(name="FK_civicrm_dedupe_exception_contact_id2", columns={"contact_id2"})})
  * @ORM\Entity
+ * @Hateoas\Relation("self",
+ *   href = @Hateoas\Route(
+ *    "Exception_get",
+ *    parameters = { "id" = "expr(object.getId())" },
+ *    absolute = true,
+ *    generator = "civi"
+ *  )
+ * )
+ *
  */
 class Exception extends \Civi\Core\Entity {
 
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */

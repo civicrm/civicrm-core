@@ -39,19 +39,33 @@ namespace Civi\PCP;
 require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
+use Hateoas\Configuration\Annotation as Hateoas;
+use Civi\API\Annotation as CiviAPI;
+use JMS\Serializer\Annotation as JMS;
 
 /**
  * PCPBlock
  *
+ * @CiviAPI\Entity("PCPBlock")
+ * @CiviAPI\Permission()
  * @ORM\Table(name="civicrm_pcp_block", indexes={@ORM\Index(name="FK_civicrm_pcp_block_supporter_profile_id", columns={"supporter_profile_id"})})
  * @ORM\Entity
+ * @Hateoas\Relation("self",
+ *   href = @Hateoas\Route(
+ *    "PCPBlock_get",
+ *    parameters = { "id" = "expr(object.getId())" },
+ *    absolute = true,
+ *    generator = "civi"
+ *  )
+ * )
+ *
  */
 class PCPBlock extends \Civi\Core\Entity {
 
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -68,7 +82,7 @@ class PCPBlock extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="entity_id", type="integer", nullable=true)
+   * @ORM\Column(name="entity_id", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
   private $entityId;
@@ -84,7 +98,7 @@ class PCPBlock extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="target_entity_id", type="integer", nullable=true)
+   * @ORM\Column(name="target_entity_id", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
   private $targetEntityId;
@@ -116,7 +130,7 @@ class PCPBlock extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="tellfriend_limit", type="integer", nullable=false)
+   * @ORM\Column(name="tellfriend_limit", type="integer", nullable=false, options={"unsigned":true})
    * 
    */
   private $tellfriendLimit = 'NULL';

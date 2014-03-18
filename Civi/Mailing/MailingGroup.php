@@ -39,19 +39,33 @@ namespace Civi\Mailing;
 require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
+use Hateoas\Configuration\Annotation as Hateoas;
+use Civi\API\Annotation as CiviAPI;
+use JMS\Serializer\Annotation as JMS;
 
 /**
  * MailingGroup
  *
+ * @CiviAPI\Entity("MailingGroup")
+ * @CiviAPI\Permission()
  * @ORM\Table(name="civicrm_mailing_group", indexes={@ORM\Index(name="FK_civicrm_mailing_group_mailing_id", columns={"mailing_id"})})
  * @ORM\Entity
+ * @Hateoas\Relation("self",
+ *   href = @Hateoas\Route(
+ *    "MailingGroup_get",
+ *    parameters = { "id" = "expr(object.getId())" },
+ *    absolute = true,
+ *    generator = "civi"
+ *  )
+ * )
+ *
  */
 class MailingGroup extends \Civi\Core\Entity {
 
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -84,7 +98,7 @@ class MailingGroup extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="entity_id", type="integer", nullable=true)
+   * @ORM\Column(name="entity_id", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
   private $entityId;
@@ -92,7 +106,7 @@ class MailingGroup extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="search_id", type="integer", nullable=true)
+   * @ORM\Column(name="search_id", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
   private $searchId;

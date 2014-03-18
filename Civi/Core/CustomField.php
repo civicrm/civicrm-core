@@ -39,19 +39,33 @@ namespace Civi\Core;
 require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
+use Hateoas\Configuration\Annotation as Hateoas;
+use Civi\API\Annotation as CiviAPI;
+use JMS\Serializer\Annotation as JMS;
 
 /**
  * CustomField
  *
+ * @CiviAPI\Entity("CustomField")
+ * @CiviAPI\Permission()
  * @ORM\Table(name="civicrm_custom_field", uniqueConstraints={@ORM\UniqueConstraint(name="UI_label_custom_group_id", columns={"label","custom_group_id"}),@ORM\UniqueConstraint(name="UI_name_custom_group_id", columns={"name","custom_group_id"})}, indexes={@ORM\Index(name="FK_civicrm_custom_field_custom_group_id", columns={"custom_group_id"})})
  * @ORM\Entity
+ * @Hateoas\Relation("self",
+ *   href = @Hateoas\Route(
+ *    "CustomField_get",
+ *    parameters = { "id" = "expr(object.getId())" },
+ *    absolute = true,
+ *    generator = "civi"
+ *  )
+ * )
+ *
  */
 class CustomField extends \Civi\Core\Entity {
 
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -132,7 +146,7 @@ class CustomField extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="weight", type="integer", nullable=false)
+   * @ORM\Column(name="weight", type="integer", nullable=false, options={"unsigned":true})
    * 
    */
   private $weight = '1';
@@ -196,7 +210,7 @@ class CustomField extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="options_per_line", type="integer", nullable=true)
+   * @ORM\Column(name="options_per_line", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
   private $optionsPerLine;
@@ -204,7 +218,7 @@ class CustomField extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="text_length", type="integer", nullable=true)
+   * @ORM\Column(name="text_length", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
   private $textLength;
@@ -212,7 +226,7 @@ class CustomField extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="start_date_years", type="integer", nullable=true)
+   * @ORM\Column(name="start_date_years", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
   private $startDateYears;
@@ -220,7 +234,7 @@ class CustomField extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="end_date_years", type="integer", nullable=true)
+   * @ORM\Column(name="end_date_years", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
   private $endDateYears;
@@ -236,7 +250,7 @@ class CustomField extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="time_format", type="integer", nullable=true)
+   * @ORM\Column(name="time_format", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
   private $timeFormat;
@@ -244,7 +258,7 @@ class CustomField extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="note_columns", type="integer", nullable=true)
+   * @ORM\Column(name="note_columns", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
   private $noteColumns;
@@ -252,7 +266,7 @@ class CustomField extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="note_rows", type="integer", nullable=true)
+   * @ORM\Column(name="note_rows", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
   private $noteRows;
@@ -268,7 +282,7 @@ class CustomField extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="option_group_id", type="integer", nullable=true)
+   * @ORM\Column(name="option_group_id", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
   private $optionGroupId;

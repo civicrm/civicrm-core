@@ -39,19 +39,33 @@ namespace Civi\Price;
 require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
+use Hateoas\Configuration\Annotation as Hateoas;
+use Civi\API\Annotation as CiviAPI;
+use JMS\Serializer\Annotation as JMS;
 
 /**
  * PriceSetEntity
  *
+ * @CiviAPI\Entity("PriceSetEntity")
+ * @CiviAPI\Permission()
  * @ORM\Table(name="civicrm_price_set_entity", uniqueConstraints={@ORM\UniqueConstraint(name="UI_entity", columns={"entity_table","entity_id"})}, indexes={@ORM\Index(name="FK_civicrm_price_set_entity_price_set_id", columns={"price_set_id"})})
  * @ORM\Entity
+ * @Hateoas\Relation("self",
+ *   href = @Hateoas\Route(
+ *    "PriceSetEntity_get",
+ *    parameters = { "id" = "expr(object.getId())" },
+ *    absolute = true,
+ *    generator = "civi"
+ *  )
+ * )
+ *
  */
 class PriceSetEntity extends \Civi\Core\Entity {
 
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -68,7 +82,7 @@ class PriceSetEntity extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="entity_id", type="integer", nullable=true)
+   * @ORM\Column(name="entity_id", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
   private $entityId;

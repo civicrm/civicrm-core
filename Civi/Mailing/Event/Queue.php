@@ -39,19 +39,33 @@ namespace Civi\Mailing\Event;
 require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
+use Hateoas\Configuration\Annotation as Hateoas;
+use Civi\API\Annotation as CiviAPI;
+use JMS\Serializer\Annotation as JMS;
 
 /**
  * Queue
  *
+ * @CiviAPI\Entity("Queue")
+ * @CiviAPI\Permission()
  * @ORM\Table(name="civicrm_mailing_event_queue", indexes={@ORM\Index(name="FK_civicrm_mailing_event_queue_job_id", columns={"job_id"}),@ORM\Index(name="FK_civicrm_mailing_event_queue_email_id", columns={"email_id"}),@ORM\Index(name="FK_civicrm_mailing_event_queue_contact_id", columns={"contact_id"}),@ORM\Index(name="FK_civicrm_mailing_event_queue_phone_id", columns={"phone_id"})})
  * @ORM\Entity
+ * @Hateoas\Relation("self",
+ *   href = @Hateoas\Route(
+ *    "Queue_get",
+ *    parameters = { "id" = "expr(object.getId())" },
+ *    absolute = true,
+ *    generator = "civi"
+ *  )
+ * )
+ *
  */
 class Queue extends \Civi\Core\Entity {
 
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */

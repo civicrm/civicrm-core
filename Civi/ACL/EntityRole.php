@@ -39,19 +39,33 @@ namespace Civi\ACL;
 require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
+use Hateoas\Configuration\Annotation as Hateoas;
+use Civi\API\Annotation as CiviAPI;
+use JMS\Serializer\Annotation as JMS;
 
 /**
  * EntityRole
  *
+ * @CiviAPI\Entity("EntityRole")
+ * @CiviAPI\Permission()
  * @ORM\Table(name="civicrm_acl_entity_role", indexes={@ORM\Index(name="index_role", columns={"acl_role_id"}),@ORM\Index(name="index_entity", columns={"entity_table","entity_id"})})
  * @ORM\Entity
+ * @Hateoas\Relation("self",
+ *   href = @Hateoas\Route(
+ *    "EntityRole_get",
+ *    parameters = { "id" = "expr(object.getId())" },
+ *    absolute = true,
+ *    generator = "civi"
+ *  )
+ * )
+ *
  */
 class EntityRole extends \Civi\Core\Entity {
 
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -60,7 +74,7 @@ class EntityRole extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="acl_role_id", type="integer", nullable=true)
+   * @ORM\Column(name="acl_role_id", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
   private $aclRoleId;
@@ -76,7 +90,7 @@ class EntityRole extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="entity_id", type="integer", nullable=true)
+   * @ORM\Column(name="entity_id", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
   private $entityId;

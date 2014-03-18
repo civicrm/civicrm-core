@@ -39,19 +39,33 @@ namespace Civi\Core;
 require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
+use Hateoas\Configuration\Annotation as Hateoas;
+use Civi\API\Annotation as CiviAPI;
+use JMS\Serializer\Annotation as JMS;
 
 /**
  * UFGroup
  *
+ * @CiviAPI\Entity("UFGroup")
+ * @CiviAPI\Permission()
  * @ORM\Table(name="civicrm_uf_group", indexes={@ORM\Index(name="FK_civicrm_uf_group_limit_listings_group_id", columns={"limit_listings_group_id"}),@ORM\Index(name="FK_civicrm_uf_group_add_to_group_id", columns={"add_to_group_id"}),@ORM\Index(name="FK_civicrm_uf_group_created_id", columns={"created_id"})})
  * @ORM\Entity
+ * @Hateoas\Relation("self",
+ *   href = @Hateoas\Route(
+ *    "UFGroup_get",
+ *    parameters = { "id" = "expr(object.getId())" },
+ *    absolute = true,
+ *    generator = "civi"
+ *  )
+ * )
+ *
  */
 class UFGroup extends \Civi\Core\Entity {
 
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */

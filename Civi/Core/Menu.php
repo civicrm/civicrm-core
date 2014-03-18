@@ -39,19 +39,33 @@ namespace Civi\Core;
 require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
+use Hateoas\Configuration\Annotation as Hateoas;
+use Civi\API\Annotation as CiviAPI;
+use JMS\Serializer\Annotation as JMS;
 
 /**
  * Menu
  *
+ * @CiviAPI\Entity("Menu")
+ * @CiviAPI\Permission()
  * @ORM\Table(name="civicrm_menu", uniqueConstraints={@ORM\UniqueConstraint(name="UI_path_domain_id", columns={"path","domain_id"})}, indexes={@ORM\Index(name="FK_civicrm_menu_domain_id", columns={"domain_id"}),@ORM\Index(name="FK_civicrm_menu_component_id", columns={"component_id"})})
  * @ORM\Entity
+ * @Hateoas\Relation("self",
+ *   href = @Hateoas\Route(
+ *    "Menu_get",
+ *    parameters = { "id" = "expr(object.getId())" },
+ *    absolute = true,
+ *    generator = "civi"
+ *  )
+ * )
+ *
  */
 class Menu extends \Civi\Core\Entity {
 
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -188,7 +202,7 @@ class Menu extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="weight", type="integer", nullable=false)
+   * @ORM\Column(name="weight", type="integer", nullable=false, options={"unsigned":true})
    * 
    */
   private $weight = '1';
@@ -196,7 +210,7 @@ class Menu extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="type", type="integer", nullable=false)
+   * @ORM\Column(name="type", type="integer", nullable=false, options={"unsigned":true})
    * 
    */
   private $type = '1';
@@ -204,7 +218,7 @@ class Menu extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="page_type", type="integer", nullable=false)
+   * @ORM\Column(name="page_type", type="integer", nullable=false, options={"unsigned":true})
    * 
    */
   private $pageType = '1';

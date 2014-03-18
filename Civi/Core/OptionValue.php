@@ -39,19 +39,33 @@ namespace Civi\Core;
 require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
+use Hateoas\Configuration\Annotation as Hateoas;
+use Civi\API\Annotation as CiviAPI;
+use JMS\Serializer\Annotation as JMS;
 
 /**
  * OptionValue
  *
+ * @CiviAPI\Entity("OptionValue")
+ * @CiviAPI\Permission()
  * @ORM\Table(name="civicrm_option_value", indexes={@ORM\Index(name="index_option_group_id_value", columns={"value","option_group_id"}),@ORM\Index(name="index_option_group_id_name", columns={"name","option_group_id"}),@ORM\Index(name="FK_civicrm_option_value_option_group_id", columns={"option_group_id"}),@ORM\Index(name="FK_civicrm_option_value_component_id", columns={"component_id"}),@ORM\Index(name="FK_civicrm_option_value_domain_id", columns={"domain_id"})})
  * @ORM\Entity
+ * @Hateoas\Relation("self",
+ *   href = @Hateoas\Route(
+ *    "OptionValue_get",
+ *    parameters = { "id" = "expr(object.getId())" },
+ *    absolute = true,
+ *    generator = "civi"
+ *  )
+ * )
+ *
  */
 class OptionValue extends \Civi\Core\Entity {
 
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -100,7 +114,7 @@ class OptionValue extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="filter", type="integer", nullable=true)
+   * @ORM\Column(name="filter", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
   private $filter;
@@ -116,7 +130,7 @@ class OptionValue extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="weight", type="integer", nullable=true)
+   * @ORM\Column(name="weight", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
   private $weight;
@@ -172,7 +186,7 @@ class OptionValue extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="visibility_id", type="integer", nullable=false)
+   * @ORM\Column(name="visibility_id", type="integer", nullable=false, options={"unsigned":true})
    * 
    */
   private $visibilityId = 'NULL';

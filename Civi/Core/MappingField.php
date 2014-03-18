@@ -39,19 +39,33 @@ namespace Civi\Core;
 require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
+use Hateoas\Configuration\Annotation as Hateoas;
+use Civi\API\Annotation as CiviAPI;
+use JMS\Serializer\Annotation as JMS;
 
 /**
  * MappingField
  *
+ * @CiviAPI\Entity("MappingField")
+ * @CiviAPI\Permission()
  * @ORM\Table(name="civicrm_mapping_field", indexes={@ORM\Index(name="FK_civicrm_mapping_field_mapping_id", columns={"mapping_id"}),@ORM\Index(name="FK_civicrm_mapping_field_location_type_id", columns={"location_type_id"}),@ORM\Index(name="FK_civicrm_mapping_field_relationship_type_id", columns={"relationship_type_id"})})
  * @ORM\Entity
+ * @Hateoas\Relation("self",
+ *   href = @Hateoas\Route(
+ *    "MappingField_get",
+ *    parameters = { "id" = "expr(object.getId())" },
+ *    absolute = true,
+ *    generator = "civi"
+ *  )
+ * )
+ *
  */
 class MappingField extends \Civi\Core\Entity {
 
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -84,7 +98,7 @@ class MappingField extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="column_number", type="integer", nullable=true)
+   * @ORM\Column(name="column_number", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
   private $columnNumber;
@@ -100,7 +114,7 @@ class MappingField extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="phone_type_id", type="integer", nullable=true)
+   * @ORM\Column(name="phone_type_id", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
   private $phoneTypeId;
@@ -108,7 +122,7 @@ class MappingField extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="im_provider_id", type="integer", nullable=true)
+   * @ORM\Column(name="im_provider_id", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
   private $imProviderId;
@@ -116,7 +130,7 @@ class MappingField extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="website_type_id", type="integer", nullable=true)
+   * @ORM\Column(name="website_type_id", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
   private $websiteTypeId;
@@ -140,7 +154,7 @@ class MappingField extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="grouping", type="integer", nullable=false)
+   * @ORM\Column(name="grouping", type="integer", nullable=false, options={"unsigned":true})
    * 
    */
   private $grouping = '1';

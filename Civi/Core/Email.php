@@ -39,19 +39,33 @@ namespace Civi\Core;
 require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
+use Hateoas\Configuration\Annotation as Hateoas;
+use Civi\API\Annotation as CiviAPI;
+use JMS\Serializer\Annotation as JMS;
 
 /**
  * Email
  *
+ * @CiviAPI\Entity("Email")
+ * @CiviAPI\Permission()
  * @ORM\Table(name="civicrm_email", indexes={@ORM\Index(name="index_location_type", columns={"location_type_id"}),@ORM\Index(name="UI_email", columns={"email"}),@ORM\Index(name="index_is_primary", columns={"is_primary"}),@ORM\Index(name="index_is_billing", columns={"is_billing"}),@ORM\Index(name="FK_civicrm_email_contact_id", columns={"contact_id"})})
  * @ORM\Entity
+ * @Hateoas\Relation("self",
+ *   href = @Hateoas\Route(
+ *    "Email_get",
+ *    parameters = { "id" = "expr(object.getId())" },
+ *    absolute = true,
+ *    generator = "civi"
+ *  )
+ * )
+ *
  */
 class Email extends \Civi\Core\Entity {
 
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -68,7 +82,7 @@ class Email extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="location_type_id", type="integer", nullable=true)
+   * @ORM\Column(name="location_type_id", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
   private $locationTypeId;

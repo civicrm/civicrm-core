@@ -39,19 +39,33 @@ namespace Civi\Contribute;
 require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
+use Hateoas\Configuration\Annotation as Hateoas;
+use Civi\API\Annotation as CiviAPI;
+use JMS\Serializer\Annotation as JMS;
 
 /**
  * ContributionPage
  *
+ * @CiviAPI\Entity("ContributionPage")
+ * @CiviAPI\Permission()
  * @ORM\Table(name="civicrm_contribution_page", indexes={@ORM\Index(name="FK_civicrm_contribution_page_financial_type_id", columns={"financial_type_id"}),@ORM\Index(name="FK_civicrm_contribution_page_created_id", columns={"created_id"}),@ORM\Index(name="FK_civicrm_contribution_page_campaign_id", columns={"campaign_id"})})
  * @ORM\Entity
+ * @Hateoas\Relation("self",
+ *   href = @Hateoas\Route(
+ *    "ContributionPage_get",
+ *    parameters = { "id" = "expr(object.getId())" },
+ *    absolute = true,
+ *    generator = "civi"
+ *  )
+ * )
+ *
  */
 class ContributionPage extends \Civi\Core\Entity {
 
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -212,7 +226,7 @@ class ContributionPage extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="default_amount_id", type="integer", nullable=true)
+   * @ORM\Column(name="default_amount_id", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
   private $defaultAmountId;

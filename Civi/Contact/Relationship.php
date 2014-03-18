@@ -39,19 +39,33 @@ namespace Civi\Contact;
 require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
+use Hateoas\Configuration\Annotation as Hateoas;
+use Civi\API\Annotation as CiviAPI;
+use JMS\Serializer\Annotation as JMS;
 
 /**
  * Relationship
  *
+ * @CiviAPI\Entity("Relationship")
+ * @CiviAPI\Permission()
  * @ORM\Table(name="civicrm_relationship", indexes={@ORM\Index(name="FK_civicrm_relationship_contact_id_a", columns={"contact_id_a"}),@ORM\Index(name="FK_civicrm_relationship_contact_id_b", columns={"contact_id_b"}),@ORM\Index(name="FK_civicrm_relationship_relationship_type_id", columns={"relationship_type_id"}),@ORM\Index(name="FK_civicrm_relationship_case_id", columns={"case_id"})})
  * @ORM\Entity
+ * @Hateoas\Relation("self",
+ *   href = @Hateoas\Route(
+ *    "Relationship_get",
+ *    parameters = { "id" = "expr(object.getId())" },
+ *    absolute = true,
+ *    generator = "civi"
+ *  )
+ * )
+ *
  */
 class Relationship extends \Civi\Core\Entity {
 
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */

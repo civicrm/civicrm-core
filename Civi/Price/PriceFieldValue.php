@@ -39,19 +39,33 @@ namespace Civi\Price;
 require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
+use Hateoas\Configuration\Annotation as Hateoas;
+use Civi\API\Annotation as CiviAPI;
+use JMS\Serializer\Annotation as JMS;
 
 /**
  * PriceFieldValue
  *
+ * @CiviAPI\Entity("PriceFieldValue")
+ * @CiviAPI\Permission()
  * @ORM\Table(name="civicrm_price_field_value", indexes={@ORM\Index(name="FK_civicrm_price_field_value_price_field_id", columns={"price_field_id"}),@ORM\Index(name="FK_civicrm_price_field_value_membership_type_id", columns={"membership_type_id"}),@ORM\Index(name="FK_civicrm_price_field_value_financial_type_id", columns={"financial_type_id"})})
  * @ORM\Entity
+ * @Hateoas\Relation("self",
+ *   href = @Hateoas\Route(
+ *    "PriceFieldValue_get",
+ *    parameters = { "id" = "expr(object.getId())" },
+ *    absolute = true,
+ *    generator = "civi"
+ *  )
+ * )
+ *
  */
 class PriceFieldValue extends \Civi\Core\Entity {
 
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -100,7 +114,7 @@ class PriceFieldValue extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="count", type="integer", nullable=false)
+   * @ORM\Column(name="count", type="integer", nullable=false, options={"unsigned":true})
    * 
    */
   private $count = 'NULL';
@@ -108,7 +122,7 @@ class PriceFieldValue extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="max_value", type="integer", nullable=false)
+   * @ORM\Column(name="max_value", type="integer", nullable=false, options={"unsigned":true})
    * 
    */
   private $maxValue = 'NULL';
@@ -116,7 +130,7 @@ class PriceFieldValue extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="weight", type="integer", nullable=false)
+   * @ORM\Column(name="weight", type="integer", nullable=false, options={"unsigned":true})
    * 
    */
   private $weight = '1';
@@ -132,7 +146,7 @@ class PriceFieldValue extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="membership_num_terms", type="integer", nullable=false)
+   * @ORM\Column(name="membership_num_terms", type="integer", nullable=false, options={"unsigned":true})
    * 
    */
   private $membershipNumTerms = 'NULL';

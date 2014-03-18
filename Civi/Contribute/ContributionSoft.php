@@ -39,19 +39,33 @@ namespace Civi\Contribute;
 require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
+use Hateoas\Configuration\Annotation as Hateoas;
+use Civi\API\Annotation as CiviAPI;
+use JMS\Serializer\Annotation as JMS;
 
 /**
  * ContributionSoft
  *
+ * @CiviAPI\Entity("ContributionSoft")
+ * @CiviAPI\Permission()
  * @ORM\Table(name="civicrm_contribution_soft", indexes={@ORM\Index(name="index_id", columns={"pcp_id"}),@ORM\Index(name="FK_civicrm_contribution_soft_contribution_id", columns={"contribution_id"}),@ORM\Index(name="FK_civicrm_contribution_soft_contact_id", columns={"contact_id"}),@ORM\Index(name="FK_civicrm_contribution_soft_pcp_id", columns={"pcp_id"})})
  * @ORM\Entity
+ * @Hateoas\Relation("self",
+ *   href = @Hateoas\Route(
+ *    "ContributionSoft_get",
+ *    parameters = { "id" = "expr(object.getId())" },
+ *    absolute = true,
+ *    generator = "civi"
+ *  )
+ * )
+ *
  */
 class ContributionSoft extends \Civi\Core\Entity {
 
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -124,7 +138,7 @@ class ContributionSoft extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="soft_credit_type_id", type="integer", nullable=false)
+   * @ORM\Column(name="soft_credit_type_id", type="integer", nullable=false, options={"unsigned":true})
    * 
    */
   private $softCreditTypeId = 'NULL';

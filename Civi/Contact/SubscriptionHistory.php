@@ -39,19 +39,33 @@ namespace Civi\Contact;
 require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
+use Hateoas\Configuration\Annotation as Hateoas;
+use Civi\API\Annotation as CiviAPI;
+use JMS\Serializer\Annotation as JMS;
 
 /**
  * SubscriptionHistory
  *
+ * @CiviAPI\Entity("SubscriptionHistory")
+ * @CiviAPI\Permission()
  * @ORM\Table(name="civicrm_subscription_history", indexes={@ORM\Index(name="FK_civicrm_subscription_history_contact_id", columns={"contact_id"}),@ORM\Index(name="FK_civicrm_subscription_history_group_id", columns={"group_id"})})
  * @ORM\Entity
+ * @Hateoas\Relation("self",
+ *   href = @Hateoas\Route(
+ *    "SubscriptionHistory_get",
+ *    parameters = { "id" = "expr(object.getId())" },
+ *    absolute = true,
+ *    generator = "civi"
+ *  )
+ * )
+ *
  */
 class SubscriptionHistory extends \Civi\Core\Entity {
 
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */

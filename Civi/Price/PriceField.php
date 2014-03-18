@@ -39,19 +39,33 @@ namespace Civi\Price;
 require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
+use Hateoas\Configuration\Annotation as Hateoas;
+use Civi\API\Annotation as CiviAPI;
+use JMS\Serializer\Annotation as JMS;
 
 /**
  * PriceField
  *
+ * @CiviAPI\Entity("PriceField")
+ * @CiviAPI\Permission()
  * @ORM\Table(name="civicrm_price_field", indexes={@ORM\Index(name="index_name", columns={"name"}),@ORM\Index(name="FK_civicrm_price_field_price_set_id", columns={"price_set_id"})})
  * @ORM\Entity
+ * @Hateoas\Relation("self",
+ *   href = @Hateoas\Route(
+ *    "PriceField_get",
+ *    parameters = { "id" = "expr(object.getId())" },
+ *    absolute = true,
+ *    generator = "civi"
+ *  )
+ * )
+ *
  */
 class PriceField extends \Civi\Core\Entity {
 
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -116,7 +130,7 @@ class PriceField extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="weight", type="integer", nullable=false)
+   * @ORM\Column(name="weight", type="integer", nullable=false, options={"unsigned":true})
    * 
    */
   private $weight = '1';
@@ -132,7 +146,7 @@ class PriceField extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="options_per_line", type="integer", nullable=false)
+   * @ORM\Column(name="options_per_line", type="integer", nullable=false, options={"unsigned":true})
    * 
    */
   private $optionsPerLine = '1';
@@ -180,7 +194,7 @@ class PriceField extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="visibility_id", type="integer", nullable=false)
+   * @ORM\Column(name="visibility_id", type="integer", nullable=false, options={"unsigned":true})
    * 
    */
   private $visibilityId = '1';

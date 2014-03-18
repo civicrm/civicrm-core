@@ -39,19 +39,33 @@ namespace Civi\Member;
 require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
+use Hateoas\Configuration\Annotation as Hateoas;
+use Civi\API\Annotation as CiviAPI;
+use JMS\Serializer\Annotation as JMS;
 
 /**
  * Membership
  *
+ * @CiviAPI\Entity("Membership")
+ * @CiviAPI\Permission()
  * @ORM\Table(name="civicrm_membership", indexes={@ORM\Index(name="index_owner_membership_id", columns={"owner_membership_id"}),@ORM\Index(name="FK_civicrm_membership_contact_id", columns={"contact_id"}),@ORM\Index(name="FK_civicrm_membership_membership_type_id", columns={"membership_type_id"}),@ORM\Index(name="FK_civicrm_membership_status_id", columns={"status_id"}),@ORM\Index(name="FK_civicrm_membership_owner_membership_id", columns={"owner_membership_id"}),@ORM\Index(name="FK_civicrm_membership_contribution_recur_id", columns={"contribution_recur_id"}),@ORM\Index(name="FK_civicrm_membership_campaign_id", columns={"campaign_id"})})
  * @ORM\Entity
+ * @Hateoas\Relation("self",
+ *   href = @Hateoas\Route(
+ *    "Membership_get",
+ *    parameters = { "id" = "expr(object.getId())" },
+ *    absolute = true,
+ *    generator = "civi"
+ *  )
+ * )
+ *
  */
 class Membership extends \Civi\Core\Entity {
 
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -132,7 +146,7 @@ class Membership extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="max_related", type="integer", nullable=true)
+   * @ORM\Column(name="max_related", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
   private $maxRelated;

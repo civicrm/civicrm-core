@@ -39,19 +39,33 @@ namespace Civi\Core;
 require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
+use Hateoas\Configuration\Annotation as Hateoas;
+use Civi\API\Annotation as CiviAPI;
+use JMS\Serializer\Annotation as JMS;
 
 /**
  * Phone
  *
+ * @CiviAPI\Entity("Phone")
+ * @CiviAPI\Permission()
  * @ORM\Table(name="civicrm_phone", indexes={@ORM\Index(name="index_location_type", columns={"location_type_id"}),@ORM\Index(name="index_is_primary", columns={"is_primary"}),@ORM\Index(name="index_is_billing", columns={"is_billing"}),@ORM\Index(name="UI_mobile_provider_id", columns={"mobile_provider_id"}),@ORM\Index(name="index_phone_numeric", columns={"phone_numeric"}),@ORM\Index(name="FK_civicrm_phone_contact_id", columns={"contact_id"})})
  * @ORM\Entity
+ * @Hateoas\Relation("self",
+ *   href = @Hateoas\Route(
+ *    "Phone_get",
+ *    parameters = { "id" = "expr(object.getId())" },
+ *    absolute = true,
+ *    generator = "civi"
+ *  )
+ * )
+ *
  */
 class Phone extends \Civi\Core\Entity {
 
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -68,7 +82,7 @@ class Phone extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="location_type_id", type="integer", nullable=true)
+   * @ORM\Column(name="location_type_id", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
   private $locationTypeId;
@@ -92,7 +106,7 @@ class Phone extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="mobile_provider_id", type="integer", nullable=true)
+   * @ORM\Column(name="mobile_provider_id", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
   private $mobileProviderId;
@@ -124,7 +138,7 @@ class Phone extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="phone_type_id", type="integer", nullable=true)
+   * @ORM\Column(name="phone_type_id", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
   private $phoneTypeId;

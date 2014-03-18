@@ -40,28 +40,32 @@ require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
 use Hateoas\Configuration\Annotation as Hateoas;
+use Civi\API\Annotation as CiviAPI;
+use JMS\Serializer\Annotation as JMS;
 
 /**
  * Contact
  *
+ * @CiviAPI\Entity("Contact")
+ * @CiviAPI\Permission()
  * @ORM\Table(name="civicrm_contact", uniqueConstraints={@ORM\UniqueConstraint(name="UI_external_identifier", columns={"external_identifier"})}, indexes={@ORM\Index(name="index_contact_type", columns={"contact_type"}),@ORM\Index(name="index_contact_sub_type", columns={"contact_sub_type"}),@ORM\Index(name="index_sort_name", columns={"sort_name"}),@ORM\Index(name="index_preferred_communication_method", columns={"preferred_communication_method"}),@ORM\Index(name="index_hash", columns={"hash"}),@ORM\Index(name="index_api_key", columns={"api_key"}),@ORM\Index(name="index_first_name", columns={"first_name"}),@ORM\Index(name="index_last_name", columns={"last_name"}),@ORM\Index(name="UI_prefix", columns={"prefix_id"}),@ORM\Index(name="UI_suffix", columns={"suffix_id"}),@ORM\Index(name="index_communication_style_id", columns={"communication_style_id"}),@ORM\Index(name="UI_gender", columns={"gender_id"}),@ORM\Index(name="index_household_name", columns={"household_name"}),@ORM\Index(name="index_organization_name", columns={"organization_name"}),@ORM\Index(name="index_is_deleted_sort_name", columns={"is_deleted","sort_name","id"}),@ORM\Index(name="FK_civicrm_contact_primary_contact_id", columns={"primary_contact_id"}),@ORM\Index(name="FK_civicrm_contact_employer_id", columns={"employer_id"})})
  * @ORM\Entity
- *
  * @Hateoas\Relation("self",
  *   href = @Hateoas\Route(
- *     "Contact_get",
- *     parameters = { "id" = "expr(object.getId())" },
- *     absolute = true,
- *     generator = "civi"
- *   )
+ *    "Contact_get",
+ *    parameters = { "id" = "expr(object.getId())" },
+ *    absolute = true,
+ *    generator = "civi"
+ *  )
  * )
+ *
  */
 class Contact extends \Civi\Core\Entity {
 
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -262,7 +266,7 @@ class Contact extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="prefix_id", type="integer", nullable=true)
+   * @ORM\Column(name="prefix_id", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
   private $prefixId;
@@ -270,7 +274,7 @@ class Contact extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="suffix_id", type="integer", nullable=true)
+   * @ORM\Column(name="suffix_id", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
   private $suffixId;
@@ -286,7 +290,7 @@ class Contact extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="communication_style_id", type="integer", nullable=true)
+   * @ORM\Column(name="communication_style_id", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
   private $communicationStyleId;
@@ -294,7 +298,7 @@ class Contact extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="email_greeting_id", type="integer", nullable=true)
+   * @ORM\Column(name="email_greeting_id", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
   private $emailGreetingId;
@@ -318,7 +322,7 @@ class Contact extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="postal_greeting_id", type="integer", nullable=true)
+   * @ORM\Column(name="postal_greeting_id", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
   private $postalGreetingId;
@@ -342,7 +346,7 @@ class Contact extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="addressee_id", type="integer", nullable=true)
+   * @ORM\Column(name="addressee_id", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
   private $addresseeId;
@@ -374,7 +378,7 @@ class Contact extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="gender_id", type="integer", nullable=true)
+   * @ORM\Column(name="gender_id", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
   private $genderId;

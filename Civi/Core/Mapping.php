@@ -39,19 +39,33 @@ namespace Civi\Core;
 require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
+use Hateoas\Configuration\Annotation as Hateoas;
+use Civi\API\Annotation as CiviAPI;
+use JMS\Serializer\Annotation as JMS;
 
 /**
  * Mapping
  *
+ * @CiviAPI\Entity("Mapping")
+ * @CiviAPI\Permission()
  * @ORM\Table(name="civicrm_mapping", indexes={@ORM\Index(name="UI_name", columns={"name"})})
  * @ORM\Entity
+ * @Hateoas\Relation("self",
+ *   href = @Hateoas\Route(
+ *    "Mapping_get",
+ *    parameters = { "id" = "expr(object.getId())" },
+ *    absolute = true,
+ *    generator = "civi"
+ *  )
+ * )
+ *
  */
 class Mapping extends \Civi\Core\Entity {
 
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -76,7 +90,7 @@ class Mapping extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="mapping_type_id", type="integer", nullable=true)
+   * @ORM\Column(name="mapping_type_id", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
   private $mappingTypeId;

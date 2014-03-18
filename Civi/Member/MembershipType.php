@@ -39,19 +39,33 @@ namespace Civi\Member;
 require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
+use Hateoas\Configuration\Annotation as Hateoas;
+use Civi\API\Annotation as CiviAPI;
+use JMS\Serializer\Annotation as JMS;
 
 /**
  * MembershipType
  *
+ * @CiviAPI\Entity("MembershipType")
+ * @CiviAPI\Permission()
  * @ORM\Table(name="civicrm_membership_type", indexes={@ORM\Index(name="index_relationship_type_id", columns={"relationship_type_id"}),@ORM\Index(name="FK_civicrm_membership_type_domain_id", columns={"domain_id"}),@ORM\Index(name="FK_civicrm_membership_type_member_of_contact_id", columns={"member_of_contact_id"}),@ORM\Index(name="FK_civicrm_membership_type_financial_type_id", columns={"financial_type_id"})})
  * @ORM\Entity
+ * @Hateoas\Relation("self",
+ *   href = @Hateoas\Route(
+ *    "MembershipType_get",
+ *    parameters = { "id" = "expr(object.getId())" },
+ *    absolute = true,
+ *    generator = "civi"
+ *  )
+ * )
+ *
  */
 class MembershipType extends \Civi\Core\Entity {
 
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -116,7 +130,7 @@ class MembershipType extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="duration_interval", type="integer", nullable=true)
+   * @ORM\Column(name="duration_interval", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
   private $durationInterval;
@@ -132,7 +146,7 @@ class MembershipType extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="fixed_period_start_day", type="integer", nullable=true)
+   * @ORM\Column(name="fixed_period_start_day", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
   private $fixedPeriodStartDay;
@@ -140,7 +154,7 @@ class MembershipType extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="fixed_period_rollover_day", type="integer", nullable=true)
+   * @ORM\Column(name="fixed_period_rollover_day", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
   private $fixedPeriodRolloverDay;
@@ -164,7 +178,7 @@ class MembershipType extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="max_related", type="integer", nullable=true)
+   * @ORM\Column(name="max_related", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
   private $maxRelated;
@@ -180,7 +194,7 @@ class MembershipType extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="weight", type="integer", nullable=true)
+   * @ORM\Column(name="weight", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
   private $weight;

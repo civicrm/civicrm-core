@@ -39,19 +39,33 @@ namespace Civi\Dedupe;
 require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
+use Hateoas\Configuration\Annotation as Hateoas;
+use Civi\API\Annotation as CiviAPI;
+use JMS\Serializer\Annotation as JMS;
 
 /**
  * Rule
  *
+ * @CiviAPI\Entity("Rule")
+ * @CiviAPI\Permission()
  * @ORM\Table(name="civicrm_dedupe_rule", indexes={@ORM\Index(name="FK_civicrm_dedupe_rule_dedupe_rule_group_id", columns={"dedupe_rule_group_id"})})
  * @ORM\Entity
+ * @Hateoas\Relation("self",
+ *   href = @Hateoas\Route(
+ *    "Rule_get",
+ *    parameters = { "id" = "expr(object.getId())" },
+ *    absolute = true,
+ *    generator = "civi"
+ *  )
+ * )
+ *
  */
 class Rule extends \Civi\Core\Entity {
 
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -84,7 +98,7 @@ class Rule extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="rule_length", type="integer", nullable=true)
+   * @ORM\Column(name="rule_length", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
   private $ruleLength;
@@ -92,7 +106,7 @@ class Rule extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="rule_weight", type="integer", nullable=true)
+   * @ORM\Column(name="rule_weight", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
   private $ruleWeight;

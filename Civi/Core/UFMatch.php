@@ -39,19 +39,33 @@ namespace Civi\Core;
 require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
+use Hateoas\Configuration\Annotation as Hateoas;
+use Civi\API\Annotation as CiviAPI;
+use JMS\Serializer\Annotation as JMS;
 
 /**
  * UFMatch
  *
+ * @CiviAPI\Entity("UFMatch")
+ * @CiviAPI\Permission()
  * @ORM\Table(name="civicrm_uf_match", uniqueConstraints={@ORM\UniqueConstraint(name="UI_uf_name_domain_id", columns={"uf_name","domain_id"}),@ORM\UniqueConstraint(name="UI_contact_domain_id", columns={"contact_id","domain_id"})}, indexes={@ORM\Index(name="I_civicrm_uf_match_uf_id", columns={"uf_id"}),@ORM\Index(name="FK_civicrm_uf_match_domain_id", columns={"domain_id"}),@ORM\Index(name="FK_civicrm_uf_match_contact_id", columns={"contact_id"})})
  * @ORM\Entity
+ * @Hateoas\Relation("self",
+ *   href = @Hateoas\Route(
+ *    "UFMatch_get",
+ *    parameters = { "id" = "expr(object.getId())" },
+ *    absolute = true,
+ *    generator = "civi"
+ *  )
+ * )
+ *
  */
 class UFMatch extends \Civi\Core\Entity {
 
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -68,7 +82,7 @@ class UFMatch extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="uf_id", type="integer", nullable=true)
+   * @ORM\Column(name="uf_id", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
   private $ufId;

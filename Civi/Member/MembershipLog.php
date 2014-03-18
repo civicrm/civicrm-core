@@ -39,19 +39,33 @@ namespace Civi\Member;
 require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
+use Hateoas\Configuration\Annotation as Hateoas;
+use Civi\API\Annotation as CiviAPI;
+use JMS\Serializer\Annotation as JMS;
 
 /**
  * MembershipLog
  *
+ * @CiviAPI\Entity("MembershipLog")
+ * @CiviAPI\Permission()
  * @ORM\Table(name="civicrm_membership_log", indexes={@ORM\Index(name="FK_civicrm_membership_log_membership_id", columns={"membership_id"}),@ORM\Index(name="FK_civicrm_membership_log_status_id", columns={"status_id"}),@ORM\Index(name="FK_civicrm_membership_log_modified_id", columns={"modified_id"}),@ORM\Index(name="FK_civicrm_membership_log_membership_type_id", columns={"membership_type_id"})})
  * @ORM\Entity
+ * @Hateoas\Relation("self",
+ *   href = @Hateoas\Route(
+ *    "MembershipLog_get",
+ *    parameters = { "id" = "expr(object.getId())" },
+ *    absolute = true,
+ *    generator = "civi"
+ *  )
+ * )
+ *
  */
 class MembershipLog extends \Civi\Core\Entity {
 
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -116,7 +130,7 @@ class MembershipLog extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="max_related", type="integer", nullable=true)
+   * @ORM\Column(name="max_related", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
   private $maxRelated;

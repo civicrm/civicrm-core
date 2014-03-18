@@ -39,19 +39,33 @@ namespace Civi\Contribute;
 require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
+use Hateoas\Configuration\Annotation as Hateoas;
+use Civi\API\Annotation as CiviAPI;
+use JMS\Serializer\Annotation as JMS;
 
 /**
  * Premium
  *
+ * @CiviAPI\Entity("Premium")
+ * @CiviAPI\Permission()
  * @ORM\Table(name="civicrm_premiums")
  * @ORM\Entity
+ * @Hateoas\Relation("self",
+ *   href = @Hateoas\Route(
+ *    "Premium_get",
+ *    parameters = { "id" = "expr(object.getId())" },
+ *    absolute = true,
+ *    generator = "civi"
+ *  )
+ * )
+ *
  */
 class Premium extends \Civi\Core\Entity {
 
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -68,7 +82,7 @@ class Premium extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="entity_id", type="integer", nullable=true)
+   * @ORM\Column(name="entity_id", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
   private $entityId;
@@ -132,7 +146,7 @@ class Premium extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="premiums_nothankyou_position", type="integer", nullable=false)
+   * @ORM\Column(name="premiums_nothankyou_position", type="integer", nullable=false, options={"unsigned":true})
    * 
    */
   private $premiumsNothankyouPosition = '1';

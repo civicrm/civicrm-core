@@ -39,19 +39,33 @@ namespace Civi\CCase;
 require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
+use Hateoas\Configuration\Annotation as Hateoas;
+use Civi\API\Annotation as CiviAPI;
+use JMS\Serializer\Annotation as JMS;
 
 /**
  * CaseActivity
  *
+ * @CiviAPI\Entity("CaseActivity")
+ * @CiviAPI\Permission()
  * @ORM\Table(name="civicrm_case_activity", indexes={@ORM\Index(name="UI_case_activity_id", columns={"case_id","activity_id"}),@ORM\Index(name="FK_civicrm_case_activity_case_id", columns={"case_id"}),@ORM\Index(name="FK_civicrm_case_activity_activity_id", columns={"activity_id"})})
  * @ORM\Entity
+ * @Hateoas\Relation("self",
+ *   href = @Hateoas\Route(
+ *    "CaseActivity_get",
+ *    parameters = { "id" = "expr(object.getId())" },
+ *    absolute = true,
+ *    generator = "civi"
+ *  )
+ * )
+ *
  */
 class CaseActivity extends \Civi\Core\Entity {
 
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */

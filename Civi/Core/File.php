@@ -39,19 +39,33 @@ namespace Civi\Core;
 require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
+use Hateoas\Configuration\Annotation as Hateoas;
+use Civi\API\Annotation as CiviAPI;
+use JMS\Serializer\Annotation as JMS;
 
 /**
  * File
  *
+ * @CiviAPI\Entity("File")
+ * @CiviAPI\Permission()
  * @ORM\Table(name="civicrm_file")
  * @ORM\Entity
+ * @Hateoas\Relation("self",
+ *   href = @Hateoas\Route(
+ *    "File_get",
+ *    parameters = { "id" = "expr(object.getId())" },
+ *    absolute = true,
+ *    generator = "civi"
+ *  )
+ * )
+ *
  */
 class File extends \Civi\Core\Entity {
 
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -60,7 +74,7 @@ class File extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="file_type_id", type="integer", nullable=true)
+   * @ORM\Column(name="file_type_id", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
   private $fileTypeId;

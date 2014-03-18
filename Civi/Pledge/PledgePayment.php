@@ -39,19 +39,33 @@ namespace Civi\Pledge;
 require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
+use Hateoas\Configuration\Annotation as Hateoas;
+use Civi\API\Annotation as CiviAPI;
+use JMS\Serializer\Annotation as JMS;
 
 /**
  * PledgePayment
  *
+ * @CiviAPI\Entity("PledgePayment")
+ * @CiviAPI\Permission()
  * @ORM\Table(name="civicrm_pledge_payment", indexes={@ORM\Index(name="index_contribution_pledge", columns={"contribution_id","pledge_id"}),@ORM\Index(name="index_status", columns={"status_id"}),@ORM\Index(name="FK_civicrm_pledge_payment_pledge_id", columns={"pledge_id"}),@ORM\Index(name="FK_civicrm_pledge_payment_contribution_id", columns={"contribution_id"})})
  * @ORM\Entity
+ * @Hateoas\Relation("self",
+ *   href = @Hateoas\Route(
+ *    "PledgePayment_get",
+ *    parameters = { "id" = "expr(object.getId())" },
+ *    absolute = true,
+ *    generator = "civi"
+ *  )
+ * )
+ *
  */
 class PledgePayment extends \Civi\Core\Entity {
 
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -116,7 +130,7 @@ class PledgePayment extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="reminder_count", type="integer", nullable=false)
+   * @ORM\Column(name="reminder_count", type="integer", nullable=false, options={"unsigned":true})
    * 
    */
   private $reminderCount = '0';
@@ -124,7 +138,7 @@ class PledgePayment extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="status_id", type="integer", nullable=true)
+   * @ORM\Column(name="status_id", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
   private $statusId;

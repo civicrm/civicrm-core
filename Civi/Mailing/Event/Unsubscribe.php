@@ -39,19 +39,33 @@ namespace Civi\Mailing\Event;
 require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
+use Hateoas\Configuration\Annotation as Hateoas;
+use Civi\API\Annotation as CiviAPI;
+use JMS\Serializer\Annotation as JMS;
 
 /**
  * Unsubscribe
  *
+ * @CiviAPI\Entity("Unsubscribe")
+ * @CiviAPI\Permission()
  * @ORM\Table(name="civicrm_mailing_event_unsubscribe", indexes={@ORM\Index(name="FK_civicrm_mailing_event_unsubscribe_event_queue_id", columns={"event_queue_id"})})
  * @ORM\Entity
+ * @Hateoas\Relation("self",
+ *   href = @Hateoas\Route(
+ *    "Unsubscribe_get",
+ *    parameters = { "id" = "expr(object.getId())" },
+ *    absolute = true,
+ *    generator = "civi"
+ *  )
+ * )
+ *
  */
 class Unsubscribe extends \Civi\Core\Entity {
 
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */

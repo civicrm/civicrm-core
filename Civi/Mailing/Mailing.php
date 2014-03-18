@@ -39,19 +39,33 @@ namespace Civi\Mailing;
 require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
+use Hateoas\Configuration\Annotation as Hateoas;
+use Civi\API\Annotation as CiviAPI;
+use JMS\Serializer\Annotation as JMS;
 
 /**
  * Mailing
  *
+ * @CiviAPI\Entity("Mailing")
+ * @CiviAPI\Permission()
  * @ORM\Table(name="civicrm_mailing", indexes={@ORM\Index(name="FK_civicrm_mailing_domain_id", columns={"domain_id"}),@ORM\Index(name="FK_civicrm_mailing_header_id", columns={"header_id"}),@ORM\Index(name="FK_civicrm_mailing_footer_id", columns={"footer_id"}),@ORM\Index(name="FK_civicrm_mailing_reply_id", columns={"reply_id"}),@ORM\Index(name="FK_civicrm_mailing_unsubscribe_id", columns={"unsubscribe_id"}),@ORM\Index(name="FK_civicrm_mailing_optout_id", columns={"optout_id"}),@ORM\Index(name="FK_civicrm_mailing_msg_template_id", columns={"msg_template_id"}),@ORM\Index(name="FK_civicrm_mailing_created_id", columns={"created_id"}),@ORM\Index(name="FK_civicrm_mailing_scheduled_id", columns={"scheduled_id"}),@ORM\Index(name="FK_civicrm_mailing_approver_id", columns={"approver_id"}),@ORM\Index(name="FK_civicrm_mailing_campaign_id", columns={"campaign_id"}),@ORM\Index(name="FK_civicrm_mailing_sms_provider_id", columns={"sms_provider_id"})})
  * @ORM\Entity
+ * @Hateoas\Relation("self",
+ *   href = @Hateoas\Route(
+ *    "Mailing_get",
+ *    parameters = { "id" = "expr(object.getId())" },
+ *    absolute = true,
+ *    generator = "civi"
+ *  )
+ * )
+ *
  */
 class Mailing extends \Civi\Core\Entity {
 
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -100,7 +114,7 @@ class Mailing extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="resubscribe_id", type="integer", nullable=true)
+   * @ORM\Column(name="resubscribe_id", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
   private $resubscribeId;
@@ -276,7 +290,7 @@ class Mailing extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="approval_status_id", type="integer", nullable=true)
+   * @ORM\Column(name="approval_status_id", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
   private $approvalStatusId;

@@ -39,19 +39,33 @@ namespace Civi\Core;
 require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
+use Hateoas\Configuration\Annotation as Hateoas;
+use Civi\API\Annotation as CiviAPI;
+use JMS\Serializer\Annotation as JMS;
 
 /**
  * ActionLog
  *
+ * @CiviAPI\Entity("ActionLog")
+ * @CiviAPI\Permission()
  * @ORM\Table(name="civicrm_action_log", indexes={@ORM\Index(name="FK_civicrm_action_log_contact_id", columns={"contact_id"}),@ORM\Index(name="FK_civicrm_action_log_action_schedule_id", columns={"action_schedule_id"})})
  * @ORM\Entity
+ * @Hateoas\Relation("self",
+ *   href = @Hateoas\Route(
+ *    "ActionLog_get",
+ *    parameters = { "id" = "expr(object.getId())" },
+ *    absolute = true,
+ *    generator = "civi"
+ *  )
+ * )
+ *
  */
 class ActionLog extends \Civi\Core\Entity {
 
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -68,7 +82,7 @@ class ActionLog extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="entity_id", type="integer", nullable=true)
+   * @ORM\Column(name="entity_id", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
   private $entityId;
@@ -116,7 +130,7 @@ class ActionLog extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="repetition_number", type="integer", nullable=true)
+   * @ORM\Column(name="repetition_number", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
   private $repetitionNumber;

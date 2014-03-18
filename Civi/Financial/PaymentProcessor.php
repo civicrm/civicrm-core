@@ -39,19 +39,33 @@ namespace Civi\Financial;
 require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
+use Hateoas\Configuration\Annotation as Hateoas;
+use Civi\API\Annotation as CiviAPI;
+use JMS\Serializer\Annotation as JMS;
 
 /**
  * PaymentProcessor
  *
+ * @CiviAPI\Entity("PaymentProcessor")
+ * @CiviAPI\Permission()
  * @ORM\Table(name="civicrm_payment_processor", uniqueConstraints={@ORM\UniqueConstraint(name="UI_name_test_domain_id", columns={"name","is_test","domain_id"})}, indexes={@ORM\Index(name="FK_civicrm_payment_processor_domain_id", columns={"domain_id"}),@ORM\Index(name="FK_civicrm_payment_processor_payment_processor_type_id", columns={"payment_processor_type_id"})})
  * @ORM\Entity
+ * @Hateoas\Relation("self",
+ *   href = @Hateoas\Route(
+ *    "PaymentProcessor_get",
+ *    parameters = { "id" = "expr(object.getId())" },
+ *    absolute = true,
+ *    generator = "civi"
+ *  )
+ * )
+ *
  */
 class PaymentProcessor extends \Civi\Core\Entity {
 
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -188,7 +202,7 @@ class PaymentProcessor extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="billing_mode", type="integer", nullable=true)
+   * @ORM\Column(name="billing_mode", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
   private $billingMode;
@@ -204,7 +218,7 @@ class PaymentProcessor extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="payment_type", type="integer", nullable=false)
+   * @ORM\Column(name="payment_type", type="integer", nullable=false, options={"unsigned":true})
    * 
    */
   private $paymentType = '1';

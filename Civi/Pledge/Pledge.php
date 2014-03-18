@@ -39,19 +39,33 @@ namespace Civi\Pledge;
 require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
+use Hateoas\Configuration\Annotation as Hateoas;
+use Civi\API\Annotation as CiviAPI;
+use JMS\Serializer\Annotation as JMS;
 
 /**
  * Pledge
  *
+ * @CiviAPI\Entity("Pledge")
+ * @CiviAPI\Permission()
  * @ORM\Table(name="civicrm_pledge", indexes={@ORM\Index(name="index_status", columns={"status_id"}),@ORM\Index(name="FK_civicrm_pledge_contact_id", columns={"contact_id"}),@ORM\Index(name="FK_civicrm_pledge_financial_type_id", columns={"financial_type_id"}),@ORM\Index(name="FK_civicrm_pledge_contribution_page_id", columns={"contribution_page_id"}),@ORM\Index(name="FK_civicrm_pledge_campaign_id", columns={"campaign_id"})})
  * @ORM\Entity
+ * @Hateoas\Relation("self",
+ *   href = @Hateoas\Route(
+ *    "Pledge_get",
+ *    parameters = { "id" = "expr(object.getId())" },
+ *    absolute = true,
+ *    generator = "civi"
+ *  )
+ * )
+ *
  */
 class Pledge extends \Civi\Core\Entity {
 
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -116,7 +130,7 @@ class Pledge extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="frequency_interval", type="integer", nullable=false)
+   * @ORM\Column(name="frequency_interval", type="integer", nullable=false, options={"unsigned":true})
    * 
    */
   private $frequencyInterval = '1';
@@ -124,7 +138,7 @@ class Pledge extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="frequency_day", type="integer", nullable=false)
+   * @ORM\Column(name="frequency_day", type="integer", nullable=false, options={"unsigned":true})
    * 
    */
   private $frequencyDay = '3';
@@ -132,7 +146,7 @@ class Pledge extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="installments", type="integer", nullable=false)
+   * @ORM\Column(name="installments", type="integer", nullable=false, options={"unsigned":true})
    * 
    */
   private $installments = '1';
@@ -188,7 +202,7 @@ class Pledge extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="max_reminders", type="integer", nullable=false)
+   * @ORM\Column(name="max_reminders", type="integer", nullable=false, options={"unsigned":true})
    * 
    */
   private $maxReminders = '1';
@@ -196,7 +210,7 @@ class Pledge extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="initial_reminder_day", type="integer", nullable=false)
+   * @ORM\Column(name="initial_reminder_day", type="integer", nullable=false, options={"unsigned":true})
    * 
    */
   private $initialReminderDay = '5';
@@ -204,7 +218,7 @@ class Pledge extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="additional_reminder_day", type="integer", nullable=false)
+   * @ORM\Column(name="additional_reminder_day", type="integer", nullable=false, options={"unsigned":true})
    * 
    */
   private $additionalReminderDay = '5';
@@ -212,7 +226,7 @@ class Pledge extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="status_id", type="integer", nullable=true)
+   * @ORM\Column(name="status_id", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
   private $statusId;

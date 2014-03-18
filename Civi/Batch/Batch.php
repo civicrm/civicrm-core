@@ -39,19 +39,33 @@ namespace Civi\Batch;
 require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
+use Hateoas\Configuration\Annotation as Hateoas;
+use Civi\API\Annotation as CiviAPI;
+use JMS\Serializer\Annotation as JMS;
 
 /**
  * Batch
  *
+ * @CiviAPI\Entity("Batch")
+ * @CiviAPI\Permission()
  * @ORM\Table(name="civicrm_batch", uniqueConstraints={@ORM\UniqueConstraint(name="UI_name", columns={"name"})}, indexes={@ORM\Index(name="FK_civicrm_batch_created_id", columns={"created_id"}),@ORM\Index(name="FK_civicrm_batch_modified_id", columns={"modified_id"}),@ORM\Index(name="FK_civicrm_batch_saved_search_id", columns={"saved_search_id"})})
  * @ORM\Entity
+ * @Hateoas\Relation("self",
+ *   href = @Hateoas\Route(
+ *    "Batch_get",
+ *    parameters = { "id" = "expr(object.getId())" },
+ *    absolute = true,
+ *    generator = "civi"
+ *  )
+ * )
+ *
  */
 class Batch extends \Civi\Core\Entity {
 
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -124,7 +138,7 @@ class Batch extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="status_id", type="integer", nullable=true)
+   * @ORM\Column(name="status_id", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
   private $statusId;
@@ -132,7 +146,7 @@ class Batch extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="type_id", type="integer", nullable=true)
+   * @ORM\Column(name="type_id", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
   private $typeId;
@@ -140,7 +154,7 @@ class Batch extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="mode_id", type="integer", nullable=true)
+   * @ORM\Column(name="mode_id", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
   private $modeId;
@@ -156,7 +170,7 @@ class Batch extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="item_count", type="integer", nullable=true)
+   * @ORM\Column(name="item_count", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
   private $itemCount;
@@ -164,7 +178,7 @@ class Batch extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="payment_instrument_id", type="integer", nullable=true)
+   * @ORM\Column(name="payment_instrument_id", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
   private $paymentInstrumentId;

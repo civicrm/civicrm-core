@@ -39,19 +39,33 @@ namespace Civi\Event;
 require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
+use Hateoas\Configuration\Annotation as Hateoas;
+use Civi\API\Annotation as CiviAPI;
+use JMS\Serializer\Annotation as JMS;
 
 /**
  * Event
  *
+ * @CiviAPI\Entity("Event")
+ * @CiviAPI\Permission()
  * @ORM\Table(name="civicrm_event", indexes={@ORM\Index(name="index_event_type_id", columns={"event_type_id"}),@ORM\Index(name="index_participant_listing_id", columns={"participant_listing_id"}),@ORM\Index(name="index_parent_event_id", columns={"parent_event_id"}),@ORM\Index(name="FK_civicrm_event_loc_block_id", columns={"loc_block_id"}),@ORM\Index(name="FK_civicrm_event_created_id", columns={"created_id"}),@ORM\Index(name="FK_civicrm_event_campaign_id", columns={"campaign_id"})})
  * @ORM\Entity
+ * @Hateoas\Relation("self",
+ *   href = @Hateoas\Route(
+ *    "Event_get",
+ *    parameters = { "id" = "expr(object.getId())" },
+ *    absolute = true,
+ *    generator = "civi"
+ *  )
+ * )
+ *
  */
 class Event extends \Civi\Core\Entity {
 
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -84,7 +98,7 @@ class Event extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="event_type_id", type="integer", nullable=false)
+   * @ORM\Column(name="event_type_id", type="integer", nullable=false, options={"unsigned":true})
    * 
    */
   private $eventTypeId = '0';
@@ -92,7 +106,7 @@ class Event extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="participant_listing_id", type="integer", nullable=false)
+   * @ORM\Column(name="participant_listing_id", type="integer", nullable=false, options={"unsigned":true})
    * 
    */
   private $participantListingId = '0';
@@ -156,7 +170,7 @@ class Event extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="max_participants", type="integer", nullable=false)
+   * @ORM\Column(name="max_participants", type="integer", nullable=false, options={"unsigned":true})
    * 
    */
   private $maxParticipants = 'NULL';
@@ -180,7 +194,7 @@ class Event extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="financial_type_id", type="integer", nullable=false)
+   * @ORM\Column(name="financial_type_id", type="integer", nullable=false, options={"unsigned":true})
    * 
    */
   private $financialTypeId = 'NULL';
@@ -236,7 +250,7 @@ class Event extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="default_role_id", type="integer", nullable=false)
+   * @ORM\Column(name="default_role_id", type="integer", nullable=false, options={"unsigned":true})
    * 
    */
   private $defaultRoleId = '1';
@@ -332,7 +346,7 @@ class Event extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="default_fee_id", type="integer", nullable=true)
+   * @ORM\Column(name="default_fee_id", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
   private $defaultFeeId;
@@ -340,7 +354,7 @@ class Event extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="default_discount_fee_id", type="integer", nullable=true)
+   * @ORM\Column(name="default_discount_fee_id", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
   private $defaultDiscountFeeId;
@@ -460,7 +474,7 @@ class Event extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="expiration_time", type="integer", nullable=true)
+   * @ORM\Column(name="expiration_time", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
   private $expirationTime;
@@ -540,7 +554,7 @@ class Event extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="parent_event_id", type="integer", nullable=false)
+   * @ORM\Column(name="parent_event_id", type="integer", nullable=false, options={"unsigned":true})
    * 
    */
   private $parentEventId = 'NULL';
@@ -548,7 +562,7 @@ class Event extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="slot_label_id", type="integer", nullable=false)
+   * @ORM\Column(name="slot_label_id", type="integer", nullable=false, options={"unsigned":true})
    * 
    */
   private $slotLabelId = 'NULL';

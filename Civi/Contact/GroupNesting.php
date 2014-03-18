@@ -39,19 +39,33 @@ namespace Civi\Contact;
 require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
+use Hateoas\Configuration\Annotation as Hateoas;
+use Civi\API\Annotation as CiviAPI;
+use JMS\Serializer\Annotation as JMS;
 
 /**
  * GroupNesting
  *
+ * @CiviAPI\Entity("GroupNesting")
+ * @CiviAPI\Permission()
  * @ORM\Table(name="civicrm_group_nesting", indexes={@ORM\Index(name="FK_civicrm_group_nesting_child_group_id", columns={"child_group_id"}),@ORM\Index(name="FK_civicrm_group_nesting_parent_group_id", columns={"parent_group_id"})})
  * @ORM\Entity
+ * @Hateoas\Relation("self",
+ *   href = @Hateoas\Route(
+ *    "GroupNesting_get",
+ *    parameters = { "id" = "expr(object.getId())" },
+ *    absolute = true,
+ *    generator = "civi"
+ *  )
+ * )
+ *
  */
 class GroupNesting extends \Civi\Core\Entity {
 
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */

@@ -39,19 +39,33 @@ namespace Civi\Event;
 require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
+use Hateoas\Configuration\Annotation as Hateoas;
+use Civi\API\Annotation as CiviAPI;
+use JMS\Serializer\Annotation as JMS;
 
 /**
  * ParticipantStatusType
  *
+ * @CiviAPI\Entity("ParticipantStatusType")
+ * @CiviAPI\Permission()
  * @ORM\Table(name="civicrm_participant_status_type")
  * @ORM\Entity
+ * @Hateoas\Relation("self",
+ *   href = @Hateoas\Route(
+ *    "ParticipantStatusType_get",
+ *    parameters = { "id" = "expr(object.getId())" },
+ *    absolute = true,
+ *    generator = "civi"
+ *  )
+ * )
+ *
  */
 class ParticipantStatusType extends \Civi\Core\Entity {
 
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -108,7 +122,7 @@ class ParticipantStatusType extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="weight", type="integer", nullable=true)
+   * @ORM\Column(name="weight", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
   private $weight;
@@ -116,7 +130,7 @@ class ParticipantStatusType extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="visibility_id", type="integer", nullable=true)
+   * @ORM\Column(name="visibility_id", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
   private $visibilityId;

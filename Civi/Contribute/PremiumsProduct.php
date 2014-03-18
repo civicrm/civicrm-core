@@ -39,19 +39,33 @@ namespace Civi\Contribute;
 require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
+use Hateoas\Configuration\Annotation as Hateoas;
+use Civi\API\Annotation as CiviAPI;
+use JMS\Serializer\Annotation as JMS;
 
 /**
  * PremiumsProduct
  *
+ * @CiviAPI\Entity("PremiumsProduct")
+ * @CiviAPI\Permission()
  * @ORM\Table(name="civicrm_premiums_product", indexes={@ORM\Index(name="FK_civicrm_premiums_product_premiums_id", columns={"premiums_id"}),@ORM\Index(name="FK_civicrm_premiums_product_product_id", columns={"product_id"}),@ORM\Index(name="FK_civicrm_premiums_product_financial_type_id", columns={"financial_type_id"})})
  * @ORM\Entity
+ * @Hateoas\Relation("self",
+ *   href = @Hateoas\Route(
+ *    "PremiumsProduct_get",
+ *    parameters = { "id" = "expr(object.getId())" },
+ *    absolute = true,
+ *    generator = "civi"
+ *  )
+ * )
+ *
  */
 class PremiumsProduct extends \Civi\Core\Entity {
 
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -76,7 +90,7 @@ class PremiumsProduct extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="weight", type="integer", nullable=true)
+   * @ORM\Column(name="weight", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
   private $weight;

@@ -39,19 +39,33 @@ namespace Civi\Contact;
 require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
+use Hateoas\Configuration\Annotation as Hateoas;
+use Civi\API\Annotation as CiviAPI;
+use JMS\Serializer\Annotation as JMS;
 
 /**
  * GroupContactCache
  *
+ * @CiviAPI\Entity("GroupContactCache")
+ * @CiviAPI\Permission()
  * @ORM\Table(name="civicrm_group_contact_cache", uniqueConstraints={@ORM\UniqueConstraint(name="UI_contact_group", columns={"contact_id","group_id"})}, indexes={@ORM\Index(name="FK_civicrm_group_contact_cache_group_id", columns={"group_id"}),@ORM\Index(name="FK_civicrm_group_contact_cache_contact_id", columns={"contact_id"})})
  * @ORM\Entity
+ * @Hateoas\Relation("self",
+ *   href = @Hateoas\Route(
+ *    "GroupContactCache_get",
+ *    parameters = { "id" = "expr(object.getId())" },
+ *    absolute = true,
+ *    generator = "civi"
+ *  )
+ * )
+ *
  */
 class GroupContactCache extends \Civi\Core\Entity {
 
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */

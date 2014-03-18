@@ -39,19 +39,33 @@ namespace Civi\Core;
 require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
+use Hateoas\Configuration\Annotation as Hateoas;
+use Civi\API\Annotation as CiviAPI;
+use JMS\Serializer\Annotation as JMS;
 
 /**
  * ActionSchedule
  *
+ * @CiviAPI\Entity("ActionSchedule")
+ * @CiviAPI\Permission()
  * @ORM\Table(name="civicrm_action_schedule", indexes={@ORM\Index(name="FK_civicrm_action_schedule_mapping_id", columns={"mapping_id"}),@ORM\Index(name="FK_civicrm_action_schedule_group_id", columns={"group_id"}),@ORM\Index(name="FK_civicrm_action_schedule_msg_template_id", columns={"msg_template_id"}),@ORM\Index(name="FK_civicrm_action_schedule_sms_provider_id", columns={"sms_provider_id"})})
  * @ORM\Entity
+ * @Hateoas\Relation("self",
+ *   href = @Hateoas\Route(
+ *    "ActionSchedule_get",
+ *    parameters = { "id" = "expr(object.getId())" },
+ *    absolute = true,
+ *    generator = "civi"
+ *  )
+ * )
+ *
  */
 class ActionSchedule extends \Civi\Core\Entity {
 
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -108,7 +122,7 @@ class ActionSchedule extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="start_action_offset", type="integer", nullable=true)
+   * @ORM\Column(name="start_action_offset", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
   private $startActionOffset;
@@ -156,7 +170,7 @@ class ActionSchedule extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="repetition_frequency_interval", type="integer", nullable=true)
+   * @ORM\Column(name="repetition_frequency_interval", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
   private $repetitionFrequencyInterval;
@@ -172,7 +186,7 @@ class ActionSchedule extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="end_frequency_interval", type="integer", nullable=true)
+   * @ORM\Column(name="end_frequency_interval", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
   private $endFrequencyInterval;

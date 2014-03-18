@@ -39,19 +39,33 @@ namespace Civi\Financial;
 require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
+use Hateoas\Configuration\Annotation as Hateoas;
+use Civi\API\Annotation as CiviAPI;
+use JMS\Serializer\Annotation as JMS;
 
 /**
  * FinancialAccount
  *
+ * @CiviAPI\Entity("FinancialAccount")
+ * @CiviAPI\Permission()
  * @ORM\Table(name="civicrm_financial_account", uniqueConstraints={@ORM\UniqueConstraint(name="UI_name", columns={"name"})}, indexes={@ORM\Index(name="FK_civicrm_financial_account_contact_id", columns={"contact_id"}),@ORM\Index(name="FK_civicrm_financial_account_parent_id", columns={"parent_id"})})
  * @ORM\Entity
+ * @Hateoas\Relation("self",
+ *   href = @Hateoas\Route(
+ *    "FinancialAccount_get",
+ *    parameters = { "id" = "expr(object.getId())" },
+ *    absolute = true,
+ *    generator = "civi"
+ *  )
+ * )
+ *
  */
 class FinancialAccount extends \Civi\Core\Entity {
 
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -76,7 +90,7 @@ class FinancialAccount extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="financial_account_type_id", type="integer", nullable=false)
+   * @ORM\Column(name="financial_account_type_id", type="integer", nullable=false, options={"unsigned":true})
    * 
    */
   private $financialAccountTypeId = '3';

@@ -39,19 +39,33 @@ namespace Civi\Contact;
 require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
+use Hateoas\Configuration\Annotation as Hateoas;
+use Civi\API\Annotation as CiviAPI;
+use JMS\Serializer\Annotation as JMS;
 
 /**
  * ACLContactCache
  *
+ * @CiviAPI\Entity("ACLContactCache")
+ * @CiviAPI\Permission()
  * @ORM\Table(name="civicrm_acl_contact_cache", uniqueConstraints={@ORM\UniqueConstraint(name="UI_user_contact_operation", columns={"user_id","contact_id","operation"})}, indexes={@ORM\Index(name="FK_civicrm_acl_contact_cache_user_id", columns={"user_id"}),@ORM\Index(name="FK_civicrm_acl_contact_cache_contact_id", columns={"contact_id"})})
  * @ORM\Entity
+ * @Hateoas\Relation("self",
+ *   href = @Hateoas\Route(
+ *    "ACLContactCache_get",
+ *    parameters = { "id" = "expr(object.getId())" },
+ *    absolute = true,
+ *    generator = "civi"
+ *  )
+ * )
+ *
  */
 class ACLContactCache extends \Civi\Core\Entity {
 
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */

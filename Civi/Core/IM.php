@@ -39,19 +39,33 @@ namespace Civi\Core;
 require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
+use Hateoas\Configuration\Annotation as Hateoas;
+use Civi\API\Annotation as CiviAPI;
+use JMS\Serializer\Annotation as JMS;
 
 /**
  * IM
  *
+ * @CiviAPI\Entity("IM")
+ * @CiviAPI\Permission()
  * @ORM\Table(name="civicrm_im", indexes={@ORM\Index(name="index_location_type", columns={"location_type_id"}),@ORM\Index(name="UI_provider_id", columns={"provider_id"}),@ORM\Index(name="index_is_primary", columns={"is_primary"}),@ORM\Index(name="index_is_billing", columns={"is_billing"}),@ORM\Index(name="FK_civicrm_im_contact_id", columns={"contact_id"})})
  * @ORM\Entity
+ * @Hateoas\Relation("self",
+ *   href = @Hateoas\Route(
+ *    "IM_get",
+ *    parameters = { "id" = "expr(object.getId())" },
+ *    absolute = true,
+ *    generator = "civi"
+ *  )
+ * )
+ *
  */
 class IM extends \Civi\Core\Entity {
 
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -68,7 +82,7 @@ class IM extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="location_type_id", type="integer", nullable=true)
+   * @ORM\Column(name="location_type_id", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
   private $locationTypeId;
@@ -84,7 +98,7 @@ class IM extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="provider_id", type="integer", nullable=true)
+   * @ORM\Column(name="provider_id", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
   private $providerId;

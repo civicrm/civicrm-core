@@ -39,19 +39,33 @@ namespace Civi\Activity;
 require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
+use Hateoas\Configuration\Annotation as Hateoas;
+use Civi\API\Annotation as CiviAPI;
+use JMS\Serializer\Annotation as JMS;
 
 /**
  * ActivityContact
  *
+ * @CiviAPI\Entity("ActivityContact")
+ * @CiviAPI\Permission()
  * @ORM\Table(name="civicrm_activity_contact", uniqueConstraints={@ORM\UniqueConstraint(name="UI_activity_contact", columns={"contact_id","activity_id","record_type_id"})}, indexes={@ORM\Index(name="index_record_type", columns={"activity_id","record_type_id"}),@ORM\Index(name="FK_civicrm_activity_contact_activity_id", columns={"activity_id"}),@ORM\Index(name="FK_civicrm_activity_contact_contact_id", columns={"contact_id"})})
  * @ORM\Entity
+ * @Hateoas\Relation("self",
+ *   href = @Hateoas\Route(
+ *    "ActivityContact_get",
+ *    parameters = { "id" = "expr(object.getId())" },
+ *    absolute = true,
+ *    generator = "civi"
+ *  )
+ * )
+ *
  */
 class ActivityContact extends \Civi\Core\Entity {
 
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -76,7 +90,7 @@ class ActivityContact extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="record_type_id", type="integer", nullable=true)
+   * @ORM\Column(name="record_type_id", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
   private $recordTypeId;

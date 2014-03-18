@@ -39,19 +39,33 @@ namespace Civi\Core;
 require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
+use Hateoas\Configuration\Annotation as Hateoas;
+use Civi\API\Annotation as CiviAPI;
+use JMS\Serializer\Annotation as JMS;
 
 /**
  * PrintLabel
  *
+ * @CiviAPI\Entity("PrintLabel")
+ * @CiviAPI\Permission()
  * @ORM\Table(name="civicrm_print_label", indexes={@ORM\Index(name="FK_civicrm_print_label_created_id", columns={"created_id"})})
  * @ORM\Entity
+ * @Hateoas\Relation("self",
+ *   href = @Hateoas\Route(
+ *    "PrintLabel_get",
+ *    parameters = { "id" = "expr(object.getId())" },
+ *    absolute = true,
+ *    generator = "civi"
+ *  )
+ * )
+ *
  */
 class PrintLabel extends \Civi\Core\Entity {
 
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -92,7 +106,7 @@ class PrintLabel extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="label_type_id", type="integer", nullable=true)
+   * @ORM\Column(name="label_type_id", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
   private $labelTypeId;

@@ -39,19 +39,33 @@ namespace Civi\Event;
 require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
+use Hateoas\Configuration\Annotation as Hateoas;
+use Civi\API\Annotation as CiviAPI;
+use JMS\Serializer\Annotation as JMS;
 
 /**
  * Participant
  *
+ * @CiviAPI\Entity("Participant")
+ * @CiviAPI\Permission()
  * @ORM\Table(name="civicrm_participant", indexes={@ORM\Index(name="index_status_id", columns={"status_id"}),@ORM\Index(name="index_role_id", columns={"role_id"}),@ORM\Index(name="FK_civicrm_participant_contact_id", columns={"contact_id"}),@ORM\Index(name="FK_civicrm_participant_event_id", columns={"event_id"}),@ORM\Index(name="FK_civicrm_participant_status_id", columns={"status_id"}),@ORM\Index(name="FK_civicrm_participant_registered_by_id", columns={"registered_by_id"}),@ORM\Index(name="FK_civicrm_participant_discount_id", columns={"discount_id"}),@ORM\Index(name="FK_civicrm_participant_campaign_id", columns={"campaign_id"}),@ORM\Index(name="FK_civicrm_participant_cart_id", columns={"cart_id"})})
  * @ORM\Entity
+ * @Hateoas\Relation("self",
+ *   href = @Hateoas\Route(
+ *    "Participant_get",
+ *    parameters = { "id" = "expr(object.getId())" },
+ *    absolute = true,
+ *    generator = "civi"
+ *  )
+ * )
+ *
  */
 class Participant extends \Civi\Core\Entity {
 
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -172,7 +186,7 @@ class Participant extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="discount_amount", type="integer", nullable=true)
+   * @ORM\Column(name="discount_amount", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
   private $discountAmount;
@@ -188,7 +202,7 @@ class Participant extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="must_wait", type="integer", nullable=true)
+   * @ORM\Column(name="must_wait", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
   private $mustWait;

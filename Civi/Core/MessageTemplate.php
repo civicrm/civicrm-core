@@ -39,19 +39,33 @@ namespace Civi\Core;
 require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
+use Hateoas\Configuration\Annotation as Hateoas;
+use Civi\API\Annotation as CiviAPI;
+use JMS\Serializer\Annotation as JMS;
 
 /**
  * MessageTemplate
  *
+ * @CiviAPI\Entity("MessageTemplate")
+ * @CiviAPI\Permission()
  * @ORM\Table(name="civicrm_msg_template", indexes={@ORM\Index(name="FK_civicrm_msg_template_pdf_format_id", columns={"pdf_format_id"})})
  * @ORM\Entity
+ * @Hateoas\Relation("self",
+ *   href = @Hateoas\Route(
+ *    "MessageTemplate_get",
+ *    parameters = { "id" = "expr(object.getId())" },
+ *    absolute = true,
+ *    generator = "civi"
+ *  )
+ * )
+ *
  */
 class MessageTemplate extends \Civi\Core\Entity {
 
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -100,7 +114,7 @@ class MessageTemplate extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="workflow_id", type="integer", nullable=true)
+   * @ORM\Column(name="workflow_id", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
   private $workflowId;

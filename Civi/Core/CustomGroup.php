@@ -39,19 +39,33 @@ namespace Civi\Core;
 require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
+use Hateoas\Configuration\Annotation as Hateoas;
+use Civi\API\Annotation as CiviAPI;
+use JMS\Serializer\Annotation as JMS;
 
 /**
  * CustomGroup
  *
+ * @CiviAPI\Entity("CustomGroup")
+ * @CiviAPI\Permission()
  * @ORM\Table(name="civicrm_custom_group", uniqueConstraints={@ORM\UniqueConstraint(name="UI_title_extends", columns={"title","extends"}),@ORM\UniqueConstraint(name="UI_name_extends", columns={"name","extends"})}, indexes={@ORM\Index(name="FK_civicrm_custom_group_created_id", columns={"created_id"})})
  * @ORM\Entity
+ * @Hateoas\Relation("self",
+ *   href = @Hateoas\Route(
+ *    "CustomGroup_get",
+ *    parameters = { "id" = "expr(object.getId())" },
+ *    absolute = true,
+ *    generator = "civi"
+ *  )
+ * )
+ *
  */
 class CustomGroup extends \Civi\Core\Entity {
 
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -84,7 +98,7 @@ class CustomGroup extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="extends_entity_column_id", type="integer", nullable=false)
+   * @ORM\Column(name="extends_entity_column_id", type="integer", nullable=false, options={"unsigned":true})
    * 
    */
   private $extendsEntityColumnId = 'NULL';
@@ -108,7 +122,7 @@ class CustomGroup extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="collapse_display", type="integer", nullable=false)
+   * @ORM\Column(name="collapse_display", type="integer", nullable=false, options={"unsigned":true})
    * 
    */
   private $collapseDisplay = '0';
@@ -132,7 +146,7 @@ class CustomGroup extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="weight", type="integer", nullable=false)
+   * @ORM\Column(name="weight", type="integer", nullable=false, options={"unsigned":true})
    * 
    */
   private $weight = '1';
@@ -164,7 +178,7 @@ class CustomGroup extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="min_multiple", type="integer", nullable=true)
+   * @ORM\Column(name="min_multiple", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
   private $minMultiple;
@@ -172,7 +186,7 @@ class CustomGroup extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="max_multiple", type="integer", nullable=true)
+   * @ORM\Column(name="max_multiple", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
   private $maxMultiple;
@@ -180,7 +194,7 @@ class CustomGroup extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="collapse_adv_display", type="integer", nullable=false)
+   * @ORM\Column(name="collapse_adv_display", type="integer", nullable=false, options={"unsigned":true})
    * 
    */
   private $collapseAdvDisplay = '0';

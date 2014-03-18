@@ -39,19 +39,33 @@ namespace Civi\Event\Cart;
 require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
+use Hateoas\Configuration\Annotation as Hateoas;
+use Civi\API\Annotation as CiviAPI;
+use JMS\Serializer\Annotation as JMS;
 
 /**
  * EventInCart
  *
+ * @CiviAPI\Entity("EventInCart")
+ * @CiviAPI\Permission()
  * @ORM\Table(name="civicrm_events_in_carts", indexes={@ORM\Index(name="FK_civicrm_events_in_carts_event_id", columns={"event_id"}),@ORM\Index(name="FK_civicrm_events_in_carts_event_cart_id", columns={"event_cart_id"})})
  * @ORM\Entity
+ * @Hateoas\Relation("self",
+ *   href = @Hateoas\Route(
+ *    "EventInCart_get",
+ *    parameters = { "id" = "expr(object.getId())" },
+ *    absolute = true,
+ *    generator = "civi"
+ *  )
+ * )
+ *
  */
 class EventInCart extends \Civi\Core\Entity {
 
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */

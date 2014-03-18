@@ -39,19 +39,33 @@ namespace Civi\Mailing\Event;
 require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
+use Hateoas\Configuration\Annotation as Hateoas;
+use Civi\API\Annotation as CiviAPI;
+use JMS\Serializer\Annotation as JMS;
 
 /**
  * Subscribe
  *
+ * @CiviAPI\Entity("Subscribe")
+ * @CiviAPI\Permission()
  * @ORM\Table(name="civicrm_mailing_event_subscribe", indexes={@ORM\Index(name="FK_civicrm_mailing_event_subscribe_group_id", columns={"group_id"}),@ORM\Index(name="FK_civicrm_mailing_event_subscribe_contact_id", columns={"contact_id"})})
  * @ORM\Entity
+ * @Hateoas\Relation("self",
+ *   href = @Hateoas\Route(
+ *    "Subscribe_get",
+ *    parameters = { "id" = "expr(object.getId())" },
+ *    absolute = true,
+ *    generator = "civi"
+ *  )
+ * )
+ *
  */
 class Subscribe extends \Civi\Core\Entity {
 
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */

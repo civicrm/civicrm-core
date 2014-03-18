@@ -39,12 +39,26 @@ namespace {$table.namespace};
 require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
+use Hateoas\Configuration\Annotation as Hateoas;
+use Civi\API\Annotation as CiviAPI;
+use JMS\Serializer\Annotation as JMS;
 
 /**
  * {$table.className}
  *
+ * @CiviAPI\Entity("{$table.className}")
+ * @CiviAPI\Permission()
  * {$table.tableInfo}
  * @ORM\Entity
+ * @Hateoas\Relation("self",
+ *   href = @Hateoas\Route(
+ *    "{$table.className}_get",
+ *    parameters = {ldelim} "id" = "expr(object.getId())" {rdelim},
+ *    absolute = true,
+ *    generator = "civi"
+ *  )
+ * )
+ *
  */
 class {$table.className} extends \Civi\Core\Entity {ldelim}
 

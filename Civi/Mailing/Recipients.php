@@ -39,19 +39,33 @@ namespace Civi\Mailing;
 require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
+use Hateoas\Configuration\Annotation as Hateoas;
+use Civi\API\Annotation as CiviAPI;
+use JMS\Serializer\Annotation as JMS;
 
 /**
  * Recipients
  *
+ * @CiviAPI\Entity("Recipients")
+ * @CiviAPI\Permission()
  * @ORM\Table(name="civicrm_mailing_recipients", indexes={@ORM\Index(name="FK_civicrm_mailing_recipients_mailing_id", columns={"mailing_id"}),@ORM\Index(name="FK_civicrm_mailing_recipients_contact_id", columns={"contact_id"}),@ORM\Index(name="FK_civicrm_mailing_recipients_email_id", columns={"email_id"}),@ORM\Index(name="FK_civicrm_mailing_recipients_phone_id", columns={"phone_id"})})
  * @ORM\Entity
+ * @Hateoas\Relation("self",
+ *   href = @Hateoas\Route(
+ *    "Recipients_get",
+ *    parameters = { "id" = "expr(object.getId())" },
+ *    absolute = true,
+ *    generator = "civi"
+ *  )
+ * )
+ *
  */
 class Recipients extends \Civi\Core\Entity {
 
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */

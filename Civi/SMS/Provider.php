@@ -39,19 +39,33 @@ namespace Civi\SMS;
 require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
+use Hateoas\Configuration\Annotation as Hateoas;
+use Civi\API\Annotation as CiviAPI;
+use JMS\Serializer\Annotation as JMS;
 
 /**
  * Provider
  *
+ * @CiviAPI\Entity("Provider")
+ * @CiviAPI\Permission()
  * @ORM\Table(name="civicrm_sms_provider")
  * @ORM\Entity
+ * @Hateoas\Relation("self",
+ *   href = @Hateoas\Route(
+ *    "Provider_get",
+ *    parameters = { "id" = "expr(object.getId())" },
+ *    absolute = true,
+ *    generator = "civi"
+ *  )
+ * )
+ *
  */
 class Provider extends \Civi\Core\Entity {
 
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -92,7 +106,7 @@ class Provider extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="api_type", type="integer", nullable=true)
+   * @ORM\Column(name="api_type", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
   private $apiType;

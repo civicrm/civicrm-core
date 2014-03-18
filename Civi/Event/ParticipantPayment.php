@@ -39,19 +39,33 @@ namespace Civi\Event;
 require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
+use Hateoas\Configuration\Annotation as Hateoas;
+use Civi\API\Annotation as CiviAPI;
+use JMS\Serializer\Annotation as JMS;
 
 /**
  * ParticipantPayment
  *
+ * @CiviAPI\Entity("ParticipantPayment")
+ * @CiviAPI\Permission()
  * @ORM\Table(name="civicrm_participant_payment", uniqueConstraints={@ORM\UniqueConstraint(name="UI_contribution_participant", columns={"contribution_id","participant_id"})}, indexes={@ORM\Index(name="FK_civicrm_participant_payment_participant_id", columns={"participant_id"}),@ORM\Index(name="FK_civicrm_participant_payment_contribution_id", columns={"contribution_id"})})
  * @ORM\Entity
+ * @Hateoas\Relation("self",
+ *   href = @Hateoas\Route(
+ *    "ParticipantPayment_get",
+ *    parameters = { "id" = "expr(object.getId())" },
+ *    absolute = true,
+ *    generator = "civi"
+ *  )
+ * )
+ *
  */
 class ParticipantPayment extends \Civi\Core\Entity {
 
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */

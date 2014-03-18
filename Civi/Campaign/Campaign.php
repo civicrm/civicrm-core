@@ -39,19 +39,33 @@ namespace Civi\Campaign;
 require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
+use Hateoas\Configuration\Annotation as Hateoas;
+use Civi\API\Annotation as CiviAPI;
+use JMS\Serializer\Annotation as JMS;
 
 /**
  * Campaign
  *
+ * @CiviAPI\Entity("Campaign")
+ * @CiviAPI\Permission()
  * @ORM\Table(name="civicrm_campaign", uniqueConstraints={@ORM\UniqueConstraint(name="UI_external_identifier", columns={"external_identifier"})}, indexes={@ORM\Index(name="UI_campaign_type_id", columns={"campaign_type_id"}),@ORM\Index(name="UI_campaign_status_id", columns={"status_id"}),@ORM\Index(name="FK_civicrm_campaign_parent_id", columns={"parent_id"}),@ORM\Index(name="FK_civicrm_campaign_created_id", columns={"created_id"}),@ORM\Index(name="FK_civicrm_campaign_last_modified_id", columns={"last_modified_id"})})
  * @ORM\Entity
+ * @Hateoas\Relation("self",
+ *   href = @Hateoas\Route(
+ *    "Campaign_get",
+ *    parameters = { "id" = "expr(object.getId())" },
+ *    absolute = true,
+ *    generator = "civi"
+ *  )
+ * )
+ *
  */
 class Campaign extends \Civi\Core\Entity {
 
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -100,7 +114,7 @@ class Campaign extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="campaign_type_id", type="integer", nullable=false)
+   * @ORM\Column(name="campaign_type_id", type="integer", nullable=false, options={"unsigned":true})
    * 
    */
   private $campaignTypeId = 'NULL';
@@ -108,7 +122,7 @@ class Campaign extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="status_id", type="integer", nullable=false)
+   * @ORM\Column(name="status_id", type="integer", nullable=false, options={"unsigned":true})
    * 
    */
   private $statusId = 'NULL';

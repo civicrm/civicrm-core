@@ -39,19 +39,33 @@ namespace Civi\Activity;
 require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
+use Hateoas\Configuration\Annotation as Hateoas;
+use Civi\API\Annotation as CiviAPI;
+use JMS\Serializer\Annotation as JMS;
 
 /**
  * Activity
  *
+ * @CiviAPI\Entity("Activity")
+ * @CiviAPI\Permission()
  * @ORM\Table(name="civicrm_activity", indexes={@ORM\Index(name="UI_source_record_id", columns={"source_record_id"}),@ORM\Index(name="UI_activity_type_id", columns={"activity_type_id"}),@ORM\Index(name="index_medium_id", columns={"medium_id"}),@ORM\Index(name="index_is_current_revision", columns={"is_current_revision"}),@ORM\Index(name="index_is_deleted", columns={"is_deleted"}),@ORM\Index(name="FK_civicrm_activity_phone_id", columns={"phone_id"}),@ORM\Index(name="FK_civicrm_activity_parent_id", columns={"parent_id"}),@ORM\Index(name="FK_civicrm_activity_relationship_id", columns={"relationship_id"}),@ORM\Index(name="FK_civicrm_activity_original_id", columns={"original_id"}),@ORM\Index(name="FK_civicrm_activity_campaign_id", columns={"campaign_id"})})
  * @ORM\Entity
+ * @Hateoas\Relation("self",
+ *   href = @Hateoas\Route(
+ *    "Activity_get",
+ *    parameters = { "id" = "expr(object.getId())" },
+ *    absolute = true,
+ *    generator = "civi"
+ *  )
+ * )
+ *
  */
 class Activity extends \Civi\Core\Entity {
 
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -60,7 +74,7 @@ class Activity extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="source_record_id", type="integer", nullable=true)
+   * @ORM\Column(name="source_record_id", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
   private $sourceRecordId;
@@ -68,7 +82,7 @@ class Activity extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="activity_type_id", type="integer", nullable=false)
+   * @ORM\Column(name="activity_type_id", type="integer", nullable=false, options={"unsigned":true})
    * 
    */
   private $activityTypeId = '1';
@@ -92,7 +106,7 @@ class Activity extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="duration", type="integer", nullable=true)
+   * @ORM\Column(name="duration", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
   private $duration;
@@ -132,7 +146,7 @@ class Activity extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="status_id", type="integer", nullable=true)
+   * @ORM\Column(name="status_id", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
   private $statusId;
@@ -140,7 +154,7 @@ class Activity extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="priority_id", type="integer", nullable=true)
+   * @ORM\Column(name="priority_id", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
   private $priorityId;
@@ -164,7 +178,7 @@ class Activity extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="medium_id", type="integer", nullable=false)
+   * @ORM\Column(name="medium_id", type="integer", nullable=false, options={"unsigned":true})
    * 
    */
   private $mediumId = 'NULL';
@@ -228,7 +242,7 @@ class Activity extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="engagement_level", type="integer", nullable=true)
+   * @ORM\Column(name="engagement_level", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
   private $engagementLevel;
@@ -236,7 +250,7 @@ class Activity extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="weight", type="integer", nullable=true)
+   * @ORM\Column(name="weight", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
   private $weight;

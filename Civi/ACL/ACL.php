@@ -39,19 +39,33 @@ namespace Civi\ACL;
 require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
+use Hateoas\Configuration\Annotation as Hateoas;
+use Civi\API\Annotation as CiviAPI;
+use JMS\Serializer\Annotation as JMS;
 
 /**
  * ACL
  *
+ * @CiviAPI\Entity("ACL")
+ * @CiviAPI\Permission()
  * @ORM\Table(name="civicrm_acl", indexes={@ORM\Index(name="index_acl_id", columns={"acl_id"})})
  * @ORM\Entity
+ * @Hateoas\Relation("self",
+ *   href = @Hateoas\Route(
+ *    "ACL_get",
+ *    parameters = { "id" = "expr(object.getId())" },
+ *    absolute = true,
+ *    generator = "civi"
+ *  )
+ * )
+ *
  */
 class ACL extends \Civi\Core\Entity {
 
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -84,7 +98,7 @@ class ACL extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="entity_id", type="integer", nullable=true)
+   * @ORM\Column(name="entity_id", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
   private $entityId;
@@ -108,7 +122,7 @@ class ACL extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="object_id", type="integer", nullable=true)
+   * @ORM\Column(name="object_id", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
   private $objectId;
@@ -124,7 +138,7 @@ class ACL extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="acl_id", type="integer", nullable=true)
+   * @ORM\Column(name="acl_id", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
   private $aclId;

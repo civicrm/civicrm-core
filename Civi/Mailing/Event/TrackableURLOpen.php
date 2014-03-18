@@ -39,19 +39,33 @@ namespace Civi\Mailing\Event;
 require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
+use Hateoas\Configuration\Annotation as Hateoas;
+use Civi\API\Annotation as CiviAPI;
+use JMS\Serializer\Annotation as JMS;
 
 /**
  * TrackableURLOpen
  *
+ * @CiviAPI\Entity("TrackableURLOpen")
+ * @CiviAPI\Permission()
  * @ORM\Table(name="civicrm_mailing_event_trackable_url_open", indexes={@ORM\Index(name="FK_civicrm_mailing_event_trackable_url_open_event_queue_id", columns={"event_queue_id"}),@ORM\Index(name="FK_civicrm_mailing_event_trackable_url_open_trackable_url_id", columns={"trackable_url_id"})})
  * @ORM\Entity
+ * @Hateoas\Relation("self",
+ *   href = @Hateoas\Route(
+ *    "TrackableURLOpen_get",
+ *    parameters = { "id" = "expr(object.getId())" },
+ *    absolute = true,
+ *    generator = "civi"
+ *  )
+ * )
+ *
  */
 class TrackableURLOpen extends \Civi\Core\Entity {
 
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */

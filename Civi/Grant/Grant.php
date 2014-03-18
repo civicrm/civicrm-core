@@ -39,19 +39,33 @@ namespace Civi\Grant;
 require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
+use Hateoas\Configuration\Annotation as Hateoas;
+use Civi\API\Annotation as CiviAPI;
+use JMS\Serializer\Annotation as JMS;
 
 /**
  * Grant
  *
+ * @CiviAPI\Entity("Grant")
+ * @CiviAPI\Permission()
  * @ORM\Table(name="civicrm_grant", indexes={@ORM\Index(name="index_grant_type_id", columns={"grant_type_id"}),@ORM\Index(name="index_status_id", columns={"status_id"}),@ORM\Index(name="FK_civicrm_grant_contact_id", columns={"contact_id"}),@ORM\Index(name="FK_civicrm_grant_financial_type_id", columns={"financial_type_id"})})
  * @ORM\Entity
+ * @Hateoas\Relation("self",
+ *   href = @Hateoas\Route(
+ *    "Grant_get",
+ *    parameters = { "id" = "expr(object.getId())" },
+ *    absolute = true,
+ *    generator = "civi"
+ *  )
+ * )
+ *
  */
 class Grant extends \Civi\Core\Entity {
 
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -108,7 +122,7 @@ class Grant extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="grant_type_id", type="integer", nullable=true)
+   * @ORM\Column(name="grant_type_id", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
   private $grantTypeId;
@@ -156,7 +170,7 @@ class Grant extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="status_id", type="integer", nullable=true)
+   * @ORM\Column(name="status_id", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
   private $statusId;

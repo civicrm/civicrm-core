@@ -39,19 +39,33 @@ namespace Civi\Contact;
 require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
+use Hateoas\Configuration\Annotation as Hateoas;
+use Civi\API\Annotation as CiviAPI;
+use JMS\Serializer\Annotation as JMS;
 
 /**
  * SavedSearch
  *
+ * @CiviAPI\Entity("SavedSearch")
+ * @CiviAPI\Permission()
  * @ORM\Table(name="civicrm_saved_search", indexes={@ORM\Index(name="FK_civicrm_saved_search_mapping_id", columns={"mapping_id"})})
  * @ORM\Entity
+ * @Hateoas\Relation("self",
+ *   href = @Hateoas\Route(
+ *    "SavedSearch_get",
+ *    parameters = { "id" = "expr(object.getId())" },
+ *    absolute = true,
+ *    generator = "civi"
+ *  )
+ * )
+ *
  */
 class SavedSearch extends \Civi\Core\Entity {
 
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -76,7 +90,7 @@ class SavedSearch extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="search_custom_id", type="integer", nullable=true)
+   * @ORM\Column(name="search_custom_id", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
   private $searchCustomId;

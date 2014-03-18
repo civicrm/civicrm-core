@@ -39,19 +39,33 @@ namespace Civi\Report;
 require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
+use Hateoas\Configuration\Annotation as Hateoas;
+use Civi\API\Annotation as CiviAPI;
+use JMS\Serializer\Annotation as JMS;
 
 /**
  * ReportInstance
  *
+ * @CiviAPI\Entity("ReportInstance")
+ * @CiviAPI\Permission()
  * @ORM\Table(name="civicrm_report_instance", indexes={@ORM\Index(name="FK_civicrm_report_instance_domain_id", columns={"domain_id"}),@ORM\Index(name="FK_civicrm_report_instance_navigation_id", columns={"navigation_id"}),@ORM\Index(name="FK_civicrm_report_instance_drilldown_id", columns={"drilldown_id"})})
  * @ORM\Entity
+ * @Hateoas\Relation("self",
+ *   href = @Hateoas\Route(
+ *    "ReportInstance_get",
+ *    parameters = { "id" = "expr(object.getId())" },
+ *    absolute = true,
+ *    generator = "civi"
+ *  )
+ * )
+ *
  */
 class ReportInstance extends \Civi\Core\Entity {
 
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */

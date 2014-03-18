@@ -39,19 +39,33 @@ namespace Civi\Dedupe;
 require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
+use Hateoas\Configuration\Annotation as Hateoas;
+use Civi\API\Annotation as CiviAPI;
+use JMS\Serializer\Annotation as JMS;
 
 /**
  * RuleGroup
  *
+ * @CiviAPI\Entity("RuleGroup")
+ * @CiviAPI\Permission()
  * @ORM\Table(name="civicrm_dedupe_rule_group")
  * @ORM\Entity
+ * @Hateoas\Relation("self",
+ *   href = @Hateoas\Route(
+ *    "RuleGroup_get",
+ *    parameters = { "id" = "expr(object.getId())" },
+ *    absolute = true,
+ *    generator = "civi"
+ *  )
+ * )
+ *
  */
 class RuleGroup extends \Civi\Core\Entity {
 
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -68,7 +82,7 @@ class RuleGroup extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="threshold", type="integer", nullable=true)
+   * @ORM\Column(name="threshold", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
   private $threshold;

@@ -39,19 +39,33 @@ namespace Civi\Mailing\Event;
 require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
+use Hateoas\Configuration\Annotation as Hateoas;
+use Civi\API\Annotation as CiviAPI;
+use JMS\Serializer\Annotation as JMS;
 
 /**
  * Bounce
  *
+ * @CiviAPI\Entity("Bounce")
+ * @CiviAPI\Permission()
  * @ORM\Table(name="civicrm_mailing_event_bounce", indexes={@ORM\Index(name="FK_civicrm_mailing_event_bounce_event_queue_id", columns={"event_queue_id"})})
  * @ORM\Entity
+ * @Hateoas\Relation("self",
+ *   href = @Hateoas\Route(
+ *    "Bounce_get",
+ *    parameters = { "id" = "expr(object.getId())" },
+ *    absolute = true,
+ *    generator = "civi"
+ *  )
+ * )
+ *
  */
 class Bounce extends \Civi\Core\Entity {
 
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -68,7 +82,7 @@ class Bounce extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="bounce_type_id", type="integer", nullable=true)
+   * @ORM\Column(name="bounce_type_id", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
   private $bounceTypeId;

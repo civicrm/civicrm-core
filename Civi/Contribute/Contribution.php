@@ -39,19 +39,33 @@ namespace Civi\Contribute;
 require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
+use Hateoas\Configuration\Annotation as Hateoas;
+use Civi\API\Annotation as CiviAPI;
+use JMS\Serializer\Annotation as JMS;
 
 /**
  * Contribution
  *
+ * @CiviAPI\Entity("Contribution")
+ * @CiviAPI\Permission()
  * @ORM\Table(name="civicrm_contribution", uniqueConstraints={@ORM\UniqueConstraint(name="UI_contrib_trxn_id", columns={"trxn_id"}),@ORM\UniqueConstraint(name="UI_contrib_invoice_id", columns={"invoice_id"})}, indexes={@ORM\Index(name="UI_contrib_payment_instrument_id", columns={"payment_instrument_id"}),@ORM\Index(name="index_contribution_status", columns={"contribution_status_id"}),@ORM\Index(name="received_date", columns={"receive_date"}),@ORM\Index(name="check_number", columns={"check_number"}),@ORM\Index(name="FK_civicrm_contribution_contact_id", columns={"contact_id"}),@ORM\Index(name="FK_civicrm_contribution_financial_type_id", columns={"financial_type_id"}),@ORM\Index(name="FK_civicrm_contribution_contribution_page_id", columns={"contribution_page_id"}),@ORM\Index(name="FK_civicrm_contribution_contribution_recur_id", columns={"contribution_recur_id"}),@ORM\Index(name="FK_civicrm_contribution_address_id", columns={"address_id"}),@ORM\Index(name="FK_civicrm_contribution_campaign_id", columns={"campaign_id"})})
  * @ORM\Entity
+ * @Hateoas\Relation("self",
+ *   href = @Hateoas\Route(
+ *    "Contribution_get",
+ *    parameters = { "id" = "expr(object.getId())" },
+ *    absolute = true,
+ *    generator = "civi"
+ *  )
+ * )
+ *
  */
 class Contribution extends \Civi\Core\Entity {
 
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -84,7 +98,7 @@ class Contribution extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="payment_instrument_id", type="integer", nullable=true)
+   * @ORM\Column(name="payment_instrument_id", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
   private $paymentInstrumentId;
@@ -228,7 +242,7 @@ class Contribution extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="contribution_status_id", type="integer", nullable=false)
+   * @ORM\Column(name="contribution_status_id", type="integer", nullable=false, options={"unsigned":true})
    * 
    */
   private $contributionStatusId = '1';

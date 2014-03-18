@@ -39,19 +39,33 @@ namespace Civi\Core;
 require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
+use Hateoas\Configuration\Annotation as Hateoas;
+use Civi\API\Annotation as CiviAPI;
+use JMS\Serializer\Annotation as JMS;
 
 /**
  * UFField
  *
+ * @CiviAPI\Entity("UFField")
+ * @CiviAPI\Permission()
  * @ORM\Table(name="civicrm_uf_field", indexes={@ORM\Index(name="FK_civicrm_uf_field_uf_group_id", columns={"uf_group_id"}),@ORM\Index(name="FK_civicrm_uf_field_location_type_id", columns={"location_type_id"})})
  * @ORM\Entity
+ * @Hateoas\Relation("self",
+ *   href = @Hateoas\Route(
+ *    "UFField_get",
+ *    parameters = { "id" = "expr(object.getId())" },
+ *    absolute = true,
+ *    generator = "civi"
+ *  )
+ * )
+ *
  */
 class UFField extends \Civi\Core\Entity {
 
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -100,7 +114,7 @@ class UFField extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="weight", type="integer", nullable=false)
+   * @ORM\Column(name="weight", type="integer", nullable=false, options={"unsigned":true})
    * 
    */
   private $weight = '1';
@@ -156,7 +170,7 @@ class UFField extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="phone_type_id", type="integer", nullable=true)
+   * @ORM\Column(name="phone_type_id", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
   private $phoneTypeId;

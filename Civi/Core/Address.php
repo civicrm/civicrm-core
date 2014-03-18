@@ -39,19 +39,33 @@ namespace Civi\Core;
 require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
+use Hateoas\Configuration\Annotation as Hateoas;
+use Civi\API\Annotation as CiviAPI;
+use JMS\Serializer\Annotation as JMS;
 
 /**
  * Address
  *
+ * @CiviAPI\Entity("Address")
+ * @CiviAPI\Permission()
  * @ORM\Table(name="civicrm_address", indexes={@ORM\Index(name="index_location_type", columns={"location_type_id"}),@ORM\Index(name="index_is_primary", columns={"is_primary"}),@ORM\Index(name="index_is_billing", columns={"is_billing"}),@ORM\Index(name="index_street_name", columns={"street_name"}),@ORM\Index(name="index_city", columns={"city"}),@ORM\Index(name="FK_civicrm_address_contact_id", columns={"contact_id"}),@ORM\Index(name="FK_civicrm_address_county_id", columns={"county_id"}),@ORM\Index(name="FK_civicrm_address_state_province_id", columns={"state_province_id"}),@ORM\Index(name="FK_civicrm_address_country_id", columns={"country_id"}),@ORM\Index(name="FK_civicrm_address_master_id", columns={"master_id"})})
  * @ORM\Entity
+ * @Hateoas\Relation("self",
+ *   href = @Hateoas\Route(
+ *    "Address_get",
+ *    parameters = { "id" = "expr(object.getId())" },
+ *    absolute = true,
+ *    generator = "civi"
+ *  )
+ * )
+ *
  */
 class Address extends \Civi\Core\Entity {
 
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -68,7 +82,7 @@ class Address extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="location_type_id", type="integer", nullable=true)
+   * @ORM\Column(name="location_type_id", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
   private $locationTypeId;
@@ -100,7 +114,7 @@ class Address extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="street_number", type="integer", nullable=true)
+   * @ORM\Column(name="street_number", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
   private $streetNumber;
