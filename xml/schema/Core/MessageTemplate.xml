@@ -85,6 +85,10 @@
       <name>pdf_format_id</name>
       <type>int unsigned</type>
       <comment>FK to civicrm_option_value containing PDF Page Format.</comment>
+      <pseudoconstant>
+        <optionGroupName>pdf_format</optionGroupName>
+        <keyColumn>id</keyColumn>
+      </pseudoconstant>
       <add>3.4</add>
   </field>
   <foreignKey>
