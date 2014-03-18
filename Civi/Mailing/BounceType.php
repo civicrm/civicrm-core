@@ -51,7 +51,7 @@ class BounceType extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -76,7 +76,7 @@ class BounceType extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="hold_threshold", type="integer", nullable=true)
+   * @ORM\Column(name="hold_threshold", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
   private $holdThreshold;

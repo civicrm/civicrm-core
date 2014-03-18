@@ -51,7 +51,7 @@ class Mailing extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -100,7 +100,7 @@ class Mailing extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="resubscribe_id", type="integer", nullable=true)
+   * @ORM\Column(name="resubscribe_id", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
   private $resubscribeId;
@@ -276,7 +276,7 @@ class Mailing extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="approval_status_id", type="integer", nullable=true)
+   * @ORM\Column(name="approval_status_id", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
   private $approvalStatusId;

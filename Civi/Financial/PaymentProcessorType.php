@@ -51,7 +51,7 @@ class PaymentProcessorType extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -204,7 +204,7 @@ class PaymentProcessorType extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="billing_mode", type="integer", nullable=true)
+   * @ORM\Column(name="billing_mode", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
   private $billingMode;
@@ -220,7 +220,7 @@ class PaymentProcessorType extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="payment_type", type="integer", nullable=false)
+   * @ORM\Column(name="payment_type", type="integer", nullable=false, options={"unsigned":true})
    * 
    */
   private $paymentType = '1';

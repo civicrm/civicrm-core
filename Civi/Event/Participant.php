@@ -51,7 +51,7 @@ class Participant extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -172,7 +172,7 @@ class Participant extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="discount_amount", type="integer", nullable=true)
+   * @ORM\Column(name="discount_amount", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
   private $discountAmount;
@@ -188,7 +188,7 @@ class Participant extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="must_wait", type="integer", nullable=true)
+   * @ORM\Column(name="must_wait", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
   private $mustWait;

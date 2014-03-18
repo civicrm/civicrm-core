@@ -51,7 +51,7 @@ class MailingJob extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -124,7 +124,7 @@ class MailingJob extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="job_offset", type="integer", nullable=false)
+   * @ORM\Column(name="job_offset", type="integer", nullable=false, options={"unsigned":true})
    * 
    */
   private $jobOffset = '0';
@@ -132,7 +132,7 @@ class MailingJob extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="job_limit", type="integer", nullable=false)
+   * @ORM\Column(name="job_limit", type="integer", nullable=false, options={"unsigned":true})
    * 
    */
   private $jobLimit = '0';

@@ -51,7 +51,7 @@ class MailSettings extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -60,7 +60,7 @@ class MailSettings extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="domain_id", type="integer", nullable=true)
+   * @ORM\Column(name="domain_id", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
   private $domainId;
@@ -124,7 +124,7 @@ class MailSettings extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="port", type="integer", nullable=true)
+   * @ORM\Column(name="port", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
   private $port;

@@ -51,7 +51,7 @@ class FinancialAccount extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -76,7 +76,7 @@ class FinancialAccount extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="financial_account_type_id", type="integer", nullable=false)
+   * @ORM\Column(name="financial_account_type_id", type="integer", nullable=false, options={"unsigned":true})
    * 
    */
   private $financialAccountTypeId = '3';

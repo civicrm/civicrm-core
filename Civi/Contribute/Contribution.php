@@ -51,7 +51,7 @@ class Contribution extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -84,7 +84,7 @@ class Contribution extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="payment_instrument_id", type="integer", nullable=true)
+   * @ORM\Column(name="payment_instrument_id", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
   private $paymentInstrumentId;
@@ -228,7 +228,7 @@ class Contribution extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="contribution_status_id", type="integer", nullable=false)
+   * @ORM\Column(name="contribution_status_id", type="integer", nullable=false, options={"unsigned":true})
    * 
    */
   private $contributionStatusId = '1';

@@ -51,7 +51,7 @@ class Product extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -164,7 +164,7 @@ class Product extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="fixed_period_start_day", type="integer", nullable=false)
+   * @ORM\Column(name="fixed_period_start_day", type="integer", nullable=false, options={"unsigned":true})
    * 
    */
   private $fixedPeriodStartDay = '0101';
@@ -180,7 +180,7 @@ class Product extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="duration_interval", type="integer", nullable=true)
+   * @ORM\Column(name="duration_interval", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
   private $durationInterval;
@@ -196,7 +196,7 @@ class Product extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="frequency_interval", type="integer", nullable=true)
+   * @ORM\Column(name="frequency_interval", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
   private $frequencyInterval;

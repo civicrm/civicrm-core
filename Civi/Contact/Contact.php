@@ -51,7 +51,7 @@ class Contact extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -252,7 +252,7 @@ class Contact extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="prefix_id", type="integer", nullable=true)
+   * @ORM\Column(name="prefix_id", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
   private $prefixId;
@@ -260,7 +260,7 @@ class Contact extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="suffix_id", type="integer", nullable=true)
+   * @ORM\Column(name="suffix_id", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
   private $suffixId;
@@ -276,7 +276,7 @@ class Contact extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="communication_style_id", type="integer", nullable=true)
+   * @ORM\Column(name="communication_style_id", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
   private $communicationStyleId;
@@ -284,7 +284,7 @@ class Contact extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="email_greeting_id", type="integer", nullable=true)
+   * @ORM\Column(name="email_greeting_id", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
   private $emailGreetingId;
@@ -308,7 +308,7 @@ class Contact extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="postal_greeting_id", type="integer", nullable=true)
+   * @ORM\Column(name="postal_greeting_id", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
   private $postalGreetingId;
@@ -332,7 +332,7 @@ class Contact extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="addressee_id", type="integer", nullable=true)
+   * @ORM\Column(name="addressee_id", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
   private $addresseeId;
@@ -364,7 +364,7 @@ class Contact extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="gender_id", type="integer", nullable=true)
+   * @ORM\Column(name="gender_id", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
   private $genderId;

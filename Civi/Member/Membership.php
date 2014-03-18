@@ -51,7 +51,7 @@ class Membership extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -132,7 +132,7 @@ class Membership extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="max_related", type="integer", nullable=true)
+   * @ORM\Column(name="max_related", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
   private $maxRelated;

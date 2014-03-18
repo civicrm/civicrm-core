@@ -51,7 +51,7 @@ class ContributionPage extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -212,7 +212,7 @@ class ContributionPage extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="default_amount_id", type="integer", nullable=true)
+   * @ORM\Column(name="default_amount_id", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
   private $defaultAmountId;

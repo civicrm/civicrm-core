@@ -51,7 +51,7 @@ class MembershipStatus extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -92,7 +92,7 @@ class MembershipStatus extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="start_event_adjust_interval", type="integer", nullable=true)
+   * @ORM\Column(name="start_event_adjust_interval", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
   private $startEventAdjustInterval;
@@ -116,7 +116,7 @@ class MembershipStatus extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="end_event_adjust_interval", type="integer", nullable=true)
+   * @ORM\Column(name="end_event_adjust_interval", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
   private $endEventAdjustInterval;
@@ -140,7 +140,7 @@ class MembershipStatus extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="weight", type="integer", nullable=true)
+   * @ORM\Column(name="weight", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
   private $weight;

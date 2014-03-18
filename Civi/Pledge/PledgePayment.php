@@ -51,7 +51,7 @@ class PledgePayment extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -116,7 +116,7 @@ class PledgePayment extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="reminder_count", type="integer", nullable=false)
+   * @ORM\Column(name="reminder_count", type="integer", nullable=false, options={"unsigned":true})
    * 
    */
   private $reminderCount = '0';
@@ -124,7 +124,7 @@ class PledgePayment extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="status_id", type="integer", nullable=true)
+   * @ORM\Column(name="status_id", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
   private $statusId;

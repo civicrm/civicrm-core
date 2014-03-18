@@ -51,7 +51,7 @@ class PriceFieldValue extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -100,7 +100,7 @@ class PriceFieldValue extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="count", type="integer", nullable=false)
+   * @ORM\Column(name="count", type="integer", nullable=false, options={"unsigned":true})
    * 
    */
   private $count = 'NULL';
@@ -108,7 +108,7 @@ class PriceFieldValue extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="max_value", type="integer", nullable=false)
+   * @ORM\Column(name="max_value", type="integer", nullable=false, options={"unsigned":true})
    * 
    */
   private $maxValue = 'NULL';
@@ -116,7 +116,7 @@ class PriceFieldValue extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="weight", type="integer", nullable=false)
+   * @ORM\Column(name="weight", type="integer", nullable=false, options={"unsigned":true})
    * 
    */
   private $weight = '1';
@@ -132,7 +132,7 @@ class PriceFieldValue extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="membership_num_terms", type="integer", nullable=false)
+   * @ORM\Column(name="membership_num_terms", type="integer", nullable=false, options={"unsigned":true})
    * 
    */
   private $membershipNumTerms = 'NULL';

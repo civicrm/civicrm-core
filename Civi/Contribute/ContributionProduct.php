@@ -51,7 +51,7 @@ class ContributionProduct extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -60,7 +60,7 @@ class ContributionProduct extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="product_id", type="integer", nullable=true)
+   * @ORM\Column(name="product_id", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
   private $productId;
@@ -84,7 +84,7 @@ class ContributionProduct extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="quantity", type="integer", nullable=true)
+   * @ORM\Column(name="quantity", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
   private $quantity;

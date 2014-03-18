@@ -51,7 +51,7 @@ class Phone extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -68,7 +68,7 @@ class Phone extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="location_type_id", type="integer", nullable=true)
+   * @ORM\Column(name="location_type_id", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
   private $locationTypeId;
@@ -92,7 +92,7 @@ class Phone extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="mobile_provider_id", type="integer", nullable=true)
+   * @ORM\Column(name="mobile_provider_id", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
   private $mobileProviderId;
@@ -124,7 +124,7 @@ class Phone extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="phone_type_id", type="integer", nullable=true)
+   * @ORM\Column(name="phone_type_id", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
   private $phoneTypeId;

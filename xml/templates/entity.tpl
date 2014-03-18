@@ -51,7 +51,7 @@ class {$table.className} extends \Civi\Core\Entity {ldelim}
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, options={ldelim}"unsigned":true{rdelim} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */

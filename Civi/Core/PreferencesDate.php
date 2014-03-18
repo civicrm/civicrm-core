@@ -51,7 +51,7 @@ class PreferencesDate extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="id", type="integer", nullable=false)
+   * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
    * @ORM\GeneratedValue(strategy="IDENTITY")
    */
@@ -76,7 +76,7 @@ class PreferencesDate extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="start", type="integer", nullable=true)
+   * @ORM\Column(name="start", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
   private $start;
@@ -84,7 +84,7 @@ class PreferencesDate extends \Civi\Core\Entity {
   /**
    * @var integer
    *
-   * @ORM\Column(name="end", type="integer", nullable=true)
+   * @ORM\Column(name="end", type="integer", nullable=true, options={"unsigned":true})
    * 
    */
   private $end;
