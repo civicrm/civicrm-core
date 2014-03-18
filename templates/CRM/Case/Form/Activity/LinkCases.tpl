@@ -23,7 +23,7 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
-{* Template for to create a link between two cases. *}{debug}
+{* Template for to create a link between two cases. *}
    <div class="crm-block crm-form-block crm-case-linkcases-form-block">
     <tr class="crm-case-linkcases-form-block-link_to_case_id">
       <td class="label">{$form.link_to_case_id.label}</td>
