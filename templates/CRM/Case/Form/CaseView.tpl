@@ -47,7 +47,7 @@
           <span class="icon edit-icon"></span>
         </a>
         {if $hasRelatedCases}
-          <div class="crm-block relatedCases-link"><a href='#' onClick='viewRelatedCases( {$caseID}, {$contactID} ); return false;'>{ts}Related Cases{/ts}</a></div>
+          <div class="crm-block relatedCases-link"><a class="crm-popup medium-popup" href="{$relatedCaseUrl}">{$relatedCaseLabel}</a></div>
         {/if}
       </td>
     </tr>
@@ -73,7 +73,7 @@
           {/foreach}
         </table>
         {if $hasRelatedCases}
-          <div class="crm-block relatedCases-link"><a href='#' onClick='viewRelatedCases( {$caseID}, {$contactID} ); return false;'>{ts}Related Cases{/ts}</a></div>
+          <div class="crm-block relatedCases-link"><a class="crm-popup medium-popup" href="{$relatedCaseUrl}">{$relatedCaseLabel}</a></div>
         {/if}
       </td>
     {/if}
@@ -81,13 +81,13 @@
       <span class="crm-case-summary-label">{ts}Subject{/ts}:</span>&nbsp;{$caseDetails.case_subject}
     </td>
     <td class="crm-case-caseview-case_type label">
-      <span class="crm-case-summary-label">{ts}Type{/ts}:</span>&nbsp;{$caseDetails.case_type}&nbsp;<a class="crm-hover-button"  href="{crmURL p='civicrm/case/activity' q="action=add&reset=1&cid=`$contactId`&caseid=`$caseId`&selectedChild=activity&atype=`$changeCaseTypeId`"}" title="{ts}Change case type (creates activity record){/ts}"><span class="icon edit-icon"></span></a>
+      <span class="crm-case-summary-label">{ts}Type{/ts}:</span>&nbsp;{$caseDetails.case_type}&nbsp;<a class="crm-hover-button action-item"  href="{crmURL p='civicrm/case/activity' q="action=add&reset=1&cid=`$contactId`&caseid=`$caseId`&selectedChild=activity&atype=`$changeCaseTypeId`"}" title="{ts}Change case type (creates activity record){/ts}"><span class="icon edit-icon"></span></a>
     </td>
     <td class="crm-case-caseview-case_status label">
-      <span class="crm-case-summary-label">{ts}Status{/ts}:</span>&nbsp;{$caseDetails.case_status}&nbsp;<a class="crm-hover-button"  href="{crmURL p='civicrm/case/activity' q="action=add&reset=1&cid=`$contactId`&caseid=`$caseId`&selectedChild=activity&atype=`$changeCaseStatusId`"}" title="{ts}Change case status (creates activity record){/ts}"><span class="icon edit-icon"></span></a>
+      <span class="crm-case-summary-label">{ts}Status{/ts}:</span>&nbsp;{$caseDetails.case_status}&nbsp;<a class="crm-hover-button action-item"  href="{crmURL p='civicrm/case/activity' q="action=add&reset=1&cid=`$contactId`&caseid=`$caseId`&selectedChild=activity&atype=`$changeCaseStatusId`"}" title="{ts}Change case status (creates activity record){/ts}"><span class="icon edit-icon"></span></a>
     </td>
     <td class="crm-case-caseview-case_start_date label">
-      <span class="crm-case-summary-label">{ts}Open Date{/ts}:</span>&nbsp;{$caseDetails.case_start_date|crmDate}&nbsp;<a class="crm-hover-button"  href="{crmURL p='civicrm/case/activity' q="action=add&reset=1&cid=`$contactId`&caseid=`$caseId`&selectedChild=activity&atype=`$changeCaseStartDateId`"}" title="{ts}Change case start date (creates activity record){/ts}"><span class="icon edit-icon"></span></a>
+      <span class="crm-case-summary-label">{ts}Open Date{/ts}:</span>&nbsp;{$caseDetails.case_start_date|crmDate}&nbsp;<a class="crm-hover-button action-item"  href="{crmURL p='civicrm/case/activity' q="action=add&reset=1&cid=`$contactId`&caseid=`$caseId`&selectedChild=activity&atype=`$changeCaseStartDateId`"}" title="{ts}Change case start date (creates activity record){/ts}"><span class="icon edit-icon"></span></a>
     </td>
     <td class="crm-case-caseview-{$caseID} label">
       <span class="crm-case-summary-label">{ts}ID{/ts}:</span>&nbsp;{$caseID}
@@ -104,10 +104,10 @@
 
 <table class="form-layout">
 <tr class="crm-case-caseview-form-block-activity_type_id">
-  <td>{$form.activity_type_id.label}<br />{$form.activity_type_id.html}&nbsp;<input type="button" accesskey="N" value="{ts}Go{/ts}" name="new_activity" onclick="checkSelection( this );"/></td>
+  <td>{$form.add_activity_type_id.html}</td>
   {if $hasAccessToAllCases}
     <td>
-      <span class="crm-button"><div class="icon print-icon"></div><input type="button"  value="{ts}Print Report{/ts}" name="case_report_all" onclick="printCaseReport( );"/></span>
+      <a class="button no-popup" href="{crmURL p='civicrm/case/report/print' q="all=1&redact=0&cid=$contactID&caseID=$caseId&asn=standard_timeline"}"><div class="icon print-icon"></div> {ts}Print Report{/ts}</a>
     </td>
   </tr>
   <tr>
@@ -131,15 +131,11 @@
   {if call_user_func(array('CRM_Core_Permission','giveMeAllACLs'))}
     <tr class="crm-case-caseview-form-block-change_client_id">
       <td colspan='2'>
-        <a class="crm-popup" href="{crmURL p='civicrm/contact/view/case/editClient' h=0 q="reset=1&action=update&id=$caseID&cid=$contactID"}"><span class="icon swap-icon"></span> {ts}Assign to Another Contact{/ts}</a>
+        <a class="crm-popup medium-popup" href="{crmURL p='civicrm/contact/view/case/editClient' h=0 q="reset=1&action=update&id=$caseID&cid=$contactID"}"><span class="icon swap-icon"></span> {ts}Assign to Another Contact{/ts}</a>
       </td>
     </tr>
   {/if}
 </table>
-
-<div id="view-related-cases">
-  <div id="related-cases-content"></div>
-</div>
 
 <div class="clear"></div>
 {include file="CRM/Case/Page/CustomDataView.tpl"}
@@ -259,15 +255,6 @@
     deleteCaseRoles('caseRoles-selector');
   }
 
-  function printCaseReport( ) {
-    var asn = 'standard_timeline';
-    var dataUrl = {/literal}"{crmURL p='civicrm/case/report/print' q='all=1&redact=0' h='0'}"{literal};
-    dataUrl     = dataUrl + '&cid={/literal}{$contactID}{literal}'
-    + '&caseID={/literal}{$caseID}{literal}'
-    + '&asn={/literal}' + asn + '{literal}';
-
-    window.location = dataUrl;
-  }
 </script>
 {/literal}
  </div><!-- /.crm-accordion-body -->
@@ -420,46 +407,6 @@
     });
   }
 
-  function viewRelatedCases( mainCaseID, contactID ) {
-    cj("#view-related-cases").show( );
-    cj("#view-related-cases").dialog({
-      title: "Related Cases",
-      modal: true,
-      width : "680px",
-      height: 'auto',
-      resizable: true,
-      bgiframe: true,
-      overlay: {
-        opacity: 0.5,
-        background: "black"
-      },
-
-      beforeclose: function(event, ui) {
-        cj(this).dialog("destroy");
-      },
-
-      open:function() {
-        var dataUrl = {/literal}"{crmURL p='civicrm/contact/view/case' h=0 q="snippet=4" }"{literal};
-          dataUrl = dataUrl + '&id=' + mainCaseID + '&cid=' +contactID + '&relatedCases=true&action=view&context=case&selectedChild=case';
-
-          cj.ajax({
-            url     : dataUrl,
-            async   : false,
-            success : function(html){
-              cj("#related-cases-content" ).html( html );
-            }
-          });
-        },
-
-      buttons: {
-        "Done": function() {
-          cj(this).dialog("close");
-          cj(this).dialog("destroy");
-        }
-      }
-    });
-  }
-
 </script>
 {/literal}
 
@@ -469,11 +416,11 @@
       {ts}Other Relationships{/ts}
     </div><!-- /.crm-accordion-header -->
     <div class="crm-accordion-body">
-
+      {capture assign=relUrl}{crmURL p='civicrm/contact/view/rel' q="action=add&reset=1&cid=`$contactId`&caseID=`$caseID`"}{/capture}
       {if $clientRelationships}
         <div class="crm-submit-buttons">
-          <a class="button" href="#" onClick="window.location='{crmURL p='civicrm/contact/view/rel' q="action=add&reset=1&cid=`$contactId`&caseID=`$caseID`"}'; return false;">
-          <span><div class="icon add-icon"></div>{ts}Add client relationship{/ts}</a></span>
+          <a class="button" href="{$relUrl}">
+          <div class="icon add-icon"></div>{ts}Add client relationship{/ts}</a>
         </div>
         <table id="clientRelationships-selector"  class="report-layout">
           <thead><tr>
@@ -486,8 +433,8 @@
         {else}
         <div class="messages status no-popup">
           <div class="icon inform-icon"></div>
-          {capture assign=crmURL}{crmURL p='civicrm/contact/view/rel' q="action=add&reset=1&cid=`$contactId`&caseID=`$caseID`"}{/capture}
-          {ts 1=$crmURL}There are no Relationships entered for this client. You can <a accesskey="N" href='%1'>add one</a>.{/ts}
+          {capture assign=link}class="action-item" href="{$relUrl}"{/capture}
+          {ts 1=$link}There are no Relationships entered for this client. You can <a %1>add one</a>.{/ts}
         </div>
       {/if}
  {literal}
@@ -946,17 +893,6 @@ function checkSelection( field ) {
     successAction     = "confirm('{/literal}{ts escape='js'}Are you sure you want to add a set of scheduled activities to this case?{/ts}{literal}');";
     break;
 
-  case 'new_activity' :
-    validationMessage = '{/literal}{ts escape="js"}Please select an activity type from the list.{/ts}{literal}';
-    validationField   = 'activity_type_id';
-    if ( document.getElementById('activity_type_id').value == 3 ) {
-      successAction = "window.location='{/literal}{$newActivityEmailUrl}{literal}' + document.getElementById('activity_type_id').value";
-    }
-    else {
-      successAction = "window.location='{/literal}{$newActivityUrl}{literal}' + document.getElementById('activity_type_id').value";
-    }
-    break;
-
   case 'case_report' :
     validationMessage = '{/literal}{ts escape="js"}Please select a report from the list.{/ts}{literal}';
     validationField   = 'report_id';
@@ -1050,16 +986,6 @@ function setSelectorClass( ) {
   });
 }
 
-function printCaseReport( ) {
-  var asn = 'standard_timeline';
-  var dataUrl = {/literal}"{crmURL p='civicrm/case/report/print' q='all=1&redact=0' h='0'}"{literal};
-  dataUrl     = dataUrl + '&cid={/literal}{$contactID}{literal}'
-  + '&caseID={/literal}{$caseID}{literal}'
-  + '&asn={/literal}' + asn + '{literal}';
-
-  window.location = dataUrl;
-}
-
 </script>
 {/literal}
 
@@ -1073,7 +999,7 @@ function printCaseReport( ) {
 </script>
 {/literal}
 
+  {include file="CRM/Case/Form/ActivityChangeStatusJs.tpl"}
 {/if} {* view related cases if end *}
 </div>
 
-{include file="CRM/Case/Form/ActivityChangeStatusJs.tpl"}
