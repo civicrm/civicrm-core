@@ -940,7 +940,7 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
       }
 
       //handle the case to avoid re-write where the profile field labels are the same
-      if (CRM_Utils_Array::value($index, $values)) {
+      if (array_key_exists($index, $values)) {
         $index .= $nullValueIndex;
         $nullValueIndex .= $nullValueIndex;
       }
@@ -950,8 +950,8 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
       if (isset($details->$name) || $name == 'group' || $name == 'tag') {
         // to handle gender / suffix / prefix
         if (in_array(substr($name, 0, -3), array('gender', 'prefix', 'suffix'))) {
-          $values[$index] = CRM_Core_PseudoConstant::getLabel('CRM_Contact_DAO_Contact', $name, $details->$name);
           $params[$index] = $details->$name;
+          $values[$index] = $details->$name;
         }
         elseif (in_array($name, CRM_Contact_BAO_Contact::$_greetingTypes)) {
           $dname          = $name . '_display';
