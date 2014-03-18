@@ -311,7 +311,7 @@
         ajaxForm: {},
         autoClose: true,
         validate: true,
-        refreshAction: ['next_new', 'submit_savenext'],
+        refreshAction: ['next_new', 'submit_savenext', 'upload_new'],
         cancelButton: '.cancel',
         openInline: 'a.open-inline, a.button, a.action-item',
         onCancel: function(event) {},
