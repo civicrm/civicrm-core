@@ -560,6 +560,23 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       $result = $this->callAPISuccess($entityName, 'get', $case[0]);
       $this->assertEquals($case[1], $result['count'], $case[2]);
       $this->assertEquals($case[1], count($result['values']));
+
+      //non preferred / legacy syntax
+      if(isset($case[0]['options']['limit'])) {
+        $result = $this->callAPISuccess($entityName, 'get', array('rowCount' => $case[0]['options']['limit']));
+        $this->assertEquals($case[1], $result['count'], $case[2]);
+        $this->assertEquals($case[1], count($result['values']));
+
+        //non preferred / legacy syntax
+        $result = $this->callAPISuccess($entityName, 'get', array('option_limit' => $case[0]['options']['limit']));
+        $this->assertEquals($case[1], $result['count'], $case[2]);
+        $this->assertEquals($case[1], count($result['values']));
+
+        //non preferred / legacy syntax
+        $result = $this->callAPISuccess($entityName, 'get', array('option.limit' => $case[0]['options']['limit']));
+        $this->assertEquals($case[1], $result['count'], $case[2]);
+        $this->assertEquals($case[1], count($result['values']));
+      }
     }
   }
 
