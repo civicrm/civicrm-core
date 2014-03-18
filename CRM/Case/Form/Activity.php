@@ -203,10 +203,6 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
       }
     }
 
-    if ($this->_currentlyViewedContactId) {
-      CRM_Contact_Page_View::setTitle($this->_currentlyViewedContactId);
-    }
-
     $session = CRM_Core_Session::singleton();
     $session->pushUserContext($url);
   }

@@ -58,12 +58,13 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
 
     $form->assign('message', $messageText);
     $form->assign('messageSubject', $messageSubject);
+    CRM_Utils_System::setTitle('Create Printable Letters (PDF)');
   }
 
   static function preProcessSingle(&$form, $cid) {
     $form->_contactIds = array($cid);
     // put contact display name in title for single contact mode
-    CRM_Contact_Page_View::setTitle($cid);
+    CRM_Utils_System::setTitle(ts('Create Printable Letter (PDF) for %1', array(1 => CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $cid, 'display_name'))));
   }
 
   /**
