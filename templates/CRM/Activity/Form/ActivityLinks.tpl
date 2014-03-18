@@ -30,8 +30,8 @@
 {/if}
 
 {if $as_select} {* on 3.2, the activities can be either a drop down select (on the activity tab) or a list (on the action menu) *}
-<select name="other_activity" id="other_activity" class="form-select">
-  <option value="">{ts}- new activity -{/ts}</option>
+<select name="other_activity" class="crm-form-select crm-select2 crm-action-menu">
+  <option value="">{ts}New activity{/ts}</option>
 {foreach from=$activityTypes key=k item=link}
   <option value="{$urls.$k}">{$link}</option>
 {/foreach}
@@ -39,12 +39,12 @@
 {literal}
 <script type="text/javascript">
   cj(function($) {
-    $('#other_activity').change(function() {
+    $('[name=other_activity].crm-action-menu').change(function() {
       var
         $el = $(this),
         url = $el.val();
       if (url) {
-        $el.val('');
+        $el.select2('val', '');
         CRM.loadForm(url).on('crmFormSuccess', function() {
           $el.closest('.crm-ajax-container, #crm-main-content-wrapper').crmSnippet().crmSnippet('refresh');
         });
