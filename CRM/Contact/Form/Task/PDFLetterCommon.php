@@ -87,15 +87,14 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
       FALSE
     );
 
-    $form->add('static', 'pdf_format_header', NULL, ts('Page Format'));
-    $form->add(
-      'select',
-      'format_id',
-      ts('Select Format'),
-      array(0 => ts('- default -')) + CRM_Core_BAO_PdfFormat::getList(TRUE),
-      FALSE,
-      array('onChange' => "selectFormat( this.value, false );")
-    );;
+    $form->add('static', 'pdf_format_header', NULL, ts('Page Format: %1', array(1 => '<span class="pdf-format-header-label"></span>')));
+    $form->addSelect('format_id', array(
+      'label' => ts('Select Format'),
+      'placeholder' => ts('Default'),
+      'entity' => 'message_template',
+      'field' => 'pdf_format_id',
+      'option_url' => 'civicrm/admin/pdfFormats',
+    ));
     $form->add(
       'select',
       'paper_size',
@@ -272,7 +271,7 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
       );
 
       $messageTemplate['pdf_format_id'] = 'null';
-      if (!empty($formValues['bind_format']) && $formValues['format_id'] > 0) {
+      if (!empty($formValues['bind_format']) && $formValues['format_id']) {
         $messageTemplate['pdf_format_id'] = $formValues['format_id'];
       }
       if (!empty($formValues['saveTemplate']) && $formValues['saveTemplate']) {
@@ -288,7 +287,7 @@ class CRM_Contact_Form_Task_PDFLetterCommon {
       }
     }
     elseif (CRM_Utils_Array::value('template', $formValues) > 0) {
-      if (!empty($formValues['bind_format']) && $formValues['format_id'] > 0) {
+      if (!empty($formValues['bind_format']) && $formValues['format_id']) {
         $query = "UPDATE civicrm_msg_template SET pdf_format_id = {$formValues['format_id']} WHERE id = {$formValues['template']}";
       }
       else {
