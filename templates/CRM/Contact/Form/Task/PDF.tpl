@@ -24,7 +24,6 @@
  +--------------------------------------------------------------------+
 *}
 <div class="crm-form-block crm-block crm-contact-task-pdf-form-block">
-<h3>{ts}Create Printable Letters (PDF){/ts}</h3>
 {if $single eq false}
     <div class="messages status no-popup">{include file="CRM/Contact/Form/Task.tpl"}</div>
 {/if}

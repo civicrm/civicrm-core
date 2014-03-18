@@ -35,7 +35,7 @@
 {else}
 
 <h3>{ts}Summary{/ts}</h3>
-<table class="report">
+<table class="report crm-entity case-summary" data-entity="case" data-id="{$caseID}" data-cid="{$contactID}">
   {if $multiClient}
     <tr class="crm-case-caseview-client">
       <td colspan="5" class="label">
@@ -47,7 +47,7 @@
           <span class="icon edit-icon"></span>
         </a>
         {if $hasRelatedCases}
-          <div class="crm-block relatedCases-link"><a class="crm-popup medium-popup" href="{$relatedCaseUrl}">{$relatedCaseLabel}</a></div>
+          <div class="crm-block relatedCases-link"><a class="crm-hover-button crm-popup medium-popup" href="{$relatedCaseUrl}">{$relatedCaseLabel}</a></div>
         {/if}
       </td>
     </tr>
@@ -73,7 +73,7 @@
           {/foreach}
         </table>
         {if $hasRelatedCases}
-          <div class="crm-block relatedCases-link"><a class="crm-popup medium-popup" href="{$relatedCaseUrl}">{$relatedCaseLabel}</a></div>
+          <div class="crm-block relatedCases-link"><a class="crm-hover-button crm-popup medium-popup" href="{$relatedCaseUrl}">{$relatedCaseLabel}</a></div>
         {/if}
       </td>
     {/if}
@@ -81,13 +81,13 @@
       <span class="crm-case-summary-label">{ts}Subject{/ts}:</span>&nbsp;{$caseDetails.case_subject}
     </td>
     <td class="crm-case-caseview-case_type label">
-      <span class="crm-case-summary-label">{ts}Type{/ts}:</span>&nbsp;{$caseDetails.case_type}&nbsp;<a class="crm-hover-button action-item"  href="{crmURL p='civicrm/case/activity' q="action=add&reset=1&cid=`$contactId`&caseid=`$caseId`&selectedChild=activity&atype=`$changeCaseTypeId`"}" title="{ts}Change case type (creates activity record){/ts}"><span class="icon edit-icon"></span></a>
+      <span class="crm-case-summary-label">{ts}Type{/ts}:</span>&nbsp;{$caseDetails.case_type}&nbsp;<a class="crm-hover-button crm-popup"  href="{crmURL p='civicrm/case/activity' q="action=add&reset=1&cid=`$contactId`&caseid=`$caseId`&selectedChild=activity&atype=`$changeCaseTypeId`"}" title="{ts}Change case type (creates activity record){/ts}"><span class="icon edit-icon"></span></a>
     </td>
     <td class="crm-case-caseview-case_status label">
-      <span class="crm-case-summary-label">{ts}Status{/ts}:</span>&nbsp;{$caseDetails.case_status}&nbsp;<a class="crm-hover-button action-item"  href="{crmURL p='civicrm/case/activity' q="action=add&reset=1&cid=`$contactId`&caseid=`$caseId`&selectedChild=activity&atype=`$changeCaseStatusId`"}" title="{ts}Change case status (creates activity record){/ts}"><span class="icon edit-icon"></span></a>
+      <span class="crm-case-summary-label">{ts}Status{/ts}:</span>&nbsp;{$caseDetails.case_status}&nbsp;<a class="crm-hover-button crm-popup"  href="{crmURL p='civicrm/case/activity' q="action=add&reset=1&cid=`$contactId`&caseid=`$caseId`&selectedChild=activity&atype=`$changeCaseStatusId`"}" title="{ts}Change case status (creates activity record){/ts}"><span class="icon edit-icon"></span></a>
     </td>
     <td class="crm-case-caseview-case_start_date label">
-      <span class="crm-case-summary-label">{ts}Open Date{/ts}:</span>&nbsp;{$caseDetails.case_start_date|crmDate}&nbsp;<a class="crm-hover-button action-item"  href="{crmURL p='civicrm/case/activity' q="action=add&reset=1&cid=`$contactId`&caseid=`$caseId`&selectedChild=activity&atype=`$changeCaseStartDateId`"}" title="{ts}Change case start date (creates activity record){/ts}"><span class="icon edit-icon"></span></a>
+      <span class="crm-case-summary-label">{ts}Open Date{/ts}:</span>&nbsp;{$caseDetails.case_start_date|crmDate}&nbsp;<a class="crm-hover-button crm-popup"  href="{crmURL p='civicrm/case/activity' q="action=add&reset=1&cid=`$contactId`&caseid=`$caseId`&selectedChild=activity&atype=`$changeCaseStartDateId`"}" title="{ts}Change case start date (creates activity record){/ts}"><span class="icon edit-icon"></span></a>
     </td>
     <td class="crm-case-caseview-{$caseID} label">
       <span class="crm-case-summary-label">{ts}ID{/ts}:</span>&nbsp;{$caseID}
@@ -276,8 +276,10 @@
     cj("#dialog").dialog({
       title: "{/literal}{ts escape="js"}Add Client to the Case{/ts}{literal}",
       modal: true,
-      bgiframe: true,
-      close  : function(event, ui) { cj("#rel_contact").unautocomplete( ); },
+      close  : function(event, ui) {
+        cj("#rel_contact").unautocomplete( );
+        cj("#dialog").hide( );
+      },
       overlay: { opacity: 0.5, background: "black" },
 
       open:function() {
@@ -295,7 +297,7 @@
       },
 
       buttons: {
-      "Done": function() {
+      "{/literal}{ts escape='js'}Done{/ts}{literal}": function() {
         var postUrl = {/literal}"{crmURL p='civicrm/case/ajax/addclient' h=0 }"{literal};
         var caseID        = {/literal}"{$caseID}"{literal};
         var contactID = cj("#rel_contact_id").val( );
@@ -314,7 +316,7 @@
         );
         },
 
-        "Cancel": function() {
+        "{/literal}{ts escape='js'}Cancel{/ts}{literal}": function() {
           cj(this).dialog("close");
           cj(this).dialog("destroy");
         }
@@ -360,7 +362,7 @@
       },
 
       buttons: {
-        "Ok": function() {
+        "{/literal}{ts escape='js'}Ok{/ts}{literal}": function() {
 
           var sourceContact = {/literal}"{$contactID}"{literal};
           var caseID        = {/literal}"{$caseID}"{literal};
@@ -399,7 +401,7 @@
           cj(this).dialog("destroy");
         },
 
-        "Cancel": function() {
+        "{/literal}{ts escape='js'}Cancel{/ts}{literal}": function() {
           cj(this).dialog("close");
           cj(this).dialog("destroy");
         }
@@ -635,7 +637,7 @@ function addRole() {
     },
 
     buttons: {
-      "Ok": function() {
+      "{/literal}{ts escape='js'}Ok{/ts}{literal}": function() {
         var sourceContact = {/literal}"{$contactID}"{literal};
         var caseID        = {/literal}"{$caseID}"{literal};
         var relID         = null;
@@ -683,7 +685,7 @@ function addRole() {
         cj(this).dialog("destroy");
       },
 
-      "Cancel": function() {
+      "{/literal}{ts escape='js'}Cancel{/ts}{literal}": function() {
         cj(this).dialog("close");
         cj(this).dialog("destroy");
       }
@@ -727,7 +729,9 @@ function addRole() {
      </div>
    {/if}
 
-  <div class="crm-submit-buttons"><input type="button" class="form-submit" onClick="javascript:addTags()" value={if $tagExits}"{ts}Edit Tags{/ts}"{else}"{ts}Add Tags{/ts}"{/if} /></div>
+  <div class="crm-submit-buttons">
+    <a class="button case-miniform" href="#manageTags" data-qfkey="{crmKey name='civicrm/case/ajax/processtags'}">{if $tagExits}{ts}Edit Tags{/ts}{else}{ts}Add Tags{/ts}{/if}</a>
+  </div>
 
  </div><!-- /.crm-accordion-body -->
 </div><!-- /.crm-accordion-wrapper -->
@@ -741,73 +745,6 @@ function addRole() {
     <div class="clear"></div>
   </div>
 </div>
-
-{literal}
-<script type="text/javascript">
-
-cj("#manageTags").hide( );
-function addTags() {
-  cj("#manageTags").show( );
-
-  cj("#manageTags").dialog({
-    title: "{/literal}{ts escape='js'}Change Case Tags{/ts}{literal}",
-    modal: true,
-    height: 'auto',
-    width: 'auto',
-    buttons: {
-      "Save": function() {
-        var tagsChecked = '';
-        var caseID      = {/literal}{$caseID}{literal};
-
-        cj("#manageTags #tags option").each( function() {
-          if (cj(this).prop('selected')) {
-            if (!tagsChecked) {
-              tagsChecked = cj(this).val() + '';
-            }
-            else {
-              tagsChecked = tagsChecked + ',' + cj(this).val();
-            }
-          }
-        });
-
-        var tagList = {};
-        cj("#manageTags input[name^=case_taglist]").each(function(){
-          var tsId = cj(this).attr('id').split('_');
-          tagList[tsId[2]] = cj(this).val();
-        });
-
-        var postUrl = {/literal}"{crmURL p='civicrm/case/ajax/processtags' h=0 }"{literal};
-        var key = {/literal}"{crmKey name='civicrm/case/ajax/processtags'}"{literal};
-        var data = {'case_id': caseID, 'tag': tagsChecked, 'taglist': tagList, 'key': key};
-
-        cj.ajax({ type: "POST", url: postUrl, data: data, async: false });
-        cj(this).dialog("close");
-        cj(this).dialog("destroy");
-
-        // Temporary workaround for problems with SSL connections being too
-        // slow. The relationship doesn't get created because the page reload
-        // happens before the ajax call.
-        // In general this reload needs improvement, which is already on the list for phase 2.
-        var sdate = (new Date()).getTime();
-        var curDate = sdate;
-        while(curDate-sdate < 2000) {
-          curDate = (new Date()).getTime();
-        }
-
-        //due to caching issues we use redirection rather than reload
-        document.location = {/literal}'{crmURL q="action=view&reset=1&id=$caseID&cid=$contactID&context=$context" h=0 }'{literal};
-      },
-
-      "Cancel": function() {
-        cj(this).dialog("close");
-        cj(this).dialog("destroy");
-      }
-    }
-  });
-}
-
-</script>
-{/literal}
 
 {/if} {* end of tag block*}
 

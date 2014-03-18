@@ -1274,7 +1274,7 @@ SELECT case_status.label AS case_status, status_id, case_type.label AS case_type
           }
         }
         if ($allowDelete) {
-          $url .= ' <a ' . $css . ' href="' . $deleteUrl . $additionalUrl . '">' . ts('Delete') . '</a>';
+          $url .= ' <a ' . str_replace('action-item', 'action-item small-popup', $css) . ' href="' . $deleteUrl . $additionalUrl . '">' . ts('Delete') . '</a>';
         }
       }
       elseif (!$caseDeleted) {
@@ -2231,7 +2231,7 @@ INNER JOIN  civicrm_case_contact ON ( civicrm_case.id = civicrm_case_contact.cas
       if (!$doFilterCases || array_key_exists($dao->id, $filterCases)) {
         $caseViewStr = "reset=1&id={$dao->id}&cid={$dao->client_id}&action=view&context=case&selectedChild=case";
         $caseViewUrl = CRM_Utils_System::url("civicrm/contact/view/case", $caseViewStr);
-        $caseView = "<a href='{$caseViewUrl}'>" . ts('View Case') . "</a>";
+        $caseView = "<a class='action-item no-popup crm-hover-button' href='{$caseViewUrl}'>" . ts('View Case') . "</a>";
       }
       $clientView = $dao->client_name;
       if ($hasViewContact) {
