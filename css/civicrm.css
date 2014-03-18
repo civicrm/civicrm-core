@@ -1684,6 +1684,9 @@ editor specific classes
 .crm-container .crm-hover-button:active .icon {
   background-image: url("../i/icons/jquery-ui-2786C2.png");
 }
+.crm-container a.action-item {
+  display: inline;
+}
 
 /* theming for panel and context menus */
 .crm-container td ul.panel li {
@@ -1728,12 +1731,13 @@ editor specific classes
   width: auto;
 }
 
-.crm-container .btn-slide {
+.crm-container span.btn-slide {
   text-align: left;
   cursor: pointer;
   position: relative;
   white-space: nowrap;
   padding-right: 15px !important;
+  display: inline;
 }
 .crm-container .btn-slide:after {
   content: "";
