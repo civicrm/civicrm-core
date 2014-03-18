@@ -79,7 +79,9 @@
     }
 
     $('#addMoreSoftCredit').on('click', function () {
-      $('.crm-contribution-form-block-soft_credit_to tr.hiddenElement').filter(':first').show().removeClass('hiddenElement');
+      if ($('tr.crm-contribution-form-block-soft_credit_to').hasClass("hiddenElement")) {
+        $('.crm-contribution-form-block-soft_credit_to tr.hiddenElement').filter(':first').show().removeClass('hiddenElement');
+      }
       if ($('.crm-soft-credit-block tr.hiddenElement').length < 1) {
         $('#addMoreSoftCredit').hide();
       }
@@ -101,7 +103,8 @@
     });
 
     $('.soft-credit-delete-link').click(function(){
-      $(this).closest('tr').hide().find('input').val('').change();
+      $(this).closest('tr').addClass('hiddenElement').removeAttr('style');
+      $('#addMoreSoftCredit').show();
       return false;
     });
 
