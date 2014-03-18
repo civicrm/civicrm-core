@@ -253,11 +253,11 @@ INNER JOIN civicrm_contribution co ON co.contribution_recur_id = cr.id
     $contRecur = CRM_Core_DAO::executeQuery($sql);
     $contRecur->fetch();
     $ids['contributionRecur'] = $contRecur->id;
-    if($ids['contact_id'] != $contRecur->contact_id){
-      CRM_Core_Error::debug_log_message("Recurring contribution appears to have been re-assigned from id {$ids['contact_id']} to {$contRecur->contact_id}
+    if($ids['contact'] != $contRecur->contact_id){
+      CRM_Core_Error::debug_log_message("Recurring contribution appears to have been re-assigned from id {$ids['contact']} to {$contRecur->contact_id}
         Continuing with {$contRecur->contact_id}
       ");
-      $ids['contact_id'] = $contRecur->contact_id;
+      $ids['contact'] = $contRecur->contact_id;
     }
     if (!$ids['contributionRecur']) {
       CRM_Core_Error::debug_log_message("Could not find contributionRecur id: ".print_r($input, TRUE));
