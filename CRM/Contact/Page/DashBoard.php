@@ -53,14 +53,6 @@ class CRM_Contact_Page_DashBoard extends CRM_Core_Page {
 
     $config = CRM_Core_Config::singleton();
 
-    // Add dashlet-specific js files
-    // TODO: Need a much better way of managing on-the-fly js requirements. Require.js perhaps?
-    // Checking if a specific dashlet is enabled is a pain and including the js here sucks anyway
-    // So here's a compromise:
-    if (in_array('CiviCase', $config->enableComponents)) {
-      $resources->addScriptFile('civicrm', 'templates/CRM/Case/Form/ActivityChangeStatus.js');
-    }
-
     $resetCache = CRM_Utils_Request::retrieve('resetCache', 'Positive', CRM_Core_DAO::$_nullObject);
 
     CRM_Utils_System::setTitle(ts('CiviCRM Home'));

@@ -49,9 +49,9 @@
       <div class="crm-block crm-form-block crm-pdf-format-form-block">
     <table class="form-layout-compressed">
       <tr>
-        <td class="label-left">{$form.format_id.label}</td><td>{$form.format_id.html}{help id="id-pdf-format" file="CRM/Contact/Form/Task/PDFLetterCommon.hlp"}</td>
-        <td colspan="2">&nbsp;</td>
-            </tr>
+        <td class="label-left">{$form.format_id.label} {help id="id-pdf-format" file="CRM/Contact/Form/Task/PDFLetterCommon.hlp"}</td>
+        <td>{$form.format_id.html}</td>
+      </tr>
       <tr>
         <td class="label-left">{$form.paper_size.label}</td><td>{$form.paper_size.html}</td>
         <td class="label-left">{$form.orientation.label}</td><td>{$form.orientation.html}</td>
@@ -117,8 +117,12 @@
 
 {literal}
 <script type="text/javascript">
-cj(function() {
-    cj().crmAccordions();
+cj(function($) {
+  var $form = $('form#{/literal}{$form.formName}{literal}');
+  $('#format_id', $form).on('change', function() {
+    selectFormat($(this).val());
+  });
+  $().crmAccordions();
 });
 
 var currentWidth;
@@ -133,10 +137,7 @@ function showBindFormatChkBox()
     if ( document.getElementById('template') == null || document.getElementById('template').value == '' ) {
         templateExists = false;
     }
-    var formatExists = true;
-    if ( document.getElementById('format_id').value == 0 ) {
-        formatExists = false;
-    }
+    var formatExists = !!cj('#format_id').val();
     if ( templateExists && formatExists ) {
         document.getElementById("bindFormat").style.display = "block";
     } else if ( formatExists && document.getElementById("saveTemplate") != null && document.getElementById("saveTemplate").checked ) {
@@ -153,20 +154,21 @@ function showBindFormatChkBox()
 
 function showUpdateFormatChkBox()
 {
-    if ( document.getElementById('format_id').value != 0 ) {
-        document.getElementById("updateFormat").style.display = "block";
+    if (cj('#format_id').val()) {
+      cj("#updateFormat").show();
     }
 }
 
-function hideUpdateFormatChkBox()
-{
-    document.getElementById("update_format").checked = false;
-    document.getElementById("updateFormat").style.display = "none";
+function updateFormatLabel() {
+  cj('.pdf-format-header-label').html(cj('#format_id option:selected').text() || cj('#format_id').attr('placeholder'));
 }
+
+updateFormatLabel();
 
 function selectFormat( val, bind )
 {
-    if ( val == null || val == 0 ) {
+  updateFormatLabel();
+    if (!val) {
         val = 0;
         bind = false;
     }
@@ -181,7 +183,7 @@ function selectFormat( val, bind )
         cj("#margin_left").val( data.margin_left );
         cj("#margin_right").val( data.margin_right );
         selectPaper( data.paper_size );
-        hideUpdateFormatChkBox();
+        cj("#update_format").prop({checked: false}).parent().hide();
         document.getElementById('bind_format').checked = bind;
         showBindFormatChkBox();
     }, 'json');
