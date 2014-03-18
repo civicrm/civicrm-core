@@ -51,9 +51,6 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
    * @access public
    */
   public function preProcess() {
-    // js for changing activity status
-    CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'templates/CRM/Case/Form/ActivityChangeStatus.js');
-
     $this->_showRelatedCases = CRM_Utils_Array::value('relatedCases', $_GET);
 
     $xmlProcessorProcess = new CRM_Case_XMLProcessor_Process();
@@ -71,6 +68,7 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
       }
       $this->assign('relatedCases', $relatedCases);
       $this->assign('showRelatedCases', TRUE);
+      CRM_Utils_System::setTitle(ts('Related Cases'));
       return;
     }
 
@@ -135,19 +133,6 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
     $this->_caseType = $caseTypeName;
     $this->assign('caseDetails', $this->_caseDetails);
 
-    $newActivityUrl = CRM_Utils_System::url('civicrm/case/activity',
-      "action=add&reset=1&cid={$this->_contactID}&caseid={$this->_caseID}&atype=",
-      FALSE, NULL, FALSE
-    );
-    $this->assign('newActivityUrl', $newActivityUrl);
-
-    // Send Email activity requires a different URL format from all other activities
-    $newActivityEmailUrl = CRM_Utils_System::url('civicrm/activity/email/add',
-      "action=add&context=standalone&reset=1&caseid={$this->_caseID}&atype=",
-      FALSE, NULL, FALSE
-    );
-    $this->assign('newActivityEmailUrl', $newActivityEmailUrl);
-
     $reportUrl = CRM_Utils_System::url('civicrm/case/report',
       "reset=1&cid={$this->_contactID}&caseid={$this->_caseID}&asn=",
       FALSE, NULL, FALSE
@@ -190,7 +175,16 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
       $relatedCases = empty($relatedCases) ? FALSE : $relatedCases;
       $this->set('relatedCases', $relatedCases);
     }
-    $this->assign('hasRelatedCases', $relatedCases);
+    $this->assign('hasRelatedCases', (bool) $relatedCases);
+    if ($relatedCases) {
+      $this->assign('relatedCaseLabel', ts('%1 Related Case', array('count' => count($relatedCases), 'plural' => '%1 Related Cases')));
+      $this->assign('relatedCaseUrl', CRM_Utils_System::url('civicrm/contact/view/case', array(
+        'id' => $this->_caseID,
+        'cid' => $this->_contactID,
+        'relatedCases' => 1,
+        'action' => 'view',
+      )));
+    }
 
     $entitySubType = !empty($values['case_type_id']) ? $values['case_type_id'][0] : NULL;
     $this->assign('caseTypeID', $entitySubType);
@@ -230,6 +224,10 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
       return;
     }
 
+    CRM_Core_Resources::singleton()
+      ->addScriptFile('civicrm', 'js/crm.livePage.js')
+      ->addScriptFile('civicrm', 'templates/CRM/Case/Form/CaseView.js');
+
     $xmlProcessor = new CRM_Case_XMLProcessor_Process();
     $caseRoles    = $xmlProcessor->get($this->_caseType, 'CaseRoles');
     $reports      = $xmlProcessor->get($this->_caseType, 'ActivitySets');
@@ -244,19 +242,16 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
 
     $allActTypes = CRM_Core_PseudoConstant::activityType(TRUE, TRUE, FALSE, 'name');
 
+    $emailActivityType = array_search('Email', $allActTypes);
+
     // remove Open Case activity type since we're inside an existing case
-    if (($openActTypeId = array_search('Open Case', $allActTypes)) &&
-      array_key_exists($openActTypeId, $aTypes)
-    ) {
+    if ($openActTypeId = array_search('Open Case', $allActTypes)) {
       unset($aTypes[$openActTypeId]);
     }
 
     //check for link cases.
     $unclosedCases = CRM_Case_BAO_Case::getUnclosedCases(NULL, array($this->_caseID));
-    if (empty($unclosedCases) &&
-      ($linkActTypeId = array_search('Link Cases', $allActTypes)) &&
-      array_key_exists($linkActTypeId, $aTypes)
-    ) {
+    if (empty($unclosedCases) && ($linkActTypeId = array_search('Link Cases', $allActTypes))) {
       unset($aTypes[$linkActTypeId]);
     }
 
@@ -264,7 +259,24 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
       asort($aTypes);
     }
 
-    $this->add('select', 'activity_type_id', ts('New Activity'), array('' => ts('- select activity type -')) + $aTypes);
+    $activityLinks = array('' => ts('Add Activity'));
+    foreach ($aTypes as $type => $label) {
+      if ($type == $emailActivityType) {
+        $url = CRM_Utils_System::url('civicrm/activity/email/add',
+          "action=add&context=standalone&reset=1&caseid={$this->_caseID}&atype=$type",
+          FALSE, NULL, FALSE
+        );
+      }
+      else {
+        $url = CRM_Utils_System::url('civicrm/case/activity',
+          "action=add&reset=1&cid={$this->_contactID}&caseid={$this->_caseID}&atype=$type",
+          FALSE, NULL, FALSE
+        );
+      }
+      $activityLinks[$url] = $label;
+    }
+
+    $this->add('select', 'add_activity_type_id', '', $activityLinks, FALSE, array('class' => 'crm-select2 crm-action-menu'));
     if ($this->_hasAccessToAllCases) {
       $this->add('select', 'report_id', ts('Run QA Audit / Redact'),
         array(
@@ -317,17 +329,6 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
         );
       }
     }
-
-    $this->add('text', 'change_client_id', ts('Assign to another Client'));
-    $this->add('hidden', 'contact_id', '', array('id' => 'contact_id'));
-    $this->addElement('submit',
-      $this->getButtonName('next', 'edit_client'),
-      ts('Reassign Case'),
-      array(
-        'class' => 'form-submit-inline',
-        'onclick' => "return checkSelection( this );",
-      )
-    );
 
     $activityStatus = CRM_Core_PseudoConstant::activityStatus();
     $this->add('select', 'status_id', ts('Status'), array("" => ts(' - any status - ')) + $activityStatus);
@@ -521,16 +522,6 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
       //redirect user to main case view.
       $url = CRM_Utils_System::url('civicrm/contact/view/case',
         "reset=1&action=view&cid={$this->_contactID}&id={$mainCaseId}&show=1"
-      );
-      $session = CRM_Core_Session::singleton();
-      $session->pushUserContext($url);
-    }
-    elseif ($buttonName == '_qf_CaseView_next_edit_client') {
-      $mainCaseId = CRM_Case_BAO_Case::mergeCases($params['contact_id'], $this->_caseID, $this->_contactID, NULL, TRUE);
-
-      // user context
-      $url = CRM_Utils_System::url('civicrm/contact/view/case',
-        "reset=1&action=view&cid={$params['contact_id']}&id={$mainCaseId[0]}&show=1"
       );
       $session = CRM_Core_Session::singleton();
       $session->pushUserContext($url);

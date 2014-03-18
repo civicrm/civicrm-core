@@ -1968,7 +1968,6 @@ AND cl.modified_id  = c.id
           $priorActivities[$index][$dao->activityID]['id'] = $dao->activityID;
           $priorActivities[$index][$dao->activityID]['name'] = $dao->name;
           $priorActivities[$index][$dao->activityID]['date'] = $dao->date;
-          $priorActivities[$index][$dao->activityID]['link'] = 'javascript:viewActivity( $dao->activityID );';
         }
         $dao->free();
       }

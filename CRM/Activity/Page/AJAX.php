@@ -256,7 +256,7 @@ class CRM_Activity_Page_AJAX {
       }
       // email column links/icon
       if ($caseRelationships[$key]['email']) {
-        $caseRelationships[$key]['email'] = '<a class="crm-hover-button" href="'.CRM_Utils_System::url('civicrm/contact/view/activity', 'action=reset=1&action=add&atype=3&cid='.$caseRelationships[$key]['cid']).'" title="compose and send an email"><span class="icon email-icon" title="compose and send an email"></span>
+        $caseRelationships[$key]['email'] = '<a class="crm-hover-button crm-popup" href="'.CRM_Utils_System::url('civicrm/activity/email/add', 'reset=1&action=add&atype=3&cid='.$caseRelationships[$key]['cid']).'" title="'. ts('Send an Email') . '"><span class="icon email-icon"></span>
              </a>';
       }
       // edit links

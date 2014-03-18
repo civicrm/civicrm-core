@@ -55,7 +55,6 @@ class CRM_Case_Form_ActivityView extends CRM_Core_Form {
       $activityID,
       'subject'
     );
-    $type = CRM_Utils_Request::retrieve('type', 'String', CRM_Core_DAO::$_nullObject);
 
     //check for required permissions, CRM-6264
     if ($activityID &&
@@ -66,7 +65,6 @@ class CRM_Case_Form_ActivityView extends CRM_Core_Form {
 
     $this->assign('contactID', $contactID);
     $this->assign('caseID', $caseID);
-    $this->assign('type', $type);
     // CRM-9145
     $this->assign('activityID', $activityID);
 
@@ -108,8 +106,8 @@ class CRM_Case_Form_ActivityView extends CRM_Core_Form {
     }
 
     if ($revs) {
+      CRM_Utils_System::setTitle(ts('Activity Revision History'));
       $this->assign('revs', $revs);
-
       $this->assign('result', $viewPriorActivities);
       $this->assign('subject', $activitySubject);
       $this->assign('latestRevisionID', $latestRevisionID);
