@@ -10,7 +10,7 @@
       CRM.loadForm(url).on('crmFormSuccess', refresh);
     }
     else {
-      window.location = url;
+      window.location.href = url;
     }
   }
 

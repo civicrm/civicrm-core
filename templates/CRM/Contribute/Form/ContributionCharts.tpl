@@ -85,13 +85,13 @@
   function byMonthOnClick( barIndex ) {
      var allData = {/literal}{$openFlashChartData}{literal};
      var url     = eval( "allData.by_month.on_click_urls.url_" + barIndex );
-     if ( url ) window.location = url;
+     if ( url ) window.location.href = url;
   }
 
   function byYearOnClick( barIndex ) {
      var allData = {/literal}{$openFlashChartData}{literal};
      var url     = eval( "allData.by_year.on_click_urls.url_" + barIndex );
-     if ( url ) window.location = url;
+     if ( url ) window.location.href = url;
   }
 
  </script>
