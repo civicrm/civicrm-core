@@ -706,7 +706,9 @@ function _civicrm_api3_apply_options_to_dao(&$params, &$dao, $entity) {
 
   $options = _civicrm_api3_get_options_from_params($params,FALSE,$entity);
   if(!$options['is_count']) {
-    $dao->limit((int)$options['offset'], (int)$options['limit']);
+    if(!empty($options['limit'])) {
+      $dao->limit((int)$options['offset'], (int)$options['limit']);
+    }
     if (!empty($options['sort'])) {
       $dao->orderBy($options['sort']);
     }
