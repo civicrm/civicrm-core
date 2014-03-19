@@ -53,7 +53,6 @@ class api_v3_MessageTemplateTest extends CiviUnitTestCase {
       'workflow_id' => $template['workflow_id'],
       'is_default' => $template['is_default'],
       'is_reserved' => $template['is_reserved'],
-      'pdf_format_id' => $template['pdf_format_id'],
     );
   }
   function tearDown() {}
