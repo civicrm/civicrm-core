@@ -268,16 +268,12 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
   public static function toBeSkipped_getlimit() {
     $entitiesWithout = array(
       'Case',//case api has non-std mandatory fields one of (case_id, contact_id, activity_id, contact_id)
-      'Contribution', //existing behaviour = fatal if 0 limit applied as offset of null is put in the query
       'EntityTag', // non-standard api - has inappropriate mandatory fields & doesn't implement limit
       'Event', // failed 'check that a 5 limit returns 5' - probably is_template field is wrong or something, or could be limit doesn't work right
       'Extension', // can't handle creating 25
       'MailingGroup', // no get call on MailingGroup
       'Note', // fails on 5 limit - probably a set up problem
-      'Participant', //existing behaviour = fatal if 0 limit applied as null offset in sql
-      'Pledge', //existing behaviour = fatal if 0 limit applied as null offset in sql
       'Setting', //a bit of a pseudoapi - keys by domain
-
     );
     return $entitiesWithout;
   }
