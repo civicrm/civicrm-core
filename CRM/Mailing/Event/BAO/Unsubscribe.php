@@ -394,9 +394,9 @@ WHERE  email = %2
     $mailer = $config->getMailer();
 
     if (is_object($mailer)) {
-      CRM_Core_Error::ignoreException();
+      $errorScope = CRM_Core_TemporaryErrorScope::ignoreException();
       $mailer->send($eq->email, $h, $b);
-      CRM_Core_Error::setCallback();
+      unset($errorScope);
     }
   }
 

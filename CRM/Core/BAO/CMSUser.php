@@ -479,9 +479,9 @@ class CRM_Core_BAO_CMSUser {
   }
 
   static function &dbHandle(&$config) {
-    CRM_Core_Error::ignoreException();
+    $errorScope = CRM_Core_TemporaryErrorScope::ignoreException();
     $db_uf = DB::connect($config->userFrameworkDSN);
-    CRM_Core_Error::setCallback();
+    unset($errorScope);
     if (!$db_uf ||
       DB::isError($db_uf)
     ) {

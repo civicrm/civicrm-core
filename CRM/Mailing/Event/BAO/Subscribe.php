@@ -285,9 +285,9 @@ SELECT     civicrm_email.id as email_id
     $mailer = $config->getMailer();
 
     if (is_object($mailer)) {
-      CRM_Core_Error::ignoreException();
+      $errorScope = CRM_Core_TemporaryErrorScope::ignoreException();
       $mailer->send($email, $h, $b);
-      CRM_Core_Error::setCallback();
+      unset($errorScope);
     }
   }
 

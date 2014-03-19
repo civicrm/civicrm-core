@@ -790,6 +790,10 @@ class CRM_Core_Error extends PEAR_ErrorStack {
     $error->_errorsByLevel = array();
   }
 
+  /**
+   * @deprecated
+   * @see CRM_Core_TemporaryErrorScope::ignoreException
+   */
   public static function ignoreException($callback = NULL) {
     if (!$callback) {
       $callback = array('CRM_Core_Error', 'nullHandler');
@@ -824,6 +828,8 @@ class CRM_Core_Error extends PEAR_ErrorStack {
    *
    * @return void
    * @access public
+   * @deprecated
+   * @see CRM_Core_TemporaryErrorScope::ignoreExxception
    * @static
    */
   public static function setCallback($callback = NULL) {

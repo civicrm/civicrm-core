@@ -24,11 +24,29 @@
 class CRM_Core_TemporaryErrorScope {
   static $oldFrames;
 
+  /**
+   * @return CRM_Core_TemporaryErrorScope
+   */
   public static function useException() {
+    return self::create(array('CRM_Core_Error', 'exceptionHandler'), 1);
+  }
+
+  /**
+   * @return CRM_Core_TemporaryErrorScope
+   */
+  public static function ignoreException() {
+    return self::create(array('CRM_Core_Error', 'nullHandler'));
+  }
+
+  /**
+   * @param mixed $callback
+   * @return CRM_Core_TemporaryErrorScope
+   */
+  public static function create($callback, $modeException = NULL) {
     $newFrame = array(
       '_PEAR_default_error_mode' => PEAR_ERROR_CALLBACK,
-      '_PEAR_default_error_options' => array('CRM_Core_Error', 'exceptionHandler'),
-      'modeException' => 1,
+      '_PEAR_default_error_options' => $callback,
+      'modeException' => $modeException,
     );
     return new CRM_Core_TemporaryErrorScope($newFrame);
   }
