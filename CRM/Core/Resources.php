@@ -575,7 +575,7 @@ class CRM_Core_Resources {
 
       "packages/backbone/lodash.compat$min.js",
 
-      "jquery/plugins/jquery.mousewheel$min.js",
+      "packages/jquery/plugins/jquery.mousewheel$min.js",
 
       "packages/jquery/plugins/select2/select2.js", // No mini until release of select2 3.4.6
       "packages/jquery/plugins/select2/select2.css",
