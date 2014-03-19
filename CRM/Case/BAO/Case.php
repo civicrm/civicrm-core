@@ -3135,36 +3135,29 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
    * Used during case component enablement and during ugprade
    */
   static function createCaseViews() {
+    $errorScope = CRM_Core_TemporaryErrorScope::ignoreException();
     $dao = new CRM_Core_DAO();
 
     $sql = self::createCaseViewsQuery('upcoming');
-    CRM_Core_Error::ignoreException();
     $dao->query($sql);
-    CRM_Core_Error::setCallback();
     if (PEAR::getStaticProperty('DB_DataObject', 'lastError')) {
       return FALSE;
     }
 
     // Above error doesn't get caught?
-    CRM_Core_Error::ignoreException();
     $doublecheck = $dao->singleValueQuery("SELECT count(id) FROM civicrm_view_case_activity_upcoming");
-    CRM_Core_Error::setCallback();
     if (is_null($doublecheck)) {
       return FALSE;
     }
 
     $sql = self::createCaseViewsQuery('recent');
-    CRM_Core_Error::ignoreException();
     $dao->query($sql);
-    CRM_Core_Error::setCallback();
     if (PEAR::getStaticProperty('DB_DataObject', 'lastError')) {
       return FALSE;
     }
 
     // Above error doesn't get caught?
-    CRM_Core_Error::ignoreException();
     $doublecheck = $dao->singleValueQuery("SELECT count(id) FROM civicrm_view_case_activity_recent");
-    CRM_Core_Error::setCallback();
     if (is_null($doublecheck)) {
       return FALSE;
     }

@@ -1337,7 +1337,7 @@ class CRM_Utils_System {
    *   Response from URL.
    */
   static function getServerResponse($url, $addCookie = TRUE) {
-    CRM_Core_Error::ignoreException();
+    $errorScope = CRM_Core_TemporaryErrorScope::ignoreException();
     require_once 'HTTP/Request.php';
     $request = new HTTP_Request($url);
 
@@ -1359,7 +1359,6 @@ class CRM_Utils_System {
     $request->sendRequest();
     $response = $request->getResponseBody();
 
-    CRM_Core_Error::setCallback();
     return $response;
   }
 
