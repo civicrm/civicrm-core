@@ -82,7 +82,7 @@
         var url = {/literal}"{$refreshURL}"{literal}
         var post = url + "&key=" + provider.value;
         if( refresh ) {
-            window.location = post; 
+            window.location.href = post;
         }
     }
 {/literal}
