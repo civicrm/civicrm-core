@@ -3946,11 +3946,11 @@ div.m ul#civicrm-menu,
   background-image: url("../packages/jquery/css/images/pbar-ani.gif");
 }
 
-div.ui-dialog {
+.crm-container.ui-dialog {
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.6);
 }
 
-.ui-dialog-titlebar.ui-widget-header {
+.crm-container .ui-dialog-titlebar.ui-widget-header {
   background: url("../i/crm-button-bg.gif") repeat-x scroll left center #70716B;
   color: white;
 }
