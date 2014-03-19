@@ -40,7 +40,7 @@
 /**
  * This file is for civimember search
  */
-class CRM_Member_Form_Search extends CRM_Core_Form {
+class CRM_Member_Form_Search extends CRM_Core_Form_Search {
 
   /**
    * Are we forced to run a search
@@ -213,6 +213,7 @@ class CRM_Member_Form_Search extends CRM_Core_Form {
    * @return void
    */
   function buildQuickForm() {
+    parent::buildQuickForm();
     $this->addElement('text', 'sort_name', ts('Member Name or Email'), CRM_Core_DAO::getAttribute('CRM_Contact_DAO_Contact', 'sort_name'));
 
     CRM_Member_BAO_Query::buildSearchForm($this);
@@ -224,8 +225,6 @@ class CRM_Member_Form_Search extends CRM_Core_Form {
 
     $rows = $this->get('rows');
     if (is_array($rows)) {
-      CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'js/crm.livePage.js');
-      CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'js/crm.searchForm.js');
       if (!$this->_single) {
         $this->addElement('checkbox', 'toggleSelect', NULL, NULL, array('onclick' => "toggleTaskAction( true );", 'class' => 'select-rows'));
         foreach ($rows as $row) {
@@ -255,15 +254,6 @@ class CRM_Member_Form_Search extends CRM_Core_Form {
       $this->addElement('radio', 'radio_ts', NULL, '', 'ts_all', array('class' => 'select-rows', 'onclick' => $this->getName() . ".toggleSelect.checked = false; toggleTaskAction( true );"));
     }
 
-
-    // add buttons
-    $this->addButtons(array(
-        array(
-          'type' => 'refresh',
-          'name' => ts('Search'),
-          'isDefault' => TRUE,
-        ),
-      ));
   }
 
   /**

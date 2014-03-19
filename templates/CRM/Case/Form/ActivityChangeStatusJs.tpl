@@ -36,7 +36,7 @@
           current_status_id = $(this).attr('current_status'),
           caseId = $(this).attr('case_id'),
           data = 'snippet=1&reset=1',
-          $el = $('<div class="crm-container crm-activity_change_status"></div>');
+          $el = $('<div class="crm-activity_change_status"></div>');
         $el.block({theme:true});
 
         $el.load(CRM.url('civicrm/case/changeactivitystatus'), data, function() {

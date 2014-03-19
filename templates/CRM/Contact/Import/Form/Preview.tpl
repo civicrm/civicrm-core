@@ -56,10 +56,8 @@ function verify( ) {
     width         : 350,
     height        : 160,
     resizable     : false,
-    bgiframe      : true,
     draggable     : true,
     closeOnEscape : false,
-    overlay       : { opacity: 0.5, background: "black" },
     open          : function ( ) {
         cj("#id-processing").dialog().parents(".ui-dialog").find(".ui-dialog-titlebar").remove();
     }

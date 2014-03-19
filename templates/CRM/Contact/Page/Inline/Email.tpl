@@ -73,21 +73,12 @@ function showHideSignature( blockId ) {
   cj("#Email_Block_" + blockId + "_signature").dialog({
       title: "Signature",
       modal: true,
-      bgiframe: true,
       width: 900,
       height: 500,
-      overlay: { 
-          opacity: 0.5, 
-          background: "black"
-      },
-
       beforeclose: function(event, ui) {
         cj(this).dialog("destroy");
       },
-      open:function() {
-      },
-
-      buttons: { 
+      buttons: {
         "Done": function() { 
                   cj(this).dialog("destroy"); 
                 } 

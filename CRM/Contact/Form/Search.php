@@ -41,7 +41,7 @@
  * Base Search / View form for *all* listing of multiple
  * contacts
  */
-class CRM_Contact_Form_Search extends CRM_Core_Form {
+class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
 
   /*
    * list of valid contexts
@@ -371,9 +371,8 @@ class CRM_Contact_Form_Search extends CRM_Core_Form {
    * @return void
    */
   function buildQuickForm() {
+    parent::buildQuickForm();
     CRM_Core_Resources::singleton()
-      ->addScriptFile('civicrm', 'js/crm.livePage.js')
-      ->addScriptFile('civicrm', 'js/crm.searchForm.js')
       // jsTree is needed for tags popup
       ->addScriptFile('civicrm', 'packages/jquery/plugins/jstree/jquery.jstree.js', 0, 'html-header', FALSE)
       ->addStyleFile('civicrm', 'packages/jquery/plugins/jstree/themes/default/style.css', 0, 'html-header');
@@ -545,17 +544,6 @@ class CRM_Contact_Form_Search extends CRM_Core_Form {
       $this->assign_by_ref('unselectedContactIds', $unselectedContactIds);
     }
 
-    // add buttons
-    $this->addButtons(array(
-        array(
-          'type' => 'refresh',
-          'name' => ts('Search'),
-          'isDefault' => TRUE,
-        ),
-      )
-    );
-
-    $this->setDefaultAction('refresh');
   }
 
   /**

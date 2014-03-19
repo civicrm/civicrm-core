@@ -293,13 +293,8 @@ function viewCase( caseId ,contactId ) {
    cj("#casedetails").dialog({
         title: "Case Details",
         modal: true,
-        bgiframe: true,
         width : 700,
   height: 400,
-        overlay: {
-                   opacity: 0.5,
-                 background: "black"
-               },
         open:function() {
        var dataUrl = {/literal}"{crmURL p='civicrm/case/ajax/details' h=0 q="snippet=4" }"{literal};
       dataUrl     = dataUrl + '&caseId=' +caseId + '&contactId=' +contactId ;
