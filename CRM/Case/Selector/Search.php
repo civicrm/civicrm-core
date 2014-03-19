@@ -223,6 +223,7 @@ class CRM_Case_Selector_Search extends CRM_Core_Selector_Base {
           'url' => 'civicrm/contact/view/case/editClient',
           'qs' => 'reset=1&action=update&id=%%id%%&cid=%%cid%%&context=%%cxt%%' . $extraParams,
           'ref' => 'reassign',
+          'class' => 'medium-popup',
           'title' => ts('Assign to Another Client'),
         ),
       );

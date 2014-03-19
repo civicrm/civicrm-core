@@ -38,6 +38,8 @@
  */
 class CRM_Case_Page_DashBoard extends CRM_Core_Page {
 
+  public $useLivePageJS = TRUE;
+
   /**
    * Heart of the viewing process. The runner gets all the meta data for
    * the contact and calls the appropriate type of page to view.
@@ -96,6 +98,7 @@ class CRM_Case_Page_DashBoard extends CRM_Core_Page {
     if (!empty($recent)) {
       $this->assign('recentCases', $recent);
     }
+    $this->assign('includeWysiwygEditor', TRUE);
   }
 
   /**
