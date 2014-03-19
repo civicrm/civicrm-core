@@ -40,7 +40,7 @@
 /**
  * This file is for civievent search
  */
-class CRM_Event_Form_Search extends CRM_Core_Form {
+class CRM_Event_Form_Search extends CRM_Core_Form_Search {
 
   /**
    * Are we forced to run a search
@@ -224,6 +224,7 @@ class CRM_Event_Form_Search extends CRM_Core_Form {
    * @return void
    */
   function buildQuickForm() {
+    parent::buildQuickForm();
     $this->addElement('text', 'sort_name', ts('Participant Name or Email'), CRM_Core_DAO::getAttribute('CRM_Contact_DAO_Contact', 'sort_name'));
 
     CRM_Event_BAO_Query::buildSearchForm($this);
@@ -234,8 +235,6 @@ class CRM_Event_Form_Search extends CRM_Core_Form {
      */
     $rows = $this->get('rows');
     if (is_array($rows)) {
-      CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'js/crm.livePage.js');
-      CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'js/crm.searchForm.js');
       $lineItems = $eventIds = array();
       if (!$this->_single) {
         $this->addElement('checkbox',
@@ -322,14 +321,6 @@ class CRM_Event_Form_Search extends CRM_Core_Form {
       );
     }
 
-    // add buttons
-    $this->addButtons(array(
-        array(
-          'type' => 'refresh',
-          'name' => ts('Search'),
-          'isDefault' => TRUE,
-        ),
-      ));
   }
 
   /**
