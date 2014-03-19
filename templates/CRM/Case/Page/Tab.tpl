@@ -51,10 +51,8 @@
     <div class="view-content">
     <div id="help">
          {ts 1=$displayName}This page lists all case records for %1.{/ts}
-         {if $permission EQ 'edit' and
-             call_user_func(array('CRM_Core_Permission','check'), 'access all cases and activities') and
-       $allowToAddNewCase}
-             {ts 1=$newCaseURL}Click <a href='%1'>Add Case</a> to add a case record for this contact.{/ts}{/if}
+         {if $permission EQ 'edit' and call_user_func(array('CRM_Core_Permission','check'), 'access all cases and activities') and $allowToAddNewCase}
+         {ts 1="href='$newCaseURL' class='action-item'"}Click <a %1>Add Case</a> to add a case record for this contact.{/ts}{/if}
     </div>
 
     {if $action eq 16 and $permission EQ 'edit' and
