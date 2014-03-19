@@ -390,6 +390,8 @@ function _civicrm_api3_store_values(&$fields, &$params, &$values) {
  *  others that use the query object. Note that this function passes permission information in.
  *  The others don't
  *
+ * * Ideally this would be merged with _civicrm_get_query_object but we need to resolve differences in what the
+ * 2 variants call
  * @param $entity
  * @param array $params as passed into api get or getcount function
  * @param array $additional_options
@@ -478,6 +480,45 @@ function _civicrm_api3_get_using_query_object($entity, $params, $additional_opti
   }
 
   return $entities;
+}
+
+/**
+ * get dao query object based on input params
+ * Ideally this would be merged with _civicrm_get_using_query_object but we need to resolve differences in what the
+ * 2 variants call
+ *
+ * @param array $params
+ * @param string $mode
+ * @param string $entity
+ * @return CRM_Core_DAO query object
+ */
+function _civicrm_api3_get_query_object($params, $mode, $entity) {
+  $options          = _civicrm_api3_get_options_from_params($params, TRUE, $entity, 'get');
+  $sort             = CRM_Utils_Array::value('sort', $options, NULL);
+  $offset           = CRM_Utils_Array::value('offset', $options);
+  $rowCount         = CRM_Utils_Array::value('limit', $options);
+  $inputParams      = CRM_Utils_Array::value('input_params', $options, array());
+  $returnProperties = CRM_Utils_Array::value('return', $options, NULL);
+  if (empty($returnProperties)) {
+    $returnProperties = CRM_Contribute_BAO_Query::defaultReturnProperties($mode);
+  }
+
+  $newParams = CRM_Contact_BAO_Query::convertFormValues($inputParams);
+  $query = new CRM_Contact_BAO_Query($newParams, $returnProperties, NULL,
+    FALSE, FALSE, $mode
+  );
+  list($select, $from, $where, $having) = $query->query();
+
+  $sql = "$select $from $where $having";
+
+  if (!empty($sort)) {
+    $sql .= " ORDER BY $sort ";
+  }
+  if(!empty($rowCount)) {
+    $sql .= " LIMIT $offset, $rowCount ";
+  }
+  $dao = CRM_Core_DAO::executeQuery($sql);
+  return array($dao, $query);
 }
 
 /**
