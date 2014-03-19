@@ -164,12 +164,6 @@ cj(function($) {
       $("#enableDisableStatusMsg").dialog({
         title: {/literal}'{ts escape="js"}Confirm Changes{/ts}'{literal},
         modal: true,
-        bgiframe: true,
-        position: "center",
-        overlay: {
-          opacity: 0.5,
-          background: "black"
-        },
         open:function() {
           switch (op) {{/literal}
             case 'reopen':
