@@ -546,7 +546,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
     //take the common contact params
     $params = $this->contactParams();
     $params['note'] = 'test note';
-    $params['create_employer'] = 'Yahoo';
+    $params['create_employer'] = 1;
 
     //create the contact with given params.
     $contact = CRM_Contact_BAO_Contact::create($params);
@@ -615,7 +615,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
     $this->assertEquals(1, $values['relationship']['totalCount'], 'Check for total relationship count');
     foreach ($values['relationship']['data'] as $key => $val) {
       //Now check values of Relationship organization.
-      $this->assertEquals($params['create_employer'], $val['name'], 'Check for organization');
+      $this->assertEquals($params['create_employer'], $val['id'], 'Check for organization');
       //Now check values of Relationship type.
       $this->assertEquals('Employee of', $val['relation'], 'Check for relationship type');
       //delete the organization.
