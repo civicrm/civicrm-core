@@ -178,20 +178,18 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
       'assignee_contact_id' => array(
         'type' => 'entityRef',
         'label' => ts('Assigned To'),
-        'attributes' => array('multiple' => TRUE),
+        'attributes' => array('multiple' => TRUE, 'create' => TRUE),
       ),
       'followup_assignee_contact_id' => array(
         'type' => 'entityRef',
         'label' => ts('Assigned To'),
-        'attributes' => array('multiple' => TRUE),
+        'attributes' => array('multiple' => TRUE, 'create' => TRUE),
       ),
       'followup_activity_type_id' => array(
         'type' => 'select',
         'label' => ts('Followup Activity'),
-        'attributes' => array(
-          '' => '- ' . ts('select activity') . ' -'
-        ) +
-        CRM_Core_PseudoConstant::ActivityType(FALSE)
+        'attributes' => array('' => '- ' . ts('select activity') . ' -') + CRM_Core_PseudoConstant::ActivityType(FALSE),
+        'extra' => array('class' => 'crm-select2'),
       ),
       // Add optional 'Subject' field for the Follow-up Activiity, CRM-4491
       'followup_activity_subject' => array(
@@ -641,7 +639,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
           $this->addEntityRef($field, $values['label'], $attribute, $required);
         }
         else {
-          $this->add($values['type'], $field, $values['label'], $attribute, $required);
+          $this->add($values['type'], $field, $values['label'], $attribute, $required, CRM_Utils_Array::value('extra', $values));
         }
       }
     }

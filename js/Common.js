@@ -425,6 +425,7 @@ CRM.validate = CRM.validate || {
     })
     // Modal dialogs should disable scrollbars
     .on('dialogopen', function(e) {
+      $(e.target).parent().addClass('crm-container');
       if ($(e.target).dialog('option', 'modal')) {
         $(e.target).addClass('modal-dialog');
         $('body').css({overflow: 'hidden'});
@@ -670,7 +671,7 @@ CRM.validate = CRM.validate || {
         }
       };
     });
-    dialog = $('<div class="crm-container crm-confirm-dialog"></div>')
+    dialog = $('<div class="crm-confirm-dialog"></div>')
       .html(options.message)
       .dialog(settings)
       .trigger('crmLoad');
@@ -789,7 +790,7 @@ CRM.validate = CRM.validate || {
     // bind the event for image popup
     $('body')
       .on('click', 'a.crm-image-popup', function() {
-        var o = $('<div class="crm-container crm-custom-image-popup"><img src=' + $(this).attr('href') + '></div>');
+        var o = $('<div class="crm-custom-image-popup"><img src=' + $(this).attr('href') + '></div>');
 
         CRM.confirm('',
           {

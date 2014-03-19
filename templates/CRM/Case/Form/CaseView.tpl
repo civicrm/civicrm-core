@@ -330,13 +330,7 @@
     cj("#dialog").dialog({
       title: "Assign Case Role",
       modal: true,
-      bgiframe: true,
       close: function(event, ui) { cj("#rel_contact").unautocomplete( ); },
-      overlay: {
-        opacity: 0.5,
-        background: "black"
-      },
-
       open:function() {
         /* set defaults if editing */
         cj("#rel_contact").val("");
@@ -610,13 +604,7 @@ function addRole() {
   cj("#addRoleDialog").dialog({
     title: "Add Role",
     modal: true,
-    bgiframe: true,
     close: function(event, ui) { cj("#role_contact").unautocomplete( ); },
-    overlay: {
-      opacity: 0.5,
-      background: "black"
-    },
-
     open:function() {
       /* set defaults if editing */
       cj("#role_contact").val( "" );

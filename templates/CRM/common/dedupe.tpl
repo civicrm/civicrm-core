@@ -22,11 +22,6 @@ function processDupes( cid, oid, oper, context, reloadURL ) {
   cj("#processDupes").dialog({
     title: title,
     modal: true,
-    bgiframe: true,
-    overlay: {
-      opacity: 0.5,
-      background: "black"
-    },
 
     open:function() {
        cj( '#processDupes' ).show( ).html( msg );
