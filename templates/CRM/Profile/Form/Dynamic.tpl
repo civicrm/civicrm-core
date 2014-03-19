@@ -46,7 +46,7 @@ function checkResponse(responseText, statusText, xhr, $form) {
   //if there is any form error show the dialog
   //else redirect to post url
   if (!cj(responseText).find('.crm-error').html()) {
-    window.location = '{/literal}{$postUrl}{literal}';
+    window.location.href = '{/literal}{$postUrl}{literal}';
   }
 } 
 </script>
