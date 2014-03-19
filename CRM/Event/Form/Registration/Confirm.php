@@ -995,7 +995,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
    * @return void
    * @access public
    */
-  public static function fixLocationFields(&$params, &$fields, $form) {
+  public static function fixLocationFields(&$params, &$fields, &$form) {
     if (!empty($form->_fields)) {
       foreach ($form->_fields as $name => $dontCare) {
         $fields[$name] = 1;
@@ -1039,7 +1039,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
    * @return void
    * @access public
    */
-  public static function updateContactFields($contactID, $params, $fields, $form) {
+  public static function updateContactFields($contactID, $params, $fields, &$form) {
     //add the contact to group, if add to group is selected for a
     //particular uf group
 
