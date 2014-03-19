@@ -549,8 +549,10 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     }
 
     // make 30 test items -- 30 > 25 (the default limit)
+    $ids = array();
     for ($i = 0; $i < 30; $i++) {
       $baoObj = CRM_Core_DAO::createTestObject($baoString, array('currency' => 'USD'));
+      $ids[] = $baoObj->id;
     }
 
     // each case is array(0 => $inputtedApiOptions, 1 => $expectedResultCount)
@@ -564,7 +566,9 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
         $this->checkLimitAgainstExpected($entityName, array('option.limit' => $case[0]['options']['limit']), $case[1], $case[2]);
       }
     }
-    $baoObj->deleteTestObjects($baoString);
+    foreach ($ids as $id) {
+      CRM_Core_DAO::deleteTestObjects($baoString, array('id' => $id));
+    }
     $baoObj->free();
   }
 
