@@ -1,7 +1,7 @@
 <html>
 <head>
 <script type="text/javascript">
-  window.location = "{$redirectURL}"
+  window.location.href = "{$redirectURL}"
 </script>
 <title>{$title}</title>
 </head>
