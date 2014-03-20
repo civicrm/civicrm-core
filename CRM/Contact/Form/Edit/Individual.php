@@ -63,7 +63,7 @@ class CRM_Contact_Form_Edit_Individual {
       //prefix
       $prefix = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'prefix_id');
       if (isset($nameFields['Prefix']) && !empty($prefix)) {
-        $form->addSelect('prefix_id', array('class' => 'four', 'placeholder' => ' '));
+        $form->addSelect('prefix_id', array('class' => 'eight', 'placeholder' => ' ', 'label' => ts('Prefix')));
       }
 
       $attributes = CRM_Core_DAO::getAttribute('CRM_Contact_DAO_Contact');
@@ -90,7 +90,7 @@ class CRM_Contact_Form_Edit_Individual {
       // suffix
       $suffix = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'suffix_id');
       if (isset($nameFields['Suffix']) && $suffix) {
-        $form->addSelect('suffix_id', array('class' => 'four', 'placeholder' => ' '));
+        $form->addSelect('suffix_id', array('class' => 'eight', 'placeholder' => ' ', 'label' => ts('Suffix')));
       }
     }
 
