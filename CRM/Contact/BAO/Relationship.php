@@ -867,7 +867,8 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
         $where .= ' AND civicrm_relationship.contact_id_b = ' . CRM_Utils_Type::escape($contactId, 'Positive');
       }
       else {
-        $where .= ' AND civicrm_relationship.contact_id_a = ' . CRM_Utils_Type::escape($contactId, 'Positive');
+        $where .= ' AND civicrm_relationship.contact_id_a = ' . CRM_Utils_Type::escape($contactId, 'Positive') . '
+                    AND civicrm_relationship.contact_id_a != civicrm_relationship.contact_id_b ';
       }
     }
     if ($relationshipId) {
@@ -1093,6 +1094,7 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
               // give access by copying to MAX_ACTION temporarily, otherwise leave at NONE which won't display
               $links[CRM_Core_Action::MAX_ACTION] = $links[CRM_Core_Action::NONE];
               $links[CRM_Core_Action::MAX_ACTION]['name'] = ts('Manage Case #%1', array(1 => $values[$rid]['case_id']));
+              $links[CRM_Core_Action::MAX_ACTION]['class'] = 'no-popup';
 
               // Also make sure we have the right client cid since can get here from multiple relationship tabs.
               if ($values[$rid]['rtype'] == 'b_a') {

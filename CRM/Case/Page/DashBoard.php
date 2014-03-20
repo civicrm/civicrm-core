@@ -38,6 +38,8 @@
  */
 class CRM_Case_Page_DashBoard extends CRM_Core_Page {
 
+  public $useLivePageJS = TRUE;
+
   /**
    * Heart of the viewing process. The runner gets all the meta data for
    * the contact and calls the appropriate type of page to view.
@@ -47,9 +49,6 @@ class CRM_Case_Page_DashBoard extends CRM_Core_Page {
    *
    */
   function preProcess() {
-    // js for changing activity status
-    CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'templates/CRM/Case/Form/ActivityChangeStatus.js');
-
     //check for civicase access.
     if (!CRM_Case_BAO_Case::accessCiviCase()) {
       CRM_Core_Error::fatal(ts('You are not authorized to access this page.'));
@@ -99,6 +98,7 @@ class CRM_Case_Page_DashBoard extends CRM_Core_Page {
     if (!empty($recent)) {
       $this->assign('recentCases', $recent);
     }
+    $this->assign('includeWysiwygEditor', TRUE);
   }
 
   /**

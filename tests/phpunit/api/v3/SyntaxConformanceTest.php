@@ -110,6 +110,10 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     return static::entities(static::toBeSkipped_updatesingle(TRUE));
   }
 
+  public static function entities_getlimit() {
+    return static::entities(static::toBeSkipped_getlimit());
+  }
+
   public static function entities_delete() {
     return static::entities(static::toBeSkipped_delete(TRUE));
   }
@@ -256,6 +260,22 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     }
     return array('pledge');
     return $entities;
+  }
+
+  /*
+   * At this stage exclude the ones that don't pass & add them as we can troubleshoot them
+  */
+  public static function toBeSkipped_getlimit() {
+    $entitiesWithout = array(
+      'Case',//case api has non-std mandatory fields one of (case_id, contact_id, activity_id, contact_id)
+      'EntityTag', // non-standard api - has inappropriate mandatory fields & doesn't implement limit
+      'Event', // failed 'check that a 5 limit returns 5' - probably is_template field is wrong or something, or could be limit doesn't work right
+      'Extension', // can't handle creating 25
+      'MailingGroup', // no get call on MailingGroup
+      'Note', // fails on 5 limit - probably a set up problem
+      'Setting', //a bit of a pseudoapi - keys by domain
+    );
+    return $entitiesWithout;
   }
 
   public function getKnownUnworkablesUpdateSingle($entity, $key){
@@ -480,6 +500,93 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     $this->assertEquals(1, count($result['values']));
   }
 
+  /**
+   * Ensure that the "get" operation accepts limiting the #result records.
+   *
+   * TODO Consider making a separate entity list ("entities_getlimit")
+   * For the moment, the "entities_updatesingle" list should give a good
+   * sense for which entities support createTestObject
+   *
+   * @dataProvider entities_getlimit
+   * @param string $entity
+   */
+  function testLimit($entityName) {
+    $cases = array(); // each case is array(0 => $inputtedApiOptions, 1 => $expectedResultCount)
+    $cases[] = array(
+      array('options' => array('limit' => NULL)),
+      30,
+      'check that a NULL limit returns unlimited',
+    );
+    $cases[] = array(
+      array('options' => array('limit' => FALSE)),
+      30,
+      'check that a FALSE limit returns unlimited',
+    );
+    $cases[] = array(
+      array('options' => array('limit' => 0)),
+      30,
+      'check that a 0 limit returns unlimited',
+    );
+    $cases[] = array(
+      array('options' => array('limit' => 5)),
+      5,
+      'check that a 5 limit returns 5',
+    );
+    $cases[] = array(
+      array(),
+      25,
+      'check that no limit returns 25',
+    );
+
+    $baoString = _civicrm_api3_get_DAO($entityName);
+    if (empty($baoString)) {
+      $this->markTestIncomplete("Entity [$entityName] cannot be mocked - no known DAO");
+      return;
+    }
+
+    // make 30 test items -- 30 > 25 (the default limit)
+    $ids = array();
+    for ($i = 0; $i < 30; $i++) {
+      $baoObj = CRM_Core_DAO::createTestObject($baoString, array('currency' => 'USD'));
+      $ids[] = $baoObj->id;
+    }
+
+    // each case is array(0 => $inputtedApiOptions, 1 => $expectedResultCount)
+    foreach ($cases as $case) {
+      $this->checkLimitAgainstExpected($entityName, $case[0], $case[1], $case[2]);
+
+      //non preferred / legacy syntax
+      if(isset($case[0]['options']['limit'])) {
+        $this->checkLimitAgainstExpected($entityName, array('rowCount' => $case[0]['options']['limit']), $case[1], $case[2]);
+        $this->checkLimitAgainstExpected($entityName, array('option_limit' => $case[0]['options']['limit']), $case[1], $case[2]);
+        $this->checkLimitAgainstExpected($entityName, array('option.limit' => $case[0]['options']['limit']), $case[1], $case[2]);
+      }
+    }
+    foreach ($ids as $id) {
+      CRM_Core_DAO::deleteTestObjects($baoString, array('id' => $id));
+    }
+    $baoObj->free();
+  }
+
+  /**
+   * Check that get fetches an appropriate number of results
+   *
+   * @param string $entityName Name of entity to test
+   * @param unknown $params
+   * @param unknown $limit
+   * @param unknown $message
+   */
+  function checkLimitAgainstExpected($entityName, $params, $limit, $message) {
+    $result = $this->callAPISuccess($entityName, 'get', $params);
+    if($limit == 30) {
+      $this->assertGreaterThanOrEqual($limit, $result['count'], $message);
+      $this->assertGreaterThanOrEqual($limit, $result['count'], $message);
+    }
+    else {
+      $this->assertEquals($limit, $result['count'], $message);
+      $this->assertEquals($limit, count($result['values']), $message);
+    }
+  }
   /**
    * Create two entities and make sure we can fetch them individually by ID (e.g. using "contact_id=>2"
    * or "group_id=>4")

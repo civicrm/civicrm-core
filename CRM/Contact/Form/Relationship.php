@@ -44,77 +44,77 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
    *
    * @var int
    */
-  protected $_relationshipId;
+  public $_relationshipId;
 
   /**
    * The contact id, used when add/edit relationship
    *
    * @var int
    */
-  protected $_contactId;
+  public $_contactId;
 
   /**
    * This is a string which is either a_b or  b_a  used to determine the relationship between to contacts
    *
    */
-  protected $_rtype;
+  public $_rtype;
 
   /**
    * This is a string which is used to determine the relationship between to contacts
    *
    */
-  protected $_rtypeId;
+  public $_rtypeId;
 
   /**
    * Display name of contact a
    *
    */
-  protected $_display_name_a;
+  public $_display_name_a;
 
   /**
    * Display name of contact b
    *
    */
-  protected $_display_name_b;
+  public $_display_name_b;
 
   /**
    * The relationship type id
    *
    * @var int
    */
-  protected $_relationshipTypeId;
+  public $_relationshipTypeId;
 
   /**
    * an array of all relationship names
    *
    * @var array
    */
-  protected $_allRelationshipNames;
+  public $_allRelationshipNames;
 
   /**
    * @var bool
    */
-  protected $_enabled;
+  public $_enabled;
 
   /**
    * @var bool
    */
-  protected $_isCurrentEmployer;
+  public $_isCurrentEmployer;
 
   /**
    * @var string
    */
-  protected $_contactType;
+  public $_contactType;
 
   /**
    * The relationship values if Updating relationship
    */
-  protected $_values;
+  public $_values;
 
   /**
    * casid if it called from case context
    */
-  protected $_caseId;
+  public $_caseId;
 
   /**
    * @var mixed
@@ -327,7 +327,7 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
     // Metadata needed on clientside
     $contactTypes = CRM_Contact_BAO_ContactType::contactTypeInfo(TRUE);
     $jsData = array();
-    // Filter it down to just what we need to keep the dom small
+    // Get just what we need to keep the dom small
     $whatWeWant = array_flip(array('contact_type_a', 'contact_type_b', 'contact_sub_type_a', 'contact_sub_type_b'));
     foreach($this->_allRelationshipNames as $id => $vals) {
       if ($vals['name_a_b'] === 'Employee of') {
@@ -360,15 +360,15 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
       $contactField->freeze();
     }
 
-    $this->add('checkbox', 'is_current_employer', $this->_contactType == 'Organization' ? ts('Current Employee') : ts('Current Employer'));
+    $this->add('advcheckbox', 'is_current_employer', $this->_contactType == 'Organization' ? ts('Current Employee') : ts('Current Employer'));
 
     $this->addDate('start_date', ts('Start Date'), FALSE, array('formatType' => 'searchDate'));
     $this->addDate('end_date', ts('End Date'), FALSE, array('formatType' => 'searchDate'));
 
-    $this->add('checkbox', 'is_active', ts('Enabled?'));
+    $this->add('advcheckbox', 'is_active', ts('Enabled?'));
 
-    $this->add('checkbox', 'is_permission_a_b');
-    $this->add('checkbox', 'is_permission_b_a');
+    $this->add('advcheckbox', 'is_permission_a_b');
+    $this->add('advcheckbox', 'is_permission_b_a');
 
     $this->add('text', 'description', ts('Description'), CRM_Core_DAO::getAttribute('CRM_Contact_DAO_Relationship', 'description'));
 
@@ -417,34 +417,31 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
 
     $ids = array('contact' => $this->_contactId);
 
-    // Boolean fields (checkboxes) are nonexistant when submitted if unchecked - cast them to boolean
-    // FIXME: Dear Quickform, this sucks.
-    $params['is_active'] = !empty($params['is_active']);
-    $params['is_permission_a_b'] = !empty($params['is_permission_a_b']);
-    $params['is_permission_b_a'] = !empty($params['is_permission_b_a']);
-
-
     $relationshipTypeId = str_replace(array('_', 'a', 'b'), '', $params['relationship_type_id']);
+
+    // Update mode (always single)
     if ($this->_action & CRM_Core_Action::UPDATE) {
       $ids['relationship'] = $this->_relationshipId;
       $relation = CRM_Contact_BAO_Relationship::getContactIds($this->_relationshipId);
       $ids['contactTarget'] = ($relation->contact_id_a == $this->_contactId) ? $relation->contact_id_b : $relation->contact_id_a;
 
-      // if relationship type changes, relationship is disabled, or "current employer" is unchecked,
-      // clear the current employer. CRM-3235.
-      $isDisabled = !$params['is_active'] || !$params['is_current_employer'];
-      $relChanged = $relationshipTypeId != $this->_values['relationship_type_id'];
-      if ($this->_isCurrentEmployer && ($isDisabled || $relChanged)) {
-        CRM_Contact_BAO_Contact_Utils::clearCurrentEmployer($this->_values['contact_id_a']);
+      if ($this->_isCurrentEmployer) {
+        // if relationship type changes, relationship is disabled, or "current employer" is unchecked,
+        // clear the current employer. CRM-3235.
+        $relChanged = $relationshipTypeId != $this->_values['relationship_type_id'];
+        if (!$params['is_active'] || !$params['is_current_employer'] || $relChanged) {
+          CRM_Contact_BAO_Contact_Utils::clearCurrentEmployer($this->_values['contact_id_a']);
+          // Refresh contact summary if in ajax mode
+          $this->ajaxResponse['reloadBlocks'] = array('#crm-contactinfo-content');
+        }
       }
-
     }
-    // Create mode - save 1 or more new relationships
+    // Create mode (could be 1 or more relationships)
     else {
       // Fill up this weird param with contact ids like the weird relationship bao expects
       $params['contact_check'] = array_fill_keys(explode(',', $params['related_contact_id']), 1);
       if (!$this->_rtype) {
-        list(, $this->_rtype) = explode('_', $relationshipTypeId, 2);
+        list(, $this->_rtype) = explode('_', $params['relationship_type_id'], 2);
       }
     }
     $params['start_date'] = CRM_Utils_Date::processDate($params['start_date'], NULL, TRUE);
@@ -482,7 +479,7 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
     }
 
     // Save notes
-    if ($this->action & CRM_Core_Action::UPDATE || $params['note']) {
+    if ($this->_action & CRM_Core_Action::UPDATE || $params['note']) {
       foreach ($relationshipIds as $id) {
         $noteParams = array(
           'entity_id' => $id,
@@ -518,6 +515,10 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
           CRM_Contact_BAO_Relationship::disableEnableRelationship($this->_relationshipId, $active);
         }
       }
+      // Refresh contact tabs with related data
+      $this->ajaxResponse['updateTabs'] = array(
+        '#tab_member' => CRM_Contact_BAO_Contact::getCountComponent('membership', $this->_contactId),
+      );
     }
     // Set current employee/employer relationship, CRM-3532
     if ($params['is_current_employer'] && $this->_allRelationshipNames[$relationshipTypeId]["name_a_b"] == 'Employee of') {
@@ -528,6 +529,8 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
         $employerParams[$rel->contact_id_a] = $rel->contact_id_b;
       }
       CRM_Contact_BAO_Contact_Utils::setCurrentEmployer($employerParams);
+      // Refresh contact summary if in ajax mode
+      $this->ajaxResponse['reloadBlocks'] = array('#crm-contactinfo-content');
     }
   }
 

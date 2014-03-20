@@ -147,7 +147,7 @@ function searchPetitions( qfKey )
       if ( qfKey ) dataUrl = dataUrl + '&qfKey=' + qfKey;
 
       cj.get( dataUrl, null, function( petitionList ) {
-        cj( '#petitionList' ).html( petitionList );
+        cj( '#petitionList' ).html( petitionList ).trigger('crmLoad');
 
         //collapse the search form.
         var searchFormName = '#search_form_' + {/literal}'{$searchFor}'{literal};

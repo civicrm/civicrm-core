@@ -1244,7 +1244,8 @@ SELECT case_status.label AS case_status, status_id, case_type.label AS case_type
       //check for view activity.
       $subject = (empty($dao->subject)) ? '(' . ts('no subject') . ')' : $dao->subject;
       if ($allowView) {
-        $subject = '<a href="javascript:' . $type . 'viewActivity(' . $dao->id . ',' . $contactID . ',' . '\'' . $type . '\' );" title=\'' . $viewTitle . '\'>' . $subject . '</a>';
+        $url = CRM_Utils_System::url('civicrm/case/activity/view', array('cid' => $contactID, 'aid' => $dao->id));
+        $subject = '<a class="crm-popup medium-popup" href="' . $url . '" title="' . $viewTitle . '">' . $subject . '</a>';
       }
       $values[$dao->id]['subject'] = $subject;
 
@@ -1260,34 +1261,33 @@ SELECT case_status.label AS case_status, status_id, case_type.label AS case_type
           $values[$dao->id]['reporter'] .= ' / ' . ts('(multiple)');
         }
       }
+      // FIXME: Why are we not using CRM_Core_Action for these links? This is too much manual work and likely to get out-of-sync with core markup.
       $url = "";
+      $css = 'class="action-item crm-hover-button"';
       $additionalUrl = "&id={$dao->id}";
       if (!$dao->deleted) {
         //hide edit link of activity type email.CRM-4530.
         if (!in_array($dao->type, $emailActivityTypeIDs)) {
           //hide Edit link if activity type is NOT editable (special case activities).CRM-5871
           if ($allowEdit) {
-            $url = '<a href="' . $editUrl . $additionalUrl . '">' . ts('Edit') . '</a> ';
+            $url = '<a ' . $css . ' href="' . $editUrl . $additionalUrl . '">' . ts('Edit') . '</a> ';
           }
         }
         if ($allowDelete) {
-          if (!empty($url)) {
-            $url .= " | ";
-          }
-          $url .= '<a href="' . $deleteUrl . $additionalUrl . '">' . ts('Delete') . '</a>';
+          $url .= ' <a ' . str_replace('action-item', 'action-item small-popup', $css) . ' href="' . $deleteUrl . $additionalUrl . '">' . ts('Delete') . '</a>';
         }
       }
       elseif (!$caseDeleted) {
-        $url = '<a href="' . $restoreUrl . $additionalUrl . '">' . ts('Restore') . '</a>';
+        $url = ' <a ' . $css . ' href="' . $restoreUrl . $additionalUrl . '">' . ts('Restore') . '</a>';
         $values[$dao->id]['status'] = $values[$dao->id]['status'] . '<br /> (deleted)';
       }
 
       //check for operations.
       if (self::checkPermission($dao->id, 'Move To Case', $dao->activity_type_id)) {
-        $url .= " | " . '<a href="#" onClick="Javascript:fileOnCase( \'move\',' . $dao->id . ', ' . $caseID . ' ); return false;">' . ts('Move To Case') . '</a> ';
+        $url .= ' <a ' . $css . ' href="#" onClick="Javascript:fileOnCase( \'move\',' . $dao->id . ', ' . $caseID . ' ); return false;">' . ts('Move To Case') . '</a> ';
       }
       if (self::checkPermission($dao->id, 'Copy To Case', $dao->activity_type_id)) {
-        $url .= " | " . '<a href="#" onClick="Javascript:fileOnCase( \'copy\',' . $dao->id . ',' . $caseID . ' ); return false;">' . ts('Copy To Case') . '</a> ';
+        $url .= ' <a ' . $css . ' href="#" onClick="Javascript:fileOnCase( \'copy\',' . $dao->id . ',' . $caseID . ' ); return false;">' . ts('Copy To Case') . '</a> ';
       }
       // if there are file attachments we will return how many and, if only one, add a link to it
       if (!empty($dao->attachment_ids)) {
@@ -1302,7 +1302,7 @@ SELECT case_status.label AS case_status, status_id, case_type.label AS case_type
             NULL,
             FALSE
           );
-          $url .= " | " . "<a href=$attachmentViewUrl >" . ts('View Attachment') . '</a> ';
+          $url .= " <a href='$attachmentViewUrl' ><span class='icon paper-icon'></span></a>";
         }
       }
 
@@ -2231,7 +2231,7 @@ INNER JOIN  civicrm_case_contact ON ( civicrm_case.id = civicrm_case_contact.cas
       if (!$doFilterCases || array_key_exists($dao->id, $filterCases)) {
         $caseViewStr = "reset=1&id={$dao->id}&cid={$dao->client_id}&action=view&context=case&selectedChild=case";
         $caseViewUrl = CRM_Utils_System::url("civicrm/contact/view/case", $caseViewStr);
-        $caseView = "<a href='{$caseViewUrl}'>" . ts('View Case') . "</a>";
+        $caseView = "<a class='action-item no-popup crm-hover-button' href='{$caseViewUrl}'>" . ts('View Case') . "</a>";
       }
       $clientView = $dao->client_name;
       if ($hasViewContact) {

@@ -104,7 +104,7 @@
         {/if}
 
         {strip}
-        <table class="selector" summary="{ts}Search results listings.{/ts}">
+        <table class="selector row-highlight" summary="{ts}Search results listings.{/ts}">
             <thead class="sticky">
                 <th scope="col" title="Select All Rows">{$form.toggleSelect.html}</th>
                 {foreach from=$columnHeaders item=header}

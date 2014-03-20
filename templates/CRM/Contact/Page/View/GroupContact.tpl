@@ -63,9 +63,9 @@
             <td>{$row.in_date|crmDate}</td>
             <td>
               {if $permission EQ 'edit'}
-                <a class="action-item action-item-first" href="#Removed" title="{ts 1=$displayName 2=$row.title}Remove %1 from %2? (status in this group will be changed to 'Removed').{/ts}">
+                <a class="action-item crm-hover-button" href="#Removed" title="{ts 1=$displayName 2=$row.title}Remove %1 from %2? (status in this group will be changed to 'Removed').{/ts}">
                   {ts}Remove{/ts}</a>
-                <a class="action-item" href="#Deleted" title="{ts 1=$displayName 2=$row.title}Delete %1 from %2? (remove contact AND delete their record of having been in this group).{/ts}">
+                <a class="action-item crm-hover-button" href="#Deleted" title="{ts 1=$displayName 2=$row.title}Delete %1 from %2? (remove contact AND delete their record of having been in this group).{/ts}">
                   {ts}Delete{/ts}</a>
               {/if}
             </td>
@@ -116,9 +116,9 @@
             <td>{$row.pending_date|crmDate}</td>
             <td>
               {if $permission EQ 'edit'}
-                <a class="action-item action-item-first" href="#Removed" title="{ts 1=$displayName 2=$row.title}Remove %1 from %2? (status in this group will be changed to 'Removed').{/ts}">
+                <a class="action-item crm-hover-button" href="#Removed" title="{ts 1=$displayName 2=$row.title}Remove %1 from %2? (status in this group will be changed to 'Removed').{/ts}">
                   {ts}Remove{/ts}</a>
-                <a class="action-item" href="#Deleted" title="{ts 1=$displayName 2=$row.title}Delete %1 from %2? (this group will no longer be listed under Pending Groups){/ts}">
+                <a class="action-item crm-hover-button" href="#Deleted" title="{ts 1=$displayName 2=$row.title}Delete %1 from %2? (this group will no longer be listed under Pending Groups){/ts}">
                   {ts}Delete{/ts}</a>
               {/if}
             </td>
@@ -154,9 +154,9 @@
             <td>{$row.date_added|crmDate}</td>
             <td>{$row.out_date|crmDate}</td>
             <td>{if $permission EQ 'edit'}
-                <a class="action-item action-item-first" href="#Added" title="{ts 1=$displayName 2=$row.title}Add %1 back into %2?{/ts}">
+                <a class="action-item crm-hover-button" href="#Added" title="{ts 1=$displayName 2=$row.title}Add %1 back into %2?{/ts}">
                   {ts}Rejoin Group{/ts}</a>
-              <a class="action-item" href="#Deleted" title="{ts 1=$displayName 2=$row.title}Delete %1 from %2? (this group will no longer be listed under Past Groups).{/ts}">
+              <a class="action-item crm-hover-button" href="#Deleted" title="{ts 1=$displayName 2=$row.title}Delete %1 from %2? (this group will no longer be listed under Past Groups).{/ts}">
                 {ts}Delete{/ts}</a>{/if}
             </td>
           </tr>
@@ -199,11 +199,8 @@
         params.status = status;
       }
       // This api is weird - 'delete' actually works for updating as well as deleting
-      CRM.api('group_contact', 'delete', params, {success: function() {
-        refresh();
-        // Normally you wouldn't put a variable within ts() but this works due to smarty hack below
-        CRM.alert('', ts(status), 'success');
-      }});
+      // Normally you wouldn't put a variable within ts() but this works due to smarty hack below
+      CRM.api3('group_contact', 'delete', params, {success: ts(status)}).done(refresh);
     }
     $('.view-contact-groups a.action-item').click(function() {
       that = this;

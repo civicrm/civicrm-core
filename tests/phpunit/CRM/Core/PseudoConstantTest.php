@@ -277,6 +277,10 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
           'sample' => array('USD' => 'US Dollar'),
           'max' => 200,
         ),
+        array(
+          'fieldName' => 'soft_credit_type_id',
+          'sample' => 'In Honor of',
+        ),
       ),
       'CRM_Contribute_DAO_Product' => array(
         array(
@@ -346,12 +350,6 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
           'fieldName' => 'mapping_type_id',
           'sample' => 'Search Builder',
           'max' => 15,
-        ),
-      ),
-      'CRM_Pledge_DAO_Pledge' => array(
-        array(
-          'fieldName' => 'honor_type_id',
-          'sample' => 'In Honor of',
         ),
       ),
       'CRM_Core_DAO_Phone' => array(
@@ -528,10 +526,6 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
         array(
           'fieldName' => 'contribution_status_id',
           'sample' => 'Completed',
-        ),
-        array(
-          'fieldName' => 'honor_type_id',
-          'sample' => 'In Honor of',
         ),
       ),
       'CRM_Contribute_DAO_ContributionPage' => array(

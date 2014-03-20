@@ -1,45 +1,14 @@
-/*
- +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
- |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
- +--------------------------------------------------------------------+
- */
-
-/**
- * @file: global functions for CiviCRM
- * FIXME: We are moving away from using global functions. DO NOT ADD MORE.
- * @see CRM object - the better alternative to adding global functions
- */
-
+// https://civicrm.org/licensing
 var CRM = CRM || {};
 var cj = jQuery;
 
 /**
  * Short-named function for string translation, defined in global scope so it's available everywhere.
  *
- * @param  $text   string  string for translating
- * @param  $params object  key:value of additional parameters
+ * @param text string for translating
+ * @param params object key:value of additional parameters
  *
- * @return         string  the translated string
+ * @return string
  */
 function ts(text, params) {
   "use strict";
@@ -62,11 +31,10 @@ function ts(text, params) {
  *  a list of 'blocks to show' and 'blocks to hide' and the template passes these parameters to
  *  this function.
  *
- * @access public
+ * @deprecated
  * @param  showBlocks Array of element Id's to be displayed
  * @param  hideBlocks Array of element Id's to be hidden
  * @param elementType Value to set display style to for showBlocks (e.g. 'block' or 'table-row' or ...)
- * @return none
  */
 function on_load_init_blocks(showBlocks, hideBlocks, elementType) {
   if (elementType == null) {
@@ -102,14 +70,13 @@ function on_load_init_blocks(showBlocks, hideBlocks, elementType) {
  *  This function is called when we need to show or hide a related form element (target_element)
  *  based on the value (trigger_value) of another form field (trigger_field).
  *
- * @access public
+ * @deprecated
  * @param  trigger_field_id     HTML id of field whose onchange is the trigger
  * @param  trigger_value        List of integers - option value(s) which trigger show-element action for target_field
  * @param  target_element_id    HTML id of element to be shown or hidden
  * @param  target_element_type  Type of element to be shown or hidden ('block' or 'table-row')
  * @param  field_type           Type of element radio/select
  * @param  invert               Boolean - if true, we HIDE target on value match; if false, we SHOW target on value match
- * @return none
  */
 function showHideByValue(trigger_field_id, trigger_value, target_element_id, target_element_type, field_type, invert) {
   if (target_element_type == null) {
@@ -173,11 +140,11 @@ function showHideByValue(trigger_field_id, trigger_value, target_element_id, tar
 
 /**
  * Function to change button text and disable one it is clicked
- *
+ * @deprecated
  * @param obj object - the button clicked
  * @param formID string - the id of the form being submitted
  * @param string procText - button text after user clicks it
- * @return null
+ * @return bool
  */
 var submitcount = 0;
 /* Changes button label on submit, and disables button after submit for newer browsers.
@@ -203,7 +170,9 @@ function submitOnce(obj, formId, procText) {
     }
   }
 }
-
+/**
+ * @deprecated
+ */
 function popUp(URL) {
   day = new Date();
   id = day.getTime();
@@ -212,8 +181,8 @@ function popUp(URL) {
 
 /**
  * Function to show / hide the row in optionFields
- *
- * @param element name index, that whose innerHTML is to hide else will show the hidden row.
+ * @deprecated
+ * @param index string, element whose innerHTML is to hide else will show the hidden row.
  */
 function showHideRow(index) {
   if (index) {
@@ -241,6 +210,7 @@ CRM.validate = CRM.validate || {
 (function ($, undefined) {
   "use strict";
 
+  $.fn.select2.defaults.dropdownCssClass = 'crm-container';
   // https://github.com/ivaynberg/select2/pull/2090
   $.fn.select2.defaults.width = 'resolve';
 
@@ -253,48 +223,68 @@ CRM.validate = CRM.validate || {
    * Populate a select list, overwriting the existing options except for the placeholder.
    * @param $el jquery collection - 1 or more select elements
    * @param options array in format returned by api.getoptions
+   * @param removePlaceholder bool
    */
-  CRM.utils.setOptions = function($el, options) {
+  CRM.utils.setOptions = function($el, options, removePlaceholder) {
     $el.each(function() {
       var
         $elect = $(this),
-        val = $elect.val() || [];
+        val = $elect.val() || [],
+        opts = removePlaceholder ? '' : '[value!=""]';
       if (typeof(val) !== 'array') {
         val = [val];
       }
-      $elect.find('option[value!=""]').remove();
-      $.each(options, function(key, option) {
+      $elect.find('option' + opts).remove();
+      _.each(options, function(option) {
         var selected = ($.inArray(''+option.key, val) > -1) ? 'selected="selected"' : '';
         $elect.append('<option value="' + option.key + '"' + selected + '>' + option.value + '</option>');
       });
-      $elect.trigger('crmOptionsUpdated').trigger('change');
+      $elect.trigger('crmOptionsUpdated', $.extend({}, options)).trigger('change');
     });
   };
 
   /**
-   * Select2 api leaves something to be desired. To alter options on-the-fly often requires re-rendering the whole thing.
-   * So making this function public in case anyone needs it.
+   * Wrapper for select2 initialization function; supplies defaults
+   * @param options object
    */
-  CRM.utils.buildSelect2Element = function() {
-    var $el = $(this);
-    var options = {};
-    // quickform doesn't support optgroups so here's a hack :(
-    $('option[value^=crm_optgroup]', this).each(function() {
-      $(this).nextUntil('option[value^=crm_optgroup]').wrapAll('<optgroup label="' + $(this).text() + '" />');
-      $(this).remove();
-    });
-    // Defaults for single-selects
-    if ($el.is('select:not([multiple])')) {
-      options.minimumResultsForSearch = 10;
-      options.allowClear = !($el.hasClass('required'));
-      if ($('option:first', this).val() === '') {
-        options.placeholderOption = 'first';
+  $.fn.crmSelect2 = function(options) {
+    return $(this).each(function () {
+      var
+        $el = $(this),
+        defaults = {allowClear: !$el.hasClass('required')};
+      // quickform doesn't support optgroups so here's a hack :(
+      $('option[value^=crm_optgroup]', this).each(function () {
+        $(this).nextUntil('option[value^=crm_optgroup]').wrapAll('<optgroup label="' + $(this).text() + '" />');
+        $(this).remove();
+      });
+      // Defaults for single-selects
+      if ($el.is('select:not([multiple])')) {
+        defaults.minimumResultsForSearch = 10;
+        if ($('option:first', this).val() === '') {
+          defaults.placeholderOption = 'first';
+        }
       }
-    }
-    $.extend(options, $el.data('select-params') || {});
-    // Autocomplete using the getlist api
-    if ($el.data('api-entity') && $el.hasClass('crm-form-entityref')) {
-      $el.addClass('crm-ajax-select');
+      $el.select2($.extend(defaults, $el.data('select-params') || {}, options || {}));
+    });
+  };
+
+  /**
+   * @see CRM_Core_Form::addEntityRef for docs
+   * @param options object
+   */
+  $.fn.crmEntityRef = function(options) {
+    options = options || {};
+    options.select = options.select || {};
+    return $(this).each(function() {
+      var
+        $el = $(this),
+        entity = options.entity || $el.data('api-entity') || 'contact',
+        selectParams = {};
+      $el.data('api-entity', entity);
+      $el.data('select-params', $.extend({}, $el.data('select-params') || {}, options.select));
+      $el.data('api-params', $.extend({}, $el.data('api-params') || {}, options.api));
+      $el.data('create-links', options.create || $el.data('create-links'));
+      $el.addClass('crm-ajax-select crm-' + entity + '-ref');
       var settings = {
         // Use select2 ajax helper instead of CRM.api because it provides more value
         ajax: {
@@ -313,28 +303,44 @@ CRM.validate = CRM.validate || {
             return {more: data.more_results, results: data.values || []};
           }
         },
-        formatResult: CRM.utils.formatSelect2Result,
+        minimumInputLength: 1,
+        formatResult: formatSelect2Result,
         formatSelection: function(row) {
           return row.label;
         },
         escapeMarkup: function (m) {return m;},
-        initSelection: function(el, callback) {
-          callback(el.data('entity-value'));
+        initSelection: function($el, callback) {
+          var
+            multiple = !!$el.data('select-params').multiple,
+            val = $el.val(),
+            stored = $el.data('entity-value') || [];
+          if (val === '') {
+            return;
+          }
+          // If we already have this data, just return it
+          if (!_.xor(val.split(','), _.pluck(stored, 'id')).length) {
+            callback(multiple ? stored : stored[0]);
+          } else {
+            var params = $.extend({}, $el.data('api-params') || {}, {id: val});
+            CRM.api3($el.data('api-entity'), 'getlist', params).done(function(result) {
+              callback(multiple ? result.values : result.values[0])
+            });
+          }
         }
       };
       if ($el.data('create-links')) {
-        options.formatInputTooShort = function() {
-          var txt = $el.data('select-params').formatInputTooShort || $.fn.select2.defaults.formatInputTooShort;
-          if ($el.data('create-links').length) {
-            txt += ' ' + ts('or') + '<br />' + CRM.utils.formatSelect2CreateLinks($el);
+        selectParams.formatInputTooShort = function() {
+          var txt = $el.data('select-params').formatInputTooShort || $.fn.select2.defaults.formatInputTooShort.call(this);
+          if ($el.data('create-links')) {
+            txt += ' ' + ts('or') + '<br />' + formatSelect2CreateLinks($el);
           }
           return txt;
         };
-        options.formatNoMatches = function() {
+        selectParams.formatNoMatches = function() {
           var txt = $el.data('select-params').formatNoMatches || $.fn.select2.defaults.formatNoMatches;
-          return txt + '<br />' + CRM.utils.formatSelect2CreateLinks($el);
+          return txt + '<br />' + formatSelect2CreateLinks($el);
         };
-        $el.on('select2-open', function() {
+        $el.off('.createLinks').on('select2-open.createLinks', function() {
           var $el = $(this);
           $('#select2-drop').off('.crmEntity').on('click.crmEntity', 'a.crm-add-entity', function(e) {
             $el.select2('close');
@@ -342,6 +348,7 @@ CRM.validate = CRM.validate || {
               dialog: {width: 500, height: 'auto'}
             }).on('crmFormSuccess', function(e, data) {
               if (data.status === 'success' && data.id) {
+                CRM.status(ts('%1 Created', {1: data.label}));
                 if ($el.select2('container').hasClass('select2-container-multi')) {
                   var selection = $el.select2('data');
                   selection.push(data);
@@ -355,13 +362,11 @@ CRM.validate = CRM.validate || {
           });
         });
       }
-      options = $.extend(settings, options);
-    }
-    options.dropdownCssClass = 'crm-container';
-    $(this).select2(options).removeClass('crm-select2');
+      $el.crmSelect2($.extend(settings, $el.data('select-params'), selectParams));
+    });
   };
 
-  CRM.utils.formatSelect2Result = function(row) {
+  function formatSelect2Result(row) {
     var markup = '<div class="crm-select2-row">';
     if (row.image !== undefined) {
       markup += '<div class="crm-select2-image"><img src="' + row.image + '"/></div>';
@@ -376,39 +381,61 @@ CRM.validate = CRM.validate || {
     });
     markup += '</div></div></div>';
     return markup;
-  };
-  
-  CRM.utils.formatSelect2CreateLinks = function($el) {
+  }
+
+  function formatSelect2CreateLinks($el) {
+    var
+      createLinks = $el.data('create-links'),
+      api = $el.data('api-params') || {},
+      type = api.params ? api.params.contact_type : null;
+    if (createLinks === true) {
+      createLinks = type ? _.where(CRM.profile.contactCreate, {type: type}) : CRM.profile.contactCreate;
+    }
     var markup = '';
-    $.each($el.data('create-links'), function(k, link) {
+    _.each(createLinks, function(link) {
       markup += ' <a class="crm-add-entity crm-hover-button" href="' + link.url + '">';
-      if (link.name) {
-        markup += '<span class="icon ' + link.name + '-icon"></span> ';
+      if (link.type) {
+        markup += '<span class="icon ' + link.type + '-profile-icon"></span> ';
       }
       markup += link.label + '</a>';
     });
     return markup;
-  };
+  }
 
   // Initialize widgets
-  $(document).on('crmLoad', function(e) {
-    $('table.row-highlight', e.target)
-      .off('.rowHighlight')
-      .on('change.rowHighlight', 'input.select-row, input.select-rows', function () {
-        var target, table = $(this).closest('table');
-        if ($(this).hasClass('select-rows')) {
-          target = $('tbody tr', table);
-          $('input.select-row', table).prop('checked', $(this).prop('checked'));
-        }
-        else {
-          target = $(this).closest('tr');
-          $('input.select-rows', table).prop('checked', $(".select-row:not(':checked')", table).length < 1);
-        }
-        target.toggleClass('crm-row-selected', $(this).is(':checked'));
-      })
-      .find('input.select-row:checked').parents('tr').addClass('crm-row-selected');
-    $('.crm-select2', e.target).each(CRM.utils.buildSelect2Element);
-  });
+  $(document)
+    .on('crmLoad', function(e) {
+      $('table.row-highlight', e.target)
+        .off('.rowHighlight')
+        .on('change.rowHighlight', 'input.select-row, input.select-rows', function () {
+          var target, table = $(this).closest('table');
+          if ($(this).hasClass('select-rows')) {
+            target = $('tbody tr', table);
+            $('input.select-row', table).prop('checked', $(this).prop('checked'));
+          }
+          else {
+            target = $(this).closest('tr');
+            $('input.select-rows', table).prop('checked', $(".select-row:not(':checked')", table).length < 1);
+          }
+          target.toggleClass('crm-row-selected', $(this).is(':checked'));
+        })
+        .find('input.select-row:checked').parents('tr').addClass('crm-row-selected');
+      $('.crm-select2:not(.select2-offscreen, .select2-container)', e.target).crmSelect2();
+      $('.crm-form-entityref:not(.select2-offscreen, .select2-container)', e.target).crmEntityRef();
+    })
+    // Modal dialogs should disable scrollbars
+    .on('dialogopen', function(e) {
+      $(e.target).parent().addClass('crm-container');
+      if ($(e.target).dialog('option', 'modal')) {
+        $(e.target).addClass('modal-dialog');
+        $('body').css({overflow: 'hidden'});
+      }
+    })
+    .on('dialogclose', function(e) {
+      if ($('.ui-dialog .modal-dialog').not(e.target).length < 1) {
+        $('body').css({overflow: ''});
+      }
+    });
 
   /**
    * Function to make multiselect boxes behave as fields in small screens
@@ -522,44 +549,47 @@ CRM.validate = CRM.validate || {
     );
   };
   /**
-   * @param startMsg string
-   * @param endMsg string|function
-   * @param deferred optional jQuery deferred object
-   * @return jQuery deferred object - if not supplied a new one will be created
+   * @see https://wiki.civicrm.org/confluence/display/CRMDOC/Notification+Reference
    */
-  var fadeOut;
-  CRM.status = function(startMsg, endMsg, deferred) {
-    var $bar = $('#civicrm-menu');
-    if (!$bar.length) {
-      console && console.log && console.log('CRM.status called on a page with no menubar');
-      return;
+  CRM.status = function(options, deferred) {
+    // For simple usage without async operations you can pass in a string. 2nd param is optional string 'error' if this is not a success msg.
+    if (typeof options === 'string') {
+      return CRM.status({start: options, success: options, error: options})[deferred === 'error' ? 'reject' : 'resolve']();
     }
-    $('.crm-menubar-status-container', $bar).remove();
-    fadeOut && window.clearTimeout(fadeOut);
-    $bar.append('<li class="crm-menubar-status-container status-busy"><div class="crm-menubar-status-progressbar"><div class="crm-menubar-status-msg">' + startMsg + '</div></div></li>');
-    $('.crm-menubar-status-container', $bar).css('min-width', $('.crm-menubar-status-container', $bar).width());
-    deferred || (deferred = new $.Deferred());
-    deferred.done(function(data) {
-      var msg = typeof(endMsg) === 'function' ? endMsg(data) : endMsg;
-      $('.crm-menubar-status-container', $bar).removeClass('status-busy').addClass('status-done').show().find('.crm-menubar-status-msg').html(msg);
-      if (msg) {
-        fadeOut = window.setTimeout(function() {
-          $('.crm-menubar-status-container', $bar).fadeOut('slow');
+    var opts = $.extend({
+      start: ts('Saving...'),
+      success: ts('Saved'),
+      error: function() {
+        CRM.alert(ts('Sorry an error occurred and your information was not saved'), ts('Error'));
+      }
+    }, options || {});
+    var $msg = $('<div class="crm-status-box-outer status-start"><div class="crm-status-box-inner"><div class="crm-status-box-msg">' + opts.start + '</div></div></div>')
+      .appendTo('body');
+    $msg.css('min-width', $msg.width());
+    function handle(status, data) {
+      var endMsg = typeof(opts[status]) === 'function' ? opts[status](data) : opts[status];
+      if (endMsg) {
+        $msg.removeClass('status-start').addClass('status-' + status).find('.crm-status-box-msg').html(endMsg);
+        window.setTimeout(function() {
+          $msg.fadeOut('slow', function() {$msg.remove()});
         }, 2000);
       } else {
-        $('.crm-menubar-status-container', $bar).hide();
+        $msg.remove();
       }
-    });
-    return deferred;
+    }
+    return (deferred || new $.Deferred())
+      .done(function(data) {
+        // If the server returns an error msg call the error handler
+        var status = $.isPlainObject(data) && (data.is_error || data.status === 'error') ? 'error' : 'success';
+        handle(status, data);
+      })
+      .fail(function(data) {
+        handle('error', data);
+      });
   };
 
   /**
-   * @param string text Displayable message
-   * @param string title Displayable title
-   * @param string type 'alert'|'info'|'success'|'error' (default: 'alert')
-   * @param {object} options
-   * @return {*}
-   * @see http://wiki.civicrm.org/confluence/display/CRM/Notifications+in+CiviCRM
+   * @see https://wiki.civicrm.org/confluence/display/CRMDOC/Notification+Reference
    */
   CRM.alert = function (text, title, type, options) {
     type = type || 'alert';
@@ -606,13 +636,7 @@ CRM.validate = CRM.validate || {
   };
 
   /**
-   * Prompt the user for confirmation.
-   *
-   * @param buttons {object|function} key|value pairs where key == button label and value == callback function
-   *  passing in a function instead of an object is a shortcut for a sinlgle button labeled "Continue"
-   * @param options {object|void} Override defaults, keys include 'title', 'message',
-   *  see jQuery.dialog for full list of available params
-   * @param cancelLabel {string}
+   * @see https://wiki.civicrm.org/confluence/display/CRMDOC/Notification+Reference
    */
   CRM.confirm = function (buttons, options, cancelLabel) {
     var dialog, callbacks = {};
@@ -624,7 +648,7 @@ CRM.validate = CRM.validate || {
       modal: true,
       width: 'auto',
       close: function () {
-        $(dialog).remove();
+        $(dialog).dialog('destroy').remove();
       },
       buttons: {}
     };
@@ -647,16 +671,15 @@ CRM.validate = CRM.validate || {
         }
       };
     });
-    dialog = $('<div class="crm-container crm-confirm-dialog"></div>')
+    dialog = $('<div class="crm-confirm-dialog"></div>')
       .html(options.message)
-      .appendTo('body')
-      .dialog(settings);
+      .dialog(settings)
+      .trigger('crmLoad');
     return dialog;
   };
 
   /**
-   * Sets an error message
-   * If called for a form item, title and removal condition will be handled automatically
+   * @see https://wiki.civicrm.org/confluence/display/CRMDOC/Notification+Reference
    */
   $.fn.crmError = function (text, title, options) {
     title = title || '';
@@ -732,246 +755,6 @@ CRM.validate = CRM.validate || {
     });
   }
 
-  $.widget('civi.crmSnippet', {
-    options: {
-      url: null,
-      block: true,
-      crmForm: null
-    },
-    _originalContent: null,
-    _originalUrl: null,
-    isOriginalUrl: function() {
-      var 
-        args = {}, 
-        same = true,
-        newUrl = this._formatUrl(this.options.url),
-        oldUrl = this._formatUrl(this._originalUrl);
-      // Compare path
-      if (newUrl.split('?')[0] !== oldUrl.split('?')[0]) {
-        return false;
-      }
-      // Compare arguments
-      $.each(newUrl.split('?')[1].split('&'), function(k, v) {
-        var arg = v.split('=');
-        args[arg[0]] = arg[1];
-      });
-      $.each(oldUrl.split('?')[1].split('&'), function(k, v) {
-        var arg = v.split('=');
-        if (args[arg[0]] !== undefined && arg[1] !== args[arg[0]]) {
-          same = false;
-        }
-      });
-      return same;
-    },
-    resetUrl: function() {
-      this.options.url = this._originalUrl;
-    },
-    _create: function() {
-      this.element.addClass('crm-ajax-container');
-      if (!this.element.is('.crm-container *')) {
-        this.element.addClass('crm-container');
-      }
-      this._handleOrderLinks();
-      // Set default if not supplied
-      this.options.url = this.options.url || document.location.href;
-      this._originalUrl = this.options.url;
-    },
-    _onFailure: function(data) {
-      this.options.block && this.element.unblock();
-      this.element.trigger('crmAjaxFail', data);
-      CRM.alert(ts('Unable to reach the server. Please refresh this page in your browser and try again.'), ts('Network Error'), 'error');
-    },
-    _formatUrl: function(url) {
-      // Strip hash
-      url = url.split('#')[0];
-      // Add snippet argument to url
-      if (url.search(/[&?]snippet=/) < 0) {
-        url += (url.indexOf('?') < 0 ? '?' : '&') + 'snippet=json';
-      } else {
-        url = url.replace(/snippet=[^&]*/, 'snippet=json');
-      }
-      return url;
-    },
-    // Hack to deal with civicrm legacy sort functionality
-    _handleOrderLinks: function() {
-      var that = this;
-      $('a.crm-weight-arrow', that.element).click(function(e) {
-        that.options.block && that.element.block();
-        $.getJSON(that._formatUrl(this.href)).done(function() {
-          that.refresh();
-        });
-        e.stopImmediatePropagation();
-        return false;
-      });
-    },
-    refresh: function() {
-      var that = this;
-      var url = this._formatUrl(this.options.url);
-      this.options.block && $('.blockOverlay', this.element).length < 1 && this.element.block();
-      $.getJSON(url, function(data) {
-        if (typeof(data) != 'object' || typeof(data.content) != 'string') {
-          that._onFailure(data);
-          return;
-        }
-        data.url = url;
-        that.element.trigger('crmBeforeLoad', data);
-        if (that._originalContent === null) {
-          that._originalContent = that.element.contents().detach();
-        }
-        that.element.html(data.content);
-        that._handleOrderLinks();
-        that.element.trigger('crmLoad', data);
-        that.options.crmForm && that.element.trigger('crmFormLoad', data);
-      }).fail(function() {
-          that._onFailure();
-        });
-    },
-    _destroy: function() {
-      this.element.removeClass('crm-ajax-container');
-      if (this._originalContent !== null) {
-        this.element.empty().append(this._originalContent);
-      }
-    }
-  });
-
-  var dialogCount = 0;
-  CRM.loadPage = function(url, options) {
-    var settings = {
-      target: '#crm-ajax-dialog-' + (dialogCount++),
-      dialog: false
-    };
-    if (!options || !options.target) {
-      settings.dialog = {
-        modal: true,
-        width: '65%',
-        height: parseInt($(window).height() * .75),
-        close: function() {
-          $(this).dialog('destroy').remove();
-        }
-      };
-    }
-    options && $.extend(true, settings, options);
-    settings.url = url;
-    // Create new dialog
-    if (settings.dialog) {
-      $('<div id="'+ settings.target.substring(1) +'"><div class="crm-loading-element">' + ts('Loading') + '...</div></div>').dialog(settings.dialog);
-    }
-    if (settings.dialog && !settings.dialog.title) {
-      $(settings.target).on('crmLoad', function(event, data) {
-        data.title && $(this).dialog('option', 'title', data.title);
-      });
-    }
-    $(settings.target).crmSnippet(settings).crmSnippet('refresh');
-    return $(settings.target);
-  };
-
-  CRM.loadForm = function(url, options) {
-    var settings = {
-      crmForm: {
-        ajaxForm: {},
-        autoClose: true,
-        validate: true,
-        refreshAction: ['next_new', 'submit_savenext'],
-        cancelButton: '.cancel.form-submit',
-        openInline: 'a.button:not("[href=#], .no-popup")',
-        onCancel: function(event) {},
-        onError: function(data) {
-          var $el = $(this);
-          $el.html(data.content).trigger('crmLoad', data).trigger('crmFormLoad', data).trigger('crmFormError', data);
-          if (typeof(data.errors) == 'object') {
-            $.each(data.errors, function(formElement, msg) {
-              $('[name="'+formElement+'"]', $el).crmError(msg);
-            });
-          }
-        }
-      }
-    };
-    // Hack to make delete dialogs smaller
-    if (url.indexOf('/delete') > 0 || url.indexOf('action=delete') > 0) {
-      settings.dialog = {
-        width: 400,
-        height: 300
-      };
-    }
-    // Move options that belong to crmForm. Others will be passed through to crmSnippet
-    options && $.each(options, function(key, value) {
-      if (typeof(settings.crmForm[key]) !== 'undefined') {
-        settings.crmForm[key] = value;
-      }
-      else {
-        settings[key] = value;
-      }
-    });
-
-    var widget = CRM.loadPage(url, settings);
-
-    widget.on('crmFormLoad', function(event, data) {
-      var $el = $(this);
-      var settings = $el.crmSnippet('option', 'crmForm');
-      settings.cancelButton && $(settings.cancelButton, this).click(function(event) {
-        var returnVal = settings.onCancel.call($el, event);
-        if (returnVal !== false) {
-          $el.trigger('crmFormCancel', event);
-          if ($el.data('uiDialog') && settings.autoClose) {
-            $el.dialog('close');
-          }
-          else if (!settings.autoClose) {
-            $el.crmSnippet('resetUrl').crmSnippet('refresh');
-          }
-        }
-        return returnVal === false;
-      });
-      if (settings.validate) {
-        $("form", this).validate(typeof(settings.validate) == 'object' ? settings.validate : CRM.validate.params);
-      }
-      $("form", this).ajaxForm($.extend({
-        url: data.url.replace(/reset=1[&]?/, ''),
-        dataType: 'json',
-        success: function(response) {
-          if (response.status !== 'form_error') {
-            $el.crmSnippet('option', 'block') && $el.unblock();
-            $el.trigger('crmFormSuccess', response);
-            // Reset form for e.g. "save and new"
-            if (response.userContext && settings.refreshAction && $.inArray(response.buttonName, settings.refreshAction) >= 0) {
-              $el.crmSnippet('option', 'url', response.userContext).crmSnippet('refresh');
-            }
-            else if ($el.data('uiDialog') && settings.autoClose) {
-              $el.dialog('close');
-            }
-            else if (settings.autoClose === false) {
-              $el.crmSnippet('resetUrl').crmSnippet('refresh');
-            }
-          }
-          else {
-            response.url = data.url;
-            settings.onError.call($el, response);
-          }
-        },
-        beforeSerialize: function(form, options) {
-          if (window.CKEDITOR && window.CKEDITOR.instances) {
-            $.each(CKEDITOR.instances, function() {
-              this.updateElement && this.updateElement();
-            });
-          }
-        },
-        beforeSubmit: function(submission) {
-          $el.crmSnippet('option', 'block') && $el.block();
-          $el.trigger('crmFormSubmit', submission);
-        }
-      }, settings.ajaxForm));
-      if (settings.openInline) {
-        settings.autoClose = $el.crmSnippet('isOriginalUrl');
-        $(settings.openInline, this).click(function(event) {
-          $el.crmSnippet('option', 'url', $(this).attr('href')).crmSnippet('refresh');
-          return false;
-        });
-      }
-      // For convenience, focus the first field
-      $('input[type=text], textarea, select', this).filter(':visible').first().focus();
-    });
-    return widget;
-  };
-
   // Preprocess all cj ajax calls to display messages
   $(document).ajaxSuccess(function(event, xhr, settings) {
     try {
@@ -990,6 +773,7 @@ CRM.validate = CRM.validate || {
 
   /**
    * Temporary stub to get around name conflict with legacy jQuery.autocomplete plugin
+   * FIXME: Remove this before 4.5 release
    */
   $.widget('civi.crmAutocomplete', $.ui.autocomplete, {});
 
@@ -1006,7 +790,7 @@ CRM.validate = CRM.validate || {
     // bind the event for image popup
     $('body')
       .on('click', 'a.crm-image-popup', function() {
-        var o = $('<div class="crm-container crm-custom-image-popup"><img src=' + $(this).attr('href') + '></div>');
+        var o = $('<div class="crm-custom-image-popup"><img src=' + $(this).attr('href') + '></div>');
 
         CRM.confirm('',
           {
@@ -1025,22 +809,6 @@ CRM.validate = CRM.validate || {
         }
       })
 
-      .on('click', 'a.crm-option-edit-link', function() {
-        var link = $(this);
-        CRM.loadForm(this.href, {openInline: 'a:not("[href=#], .no-popup")'})
-          // Lots of things can happen once the form opens, this is the only event we can really rely on
-          .on('dialogclose', function() {
-            link.trigger('crmOptionsEdited');
-            var $elects = $('select[data-option-edit-path="' + link.data('option-edit-path') + '"]');
-            if ($elects.data('api-entity') && $elects.data('api-field')) {
-              CRM.api3($elects.data('api-entity'), 'getoptions', {sequential: 1, field: $elects.data('api-field')})
-                .done(function(data) {
-                  CRM.utils.setOptions($elects, data.values);
-                });
-            }
-          });
-        return false;
-      })
       // Handle clear button for form elements
       .on('click', 'a.crm-clear-link', function() {
         $(this).css({visibility: 'hidden'}).siblings('.crm-form-radio:checked').prop('checked', false).change();
@@ -1050,6 +818,7 @@ CRM.validate = CRM.validate || {
       .on('change', 'input.crm-form-radio:checked', function() {
         $(this).siblings('.crm-clear-link').css({visibility: ''});
       });
+
     $().crmtooltip();
   });
 

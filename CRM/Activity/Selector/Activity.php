@@ -128,6 +128,7 @@ class CRM_Activity_Selector_Activity extends CRM_Core_Selector_Base implements C
     //when activity type is disabled or no more exists give only delete.
     switch ($activityTypeName) {
       case 'Event Registration':
+      case 'Change Registration':
         $url = 'civicrm/contact/view/participant';
         $qsView = "action=view&reset=1&id={$sourceRecordId}&cid=%%cid%%&context=%%cxt%%{$extraParams}";
         break;
@@ -135,6 +136,15 @@ class CRM_Activity_Selector_Activity extends CRM_Core_Selector_Base implements C
       case 'Contribution':
         $url = 'civicrm/contact/view/contribution';
         $qsView = "action=view&reset=1&id={$sourceRecordId}&cid=%%cid%%&context=%%cxt%%{$extraParams}";
+        break;
+
+      case 'Payment':
+      case 'Refund':
+        $participantId = CRM_Core_DAO::getFieldValue('CRM_Event_BAO_ParticipantPayment', $sourceRecordId, 'participant_id', 'contribution_id');
+        if (!empty($participantId)) {
+          $url = 'civicrm/contact/view/participant';
+          $qsView = "action=view&reset=1&id={$participantId}&cid=%%cid%%&context=%%cxt%%{$extraParams}";
+        }
         break;
 
       case 'Membership Signup':

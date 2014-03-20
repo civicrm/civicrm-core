@@ -55,7 +55,7 @@ function buildPaymentBlock( type ) {
                         async: false
                         }).responseText;
 
-  cj('#billing-payment-block').html(response).trigger('crmFormLoad');
+  cj('#billing-payment-block').html(response).trigger('crmLoad').trigger('crmFormLoad');
 }
 
 cj( function() {

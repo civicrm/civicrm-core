@@ -274,7 +274,7 @@ class CRM_Report_Form_Contribute_TopDonor extends CRM_Report_Form {
 
   function where() {
     $clauses = array();
-    $this->_tempClause = $this->_outerCluase = '';
+    $this->_tempClause = $this->_outerCluase = $this->_groupLimit = '';
     foreach ($this->_columns as $tableName => $table) {
       if (array_key_exists('filters', $table)) {
         foreach ($table['filters'] as $fieldName => $field) {
@@ -304,6 +304,7 @@ class CRM_Report_Form_Contribute_TopDonor extends CRM_Report_Form {
             if ($fieldName == 'total_range') {
               $value = CRM_Utils_Array::value("total_range_value", $this->_params);
               $this->_outerCluase = " WHERE (( @rows := @rows + 1) <= {$value}) ";
+              $this->_groupLimit = " LIMIT {$value}";
             }
             else {
               $clauses[] = $clause;
@@ -379,7 +380,7 @@ class CRM_Report_Form_Contribute_TopDonor extends CRM_Report_Form {
       $sql = "
 {$this->_select} {$this->_from}  {$this->_where} {$this->_groupBy}
 ORDER BY civicrm_contribution_total_amount_sum DESC
-) as abc {$this->_outerCluase}";
+) as abc {$this->_groupLimit}";
       $dao = CRM_Core_DAO::executeQuery($sql);
 
       $contact_ids = array();

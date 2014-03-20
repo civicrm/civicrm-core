@@ -132,8 +132,8 @@ class WebTest_Member_OnlineMembershipRenewTest extends CiviSeleniumTestCase {
     $this->openCiviPage("member/search", "reset=1", "member_end_date_high");
 
     $this->type("sort_name", "$firstName $lastName");
-    $this->clickLink("_qf_Search_refresh", 'css=#memberSearch table tbody tr td span a.action-item-first');
-    $this->click('css=#memberSearch table tbody tr td span a.action-item-first');
+    $this->clickLink("_qf_Search_refresh", 'css=#memberSearch table tbody tr td span a.action-item:first-child');
+    $this->click('css=#memberSearch table tbody tr td span a.action-item:first-child');
     $this->waitForElementPresent("_qf_MembershipView_cancel-bottom");
 
     //View Membership Record
@@ -187,8 +187,8 @@ class WebTest_Member_OnlineMembershipRenewTest extends CiviSeleniumTestCase {
     $this->openCiviPage("member/search", "reset=1", "member_end_date_high");
 
     $this->type("sort_name", "$firstName $lastName");
-    $this->clickLink("_qf_Search_refresh", 'css=#memberSearch table tbody tr td span a.action-item-first');
-    $this->click('css=#memberSearch table tbody tr td span a.action-item-first');
+    $this->clickLink("_qf_Search_refresh", 'css=#memberSearch table tbody tr td span a.action-item:first-child');
+    $this->click('css=#memberSearch table tbody tr td span a.action-item:first-child');
     $this->waitForElementPresent("_qf_MembershipView_cancel-bottom");
 
     //View Membership Record
@@ -297,8 +297,8 @@ class WebTest_Member_OnlineMembershipRenewTest extends CiviSeleniumTestCase {
     $this->openCiviPage("member/search", "reset=1", "member_end_date_high");
 
     $this->type("sort_name", "$firstName $lastName");
-    $this->clickLink("_qf_Search_refresh", 'css=#memberSearch table tbody tr td span a.action-item-first');
-    $this->click('css=#memberSearch table tbody tr td span a.action-item-first');
+    $this->clickLink("_qf_Search_refresh", 'css=#memberSearch table tbody tr td span a.action-item:first-child');
+    $this->click('css=#memberSearch table tbody tr td span a.action-item:first-child');
     $this->waitForElementPresent("_qf_MembershipView_cancel-bottom");
 
     $membershipCreatedId = $this->urlArg('id');
@@ -335,8 +335,8 @@ class WebTest_Member_OnlineMembershipRenewTest extends CiviSeleniumTestCase {
     $this->openCiviPage("member/search", "reset=1", "member_end_date_high");
 
     $this->type("sort_name", "$firstName $lastName");
-    $this->clickLink("_qf_Search_refresh", 'css=#memberSearch table tbody tr td span a.action-item-first');
-    $this->click('css=#memberSearch table tbody tr td span a.action-item-first');
+    $this->clickLink("_qf_Search_refresh", 'css=#memberSearch table tbody tr td span a.action-item:first-child');
+    $this->click('css=#memberSearch table tbody tr td span a.action-item:first-child');
     $this->waitForElementPresent("_qf_MembershipView_cancel-bottom");
 
     $membershipRenewedId = $this->urlArg('id');
@@ -529,8 +529,8 @@ class WebTest_Member_OnlineMembershipRenewTest extends CiviSeleniumTestCase {
     $this->openCiviPage("member/search", "reset=1", "member_end_date_high");
 
     $this->type("sort_name", "$organisationName");
-    $this->clickLink("_qf_Search_refresh", 'css=#memberSearch table tbody tr td span a.action-item-first');
-    $this->click('css=#memberSearch table tbody tr td span a.action-item-first');
+    $this->clickLink("_qf_Search_refresh", 'css=#memberSearch table tbody tr td span a.action-item:first-child');
+    $this->click('css=#memberSearch table tbody tr td span a.action-item:first-child');
     $this->waitForElementPresent("_qf_MembershipView_cancel-bottom");
 
     //View Membership Record
@@ -550,8 +550,8 @@ class WebTest_Member_OnlineMembershipRenewTest extends CiviSeleniumTestCase {
     $this->openCiviPage("member/search", "reset=1", "member_end_date_high");
 
     $this->type("sort_name", "$lastName, $firstName");
-    $this->clickLink("_qf_Search_refresh", 'css=#memberSearch table tbody tr td span a.action-item-first');
-    $this->click('css=#memberSearch table tbody tr td span a.action-item-first');
+    $this->clickLink("_qf_Search_refresh", 'css=#memberSearch table tbody tr td span a.action-item:first-child');
+    $this->click('css=#memberSearch table tbody tr td span a.action-item:first-child');
     $this->waitForElementPresent("_qf_MembershipView_cancel-bottom");
 
     //View Membership Record
@@ -618,8 +618,8 @@ class WebTest_Member_OnlineMembershipRenewTest extends CiviSeleniumTestCase {
     $this->openCiviPage("member/search", "reset=1", "member_end_date_high");
 
     $this->type("sort_name", "$organisationName");
-    $this->clickLink("_qf_Search_refresh", 'css=#memberSearch table tbody tr td span a.action-item-first');
-    $this->click('css=#memberSearch table tbody tr td span a.action-item-first');
+    $this->clickLink("_qf_Search_refresh", 'css=#memberSearch table tbody tr td span a.action-item:first-child');
+    $this->click('css=#memberSearch table tbody tr td span a.action-item:first-child');
     $this->waitForElementPresent("_qf_MembershipView_cancel-bottom");
 
     //View Membership Record
@@ -638,8 +638,8 @@ class WebTest_Member_OnlineMembershipRenewTest extends CiviSeleniumTestCase {
     $this->openCiviPage("member/search", "reset=1", "member_end_date_high");
 
     $this->type("sort_name", "$lastName, $firstName");
-    $this->clickLink("_qf_Search_refresh", 'css=#memberSearch table tbody tr td span a.action-item-first');
-    $this->click('css=#memberSearch table tbody tr td span a.action-item-first');
+    $this->clickLink("_qf_Search_refresh", 'css=#memberSearch table tbody tr td span a.action-item:first-child');
+    $this->click('css=#memberSearch table tbody tr td span a.action-item:first-child');
     $this->waitForElementPresent("_qf_MembershipView_cancel-bottom");
 
     //View Membership Record

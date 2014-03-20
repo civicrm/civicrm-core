@@ -125,6 +125,8 @@ function civicrm_source($dsn, $fileName, $lineMode = FALSE) {
   }
   $db->query("SET NAMES utf8");
 
+  $db->query("SET NAMES utf8");
+
   if (!$lineMode) {
     $string = file_get_contents($fileName);
 

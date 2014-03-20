@@ -40,7 +40,7 @@
 /**
  * advanced search, extends basic search
  */
-class CRM_Contribute_Form_Search extends CRM_Core_Form {
+class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
 
   /**
    * Are we forced to run a search
@@ -229,6 +229,7 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form {
    * @return void
    */
   function buildQuickForm() {
+    parent::buildQuickForm();
     // text for sort_name
     $this->addElement('text',
       'sort_name',
@@ -265,7 +266,6 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form {
 
     $rows = $this->get('rows');
     if (is_array($rows)) {
-      CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'js/crm.searchForm.js');
       if (!$this->_single) {
         $this->addElement('checkbox',
           'toggleSelect',
@@ -285,7 +285,12 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form {
 
       $permission = CRM_Core_Permission::getPermission();
 
-      $tasks = array('' => ts('- actions -')) + CRM_Contribute_Task::permissionedTaskTitles($permission);
+      $queryParams = $this->get('queryParams');
+      $softCreditFiltering = FALSE;
+      if (!empty($queryParams)) {
+        $softCreditFiltering = CRM_Contribute_BAO_Query::isSoftCreditOptionEnabled($queryParams);
+      }
+      $tasks = array('' => ts('- actions -')) + CRM_Contribute_Task::permissionedTaskTitles($permission, $softCreditFiltering);
       $this->add('select', 'task', ts('Actions:') . ' ', $tasks);
       $this->add('submit', $this->_actionButtonName, ts('Go'),
         array(
@@ -300,15 +305,6 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form {
       $this->addElement('radio', 'radio_ts', NULL, '', 'ts_all', array('class' => 'select-rows', 'onclick' => $this->getName() . ".toggleSelect.checked = false; toggleTaskAction( true );"));
     }
 
-    // add buttons
-    $this->addButtons(array(
-        array(
-          'type' => 'refresh',
-          'name' => ts('Search'),
-          'isDefault' => TRUE,
-        ),
-      )
-    );
   }
 
   /**

@@ -101,14 +101,12 @@ cj(function($) {
     buildGroupSelector( true );
   });
   // Add livePage functionality
-  $('#crm-container').on('click', 'a.button, a.action-item[href*="action=update"], a.action-item[href*="action=delete"]', function() {
-    CRM.loadForm($(this).attr('href'))
-      .on('crmFormSuccess', function(e, data) {
+  $('#crm-container')
+    .on('click', 'a.button, a.action-item[href*="action=update"], a.action-item[href*="action=delete"]', CRM.popup)
+    .on('crmPopupFormSuccess', 'a.button, a.action-item[href*="action=update"], a.action-item[href*="action=delete"]', function() {
         // Refresh datatable when form completes
         $('#crm-group-selector').dataTable().fnDraw();
-      });
-    return false;
-  });
+    });
 });
 
 function buildGroupSelector( filterSearch, parentsOnlyArg ) {
@@ -312,6 +310,7 @@ function showChildren( parent_id, showOrgInfo, group_id, levelClass) {
             appendHTML += "</tr>";
           });
           cj( rowID ).after( appendHTML );
+          cj( rowID ).next().trigger('crmLoad');
           cj('.crm-editable').crmEditable();
         }
     } );

@@ -109,8 +109,6 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
    * @access public
    */
   function browse() {
-    CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'js/crm.livePage.js');
-
     // add annual contribution
     $annual = array();
     list($annual['count'],

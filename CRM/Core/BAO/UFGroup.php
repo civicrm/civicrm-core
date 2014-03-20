@@ -940,7 +940,7 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
       }
 
       //handle the case to avoid re-write where the profile field labels are the same
-      if (!empty($values[$index])) {
+      if (array_key_exists($index, $values)) {
         $index .= $nullValueIndex;
         $nullValueIndex .= $nullValueIndex;
       }
@@ -950,8 +950,8 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
       if (isset($details->$name) || $name == 'group' || $name == 'tag') {
         // to handle gender / suffix / prefix
         if (in_array(substr($name, 0, -3), array('gender', 'prefix', 'suffix'))) {
-          $values[$index] = CRM_Core_PseudoConstant::getLabel('CRM_Contact_DAO_Contact', $name, $details->$name);
           $params[$index] = $details->$name;
+          $values[$index] = $details->$name;
         }
         elseif (in_array($name, CRM_Contact_BAO_Contact::$_greetingTypes)) {
           $dname          = $name . '_display';
@@ -1878,7 +1878,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
         $form->addRule($name, ts('%1 is a required field.', array(1 => $title)), 'required');
       }
       else {
-        $group->setAttribute('unselectable', TRUE);
+        $group->setAttribute('allowClear', TRUE);
       }
     }
     elseif ($fieldName === 'prefix_id' || $fieldName === 'suffix_id') {
@@ -3210,7 +3210,11 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
    * @param array|string $profiles - name of profile(s) to create links for
    * @param array $appendProfiles - name of profile(s) to append to each link
    */
-  static function getCreateLinks($profiles, $appendProfiles = array()) {
+  static function getCreateLinks($profiles = '', $appendProfiles = array()) {
+    // Default to contact profiles
+    if (!$profiles) {
+      $profiles = array('new_individual', 'new_organization', 'new_household');
+    }
     $profiles = (array) $profiles;
     $toGet = array_merge($profiles, (array) $appendProfiles);
     $retrieved = civicrm_api3('uf_group', 'get', array(
@@ -3223,8 +3227,9 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
         if (in_array($profile['name'], $profiles)) {
           $links[] = array(
             'label' => $profile['title'],
-            'url' => CRM_Utils_System::url('civicrm/profile/create', 'reset=1&context=dialog&&gid=' . $id),
-            'name' => $profile['name'],
+            'url' => CRM_Utils_System::url('civicrm/profile/create', "reset=1&context=dialog&gid=$id",
+              NULL, NULL, FALSE, NULL, FALSE) ,
+            'type' => ucfirst(str_replace('new_', '', $profile['name'])),
           );
         }
         else {

@@ -346,7 +346,8 @@ class CRM_Report_Form_Member_Summary extends CRM_Report_Form {
   // end of from
 
   function where() {
-    $this->_whereClauses[] = "{$this->_aliases['civicrm_membership']}.is_test = 0";
+    $this->_whereClauses[] = "{$this->_aliases['civicrm_membership']}.is_test = 0 AND 
+                              {$this->_aliases['civicrm_contact']}.is_deleted = 0";
     parent::where();
   }
 

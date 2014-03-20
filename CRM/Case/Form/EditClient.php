@@ -46,15 +46,15 @@ class CRM_Case_Form_EditClient extends CRM_Core_Form {
    * @access public
    */
   public function preProcess() {
-    $this->_contactId = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
-    $this->_caseId    = CRM_Utils_Request::retrieve('id', 'Positive', $this);
-    $context          = CRM_Utils_Request::retrieve('context', 'String', $this);
+    $cid = CRM_Utils_Request::retrieve('cid', 'Positive', $this, TRUE);
+    CRM_Utils_Request::retrieve('id', 'Positive', $this, TRUE);
+    $context = CRM_Utils_Request::retrieve('context', 'String', $this);
 
     //get current client name.
-    $this->assign('currentClientName', CRM_Contact_BAO_Contact::displayName($this->_contactId));
+    $this->assign('currentClientName', CRM_Contact_BAO_Contact::displayName($cid));
 
     //set the context.
-    $url = CRM_Utils_System::url('civicrm/contact/view', "reset=1&force=1&cid={$this->_contactId}&selectedChild=case");
+    $url = CRM_Utils_System::url('civicrm/contact/view', "reset=1&force=1&cid={$cid}&selectedChild=case");
     if ($context == 'search') {
       $qfKey = CRM_Utils_Request::retrieve('key', 'String', $this);
       //validate the qfKey
@@ -82,24 +82,33 @@ class CRM_Case_Form_EditClient extends CRM_Core_Form {
    * @access public
    */
   public function buildQuickForm() {
-    $this->add('text', 'change_client_id', ts('Select Contact'));
-    $this->add('hidden', 'contact_id', '', array('id' => 'contact_id'));
-    $this->addElement('submit',
-      $this->getButtonName('next', 'edit_client'),
-      ts('Reassign Case'),
+    $this->addEntityRef('reassign_contact_id', ts('Select Contact'), array('create' => TRUE), TRUE);
+    $this->addButtons(array(
       array(
-        'class' => 'form-submit-inline',
-        'onclick' => "return checkSelection( this );",
-      )
-    );
+        'type' => 'cancel',
+        'name' => ts('Cancel'),
+      ),
+      array(
+        'type' => 'done',
+        'name' => ts('Reassign Case'),
+      ),
+    ));
 
-    $this->addElement('submit',
-      $this->getButtonName('cancel', 'edit_client'),
-      ts('Cancel'),
-      array('class' => 'form-submit-inline')
-    );
+    // This form may change the url structure so should not submit via ajax
+    $this->preventAjaxSubmit();
+  }
 
-    $this->assign('contactId', $this->_contactId);
+
+  function addRules() {
+    $this->addFormRule(array(get_class($this), 'formRule'), $this);
+  }
+
+  static function formRule($vals, $rule, $form) {
+    $errors = array();
+    if (empty($vals['reassign_contact_id']) || $vals['reassign_contact_id'] == $form->get('cid')) {
+      $errors['reassign_contact_id'] = ts("Please select a different contact.");
+    }
+    return $errors;
   }
 
   /**
@@ -112,14 +121,13 @@ class CRM_Case_Form_EditClient extends CRM_Core_Form {
     $params = $this->controller->exportValues($this->_name);
 
     //assign case to another client.
-    $mainCaseId = CRM_Case_BAO_Case::mergeCases($params['contact_id'], $this->_caseId, $this->_contactId, NULL, TRUE);
+    $mainCaseId = CRM_Case_BAO_Case::mergeCases($params['reassign_contact_id'], $this->get('id'), $this->get('cid'), NULL, TRUE);
 
     // user context
     $url = CRM_Utils_System::url('civicrm/contact/view/case',
-      "reset=1&action=view&cid={$params['contact_id']}&id={$mainCaseId[0]}&show=1"
+      "reset=1&action=view&cid={$params['reassign_contact_id']}&id={$mainCaseId[0]}&show=1"
     );
-    $session = CRM_Core_Session::singleton();
-    $session->pushUserContext($url);
+    CRM_Core_Session::singleton()->pushUserContext($url);
   }
 }
 

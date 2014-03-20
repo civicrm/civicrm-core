@@ -126,6 +126,12 @@ class CRM_Core_Page {
   public $request;
 
   /**
+   * Should crm.livePage.js be added to the page?
+   * @var bool
+   */
+  public $useLivePageJS;
+
+  /**
    * class constructor
    *
    * @param string $title title of the page
@@ -222,17 +228,20 @@ class CRM_Core_Page {
 
     $config = CRM_Core_Config::singleton();
 
-    // TODO: Is there a better way to ensure these actions don't happen during AJAX requests?
-    if (empty($_GET['snippet'])) {
-      // Version check and intermittent alert to admins
-      CRM_Utils_VersionCheck::singleton()->versionAlert();
-      CRM_Utils_Check_Security::singleton()->showPeriodicAlerts();
+    // Version check and intermittent alert to admins
+    CRM_Utils_VersionCheck::singleton()->versionAlert();
+    CRM_Utils_Check_Security::singleton()->showPeriodicAlerts();
 
-      // Debug msg once per hour
-      if ($config->debug && CRM_Core_Permission::check('administer CiviCRM') && CRM_Core_Session::singleton()->timer('debug_alert', 3600)) {
-        $msg = ts('Warning: Debug is enabled in <a href="%1">system settings</a>. This should not be enabled on production servers.', array(1 => CRM_Utils_System::url('civicrm/admin/setting/debug', 'reset=1')));
-        CRM_Core_Session::setStatus($msg, ts('Debug Mode'));
-      }
+    // Debug msg once per hour
+    if ($config->debug && CRM_Core_Permission::check('administer CiviCRM') && CRM_Core_Session::singleton()->timer('debug_alert', 3600)) {
+      $msg = ts('Warning: Debug is enabled in <a href="%1">system settings</a>. This should not be enabled on production servers.', array(1 => CRM_Utils_System::url('civicrm/admin/setting/debug', 'reset=1')));
+      CRM_Core_Session::setStatus($msg, ts('Debug Mode'));
+    }
+
+    if ($this->useLivePageJS &&
+      CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'ajaxPopupsEnabled', NULL, TRUE))
+    {
+      CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'js/crm.livePage.js');
     }
 
     $content = self::$_template->fetch('CRM/common/' . strtolower($config->userFramework) . '.tpl');

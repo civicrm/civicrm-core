@@ -88,7 +88,7 @@
       "bServerSide": true,
       "bJQueryUI": true,
       "sAjaxSource": sourceUrl,
-      "iDisplayLength": 25,
+      "iDisplayLength": 10,
       "oLanguage": {
         "sZeroRecords": ZeroRecordText,
         "sProcessing": {/literal}"{ts escape='js'}Processing...{/ts}"{literal},

@@ -228,6 +228,9 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $this->preProcessPledge();
     }
 
+    if ($this->_id) {
+      $this->showRecordLinkMesssage($this->_id);
+    }
     $this->_values = array();
 
     // current contribution id

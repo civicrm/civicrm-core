@@ -388,10 +388,10 @@ class CRM_Mailing_BAO_Query {
     );
 
     // event filters
-    $form->addRadio('mailing_delivery_status', ts('Delivery Status'), CRM_Mailing_PseudoConstant::yesNoOptions('delivered'), array('unselectable' => TRUE));
-    $form->addRadio('mailing_open_status', ts('Trackable Opens'), CRM_Mailing_PseudoConstant::yesNoOptions('open'), array('unselectable' => TRUE));
-    $form->addRadio('mailing_click_status', ts('Trackable URLs'), CRM_Mailing_PseudoConstant::yesNoOptions('click'), array('unselectable' => TRUE));
-    $form->addRadio('mailing_reply_status', ts('Trackable Replies'), CRM_Mailing_PseudoConstant::yesNoOptions('reply'), array('unselectable' => TRUE));
+    $form->addRadio('mailing_delivery_status', ts('Delivery Status'), CRM_Mailing_PseudoConstant::yesNoOptions('delivered'), array('allowClear' => TRUE));
+    $form->addRadio('mailing_open_status', ts('Trackable Opens'), CRM_Mailing_PseudoConstant::yesNoOptions('open'), array('allowClear' => TRUE));
+    $form->addRadio('mailing_click_status', ts('Trackable URLs'), CRM_Mailing_PseudoConstant::yesNoOptions('click'), array('allowClear' => TRUE));
+    $form->addRadio('mailing_reply_status', ts('Trackable Replies'), CRM_Mailing_PseudoConstant::yesNoOptions('reply'), array('allowClear' => TRUE));
 
     $form->add('checkbox', 'mailing_unsubscribe', ts('Unsubscribe Requests'));
     $form->add('checkbox', 'mailing_optout', ts('Opt-out Requests'));

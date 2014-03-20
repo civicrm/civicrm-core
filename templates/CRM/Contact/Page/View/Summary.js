@@ -39,10 +39,21 @@
           o.trigger('crmLoad').trigger('crmFormLoad');
         });
     }
-  };
+  }
+
+  function reloadBlock(el) {
+    return $(el).each(function() {
+      var data = $(this).data('edit-params');
+      data.snippet = data.reset = 1;
+      data.class_name = data.class_name.replace('Form', 'Page');
+      data.type = 'page';
+      $(this).closest('.crm-summary-block').load(CRM.url('civicrm/ajax/inline', data), function() {$(this).trigger('crmLoad');});
+    });
+  }
 
   function requestHandler(response) {
     var o = $('div.crm-inline-edit.form');
+    $('form', o).ajaxFormUnbind();
 
     if (response.status == 'success' || response.status == 'cancel') {
       o.trigger('crmFormSuccess', [response]);
@@ -72,21 +83,13 @@
       // Delete an address
       if (o.hasClass('address') && !o.hasClass('add-new') && !response.addressId) {
         o.parent().remove();
-        CRM.alert('', ts('Address Deleted'), 'success');
+        CRM.status(ts('Address Deleted'));
       }
       else {
         // Reload this block plus all dependent blocks
         var update = $.merge([o], dependent);
-        for (var i in update) {
-          $(update[i]).each(function() {
-            var data = $(this).data('edit-params');
-            data.snippet = data.reset = 1;
-            data.class_name = data.class_name.replace('Form', 'Page');
-            data.type = 'page';
-            $(this).closest('.crm-summary-block').load(CRM.url('civicrm/ajax/inline', data), function() {$(this).trigger('load');});
-          });
-        }
-        CRM.alert('', ts('Saved'), 'success');
+        _.each(update, reloadBlock);
+        CRM.status(ts('Saved'));
       }
       // Update changelog tab and contact footer
       if (response.changeLog.count) {
@@ -100,7 +103,6 @@
     }
     else {
       // Handle formRule error
-      $('form', o).ajaxForm('destroy');
       $('.crm-container-snippet', o).replaceWith(response.content);
       $('form', o).validate(CRM.validate.params);
       $('form', o).ajaxForm(ajaxFormParams);
@@ -211,6 +213,7 @@
       // Inline edit form cancel button
       .on('click', '.crm-inline-edit :submit[name$=cancel]', function() {
         var container = $(this).closest('.crm-inline-edit.form');
+        $('form', container).ajaxFormUnbind();
         $('.inline-edit-hidden-content', container).nextAll().remove();
         $('.inline-edit-hidden-content > *:first-child', container).unwrap();
         container.removeClass('form');
@@ -255,7 +258,7 @@
          CRM.confirm(function() {
             CRM.api('address', 'delete', {id: $block.data('edit-params').aid}, {success:
               function(data) {
-                CRM.alert('', ts('Address Deleted'), 'success');
+                CRM.status(ts('Address Deleted'));
                 $('.crm-inline-edit-container').addClass('crm-edit-ready');
                 $block.remove();
               }
@@ -292,23 +295,19 @@
       })
       // Handle action links in popup
       .on('click', '.crm-contact_actions-list a, .crm-contact_activities-list a', function() {
-        var tabName = $(this).data('tab') || 'summary';
-        var $tab = $('#tab_' + tabName);
-        var $panel = $('#' + $tab.attr('aria-controls'));
-        var url = $(this).attr('href');
-        if (url !== '#') {
-          CRM.loadForm(url)
-            .on('crmFormSuccess', function() {
-              if ($panel.data('civiCrmSnippet')) {
-                $panel.crmSnippet('refresh');
-              }
-              $('#mainTabContainer').tabs('option', 'active', $tab.prevAll().length);
-            });
-        } else {
-          $('#mainTabContainer').tabs('option', 'active', $tab.prevAll().length);
-        }
         $('#crm-contact-actions-list').hide();
-        return false;
+        if ($(this).attr('href') === '#') {
+          var $tab = $('#tab_' + ($(this).data('tab') || 'summary'));
+          CRM.tabHeader.focus($tab);
+          return false;
+        } else {
+          return CRM.popup.call(this);
+        }
+      })
+      .on('crmPopupFormSuccess',  '.crm-contact_actions-list a, .crm-contact_activities-list a', function() {
+        var $tab = $('#tab_' + ($(this).data('tab') || 'summary'));
+        CRM.tabHeader.resetTab($tab);
+        CRM.tabHeader.focus($tab);
       });
     $(document)
       // Actions menu
@@ -319,9 +318,13 @@
         }
         $('#crm-contact-actions-list').hide();
       })
-      // Reload changelog whenever an inline or popup form submits
-      .on('crmFormSuccess', function(e) {
+      .on('crmFormSuccess', function(e, data) {
+        // Reload changelog whenever an inline or popup form submits
         CRM.reloadChangeLogTab && CRM.reloadChangeLogTab();
+        // Refresh dependent blocks
+        if (data && data.reloadBlocks) {
+          _.each(data.reloadBlocks, reloadBlock);
+        }
       });
     $().crmAccordions();
   });

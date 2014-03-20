@@ -38,6 +38,8 @@
  */
 class CRM_Admin_Page_LocationType extends CRM_Core_Page_Basic {
 
+  public $useLivePageJS = TRUE;
+
   /**
    * The action links that we need to display for the browse screen
    *
@@ -61,7 +63,6 @@ class CRM_Admin_Page_LocationType extends CRM_Core_Page_Basic {
    * @return array (reference) of action links
    */
   function &links() {
-    CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'js/crm.livePage.js');
     if (!(self::$_links)) {
       self::$_links = array(
         CRM_Core_Action::UPDATE => array(

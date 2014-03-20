@@ -259,44 +259,8 @@ UNION
    * @access public
    * @static
    */
-  static function createCurrentEmployerRelationship($contactID, $organization, $previousEmployerID = NULL) {
-    $organizationId = NULL;
-
-    // if organization id is passed.
-    if (is_numeric($organization)) {
-      $organizationId = $organization;
-    }
-    else {
-      $orgName = explode('::', $organization);
-      trim($orgName[0]);
-
-      $organizationParams = array();
-      $organizationParams['organization_name'] = $orgName[0];
-
-      $dedupeParams = CRM_Dedupe_Finder::formatParams($organizationParams, 'Organization');
-
-      $dedupeParams['check_permission'] = FALSE;
-      $dupeIDs = CRM_Dedupe_Finder::dupesByParams($dedupeParams, 'Organization', 'Supervised');
-
-      if (is_array($dupeIDs) && !empty($dupeIDs)) {
-        // we should create relationship only w/ first org CRM-4193
-        foreach ($dupeIDs as $orgId) {
-          $organizationId = $orgId;
-          break;
-        }
-      }
-      else {
-        //create new organization
-        $newOrg = array(
-          'contact_type' => 'Organization',
-          'organization_name' => trim($orgName[0]),
-        );
-        $org = CRM_Contact_BAO_Contact::create($newOrg);
-        $organizationId = $org->id;
-      }
-    }
-
-    if ($organizationId) {
+  static function createCurrentEmployerRelationship($contactID, $organizationId, $previousEmployerID = NULL) {
+    if ($organizationId && is_numeric($organizationId)) {
       $cid = array('contact' => $contactID);
 
       // get the relationship type id of "Employee of"
@@ -664,7 +628,7 @@ LEFT JOIN  civicrm_email ce ON ( ce.contact_id=c.id AND ce.is_primary = 1 )
 
       // do check for view.
       if (array_key_exists('view', $hasPermissions)) {
-        $contactLinks['rows'][$i]['view'] = '<a class="action-item action-item-first" href="' . CRM_Utils_System::url('civicrm/contact/view', 'reset=1&cid=' . $dao->id) . '" target="_blank">' . ts('View') . '</a>';
+        $contactLinks['rows'][$i]['view'] = '<a class="action-item" href="' . CRM_Utils_System::url('civicrm/contact/view', 'reset=1&cid=' . $dao->id) . '" target="_blank">' . ts('View') . '</a>';
         if (!$contactLinks['msg']) {
           $contactLinks['msg'] = 'view';
         }

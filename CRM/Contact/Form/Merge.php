@@ -179,8 +179,8 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
     }
 
     $rowsElementsAndInfo = CRM_Dedupe_Merger::getRowsElementsAndInfo($cid, $oid);
-    $main                = &$rowsElementsAndInfo['main_details'];
-    $other               = &$rowsElementsAndInfo['other_details'];
+    $main = $this->_mainDetails = &$rowsElementsAndInfo['main_details'];
+    $other = $this->_otherDetails = &$rowsElementsAndInfo['other_details'];
 
     if ($main['contact_id'] != $cid) {
       CRM_Core_Error::fatal(ts('The main contact record does not exist'));
@@ -318,10 +318,8 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
       $session->resetScope('selectedSearchContactIds');
     }
 
-    $formValues['main_details'] = $formValues['other_details'] = array();
-    $formValues['main_details']['contact_type'] = $this->_contactType;
-    $formValues['main_details']['loc_block_ids'] = $this->_locBlockIds['main'];
-    $formValues['other_details']['loc_block_ids'] = $this->_locBlockIds['other'];
+    $formValues['main_details'] = $this->_mainDetails;
+    $formValues['other_details'] = $this->_otherDetails;
 
     CRM_Dedupe_Merger::moveAllBelongings($this->_cid, $this->_oid, $formValues);
 

@@ -63,13 +63,13 @@
     {if $list eq 'upcoming'}
        <td class="crm-case-case_scheduled_activity">
      {if $row.case_upcoming_activity_viewable}
-        <a href="#" onclick="{$list}viewActivity({$row.case_scheduled_activity_id}, {$row.contact_id}, '{$list}'); return false;" title="{ts}View this activity.{/ts}">{$row.case_scheduled_activity_type}</a>
+        <a class="crm-popup" href="{crmURL p='civicrm/case/activity/view' h=0 q="cid="}{$row.contact_id}&aid={$row.case_scheduled_activity_id}" title="{ts}View this activity.{/ts}">{$row.case_scheduled_activity_type}</a>
      {else}
         {$row.case_scheduled_activity_type}
      {/if}
        &nbsp;&nbsp;
      {if $row.case_upcoming_activity_editable}
-       <a href="{crmURL p="civicrm/case/activity" q="reset=1&cid=`$row.contact_id`&caseid=`$row.case_id`&action=update&id=`$row.case_scheduled_activity_id`"}" title="{ts}Edit this activity.{/ts}"><span class="icon edit-icon"></span></a>
+       <a class="action-item crm-hover-button" href="{crmURL p="civicrm/case/activity" q="reset=1&cid=`$row.contact_id`&caseid=`$row.case_id`&action=update&id=`$row.case_scheduled_activity_id`"}" title="{ts}Edit this activity.{/ts}"><span class="icon edit-icon"></span></a>
      {/if}
      <br />
      {$row.case_scheduled_activity_date|crmDate}
@@ -78,7 +78,7 @@
     {elseif $list eq 'recent'}
        <td class="crm-case-case_recent_activity">
    {if $row.case_recent_activity_viewable}
-       <a href="#" onclick="{$list}viewActivity({$row.case_recent_activity_id}, {$row.contact_id}, '{$list}'); return false;" title="{ts}View this activity.{/ts}">{$row.case_recent_activity_type}</a>
+       <a class="crm-popup" href="{crmURL p='civicrm/case/activity/view' h=0 q="cid="}{$row.contact_id}&aid={$row.case_recent_activity_id}" title="{ts}View this activity.{/ts}">{$row.case_recent_activity_type}</a>
     {else}
        {$row.case_recent_activity_type}
     {/if}
@@ -111,11 +111,6 @@
 
 </table>
 
-{*include activity view js file*}
-{include file="CRM/common/activityView.tpl" list=$list}
-<div id="view-activity-{$list}">
-    <div id="activity-content-{$list}"></div>
-</div>
 {/strip}
 
 {* Build case details*}
@@ -151,3 +146,5 @@ function hideCaseActivities( caseId , type, context ) {
 
 </script>
 {/literal}
+
+{include file="CRM/Case/Form/ActivityChangeStatusJs.tpl"}

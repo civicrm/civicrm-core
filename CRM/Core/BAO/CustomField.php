@@ -877,7 +877,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
           $qf->addRule($elementName, ts('%1 is a required field.', array(1 => $label)), 'required');
         }
         else {
-          $group->setAttribute('unselectable', TRUE);
+          $group->setAttribute('allowClear', TRUE);
         }
         break;
 

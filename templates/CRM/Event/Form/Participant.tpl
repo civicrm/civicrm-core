@@ -132,6 +132,7 @@
 
   // change the status to default 'partially paid' for partial payments
   var feeAmount, userModifiedAmount;
+  var partiallyPaidStatusId = {/literal}{$partiallyPaidStatusId}{literal};
 
   cj('#total_amount')
    .focus(
@@ -145,19 +146,20 @@
       userModifiedAmount = cj(this).val();
       userModifiedAmount = parseInt(userModifiedAmount);
       if (userModifiedAmount < feeAmount) {
-        cj('#status_id').val(CRM.partiallyPaidStatusId);
+        cj('#status_id').val(partiallyPaidStatusId).change();
       }
     }
   );
 
-  cj('#Participant').submit(
+  cj('#Participant').on("click",'.validate',
     function(e) {
       var userSubmittedStatus = cj('#status_id').val();
       var statusLabel = cj('#status_id option:selected').text();
-      if (userModifiedAmount < feeAmount && userSubmittedStatus != CRM.partiallyPaidStatusId) {
-        var result = confirm('Payment amount is less than the amount owed. Expected participant status is \'Partially paid\'. Are you sure you want to set the participant status to ' + statusLabel + '? Click OK to continue, Cancel to change your entries.');
+      if (userModifiedAmount < feeAmount && userSubmittedStatus != partiallyPaidStatusId) {
+        var msg = "{/literal}{ts escape="js" 1="%1"}Payment amount is less than the amount owed. Expected participant status is 'Partially paid'. Are you sure you want to set the participant status to %1? Click OK to continue, Cancel to change your entries.{/ts}{literal}";
+        var result = confirm(ts(msg, {1: statusLabel}));
         if (result == false) {
-          e.preventDefault();
+          return false;
         }
       }
     }
@@ -165,6 +167,7 @@
   </script>
   {/literal}
   {/if}
+
   {include file="CRM/Event/Form/EventFees.tpl"}
 
 {* Ajax callback for custom data snippet *}
@@ -293,7 +296,7 @@
             <span class="description">{ts}Source for this registration (if applicable).{/ts}</span></td>
           </tr>
         </table>
-       {if $participantId}
+       {if $participantId and $hasPayment}
         <table class='form-layout'>
           <tr>
             <td class='label'>{ts}Fees{/ts}</td>
@@ -329,7 +332,7 @@
   </div>
   {* JS block for ADD or UPDATE actions only *}
   {if $action eq 1 or $action eq 2}
-    {if $participantId}
+    {if $participantId and $hasPayment}
       {include file="CRM/Contribute/Page/PaymentInfo.tpl" show='event-payment'}
     {/if}
 
@@ -341,6 +344,17 @@
       cj(function($) {
 
         var $form = $('form#{/literal}{$form.formName}{literal}');
+
+        // don't show cart related statuses if it's disabled
+        {/literal}{if !$enableCart}{literal}
+          var pendingInCartStatusId = {/literal}{$pendingInCartStatusId}{literal};
+          $("#status_id option[value='" + pendingInCartStatusId + "']").remove();
+        {/literal}{/if}{literal}
+
+        {/literal}{if $action eq 1}{literal}
+          var pendingRefundStatusId = {/literal}{$pendingRefundStatusId}{literal};
+          $("#status_id option[value='" + pendingRefundStatusId + "']").remove();
+        {/literal}{/if}{literal}
 
         // Handle event selection
         $('#event_id', $form).change(function() {
@@ -393,6 +407,12 @@
           {literal}
           var eventId = $('#event_id').val();
 
+          {/literal}{if $action eq 2}{literal}
+            if (typeof eventId == 'undefined') {
+              var eventId = $('[name=event_id]').val();
+            }
+          {/literal}{/if}{literal}
+
           if (eventId) {
             dataUrl += '&eventId=' + eventId;
           }
@@ -417,7 +437,7 @@
             async: false,
             global: false,
             success: function ( html ) {
-              $("#feeBlock").html( html );
+              $("#feeBlock").html( html ).trigger('crmLoad');
             }
           });
 
@@ -439,14 +459,13 @@
         }
 
         var roleGroupMapper = {/literal}{$participantRoleIds|@json_encode}{literal};
-
         function showCustomData( type, subType, subName ) {
           var dataUrl = {/literal}"{crmURL p=$urlPath h=0 q='snippet=4&type='}"{literal} + type;
           var roleid = "role_id_"+subType;
           var loadData = false;
 
           if ( document.getElementById( roleid ).checked == true ) {
-            if ( roleGroupMapper[subType] ) {
+            if ( typeof roleGroupMapper !== 'undefined' && roleGroupMapper[subType] ) {
               var splitGroup = roleGroupMapper[subType].split(",");
               for ( i = 0; i < splitGroup.length; i++ ) {
                 var roleCustomGroupId = splitGroup[i];
@@ -536,7 +555,7 @@
           if ( subType != 'null' ) {
             if ( document.getElementById(roleid).checked == true ) {
               var response_text = '<div style="display:block;" id = '+subType+'_chk >'+response+'</div>';
-              $( fname ).append(response_text);
+              $( fname ).append(response_text).trigger('crmLoad');
             }
             else {
               $('#'+subType+'_chk').remove();

@@ -223,21 +223,11 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
       );
     }
 
-    if ($contact->contact_type == 'Individual' &&
-      (isset($params['current_employer']) ||
-      isset($params['employer_id'])
-    )
-    ) {
+    if ($contact->contact_type == 'Individual' && (isset($params['current_employer']) || isset($params['employer_id']))) {
+      $newEmployer = !empty($params['employer_id']) ? $params['employer_id'] : CRM_Utils_Array::value('current_employer', $params);
       // create current employer
-      if (isset($params['employer_id'])) {
-        CRM_Contact_BAO_Contact_Utils::createCurrentEmployerRelationship($contact->id,
-          $params['employer_id'], $employerId
-        );
-      }
-      elseif ($params['current_employer']) {
-        CRM_Contact_BAO_Contact_Utils::createCurrentEmployerRelationship($contact->id,
-          $params['current_employer']
-        );
+      if ($newEmployer) {
+        CRM_Contact_BAO_Contact_Utils::createCurrentEmployerRelationship($contact->id, $newEmployer, $employerId);
       }
       else {
         //unset if employer id exits
@@ -2731,6 +2721,7 @@ AND       civicrm_openid.is_primary = 1";
         'title' => ts('Add Contribution'),
         'weight' => 5,
         'ref' => 'new-contribution',
+        'class' => 'huge-popup',
         'key' => 'contribution',
         'tab' => 'contribute',
         'component' => 'CiviContribute',
@@ -2746,6 +2737,7 @@ AND       civicrm_openid.is_primary = 1";
         'title' => ts('Register for Event'),
         'weight' => 10,
         'ref' => 'new-participant',
+        'class' => 'huge-popup',
         'key' => 'participant',
         'tab' => 'participant',
         'component' => 'CiviEvent',
@@ -2781,6 +2773,7 @@ AND       civicrm_openid.is_primary = 1";
         'title' => ts('Add Membership'),
         'weight' => 20,
         'ref' => 'new-membership',
+        'class' => 'huge-popup',
         'key' => 'membership',
         'tab' => 'member',
         'component' => 'CiviMember',
@@ -2831,6 +2824,7 @@ AND       civicrm_openid.is_primary = 1";
         'ref' => 'new-note',
         'key' => 'note',
         'tab' => 'note',
+        'class' => 'medium-popup',
         'href' => CRM_Utils_System::url('civicrm/contact/view/note',
           'reset=1&action=add'
         ),

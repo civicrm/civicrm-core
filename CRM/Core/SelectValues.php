@@ -186,30 +186,6 @@ class CRM_Core_SelectValues {
   }
 
   /**
-   * Extended property (custom field) data types
-   * @static
-   */
-  static function &customDataType() {
-    static $customDataType = NULL;
-    if (!$customDataType) {
-      $customDataType = array(
-        '' => ts('- select -'),
-        'String' => ts('Text'),
-        'Int' => ts('Integer'),
-        'Float' => ts('Decimal Number'),
-        'Money' => ts('Money'),
-        'Text' => ts('Memo'),
-        'Date' => ts('Date'),
-        'File' => ts('File'),
-        'Boolean' => ts('Yes/No'),
-        'Link' => ts('Link'),
-        'Auto-complete' => ts('Auto-complete'),
-      );
-    }
-    return $customDataType;
-  }
-
-  /**
    * Custom form field types
    * @static
    */
@@ -222,13 +198,19 @@ class CRM_Core_SelectValues {
         'TextArea' => ts('Multi-line text box (textarea)'),
         'Select' => ts('Drop-down (select list)'),
         'Radio' => ts('Radio buttons'),
-        'Checkbox' => ts('Checkbox(es)'),
-        'Select Date' => ts('Date selector'),
+        'CheckBox' => ts('Checkbox(es)'),
+        'Select Date' => ts('Select Date'),
         'File' => ts('File'),
-        'Select State / Province' => ts('State / Province selector'),
-        'Select Country' => ts('Country selector'),
+        'Select State/Province' => ts('Select State/Province'),
+        'Multi-Select State/Province' => ts('Multi-Select State/Province'),
+        'Select Country' => ts('Select Country'),
+        'Multi-Select Country' => ts('Multi-Select Country'),
         'RichTextEditor' => ts('Rich Text Editor'),
-        'Auto-complete' => ts('Contact Reference'),
+        'Autocomplete-Select' => ts('Autocomplete-Select'),
+        'Multi-Select' => ts('Multi-Select'),
+        'AdvMulti-Select' => ts('AdvMulti-Select'),
+        'Link' => ts('Link'),
+        'ContactReference' => ts('Autocomplete Select'),
       );
     }
     return $customHtmlType;
@@ -277,7 +259,7 @@ class CRM_Core_SelectValues {
       $customGroupStyle = array(
         'Tab' => ts('Tab'),
         'Inline' => ts('Inline'),
-        'Tab with table' => ts('Tab with table')
+        'Tab with table' => ts('Tab with table'),
       );
     }
     return $customGroupStyle;
@@ -392,17 +374,14 @@ class CRM_Core_SelectValues {
    *
    * @static
    */
-  static function ufVisibility($isGroup = FALSE) {
-    static $_visibility = NULL;
+  static function ufVisibility() {
+    static $_visibility = array();
     if (!$_visibility) {
       $_visibility = array(
         'User and User Admin Only' => ts('User and User Admin Only'),
         'Public Pages' => ts('Public Pages'),
         'Public Pages and Listings' => ts('Public Pages and Listings'),
       );
-      if ($isGroup) {
-        unset($_visibility['Public Pages and Listings']);
-      }
     }
     return $_visibility;
   }
@@ -415,7 +394,10 @@ class CRM_Core_SelectValues {
   static function groupVisibility() {
     static $_groupVisibility = NULL;
     if (!$_groupVisibility) {
-      $_groupVisibility = self::ufVisibility(true);
+      $_groupVisibility = array(
+        'User and User Admin Only' => ts('User and User Admin Only'),
+        'Public Pages' => ts('Public Pages'),
+      );
     }
     return $_groupVisibility;
   }
@@ -1071,7 +1053,7 @@ class CRM_Core_SelectValues {
   /**
    * Mailing Job Status
    */
-  static function geMailingJobStatus() {
+  static function getMailingJobStatus() {
     static $mailingJobStatus = NULL;
     if (!$mailingJobStatus) {
       $mailingJobStatus = array(
@@ -1086,5 +1068,17 @@ class CRM_Core_SelectValues {
     return $mailingJobStatus;
   }
 
+  /**
+   * Frequency unit for schedule reminders
+   */
+  static function getScheduleReminderFrequencyUnits() {
+    static $scheduleReminderFrequencyUnits = NULL;
+    if (!$scheduleReminderFrequencyUnits) {
+      $scheduleReminderFrequencyUnits = array(
+          'hour' => ts('hour')) + CRM_Core_OptionGroup::values('recur_frequency_units');
+    }
+
+    return $scheduleReminderFrequencyUnits;
+  }
 }
 

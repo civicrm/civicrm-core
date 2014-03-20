@@ -40,6 +40,8 @@
  */
 class CRM_Event_Form_ParticipantFeeSelection extends CRM_Core_Form {
 
+  public $useLivePageJS = TRUE;
+
   protected $_contactId = NULL;
 
   protected $_contributorDisplayName = NULL;
@@ -94,7 +96,7 @@ class CRM_Event_Form_ParticipantFeeSelection extends CRM_Core_Form {
     $paymentInfo = CRM_Contribute_BAO_Contribution::getPaymentInfo($this->_participantId, 'event');
     $this->_paidAmount = $paymentInfo['paid'];
     $this->assign('paymentInfo', $paymentInfo);
-    CRM_Core_Resources::singleton()->addSetting(array('feePaid' => $this->_paidAmount));
+    $this->assign('feePaid', $this->_paidAmount);
 
     $title = "Change selections for {$this->_contributorDisplayName}";
     if ($title) {
@@ -108,7 +110,7 @@ class CRM_Event_Form_ParticipantFeeSelection extends CRM_Core_Form {
     CRM_Event_BAO_Participant::getValues($params, $defaults, $ids);
     $priceSetId = CRM_Price_BAO_PriceSet::getFor('civicrm_event', $this->_eventId);
 
-    $priceSetValues = CRM_Event_Form_EventFees::setDefaultPriceSet($this->_participantId, $this->_eventId);
+    $priceSetValues = CRM_Event_Form_EventFees::setDefaultPriceSet($this->_participantId, $this->_eventId, FALSE);
     if (!empty($priceSetValues)) {
       $defaults[$this->_participantId] = array_merge($defaults[$this->_participantId], $priceSetValues);
     }
@@ -125,14 +127,11 @@ class CRM_Event_Form_ParticipantFeeSelection extends CRM_Core_Form {
   }
 
   public function buildQuickForm() {
-    CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'js/crm.livePage.js');
 
     $statuses = CRM_Event_PseudoConstant::participantStatus();
-    CRM_Core_Resources::singleton()->addSetting(array(
-        'partiallyPaid' => array_search('Partially paid', $statuses),
-        'pendingRefund' => array_search('Pending refund', $statuses),
-        'participantStatus' => $this->_participantStatus
-      ));
+    $this->assign('partiallyPaid',  array_search('Partially paid', $statuses));
+    $this->assign('pendingRefund',  array_search('Pending refund', $statuses));
+    $this->assign('participantStatus', $this->_participantStatus);
 
     $config = CRM_Core_Config::singleton();
     $this->assign('currencySymbol',  $config->defaultCurrencySymbol);
@@ -232,13 +231,20 @@ class CRM_Event_Form_ParticipantFeeSelection extends CRM_Core_Form {
     $buttonName = $this->controller->getButtonName();
     if ($buttonName == $this->getButtonName('upload', 'new')) {
       $session = CRM_Core_Session::singleton();
-      $session->replaceUserContext(CRM_Utils_System::url('civicrm/payment/add',
+      $session->pushUserContext(CRM_Utils_System::url('civicrm/payment/add',
           "reset=1&action=add&component=event&id={$this->_participantId}&cid={$this->_contactId}"
         ));
     }
   }
 
   function emailReceipt(&$params) {
+    $updatedLineItem = CRM_Price_BAO_LineItem::getLineItems($this->_participantId, 'participant', NULL, FALSE);
+    $lineItem = array();
+    if ($updatedLineItem) {
+      $lineItem[] = $updatedLineItem;
+    }
+    $this->assign('lineItem', empty($lineItem) ? FALSE : $lineItem);
+
     // offline receipt sending
     if (array_key_exists($params['from_email_address'], $this->_fromEmails['from_email_id'])) {
       $receiptFrom = $params['from_email_address'];

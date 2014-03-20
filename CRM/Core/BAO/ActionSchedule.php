@@ -731,7 +731,12 @@ WHERE reminder.action_schedule_id = %1 AND reminder.action_date_time IS NULL
           }
           elseif ($field == 'balance') {
             $info = CRM_Contribute_BAO_Contribution::getPaymentInfo($dao->entityID, 'event');
-            $entityTokenParams["{$tokenEntity}." . $field] = CRM_Utils_Array::value('balance', $info);
+            $balancePay = CRM_Utils_Array::value('balance', $info);
+            $balancePay = CRM_Utils_Money::format($balancePay);
+            $entityTokenParams["{$tokenEntity}." . $field] = $balancePay;
+          }
+          elseif ($field == 'fee_amount') {
+            $entityTokenParams["{$tokenEntity}." . $field] = CRM_Utils_Money::format($dao->$field);
           }
           else {
             $entityTokenParams["{$tokenEntity}." . $field] = $dao->$field;

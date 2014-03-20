@@ -50,12 +50,15 @@ function civicrm_api3_generic_getList($apiRequest) {
   $fnName = function_exists($fnName) ? $fnName : '_civicrm_api3_generic_getlist_output';
   $values = $fnName($result, $request);
 
-  $output = array(
+  $output = array('page_num' => $request['page_num']);
+
+  // Limit is set for searching but not fetching by id
+  if (!empty($request['params']['limit'])) {
     // If we have an extra result then this is not the last page
-    'more_results' => isset($values[10]),
-    'page_num' => $request['page_num'],
-  );
-  unset($values[10]);
+    $last = $request['params']['limit'] - 1;
+    $output['more_results'] = isset($values[$last]);
+    unset($values[$last]);
+  }
 
   return civicrm_api3_create_success($values, $request['params'], $entity, 'getlist', CRM_Core_DAO::$_nullObject, $output);
 }
@@ -113,6 +116,8 @@ function _civicrm_api3_generic_getList_defaults($entity, &$request) {
     if (is_string($request['id']) && strpos(',', $request['id'])) {
       $request['id'] = explode(',', $request['id']);
     }
+    // Don't run into search limits when prefilling selection
+    unset($params['limit'], $params['offset'], $request['params']['limit'], $request['params']['offset']);
     $params[$request['id_field']] = is_array($request['id']) ? array('IN' => $request['id']) : $request['id'];
   }
   $request['params'] += $params;

@@ -122,7 +122,7 @@
     <weight>580</weight>
   </item>
   <item>
-    <path>civicrm/payment/add</path>
+    <path>civicrm/payment</path>
     <title>New Payment</title>
     <page_callback>CRM_Contribute_Form_AdditionalPayment</page_callback>
     <path_arguments>action=add</path_arguments>

@@ -101,11 +101,6 @@ function assignRemove(recordID, op) {
     cj("#enableDisableStatusMsg").dialog({
       title: {/literal}'{ts escape="js"}Close Batch{/ts}'{literal},
       modal: true,
-      bgiframe: true,
-      overlay: {
-        opacity: 0.5,
-        background: "black"
-      },
       open:function() {
         if (op == 'close') {
           var msg = {/literal}'{ts escape="js"}Are you sure you want to close this batch?{/ts}'{literal};

@@ -36,7 +36,7 @@
 /**
  * This file is for Case search
  */
-class CRM_Case_Form_Search extends CRM_Core_Form {
+class CRM_Case_Form_Search extends CRM_Core_Form_Search {
 
   /**
    * Are we forced to run a search
@@ -126,9 +126,6 @@ class CRM_Case_Form_Search extends CRM_Core_Form {
    */
   function preProcess() {
     $this->set('searchFormName', 'Search');
-
-    // js for changing activity status
-    CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'templates/CRM/Case/Form/ActivityChangeStatus.js');
 
     //check for civicase access.
     if (!CRM_Case_BAO_Case::accessCiviCase()) {
@@ -230,6 +227,7 @@ class CRM_Case_Form_Search extends CRM_Core_Form {
    * @return void
    */
   function buildQuickForm() {
+    parent::buildQuickForm();
     $this->addElement('text',
       'sort_name',
       ts('Client Name or Email'),
@@ -244,7 +242,6 @@ class CRM_Case_Form_Search extends CRM_Core_Form {
      */
     $rows = $this->get('rows');
     if (is_array($rows)) {
-      CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'js/crm.searchForm.js');
       if (!$this->_single) {
         $this->addElement('checkbox',
           'toggleSelect',
@@ -288,14 +285,6 @@ class CRM_Case_Form_Search extends CRM_Core_Form {
       $this->addElement('radio', 'radio_ts', NULL, '', 'ts_all', array('class' => 'select-rows', 'onclick' => $this->getName() . ".toggleSelect.checked = false; toggleTaskAction( true );"));
     }
 
-    // add buttons
-    $this->addButtons(array(
-        array(
-          'type' => 'refresh',
-          'name' => ts('Search'),
-          'isDefault' => TRUE,
-        ),
-      ));
   }
 
   /**

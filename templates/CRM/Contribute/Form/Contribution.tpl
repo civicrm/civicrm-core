@@ -75,7 +75,7 @@
       {else}
         {capture assign=ccModeLink}{crmURL p='civicrm/contact/view/contribution' q="reset=1&action=add&context=standalone&mode=live"}{/capture}
       {/if}
-      <span class="action-link crm-link-credit-card-mode">&nbsp;<a href="{$ccModeLink}">&raquo; {ts}submit credit card contribution{/ts}</a>
+      <span class="action-link crm-link-credit-card-mode">&nbsp;<a class="open-inline crm-hover-button" href="{$ccModeLink}">&raquo; {ts}submit credit card contribution{/ts}</a></span>
     {/if}
   </div>
   {if $isOnline}{assign var=valueStyle value=" class='view-value'"}{else}{assign var=valueStyle value=""}{/if}
@@ -385,7 +385,7 @@
         cj('div.'+id).html(loading);
         cj.ajax({
           url    : url,
-          success: function(data) { cj('div.'+id).html(data); }
+          success: function(data) { cj('div.'+id).html(data).trigger('crmLoad'); }
         });
       }
     }
@@ -583,7 +583,7 @@ function buildAmount( priceSetId ) {
     async: false
   }).responseText;
 
-  cj( fname ).show( ).html( response );
+  cj( fname ).show( ).html( response ).trigger('crmLoad');
   // freeze total amount text field.
   cj( "#total_amount").val('');
 

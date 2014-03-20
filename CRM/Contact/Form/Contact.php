@@ -411,9 +411,6 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
       }
     }
     else {
-      $currentEmployer = CRM_Contact_BAO_Relationship::getCurrentEmployer(array($this->_contactId));
-      $defaults['current_employer_id'] = CRM_Utils_Array::value('org_id', $currentEmployer[$this->_contactId]);
-
       foreach ($defaults['email'] as $dontCare => & $val) {
         if (isset($val['signature_text'])) {
           $val['signature_text_hidden'] = $val['signature_text'];
@@ -427,8 +424,6 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
         $defaults['contact_sub_type'] = $this->_oldSubtypes;
       }
     }
-    $this->assign('currentEmployer', CRM_Utils_Array::value('current_employer_id', $defaults));
-
     // set defaults for blocks ( custom data, address, communication preference, notes, tags and groups )
     foreach ($this->_editOptions as $name => $label) {
       if (!in_array($name, array('Address', 'Notes'))) {

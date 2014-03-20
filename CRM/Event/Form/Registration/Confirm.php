@@ -506,7 +506,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
     $this->participantIDS = array();
     $fields = array();
     foreach ($params as $key => $value) {
-      $this->fixLocationFields($value, $fields);
+      CRM_Event_Form_Registration_Confirm::fixLocationFields($value, $fields, $this);
       //unset the billing parameters if it is pay later mode
       //to avoid creation of billing location
       if ($this->_allowWaitlist || $this->_requireApproval || !empty($value['is_pay_later']) || empty($value['is_primary'])) {
@@ -544,7 +544,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
         $value['amount'] = $this->_totalAmount;
       }
 
-      $contactID = $this->updateContactFields($contactID, $value, $fields);
+      $contactID = CRM_Event_Form_Registration_Confirm::updateContactFields($contactID, $value, $fields, $this);
 
       // lets store the contactID in the session
       // we dont store in userID in case the user is doing multiple
@@ -995,9 +995,9 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
    * @return void
    * @access public
    */
-  public function fixLocationFields(&$params, &$fields) {
-    if (!empty($this->_fields)) {
-      foreach ($this->_fields as $name => $dontCare) {
+  public static function fixLocationFields(&$params, &$fields, &$form) {
+    if (!empty($form->_fields)) {
+      foreach ($form->_fields as $name => $dontCare) {
         $fields[$name] = 1;
       }
     }
@@ -1016,20 +1016,20 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
     }
 
     // also add location name to the array
-    if ($this->_values['event']['is_monetary']) {
-      $params["address_name-{$this->_bltID}"] = CRM_Utils_Array::value('billing_first_name', $params) . ' ' . CRM_Utils_Array::value('billing_middle_name', $params) . ' ' . CRM_Utils_Array::value('billing_last_name', $params);
-      $fields["address_name-{$this->_bltID}"] = 1;
+    if ($form->_values['event']['is_monetary']) {
+      $params["address_name-{$form->_bltID}"] = CRM_Utils_Array::value('billing_first_name', $params) . ' ' . CRM_Utils_Array::value('billing_middle_name', $params) . ' ' . CRM_Utils_Array::value('billing_last_name', $params);
+      $fields["address_name-{$form->_bltID}"] = 1;
     }
-    $fields["email-{$this->_bltID}"] = 1;
+    $fields["email-{$form->_bltID}"] = 1;
     $fields['email-Primary'] = 1;
 
     //if its pay later or additional participant set email address as primary.
     if ((!empty($params['is_pay_later']) || empty($params['is_primary']) ||
-        !$this->_values['event']['is_monetary'] ||
-        $this->_allowWaitlist ||
-        $this->_requireApproval
-      ) && !empty($params["email-{$this->_bltID}"])) {
-      $params['email-Primary'] = $params["email-{$this->_bltID}"];
+        !$form->_values['event']['is_monetary'] ||
+        $form->_allowWaitlist ||
+        $form->_requireApproval
+      ) && !empty($params["email-{$form->_bltID}"])) {
+      $params['email-Primary'] = $params["email-{$form->_bltID}"];
     }
   }
 
@@ -1039,15 +1039,15 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
    * @return void
    * @access public
    */
-  public function updateContactFields($contactID, $params, $fields) {
+  public static function updateContactFields($contactID, $params, $fields, &$form) {
     //add the contact to group, if add to group is selected for a
     //particular uf group
 
     // get the add to groups
     $addToGroups = array();
 
-    if (!empty($this->_fields)) {
-      foreach ($this->_fields as $key => $value) {
+    if (!empty($form->_fields)) {
+      foreach ($form->_fields as $key => $value) {
         if (!empty($value['add_to_group_id'])) {
           $addToGroups[$value['add_to_group_id']] = $value['add_to_group_id'];
         }
@@ -1112,13 +1112,13 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
         NULL,
         TRUE
       );
-      $this->set('contactID', $contactID);
+      $form->set('contactID', $contactID);
     }
 
     //get email primary first if exist
     $subscribtionEmail = array('email' => CRM_Utils_Array::value('email-Primary', $params));
     if (!$subscribtionEmail['email']) {
-      $subscribtionEmail['email'] = CRM_Utils_Array::value("email-{$this->_bltID}", $params);
+      $subscribtionEmail['email'] = CRM_Utils_Array::value("email-{$form->_bltID}", $params);
     }
     // subscribing contact to groups
     if (!empty($subscribeGroupIds) && $subscribtionEmail['email']) {

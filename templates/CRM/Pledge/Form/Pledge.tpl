@@ -174,7 +174,7 @@ function loadPanes( id ) {
       cj('div.'+id).html(loading);
       cj.ajax({
           url    : url,
-          success: function(data) { cj('div.'+id).html(data); }
+          success: function(data) { cj('div.'+id).html(data).trigger('crmLoad'); }
           });
       }
   }

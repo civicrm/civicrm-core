@@ -30,7 +30,7 @@
 {capture assign=iconURL}<img src="{$config->resourceBase}i/TreePlus.gif" alt="{ts}open section{/ts}"/>{/capture}
 {ts 1=$iconURL}Click %1 to view pledge payments.{/ts}
 {strip}
-<table class="selector">
+<table class="selector row-highlight">
     <thead class="sticky">
         {if ! $single and $context eq 'Search' }
             <th scope="col" title="Select Rows">{$form.toggleSelect.html}</th>
@@ -123,7 +123,7 @@
                 dataType: "html",
                 timeout : 5000, //Time in milliseconds
                 success : function( data ){
-                            cj( '#paymentDetails' + pledgeId ).html( data );
+                            cj( '#paymentDetails' + pledgeId ).html( data ).trigger('crmLoad');
                           },
                 error   : function( XMLHttpRequest, textStatus, errorThrown ) {
                             console.error( 'Error: '+ textStatus );

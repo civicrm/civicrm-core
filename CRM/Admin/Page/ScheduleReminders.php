@@ -39,6 +39,8 @@
  */
 class CRM_Admin_Page_ScheduleReminders extends CRM_Core_Page_Basic {
 
+  public $useLivePageJS = TRUE;
+
   /**
    * The action links that we need to display for the browse screen
    *
@@ -128,7 +130,6 @@ class CRM_Admin_Page_ScheduleReminders extends CRM_Core_Page_Basic {
    * @static
    */
   function browse($action = NULL) {
-    CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'js/crm.livePage.js');
     // Get list of configured reminders
     $reminderList = CRM_Core_BAO_ActionSchedule::getList();
 

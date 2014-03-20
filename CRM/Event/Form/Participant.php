@@ -40,6 +40,8 @@
  */
 class CRM_Event_Form_Participant extends CRM_Contact_Form_Task {
 
+  public $useLivePageJS = TRUE;
+
   /**
    * the values for the contribution db object
    *
@@ -222,7 +224,10 @@ class CRM_Event_Form_Participant extends CRM_Contact_Form_Task {
     // check the current path, if search based, then dont get participantID
     // CRM-5792
     $path = CRM_Utils_System::currentPath();
-    if (strpos($path, 'civicrm/contact/search') === 0) {
+    if (
+      strpos($path, 'civicrm/contact/search') === 0 ||
+      strpos($path, 'civicrm/group/search') === 0
+      ) {
       $this->_id = NULL;
     }
     else {
@@ -236,6 +241,9 @@ class CRM_Event_Form_Participant extends CRM_Contact_Form_Task {
       $this->_paymentId = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_ParticipantPayment',
         $this->_id, 'id', 'participant_id'
       );
+
+      $this->assign('hasPayment', $this->_paymentId);
+
       // CRM-12615 - Get payment information from the primary registration
       if ((!$this->_paymentId) && ($this->_action == CRM_Core_Action::UPDATE)) {
         $registered_by_id = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Participant',
@@ -452,7 +460,6 @@ class CRM_Event_Form_Participant extends CRM_Contact_Form_Task {
     }
     $this->set('onlinePendingContributionId', $this->_onlinePendingContributionId);
     $roleIds = CRM_Event_PseudoConstant::participantRole();
-
     if (!empty($roleIds)) {
       $query = "
 SELECT civicrm_custom_group.name as name,
@@ -666,10 +673,9 @@ SELECT civicrm_custom_group.name as name,
    * @access public
    */
   public function buildQuickForm() {
-    CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'js/crm.livePage.js');
     $participantStatuses = CRM_Event_PseudoConstant::participantStatus();
     $partiallyPaidStatusId = array_search('Partially paid', $participantStatuses);
-    CRM_Core_Resources::singleton()->addSetting(array('partiallyPaidStatusId' => $partiallyPaidStatusId));
+    $this->assign('partiallyPaidStatusId', $partiallyPaidStatusId);
 
     if ($this->_showFeeBlock) {
       return CRM_Event_Form_EventFees::buildQuickForm($this);
@@ -843,6 +849,15 @@ SELECT civicrm_custom_group.name as name,
 
     $this->_participantStatuses = CRM_Event_PseudoConstant::participantStatus(NULL, NULL, 'label');
     $this->addSelect('status_id', $checkCancelledJs, TRUE);
+
+    $enableCart = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::EVENT_PREFERENCES_NAME,
+      'enable_cart'
+    );
+    $pendingInCartStatusId = array_search('Pending in cart', $participantStatusName);
+    $this->assign('pendingInCartStatusId', $pendingInCartStatusId);
+    $this->assign('enableCart', $enableCart);
+    $pendingRefundStatusId = array_search('Pending refund', $participantStatusName);
+    $this->assign('pendingRefundStatusId', $pendingRefundStatusId);
 
     $this->addElement('checkbox', 'is_notify', ts('Send Notification'), NULL);
 
@@ -1050,7 +1065,8 @@ SELECT civicrm_custom_group.name as name,
 
         $params['fee_level'] = $params['amount_level'];
         $contributionParams['total_amount'] = $params['amount'];
-        if ($this->_quickConfig && !empty($params['total_amount']) && $params['status_id'] != array_search('Partially paid', $participantStatus)) {
+        if ($this->_quickConfig && !empty($params['total_amount']) &&
+          $params['status_id'] != array_search('Partially paid', $participantStatus)) {
           $params['fee_amount'] = $params['total_amount'];
         } else {
           //fix for CRM-3086
@@ -1395,6 +1411,10 @@ SELECT civicrm_custom_group.name as name,
         }
 
         if ($params['status_id'] == array_search('Partially paid', $participantStatus)) {
+          if (!$amountOwed && $this->_action & CRM_Core_Action::UPDATE) {
+            $amountOwed = $params['fee_amount'];
+          }
+
           // CRM-13964 partial_payment_total
           if ($amountOwed > $params['total_amount']) {
             // the owed amount
@@ -1403,6 +1423,7 @@ SELECT civicrm_custom_group.name as name,
             $contributionParams['partial_amount_pay'] = $params['total_amount'];
           }
         }
+
         if ($this->_single) {
           if (empty($ids)) {
             $ids = array();
@@ -1452,7 +1473,8 @@ SELECT civicrm_custom_group.name as name,
           if (is_array($value) && $value != 'skip') {
             foreach ($value as $lineKey => $line) {
               //10117 update the line items for participants if contribution amount is recorded
-              if ($this->_quickConfig && !empty($params['total_amount']) && $params['status_id'] != array_search('Partially paid', $participantStatus)
+              if ($this->_quickConfig && !empty($params['total_amount']) &&
+                ($params['status_id'] != array_search('Partially paid', $participantStatus))
               ) {
                 $line['unit_price'] = $line['line_total'] = $params['total_amount'];
               }
@@ -1538,7 +1560,11 @@ SELECT civicrm_custom_group.name as name,
         }
 
         $this->assign('totalAmount', $contributionParams['total_amount']);
-
+        if (isset($contributionParams['partial_payment_total'])) {
+          // balance amount
+          $balanceAmount = $contributionParams['partial_payment_total'] - $contributionParams['partial_amount_pay'];
+          $this->assign('balanceAmount', $balanceAmount );
+        }
         $this->assign('isPrimary', 1);
         $this->assign('checkNumber', CRM_Utils_Array::value('check_number', $params));
       }
@@ -1736,4 +1762,3 @@ SELECT civicrm_custom_group.name as name,
     }
   }
 }
-

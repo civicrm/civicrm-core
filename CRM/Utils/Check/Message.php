@@ -1,8 +1,9 @@
-{*
+<?php
+/*
  +--------------------------------------------------------------------+
  | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -22,44 +23,52 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*}
-{literal}
-<script type="text/javascript">
-function {/literal}{$list}{literal}viewActivity(activityID, contactID, list) {
-  if (list) {
-    list = "-" + list;
+*/
+
+/**
+ *
+ * @package CRM
+ * @copyright CiviCRM LLC (c) 2004-2014
+ * $Id: $
+ *
+ */
+class CRM_Utils_Check_Message {
+  /**
+   * @var string
+   */
+  private $name;
+
+  /**
+   * @var string
+   */
+  private $message;
+
+  function __construct($name, $message) {
+    $this->name = $name;
+    $this->message = $message;
   }
 
-  cj("#view-activity" + list ).show( );
+  /**
+   * @return string
+   */
+  function getName() {
+    return $this->name;
+  }
 
-  cj("#view-activity" + list ).dialog({
-    title: {/literal}"{ts escape="js"}View Activity{/ts}"{literal},
-    modal: true,
-    width : "680px", // don't remove px
-    height: "560",
-    resizable: true,
-    bgiframe: true,
-    overlay: {
-      opacity: 0.5,
-      background: "black"
-    },
+  /**
+   * @return string
+   */
+  function getMessage() {
+    return $this->message;
+  }
 
-    beforeclose: function(event, ui) {
-      cj(this).dialog("destroy");
-    },
-
-    open:function() {
-      cj("#activity-content" + list , this).html("");
-      var viewUrl = {/literal}"{crmURL p='civicrm/case/activity/view' h=0 q="snippet=4" }"{literal};
-      cj("#activity-content" + list , this).load( viewUrl + "&cid="+contactID + "&aid=" + activityID + "&type="+list);
-    },
-
-    buttons: {
-      "{/literal}{ts escape="js"}Done{/ts}{literal}": function() {
-        cj(this).dialog("destroy");
-      }
-    }
-  });
+  /**
+   * @return array
+   */
+  function toArray() {
+    return array(
+      'name' => $this->name,
+      'message' => $this->message,
+    );
+  }
 }
-</script>
-{/literal}

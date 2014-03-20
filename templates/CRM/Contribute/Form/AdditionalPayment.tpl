@@ -23,7 +23,40 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
-{if $formType}
+{if $transaction}
+  {if !empty($rows)}
+   <table id='info'>
+     <tr class="columnheader">
+       <th>{ts}Amount{/ts}</th>
+       <th>{ts}Type{/ts}</th>
+       <th>{ts}Paid By{/ts}</th>
+       <th>{ts}Received{/ts}</th>
+       <th>{ts}Transaction ID{/ts}</th>
+       <th>{ts}Status{/ts}</th>
+     </tr>
+     {foreach from=$rows item=row}
+     <tr>
+       <td>{$row.total_amount|crmMoney}</td>
+       <td>{$row.financial_type}</td>
+       <td>{$row.payment_instrument}{if $row.check_number} (#{$row.check_number}){/if}</td>
+       <td>{$row.receive_date|crmDate}</td>
+       <td>{$row.trxn_id}</td>
+       <td>{$row.status}</td>
+     </tr>
+     {/foreach}
+    <table>
+  {else}
+     {if $component eq 'event'}
+       {assign var='entity' value='participant'}
+     {else}
+       {assign var='entity' value=$component}
+     {/if}
+    {ts 1=$entity}No additional payments found for this %1 record{/ts}
+  {/if}
+ <div class="crm-submit-buttons">
+    {include file="CRM/common/formButtons.tpl"}
+ </div>
+{elseif $formType}
   {include file="CRM/Contribute/Form/AdditionalInfo/$formType.tpl"}
 {else}
 
@@ -52,7 +85,7 @@
         {capture assign=ccModeLink}{crmURL p='civicrm/payment/add' q="reset=1&action=add&cid=`$contactId`&id=`$id`&component=`$component`&mode=live"}{/capture}
        {/if}
       {if $paymentType eq 'owed'}
-        <span class="action-link crm-link-credit-card-mode">&nbsp;<a href="{$ccModeLink}">&raquo; {ts}submit credit card payment{/ts}</a>
+        <span class="action-link crm-link-credit-card-mode">&nbsp;<a class="open-inline crm-hover-button" href="{$ccModeLink}">&raquo; {ts}submit credit card payment{/ts}</a></span>
       {/if}
     {/if}
   </div>
@@ -65,10 +98,6 @@
     {/if}   
     <tr>
       <td class='label'>{ts}Event{/ts}</td><td>{$eventName}</td>
-    </tr>
-    <tr class="crm-payment-form-block-contribution_type_id crm-payment-form-block-financial_type_id">
-      <td class="label">{$form.financial_type_id.label}</td><td{$valueStyle}>{$form.financial_type_id.html}&nbsp;
-      </td>
     </tr>
     <tr class="crm-payment-form-block-total_amount">
       <td class="label">{$form.total_amount.label}</td>
@@ -229,7 +258,7 @@
         cj('div.'+id).html(loading);
         cj.ajax({
           url    : url,
-          success: function(data) { cj('div.'+id).html(data); }
+          success: function(data) { cj('div.'+id).html(data).trigger('crmLoad'); }
         });
       }
     }

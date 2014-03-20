@@ -23,7 +23,7 @@ cj(function() {
 
   var displayResponseData = function(data, textStatus, jqXHR) {
     if (data.redirect_url) {
-      window.location = data.redirect_url;
+      window.location.href = data.redirect_url;
       return;
     }
     

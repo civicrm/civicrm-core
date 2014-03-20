@@ -220,9 +220,13 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    *
    */
   function &add($type, $name, $label = '',
-    $attributes = '', $required = FALSE, $javascript = NULL
+    $attributes = '', $required = FALSE, $extra = NULL
   ) {
-    $element = $this->addElement($type, $name, $label, $attributes, $javascript);
+    // Normalize this property
+    if ($type == 'select' && is_array($extra) && !empty($extra['multiple'])) {
+      $extra['multiple'] = 'multiple';
+    }
+    $element = $this->addElement($type, $name, $label, $attributes, $extra);
     if (HTML_QuickForm::isError($element)) {
       CRM_Core_Error::fatal(HTML_QuickForm::errorMessage($element));
     }
@@ -439,6 +443,10 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
         $attrs = array_merge($js, $attrs);
       }
 
+      if ($button['type'] === 'cancel') {
+        $attrs['class'] .= ' cancel';
+      }
+
       if ($button['type'] === 'reset') {
         $prevnext[] = $this->createElement($button['type'], 'reset', $button['name'], $attrs);
       }
@@ -450,8 +458,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
           $buttonName = $this->getButtonName($button['type']);
         }
 
-        if (in_array($button['type'], array(
-          'next', 'upload')) && $button['name'] === 'Save') {
+        if (in_array($button['type'], array('next', 'upload', 'done')) && $button['name'] === ts('Save')) {
           $attrs = array_merge($attrs, (array('accesskey' => 'S')));
         }
         $prevnext[] = $this->createElement('submit', $buttonName, $button['name'], $attrs);
@@ -773,8 +780,8 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   function &addRadio($name, $title, $values, $attributes = array(), $separator = NULL, $required = FALSE) {
     $options = array();
     $attributes = $attributes ? $attributes : array();
-    $unselectable = !empty($attributes['unselectable']);
-    unset($attributes['unselectable']);
+    $allowClear = !empty($attributes['allowClear']);
+    unset($attributes['allowClear']);
     $attributes += array('id_suffix' => $name);
     foreach ($values as $key => $var) {
       $options[] = $this->createElement('radio', NULL, NULL, $var, $key, $attributes);
@@ -783,21 +790,21 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     if ($required) {
       $this->addRule($name, ts('%1 is a required field.', array(1 => $title)), 'required');
     }
-    if ($unselectable) {
-      $group->setAttribute('unselectable', TRUE);
+    if ($allowClear) {
+      $group->setAttribute('allowClear', TRUE);
     }
     return $group;
   }
 
-  function addYesNo($id, $title, $unselectable = FALSE, $required = NULL, $attributes = array()) {
+  function addYesNo($id, $title, $allowClear = FALSE, $required = NULL, $attributes = array()) {
     $attributes += array('id_suffix' => $id);
     $choice   = array();
     $choice[] = $this->createElement('radio', NULL, '11', ts('Yes'), '1', $attributes);
     $choice[] = $this->createElement('radio', NULL, '11', ts('No'), '0', $attributes);
 
     $group = $this->addGroup($choice, $id, $title);
-    if ($unselectable) {
-      $group->setAttribute('unselectable', TRUE);
+    if ($allowClear) {
+      $group->setAttribute('allowClear', TRUE);
     }
     if ($required) {
       $this->addRule($id, ts('%1 is a required field.', array(1 => $title)), 'required');
@@ -904,6 +911,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    *   - field (field name - only needed if different from name used on the form)
    *   - option_url - path to edit this option list - usually retrieved automatically - set to NULL to disable link
    *   - placeholder - set to NULL to disable
+   *   - multiple - bool
    * @param bool $required
    * @throws CRM_Core_Exception
    * @return HTML_QuickForm_Element
@@ -1250,7 +1258,9 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    *  - create - can the user create a new entity on-the-fly?
    *             Set to TRUE if entity is contact and you want the default profiles,
    *             or pass in your own set of links. @see CRM_Core_BAO_UFGroup::getCreateLinks for format
-   *  - api - array of settings for the getlist api
+   *             note that permissions are checked automatically
+   *  - api - array of settings for the getlist api wrapper
+   *          note that it accepts a 'params' setting which will be passed to the underlying api
    *  - placeholder - string
    *  - multiple - bool
    *  - class, etc. - other html properties
@@ -1260,35 +1270,22 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * @return HTML_QuickForm_Element
    */
   function addEntityRef($name, $label = '', $props = array(), $required = FALSE) {
+    require_once "api/api.php";
     $config = CRM_Core_Config::singleton();
     // Default properties
     $props['api'] = CRM_Utils_Array::value('api', $props, array());
-    $props['entity'] = CRM_Utils_Array::value('entity', $props, 'contact');
-
-    $props['class'] = isset($props['class']) ? $props['class'] . ' ' : '';
-    $props['class'] .= "crm-select2 crm-form-entityref";
+    $props['entity'] = _civicrm_api_get_entity_name_from_camel(CRM_Utils_Array::value('entity', $props, 'contact'));
+    $props['class'] = ltrim(CRM_Utils_Array::value('class', $props, '') . ' crm-form-entityref');
 
     if ($props['entity'] == 'contact' && isset($props['create']) && !(CRM_Core_Permission::check('edit all contacts') || CRM_Core_Permission::check('add contacts'))) {
       unset($props['create']);
     }
-    // Convenient shortcut to passing in array create links
-    if ($props['entity'] == 'contact' && isset($props['create']) && $props['create'] === TRUE) {
-      if (empty($props['api']['params']['contact_type'])) {
-        $props['create'] = CRM_Core_BAO_UFGroup::getCreateLinks(array('new_individual', 'new_organization', 'new_household'));
-      }
-      else {
-        $props['create'] = CRM_Core_BAO_UFGroup::getCreateLinks('new_' . strtolower($props['api']['params']['contact_type']));
-      }
-    }
 
-    $defaults = array(
-      'minimumInputLength' => 1,
-      'multiple' => !empty($props['multiple']),
-      'placeholder' => CRM_Utils_Array::value('placeholder', $props, $required ? ts('- select %1 -', array(1 => ts($props['entity']))) : ts('- none -')),
-      'allowClear' => !$required,
-    );
-    if ($props['entity'] == 'contact') {
-      $defaults['formatInputTooShort'] = $config->includeEmailInName ? ts('Start typing a name or email...') : ts('Start typing a name...');
+    $props['placeholder'] = CRM_Utils_Array::value('placeholder', $props, $required ? ts('- select %1 -', array(1 => ts(str_replace('_', ' ', $props['entity'])))) : ts('- none -'));
+
+    $defaults = array();
+    if (!empty($props['multiple'])) {
+      $defaults['multiple'] = TRUE;
     }
     $props['select'] = CRM_Utils_Array::value('select', $props, array()) + $defaults;
 
@@ -1306,7 +1303,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     if (!empty($props['create'])) {
       $props['data-create-links'] = json_encode($props['create']);
     }
-    CRM_Utils_Array::remove($props, 'multiple', 'select', 'api', 'entity', 'placeholder', 'create');
+    CRM_Utils_Array::remove($props, 'multiple', 'select', 'api', 'entity', 'create');
   }
 
   /**
@@ -1525,6 +1522,22 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       // as silent failures are often worse than noisy ones
       return array();
     }
+  }
+
+  /**
+   * Sets form attribute
+   * @see CRM.loadForm
+   */
+  function preventAjaxSubmit() {
+    $this->setAttribute('data-no-ajax-submit', 'true');
+  }
+
+  /**
+   * Sets form attribute
+   * @see CRM.loadForm
+   */
+  function allowAjaxSubmit() {
+    $this->removeAttribute('data-no-ajax-submit');
   }
 }
 

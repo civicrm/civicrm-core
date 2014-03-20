@@ -37,8 +37,6 @@ function loadDialog( url, fieldName ) {
       width       : 290,
       height      : 290,
       resizable   : true,
-      bgiframe    : true,
-      overlay     : { opacity: 0.5, background: "black" },
       beforeclose : function(event, ui) {
                      cj(this).dialog("destroy");
                        }

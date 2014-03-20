@@ -1110,6 +1110,11 @@ ORDER BY   civicrm_email.is_bulkmail DESC
     if ($contactDetails) {
       $contact = $contactDetails;
     }
+    elseif ($contactId === 0) {
+      //anonymous user
+      $contact = array();
+      CRM_Utils_Hook::tokenValues($contact, $contactId, $job_id);
+    }
     else {
       $params = array(array('contact_id', '=', $contactId, 0, 0));
       list($contact, $_) = CRM_Contact_BAO_Query::apiQuery($params);
