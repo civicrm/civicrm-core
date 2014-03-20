@@ -1211,13 +1211,13 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
           $contactID = $this->getContactID();
         }
 
-        CRM_Event_Form_Registration_Confirm::fixLocationFields($value, $fields);
+        CRM_Event_Form_Registration_Confirm::fixLocationFields($value, $fields, $this);
         //for free event or additional participant, dont create billing email address.
         if (empty($value['is_primary']) || !$this->_values['event']['is_monetary']) {
           unset($value["email-{$this->_bltID}"]);
         }
 
-        $contactID = CRM_Event_Form_Registration_Confirm::updateContactFields($contactID, $value, $fields);
+        $contactID = CRM_Event_Form_Registration_Confirm::updateContactFields($contactID, $value, $fields, $this);
 
         // lets store the contactID in the session
         // we dont store in userID in case the user is doing multiple
