@@ -568,10 +568,10 @@ class CRM_Core_Resources {
     // Scripts needed by everyone, everywhere
     // FIXME: This is too long; list needs finer-grained segmentation
     $items = array(
-      "packages/jquery/jquery-1.10.2$min.js",
+      "packages/jquery/jquery-1.11.0$min.js",
       "packages/jquery/jquery-migrate-1.2.1.js", // TODO: Remove before 4.5 release
-      "packages/jquery/jquery-ui/js/jquery-ui-1.10.3.custom$min.js",
-      "packages/jquery/jquery-ui/css/black-tie/jquery-ui-1.10.3.custom$min.css",
+      "packages/jquery/jquery-ui/js/jquery-ui-1.10.4.custom$min.js",
+      "packages/jquery/jquery-ui/css/theme/jquery-ui-1.10.4.custom$min.css",
 
       "packages/backbone/lodash.compat$min.js",
 

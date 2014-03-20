@@ -176,7 +176,7 @@ There's the potential for collisions (two different labels having the same short
           dataUrl     = dataUrl + '&cid={/literal}{$clientID}{literal}'+'&selectedChild=case';
        }
 
-       window.location =  dataUrl;
+       window.location.href =  dataUrl;
 }
 </script>
 {/literal}
