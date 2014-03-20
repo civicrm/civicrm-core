@@ -1193,6 +1193,7 @@ class CRM_Utils_Token {
     $tokens           = array(),
     $className        = NULL
   ) {
+    //@todo - this function basically replications calling civicrm_api3('contribution', 'get', array('id' => array('IN' => array())
     if (empty($contributionIDs)) {
       // putting a fatal here so we can track if/when this happens
       CRM_Core_Error::fatal();
@@ -1412,17 +1413,26 @@ class CRM_Utils_Token {
     return $str;
   }
 
-  public static function &replaceContributionTokens($str, &$contribution, $html = FALSE, $knownTokens = NULL, $escapeSmarty = FALSE) {
+  /**
+   * Replace Contribution tokens in html
+   * @param unknown $str
+   * @param unknown $contribution
+   * @param string $html
+   * @param string $knownTokens
+   * @param string $escapeSmarty
+   * @return unknown|Ambigous <string, mixed>|mixed
+   */
+  public static function replaceContributionTokens($str, &$contribution, $html = FALSE, $knownTokens = NULL, $escapeSmarty = FALSE) {
+    $key = 'contribution';
+    if (!$knownTokens || !CRM_Utils_Array::value($key, $knownTokens)) {
+      return $str; //early return
+    }
     self::_buildContributionTokens();
 
     // here we intersect with the list of pre-configured valid tokens
     // so that we remove anything we do not recognize
     // I hope to move this step out of here soon and
     // then we will just iterate on a list of tokens that are passed to us
-    $key = 'contribution';
-    if (!$knownTokens || empty($knownTokens[$key])) {
-      return $str;
-    }
 
     $str = preg_replace_callback(
       self::tokenRegex($key),
@@ -1434,6 +1444,40 @@ class CRM_Utils_Token {
 
     $str = preg_replace('/\\\\|\{(\s*)?\}/', ' ', $str);
     return $str;
+  }
+
+  /**
+   * We have a situation where we are rendering more than one token in each field because we are combining
+   * tokens from more than one contribution when pdf thank you letters are grouped (CRM-14367)
+   *
+   * The replaceContributionToken doesn't handle receive_date correctly in this scenario because of the formatting
+   * it applies (other tokens are OK including date fields)
+   *
+   * So we sort this out & then call the main function. Note that we are not escaping smarty on this fields like the main function
+   * does - but the fields is already being formatted through a date function
+   *
+   * @param string $separator
+   * @param string $str
+   * @param array $contribution
+   * @param string $html
+   * @param string $knownTokens
+   * @param string $escapeSmarty
+   */
+  public static function replaceMultipleContributionTokens($separator, $str, &$contribution, $html = FALSE, $knownTokens = NULL, $escapeSmarty = FALSE) {
+    if(empty($knownTokens['contribution'])) {
+      return $str;
+    }
+
+    if(in_array('receive_date', $knownTokens['contribution'])) {
+      $formattedDates = array();
+      $dates = explode($separator, $contribution['receive_date']);
+      foreach ($dates as $date) {
+        $formattedDates[] = CRM_Utils_Date::customFormat($date, NULL, array('j', 'm', 'Y'));
+      }
+      $str = str_replace("{contribution.receive_date}", implode($separator, $formattedDates), $str);
+      unset($knownTokens['contribution']['receive_date']);
+    }
+    return self::replaceContributionTokens($str, $contribution, $html, $knownTokens, $escapeSmarty);
   }
 
   /**

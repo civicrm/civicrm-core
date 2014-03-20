@@ -59,7 +59,6 @@ class CRM_Contribute_Form_Task_PDFLetter extends CRM_Contribute_Form_Task {
   function preProcess() {
     $this->skipOnHold = $this->skipDeceased = FALSE;
     CRM_Contact_Form_Task_PDFLetterCommon::preProcess($this);
-
     // store case id if present
     $this->_caseId = CRM_Utils_Request::retrieve('caseid', 'Positive', $this, FALSE);
 
@@ -113,8 +112,26 @@ class CRM_Contribute_Form_Task_PDFLetter extends CRM_Contribute_Form_Task {
     $this->add('checkbox', 'thankyou_update', ts('Update thank-you dates for these contributions'), FALSE);
 
     // Group options for tokens are not yet implemented. dgg
-    $options = array(ts('Contact'), ts('Recurring'));
-    $this->addRadio('is_group_by', ts('Grouping contributions in one letter based on'), $options, array('allowClear' => TRUE), "<br/>", FALSE);
+    $options = array(
+      '' => ts('No Grouping'),
+      'contact_id' => ts('Contact'),
+      'contribution_recur_id' => ts('Recurring'),
+      'financial_type_id' => ts('Financial Type'),
+      'campaign_id' => ts('Campaign'),
+      'payment_instrument_id' => 'Payment Instrument',
+    );
+    $this->addElement('select', 'group_by', ts('Grouping contributions in one letter based on'), $options, array(), "<br/>", FALSE);
+    // this was going to be free-text but I opted for radio options in case there was a script injection risk
+    $separatorOptions = array('comma' => 'Comma', 'td' => 'Table Cell' );
+    $this->addElement('select', 'group_by_separator', ts('Separator for fields in Grouped Contributions'), $separatorOptions);
+    $emailOptions = array(
+      '' => ts('Generate PDFs for printing (only)'),
+      'email' => ts('Send as email where possible. Only generate printable PDF for remainder'),
+      'both' => ts('Send as email where possible And generate printable PDF for all'),
+      'pdfemail' => ts('Send pdf in email where possible. Only generate printable PDF for remainder'),
+      'pdfemail_both' => ts('Send pdf in email where possible And generate printable PDF for all'),
+    );
+    $this->addElement('select', 'email_options', ts('PDF by email options'), $emailOptions, array(), "<br/>", FALSE);
 
     $this->addButtons(array(
         array(
@@ -139,9 +156,6 @@ class CRM_Contribute_Form_Task_PDFLetter extends CRM_Contribute_Form_Task {
    * @return void
    */
   public function postProcess() {
-    // TODO: rewrite using contribution token and one letter by contribution
-    $this->setContactIDs();
-
     CRM_Contribute_Form_Task_PDFLetterCommon::postProcess($this);
   }
 }
