@@ -143,14 +143,16 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
     if (empty($ids['contribution']) && empty($params['contribution_status_id'])) {
       $params['contribution_status_id'] = CRM_Core_OptionGroup::getValue('contribution_status', 'Completed', 'name');
     }
-
+    $setPrevContribution = TRUE;
     // CRM-13964 partial payment
-    if (empty($contributionID)) {
-      if (!empty($params['partial_payment_total']) && !empty($params['partial_amount_pay'])) {
-        $partialAmtTotal = $params['partial_payment_total'];
-        $partialAmtPay = $params['partial_amount_pay'];
-        $params['total_amount'] = $partialAmtTotal;
+    if (!empty($params['partial_payment_total']) && !empty($params['partial_amount_pay'])) {
+      $partialAmtTotal = $params['partial_payment_total'];
+      $partialAmtPay = $params['partial_amount_pay'];
+      $params['total_amount'] = $partialAmtTotal;
+      if ($partialAmtPay < $partialAmtTotal) {
         $params['contribution_status_id'] = CRM_Core_OptionGroup::getValue('contribution_status', 'Partially paid', 'name');
+        $params['is_pay_later'] = 0;
+        $setPrevContribution = FALSE;
       }
     }
 
@@ -170,7 +172,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
       $contribution->currency = $config->defaultCurrency;
     }
 
-    if ($contributionID) {
+    if ($contributionID && $setPrevContribution) {
       $params['prevContribution'] = self::getValues(array('id' => $contributionID), CRM_Core_DAO::$_nullArray, CRM_Core_DAO::$_nullArray);
     }
 
