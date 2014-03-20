@@ -1632,6 +1632,7 @@ class CRM_Contact_BAO_Query {
       case 'activity_subject':
       case 'test_activities':
       case 'activity_type_id':
+      case 'activity_type':
       case 'activity_survey_id':
       case 'activity_tags':
       case 'activity_taglist':
