@@ -323,8 +323,8 @@ class CRM_Core_SelectValues {
   /**
    * compose the parameters for a date select object
    *
-   * @param  $type    the type of date
-   * @param  $format  date format ( QF format)
+   * @param  string|NULL $type    the type of date
+   * @param  string|NULL $format  date format ( QF format)
    *
    * @return array         the date array
    * @static
@@ -432,6 +432,7 @@ class CRM_Core_SelectValues {
    * @static
    */
   function getHours() {
+    $hours = array();
     for ($i = 0; $i <= 6; $i++) {
       $hours[$i] = $i;
     }
@@ -445,6 +446,7 @@ class CRM_Core_SelectValues {
    * @static
    */
   function getMinutes() {
+    $minutes = array();
     for ($i = 0; $i < 60; $i = $i + 15) {
       $minutes[$i] = $i;
     }
@@ -588,10 +590,8 @@ class CRM_Core_SelectValues {
         '{event.end_date}' => ts('Event End Date'),
         '{event.event_type}' => ts('Event Type'),
         '{event.summary}' => ts('Event Summary'),
-        '{event.description}' => ts('Event Description'),
         '{event.contact_email}' => ts('Event Contact Email'),
         '{event.contact_phone}' => ts('Event Contact Phone'),
-        '{event.location}' => ts('Event Location'),
         '{event.description}' => ts('Event Description'),
         '{event.location}' => ts('Event Location'),
         '{event.fee_amount}' => ts('Event Fees'),
@@ -854,6 +854,7 @@ class CRM_Core_SelectValues {
    * @static
    */
   public static function getNumericOptions($start = 0, $end = 10) {
+    $numericOptions = array();
     for ($i = $start; $i <= $end; $i++) {
         $numericOptions[$i] = $i;
     }
@@ -1032,7 +1033,7 @@ class CRM_Core_SelectValues {
       );
     }
 
-    return $jobFrequency;
+    return $wordReplacementMatchType;
   }
 
   /**
