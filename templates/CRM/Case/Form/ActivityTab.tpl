@@ -23,7 +23,7 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
-{this template is used for activity accordion}
+{*this template is used for activity accordion*}
 <div class="crm-accordion-wrapper crm-case_activities-accordion  crm-case-activities-block">
   <div class="crm-accordion-header">
     {ts}Activities{/ts}
@@ -86,3 +86,80 @@
 
   </div><!-- /.crm-accordion-body -->
 </div><!-- /.crm-accordion-wrapper -->
+
+{literal}
+<script type="text/javascript">
+cj(function( ) {
+  buildCaseActivities(false);
+});
+
+function buildCaseActivities(filterSearch) {
+  if (filterSearch) {
+    oTable.fnDestroy();
+  }
+  var count   = 0;
+  var columns = '';
+  var sourceUrl = {/literal}"{crmURL p='civicrm/ajax/activity' h=0 q='snippet=4&caseID='}{$caseID}"{literal};
+  sourceUrl = sourceUrl + '&cid={/literal}{$contactID}{literal}';
+  sourceUrl = sourceUrl + '&userID={/literal}{$userID}{literal}';
+
+  cj('#activities-selector th').each(function( ) {
+    if (cj(this).attr('id') != 'nosort') {
+      columns += '{"sClass": "' + cj(this).attr('class') +'"},';
+    }
+    else {
+      columns += '{ "bSortable": false },';
+    }
+    count++;
+  });
+
+  columns    = columns.substring(0, columns.length - 1 );
+  eval('columns =[' + columns + ']');
+
+  oTable = cj('#activities-selector').dataTable({
+    "bFilter"    : false,
+    "bAutoWidth" : false,
+    "aaSorting"  : [],
+    "aoColumns"  : columns,
+    "bProcessing": true,
+    "bJQueryUI": true,
+    "asStripClasses" : [ "odd-row", "even-row" ],
+    "sPaginationType": "full_numbers",
+    "sDom"       : '<"crm-datatable-pager-top"lfp>rt<"crm-datatable-pager-bottom"ip>',
+    "bServerSide": true,
+    "sAjaxSource": sourceUrl,
+    "iDisplayLength": 10,
+    "fnDrawCallback": function() { setSelectorClass(); },
+    "fnServerData": function ( sSource, aoData, fnCallback ) {
+
+      if ( filterSearch ) {
+        var activity_deleted = 0;
+        if ( cj("#activity_deleted:checked").val() == 1 ) {
+          activity_deleted = 1;
+        }
+        aoData.push(
+          {name:'status_id', value: cj("select#status_id").val()},
+          {name:'activity_type_id', value: cj("select#activity_type_filter_id").val()},
+          {name:'activity_date_low', value: cj("#activity_date_low").val()},
+          {name:'activity_date_high', value: cj("#activity_date_high").val() },
+          {name:'activity_deleted', value: activity_deleted }
+        );
+      }
+      cj.ajax( {
+        "dataType": 'json',
+        "type": "POST",
+        "url": sSource,
+        "data": aoData,
+        "success": fnCallback
+      } );
+    }
+  });
+}
+
+function setSelectorClass( ) {
+  cj("#activities-selector td:last-child").each( function( ) {
+    cj(this).parent().addClass(cj(this).text() );
+  });
+}
+</script>
+{/literal}
