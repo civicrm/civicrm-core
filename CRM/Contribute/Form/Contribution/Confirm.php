@@ -1524,7 +1524,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       CRM_Core_Error::displaySessionError($result);
       $urlString = 'civicrm/contribute/transact';
       $urlParams = '_qf_Main_display=true';
-      if ($className == 'CRM_Contribute_Form_Contribution') {
+      if (get_class($form) == 'CRM_Contribute_Form_Contribution') {
         $urlString = 'civicrm/contact/view/contribution';
         $urlParams = "action=add&cid={$form->_contactID}";
         if ($form->_mode) {
