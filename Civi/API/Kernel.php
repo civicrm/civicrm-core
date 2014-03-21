@@ -74,6 +74,7 @@ class Kernel {
     $apiRequest['params'] = $params;
     $apiRequest['extra'] = $extra;
 
+    /** @var $apiWrappers array<\API_Wrapper> */
     $apiWrappers = array(
       \CRM_Utils_API_HTMLInputCoder::singleton(),
       \CRM_Utils_API_NullOutputCoder::singleton(),
@@ -165,60 +166,22 @@ class Kernel {
       $result = $responseEvent->getResponse();
 
       return $result;
-    } catch (PEAR_Exception $e) {
-      if (\CRM_Utils_Array::value('format.is_success', $apiRequest['params']) == 1) {
-        return 0;
-      }
-      $error = $e->getCause();
-      if ($error instanceof DB_Error) {
-        $data["error_code"] = DB::errorMessage($error->getCode());
-        $data["sql"] = $error->getDebugInfo();
-      }
-      if (!empty($apiRequest['params']['debug'])) {
-        if (method_exists($e, 'getUserInfo')) {
-          $data['debug_info'] = $error->getUserInfo();
-        }
-        if (method_exists($e, 'getExtraData')) {
-          $data['debug_info'] = $data + $error->getExtraData();
-        }
-        $data['trace'] = $e->getTraceAsString();
-      }
-      else {
-        $data['tip'] = "add debug=1 to your API call to have more info about the error";
-      }
-      $err = civicrm_api3_create_error($e->getMessage(), $data, $apiRequest);
-      $this->dispatcher->dispatch(Events::EXCEPTION, new ExceptionEvent($e, NULL, $apiRequest));
-      return $err;
-    }
-    catch (\API_Exception $e) {
-      if (!isset($apiRequest)) {
-        $apiRequest = array();
-      }
-      if (\CRM_Utils_Array::value('format.is_success', \CRM_Utils_Array::value('params', $apiRequest)) == 1) {
-        return 0;
-      }
-      $data = $e->getExtraParams();
-      $data['entity'] = \CRM_Utils_Array::value('entity', $apiRequest);
-      $data['action'] = \CRM_Utils_Array::value('action', $apiRequest);
-      $err = civicrm_api3_create_error($e->getMessage(), $data, $apiRequest, $e->getCode());
-      if (\CRM_Utils_Array::value('debug', \CRM_Utils_Array::value('params', $apiRequest))
-        && empty($data['trace']) // prevent recursion
-      ) {
-        $err['trace'] = $e->getTraceAsString();
-      }
-      $this->dispatcher->dispatch(Events::EXCEPTION, new ExceptionEvent($e, NULL, $apiRequest));
-      return $err;
     }
     catch (\Exception $e) {
-      if (\CRM_Utils_Array::value('format.is_success', $apiRequest['params']) == 1) {
+      $this->dispatcher->dispatch(Events::EXCEPTION, new ExceptionEvent($e, NULL, $apiRequest));
+
+      if (isset($apiRequest, $apiRequest['params'], $apiRequest['params']['format.is_success']) && $apiRequest['params']['format.is_success'] == 1) {
         return 0;
       }
-      $data = array();
-      $err = civicrm_api3_create_error($e->getMessage(), $data, $apiRequest, $e->getCode());
-      if (!empty($apiRequest['params']['debug'])) {
-        $err['trace'] = $e->getTraceAsString();
+
+      if ($e instanceof \PEAR_Exception) {
+        $err = $this->formatPearException($e, $apiRequest);
+      } elseif ($e instanceof \API_Exception) {
+        $err = $this->formatApiException($e, $apiRequest);
+      } else {
+        $err = $this->formatException($e, $apiRequest);
       }
-      $this->dispatcher->dispatch(Events::EXCEPTION, new ExceptionEvent($e, NULL, $apiRequest));
+
       return $err;
     }
 
@@ -228,5 +191,65 @@ class Kernel {
     require_once ('api/v3/utils.php');
     require_once 'api/Exception.php';
     _civicrm_api3_initialize();
+  }
+
+  /**
+   * @param \Exception $e
+   * @param array $apiRequest
+   * @return array (API response)
+   */
+  public function formatException($e, $apiRequest) {
+    $data = array();
+    if (!empty($apiRequest['params']['debug'])) {
+      $data['trace'] = $e->getTraceAsString();
+    }
+    return civicrm_api3_create_error($e->getMessage(), $data, $apiRequest, $e->getCode());
+  }
+
+  /**
+   * @param \API_Exception $e
+   * @param array $apiRequest
+   * @return array (API response)
+   */
+  public function formatApiException($e, $apiRequest) {
+    $data = $e->getExtraParams();
+    $data['entity'] = \CRM_Utils_Array::value('entity', $apiRequest);
+    $data['action'] = \CRM_Utils_Array::value('action', $apiRequest);
+
+    if (\CRM_Utils_Array::value('debug', \CRM_Utils_Array::value('params', $apiRequest))
+      && empty($data['trace']) // prevent recursion
+    ) {
+      $data['trace'] = $e->getTraceAsString();
+    }
+
+    return civicrm_api3_create_error($e->getMessage(), $data, $apiRequest, $e->getCode());
+  }
+
+  /**
+   * @param \PEAR_Exception $e
+   * @param array $apiRequest
+   * @return array (API response)
+   */
+  public function formatPearException($e, $apiRequest) {
+    $data = array();
+    $error = $e->getCause();
+    if ($error instanceof \DB_Error) {
+      $data["error_code"] = \DB::errorMessage($error->getCode());
+      $data["sql"] = $error->getDebugInfo();
+    }
+    if (!empty($apiRequest['params']['debug'])) {
+      if (method_exists($e, 'getUserInfo')) {
+        $data['debug_info'] = $error->getUserInfo();
+      }
+      if (method_exists($e, 'getExtraData')) {
+        $data['debug_info'] = $data + $error->getExtraData();
+      }
+      $data['trace'] = $e->getTraceAsString();
+    }
+    else {
+      $data['tip'] = "add debug=1 to your API call to have more info about the error";
+    }
+
+    return civicrm_api3_create_error($e->getMessage(), $data, $apiRequest);
   }
 }
