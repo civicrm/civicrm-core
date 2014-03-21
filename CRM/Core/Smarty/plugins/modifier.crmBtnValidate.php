@@ -50,7 +50,7 @@ function smarty_modifier_crmBtnValidate($btnName) {
   // note the first _
   $substr = CRM_Utils_System::explode('_', $btnName, 5);
 
-  if (in_array($substr[3], array('upload', 'next', 'submit', 'done', 'process'))) {
+  if (in_array($substr[3], array('upload', 'next', 'submit', 'done', 'process', 'refresh'))) {
     return 'validate';
   }
   return 'cancel';
