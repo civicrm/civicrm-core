@@ -1249,8 +1249,8 @@ input.crm-form-entityref {
 /*
 ** Style for hiding blocks or table rows
 */
-#crm-container .hide-block,
-#crm-container .hide-row {
+#crm-container .hide-block, .crm-container-snippet .hide-block,
+#crm-container .hide-row, .crm-container-snippet .hide-row {
   display: none;
 }
 
