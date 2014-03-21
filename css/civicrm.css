@@ -2487,7 +2487,7 @@ div.grippie {
 .crm-container .icon {
   height: 16px;
   width: 16px;
-  background: transparent url("../i/icons/jquery-ui-52534D.png") no-repeat top right;
+  background-image: url("../i/icons/jquery-ui-52534D.png");
   float: left;
   text-indent: -10000px;
 }

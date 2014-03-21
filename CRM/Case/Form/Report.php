@@ -105,7 +105,6 @@ class CRM_Case_Form_Report extends CRM_Core_Form {
         array(
           'type' => 'refresh',
           'name' => ts('Generate Report'),
-          'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
           'isDefault' => TRUE,
         ),
         array(
@@ -114,6 +113,8 @@ class CRM_Case_Form_Report extends CRM_Core_Form {
         ),
       )
     );
+    // We want this form to redirect to a full page
+    $this->preventAjaxSubmit();
   }
 
   /**

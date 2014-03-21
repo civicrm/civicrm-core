@@ -654,18 +654,22 @@ CRM.validate = CRM.validate || {
     };
 
     settings.buttons[cancelLabel] = function () {
-      dialog.dialog('close');
+      dialog.trigger('crmConfirmNo').dialog('close');
     };
     options = options || {};
     $.extend(settings, options);
-    if (typeof(buttons) === 'function') {
+    if ($.isFunction(buttons)) {
       callbacks[ts('Continue')] = buttons;
+    }
+    else if (_.isString(buttons) || !buttons) {
+      callbacks[buttons || ts('Continue')] = function() {};
     }
     else {
       callbacks = buttons;
     }
     $.each(callbacks, function (label, callback) {
       settings.buttons[label] = function () {
+        dialog.trigger('crmConfirmYes');
         if (callback.call(dialog) !== false) {
           dialog.dialog('close');
         }
