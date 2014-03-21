@@ -127,7 +127,7 @@ class CRM_Admin_Form_Extensions extends CRM_Admin_Form {
         break;
 
       case CRM_Core_Action::DISABLE:
-        $buttonName = 'Disable';
+        $buttonName = ts('Disable');
         $title = ts('Disable Extension');
         break;
     }
