@@ -1499,7 +1499,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       $recurParams['start_date'] = $params['receive_date'];
     }
     $recurParams['invoice_id'] = CRM_Utils_Array::value('invoiceID', $params);
-    $recurParams['contribution_status_id'] = 2;
+    $recurParams['contribution_status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending');
     $recurParams['payment_processor_id'] = CRM_Utils_Array::value('payment_processor_id', $params);
     $recurParams['is_email_receipt'] = CRM_Utils_Array::value('is_email_receipt', $params);
     // we need to add a unique trxn_id to avoid a unique key error
