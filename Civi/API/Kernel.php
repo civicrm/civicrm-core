@@ -26,6 +26,12 @@
 */
 namespace Civi\API;
 
+use Civi\API\Event\AuthorizeEvent;
+use Civi\API\Event\PrepareEvent;
+use Civi\API\Event\ExceptionEvent;
+use Civi\API\Event\RespondEvent;
+
+
 /**
  *
  * @package Civi
@@ -77,15 +83,22 @@ class Kernel {
     \CRM_Utils_Hook::apiWrappers($apiWrappers, $apiRequest);
 
     try {
-      require_once ('api/v3/utils.php');
-      require_once 'api/Exception.php';
       if (!is_array($params)) {
         throw new \API_Exception('Input variable `params` is not an array', 2000);
       }
-      _civicrm_api3_initialize();
+
+      $this->boot();
       $errorScope = \CRM_Core_TemporaryErrorScope::useException();
+
       // look up function, file, is_generic
       $apiRequest += _civicrm_api_resolve($apiRequest);
+
+      if (! $this->dispatcher->dispatch(Events::AUTHORIZE, new AuthorizeEvent(NULL, $apiRequest))->isAuthorized()) {
+        throw new \API_Exception("Authorization failed");
+      }
+
+      $apiRequest = $this->dispatcher->dispatch(Events::PREPARE, new PrepareEvent(NULL, $apiRequest))->getApiRequest();
+
       if (strtolower($action) == 'create' || strtolower($action) == 'delete' || strtolower($action) == 'submit') {
         $apiRequest['is_transactional'] = 1;
         $transaction = new \CRM_Core_Transaction();
@@ -136,18 +149,23 @@ class Kernel {
 
       if (\CRM_Utils_Array::value('format.is_success', $apiRequest['params']) == 1) {
         if ($result['is_error'] === 0) {
+          // FIXME dispatch
           return 1;
         }
         else {
+          // FIXME dispatch
           return 0;
         }
       }
       if (!empty($apiRequest['params']['format.only_id']) && isset($result['id'])) {
+        // FIXME dispatch
         return $result['id'];
       }
+
       if (\CRM_Utils_Array::value('is_error', $result, 0) == 0) {
         _civicrm_api_call_nested_api($apiRequest['params'], $result, $apiRequest['action'], $apiRequest['entity'], $apiRequest['version']);
       }
+
       if (function_exists('xdebug_time_index')
         && \CRM_Utils_Array::value('debug', $apiRequest['params'])
         // result would not be an array for getvalue
@@ -157,6 +175,9 @@ class Kernel {
         $result['xdebug']['memory'] = xdebug_memory_usage();
         $result['xdebug']['timeIndex'] = xdebug_time_index();
       }
+
+      $responseEvent = $this->dispatcher->dispatch(Events::RESPOND, new RespondEvent(NULL, $apiRequest, $result));
+      $result = $responseEvent->getResponse();
 
       return $result;
     } catch (PEAR_Exception $e) {
@@ -184,6 +205,7 @@ class Kernel {
       if (!empty($apiRequest['is_transactional'])) {
         $transaction->rollback();
       }
+      $this->dispatcher->dispatch(Events::EXCEPTION, new ExceptionEvent($e, NULL, $apiRequest));
       return $err;
     }
     catch (\API_Exception $e) {
@@ -205,6 +227,7 @@ class Kernel {
       if (!empty($apiRequest['is_transactional'])) {
         $transaction->rollback();
       }
+      $this->dispatcher->dispatch(Events::EXCEPTION, new ExceptionEvent($e, NULL, $apiRequest));
       return $err;
     }
     catch (\Exception $e) {
@@ -219,8 +242,15 @@ class Kernel {
       if (!empty($apiRequest['is_transactional'])) {
         $transaction->rollback();
       }
+      $this->dispatcher->dispatch(Events::EXCEPTION, new ExceptionEvent($e, NULL, $apiRequest));
       return $err;
     }
 
+  }
+
+  public function boot() {
+    require_once ('api/v3/utils.php');
+    require_once 'api/Exception.php';
+    _civicrm_api3_initialize();
   }
 }
