@@ -78,6 +78,12 @@ class Container {
     ))
       ->setFactoryService(self::SELF)->setFactoryMethod('createEntityManager');
 
+    $container->setDefinition('dispatcher', new Definition(
+      '\Symfony\Component\EventDispatcher\EventDispatcher',
+      array()
+    ))
+      ->setFactoryService(self::SELF)->setFactoryMethod('createEventDispatcher');
+
     $container->setDefinition('civi_api_registry', new Definition(
       '\Civi\API\Registry',
       array(new Reference('doctrine_configuration'), new Reference('annotation_reader'))
@@ -143,5 +149,13 @@ class Container {
     $dbSettings = new \CRM_DB_Settings();
     $em = EntityManager::create($dbSettings->toDoctrineArray(), $config);
     return $em;
+  }
+
+  /**
+   * @return \Symfony\Component\EventDispatcher\EventDispatcher
+   */
+  public function createEventDispatcher() {
+    $dispatcher = new \Symfony\Component\EventDispatcher\EventDispatcher();
+    return $dispatcher;
   }
 }
