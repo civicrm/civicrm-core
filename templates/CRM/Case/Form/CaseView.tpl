@@ -43,9 +43,12 @@
         {foreach from=$caseRoles.client item=client name=clients}
           <a href="{crmURL p='civicrm/contact/view' q="action=view&reset=1&cid=`$client.contact_id`"}" title="{ts}view contact record{/ts}">{$client.display_name}</a>{if not $smarty.foreach.clients.last}, &nbsp; {/if}
         {/foreach}
-        <a href="#" class="crm-hover-button" title="{ts}add new client to the case{/ts}" onclick="addClient( );return false;">
-          <span class="icon edit-icon"></span>
+        <a href="#addClientDialog" class="crm-hover-button case-miniform" title="{ts}Add Client{/ts}" data-key="{crmKey name='civicrm/case/ajax/addclient'}">
+          <span class="icon add-icon"></span>
         </a>
+        <div id="addClientDialog" class="hiddenElement">
+          <input name="add_client_id" placeholder="{ts}- select contact -{/ts}" class="huge" />
+        </div>
         {if $hasRelatedCases}
           <div class="crm-block relatedCases-link"><a class="crm-hover-button crm-popup medium-popup" href="{$relatedCaseUrl}">{$relatedCaseLabel}</a></div>
         {/if}
@@ -102,40 +105,36 @@
   </div>
   {/if}
 
-<table class="form-layout">
-<tr class="crm-case-caseview-form-block-activity_type_id">
-  <td>{$form.add_activity_type_id.html}</td>
-  {if $hasAccessToAllCases}
-    <td>
-      <a class="button no-popup" href="{crmURL p='civicrm/case/report/print' q="all=1&redact=0&cid=$contactID&caseID=$caseId&asn=standard_timeline"}"><div class="icon print-icon"></div> {ts}Print Report{/ts}</a>
-    </td>
-  </tr>
-  <tr>
-    <td class="crm-case-caseview-form-block-timeline_id">{$form.timeline_id.label}<br />{$form.timeline_id.html}&nbsp;{$form._qf_CaseView_next.html}</td>
-    <td class="crm-case-caseview-form-block-report_id">{$form.report_id.label}<br />{$form.report_id.html}&nbsp;<input type="button" accesskey="R" value="Go" name="case_report" onclick="checkSelection( this );"/></td>
-    {else}
-    <td></td>
-  {/if}
-</tr>
+<div class="case-control-panel">
+  <div>
+    <p>
+      {$form.add_activity_type_id.html}
+      {if $hasAccessToAllCases} &nbsp;
+        {$form.timeline_id.html}{$form._qf_CaseView_next.html} &nbsp;
+        {$form.report_id.html}
+      {/if}
+    </p>
+  </div>
+  <div>
+    <p>
+      {if $hasAccessToAllCases}
+        <a class="crm-hover-button action-item no-popup" href="{crmURL p='civicrm/case/report/print' q="all=1&redact=0&cid=$contactID&caseID=$caseId&asn=standard_timeline"}"><span class="icon print-icon"></span> {ts}Print Report{/ts}</a>
+      {/if}
 
-  {if $mergeCases}
-    <tr class="crm-case-caseview-form-block-merge_case_id">
-      <td colspan='2'><a href="#" onClick='cj("#merge_cases").toggle( ); return false;'>{ts}Merge Case{/ts}</a>
-        <span id='merge_cases' class='hide-block'>
-          {$form.merge_case_id.html}&nbsp;{$form._qf_CaseView_next_merge_case.html}
+      {if $mergeCases}
+        <a href="#mergeCasesDialog" class="action-item no-popup crm-hover-button case-miniform"><span class="icon ui-icon-copy"></span>{ts}Merge Case{/ts}</a>
+        {$form._qf_CaseView_next_merge_case.html}
+        <span id="mergeCasesDialog" class="hiddenElement">
+          {$form.merge_case_id.html}
         </span>
-      </td>
-    </tr>
-  {/if}
+      {/if}
 
-  {if call_user_func(array('CRM_Core_Permission','giveMeAllACLs'))}
-    <tr class="crm-case-caseview-form-block-change_client_id">
-      <td colspan='2'>
-        <a class="crm-popup medium-popup" href="{crmURL p='civicrm/contact/view/case/editClient' h=0 q="reset=1&action=update&id=$caseID&cid=$contactID"}"><span class="icon swap-icon"></span> {ts}Assign to Another Contact{/ts}</a>
-      </td>
-    </tr>
-  {/if}
-</table>
+      {if call_user_func(array('CRM_Core_Permission','giveMeAllACLs'))}
+        <a class="action-item crm-hover-button medium-popup" href="{crmURL p='civicrm/contact/view/case/editClient' h=1 q="reset=1&action=update&id=$caseID&cid=$contactID"}"><span class="icon ui-icon-person"></span> {ts}Assign to Another Client{/ts}</a>
+      {/if}
+    </p>
+  </div>
+</div>
 
 <div class="clear"></div>
 {include file="CRM/Case/Page/CustomDataView.tpl"}
@@ -148,9 +147,20 @@
 
     {if $hasAccessToAllCases}
       <div class="crm-submit-buttons">
-        <a class="button" href="#" onclick="addRole();return false;"><span><div class="icon add-icon"></div>{ts}Add new role{/ts}</span></a>
+        <a class="button case-miniform" href="#addCaseRoleDialog" data-key="{crmKey name='civicrm/ajax/relation'}" rel="#caseRoles-selector"><div class="icon add-icon"></div>{ts}Add new role{/ts}</a>
+      </div>
+      <div id="addCaseRoleDialog" class="hiddenElement">
+        <div>{$form.role_type.label}</div>
+        <div>{$form.role_type.html}</div><br />
+        <div><label for="add_role_contact_id">{ts}Assign To{/ts}:</label></div>
+        <div><input name="add_role_contact_id" placeholder="{ts}- select contact -{/ts}" class="huge" /></div>
       </div>
     {/if}
+
+    <div id="editCaseRoleDialog" class="hiddenElement">
+      <div><label for="edit_role_contact_id">{ts}Change To{/ts}:</label></div>
+      <div><input name="edit_role_contact_id" placeholder="{ts}- select contact -{/ts}" class="huge" /></div>
+    </div>
 
     <table id="caseRoles-selector"  class="report-layout">
       <thead><tr>
@@ -164,38 +174,17 @@
       </tr></thead>
     </table>
 
+    <div id="deleteCaseRoleDialog" class="hiddenElement">
+     {ts}Are you sure you want to delete this case role?{/ts}
+    </div>
+
   {literal}
   <script type="text/javascript">
   var oTable;
 
   cj(function() {
-    cj().crmAccordions();
     buildCaseRoles(false);
   });
-
-  function deleteCaseRoles(caseselector) {
-    cj('.case-role-delete').click(function(){
-      var caseID = cj(this).attr('case_id');
-      var relType  = cj(this).attr('rel_type');
-
-      CRM.confirm(function() {
-        var postUrl = {/literal}"{crmURL p='civicrm/ajax/delcaserole' h=0 }"{literal};
-        cj.post( postUrl, {
-          rel_type: relType, case_id: caseID, key: {/literal}"{crmKey name='civicrm/ajax/delcaserole'}"{literal}},
-          function(data) {
-            // reloading datatable
-            var oTable = cj('#' + caseselector).dataTable();
-            oTable.fnDraw();
-          }
-        );
-      }
-      ,{
-        title: '{/literal}{ts escape="js"}Delete case role{/ts}{literal}',
-        message: '{/literal}{ts escape="js"}Are you sure you want to delete this case role?{/ts}{literal}'
-      });
-      return false;
-    });
-  }
 
   function buildCaseRoles(filterSearch) {
     if(filterSearch) {
@@ -250,161 +239,12 @@
     cj("#caseRoles-selector td:last-child").each( function( ) {
       cj(this).parent().addClass(cj(this).text() );
     });
-
-    // also bind delete action once rows are rendered
-    deleteCaseRoles('caseRoles-selector');
   }
 
 </script>
 {/literal}
  </div><!-- /.crm-accordion-body -->
 </div><!-- /.crm-accordion-wrapper -->
-<div id="dialog">
-  {ts}Begin typing last name of contact.{/ts}<br/>
-  <input type="text" id="rel_contact"/>
-  <input type="hidden" id="rel_contact_id" value="">
-</div>
-
-{literal}
-<script type="text/javascript">
-
-  cj("#dialog").hide( );
-
-  function addClient( ) {
-    cj("#dialog").show( );
-
-    cj("#dialog").dialog({
-      title: "{/literal}{ts escape="js"}Add Client to the Case{/ts}{literal}",
-      modal: true,
-      close  : function(event, ui) {
-        cj("#rel_contact").unautocomplete( );
-        cj("#dialog").hide( );
-      },
-      overlay: { opacity: 0.5, background: "black" },
-
-      open:function() {
-      var contactUrl = {/literal}"{crmURL p='civicrm/ajax/rest' q='className=CRM_Contact_Page_AJAX&fnName=getContactList&json=1&context=caseview' h=0 }"{literal};
-        cj("#rel_contact").autocomplete( contactUrl, {
-          width: 260,
-          selectFirst: false,
-          matchContains: true
-        });
-
-        cj("#rel_contact").focus();
-        cj("#rel_contact").result(function(event, data, formatted) {
-          cj("input[id=rel_contact_id]").val(data[1]);
-        });
-      },
-
-      buttons: {
-      "{/literal}{ts escape='js'}Done{/ts}{literal}": function() {
-        var postUrl = {/literal}"{crmURL p='civicrm/case/ajax/addclient' h=0 }"{literal};
-        var caseID        = {/literal}"{$caseID}"{literal};
-        var contactID = cj("#rel_contact_id").val( );
-
-        if ( !cj("#rel_contact").val( ) || !contactID ) {
-          cj("#rel_contact").crmError('{/literal}{ts escape="js"}Select valid contact from the list.{/ts}{literal}');
-          return false;
-        }
-        cj.post( postUrl, {contactID: contactID,caseID: caseID,
-          key: {/literal}"{crmKey name='civicrm/case/ajax/addclient'}"{literal} },
-          function( data ) {
-            //due to caching issues we use redirection rather than reload
-            document.location = {/literal}'{crmURL q="action=view&reset=1&id=$caseID&cid=$contactID&context=$context" h=0 }'{literal};
-          },
-          'json'
-        );
-        },
-
-        "{/literal}{ts escape='js'}Cancel{/ts}{literal}": function() {
-          cj(this).dialog("close");
-          cj(this).dialog("destroy");
-        }
-      }
-    });
-  }
-
-  function createRelationship( relType, contactID, relID, rowNumber, relTypeName ) {
-    cj("#dialog").show( );
-
-    cj("#dialog").dialog({
-      title: "Assign Case Role",
-      modal: true,
-      close: function(event, ui) { cj("#rel_contact").unautocomplete( ); },
-      open:function() {
-        /* set defaults if editing */
-        cj("#rel_contact").val("");
-        cj("#rel_contact_id").val(null);
-        if (contactID) {
-          cj("#rel_contact_id").val(contactID);
-          var contactName = cj('#caseRoles-selector').find('tr :eq('+ rowNumber +')').children(':eq(1)').text();
-          cj("#rel_contact").val(contactName);
-        }
-
-        var contactUrl = {/literal}"{crmURL p='civicrm/ajax/rest' q='className=CRM_Contact_Page_AJAX&fnName=getContactList&json=1&context=caseview' h=0 }"{literal};
-
-        cj("#rel_contact").autocomplete( contactUrl, {
-          width: 260,
-          selectFirst: false,
-          matchContains: true
-        });
-
-        cj("#rel_contact").focus();
-        cj("#rel_contact").result(function(event, data, formatted) {
-          cj("input[id=rel_contact_id]").val(data[1]);
-        });
-      },
-
-      buttons: {
-        "{/literal}{ts escape='js'}Ok{/ts}{literal}": function() {
-
-          var sourceContact = {/literal}"{$contactID}"{literal};
-          var caseID        = {/literal}"{$caseID}"{literal};
-
-          var v1 = cj("#rel_contact_id").val( );
-
-          if ( !cj("#rel_contact").val( ) || !v1 ) {
-            cj("#rel_contact").crmError('{/literal}{ts escape="js"}Select valid contact from the list{/ts}{literal}.');
-            return false;
-          }
-
-          var postUrl = {/literal}"{crmURL p='civicrm/ajax/relation' h=0 }"{literal};
-          cj.post( postUrl, { rel_contact: v1, rel_type: relType, contact_id: sourceContact,
-            rel_id: relID, case_id: caseID, key: {/literal}"{crmKey name='civicrm/ajax/relation'}"{literal} },
-            function( data ) {
-              if ( data.status == 'process-relationship-success' ) {
-                // reloading datatable
-                var oTable = cj('#caseRoles-selector').dataTable();
-                oTable.fnDraw();
-              }
-              else {
-                // This is an awkward mix of smarty and javascript: the relTypeName variable is
-                // not available in smarty, could not find an i18n-correct way of doing this.
-                {/literal}
-                  {capture assign=relTypeAdminLink}{crmURL p='civicrm/admin/reltype' q='reset=1' h=0 }{/capture}
-                {literal}
-                var errorMsg = relTypeName + ': ' + '{/literal}{ts escape="js" 1="$relTypeAdminLink"}The relationship type definition for the case role is not valid for the client and / or staff contact types. You can review and edit relationship types at <a href="%1">Administer >> Option Lists >> Relationship Types</a>.{/ts}{literal}';
-
-                //display error message.
-                cj().crmError(errorMsg);
-              }
-            }, 'json'
-          );
-
-          cj(this).dialog("close");
-          cj(this).dialog("destroy");
-        },
-
-        "{/literal}{ts escape='js'}Cancel{/ts}{literal}": function() {
-          cj(this).dialog("close");
-          cj(this).dialog("destroy");
-        }
-      }
-    });
-  }
-
-</script>
-{/literal}
 
   {if $hasAccessToAllCases}
   <div class="crm-accordion-wrapper collapsed crm-case-other-relationships-block">
@@ -499,8 +339,9 @@
 
   {if $globalRelationships}
     <div class="crm-submit-buttons">
-      <a class="button" href="#"  onClick="window.location='{crmURL p='civicrm/group/search' q="reset=1&context=amtg&amtgID=`$globalGroupInfo.id`"}'; return false;">
-      <span><div class="icon add-icon"></div>{ts 1=$globalGroupInfo.title}Add members to %1{/ts}</a></span>
+      <a class="button case-miniform" href="#addMembersToGroupDialog" rel="#globalRelationships-selector" data-group_id="{$globalGroupInfo.id}">
+        <div class="icon add-icon"></div>{ts 1=$globalGroupInfo.title}Add members to %1{/ts}
+      </a>
     </div>
     <table id="globalRelationships-selector"  class="report-layout">
       <thead><tr>
@@ -512,10 +353,12 @@
     {elseif $globalGroupInfo.id}
     <div class="messages status no-popup">
       <div class="icon inform-icon"></div>&nbsp;
-      {capture assign=crmURL}{crmURL p='civicrm/group/search' q="reset=1&context=amtg&amtgID=`$globalGroupInfo.id`"}{/capture}
-      {ts 1=$crmURL 2=$globalGroupInfo.title}The group %2 has no members. You can <a href='%1'>add one</a>.{/ts}
+      {ts 1=$globalGroupInfo.title}The group %1 has no members.{/ts}
     </div>
   {/if}
+  <div id="addMembersToGroupDialog" class="hiddenElement">
+    <input name="add_member_to_group_contact_id" placeholder="{ts}- select contact -{/ts}" class="huge" />
+  </div>
 
  {literal}
  <script type="text/javascript">
@@ -584,105 +427,6 @@
 </div><!-- /.crm-accordion-wrapper -->
 
 {/if} {* other relationship section ends *}
-
-<div id="addRoleDialog">
-{$form.role_type.label}<br />
-{$form.role_type.html}
-<br /><br />
-    {ts}Begin typing last name of contact.{/ts}<br/>
-    <input type="text" id="role_contact"/>
-    <input type="hidden" id="role_contact_id" value="">
-</div>
-
-{literal}
-<script type="text/javascript">
-
-cj("#addRoleDialog").hide( );
-function addRole() {
-  cj("#addRoleDialog").show( );
-
-  cj("#addRoleDialog").dialog({
-    title: "Add Role",
-    modal: true,
-    close: function(event, ui) { cj("#role_contact").unautocomplete( ); },
-    open:function() {
-      /* set defaults if editing */
-      cj("#role_contact").val( "" );
-      cj("#role_contact_id").val( null );
-
-      var contactUrl = {/literal}"{crmURL p='civicrm/ajax/rest' q='className=CRM_Contact_Page_AJAX&fnName=getContactList&json=1&context=caseview' h=0 }"{literal};
-
-      cj("#role_contact").autocomplete( contactUrl, {
-        width: 260,
-        selectFirst: false,
-        matchContains: true
-      });
-
-      cj("#role_contact").focus();
-      cj("#role_contact").result(function(event, data, formatted) {
-        cj("input[id=role_contact_id]").val(data[1]);
-      });
-    },
-
-    buttons: {
-      "{/literal}{ts escape='js'}Ok{/ts}{literal}": function() {
-        var sourceContact = {/literal}"{$contactID}"{literal};
-        var caseID        = {/literal}"{$caseID}"{literal};
-        var relID         = null;
-
-        var v2 = cj("#role_type").val();
-        if (!v2) {
-          cj("#role_type").crmError('{/literal}{ts escape="js"}Select valid type from the list{/ts}{literal}.');
-          return false;
-        }
-
-        var v1 = cj("#role_contact_id").val( );
-        if (!cj("#role_contact").val( ) || !v1) {
-          cj("#role_contact").crmError('{/literal}{ts escape="js"}Select valid contact from the list{/ts}{literal}.');
-          return false;
-        }
-
-        /* send synchronous request so that disabling any actions for slow servers*/
-        var postUrl = {/literal}"{crmURL p='civicrm/ajax/relation' h=0 }"{literal};
-        var data = 'rel_contact='+ v1 + '&rel_type='+ v2 + '&contact_id='+sourceContact + '&rel_id='+ relID
-          + '&case_id=' + caseID + "&key={/literal}{crmKey name='civicrm/ajax/relation'}{literal}";
-        cj.ajax({
-          type     : "POST",
-          url      : postUrl,
-          data     : data,
-          async    : false,
-          dataType : "json",
-          success  : function(values) {
-            if (values.status == 'process-relationship-success') {
-              // reloading datatable
-              var oTable = cj('#caseRoles-selector').dataTable();
-              oTable.fnDraw();
-            }
-            else {
-              var relTypeName = cj("#role_type :selected").text();
-              var relTypeAdminLink = {/literal}"{crmURL p='civicrm/admin/reltype' q='reset=1' h=0 }"{literal};
-              var errorMsg = '{/literal}{ts escape="js" 1="' + relTypeName + '" 2="' + relTypeAdminLink + '"}The relationship type definition for the %1 case role is not valid for the client and / or staff contact types. You can review and edit relationship types at <a href="%2">Administer >> Option Lists >> Relationship Types</a>{/ts}{literal}.';
-
-              //display error message.
-              cj().crmError(errorMsg);
-            }
-          }
-        });
-
-        cj(this).dialog("close");
-        cj(this).dialog("destroy");
-      },
-
-      "{/literal}{ts escape='js'}Cancel{/ts}{literal}": function() {
-        cj(this).dialog("close");
-        cj(this).dialog("destroy");
-      }
-    }
-  });
-}
-
-</script>
-{/literal}
 {include file="CRM/Case/Form/ActivityToCase.tpl"}
 
 {* pane to display / edit regular tags or tagsets for cases *}
@@ -718,13 +462,13 @@ function addRole() {
    {/if}
 
   <div class="crm-submit-buttons">
-    <a class="button case-miniform" href="#manageTags" data-qfkey="{crmKey name='civicrm/case/ajax/processtags'}">{if $tagExits}{ts}Edit Tags{/ts}{else}{ts}Add Tags{/ts}{/if}</a>
+    <a class="button case-miniform" href="#manageTagsDialog" data-key="{crmKey name='civicrm/case/ajax/processtags'}">{if $tagExits}{ts}Edit Tags{/ts}{else}{ts}Add Tags{/ts}{/if}</a>
   </div>
 
  </div><!-- /.crm-accordion-body -->
 </div><!-- /.crm-accordion-wrapper -->
 
-<div id="manageTags">
+<div id="manageTagsDialog" class="hiddenElement">
   <div class="label">{$form.case_tag.label}</div>
   <div class="view-value"><div class="crm-select-container">{$form.case_tag.html}</div>
     <br/>
@@ -803,41 +547,6 @@ function addRole() {
 <script type="text/javascript">
 var oTable;
 
-function checkSelection( field ) {
-  var validationMessage = '';
-  var validationField   = '';
-  var successAction     = '';
-  var forceValidation   = false;
-
-  var fName = field.name;
-
-  switch ( fName )  {
-  case '_qf_CaseView_next' :
-    validationMessage = '{/literal}{ts escape="js"}Please select an activity set from the list.{/ts}{literal}';
-    validationField   = 'timeline_id';
-    successAction     = "confirm('{/literal}{ts escape='js'}Are you sure you want to add a set of scheduled activities to this case?{/ts}{literal}');";
-    break;
-
-  case 'case_report' :
-    validationMessage = '{/literal}{ts escape="js"}Please select a report from the list.{/ts}{literal}';
-    validationField   = 'report_id';
-    successAction     = "window.location='{/literal}{$reportUrl}{literal}' + document.getElementById('report_id').value";
-    break;
-
-  case '_qf_CaseView_next_merge_case' :
-    validationMessage = '{/literal}{ts escape="js"}Please select a case from the list to merge with.{/ts}{literal}';
-    validationField   = 'merge_case_id';
-    break;
-  }
-  if ( forceValidation || ( document.getElementById( validationField ).value == '' ) ) {
-    cj('#'+validationField).crmError(validationMessage);
-    return false;
-  }
-  else if ( successAction ) {
-    return eval( successAction );
-  }
-}
-
 cj(function( ) {
   buildCaseActivities(false);
 });
@@ -915,14 +624,6 @@ function setSelectorClass( ) {
 {/literal}
 
 <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
-
-{literal}
-<script type="text/javascript">
-  cj(function() {
-    cj().crmAccordions();
-  });
-</script>
-{/literal}
 
   {include file="CRM/Case/Form/ActivityChangeStatusJs.tpl"}
 {/if} {* view related cases if end *}
