@@ -161,16 +161,6 @@ class Kernel {
         _civicrm_api_call_nested_api($apiRequest['params'], $result, $apiRequest['action'], $apiRequest['entity'], $apiRequest['version']);
       }
 
-      if (function_exists('xdebug_time_index')
-        && \CRM_Utils_Array::value('debug', $apiRequest['params'])
-        // result would not be an array for getvalue
-        && is_array($result)
-      ) {
-        $result['xdebug']['peakMemory'] = xdebug_peak_memory_usage();
-        $result['xdebug']['memory'] = xdebug_memory_usage();
-        $result['xdebug']['timeIndex'] = xdebug_time_index();
-      }
-
       $responseEvent = $this->dispatcher->dispatch(Events::RESPOND, new RespondEvent(NULL, $apiRequest, $result));
       $result = $responseEvent->getResponse();
 
