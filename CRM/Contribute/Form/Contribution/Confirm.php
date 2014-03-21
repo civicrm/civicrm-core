@@ -1521,7 +1521,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
 
     $recurring = CRM_Contribute_BAO_ContributionRecur::add($recurParams);
     if (is_a($recurring, 'CRM_Core_Error')) {
-      CRM_Core_Error::displaySessionError($result);
+      CRM_Core_Error::displaySessionError($recurring);
       $urlString = 'civicrm/contribute/transact';
       $urlParams = '_qf_Main_display=true';
       if (get_class($form) == 'CRM_Contribute_Form_Contribution') {
