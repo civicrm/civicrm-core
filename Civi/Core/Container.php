@@ -87,6 +87,7 @@ class Container {
    */
   public function createApiKernel($dispatcher) {
     $dispatcher->addSubscriber(new \Civi\API\Subscriber\TransactionSubscriber());
+    $dispatcher->addSubscriber(new \Civi\API\Subscriber\XDebugSubscriber());
     $dispatcher->addListener(\Civi\API\Events::AUTHORIZE, function($event) {
       // dummy placeholder
       $event->authorize();
