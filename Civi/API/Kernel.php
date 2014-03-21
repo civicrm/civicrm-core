@@ -143,36 +143,15 @@ class Kernel {
         $result = $apiWrapper->toApiOutput($apiRequest, $result);
       }
 
-      if (\CRM_Utils_Array::value('format.is_success', $apiRequest['params']) == 1) {
-        if ($result['is_error'] === 0) {
-          // FIXME dispatch
-          return 1;
-        }
-        else {
-          // FIXME dispatch
-          return 0;
-        }
-      }
-      if (!empty($apiRequest['params']['format.only_id']) && isset($result['id'])) {
-        // FIXME dispatch
-        return $result['id'];
-      }
-
       if (\CRM_Utils_Array::value('is_error', $result, 0) == 0) {
         _civicrm_api_call_nested_api($apiRequest['params'], $result, $apiRequest['action'], $apiRequest['entity'], $apiRequest['version']);
       }
 
       $responseEvent = $this->dispatcher->dispatch(Events::RESPOND, new RespondEvent(NULL, $apiRequest, $result));
-      $result = $responseEvent->getResponse();
-
-      return $result;
+      return $this->formatResult($apiRequest, $responseEvent->getResponse());
     }
     catch (\Exception $e) {
       $this->dispatcher->dispatch(Events::EXCEPTION, new ExceptionEvent($e, NULL, $apiRequest));
-
-      if (isset($apiRequest, $apiRequest['params'], $apiRequest['params']['format.is_success']) && $apiRequest['params']['format.is_success'] == 1) {
-        return 0;
-      }
 
       if ($e instanceof \PEAR_Exception) {
         $err = $this->formatPearException($e, $apiRequest);
@@ -182,7 +161,7 @@ class Kernel {
         $err = $this->formatException($e, $apiRequest);
       }
 
-      return $err;
+      return $this->formatResult($apiRequest, $err);
     }
 
   }
@@ -251,5 +230,22 @@ class Kernel {
     }
 
     return civicrm_api3_create_error($e->getMessage(), $data, $apiRequest);
+  }
+
+  /**
+   * @return mixed
+   */
+  public function formatResult($apiRequest, $result) {
+    if (isset($apiRequest, $apiRequest['params'])) {
+      if (isset($apiRequest['params']['format.is_success']) && $apiRequest['params']['format.is_success'] == 1) {
+        return (empty($result['is_error'])) ? 1 : 0;
+      }
+
+      if (!empty($apiRequest['params']['format.only_id']) && isset($result['id'])) {
+        // FIXME dispatch
+        return $result['id'];
+      }
+    }
+    return $result;
   }
 }
