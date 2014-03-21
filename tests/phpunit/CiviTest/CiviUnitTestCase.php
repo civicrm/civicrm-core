@@ -681,6 +681,18 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   }
 
   /**
+   * A stub for the API interface. This can be overriden by subclasses to change how the API is called.
+   *
+   * @param $entity
+   * @param $action
+   * @param $params
+   * @return array|int
+   */
+  function civicrm_api($entity, $action, $params) {
+    return civicrm_api($entity, $action, $params);
+  }
+
+  /**
    * This function exists to wrap api functions
    * so we can ensure they succeed & throw exceptions without litterering the test with checks
    * @param string $entity
@@ -706,7 +718,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
       case 'getcount' :
           return $this->callAPISuccessGetCount($entity, $params, $checkAgainst);
     }
-    $result = civicrm_api($entity, $action, $params);
+    $result = $this->civicrm_api($entity, $action, $params);
     $this->assertAPISuccess($result, "Failure in api call for $entity $action");
     return $result;
   }
@@ -730,7 +742,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
       'version' => $this->_apiversion,
       'debug' => 1,
     );
-    $result = civicrm_api($entity, 'getvalue', $params);
+    $result = $this->civicrm_api($entity, 'getvalue', $params);
     if($type){
       if($type == 'integer'){
         // api seems to return integers as strings
@@ -761,7 +773,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
       'version' => $this->_apiversion,
       'debug' => 1,
     );
-    $result = civicrm_api($entity, 'getsingle', $params);
+    $result = $this->civicrm_api($entity, 'getsingle', $params);
     if(!is_array($result) || !empty($result['is_error']) || isset($result['values'])) {
       throw new Exception('Invalid getsingle result' . print_r($result, TRUE));
     }
@@ -790,7 +802,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
       'version' => $this->_apiversion,
       'debug' => 1,
     );
-    $result = civicrm_api($entity, 'getcount', $params);
+    $result = $this->civicrm_api($entity, 'getcount', $params);
     if(!is_integer($result) || !empty($result['is_error']) || isset($result['values'])) {
       throw new Exception('Invalid getcount result : ' . print_r($result, TRUE) . " type :" . gettype($result));
     }
@@ -835,7 +847,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
         'version' => $this->_apiversion,
       );
     }
-    $result = civicrm_api($entity, $action, $params);
+    $result = $this->civicrm_api($entity, $action, $params);
     $this->assertAPIFailure($result, "We expected a failure for $entity $action but got a success");
     return $result;
   }
@@ -1582,7 +1594,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
       'contact_id.1' => $contactId,
       'group_id' => 1,
     );
-    civicrm_api('GroupContact', 'Delete', $params);
+    $this->civicrm_api('GroupContact', 'Delete', $params);
   }
 
   /**

@@ -94,6 +94,12 @@ class Container {
       array(new Reference('annotation_reader'))
     ));
 
+    $container->setDefinition('civi_api_kernel', new Definition(
+      '\Civi\API\Kernel',
+      array(new Reference('dispatcher'))
+    ))
+      ->setFactoryService(self::SELF)->setFactoryMethod('createApiKernel');
+
     return $container;
   }
 
@@ -157,5 +163,14 @@ class Container {
   public function createEventDispatcher() {
     $dispatcher = new \Symfony\Component\EventDispatcher\EventDispatcher();
     return $dispatcher;
+  }
+
+  /**
+   * @param \Symfony\Component\EventDispatcher\EventDispatcher $dispatcher
+   * @return \Civi\API\Kernel
+   */
+  public function createApiKernel($dispatcher) {
+    $kernel = new \Civi\API\Kernel($dispatcher, array());
+    return $kernel;
   }
 }
