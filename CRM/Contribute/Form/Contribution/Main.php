@@ -1073,38 +1073,38 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
 
     if (!empty($params['priceSetId'])) {
       $is_quick_config = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $this->_priceSetId, 'is_quick_config');
-      $formValue = array();
       if ($is_quick_config) {
         $priceField = new CRM_Price_DAO_PriceField();
         $priceField->price_set_id = $params['priceSetId'];
         $priceField->orderBy('weight');
         $priceField->find();
 
-        $values = array();
+        $priceOptions = array();
         while ($priceField->fetch()) {
-          CRM_Price_BAO_PriceFieldValue::getValues($priceField->id, $values);
-          if ($priceField->name == 'membership_amount') {
-            if ($priceFiledID = CRM_Utils_Array::value("price_{$priceField->id}", $params)) {
-              $this->_params['selectMembership'] = $params['selectMembership'] = CRM_Utils_Array::value('membership_type_id', $values[$priceFiledID]);
-              $this->set('selectMembership',CRM_Utils_Array::value('selectMembership', $params));
-              if (CRM_Utils_Array::value('is_separate_payment', $this->_membershipBlock) == 0) {
-                $this->_values['amount'] = CRM_Utils_Array::value('amount', $values[$priceFiledID]);
-              }
+          CRM_Price_BAO_PriceFieldValue::getValues($priceField->id, $priceOptions);
+          if ($selectedPriceOptionID = CRM_Utils_Array::value("price_{$priceField->id}", $params)) {
+            switch ($priceField->name) {
+              case 'membership_amount':
+                $this->_params['selectMembership'] = $params['selectMembership'] = CRM_Utils_Array::value('membership_type_id', $priceOptions[$selectedPriceOptionID]);
+                $this->set('selectMembership', $params['selectMembership']);
+                if (CRM_Utils_Array::value('is_separate_payment', $this->_membershipBlock) == 0) {
+                  $this->_values['amount'] = CRM_Utils_Array::value('amount', $priceOptions[$selectedPriceOptionID]);
+                }
+                break;
+
+              case 'contribution_amount':
+                $params['amount'] = $selectedPriceOptionID;
+                $this->_values['amount'] = CRM_Utils_Array::value('amount', $priceOptions[$selectedPriceOptionID]);
+                $this->_values[$selectedPriceOptionID]['value'] = CRM_Utils_Array::value('amount', $priceOptions[$selectedPriceOptionID]);
+                $this->_values[$selectedPriceOptionID]['label'] = CRM_Utils_Array::value('label', $priceOptions[$selectedPriceOptionID]);
+                $this->_values[$selectedPriceOptionID]['amount_id'] = CRM_Utils_Array::value('id', $priceOptions[$selectedPriceOptionID]);
+                $this->_values[$selectedPriceOptionID]['weight'] = CRM_Utils_Array::value('weight', $priceOptions[$selectedPriceOptionID]);
+                break;
+
+              case 'other_amount':
+                $params['amount_other'] = $selectedPriceOptionID;
+                break;
             }
-          }
-          if ($priceField->name == 'contribution_amount') {
-            $priceFiledID = CRM_Utils_Array::value("price_{$priceField->id}", $params);
-            if ($priceFiledID > 0 && !empty($priceFiledID)) {
-              $params['amount'] = $priceFiledID;
-              $this->_values['amount'] = CRM_Utils_Array::value('amount', $values[$priceFiledID]);
-              $this->_values[$priceFiledID]['value'] = CRM_Utils_Array::value('amount', $values[$priceFiledID]);
-              $this->_values[$priceFiledID]['label'] = CRM_Utils_Array::value('label', $values[$priceFiledID]);
-              $this->_values[$priceFiledID]['amount_id'] = CRM_Utils_Array::value('id', $values[$priceFiledID]);
-              $this->_values[$priceFiledID]['weight'] = CRM_Utils_Array::value('weight', $values[$priceFiledID]);
-            }
-          }
-          if ($priceField->name == 'other_amount' && $priceFiledID = CRM_Utils_Array::value("price_{$priceField->id}", $params)) {
-            $params['amount_other'] = $priceFiledID;
           }
         }
       }
