@@ -99,11 +99,6 @@ class Kernel {
 
       $apiRequest = $this->dispatcher->dispatch(Events::PREPARE, new PrepareEvent(NULL, $apiRequest))->getApiRequest();
 
-      if (strtolower($action) == 'create' || strtolower($action) == 'delete' || strtolower($action) == 'submit') {
-        $apiRequest['is_transactional'] = 1;
-        $transaction = new \CRM_Core_Transaction();
-      }
-
       // support multi-lingual requests
       if ($language = \CRM_Utils_Array::value('option.language', $params)) {
         _civicrm_api_set_locale($language);
@@ -202,9 +197,6 @@ class Kernel {
         $data['tip'] = "add debug=1 to your API call to have more info about the error";
       }
       $err = civicrm_api3_create_error($e->getMessage(), $data, $apiRequest);
-      if (!empty($apiRequest['is_transactional'])) {
-        $transaction->rollback();
-      }
       $this->dispatcher->dispatch(Events::EXCEPTION, new ExceptionEvent($e, NULL, $apiRequest));
       return $err;
     }
@@ -224,9 +216,6 @@ class Kernel {
       ) {
         $err['trace'] = $e->getTraceAsString();
       }
-      if (!empty($apiRequest['is_transactional'])) {
-        $transaction->rollback();
-      }
       $this->dispatcher->dispatch(Events::EXCEPTION, new ExceptionEvent($e, NULL, $apiRequest));
       return $err;
     }
@@ -238,9 +227,6 @@ class Kernel {
       $err = civicrm_api3_create_error($e->getMessage(), $data, $apiRequest, $e->getCode());
       if (!empty($apiRequest['params']['debug'])) {
         $err['trace'] = $e->getTraceAsString();
-      }
-      if (!empty($apiRequest['is_transactional'])) {
-        $transaction->rollback();
       }
       $this->dispatcher->dispatch(Events::EXCEPTION, new ExceptionEvent($e, NULL, $apiRequest));
       return $err;
