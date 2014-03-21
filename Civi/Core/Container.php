@@ -86,6 +86,10 @@ class Container {
    * @return \Civi\API\Kernel
    */
   public function createApiKernel($dispatcher) {
+    $dispatcher->addListener(\Civi\API\Events::AUTHORIZE, function($event) {
+      // dummy placeholder
+      $event->authorize();
+    });
     $kernel = new \Civi\API\Kernel($dispatcher, array());
     return $kernel;
   }
