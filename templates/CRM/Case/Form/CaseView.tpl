@@ -102,40 +102,36 @@
   </div>
   {/if}
 
-<table class="form-layout">
-<tr class="crm-case-caseview-form-block-activity_type_id">
-  <td>{$form.add_activity_type_id.html}</td>
-  {if $hasAccessToAllCases}
-    <td>
-      <a class="button no-popup" href="{crmURL p='civicrm/case/report/print' q="all=1&redact=0&cid=$contactID&caseID=$caseId&asn=standard_timeline"}"><div class="icon print-icon"></div> {ts}Print Report{/ts}</a>
-    </td>
-  </tr>
-  <tr>
-    <td class="crm-case-caseview-form-block-timeline_id">{$form.timeline_id.label}<br />{$form.timeline_id.html}&nbsp;{$form._qf_CaseView_next.html}</td>
-    <td class="crm-case-caseview-form-block-report_id">{$form.report_id.label}<br />{$form.report_id.html}&nbsp;<input type="button" accesskey="R" value="Go" name="case_report" onclick="checkSelection( this );"/></td>
-    {else}
-    <td></td>
-  {/if}
-</tr>
+<div class="case-control-panel">
+  <div>
+    <p>
+      {$form.add_activity_type_id.html}
+      {if $hasAccessToAllCases} &nbsp;
+        {$form.timeline_id.html}{$form._qf_CaseView_next.html} &nbsp;
+        {$form.report_id.html}
+      {/if}
+    </p>
+  </div>
+  <div>
+    <p>
+      {if $hasAccessToAllCases}
+        <a class="crm-hover-button action-item no-popup" href="{crmURL p='civicrm/case/report/print' q="all=1&redact=0&cid=$contactID&caseID=$caseId&asn=standard_timeline"}"><span class="icon print-icon"></span> {ts}Print Report{/ts}</a>
+      {/if}
 
-  {if $mergeCases}
-    <tr class="crm-case-caseview-form-block-merge_case_id">
-      <td colspan='2'><a href="#" onClick='cj("#merge_cases").toggle( ); return false;'>{ts}Merge Case{/ts}</a>
-        <span id='merge_cases' class='hide-block'>
-          {$form.merge_case_id.html}&nbsp;{$form._qf_CaseView_next_merge_case.html}
+      {if $mergeCases}
+        <a href="#merge_cases" class="action-item no-popup crm-hover-button case-miniform"><span class="icon ui-icon-copy"></span>{ts}Merge Case{/ts}</a>
+        {$form._qf_CaseView_next_merge_case.html}
+        <span id='merge_cases' class="hiddenElement">
+          {$form.merge_case_id.html}
         </span>
-      </td>
-    </tr>
-  {/if}
+      {/if}
 
-  {if call_user_func(array('CRM_Core_Permission','giveMeAllACLs'))}
-    <tr class="crm-case-caseview-form-block-change_client_id">
-      <td colspan='2'>
-        <a class="crm-popup medium-popup" href="{crmURL p='civicrm/contact/view/case/editClient' h=0 q="reset=1&action=update&id=$caseID&cid=$contactID"}"><span class="icon swap-icon"></span> {ts}Assign to Another Contact{/ts}</a>
-      </td>
-    </tr>
-  {/if}
-</table>
+      {if call_user_func(array('CRM_Core_Permission','giveMeAllACLs'))}
+        <a class="action-item crm-hover-button medium-popup" href="{crmURL p='civicrm/contact/view/case/editClient' h=1 q="reset=1&action=update&id=$caseID&cid=$contactID"}"><span class="icon ui-icon-person"></span> {ts}Assign to Another Client{/ts}</a>
+      {/if}
+    </p>
+  </div>
+</div>
 
 <div class="clear"></div>
 {include file="CRM/Case/Page/CustomDataView.tpl"}
@@ -164,38 +160,17 @@
       </tr></thead>
     </table>
 
+    <div id="deleteCaseRole" class="case-miniform hiddenElement">
+     {ts}Are you sure you want to delete this case role?{/ts}
+    </div>
+
   {literal}
   <script type="text/javascript">
   var oTable;
 
   cj(function() {
-    cj().crmAccordions();
     buildCaseRoles(false);
   });
-
-  function deleteCaseRoles(caseselector) {
-    cj('.case-role-delete').click(function(){
-      var caseID = cj(this).attr('case_id');
-      var relType  = cj(this).attr('rel_type');
-
-      CRM.confirm(function() {
-        var postUrl = {/literal}"{crmURL p='civicrm/ajax/delcaserole' h=0 }"{literal};
-        cj.post( postUrl, {
-          rel_type: relType, case_id: caseID, key: {/literal}"{crmKey name='civicrm/ajax/delcaserole'}"{literal}},
-          function(data) {
-            // reloading datatable
-            var oTable = cj('#' + caseselector).dataTable();
-            oTable.fnDraw();
-          }
-        );
-      }
-      ,{
-        title: '{/literal}{ts escape="js"}Delete case role{/ts}{literal}',
-        message: '{/literal}{ts escape="js"}Are you sure you want to delete this case role?{/ts}{literal}'
-      });
-      return false;
-    });
-  }
 
   function buildCaseRoles(filterSearch) {
     if(filterSearch) {
@@ -250,9 +225,6 @@
     cj("#caseRoles-selector td:last-child").each( function( ) {
       cj(this).parent().addClass(cj(this).text() );
     });
-
-    // also bind delete action once rows are rendered
-    deleteCaseRoles('caseRoles-selector');
   }
 
 </script>
@@ -718,13 +690,13 @@ function addRole() {
    {/if}
 
   <div class="crm-submit-buttons">
-    <a class="button case-miniform" href="#manageTags" data-qfkey="{crmKey name='civicrm/case/ajax/processtags'}">{if $tagExits}{ts}Edit Tags{/ts}{else}{ts}Add Tags{/ts}{/if}</a>
+    <a class="button case-miniform" href="#manageTags" data-key="{crmKey name='civicrm/case/ajax/processtags'}">{if $tagExits}{ts}Edit Tags{/ts}{else}{ts}Add Tags{/ts}{/if}</a>
   </div>
 
  </div><!-- /.crm-accordion-body -->
 </div><!-- /.crm-accordion-wrapper -->
 
-<div id="manageTags">
+<div id="manageTags" class="hiddenElement">
   <div class="label">{$form.case_tag.label}</div>
   <div class="view-value"><div class="crm-select-container">{$form.case_tag.html}</div>
     <br/>
@@ -803,41 +775,6 @@ function addRole() {
 <script type="text/javascript">
 var oTable;
 
-function checkSelection( field ) {
-  var validationMessage = '';
-  var validationField   = '';
-  var successAction     = '';
-  var forceValidation   = false;
-
-  var fName = field.name;
-
-  switch ( fName )  {
-  case '_qf_CaseView_next' :
-    validationMessage = '{/literal}{ts escape="js"}Please select an activity set from the list.{/ts}{literal}';
-    validationField   = 'timeline_id';
-    successAction     = "confirm('{/literal}{ts escape='js'}Are you sure you want to add a set of scheduled activities to this case?{/ts}{literal}');";
-    break;
-
-  case 'case_report' :
-    validationMessage = '{/literal}{ts escape="js"}Please select a report from the list.{/ts}{literal}';
-    validationField   = 'report_id';
-    successAction     = "window.location='{/literal}{$reportUrl}{literal}' + document.getElementById('report_id').value";
-    break;
-
-  case '_qf_CaseView_next_merge_case' :
-    validationMessage = '{/literal}{ts escape="js"}Please select a case from the list to merge with.{/ts}{literal}';
-    validationField   = 'merge_case_id';
-    break;
-  }
-  if ( forceValidation || ( document.getElementById( validationField ).value == '' ) ) {
-    cj('#'+validationField).crmError(validationMessage);
-    return false;
-  }
-  else if ( successAction ) {
-    return eval( successAction );
-  }
-}
-
 cj(function( ) {
   buildCaseActivities(false);
 });
@@ -915,14 +852,6 @@ function setSelectorClass( ) {
 {/literal}
 
 <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
-
-{literal}
-<script type="text/javascript">
-  cj(function() {
-    cj().crmAccordions();
-  });
-</script>
-{/literal}
 
   {include file="CRM/Case/Form/ActivityChangeStatusJs.tpl"}
 {/if} {* view related cases if end *}

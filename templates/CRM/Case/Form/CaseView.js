@@ -5,9 +5,9 @@
     $('#crm-main-content-wrapper').crmSnippet('refresh');
   }
 
-  function open(url) {
+  function open(url, options) {
     if (CRM.config.ajaxPopupsEnabled) {
-      CRM.loadForm(url).on('crmFormSuccess', refresh);
+      CRM.loadForm(url, options).on('crmFormSuccess', refresh);
     }
     else {
       window.location.href = url;
@@ -31,7 +31,6 @@
   var detached = {},
     miniForms = {
       '#manageTags': function() {
-        console.log(this);
         var tagsChecked = $("#manageTags #tags").select2('val').join(','),
           tagList = {},
           url = CRM.url('civicrm/case/ajax/processtags');
@@ -43,17 +42,26 @@
           case_id: caseId(),
           tag: tagsChecked,
           taglist: tagList,
-          key: $(this).data('qfkey')
+          key: $(this).data('key')
         };
-
         return $.post(url, data);
+      },
+      '#merge_cases': function() {
+        if ($('select#merge_case_id').val()) {
+          $('select#merge_case_id').appendTo('form#CaseView');
+          $('[name="_qf_CaseView_next_merge_case"]').click();
+        }
+      },
+      '#deleteCaseRole': function() {
+        var params = $.extend({case_id: caseId()}, $(this).data());
+        return $.post(CRM.url('civicrm/ajax/delcaserole'), params);
       }
     };
 
   function detachMiniForms() {
     detached = {};
     $.each(miniForms, function(selector) {
-      detached[selector] = $(selector).detach();
+      detached[selector] = $(selector).detach().removeClass('hiddenElement');
     });
   }
 
@@ -66,20 +74,49 @@
         open($(this).val());
         $(this).select2('val', '');
       })
+      .on('change', 'select[name=timeline_id]', function() {
+        if ($(this).val()) {
+          CRM.confirm(ts('Add'), {
+            title: $('option:first', this).text(),
+            message: ts('Add the %1 set of scheduled activities to this case?', {1: '<em>' + $('option:selected', this).text() + '</em>'})
+          })
+            .on('crmConfirmYes', function () {
+              $('[name=_qf_CaseView_next]').click();
+            })
+            .on('crmConfirmNo', function() {
+              $('select[name=timeline_id]').select2('val', '');
+            });
+        }
+      })
+      .on('change', 'select[name=report_id]', function() {
+        if ($(this).val()) {
+          var url = CRM.url('civicrm/case/report', {
+            reset: 1,
+            cid: contactId(),
+            caseid: caseId(),
+            asn: $(this).val()
+          });
+          open(url, {dialog: {width: '50%', height: 'auto'}});
+          $(this).select2('val', '');
+        }
+      })
       .on('click', 'a.case-miniform', function() {
         var dialog,
           $el = $(this),
           target = $el.attr('href');
         function submit() {
-          dialog.parent().block();
-          miniForms[target].call($el[0]).done(function() {
-            dialog.dialog('close');
-            refresh();
-          });
-          return false;
+          var submission = miniForms[target].call($el[0]);
+          if (submission) {
+            dialog.parent().block();
+            submission.done(function() {
+              dialog.dialog('close');
+              refresh();
+            });
+            return false;
+          }
         }
         dialog = CRM.confirm(submit, {
-          title: $(this).text(),
+          title: $(this).attr('title') || $(this).text(),
           message: detached[target],
           close: function() {
             detached[target] = $(target, dialog).detach();
@@ -88,5 +125,6 @@
         });
         return false;
       });
+    $().crmAccordions();
   });
 }(cj, CRM))

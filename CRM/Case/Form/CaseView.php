@@ -276,23 +276,20 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
       $activityLinks[$url] = $label;
     }
 
-    $this->add('select', 'add_activity_type_id', '', $activityLinks, FALSE, array('class' => 'crm-select2 crm-action-menu'));
+    $this->add('select', 'add_activity_type_id', '', $activityLinks, FALSE, array('class' => 'crm-select2 crm-action-menu twenty'));
     if ($this->_hasAccessToAllCases) {
-      $this->add('select', 'report_id', ts('Run QA Audit / Redact'),
-        array(
-          '' => ts('- select activity set -')) + $reports
+      $this->add('select', 'report_id', '',
+        array('' => ts('Run QA Audit / Redact')) + $reports,
+        FALSE,
+        array('class' => 'crm-select2 crm-action-menu')
       );
-      $this->add('select', 'timeline_id', ts('Add Timeline'),
-        array(
-          '' => ts('- select activity set -')) + $reports
+      $this->add('select', 'timeline_id', '',
+        array('' => ts('Add Timeline')) + $reports,
+        FALSE,
+        array('class' => 'crm-select2 crm-action-menu')
       );
     }
-    $this->addElement('submit', $this->getButtonName('next'), ts('Go'),
-      array(
-        'class' => 'form-submit-inline',
-        'onclick' => "return checkSelection( this );",
-      )
-    );
+    $this->addElement('submit', $this->getButtonName('next'), ' ', array('class' => 'hiddenElement'));
 
     if ($this->_mergeCases) {
       $allCases = CRM_Case_BAO_Case::getContactCases($this->_contactID);
@@ -317,14 +314,15 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
         $this->add('select', 'merge_case_id',
           ts('Select Case for Merge'),
           array(
-            '' => ts('- select case -')) + $otherCases
+            '' => ts('- select case -')) + $otherCases,
+          FALSE,
+          array('class' => 'crm-select2 huge')
         );
         $this->addElement('submit',
           $this->getButtonName('next', 'merge_case'),
           ts('Merge'),
           array(
-            'class' => 'form-submit-inline',
-            'onclick' => "return checkSelection( this );",
+            'class' => 'form-submit-inline hiddenElement',
           )
         );
       }

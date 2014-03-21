@@ -244,7 +244,6 @@ class CRM_Contact_Page_AJAX {
   static function relationship() {
     $relType         = CRM_Utils_Array::value('rel_type', $_REQUEST);
     $relContactID    = CRM_Utils_Array::value('rel_contact', $_REQUEST);
-    $sourceContactID = CRM_Utils_Array::value('contact_id', $_REQUEST); // we no longer need this.
     $relationshipID  = CRM_Utils_Array::value('rel_id', $_REQUEST); // this used only to determine add or update mode
     $caseID          = CRM_Utils_Array::value('case_id', $_REQUEST);
 

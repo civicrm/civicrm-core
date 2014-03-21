@@ -264,7 +264,8 @@ class CRM_Activity_Page_AJAX {
         switch($caseRelationships[$key]['source']){
         case 'caseRel':
           $caseRelationships[$key]['actions'] =
-            '<a href="#" title="edit case role" class="crm-hover-button" onclick="createRelationship( '.$caseRelationships[$key]['relation_type'].', '.$caseRelationships[$key]['cid'].', '.$caseRelationships[$key]['rel_id'].', '.$idx.', \''.$caseRelationships[$key]['relation'].'\' );return false;"><span class="icon edit-icon" ></span></a> <a href="#" class="case-role-delete crm-hover-button" case_id="'.$caseID.'" rel_type="'.$caseRelationships[$key]['relation_type'].'"><span class="icon delete-icon" title="remove contact from case role"></span></a>';
+            '<a href="#" title="edit case role" class="crm-hover-button" onclick="createRelationship( '.$caseRelationships[$key]['relation_type'].', '.$caseRelationships[$key]['cid'].', '.$caseRelationships[$key]['rel_id'].', '.$idx.', \''.$caseRelationships[$key]['relation'].'\' );return false;"><span class="icon edit-icon" ></span></a>
+            <a href="#deleteCaseRole" title="'. ts('Remove Case Role') .'" class="case-miniform crm-hover-button" data-case_id="'.$caseID.'" data-rel_type="'.$caseRelationships[$key]['relation_type'].'" data-key="'. CRM_Core_Key::get('civicrm/ajax/delcaserole') .'"><span class="icon delete-icon"></span></a>';
           break;
 
         case 'caseRoles':
