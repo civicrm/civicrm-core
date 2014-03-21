@@ -248,33 +248,40 @@ class CRM_Activity_Page_AJAX {
     // set user name, email and edit columns links
     // idx will count number of current row / needed by edit links
     $idx = 1;
-    foreach ($caseRelationships as $key => $row) {
+    foreach ($caseRelationships as &$row) {
+      // Get rid of the "<br />(Case Manager)" from label
+      list($typeLabel) = explode('<', $row['relation']);
       // view user links
-      if ($caseRelationships[$key]['cid']) {
-        $caseRelationships[$key]['name'] = '<a href='.CRM_Utils_System::url('civicrm/contact/view',
-          'action=view&reset=1&cid='.$caseRelationships[$key]['cid']).'>'.$caseRelationships[$key]['name'].'</a>';
+      if ($row['cid']) {
+        $row['name'] = '<a class="view-contact" title="'. ts('View Contact') .'" href='.CRM_Utils_System::url('civicrm/contact/view',
+          'action=view&reset=1&cid='.$row['cid']).'>'.$row['name'].'</a>';
       }
       // email column links/icon
-      if ($caseRelationships[$key]['email']) {
-        $caseRelationships[$key]['email'] = '<a class="crm-hover-button crm-popup" href="'.CRM_Utils_System::url('civicrm/activity/email/add', 'reset=1&action=add&atype=3&cid='.$caseRelationships[$key]['cid']).'" title="'. ts('Send an Email') . '"><span class="icon email-icon"></span>
-             </a>';
+      if ($row['email']) {
+        $row['email'] = '<a class="crm-hover-button crm-popup" href="'.CRM_Utils_System::url('civicrm/activity/email/add', 'reset=1&action=add&atype=3&cid='.$row['cid']).'" title="'. ts('Send an Email') . '"><span class="icon email-icon"></span></a>';
       }
       // edit links
       if ($hasAccessToAllCases) {
-        switch($caseRelationships[$key]['source']){
+        switch($row['source']){
         case 'caseRel':
-          $caseRelationships[$key]['actions'] =
-            '<a href="#" title="edit case role" class="crm-hover-button" onclick="createRelationship( '.$caseRelationships[$key]['relation_type'].', '.$caseRelationships[$key]['cid'].', '.$caseRelationships[$key]['rel_id'].', '.$idx.', \''.$caseRelationships[$key]['relation'].'\' );return false;"><span class="icon edit-icon" ></span></a>
-            <a href="#deleteCaseRole" title="'. ts('Remove Case Role') .'" class="case-miniform crm-hover-button" data-case_id="'.$caseID.'" data-rel_type="'.$caseRelationships[$key]['relation_type'].'" data-key="'. CRM_Core_Key::get('civicrm/ajax/delcaserole') .'"><span class="icon delete-icon"></span></a>';
+          $row['actions'] =
+            '<a href="#editCaseRoleDialog" title="'. ts('Reassign %1', array(1 => $typeLabel)) .'" class="crm-hover-button case-miniform" data-rel_type="'. $row['relation_type'] .'" data-rel_id="'. $row['rel_id'] .'"data-key="'. CRM_Core_Key::get('civicrm/ajax/relation') .'">'.
+              '<span class="icon edit-icon"></span>'.
+            '</a>'.
+            '<a href="#deleteCaseRoleDialog" title="'. ts('Remove %1', array(1 => $typeLabel)) .'" class="crm-hover-button case-miniform" data-rel_type="'.$row['relation_type'].'" data-key="'. CRM_Core_Key::get('civicrm/ajax/delcaserole') .'">'.
+              '<span class="icon delete-icon"></span>'.
+            '</a>';
           break;
 
         case 'caseRoles':
-          $caseRelationships[$key]['actions'] =
-            '<a href="#" title="edit case role" class="crm-hover-button" onclick="createRelationship('.$caseRelationships[$key]['relation_type'].', null, null, '.$idx.',  \''.$caseRelationships[$key]['relation'].'\');return false;"><span class="icon edit-icon"></span></a>';
+          $row['actions'] =
+            '<a href="#editCaseRoleDialog" title="'. ts('Assign %1', array(1 => $typeLabel)) .'" class="crm-hover-button case-miniform" data-rel_type="'. $row['relation_type'] .'" data-key="'. CRM_Core_Key::get('civicrm/ajax/relation') .'">'.
+              '<span class="icon edit-icon"></span>'.
+            '</a>';
           break;
         }
       } else {
-        $caseRelationships[$key]['actions'] = '';
+        $row['actions'] = '';
       }
       $idx++;
     }

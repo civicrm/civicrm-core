@@ -1,13 +1,19 @@
 // https://civicrm.org/licensing
 (function($, CRM) {
 
-  function refresh() {
-    $('#crm-main-content-wrapper').crmSnippet('refresh');
+  function refresh(table) {
+    if (table) {
+      $(table).dataTable().fnDraw();
+    } else {
+      $('#crm-main-content-wrapper').crmSnippet('refresh');
+    }
   }
 
-  function open(url, options) {
+  function open(url, options, table) {
     if (CRM.config.ajaxPopupsEnabled) {
-      CRM.loadForm(url, options).on('crmFormSuccess', refresh);
+      CRM.loadForm(url, options).on('crmFormSuccess', function() {
+        refresh(table);
+      });
     }
     else {
       window.location.href = url;
@@ -26,37 +32,105 @@
    * The CaseView form includes some extra fields which are meant to open in a dialog.
    * We stash them initially and pop them up as needed
    * TODO: Creating a separate form class for each of these and opening them as standard popup links would be simpler and more reusable
-   * @type {*}
+   * @type {pre, post}
    */
-  var detached = {},
-    miniForms = {
-      '#manageTags': function() {
-        var tagsChecked = $("#manageTags #tags").select2('val').join(','),
+  var miniForms = {
+    '#manageTagsDialog': {
+      post: function(data) {
+        var tagsChecked = $("#tags", this).select2('val').join(','),
           tagList = {},
           url = CRM.url('civicrm/case/ajax/processtags');
-        $("#manageTags input[name^=case_taglist]").each(function() {
+        $("input[name^=case_taglist]", this).each(function() {
           var tsId = $(this).attr('id').split('_');
           tagList[tsId[2]] = $(this).val();
         });
-        var data = {
+        $.extend(data, {
           case_id: caseId(),
           tag: tagsChecked,
-          taglist: tagList,
-          key: $(this).data('key')
-        };
+          taglist: tagList
+        });
         return $.post(url, data);
-      },
-      '#merge_cases': function() {
+      }
+    },
+    '#mergeCasesDialog': {
+      post: function(data) {
         if ($('select#merge_case_id').val()) {
           $('select#merge_case_id').appendTo('form#CaseView');
           $('[name="_qf_CaseView_next_merge_case"]').click();
+        } else {
+          return false;
         }
-      },
-      '#deleteCaseRole': function() {
-        var params = $.extend({case_id: caseId()}, $(this).data());
-        return $.post(CRM.url('civicrm/ajax/delcaserole'), params);
       }
-    };
+    },
+    '#deleteCaseRoleDialog': {
+      post: function(data) {
+        data.case_id = caseId();
+        return $.post(CRM.url('civicrm/ajax/delcaserole'), data);
+      }
+    },
+    '#addCaseRoleDialog': {
+      pre: function() {
+        $('[name=role_type]', this).val('').change();
+        $('[name=add_role_contact_id]', this).val('').crmEntityRef({create: true, api: {params: {contact_type: 'Individual'}}});
+      },
+      post: function(data) {
+        var contactID = $('[name=add_role_contact_id]').val(),
+          relType = $('[name=role_type]').val();
+        if (contactID && relType) {
+          $.extend(data, {
+            case_id: caseId(),
+            rel_contact: contactID,
+            rel_type: relType,
+            contact_id: contactId()
+          });
+          return $.post(CRM.url('civicrm/ajax/relation'), data);
+        }
+        return false;
+      }
+    },
+    '#editCaseRoleDialog': {
+      pre: function() {
+        $('[name=edit_role_contact_id]', this).val('').crmEntityRef({create: true, api: {params: {contact_type: 'Individual'}}});
+      },
+      post: function(data) {
+        data.rel_contact = $('[name=edit_role_contact_id]').val();
+        if (data.rel_contact) {
+          $.extend(data, {
+            case_id: caseId(),
+            contact_id: contactId()
+          });
+          return $.post(CRM.url('civicrm/ajax/relation'), data);
+        }
+        return false;
+      }
+    },
+    '#addClientDialog': {
+      pre: function() {
+        $('[name=add_client_id]', this).val('').crmEntityRef({create: true});
+      },
+      post: function(data) {
+        data.contactID = $('[name=add_client_id]').val();
+        if (data.contactID) {
+          data.caseID = caseId();
+          return $.post(CRM.url('civicrm/case/ajax/addclient'), data);
+        }
+        return false;
+      }
+    },
+    '#addMembersToGroupDialog': {
+      pre: function() {
+        $('[name=add_member_to_group_contact_id]', this).val('').crmEntityRef({create: true});
+      },
+      post: function(data) {
+        data.contact_id = $('[name=add_member_to_group_contact_id]').val();
+        if (data.contact_id) {
+          return CRM.api3('group_contact', 'create', data);
+        }
+        return false;
+      }
+    }
+  },
+    detached = {};
 
   function detachMiniForms() {
     detached = {};
@@ -80,7 +154,7 @@
             title: $('option:first', this).text(),
             message: ts('Add the %1 set of scheduled activities to this case?', {1: '<em>' + $('option:selected', this).text() + '</em>'})
           })
-            .on('crmConfirmYes', function () {
+            .on('crmConfirmYes', function() {
               $('[name=_qf_CaseView_next]').click();
             })
             .on('crmConfirmNo', function() {
@@ -105,15 +179,30 @@
           $el = $(this),
           target = $el.attr('href');
         function submit() {
-          var submission = miniForms[target].call($el[0]);
+          // Call post function with dialog as context and link data as param
+          var submission = miniForms[target].post.call(dialog[0], $.extend({}, $el.data()));
+          // Function should return a deferred object
           if (submission) {
             dialog.parent().block();
-            submission.done(function() {
+            submission.done(function(data) {
               dialog.dialog('close');
-              refresh();
+              var table = $el.closest('table.dataTable');
+              refresh(table.length ? table : $el.attr('rel'));
+              if ($.isPlainObject(data) && data.is_error && data.error_message) {
+                CRM.alert(data.error_message, ts('Error'), 'error');
+              }
             });
             return false;
           }
+          // Validation failed - show an error msg on empty fields
+          else if (submission === false) {
+            $(':input', dialog).not('.select2-container *').each(function() {
+              if (!$(this).val()) {
+                $(this).crmError(ts('Please select a value'));
+              }
+            })
+          }
+          return submission;
         }
         dialog = CRM.confirm(submit, {
           title: $(this).attr('title') || $(this).text(),
@@ -121,7 +210,8 @@
           close: function() {
             detached[target] = $(target, dialog).detach();
             $(dialog).dialog('destroy').remove();
-          }
+          },
+          open: miniForms[target].pre
         });
         return false;
       });

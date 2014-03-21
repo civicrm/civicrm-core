@@ -412,7 +412,7 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
     foreach ($relType as $k => $v) {
       $roleTypes[substr($k, 0, strpos($k, '_'))] = $v;
     }
-    $this->add('select', 'role_type', ts('Relationship Type'), array('' => ts('- select type -')) + $roleTypes);
+    $this->add('select', 'role_type', ts('Relationship Type'), array('' => ts('- select type -')) + $roleTypes, FALSE, array('class' => 'crm-select2 twenty'));
 
     $hookCaseSummary = CRM_Utils_Hook::caseSummary($this->_caseID);
     if (is_array($hookCaseSummary)) {
