@@ -1393,10 +1393,29 @@ SELECT contact_id
             case CRM_Utils_Type::T_LONGTEXT:
             case CRM_Utils_Type::T_EMAIL:
             default:
-              $object->$dbName = $dbName . '_' . $counter;
-              $maxlength = CRM_Utils_Array::value('maxlength', $value);
-              if ($maxlength > 0 && strlen($object->$dbName) > $maxlength) {
-                $object->$dbName = substr($object->$dbName, 0, $value['maxlength']);
+              // WAS: if (isset($value['enumValues'])) {
+              // TODO: see if this works with all pseudoconstants
+              if (isset($value['pseudoconstant'], $value['pseudoconstant']['callback'])) {
+                if (isset($value['default'])) {
+                  $object->$dbName = $value['default'];
+                }
+                else {
+                  $options = CRM_Core_PseudoConstant::get($daoName, $name);
+                  if (is_array($options)) {
+                    $object->$dbName = $options[0];
+                  }
+                  else {
+                    $defaultValues = explode(',', $options);
+                    $object->$dbName = $defaultValues[0];
+                  }
+                }
+              }
+              else {
+                $object->$dbName = $dbName . '_' . $counter;
+                $maxlength = CRM_Utils_Array::value('maxlength', $value);
+                if ($maxlength > 0 && strlen($object->$dbName) > $maxlength) {
+                  $object->$dbName = substr($object->$dbName, 0, $value['maxlength']);
+                }
               }
           }
         }
