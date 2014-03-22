@@ -659,7 +659,7 @@ LIMIT  1
     return $string;
   }
 
-  function getCaseReport($clientID, $caseID, $activitySetName, $params, $form) {
+  static function getCaseReport($clientID, $caseID, $activitySetName, $params, $form) {
 
     $template = CRM_Core_Smarty::singleton();
 
@@ -721,7 +721,7 @@ LIMIT  1
     return $contents;
   }
 
-  function printCaseReport() {
+  static function printCaseReport() {
     $caseID            = CRM_Utils_Request::retrieve('caseID', 'Positive', CRM_Core_DAO::$_nullObject);
     $clientID          = CRM_Utils_Request::retrieve('cid', 'Positive', CRM_Core_DAO::$_nullObject);
     $activitySetName   = CRM_Utils_Request::retrieve('asn', 'String', CRM_Core_DAO::$_nullObject);

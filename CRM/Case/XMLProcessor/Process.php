@@ -454,7 +454,7 @@ AND        a.is_deleted = 0
     return TRUE;
   }
 
-  function activitySets($activitySetsXML) {
+  static function activitySets($activitySetsXML) {
     $result = array();
     foreach ($activitySetsXML as $activitySetXML) {
       foreach ($activitySetXML as $recordXML) {
