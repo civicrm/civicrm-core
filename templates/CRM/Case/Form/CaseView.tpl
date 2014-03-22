@@ -336,12 +336,14 @@
  </script>
  {/literal}
   <br />
-
-  {if $globalRelationships}
+  {if !empty($globalGroupInfo.id)}
     <div class="crm-submit-buttons">
       <a class="button case-miniform" href="#addMembersToGroupDialog" rel="#globalRelationships-selector" data-group_id="{$globalGroupInfo.id}">
         <div class="icon add-icon"></div>{ts 1=$globalGroupInfo.title}Add members to %1{/ts}
       </a>
+    </div>
+    <div id="addMembersToGroupDialog" class="hiddenElement">
+      <input name="add_member_to_group_contact_id" placeholder="{ts}- select contact -{/ts}" class="huge" />
     </div>
     <table id="globalRelationships-selector"  class="report-layout">
       <thead><tr>
@@ -350,15 +352,7 @@
         <th>{ts}Email{/ts}</th>
       </tr></thead>
     </table>
-    {elseif $globalGroupInfo.id}
-    <div class="messages status no-popup">
-      <div class="icon inform-icon"></div>&nbsp;
-      {ts 1=$globalGroupInfo.title}The group %1 has no members.{/ts}
-    </div>
   {/if}
-  <div id="addMembersToGroupDialog" class="hiddenElement">
-    <input name="add_member_to_group_contact_id" placeholder="{ts}- select contact -{/ts}" class="huge" />
-  </div>
 
  {literal}
  <script type="text/javascript">
@@ -404,6 +398,9 @@
       "sAjaxSource": sourceUrl,
       "iDisplayLength": 10,
       "fnDrawCallback": function() { setGlobalRelationshipsSelectorClass(); },
+      "oLanguage": {
+        "sEmptyTable": {/literal}'{ts escape='js' 1=$globalGroupInfo.title}The group %1 has no members.{/ts}'{literal}
+      },
       "fnServerData": function ( sSource, aoData, fnCallback ) {
         cj.ajax( {
           "dataType": 'json',
