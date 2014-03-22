@@ -814,7 +814,7 @@ LEFT JOIN  civicrm_premiums            ON ( civicrm_premiums.entity_id = civicrm
     if ($setDefault) {
       $sctJsonDecode = json_decode($params);
       $sctJsonDecode = (array) $sctJsonDecode->soft_credit;
-      if ($domain->locales && !empty($sctJsonDecode[$config->lcMessages])) {
+      if (!empty($sctJsonDecode[$config->lcMessages])) {
         foreach ($sctJsonDecode[$config->lcMessages] as $column => $value) {
           $sctJsonDecode[$column] = $value;
         }
