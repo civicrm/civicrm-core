@@ -100,7 +100,6 @@ class Kernel {
 
       $apiRequest = $this->dispatcher->dispatch(Events::PREPARE, new PrepareEvent(NULL, $apiRequest))->getApiRequest();
 
-      _civicrm_api3_api_check_permission($apiRequest['entity'], $apiRequest['action'], $apiRequest['params']);
       $fields = _civicrm_api3_api_getfields($apiRequest);
       // we do this before we
       _civicrm_api3_swap_out_aliases($apiRequest, $fields);
