@@ -79,16 +79,17 @@ class CRM_Contribute_Form_SoftCredit {
       $ufJoinDAO->module = 'soft_credit';
       $ufJoinDAO->entity_id = $form->_id;
       if ($ufJoinDAO->find(TRUE)) {
-        $jsonData = json_decode($ufJoinDAO->module_data);
+        $jsonData = CRM_Contribute_BAO_ContributionPage::formatMultilingualHonorParams($ufJoinDAO->module_data, TRUE);
         if ($jsonData) {
-          $form->assign('honor_block_title', $jsonData->soft_credit->honor_block_title);
-          $form->assign('honor_block_text', $jsonData->soft_credit->honor_block_text);
+          foreach (array('honor_block_title', 'honor_block_text') as $name) {
+            $form->assign($name, $jsonData[$name]);
+          }
 
           $softCreditTypes = CRM_Core_OptionGroup::values("soft_credit_type", FALSE);
           $extraOption = array('onclick' => "enableHonorType();");
 
           // radio button for Honor Type
-          foreach ($jsonData->soft_credit->soft_credit_types as $value) {
+          foreach ($jsonData['soft_credit_types'] as $value) {
             $honorTypes[$value] = $form->createElement('radio', NULL, NULL, $softCreditTypes[$value], $value, $extraOption);
           }
           $form->addGroup($honorTypes, 'soft_credit_type_id', NULL);
