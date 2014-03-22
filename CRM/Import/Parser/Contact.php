@@ -337,6 +337,9 @@ class CRM_Import_Parser_Contact extends CRM_Import_Parser {
       }
 
       $email = CRM_Utils_Array::value($this->_emailIndex, $values);
+      
+      $email = trim($email); 
+      
       if ($email) {
         /* If the email address isn't valid, bail */
 
