@@ -1543,33 +1543,7 @@ function _getStandardTypeFromCustomDataType($dataType) {
   );
   return $mapping[$dataType];
 }
-/**
- * Return array of defaults for the given API (function is a wrapper on getfields)
- */
-function _civicrm_api3_getdefaults($apiRequest, $fields) {
-  $defaults = array();
 
-  foreach ($fields as $field => $values) {
-    if (isset($values['api.default'])) {
-      $defaults[$field] = $values['api.default'];
-    }
-  }
-  return $defaults;
-}
-
-/**
- * Return array of defaults for the given API (function is a wrapper on getfields)
- */
-function _civicrm_api3_getrequired($apiRequest, $fields) {
-  $required = array('version');
-
-  foreach ($fields as $field => $values) {
-    if (!empty($values['api.required'])) {
-      $required[] = $field;
-    }
-  }
-  return $required;
-}
 
 /**
  * Fill params array with alternate (alias) values where a field has an alias and that is filled & the main field isn't

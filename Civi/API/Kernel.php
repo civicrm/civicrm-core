@@ -73,6 +73,7 @@ class Kernel {
     $apiRequest['version'] = civicrm_get_api_version($params);
     $apiRequest['params'] = $params;
     $apiRequest['extra'] = $extra;
+    $apiRequest['fields'] = NULL;
 
     /** @var $apiWrappers array<\API_Wrapper> */
     $apiWrappers = array(
@@ -100,17 +101,6 @@ class Kernel {
 
       $apiRequest = $this->dispatcher->dispatch(Events::PREPARE, new PrepareEvent(NULL, $apiRequest))->getApiRequest();
 
-      $fields = _civicrm_api3_api_getfields($apiRequest);
-      // we do this before we
-      _civicrm_api3_swap_out_aliases($apiRequest, $fields);
-      if (strtolower($action) != 'getfields') {
-        if (empty($apiRequest['params']['id'])) {
-          $apiRequest['params'] = array_merge(_civicrm_api3_getdefaults($apiRequest, $fields), $apiRequest['params']);
-        }
-        //if 'id' is set then only 'version' will be checked but should still be checked for consistency
-        civicrm_api3_verify_mandatory($apiRequest['params'], NULL, _civicrm_api3_getrequired($apiRequest, $fields));
-      }
-
       // For input filtering, process $apiWrappers in forward order
       foreach ($apiWrappers as $apiWrapper) {
         $apiRequest = $apiWrapper->fromApiInput($apiRequest);
@@ -124,8 +114,6 @@ class Kernel {
         $result = $function($apiRequest);
       }
       elseif ($apiRequest['function'] && !$apiRequest['is_generic']) {
-        _civicrm_api3_validate_fields($apiRequest['entity'], $apiRequest['action'], $apiRequest['params'], $fields);
-
         $result = isset($extra) ? $function($apiRequest['params'], $extra) : $function($apiRequest['params']);
       }
       else {
