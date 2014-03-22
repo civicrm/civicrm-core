@@ -75,15 +75,6 @@ class Kernel {
     $apiRequest['extra'] = $extra;
     $apiRequest['fields'] = NULL;
 
-    /** @var $apiWrappers array<\API_Wrapper> */
-    $apiWrappers = array(
-      \CRM_Utils_API_HTMLInputCoder::singleton(),
-      \CRM_Utils_API_NullOutputCoder::singleton(),
-      \CRM_Utils_API_ReloadOption::singleton(),
-      \CRM_Utils_API_MatchOption::singleton(),
-    );
-    \CRM_Utils_Hook::apiWrappers($apiWrappers, $apiRequest);
-
     try {
       if (!is_array($params)) {
         throw new \API_Exception('Input variable `params` is not an array', 2000);
@@ -101,11 +92,6 @@ class Kernel {
 
       $apiRequest = $this->dispatcher->dispatch(Events::PREPARE, new PrepareEvent(NULL, $apiRequest))->getApiRequest();
 
-      // For input filtering, process $apiWrappers in forward order
-      foreach ($apiWrappers as $apiWrapper) {
-        $apiRequest = $apiWrapper->fromApiInput($apiRequest);
-      }
-
       $function = $apiRequest['function'];
       if ($apiRequest['function'] && $apiRequest['is_generic']) {
         // Unlike normal API implementations, generic implementations require explicit
@@ -118,11 +104,6 @@ class Kernel {
       }
       else {
         throw new \API_Exception("API (" . $apiRequest['entity'] . ", " . $apiRequest['action'] . ") does not exist (join the API team and implement it!)");
-      }
-
-      // For output filtering, process $apiWrappers in reverse order
-      foreach (array_reverse($apiWrappers) as $apiWrapper) {
-        $result = $apiWrapper->toApiOutput($apiRequest, $result);
       }
 
       if (\CRM_Utils_Array::value('is_error', $result, 0) == 0) {
