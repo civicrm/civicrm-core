@@ -1757,9 +1757,8 @@ SELECT case_status.label AS case_status, status_id, case_type.label AS case_type
           $groupInfo['id'] = $results['id'];
           $groupInfo['title'] = $results['title'];
           $params = array(array('group', 'IN', array($groupInfo['id'] => 1), 0, 0));
-          $return = array('sort_name' => 1, 'display_name' => 1, 'email' => 1, 'phone' => 1);
           $return = array('contact_id' => 1, 'sort_name' => 1, 'display_name' => 1, 'email' => 1, 'phone' => 1);
-          list($globalContacts, $_) = CRM_Contact_BAO_Query::apiQuery($params, $return, NULL, $sort, $offset, $rowCount, TRUE, $returnOnlyCount);
+          list($globalContacts) = CRM_Contact_BAO_Query::apiQuery($params, $return, NULL, $sort, $offset, $rowCount, TRUE, $returnOnlyCount);
 
           if ($returnOnlyCount) {
             return $globalContacts;
@@ -1767,7 +1766,7 @@ SELECT case_status.label AS case_status, status_id, case_type.label AS case_type
 
           if ($showLinks) {
             foreach ($globalContacts as $idx => $contact) {
-              $globalContacts[$idx]['sort_name'] = '<a href="' . $contactViewUrl . $contact['contact_id'] . '">' . $contact['sort_name'] . '</a>';
+              $globalContacts[$idx]['sort_name'] = '<a href="' . CRM_Utils_System::url('civicrm/contact/view', "reset=1&cid={$contact['contact_id']}") . '">' . $contact['sort_name'] . '</a>';
             }
           }
         }

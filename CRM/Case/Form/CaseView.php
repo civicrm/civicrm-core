@@ -401,8 +401,7 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
 
     // Now global contact list that appears on all cases.
     $globalGroupInfo = array();
-    $relGlobal = CRM_Case_BAO_Case::getGlobalContacts($globalGroupInfo);
-    $this->assign('globalRelationships', $relGlobal);
+    CRM_Case_BAO_Case::getGlobalContacts($globalGroupInfo);
     $this->assign('globalGroupInfo', $globalGroupInfo);
 
     // List of relationship types

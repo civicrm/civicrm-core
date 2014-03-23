@@ -215,6 +215,27 @@
         });
         return false;
       });
+
     $().crmAccordions();
+
+    // Keep the state of accordions when refreshing
+    var accordionStates = [];
+    $('#crm-main-content-wrapper')
+      .on('crmBeforeLoad', function(e) {
+        if ($(e.target).is(this)) {
+          accordionStates = [];
+          $('.crm-accordion-wrapper', this).each(function() {
+            accordionStates.push($(this).hasClass('collapsed'));
+          });
+        }
+      })
+      .on('crmLoad', function(e) {
+        if ($(e.target).is(this)) {
+          var $targets = $('.crm-accordion-wrapper', this);
+          $.each(accordionStates, function(i, isCollapsed) {
+            $targets.eq(i).toggleClass('collapsed', isCollapsed);
+          });
+        }
+      });
   });
 }(cj, CRM))
