@@ -238,9 +238,9 @@
               </td>
             </tr>
             <tr class="crm-contribution-pcp-block crm-contribution-form-block-pcp_made_through_id hiddenElement">
-              <td class="label">{$form.pcp_made_through.label}</td>
+              <td class="label">{$form.pcp_made_through_id.label}</td>
               <td>
-                {$form.pcp_made_through.html} &nbsp;
+                {$form.pcp_made_through_id.html} &nbsp;
                 <span class="showSoftCreditLink">
                   <a href="#" id="showSoftCredit">{ts}unlink from personal campaign page{/ts}</a>
                 </span><br/>
