@@ -891,7 +891,7 @@ WHERE     $whereClause
 
 
 /**
- * Overrides _civicrm_api3_generic_getlist_params.
+ * @see _civicrm_api3_generic_getlist_params
  *
  * @param $request array
  */
@@ -934,7 +934,7 @@ function _civicrm_api3_contact_getlist_params(&$request) {
 }
 
 /**
- * Overrides _civicrm_api3_generic_getlist_output
+ * @see _civicrm_api3_generic_getlist_output
  *
  * @param $result array
  * @param $request array
