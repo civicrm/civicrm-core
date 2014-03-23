@@ -236,9 +236,10 @@ class CRM_Contact_Page_AJAX {
     $dao = CRM_Core_DAO::executeQuery($query);
     $results = array();
     while ($dao->fetch()) {
-      $results[$dao->id] = $dao->data;
+      $results[] = array('id' => $dao->id, 'text' => $dao->data);
     }
-    CRM_Core_Page_AJAX::autocompleteResults($results);
+    print json_encode($results);
+    CRM_Utils_System::civiExit();
   }
 
   static function relationship() {
