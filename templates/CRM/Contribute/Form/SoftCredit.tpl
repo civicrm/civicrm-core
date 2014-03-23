@@ -67,6 +67,7 @@
 {literal}
 <script type="text/javascript">
   cj(function($) {
+    var $form = $("#{/literal}{$form.formName}{literal}");
     $('#showPCP, #showSoftCredit').click(function(){
       return showHideSoftCreditAndPCP();
     });
@@ -103,9 +104,14 @@
         }
       },
       initSelection: function(el, callback) {
-        callback({id: $(el).val(), text: $('#pcp_made_through').val()});
+        callback({id: $(el).val(), text: $('[name=pcp_made_through]', $form).val()});
       }
-    });
+    })
+      // This is just a cheap trick to store the name in case of a formrule error
+      .on('change', function() {
+        console.log($(this).select2('data'));
+        $('[name=pcp_made_through]', $form).val($(this).select2('data').text || '');
+      });
 
     $('.crm-soft-credit-block tr span').each(function () {
       if ($(this).hasClass('crm-error')) {
