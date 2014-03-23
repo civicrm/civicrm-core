@@ -101,7 +101,7 @@ class CRM_Contribute_Form_SoftCredit {
     $item_count = 6;
 
     $showSoftCreditRow = 2;
-    if ($form->_action & CRM_Core_Action::UPDATE) {
+    if ($form->getAction() & CRM_Core_Action::UPDATE) {
       $form->_softCreditInfo = CRM_Contribute_BAO_ContributionSoft::getSoftContribution($form->_id, TRUE);
     }
     elseif ($form->_pledgeID) {
