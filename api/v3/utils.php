@@ -318,7 +318,19 @@ function _civicrm_api3_get_DAO($name) {
   if ($name == 'Im' || $name == 'Acl') {
     $name = strtoupper($name);
   }
-  return CRM_Core_DAO_AllCoreTables::getFullName($name);
+  $dao = CRM_Core_DAO_AllCoreTables::getFullName($name);
+  if ($dao) {
+    return $dao;
+  }
+
+  // Really weird apis can declare their own DAO name. Not sure if this is a good idea...
+  include_once "api/v3/$name.php";
+  $daoFn = "_civicrm_api3_" . _civicrm_api_get_entity_name_from_camel($name) . "_DAO";
+  if (function_exists($daoFn)) {
+    return $daoFn();
+  }
+
+  return NULL;
 }
 
 /**

@@ -202,7 +202,9 @@ CRM.validate = CRM.validate || {
 (function ($, undefined) {
   "use strict";
 
-  $.fn.select2.defaults.dropdownCssClass = 'crm-container';
+  // Theme classes for unattached elements
+  $.fn.select2.defaults.dropdownCssClass = $.ui.dialog.prototype.options.dialogClass = 'crm-container';
+
   // https://github.com/ivaynberg/select2/pull/2090
   $.fn.select2.defaults.width = 'resolve';
 
@@ -417,7 +419,6 @@ CRM.validate = CRM.validate || {
     })
     // Modal dialogs should disable scrollbars
     .on('dialogopen', function(e) {
-      $(e.target).parent().addClass('crm-container');
       if ($(e.target).dialog('option', 'modal')) {
         $(e.target).addClass('modal-dialog');
         $('body').css({overflow: 'hidden'});
