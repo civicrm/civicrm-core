@@ -88,14 +88,24 @@ function _civicrm_api3_permissions($entity, $action, &$params) {
   );
 
   // Contact-related data permissions
+  $permissions['entity_tag'] = array(
+    'get' => array(
+      'access CiviCRM',
+      'view all contacts',
+    ),
+    'default' => array(
+      'access CiviCRM',
+      'edit all contacts',
+    ),
+  );
   $permissions['address'] = array(
     'get' => array(
       'access CiviCRM',
       'view all contacts',
     ),
     'delete' => array(
-      'access CiviCRM',
-      'delete contacts',
+       'access CiviCRM',
+       'delete contacts',
     ),
     'default' => array(
       'access CiviCRM',
@@ -107,7 +117,6 @@ function _civicrm_api3_permissions($entity, $action, &$params) {
   $permissions['website'] = $permissions['address'];
   $permissions['im'] = $permissions['address'];
   $permissions['loc_block'] = $permissions['address'];
-  $permissions['entity_tag'] = $permissions['address'];
   $permissions['note'] = $permissions['address'];
 
   // Activity permissions
