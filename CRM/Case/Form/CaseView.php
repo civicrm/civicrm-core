@@ -328,16 +328,8 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
       }
     }
 
-    $activityStatus = CRM_Core_PseudoConstant::activityStatus();
-    $this->add('select', 'status_id', ts('Status'), array("" => ts(' - any status - ')) + $activityStatus);
-
-    // activity dates
-    $this->addDate('activity_date_low', ts('Activity Dates - From'), FALSE, array('formatType' => 'searchDate'));
-    $this->addDate('activity_date_high', ts('To'), FALSE, array('formatType' => 'searchDate'));
-
-    if (CRM_Core_Permission::check('administer CiviCRM')) {
-      $this->add('checkbox', 'activity_deleted', ts('Deleted Activities'));
-    }
+    //call activity form
+    self::activityForm($this);
 
     //get case related relationships (Case Role)
     $caseRelationships = CRM_Case_BAO_Case::getCaseRoles($this->_contactID, $this->_caseID);
@@ -345,11 +337,7 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
     //save special label because we unset it in the loop
     $managerLabel = empty($managerRoleId) ? '' : $caseRoles[$managerRoleId];
 
-    //build reporter select
-    $reporters = array("" => ts(' - any reporter - '));
     foreach ($caseRelationships as $key => & $value) {
-      $reporters[$value['cid']] = $value['name'] . " ( {$value['relation']} )";
-
       if (!empty($managerRoleId)) {
         if ($managerRoleId == $value['relation_type']) {
           $value['relation'] = $managerLabel;
@@ -362,26 +350,12 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
       }
     }
 
-    // take all case activity types for search filter, CRM-7187
-    $aTypesFilter = array();
-    $allCaseActTypes = CRM_Case_PseudoConstant::caseActivityType();
-    foreach ($allCaseActTypes as $typeDetails) {
-      if (!in_array($typeDetails['name'], array(
-        'Open Case'))) {
-        $aTypesFilter[$typeDetails['id']] = CRM_Utils_Array::value('label', $typeDetails);
-      }
-    }
-    asort($aTypesFilter);
-    $this->add('select', 'activity_type_filter_id', ts('Activity Type'), array('' => ts('- select activity type -')) + $aTypesFilter);
-
     $this->assign('caseRelationships', $caseRelationships);
 
     //also add client as role. CRM-4438
     $caseRoles['client'] = CRM_Case_BAO_Case::getContactNames($this->_caseID);
 
     $this->assign('caseRoles', $caseRoles);
-
-    $this->add('select', 'reporter_id', ts('Reporter/Role'), $reporters);
 
     // Retrieve ALL client relationships
     $relClient = CRM_Contact_BAO_Relationship::getRelationship($this->_contactID,
@@ -522,6 +496,42 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
       );
       $session = CRM_Core_Session::singleton();
       $session->pushUserContext($url);
+    }
+  }
+
+  /**
+   * Build the activity selector/datatable
+   * @param CRM_Core_Form $form
+   */
+  static function activityForm($form) {
+    $caseRelationships = CRM_Case_BAO_Case::getCaseRoles($form->_contactID, $form->_caseID);
+    //build reporter select
+    $reporters = array("" => ts(' - any reporter - '));
+    foreach ($caseRelationships as $key => & $value) {
+      $reporters[$value['cid']] = $value['name'] . " ( {$value['relation']} )";
+    }
+    $form->add('select', 'reporter_id', ts('Reporter/Role'), $reporters);
+
+    // take all case activity types for search filter, CRM-7187
+    $aTypesFilter = array();
+    $allCaseActTypes = CRM_Case_PseudoConstant::caseActivityType();
+    foreach ($allCaseActTypes as $typeDetails) {
+      if (!in_array($typeDetails['name'], array('Open Case'))) {
+        $aTypesFilter[$typeDetails['id']] = CRM_Utils_Array::value('label', $typeDetails);
+      }
+    }
+    asort($aTypesFilter);
+    $form->add('select', 'activity_type_filter_id', ts('Activity Type'), array('' => ts('- select activity type -')) + $aTypesFilter);
+
+    $activityStatus = CRM_Core_PseudoConstant::activityStatus();
+    $form->add('select', 'status_id', ts('Status'), array("" => ts(' - any status - ')) + $activityStatus);
+
+    // activity dates
+    $form->addDate('activity_date_low', ts('Activity Dates - From'), FALSE, array('formatType' => 'searchDate'));
+    $form->addDate('activity_date_high', ts('To'), FALSE, array('formatType' => 'searchDate'));
+
+    if (CRM_Core_Permission::check('administer CiviCRM')) {
+      $form->add('checkbox', 'activity_deleted', ts('Deleted Activities'));
     }
   }
 }
