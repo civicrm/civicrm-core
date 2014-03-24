@@ -122,7 +122,7 @@ class WebTest_Event_ParticipantSearchTest extends CiviSeleniumTestCase {
     // visit event search page
     $this->openCiviPage("event/search", "reset=1");
 
-    $this->select('event_relative', "label=Choose Date Range");
+    $this->select2('s2id_autogen3_search', "Choose Date Range");
     $this->webtestFillDate('event_start_date_low', '-2 year');
     $this->webtestFillDate('event_end_date_high', '+1 year');
 
@@ -147,7 +147,7 @@ class WebTest_Event_ParticipantSearchTest extends CiviSeleniumTestCase {
     // visit event search page
     $this->openCiviPage("event/search", "reset=1");
 
-    $this->select('event_relative', "label=Choose Date Range");
+    $this->select2('s2id_autogen3_search', "Choose Date Range");
     $this->webtestFillDate('event_start_date_low', '-2 year');
     $this->webtestFillDate('event_end_date_high', '+1 year');
 

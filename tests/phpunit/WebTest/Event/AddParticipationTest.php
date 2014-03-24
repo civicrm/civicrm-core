@@ -48,7 +48,7 @@ class WebTest_Event_AddParticipationTest extends CiviSeleniumTestCase {
     $this->webtestFillAutocomplete($firstName);
 
     // Select event. Based on label for now.
-    $this->select('event_id', "label=regexp:Rain-forest Cup Youth Soccer Tournament.");
+    $this->select2('s2id_autogen2_search', "Rain-forest Cup Youth Soccer Tournament");
 
     // Select role
     $this->click('role_id[2]');
@@ -60,7 +60,7 @@ class WebTest_Event_AddParticipationTest extends CiviSeleniumTestCase {
     // May 5th, 2010
 
     // Select participant status
-    $this->select('status_id', 'value=1');
+    $this->select2('s2id_autogen3_search', 'Registered');
 
     // Setting registration source
     $this->type('source', 'Event StandaloneAddTest Webtest');
@@ -242,7 +242,7 @@ class WebTest_Event_AddParticipationTest extends CiviSeleniumTestCase {
     $this->webtestFillAutocomplete($firstName);
 
     // Select event. Based on label for now.
-    $this->select('event_id', "label=regexp:Rain-forest Cup Youth Soccer Tournament.");
+    $this->select2('s2id_autogen2_search', "Rain-forest Cup Youth Soccer Tournament");
 
     // Select roles
     $this->click('role_id[2]');
@@ -407,7 +407,7 @@ class WebTest_Event_AddParticipationTest extends CiviSeleniumTestCase {
     $this->openCiviPage("participant/add", "reset=1&action=add&context=standalone", "_qf_Participant_upload-bottom");
 
     // Select event.
-    $this->select('event_id', "label=regexp:Rain-forest Cup Youth Soccer Tournament.");
+    $this->select2('s2id_autogen2_search', "Rain-forest Cup Youth Soccer Tournament");
 
     // Select role.
     $this->click('role_id[2]');
