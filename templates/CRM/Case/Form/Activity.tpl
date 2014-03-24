@@ -196,6 +196,16 @@
               <td class="label">{$form.followup_activity_subject.label}</td>
               <td>{$form.followup_activity_subject.html|crmAddClass:huge}</td>
             </tr>
+	    <tr>
+              <td class="label">
+                {$form.followup_assignee_contact_id.label}
+                {edit}
+                {/edit}
+              </td>
+              <td>
+                {$form.followup_assignee_contact_id.html}
+              </td>
+            </tr>
           </table>
         </div><!-- /.crm-accordion-body -->
       </div><!-- /.crm-accordion-wrapper -->
