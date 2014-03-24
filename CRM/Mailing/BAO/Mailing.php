@@ -2566,30 +2566,26 @@ SELECT  $mailing.id as mailing_id
 
     $text = CRM_Utils_Request::retrieve('text', 'Boolean', $form);
     if ($text) {
-      echo "<pre>{$textHeader}</br>{$report['mailing']['body_text']}</br>{$textFooter}</pre>";
-      CRM_Utils_System::civiExit();
+      CRM_Core_Page_AJAX::returnJsonResponse("<pre>{$textHeader}</br>{$report['mailing']['body_text']}</br>{$textFooter}</pre>");
     }
 
     if (!$isSMS) {
       $html = CRM_Utils_Request::retrieve('html', 'Boolean', $form);
       if ($html) {
         $output = $htmlHeader . $report['mailing']['body_html'] . $htmlFooter ;
-        echo str_replace( "\n", '<br />', $output );
-        CRM_Utils_System::civiExit();
+        CRM_Core_Page_AJAX::returnJsonResponse(str_replace("\n", '<br />', $output));
       }
     }
 
     if (!empty($report['mailing']['body_text'])) {
       $url = CRM_Utils_System::url('civicrm/mailing/report', 'reset=1&text=1&mid=' . $form->_mailing_id);
-      $popup = "javascript:popUp(\"$url\");";
-      $form->assign('textViewURL', $popup);
+      $form->assign('textViewURL', $url);
     }
 
     if (!$isSMS) {
       if (!empty($report['mailing']['body_html'])) {
         $url = CRM_Utils_System::url('civicrm/mailing/report', 'reset=1&html=1&mid=' . $form->_mailing_id);
-        $popup = "javascript:popUp(\"$url\");";
-        $form->assign('htmlViewURL', $popup);
+        $form->assign('htmlViewURL', $url);
       }
     }
 
