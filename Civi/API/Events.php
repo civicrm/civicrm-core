@@ -28,7 +28,7 @@ namespace Civi\API;
 
 /**
  * The API kernel dispatches a series of events while processing each API request.
- * For a successful API request, the sequence is AUTHORIZE => PREPARE => RESPOND.
+ * For a successful API request, the sequence is RESOLVE => AUTHORIZE => PREPARE => RESPOND.
  * If an exception arises in any stage, then the sequence is aborted and the EXCEPTION
  * event is dispatched.
  *
@@ -44,6 +44,14 @@ class Events {
    * @see AuthorizeEvent
    */
   const AUTHORIZE = 'api.authorize';
+
+  /**
+   * Determine which API provider executes the given request. For successful
+   * execution, at least one listener must invoke $event->setProvider($provider).
+   *
+   * @see ResolveEvent
+   */
+  const RESOLVE = 'api.resolve';
 
   /**
    * Apply pre-execution logic

@@ -25,35 +25,13 @@
  +--------------------------------------------------------------------+
 */
 
-namespace Civi\API\Event;
+namespace Civi\API\Provider;
+use Civi\API\Events;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class Event extends \Symfony\Component\EventDispatcher\Event {
-  /**
-   * @var \Civi\API\Provider\ProviderInterface
-   */
-  protected $apiProvider;
-
-  /**
-   * @var array
-   */
-  protected $apiRequest;
-
-  function __construct($apiProvider, $apiRequest) {
-    $this->apiProvider = $apiProvider;
-    $this->apiRequest = $apiRequest;
-  }
-
-  /**
-   * @return \Civi\API\Provider\ProviderInterface
-   */
-  public function getApiProvider() {
-    return $this->apiProvider;
-  }
-
-  /**
-   * @return array
-   */
-  public function getApiRequest() {
-    return $this->apiRequest;
-  }
+/**
+ * An API "provider" provides a means to execute API requests.
+ */
+interface ProviderInterface {
+  function invoke($apiRequest);
 }
