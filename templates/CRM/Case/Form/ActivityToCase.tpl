@@ -130,7 +130,7 @@
           width: 600,
           height: 270,
           close: function( event, ui ) {
-            cj( "#unclosed_cases" ).unautocomplete( );
+            cj('input[name=unclosed_case_id]', '#fileOnCaseDialog').select2('destroy');
             cj(this).hide().dialog("destroy");
           },
           open: function() {
