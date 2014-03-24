@@ -169,7 +169,7 @@
   <td>
     {$report.mailing.body_text|mb_truncate:30|escape|nl2br}
     <br />
-    <strong><a href='{$textViewURL}'>&raquo; {ts}View complete message{/ts}</a></strong>
+    <strong><a class="crm-popup" href='{$textViewURL}'>&raquo; {ts}View complete message{/ts}</a></strong>
   </td>
 </tr>
 {/if}
@@ -180,7 +180,7 @@
   <td>
     {$report.mailing.body_html|mb_truncate:30|escape|nl2br}
     <br/>
-    <strong><a href='{$htmlViewURL}'>&raquo; {ts}View complete message{/ts}</a></strong>
+    <strong><a class="crm-popup" href='{$htmlViewURL}'>&raquo; {ts}View complete message{/ts}</a></strong>
   </td>
 </tr>
 {/if}
