@@ -109,7 +109,6 @@
     })
       // This is just a cheap trick to store the name in case of a formrule error
       .on('change', function() {
-        console.log($(this).select2('data'));
         $('[name=pcp_made_through]', $form).val($(this).select2('data').text || '');
       });
 
