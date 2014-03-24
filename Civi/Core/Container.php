@@ -88,6 +88,7 @@ class Container {
   public function createApiKernel($dispatcher) {
     $dispatcher->addSubscriber(new \Civi\API\Subscriber\TransactionSubscriber());
     $dispatcher->addSubscriber(new \Civi\API\Subscriber\I18nSubscriber());
+    $dispatcher->addSubscriber(new \Civi\API\Provider\MagicFunctionProvider());
     $dispatcher->addSubscriber(new \Civi\API\Subscriber\APIv3SchemaAdapter());
     $dispatcher->addSubscriber(new \Civi\API\Subscriber\WrapperAdapter(array(
       \CRM_Utils_API_HTMLInputCoder::singleton(),
