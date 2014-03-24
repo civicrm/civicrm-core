@@ -153,7 +153,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
   }
 
   public static function toBeSkipped_delete($sequential = FALSE) {
-    $entitiesWithout = array('MailingGroup', 'Constant', 'Entity', 'Location', 'Domain', 'Profile', 'CustomValue');
+    $entitiesWithout = array('MailingContact', 'MailingEventConfirm', 'MailingEventResubscribe', 'MailingEventSubscribe', 'MailingEventUnsubscribe', 'MailingGroup', 'MailingRecipients', 'Constant', 'Entity', 'Location', 'Domain', 'Profile', 'CustomValue', 'Setting');
     if ($sequential === TRUE) {
       return $entitiesWithout;
     }
