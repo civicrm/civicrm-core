@@ -31,7 +31,6 @@ use Civi\API\Event\PrepareEvent;
 use Civi\API\Event\ExceptionEvent;
 use Civi\API\Event\RespondEvent;
 
-
 /**
  *
  * @package Civi
@@ -67,13 +66,7 @@ class Kernel {
    * @return array|int
    */
   public function run($entity, $action, $params, $extra) {
-    $apiRequest = array();
-    $apiRequest['entity'] = \CRM_Utils_String::munge($entity);
-    $apiRequest['action'] = \CRM_Utils_String::munge($action);
-    $apiRequest['version'] = civicrm_get_api_version($params);
-    $apiRequest['params'] = $params;
-    $apiRequest['extra'] = $extra;
-    $apiRequest['fields'] = NULL;
+    $apiRequest = $this->createRequest($entity, $action, $params, $extra);
 
     try {
       if (!is_array($params)) {
@@ -127,6 +120,26 @@ class Kernel {
       return $this->formatResult($apiRequest, $err);
     }
 
+  }
+
+  /**
+   * Create a formatted/normalized request object.
+   *
+   * @param string $entity
+   * @param string $action
+   * @param array $params
+   * @param mixed $extra
+   * @return array the request descriptor
+   */
+  public function createRequest($entity, $action, $params, $extra) {
+    $apiRequest = array();
+    $apiRequest['entity'] = \CRM_Utils_String::munge($entity);
+    $apiRequest['action'] = \CRM_Utils_String::munge($action);
+    $apiRequest['version'] = civicrm_get_api_version($params);
+    $apiRequest['params'] = $params;
+    $apiRequest['extra'] = $extra;
+    $apiRequest['fields'] = NULL;
+    return $apiRequest;
   }
 
   public function boot() {
