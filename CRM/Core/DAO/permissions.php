@@ -104,8 +104,8 @@ function _civicrm_api3_permissions($entity, $action, &$params) {
       'view all contacts',
     ),
     'delete' => array(
-       'access CiviCRM',
-       'delete contacts',
+      'access CiviCRM',
+      'delete contacts',
     ),
     'default' => array(
       'access CiviCRM',
