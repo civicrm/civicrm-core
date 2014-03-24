@@ -25,35 +25,46 @@
  +--------------------------------------------------------------------+
 */
 
-namespace Civi\API\Event;
+namespace Civi\API\Provider;
+use Civi\API\Events;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class Event extends \Symfony\Component\EventDispatcher\Event {
-  /**
-   * @var \Civi\API\Provider\ProviderInterface
-   */
-  protected $apiProvider;
-
-  /**
-   * @var array
-   */
-  protected $apiRequest;
-
-  function __construct($apiProvider, $apiRequest) {
-    $this->apiProvider = $apiProvider;
-    $this->apiRequest = $apiRequest;
+/**
+ * This class manages the loading of API's using strict file+function naming
+ * conventions.
+ */
+class MagicFunctionProvider implements EventSubscriberInterface, ProviderInterface {
+  public static function getSubscribedEvents() {
+    return array(
+      Events::RESOLVE => array(
+        array('onApiResolve', Events::W_MIDDLE),
+      ),
+    );
   }
 
-  /**
-   * @return \Civi\API\Provider\ProviderInterface
-   */
-  public function getApiProvider() {
-    return $this->apiProvider;
+  public function onApiResolve(\Civi\API\Event\ResolveEvent $event) {
+    $apiRequest = $event->getApiRequest();
+    $resolved = _civicrm_api_resolve($apiRequest);
+    if ($resolved['function']) {
+      $apiRequest += $resolved;
+      $event->setApiRequest($apiRequest);
+      $event->setApiProvider($this);
+      $event->stopPropagation();
+    }
   }
 
-  /**
-   * @return array
-   */
-  public function getApiRequest() {
-    return $this->apiRequest;
+  public function invoke($apiRequest) {
+    $function = $apiRequest['function'];
+    if ($apiRequest['function'] && $apiRequest['is_generic']) {
+      // Unlike normal API implementations, generic implementations require explicit
+      // knowledge of the entity and action (as well as $params). Bundle up these bits
+      // into a convenient data structure.
+      $result = $function($apiRequest);
+    }
+    elseif ($apiRequest['function'] && !$apiRequest['is_generic']) {
+      $result = isset($extra) ? $function($apiRequest['params'], $extra) : $function($apiRequest['params']);
+    }
+    return $result;
   }
+
 }

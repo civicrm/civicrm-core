@@ -29,6 +29,7 @@ namespace Civi\API;
 use Civi\API\Event\AuthorizeEvent;
 use Civi\API\Event\PrepareEvent;
 use Civi\API\Event\ExceptionEvent;
+use Civi\API\Event\ResolveEvent;
 use Civi\API\Event\RespondEvent;
 
 /**
@@ -66,6 +67,11 @@ class Kernel {
    * @return array|int
    */
   public function run($entity, $action, $params, $extra) {
+    /**
+     * @var $apiProvider \Civi\API\Provider\ProviderInterface|NULL
+     */
+    $apiProvider = NULL;
+
     $apiRequest = $this->createRequest($entity, $action, $params, $extra);
 
     try {
@@ -76,38 +82,29 @@ class Kernel {
       $this->boot();
       $errorScope = \CRM_Core_TemporaryErrorScope::useException();
 
-      // look up function, file, is_generic
-      $apiRequest += _civicrm_api_resolve($apiRequest);
-
-      if (! $this->dispatcher->dispatch(Events::AUTHORIZE, new AuthorizeEvent(NULL, $apiRequest))->isAuthorized()) {
-        throw new \API_Exception("Authorization failed");
-      }
-
-      $apiRequest = $this->dispatcher->dispatch(Events::PREPARE, new PrepareEvent(NULL, $apiRequest))->getApiRequest();
-
-      $function = $apiRequest['function'];
-      if ($apiRequest['function'] && $apiRequest['is_generic']) {
-        // Unlike normal API implementations, generic implementations require explicit
-        // knowledge of the entity and action (as well as $params). Bundle up these bits
-        // into a convenient data structure.
-        $result = $function($apiRequest);
-      }
-      elseif ($apiRequest['function'] && !$apiRequest['is_generic']) {
-        $result = isset($extra) ? $function($apiRequest['params'], $extra) : $function($apiRequest['params']);
-      }
-      else {
+      $resolveEvent = $this->dispatcher->dispatch(Events::RESOLVE, new ResolveEvent($apiRequest));
+      $apiRequest = $resolveEvent->getApiRequest();
+      $apiProvider = $resolveEvent->getApiProvider();
+      if (!$apiProvider) {
         throw new \API_Exception("API (" . $apiRequest['entity'] . ", " . $apiRequest['action'] . ") does not exist (join the API team and implement it!)");
       }
+
+      if (! $this->dispatcher->dispatch(Events::AUTHORIZE, new AuthorizeEvent($apiProvider, $apiRequest))->isAuthorized()) {
+        throw new \API_Exception("Authorization failed", 'unauthorized');
+      }
+
+      $apiRequest = $this->dispatcher->dispatch(Events::PREPARE, new PrepareEvent($apiProvider, $apiRequest))->getApiRequest();
+      $result = $apiProvider->invoke($apiRequest);
 
       if (\CRM_Utils_Array::value('is_error', $result, 0) == 0) {
         _civicrm_api_call_nested_api($apiRequest['params'], $result, $apiRequest['action'], $apiRequest['entity'], $apiRequest['version']);
       }
 
-      $responseEvent = $this->dispatcher->dispatch(Events::RESPOND, new RespondEvent(NULL, $apiRequest, $result));
+      $responseEvent = $this->dispatcher->dispatch(Events::RESPOND, new RespondEvent($apiProvider, $apiRequest, $result));
       return $this->formatResult($apiRequest, $responseEvent->getResponse());
     }
     catch (\Exception $e) {
-      $this->dispatcher->dispatch(Events::EXCEPTION, new ExceptionEvent($e, NULL, $apiRequest));
+      $this->dispatcher->dispatch(Events::EXCEPTION, new ExceptionEvent($e, $apiProvider, $apiRequest));
 
       if ($e instanceof \PEAR_Exception) {
         $err = $this->formatPearException($e, $apiRequest);
