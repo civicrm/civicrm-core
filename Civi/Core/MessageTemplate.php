@@ -39,7 +39,6 @@ namespace Civi\Core;
 require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
-use Hateoas\Configuration\Annotation as Hateoas;
 use Civi\API\Annotation as CiviAPI;
 use JMS\Serializer\Annotation as JMS;
 
@@ -50,14 +49,6 @@ use JMS\Serializer\Annotation as JMS;
  * @CiviAPI\Permission()
  * @ORM\Table(name="civicrm_msg_template", indexes={@ORM\Index(name="FK_civicrm_msg_template_pdf_format_id", columns={"pdf_format_id"})})
  * @ORM\Entity
- * @Hateoas\Relation("self",
- *   href = @Hateoas\Route(
- *    "MessageTemplate_get",
- *    parameters = { "id" = "expr(object.getId())" },
- *    absolute = true,
- *    generator = "civi"
- *  )
- * )
  *
  */
 class MessageTemplate extends \Civi\Core\Entity {
@@ -147,7 +138,7 @@ class MessageTemplate extends \Civi\Core\Entity {
   /**
    * @var \Civi\Core\OptionValue
    *
-   * @JMS\Type("\Civi\Core\OptionValue")
+   * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\OptionValue")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="pdf_format_id", referencedColumnName="id", onDelete="SET NULL")})
    */

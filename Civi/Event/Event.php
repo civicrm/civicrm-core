@@ -39,7 +39,6 @@ namespace Civi\Event;
 require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
-use Hateoas\Configuration\Annotation as Hateoas;
 use Civi\API\Annotation as CiviAPI;
 use JMS\Serializer\Annotation as JMS;
 
@@ -50,14 +49,6 @@ use JMS\Serializer\Annotation as JMS;
  * @CiviAPI\Permission()
  * @ORM\Table(name="civicrm_event", indexes={@ORM\Index(name="index_event_type_id", columns={"event_type_id"}),@ORM\Index(name="index_participant_listing_id", columns={"participant_listing_id"}),@ORM\Index(name="index_parent_event_id", columns={"parent_event_id"}),@ORM\Index(name="FK_civicrm_event_loc_block_id", columns={"loc_block_id"}),@ORM\Index(name="FK_civicrm_event_created_id", columns={"created_id"}),@ORM\Index(name="FK_civicrm_event_campaign_id", columns={"campaign_id"})})
  * @ORM\Entity
- * @Hateoas\Relation("self",
- *   href = @Hateoas\Route(
- *    "Event_get",
- *    parameters = { "id" = "expr(object.getId())" },
- *    absolute = true,
- *    generator = "civi"
- *  )
- * )
  *
  */
 class Event extends \Civi\Core\Entity {
@@ -264,7 +255,7 @@ class Event extends \Civi\Core\Entity {
   /**
    * @var \Civi\Core\LocBlock
    *
-   * @JMS\Type("\Civi\Core\LocBlock")
+   * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\LocBlock")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="loc_block_id", referencedColumnName="id", onDelete="SET NULL")})
    */
@@ -570,7 +561,7 @@ class Event extends \Civi\Core\Entity {
   /**
    * @var \Civi\Contact\Contact
    *
-   * @JMS\Type("\Civi\Contact\Contact")
+   * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Contact")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="created_id", referencedColumnName="id", onDelete="SET NULL")})
    */
@@ -597,7 +588,7 @@ class Event extends \Civi\Core\Entity {
   /**
    * @var \Civi\Campaign\Campaign
    *
-   * @JMS\Type("\Civi\Campaign\Campaign")
+   * 
    * @ORM\ManyToOne(targetEntity="Civi\Campaign\Campaign")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="campaign_id", referencedColumnName="id", onDelete="SET NULL")})
    */

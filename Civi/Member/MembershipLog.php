@@ -39,7 +39,6 @@ namespace Civi\Member;
 require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
-use Hateoas\Configuration\Annotation as Hateoas;
 use Civi\API\Annotation as CiviAPI;
 use JMS\Serializer\Annotation as JMS;
 
@@ -50,14 +49,6 @@ use JMS\Serializer\Annotation as JMS;
  * @CiviAPI\Permission()
  * @ORM\Table(name="civicrm_membership_log", indexes={@ORM\Index(name="FK_civicrm_membership_log_membership_id", columns={"membership_id"}),@ORM\Index(name="FK_civicrm_membership_log_status_id", columns={"status_id"}),@ORM\Index(name="FK_civicrm_membership_log_modified_id", columns={"modified_id"}),@ORM\Index(name="FK_civicrm_membership_log_membership_type_id", columns={"membership_type_id"})})
  * @ORM\Entity
- * @Hateoas\Relation("self",
- *   href = @Hateoas\Route(
- *    "MembershipLog_get",
- *    parameters = { "id" = "expr(object.getId())" },
- *    absolute = true,
- *    generator = "civi"
- *  )
- * )
  *
  */
 class MembershipLog extends \Civi\Core\Entity {
@@ -75,7 +66,7 @@ class MembershipLog extends \Civi\Core\Entity {
   /**
    * @var \Civi\Member\Membership
    *
-   * @JMS\Type("\Civi\Member\Membership")
+   * 
    * @ORM\ManyToOne(targetEntity="Civi\Member\Membership")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="membership_id", referencedColumnName="id", onDelete="CASCADE")})
    */
@@ -84,7 +75,7 @@ class MembershipLog extends \Civi\Core\Entity {
   /**
    * @var \Civi\Member\MembershipStatus
    *
-   * @JMS\Type("\Civi\Member\MembershipStatus")
+   * 
    * @ORM\ManyToOne(targetEntity="Civi\Member\MembershipStatus")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="status_id", referencedColumnName="id", onDelete="CASCADE")})
    */
@@ -111,7 +102,7 @@ class MembershipLog extends \Civi\Core\Entity {
   /**
    * @var \Civi\Contact\Contact
    *
-   * @JMS\Type("\Civi\Contact\Contact")
+   * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Contact")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="modified_id", referencedColumnName="id", onDelete="SET NULL")})
    */
@@ -129,7 +120,7 @@ class MembershipLog extends \Civi\Core\Entity {
   /**
    * @var \Civi\Member\MembershipType
    *
-   * @JMS\Type("\Civi\Member\MembershipType")
+   * 
    * @ORM\ManyToOne(targetEntity="Civi\Member\MembershipType")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="membership_type_id", referencedColumnName="id", onDelete="SET NULL")})
    */

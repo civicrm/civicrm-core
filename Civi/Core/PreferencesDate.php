@@ -39,7 +39,6 @@ namespace Civi\Core;
 require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
-use Hateoas\Configuration\Annotation as Hateoas;
 use Civi\API\Annotation as CiviAPI;
 use JMS\Serializer\Annotation as JMS;
 
@@ -50,14 +49,6 @@ use JMS\Serializer\Annotation as JMS;
  * @CiviAPI\Permission()
  * @ORM\Table(name="civicrm_preferences_date", indexes={@ORM\Index(name="index_name", columns={"name"})})
  * @ORM\Entity
- * @Hateoas\Relation("self",
- *   href = @Hateoas\Route(
- *    "PreferencesDate_get",
- *    parameters = { "id" = "expr(object.getId())" },
- *    absolute = true,
- *    generator = "civi"
- *  )
- * )
  *
  */
 class PreferencesDate extends \Civi\Core\Entity {

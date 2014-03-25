@@ -39,7 +39,6 @@ namespace Civi\Core;
 require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
-use Hateoas\Configuration\Annotation as Hateoas;
 use Civi\API\Annotation as CiviAPI;
 use JMS\Serializer\Annotation as JMS;
 
@@ -50,14 +49,6 @@ use JMS\Serializer\Annotation as JMS;
  * @CiviAPI\Permission()
  * @ORM\Table(name="civicrm_openid", uniqueConstraints={@ORM\UniqueConstraint(name="UI_openid", columns={"openid"})}, indexes={@ORM\Index(name="index_location_type", columns={"location_type_id"}),@ORM\Index(name="FK_civicrm_openid_contact_id", columns={"contact_id"})})
  * @ORM\Entity
- * @Hateoas\Relation("self",
- *   href = @Hateoas\Route(
- *    "OpenID_get",
- *    parameters = { "id" = "expr(object.getId())" },
- *    absolute = true,
- *    generator = "civi"
- *  )
- * )
  *
  */
 class OpenID extends \Civi\Core\Entity {
@@ -75,7 +66,7 @@ class OpenID extends \Civi\Core\Entity {
   /**
    * @var \Civi\Contact\Contact
    *
-   * @JMS\Type("\Civi\Contact\Contact")
+   * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Contact")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="contact_id", referencedColumnName="id", onDelete="CASCADE")})
    */

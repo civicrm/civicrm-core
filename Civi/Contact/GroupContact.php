@@ -39,7 +39,6 @@ namespace Civi\Contact;
 require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
-use Hateoas\Configuration\Annotation as Hateoas;
 use Civi\API\Annotation as CiviAPI;
 use JMS\Serializer\Annotation as JMS;
 
@@ -50,14 +49,6 @@ use JMS\Serializer\Annotation as JMS;
  * @CiviAPI\Permission()
  * @ORM\Table(name="civicrm_group_contact", uniqueConstraints={@ORM\UniqueConstraint(name="UI_contact_group", columns={"contact_id","group_id"})}, indexes={@ORM\Index(name="FK_civicrm_group_contact_group_id", columns={"group_id"}),@ORM\Index(name="FK_civicrm_group_contact_contact_id", columns={"contact_id"}),@ORM\Index(name="FK_civicrm_group_contact_location_id", columns={"location_id"}),@ORM\Index(name="FK_civicrm_group_contact_email_id", columns={"email_id"})})
  * @ORM\Entity
- * @Hateoas\Relation("self",
- *   href = @Hateoas\Route(
- *    "GroupContact_get",
- *    parameters = { "id" = "expr(object.getId())" },
- *    absolute = true,
- *    generator = "civi"
- *  )
- * )
  *
  */
 class GroupContact extends \Civi\Core\Entity {
@@ -75,7 +66,7 @@ class GroupContact extends \Civi\Core\Entity {
   /**
    * @var \Civi\Contact\Group
    *
-   * @JMS\Type("\Civi\Contact\Group")
+   * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Group")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="group_id", referencedColumnName="id", onDelete="CASCADE")})
    */
@@ -84,7 +75,7 @@ class GroupContact extends \Civi\Core\Entity {
   /**
    * @var \Civi\Contact\Contact
    *
-   * @JMS\Type("\Civi\Contact\Contact")
+   * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Contact")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="contact_id", referencedColumnName="id", onDelete="CASCADE")})
    */
@@ -102,7 +93,7 @@ class GroupContact extends \Civi\Core\Entity {
   /**
    * @var \Civi\Core\LocBlock
    *
-   * @JMS\Type("\Civi\Core\LocBlock")
+   * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\LocBlock")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="location_id", referencedColumnName="id", onDelete="SET NULL")})
    */
@@ -111,7 +102,7 @@ class GroupContact extends \Civi\Core\Entity {
   /**
    * @var \Civi\Core\Email
    *
-   * @JMS\Type("\Civi\Core\Email")
+   * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\Email")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="email_id", referencedColumnName="id")})
    */

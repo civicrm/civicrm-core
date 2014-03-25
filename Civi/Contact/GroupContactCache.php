@@ -39,7 +39,6 @@ namespace Civi\Contact;
 require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
-use Hateoas\Configuration\Annotation as Hateoas;
 use Civi\API\Annotation as CiviAPI;
 use JMS\Serializer\Annotation as JMS;
 
@@ -50,14 +49,6 @@ use JMS\Serializer\Annotation as JMS;
  * @CiviAPI\Permission()
  * @ORM\Table(name="civicrm_group_contact_cache", uniqueConstraints={@ORM\UniqueConstraint(name="UI_contact_group", columns={"contact_id","group_id"})}, indexes={@ORM\Index(name="FK_civicrm_group_contact_cache_group_id", columns={"group_id"}),@ORM\Index(name="FK_civicrm_group_contact_cache_contact_id", columns={"contact_id"})})
  * @ORM\Entity
- * @Hateoas\Relation("self",
- *   href = @Hateoas\Route(
- *    "GroupContactCache_get",
- *    parameters = { "id" = "expr(object.getId())" },
- *    absolute = true,
- *    generator = "civi"
- *  )
- * )
  *
  */
 class GroupContactCache extends \Civi\Core\Entity {
@@ -75,7 +66,7 @@ class GroupContactCache extends \Civi\Core\Entity {
   /**
    * @var \Civi\Contact\Group
    *
-   * @JMS\Type("\Civi\Contact\Group")
+   * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Group")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="group_id", referencedColumnName="id", onDelete="CASCADE")})
    */
@@ -84,7 +75,7 @@ class GroupContactCache extends \Civi\Core\Entity {
   /**
    * @var \Civi\Contact\Contact
    *
-   * @JMS\Type("\Civi\Contact\Contact")
+   * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Contact")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="contact_id", referencedColumnName="id", onDelete="CASCADE")})
    */

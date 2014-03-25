@@ -39,7 +39,6 @@ namespace Civi\Core;
 require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
-use Hateoas\Configuration\Annotation as Hateoas;
 use Civi\API\Annotation as CiviAPI;
 use JMS\Serializer\Annotation as JMS;
 
@@ -50,14 +49,6 @@ use JMS\Serializer\Annotation as JMS;
  * @CiviAPI\Permission()
  * @ORM\Table(name="civicrm_action_schedule", indexes={@ORM\Index(name="FK_civicrm_action_schedule_mapping_id", columns={"mapping_id"}),@ORM\Index(name="FK_civicrm_action_schedule_group_id", columns={"group_id"}),@ORM\Index(name="FK_civicrm_action_schedule_msg_template_id", columns={"msg_template_id"}),@ORM\Index(name="FK_civicrm_action_schedule_sms_provider_id", columns={"sms_provider_id"})})
  * @ORM\Entity
- * @Hateoas\Relation("self",
- *   href = @Hateoas\Route(
- *    "ActionSchedule_get",
- *    parameters = { "id" = "expr(object.getId())" },
- *    absolute = true,
- *    generator = "civi"
- *  )
- * )
  *
  */
 class ActionSchedule extends \Civi\Core\Entity {
@@ -291,7 +282,7 @@ class ActionSchedule extends \Civi\Core\Entity {
   /**
    * @var \Civi\Core\ActionMapping
    *
-   * @JMS\Type("\Civi\Core\ActionMapping")
+   * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\ActionMapping")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="mapping_id", referencedColumnName="id", onDelete="SET NULL")})
    */
@@ -300,7 +291,7 @@ class ActionSchedule extends \Civi\Core\Entity {
   /**
    * @var \Civi\Contact\Group
    *
-   * @JMS\Type("\Civi\Contact\Group")
+   * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Group")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="group_id", referencedColumnName="id", onDelete="SET NULL")})
    */
@@ -309,7 +300,7 @@ class ActionSchedule extends \Civi\Core\Entity {
   /**
    * @var \Civi\Core\MessageTemplate
    *
-   * @JMS\Type("\Civi\Core\MessageTemplate")
+   * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\MessageTemplate")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="msg_template_id", referencedColumnName="id", onDelete="SET NULL")})
    */
@@ -336,7 +327,7 @@ class ActionSchedule extends \Civi\Core\Entity {
   /**
    * @var \Civi\SMS\Provider
    *
-   * @JMS\Type("\Civi\SMS\Provider")
+   * 
    * @ORM\ManyToOne(targetEntity="Civi\SMS\Provider")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="sms_provider_id", referencedColumnName="id", onDelete="SET NULL")})
    */

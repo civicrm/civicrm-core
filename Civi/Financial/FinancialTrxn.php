@@ -39,7 +39,6 @@ namespace Civi\Financial;
 require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
-use Hateoas\Configuration\Annotation as Hateoas;
 use Civi\API\Annotation as CiviAPI;
 use JMS\Serializer\Annotation as JMS;
 
@@ -50,14 +49,6 @@ use JMS\Serializer\Annotation as JMS;
  * @CiviAPI\Permission()
  * @ORM\Table(name="civicrm_financial_trxn", indexes={@ORM\Index(name="UI_ftrxn_payment_instrument_id", columns={"payment_instrument_id"}),@ORM\Index(name="UI_ftrxn_check_number", columns={"check_number"}),@ORM\Index(name="FK_civicrm_financial_trxn_from_financial_account_id", columns={"from_financial_account_id"}),@ORM\Index(name="FK_civicrm_financial_trxn_to_financial_account_id", columns={"to_financial_account_id"}),@ORM\Index(name="FK_civicrm_financial_trxn_payment_processor_id", columns={"payment_processor_id"})})
  * @ORM\Entity
- * @Hateoas\Relation("self",
- *   href = @Hateoas\Route(
- *    "FinancialTrxn_get",
- *    parameters = { "id" = "expr(object.getId())" },
- *    absolute = true,
- *    generator = "civi"
- *  )
- * )
  *
  */
 class FinancialTrxn extends \Civi\Core\Entity {
@@ -75,7 +66,7 @@ class FinancialTrxn extends \Civi\Core\Entity {
   /**
    * @var \Civi\Financial\FinancialAccount
    *
-   * @JMS\Type("\Civi\Financial\FinancialAccount")
+   * 
    * @ORM\ManyToOne(targetEntity="Civi\Financial\FinancialAccount")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="from_financial_account_id", referencedColumnName="id")})
    */
@@ -84,7 +75,7 @@ class FinancialTrxn extends \Civi\Core\Entity {
   /**
    * @var \Civi\Financial\FinancialAccount
    *
-   * @JMS\Type("\Civi\Financial\FinancialAccount")
+   * 
    * @ORM\ManyToOne(targetEntity="Civi\Financial\FinancialAccount")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="to_financial_account_id", referencedColumnName="id")})
    */
@@ -165,7 +156,7 @@ class FinancialTrxn extends \Civi\Core\Entity {
   /**
    * @var \Civi\Financial\PaymentProcessor
    *
-   * @JMS\Type("\Civi\Financial\PaymentProcessor")
+   * 
    * @ORM\ManyToOne(targetEntity="Civi\Financial\PaymentProcessor")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="payment_processor_id", referencedColumnName="id", onDelete="SET NULL")})
    */

@@ -39,7 +39,6 @@ namespace Civi\Pledge;
 require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
-use Hateoas\Configuration\Annotation as Hateoas;
 use Civi\API\Annotation as CiviAPI;
 use JMS\Serializer\Annotation as JMS;
 
@@ -50,14 +49,6 @@ use JMS\Serializer\Annotation as JMS;
  * @CiviAPI\Permission()
  * @ORM\Table(name="civicrm_pledge_payment", indexes={@ORM\Index(name="index_contribution_pledge", columns={"contribution_id","pledge_id"}),@ORM\Index(name="index_status", columns={"status_id"}),@ORM\Index(name="FK_civicrm_pledge_payment_pledge_id", columns={"pledge_id"}),@ORM\Index(name="FK_civicrm_pledge_payment_contribution_id", columns={"contribution_id"})})
  * @ORM\Entity
- * @Hateoas\Relation("self",
- *   href = @Hateoas\Route(
- *    "PledgePayment_get",
- *    parameters = { "id" = "expr(object.getId())" },
- *    absolute = true,
- *    generator = "civi"
- *  )
- * )
  *
  */
 class PledgePayment extends \Civi\Core\Entity {
@@ -75,7 +66,7 @@ class PledgePayment extends \Civi\Core\Entity {
   /**
    * @var \Civi\Pledge\Pledge
    *
-   * @JMS\Type("\Civi\Pledge\Pledge")
+   * 
    * @ORM\ManyToOne(targetEntity="Civi\Pledge\Pledge")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="pledge_id", referencedColumnName="id", onDelete="CASCADE")})
    */
@@ -84,7 +75,7 @@ class PledgePayment extends \Civi\Core\Entity {
   /**
    * @var \Civi\Contribute\Contribution
    *
-   * @JMS\Type("\Civi\Contribute\Contribution")
+   * 
    * @ORM\ManyToOne(targetEntity="Civi\Contribute\Contribution")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="contribution_id", referencedColumnName="id", onDelete="CASCADE")})
    */

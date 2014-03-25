@@ -39,7 +39,6 @@ namespace Civi\Core;
 require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
-use Hateoas\Configuration\Annotation as Hateoas;
 use Civi\API\Annotation as CiviAPI;
 use JMS\Serializer\Annotation as JMS;
 
@@ -50,14 +49,6 @@ use JMS\Serializer\Annotation as JMS;
  * @CiviAPI\Permission()
  * @ORM\Table(name="civicrm_menu", uniqueConstraints={@ORM\UniqueConstraint(name="UI_path_domain_id", columns={"path","domain_id"})}, indexes={@ORM\Index(name="FK_civicrm_menu_domain_id", columns={"domain_id"}),@ORM\Index(name="FK_civicrm_menu_component_id", columns={"component_id"})})
  * @ORM\Entity
- * @Hateoas\Relation("self",
- *   href = @Hateoas\Route(
- *    "Menu_get",
- *    parameters = { "id" = "expr(object.getId())" },
- *    absolute = true,
- *    generator = "civi"
- *  )
- * )
  *
  */
 class Menu extends \Civi\Core\Entity {
@@ -75,7 +66,7 @@ class Menu extends \Civi\Core\Entity {
   /**
    * @var \Civi\Core\Domain
    *
-   * @JMS\Type("\Civi\Core\Domain")
+   * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\Domain")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="domain_id", referencedColumnName="id")})
    */
@@ -174,7 +165,7 @@ class Menu extends \Civi\Core\Entity {
   /**
    * @var \Civi\Core\Component
    *
-   * @JMS\Type("\Civi\Core\Component")
+   * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\Component")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="component_id", referencedColumnName="id")})
    */

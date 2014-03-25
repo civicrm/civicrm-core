@@ -39,7 +39,6 @@ namespace Civi\Activity;
 require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
-use Hateoas\Configuration\Annotation as Hateoas;
 use Civi\API\Annotation as CiviAPI;
 use JMS\Serializer\Annotation as JMS;
 
@@ -50,14 +49,6 @@ use JMS\Serializer\Annotation as JMS;
  * @CiviAPI\Permission()
  * @ORM\Table(name="civicrm_activity", indexes={@ORM\Index(name="UI_source_record_id", columns={"source_record_id"}),@ORM\Index(name="UI_activity_type_id", columns={"activity_type_id"}),@ORM\Index(name="index_medium_id", columns={"medium_id"}),@ORM\Index(name="index_is_current_revision", columns={"is_current_revision"}),@ORM\Index(name="index_is_deleted", columns={"is_deleted"}),@ORM\Index(name="FK_civicrm_activity_phone_id", columns={"phone_id"}),@ORM\Index(name="FK_civicrm_activity_parent_id", columns={"parent_id"}),@ORM\Index(name="FK_civicrm_activity_relationship_id", columns={"relationship_id"}),@ORM\Index(name="FK_civicrm_activity_original_id", columns={"original_id"}),@ORM\Index(name="FK_civicrm_activity_campaign_id", columns={"campaign_id"})})
  * @ORM\Entity
- * @Hateoas\Relation("self",
- *   href = @Hateoas\Route(
- *    "Activity_get",
- *    parameters = { "id" = "expr(object.getId())" },
- *    absolute = true,
- *    generator = "civi"
- *  )
- * )
  *
  */
 class Activity extends \Civi\Core\Entity {
@@ -129,7 +120,7 @@ class Activity extends \Civi\Core\Entity {
   /**
    * @var \Civi\Core\Phone
    *
-   * @JMS\Type("\Civi\Core\Phone")
+   * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\Phone")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="phone_id", referencedColumnName="id", onDelete="SET NULL")})
    */
@@ -174,7 +165,7 @@ class Activity extends \Civi\Core\Entity {
   /**
    * @var \Civi\Activity\Activity
    *
-   * @JMS\Type("\Civi\Activity\Activity")
+   * 
    * @ORM\ManyToOne(targetEntity="Civi\Activity\Activity")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="parent_id", referencedColumnName="id", onDelete="CASCADE")})
    */
@@ -210,7 +201,7 @@ class Activity extends \Civi\Core\Entity {
   /**
    * @var \Civi\Contact\Relationship
    *
-   * @JMS\Type("\Civi\Contact\Relationship")
+   * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Relationship")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="relationship_id", referencedColumnName="id", onDelete="SET NULL")})
    */
@@ -228,7 +219,7 @@ class Activity extends \Civi\Core\Entity {
   /**
    * @var \Civi\Activity\Activity
    *
-   * @JMS\Type("\Civi\Activity\Activity")
+   * 
    * @ORM\ManyToOne(targetEntity="Civi\Activity\Activity")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="original_id", referencedColumnName="id", onDelete="CASCADE")})
    */
@@ -255,7 +246,7 @@ class Activity extends \Civi\Core\Entity {
   /**
    * @var \Civi\Campaign\Campaign
    *
-   * @JMS\Type("\Civi\Campaign\Campaign")
+   * 
    * @ORM\ManyToOne(targetEntity="Civi\Campaign\Campaign")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="campaign_id", referencedColumnName="id", onDelete="SET NULL")})
    */

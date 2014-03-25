@@ -39,7 +39,6 @@ namespace Civi\Campaign;
 require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
-use Hateoas\Configuration\Annotation as Hateoas;
 use Civi\API\Annotation as CiviAPI;
 use JMS\Serializer\Annotation as JMS;
 
@@ -50,14 +49,6 @@ use JMS\Serializer\Annotation as JMS;
  * @CiviAPI\Permission()
  * @ORM\Table(name="civicrm_survey", indexes={@ORM\Index(name="UI_activity_type_id", columns={"activity_type_id"}),@ORM\Index(name="FK_civicrm_survey_campaign_id", columns={"campaign_id"}),@ORM\Index(name="FK_civicrm_survey_created_id", columns={"created_id"}),@ORM\Index(name="FK_civicrm_survey_last_modified_id", columns={"last_modified_id"})})
  * @ORM\Entity
- * @Hateoas\Relation("self",
- *   href = @Hateoas\Route(
- *    "Survey_get",
- *    parameters = { "id" = "expr(object.getId())" },
- *    absolute = true,
- *    generator = "civi"
- *  )
- * )
  *
  */
 class Survey extends \Civi\Core\Entity {
@@ -84,7 +75,7 @@ class Survey extends \Civi\Core\Entity {
   /**
    * @var \Civi\Campaign\Campaign
    *
-   * @JMS\Type("\Civi\Campaign\Campaign")
+   * 
    * @ORM\ManyToOne(targetEntity="Civi\Campaign\Campaign")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="campaign_id", referencedColumnName="id", onDelete="SET NULL")})
    */
@@ -165,7 +156,7 @@ class Survey extends \Civi\Core\Entity {
   /**
    * @var \Civi\Contact\Contact
    *
-   * @JMS\Type("\Civi\Contact\Contact")
+   * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Contact")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="created_id", referencedColumnName="id", onDelete="SET NULL")})
    */
@@ -183,7 +174,7 @@ class Survey extends \Civi\Core\Entity {
   /**
    * @var \Civi\Contact\Contact
    *
-   * @JMS\Type("\Civi\Contact\Contact")
+   * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Contact")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="last_modified_id", referencedColumnName="id", onDelete="SET NULL")})
    */

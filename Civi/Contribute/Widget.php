@@ -39,7 +39,6 @@ namespace Civi\Contribute;
 require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
-use Hateoas\Configuration\Annotation as Hateoas;
 use Civi\API\Annotation as CiviAPI;
 use JMS\Serializer\Annotation as JMS;
 
@@ -50,14 +49,6 @@ use JMS\Serializer\Annotation as JMS;
  * @CiviAPI\Permission()
  * @ORM\Table(name="civicrm_contribution_widget", indexes={@ORM\Index(name="FK_civicrm_contribution_widget_contribution_page_id", columns={"contribution_page_id"})})
  * @ORM\Entity
- * @Hateoas\Relation("self",
- *   href = @Hateoas\Route(
- *    "Widget_get",
- *    parameters = { "id" = "expr(object.getId())" },
- *    absolute = true,
- *    generator = "civi"
- *  )
- * )
  *
  */
 class Widget extends \Civi\Core\Entity {
@@ -75,7 +66,7 @@ class Widget extends \Civi\Core\Entity {
   /**
    * @var \Civi\Contribute\ContributionPage
    *
-   * @JMS\Type("\Civi\Contribute\ContributionPage")
+   * 
    * @ORM\ManyToOne(targetEntity="Civi\Contribute\ContributionPage")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="contribution_page_id", referencedColumnName="id", onDelete="CASCADE")})
    */

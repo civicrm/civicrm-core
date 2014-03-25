@@ -39,7 +39,6 @@ namespace Civi\CCase;
 require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
-use Hateoas\Configuration\Annotation as Hateoas;
 use Civi\API\Annotation as CiviAPI;
 use JMS\Serializer\Annotation as JMS;
 
@@ -50,14 +49,6 @@ use JMS\Serializer\Annotation as JMS;
  * @CiviAPI\Permission()
  * @ORM\Table(name="civicrm_case_activity", indexes={@ORM\Index(name="UI_case_activity_id", columns={"case_id","activity_id"}),@ORM\Index(name="FK_civicrm_case_activity_case_id", columns={"case_id"}),@ORM\Index(name="FK_civicrm_case_activity_activity_id", columns={"activity_id"})})
  * @ORM\Entity
- * @Hateoas\Relation("self",
- *   href = @Hateoas\Route(
- *    "CaseActivity_get",
- *    parameters = { "id" = "expr(object.getId())" },
- *    absolute = true,
- *    generator = "civi"
- *  )
- * )
  *
  */
 class CaseActivity extends \Civi\Core\Entity {
@@ -75,7 +66,7 @@ class CaseActivity extends \Civi\Core\Entity {
   /**
    * @var \Civi\CCase\CCase
    *
-   * @JMS\Type("\Civi\CCase\CCase")
+   * 
    * @ORM\ManyToOne(targetEntity="Civi\CCase\CCase")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="case_id", referencedColumnName="id", onDelete="CASCADE")})
    */
@@ -84,7 +75,7 @@ class CaseActivity extends \Civi\Core\Entity {
   /**
    * @var \Civi\Activity\Activity
    *
-   * @JMS\Type("\Civi\Activity\Activity")
+   * 
    * @ORM\ManyToOne(targetEntity="Civi\Activity\Activity")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="activity_id", referencedColumnName="id", onDelete="CASCADE")})
    */

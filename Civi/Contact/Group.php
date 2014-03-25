@@ -39,7 +39,6 @@ namespace Civi\Contact;
 require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
-use Hateoas\Configuration\Annotation as Hateoas;
 use Civi\API\Annotation as CiviAPI;
 use JMS\Serializer\Annotation as JMS;
 
@@ -50,14 +49,6 @@ use JMS\Serializer\Annotation as JMS;
  * @CiviAPI\Permission()
  * @ORM\Table(name="civicrm_group", uniqueConstraints={@ORM\UniqueConstraint(name="UI_title", columns={"title"}),@ORM\UniqueConstraint(name="UI_name", columns={"name"})}, indexes={@ORM\Index(name="index_group_type", columns={"group_type"}),@ORM\Index(name="FK_civicrm_group_saved_search_id", columns={"saved_search_id"}),@ORM\Index(name="FK_civicrm_group_created_id", columns={"created_id"}),@ORM\Index(name="FK_civicrm_group_modified_id", columns={"modified_id"})})
  * @ORM\Entity
- * @Hateoas\Relation("self",
- *   href = @Hateoas\Route(
- *    "Group_get",
- *    parameters = { "id" = "expr(object.getId())" },
- *    absolute = true,
- *    generator = "civi"
- *  )
- * )
  *
  */
 class Group extends \Civi\Core\Entity {
@@ -111,7 +102,7 @@ class Group extends \Civi\Core\Entity {
   /**
    * @var \Civi\Contact\SavedSearch
    *
-   * @JMS\Type("\Civi\Contact\SavedSearch")
+   * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\SavedSearch")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="saved_search_id", referencedColumnName="id", onDelete="SET NULL")})
    */
@@ -228,7 +219,7 @@ class Group extends \Civi\Core\Entity {
   /**
    * @var \Civi\Contact\Contact
    *
-   * @JMS\Type("\Civi\Contact\Contact")
+   * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Contact")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="created_id", referencedColumnName="id", onDelete="SET NULL")})
    */
@@ -237,7 +228,7 @@ class Group extends \Civi\Core\Entity {
   /**
    * @var \Civi\Contact\Contact
    *
-   * @JMS\Type("\Civi\Contact\Contact")
+   * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Contact")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="modified_id", referencedColumnName="id", onDelete="SET NULL")})
    */

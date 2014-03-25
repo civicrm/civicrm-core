@@ -39,7 +39,6 @@ namespace Civi\Contact;
 require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
-use Hateoas\Configuration\Annotation as Hateoas;
 use Civi\API\Annotation as CiviAPI;
 use JMS\Serializer\Annotation as JMS;
 
@@ -50,14 +49,6 @@ use JMS\Serializer\Annotation as JMS;
  * @CiviAPI\Permission()
  * @ORM\Table(name="civicrm_contact_type", uniqueConstraints={@ORM\UniqueConstraint(name="contact_type", columns={"name"})}, indexes={@ORM\Index(name="FK_civicrm_contact_type_parent_id", columns={"parent_id"})})
  * @ORM\Entity
- * @Hateoas\Relation("self",
- *   href = @Hateoas\Route(
- *    "ContactType_get",
- *    parameters = { "id" = "expr(object.getId())" },
- *    absolute = true,
- *    generator = "civi"
- *  )
- * )
  *
  */
 class ContactType extends \Civi\Core\Entity {
@@ -111,7 +102,7 @@ class ContactType extends \Civi\Core\Entity {
   /**
    * @var \Civi\Contact\ContactType
    *
-   * @JMS\Type("\Civi\Contact\ContactType")
+   * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\ContactType")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="parent_id", referencedColumnName="id")})
    */

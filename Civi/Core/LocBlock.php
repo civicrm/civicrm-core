@@ -39,7 +39,6 @@ namespace Civi\Core;
 require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
-use Hateoas\Configuration\Annotation as Hateoas;
 use Civi\API\Annotation as CiviAPI;
 use JMS\Serializer\Annotation as JMS;
 
@@ -50,14 +49,6 @@ use JMS\Serializer\Annotation as JMS;
  * @CiviAPI\Permission()
  * @ORM\Table(name="civicrm_loc_block", indexes={@ORM\Index(name="FK_civicrm_loc_block_address_id", columns={"address_id"}),@ORM\Index(name="FK_civicrm_loc_block_email_id", columns={"email_id"}),@ORM\Index(name="FK_civicrm_loc_block_phone_id", columns={"phone_id"}),@ORM\Index(name="FK_civicrm_loc_block_im_id", columns={"im_id"}),@ORM\Index(name="FK_civicrm_loc_block_address_2_id", columns={"address_2_id"}),@ORM\Index(name="FK_civicrm_loc_block_email_2_id", columns={"email_2_id"}),@ORM\Index(name="FK_civicrm_loc_block_phone_2_id", columns={"phone_2_id"}),@ORM\Index(name="FK_civicrm_loc_block_im_2_id", columns={"im_2_id"})})
  * @ORM\Entity
- * @Hateoas\Relation("self",
- *   href = @Hateoas\Route(
- *    "LocBlock_get",
- *    parameters = { "id" = "expr(object.getId())" },
- *    absolute = true,
- *    generator = "civi"
- *  )
- * )
  *
  */
 class LocBlock extends \Civi\Core\Entity {
@@ -75,7 +66,7 @@ class LocBlock extends \Civi\Core\Entity {
   /**
    * @var \Civi\Core\Address
    *
-   * @JMS\Type("\Civi\Core\Address")
+   * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\Address")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="address_id", referencedColumnName="id", onDelete="SET NULL")})
    */
@@ -84,7 +75,7 @@ class LocBlock extends \Civi\Core\Entity {
   /**
    * @var \Civi\Core\Email
    *
-   * @JMS\Type("\Civi\Core\Email")
+   * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\Email")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="email_id", referencedColumnName="id", onDelete="SET NULL")})
    */
@@ -93,7 +84,7 @@ class LocBlock extends \Civi\Core\Entity {
   /**
    * @var \Civi\Core\Phone
    *
-   * @JMS\Type("\Civi\Core\Phone")
+   * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\Phone")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="phone_id", referencedColumnName="id", onDelete="SET NULL")})
    */
@@ -102,7 +93,7 @@ class LocBlock extends \Civi\Core\Entity {
   /**
    * @var \Civi\Core\IM
    *
-   * @JMS\Type("\Civi\Core\IM")
+   * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\IM")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="im_id", referencedColumnName="id", onDelete="SET NULL")})
    */
@@ -111,7 +102,7 @@ class LocBlock extends \Civi\Core\Entity {
   /**
    * @var \Civi\Core\Address
    *
-   * @JMS\Type("\Civi\Core\Address")
+   * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\Address")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="address_2_id", referencedColumnName="id", onDelete="SET NULL")})
    */
@@ -120,7 +111,7 @@ class LocBlock extends \Civi\Core\Entity {
   /**
    * @var \Civi\Core\Email
    *
-   * @JMS\Type("\Civi\Core\Email")
+   * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\Email")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="email_2_id", referencedColumnName="id", onDelete="SET NULL")})
    */
@@ -129,7 +120,7 @@ class LocBlock extends \Civi\Core\Entity {
   /**
    * @var \Civi\Core\Phone
    *
-   * @JMS\Type("\Civi\Core\Phone")
+   * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\Phone")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="phone_2_id", referencedColumnName="id", onDelete="SET NULL")})
    */
@@ -138,7 +129,7 @@ class LocBlock extends \Civi\Core\Entity {
   /**
    * @var \Civi\Core\IM
    *
-   * @JMS\Type("\Civi\Core\IM")
+   * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\IM")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="im_2_id", referencedColumnName="id", onDelete="SET NULL")})
    */

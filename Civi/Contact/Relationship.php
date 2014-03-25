@@ -39,7 +39,6 @@ namespace Civi\Contact;
 require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
-use Hateoas\Configuration\Annotation as Hateoas;
 use Civi\API\Annotation as CiviAPI;
 use JMS\Serializer\Annotation as JMS;
 
@@ -50,14 +49,6 @@ use JMS\Serializer\Annotation as JMS;
  * @CiviAPI\Permission()
  * @ORM\Table(name="civicrm_relationship", indexes={@ORM\Index(name="FK_civicrm_relationship_contact_id_a", columns={"contact_id_a"}),@ORM\Index(name="FK_civicrm_relationship_contact_id_b", columns={"contact_id_b"}),@ORM\Index(name="FK_civicrm_relationship_relationship_type_id", columns={"relationship_type_id"}),@ORM\Index(name="FK_civicrm_relationship_case_id", columns={"case_id"})})
  * @ORM\Entity
- * @Hateoas\Relation("self",
- *   href = @Hateoas\Route(
- *    "Relationship_get",
- *    parameters = { "id" = "expr(object.getId())" },
- *    absolute = true,
- *    generator = "civi"
- *  )
- * )
  *
  */
 class Relationship extends \Civi\Core\Entity {
@@ -75,7 +66,7 @@ class Relationship extends \Civi\Core\Entity {
   /**
    * @var \Civi\Contact\Contact
    *
-   * @JMS\Type("\Civi\Contact\Contact")
+   * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Contact")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="contact_id_a", referencedColumnName="id", onDelete="CASCADE")})
    */
@@ -84,7 +75,7 @@ class Relationship extends \Civi\Core\Entity {
   /**
    * @var \Civi\Contact\Contact
    *
-   * @JMS\Type("\Civi\Contact\Contact")
+   * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Contact")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="contact_id_b", referencedColumnName="id", onDelete="CASCADE")})
    */
@@ -93,7 +84,7 @@ class Relationship extends \Civi\Core\Entity {
   /**
    * @var \Civi\Contact\RelationshipType
    *
-   * @JMS\Type("\Civi\Contact\RelationshipType")
+   * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\RelationshipType")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="relationship_type_id", referencedColumnName="id", onDelete="CASCADE")})
    */
@@ -156,7 +147,7 @@ class Relationship extends \Civi\Core\Entity {
   /**
    * @var \Civi\CCase\CCase
    *
-   * @JMS\Type("\Civi\CCase\CCase")
+   * 
    * @ORM\ManyToOne(targetEntity="Civi\CCase\CCase")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="case_id", referencedColumnName="id", onDelete="CASCADE")})
    */

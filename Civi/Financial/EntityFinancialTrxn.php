@@ -39,7 +39,6 @@ namespace Civi\Financial;
 require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
-use Hateoas\Configuration\Annotation as Hateoas;
 use Civi\API\Annotation as CiviAPI;
 use JMS\Serializer\Annotation as JMS;
 
@@ -50,14 +49,6 @@ use JMS\Serializer\Annotation as JMS;
  * @CiviAPI\Permission()
  * @ORM\Table(name="civicrm_entity_financial_trxn", indexes={@ORM\Index(name="UI_entity_financial_trxn_entity_table", columns={"entity_table"}),@ORM\Index(name="UI_entity_financial_trxn_entity_id", columns={"entity_id"}),@ORM\Index(name="FK_civicrm_entity_financial_trxn_financial_trxn_id", columns={"financial_trxn_id"})})
  * @ORM\Entity
- * @Hateoas\Relation("self",
- *   href = @Hateoas\Route(
- *    "EntityFinancialTrxn_get",
- *    parameters = { "id" = "expr(object.getId())" },
- *    absolute = true,
- *    generator = "civi"
- *  )
- * )
  *
  */
 class EntityFinancialTrxn extends \Civi\Core\Entity {
@@ -93,7 +84,7 @@ class EntityFinancialTrxn extends \Civi\Core\Entity {
   /**
    * @var \Civi\Financial\FinancialTrxn
    *
-   * @JMS\Type("\Civi\Financial\FinancialTrxn")
+   * 
    * @ORM\ManyToOne(targetEntity="Civi\Financial\FinancialTrxn")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="financial_trxn_id", referencedColumnName="id", onDelete="SET NULL")})
    */

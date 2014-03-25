@@ -39,7 +39,6 @@ namespace Civi\Core;
 require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
-use Hateoas\Configuration\Annotation as Hateoas;
 use Civi\API\Annotation as CiviAPI;
 use JMS\Serializer\Annotation as JMS;
 
@@ -50,14 +49,6 @@ use JMS\Serializer\Annotation as JMS;
  * @CiviAPI\Permission()
  * @ORM\Table(name="civicrm_word_replacement", uniqueConstraints={@ORM\UniqueConstraint(name="UI_domain_find", columns={"domain_id","find_word"})}, indexes={@ORM\Index(name="FK_civicrm_word_replacement_domain_id", columns={"domain_id"})})
  * @ORM\Entity
- * @Hateoas\Relation("self",
- *   href = @Hateoas\Route(
- *    "WordReplacement_get",
- *    parameters = { "id" = "expr(object.getId())" },
- *    absolute = true,
- *    generator = "civi"
- *  )
- * )
  *
  */
 class WordReplacement extends \Civi\Core\Entity {
@@ -111,7 +102,7 @@ class WordReplacement extends \Civi\Core\Entity {
   /**
    * @var \Civi\Core\Domain
    *
-   * @JMS\Type("\Civi\Core\Domain")
+   * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\Domain")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="domain_id", referencedColumnName="id")})
    */

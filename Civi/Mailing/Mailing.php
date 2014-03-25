@@ -39,7 +39,6 @@ namespace Civi\Mailing;
 require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
-use Hateoas\Configuration\Annotation as Hateoas;
 use Civi\API\Annotation as CiviAPI;
 use JMS\Serializer\Annotation as JMS;
 
@@ -50,14 +49,6 @@ use JMS\Serializer\Annotation as JMS;
  * @CiviAPI\Permission()
  * @ORM\Table(name="civicrm_mailing", indexes={@ORM\Index(name="FK_civicrm_mailing_domain_id", columns={"domain_id"}),@ORM\Index(name="FK_civicrm_mailing_header_id", columns={"header_id"}),@ORM\Index(name="FK_civicrm_mailing_footer_id", columns={"footer_id"}),@ORM\Index(name="FK_civicrm_mailing_reply_id", columns={"reply_id"}),@ORM\Index(name="FK_civicrm_mailing_unsubscribe_id", columns={"unsubscribe_id"}),@ORM\Index(name="FK_civicrm_mailing_optout_id", columns={"optout_id"}),@ORM\Index(name="FK_civicrm_mailing_msg_template_id", columns={"msg_template_id"}),@ORM\Index(name="FK_civicrm_mailing_created_id", columns={"created_id"}),@ORM\Index(name="FK_civicrm_mailing_scheduled_id", columns={"scheduled_id"}),@ORM\Index(name="FK_civicrm_mailing_approver_id", columns={"approver_id"}),@ORM\Index(name="FK_civicrm_mailing_campaign_id", columns={"campaign_id"}),@ORM\Index(name="FK_civicrm_mailing_sms_provider_id", columns={"sms_provider_id"})})
  * @ORM\Entity
- * @Hateoas\Relation("self",
- *   href = @Hateoas\Route(
- *    "Mailing_get",
- *    parameters = { "id" = "expr(object.getId())" },
- *    absolute = true,
- *    generator = "civi"
- *  )
- * )
  *
  */
 class Mailing extends \Civi\Core\Entity {
@@ -75,7 +66,7 @@ class Mailing extends \Civi\Core\Entity {
   /**
    * @var \Civi\Core\Domain
    *
-   * @JMS\Type("\Civi\Core\Domain")
+   * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\Domain")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="domain_id", referencedColumnName="id", onDelete="SET NULL")})
    */
@@ -84,7 +75,7 @@ class Mailing extends \Civi\Core\Entity {
   /**
    * @var \Civi\Mailing\Component
    *
-   * @JMS\Type("\Civi\Mailing\Component")
+   * 
    * @ORM\ManyToOne(targetEntity="Civi\Mailing\Component")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="header_id", referencedColumnName="id", onDelete="SET NULL")})
    */
@@ -93,7 +84,7 @@ class Mailing extends \Civi\Core\Entity {
   /**
    * @var \Civi\Mailing\Component
    *
-   * @JMS\Type("\Civi\Mailing\Component")
+   * 
    * @ORM\ManyToOne(targetEntity="Civi\Mailing\Component")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="footer_id", referencedColumnName="id", onDelete="SET NULL")})
    */
@@ -102,7 +93,7 @@ class Mailing extends \Civi\Core\Entity {
   /**
    * @var \Civi\Mailing\Component
    *
-   * @JMS\Type("\Civi\Mailing\Component")
+   * 
    * @ORM\ManyToOne(targetEntity="Civi\Mailing\Component")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="reply_id", referencedColumnName="id", onDelete="SET NULL")})
    */
@@ -111,7 +102,7 @@ class Mailing extends \Civi\Core\Entity {
   /**
    * @var \Civi\Mailing\Component
    *
-   * @JMS\Type("\Civi\Mailing\Component")
+   * 
    * @ORM\ManyToOne(targetEntity="Civi\Mailing\Component")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="unsubscribe_id", referencedColumnName="id", onDelete="SET NULL")})
    */
@@ -129,7 +120,7 @@ class Mailing extends \Civi\Core\Entity {
   /**
    * @var \Civi\Mailing\Component
    *
-   * @JMS\Type("\Civi\Mailing\Component")
+   * 
    * @ORM\ManyToOne(targetEntity="Civi\Mailing\Component")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="optout_id", referencedColumnName="id", onDelete="SET NULL")})
    */
@@ -246,7 +237,7 @@ class Mailing extends \Civi\Core\Entity {
   /**
    * @var \Civi\Core\MessageTemplate
    *
-   * @JMS\Type("\Civi\Core\MessageTemplate")
+   * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\MessageTemplate")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="msg_template_id", referencedColumnName="id", onDelete="SET NULL")})
    */
@@ -264,7 +255,7 @@ class Mailing extends \Civi\Core\Entity {
   /**
    * @var \Civi\Contact\Contact
    *
-   * @JMS\Type("\Civi\Contact\Contact")
+   * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Contact")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="created_id", referencedColumnName="id", onDelete="SET NULL")})
    */
@@ -282,7 +273,7 @@ class Mailing extends \Civi\Core\Entity {
   /**
    * @var \Civi\Contact\Contact
    *
-   * @JMS\Type("\Civi\Contact\Contact")
+   * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Contact")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="scheduled_id", referencedColumnName="id", onDelete="SET NULL")})
    */
@@ -300,7 +291,7 @@ class Mailing extends \Civi\Core\Entity {
   /**
    * @var \Civi\Contact\Contact
    *
-   * @JMS\Type("\Civi\Contact\Contact")
+   * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Contact")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="approver_id", referencedColumnName="id", onDelete="SET NULL")})
    */
@@ -354,7 +345,7 @@ class Mailing extends \Civi\Core\Entity {
   /**
    * @var \Civi\Campaign\Campaign
    *
-   * @JMS\Type("\Civi\Campaign\Campaign")
+   * 
    * @ORM\ManyToOne(targetEntity="Civi\Campaign\Campaign")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="campaign_id", referencedColumnName="id", onDelete="SET NULL")})
    */
@@ -372,7 +363,7 @@ class Mailing extends \Civi\Core\Entity {
   /**
    * @var \Civi\SMS\Provider
    *
-   * @JMS\Type("\Civi\SMS\Provider")
+   * 
    * @ORM\ManyToOne(targetEntity="Civi\SMS\Provider")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="sms_provider_id", referencedColumnName="id", onDelete="SET NULL")})
    */

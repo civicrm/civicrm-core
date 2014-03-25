@@ -39,7 +39,6 @@ namespace Civi\Grant;
 require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
-use Hateoas\Configuration\Annotation as Hateoas;
 use Civi\API\Annotation as CiviAPI;
 use JMS\Serializer\Annotation as JMS;
 
@@ -50,14 +49,6 @@ use JMS\Serializer\Annotation as JMS;
  * @CiviAPI\Permission()
  * @ORM\Table(name="civicrm_grant", indexes={@ORM\Index(name="index_grant_type_id", columns={"grant_type_id"}),@ORM\Index(name="index_status_id", columns={"status_id"}),@ORM\Index(name="FK_civicrm_grant_contact_id", columns={"contact_id"}),@ORM\Index(name="FK_civicrm_grant_financial_type_id", columns={"financial_type_id"})})
  * @ORM\Entity
- * @Hateoas\Relation("self",
- *   href = @Hateoas\Route(
- *    "Grant_get",
- *    parameters = { "id" = "expr(object.getId())" },
- *    absolute = true,
- *    generator = "civi"
- *  )
- * )
  *
  */
 class Grant extends \Civi\Core\Entity {
@@ -75,7 +66,7 @@ class Grant extends \Civi\Core\Entity {
   /**
    * @var \Civi\Contact\Contact
    *
-   * @JMS\Type("\Civi\Contact\Contact")
+   * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Contact")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="contact_id", referencedColumnName="id", onDelete="CASCADE")})
    */
@@ -192,7 +183,7 @@ class Grant extends \Civi\Core\Entity {
   /**
    * @var \Civi\Financial\FinancialType
    *
-   * @JMS\Type("\Civi\Financial\FinancialType")
+   * 
    * @ORM\ManyToOne(targetEntity="Civi\Financial\FinancialType")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="financial_type_id", referencedColumnName="id", onDelete="SET NULL")})
    */

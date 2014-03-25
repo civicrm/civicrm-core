@@ -39,7 +39,6 @@ namespace Civi\Activity;
 require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
-use Hateoas\Configuration\Annotation as Hateoas;
 use Civi\API\Annotation as CiviAPI;
 use JMS\Serializer\Annotation as JMS;
 
@@ -50,14 +49,6 @@ use JMS\Serializer\Annotation as JMS;
  * @CiviAPI\Permission()
  * @ORM\Table(name="civicrm_activity_contact", uniqueConstraints={@ORM\UniqueConstraint(name="UI_activity_contact", columns={"contact_id","activity_id","record_type_id"})}, indexes={@ORM\Index(name="index_record_type", columns={"activity_id","record_type_id"}),@ORM\Index(name="FK_civicrm_activity_contact_activity_id", columns={"activity_id"}),@ORM\Index(name="FK_civicrm_activity_contact_contact_id", columns={"contact_id"})})
  * @ORM\Entity
- * @Hateoas\Relation("self",
- *   href = @Hateoas\Route(
- *    "ActivityContact_get",
- *    parameters = { "id" = "expr(object.getId())" },
- *    absolute = true,
- *    generator = "civi"
- *  )
- * )
  *
  */
 class ActivityContact extends \Civi\Core\Entity {
@@ -75,7 +66,7 @@ class ActivityContact extends \Civi\Core\Entity {
   /**
    * @var \Civi\Activity\Activity
    *
-   * @JMS\Type("\Civi\Activity\Activity")
+   * 
    * @ORM\ManyToOne(targetEntity="Civi\Activity\Activity")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="activity_id", referencedColumnName="id", onDelete="CASCADE")})
    */
@@ -84,7 +75,7 @@ class ActivityContact extends \Civi\Core\Entity {
   /**
    * @var \Civi\Contact\Contact
    *
-   * @JMS\Type("\Civi\Contact\Contact")
+   * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Contact")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="contact_id", referencedColumnName="id", onDelete="CASCADE")})
    */

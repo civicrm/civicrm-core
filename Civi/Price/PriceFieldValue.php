@@ -39,7 +39,6 @@ namespace Civi\Price;
 require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
-use Hateoas\Configuration\Annotation as Hateoas;
 use Civi\API\Annotation as CiviAPI;
 use JMS\Serializer\Annotation as JMS;
 
@@ -50,14 +49,6 @@ use JMS\Serializer\Annotation as JMS;
  * @CiviAPI\Permission()
  * @ORM\Table(name="civicrm_price_field_value", indexes={@ORM\Index(name="FK_civicrm_price_field_value_price_field_id", columns={"price_field_id"}),@ORM\Index(name="FK_civicrm_price_field_value_membership_type_id", columns={"membership_type_id"}),@ORM\Index(name="FK_civicrm_price_field_value_financial_type_id", columns={"financial_type_id"})})
  * @ORM\Entity
- * @Hateoas\Relation("self",
- *   href = @Hateoas\Route(
- *    "PriceFieldValue_get",
- *    parameters = { "id" = "expr(object.getId())" },
- *    absolute = true,
- *    generator = "civi"
- *  )
- * )
  *
  */
 class PriceFieldValue extends \Civi\Core\Entity {
@@ -75,7 +66,7 @@ class PriceFieldValue extends \Civi\Core\Entity {
   /**
    * @var \Civi\Price\PriceField
    *
-   * @JMS\Type("\Civi\Price\PriceField")
+   * 
    * @ORM\ManyToOne(targetEntity="Civi\Price\PriceField")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="price_field_id", referencedColumnName="id")})
    */
@@ -147,7 +138,7 @@ class PriceFieldValue extends \Civi\Core\Entity {
   /**
    * @var \Civi\Member\MembershipType
    *
-   * @JMS\Type("\Civi\Member\MembershipType")
+   * 
    * @ORM\ManyToOne(targetEntity="Civi\Member\MembershipType")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="membership_type_id", referencedColumnName="id", onDelete="SET NULL")})
    */
@@ -183,7 +174,7 @@ class PriceFieldValue extends \Civi\Core\Entity {
   /**
    * @var \Civi\Financial\FinancialType
    *
-   * @JMS\Type("\Civi\Financial\FinancialType")
+   * 
    * @ORM\ManyToOne(targetEntity="Civi\Financial\FinancialType")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="financial_type_id", referencedColumnName="id", onDelete="SET NULL")})
    */

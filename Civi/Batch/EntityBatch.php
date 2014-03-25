@@ -39,7 +39,6 @@ namespace Civi\Batch;
 require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
-use Hateoas\Configuration\Annotation as Hateoas;
 use Civi\API\Annotation as CiviAPI;
 use JMS\Serializer\Annotation as JMS;
 
@@ -50,14 +49,6 @@ use JMS\Serializer\Annotation as JMS;
  * @CiviAPI\Permission()
  * @ORM\Table(name="civicrm_entity_batch", uniqueConstraints={@ORM\UniqueConstraint(name="UI_batch_entity", columns={"batch_id","entity_id","entity_table"})}, indexes={@ORM\Index(name="index_entity", columns={"entity_table","entity_id"}),@ORM\Index(name="FK_civicrm_entity_batch_batch_id", columns={"batch_id"})})
  * @ORM\Entity
- * @Hateoas\Relation("self",
- *   href = @Hateoas\Route(
- *    "EntityBatch_get",
- *    parameters = { "id" = "expr(object.getId())" },
- *    absolute = true,
- *    generator = "civi"
- *  )
- * )
  *
  */
 class EntityBatch extends \Civi\Core\Entity {
@@ -93,7 +84,7 @@ class EntityBatch extends \Civi\Core\Entity {
   /**
    * @var \Civi\Batch\Batch
    *
-   * @JMS\Type("\Civi\Batch\Batch")
+   * 
    * @ORM\ManyToOne(targetEntity="Civi\Batch\Batch")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="batch_id", referencedColumnName="id", onDelete="CASCADE")})
    */

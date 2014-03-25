@@ -39,7 +39,6 @@ namespace Civi\Financial;
 require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
-use Hateoas\Configuration\Annotation as Hateoas;
 use Civi\API\Annotation as CiviAPI;
 use JMS\Serializer\Annotation as JMS;
 
@@ -50,14 +49,6 @@ use JMS\Serializer\Annotation as JMS;
  * @CiviAPI\Permission()
  * @ORM\Table(name="civicrm_payment_processor", uniqueConstraints={@ORM\UniqueConstraint(name="UI_name_test_domain_id", columns={"name","is_test","domain_id"})}, indexes={@ORM\Index(name="FK_civicrm_payment_processor_domain_id", columns={"domain_id"}),@ORM\Index(name="FK_civicrm_payment_processor_payment_processor_type_id", columns={"payment_processor_type_id"})})
  * @ORM\Entity
- * @Hateoas\Relation("self",
- *   href = @Hateoas\Route(
- *    "PaymentProcessor_get",
- *    parameters = { "id" = "expr(object.getId())" },
- *    absolute = true,
- *    generator = "civi"
- *  )
- * )
  *
  */
 class PaymentProcessor extends \Civi\Core\Entity {
@@ -75,7 +66,7 @@ class PaymentProcessor extends \Civi\Core\Entity {
   /**
    * @var \Civi\Core\Domain
    *
-   * @JMS\Type("\Civi\Core\Domain")
+   * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\Domain")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="domain_id", referencedColumnName="id")})
    */
@@ -102,7 +93,7 @@ class PaymentProcessor extends \Civi\Core\Entity {
   /**
    * @var \Civi\Financial\PaymentProcessorType
    *
-   * @JMS\Type("\Civi\Financial\PaymentProcessorType")
+   * 
    * @ORM\ManyToOne(targetEntity="Civi\Financial\PaymentProcessorType")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="payment_processor_type_id", referencedColumnName="id")})
    */
