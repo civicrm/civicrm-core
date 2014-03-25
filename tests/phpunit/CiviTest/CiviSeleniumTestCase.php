@@ -364,7 +364,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
 
   /**
    */
-  function webtestFillAutocomplete($sortName, $fieldName = 's2id_contact_id') {
+  function webtestFillAutocomplete($sortName, $fieldName = 'contact_id') {
     $this->select2($fieldName,$sortName);
     //$this->assertContains($sortName, $this->getValue($fieldName), "autocomplete expected $sortName but didn’t find it in " . $this->getValue($fieldName));
   }
@@ -372,7 +372,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
   /**
    */
   function webtestOrganisationAutocomplete($sortName) {
-    $this->clickAt("//*[@id='s2id_contact_id']/a");
+    $this->clickAt("//*[@id='contact_id']/../div/a");
     $this->waitForElementPresent("//*[@id='select2-drop']/div/input");
     $this->keyDown("//*[@id='select2-drop']/div/input", " ");
     $this->type("//*[@id='select2-drop']/div/input", $sortName);
@@ -1880,7 +1880,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
    * function to type and select first occurance of autocomplete
    */
   function select2($fieldName,$label) {
-    $this->clickAt("//*[@id='$fieldName']/a");
+    $this->clickAt("//*[@id='$fieldName']/../div/a");
     $this->waitForElementPresent("//*[@id='select2-drop']/div/input");
     $this->keyDown("//*[@id='select2-drop']/div/input", " ");
     $this->type("//*[@id='select2-drop']/div/input", $label);

@@ -297,7 +297,7 @@ class WebTest_Contact_AdvancedSearchTest extends CiviSeleniumTestCase {
       $this->click("xpath=//div[@id='activity']/table/tbody/tr[1]/td[1]/div[1]//div/label[text()=\"$labels\"]");
     }
     // fill date range
-    $this->select2("s2id_activity_date_relative","Choose Date Range");
+    $this->select("activity_date_relative","value=0");
     $this->webtestFillDate("activity_date_low", "-1 day");
     $this->webtestFillDate("activity_date_high", "+1 day");
     $this->type("activity_subject", "Student - membership source$firstName - Status: New");
@@ -310,12 +310,12 @@ class WebTest_Contact_AdvancedSearchTest extends CiviSeleniumTestCase {
   // function to fill demographic search details
   function addDemographicSearchDetail() {
     // fill birth date range
-    $this->select2("s2id_birth_date_relative","Choose Date Range");
+    $this->select("birth_date_relative","value=0");
     $this->webtestFillDate("birth_date_low", "-3 year");
     $this->webtestFillDate("birth_date_high", "now");
     // fill deceased date range
     $this->click("xpath=//div[@id='demographics']/table/tbody//tr/td/label[text()='Deceased']/../label[text()='Yes']");
-    $this->select2("s2id_deceased_date_relative","Choose Date Range");
+    $this->select("deceased_date_relative","value=0");
     $this->webtestFillDate("deceased_date_low", "-1 month");
     $this->webtestFillDate("deceased_date_high", "+1 month");
     // fill gender (male)
@@ -325,7 +325,7 @@ class WebTest_Contact_AdvancedSearchTest extends CiviSeleniumTestCase {
   //function to fill contribution search details
   function addContributionSearchDetail($firstName) {
     // fill contribution date range
-    $this->select2("s2id_contribution_date_relative","Choose Date Range");
+    $this->select("contribution_date_relative","value=0");
     $this->webtestFillDate("contribution_date_low", "-1 day");
     $this->webtestFillDate("contribution_date_high", "+1 day");
     // fill amount range
@@ -341,7 +341,7 @@ class WebTest_Contact_AdvancedSearchTest extends CiviSeleniumTestCase {
       // fill financial type
       $this->select("financial_type_id", "Event Fee");
     // fill currency type
-    $this->select2("s2id_contribution_currency_type", "USD");
+    $this->select("contribution_currency_type", "USD");
   }
 
   // function to fill participant search details
@@ -372,15 +372,15 @@ class WebTest_Contact_AdvancedSearchTest extends CiviSeleniumTestCase {
     // check to search primary member
     $this->click("xpath=//div[@id='memberForm']/table/tbody/tr[2]/td[2]/p/input");
     // add join date range
-    $this->select2("s2id_member_join_date_relative","Choose Date Range");
+    $this->select("member_join_date_relative","value=0");
     $this->webtestFillDate("member_join_date_low", "-1 day");
     $this->webtestFillDate("member_join_date_high", "+1 day");
     // add start date range
-    $this->select2("s2id_member_start_date_relative","Choose Date Range");
+    $this->select("member_start_date_relative","value=0");
     $this->webtestFillDate("member_start_date_low", "-1 day");
     $this->webtestFillDate("member_start_date_high", "+1 day");
     // add end date range
-    $this->select2("s2id_member_end_date_relative","Choose Date Range");
+    $this->select("member_end_date_relative","value=0");
     $this->webtestFillDate("member_end_date_low", "-1 year");
     $this->webtestFillDate("member_end_date_high", "+2 year");
   }
@@ -388,7 +388,7 @@ class WebTest_Contact_AdvancedSearchTest extends CiviSeleniumTestCase {
   // function to fill member search details
   function addPledgeSearchDetail($firstName) {
     // fill pledge schedule date range
-    $this->select2("s2id_pledge_payment_date_relative","Choose Date Range");
+    $this->select("pledge_payment_date_relative","value=0");
     $this->webtestFillDate("pledge_payment_date_low", "-1 day");
     $this->webtestFillDate("pledge_payment_date_high", "+1 day");
     // fill Pledge payment status
