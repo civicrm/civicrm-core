@@ -150,14 +150,14 @@
       })
       .on('change', 'select[name=timeline_id]', function() {
         if ($(this).val()) {
-          CRM.confirm(ts('Add'), {
+          CRM.confirm({
             title: $('option:first', this).text(),
             message: ts('Add the %1 set of scheduled activities to this case?', {1: '<em>' + $('option:selected', this).text() + '</em>'})
           })
-            .on('crmConfirmYes', function() {
+            .on('crmConfirm:yes', function() {
               $('[name=_qf_CaseView_next]').click();
             })
-            .on('crmConfirmNo', function() {
+            .on('crmConfirm:no', function() {
               $('select[name=timeline_id]').select2('val', '');
             });
         }
@@ -174,7 +174,7 @@
           $(this).select2('val', '');
         }
       })
-      .on('click', 'a.case-miniform', function() {
+      .on('click', 'a.case-miniform', function(e) {
         var dialog,
           $el = $(this),
           target = $el.attr('href');
@@ -204,16 +204,16 @@
           }
           return submission;
         }
-        dialog = CRM.confirm(submit, {
+        dialog = CRM.confirm({
           title: $(this).attr('title') || $(this).text(),
           message: detached[target],
-          close: function() {
-            detached[target] = $(target, dialog).detach();
-            $(dialog).dialog('destroy').remove();
-          },
           open: miniForms[target].pre
-        });
-        return false;
+        })
+          .on('dialogclose', function() {
+            detached[target] = $(target, dialog).detach();
+          })
+          .on('crmConfirm:yes', submit);
+        e.preventDefault();
       });
 
     $().crmAccordions();
