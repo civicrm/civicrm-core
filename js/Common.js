@@ -631,48 +631,44 @@ CRM.validate = CRM.validate || {
   /**
    * @see https://wiki.civicrm.org/confluence/display/CRMDOC/Notification+Reference
    */
-  CRM.confirm = function (buttons, options, cancelLabel) {
-    var dialog, callbacks = {};
-    cancelLabel = cancelLabel || ts('Cancel');
-    var settings = {
+  CRM.confirm = function (options) {
+    var dialog, settings = {
       title: ts('Confirm Action'),
       message: ts('Are you sure you want to continue?'),
-      resizable: false,
-      modal: true,
       width: 'auto',
+      modal: true,
+      dialogClass: 'crm-container crm-confirm',
       close: function () {
-        $(dialog).dialog('destroy').remove();
+        $(this).dialog('destroy').remove();
       },
-      buttons: {}
+      options: {
+        no: ts('Cancel'),
+        yes: ts('Continue')
+      }
     };
-
-    settings.buttons[cancelLabel] = function () {
-      dialog.trigger('crmConfirmNo').dialog('close');
-    };
-    options = options || {};
-    $.extend(settings, options);
-    if ($.isFunction(buttons)) {
-      callbacks[ts('Continue')] = buttons;
+    $.extend(settings, ($.isFunction(options) ? arguments[1] : options) || {});
+    if (!settings.buttons && $.isPlainObject(settings.options)) {
+      settings.buttons = [];
+      $.each(settings.options, function(key, label) {
+        settings.buttons.push({
+          text: label,
+          click: function() {
+            var event = $.Event('crmConfirm:' + key);
+            $(this).trigger(event);
+            if (!event.isDefaultPrevented()) {
+              dialog.dialog('close');
+            }
+          }
+        });
+      });
     }
-    else if (_.isString(buttons) || !buttons) {
-      callbacks[buttons || ts('Continue')] = function() {};
+    dialog = $('<div class="crm-confirm-dialog"></div>').html(settings.message);
+    delete settings.options;
+    delete settings.message;
+    if ($.isFunction(options)) {
+      dialog.on('crmConfirm:yes', options);
     }
-    else {
-      callbacks = buttons;
-    }
-    $.each(callbacks, function (label, callback) {
-      settings.buttons[label] = function () {
-        dialog.trigger('crmConfirmYes');
-        if (callback.call(dialog) !== false) {
-          dialog.dialog('close');
-        }
-      };
-    });
-    dialog = $('<div class="crm-confirm-dialog"></div>')
-      .html(options.message)
-      .dialog(settings)
-      .trigger('crmLoad');
-    return dialog;
+    return dialog.dialog(settings).trigger('crmLoad');
   };
 
   /**
@@ -738,11 +734,6 @@ CRM.validate = CRM.validate || {
     });
     // Handle qf form errors
     $('form :input.error', this).one('blur', function() {
-      // ignore autocomplete fields
-      if ($(this).is('.ac_input')) {
-        return;
-      }
-
       $('.ui-notify-message.error a.ui-notify-close').click();
       $(this).removeClass('error');
       $(this).next('span.crm-error').remove();
@@ -784,19 +775,15 @@ CRM.validate = CRM.validate || {
       messagesFromMarkup.call($('#crm-container'));
     }
 
-    // bind the event for image popup
     $('body')
-      .on('click', 'a.crm-image-popup', function() {
-        var o = $('<div class="crm-custom-image-popup"><img src=' + $(this).attr('href') + '></div>');
-
-        CRM.confirm('',
-          {
-            title: ts('Preview'),
-            message: o
-          },
-          ts('Done')
-        );
-        return false;
+      // bind the event for image popup
+      .on('click', 'a.crm-image-popup', function(e) {
+        CRM.confirm({
+          title: ts('Preview'),
+          message: '<div class="crm-custom-image-popup"><img src=' + $(this).attr('href') + '></div>',
+          options: null
+        });
+        e.preventDefault();
       })
 
       .on('click', function (event) {

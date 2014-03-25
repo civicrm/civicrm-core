@@ -44,7 +44,11 @@
           cj("#activity_change_status").val(current_status_id);
         });
 
-        CRM.confirm(function() {
+        CRM.confirm({
+          title: {/literal}'{ts escape='js'}Change Activity Status{/ts}'{literal},
+          message: $el
+        })
+          .on('crmConfirm:yes', function() {
             // update the status
             var status_id = $("#activity_change_status").val();
             if (status_id === current_status_id) {
@@ -83,12 +87,7 @@
               }
             });
             CRM.status({}, request);
-          }
-          ,{
-            title: {/literal}'{ts escape='js'}Change Activity Status{/ts}'{literal},
-            message: $el
-          }
-        );
+          });
         return false;
       });
     });

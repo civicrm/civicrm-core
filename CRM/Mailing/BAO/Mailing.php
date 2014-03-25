@@ -2564,27 +2564,14 @@ SELECT  $mailing.id as mailing_id
       }
     }
 
-    $text = CRM_Utils_Request::retrieve('text', 'Boolean', $form);
-    if ($text) {
-      CRM_Core_Page_AJAX::returnJsonResponse("<pre>{$textHeader}</br>{$report['mailing']['body_text']}</br>{$textFooter}</pre>");
-    }
-
-    if (!$isSMS) {
-      $html = CRM_Utils_Request::retrieve('html', 'Boolean', $form);
-      if ($html) {
-        $output = $htmlHeader . $report['mailing']['body_html'] . $htmlFooter ;
-        CRM_Core_Page_AJAX::returnJsonResponse(str_replace("\n", '<br />', $output));
-      }
-    }
-
     if (!empty($report['mailing']['body_text'])) {
-      $url = CRM_Utils_System::url('civicrm/mailing/report', 'reset=1&text=1&mid=' . $form->_mailing_id);
+      $url = CRM_Utils_System::url('civicrm/mailing/view', 'reset=1&text=1&id=' . $form->_mailing_id);
       $form->assign('textViewURL', $url);
     }
 
     if (!$isSMS) {
       if (!empty($report['mailing']['body_html'])) {
-        $url = CRM_Utils_System::url('civicrm/mailing/report', 'reset=1&html=1&mid=' . $form->_mailing_id);
+        $url = CRM_Utils_System::url('civicrm/mailing/view', 'reset=1&id=' . $form->_mailing_id);
         $form->assign('htmlViewURL', $url);
       }
     }
@@ -2772,7 +2759,7 @@ AND        m.id = %1
           'url' => 'civicrm/mailing/view',
           'qs' => "reset=1&id=%%mid%%",
           'title' => ts('View Mailing'),
-          'class' => 'crm-mailing-view',
+          'class' => 'crm-popup',
         ),
         CRM_Core_Action::BROWSE => array(
           'name' => ts('Mailing Report'),
