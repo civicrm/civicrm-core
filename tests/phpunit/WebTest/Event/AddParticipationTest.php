@@ -48,7 +48,7 @@ class WebTest_Event_AddParticipationTest extends CiviSeleniumTestCase {
     $this->webtestFillAutocomplete($firstName);
 
     // Select event. Based on label for now.
-    $this->select('event_id', "label=regexp:Rain-forest Cup Youth Soccer Tournament.");
+    $this->select2('event_id', "Rain-forest Cup Youth Soccer Tournament");
 
     // Select role
     $this->click('role_id[2]');
@@ -242,7 +242,7 @@ class WebTest_Event_AddParticipationTest extends CiviSeleniumTestCase {
     $this->webtestFillAutocomplete($firstName);
 
     // Select event. Based on label for now.
-    $this->select('event_id', "label=regexp:Rain-forest Cup Youth Soccer Tournament.");
+    $this->select2('event_id', "Rain-forest Cup Youth Soccer Tournament");
 
     // Select roles
     $this->click('role_id[2]');
@@ -407,7 +407,7 @@ class WebTest_Event_AddParticipationTest extends CiviSeleniumTestCase {
     $this->openCiviPage("participant/add", "reset=1&action=add&context=standalone", "_qf_Participant_upload-bottom");
 
     // Select event.
-    $this->select('event_id', "label=regexp:Rain-forest Cup Youth Soccer Tournament.");
+    $this->select2('event_id', "Rain-forest Cup Youth Soccer Tournament");
 
     // Select role.
     $this->click('role_id[2]');
