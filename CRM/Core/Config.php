@@ -188,8 +188,8 @@ class CRM_Core_Config extends CRM_Core_Config_Variables {
   static function &singleton($loadFromDB = TRUE, $force = FALSE) {
     if (self::$_singleton === NULL || $force) {
       // goto a simple error handler
-      $GLOBALS['_PEAR_default_error_mode'] = PEAR_ERROR_CALLBACK;
-      $GLOBALS['_PEAR_default_error_options'] = array('CRM_Core_Error', 'simpleHandler');
+      $GLOBALS['civicrm_default_error_scope'] = CRM_Core_TemporaryErrorScope::create(array('CRM_Core_Error', 'handle'));
+      $errorScope = CRM_Core_TemporaryErrorScope::create(array('CRM_Core_Error', 'simpleHandler'));
 
       // lets ensure we set E_DEPRECATED to minimize errors
       // CRM-6327
@@ -241,7 +241,7 @@ class CRM_Core_Config extends CRM_Core_Config_Variables {
 
       // set the callback at the very very end, to avoid an infinite loop
       // set the error callback
-      CRM_Core_Error::setCallback();
+      unset($errorScope);
 
       // call the hook so other modules can add to the config
       // again doing this at the very very end

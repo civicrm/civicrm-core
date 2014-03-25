@@ -38,14 +38,14 @@
  */
 function smarty_function_crmSetting($params, &$smarty) {
 
-  CRM_Core_Error::setCallback(array('CRM_Utils_REST', 'fatal'));
+  $errorScope = CRM_Core_TemporaryErrorScope::create(array('CRM_Utils_REST', 'fatal'));
   unset($params['method']);
   unset($params['assign']);
   $params['version'] = 3;
 
   require_once 'api/api.php';
   $result = civicrm_api('setting', 'getvalue', $params);
-  CRM_Core_Error::setCallback();
+  unset($errorScope);
   if ($result === FALSE) {
     $smarty->trigger_error("Unknown error");
     return;
