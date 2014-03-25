@@ -985,9 +985,9 @@ SELECT 'civicrm_contact', contact_a.id, contact_a.id, '$cacheKey', contact_a.dis
 
     $sql = str_replace($replaceSQL, $insertSQL, $sql);
 
-    CRM_Core_Error::ignoreException();
+    $errorScope = CRM_Core_TemporaryErrorScope::ignoreException();
     $result = CRM_Core_DAO::executeQuery($sql);
-    CRM_Core_Error::setCallback();
+    unset($errorScope);
 
     if (is_a($result, 'DB_Error')) {
       // oops the above query failed, so lets just ignore it
