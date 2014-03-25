@@ -132,6 +132,11 @@ class CRM_Contact_Form_CustomData extends CRM_Core_Form {
         $this->_groupID = CRM_Utils_Request::retrieve('groupID', 'Positive', $this);
         $this->_tableID = $this->_entityId;
         $this->_copyValueId = CRM_Utils_Request::retrieve('copyValueId', 'Positive', $this);
+        $backUrl = CRM_Core_Session::singleton()->readUserContext();
+        $this->assign('backUrl', $backUrl);
+        if (!empty($_POST['hidden_custom'])) {
+          $this->assign('postedInfo', TRUE);
+        }
       }
       return;
     }
