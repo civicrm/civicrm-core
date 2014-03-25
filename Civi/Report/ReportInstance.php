@@ -39,7 +39,6 @@ namespace Civi\Report;
 require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
-use Hateoas\Configuration\Annotation as Hateoas;
 use Civi\API\Annotation as CiviAPI;
 use JMS\Serializer\Annotation as JMS;
 
@@ -50,14 +49,6 @@ use JMS\Serializer\Annotation as JMS;
  * @CiviAPI\Permission()
  * @ORM\Table(name="civicrm_report_instance", indexes={@ORM\Index(name="FK_civicrm_report_instance_domain_id", columns={"domain_id"}),@ORM\Index(name="FK_civicrm_report_instance_navigation_id", columns={"navigation_id"}),@ORM\Index(name="FK_civicrm_report_instance_drilldown_id", columns={"drilldown_id"})})
  * @ORM\Entity
- * @Hateoas\Relation("self",
- *   href = @Hateoas\Route(
- *    "ReportInstance_get",
- *    parameters = { "id" = "expr(object.getId())" },
- *    absolute = true,
- *    generator = "civi"
- *  )
- * )
  *
  */
 class ReportInstance extends \Civi\Core\Entity {
@@ -75,7 +66,7 @@ class ReportInstance extends \Civi\Core\Entity {
   /**
    * @var \Civi\Core\Domain
    *
-   * @JMS\Type("\Civi\Core\Domain")
+   * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\Domain")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="domain_id", referencedColumnName="id")})
    */
@@ -210,7 +201,7 @@ class ReportInstance extends \Civi\Core\Entity {
   /**
    * @var \Civi\Core\Navigation
    *
-   * @JMS\Type("\Civi\Core\Navigation")
+   * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\Navigation")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="navigation_id", referencedColumnName="id", onDelete="SET NULL")})
    */
@@ -219,7 +210,7 @@ class ReportInstance extends \Civi\Core\Entity {
   /**
    * @var \Civi\Report\ReportInstance
    *
-   * @JMS\Type("\Civi\Report\ReportInstance")
+   * 
    * @ORM\ManyToOne(targetEntity="Civi\Report\ReportInstance")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="drilldown_id", referencedColumnName="id", onDelete="SET NULL")})
    */

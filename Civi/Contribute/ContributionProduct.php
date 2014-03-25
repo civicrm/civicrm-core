@@ -39,7 +39,6 @@ namespace Civi\Contribute;
 require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
-use Hateoas\Configuration\Annotation as Hateoas;
 use Civi\API\Annotation as CiviAPI;
 use JMS\Serializer\Annotation as JMS;
 
@@ -50,14 +49,6 @@ use JMS\Serializer\Annotation as JMS;
  * @CiviAPI\Permission()
  * @ORM\Table(name="civicrm_contribution_product", indexes={@ORM\Index(name="FK_civicrm_contribution_product_contribution_id", columns={"contribution_id"}),@ORM\Index(name="FK_civicrm_contribution_product_financial_type_id", columns={"financial_type_id"})})
  * @ORM\Entity
- * @Hateoas\Relation("self",
- *   href = @Hateoas\Route(
- *    "ContributionProduct_get",
- *    parameters = { "id" = "expr(object.getId())" },
- *    absolute = true,
- *    generator = "civi"
- *  )
- * )
  *
  */
 class ContributionProduct extends \Civi\Core\Entity {
@@ -84,7 +75,7 @@ class ContributionProduct extends \Civi\Core\Entity {
   /**
    * @var \Civi\Contribute\Contribution
    *
-   * @JMS\Type("\Civi\Contribute\Contribution")
+   * 
    * @ORM\ManyToOne(targetEntity="Civi\Contribute\Contribution")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="contribution_id", referencedColumnName="id", onDelete="CASCADE")})
    */
@@ -147,7 +138,7 @@ class ContributionProduct extends \Civi\Core\Entity {
   /**
    * @var \Civi\Financial\FinancialType
    *
-   * @JMS\Type("\Civi\Financial\FinancialType")
+   * 
    * @ORM\ManyToOne(targetEntity="Civi\Financial\FinancialType")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="financial_type_id", referencedColumnName="id", onDelete="SET NULL")})
    */

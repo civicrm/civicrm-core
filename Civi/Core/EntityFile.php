@@ -39,7 +39,6 @@ namespace Civi\Core;
 require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
-use Hateoas\Configuration\Annotation as Hateoas;
 use Civi\API\Annotation as CiviAPI;
 use JMS\Serializer\Annotation as JMS;
 
@@ -50,14 +49,6 @@ use JMS\Serializer\Annotation as JMS;
  * @CiviAPI\Permission()
  * @ORM\Table(name="civicrm_entity_file", indexes={@ORM\Index(name="index_entity", columns={"entity_table","entity_id"}),@ORM\Index(name="index_entity_file_id", columns={"entity_table","entity_id","file_id"}),@ORM\Index(name="FK_civicrm_entity_file_file_id", columns={"file_id"})})
  * @ORM\Entity
- * @Hateoas\Relation("self",
- *   href = @Hateoas\Route(
- *    "EntityFile_get",
- *    parameters = { "id" = "expr(object.getId())" },
- *    absolute = true,
- *    generator = "civi"
- *  )
- * )
  *
  */
 class EntityFile extends \Civi\Core\Entity {
@@ -93,7 +84,7 @@ class EntityFile extends \Civi\Core\Entity {
   /**
    * @var \Civi\Core\File
    *
-   * @JMS\Type("\Civi\Core\File")
+   * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\File")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="file_id", referencedColumnName="id")})
    */

@@ -39,7 +39,6 @@ namespace Civi\Contribute;
 require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
-use Hateoas\Configuration\Annotation as Hateoas;
 use Civi\API\Annotation as CiviAPI;
 use JMS\Serializer\Annotation as JMS;
 
@@ -50,14 +49,6 @@ use JMS\Serializer\Annotation as JMS;
  * @CiviAPI\Permission()
  * @ORM\Table(name="civicrm_contribution", uniqueConstraints={@ORM\UniqueConstraint(name="UI_contrib_trxn_id", columns={"trxn_id"}),@ORM\UniqueConstraint(name="UI_contrib_invoice_id", columns={"invoice_id"})}, indexes={@ORM\Index(name="UI_contrib_payment_instrument_id", columns={"payment_instrument_id"}),@ORM\Index(name="index_contribution_status", columns={"contribution_status_id"}),@ORM\Index(name="received_date", columns={"receive_date"}),@ORM\Index(name="check_number", columns={"check_number"}),@ORM\Index(name="FK_civicrm_contribution_contact_id", columns={"contact_id"}),@ORM\Index(name="FK_civicrm_contribution_financial_type_id", columns={"financial_type_id"}),@ORM\Index(name="FK_civicrm_contribution_contribution_page_id", columns={"contribution_page_id"}),@ORM\Index(name="FK_civicrm_contribution_contribution_recur_id", columns={"contribution_recur_id"}),@ORM\Index(name="FK_civicrm_contribution_address_id", columns={"address_id"}),@ORM\Index(name="FK_civicrm_contribution_campaign_id", columns={"campaign_id"})})
  * @ORM\Entity
- * @Hateoas\Relation("self",
- *   href = @Hateoas\Route(
- *    "Contribution_get",
- *    parameters = { "id" = "expr(object.getId())" },
- *    absolute = true,
- *    generator = "civi"
- *  )
- * )
  *
  */
 class Contribution extends \Civi\Core\Entity {
@@ -75,7 +66,7 @@ class Contribution extends \Civi\Core\Entity {
   /**
    * @var \Civi\Contact\Contact
    *
-   * @JMS\Type("\Civi\Contact\Contact")
+   * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Contact")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="contact_id", referencedColumnName="id", onDelete="CASCADE")})
    */
@@ -84,7 +75,7 @@ class Contribution extends \Civi\Core\Entity {
   /**
    * @var \Civi\Financial\FinancialType
    *
-   * @JMS\Type("\Civi\Financial\FinancialType")
+   * 
    * @ORM\ManyToOne(targetEntity="Civi\Financial\FinancialType")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="financial_type_id", referencedColumnName="id")})
    */
@@ -93,7 +84,7 @@ class Contribution extends \Civi\Core\Entity {
   /**
    * @var \Civi\Contribute\ContributionPage
    *
-   * @JMS\Type("\Civi\Contribute\ContributionPage")
+   * 
    * @ORM\ManyToOne(targetEntity="Civi\Contribute\ContributionPage")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="contribution_page_id", referencedColumnName="id", onDelete="SET NULL")})
    */
@@ -237,7 +228,7 @@ class Contribution extends \Civi\Core\Entity {
   /**
    * @var \Civi\Contribute\ContributionRecur
    *
-   * @JMS\Type("\Civi\Contribute\ContributionRecur")
+   * 
    * @ORM\ManyToOne(targetEntity="Civi\Contribute\ContributionRecur")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="contribution_recur_id", referencedColumnName="id", onDelete="SET NULL")})
    */
@@ -273,7 +264,7 @@ class Contribution extends \Civi\Core\Entity {
   /**
    * @var \Civi\Core\Address
    *
-   * @JMS\Type("\Civi\Core\Address")
+   * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\Address")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="address_id", referencedColumnName="id", onDelete="SET NULL")})
    */
@@ -291,7 +282,7 @@ class Contribution extends \Civi\Core\Entity {
   /**
    * @var \Civi\Campaign\Campaign
    *
-   * @JMS\Type("\Civi\Campaign\Campaign")
+   * 
    * @ORM\ManyToOne(targetEntity="Civi\Campaign\Campaign")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="campaign_id", referencedColumnName="id", onDelete="SET NULL")})
    */

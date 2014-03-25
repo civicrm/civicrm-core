@@ -39,7 +39,6 @@ namespace Civi\Core;
 require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
-use Hateoas\Configuration\Annotation as Hateoas;
 use Civi\API\Annotation as CiviAPI;
 use JMS\Serializer\Annotation as JMS;
 
@@ -50,14 +49,6 @@ use JMS\Serializer\Annotation as JMS;
  * @CiviAPI\Permission()
  * @ORM\Table(name="civicrm_mapping_field", indexes={@ORM\Index(name="FK_civicrm_mapping_field_mapping_id", columns={"mapping_id"}),@ORM\Index(name="FK_civicrm_mapping_field_location_type_id", columns={"location_type_id"}),@ORM\Index(name="FK_civicrm_mapping_field_relationship_type_id", columns={"relationship_type_id"})})
  * @ORM\Entity
- * @Hateoas\Relation("self",
- *   href = @Hateoas\Route(
- *    "MappingField_get",
- *    parameters = { "id" = "expr(object.getId())" },
- *    absolute = true,
- *    generator = "civi"
- *  )
- * )
  *
  */
 class MappingField extends \Civi\Core\Entity {
@@ -75,7 +66,7 @@ class MappingField extends \Civi\Core\Entity {
   /**
    * @var \Civi\Core\Mapping
    *
-   * @JMS\Type("\Civi\Core\Mapping")
+   * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\Mapping")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="mapping_id", referencedColumnName="id")})
    */
@@ -111,7 +102,7 @@ class MappingField extends \Civi\Core\Entity {
   /**
    * @var \Civi\Core\LocationType
    *
-   * @JMS\Type("\Civi\Core\LocationType")
+   * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\LocationType")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="location_type_id", referencedColumnName="id")})
    */
@@ -147,7 +138,7 @@ class MappingField extends \Civi\Core\Entity {
   /**
    * @var \Civi\Contact\RelationshipType
    *
-   * @JMS\Type("\Civi\Contact\RelationshipType")
+   * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\RelationshipType")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="relationship_type_id", referencedColumnName="id")})
    */

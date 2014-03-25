@@ -39,7 +39,6 @@ namespace Civi\Financial;
 require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
-use Hateoas\Configuration\Annotation as Hateoas;
 use Civi\API\Annotation as CiviAPI;
 use JMS\Serializer\Annotation as JMS;
 
@@ -50,14 +49,6 @@ use JMS\Serializer\Annotation as JMS;
  * @CiviAPI\Permission()
  * @ORM\Table(name="civicrm_financial_item", uniqueConstraints={@ORM\UniqueConstraint(name="UI_id", columns={"id"})}, indexes={@ORM\Index(name="IX_created_date", columns={"created_date"}),@ORM\Index(name="IX_transaction_date", columns={"transaction_date"}),@ORM\Index(name="IX_entity", columns={"entity_table","entity_id"}),@ORM\Index(name="FK_civicrm_financial_item_contact_id", columns={"contact_id"}),@ORM\Index(name="FK_civicrm_financial_item_financial_account_id", columns={"financial_account_id"})})
  * @ORM\Entity
- * @Hateoas\Relation("self",
- *   href = @Hateoas\Route(
- *    "FinancialItem_get",
- *    parameters = { "id" = "expr(object.getId())" },
- *    absolute = true,
- *    generator = "civi"
- *  )
- * )
  *
  */
 class FinancialItem extends \Civi\Core\Entity {
@@ -93,7 +84,7 @@ class FinancialItem extends \Civi\Core\Entity {
   /**
    * @var \Civi\Contact\Contact
    *
-   * @JMS\Type("\Civi\Contact\Contact")
+   * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Contact")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="contact_id", referencedColumnName="id", onDelete="CASCADE")})
    */
@@ -129,7 +120,7 @@ class FinancialItem extends \Civi\Core\Entity {
   /**
    * @var \Civi\Financial\FinancialAccount
    *
-   * @JMS\Type("\Civi\Financial\FinancialAccount")
+   * 
    * @ORM\ManyToOne(targetEntity="Civi\Financial\FinancialAccount")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="financial_account_id", referencedColumnName="id")})
    */

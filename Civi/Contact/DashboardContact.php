@@ -39,7 +39,6 @@ namespace Civi\Contact;
 require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
-use Hateoas\Configuration\Annotation as Hateoas;
 use Civi\API\Annotation as CiviAPI;
 use JMS\Serializer\Annotation as JMS;
 
@@ -50,14 +49,6 @@ use JMS\Serializer\Annotation as JMS;
  * @CiviAPI\Permission()
  * @ORM\Table(name="civicrm_dashboard_contact", indexes={@ORM\Index(name="FK_civicrm_dashboard_contact_dashboard_id", columns={"dashboard_id"}),@ORM\Index(name="FK_civicrm_dashboard_contact_contact_id", columns={"contact_id"})})
  * @ORM\Entity
- * @Hateoas\Relation("self",
- *   href = @Hateoas\Route(
- *    "DashboardContact_get",
- *    parameters = { "id" = "expr(object.getId())" },
- *    absolute = true,
- *    generator = "civi"
- *  )
- * )
  *
  */
 class DashboardContact extends \Civi\Core\Entity {
@@ -75,7 +66,7 @@ class DashboardContact extends \Civi\Core\Entity {
   /**
    * @var \Civi\Core\Dashboard
    *
-   * @JMS\Type("\Civi\Core\Dashboard")
+   * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\Dashboard")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="dashboard_id", referencedColumnName="id", onDelete="CASCADE")})
    */
@@ -84,7 +75,7 @@ class DashboardContact extends \Civi\Core\Entity {
   /**
    * @var \Civi\Contact\Contact
    *
-   * @JMS\Type("\Civi\Contact\Contact")
+   * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Contact")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="contact_id", referencedColumnName="id", onDelete="CASCADE")})
    */

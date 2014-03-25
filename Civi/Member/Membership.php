@@ -39,7 +39,6 @@ namespace Civi\Member;
 require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
-use Hateoas\Configuration\Annotation as Hateoas;
 use Civi\API\Annotation as CiviAPI;
 use JMS\Serializer\Annotation as JMS;
 
@@ -50,14 +49,6 @@ use JMS\Serializer\Annotation as JMS;
  * @CiviAPI\Permission()
  * @ORM\Table(name="civicrm_membership", indexes={@ORM\Index(name="index_owner_membership_id", columns={"owner_membership_id"}),@ORM\Index(name="FK_civicrm_membership_contact_id", columns={"contact_id"}),@ORM\Index(name="FK_civicrm_membership_membership_type_id", columns={"membership_type_id"}),@ORM\Index(name="FK_civicrm_membership_status_id", columns={"status_id"}),@ORM\Index(name="FK_civicrm_membership_owner_membership_id", columns={"owner_membership_id"}),@ORM\Index(name="FK_civicrm_membership_contribution_recur_id", columns={"contribution_recur_id"}),@ORM\Index(name="FK_civicrm_membership_campaign_id", columns={"campaign_id"})})
  * @ORM\Entity
- * @Hateoas\Relation("self",
- *   href = @Hateoas\Route(
- *    "Membership_get",
- *    parameters = { "id" = "expr(object.getId())" },
- *    absolute = true,
- *    generator = "civi"
- *  )
- * )
  *
  */
 class Membership extends \Civi\Core\Entity {
@@ -75,7 +66,7 @@ class Membership extends \Civi\Core\Entity {
   /**
    * @var \Civi\Contact\Contact
    *
-   * @JMS\Type("\Civi\Contact\Contact")
+   * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Contact")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="contact_id", referencedColumnName="id", onDelete="CASCADE")})
    */
@@ -84,7 +75,7 @@ class Membership extends \Civi\Core\Entity {
   /**
    * @var \Civi\Member\MembershipType
    *
-   * @JMS\Type("\Civi\Member\MembershipType")
+   * 
    * @ORM\ManyToOne(targetEntity="Civi\Member\MembershipType")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="membership_type_id", referencedColumnName="id", onDelete="CASCADE")})
    */
@@ -129,7 +120,7 @@ class Membership extends \Civi\Core\Entity {
   /**
    * @var \Civi\Member\MembershipStatus
    *
-   * @JMS\Type("\Civi\Member\MembershipStatus")
+   * 
    * @ORM\ManyToOne(targetEntity="Civi\Member\MembershipStatus")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="status_id", referencedColumnName="id", onDelete="CASCADE")})
    */
@@ -147,7 +138,7 @@ class Membership extends \Civi\Core\Entity {
   /**
    * @var \Civi\Member\Membership
    *
-   * @JMS\Type("\Civi\Member\Membership")
+   * 
    * @ORM\ManyToOne(targetEntity="Civi\Member\Membership")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="owner_membership_id", referencedColumnName="id", onDelete="SET NULL")})
    */
@@ -183,7 +174,7 @@ class Membership extends \Civi\Core\Entity {
   /**
    * @var \Civi\Contribute\ContributionRecur
    *
-   * @JMS\Type("\Civi\Contribute\ContributionRecur")
+   * 
    * @ORM\ManyToOne(targetEntity="Civi\Contribute\ContributionRecur")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="contribution_recur_id", referencedColumnName="id", onDelete="SET NULL")})
    */
@@ -192,7 +183,7 @@ class Membership extends \Civi\Core\Entity {
   /**
    * @var \Civi\Campaign\Campaign
    *
-   * @JMS\Type("\Civi\Campaign\Campaign")
+   * 
    * @ORM\ManyToOne(targetEntity="Civi\Campaign\Campaign")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="campaign_id", referencedColumnName="id", onDelete="SET NULL")})
    */

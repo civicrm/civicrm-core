@@ -39,7 +39,6 @@ namespace Civi\Core;
 require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
-use Hateoas\Configuration\Annotation as Hateoas;
 use Civi\API\Annotation as CiviAPI;
 use JMS\Serializer\Annotation as JMS;
 
@@ -50,14 +49,6 @@ use JMS\Serializer\Annotation as JMS;
  * @CiviAPI\Permission()
  * @ORM\Table(name="civicrm_entity_tag", uniqueConstraints={@ORM\UniqueConstraint(name="UI_entity_id_entity_table_tag_id", columns={"entity_id","entity_table","tag_id"})}, indexes={@ORM\Index(name="FK_civicrm_entity_tag_tag_id", columns={"tag_id"})})
  * @ORM\Entity
- * @Hateoas\Relation("self",
- *   href = @Hateoas\Route(
- *    "EntityTag_get",
- *    parameters = { "id" = "expr(object.getId())" },
- *    absolute = true,
- *    generator = "civi"
- *  )
- * )
  *
  */
 class EntityTag extends \Civi\Core\Entity {
@@ -93,7 +84,7 @@ class EntityTag extends \Civi\Core\Entity {
   /**
    * @var \Civi\Core\Tag
    *
-   * @JMS\Type("\Civi\Core\Tag")
+   * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\Tag")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="tag_id", referencedColumnName="id", onDelete="CASCADE")})
    */

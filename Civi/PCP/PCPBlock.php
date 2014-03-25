@@ -39,7 +39,6 @@ namespace Civi\PCP;
 require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
-use Hateoas\Configuration\Annotation as Hateoas;
 use Civi\API\Annotation as CiviAPI;
 use JMS\Serializer\Annotation as JMS;
 
@@ -50,14 +49,6 @@ use JMS\Serializer\Annotation as JMS;
  * @CiviAPI\Permission()
  * @ORM\Table(name="civicrm_pcp_block", indexes={@ORM\Index(name="FK_civicrm_pcp_block_supporter_profile_id", columns={"supporter_profile_id"})})
  * @ORM\Entity
- * @Hateoas\Relation("self",
- *   href = @Hateoas\Route(
- *    "PCPBlock_get",
- *    parameters = { "id" = "expr(object.getId())" },
- *    absolute = true,
- *    generator = "civi"
- *  )
- * )
  *
  */
 class PCPBlock extends \Civi\Core\Entity {
@@ -111,7 +102,7 @@ class PCPBlock extends \Civi\Core\Entity {
   /**
    * @var \Civi\Core\UFGroup
    *
-   * @JMS\Type("\Civi\Core\UFGroup")
+   * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\UFGroup")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="supporter_profile_id", referencedColumnName="id", onDelete="SET NULL")})
    */

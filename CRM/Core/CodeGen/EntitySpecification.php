@@ -148,6 +148,7 @@ class CRM_Core_CodeGen_EntitySpecification {
 
       $targetEntity = str_replace('CRM', 'Civi', str_replace('_', '\\', $classNames[$ftable]));
       $tables[$name]['fields'][$fkey]['columnType'] = '\\' . $targetEntity;
+      $tables[$name]['fields'][$fkey]['jmsType'] = '';
       $tables[$name]['fields'][$fkey]['columnInfo'] = '@ORM\ManyToOne(targetEntity="' . $targetEntity . '")';
       $tables[$name]['fields'][$fkey]['columnJoin'] = '@ORM\JoinColumns({@ORM\JoinColumn(name="' . $tables[$name]['foreignKey'][$fkey]['name'] . '", referencedColumnName="' . $tables[$name]['foreignKey'][$fkey]['key'] . '"';
 
@@ -264,6 +265,9 @@ class CRM_Core_CodeGen_EntitySpecification {
       $field['columnInfo'] .= ')';
 
       $field['columnType'] = $field['phpType'];
+
+      $field['jmsType'] = '@JMS\Type("' . $field['phpType'] . '")';
+
       $field['columnJoin'] = '';
 
       $field['setFunctionInput'] = '$' . $field['propertyName'];

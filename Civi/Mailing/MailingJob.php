@@ -39,7 +39,6 @@ namespace Civi\Mailing;
 require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
-use Hateoas\Configuration\Annotation as Hateoas;
 use Civi\API\Annotation as CiviAPI;
 use JMS\Serializer\Annotation as JMS;
 
@@ -50,14 +49,6 @@ use JMS\Serializer\Annotation as JMS;
  * @CiviAPI\Permission()
  * @ORM\Table(name="civicrm_mailing_job", indexes={@ORM\Index(name="FK_civicrm_mailing_job_mailing_id", columns={"mailing_id"}),@ORM\Index(name="FK_civicrm_mailing_job_parent_id", columns={"parent_id"})})
  * @ORM\Entity
- * @Hateoas\Relation("self",
- *   href = @Hateoas\Route(
- *    "MailingJob_get",
- *    parameters = { "id" = "expr(object.getId())" },
- *    absolute = true,
- *    generator = "civi"
- *  )
- * )
  *
  */
 class MailingJob extends \Civi\Core\Entity {
@@ -75,7 +66,7 @@ class MailingJob extends \Civi\Core\Entity {
   /**
    * @var \Civi\Mailing\Mailing
    *
-   * @JMS\Type("\Civi\Mailing\Mailing")
+   * 
    * @ORM\ManyToOne(targetEntity="Civi\Mailing\Mailing")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="mailing_id", referencedColumnName="id", onDelete="CASCADE")})
    */
@@ -138,7 +129,7 @@ class MailingJob extends \Civi\Core\Entity {
   /**
    * @var \Civi\Mailing\MailingJob
    *
-   * @JMS\Type("\Civi\Mailing\MailingJob")
+   * 
    * @ORM\ManyToOne(targetEntity="Civi\Mailing\MailingJob")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="parent_id", referencedColumnName="id", onDelete="CASCADE")})
    */

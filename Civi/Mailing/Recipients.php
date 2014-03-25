@@ -39,7 +39,6 @@ namespace Civi\Mailing;
 require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
-use Hateoas\Configuration\Annotation as Hateoas;
 use Civi\API\Annotation as CiviAPI;
 use JMS\Serializer\Annotation as JMS;
 
@@ -50,14 +49,6 @@ use JMS\Serializer\Annotation as JMS;
  * @CiviAPI\Permission()
  * @ORM\Table(name="civicrm_mailing_recipients", indexes={@ORM\Index(name="FK_civicrm_mailing_recipients_mailing_id", columns={"mailing_id"}),@ORM\Index(name="FK_civicrm_mailing_recipients_contact_id", columns={"contact_id"}),@ORM\Index(name="FK_civicrm_mailing_recipients_email_id", columns={"email_id"}),@ORM\Index(name="FK_civicrm_mailing_recipients_phone_id", columns={"phone_id"})})
  * @ORM\Entity
- * @Hateoas\Relation("self",
- *   href = @Hateoas\Route(
- *    "Recipients_get",
- *    parameters = { "id" = "expr(object.getId())" },
- *    absolute = true,
- *    generator = "civi"
- *  )
- * )
  *
  */
 class Recipients extends \Civi\Core\Entity {
@@ -75,7 +66,7 @@ class Recipients extends \Civi\Core\Entity {
   /**
    * @var \Civi\Mailing\Mailing
    *
-   * @JMS\Type("\Civi\Mailing\Mailing")
+   * 
    * @ORM\ManyToOne(targetEntity="Civi\Mailing\Mailing")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="mailing_id", referencedColumnName="id", onDelete="CASCADE")})
    */
@@ -84,7 +75,7 @@ class Recipients extends \Civi\Core\Entity {
   /**
    * @var \Civi\Contact\Contact
    *
-   * @JMS\Type("\Civi\Contact\Contact")
+   * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Contact")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="contact_id", referencedColumnName="id", onDelete="CASCADE")})
    */
@@ -93,7 +84,7 @@ class Recipients extends \Civi\Core\Entity {
   /**
    * @var \Civi\Core\Email
    *
-   * @JMS\Type("\Civi\Core\Email")
+   * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\Email")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="email_id", referencedColumnName="id", onDelete="CASCADE")})
    */
@@ -102,7 +93,7 @@ class Recipients extends \Civi\Core\Entity {
   /**
    * @var \Civi\Core\Phone
    *
-   * @JMS\Type("\Civi\Core\Phone")
+   * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\Phone")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="phone_id", referencedColumnName="id", onDelete="CASCADE")})
    */

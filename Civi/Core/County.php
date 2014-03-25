@@ -39,7 +39,6 @@ namespace Civi\Core;
 require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
-use Hateoas\Configuration\Annotation as Hateoas;
 use Civi\API\Annotation as CiviAPI;
 use JMS\Serializer\Annotation as JMS;
 
@@ -50,14 +49,6 @@ use JMS\Serializer\Annotation as JMS;
  * @CiviAPI\Permission()
  * @ORM\Table(name="civicrm_county", uniqueConstraints={@ORM\UniqueConstraint(name="UI_name_state_id", columns={"name","state_province_id"})}, indexes={@ORM\Index(name="FK_civicrm_county_state_province_id", columns={"state_province_id"})})
  * @ORM\Entity
- * @Hateoas\Relation("self",
- *   href = @Hateoas\Route(
- *    "County_get",
- *    parameters = { "id" = "expr(object.getId())" },
- *    absolute = true,
- *    generator = "civi"
- *  )
- * )
  *
  */
 class County extends \Civi\Core\Entity {
@@ -93,7 +84,7 @@ class County extends \Civi\Core\Entity {
   /**
    * @var \Civi\Core\StateProvince
    *
-   * @JMS\Type("\Civi\Core\StateProvince")
+   * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\StateProvince")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="state_province_id", referencedColumnName="id")})
    */

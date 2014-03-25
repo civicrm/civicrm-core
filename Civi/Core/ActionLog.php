@@ -39,7 +39,6 @@ namespace Civi\Core;
 require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
-use Hateoas\Configuration\Annotation as Hateoas;
 use Civi\API\Annotation as CiviAPI;
 use JMS\Serializer\Annotation as JMS;
 
@@ -50,14 +49,6 @@ use JMS\Serializer\Annotation as JMS;
  * @CiviAPI\Permission()
  * @ORM\Table(name="civicrm_action_log", indexes={@ORM\Index(name="FK_civicrm_action_log_contact_id", columns={"contact_id"}),@ORM\Index(name="FK_civicrm_action_log_action_schedule_id", columns={"action_schedule_id"})})
  * @ORM\Entity
- * @Hateoas\Relation("self",
- *   href = @Hateoas\Route(
- *    "ActionLog_get",
- *    parameters = { "id" = "expr(object.getId())" },
- *    absolute = true,
- *    generator = "civi"
- *  )
- * )
  *
  */
 class ActionLog extends \Civi\Core\Entity {
@@ -75,7 +66,7 @@ class ActionLog extends \Civi\Core\Entity {
   /**
    * @var \Civi\Contact\Contact
    *
-   * @JMS\Type("\Civi\Contact\Contact")
+   * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Contact")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="contact_id", referencedColumnName="id", onDelete="CASCADE")})
    */
@@ -102,7 +93,7 @@ class ActionLog extends \Civi\Core\Entity {
   /**
    * @var \Civi\Core\ActionSchedule
    *
-   * @JMS\Type("\Civi\Core\ActionSchedule")
+   * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\ActionSchedule")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="action_schedule_id", referencedColumnName="id", onDelete="CASCADE")})
    */

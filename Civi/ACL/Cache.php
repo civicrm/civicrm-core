@@ -39,7 +39,6 @@ namespace Civi\ACL;
 require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
-use Hateoas\Configuration\Annotation as Hateoas;
 use Civi\API\Annotation as CiviAPI;
 use JMS\Serializer\Annotation as JMS;
 
@@ -50,14 +49,6 @@ use JMS\Serializer\Annotation as JMS;
  * @CiviAPI\Permission()
  * @ORM\Table(name="civicrm_acl_cache", indexes={@ORM\Index(name="index_acl_id", columns={"acl_id"}),@ORM\Index(name="FK_civicrm_acl_cache_contact_id", columns={"contact_id"}),@ORM\Index(name="FK_civicrm_acl_cache_acl_id", columns={"acl_id"})})
  * @ORM\Entity
- * @Hateoas\Relation("self",
- *   href = @Hateoas\Route(
- *    "Cache_get",
- *    parameters = { "id" = "expr(object.getId())" },
- *    absolute = true,
- *    generator = "civi"
- *  )
- * )
  *
  */
 class Cache extends \Civi\Core\Entity {
@@ -75,7 +66,7 @@ class Cache extends \Civi\Core\Entity {
   /**
    * @var \Civi\Contact\Contact
    *
-   * @JMS\Type("\Civi\Contact\Contact")
+   * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Contact")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="contact_id", referencedColumnName="id", onDelete="CASCADE")})
    */
@@ -84,7 +75,7 @@ class Cache extends \Civi\Core\Entity {
   /**
    * @var \Civi\ACL\ACL
    *
-   * @JMS\Type("\Civi\ACL\ACL")
+   * 
    * @ORM\ManyToOne(targetEntity="Civi\ACL\ACL")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="acl_id", referencedColumnName="id", onDelete="CASCADE")})
    */

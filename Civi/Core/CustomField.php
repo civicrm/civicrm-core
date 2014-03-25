@@ -39,7 +39,6 @@ namespace Civi\Core;
 require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
-use Hateoas\Configuration\Annotation as Hateoas;
 use Civi\API\Annotation as CiviAPI;
 use JMS\Serializer\Annotation as JMS;
 
@@ -50,14 +49,6 @@ use JMS\Serializer\Annotation as JMS;
  * @CiviAPI\Permission()
  * @ORM\Table(name="civicrm_custom_field", uniqueConstraints={@ORM\UniqueConstraint(name="UI_label_custom_group_id", columns={"label","custom_group_id"}),@ORM\UniqueConstraint(name="UI_name_custom_group_id", columns={"name","custom_group_id"})}, indexes={@ORM\Index(name="FK_civicrm_custom_field_custom_group_id", columns={"custom_group_id"})})
  * @ORM\Entity
- * @Hateoas\Relation("self",
- *   href = @Hateoas\Route(
- *    "CustomField_get",
- *    parameters = { "id" = "expr(object.getId())" },
- *    absolute = true,
- *    generator = "civi"
- *  )
- * )
  *
  */
 class CustomField extends \Civi\Core\Entity {
@@ -75,7 +66,7 @@ class CustomField extends \Civi\Core\Entity {
   /**
    * @var \Civi\Core\CustomGroup
    *
-   * @JMS\Type("\Civi\Core\CustomGroup")
+   * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\CustomGroup")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="custom_group_id", referencedColumnName="id", onDelete="CASCADE")})
    */

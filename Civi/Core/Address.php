@@ -39,7 +39,6 @@ namespace Civi\Core;
 require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
-use Hateoas\Configuration\Annotation as Hateoas;
 use Civi\API\Annotation as CiviAPI;
 use JMS\Serializer\Annotation as JMS;
 
@@ -50,14 +49,6 @@ use JMS\Serializer\Annotation as JMS;
  * @CiviAPI\Permission()
  * @ORM\Table(name="civicrm_address", indexes={@ORM\Index(name="index_location_type", columns={"location_type_id"}),@ORM\Index(name="index_is_primary", columns={"is_primary"}),@ORM\Index(name="index_is_billing", columns={"is_billing"}),@ORM\Index(name="index_street_name", columns={"street_name"}),@ORM\Index(name="index_city", columns={"city"}),@ORM\Index(name="FK_civicrm_address_contact_id", columns={"contact_id"}),@ORM\Index(name="FK_civicrm_address_county_id", columns={"county_id"}),@ORM\Index(name="FK_civicrm_address_state_province_id", columns={"state_province_id"}),@ORM\Index(name="FK_civicrm_address_country_id", columns={"country_id"}),@ORM\Index(name="FK_civicrm_address_master_id", columns={"master_id"})})
  * @ORM\Entity
- * @Hateoas\Relation("self",
- *   href = @Hateoas\Route(
- *    "Address_get",
- *    parameters = { "id" = "expr(object.getId())" },
- *    absolute = true,
- *    generator = "civi"
- *  )
- * )
  *
  */
 class Address extends \Civi\Core\Entity {
@@ -75,7 +66,7 @@ class Address extends \Civi\Core\Entity {
   /**
    * @var \Civi\Contact\Contact
    *
-   * @JMS\Type("\Civi\Contact\Contact")
+   * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Contact")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="contact_id", referencedColumnName="id", onDelete="CASCADE")})
    */
@@ -219,7 +210,7 @@ class Address extends \Civi\Core\Entity {
   /**
    * @var \Civi\Core\County
    *
-   * @JMS\Type("\Civi\Core\County")
+   * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\County")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="county_id", referencedColumnName="id", onDelete="SET NULL")})
    */
@@ -228,7 +219,7 @@ class Address extends \Civi\Core\Entity {
   /**
    * @var \Civi\Core\StateProvince
    *
-   * @JMS\Type("\Civi\Core\StateProvince")
+   * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\StateProvince")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="state_province_id", referencedColumnName="id", onDelete="SET NULL")})
    */
@@ -264,7 +255,7 @@ class Address extends \Civi\Core\Entity {
   /**
    * @var \Civi\Core\Country
    *
-   * @JMS\Type("\Civi\Core\Country")
+   * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\Country")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="country_id", referencedColumnName="id", onDelete="SET NULL")})
    */
@@ -318,7 +309,7 @@ class Address extends \Civi\Core\Entity {
   /**
    * @var \Civi\Core\Address
    *
-   * @JMS\Type("\Civi\Core\Address")
+   * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\Address")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="master_id", referencedColumnName="id", onDelete="SET NULL")})
    */

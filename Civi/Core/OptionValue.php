@@ -39,7 +39,6 @@ namespace Civi\Core;
 require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
-use Hateoas\Configuration\Annotation as Hateoas;
 use Civi\API\Annotation as CiviAPI;
 use JMS\Serializer\Annotation as JMS;
 
@@ -50,14 +49,6 @@ use JMS\Serializer\Annotation as JMS;
  * @CiviAPI\Permission()
  * @ORM\Table(name="civicrm_option_value", indexes={@ORM\Index(name="index_option_group_id_value", columns={"value","option_group_id"}),@ORM\Index(name="index_option_group_id_name", columns={"name","option_group_id"}),@ORM\Index(name="FK_civicrm_option_value_option_group_id", columns={"option_group_id"}),@ORM\Index(name="FK_civicrm_option_value_component_id", columns={"component_id"}),@ORM\Index(name="FK_civicrm_option_value_domain_id", columns={"domain_id"})})
  * @ORM\Entity
- * @Hateoas\Relation("self",
- *   href = @Hateoas\Route(
- *    "OptionValue_get",
- *    parameters = { "id" = "expr(object.getId())" },
- *    absolute = true,
- *    generator = "civi"
- *  )
- * )
  *
  */
 class OptionValue extends \Civi\Core\Entity {
@@ -75,7 +66,7 @@ class OptionValue extends \Civi\Core\Entity {
   /**
    * @var \Civi\Core\OptionGroup
    *
-   * @JMS\Type("\Civi\Core\OptionGroup")
+   * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\OptionGroup")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="option_group_id", referencedColumnName="id", onDelete="CASCADE")})
    */
@@ -183,7 +174,7 @@ class OptionValue extends \Civi\Core\Entity {
   /**
    * @var \Civi\Core\Component
    *
-   * @JMS\Type("\Civi\Core\Component")
+   * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\Component")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="component_id", referencedColumnName="id")})
    */
@@ -192,7 +183,7 @@ class OptionValue extends \Civi\Core\Entity {
   /**
    * @var \Civi\Core\Domain
    *
-   * @JMS\Type("\Civi\Core\Domain")
+   * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\Domain")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="domain_id", referencedColumnName="id")})
    */

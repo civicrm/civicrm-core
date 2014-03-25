@@ -39,7 +39,6 @@ namespace Civi\Contribute;
 require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
-use Hateoas\Configuration\Annotation as Hateoas;
 use Civi\API\Annotation as CiviAPI;
 use JMS\Serializer\Annotation as JMS;
 
@@ -50,14 +49,6 @@ use JMS\Serializer\Annotation as JMS;
  * @CiviAPI\Permission()
  * @ORM\Table(name="civicrm_premiums_product", indexes={@ORM\Index(name="FK_civicrm_premiums_product_premiums_id", columns={"premiums_id"}),@ORM\Index(name="FK_civicrm_premiums_product_product_id", columns={"product_id"}),@ORM\Index(name="FK_civicrm_premiums_product_financial_type_id", columns={"financial_type_id"})})
  * @ORM\Entity
- * @Hateoas\Relation("self",
- *   href = @Hateoas\Route(
- *    "PremiumsProduct_get",
- *    parameters = { "id" = "expr(object.getId())" },
- *    absolute = true,
- *    generator = "civi"
- *  )
- * )
  *
  */
 class PremiumsProduct extends \Civi\Core\Entity {
@@ -75,7 +66,7 @@ class PremiumsProduct extends \Civi\Core\Entity {
   /**
    * @var \Civi\Contribute\Premium
    *
-   * @JMS\Type("\Civi\Contribute\Premium")
+   * 
    * @ORM\ManyToOne(targetEntity="Civi\Contribute\Premium")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="premiums_id", referencedColumnName="id")})
    */
@@ -84,7 +75,7 @@ class PremiumsProduct extends \Civi\Core\Entity {
   /**
    * @var \Civi\Contribute\Product
    *
-   * @JMS\Type("\Civi\Contribute\Product")
+   * 
    * @ORM\ManyToOne(targetEntity="Civi\Contribute\Product")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="product_id", referencedColumnName="id")})
    */
@@ -102,7 +93,7 @@ class PremiumsProduct extends \Civi\Core\Entity {
   /**
    * @var \Civi\Financial\FinancialType
    *
-   * @JMS\Type("\Civi\Financial\FinancialType")
+   * 
    * @ORM\ManyToOne(targetEntity="Civi\Financial\FinancialType")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="financial_type_id", referencedColumnName="id", onDelete="SET NULL")})
    */

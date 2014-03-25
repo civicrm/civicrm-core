@@ -39,7 +39,6 @@ namespace Civi\Core;
 require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
-use Hateoas\Configuration\Annotation as Hateoas;
 use Civi\API\Annotation as CiviAPI;
 use JMS\Serializer\Annotation as JMS;
 
@@ -50,14 +49,6 @@ use JMS\Serializer\Annotation as JMS;
  * @CiviAPI\Permission()
  * @ORM\Table(name="civicrm_country", uniqueConstraints={@ORM\UniqueConstraint(name="UI_name_iso_code", columns={"name","iso_code"})}, indexes={@ORM\Index(name="FK_civicrm_country_address_format_id", columns={"address_format_id"}),@ORM\Index(name="FK_civicrm_country_region_id", columns={"region_id"})})
  * @ORM\Entity
- * @Hateoas\Relation("self",
- *   href = @Hateoas\Route(
- *    "Country_get",
- *    parameters = { "id" = "expr(object.getId())" },
- *    absolute = true,
- *    generator = "civi"
- *  )
- * )
  *
  */
 class Country extends \Civi\Core\Entity {
@@ -102,7 +93,7 @@ class Country extends \Civi\Core\Entity {
   /**
    * @var \Civi\Core\AddressFormat
    *
-   * @JMS\Type("\Civi\Core\AddressFormat")
+   * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\AddressFormat")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="address_format_id", referencedColumnName="id")})
    */
@@ -129,7 +120,7 @@ class Country extends \Civi\Core\Entity {
   /**
    * @var \Civi\Core\Worldregion
    *
-   * @JMS\Type("\Civi\Core\Worldregion")
+   * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\Worldregion")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="region_id", referencedColumnName="id")})
    */

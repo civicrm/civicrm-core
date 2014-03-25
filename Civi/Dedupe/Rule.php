@@ -39,7 +39,6 @@ namespace Civi\Dedupe;
 require_once 'Civi/Core/Entity.php';
 
 use Doctrine\ORM\Mapping as ORM;
-use Hateoas\Configuration\Annotation as Hateoas;
 use Civi\API\Annotation as CiviAPI;
 use JMS\Serializer\Annotation as JMS;
 
@@ -50,14 +49,6 @@ use JMS\Serializer\Annotation as JMS;
  * @CiviAPI\Permission()
  * @ORM\Table(name="civicrm_dedupe_rule", indexes={@ORM\Index(name="FK_civicrm_dedupe_rule_dedupe_rule_group_id", columns={"dedupe_rule_group_id"})})
  * @ORM\Entity
- * @Hateoas\Relation("self",
- *   href = @Hateoas\Route(
- *    "Rule_get",
- *    parameters = { "id" = "expr(object.getId())" },
- *    absolute = true,
- *    generator = "civi"
- *  )
- * )
  *
  */
 class Rule extends \Civi\Core\Entity {
@@ -75,7 +66,7 @@ class Rule extends \Civi\Core\Entity {
   /**
    * @var \Civi\Dedupe\RuleGroup
    *
-   * @JMS\Type("\Civi\Dedupe\RuleGroup")
+   * 
    * @ORM\ManyToOne(targetEntity="Civi\Dedupe\RuleGroup")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="dedupe_rule_group_id", referencedColumnName="id")})
    */
