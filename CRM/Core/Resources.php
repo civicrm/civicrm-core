@@ -546,7 +546,7 @@ class CRM_Core_Resources {
       $.fn.select2.defaults.formatNoMatches = " . json_encode(ts("None found.")) . ";
       $.fn.select2.defaults.formatLoadMore = " . json_encode(ts("Loading...")) . ";
       $.fn.select2.defaults.formatSearching = " . json_encode(ts("Searching...")) . ";
-      $.fn.select2.defaults.formatInputTooShort = function(){return cj(this).data('api-entity') == 'contact' ? $contactSearch : $otherSearch};
+      $.fn.select2.defaults.formatInputTooShort = function(){return CRM.$(this).data('api-entity') == 'contact' ? $contactSearch : $otherSearch};
     ";
 
     // Contact create profiles with localized names

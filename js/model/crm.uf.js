@@ -1,5 +1,4 @@
-(function($) {
-  var CRM = (window.CRM) ? (window.CRM) : (window.CRM = {});
+(function($, _) {
   if (!CRM.UF) CRM.UF = {};
 
   var YESNO = [
@@ -776,4 +775,4 @@
   CRM.UF.UFGroupCollection = CRM.Backbone.Collection.extend({
     model: CRM.UF.UFGroupModel
   });
-})(cj);
+})(CRM.$, CRM._);
