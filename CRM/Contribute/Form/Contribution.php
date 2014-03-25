@@ -655,7 +655,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         unset($status[CRM_Utils_Array::key('Overdue', $statusName)]);
       }
     }
-    
+
     if ($this->_id) {
       $contributionStatus = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $this->_id, 'contribution_status_id');
       $name = CRM_Utils_Array::value($contributionStatus, $statusName);
@@ -1031,23 +1031,22 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         $pcp[$f] = CRM_Utils_Array::value($f, $submittedValues);
       }
     }
+
+    $isEmpty = array_keys(array_flip($submittedValues['soft_credit_contact_id']));
+    if ($this->_id && count($isEmpty) == 1 && key($isEmpty) == NULL) {
+      //Delete existing soft credit records if soft credit list is empty on update
+      CRM_Contribute_BAO_ContributionSoft::del(array('contribution_id' => $this->_id));
+    }
     else {
-      $isEmpty = array_keys(array_flip($submittedValues['soft_credit_contact_id']));
-      if ($this->_id && count($isEmpty) == 1 && key($isEmpty) == NULL) {
-        //Delete existing soft credit records if soft credit list is empty on update
-        CRM_Contribute_BAO_ContributionSoft::del(array('contribution_id' => $this->_id));
-      }
-      else {
-        //build soft credit params
-        $softParams = $softIDs =array();
-        foreach ($submittedValues['soft_credit_contact_id'] as $key => $val) {
-          if ($val && $submittedValues['soft_credit_amount'][$key]) {
-            $softParams[$key]['contact_id'] = $val;
-            $softParams[$key]['amount'] = CRM_Utils_Rule::cleanMoney($submittedValues['soft_credit_amount'][$key]);
-            $softParams[$key]['soft_credit_type_id'] = $submittedValues['soft_credit_type'][$key];
-            if (!empty($submittedValues['soft_credit_id'][$key])) {
-              $softIDs[] = $softParams[$key]['id'] = $submittedValues['soft_credit_id'][$key];
-            }
+      //build soft credit params
+      $softParams = $softIDs =array();
+      foreach ($submittedValues['soft_credit_contact_id'] as $key => $val) {
+        if ($val && $submittedValues['soft_credit_amount'][$key]) {
+          $softParams[$key]['contact_id'] = $val;
+          $softParams[$key]['amount'] = CRM_Utils_Rule::cleanMoney($submittedValues['soft_credit_amount'][$key]);
+          $softParams[$key]['soft_credit_type_id'] = $submittedValues['soft_credit_type'][$key];
+          if (!empty($submittedValues['soft_credit_id'][$key])) {
+            $softIDs[] = $softParams[$key]['id'] = $submittedValues['soft_credit_id'][$key];
           }
         }
       }
