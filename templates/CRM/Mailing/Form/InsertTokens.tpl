@@ -295,12 +295,27 @@ cj(function($) {
     if (field === 'html_message') {
       tokenReplHtml(token);
     } else {
+      field = textMsgID($(this));
       $('#' + field).replaceSelection(token);
     }
     $(this).select2('val', '');
     if (isMailing) {
       verify();
     }
+  }
+
+  function textMsgID(obj) {
+    if (obj.parents().is("#sms")) {
+      field = 'sms #' + obj.data('field');
+    }
+    else if(obj.parents().is("#email")) {
+      field = 'email #' + obj.data('field');
+    }
+    else {
+      field = obj.data('field');
+    }
+
+    return field;
   }
 
   function tokenReplHtml(token) {
