@@ -542,7 +542,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
   static public function buildAmount(&$form, $required = TRUE, $discountId = NULL) {
     // build amount only when needed, skip incase of event full and waitlisting is enabled
     // and few other conditions check preProcess()
-    if ($form->_noFees) {
+    if (property_exists($form, '_noFees') && $form->_noFees) {
       return;
     }
 
