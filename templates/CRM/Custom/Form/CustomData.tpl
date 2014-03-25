@@ -58,7 +58,7 @@
         {/if}
       </div>
     {else}
-     <div class="custom-group custom-group-{$cd_edit.name}" class="crm-accordion-wrapper {if $cd_edit.collapse_display and !$skipTitle}collapsed{/if}">
+     <div class="custom-group custom-group-{$cd_edit.name} crm-accordion-wrapper {if $cd_edit.collapse_display and !$skipTitle}collapsed{/if}">
       {if !$skipTitle}
       <div class="crm-accordion-header">
         {$cd_edit.title}
