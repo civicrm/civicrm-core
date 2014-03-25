@@ -76,11 +76,12 @@
       fieldLabel = info.label || info.title || info.name || {/literal}'{ts escape="js"}Record{/ts}'{literal};
       enabled = !$row.hasClass('disabled');
       if (enabled) {
-        CRM.confirm({}, {{/literal}
+        CRM.confirm({{/literal}
           message: '<div class="crm-loading-element">{ts escape="js"}Loading{/ts}...</div>',
           {* client-side variable substitutions in smarty are AWKWARD! *}
           title: ts('{ts escape="js" 1='%1'}Disable %1{/ts}{literal}', {1: fieldLabel}),
           width: 300,
+          options: null,
           open: confirmation
         });
       } else {
