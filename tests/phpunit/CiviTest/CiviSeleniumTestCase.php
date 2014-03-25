@@ -364,22 +364,21 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
 
   /**
    */
-  function webtestFillAutocomplete($sortName, $fieldName = 'contact_1') {
-    $this->click($fieldName);
-    $this->type($fieldName, $sortName);
-    $this->typeKeys($fieldName, $sortName);
-    $this->waitForElementPresent("css=div.ac_results-inner li");
-    $this->click("css=div.ac_results-inner li");
-    $this->assertContains($sortName, $this->getValue($fieldName), "autocomplete expected $sortName but didn’t find it in " . $this->getValue($fieldName));
+  function webtestFillAutocomplete($sortName, $fieldName = 'contact_id') {
+    $this->select2($fieldName,$sortName);
+    //$this->assertContains($sortName, $this->getValue($fieldName), "autocomplete expected $sortName but didn’t find it in " . $this->getValue($fieldName));
   }
 
   /**
    */
   function webtestOrganisationAutocomplete($sortName) {
-    $this->type('contact_name', $sortName);
-    $this->click('contact_name');
-    $this->waitForElementPresent("css=div.ac_results-inner li");
-    $this->click("css=div.ac_results-inner li");
+    $this->clickAt("//*[@id='contact_id']/../div/a");
+    $this->waitForElementPresent("//*[@id='select2-drop']/div/input");
+    $this->keyDown("//*[@id='select2-drop']/div/input", " ");
+    $this->type("//*[@id='select2-drop']/div/input", $sortName);
+    $this->typeKeys("//*[@id='select2-drop']/div/input", $sortName);
+    $this->waitForElementPresent("//*[@class='select2-result-label']");
+    $this->clickAt("//*[@class='select2-results']/li[1]");
     //$this->assertContains($sortName, $this->getValue('contact_1'), "autocomplete expected $sortName but didn’t find it in " . $this->getValue('contact_1'));
   }
 
@@ -1875,5 +1874,18 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
         "{$customSet['entity']}_{$customSet['subEntity']}" => array('cgtitle' => $customGroupTitle, 'gid' => $gid, 'triggerElement' => $customSet['triggerElement']));
     }
     return $return;
+  }
+
+  /**
+   * function to type and select first occurance of autocomplete
+   */
+  function select2($fieldName,$label) {
+    $this->clickAt("//*[@id='$fieldName']/../div/a");
+    $this->waitForElementPresent("//*[@id='select2-drop']/div/input");
+    $this->keyDown("//*[@id='select2-drop']/div/input", " ");
+    $this->type("//*[@id='select2-drop']/div/input", $label);
+    $this->typeKeys("//*[@id='select2-drop']/div/input", $label);
+    $this->waitForElementPresent("//*[@class='select2-result-label']");
+    $this->clickAt("//*[@class='select2-results']/li[1]");
   }
 }
