@@ -98,15 +98,12 @@
           o.unblock();
         });
 
-        CRM.confirm( ''
-          ,{
-            title: ts('Email Message'),
-            message: o,
-            width : "680px", // don't remove px
-            height: "560"
-          },
-          ts('Done')
-        );
+        CRM.confirm({
+          title: ts('Email Message'),
+          message: o,
+          width : 680,
+          height: 560
+        });
         return false;
       });
     }
