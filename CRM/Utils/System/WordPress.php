@@ -412,7 +412,18 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
    * @return string  with the locale or null for none
    */
   function getUFLocale() {
-    return NULL;
+    // WPML plugin
+    if (defined('ICL_LANGUAGE_CODE')) {
+      $language = ICL_LANGUAGE_CODE;
+    }
+
+    // TODO: set language variable for others WordPress plugin
+
+    if (isset($language)) {
+      return CRM_Core_I18n_PseudoConstant::longForShort(substr($language, 0, 2));
+    } else {
+      return NULL;
+    }
   }
 
   /**
