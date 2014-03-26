@@ -111,6 +111,9 @@ function civicrm_api3_activity_create($params) {
         $activityDAO->id = $params['id'];
         $activityDAO->is_current_revision = 0;
         if (!$activityDAO->save()) {
+          if (is_object($activityDAO)) {
+            $activityDAO->free();
+          }
           return civicrm_api3_create_error(ts("Unable to revision existing case activity."), NULL, $activityDAO);
         }
         $createRevision = TRUE;
