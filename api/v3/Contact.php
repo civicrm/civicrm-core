@@ -332,10 +332,11 @@ function _civicrm_api3_contact_check_params( &$params, $dupeCheck = true, $dupeE
     }
   }
 
-  //check for organisations with same name
+  // The BAO no longer supports the legacy param "current_employer" so here is a shim for api backward-compatability
   if (!empty($params['current_employer'])) {
-    $organizationParams = array();
-    $organizationParams['organization_name'] = $params['current_employer'];
+    $organizationParams = array(
+      'organization_name' => $params['current_employer'],
+    );
 
     $dedupParams = CRM_Dedupe_Finder::formatParams($organizationParams, 'Organization');
 
@@ -350,6 +351,17 @@ function _civicrm_api3_contact_check_params( &$params, $dupeCheck = true, $dupeE
     // show error if multiple organisation with same name exist
     if (empty($params['employer_id']) && (count($dupeIds) > 1)) {
       throw new API_Exception('Found more than one Organisation with same Name.');
+    }
+
+    if ($dupeIds) {
+      $params['employer_id'] = $dupeIds[0];
+    }
+    else {
+      $result = civicrm_api3('contact', 'create', array(
+        'organization_name' => $params['current_employer'],
+        'contact_type' => 'Organization'
+      ));
+      $params['employer_id'] = $result['id'];
     }
   }
 
