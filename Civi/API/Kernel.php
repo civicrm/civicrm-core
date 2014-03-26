@@ -241,7 +241,7 @@ class Kernel {
     if (!empty($apiRequest['params']['debug'])) {
       $data['trace'] = $e->getTraceAsString();
     }
-    return civicrm_api3_create_error($e->getMessage(), $data, $apiRequest, $e->getCode());
+    return $this->createError($e->getMessage(), $data, $apiRequest, $e->getCode());
   }
 
   /**
@@ -260,7 +260,7 @@ class Kernel {
       $data['trace'] = $e->getTraceAsString();
     }
 
-    return civicrm_api3_create_error($e->getMessage(), $data, $apiRequest, $e->getCode());
+    return $this->createError($e->getMessage(), $data, $apiRequest, $e->getCode());
   }
 
   /**
@@ -288,7 +288,37 @@ class Kernel {
       $data['tip'] = "add debug=1 to your API call to have more info about the error";
     }
 
-    return civicrm_api3_create_error($e->getMessage(), $data, $apiRequest);
+    return $this->createError($e->getMessage(), $data, $apiRequest);
+  }
+
+  /**
+   *
+   * @param <type> $data
+   * @param array $data
+   * @param object $apiRequest DAO / BAO object to be freed here
+   *
+   * @throws API_Exception
+   * @return array <type>
+   */
+  function createError($msg, $data, $apiRequest, $code = NULL) {
+    // FIXME what to do with $code?
+    if ($msg == 'DB Error: constraint violation' || substr($msg, 0, 9) == 'DB Error:' || $msg == 'DB Error: already exists') {
+      try {
+        $fields = _civicrm_api3_api_getfields($apiRequest);
+        _civicrm_api3_validate_fields($apiRequest['entity'], $apiRequest['action'], $apiRequest['params'], $fields, TRUE);
+      } catch (Exception $e) {
+        $msg = $e->getMessage();
+      }
+    }
+
+    $data = civicrm_api3_create_error($msg, $data);
+
+    if (isset($apiRequest['params']) && is_array($apiRequest['params']) && !empty($apiRequest['params']['api.has_parent'])) {
+      $errorCode = empty($data['error_code']) ? 'chained_api_failed' : $data['error_code'];
+      throw new \API_Exception('Error in call to ' . $apiRequest['entity'] . '_' . $apiRequest['action'] . ' : ' . $msg, $errorCode, $data);
+    }
+
+    return $data;
   }
 
   /**
