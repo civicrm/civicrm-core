@@ -1,4 +1,4 @@
-(function($) {
+(function($, _) {
   var ufGroupCollection = new CRM.UF.UFGroupCollection(_.sortBy(CRM.initialProfileList.values, 'title'));
   //var ufGroupCollection = new CRM.UF.UFGroupCollection(CRM.initialProfileList.values, {
   //  comparator: 'title' // no point, this doesn't work with subcollections
@@ -63,4 +63,4 @@
     });
   });
 
-})(cj);
+})(CRM.$, CRM._);
