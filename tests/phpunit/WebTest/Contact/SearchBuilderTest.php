@@ -83,7 +83,7 @@ class WebTest_Contact_SearchBuilderTest extends CiviSeleniumTestCase {
     $this->type("first_name", "$firstName");
     $this->type("middle_name", "mid$firstName");
     $this->type("last_name", "adv$firstName");
-    $this->select("contact_sub_type", "label=- $Subtype");
+    $this->select("contact_sub_type", "label=$Subtype");
     $this->type("email_1_email", "$firstName@advsearch.co.in");
     $this->type("phone_1_phone", "123456789");
     $this->type("external_identifier", "extid$firstName");
