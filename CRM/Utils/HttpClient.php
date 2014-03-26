@@ -206,7 +206,7 @@ class CRM_Utils_HttpClient {
   }
 
   public function isRedirectSupported() {
-    return ini_get('open_basedir') == '' && ini_get('safe_mode') == 'Off';
+    return (ini_get('open_basedir') == '') && (ini_get('safe_mode') == 'Off' || ini_get('safe_mode') === FALSE);
   }
 
 }
