@@ -54,8 +54,8 @@
               {include file="CRM/Contact/Page/Inline/Actions.tpl"}
             </li>
           {/if}
-          {* Include Edit button if contact has 'edit contacts' permission OR user is viewing their own contact AND has 'edit my contact' permission. *}
-          {if $permission EQ 'edit' || call_user_func(array('CRM_Core_Permission','check'), 'edit my contact')}
+          {* Include Edit button if contact has 'edit contacts' permission OR user is viewing their own contact AND has 'edit my contact' permission. CRM_Contact_Page_View::checkUserPermission handles this and assigns $permission true as needed. *}
+          {if $permission EQ 'edit'}
             <li>
               {assign var='editParams' value=$urlParams|cat:"&action=update&cid=$contactId"}
               <a href="{crmURL p='civicrm/contact/add' q=$editParams}" class="edit button" title="{ts}Edit{/ts}">
