@@ -1,5 +1,5 @@
 // http://civicrm.org/licensing
-(function($) {
+(function($, _) {
 
   var ajaxFormParams = {
     dataType:'json',
@@ -328,4 +328,4 @@
       });
     $().crmAccordions();
   });
-})(cj);
+})(CRM.$, CRM._);

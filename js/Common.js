@@ -1,6 +1,7 @@
 // https://civicrm.org/licensing
 var CRM = CRM || {};
-var cj = jQuery;
+var cj = CRM.$ = jQuery;
+CRM._ = _;
 
 /**
  * Short-named function for string translation, defined in global scope so it's available everywhere.
@@ -199,7 +200,7 @@ CRM.validate = CRM.validate || {
   functions: []
 };
 
-(function ($, undefined) {
+(function ($, _, undefined) {
   "use strict";
 
   // Theme classes for unattached elements
@@ -866,4 +867,4 @@ CRM.validate = CRM.validate || {
     result = sign + (j ? i.substr(0, j) + separator : '') + i.substr(j).replace(/(\d{3})(?=\d)/g, "$1" + separator) + (2 ? decimal + Math.abs(value - i).toFixed(2).slice(2) : '');
     return format.replace(/1.*234.*56/, result);
   };
-})(jQuery);
+})(jQuery, _);
