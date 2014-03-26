@@ -3,6 +3,8 @@ namespace Civi\API\Page;
 use Civi\API\Annotation\Permission;
 use Civi\API\AuthorizationCheck;
 use Civi\Core\Container;
+use JMS\Serializer\Serializer;
+use JMS\Serializer\DeserializationContext;
 use Symfony\Component\HttpFoundation\Response;
 use Doctrine\Common\Collections\Criteria;
 
@@ -42,48 +44,61 @@ class REST extends \CRM_Core_Page {
 
 
   function run() {
-    if (count($this->urlPath) == 4) {
-      list ($civicrm, $rest, $entity, $id) = $this->urlPath;
-    }
-    elseif (count($this->urlPath) == 3) {
-      list ($civicrm, $rest, $entity) = $this->urlPath;
-      $id = NULL;
-    }
-    else {
-      return $this->createError(400, 'Wrong number of items in path');
-    }
+    try {
+      if (count($this->urlPath) == 4) {
+        list ($civicrm, $rest, $entity, $id) = $this->urlPath;
+      }
+      elseif (count($this->urlPath) == 3) {
+        list ($civicrm, $rest, $entity) = $this->urlPath;
+        $id = NULL;
+      }
+      else {
+        return $this->createError(400, 'Wrong number of items in path');
+      }
 
-    if ($civicrm != 'civicrm' || $rest != 'rest') {
-      return $this->createError(400, 'Invalid path prefix');
-    }
+      if ($civicrm != 'civicrm' || $rest != 'rest') {
+        return $this->createError(400, 'Invalid path prefix');
+      }
 
-    $entityClass = $this->apiRegistry->getClassBySlug($entity);
-    if ($entityClass === NULL) {
-      return $this->createError(404, 'Invalid entity');
-    }
+      $entityClass = $this->apiRegistry->getClassBySlug($entity);
+      if ($entityClass === NULL) {
+        return $this->createError(404, 'Invalid entity');
+      }
 
-    switch ($this->request->getMethod()) {
-      case 'GET':
-        if ($id) {
-          return $this->getItem($entityClass, $id);
-        }
-        else {
-          return $this->getCollection($entityClass);
-        }
-        break;
-      case 'POST':
-        if (!$id) {
-          return $this->createItem($entityClass);
-        }
-        break;
-      case 'DELETE':
-        if ($id) {
-          return $this->deleteItem($entityClass, $id);
-        }
-        break;
-      default:
+      switch ($this->request->getMethod()) {
+        case 'GET':
+          if ($id) {
+            return $this->getItem($entityClass, $id);
+          }
+          else {
+            return $this->getCollection($entityClass);
+          }
+          break;
+        case 'POST':
+          if (!$id) {
+            return $this->createItem($entityClass);
+          }
+          else {
+            return $this->updateItem($entityClass, $id);
+          }
+          break;
+        case 'PATCH':
+          if ($id) {
+            return $this->updateItem($entityClass, $id);
+          }
+          break;
+        case 'DELETE':
+          if ($id) {
+            return $this->deleteItem($entityClass, $id);
+          }
+          break;
+        default:
+      }
+      return $this->createError(405);
+    } catch (\Exception $e) {
+      \CRM_Core_Error::debug_log_message(\CRM_Core_Error::formatTextException($e));
+      return $this->createError(500, $e->getMessage());
     }
-    return $this->createError(405);
   }
 
   /**
@@ -144,6 +159,38 @@ class REST extends \CRM_Core_Page {
     $em->flush($obj);
     return $this->createResponse(200, array($obj));
   }
+
+  /**
+   * @param string $entityClass
+   * @param mixed $id
+   * @return \Symfony\Component\HttpFoundation\Response
+   */
+  public function updateItem($entityClass, $id) {
+    $em = \CRM_DB_EntityManager::singleton();
+    $item = $em->find($entityClass, $id);
+    if ($item) {
+      if (!$this->apiSecurity->check(new AuthorizationCheck($entityClass, Permission::CREATE, array($item)))) {
+        return $this->createError(403);
+      }
+
+      $context = new DeserializationContext();
+      $context->attributes->set('target', $item);
+      $this->hateoas->deserialize($this->request->getContent(), $entityClass, $this->getRequestFormat(), $context);
+
+      if (!$this->apiSecurity->check(new AuthorizationCheck($entityClass, Permission::CREATE, array($item)))) {
+        return $this->createError(403);
+      }
+
+      $em->flush($item);
+
+      // Return success as long as post-condition is OK ("$id does not exist")
+      return $this->createResponse(200, array($item));
+    }
+    else {
+      return $this->createError(404);
+    }
+  }
+
 
   /**
    * @param string $entityClass

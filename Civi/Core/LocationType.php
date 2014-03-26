@@ -38,15 +38,15 @@ namespace Civi\Core;
 
 require_once 'Civi/Core/Entity.php';
 
-use Doctrine\ORM\Mapping as ORM;
 use Civi\API\Annotation as CiviAPI;
+use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as JMS;
 
 /**
  * LocationType
  *
- * @CiviAPI\Entity("LocationType")
- * @CiviAPI\Permission()
+ * @CiviAPI\Entity("LocationType", slug="location-type")
+ * @CiviAPI\Permission(get="access CiviCRM")
  * @ORM\Table(name="civicrm_location_type", uniqueConstraints={@ORM\UniqueConstraint(name="UI_name", columns={"name"})})
  * @ORM\Entity
  *
