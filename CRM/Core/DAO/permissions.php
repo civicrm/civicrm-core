@@ -87,25 +87,12 @@ function _civicrm_api3_permissions($entity, $action, &$params) {
     ),
   );
 
-  // Contact-related data permissions
-  $permissions['entity_tag'] = array(
-    'get' => array(
-      'access CiviCRM',
-      'view all contacts',
-    ),
-    'default' => array(
-      'access CiviCRM',
-      'edit all contacts',
-    ),
-  );
+  // Contact-related data permissions.
+  // CRM-14094 - Users can edit and delete contact-related objects using inline edit with 'edit all contacts' permission
   $permissions['address'] = array(
     'get' => array(
       'access CiviCRM',
       'view all contacts',
-    ),
-    'delete' => array(
-      'access CiviCRM',
-      'delete contacts',
     ),
     'default' => array(
       'access CiviCRM',
@@ -117,6 +104,7 @@ function _civicrm_api3_permissions($entity, $action, &$params) {
   $permissions['website'] = $permissions['address'];
   $permissions['im'] = $permissions['address'];
   $permissions['loc_block'] = $permissions['address'];
+  $permissions['entity_tag'] = $permissions['address'];
   $permissions['note'] = $permissions['address'];
 
   // Activity permissions
