@@ -45,8 +45,8 @@ use JMS\Serializer\Annotation as JMS;
 /**
  * Worldregion
  *
- * @CiviAPI\Entity("Worldregion")
- * @CiviAPI\Permission()
+ * @CiviAPI\Entity("Worldregion", slug="world-region")
+ * @CiviAPI\Permission(get="access CiviCRM")
  * @ORM\Table(name="civicrm_worldregion")
  * @ORM\Entity
  *
