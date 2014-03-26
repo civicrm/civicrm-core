@@ -1823,15 +1823,10 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
           }
         }
 
-        //sleep method is used as to wait for custom field div to load -
-        //we cant use wait for the div element as we are asserting for the same,
-        //so wait for some time till the div loads
-        sleep(1);
-
         //checking for proper custom data which is loading through ajax
-        $this->assertElementPresent("xpath=//div[@id='{$customData['cgtitle']}'][@class='crm-accordion-body']",
+        $this->waitForElementPresent("xpath=//div[contains(@class, 'custom-group-{$customData['cgtitle']}')]",
           "The on the fly custom group has not been rendered for entity : {$entity} => {$entityData}");
-        $this->assertElementPresent("xpath=//div[@id='{$customData['cgtitle']}'][@class='crm-accordion-body']/table/tbody/tr/td[2]/input",
+        $this->assertElementPresent("xpath=//div[contains(@class, 'custom-group-{$customData['cgtitle']}')]/[contains(@class, 'crm-accordion-body')]/table/tbody/tr/td[2]/input",
           "The on the fly custom group field is not present for entity : {$entity} => {$entityData}");
       }
     }
