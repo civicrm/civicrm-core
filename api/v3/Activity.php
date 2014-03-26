@@ -104,7 +104,7 @@ function civicrm_api3_activity_create($params) {
         CRM_Activity_BAO_Activity::retrieve($oldActivityParams, $oldActivityValues);
       }
       if (empty($oldActivityValues)) {
-        return civicrm_api3_create_error(ts("Unable to locate existing activity."), NULL, CRM_Core_DAO::$_nullObject);
+        return civicrm_api3_create_error(ts("Unable to locate existing activity."));
       }
       else {
         $activityDAO = new CRM_Activity_DAO_Activity();
@@ -154,7 +154,7 @@ function civicrm_api3_activity_create($params) {
       $params['original_id'] = empty($oldActivityValues['original_id']) ? $oldActivityValues['id'] : $oldActivityValues['original_id'];
     }
     else {
-      return civicrm_api3_create_error(ts("Unable to create new revision of case activity."), NULL, CRM_Core_DAO::$_nullObject);
+      return civicrm_api3_create_error(ts("Unable to create new revision of case activity."));
     }
   }
 
