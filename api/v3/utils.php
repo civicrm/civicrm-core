@@ -319,7 +319,7 @@ function _civicrm_api3_get_DAO($name) {
     $name = strtoupper($name);
   }
   $dao = CRM_Core_DAO_AllCoreTables::getFullName($name);
-  if ($dao) {
+  if ($dao || !$name) {
     return $dao;
   }
 
