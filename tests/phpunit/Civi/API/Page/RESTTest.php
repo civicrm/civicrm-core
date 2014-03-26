@@ -40,11 +40,12 @@ class RESTTest extends \CiviUnitTestCase {
     $this->fixtures['Middle East'] = array(
       'id' => 3,
       'name' => 'Middle East and North Africa',
-      '_links' => array(
-        'self' => array(
-          'href' => $this->url('civicrm/rest/world-region/3'),
-        ),
-      ),
+      //HAL:
+      //'_links' => array(
+      //  'self' => array(
+      //    'href' => $this->url('civicrm/rest/world-region/3'),
+      //  ),
+      //),
     );
     $test = $this;
     $this->apiSecurityGrantedPermissions = array('access AJAX API', 'access CiviCRM', 'administer CiviCRM');
@@ -84,8 +85,8 @@ class RESTTest extends \CiviUnitTestCase {
     $this->assertEquals(1, count($xml->children()));
     $this->assertEquals(3, (string) $xml->entry->id);
     $this->assertEquals('Middle East and North Africa', (string) $xml->entry->name);
-    $this->assertEquals('self', (string) $xml->entry->link['rel']);
-    $this->assertEquals($this->url('civicrm/rest/world-region/3'), (string) $xml->entry->link['href']);
+    // HAL: $this->assertEquals('self', (string) $xml->entry->link['rel']);
+    // HAL: $this->assertEquals($this->url('civicrm/rest/world-region/3'), (string) $xml->entry->link['href']);
   }
 
   function testGetItem_InsufficientPermission_DefaultJson() {
@@ -102,7 +103,7 @@ class RESTTest extends \CiviUnitTestCase {
     foreach ($actual as $country) {
       $this->assertTrue(isset($country['id']) && is_numeric($country['id']));
       $this->assertTrue(isset($country['name']));
-      $this->assertTrue(isset($country['_links']));
+      // HAL: $this->assertTrue(isset($country['_links']));
     }
     $this->assertContains($this->fixtures['Middle East'], $actual);
   }
@@ -130,8 +131,8 @@ class RESTTest extends \CiviUnitTestCase {
       if ('Middle East and North Africa' == (string) $entry->name) {
         $mideastCount++;
       }
-      $this->assertEquals('self', (string) $entry->link['rel']);
-      $this->assertNotEmpty((string) $entry->link['href']);
+      // HAL: $this->assertEquals('self', (string) $entry->link['rel']);
+      // HAL: $this->assertNotEmpty((string) $entry->link['href']);
     }
     $this->assertEquals(1, $mideastCount);
   }
@@ -192,8 +193,8 @@ class RESTTest extends \CiviUnitTestCase {
     $this->assertEquals(1, count($xml->children()));
     $this->assertTrue(\CRM_Utils_Rule::positiveInteger((string) $xml->entry->id));
     $this->assertEquals('Middle Earth', (string) $xml->entry->name);
-    $this->assertEquals('self', (string) $xml->entry->link['rel']);
-    $this->assertEquals($this->url('civicrm/rest/world-region/' . $xml->entry->id), (string) $xml->entry->link['href']);
+    // HAL: $this->assertEquals('self', (string) $xml->entry->link['rel']);
+    // HAL: $this->assertEquals($this->url('civicrm/rest/world-region/' . $xml->entry->id), (string) $xml->entry->link['href']);
 
     $this->assertDBQuery(1, 'SELECT count(*) FROM civicrm_worldregion WHERE name = "Middle Earth"');
   }
