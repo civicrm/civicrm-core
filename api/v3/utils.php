@@ -153,7 +153,9 @@ function civicrm_api3_create_error($msg, $data = array(), &$dao = NULL) {
   // we will show sql to privelledged user only (not sure of a specific
   // security hole here but seems sensible - perhaps should apply to the trace as well?
   if(isset($data['sql']) && CRM_Core_Permission::check('Administer CiviCRM')) {
-    $data['debug_information'] = $data['sql'];
+    $data['debug_information'] = $data['sql']; // Isn't this redundant?
+  } else {
+    unset($data['sql']);
   }
   if (is_array($dao) && isset($dao['params']) && is_array($dao['params']) && !empty($dao['params']['api.has_parent'])) {
     $errorCode = empty($data['error_code']) ? 'chained_api_failed' : $data['error_code'];
