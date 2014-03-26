@@ -49,6 +49,10 @@
        if (!cj(responseText).find('.crm-error').html()) {
          window.location.href = '{/literal}{$backUrl}{literal}';
        }
+       else {
+         var errorInfo = cj(responseText).find('div.crm-error').html();
+         cj('.crm-container-snippet #CustomData').prepend(errorInfo);
+       }
      }
      </script>
      {/literal}
