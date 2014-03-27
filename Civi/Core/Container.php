@@ -96,7 +96,7 @@ class Container {
 
     $container->setDefinition('civi_api_kernel', new Definition(
       '\Civi\API\Kernel',
-      array(new Reference('dispatcher'))
+      array(new Reference('dispatcher'), new Reference('civi_api_registry'), new Reference('annotation_reader'))
     ))
       ->setFactoryService(self::SELF)->setFactoryMethod('createApiKernel');
 
@@ -167,12 +167,16 @@ class Container {
 
   /**
    * @param \Symfony\Component\EventDispatcher\EventDispatcher $dispatcher
+   * @param \Civi\API\Registry $apiRegistry
+   * @param \Doctrine\Common\Annotations\Reader $annotationReader
    * @return \Civi\API\Kernel
    */
-  public function createApiKernel($dispatcher) {
+  public function createApiKernel($dispatcher, $apiRegistry, $annotationReader) {
     $dispatcher->addSubscriber(new \Civi\API\Subscriber\TransactionSubscriber());
     $dispatcher->addSubscriber(new \Civi\API\Subscriber\I18nSubscriber());
     $dispatcher->addSubscriber(new \Civi\API\Provider\MagicFunctionProvider());
+    $dispatcher->addSubscriber(new \Civi\API\Provider\DoctrineCrudProvider($apiRegistry));
+    $dispatcher->addSubscriber(new \Civi\API\Subscriber\AnnotationPermissionCheck($annotationReader));
     $dispatcher->addSubscriber(new \Civi\API\Subscriber\APIv3SchemaAdapter());
     $dispatcher->addSubscriber(new \Civi\API\Subscriber\WrapperAdapter(array(
       \CRM_Utils_API_HTMLInputCoder::singleton(),
@@ -183,10 +187,11 @@ class Container {
     $dispatcher->addSubscriber(new \Civi\API\Subscriber\XDebugSubscriber());
     $dispatcher->addListener(\Civi\API\Events::AUTHORIZE, function(\Civi\API\Event\AuthorizeEvent $event) {
       $apiRequest = $event->getApiRequest();
-      // At time of writing, _civicrm_api3_api_check_permission generates an exception on failure
+      // FIXME: At time of writing, _civicrm_api3_api_check_permission generates an exception on failure
+      // This means it doesn't coexist well with other permission checks.
       _civicrm_api3_api_check_permission($apiRequest['entity'], $apiRequest['action'], $apiRequest['params']);
       $event->authorize();
-    });
+    }, \Civi\API\Events::W_LATE);
     $kernel = new \Civi\API\Kernel($dispatcher, array());
     return $kernel;
   }

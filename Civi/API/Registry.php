@@ -1,6 +1,9 @@
 <?php
 namespace Civi\API;
 
+/**
+ * A registry of API-enabled Doctrine entities
+ */
 class Registry {
   /**
    * @var array (string $name => string $className)
