@@ -34,12 +34,14 @@
  */
 class CRM_Case_BAO_Query {
 
-  static function &getFields() {
+  static function &getFields($excludeActivityFields = FALSE) {
     $fields = array();
     $fields = CRM_Case_BAO_Case::exportableFields();
 
     // add activity related fields
-    $fields = array_merge($fields, CRM_Activity_BAO_Activity::exportableFields('Case'));
+    if (!$excludeActivityFields) {
+      $fields = array_merge($fields, CRM_Activity_BAO_Activity::exportableFields('Case'));
+    }
 
     return $fields;
   }
