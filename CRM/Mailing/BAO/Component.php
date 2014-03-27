@@ -89,7 +89,7 @@ class CRM_Mailing_BAO_Component extends CRM_Mailing_DAO_Component {
    * @access public
    * @static
    */
-  static function add(&$params, &$ids) {
+  static function add(&$params, &$ids = array()) {
     // action is taken depending upon the mode
     $component = new CRM_Mailing_DAO_Component();
     $component->name = $params['name'];
