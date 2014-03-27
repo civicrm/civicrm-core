@@ -2823,7 +2823,7 @@ div.grippie {
 /* Status message box */
 .crm-status-box-outer {
   position: fixed;
-  z-index: 9999;
+  z-index: 99999;
   right: 0;
   top: 0;
 }
