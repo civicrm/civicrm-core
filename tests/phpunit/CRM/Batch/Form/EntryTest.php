@@ -187,7 +187,7 @@ class CRM_Batch_Form_EntryTest extends CiviUnitTestCase {
     return array(
       'batch_id' => 4,
       'primary_profiles' => array(1 => NULL, 2 => NULL, 3 => NULL),
-      'primary_contact_select_id' => Array (
+      'primary_contact_id' => Array (
         1 => $this->_contactID,
         2 => $this->_contactID2,
         3 => $this->_contactID3,
