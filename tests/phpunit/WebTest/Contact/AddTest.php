@@ -257,10 +257,7 @@ class WebTest_Contact_AddTest extends CiviSeleniumTestCase {
     $this->select("preferred_language", "value=fr_FR");
 
     //Notes section
-    $this->clickAt("xpath=//div[text()='
-   
-    Notes
-  ']");
+    $this->clickAt("//*[@id='Contact']/div[2]/div[6]/div[1]");
     $this->waitForElementPresent("subject");
     $this->type("subject", "Grant's note");
     $this->type("note", "This is a household contact webtest note.");
