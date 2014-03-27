@@ -321,7 +321,9 @@ function _civicrm_api3_get_DAO($name) {
   }
 
   // Really weird apis can declare their own DAO name. Not sure if this is a good idea...
-  include_once "api/v3/$name.php";
+  if(file_exists("api/v3/$name.php")) {
+    include_once "api/v3/$name.php";
+  }
   $daoFn = "_civicrm_api3_" . _civicrm_api_get_entity_name_from_camel($name) . "_DAO";
   if (function_exists($daoFn)) {
     return $daoFn();
