@@ -110,7 +110,9 @@ class CRM_Financial_BAO_FinancialAccount extends CRM_Financial_DAO_FinancialAcco
     // action is taken depending upon the mode
     $financialAccount = new CRM_Financial_DAO_FinancialAccount();
     $financialAccount->copyValues($params);
-    $financialAccount->id = CRM_Utils_Array::value('contributionType', $ids);
+    if (!empty($ids['contributionType'])) {
+      $financialAccount->id = CRM_Utils_Array::value('contributionType', $ids);
+    }
     $financialAccount->save();
     return $financialAccount;
   }
