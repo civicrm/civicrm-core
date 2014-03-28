@@ -359,7 +359,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
         }
       }
     }
-    
+
     if (CRM_Utils_Array::value('record_contribution', $defaults) && !$this->_mode) {
       $contributionParams = array('id' => $defaults['record_contribution']);
       $contributionIds = array();
@@ -930,7 +930,7 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
     if (!$priceSetId && $self->_mode && !CRM_Utils_Array::value('financial_type_id', $params)) {
       $errors['financial_type_id'] = ts('Please enter the financial Type.');
     }
-    
+
     if (CRM_Utils_Array::value('record_contribution', $params) && !CRM_Utils_Array::value('payment_instrument_id', $params)) {
       $errors['payment_instrument_id'] = ts('Paid By is a required field.');
     }
