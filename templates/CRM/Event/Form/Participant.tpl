@@ -49,7 +49,7 @@
     {literal}
 
     if ( fieldOptionsFull.length > 0 ) {
-      cj(function() {
+      CRM.$(function($) {
         cj("input,#priceset select,#priceset").each(function () {
           if ( cj(this).attr('price') ) {
             switch( cj(this).attr('type') ) {
@@ -341,7 +341,7 @@
 
     <script type="text/javascript">
       {literal}
-      cj(function($) {
+      CRM.$(function($) {
 
         var $form = $('form#{/literal}{$form.formName}{literal}');
 
@@ -610,7 +610,7 @@
     {/literal}
   {/if}
   {literal}
-  cj(function() {
+  CRM.$(function($) {
     cj().crmAccordions();
   });
   {/literal}

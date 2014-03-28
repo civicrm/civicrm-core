@@ -25,7 +25,7 @@
 *}
 {literal}
 <script type="text/javascript">
-cj( function( ) {
+CRM.$(function($) {
     var url       = "{/literal}{$customUrls.$element_name}{literal}";
     var custom    = "{/literal}#{$element_name|replace:']':''|replace:'[':'_'}{literal}";
     var custom_id = "{/literal}input[name=\"{$element_name|cat:'_id'|regex_replace:'/\]_id$/':'_id]'}\"]{literal}";

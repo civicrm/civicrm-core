@@ -26,7 +26,7 @@
 {* handle common enable/disable actions *}
 {literal}
 <script type="text/javascript">
-  cj(function($) {
+  CRM.$(function($) {
     var $row, $table, info, enabled, fieldLabel;
 
     function successMsg() {

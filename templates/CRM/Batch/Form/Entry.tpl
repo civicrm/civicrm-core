@@ -106,7 +106,7 @@
 </div>
 {literal}
 <script type="text/javascript">
-cj(function () {
+CRM.$(function($) {
   cj('.selector-rows').change(function () {
     var options = {
       'url': {/literal}"{crmURL p='civicrm/ajax/batch' h=0}"{literal}

@@ -92,7 +92,7 @@
 /**
  * Function to update participant status
  */
-cj( function(){
+CRM.$(function($) {
    cj('#status_change').change( function() {
       if ( cj(this).val() ) {
         cj('.crm-copy-fields [name^="field["][name*="[participant_status]"]').val( cj(this).val() );

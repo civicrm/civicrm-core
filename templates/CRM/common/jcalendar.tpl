@@ -69,7 +69,7 @@
 
 <script type="text/javascript">
     {literal}
-    cj( function() {
+    CRM.$(function($) {
       {/literal}
       var element_date   = "#{$displayDate}";
       var element_time  = "#{$elementId}_time";

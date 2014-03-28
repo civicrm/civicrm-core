@@ -171,7 +171,7 @@
      <script type="text/javascript">
      {literal}
 
-cj( function( ) {
+CRM.$(function($) {
   // build list of ids to track changes on
   var address_fields = {/literal}{$profileAddressFields|@json_encode}{literal};
   var input_ids = {};

@@ -69,7 +69,7 @@
 {include file="CRM/common/formNavigate.tpl"}
 {literal}
 <script type="text/javascript">
-cj(function() {
+CRM.$(function($) {
    cj().crmAccordions(); 
 });
 </script>

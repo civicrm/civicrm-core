@@ -142,7 +142,7 @@
 
 {literal}
 <script type="text/javascript">
-    cj( function() {
+    CRM.$(function($) {
         //show/hide membership block
         showHideMembershipBlock();
         cj('#member_is_active').click( function() {

@@ -67,7 +67,7 @@ function showDeceasedDate( ) {
   }
 }
 
-cj( function() {
+CRM.$(function($) {
   showDeceasedDate( );
 });
 </script>

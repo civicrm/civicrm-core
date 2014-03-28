@@ -26,7 +26,7 @@
 {if $show eq 'event-payment'}
 {literal}
 <script type='text/javascript'>
-cj(function($){
+CRM.$(function($) {
   if (cj("#payment-info").length) {
     var dataUrl = {/literal}'{crmURL p="civicrm/payment/view" h=0 q="action=browse&id=$participantId&cid=`$contactId`&component=event&context=payment_info&snippet=4"}'{literal};
     cj.ajax({

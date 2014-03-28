@@ -58,7 +58,7 @@ function buildPaymentBlock( type ) {
   cj('#billing-payment-block').html(response).trigger('crmLoad').trigger('crmFormLoad');
 }
 
-cj( function() {
+CRM.$(function($) {
     cj('.crm-group.payment_options-group').show();
 
     cj('input[name="payment_processor"]').change( function() {

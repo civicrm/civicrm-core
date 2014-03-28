@@ -1,4 +1,4 @@
-cj(function($) {
+CRM.$(function($) {
   checkExistingMemOrg();
 
   $("select[name='membership_type_id[0]']").change( checkExistingMemOrg );

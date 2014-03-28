@@ -26,7 +26,7 @@
 {literal}
 <script type="text/javascript">
 
-cj(function($) {
+CRM.$(function($) {
   // The set of options we can use to initialize jQuery.dashboard().
   var options = {
     // Optional. Defaults to 3.  You'll need to change the width of columns in CSS too.

@@ -57,7 +57,7 @@
     {if $location neq 'top'}
       <script type="text/javascript">
         {literal}
-        cj(function($) {
+        CRM.$(function($) {
           {/literal}
           var
             $form = $('#{$form.formName}'),

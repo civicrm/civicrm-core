@@ -26,7 +26,7 @@
 {if $config->stateCountryMap}
 <script type="text/javascript">
   {literal}
-  cj(function($) {
+  CRM.$(function($) {
     function chainSelect(e) {
       var info = $(this).data('chainSelect');
       var val = info.target.val();

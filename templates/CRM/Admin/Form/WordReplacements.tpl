@@ -100,7 +100,7 @@ function buildStringOverrideRow( curInstance )
    });
 }
 
-cj( function( ) {
+CRM.$(function($) {
   {/literal}
   {if $stringOverrideInstances}
      {foreach from=$stringOverrideInstances key="index" item="instance"}

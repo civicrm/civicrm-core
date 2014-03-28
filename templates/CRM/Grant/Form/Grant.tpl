@@ -124,7 +124,7 @@
 
 {literal}
 <script type="text/javascript">
-    cj( function( ) {
+    CRM.$(function($) {
         {/literal}
         CRM.buildCustomData( '{$customDataType}' );
         {if $customDataSubType}
@@ -133,7 +133,7 @@
         {literal}
     });
 
-    cj(function() {
+    CRM.$(function($) {
        cj().crmAccordions();
     });
 </script>

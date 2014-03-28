@@ -72,7 +72,7 @@
 </div><!-- /.crm-content-block -->
 {literal}
 <script type="text/javascript">
-cj(function() {
+CRM.$(function($) {
    cj().crmAccordions();
 });
 </script>

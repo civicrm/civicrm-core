@@ -1,6 +1,6 @@
 //@todo functions partially moved from tpl but still need an enclosure / cleanup
 // jslinting etc
-cj(function () {
+CRM.$(function($) {
   cj('.selector-rows').change(function () {
     var options = {
       'url': CRM.url('civicrm/ajax/batch')

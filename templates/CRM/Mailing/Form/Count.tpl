@@ -63,7 +63,7 @@ cj("#button").click(function(){
      });
   });
 
-    cj( function( ) {
+    CRM.$(function($) {
         var count = 0; var columns=''; var sortColumn = '';
 
         cj('#selectedRecords th').each( function( ) {

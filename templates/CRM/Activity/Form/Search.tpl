@@ -87,7 +87,7 @@
 {/if}
 {literal}
   <script type="text/javascript">
-    cj(function () {
+    CRM.$(function($) {
       cj().crmAccordions();
 
       var roleId = cj('input[name=activity_role]:checked', '#Search').val();

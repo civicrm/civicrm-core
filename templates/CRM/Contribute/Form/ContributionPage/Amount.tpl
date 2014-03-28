@@ -239,7 +239,7 @@
      cj('#amountFields').hide();
   }
 
-  cj(function() {
+  CRM.$(function($) {
     payLater('is_pay_later');
   });
 

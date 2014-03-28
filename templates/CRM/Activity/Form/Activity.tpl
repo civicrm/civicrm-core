@@ -238,7 +238,7 @@
       </div><!-- /.crm-accordion-wrapper -->
       {literal}
         <script type="text/javascript">
-          cj(function($) {
+          CRM.$(function($) {
             cj().crmAccordions();
             cj('.crm-accordion-body').each( function() {
               //open tab if form rule throws error
@@ -292,7 +292,7 @@
   {include file="CRM/common/customData.tpl"}
     {literal}
     <script type="text/javascript">
-    cj(function() {
+    CRM.$(function($) {
     {/literal}
     {if $customDataSubType}
       CRM.buildCustomData( '{$customDataType}', {$customDataSubType} );

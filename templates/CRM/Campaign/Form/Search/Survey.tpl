@@ -45,7 +45,7 @@
 
   {literal}
   <script type="text/javascript">
-    cj( function( ){
+    CRM.$(function($) {
       loadSurveyList( );
     });
   </script>
@@ -131,7 +131,7 @@
 {literal}
 <script type="text/javascript">
 
- cj(function() {
+ CRM.$(function($) {
     cj().crmAccordions();
  });
 
@@ -139,7 +139,7 @@
  {* load selector when force *}
  {if $force and !$buildSelector}
  {literal}
- cj( function( ) {
+ CRM.$(function($) {
     searchSurveys( {/literal}'{$qfKey}'{literal} );
  });
 

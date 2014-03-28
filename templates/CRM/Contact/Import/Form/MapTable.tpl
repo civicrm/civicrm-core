@@ -168,7 +168,7 @@
 
       {* // Set default location type *}
       {literal}
-      cj(function() {
+      CRM.$(function($) {
         var defaultLocationType = "{/literal}{$defaultLocationType}{literal}";
         if (defaultLocationType.length) {
           cj('#map-field').on('change', 'select[id^="mapper"][id$="_0"]', function() {

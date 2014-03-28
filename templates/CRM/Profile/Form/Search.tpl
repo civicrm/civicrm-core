@@ -143,7 +143,7 @@
 
     {literal}
       <script type="text/javascript">
-        cj(function() {
+        CRM.$(function($) {
           cj().crmAccordions();
         });
       </script>
@@ -164,7 +164,7 @@
 {/if}
 {literal}
   <script type="text/javascript">
-    cj(function(){
+    CRM.$(function($) {
       cj('#selector tr:even').addClass('odd-row ');
       cj('#selector tr:odd ').addClass('even-row');
     });
