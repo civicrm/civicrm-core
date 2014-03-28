@@ -67,7 +67,7 @@
 
 {literal}
 <script type="text/javascript">
-    cj(function($) {
+    CRM.$(function($) {
       // check first primary radio
       $('#Email_1_IsPrimary').prop('checked', true );
     });

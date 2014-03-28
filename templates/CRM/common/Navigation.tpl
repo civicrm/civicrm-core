@@ -153,4 +153,4 @@ $('#civicrm-menu').ready(function() {
   });
 });
 $('#civicrm-menu').menuBar({arrowSrc: CRM.config.resourceBase + 'packages/jquery/css/images/arrow.png'});
-})(cj);{/literal}
+})(CRM.$);{/literal}

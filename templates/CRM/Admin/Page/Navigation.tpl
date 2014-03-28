@@ -52,7 +52,7 @@
     }
   </style>
   <script type="text/javascript">
-  cj(function($) {
+  CRM.$(function($) {
     cj("#navigation-tree").jstree({
     plugins : [ "themes", "json_data", "dnd","ui", "crrm","contextmenu" ],
     json_data  : {

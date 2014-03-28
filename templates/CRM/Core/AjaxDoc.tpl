@@ -13,7 +13,7 @@ code {line-height:1em;}
 <script>
 {literal}
 
-cj(function($) {
+CRM.$(function($) {
   var restURL = CRM.url("civicrm/ajax/rest");
 
   function toggleField (name, label, type) {

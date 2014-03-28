@@ -242,7 +242,7 @@ if ( isMailing ) {
   {/literal}
   {if $editor eq "ckeditor"}
   {literal}
-    cj( function() {
+    CRM.$(function($) {
       oEditor = CKEDITOR.instances['html_message'];
       oEditor.BaseHref = '' ;
       oEditor.UserFilesPath = '' ;
@@ -251,7 +251,7 @@ if ( isMailing ) {
   {/literal}
   {elseif $editor eq "tinymce"}
   {literal}
-    cj( function( ) {
+    CRM.$(function($) {
       if ( isMailing ) {
         cj('div.html').hover(
           function( ) {
@@ -274,7 +274,7 @@ if ( isMailing ) {
   {/literal}
   {elseif $editor eq "drupalwysiwyg"}
   {literal}
-    cj( function( ) {
+    CRM.$(function($) {
       if ( isMailing ) {
         cj('div.html').hover(
           verify,
@@ -287,7 +287,7 @@ if ( isMailing ) {
   {literal}
 }
 
-cj(function($) {
+CRM.$(function($) {
   function insertToken() {
     var
       token = $(this).val(),

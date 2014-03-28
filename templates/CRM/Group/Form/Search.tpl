@@ -91,7 +91,7 @@
 
 {literal}
 <script type="text/javascript">
-cj(function($) {
+CRM.$(function($) {
   // for CRM-11310 and CRM-10635 : processing just parent groups on initial display
   // passing '1' for parentsOnlyArg to show parent child heirarchy structure display
   // on initial load of manage group page and

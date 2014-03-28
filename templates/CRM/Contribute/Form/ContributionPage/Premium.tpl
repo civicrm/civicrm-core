@@ -140,7 +140,7 @@
 
 <script type="text/javascript">
   {literal}
-  cj(function () {
+  CRM.$(function($) {
     cj().crmAccordions();
 
     // bind click event to premiums_active checkbox

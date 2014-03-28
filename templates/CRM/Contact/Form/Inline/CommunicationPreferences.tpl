@@ -146,7 +146,7 @@
 
 {literal}
 <script type="text/javascript">
-cj( function( ) {
+CRM.$(function($) {
     var fields = new Array( 'postal_greeting', 'addressee', 'email_greeting');
     for ( var i = 0; i < 3; i++ ) {
       cj( "#" + fields[i] + "_id").change( function( ) {

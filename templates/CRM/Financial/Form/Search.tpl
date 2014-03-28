@@ -67,7 +67,7 @@
 {include file="CRM/Form/validate.tpl"}
 {literal}
 <script type="text/javascript">
-cj(function($) {
+CRM.$(function($) {
   var batchSelector;
   buildBatchSelector();
   $("#batch_update").prop('disabled', false);

@@ -417,7 +417,7 @@
     toggleConfirmButton();
   });
 
-  cj(function() {
+  CRM.$(function($) {
     toggleConfirmButton();
   });
 
@@ -432,7 +432,7 @@
     }
   }
 
-  cj(function(){
+  CRM.$(function($) {
     // highlight price sets
     function updatePriceSetHighlight() {
       cj('#priceset .price-set-row').removeClass('highlight');

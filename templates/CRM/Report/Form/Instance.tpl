@@ -122,7 +122,7 @@
   cj(document).ready(function() {
     cj('#title').data('initial_value', cj('#title').val());
   });
-  cj( function(){
+  CRM.$(function($) {
       var formName = {/literal}"{$form.formName}"{literal};
       cj('#_qf_' + formName + '_submit_save').click (
           function(){

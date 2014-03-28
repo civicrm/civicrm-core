@@ -89,7 +89,7 @@
 
 {literal}
 <script type="text/javascript">
-cj( function() {
+CRM.$(function($) {
   cj().crmAccordions();
   cj('#_qf_BatchTransaction_submit-top, #_qf_BatchTransaction_submit-botttom').click(function() {
     cj('.crm-batch_transaction_search-accordion:not(.collapsed)').crmAccordionToggle();

@@ -25,7 +25,7 @@
 *}
 {literal}
 <script type="text/javascript">
-  cj( function() {
+  CRM.$(function($) {
     //bind the click event for action icon
     cj('.action-icon').click( function( ) {
       copyFieldValues( cj(this).attr('fname') );

@@ -26,7 +26,7 @@
 {* tpl for building Individual related fields *}
 <script type="text/javascript">
 {literal}
-cj(function($) {
+CRM.$(function($) {
 {/literal}
   var cid=parseFloat("{$contactId}");//parseInt is octal by default
   var contactIndividual = "{crmURL p='civicrm/ajax/rest' q='entity=contact&action=get&json=1&contact_type=Individual&return=display_name,sort_name,email&rowCount=50' h=0}";

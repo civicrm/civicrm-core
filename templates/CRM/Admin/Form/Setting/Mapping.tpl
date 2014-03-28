@@ -54,7 +54,7 @@
 </div>
 {literal}
 <script type="text/javascript">
-cj(function() {
+CRM.$(function($) {
   showHideMapAPIkey( cj('#mapProvider').val( ) );
 });
 function showHideMapAPIkey( mapProvider ) {

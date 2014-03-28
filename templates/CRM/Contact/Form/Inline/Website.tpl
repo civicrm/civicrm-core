@@ -61,7 +61,7 @@
 
 {literal}
 <script type="text/javascript">
-    cj(function($) {
+    CRM.$(function($) {
       // error handling / show hideen elements duing form validation
       $('tr[id^="Website_Block_"]' ).each( function() {
           if( $(this).find('td:first span').length > 0 ) {

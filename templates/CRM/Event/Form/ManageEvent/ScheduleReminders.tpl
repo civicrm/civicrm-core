@@ -180,7 +180,7 @@
 
   {literal}
     <script type='text/javascript'>
-      cj(function() {
+      CRM.$(function($) {
         populateRecipient();
         cj('#recipient').click( function( ) {
           populateRecipient();

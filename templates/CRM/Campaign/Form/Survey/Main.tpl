@@ -95,7 +95,7 @@
 {literal}
 <script type="text/javascript">
     //show edit profile field links
-    cj(function() {
+    CRM.$(function($) {
         // show edit for profile
         cj('select[id="profile_id"]').change( function( ) {
             buildLinks( cj(this), cj(this).val());

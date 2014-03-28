@@ -55,7 +55,7 @@
 {if $useLogging}
 {literal}
   <script type="text/javascript">
-  cj(function ($) {
+  CRM.$(function($) {
     $('#changeLog .instance_data').on('crmLoad', function(e, data) {
       CRM.tabHeader.updateCount('#tab_log', data.totalRows);
     });

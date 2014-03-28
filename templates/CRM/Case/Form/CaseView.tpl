@@ -182,7 +182,7 @@
   <script type="text/javascript">
   var oTable;
 
-  cj(function() {
+  CRM.$(function($) {
     buildCaseRoles(false);
   });
 
@@ -275,7 +275,7 @@
       {/if}
  {literal}
  <script type="text/javascript">
-   cj(function( ) {
+   CRM.$(function($) {
       buildCaseClientRelationships(false);
    });
 
@@ -357,7 +357,7 @@
  {literal}
  <script type="text/javascript">
 
- cj(function() {
+ CRM.$(function($) {
     buildCaseGlobalRelationships(false);
  });
 

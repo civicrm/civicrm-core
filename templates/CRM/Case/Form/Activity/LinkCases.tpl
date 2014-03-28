@@ -32,7 +32,7 @@
 
 {literal}
 <script type="text/javascript">
-  cj(function($) {
+  CRM.$(function($) {
     var $form = $("#{/literal}{$form.formName}{literal}");
     $('input[name=link_to_case_id]', $form).select2({
       placeholder: {/literal}'{ts escape="js"}- select case -{/ts}'{literal},
