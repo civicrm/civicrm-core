@@ -174,6 +174,37 @@ class Kernel {
   }
 
   /**
+   * @param int $version
+   * @return array<string>
+   */
+  public function getEntityNames($version) {
+    // Question: Would it better to eliminate $this->apiProviders and just use $this->dispatcher?
+    $entityNames = array();
+    foreach ($this->getApiProviders() as $provider) {
+      $entityNames = array_merge($entityNames, $provider->getEntityNames($version));
+    }
+    $entityNames = array_unique($entityNames);
+    sort($entityNames);
+    return $entityNames;
+  }
+
+  /**
+   * @param int $version
+   * @param string $entity
+   * @return array<string>
+   */
+  public function getActionNames($version, $entity) {
+    // Question: Would it better to eliminate $this->apiProviders and just use $this->dispatcher?
+    $actionNames = array();
+    foreach ($this->getApiProviders() as $provider) {
+      $actionNames = array_merge($actionNames, $provider->getActionNames($version, $entity));
+    }
+    $actionNames = array_unique($actionNames);
+    sort($actionNames);
+    return $actionNames;
+  }
+
+  /**
    * @param \Exception $e
    * @param array $apiRequest
    * @return array (API response)
@@ -278,5 +309,33 @@ class Kernel {
       }
     }
     return $result;
+  }
+
+  /**
+   * @return array<ProviderInterface>
+   */
+  public function getApiProviders() {
+    return $this->apiProviders;
+  }
+
+  /**
+   * @param array $apiProviders
+   */
+  public function setApiProviders($apiProviders) {
+    $this->apiProviders = $apiProviders;
+  }
+
+  /**
+   * @return \Symfony\Component\EventDispatcher\EventDispatcher
+   */
+  public function getDispatcher() {
+    return $this->dispatcher;
+  }
+
+  /**
+   * @param \Symfony\Component\EventDispatcher\EventDispatcher $dispatcher
+   */
+  public function setDispatcher($dispatcher) {
+    $this->dispatcher = $dispatcher;
   }
 }
