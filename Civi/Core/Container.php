@@ -177,10 +177,12 @@ class Container {
    * @return \Civi\API\Kernel
    */
   public function createApiKernel($dispatcher, $apiRegistry, $annotationReader, $magicFunctionProvider) {
+    $doctrineCrudProvider = new \Civi\API\Provider\DoctrineCrudProvider($apiRegistry);
+
     $dispatcher->addSubscriber(new \Civi\API\Subscriber\TransactionSubscriber());
     $dispatcher->addSubscriber(new \Civi\API\Subscriber\I18nSubscriber());
     $dispatcher->addSubscriber($magicFunctionProvider);
-    $dispatcher->addSubscriber(new \Civi\API\Provider\DoctrineCrudProvider($apiRegistry));
+    $dispatcher->addSubscriber($doctrineCrudProvider);
     $dispatcher->addSubscriber(new \Civi\API\Subscriber\AnnotationPermissionCheck($annotationReader));
     $dispatcher->addSubscriber(new \Civi\API\Subscriber\PermissionCheck());
     $dispatcher->addSubscriber(new \Civi\API\Subscriber\APIv3SchemaAdapter());
@@ -191,7 +193,17 @@ class Container {
       \CRM_Utils_API_MatchOption::singleton(),
     )));
     $dispatcher->addSubscriber(new \Civi\API\Subscriber\XDebugSubscriber());
-    $kernel = new \Civi\API\Kernel($dispatcher, array());
+    $kernel = new \Civi\API\Kernel($dispatcher);
+
+    $reflectionProvider = new \Civi\API\Provider\ReflectionProvider($kernel);
+    $dispatcher->addSubscriber($reflectionProvider);
+
+    $kernel->setApiProviders(array(
+      $reflectionProvider,
+      $magicFunctionProvider,
+      $doctrineCrudProvider,
+    ));
+
     return $kernel;
   }
 }

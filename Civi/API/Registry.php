@@ -62,6 +62,13 @@ class Registry {
   }
 
   /**
+   * @return array<string>
+   */
+  public function getNames() {
+    return array_keys($this->names);
+  }
+
+  /**
    * Look up the name of an entity class based on the entity name.
    *
    * @param string $entityName

@@ -100,6 +100,9 @@ class DoctrineCrudProvider implements EventSubscriberInterface, ProviderInterfac
     }
   }
 
+  /**
+   * {inheritdoc}
+   */
   public function invoke($apiRequest) {
     switch ($apiRequest['action']) {
       case 'create':
@@ -112,6 +115,24 @@ class DoctrineCrudProvider implements EventSubscriberInterface, ProviderInterfac
         // We shouldn't get here because onApiResolve() checks $this->supportedActions
         throw new \API_Exception("Unsupported action (" . $apiRequest['action'] . ']');
     }
+  }
+
+  /**
+   * {inheritdoc}
+   */
+  function getEntityNames($version) {
+    return $version == 4 ? $this->apiRegistry->getNames() : array();
+  }
+
+  /**
+   * {inheritdoc}
+   */
+  public function getActionNames($version, $entity) {
+    if ($version != 4) {
+      return array();
+    }
+    $entityClass = $this->apiRegistry->getClassByName($entity);
+    return $entityClass ? $this->supportedActions : array();
   }
 
   public function createItem($apiRequest) {

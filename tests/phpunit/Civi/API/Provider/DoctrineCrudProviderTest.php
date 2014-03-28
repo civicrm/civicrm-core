@@ -181,6 +181,29 @@ class DoctrineCrudProviderTest extends \CiviUnitTestCase {
     $this->assertDBQuery(0, 'SELECT count(*) FROM civicrm_worldregion WHERE name = "OhNoes"');
   }
 
+  function testGetEntityNames() {
+    $dp = new DoctrineCrudProvider(\Civi\Core\Container::singleton()->get('civi_api_registry'));
+    $this->assertSubset(array('Worldregion', 'LocationType'), $dp->getEntityNames(4));
+    $this->assertEquals(array(), $dp->getEntityNames(3));
+
+    $result = $this->callAPISuccess('Entity', 'get', array('version' => 4));
+    $this->assertSubset(array('Worldregion', 'LocationType'), $result['values']);
+
+    // The following is likely to break if someone independently adds "Worldregion" to APIv3,
+    // but it's good for the moment to ensure that DoctrineCrudProvider doesn't bleed out to APIv3.
+    $result = $this->callAPISuccess('Entity', 'get', array('version' => 3));
+    $this->assertFalse(in_array('Worldregion', $result['values']));
+  }
+
+  function testGetActionNames() {
+    $dp = new DoctrineCrudProvider(\Civi\Core\Container::singleton()->get('civi_api_registry'));
+    $this->assertEquals(array(), $dp->getActionNames(3, 'Worldregion'));
+    $this->assertSubset(array('create', 'get', 'delete'), $dp->getActionNames(4, 'Worldregion'));
+
+    $result = $this->callAPISuccess('Worldregion', 'getactions', array('version' => 4));
+    $this->assertSubset(array('create', 'get', 'delete'), $result['values']);
+  }
+
   /**
    * @param array<string> $perms
    */
@@ -215,6 +238,11 @@ class DoctrineCrudProviderTest extends \CiviUnitTestCase {
     $em->persist($region);
     $em->flush();
     return $region;
+  }
+
+  function assertSubset($expectedSubset, $superset) {
+    $message = 'Expect that (' . implode(',', $expectedSubset) . ') is a subset of (' . implode(',', $superset) . ')';
+    $this->assertTrue(\CRM_Utils_Array::isSubset($expectedSubset, $superset), $message);
   }
 
 }
