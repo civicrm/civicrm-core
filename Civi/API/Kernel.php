@@ -234,7 +234,7 @@ class Kernel {
     $resolveEvent = $this->dispatcher->dispatch(Events::RESOLVE, new ResolveEvent($apiRequest));
     $apiRequest = $resolveEvent->getApiRequest();
     if (!$resolveEvent->getApiProvider()) {
-      throw new \API_Exception("API (" . $apiRequest['entity'] . ", " . $apiRequest['action'] . ") does not exist (join the API team and implement it!)", \API_Exception::NOT_IMPLEMENTED);
+      throw new \Civi\API\Exception\NotImplementedException("API (" . $apiRequest['entity'] . ", " . $apiRequest['action'] . ") does not exist (join the API team and implement it!)");
     }
     return array($resolveEvent->getApiProvider(), $apiRequest);
   }
@@ -249,7 +249,7 @@ class Kernel {
   public function authorize($apiProvider, $apiRequest) {
     $event = $this->dispatcher->dispatch(Events::AUTHORIZE, new AuthorizeEvent($apiProvider, $apiRequest));
     if (!$event->isAuthorized()) {
-      throw new \API_Exception("Authorization failed", \API_Exception::UNAUTHORIZED);
+      throw new \Civi\API\Exception\UnauthorizedException("Authorization failed");
     }
   }
 

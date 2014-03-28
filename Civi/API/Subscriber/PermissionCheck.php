@@ -67,7 +67,7 @@ class PermissionCheck implements EventSubscriberInterface {
           $permissions = implode(' and ', $permissions);
         }
         // FIXME: Generating the exception ourselves allows for detailed error but doesn't play well with multiple authz subscribers.
-        throw new \API_Exception("API permission check failed for {$apiRequest['entity']}/{$apiRequest['action']} call; insufficient permission: require $permissions", \API_Exception::UNAUTHORIZED);
+        throw new \Civi\API\Exception\UnauthorizedException("API permission check failed for {$apiRequest['entity']}/{$apiRequest['action']} call; insufficient permission: require $permissions");
       }
 
       $event->authorize();
