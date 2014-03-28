@@ -968,6 +968,24 @@ SELECT  id
       }
     }
 
+    if (CRM_Core_Permission::access('CiviCase')) {
+      $caseFields = CRM_Case_BAO_Query::getFields(TRUE);
+      $caseFields = array_merge($caseFields, CRM_Core_BAO_CustomField::getFieldsForImport('Case'));
+      if ($caseFields) {
+        // Remove fields not supported by profiles
+        CRM_Utils_Array::remove($caseFields,
+          'case_id',
+          'case_type',
+          'case_start_date',
+          'case_end_date',
+          'case_role',
+          'case_status',
+          'case_deleted'
+        );
+      }
+      $fields['Case'] = $caseFields;
+    }
+
     $activityFields = CRM_Activity_BAO_Activity::getProfileFields();
     if ($activityFields) {
       // campaign related fields.
