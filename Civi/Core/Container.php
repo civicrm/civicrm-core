@@ -94,9 +94,14 @@ class Container {
       array(new Reference('annotation_reader'))
     ));
 
+    $container->setDefinition('magic_function_provider', new Definition(
+      '\Civi\API\Provider\MagicFunctionProvider',
+      array()
+    ));
+
     $container->setDefinition('civi_api_kernel', new Definition(
       '\Civi\API\Kernel',
-      array(new Reference('dispatcher'), new Reference('civi_api_registry'), new Reference('annotation_reader'))
+      array(new Reference('dispatcher'), new Reference('civi_api_registry'), new Reference('annotation_reader'), new Reference('magic_function_provider'))
     ))
       ->setFactoryService(self::SELF)->setFactoryMethod('createApiKernel');
 
@@ -171,10 +176,10 @@ class Container {
    * @param \Doctrine\Common\Annotations\Reader $annotationReader
    * @return \Civi\API\Kernel
    */
-  public function createApiKernel($dispatcher, $apiRegistry, $annotationReader) {
+  public function createApiKernel($dispatcher, $apiRegistry, $annotationReader, $magicFunctionProvider) {
     $dispatcher->addSubscriber(new \Civi\API\Subscriber\TransactionSubscriber());
     $dispatcher->addSubscriber(new \Civi\API\Subscriber\I18nSubscriber());
-    $dispatcher->addSubscriber(new \Civi\API\Provider\MagicFunctionProvider());
+    $dispatcher->addSubscriber($magicFunctionProvider);
     $dispatcher->addSubscriber(new \Civi\API\Provider\DoctrineCrudProvider($apiRegistry));
     $dispatcher->addSubscriber(new \Civi\API\Subscriber\AnnotationPermissionCheck($annotationReader));
     $dispatcher->addSubscriber(new \Civi\API\Subscriber\PermissionCheck());

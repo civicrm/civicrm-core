@@ -105,8 +105,12 @@ function civicrm_api3_generic_getfields($apiRequest) {
 
   // find any supplemental information
   $hypApiRequest = array('entity' => $apiRequest['entity'], 'action' => $action, 'version' => $apiRequest['version']);
-  $hypApiRequest += _civicrm_api_resolve($hypApiRequest);
-  $helper = '_' . $hypApiRequest['function'] . '_spec';
+  try {
+    list ($apiProvider, $hypApiRequest) = \Civi\Core\Container::singleton()->get('civi_api_kernel')->resolve($hypApiRequest);
+    $helper = '_' . $hypApiRequest['function'] . '_spec';
+  } catch (\Civi\API\Exception\NotImplementedException $e) {
+    $helper = NULL;
+  }
   if (function_exists($helper)) {
     // alter
     $helper($metadata, $apiRequest);

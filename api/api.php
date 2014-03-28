@@ -26,76 +26,6 @@ function civicrm_api($entity, $action, $params, $extra = NULL) {
 }
 
 /**
- * Look up the implementation for a given API request
- *
- * @param $apiRequest array with keys:
- *  - entity: string, required
- *  - action: string, required
- *  - params: array
- *  - version: scalar, required
- *
- * @return array with keys
- *  - function: callback (mixed)
- *  - is_generic: boolean
- */
-function _civicrm_api_resolve($apiRequest) {
-  static $cache;
-  $cachekey = strtolower($apiRequest['entity']) . ':' . strtolower($apiRequest['action']) . ':' . $apiRequest['version'];
-  if (isset($cache[$cachekey])) {
-    return $cache[$cachekey];
-  }
-
-  $camelName = _civicrm_api_get_camel_name($apiRequest['entity'], $apiRequest['version']);
-  $actionCamelName = _civicrm_api_get_camel_name($apiRequest['action']);
-
-  // Determine if there is an entity-specific implementation of the action
-  $stdFunction = civicrm_api_get_function_name($apiRequest['entity'], $apiRequest['action'], $apiRequest['version']);
-  if (function_exists($stdFunction)) {
-    // someone already loaded the appropriate file
-    // FIXME: This has the affect of masking bugs in load order; this is included to provide bug-compatibility
-    $cache[$cachekey] = array('function' => $stdFunction, 'is_generic' => FALSE);
-    return $cache[$cachekey];
-  }
-
-  $stdFiles = array(
-    // By convention, the $camelName.php is more likely to contain the function, so test it first
-    'api/v' . $apiRequest['version'] . '/' . $camelName . '.php',
-    'api/v' . $apiRequest['version'] . '/' . $camelName . '/' . $actionCamelName . '.php',
-  );
-  foreach ($stdFiles as $stdFile) {
-    if (CRM_Utils_File::isIncludable($stdFile)) {
-      require_once $stdFile;
-      if (function_exists($stdFunction)) {
-        $cache[$cachekey] = array('function' => $stdFunction, 'is_generic' => FALSE);
-        return $cache[$cachekey];
-      }
-    }
-  }
-
-  // Determine if there is a generic implementation of the action
-  require_once 'api/v3/Generic.php';
-  # $genericFunction = 'civicrm_api3_generic_' . $apiRequest['action'];
-  $genericFunction = civicrm_api_get_function_name('generic', $apiRequest['action'], $apiRequest['version']);
-  $genericFiles = array(
-    // By convention, the Generic.php is more likely to contain the function, so test it first
-    'api/v' . $apiRequest['version'] . '/Generic.php',
-    'api/v' . $apiRequest['version'] . '/Generic/' . $actionCamelName . '.php',
-  );
-  foreach ($genericFiles as $genericFile) {
-    if (CRM_Utils_File::isIncludable($genericFile)) {
-      require_once $genericFile;
-      if (function_exists($genericFunction)) {
-        $cache[$cachekey] = array('function' => $genericFunction, 'is_generic' => TRUE);
-        return $cache[$cachekey];
-      }
-    }
-  }
-
-  $cache[$cachekey] = array('function' => FALSE, 'is_generic' => FALSE);
-  return $cache[$cachekey];
-}
-
-/**
  * Version 3 wrapper for civicrm_api. Throws exception
  *
  * @param string $entity type of entities to deal with
@@ -146,101 +76,6 @@ function _civicrm_api3_api_getfields(&$apiRequest) {
 }
 
 /**
- * Load/require all files related to an entity.
- *
- * This should not normally be called because it's does a file-system scan; it's
- * only appropriate when introspection is really required (eg for "getActions").
- *
- * @param string $entity
- * @param int $version
- *
- * @return void
- */
-function _civicrm_api_loadEntity($entity, $version = 3) {
-  /*
-  $apiRequest = array();
-  $apiRequest['entity'] = $entity;
-  $apiRequest['action'] = 'pretty sure it will never exist. Trick to [try to] force resolve to scan everywhere';
-  $apiRequest['version'] = $version;
-  // look up function, file, is_generic
-  $apiRequest = _civicrm_api_resolve($apiRequest);
-  */
-
-  $camelName = _civicrm_api_get_camel_name($entity, $version);
-
-  // Check for master entity file; to match _civicrm_api_resolve(), only load the first one
-  $stdFile = 'api/v' . $version . '/' . $camelName . '.php';
-  if (CRM_Utils_File::isIncludable($stdFile)) {
-    require_once $stdFile;
-  }
-
-  // Check for standalone action files; to match _civicrm_api_resolve(), only load the first one
-  $loaded_files = array(); // array($relativeFilePath => TRUE)
-  $include_dirs = array_unique(explode(PATH_SEPARATOR, get_include_path()));
-  foreach ($include_dirs as $include_dir) {
-    $action_dir = implode(DIRECTORY_SEPARATOR, array($include_dir, 'api', "v${version}", $camelName));
-    if (! is_dir($action_dir)) {
-      continue;
-    }
-
-    $iterator = new DirectoryIterator($action_dir);
-    foreach ($iterator as $fileinfo) {
-      $file = $fileinfo->getFilename();
-      if (array_key_exists($file, $loaded_files)) {
-        continue; // action provided by an earlier item on include_path
-      }
-
-      $parts = explode(".", $file);
-      if (end($parts) == "php" && !preg_match('/Tests?\.php$/', $file) ) {
-        require_once $action_dir . DIRECTORY_SEPARATOR . $file;
-        $loaded_files[$file] = TRUE;
-      }
-    }
-  }
-}
-
-/**
- *
- * @deprecated
- */
-function civicrm_api_get_function_name($entity, $action, $version = NULL) {
-
-  if (empty($version)) {
-    $version = civicrm_get_api_version();
-  }
-
-  $entity = _civicrm_api_get_entity_name_from_camel($entity);
-  return 'civicrm_api3' . '_' . $entity . '_' . $action;
-}
-
-/**
- * We must be sure that every request uses only one version of the API.
- *
- * @param $desired_version : array or integer
- *   One chance to set the version number.
- *   After that, this version number will be used for the remaining request.
- *   This can either be a number, or an array(.., 'version' => $version, ..).
- *   This allows to directly pass the $params array.
- * @return int
- */
-function civicrm_get_api_version($desired_version = NULL) {
-
-  if (is_array($desired_version)) {
-    // someone gave the full $params array.
-    $params = $desired_version;
-    $desired_version = empty($params['version']) ? NULL : (int) $params['version'];
-  }
-  if (isset($desired_version) && is_integer($desired_version)) {
-    $_version = $desired_version;
-  }
-  else {
-    // we will set the default to version 3 as soon as we find that it works.
-    $_version = 3;
-  }
-  return $_version;
-}
-
-/**
  * Check if the result is an error. Note that this function has been retained from
  * api v2 for convenience but the result is more standardised in v3 and param
  * 'format.is_success' => 1
@@ -264,10 +99,6 @@ function civicrm_error($result) {
 }
 
 function _civicrm_api_get_camel_name($entity, $version = NULL) {
-  if (empty($version)) {
-    $version = civicrm_get_api_version();
-  }
-
   $fragments = explode('_', $entity);
   foreach ($fragments as & $fragment) {
     $fragment = ucfirst($fragment);

@@ -45,6 +45,9 @@ class APIv3SchemaAdapter implements EventSubscriberInterface {
 
   public function onApiPrepare(\Civi\API\Event\PrepareEvent $event) {
     $apiRequest = $event->getApiRequest();
+    if ($apiRequest['version'] > 3) {
+      return;
+    }
 
     $apiRequest['fields'] = _civicrm_api3_api_getfields($apiRequest);
 
