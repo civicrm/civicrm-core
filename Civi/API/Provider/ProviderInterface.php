@@ -33,5 +33,24 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  * An API "provider" provides a means to execute API requests.
  */
 interface ProviderInterface {
+  /**
+   * @param array $apiRequest
+   * @return array structured response data (per civicrm_api3_create_success)
+   * @see civicrm_api3_create_success
+   * @throws \API_Exception
+   */
   function invoke($apiRequest);
+
+  /**
+   * @param int $version
+   * @return array<string>
+   */
+  function getEntityNames($version);
+
+  /**
+   * @param int $version
+   * @param string $entity
+   * @return array<string>
+   */
+  function getActionNames($version, $entity);
 }

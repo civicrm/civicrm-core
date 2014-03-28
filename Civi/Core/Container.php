@@ -103,7 +103,16 @@ class Container {
       \CRM_Utils_API_MatchOption::singleton(),
     )));
     $dispatcher->addSubscriber(new \Civi\API\Subscriber\XDebugSubscriber());
-    $kernel = new \Civi\API\Kernel($dispatcher, array());
+    $kernel = new \Civi\API\Kernel($dispatcher);
+
+    $reflectionProvider = new \Civi\API\Provider\ReflectionProvider($kernel);
+    $dispatcher->addSubscriber($reflectionProvider);
+
+    $kernel->setApiProviders(array(
+      $reflectionProvider,
+      $magicFunctionProvider,
+    ));
+
     return $kernel;
   }
 }

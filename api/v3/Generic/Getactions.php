@@ -29,6 +29,6 @@
 function civicrm_api3_generic_getActions($apiRequest) {
   civicrm_api3_verify_mandatory($apiRequest, NULL, array('entity'));
   $mfp = \Civi\Core\Container::singleton()->get('magic_function_provider');
-  $actions = $mfp->getActionNames($apiRequest['entity'], $apiRequest['version']);
+  $actions = $mfp->getActionNames($apiRequest['version'], $apiRequest['entity']);
   return civicrm_api3_create_success($actions);
 }

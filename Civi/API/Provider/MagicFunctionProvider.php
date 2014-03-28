@@ -62,6 +62,9 @@ class MagicFunctionProvider implements EventSubscriberInterface, ProviderInterfa
     }
   }
 
+  /**
+   * {inheritdoc}
+   */
   public function invoke($apiRequest) {
     $function = $apiRequest['function'];
     if ($apiRequest['function'] && $apiRequest['is_generic']) {
@@ -76,11 +79,52 @@ class MagicFunctionProvider implements EventSubscriberInterface, ProviderInterfa
     return $result;
   }
 
-  public function getActionNames($entity, $version) {
-    // TODO don't recurse into civicrm_api
-    $r = civicrm_api('Entity', 'Get', array('version' => $version));
-    if (!in_array($entity, $r['values'])) {
-      throw new \Civi\API\Exception\NotImplementedException("Entity " . $entity . " invalid. Use api.entity.get to have the list", array('entity' => $r['values']));
+  /**
+   * {inheritdoc}
+   */
+  function getEntityNames($version) {
+    $entities = array();
+    $include_dirs = array_unique(explode(PATH_SEPARATOR, get_include_path()));
+    #$include_dirs = array(dirname(__FILE__). '/../../');
+    foreach ($include_dirs as $include_dir) {
+      $api_dir = implode(DIRECTORY_SEPARATOR, array($include_dir, 'api', 'v' . $version));
+      if (! is_dir($api_dir)) {
+        continue;
+      }
+      $iterator = new \DirectoryIterator($api_dir);
+      foreach ($iterator as $fileinfo) {
+        $file = $fileinfo->getFilename();
+
+        // Check for entities with a master file ("api/v3/MyEntity.php")
+        $parts = explode(".", $file);
+        if (end($parts) == "php" && $file != "utils.php" && !preg_match('/Tests?.php$/', $file) ) {
+          // without the ".php"
+          $entities[] = substr($file, 0, -4);
+        }
+
+        // Check for entities with standalone action files ("api/v3/MyEntity/MyAction.php")
+        $action_dir = $api_dir . DIRECTORY_SEPARATOR . $file;
+        if (preg_match('/^[A-Z][A-Za-z0-9]*$/', $file) && is_dir($action_dir)) {
+          if (count(glob("$action_dir/[A-Z]*.php")) > 0) {
+            $entities[] = $file;
+          }
+        }
+      }
+    }
+    $entities = array_diff($entities, array('Generic'));
+    $entities = array_unique($entities);
+    sort($entities);
+
+    return $entities;
+  }
+
+  /**
+   * {inheritdoc}
+   */
+  public function getActionNames($version, $entity) {
+    $entities = $this->getEntityNames($version);
+    if (!in_array($entity, $entities)) {
+      return array();
     }
     $this->loadEntity($entity, $version);
 
