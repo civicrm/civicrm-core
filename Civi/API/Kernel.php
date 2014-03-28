@@ -31,6 +31,7 @@ use Civi\API\Event\PrepareEvent;
 use Civi\API\Event\ExceptionEvent;
 use Civi\API\Event\ResolveEvent;
 use Civi\API\Event\RespondEvent;
+use Civi\API\Provider\ProviderInterface;
 
 /**
  *
@@ -46,7 +47,7 @@ class Kernel {
   protected $dispatcher;
 
   /**
-   * @var array<APIProviderInterface>
+   * @var array<ProviderInterface>
    */
   protected $apiProviders;
 
@@ -84,26 +85,17 @@ class Kernel {
       $this->boot();
       $errorScope = \CRM_Core_TemporaryErrorScope::useException();
 
-      $resolveEvent = $this->dispatcher->dispatch(Events::RESOLVE, new ResolveEvent($apiRequest));
-      $apiRequest = $resolveEvent->getApiRequest();
-      $apiProvider = $resolveEvent->getApiProvider();
-      if (!$apiProvider) {
-        throw new \API_Exception("API (" . $apiRequest['entity'] . ", " . $apiRequest['action'] . ") does not exist (join the API team and implement it!)");
-      }
-
-      if (! $this->dispatcher->dispatch(Events::AUTHORIZE, new AuthorizeEvent($apiProvider, $apiRequest))->isAuthorized()) {
-        throw new \API_Exception("Authorization failed", 'unauthorized');
-      }
-
-      $apiRequest = $this->dispatcher->dispatch(Events::PREPARE, new PrepareEvent($apiProvider, $apiRequest))->getApiRequest();
+      list($apiProvider, $apiRequest) = $this->resolve($apiRequest);
+      $this->authorize($apiProvider, $apiRequest);
+      $apiRequest = $this->prepare($apiProvider, $apiRequest);
       $result = $apiProvider->invoke($apiRequest);
 
       if (\CRM_Utils_Array::value('is_error', $result, 0) == 0) {
         _civicrm_api_call_nested_api($apiRequest['params'], $result, $apiRequest['action'], $apiRequest['entity'], $apiRequest['version']);
       }
 
-      $responseEvent = $this->dispatcher->dispatch(Events::RESPOND, new RespondEvent($apiProvider, $apiRequest, $result));
-      return $this->formatResult($apiRequest, $responseEvent->getResponse());
+      $apiResponse = $this->respond($apiProvider, $apiRequest, $result);
+      return $this->formatResult($apiRequest, $apiResponse);
     }
     catch (\Exception $e) {
       $this->dispatcher->dispatch(Events::EXCEPTION, new ExceptionEvent($e, $apiProvider, $apiRequest));
@@ -229,6 +221,61 @@ class Kernel {
     require_once ('api/v3/utils.php');
     require_once 'api/Exception.php';
     _civicrm_api3_initialize();
+  }
+
+  /**
+   * Determine which, if any, service will execute the API request.
+   *
+   * @param $apiRequest
+   * @return array
+   * @throws \API_Exception
+   */
+  public function resolve($apiRequest) {
+    $resolveEvent = $this->dispatcher->dispatch(Events::RESOLVE, new ResolveEvent($apiRequest));
+    $apiRequest = $resolveEvent->getApiRequest();
+    if (!$resolveEvent->getApiProvider()) {
+      throw new \API_Exception("API (" . $apiRequest['entity'] . ", " . $apiRequest['action'] . ") does not exist (join the API team and implement it!)", \API_Exception::NOT_IMPLEMENTED);
+    }
+    return array($resolveEvent->getApiProvider(), $apiRequest);
+  }
+
+  /**
+   * Determine if the API request is allowed (under current policy)
+   *
+   * @param ProviderInterface $apiProvider
+   * @param array $apiRequest
+   * @throws \API_Exception
+   */
+  public function authorize($apiProvider, $apiRequest) {
+    $event = $this->dispatcher->dispatch(Events::AUTHORIZE, new AuthorizeEvent($apiProvider, $apiRequest));
+    if (!$event->isAuthorized()) {
+      throw new \API_Exception("Authorization failed", \API_Exception::UNAUTHORIZED);
+    }
+  }
+
+  /**
+   * Allow third-party code to manipulate the API request before execution.
+   *
+   * @param ProviderInterface $apiProvider
+   * @param array $apiRequest
+   * @return mixed
+   */
+  public function prepare($apiProvider, $apiRequest) {
+    $event = $this->dispatcher->dispatch(Events::PREPARE, new PrepareEvent($apiProvider, $apiRequest));
+    return $event->getApiRequest();
+  }
+
+  /**
+   * Allow third-party code to manipulate the API response after execution.
+   *
+   * @param ProviderInterface $apiProvider
+   * @param array $apiRequest
+   * @param array $result
+   * @return mixed
+   */
+  public function respond($apiProvider, $apiRequest, $result) {
+    $event = $this->dispatcher->dispatch(Events::RESPOND, new RespondEvent($apiProvider, $apiRequest, $result));
+    return $event->getResponse();
   }
 
   /**
