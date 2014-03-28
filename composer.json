@@ -11,6 +11,7 @@
     "symfony/dependency-injection": "2.3.*",
     "symfony/http-foundation": "2.3.*",
     "jms/serializer": "~0.13@dev",
-    "symfony/event-dispatcher": "2.3.*"
+    "symfony/event-dispatcher": "2.3.*",
+    "symfony/serializer": "2.3.*"
   }
 }
