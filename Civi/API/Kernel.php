@@ -67,7 +67,7 @@ class Kernel {
    *
    * @return array|int
    */
-  public function run($entity, $action, $params, $extra) {
+  public function run($entity, $action, $params, $extra = NULL) {
     /**
      * @var $apiProvider \Civi\API\Provider\ProviderInterface|NULL
      */
@@ -320,9 +320,23 @@ class Kernel {
 
   /**
    * @param array $apiProviders
+   * @return Kernel
    */
   public function setApiProviders($apiProviders) {
     $this->apiProviders = $apiProviders;
+    return $this;
+  }
+
+  /**
+   * @param ProviderInterface $apiProvider
+   * @return Kernel
+   */
+  public function registerApiProvider($apiProvider) {
+    $this->apiProviders[] = $apiProvider;
+    if ($apiProvider instanceof \Symfony\Component\EventDispatcher\EventSubscriberInterface) {
+      $this->getDispatcher()->addSubscriber($apiProvider);
+    }
+    return $this;
   }
 
   /**
@@ -334,8 +348,10 @@ class Kernel {
 
   /**
    * @param \Symfony\Component\EventDispatcher\EventDispatcher $dispatcher
+   * @return Kernel
    */
   public function setDispatcher($dispatcher) {
     $this->dispatcher = $dispatcher;
+    return $this;
   }
 }
