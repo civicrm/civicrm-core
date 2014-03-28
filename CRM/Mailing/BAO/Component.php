@@ -93,15 +93,15 @@ class CRM_Mailing_BAO_Component extends CRM_Mailing_DAO_Component {
     // action is taken depending upon the mode
     $component = new CRM_Mailing_DAO_Component();
     $component->name = $params['name'];
-    $component->component_type = $params['component_type'];
-    $component->subject = $params['subject'];
-    if ($params['body_text']) {
-      $component->body_text = $params['body_text'];
+    $component->component_type = CRM_Utils_Array::value('component_type', $params);
+    $component->subject = CRM_Utils_Array::value('subject', $params);
+    if (CRM_Utils_Array::value('body_text', $params)) {
+      $component->body_text = CRM_Utils_Array::value('body_text', $params);
     }
     else {
-      $component->body_text = CRM_Utils_String::htmlToText($params['body_html']);
+      $component->body_text = CRM_Utils_String::htmlToText(CRM_Utils_Array::value('body_html', $params));
     }
-    $component->body_html = $params['body_html'];
+    $component->body_html = CRM_Utils_Array::value('body_html', $params);
     $component->is_active = CRM_Utils_Array::value('is_active', $params, FALSE);
     $component->is_default = CRM_Utils_Array::value('is_default', $params, FALSE);
 
