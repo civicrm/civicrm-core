@@ -89,6 +89,7 @@ class Container {
     $dispatcher->addSubscriber(new \Civi\API\Subscriber\TransactionSubscriber());
     $dispatcher->addSubscriber(new \Civi\API\Subscriber\I18nSubscriber());
     $dispatcher->addSubscriber(new \Civi\API\Provider\MagicFunctionProvider());
+    $dispatcher->addSubscriber(new \Civi\API\Subscriber\PermissionCheck());
     $dispatcher->addSubscriber(new \Civi\API\Subscriber\APIv3SchemaAdapter());
     $dispatcher->addSubscriber(new \Civi\API\Subscriber\WrapperAdapter(array(
       \CRM_Utils_API_HTMLInputCoder::singleton(),
@@ -97,12 +98,6 @@ class Container {
       \CRM_Utils_API_MatchOption::singleton(),
     )));
     $dispatcher->addSubscriber(new \Civi\API\Subscriber\XDebugSubscriber());
-    $dispatcher->addListener(\Civi\API\Events::AUTHORIZE, function(\Civi\API\Event\AuthorizeEvent $event) {
-      $apiRequest = $event->getApiRequest();
-      // At time of writing, _civicrm_api3_api_check_permission generates an exception on failure
-      _civicrm_api3_api_check_permission($apiRequest['entity'], $apiRequest['action'], $apiRequest['params']);
-      $event->authorize();
-    });
     $kernel = new \Civi\API\Kernel($dispatcher, array());
     return $kernel;
   }

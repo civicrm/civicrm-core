@@ -979,48 +979,6 @@ function _civicrm_api3_check_required_fields($params, $daoName, $return = FALSE)
 }
 
 /**
- * Check permissions for a given API call.
- *
- * @param $entity string API entity being accessed
- * @param $action string API action being performed
- * @param $params array  params of the API call
- * @param $throw deprecated bool    whether to throw exception instead of returning false
- *
- * @throws Exception
- * @return bool whether the current API user has the permission to make the call
- */
-function _civicrm_api3_api_check_permission($entity, $action, &$params, $throw = TRUE) {
-  // return early unless we’re told explicitly to do the permission check
-  if (empty($params['check_permissions']) or $params['check_permissions'] == FALSE) {
-    return TRUE;
-  }
-
-  require_once 'CRM/Core/DAO/permissions.php';
-  $permissions = _civicrm_api3_permissions($entity, $action, $params);
-
-  // $params might’ve been reset by the alterAPIPermissions() hook
-  if (isset($params['check_permissions']) and $params['check_permissions'] == FALSE) {
-    return TRUE;
-  }
-
-  if (!CRM_Core_Permission::check($permissions)) {
-    if ($throw) {
-      if(is_array($permissions)) {
-        $permissions = implode(' and ', $permissions);
-      }
-      throw new Exception("API permission check failed for $entity/$action call; insufficient permission: require $permissions");
-    }
-    else {
-      //@todo remove this - this is an internal api function called with $throw set to TRUE. It is only called with false
-      // in tests & that should be tidied up
-      return FALSE;
-    }
-  }
-
-  return TRUE;
-}
-
-/**
  * Function to do a 'standard' api get - when the api is only doing a $bao->find then use this
  *
  * @param string $bao_name name of BAO
