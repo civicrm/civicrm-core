@@ -180,7 +180,7 @@ class WebTest_Contribute_AddPricesetTest extends CiviSeleniumTestCase {
     $this->openCiviPage("admin/price", "reset=1");
 
     // Use the price set id ($sid) to pick the correct row
-    $this->clickLink("css=tr#row_{$sid} a[title='View and Edit Price Fields']", 'Link=Add Price Field');
+    $this->clickLink("//*[@id='price_set-{$sid}']/td[4]/span[1]/a[1]", 'Link=Add Price Field');
     // Check for expected price set field strings
     $this->assertStringsPresent($validateStrings);
   }

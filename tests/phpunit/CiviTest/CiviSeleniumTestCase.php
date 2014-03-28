@@ -1646,7 +1646,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     else {
       $this->click("xpath=id('ltype')/div/table/tbody/tr/td[1][text()='$financialType[oldname]']/../td[7]/span/a[text()='Edit']");
     }
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->waitForElementPresent("name");
     $this->type('name', $financialType['name']);
     if ($option == 'new') {
       $this->type('description', $financialType['name'] . ' description');

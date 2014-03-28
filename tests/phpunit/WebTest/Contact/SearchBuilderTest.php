@@ -268,7 +268,7 @@ class WebTest_Contact_SearchBuilderTest extends CiviSeleniumTestCase {
     //advanced search by selecting the contactType
     $this->openCiviPage("contact/search/advanced", "reset=1");
     if (isset($contactType)) {
-      $this->select("id=crmasmSelect0", "value=$contactType");
+      $this->select("id=contact_type", "value=$contactType");
     }
     if (substr($field, 0, 5) == 'note_') {
       $this->click("notes");
