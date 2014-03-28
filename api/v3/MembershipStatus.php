@@ -149,35 +149,33 @@ function civicrm_api3_membership_status_delete($params) {
  * @public
  */
 function civicrm_api3_membership_status_calc($membershipParams) {
-
   if (!($membershipID = CRM_Utils_Array::value('membership_id', $membershipParams))) {
-    return civicrm_api3_create_error('membershipParams do not contain membership_id');
+    throw new API_Exception('membershipParams do not contain membership_id');
   }
 
+  if(empty($membershipParams['id'])) {
+    //for consistency lets make sure id is set as this will get passed to hooks downstream
+    $membershipParams['id'] = $membershipID;
+  }
   $query = "
-SELECT start_date, end_date, join_date
+SELECT start_date, end_date, join_date, membership_type_id
   FROM civicrm_membership
  WHERE id = %1
 ";
 
   $params = array(1 => array($membershipID, 'Integer'));
-  $dao = &CRM_Core_DAO::executeQuery($query, $params);
+  $dao = CRM_Core_DAO::executeQuery($query, $params);
   if ($dao->fetch()) {
-    // Take the is_admin column in MembershipStatus into consideration when requested
-    if (! CRM_Utils_Array::value('ignore_admin_only', $membershipParams) ) {
-      $result = &CRM_Member_BAO_MembershipStatus::getMembershipStatusByDate($dao->start_date, $dao->end_date, $dao->join_date, 'today', TRUE);
-    }
-    else {
-    $result = &CRM_Member_BAO_MembershipStatus::getMembershipStatusByDate($dao->start_date, $dao->end_date, $dao->join_date);
-    }
-
+    $membershipTypeID = empty($membershipParams['membership_type_id']) ? $dao->membership_type_id : $membershipParams['membership_type_id'];
+    $result = CRM_Member_BAO_MembershipStatus::getMembershipStatusByDate($dao->start_date, $dao->end_date, $dao->join_date, 'today', CRM_Utils_Array::value('ignore_admin_only', $membershipParams), $membershipTypeID, $membershipParams);
     //make is error zero only when valid status found.
     if (CRM_Utils_Array::value('id', $result)) {
       $result['is_error'] = 0;
     }
   }
   else {
-    $result = civicrm_api3_create_error('did not find a membership record');
+    $dao->free();
+    throw new API_Exception('did not find a membership record');
   }
   $dao->free();
   return $result;
