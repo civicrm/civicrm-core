@@ -96,13 +96,13 @@ class CRM_Profile_Page_MultipleRecordFieldsListing extends CRM_Core_Page_Basic {
       // urls and queryStrings
       if ($this->_pageViewType == 'profileDataView') {
         $links[CRM_Core_Action::VIEW]['url'] = 'civicrm/profile/view';
-        $links[CRM_Core_Action::VIEW]['qs'] = "reset=1&id=%%id%%&recordId=%%recordId%%&gid=%%gid%%&multiRecord={$view}&context=multiProfileDialog&onPopupClose=%%onPopupClose%%";
+        $links[CRM_Core_Action::VIEW]['qs'] = "reset=1&id=%%id%%&recordId=%%recordId%%&gid=%%gid%%&multiRecord={$view}";
 
         $links[CRM_Core_Action::UPDATE]['url'] = 'civicrm/profile/edit';
-        $links[CRM_Core_Action::UPDATE]['qs'] = "reset=1&id=%%id%%&recordId=%%recordId%%&gid=%%gid%%&multiRecord={$update}&context=multiProfileDialog&onPopupClose=%%onPopupClose%%";
+        $links[CRM_Core_Action::UPDATE]['qs'] = "reset=1&id=%%id%%&recordId=%%recordId%%&gid=%%gid%%&multiRecord={$update}";
 
         $links[CRM_Core_Action::DELETE]['url'] = 'civicrm/profile/edit';
-        $links[CRM_Core_Action::DELETE]['qs'] = "reset=1&id=%%id%%&recordId=%%recordId%%&gid=%%gid%%&multiRecord={$delete}&context=multiProfileDialog&onPopupClose=%%onPopupClose%%";
+        $links[CRM_Core_Action::DELETE]['qs'] = "reset=1&id=%%id%%&recordId=%%recordId%%&gid=%%gid%%&multiRecord={$delete}";
 
       }
       elseif ($this->_pageViewType == 'customDataView') {
@@ -143,7 +143,6 @@ class CRM_Profile_Page_MultipleRecordFieldsListing extends CRM_Core_Page_Basic {
   function run() {
     // get the requested action, default to 'browse'
     $action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, FALSE);
-    $this->_onPopupClose = CRM_Utils_Request::retrieve('onPopupClose', 'String', $this);
 
     // assign vars to templates
     $this->assign('action', $action);
@@ -305,7 +304,7 @@ class CRM_Profile_Page_MultipleRecordFieldsListing extends CRM_Core_Page_Basic {
               $op = NULL;
               if ($this->_pageViewType == 'profileDataView') {
                 $actionParams = array('recordId' => $recId, 'gid' => $this->_profileId,
-                  'id' => $this->_contactId, 'onPopupClose' => $this->_onPopupClose);
+                  'id' => $this->_contactId);
                 $op = 'profile.multiValue.row';
               }
               else {
