@@ -56,7 +56,7 @@
 
 {literal}
 <script type="text/javascript">
-cj( function() {
+CRM.$(function($) {
   buildBatchSelector( false );
   cj('#_qf_Search_refresh').click( function() {
     buildBatchSelector(true);

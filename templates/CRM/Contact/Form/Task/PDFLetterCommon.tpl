@@ -117,7 +117,7 @@
 
 {literal}
 <script type="text/javascript">
-cj(function($) {
+CRM.$(function($) {
   var $form = $('form#{/literal}{$form.formName}{literal}');
   $('#format_id', $form).on('change', function() {
     selectFormat($(this).val());

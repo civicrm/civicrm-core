@@ -141,7 +141,7 @@ function processAddressFields( name, loadData ) {
 
 }
 
-cj(function( ) {
+CRM.$(function($) {
   if (  cj('#street_name').val( ).length > 0 ||
         cj('#street_unit').val( ).length > 0 ||
         cj('#street_number').val( ).length > 0 ) {

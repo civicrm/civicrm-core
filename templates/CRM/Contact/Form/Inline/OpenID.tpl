@@ -62,7 +62,7 @@
 
 {literal}
 <script type="text/javascript">
-    cj(function($) {
+    CRM.$(function($) {
       // check first primary radio
       $('#OpenID_1_IsPrimary').prop('checked', true );
     });

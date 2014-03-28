@@ -74,7 +74,7 @@
        eval( 'cj( "#recurringPaymentBlock" ).' + funName + "( )" );
    }
 
-   cj( function() {
+   CRM.$(function($) {
        buildRecurBlock( null );
        enablePeriod( );
    });

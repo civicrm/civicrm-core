@@ -94,7 +94,7 @@
 
 {literal}
 <script type="text/javascript">
-cj(function() {
+CRM.$(function($) {
   toggleTaskAction( );
 });
 </script>

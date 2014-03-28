@@ -1,4 +1,4 @@
-cj(function ($) {
+CRM.$(function($) {
   'use strict';
   $('#per_membership').click(function() {
     if($(this).is(":checked")) {

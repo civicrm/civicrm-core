@@ -155,7 +155,7 @@
 
   </div> {* maincontainer*}
   <script type='text/javascript'>
-      cj( function() {ldelim}
+      CRM.$(function($) {ldelim}
         var selectedTab = '{if $selectedChild}{$selectedChild}{else}user-profiles{/if}';
         var tabIndex = cj('#tab_' + selectedTab).prevAll().length;
         {literal}

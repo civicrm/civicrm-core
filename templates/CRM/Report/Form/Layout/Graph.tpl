@@ -47,7 +47,7 @@
 
 {literal}
 <script type="text/javascript">
-   cj( function( ) {
+   CRM.$(function($) {
      buildChart( );
 
      cj("input[id$='submit_print'],input[id$='submit_pdf']").bind('click', function(e){

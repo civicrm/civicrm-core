@@ -52,7 +52,7 @@
 </div>
 {literal}
 <script type="text/javascript">
-  cj(function(){
+  CRM.$(function($) {
     cj('input[name="export_format"]').filter('[value=IIF]').prop('checked', true);
     cj('#_qf_Export_next').click(function(){
       cj(this).hide();

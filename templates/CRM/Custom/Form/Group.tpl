@@ -85,7 +85,7 @@
 {$initHideBlocks}
 {literal}
 <script type="text/Javascript">
-cj(function($) {
+CRM.$(function($) {
 
   showHideStyle();
   cj('#extends_0').change(function() {

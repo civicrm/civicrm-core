@@ -26,7 +26,7 @@
 {* Advanced Search Criteria Fieldset *}
 {literal}
 <script type="text/javascript">
-cj(function($) {
+CRM.$(function($) {
   $().crmAccordions();
   // Bind first click of accordion header to load crm-accordion-body with snippet
   // everything else is taken care of by crmAccordions()

@@ -1,4 +1,4 @@
-cj(function ($) {
+CRM.$(function($) {
   'use strict';
 
   // Behind the scenes method deals with browser for setting cursor position

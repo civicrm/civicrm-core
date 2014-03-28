@@ -425,7 +425,7 @@ invert              = 0
     }
 
     //show edit profile field links
-    cj(function() {
+    CRM.$(function($) {
         // show edit for main profile
         cj(document).on('change', 'select[id^="custom_p"]', function( event ) {
             buildLinks( cj(this), cj(this).val());

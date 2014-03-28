@@ -75,7 +75,7 @@
 
 {literal}
 <script>
-cj(function($) {
+CRM.$(function($) {
   $('body').click(function() {
     $('#crm-event-links-list, #crm-participant-list').hide();
   });

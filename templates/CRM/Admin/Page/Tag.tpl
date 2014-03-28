@@ -100,7 +100,7 @@
 
 {literal}
 <script type="text/javascript">
-cj(function($) {
+CRM.$(function($) {
   var tag;
   $('.merge_tag').click(function(e) {
     tag = $(this).crmEditableEntity();

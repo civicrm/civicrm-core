@@ -26,7 +26,7 @@
 {* CiviCase - change activity status inline *}
 {literal}
   <script type="text/javascript">
-    cj(function($) {
+    CRM.$(function($) {
       // Elements are sometimes in a jQuery dialog box which is outside crm-container,
       // So gotta attach this handler to the whole body - sorry.
       $('body').off('click.changeActivityStatus');

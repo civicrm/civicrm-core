@@ -330,7 +330,7 @@
 {* CRM-10560 *}
 {literal}
 <script type="text/javascript">
-cj(function($) {
+CRM.$(function($) {
   $('.crm-inline-edit-container').crmFormContactLock({
     ignoreLabel: "{/literal}{ts escape='js'}Ignore{/ts}{literal}",
     saveAnywayLabel: "{/literal}{ts escape='js'}Save Anyway{/ts}{literal}",

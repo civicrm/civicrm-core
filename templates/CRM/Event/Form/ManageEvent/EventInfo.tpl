@@ -173,7 +173,7 @@
 </div>
 {literal}
 <script type="text/javascript">
-  cj(function($) {
+  CRM.$(function($) {
     $('#template_id', '#EventInfo').change(function() {
       $('#crm-main-content-wrapper')
         .crmSnippet({url: CRM.url('civicrm/event/add', {action: 'add', reset: 1, template_id: $(this).val()})})

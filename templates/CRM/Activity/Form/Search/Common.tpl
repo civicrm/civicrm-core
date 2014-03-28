@@ -127,7 +127,7 @@ campaignContext="componentSearch" campaignTrClass='' campaignTdClass=''}
 
 {literal}
 <script type="text/javascript">
-  cj(function() {
+  CRM.$(function($) {
     //Searchable activity custom fields which extend ALL activity types are always displayed in the form
     //hence hide remaining activity custom data
     cj('#activityCustom').children( ).each( function( ) {

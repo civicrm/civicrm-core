@@ -249,7 +249,7 @@
   {include file="CRM/common/customData.tpl"}
     {literal}
     <script type="text/javascript">
-    cj(function() {
+    CRM.$(function($) {
     {/literal}
     {if $customDataSubType}
       CRM.buildCustomData( '{$customDataType}', {$customDataSubType} );
@@ -278,7 +278,7 @@
   {if $action eq 2 or $action eq 1}
     {literal}
     <script type="text/javascript">
-      cj(function( ) {
+      CRM.$(function($) {
         cj('.crm-with-contact').click(function(){
           cj('#with-contacts-widget').toggle();
           cj('#with-clients').toggle();

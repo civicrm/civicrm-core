@@ -169,7 +169,7 @@
 
 {literal}
 <script type="text/javascript">
-  cj(function($) {
+  CRM.$(function($) {
     // load panes function calls for snippet based on id of crm-accordion-header
     function loadPanes() {
       var id = $(this).attr('id');

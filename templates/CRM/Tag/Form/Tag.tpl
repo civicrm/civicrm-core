@@ -73,7 +73,7 @@
       // update summary tab
       $("#contact-summary #tags").html(tags.join(', '));
     };
-  })(cj);
+  })(CRM.$);
   {/literal}
 </script>
 <div id="Tag" class="view-content">

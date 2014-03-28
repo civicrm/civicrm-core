@@ -49,7 +49,7 @@
     var target_contact_id = '';
     var selectedCaseId = '';
     var contactId = '';
-    cj(function($) {
+    CRM.$(function($) {
       $('input[name=unclosed_case_id]', '#fileOnCaseDialog').select2({
         placeholder: {/literal}'{ts escape="js"}- select case -{/ts}'{literal},
         minimumInputLength: 1,

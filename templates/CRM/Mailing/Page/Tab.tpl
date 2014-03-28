@@ -40,7 +40,7 @@
 </div>
 {literal}
 <script type="text/javascript">
-  cj(function($) {
+  CRM.$(function($) {
     var oTable;
 
     buildMailingContact();

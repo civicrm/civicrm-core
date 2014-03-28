@@ -230,7 +230,7 @@
             {if $discountSection eq 2}
                 <script type="text/javascript">
                 {literal}
-                    cj( function() {
+                    CRM.$(function($) {
                         cj('#discounted_label_1').focus( );
                     });
                 {/literal}

@@ -74,7 +74,7 @@
       {$form.group_type.html}
         {literal}
         <script type="text/javascript">
-        cj(function(){
+        CRM.$(function($) {
           function showGroupSearch(){
             cj('#grouptypeselect').hide();
             cj('#groupselect').show();

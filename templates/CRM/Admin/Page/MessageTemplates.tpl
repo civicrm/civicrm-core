@@ -161,7 +161,7 @@
     var selectedTab = 'user';
     {if $selectedChild}selectedTab = '{$selectedChild}';{/if}
     {literal}
-      cj( function() {
+      CRM.$(function($) {
         var tabIndex = cj('#tab_' + selectedTab).prevAll().length
         cj("#mainTabContainer").tabs( {active: tabIndex} );
       });

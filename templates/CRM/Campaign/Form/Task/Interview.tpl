@@ -209,7 +209,7 @@
 <script type="text/javascript">
 var updateVote = "{/literal}{ts escape='js'}Update Response{/ts}{literal}";
 var updateVoteforall = "{/literal}{ts escape='js'}Update Responses for All{/ts}{literal}";
-cj( function( ) {
+CRM.$(function($) {
   var count = 0; var columns='';
 
   cj('#voterRecords th').each( function( ) {

@@ -72,7 +72,7 @@
     }
   }
 
-cj( function( ) {
+CRM.$(function($) {
     var blockNo = {/literal}{$blockId}{literal};
 
     // call this when form loads

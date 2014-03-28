@@ -25,7 +25,7 @@
 *}
 {literal}
 <script type="text/javascript">
-cj( function( ) {
+CRM.$(function($) {
 // for date sorting see http://wiki.civicrm.org/confluence/display/CRMDOC/Sorting+Date+Fields+in+dataTables+Widget
 var useAjax = {/literal}{if $useAjax}1{else}0{/if}{literal};
 var sortEnabled = true;

@@ -107,7 +107,7 @@
   {literal}
 
   <script type="text/javascript" >
-  cj(function($) {
+  CRM.$(function($) {
     var action = "{/literal}{$action}{literal}";
     $().crmAccordions();
 

@@ -32,7 +32,7 @@
 
 {literal}
 <script type="text/javascript" >
-cj(function($) {
+CRM.$(function($) {
   var messages = {{/literal}
         required: "{ts escape='js'}This field is required.{/ts}",
         remote: "{ts escape='js'}Please fix this field.{/ts}",

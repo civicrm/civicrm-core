@@ -59,7 +59,7 @@
 
 {literal}
 <script type="text/javascript">
-  cj(function() {
+  CRM.$(function($) {
       var currentReSortEvent;
     cj(".dash-column").sortable({
       connectWith: '.dash-column',

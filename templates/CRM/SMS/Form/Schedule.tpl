@@ -74,14 +74,14 @@
 <script type="text/javascript">
 {if $preview}
 {literal}
-cj(function() {
+CRM.$(function($) {
    cj().crmAccordions();
 });
 {/literal}
 {/if}
 
 {literal}
-cj(function() {
+CRM.$(function($) {
    cj('#start_date_display').change( function( ) { 
        if ( cj(this).val( ) ) {
           cj('#now').prop('checked', false );
