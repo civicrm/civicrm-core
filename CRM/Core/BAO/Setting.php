@@ -509,7 +509,7 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
       list($name) = array_keys($settingParams);
       $getFieldsParams['name'] = $name;
     }
-    $fields = civicrm_api('setting','getfields', $getFieldsParams);
+    $fields = civicrm_api3('setting','getfields', $getFieldsParams);
     $invalidParams = (array_diff_key($settingParams, $fields['values']));
     if (!empty($invalidParams)) {
       throw new api_Exception(implode(',', $invalidParams) . " not valid settings");
