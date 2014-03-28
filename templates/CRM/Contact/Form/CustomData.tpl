@@ -28,34 +28,6 @@
    {include file="CRM/Custom/Form/CustomData.tpl"}
    {if $multiRecordDisplay eq 'single'}
      <div class="html-adjust">{$form.buttons.html}</div>
-     {* for form rule handling *}
-     {include file="CRM/Form/validate.tpl"}
-     {literal}
-     <script type='text/javascript'>
-       cj(function($) {
-         $('#custom-record-dialog .crm-container-snippet #CustomData').validate(CRM.validate.params);
-         var formOptions = {
-           success:       checkResponse  // post-submit callback
-         };
-
-         //binding the callback to snippet profile form
-         $('.crm-container-snippet #CustomData').ajaxForm(formOptions);
-       });
-
-     // post-submit callback
-     function checkResponse(responseText, statusText, xhr, $form) {
-       //if there is any form error show the dialog
-       //else redirect to post url
-       if (!cj(responseText).find('.crm-error').html()) {
-         window.location.href = '{/literal}{$backUrl}{literal}';
-       }
-       else {
-         var errorInfo = cj(responseText).find('div.crm-error').html();
-         cj('.crm-container-snippet #CustomData').prepend(errorInfo);
-       }
-     }
-     </script>
-     {/literal}
    {/if}
 {else}
     <div id="customData"></div>
