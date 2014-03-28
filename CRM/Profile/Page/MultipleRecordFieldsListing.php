@@ -53,6 +53,7 @@ class CRM_Profile_Page_MultipleRecordFieldsListing extends CRM_Core_Page_Basic {
   protected $_pageViewType = NULL;
 
   protected $_contactType = NULL;
+
   /**
    * Get BAO Name
    *
@@ -95,23 +96,23 @@ class CRM_Profile_Page_MultipleRecordFieldsListing extends CRM_Core_Page_Basic {
       // urls and queryStrings
       if ($this->_pageViewType == 'profileDataView') {
         $links[CRM_Core_Action::VIEW]['url'] = 'civicrm/profile/view';
-        $links[CRM_Core_Action::VIEW]['qs'] = "reset=1&id=%%id%%&recordId=%%recordId%%&gid=%%gid%%&multiRecord={$view}&snippet=1&context=multiProfileDialog&onPopupClose=%%onPopupClose%%";
+        $links[CRM_Core_Action::VIEW]['qs'] = "reset=1&id=%%id%%&recordId=%%recordId%%&gid=%%gid%%&multiRecord={$view}";
 
         $links[CRM_Core_Action::UPDATE]['url'] = 'civicrm/profile/edit';
-        $links[CRM_Core_Action::UPDATE]['qs'] = "reset=1&id=%%id%%&recordId=%%recordId%%&gid=%%gid%%&multiRecord={$update}&snippet=1&context=multiProfileDialog&onPopupClose=%%onPopupClose%%";
+        $links[CRM_Core_Action::UPDATE]['qs'] = "reset=1&id=%%id%%&recordId=%%recordId%%&gid=%%gid%%&multiRecord={$update}";
 
         $links[CRM_Core_Action::DELETE]['url'] = 'civicrm/profile/edit';
-        $links[CRM_Core_Action::DELETE]['qs'] = "reset=1&id=%%id%%&recordId=%%recordId%%&gid=%%gid%%&multiRecord={$delete}&snippet=1&context=multiProfileDialog&onPopupClose=%%onPopupClose%%";
+        $links[CRM_Core_Action::DELETE]['qs'] = "reset=1&id=%%id%%&recordId=%%recordId%%&gid=%%gid%%&multiRecord={$delete}";
 
       }
       elseif ($this->_pageViewType == 'customDataView') {
         // custom data specific view links
         $links[CRM_Core_Action::VIEW]['url'] = 'civicrm/contact/view/cd';
-        $links[CRM_Core_Action::VIEW]['qs'] = 'reset=1&snippet=1&gid=%%gid%%&cid=%%cid%%&recId=%%recId%%&multiRecordDisplay=single';
+        $links[CRM_Core_Action::VIEW]['qs'] = 'reset=1&gid=%%gid%%&cid=%%cid%%&recId=%%recId%%&multiRecordDisplay=single&mode=view';
 
         // custom data specific update links
         $links[CRM_Core_Action::UPDATE]['url'] = 'civicrm/contact/view/cd/edit';
-        $links[CRM_Core_Action::UPDATE]['qs'] = 'reset=1&snippet=1&type=%%type%%&groupID=%%groupID%%&entityID=%%entityID%%&cgcount=%%cgcount%%&multiRecordDisplay=single';
+        $links[CRM_Core_Action::UPDATE]['qs'] = 'reset=1&type=%%type%%&groupID=%%groupID%%&entityID=%%entityID%%&cgcount=%%cgcount%%&multiRecordDisplay=single&mode=edit';
         // NOTE : links for DELETE action for customDataView is handled in browse
 
         // copy action
@@ -119,7 +120,7 @@ class CRM_Profile_Page_MultipleRecordFieldsListing extends CRM_Core_Page_Basic {
           'name' => ts('Copy'),
           'title' => ts('Copy %1', array( 1 => $this->_customGroupTitle . ' record')),
           'url' => 'civicrm/contact/view/cd/edit',
-          'qs' => 'reset=1&snippet=1&type=%%type%%&groupID=%%groupID%%&entityID=%%entityID%%&cgcount=%%newCgCount%%&multiRecordDisplay=single&copyValueId=%%cgcount%%'
+          'qs' => 'reset=1&type=%%type%%&groupID=%%groupID%%&entityID=%%entityID%%&cgcount=%%newCgCount%%&multiRecordDisplay=single&copyValueId=%%cgcount%%&mode=copy'
         );
       }
 
@@ -142,7 +143,6 @@ class CRM_Profile_Page_MultipleRecordFieldsListing extends CRM_Core_Page_Basic {
   function run() {
     // get the requested action, default to 'browse'
     $action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, FALSE);
-    $this->_onPopupClose = CRM_Utils_Request::retrieve('onPopupClose', 'String', $this);
 
     // assign vars to templates
     $this->assign('action', $action);
@@ -304,7 +304,7 @@ class CRM_Profile_Page_MultipleRecordFieldsListing extends CRM_Core_Page_Basic {
               $op = NULL;
               if ($this->_pageViewType == 'profileDataView') {
                 $actionParams = array('recordId' => $recId, 'gid' => $this->_profileId,
-                  'id' => $this->_contactId, 'onPopupClose' => $this->_onPopupClose);
+                  'id' => $this->_contactId);
                 $op = 'profile.multiValue.row';
               }
               else {

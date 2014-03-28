@@ -394,6 +394,7 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
         'title' => $group['title'],
         'weight' => $weight,
         'count' => CRM_Contact_BAO_Contact::getCountComponent($id, $this->_contactId, $group['table_name']),
+        'class' => 'livePage'
       );
       $weight += 10;
     }
