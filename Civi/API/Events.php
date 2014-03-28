@@ -88,4 +88,17 @@ class Events {
    * Weight - Late
    */
   const W_LATE = -100;
+
+  /**
+   * @return array<string>
+   */
+  public static function allEvents() {
+    return array(
+      self::AUTHORIZE,
+      self::EXCEPTION,
+      self::PREPARE,
+      self::RESOLVE,
+      self::RESPOND,
+    );
+  }
 }
