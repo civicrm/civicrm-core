@@ -42,9 +42,18 @@ class MagicFunctionProvider implements EventSubscriberInterface, ProviderInterfa
     );
   }
 
+  /**
+   * @var array (string $cachekey => array('function' => string, 'is_generic' => bool))
+   */
+  private $cache;
+
+  function __construct() {
+    $this->cache = array();
+  }
+
   public function onApiResolve(\Civi\API\Event\ResolveEvent $event) {
     $apiRequest = $event->getApiRequest();
-    $resolved = _civicrm_api_resolve($apiRequest);
+    $resolved = $this->resolve($apiRequest);
     if ($resolved['function']) {
       $apiRequest += $resolved;
       $event->setApiRequest($apiRequest);
@@ -65,6 +74,153 @@ class MagicFunctionProvider implements EventSubscriberInterface, ProviderInterfa
       $result = isset($extra) ? $function($apiRequest['params'], $extra) : $function($apiRequest['params']);
     }
     return $result;
+  }
+
+  public function getActionNames($entity, $version) {
+    // TODO don't recurse into civicrm_api
+    $r = civicrm_api('Entity', 'Get', array('version' => $version));
+    if (!in_array($entity, $r['values'])) {
+      throw new \Civi\API\Exception\NotImplementedException("Entity " . $entity . " invalid. Use api.entity.get to have the list", array('entity' => $r['values']));
+    }
+    $this->loadEntity($entity, $version);
+
+    $functions = get_defined_functions();
+    $actions = array();
+    $prefix = 'civicrm_api' . $version . '_' . strtolower($entity) . '_';
+    $prefixGeneric = 'civicrm_api' . $version . '_generic_';
+    foreach ($functions['user'] as $fct) {
+      if (strpos($fct, $prefix) === 0) {
+        $actions[] = substr($fct, strlen($prefix));
+      }
+      elseif (strpos($fct, $prefixGeneric) === 0) {
+        $actions[] = substr($fct, strlen($prefixGeneric));
+      }
+    }
+    return $actions;
+  }
+
+  /**
+   * Look up the implementation for a given API request
+   *
+   * @param $apiRequest array with keys:
+   *  - entity: string, required
+   *  - action: string, required
+   *  - params: array
+   *  - version: scalar, required
+   *
+   * @return array with keys
+   *  - function: callback (mixed)
+   *  - is_generic: boolean
+   */
+  protected function resolve($apiRequest) {
+    $cachekey = strtolower($apiRequest['entity']) . ':' . strtolower($apiRequest['action']) . ':' . $apiRequest['version'];
+    if (isset($this->cache[$cachekey])) {
+      return $this->cache[$cachekey];
+    }
+
+    $camelName = _civicrm_api_get_camel_name($apiRequest['entity'], $apiRequest['version']);
+    $actionCamelName = _civicrm_api_get_camel_name($apiRequest['action']);
+
+    // Determine if there is an entity-specific implementation of the action
+    $stdFunction = $this->getFunctionName($apiRequest['entity'], $apiRequest['action'], $apiRequest['version']);
+    if (function_exists($stdFunction)) {
+      // someone already loaded the appropriate file
+      // FIXME: This has the affect of masking bugs in load order; this is included to provide bug-compatibility
+      $this->cache[$cachekey] = array('function' => $stdFunction, 'is_generic' => FALSE);
+      return $this->cache[$cachekey];
+    }
+
+    $stdFiles = array(
+      // By convention, the $camelName.php is more likely to contain the function, so test it first
+      'api/v' . $apiRequest['version'] . '/' . $camelName . '.php',
+      'api/v' . $apiRequest['version'] . '/' . $camelName . '/' . $actionCamelName . '.php',
+    );
+    foreach ($stdFiles as $stdFile) {
+      if (\CRM_Utils_File::isIncludable($stdFile)) {
+        require_once $stdFile;
+        if (function_exists($stdFunction)) {
+          $this->cache[$cachekey] = array('function' => $stdFunction, 'is_generic' => FALSE);
+          return $this->cache[$cachekey];
+        }
+      }
+    }
+
+    // Determine if there is a generic implementation of the action
+    require_once 'api/v3/Generic.php';
+    # $genericFunction = 'civicrm_api3_generic_' . $apiRequest['action'];
+    $genericFunction = $this->getFunctionName('generic', $apiRequest['action'], $apiRequest['version']);
+    $genericFiles = array(
+      // By convention, the Generic.php is more likely to contain the function, so test it first
+      'api/v' . $apiRequest['version'] . '/Generic.php',
+      'api/v' . $apiRequest['version'] . '/Generic/' . $actionCamelName . '.php',
+    );
+    foreach ($genericFiles as $genericFile) {
+      if (\CRM_Utils_File::isIncludable($genericFile)) {
+        require_once $genericFile;
+        if (function_exists($genericFunction)) {
+          $this->cache[$cachekey] = array('function' => $genericFunction, 'is_generic' => TRUE);
+          return $this->cache[$cachekey];
+        }
+      }
+    }
+
+    $this->cache[$cachekey] = array('function' => FALSE, 'is_generic' => FALSE);
+    return $this->cache[$cachekey];
+  }
+
+  /**
+   * @param string $entity
+   * @param string $action
+   * @return string
+   */
+  protected function getFunctionName($entity, $action, $version) {
+    $entity = _civicrm_api_get_entity_name_from_camel($entity);
+    return 'civicrm_api' . $version . '_' . $entity . '_' . $action;
+  }
+
+  /**
+   * Load/require all files related to an entity.
+   *
+   * This should not normally be called because it's does a file-system scan; it's
+   * only appropriate when introspection is really required (eg for "getActions").
+   *
+   * @param string $entity
+   * @param int $version
+   *
+   * @return void
+   */
+  protected function loadEntity($entity, $version) {
+    $camelName = _civicrm_api_get_camel_name($entity, $version);
+
+    // Check for master entity file; to match _civicrm_api_resolve(), only load the first one
+    $stdFile = 'api/v' . $version . '/' . $camelName . '.php';
+    if (\CRM_Utils_File::isIncludable($stdFile)) {
+      require_once $stdFile;
+    }
+
+    // Check for standalone action files; to match _civicrm_api_resolve(), only load the first one
+    $loaded_files = array(); // array($relativeFilePath => TRUE)
+    $include_dirs = array_unique(explode(PATH_SEPARATOR, get_include_path()));
+    foreach ($include_dirs as $include_dir) {
+      $action_dir = implode(DIRECTORY_SEPARATOR, array($include_dir, 'api', "v${version}", $camelName));
+      if (!is_dir($action_dir)) {
+        continue;
+      }
+
+      $iterator = new \DirectoryIterator($action_dir);
+      foreach ($iterator as $fileinfo) {
+        $file = $fileinfo->getFilename();
+        if (array_key_exists($file, $loaded_files)) {
+          continue; // action provided by an earlier item on include_path
+        }
+
+        $parts = explode(".", $file);
+        if (end($parts) == "php" && !preg_match('/Tests?\.php$/', $file)) {
+          require_once $action_dir . DIRECTORY_SEPARATOR . $file;
+          $loaded_files[$file] = TRUE;
+        }
+      }
+    }
   }
 
 }
