@@ -352,7 +352,7 @@ class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
       $fieldDetail = reset($fields);
       $fieldId = CRM_Core_BAO_CustomField::getKeyID($fieldDetail['name']);
       $customGroupDetails = CRM_Core_BAO_CustomGroup::getGroupTitles(array($fieldId));
-      $title = $customGroupDetails[$fieldId]['groupTitle'];
+      $multiRecTitle = $customGroupDetails[$fieldId]['groupTitle'];
     } else {
       $title = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_UFGroup', $this->_gid, 'title');
     }
@@ -374,6 +374,7 @@ class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
       $title .= ' - ' . $displayName;
     }
 
+    $title = isset($multiRecTitle) ? ts('View %1 Record', array(1 => $multiRecTitle)) : $title;
     CRM_Utils_System::setTitle($title);
 
     // invoke the pagRun hook, CRM-3906
