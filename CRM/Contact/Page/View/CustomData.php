@@ -152,6 +152,9 @@ class CRM_Contact_Page_View_CustomData extends CRM_Core_Page {
       else {
         $recId = NULL;
         if ($this->_multiRecordDisplay == 'single') {
+          $groupTitle = CRM_Core_BAO_CustomGroup::getTitle($this->_groupId);
+          CRM_Utils_System::setTitle(ts('View %1 Record', array(1 => $groupTitle)));
+
           $recId = $this->_recId;
           $this->assign('multiRecordDisplay', $this->_multiRecordDisplay);
           $this->assign('skipTitle', 1);

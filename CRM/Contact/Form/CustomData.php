@@ -133,6 +133,11 @@ class CRM_Contact_Form_CustomData extends CRM_Core_Form {
         $this->_tableID = $this->_entityId;
         $this->_copyValueId = CRM_Utils_Request::retrieve('copyValueId', 'Positive', $this);
 
+        $groupTitle = CRM_Core_BAO_CustomGroup::getTitle($this->_groupID);
+        $mode = CRM_Utils_Request::retrieve('mode', 'String', CRM_Core_DAO::$_nullObject, FALSE, NULL, 'GET');
+        $mode = ucfirst($mode);
+        CRM_Utils_System::setTitle(ts('%1 %2 Record', array(1 => $mode, 2 => $groupTitle)));
+
         if (!empty($_POST['hidden_custom'])) {
           $this->assign('postedInfo', TRUE);
         }
