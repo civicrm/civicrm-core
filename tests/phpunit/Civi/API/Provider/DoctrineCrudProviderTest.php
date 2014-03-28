@@ -177,7 +177,7 @@ class DoctrineCrudProviderTest extends \CiviUnitTestCase {
       'id' => 123456789,
       'name' => 'OhNoes',
     ));
-    $this->assertEquals('not-found', $result['error_code']);
+    $this->assertEquals(\API_Exception::NOT_IMPLEMENTED, $result['error_code']);
     $this->assertDBQuery(0, 'SELECT count(*) FROM civicrm_worldregion WHERE name = "OhNoes"');
   }
 
