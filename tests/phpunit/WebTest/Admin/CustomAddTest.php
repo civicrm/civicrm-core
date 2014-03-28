@@ -96,9 +96,6 @@ class WebTest_Admin_CustomAddTest extends CiviSeleniumTestCase {
     $this->click("_qf_Field_next_new-bottom");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
-    //Is custom field created?
-    $this->waitForText('crm-notification-container', "Your custom field '$checkboxFieldLabel' has been saved.");
-
     //create another custom field - Number Radio
     $this->click("data_type[0]");
     $this->select("data_type[0]", "value=2");
@@ -131,9 +128,6 @@ class WebTest_Admin_CustomAddTest extends CiviSeleniumTestCase {
     //clicking save
     $this->click("_qf_Field_next-bottom");
     $this->waitForPageToLoad($this->getTimeoutMsec());
-
-    //Is custom field created
-    $this->waitForText('crm-notification-container', "Your custom field '$radioFieldLabel' has been saved.");
 
     //On New Individual contact form
     $this->openCiviPage("contact/add", "ct=Individual&reset=1");
