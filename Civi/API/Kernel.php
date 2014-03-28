@@ -75,7 +75,7 @@ class Kernel {
 
     // TODO Define alternative calling convention makes it easier to construct $apiRequest
     // without the ambiguity of "data" vs "options"
-    $apiRequest = $this->createRequest($entity, $action, $params, $extra);
+    $apiRequest = Request::create($entity, $action, $params, $extra);
 
     try {
       if (!is_array($params)) {
@@ -109,128 +109,6 @@ class Kernel {
       }
 
       return $this->formatResult($apiRequest, $err);
-    }
-
-  }
-
-  /**
-   * Create a formatted/normalized request object.
-   *
-   * @param string $entity
-   * @param string $action
-   * @param array $params
-   * @param mixed $extra
-   * @return array the request descriptor; keys:
-   *   - version: int
-   *   - entity: string
-   *   - action: string
-   *   - params: array (string $key => mixed $value) [deprecated in v4]
-   *   - extra: unspecified
-   *   - fields: NULL|array (string $key => array $fieldSpec)
-   *   - options: \CRM_Utils_OptionBag derived from params [v4-only]
-   *   - data: \CRM_Utils_OptionBag derived from params [v4-only]
-   *   - chains: unspecified derived from params [v4-only]
-   */
-  public function createRequest($entity, $action, $params, $extra) {
-    $apiRequest = array(); // new \Civi\API\Request();
-    $apiRequest['version'] = $this->parseVersion($params);
-    $apiRequest['params'] = $params;
-    $apiRequest['extra'] = $extra;
-    $apiRequest['fields'] = NULL;
-
-    if ($apiRequest['version'] <= 3) {
-      // APIv1-v3 munges entity/action names, which means that the same name can be written
-      // multiple ways. That makes it harder to work with.
-      $apiRequest['entity'] = \CRM_Utils_String::munge($entity);
-      $apiRequest['action'] = \CRM_Utils_String::munge($action);
-    }
-    else {
-      // APIv4 requires exact entity/action name; deviations should cause errors
-      if (!preg_match('/^[a-zA-Z][a-zA-Z0-9]*$/', $entity)) {
-        throw new \API_Exception("Malformed entity");
-      }
-      if (!preg_match('/^[a-zA-Z][a-zA-Z0-9]*$/', $action)) {
-        throw new \API_Exception("Malformed action");
-      }
-      $apiRequest['entity'] = $entity;
-      $apiRequest['action'] = $action;
-    }
-
-    // APIv1-v3 mix data+options in $params which means that each API callback is responsible
-    // for splitting the two. In APIv4, the split is done systematically so that we don't
-    // so much parsing logic spread around.
-    if ($apiRequest['version'] >= 4) {
-      $options = array();
-      $data = array();
-      $chains = array();
-      foreach ($params as $key => $value) {
-        if ($key == 'options') {
-          $options = array_merge($options, $value);
-        }
-        elseif ($key == 'return') {
-          if (!isset($options['return'])) {
-            $options['return'] = array();
-          }
-          $options['return'] = array_merge($options['return'], $value);
-        }
-        elseif (preg_match('/^option\.(.*)$/', $key, $matches)) {
-          $options[$matches[1]] = $value;
-        }
-        elseif (preg_match('/^return\.(.*)$/', $key, $matches)) {
-          if ($value) {
-            if (!isset($options['return'])) {
-              $options['return'] = array();
-            }
-            $options['return'][] = $matches[1];
-          }
-        }
-        elseif (preg_match('/^format\.(.*)$/', $key, $matches)) {
-          if ($value) {
-            if (!isset($options['format'])) {
-              $options['format'] = $matches[1];
-            }
-            else {
-              throw new \API_Exception("Too many API formats specified");
-            }
-          }
-        }
-        elseif (preg_match('/^api\./', $key)) {
-          // FIXME: represent subrequests as instances of "Request"
-          $chains[$key] = $value;
-        }
-        elseif ($key == 'debug') {
-          $options['debug'] = $value;
-        }
-        elseif ($key == 'version') {
-          // ignore
-        }
-        else {
-          $data[$key] = $value;
-
-        }
-      }
-      $apiRequest['options'] = new \CRM_Utils_OptionBag($options);
-      $apiRequest['data'] = new \CRM_Utils_OptionBag($data);
-      $apiRequest['chains'] = $chains;
-    }
-
-    return $apiRequest;
-  }
-
-  /**
-   * We must be sure that every request uses only one version of the API.
-   *
-   * @param array $params
-   * @return int
-   */
-  protected function parseVersion($params) {
-    $desired_version = empty($params['version']) ? NULL : (int) $params['version'];
-    if (isset($desired_version) && is_integer($desired_version)) {
-      return $desired_version;
-    }
-    else {
-      // we will set the default to version 3 as soon as we find that it works.
-      return 3;
     }
   }
 

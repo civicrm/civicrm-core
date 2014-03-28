@@ -5,7 +5,7 @@ require_once 'CiviTest/CiviUnitTestCase.php';
 
 /**
  */
-class KernelTest extends \CiviUnitTestCase {
+class RequestTest extends \CiviUnitTestCase {
 
   function v4options() {
     $cases = array(); // array(0 => $requestParams, 1 => $expectedOptions, 2 => $expectedData, 3 => $expectedChains)
@@ -78,8 +78,7 @@ class KernelTest extends \CiviUnitTestCase {
    * @dataProvider v4options
    */
   function testCreateRequest_v4Options($inputParams, $expectedOptions, $expectedData, $expectedChains) {
-    $kernel = new Kernel(NULL);
-    $apiRequest = $kernel->createRequest('MyEntity', 'MyAction', $inputParams, NULL);
+    $apiRequest = Request::create('MyEntity', 'MyAction', $inputParams, NULL);
     $this->assertEquals($expectedOptions, $apiRequest['options']->getArray());
     $this->assertEquals($expectedData, $apiRequest['data']->getArray());
     $this->assertEquals($expectedChains, $apiRequest['chains']);
@@ -89,15 +88,59 @@ class KernelTest extends \CiviUnitTestCase {
    * @expectedException \API_Exception
    */
   function testCreateRequest_v4BadEntity() {
-    $kernel = new Kernel(NULL);
-    $kernel->createRequest('Not!Valid', 'create', array('version' => 4), NULL);
+    Request::create('Not!Valid', 'create', array('version' => 4), NULL);
   }
 
   /**
    * @expectedException \API_Exception
    */
   function testCreateRequest_v4BadAction() {
-    $kernel = new Kernel(NULL);
-    $kernel->createRequest('MyEntity', 'bad!action', array('version' => 4), NULL);
+    Request::create('MyEntity', 'bad!action', array('version' => 4), NULL);
   }
+
+  function validEntityActionPairs() {
+    $cases = array();
+    $cases[] = array(
+      array('MyEntity', 'MyAction', 3),
+      array('MyEntity', 'myAction', 3),
+    );
+    $cases[] = array(
+      array('my+entity', 'MyAction', 3),
+      array('my_entity', 'myAction', 3),
+    );
+    $cases[] = array(
+      array('MyEntity', 'MyAction', 4),
+      array('MyEntity', 'myAction', 4),
+    );
+    return $cases;
+  }
+
+  /**
+   * @dataProvider validEntityActionPairs
+   */
+  function testCreateRequest_EntityActionMunging($input, $expected) {
+    list ($inEntity, $inAction, $inVersion) = $input;
+    $apiRequest = Request::create($inEntity, $inAction, array('version' => $inVersion), NULL);
+    $this->assertEquals($expected, array($apiRequest['entity'], $apiRequest['action'], $apiRequest['version']));
+  }
+
+  function invalidEntityActionPairs() {
+    $cases = array();
+    $cases[] = array('My+Entity', 'MyAction', 4);
+    $cases[] = array('My Entity', 'MyAction', 4);
+    $cases[] = array('2MyEntity', 'MyAction', 4);
+    $cases[] = array('MyEntity', 'My+Action', 4);
+    $cases[] = array('MyEntity', 'My Action', 4);
+    $cases[] = array('MyEntity', '2Action', 4);
+    return $cases;
+  }
+
+  /**
+   * @dataProvider invalidEntityActionPairs
+   * @expectedException \API_Exception
+   */
+  function testCreateRequest_InvalidEntityAction($inEntity, $inAction, $inVersion) {
+    Request::create($inEntity, $inAction, array('version' => $inVersion), NULL);
+  }
+
 }
