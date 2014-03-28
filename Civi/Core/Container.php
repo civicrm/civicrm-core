@@ -177,6 +177,7 @@ class Container {
     $dispatcher->addSubscriber(new \Civi\API\Provider\MagicFunctionProvider());
     $dispatcher->addSubscriber(new \Civi\API\Provider\DoctrineCrudProvider($apiRegistry));
     $dispatcher->addSubscriber(new \Civi\API\Subscriber\AnnotationPermissionCheck($annotationReader));
+    $dispatcher->addSubscriber(new \Civi\API\Subscriber\PermissionCheck());
     $dispatcher->addSubscriber(new \Civi\API\Subscriber\APIv3SchemaAdapter());
     $dispatcher->addSubscriber(new \Civi\API\Subscriber\WrapperAdapter(array(
       \CRM_Utils_API_HTMLInputCoder::singleton(),
@@ -185,13 +186,6 @@ class Container {
       \CRM_Utils_API_MatchOption::singleton(),
     )));
     $dispatcher->addSubscriber(new \Civi\API\Subscriber\XDebugSubscriber());
-    $dispatcher->addListener(\Civi\API\Events::AUTHORIZE, function(\Civi\API\Event\AuthorizeEvent $event) {
-      $apiRequest = $event->getApiRequest();
-      // FIXME: At time of writing, _civicrm_api3_api_check_permission generates an exception on failure
-      // This means it doesn't coexist well with other permission checks.
-      _civicrm_api3_api_check_permission($apiRequest['entity'], $apiRequest['action'], $apiRequest['params']);
-      $event->authorize();
-    }, \Civi\API\Events::W_LATE);
     $kernel = new \Civi\API\Kernel($dispatcher, array());
     return $kernel;
   }
