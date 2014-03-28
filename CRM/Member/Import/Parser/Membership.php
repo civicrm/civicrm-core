@@ -441,7 +441,9 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
               $endDate,
               $joinDate,
               'today',
-              $excludeIsAdmin
+              $excludeIsAdmin,
+              $formatted['membership_type_id'],
+              $formatted
             );
 
             if (empty($formatted['status_id'])) {
@@ -529,7 +531,9 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
           $endDate,
           $joinDate,
           'today',
-          $excludeIsAdmin
+          $excludeIsAdmin,
+          $formatted['membership_type_id'],
+          $formatted
         );
         if (empty($formatted['status_id'])) {
           $formatted['status_id'] = CRM_Utils_Array::value('id', $calcStatus);
