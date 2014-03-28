@@ -27,8 +27,9 @@
 
 class CRM_Utils_Api {
   /**
-   * Attempt to retrieve the api entity name from any calling class
-   * @param $classNameOrObject
+   * Attempts to retrieve the API entity name from any calling class.
+   *
+   * @param string|object $classNameOrObject
    * @throws CRM_Core_Exception
    */
   static function getEntityName($classNameOrObject) {
