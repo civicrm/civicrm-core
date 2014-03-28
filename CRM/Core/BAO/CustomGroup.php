@@ -614,13 +614,16 @@ ORDER BY civicrm_custom_group.weight,
    *
    * @return boolean does this entity have data in this custom table
    */
-  static public function customGroupDataExistsForEntity($entityID, $table){
+  static public function customGroupDataExistsForEntity($entityID, $table, $getCount = FALSE){
     $query = "
       SELECT count(id)
       FROM   $table
       WHERE  entity_id = $entityID
     ";
     $recordExists = CRM_Core_DAO::singleValueQuery($query);
+    if ($getCount) {
+      return $recordExists;
+    }
     return $recordExists ? TRUE : FALSE;
   }
 
