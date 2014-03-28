@@ -64,9 +64,14 @@ class Container {
     ))
       ->setFactoryService(self::SELF)->setFactoryMethod('createEventDispatcher');
 
+    $container->setDefinition('magic_function_provider', new Definition(
+      '\Civi\API\Provider\MagicFunctionProvider',
+      array()
+    ));
+
     $container->setDefinition('civi_api_kernel', new Definition(
       '\Civi\API\Kernel',
-      array(new Reference('dispatcher'))
+      array(new Reference('dispatcher'), new Reference('magic_function_provider'))
     ))
       ->setFactoryService(self::SELF)->setFactoryMethod('createApiKernel');
 
@@ -85,10 +90,10 @@ class Container {
    * @param \Symfony\Component\EventDispatcher\EventDispatcher $dispatcher
    * @return \Civi\API\Kernel
    */
-  public function createApiKernel($dispatcher) {
+  public function createApiKernel($dispatcher, $magicFunctionProvider) {
     $dispatcher->addSubscriber(new \Civi\API\Subscriber\TransactionSubscriber());
     $dispatcher->addSubscriber(new \Civi\API\Subscriber\I18nSubscriber());
-    $dispatcher->addSubscriber(new \Civi\API\Provider\MagicFunctionProvider());
+    $dispatcher->addSubscriber($magicFunctionProvider);
     $dispatcher->addSubscriber(new \Civi\API\Subscriber\PermissionCheck());
     $dispatcher->addSubscriber(new \Civi\API\Subscriber\APIv3SchemaAdapter());
     $dispatcher->addSubscriber(new \Civi\API\Subscriber\WrapperAdapter(array(

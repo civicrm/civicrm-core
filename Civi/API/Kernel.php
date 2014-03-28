@@ -133,7 +133,7 @@ class Kernel {
    */
   public function createRequest($entity, $action, $params, $extra) {
     $apiRequest = array(); // new \Civi\API\Request();
-    $apiRequest['version'] = civicrm_get_api_version($params);
+    $apiRequest['version'] = $this->parseVersion($params);
     $apiRequest['params'] = $params;
     $apiRequest['extra'] = $extra;
     $apiRequest['fields'] = NULL;
@@ -215,6 +215,23 @@ class Kernel {
     }
 
     return $apiRequest;
+  }
+
+  /**
+   * We must be sure that every request uses only one version of the API.
+   *
+   * @param array $params
+   * @return int
+   */
+  protected function parseVersion($params) {
+    $desired_version = empty($params['version']) ? NULL : (int) $params['version'];
+    if (isset($desired_version) && is_integer($desired_version)) {
+      return $desired_version;
+    }
+    else {
+      // we will set the default to version 3 as soon as we find that it works.
+      return 3;
+    }
   }
 
   public function boot() {
