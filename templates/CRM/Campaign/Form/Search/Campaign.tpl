@@ -43,7 +43,7 @@
 
   {literal}
     <script type="text/javascript">
-      cj(function () {
+      CRM.$(function($) {
         loadCampaignList();
       });
     </script>
@@ -141,7 +141,7 @@
 {literal}
 <script type="text/javascript">
 
-  cj(function () {
+  CRM.$(function($) {
     cj().crmAccordions();
   });
 
@@ -149,7 +149,7 @@
   {* load selector when force *}
   {if $force and !$buildSelector}
   {literal}
-  cj(function () {
+  CRM.$(function($) {
     searchCampaigns({/literal}'{$qfKey}'{literal});
   });
 

@@ -25,7 +25,7 @@
 *}
 {* Highlight the required field during import (included within a <script>)*}
 {literal}
-cj(function($) {
+CRM.$(function($) {
   var highlightedFields = ["{/literal}{'","'|implode:$highlightedFields}{literal}"];
   $.each(highlightedFields, function() {
     $('select[id^="mapper"][id$="_0"] option[value='+ this + ']').append(' *').css({"color":"#FF0000"});

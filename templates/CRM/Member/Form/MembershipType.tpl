@@ -159,7 +159,7 @@
 
 {literal}
 <script type="text/javascript">
-cj(function(){
+CRM.$(function($) {
   showHidePeriodSettings();
   cj('#duration_unit').change(function(){
     showHidePeriodSettings();
@@ -217,7 +217,7 @@ function showHidePeriodSettings() {
 
 //load the auto renew msg if recur allow.
 {/literal}{if $authorize and $allowAutoRenewMsg}{literal}
-cj( function(){
+CRM.$(function($) {
   setReminder( null );
 });
 {/literal}{/if}{literal}

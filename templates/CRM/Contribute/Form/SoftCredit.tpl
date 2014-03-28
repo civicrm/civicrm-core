@@ -66,7 +66,7 @@
 {/if}
 {literal}
 <script type="text/javascript">
-  cj(function($) {
+  CRM.$(function($) {
     var $form = $("#{/literal}{$form.formName}{literal}");
     $('#showPCP, #showSoftCredit').click(function(){
       return showHideSoftCreditAndPCP();

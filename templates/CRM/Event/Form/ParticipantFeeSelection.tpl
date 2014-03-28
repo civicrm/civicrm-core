@@ -67,7 +67,7 @@ function populatebalanceFee(updatedAmt) {
   cj('#balance-fee').text(symbol+" "+balanceAmt);
 }
 
-cj(function(){
+CRM.$(function($) {
   // assign statuses
   var partiallyPaid = {/literal}{$partiallyPaid}{literal};
   var pendingRefund = {/literal}{$pendingRefund}{literal};
@@ -193,7 +193,7 @@ cj(function(){
 {/if}
 {literal}
 <script type='text/javascript'>
-cj(function($){
+CRM.$(function($) {
   cj('.total_amount-section').remove(); 
 
   cj('#ParticipantFeeSelection').submit(function(e) {

@@ -143,7 +143,7 @@
     {include file="CRM/common/customData.tpl" includeWysiwygEditor=TRUE}
     <script type="text/javascript">
       {literal}
-      cj(function($) {
+      CRM.$(function($) {
         var
           $form = $("form#{/literal}{$form.formName}{literal}"),
           relationshipData = {/literal}{$relationshipData|@json_encode}{literal};

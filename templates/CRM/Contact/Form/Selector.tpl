@@ -146,7 +146,7 @@
 
 <script type="text/javascript">
   {literal}
-  cj(function($) {
+  CRM.$(function($) {
     cj("#toggleSelect, input[id^=mark_x_]").prop('checked', false);
     var cids = [];
     var i = 0;

@@ -303,7 +303,7 @@
   {/if}
 {literal}
   <script type="text/javascript">
-    cj(function () {
+    CRM.$(function($) {
       cj('#membershipOrgType').hide();
       cj('#changeNumTerms').hide();
       {/literal}
@@ -339,7 +339,7 @@
       cj('#defaultNumTerms').hide();
     }
 
-    cj(function () {
+    CRM.$(function($) {
       cj('#record_contribution').click(function () {
         if (cj(this).prop('checked')) {
           cj('#recordContribution').show();

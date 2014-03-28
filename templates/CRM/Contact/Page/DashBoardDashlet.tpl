@@ -92,7 +92,7 @@
 <div class="clear"></div>
 {literal}
 <script type="text/javascript">
-  cj(function($) {
+  CRM.$(function($) {
     $('#crm-dashboard-configure').click(function() {
       $.ajax({
          url: CRM.url('civicrm/dashlet', 'reset=1&snippet=1'),

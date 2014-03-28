@@ -61,7 +61,7 @@
 <script type="text/javascript">
   var {/literal}{$context}{literal}oTable;
 
-  cj(function ( ) {
+  CRM.$(function($) {
     cj().crmAccordions();
     var context = {/literal}"{$context}"{literal};
     var filterSearchOnLoad = false;

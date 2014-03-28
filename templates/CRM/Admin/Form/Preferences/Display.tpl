@@ -227,7 +227,7 @@
 {if $form.contact_edit_options.html}
   {literal}
     <script type="text/javascript">
-      cj(function () {
+      CRM.$(function($) {
         cj("#contactEditBlocks").sortable({
           placeholder: 'ui-state-highlight',
           update: getSorting

@@ -25,7 +25,7 @@
 *}
 {literal}
 <script type="text/javascript" >
-cj( function( ) {
+CRM.$(function($) {
     {/literal}
     {if $generateAjaxRequest}
         {foreach from=$ajaxRequestBlocks key="blockName" item="instances"}

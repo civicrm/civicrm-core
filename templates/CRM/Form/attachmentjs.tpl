@@ -1,6 +1,6 @@
 <script type="text/javascript">
 {literal}
-  cj(function($) {
+  CRM.$(function($) {
     $('a.delete-attachment').click(function() {
       var $el = $(this),
         $row = $el.closest('.crm-attachment-wrapper'),

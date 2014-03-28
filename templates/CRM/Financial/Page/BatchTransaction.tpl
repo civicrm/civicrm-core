@@ -76,7 +76,7 @@
 
 {literal}
 <script type="text/javascript">
-cj( function() {
+CRM.$(function($) {
   var entityID = {/literal}{$entityID}{literal};
   batchSummary(entityID);
   cj('#close_batch').click( function() {

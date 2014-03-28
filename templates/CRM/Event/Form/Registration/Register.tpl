@@ -200,7 +200,7 @@
       toggleConfirmButton();
     });
 
-    cj(function () {
+    CRM.$(function($) {
       toggleConfirmButton();
       skipPaymentMethod();
     });

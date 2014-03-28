@@ -45,7 +45,7 @@
 </div>
 {literal}
 <script type="text/javascript">
-    cj( function( ) {
+    CRM.$(function($) {
       if (cj('#crm-recently-viewed').offset().left > 150) {
         cj('#crm-recently-viewed').removeClass('left').addClass('right');
           }

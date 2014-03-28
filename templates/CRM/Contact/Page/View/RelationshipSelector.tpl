@@ -47,7 +47,7 @@
 <script type="text/javascript">
   var {/literal}{$context}{literal}oTable;
 
-  cj(function () {
+  CRM.$(function($) {
     buildContactRelationships{/literal}{$context}{literal}();
   });
 

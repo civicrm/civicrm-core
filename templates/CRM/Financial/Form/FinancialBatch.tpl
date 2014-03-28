@@ -94,7 +94,7 @@
 {include file="CRM/Form/validate.tpl"}
 {literal}
 <script type="text/javascript">
-cj(function($){
+CRM.$(function($) {
   $().crmAccordions();
 });
 </script>

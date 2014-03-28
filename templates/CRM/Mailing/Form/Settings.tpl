@@ -27,7 +27,7 @@
 <script  type="text/javascript">
 {literal}
 
-cj( function($) {
+CRM.$(function($) {
   // hide all the selects that contains only one option
   cj('.crm-message-select select').each(function (){
     if (cj(this).find('option').size() == 1) {

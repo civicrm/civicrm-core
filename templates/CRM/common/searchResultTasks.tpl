@@ -78,7 +78,7 @@
 </div>
 {literal}
 <script type="text/javascript">
-cj(function() {
+CRM.$(function($) {
   toggleTaskAction( );
   if (cj('#task option').length == 1 && !cj('#task option').val()) {
     cj('#task-section').remove();

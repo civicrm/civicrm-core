@@ -204,7 +204,7 @@
 {if $context eq 'standalone' and $outBound_option != 2 }
 <script type="text/javascript">
 {literal}
-cj( function( ) {
+CRM.$(function($) {
     cj("#contact_1").blur( function( ) {
         checkEmail( );
     } );

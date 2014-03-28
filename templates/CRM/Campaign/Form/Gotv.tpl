@@ -41,7 +41,7 @@
 
        {literal}
        <script type="text/javascript">
-       cj( function( ){
+       CRM.$(function($) {
            loadVoterList( );
        });
        </script>
@@ -84,7 +84,7 @@
  {* load selector when force *}
  {if $force and !$buildSelector}
  {literal}
- cj( function( ) {
+ CRM.$(function($) {
     searchVoters( {/literal}'{$qfKey}'{literal} );
  });
 

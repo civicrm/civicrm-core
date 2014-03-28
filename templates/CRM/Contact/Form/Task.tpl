@@ -50,7 +50,7 @@
 {if $searchtype eq 'ts_sel'}
 {literal}
 <script type="text/javascript">
-  cj(function($) {
+  CRM.$(function($) {
     $("#popupContainer").css({
       "background-color":"#E0E0E0",
       'display':'none',

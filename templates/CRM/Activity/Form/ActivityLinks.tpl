@@ -38,7 +38,7 @@
 </select>
 {literal}
 <script type="text/javascript">
-  cj(function($) {
+  CRM.$(function($) {
     $('[name=other_activity].crm-action-menu').change(function() {
       var
         $el = $(this),

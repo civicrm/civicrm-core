@@ -94,7 +94,7 @@
   {/foreach}
   <script type="text/javascript">
     {literal}
-      cj(function() {
+      CRM.$(function($) {
         cj().crmAccordions();
       });
     {/literal}
