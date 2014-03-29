@@ -165,22 +165,25 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
     $softContribution = array();
     $count = 1;
     while ($dao->fetch()) {
-      if ($all) {
-        foreach ($pcpFields as $val) {
-          $softContribution[$val] = $dao->$val;
+      if ($dao->pcp_id) {
+        if ($all) {
+          foreach ($pcpFields as $val) {
+            $softContribution[$val] = $dao->$val;
+          }
         }
       }
-
-      $softContribution['soft_credit'][$count] = array(
-        'contact_id' => $dao->contact_id,
-        'soft_credit_id' => $dao->id,
-        'currency' => $dao->currency,
-        'amount' => $dao->amount,
-        'contact_name' => $dao->display_name,
-        'soft_credit_type' => $dao->soft_credit_type_id,
-        'soft_credit_type_label' => CRM_Core_OptionGroup::getLabel('soft_credit_type', $dao->soft_credit_type_id)
-      );
-      $count++;
+      else {
+        $softContribution['soft_credit'][$count] = array(
+          'contact_id' => $dao->contact_id,
+          'soft_credit_id' => $dao->id,
+          'currency' => $dao->currency,
+          'amount' => $dao->amount,
+          'contact_name' => $dao->display_name,
+          'soft_credit_type' => $dao->soft_credit_type_id,
+          'soft_credit_type_label' => CRM_Core_OptionGroup::getLabel('soft_credit_type', $dao->soft_credit_type_id)
+        );
+        $count++;
+      }
     }
 
     /*
@@ -212,27 +215,28 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
     return $softContribution;
   }
 
-  static function getSoftCreditType($contributionID) {
+  static function getSoftCreditIds($contributionID , $isPCP = FALSE) {
     $query = "
-  SELECT id, pcp_id
+  SELECT id
   FROM  civicrm_contribution_soft
   WHERE contribution_id = %1
   ";
+
+    if ($isPCP) {
+      $query .= " AND pcp_id IS NOT NULL";
+    }
     $params = array(1 => array($contributionID, 'Integer'));
 
     $dao = CRM_Core_DAO::executeQuery($query, $params);
     $id = array();
     $type = '';
     while ($dao->fetch()) {
-      if ($dao->pcp_id) {
-        $type = 'pcp';
-      }
-      else {
-        $type = 'soft';
+      if ($isPCP) {
+        return $dao->id;
       }
       $id[] = $dao->id;
     }
-    return array($type, $id);
+    return $id;
   }
 
   /**
