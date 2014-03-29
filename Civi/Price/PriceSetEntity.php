@@ -69,6 +69,7 @@ class PriceSetEntity extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="entity_table", type="string", length=64, nullable=true)
    * 
+   * 
    */
   private $entityTable;
   
@@ -77,6 +78,7 @@ class PriceSetEntity extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="entity_id", type="integer", nullable=true, options={"unsigned":true})
+   * 
    * 
    */
   private $entityId;
@@ -87,6 +89,7 @@ class PriceSetEntity extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Price\PriceSet")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="price_set_id", referencedColumnName="id")})
+   * 
    */
   private $priceSet;
 
@@ -172,6 +175,7 @@ class PriceSetEntity extends \Civi\Core\Entity {
               'id' => array(
       
         'name' => 'id',
+        'propertyName' => 'id',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -181,6 +185,7 @@ class PriceSetEntity extends \Civi\Core\Entity {
               'entity_table' => array(
       
         'name' => 'entity_table',
+        'propertyName' => 'entityTable',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Entity Table'),
                         'required' => true,
@@ -193,6 +198,7 @@ class PriceSetEntity extends \Civi\Core\Entity {
               'entity_id' => array(
       
         'name' => 'entity_id',
+        'propertyName' => 'entityId',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -202,6 +208,7 @@ class PriceSetEntity extends \Civi\Core\Entity {
               'price_set_id' => array(
       
         'name' => 'price_set_id',
+        'propertyName' => 'priceSet',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              

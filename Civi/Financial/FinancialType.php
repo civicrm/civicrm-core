@@ -69,6 +69,7 @@ class FinancialType extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="name", type="string", length=64, nullable=true)
    * 
+   * 
    */
   private $name;
   
@@ -77,6 +78,7 @@ class FinancialType extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="description", type="string", length=255, nullable=true)
+   * 
    * 
    */
   private $description;
@@ -87,6 +89,7 @@ class FinancialType extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_deductible", type="boolean", nullable=false)
    * 
+   * 
    */
   private $isDeductible = '1';
   
@@ -96,6 +99,7 @@ class FinancialType extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_reserved", type="boolean", nullable=true)
    * 
+   * 
    */
   private $isReserved;
   
@@ -104,6 +108,7 @@ class FinancialType extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_active", type="boolean", nullable=true)
+   * 
    * 
    */
   private $isActive;
@@ -230,6 +235,7 @@ class FinancialType extends \Civi\Core\Entity {
               'id' => array(
       
         'name' => 'id',
+        'propertyName' => 'id',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -239,6 +245,7 @@ class FinancialType extends \Civi\Core\Entity {
               'financial_type' => array(
       
         'name' => 'name',
+        'propertyName' => 'name',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Financial Type'),
                         'required' => true,
@@ -256,6 +263,7 @@ class FinancialType extends \Civi\Core\Entity {
               'description' => array(
       
         'name' => 'description',
+        'propertyName' => 'description',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Description'),
                                  'maxlength' => 255,
@@ -267,6 +275,7 @@ class FinancialType extends \Civi\Core\Entity {
               'is_deductible' => array(
       
         'name' => 'is_deductible',
+        'propertyName' => 'isDeductible',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                                                      
                                            'default' => '1',
@@ -276,6 +285,7 @@ class FinancialType extends \Civi\Core\Entity {
               'is_reserved' => array(
       
         'name' => 'is_reserved',
+        'propertyName' => 'isReserved',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                                                      
                                     
@@ -284,6 +294,7 @@ class FinancialType extends \Civi\Core\Entity {
               'is_active' => array(
       
         'name' => 'is_active',
+        'propertyName' => 'isActive',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                                                      
                                     

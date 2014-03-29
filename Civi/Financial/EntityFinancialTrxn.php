@@ -69,6 +69,7 @@ class EntityFinancialTrxn extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="entity_table", type="string", length=64, nullable=true)
    * 
+   * 
    */
   private $entityTable;
   
@@ -77,6 +78,7 @@ class EntityFinancialTrxn extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="entity_id", type="integer", nullable=true, options={"unsigned":true})
+   * 
    * 
    */
   private $entityId;
@@ -87,6 +89,7 @@ class EntityFinancialTrxn extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Financial\FinancialTrxn")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="financial_trxn_id", referencedColumnName="id", onDelete="SET NULL")})
+   * 
    */
   private $financialTrxn;
   
@@ -95,6 +98,7 @@ class EntityFinancialTrxn extends \Civi\Core\Entity {
    *
    * @JMS\Type("float")
    * @ORM\Column(name="amount", type="float", nullable=true)
+   * 
    * 
    */
   private $amount;
@@ -201,6 +205,7 @@ class EntityFinancialTrxn extends \Civi\Core\Entity {
               'id' => array(
       
         'name' => 'id',
+        'propertyName' => 'id',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -210,6 +215,7 @@ class EntityFinancialTrxn extends \Civi\Core\Entity {
               'entity_table' => array(
       
         'name' => 'entity_table',
+        'propertyName' => 'entityTable',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Entity Table'),
                         'required' => true,
@@ -227,6 +233,7 @@ class EntityFinancialTrxn extends \Civi\Core\Entity {
               'entity_id' => array(
       
         'name' => 'entity_id',
+        'propertyName' => 'entityId',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -236,6 +243,7 @@ class EntityFinancialTrxn extends \Civi\Core\Entity {
               'financial_trxn_id' => array(
       
         'name' => 'financial_trxn_id',
+        'propertyName' => 'financialTrxn',
         'type' => CRM_Utils_Type::T_INT,
                                                      
                                     
@@ -245,6 +253,7 @@ class EntityFinancialTrxn extends \Civi\Core\Entity {
               'amount' => array(
       
         'name' => 'amount',
+        'propertyName' => 'amount',
         'type' => CRM_Utils_Type::T_MONEY,
                 'title' => ts('Amount'),
                         'required' => true,

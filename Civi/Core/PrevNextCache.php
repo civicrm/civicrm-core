@@ -69,6 +69,7 @@ class PrevNextCache extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="entity_table", type="string", length=64, nullable=true)
    * 
+   * 
    */
   private $entityTable;
   
@@ -77,6 +78,7 @@ class PrevNextCache extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="entity_id1", type="integer", nullable=true, options={"unsigned":true})
+   * 
    * 
    */
   private $entityId1;
@@ -87,6 +89,7 @@ class PrevNextCache extends \Civi\Core\Entity {
    * @JMS\Type("integer")
    * @ORM\Column(name="entity_id2", type="integer", nullable=true, options={"unsigned":true})
    * 
+   * 
    */
   private $entityId2;
   
@@ -95,6 +98,7 @@ class PrevNextCache extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="cacheKey", type="string", length=255, nullable=true)
+   * 
    * 
    */
   private $cacheKey;
@@ -105,6 +109,7 @@ class PrevNextCache extends \Civi\Core\Entity {
    * @JMS\Type("text")
    * @ORM\Column(name="data", type="text", nullable=true)
    * 
+   * 
    */
   private $data;
   
@@ -113,6 +118,7 @@ class PrevNextCache extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_selected", type="boolean", nullable=false)
+   * 
    * 
    */
   private $isSelected = '0';
@@ -259,6 +265,7 @@ class PrevNextCache extends \Civi\Core\Entity {
               'id' => array(
       
         'name' => 'id',
+        'propertyName' => 'id',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -268,6 +275,7 @@ class PrevNextCache extends \Civi\Core\Entity {
               'entity_table' => array(
       
         'name' => 'entity_table',
+        'propertyName' => 'entityTable',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Entity Table'),
                                  'maxlength' => 64,
@@ -279,6 +287,7 @@ class PrevNextCache extends \Civi\Core\Entity {
               'entity_id1' => array(
       
         'name' => 'entity_id1',
+        'propertyName' => 'entityId1',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Entity Id1'),
                         'required' => true,
@@ -289,6 +298,7 @@ class PrevNextCache extends \Civi\Core\Entity {
               'entity_id2' => array(
       
         'name' => 'entity_id2',
+        'propertyName' => 'entityId2',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Entity Id2'),
                         'required' => true,
@@ -299,6 +309,7 @@ class PrevNextCache extends \Civi\Core\Entity {
               'cacheKey' => array(
       
         'name' => 'cacheKey',
+        'propertyName' => 'cacheKey',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Cachekey'),
                                  'maxlength' => 255,
@@ -310,6 +321,7 @@ class PrevNextCache extends \Civi\Core\Entity {
               'data' => array(
       
         'name' => 'data',
+        'propertyName' => 'data',
         'type' => CRM_Utils_Type::T_LONGTEXT,
                 'title' => ts('Data'),
                                                      
@@ -319,6 +331,7 @@ class PrevNextCache extends \Civi\Core\Entity {
               'is_selected' => array(
       
         'name' => 'is_selected',
+        'propertyName' => 'isSelected',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                                                      
                                     

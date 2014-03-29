@@ -69,6 +69,7 @@ class Website extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Contact")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="contact_id", referencedColumnName="id", onDelete="CASCADE")})
+   * 
    */
   private $contact;
   
@@ -78,6 +79,7 @@ class Website extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="url", type="string", length=128, nullable=true)
    * 
+   * 
    */
   private $url;
   
@@ -86,6 +88,7 @@ class Website extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="website_type_id", type="integer", nullable=true, options={"unsigned":true})
+   * 
    * 
    */
   private $websiteTypeId;
@@ -172,6 +175,7 @@ class Website extends \Civi\Core\Entity {
               'id' => array(
       
         'name' => 'id',
+        'propertyName' => 'id',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Website ID'),
                         'required' => true,
@@ -182,6 +186,7 @@ class Website extends \Civi\Core\Entity {
               'contact_id' => array(
       
         'name' => 'contact_id',
+        'propertyName' => 'contact',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Contact'),
                                                      
@@ -192,6 +197,7 @@ class Website extends \Civi\Core\Entity {
               'url' => array(
       
         'name' => 'url',
+        'propertyName' => 'url',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Website'),
                                  'maxlength' => 128,
@@ -208,6 +214,7 @@ class Website extends \Civi\Core\Entity {
               'website_type_id' => array(
       
         'name' => 'website_type_id',
+        'propertyName' => 'websiteTypeId',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Website Type'),
                                                      

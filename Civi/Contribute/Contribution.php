@@ -69,6 +69,7 @@ class Contribution extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Contact")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="contact_id", referencedColumnName="id", onDelete="CASCADE")})
+   * 
    */
   private $contact;
   
@@ -78,6 +79,7 @@ class Contribution extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Financial\FinancialType")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="financial_type_id", referencedColumnName="id")})
+   * 
    */
   private $financialType;
   
@@ -87,6 +89,7 @@ class Contribution extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Contribute\ContributionPage")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="contribution_page_id", referencedColumnName="id", onDelete="SET NULL")})
+   * 
    */
   private $contributionPage;
   
@@ -95,6 +98,7 @@ class Contribution extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="payment_instrument_id", type="integer", nullable=true, options={"unsigned":true})
+   * 
    * 
    */
   private $paymentInstrumentId;
@@ -105,6 +109,7 @@ class Contribution extends \Civi\Core\Entity {
    * @JMS\Type("datetime")
    * @ORM\Column(name="receive_date", type="datetime", nullable=true)
    * 
+   * 
    */
   private $receiveDate;
   
@@ -113,6 +118,7 @@ class Contribution extends \Civi\Core\Entity {
    *
    * @JMS\Type("float")
    * @ORM\Column(name="non_deductible_amount", type="float", nullable=false)
+   * 
    * 
    */
   private $nonDeductibleAmount = '0';
@@ -123,6 +129,7 @@ class Contribution extends \Civi\Core\Entity {
    * @JMS\Type("float")
    * @ORM\Column(name="total_amount", type="float", nullable=true)
    * 
+   * 
    */
   private $totalAmount;
   
@@ -131,6 +138,7 @@ class Contribution extends \Civi\Core\Entity {
    *
    * @JMS\Type("float")
    * @ORM\Column(name="fee_amount", type="float", nullable=true)
+   * 
    * 
    */
   private $feeAmount;
@@ -141,6 +149,7 @@ class Contribution extends \Civi\Core\Entity {
    * @JMS\Type("float")
    * @ORM\Column(name="net_amount", type="float", nullable=true)
    * 
+   * 
    */
   private $netAmount;
   
@@ -149,6 +158,7 @@ class Contribution extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="trxn_id", type="string", length=255, nullable=true)
+   * 
    * 
    */
   private $trxnId;
@@ -159,6 +169,7 @@ class Contribution extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="invoice_id", type="string", length=255, nullable=true)
    * 
+   * 
    */
   private $invoiceId;
   
@@ -167,6 +178,7 @@ class Contribution extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="currency", type="string", length=3, nullable=false)
+   * 
    * 
    */
   private $currency = 'NULL';
@@ -177,6 +189,7 @@ class Contribution extends \Civi\Core\Entity {
    * @JMS\Type("datetime")
    * @ORM\Column(name="cancel_date", type="datetime", nullable=true)
    * 
+   * 
    */
   private $cancelDate;
   
@@ -184,7 +197,8 @@ class Contribution extends \Civi\Core\Entity {
    * @var text
    *
    * @JMS\Type("text")
-   * @ORM\Column(name="cancel_reason", type="text", nullable=true)
+   * @ORM\Column(name="cancel_reason", type="text", length=65535, nullable=true)
+   * 
    * 
    */
   private $cancelReason;
@@ -195,6 +209,7 @@ class Contribution extends \Civi\Core\Entity {
    * @JMS\Type("datetime")
    * @ORM\Column(name="receipt_date", type="datetime", nullable=true)
    * 
+   * 
    */
   private $receiptDate;
   
@@ -203,6 +218,7 @@ class Contribution extends \Civi\Core\Entity {
    *
    * @JMS\Type("datetime")
    * @ORM\Column(name="thankyou_date", type="datetime", nullable=true)
+   * 
    * 
    */
   private $thankyouDate;
@@ -213,6 +229,7 @@ class Contribution extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="source", type="string", length=255, nullable=true)
    * 
+   * 
    */
   private $source;
   
@@ -220,7 +237,8 @@ class Contribution extends \Civi\Core\Entity {
    * @var text
    *
    * @JMS\Type("text")
-   * @ORM\Column(name="amount_level", type="text", nullable=true)
+   * @ORM\Column(name="amount_level", type="text", length=65535, nullable=true)
+   * 
    * 
    */
   private $amountLevel;
@@ -231,6 +249,7 @@ class Contribution extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Contribute\ContributionRecur")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="contribution_recur_id", referencedColumnName="id", onDelete="SET NULL")})
+   * 
    */
   private $contributionRecur;
   
@@ -239,6 +258,7 @@ class Contribution extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_test", type="boolean", nullable=false)
+   * 
    * 
    */
   private $isTest = '0';
@@ -249,6 +269,7 @@ class Contribution extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_pay_later", type="boolean", nullable=false)
    * 
+   * 
    */
   private $isPayLater = '0';
   
@@ -257,6 +278,7 @@ class Contribution extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="contribution_status_id", type="integer", nullable=false, options={"unsigned":true})
+   * 
    * 
    */
   private $contributionStatusId = '1';
@@ -267,6 +289,7 @@ class Contribution extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\Address")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="address_id", referencedColumnName="id", onDelete="SET NULL")})
+   * 
    */
   private $address;
   
@@ -275,6 +298,7 @@ class Contribution extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="check_number", type="string", length=255, nullable=true)
+   * 
    * 
    */
   private $checkNumber;
@@ -285,6 +309,7 @@ class Contribution extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Campaign\Campaign")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="campaign_id", referencedColumnName="id", onDelete="SET NULL")})
+   * 
    */
   private $campaign;
 
@@ -810,6 +835,7 @@ class Contribution extends \Civi\Core\Entity {
               'contribution_id' => array(
       
         'name' => 'id',
+        'propertyName' => 'id',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Contribution ID'),
                         'required' => true,
@@ -825,6 +851,7 @@ class Contribution extends \Civi\Core\Entity {
               'contribution_contact_id' => array(
       
         'name' => 'contact_id',
+        'propertyName' => 'contact',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Contact ID'),
                         'required' => true,
@@ -841,6 +868,7 @@ class Contribution extends \Civi\Core\Entity {
               'financial_type_id' => array(
       
         'name' => 'financial_type_id',
+        'propertyName' => 'financialType',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Financial Type'),
                                                      
@@ -860,6 +888,7 @@ class Contribution extends \Civi\Core\Entity {
               'contribution_page_id' => array(
       
         'name' => 'contribution_page_id',
+        'propertyName' => 'contributionPage',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Contribution Page'),
                                                      
@@ -880,6 +909,7 @@ class Contribution extends \Civi\Core\Entity {
               'contribution_payment_instrument_id' => array(
       
         'name' => 'payment_instrument_id',
+        'propertyName' => 'paymentInstrumentId',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Payment Instrument'),
                                                      
@@ -892,6 +922,7 @@ class Contribution extends \Civi\Core\Entity {
               'receive_date' => array(
       
         'name' => 'receive_date',
+        'propertyName' => 'receiveDate',
         'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
                 'title' => ts('Receive Date'),
                                                      
@@ -906,6 +937,7 @@ class Contribution extends \Civi\Core\Entity {
               'non_deductible_amount' => array(
       
         'name' => 'non_deductible_amount',
+        'propertyName' => 'nonDeductibleAmount',
         'type' => CRM_Utils_Type::T_MONEY,
                 'title' => ts('Non-deductible Amount'),
                                                      
@@ -920,6 +952,7 @@ class Contribution extends \Civi\Core\Entity {
               'total_amount' => array(
       
         'name' => 'total_amount',
+        'propertyName' => 'totalAmount',
         'type' => CRM_Utils_Type::T_MONEY,
                 'title' => ts('Total Amount'),
                         'required' => true,
@@ -935,6 +968,7 @@ class Contribution extends \Civi\Core\Entity {
               'fee_amount' => array(
       
         'name' => 'fee_amount',
+        'propertyName' => 'feeAmount',
         'type' => CRM_Utils_Type::T_MONEY,
                 'title' => ts('Fee Amount'),
                                                      
@@ -949,6 +983,7 @@ class Contribution extends \Civi\Core\Entity {
               'net_amount' => array(
       
         'name' => 'net_amount',
+        'propertyName' => 'netAmount',
         'type' => CRM_Utils_Type::T_MONEY,
                 'title' => ts('Net Amount'),
                                                      
@@ -963,6 +998,7 @@ class Contribution extends \Civi\Core\Entity {
               'trxn_id' => array(
       
         'name' => 'trxn_id',
+        'propertyName' => 'trxnId',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Transaction ID'),
                                  'maxlength' => 255,
@@ -979,6 +1015,7 @@ class Contribution extends \Civi\Core\Entity {
               'invoice_id' => array(
       
         'name' => 'invoice_id',
+        'propertyName' => 'invoiceId',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Invoice ID'),
                                  'maxlength' => 255,
@@ -995,6 +1032,7 @@ class Contribution extends \Civi\Core\Entity {
               'currency' => array(
       
         'name' => 'currency',
+        'propertyName' => 'currency',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Currency'),
                                  'maxlength' => 3,
@@ -1018,6 +1056,7 @@ class Contribution extends \Civi\Core\Entity {
               'cancel_date' => array(
       
         'name' => 'cancel_date',
+        'propertyName' => 'cancelDate',
         'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
                 'title' => ts('Cancel Date'),
                                                      
@@ -1032,9 +1071,11 @@ class Contribution extends \Civi\Core\Entity {
               'cancel_reason' => array(
       
         'name' => 'cancel_reason',
+        'propertyName' => 'cancelReason',
         'type' => CRM_Utils_Type::T_TEXT,
                 'title' => ts('Cancel Reason'),
-                                                     
+                                 'maxlength' => 65535,
+                                    
                 'import' => true,
         'where' => 'civicrm_contribution.cancel_reason',
         'headerPattern' => '/(cancel.?)?reason/i',
@@ -1046,6 +1087,7 @@ class Contribution extends \Civi\Core\Entity {
               'receipt_date' => array(
       
         'name' => 'receipt_date',
+        'propertyName' => 'receiptDate',
         'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
                 'title' => ts('Receipt Date'),
                                                      
@@ -1060,6 +1102,7 @@ class Contribution extends \Civi\Core\Entity {
               'thankyou_date' => array(
       
         'name' => 'thankyou_date',
+        'propertyName' => 'thankyouDate',
         'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
                 'title' => ts('Thank-you Date'),
                                                      
@@ -1074,6 +1117,7 @@ class Contribution extends \Civi\Core\Entity {
               'contribution_source' => array(
       
         'name' => 'source',
+        'propertyName' => 'source',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Contribution Source'),
                                  'maxlength' => 255,
@@ -1090,9 +1134,11 @@ class Contribution extends \Civi\Core\Entity {
               'amount_level' => array(
       
         'name' => 'amount_level',
+        'propertyName' => 'amountLevel',
         'type' => CRM_Utils_Type::T_TEXT,
                 'title' => ts('Amount Label'),
-                                                     
+                                 'maxlength' => 65535,
+                                    
                 'import' => true,
         'where' => 'civicrm_contribution.amount_level',
         'headerPattern' => '',
@@ -1104,6 +1150,7 @@ class Contribution extends \Civi\Core\Entity {
               'contribution_recur_id' => array(
       
         'name' => 'contribution_recur_id',
+        'propertyName' => 'contributionRecur',
         'type' => CRM_Utils_Type::T_INT,
                                                      
                                     
@@ -1113,6 +1160,7 @@ class Contribution extends \Civi\Core\Entity {
               'is_test' => array(
       
         'name' => 'is_test',
+        'propertyName' => 'isTest',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('Test'),
                                                      
@@ -1127,6 +1175,7 @@ class Contribution extends \Civi\Core\Entity {
               'is_pay_later' => array(
       
         'name' => 'is_pay_later',
+        'propertyName' => 'isPayLater',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('Is Pay Later'),
                                                      
@@ -1141,6 +1190,7 @@ class Contribution extends \Civi\Core\Entity {
               'contribution_status_id' => array(
       
         'name' => 'contribution_status_id',
+        'propertyName' => 'contributionStatusId',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Contribution Status'),
                                                      
@@ -1159,6 +1209,7 @@ class Contribution extends \Civi\Core\Entity {
               'address_id' => array(
       
         'name' => 'address_id',
+        'propertyName' => 'address',
         'type' => CRM_Utils_Type::T_INT,
                                                      
                                     
@@ -1168,6 +1219,7 @@ class Contribution extends \Civi\Core\Entity {
               'check_number' => array(
       
         'name' => 'check_number',
+        'propertyName' => 'checkNumber',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Check Number'),
                                  'maxlength' => 255,
@@ -1184,6 +1236,7 @@ class Contribution extends \Civi\Core\Entity {
               'contribution_campaign_id' => array(
       
         'name' => 'campaign_id',
+        'propertyName' => 'campaign',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Campaign'),
                                                      

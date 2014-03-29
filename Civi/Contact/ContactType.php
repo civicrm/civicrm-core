@@ -69,6 +69,7 @@ class ContactType extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="name", type="string", length=64, nullable=true)
    * 
+   * 
    */
   private $name;
   
@@ -78,6 +79,7 @@ class ContactType extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="label", type="string", length=64, nullable=true)
    * 
+   * 
    */
   private $label;
   
@@ -85,7 +87,8 @@ class ContactType extends \Civi\Core\Entity {
    * @var text
    *
    * @JMS\Type("text")
-   * @ORM\Column(name="description", type="text", nullable=true)
+   * @ORM\Column(name="description", type="text", length=65535, nullable=true)
+   * 
    * 
    */
   private $description;
@@ -96,6 +99,7 @@ class ContactType extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="image_URL", type="string", length=255, nullable=true)
    * 
+   * 
    */
   private $imageURL;
   
@@ -105,6 +109,7 @@ class ContactType extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\ContactType")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="parent_id", referencedColumnName="id")})
+   * 
    */
   private $parent;
   
@@ -114,6 +119,7 @@ class ContactType extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_active", type="boolean", nullable=true)
    * 
+   * 
    */
   private $isActive;
   
@@ -122,6 +128,7 @@ class ContactType extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_reserved", type="boolean", nullable=true)
+   * 
    * 
    */
   private $isReserved;
@@ -288,6 +295,7 @@ class ContactType extends \Civi\Core\Entity {
               'id' => array(
       
         'name' => 'id',
+        'propertyName' => 'id',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -297,6 +305,7 @@ class ContactType extends \Civi\Core\Entity {
               'name' => array(
       
         'name' => 'name',
+        'propertyName' => 'name',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Name'),
                                  'maxlength' => 64,
@@ -308,6 +317,7 @@ class ContactType extends \Civi\Core\Entity {
               'label' => array(
       
         'name' => 'label',
+        'propertyName' => 'label',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Label'),
                                  'maxlength' => 64,
@@ -319,9 +329,11 @@ class ContactType extends \Civi\Core\Entity {
               'description' => array(
       
         'name' => 'description',
+        'propertyName' => 'description',
         'type' => CRM_Utils_Type::T_TEXT,
                 'title' => ts('Description'),
-                                                   'rows' => 2,
+                                 'maxlength' => 65535,
+                                  'rows' => 2,
                          'cols' => 60,
          
                                     
@@ -330,6 +342,7 @@ class ContactType extends \Civi\Core\Entity {
               'image_URL' => array(
       
         'name' => 'image_URL',
+        'propertyName' => 'imageURL',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Image Url'),
                                  'maxlength' => 255,
@@ -341,6 +354,7 @@ class ContactType extends \Civi\Core\Entity {
               'parent_id' => array(
       
         'name' => 'parent_id',
+        'propertyName' => 'parent',
         'type' => CRM_Utils_Type::T_INT,
                                                      
                                     
@@ -350,6 +364,7 @@ class ContactType extends \Civi\Core\Entity {
               'is_active' => array(
       
         'name' => 'is_active',
+        'propertyName' => 'isActive',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                                                      
                                     
@@ -358,6 +373,7 @@ class ContactType extends \Civi\Core\Entity {
               'is_reserved' => array(
       
         'name' => 'is_reserved',
+        'propertyName' => 'isReserved',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                                                      
                                     

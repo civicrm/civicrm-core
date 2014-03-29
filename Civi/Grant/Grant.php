@@ -69,6 +69,7 @@ class Grant extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Contact")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="contact_id", referencedColumnName="id", onDelete="CASCADE")})
+   * 
    */
   private $contact;
   
@@ -77,6 +78,7 @@ class Grant extends \Civi\Core\Entity {
    *
    * @JMS\Type("date")
    * @ORM\Column(name="application_received_date", type="date", nullable=true)
+   * 
    * 
    */
   private $applicationReceivedDate;
@@ -87,6 +89,7 @@ class Grant extends \Civi\Core\Entity {
    * @JMS\Type("date")
    * @ORM\Column(name="decision_date", type="date", nullable=true)
    * 
+   * 
    */
   private $decisionDate;
   
@@ -95,6 +98,7 @@ class Grant extends \Civi\Core\Entity {
    *
    * @JMS\Type("date")
    * @ORM\Column(name="money_transfer_date", type="date", nullable=true)
+   * 
    * 
    */
   private $moneyTransferDate;
@@ -105,6 +109,7 @@ class Grant extends \Civi\Core\Entity {
    * @JMS\Type("date")
    * @ORM\Column(name="grant_due_date", type="date", nullable=true)
    * 
+   * 
    */
   private $grantDueDate;
   
@@ -113,6 +118,7 @@ class Grant extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="grant_report_received", type="boolean", nullable=true)
+   * 
    * 
    */
   private $grantReportReceived;
@@ -123,6 +129,7 @@ class Grant extends \Civi\Core\Entity {
    * @JMS\Type("integer")
    * @ORM\Column(name="grant_type_id", type="integer", nullable=true, options={"unsigned":true})
    * 
+   * 
    */
   private $grantTypeId;
   
@@ -131,6 +138,7 @@ class Grant extends \Civi\Core\Entity {
    *
    * @JMS\Type("float")
    * @ORM\Column(name="amount_total", type="float", nullable=true)
+   * 
    * 
    */
   private $amountTotal;
@@ -141,6 +149,7 @@ class Grant extends \Civi\Core\Entity {
    * @JMS\Type("float")
    * @ORM\Column(name="amount_requested", type="float", nullable=true)
    * 
+   * 
    */
   private $amountRequested;
   
@@ -149,6 +158,7 @@ class Grant extends \Civi\Core\Entity {
    *
    * @JMS\Type("float")
    * @ORM\Column(name="amount_granted", type="float", nullable=true)
+   * 
    * 
    */
   private $amountGranted;
@@ -159,6 +169,7 @@ class Grant extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="currency", type="string", length=3, nullable=true)
    * 
+   * 
    */
   private $currency;
   
@@ -166,7 +177,8 @@ class Grant extends \Civi\Core\Entity {
    * @var text
    *
    * @JMS\Type("text")
-   * @ORM\Column(name="rationale", type="text", nullable=true)
+   * @ORM\Column(name="rationale", type="text", length=65535, nullable=true)
+   * 
    * 
    */
   private $rationale;
@@ -177,6 +189,7 @@ class Grant extends \Civi\Core\Entity {
    * @JMS\Type("integer")
    * @ORM\Column(name="status_id", type="integer", nullable=true, options={"unsigned":true})
    * 
+   * 
    */
   private $statusId;
   
@@ -186,6 +199,7 @@ class Grant extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Financial\FinancialType")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="financial_type_id", referencedColumnName="id", onDelete="SET NULL")})
+   * 
    */
   private $financialType = 'NULL';
 
@@ -491,6 +505,7 @@ class Grant extends \Civi\Core\Entity {
               'grant_id' => array(
       
         'name' => 'id',
+        'propertyName' => 'id',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Grant ID'),
                         'required' => true,
@@ -506,6 +521,7 @@ class Grant extends \Civi\Core\Entity {
               'grant_contact_id' => array(
       
         'name' => 'contact_id',
+        'propertyName' => 'contact',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Contact ID'),
                         'required' => true,
@@ -521,6 +537,7 @@ class Grant extends \Civi\Core\Entity {
               'application_received_date' => array(
       
         'name' => 'application_received_date',
+        'propertyName' => 'applicationReceivedDate',
         'type' => CRM_Utils_Type::T_DATE,
                 'title' => ts('Application received date'),
                                                      
@@ -534,6 +551,7 @@ class Grant extends \Civi\Core\Entity {
               'decision_date' => array(
       
         'name' => 'decision_date',
+        'propertyName' => 'decisionDate',
         'type' => CRM_Utils_Type::T_DATE,
                 'title' => ts('Decision date'),
                                                      
@@ -548,6 +566,7 @@ class Grant extends \Civi\Core\Entity {
               'money_transfer_date' => array(
       
         'name' => 'money_transfer_date',
+        'propertyName' => 'moneyTransferDate',
         'type' => CRM_Utils_Type::T_DATE,
                 'title' => ts('Grant Money transfer date'),
                                                      
@@ -562,6 +581,7 @@ class Grant extends \Civi\Core\Entity {
               'grant_due_date' => array(
       
         'name' => 'grant_due_date',
+        'propertyName' => 'grantDueDate',
         'type' => CRM_Utils_Type::T_DATE,
                 'title' => ts('Grant Due Date'),
                                                      
@@ -571,6 +591,7 @@ class Grant extends \Civi\Core\Entity {
               'grant_report_received' => array(
       
         'name' => 'grant_report_received',
+        'propertyName' => 'grantReportReceived',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('Grant report received'),
                                                      
@@ -585,6 +606,7 @@ class Grant extends \Civi\Core\Entity {
               'grant_type_id' => array(
       
         'name' => 'grant_type_id',
+        'propertyName' => 'grantTypeId',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Grant Type'),
                         'required' => true,
@@ -602,6 +624,7 @@ class Grant extends \Civi\Core\Entity {
               'amount_total' => array(
       
         'name' => 'amount_total',
+        'propertyName' => 'amountTotal',
         'type' => CRM_Utils_Type::T_MONEY,
                 'title' => ts('Total Amount'),
                         'required' => true,
@@ -617,6 +640,7 @@ class Grant extends \Civi\Core\Entity {
               'amount_requested' => array(
       
         'name' => 'amount_requested',
+        'propertyName' => 'amountRequested',
         'type' => CRM_Utils_Type::T_MONEY,
                 'title' => ts('Amount Requested'),
                                                      
@@ -626,6 +650,7 @@ class Grant extends \Civi\Core\Entity {
               'amount_granted' => array(
       
         'name' => 'amount_granted',
+        'propertyName' => 'amountGranted',
         'type' => CRM_Utils_Type::T_MONEY,
                 'title' => ts('Amount granted'),
                                                      
@@ -640,6 +665,7 @@ class Grant extends \Civi\Core\Entity {
               'currency' => array(
       
         'name' => 'currency',
+        'propertyName' => 'currency',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Grant Currency'),
                         'required' => true,
@@ -658,9 +684,11 @@ class Grant extends \Civi\Core\Entity {
               'rationale' => array(
       
         'name' => 'rationale',
+        'propertyName' => 'rationale',
         'type' => CRM_Utils_Type::T_TEXT,
                 'title' => ts('Grant Rationale'),
-                                                   'rows' => 4,
+                                 'maxlength' => 65535,
+                                  'rows' => 4,
                          'cols' => 60,
          
                 'import' => true,
@@ -674,6 +702,7 @@ class Grant extends \Civi\Core\Entity {
               'grant_status_id' => array(
       
         'name' => 'status_id',
+        'propertyName' => 'statusId',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Grant Status'),
                         'required' => true,
@@ -692,6 +721,7 @@ class Grant extends \Civi\Core\Entity {
               'financial_type_id' => array(
       
         'name' => 'financial_type_id',
+        'propertyName' => 'financialType',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Financial Type'),
                                                      

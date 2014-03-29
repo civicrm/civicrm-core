@@ -69,6 +69,7 @@ class PremiumsProduct extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Contribute\Premium")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="premiums_id", referencedColumnName="id")})
+   * 
    */
   private $premiums;
   
@@ -78,6 +79,7 @@ class PremiumsProduct extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Contribute\Product")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="product_id", referencedColumnName="id")})
+   * 
    */
   private $product;
   
@@ -86,6 +88,7 @@ class PremiumsProduct extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="weight", type="integer", nullable=true, options={"unsigned":true})
+   * 
    * 
    */
   private $weight;
@@ -96,6 +99,7 @@ class PremiumsProduct extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Financial\FinancialType")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="financial_type_id", referencedColumnName="id", onDelete="SET NULL")})
+   * 
    */
   private $financialType = 'NULL';
 
@@ -201,6 +205,7 @@ class PremiumsProduct extends \Civi\Core\Entity {
               'id' => array(
       
         'name' => 'id',
+        'propertyName' => 'id',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -210,6 +215,7 @@ class PremiumsProduct extends \Civi\Core\Entity {
               'premiums_id' => array(
       
         'name' => 'premiums_id',
+        'propertyName' => 'premiums',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -220,6 +226,7 @@ class PremiumsProduct extends \Civi\Core\Entity {
               'product_id' => array(
       
         'name' => 'product_id',
+        'propertyName' => 'product',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -230,6 +237,7 @@ class PremiumsProduct extends \Civi\Core\Entity {
               'weight' => array(
       
         'name' => 'weight',
+        'propertyName' => 'weight',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Weight'),
                         'required' => true,
@@ -240,6 +248,7 @@ class PremiumsProduct extends \Civi\Core\Entity {
               'financial_type_id' => array(
       
         'name' => 'financial_type_id',
+        'propertyName' => 'financialType',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Financial Type'),
                                                      

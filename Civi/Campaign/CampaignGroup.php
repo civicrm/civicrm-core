@@ -69,6 +69,7 @@ class CampaignGroup extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Campaign\Campaign")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="campaign_id", referencedColumnName="id", onDelete="CASCADE")})
+   * 
    */
   private $campaign;
   
@@ -77,6 +78,7 @@ class CampaignGroup extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="group_type", type="string", length=8, nullable=false)
+   * 
    * 
    */
   private $groupType = 'NULL';
@@ -87,6 +89,7 @@ class CampaignGroup extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="entity_table", type="string", length=64, nullable=false)
    * 
+   * 
    */
   private $entityTable = 'NULL';
   
@@ -95,6 +98,7 @@ class CampaignGroup extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="entity_id", type="integer", nullable=false, options={"unsigned":true})
+   * 
    * 
    */
   private $entityId = 'NULL';
@@ -201,6 +205,7 @@ class CampaignGroup extends \Civi\Core\Entity {
               'id' => array(
       
         'name' => 'id',
+        'propertyName' => 'id',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -210,6 +215,7 @@ class CampaignGroup extends \Civi\Core\Entity {
               'campaign_id' => array(
       
         'name' => 'campaign_id',
+        'propertyName' => 'campaign',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -225,6 +231,7 @@ class CampaignGroup extends \Civi\Core\Entity {
               'group_type' => array(
       
         'name' => 'group_type',
+        'propertyName' => 'groupType',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Group Type'),
                                  'maxlength' => 8,
@@ -240,6 +247,7 @@ class CampaignGroup extends \Civi\Core\Entity {
               'entity_table' => array(
       
         'name' => 'entity_table',
+        'propertyName' => 'entityTable',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Entity Table'),
                                  'maxlength' => 64,
@@ -252,6 +260,7 @@ class CampaignGroup extends \Civi\Core\Entity {
               'entity_id' => array(
       
         'name' => 'entity_id',
+        'propertyName' => 'entityId',
         'type' => CRM_Utils_Type::T_INT,
                                                      
                                            'default' => 'NULL',

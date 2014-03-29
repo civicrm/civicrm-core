@@ -69,6 +69,7 @@ class PCP extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Contact")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="contact_id", referencedColumnName="id", onDelete="CASCADE")})
+   * 
    */
   private $contact;
   
@@ -77,6 +78,7 @@ class PCP extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="status_id", type="integer", nullable=true, options={"unsigned":true})
+   * 
    * 
    */
   private $statusId;
@@ -87,6 +89,7 @@ class PCP extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="title", type="string", length=255, nullable=false)
    * 
+   * 
    */
   private $title = 'NULL';
   
@@ -94,7 +97,8 @@ class PCP extends \Civi\Core\Entity {
    * @var text
    *
    * @JMS\Type("text")
-   * @ORM\Column(name="intro_text", type="text", nullable=false)
+   * @ORM\Column(name="intro_text", type="text", length=65535, nullable=false)
+   * 
    * 
    */
   private $introText = 'NULL';
@@ -103,7 +107,8 @@ class PCP extends \Civi\Core\Entity {
    * @var text
    *
    * @JMS\Type("text")
-   * @ORM\Column(name="page_text", type="text", nullable=false)
+   * @ORM\Column(name="page_text", type="text", length=65535, nullable=false)
+   * 
    * 
    */
   private $pageText = 'NULL';
@@ -114,6 +119,7 @@ class PCP extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="donate_link_text", type="string", length=255, nullable=false)
    * 
+   * 
    */
   private $donateLinkText = 'NULL';
   
@@ -122,6 +128,7 @@ class PCP extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="page_id", type="integer", nullable=true, options={"unsigned":true})
+   * 
    * 
    */
   private $pageId;
@@ -132,6 +139,7 @@ class PCP extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="page_type", type="string", length=64, nullable=false)
    * 
+   * 
    */
   private $pageType = 'contribute';
   
@@ -140,6 +148,7 @@ class PCP extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="pcp_block_id", type="integer", nullable=true, options={"unsigned":true})
+   * 
    * 
    */
   private $pcpBlockId;
@@ -150,6 +159,7 @@ class PCP extends \Civi\Core\Entity {
    * @JMS\Type("integer")
    * @ORM\Column(name="is_thermometer", type="integer", nullable=false, options={"unsigned":true})
    * 
+   * 
    */
   private $isThermometer = '0';
   
@@ -158,6 +168,7 @@ class PCP extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="is_honor_roll", type="integer", nullable=false, options={"unsigned":true})
+   * 
    * 
    */
   private $isHonorRoll = '0';
@@ -168,6 +179,7 @@ class PCP extends \Civi\Core\Entity {
    * @JMS\Type("float")
    * @ORM\Column(name="goal_amount", type="float", nullable=true)
    * 
+   * 
    */
   private $goalAmount;
   
@@ -177,6 +189,7 @@ class PCP extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="currency", type="string", length=3, nullable=false)
    * 
+   * 
    */
   private $currency = 'NULL';
   
@@ -185,6 +198,7 @@ class PCP extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_active", type="boolean", nullable=false)
+   * 
    * 
    */
   private $isActive = '0';
@@ -491,6 +505,7 @@ class PCP extends \Civi\Core\Entity {
               'pcp_id' => array(
       
         'name' => 'id',
+        'propertyName' => 'id',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Personal Campaign Page ID'),
                         'required' => true,
@@ -501,6 +516,7 @@ class PCP extends \Civi\Core\Entity {
               'pcp_contact_id' => array(
       
         'name' => 'contact_id',
+        'propertyName' => 'contact',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Contact ID'),
                         'required' => true,
@@ -512,6 +528,7 @@ class PCP extends \Civi\Core\Entity {
               'status_id' => array(
       
         'name' => 'status_id',
+        'propertyName' => 'statusId',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Personal Campaign Page Status'),
                         'required' => true,
@@ -525,6 +542,7 @@ class PCP extends \Civi\Core\Entity {
               'title' => array(
       
         'name' => 'title',
+        'propertyName' => 'title',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Personal Campaign Page Title'),
                                  'maxlength' => 255,
@@ -537,9 +555,11 @@ class PCP extends \Civi\Core\Entity {
               'intro_text' => array(
       
         'name' => 'intro_text',
+        'propertyName' => 'introText',
         'type' => CRM_Utils_Type::T_TEXT,
                 'title' => ts('Intro Text'),
-                                                     
+                                 'maxlength' => 65535,
+                                    
                                            'default' => 'NULL',
          
                           ),
@@ -547,9 +567,11 @@ class PCP extends \Civi\Core\Entity {
               'page_text' => array(
       
         'name' => 'page_text',
+        'propertyName' => 'pageText',
         'type' => CRM_Utils_Type::T_TEXT,
                 'title' => ts('Page Text'),
-                                                     
+                                 'maxlength' => 65535,
+                                    
                                            'default' => 'NULL',
          
                           ),
@@ -557,6 +579,7 @@ class PCP extends \Civi\Core\Entity {
               'donate_link_text' => array(
       
         'name' => 'donate_link_text',
+        'propertyName' => 'donateLinkText',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Donate Link Text'),
                                  'maxlength' => 255,
@@ -569,6 +592,7 @@ class PCP extends \Civi\Core\Entity {
               'page_id' => array(
       
         'name' => 'page_id',
+        'propertyName' => 'pageId',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -578,6 +602,7 @@ class PCP extends \Civi\Core\Entity {
               'page_type' => array(
       
         'name' => 'page_type',
+        'propertyName' => 'pageType',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('PCP Page Type'),
                                  'maxlength' => 64,
@@ -590,6 +615,7 @@ class PCP extends \Civi\Core\Entity {
               'pcp_block_id' => array(
       
         'name' => 'pcp_block_id',
+        'propertyName' => 'pcpBlockId',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -599,6 +625,7 @@ class PCP extends \Civi\Core\Entity {
               'is_thermometer' => array(
       
         'name' => 'is_thermometer',
+        'propertyName' => 'isThermometer',
         'type' => CRM_Utils_Type::T_INT,
                                                      
                                     
@@ -607,6 +634,7 @@ class PCP extends \Civi\Core\Entity {
               'is_honor_roll' => array(
       
         'name' => 'is_honor_roll',
+        'propertyName' => 'isHonorRoll',
         'type' => CRM_Utils_Type::T_INT,
                                                      
                                     
@@ -615,6 +643,7 @@ class PCP extends \Civi\Core\Entity {
               'goal_amount' => array(
       
         'name' => 'goal_amount',
+        'propertyName' => 'goalAmount',
         'type' => CRM_Utils_Type::T_MONEY,
                 'title' => ts('Goal Amount'),
                                                      
@@ -624,6 +653,7 @@ class PCP extends \Civi\Core\Entity {
               'currency' => array(
       
         'name' => 'currency',
+        'propertyName' => 'currency',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Currency'),
                                  'maxlength' => 3,
@@ -642,6 +672,7 @@ class PCP extends \Civi\Core\Entity {
               'is_active' => array(
       
         'name' => 'is_active',
+        'propertyName' => 'isActive',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                                                      
                                     

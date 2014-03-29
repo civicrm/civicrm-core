@@ -69,6 +69,7 @@ class Extension extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="type", type="string", length=8, nullable=true)
    * 
+   * 
    */
   private $type;
   
@@ -77,6 +78,7 @@ class Extension extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="full_name", type="string", length=255, nullable=true)
+   * 
    * 
    */
   private $fullName;
@@ -87,6 +89,7 @@ class Extension extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="name", type="string", length=255, nullable=true)
    * 
+   * 
    */
   private $name;
   
@@ -95,6 +98,7 @@ class Extension extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="label", type="string", length=255, nullable=true)
+   * 
    * 
    */
   private $label;
@@ -105,6 +109,7 @@ class Extension extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="file", type="string", length=255, nullable=true)
    * 
+   * 
    */
   private $file;
   
@@ -114,6 +119,7 @@ class Extension extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="schema_version", type="string", length=63, nullable=true)
    * 
+   * 
    */
   private $schemaVersion;
   
@@ -122,6 +128,7 @@ class Extension extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_active", type="boolean", nullable=false)
+   * 
    * 
    */
   private $isActive = '1';
@@ -288,6 +295,7 @@ class Extension extends \Civi\Core\Entity {
               'id' => array(
       
         'name' => 'id',
+        'propertyName' => 'id',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -297,6 +305,7 @@ class Extension extends \Civi\Core\Entity {
               'type' => array(
       
         'name' => 'type',
+        'propertyName' => 'type',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Type'),
                         'required' => true,
@@ -312,6 +321,7 @@ class Extension extends \Civi\Core\Entity {
               'full_name' => array(
       
         'name' => 'full_name',
+        'propertyName' => 'fullName',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Key'),
                         'required' => true,
@@ -324,6 +334,7 @@ class Extension extends \Civi\Core\Entity {
               'name' => array(
       
         'name' => 'name',
+        'propertyName' => 'name',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Name'),
                                  'maxlength' => 255,
@@ -340,6 +351,7 @@ class Extension extends \Civi\Core\Entity {
               'label' => array(
       
         'name' => 'label',
+        'propertyName' => 'label',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Label'),
                                  'maxlength' => 255,
@@ -356,6 +368,7 @@ class Extension extends \Civi\Core\Entity {
               'file' => array(
       
         'name' => 'file',
+        'propertyName' => 'file',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('File'),
                                  'maxlength' => 255,
@@ -372,6 +385,7 @@ class Extension extends \Civi\Core\Entity {
               'schema_version' => array(
       
         'name' => 'schema_version',
+        'propertyName' => 'schemaVersion',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Schema Version'),
                                  'maxlength' => 63,
@@ -388,6 +402,7 @@ class Extension extends \Civi\Core\Entity {
               'is_active' => array(
       
         'name' => 'is_active',
+        'propertyName' => 'isActive',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                                                      
                                            'default' => '1',

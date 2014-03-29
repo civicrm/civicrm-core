@@ -69,6 +69,7 @@ class Menu extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\Domain")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="domain_id", referencedColumnName="id")})
+   * 
    */
   private $domain;
   
@@ -78,6 +79,7 @@ class Menu extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="path", type="string", length=255, nullable=true)
    * 
+   * 
    */
   private $path;
   
@@ -85,7 +87,8 @@ class Menu extends \Civi\Core\Entity {
    * @var text
    *
    * @JMS\Type("text")
-   * @ORM\Column(name="path_arguments", type="text", nullable=true)
+   * @ORM\Column(name="path_arguments", type="text", length=65535, nullable=true)
+   * 
    * 
    */
   private $pathArguments;
@@ -96,6 +99,7 @@ class Menu extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="title", type="string", length=255, nullable=true)
    * 
+   * 
    */
   private $title;
   
@@ -105,6 +109,7 @@ class Menu extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="access_callback", type="string", length=255, nullable=true)
    * 
+   * 
    */
   private $accessCallback;
   
@@ -112,7 +117,8 @@ class Menu extends \Civi\Core\Entity {
    * @var text
    *
    * @JMS\Type("text")
-   * @ORM\Column(name="access_arguments", type="text", nullable=true)
+   * @ORM\Column(name="access_arguments", type="text", length=65535, nullable=true)
+   * 
    * 
    */
   private $accessArguments;
@@ -123,6 +129,7 @@ class Menu extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="page_callback", type="string", length=255, nullable=true)
    * 
+   * 
    */
   private $pageCallback;
   
@@ -130,7 +137,8 @@ class Menu extends \Civi\Core\Entity {
    * @var text
    *
    * @JMS\Type("text")
-   * @ORM\Column(name="page_arguments", type="text", nullable=true)
+   * @ORM\Column(name="page_arguments", type="text", length=65535, nullable=true)
+   * 
    * 
    */
   private $pageArguments;
@@ -139,7 +147,8 @@ class Menu extends \Civi\Core\Entity {
    * @var text
    *
    * @JMS\Type("text")
-   * @ORM\Column(name="breadcrumb", type="text", nullable=true)
+   * @ORM\Column(name="breadcrumb", type="text", length=65535, nullable=true)
+   * 
    * 
    */
   private $breadcrumb;
@@ -150,6 +159,7 @@ class Menu extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="return_url", type="string", length=255, nullable=true)
    * 
+   * 
    */
   private $returnUrl;
   
@@ -158,6 +168,7 @@ class Menu extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="return_url_args", type="string", length=255, nullable=true)
+   * 
    * 
    */
   private $returnUrlArgs;
@@ -168,6 +179,7 @@ class Menu extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\Component")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="component_id", referencedColumnName="id")})
+   * 
    */
   private $component;
   
@@ -176,6 +188,7 @@ class Menu extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_active", type="boolean", nullable=true)
+   * 
    * 
    */
   private $isActive;
@@ -186,6 +199,7 @@ class Menu extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_public", type="boolean", nullable=true)
    * 
+   * 
    */
   private $isPublic;
   
@@ -194,6 +208,7 @@ class Menu extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_exposed", type="boolean", nullable=true)
+   * 
    * 
    */
   private $isExposed;
@@ -204,6 +219,7 @@ class Menu extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_ssl", type="boolean", nullable=true)
    * 
+   * 
    */
   private $isSsl;
   
@@ -212,6 +228,7 @@ class Menu extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="weight", type="integer", nullable=false, options={"unsigned":true})
+   * 
    * 
    */
   private $weight = '1';
@@ -222,6 +239,7 @@ class Menu extends \Civi\Core\Entity {
    * @JMS\Type("integer")
    * @ORM\Column(name="type", type="integer", nullable=false, options={"unsigned":true})
    * 
+   * 
    */
   private $type = '1';
   
@@ -231,6 +249,7 @@ class Menu extends \Civi\Core\Entity {
    * @JMS\Type("integer")
    * @ORM\Column(name="page_type", type="integer", nullable=false, options={"unsigned":true})
    * 
+   * 
    */
   private $pageType = '1';
   
@@ -239,6 +258,7 @@ class Menu extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="skipBreadcrumb", type="boolean", nullable=true)
+   * 
    * 
    */
   private $skipBreadcrumb;
@@ -665,6 +685,7 @@ class Menu extends \Civi\Core\Entity {
               'id' => array(
       
         'name' => 'id',
+        'propertyName' => 'id',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -674,6 +695,7 @@ class Menu extends \Civi\Core\Entity {
               'domain_id' => array(
       
         'name' => 'domain_id',
+        'propertyName' => 'domain',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -684,6 +706,7 @@ class Menu extends \Civi\Core\Entity {
               'path' => array(
       
         'name' => 'path',
+        'propertyName' => 'path',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Path'),
                                  'maxlength' => 255,
@@ -695,15 +718,18 @@ class Menu extends \Civi\Core\Entity {
               'path_arguments' => array(
       
         'name' => 'path_arguments',
+        'propertyName' => 'pathArguments',
         'type' => CRM_Utils_Type::T_TEXT,
                 'title' => ts('Path Arguments'),
-                                                     
+                                 'maxlength' => 65535,
+                                    
                                     
                           ),
       
               'title' => array(
       
         'name' => 'title',
+        'propertyName' => 'title',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Title'),
                                  'maxlength' => 255,
@@ -715,6 +741,7 @@ class Menu extends \Civi\Core\Entity {
               'access_callback' => array(
       
         'name' => 'access_callback',
+        'propertyName' => 'accessCallback',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Access Callback'),
                                  'maxlength' => 255,
@@ -726,15 +753,18 @@ class Menu extends \Civi\Core\Entity {
               'access_arguments' => array(
       
         'name' => 'access_arguments',
+        'propertyName' => 'accessArguments',
         'type' => CRM_Utils_Type::T_TEXT,
                 'title' => ts('Access Arguments'),
-                                                     
+                                 'maxlength' => 65535,
+                                    
                                     
                           ),
       
               'page_callback' => array(
       
         'name' => 'page_callback',
+        'propertyName' => 'pageCallback',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Page Callback'),
                                  'maxlength' => 255,
@@ -746,24 +776,29 @@ class Menu extends \Civi\Core\Entity {
               'page_arguments' => array(
       
         'name' => 'page_arguments',
+        'propertyName' => 'pageArguments',
         'type' => CRM_Utils_Type::T_TEXT,
                 'title' => ts('Page Arguments'),
-                                                     
+                                 'maxlength' => 65535,
+                                    
                                     
                           ),
       
               'breadcrumb' => array(
       
         'name' => 'breadcrumb',
+        'propertyName' => 'breadcrumb',
         'type' => CRM_Utils_Type::T_TEXT,
                 'title' => ts('Breadcrumb'),
-                                                     
+                                 'maxlength' => 65535,
+                                    
                                     
                           ),
       
               'return_url' => array(
       
         'name' => 'return_url',
+        'propertyName' => 'returnUrl',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Return Url'),
                                  'maxlength' => 255,
@@ -775,6 +810,7 @@ class Menu extends \Civi\Core\Entity {
               'return_url_args' => array(
       
         'name' => 'return_url_args',
+        'propertyName' => 'returnUrlArgs',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Return Url Args'),
                                  'maxlength' => 255,
@@ -786,6 +822,7 @@ class Menu extends \Civi\Core\Entity {
               'component_id' => array(
       
         'name' => 'component_id',
+        'propertyName' => 'component',
         'type' => CRM_Utils_Type::T_INT,
                                                      
                                     
@@ -800,6 +837,7 @@ class Menu extends \Civi\Core\Entity {
               'is_active' => array(
       
         'name' => 'is_active',
+        'propertyName' => 'isActive',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                                                      
                                     
@@ -808,6 +846,7 @@ class Menu extends \Civi\Core\Entity {
               'is_public' => array(
       
         'name' => 'is_public',
+        'propertyName' => 'isPublic',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                                                      
                                     
@@ -816,6 +855,7 @@ class Menu extends \Civi\Core\Entity {
               'is_exposed' => array(
       
         'name' => 'is_exposed',
+        'propertyName' => 'isExposed',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                                                      
                                     
@@ -824,6 +864,7 @@ class Menu extends \Civi\Core\Entity {
               'is_ssl' => array(
       
         'name' => 'is_ssl',
+        'propertyName' => 'isSsl',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                                                      
                                     
@@ -832,6 +873,7 @@ class Menu extends \Civi\Core\Entity {
               'weight' => array(
       
         'name' => 'weight',
+        'propertyName' => 'weight',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Weight'),
                         'required' => true,
@@ -843,6 +885,7 @@ class Menu extends \Civi\Core\Entity {
               'type' => array(
       
         'name' => 'type',
+        'propertyName' => 'type',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Type'),
                         'required' => true,
@@ -854,6 +897,7 @@ class Menu extends \Civi\Core\Entity {
               'page_type' => array(
       
         'name' => 'page_type',
+        'propertyName' => 'pageType',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Page Type'),
                         'required' => true,
@@ -865,6 +909,7 @@ class Menu extends \Civi\Core\Entity {
               'skipBreadcrumb' => array(
       
         'name' => 'skipBreadcrumb',
+        'propertyName' => 'skipBreadcrumb',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('Skipbreadcrumb'),
                                                      

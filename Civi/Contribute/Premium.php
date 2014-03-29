@@ -69,6 +69,7 @@ class Premium extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="entity_table", type="string", length=64, nullable=true)
    * 
+   * 
    */
   private $entityTable;
   
@@ -77,6 +78,7 @@ class Premium extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="entity_id", type="integer", nullable=true, options={"unsigned":true})
+   * 
    * 
    */
   private $entityId;
@@ -87,6 +89,7 @@ class Premium extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="premiums_active", type="boolean", nullable=false)
    * 
+   * 
    */
   private $premiumsActive = '0';
   
@@ -96,6 +99,7 @@ class Premium extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="premiums_intro_title", type="string", length=255, nullable=true)
    * 
+   * 
    */
   private $premiumsIntroTitle;
   
@@ -103,7 +107,8 @@ class Premium extends \Civi\Core\Entity {
    * @var text
    *
    * @JMS\Type("text")
-   * @ORM\Column(name="premiums_intro_text", type="text", nullable=true)
+   * @ORM\Column(name="premiums_intro_text", type="text", length=65535, nullable=true)
+   * 
    * 
    */
   private $premiumsIntroText;
@@ -114,6 +119,7 @@ class Premium extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="premiums_contact_email", type="string", length=100, nullable=true)
    * 
+   * 
    */
   private $premiumsContactEmail;
   
@@ -122,6 +128,7 @@ class Premium extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="premiums_contact_phone", type="string", length=50, nullable=true)
+   * 
    * 
    */
   private $premiumsContactPhone;
@@ -132,6 +139,7 @@ class Premium extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="premiums_display_min_contribution", type="boolean", nullable=true)
    * 
+   * 
    */
   private $premiumsDisplayMinContribution;
   
@@ -141,6 +149,7 @@ class Premium extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="premiums_nothankyou_label", type="string", length=255, nullable=true)
    * 
+   * 
    */
   private $premiumsNothankyouLabel;
   
@@ -149,6 +158,7 @@ class Premium extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="premiums_nothankyou_position", type="integer", nullable=false, options={"unsigned":true})
+   * 
    * 
    */
   private $premiumsNothankyouPosition = '1';
@@ -375,6 +385,7 @@ class Premium extends \Civi\Core\Entity {
               'id' => array(
       
         'name' => 'id',
+        'propertyName' => 'id',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -384,6 +395,7 @@ class Premium extends \Civi\Core\Entity {
               'entity_table' => array(
       
         'name' => 'entity_table',
+        'propertyName' => 'entityTable',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Entity Table'),
                         'required' => true,
@@ -396,6 +408,7 @@ class Premium extends \Civi\Core\Entity {
               'entity_id' => array(
       
         'name' => 'entity_id',
+        'propertyName' => 'entityId',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -405,6 +418,7 @@ class Premium extends \Civi\Core\Entity {
               'premiums_active' => array(
       
         'name' => 'premiums_active',
+        'propertyName' => 'premiumsActive',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('Premiums Active'),
                         'required' => true,
@@ -415,6 +429,7 @@ class Premium extends \Civi\Core\Entity {
               'premiums_intro_title' => array(
       
         'name' => 'premiums_intro_title',
+        'propertyName' => 'premiumsIntroTitle',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Title for Premiums section'),
                                  'maxlength' => 255,
@@ -426,15 +441,18 @@ class Premium extends \Civi\Core\Entity {
               'premiums_intro_text' => array(
       
         'name' => 'premiums_intro_text',
+        'propertyName' => 'premiumsIntroText',
         'type' => CRM_Utils_Type::T_TEXT,
                 'title' => ts('Premiums Intro Text'),
-                                                     
+                                 'maxlength' => 65535,
+                                    
                                     
                           ),
       
               'premiums_contact_email' => array(
       
         'name' => 'premiums_contact_email',
+        'propertyName' => 'premiumsContactEmail',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Premiums Contact Email'),
                                  'maxlength' => 100,
@@ -446,6 +464,7 @@ class Premium extends \Civi\Core\Entity {
               'premiums_contact_phone' => array(
       
         'name' => 'premiums_contact_phone',
+        'propertyName' => 'premiumsContactPhone',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Premiums Contact Phone'),
                                  'maxlength' => 50,
@@ -457,6 +476,7 @@ class Premium extends \Civi\Core\Entity {
               'premiums_display_min_contribution' => array(
       
         'name' => 'premiums_display_min_contribution',
+        'propertyName' => 'premiumsDisplayMinContribution',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('Premiums Display Min Contribution'),
                         'required' => true,
@@ -467,6 +487,7 @@ class Premium extends \Civi\Core\Entity {
               'premiums_nothankyou_label' => array(
       
         'name' => 'premiums_nothankyou_label',
+        'propertyName' => 'premiumsNothankyouLabel',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('No Thank-you Text'),
                                  'maxlength' => 255,
@@ -478,6 +499,7 @@ class Premium extends \Civi\Core\Entity {
               'premiums_nothankyou_position' => array(
       
         'name' => 'premiums_nothankyou_position',
+        'propertyName' => 'premiumsNothankyouPosition',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('No Thank-you Position'),
                                                      

@@ -69,6 +69,7 @@ class Recipients extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Mailing\Mailing")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="mailing_id", referencedColumnName="id", onDelete="CASCADE")})
+   * 
    */
   private $mailing;
   
@@ -78,6 +79,7 @@ class Recipients extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Contact")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="contact_id", referencedColumnName="id", onDelete="CASCADE")})
+   * 
    */
   private $contact;
   
@@ -87,6 +89,7 @@ class Recipients extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\Email")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="email_id", referencedColumnName="id", onDelete="CASCADE")})
+   * 
    */
   private $email = 'NULL';
   
@@ -96,6 +99,7 @@ class Recipients extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\Phone")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="phone_id", referencedColumnName="id", onDelete="CASCADE")})
+   * 
    */
   private $phone = 'NULL';
 
@@ -201,6 +205,7 @@ class Recipients extends \Civi\Core\Entity {
               'id' => array(
       
         'name' => 'id',
+        'propertyName' => 'id',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -210,6 +215,7 @@ class Recipients extends \Civi\Core\Entity {
               'mailing_id' => array(
       
         'name' => 'mailing_id',
+        'propertyName' => 'mailing',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -220,6 +226,7 @@ class Recipients extends \Civi\Core\Entity {
               'contact_id' => array(
       
         'name' => 'contact_id',
+        'propertyName' => 'contact',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -230,6 +237,7 @@ class Recipients extends \Civi\Core\Entity {
               'email_id' => array(
       
         'name' => 'email_id',
+        'propertyName' => 'email',
         'type' => CRM_Utils_Type::T_INT,
                                                      
                                            'default' => 'NULL',
@@ -240,6 +248,7 @@ class Recipients extends \Civi\Core\Entity {
               'phone_id' => array(
       
         'name' => 'phone_id',
+        'propertyName' => 'phone',
         'type' => CRM_Utils_Type::T_INT,
                                                      
                                            'default' => 'NULL',

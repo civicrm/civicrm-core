@@ -69,6 +69,7 @@ class Worldregion extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="name", type="string", length=128, nullable=true)
    * 
+   * 
    */
   private $name;
 
@@ -114,6 +115,7 @@ class Worldregion extends \Civi\Core\Entity {
               'id' => array(
       
         'name' => 'id',
+        'propertyName' => 'id',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -123,6 +125,7 @@ class Worldregion extends \Civi\Core\Entity {
               'world_region' => array(
       
         'name' => 'name',
+        'propertyName' => 'name',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('World Region'),
                                  'maxlength' => 128,

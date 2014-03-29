@@ -69,6 +69,7 @@ class PledgeBlock extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="entity_table", type="string", length=64, nullable=true)
    * 
+   * 
    */
   private $entityTable;
   
@@ -77,6 +78,7 @@ class PledgeBlock extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="entity_id", type="integer", nullable=true, options={"unsigned":true})
+   * 
    * 
    */
   private $entityId;
@@ -87,6 +89,7 @@ class PledgeBlock extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="pledge_frequency_unit", type="string", length=128, nullable=true)
    * 
+   * 
    */
   private $pledgeFrequencyUnit;
   
@@ -95,6 +98,7 @@ class PledgeBlock extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_pledge_interval", type="boolean", nullable=false)
+   * 
    * 
    */
   private $isPledgeInterval = '0';
@@ -105,6 +109,7 @@ class PledgeBlock extends \Civi\Core\Entity {
    * @JMS\Type("integer")
    * @ORM\Column(name="max_reminders", type="integer", nullable=false, options={"unsigned":true})
    * 
+   * 
    */
   private $maxReminders = '1';
   
@@ -114,6 +119,7 @@ class PledgeBlock extends \Civi\Core\Entity {
    * @JMS\Type("integer")
    * @ORM\Column(name="initial_reminder_day", type="integer", nullable=false, options={"unsigned":true})
    * 
+   * 
    */
   private $initialReminderDay = '5';
   
@@ -122,6 +128,7 @@ class PledgeBlock extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="additional_reminder_day", type="integer", nullable=false, options={"unsigned":true})
+   * 
    * 
    */
   private $additionalReminderDay = '5';
@@ -288,6 +295,7 @@ class PledgeBlock extends \Civi\Core\Entity {
               'id' => array(
       
         'name' => 'id',
+        'propertyName' => 'id',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -297,6 +305,7 @@ class PledgeBlock extends \Civi\Core\Entity {
               'entity_table' => array(
       
         'name' => 'entity_table',
+        'propertyName' => 'entityTable',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Entity Table'),
                                  'maxlength' => 64,
@@ -308,6 +317,7 @@ class PledgeBlock extends \Civi\Core\Entity {
               'entity_id' => array(
       
         'name' => 'entity_id',
+        'propertyName' => 'entityId',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Entity Id'),
                         'required' => true,
@@ -318,6 +328,7 @@ class PledgeBlock extends \Civi\Core\Entity {
               'pledge_frequency_unit' => array(
       
         'name' => 'pledge_frequency_unit',
+        'propertyName' => 'pledgeFrequencyUnit',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Pledge Frequency Unit'),
                                  'maxlength' => 128,
@@ -329,6 +340,7 @@ class PledgeBlock extends \Civi\Core\Entity {
               'is_pledge_interval' => array(
       
         'name' => 'is_pledge_interval',
+        'propertyName' => 'isPledgeInterval',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                                                      
                                     
@@ -337,6 +349,7 @@ class PledgeBlock extends \Civi\Core\Entity {
               'max_reminders' => array(
       
         'name' => 'max_reminders',
+        'propertyName' => 'maxReminders',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Maximum Number of Reminders'),
                                                      
@@ -347,6 +360,7 @@ class PledgeBlock extends \Civi\Core\Entity {
               'initial_reminder_day' => array(
       
         'name' => 'initial_reminder_day',
+        'propertyName' => 'initialReminderDay',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Initial Reminder Day'),
                                                      
@@ -357,6 +371,7 @@ class PledgeBlock extends \Civi\Core\Entity {
               'additional_reminder_day' => array(
       
         'name' => 'additional_reminder_day',
+        'propertyName' => 'additionalReminderDay',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Additional Reminder Days'),
                                                      

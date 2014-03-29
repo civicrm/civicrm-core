@@ -69,6 +69,7 @@ class CustomField extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\CustomGroup")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="custom_group_id", referencedColumnName="id", onDelete="CASCADE")})
+   * 
    */
   private $customGroup;
   
@@ -77,6 +78,7 @@ class CustomField extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="name", type="string", length=64, nullable=true)
+   * 
    * 
    */
   private $name;
@@ -87,6 +89,7 @@ class CustomField extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="label", type="string", length=255, nullable=true)
    * 
+   * 
    */
   private $label;
   
@@ -95,6 +98,7 @@ class CustomField extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="data_type", type="string", length=16, nullable=true)
+   * 
    * 
    */
   private $dataType;
@@ -105,6 +109,7 @@ class CustomField extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="html_type", type="string", length=32, nullable=true)
    * 
+   * 
    */
   private $htmlType;
   
@@ -113,6 +118,7 @@ class CustomField extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="default_value", type="string", length=255, nullable=true)
+   * 
    * 
    */
   private $defaultValue;
@@ -123,6 +129,7 @@ class CustomField extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_required", type="boolean", nullable=true)
    * 
+   * 
    */
   private $isRequired;
   
@@ -131,6 +138,7 @@ class CustomField extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_searchable", type="boolean", nullable=true)
+   * 
    * 
    */
   private $isSearchable;
@@ -141,6 +149,7 @@ class CustomField extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_search_range", type="boolean", nullable=false)
    * 
+   * 
    */
   private $isSearchRange = '0';
   
@@ -150,6 +159,7 @@ class CustomField extends \Civi\Core\Entity {
    * @JMS\Type("integer")
    * @ORM\Column(name="weight", type="integer", nullable=false, options={"unsigned":true})
    * 
+   * 
    */
   private $weight = '1';
   
@@ -157,7 +167,8 @@ class CustomField extends \Civi\Core\Entity {
    * @var text
    *
    * @JMS\Type("text")
-   * @ORM\Column(name="help_pre", type="text", nullable=true)
+   * @ORM\Column(name="help_pre", type="text", length=65535, nullable=true)
+   * 
    * 
    */
   private $helpPre;
@@ -166,7 +177,8 @@ class CustomField extends \Civi\Core\Entity {
    * @var text
    *
    * @JMS\Type("text")
-   * @ORM\Column(name="help_post", type="text", nullable=true)
+   * @ORM\Column(name="help_post", type="text", length=65535, nullable=true)
+   * 
    * 
    */
   private $helpPost;
@@ -177,6 +189,7 @@ class CustomField extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="mask", type="string", length=64, nullable=true)
    * 
+   * 
    */
   private $mask;
   
@@ -185,6 +198,7 @@ class CustomField extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="attributes", type="string", length=255, nullable=true)
+   * 
    * 
    */
   private $attributes;
@@ -195,6 +209,7 @@ class CustomField extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="javascript", type="string", length=255, nullable=true)
    * 
+   * 
    */
   private $javascript;
   
@@ -203,6 +218,7 @@ class CustomField extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_active", type="boolean", nullable=true)
+   * 
    * 
    */
   private $isActive;
@@ -213,6 +229,7 @@ class CustomField extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_view", type="boolean", nullable=true)
    * 
+   * 
    */
   private $isView;
   
@@ -221,6 +238,7 @@ class CustomField extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="options_per_line", type="integer", nullable=true, options={"unsigned":true})
+   * 
    * 
    */
   private $optionsPerLine;
@@ -231,6 +249,7 @@ class CustomField extends \Civi\Core\Entity {
    * @JMS\Type("integer")
    * @ORM\Column(name="text_length", type="integer", nullable=true, options={"unsigned":true})
    * 
+   * 
    */
   private $textLength;
   
@@ -239,6 +258,7 @@ class CustomField extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="start_date_years", type="integer", nullable=true, options={"unsigned":true})
+   * 
    * 
    */
   private $startDateYears;
@@ -249,6 +269,7 @@ class CustomField extends \Civi\Core\Entity {
    * @JMS\Type("integer")
    * @ORM\Column(name="end_date_years", type="integer", nullable=true, options={"unsigned":true})
    * 
+   * 
    */
   private $endDateYears;
   
@@ -257,6 +278,7 @@ class CustomField extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="date_format", type="string", length=64, nullable=true)
+   * 
    * 
    */
   private $dateFormat;
@@ -267,6 +289,7 @@ class CustomField extends \Civi\Core\Entity {
    * @JMS\Type("integer")
    * @ORM\Column(name="time_format", type="integer", nullable=true, options={"unsigned":true})
    * 
+   * 
    */
   private $timeFormat;
   
@@ -275,6 +298,7 @@ class CustomField extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="note_columns", type="integer", nullable=true, options={"unsigned":true})
+   * 
    * 
    */
   private $noteColumns;
@@ -285,6 +309,7 @@ class CustomField extends \Civi\Core\Entity {
    * @JMS\Type("integer")
    * @ORM\Column(name="note_rows", type="integer", nullable=true, options={"unsigned":true})
    * 
+   * 
    */
   private $noteRows;
   
@@ -293,6 +318,7 @@ class CustomField extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="column_name", type="string", length=255, nullable=true)
+   * 
    * 
    */
   private $columnName;
@@ -303,6 +329,7 @@ class CustomField extends \Civi\Core\Entity {
    * @JMS\Type("integer")
    * @ORM\Column(name="option_group_id", type="integer", nullable=true, options={"unsigned":true})
    * 
+   * 
    */
   private $optionGroupId;
   
@@ -312,6 +339,7 @@ class CustomField extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="filter", type="string", length=255, nullable=true)
    * 
+   * 
    */
   private $filter;
   
@@ -320,6 +348,7 @@ class CustomField extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="in_selector", type="boolean", nullable=false)
+   * 
    * 
    */
   private $inSelector = '0';
@@ -926,6 +955,7 @@ class CustomField extends \Civi\Core\Entity {
               'id' => array(
       
         'name' => 'id',
+        'propertyName' => 'id',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -935,6 +965,7 @@ class CustomField extends \Civi\Core\Entity {
               'custom_group_id' => array(
       
         'name' => 'custom_group_id',
+        'propertyName' => 'customGroup',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -950,6 +981,7 @@ class CustomField extends \Civi\Core\Entity {
               'name' => array(
       
         'name' => 'name',
+        'propertyName' => 'name',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Name'),
                                  'maxlength' => 64,
@@ -961,6 +993,7 @@ class CustomField extends \Civi\Core\Entity {
               'label' => array(
       
         'name' => 'label',
+        'propertyName' => 'label',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Label'),
                         'required' => true,
@@ -973,6 +1006,7 @@ class CustomField extends \Civi\Core\Entity {
               'data_type' => array(
       
         'name' => 'data_type',
+        'propertyName' => 'dataType',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Data Type'),
                         'required' => true,
@@ -988,6 +1022,7 @@ class CustomField extends \Civi\Core\Entity {
               'html_type' => array(
       
         'name' => 'html_type',
+        'propertyName' => 'htmlType',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Html Type'),
                         'required' => true,
@@ -1003,6 +1038,7 @@ class CustomField extends \Civi\Core\Entity {
               'default_value' => array(
       
         'name' => 'default_value',
+        'propertyName' => 'defaultValue',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Default Value'),
                                  'maxlength' => 255,
@@ -1014,6 +1050,7 @@ class CustomField extends \Civi\Core\Entity {
               'is_required' => array(
       
         'name' => 'is_required',
+        'propertyName' => 'isRequired',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                                                      
                                     
@@ -1022,6 +1059,7 @@ class CustomField extends \Civi\Core\Entity {
               'is_searchable' => array(
       
         'name' => 'is_searchable',
+        'propertyName' => 'isSearchable',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                                                      
                                     
@@ -1030,6 +1068,7 @@ class CustomField extends \Civi\Core\Entity {
               'is_search_range' => array(
       
         'name' => 'is_search_range',
+        'propertyName' => 'isSearchRange',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                                                      
                                     
@@ -1038,6 +1077,7 @@ class CustomField extends \Civi\Core\Entity {
               'weight' => array(
       
         'name' => 'weight',
+        'propertyName' => 'weight',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Weight'),
                         'required' => true,
@@ -1049,24 +1089,29 @@ class CustomField extends \Civi\Core\Entity {
               'help_pre' => array(
       
         'name' => 'help_pre',
+        'propertyName' => 'helpPre',
         'type' => CRM_Utils_Type::T_TEXT,
                 'title' => ts('Help Pre'),
-                                                     
+                                 'maxlength' => 65535,
+                                    
                                     
                           ),
       
               'help_post' => array(
       
         'name' => 'help_post',
+        'propertyName' => 'helpPost',
         'type' => CRM_Utils_Type::T_TEXT,
                 'title' => ts('Help Post'),
-                                                     
+                                 'maxlength' => 65535,
+                                    
                                     
                           ),
       
               'mask' => array(
       
         'name' => 'mask',
+        'propertyName' => 'mask',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Mask'),
                                  'maxlength' => 64,
@@ -1078,6 +1123,7 @@ class CustomField extends \Civi\Core\Entity {
               'attributes' => array(
       
         'name' => 'attributes',
+        'propertyName' => 'attributes',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Attributes'),
                                  'maxlength' => 255,
@@ -1089,6 +1135,7 @@ class CustomField extends \Civi\Core\Entity {
               'javascript' => array(
       
         'name' => 'javascript',
+        'propertyName' => 'javascript',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Javascript'),
                                  'maxlength' => 255,
@@ -1100,6 +1147,7 @@ class CustomField extends \Civi\Core\Entity {
               'is_active' => array(
       
         'name' => 'is_active',
+        'propertyName' => 'isActive',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                                                      
                                     
@@ -1108,6 +1156,7 @@ class CustomField extends \Civi\Core\Entity {
               'is_view' => array(
       
         'name' => 'is_view',
+        'propertyName' => 'isView',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                                                      
                                     
@@ -1116,6 +1165,7 @@ class CustomField extends \Civi\Core\Entity {
               'options_per_line' => array(
       
         'name' => 'options_per_line',
+        'propertyName' => 'optionsPerLine',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Options Per Line'),
                                                      
@@ -1125,6 +1175,7 @@ class CustomField extends \Civi\Core\Entity {
               'text_length' => array(
       
         'name' => 'text_length',
+        'propertyName' => 'textLength',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Text Length'),
                                                      
@@ -1134,6 +1185,7 @@ class CustomField extends \Civi\Core\Entity {
               'start_date_years' => array(
       
         'name' => 'start_date_years',
+        'propertyName' => 'startDateYears',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Start Date Years'),
                                                      
@@ -1143,6 +1195,7 @@ class CustomField extends \Civi\Core\Entity {
               'end_date_years' => array(
       
         'name' => 'end_date_years',
+        'propertyName' => 'endDateYears',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('End Date Years'),
                                                      
@@ -1152,6 +1205,7 @@ class CustomField extends \Civi\Core\Entity {
               'date_format' => array(
       
         'name' => 'date_format',
+        'propertyName' => 'dateFormat',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Date Format'),
                                  'maxlength' => 64,
@@ -1163,6 +1217,7 @@ class CustomField extends \Civi\Core\Entity {
               'time_format' => array(
       
         'name' => 'time_format',
+        'propertyName' => 'timeFormat',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Time Format'),
                                                      
@@ -1172,6 +1227,7 @@ class CustomField extends \Civi\Core\Entity {
               'note_columns' => array(
       
         'name' => 'note_columns',
+        'propertyName' => 'noteColumns',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Note Columns'),
                                                      
@@ -1181,6 +1237,7 @@ class CustomField extends \Civi\Core\Entity {
               'note_rows' => array(
       
         'name' => 'note_rows',
+        'propertyName' => 'noteRows',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Note Rows'),
                                                      
@@ -1190,6 +1247,7 @@ class CustomField extends \Civi\Core\Entity {
               'column_name' => array(
       
         'name' => 'column_name',
+        'propertyName' => 'columnName',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Column Name'),
                                  'maxlength' => 255,
@@ -1201,6 +1259,7 @@ class CustomField extends \Civi\Core\Entity {
               'option_group_id' => array(
       
         'name' => 'option_group_id',
+        'propertyName' => 'optionGroupId',
         'type' => CRM_Utils_Type::T_INT,
                                                      
                                     
@@ -1209,6 +1268,7 @@ class CustomField extends \Civi\Core\Entity {
               'filter' => array(
       
         'name' => 'filter',
+        'propertyName' => 'filter',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Filter'),
                                  'maxlength' => 255,
@@ -1220,6 +1280,7 @@ class CustomField extends \Civi\Core\Entity {
               'in_selector' => array(
       
         'name' => 'in_selector',
+        'propertyName' => 'inSelector',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('In Selector'),
                                                      

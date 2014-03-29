@@ -69,6 +69,7 @@ class ActivityContact extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Activity\Activity")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="activity_id", referencedColumnName="id", onDelete="CASCADE")})
+   * 
    */
   private $activity;
   
@@ -78,6 +79,7 @@ class ActivityContact extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Contact")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="contact_id", referencedColumnName="id", onDelete="CASCADE")})
+   * 
    */
   private $contact;
   
@@ -86,6 +88,7 @@ class ActivityContact extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="record_type_id", type="integer", nullable=true, options={"unsigned":true})
+   * 
    * 
    */
   private $recordTypeId;
@@ -172,6 +175,7 @@ class ActivityContact extends \Civi\Core\Entity {
               'id' => array(
       
         'name' => 'id',
+        'propertyName' => 'id',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Activity Contact ID'),
                         'required' => true,
@@ -182,6 +186,7 @@ class ActivityContact extends \Civi\Core\Entity {
               'activity_id' => array(
       
         'name' => 'activity_id',
+        'propertyName' => 'activity',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Activity ID'),
                         'required' => true,
@@ -193,6 +198,7 @@ class ActivityContact extends \Civi\Core\Entity {
               'contact_id' => array(
       
         'name' => 'contact_id',
+        'propertyName' => 'contact',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Contact ID (match to contact)'),
                         'required' => true,
@@ -209,6 +215,7 @@ class ActivityContact extends \Civi\Core\Entity {
               'record_type_id' => array(
       
         'name' => 'record_type_id',
+        'propertyName' => 'recordTypeId',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Record Type ID'),
                                                      

@@ -69,6 +69,7 @@ class OpenID extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Contact")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="contact_id", referencedColumnName="id", onDelete="CASCADE")})
+   * 
    */
   private $contact;
   
@@ -77,6 +78,7 @@ class OpenID extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="location_type_id", type="integer", nullable=true, options={"unsigned":true})
+   * 
    * 
    */
   private $locationTypeId;
@@ -87,6 +89,7 @@ class OpenID extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="openid", type="string", length=255, nullable=true)
    * 
+   * 
    */
   private $openid;
   
@@ -96,6 +99,7 @@ class OpenID extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="allowed_to_login", type="boolean", nullable=false)
    * 
+   * 
    */
   private $allowedToLogin = '0';
   
@@ -104,6 +108,7 @@ class OpenID extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_primary", type="boolean", nullable=false)
+   * 
    * 
    */
   private $isPrimary = '0';
@@ -230,6 +235,7 @@ class OpenID extends \Civi\Core\Entity {
               'id' => array(
       
         'name' => 'id',
+        'propertyName' => 'id',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -239,6 +245,7 @@ class OpenID extends \Civi\Core\Entity {
               'contact_id' => array(
       
         'name' => 'contact_id',
+        'propertyName' => 'contact',
         'type' => CRM_Utils_Type::T_INT,
                                                      
                                     
@@ -248,6 +255,7 @@ class OpenID extends \Civi\Core\Entity {
               'location_type_id' => array(
       
         'name' => 'location_type_id',
+        'propertyName' => 'locationTypeId',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('OpenID Location Type'),
                                                      
@@ -257,6 +265,7 @@ class OpenID extends \Civi\Core\Entity {
               'openid' => array(
       
         'name' => 'openid',
+        'propertyName' => 'openid',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('OpenID'),
                                  'maxlength' => 255,
@@ -274,6 +283,7 @@ class OpenID extends \Civi\Core\Entity {
               'allowed_to_login' => array(
       
         'name' => 'allowed_to_login',
+        'propertyName' => 'allowedToLogin',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('Allowed To Login'),
                         'required' => true,
@@ -284,6 +294,7 @@ class OpenID extends \Civi\Core\Entity {
               'is_primary' => array(
       
         'name' => 'is_primary',
+        'propertyName' => 'isPrimary',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('Is OpenID Primary?'),
                                                      

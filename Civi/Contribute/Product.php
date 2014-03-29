@@ -69,6 +69,7 @@ class Product extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="name", type="string", length=255, nullable=true)
    * 
+   * 
    */
   private $name;
   
@@ -76,7 +77,8 @@ class Product extends \Civi\Core\Entity {
    * @var text
    *
    * @JMS\Type("text")
-   * @ORM\Column(name="description", type="text", nullable=true)
+   * @ORM\Column(name="description", type="text", length=65535, nullable=true)
+   * 
    * 
    */
   private $description;
@@ -87,6 +89,7 @@ class Product extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="sku", type="string", length=50, nullable=true)
    * 
+   * 
    */
   private $sku;
   
@@ -94,7 +97,8 @@ class Product extends \Civi\Core\Entity {
    * @var text
    *
    * @JMS\Type("text")
-   * @ORM\Column(name="options", type="text", nullable=true)
+   * @ORM\Column(name="options", type="text", length=65535, nullable=true)
+   * 
    * 
    */
   private $options;
@@ -105,6 +109,7 @@ class Product extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="image", type="string", length=255, nullable=true)
    * 
+   * 
    */
   private $image;
   
@@ -113,6 +118,7 @@ class Product extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="thumbnail", type="string", length=255, nullable=true)
+   * 
    * 
    */
   private $thumbnail;
@@ -123,6 +129,7 @@ class Product extends \Civi\Core\Entity {
    * @JMS\Type("float")
    * @ORM\Column(name="price", type="float", nullable=true)
    * 
+   * 
    */
   private $price;
   
@@ -131,6 +138,7 @@ class Product extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="currency", type="string", length=3, nullable=false)
+   * 
    * 
    */
   private $currency = 'NULL';
@@ -141,6 +149,7 @@ class Product extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Financial\FinancialType")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="financial_type_id", referencedColumnName="id", onDelete="SET NULL")})
+   * 
    */
   private $financialType = 'NULL';
   
@@ -149,6 +158,7 @@ class Product extends \Civi\Core\Entity {
    *
    * @JMS\Type("float")
    * @ORM\Column(name="min_contribution", type="float", nullable=true)
+   * 
    * 
    */
   private $minContribution;
@@ -159,6 +169,7 @@ class Product extends \Civi\Core\Entity {
    * @JMS\Type("float")
    * @ORM\Column(name="cost", type="float", nullable=true)
    * 
+   * 
    */
   private $cost;
   
@@ -167,6 +178,7 @@ class Product extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_active", type="boolean", nullable=true)
+   * 
    * 
    */
   private $isActive;
@@ -177,6 +189,7 @@ class Product extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="period_type", type="string", length=8, nullable=false)
    * 
+   * 
    */
   private $periodType = 'rolling';
   
@@ -185,6 +198,7 @@ class Product extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="fixed_period_start_day", type="integer", nullable=false, options={"unsigned":true})
+   * 
    * 
    */
   private $fixedPeriodStartDay = '0101';
@@ -195,6 +209,7 @@ class Product extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="duration_unit", type="string", length=8, nullable=false)
    * 
+   * 
    */
   private $durationUnit = 'year';
   
@@ -203,6 +218,7 @@ class Product extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="duration_interval", type="integer", nullable=true, options={"unsigned":true})
+   * 
    * 
    */
   private $durationInterval;
@@ -213,6 +229,7 @@ class Product extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="frequency_unit", type="string", length=8, nullable=false)
    * 
+   * 
    */
   private $frequencyUnit = 'month';
   
@@ -221,6 +238,7 @@ class Product extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="frequency_interval", type="integer", nullable=true, options={"unsigned":true})
+   * 
    * 
    */
   private $frequencyInterval;
@@ -607,6 +625,7 @@ class Product extends \Civi\Core\Entity {
               'id' => array(
       
         'name' => 'id',
+        'propertyName' => 'id',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -616,6 +635,7 @@ class Product extends \Civi\Core\Entity {
               'product_name' => array(
       
         'name' => 'name',
+        'propertyName' => 'name',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Product Name'),
                         'required' => true,
@@ -632,15 +652,18 @@ class Product extends \Civi\Core\Entity {
               'description' => array(
       
         'name' => 'description',
+        'propertyName' => 'description',
         'type' => CRM_Utils_Type::T_TEXT,
                 'title' => ts('Description'),
-                                                     
+                                 'maxlength' => 65535,
+                                    
                                     
                           ),
       
               'sku' => array(
       
         'name' => 'sku',
+        'propertyName' => 'sku',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('SKU'),
                                  'maxlength' => 50,
@@ -656,15 +679,18 @@ class Product extends \Civi\Core\Entity {
               'options' => array(
       
         'name' => 'options',
+        'propertyName' => 'options',
         'type' => CRM_Utils_Type::T_TEXT,
                 'title' => ts('Options'),
-                                                     
+                                 'maxlength' => 65535,
+                                    
                                     
                           ),
       
               'image' => array(
       
         'name' => 'image',
+        'propertyName' => 'image',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Image'),
                                  'maxlength' => 255,
@@ -676,6 +702,7 @@ class Product extends \Civi\Core\Entity {
               'thumbnail' => array(
       
         'name' => 'thumbnail',
+        'propertyName' => 'thumbnail',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Thumbnail'),
                                  'maxlength' => 255,
@@ -687,6 +714,7 @@ class Product extends \Civi\Core\Entity {
               'price' => array(
       
         'name' => 'price',
+        'propertyName' => 'price',
         'type' => CRM_Utils_Type::T_MONEY,
                 'title' => ts('Price'),
                                                      
@@ -696,6 +724,7 @@ class Product extends \Civi\Core\Entity {
               'currency' => array(
       
         'name' => 'currency',
+        'propertyName' => 'currency',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Currency'),
                                  'maxlength' => 3,
@@ -714,6 +743,7 @@ class Product extends \Civi\Core\Entity {
               'financial_type_id' => array(
       
         'name' => 'financial_type_id',
+        'propertyName' => 'financialType',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Financial Type'),
                                                      
@@ -725,6 +755,7 @@ class Product extends \Civi\Core\Entity {
               'min_contribution' => array(
       
         'name' => 'min_contribution',
+        'propertyName' => 'minContribution',
         'type' => CRM_Utils_Type::T_MONEY,
                 'title' => ts('Minimum Contribution'),
                                                      
@@ -734,6 +765,7 @@ class Product extends \Civi\Core\Entity {
               'cost' => array(
       
         'name' => 'cost',
+        'propertyName' => 'cost',
         'type' => CRM_Utils_Type::T_MONEY,
                 'title' => ts('Cost'),
                                                      
@@ -743,6 +775,7 @@ class Product extends \Civi\Core\Entity {
               'is_active' => array(
       
         'name' => 'is_active',
+        'propertyName' => 'isActive',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('Is Active'),
                         'required' => true,
@@ -753,6 +786,7 @@ class Product extends \Civi\Core\Entity {
               'period_type' => array(
       
         'name' => 'period_type',
+        'propertyName' => 'periodType',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Period Type'),
                                  'maxlength' => 8,
@@ -768,6 +802,7 @@ class Product extends \Civi\Core\Entity {
               'fixed_period_start_day' => array(
       
         'name' => 'fixed_period_start_day',
+        'propertyName' => 'fixedPeriodStartDay',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Fixed Period Start Day'),
                                                      
@@ -778,6 +813,7 @@ class Product extends \Civi\Core\Entity {
               'duration_unit' => array(
       
         'name' => 'duration_unit',
+        'propertyName' => 'durationUnit',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Duration Unit'),
                                  'maxlength' => 8,
@@ -793,6 +829,7 @@ class Product extends \Civi\Core\Entity {
               'duration_interval' => array(
       
         'name' => 'duration_interval',
+        'propertyName' => 'durationInterval',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Duration Interval'),
                                                      
@@ -802,6 +839,7 @@ class Product extends \Civi\Core\Entity {
               'frequency_unit' => array(
       
         'name' => 'frequency_unit',
+        'propertyName' => 'frequencyUnit',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Frequency Unit'),
                                  'maxlength' => 8,
@@ -817,6 +855,7 @@ class Product extends \Civi\Core\Entity {
               'frequency_interval' => array(
       
         'name' => 'frequency_interval',
+        'propertyName' => 'frequencyInterval',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Frequency Interval'),
                                                      

@@ -69,6 +69,7 @@ class Setting extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="group_name", type="string", length=64, nullable=true)
    * 
+   * 
    */
   private $groupName;
   
@@ -78,6 +79,7 @@ class Setting extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="name", type="string", length=255, nullable=true)
    * 
+   * 
    */
   private $name;
   
@@ -85,7 +87,8 @@ class Setting extends \Civi\Core\Entity {
    * @var text
    *
    * @JMS\Type("text")
-   * @ORM\Column(name="value", type="text", nullable=true)
+   * @ORM\Column(name="value", type="text", length=65535, nullable=true)
+   * 
    * 
    */
   private $value;
@@ -96,6 +99,7 @@ class Setting extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\Domain")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="domain_id", referencedColumnName="id", onDelete="CASCADE")})
+   * 
    */
   private $domain;
   
@@ -105,6 +109,7 @@ class Setting extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Contact")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="contact_id", referencedColumnName="id", onDelete="CASCADE")})
+   * 
    */
   private $contact;
   
@@ -113,6 +118,7 @@ class Setting extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_domain", type="boolean", nullable=true)
+   * 
    * 
    */
   private $isDomain;
@@ -123,6 +129,7 @@ class Setting extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\Component")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="component_id", referencedColumnName="id")})
+   * 
    */
   private $component;
   
@@ -131,6 +138,7 @@ class Setting extends \Civi\Core\Entity {
    *
    * @JMS\Type("datetime")
    * @ORM\Column(name="created_date", type="datetime", nullable=true)
+   * 
    * 
    */
   private $createdDate;
@@ -141,6 +149,7 @@ class Setting extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Contact")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="created_id", referencedColumnName="id", onDelete="SET NULL")})
+   * 
    */
   private $created;
 
@@ -346,6 +355,7 @@ class Setting extends \Civi\Core\Entity {
               'id' => array(
       
         'name' => 'id',
+        'propertyName' => 'id',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -355,6 +365,7 @@ class Setting extends \Civi\Core\Entity {
               'group_name' => array(
       
         'name' => 'group_name',
+        'propertyName' => 'groupName',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Group Name'),
                         'required' => true,
@@ -367,6 +378,7 @@ class Setting extends \Civi\Core\Entity {
               'name' => array(
       
         'name' => 'name',
+        'propertyName' => 'name',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Name'),
                                  'maxlength' => 255,
@@ -378,15 +390,18 @@ class Setting extends \Civi\Core\Entity {
               'value' => array(
       
         'name' => 'value',
+        'propertyName' => 'value',
         'type' => CRM_Utils_Type::T_TEXT,
                 'title' => ts('Value'),
-                                                     
+                                 'maxlength' => 65535,
+                                    
                                     
                           ),
       
               'domain_id' => array(
       
         'name' => 'domain_id',
+        'propertyName' => 'domain',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -397,6 +412,7 @@ class Setting extends \Civi\Core\Entity {
               'contact_id' => array(
       
         'name' => 'contact_id',
+        'propertyName' => 'contact',
         'type' => CRM_Utils_Type::T_INT,
                                                      
                                     
@@ -406,6 +422,7 @@ class Setting extends \Civi\Core\Entity {
               'is_domain' => array(
       
         'name' => 'is_domain',
+        'propertyName' => 'isDomain',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                                                      
                                     
@@ -414,6 +431,7 @@ class Setting extends \Civi\Core\Entity {
               'component_id' => array(
       
         'name' => 'component_id',
+        'propertyName' => 'component',
         'type' => CRM_Utils_Type::T_INT,
                                                      
                                     
@@ -428,6 +446,7 @@ class Setting extends \Civi\Core\Entity {
               'created_date' => array(
       
         'name' => 'created_date',
+        'propertyName' => 'createdDate',
         'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
                 'title' => ts('Created Date'),
                                                      
@@ -437,6 +456,7 @@ class Setting extends \Civi\Core\Entity {
               'created_id' => array(
       
         'name' => 'created_id',
+        'propertyName' => 'created',
         'type' => CRM_Utils_Type::T_INT,
                                                      
                                     

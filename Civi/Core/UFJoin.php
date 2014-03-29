@@ -69,6 +69,7 @@ class UFJoin extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_active", type="boolean", nullable=false)
    * 
+   * 
    */
   private $isActive = '1';
   
@@ -77,6 +78,7 @@ class UFJoin extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="module", type="string", length=64, nullable=true)
+   * 
    * 
    */
   private $module;
@@ -87,6 +89,7 @@ class UFJoin extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="entity_table", type="string", length=64, nullable=true)
    * 
+   * 
    */
   private $entityTable;
   
@@ -95,6 +98,7 @@ class UFJoin extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="entity_id", type="integer", nullable=true, options={"unsigned":true})
+   * 
    * 
    */
   private $entityId;
@@ -105,6 +109,7 @@ class UFJoin extends \Civi\Core\Entity {
    * @JMS\Type("integer")
    * @ORM\Column(name="weight", type="integer", nullable=false, options={"unsigned":true})
    * 
+   * 
    */
   private $weight = '1';
   
@@ -114,6 +119,7 @@ class UFJoin extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\UFGroup")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="uf_group_id", referencedColumnName="id")})
+   * 
    */
   private $ufGroup;
   
@@ -122,6 +128,7 @@ class UFJoin extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="module_data", type="string", length=255, nullable=true)
+   * 
    * 
    */
   private $moduleData;
@@ -288,6 +295,7 @@ class UFJoin extends \Civi\Core\Entity {
               'id' => array(
       
         'name' => 'id',
+        'propertyName' => 'id',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -297,6 +305,7 @@ class UFJoin extends \Civi\Core\Entity {
               'is_active' => array(
       
         'name' => 'is_active',
+        'propertyName' => 'isActive',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                                                      
                                            'default' => '1',
@@ -306,6 +315,7 @@ class UFJoin extends \Civi\Core\Entity {
               'module' => array(
       
         'name' => 'module',
+        'propertyName' => 'module',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Module'),
                         'required' => true,
@@ -318,6 +328,7 @@ class UFJoin extends \Civi\Core\Entity {
               'entity_table' => array(
       
         'name' => 'entity_table',
+        'propertyName' => 'entityTable',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Entity Table'),
                                  'maxlength' => 64,
@@ -329,6 +340,7 @@ class UFJoin extends \Civi\Core\Entity {
               'entity_id' => array(
       
         'name' => 'entity_id',
+        'propertyName' => 'entityId',
         'type' => CRM_Utils_Type::T_INT,
                                                      
                                     
@@ -337,6 +349,7 @@ class UFJoin extends \Civi\Core\Entity {
               'weight' => array(
       
         'name' => 'weight',
+        'propertyName' => 'weight',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Weight'),
                         'required' => true,
@@ -348,6 +361,7 @@ class UFJoin extends \Civi\Core\Entity {
               'uf_group_id' => array(
       
         'name' => 'uf_group_id',
+        'propertyName' => 'ufGroup',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -363,6 +377,7 @@ class UFJoin extends \Civi\Core\Entity {
               'module_data' => array(
       
         'name' => 'module_data',
+        'propertyName' => 'moduleData',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Module Data'),
                                  'maxlength' => 255,

@@ -69,6 +69,7 @@ class Participant extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Contact")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="contact_id", referencedColumnName="id", onDelete="CASCADE")})
+   * 
    */
   private $contact;
   
@@ -78,6 +79,7 @@ class Participant extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Event\Event")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="event_id", referencedColumnName="id", onDelete="CASCADE")})
+   * 
    */
   private $event;
   
@@ -87,6 +89,7 @@ class Participant extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Event\ParticipantStatusType")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="status_id", referencedColumnName="id")})
+   * 
    */
   private $status = '1';
   
@@ -95,6 +98,7 @@ class Participant extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="role_id", type="string", length=128, nullable=false)
+   * 
    * 
    */
   private $roleId = 'NULL';
@@ -105,6 +109,7 @@ class Participant extends \Civi\Core\Entity {
    * @JMS\Type("datetime")
    * @ORM\Column(name="register_date", type="datetime", nullable=true)
    * 
+   * 
    */
   private $registerDate;
   
@@ -114,6 +119,7 @@ class Participant extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="source", type="string", length=128, nullable=true)
    * 
+   * 
    */
   private $source;
   
@@ -121,7 +127,8 @@ class Participant extends \Civi\Core\Entity {
    * @var text
    *
    * @JMS\Type("text")
-   * @ORM\Column(name="fee_level", type="text", nullable=true)
+   * @ORM\Column(name="fee_level", type="text", length=65535, nullable=true)
+   * 
    * 
    */
   private $feeLevel;
@@ -132,6 +139,7 @@ class Participant extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_test", type="boolean", nullable=false)
    * 
+   * 
    */
   private $isTest = '0';
   
@@ -140,6 +148,7 @@ class Participant extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_pay_later", type="boolean", nullable=false)
+   * 
    * 
    */
   private $isPayLater = '0';
@@ -150,6 +159,7 @@ class Participant extends \Civi\Core\Entity {
    * @JMS\Type("float")
    * @ORM\Column(name="fee_amount", type="float", nullable=true)
    * 
+   * 
    */
   private $feeAmount;
   
@@ -159,6 +169,7 @@ class Participant extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Event\Participant")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="registered_by_id", referencedColumnName="id", onDelete="SET NULL")})
+   * 
    */
   private $registeredBy = 'NULL';
   
@@ -168,6 +179,7 @@ class Participant extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\Discount")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="discount_id", referencedColumnName="id", onDelete="SET NULL")})
+   * 
    */
   private $discount = 'NULL';
   
@@ -176,6 +188,7 @@ class Participant extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="fee_currency", type="string", length=3, nullable=false)
+   * 
    * 
    */
   private $feeCurrency = 'NULL';
@@ -186,6 +199,7 @@ class Participant extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Campaign\Campaign")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="campaign_id", referencedColumnName="id", onDelete="SET NULL")})
+   * 
    */
   private $campaign;
   
@@ -194,6 +208,7 @@ class Participant extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="discount_amount", type="integer", nullable=true, options={"unsigned":true})
+   * 
    * 
    */
   private $discountAmount;
@@ -204,6 +219,7 @@ class Participant extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Event\Cart\Cart")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="cart_id", referencedColumnName="id", onDelete="SET NULL")})
+   * 
    */
   private $cart;
   
@@ -212,6 +228,7 @@ class Participant extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="must_wait", type="integer", nullable=true, options={"unsigned":true})
+   * 
    * 
    */
   private $mustWait;
@@ -578,6 +595,7 @@ class Participant extends \Civi\Core\Entity {
               'participant_id' => array(
       
         'name' => 'id',
+        'propertyName' => 'id',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Participant ID'),
                         'required' => true,
@@ -593,6 +611,7 @@ class Participant extends \Civi\Core\Entity {
               'participant_contact_id' => array(
       
         'name' => 'contact_id',
+        'propertyName' => 'contact',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Contact ID'),
                         'required' => true,
@@ -609,6 +628,7 @@ class Participant extends \Civi\Core\Entity {
               'event_id' => array(
       
         'name' => 'event_id',
+        'propertyName' => 'event',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Event'),
                         'required' => true,
@@ -625,6 +645,7 @@ class Participant extends \Civi\Core\Entity {
               'participant_status_id' => array(
       
         'name' => 'status_id',
+        'propertyName' => 'status',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Participant Status'),
                         'required' => true,
@@ -647,6 +668,7 @@ class Participant extends \Civi\Core\Entity {
               'participant_role_id' => array(
       
         'name' => 'role_id',
+        'propertyName' => 'roleId',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Participant Role Id'),
                                  'maxlength' => 128,
@@ -667,6 +689,7 @@ class Participant extends \Civi\Core\Entity {
               'participant_register_date' => array(
       
         'name' => 'register_date',
+        'propertyName' => 'registerDate',
         'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
                 'title' => ts('Register date'),
                                                      
@@ -681,6 +704,7 @@ class Participant extends \Civi\Core\Entity {
               'participant_source' => array(
       
         'name' => 'source',
+        'propertyName' => 'source',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Participant Source'),
                                  'maxlength' => 128,
@@ -697,9 +721,11 @@ class Participant extends \Civi\Core\Entity {
               'participant_fee_level' => array(
       
         'name' => 'fee_level',
+        'propertyName' => 'feeLevel',
         'type' => CRM_Utils_Type::T_TEXT,
                 'title' => ts('Fee level'),
-                                                     
+                                 'maxlength' => 65535,
+                                    
                 'import' => true,
         'where' => 'civicrm_participant.fee_level',
         'headerPattern' => '/^(f(ee\s)?level)$/i',
@@ -711,6 +737,7 @@ class Participant extends \Civi\Core\Entity {
               'participant_is_test' => array(
       
         'name' => 'is_test',
+        'propertyName' => 'isTest',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('Test'),
                                                      
@@ -725,6 +752,7 @@ class Participant extends \Civi\Core\Entity {
               'participant_is_pay_later' => array(
       
         'name' => 'is_pay_later',
+        'propertyName' => 'isPayLater',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('Is Pay Later'),
                                                      
@@ -739,6 +767,7 @@ class Participant extends \Civi\Core\Entity {
               'participant_fee_amount' => array(
       
         'name' => 'fee_amount',
+        'propertyName' => 'feeAmount',
         'type' => CRM_Utils_Type::T_MONEY,
                 'title' => ts('Fee Amount'),
                                                      
@@ -753,6 +782,7 @@ class Participant extends \Civi\Core\Entity {
               'participant_registered_by_id' => array(
       
         'name' => 'registered_by_id',
+        'propertyName' => 'registeredBy',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Registered By ID'),
                                                      
@@ -769,6 +799,7 @@ class Participant extends \Civi\Core\Entity {
               'participant_discount_id' => array(
       
         'name' => 'discount_id',
+        'propertyName' => 'discount',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Discount ID'),
                                                      
@@ -780,6 +811,7 @@ class Participant extends \Civi\Core\Entity {
               'participant_fee_currency' => array(
       
         'name' => 'fee_currency',
+        'propertyName' => 'feeCurrency',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Fee Currency'),
                                  'maxlength' => 3,
@@ -803,6 +835,7 @@ class Participant extends \Civi\Core\Entity {
               'participant_campaign_id' => array(
       
         'name' => 'campaign_id',
+        'propertyName' => 'campaign',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Campaign'),
                                                      
@@ -823,6 +856,7 @@ class Participant extends \Civi\Core\Entity {
               'discount_amount' => array(
       
         'name' => 'discount_amount',
+        'propertyName' => 'discountAmount',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Discount Amount'),
                                                      
@@ -832,6 +866,7 @@ class Participant extends \Civi\Core\Entity {
               'cart_id' => array(
       
         'name' => 'cart_id',
+        'propertyName' => 'cart',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Event Cart ID'),
                                                      
@@ -842,6 +877,7 @@ class Participant extends \Civi\Core\Entity {
               'must_wait' => array(
       
         'name' => 'must_wait',
+        'propertyName' => 'mustWait',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Must Wait on List'),
                                                      

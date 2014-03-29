@@ -69,6 +69,7 @@ class StateProvince extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="name", type="string", length=64, nullable=true)
    * 
+   * 
    */
   private $name;
   
@@ -77,6 +78,7 @@ class StateProvince extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="abbreviation", type="string", length=4, nullable=true)
+   * 
    * 
    */
   private $abbreviation;
@@ -87,6 +89,7 @@ class StateProvince extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\Country")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="country_id", referencedColumnName="id")})
+   * 
    */
   private $country;
 
@@ -172,6 +175,7 @@ class StateProvince extends \Civi\Core\Entity {
               'id' => array(
       
         'name' => 'id',
+        'propertyName' => 'id',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -181,6 +185,7 @@ class StateProvince extends \Civi\Core\Entity {
               'name' => array(
       
         'name' => 'name',
+        'propertyName' => 'name',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('State'),
                                  'maxlength' => 64,
@@ -197,6 +202,7 @@ class StateProvince extends \Civi\Core\Entity {
               'abbreviation' => array(
       
         'name' => 'abbreviation',
+        'propertyName' => 'abbreviation',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('State Abbreviation'),
                                  'maxlength' => 4,
@@ -208,6 +214,7 @@ class StateProvince extends \Civi\Core\Entity {
               'country_id' => array(
       
         'name' => 'country_id',
+        'propertyName' => 'country',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              

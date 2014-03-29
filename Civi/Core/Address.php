@@ -69,6 +69,7 @@ class Address extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Contact")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="contact_id", referencedColumnName="id", onDelete="CASCADE")})
+   * 
    */
   private $contact;
   
@@ -77,6 +78,7 @@ class Address extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="location_type_id", type="integer", nullable=true, options={"unsigned":true})
+   * 
    * 
    */
   private $locationTypeId;
@@ -87,6 +89,7 @@ class Address extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_primary", type="boolean", nullable=false)
    * 
+   * 
    */
   private $isPrimary = '0';
   
@@ -95,6 +98,7 @@ class Address extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_billing", type="boolean", nullable=false)
+   * 
    * 
    */
   private $isBilling = '0';
@@ -105,6 +109,7 @@ class Address extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="street_address", type="string", length=96, nullable=true)
    * 
+   * 
    */
   private $streetAddress;
   
@@ -113,6 +118,7 @@ class Address extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="street_number", type="integer", nullable=true, options={"unsigned":true})
+   * 
    * 
    */
   private $streetNumber;
@@ -123,6 +129,7 @@ class Address extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="street_number_suffix", type="string", length=8, nullable=true)
    * 
+   * 
    */
   private $streetNumberSuffix;
   
@@ -131,6 +138,7 @@ class Address extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="street_number_predirectional", type="string", length=8, nullable=true)
+   * 
    * 
    */
   private $streetNumberPredirectional;
@@ -141,6 +149,7 @@ class Address extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="street_name", type="string", length=64, nullable=true)
    * 
+   * 
    */
   private $streetName;
   
@@ -149,6 +158,7 @@ class Address extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="street_type", type="string", length=8, nullable=true)
+   * 
    * 
    */
   private $streetType;
@@ -159,6 +169,7 @@ class Address extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="street_number_postdirectional", type="string", length=8, nullable=true)
    * 
+   * 
    */
   private $streetNumberPostdirectional;
   
@@ -167,6 +178,7 @@ class Address extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="street_unit", type="string", length=16, nullable=true)
+   * 
    * 
    */
   private $streetUnit;
@@ -177,6 +189,7 @@ class Address extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="supplemental_address_1", type="string", length=96, nullable=true)
    * 
+   * 
    */
   private $supplementalAddress1;
   
@@ -185,6 +198,7 @@ class Address extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="supplemental_address_2", type="string", length=96, nullable=true)
+   * 
    * 
    */
   private $supplementalAddress2;
@@ -195,6 +209,7 @@ class Address extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="supplemental_address_3", type="string", length=96, nullable=true)
    * 
+   * 
    */
   private $supplementalAddress3;
   
@@ -203,6 +218,7 @@ class Address extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="city", type="string", length=64, nullable=true)
+   * 
    * 
    */
   private $city;
@@ -213,6 +229,7 @@ class Address extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\County")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="county_id", referencedColumnName="id", onDelete="SET NULL")})
+   * 
    */
   private $county;
   
@@ -222,6 +239,7 @@ class Address extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\StateProvince")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="state_province_id", referencedColumnName="id", onDelete="SET NULL")})
+   * 
    */
   private $stateProvince;
   
@@ -230,6 +248,7 @@ class Address extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="postal_code_suffix", type="string", length=12, nullable=true)
+   * 
    * 
    */
   private $postalCodeSuffix;
@@ -240,6 +259,7 @@ class Address extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="postal_code", type="string", length=12, nullable=true)
    * 
+   * 
    */
   private $postalCode;
   
@@ -248,6 +268,7 @@ class Address extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="usps_adc", type="string", length=32, nullable=true)
+   * 
    * 
    */
   private $uspsAdc;
@@ -258,6 +279,7 @@ class Address extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\Country")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="country_id", referencedColumnName="id", onDelete="SET NULL")})
+   * 
    */
   private $country;
   
@@ -266,6 +288,7 @@ class Address extends \Civi\Core\Entity {
    *
    * @JMS\Type("float")
    * @ORM\Column(name="geo_code_1", type="float", nullable=true)
+   * 
    * 
    */
   private $geoCode1;
@@ -276,6 +299,7 @@ class Address extends \Civi\Core\Entity {
    * @JMS\Type("float")
    * @ORM\Column(name="geo_code_2", type="float", nullable=true)
    * 
+   * 
    */
   private $geoCode2;
   
@@ -284,6 +308,7 @@ class Address extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="manual_geo_code", type="boolean", nullable=false)
+   * 
    * 
    */
   private $manualGeoCode = '0';
@@ -294,6 +319,7 @@ class Address extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="timezone", type="string", length=8, nullable=true)
    * 
+   * 
    */
   private $timezone;
   
@@ -302,6 +328,7 @@ class Address extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="name", type="string", length=255, nullable=true)
+   * 
    * 
    */
   private $name;
@@ -312,6 +339,7 @@ class Address extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\Address")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="master_id", referencedColumnName="id", onDelete="SET NULL")})
+   * 
    */
   private $master;
 
@@ -897,6 +925,7 @@ class Address extends \Civi\Core\Entity {
               'id' => array(
       
         'name' => 'id',
+        'propertyName' => 'id',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -906,6 +935,7 @@ class Address extends \Civi\Core\Entity {
               'contact_id' => array(
       
         'name' => 'contact_id',
+        'propertyName' => 'contact',
         'type' => CRM_Utils_Type::T_INT,
                                                      
                                     
@@ -915,6 +945,7 @@ class Address extends \Civi\Core\Entity {
               'location_type_id' => array(
       
         'name' => 'location_type_id',
+        'propertyName' => 'locationTypeId',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Address Location Type'),
                                                      
@@ -929,6 +960,7 @@ class Address extends \Civi\Core\Entity {
               'is_primary' => array(
       
         'name' => 'is_primary',
+        'propertyName' => 'isPrimary',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('Is Address Primary?'),
                                                      
@@ -938,6 +970,7 @@ class Address extends \Civi\Core\Entity {
               'is_billing' => array(
       
         'name' => 'is_billing',
+        'propertyName' => 'isBilling',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                                                      
                                     
@@ -946,6 +979,7 @@ class Address extends \Civi\Core\Entity {
               'street_address' => array(
       
         'name' => 'street_address',
+        'propertyName' => 'streetAddress',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Street Address'),
                                  'maxlength' => 96,
@@ -962,6 +996,7 @@ class Address extends \Civi\Core\Entity {
               'street_number' => array(
       
         'name' => 'street_number',
+        'propertyName' => 'streetNumber',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Street Number'),
                                                      
@@ -975,6 +1010,7 @@ class Address extends \Civi\Core\Entity {
               'street_number_suffix' => array(
       
         'name' => 'street_number_suffix',
+        'propertyName' => 'streetNumberSuffix',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Street Number Suffix'),
                                  'maxlength' => 8,
@@ -990,6 +1026,7 @@ class Address extends \Civi\Core\Entity {
               'street_number_predirectional' => array(
       
         'name' => 'street_number_predirectional',
+        'propertyName' => 'streetNumberPredirectional',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Street Number Predirectional'),
                                  'maxlength' => 8,
@@ -1001,6 +1038,7 @@ class Address extends \Civi\Core\Entity {
               'street_name' => array(
       
         'name' => 'street_name',
+        'propertyName' => 'streetName',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Street Name'),
                                  'maxlength' => 64,
@@ -1016,6 +1054,7 @@ class Address extends \Civi\Core\Entity {
               'street_type' => array(
       
         'name' => 'street_type',
+        'propertyName' => 'streetType',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Street Type'),
                                  'maxlength' => 8,
@@ -1027,6 +1066,7 @@ class Address extends \Civi\Core\Entity {
               'street_number_postdirectional' => array(
       
         'name' => 'street_number_postdirectional',
+        'propertyName' => 'streetNumberPostdirectional',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Street Number Postdirectional'),
                                  'maxlength' => 8,
@@ -1038,6 +1078,7 @@ class Address extends \Civi\Core\Entity {
               'street_unit' => array(
       
         'name' => 'street_unit',
+        'propertyName' => 'streetUnit',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Street Unit'),
                                  'maxlength' => 16,
@@ -1053,6 +1094,7 @@ class Address extends \Civi\Core\Entity {
               'supplemental_address_1' => array(
       
         'name' => 'supplemental_address_1',
+        'propertyName' => 'supplementalAddress1',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Supplemental Address 1'),
                                  'maxlength' => 96,
@@ -1069,6 +1111,7 @@ class Address extends \Civi\Core\Entity {
               'supplemental_address_2' => array(
       
         'name' => 'supplemental_address_2',
+        'propertyName' => 'supplementalAddress2',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Supplemental Address 2'),
                                  'maxlength' => 96,
@@ -1085,6 +1128,7 @@ class Address extends \Civi\Core\Entity {
               'supplemental_address_3' => array(
       
         'name' => 'supplemental_address_3',
+        'propertyName' => 'supplementalAddress3',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Supplemental Address 3'),
                                  'maxlength' => 96,
@@ -1096,6 +1140,7 @@ class Address extends \Civi\Core\Entity {
               'city' => array(
       
         'name' => 'city',
+        'propertyName' => 'city',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('City'),
                                  'maxlength' => 64,
@@ -1112,6 +1157,7 @@ class Address extends \Civi\Core\Entity {
               'county_id' => array(
       
         'name' => 'county_id',
+        'propertyName' => 'county',
         'type' => CRM_Utils_Type::T_INT,
                                                      
                                     
@@ -1126,6 +1172,7 @@ class Address extends \Civi\Core\Entity {
               'state_province_id' => array(
       
         'name' => 'state_province_id',
+        'propertyName' => 'stateProvince',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('State'),
                                                      
@@ -1141,6 +1188,7 @@ class Address extends \Civi\Core\Entity {
               'postal_code_suffix' => array(
       
         'name' => 'postal_code_suffix',
+        'propertyName' => 'postalCodeSuffix',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Postal Code Suffix'),
                                  'maxlength' => 12,
@@ -1157,6 +1205,7 @@ class Address extends \Civi\Core\Entity {
               'postal_code' => array(
       
         'name' => 'postal_code',
+        'propertyName' => 'postalCode',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Postal Code'),
                                  'maxlength' => 12,
@@ -1173,6 +1222,7 @@ class Address extends \Civi\Core\Entity {
               'usps_adc' => array(
       
         'name' => 'usps_adc',
+        'propertyName' => 'uspsAdc',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Usps Adc'),
                                  'maxlength' => 32,
@@ -1184,6 +1234,7 @@ class Address extends \Civi\Core\Entity {
               'country_id' => array(
       
         'name' => 'country_id',
+        'propertyName' => 'country',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Country'),
                                                      
@@ -1200,6 +1251,7 @@ class Address extends \Civi\Core\Entity {
               'geo_code_1' => array(
       
         'name' => 'geo_code_1',
+        'propertyName' => 'geoCode1',
         'type' => CRM_Utils_Type::T_FLOAT,
                 'title' => ts('Geo Code 1'),
                                                      
@@ -1214,6 +1266,7 @@ class Address extends \Civi\Core\Entity {
               'geo_code_2' => array(
       
         'name' => 'geo_code_2',
+        'propertyName' => 'geoCode2',
         'type' => CRM_Utils_Type::T_FLOAT,
                 'title' => ts('Geo Code 2'),
                                                      
@@ -1228,6 +1281,7 @@ class Address extends \Civi\Core\Entity {
               'manual_geo_code' => array(
       
         'name' => 'manual_geo_code',
+        'propertyName' => 'manualGeoCode',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('Manual Geo Code'),
                                                      
@@ -1237,6 +1291,7 @@ class Address extends \Civi\Core\Entity {
               'timezone' => array(
       
         'name' => 'timezone',
+        'propertyName' => 'timezone',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Timezone'),
                                  'maxlength' => 8,
@@ -1248,6 +1303,7 @@ class Address extends \Civi\Core\Entity {
               'address_name' => array(
       
         'name' => 'name',
+        'propertyName' => 'name',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Address Name'),
                                  'maxlength' => 255,
@@ -1264,6 +1320,7 @@ class Address extends \Civi\Core\Entity {
               'master_id' => array(
       
         'name' => 'master_id',
+        'propertyName' => 'master',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Master Address Belongs To'),
                                                      

@@ -69,6 +69,7 @@ class Managed extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="module", type="string", length=127, nullable=true)
    * 
+   * 
    */
   private $module;
   
@@ -77,6 +78,7 @@ class Managed extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="name", type="string", length=127, nullable=true)
+   * 
    * 
    */
   private $name;
@@ -87,6 +89,7 @@ class Managed extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="entity_type", type="string", length=64, nullable=true)
    * 
+   * 
    */
   private $entityType;
   
@@ -95,6 +98,7 @@ class Managed extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="entity_id", type="integer", nullable=true, options={"unsigned":true})
+   * 
    * 
    */
   private $entityId;
@@ -201,6 +205,7 @@ class Managed extends \Civi\Core\Entity {
               'id' => array(
       
         'name' => 'id',
+        'propertyName' => 'id',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -210,6 +215,7 @@ class Managed extends \Civi\Core\Entity {
               'module' => array(
       
         'name' => 'module',
+        'propertyName' => 'module',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Module'),
                         'required' => true,
@@ -222,6 +228,7 @@ class Managed extends \Civi\Core\Entity {
               'name' => array(
       
         'name' => 'name',
+        'propertyName' => 'name',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Name'),
                                  'maxlength' => 127,
@@ -233,6 +240,7 @@ class Managed extends \Civi\Core\Entity {
               'entity_type' => array(
       
         'name' => 'entity_type',
+        'propertyName' => 'entityType',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Entity Type'),
                         'required' => true,
@@ -245,6 +253,7 @@ class Managed extends \Civi\Core\Entity {
               'entity_id' => array(
       
         'name' => 'entity_id',
+        'propertyName' => 'entityId',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              

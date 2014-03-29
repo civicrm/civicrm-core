@@ -69,6 +69,7 @@ class File extends \Civi\Core\Entity {
    * @JMS\Type("integer")
    * @ORM\Column(name="file_type_id", type="integer", nullable=true, options={"unsigned":true})
    * 
+   * 
    */
   private $fileTypeId;
   
@@ -77,6 +78,7 @@ class File extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="mime_type", type="string", length=255, nullable=true)
+   * 
    * 
    */
   private $mimeType;
@@ -87,6 +89,7 @@ class File extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="uri", type="string", length=255, nullable=true)
    * 
+   * 
    */
   private $uri;
   
@@ -94,7 +97,8 @@ class File extends \Civi\Core\Entity {
    * @var blob
    *
    * @JMS\Type("blob")
-   * @ORM\Column(name="document", type="blob", nullable=true)
+   * @ORM\Column(name="document", type="blob", length=16777215, nullable=true)
+   * 
    * 
    */
   private $document;
@@ -105,6 +109,7 @@ class File extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="description", type="string", length=255, nullable=true)
    * 
+   * 
    */
   private $description;
   
@@ -113,6 +118,7 @@ class File extends \Civi\Core\Entity {
    *
    * @JMS\Type("datetime")
    * @ORM\Column(name="upload_date", type="datetime", nullable=true)
+   * 
    * 
    */
   private $uploadDate;
@@ -259,6 +265,7 @@ class File extends \Civi\Core\Entity {
               'id' => array(
       
         'name' => 'id',
+        'propertyName' => 'id',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -268,6 +275,7 @@ class File extends \Civi\Core\Entity {
               'file_type_id' => array(
       
         'name' => 'file_type_id',
+        'propertyName' => 'fileTypeId',
         'type' => CRM_Utils_Type::T_INT,
                                                      
                                     
@@ -276,6 +284,7 @@ class File extends \Civi\Core\Entity {
               'mime_type' => array(
       
         'name' => 'mime_type',
+        'propertyName' => 'mimeType',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Mime Type'),
                                  'maxlength' => 255,
@@ -287,6 +296,7 @@ class File extends \Civi\Core\Entity {
               'uri' => array(
       
         'name' => 'uri',
+        'propertyName' => 'uri',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Uri'),
                                  'maxlength' => 255,
@@ -298,6 +308,7 @@ class File extends \Civi\Core\Entity {
               'document' => array(
       
         'name' => 'document',
+        'propertyName' => 'document',
         'type' => CRM_Utils_Type::T_MEDIUMBLOB,
                 'title' => ts('Document'),
                                  'maxlength' => 16777215,
@@ -308,6 +319,7 @@ class File extends \Civi\Core\Entity {
               'description' => array(
       
         'name' => 'description',
+        'propertyName' => 'description',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Description'),
                                  'maxlength' => 255,
@@ -319,6 +331,7 @@ class File extends \Civi\Core\Entity {
               'upload_date' => array(
       
         'name' => 'upload_date',
+        'propertyName' => 'uploadDate',
         'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
                 'title' => ts('Upload Date'),
                                                      

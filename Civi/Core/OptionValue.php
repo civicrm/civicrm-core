@@ -69,6 +69,7 @@ class OptionValue extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\OptionGroup")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="option_group_id", referencedColumnName="id", onDelete="CASCADE")})
+   * 
    */
   private $optionGroup;
   
@@ -77,6 +78,7 @@ class OptionValue extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="label", type="string", length=255, nullable=true)
+   * 
    * 
    */
   private $label;
@@ -87,6 +89,7 @@ class OptionValue extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="value", type="string", length=512, nullable=true)
    * 
+   * 
    */
   private $value;
   
@@ -95,6 +98,7 @@ class OptionValue extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="name", type="string", length=255, nullable=true)
+   * 
    * 
    */
   private $name;
@@ -105,6 +109,7 @@ class OptionValue extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="grouping", type="string", length=255, nullable=true)
    * 
+   * 
    */
   private $grouping;
   
@@ -113,6 +118,7 @@ class OptionValue extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="filter", type="integer", nullable=true, options={"unsigned":true})
+   * 
    * 
    */
   private $filter;
@@ -123,6 +129,7 @@ class OptionValue extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_default", type="boolean", nullable=false)
    * 
+   * 
    */
   private $isDefault = '0';
   
@@ -132,6 +139,7 @@ class OptionValue extends \Civi\Core\Entity {
    * @JMS\Type("integer")
    * @ORM\Column(name="weight", type="integer", nullable=true, options={"unsigned":true})
    * 
+   * 
    */
   private $weight;
   
@@ -139,7 +147,8 @@ class OptionValue extends \Civi\Core\Entity {
    * @var text
    *
    * @JMS\Type("text")
-   * @ORM\Column(name="description", type="text", nullable=true)
+   * @ORM\Column(name="description", type="text", length=65535, nullable=true)
+   * 
    * 
    */
   private $description;
@@ -150,6 +159,7 @@ class OptionValue extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_optgroup", type="boolean", nullable=false)
    * 
+   * 
    */
   private $isOptgroup = '0';
   
@@ -158,6 +168,7 @@ class OptionValue extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_reserved", type="boolean", nullable=false)
+   * 
    * 
    */
   private $isReserved = '0';
@@ -168,6 +179,7 @@ class OptionValue extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_active", type="boolean", nullable=false)
    * 
+   * 
    */
   private $isActive = '1';
   
@@ -177,6 +189,7 @@ class OptionValue extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\Component")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="component_id", referencedColumnName="id")})
+   * 
    */
   private $component;
   
@@ -186,6 +199,7 @@ class OptionValue extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\Domain")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="domain_id", referencedColumnName="id")})
+   * 
    */
   private $domain;
   
@@ -194,6 +208,7 @@ class OptionValue extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="visibility_id", type="integer", nullable=false, options={"unsigned":true})
+   * 
    * 
    */
   private $visibilityId = 'NULL';
@@ -520,6 +535,7 @@ class OptionValue extends \Civi\Core\Entity {
               'id' => array(
       
         'name' => 'id',
+        'propertyName' => 'id',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -529,6 +545,7 @@ class OptionValue extends \Civi\Core\Entity {
               'option_group_id' => array(
       
         'name' => 'option_group_id',
+        'propertyName' => 'optionGroup',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -544,6 +561,7 @@ class OptionValue extends \Civi\Core\Entity {
               'label' => array(
       
         'name' => 'label',
+        'propertyName' => 'label',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Option Label'),
                         'required' => true,
@@ -556,6 +574,7 @@ class OptionValue extends \Civi\Core\Entity {
               'value' => array(
       
         'name' => 'value',
+        'propertyName' => 'value',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Option Value'),
                         'required' => true,
@@ -568,6 +587,7 @@ class OptionValue extends \Civi\Core\Entity {
               'name' => array(
       
         'name' => 'name',
+        'propertyName' => 'name',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Option Name'),
                                  'maxlength' => 255,
@@ -584,6 +604,7 @@ class OptionValue extends \Civi\Core\Entity {
               'grouping' => array(
       
         'name' => 'grouping',
+        'propertyName' => 'grouping',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Option Grouping Name'),
                                  'maxlength' => 255,
@@ -595,6 +616,7 @@ class OptionValue extends \Civi\Core\Entity {
               'filter' => array(
       
         'name' => 'filter',
+        'propertyName' => 'filter',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Filter'),
                                                      
@@ -604,6 +626,7 @@ class OptionValue extends \Civi\Core\Entity {
               'is_default' => array(
       
         'name' => 'is_default',
+        'propertyName' => 'isDefault',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                                                      
                                     
@@ -612,6 +635,7 @@ class OptionValue extends \Civi\Core\Entity {
               'weight' => array(
       
         'name' => 'weight',
+        'propertyName' => 'weight',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Weight'),
                         'required' => true,
@@ -622,9 +646,11 @@ class OptionValue extends \Civi\Core\Entity {
               'description' => array(
       
         'name' => 'description',
+        'propertyName' => 'description',
         'type' => CRM_Utils_Type::T_TEXT,
                 'title' => ts('Description'),
-                                                   'rows' => 8,
+                                 'maxlength' => 65535,
+                                  'rows' => 8,
                          'cols' => 60,
          
                                     
@@ -633,6 +659,7 @@ class OptionValue extends \Civi\Core\Entity {
               'is_optgroup' => array(
       
         'name' => 'is_optgroup',
+        'propertyName' => 'isOptgroup',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                                                      
                                     
@@ -641,6 +668,7 @@ class OptionValue extends \Civi\Core\Entity {
               'is_reserved' => array(
       
         'name' => 'is_reserved',
+        'propertyName' => 'isReserved',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                                                      
                                     
@@ -649,6 +677,7 @@ class OptionValue extends \Civi\Core\Entity {
               'is_active' => array(
       
         'name' => 'is_active',
+        'propertyName' => 'isActive',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                                                      
                                            'default' => '1',
@@ -658,6 +687,7 @@ class OptionValue extends \Civi\Core\Entity {
               'component_id' => array(
       
         'name' => 'component_id',
+        'propertyName' => 'component',
         'type' => CRM_Utils_Type::T_INT,
                                                      
                                     
@@ -672,6 +702,7 @@ class OptionValue extends \Civi\Core\Entity {
               'domain_id' => array(
       
         'name' => 'domain_id',
+        'propertyName' => 'domain',
         'type' => CRM_Utils_Type::T_INT,
                                                      
                                     
@@ -681,6 +712,7 @@ class OptionValue extends \Civi\Core\Entity {
               'visibility_id' => array(
       
         'name' => 'visibility_id',
+        'propertyName' => 'visibilityId',
         'type' => CRM_Utils_Type::T_INT,
                                                      
                                            'default' => 'NULL',

@@ -69,6 +69,7 @@ class LineItem extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="entity_table", type="string", length=64, nullable=true)
    * 
+   * 
    */
   private $entityTable;
   
@@ -77,6 +78,7 @@ class LineItem extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="entity_id", type="integer", nullable=true, options={"unsigned":true})
+   * 
    * 
    */
   private $entityId;
@@ -87,6 +89,7 @@ class LineItem extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Price\PriceField")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="price_field_id", referencedColumnName="id", onDelete="SET NULL")})
+   * 
    */
   private $priceField;
   
@@ -95,6 +98,7 @@ class LineItem extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="label", type="string", length=255, nullable=false)
+   * 
    * 
    */
   private $label = 'NULL';
@@ -105,6 +109,7 @@ class LineItem extends \Civi\Core\Entity {
    * @JMS\Type("integer")
    * @ORM\Column(name="qty", type="integer", nullable=true, options={"unsigned":true})
    * 
+   * 
    */
   private $qty;
   
@@ -113,6 +118,7 @@ class LineItem extends \Civi\Core\Entity {
    *
    * @JMS\Type("float")
    * @ORM\Column(name="unit_price", type="float", nullable=true)
+   * 
    * 
    */
   private $unitPrice;
@@ -123,6 +129,7 @@ class LineItem extends \Civi\Core\Entity {
    * @JMS\Type("float")
    * @ORM\Column(name="line_total", type="float", nullable=true)
    * 
+   * 
    */
   private $lineTotal;
   
@@ -131,6 +138,7 @@ class LineItem extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="participant_count", type="integer", nullable=false, options={"unsigned":true})
+   * 
    * 
    */
   private $participantCount = 'NULL';
@@ -141,6 +149,7 @@ class LineItem extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Price\PriceFieldValue")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="price_field_value_id", referencedColumnName="id", onDelete="SET NULL")})
+   * 
    */
   private $priceFieldValue = 'NULL';
   
@@ -150,6 +159,7 @@ class LineItem extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Financial\FinancialType")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="financial_type_id", referencedColumnName="id", onDelete="SET NULL")})
+   * 
    */
   private $financialType = 'NULL';
   
@@ -158,6 +168,7 @@ class LineItem extends \Civi\Core\Entity {
    *
    * @JMS\Type("float")
    * @ORM\Column(name="deductible_amount", type="float", nullable=false)
+   * 
    * 
    */
   private $deductibleAmount = '0.0';
@@ -404,6 +415,7 @@ class LineItem extends \Civi\Core\Entity {
               'id' => array(
       
         'name' => 'id',
+        'propertyName' => 'id',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -413,6 +425,7 @@ class LineItem extends \Civi\Core\Entity {
               'entity_table' => array(
       
         'name' => 'entity_table',
+        'propertyName' => 'entityTable',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Entity Table'),
                         'required' => true,
@@ -425,6 +438,7 @@ class LineItem extends \Civi\Core\Entity {
               'entity_id' => array(
       
         'name' => 'entity_id',
+        'propertyName' => 'entityId',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -434,6 +448,7 @@ class LineItem extends \Civi\Core\Entity {
               'price_field_id' => array(
       
         'name' => 'price_field_id',
+        'propertyName' => 'priceField',
         'type' => CRM_Utils_Type::T_INT,
                                                      
                                     
@@ -443,6 +458,7 @@ class LineItem extends \Civi\Core\Entity {
               'label' => array(
       
         'name' => 'label',
+        'propertyName' => 'label',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Label'),
                                  'maxlength' => 255,
@@ -455,6 +471,7 @@ class LineItem extends \Civi\Core\Entity {
               'qty' => array(
       
         'name' => 'qty',
+        'propertyName' => 'qty',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Qty'),
                         'required' => true,
@@ -465,6 +482,7 @@ class LineItem extends \Civi\Core\Entity {
               'unit_price' => array(
       
         'name' => 'unit_price',
+        'propertyName' => 'unitPrice',
         'type' => CRM_Utils_Type::T_MONEY,
                 'title' => ts('Unit Price'),
                         'required' => true,
@@ -475,6 +493,7 @@ class LineItem extends \Civi\Core\Entity {
               'line_total' => array(
       
         'name' => 'line_total',
+        'propertyName' => 'lineTotal',
         'type' => CRM_Utils_Type::T_MONEY,
                 'title' => ts('Line Total'),
                         'required' => true,
@@ -485,6 +504,7 @@ class LineItem extends \Civi\Core\Entity {
               'participant_count' => array(
       
         'name' => 'participant_count',
+        'propertyName' => 'participantCount',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Participant Count'),
                                                      
@@ -495,6 +515,7 @@ class LineItem extends \Civi\Core\Entity {
               'price_field_value_id' => array(
       
         'name' => 'price_field_value_id',
+        'propertyName' => 'priceFieldValue',
         'type' => CRM_Utils_Type::T_INT,
                                                      
                                            'default' => 'NULL',
@@ -505,6 +526,7 @@ class LineItem extends \Civi\Core\Entity {
               'financial_type_id' => array(
       
         'name' => 'financial_type_id',
+        'propertyName' => 'financialType',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Financial Type'),
                                                      
@@ -516,6 +538,7 @@ class LineItem extends \Civi\Core\Entity {
               'deductible_amount' => array(
       
         'name' => 'deductible_amount',
+        'propertyName' => 'deductibleAmount',
         'type' => CRM_Utils_Type::T_MONEY,
                 'title' => ts('Deductible Amount'),
                         'required' => true,

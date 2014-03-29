@@ -69,6 +69,7 @@ class PCPBlock extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="entity_table", type="string", length=64, nullable=true)
    * 
+   * 
    */
   private $entityTable;
   
@@ -77,6 +78,7 @@ class PCPBlock extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="entity_id", type="integer", nullable=true, options={"unsigned":true})
+   * 
    * 
    */
   private $entityId;
@@ -87,6 +89,7 @@ class PCPBlock extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="target_entity_type", type="string", length=255, nullable=false)
    * 
+   * 
    */
   private $targetEntityType = 'contribute';
   
@@ -95,6 +98,7 @@ class PCPBlock extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="target_entity_id", type="integer", nullable=true, options={"unsigned":true})
+   * 
    * 
    */
   private $targetEntityId;
@@ -105,6 +109,7 @@ class PCPBlock extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\UFGroup")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="supporter_profile_id", referencedColumnName="id", onDelete="SET NULL")})
+   * 
    */
   private $supporterProfile = 'NULL';
   
@@ -113,6 +118,7 @@ class PCPBlock extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_approval_needed", type="boolean", nullable=false)
+   * 
    * 
    */
   private $isApprovalNeeded = 'NULL';
@@ -123,6 +129,7 @@ class PCPBlock extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_tellfriend_enabled", type="boolean", nullable=false)
    * 
+   * 
    */
   private $isTellfriendEnabled = 'NULL';
   
@@ -131,6 +138,7 @@ class PCPBlock extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="tellfriend_limit", type="integer", nullable=false, options={"unsigned":true})
+   * 
    * 
    */
   private $tellfriendLimit = 'NULL';
@@ -141,6 +149,7 @@ class PCPBlock extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="link_text", type="string", length=255, nullable=false)
    * 
+   * 
    */
   private $linkText = 'NULL';
   
@@ -150,6 +159,7 @@ class PCPBlock extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_active", type="boolean", nullable=false)
    * 
+   * 
    */
   private $isActive = '1';
   
@@ -158,6 +168,7 @@ class PCPBlock extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="notify_email", type="string", length=255, nullable=false)
+   * 
    * 
    */
   private $notifyEmail = 'NULL';
@@ -404,6 +415,7 @@ class PCPBlock extends \Civi\Core\Entity {
               'id' => array(
       
         'name' => 'id',
+        'propertyName' => 'id',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -413,6 +425,7 @@ class PCPBlock extends \Civi\Core\Entity {
               'entity_table' => array(
       
         'name' => 'entity_table',
+        'propertyName' => 'entityTable',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Entity Table'),
                                  'maxlength' => 64,
@@ -424,6 +437,7 @@ class PCPBlock extends \Civi\Core\Entity {
               'entity_id' => array(
       
         'name' => 'entity_id',
+        'propertyName' => 'entityId',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -433,6 +447,7 @@ class PCPBlock extends \Civi\Core\Entity {
               'target_entity_type' => array(
       
         'name' => 'target_entity_type',
+        'propertyName' => 'targetEntityType',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Target Entity Type'),
                         'required' => true,
@@ -446,6 +461,7 @@ class PCPBlock extends \Civi\Core\Entity {
               'target_entity_id' => array(
       
         'name' => 'target_entity_id',
+        'propertyName' => 'targetEntityId',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -455,6 +471,7 @@ class PCPBlock extends \Civi\Core\Entity {
               'supporter_profile_id' => array(
       
         'name' => 'supporter_profile_id',
+        'propertyName' => 'supporterProfile',
         'type' => CRM_Utils_Type::T_INT,
                                                      
                                            'default' => 'NULL',
@@ -465,6 +482,7 @@ class PCPBlock extends \Civi\Core\Entity {
               'is_approval_needed' => array(
       
         'name' => 'is_approval_needed',
+        'propertyName' => 'isApprovalNeeded',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                                                      
                                            'default' => 'NULL',
@@ -474,6 +492,7 @@ class PCPBlock extends \Civi\Core\Entity {
               'is_tellfriend_enabled' => array(
       
         'name' => 'is_tellfriend_enabled',
+        'propertyName' => 'isTellfriendEnabled',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                                                      
                                            'default' => 'NULL',
@@ -483,6 +502,7 @@ class PCPBlock extends \Civi\Core\Entity {
               'tellfriend_limit' => array(
       
         'name' => 'tellfriend_limit',
+        'propertyName' => 'tellfriendLimit',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Tellfriend Limit'),
                                                      
@@ -493,6 +513,7 @@ class PCPBlock extends \Civi\Core\Entity {
               'link_text' => array(
       
         'name' => 'link_text',
+        'propertyName' => 'linkText',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Link Text'),
                                  'maxlength' => 255,
@@ -505,6 +526,7 @@ class PCPBlock extends \Civi\Core\Entity {
               'is_active' => array(
       
         'name' => 'is_active',
+        'propertyName' => 'isActive',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                                                      
                                            'default' => '1',
@@ -514,6 +536,7 @@ class PCPBlock extends \Civi\Core\Entity {
               'notify_email' => array(
       
         'name' => 'notify_email',
+        'propertyName' => 'notifyEmail',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Notify Email'),
                                  'maxlength' => 255,

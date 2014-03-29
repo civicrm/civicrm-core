@@ -69,6 +69,7 @@ class CaseContact extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\CCase\CCase")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="case_id", referencedColumnName="id", onDelete="CASCADE")})
+   * 
    */
   private $case;
   
@@ -78,6 +79,7 @@ class CaseContact extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Contact")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="contact_id", referencedColumnName="id", onDelete="CASCADE")})
+   * 
    */
   private $contact;
 
@@ -143,6 +145,7 @@ class CaseContact extends \Civi\Core\Entity {
               'id' => array(
       
         'name' => 'id',
+        'propertyName' => 'id',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -152,6 +155,7 @@ class CaseContact extends \Civi\Core\Entity {
               'case_id' => array(
       
         'name' => 'case_id',
+        'propertyName' => 'case',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -162,6 +166,7 @@ class CaseContact extends \Civi\Core\Entity {
               'case_contact_id' => array(
       
         'name' => 'contact_id',
+        'propertyName' => 'contact',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              

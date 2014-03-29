@@ -69,6 +69,7 @@ class MembershipStatus extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="name", type="string", length=128, nullable=true)
    * 
+   * 
    */
   private $name;
   
@@ -77,6 +78,7 @@ class MembershipStatus extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="label", type="string", length=128, nullable=true)
+   * 
    * 
    */
   private $label;
@@ -87,6 +89,7 @@ class MembershipStatus extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="start_event", type="string", length=12, nullable=true)
    * 
+   * 
    */
   private $startEvent;
   
@@ -95,6 +98,7 @@ class MembershipStatus extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="start_event_adjust_unit", type="string", length=8, nullable=true)
+   * 
    * 
    */
   private $startEventAdjustUnit;
@@ -105,6 +109,7 @@ class MembershipStatus extends \Civi\Core\Entity {
    * @JMS\Type("integer")
    * @ORM\Column(name="start_event_adjust_interval", type="integer", nullable=true, options={"unsigned":true})
    * 
+   * 
    */
   private $startEventAdjustInterval;
   
@@ -113,6 +118,7 @@ class MembershipStatus extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="end_event", type="string", length=12, nullable=true)
+   * 
    * 
    */
   private $endEvent;
@@ -123,6 +129,7 @@ class MembershipStatus extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="end_event_adjust_unit", type="string", length=8, nullable=true)
    * 
+   * 
    */
   private $endEventAdjustUnit;
   
@@ -131,6 +138,7 @@ class MembershipStatus extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="end_event_adjust_interval", type="integer", nullable=true, options={"unsigned":true})
+   * 
    * 
    */
   private $endEventAdjustInterval;
@@ -141,6 +149,7 @@ class MembershipStatus extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_current_member", type="boolean", nullable=true)
    * 
+   * 
    */
   private $isCurrentMember;
   
@@ -149,6 +158,7 @@ class MembershipStatus extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_admin", type="boolean", nullable=true)
+   * 
    * 
    */
   private $isAdmin;
@@ -159,6 +169,7 @@ class MembershipStatus extends \Civi\Core\Entity {
    * @JMS\Type("integer")
    * @ORM\Column(name="weight", type="integer", nullable=true, options={"unsigned":true})
    * 
+   * 
    */
   private $weight;
   
@@ -167,6 +178,7 @@ class MembershipStatus extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_default", type="boolean", nullable=true)
+   * 
    * 
    */
   private $isDefault;
@@ -177,6 +189,7 @@ class MembershipStatus extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_active", type="boolean", nullable=false)
    * 
+   * 
    */
   private $isActive = '1';
   
@@ -185,6 +198,7 @@ class MembershipStatus extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_reserved", type="boolean", nullable=false)
+   * 
    * 
    */
   private $isReserved = '0';
@@ -491,6 +505,7 @@ class MembershipStatus extends \Civi\Core\Entity {
               'id' => array(
       
         'name' => 'id',
+        'propertyName' => 'id',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -500,6 +515,7 @@ class MembershipStatus extends \Civi\Core\Entity {
               'membership_status' => array(
       
         'name' => 'name',
+        'propertyName' => 'name',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Membership Status'),
                                  'maxlength' => 128,
@@ -516,6 +532,7 @@ class MembershipStatus extends \Civi\Core\Entity {
               'label' => array(
       
         'name' => 'label',
+        'propertyName' => 'label',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Label'),
                                  'maxlength' => 128,
@@ -527,6 +544,7 @@ class MembershipStatus extends \Civi\Core\Entity {
               'start_event' => array(
       
         'name' => 'start_event',
+        'propertyName' => 'startEvent',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Start Event'),
                                  'maxlength' => 12,
@@ -541,6 +559,7 @@ class MembershipStatus extends \Civi\Core\Entity {
               'start_event_adjust_unit' => array(
       
         'name' => 'start_event_adjust_unit',
+        'propertyName' => 'startEventAdjustUnit',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Start Event Adjust Unit'),
                                  'maxlength' => 8,
@@ -555,6 +574,7 @@ class MembershipStatus extends \Civi\Core\Entity {
               'start_event_adjust_interval' => array(
       
         'name' => 'start_event_adjust_interval',
+        'propertyName' => 'startEventAdjustInterval',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Start Event Adjust Interval'),
                                                      
@@ -564,6 +584,7 @@ class MembershipStatus extends \Civi\Core\Entity {
               'end_event' => array(
       
         'name' => 'end_event',
+        'propertyName' => 'endEvent',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('End Event'),
                                  'maxlength' => 12,
@@ -578,6 +599,7 @@ class MembershipStatus extends \Civi\Core\Entity {
               'end_event_adjust_unit' => array(
       
         'name' => 'end_event_adjust_unit',
+        'propertyName' => 'endEventAdjustUnit',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('End Event Adjust Unit'),
                                  'maxlength' => 8,
@@ -592,6 +614,7 @@ class MembershipStatus extends \Civi\Core\Entity {
               'end_event_adjust_interval' => array(
       
         'name' => 'end_event_adjust_interval',
+        'propertyName' => 'endEventAdjustInterval',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('End Event Adjust Interval'),
                                                      
@@ -601,6 +624,7 @@ class MembershipStatus extends \Civi\Core\Entity {
               'is_current_member' => array(
       
         'name' => 'is_current_member',
+        'propertyName' => 'isCurrentMember',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('Current Membership?'),
                                                      
@@ -610,6 +634,7 @@ class MembershipStatus extends \Civi\Core\Entity {
               'is_admin' => array(
       
         'name' => 'is_admin',
+        'propertyName' => 'isAdmin',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('Admin Assigned Only?'),
                                                      
@@ -619,6 +644,7 @@ class MembershipStatus extends \Civi\Core\Entity {
               'weight' => array(
       
         'name' => 'weight',
+        'propertyName' => 'weight',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Weight'),
                                                      
@@ -628,6 +654,7 @@ class MembershipStatus extends \Civi\Core\Entity {
               'is_default' => array(
       
         'name' => 'is_default',
+        'propertyName' => 'isDefault',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('Default Status?'),
                                                      
@@ -637,6 +664,7 @@ class MembershipStatus extends \Civi\Core\Entity {
               'is_active' => array(
       
         'name' => 'is_active',
+        'propertyName' => 'isActive',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('Is Active'),
                                                      
@@ -647,6 +675,7 @@ class MembershipStatus extends \Civi\Core\Entity {
               'is_reserved' => array(
       
         'name' => 'is_reserved',
+        'propertyName' => 'isReserved',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('Is Reserved'),
                                                      

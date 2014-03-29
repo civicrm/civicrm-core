@@ -69,6 +69,7 @@ class EventInCart extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Event\Event")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="event_id", referencedColumnName="id", onDelete="CASCADE")})
+   * 
    */
   private $event;
   
@@ -78,6 +79,7 @@ class EventInCart extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Event\Cart\Cart")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="event_cart_id", referencedColumnName="id", onDelete="CASCADE")})
+   * 
    */
   private $eventCart;
 
@@ -143,6 +145,7 @@ class EventInCart extends \Civi\Core\Entity {
               'event_in_cart_id' => array(
       
         'name' => 'id',
+        'propertyName' => 'id',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -152,6 +155,7 @@ class EventInCart extends \Civi\Core\Entity {
               'event_id' => array(
       
         'name' => 'event_id',
+        'propertyName' => 'event',
         'type' => CRM_Utils_Type::T_INT,
                                                      
                                     
@@ -161,6 +165,7 @@ class EventInCart extends \Civi\Core\Entity {
               'event_cart_id' => array(
       
         'name' => 'event_cart_id',
+        'propertyName' => 'eventCart',
         'type' => CRM_Utils_Type::T_INT,
                                                      
                                     

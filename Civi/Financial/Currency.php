@@ -69,6 +69,7 @@ class Currency extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="name", type="string", length=64, nullable=true)
    * 
+   * 
    */
   private $name;
   
@@ -77,6 +78,7 @@ class Currency extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="symbol", type="string", length=8, nullable=true)
+   * 
    * 
    */
   private $symbol;
@@ -87,6 +89,7 @@ class Currency extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="numeric_code", type="string", length=3, nullable=true)
    * 
+   * 
    */
   private $numericCode;
   
@@ -95,6 +98,7 @@ class Currency extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="full_name", type="string", length=64, nullable=true)
+   * 
    * 
    */
   private $fullName;
@@ -201,6 +205,7 @@ class Currency extends \Civi\Core\Entity {
               'id' => array(
       
         'name' => 'id',
+        'propertyName' => 'id',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -210,6 +215,7 @@ class Currency extends \Civi\Core\Entity {
               'name' => array(
       
         'name' => 'name',
+        'propertyName' => 'name',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Currency'),
                                  'maxlength' => 64,
@@ -226,6 +232,7 @@ class Currency extends \Civi\Core\Entity {
               'symbol' => array(
       
         'name' => 'symbol',
+        'propertyName' => 'symbol',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Symbol'),
                                  'maxlength' => 8,
@@ -237,6 +244,7 @@ class Currency extends \Civi\Core\Entity {
               'numeric_code' => array(
       
         'name' => 'numeric_code',
+        'propertyName' => 'numericCode',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Numeric Code'),
                                  'maxlength' => 3,
@@ -253,6 +261,7 @@ class Currency extends \Civi\Core\Entity {
               'full_name' => array(
       
         'name' => 'full_name',
+        'propertyName' => 'fullName',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Full Name'),
                                  'maxlength' => 64,

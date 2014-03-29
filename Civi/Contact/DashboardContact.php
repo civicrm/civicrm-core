@@ -69,6 +69,7 @@ class DashboardContact extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\Dashboard")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="dashboard_id", referencedColumnName="id", onDelete="CASCADE")})
+   * 
    */
   private $dashboard;
   
@@ -78,6 +79,7 @@ class DashboardContact extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Contact")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="contact_id", referencedColumnName="id", onDelete="CASCADE")})
+   * 
    */
   private $contact;
   
@@ -86,6 +88,7 @@ class DashboardContact extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="column_no", type="boolean", nullable=false)
+   * 
    * 
    */
   private $columnNo = '0';
@@ -96,6 +99,7 @@ class DashboardContact extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_minimized", type="boolean", nullable=false)
    * 
+   * 
    */
   private $isMinimized = '0';
   
@@ -104,6 +108,7 @@ class DashboardContact extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_fullscreen", type="boolean", nullable=false)
+   * 
    * 
    */
   private $isFullscreen = '1';
@@ -114,6 +119,7 @@ class DashboardContact extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_active", type="boolean", nullable=false)
    * 
+   * 
    */
   private $isActive = '0';
   
@@ -122,6 +128,7 @@ class DashboardContact extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="weight", type="integer", nullable=false, options={"unsigned":true})
+   * 
    * 
    */
   private $weight = '0';
@@ -132,6 +139,7 @@ class DashboardContact extends \Civi\Core\Entity {
    * @JMS\Type("text")
    * @ORM\Column(name="content", type="text", nullable=true)
    * 
+   * 
    */
   private $content;
   
@@ -140,6 +148,7 @@ class DashboardContact extends \Civi\Core\Entity {
    *
    * @JMS\Type("datetime")
    * @ORM\Column(name="created_date", type="datetime", nullable=true)
+   * 
    * 
    */
   private $createdDate;
@@ -346,6 +355,7 @@ class DashboardContact extends \Civi\Core\Entity {
               'id' => array(
       
         'name' => 'id',
+        'propertyName' => 'id',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -355,6 +365,7 @@ class DashboardContact extends \Civi\Core\Entity {
               'dashboard_id' => array(
       
         'name' => 'dashboard_id',
+        'propertyName' => 'dashboard',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -365,6 +376,7 @@ class DashboardContact extends \Civi\Core\Entity {
               'contact_id' => array(
       
         'name' => 'contact_id',
+        'propertyName' => 'contact',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -375,6 +387,7 @@ class DashboardContact extends \Civi\Core\Entity {
               'column_no' => array(
       
         'name' => 'column_no',
+        'propertyName' => 'columnNo',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('Column No'),
                                                      
@@ -384,6 +397,7 @@ class DashboardContact extends \Civi\Core\Entity {
               'is_minimized' => array(
       
         'name' => 'is_minimized',
+        'propertyName' => 'isMinimized',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                                                      
                                     
@@ -392,6 +406,7 @@ class DashboardContact extends \Civi\Core\Entity {
               'is_fullscreen' => array(
       
         'name' => 'is_fullscreen',
+        'propertyName' => 'isFullscreen',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                                                      
                                            'default' => '1',
@@ -401,6 +416,7 @@ class DashboardContact extends \Civi\Core\Entity {
               'is_active' => array(
       
         'name' => 'is_active',
+        'propertyName' => 'isActive',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                                                      
                                     
@@ -409,6 +425,7 @@ class DashboardContact extends \Civi\Core\Entity {
               'weight' => array(
       
         'name' => 'weight',
+        'propertyName' => 'weight',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Weight'),
                                                      
@@ -418,6 +435,7 @@ class DashboardContact extends \Civi\Core\Entity {
               'content' => array(
       
         'name' => 'content',
+        'propertyName' => 'content',
         'type' => CRM_Utils_Type::T_LONGTEXT,
                 'title' => ts('Content'),
                                                      
@@ -427,6 +445,7 @@ class DashboardContact extends \Civi\Core\Entity {
               'created_date' => array(
       
         'name' => 'created_date',
+        'propertyName' => 'createdDate',
         'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
                 'title' => ts('Created Date'),
                                                      

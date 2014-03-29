@@ -69,6 +69,7 @@ class PriceField extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Price\PriceSet")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="price_set_id", referencedColumnName="id")})
+   * 
    */
   private $priceSet;
   
@@ -77,6 +78,7 @@ class PriceField extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="name", type="string", length=255, nullable=true)
+   * 
    * 
    */
   private $name;
@@ -87,6 +89,7 @@ class PriceField extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="label", type="string", length=255, nullable=true)
    * 
+   * 
    */
   private $label;
   
@@ -95,6 +98,7 @@ class PriceField extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="html_type", type="string", length=12, nullable=true)
+   * 
    * 
    */
   private $htmlType;
@@ -105,6 +109,7 @@ class PriceField extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_enter_qty", type="boolean", nullable=false)
    * 
+   * 
    */
   private $isEnterQty = '0';
   
@@ -112,7 +117,8 @@ class PriceField extends \Civi\Core\Entity {
    * @var text
    *
    * @JMS\Type("text")
-   * @ORM\Column(name="help_pre", type="text", nullable=true)
+   * @ORM\Column(name="help_pre", type="text", length=65535, nullable=true)
+   * 
    * 
    */
   private $helpPre;
@@ -121,7 +127,8 @@ class PriceField extends \Civi\Core\Entity {
    * @var text
    *
    * @JMS\Type("text")
-   * @ORM\Column(name="help_post", type="text", nullable=true)
+   * @ORM\Column(name="help_post", type="text", length=65535, nullable=true)
+   * 
    * 
    */
   private $helpPost;
@@ -132,6 +139,7 @@ class PriceField extends \Civi\Core\Entity {
    * @JMS\Type("integer")
    * @ORM\Column(name="weight", type="integer", nullable=false, options={"unsigned":true})
    * 
+   * 
    */
   private $weight = '1';
   
@@ -140,6 +148,7 @@ class PriceField extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_display_amounts", type="boolean", nullable=false)
+   * 
    * 
    */
   private $isDisplayAmounts = '1';
@@ -150,6 +159,7 @@ class PriceField extends \Civi\Core\Entity {
    * @JMS\Type("integer")
    * @ORM\Column(name="options_per_line", type="integer", nullable=false, options={"unsigned":true})
    * 
+   * 
    */
   private $optionsPerLine = '1';
   
@@ -158,6 +168,7 @@ class PriceField extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_active", type="boolean", nullable=false)
+   * 
    * 
    */
   private $isActive = '1';
@@ -168,6 +179,7 @@ class PriceField extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_required", type="boolean", nullable=false)
    * 
+   * 
    */
   private $isRequired = '1';
   
@@ -176,6 +188,7 @@ class PriceField extends \Civi\Core\Entity {
    *
    * @JMS\Type("datetime")
    * @ORM\Column(name="active_on", type="datetime", nullable=false)
+   * 
    * 
    */
   private $activeOn = 'NULL';
@@ -186,6 +199,7 @@ class PriceField extends \Civi\Core\Entity {
    * @JMS\Type("datetime")
    * @ORM\Column(name="expire_on", type="datetime", nullable=false)
    * 
+   * 
    */
   private $expireOn = 'NULL';
   
@@ -195,6 +209,7 @@ class PriceField extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="javascript", type="string", length=255, nullable=true)
    * 
+   * 
    */
   private $javascript;
   
@@ -203,6 +218,7 @@ class PriceField extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="visibility_id", type="integer", nullable=false, options={"unsigned":true})
+   * 
    * 
    */
   private $visibilityId = '1';
@@ -549,6 +565,7 @@ class PriceField extends \Civi\Core\Entity {
               'id' => array(
       
         'name' => 'id',
+        'propertyName' => 'id',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -558,6 +575,7 @@ class PriceField extends \Civi\Core\Entity {
               'price_set_id' => array(
       
         'name' => 'price_set_id',
+        'propertyName' => 'priceSet',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -568,6 +586,7 @@ class PriceField extends \Civi\Core\Entity {
               'name' => array(
       
         'name' => 'name',
+        'propertyName' => 'name',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Name'),
                         'required' => true,
@@ -580,6 +599,7 @@ class PriceField extends \Civi\Core\Entity {
               'label' => array(
       
         'name' => 'label',
+        'propertyName' => 'label',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Label'),
                         'required' => true,
@@ -592,6 +612,7 @@ class PriceField extends \Civi\Core\Entity {
               'html_type' => array(
       
         'name' => 'html_type',
+        'propertyName' => 'htmlType',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Html Type'),
                         'required' => true,
@@ -607,6 +628,7 @@ class PriceField extends \Civi\Core\Entity {
               'is_enter_qty' => array(
       
         'name' => 'is_enter_qty',
+        'propertyName' => 'isEnterQty',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                                                      
                                     
@@ -615,9 +637,11 @@ class PriceField extends \Civi\Core\Entity {
               'help_pre' => array(
       
         'name' => 'help_pre',
+        'propertyName' => 'helpPre',
         'type' => CRM_Utils_Type::T_TEXT,
                 'title' => ts('Help Pre'),
-                                                   'rows' => 4,
+                                 'maxlength' => 65535,
+                                  'rows' => 4,
                          'cols' => 80,
          
                                     
@@ -626,9 +650,11 @@ class PriceField extends \Civi\Core\Entity {
               'help_post' => array(
       
         'name' => 'help_post',
+        'propertyName' => 'helpPost',
         'type' => CRM_Utils_Type::T_TEXT,
                 'title' => ts('Help Post'),
-                                                   'rows' => 4,
+                                 'maxlength' => 65535,
+                                  'rows' => 4,
                          'cols' => 80,
          
                                     
@@ -637,6 +663,7 @@ class PriceField extends \Civi\Core\Entity {
               'weight' => array(
       
         'name' => 'weight',
+        'propertyName' => 'weight',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Weight'),
                                                      
@@ -647,6 +674,7 @@ class PriceField extends \Civi\Core\Entity {
               'is_display_amounts' => array(
       
         'name' => 'is_display_amounts',
+        'propertyName' => 'isDisplayAmounts',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                                                      
                                            'default' => '1',
@@ -656,6 +684,7 @@ class PriceField extends \Civi\Core\Entity {
               'options_per_line' => array(
       
         'name' => 'options_per_line',
+        'propertyName' => 'optionsPerLine',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Options Per Line'),
                                                      
@@ -666,6 +695,7 @@ class PriceField extends \Civi\Core\Entity {
               'is_active' => array(
       
         'name' => 'is_active',
+        'propertyName' => 'isActive',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                                                      
                                            'default' => '1',
@@ -675,6 +705,7 @@ class PriceField extends \Civi\Core\Entity {
               'is_required' => array(
       
         'name' => 'is_required',
+        'propertyName' => 'isRequired',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                                                      
                                            'default' => '1',
@@ -684,6 +715,7 @@ class PriceField extends \Civi\Core\Entity {
               'active_on' => array(
       
         'name' => 'active_on',
+        'propertyName' => 'activeOn',
         'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
                 'title' => ts('Active On'),
                                                      
@@ -694,6 +726,7 @@ class PriceField extends \Civi\Core\Entity {
               'expire_on' => array(
       
         'name' => 'expire_on',
+        'propertyName' => 'expireOn',
         'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
                 'title' => ts('Expire On'),
                                                      
@@ -704,6 +737,7 @@ class PriceField extends \Civi\Core\Entity {
               'javascript' => array(
       
         'name' => 'javascript',
+        'propertyName' => 'javascript',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Javascript'),
                                  'maxlength' => 255,
@@ -715,6 +749,7 @@ class PriceField extends \Civi\Core\Entity {
               'visibility_id' => array(
       
         'name' => 'visibility_id',
+        'propertyName' => 'visibilityId',
         'type' => CRM_Utils_Type::T_INT,
                                                      
                                            'default' => '1',

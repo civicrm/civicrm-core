@@ -69,6 +69,7 @@ class EntityBatch extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="entity_table", type="string", length=64, nullable=true)
    * 
+   * 
    */
   private $entityTable;
   
@@ -77,6 +78,7 @@ class EntityBatch extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="entity_id", type="integer", nullable=true, options={"unsigned":true})
+   * 
    * 
    */
   private $entityId;
@@ -87,6 +89,7 @@ class EntityBatch extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Batch\Batch")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="batch_id", referencedColumnName="id", onDelete="CASCADE")})
+   * 
    */
   private $batch;
 
@@ -172,6 +175,7 @@ class EntityBatch extends \Civi\Core\Entity {
               'id' => array(
       
         'name' => 'id',
+        'propertyName' => 'id',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -181,6 +185,7 @@ class EntityBatch extends \Civi\Core\Entity {
               'entity_table' => array(
       
         'name' => 'entity_table',
+        'propertyName' => 'entityTable',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Entity Table'),
                                  'maxlength' => 64,
@@ -192,6 +197,7 @@ class EntityBatch extends \Civi\Core\Entity {
               'entity_id' => array(
       
         'name' => 'entity_id',
+        'propertyName' => 'entityId',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -201,6 +207,7 @@ class EntityBatch extends \Civi\Core\Entity {
               'batch_id' => array(
       
         'name' => 'batch_id',
+        'propertyName' => 'batch',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              

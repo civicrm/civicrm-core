@@ -69,6 +69,7 @@ class Domain extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="name", type="string", length=64, nullable=true)
    * 
+   * 
    */
   private $name;
   
@@ -78,6 +79,7 @@ class Domain extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="description", type="string", length=255, nullable=true)
    * 
+   * 
    */
   private $description;
   
@@ -85,7 +87,8 @@ class Domain extends \Civi\Core\Entity {
    * @var text
    *
    * @JMS\Type("text")
-   * @ORM\Column(name="config_backend", type="text", nullable=true)
+   * @ORM\Column(name="config_backend", type="text", length=65535, nullable=true)
+   * 
    * 
    */
   private $configBackend;
@@ -96,6 +99,7 @@ class Domain extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="version", type="string", length=32, nullable=true)
    * 
+   * 
    */
   private $version;
   
@@ -105,6 +109,7 @@ class Domain extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Contact")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="contact_id", referencedColumnName="id")})
+   * 
    */
   private $contact;
   
@@ -112,7 +117,8 @@ class Domain extends \Civi\Core\Entity {
    * @var text
    *
    * @JMS\Type("text")
-   * @ORM\Column(name="locales", type="text", nullable=true)
+   * @ORM\Column(name="locales", type="text", length=65535, nullable=true)
+   * 
    * 
    */
   private $locales;
@@ -121,7 +127,8 @@ class Domain extends \Civi\Core\Entity {
    * @var text
    *
    * @JMS\Type("text")
-   * @ORM\Column(name="locale_custom_strings", type="text", nullable=true)
+   * @ORM\Column(name="locale_custom_strings", type="text", length=65535, nullable=true)
+   * 
    * 
    */
   private $localeCustomStrings;
@@ -288,6 +295,7 @@ class Domain extends \Civi\Core\Entity {
               'id' => array(
       
         'name' => 'id',
+        'propertyName' => 'id',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -297,6 +305,7 @@ class Domain extends \Civi\Core\Entity {
               'name' => array(
       
         'name' => 'name',
+        'propertyName' => 'name',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Name'),
                                  'maxlength' => 64,
@@ -308,6 +317,7 @@ class Domain extends \Civi\Core\Entity {
               'description' => array(
       
         'name' => 'description',
+        'propertyName' => 'description',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Description'),
                                  'maxlength' => 255,
@@ -319,9 +329,11 @@ class Domain extends \Civi\Core\Entity {
               'config_backend' => array(
       
         'name' => 'config_backend',
+        'propertyName' => 'configBackend',
         'type' => CRM_Utils_Type::T_TEXT,
                 'title' => ts('Config Backend'),
-                                                   'rows' => 20,
+                                 'maxlength' => 65535,
+                                  'rows' => 20,
                          'cols' => 80,
          
                                     
@@ -330,6 +342,7 @@ class Domain extends \Civi\Core\Entity {
               'version' => array(
       
         'name' => 'version',
+        'propertyName' => 'version',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Version'),
                                  'maxlength' => 32,
@@ -341,6 +354,7 @@ class Domain extends \Civi\Core\Entity {
               'contact_id' => array(
       
         'name' => 'contact_id',
+        'propertyName' => 'contact',
         'type' => CRM_Utils_Type::T_INT,
                                                      
                                     
@@ -350,18 +364,22 @@ class Domain extends \Civi\Core\Entity {
               'locales' => array(
       
         'name' => 'locales',
+        'propertyName' => 'locales',
         'type' => CRM_Utils_Type::T_TEXT,
                 'title' => ts('Locales'),
-                                                     
+                                 'maxlength' => 65535,
+                                    
                                     
                           ),
       
               'locale_custom_strings' => array(
       
         'name' => 'locale_custom_strings',
+        'propertyName' => 'localeCustomStrings',
         'type' => CRM_Utils_Type::T_TEXT,
                 'title' => ts('Locale Custom Strings'),
-                                                   'rows' => 20,
+                                 'maxlength' => 65535,
+                                  'rows' => 20,
                          'cols' => 80,
          
                                     

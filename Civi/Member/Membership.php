@@ -69,6 +69,7 @@ class Membership extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Contact")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="contact_id", referencedColumnName="id", onDelete="CASCADE")})
+   * 
    */
   private $contact;
   
@@ -78,6 +79,7 @@ class Membership extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Member\MembershipType")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="membership_type_id", referencedColumnName="id", onDelete="CASCADE")})
+   * 
    */
   private $membershipType;
   
@@ -86,6 +88,7 @@ class Membership extends \Civi\Core\Entity {
    *
    * @JMS\Type("date")
    * @ORM\Column(name="join_date", type="date", nullable=true)
+   * 
    * 
    */
   private $joinDate;
@@ -96,6 +99,7 @@ class Membership extends \Civi\Core\Entity {
    * @JMS\Type("date")
    * @ORM\Column(name="start_date", type="date", nullable=true)
    * 
+   * 
    */
   private $startDate;
   
@@ -104,6 +108,7 @@ class Membership extends \Civi\Core\Entity {
    *
    * @JMS\Type("date")
    * @ORM\Column(name="end_date", type="date", nullable=true)
+   * 
    * 
    */
   private $endDate;
@@ -114,6 +119,7 @@ class Membership extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="source", type="string", length=128, nullable=true)
    * 
+   * 
    */
   private $source;
   
@@ -123,6 +129,7 @@ class Membership extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Member\MembershipStatus")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="status_id", referencedColumnName="id", onDelete="CASCADE")})
+   * 
    */
   private $status;
   
@@ -131,6 +138,7 @@ class Membership extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_override", type="boolean", nullable=true)
+   * 
    * 
    */
   private $isOverride;
@@ -141,6 +149,7 @@ class Membership extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Member\Membership")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="owner_membership_id", referencedColumnName="id", onDelete="SET NULL")})
+   * 
    */
   private $ownerMembership;
   
@@ -149,6 +158,7 @@ class Membership extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="max_related", type="integer", nullable=true, options={"unsigned":true})
+   * 
    * 
    */
   private $maxRelated;
@@ -159,6 +169,7 @@ class Membership extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_test", type="boolean", nullable=false)
    * 
+   * 
    */
   private $isTest = '0';
   
@@ -167,6 +178,7 @@ class Membership extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_pay_later", type="boolean", nullable=false)
+   * 
    * 
    */
   private $isPayLater = '0';
@@ -177,6 +189,7 @@ class Membership extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Contribute\ContributionRecur")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="contribution_recur_id", referencedColumnName="id", onDelete="SET NULL")})
+   * 
    */
   private $contributionRecur;
   
@@ -186,6 +199,7 @@ class Membership extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Campaign\Campaign")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="campaign_id", referencedColumnName="id", onDelete="SET NULL")})
+   * 
    */
   private $campaign;
 
@@ -491,6 +505,7 @@ class Membership extends \Civi\Core\Entity {
               'membership_id' => array(
       
         'name' => 'id',
+        'propertyName' => 'id',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Membership ID'),
                         'required' => true,
@@ -506,6 +521,7 @@ class Membership extends \Civi\Core\Entity {
               'membership_contact_id' => array(
       
         'name' => 'contact_id',
+        'propertyName' => 'contact',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Contact ID'),
                         'required' => true,
@@ -522,6 +538,7 @@ class Membership extends \Civi\Core\Entity {
               'membership_type_id' => array(
       
         'name' => 'membership_type_id',
+        'propertyName' => 'membershipType',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Membership Type Id'),
                         'required' => true,
@@ -543,6 +560,7 @@ class Membership extends \Civi\Core\Entity {
               'join_date' => array(
       
         'name' => 'join_date',
+        'propertyName' => 'joinDate',
         'type' => CRM_Utils_Type::T_DATE,
                 'title' => ts('Member Since'),
                                                      
@@ -557,6 +575,7 @@ class Membership extends \Civi\Core\Entity {
               'membership_start_date' => array(
       
         'name' => 'start_date',
+        'propertyName' => 'startDate',
         'type' => CRM_Utils_Type::T_DATE,
                 'title' => ts('Membership Start Date'),
                                                      
@@ -571,6 +590,7 @@ class Membership extends \Civi\Core\Entity {
               'membership_end_date' => array(
       
         'name' => 'end_date',
+        'propertyName' => 'endDate',
         'type' => CRM_Utils_Type::T_DATE,
                 'title' => ts('Membership Expiration Date'),
                                                      
@@ -585,6 +605,7 @@ class Membership extends \Civi\Core\Entity {
               'membership_source' => array(
       
         'name' => 'source',
+        'propertyName' => 'source',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Source'),
                                  'maxlength' => 128,
@@ -601,6 +622,7 @@ class Membership extends \Civi\Core\Entity {
               'status_id' => array(
       
         'name' => 'status_id',
+        'propertyName' => 'status',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Membership Status Id'),
                         'required' => true,
@@ -622,6 +644,7 @@ class Membership extends \Civi\Core\Entity {
               'is_override' => array(
       
         'name' => 'is_override',
+        'propertyName' => 'isOverride',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('Status Override'),
                                                      
@@ -636,6 +659,7 @@ class Membership extends \Civi\Core\Entity {
               'owner_membership_id' => array(
       
         'name' => 'owner_membership_id',
+        'propertyName' => 'ownerMembership',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Primary Member ID'),
                                                      
@@ -650,6 +674,7 @@ class Membership extends \Civi\Core\Entity {
               'max_related' => array(
       
         'name' => 'max_related',
+        'propertyName' => 'maxRelated',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Max Related'),
                                                      
@@ -659,6 +684,7 @@ class Membership extends \Civi\Core\Entity {
               'member_is_test' => array(
       
         'name' => 'is_test',
+        'propertyName' => 'isTest',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('Test'),
                                                      
@@ -673,6 +699,7 @@ class Membership extends \Civi\Core\Entity {
               'member_is_pay_later' => array(
       
         'name' => 'is_pay_later',
+        'propertyName' => 'isPayLater',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('Is Pay Later'),
                                                      
@@ -687,6 +714,7 @@ class Membership extends \Civi\Core\Entity {
               'contribution_recur_id' => array(
       
         'name' => 'contribution_recur_id',
+        'propertyName' => 'contributionRecur',
         'type' => CRM_Utils_Type::T_INT,
                                                      
                                     
@@ -696,6 +724,7 @@ class Membership extends \Civi\Core\Entity {
               'member_campaign_id' => array(
       
         'name' => 'campaign_id',
+        'propertyName' => 'campaign',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Campaign'),
                                                      

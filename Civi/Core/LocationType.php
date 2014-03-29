@@ -69,6 +69,7 @@ class LocationType extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="name", type="string", length=64, nullable=true)
    * 
+   * 
    */
   private $name;
   
@@ -77,6 +78,7 @@ class LocationType extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="display_name", type="string", length=64, nullable=true)
+   * 
    * 
    */
   private $displayName;
@@ -87,6 +89,7 @@ class LocationType extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="vcard_name", type="string", length=64, nullable=true)
    * 
+   * 
    */
   private $vcardName;
   
@@ -95,6 +98,7 @@ class LocationType extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="description", type="string", length=255, nullable=true)
+   * 
    * 
    */
   private $description;
@@ -105,6 +109,7 @@ class LocationType extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_reserved", type="boolean", nullable=true)
    * 
+   * 
    */
   private $isReserved;
   
@@ -114,6 +119,7 @@ class LocationType extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_active", type="boolean", nullable=true)
    * 
+   * 
    */
   private $isActive;
   
@@ -122,6 +128,7 @@ class LocationType extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_default", type="boolean", nullable=true)
+   * 
    * 
    */
   private $isDefault;
@@ -288,6 +295,7 @@ class LocationType extends \Civi\Core\Entity {
               'id' => array(
       
         'name' => 'id',
+        'propertyName' => 'id',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -297,6 +305,7 @@ class LocationType extends \Civi\Core\Entity {
               'name' => array(
       
         'name' => 'name',
+        'propertyName' => 'name',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Location Type'),
                                  'maxlength' => 64,
@@ -308,6 +317,7 @@ class LocationType extends \Civi\Core\Entity {
               'display_name' => array(
       
         'name' => 'display_name',
+        'propertyName' => 'displayName',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Display Name'),
                                  'maxlength' => 64,
@@ -319,6 +329,7 @@ class LocationType extends \Civi\Core\Entity {
               'vcard_name' => array(
       
         'name' => 'vcard_name',
+        'propertyName' => 'vcardName',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('vCard Location Type'),
                                  'maxlength' => 64,
@@ -330,6 +341,7 @@ class LocationType extends \Civi\Core\Entity {
               'description' => array(
       
         'name' => 'description',
+        'propertyName' => 'description',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Description'),
                                  'maxlength' => 255,
@@ -341,6 +353,7 @@ class LocationType extends \Civi\Core\Entity {
               'is_reserved' => array(
       
         'name' => 'is_reserved',
+        'propertyName' => 'isReserved',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                                                      
                                     
@@ -349,6 +362,7 @@ class LocationType extends \Civi\Core\Entity {
               'is_active' => array(
       
         'name' => 'is_active',
+        'propertyName' => 'isActive',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                                                      
                                     
@@ -357,6 +371,7 @@ class LocationType extends \Civi\Core\Entity {
               'is_default' => array(
       
         'name' => 'is_default',
+        'propertyName' => 'isDefault',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                                                      
                                     

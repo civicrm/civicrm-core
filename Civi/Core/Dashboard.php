@@ -69,6 +69,7 @@ class Dashboard extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\Domain")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="domain_id", referencedColumnName="id")})
+   * 
    */
   private $domain;
   
@@ -77,6 +78,7 @@ class Dashboard extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="name", type="string", length=64, nullable=true)
+   * 
    * 
    */
   private $name;
@@ -87,6 +89,7 @@ class Dashboard extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="label", type="string", length=255, nullable=true)
    * 
+   * 
    */
   private $label;
   
@@ -95,6 +98,7 @@ class Dashboard extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="url", type="string", length=255, nullable=true)
+   * 
    * 
    */
   private $url;
@@ -105,6 +109,7 @@ class Dashboard extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="permission", type="string", length=255, nullable=true)
    * 
+   * 
    */
   private $permission;
   
@@ -113,6 +118,7 @@ class Dashboard extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="permission_operator", type="string", length=3, nullable=true)
+   * 
    * 
    */
   private $permissionOperator;
@@ -123,6 +129,7 @@ class Dashboard extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="column_no", type="boolean", nullable=false)
    * 
+   * 
    */
   private $columnNo = '0';
   
@@ -131,6 +138,7 @@ class Dashboard extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_minimized", type="boolean", nullable=false)
+   * 
    * 
    */
   private $isMinimized = '0';
@@ -141,6 +149,7 @@ class Dashboard extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="fullscreen_url", type="string", length=255, nullable=true)
    * 
+   * 
    */
   private $fullscreenUrl;
   
@@ -149,6 +158,7 @@ class Dashboard extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_fullscreen", type="boolean", nullable=false)
+   * 
    * 
    */
   private $isFullscreen = '1';
@@ -159,6 +169,7 @@ class Dashboard extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_active", type="boolean", nullable=false)
    * 
+   * 
    */
   private $isActive = '0';
   
@@ -168,6 +179,7 @@ class Dashboard extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_reserved", type="boolean", nullable=false)
    * 
+   * 
    */
   private $isReserved = '0';
   
@@ -176,6 +188,7 @@ class Dashboard extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="weight", type="integer", nullable=false, options={"unsigned":true})
+   * 
    * 
    */
   private $weight = '0';
@@ -462,6 +475,7 @@ class Dashboard extends \Civi\Core\Entity {
               'id' => array(
       
         'name' => 'id',
+        'propertyName' => 'id',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -471,6 +485,7 @@ class Dashboard extends \Civi\Core\Entity {
               'domain_id' => array(
       
         'name' => 'domain_id',
+        'propertyName' => 'domain',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -481,6 +496,7 @@ class Dashboard extends \Civi\Core\Entity {
               'name' => array(
       
         'name' => 'name',
+        'propertyName' => 'name',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Dashlet Name'),
                                  'maxlength' => 64,
@@ -492,6 +508,7 @@ class Dashboard extends \Civi\Core\Entity {
               'label' => array(
       
         'name' => 'label',
+        'propertyName' => 'label',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Label'),
                                  'maxlength' => 255,
@@ -503,6 +520,7 @@ class Dashboard extends \Civi\Core\Entity {
               'url' => array(
       
         'name' => 'url',
+        'propertyName' => 'url',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Url'),
                                  'maxlength' => 255,
@@ -514,6 +532,7 @@ class Dashboard extends \Civi\Core\Entity {
               'permission' => array(
       
         'name' => 'permission',
+        'propertyName' => 'permission',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Permission'),
                                  'maxlength' => 255,
@@ -525,6 +544,7 @@ class Dashboard extends \Civi\Core\Entity {
               'permission_operator' => array(
       
         'name' => 'permission_operator',
+        'propertyName' => 'permissionOperator',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Permission Operator'),
                                  'maxlength' => 3,
@@ -536,6 +556,7 @@ class Dashboard extends \Civi\Core\Entity {
               'column_no' => array(
       
         'name' => 'column_no',
+        'propertyName' => 'columnNo',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('Column No'),
                                                      
@@ -545,6 +566,7 @@ class Dashboard extends \Civi\Core\Entity {
               'is_minimized' => array(
       
         'name' => 'is_minimized',
+        'propertyName' => 'isMinimized',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                                                      
                                     
@@ -553,6 +575,7 @@ class Dashboard extends \Civi\Core\Entity {
               'fullscreen_url' => array(
       
         'name' => 'fullscreen_url',
+        'propertyName' => 'fullscreenUrl',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Fullscreen Url'),
                                  'maxlength' => 255,
@@ -564,6 +587,7 @@ class Dashboard extends \Civi\Core\Entity {
               'is_fullscreen' => array(
       
         'name' => 'is_fullscreen',
+        'propertyName' => 'isFullscreen',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                                                      
                                            'default' => '1',
@@ -573,6 +597,7 @@ class Dashboard extends \Civi\Core\Entity {
               'is_active' => array(
       
         'name' => 'is_active',
+        'propertyName' => 'isActive',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                                                      
                                     
@@ -581,6 +606,7 @@ class Dashboard extends \Civi\Core\Entity {
               'is_reserved' => array(
       
         'name' => 'is_reserved',
+        'propertyName' => 'isReserved',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                                                      
                                     
@@ -589,6 +615,7 @@ class Dashboard extends \Civi\Core\Entity {
               'weight' => array(
       
         'name' => 'weight',
+        'propertyName' => 'weight',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Weight'),
                                                      

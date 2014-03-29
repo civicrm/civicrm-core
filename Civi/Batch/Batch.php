@@ -69,6 +69,7 @@ class Batch extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="name", type="string", length=64, nullable=true)
    * 
+   * 
    */
   private $name;
   
@@ -78,6 +79,7 @@ class Batch extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="title", type="string", length=64, nullable=true)
    * 
+   * 
    */
   private $title;
   
@@ -85,7 +87,8 @@ class Batch extends \Civi\Core\Entity {
    * @var text
    *
    * @JMS\Type("text")
-   * @ORM\Column(name="description", type="text", nullable=true)
+   * @ORM\Column(name="description", type="text", length=65535, nullable=true)
+   * 
    * 
    */
   private $description;
@@ -96,6 +99,7 @@ class Batch extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Contact")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="created_id", referencedColumnName="id", onDelete="SET NULL")})
+   * 
    */
   private $created;
   
@@ -104,6 +108,7 @@ class Batch extends \Civi\Core\Entity {
    *
    * @JMS\Type("datetime")
    * @ORM\Column(name="created_date", type="datetime", nullable=true)
+   * 
    * 
    */
   private $createdDate;
@@ -114,6 +119,7 @@ class Batch extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Contact")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="modified_id", referencedColumnName="id", onDelete="SET NULL")})
+   * 
    */
   private $modified;
   
@@ -122,6 +128,7 @@ class Batch extends \Civi\Core\Entity {
    *
    * @JMS\Type("datetime")
    * @ORM\Column(name="modified_date", type="datetime", nullable=true)
+   * 
    * 
    */
   private $modifiedDate;
@@ -132,6 +139,7 @@ class Batch extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\SavedSearch")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="saved_search_id", referencedColumnName="id", onDelete="SET NULL")})
+   * 
    */
   private $savedSearch;
   
@@ -140,6 +148,7 @@ class Batch extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="status_id", type="integer", nullable=true, options={"unsigned":true})
+   * 
    * 
    */
   private $statusId;
@@ -150,6 +159,7 @@ class Batch extends \Civi\Core\Entity {
    * @JMS\Type("integer")
    * @ORM\Column(name="type_id", type="integer", nullable=true, options={"unsigned":true})
    * 
+   * 
    */
   private $typeId;
   
@@ -158,6 +168,7 @@ class Batch extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="mode_id", type="integer", nullable=true, options={"unsigned":true})
+   * 
    * 
    */
   private $modeId;
@@ -168,6 +179,7 @@ class Batch extends \Civi\Core\Entity {
    * @JMS\Type("float")
    * @ORM\Column(name="total", type="float", nullable=true)
    * 
+   * 
    */
   private $total;
   
@@ -176,6 +188,7 @@ class Batch extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="item_count", type="integer", nullable=true, options={"unsigned":true})
+   * 
    * 
    */
   private $itemCount;
@@ -186,6 +199,7 @@ class Batch extends \Civi\Core\Entity {
    * @JMS\Type("integer")
    * @ORM\Column(name="payment_instrument_id", type="integer", nullable=true, options={"unsigned":true})
    * 
+   * 
    */
   private $paymentInstrumentId;
   
@@ -195,6 +209,7 @@ class Batch extends \Civi\Core\Entity {
    * @JMS\Type("datetime")
    * @ORM\Column(name="exported_date", type="datetime", nullable=true)
    * 
+   * 
    */
   private $exportedDate;
   
@@ -203,6 +218,7 @@ class Batch extends \Civi\Core\Entity {
    *
    * @JMS\Type("text")
    * @ORM\Column(name="data", type="text", nullable=true)
+   * 
    * 
    */
   private $data;
@@ -549,6 +565,7 @@ class Batch extends \Civi\Core\Entity {
               'id' => array(
       
         'name' => 'id',
+        'propertyName' => 'id',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -558,6 +575,7 @@ class Batch extends \Civi\Core\Entity {
               'name' => array(
       
         'name' => 'name',
+        'propertyName' => 'name',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Name'),
                                  'maxlength' => 64,
@@ -569,6 +587,7 @@ class Batch extends \Civi\Core\Entity {
               'title' => array(
       
         'name' => 'title',
+        'propertyName' => 'title',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Title'),
                                  'maxlength' => 64,
@@ -580,9 +599,11 @@ class Batch extends \Civi\Core\Entity {
               'description' => array(
       
         'name' => 'description',
+        'propertyName' => 'description',
         'type' => CRM_Utils_Type::T_TEXT,
                 'title' => ts('Description'),
-                                                   'rows' => 4,
+                                 'maxlength' => 65535,
+                                  'rows' => 4,
                          'cols' => 80,
          
                                     
@@ -591,6 +612,7 @@ class Batch extends \Civi\Core\Entity {
               'created_id' => array(
       
         'name' => 'created_id',
+        'propertyName' => 'created',
         'type' => CRM_Utils_Type::T_INT,
                                                      
                                     
@@ -600,6 +622,7 @@ class Batch extends \Civi\Core\Entity {
               'created_date' => array(
       
         'name' => 'created_date',
+        'propertyName' => 'createdDate',
         'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
                 'title' => ts('Created Date'),
                                                      
@@ -609,6 +632,7 @@ class Batch extends \Civi\Core\Entity {
               'modified_id' => array(
       
         'name' => 'modified_id',
+        'propertyName' => 'modified',
         'type' => CRM_Utils_Type::T_INT,
                                                      
                                     
@@ -618,6 +642,7 @@ class Batch extends \Civi\Core\Entity {
               'modified_date' => array(
       
         'name' => 'modified_date',
+        'propertyName' => 'modifiedDate',
         'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
                 'title' => ts('Modified Date'),
                                                      
@@ -627,6 +652,7 @@ class Batch extends \Civi\Core\Entity {
               'saved_search_id' => array(
       
         'name' => 'saved_search_id',
+        'propertyName' => 'savedSearch',
         'type' => CRM_Utils_Type::T_INT,
                                                      
                                     
@@ -636,6 +662,7 @@ class Batch extends \Civi\Core\Entity {
               'status_id' => array(
       
         'name' => 'status_id',
+        'propertyName' => 'statusId',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -648,6 +675,7 @@ class Batch extends \Civi\Core\Entity {
               'type_id' => array(
       
         'name' => 'type_id',
+        'propertyName' => 'typeId',
         'type' => CRM_Utils_Type::T_INT,
                                                      
                                     
@@ -659,6 +687,7 @@ class Batch extends \Civi\Core\Entity {
               'mode_id' => array(
       
         'name' => 'mode_id',
+        'propertyName' => 'modeId',
         'type' => CRM_Utils_Type::T_INT,
                                                      
                                     
@@ -670,6 +699,7 @@ class Batch extends \Civi\Core\Entity {
               'total' => array(
       
         'name' => 'total',
+        'propertyName' => 'total',
         'type' => CRM_Utils_Type::T_MONEY,
                 'title' => ts('Total'),
                                                      
@@ -679,6 +709,7 @@ class Batch extends \Civi\Core\Entity {
               'item_count' => array(
       
         'name' => 'item_count',
+        'propertyName' => 'itemCount',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Item Count'),
                                                      
@@ -688,6 +719,7 @@ class Batch extends \Civi\Core\Entity {
               'payment_instrument_id' => array(
       
         'name' => 'payment_instrument_id',
+        'propertyName' => 'paymentInstrumentId',
         'type' => CRM_Utils_Type::T_INT,
                                                      
                                     
@@ -699,6 +731,7 @@ class Batch extends \Civi\Core\Entity {
               'exported_date' => array(
       
         'name' => 'exported_date',
+        'propertyName' => 'exportedDate',
         'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
                 'title' => ts('Exported Date'),
                                                      
@@ -708,6 +741,7 @@ class Batch extends \Civi\Core\Entity {
               'data' => array(
       
         'name' => 'data',
+        'propertyName' => 'data',
         'type' => CRM_Utils_Type::T_LONGTEXT,
                 'title' => ts('Data'),
                                                      

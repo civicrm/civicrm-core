@@ -69,6 +69,7 @@ class JobLog extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\Domain")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="domain_id", referencedColumnName="id")})
+   * 
    */
   private $domain;
   
@@ -78,6 +79,7 @@ class JobLog extends \Civi\Core\Entity {
    * @JMS\Type("datetime")
    * @ORM\Column(name="run_time", type="datetime", nullable=true)
    * 
+   * 1
    */
   private $runTime;
   
@@ -86,6 +88,7 @@ class JobLog extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="job_id", type="integer", nullable=true, options={"unsigned":true})
+   * 
    * 
    */
   private $jobId;
@@ -96,6 +99,7 @@ class JobLog extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="name", type="string", length=255, nullable=true)
    * 
+   * 
    */
   private $name;
   
@@ -104,6 +108,7 @@ class JobLog extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="command", type="string", length=255, nullable=true)
+   * 
    * 
    */
   private $command;
@@ -114,6 +119,7 @@ class JobLog extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="description", type="string", length=255, nullable=true)
    * 
+   * 
    */
   private $description;
   
@@ -121,7 +127,8 @@ class JobLog extends \Civi\Core\Entity {
    * @var text
    *
    * @JMS\Type("text")
-   * @ORM\Column(name="data", type="text", nullable=true)
+   * @ORM\Column(name="data", type="text", length=65535, nullable=true)
+   * 
    * 
    */
   private $data;
@@ -288,6 +295,7 @@ class JobLog extends \Civi\Core\Entity {
               'id' => array(
       
         'name' => 'id',
+        'propertyName' => 'id',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -297,6 +305,7 @@ class JobLog extends \Civi\Core\Entity {
               'domain_id' => array(
       
         'name' => 'domain_id',
+        'propertyName' => 'domain',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -307,6 +316,7 @@ class JobLog extends \Civi\Core\Entity {
               'run_time' => array(
       
         'name' => 'run_time',
+        'propertyName' => 'runTime',
         'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
                 'title' => ts('Run Time'),
                                                      
@@ -316,6 +326,7 @@ class JobLog extends \Civi\Core\Entity {
               'job_id' => array(
       
         'name' => 'job_id',
+        'propertyName' => 'jobId',
         'type' => CRM_Utils_Type::T_INT,
                                                      
                                     
@@ -324,6 +335,7 @@ class JobLog extends \Civi\Core\Entity {
               'name' => array(
       
         'name' => 'name',
+        'propertyName' => 'name',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Name'),
                                  'maxlength' => 255,
@@ -335,6 +347,7 @@ class JobLog extends \Civi\Core\Entity {
               'command' => array(
       
         'name' => 'command',
+        'propertyName' => 'command',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Command'),
                                  'maxlength' => 255,
@@ -346,6 +359,7 @@ class JobLog extends \Civi\Core\Entity {
               'description' => array(
       
         'name' => 'description',
+        'propertyName' => 'description',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Description'),
                                  'maxlength' => 255,
@@ -357,9 +371,11 @@ class JobLog extends \Civi\Core\Entity {
               'data' => array(
       
         'name' => 'data',
+        'propertyName' => 'data',
         'type' => CRM_Utils_Type::T_TEXT,
                 'title' => ts('Data'),
-                                                     
+                                 'maxlength' => 65535,
+                                    
                                     
                           ),
              );

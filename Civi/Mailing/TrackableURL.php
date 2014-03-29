@@ -69,6 +69,7 @@ class TrackableURL extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="url", type="string", length=255, nullable=true)
    * 
+   * 
    */
   private $url;
   
@@ -78,6 +79,7 @@ class TrackableURL extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Mailing\Mailing")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="mailing_id", referencedColumnName="id", onDelete="CASCADE")})
+   * 
    */
   private $mailing;
 
@@ -143,6 +145,7 @@ class TrackableURL extends \Civi\Core\Entity {
               'id' => array(
       
         'name' => 'id',
+        'propertyName' => 'id',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -152,6 +155,7 @@ class TrackableURL extends \Civi\Core\Entity {
               'url' => array(
       
         'name' => 'url',
+        'propertyName' => 'url',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Url'),
                         'required' => true,
@@ -164,6 +168,7 @@ class TrackableURL extends \Civi\Core\Entity {
               'mailing_id' => array(
       
         'name' => 'mailing_id',
+        'propertyName' => 'mailing',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              

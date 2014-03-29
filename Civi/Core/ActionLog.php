@@ -69,6 +69,7 @@ class ActionLog extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Contact")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="contact_id", referencedColumnName="id", onDelete="CASCADE")})
+   * 
    */
   private $contact;
   
@@ -77,6 +78,7 @@ class ActionLog extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="entity_id", type="integer", nullable=true, options={"unsigned":true})
+   * 
    * 
    */
   private $entityId;
@@ -87,6 +89,7 @@ class ActionLog extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="entity_table", type="string", length=255, nullable=true)
    * 
+   * 
    */
   private $entityTable;
   
@@ -96,6 +99,7 @@ class ActionLog extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\ActionSchedule")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="action_schedule_id", referencedColumnName="id", onDelete="CASCADE")})
+   * 
    */
   private $actionSchedule;
   
@@ -104,6 +108,7 @@ class ActionLog extends \Civi\Core\Entity {
    *
    * @JMS\Type("datetime")
    * @ORM\Column(name="action_date_time", type="datetime", nullable=true)
+   * 
    * 
    */
   private $actionDateTime;
@@ -114,6 +119,7 @@ class ActionLog extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_error", type="boolean", nullable=false)
    * 
+   * 
    */
   private $isError = '0';
   
@@ -121,7 +127,8 @@ class ActionLog extends \Civi\Core\Entity {
    * @var text
    *
    * @JMS\Type("text")
-   * @ORM\Column(name="message", type="text", nullable=true)
+   * @ORM\Column(name="message", type="text", length=65535, nullable=true)
+   * 
    * 
    */
   private $message;
@@ -131,6 +138,7 @@ class ActionLog extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="repetition_number", type="integer", nullable=true, options={"unsigned":true})
+   * 
    * 
    */
   private $repetitionNumber;
@@ -317,6 +325,7 @@ class ActionLog extends \Civi\Core\Entity {
               'id' => array(
       
         'name' => 'id',
+        'propertyName' => 'id',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -326,6 +335,7 @@ class ActionLog extends \Civi\Core\Entity {
               'contact_id' => array(
       
         'name' => 'contact_id',
+        'propertyName' => 'contact',
         'type' => CRM_Utils_Type::T_INT,
                                                      
                                     
@@ -335,6 +345,7 @@ class ActionLog extends \Civi\Core\Entity {
               'entity_id' => array(
       
         'name' => 'entity_id',
+        'propertyName' => 'entityId',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -344,6 +355,7 @@ class ActionLog extends \Civi\Core\Entity {
               'entity_table' => array(
       
         'name' => 'entity_table',
+        'propertyName' => 'entityTable',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Entity Table'),
                                  'maxlength' => 255,
@@ -355,6 +367,7 @@ class ActionLog extends \Civi\Core\Entity {
               'action_schedule_id' => array(
       
         'name' => 'action_schedule_id',
+        'propertyName' => 'actionSchedule',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -365,6 +378,7 @@ class ActionLog extends \Civi\Core\Entity {
               'action_date_time' => array(
       
         'name' => 'action_date_time',
+        'propertyName' => 'actionDateTime',
         'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
                 'title' => ts('Action Date Time'),
                                                      
@@ -374,6 +388,7 @@ class ActionLog extends \Civi\Core\Entity {
               'is_error' => array(
       
         'name' => 'is_error',
+        'propertyName' => 'isError',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                                                      
                                     
@@ -382,15 +397,18 @@ class ActionLog extends \Civi\Core\Entity {
               'message' => array(
       
         'name' => 'message',
+        'propertyName' => 'message',
         'type' => CRM_Utils_Type::T_TEXT,
                 'title' => ts('Message'),
-                                                     
+                                 'maxlength' => 65535,
+                                    
                                     
                           ),
       
               'repetition_number' => array(
       
         'name' => 'repetition_number',
+        'propertyName' => 'repetitionNumber',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Repetition Number'),
                                                      

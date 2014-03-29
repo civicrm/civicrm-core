@@ -69,6 +69,7 @@ class GroupOrganization extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Group")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="group_id", referencedColumnName="id", onDelete="CASCADE")})
+   * 
    */
   private $group;
   
@@ -78,6 +79,7 @@ class GroupOrganization extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Contact")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="organization_id", referencedColumnName="id", onDelete="CASCADE")})
+   * 
    */
   private $organization;
 
@@ -143,6 +145,7 @@ class GroupOrganization extends \Civi\Core\Entity {
               'id' => array(
       
         'name' => 'id',
+        'propertyName' => 'id',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -152,6 +155,7 @@ class GroupOrganization extends \Civi\Core\Entity {
               'group_id' => array(
       
         'name' => 'group_id',
+        'propertyName' => 'group',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -167,6 +171,7 @@ class GroupOrganization extends \Civi\Core\Entity {
               'organization_id' => array(
       
         'name' => 'organization_id',
+        'propertyName' => 'organization',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              

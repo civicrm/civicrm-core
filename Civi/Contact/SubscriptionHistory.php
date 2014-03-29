@@ -69,6 +69,7 @@ class SubscriptionHistory extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Contact")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="contact_id", referencedColumnName="id", onDelete="CASCADE")})
+   * 
    */
   private $contact;
   
@@ -78,6 +79,7 @@ class SubscriptionHistory extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Group")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="group_id", referencedColumnName="id", onDelete="CASCADE")})
+   * 
    */
   private $group;
   
@@ -86,6 +88,7 @@ class SubscriptionHistory extends \Civi\Core\Entity {
    *
    * @JMS\Type("datetime")
    * @ORM\Column(name="date", type="datetime", nullable=true)
+   * 
    * 
    */
   private $date;
@@ -96,6 +99,7 @@ class SubscriptionHistory extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="method", type="string", length=8, nullable=true)
    * 
+   * 
    */
   private $method;
   
@@ -105,6 +109,7 @@ class SubscriptionHistory extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="status", type="string", length=8, nullable=true)
    * 
+   * 
    */
   private $status;
   
@@ -113,6 +118,7 @@ class SubscriptionHistory extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="tracking", type="string", length=255, nullable=true)
+   * 
    * 
    */
   private $tracking;
@@ -259,6 +265,7 @@ class SubscriptionHistory extends \Civi\Core\Entity {
               'id' => array(
       
         'name' => 'id',
+        'propertyName' => 'id',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -268,6 +275,7 @@ class SubscriptionHistory extends \Civi\Core\Entity {
               'contact_id' => array(
       
         'name' => 'contact_id',
+        'propertyName' => 'contact',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -278,6 +286,7 @@ class SubscriptionHistory extends \Civi\Core\Entity {
               'group_id' => array(
       
         'name' => 'group_id',
+        'propertyName' => 'group',
         'type' => CRM_Utils_Type::T_INT,
                                                      
                                     
@@ -292,6 +301,7 @@ class SubscriptionHistory extends \Civi\Core\Entity {
               'date' => array(
       
         'name' => 'date',
+        'propertyName' => 'date',
         'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
                 'title' => ts('Date'),
                         'required' => true,
@@ -302,6 +312,7 @@ class SubscriptionHistory extends \Civi\Core\Entity {
               'method' => array(
       
         'name' => 'method',
+        'propertyName' => 'method',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Method'),
                                  'maxlength' => 8,
@@ -316,6 +327,7 @@ class SubscriptionHistory extends \Civi\Core\Entity {
               'status' => array(
       
         'name' => 'status',
+        'propertyName' => 'status',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Status'),
                                  'maxlength' => 8,
@@ -330,6 +342,7 @@ class SubscriptionHistory extends \Civi\Core\Entity {
               'tracking' => array(
       
         'name' => 'tracking',
+        'propertyName' => 'tracking',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Tracking'),
                                  'maxlength' => 255,

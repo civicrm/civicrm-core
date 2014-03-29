@@ -69,6 +69,7 @@ class Email extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Contact")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="contact_id", referencedColumnName="id", onDelete="CASCADE")})
+   * 
    */
   private $contact;
   
@@ -77,6 +78,7 @@ class Email extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="location_type_id", type="integer", nullable=true, options={"unsigned":true})
+   * 
    * 
    */
   private $locationTypeId;
@@ -87,6 +89,7 @@ class Email extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="email", type="string", length=254, nullable=true)
    * 
+   * 
    */
   private $email;
   
@@ -95,6 +98,7 @@ class Email extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_primary", type="boolean", nullable=false)
+   * 
    * 
    */
   private $isPrimary = '0';
@@ -105,6 +109,7 @@ class Email extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_billing", type="boolean", nullable=false)
    * 
+   * 
    */
   private $isBilling = '0';
   
@@ -113,6 +118,7 @@ class Email extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="on_hold", type="boolean", nullable=false)
+   * 
    * 
    */
   private $onHold = '0';
@@ -123,6 +129,7 @@ class Email extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_bulkmail", type="boolean", nullable=false)
    * 
+   * 
    */
   private $isBulkmail = '0';
   
@@ -131,6 +138,7 @@ class Email extends \Civi\Core\Entity {
    *
    * @JMS\Type("datetime")
    * @ORM\Column(name="hold_date", type="datetime", nullable=true)
+   * 
    * 
    */
   private $holdDate;
@@ -141,6 +149,7 @@ class Email extends \Civi\Core\Entity {
    * @JMS\Type("datetime")
    * @ORM\Column(name="reset_date", type="datetime", nullable=true)
    * 
+   * 
    */
   private $resetDate;
   
@@ -148,7 +157,8 @@ class Email extends \Civi\Core\Entity {
    * @var text
    *
    * @JMS\Type("text")
-   * @ORM\Column(name="signature_text", type="text", nullable=false)
+   * @ORM\Column(name="signature_text", type="text", length=65535, nullable=false)
+   * 
    * 
    */
   private $signatureText = 'NULL';
@@ -157,7 +167,8 @@ class Email extends \Civi\Core\Entity {
    * @var text
    *
    * @JMS\Type("text")
-   * @ORM\Column(name="signature_html", type="text", nullable=false)
+   * @ORM\Column(name="signature_html", type="text", length=65535, nullable=false)
+   * 
    * 
    */
   private $signatureHtml = 'NULL';
@@ -404,6 +415,7 @@ class Email extends \Civi\Core\Entity {
               'id' => array(
       
         'name' => 'id',
+        'propertyName' => 'id',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -413,6 +425,7 @@ class Email extends \Civi\Core\Entity {
               'contact_id' => array(
       
         'name' => 'contact_id',
+        'propertyName' => 'contact',
         'type' => CRM_Utils_Type::T_INT,
                                                      
                                     
@@ -422,6 +435,7 @@ class Email extends \Civi\Core\Entity {
               'location_type_id' => array(
       
         'name' => 'location_type_id',
+        'propertyName' => 'locationTypeId',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Email Location Type'),
                                                      
@@ -436,6 +450,7 @@ class Email extends \Civi\Core\Entity {
               'email' => array(
       
         'name' => 'email',
+        'propertyName' => 'email',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Email'),
                                  'maxlength' => 254,
@@ -453,6 +468,7 @@ class Email extends \Civi\Core\Entity {
               'is_primary' => array(
       
         'name' => 'is_primary',
+        'propertyName' => 'isPrimary',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                                                      
                                     
@@ -461,6 +477,7 @@ class Email extends \Civi\Core\Entity {
               'is_billing' => array(
       
         'name' => 'is_billing',
+        'propertyName' => 'isBilling',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                                                      
                                     
@@ -469,6 +486,7 @@ class Email extends \Civi\Core\Entity {
               'on_hold' => array(
       
         'name' => 'on_hold',
+        'propertyName' => 'onHold',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('On Hold'),
                         'required' => true,
@@ -483,6 +501,7 @@ class Email extends \Civi\Core\Entity {
               'is_bulkmail' => array(
       
         'name' => 'is_bulkmail',
+        'propertyName' => 'isBulkmail',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('Use for Bulk Mail'),
                         'required' => true,
@@ -497,6 +516,7 @@ class Email extends \Civi\Core\Entity {
               'hold_date' => array(
       
         'name' => 'hold_date',
+        'propertyName' => 'holdDate',
         'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
                 'title' => ts('Hold Date'),
                                                      
@@ -506,6 +526,7 @@ class Email extends \Civi\Core\Entity {
               'reset_date' => array(
       
         'name' => 'reset_date',
+        'propertyName' => 'resetDate',
         'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
                 'title' => ts('Reset Date'),
                                                      
@@ -515,9 +536,11 @@ class Email extends \Civi\Core\Entity {
               'signature_text' => array(
       
         'name' => 'signature_text',
+        'propertyName' => 'signatureText',
         'type' => CRM_Utils_Type::T_TEXT,
                 'title' => ts('Signature Text'),
-                                                     
+                                 'maxlength' => 65535,
+                                    
                 'import' => true,
         'where' => 'civicrm_email.signature_text',
         'headerPattern' => '',
@@ -530,9 +553,11 @@ class Email extends \Civi\Core\Entity {
               'signature_html' => array(
       
         'name' => 'signature_html',
+        'propertyName' => 'signatureHtml',
         'type' => CRM_Utils_Type::T_TEXT,
                 'title' => ts('Signature Html'),
-                                                     
+                                 'maxlength' => 65535,
+                                    
                 'import' => true,
         'where' => 'civicrm_email.signature_html',
         'headerPattern' => '',

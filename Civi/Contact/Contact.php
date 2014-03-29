@@ -69,6 +69,7 @@ class Contact extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="contact_type", type="string", length=64, nullable=true)
    * 
+   * 
    */
   private $contactType;
   
@@ -77,6 +78,7 @@ class Contact extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="contact_sub_type", type="string", length=255, nullable=true)
+   * 
    * 
    */
   private $contactSubType;
@@ -87,6 +89,7 @@ class Contact extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="do_not_email", type="boolean", nullable=false)
    * 
+   * 
    */
   private $doNotEmail = '0';
   
@@ -95,6 +98,7 @@ class Contact extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="do_not_phone", type="boolean", nullable=false)
+   * 
    * 
    */
   private $doNotPhone = '0';
@@ -105,6 +109,7 @@ class Contact extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="do_not_mail", type="boolean", nullable=false)
    * 
+   * 
    */
   private $doNotMail = '0';
   
@@ -113,6 +118,7 @@ class Contact extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="do_not_sms", type="boolean", nullable=false)
+   * 
    * 
    */
   private $doNotSms = '0';
@@ -123,6 +129,7 @@ class Contact extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="do_not_trade", type="boolean", nullable=false)
    * 
+   * 
    */
   private $doNotTrade = '0';
   
@@ -131,6 +138,7 @@ class Contact extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_opt_out", type="boolean", nullable=false)
+   * 
    * 
    */
   private $isOptOut = '0';
@@ -141,6 +149,7 @@ class Contact extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="legal_identifier", type="string", length=32, nullable=true)
    * 
+   * 
    */
   private $legalIdentifier;
   
@@ -149,6 +158,7 @@ class Contact extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="external_identifier", type="string", length=32, nullable=true)
+   * 
    * 
    */
   private $externalIdentifier;
@@ -159,6 +169,7 @@ class Contact extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="sort_name", type="string", length=128, nullable=true)
    * 
+   * 
    */
   private $sortName;
   
@@ -167,6 +178,7 @@ class Contact extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="display_name", type="string", length=128, nullable=true)
+   * 
    * 
    */
   private $displayName;
@@ -177,6 +189,7 @@ class Contact extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="nick_name", type="string", length=128, nullable=true)
    * 
+   * 
    */
   private $nickName;
   
@@ -185,6 +198,7 @@ class Contact extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="legal_name", type="string", length=128, nullable=true)
+   * 
    * 
    */
   private $legalName;
@@ -195,6 +209,7 @@ class Contact extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="image_URL", type="string", length=255, nullable=true)
    * 
+   * 
    */
   private $imageURL;
   
@@ -203,6 +218,7 @@ class Contact extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="preferred_communication_method", type="string", length=255, nullable=true)
+   * 
    * 
    */
   private $preferredCommunicationMethod;
@@ -213,6 +229,7 @@ class Contact extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="preferred_language", type="string", length=5, nullable=true)
    * 
+   * 
    */
   private $preferredLanguage;
   
@@ -221,6 +238,7 @@ class Contact extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="preferred_mail_format", type="string", length=8, nullable=false)
+   * 
    * 
    */
   private $preferredMailFormat = '"Both"';
@@ -231,6 +249,7 @@ class Contact extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="hash", type="string", length=32, nullable=true)
    * 
+   * 
    */
   private $hash;
   
@@ -239,6 +258,7 @@ class Contact extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="api_key", type="string", length=32, nullable=true)
+   * 
    * 
    */
   private $apiKey;
@@ -249,6 +269,7 @@ class Contact extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="source", type="string", length=255, nullable=true)
    * 
+   * 
    */
   private $source;
   
@@ -257,6 +278,7 @@ class Contact extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="first_name", type="string", length=64, nullable=true)
+   * 
    * 
    */
   private $firstName;
@@ -267,6 +289,7 @@ class Contact extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="middle_name", type="string", length=64, nullable=true)
    * 
+   * 
    */
   private $middleName;
   
@@ -275,6 +298,7 @@ class Contact extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="last_name", type="string", length=64, nullable=true)
+   * 
    * 
    */
   private $lastName;
@@ -285,6 +309,7 @@ class Contact extends \Civi\Core\Entity {
    * @JMS\Type("integer")
    * @ORM\Column(name="prefix_id", type="integer", nullable=true, options={"unsigned":true})
    * 
+   * 
    */
   private $prefixId;
   
@@ -293,6 +318,7 @@ class Contact extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="suffix_id", type="integer", nullable=true, options={"unsigned":true})
+   * 
    * 
    */
   private $suffixId;
@@ -303,6 +329,7 @@ class Contact extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="formal_title", type="string", length=64, nullable=true)
    * 
+   * 
    */
   private $formalTitle;
   
@@ -311,6 +338,7 @@ class Contact extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="communication_style_id", type="integer", nullable=true, options={"unsigned":true})
+   * 
    * 
    */
   private $communicationStyleId;
@@ -321,6 +349,7 @@ class Contact extends \Civi\Core\Entity {
    * @JMS\Type("integer")
    * @ORM\Column(name="email_greeting_id", type="integer", nullable=true, options={"unsigned":true})
    * 
+   * 
    */
   private $emailGreetingId;
   
@@ -329,6 +358,7 @@ class Contact extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="email_greeting_custom", type="string", length=128, nullable=true)
+   * 
    * 
    */
   private $emailGreetingCustom;
@@ -339,6 +369,7 @@ class Contact extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="email_greeting_display", type="string", length=255, nullable=true)
    * 
+   * 
    */
   private $emailGreetingDisplay;
   
@@ -347,6 +378,7 @@ class Contact extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="postal_greeting_id", type="integer", nullable=true, options={"unsigned":true})
+   * 
    * 
    */
   private $postalGreetingId;
@@ -357,6 +389,7 @@ class Contact extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="postal_greeting_custom", type="string", length=128, nullable=true)
    * 
+   * 
    */
   private $postalGreetingCustom;
   
@@ -365,6 +398,7 @@ class Contact extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="postal_greeting_display", type="string", length=255, nullable=true)
+   * 
    * 
    */
   private $postalGreetingDisplay;
@@ -375,6 +409,7 @@ class Contact extends \Civi\Core\Entity {
    * @JMS\Type("integer")
    * @ORM\Column(name="addressee_id", type="integer", nullable=true, options={"unsigned":true})
    * 
+   * 
    */
   private $addresseeId;
   
@@ -383,6 +418,7 @@ class Contact extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="addressee_custom", type="string", length=128, nullable=true)
+   * 
    * 
    */
   private $addresseeCustom;
@@ -393,6 +429,7 @@ class Contact extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="addressee_display", type="string", length=255, nullable=true)
    * 
+   * 
    */
   private $addresseeDisplay;
   
@@ -401,6 +438,7 @@ class Contact extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="job_title", type="string", length=255, nullable=true)
+   * 
    * 
    */
   private $jobTitle;
@@ -411,6 +449,7 @@ class Contact extends \Civi\Core\Entity {
    * @JMS\Type("integer")
    * @ORM\Column(name="gender_id", type="integer", nullable=true, options={"unsigned":true})
    * 
+   * 
    */
   private $genderId;
   
@@ -419,6 +458,7 @@ class Contact extends \Civi\Core\Entity {
    *
    * @JMS\Type("date")
    * @ORM\Column(name="birth_date", type="date", nullable=true)
+   * 
    * 
    */
   private $birthDate;
@@ -429,6 +469,7 @@ class Contact extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_deceased", type="boolean", nullable=false)
    * 
+   * 
    */
   private $isDeceased = '0';
   
@@ -437,6 +478,7 @@ class Contact extends \Civi\Core\Entity {
    *
    * @JMS\Type("date")
    * @ORM\Column(name="deceased_date", type="date", nullable=true)
+   * 
    * 
    */
   private $deceasedDate;
@@ -447,6 +489,7 @@ class Contact extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="household_name", type="string", length=128, nullable=true)
    * 
+   * 
    */
   private $householdName;
   
@@ -456,6 +499,7 @@ class Contact extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Contact")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="primary_contact_id", referencedColumnName="id", onDelete="SET NULL")})
+   * 
    */
   private $primaryContact;
   
@@ -464,6 +508,7 @@ class Contact extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="organization_name", type="string", length=128, nullable=true)
+   * 
    * 
    */
   private $organizationName;
@@ -474,6 +519,7 @@ class Contact extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="sic_code", type="string", length=8, nullable=true)
    * 
+   * 
    */
   private $sicCode;
   
@@ -482,6 +528,7 @@ class Contact extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="user_unique_id", type="string", length=255, nullable=true)
+   * 
    * 
    */
   private $userUniqueId;
@@ -492,6 +539,7 @@ class Contact extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Contact")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="employer_id", referencedColumnName="id", onDelete="SET NULL")})
+   * 
    */
   private $employer;
   
@@ -500,6 +548,7 @@ class Contact extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_deleted", type="boolean", nullable=false)
+   * 
    * 
    */
   private $isDeleted = '0';
@@ -510,6 +559,7 @@ class Contact extends \Civi\Core\Entity {
    * @JMS\Type("datetime")
    * @ORM\Column(name="created_date", type="datetime", nullable=false)
    * 
+   * 1
    */
   private $createdDate = 'NULL';
   
@@ -519,6 +569,7 @@ class Contact extends \Civi\Core\Entity {
    * @JMS\Type("datetime")
    * @ORM\Column(name="modified_date", type="datetime", nullable=false)
    * 
+   * 1
    */
   private $modifiedDate = 'CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP';
 
@@ -1564,6 +1615,7 @@ class Contact extends \Civi\Core\Entity {
               'id' => array(
       
         'name' => 'id',
+        'propertyName' => 'id',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Internal Contact ID'),
                         'required' => true,
@@ -1579,6 +1631,7 @@ class Contact extends \Civi\Core\Entity {
               'contact_type' => array(
       
         'name' => 'contact_type',
+        'propertyName' => 'contactType',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Contact Type'),
                                  'maxlength' => 64,
@@ -1600,6 +1653,7 @@ class Contact extends \Civi\Core\Entity {
               'contact_sub_type' => array(
       
         'name' => 'contact_sub_type',
+        'propertyName' => 'contactSubType',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Contact Subtype'),
                                  'maxlength' => 255,
@@ -1622,6 +1676,7 @@ class Contact extends \Civi\Core\Entity {
               'do_not_email' => array(
       
         'name' => 'do_not_email',
+        'propertyName' => 'doNotEmail',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('Do Not Email'),
                                                      
@@ -1636,6 +1691,7 @@ class Contact extends \Civi\Core\Entity {
               'do_not_phone' => array(
       
         'name' => 'do_not_phone',
+        'propertyName' => 'doNotPhone',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('Do Not Phone'),
                                                      
@@ -1650,6 +1706,7 @@ class Contact extends \Civi\Core\Entity {
               'do_not_mail' => array(
       
         'name' => 'do_not_mail',
+        'propertyName' => 'doNotMail',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('Do Not Mail'),
                                                      
@@ -1664,6 +1721,7 @@ class Contact extends \Civi\Core\Entity {
               'do_not_sms' => array(
       
         'name' => 'do_not_sms',
+        'propertyName' => 'doNotSms',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('Do Not Sms'),
                                                      
@@ -1678,6 +1736,7 @@ class Contact extends \Civi\Core\Entity {
               'do_not_trade' => array(
       
         'name' => 'do_not_trade',
+        'propertyName' => 'doNotTrade',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('Do Not Trade'),
                                                      
@@ -1692,6 +1751,7 @@ class Contact extends \Civi\Core\Entity {
               'is_opt_out' => array(
       
         'name' => 'is_opt_out',
+        'propertyName' => 'isOptOut',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('No Bulk Emails (User Opt Out)'),
                         'required' => true,
@@ -1707,6 +1767,7 @@ class Contact extends \Civi\Core\Entity {
               'legal_identifier' => array(
       
         'name' => 'legal_identifier',
+        'propertyName' => 'legalIdentifier',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Legal Identifier'),
                                  'maxlength' => 32,
@@ -1723,6 +1784,7 @@ class Contact extends \Civi\Core\Entity {
               'external_identifier' => array(
       
         'name' => 'external_identifier',
+        'propertyName' => 'externalIdentifier',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('External Identifier'),
                                  'maxlength' => 32,
@@ -1739,6 +1801,7 @@ class Contact extends \Civi\Core\Entity {
               'sort_name' => array(
       
         'name' => 'sort_name',
+        'propertyName' => 'sortName',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Sort Name'),
                                  'maxlength' => 128,
@@ -1754,6 +1817,7 @@ class Contact extends \Civi\Core\Entity {
               'display_name' => array(
       
         'name' => 'display_name',
+        'propertyName' => 'displayName',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Display Name'),
                                  'maxlength' => 128,
@@ -1769,6 +1833,7 @@ class Contact extends \Civi\Core\Entity {
               'nick_name' => array(
       
         'name' => 'nick_name',
+        'propertyName' => 'nickName',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Nickname'),
                                  'maxlength' => 128,
@@ -1785,6 +1850,7 @@ class Contact extends \Civi\Core\Entity {
               'legal_name' => array(
       
         'name' => 'legal_name',
+        'propertyName' => 'legalName',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Legal Name'),
                                  'maxlength' => 128,
@@ -1801,6 +1867,7 @@ class Contact extends \Civi\Core\Entity {
               'image_URL' => array(
       
         'name' => 'image_URL',
+        'propertyName' => 'imageURL',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Image Url'),
                                  'maxlength' => 255,
@@ -1817,6 +1884,7 @@ class Contact extends \Civi\Core\Entity {
               'preferred_communication_method' => array(
       
         'name' => 'preferred_communication_method',
+        'propertyName' => 'preferredCommunicationMethod',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Preferred Communication Method'),
                                  'maxlength' => 255,
@@ -1836,6 +1904,7 @@ class Contact extends \Civi\Core\Entity {
               'preferred_language' => array(
       
         'name' => 'preferred_language',
+        'propertyName' => 'preferredLanguage',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Preferred Language'),
                                  'maxlength' => 5,
@@ -1856,6 +1925,7 @@ class Contact extends \Civi\Core\Entity {
               'preferred_mail_format' => array(
       
         'name' => 'preferred_mail_format',
+        'propertyName' => 'preferredMailFormat',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Preferred Mail Format'),
                                  'maxlength' => 8,
@@ -1876,6 +1946,7 @@ class Contact extends \Civi\Core\Entity {
               'hash' => array(
       
         'name' => 'hash',
+        'propertyName' => 'hash',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Contact Hash'),
                                  'maxlength' => 32,
@@ -1891,6 +1962,7 @@ class Contact extends \Civi\Core\Entity {
               'api_key' => array(
       
         'name' => 'api_key',
+        'propertyName' => 'apiKey',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Api Key'),
                                  'maxlength' => 32,
@@ -1902,6 +1974,7 @@ class Contact extends \Civi\Core\Entity {
               'contact_source' => array(
       
         'name' => 'source',
+        'propertyName' => 'source',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Source of Contact Data'),
                                  'maxlength' => 255,
@@ -1918,6 +1991,7 @@ class Contact extends \Civi\Core\Entity {
               'first_name' => array(
       
         'name' => 'first_name',
+        'propertyName' => 'firstName',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('First Name'),
                                  'maxlength' => 64,
@@ -1934,6 +2008,7 @@ class Contact extends \Civi\Core\Entity {
               'middle_name' => array(
       
         'name' => 'middle_name',
+        'propertyName' => 'middleName',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Middle Name'),
                                  'maxlength' => 64,
@@ -1950,6 +2025,7 @@ class Contact extends \Civi\Core\Entity {
               'last_name' => array(
       
         'name' => 'last_name',
+        'propertyName' => 'lastName',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Last Name'),
                                  'maxlength' => 64,
@@ -1966,6 +2042,7 @@ class Contact extends \Civi\Core\Entity {
               'prefix_id' => array(
       
         'name' => 'prefix_id',
+        'propertyName' => 'prefixId',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Individual Prefix'),
                                                      
@@ -1983,6 +2060,7 @@ class Contact extends \Civi\Core\Entity {
               'suffix_id' => array(
       
         'name' => 'suffix_id',
+        'propertyName' => 'suffixId',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Individual Suffix'),
                                                      
@@ -2000,6 +2078,7 @@ class Contact extends \Civi\Core\Entity {
               'formal_title' => array(
       
         'name' => 'formal_title',
+        'propertyName' => 'formalTitle',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Formal Title'),
                                  'maxlength' => 64,
@@ -2016,6 +2095,7 @@ class Contact extends \Civi\Core\Entity {
               'communication_style_id' => array(
       
         'name' => 'communication_style_id',
+        'propertyName' => 'communicationStyleId',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Communication Style'),
                                                      
@@ -2032,6 +2112,7 @@ class Contact extends \Civi\Core\Entity {
               'email_greeting_id' => array(
       
         'name' => 'email_greeting_id',
+        'propertyName' => 'emailGreetingId',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Email Greeting ID'),
                                                      
@@ -2041,6 +2122,7 @@ class Contact extends \Civi\Core\Entity {
               'email_greeting_custom' => array(
       
         'name' => 'email_greeting_custom',
+        'propertyName' => 'emailGreetingCustom',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Email Greeting Custom'),
                                  'maxlength' => 128,
@@ -2057,6 +2139,7 @@ class Contact extends \Civi\Core\Entity {
               'email_greeting_display' => array(
       
         'name' => 'email_greeting_display',
+        'propertyName' => 'emailGreetingDisplay',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Email Greeting'),
                                  'maxlength' => 255,
@@ -2068,6 +2151,7 @@ class Contact extends \Civi\Core\Entity {
               'postal_greeting_id' => array(
       
         'name' => 'postal_greeting_id',
+        'propertyName' => 'postalGreetingId',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Postal Greeting ID'),
                                                      
@@ -2077,6 +2161,7 @@ class Contact extends \Civi\Core\Entity {
               'postal_greeting_custom' => array(
       
         'name' => 'postal_greeting_custom',
+        'propertyName' => 'postalGreetingCustom',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Postal Greeting Custom'),
                                  'maxlength' => 128,
@@ -2093,6 +2178,7 @@ class Contact extends \Civi\Core\Entity {
               'postal_greeting_display' => array(
       
         'name' => 'postal_greeting_display',
+        'propertyName' => 'postalGreetingDisplay',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Postal Greeting'),
                                  'maxlength' => 255,
@@ -2104,6 +2190,7 @@ class Contact extends \Civi\Core\Entity {
               'addressee_id' => array(
       
         'name' => 'addressee_id',
+        'propertyName' => 'addresseeId',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Addressee ID'),
                                                      
@@ -2113,6 +2200,7 @@ class Contact extends \Civi\Core\Entity {
               'addressee_custom' => array(
       
         'name' => 'addressee_custom',
+        'propertyName' => 'addresseeCustom',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Addressee Custom'),
                                  'maxlength' => 128,
@@ -2129,6 +2217,7 @@ class Contact extends \Civi\Core\Entity {
               'addressee_display' => array(
       
         'name' => 'addressee_display',
+        'propertyName' => 'addresseeDisplay',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Addressee'),
                                  'maxlength' => 255,
@@ -2140,6 +2229,7 @@ class Contact extends \Civi\Core\Entity {
               'job_title' => array(
       
         'name' => 'job_title',
+        'propertyName' => 'jobTitle',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Job Title'),
                                  'maxlength' => 255,
@@ -2156,6 +2246,7 @@ class Contact extends \Civi\Core\Entity {
               'gender_id' => array(
       
         'name' => 'gender_id',
+        'propertyName' => 'genderId',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Gender'),
                                                      
@@ -2173,6 +2264,7 @@ class Contact extends \Civi\Core\Entity {
               'birth_date' => array(
       
         'name' => 'birth_date',
+        'propertyName' => 'birthDate',
         'type' => CRM_Utils_Type::T_DATE,
                 'title' => ts('Birth Date'),
                                                      
@@ -2187,6 +2279,7 @@ class Contact extends \Civi\Core\Entity {
               'is_deceased' => array(
       
         'name' => 'is_deceased',
+        'propertyName' => 'isDeceased',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('Is Deceased'),
                                                      
@@ -2201,6 +2294,7 @@ class Contact extends \Civi\Core\Entity {
               'deceased_date' => array(
       
         'name' => 'deceased_date',
+        'propertyName' => 'deceasedDate',
         'type' => CRM_Utils_Type::T_DATE,
                 'title' => ts('Deceased Date'),
                                                      
@@ -2215,6 +2309,7 @@ class Contact extends \Civi\Core\Entity {
               'household_name' => array(
       
         'name' => 'household_name',
+        'propertyName' => 'householdName',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Household Name'),
                                  'maxlength' => 128,
@@ -2231,6 +2326,7 @@ class Contact extends \Civi\Core\Entity {
               'primary_contact_id' => array(
       
         'name' => 'primary_contact_id',
+        'propertyName' => 'primaryContact',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Household Primary Contact ID'),
                                                      
@@ -2241,6 +2337,7 @@ class Contact extends \Civi\Core\Entity {
               'organization_name' => array(
       
         'name' => 'organization_name',
+        'propertyName' => 'organizationName',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Organization Name'),
                                  'maxlength' => 128,
@@ -2257,6 +2354,7 @@ class Contact extends \Civi\Core\Entity {
               'sic_code' => array(
       
         'name' => 'sic_code',
+        'propertyName' => 'sicCode',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Sic Code'),
                                  'maxlength' => 8,
@@ -2273,6 +2371,7 @@ class Contact extends \Civi\Core\Entity {
               'user_unique_id' => array(
       
         'name' => 'user_unique_id',
+        'propertyName' => 'userUniqueId',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Unique ID (OpenID)'),
                                  'maxlength' => 255,
@@ -2290,6 +2389,7 @@ class Contact extends \Civi\Core\Entity {
               'current_employer_id' => array(
       
         'name' => 'employer_id',
+        'propertyName' => 'employer',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Current Employer ID'),
                                                      
@@ -2304,6 +2404,7 @@ class Contact extends \Civi\Core\Entity {
               'contact_is_deleted' => array(
       
         'name' => 'is_deleted',
+        'propertyName' => 'isDeleted',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('Contact is in Trash'),
                         'required' => true,
@@ -2318,6 +2419,7 @@ class Contact extends \Civi\Core\Entity {
               'created_date' => array(
       
         'name' => 'created_date',
+        'propertyName' => 'createdDate',
         'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
                 'title' => ts('Created Date'),
                         'required' => false,
@@ -2329,6 +2431,7 @@ class Contact extends \Civi\Core\Entity {
               'modified_date' => array(
       
         'name' => 'modified_date',
+        'propertyName' => 'modifiedDate',
         'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
                 'title' => ts('Modified Date'),
                         'required' => false,

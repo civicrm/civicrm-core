@@ -69,6 +69,7 @@ class FinancialAccount extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="name", type="string", length=255, nullable=true)
    * 
+   * 
    */
   private $name;
   
@@ -78,6 +79,7 @@ class FinancialAccount extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Contact")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="contact_id", referencedColumnName="id", onDelete="SET NULL")})
+   * 
    */
   private $contact;
   
@@ -86,6 +88,7 @@ class FinancialAccount extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="financial_account_type_id", type="integer", nullable=false, options={"unsigned":true})
+   * 
    * 
    */
   private $financialAccountTypeId = '3';
@@ -96,6 +99,7 @@ class FinancialAccount extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="accounting_code", type="string", length=64, nullable=true)
    * 
+   * 
    */
   private $accountingCode;
   
@@ -104,6 +108,7 @@ class FinancialAccount extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="account_type_code", type="string", length=64, nullable=true)
+   * 
    * 
    */
   private $accountTypeCode;
@@ -114,6 +119,7 @@ class FinancialAccount extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="description", type="string", length=255, nullable=true)
    * 
+   * 
    */
   private $description;
   
@@ -123,6 +129,7 @@ class FinancialAccount extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Financial\FinancialAccount")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="parent_id", referencedColumnName="id")})
+   * 
    */
   private $parent;
   
@@ -131,6 +138,7 @@ class FinancialAccount extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_header_account", type="boolean", nullable=false)
+   * 
    * 
    */
   private $isHeaderAccount = '0';
@@ -141,6 +149,7 @@ class FinancialAccount extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_deductible", type="boolean", nullable=false)
    * 
+   * 
    */
   private $isDeductible = '1';
   
@@ -149,6 +158,7 @@ class FinancialAccount extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_tax", type="boolean", nullable=false)
+   * 
    * 
    */
   private $isTax = '0';
@@ -159,6 +169,7 @@ class FinancialAccount extends \Civi\Core\Entity {
    * @JMS\Type("float")
    * @ORM\Column(name="tax_rate", type="float", nullable=true)
    * 
+   * 
    */
   private $taxRate;
   
@@ -167,6 +178,7 @@ class FinancialAccount extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_reserved", type="boolean", nullable=true)
+   * 
    * 
    */
   private $isReserved;
@@ -177,6 +189,7 @@ class FinancialAccount extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_active", type="boolean", nullable=true)
    * 
+   * 
    */
   private $isActive;
   
@@ -185,6 +198,7 @@ class FinancialAccount extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_default", type="boolean", nullable=true)
+   * 
    * 
    */
   private $isDefault;
@@ -491,6 +505,7 @@ class FinancialAccount extends \Civi\Core\Entity {
               'id' => array(
       
         'name' => 'id',
+        'propertyName' => 'id',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -500,6 +515,7 @@ class FinancialAccount extends \Civi\Core\Entity {
               'name' => array(
       
         'name' => 'name',
+        'propertyName' => 'name',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Name'),
                         'required' => true,
@@ -512,6 +528,7 @@ class FinancialAccount extends \Civi\Core\Entity {
               'financial_account_contact_id' => array(
       
         'name' => 'contact_id',
+        'propertyName' => 'contact',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Contact ID'),
                                                      
@@ -522,6 +539,7 @@ class FinancialAccount extends \Civi\Core\Entity {
               'financial_account_type_id' => array(
       
         'name' => 'financial_account_type_id',
+        'propertyName' => 'financialAccountTypeId',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -535,6 +553,7 @@ class FinancialAccount extends \Civi\Core\Entity {
               'accounting_code' => array(
       
         'name' => 'accounting_code',
+        'propertyName' => 'accountingCode',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Accounting Code'),
                                  'maxlength' => 64,
@@ -550,6 +569,7 @@ class FinancialAccount extends \Civi\Core\Entity {
               'account_type_code' => array(
       
         'name' => 'account_type_code',
+        'propertyName' => 'accountTypeCode',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Account Type Code'),
                                  'maxlength' => 64,
@@ -565,6 +585,7 @@ class FinancialAccount extends \Civi\Core\Entity {
               'description' => array(
       
         'name' => 'description',
+        'propertyName' => 'description',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Description'),
                                  'maxlength' => 255,
@@ -576,6 +597,7 @@ class FinancialAccount extends \Civi\Core\Entity {
               'parent_id' => array(
       
         'name' => 'parent_id',
+        'propertyName' => 'parent',
         'type' => CRM_Utils_Type::T_INT,
                                                      
                                     
@@ -585,6 +607,7 @@ class FinancialAccount extends \Civi\Core\Entity {
               'is_header_account' => array(
       
         'name' => 'is_header_account',
+        'propertyName' => 'isHeaderAccount',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                                                      
                                     
@@ -593,6 +616,7 @@ class FinancialAccount extends \Civi\Core\Entity {
               'is_deductible' => array(
       
         'name' => 'is_deductible',
+        'propertyName' => 'isDeductible',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                                                      
                                            'default' => '1',
@@ -602,6 +626,7 @@ class FinancialAccount extends \Civi\Core\Entity {
               'is_tax' => array(
       
         'name' => 'is_tax',
+        'propertyName' => 'isTax',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                                                      
                                     
@@ -610,6 +635,7 @@ class FinancialAccount extends \Civi\Core\Entity {
               'tax_rate' => array(
       
         'name' => 'tax_rate',
+        'propertyName' => 'taxRate',
         'type' => CRM_Utils_Type::T_MONEY,
                 'title' => ts('Tax Rate'),
                                                      
@@ -619,6 +645,7 @@ class FinancialAccount extends \Civi\Core\Entity {
               'is_reserved' => array(
       
         'name' => 'is_reserved',
+        'propertyName' => 'isReserved',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                                                      
                                     
@@ -627,6 +654,7 @@ class FinancialAccount extends \Civi\Core\Entity {
               'is_active' => array(
       
         'name' => 'is_active',
+        'propertyName' => 'isActive',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                                                      
                                     
@@ -635,6 +663,7 @@ class FinancialAccount extends \Civi\Core\Entity {
               'is_default' => array(
       
         'name' => 'is_default',
+        'propertyName' => 'isDefault',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                                                      
                                     

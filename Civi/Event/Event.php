@@ -69,6 +69,7 @@ class Event extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="title", type="string", length=255, nullable=true)
    * 
+   * 
    */
   private $title;
   
@@ -76,7 +77,8 @@ class Event extends \Civi\Core\Entity {
    * @var text
    *
    * @JMS\Type("text")
-   * @ORM\Column(name="summary", type="text", nullable=true)
+   * @ORM\Column(name="summary", type="text", length=65535, nullable=true)
+   * 
    * 
    */
   private $summary;
@@ -85,7 +87,8 @@ class Event extends \Civi\Core\Entity {
    * @var text
    *
    * @JMS\Type("text")
-   * @ORM\Column(name="description", type="text", nullable=true)
+   * @ORM\Column(name="description", type="text", length=65535, nullable=true)
+   * 
    * 
    */
   private $description;
@@ -96,6 +99,7 @@ class Event extends \Civi\Core\Entity {
    * @JMS\Type("integer")
    * @ORM\Column(name="event_type_id", type="integer", nullable=false, options={"unsigned":true})
    * 
+   * 
    */
   private $eventTypeId = '0';
   
@@ -104,6 +108,7 @@ class Event extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="participant_listing_id", type="integer", nullable=false, options={"unsigned":true})
+   * 
    * 
    */
   private $participantListingId = '0';
@@ -114,6 +119,7 @@ class Event extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_public", type="boolean", nullable=false)
    * 
+   * 
    */
   private $isPublic = '1';
   
@@ -122,6 +128,7 @@ class Event extends \Civi\Core\Entity {
    *
    * @JMS\Type("datetime")
    * @ORM\Column(name="start_date", type="datetime", nullable=true)
+   * 
    * 
    */
   private $startDate;
@@ -132,6 +139,7 @@ class Event extends \Civi\Core\Entity {
    * @JMS\Type("datetime")
    * @ORM\Column(name="end_date", type="datetime", nullable=true)
    * 
+   * 
    */
   private $endDate;
   
@@ -140,6 +148,7 @@ class Event extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_online_registration", type="boolean", nullable=false)
+   * 
    * 
    */
   private $isOnlineRegistration = '0';
@@ -150,6 +159,7 @@ class Event extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="registration_link_text", type="string", length=255, nullable=true)
    * 
+   * 
    */
   private $registrationLinkText;
   
@@ -158,6 +168,7 @@ class Event extends \Civi\Core\Entity {
    *
    * @JMS\Type("datetime")
    * @ORM\Column(name="registration_start_date", type="datetime", nullable=true)
+   * 
    * 
    */
   private $registrationStartDate;
@@ -168,6 +179,7 @@ class Event extends \Civi\Core\Entity {
    * @JMS\Type("datetime")
    * @ORM\Column(name="registration_end_date", type="datetime", nullable=true)
    * 
+   * 
    */
   private $registrationEndDate;
   
@@ -177,6 +189,7 @@ class Event extends \Civi\Core\Entity {
    * @JMS\Type("integer")
    * @ORM\Column(name="max_participants", type="integer", nullable=false, options={"unsigned":true})
    * 
+   * 
    */
   private $maxParticipants = 'NULL';
   
@@ -184,7 +197,8 @@ class Event extends \Civi\Core\Entity {
    * @var text
    *
    * @JMS\Type("text")
-   * @ORM\Column(name="event_full_text", type="text", nullable=true)
+   * @ORM\Column(name="event_full_text", type="text", length=65535, nullable=true)
+   * 
    * 
    */
   private $eventFullText;
@@ -195,6 +209,7 @@ class Event extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_monetary", type="boolean", nullable=false)
    * 
+   * 
    */
   private $isMonetary = '0';
   
@@ -203,6 +218,7 @@ class Event extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="financial_type_id", type="integer", nullable=false, options={"unsigned":true})
+   * 
    * 
    */
   private $financialTypeId = 'NULL';
@@ -213,6 +229,7 @@ class Event extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="payment_processor", type="string", length=128, nullable=true)
    * 
+   * 
    */
   private $paymentProcessor;
   
@@ -221,6 +238,7 @@ class Event extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_map", type="boolean", nullable=false)
+   * 
    * 
    */
   private $isMap = '0';
@@ -231,6 +249,7 @@ class Event extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_active", type="boolean", nullable=false)
    * 
+   * 
    */
   private $isActive = '0';
   
@@ -239,6 +258,7 @@ class Event extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="fee_label", type="string", length=255, nullable=true)
+   * 
    * 
    */
   private $feeLabel;
@@ -249,6 +269,7 @@ class Event extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_show_location", type="boolean", nullable=false)
    * 
+   * 
    */
   private $isShowLocation = '1';
   
@@ -258,6 +279,7 @@ class Event extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\LocBlock")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="loc_block_id", referencedColumnName="id", onDelete="SET NULL")})
+   * 
    */
   private $locBlock;
   
@@ -267,6 +289,7 @@ class Event extends \Civi\Core\Entity {
    * @JMS\Type("integer")
    * @ORM\Column(name="default_role_id", type="integer", nullable=false, options={"unsigned":true})
    * 
+   * 
    */
   private $defaultRoleId = '1';
   
@@ -274,7 +297,8 @@ class Event extends \Civi\Core\Entity {
    * @var text
    *
    * @JMS\Type("text")
-   * @ORM\Column(name="intro_text", type="text", nullable=true)
+   * @ORM\Column(name="intro_text", type="text", length=65535, nullable=true)
+   * 
    * 
    */
   private $introText;
@@ -283,7 +307,8 @@ class Event extends \Civi\Core\Entity {
    * @var text
    *
    * @JMS\Type("text")
-   * @ORM\Column(name="footer_text", type="text", nullable=true)
+   * @ORM\Column(name="footer_text", type="text", length=65535, nullable=true)
+   * 
    * 
    */
   private $footerText;
@@ -294,6 +319,7 @@ class Event extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="confirm_title", type="string", length=255, nullable=false)
    * 
+   * 
    */
   private $confirmTitle = 'NULL';
   
@@ -301,7 +327,8 @@ class Event extends \Civi\Core\Entity {
    * @var text
    *
    * @JMS\Type("text")
-   * @ORM\Column(name="confirm_text", type="text", nullable=true)
+   * @ORM\Column(name="confirm_text", type="text", length=65535, nullable=true)
+   * 
    * 
    */
   private $confirmText;
@@ -310,7 +337,8 @@ class Event extends \Civi\Core\Entity {
    * @var text
    *
    * @JMS\Type("text")
-   * @ORM\Column(name="confirm_footer_text", type="text", nullable=true)
+   * @ORM\Column(name="confirm_footer_text", type="text", length=65535, nullable=true)
+   * 
    * 
    */
   private $confirmFooterText;
@@ -321,6 +349,7 @@ class Event extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_email_confirm", type="boolean", nullable=false)
    * 
+   * 
    */
   private $isEmailConfirm = '0';
   
@@ -328,7 +357,8 @@ class Event extends \Civi\Core\Entity {
    * @var text
    *
    * @JMS\Type("text")
-   * @ORM\Column(name="confirm_email_text", type="text", nullable=true)
+   * @ORM\Column(name="confirm_email_text", type="text", length=65535, nullable=true)
+   * 
    * 
    */
   private $confirmEmailText;
@@ -339,6 +369,7 @@ class Event extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="confirm_from_name", type="string", length=255, nullable=true)
    * 
+   * 
    */
   private $confirmFromName;
   
@@ -347,6 +378,7 @@ class Event extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="confirm_from_email", type="string", length=255, nullable=true)
+   * 
    * 
    */
   private $confirmFromEmail;
@@ -357,6 +389,7 @@ class Event extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="cc_confirm", type="string", length=255, nullable=true)
    * 
+   * 
    */
   private $ccConfirm;
   
@@ -365,6 +398,7 @@ class Event extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="bcc_confirm", type="string", length=255, nullable=true)
+   * 
    * 
    */
   private $bccConfirm;
@@ -375,6 +409,7 @@ class Event extends \Civi\Core\Entity {
    * @JMS\Type("integer")
    * @ORM\Column(name="default_fee_id", type="integer", nullable=true, options={"unsigned":true})
    * 
+   * 
    */
   private $defaultFeeId;
   
@@ -383,6 +418,7 @@ class Event extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="default_discount_fee_id", type="integer", nullable=true, options={"unsigned":true})
+   * 
    * 
    */
   private $defaultDiscountFeeId;
@@ -393,6 +429,7 @@ class Event extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="thankyou_title", type="string", length=255, nullable=false)
    * 
+   * 
    */
   private $thankyouTitle = 'NULL';
   
@@ -400,7 +437,8 @@ class Event extends \Civi\Core\Entity {
    * @var text
    *
    * @JMS\Type("text")
-   * @ORM\Column(name="thankyou_text", type="text", nullable=true)
+   * @ORM\Column(name="thankyou_text", type="text", length=65535, nullable=true)
+   * 
    * 
    */
   private $thankyouText;
@@ -409,7 +447,8 @@ class Event extends \Civi\Core\Entity {
    * @var text
    *
    * @JMS\Type("text")
-   * @ORM\Column(name="thankyou_footer_text", type="text", nullable=true)
+   * @ORM\Column(name="thankyou_footer_text", type="text", length=65535, nullable=true)
+   * 
    * 
    */
   private $thankyouFooterText;
@@ -420,6 +459,7 @@ class Event extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_pay_later", type="boolean", nullable=false)
    * 
+   * 
    */
   private $isPayLater = '0';
   
@@ -427,7 +467,8 @@ class Event extends \Civi\Core\Entity {
    * @var text
    *
    * @JMS\Type("text")
-   * @ORM\Column(name="pay_later_text", type="text", nullable=true)
+   * @ORM\Column(name="pay_later_text", type="text", length=65535, nullable=true)
+   * 
    * 
    */
   private $payLaterText;
@@ -436,7 +477,8 @@ class Event extends \Civi\Core\Entity {
    * @var text
    *
    * @JMS\Type("text")
-   * @ORM\Column(name="pay_later_receipt", type="text", nullable=true)
+   * @ORM\Column(name="pay_later_receipt", type="text", length=65535, nullable=true)
+   * 
    * 
    */
   private $payLaterReceipt;
@@ -447,6 +489,7 @@ class Event extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_partial_payment", type="boolean", nullable=false)
    * 
+   * 
    */
   private $isPartialPayment = '0';
   
@@ -456,6 +499,7 @@ class Event extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="initial_amount_label", type="string", length=255, nullable=true)
    * 
+   * 
    */
   private $initialAmountLabel;
   
@@ -463,7 +507,8 @@ class Event extends \Civi\Core\Entity {
    * @var text
    *
    * @JMS\Type("text")
-   * @ORM\Column(name="initial_amount_help_text", type="text", nullable=true)
+   * @ORM\Column(name="initial_amount_help_text", type="text", length=65535, nullable=true)
+   * 
    * 
    */
   private $initialAmountHelpText;
@@ -474,6 +519,7 @@ class Event extends \Civi\Core\Entity {
    * @JMS\Type("float")
    * @ORM\Column(name="min_initial_amount", type="float", nullable=true)
    * 
+   * 
    */
   private $minInitialAmount;
   
@@ -482,6 +528,7 @@ class Event extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_multiple_registrations", type="boolean", nullable=false)
+   * 
    * 
    */
   private $isMultipleRegistrations = '0';
@@ -492,6 +539,7 @@ class Event extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="allow_same_participant_emails", type="boolean", nullable=false)
    * 
+   * 
    */
   private $allowSameParticipantEmails = '0';
   
@@ -500,6 +548,7 @@ class Event extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="has_waitlist", type="boolean", nullable=true)
+   * 
    * 
    */
   private $hasWaitlist;
@@ -510,6 +559,7 @@ class Event extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="requires_approval", type="boolean", nullable=true)
    * 
+   * 
    */
   private $requiresApproval;
   
@@ -519,6 +569,7 @@ class Event extends \Civi\Core\Entity {
    * @JMS\Type("integer")
    * @ORM\Column(name="expiration_time", type="integer", nullable=true, options={"unsigned":true})
    * 
+   * 
    */
   private $expirationTime;
   
@@ -526,7 +577,8 @@ class Event extends \Civi\Core\Entity {
    * @var text
    *
    * @JMS\Type("text")
-   * @ORM\Column(name="waitlist_text", type="text", nullable=true)
+   * @ORM\Column(name="waitlist_text", type="text", length=65535, nullable=true)
+   * 
    * 
    */
   private $waitlistText;
@@ -535,7 +587,8 @@ class Event extends \Civi\Core\Entity {
    * @var text
    *
    * @JMS\Type("text")
-   * @ORM\Column(name="approval_req_text", type="text", nullable=true)
+   * @ORM\Column(name="approval_req_text", type="text", length=65535, nullable=true)
+   * 
    * 
    */
   private $approvalReqText;
@@ -546,6 +599,7 @@ class Event extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_template", type="boolean", nullable=false)
    * 
+   * 
    */
   private $isTemplate = '0';
   
@@ -554,6 +608,7 @@ class Event extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="template_title", type="string", length=255, nullable=true)
+   * 
    * 
    */
   private $templateTitle;
@@ -564,6 +619,7 @@ class Event extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Contact")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="created_id", referencedColumnName="id", onDelete="SET NULL")})
+   * 
    */
   private $created;
   
@@ -572,6 +628,7 @@ class Event extends \Civi\Core\Entity {
    *
    * @JMS\Type("datetime")
    * @ORM\Column(name="created_date", type="datetime", nullable=true)
+   * 
    * 
    */
   private $createdDate;
@@ -582,6 +639,7 @@ class Event extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="currency", type="string", length=3, nullable=true)
    * 
+   * 
    */
   private $currency;
   
@@ -591,6 +649,7 @@ class Event extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Campaign\Campaign")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="campaign_id", referencedColumnName="id", onDelete="SET NULL")})
+   * 
    */
   private $campaign;
   
@@ -599,6 +658,7 @@ class Event extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_share", type="boolean", nullable=false)
+   * 
    * 
    */
   private $isShare = '1';
@@ -609,6 +669,7 @@ class Event extends \Civi\Core\Entity {
    * @JMS\Type("integer")
    * @ORM\Column(name="parent_event_id", type="integer", nullable=false, options={"unsigned":true})
    * 
+   * 
    */
   private $parentEventId = 'NULL';
   
@@ -617,6 +678,7 @@ class Event extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="slot_label_id", type="integer", nullable=false, options={"unsigned":true})
+   * 
    * 
    */
   private $slotLabelId = 'NULL';
@@ -1883,6 +1945,7 @@ class Event extends \Civi\Core\Entity {
               'id' => array(
       
         'name' => 'id',
+        'propertyName' => 'id',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Event'),
                         'required' => true,
@@ -1893,6 +1956,7 @@ class Event extends \Civi\Core\Entity {
               'event_title' => array(
       
         'name' => 'title',
+        'propertyName' => 'title',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Event Title'),
                                  'maxlength' => 255,
@@ -1909,9 +1973,11 @@ class Event extends \Civi\Core\Entity {
               'summary' => array(
       
         'name' => 'summary',
+        'propertyName' => 'summary',
         'type' => CRM_Utils_Type::T_TEXT,
                 'title' => ts('Event Summary'),
-                                                   'rows' => 4,
+                                 'maxlength' => 65535,
+                                  'rows' => 4,
                          'cols' => 60,
          
                                     
@@ -1920,9 +1986,11 @@ class Event extends \Civi\Core\Entity {
               'event_description' => array(
       
         'name' => 'description',
+        'propertyName' => 'description',
         'type' => CRM_Utils_Type::T_TEXT,
                 'title' => ts('Event Description'),
-                                                   'rows' => 8,
+                                 'maxlength' => 65535,
+                                  'rows' => 8,
                          'cols' => 60,
          
                                     
@@ -1931,6 +1999,7 @@ class Event extends \Civi\Core\Entity {
               'event_type_id' => array(
       
         'name' => 'event_type_id',
+        'propertyName' => 'eventTypeId',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Event Type'),
                                                      
@@ -1943,6 +2012,7 @@ class Event extends \Civi\Core\Entity {
               'participant_listing_id' => array(
       
         'name' => 'participant_listing_id',
+        'propertyName' => 'participantListingId',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Participant Listing'),
                                                      
@@ -1955,6 +2025,7 @@ class Event extends \Civi\Core\Entity {
               'is_public' => array(
       
         'name' => 'is_public',
+        'propertyName' => 'isPublic',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('Is Event Public'),
                                                      
@@ -1965,6 +2036,7 @@ class Event extends \Civi\Core\Entity {
               'event_start_date' => array(
       
         'name' => 'start_date',
+        'propertyName' => 'startDate',
         'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
                 'title' => ts('Event Start Date'),
                                                      
@@ -1979,6 +2051,7 @@ class Event extends \Civi\Core\Entity {
               'event_end_date' => array(
       
         'name' => 'end_date',
+        'propertyName' => 'endDate',
         'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
                 'title' => ts('Event End Date'),
                                                      
@@ -1993,6 +2066,7 @@ class Event extends \Civi\Core\Entity {
               'is_online_registration' => array(
       
         'name' => 'is_online_registration',
+        'propertyName' => 'isOnlineRegistration',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('Is Online Registration'),
                                                      
@@ -2002,6 +2076,7 @@ class Event extends \Civi\Core\Entity {
               'registration_link_text' => array(
       
         'name' => 'registration_link_text',
+        'propertyName' => 'registrationLinkText',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Event Registration Link Text'),
                                  'maxlength' => 255,
@@ -2013,6 +2088,7 @@ class Event extends \Civi\Core\Entity {
               'registration_start_date' => array(
       
         'name' => 'registration_start_date',
+        'propertyName' => 'registrationStartDate',
         'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
                 'title' => ts('Registration Start Date'),
                                                      
@@ -2022,6 +2098,7 @@ class Event extends \Civi\Core\Entity {
               'registration_end_date' => array(
       
         'name' => 'registration_end_date',
+        'propertyName' => 'registrationEndDate',
         'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
                 'title' => ts('Registration End Date'),
                                                      
@@ -2031,6 +2108,7 @@ class Event extends \Civi\Core\Entity {
               'max_participants' => array(
       
         'name' => 'max_participants',
+        'propertyName' => 'maxParticipants',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Max Participants'),
                                                      
@@ -2041,9 +2119,11 @@ class Event extends \Civi\Core\Entity {
               'event_full_text' => array(
       
         'name' => 'event_full_text',
+        'propertyName' => 'eventFullText',
         'type' => CRM_Utils_Type::T_TEXT,
                 'title' => ts('Event Information'),
-                                                   'rows' => 4,
+                                 'maxlength' => 65535,
+                                  'rows' => 4,
                          'cols' => 60,
          
                                     
@@ -2052,6 +2132,7 @@ class Event extends \Civi\Core\Entity {
               'is_monetary' => array(
       
         'name' => 'is_monetary',
+        'propertyName' => 'isMonetary',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('Is this a PAID event?'),
                                                      
@@ -2061,6 +2142,7 @@ class Event extends \Civi\Core\Entity {
               'financial_type_id' => array(
       
         'name' => 'financial_type_id',
+        'propertyName' => 'financialTypeId',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Financial Type'),
                                                      
@@ -2076,6 +2158,7 @@ class Event extends \Civi\Core\Entity {
               'payment_processor' => array(
       
         'name' => 'payment_processor',
+        'propertyName' => 'paymentProcessor',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Payment Processor'),
                                  'maxlength' => 128,
@@ -2092,6 +2175,7 @@ class Event extends \Civi\Core\Entity {
               'is_map' => array(
       
         'name' => 'is_map',
+        'propertyName' => 'isMap',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('Map Enabled'),
                                                      
@@ -2101,6 +2185,7 @@ class Event extends \Civi\Core\Entity {
               'is_active' => array(
       
         'name' => 'is_active',
+        'propertyName' => 'isActive',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('Is Active'),
                                                      
@@ -2110,6 +2195,7 @@ class Event extends \Civi\Core\Entity {
               'fee_label' => array(
       
         'name' => 'fee_label',
+        'propertyName' => 'feeLabel',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Fee Label'),
                                  'maxlength' => 255,
@@ -2126,6 +2212,7 @@ class Event extends \Civi\Core\Entity {
               'is_show_location' => array(
       
         'name' => 'is_show_location',
+        'propertyName' => 'isShowLocation',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('show location'),
                                                      
@@ -2136,6 +2223,7 @@ class Event extends \Civi\Core\Entity {
               'loc_block_id' => array(
       
         'name' => 'loc_block_id',
+        'propertyName' => 'locBlock',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Location Block ID'),
                                                      
@@ -2146,6 +2234,7 @@ class Event extends \Civi\Core\Entity {
               'default_role_id' => array(
       
         'name' => 'default_role_id',
+        'propertyName' => 'defaultRoleId',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Participant Role'),
                                                      
@@ -2164,9 +2253,11 @@ class Event extends \Civi\Core\Entity {
               'intro_text' => array(
       
         'name' => 'intro_text',
+        'propertyName' => 'introText',
         'type' => CRM_Utils_Type::T_TEXT,
                 'title' => ts('Introductory Message'),
-                                                   'rows' => 6,
+                                 'maxlength' => 65535,
+                                  'rows' => 6,
                          'cols' => 50,
          
                                     
@@ -2175,9 +2266,11 @@ class Event extends \Civi\Core\Entity {
               'footer_text' => array(
       
         'name' => 'footer_text',
+        'propertyName' => 'footerText',
         'type' => CRM_Utils_Type::T_TEXT,
                 'title' => ts('Footer Message'),
-                                                   'rows' => 6,
+                                 'maxlength' => 65535,
+                                  'rows' => 6,
                          'cols' => 50,
          
                                     
@@ -2186,6 +2279,7 @@ class Event extends \Civi\Core\Entity {
               'confirm_title' => array(
       
         'name' => 'confirm_title',
+        'propertyName' => 'confirmTitle',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Confirmation Title'),
                                  'maxlength' => 255,
@@ -2198,9 +2292,11 @@ class Event extends \Civi\Core\Entity {
               'confirm_text' => array(
       
         'name' => 'confirm_text',
+        'propertyName' => 'confirmText',
         'type' => CRM_Utils_Type::T_TEXT,
                 'title' => ts('Confirm Text'),
-                                                   'rows' => 6,
+                                 'maxlength' => 65535,
+                                  'rows' => 6,
                          'cols' => 50,
          
                                     
@@ -2209,9 +2305,11 @@ class Event extends \Civi\Core\Entity {
               'confirm_footer_text' => array(
       
         'name' => 'confirm_footer_text',
+        'propertyName' => 'confirmFooterText',
         'type' => CRM_Utils_Type::T_TEXT,
                 'title' => ts('Footer Text'),
-                                                   'rows' => 6,
+                                 'maxlength' => 65535,
+                                  'rows' => 6,
                          'cols' => 50,
          
                                     
@@ -2220,6 +2318,7 @@ class Event extends \Civi\Core\Entity {
               'is_email_confirm' => array(
       
         'name' => 'is_email_confirm',
+        'propertyName' => 'isEmailConfirm',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('Is confirm email'),
                                                      
@@ -2229,9 +2328,11 @@ class Event extends \Civi\Core\Entity {
               'confirm_email_text' => array(
       
         'name' => 'confirm_email_text',
+        'propertyName' => 'confirmEmailText',
         'type' => CRM_Utils_Type::T_TEXT,
                 'title' => ts('Confirmation Email Text'),
-                                                   'rows' => 4,
+                                 'maxlength' => 65535,
+                                  'rows' => 4,
                          'cols' => 50,
          
                                     
@@ -2240,6 +2341,7 @@ class Event extends \Civi\Core\Entity {
               'confirm_from_name' => array(
       
         'name' => 'confirm_from_name',
+        'propertyName' => 'confirmFromName',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Confirm From Name'),
                                  'maxlength' => 255,
@@ -2251,6 +2353,7 @@ class Event extends \Civi\Core\Entity {
               'confirm_from_email' => array(
       
         'name' => 'confirm_from_email',
+        'propertyName' => 'confirmFromEmail',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Confirm From Email'),
                                  'maxlength' => 255,
@@ -2262,6 +2365,7 @@ class Event extends \Civi\Core\Entity {
               'cc_confirm' => array(
       
         'name' => 'cc_confirm',
+        'propertyName' => 'ccConfirm',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Cc Confirm'),
                                  'maxlength' => 255,
@@ -2273,6 +2377,7 @@ class Event extends \Civi\Core\Entity {
               'bcc_confirm' => array(
       
         'name' => 'bcc_confirm',
+        'propertyName' => 'bccConfirm',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Bcc Confirm'),
                                  'maxlength' => 255,
@@ -2284,6 +2389,7 @@ class Event extends \Civi\Core\Entity {
               'default_fee_id' => array(
       
         'name' => 'default_fee_id',
+        'propertyName' => 'defaultFeeId',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Default Fee ID'),
                                                      
@@ -2293,6 +2399,7 @@ class Event extends \Civi\Core\Entity {
               'default_discount_fee_id' => array(
       
         'name' => 'default_discount_fee_id',
+        'propertyName' => 'defaultDiscountFeeId',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Default Discount Fee ID'),
                                                      
@@ -2302,6 +2409,7 @@ class Event extends \Civi\Core\Entity {
               'thankyou_title' => array(
       
         'name' => 'thankyou_title',
+        'propertyName' => 'thankyouTitle',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('ThankYou Title'),
                                  'maxlength' => 255,
@@ -2314,9 +2422,11 @@ class Event extends \Civi\Core\Entity {
               'thankyou_text' => array(
       
         'name' => 'thankyou_text',
+        'propertyName' => 'thankyouText',
         'type' => CRM_Utils_Type::T_TEXT,
                 'title' => ts('ThankYou Text'),
-                                                   'rows' => 6,
+                                 'maxlength' => 65535,
+                                  'rows' => 6,
                          'cols' => 50,
          
                                     
@@ -2325,9 +2435,11 @@ class Event extends \Civi\Core\Entity {
               'thankyou_footer_text' => array(
       
         'name' => 'thankyou_footer_text',
+        'propertyName' => 'thankyouFooterText',
         'type' => CRM_Utils_Type::T_TEXT,
                 'title' => ts('Footer Text'),
-                                                   'rows' => 6,
+                                 'maxlength' => 65535,
+                                  'rows' => 6,
                          'cols' => 50,
          
                                     
@@ -2336,6 +2448,7 @@ class Event extends \Civi\Core\Entity {
               'is_pay_later' => array(
       
         'name' => 'is_pay_later',
+        'propertyName' => 'isPayLater',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('Pay Later Allowed'),
                                                      
@@ -2345,24 +2458,29 @@ class Event extends \Civi\Core\Entity {
               'pay_later_text' => array(
       
         'name' => 'pay_later_text',
+        'propertyName' => 'payLaterText',
         'type' => CRM_Utils_Type::T_TEXT,
                 'title' => ts('Pay Later Text'),
-                                                     
+                                 'maxlength' => 65535,
+                                    
                                     
                           ),
       
               'pay_later_receipt' => array(
       
         'name' => 'pay_later_receipt',
+        'propertyName' => 'payLaterReceipt',
         'type' => CRM_Utils_Type::T_TEXT,
                 'title' => ts('Pay Later Receipt Text'),
-                                                     
+                                 'maxlength' => 65535,
+                                    
                                     
                           ),
       
               'is_partial_payment' => array(
       
         'name' => 'is_partial_payment',
+        'propertyName' => 'isPartialPayment',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('Partial Payments Enabled'),
                                                      
@@ -2372,6 +2490,7 @@ class Event extends \Civi\Core\Entity {
               'initial_amount_label' => array(
       
         'name' => 'initial_amount_label',
+        'propertyName' => 'initialAmountLabel',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Initial Amount Label'),
                                  'maxlength' => 255,
@@ -2383,15 +2502,18 @@ class Event extends \Civi\Core\Entity {
               'initial_amount_help_text' => array(
       
         'name' => 'initial_amount_help_text',
+        'propertyName' => 'initialAmountHelpText',
         'type' => CRM_Utils_Type::T_TEXT,
                 'title' => ts('Initial Amount Help Text'),
-                                                     
+                                 'maxlength' => 65535,
+                                    
                                     
                           ),
       
               'min_initial_amount' => array(
       
         'name' => 'min_initial_amount',
+        'propertyName' => 'minInitialAmount',
         'type' => CRM_Utils_Type::T_MONEY,
                 'title' => ts('Minimum Initial Amount'),
                                                      
@@ -2401,6 +2523,7 @@ class Event extends \Civi\Core\Entity {
               'is_multiple_registrations' => array(
       
         'name' => 'is_multiple_registrations',
+        'propertyName' => 'isMultipleRegistrations',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('Allow Multiple Registrations'),
                                                      
@@ -2410,6 +2533,7 @@ class Event extends \Civi\Core\Entity {
               'allow_same_participant_emails' => array(
       
         'name' => 'allow_same_participant_emails',
+        'propertyName' => 'allowSameParticipantEmails',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('Does Event allow multiple registrations from same email address?'),
                                                      
@@ -2419,6 +2543,7 @@ class Event extends \Civi\Core\Entity {
               'has_waitlist' => array(
       
         'name' => 'has_waitlist',
+        'propertyName' => 'hasWaitlist',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('Waitlist Enabled'),
                                                      
@@ -2428,6 +2553,7 @@ class Event extends \Civi\Core\Entity {
               'requires_approval' => array(
       
         'name' => 'requires_approval',
+        'propertyName' => 'requiresApproval',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('Requires Approval'),
                                                      
@@ -2437,6 +2563,7 @@ class Event extends \Civi\Core\Entity {
               'expiration_time' => array(
       
         'name' => 'expiration_time',
+        'propertyName' => 'expirationTime',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Expiration Time'),
                                                      
@@ -2446,9 +2573,11 @@ class Event extends \Civi\Core\Entity {
               'waitlist_text' => array(
       
         'name' => 'waitlist_text',
+        'propertyName' => 'waitlistText',
         'type' => CRM_Utils_Type::T_TEXT,
                 'title' => ts('Waitlist Text'),
-                                                   'rows' => 4,
+                                 'maxlength' => 65535,
+                                  'rows' => 4,
                          'cols' => 60,
          
                                     
@@ -2457,9 +2586,11 @@ class Event extends \Civi\Core\Entity {
               'approval_req_text' => array(
       
         'name' => 'approval_req_text',
+        'propertyName' => 'approvalReqText',
         'type' => CRM_Utils_Type::T_TEXT,
                 'title' => ts('Approval Req Text'),
-                                                   'rows' => 4,
+                                 'maxlength' => 65535,
+                                  'rows' => 4,
                          'cols' => 60,
          
                                     
@@ -2468,6 +2599,7 @@ class Event extends \Civi\Core\Entity {
               'is_template' => array(
       
         'name' => 'is_template',
+        'propertyName' => 'isTemplate',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('Is an Event Template'),
                                                      
@@ -2477,6 +2609,7 @@ class Event extends \Civi\Core\Entity {
               'template_title' => array(
       
         'name' => 'template_title',
+        'propertyName' => 'templateTitle',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Event Template Title'),
                                  'maxlength' => 255,
@@ -2493,6 +2626,7 @@ class Event extends \Civi\Core\Entity {
               'created_id' => array(
       
         'name' => 'created_id',
+        'propertyName' => 'created',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Created By Contact ID'),
                                                      
@@ -2503,6 +2637,7 @@ class Event extends \Civi\Core\Entity {
               'created_date' => array(
       
         'name' => 'created_date',
+        'propertyName' => 'createdDate',
         'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
                 'title' => ts('Event Created Date'),
                                                      
@@ -2512,6 +2647,7 @@ class Event extends \Civi\Core\Entity {
               'currency' => array(
       
         'name' => 'currency',
+        'propertyName' => 'currency',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Currency'),
                                  'maxlength' => 3,
@@ -2534,6 +2670,7 @@ class Event extends \Civi\Core\Entity {
               'campaign_id' => array(
       
         'name' => 'campaign_id',
+        'propertyName' => 'campaign',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Campaign'),
                                                      
@@ -2549,6 +2686,7 @@ class Event extends \Civi\Core\Entity {
               'is_share' => array(
       
         'name' => 'is_share',
+        'propertyName' => 'isShare',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('Is shared through social media'),
                                                      
@@ -2559,6 +2697,7 @@ class Event extends \Civi\Core\Entity {
               'parent_event_id' => array(
       
         'name' => 'parent_event_id',
+        'propertyName' => 'parentEventId',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Parent Event ID'),
                                                      
@@ -2569,6 +2708,7 @@ class Event extends \Civi\Core\Entity {
               'slot_label_id' => array(
       
         'name' => 'slot_label_id',
+        'propertyName' => 'slotLabelId',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Subevent Slot Label ID'),
                                                      

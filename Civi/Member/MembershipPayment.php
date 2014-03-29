@@ -69,6 +69,7 @@ class MembershipPayment extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Member\Membership")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="membership_id", referencedColumnName="id", onDelete="CASCADE")})
+   * 
    */
   private $membership;
   
@@ -78,6 +79,7 @@ class MembershipPayment extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Contribute\Contribution")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="contribution_id", referencedColumnName="id", onDelete="CASCADE")})
+   * 
    */
   private $contribution;
 
@@ -143,6 +145,7 @@ class MembershipPayment extends \Civi\Core\Entity {
               'id' => array(
       
         'name' => 'id',
+        'propertyName' => 'id',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -152,6 +155,7 @@ class MembershipPayment extends \Civi\Core\Entity {
               'membership_id' => array(
       
         'name' => 'membership_id',
+        'propertyName' => 'membership',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -162,6 +166,7 @@ class MembershipPayment extends \Civi\Core\Entity {
               'contribution_id' => array(
       
         'name' => 'contribution_id',
+        'propertyName' => 'contribution',
         'type' => CRM_Utils_Type::T_INT,
                                                      
                                     
