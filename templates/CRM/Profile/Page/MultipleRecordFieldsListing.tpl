@@ -32,7 +32,7 @@
   {/if}
   {if $records and $headers}
     {include file="CRM/common/jsortable.tpl"}
-    <div id="browseValues">
+    <div id="custom-{$customGroupId}-table-wrapper">
       <div>
         {strip}
           <table id="records" class="display">
