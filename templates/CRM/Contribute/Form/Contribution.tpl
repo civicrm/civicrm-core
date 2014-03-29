@@ -229,26 +229,33 @@
       </div>
       <div class="crm-accordion-body">
         <table class="form-layout-compressed">
-          {if $siteHasPCPs}
-            <tr class="crm-contribution-pcp-block-link">
-              <td colspan="2">
-                <div id="showPCP">
-                  <a href='#'>{ts}credit this contribution to a personal campaign page{/ts}</a>
-                </div>
-              </td>
-            </tr>
-            <tr class="crm-contribution-pcp-block crm-contribution-form-block-pcp_made_through_id hiddenElement">
+          <tr class="crm-contribution-form-block-soft_credit_to">
+            <td colspan="2">
+              {include file="CRM/Contribute/Form/SoftCredit.tpl"}
+            </td>
+          </tr>
+        </table>
+      </div>
+    </div>
+    <!-- end of soft credit -->
+
+    <!-- start of PCP -->
+    {if $siteHasPCPs}
+      <div class="crm-accordion-wrapper crm-accordion_title-accordion crm-accordion-processed" id="softCredit">
+        <div class="crm-accordion-header">
+          {ts}Personal Campaign Page{/ts}&nbsp;{help id="id-pcp"}
+        </div>
+        <div class="crm-accordion-body">
+          <table class="form-layout-compressed">
+            <tr class="crm-contribution-pcp-block crm-contribution-form-block-pcp_made_through_id">
               <td class="label">{$form.pcp_made_through_id.label}</td>
               <td>
                 {$form.pcp_made_through_id.html} &nbsp;
-                <span class="showSoftCreditLink">
-                  <a href="#" id="showSoftCredit">{ts}unlink from personal campaign page{/ts}</a>
-                </span><br/>
                 <span class="description">{ts}Search for the Personal Campaign Page by the fund-raiser's last name or
                  email address.{/ts}</span>
 
                 <div class="spacer"></div>
-                <div class="crm-contribution-form-block-pcp_details">
+                 <div class="crm-contribution-form-block-pcp_details">
                   <table class="crm-contribution-form-table-credit_to_pcp">
                     <tr id="pcpDisplayRollID" class="crm-contribution-form-block-pcp_display_in_roll">
                       <td class="label">{$form.pcp_display_in_roll.label}</td>
@@ -273,16 +280,12 @@
                 </div>
               </td>
             </tr>
-          {/if}
-          <tr class="crm-contribution-form-block-soft_credit_to">
-            <td colspan="2">
-              {include file="CRM/Contribute/Form/SoftCredit.tpl"}
-            </td>
-          </tr>
-        </table>
+          </table>
+        </div>
       </div>
-    </div>
-    <!-- end of soft credit -->
+    {/if}
+    <!-- end of PCP -->
+
     {if !$contributionMode}
     <div class="crm-accordion-wrapper crm-accordion_title-accordion crm-accordion-processed" id="paymentDetails_Information">
       <div class="crm-accordion-header">
