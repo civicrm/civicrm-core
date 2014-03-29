@@ -27,6 +27,8 @@
 namespace Civi\API;
 
 class Request {
+  private static $nextId = 1;
+
   /**
    * Create a formatted/normalized request object.
    *
@@ -47,6 +49,7 @@ class Request {
    */
   public static function create($entity, $action, $params, $extra) {
     $apiRequest = array(); // new \Civi\API\Request();
+    $apiRequest['id'] = self::$nextId++;
     $apiRequest['version'] = self::parseVersion($params);
     $apiRequest['params'] = $params;
     $apiRequest['extra'] = $extra;
