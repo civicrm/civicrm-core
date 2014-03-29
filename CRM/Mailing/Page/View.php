@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -128,7 +128,6 @@ class CRM_Mailing_Page_View extends CRM_Core_Page {
       $contactId = $this->_contactID;
     }
     else {
-      $details = array('test');
       //get tokens that are not contact specific resolved
       $params  = array('contact_id' => 0);
       $details = CRM_Utils_Token::getAnonymousTokenDetails($params,
@@ -148,8 +147,7 @@ class CRM_Mailing_Page_View extends CRM_Core_Page {
     );
 
     $title = NULL;
-    if (isset($this->_mailing->body_html)) {
-      
+    if (isset($this->_mailing->body_html) && empty($_GET['text'])) {
       $header = 'Content-Type: text/html; charset=utf-8';
       $content = $mime->getHTMLBody();
       if (strpos($content, '<head>') === FALSE && strpos($content, '<title>') === FALSE) {
@@ -160,7 +158,11 @@ class CRM_Mailing_Page_View extends CRM_Core_Page {
       $header = 'Content-Type: text/plain; charset=utf-8';
       $content = $mime->getTXTBody();
     }
+    CRM_Utils_System::setTitle($this->_mailing->subject);
 
+    if (CRM_Utils_Array::value('snippet', $_GET) === 'json') {
+      CRM_Core_Page_AJAX::returnJsonResponse($content);
+    }
     if ($print) {
       header($header);
       print $title;

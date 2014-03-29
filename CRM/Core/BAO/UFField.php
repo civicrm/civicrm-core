@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -966,6 +966,24 @@ SELECT  id
       else {
         $fields['Membership'] = $membershipFields;
       }
+    }
+
+    if (CRM_Core_Permission::access('CiviCase')) {
+      $caseFields = CRM_Case_BAO_Query::getFields(TRUE);
+      $caseFields = array_merge($caseFields, CRM_Core_BAO_CustomField::getFieldsForImport('Case'));
+      if ($caseFields) {
+        // Remove fields not supported by profiles
+        CRM_Utils_Array::remove($caseFields,
+          'case_id',
+          'case_type',
+          'case_start_date',
+          'case_end_date',
+          'case_role',
+          'case_status',
+          'case_deleted'
+        );
+      }
+      $fields['Case'] = $caseFields;
     }
 
     $activityFields = CRM_Activity_BAO_Activity::getProfileFields();

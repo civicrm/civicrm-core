@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -159,7 +159,7 @@
 
 {literal}
 <script type="text/javascript">
-cj(function(){
+CRM.$(function($) {
   showHidePeriodSettings();
   cj('#duration_unit').change(function(){
     showHidePeriodSettings();
@@ -217,7 +217,7 @@ function showHidePeriodSettings() {
 
 //load the auto renew msg if recur allow.
 {/literal}{if $authorize and $allowAutoRenewMsg}{literal}
-cj( function(){
+CRM.$(function($) {
   setReminder( null );
 });
 {/literal}{/if}{literal}

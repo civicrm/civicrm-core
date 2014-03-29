@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -113,7 +113,7 @@ class WebTest_Contact_SearchTest extends CiviSeleniumTestCase {
     // add to group
     $this->select("group_id", "label=$groupName");
     $this->click("_qf_GroupContact_next");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->waitForText("crm-notification-container","Contact has been added to '$groupName'.");
 
     // tag a contact
     // visit tag tab
@@ -128,7 +128,7 @@ class WebTest_Contact_SearchTest extends CiviSeleniumTestCase {
     $this->openCiviPage("contact/search", "reset=1");
 
     // fill name as first_name
-    $this->type("css=.crm-basic-criteria-form-block input#sort_name", $firstName);
+    $this->type("sort_name", $firstName);
 
     // select contact type as Indiividual
     $this->select("contact_type", "value=Individual");
@@ -141,7 +141,7 @@ class WebTest_Contact_SearchTest extends CiviSeleniumTestCase {
 
     // click to search
     $this->click("_qf_Basic_refresh");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->waitForElementPresent("xpath=//div[@class='crm-search-results']");
 
     // Is contact present in search result?
     $this->assertElementContainsText('css=.crm-search-results > table.row-highlight', $sortName);
@@ -202,7 +202,7 @@ class WebTest_Contact_SearchTest extends CiviSeleniumTestCase {
     // add to group
     $this->select("group_id", "label=$parentGroupName");
     $this->click("_qf_GroupContact_next");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->waitForText("crm-notification-container","Contact has been added to '$parentGroupName'.");
 
     // Adding child group contact
     // We're using Quick Add block on the main page for this.
@@ -220,7 +220,7 @@ class WebTest_Contact_SearchTest extends CiviSeleniumTestCase {
     // add to child group
     $this->select("group_id", "*$childGroupName");
     $this->click("_qf_GroupContact_next");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->waitForText("crm-notification-container","Contact has been added to '$childGroupName'.");
 
     // visit contact search page
     $this->openCiviPage("contact/search", "reset=1");

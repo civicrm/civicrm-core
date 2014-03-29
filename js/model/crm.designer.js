@@ -1,5 +1,4 @@
-(function($) {
-  var CRM = (window.CRM) ? (window.CRM) : (window.CRM = {});
+(function($, _) {
   if (!CRM.Designer) CRM.Designer = {};
 
   // TODO Optimize this class
@@ -114,4 +113,4 @@
       return fieldsByEntitySection;
     }
   });
-})(cj);
+})(CRM.$, CRM._);

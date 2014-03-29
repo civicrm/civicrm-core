@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -238,9 +238,9 @@
               </td>
             </tr>
             <tr class="crm-contribution-pcp-block crm-contribution-form-block-pcp_made_through_id hiddenElement">
-              <td class="label">{$form.pcp_made_through.label}</td>
+              <td class="label">{$form.pcp_made_through_id.label}</td>
               <td>
-                {$form.pcp_made_through.html} &nbsp;
+                {$form.pcp_made_through_id.html} &nbsp;
                 <span class="showSoftCreditLink">
                   <a href="#" id="showSoftCredit">{ts}unlink from personal campaign page{/ts}</a>
                 </span><br/>
@@ -347,7 +347,7 @@
 
     {literal}
     <script type="text/javascript">
-      cj( function( ) {
+      CRM.$(function($) {
     {/literal}
     CRM.buildCustomData( '{$customDataType}' );
     {if $customDataSubType}
@@ -360,7 +360,7 @@
 
     // bind first click of accordion header to load crm-accordion-body with snippet
     // everything else taken care of by cj().crm-accordions()
-    cj(function() {
+    CRM.$(function($) {
       cj('#adjust-option-type').hide();
       cj('.crm-ajax-accordion .crm-accordion-header').one('click', function() {
         loadPanes(cj(this).attr('id'));
@@ -395,7 +395,7 @@
   {/literal}
     {if $context eq 'standalone' and $outBound_option != 2 }
       {literal}
-      cj( function( ) {
+      CRM.$(function($) {
         cj("#contact_1").blur( function( ) {
           checkEmail( );
         });
@@ -477,7 +477,7 @@
   {if $action neq 8}
     {literal}
     <script type="text/javascript">
-      cj( function( ) {
+      CRM.$(function($) {
         checkEmailDependancies( );
         cj('#is_email_receipt').click( function( ) {
           checkEmailDependancies( );
@@ -496,7 +496,7 @@
       }
 
     {/literal}{if !$contributionMode}{literal}
-     cj( function( ) {
+     CRM.$(function($) {
       showHideCancelInfo(cj('#contribution_status_id'));
 
       cj('#contribution_status_id').change(function() {
@@ -538,7 +538,7 @@
 
 {literal}
 <script type="text/javascript">
-cj(function() {
+CRM.$(function($) {
   cj().crmAccordions();
 });
 

@@ -2,9 +2,9 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -33,7 +33,7 @@
  * @package CiviCRM_APIv3
  * @subpackage API_Event
  *
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * @version $Id: Event.php 30964 2010-11-29 09:41:54Z shot $
  *
  */
@@ -233,7 +233,7 @@ function _civicrm_api3_event_getisfull(&$event, $event_id) {
 
 
 /**
- * Overrides _civicrm_api3_generic_getlist_params.
+ * @see _civicrm_api3_generic_getlist_params.
  *
  * @param $request array
  */
@@ -248,7 +248,7 @@ function _civicrm_api3_event_getlist_params(&$request) {
 }
 
 /**
- * Overrides _civicrm_api3_generic_getlist_output
+ * @see _civicrm_api3_generic_getlist_output
  *
  * @param $result array
  * @param $request array

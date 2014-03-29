@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -40,7 +40,7 @@
 </div>
 {literal}
 <script type="text/javascript">
-  cj(function($) {
+  CRM.$(function($) {
     var oTable;
 
     buildMailingContact();
@@ -83,34 +83,9 @@
             "sNext": {/literal}"{ts escape='js'}Next{/ts}"{literal},
             "sLast": {/literal}"{ts escape='js'}Last{/ts}"{literal}
           }
-        },
-        "fnDrawCallback": function () {
-          addMailingViewDialog()
         }
       });
     }
-
-    function addMailingViewDialog() {
-      $('a.crm-mailing-view').click(function() {
-        var o = $('<div class="crm-container crm-mailing-view-dialog"></div>');
-        o.block({theme: true});
-        o.load($(this).attr('href'), function() {
-          o.unblock();
-        });
-
-        CRM.confirm( ''
-          ,{
-            title: ts('Email Message'),
-            message: o,
-            width : "680px", // don't remove px
-            height: "560"
-          },
-          ts('Done')
-        );
-        return false;
-      });
-    }
-
   });
 </script>
 {/literal}

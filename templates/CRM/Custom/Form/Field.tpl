@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -156,10 +156,12 @@ function custom_option_html_type( ) {
     {/if}
             </td>
         </tr>
+       {if $form.in_selector}
        <tr class='crm-custom-field-form-block-in_selector'>
           <td class='label'>{$form.in_selector.label}</td>
           <td class='html-adjust'>{$form.in_selector.html} {help id="id-in_selector"}</td>
        </tr>
+       {/if}
        <tr class="crm-custom-field-form-block-text_length"  id="textLength" {if !( $action eq 1 || $action eq 2 ) && ($form.data_type.value.0.0 != 0)}class="hide-block"{/if}>
             <td class="label">{$form.text_length.label}</td>
             <td class="html-adjust">{$form.text_length.html}</td>

@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -200,7 +200,7 @@
       toggleConfirmButton();
     });
 
-    cj(function () {
+    CRM.$(function($) {
       toggleConfirmButton();
       skipPaymentMethod();
     });
@@ -214,8 +214,7 @@
         flag = 0;
       }
 
-      if (((cj('#priceset input:checked').attr('data-amount') == 0) ||
-        (cj('#pricevalue').text() == symbol + " 0.00" )) && flag) {
+      if ((cj('#pricevalue').text() == symbol + " 0.00") && flag) {
         cj(".payment_options-group").hide();
         cj("div.payment_processor-section").hide();
         cj("div#payment_information").hide();

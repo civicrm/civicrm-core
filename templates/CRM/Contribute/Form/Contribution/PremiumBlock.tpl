@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -127,7 +127,7 @@
   {if $context EQ "makeContribution"}
     {literal}
     <script>
-      cj(function($){
+      CRM.$(function($) {
         var is_separate_payment = {/literal}{if $membershipBlock.is_separate_payment}{$membershipBlock.is_separate_payment}{else}0{/if}{literal};
 
         // select a new premium
@@ -357,7 +357,7 @@
   {else}
     {literal}
     <script>
-      cj(function(){
+      CRM.$(function($) {
         cj('.premium-short').hide();
         cj('.premium-full').show();
       });

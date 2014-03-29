@@ -1,4 +1,4 @@
-(function($) {
+(function($, _) {
   if (!CRM.Designer) CRM.Designer = {};
 
   /**
@@ -874,4 +874,4 @@
     }
   });
 
-})(cj);
+})(CRM.$, CRM._);

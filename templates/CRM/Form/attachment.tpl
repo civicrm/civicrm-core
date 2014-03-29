@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -49,7 +49,7 @@
       {capture assign=attachTitle}{ts}Attachment(s){/ts}{/capture}
     {/if}
     {if !$noexpand}
-    <div class="crm-accordion-wrapper {if $context NEQ 'pcpCampaign'}collapsed{/if}">
+    <div class="crm-accordion-wrapper {if $context NEQ 'pcpCampaign' AND !$currentAttachmentInfo}collapsed{/if}">
        <div class="crm-accordion-header">
           {$attachTitle}
       </div><!-- /.crm-accordion-header -->
@@ -102,12 +102,11 @@
             <td class="label">{ts}Current Attachment(s){/ts}</td>
             <td class="view-value">
           {foreach from=$currentAttachmentInfo key=attKey item=attVal}
-                <div id="attachStatusMesg" class="status hiddenElement"></div>
-                <div id="attachFileRecord_{$attVal.fileID}">
-                  <strong><a href="{$attVal.url}">{$attVal.cleanName}</a></strong>
+                <div class="crm-attachment-wrapper crm-entity" id="file_{$attVal.fileID}">
+                  <strong><a class="crm-attachment" href="{$attVal.url}">{$attVal.cleanName}</a></strong>
                   {if $attVal.description}&nbsp;-&nbsp;{$attVal.description}{/if}
                   {if $attVal.deleteURLArgs}
-                   <a href="#" onclick="showDeleteAttachment('{$attVal.cleanName}', '{$attVal.deleteURLArgs}', {$attVal.fileID}, '#attachStatusMesg', '#attachFileRecord_{$attVal.fileID}'); return false;" title="{ts}Delete this attachment{/ts}"><span class="icon red-icon delete-icon" style="margin:0px 0px -5px 20px" title="{ts}Delete this attachment{/ts}"></span></a>
+                   <a href="#" class="crm-hover-button delete-attachment" data-filename="{$attVal.cleanName}" data-args="{$attVal.deleteURLArgs}" title="{ts}Delete File{/ts}"><span class="icon delete-icon"></span></a>
                   {/if}
                   {if !empty($attVal.tag)}
                     <br/>
@@ -120,8 +119,7 @@
         </tr>
         <tr>
             <td class="label">&nbsp;</td>
-            <td>{$form.is_delete_attachment.html}&nbsp;{$form.is_delete_attachment.label}<br />
-                <span class="description">{ts}Click the red trash-can next to a file name to delete a specific attachment. If you want to delete ALL attachments, check the box above and click Save.{/ts}</span>
+            <td>{$form.is_delete_attachment.html}&nbsp;{$form.is_delete_attachment.label}
             </td>
         </tr>
       {/if}
@@ -132,7 +130,7 @@
   {if !$noexpand}
     {literal}
     <script type="text/javascript">
-    cj(function() {
+    CRM.$(function($) {
        cj().crmAccordions();
     });
     </script>

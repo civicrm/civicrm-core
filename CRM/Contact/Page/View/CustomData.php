@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -130,6 +130,8 @@ class CRM_Contact_Page_View_CustomData extends CRM_Core_Page {
       );
 
       if ($displayStyle === 'Tab with table' && $this->_multiRecordDisplay != 'single') {
+        $id = "custom_{$this->_groupId}";
+        $this->ajaxResponse['tabCount'] = CRM_Contact_BAO_Contact::getCountComponent($id, $this->_contactId, $groupTree[$this->_groupId]['table_name']);
         $ctype = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact',
           $this->_contactId,
           'contact_type'
@@ -150,6 +152,9 @@ class CRM_Contact_Page_View_CustomData extends CRM_Core_Page {
       else {
         $recId = NULL;
         if ($this->_multiRecordDisplay == 'single') {
+          $groupTitle = CRM_Core_BAO_CustomGroup::getTitle($this->_groupId);
+          CRM_Utils_System::setTitle(ts('View %1 Record', array(1 => $groupTitle)));
+
           $recId = $this->_recId;
           $this->assign('multiRecordDisplay', $this->_multiRecordDisplay);
           $this->assign('skipTitle', 1);

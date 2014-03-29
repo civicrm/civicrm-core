@@ -1,9 +1,9 @@
 <?php
 /*
    +--------------------------------------------------------------------+
-   | CiviCRM version 4.4                                                |
+   | CiviCRM version 4.5                                                |
    +--------------------------------------------------------------------+
-   | Copyright CiviCRM LLC (c) 2004-2013                                |
+   | Copyright CiviCRM LLC (c) 2004-2014                                |
    +--------------------------------------------------------------------+
    | This file is a part of CiviCRM.                                    |
    |                                                                    |
@@ -29,7 +29,7 @@
  * This class handles all REST client requests.
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  *
  */
 class CRM_Utils_REST {
@@ -356,9 +356,9 @@ class CRM_Utils_REST {
     }
 
     // trap all fatal errors
-    CRM_Core_Error::setCallback(array('CRM_Utils_REST', 'fatal'));
+    $errorScope = CRM_Core_TemporaryErrorScope::create(array('CRM_Utils_REST', 'fatal'));
     $result = civicrm_api($args[1], $args[2], $params);
-    CRM_Core_Error::setCallback();
+    unset($errorScope);
 
     if ($result === FALSE) {
       return self::error('Unknown error.');
@@ -526,11 +526,11 @@ class CRM_Utils_REST {
     if (!$params['sequential']) {
       $params['sequential'] = 1;
     }
-    // trap all fatal errors
-    CRM_Core_Error::setCallback(array('CRM_Utils_REST', 'fatal'));
-    $result = civicrm_api($entity, $action, $params);
 
-    CRM_Core_Error::setCallback();
+    // trap all fatal errors
+    $errorScope = CRM_Core_TemporaryErrorScope::create(array('CRM_Utils_REST', 'fatal'));
+    $result = civicrm_api($entity, $action, $params);
+    unset($errorScope);
 
     echo self::output($result);
 

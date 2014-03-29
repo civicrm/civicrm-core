@@ -1,9 +1,9 @@
 <?php
 /*
   +--------------------------------------------------------------------+
-  | CiviCRM version 4.4                                                |
+  | CiviCRM version 4.5                                                |
   +--------------------------------------------------------------------+
-  | Copyright CiviCRM LLC (c) 2004-2013                                |
+  | Copyright CiviCRM LLC (c) 2004-2014                                |
   +--------------------------------------------------------------------+
   | This file is a part of CiviCRM.                                    |
   |                                                                    |
@@ -31,7 +31,7 @@
  * @package CiviCRM_APIv3
  * @subpackage API_utils
  *
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * @version $Id: utils.php 30879 2010-11-22 15:45:55Z shot $
  *
  */
@@ -131,17 +131,12 @@ function civicrm_api3_verify_mandatory($params, $daoName = NULL, $keys = array()
  *
  * @param <type> $data
  * @param array $data
- * @param object $dao DAO / BAO object to be freed here
+ * @param array $dao (misnomer) apiRequest which led to this error (with keys "entity", "action", etc)
  *
  * @throws API_Exception
  * @return array <type>
  */
 function civicrm_api3_create_error($msg, $data = array(), &$dao = NULL) {
-  //fix me - $dao should be param 4 & 3 should be $apiRequest
-  if (is_object($dao)) {
-    $dao->free();
-  }
-
   if (is_array($dao)) {
     if ($msg == 'DB Error: constraint violation' || substr($msg, 0,9)  == 'DB Error:' || $msg == 'DB Error: already exists') {
       try {
@@ -158,7 +153,9 @@ function civicrm_api3_create_error($msg, $data = array(), &$dao = NULL) {
   // we will show sql to privelledged user only (not sure of a specific
   // security hole here but seems sensible - perhaps should apply to the trace as well?
   if(isset($data['sql']) && CRM_Core_Permission::check('Administer CiviCRM')) {
-    $data['debug_information'] = $data['sql'];
+    $data['debug_information'] = $data['sql']; // Isn't this redundant?
+  } else {
+    unset($data['sql']);
   }
   if (is_array($dao) && isset($dao['params']) && is_array($dao['params']) && !empty($dao['params']['api.has_parent'])) {
     $errorCode = empty($data['error_code']) ? 'chained_api_failed' : $data['error_code'];
@@ -318,7 +315,21 @@ function _civicrm_api3_get_DAO($name) {
   if ($name == 'Im' || $name == 'Acl') {
     $name = strtoupper($name);
   }
-  return CRM_Core_DAO_AllCoreTables::getFullName($name);
+  $dao = CRM_Core_DAO_AllCoreTables::getFullName($name);
+  if ($dao || !$name) {
+    return $dao;
+  }
+
+  // Really weird apis can declare their own DAO name. Not sure if this is a good idea...
+  if(file_exists("api/v3/$name.php")) {
+    include_once "api/v3/$name.php";
+  }
+  $daoFn = "_civicrm_api3_" . _civicrm_api_get_entity_name_from_camel($name) . "_DAO";
+  if (function_exists($daoFn)) {
+    return $daoFn();
+  }
+
+  return NULL;
 }
 
 /**

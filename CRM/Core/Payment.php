@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -204,7 +204,9 @@ abstract class CRM_Core_Payment {
   }
 
   /**
-   * Payment callback handler
+   * Payment callback handler. The processor_name or processor_id is passed in.
+   * Note that processor_id is more reliable as one site may have more than one instance of a
+   * processor & ideally the processor will be validating the results
    * Load requested payment processor and call that processor's handle<$method> method
    *
    * @public
@@ -258,10 +260,11 @@ abstract class CRM_Core_Payment {
         require_once $ext->classToPath($paymentClass);
       }
       else {
-        // Legacy instance - but there may also be an extension instance, so
-        // continue on to the next instance and check that one. We'll raise an
-        // error later on if none are found.
-        continue;
+        // Legacy or extension as module instance
+        if(empty($paymentClass)) {
+          $paymentClass = 'CRM_Core_' . $dao->class_name;
+
+        }
       }
 
       $paymentProcessor = CRM_Financial_BAO_PaymentProcessor::getPayment($dao->processor_id, $mode);
@@ -278,9 +281,9 @@ abstract class CRM_Core_Payment {
       if (!method_exists($processorInstance, $method) ||
         !is_callable(array($processorInstance, $method))
       ) {
-        // No? This will be the case in all instances, so let's just die now
-        // and not prolong the agony.
-        CRM_Core_Error::fatal("Payment processor does not implement a '$method' method");
+        // on the off chance there is a double implementation of this processor we should keep looking for another
+        // note that passing processor_id is more reliable & we should work to deprecate processor_name
+        continue;
       }
 
       // Everything, it seems, is ok - execute pp callback handler

@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
  | Copyright (C) 2011 Marty Wright                                    |
  | Licensed to CiviCRM under the Academic Free License version 3.0.   |
@@ -176,7 +176,7 @@
 
 {literal}
 <script type='text/javascript'>
-  cj(function($) {
+  CRM.$(function($) {
     $().crmAccordions();
   });
     var entityMapping = eval({/literal}{$entityMapping}{literal});
@@ -193,7 +193,7 @@
         }
     });
 
-    cj(function() {
+    CRM.$(function($) {
         if (cj('#absolute_date_display').val()) {
             cj('#relativeDate').hide();
             cj('#relativeDateRepeat').hide();
@@ -207,7 +207,7 @@
          });
      });
 
-  cj(function () {
+  CRM.$(function($) {
     loadMsgBox();
     cj('#mode').change(function () {
       loadMsgBox();
@@ -246,7 +246,7 @@
     }
   }
 
-  cj(function () {
+  CRM.$(function($) {
     if (cj('#is_recipient_listing').val()) {
       cj('#recipientList').show();
     }

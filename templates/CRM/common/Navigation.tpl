@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -26,7 +26,7 @@
 {capture assign=menuMarkup}{strip}
   <ul id="civicrm-menu">
     {if call_user_func(array('CRM_Core_Permission','giveMeAllACLs'))}
-      <li id="crm-qsearch" class="menumain crm-link-home">
+      <li id="crm-qsearch" class="menumain">
         <form action="{crmURL p='civicrm/contact/search/advanced' h=0 }" name="search_block" id="id_search_block" method="post">
           <div id="quickSearch">
             <input type="text" class="form-text" id="sort_name_navigation" placeholder="{ts}Find Contacts{/ts}" name="sort_name" style="width: 12em;" />
@@ -58,7 +58,7 @@
 (function($) {
   var menuMarkup = {/literal}{$menuMarkup|@json_encode};
 {if $config->userFramework neq 'Joomla'}{literal}
-  $('body').prepend(menuMarkup);
+  $('body').append(menuMarkup);
 
   //Track Scrolling
   $(window).scroll(function () {
@@ -153,4 +153,4 @@ $('#civicrm-menu').ready(function() {
   });
 });
 $('#civicrm-menu').menuBar({arrowSrc: CRM.config.resourceBase + 'packages/jquery/css/images/arrow.png'});
-})(cj);{/literal}
+})(CRM.$);{/literal}

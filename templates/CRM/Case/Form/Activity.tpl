@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -196,6 +196,16 @@
               <td class="label">{$form.followup_activity_subject.label}</td>
               <td>{$form.followup_activity_subject.html|crmAddClass:huge}</td>
             </tr>
+	    <tr>
+              <td class="label">
+                {$form.followup_assignee_contact_id.label}
+                {edit}
+                {/edit}
+              </td>
+              <td>
+                {$form.followup_assignee_contact_id.html}
+              </td>
+            </tr>
           </table>
         </div><!-- /.crm-accordion-body -->
       </div><!-- /.crm-accordion-wrapper -->
@@ -239,7 +249,7 @@
   {include file="CRM/common/customData.tpl"}
     {literal}
     <script type="text/javascript">
-    cj(function() {
+    CRM.$(function($) {
     {/literal}
     {if $customDataSubType}
       CRM.buildCustomData( '{$customDataType}', {$customDataSubType} );
@@ -268,7 +278,7 @@
   {if $action eq 2 or $action eq 1}
     {literal}
     <script type="text/javascript">
-      cj(function( ) {
+      CRM.$(function($) {
         cj('.crm-with-contact').click(function(){
           cj('#with-contacts-widget').toggle();
           cj('#with-clients').toggle();

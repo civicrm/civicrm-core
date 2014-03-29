@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -171,7 +171,7 @@
      <script type="text/javascript">
      {literal}
 
-cj( function( ) {
+CRM.$(function($) {
   // build list of ids to track changes on
   var address_fields = {/literal}{$profileAddressFields|@json_encode}{literal};
   var input_ids = {};

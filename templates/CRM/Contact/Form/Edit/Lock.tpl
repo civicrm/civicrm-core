@@ -1,6 +1,6 @@
 {literal}
 <script type="text/javascript">
-cj(function() {
+CRM.$(function($) {
   if (cj('#update_modified_date').length == 0) {
     return;
   }

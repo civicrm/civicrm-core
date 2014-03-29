@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -352,7 +352,7 @@ class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
       $fieldDetail = reset($fields);
       $fieldId = CRM_Core_BAO_CustomField::getKeyID($fieldDetail['name']);
       $customGroupDetails = CRM_Core_BAO_CustomGroup::getGroupTitles(array($fieldId));
-      $title = $customGroupDetails[$fieldId]['groupTitle'];
+      $multiRecTitle = $customGroupDetails[$fieldId]['groupTitle'];
     } else {
       $title = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_UFGroup', $this->_gid, 'title');
     }
@@ -374,6 +374,7 @@ class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
       $title .= ' - ' . $displayName;
     }
 
+    $title = isset($multiRecTitle) ? ts('View %1 Record', array(1 => $multiRecTitle)) : $title;
     CRM_Utils_System::setTitle($title);
 
     // invoke the pagRun hook, CRM-3906

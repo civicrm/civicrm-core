@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -84,7 +84,7 @@
     {* Expand/Collapse *}
     {literal}
     <script type="text/javascript">
-      cj( function( ) {
+      CRM.$(function($) {
           cj('.collapsed').click( function( ) {
               var currentObj = cj( this );
               if ( currentObj.hasClass( 'expanded') ) {
@@ -108,7 +108,7 @@
 
     {literal}
 
-    cj( function() {
+    CRM.$(function($) {
       var tabIndex = cj('#tab_' + selectedTab).prevAll().length;
       cj("#mainTabContainer").tabs({active: tabIndex});
       cj(".crm-tab-button").addClass("ui-corner-bottom");
@@ -119,7 +119,7 @@
     {* Refresh buttons *}
     {literal}
     <script type="text/javascript">
-    cj(function() {
+    CRM.$(function($) {
       cj('.crm-extensions-refresh').click(function(event){
         event.stopPropagation();
         CRM.alert('', '{/literal}{ts escape="js"}Refreshing...{/ts}{literal}', 'crm-msg-loading', {expires: 0});

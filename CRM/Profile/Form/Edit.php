@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -201,30 +201,6 @@ SELECT module
             "reset=1&gid={$gidString}"
           );
         }
-      }
-
-      if ($this->_multiRecordProfile) {
-        $urlParams = "reset=1&id={$this->_id}&gid={$gidString}";
-
-        // get checksum if present
-        if ($this->get('cs')) {
-          $urlParams .= "&cs=" . $this->get('cs');
-        }
-        $this->_postURL = CRM_Utils_System::url('civicrm/profile/edit', $urlParams);
-        $this->_cancelURL = CRM_Utils_System::url('civicrm/profile/edit', $urlParams);
-
-        //passing the post url to template so the popup form does
-        //proper redirection and proccess form errors if any
-        if (!isset($this->_onPopupClose) || $this->_onPopupClose == 'redirectToProfile') {
-          $popupRedirect = CRM_Utils_System::url('civicrm/profile/edit', $urlParams, FALSE, NULL, FALSE);
-        }
-        elseif ($this->_onPopupClose == 'redirectToTab') {
-          $popupRedirect = CRM_Utils_System::url('civicrm/contact/view',
-            "reset=1&cid={$this->_id}&selectedChild=custom_{$this->_customGroupId}", FALSE, NULL, FALSE);
-        }
-
-        $this->assign('urlParams', $urlParams);
-        $this->assign('postUrl', $popupRedirect);
       }
 
       // we do this gross hack since qf also does entity replacement

@@ -1,9 +1,9 @@
 <?php
 /*
   +--------------------------------------------------------------------+
-  | CiviCRM version 4.4                                                |
+  | CiviCRM version 4.5                                                |
   +--------------------------------------------------------------------+
-  | Copyright CiviCRM LLC (c) 2004-2013                                |
+  | Copyright CiviCRM LLC (c) 2004-2014                                |
   +--------------------------------------------------------------------+
   | This file is a part of CiviCRM.                                    |
   |                                                                    |
@@ -32,7 +32,7 @@
  *
  * @package CiviCRM_APIv3
  * @subpackage API_Contact
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id: Contact.php 30879 2010-11-22 15:45:55Z shot $
  *
  */
@@ -332,10 +332,11 @@ function _civicrm_api3_contact_check_params( &$params, $dupeCheck = true, $dupeE
     }
   }
 
-  //check for organisations with same name
+  // The BAO no longer supports the legacy param "current_employer" so here is a shim for api backward-compatability
   if (!empty($params['current_employer'])) {
-    $organizationParams = array();
-    $organizationParams['organization_name'] = $params['current_employer'];
+    $organizationParams = array(
+      'organization_name' => $params['current_employer'],
+    );
 
     $dedupParams = CRM_Dedupe_Finder::formatParams($organizationParams, 'Organization');
 
@@ -350,6 +351,17 @@ function _civicrm_api3_contact_check_params( &$params, $dupeCheck = true, $dupeE
     // show error if multiple organisation with same name exist
     if (empty($params['employer_id']) && (count($dupeIds) > 1)) {
       throw new API_Exception('Found more than one Organisation with same Name.');
+    }
+
+    if ($dupeIds) {
+      $params['employer_id'] = $dupeIds[0];
+    }
+    else {
+      $result = civicrm_api3('contact', 'create', array(
+        'organization_name' => $params['current_employer'],
+        'contact_type' => 'Organization'
+      ));
+      $params['employer_id'] = $result['id'];
     }
   }
 
@@ -891,7 +903,7 @@ WHERE     $whereClause
 
 
 /**
- * Overrides _civicrm_api3_generic_getlist_params.
+ * @see _civicrm_api3_generic_getlist_params
  *
  * @param $request array
  */
@@ -934,7 +946,7 @@ function _civicrm_api3_contact_getlist_params(&$request) {
 }
 
 /**
- * Overrides _civicrm_api3_generic_getlist_output
+ * @see _civicrm_api3_generic_getlist_output
  *
  * @param $result array
  * @param $request array

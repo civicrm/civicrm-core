@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -105,7 +105,6 @@ class CRM_Case_Form_Report extends CRM_Core_Form {
         array(
           'type' => 'refresh',
           'name' => ts('Generate Report'),
-          'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
           'isDefault' => TRUE,
         ),
         array(
@@ -114,6 +113,8 @@ class CRM_Case_Form_Report extends CRM_Core_Form {
         ),
       )
     );
+    // We want this form to redirect to a full page
+    $this->preventAjaxSubmit();
   }
 
   /**

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -350,43 +350,44 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
     }
 
     $config = CRM_Core_Config::singleton();
-    // CRM-13848
-    $financialType = CRM_Utils_Array::value('financial_type_id', $this->_formValues);
-    if ($financialType && is_array($financialType)) {
-      unset($this->_formValues['financial_type_id']);
-      foreach($financialType as $notImportant => $typeID) {
-        $this->_formValues['financial_type_id'][$typeID] = 1;
-      }
-    }
-
-    $tags = CRM_Utils_Array::value('contact_tags', $this->_formValues);
-    if ($tags && !is_array($tags)) {
-      unset($this->_formValues['contact_tags']);
-      $this->_formValues['contact_tags'][$tags] = 1;
-    }
-
-    if ($tags && is_array($tags)) {
-      unset($this->_formValues['contact_tags']);
-      foreach($tags as $notImportant => $tagID) {
-        $this->_formValues['contact_tags'][$tagID] = 1;
-      }
-    }
-
-
-    if (!$config->groupTree) {
-      $group = CRM_Utils_Array::value('group', $this->_formValues);
-      if ($group && !is_array($group)) {
-        unset($this->_formValues['group']);
-        $this->_formValues['group'][$group] = 1;
-      }
-
-      if ($group && is_array($group)) {
-        unset($this->_formValues['group']);
-        foreach($group as $notImportant => $groupID) {
-          $this->_formValues['group'][$groupID] = 1;
+    if (!empty($_POST)) {
+      // CRM-13848
+      $financialType = CRM_Utils_Array::value('financial_type_id', $this->_formValues);
+      if ($financialType && is_array($financialType)) {
+        unset($this->_formValues['financial_type_id']);
+        foreach($financialType as $notImportant => $typeID) {
+          $this->_formValues['financial_type_id'][$typeID] = 1;
         }
       }
 
+      $tags = CRM_Utils_Array::value('contact_tags', $this->_formValues);
+      if ($tags && !is_array($tags)) {
+        unset($this->_formValues['contact_tags']);
+        $this->_formValues['contact_tags'][$tags] = 1;
+      }
+
+      if ($tags && is_array($tags)) {
+        unset($this->_formValues['contact_tags']);
+        foreach($tags as $notImportant => $tagID) {
+          $this->_formValues['contact_tags'][$tagID] = 1;
+        }
+      }
+
+
+      if (!$config->groupTree) {
+        $group = CRM_Utils_Array::value('group', $this->_formValues);
+        if ($group && !is_array($group)) {
+          unset($this->_formValues['group']);
+          $this->_formValues['group'][$group] = 1;
+        }
+
+        if ($group && is_array($group)) {
+          unset($this->_formValues['group']);
+          foreach($group as $notImportant => $groupID) {
+            $this->_formValues['group'][$groupID] = 1;
+          }
+        }
+      }
     }
 
     CRM_Core_BAO_CustomValue::fixFieldValueOfTypeMemo($this->_formValues);
@@ -454,7 +455,6 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
     // if this search has been forced
     // then see if there are any get values, and if so over-ride the post values
     // note that this means that GET over-rides POST :)
-
     if (!$this->_force) {
       return;
     }

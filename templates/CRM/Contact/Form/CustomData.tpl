@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -24,19 +24,10 @@
  +--------------------------------------------------------------------+
 *}
 {* this template is used for building tabbed custom data *}
-{if $cdType }
+{if $cdType || $postedInfo}
    {include file="CRM/Custom/Form/CustomData.tpl"}
    {if $multiRecordDisplay eq 'single'}
      <div class="html-adjust">{$form.buttons.html}</div>
-     {* for form rule handling *}
-     {include file="CRM/Form/validate.tpl"}
-     {literal}
-     <script type='text/javascript'>
-       cj(function($) {
-         $('#custom-record-dialog .crm-container-snippet #CustomData').validate(CRM.validate.params);
-       });
-     </script>
-     {/literal}
    {/if}
 {else}
     <div id="customData"></div>

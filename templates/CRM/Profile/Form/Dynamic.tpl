@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,31 +28,6 @@
 
 {* Profile forms when embedded in CMS account create (mode=1) or
     cms account edit (mode=8) or civicrm/profile (mode=4) pages *}
-{if ($context eq 'multiProfileDialog')}
-{literal}
-<script type="text/javascript">
-cj(function($) {
-  $('#profile-dialog .crm-container-snippet #Edit').validate(CRM.validate.params);
-  var formOptions = {
-    success:       checkResponse  // post-submit callback 
-  };
-
-  //binding the callback to snippet profile form
-  $('.crm-container-snippet #Edit').ajaxForm(formOptions);
-});
-
-// post-submit callback 
-function checkResponse(responseText, statusText, xhr, $form) { 
-  //if there is any form error show the dialog
-  //else redirect to post url
-  if (!cj(responseText).find('.crm-error').html()) {
-    window.location.href = '{/literal}{$postUrl}{literal}';
-  }
-} 
-</script>
-{/literal}
-{include file="CRM/Form/validate.tpl"}
-{/if}
 {if $deleteRecord}
 <div class="messages status no-popup">
   <div class="icon inform-icon"></div>&nbsp;

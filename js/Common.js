@@ -1,6 +1,7 @@
 // https://civicrm.org/licensing
 var CRM = CRM || {};
-var cj = jQuery;
+var cj = CRM.$ = jQuery;
+CRM._ = _;
 
 /**
  * Short-named function for string translation, defined in global scope so it's available everywhere.
@@ -170,14 +171,6 @@ function submitOnce(obj, formId, procText) {
     }
   }
 }
-/**
- * @deprecated
- */
-function popUp(URL) {
-  day = new Date();
-  id = day.getTime();
-  eval("page" + id + " = window.open(URL, '" + id + "', 'toolbar=0,scrollbars=1,location=0,statusbar=0,menubar=0,resizable=0,width=640,height=420,left = 202,top = 184');");
-}
 
 /**
  * Function to show / hide the row in optionFields
@@ -207,10 +200,12 @@ CRM.validate = CRM.validate || {
   functions: []
 };
 
-(function ($, undefined) {
+(function ($, _, undefined) {
   "use strict";
 
-  $.fn.select2.defaults.dropdownCssClass = 'crm-container';
+  // Theme classes for unattached elements
+  $.fn.select2.defaults.dropdownCssClass = $.ui.dialog.prototype.options.dialogClass = 'crm-container';
+
   // https://github.com/ivaynberg/select2/pull/2090
   $.fn.select2.defaults.width = 'resolve';
 
@@ -425,7 +420,6 @@ CRM.validate = CRM.validate || {
     })
     // Modal dialogs should disable scrollbars
     .on('dialogopen', function(e) {
-      $(e.target).parent().addClass('crm-container');
       if ($(e.target).dialog('option', 'modal')) {
         $(e.target).addClass('modal-dialog');
         $('body').css({overflow: 'hidden'});
@@ -638,44 +632,44 @@ CRM.validate = CRM.validate || {
   /**
    * @see https://wiki.civicrm.org/confluence/display/CRMDOC/Notification+Reference
    */
-  CRM.confirm = function (buttons, options, cancelLabel) {
-    var dialog, callbacks = {};
-    cancelLabel = cancelLabel || ts('Cancel');
-    var settings = {
+  CRM.confirm = function (options) {
+    var dialog, settings = {
       title: ts('Confirm Action'),
       message: ts('Are you sure you want to continue?'),
-      resizable: false,
-      modal: true,
       width: 'auto',
+      modal: true,
+      dialogClass: 'crm-container crm-confirm',
       close: function () {
-        $(dialog).dialog('destroy').remove();
+        $(this).dialog('destroy').remove();
       },
-      buttons: {}
+      options: {
+        no: ts('Cancel'),
+        yes: ts('Continue')
+      }
     };
-
-    settings.buttons[cancelLabel] = function () {
-      dialog.dialog('close');
-    };
-    options = options || {};
-    $.extend(settings, options);
-    if (typeof(buttons) === 'function') {
-      callbacks[ts('Continue')] = buttons;
+    $.extend(settings, ($.isFunction(options) ? arguments[1] : options) || {});
+    if (!settings.buttons && $.isPlainObject(settings.options)) {
+      settings.buttons = [];
+      $.each(settings.options, function(key, label) {
+        settings.buttons.push({
+          text: label,
+          click: function() {
+            var event = $.Event('crmConfirm:' + key);
+            $(this).trigger(event);
+            if (!event.isDefaultPrevented()) {
+              dialog.dialog('close');
+            }
+          }
+        });
+      });
     }
-    else {
-      callbacks = buttons;
+    dialog = $('<div class="crm-confirm-dialog"></div>').html(settings.message);
+    delete settings.options;
+    delete settings.message;
+    if ($.isFunction(options)) {
+      dialog.on('crmConfirm:yes', options);
     }
-    $.each(callbacks, function (label, callback) {
-      settings.buttons[label] = function () {
-        if (callback.call(dialog) !== false) {
-          dialog.dialog('close');
-        }
-      };
-    });
-    dialog = $('<div class="crm-confirm-dialog"></div>')
-      .html(options.message)
-      .dialog(settings)
-      .trigger('crmLoad');
-    return dialog;
+    return dialog.dialog(settings).trigger('crmLoad');
   };
 
   /**
@@ -741,11 +735,6 @@ CRM.validate = CRM.validate || {
     });
     // Handle qf form errors
     $('form :input.error', this).one('blur', function() {
-      // ignore autocomplete fields
-      if ($(this).is('.ac_input')) {
-        return;
-      }
-
       $('.ui-notify-message.error a.ui-notify-close').click();
       $(this).removeClass('error');
       $(this).next('span.crm-error').remove();
@@ -787,19 +776,15 @@ CRM.validate = CRM.validate || {
       messagesFromMarkup.call($('#crm-container'));
     }
 
-    // bind the event for image popup
     $('body')
-      .on('click', 'a.crm-image-popup', function() {
-        var o = $('<div class="crm-custom-image-popup"><img src=' + $(this).attr('href') + '></div>');
-
-        CRM.confirm('',
-          {
-            title: ts('Preview'),
-            message: o
-          },
-          ts('Done')
-        );
-        return false;
+      // bind the event for image popup
+      .on('click', 'a.crm-image-popup', function(e) {
+        CRM.confirm({
+          title: ts('Preview'),
+          message: '<div class="crm-custom-image-popup"><img src=' + $(this).attr('href') + '></div>',
+          options: null
+        });
+        e.preventDefault();
       })
 
       .on('click', function (event) {
@@ -882,4 +867,4 @@ CRM.validate = CRM.validate || {
     result = sign + (j ? i.substr(0, j) + separator : '') + i.substr(j).replace(/(\d{3})(?=\d)/g, "$1" + separator) + (2 ? decimal + Math.abs(value - i).toFixed(2).slice(2) : '');
     return format.replace(/1.*234.*56/, result);
   };
-})(jQuery);
+})(jQuery, _);

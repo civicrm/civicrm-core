@@ -1108,14 +1108,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
   }
 
   /**
-   *  Test civicrm_contact_quicksearch() with empty name param
-   */
-  public function testContactGetQuickEmpty() {
-    $result = $this->callAPIFailure('contact', 'getquick', array());
-  }
-
-  /**
-   *  Test civicrm_contact_quicksearch() with empty name param
+   *  Test civicrm_contact_getquick() with empty name param
    */
   public function testContactGetQuick() {
     //  Insert a row in civicrm_contact creating individual contact
@@ -1134,7 +1127,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
       'name' => "T",
     );
 
-    $result = $this->callAPISuccess('contact', 'quicksearch', $params);
+    $result = $this->callAPISuccess('contact', 'getquick', $params);
     $this->assertEquals(17, $result['values'][0]['id'], 'in line ' . __LINE__);
   }
 
@@ -1685,10 +1678,10 @@ class api_v3_ContactTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test that Ajax API permission is suffient to access quicksearch api
-   * (note that quicksearch api is required for autocomplete & has ACL permissions applied)
+   * Test that Ajax API permission is suffient to access getquick api
+   * (note that getquick api is required for autocomplete & has ACL permissions applied)
    */
-  function testQuickSearchPermission_CRM_13744() {
+  function testgetquickPermission_CRM_13744() {
     CRM_Core_Config::singleton()->userPermissionClass->permissions = array('access CiviEvent');
     $result = $this->callAPIFailure('contact', 'getquick', array('name' => 'b', 'check_permissions' => TRUE));
     CRM_Core_Config::singleton()->userPermissionClass->permissions = array('access CiviCRM');

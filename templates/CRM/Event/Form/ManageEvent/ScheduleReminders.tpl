@@ -1,6 +1,6 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
  | Copyright (C) 2011 Marty Wright                                    |
  | Licensed to CiviCRM under the Academic Free License version 3.0.   |
@@ -180,7 +180,7 @@
 
   {literal}
     <script type='text/javascript'>
-      cj(function() {
+      CRM.$(function($) {
         populateRecipient();
         cj('#recipient').click( function( ) {
           populateRecipient();

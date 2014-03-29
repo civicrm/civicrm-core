@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -37,7 +37,7 @@
   {include file="CRM/Price/Form/PriceSet.tpl" context="standalone" extends="Membership"}
   {literal}
   <script type="text/javascript">
-  cj( function() {
+  CRM.$(function($) {
     var membershipValues = new Array;
     {/literal}{foreach from=$optionsMembershipTypes item=memType key=opId}{literal}
       membershipValues[{/literal}{$opId}{literal}] = {/literal}{$memType}{literal};
@@ -295,7 +295,7 @@
       {include file="CRM/common/customData.tpl"}
       {literal}
       <script type="text/javascript">
-      cj(function() {
+      CRM.$(function($) {
       {/literal}
         CRM.buildCustomData( '{$customDataType}' );
         {if $customDataSubType}
@@ -382,7 +382,7 @@
       }
 
 
-      cj( function( ) {
+      CRM.$(function($) {
       var mode   = {/literal}'{$membershipMode}'{literal};
       if ( !mode ) {
         // Offline form (mode = false) has the record_contribution checkbox
@@ -462,7 +462,7 @@
 
     {if $context eq 'standalone' and $outBound_option != 2 }
     {literal}
-    cj( function( ) {
+    CRM.$(function($) {
       cj("#contact_1").blur( function( ) {
         checkEmail( );
       } );
@@ -503,7 +503,7 @@
 
     {literal}
     //keep read only always checked.
-    cj( function( ) {
+    CRM.$(function($) {
       var allowAutoRenew   = {/literal}'{$allowAutoRenew}'{literal};
       var alreadyAutoRenew = {/literal}'{$alreadyAutoRenew}'{literal};
       if ( allowAutoRenew || alreadyAutoRenew ) {

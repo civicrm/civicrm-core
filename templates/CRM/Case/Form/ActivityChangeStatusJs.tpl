@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -26,7 +26,7 @@
 {* CiviCase - change activity status inline *}
 {literal}
   <script type="text/javascript">
-    cj(function($) {
+    CRM.$(function($) {
       // Elements are sometimes in a jQuery dialog box which is outside crm-container,
       // So gotta attach this handler to the whole body - sorry.
       $('body').off('click.changeActivityStatus');
@@ -44,7 +44,11 @@
           cj("#activity_change_status").val(current_status_id);
         });
 
-        CRM.confirm(function() {
+        CRM.confirm({
+          title: {/literal}'{ts escape='js'}Change Activity Status{/ts}'{literal},
+          message: $el
+        })
+          .on('crmConfirm:yes', function() {
             // update the status
             var status_id = $("#activity_change_status").val();
             if (status_id === current_status_id) {
@@ -83,12 +87,7 @@
               }
             });
             CRM.status({}, request);
-          }
-          ,{
-            title: {/literal}'{ts escape='js'}Change Activity Status{/ts}'{literal},
-            message: $el
-          }
-        );
+          });
         return false;
       });
     });

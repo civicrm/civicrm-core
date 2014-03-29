@@ -2,9 +2,9 @@
 
 /*
   +--------------------------------------------------------------------+
-  | CiviCRM version 4.4                                                |
+  | CiviCRM version 4.5                                                |
   +--------------------------------------------------------------------+
-  | Copyright CiviCRM LLC (c) 2004-2013                                |
+  | Copyright CiviCRM LLC (c) 2004-2014                                |
   +--------------------------------------------------------------------+
   | This file is a part of CiviCRM.                                    |
   |                                                                    |
@@ -29,7 +29,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -95,7 +95,7 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
    * @static
    * @return object
    */
-  static function add(&$params, &$ids) {
+  static function add(&$params, &$ids = array()) {
     $params['is_active'] = CRM_Utils_Array::value('is_active', $params, false);
     $params['is_deductible'] = CRM_Utils_Array::value('is_deductible', $params, false);
     $params['is_reserved'] = CRM_Utils_Array::value('is_reserved', $params, false);

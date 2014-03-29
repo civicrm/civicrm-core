@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -1757,9 +1757,8 @@ SELECT case_status.label AS case_status, status_id, case_type.label AS case_type
           $groupInfo['id'] = $results['id'];
           $groupInfo['title'] = $results['title'];
           $params = array(array('group', 'IN', array($groupInfo['id'] => 1), 0, 0));
-          $return = array('sort_name' => 1, 'display_name' => 1, 'email' => 1, 'phone' => 1);
           $return = array('contact_id' => 1, 'sort_name' => 1, 'display_name' => 1, 'email' => 1, 'phone' => 1);
-          list($globalContacts, $_) = CRM_Contact_BAO_Query::apiQuery($params, $return, NULL, $sort, $offset, $rowCount, TRUE, $returnOnlyCount);
+          list($globalContacts) = CRM_Contact_BAO_Query::apiQuery($params, $return, NULL, $sort, $offset, $rowCount, TRUE, $returnOnlyCount);
 
           if ($returnOnlyCount) {
             return $globalContacts;
@@ -1767,7 +1766,7 @@ SELECT case_status.label AS case_status, status_id, case_type.label AS case_type
 
           if ($showLinks) {
             foreach ($globalContacts as $idx => $contact) {
-              $globalContacts[$idx]['sort_name'] = '<a href="' . $contactViewUrl . $contact['contact_id'] . '">' . $contact['sort_name'] . '</a>';
+              $globalContacts[$idx]['sort_name'] = '<a href="' . CRM_Utils_System::url('civicrm/contact/view', "reset=1&cid={$contact['contact_id']}") . '">' . $contact['sort_name'] . '</a>';
             }
           }
         }
@@ -3135,36 +3134,29 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
    * Used during case component enablement and during ugprade
    */
   static function createCaseViews() {
+    $errorScope = CRM_Core_TemporaryErrorScope::ignoreException();
     $dao = new CRM_Core_DAO();
 
     $sql = self::createCaseViewsQuery('upcoming');
-    CRM_Core_Error::ignoreException();
     $dao->query($sql);
-    CRM_Core_Error::setCallback();
     if (PEAR::getStaticProperty('DB_DataObject', 'lastError')) {
       return FALSE;
     }
 
     // Above error doesn't get caught?
-    CRM_Core_Error::ignoreException();
     $doublecheck = $dao->singleValueQuery("SELECT count(id) FROM civicrm_view_case_activity_upcoming");
-    CRM_Core_Error::setCallback();
     if (is_null($doublecheck)) {
       return FALSE;
     }
 
     $sql = self::createCaseViewsQuery('recent');
-    CRM_Core_Error::ignoreException();
     $dao->query($sql);
-    CRM_Core_Error::setCallback();
     if (PEAR::getStaticProperty('DB_DataObject', 'lastError')) {
       return FALSE;
     }
 
     // Above error doesn't get caught?
-    CRM_Core_Error::ignoreException();
     $doublecheck = $dao->singleValueQuery("SELECT count(id) FROM civicrm_view_case_activity_recent");
-    CRM_Core_Error::setCallback();
     if (is_null($doublecheck)) {
       return FALSE;
     }

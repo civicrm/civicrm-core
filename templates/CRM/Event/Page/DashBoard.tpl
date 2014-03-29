@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -105,12 +105,12 @@
           {/if}
           {if $values.configure}
             <div class="crm-configure-actions">
-                <span id="{$id}" class="btn-slide">{ts}Configure{/ts}
+                <span id="{$id}" class="btn-slide crm-hover-button">{ts}Configure{/ts}
                   <ul class="panel" id="panel_info_{$id}">
                     {foreach from=$eventSummary.tab key=k item=v}
                       {assign var="fld" value=$v.field}
                       {if NOT $values.$fld}{assign var="status" value="disabled"}{else}{assign var="status" value="enabled"}{/if}
-                      <li><a title="{$v.title}" class="action-item-wrap {$status}"
+                      <li><a title="{$v.title}" class="action-item crm-hover-button {$status}"
                              href="{crmURL p="`$v.url`" q="reset=1&action=update&id=`$id`"}">{$v.title}</a></li>
                     {/foreach}
                   </ul>

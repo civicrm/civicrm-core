@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -417,7 +417,7 @@
     toggleConfirmButton();
   });
 
-  cj(function() {
+  CRM.$(function($) {
     toggleConfirmButton();
   });
 
@@ -432,7 +432,7 @@
     }
   }
 
-  cj(function(){
+  CRM.$(function($) {
     // highlight price sets
     function updatePriceSetHighlight() {
       cj('#priceset .price-set-row').removeClass('highlight');

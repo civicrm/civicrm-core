@@ -2,9 +2,9 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -31,7 +31,7 @@
  * PEAR_ErrorStack and use that framework
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -790,25 +790,21 @@ class CRM_Core_Error extends PEAR_ErrorStack {
     $error->_errorsByLevel = array();
   }
 
-  public static function ignoreException($callback = NULL) {
-    if (!$callback) {
-      $callback = array('CRM_Core_Error', 'nullHandler');
-    }
-
-    $GLOBALS['_PEAR_default_error_mode'] = PEAR_ERROR_CALLBACK;
-    $GLOBALS['_PEAR_default_error_options'] = $callback;
-  }
-
+  /**
+   * PEAR error-handler which converts errors to exceptions
+   *
+   * @param $pearError
+   * @throws PEAR_Exception
+   */
   public static function exceptionHandler($pearError) {
     CRM_Core_Error::backtrace('backTrace', TRUE);
     throw new PEAR_Exception($pearError->getMessage(), $pearError);
   }
 
   /**
-   * Error handler to quietly catch otherwise fatal smtp transport errors.
+   * PEAR error-handler to quietly catch otherwise fatal errors. Intended for use with smtp transport.
    *
    * @param object $obj       The PEAR_ERROR object
-   *
    * @return object $obj
    * @access public
    * @static
@@ -817,21 +813,6 @@ class CRM_Core_Error extends PEAR_ErrorStack {
     CRM_Core_Error::debug_log_message("Ignoring exception thrown by nullHandler: {$obj->code}, {$obj->message}");
     CRM_Core_Error::backtrace('backTrace', TRUE);
     return $obj;
-  }
-
-  /**
-   * (Re)set the default callback method
-   *
-   * @return void
-   * @access public
-   * @static
-   */
-  public static function setCallback($callback = NULL) {
-    if (!$callback) {
-      $callback = array('CRM_Core_Error', 'handle');
-    }
-    $GLOBALS['_PEAR_default_error_mode'] = PEAR_ERROR_CALLBACK;
-    $GLOBALS['_PEAR_default_error_options'] = $callback;
   }
 
   /*

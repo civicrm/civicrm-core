@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -67,7 +67,7 @@ function populatebalanceFee(updatedAmt) {
   cj('#balance-fee').text(symbol+" "+balanceAmt);
 }
 
-cj(function(){
+CRM.$(function($) {
   // assign statuses
   var partiallyPaid = {/literal}{$partiallyPaid}{literal};
   var pendingRefund = {/literal}{$pendingRefund}{literal};
@@ -193,7 +193,7 @@ cj(function(){
 {/if}
 {literal}
 <script type='text/javascript'>
-cj(function($){
+CRM.$(function($) {
   cj('.total_amount-section').remove(); 
 
   cj('#ParticipantFeeSelection').submit(function(e) {

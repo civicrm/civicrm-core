@@ -1,6 +1,6 @@
 // http://civicrm.org/licensing
 // Adds ajaxy behavior to a simple CiviCRM page
-cj(function($) {
+CRM.$(function($) {
   var active = 'a.button, a.action-item, a.crm-popup';
   $('#crm-main-content-wrapper')
     // Widgetize the content area

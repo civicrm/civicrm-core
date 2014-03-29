@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -96,7 +96,7 @@ var otherModule = new Array( );
 otherModule[{/literal}{$mkey}{literal}] = '{/literal}{$mval}{literal}';
 {/literal}{/foreach}{literal}
 
-cj(function($) {
+CRM.$(function($) {
   if ( $.inArray( "Profile", otherModule ) > -1 && $.inArray( "Search Profile", otherModule ) == -1 ){
     $('#profile_visibility').show();
   }
@@ -202,7 +202,7 @@ cj("#field_name_1").bind( 'change blur', function( ) {
   showHideSeletorSearch( );
 });
 
-cj( function( ) {
+CRM.$(function($) {
   cj("#field_name_1").addClass( 'huge' );
   viewOnlyShowHide( );
   cj("#is_view").click( function(){
@@ -216,7 +216,7 @@ cj("#field_name_1").change(
     multiSummaryToggle(cj(this).val());
   });
 
-cj( function( ) {
+CRM.$(function($) {
   var fieldId = cj("#field_name_1").val();
   multiSummaryToggle(fieldId);
 });

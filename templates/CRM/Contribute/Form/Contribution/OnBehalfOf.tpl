@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -297,7 +297,7 @@ function selectCreateOrg( orgOption, reset ) {
 {* If mid present in the url, take the required action (poping up related existing contact ..etc) *}
 {if $membershipContactID}
 {literal}
-  cj( function( ) {
+  CRM.$(function($) {
     cj('#organization_id').val("{/literal}{$membershipContactName}{literal}");
     cj('#organization_name').val("{/literal}{$membershipContactName}{literal}");
     cj('#onbehalfof_id').val("{/literal}{$membershipContactID}{literal}");

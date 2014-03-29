@@ -290,12 +290,30 @@ input.crm-form-entityref {
   width: 6em;
 }
 
+/* Style civi form inputs to match select2 */
+.crm-container select.crm-form-select {
+  border: 1px solid #aaa;
+  color: #444;
+  height: 2.2em;
+  padding: 4px;
+  border-radius: 4px;
+  background-color: #fff;
+  background-image: -webkit-gradient(linear, left bottom, left top, color-stop(0, #eee), color-stop(0.5, #fff));
+  background-image: -webkit-linear-gradient(center bottom, #eee 0%, #fff 50%);
+  background-image: -moz-linear-gradient(center bottom, #eee 0%, #fff 50%);
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr = '#ffffff', endColorstr = '#eeeeee', GradientType = 0);
+  background-image: linear-gradient(top, #fff 0%, #eee 50%);
+}
 .crm-container input.crm-form-text,
 .crm-container input.dateplugin {
   border: 1px solid #999;
   vertical-align: middle;
   padding: 1px 2px;
   height: 1.8em;
+  background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, color-stop(1%, #eee), color-stop(15%, #fff));
+  background-image: -webkit-linear-gradient(top, #eee 1%, #fff 15%);
+  background-image: -moz-linear-gradient(top, #eee 1%, #fff 15%);
+  background-image: linear-gradient(top, #eee 1%, #fff 15%);
 }
 
 .crm-container .form-submit {
@@ -1249,8 +1267,8 @@ input.crm-form-entityref {
 /*
 ** Style for hiding blocks or table rows
 */
-#crm-container .hide-block,
-#crm-container .hide-row {
+.crm-container .hide-block,
+.crm-container .hide-row {
   display: none;
 }
 
@@ -1657,6 +1675,9 @@ editor specific classes
   padding: 3px 5px;
   opacity: 1;
 }
+.crm-container .btn-slide .action-item {
+  white-space: normal;
+}
 .crm-container .crm-accordion-header .crm-hover-button {
   opacity: 1;
   position: relative;
@@ -1755,7 +1776,6 @@ editor specific classes
   z-index: 10;
 }
 
-.crm-container .crm-configure-actions,
 .crm-container .crm-event-participants,
 .crm-container .crm-event-links,
 .crm-container .crm-event-more {
@@ -2485,7 +2505,7 @@ div.grippie {
 .crm-container .icon {
   height: 16px;
   width: 16px;
-  background: transparent url("../i/icons/jquery-ui-52534D.png") no-repeat top right;
+  background-image: url("../i/icons/jquery-ui-52534D.png");
   float: left;
   text-indent: -10000px;
 }
@@ -2821,7 +2841,7 @@ div.grippie {
 /* Status message box */
 .crm-status-box-outer {
   position: fixed;
-  z-index: 9999;
+  z-index: 99999;
   right: 0;
   top: 0;
 }
@@ -3480,7 +3500,6 @@ div#crm-container form {
   width: 9em;
 }
 
-/* Date plugin */
 .crm-container div.batch-update {
   overflow: visible;
 }
@@ -3812,26 +3831,6 @@ div.m ul#civicrm-menu,
 .crm-container .select2-container {
   min-width: 6em !important;
   font-size: 11px;
-}
-/* Style civi form inputs to match select2 */
-.crm-container input.crm-form-text {
-  background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, color-stop(1%, #eee), color-stop(15%, #fff));
-  background-image: -webkit-linear-gradient(top, #eee 1%, #fff 15%);
-  background-image: -moz-linear-gradient(top, #eee 1%, #fff 15%);
-  background-image: linear-gradient(top, #eee 1%, #fff 15%);
-}
-.crm-container select.crm-form-select {
-  border: 1px solid #aaa;
-  color: #444;
-  height: 2.2em;
-  padding: 4px;
-  border-radius: 4px;
-  background-color: #fff;
-  background-image: -webkit-gradient(linear, left bottom, left top, color-stop(0, #eee), color-stop(0.5, #fff));
-  background-image: -webkit-linear-gradient(center bottom, #eee 0%, #fff 50%);
-  background-image: -moz-linear-gradient(center bottom, #eee 0%, #fff 50%);
-  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr = '#ffffff', endColorstr = '#eeeeee', GradientType = 0);
-  background-image: linear-gradient(top, #fff 0%, #eee 50%);
 }
 /* Add arrow icon to multi-selects */
 .crm-container .select2-container-multi .select2-choices:before {

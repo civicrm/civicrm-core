@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  *
  */
 
@@ -236,23 +236,25 @@ class CRM_Contact_Page_AJAX {
     $dao = CRM_Core_DAO::executeQuery($query);
     $results = array();
     while ($dao->fetch()) {
-      $results[$dao->id] = $dao->data;
+      $results[] = array('id' => $dao->id, 'text' => $dao->data);
     }
-    CRM_Core_Page_AJAX::autocompleteResults($results);
+    print json_encode($results);
+    CRM_Utils_System::civiExit();
   }
 
   static function relationship() {
-    $relType         = CRM_Utils_Array::value('rel_type', $_REQUEST);
-    $relContactID    = CRM_Utils_Array::value('rel_contact', $_REQUEST);
-    $sourceContactID = CRM_Utils_Array::value('contact_id', $_REQUEST); // we no longer need this.
-    $relationshipID  = CRM_Utils_Array::value('rel_id', $_REQUEST); // this used only to determine add or update mode
-    $caseID          = CRM_Utils_Array::value('case_id', $_REQUEST);
+    $relType = CRM_Utils_Request::retrieve('rel_type', 'Positive', CRM_Core_DAO::$_nullObject, TRUE);
+    $relContactID = CRM_Utils_Request::retrieve('rel_contact', 'Positive', CRM_Core_DAO::$_nullObject, TRUE);
+    $relationshipID = CRM_Utils_Array::value('rel_id', $_REQUEST); // this used only to determine add or update mode
+    $caseID = CRM_Utils_Request::retrieve('case_id', 'Positive', CRM_Core_DAO::$_nullObject, TRUE);
 
     // check if there are multiple clients for this case, if so then we need create
     // relationship and also activities for each contacts
 
     // get case client list
     $clientList = CRM_Case_BAO_Case::getCaseClients($caseID);
+
+    $ret = array('is_error' => 0);
 
     foreach($clientList as $sourceContactID) {
       $relationParams = array(
@@ -284,18 +286,22 @@ class CRM_Contact_Page_AJAX {
       // create new or update existing relationship
       $return = CRM_Contact_BAO_Relationship::create($relationParams, $relationIds);
 
-      $status = 'process-relationship-fail';
       if (!empty($return[4][0])) {
         $relationshipID = $return[4][0];
-        $status = 'process-relationship-success';
 
         //create an activity for case role assignment.CRM-4480
         CRM_Case_BAO_Case::createCaseRoleActivity($caseID, $relationshipID, $relContactID);
       }
+      else {
+        $ret = array(
+          'is_error' => 1,
+          'error_message' => ts('The relationship type definition for the case role is not valid for the client and / or staff contact types. You can review and edit relationship types at <a href="%1">Administer >> Option Lists >> Relationship Types</a>.',
+            array(1 => CRM_Utils_System::url('civicrm/admin/reltype', 'reset=1')))
+        );
+      }
     }
 
-    $relation['status'] = $status;
-    echo json_encode($relation);
+    echo json_encode($ret);
     CRM_Utils_System::civiExit();
   }
 

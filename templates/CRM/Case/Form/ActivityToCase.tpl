@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -49,7 +49,7 @@
     var target_contact_id = '';
     var selectedCaseId = '';
     var contactId = '';
-    cj(function($) {
+    CRM.$(function($) {
       $('input[name=unclosed_case_id]', '#fileOnCaseDialog').select2({
         placeholder: {/literal}'{ts escape="js"}- select case -{/ts}'{literal},
         minimumInputLength: 1,
@@ -130,7 +130,7 @@
           width: 600,
           height: 270,
           close: function( event, ui ) {
-            cj( "#unclosed_cases" ).unautocomplete( );
+            cj('input[name=unclosed_case_id]', '#fileOnCaseDialog').select2('destroy');
             cj(this).hide().dialog("destroy");
           },
           open: function() {

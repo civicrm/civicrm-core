@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -69,7 +69,7 @@
 
 <script type="text/javascript">
     {literal}
-    cj( function() {
+    CRM.$(function($) {
       {/literal}
       var element_date   = "#{$displayDate}";
       var element_time  = "#{$elementId}_time";

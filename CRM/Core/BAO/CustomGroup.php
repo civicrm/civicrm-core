@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -614,13 +614,16 @@ ORDER BY civicrm_custom_group.weight,
    *
    * @return boolean does this entity have data in this custom table
    */
-  static public function customGroupDataExistsForEntity($entityID, $table){
+  static public function customGroupDataExistsForEntity($entityID, $table, $getCount = FALSE){
     $query = "
       SELECT count(id)
       FROM   $table
       WHERE  entity_id = $entityID
     ";
     $recordExists = CRM_Core_DAO::singleValueQuery($query);
+    if ($getCount) {
+      return $recordExists;
+    }
     return $recordExists ? TRUE : FALSE;
   }
 
@@ -774,10 +777,12 @@ ORDER BY civicrm_custom_group.weight,
             list($path) = CRM_Core_BAO_File::path($fileDAO->id, $entityId,
               NULL, NULL
             );
-            list($imageWidth, $imageHeight) = getimagesize($path);
-            list($imageThumbWidth, $imageThumbHeight) = CRM_Contact_BAO_Contact::getThumbSize($imageWidth, $imageHeight);
-            $customValue['imageThumbWidth'] = $imageThumbWidth;
-            $customValue['imageThumbHeight'] = $imageThumbHeight;
+            if ($path && file_exists($path)) {
+              list($imageWidth, $imageHeight) = getimagesize($path);
+              list($imageThumbWidth, $imageThumbHeight) = CRM_Contact_BAO_Contact::getThumbSize($imageWidth, $imageHeight);
+              $customValue['imageThumbWidth'] = $imageThumbWidth;
+              $customValue['imageThumbHeight'] = $imageThumbHeight;
+            }
           }
         }
       }

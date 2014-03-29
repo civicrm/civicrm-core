@@ -2,9 +2,9 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -87,15 +87,12 @@ function _civicrm_api3_permissions($entity, $action, &$params) {
     ),
   );
 
-  // Contact-related data permissions
+  // Contact-related data permissions.
+  // CRM-14094 - Users can edit and delete contact-related objects using inline edit with 'edit all contacts' permission
   $permissions['address'] = array(
     'get' => array(
       'access CiviCRM',
       'view all contacts',
-    ),
-    'delete' => array(
-      'access CiviCRM',
-      'delete contacts',
     ),
     'default' => array(
       'access CiviCRM',
