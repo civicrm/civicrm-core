@@ -125,6 +125,7 @@ class {$table.className} extends \Civi\Core\Entity {ldelim}
       {/if}
 
         'name' => '{$field.name}',
+        'propertyName' => '{$field.propertyName}',
         'type' => {$field.crmType},
         {if $field.title}
         'title' => ts('{$field.title}'),
