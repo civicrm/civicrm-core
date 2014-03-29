@@ -880,6 +880,10 @@ WHERE id={$id}; ";
             $userFrameworkBaseURL = trim( str_replace( '/wp-admin/', '', $config->userFrameworkBaseURL ) );
             $customFileUploadDirectory = strstr( str_replace('\\', '/', $absolutePath), '/wp-content/' );
             $relativePath = $userFrameworkBaseURL . $customFileUploadDirectory;
+        } else if ( $config->userFramework == 'Standalone' ) {
+            $customFileUploadDirectory = strstr( str_replace('\\', '/', $absolutePath), '/civicrm' );
+            $customFileUploadBaseURL = strstr( $config->imageUploadURL, '/civicrm', TRUE );
+            $relativePath = $customFileUploadBaseURL . $customFileUploadDirectory;
     }
 
     return $relativePath;

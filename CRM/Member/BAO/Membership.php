@@ -2090,6 +2090,8 @@ WHERE  civicrm_membership.contact_id = civicrm_contact.id
         $relMemIds = array();
         if ($relMembership->find(TRUE)) {
           $params['id'] = $relMemIds['membership'] = $relMembership->id;
+        } else {
+          unset($params['id']);
         }
         $params['contact_id'] = $contactId;
         $params['owner_membership_id'] = $membership->id;
@@ -2127,7 +2129,7 @@ WHERE  civicrm_membership.contact_id = civicrm_contact.id
           // related membership already exists, so this is just an update
           if (isset($params['id'])) {
             if ($available > 0) {
-        CRM_Member_BAO_Membership::create($params, $relMemIds);
+              CRM_Member_BAO_Membership::create($params, $relMemIds);
               $available --;
             } else { // we have run out of inherited memberships, so delete extras
               self::deleteMembership($params['id']);

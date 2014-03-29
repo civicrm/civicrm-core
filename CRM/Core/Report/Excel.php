@@ -93,6 +93,7 @@ class CRM_Core_Report_Excel {
           // loic1 : always enclose fields
           //$value = ereg_replace("\015(\012)?", "\012", $value);
           $value = preg_replace("/\015(\012)?/", "\012", $value);
+          $value = mb_convert_encoding( $value , $config->legacyEncoding, 'UTF-8');
           if ($enclosed == '') {
             $schema_insert .= $value;
           }

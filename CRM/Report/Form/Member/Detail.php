@@ -79,11 +79,6 @@ class CRM_Report_Form_Member_Detail extends CRM_Report_Form {
           array('title' => ts('First Name'),
             'no_repeat' => TRUE,
           ),
-          'id' =>
-          array(
-            'no_display' => TRUE,
-            'required' => TRUE,
-          ),
           'last_name' =>
           array('title' => ts('Last Name'),
             'no_repeat' => TRUE,
@@ -108,16 +103,28 @@ class CRM_Report_Form_Member_Detail extends CRM_Report_Form {
           array('title' => ts('Contact Name'),
             'operator' => 'like',
           ),
+          'employer' =>
+          array('title' => ts('Employer'),
+            'operator' => 'like',
+          ),
           'id' =>
           array('no_display' => TRUE),
         ),
         'order_bys' =>
         array(
           'sort_name' => array(
-            'title' => ts('Last Name, First Name'),
+            'title' => ts('Contact Name'),
             'default' => '1',
-            'default_weight' => '0',
-            'default_order' => 'ASC'
+            'default_weight' => '1',
+            'default_order' => 'ASC',
+          ),
+          'contact_type' => array(
+            'title' => ts('Contact Type'),
+            'default-order' => 'DESC',
+          ),
+          'organization_name' => array(
+            'title' => ts('Employer'),
+            'default-order' => 'ASC',
           ),
         ),
         'grouping' => 'contact-fields',
@@ -141,6 +148,11 @@ class CRM_Report_Form_Member_Detail extends CRM_Report_Form {
           'join_date' => array('title' => ts('Join Date'),
             'default' => TRUE,
           ),
+          'owner_membership_id' =>
+          array(
+            'no_display' => TRUE,
+            'required' => TRUE,
+          ),
           'source' => array('title' => 'Source'),
         ),
         'filters' => array(
@@ -162,6 +174,11 @@ class CRM_Report_Form_Member_Detail extends CRM_Report_Form {
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Member_PseudoConstant::membershipType(),
           ),
+        ),
+        'order_bys' =>
+        array(
+          'membership_type_id' =>
+          array('title' => ts('Membership Type'), 'default_weight' => '3'),
         ),
         'grouping' => 'member-fields',
       ),
@@ -452,6 +469,9 @@ class CRM_Report_Form_Member_Detail extends CRM_Report_Form {
         if ($value = $row['civicrm_membership_membership_type_id']) {
           $rows[$rowNum]['civicrm_membership_membership_type_id'] = CRM_Member_PseudoConstant::membershipType($value, FALSE);
         }
+        if (CRM_Utils_Array::value('civicrm_membership_owner_membership_id', $row)) {
+          $rows[$rowNum]['civicrm_membership_membership_type_id'] .= ' (' . ts('by relationship') . ')';
+        }
         $entryFound = TRUE;
       }
 
@@ -479,6 +499,13 @@ class CRM_Report_Form_Member_Detail extends CRM_Report_Form {
         );
         $rows[$rowNum]['civicrm_contact_sort_name_link'] = $url;
         $rows[$rowNum]['civicrm_contact_sort_name_hover'] = ts("View Contact Summary for this Contact.");
+        $entryFound = TRUE;
+      }
+
+      // Remove 'employer' when contact is not an Individual
+      if (CRM_Utils_Array::value('civicrm_contact_organization_name', $row) &&
+          CRM_Utils_Array::value('civicrm_contact_contact_type', $row) != 'Individual') {
+        $rows[$rowNum]['civicrm_contact_organization_name'] = '';
         $entryFound = TRUE;
       }
 

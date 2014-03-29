@@ -1,9 +1,11 @@
 <?php
+
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 3.1                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright U.S. PIRG Education Fund (c) 2007                        |
+ | Licensed to CiviCRM under the Academic Free License version 3.0.   |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -26,33 +28,28 @@
 */
 
 /**
+ *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright U.S. PIRG Education Fund 2007
  * $Id$
+ *
  */
 
 session_start();
 
-require_once '../civicrm.config.php';
-$config = CRM_Core_Config::singleton();
+// Pull in the settings file & Instantiate the config so that the DB connection will fire up
+require_once dirname(dirname(__FILE__)) . DIRECTORY_SEPARATOR . 'civicrm.config.php';
 
-// Log all IPN transactions - from Eileen
-$logTableExists = FALSE;
-$checkTable = "SHOW TABLES LIKE 'civicrm_notification_log'";
-$dao = CRM_Core_DAO::executeQuery($checkTable);
-if(!$dao->N) {
-  CRM_Core_DAO::executeQuery("CREATE TABLE IF NOT EXISTS `civicrm_notification_log` (
-`id` INT(10) NOT NULL AUTO_INCREMENT,
-`timestamp` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-`message_type` VARCHAR(255) NULL DEFAULT NULL,
-`message_raw` LONGTEXT NULL,
-PRIMARY KEY (`id`)
-)");
+// autoload
+require_once 'CRM/Core/ClassLoader.php';
+CRM_Core_ClassLoader::singleton()->register();
+
+$config  = CRM_Core_Config::singleton( );
+$session = CRM_Core_Session::singleton( );
+
+// Check for errors in the session
+if ($session->get('error')) {
+    print $session->get('error');
+    $session->set('error',null);
+    $gotError = true;
 }
-$msgType = 'authorize.net';
-$dao = CRM_Core_DAO::executeQuery("INSERT INTO civicrm_notification_log (message_raw, message_type) VALUES (%1, %2)",
-  array(1 => array(json_encode($_REQUEST), 'String'), 2 => array($msgType, 'String'))
-);
-
-$authorizeNetIPN = new CRM_Core_Payment_AuthorizeNetIPN();
-$authorizeNetIPN->main();

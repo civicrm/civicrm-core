@@ -97,6 +97,27 @@ class CRM_Core_BAO_UFMatch extends CRM_Core_DAO_UFMatch {
       $login = 'user_login';
       $mail  = 'user_email';
     }
+    elseif ($uf == 'Standalone') {
+      $key = 'id';
+      $mail = 'email';
+      $uniqId = $user->identity_url;
+
+      $query = "
+SELECT    id, contact_id
+FROM      civicrm_openid
+WHERE     openid = %1";
+      $p = array(1 => array($uniqId, 'String'));
+      $dao = CRM_Core_DAO::executeQuery($query, $p);
+      if ($dao->fetch()) {
+        $user->$key = $dao->id;
+        $user->contact_id = $dao->contact_id;
+      }
+/*      if (!$user->$key) {
+        // Let's get the next uf_id since we don't actually have one
+        $user->$key = self::getNextUfIdValue();
+      }
+*/
+    }
     else {
       CRM_Core_Error::statusBounce(ts('Please set the user framework variable'));
     }
@@ -200,7 +221,16 @@ class CRM_Core_BAO_UFMatch extends CRM_Core_DAO_UFMatch {
   static function &synchronizeUFMatch(&$user, $userKey, $uniqId, $uf, $status = NULL, $ctype = NULL, $isLogin = FALSE) {
     $config = CRM_Core_Config::singleton();
 
-    if (!CRM_Utils_Rule::email($uniqId)) {
+    if ($uf == 'Standalone') {
+      $ufmatch             = new CRM_Core_DAO_UFMatch();
+      $ufmatch->domain_id  = CRM_Core_Config::domainID();
+      $ufmatch->uf_id      = $userKey;
+      $ufmatch->contact_id = $user->contact_id;
+      $ufmatch->uf_name    = $uniqId;
+      return $ufmatch;
+    }
+	// We do not need this check for Standalone
+    if (($uf != 'Standalone' ) && (!CRM_Utils_Rule::email($uniqId))) {
       $retVal = $status ? NULL : FALSE;
       return $retVal;
     }
@@ -378,6 +408,10 @@ AND    domain_id    = %4
    * @static
    */
   static function updateUFName($contactId) {
+    $config = CRM_Core_Config::singleton();
+    if ($config->userFramework == 'Standalone')
+      return;
+
     if (!$contactId) {
       return;
     }

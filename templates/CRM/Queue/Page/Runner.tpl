@@ -1,3 +1,19 @@
+{if $config->userFramework EQ 'Standalone'}
+  {* we need at minimum the HTML page structure and jQuery library *}
+  <!DOCTYPE html>
+  <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="{$config->lcMessages|truncate:2:"":true}">
+  <head>
+    <meta http-equiv="Content-Style-Type" content="text/css" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="Shortcut Icon" type="image/x-icon" href="{$config->resourceBase}i/widget/favicon.png" />
+
+    {crmRegion name='html-header' allowCmsOverride=0}
+    {/crmRegion}
+
+  </head>
+  <body>
+{/if}
+
 <!-- FIXME: CSS conventions and polish -->
 <div class="crm-block crm-form-block crm-queue-runner-form-block">
   <div id="crm-queue-runner-progress"></div>
@@ -144,3 +160,8 @@ cj(function() {
 
 </script>
 {/literal}
+
+{if $config->userFramework EQ 'Standalone'}
+  </body>
+  </html>
+{/if}

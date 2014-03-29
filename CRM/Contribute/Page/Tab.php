@@ -177,6 +177,7 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
 
     if (!empty($params)) {
       foreach ($params as $ids => $recur) {
+        $params[$ids]['total_amount'] = $params[$ids]['amount'] * $params[$ids]['installments'];
         $action = array_sum(array_keys($this->recurLinks($ids)));
         // no action allowed if it's not active
         $params[$ids]['is_active'] = ($recur['contribution_status_id'] != 3);

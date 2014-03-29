@@ -936,13 +936,13 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
       //handle for the label not set for the field
       if (empty($field['title'])) {
         $index = $nullIndex;
-        $nullIndex .= $nullIndex;
+        $nullIndex .= ' '; //$nullIndex;
       }
 
       //handle the case to avoid re-write where the profile field labels are the same
       if (CRM_Utils_Array::value($index, $values)) {
         $index .= $nullValueIndex;
-        $nullValueIndex .= $nullValueIndex;
+        $nullValueIndex .= ' '; //$nullValueIndex;
       }
       $params[$index] = $values[$index] = '';
       $customFieldName = NULL;

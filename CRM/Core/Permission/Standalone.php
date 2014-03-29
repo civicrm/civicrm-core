@@ -1,9 +1,10 @@
 <?php
+
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 3.1                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2010                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -26,33 +27,36 @@
 */
 
 /**
+ *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2010
  * $Id$
+ *
  */
 
-session_start();
+/**
+ *
+ */
+class CRM_Core_Permission_Standalone extends CRM_Core_Permission_Base {
 
-require_once '../civicrm.config.php';
-$config = CRM_Core_Config::singleton();
-
-// Log all IPN transactions - from Eileen
-$logTableExists = FALSE;
-$checkTable = "SHOW TABLES LIKE 'civicrm_notification_log'";
-$dao = CRM_Core_DAO::executeQuery($checkTable);
-if(!$dao->N) {
-  CRM_Core_DAO::executeQuery("CREATE TABLE IF NOT EXISTS `civicrm_notification_log` (
-`id` INT(10) NOT NULL AUTO_INCREMENT,
-`timestamp` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-`message_type` VARCHAR(255) NULL DEFAULT NULL,
-`message_raw` LONGTEXT NULL,
-PRIMARY KEY (`id`)
-)");
+    /**
+     * given a permission string, check for access requirements
+     *
+     * @param string $str the permission to check
+     *
+     * @return boolean true if yes, else false
+     * @static
+     * @access public
+     */
+    function check( $str ) {
+        static $isAdmin = null;
+        if ( $isAdmin === null ) {
+            $session =& CRM_Core_Session::singleton( );
+            if ( $session->get( 'new_install' ) == 1 && $session->get( 'goahead' ) == 'yes' ) {
+                return true;
+            }
+        }
+        require_once 'CRM/ACL/API.php';
+        return ( $isAdmin) ? true : CRM_ACL_API::check( $str, null );
+    }
 }
-$msgType = 'authorize.net';
-$dao = CRM_Core_DAO::executeQuery("INSERT INTO civicrm_notification_log (message_raw, message_type) VALUES (%1, %2)",
-  array(1 => array(json_encode($_REQUEST), 'String'), 2 => array($msgType, 'String'))
-);
-
-$authorizeNetIPN = new CRM_Core_Payment_AuthorizeNetIPN();
-$authorizeNetIPN->main();

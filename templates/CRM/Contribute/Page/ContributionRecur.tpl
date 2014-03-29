@@ -31,7 +31,8 @@
         <h3>{ts}View Recurring Payment{/ts}</h3>
         <div class="crm-block crm-content-block crm-recurcontrib-view-block">
           <table class="crm-info-panel">
-            <tr><td class="label">{ts}Amount{/ts}</td><td>{$recur.amount|crmMoney:$recur.currency}{if $is_test} ({ts}test{/ts}){/if}</td></tr>
+            <tr><td class="label">{ts}Total Amount{/ts}</td><td><b>{$recur.total_amount|crmMoney:$recur.currency}</b>{if $is_test} ({ts}test{/ts}){/if}</td></tr>
+            <tr><td class="label">{ts}Recurring Amount{/ts}</td><td>{$recur.amount|crmMoney:$recur.currency}{if $is_test} ({ts}test{/ts}){/if}</td></tr>
             <tr><td class="label">{ts}Frequency{/ts}</td><td>every {$recur.frequency_interval} {$recur.frequency_unit}</td></tr>
             <tr><td class="label">{ts}Installments{/ts}</td><td>{$recur.installments}</td></tr>
             <tr><td class="label">{ts}Status{/ts}</td><td>{$recur.contribution_status}</td></tr>
@@ -58,7 +59,8 @@
     {strip}
     <table class="selector">
         <tr class="columnheader">
-            <th scope="col">{ts}Amount{/ts}</th>
+            <th scope="col"><b>{ts}Total Amount{/ts}</b></th>
+            <th scope="col">{ts}Recurring Amount{/ts}</th>
             <th scope="col">{ts}Frequency{/ts}</th>
             <th scope="col">{ts}Start Date{/ts}</th>
             <th scope="col">{ts}Installments{/ts}</th>
@@ -69,7 +71,8 @@
         {foreach from=$recurRows item=row}
             {assign var=id value=$row.id}
             <tr id="row_{$row.id}" class="{cycle values="even-row,odd-row"}{if NOT $row.is_active} disabled{/if}">
-                <td>{$row.amount|crmMoney}{if $row.is_test} ({ts}test{/ts}){/if}</td>
+                <td class="right"><b>{$row.total_amount|crmMoney}</b>{if $row.is_test} ({ts}test{/ts}){/if}</td>
+                <td class="right">{$row.amount|crmMoney}{if $row.is_test} ({ts}test{/ts}){/if}</td>
                 <td>{ts}Every{/ts} {$row.frequency_interval} {$row.frequency_unit} </td>
                 <td>{$row.start_date|crmDate}</td>
                 <td>{$row.installments}</td>

@@ -94,6 +94,9 @@ class CRM_Report_Form_Event_ParticipantListing extends CRM_Report_Form_Event {
           'employer_id' =>
           array('title' => ts('Organization'),
           ),
+          'job_title' =>
+          array('title' => ts('Job Title'),
+          ),
         ),
         'grouping' => 'contact-fields',
         'order_bys' =>
@@ -144,7 +147,7 @@ class CRM_Report_Form_Event_ParticipantListing extends CRM_Report_Form_Event {
         'fields' =>
         array(
           'email' =>
-          array('title' => ts('Email'),
+          array('title' => ts('Primary Email'),
             'no_repeat' => TRUE,
           ),
         ),
@@ -157,6 +160,18 @@ class CRM_Report_Form_Event_ParticipantListing extends CRM_Report_Form_Event {
           ),
         ),
       ),
+      'civicrm_phone' =>
+        array(
+          'dao' => 'CRM_Core_DAO_Phone',
+          'fields' =>
+          array(
+            'phone' =>
+            array('title' => ts('Primary Phone'),
+              'no_repeat' => TRUE,
+            ),
+          ),
+          'grouping' => 'contact-fields',
+        ),
       'civicrm_address' =>
       array(
         'dao' => 'CRM_Core_DAO_Address',

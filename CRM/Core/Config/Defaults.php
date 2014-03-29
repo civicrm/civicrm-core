@@ -128,6 +128,9 @@ class CRM_Core_Config_Defaults {
       elseif ($config->userFramework == 'WordPress') {
         $defaults['userFrameworkResourceURL'] = $baseURL . "wp-content/plugins/civicrm/civicrm/";
       }
+      elseif ( $config->userFramework == 'Standalone' ) {
+        $defaults['userFrameworkResourceURL'] = $baseURL;
+      }
       else {
         // Drupal setting
         // check and see if we are installed in sites/all (for D5 and above)
@@ -178,6 +181,9 @@ class CRM_Core_Config_Defaults {
       elseif ($config->userFramework == 'WordPress') {
         //for standalone no need of sites/defaults directory
         $defaults['imageUploadURL'] = $baseURL . "wp-content/plugins/files/civicrm/persist/contribute/";
+      }
+      else if ( $config->userFramework == 'Standalone' ) {
+        $defaults['imageUploadURL'] = $baseURL . "standalone/files/civicrm/persist/contribute/";
       }
       else {
         $defaults['imageUploadURL'] = $baseURL . "sites/default/files/civicrm/persist/contribute/";

@@ -504,4 +504,3 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
     return parent::getOperationPair($type, $fieldName);
   }
 }
-

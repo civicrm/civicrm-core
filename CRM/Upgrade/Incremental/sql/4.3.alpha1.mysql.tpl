@@ -628,12 +628,12 @@ ADD COLUMN  `drilldown_id` int(10) unsigned DEFAULT NULL COMMENT 'FK to instance
 ADD CONSTRAINT `FK_civicrm_report_instance_drilldown_id` FOREIGN KEY (`drilldown_id`) REFERENCES `civicrm_report_instance` (`id`) ON DELETE SET NULL;
 
 -- CRM-10012
-ALTER TABLE `civicrm_membership_type`
-ADD COLUMN `max_related` INT(10) unsigned DEFAULT NULL COMMENT 'Maximum number of related memberships.' AFTER `relationship_direction`;
-ALTER TABLE `civicrm_membership`
-ADD COLUMN `max_related` INT(10) unsigned DEFAULT NULL COMMENT 'Maximum number of related memberships (membership_type override).' AFTER `owner_membership_id`;
-ALTER TABLE `civicrm_membership_log`
-ADD COLUMN `max_related` INT(10) unsigned DEFAULT NULL COMMENT 'Maximum number of related memberships.' AFTER `membership_type_id`;
+-- ALTER TABLE `civicrm_membership_type`
+-- ADD COLUMN `max_related` INT(10) unsigned DEFAULT NULL COMMENT 'Maximum number of related memberships.' AFTER `relationship_direction`;
+-- ALTER TABLE `civicrm_membership`
+-- ADD COLUMN `max_related` INT(10) unsigned DEFAULT NULL COMMENT 'Maximum number of related memberships (membership_type override).' AFTER `owner_membership_id`;
+-- ALTER TABLE `civicrm_membership_log`
+-- ADD COLUMN `max_related` INT(10) unsigned DEFAULT NULL COMMENT 'Maximum number of related memberships.' AFTER `membership_type_id`;
 
 -- CRM-11358
 DELETE FROM civicrm_dashboard_contact WHERE contact_id NOT IN (SELECT id FROM civicrm_contact);

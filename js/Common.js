@@ -426,6 +426,11 @@ function popUp(URL) {
   eval("page" + id + " = window.open(URL, '" + id + "', 'toolbar=0,scrollbars=1,location=0,statusbar=0,menubar=0,resizable=0,width=640,height=420,left = 202,top = 184');");
 }
 
+function imagePopUpWH( path, width, height ) {
+    window.open(path,'popupWindow','toolbar=no,location=no,directories=no,status=no,menubar=no,scrollbars=no,resizable=yes,copyhistory=no'
+        +'width='+width+',height='+height+'screenX=150,screenY=150,top=150,left=150');
+}
+
 /**
  * Function to show / hide the row in optionFields
  *

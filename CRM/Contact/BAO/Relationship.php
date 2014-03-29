@@ -1009,6 +1009,12 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
           $mask = $mask & $permissionMask;
         }
       }
+      // Get job_title from source contact
+      $contact = new CRM_Contact_BAO_Contact();
+      $contact->id = $contactId;
+      if ($contact->find(TRUE)) {
+        $job_title = $contact->job_title;
+      }
       while ($relationship->fetch()) {
         $rid = $relationship->civicrm_relationship_id;
         $cid = $relationship->civicrm_contact_id;
@@ -1025,7 +1031,12 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
         $values[$rid]['relation'] = $relationship->relation;
         $values[$rid]['name'] = $relationship->sort_name;
         $values[$rid]['display_name'] = $relationship->display_name;
-        $values[$rid]['job_title'] = $relationship->job_title;
+        if (($relationship->civicrm_relationship_type_id == 4) &&  // Employee/employer
+            ($relationship->contact_id_a == $contactId)) { // We are looking at the employee
+          $values[$rid]['job_title'] = $job_title;
+        } else {
+          $values[$rid]['job_title'] = $relationship->job_title;
+        }
         $values[$rid]['email'] = $relationship->email;
         $values[$rid]['phone'] = $relationship->phone;
         $values[$rid]['employer_id'] = $relationship->employer_id;
@@ -1337,9 +1348,9 @@ SELECT count(*)
  WHERE membership_type_id = {$membershipValues['membership_type_id']} AND owner_membership_id = {$membershipValues['owner_membership_id']}
     AND is_current_member = 1";
             $result = CRM_Core_DAO::singleValueQuery($query);
-            if ($result < CRM_Utils_Array::value('max_related', $membershipValues, PHP_INT_MAX)) {
+            // Number of inherited memberships available - NULL is interpreted as unlimited, '0' as none
+            if ($result < CRM_Utils_Array::value('max_related', $membershipValues, PHP_INT_MAX))
               CRM_Member_BAO_Membership::create($membershipValues, CRM_Core_DAO::$_nullArray);
-            }
           }
         }
         elseif ($action & CRM_Core_Action::UPDATE) {

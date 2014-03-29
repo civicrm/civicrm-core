@@ -83,6 +83,9 @@ function civicrm_main(&$config) {
   elseif ($installType == 'wordpress') {
     civicrm_setup(WP_PLUGIN_DIR . DIRECTORY_SEPARATOR . 'files');
   }
+  elseif ( $installType == 'standalone' ) {
+    civicrm_setup($cmsPath . DIRECTORY_SEPARATOR . 'files');
+  }
 
   $dsn = "mysql://{$config['mysql']['username']}:{$config['mysql']['password']}@{$config['mysql']['server']}/{$config['mysql']['database']}?new_link=true";
 
@@ -111,6 +114,9 @@ function civicrm_main(&$config) {
     $configFile = $cmsPath . DIRECTORY_SEPARATOR . 'sites' . DIRECTORY_SEPARATOR . $siteDir . DIRECTORY_SEPARATOR . 'civicrm.settings.php';
   }
   elseif ($installType == 'wordpress') {
+    $configFile = $cmsPath . DIRECTORY_SEPARATOR . 'civicrm.settings.php';
+  }
+  elseif ($installType == 'standalone') {
     $configFile = $cmsPath . DIRECTORY_SEPARATOR . 'civicrm.settings.php';
   }
 
@@ -203,7 +209,7 @@ function civicrm_config(&$config) {
       $params['CMSdbName'] = addslashes($config['drupal']['database']);
     }
   }
-  else {
+  elseif ( $installType == 'wordpress' ) {
     $params['cms']       = 'WordPress';
     $params['CMSdbUser'] = addslashes(DB_USER);
     $params['CMSdbPass'] = addslashes(DB_PASSWORD);
@@ -212,6 +218,9 @@ function civicrm_config(&$config) {
 
     // CRM-12386
     $params['crmRoot'] = addslashes($params['crmRoot']);
+  }
+  elseif ( $installType == 'standalone' ) {
+    $params['cms'] = 'Standalone';
   }
 
   $params['siteKey'] = md5(uniqid('', TRUE) . $params['baseURL']);
@@ -228,6 +237,11 @@ function civicrm_cms_base() {
 
   // for drupal
   $numPrevious = 6;
+
+  // for standalone
+  if ($installType == 'standalone') {
+    $numPrevious = 2;
+  }
 
   if (isset($_SERVER['HTTPS']) &&
     !empty($_SERVER['HTTPS']) &&

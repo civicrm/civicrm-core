@@ -62,7 +62,7 @@ cj( function() {
             // we need to change the action of parent form, so that form submits to correct page
             var url = ui.tab.href;
 
-            {/literal}{if $config->userSystem->is_drupal}{literal}
+            {/literal}{if $config->userSystem->is_drupal OR $config->userFramework EQ 'Standalone'}{literal}
                 var actionUrl = url.split( '?' );
                 {/literal}{if $config->cleanURL}{literal}
                   var actualUrl = actionUrl[0];

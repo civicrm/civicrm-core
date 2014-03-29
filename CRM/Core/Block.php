@@ -52,7 +52,8 @@ class CRM_Core_Block {
     ADD = 4,
     LANGSWITCH = 5,
     EVENT = 6,
-    FULLTEXT_SEARCH = 7;
+    FULLTEXT_SEARCH = 7,
+    DID_YOU_KNOW = 8;
 
   /**
    * template file names for the above blocks
@@ -170,6 +171,18 @@ class CRM_Core_Block {
           'visibility' => 1,
           'weight' => -94,
           'status' => 0,
+          'pages' => "civicrm\ncivicrm/*",
+          'region' => $config->userSystem->getDefaultBlockLocation(),
+        ),
+        self::DID_YOU_KNOW => array(
+          'template' => 'DidYouKnow.tpl',
+          'info' => ts('Cividesk tips'),
+          'subject' => ts('Did you know?'),
+          'active' => true,
+          'cache' => BLOCK_NO_CACHE,
+          'visibility' => 1,
+          'weight' => -99,
+          'status' => 1,
           'pages' => "civicrm\ncivicrm/*",
           'region' => $config->userSystem->getDefaultBlockLocation(),
         ),
@@ -325,6 +338,33 @@ class CRM_Core_Block {
 
       case self::EVENT:
         self::setTemplateEventValues();
+        break;
+
+      case self::DID_YOU_KNOW:
+        $messages = array( // TODO: add a link properties to help pages
+          array( 'text' => 'Cividesk can print name badges for participants to your events.' ), // 'link' => 'http://www.example.com' ),
+          array( 'text' => 'Cividesk can do mass mailings, and we can help you with template design.' ),
+          array( 'text' => 'Cividesk can automatically email you any report on a regular basis.' ),
+          array( 'text' => 'Cividesk can synchronize your CRM contacts with Google Contacts.' ),
+          array( 'text' => 'Cividesk can sync your contacts with ConstantContact, Mailchimp, VerticalResponse and others.' ),
+          array( 'text' => 'We love referrals - tell your peers if you are satisfied with our services.' ),
+          array( 'text' => 'You can share addresses between contacts, and only update this one address in case of a move!' ),
+          array( 'text' => 'Time saver: you can create event templates for repetitive events.' ),
+          array( 'text' => 'Time saver: profiles can help you do mass updates on your database.' ),
+          array( 'text' => 'Every Cividesk user can personalize it\'s very own dashboard.'),
+          array( 'text' => 'Cividesk automates the sending of reminder emails for expired memberships.'),
+          array( 'text' => 'Cividesk can display maps for just about any address in your database.'),
+          array( 'text' => 'We can help you design custom reports if the predefined ones do not fit your needs.'),
+          array( 'text' => 'Cividesk has a lot of custom field types, including file attachement, web link, date and money amount.'),
+          array( 'text' => 'The <i>More</i> menu has many shortcuts that can take you places, quickly.'),
+          array( 'text' => 'Cividesk can do full-text searches on contacts, activities, contributions, memberships and more!'),
+          array( 'text' => 'Cividesk can find and merge duplicate contacts with just a few clicks - no excuses for that messy database anymore!'),
+          array( 'text' => 'Scheduling activities can help you stay on top of your todo list and never drop a ball again.'),
+          array( 'text' => 'You can export almost anything from Cividesk - in Excel, CSV or PDF formats.'),
+          array( 'text' => 'The <i>Advanced Search</i> screen is easy to use and immensely powerful - master it and find just about anything, fast.'),
+        );
+        $message = $messages[ rand(0, count($messages)-1) ];              
+        self::setProperty( self::DID_YOU_KNOW, 'templateValues', array( 'message' => $message ) );
         break;
     }
   }

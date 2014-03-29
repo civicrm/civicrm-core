@@ -128,7 +128,6 @@ function buildGroupSelector( filterSearch, parentsOnlyArg ) {
         "aaSorting"  : [],
         "aoColumns"  : [
                         {sClass:'crm-group-name'},
-                        {sClass:'crm-group-group_id'},
                         {sClass:'crm-group-created_by'},
                         {sClass:'crm-group-description', bSortable:false},
                         {sClass:'crm-group-group_type'},

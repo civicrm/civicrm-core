@@ -51,8 +51,8 @@
         <tr>
             <th>{ts}Relationship{/ts}</th>
             <th></th>
-            <th id="start_date">{ts}Start{/ts}</th>
-            <th id="end_date">{ts}End{/ts}</th>
+            <th>{ts}Since{/ts}</th>
+            <th>{ts}Position{/ts}</th>
             <th>{ts}City{/ts}</th>
             <th>{ts}State/Prov{/ts}</th>
             <th>{ts}Email{/ts}</th>
@@ -93,7 +93,7 @@
                 <td>{$rel.name}</td>
             {/if}
                 <td class="crm-rel-start_date">{$rel.start_date}</td>
-                <td class="crm-rel-end_date">{$rel.end_date}</td>
+                <td>{$rel.job_title}</td>
                 <td>{$rel.city}</td>
                 <td>{$rel.state}</td>
                 <td>{$rel.email}</td>

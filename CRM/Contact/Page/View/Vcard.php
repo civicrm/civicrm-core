@@ -88,6 +88,10 @@ class CRM_Contact_Page_View_Vcard extends CRM_Contact_Page_View {
       $vcard->addNickname($defaults['nick_name']);
     }
 
+    if (CRM_Utils_Array::value('organization_name', $defaults)) {
+      $vcard->addOrganization($defaults['organization_name']);
+    }
+
     if (CRM_Utils_Array::value('job_title', $defaults)) {
       $vcard->setTitle($defaults['job_title']);
     }

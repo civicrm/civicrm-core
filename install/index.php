@@ -51,7 +51,7 @@ global $installType;
 $installType = strtolower($_SESSION['civicrm_install_type']);
 
 if (!in_array($installType, array(
-  'drupal', 'wordpress'))) {
+  'drupal', 'wordpress', 'standalone'))) {
   $errorTitle = "Oops! Unsupported installation mode";
   $errorMsg = "";
   errorDisplayPage($errorTitle, $errorMsg);
@@ -69,6 +69,9 @@ elseif ($installType == 'wordpress') {
   $installDirPath = WP_PLUGIN_DIR . DIRECTORY_SEPARATOR . 'civicrm' . DIRECTORY_SEPARATOR . 'civicrm' . DIRECTORY_SEPARATOR . 'install' . DIRECTORY_SEPARATOR;
 
   $installURLPath = WP_PLUGIN_URL . DIRECTORY_SEPARATOR . 'civicrm' . DIRECTORY_SEPARATOR . 'civicrm' . DIRECTORY_SEPARATOR . 'install' . DIRECTORY_SEPARATOR;
+}
+elseif ( $installType == 'standalone' ) {
+    $crmPath = dirname ( dirname( $_SERVER['SCRIPT_FILENAME'] ) );
 }
 
 set_include_path(get_include_path() . PATH_SEPARATOR . $crmPath);
@@ -88,6 +91,7 @@ if ($installType == 'drupal') {
     $errorTitle = "Oops! Please Correct Your Install Location";
     $errorMsg = "Please untar (uncompress) your downloaded copy of CiviCRM in the <strong>" . implode(CIVICRM_DIRECTORY_SEPARATOR, array(
       'sites', 'all', 'modules')) . "</strong> directory below your Drupal root directory. Refer to the online " . $docLink . " for more information.";
+    $errorMsg .= "<p>If you want to setup / install a <strong>Standalone CiviCRM</strong> version (i.e. not a Drupal or Joomla module), <a href=\"?civicrm_install_type=standalone\">click here</a>.</p>";
     errorDisplayPage($errorTitle, $errorMsg);
   }
 }
@@ -157,6 +161,11 @@ elseif ($installType == 'wordpress') {
     'civicrm.settings.php'
   );
 }
+elseif ($installType == 'standalone') {
+    $cmsPath = $crmPath . DIRECTORY_SEPARATOR . 'standalone';    
+    $alreadyInstalled = file_exists($cmsPath . CIVICRM_DIRECTORY_SEPARATOR .
+      'civicrm.settings.php' );
+}
 
 // Exit with error if CiviCRM has already been installed.
 if ($alreadyInstalled) {
@@ -168,6 +177,9 @@ if ($alreadyInstalled) {
   }
   elseif ($installType == 'wordpress') {
     $errorMsg = "CiviCRM has already been installed in this WordPress site. <ul><li>To <strong>start over</strong>, you must delete or rename the existing CiviCRM settings file - <strong>civicrm.settings.php</strong> - from <strong>" . $cmsPath . "</strong>.</li><li>To <strong>upgrade an existing installation</strong>, refer to the online " . $docLink . ".</li></ul>";
+  }
+  elseif ( $installType == 'standalone' ) {
+    $errorMsg = "Standalone CiviCRM has already been installed. <ul><li>To <strong>start over</strong>, you must delete or rename the existing CiviCRM settings file - <strong>civicrm.settings.php</strong> - from <strong>[your CiviCRM root directory]" . CIVICRM_DIRECTORY_SEPARATOR . "standalone</strong>.</li><li>To <strong>upgrade an existing installation</strong>, refer to the online " . $docLink . ".</li></ul>";
   }
   errorDisplayPage($errorTitle, $errorMsg);
 }
@@ -442,6 +454,10 @@ class InstallRequirements {
     elseif ($installType == 'wordpress') {
       // make sure that we can write to plugins/civicrm  and plugins/files/
       $writableDirectories = array(WP_PLUGIN_DIR . DIRECTORY_SEPARATOR . 'files', $cmsPath);
+    }
+    elseif ($installType == 'standalone') {
+      // make sure that we can write to standalone and standalone/files
+      $writableDirectories = array($cmsPath, $cmsPath . CIVICRM_DIRECTORY_SEPARATOR . 'files');
     }
 
     foreach ($writableDirectories as $dir) {
@@ -1216,6 +1232,14 @@ class Installer extends InstallRequirements {
          echo '</div>';
        }
      }
+     elseif ( $installType == 'standalone' ) {
+       $standaloneURL = civicrm_cms_base( ) . 'index.php';
+       $checkListURL  = $standaloneURL . "?q=civicrm/admin/configtask&reset=1";
+       echo "<li>Click <a target=\"_blank\" href=\"$standaloneURL\">here</a> to go to your CiviCRM Standalone home page.</li>";
+       echo '</ul>';
+       echo '</div>';
+    }
+
 
     return $this->errors;
   }

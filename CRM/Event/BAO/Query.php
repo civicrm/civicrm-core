@@ -508,6 +508,8 @@ class CRM_Event_BAO_Query {
         'contact_sub_type' => 1,
         'sort_name' => 1,
         'display_name' => 1,
+        'current_employer'          => 1, // NG: Added for FBG AD
+        'current_employer_id'       => 1, // NG: for the link to
         'event_id' => 1,
         'event_title' => 1,
         'event_start_date' => 1,

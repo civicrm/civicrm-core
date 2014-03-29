@@ -126,6 +126,29 @@ class CRM_Utils_Mail_EmailProcessor {
     }
   }
 
+  // Recursively peels & filter Multipart layers in an email
+  // to only return individual Parts of the specific subtype
+  static function _get_parts( $part, $subtype = "" ) {
+    $ret = array();
+    if ($part instanceof ezcMailMultipart) {
+      if ($part instanceof ezcMailMultipartRelated) {
+        foreach ($part->getRelatedParts() as $subpart) {
+          $ret += self::_get_parts($subpart, $subtype);
+        }
+      } else {
+        foreach ($part->getParts() as $subpart) {
+          $ret += self::_get_parts($subpart, $subtype);
+        }
+      }
+    }
+    elseif ($part instanceof ezcMailPart) {
+      if (empty($subtype) || (isset($part->subType) && ($part->subType == $subtype))) {
+        $ret[] = $part;
+      }
+    }
+    return $ret;
+  }
+
   static function _process($civiMail, $dao) {
     // 0 = activities; 1 = bounce;
     $usedfor = $dao->is_default;
@@ -259,26 +282,10 @@ class CRM_Utils_Mail_EmailProcessor {
             case 'b':
             case 'bounce':
               $text = '';
-              if ($mail->body instanceof ezcMailText) {
-                $text = $mail->body->text;
-              }
-              elseif ($mail->body instanceof ezcMailMultipart) {
-                if ($mail->body instanceof ezcMailMultipartRelated) {
-                  foreach ($mail->body->getRelatedParts() as $part) {
-                    if (isset($part->subType) and $part->subType == 'plain') {
-                      $text = $part->text;
-                      break;
-                    }
-                  }
-                }
-                else {
-                  foreach ($mail->body->getParts() as $part) {
-                    if (isset($part->subType) and $part->subType == 'plain') {
-                      $text = $part->text;
-                      break;
-                    }
-                  }
-                }
+              $parts = self::_get_parts( $mail->body, 'plain' );
+              if (!empty($parts)) {
+                $part = reset($parts);
+                $text = $part->text;
               }
 
               if (

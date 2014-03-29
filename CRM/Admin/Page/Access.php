@@ -73,8 +73,12 @@ class CRM_Admin_Page_Access extends CRM_Core_Page {
       case 'WordPress':
         $this->assign('ufAccessURL', CRM_Utils_System::url('civicrm/admin/access/wp-permissions', 'reset=1'));
         break;
+
+      case 'Standalone':
+        $this->assign('ufAccessURL', CRM_Utils_System::url('admin/user/permissions'));
+        break;
+
     }
     return parent::run();
   }
 }
-
