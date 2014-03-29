@@ -39,31 +39,39 @@ class TransactionSubscriber implements EventSubscriberInterface {
   }
 
   /**
-   * @var array<\CRM_Core_Transaction>
+   * @var array (scalar $apiRequestId => CRM_Core_Transaction $tx)
    */
-  private $stack = array();
+  private $transactions = array();
+
+  /**
+   * Determine if an API request should be treated as transactional
+   *
+   * @param \Civi\API\Provider\ProviderInterface $apiProvider
+   * @param array $apiRequest
+   * @return bool
+   */
+  public function isTransactional($apiProvider, $apiRequest) {
+    return strtolower($apiRequest['action']) == 'create' || strtolower($apiRequest['action']) == 'delete' || strtolower($apiRequest['action']) == 'submit';
+  }
 
   /**
    * Open a new transaction instance (if appropriate in the current policy)
    *
-   * @param \Civi\API\Event\Event $event
+   * @param \Civi\API\Event\PrepareEvent $event
    */
-  function onApiPrepare(\Civi\API\Event\Event $event) {
+  function onApiPrepare(\Civi\API\Event\PrepareEvent $event) {
     $apiRequest = $event->getApiRequest();
-    if (strtolower($apiRequest['action']) == 'create' || strtolower($apiRequest['action']) == 'delete' || strtolower($apiRequest['action']) == 'submit') {
-      $apiRequest['is_transactional'] = 1;
-
-      $this->stack[] = new \CRM_Core_Transaction();
-    } else {
-      $this->stack[] = NULL;
+    if ($this->isTransactional($event->getApiProvider(), $apiRequest)) {
+      $this->transactions[$apiRequest['id']] = new \CRM_Core_Transaction();
     }
   }
 
   /**
    * Close any pending transactions
    */
-  function onApiRespond() {
-    array_pop($this->stack);
+  function onApiRespond(\Civi\API\Event\RespondEvent $event) {
+    $apiRequest = $event->getApiRequest();
+    unset($this->transactions[$apiRequest['id']]);
   }
 
   /**
@@ -72,9 +80,10 @@ class TransactionSubscriber implements EventSubscriberInterface {
    * @param \Civi\API\Event\ExceptionEvent $event
    */
   function onApiException(\Civi\API\Event\ExceptionEvent $event) {
-    $transaction = array_pop($this->stack);
-    if ($transaction !== NULL) {
-      $transaction->rollback();
+    $apiRequest = $event->getApiRequest();
+    if (isset($this->transactions[$apiRequest['id']])) {
+      $this->transactions[$apiRequest['id']]->rollback();
+      unset($this->transactions[$apiRequest['id']]);
     }
   }
 }
