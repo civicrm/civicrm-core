@@ -66,6 +66,18 @@
 <p>
 {ts}When a contribution is made via a Personal Campaign Page, a soft credit for that contribution is automatically assigned to the contact who created the Personal Campaign Page.{/ts}
 </p>
+{/htxt}
+
+{htxt id="id-pcp-title"}
+  {ts}Personal Campaign Page{/ts}
+{/htxt}
+{htxt id="id-pcp"}
+<p>
+{ts}Use to indicate that a contact has a relationship with the actual donor and / or was indirectly responsible for the contribution. For example, if one family member makes a large contribution - it is often useful to record a Soft Credit for the other family member(s). You can record a soft credit while adding or editing a contribution record from this tab.{/ts}
+</p>
+<p>
+{ts}When a contribution is made via a Personal Campaign Page, a soft credit for that contribution is automatically assigned to the contact who created the Personal Campaign Page.{/ts}
+</p>
 {/htxt} 
 
 {htxt id="adjust-payment-amount-title"}
