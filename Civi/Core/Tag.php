@@ -69,6 +69,7 @@ class Tag extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="name", type="string", length=64, nullable=true)
    * 
+   * 
    */
   private $name;
   
@@ -77,6 +78,7 @@ class Tag extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="description", type="string", length=255, nullable=true)
+   * 
    * 
    */
   private $description;
@@ -87,6 +89,7 @@ class Tag extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\Tag")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="parent_id", referencedColumnName="id")})
+   * 
    */
   private $parent = 'NULL';
   
@@ -95,6 +98,7 @@ class Tag extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_selectable", type="boolean", nullable=false)
+   * 
    * 
    */
   private $isSelectable = '1';
@@ -105,6 +109,7 @@ class Tag extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_reserved", type="boolean", nullable=false)
    * 
+   * 
    */
   private $isReserved = '0';
   
@@ -113,6 +118,7 @@ class Tag extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_tagset", type="boolean", nullable=false)
+   * 
    * 
    */
   private $isTagset = '0';
@@ -123,6 +129,7 @@ class Tag extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="used_for", type="string", length=64, nullable=false)
    * 
+   * 
    */
   private $usedFor = 'NULL';
   
@@ -132,6 +139,7 @@ class Tag extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Contact")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="created_id", referencedColumnName="id", onDelete="SET NULL")})
+   * 
    */
   private $created;
   
@@ -140,6 +148,7 @@ class Tag extends \Civi\Core\Entity {
    *
    * @JMS\Type("datetime")
    * @ORM\Column(name="created_date", type="datetime", nullable=true)
+   * 
    * 
    */
   private $createdDate;
@@ -346,6 +355,7 @@ class Tag extends \Civi\Core\Entity {
               'id' => array(
       
         'name' => 'id',
+        'propertyName' => 'id',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -355,6 +365,7 @@ class Tag extends \Civi\Core\Entity {
               'name' => array(
       
         'name' => 'name',
+        'propertyName' => 'name',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Tag Name'),
                         'required' => true,
@@ -367,6 +378,7 @@ class Tag extends \Civi\Core\Entity {
               'description' => array(
       
         'name' => 'description',
+        'propertyName' => 'description',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Description'),
                                  'maxlength' => 255,
@@ -378,6 +390,7 @@ class Tag extends \Civi\Core\Entity {
               'parent_id' => array(
       
         'name' => 'parent_id',
+        'propertyName' => 'parent',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Parent Tag'),
                                                      
@@ -389,6 +402,7 @@ class Tag extends \Civi\Core\Entity {
               'is_selectable' => array(
       
         'name' => 'is_selectable',
+        'propertyName' => 'isSelectable',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                                                      
                                            'default' => '1',
@@ -398,6 +412,7 @@ class Tag extends \Civi\Core\Entity {
               'is_reserved' => array(
       
         'name' => 'is_reserved',
+        'propertyName' => 'isReserved',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('Reserved'),
                                                      
@@ -407,6 +422,7 @@ class Tag extends \Civi\Core\Entity {
               'is_tagset' => array(
       
         'name' => 'is_tagset',
+        'propertyName' => 'isTagset',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('Tagset'),
                                                      
@@ -416,6 +432,7 @@ class Tag extends \Civi\Core\Entity {
               'used_for' => array(
       
         'name' => 'used_for',
+        'propertyName' => 'usedFor',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Used For'),
                                  'maxlength' => 64,
@@ -431,6 +448,7 @@ class Tag extends \Civi\Core\Entity {
               'created_id' => array(
       
         'name' => 'created_id',
+        'propertyName' => 'created',
         'type' => CRM_Utils_Type::T_INT,
                                                      
                                     
@@ -440,6 +458,7 @@ class Tag extends \Civi\Core\Entity {
               'created_date' => array(
       
         'name' => 'created_date',
+        'propertyName' => 'createdDate',
         'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
                 'title' => ts('Tag Created Date'),
                                                      

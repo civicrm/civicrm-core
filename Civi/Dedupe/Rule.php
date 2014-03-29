@@ -69,6 +69,7 @@ class Rule extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Dedupe\RuleGroup")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="dedupe_rule_group_id", referencedColumnName="id")})
+   * 
    */
   private $dedupeRuleGroup;
   
@@ -77,6 +78,7 @@ class Rule extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="rule_table", type="string", length=64, nullable=true)
+   * 
    * 
    */
   private $ruleTable;
@@ -87,6 +89,7 @@ class Rule extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="rule_field", type="string", length=64, nullable=true)
    * 
+   * 
    */
   private $ruleField;
   
@@ -96,6 +99,7 @@ class Rule extends \Civi\Core\Entity {
    * @JMS\Type("integer")
    * @ORM\Column(name="rule_length", type="integer", nullable=true, options={"unsigned":true})
    * 
+   * 
    */
   private $ruleLength;
   
@@ -104,6 +108,7 @@ class Rule extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="rule_weight", type="integer", nullable=true, options={"unsigned":true})
+   * 
    * 
    */
   private $ruleWeight;
@@ -230,6 +235,7 @@ class Rule extends \Civi\Core\Entity {
               'id' => array(
       
         'name' => 'id',
+        'propertyName' => 'id',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -239,6 +245,7 @@ class Rule extends \Civi\Core\Entity {
               'dedupe_rule_group_id' => array(
       
         'name' => 'dedupe_rule_group_id',
+        'propertyName' => 'dedupeRuleGroup',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -249,6 +256,7 @@ class Rule extends \Civi\Core\Entity {
               'rule_table' => array(
       
         'name' => 'rule_table',
+        'propertyName' => 'ruleTable',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Rule Table'),
                         'required' => true,
@@ -261,6 +269,7 @@ class Rule extends \Civi\Core\Entity {
               'rule_field' => array(
       
         'name' => 'rule_field',
+        'propertyName' => 'ruleField',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Rule Field'),
                         'required' => true,
@@ -273,6 +282,7 @@ class Rule extends \Civi\Core\Entity {
               'rule_length' => array(
       
         'name' => 'rule_length',
+        'propertyName' => 'ruleLength',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Rule Length'),
                                                      
@@ -282,6 +292,7 @@ class Rule extends \Civi\Core\Entity {
               'rule_weight' => array(
       
         'name' => 'rule_weight',
+        'propertyName' => 'ruleWeight',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Rule Weight'),
                         'required' => true,

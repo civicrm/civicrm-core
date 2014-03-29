@@ -69,6 +69,7 @@ class Subscribe extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Group")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="group_id", referencedColumnName="id", onDelete="CASCADE")})
+   * 
    */
   private $group;
   
@@ -78,6 +79,7 @@ class Subscribe extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Contact")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="contact_id", referencedColumnName="id", onDelete="CASCADE")})
+   * 
    */
   private $contact;
   
@@ -87,6 +89,7 @@ class Subscribe extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="hash", type="string", length=255, nullable=true)
    * 
+   * 
    */
   private $hash;
   
@@ -95,6 +98,7 @@ class Subscribe extends \Civi\Core\Entity {
    *
    * @JMS\Type("datetime")
    * @ORM\Column(name="time_stamp", type="datetime", nullable=true)
+   * 
    * 
    */
   private $timeStamp;
@@ -201,6 +205,7 @@ class Subscribe extends \Civi\Core\Entity {
               'id' => array(
       
         'name' => 'id',
+        'propertyName' => 'id',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -210,6 +215,7 @@ class Subscribe extends \Civi\Core\Entity {
               'group_id' => array(
       
         'name' => 'group_id',
+        'propertyName' => 'group',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -225,6 +231,7 @@ class Subscribe extends \Civi\Core\Entity {
               'contact_id' => array(
       
         'name' => 'contact_id',
+        'propertyName' => 'contact',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -235,6 +242,7 @@ class Subscribe extends \Civi\Core\Entity {
               'hash' => array(
       
         'name' => 'hash',
+        'propertyName' => 'hash',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Hash'),
                         'required' => true,
@@ -247,6 +255,7 @@ class Subscribe extends \Civi\Core\Entity {
               'time_stamp' => array(
       
         'name' => 'time_stamp',
+        'propertyName' => 'timeStamp',
         'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
                 'title' => ts('Time Stamp'),
                         'required' => true,

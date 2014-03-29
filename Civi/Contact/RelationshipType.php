@@ -69,6 +69,7 @@ class RelationshipType extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="name_a_b", type="string", length=64, nullable=true)
    * 
+   * 
    */
   private $nameAB;
   
@@ -77,6 +78,7 @@ class RelationshipType extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="label_a_b", type="string", length=64, nullable=true)
+   * 
    * 
    */
   private $labelAB;
@@ -87,6 +89,7 @@ class RelationshipType extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="name_b_a", type="string", length=64, nullable=true)
    * 
+   * 
    */
   private $nameBA;
   
@@ -95,6 +98,7 @@ class RelationshipType extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="label_b_a", type="string", length=64, nullable=true)
+   * 
    * 
    */
   private $labelBA;
@@ -105,6 +109,7 @@ class RelationshipType extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="description", type="string", length=255, nullable=true)
    * 
+   * 
    */
   private $description;
   
@@ -113,6 +118,7 @@ class RelationshipType extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="contact_type_a", type="string", length=12, nullable=true)
+   * 
    * 
    */
   private $contactTypeA;
@@ -123,6 +129,7 @@ class RelationshipType extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="contact_type_b", type="string", length=12, nullable=true)
    * 
+   * 
    */
   private $contactTypeB;
   
@@ -131,6 +138,7 @@ class RelationshipType extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="contact_sub_type_a", type="string", length=64, nullable=true)
+   * 
    * 
    */
   private $contactSubTypeA;
@@ -141,6 +149,7 @@ class RelationshipType extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="contact_sub_type_b", type="string", length=64, nullable=true)
    * 
+   * 
    */
   private $contactSubTypeB;
   
@@ -150,6 +159,7 @@ class RelationshipType extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_reserved", type="boolean", nullable=true)
    * 
+   * 
    */
   private $isReserved;
   
@@ -158,6 +168,7 @@ class RelationshipType extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_active", type="boolean", nullable=false)
+   * 
    * 
    */
   private $isActive = '1';
@@ -404,6 +415,7 @@ class RelationshipType extends \Civi\Core\Entity {
               'id' => array(
       
         'name' => 'id',
+        'propertyName' => 'id',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Relationship Type ID'),
                         'required' => true,
@@ -414,6 +426,7 @@ class RelationshipType extends \Civi\Core\Entity {
               'name_a_b' => array(
       
         'name' => 'name_a_b',
+        'propertyName' => 'nameAB',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Relationship Type Name A to B'),
                                  'maxlength' => 64,
@@ -425,6 +438,7 @@ class RelationshipType extends \Civi\Core\Entity {
               'label_a_b' => array(
       
         'name' => 'label_a_b',
+        'propertyName' => 'labelAB',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Relationship Type Label A to B'),
                                  'maxlength' => 64,
@@ -436,6 +450,7 @@ class RelationshipType extends \Civi\Core\Entity {
               'name_b_a' => array(
       
         'name' => 'name_b_a',
+        'propertyName' => 'nameBA',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Relationship Type Name B to A'),
                                  'maxlength' => 64,
@@ -447,6 +462,7 @@ class RelationshipType extends \Civi\Core\Entity {
               'label_b_a' => array(
       
         'name' => 'label_b_a',
+        'propertyName' => 'labelBA',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Relationship Type Label B to A'),
                                  'maxlength' => 64,
@@ -458,6 +474,7 @@ class RelationshipType extends \Civi\Core\Entity {
               'description' => array(
       
         'name' => 'description',
+        'propertyName' => 'description',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Relationship Description'),
                                  'maxlength' => 255,
@@ -469,6 +486,7 @@ class RelationshipType extends \Civi\Core\Entity {
               'contact_type_a' => array(
       
         'name' => 'contact_type_a',
+        'propertyName' => 'contactTypeA',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Contact Type for Contact A'),
                                  'maxlength' => 12,
@@ -483,6 +501,7 @@ class RelationshipType extends \Civi\Core\Entity {
               'contact_type_b' => array(
       
         'name' => 'contact_type_b',
+        'propertyName' => 'contactTypeB',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Contact Type for Contact B'),
                                  'maxlength' => 12,
@@ -497,6 +516,7 @@ class RelationshipType extends \Civi\Core\Entity {
               'contact_sub_type_a' => array(
       
         'name' => 'contact_sub_type_a',
+        'propertyName' => 'contactSubTypeA',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Contact Subtype A'),
                                  'maxlength' => 64,
@@ -508,6 +528,7 @@ class RelationshipType extends \Civi\Core\Entity {
               'contact_sub_type_b' => array(
       
         'name' => 'contact_sub_type_b',
+        'propertyName' => 'contactSubTypeB',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Contact Subtype B'),
                                  'maxlength' => 64,
@@ -519,6 +540,7 @@ class RelationshipType extends \Civi\Core\Entity {
               'is_reserved' => array(
       
         'name' => 'is_reserved',
+        'propertyName' => 'isReserved',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('Relationship Type is Reserved'),
                                                      
@@ -528,6 +550,7 @@ class RelationshipType extends \Civi\Core\Entity {
               'is_active' => array(
       
         'name' => 'is_active',
+        'propertyName' => 'isActive',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('Relationship Type is Active'),
                                                      

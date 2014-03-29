@@ -69,6 +69,7 @@ class Pledge extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Contact")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="contact_id", referencedColumnName="id", onDelete="CASCADE")})
+   * 
    */
   private $contact;
   
@@ -78,6 +79,7 @@ class Pledge extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Financial\FinancialType")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="financial_type_id", referencedColumnName="id")})
+   * 
    */
   private $financialType;
   
@@ -87,6 +89,7 @@ class Pledge extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Contribute\ContributionPage")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="contribution_page_id", referencedColumnName="id", onDelete="SET NULL")})
+   * 
    */
   private $contributionPage;
   
@@ -95,6 +98,7 @@ class Pledge extends \Civi\Core\Entity {
    *
    * @JMS\Type("float")
    * @ORM\Column(name="amount", type="float", nullable=true)
+   * 
    * 
    */
   private $amount;
@@ -105,6 +109,7 @@ class Pledge extends \Civi\Core\Entity {
    * @JMS\Type("float")
    * @ORM\Column(name="original_installment_amount", type="float", nullable=true)
    * 
+   * 
    */
   private $originalInstallmentAmount;
   
@@ -113,6 +118,7 @@ class Pledge extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="currency", type="string", length=3, nullable=false)
+   * 
    * 
    */
   private $currency = 'NULL';
@@ -123,6 +129,7 @@ class Pledge extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="frequency_unit", type="string", length=8, nullable=false)
    * 
+   * 
    */
   private $frequencyUnit = 'month';
   
@@ -131,6 +138,7 @@ class Pledge extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="frequency_interval", type="integer", nullable=false, options={"unsigned":true})
+   * 
    * 
    */
   private $frequencyInterval = '1';
@@ -141,6 +149,7 @@ class Pledge extends \Civi\Core\Entity {
    * @JMS\Type("integer")
    * @ORM\Column(name="frequency_day", type="integer", nullable=false, options={"unsigned":true})
    * 
+   * 
    */
   private $frequencyDay = '3';
   
@@ -149,6 +158,7 @@ class Pledge extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="installments", type="integer", nullable=false, options={"unsigned":true})
+   * 
    * 
    */
   private $installments = '1';
@@ -159,6 +169,7 @@ class Pledge extends \Civi\Core\Entity {
    * @JMS\Type("datetime")
    * @ORM\Column(name="start_date", type="datetime", nullable=true)
    * 
+   * 
    */
   private $startDate;
   
@@ -167,6 +178,7 @@ class Pledge extends \Civi\Core\Entity {
    *
    * @JMS\Type("datetime")
    * @ORM\Column(name="create_date", type="datetime", nullable=true)
+   * 
    * 
    */
   private $createDate;
@@ -177,6 +189,7 @@ class Pledge extends \Civi\Core\Entity {
    * @JMS\Type("datetime")
    * @ORM\Column(name="acknowledge_date", type="datetime", nullable=true)
    * 
+   * 
    */
   private $acknowledgeDate;
   
@@ -185,6 +198,7 @@ class Pledge extends \Civi\Core\Entity {
    *
    * @JMS\Type("datetime")
    * @ORM\Column(name="modified_date", type="datetime", nullable=true)
+   * 
    * 
    */
   private $modifiedDate;
@@ -195,6 +209,7 @@ class Pledge extends \Civi\Core\Entity {
    * @JMS\Type("datetime")
    * @ORM\Column(name="cancel_date", type="datetime", nullable=true)
    * 
+   * 
    */
   private $cancelDate;
   
@@ -203,6 +218,7 @@ class Pledge extends \Civi\Core\Entity {
    *
    * @JMS\Type("datetime")
    * @ORM\Column(name="end_date", type="datetime", nullable=true)
+   * 
    * 
    */
   private $endDate;
@@ -213,6 +229,7 @@ class Pledge extends \Civi\Core\Entity {
    * @JMS\Type("integer")
    * @ORM\Column(name="max_reminders", type="integer", nullable=false, options={"unsigned":true})
    * 
+   * 
    */
   private $maxReminders = '1';
   
@@ -221,6 +238,7 @@ class Pledge extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="initial_reminder_day", type="integer", nullable=false, options={"unsigned":true})
+   * 
    * 
    */
   private $initialReminderDay = '5';
@@ -231,6 +249,7 @@ class Pledge extends \Civi\Core\Entity {
    * @JMS\Type("integer")
    * @ORM\Column(name="additional_reminder_day", type="integer", nullable=false, options={"unsigned":true})
    * 
+   * 
    */
   private $additionalReminderDay = '5';
   
@@ -239,6 +258,7 @@ class Pledge extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="status_id", type="integer", nullable=true, options={"unsigned":true})
+   * 
    * 
    */
   private $statusId;
@@ -249,6 +269,7 @@ class Pledge extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_test", type="boolean", nullable=false)
    * 
+   * 
    */
   private $isTest = '0';
   
@@ -258,6 +279,7 @@ class Pledge extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Campaign\Campaign")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="campaign_id", referencedColumnName="id", onDelete="SET NULL")})
+   * 
    */
   private $campaign;
 
@@ -723,6 +745,7 @@ class Pledge extends \Civi\Core\Entity {
               'pledge_id' => array(
       
         'name' => 'id',
+        'propertyName' => 'id',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Pledge ID'),
                         'required' => true,
@@ -738,6 +761,7 @@ class Pledge extends \Civi\Core\Entity {
               'pledge_contact_id' => array(
       
         'name' => 'contact_id',
+        'propertyName' => 'contact',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Contact ID'),
                         'required' => true,
@@ -754,6 +778,7 @@ class Pledge extends \Civi\Core\Entity {
               'pledge_financial_type_id' => array(
       
         'name' => 'financial_type_id',
+        'propertyName' => 'financialType',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Type'),
                                                      
@@ -764,6 +789,7 @@ class Pledge extends \Civi\Core\Entity {
               'pledge_contribution_page_id' => array(
       
         'name' => 'contribution_page_id',
+        'propertyName' => 'contributionPage',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Pledge Contribution Page'),
                                                      
@@ -774,6 +800,7 @@ class Pledge extends \Civi\Core\Entity {
               'pledge_amount' => array(
       
         'name' => 'amount',
+        'propertyName' => 'amount',
         'type' => CRM_Utils_Type::T_MONEY,
                 'title' => ts('Total Pledged'),
                         'required' => true,
@@ -789,6 +816,7 @@ class Pledge extends \Civi\Core\Entity {
               'pledge_original_installment_amount' => array(
       
         'name' => 'original_installment_amount',
+        'propertyName' => 'originalInstallmentAmount',
         'type' => CRM_Utils_Type::T_MONEY,
                 'title' => ts('Original Installment Amount'),
                         'required' => true,
@@ -799,6 +827,7 @@ class Pledge extends \Civi\Core\Entity {
               'currency' => array(
       
         'name' => 'currency',
+        'propertyName' => 'currency',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Pledge Currency'),
                                  'maxlength' => 3,
@@ -817,6 +846,7 @@ class Pledge extends \Civi\Core\Entity {
               'pledge_frequency_unit' => array(
       
         'name' => 'frequency_unit',
+        'propertyName' => 'frequencyUnit',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Pledge Frequency Unit'),
                                  'maxlength' => 8,
@@ -833,6 +863,7 @@ class Pledge extends \Civi\Core\Entity {
               'pledge_frequency_interval' => array(
       
         'name' => 'frequency_interval',
+        'propertyName' => 'frequencyInterval',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Pledge Frequency Interval'),
                         'required' => true,
@@ -844,6 +875,7 @@ class Pledge extends \Civi\Core\Entity {
               'frequency_day' => array(
       
         'name' => 'frequency_day',
+        'propertyName' => 'frequencyDay',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Pledge day'),
                         'required' => true,
@@ -855,6 +887,7 @@ class Pledge extends \Civi\Core\Entity {
               'installments' => array(
       
         'name' => 'installments',
+        'propertyName' => 'installments',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Pledge Number of Installments'),
                                                      
@@ -865,6 +898,7 @@ class Pledge extends \Civi\Core\Entity {
               'start_date' => array(
       
         'name' => 'start_date',
+        'propertyName' => 'startDate',
         'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
                 'title' => ts('Pledge Start Date'),
                         'required' => true,
@@ -875,6 +909,7 @@ class Pledge extends \Civi\Core\Entity {
               'pledge_create_date' => array(
       
         'name' => 'create_date',
+        'propertyName' => 'createDate',
         'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
                 'title' => ts('Pledge Made'),
                         'required' => true,
@@ -890,6 +925,7 @@ class Pledge extends \Civi\Core\Entity {
               'acknowledge_date' => array(
       
         'name' => 'acknowledge_date',
+        'propertyName' => 'acknowledgeDate',
         'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
                 'title' => ts('Pledge Acknowledged'),
                                                      
@@ -899,6 +935,7 @@ class Pledge extends \Civi\Core\Entity {
               'modified_date' => array(
       
         'name' => 'modified_date',
+        'propertyName' => 'modifiedDate',
         'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
                 'title' => ts('Pledge Modified Date'),
                                                      
@@ -908,6 +945,7 @@ class Pledge extends \Civi\Core\Entity {
               'cancel_date' => array(
       
         'name' => 'cancel_date',
+        'propertyName' => 'cancelDate',
         'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
                 'title' => ts('Pledge Cancelled Date'),
                                                      
@@ -917,6 +955,7 @@ class Pledge extends \Civi\Core\Entity {
               'end_date' => array(
       
         'name' => 'end_date',
+        'propertyName' => 'endDate',
         'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
                 'title' => ts('Pledge End Date'),
                                                      
@@ -926,6 +965,7 @@ class Pledge extends \Civi\Core\Entity {
               'max_reminders' => array(
       
         'name' => 'max_reminders',
+        'propertyName' => 'maxReminders',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Maximum Number of Reminders'),
                                                      
@@ -936,6 +976,7 @@ class Pledge extends \Civi\Core\Entity {
               'initial_reminder_day' => array(
       
         'name' => 'initial_reminder_day',
+        'propertyName' => 'initialReminderDay',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Initial Reminder Day'),
                                                      
@@ -946,6 +987,7 @@ class Pledge extends \Civi\Core\Entity {
               'additional_reminder_day' => array(
       
         'name' => 'additional_reminder_day',
+        'propertyName' => 'additionalReminderDay',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Additional Reminder Days'),
                                                      
@@ -956,6 +998,7 @@ class Pledge extends \Civi\Core\Entity {
               'pledge_status_id' => array(
       
         'name' => 'status_id',
+        'propertyName' => 'statusId',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Pledge Status Id'),
                                                      
@@ -970,6 +1013,7 @@ class Pledge extends \Civi\Core\Entity {
               'pledge_is_test' => array(
       
         'name' => 'is_test',
+        'propertyName' => 'isTest',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('Test'),
                                                      
@@ -984,6 +1028,7 @@ class Pledge extends \Civi\Core\Entity {
               'pledge_campaign_id' => array(
       
         'name' => 'campaign_id',
+        'propertyName' => 'campaign',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Campaign'),
                                                      

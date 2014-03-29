@@ -69,6 +69,7 @@ class ParticipantPayment extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Event\Participant")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="participant_id", referencedColumnName="id", onDelete="CASCADE")})
+   * 
    */
   private $participant;
   
@@ -78,6 +79,7 @@ class ParticipantPayment extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Contribute\Contribution")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="contribution_id", referencedColumnName="id", onDelete="CASCADE")})
+   * 
    */
   private $contribution;
 
@@ -143,6 +145,7 @@ class ParticipantPayment extends \Civi\Core\Entity {
               'id' => array(
       
         'name' => 'id',
+        'propertyName' => 'id',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Payment ID'),
                         'required' => true,
@@ -153,6 +156,7 @@ class ParticipantPayment extends \Civi\Core\Entity {
               'participant_id' => array(
       
         'name' => 'participant_id',
+        'propertyName' => 'participant',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Participant ID'),
                         'required' => true,
@@ -164,6 +168,7 @@ class ParticipantPayment extends \Civi\Core\Entity {
               'contribution_id' => array(
       
         'name' => 'contribution_id',
+        'propertyName' => 'contribution',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              

@@ -67,7 +67,8 @@ class AddressFormat extends \Civi\Core\Entity {
    * @var text
    *
    * @JMS\Type("text")
-   * @ORM\Column(name="format", type="text", nullable=true)
+   * @ORM\Column(name="format", type="text", length=65535, nullable=true)
+   * 
    * 
    */
   private $format;
@@ -114,6 +115,7 @@ class AddressFormat extends \Civi\Core\Entity {
               'id' => array(
       
         'name' => 'id',
+        'propertyName' => 'id',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -123,9 +125,11 @@ class AddressFormat extends \Civi\Core\Entity {
               'format' => array(
       
         'name' => 'format',
+        'propertyName' => 'format',
         'type' => CRM_Utils_Type::T_TEXT,
                 'title' => ts('Address Format'),
-                                                     
+                                 'maxlength' => 65535,
+                                    
                                     
                           ),
              );

@@ -69,6 +69,7 @@ class Mailing extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\Domain")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="domain_id", referencedColumnName="id", onDelete="SET NULL")})
+   * 
    */
   private $domain;
   
@@ -78,6 +79,7 @@ class Mailing extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Mailing\Component")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="header_id", referencedColumnName="id", onDelete="SET NULL")})
+   * 
    */
   private $header;
   
@@ -87,6 +89,7 @@ class Mailing extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Mailing\Component")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="footer_id", referencedColumnName="id", onDelete="SET NULL")})
+   * 
    */
   private $footer;
   
@@ -96,6 +99,7 @@ class Mailing extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Mailing\Component")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="reply_id", referencedColumnName="id", onDelete="SET NULL")})
+   * 
    */
   private $reply;
   
@@ -105,6 +109,7 @@ class Mailing extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Mailing\Component")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="unsubscribe_id", referencedColumnName="id", onDelete="SET NULL")})
+   * 
    */
   private $unsubscribe;
   
@@ -113,6 +118,7 @@ class Mailing extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="resubscribe_id", type="integer", nullable=true, options={"unsigned":true})
+   * 
    * 
    */
   private $resubscribeId;
@@ -123,6 +129,7 @@ class Mailing extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Mailing\Component")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="optout_id", referencedColumnName="id", onDelete="SET NULL")})
+   * 
    */
   private $optout;
   
@@ -131,6 +138,7 @@ class Mailing extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="name", type="string", length=128, nullable=true)
+   * 
    * 
    */
   private $name;
@@ -141,6 +149,7 @@ class Mailing extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="from_name", type="string", length=128, nullable=true)
    * 
+   * 
    */
   private $fromName;
   
@@ -149,6 +158,7 @@ class Mailing extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="from_email", type="string", length=128, nullable=true)
+   * 
    * 
    */
   private $fromEmail;
@@ -159,6 +169,7 @@ class Mailing extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="replyto_email", type="string", length=128, nullable=true)
    * 
+   * 
    */
   private $replytoEmail;
   
@@ -167,6 +178,7 @@ class Mailing extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="subject", type="string", length=128, nullable=true)
+   * 
    * 
    */
   private $subject;
@@ -177,6 +189,7 @@ class Mailing extends \Civi\Core\Entity {
    * @JMS\Type("text")
    * @ORM\Column(name="body_text", type="text", nullable=true)
    * 
+   * 
    */
   private $bodyText;
   
@@ -185,6 +198,7 @@ class Mailing extends \Civi\Core\Entity {
    *
    * @JMS\Type("text")
    * @ORM\Column(name="body_html", type="text", nullable=true)
+   * 
    * 
    */
   private $bodyHtml;
@@ -195,6 +209,7 @@ class Mailing extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="url_tracking", type="boolean", nullable=true)
    * 
+   * 
    */
   private $urlTracking;
   
@@ -203,6 +218,7 @@ class Mailing extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="forward_replies", type="boolean", nullable=true)
+   * 
    * 
    */
   private $forwardReplies;
@@ -213,6 +229,7 @@ class Mailing extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="auto_responder", type="boolean", nullable=true)
    * 
+   * 
    */
   private $autoResponder;
   
@@ -221,6 +238,7 @@ class Mailing extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="open_tracking", type="boolean", nullable=true)
+   * 
    * 
    */
   private $openTracking;
@@ -231,6 +249,7 @@ class Mailing extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_completed", type="boolean", nullable=true)
    * 
+   * 
    */
   private $isCompleted;
   
@@ -240,6 +259,7 @@ class Mailing extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\MessageTemplate")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="msg_template_id", referencedColumnName="id", onDelete="SET NULL")})
+   * 
    */
   private $msgTemplate;
   
@@ -248,6 +268,7 @@ class Mailing extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="override_verp", type="boolean", nullable=false)
+   * 
    * 
    */
   private $overrideVerp = '0';
@@ -258,6 +279,7 @@ class Mailing extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Contact")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="created_id", referencedColumnName="id", onDelete="SET NULL")})
+   * 
    */
   private $created;
   
@@ -266,6 +288,7 @@ class Mailing extends \Civi\Core\Entity {
    *
    * @JMS\Type("datetime")
    * @ORM\Column(name="created_date", type="datetime", nullable=true)
+   * 
    * 
    */
   private $createdDate;
@@ -276,6 +299,7 @@ class Mailing extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Contact")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="scheduled_id", referencedColumnName="id", onDelete="SET NULL")})
+   * 
    */
   private $scheduled;
   
@@ -284,6 +308,7 @@ class Mailing extends \Civi\Core\Entity {
    *
    * @JMS\Type("datetime")
    * @ORM\Column(name="scheduled_date", type="datetime", nullable=true)
+   * 
    * 
    */
   private $scheduledDate;
@@ -294,6 +319,7 @@ class Mailing extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Contact")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="approver_id", referencedColumnName="id", onDelete="SET NULL")})
+   * 
    */
   private $approver;
   
@@ -302,6 +328,7 @@ class Mailing extends \Civi\Core\Entity {
    *
    * @JMS\Type("datetime")
    * @ORM\Column(name="approval_date", type="datetime", nullable=true)
+   * 
    * 
    */
   private $approvalDate;
@@ -312,6 +339,7 @@ class Mailing extends \Civi\Core\Entity {
    * @JMS\Type("integer")
    * @ORM\Column(name="approval_status_id", type="integer", nullable=true, options={"unsigned":true})
    * 
+   * 
    */
   private $approvalStatusId;
   
@@ -320,6 +348,7 @@ class Mailing extends \Civi\Core\Entity {
    *
    * @JMS\Type("text")
    * @ORM\Column(name="approval_note", type="text", nullable=true)
+   * 
    * 
    */
   private $approvalNote;
@@ -330,6 +359,7 @@ class Mailing extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_archived", type="boolean", nullable=false)
    * 
+   * 
    */
   private $isArchived = '0';
   
@@ -338,6 +368,7 @@ class Mailing extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="visibility", type="string", length=40, nullable=false)
+   * 
    * 
    */
   private $visibility = 'User and User Admin Only';
@@ -348,6 +379,7 @@ class Mailing extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Campaign\Campaign")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="campaign_id", referencedColumnName="id", onDelete="SET NULL")})
+   * 
    */
   private $campaign;
   
@@ -356,6 +388,7 @@ class Mailing extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="dedupe_email", type="boolean", nullable=false)
+   * 
    * 
    */
   private $dedupeEmail = '0';
@@ -366,6 +399,7 @@ class Mailing extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\SMS\Provider")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="sms_provider_id", referencedColumnName="id", onDelete="SET NULL")})
+   * 
    */
   private $smsProvider;
 
@@ -1071,6 +1105,7 @@ class Mailing extends \Civi\Core\Entity {
               'id' => array(
       
         'name' => 'id',
+        'propertyName' => 'id',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -1080,6 +1115,7 @@ class Mailing extends \Civi\Core\Entity {
               'domain_id' => array(
       
         'name' => 'domain_id',
+        'propertyName' => 'domain',
         'type' => CRM_Utils_Type::T_INT,
                                                      
                                     
@@ -1089,6 +1125,7 @@ class Mailing extends \Civi\Core\Entity {
               'header_id' => array(
       
         'name' => 'header_id',
+        'propertyName' => 'header',
         'type' => CRM_Utils_Type::T_INT,
                                                      
                                     
@@ -1098,6 +1135,7 @@ class Mailing extends \Civi\Core\Entity {
               'footer_id' => array(
       
         'name' => 'footer_id',
+        'propertyName' => 'footer',
         'type' => CRM_Utils_Type::T_INT,
                                                      
                                     
@@ -1107,6 +1145,7 @@ class Mailing extends \Civi\Core\Entity {
               'reply_id' => array(
       
         'name' => 'reply_id',
+        'propertyName' => 'reply',
         'type' => CRM_Utils_Type::T_INT,
                                                      
                                     
@@ -1116,6 +1155,7 @@ class Mailing extends \Civi\Core\Entity {
               'unsubscribe_id' => array(
       
         'name' => 'unsubscribe_id',
+        'propertyName' => 'unsubscribe',
         'type' => CRM_Utils_Type::T_INT,
                                                      
                                     
@@ -1125,6 +1165,7 @@ class Mailing extends \Civi\Core\Entity {
               'resubscribe_id' => array(
       
         'name' => 'resubscribe_id',
+        'propertyName' => 'resubscribeId',
         'type' => CRM_Utils_Type::T_INT,
                                                      
                                     
@@ -1133,6 +1174,7 @@ class Mailing extends \Civi\Core\Entity {
               'optout_id' => array(
       
         'name' => 'optout_id',
+        'propertyName' => 'optout',
         'type' => CRM_Utils_Type::T_INT,
                                                      
                                     
@@ -1142,6 +1184,7 @@ class Mailing extends \Civi\Core\Entity {
               'name' => array(
       
         'name' => 'name',
+        'propertyName' => 'name',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Name'),
                                  'maxlength' => 128,
@@ -1153,6 +1196,7 @@ class Mailing extends \Civi\Core\Entity {
               'from_name' => array(
       
         'name' => 'from_name',
+        'propertyName' => 'fromName',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('From Name'),
                                  'maxlength' => 128,
@@ -1164,6 +1208,7 @@ class Mailing extends \Civi\Core\Entity {
               'from_email' => array(
       
         'name' => 'from_email',
+        'propertyName' => 'fromEmail',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('From Email'),
                                  'maxlength' => 128,
@@ -1175,6 +1220,7 @@ class Mailing extends \Civi\Core\Entity {
               'replyto_email' => array(
       
         'name' => 'replyto_email',
+        'propertyName' => 'replytoEmail',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Replyto Email'),
                                  'maxlength' => 128,
@@ -1186,6 +1232,7 @@ class Mailing extends \Civi\Core\Entity {
               'subject' => array(
       
         'name' => 'subject',
+        'propertyName' => 'subject',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Subject'),
                                  'maxlength' => 128,
@@ -1197,6 +1244,7 @@ class Mailing extends \Civi\Core\Entity {
               'body_text' => array(
       
         'name' => 'body_text',
+        'propertyName' => 'bodyText',
         'type' => CRM_Utils_Type::T_LONGTEXT,
                 'title' => ts('Body Text'),
                                                      
@@ -1206,6 +1254,7 @@ class Mailing extends \Civi\Core\Entity {
               'body_html' => array(
       
         'name' => 'body_html',
+        'propertyName' => 'bodyHtml',
         'type' => CRM_Utils_Type::T_LONGTEXT,
                 'title' => ts('Body Html'),
                                                      
@@ -1215,6 +1264,7 @@ class Mailing extends \Civi\Core\Entity {
               'url_tracking' => array(
       
         'name' => 'url_tracking',
+        'propertyName' => 'urlTracking',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('Url Tracking'),
                                                      
@@ -1224,6 +1274,7 @@ class Mailing extends \Civi\Core\Entity {
               'forward_replies' => array(
       
         'name' => 'forward_replies',
+        'propertyName' => 'forwardReplies',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('Forward Replies'),
                                                      
@@ -1233,6 +1284,7 @@ class Mailing extends \Civi\Core\Entity {
               'auto_responder' => array(
       
         'name' => 'auto_responder',
+        'propertyName' => 'autoResponder',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('Auto Responder'),
                                                      
@@ -1242,6 +1294,7 @@ class Mailing extends \Civi\Core\Entity {
               'open_tracking' => array(
       
         'name' => 'open_tracking',
+        'propertyName' => 'openTracking',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('Open Tracking'),
                                                      
@@ -1251,6 +1304,7 @@ class Mailing extends \Civi\Core\Entity {
               'is_completed' => array(
       
         'name' => 'is_completed',
+        'propertyName' => 'isCompleted',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                                                      
                                     
@@ -1259,6 +1313,7 @@ class Mailing extends \Civi\Core\Entity {
               'msg_template_id' => array(
       
         'name' => 'msg_template_id',
+        'propertyName' => 'msgTemplate',
         'type' => CRM_Utils_Type::T_INT,
                                                      
                                     
@@ -1268,6 +1323,7 @@ class Mailing extends \Civi\Core\Entity {
               'override_verp' => array(
       
         'name' => 'override_verp',
+        'propertyName' => 'overrideVerp',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('Override Verp'),
                                                      
@@ -1277,6 +1333,7 @@ class Mailing extends \Civi\Core\Entity {
               'created_id' => array(
       
         'name' => 'created_id',
+        'propertyName' => 'created',
         'type' => CRM_Utils_Type::T_INT,
                                                      
                                     
@@ -1286,6 +1343,7 @@ class Mailing extends \Civi\Core\Entity {
               'created_date' => array(
       
         'name' => 'created_date',
+        'propertyName' => 'createdDate',
         'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
                 'title' => ts('Mailing Created Date'),
                                                      
@@ -1295,6 +1353,7 @@ class Mailing extends \Civi\Core\Entity {
               'scheduled_id' => array(
       
         'name' => 'scheduled_id',
+        'propertyName' => 'scheduled',
         'type' => CRM_Utils_Type::T_INT,
                                                      
                                     
@@ -1304,6 +1363,7 @@ class Mailing extends \Civi\Core\Entity {
               'scheduled_date' => array(
       
         'name' => 'scheduled_date',
+        'propertyName' => 'scheduledDate',
         'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
                 'title' => ts('Mailing Scheduled Date'),
                                                      
@@ -1313,6 +1373,7 @@ class Mailing extends \Civi\Core\Entity {
               'approver_id' => array(
       
         'name' => 'approver_id',
+        'propertyName' => 'approver',
         'type' => CRM_Utils_Type::T_INT,
                                                      
                                     
@@ -1322,6 +1383,7 @@ class Mailing extends \Civi\Core\Entity {
               'approval_date' => array(
       
         'name' => 'approval_date',
+        'propertyName' => 'approvalDate',
         'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
                 'title' => ts('Mailing Approved Date'),
                                                      
@@ -1331,6 +1393,7 @@ class Mailing extends \Civi\Core\Entity {
               'approval_status_id' => array(
       
         'name' => 'approval_status_id',
+        'propertyName' => 'approvalStatusId',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Approval Status'),
                                                      
@@ -1343,6 +1406,7 @@ class Mailing extends \Civi\Core\Entity {
               'approval_note' => array(
       
         'name' => 'approval_note',
+        'propertyName' => 'approvalNote',
         'type' => CRM_Utils_Type::T_LONGTEXT,
                 'title' => ts('Approval Note'),
                                                      
@@ -1352,6 +1416,7 @@ class Mailing extends \Civi\Core\Entity {
               'is_archived' => array(
       
         'name' => 'is_archived',
+        'propertyName' => 'isArchived',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                                                      
                                     
@@ -1360,6 +1425,7 @@ class Mailing extends \Civi\Core\Entity {
               'visibility' => array(
       
         'name' => 'visibility',
+        'propertyName' => 'visibility',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Visibility'),
                                  'maxlength' => 40,
@@ -1375,6 +1441,7 @@ class Mailing extends \Civi\Core\Entity {
               'campaign_id' => array(
       
         'name' => 'campaign_id',
+        'propertyName' => 'campaign',
         'type' => CRM_Utils_Type::T_INT,
                                                      
                                     
@@ -1389,6 +1456,7 @@ class Mailing extends \Civi\Core\Entity {
               'dedupe_email' => array(
       
         'name' => 'dedupe_email',
+        'propertyName' => 'dedupeEmail',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('Dedupe Email'),
                                                      
@@ -1398,6 +1466,7 @@ class Mailing extends \Civi\Core\Entity {
               'sms_provider_id' => array(
       
         'name' => 'sms_provider_id',
+        'propertyName' => 'smsProvider',
         'type' => CRM_Utils_Type::T_INT,
                                                      
                                     

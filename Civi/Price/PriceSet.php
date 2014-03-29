@@ -69,6 +69,7 @@ class PriceSet extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\Domain")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="domain_id", referencedColumnName="id")})
+   * 
    */
   private $domain;
   
@@ -77,6 +78,7 @@ class PriceSet extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="name", type="string", length=255, nullable=true)
+   * 
    * 
    */
   private $name;
@@ -87,6 +89,7 @@ class PriceSet extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="title", type="string", length=255, nullable=true)
    * 
+   * 
    */
   private $title;
   
@@ -96,6 +99,7 @@ class PriceSet extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_active", type="boolean", nullable=false)
    * 
+   * 
    */
   private $isActive = '1';
   
@@ -103,7 +107,8 @@ class PriceSet extends \Civi\Core\Entity {
    * @var text
    *
    * @JMS\Type("text")
-   * @ORM\Column(name="help_pre", type="text", nullable=true)
+   * @ORM\Column(name="help_pre", type="text", length=65535, nullable=true)
+   * 
    * 
    */
   private $helpPre;
@@ -112,7 +117,8 @@ class PriceSet extends \Civi\Core\Entity {
    * @var text
    *
    * @JMS\Type("text")
-   * @ORM\Column(name="help_post", type="text", nullable=true)
+   * @ORM\Column(name="help_post", type="text", length=65535, nullable=true)
+   * 
    * 
    */
   private $helpPost;
@@ -123,6 +129,7 @@ class PriceSet extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="javascript", type="string", length=64, nullable=true)
    * 
+   * 
    */
   private $javascript;
   
@@ -131,6 +138,7 @@ class PriceSet extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="extends", type="string", length=255, nullable=true)
+   * 
    * 
    */
   private $extends;
@@ -141,6 +149,7 @@ class PriceSet extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Financial\FinancialType")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="financial_type_id", referencedColumnName="id", onDelete="SET NULL")})
+   * 
    */
   private $financialType = 'NULL';
   
@@ -150,6 +159,7 @@ class PriceSet extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_quick_config", type="boolean", nullable=false)
    * 
+   * 
    */
   private $isQuickConfig = '0';
   
@@ -158,6 +168,7 @@ class PriceSet extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_reserved", type="boolean", nullable=false)
+   * 
    * 
    */
   private $isReserved = '0';
@@ -404,6 +415,7 @@ class PriceSet extends \Civi\Core\Entity {
               'id' => array(
       
         'name' => 'id',
+        'propertyName' => 'id',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -413,6 +425,7 @@ class PriceSet extends \Civi\Core\Entity {
               'domain_id' => array(
       
         'name' => 'domain_id',
+        'propertyName' => 'domain',
         'type' => CRM_Utils_Type::T_INT,
                                                      
                                     
@@ -422,6 +435,7 @@ class PriceSet extends \Civi\Core\Entity {
               'name' => array(
       
         'name' => 'name',
+        'propertyName' => 'name',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Name'),
                         'required' => true,
@@ -434,6 +448,7 @@ class PriceSet extends \Civi\Core\Entity {
               'title' => array(
       
         'name' => 'title',
+        'propertyName' => 'title',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Title'),
                         'required' => true,
@@ -446,6 +461,7 @@ class PriceSet extends \Civi\Core\Entity {
               'is_active' => array(
       
         'name' => 'is_active',
+        'propertyName' => 'isActive',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                                                      
                                            'default' => '1',
@@ -455,9 +471,11 @@ class PriceSet extends \Civi\Core\Entity {
               'help_pre' => array(
       
         'name' => 'help_pre',
+        'propertyName' => 'helpPre',
         'type' => CRM_Utils_Type::T_TEXT,
                 'title' => ts('Help Pre'),
-                                                   'rows' => 4,
+                                 'maxlength' => 65535,
+                                  'rows' => 4,
                          'cols' => 80,
          
                                     
@@ -466,9 +484,11 @@ class PriceSet extends \Civi\Core\Entity {
               'help_post' => array(
       
         'name' => 'help_post',
+        'propertyName' => 'helpPost',
         'type' => CRM_Utils_Type::T_TEXT,
                 'title' => ts('Help Post'),
-                                                   'rows' => 4,
+                                 'maxlength' => 65535,
+                                  'rows' => 4,
                          'cols' => 80,
          
                                     
@@ -477,6 +497,7 @@ class PriceSet extends \Civi\Core\Entity {
               'javascript' => array(
       
         'name' => 'javascript',
+        'propertyName' => 'javascript',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Javascript'),
                                  'maxlength' => 64,
@@ -488,6 +509,7 @@ class PriceSet extends \Civi\Core\Entity {
               'extends' => array(
       
         'name' => 'extends',
+        'propertyName' => 'extends',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Extends'),
                         'required' => true,
@@ -500,6 +522,7 @@ class PriceSet extends \Civi\Core\Entity {
               'financial_type_id' => array(
       
         'name' => 'financial_type_id',
+        'propertyName' => 'financialType',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Financial Type'),
                                                      
@@ -511,6 +534,7 @@ class PriceSet extends \Civi\Core\Entity {
               'is_quick_config' => array(
       
         'name' => 'is_quick_config',
+        'propertyName' => 'isQuickConfig',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                                                      
                                     
@@ -519,6 +543,7 @@ class PriceSet extends \Civi\Core\Entity {
               'is_reserved' => array(
       
         'name' => 'is_reserved',
+        'propertyName' => 'isReserved',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                                                      
                                     

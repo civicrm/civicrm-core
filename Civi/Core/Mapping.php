@@ -69,6 +69,7 @@ class Mapping extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="name", type="string", length=64, nullable=true)
    * 
+   * 
    */
   private $name;
   
@@ -78,6 +79,7 @@ class Mapping extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="description", type="string", length=255, nullable=true)
    * 
+   * 
    */
   private $description;
   
@@ -86,6 +88,7 @@ class Mapping extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="mapping_type_id", type="integer", nullable=true, options={"unsigned":true})
+   * 
    * 
    */
   private $mappingTypeId;
@@ -172,6 +175,7 @@ class Mapping extends \Civi\Core\Entity {
               'id' => array(
       
         'name' => 'id',
+        'propertyName' => 'id',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -181,6 +185,7 @@ class Mapping extends \Civi\Core\Entity {
               'name' => array(
       
         'name' => 'name',
+        'propertyName' => 'name',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Name'),
                                  'maxlength' => 64,
@@ -192,6 +197,7 @@ class Mapping extends \Civi\Core\Entity {
               'description' => array(
       
         'name' => 'description',
+        'propertyName' => 'description',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Description'),
                                  'maxlength' => 255,
@@ -203,6 +209,7 @@ class Mapping extends \Civi\Core\Entity {
               'mapping_type_id' => array(
       
         'name' => 'mapping_type_id',
+        'propertyName' => 'mappingTypeId',
         'type' => CRM_Utils_Type::T_INT,
                                                      
                                     

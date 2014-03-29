@@ -69,6 +69,7 @@ class Log extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="entity_table", type="string", length=64, nullable=true)
    * 
+   * 
    */
   private $entityTable;
   
@@ -78,6 +79,7 @@ class Log extends \Civi\Core\Entity {
    * @JMS\Type("integer")
    * @ORM\Column(name="entity_id", type="integer", nullable=true, options={"unsigned":true})
    * 
+   * 
    */
   private $entityId;
   
@@ -85,7 +87,8 @@ class Log extends \Civi\Core\Entity {
    * @var text
    *
    * @JMS\Type("text")
-   * @ORM\Column(name="data", type="text", nullable=true)
+   * @ORM\Column(name="data", type="text", length=65535, nullable=true)
+   * 
    * 
    */
   private $data;
@@ -96,6 +99,7 @@ class Log extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Contact")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="modified_id", referencedColumnName="id", onDelete="CASCADE")})
+   * 
    */
   private $modified;
   
@@ -104,6 +108,7 @@ class Log extends \Civi\Core\Entity {
    *
    * @JMS\Type("datetime")
    * @ORM\Column(name="modified_date", type="datetime", nullable=true)
+   * 
    * 
    */
   private $modifiedDate;
@@ -230,6 +235,7 @@ class Log extends \Civi\Core\Entity {
               'id' => array(
       
         'name' => 'id',
+        'propertyName' => 'id',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -239,6 +245,7 @@ class Log extends \Civi\Core\Entity {
               'entity_table' => array(
       
         'name' => 'entity_table',
+        'propertyName' => 'entityTable',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Entity Table'),
                         'required' => true,
@@ -251,6 +258,7 @@ class Log extends \Civi\Core\Entity {
               'entity_id' => array(
       
         'name' => 'entity_id',
+        'propertyName' => 'entityId',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -260,15 +268,18 @@ class Log extends \Civi\Core\Entity {
               'data' => array(
       
         'name' => 'data',
+        'propertyName' => 'data',
         'type' => CRM_Utils_Type::T_TEXT,
                 'title' => ts('Data'),
-                                                     
+                                 'maxlength' => 65535,
+                                    
                                     
                           ),
       
               'modified_id' => array(
       
         'name' => 'modified_id',
+        'propertyName' => 'modified',
         'type' => CRM_Utils_Type::T_INT,
                                                      
                                     
@@ -278,6 +289,7 @@ class Log extends \Civi\Core\Entity {
               'modified_date' => array(
       
         'name' => 'modified_date',
+        'propertyName' => 'modifiedDate',
         'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
                 'title' => ts('Modified Date'),
                                                      

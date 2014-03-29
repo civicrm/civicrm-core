@@ -69,6 +69,7 @@ class PreferencesDate extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="name", type="string", length=64, nullable=true)
    * 
+   * 
    */
   private $name;
   
@@ -77,6 +78,7 @@ class PreferencesDate extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="description", type="string", length=255, nullable=true)
+   * 
    * 
    */
   private $description;
@@ -87,6 +89,7 @@ class PreferencesDate extends \Civi\Core\Entity {
    * @JMS\Type("integer")
    * @ORM\Column(name="start", type="integer", nullable=true, options={"unsigned":true})
    * 
+   * 
    */
   private $start;
   
@@ -95,6 +98,7 @@ class PreferencesDate extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="end", type="integer", nullable=true, options={"unsigned":true})
+   * 
    * 
    */
   private $end;
@@ -105,6 +109,7 @@ class PreferencesDate extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="date_format", type="string", length=64, nullable=true)
    * 
+   * 
    */
   private $dateFormat;
   
@@ -113,6 +118,7 @@ class PreferencesDate extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="time_format", type="string", length=64, nullable=true)
+   * 
    * 
    */
   private $timeFormat;
@@ -259,6 +265,7 @@ class PreferencesDate extends \Civi\Core\Entity {
               'id' => array(
       
         'name' => 'id',
+        'propertyName' => 'id',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -268,6 +275,7 @@ class PreferencesDate extends \Civi\Core\Entity {
               'name' => array(
       
         'name' => 'name',
+        'propertyName' => 'name',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Name'),
                         'required' => true,
@@ -280,6 +288,7 @@ class PreferencesDate extends \Civi\Core\Entity {
               'description' => array(
       
         'name' => 'description',
+        'propertyName' => 'description',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Description'),
                                  'maxlength' => 255,
@@ -291,6 +300,7 @@ class PreferencesDate extends \Civi\Core\Entity {
               'start' => array(
       
         'name' => 'start',
+        'propertyName' => 'start',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Start'),
                         'required' => true,
@@ -301,6 +311,7 @@ class PreferencesDate extends \Civi\Core\Entity {
               'end' => array(
       
         'name' => 'end',
+        'propertyName' => 'end',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('End'),
                         'required' => true,
@@ -311,6 +322,7 @@ class PreferencesDate extends \Civi\Core\Entity {
               'date_format' => array(
       
         'name' => 'date_format',
+        'propertyName' => 'dateFormat',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Date Format'),
                                  'maxlength' => 64,
@@ -322,6 +334,7 @@ class PreferencesDate extends \Civi\Core\Entity {
               'time_format' => array(
       
         'name' => 'time_format',
+        'propertyName' => 'timeFormat',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Time Format'),
                                  'maxlength' => 64,

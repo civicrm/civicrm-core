@@ -69,6 +69,7 @@ class IM extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Contact")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="contact_id", referencedColumnName="id", onDelete="CASCADE")})
+   * 
    */
   private $contact;
   
@@ -77,6 +78,7 @@ class IM extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="location_type_id", type="integer", nullable=true, options={"unsigned":true})
+   * 
    * 
    */
   private $locationTypeId;
@@ -87,6 +89,7 @@ class IM extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="name", type="string", length=64, nullable=true)
    * 
+   * 
    */
   private $name;
   
@@ -95,6 +98,7 @@ class IM extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="provider_id", type="integer", nullable=true, options={"unsigned":true})
+   * 
    * 
    */
   private $providerId;
@@ -105,6 +109,7 @@ class IM extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_primary", type="boolean", nullable=false)
    * 
+   * 
    */
   private $isPrimary = '0';
   
@@ -113,6 +118,7 @@ class IM extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_billing", type="boolean", nullable=false)
+   * 
    * 
    */
   private $isBilling = '0';
@@ -259,6 +265,7 @@ class IM extends \Civi\Core\Entity {
               'id' => array(
       
         'name' => 'id',
+        'propertyName' => 'id',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -268,6 +275,7 @@ class IM extends \Civi\Core\Entity {
               'contact_id' => array(
       
         'name' => 'contact_id',
+        'propertyName' => 'contact',
         'type' => CRM_Utils_Type::T_INT,
                                                      
                                     
@@ -277,6 +285,7 @@ class IM extends \Civi\Core\Entity {
               'location_type_id' => array(
       
         'name' => 'location_type_id',
+        'propertyName' => 'locationTypeId',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('IM Location Type'),
                                                      
@@ -291,6 +300,7 @@ class IM extends \Civi\Core\Entity {
               'name' => array(
       
         'name' => 'name',
+        'propertyName' => 'name',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('IM Screen Name'),
                                  'maxlength' => 64,
@@ -307,6 +317,7 @@ class IM extends \Civi\Core\Entity {
               'provider_id' => array(
       
         'name' => 'provider_id',
+        'propertyName' => 'providerId',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('IM Provider'),
                                                      
@@ -319,6 +330,7 @@ class IM extends \Civi\Core\Entity {
               'is_primary' => array(
       
         'name' => 'is_primary',
+        'propertyName' => 'isPrimary',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('Is IM Primary?'),
                                                      
@@ -328,6 +340,7 @@ class IM extends \Civi\Core\Entity {
               'is_billing' => array(
       
         'name' => 'is_billing',
+        'propertyName' => 'isBilling',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                                                      
                                     

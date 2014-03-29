@@ -69,6 +69,7 @@ class Component extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="name", type="string", length=64, nullable=true)
    * 
+   * 
    */
   private $name;
   
@@ -77,6 +78,7 @@ class Component extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="namespace", type="string", length=128, nullable=true)
+   * 
    * 
    */
   private $namespace;
@@ -143,6 +145,7 @@ class Component extends \Civi\Core\Entity {
               'id' => array(
       
         'name' => 'id',
+        'propertyName' => 'id',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -152,6 +155,7 @@ class Component extends \Civi\Core\Entity {
               'name' => array(
       
         'name' => 'name',
+        'propertyName' => 'name',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Component name'),
                         'required' => true,
@@ -164,6 +168,7 @@ class Component extends \Civi\Core\Entity {
               'namespace' => array(
       
         'name' => 'namespace',
+        'propertyName' => 'namespace',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Namespace reserved for component.'),
                                  'maxlength' => 128,

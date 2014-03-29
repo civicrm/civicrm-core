@@ -69,6 +69,7 @@ class MailingGroup extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Mailing\Mailing")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="mailing_id", referencedColumnName="id", onDelete="CASCADE")})
+   * 
    */
   private $mailing;
   
@@ -77,6 +78,7 @@ class MailingGroup extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="group_type", type="string", length=8, nullable=true)
+   * 
    * 
    */
   private $groupType;
@@ -87,6 +89,7 @@ class MailingGroup extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="entity_table", type="string", length=64, nullable=true)
    * 
+   * 
    */
   private $entityTable;
   
@@ -95,6 +98,7 @@ class MailingGroup extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="entity_id", type="integer", nullable=true, options={"unsigned":true})
+   * 
    * 
    */
   private $entityId;
@@ -105,6 +109,7 @@ class MailingGroup extends \Civi\Core\Entity {
    * @JMS\Type("integer")
    * @ORM\Column(name="search_id", type="integer", nullable=true, options={"unsigned":true})
    * 
+   * 
    */
   private $searchId;
   
@@ -112,7 +117,8 @@ class MailingGroup extends \Civi\Core\Entity {
    * @var text
    *
    * @JMS\Type("text")
-   * @ORM\Column(name="search_args", type="text", nullable=true)
+   * @ORM\Column(name="search_args", type="text", length=65535, nullable=true)
+   * 
    * 
    */
   private $searchArgs;
@@ -259,6 +265,7 @@ class MailingGroup extends \Civi\Core\Entity {
               'id' => array(
       
         'name' => 'id',
+        'propertyName' => 'id',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -268,6 +275,7 @@ class MailingGroup extends \Civi\Core\Entity {
               'mailing_id' => array(
       
         'name' => 'mailing_id',
+        'propertyName' => 'mailing',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -278,6 +286,7 @@ class MailingGroup extends \Civi\Core\Entity {
               'group_type' => array(
       
         'name' => 'group_type',
+        'propertyName' => 'groupType',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Group Type'),
                                  'maxlength' => 8,
@@ -292,6 +301,7 @@ class MailingGroup extends \Civi\Core\Entity {
               'entity_table' => array(
       
         'name' => 'entity_table',
+        'propertyName' => 'entityTable',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Entity Table'),
                         'required' => true,
@@ -304,6 +314,7 @@ class MailingGroup extends \Civi\Core\Entity {
               'entity_id' => array(
       
         'name' => 'entity_id',
+        'propertyName' => 'entityId',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -313,6 +324,7 @@ class MailingGroup extends \Civi\Core\Entity {
               'search_id' => array(
       
         'name' => 'search_id',
+        'propertyName' => 'searchId',
         'type' => CRM_Utils_Type::T_INT,
                                                      
                                     
@@ -321,9 +333,11 @@ class MailingGroup extends \Civi\Core\Entity {
               'search_args' => array(
       
         'name' => 'search_args',
+        'propertyName' => 'searchArgs',
         'type' => CRM_Utils_Type::T_TEXT,
                 'title' => ts('Search Args'),
-                                                     
+                                 'maxlength' => 65535,
+                                    
                                     
                           ),
              );

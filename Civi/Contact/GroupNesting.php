@@ -69,6 +69,7 @@ class GroupNesting extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Group")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="child_group_id", referencedColumnName="id", onDelete="CASCADE")})
+   * 
    */
   private $childGroup;
   
@@ -78,6 +79,7 @@ class GroupNesting extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Group")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="parent_group_id", referencedColumnName="id", onDelete="CASCADE")})
+   * 
    */
   private $parentGroup;
 
@@ -143,6 +145,7 @@ class GroupNesting extends \Civi\Core\Entity {
               'id' => array(
       
         'name' => 'id',
+        'propertyName' => 'id',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -152,6 +155,7 @@ class GroupNesting extends \Civi\Core\Entity {
               'child_group_id' => array(
       
         'name' => 'child_group_id',
+        'propertyName' => 'childGroup',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -162,6 +166,7 @@ class GroupNesting extends \Civi\Core\Entity {
               'parent_group_id' => array(
       
         'name' => 'parent_group_id',
+        'propertyName' => 'parentGroup',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              

@@ -69,6 +69,7 @@ class MappingField extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\Mapping")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="mapping_id", referencedColumnName="id")})
+   * 
    */
   private $mapping;
   
@@ -77,6 +78,7 @@ class MappingField extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="name", type="string", length=255, nullable=true)
+   * 
    * 
    */
   private $name;
@@ -87,6 +89,7 @@ class MappingField extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="contact_type", type="string", length=64, nullable=true)
    * 
+   * 
    */
   private $contactType;
   
@@ -95,6 +98,7 @@ class MappingField extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="column_number", type="integer", nullable=true, options={"unsigned":true})
+   * 
    * 
    */
   private $columnNumber;
@@ -105,6 +109,7 @@ class MappingField extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\LocationType")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="location_type_id", referencedColumnName="id")})
+   * 
    */
   private $locationType;
   
@@ -113,6 +118,7 @@ class MappingField extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="phone_type_id", type="integer", nullable=true, options={"unsigned":true})
+   * 
    * 
    */
   private $phoneTypeId;
@@ -123,6 +129,7 @@ class MappingField extends \Civi\Core\Entity {
    * @JMS\Type("integer")
    * @ORM\Column(name="im_provider_id", type="integer", nullable=true, options={"unsigned":true})
    * 
+   * 
    */
   private $imProviderId;
   
@@ -131,6 +138,7 @@ class MappingField extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="website_type_id", type="integer", nullable=true, options={"unsigned":true})
+   * 
    * 
    */
   private $websiteTypeId;
@@ -141,6 +149,7 @@ class MappingField extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\RelationshipType")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="relationship_type_id", referencedColumnName="id")})
+   * 
    */
   private $relationshipType;
   
@@ -149,6 +158,7 @@ class MappingField extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="relationship_direction", type="string", length=6, nullable=true)
+   * 
    * 
    */
   private $relationshipDirection;
@@ -159,6 +169,7 @@ class MappingField extends \Civi\Core\Entity {
    * @JMS\Type("integer")
    * @ORM\Column(name="grouping", type="integer", nullable=false, options={"unsigned":true})
    * 
+   * 
    */
   private $grouping = '1';
   
@@ -168,6 +179,7 @@ class MappingField extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="operator", type="string", length=16, nullable=true)
    * 
+   * 
    */
   private $operator;
   
@@ -176,6 +188,7 @@ class MappingField extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="value", type="string", length=255, nullable=true)
+   * 
    * 
    */
   private $value;
@@ -462,6 +475,7 @@ class MappingField extends \Civi\Core\Entity {
               'id' => array(
       
         'name' => 'id',
+        'propertyName' => 'id',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -471,6 +485,7 @@ class MappingField extends \Civi\Core\Entity {
               'mapping_id' => array(
       
         'name' => 'mapping_id',
+        'propertyName' => 'mapping',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -481,6 +496,7 @@ class MappingField extends \Civi\Core\Entity {
               'name' => array(
       
         'name' => 'name',
+        'propertyName' => 'name',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Name'),
                                  'maxlength' => 255,
@@ -492,6 +508,7 @@ class MappingField extends \Civi\Core\Entity {
               'contact_type' => array(
       
         'name' => 'contact_type',
+        'propertyName' => 'contactType',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Contact Type'),
                                  'maxlength' => 64,
@@ -508,6 +525,7 @@ class MappingField extends \Civi\Core\Entity {
               'column_number' => array(
       
         'name' => 'column_number',
+        'propertyName' => 'columnNumber',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Column Number'),
                         'required' => true,
@@ -518,6 +536,7 @@ class MappingField extends \Civi\Core\Entity {
               'location_type_id' => array(
       
         'name' => 'location_type_id',
+        'propertyName' => 'locationType',
         'type' => CRM_Utils_Type::T_INT,
                                                      
                                     
@@ -527,6 +546,7 @@ class MappingField extends \Civi\Core\Entity {
               'phone_type_id' => array(
       
         'name' => 'phone_type_id',
+        'propertyName' => 'phoneTypeId',
         'type' => CRM_Utils_Type::T_INT,
                                                      
                                     
@@ -535,6 +555,7 @@ class MappingField extends \Civi\Core\Entity {
               'im_provider_id' => array(
       
         'name' => 'im_provider_id',
+        'propertyName' => 'imProviderId',
         'type' => CRM_Utils_Type::T_INT,
                                                      
                                     
@@ -546,6 +567,7 @@ class MappingField extends \Civi\Core\Entity {
               'website_type_id' => array(
       
         'name' => 'website_type_id',
+        'propertyName' => 'websiteTypeId',
         'type' => CRM_Utils_Type::T_INT,
                                                      
                                     
@@ -557,6 +579,7 @@ class MappingField extends \Civi\Core\Entity {
               'relationship_type_id' => array(
       
         'name' => 'relationship_type_id',
+        'propertyName' => 'relationshipType',
         'type' => CRM_Utils_Type::T_INT,
                                                      
                                     
@@ -566,6 +589,7 @@ class MappingField extends \Civi\Core\Entity {
               'relationship_direction' => array(
       
         'name' => 'relationship_direction',
+        'propertyName' => 'relationshipDirection',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Relationship Direction'),
                                  'maxlength' => 6,
@@ -577,6 +601,7 @@ class MappingField extends \Civi\Core\Entity {
               'grouping' => array(
       
         'name' => 'grouping',
+        'propertyName' => 'grouping',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Grouping'),
                                                      
@@ -587,6 +612,7 @@ class MappingField extends \Civi\Core\Entity {
               'operator' => array(
       
         'name' => 'operator',
+        'propertyName' => 'operator',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Operator'),
                                  'maxlength' => 16,
@@ -601,6 +627,7 @@ class MappingField extends \Civi\Core\Entity {
               'value' => array(
       
         'name' => 'value',
+        'propertyName' => 'value',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Value'),
                                  'maxlength' => 255,

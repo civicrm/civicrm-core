@@ -69,6 +69,7 @@ class Cache extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Contact")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="contact_id", referencedColumnName="id", onDelete="CASCADE")})
+   * 
    */
   private $contact;
   
@@ -78,6 +79,7 @@ class Cache extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\ACL\ACL")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="acl_id", referencedColumnName="id", onDelete="CASCADE")})
+   * 
    */
   private $acl;
   
@@ -86,6 +88,7 @@ class Cache extends \Civi\Core\Entity {
    *
    * @JMS\Type("date")
    * @ORM\Column(name="modified_date", type="date", nullable=true)
+   * 
    * 
    */
   private $modifiedDate;
@@ -172,6 +175,7 @@ class Cache extends \Civi\Core\Entity {
               'id' => array(
       
         'name' => 'id',
+        'propertyName' => 'id',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -181,6 +185,7 @@ class Cache extends \Civi\Core\Entity {
               'contact_id' => array(
       
         'name' => 'contact_id',
+        'propertyName' => 'contact',
         'type' => CRM_Utils_Type::T_INT,
                                                      
                                     
@@ -190,6 +195,7 @@ class Cache extends \Civi\Core\Entity {
               'acl_id' => array(
       
         'name' => 'acl_id',
+        'propertyName' => 'acl',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -200,6 +206,7 @@ class Cache extends \Civi\Core\Entity {
               'modified_date' => array(
       
         'name' => 'modified_date',
+        'propertyName' => 'modifiedDate',
         'type' => CRM_Utils_Type::T_DATE,
                 'title' => ts('Modified Date'),
                                                      

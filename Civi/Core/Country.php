@@ -69,6 +69,7 @@ class Country extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="name", type="string", length=64, nullable=true)
    * 
+   * 
    */
   private $name;
   
@@ -77,6 +78,7 @@ class Country extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="iso_code", type="string", length=2, nullable=true)
+   * 
    * 
    */
   private $isoCode;
@@ -87,6 +89,7 @@ class Country extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="country_code", type="string", length=4, nullable=true)
    * 
+   * 
    */
   private $countryCode;
   
@@ -96,6 +99,7 @@ class Country extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\AddressFormat")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="address_format_id", referencedColumnName="id")})
+   * 
    */
   private $addressFormat;
   
@@ -104,6 +108,7 @@ class Country extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="idd_prefix", type="string", length=4, nullable=true)
+   * 
    * 
    */
   private $iddPrefix;
@@ -114,6 +119,7 @@ class Country extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="ndd_prefix", type="string", length=4, nullable=true)
    * 
+   * 
    */
   private $nddPrefix;
   
@@ -123,6 +129,7 @@ class Country extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\Worldregion")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="region_id", referencedColumnName="id")})
+   * 
    */
   private $region;
   
@@ -131,6 +138,7 @@ class Country extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_province_abbreviated", type="boolean", nullable=false)
+   * 
    * 
    */
   private $isProvinceAbbreviated = '0';
@@ -317,6 +325,7 @@ class Country extends \Civi\Core\Entity {
               'id' => array(
       
         'name' => 'id',
+        'propertyName' => 'id',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -326,6 +335,7 @@ class Country extends \Civi\Core\Entity {
               'name' => array(
       
         'name' => 'name',
+        'propertyName' => 'name',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Country'),
                                  'maxlength' => 64,
@@ -342,6 +352,7 @@ class Country extends \Civi\Core\Entity {
               'iso_code' => array(
       
         'name' => 'iso_code',
+        'propertyName' => 'isoCode',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Iso Code'),
                                  'maxlength' => 2,
@@ -353,6 +364,7 @@ class Country extends \Civi\Core\Entity {
               'country_code' => array(
       
         'name' => 'country_code',
+        'propertyName' => 'countryCode',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Country Code'),
                                  'maxlength' => 4,
@@ -364,6 +376,7 @@ class Country extends \Civi\Core\Entity {
               'address_format_id' => array(
       
         'name' => 'address_format_id',
+        'propertyName' => 'addressFormat',
         'type' => CRM_Utils_Type::T_INT,
                                                      
                                     
@@ -373,6 +386,7 @@ class Country extends \Civi\Core\Entity {
               'idd_prefix' => array(
       
         'name' => 'idd_prefix',
+        'propertyName' => 'iddPrefix',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Idd Prefix'),
                                  'maxlength' => 4,
@@ -384,6 +398,7 @@ class Country extends \Civi\Core\Entity {
               'ndd_prefix' => array(
       
         'name' => 'ndd_prefix',
+        'propertyName' => 'nddPrefix',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Ndd Prefix'),
                                  'maxlength' => 4,
@@ -395,6 +410,7 @@ class Country extends \Civi\Core\Entity {
               'region_id' => array(
       
         'name' => 'region_id',
+        'propertyName' => 'region',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -405,6 +421,7 @@ class Country extends \Civi\Core\Entity {
               'is_province_abbreviated' => array(
       
         'name' => 'is_province_abbreviated',
+        'propertyName' => 'isProvinceAbbreviated',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                                                      
                                     

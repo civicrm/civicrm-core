@@ -69,6 +69,7 @@ class Component extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="name", type="string", length=64, nullable=true)
    * 
+   * 
    */
   private $name;
   
@@ -77,6 +78,7 @@ class Component extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="component_type", type="string", length=12, nullable=true)
+   * 
    * 
    */
   private $componentType;
@@ -87,6 +89,7 @@ class Component extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="subject", type="string", length=255, nullable=true)
    * 
+   * 
    */
   private $subject;
   
@@ -94,7 +97,8 @@ class Component extends \Civi\Core\Entity {
    * @var text
    *
    * @JMS\Type("text")
-   * @ORM\Column(name="body_html", type="text", nullable=true)
+   * @ORM\Column(name="body_html", type="text", length=65535, nullable=true)
+   * 
    * 
    */
   private $bodyHtml;
@@ -103,7 +107,8 @@ class Component extends \Civi\Core\Entity {
    * @var text
    *
    * @JMS\Type("text")
-   * @ORM\Column(name="body_text", type="text", nullable=true)
+   * @ORM\Column(name="body_text", type="text", length=65535, nullable=true)
+   * 
    * 
    */
   private $bodyText;
@@ -114,6 +119,7 @@ class Component extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_default", type="boolean", nullable=false)
    * 
+   * 
    */
   private $isDefault = '0';
   
@@ -122,6 +128,7 @@ class Component extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_active", type="boolean", nullable=true)
+   * 
    * 
    */
   private $isActive;
@@ -288,6 +295,7 @@ class Component extends \Civi\Core\Entity {
               'id' => array(
       
         'name' => 'id',
+        'propertyName' => 'id',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -297,6 +305,7 @@ class Component extends \Civi\Core\Entity {
               'name' => array(
       
         'name' => 'name',
+        'propertyName' => 'name',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Component Name'),
                                  'maxlength' => 64,
@@ -308,6 +317,7 @@ class Component extends \Civi\Core\Entity {
               'component_type' => array(
       
         'name' => 'component_type',
+        'propertyName' => 'componentType',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Component Type'),
                                  'maxlength' => 12,
@@ -322,6 +332,7 @@ class Component extends \Civi\Core\Entity {
               'subject' => array(
       
         'name' => 'subject',
+        'propertyName' => 'subject',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Subject'),
                                  'maxlength' => 255,
@@ -333,9 +344,11 @@ class Component extends \Civi\Core\Entity {
               'body_html' => array(
       
         'name' => 'body_html',
+        'propertyName' => 'bodyHtml',
         'type' => CRM_Utils_Type::T_TEXT,
                 'title' => ts('Body Html'),
-                                                   'rows' => 8,
+                                 'maxlength' => 65535,
+                                  'rows' => 8,
                          'cols' => 80,
          
                                     
@@ -344,9 +357,11 @@ class Component extends \Civi\Core\Entity {
               'body_text' => array(
       
         'name' => 'body_text',
+        'propertyName' => 'bodyText',
         'type' => CRM_Utils_Type::T_TEXT,
                 'title' => ts('Body Text'),
-                                                   'rows' => 8,
+                                 'maxlength' => 65535,
+                                  'rows' => 8,
                          'cols' => 80,
          
                                     
@@ -355,6 +370,7 @@ class Component extends \Civi\Core\Entity {
               'is_default' => array(
       
         'name' => 'is_default',
+        'propertyName' => 'isDefault',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                                                      
                                     
@@ -363,6 +379,7 @@ class Component extends \Civi\Core\Entity {
               'is_active' => array(
       
         'name' => 'is_active',
+        'propertyName' => 'isActive',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                                                      
                                     

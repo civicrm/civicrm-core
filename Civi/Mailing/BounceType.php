@@ -69,6 +69,7 @@ class BounceType extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="name", type="string", length=8, nullable=true)
    * 
+   * 
    */
   private $name;
   
@@ -78,6 +79,7 @@ class BounceType extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="description", type="string", length=255, nullable=true)
    * 
+   * 
    */
   private $description;
   
@@ -86,6 +88,7 @@ class BounceType extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="hold_threshold", type="integer", nullable=true, options={"unsigned":true})
+   * 
    * 
    */
   private $holdThreshold;
@@ -172,6 +175,7 @@ class BounceType extends \Civi\Core\Entity {
               'id' => array(
       
         'name' => 'id',
+        'propertyName' => 'id',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -181,6 +185,7 @@ class BounceType extends \Civi\Core\Entity {
               'name' => array(
       
         'name' => 'name',
+        'propertyName' => 'name',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Name'),
                         'required' => true,
@@ -193,6 +198,7 @@ class BounceType extends \Civi\Core\Entity {
               'description' => array(
       
         'name' => 'description',
+        'propertyName' => 'description',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Description'),
                                  'maxlength' => 255,
@@ -204,6 +210,7 @@ class BounceType extends \Civi\Core\Entity {
               'hold_threshold' => array(
       
         'name' => 'hold_threshold',
+        'propertyName' => 'holdThreshold',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Hold Threshold'),
                         'required' => true,

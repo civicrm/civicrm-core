@@ -69,6 +69,7 @@ class Activity extends \Civi\Core\Entity {
    * @JMS\Type("integer")
    * @ORM\Column(name="source_record_id", type="integer", nullable=true, options={"unsigned":true})
    * 
+   * 
    */
   private $sourceRecordId;
   
@@ -77,6 +78,7 @@ class Activity extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="activity_type_id", type="integer", nullable=false, options={"unsigned":true})
+   * 
    * 
    */
   private $activityTypeId = '1';
@@ -87,6 +89,7 @@ class Activity extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="subject", type="string", length=255, nullable=true)
    * 
+   * 
    */
   private $subject;
   
@@ -95,6 +98,7 @@ class Activity extends \Civi\Core\Entity {
    *
    * @JMS\Type("datetime")
    * @ORM\Column(name="activity_date_time", type="datetime", nullable=true)
+   * 
    * 
    */
   private $activityDateTime;
@@ -105,6 +109,7 @@ class Activity extends \Civi\Core\Entity {
    * @JMS\Type("integer")
    * @ORM\Column(name="duration", type="integer", nullable=true, options={"unsigned":true})
    * 
+   * 
    */
   private $duration;
   
@@ -113,6 +118,7 @@ class Activity extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="location", type="string", length=255, nullable=true)
+   * 
    * 
    */
   private $location;
@@ -123,6 +129,7 @@ class Activity extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\Phone")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="phone_id", referencedColumnName="id", onDelete="SET NULL")})
+   * 
    */
   private $phone;
   
@@ -132,6 +139,7 @@ class Activity extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="phone_number", type="string", length=64, nullable=true)
    * 
+   * 
    */
   private $phoneNumber;
   
@@ -139,7 +147,8 @@ class Activity extends \Civi\Core\Entity {
    * @var text
    *
    * @JMS\Type("text")
-   * @ORM\Column(name="details", type="text", nullable=true)
+   * @ORM\Column(name="details", type="text", length=65535, nullable=true)
+   * 
    * 
    */
   private $details;
@@ -150,6 +159,7 @@ class Activity extends \Civi\Core\Entity {
    * @JMS\Type("integer")
    * @ORM\Column(name="status_id", type="integer", nullable=true, options={"unsigned":true})
    * 
+   * 
    */
   private $statusId;
   
@@ -158,6 +168,7 @@ class Activity extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="priority_id", type="integer", nullable=true, options={"unsigned":true})
+   * 
    * 
    */
   private $priorityId;
@@ -168,6 +179,7 @@ class Activity extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Activity\Activity")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="parent_id", referencedColumnName="id", onDelete="CASCADE")})
+   * 
    */
   private $parent;
   
@@ -176,6 +188,7 @@ class Activity extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_test", type="boolean", nullable=false)
+   * 
    * 
    */
   private $isTest = '0';
@@ -186,6 +199,7 @@ class Activity extends \Civi\Core\Entity {
    * @JMS\Type("integer")
    * @ORM\Column(name="medium_id", type="integer", nullable=false, options={"unsigned":true})
    * 
+   * 
    */
   private $mediumId = 'NULL';
   
@@ -194,6 +208,7 @@ class Activity extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_auto", type="boolean", nullable=false)
+   * 
    * 
    */
   private $isAuto = '0';
@@ -204,6 +219,7 @@ class Activity extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Relationship")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="relationship_id", referencedColumnName="id", onDelete="SET NULL")})
+   * 
    */
   private $relationship = 'NULL';
   
@@ -212,6 +228,7 @@ class Activity extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_current_revision", type="boolean", nullable=false)
+   * 
    * 
    */
   private $isCurrentRevision = '1';
@@ -222,6 +239,7 @@ class Activity extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Activity\Activity")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="original_id", referencedColumnName="id", onDelete="CASCADE")})
+   * 
    */
   private $original;
   
@@ -230,6 +248,7 @@ class Activity extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="result", type="string", length=255, nullable=true)
+   * 
    * 
    */
   private $result;
@@ -240,6 +259,7 @@ class Activity extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_deleted", type="boolean", nullable=false)
    * 
+   * 
    */
   private $isDeleted = '0';
   
@@ -249,6 +269,7 @@ class Activity extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Campaign\Campaign")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="campaign_id", referencedColumnName="id", onDelete="SET NULL")})
+   * 
    */
   private $campaign;
   
@@ -258,6 +279,7 @@ class Activity extends \Civi\Core\Entity {
    * @JMS\Type("integer")
    * @ORM\Column(name="engagement_level", type="integer", nullable=true, options={"unsigned":true})
    * 
+   * 
    */
   private $engagementLevel;
   
@@ -266,6 +288,7 @@ class Activity extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="weight", type="integer", nullable=true, options={"unsigned":true})
+   * 
    * 
    */
   private $weight;
@@ -752,6 +775,7 @@ class Activity extends \Civi\Core\Entity {
               'activity_id' => array(
       
         'name' => 'id',
+        'propertyName' => 'id',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Activity ID'),
                         'required' => true,
@@ -767,6 +791,7 @@ class Activity extends \Civi\Core\Entity {
               'source_record_id' => array(
       
         'name' => 'source_record_id',
+        'propertyName' => 'sourceRecordId',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Source Record'),
                                                      
@@ -776,6 +801,7 @@ class Activity extends \Civi\Core\Entity {
               'activity_type_id' => array(
       
         'name' => 'activity_type_id',
+        'propertyName' => 'activityTypeId',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Activity Type'),
                         'required' => true,
@@ -795,6 +821,7 @@ class Activity extends \Civi\Core\Entity {
               'activity_subject' => array(
       
         'name' => 'subject',
+        'propertyName' => 'subject',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Subject'),
                                  'maxlength' => 255,
@@ -811,6 +838,7 @@ class Activity extends \Civi\Core\Entity {
               'activity_date_time' => array(
       
         'name' => 'activity_date_time',
+        'propertyName' => 'activityDateTime',
         'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
                 'title' => ts('Activity Date'),
                                                      
@@ -825,6 +853,7 @@ class Activity extends \Civi\Core\Entity {
               'activity_duration' => array(
       
         'name' => 'duration',
+        'propertyName' => 'duration',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Duration'),
                                                      
@@ -839,6 +868,7 @@ class Activity extends \Civi\Core\Entity {
               'activity_location' => array(
       
         'name' => 'location',
+        'propertyName' => 'location',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Location'),
                                  'maxlength' => 255,
@@ -855,6 +885,7 @@ class Activity extends \Civi\Core\Entity {
               'phone_id' => array(
       
         'name' => 'phone_id',
+        'propertyName' => 'phone',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Phone (called) ID'),
                                                      
@@ -865,6 +896,7 @@ class Activity extends \Civi\Core\Entity {
               'phone_number' => array(
       
         'name' => 'phone_number',
+        'propertyName' => 'phoneNumber',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Phone (called) Number'),
                                  'maxlength' => 64,
@@ -876,9 +908,11 @@ class Activity extends \Civi\Core\Entity {
               'activity_details' => array(
       
         'name' => 'details',
+        'propertyName' => 'details',
         'type' => CRM_Utils_Type::T_TEXT,
                 'title' => ts('Details'),
-                                                   'rows' => 8,
+                                 'maxlength' => 65535,
+                                  'rows' => 8,
                          'cols' => 60,
          
                 'import' => true,
@@ -892,6 +926,7 @@ class Activity extends \Civi\Core\Entity {
               'activity_status_id' => array(
       
         'name' => 'status_id',
+        'propertyName' => 'statusId',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Activity Status'),
                                                      
@@ -909,6 +944,7 @@ class Activity extends \Civi\Core\Entity {
               'priority_id' => array(
       
         'name' => 'priority_id',
+        'propertyName' => 'priorityId',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Priority'),
                                                      
@@ -921,6 +957,7 @@ class Activity extends \Civi\Core\Entity {
               'parent_id' => array(
       
         'name' => 'parent_id',
+        'propertyName' => 'parent',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Parent Activity Id'),
                                                      
@@ -931,6 +968,7 @@ class Activity extends \Civi\Core\Entity {
               'activity_is_test' => array(
       
         'name' => 'is_test',
+        'propertyName' => 'isTest',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('Test'),
                                                      
@@ -945,6 +983,7 @@ class Activity extends \Civi\Core\Entity {
               'activity_medium_id' => array(
       
         'name' => 'medium_id',
+        'propertyName' => 'mediumId',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Activity Medium'),
                                                      
@@ -958,6 +997,7 @@ class Activity extends \Civi\Core\Entity {
               'is_auto' => array(
       
         'name' => 'is_auto',
+        'propertyName' => 'isAuto',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('Auto'),
                                                      
@@ -967,6 +1007,7 @@ class Activity extends \Civi\Core\Entity {
               'relationship_id' => array(
       
         'name' => 'relationship_id',
+        'propertyName' => 'relationship',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Relationship Id'),
                                                      
@@ -978,6 +1019,7 @@ class Activity extends \Civi\Core\Entity {
               'is_current_revision' => array(
       
         'name' => 'is_current_revision',
+        'propertyName' => 'isCurrentRevision',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('Is this activity a current revision in versioning chain?'),
                                                      
@@ -993,6 +1035,7 @@ class Activity extends \Civi\Core\Entity {
               'original_id' => array(
       
         'name' => 'original_id',
+        'propertyName' => 'original',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Original Activity ID '),
                                                      
@@ -1003,6 +1046,7 @@ class Activity extends \Civi\Core\Entity {
               'activity_result' => array(
       
         'name' => 'result',
+        'propertyName' => 'result',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Result'),
                                  'maxlength' => 255,
@@ -1014,6 +1058,7 @@ class Activity extends \Civi\Core\Entity {
               'activity_is_deleted' => array(
       
         'name' => 'is_deleted',
+        'propertyName' => 'isDeleted',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('Activity is in the Trash'),
                                                      
@@ -1028,6 +1073,7 @@ class Activity extends \Civi\Core\Entity {
               'activity_campaign_id' => array(
       
         'name' => 'campaign_id',
+        'propertyName' => 'campaign',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Campaign'),
                                                      
@@ -1048,6 +1094,7 @@ class Activity extends \Civi\Core\Entity {
               'activity_engagement_level' => array(
       
         'name' => 'engagement_level',
+        'propertyName' => 'engagementLevel',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Engagement Index'),
                                                      
@@ -1065,6 +1112,7 @@ class Activity extends \Civi\Core\Entity {
               'weight' => array(
       
         'name' => 'weight',
+        'propertyName' => 'weight',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Weight'),
                                                      

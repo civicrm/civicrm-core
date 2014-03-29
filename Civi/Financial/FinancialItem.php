@@ -69,6 +69,7 @@ class FinancialItem extends \Civi\Core\Entity {
    * @JMS\Type("datetime")
    * @ORM\Column(name="created_date", type="datetime", nullable=false)
    * 
+   * 1
    */
   private $createdDate = 'CURRENT_TIMESTAMP';
   
@@ -77,6 +78,7 @@ class FinancialItem extends \Civi\Core\Entity {
    *
    * @JMS\Type("datetime")
    * @ORM\Column(name="transaction_date", type="datetime", nullable=true)
+   * 
    * 
    */
   private $transactionDate;
@@ -87,6 +89,7 @@ class FinancialItem extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Contact")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="contact_id", referencedColumnName="id", onDelete="CASCADE")})
+   * 
    */
   private $contact;
   
@@ -95,6 +98,7 @@ class FinancialItem extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="description", type="string", length=255, nullable=true)
+   * 
    * 
    */
   private $description;
@@ -105,6 +109,7 @@ class FinancialItem extends \Civi\Core\Entity {
    * @JMS\Type("float")
    * @ORM\Column(name="amount", type="float", nullable=false)
    * 
+   * 
    */
   private $amount = '0';
   
@@ -113,6 +118,7 @@ class FinancialItem extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="currency", type="string", length=3, nullable=true)
+   * 
    * 
    */
   private $currency;
@@ -123,6 +129,7 @@ class FinancialItem extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Financial\FinancialAccount")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="financial_account_id", referencedColumnName="id")})
+   * 
    */
   private $financialAccount;
   
@@ -131,6 +138,7 @@ class FinancialItem extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="status_id", type="integer", nullable=true, options={"unsigned":true})
+   * 
    * 
    */
   private $statusId;
@@ -141,6 +149,7 @@ class FinancialItem extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="entity_table", type="string", length=64, nullable=true)
    * 
+   * 
    */
   private $entityTable;
   
@@ -149,6 +158,7 @@ class FinancialItem extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="entity_id", type="integer", nullable=true, options={"unsigned":true})
+   * 
    * 
    */
   private $entityId;
@@ -375,6 +385,7 @@ class FinancialItem extends \Civi\Core\Entity {
               'id' => array(
       
         'name' => 'id',
+        'propertyName' => 'id',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -384,6 +395,7 @@ class FinancialItem extends \Civi\Core\Entity {
               'created_date' => array(
       
         'name' => 'created_date',
+        'propertyName' => 'createdDate',
         'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
                 'title' => ts('Created Date'),
                         'required' => true,
@@ -395,6 +407,7 @@ class FinancialItem extends \Civi\Core\Entity {
               'transaction_date' => array(
       
         'name' => 'transaction_date',
+        'propertyName' => 'transactionDate',
         'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
                 'title' => ts('Transaction Date'),
                         'required' => true,
@@ -405,6 +418,7 @@ class FinancialItem extends \Civi\Core\Entity {
               'contact_id' => array(
       
         'name' => 'contact_id',
+        'propertyName' => 'contact',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -419,6 +433,7 @@ class FinancialItem extends \Civi\Core\Entity {
               'description' => array(
       
         'name' => 'description',
+        'propertyName' => 'description',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Description'),
                                  'maxlength' => 255,
@@ -430,6 +445,7 @@ class FinancialItem extends \Civi\Core\Entity {
               'amount' => array(
       
         'name' => 'amount',
+        'propertyName' => 'amount',
         'type' => CRM_Utils_Type::T_MONEY,
                 'title' => ts('Amount'),
                         'required' => true,
@@ -440,6 +456,7 @@ class FinancialItem extends \Civi\Core\Entity {
               'currency' => array(
       
         'name' => 'currency',
+        'propertyName' => 'currency',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Currency'),
                                  'maxlength' => 3,
@@ -461,6 +478,7 @@ class FinancialItem extends \Civi\Core\Entity {
               'financial_account_id' => array(
       
         'name' => 'financial_account_id',
+        'propertyName' => 'financialAccount',
         'type' => CRM_Utils_Type::T_INT,
                                                      
                                     
@@ -475,6 +493,7 @@ class FinancialItem extends \Civi\Core\Entity {
               'status_id' => array(
       
         'name' => 'status_id',
+        'propertyName' => 'statusId',
         'type' => CRM_Utils_Type::T_INT,
                                                      
                          'export' => true,
@@ -490,6 +509,7 @@ class FinancialItem extends \Civi\Core\Entity {
               'entity_table' => array(
       
         'name' => 'entity_table',
+        'propertyName' => 'entityTable',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Entity Table'),
                                  'maxlength' => 64,
@@ -501,6 +521,7 @@ class FinancialItem extends \Civi\Core\Entity {
               'entity_id' => array(
       
         'name' => 'entity_id',
+        'propertyName' => 'entityId',
         'type' => CRM_Utils_Type::T_INT,
                                                      
                                     

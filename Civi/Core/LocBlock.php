@@ -69,6 +69,7 @@ class LocBlock extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\Address")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="address_id", referencedColumnName="id", onDelete="SET NULL")})
+   * 
    */
   private $address;
   
@@ -78,6 +79,7 @@ class LocBlock extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\Email")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="email_id", referencedColumnName="id", onDelete="SET NULL")})
+   * 
    */
   private $email;
   
@@ -87,6 +89,7 @@ class LocBlock extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\Phone")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="phone_id", referencedColumnName="id", onDelete="SET NULL")})
+   * 
    */
   private $phone;
   
@@ -96,6 +99,7 @@ class LocBlock extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\IM")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="im_id", referencedColumnName="id", onDelete="SET NULL")})
+   * 
    */
   private $im;
   
@@ -105,6 +109,7 @@ class LocBlock extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\Address")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="address_2_id", referencedColumnName="id", onDelete="SET NULL")})
+   * 
    */
   private $address2;
   
@@ -114,6 +119,7 @@ class LocBlock extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\Email")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="email_2_id", referencedColumnName="id", onDelete="SET NULL")})
+   * 
    */
   private $email2;
   
@@ -123,6 +129,7 @@ class LocBlock extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\Phone")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="phone_2_id", referencedColumnName="id", onDelete="SET NULL")})
+   * 
    */
   private $phone2;
   
@@ -132,6 +139,7 @@ class LocBlock extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\IM")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="im_2_id", referencedColumnName="id", onDelete="SET NULL")})
+   * 
    */
   private $im2;
 
@@ -317,6 +325,7 @@ class LocBlock extends \Civi\Core\Entity {
               'id' => array(
       
         'name' => 'id',
+        'propertyName' => 'id',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -326,6 +335,7 @@ class LocBlock extends \Civi\Core\Entity {
               'address_id' => array(
       
         'name' => 'address_id',
+        'propertyName' => 'address',
         'type' => CRM_Utils_Type::T_INT,
                                                      
                                     
@@ -335,6 +345,7 @@ class LocBlock extends \Civi\Core\Entity {
               'email_id' => array(
       
         'name' => 'email_id',
+        'propertyName' => 'email',
         'type' => CRM_Utils_Type::T_INT,
                                                      
                                     
@@ -344,6 +355,7 @@ class LocBlock extends \Civi\Core\Entity {
               'phone_id' => array(
       
         'name' => 'phone_id',
+        'propertyName' => 'phone',
         'type' => CRM_Utils_Type::T_INT,
                                                      
                                     
@@ -353,6 +365,7 @@ class LocBlock extends \Civi\Core\Entity {
               'im_id' => array(
       
         'name' => 'im_id',
+        'propertyName' => 'im',
         'type' => CRM_Utils_Type::T_INT,
                                                      
                                     
@@ -362,6 +375,7 @@ class LocBlock extends \Civi\Core\Entity {
               'address_2_id' => array(
       
         'name' => 'address_2_id',
+        'propertyName' => 'address2',
         'type' => CRM_Utils_Type::T_INT,
                                                      
                                     
@@ -371,6 +385,7 @@ class LocBlock extends \Civi\Core\Entity {
               'email_2_id' => array(
       
         'name' => 'email_2_id',
+        'propertyName' => 'email2',
         'type' => CRM_Utils_Type::T_INT,
                                                      
                                     
@@ -380,6 +395,7 @@ class LocBlock extends \Civi\Core\Entity {
               'phone_2_id' => array(
       
         'name' => 'phone_2_id',
+        'propertyName' => 'phone2',
         'type' => CRM_Utils_Type::T_INT,
                                                      
                                     
@@ -389,6 +405,7 @@ class LocBlock extends \Civi\Core\Entity {
               'im_2_id' => array(
       
         'name' => 'im_2_id',
+        'propertyName' => 'im2',
         'type' => CRM_Utils_Type::T_INT,
                                                      
                                     

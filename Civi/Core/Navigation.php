@@ -69,6 +69,7 @@ class Navigation extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\Domain")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="domain_id", referencedColumnName="id")})
+   * 
    */
   private $domain;
   
@@ -77,6 +78,7 @@ class Navigation extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="label", type="string", length=255, nullable=true)
+   * 
    * 
    */
   private $label;
@@ -87,6 +89,7 @@ class Navigation extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="name", type="string", length=255, nullable=true)
    * 
+   * 
    */
   private $name;
   
@@ -95,6 +98,7 @@ class Navigation extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="url", type="string", length=255, nullable=true)
+   * 
    * 
    */
   private $url;
@@ -105,6 +109,7 @@ class Navigation extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="permission", type="string", length=255, nullable=true)
    * 
+   * 
    */
   private $permission;
   
@@ -113,6 +118,7 @@ class Navigation extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="permission_operator", type="string", length=3, nullable=true)
+   * 
    * 
    */
   private $permissionOperator;
@@ -123,6 +129,7 @@ class Navigation extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\Navigation")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="parent_id", referencedColumnName="id", onDelete="CASCADE")})
+   * 
    */
   private $parent;
   
@@ -131,6 +138,7 @@ class Navigation extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_active", type="boolean", nullable=true)
+   * 
    * 
    */
   private $isActive;
@@ -141,6 +149,7 @@ class Navigation extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="has_separator", type="boolean", nullable=true)
    * 
+   * 
    */
   private $hasSeparator;
   
@@ -149,6 +158,7 @@ class Navigation extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="weight", type="integer", nullable=true, options={"unsigned":true})
+   * 
    * 
    */
   private $weight;
@@ -375,6 +385,7 @@ class Navigation extends \Civi\Core\Entity {
               'id' => array(
       
         'name' => 'id',
+        'propertyName' => 'id',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -384,6 +395,7 @@ class Navigation extends \Civi\Core\Entity {
               'domain_id' => array(
       
         'name' => 'domain_id',
+        'propertyName' => 'domain',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -394,6 +406,7 @@ class Navigation extends \Civi\Core\Entity {
               'label' => array(
       
         'name' => 'label',
+        'propertyName' => 'label',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Label'),
                                  'maxlength' => 255,
@@ -405,6 +418,7 @@ class Navigation extends \Civi\Core\Entity {
               'name' => array(
       
         'name' => 'name',
+        'propertyName' => 'name',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Name'),
                                  'maxlength' => 255,
@@ -416,6 +430,7 @@ class Navigation extends \Civi\Core\Entity {
               'url' => array(
       
         'name' => 'url',
+        'propertyName' => 'url',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Url'),
                                  'maxlength' => 255,
@@ -427,6 +442,7 @@ class Navigation extends \Civi\Core\Entity {
               'permission' => array(
       
         'name' => 'permission',
+        'propertyName' => 'permission',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Permission'),
                                  'maxlength' => 255,
@@ -438,6 +454,7 @@ class Navigation extends \Civi\Core\Entity {
               'permission_operator' => array(
       
         'name' => 'permission_operator',
+        'propertyName' => 'permissionOperator',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Permission Operator'),
                                  'maxlength' => 3,
@@ -449,6 +466,7 @@ class Navigation extends \Civi\Core\Entity {
               'parent_id' => array(
       
         'name' => 'parent_id',
+        'propertyName' => 'parent',
         'type' => CRM_Utils_Type::T_INT,
                                                      
                                     
@@ -458,6 +476,7 @@ class Navigation extends \Civi\Core\Entity {
               'is_active' => array(
       
         'name' => 'is_active',
+        'propertyName' => 'isActive',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                                                      
                                     
@@ -466,6 +485,7 @@ class Navigation extends \Civi\Core\Entity {
               'has_separator' => array(
       
         'name' => 'has_separator',
+        'propertyName' => 'hasSeparator',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('Has Separator'),
                                                      
@@ -475,6 +495,7 @@ class Navigation extends \Civi\Core\Entity {
               'weight' => array(
       
         'name' => 'weight',
+        'propertyName' => 'weight',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Weight'),
                                                      

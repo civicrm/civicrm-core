@@ -69,6 +69,7 @@ class BouncePattern extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Mailing\BounceType")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="bounce_type_id", referencedColumnName="id", onDelete="CASCADE")})
+   * 
    */
   private $bounceType;
   
@@ -77,6 +78,7 @@ class BouncePattern extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="pattern", type="string", length=255, nullable=true)
+   * 
    * 
    */
   private $pattern;
@@ -143,6 +145,7 @@ class BouncePattern extends \Civi\Core\Entity {
               'id' => array(
       
         'name' => 'id',
+        'propertyName' => 'id',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -152,6 +155,7 @@ class BouncePattern extends \Civi\Core\Entity {
               'bounce_type_id' => array(
       
         'name' => 'bounce_type_id',
+        'propertyName' => 'bounceType',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -162,6 +166,7 @@ class BouncePattern extends \Civi\Core\Entity {
               'pattern' => array(
       
         'name' => 'pattern',
+        'propertyName' => 'pattern',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Pattern'),
                                  'maxlength' => 255,

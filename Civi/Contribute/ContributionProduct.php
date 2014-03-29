@@ -69,6 +69,7 @@ class ContributionProduct extends \Civi\Core\Entity {
    * @JMS\Type("integer")
    * @ORM\Column(name="product_id", type="integer", nullable=true, options={"unsigned":true})
    * 
+   * 
    */
   private $productId;
   
@@ -78,6 +79,7 @@ class ContributionProduct extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Contribute\Contribution")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="contribution_id", referencedColumnName="id", onDelete="CASCADE")})
+   * 
    */
   private $contribution;
   
@@ -86,6 +88,7 @@ class ContributionProduct extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="product_option", type="string", length=255, nullable=true)
+   * 
    * 
    */
   private $productOption;
@@ -96,6 +99,7 @@ class ContributionProduct extends \Civi\Core\Entity {
    * @JMS\Type("integer")
    * @ORM\Column(name="quantity", type="integer", nullable=true, options={"unsigned":true})
    * 
+   * 
    */
   private $quantity;
   
@@ -104,6 +108,7 @@ class ContributionProduct extends \Civi\Core\Entity {
    *
    * @JMS\Type("date")
    * @ORM\Column(name="fulfilled_date", type="date", nullable=true)
+   * 
    * 
    */
   private $fulfilledDate;
@@ -114,6 +119,7 @@ class ContributionProduct extends \Civi\Core\Entity {
    * @JMS\Type("date")
    * @ORM\Column(name="start_date", type="date", nullable=true)
    * 
+   * 
    */
   private $startDate;
   
@@ -123,6 +129,7 @@ class ContributionProduct extends \Civi\Core\Entity {
    * @JMS\Type("date")
    * @ORM\Column(name="end_date", type="date", nullable=true)
    * 
+   * 
    */
   private $endDate;
   
@@ -130,7 +137,8 @@ class ContributionProduct extends \Civi\Core\Entity {
    * @var text
    *
    * @JMS\Type("text")
-   * @ORM\Column(name="comment", type="text", nullable=true)
+   * @ORM\Column(name="comment", type="text", length=65535, nullable=true)
+   * 
    * 
    */
   private $comment;
@@ -141,6 +149,7 @@ class ContributionProduct extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Financial\FinancialType")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="financial_type_id", referencedColumnName="id", onDelete="SET NULL")})
+   * 
    */
   private $financialType = 'NULL';
 
@@ -346,6 +355,7 @@ class ContributionProduct extends \Civi\Core\Entity {
               'id' => array(
       
         'name' => 'id',
+        'propertyName' => 'id',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -355,6 +365,7 @@ class ContributionProduct extends \Civi\Core\Entity {
               'product_id' => array(
       
         'name' => 'product_id',
+        'propertyName' => 'productId',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -364,6 +375,7 @@ class ContributionProduct extends \Civi\Core\Entity {
               'contribution_id' => array(
       
         'name' => 'contribution_id',
+        'propertyName' => 'contribution',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -374,6 +386,7 @@ class ContributionProduct extends \Civi\Core\Entity {
               'product_option' => array(
       
         'name' => 'product_option',
+        'propertyName' => 'productOption',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Product Option'),
                                  'maxlength' => 255,
@@ -389,6 +402,7 @@ class ContributionProduct extends \Civi\Core\Entity {
               'quantity' => array(
       
         'name' => 'quantity',
+        'propertyName' => 'quantity',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Quantity'),
                                                      
@@ -402,6 +416,7 @@ class ContributionProduct extends \Civi\Core\Entity {
               'fulfilled_date' => array(
       
         'name' => 'fulfilled_date',
+        'propertyName' => 'fulfilledDate',
         'type' => CRM_Utils_Type::T_DATE,
                 'title' => ts('Fulfilled Date'),
                                                      
@@ -415,6 +430,7 @@ class ContributionProduct extends \Civi\Core\Entity {
               'contribution_start_date' => array(
       
         'name' => 'start_date',
+        'propertyName' => 'startDate',
         'type' => CRM_Utils_Type::T_DATE,
                 'title' => ts('Start Date'),
                                                      
@@ -428,6 +444,7 @@ class ContributionProduct extends \Civi\Core\Entity {
               'contribution_end_date' => array(
       
         'name' => 'end_date',
+        'propertyName' => 'endDate',
         'type' => CRM_Utils_Type::T_DATE,
                 'title' => ts('End Date'),
                                                      
@@ -441,15 +458,18 @@ class ContributionProduct extends \Civi\Core\Entity {
               'comment' => array(
       
         'name' => 'comment',
+        'propertyName' => 'comment',
         'type' => CRM_Utils_Type::T_TEXT,
                 'title' => ts('Comment'),
-                                                     
+                                 'maxlength' => 65535,
+                                    
                                     
                           ),
       
               'financial_type_id' => array(
       
         'name' => 'financial_type_id',
+        'propertyName' => 'financialType',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Financial Type'),
                                                      

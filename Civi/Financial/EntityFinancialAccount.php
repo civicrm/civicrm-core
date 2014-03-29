@@ -69,6 +69,7 @@ class EntityFinancialAccount extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="entity_table", type="string", length=64, nullable=true)
    * 
+   * 
    */
   private $entityTable;
   
@@ -77,6 +78,7 @@ class EntityFinancialAccount extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="entity_id", type="integer", nullable=true, options={"unsigned":true})
+   * 
    * 
    */
   private $entityId;
@@ -87,6 +89,7 @@ class EntityFinancialAccount extends \Civi\Core\Entity {
    * @JMS\Type("integer")
    * @ORM\Column(name="account_relationship", type="integer", nullable=true, options={"unsigned":true})
    * 
+   * 
    */
   private $accountRelationship;
   
@@ -96,6 +99,7 @@ class EntityFinancialAccount extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Financial\FinancialAccount")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="financial_account_id", referencedColumnName="id", onDelete="RESTRICT")})
+   * 
    */
   private $financialAccount;
 
@@ -201,6 +205,7 @@ class EntityFinancialAccount extends \Civi\Core\Entity {
               'id' => array(
       
         'name' => 'id',
+        'propertyName' => 'id',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -210,6 +215,7 @@ class EntityFinancialAccount extends \Civi\Core\Entity {
               'entity_table' => array(
       
         'name' => 'entity_table',
+        'propertyName' => 'entityTable',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Entity Table'),
                         'required' => true,
@@ -227,6 +233,7 @@ class EntityFinancialAccount extends \Civi\Core\Entity {
               'entity_id' => array(
       
         'name' => 'entity_id',
+        'propertyName' => 'entityId',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -236,6 +243,7 @@ class EntityFinancialAccount extends \Civi\Core\Entity {
               'account_relationship' => array(
       
         'name' => 'account_relationship',
+        'propertyName' => 'accountRelationship',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Account Relationship'),
                         'required' => true,
@@ -249,6 +257,7 @@ class EntityFinancialAccount extends \Civi\Core\Entity {
               'financial_account_id' => array(
       
         'name' => 'financial_account_id',
+        'propertyName' => 'financialAccount',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              

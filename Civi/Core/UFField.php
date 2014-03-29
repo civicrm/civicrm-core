@@ -69,6 +69,7 @@ class UFField extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\UFGroup")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="uf_group_id", referencedColumnName="id", onDelete="CASCADE")})
+   * 
    */
   private $ufGroup;
   
@@ -77,6 +78,7 @@ class UFField extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="field_name", type="string", length=64, nullable=true)
+   * 
    * 
    */
   private $fieldName;
@@ -87,6 +89,7 @@ class UFField extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_active", type="boolean", nullable=false)
    * 
+   * 
    */
   private $isActive = '1';
   
@@ -95,6 +98,7 @@ class UFField extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_view", type="boolean", nullable=false)
+   * 
    * 
    */
   private $isView = '0';
@@ -105,6 +109,7 @@ class UFField extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_required", type="boolean", nullable=false)
    * 
+   * 
    */
   private $isRequired = '0';
   
@@ -114,6 +119,7 @@ class UFField extends \Civi\Core\Entity {
    * @JMS\Type("integer")
    * @ORM\Column(name="weight", type="integer", nullable=false, options={"unsigned":true})
    * 
+   * 
    */
   private $weight = '1';
   
@@ -121,7 +127,8 @@ class UFField extends \Civi\Core\Entity {
    * @var text
    *
    * @JMS\Type("text")
-   * @ORM\Column(name="help_post", type="text", nullable=true)
+   * @ORM\Column(name="help_post", type="text", length=65535, nullable=true)
+   * 
    * 
    */
   private $helpPost;
@@ -130,7 +137,8 @@ class UFField extends \Civi\Core\Entity {
    * @var text
    *
    * @JMS\Type("text")
-   * @ORM\Column(name="help_pre", type="text", nullable=true)
+   * @ORM\Column(name="help_pre", type="text", length=65535, nullable=true)
+   * 
    * 
    */
   private $helpPre;
@@ -141,6 +149,7 @@ class UFField extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="visibility", type="string", length=32, nullable=false)
    * 
+   * 
    */
   private $visibility = 'User and User Admin Only';
   
@@ -149,6 +158,7 @@ class UFField extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="in_selector", type="boolean", nullable=false)
+   * 
    * 
    */
   private $inSelector = '0';
@@ -159,6 +169,7 @@ class UFField extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_searchable", type="boolean", nullable=false)
    * 
+   * 
    */
   private $isSearchable = '0';
   
@@ -168,6 +179,7 @@ class UFField extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\LocationType")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="location_type_id", referencedColumnName="id", onDelete="SET NULL")})
+   * 
    */
   private $locationType;
   
@@ -176,6 +188,7 @@ class UFField extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="phone_type_id", type="integer", nullable=true, options={"unsigned":true})
+   * 
    * 
    */
   private $phoneTypeId;
@@ -186,6 +199,7 @@ class UFField extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="label", type="string", length=255, nullable=true)
    * 
+   * 
    */
   private $label;
   
@@ -194,6 +208,7 @@ class UFField extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="field_type", type="string", length=255, nullable=true)
+   * 
    * 
    */
   private $fieldType;
@@ -204,6 +219,7 @@ class UFField extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_reserved", type="boolean", nullable=true)
    * 
+   * 
    */
   private $isReserved;
   
@@ -212,6 +228,7 @@ class UFField extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_multi_summary", type="boolean", nullable=false)
+   * 
    * 
    */
   private $isMultiSummary = '0';
@@ -578,6 +595,7 @@ class UFField extends \Civi\Core\Entity {
               'id' => array(
       
         'name' => 'id',
+        'propertyName' => 'id',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -587,6 +605,7 @@ class UFField extends \Civi\Core\Entity {
               'uf_group_id' => array(
       
         'name' => 'uf_group_id',
+        'propertyName' => 'ufGroup',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -602,6 +621,7 @@ class UFField extends \Civi\Core\Entity {
               'field_name' => array(
       
         'name' => 'field_name',
+        'propertyName' => 'fieldName',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Field Name'),
                         'required' => true,
@@ -614,6 +634,7 @@ class UFField extends \Civi\Core\Entity {
               'is_active' => array(
       
         'name' => 'is_active',
+        'propertyName' => 'isActive',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                                                      
                                            'default' => '1',
@@ -623,6 +644,7 @@ class UFField extends \Civi\Core\Entity {
               'is_view' => array(
       
         'name' => 'is_view',
+        'propertyName' => 'isView',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                                                      
                                     
@@ -631,6 +653,7 @@ class UFField extends \Civi\Core\Entity {
               'is_required' => array(
       
         'name' => 'is_required',
+        'propertyName' => 'isRequired',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                                                      
                                     
@@ -639,6 +662,7 @@ class UFField extends \Civi\Core\Entity {
               'weight' => array(
       
         'name' => 'weight',
+        'propertyName' => 'weight',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Weight'),
                         'required' => true,
@@ -650,24 +674,29 @@ class UFField extends \Civi\Core\Entity {
               'help_post' => array(
       
         'name' => 'help_post',
+        'propertyName' => 'helpPost',
         'type' => CRM_Utils_Type::T_TEXT,
                 'title' => ts('Help Post'),
-                                                     
+                                 'maxlength' => 65535,
+                                    
                                     
                           ),
       
               'help_pre' => array(
       
         'name' => 'help_pre',
+        'propertyName' => 'helpPre',
         'type' => CRM_Utils_Type::T_TEXT,
                 'title' => ts('Help Pre'),
-                                                     
+                                 'maxlength' => 65535,
+                                    
                                     
                           ),
       
               'visibility' => array(
       
         'name' => 'visibility',
+        'propertyName' => 'visibility',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Visibility'),
                                  'maxlength' => 32,
@@ -683,6 +712,7 @@ class UFField extends \Civi\Core\Entity {
               'in_selector' => array(
       
         'name' => 'in_selector',
+        'propertyName' => 'inSelector',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('In Selector'),
                                                      
@@ -692,6 +722,7 @@ class UFField extends \Civi\Core\Entity {
               'is_searchable' => array(
       
         'name' => 'is_searchable',
+        'propertyName' => 'isSearchable',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                                                      
                                     
@@ -700,6 +731,7 @@ class UFField extends \Civi\Core\Entity {
               'location_type_id' => array(
       
         'name' => 'location_type_id',
+        'propertyName' => 'locationType',
         'type' => CRM_Utils_Type::T_INT,
                                                      
                                     
@@ -709,6 +741,7 @@ class UFField extends \Civi\Core\Entity {
               'phone_type_id' => array(
       
         'name' => 'phone_type_id',
+        'propertyName' => 'phoneTypeId',
         'type' => CRM_Utils_Type::T_INT,
                                                      
                                     
@@ -717,6 +750,7 @@ class UFField extends \Civi\Core\Entity {
               'label' => array(
       
         'name' => 'label',
+        'propertyName' => 'label',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Label'),
                         'required' => true,
@@ -729,6 +763,7 @@ class UFField extends \Civi\Core\Entity {
               'field_type' => array(
       
         'name' => 'field_type',
+        'propertyName' => 'fieldType',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Field Type'),
                                  'maxlength' => 255,
@@ -740,6 +775,7 @@ class UFField extends \Civi\Core\Entity {
               'is_reserved' => array(
       
         'name' => 'is_reserved',
+        'propertyName' => 'isReserved',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                                                      
                                     
@@ -748,6 +784,7 @@ class UFField extends \Civi\Core\Entity {
               'is_multi_summary' => array(
       
         'name' => 'is_multi_summary',
+        'propertyName' => 'isMultiSummary',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                                                      
                                     

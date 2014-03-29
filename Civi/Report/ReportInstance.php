@@ -69,6 +69,7 @@ class ReportInstance extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\Domain")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="domain_id", referencedColumnName="id")})
+   * 
    */
   private $domain;
   
@@ -77,6 +78,7 @@ class ReportInstance extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="title", type="string", length=255, nullable=true)
+   * 
    * 
    */
   private $title;
@@ -87,6 +89,7 @@ class ReportInstance extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="report_id", type="string", length=64, nullable=true)
    * 
+   * 
    */
   private $reportId;
   
@@ -95,6 +98,7 @@ class ReportInstance extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="name", type="string", length=255, nullable=true)
+   * 
    * 
    */
   private $name;
@@ -105,6 +109,7 @@ class ReportInstance extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="args", type="string", length=255, nullable=true)
    * 
+   * 
    */
   private $args;
   
@@ -113,6 +118,7 @@ class ReportInstance extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="description", type="string", length=255, nullable=true)
+   * 
    * 
    */
   private $description;
@@ -123,6 +129,7 @@ class ReportInstance extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="permission", type="string", length=255, nullable=true)
    * 
+   * 
    */
   private $permission;
   
@@ -132,6 +139,7 @@ class ReportInstance extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="grouprole", type="string", length=1024, nullable=true)
    * 
+   * 
    */
   private $grouprole;
   
@@ -139,7 +147,8 @@ class ReportInstance extends \Civi\Core\Entity {
    * @var text
    *
    * @JMS\Type("text")
-   * @ORM\Column(name="form_values", type="text", nullable=true)
+   * @ORM\Column(name="form_values", type="text", length=65535, nullable=true)
+   * 
    * 
    */
   private $formValues;
@@ -150,6 +159,7 @@ class ReportInstance extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_active", type="boolean", nullable=true)
    * 
+   * 
    */
   private $isActive;
   
@@ -159,6 +169,7 @@ class ReportInstance extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="email_subject", type="string", length=255, nullable=true)
    * 
+   * 
    */
   private $emailSubject;
   
@@ -166,7 +177,8 @@ class ReportInstance extends \Civi\Core\Entity {
    * @var text
    *
    * @JMS\Type("text")
-   * @ORM\Column(name="email_to", type="text", nullable=true)
+   * @ORM\Column(name="email_to", type="text", length=65535, nullable=true)
+   * 
    * 
    */
   private $emailTo;
@@ -175,7 +187,8 @@ class ReportInstance extends \Civi\Core\Entity {
    * @var text
    *
    * @JMS\Type("text")
-   * @ORM\Column(name="email_cc", type="text", nullable=true)
+   * @ORM\Column(name="email_cc", type="text", length=65535, nullable=true)
+   * 
    * 
    */
   private $emailCc;
@@ -184,7 +197,8 @@ class ReportInstance extends \Civi\Core\Entity {
    * @var text
    *
    * @JMS\Type("text")
-   * @ORM\Column(name="header", type="text", nullable=true)
+   * @ORM\Column(name="header", type="text", length=65535, nullable=true)
+   * 
    * 
    */
   private $header;
@@ -193,7 +207,8 @@ class ReportInstance extends \Civi\Core\Entity {
    * @var text
    *
    * @JMS\Type("text")
-   * @ORM\Column(name="footer", type="text", nullable=true)
+   * @ORM\Column(name="footer", type="text", length=65535, nullable=true)
+   * 
    * 
    */
   private $footer;
@@ -204,6 +219,7 @@ class ReportInstance extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\Navigation")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="navigation_id", referencedColumnName="id", onDelete="SET NULL")})
+   * 
    */
   private $navigation;
   
@@ -213,6 +229,7 @@ class ReportInstance extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Report\ReportInstance")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="drilldown_id", referencedColumnName="id", onDelete="SET NULL")})
+   * 
    */
   private $drilldown;
   
@@ -221,6 +238,7 @@ class ReportInstance extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_reserved", type="boolean", nullable=false)
+   * 
    * 
    */
   private $isReserved = '0';
@@ -607,6 +625,7 @@ class ReportInstance extends \Civi\Core\Entity {
               'id' => array(
       
         'name' => 'id',
+        'propertyName' => 'id',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Report Instance ID'),
                         'required' => true,
@@ -617,6 +636,7 @@ class ReportInstance extends \Civi\Core\Entity {
               'domain_id' => array(
       
         'name' => 'domain_id',
+        'propertyName' => 'domain',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Report Instance Domain ID'),
                         'required' => true,
@@ -628,6 +648,7 @@ class ReportInstance extends \Civi\Core\Entity {
               'title' => array(
       
         'name' => 'title',
+        'propertyName' => 'title',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Report Instance Title'),
                                  'maxlength' => 255,
@@ -639,6 +660,7 @@ class ReportInstance extends \Civi\Core\Entity {
               'report_id' => array(
       
         'name' => 'report_id',
+        'propertyName' => 'reportId',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Report template ID'),
                         'required' => true,
@@ -651,6 +673,7 @@ class ReportInstance extends \Civi\Core\Entity {
               'name' => array(
       
         'name' => 'name',
+        'propertyName' => 'name',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Report instance Name'),
                                  'maxlength' => 255,
@@ -662,6 +685,7 @@ class ReportInstance extends \Civi\Core\Entity {
               'args' => array(
       
         'name' => 'args',
+        'propertyName' => 'args',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Report Instance Arguments'),
                                  'maxlength' => 255,
@@ -673,6 +697,7 @@ class ReportInstance extends \Civi\Core\Entity {
               'description' => array(
       
         'name' => 'description',
+        'propertyName' => 'description',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Report Instance description'),
                                  'maxlength' => 255,
@@ -684,6 +709,7 @@ class ReportInstance extends \Civi\Core\Entity {
               'permission' => array(
       
         'name' => 'permission',
+        'propertyName' => 'permission',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Report Instance Permissions'),
                                  'maxlength' => 255,
@@ -695,6 +721,7 @@ class ReportInstance extends \Civi\Core\Entity {
               'grouprole' => array(
       
         'name' => 'grouprole',
+        'propertyName' => 'grouprole',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Report Instance Assigned to Roles'),
                                  'maxlength' => 1024,
@@ -706,9 +733,11 @@ class ReportInstance extends \Civi\Core\Entity {
               'form_values' => array(
       
         'name' => 'form_values',
+        'propertyName' => 'formValues',
         'type' => CRM_Utils_Type::T_TEXT,
                 'title' => ts('Submitted Form Values'),
-                                                     
+                                 'maxlength' => 65535,
+                                    
                 'import' => true,
         'where' => 'civicrm_report_instance.form_values',
         'headerPattern' => '',
@@ -720,6 +749,7 @@ class ReportInstance extends \Civi\Core\Entity {
               'is_active' => array(
       
         'name' => 'is_active',
+        'propertyName' => 'isActive',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('Report Instance is Active'),
                                                      
@@ -729,6 +759,7 @@ class ReportInstance extends \Civi\Core\Entity {
               'email_subject' => array(
       
         'name' => 'email_subject',
+        'propertyName' => 'emailSubject',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Report Instance email Subject'),
                                  'maxlength' => 255,
@@ -740,27 +771,33 @@ class ReportInstance extends \Civi\Core\Entity {
               'email_to' => array(
       
         'name' => 'email_to',
+        'propertyName' => 'emailTo',
         'type' => CRM_Utils_Type::T_TEXT,
                 'title' => ts('Email Report Instance To'),
-                                                     
+                                 'maxlength' => 65535,
+                                    
                                     
                           ),
       
               'email_cc' => array(
       
         'name' => 'email_cc',
+        'propertyName' => 'emailCc',
         'type' => CRM_Utils_Type::T_TEXT,
                 'title' => ts('cc Email Report Instance To'),
-                                                     
+                                 'maxlength' => 65535,
+                                    
                                     
                           ),
       
               'header' => array(
       
         'name' => 'header',
+        'propertyName' => 'header',
         'type' => CRM_Utils_Type::T_TEXT,
                 'title' => ts('Report Instance Header'),
-                                                   'rows' => 4,
+                                 'maxlength' => 65535,
+                                  'rows' => 4,
                          'cols' => 60,
          
                                     
@@ -769,9 +806,11 @@ class ReportInstance extends \Civi\Core\Entity {
               'footer' => array(
       
         'name' => 'footer',
+        'propertyName' => 'footer',
         'type' => CRM_Utils_Type::T_TEXT,
                 'title' => ts('Report Instance Footer'),
-                                                   'rows' => 4,
+                                 'maxlength' => 65535,
+                                  'rows' => 4,
                          'cols' => 60,
          
                                     
@@ -780,6 +819,7 @@ class ReportInstance extends \Civi\Core\Entity {
               'navigation_id' => array(
       
         'name' => 'navigation_id',
+        'propertyName' => 'navigation',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Navigation ID'),
                                                      
@@ -795,6 +835,7 @@ class ReportInstance extends \Civi\Core\Entity {
               'drilldown_id' => array(
       
         'name' => 'drilldown_id',
+        'propertyName' => 'drilldown',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Drilldown Report ID'),
                                                      
@@ -810,6 +851,7 @@ class ReportInstance extends \Civi\Core\Entity {
               'is_reserved' => array(
       
         'name' => 'is_reserved',
+        'propertyName' => 'isReserved',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('Instance is Reserved'),
                                                      

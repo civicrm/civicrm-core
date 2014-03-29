@@ -69,6 +69,7 @@ class ParticipantStatusType extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="name", type="string", length=64, nullable=true)
    * 
+   * 
    */
   private $name;
   
@@ -77,6 +78,7 @@ class ParticipantStatusType extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="label", type="string", length=255, nullable=true)
+   * 
    * 
    */
   private $label;
@@ -87,6 +89,7 @@ class ParticipantStatusType extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="class", type="string", length=8, nullable=true)
    * 
+   * 
    */
   private $class;
   
@@ -95,6 +98,7 @@ class ParticipantStatusType extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_reserved", type="boolean", nullable=true)
+   * 
    * 
    */
   private $isReserved;
@@ -105,6 +109,7 @@ class ParticipantStatusType extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_active", type="boolean", nullable=false)
    * 
+   * 
    */
   private $isActive = '1';
   
@@ -113,6 +118,7 @@ class ParticipantStatusType extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_counted", type="boolean", nullable=true)
+   * 
    * 
    */
   private $isCounted;
@@ -123,6 +129,7 @@ class ParticipantStatusType extends \Civi\Core\Entity {
    * @JMS\Type("integer")
    * @ORM\Column(name="weight", type="integer", nullable=true, options={"unsigned":true})
    * 
+   * 
    */
   private $weight;
   
@@ -131,6 +138,7 @@ class ParticipantStatusType extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="visibility_id", type="integer", nullable=true, options={"unsigned":true})
+   * 
    * 
    */
   private $visibilityId;
@@ -317,6 +325,7 @@ class ParticipantStatusType extends \Civi\Core\Entity {
               'id' => array(
       
         'name' => 'id',
+        'propertyName' => 'id',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -326,6 +335,7 @@ class ParticipantStatusType extends \Civi\Core\Entity {
               'participant_status' => array(
       
         'name' => 'name',
+        'propertyName' => 'name',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Participant Status'),
                                  'maxlength' => 64,
@@ -342,6 +352,7 @@ class ParticipantStatusType extends \Civi\Core\Entity {
               'label' => array(
       
         'name' => 'label',
+        'propertyName' => 'label',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Label'),
                                  'maxlength' => 255,
@@ -353,6 +364,7 @@ class ParticipantStatusType extends \Civi\Core\Entity {
               'class' => array(
       
         'name' => 'class',
+        'propertyName' => 'class',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Class'),
                                  'maxlength' => 8,
@@ -367,6 +379,7 @@ class ParticipantStatusType extends \Civi\Core\Entity {
               'is_reserved' => array(
       
         'name' => 'is_reserved',
+        'propertyName' => 'isReserved',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                                                      
                                     
@@ -375,6 +388,7 @@ class ParticipantStatusType extends \Civi\Core\Entity {
               'is_active' => array(
       
         'name' => 'is_active',
+        'propertyName' => 'isActive',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                                                      
                                            'default' => '1',
@@ -384,6 +398,7 @@ class ParticipantStatusType extends \Civi\Core\Entity {
               'is_counted' => array(
       
         'name' => 'is_counted',
+        'propertyName' => 'isCounted',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                                                      
                                     
@@ -392,6 +407,7 @@ class ParticipantStatusType extends \Civi\Core\Entity {
               'weight' => array(
       
         'name' => 'weight',
+        'propertyName' => 'weight',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Weight'),
                         'required' => true,
@@ -402,6 +418,7 @@ class ParticipantStatusType extends \Civi\Core\Entity {
               'visibility_id' => array(
       
         'name' => 'visibility_id',
+        'propertyName' => 'visibilityId',
         'type' => CRM_Utils_Type::T_INT,
                                                      
                                     

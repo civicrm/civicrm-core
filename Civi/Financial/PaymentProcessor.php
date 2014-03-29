@@ -69,6 +69,7 @@ class PaymentProcessor extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\Domain")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="domain_id", referencedColumnName="id")})
+   * 
    */
   private $domain;
   
@@ -77,6 +78,7 @@ class PaymentProcessor extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="name", type="string", length=64, nullable=true)
+   * 
    * 
    */
   private $name;
@@ -87,6 +89,7 @@ class PaymentProcessor extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="description", type="string", length=255, nullable=true)
    * 
+   * 
    */
   private $description;
   
@@ -96,6 +99,7 @@ class PaymentProcessor extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Financial\PaymentProcessorType")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="payment_processor_type_id", referencedColumnName="id")})
+   * 
    */
   private $paymentProcessorType;
   
@@ -104,6 +108,7 @@ class PaymentProcessor extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_active", type="boolean", nullable=true)
+   * 
    * 
    */
   private $isActive;
@@ -114,6 +119,7 @@ class PaymentProcessor extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_default", type="boolean", nullable=true)
    * 
+   * 
    */
   private $isDefault;
   
@@ -122,6 +128,7 @@ class PaymentProcessor extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_test", type="boolean", nullable=true)
+   * 
    * 
    */
   private $isTest;
@@ -132,6 +139,7 @@ class PaymentProcessor extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="user_name", type="string", length=255, nullable=true)
    * 
+   * 
    */
   private $userName;
   
@@ -140,6 +148,7 @@ class PaymentProcessor extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="password", type="string", length=255, nullable=true)
+   * 
    * 
    */
   private $password;
@@ -150,6 +159,7 @@ class PaymentProcessor extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="signature", type="string", length=255, nullable=true)
    * 
+   * 
    */
   private $signature;
   
@@ -158,6 +168,7 @@ class PaymentProcessor extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="url_site", type="string", length=255, nullable=true)
+   * 
    * 
    */
   private $urlSite;
@@ -168,6 +179,7 @@ class PaymentProcessor extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="url_api", type="string", length=255, nullable=true)
    * 
+   * 
    */
   private $urlApi;
   
@@ -176,6 +188,7 @@ class PaymentProcessor extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="url_recur", type="string", length=255, nullable=true)
+   * 
    * 
    */
   private $urlRecur;
@@ -186,6 +199,7 @@ class PaymentProcessor extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="url_button", type="string", length=255, nullable=true)
    * 
+   * 
    */
   private $urlButton;
   
@@ -194,6 +208,7 @@ class PaymentProcessor extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="subject", type="string", length=255, nullable=true)
+   * 
    * 
    */
   private $subject;
@@ -204,6 +219,7 @@ class PaymentProcessor extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="class_name", type="string", length=255, nullable=true)
    * 
+   * 
    */
   private $className;
   
@@ -212,6 +228,7 @@ class PaymentProcessor extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="billing_mode", type="integer", nullable=true, options={"unsigned":true})
+   * 
    * 
    */
   private $billingMode;
@@ -222,6 +239,7 @@ class PaymentProcessor extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_recur", type="boolean", nullable=true)
    * 
+   * 
    */
   private $isRecur;
   
@@ -230,6 +248,7 @@ class PaymentProcessor extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="payment_type", type="integer", nullable=false, options={"unsigned":true})
+   * 
    * 
    */
   private $paymentType = '1';
@@ -636,6 +655,7 @@ class PaymentProcessor extends \Civi\Core\Entity {
               'id' => array(
       
         'name' => 'id',
+        'propertyName' => 'id',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -645,6 +665,7 @@ class PaymentProcessor extends \Civi\Core\Entity {
               'domain_id' => array(
       
         'name' => 'domain_id',
+        'propertyName' => 'domain',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -655,6 +676,7 @@ class PaymentProcessor extends \Civi\Core\Entity {
               'name' => array(
       
         'name' => 'name',
+        'propertyName' => 'name',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Payment Processor'),
                                  'maxlength' => 64,
@@ -666,6 +688,7 @@ class PaymentProcessor extends \Civi\Core\Entity {
               'description' => array(
       
         'name' => 'description',
+        'propertyName' => 'description',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Description'),
                                  'maxlength' => 255,
@@ -677,6 +700,7 @@ class PaymentProcessor extends \Civi\Core\Entity {
               'payment_processor_type_id' => array(
       
         'name' => 'payment_processor_type_id',
+        'propertyName' => 'paymentProcessorType',
         'type' => CRM_Utils_Type::T_INT,
                                                      
                                     
@@ -686,6 +710,7 @@ class PaymentProcessor extends \Civi\Core\Entity {
               'is_active' => array(
       
         'name' => 'is_active',
+        'propertyName' => 'isActive',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                                                      
                                     
@@ -694,6 +719,7 @@ class PaymentProcessor extends \Civi\Core\Entity {
               'is_default' => array(
       
         'name' => 'is_default',
+        'propertyName' => 'isDefault',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                                                      
                                     
@@ -702,6 +728,7 @@ class PaymentProcessor extends \Civi\Core\Entity {
               'is_test' => array(
       
         'name' => 'is_test',
+        'propertyName' => 'isTest',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                                                      
                                     
@@ -710,6 +737,7 @@ class PaymentProcessor extends \Civi\Core\Entity {
               'user_name' => array(
       
         'name' => 'user_name',
+        'propertyName' => 'userName',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('User Name'),
                                  'maxlength' => 255,
@@ -721,6 +749,7 @@ class PaymentProcessor extends \Civi\Core\Entity {
               'password' => array(
       
         'name' => 'password',
+        'propertyName' => 'password',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Password'),
                                  'maxlength' => 255,
@@ -732,6 +761,7 @@ class PaymentProcessor extends \Civi\Core\Entity {
               'signature' => array(
       
         'name' => 'signature',
+        'propertyName' => 'signature',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Signature'),
                                  'maxlength' => 255,
@@ -743,6 +773,7 @@ class PaymentProcessor extends \Civi\Core\Entity {
               'url_site' => array(
       
         'name' => 'url_site',
+        'propertyName' => 'urlSite',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Site URL'),
                                  'maxlength' => 255,
@@ -754,6 +785,7 @@ class PaymentProcessor extends \Civi\Core\Entity {
               'url_api' => array(
       
         'name' => 'url_api',
+        'propertyName' => 'urlApi',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('API URL'),
                                  'maxlength' => 255,
@@ -765,6 +797,7 @@ class PaymentProcessor extends \Civi\Core\Entity {
               'url_recur' => array(
       
         'name' => 'url_recur',
+        'propertyName' => 'urlRecur',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Recurring Payments URL'),
                                  'maxlength' => 255,
@@ -776,6 +809,7 @@ class PaymentProcessor extends \Civi\Core\Entity {
               'url_button' => array(
       
         'name' => 'url_button',
+        'propertyName' => 'urlButton',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Button URL'),
                                  'maxlength' => 255,
@@ -787,6 +821,7 @@ class PaymentProcessor extends \Civi\Core\Entity {
               'subject' => array(
       
         'name' => 'subject',
+        'propertyName' => 'subject',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Subject'),
                                  'maxlength' => 255,
@@ -798,6 +833,7 @@ class PaymentProcessor extends \Civi\Core\Entity {
               'class_name' => array(
       
         'name' => 'class_name',
+        'propertyName' => 'className',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Suffix for PHP clas name implementation'),
                                  'maxlength' => 255,
@@ -809,6 +845,7 @@ class PaymentProcessor extends \Civi\Core\Entity {
               'billing_mode' => array(
       
         'name' => 'billing_mode',
+        'propertyName' => 'billingMode',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Billing Mode'),
                         'required' => true,
@@ -819,6 +856,7 @@ class PaymentProcessor extends \Civi\Core\Entity {
               'is_recur' => array(
       
         'name' => 'is_recur',
+        'propertyName' => 'isRecur',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                                                      
                                     
@@ -827,6 +865,7 @@ class PaymentProcessor extends \Civi\Core\Entity {
               'payment_type' => array(
       
         'name' => 'payment_type',
+        'propertyName' => 'paymentType',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Payment Type'),
                                                      

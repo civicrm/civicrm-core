@@ -69,6 +69,7 @@ class Note extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="entity_table", type="string", length=64, nullable=true)
    * 
+   * 
    */
   private $entityTable;
   
@@ -78,6 +79,7 @@ class Note extends \Civi\Core\Entity {
    * @JMS\Type("integer")
    * @ORM\Column(name="entity_id", type="integer", nullable=true, options={"unsigned":true})
    * 
+   * 
    */
   private $entityId;
   
@@ -85,7 +87,8 @@ class Note extends \Civi\Core\Entity {
    * @var text
    *
    * @JMS\Type("text")
-   * @ORM\Column(name="note", type="text", nullable=true)
+   * @ORM\Column(name="note", type="text", length=65535, nullable=true)
+   * 
    * 
    */
   private $note;
@@ -96,6 +99,7 @@ class Note extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Contact")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="contact_id", referencedColumnName="id", onDelete="SET NULL")})
+   * 
    */
   private $contact;
   
@@ -104,6 +108,7 @@ class Note extends \Civi\Core\Entity {
    *
    * @JMS\Type("date")
    * @ORM\Column(name="modified_date", type="date", nullable=true)
+   * 
    * 
    */
   private $modifiedDate;
@@ -114,6 +119,7 @@ class Note extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="subject", type="string", length=255, nullable=true)
    * 
+   * 
    */
   private $subject;
   
@@ -122,6 +128,7 @@ class Note extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="privacy", type="string", length=255, nullable=true)
+   * 
    * 
    */
   private $privacy;
@@ -288,6 +295,7 @@ class Note extends \Civi\Core\Entity {
               'id' => array(
       
         'name' => 'id',
+        'propertyName' => 'id',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -297,6 +305,7 @@ class Note extends \Civi\Core\Entity {
               'entity_table' => array(
       
         'name' => 'entity_table',
+        'propertyName' => 'entityTable',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Entity Table'),
                         'required' => true,
@@ -309,6 +318,7 @@ class Note extends \Civi\Core\Entity {
               'entity_id' => array(
       
         'name' => 'entity_id',
+        'propertyName' => 'entityId',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -318,9 +328,11 @@ class Note extends \Civi\Core\Entity {
               'note' => array(
       
         'name' => 'note',
+        'propertyName' => 'note',
         'type' => CRM_Utils_Type::T_TEXT,
                 'title' => ts('Note'),
-                                                   'rows' => 4,
+                                 'maxlength' => 65535,
+                                  'rows' => 4,
                          'cols' => 60,
          
                 'import' => true,
@@ -334,6 +346,7 @@ class Note extends \Civi\Core\Entity {
               'contact_id' => array(
       
         'name' => 'contact_id',
+        'propertyName' => 'contact',
         'type' => CRM_Utils_Type::T_INT,
                                                      
                                     
@@ -343,6 +356,7 @@ class Note extends \Civi\Core\Entity {
               'modified_date' => array(
       
         'name' => 'modified_date',
+        'propertyName' => 'modifiedDate',
         'type' => CRM_Utils_Type::T_DATE,
                 'title' => ts('Modified Date'),
                                                      
@@ -352,6 +366,7 @@ class Note extends \Civi\Core\Entity {
               'subject' => array(
       
         'name' => 'subject',
+        'propertyName' => 'subject',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Subject'),
                                  'maxlength' => 255,
@@ -363,6 +378,7 @@ class Note extends \Civi\Core\Entity {
               'privacy' => array(
       
         'name' => 'privacy',
+        'propertyName' => 'privacy',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Privacy'),
                                  'maxlength' => 255,

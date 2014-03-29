@@ -69,6 +69,7 @@ class MembershipLog extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Member\Membership")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="membership_id", referencedColumnName="id", onDelete="CASCADE")})
+   * 
    */
   private $membership;
   
@@ -78,6 +79,7 @@ class MembershipLog extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Member\MembershipStatus")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="status_id", referencedColumnName="id", onDelete="CASCADE")})
+   * 
    */
   private $status;
   
@@ -86,6 +88,7 @@ class MembershipLog extends \Civi\Core\Entity {
    *
    * @JMS\Type("date")
    * @ORM\Column(name="start_date", type="date", nullable=true)
+   * 
    * 
    */
   private $startDate;
@@ -96,6 +99,7 @@ class MembershipLog extends \Civi\Core\Entity {
    * @JMS\Type("date")
    * @ORM\Column(name="end_date", type="date", nullable=true)
    * 
+   * 
    */
   private $endDate;
   
@@ -105,6 +109,7 @@ class MembershipLog extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Contact")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="modified_id", referencedColumnName="id", onDelete="SET NULL")})
+   * 
    */
   private $modified;
   
@@ -113,6 +118,7 @@ class MembershipLog extends \Civi\Core\Entity {
    *
    * @JMS\Type("date")
    * @ORM\Column(name="modified_date", type="date", nullable=true)
+   * 
    * 
    */
   private $modifiedDate;
@@ -123,6 +129,7 @@ class MembershipLog extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Member\MembershipType")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="membership_type_id", referencedColumnName="id", onDelete="SET NULL")})
+   * 
    */
   private $membershipType;
   
@@ -131,6 +138,7 @@ class MembershipLog extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="max_related", type="integer", nullable=true, options={"unsigned":true})
+   * 
    * 
    */
   private $maxRelated;
@@ -317,6 +325,7 @@ class MembershipLog extends \Civi\Core\Entity {
               'id' => array(
       
         'name' => 'id',
+        'propertyName' => 'id',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -326,6 +335,7 @@ class MembershipLog extends \Civi\Core\Entity {
               'membership_id' => array(
       
         'name' => 'membership_id',
+        'propertyName' => 'membership',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -336,6 +346,7 @@ class MembershipLog extends \Civi\Core\Entity {
               'status_id' => array(
       
         'name' => 'status_id',
+        'propertyName' => 'status',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Membership Status'),
                         'required' => true,
@@ -347,6 +358,7 @@ class MembershipLog extends \Civi\Core\Entity {
               'start_date' => array(
       
         'name' => 'start_date',
+        'propertyName' => 'startDate',
         'type' => CRM_Utils_Type::T_DATE,
                 'title' => ts('Start Date'),
                                                      
@@ -356,6 +368,7 @@ class MembershipLog extends \Civi\Core\Entity {
               'end_date' => array(
       
         'name' => 'end_date',
+        'propertyName' => 'endDate',
         'type' => CRM_Utils_Type::T_DATE,
                 'title' => ts('End Date'),
                                                      
@@ -365,6 +378,7 @@ class MembershipLog extends \Civi\Core\Entity {
               'modified_id' => array(
       
         'name' => 'modified_id',
+        'propertyName' => 'modified',
         'type' => CRM_Utils_Type::T_INT,
                                                      
                                     
@@ -374,6 +388,7 @@ class MembershipLog extends \Civi\Core\Entity {
               'modified_date' => array(
       
         'name' => 'modified_date',
+        'propertyName' => 'modifiedDate',
         'type' => CRM_Utils_Type::T_DATE,
                 'title' => ts('Membership Change Date'),
                                                      
@@ -383,6 +398,7 @@ class MembershipLog extends \Civi\Core\Entity {
               'membership_type_id' => array(
       
         'name' => 'membership_type_id',
+        'propertyName' => 'membershipType',
         'type' => CRM_Utils_Type::T_INT,
                                                      
                                     
@@ -392,6 +408,7 @@ class MembershipLog extends \Civi\Core\Entity {
               'max_related' => array(
       
         'name' => 'max_related',
+        'propertyName' => 'maxRelated',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Max Related'),
                                                      

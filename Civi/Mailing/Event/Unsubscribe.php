@@ -69,6 +69,7 @@ class Unsubscribe extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Mailing\Event\Queue")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="event_queue_id", referencedColumnName="id", onDelete="CASCADE")})
+   * 
    */
   private $eventQueue;
   
@@ -78,6 +79,7 @@ class Unsubscribe extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="org_unsubscribe", type="boolean", nullable=true)
    * 
+   * 
    */
   private $orgUnsubscribe;
   
@@ -86,6 +88,7 @@ class Unsubscribe extends \Civi\Core\Entity {
    *
    * @JMS\Type("datetime")
    * @ORM\Column(name="time_stamp", type="datetime", nullable=true)
+   * 
    * 
    */
   private $timeStamp;
@@ -172,6 +175,7 @@ class Unsubscribe extends \Civi\Core\Entity {
               'id' => array(
       
         'name' => 'id',
+        'propertyName' => 'id',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -181,6 +185,7 @@ class Unsubscribe extends \Civi\Core\Entity {
               'event_queue_id' => array(
       
         'name' => 'event_queue_id',
+        'propertyName' => 'eventQueue',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -191,6 +196,7 @@ class Unsubscribe extends \Civi\Core\Entity {
               'org_unsubscribe' => array(
       
         'name' => 'org_unsubscribe',
+        'propertyName' => 'orgUnsubscribe',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('Org Unsubscribe'),
                         'required' => true,
@@ -201,6 +207,7 @@ class Unsubscribe extends \Civi\Core\Entity {
               'time_stamp' => array(
       
         'name' => 'time_stamp',
+        'propertyName' => 'timeStamp',
         'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
                 'title' => ts('Time Stamp'),
                         'required' => true,

@@ -69,6 +69,7 @@ class Timezone extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="name", type="string", length=64, nullable=true)
    * 
+   * 
    */
   private $name;
   
@@ -77,6 +78,7 @@ class Timezone extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="abbreviation", type="string", length=3, nullable=true)
+   * 
    * 
    */
   private $abbreviation;
@@ -87,6 +89,7 @@ class Timezone extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="gmt", type="string", length=64, nullable=true)
    * 
+   * 
    */
   private $gmt;
   
@@ -95,6 +98,7 @@ class Timezone extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="offset", type="integer", nullable=true, options={"unsigned":true})
+   * 
    * 
    */
   private $offset;
@@ -105,6 +109,7 @@ class Timezone extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\Country")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="country_id", referencedColumnName="id")})
+   * 
    */
   private $country;
 
@@ -230,6 +235,7 @@ class Timezone extends \Civi\Core\Entity {
               'id' => array(
       
         'name' => 'id',
+        'propertyName' => 'id',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -239,6 +245,7 @@ class Timezone extends \Civi\Core\Entity {
               'name' => array(
       
         'name' => 'name',
+        'propertyName' => 'name',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Name'),
                                  'maxlength' => 64,
@@ -250,6 +257,7 @@ class Timezone extends \Civi\Core\Entity {
               'abbreviation' => array(
       
         'name' => 'abbreviation',
+        'propertyName' => 'abbreviation',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Abbreviation'),
                                  'maxlength' => 3,
@@ -261,6 +269,7 @@ class Timezone extends \Civi\Core\Entity {
               'gmt' => array(
       
         'name' => 'gmt',
+        'propertyName' => 'gmt',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Gmt'),
                                  'maxlength' => 64,
@@ -272,6 +281,7 @@ class Timezone extends \Civi\Core\Entity {
               'offset' => array(
       
         'name' => 'offset',
+        'propertyName' => 'offset',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Offset'),
                                                      
@@ -281,6 +291,7 @@ class Timezone extends \Civi\Core\Entity {
               'country_id' => array(
       
         'name' => 'country_id',
+        'propertyName' => 'country',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              

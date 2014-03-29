@@ -69,6 +69,7 @@ class ACLContactCache extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Contact")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="user_id", referencedColumnName="id", onDelete="CASCADE")})
+   * 
    */
   private $user;
   
@@ -78,6 +79,7 @@ class ACLContactCache extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Contact")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="contact_id", referencedColumnName="id", onDelete="CASCADE")})
+   * 
    */
   private $contact;
   
@@ -86,6 +88,7 @@ class ACLContactCache extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="operation", type="string", length=8, nullable=true)
+   * 
    * 
    */
   private $operation;
@@ -172,6 +175,7 @@ class ACLContactCache extends \Civi\Core\Entity {
               'id' => array(
       
         'name' => 'id',
+        'propertyName' => 'id',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -181,6 +185,7 @@ class ACLContactCache extends \Civi\Core\Entity {
               'user_id' => array(
       
         'name' => 'user_id',
+        'propertyName' => 'user',
         'type' => CRM_Utils_Type::T_INT,
                                                      
                                     
@@ -190,6 +195,7 @@ class ACLContactCache extends \Civi\Core\Entity {
               'contact_id' => array(
       
         'name' => 'contact_id',
+        'propertyName' => 'contact',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -200,6 +206,7 @@ class ACLContactCache extends \Civi\Core\Entity {
               'operation' => array(
       
         'name' => 'operation',
+        'propertyName' => 'operation',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Operation'),
                         'required' => true,

@@ -69,6 +69,7 @@ class Cart extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Contact")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="user_id", referencedColumnName="id", onDelete="SET NULL")})
+   * 
    */
   private $user;
   
@@ -77,6 +78,7 @@ class Cart extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="completed", type="boolean", nullable=false)
+   * 
    * 
    */
   private $completed = '0';
@@ -143,6 +145,7 @@ class Cart extends \Civi\Core\Entity {
               'cart_id' => array(
       
         'name' => 'id',
+        'propertyName' => 'id',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -152,6 +155,7 @@ class Cart extends \Civi\Core\Entity {
               'user_id' => array(
       
         'name' => 'user_id',
+        'propertyName' => 'user',
         'type' => CRM_Utils_Type::T_INT,
                                                      
                                     
@@ -161,6 +165,7 @@ class Cart extends \Civi\Core\Entity {
               'completed' => array(
       
         'name' => 'completed',
+        'propertyName' => 'completed',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('Completed'),
                                                      

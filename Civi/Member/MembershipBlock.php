@@ -69,6 +69,7 @@ class MembershipBlock extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="entity_table", type="string", length=64, nullable=true)
    * 
+   * 
    */
   private $entityTable;
   
@@ -78,6 +79,7 @@ class MembershipBlock extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Contribute\ContributionPage")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="entity_id", referencedColumnName="id")})
+   * 
    */
   private $entity;
   
@@ -86,6 +88,7 @@ class MembershipBlock extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="membership_types", type="string", length=255, nullable=true)
+   * 
    * 
    */
   private $membershipTypes;
@@ -96,6 +99,7 @@ class MembershipBlock extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Member\MembershipType")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="membership_type_default", referencedColumnName="id")})
+   * 
    */
   private $membershipTypeDefault;
   
@@ -104,6 +108,7 @@ class MembershipBlock extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="display_min_fee", type="boolean", nullable=false)
+   * 
    * 
    */
   private $displayMinFee = '1';
@@ -114,6 +119,7 @@ class MembershipBlock extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_separate_payment", type="boolean", nullable=false)
    * 
+   * 
    */
   private $isSeparatePayment = '1';
   
@@ -123,6 +129,7 @@ class MembershipBlock extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="new_title", type="string", length=255, nullable=true)
    * 
+   * 
    */
   private $newTitle;
   
@@ -130,7 +137,8 @@ class MembershipBlock extends \Civi\Core\Entity {
    * @var text
    *
    * @JMS\Type("text")
-   * @ORM\Column(name="new_text", type="text", nullable=true)
+   * @ORM\Column(name="new_text", type="text", length=65535, nullable=true)
+   * 
    * 
    */
   private $newText;
@@ -141,6 +149,7 @@ class MembershipBlock extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="renewal_title", type="string", length=255, nullable=true)
    * 
+   * 
    */
   private $renewalTitle;
   
@@ -148,7 +157,8 @@ class MembershipBlock extends \Civi\Core\Entity {
    * @var text
    *
    * @JMS\Type("text")
-   * @ORM\Column(name="renewal_text", type="text", nullable=true)
+   * @ORM\Column(name="renewal_text", type="text", length=65535, nullable=true)
+   * 
    * 
    */
   private $renewalText;
@@ -159,6 +169,7 @@ class MembershipBlock extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_required", type="boolean", nullable=false)
    * 
+   * 
    */
   private $isRequired = '0';
   
@@ -167,6 +178,7 @@ class MembershipBlock extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_active", type="boolean", nullable=false)
+   * 
    * 
    */
   private $isActive = '1';
@@ -433,6 +445,7 @@ class MembershipBlock extends \Civi\Core\Entity {
               'id' => array(
       
         'name' => 'id',
+        'propertyName' => 'id',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -442,6 +455,7 @@ class MembershipBlock extends \Civi\Core\Entity {
               'entity_table' => array(
       
         'name' => 'entity_table',
+        'propertyName' => 'entityTable',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Entity Table'),
                                  'maxlength' => 64,
@@ -453,6 +467,7 @@ class MembershipBlock extends \Civi\Core\Entity {
               'entity_id' => array(
       
         'name' => 'entity_id',
+        'propertyName' => 'entity',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -463,6 +478,7 @@ class MembershipBlock extends \Civi\Core\Entity {
               'membership_types' => array(
       
         'name' => 'membership_types',
+        'propertyName' => 'membershipTypes',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Membership Types'),
                                  'maxlength' => 255,
@@ -474,6 +490,7 @@ class MembershipBlock extends \Civi\Core\Entity {
               'membership_type_default' => array(
       
         'name' => 'membership_type_default',
+        'propertyName' => 'membershipTypeDefault',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Membership Type Default'),
                                                      
@@ -484,6 +501,7 @@ class MembershipBlock extends \Civi\Core\Entity {
               'display_min_fee' => array(
       
         'name' => 'display_min_fee',
+        'propertyName' => 'displayMinFee',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('Display Min Fee'),
                                                      
@@ -494,6 +512,7 @@ class MembershipBlock extends \Civi\Core\Entity {
               'is_separate_payment' => array(
       
         'name' => 'is_separate_payment',
+        'propertyName' => 'isSeparatePayment',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                                                      
                                            'default' => '1',
@@ -503,6 +522,7 @@ class MembershipBlock extends \Civi\Core\Entity {
               'new_title' => array(
       
         'name' => 'new_title',
+        'propertyName' => 'newTitle',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('New Title'),
                                  'maxlength' => 255,
@@ -514,15 +534,18 @@ class MembershipBlock extends \Civi\Core\Entity {
               'new_text' => array(
       
         'name' => 'new_text',
+        'propertyName' => 'newText',
         'type' => CRM_Utils_Type::T_TEXT,
                 'title' => ts('New Text'),
-                                                     
+                                 'maxlength' => 65535,
+                                    
                                     
                           ),
       
               'renewal_title' => array(
       
         'name' => 'renewal_title',
+        'propertyName' => 'renewalTitle',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Renewal Title'),
                                  'maxlength' => 255,
@@ -534,15 +557,18 @@ class MembershipBlock extends \Civi\Core\Entity {
               'renewal_text' => array(
       
         'name' => 'renewal_text',
+        'propertyName' => 'renewalText',
         'type' => CRM_Utils_Type::T_TEXT,
                 'title' => ts('Renewal Text'),
-                                                     
+                                 'maxlength' => 65535,
+                                    
                                     
                           ),
       
               'is_required' => array(
       
         'name' => 'is_required',
+        'propertyName' => 'isRequired',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('Is Required'),
                                                      
@@ -552,6 +578,7 @@ class MembershipBlock extends \Civi\Core\Entity {
               'is_active' => array(
       
         'name' => 'is_active',
+        'propertyName' => 'isActive',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('Is Active'),
                                                      

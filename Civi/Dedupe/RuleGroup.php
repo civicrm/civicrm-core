@@ -69,6 +69,7 @@ class RuleGroup extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="contact_type", type="string", length=12, nullable=true)
    * 
+   * 
    */
   private $contactType;
   
@@ -77,6 +78,7 @@ class RuleGroup extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="threshold", type="integer", nullable=true, options={"unsigned":true})
+   * 
    * 
    */
   private $threshold;
@@ -87,6 +89,7 @@ class RuleGroup extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="used", type="string", length=12, nullable=true)
    * 
+   * 
    */
   private $used;
   
@@ -95,6 +98,7 @@ class RuleGroup extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="name", type="string", length=64, nullable=true)
+   * 
    * 
    */
   private $name;
@@ -105,6 +109,7 @@ class RuleGroup extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="title", type="string", length=255, nullable=true)
    * 
+   * 
    */
   private $title;
   
@@ -113,6 +118,7 @@ class RuleGroup extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_reserved", type="boolean", nullable=true)
+   * 
    * 
    */
   private $isReserved;
@@ -259,6 +265,7 @@ class RuleGroup extends \Civi\Core\Entity {
               'id' => array(
       
         'name' => 'id',
+        'propertyName' => 'id',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -268,6 +275,7 @@ class RuleGroup extends \Civi\Core\Entity {
               'contact_type' => array(
       
         'name' => 'contact_type',
+        'propertyName' => 'contactType',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Contact Type'),
                                  'maxlength' => 12,
@@ -285,6 +293,7 @@ class RuleGroup extends \Civi\Core\Entity {
               'threshold' => array(
       
         'name' => 'threshold',
+        'propertyName' => 'threshold',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Threshold'),
                         'required' => true,
@@ -295,6 +304,7 @@ class RuleGroup extends \Civi\Core\Entity {
               'used' => array(
       
         'name' => 'used',
+        'propertyName' => 'used',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Used'),
                         'required' => true,
@@ -310,6 +320,7 @@ class RuleGroup extends \Civi\Core\Entity {
               'name' => array(
       
         'name' => 'name',
+        'propertyName' => 'name',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Name'),
                                  'maxlength' => 64,
@@ -321,6 +332,7 @@ class RuleGroup extends \Civi\Core\Entity {
               'title' => array(
       
         'name' => 'title',
+        'propertyName' => 'title',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Title'),
                                  'maxlength' => 255,
@@ -332,6 +344,7 @@ class RuleGroup extends \Civi\Core\Entity {
               'is_reserved' => array(
       
         'name' => 'is_reserved',
+        'propertyName' => 'isReserved',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                                                      
                                     

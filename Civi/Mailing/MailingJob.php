@@ -69,6 +69,7 @@ class MailingJob extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Mailing\Mailing")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="mailing_id", referencedColumnName="id", onDelete="CASCADE")})
+   * 
    */
   private $mailing;
   
@@ -77,6 +78,7 @@ class MailingJob extends \Civi\Core\Entity {
    *
    * @JMS\Type("datetime")
    * @ORM\Column(name="scheduled_date", type="datetime", nullable=true)
+   * 
    * 
    */
   private $scheduledDate;
@@ -87,6 +89,7 @@ class MailingJob extends \Civi\Core\Entity {
    * @JMS\Type("datetime")
    * @ORM\Column(name="start_date", type="datetime", nullable=true)
    * 
+   * 
    */
   private $startDate;
   
@@ -95,6 +98,7 @@ class MailingJob extends \Civi\Core\Entity {
    *
    * @JMS\Type("datetime")
    * @ORM\Column(name="end_date", type="datetime", nullable=true)
+   * 
    * 
    */
   private $endDate;
@@ -105,6 +109,7 @@ class MailingJob extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="status", type="string", length=12, nullable=true)
    * 
+   * 
    */
   private $status;
   
@@ -113,6 +118,7 @@ class MailingJob extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_test", type="boolean", nullable=false)
+   * 
    * 
    */
   private $isTest = '0';
@@ -123,6 +129,7 @@ class MailingJob extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="job_type", type="string", length=255, nullable=true)
    * 
+   * 
    */
   private $jobType;
   
@@ -132,6 +139,7 @@ class MailingJob extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Mailing\MailingJob")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="parent_id", referencedColumnName="id", onDelete="CASCADE")})
+   * 
    */
   private $parent = 'NULL';
   
@@ -141,6 +149,7 @@ class MailingJob extends \Civi\Core\Entity {
    * @JMS\Type("integer")
    * @ORM\Column(name="job_offset", type="integer", nullable=false, options={"unsigned":true})
    * 
+   * 
    */
   private $jobOffset = '0';
   
@@ -149,6 +158,7 @@ class MailingJob extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="job_limit", type="integer", nullable=false, options={"unsigned":true})
+   * 
    * 
    */
   private $jobLimit = '0';
@@ -375,6 +385,7 @@ class MailingJob extends \Civi\Core\Entity {
               'id' => array(
       
         'name' => 'id',
+        'propertyName' => 'id',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -384,6 +395,7 @@ class MailingJob extends \Civi\Core\Entity {
               'mailing_id' => array(
       
         'name' => 'mailing_id',
+        'propertyName' => 'mailing',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -394,6 +406,7 @@ class MailingJob extends \Civi\Core\Entity {
               'scheduled_date' => array(
       
         'name' => 'scheduled_date',
+        'propertyName' => 'scheduledDate',
         'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
                 'title' => ts('Scheduled Date'),
                                                      
@@ -403,6 +416,7 @@ class MailingJob extends \Civi\Core\Entity {
               'start_date' => array(
       
         'name' => 'start_date',
+        'propertyName' => 'startDate',
         'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
                 'title' => ts('Start Date'),
                                                      
@@ -412,6 +426,7 @@ class MailingJob extends \Civi\Core\Entity {
               'end_date' => array(
       
         'name' => 'end_date',
+        'propertyName' => 'endDate',
         'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
                 'title' => ts('End Date'),
                                                      
@@ -421,6 +436,7 @@ class MailingJob extends \Civi\Core\Entity {
               'status' => array(
       
         'name' => 'status',
+        'propertyName' => 'status',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Status'),
                                  'maxlength' => 12,
@@ -435,6 +451,7 @@ class MailingJob extends \Civi\Core\Entity {
               'is_test' => array(
       
         'name' => 'is_test',
+        'propertyName' => 'isTest',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                                                      
                                     
@@ -443,6 +460,7 @@ class MailingJob extends \Civi\Core\Entity {
               'job_type' => array(
       
         'name' => 'job_type',
+        'propertyName' => 'jobType',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Job Type'),
                                  'maxlength' => 255,
@@ -454,6 +472,7 @@ class MailingJob extends \Civi\Core\Entity {
               'parent_id' => array(
       
         'name' => 'parent_id',
+        'propertyName' => 'parent',
         'type' => CRM_Utils_Type::T_INT,
                                                      
                                            'default' => 'NULL',
@@ -464,6 +483,7 @@ class MailingJob extends \Civi\Core\Entity {
               'job_offset' => array(
       
         'name' => 'job_offset',
+        'propertyName' => 'jobOffset',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Job Offset'),
                                                      
@@ -473,6 +493,7 @@ class MailingJob extends \Civi\Core\Entity {
               'job_limit' => array(
       
         'name' => 'job_limit',
+        'propertyName' => 'jobLimit',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Job Limit'),
                                                      

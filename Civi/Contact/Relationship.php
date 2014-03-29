@@ -69,6 +69,7 @@ class Relationship extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Contact")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="contact_id_a", referencedColumnName="id", onDelete="CASCADE")})
+   * 
    */
   private $contactA;
   
@@ -78,6 +79,7 @@ class Relationship extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Contact")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="contact_id_b", referencedColumnName="id", onDelete="CASCADE")})
+   * 
    */
   private $contactB;
   
@@ -87,6 +89,7 @@ class Relationship extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\RelationshipType")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="relationship_type_id", referencedColumnName="id", onDelete="CASCADE")})
+   * 
    */
   private $relationshipType;
   
@@ -95,6 +98,7 @@ class Relationship extends \Civi\Core\Entity {
    *
    * @JMS\Type("date")
    * @ORM\Column(name="start_date", type="date", nullable=true)
+   * 
    * 
    */
   private $startDate;
@@ -105,6 +109,7 @@ class Relationship extends \Civi\Core\Entity {
    * @JMS\Type("date")
    * @ORM\Column(name="end_date", type="date", nullable=true)
    * 
+   * 
    */
   private $endDate;
   
@@ -113,6 +118,7 @@ class Relationship extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_active", type="boolean", nullable=false)
+   * 
    * 
    */
   private $isActive = '1';
@@ -123,6 +129,7 @@ class Relationship extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="description", type="string", length=255, nullable=true)
    * 
+   * 
    */
   private $description;
   
@@ -131,6 +138,7 @@ class Relationship extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_permission_a_b", type="boolean", nullable=false)
+   * 
    * 
    */
   private $isPermissionAB = '0';
@@ -141,6 +149,7 @@ class Relationship extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_permission_b_a", type="boolean", nullable=false)
    * 
+   * 
    */
   private $isPermissionBA = '0';
   
@@ -150,6 +159,7 @@ class Relationship extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\CCase\CCase")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="case_id", referencedColumnName="id", onDelete="CASCADE")})
+   * 
    */
   private $case = 'NULL';
 
@@ -375,6 +385,7 @@ class Relationship extends \Civi\Core\Entity {
               'id' => array(
       
         'name' => 'id',
+        'propertyName' => 'id',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Relationship ID'),
                         'required' => true,
@@ -385,8 +396,9 @@ class Relationship extends \Civi\Core\Entity {
               'contact_id_a' => array(
       
         'name' => 'contact_id_a',
+        'propertyName' => 'contactA',
         'type' => CRM_Utils_Type::T_INT,
-                'title' => ts('Contact A ID'),
+                'title' => ts('Contact A'),
                         'required' => true,
                                              
                                     
@@ -396,8 +408,9 @@ class Relationship extends \Civi\Core\Entity {
               'contact_id_b' => array(
       
         'name' => 'contact_id_b',
+        'propertyName' => 'contactB',
         'type' => CRM_Utils_Type::T_INT,
-                'title' => ts('Contact B ID'),
+                'title' => ts('Contact B'),
                         'required' => true,
                                              
                                     
@@ -407,8 +420,9 @@ class Relationship extends \Civi\Core\Entity {
               'relationship_type_id' => array(
       
         'name' => 'relationship_type_id',
+        'propertyName' => 'relationshipType',
         'type' => CRM_Utils_Type::T_INT,
-                'title' => ts('Relationship Type ID'),
+                'title' => ts('Relationship Type'),
                         'required' => true,
                                              
                                     
@@ -418,6 +432,7 @@ class Relationship extends \Civi\Core\Entity {
               'start_date' => array(
       
         'name' => 'start_date',
+        'propertyName' => 'startDate',
         'type' => CRM_Utils_Type::T_DATE,
                 'title' => ts('Relationship Start Date'),
                                                      
@@ -427,6 +442,7 @@ class Relationship extends \Civi\Core\Entity {
               'end_date' => array(
       
         'name' => 'end_date',
+        'propertyName' => 'endDate',
         'type' => CRM_Utils_Type::T_DATE,
                 'title' => ts('Relationship End Date'),
                                                      
@@ -436,6 +452,7 @@ class Relationship extends \Civi\Core\Entity {
               'is_active' => array(
       
         'name' => 'is_active',
+        'propertyName' => 'isActive',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('Relationship Is Active'),
                                                      
@@ -446,6 +463,7 @@ class Relationship extends \Civi\Core\Entity {
               'description' => array(
       
         'name' => 'description',
+        'propertyName' => 'description',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Relationship Description'),
                                  'maxlength' => 255,
@@ -457,6 +475,7 @@ class Relationship extends \Civi\Core\Entity {
               'is_permission_a_b' => array(
       
         'name' => 'is_permission_a_b',
+        'propertyName' => 'isPermissionAB',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('Contact A has Permission Over Contact B'),
                                                      
@@ -466,6 +485,7 @@ class Relationship extends \Civi\Core\Entity {
               'is_permission_b_a' => array(
       
         'name' => 'is_permission_b_a',
+        'propertyName' => 'isPermissionBA',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('Contact B has Permission Over Contact A'),
                                                      
@@ -475,8 +495,9 @@ class Relationship extends \Civi\Core\Entity {
               'case_id' => array(
       
         'name' => 'case_id',
+        'propertyName' => 'case',
         'type' => CRM_Utils_Type::T_INT,
-                'title' => ts('Relationship Case ID'),
+                'title' => ts('Relationship Case'),
                                                      
                                            'default' => 'NULL',
          

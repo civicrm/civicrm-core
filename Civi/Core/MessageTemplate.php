@@ -69,6 +69,7 @@ class MessageTemplate extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="msg_title", type="string", length=255, nullable=true)
    * 
+   * 
    */
   private $msgTitle;
   
@@ -76,7 +77,8 @@ class MessageTemplate extends \Civi\Core\Entity {
    * @var text
    *
    * @JMS\Type("text")
-   * @ORM\Column(name="msg_subject", type="text", nullable=true)
+   * @ORM\Column(name="msg_subject", type="text", length=65535, nullable=true)
+   * 
    * 
    */
   private $msgSubject;
@@ -87,6 +89,7 @@ class MessageTemplate extends \Civi\Core\Entity {
    * @JMS\Type("text")
    * @ORM\Column(name="msg_text", type="text", nullable=true)
    * 
+   * 
    */
   private $msgText;
   
@@ -95,6 +98,7 @@ class MessageTemplate extends \Civi\Core\Entity {
    *
    * @JMS\Type("text")
    * @ORM\Column(name="msg_html", type="text", nullable=true)
+   * 
    * 
    */
   private $msgHtml;
@@ -105,6 +109,7 @@ class MessageTemplate extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_active", type="boolean", nullable=false)
    * 
+   * 
    */
   private $isActive = '1';
   
@@ -113,6 +118,7 @@ class MessageTemplate extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="workflow_id", type="integer", nullable=true, options={"unsigned":true})
+   * 
    * 
    */
   private $workflowId;
@@ -123,6 +129,7 @@ class MessageTemplate extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_default", type="boolean", nullable=false)
    * 
+   * 
    */
   private $isDefault = '1';
   
@@ -131,6 +138,7 @@ class MessageTemplate extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_reserved", type="boolean", nullable=true)
+   * 
    * 
    */
   private $isReserved;
@@ -141,6 +149,7 @@ class MessageTemplate extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\OptionValue")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="pdf_format_id", referencedColumnName="id", onDelete="SET NULL")})
+   * 
    */
   private $pdfFormat;
 
@@ -346,6 +355,7 @@ class MessageTemplate extends \Civi\Core\Entity {
               'id' => array(
       
         'name' => 'id',
+        'propertyName' => 'id',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -355,6 +365,7 @@ class MessageTemplate extends \Civi\Core\Entity {
               'msg_title' => array(
       
         'name' => 'msg_title',
+        'propertyName' => 'msgTitle',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Msg Title'),
                                  'maxlength' => 255,
@@ -366,15 +377,18 @@ class MessageTemplate extends \Civi\Core\Entity {
               'msg_subject' => array(
       
         'name' => 'msg_subject',
+        'propertyName' => 'msgSubject',
         'type' => CRM_Utils_Type::T_TEXT,
                 'title' => ts('Msg Subject'),
-                                                     
+                                 'maxlength' => 65535,
+                                    
                                     
                           ),
       
               'msg_text' => array(
       
         'name' => 'msg_text',
+        'propertyName' => 'msgText',
         'type' => CRM_Utils_Type::T_LONGTEXT,
                 'title' => ts('Msg Text'),
                                                      
@@ -384,6 +398,7 @@ class MessageTemplate extends \Civi\Core\Entity {
               'msg_html' => array(
       
         'name' => 'msg_html',
+        'propertyName' => 'msgHtml',
         'type' => CRM_Utils_Type::T_LONGTEXT,
                 'title' => ts('Msg Html'),
                                                      
@@ -393,6 +408,7 @@ class MessageTemplate extends \Civi\Core\Entity {
               'is_active' => array(
       
         'name' => 'is_active',
+        'propertyName' => 'isActive',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('Is Active'),
                                                      
@@ -403,6 +419,7 @@ class MessageTemplate extends \Civi\Core\Entity {
               'workflow_id' => array(
       
         'name' => 'workflow_id',
+        'propertyName' => 'workflowId',
         'type' => CRM_Utils_Type::T_INT,
                                                      
                                     
@@ -411,6 +428,7 @@ class MessageTemplate extends \Civi\Core\Entity {
               'is_default' => array(
       
         'name' => 'is_default',
+        'propertyName' => 'isDefault',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                                                      
                                            'default' => '1',
@@ -420,6 +438,7 @@ class MessageTemplate extends \Civi\Core\Entity {
               'is_reserved' => array(
       
         'name' => 'is_reserved',
+        'propertyName' => 'isReserved',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                                                      
                                     
@@ -428,11 +447,16 @@ class MessageTemplate extends \Civi\Core\Entity {
               'pdf_format_id' => array(
       
         'name' => 'pdf_format_id',
+        'propertyName' => 'pdfFormat',
         'type' => CRM_Utils_Type::T_INT,
                                                      
                                     
                 'FKClassName' => 'CRM_Core_OptionValue',
-                          ),
+                                     'pseudoconstant' => array(
+                                'optionGroupName' => 'pdf_format',
+                      'keyColumn' => 'id',
+                    )
+                 ),
              );
     }
     return self::$_fields;

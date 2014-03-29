@@ -69,6 +69,7 @@ class Bounce extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Mailing\Event\Queue")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="event_queue_id", referencedColumnName="id", onDelete="CASCADE")})
+   * 
    */
   private $eventQueue;
   
@@ -77,6 +78,7 @@ class Bounce extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="bounce_type_id", type="integer", nullable=true, options={"unsigned":true})
+   * 
    * 
    */
   private $bounceTypeId;
@@ -87,6 +89,7 @@ class Bounce extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="bounce_reason", type="string", length=255, nullable=true)
    * 
+   * 
    */
   private $bounceReason;
   
@@ -95,6 +98,7 @@ class Bounce extends \Civi\Core\Entity {
    *
    * @JMS\Type("datetime")
    * @ORM\Column(name="time_stamp", type="datetime", nullable=true)
+   * 
    * 
    */
   private $timeStamp;
@@ -201,6 +205,7 @@ class Bounce extends \Civi\Core\Entity {
               'id' => array(
       
         'name' => 'id',
+        'propertyName' => 'id',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -210,6 +215,7 @@ class Bounce extends \Civi\Core\Entity {
               'event_queue_id' => array(
       
         'name' => 'event_queue_id',
+        'propertyName' => 'eventQueue',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -220,6 +226,7 @@ class Bounce extends \Civi\Core\Entity {
               'bounce_type_id' => array(
       
         'name' => 'bounce_type_id',
+        'propertyName' => 'bounceTypeId',
         'type' => CRM_Utils_Type::T_INT,
                                                      
                                     
@@ -233,6 +240,7 @@ class Bounce extends \Civi\Core\Entity {
               'bounce_reason' => array(
       
         'name' => 'bounce_reason',
+        'propertyName' => 'bounceReason',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Bounce Reason'),
                                  'maxlength' => 255,
@@ -244,6 +252,7 @@ class Bounce extends \Civi\Core\Entity {
               'time_stamp' => array(
       
         'name' => 'time_stamp',
+        'propertyName' => 'timeStamp',
         'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
                 'title' => ts('Time Stamp'),
                         'required' => true,

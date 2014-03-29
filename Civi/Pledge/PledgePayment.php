@@ -69,6 +69,7 @@ class PledgePayment extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Pledge\Pledge")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="pledge_id", referencedColumnName="id", onDelete="CASCADE")})
+   * 
    */
   private $pledge;
   
@@ -78,6 +79,7 @@ class PledgePayment extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Contribute\Contribution")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="contribution_id", referencedColumnName="id", onDelete="CASCADE")})
+   * 
    */
   private $contribution;
   
@@ -86,6 +88,7 @@ class PledgePayment extends \Civi\Core\Entity {
    *
    * @JMS\Type("float")
    * @ORM\Column(name="scheduled_amount", type="float", nullable=true)
+   * 
    * 
    */
   private $scheduledAmount;
@@ -96,6 +99,7 @@ class PledgePayment extends \Civi\Core\Entity {
    * @JMS\Type("float")
    * @ORM\Column(name="actual_amount", type="float", nullable=true)
    * 
+   * 
    */
   private $actualAmount;
   
@@ -104,6 +108,7 @@ class PledgePayment extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="currency", type="string", length=3, nullable=false)
+   * 
    * 
    */
   private $currency = 'NULL';
@@ -114,6 +119,7 @@ class PledgePayment extends \Civi\Core\Entity {
    * @JMS\Type("datetime")
    * @ORM\Column(name="scheduled_date", type="datetime", nullable=true)
    * 
+   * 
    */
   private $scheduledDate;
   
@@ -122,6 +128,7 @@ class PledgePayment extends \Civi\Core\Entity {
    *
    * @JMS\Type("datetime")
    * @ORM\Column(name="reminder_date", type="datetime", nullable=true)
+   * 
    * 
    */
   private $reminderDate;
@@ -132,6 +139,7 @@ class PledgePayment extends \Civi\Core\Entity {
    * @JMS\Type("integer")
    * @ORM\Column(name="reminder_count", type="integer", nullable=false, options={"unsigned":true})
    * 
+   * 
    */
   private $reminderCount = '0';
   
@@ -140,6 +148,7 @@ class PledgePayment extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="status_id", type="integer", nullable=true, options={"unsigned":true})
+   * 
    * 
    */
   private $statusId;
@@ -346,6 +355,7 @@ class PledgePayment extends \Civi\Core\Entity {
               'pledge_payment_id' => array(
       
         'name' => 'id',
+        'propertyName' => 'id',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Payment ID'),
                         'required' => true,
@@ -361,6 +371,7 @@ class PledgePayment extends \Civi\Core\Entity {
               'pledge_id' => array(
       
         'name' => 'pledge_id',
+        'propertyName' => 'pledge',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -371,6 +382,7 @@ class PledgePayment extends \Civi\Core\Entity {
               'contribution_id' => array(
       
         'name' => 'contribution_id',
+        'propertyName' => 'contribution',
         'type' => CRM_Utils_Type::T_INT,
                                                      
                                     
@@ -380,6 +392,7 @@ class PledgePayment extends \Civi\Core\Entity {
               'pledge_payment_scheduled_amount' => array(
       
         'name' => 'scheduled_amount',
+        'propertyName' => 'scheduledAmount',
         'type' => CRM_Utils_Type::T_MONEY,
                 'title' => ts('Scheduled Amount'),
                         'required' => true,
@@ -395,6 +408,7 @@ class PledgePayment extends \Civi\Core\Entity {
               'pledge_payment_actual_amount' => array(
       
         'name' => 'actual_amount',
+        'propertyName' => 'actualAmount',
         'type' => CRM_Utils_Type::T_MONEY,
                 'title' => ts('Actual Amount'),
                                                      
@@ -409,6 +423,7 @@ class PledgePayment extends \Civi\Core\Entity {
               'currency' => array(
       
         'name' => 'currency',
+        'propertyName' => 'currency',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Currency'),
                                  'maxlength' => 3,
@@ -427,6 +442,7 @@ class PledgePayment extends \Civi\Core\Entity {
               'pledge_payment_scheduled_date' => array(
       
         'name' => 'scheduled_date',
+        'propertyName' => 'scheduledDate',
         'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
                 'title' => ts('Scheduled Date'),
                         'required' => true,
@@ -442,6 +458,7 @@ class PledgePayment extends \Civi\Core\Entity {
               'pledge_payment_reminder_date' => array(
       
         'name' => 'reminder_date',
+        'propertyName' => 'reminderDate',
         'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
                 'title' => ts('Last Reminder'),
                                                      
@@ -456,6 +473,7 @@ class PledgePayment extends \Civi\Core\Entity {
               'pledge_payment_reminder_count' => array(
       
         'name' => 'reminder_count',
+        'propertyName' => 'reminderCount',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Reminders Sent'),
                                                      
@@ -470,6 +488,7 @@ class PledgePayment extends \Civi\Core\Entity {
               'pledge_payment_status_id' => array(
       
         'name' => 'status_id',
+        'propertyName' => 'statusId',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Payment Status'),
                                                      

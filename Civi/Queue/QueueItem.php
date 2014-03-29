@@ -69,6 +69,7 @@ class QueueItem extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="queue_name", type="string", length=64, nullable=true)
    * 
+   * 
    */
   private $queueName;
   
@@ -77,6 +78,7 @@ class QueueItem extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="weight", type="integer", nullable=true, options={"unsigned":true})
+   * 
    * 
    */
   private $weight;
@@ -87,6 +89,7 @@ class QueueItem extends \Civi\Core\Entity {
    * @JMS\Type("datetime")
    * @ORM\Column(name="submit_time", type="datetime", nullable=true)
    * 
+   * 
    */
   private $submitTime;
   
@@ -96,6 +99,7 @@ class QueueItem extends \Civi\Core\Entity {
    * @JMS\Type("datetime")
    * @ORM\Column(name="release_time", type="datetime", nullable=true)
    * 
+   * 
    */
   private $releaseTime;
   
@@ -103,7 +107,8 @@ class QueueItem extends \Civi\Core\Entity {
    * @var text
    *
    * @JMS\Type("text")
-   * @ORM\Column(name="data", type="text", nullable=true)
+   * @ORM\Column(name="data", type="text", length=65535, nullable=true)
+   * 
    * 
    */
   private $data;
@@ -230,6 +235,7 @@ class QueueItem extends \Civi\Core\Entity {
               'id' => array(
       
         'name' => 'id',
+        'propertyName' => 'id',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -239,6 +245,7 @@ class QueueItem extends \Civi\Core\Entity {
               'queue_name' => array(
       
         'name' => 'queue_name',
+        'propertyName' => 'queueName',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Queue Name'),
                         'required' => true,
@@ -251,6 +258,7 @@ class QueueItem extends \Civi\Core\Entity {
               'weight' => array(
       
         'name' => 'weight',
+        'propertyName' => 'weight',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Weight'),
                         'required' => true,
@@ -261,6 +269,7 @@ class QueueItem extends \Civi\Core\Entity {
               'submit_time' => array(
       
         'name' => 'submit_time',
+        'propertyName' => 'submitTime',
         'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
                 'title' => ts('Submit Time'),
                         'required' => true,
@@ -271,6 +280,7 @@ class QueueItem extends \Civi\Core\Entity {
               'release_time' => array(
       
         'name' => 'release_time',
+        'propertyName' => 'releaseTime',
         'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
                 'title' => ts('Release Time'),
                                                      
@@ -280,9 +290,11 @@ class QueueItem extends \Civi\Core\Entity {
               'data' => array(
       
         'name' => 'data',
+        'propertyName' => 'data',
         'type' => CRM_Utils_Type::T_TEXT,
                 'title' => ts('Queue item datas'),
-                                                     
+                                 'maxlength' => 65535,
+                                    
                                     
                           ),
              );

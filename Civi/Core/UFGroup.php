@@ -69,6 +69,7 @@ class UFGroup extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_active", type="boolean", nullable=false)
    * 
+   * 
    */
   private $isActive = '1';
   
@@ -77,6 +78,7 @@ class UFGroup extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="group_type", type="string", length=255, nullable=true)
+   * 
    * 
    */
   private $groupType;
@@ -87,6 +89,7 @@ class UFGroup extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="title", type="string", length=64, nullable=true)
    * 
+   * 
    */
   private $title;
   
@@ -94,7 +97,8 @@ class UFGroup extends \Civi\Core\Entity {
    * @var text
    *
    * @JMS\Type("text")
-   * @ORM\Column(name="description", type="text", nullable=true)
+   * @ORM\Column(name="description", type="text", length=65535, nullable=true)
+   * 
    * 
    */
   private $description;
@@ -103,7 +107,8 @@ class UFGroup extends \Civi\Core\Entity {
    * @var text
    *
    * @JMS\Type("text")
-   * @ORM\Column(name="help_pre", type="text", nullable=true)
+   * @ORM\Column(name="help_pre", type="text", length=65535, nullable=true)
+   * 
    * 
    */
   private $helpPre;
@@ -112,7 +117,8 @@ class UFGroup extends \Civi\Core\Entity {
    * @var text
    *
    * @JMS\Type("text")
-   * @ORM\Column(name="help_post", type="text", nullable=true)
+   * @ORM\Column(name="help_post", type="text", length=65535, nullable=true)
+   * 
    * 
    */
   private $helpPost;
@@ -123,6 +129,7 @@ class UFGroup extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Group")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="limit_listings_group_id", referencedColumnName="id", onDelete="SET NULL")})
+   * 
    */
   private $limitListingsGroup;
   
@@ -131,6 +138,7 @@ class UFGroup extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="post_URL", type="string", length=255, nullable=true)
+   * 
    * 
    */
   private $postURL;
@@ -141,6 +149,7 @@ class UFGroup extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Group")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="add_to_group_id", referencedColumnName="id", onDelete="SET NULL")})
+   * 
    */
   private $addToGroup;
   
@@ -149,6 +158,7 @@ class UFGroup extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="add_captcha", type="boolean", nullable=false)
+   * 
    * 
    */
   private $addCaptcha = '0';
@@ -159,6 +169,7 @@ class UFGroup extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_map", type="boolean", nullable=false)
    * 
+   * 
    */
   private $isMap = '0';
   
@@ -167,6 +178,7 @@ class UFGroup extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_edit_link", type="boolean", nullable=false)
+   * 
    * 
    */
   private $isEditLink = '0';
@@ -177,6 +189,7 @@ class UFGroup extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_uf_link", type="boolean", nullable=false)
    * 
+   * 
    */
   private $isUfLink = '0';
   
@@ -185,6 +198,7 @@ class UFGroup extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_update_dupe", type="boolean", nullable=false)
+   * 
    * 
    */
   private $isUpdateDupe = '0';
@@ -195,6 +209,7 @@ class UFGroup extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="cancel_URL", type="string", length=255, nullable=true)
    * 
+   * 
    */
   private $cancelURL;
   
@@ -204,6 +219,7 @@ class UFGroup extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_cms_user", type="boolean", nullable=false)
    * 
+   * 
    */
   private $isCmsUser = '0';
   
@@ -211,7 +227,8 @@ class UFGroup extends \Civi\Core\Entity {
    * @var text
    *
    * @JMS\Type("text")
-   * @ORM\Column(name="notify", type="text", nullable=true)
+   * @ORM\Column(name="notify", type="text", length=65535, nullable=true)
+   * 
    * 
    */
   private $notify;
@@ -222,6 +239,7 @@ class UFGroup extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_reserved", type="boolean", nullable=true)
    * 
+   * 
    */
   private $isReserved;
   
@@ -230,6 +248,7 @@ class UFGroup extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="name", type="string", length=64, nullable=true)
+   * 
    * 
    */
   private $name;
@@ -240,6 +259,7 @@ class UFGroup extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Contact")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="created_id", referencedColumnName="id", onDelete="SET NULL")})
+   * 
    */
   private $created;
   
@@ -249,6 +269,7 @@ class UFGroup extends \Civi\Core\Entity {
    * @JMS\Type("datetime")
    * @ORM\Column(name="created_date", type="datetime", nullable=true)
    * 
+   * 
    */
   private $createdDate;
   
@@ -257,6 +278,7 @@ class UFGroup extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_proximity_search", type="boolean", nullable=false)
+   * 
    * 
    */
   private $isProximitySearch = '0';
@@ -723,6 +745,7 @@ class UFGroup extends \Civi\Core\Entity {
               'id' => array(
       
         'name' => 'id',
+        'propertyName' => 'id',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -732,6 +755,7 @@ class UFGroup extends \Civi\Core\Entity {
               'is_active' => array(
       
         'name' => 'is_active',
+        'propertyName' => 'isActive',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                                                      
                                            'default' => '1',
@@ -741,6 +765,7 @@ class UFGroup extends \Civi\Core\Entity {
               'group_type' => array(
       
         'name' => 'group_type',
+        'propertyName' => 'groupType',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Group Type'),
                                  'maxlength' => 255,
@@ -752,14 +777,12 @@ class UFGroup extends \Civi\Core\Entity {
         'dataPattern' => '',
                          'export' => true,
                                    
-                                     'pseudoconstant' => array(
-                                '0' => 'not in database',
-                    )
-                 ),
+                          ),
       
               'title' => array(
       
         'name' => 'title',
+        'propertyName' => 'title',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Title'),
                         'required' => true,
@@ -772,9 +795,11 @@ class UFGroup extends \Civi\Core\Entity {
               'description' => array(
       
         'name' => 'description',
+        'propertyName' => 'description',
         'type' => CRM_Utils_Type::T_TEXT,
                 'title' => ts('Profile Description'),
-                                                   'rows' => 2,
+                                 'maxlength' => 65535,
+                                  'rows' => 2,
                          'cols' => 60,
          
                                     
@@ -783,9 +808,11 @@ class UFGroup extends \Civi\Core\Entity {
               'help_pre' => array(
       
         'name' => 'help_pre',
+        'propertyName' => 'helpPre',
         'type' => CRM_Utils_Type::T_TEXT,
                 'title' => ts('Help Pre'),
-                                                   'rows' => 4,
+                                 'maxlength' => 65535,
+                                  'rows' => 4,
                          'cols' => 80,
          
                                     
@@ -794,9 +821,11 @@ class UFGroup extends \Civi\Core\Entity {
               'help_post' => array(
       
         'name' => 'help_post',
+        'propertyName' => 'helpPost',
         'type' => CRM_Utils_Type::T_TEXT,
                 'title' => ts('Help Post'),
-                                                   'rows' => 4,
+                                 'maxlength' => 65535,
+                                  'rows' => 4,
                          'cols' => 80,
          
                                     
@@ -805,6 +834,7 @@ class UFGroup extends \Civi\Core\Entity {
               'limit_listings_group_id' => array(
       
         'name' => 'limit_listings_group_id',
+        'propertyName' => 'limitListingsGroup',
         'type' => CRM_Utils_Type::T_INT,
                                                      
                                     
@@ -814,6 +844,7 @@ class UFGroup extends \Civi\Core\Entity {
               'post_URL' => array(
       
         'name' => 'post_URL',
+        'propertyName' => 'postURL',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Post Url'),
                                  'maxlength' => 255,
@@ -825,6 +856,7 @@ class UFGroup extends \Civi\Core\Entity {
               'add_to_group_id' => array(
       
         'name' => 'add_to_group_id',
+        'propertyName' => 'addToGroup',
         'type' => CRM_Utils_Type::T_INT,
                                                      
                                     
@@ -834,6 +866,7 @@ class UFGroup extends \Civi\Core\Entity {
               'add_captcha' => array(
       
         'name' => 'add_captcha',
+        'propertyName' => 'addCaptcha',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('Add Captcha'),
                                                      
@@ -843,6 +876,7 @@ class UFGroup extends \Civi\Core\Entity {
               'is_map' => array(
       
         'name' => 'is_map',
+        'propertyName' => 'isMap',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                                                      
                                     
@@ -851,6 +885,7 @@ class UFGroup extends \Civi\Core\Entity {
               'is_edit_link' => array(
       
         'name' => 'is_edit_link',
+        'propertyName' => 'isEditLink',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                                                      
                                     
@@ -859,6 +894,7 @@ class UFGroup extends \Civi\Core\Entity {
               'is_uf_link' => array(
       
         'name' => 'is_uf_link',
+        'propertyName' => 'isUfLink',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                                                      
                                     
@@ -867,6 +903,7 @@ class UFGroup extends \Civi\Core\Entity {
               'is_update_dupe' => array(
       
         'name' => 'is_update_dupe',
+        'propertyName' => 'isUpdateDupe',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                                                      
                                     
@@ -875,6 +912,7 @@ class UFGroup extends \Civi\Core\Entity {
               'cancel_URL' => array(
       
         'name' => 'cancel_URL',
+        'propertyName' => 'cancelURL',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Cancel Url'),
                                  'maxlength' => 255,
@@ -886,6 +924,7 @@ class UFGroup extends \Civi\Core\Entity {
               'is_cms_user' => array(
       
         'name' => 'is_cms_user',
+        'propertyName' => 'isCmsUser',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                                                      
                                     
@@ -894,15 +933,18 @@ class UFGroup extends \Civi\Core\Entity {
               'notify' => array(
       
         'name' => 'notify',
+        'propertyName' => 'notify',
         'type' => CRM_Utils_Type::T_TEXT,
                 'title' => ts('Notify'),
-                                                     
+                                 'maxlength' => 65535,
+                                    
                                     
                           ),
       
               'is_reserved' => array(
       
         'name' => 'is_reserved',
+        'propertyName' => 'isReserved',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                                                      
                                     
@@ -911,6 +953,7 @@ class UFGroup extends \Civi\Core\Entity {
               'name' => array(
       
         'name' => 'name',
+        'propertyName' => 'name',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Name'),
                                  'maxlength' => 64,
@@ -922,6 +965,7 @@ class UFGroup extends \Civi\Core\Entity {
               'created_id' => array(
       
         'name' => 'created_id',
+        'propertyName' => 'created',
         'type' => CRM_Utils_Type::T_INT,
                                                      
                                     
@@ -931,6 +975,7 @@ class UFGroup extends \Civi\Core\Entity {
               'created_date' => array(
       
         'name' => 'created_date',
+        'propertyName' => 'createdDate',
         'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
                 'title' => ts('UF Group Created Date'),
                                                      
@@ -940,6 +985,7 @@ class UFGroup extends \Civi\Core\Entity {
               'is_proximity_search' => array(
       
         'name' => 'is_proximity_search',
+        'propertyName' => 'isProximitySearch',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                                                      
                                     

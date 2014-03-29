@@ -69,6 +69,7 @@ class Spool extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Mailing\MailingJob")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="job_id", referencedColumnName="id", onDelete="CASCADE")})
+   * 
    */
   private $job;
   
@@ -76,7 +77,8 @@ class Spool extends \Civi\Core\Entity {
    * @var text
    *
    * @JMS\Type("text")
-   * @ORM\Column(name="recipient_email", type="text", nullable=true)
+   * @ORM\Column(name="recipient_email", type="text", length=65535, nullable=true)
+   * 
    * 
    */
   private $recipientEmail;
@@ -85,7 +87,8 @@ class Spool extends \Civi\Core\Entity {
    * @var text
    *
    * @JMS\Type("text")
-   * @ORM\Column(name="headers", type="text", nullable=true)
+   * @ORM\Column(name="headers", type="text", length=65535, nullable=true)
+   * 
    * 
    */
   private $headers;
@@ -94,7 +97,8 @@ class Spool extends \Civi\Core\Entity {
    * @var text
    *
    * @JMS\Type("text")
-   * @ORM\Column(name="body", type="text", nullable=true)
+   * @ORM\Column(name="body", type="text", length=65535, nullable=true)
+   * 
    * 
    */
   private $body;
@@ -105,6 +109,7 @@ class Spool extends \Civi\Core\Entity {
    * @JMS\Type("datetime")
    * @ORM\Column(name="added_at", type="datetime", nullable=true)
    * 
+   * 
    */
   private $addedAt;
   
@@ -113,6 +118,7 @@ class Spool extends \Civi\Core\Entity {
    *
    * @JMS\Type("datetime")
    * @ORM\Column(name="removed_at", type="datetime", nullable=true)
+   * 
    * 
    */
   private $removedAt;
@@ -259,6 +265,7 @@ class Spool extends \Civi\Core\Entity {
               'id' => array(
       
         'name' => 'id',
+        'propertyName' => 'id',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -268,6 +275,7 @@ class Spool extends \Civi\Core\Entity {
               'job_id' => array(
       
         'name' => 'job_id',
+        'propertyName' => 'job',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -278,33 +286,40 @@ class Spool extends \Civi\Core\Entity {
               'recipient_email' => array(
       
         'name' => 'recipient_email',
+        'propertyName' => 'recipientEmail',
         'type' => CRM_Utils_Type::T_TEXT,
                 'title' => ts('Recipient Email'),
-                                                     
+                                 'maxlength' => 65535,
+                                    
                                     
                           ),
       
               'headers' => array(
       
         'name' => 'headers',
+        'propertyName' => 'headers',
         'type' => CRM_Utils_Type::T_TEXT,
                 'title' => ts('Headers'),
-                                                     
+                                 'maxlength' => 65535,
+                                    
                                     
                           ),
       
               'body' => array(
       
         'name' => 'body',
+        'propertyName' => 'body',
         'type' => CRM_Utils_Type::T_TEXT,
                 'title' => ts('Body'),
-                                                     
+                                 'maxlength' => 65535,
+                                    
                                     
                           ),
       
               'added_at' => array(
       
         'name' => 'added_at',
+        'propertyName' => 'addedAt',
         'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
                 'title' => ts('Added At'),
                                                      
@@ -314,6 +329,7 @@ class Spool extends \Civi\Core\Entity {
               'removed_at' => array(
       
         'name' => 'removed_at',
+        'propertyName' => 'removedAt',
         'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
                 'title' => ts('Removed At'),
                                                      

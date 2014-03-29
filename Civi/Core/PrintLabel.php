@@ -69,6 +69,7 @@ class PrintLabel extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="title", type="string", length=255, nullable=true)
    * 
+   * 
    */
   private $title;
   
@@ -78,6 +79,7 @@ class PrintLabel extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="name", type="string", length=255, nullable=true)
    * 
+   * 
    */
   private $name;
   
@@ -85,7 +87,8 @@ class PrintLabel extends \Civi\Core\Entity {
    * @var text
    *
    * @JMS\Type("text")
-   * @ORM\Column(name="description", type="text", nullable=true)
+   * @ORM\Column(name="description", type="text", length=65535, nullable=true)
+   * 
    * 
    */
   private $description;
@@ -96,6 +99,7 @@ class PrintLabel extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="label_format_name", type="string", length=255, nullable=true)
    * 
+   * 
    */
   private $labelFormatName;
   
@@ -104,6 +108,7 @@ class PrintLabel extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="label_type_id", type="integer", nullable=true, options={"unsigned":true})
+   * 
    * 
    */
   private $labelTypeId;
@@ -114,6 +119,7 @@ class PrintLabel extends \Civi\Core\Entity {
    * @JMS\Type("text")
    * @ORM\Column(name="data", type="text", nullable=true)
    * 
+   * 
    */
   private $data;
   
@@ -122,6 +128,7 @@ class PrintLabel extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_default", type="boolean", nullable=false)
+   * 
    * 
    */
   private $isDefault = '1';
@@ -132,6 +139,7 @@ class PrintLabel extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_active", type="boolean", nullable=false)
    * 
+   * 
    */
   private $isActive = '1';
   
@@ -140,6 +148,7 @@ class PrintLabel extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_reserved", type="boolean", nullable=false)
+   * 
    * 
    */
   private $isReserved = '1';
@@ -150,6 +159,7 @@ class PrintLabel extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Contact")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="created_id", referencedColumnName="id", onDelete="SET NULL")})
+   * 
    */
   private $created;
 
@@ -375,6 +385,7 @@ class PrintLabel extends \Civi\Core\Entity {
               'id' => array(
       
         'name' => 'id',
+        'propertyName' => 'id',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -384,6 +395,7 @@ class PrintLabel extends \Civi\Core\Entity {
               'title' => array(
       
         'name' => 'title',
+        'propertyName' => 'title',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Title'),
                                  'maxlength' => 255,
@@ -395,6 +407,7 @@ class PrintLabel extends \Civi\Core\Entity {
               'name' => array(
       
         'name' => 'name',
+        'propertyName' => 'name',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Name'),
                                  'maxlength' => 255,
@@ -406,15 +419,18 @@ class PrintLabel extends \Civi\Core\Entity {
               'description' => array(
       
         'name' => 'description',
+        'propertyName' => 'description',
         'type' => CRM_Utils_Type::T_TEXT,
                 'title' => ts('Description'),
-                                                     
+                                 'maxlength' => 65535,
+                                    
                                     
                           ),
       
               'label_format_name' => array(
       
         'name' => 'label_format_name',
+        'propertyName' => 'labelFormatName',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Label Format Name'),
                                  'maxlength' => 255,
@@ -429,6 +445,7 @@ class PrintLabel extends \Civi\Core\Entity {
               'label_type_id' => array(
       
         'name' => 'label_type_id',
+        'propertyName' => 'labelTypeId',
         'type' => CRM_Utils_Type::T_INT,
                                                      
                                     
@@ -440,6 +457,7 @@ class PrintLabel extends \Civi\Core\Entity {
               'data' => array(
       
         'name' => 'data',
+        'propertyName' => 'data',
         'type' => CRM_Utils_Type::T_LONGTEXT,
                 'title' => ts('Data'),
                                                      
@@ -449,6 +467,7 @@ class PrintLabel extends \Civi\Core\Entity {
               'is_default' => array(
       
         'name' => 'is_default',
+        'propertyName' => 'isDefault',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                                                      
                                            'default' => '1',
@@ -458,6 +477,7 @@ class PrintLabel extends \Civi\Core\Entity {
               'is_active' => array(
       
         'name' => 'is_active',
+        'propertyName' => 'isActive',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                                                      
                                            'default' => '1',
@@ -467,6 +487,7 @@ class PrintLabel extends \Civi\Core\Entity {
               'is_reserved' => array(
       
         'name' => 'is_reserved',
+        'propertyName' => 'isReserved',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                                                      
                                            'default' => '1',
@@ -476,6 +497,7 @@ class PrintLabel extends \Civi\Core\Entity {
               'created_id' => array(
       
         'name' => 'created_id',
+        'propertyName' => 'created',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Created By Contact ID'),
                                                      

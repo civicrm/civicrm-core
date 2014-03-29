@@ -67,7 +67,8 @@ class SavedSearch extends \Civi\Core\Entity {
    * @var text
    *
    * @JMS\Type("text")
-   * @ORM\Column(name="form_values", type="text", nullable=true)
+   * @ORM\Column(name="form_values", type="text", length=65535, nullable=true)
+   * 
    * 
    */
   private $formValues;
@@ -78,6 +79,7 @@ class SavedSearch extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\Mapping")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="mapping_id", referencedColumnName="id")})
+   * 
    */
   private $mapping;
   
@@ -87,6 +89,7 @@ class SavedSearch extends \Civi\Core\Entity {
    * @JMS\Type("integer")
    * @ORM\Column(name="search_custom_id", type="integer", nullable=true, options={"unsigned":true})
    * 
+   * 
    */
   private $searchCustomId;
   
@@ -94,7 +97,8 @@ class SavedSearch extends \Civi\Core\Entity {
    * @var text
    *
    * @JMS\Type("text")
-   * @ORM\Column(name="where_clause", type="text", nullable=true)
+   * @ORM\Column(name="where_clause", type="text", length=65535, nullable=true)
+   * 
    * 
    */
   private $whereClause;
@@ -103,7 +107,8 @@ class SavedSearch extends \Civi\Core\Entity {
    * @var text
    *
    * @JMS\Type("text")
-   * @ORM\Column(name="select_tables", type="text", nullable=true)
+   * @ORM\Column(name="select_tables", type="text", length=65535, nullable=true)
+   * 
    * 
    */
   private $selectTables;
@@ -112,7 +117,8 @@ class SavedSearch extends \Civi\Core\Entity {
    * @var text
    *
    * @JMS\Type("text")
-   * @ORM\Column(name="where_tables", type="text", nullable=true)
+   * @ORM\Column(name="where_tables", type="text", length=65535, nullable=true)
+   * 
    * 
    */
   private $whereTables;
@@ -259,6 +265,7 @@ class SavedSearch extends \Civi\Core\Entity {
               'id' => array(
       
         'name' => 'id',
+        'propertyName' => 'id',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -268,9 +275,11 @@ class SavedSearch extends \Civi\Core\Entity {
               'form_values' => array(
       
         'name' => 'form_values',
+        'propertyName' => 'formValues',
         'type' => CRM_Utils_Type::T_TEXT,
                 'title' => ts('Submitted Form Values'),
-                                                     
+                                 'maxlength' => 65535,
+                                    
                 'import' => true,
         'where' => 'civicrm_saved_search.form_values',
         'headerPattern' => '',
@@ -282,6 +291,7 @@ class SavedSearch extends \Civi\Core\Entity {
               'mapping_id' => array(
       
         'name' => 'mapping_id',
+        'propertyName' => 'mapping',
         'type' => CRM_Utils_Type::T_INT,
                                                      
                                     
@@ -291,6 +301,7 @@ class SavedSearch extends \Civi\Core\Entity {
               'search_custom_id' => array(
       
         'name' => 'search_custom_id',
+        'propertyName' => 'searchCustomId',
         'type' => CRM_Utils_Type::T_INT,
                                                      
                                     
@@ -299,27 +310,33 @@ class SavedSearch extends \Civi\Core\Entity {
               'where_clause' => array(
       
         'name' => 'where_clause',
+        'propertyName' => 'whereClause',
         'type' => CRM_Utils_Type::T_TEXT,
                 'title' => ts('Where Clause'),
-                                                     
+                                 'maxlength' => 65535,
+                                    
                                     
                           ),
       
               'select_tables' => array(
       
         'name' => 'select_tables',
+        'propertyName' => 'selectTables',
         'type' => CRM_Utils_Type::T_TEXT,
                 'title' => ts('Select Tables'),
-                                                     
+                                 'maxlength' => 65535,
+                                    
                                     
                           ),
       
               'where_tables' => array(
       
         'name' => 'where_tables',
+        'propertyName' => 'whereTables',
         'type' => CRM_Utils_Type::T_TEXT,
                 'title' => ts('Where Tables'),
-                                                     
+                                 'maxlength' => 65535,
+                                    
                                     
                           ),
              );

@@ -69,6 +69,7 @@ class Delivered extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Mailing\Event\Queue")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="event_queue_id", referencedColumnName="id", onDelete="CASCADE")})
+   * 
    */
   private $eventQueue;
   
@@ -77,6 +78,7 @@ class Delivered extends \Civi\Core\Entity {
    *
    * @JMS\Type("datetime")
    * @ORM\Column(name="time_stamp", type="datetime", nullable=true)
+   * 
    * 
    */
   private $timeStamp;
@@ -143,6 +145,7 @@ class Delivered extends \Civi\Core\Entity {
               'id' => array(
       
         'name' => 'id',
+        'propertyName' => 'id',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -152,6 +155,7 @@ class Delivered extends \Civi\Core\Entity {
               'event_queue_id' => array(
       
         'name' => 'event_queue_id',
+        'propertyName' => 'eventQueue',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -162,6 +166,7 @@ class Delivered extends \Civi\Core\Entity {
               'time_stamp' => array(
       
         'name' => 'time_stamp',
+        'propertyName' => 'timeStamp',
         'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
                 'title' => ts('Time Stamp'),
                         'required' => true,

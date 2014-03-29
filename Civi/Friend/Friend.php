@@ -69,6 +69,7 @@ class Friend extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="entity_table", type="string", length=64, nullable=true)
    * 
+   * 
    */
   private $entityTable;
   
@@ -77,6 +78,7 @@ class Friend extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="entity_id", type="integer", nullable=true, options={"unsigned":true})
+   * 
    * 
    */
   private $entityId;
@@ -87,6 +89,7 @@ class Friend extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="title", type="string", length=255, nullable=true)
    * 
+   * 
    */
   private $title;
   
@@ -94,7 +97,8 @@ class Friend extends \Civi\Core\Entity {
    * @var text
    *
    * @JMS\Type("text")
-   * @ORM\Column(name="intro", type="text", nullable=true)
+   * @ORM\Column(name="intro", type="text", length=65535, nullable=true)
+   * 
    * 
    */
   private $intro;
@@ -103,7 +107,8 @@ class Friend extends \Civi\Core\Entity {
    * @var text
    *
    * @JMS\Type("text")
-   * @ORM\Column(name="suggested_message", type="text", nullable=true)
+   * @ORM\Column(name="suggested_message", type="text", length=65535, nullable=true)
+   * 
    * 
    */
   private $suggestedMessage;
@@ -114,6 +119,7 @@ class Friend extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="general_link", type="string", length=255, nullable=true)
    * 
+   * 
    */
   private $generalLink;
   
@@ -123,6 +129,7 @@ class Friend extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="thankyou_title", type="string", length=255, nullable=true)
    * 
+   * 
    */
   private $thankyouTitle;
   
@@ -130,7 +137,8 @@ class Friend extends \Civi\Core\Entity {
    * @var text
    *
    * @JMS\Type("text")
-   * @ORM\Column(name="thankyou_text", type="text", nullable=true)
+   * @ORM\Column(name="thankyou_text", type="text", length=65535, nullable=true)
+   * 
    * 
    */
   private $thankyouText;
@@ -140,6 +148,7 @@ class Friend extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_active", type="boolean", nullable=true)
+   * 
    * 
    */
   private $isActive;
@@ -346,6 +355,7 @@ class Friend extends \Civi\Core\Entity {
               'id' => array(
       
         'name' => 'id',
+        'propertyName' => 'id',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -355,6 +365,7 @@ class Friend extends \Civi\Core\Entity {
               'entity_table' => array(
       
         'name' => 'entity_table',
+        'propertyName' => 'entityTable',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Entity Table'),
                         'required' => true,
@@ -367,6 +378,7 @@ class Friend extends \Civi\Core\Entity {
               'entity_id' => array(
       
         'name' => 'entity_id',
+        'propertyName' => 'entityId',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -376,6 +388,7 @@ class Friend extends \Civi\Core\Entity {
               'title' => array(
       
         'name' => 'title',
+        'propertyName' => 'title',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Title'),
                                  'maxlength' => 255,
@@ -387,24 +400,29 @@ class Friend extends \Civi\Core\Entity {
               'intro' => array(
       
         'name' => 'intro',
+        'propertyName' => 'intro',
         'type' => CRM_Utils_Type::T_TEXT,
                 'title' => ts('Intro'),
-                                                     
+                                 'maxlength' => 65535,
+                                    
                                     
                           ),
       
               'suggested_message' => array(
       
         'name' => 'suggested_message',
+        'propertyName' => 'suggestedMessage',
         'type' => CRM_Utils_Type::T_TEXT,
                 'title' => ts('Suggested Message'),
-                                                     
+                                 'maxlength' => 65535,
+                                    
                                     
                           ),
       
               'general_link' => array(
       
         'name' => 'general_link',
+        'propertyName' => 'generalLink',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('General Link'),
                                  'maxlength' => 255,
@@ -421,6 +439,7 @@ class Friend extends \Civi\Core\Entity {
               'thankyou_title' => array(
       
         'name' => 'thankyou_title',
+        'propertyName' => 'thankyouTitle',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Thankyou Title'),
                                  'maxlength' => 255,
@@ -432,15 +451,18 @@ class Friend extends \Civi\Core\Entity {
               'thankyou_text' => array(
       
         'name' => 'thankyou_text',
+        'propertyName' => 'thankyouText',
         'type' => CRM_Utils_Type::T_TEXT,
                 'title' => ts('Thankyou Text'),
-                                                     
+                                 'maxlength' => 65535,
+                                    
                                     
                           ),
       
               'is_active' => array(
       
         'name' => 'is_active',
+        'propertyName' => 'isActive',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                                                      
                                     

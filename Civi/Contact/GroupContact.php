@@ -69,6 +69,7 @@ class GroupContact extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Group")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="group_id", referencedColumnName="id", onDelete="CASCADE")})
+   * 
    */
   private $group;
   
@@ -78,6 +79,7 @@ class GroupContact extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Contact")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="contact_id", referencedColumnName="id", onDelete="CASCADE")})
+   * 
    */
   private $contact;
   
@@ -86,6 +88,7 @@ class GroupContact extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="status", type="string", length=8, nullable=true)
+   * 
    * 
    */
   private $status;
@@ -96,6 +99,7 @@ class GroupContact extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\LocBlock")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="location_id", referencedColumnName="id", onDelete="SET NULL")})
+   * 
    */
   private $location;
   
@@ -105,6 +109,7 @@ class GroupContact extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\Email")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="email_id", referencedColumnName="id")})
+   * 
    */
   private $email;
 
@@ -230,6 +235,7 @@ class GroupContact extends \Civi\Core\Entity {
               'id' => array(
       
         'name' => 'id',
+        'propertyName' => 'id',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Group Contact ID'),
                         'required' => true,
@@ -240,6 +246,7 @@ class GroupContact extends \Civi\Core\Entity {
               'group_id' => array(
       
         'name' => 'group_id',
+        'propertyName' => 'group',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Group ID'),
                         'required' => true,
@@ -256,6 +263,7 @@ class GroupContact extends \Civi\Core\Entity {
               'contact_id' => array(
       
         'name' => 'contact_id',
+        'propertyName' => 'contact',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Contact ID'),
                         'required' => true,
@@ -267,6 +275,7 @@ class GroupContact extends \Civi\Core\Entity {
               'status' => array(
       
         'name' => 'status',
+        'propertyName' => 'status',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Group Contact Status'),
                                  'maxlength' => 8,
@@ -281,6 +290,7 @@ class GroupContact extends \Civi\Core\Entity {
               'location_id' => array(
       
         'name' => 'location_id',
+        'propertyName' => 'location',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Group Contact Location'),
                                                      
@@ -291,6 +301,7 @@ class GroupContact extends \Civi\Core\Entity {
               'email_id' => array(
       
         'name' => 'email_id',
+        'propertyName' => 'email',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Group Contact Email'),
                                                      

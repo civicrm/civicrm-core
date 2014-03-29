@@ -69,6 +69,7 @@ class Queue extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Mailing\MailingJob")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="job_id", referencedColumnName="id", onDelete="CASCADE")})
+   * 
    */
   private $job;
   
@@ -78,6 +79,7 @@ class Queue extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\Email")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="email_id", referencedColumnName="id", onDelete="CASCADE")})
+   * 
    */
   private $email = 'NULL';
   
@@ -87,6 +89,7 @@ class Queue extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Contact")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="contact_id", referencedColumnName="id", onDelete="CASCADE")})
+   * 
    */
   private $contact;
   
@@ -95,6 +98,7 @@ class Queue extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="hash", type="string", length=255, nullable=true)
+   * 
    * 
    */
   private $hash;
@@ -105,6 +109,7 @@ class Queue extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\Phone")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="phone_id", referencedColumnName="id", onDelete="CASCADE")})
+   * 
    */
   private $phone = 'NULL';
 
@@ -230,6 +235,7 @@ class Queue extends \Civi\Core\Entity {
               'id' => array(
       
         'name' => 'id',
+        'propertyName' => 'id',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -239,6 +245,7 @@ class Queue extends \Civi\Core\Entity {
               'job_id' => array(
       
         'name' => 'job_id',
+        'propertyName' => 'job',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -249,6 +256,7 @@ class Queue extends \Civi\Core\Entity {
               'email_id' => array(
       
         'name' => 'email_id',
+        'propertyName' => 'email',
         'type' => CRM_Utils_Type::T_INT,
                                                      
                                            'default' => 'NULL',
@@ -259,6 +267,7 @@ class Queue extends \Civi\Core\Entity {
               'contact_id' => array(
       
         'name' => 'contact_id',
+        'propertyName' => 'contact',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -269,6 +278,7 @@ class Queue extends \Civi\Core\Entity {
               'hash' => array(
       
         'name' => 'hash',
+        'propertyName' => 'hash',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Hash'),
                         'required' => true,
@@ -281,6 +291,7 @@ class Queue extends \Civi\Core\Entity {
               'phone_id' => array(
       
         'name' => 'phone_id',
+        'propertyName' => 'phone',
         'type' => CRM_Utils_Type::T_INT,
                                                      
                                            'default' => 'NULL',

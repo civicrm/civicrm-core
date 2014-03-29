@@ -69,6 +69,7 @@ class EntityTag extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="entity_table", type="string", length=64, nullable=true)
    * 
+   * 
    */
   private $entityTable;
   
@@ -77,6 +78,7 @@ class EntityTag extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="entity_id", type="integer", nullable=true, options={"unsigned":true})
+   * 
    * 
    */
   private $entityId;
@@ -87,6 +89,7 @@ class EntityTag extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\Tag")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="tag_id", referencedColumnName="id", onDelete="CASCADE")})
+   * 
    */
   private $tag;
 
@@ -172,6 +175,7 @@ class EntityTag extends \Civi\Core\Entity {
               'id' => array(
       
         'name' => 'id',
+        'propertyName' => 'id',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Entity Tag ID'),
                         'required' => true,
@@ -182,6 +186,7 @@ class EntityTag extends \Civi\Core\Entity {
               'entity_table' => array(
       
         'name' => 'entity_table',
+        'propertyName' => 'entityTable',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Entity Table'),
                                  'maxlength' => 64,
@@ -193,6 +198,7 @@ class EntityTag extends \Civi\Core\Entity {
               'entity_id' => array(
       
         'name' => 'entity_id',
+        'propertyName' => 'entityId',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Entity ID'),
                         'required' => true,
@@ -203,6 +209,7 @@ class EntityTag extends \Civi\Core\Entity {
               'tag_id' => array(
       
         'name' => 'tag_id',
+        'propertyName' => 'tag',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Tag ID'),
                         'required' => true,

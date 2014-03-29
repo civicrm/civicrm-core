@@ -69,6 +69,7 @@ class ACL extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="name", type="string", length=64, nullable=true)
    * 
+   * 
    */
   private $name;
   
@@ -77,6 +78,7 @@ class ACL extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="deny", type="boolean", nullable=false)
+   * 
    * 
    */
   private $deny = '0';
@@ -87,6 +89,7 @@ class ACL extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="entity_table", type="string", length=64, nullable=true)
    * 
+   * 
    */
   private $entityTable;
   
@@ -95,6 +98,7 @@ class ACL extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="entity_id", type="integer", nullable=true, options={"unsigned":true})
+   * 
    * 
    */
   private $entityId;
@@ -105,6 +109,7 @@ class ACL extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="operation", type="string", length=8, nullable=true)
    * 
+   * 
    */
   private $operation;
   
@@ -113,6 +118,7 @@ class ACL extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="object_table", type="string", length=64, nullable=true)
+   * 
    * 
    */
   private $objectTable;
@@ -123,6 +129,7 @@ class ACL extends \Civi\Core\Entity {
    * @JMS\Type("integer")
    * @ORM\Column(name="object_id", type="integer", nullable=true, options={"unsigned":true})
    * 
+   * 
    */
   private $objectId;
   
@@ -131,6 +138,7 @@ class ACL extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="acl_table", type="string", length=64, nullable=true)
+   * 
    * 
    */
   private $aclTable;
@@ -141,6 +149,7 @@ class ACL extends \Civi\Core\Entity {
    * @JMS\Type("integer")
    * @ORM\Column(name="acl_id", type="integer", nullable=true, options={"unsigned":true})
    * 
+   * 
    */
   private $aclId;
   
@@ -149,6 +158,7 @@ class ACL extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_active", type="boolean", nullable=true)
+   * 
    * 
    */
   private $isActive;
@@ -375,6 +385,7 @@ class ACL extends \Civi\Core\Entity {
               'id' => array(
       
         'name' => 'id',
+        'propertyName' => 'id',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('ACL ID'),
                         'required' => true,
@@ -385,6 +396,7 @@ class ACL extends \Civi\Core\Entity {
               'name' => array(
       
         'name' => 'name',
+        'propertyName' => 'name',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('ACL Name'),
                                  'maxlength' => 64,
@@ -396,6 +408,7 @@ class ACL extends \Civi\Core\Entity {
               'deny' => array(
       
         'name' => 'deny',
+        'propertyName' => 'deny',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('Deny'),
                         'required' => true,
@@ -406,6 +419,7 @@ class ACL extends \Civi\Core\Entity {
               'entity_table' => array(
       
         'name' => 'entity_table',
+        'propertyName' => 'entityTable',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Entity Table'),
                         'required' => true,
@@ -418,6 +432,7 @@ class ACL extends \Civi\Core\Entity {
               'entity_id' => array(
       
         'name' => 'entity_id',
+        'propertyName' => 'entityId',
         'type' => CRM_Utils_Type::T_INT,
                                                      
                                     
@@ -426,6 +441,7 @@ class ACL extends \Civi\Core\Entity {
               'operation' => array(
       
         'name' => 'operation',
+        'propertyName' => 'operation',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Operation'),
                         'required' => true,
@@ -441,6 +457,7 @@ class ACL extends \Civi\Core\Entity {
               'object_table' => array(
       
         'name' => 'object_table',
+        'propertyName' => 'objectTable',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Object Table'),
                                  'maxlength' => 64,
@@ -452,6 +469,7 @@ class ACL extends \Civi\Core\Entity {
               'object_id' => array(
       
         'name' => 'object_id',
+        'propertyName' => 'objectId',
         'type' => CRM_Utils_Type::T_INT,
                                                      
                                     
@@ -460,6 +478,7 @@ class ACL extends \Civi\Core\Entity {
               'acl_table' => array(
       
         'name' => 'acl_table',
+        'propertyName' => 'aclTable',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Acl Table'),
                                  'maxlength' => 64,
@@ -471,6 +490,7 @@ class ACL extends \Civi\Core\Entity {
               'acl_id' => array(
       
         'name' => 'acl_id',
+        'propertyName' => 'aclId',
         'type' => CRM_Utils_Type::T_INT,
                                                      
                                     
@@ -479,6 +499,7 @@ class ACL extends \Civi\Core\Entity {
               'is_active' => array(
       
         'name' => 'is_active',
+        'propertyName' => 'isActive',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                                                      
                                     

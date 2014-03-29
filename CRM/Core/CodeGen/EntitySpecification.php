@@ -243,7 +243,7 @@ class CRM_Core_CodeGen_EntitySpecification {
 
       $field['columnInfo'] = '@ORM\Column(name="' . $field['name'] . '", type="' . $field['phpType'] . '"';
 
-      if ($field['phpType'] == 'string') {
+      if (!empty($field['length']) && in_array($field['phpType'], array('string', 'blob', 'text'))) {
         $field['columnInfo'] .= ', length=' . $field['length'];
       }
 
@@ -271,6 +271,14 @@ class CRM_Core_CodeGen_EntitySpecification {
       $field['columnJoin'] = '';
 
       $field['setFunctionInput'] = '$' . $field['propertyName'];
+
+      //special handling for timestamp column type
+//      if (empty($field['version'])) {
+//        $field['version'] = '';
+//      }
+//      else {
+//        $field['version'] = '@ORM\Version';
+//      }
     }
 
     if ($this->value('primaryKey', $tableXML)) {
@@ -389,12 +397,14 @@ class CRM_Core_CodeGen_EntitySpecification {
       case 'text':
         $field['sqlType'] = $field['phpType'] = $type;
         $field['crmType'] = 'CRM_Utils_Type::T_' . strtoupper($type);
+        $field['length']  = '65535';
         // CRM-13497 see fixme below
         $field['rows'] = isset($fieldXML->html) ? $this->value('rows', $fieldXML->html) : NULL;
         $field['cols'] = isset($fieldXML->html) ? $this->value('cols', $fieldXML->html) : NULL;
         break;
 
       case 'timestamp':
+        $field['version'] = true;
       case 'datetime':
         $field['sqlType'] = $field['phpType'] = 'datetime';
         $field['crmType'] = 'CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME';

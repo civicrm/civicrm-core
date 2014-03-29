@@ -69,6 +69,7 @@ class EntityRole extends \Civi\Core\Entity {
    * @JMS\Type("integer")
    * @ORM\Column(name="acl_role_id", type="integer", nullable=true, options={"unsigned":true})
    * 
+   * 
    */
   private $aclRoleId;
   
@@ -77,6 +78,7 @@ class EntityRole extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="entity_table", type="string", length=64, nullable=true)
+   * 
    * 
    */
   private $entityTable;
@@ -87,6 +89,7 @@ class EntityRole extends \Civi\Core\Entity {
    * @JMS\Type("integer")
    * @ORM\Column(name="entity_id", type="integer", nullable=true, options={"unsigned":true})
    * 
+   * 
    */
   private $entityId;
   
@@ -95,6 +98,7 @@ class EntityRole extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_active", type="boolean", nullable=true)
+   * 
    * 
    */
   private $isActive;
@@ -201,6 +205,7 @@ class EntityRole extends \Civi\Core\Entity {
               'id' => array(
       
         'name' => 'id',
+        'propertyName' => 'id',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -210,6 +215,7 @@ class EntityRole extends \Civi\Core\Entity {
               'acl_role_id' => array(
       
         'name' => 'acl_role_id',
+        'propertyName' => 'aclRoleId',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -219,6 +225,7 @@ class EntityRole extends \Civi\Core\Entity {
               'entity_table' => array(
       
         'name' => 'entity_table',
+        'propertyName' => 'entityTable',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Entity Table'),
                         'required' => true,
@@ -231,6 +238,7 @@ class EntityRole extends \Civi\Core\Entity {
               'entity_id' => array(
       
         'name' => 'entity_id',
+        'propertyName' => 'entityId',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -240,6 +248,7 @@ class EntityRole extends \Civi\Core\Entity {
               'is_active' => array(
       
         'name' => 'is_active',
+        'propertyName' => 'isActive',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                                                      
                                     

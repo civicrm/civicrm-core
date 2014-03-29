@@ -69,6 +69,7 @@ class Job extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\Domain")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="domain_id", referencedColumnName="id")})
+   * 
    */
   private $domain;
   
@@ -77,6 +78,7 @@ class Job extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="run_frequency", type="string", length=8, nullable=false)
+   * 
    * 
    */
   private $runFrequency = '"Daily"';
@@ -87,6 +89,7 @@ class Job extends \Civi\Core\Entity {
    * @JMS\Type("datetime")
    * @ORM\Column(name="last_run", type="datetime", nullable=false)
    * 
+   * 
    */
   private $lastRun = 'NULL';
   
@@ -95,6 +98,7 @@ class Job extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="name", type="string", length=255, nullable=true)
+   * 
    * 
    */
   private $name;
@@ -105,6 +109,7 @@ class Job extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="description", type="string", length=255, nullable=true)
    * 
+   * 
    */
   private $description;
   
@@ -113,6 +118,7 @@ class Job extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="api_entity", type="string", length=255, nullable=true)
+   * 
    * 
    */
   private $apiEntity;
@@ -123,6 +129,7 @@ class Job extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="api_action", type="string", length=255, nullable=true)
    * 
+   * 
    */
   private $apiAction;
   
@@ -130,7 +137,8 @@ class Job extends \Civi\Core\Entity {
    * @var text
    *
    * @JMS\Type("text")
-   * @ORM\Column(name="parameters", type="text", nullable=true)
+   * @ORM\Column(name="parameters", type="text", length=65535, nullable=true)
+   * 
    * 
    */
   private $parameters;
@@ -140,6 +148,7 @@ class Job extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_active", type="boolean", nullable=true)
+   * 
    * 
    */
   private $isActive;
@@ -346,6 +355,7 @@ class Job extends \Civi\Core\Entity {
               'id' => array(
       
         'name' => 'id',
+        'propertyName' => 'id',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -355,6 +365,7 @@ class Job extends \Civi\Core\Entity {
               'domain_id' => array(
       
         'name' => 'domain_id',
+        'propertyName' => 'domain',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -365,6 +376,7 @@ class Job extends \Civi\Core\Entity {
               'run_frequency' => array(
       
         'name' => 'run_frequency',
+        'propertyName' => 'runFrequency',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Run Frequency'),
                                  'maxlength' => 8,
@@ -380,6 +392,7 @@ class Job extends \Civi\Core\Entity {
               'last_run' => array(
       
         'name' => 'last_run',
+        'propertyName' => 'lastRun',
         'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
                 'title' => ts('Last Run'),
                                                      
@@ -390,6 +403,7 @@ class Job extends \Civi\Core\Entity {
               'name' => array(
       
         'name' => 'name',
+        'propertyName' => 'name',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Name'),
                                  'maxlength' => 255,
@@ -401,6 +415,7 @@ class Job extends \Civi\Core\Entity {
               'description' => array(
       
         'name' => 'description',
+        'propertyName' => 'description',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Description'),
                                  'maxlength' => 255,
@@ -412,6 +427,7 @@ class Job extends \Civi\Core\Entity {
               'api_entity' => array(
       
         'name' => 'api_entity',
+        'propertyName' => 'apiEntity',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Api Entity'),
                                  'maxlength' => 255,
@@ -423,6 +439,7 @@ class Job extends \Civi\Core\Entity {
               'api_action' => array(
       
         'name' => 'api_action',
+        'propertyName' => 'apiAction',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Api Action'),
                                  'maxlength' => 255,
@@ -434,9 +451,11 @@ class Job extends \Civi\Core\Entity {
               'parameters' => array(
       
         'name' => 'parameters',
+        'propertyName' => 'parameters',
         'type' => CRM_Utils_Type::T_TEXT,
                 'title' => ts('Parameters'),
-                                                   'rows' => 4,
+                                 'maxlength' => 65535,
+                                  'rows' => 4,
                          'cols' => 60,
          
                                     
@@ -445,6 +464,7 @@ class Job extends \Civi\Core\Entity {
               'is_active' => array(
       
         'name' => 'is_active',
+        'propertyName' => 'isActive',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                                                      
                                     

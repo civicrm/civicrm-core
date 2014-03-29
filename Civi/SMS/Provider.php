@@ -69,6 +69,7 @@ class Provider extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="name", type="string", length=64, nullable=true)
    * 
+   * 
    */
   private $name;
   
@@ -77,6 +78,7 @@ class Provider extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="title", type="string", length=64, nullable=true)
+   * 
    * 
    */
   private $title;
@@ -87,6 +89,7 @@ class Provider extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="username", type="string", length=255, nullable=true)
    * 
+   * 
    */
   private $username;
   
@@ -95,6 +98,7 @@ class Provider extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="password", type="string", length=255, nullable=true)
+   * 
    * 
    */
   private $password;
@@ -105,6 +109,7 @@ class Provider extends \Civi\Core\Entity {
    * @JMS\Type("integer")
    * @ORM\Column(name="api_type", type="integer", nullable=true, options={"unsigned":true})
    * 
+   * 
    */
   private $apiType;
   
@@ -114,6 +119,7 @@ class Provider extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="api_url", type="string", length=128, nullable=true)
    * 
+   * 
    */
   private $apiUrl;
   
@@ -121,7 +127,8 @@ class Provider extends \Civi\Core\Entity {
    * @var text
    *
    * @JMS\Type("text")
-   * @ORM\Column(name="api_params", type="text", nullable=true)
+   * @ORM\Column(name="api_params", type="text", length=65535, nullable=true)
+   * 
    * 
    */
   private $apiParams;
@@ -132,6 +139,7 @@ class Provider extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_default", type="boolean", nullable=false)
    * 
+   * 
    */
   private $isDefault = '0';
   
@@ -140,6 +148,7 @@ class Provider extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_active", type="boolean", nullable=false)
+   * 
    * 
    */
   private $isActive = '0';
@@ -346,6 +355,7 @@ class Provider extends \Civi\Core\Entity {
               'id' => array(
       
         'name' => 'id',
+        'propertyName' => 'id',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -355,6 +365,7 @@ class Provider extends \Civi\Core\Entity {
               'name' => array(
       
         'name' => 'name',
+        'propertyName' => 'name',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Name'),
                                  'maxlength' => 64,
@@ -366,6 +377,7 @@ class Provider extends \Civi\Core\Entity {
               'title' => array(
       
         'name' => 'title',
+        'propertyName' => 'title',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Title'),
                                  'maxlength' => 64,
@@ -377,6 +389,7 @@ class Provider extends \Civi\Core\Entity {
               'username' => array(
       
         'name' => 'username',
+        'propertyName' => 'username',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Username'),
                                  'maxlength' => 255,
@@ -388,6 +401,7 @@ class Provider extends \Civi\Core\Entity {
               'password' => array(
       
         'name' => 'password',
+        'propertyName' => 'password',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Password'),
                                  'maxlength' => 255,
@@ -399,6 +413,7 @@ class Provider extends \Civi\Core\Entity {
               'api_type' => array(
       
         'name' => 'api_type',
+        'propertyName' => 'apiType',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Api Type'),
                         'required' => true,
@@ -409,6 +424,7 @@ class Provider extends \Civi\Core\Entity {
               'api_url' => array(
       
         'name' => 'api_url',
+        'propertyName' => 'apiUrl',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Api Url'),
                                  'maxlength' => 128,
@@ -420,15 +436,18 @@ class Provider extends \Civi\Core\Entity {
               'api_params' => array(
       
         'name' => 'api_params',
+        'propertyName' => 'apiParams',
         'type' => CRM_Utils_Type::T_TEXT,
                 'title' => ts('Api Params'),
-                                                     
+                                 'maxlength' => 65535,
+                                    
                                     
                           ),
       
               'is_default' => array(
       
         'name' => 'is_default',
+        'propertyName' => 'isDefault',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                                                      
                                     
@@ -437,6 +456,7 @@ class Provider extends \Civi\Core\Entity {
               'is_active' => array(
       
         'name' => 'is_active',
+        'propertyName' => 'isActive',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                                                      
                                     

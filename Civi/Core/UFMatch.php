@@ -69,6 +69,7 @@ class UFMatch extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\Domain")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="domain_id", referencedColumnName="id")})
+   * 
    */
   private $domain;
   
@@ -77,6 +78,7 @@ class UFMatch extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="uf_id", type="integer", nullable=true, options={"unsigned":true})
+   * 
    * 
    */
   private $ufId;
@@ -87,6 +89,7 @@ class UFMatch extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="uf_name", type="string", length=128, nullable=true)
    * 
+   * 
    */
   private $ufName;
   
@@ -96,6 +99,7 @@ class UFMatch extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Contact")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="contact_id", referencedColumnName="id", onDelete="CASCADE")})
+   * 
    */
   private $contact;
   
@@ -104,6 +108,7 @@ class UFMatch extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="language", type="string", length=5, nullable=true)
+   * 
    * 
    */
   private $language;
@@ -230,6 +235,7 @@ class UFMatch extends \Civi\Core\Entity {
               'id' => array(
       
         'name' => 'id',
+        'propertyName' => 'id',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -239,6 +245,7 @@ class UFMatch extends \Civi\Core\Entity {
               'domain_id' => array(
       
         'name' => 'domain_id',
+        'propertyName' => 'domain',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -249,6 +256,7 @@ class UFMatch extends \Civi\Core\Entity {
               'uf_id' => array(
       
         'name' => 'uf_id',
+        'propertyName' => 'ufId',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -258,6 +266,7 @@ class UFMatch extends \Civi\Core\Entity {
               'uf_name' => array(
       
         'name' => 'uf_name',
+        'propertyName' => 'ufName',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Uf Name'),
                                  'maxlength' => 128,
@@ -269,6 +278,7 @@ class UFMatch extends \Civi\Core\Entity {
               'contact_id' => array(
       
         'name' => 'contact_id',
+        'propertyName' => 'contact',
         'type' => CRM_Utils_Type::T_INT,
                                                      
                                     
@@ -278,6 +288,7 @@ class UFMatch extends \Civi\Core\Entity {
               'language' => array(
       
         'name' => 'language',
+        'propertyName' => 'language',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Language'),
                                  'maxlength' => 5,

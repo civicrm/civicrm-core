@@ -69,6 +69,7 @@ class MailSettings extends \Civi\Core\Entity {
    * @JMS\Type("integer")
    * @ORM\Column(name="domain_id", type="integer", nullable=true, options={"unsigned":true})
    * 
+   * 
    */
   private $domainId;
   
@@ -77,6 +78,7 @@ class MailSettings extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="name", type="string", length=255, nullable=true)
+   * 
    * 
    */
   private $name;
@@ -87,6 +89,7 @@ class MailSettings extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_default", type="boolean", nullable=true)
    * 
+   * 
    */
   private $isDefault;
   
@@ -95,6 +98,7 @@ class MailSettings extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="domain", type="string", length=255, nullable=true)
+   * 
    * 
    */
   private $domain;
@@ -105,6 +109,7 @@ class MailSettings extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="localpart", type="string", length=255, nullable=true)
    * 
+   * 
    */
   private $localpart;
   
@@ -113,6 +118,7 @@ class MailSettings extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="return_path", type="string", length=255, nullable=true)
+   * 
    * 
    */
   private $returnPath;
@@ -123,6 +129,7 @@ class MailSettings extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="protocol", type="string", length=255, nullable=true)
    * 
+   * 
    */
   private $protocol;
   
@@ -131,6 +138,7 @@ class MailSettings extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="server", type="string", length=255, nullable=true)
+   * 
    * 
    */
   private $server;
@@ -141,6 +149,7 @@ class MailSettings extends \Civi\Core\Entity {
    * @JMS\Type("integer")
    * @ORM\Column(name="port", type="integer", nullable=true, options={"unsigned":true})
    * 
+   * 
    */
   private $port;
   
@@ -149,6 +158,7 @@ class MailSettings extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="username", type="string", length=255, nullable=true)
+   * 
    * 
    */
   private $username;
@@ -159,6 +169,7 @@ class MailSettings extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="password", type="string", length=255, nullable=true)
    * 
+   * 
    */
   private $password;
   
@@ -168,6 +179,7 @@ class MailSettings extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_ssl", type="boolean", nullable=true)
    * 
+   * 
    */
   private $isSsl;
   
@@ -176,6 +188,7 @@ class MailSettings extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="source", type="string", length=255, nullable=true)
+   * 
    * 
    */
   private $source;
@@ -462,6 +475,7 @@ class MailSettings extends \Civi\Core\Entity {
               'id' => array(
       
         'name' => 'id',
+        'propertyName' => 'id',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -471,6 +485,7 @@ class MailSettings extends \Civi\Core\Entity {
               'domain_id' => array(
       
         'name' => 'domain_id',
+        'propertyName' => 'domainId',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -480,6 +495,7 @@ class MailSettings extends \Civi\Core\Entity {
               'name' => array(
       
         'name' => 'name',
+        'propertyName' => 'name',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Name'),
                                  'maxlength' => 255,
@@ -491,6 +507,7 @@ class MailSettings extends \Civi\Core\Entity {
               'is_default' => array(
       
         'name' => 'is_default',
+        'propertyName' => 'isDefault',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                                                      
                                     
@@ -499,6 +516,7 @@ class MailSettings extends \Civi\Core\Entity {
               'domain' => array(
       
         'name' => 'domain',
+        'propertyName' => 'domain',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Domain'),
                                  'maxlength' => 255,
@@ -510,6 +528,7 @@ class MailSettings extends \Civi\Core\Entity {
               'localpart' => array(
       
         'name' => 'localpart',
+        'propertyName' => 'localpart',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Localpart'),
                                  'maxlength' => 255,
@@ -521,6 +540,7 @@ class MailSettings extends \Civi\Core\Entity {
               'return_path' => array(
       
         'name' => 'return_path',
+        'propertyName' => 'returnPath',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Return Path'),
                                  'maxlength' => 255,
@@ -532,6 +552,7 @@ class MailSettings extends \Civi\Core\Entity {
               'protocol' => array(
       
         'name' => 'protocol',
+        'propertyName' => 'protocol',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Protocol'),
                                  'maxlength' => 255,
@@ -546,6 +567,7 @@ class MailSettings extends \Civi\Core\Entity {
               'server' => array(
       
         'name' => 'server',
+        'propertyName' => 'server',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Server'),
                                  'maxlength' => 255,
@@ -557,6 +579,7 @@ class MailSettings extends \Civi\Core\Entity {
               'port' => array(
       
         'name' => 'port',
+        'propertyName' => 'port',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Port'),
                                                      
@@ -566,6 +589,7 @@ class MailSettings extends \Civi\Core\Entity {
               'username' => array(
       
         'name' => 'username',
+        'propertyName' => 'username',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Username'),
                                  'maxlength' => 255,
@@ -577,6 +601,7 @@ class MailSettings extends \Civi\Core\Entity {
               'password' => array(
       
         'name' => 'password',
+        'propertyName' => 'password',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Password'),
                                  'maxlength' => 255,
@@ -588,6 +613,7 @@ class MailSettings extends \Civi\Core\Entity {
               'is_ssl' => array(
       
         'name' => 'is_ssl',
+        'propertyName' => 'isSsl',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                                                      
                                     
@@ -596,6 +622,7 @@ class MailSettings extends \Civi\Core\Entity {
               'source' => array(
       
         'name' => 'source',
+        'propertyName' => 'source',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Source'),
                                  'maxlength' => 255,

@@ -69,6 +69,7 @@ class ActionSchedule extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="name", type="string", length=64, nullable=true)
    * 
+   * 
    */
   private $name;
   
@@ -77,6 +78,7 @@ class ActionSchedule extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="title", type="string", length=64, nullable=true)
+   * 
    * 
    */
   private $title;
@@ -87,6 +89,7 @@ class ActionSchedule extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="recipient", type="string", length=64, nullable=true)
    * 
+   * 
    */
   private $recipient;
   
@@ -95,6 +98,7 @@ class ActionSchedule extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="limit_to", type="boolean", nullable=false)
+   * 
    * 
    */
   private $limitTo = '1';
@@ -105,6 +109,7 @@ class ActionSchedule extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="entity_value", type="string", length=64, nullable=true)
    * 
+   * 
    */
   private $entityValue;
   
@@ -113,6 +118,7 @@ class ActionSchedule extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="entity_status", type="string", length=64, nullable=true)
+   * 
    * 
    */
   private $entityStatus;
@@ -123,6 +129,7 @@ class ActionSchedule extends \Civi\Core\Entity {
    * @JMS\Type("integer")
    * @ORM\Column(name="start_action_offset", type="integer", nullable=true, options={"unsigned":true})
    * 
+   * 
    */
   private $startActionOffset;
   
@@ -131,6 +138,7 @@ class ActionSchedule extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="start_action_unit", type="string", length=8, nullable=true)
+   * 
    * 
    */
   private $startActionUnit;
@@ -141,6 +149,7 @@ class ActionSchedule extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="start_action_condition", type="string", length=32, nullable=true)
    * 
+   * 
    */
   private $startActionCondition;
   
@@ -149,6 +158,7 @@ class ActionSchedule extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="start_action_date", type="string", length=64, nullable=true)
+   * 
    * 
    */
   private $startActionDate;
@@ -159,6 +169,7 @@ class ActionSchedule extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_repeat", type="boolean", nullable=false)
    * 
+   * 
    */
   private $isRepeat = '0';
   
@@ -167,6 +178,7 @@ class ActionSchedule extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="repetition_frequency_unit", type="string", length=8, nullable=true)
+   * 
    * 
    */
   private $repetitionFrequencyUnit;
@@ -177,6 +189,7 @@ class ActionSchedule extends \Civi\Core\Entity {
    * @JMS\Type("integer")
    * @ORM\Column(name="repetition_frequency_interval", type="integer", nullable=true, options={"unsigned":true})
    * 
+   * 
    */
   private $repetitionFrequencyInterval;
   
@@ -185,6 +198,7 @@ class ActionSchedule extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="end_frequency_unit", type="string", length=8, nullable=true)
+   * 
    * 
    */
   private $endFrequencyUnit;
@@ -195,6 +209,7 @@ class ActionSchedule extends \Civi\Core\Entity {
    * @JMS\Type("integer")
    * @ORM\Column(name="end_frequency_interval", type="integer", nullable=true, options={"unsigned":true})
    * 
+   * 
    */
   private $endFrequencyInterval;
   
@@ -203,6 +218,7 @@ class ActionSchedule extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="end_action", type="string", length=32, nullable=true)
+   * 
    * 
    */
   private $endAction;
@@ -213,6 +229,7 @@ class ActionSchedule extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="end_date", type="string", length=64, nullable=true)
    * 
+   * 
    */
   private $endDate;
   
@@ -221,6 +238,7 @@ class ActionSchedule extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_active", type="boolean", nullable=false)
+   * 
    * 
    */
   private $isActive = '1';
@@ -231,6 +249,7 @@ class ActionSchedule extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="recipient_manual", type="string", length=128, nullable=true)
    * 
+   * 
    */
   private $recipientManual;
   
@@ -239,6 +258,7 @@ class ActionSchedule extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="recipient_listing", type="string", length=128, nullable=true)
+   * 
    * 
    */
   private $recipientListing;
@@ -249,6 +269,7 @@ class ActionSchedule extends \Civi\Core\Entity {
    * @JMS\Type("text")
    * @ORM\Column(name="body_text", type="text", nullable=true)
    * 
+   * 
    */
   private $bodyText;
   
@@ -257,6 +278,7 @@ class ActionSchedule extends \Civi\Core\Entity {
    *
    * @JMS\Type("text")
    * @ORM\Column(name="body_html", type="text", nullable=true)
+   * 
    * 
    */
   private $bodyHtml;
@@ -267,6 +289,7 @@ class ActionSchedule extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="subject", type="string", length=128, nullable=true)
    * 
+   * 
    */
   private $subject;
   
@@ -275,6 +298,7 @@ class ActionSchedule extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="record_activity", type="boolean", nullable=false)
+   * 
    * 
    */
   private $recordActivity = 'NULL';
@@ -285,6 +309,7 @@ class ActionSchedule extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\ActionMapping")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="mapping_id", referencedColumnName="id", onDelete="SET NULL")})
+   * 
    */
   private $mapping;
   
@@ -294,6 +319,7 @@ class ActionSchedule extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Group")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="group_id", referencedColumnName="id", onDelete="SET NULL")})
+   * 
    */
   private $group;
   
@@ -303,6 +329,7 @@ class ActionSchedule extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\MessageTemplate")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="msg_template_id", referencedColumnName="id", onDelete="SET NULL")})
+   * 
    */
   private $msgTemplate;
   
@@ -311,6 +338,7 @@ class ActionSchedule extends \Civi\Core\Entity {
    *
    * @JMS\Type("date")
    * @ORM\Column(name="absolute_date", type="date", nullable=true)
+   * 
    * 
    */
   private $absoluteDate;
@@ -321,6 +349,7 @@ class ActionSchedule extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="mode", type="string", length=128, nullable=false)
    * 
+   * 
    */
   private $mode = '"Email"';
   
@@ -330,6 +359,7 @@ class ActionSchedule extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\SMS\Provider")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="sms_provider_id", referencedColumnName="id", onDelete="SET NULL")})
+   * 
    */
   private $smsProvider;
 
@@ -955,6 +985,7 @@ class ActionSchedule extends \Civi\Core\Entity {
               'id' => array(
       
         'name' => 'id',
+        'propertyName' => 'id',
         'type' => CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
@@ -964,6 +995,7 @@ class ActionSchedule extends \Civi\Core\Entity {
               'name' => array(
       
         'name' => 'name',
+        'propertyName' => 'name',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Name'),
                                  'maxlength' => 64,
@@ -975,6 +1007,7 @@ class ActionSchedule extends \Civi\Core\Entity {
               'title' => array(
       
         'name' => 'title',
+        'propertyName' => 'title',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Title'),
                                  'maxlength' => 64,
@@ -986,6 +1019,7 @@ class ActionSchedule extends \Civi\Core\Entity {
               'recipient' => array(
       
         'name' => 'recipient',
+        'propertyName' => 'recipient',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Recipient'),
                                  'maxlength' => 64,
@@ -997,6 +1031,7 @@ class ActionSchedule extends \Civi\Core\Entity {
               'limit_to' => array(
       
         'name' => 'limit_to',
+        'propertyName' => 'limitTo',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('Limit To'),
                                                      
@@ -1007,6 +1042,7 @@ class ActionSchedule extends \Civi\Core\Entity {
               'entity_value' => array(
       
         'name' => 'entity_value',
+        'propertyName' => 'entityValue',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Entity Value'),
                                  'maxlength' => 64,
@@ -1018,6 +1054,7 @@ class ActionSchedule extends \Civi\Core\Entity {
               'entity_status' => array(
       
         'name' => 'entity_status',
+        'propertyName' => 'entityStatus',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Entity Status'),
                                  'maxlength' => 64,
@@ -1029,6 +1066,7 @@ class ActionSchedule extends \Civi\Core\Entity {
               'start_action_offset' => array(
       
         'name' => 'start_action_offset',
+        'propertyName' => 'startActionOffset',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Start Action Offset'),
                                                      
@@ -1038,6 +1076,7 @@ class ActionSchedule extends \Civi\Core\Entity {
               'start_action_unit' => array(
       
         'name' => 'start_action_unit',
+        'propertyName' => 'startActionUnit',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Start Action Unit'),
                                  'maxlength' => 8,
@@ -1045,14 +1084,14 @@ class ActionSchedule extends \Civi\Core\Entity {
                            
                                     
                                      'pseudoconstant' => array(
-                                'optionGroupName' => 'recur_frequency_units',
-                      'keyColumn' => 'name',
+                                '0' => 'not in database',
                     )
                  ),
       
               'start_action_condition' => array(
       
         'name' => 'start_action_condition',
+        'propertyName' => 'startActionCondition',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Start Action Condition'),
                                  'maxlength' => 32,
@@ -1064,6 +1103,7 @@ class ActionSchedule extends \Civi\Core\Entity {
               'start_action_date' => array(
       
         'name' => 'start_action_date',
+        'propertyName' => 'startActionDate',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Start Action Date'),
                                  'maxlength' => 64,
@@ -1075,6 +1115,7 @@ class ActionSchedule extends \Civi\Core\Entity {
               'is_repeat' => array(
       
         'name' => 'is_repeat',
+        'propertyName' => 'isRepeat',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('Repeat?'),
                                                      
@@ -1084,6 +1125,7 @@ class ActionSchedule extends \Civi\Core\Entity {
               'repetition_frequency_unit' => array(
       
         'name' => 'repetition_frequency_unit',
+        'propertyName' => 'repetitionFrequencyUnit',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Repetition Frequency Unit'),
                                  'maxlength' => 8,
@@ -1091,14 +1133,14 @@ class ActionSchedule extends \Civi\Core\Entity {
                            
                                     
                                      'pseudoconstant' => array(
-                                'optionGroupName' => 'recur_frequency_units',
-                      'keyColumn' => 'name',
+                                '0' => 'not in database',
                     )
                  ),
       
               'repetition_frequency_interval' => array(
       
         'name' => 'repetition_frequency_interval',
+        'propertyName' => 'repetitionFrequencyInterval',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('Repetition Frequency Interval'),
                                                      
@@ -1108,6 +1150,7 @@ class ActionSchedule extends \Civi\Core\Entity {
               'end_frequency_unit' => array(
       
         'name' => 'end_frequency_unit',
+        'propertyName' => 'endFrequencyUnit',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('End Frequency Unit'),
                                  'maxlength' => 8,
@@ -1115,14 +1158,14 @@ class ActionSchedule extends \Civi\Core\Entity {
                            
                                     
                                      'pseudoconstant' => array(
-                                'optionGroupName' => 'recur_frequency_units',
-                      'keyColumn' => 'name',
+                                '0' => 'not in database',
                     )
                  ),
       
               'end_frequency_interval' => array(
       
         'name' => 'end_frequency_interval',
+        'propertyName' => 'endFrequencyInterval',
         'type' => CRM_Utils_Type::T_INT,
                 'title' => ts('End Frequency Interval'),
                                                      
@@ -1132,6 +1175,7 @@ class ActionSchedule extends \Civi\Core\Entity {
               'end_action' => array(
       
         'name' => 'end_action',
+        'propertyName' => 'endAction',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('End Action'),
                                  'maxlength' => 32,
@@ -1143,6 +1187,7 @@ class ActionSchedule extends \Civi\Core\Entity {
               'end_date' => array(
       
         'name' => 'end_date',
+        'propertyName' => 'endDate',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('End Date'),
                                  'maxlength' => 64,
@@ -1154,6 +1199,7 @@ class ActionSchedule extends \Civi\Core\Entity {
               'is_active' => array(
       
         'name' => 'is_active',
+        'propertyName' => 'isActive',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                                                      
                                            'default' => '1',
@@ -1163,6 +1209,7 @@ class ActionSchedule extends \Civi\Core\Entity {
               'recipient_manual' => array(
       
         'name' => 'recipient_manual',
+        'propertyName' => 'recipientManual',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Recipient Manual'),
                                  'maxlength' => 128,
@@ -1174,6 +1221,7 @@ class ActionSchedule extends \Civi\Core\Entity {
               'recipient_listing' => array(
       
         'name' => 'recipient_listing',
+        'propertyName' => 'recipientListing',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Recipient Listing'),
                                  'maxlength' => 128,
@@ -1185,6 +1233,7 @@ class ActionSchedule extends \Civi\Core\Entity {
               'body_text' => array(
       
         'name' => 'body_text',
+        'propertyName' => 'bodyText',
         'type' => CRM_Utils_Type::T_LONGTEXT,
                 'title' => ts('Body Text'),
                                                      
@@ -1194,6 +1243,7 @@ class ActionSchedule extends \Civi\Core\Entity {
               'body_html' => array(
       
         'name' => 'body_html',
+        'propertyName' => 'bodyHtml',
         'type' => CRM_Utils_Type::T_LONGTEXT,
                 'title' => ts('Body Html'),
                                                      
@@ -1203,6 +1253,7 @@ class ActionSchedule extends \Civi\Core\Entity {
               'subject' => array(
       
         'name' => 'subject',
+        'propertyName' => 'subject',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Subject'),
                                  'maxlength' => 128,
@@ -1214,6 +1265,7 @@ class ActionSchedule extends \Civi\Core\Entity {
               'record_activity' => array(
       
         'name' => 'record_activity',
+        'propertyName' => 'recordActivity',
         'type' => CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('Record Activity'),
                                                      
@@ -1224,6 +1276,7 @@ class ActionSchedule extends \Civi\Core\Entity {
               'mapping_id' => array(
       
         'name' => 'mapping_id',
+        'propertyName' => 'mapping',
         'type' => CRM_Utils_Type::T_INT,
                                                      
                                     
@@ -1233,6 +1286,7 @@ class ActionSchedule extends \Civi\Core\Entity {
               'group_id' => array(
       
         'name' => 'group_id',
+        'propertyName' => 'group',
         'type' => CRM_Utils_Type::T_INT,
                                                      
                                     
@@ -1247,6 +1301,7 @@ class ActionSchedule extends \Civi\Core\Entity {
               'msg_template_id' => array(
       
         'name' => 'msg_template_id',
+        'propertyName' => 'msgTemplate',
         'type' => CRM_Utils_Type::T_INT,
                                                      
                                     
@@ -1256,6 +1311,7 @@ class ActionSchedule extends \Civi\Core\Entity {
               'absolute_date' => array(
       
         'name' => 'absolute_date',
+        'propertyName' => 'absoluteDate',
         'type' => CRM_Utils_Type::T_DATE,
                 'title' => ts('Absolute Date'),
                                                      
@@ -1265,6 +1321,7 @@ class ActionSchedule extends \Civi\Core\Entity {
               'mode' => array(
       
         'name' => 'mode',
+        'propertyName' => 'mode',
         'type' => CRM_Utils_Type::T_STRING,
                 'title' => ts('Message Mode'),
                                  'maxlength' => 128,
@@ -1280,6 +1337,7 @@ class ActionSchedule extends \Civi\Core\Entity {
               'sms_provider_id' => array(
       
         'name' => 'sms_provider_id',
+        'propertyName' => 'smsProvider',
         'type' => CRM_Utils_Type::T_INT,
                                                      
                                     
