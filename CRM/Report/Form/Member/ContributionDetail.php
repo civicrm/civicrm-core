@@ -631,11 +631,12 @@ class CRM_Report_Form_Member_ContributionDetail extends CRM_Report_Form {
           INSERT INTO civireport_membership_contribution_detail (contribution_id, contact_id, membership_id)
           SELECT contribution.id, contact.id, m.id
           FROM civicrm_contribution contribution
-          INNER JOIN civicrm_contact contact {$this->_aclFrom}
+          INNER JOIN civicrm_contact contact
                 ON contact.id = contribution.contact_id AND contribution.is_test = 0
-           LEFT JOIN civicrm_membership_payment mp
+          {$this->_aclFrom}
+          LEFT JOIN civicrm_membership_payment mp
                 ON contribution.id = mp.contribution_id
-           LEFT JOIN civicrm_membership m
+          LEFT JOIN civicrm_membership m
                 ON mp.membership_id = m.id AND m.is_test = 0 ";
 
     CRM_Core_DAO::executeQuery($fillTemp);

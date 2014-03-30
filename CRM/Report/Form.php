@@ -378,7 +378,7 @@ class CRM_Report_Form extends CRM_Core_Form {
       if (empty($this->_instanceValues)) {
         CRM_Core_Error::fatal("Report could not be loaded.");
       }
-
+      $this->_title = $this->_instanceValues['title'];
       if (!empty($this->_instanceValues['permission']) &&
         (!(CRM_Core_Permission::check($this->_instanceValues['permission']) ||
           CRM_Core_Permission::check('administer Reports')
@@ -2229,7 +2229,7 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
           }
           elseif (array_key_exists('extends', $table)) {
             // For custom fields referenced in $this->_customGroupExtends
-            $fields = $table['fields'];
+            $fields = CRM_Utils_Array::value('fields', $table, array());
           }
           if (!empty($fields) && is_array($fields)) {
             foreach ($fields as $fieldName => $field) {

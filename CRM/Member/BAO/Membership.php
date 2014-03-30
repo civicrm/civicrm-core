@@ -250,7 +250,7 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
         $excludeIsAdmin = TRUE;
       }
 
-      $calcStatus = $calcStatus = CRM_Member_BAO_MembershipStatus::getMembershipStatusByDate($start_date, $end_date, $join_date,
+      $calcStatus = CRM_Member_BAO_MembershipStatus::getMembershipStatusByDate($start_date, $end_date, $join_date,
         'today', $excludeIsAdmin
       );
       if (empty($calcStatus)) {

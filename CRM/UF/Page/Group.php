@@ -87,6 +87,7 @@ class CRM_UF_Page_Group extends CRM_Core_Page {
           'url' => 'civicrm/profile/create',
           'qs' => 'gid=%%id%%&reset=1',
           'title' => ts('Use Profile-Create Mode'),
+          'fe' => true,
         ),
         CRM_Core_Action::DISABLE => array(
           'name' => ts('Disable'),

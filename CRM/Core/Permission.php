@@ -336,9 +336,7 @@ class CRM_Core_Permission {
     if (!empty($permissionedEvents)) {
       return array_search($eventID, $permissionedEvents) === FALSE ? NULL : $eventID;
     }
-    else {
-      return $eventID;
-    }
+    return NULL;
   }
 
   static function eventClause($type = CRM_Core_Permission::VIEW, $prefix = NULL) {

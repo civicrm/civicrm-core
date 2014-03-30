@@ -457,6 +457,9 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
     $params            = array('id' => $membershipId);
     $membershipDetails = CRM_Member_BAO_Membership::getValues($params, $values);
     $statusID          = $membershipDetails[$membershipId]->status_id;
+    $membershipDates = array(
+      'join_date' => CRM_Utils_Date::customFormat($membershipDetails[$membershipId]->join_date, '%Y%m%d'),
+    );
 
     $oldPeriodType = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType',
         CRM_Core_DAO::getFieldValue('CRM_Member_DAO_Membership', $membershipId, 'membership_type_id'), 'period_type');
@@ -523,7 +526,6 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
           ));
       }
       $today = date('Y-m-d');
-      $membershipDates = array();
       $membershipDates['today'] = CRM_Utils_Date::customFormat($today, '%Y%m%d');
       $membershipDates['start_date'] = CRM_Utils_Date::customFormat($startDate, '%Y%m%d');
       $membershipDates['end_date'] = CRM_Utils_Date::customFormat($endDate, '%Y%m%d');
@@ -538,7 +540,6 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
       $renewalDates = self::getDatesForMembershipType($membershipTypeDetails['id'],
         $today, NULL, NULL, $numRenewTerms
       );
-      $membershipDates = array();
       $membershipDates['today'] = CRM_Utils_Date::customFormat($today, '%Y%m%d');
       $membershipDates['start_date'] = $renewalDates['start_date'];
       $membershipDates['end_date'] = $renewalDates['end_date'];

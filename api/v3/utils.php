@@ -48,7 +48,7 @@ function _civicrm_api3_initialize() {
 /**
  * Wrapper Function for civicrm_verify_mandatory to make it simple to pass either / or fields for checking
  *
- * @param array $params array of fields to check
+ * @param array $params array of fields to checkl
  * @param array $daoName string DAO to check for required fields (create functions only)
  * @param array $keyoptions
  *
@@ -253,7 +253,13 @@ function civicrm_api3_create_success($values = 1, $params = array(
   else {
     $result['values'] = $values;
   }
-
+  if(!empty($params['options']['metadata'])) {
+    // we've made metadata an array but only supporting 'fields' atm
+    if(in_array('fields', $params['options']['metadata'])) {
+      $fields = civicrm_api3($entity, 'getfields', array('action' => $action));
+      $result['metadata']['fields'] = $fields['values'];
+    }
+  }
   return array_merge($result, $extraReturnValues);
 }
 
@@ -559,6 +565,7 @@ function _civicrm_api3_dao_set_filter(&$dao, $params, $unique = TRUE, $entity) {
       $dao->selectAdd($allfields[$uniqueVal]);
     }
   }
+  $dao->setApiFilter($params);
 }
 
 /**
@@ -965,9 +972,9 @@ function _civicrm_api3_api_check_permission($entity, $action, &$params, $throw =
  */
 function _civicrm_api3_basic_get($bao_name, &$params, $returnAsSuccess = TRUE, $entity = "") {
   $bao = new $bao_name();
-  _civicrm_api3_dao_set_filter($bao, $params, TRUE,$entity);
+  _civicrm_api3_dao_set_filter($bao, $params, TRUE, $entity);
   if ($returnAsSuccess) {
-      return civicrm_api3_create_success(_civicrm_api3_dao_to_array($bao, $params, FALSE, $entity), $params, $entity);
+      return civicrm_api3_create_success(_civicrm_api3_dao_to_array($bao, $params, FALSE, $entity), $params, $entity, 'get');
   }
   else {
     return _civicrm_api3_dao_to_array($bao, $params, FALSE, $entity);

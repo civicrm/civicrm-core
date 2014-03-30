@@ -1136,6 +1136,39 @@ class CRM_Utils_Token {
   }
 
   /**
+   * Call hooks on tokens for anonymous users - contact id is set to 0 - this allows non-contact
+   * specific tokens to be rendered
+   *
+   * @param array $contactIDs - this should always be array(0) or its not anonymous - left to keep signature same
+   * as main fn
+   * @param string $returnProperties
+   * @param boolean $skipOnHold
+   * @param boolean $skipDeceased
+   * @param string $extraParams
+   * @param array $tokens
+   * @param string $className sent as context to the hook
+   * @param string $jobID
+   * @return array contactDetails with hooks swapped out
+   */
+  function getAnonymousTokenDetails($contactIDs = array(0),
+    $returnProperties = NULL,
+    $skipOnHold       = TRUE,
+    $skipDeceased     = TRUE,
+    $extraParams      = NULL,
+    $tokens           = array(),
+    $className        = NULL,
+    $jobID            = NULL) {
+    $details = array(0 => array());
+      // also call a hook and get token details
+      CRM_Utils_Hook::tokenValues($details[0],
+      $contactIDs,
+      $jobID,
+      $tokens,
+      $className
+    );
+    return $details;
+  }
+  /**
    * gives required details of contribuion in an indexed array format so we
    * can iterate in a nice loop and do token evaluation
    *

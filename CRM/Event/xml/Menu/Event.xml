@@ -281,7 +281,7 @@
   <item>
      <path>civicrm/ajax/locBlock</path>
      <page_callback>CRM_Core_Page_AJAX_Location::getLocBlock</page_callback>
-     <access_arguments>access CiviCRM,access CiviEvent</access_arguments>
+     <access_arguments>access CiviEvent</access_arguments>
   </item>
   <item>
      <path>civicrm/ajax/eventlist</path>

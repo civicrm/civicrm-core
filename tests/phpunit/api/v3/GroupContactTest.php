@@ -53,7 +53,7 @@ class api_v3_GroupContactTest extends CiviUnitTestCase {
 
     $this->_contactId = $this->individualCreate();
 
-    $this->_groupId1 = $this->groupCreate(NULL);
+    $this->_groupId1 = $this->groupCreate();
     $params = array(
       'contact_id' => $this->_contactId,
       'group_id' => $this->_groupId1,
@@ -70,7 +70,7 @@ class api_v3_GroupContactTest extends CiviUnitTestCase {
       'visibility' => 'User and User Admin Only',
     );
 
-    $this->_groupId2 = $this->groupCreate($group, 3);
+    $this->_groupId2 = $this->groupCreate($group);
     $params = array(
       'contact_id.1' => $this->_contactId,
       'group_id' => $this->_groupId2,

@@ -107,6 +107,7 @@ class CRM_Report_Utils_Get {
         break;
       case 'in':
       case 'notin':
+      case 'mhas':
         $value = self::getTypedValue("{$fieldName}_value", CRM_Utils_Type::T_STRING);
         if ($value !== NULL) {
           $defaults["{$fieldName}_value"] = explode(",", $value);

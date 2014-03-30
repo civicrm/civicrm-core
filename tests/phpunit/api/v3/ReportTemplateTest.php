@@ -117,7 +117,9 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
     $description = "Retrieve rows from a report template (optionally providing the instance_id)";
     $result = $this->callAPIAndDocument('report_template', 'getrows', array(
       'report_id' => 'contact/summary',
+      'options' => array('metadata' => array('labels', 'title'))
     ), __FUNCTION__, __FILE__, $description, 'Getrows', 'getrows');
+    $this->assertEquals('Contact Name', $result['metadata']['labels']['civicrm_contact_sort_name']);
 
     //the second part of this test has been commented out because it relied on the db being reset to
     // it's base state
@@ -180,7 +182,6 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
         'contribute/lybunt' => 'same as sybunt - fatals on force url & test identifies why',
         'event/income' => 'I do no understant why but error is Call to undefined method CRM_Report_Form_Event_Income::from() in CRM/Report/Form.php on line 2120',
         'contact/relationship' => '(see contribute/repeat), property declaration issue, Undefined property: CRM_Report_Form_Contact_Relationship::$relationType in /Contact/Relationship.php(486):',
-        'case/demographics' => 'Undefined index: operatorType Case/Demographics.php(319)',
         'activitySummary' => 'Undefined index: group_bys_freq m/ActivitySummary.php(191)',
         'event/incomesummary' => 'Undefined index: title, Report/Form/Event/IncomeCountSummary.php(187)',
         'logging/contact/summary' => '(likely to be test releated) probably logging off Undefined index: Form/Contact/LoggingSummary.php(231): PHP',
