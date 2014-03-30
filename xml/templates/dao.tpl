@@ -38,14 +38,6 @@
 require_once 'CRM/Core/DAO.php';
 require_once 'CRM/Utils/Type.php';
 
-{if $table.foreignKey}
-  {foreach from=$table.foreignKey item=foreign}
-     {if $foreign.import}
-require_once '{$foreign.fileName}';
-     {/if}
-  {/foreach}
-{/if}
-
 class {$table.className} extends CRM_Core_DAO {ldelim}
 
      /**
@@ -162,86 +154,7 @@ class {$table.className} extends CRM_Core_DAO {ldelim}
        * @return array
        */
       static function &fields( ) {ldelim}
-        if ( ! ( self::$_fields ) ) {ldelim}
-               self::$_fields = array (
-{foreach from=$table.fields item=field}
-
-{if $field.uniqueName}
-                                            '{$field.uniqueName}'
-{else}
-                                            '{$field.name}'
-{/if}
-               => array(
-                                                                      'name'      => '{$field.name}',
-                                                                      'type'      => {$field.crmType},
-{if $field.title}
-                                                                      'title'     => ts('{$field.title}'),
-{/if}
-{if $field.required}
-                                        'required'  => {$field.required},
-{/if} {* field.required *}
-{if $field.length}
-                      'maxlength' => {$field.length},
-{/if} {* field.length *}
-{if $field.precision}
-                      'precision'      => array({$field.precision}),
-{/if}
-{if $field.size}
-                      'size'      => {$field.size},
-{/if} {* field.size *}
-{if $field.rows}
-                      'rows'      => {$field.rows},
-{/if} {* field.rows *}
-{if $field.cols}
-                      'cols'      => {$field.cols},
-{/if} {* field.cols *}
-
-{if $field.import}
-                      'import'    => {$field.import},
-                                                                      'where'     => '{$table.name}.{$field.name}',
-                                      'headerPattern' => '{$field.headerPattern}',
-                                      'dataPattern' => '{$field.dataPattern}',
-{/if} {* field.import *}
-{if $field.export}
-                      'export'    => {$field.export},
-                                      {if ! $field.import}
-                      'where'     => '{$table.name}.{$field.name}',
-                                      'headerPattern' => '{$field.headerPattern}',
-                                      'dataPattern' => '{$field.dataPattern}',
-              {/if}
-{/if} {* field.export *}
-{if $field.rule}
-                      'rule'      => '{$field.rule}',
-{/if} {* field.rule *}
-{if $field.default}
-                         'default'   => '{if ($field.default[0]=="'" or $field.default[0]=='"')}{$field.default|substring:1:-1}{else}{$field.default}{/if}',
-{/if} {* field.default *}
-
-{if $field.FKClassName}
-                      'FKClassName' => '{$field.FKClassName}',
-{/if} {* field.FKClassName *}
-{if $field.html}
-  {assign var=htmlOptions value=$field.html}
-  'html' => array(
-{*{$htmlOptions|@print_array}*}
-  {foreach from=$htmlOptions key=optionKey item=optionValue}
-    '{$optionKey}' => '{$optionValue}',
-  {/foreach}
-  ),
-{/if} {* field.html *}
-{if $field.pseudoconstant}
-{assign var=pseudoOptions value=$field.pseudoconstant}
-'pseudoconstant' => array(
-{*{$pseudoOptions|@print_array}*}
-{foreach from=$pseudoOptions key=optionKey item=optionValue}
-                      '{$optionKey}' => '{$optionValue}',
-                      {/foreach}
-                )
-{/if} {* field.pseudoconstant *}                                                                    ),
-{/foreach} {* table.fields *}
-                                      );
-          {rdelim}
-          return self::$_fields;
+        return {$table.entity_class_name}::fields();
       {rdelim}
 
       /**
@@ -252,20 +165,13 @@ class {$table.className} extends CRM_Core_DAO {ldelim}
        * @return array
        */
       static function &fieldKeys( ) {ldelim}
-        if ( ! ( self::$_fieldKeys ) ) {ldelim}
-               self::$_fieldKeys = array (
-{foreach from=$table.fields item=field}
-                    '{$field.name}' =>
-{if $field.uniqueName}
-                                            '{$field.uniqueName}'
-{else}
-                                            '{$field.name}'
-{/if},
-
-{/foreach} {* table.fields *}
-                                      );
+        if (!(self::$_fieldKeys)) {ldelim}
+          self::$_fieldKeys = array();
+          foreach (self::$_fields as $unique_name => $field) {ldelim}
+            self::$_fieldKeys[$field['name']] = $unique_name;
           {rdelim}
-          return self::$_fieldKeys;
+        {rdelim}
+        return self::$_fieldKeys;
       {rdelim}
 
       /**

@@ -98,21 +98,12 @@ class CRM_Core_CodeGen_Doctrine {
     $fields = array();
     foreach ($class_metadata->fieldMappings as $field_mapping) {
       $field = array(
-        'cols' => NULL, /* XXX */
-        'comment' => '', /* XXX */
         'crmType' => $this->crmTypeForDoctrineType($field_mapping['type']),
-        'export' => NULL, /* XXX */
-        'import' => NULL, /* XXX */
         'length' => $field_mapping['length'],
         'localizable' => NULL, /* XXX */
         'name' => $field_mapping['columnName'],
         'phpType' => $this->phpTypeForDoctrineType($field_mapping['type']),
-        'pseudoconstant' => NULL, /* XXX */
         'required' => $field_mapping['nullable'] ? NULL : 'true',
-        'rows' => NULL, /* XXX */
-        'rule' => NULL, /* XXX */
-        'title' => NULL, /* XXX */
-        'uniqueName' => NULL, /* XXX */
       );
       if ($field_mapping['type'] == DoctrineType::STRING || $field_mapping['type'] == DoctrineType::STRING) {
         $field['size'] = $this->crmSizeForDoctrineLength($field_mapping['length']);
@@ -182,6 +173,7 @@ class CRM_Core_CodeGen_Doctrine {
     $table['fields'] = $this->buildDAOFieldsForClassMetadata($class_metadata);
     $table['fields'] = array_merge($table['fields'], $this->buildDAOFieldsForClassMetadataAssociations($class_metadata));
     $table['foreignKey'] = $this->buildDAOForeignKeyForClassMetadata($class_metadata);
+    $table['entity_class_name'] = $class_metadata->name;
     return $table;
   }
 
