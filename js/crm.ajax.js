@@ -408,14 +408,14 @@
    * Handler for jQuery click event e.g. $('a').click(CRM.popup)
    * @returns {boolean}
    */
-  CRM.popup = function() {
+  CRM.popup = function(e) {
     var $el = $(this).first(),
       url = $el.attr('href'),
       popup = $el.data('popup-type') === 'page' ? CRM.loadPage : CRM.loadForm,
       settings = $el.data('popup-settings') || {},
       triggers = {dialogclose: 'crmPopupClose', crmLoad: 'crmPopupLoad', crmFormSuccess: 'crmPopupFormSuccess'};
     settings.dialog = settings.dialog || {};
-    if (!CRM.config.ajaxPopupsEnabled || !url || $el.is(exclude)) {
+    if (e.isDefaultPrevented() || !CRM.config.ajaxPopupsEnabled || !url || $el.is(exclude)) {
       return;
     }
     // Sized based on css class
@@ -437,7 +437,7 @@
         $el.trigger(target, [dialog, data]);
       });
     });
-    return false;
+    e.preventDefault();
   };
 
   $(function($) {
