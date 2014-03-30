@@ -66,6 +66,8 @@ class CRM_Event_Selector_Search extends CRM_Core_Selector_Base implements CRM_Co
     'contact_id',
     'contact_type',
     'sort_name',
+    'current_employer',     // NG: Added for FBG AD
+    'current_employer_id',  // NG: for the link to
     'event_id',
     'participant_status_id',
     'event_title',
@@ -444,11 +446,13 @@ class CRM_Event_Selector_Search extends CRM_Core_Selector_Base implements CRM_Co
           'sort' => 'participant_register_date',
           'direction' => CRM_Utils_Sort::DESCENDING,
         ),
+        /* NG: Deleted for FBG AD (leave room for Employer))
         array(
           'name' => ts('Event Date(s)'),
           'sort' => 'event_start_date',
           'direction' => CRM_Utils_Sort::DESCENDING,
         ),
+        */
         array(
           'name' => ts('Status'),
           'sort' => 'participant_status',
@@ -470,6 +474,12 @@ class CRM_Event_Selector_Search extends CRM_Core_Selector_Base implements CRM_Co
             'sort' => 'sort_name',
             'direction' => CRM_Utils_Sort::DONTCARE,
           ),
+          // NG: Added for FBG AD
+          array( 
+            'name'      => ts('Employer'), 
+            'sort'      => 'current_employer', 
+            'direction' => CRM_Utils_Sort::DONTCARE,
+          ),                             
         );
         self::$_columnHeaders = array_merge($pre, self::$_columnHeaders);
       }

@@ -2132,7 +2132,7 @@ WHERE  civicrm_membership.contact_id = civicrm_contact.id
               CRM_Member_BAO_Membership::create($params, $relMemIds);
               $available --;
             } else { // we have run out of inherited memberships, so delete extras
-              self::deleteMembership($params['id']);
+              CRM_Member_BAO_Membership::deleteMembership($params['id']);
             }
           // we need to first check if there will remain inherited memberships, so queue it up
           } else {

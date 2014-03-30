@@ -196,10 +196,10 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
       CRM_Core_DAO::executeQuery($query, $p);
     }
 
-    // CRM-13814 : evalute option group id
+    // CRM-13814 : evaluate option group id
     if (!array_key_exists('option_group_id', $params) && !empty($ids['optionValue'])) {
       $groupId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionValue',
-        $ids['optionValue'], 'option_group_id', 'id'
+      $ids['optionValue'], 'option_group_id', 'id'
       );
     }
     else {

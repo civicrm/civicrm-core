@@ -40,7 +40,7 @@ function civicrm_api3_option_value_get($params) {
 function civicrm_api3_option_value_create($params) {
   $result = _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 
-  // CRM-13814 : evalute option group id
+  // CRM-13814 : evaluate option group id
   // option group id would be passed in case of adding a new option value record
   if (!empty($params['id']) && !array_key_exists('option_group_id', $params)) {
     $groupId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionValue',

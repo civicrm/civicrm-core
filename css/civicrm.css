@@ -105,9 +105,9 @@ div.crm-container fieldset label{
   border-top: none;
 }
 
-.crm-container tr {
-  font-size: .95em;
-  background: none;
+#crm-container tr {
+    font-size: 11px;
+    background: none;
 }
 
 .crm-container td {
@@ -2607,6 +2607,9 @@ div.grippie {
   margin: 2px 4px 0 0;
   text-indent: -10000px;
   /* for accessibility reason, put the name of the type/subtype in the icon div (it will be hidden and replaced by the icon) */
+}
+td .crm-icon {
+    margin: 0;
 }
 
 .crm-container .Individual-icon {

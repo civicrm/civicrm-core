@@ -128,7 +128,7 @@ class CRM_Contact_Form_Search_Custom_DateAdded extends CRM_Contact_Form_Search_C
       $selectClause = "contact_a.id  as contact_id,
                        contact_a.contact_type as contact_type,
                        contact_a.sort_name    as sort_name,
-                      d.date_added           as date_added";
+                       d.date_added           as date_added";
     }
 
     $groupBy = " GROUP BY contact_id ";
