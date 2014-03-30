@@ -91,8 +91,10 @@ class CRM_Case_Form_CustomData extends CRM_Core_Form {
     );
     // simplified formatted groupTree
     $groupTree = CRM_Core_BAO_CustomGroup::formatGroupTree($groupTree, 1, $this);
+    // Array contains only one item
     foreach ($groupTree as $groupValues) {
       $this->_customTitle = $groupValues['title'];
+      CRM_Utils_System::setTitle(ts('Edit %1', array(1 => $groupValues['title'])));
     }
 
     $this->_defaults = array();
