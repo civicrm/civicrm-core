@@ -23,5 +23,7 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
-{include file="CRM/Custom/Form/CustomData.tpl" skipTitle=1}
-<div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
+<div class="crm-block crm-form-block crm-case-custom-form-block">
+  {include file="CRM/Custom/Form/CustomData.tpl" skipTitle=1}
+  <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
+</div>
