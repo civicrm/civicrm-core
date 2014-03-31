@@ -88,8 +88,6 @@
 {literal}
   <script type="text/javascript">
     CRM.$(function($) {
-      cj().crmAccordions();
-
       var roleId = cj('input[name=activity_role]:checked', '#Search').val();
       if (roleId) {
         cj('.description .option-' + roleId).show();

@@ -216,8 +216,6 @@
         e.preventDefault();
       });
 
-    $().crmAccordions();
-
     // Keep the state of accordions when refreshing
     var accordionStates = [];
     $('#crm-main-content-wrapper')

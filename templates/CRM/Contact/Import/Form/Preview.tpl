@@ -228,9 +228,6 @@ function verify( ) {
 
 {literal}
 <script type="text/javascript">
-CRM.$(function($) {
-   cj().crmAccordions();
-});
 
 {/literal}{if $invalidGroupName}{literal}
 cj("#new-group.collapsed").crmAccordionToggle();

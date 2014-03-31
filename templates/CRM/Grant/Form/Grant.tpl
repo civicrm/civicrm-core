@@ -133,9 +133,6 @@
         {literal}
     });
 
-    CRM.$(function($) {
-       cj().crmAccordions();
-    });
 </script>
 {/literal}
 

@@ -92,13 +92,6 @@
     {/if}
     <div id="custom_group_{$group_id}_{$cgCount}"></div>
   {/foreach}
-  <script type="text/javascript">
-    {literal}
-      CRM.$(function($) {
-        cj().crmAccordions();
-      });
-    {/literal}
-  </script>
 
 {/if}
 

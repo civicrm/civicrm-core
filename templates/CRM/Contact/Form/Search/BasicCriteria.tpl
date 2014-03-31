@@ -99,10 +99,3 @@
     </div><!-- /.crm-accordion-wrapper -->
 </div><!-- /.crm-form-block -->
 {/strip}
-{literal}
-<script type="text/javascript">
-CRM.$(function($) {
-   cj().crmAccordions();
-});
-</script>
-{/literal}

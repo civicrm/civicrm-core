@@ -411,7 +411,7 @@
         if (!widget.fullscreenUrl) {
           return;
         }
-        CRM.loadPage(widget.fullscreenUrl).crmAccordions();
+        CRM.loadPage(widget.fullscreenUrl);
       };
       
       // Exit fullscreen mode.
