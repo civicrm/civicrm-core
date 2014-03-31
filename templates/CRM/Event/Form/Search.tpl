@@ -77,10 +77,3 @@
 
 </div>
 {/if}
-{literal}
-<script type="text/javascript">
-CRM.$(function($) {
-   cj().crmAccordions();
-});
-</script>
-{/literal}

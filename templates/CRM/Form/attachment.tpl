@@ -127,15 +127,6 @@
     </div>
   </div><!-- /.crm-accordion-body -->
   </div><!-- /.crm-accordion-wrapper -->
-  {if !$noexpand}
-    {literal}
-    <script type="text/javascript">
-    CRM.$(function($) {
-       cj().crmAccordions();
-    });
-    </script>
-    {/literal}
-  {/if}
     {literal}
     <script type="text/javascript">
       function clearAttachment( element, desc ) {

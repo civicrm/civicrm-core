@@ -103,7 +103,6 @@ CRM.$(function($) {
     $('#crm-event-name-page-title').text($(this).val());
   });
   
-  $().crmAccordions();
 });
 </script>
 {/literal}

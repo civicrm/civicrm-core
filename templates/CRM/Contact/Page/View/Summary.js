@@ -326,6 +326,5 @@
           _.each(data.reloadBlocks, reloadBlock);
         }
       });
-    $().crmAccordions();
   });
 })(CRM.$, CRM._);

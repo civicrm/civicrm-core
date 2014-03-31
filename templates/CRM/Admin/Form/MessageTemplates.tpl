@@ -123,10 +123,3 @@
 </div>
 </div> <!-- end of crm-form-block -->
 {include file="CRM/Mailing/Form/InsertTokens.tpl"}
-{literal}
-<script type="text/javascript">
-CRM.$(function($) {
-   cj().crmAccordions();
-});
-</script>
-{/literal}

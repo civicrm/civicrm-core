@@ -24,6 +24,3 @@
  +--------------------------------------------------------------------+
 *}
 {include file="CRM/Financial/Form/Search.tpl"}
-<script type="text/javascript">
-  cj().crmAccordions();
-</script>

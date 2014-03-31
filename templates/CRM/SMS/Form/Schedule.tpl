@@ -73,11 +73,6 @@
 
 <script type="text/javascript">
 {if $preview}
-{literal}
-CRM.$(function($) {
-   cj().crmAccordions();
-});
-{/literal}
 {/if}
 
 {literal}

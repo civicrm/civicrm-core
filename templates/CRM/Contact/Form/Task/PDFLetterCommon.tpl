@@ -122,7 +122,6 @@ CRM.$(function($) {
   $('#format_id', $form).on('change', function() {
     selectFormat($(this).val());
   });
-  $().crmAccordions();
 });
 
 var currentWidth;
