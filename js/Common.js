@@ -824,31 +824,34 @@ CRM.validate = CRM.validate || {
       })
       .on('change', 'input.crm-form-radio:checked', function() {
         $(this).siblings('.crm-clear-link').css({visibility: ''});
+      })
+
+      // Allow normal clicking of links within accordions
+      .on('click.crmAccordions', 'div.crm-accordion-header a', function (e) {
+        e.stopPropagation();
+      })
+      // Handle accordions
+      .on('click.crmAccordions', '.crm-accordion-header, .crm-collapsible .collapsible-title', function (e) {
+        if ($(this).parent().hasClass('collapsed')) {
+          $(this).next().css('display', 'none').slideDown(200);
+        }
+        else {
+          $(this).next().css('display', 'block').slideUp(200);
+        }
+        $(this).parent().toggleClass('collapsed');
+        e.preventDefault();
       });
 
     $().crmtooltip();
   });
-
-  $.fn.crmAccordions = function (speed) {
-    var container = $(this).length > 0 ? $(this) : $('.crm-container');
-    speed = speed === undefined ? 200 : speed;
-    container
-      .off('click.crmAccordions')
-      // Allow normal clicking of links
-      .on('click.crmAccordions', 'div.crm-accordion-header a', function (e) {
-        e.stopPropagation && e.stopPropagation();
-      })
-      .on('click.crmAccordions', '.crm-accordion-header, .crm-collapsible .collapsible-title', function () {
-        if ($(this).parent().hasClass('collapsed')) {
-          $(this).next().css('display', 'none').slideDown(speed);
-        }
-        else {
-          $(this).next().css('display', 'block').slideUp(speed);
-        }
-        $(this).parent().toggleClass('collapsed');
-        return false;
-      });
-  };
+  /**
+   * @deprecated
+   */
+  $.fn.crmAccordions = function () {};
+  /**
+   * Collapse or expand an accordion
+   * @param speed
+   */
   $.fn.crmAccordionToggle = function (speed) {
     $(this).each(function () {
       if ($(this).hasClass('collapsed')) {
