@@ -174,8 +174,14 @@ popd
 
 # Before anything - regenerate DAOs
 
-cd $DM_SOURCEDIR/xml
-$DM_PHP GenCode.php schema/Schema.xml $DM_VERSION
+if [ -f $DM_SOURCEDIR/xml/GenCode.php ]; then
+  cd $DM_SOURCEDIR/xml
+  $DM_PHP GenCode.php schema/Schema.xml $DM_VERSION
+else
+  pushd $DM_SOURCEDIR
+  $DM_PHP bin/gencode generate --civi-version="$DM_VERSION"
+  popd
+fi
 
 cd $ORIGPWD
 

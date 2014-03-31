@@ -49,7 +49,11 @@ fi
 
 # run code generator if it's there - which means it's
 # checkout, not packaged code
-if [ -d "$CALLEDPATH/../xml" ]; then
+if [ -f "$CALLEDPATH/gencode" ]; then
+  pushd "$CALLEDPATH/.."
+    "$PHP5PATH"php bin/gencode generate
+  popd
+elif [ -f "$CALLEDPATH/../xml/GenCode.php" ]; then
   cd "$CALLEDPATH/../xml"
   "$PHP5PATH"php GenCode.php $SCHEMA '' $GENCODE_CMS
 fi

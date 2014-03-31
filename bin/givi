@@ -238,7 +238,15 @@ class Givi {
       $this->run('core', $this->civiRoot . '/bin', 'bash', 'setup.sh');
     }
     elseif ($this->useGencode) {
-      $this->run('core', $this->civiRoot . '/xml', 'php', 'GenCode.php');
+      if (file_exists($this->civiRoot . '/bin/gencode')) {
+        $this->run('core', $this->civiRoot, 'php', 'bin/gencode', 'generate');
+      }
+      elseif (file_exists($this->civiRoot . '/xml/GenCode.php')) {
+        $this->run('core', $this->civiRoot . '/xml', 'php', 'GenCode.php');
+      }
+      else {
+        $this->returnError("Failed to locate GenCode command\n");
+      }
     }
 
     $this->dirStack->pop();

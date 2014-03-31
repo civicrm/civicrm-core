@@ -94,10 +94,15 @@ function do_svnify() {
 ###########################################
 ## usage: do_gencode <civicrm-path>
 function do_gencode() {
-  pushd "$1/xml" > /dev/null
-    if [ -f "GenCode.php" ]; then
-      echo "[[Generate files]]"
-      php GenCode.php
+  pushd "$1" > /dev/null
+    if [ -f "xml/GenCode.php" ]; then
+      echo "[[Generate files (xml/GenCode.php)]]"
+      pushd "xml" > /dev/null
+        php GenCode.php
+      popd >> /dev/null
+    elif [ -f "bin/gencode" ]; then
+      echo "[[Generate files (bin/gencode)]]"
+      php bin/gencode generate
     else
       echo "[[Skip \"Generate files\"]]"
     fi
