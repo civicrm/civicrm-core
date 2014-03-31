@@ -418,14 +418,36 @@ CRM.validate = CRM.validate || {
       $('.crm-select2:not(.select2-offscreen, .select2-container)', e.target).crmSelect2();
       $('.crm-form-entityref:not(.select2-offscreen, .select2-container)', e.target).crmEntityRef();
     })
-    // Modal dialogs should disable scrollbars
     .on('dialogopen', function(e) {
-      if ($(e.target).dialog('option', 'modal')) {
-        $(e.target).addClass('modal-dialog');
+      var $el = $(e.target);
+      // Modal dialogs should disable scrollbars
+      if ($el.dialog('option', 'modal')) {
+        $el.addClass('modal-dialog');
         $('body').css({overflow: 'hidden'});
+      }
+      $el.parent().find('.ui-dialog-titlebar-close').attr('title', ts('Close'));
+      // Add resize button
+      if ($el.parent().hasClass('crm-container')) {
+        $el.parent().find('.ui-dialog-titlebar').append($('<button class="crm-dialog-titlebar-resize ui-dialog-titlebar-close" title="'+ts('Resize')+'" style="right:2em;"/>').button({icons: {primary: 'ui-icon-newwin'}, text: false}));
+        $('.crm-dialog-titlebar-resize', $el.parent()).click(function(e) {
+          if ($el.data('origSize')) {
+            $el.dialog('option', $el.data('origSize'));
+            $el.data('origSize', null);
+          } else {
+            $el.data('origSize', {
+              position: 'center',
+              width: $el.dialog('option', 'width'),
+              height: $el.dialog('option', 'height')
+            });
+            var menuHeight = $('#civicrm-menu').height();
+            $el.dialog('option', {width: '100%', height: ($(window).height() - menuHeight), position: [0, menuHeight]});
+          }
+          e.preventDefault();
+        });
       }
     })
     .on('dialogclose', function(e) {
+      // Restore scrollbars when closing modal
       if ($('.ui-dialog .modal-dialog').not(e.target).length < 1) {
         $('body').css({overflow: ''});
       }
