@@ -2313,6 +2313,8 @@ INNER JOIN  civicrm_case_contact ON ( civicrm_case.id = civicrm_case_contact.cas
     $session = CRM_Core_Session::singleton();
     $currentUserId = $session->get('userID');
 
+    CRM_Utils_Hook::pre_case_merge($mainContactId, $mainCaseId, $otherContactId, $otherCaseId, $changeClient);
+
     // copy all cases and connect to main contact id.
     foreach ($processCaseIds as $otherCaseId) {
       if ($duplicateContacts) {
@@ -2661,6 +2663,9 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
 
       self::processCaseActivity($mergeCaseAct);
     }
+
+    CRM_Utils_Hook::post_case_merge($mainContactId, $mainCaseId, $otherContactId, $otherCaseId, $changeClient);
+
     return $mainCaseIds;
   }
 
