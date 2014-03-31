@@ -609,11 +609,6 @@
     }
     {/literal}
   {/if}
-  {literal}
-  CRM.$(function($) {
-    cj().crmAccordions();
-  });
-  {/literal}
 </script>
 
 {/if} {* end of main event block*}

@@ -176,9 +176,6 @@
 
 {literal}
 <script type='text/javascript'>
-  CRM.$(function($) {
-    $().crmAccordions();
-  });
     var entityMapping = eval({/literal}{$entityMapping}{literal});
     var recipientMapping = eval({/literal}{$recipientMapping}{literal});
 

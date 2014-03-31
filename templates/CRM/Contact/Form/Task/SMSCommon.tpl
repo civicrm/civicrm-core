@@ -57,9 +57,6 @@
 {include file="CRM/Mailing/Form/InsertTokens.tpl"}
 {literal}
 <script type="text/javascript">
-CRM.$(function($) {
-   cj().crmAccordions();
-});
 
 {/literal}{if $max_sms_length}{literal}
 maxCharInfoDisplay();

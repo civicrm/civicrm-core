@@ -140,15 +140,6 @@
   {if $groupId}
   </div><!-- /.crm-accordion-body -->
   </div><!-- /.crm-accordion-wrapper -->
-
-    {literal}
-      <script type="text/javascript">
-        CRM.$(function($) {
-          cj().crmAccordions();
-        });
-      </script>
-    {/literal}
-
   {/if}
 
 {elseif $statusMessage}

@@ -253,14 +253,6 @@
     {/if}
     {/if} {* settings section ends *}
 
-    {literal}
-    <script type="text/javascript">
-    CRM.$(function($) {
-      cj().crmAccordions();
-    });
-    </script>
-    {/literal}
-
     {/if} {* NO print section ends *}
 
 

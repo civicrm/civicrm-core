@@ -79,13 +79,6 @@
     {/if}
 </div>
 {/if}
-{literal}
-<script type="text/javascript">
-CRM.$(function($) {
-   cj().crmAccordions();
-});
-</script>
-{/literal}
 {/if}
 
 {include file="CRM/Case/Form/ActivityChangeStatusJs.tpl"}

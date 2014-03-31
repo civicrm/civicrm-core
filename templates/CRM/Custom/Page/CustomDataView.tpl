@@ -182,13 +182,6 @@
 {/if}
   {/foreach}
 {/foreach}
-{literal}
-  <script type="text/javascript">
-    CRM.$(function($) {
-      cj().crmAccordions();
-    });
-  </script>
-{/literal}
 {*currently delete is available only for tab custom data*}
 {if $groupId}
   <script type="text/javascript">
