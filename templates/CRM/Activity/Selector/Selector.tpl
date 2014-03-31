@@ -62,7 +62,6 @@
   var {/literal}{$context}{literal}oTable;
 
   CRM.$(function($) {
-    cj().crmAccordions();
     var context = {/literal}"{$context}"{literal};
     var filterSearchOnLoad = false;
     if (context == 'activity') {

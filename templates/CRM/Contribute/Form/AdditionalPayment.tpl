@@ -288,10 +288,3 @@ cj('#fee_amount').change( function() {
   {include file="CRM/common/formNavigate.tpl"}
 
 {/if}
-{literal}
-<script type="text/javascript">
-CRM.$(function($) {
-  cj().crmAccordions();
-});
-</script>
-{/literal}

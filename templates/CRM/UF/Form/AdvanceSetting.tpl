@@ -23,14 +23,6 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
-{literal}
-<script type="text/javascript">
-    CRM.$(function($) {
-        cj().crmAccordions();
-    });
-</script>
-{/literal}
-
 <div class="crm-accordion-wrapper collapsed">
  <div class="crm-accordion-header">
     Advanced Settings

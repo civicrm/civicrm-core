@@ -75,14 +75,6 @@
 </div>
 
 <script type="text/javascript">
-{if $preview}
-{literal}
-CRM.$(function($) {
-   cj().crmAccordions();
-});
-{/literal}
-{/if}
-
 {literal}
 CRM.$(function($) {
    cj('#start_date_display').change( function( ) {

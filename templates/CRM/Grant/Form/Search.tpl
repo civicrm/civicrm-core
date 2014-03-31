@@ -70,10 +70,3 @@
     </div><!-- /.crm-results-block -->
 {/if}
 </div><!-- /.crm-content-block -->
-{literal}
-<script type="text/javascript">
-CRM.$(function($) {
-   cj().crmAccordions();
-});
-</script>
-{/literal}

@@ -538,9 +538,6 @@
 
 {literal}
 <script type="text/javascript">
-CRM.$(function($) {
-  cj().crmAccordions();
-});
 
 {/literal}
 
