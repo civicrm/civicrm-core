@@ -147,6 +147,13 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
       FALSE, NULL, FALSE
     );
     $this->assign('newActivityEmailUrl', $newActivityEmailUrl);
+    
+    // Print PDF Letter activity requires a different URL format from all other activities
+    $newActivityPrintPDFLetterUrl = CRM_Utils_System::url('civicrm/activity/pdf/add',
+      "action=add&context=standalone&reset=1&cid={$this->_contactID}&caseid={$this->_caseID}&atype=",
+      FALSE, NULL, FALSE
+    );
+    $this->assign('newActivityPrintPDFLetterUrl', $newActivityPrintPDFLetterUrl);
 
     $reportUrl = CRM_Utils_System::url('civicrm/case/report',
       "reset=1&cid={$this->_contactID}&caseid={$this->_caseID}&asn=",

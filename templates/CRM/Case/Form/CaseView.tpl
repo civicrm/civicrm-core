@@ -990,6 +990,9 @@ function checkSelection( field ) {
     if ( document.getElementById('activity_type_id').value == 3 ) {
       successAction = "window.location='{/literal}{$newActivityEmailUrl}{literal}' + document.getElementById('activity_type_id').value";
     }
+    else if (document.getElementById('activity_type_id').value == 22 ) {
+      successAction = "window.location='{/literal}{$newActivityPrintPDFLetterUrl}{literal}' + document.getElementById('activity_type_id').value";
+    }
     else {
       successAction = "window.location='{/literal}{$newActivityUrl}{literal}' + document.getElementById('activity_type_id').value";
     }
