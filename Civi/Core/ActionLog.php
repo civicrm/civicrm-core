@@ -318,6 +318,8 @@ class ActionLog extends \Civi\Core\Entity {
    * @access public
    * @return array
    */
+  public static $_fields = NULL;
+
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
@@ -326,7 +328,7 @@ class ActionLog extends \Civi\Core\Entity {
       
         'name' => 'id',
         'propertyName' => 'id',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
                                     
@@ -336,17 +338,17 @@ class ActionLog extends \Civi\Core\Entity {
       
         'name' => 'contact_id',
         'propertyName' => 'contact',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                                                      
                                     
-                'FKClassName' => 'CRM_Contact_Contact',
+                'FKClassName' => 'Civi_Contact_Contact',
                           ),
       
               'entity_id' => array(
       
         'name' => 'entity_id',
         'propertyName' => 'entityId',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
                                     
@@ -356,10 +358,10 @@ class ActionLog extends \Civi\Core\Entity {
       
         'name' => 'entity_table',
         'propertyName' => 'entityTable',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Entity Table'),
                                  'maxlength' => 255,
-                         'size' => CRM_Utils_Type::HUGE,
+                         'size' => \CRM_Utils_Type::HUGE,
                            
                                     
                           ),
@@ -368,18 +370,18 @@ class ActionLog extends \Civi\Core\Entity {
       
         'name' => 'action_schedule_id',
         'propertyName' => 'actionSchedule',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
                                     
-                'FKClassName' => 'CRM_Core_ActionSchedule',
+                'FKClassName' => 'Civi_Core_ActionSchedule',
                           ),
       
               'action_date_time' => array(
       
         'name' => 'action_date_time',
         'propertyName' => 'actionDateTime',
-        'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
+        'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
                 'title' => ts('Action Date Time'),
                                                      
                                     
@@ -389,7 +391,7 @@ class ActionLog extends \Civi\Core\Entity {
       
         'name' => 'is_error',
         'propertyName' => 'isError',
-        'type' => CRM_Utils_Type::T_BOOLEAN,
+        'type' => \CRM_Utils_Type::T_BOOLEAN,
                                                      
                                     
                           ),
@@ -398,7 +400,7 @@ class ActionLog extends \Civi\Core\Entity {
       
         'name' => 'message',
         'propertyName' => 'message',
-        'type' => CRM_Utils_Type::T_TEXT,
+        'type' => \CRM_Utils_Type::T_TEXT,
                 'title' => ts('Message'),
                                  'maxlength' => 65535,
                                     
@@ -409,7 +411,7 @@ class ActionLog extends \Civi\Core\Entity {
       
         'name' => 'repetition_number',
         'propertyName' => 'repetitionNumber',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Repetition Number'),
                                                      
                                     

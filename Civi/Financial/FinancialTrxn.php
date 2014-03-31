@@ -468,6 +468,8 @@ class FinancialTrxn extends \Civi\Core\Entity {
    * @access public
    * @return array
    */
+  public static $_fields = NULL;
+
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
@@ -476,7 +478,7 @@ class FinancialTrxn extends \Civi\Core\Entity {
       
         'name' => 'id',
         'propertyName' => 'id',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
                                     
@@ -486,10 +488,10 @@ class FinancialTrxn extends \Civi\Core\Entity {
       
         'name' => 'from_financial_account_id',
         'propertyName' => 'fromFinancialAccount',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                                                      
                                     
-                'FKClassName' => 'CRM_Financial_FinancialAccount',
+                'FKClassName' => 'Civi_Financial_FinancialAccount',
                                      'pseudoconstant' => array(
                                 'table' => 'civicrm_financial_account',
                       'keyColumn' => 'id',
@@ -501,10 +503,10 @@ class FinancialTrxn extends \Civi\Core\Entity {
       
         'name' => 'to_financial_account_id',
         'propertyName' => 'toFinancialAccount',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                                                      
                                     
-                'FKClassName' => 'CRM_Financial_FinancialAccount',
+                'FKClassName' => 'Civi_Financial_FinancialAccount',
                                      'pseudoconstant' => array(
                                 'table' => 'civicrm_financial_account',
                       'keyColumn' => 'id',
@@ -516,7 +518,7 @@ class FinancialTrxn extends \Civi\Core\Entity {
       
         'name' => 'trxn_date',
         'propertyName' => 'trxnDate',
-        'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
+        'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
                 'title' => ts('Trxn Date'),
                                                      
                                            'default' => 'NULL',
@@ -527,7 +529,7 @@ class FinancialTrxn extends \Civi\Core\Entity {
       
         'name' => 'total_amount',
         'propertyName' => 'totalAmount',
-        'type' => CRM_Utils_Type::T_MONEY,
+        'type' => \CRM_Utils_Type::T_MONEY,
                 'title' => ts('Total Amount'),
                         'required' => true,
                                              
@@ -538,7 +540,7 @@ class FinancialTrxn extends \Civi\Core\Entity {
       
         'name' => 'fee_amount',
         'propertyName' => 'feeAmount',
-        'type' => CRM_Utils_Type::T_MONEY,
+        'type' => \CRM_Utils_Type::T_MONEY,
                 'title' => ts('Fee Amount'),
                                                      
                                     
@@ -548,7 +550,7 @@ class FinancialTrxn extends \Civi\Core\Entity {
       
         'name' => 'net_amount',
         'propertyName' => 'netAmount',
-        'type' => CRM_Utils_Type::T_MONEY,
+        'type' => \CRM_Utils_Type::T_MONEY,
                 'title' => ts('Net Amount'),
                                                      
                                     
@@ -558,10 +560,10 @@ class FinancialTrxn extends \Civi\Core\Entity {
       
         'name' => 'currency',
         'propertyName' => 'currency',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Currency'),
                                  'maxlength' => 3,
-                         'size' => CRM_Utils_Type::FOUR,
+                         'size' => \CRM_Utils_Type::FOUR,
                            
                 'import' => true,
         'where' => 'civicrm_financial_trxn.currency',
@@ -582,9 +584,9 @@ class FinancialTrxn extends \Civi\Core\Entity {
       
         'name' => 'trxn_id',
         'propertyName' => 'trxnId',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                                  'maxlength' => 255,
-                         'size' => CRM_Utils_Type::HUGE,
+                         'size' => \CRM_Utils_Type::HUGE,
                            
                                     
                           ),
@@ -593,10 +595,10 @@ class FinancialTrxn extends \Civi\Core\Entity {
       
         'name' => 'trxn_result_code',
         'propertyName' => 'trxnResultCode',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Trxn Result Code'),
                                  'maxlength' => 255,
-                         'size' => CRM_Utils_Type::HUGE,
+                         'size' => \CRM_Utils_Type::HUGE,
                            
                                     
                           ),
@@ -605,7 +607,7 @@ class FinancialTrxn extends \Civi\Core\Entity {
       
         'name' => 'status_id',
         'propertyName' => 'statusId',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Financial Transaction Status Id'),
                                                      
                 'import' => true,
@@ -620,17 +622,17 @@ class FinancialTrxn extends \Civi\Core\Entity {
       
         'name' => 'payment_processor_id',
         'propertyName' => 'paymentProcessor',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                                                      
                                     
-                'FKClassName' => 'CRM_Financial_PaymentProcessor',
+                'FKClassName' => 'Civi_Financial_PaymentProcessor',
                           ),
       
               'financial_trxn_payment_instrument_id' => array(
       
         'name' => 'payment_instrument_id',
         'propertyName' => 'paymentInstrumentId',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Payment Instrument'),
                                                      
                                     
@@ -643,10 +645,10 @@ class FinancialTrxn extends \Civi\Core\Entity {
       
         'name' => 'check_number',
         'propertyName' => 'checkNumber',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Check Number'),
                                  'maxlength' => 255,
-                         'size' => CRM_Utils_Type::SIX,
+                         'size' => \CRM_Utils_Type::SIX,
                            
                                     
                           ),

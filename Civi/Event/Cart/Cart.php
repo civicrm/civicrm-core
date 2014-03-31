@@ -138,6 +138,8 @@ class Cart extends \Civi\Core\Entity {
    * @access public
    * @return array
    */
+  public static $_fields = NULL;
+
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
@@ -146,7 +148,7 @@ class Cart extends \Civi\Core\Entity {
       
         'name' => 'id',
         'propertyName' => 'id',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
                                     
@@ -156,17 +158,17 @@ class Cart extends \Civi\Core\Entity {
       
         'name' => 'user_id',
         'propertyName' => 'user',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                                                      
                                     
-                'FKClassName' => 'CRM_Contact_Contact',
+                'FKClassName' => 'Civi_Contact_Contact',
                           ),
       
               'completed' => array(
       
         'name' => 'completed',
         'propertyName' => 'completed',
-        'type' => CRM_Utils_Type::T_BOOLEAN,
+        'type' => \CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('Completed'),
                                                      
                                     

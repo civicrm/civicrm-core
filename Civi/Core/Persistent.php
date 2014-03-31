@@ -198,6 +198,8 @@ class Persistent extends \Civi\Core\Entity {
    * @access public
    * @return array
    */
+  public static $_fields = NULL;
+
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
@@ -206,7 +208,7 @@ class Persistent extends \Civi\Core\Entity {
       
         'name' => 'id',
         'propertyName' => 'id',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
                                     
@@ -216,11 +218,11 @@ class Persistent extends \Civi\Core\Entity {
       
         'name' => 'context',
         'propertyName' => 'context',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Context'),
                         'required' => true,
                          'maxlength' => 255,
-                         'size' => CRM_Utils_Type::HUGE,
+                         'size' => \CRM_Utils_Type::HUGE,
                            
                                     
                           ),
@@ -229,11 +231,11 @@ class Persistent extends \Civi\Core\Entity {
       
         'name' => 'name',
         'propertyName' => 'name',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Name'),
                         'required' => true,
                          'maxlength' => 255,
-                         'size' => CRM_Utils_Type::HUGE,
+                         'size' => \CRM_Utils_Type::HUGE,
                            
                                     
                           ),
@@ -242,7 +244,7 @@ class Persistent extends \Civi\Core\Entity {
       
         'name' => 'data',
         'propertyName' => 'data',
-        'type' => CRM_Utils_Type::T_LONGTEXT,
+        'type' => \CRM_Utils_Type::T_LONGTEXT,
                 'title' => ts('Data'),
                                                      
                                     
@@ -252,7 +254,7 @@ class Persistent extends \Civi\Core\Entity {
       
         'name' => 'is_config',
         'propertyName' => 'isConfig',
-        'type' => CRM_Utils_Type::T_BOOLEAN,
+        'type' => \CRM_Utils_Type::T_BOOLEAN,
                         'required' => true,
                                              
                                     

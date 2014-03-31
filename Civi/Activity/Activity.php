@@ -768,6 +768,8 @@ class Activity extends \Civi\Core\Entity {
    * @access public
    * @return array
    */
+  public static $_fields = NULL;
+
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
@@ -776,7 +778,7 @@ class Activity extends \Civi\Core\Entity {
       
         'name' => 'id',
         'propertyName' => 'id',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Activity ID'),
                         'required' => true,
                                              
@@ -792,7 +794,7 @@ class Activity extends \Civi\Core\Entity {
       
         'name' => 'source_record_id',
         'propertyName' => 'sourceRecordId',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Source Record'),
                                                      
                                     
@@ -802,7 +804,7 @@ class Activity extends \Civi\Core\Entity {
       
         'name' => 'activity_type_id',
         'propertyName' => 'activityTypeId',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Activity Type'),
                         'required' => true,
                                              
@@ -822,10 +824,10 @@ class Activity extends \Civi\Core\Entity {
       
         'name' => 'subject',
         'propertyName' => 'subject',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Subject'),
                                  'maxlength' => 255,
-                         'size' => CRM_Utils_Type::HUGE,
+                         'size' => \CRM_Utils_Type::HUGE,
                            
                 'import' => true,
         'where' => 'civicrm_activity.subject',
@@ -839,7 +841,7 @@ class Activity extends \Civi\Core\Entity {
       
         'name' => 'activity_date_time',
         'propertyName' => 'activityDateTime',
-        'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
+        'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
                 'title' => ts('Activity Date'),
                                                      
                 'import' => true,
@@ -854,7 +856,7 @@ class Activity extends \Civi\Core\Entity {
       
         'name' => 'duration',
         'propertyName' => 'duration',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Duration'),
                                                      
                 'import' => true,
@@ -869,10 +871,10 @@ class Activity extends \Civi\Core\Entity {
       
         'name' => 'location',
         'propertyName' => 'location',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Location'),
                                  'maxlength' => 255,
-                         'size' => CRM_Utils_Type::HUGE,
+                         'size' => \CRM_Utils_Type::HUGE,
                            
                 'import' => true,
         'where' => 'civicrm_activity.location',
@@ -886,21 +888,21 @@ class Activity extends \Civi\Core\Entity {
       
         'name' => 'phone_id',
         'propertyName' => 'phone',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Phone (called) ID'),
                                                      
                                     
-                'FKClassName' => 'CRM_Core_Phone',
+                'FKClassName' => 'Civi_Core_Phone',
                           ),
       
               'phone_number' => array(
       
         'name' => 'phone_number',
         'propertyName' => 'phoneNumber',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Phone (called) Number'),
                                  'maxlength' => 64,
-                         'size' => CRM_Utils_Type::BIG,
+                         'size' => \CRM_Utils_Type::BIG,
                            
                                     
                           ),
@@ -909,7 +911,7 @@ class Activity extends \Civi\Core\Entity {
       
         'name' => 'details',
         'propertyName' => 'details',
-        'type' => CRM_Utils_Type::T_TEXT,
+        'type' => \CRM_Utils_Type::T_TEXT,
                 'title' => ts('Details'),
                                  'maxlength' => 65535,
                                   'rows' => 8,
@@ -927,7 +929,7 @@ class Activity extends \Civi\Core\Entity {
       
         'name' => 'status_id',
         'propertyName' => 'statusId',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Activity Status'),
                                                      
                 'import' => true,
@@ -945,7 +947,7 @@ class Activity extends \Civi\Core\Entity {
       
         'name' => 'priority_id',
         'propertyName' => 'priorityId',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Priority'),
                                                      
                                     
@@ -958,18 +960,18 @@ class Activity extends \Civi\Core\Entity {
       
         'name' => 'parent_id',
         'propertyName' => 'parent',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Parent Activity Id'),
                                                      
                                     
-                'FKClassName' => 'CRM_Activity_Activity',
+                'FKClassName' => 'Civi_Activity_Activity',
                           ),
       
               'activity_is_test' => array(
       
         'name' => 'is_test',
         'propertyName' => 'isTest',
-        'type' => CRM_Utils_Type::T_BOOLEAN,
+        'type' => \CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('Test'),
                                                      
                 'import' => true,
@@ -984,7 +986,7 @@ class Activity extends \Civi\Core\Entity {
       
         'name' => 'medium_id',
         'propertyName' => 'mediumId',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Activity Medium'),
                                                      
                                            'default' => 'NULL',
@@ -998,7 +1000,7 @@ class Activity extends \Civi\Core\Entity {
       
         'name' => 'is_auto',
         'propertyName' => 'isAuto',
-        'type' => CRM_Utils_Type::T_BOOLEAN,
+        'type' => \CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('Auto'),
                                                      
                                     
@@ -1008,19 +1010,19 @@ class Activity extends \Civi\Core\Entity {
       
         'name' => 'relationship_id',
         'propertyName' => 'relationship',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Relationship Id'),
                                                      
                                            'default' => 'NULL',
          
-                'FKClassName' => 'CRM_Contact_Relationship',
+                'FKClassName' => 'Civi_Contact_Relationship',
                           ),
       
               'is_current_revision' => array(
       
         'name' => 'is_current_revision',
         'propertyName' => 'isCurrentRevision',
-        'type' => CRM_Utils_Type::T_BOOLEAN,
+        'type' => \CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('Is this activity a current revision in versioning chain?'),
                                                      
                 'import' => true,
@@ -1036,21 +1038,21 @@ class Activity extends \Civi\Core\Entity {
       
         'name' => 'original_id',
         'propertyName' => 'original',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Original Activity ID '),
                                                      
                                     
-                'FKClassName' => 'CRM_Activity_Activity',
+                'FKClassName' => 'Civi_Activity_Activity',
                           ),
       
               'activity_result' => array(
       
         'name' => 'result',
         'propertyName' => 'result',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Result'),
                                  'maxlength' => 255,
-                         'size' => CRM_Utils_Type::HUGE,
+                         'size' => \CRM_Utils_Type::HUGE,
                            
                                     
                           ),
@@ -1059,7 +1061,7 @@ class Activity extends \Civi\Core\Entity {
       
         'name' => 'is_deleted',
         'propertyName' => 'isDeleted',
-        'type' => CRM_Utils_Type::T_BOOLEAN,
+        'type' => \CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('Activity is in the Trash'),
                                                      
                 'import' => true,
@@ -1074,7 +1076,7 @@ class Activity extends \Civi\Core\Entity {
       
         'name' => 'campaign_id',
         'propertyName' => 'campaign',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Campaign'),
                                                      
                 'import' => true,
@@ -1083,7 +1085,7 @@ class Activity extends \Civi\Core\Entity {
         'dataPattern' => '',
                          'export' => true,
                                    
-                'FKClassName' => 'CRM_Campaign_Campaign',
+                'FKClassName' => 'Civi_Campaign_Campaign',
                                      'pseudoconstant' => array(
                                 'table' => 'civicrm_campaign',
                       'keyColumn' => 'id',
@@ -1095,7 +1097,7 @@ class Activity extends \Civi\Core\Entity {
       
         'name' => 'engagement_level',
         'propertyName' => 'engagementLevel',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Engagement Index'),
                                                      
                 'import' => true,
@@ -1113,7 +1115,7 @@ class Activity extends \Civi\Core\Entity {
       
         'name' => 'weight',
         'propertyName' => 'weight',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Weight'),
                                                      
                                     

@@ -288,6 +288,8 @@ class LocationType extends \Civi\Core\Entity {
    * @access public
    * @return array
    */
+  public static $_fields = NULL;
+
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
@@ -296,7 +298,7 @@ class LocationType extends \Civi\Core\Entity {
       
         'name' => 'id',
         'propertyName' => 'id',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
                                     
@@ -306,10 +308,10 @@ class LocationType extends \Civi\Core\Entity {
       
         'name' => 'name',
         'propertyName' => 'name',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Location Type'),
                                  'maxlength' => 64,
-                         'size' => CRM_Utils_Type::BIG,
+                         'size' => \CRM_Utils_Type::BIG,
                            
                                     
                           ),
@@ -318,10 +320,10 @@ class LocationType extends \Civi\Core\Entity {
       
         'name' => 'display_name',
         'propertyName' => 'displayName',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Display Name'),
                                  'maxlength' => 64,
-                         'size' => CRM_Utils_Type::BIG,
+                         'size' => \CRM_Utils_Type::BIG,
                            
                                     
                           ),
@@ -330,10 +332,10 @@ class LocationType extends \Civi\Core\Entity {
       
         'name' => 'vcard_name',
         'propertyName' => 'vcardName',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('vCard Location Type'),
                                  'maxlength' => 64,
-                         'size' => CRM_Utils_Type::BIG,
+                         'size' => \CRM_Utils_Type::BIG,
                            
                                     
                           ),
@@ -342,10 +344,10 @@ class LocationType extends \Civi\Core\Entity {
       
         'name' => 'description',
         'propertyName' => 'description',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Description'),
                                  'maxlength' => 255,
-                         'size' => CRM_Utils_Type::HUGE,
+                         'size' => \CRM_Utils_Type::HUGE,
                            
                                     
                           ),
@@ -354,7 +356,7 @@ class LocationType extends \Civi\Core\Entity {
       
         'name' => 'is_reserved',
         'propertyName' => 'isReserved',
-        'type' => CRM_Utils_Type::T_BOOLEAN,
+        'type' => \CRM_Utils_Type::T_BOOLEAN,
                                                      
                                     
                           ),
@@ -363,7 +365,7 @@ class LocationType extends \Civi\Core\Entity {
       
         'name' => 'is_active',
         'propertyName' => 'isActive',
-        'type' => CRM_Utils_Type::T_BOOLEAN,
+        'type' => \CRM_Utils_Type::T_BOOLEAN,
                                                      
                                     
                           ),
@@ -372,7 +374,7 @@ class LocationType extends \Civi\Core\Entity {
       
         'name' => 'is_default',
         'propertyName' => 'isDefault',
-        'type' => CRM_Utils_Type::T_BOOLEAN,
+        'type' => \CRM_Utils_Type::T_BOOLEAN,
                                                      
                                     
                           ),

@@ -138,6 +138,8 @@ class EventInCart extends \Civi\Core\Entity {
    * @access public
    * @return array
    */
+  public static $_fields = NULL;
+
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
@@ -146,7 +148,7 @@ class EventInCart extends \Civi\Core\Entity {
       
         'name' => 'id',
         'propertyName' => 'id',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
                                     
@@ -156,20 +158,20 @@ class EventInCart extends \Civi\Core\Entity {
       
         'name' => 'event_id',
         'propertyName' => 'event',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                                                      
                                     
-                'FKClassName' => 'CRM_Event_Event',
+                'FKClassName' => 'Civi_Event_Event',
                           ),
       
               'event_cart_id' => array(
       
         'name' => 'event_cart_id',
         'propertyName' => 'eventCart',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                                                      
                                     
-                'FKClassName' => 'CRM_Event_Cart_Cart',
+                'FKClassName' => 'Civi_Event_Cart_Cart',
                           ),
              );
     }

@@ -348,6 +348,8 @@ class Phone extends \Civi\Core\Entity {
    * @access public
    * @return array
    */
+  public static $_fields = NULL;
+
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
@@ -356,7 +358,7 @@ class Phone extends \Civi\Core\Entity {
       
         'name' => 'id',
         'propertyName' => 'id',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
                                     
@@ -366,17 +368,17 @@ class Phone extends \Civi\Core\Entity {
       
         'name' => 'contact_id',
         'propertyName' => 'contact',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                                                      
                                     
-                'FKClassName' => 'CRM_Contact_Contact',
+                'FKClassName' => 'Civi_Contact_Contact',
                           ),
       
               'location_type_id' => array(
       
         'name' => 'location_type_id',
         'propertyName' => 'locationTypeId',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Phone Location Type'),
                                                      
                                     
@@ -391,7 +393,7 @@ class Phone extends \Civi\Core\Entity {
       
         'name' => 'is_primary',
         'propertyName' => 'isPrimary',
-        'type' => CRM_Utils_Type::T_BOOLEAN,
+        'type' => \CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('Is Phone Primary?'),
                                                      
                                     
@@ -401,7 +403,7 @@ class Phone extends \Civi\Core\Entity {
       
         'name' => 'is_billing',
         'propertyName' => 'isBilling',
-        'type' => CRM_Utils_Type::T_BOOLEAN,
+        'type' => \CRM_Utils_Type::T_BOOLEAN,
                                                      
                                     
                           ),
@@ -410,7 +412,7 @@ class Phone extends \Civi\Core\Entity {
       
         'name' => 'mobile_provider_id',
         'propertyName' => 'mobileProviderId',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                                                      
                                     
                           ),
@@ -419,10 +421,10 @@ class Phone extends \Civi\Core\Entity {
       
         'name' => 'phone',
         'propertyName' => 'phone',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Phone'),
                                  'maxlength' => 32,
-                         'size' => CRM_Utils_Type::MEDIUM,
+                         'size' => \CRM_Utils_Type::MEDIUM,
                            
                 'import' => true,
         'where' => 'civicrm_phone.phone',
@@ -436,10 +438,10 @@ class Phone extends \Civi\Core\Entity {
       
         'name' => 'phone_ext',
         'propertyName' => 'phoneExt',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Phone Extension'),
                                  'maxlength' => 16,
-                         'size' => CRM_Utils_Type::FOUR,
+                         'size' => \CRM_Utils_Type::FOUR,
                            
                 'import' => true,
         'where' => 'civicrm_phone.phone_ext',
@@ -453,10 +455,10 @@ class Phone extends \Civi\Core\Entity {
       
         'name' => 'phone_numeric',
         'propertyName' => 'phoneNumeric',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Phone Numeric'),
                                  'maxlength' => 32,
-                         'size' => CRM_Utils_Type::MEDIUM,
+                         'size' => \CRM_Utils_Type::MEDIUM,
                            
                                     
                           ),
@@ -465,7 +467,7 @@ class Phone extends \Civi\Core\Entity {
       
         'name' => 'phone_type_id',
         'propertyName' => 'phoneTypeId',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Phone Type'),
                                                      
                                     

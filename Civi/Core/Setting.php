@@ -348,6 +348,8 @@ class Setting extends \Civi\Core\Entity {
    * @access public
    * @return array
    */
+  public static $_fields = NULL;
+
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
@@ -356,7 +358,7 @@ class Setting extends \Civi\Core\Entity {
       
         'name' => 'id',
         'propertyName' => 'id',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
                                     
@@ -366,11 +368,11 @@ class Setting extends \Civi\Core\Entity {
       
         'name' => 'group_name',
         'propertyName' => 'groupName',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Group Name'),
                         'required' => true,
                          'maxlength' => 64,
-                         'size' => CRM_Utils_Type::BIG,
+                         'size' => \CRM_Utils_Type::BIG,
                            
                                     
                           ),
@@ -379,10 +381,10 @@ class Setting extends \Civi\Core\Entity {
       
         'name' => 'name',
         'propertyName' => 'name',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Name'),
                                  'maxlength' => 255,
-                         'size' => CRM_Utils_Type::HUGE,
+                         'size' => \CRM_Utils_Type::HUGE,
                            
                                     
                           ),
@@ -391,7 +393,7 @@ class Setting extends \Civi\Core\Entity {
       
         'name' => 'value',
         'propertyName' => 'value',
-        'type' => CRM_Utils_Type::T_TEXT,
+        'type' => \CRM_Utils_Type::T_TEXT,
                 'title' => ts('Value'),
                                  'maxlength' => 65535,
                                     
@@ -402,28 +404,28 @@ class Setting extends \Civi\Core\Entity {
       
         'name' => 'domain_id',
         'propertyName' => 'domain',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
                                     
-                'FKClassName' => 'CRM_Core_Domain',
+                'FKClassName' => 'Civi_Core_Domain',
                           ),
       
               'contact_id' => array(
       
         'name' => 'contact_id',
         'propertyName' => 'contact',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                                                      
                                     
-                'FKClassName' => 'CRM_Contact_Contact',
+                'FKClassName' => 'Civi_Contact_Contact',
                           ),
       
               'is_domain' => array(
       
         'name' => 'is_domain',
         'propertyName' => 'isDomain',
-        'type' => CRM_Utils_Type::T_BOOLEAN,
+        'type' => \CRM_Utils_Type::T_BOOLEAN,
                                                      
                                     
                           ),
@@ -432,10 +434,10 @@ class Setting extends \Civi\Core\Entity {
       
         'name' => 'component_id',
         'propertyName' => 'component',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                                                      
                                     
-                'FKClassName' => 'CRM_Core_Component',
+                'FKClassName' => 'Civi_Core_Component',
                                      'pseudoconstant' => array(
                                 'table' => 'civicrm_component',
                       'keyColumn' => 'id',
@@ -447,7 +449,7 @@ class Setting extends \Civi\Core\Entity {
       
         'name' => 'created_date',
         'propertyName' => 'createdDate',
-        'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
+        'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
                 'title' => ts('Created Date'),
                                                      
                                     
@@ -457,10 +459,10 @@ class Setting extends \Civi\Core\Entity {
       
         'name' => 'created_id',
         'propertyName' => 'created',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                                                      
                                     
-                'FKClassName' => 'CRM_Contact_Contact',
+                'FKClassName' => 'Civi_Contact_Contact',
                           ),
              );
     }

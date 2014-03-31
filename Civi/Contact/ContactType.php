@@ -288,6 +288,8 @@ class ContactType extends \Civi\Core\Entity {
    * @access public
    * @return array
    */
+  public static $_fields = NULL;
+
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
@@ -296,7 +298,7 @@ class ContactType extends \Civi\Core\Entity {
       
         'name' => 'id',
         'propertyName' => 'id',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
                                     
@@ -306,10 +308,10 @@ class ContactType extends \Civi\Core\Entity {
       
         'name' => 'name',
         'propertyName' => 'name',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Name'),
                                  'maxlength' => 64,
-                         'size' => CRM_Utils_Type::BIG,
+                         'size' => \CRM_Utils_Type::BIG,
                            
                                     
                           ),
@@ -318,10 +320,10 @@ class ContactType extends \Civi\Core\Entity {
       
         'name' => 'label',
         'propertyName' => 'label',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Label'),
                                  'maxlength' => 64,
-                         'size' => CRM_Utils_Type::BIG,
+                         'size' => \CRM_Utils_Type::BIG,
                            
                                     
                           ),
@@ -330,7 +332,7 @@ class ContactType extends \Civi\Core\Entity {
       
         'name' => 'description',
         'propertyName' => 'description',
-        'type' => CRM_Utils_Type::T_TEXT,
+        'type' => \CRM_Utils_Type::T_TEXT,
                 'title' => ts('Description'),
                                  'maxlength' => 65535,
                                   'rows' => 2,
@@ -343,10 +345,10 @@ class ContactType extends \Civi\Core\Entity {
       
         'name' => 'image_URL',
         'propertyName' => 'imageURL',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Image Url'),
                                  'maxlength' => 255,
-                         'size' => CRM_Utils_Type::HUGE,
+                         'size' => \CRM_Utils_Type::HUGE,
                            
                                     
                           ),
@@ -355,17 +357,17 @@ class ContactType extends \Civi\Core\Entity {
       
         'name' => 'parent_id',
         'propertyName' => 'parent',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                                                      
                                     
-                'FKClassName' => 'CRM_Contact_ContactType',
+                'FKClassName' => 'Civi_Contact_ContactType',
                           ),
       
               'is_active' => array(
       
         'name' => 'is_active',
         'propertyName' => 'isActive',
-        'type' => CRM_Utils_Type::T_BOOLEAN,
+        'type' => \CRM_Utils_Type::T_BOOLEAN,
                                                      
                                     
                           ),
@@ -374,7 +376,7 @@ class ContactType extends \Civi\Core\Entity {
       
         'name' => 'is_reserved',
         'propertyName' => 'isReserved',
-        'type' => CRM_Utils_Type::T_BOOLEAN,
+        'type' => \CRM_Utils_Type::T_BOOLEAN,
                                                      
                                     
                           ),

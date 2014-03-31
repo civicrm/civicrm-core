@@ -138,6 +138,8 @@ class BouncePattern extends \Civi\Core\Entity {
    * @access public
    * @return array
    */
+  public static $_fields = NULL;
+
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
@@ -146,7 +148,7 @@ class BouncePattern extends \Civi\Core\Entity {
       
         'name' => 'id',
         'propertyName' => 'id',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
                                     
@@ -156,21 +158,21 @@ class BouncePattern extends \Civi\Core\Entity {
       
         'name' => 'bounce_type_id',
         'propertyName' => 'bounceType',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
                                     
-                'FKClassName' => 'CRM_Mailing_BounceType',
+                'FKClassName' => 'Civi_Mailing_BounceType',
                           ),
       
               'pattern' => array(
       
         'name' => 'pattern',
         'propertyName' => 'pattern',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Pattern'),
                                  'maxlength' => 255,
-                         'size' => CRM_Utils_Type::HUGE,
+                         'size' => \CRM_Utils_Type::HUGE,
                            
                                     
                           ),

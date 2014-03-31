@@ -228,6 +228,8 @@ class OpenID extends \Civi\Core\Entity {
    * @access public
    * @return array
    */
+  public static $_fields = NULL;
+
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
@@ -236,7 +238,7 @@ class OpenID extends \Civi\Core\Entity {
       
         'name' => 'id',
         'propertyName' => 'id',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
                                     
@@ -246,17 +248,17 @@ class OpenID extends \Civi\Core\Entity {
       
         'name' => 'contact_id',
         'propertyName' => 'contact',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                                                      
                                     
-                'FKClassName' => 'CRM_Contact_Contact',
+                'FKClassName' => 'Civi_Contact_Contact',
                           ),
       
               'location_type_id' => array(
       
         'name' => 'location_type_id',
         'propertyName' => 'locationTypeId',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('OpenID Location Type'),
                                                      
                                     
@@ -266,10 +268,10 @@ class OpenID extends \Civi\Core\Entity {
       
         'name' => 'openid',
         'propertyName' => 'openid',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('OpenID'),
                                  'maxlength' => 255,
-                         'size' => CRM_Utils_Type::HUGE,
+                         'size' => \CRM_Utils_Type::HUGE,
                            
                 'import' => true,
         'where' => 'civicrm_openid.openid',
@@ -284,7 +286,7 @@ class OpenID extends \Civi\Core\Entity {
       
         'name' => 'allowed_to_login',
         'propertyName' => 'allowedToLogin',
-        'type' => CRM_Utils_Type::T_BOOLEAN,
+        'type' => \CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('Allowed To Login'),
                         'required' => true,
                                              
@@ -295,7 +297,7 @@ class OpenID extends \Civi\Core\Entity {
       
         'name' => 'is_primary',
         'propertyName' => 'isPrimary',
-        'type' => CRM_Utils_Type::T_BOOLEAN,
+        'type' => \CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('Is OpenID Primary?'),
                                                      
                                     

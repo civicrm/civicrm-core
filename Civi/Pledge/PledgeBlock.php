@@ -288,6 +288,8 @@ class PledgeBlock extends \Civi\Core\Entity {
    * @access public
    * @return array
    */
+  public static $_fields = NULL;
+
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
@@ -296,7 +298,7 @@ class PledgeBlock extends \Civi\Core\Entity {
       
         'name' => 'id',
         'propertyName' => 'id',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
                                     
@@ -306,10 +308,10 @@ class PledgeBlock extends \Civi\Core\Entity {
       
         'name' => 'entity_table',
         'propertyName' => 'entityTable',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Entity Table'),
                                  'maxlength' => 64,
-                         'size' => CRM_Utils_Type::BIG,
+                         'size' => \CRM_Utils_Type::BIG,
                            
                                     
                           ),
@@ -318,7 +320,7 @@ class PledgeBlock extends \Civi\Core\Entity {
       
         'name' => 'entity_id',
         'propertyName' => 'entityId',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Entity Id'),
                         'required' => true,
                                              
@@ -329,10 +331,10 @@ class PledgeBlock extends \Civi\Core\Entity {
       
         'name' => 'pledge_frequency_unit',
         'propertyName' => 'pledgeFrequencyUnit',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Pledge Frequency Unit'),
                                  'maxlength' => 128,
-                         'size' => CRM_Utils_Type::HUGE,
+                         'size' => \CRM_Utils_Type::HUGE,
                            
                                     
                           ),
@@ -341,7 +343,7 @@ class PledgeBlock extends \Civi\Core\Entity {
       
         'name' => 'is_pledge_interval',
         'propertyName' => 'isPledgeInterval',
-        'type' => CRM_Utils_Type::T_BOOLEAN,
+        'type' => \CRM_Utils_Type::T_BOOLEAN,
                                                      
                                     
                           ),
@@ -350,7 +352,7 @@ class PledgeBlock extends \Civi\Core\Entity {
       
         'name' => 'max_reminders',
         'propertyName' => 'maxReminders',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Maximum Number of Reminders'),
                                                      
                                            'default' => '1',
@@ -361,7 +363,7 @@ class PledgeBlock extends \Civi\Core\Entity {
       
         'name' => 'initial_reminder_day',
         'propertyName' => 'initialReminderDay',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Initial Reminder Day'),
                                                      
                                            'default' => '5',
@@ -372,7 +374,7 @@ class PledgeBlock extends \Civi\Core\Entity {
       
         'name' => 'additional_reminder_day',
         'propertyName' => 'additionalReminderDay',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Additional Reminder Days'),
                                                      
                                            'default' => '5',

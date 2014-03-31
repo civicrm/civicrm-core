@@ -318,6 +318,8 @@ class LocBlock extends \Civi\Core\Entity {
    * @access public
    * @return array
    */
+  public static $_fields = NULL;
+
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
@@ -326,7 +328,7 @@ class LocBlock extends \Civi\Core\Entity {
       
         'name' => 'id',
         'propertyName' => 'id',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
                                     
@@ -336,80 +338,80 @@ class LocBlock extends \Civi\Core\Entity {
       
         'name' => 'address_id',
         'propertyName' => 'address',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                                                      
                                     
-                'FKClassName' => 'CRM_Core_Address',
+                'FKClassName' => 'Civi_Core_Address',
                           ),
       
               'email_id' => array(
       
         'name' => 'email_id',
         'propertyName' => 'email',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                                                      
                                     
-                'FKClassName' => 'CRM_Core_Email',
+                'FKClassName' => 'Civi_Core_Email',
                           ),
       
               'phone_id' => array(
       
         'name' => 'phone_id',
         'propertyName' => 'phone',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                                                      
                                     
-                'FKClassName' => 'CRM_Core_Phone',
+                'FKClassName' => 'Civi_Core_Phone',
                           ),
       
               'im_id' => array(
       
         'name' => 'im_id',
         'propertyName' => 'im',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                                                      
                                     
-                'FKClassName' => 'CRM_Core_IM',
+                'FKClassName' => 'Civi_Core_IM',
                           ),
       
               'address_2_id' => array(
       
         'name' => 'address_2_id',
         'propertyName' => 'address2',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                                                      
                                     
-                'FKClassName' => 'CRM_Core_Address',
+                'FKClassName' => 'Civi_Core_Address',
                           ),
       
               'email_2_id' => array(
       
         'name' => 'email_2_id',
         'propertyName' => 'email2',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                                                      
                                     
-                'FKClassName' => 'CRM_Core_Email',
+                'FKClassName' => 'Civi_Core_Email',
                           ),
       
               'phone_2_id' => array(
       
         'name' => 'phone_2_id',
         'propertyName' => 'phone2',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                                                      
                                     
-                'FKClassName' => 'CRM_Core_Phone',
+                'FKClassName' => 'Civi_Core_Phone',
                           ),
       
               'im_2_id' => array(
       
         'name' => 'im_2_id',
         'propertyName' => 'im2',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                                                      
                                     
-                'FKClassName' => 'CRM_Core_IM',
+                'FKClassName' => 'Civi_Core_IM',
                           ),
              );
     }

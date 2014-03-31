@@ -318,6 +318,8 @@ class ParticipantStatusType extends \Civi\Core\Entity {
    * @access public
    * @return array
    */
+  public static $_fields = NULL;
+
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
@@ -326,7 +328,7 @@ class ParticipantStatusType extends \Civi\Core\Entity {
       
         'name' => 'id',
         'propertyName' => 'id',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
                                     
@@ -336,10 +338,10 @@ class ParticipantStatusType extends \Civi\Core\Entity {
       
         'name' => 'name',
         'propertyName' => 'name',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Participant Status'),
                                  'maxlength' => 64,
-                         'size' => CRM_Utils_Type::BIG,
+                         'size' => \CRM_Utils_Type::BIG,
                            
                 'import' => true,
         'where' => 'civicrm_participant_status_type.name',
@@ -353,10 +355,10 @@ class ParticipantStatusType extends \Civi\Core\Entity {
       
         'name' => 'label',
         'propertyName' => 'label',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Label'),
                                  'maxlength' => 255,
-                         'size' => CRM_Utils_Type::HUGE,
+                         'size' => \CRM_Utils_Type::HUGE,
                            
                                     
                           ),
@@ -365,10 +367,10 @@ class ParticipantStatusType extends \Civi\Core\Entity {
       
         'name' => 'class',
         'propertyName' => 'class',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Class'),
                                  'maxlength' => 8,
-                         'size' => CRM_Utils_Type::EIGHT,
+                         'size' => \CRM_Utils_Type::EIGHT,
                            
                                     
                                      'pseudoconstant' => array(
@@ -380,7 +382,7 @@ class ParticipantStatusType extends \Civi\Core\Entity {
       
         'name' => 'is_reserved',
         'propertyName' => 'isReserved',
-        'type' => CRM_Utils_Type::T_BOOLEAN,
+        'type' => \CRM_Utils_Type::T_BOOLEAN,
                                                      
                                     
                           ),
@@ -389,7 +391,7 @@ class ParticipantStatusType extends \Civi\Core\Entity {
       
         'name' => 'is_active',
         'propertyName' => 'isActive',
-        'type' => CRM_Utils_Type::T_BOOLEAN,
+        'type' => \CRM_Utils_Type::T_BOOLEAN,
                                                      
                                            'default' => '1',
          
@@ -399,7 +401,7 @@ class ParticipantStatusType extends \Civi\Core\Entity {
       
         'name' => 'is_counted',
         'propertyName' => 'isCounted',
-        'type' => CRM_Utils_Type::T_BOOLEAN,
+        'type' => \CRM_Utils_Type::T_BOOLEAN,
                                                      
                                     
                           ),
@@ -408,7 +410,7 @@ class ParticipantStatusType extends \Civi\Core\Entity {
       
         'name' => 'weight',
         'propertyName' => 'weight',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Weight'),
                         'required' => true,
                                              
@@ -419,7 +421,7 @@ class ParticipantStatusType extends \Civi\Core\Entity {
       
         'name' => 'visibility_id',
         'propertyName' => 'visibilityId',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                                                      
                                     
                                      'pseudoconstant' => array(

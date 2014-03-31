@@ -258,6 +258,8 @@ class SubscriptionHistory extends \Civi\Core\Entity {
    * @access public
    * @return array
    */
+  public static $_fields = NULL;
+
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
@@ -266,7 +268,7 @@ class SubscriptionHistory extends \Civi\Core\Entity {
       
         'name' => 'id',
         'propertyName' => 'id',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
                                     
@@ -276,21 +278,21 @@ class SubscriptionHistory extends \Civi\Core\Entity {
       
         'name' => 'contact_id',
         'propertyName' => 'contact',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
                                     
-                'FKClassName' => 'CRM_Contact_Contact',
+                'FKClassName' => 'Civi_Contact_Contact',
                           ),
       
               'group_id' => array(
       
         'name' => 'group_id',
         'propertyName' => 'group',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                                                      
                                     
-                'FKClassName' => 'CRM_Contact_Group',
+                'FKClassName' => 'Civi_Contact_Group',
                                      'pseudoconstant' => array(
                                 'table' => 'civicrm_group',
                       'keyColumn' => 'id',
@@ -302,7 +304,7 @@ class SubscriptionHistory extends \Civi\Core\Entity {
       
         'name' => 'date',
         'propertyName' => 'date',
-        'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
+        'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
                 'title' => ts('Date'),
                         'required' => true,
                                              
@@ -313,10 +315,10 @@ class SubscriptionHistory extends \Civi\Core\Entity {
       
         'name' => 'method',
         'propertyName' => 'method',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Method'),
                                  'maxlength' => 8,
-                         'size' => CRM_Utils_Type::EIGHT,
+                         'size' => \CRM_Utils_Type::EIGHT,
                            
                                     
                                      'pseudoconstant' => array(
@@ -328,10 +330,10 @@ class SubscriptionHistory extends \Civi\Core\Entity {
       
         'name' => 'status',
         'propertyName' => 'status',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Status'),
                                  'maxlength' => 8,
-                         'size' => CRM_Utils_Type::EIGHT,
+                         'size' => \CRM_Utils_Type::EIGHT,
                            
                                     
                                      'pseudoconstant' => array(
@@ -343,10 +345,10 @@ class SubscriptionHistory extends \Civi\Core\Entity {
       
         'name' => 'tracking',
         'propertyName' => 'tracking',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Tracking'),
                                  'maxlength' => 255,
-                         'size' => CRM_Utils_Type::HUGE,
+                         'size' => \CRM_Utils_Type::HUGE,
                            
                                     
                           ),

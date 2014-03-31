@@ -258,6 +258,8 @@ class PrevNextCache extends \Civi\Core\Entity {
    * @access public
    * @return array
    */
+  public static $_fields = NULL;
+
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
@@ -266,7 +268,7 @@ class PrevNextCache extends \Civi\Core\Entity {
       
         'name' => 'id',
         'propertyName' => 'id',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
                                     
@@ -276,10 +278,10 @@ class PrevNextCache extends \Civi\Core\Entity {
       
         'name' => 'entity_table',
         'propertyName' => 'entityTable',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Entity Table'),
                                  'maxlength' => 64,
-                         'size' => CRM_Utils_Type::BIG,
+                         'size' => \CRM_Utils_Type::BIG,
                            
                                     
                           ),
@@ -288,7 +290,7 @@ class PrevNextCache extends \Civi\Core\Entity {
       
         'name' => 'entity_id1',
         'propertyName' => 'entityId1',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Entity Id1'),
                         'required' => true,
                                              
@@ -299,7 +301,7 @@ class PrevNextCache extends \Civi\Core\Entity {
       
         'name' => 'entity_id2',
         'propertyName' => 'entityId2',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Entity Id2'),
                         'required' => true,
                                              
@@ -310,10 +312,10 @@ class PrevNextCache extends \Civi\Core\Entity {
       
         'name' => 'cacheKey',
         'propertyName' => 'cacheKey',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Cachekey'),
                                  'maxlength' => 255,
-                         'size' => CRM_Utils_Type::HUGE,
+                         'size' => \CRM_Utils_Type::HUGE,
                            
                                     
                           ),
@@ -322,7 +324,7 @@ class PrevNextCache extends \Civi\Core\Entity {
       
         'name' => 'data',
         'propertyName' => 'data',
-        'type' => CRM_Utils_Type::T_LONGTEXT,
+        'type' => \CRM_Utils_Type::T_LONGTEXT,
                 'title' => ts('Data'),
                                                      
                                     
@@ -332,7 +334,7 @@ class PrevNextCache extends \Civi\Core\Entity {
       
         'name' => 'is_selected',
         'propertyName' => 'isSelected',
-        'type' => CRM_Utils_Type::T_BOOLEAN,
+        'type' => \CRM_Utils_Type::T_BOOLEAN,
                                                      
                                     
                           ),

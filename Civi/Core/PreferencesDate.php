@@ -258,6 +258,8 @@ class PreferencesDate extends \Civi\Core\Entity {
    * @access public
    * @return array
    */
+  public static $_fields = NULL;
+
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
@@ -266,7 +268,7 @@ class PreferencesDate extends \Civi\Core\Entity {
       
         'name' => 'id',
         'propertyName' => 'id',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
                                     
@@ -276,11 +278,11 @@ class PreferencesDate extends \Civi\Core\Entity {
       
         'name' => 'name',
         'propertyName' => 'name',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Name'),
                         'required' => true,
                          'maxlength' => 64,
-                         'size' => CRM_Utils_Type::BIG,
+                         'size' => \CRM_Utils_Type::BIG,
                            
                                     
                           ),
@@ -289,10 +291,10 @@ class PreferencesDate extends \Civi\Core\Entity {
       
         'name' => 'description',
         'propertyName' => 'description',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Description'),
                                  'maxlength' => 255,
-                         'size' => CRM_Utils_Type::HUGE,
+                         'size' => \CRM_Utils_Type::HUGE,
                            
                                     
                           ),
@@ -301,7 +303,7 @@ class PreferencesDate extends \Civi\Core\Entity {
       
         'name' => 'start',
         'propertyName' => 'start',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Start'),
                         'required' => true,
                                              
@@ -312,7 +314,7 @@ class PreferencesDate extends \Civi\Core\Entity {
       
         'name' => 'end',
         'propertyName' => 'end',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('End'),
                         'required' => true,
                                              
@@ -323,10 +325,10 @@ class PreferencesDate extends \Civi\Core\Entity {
       
         'name' => 'date_format',
         'propertyName' => 'dateFormat',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Date Format'),
                                  'maxlength' => 64,
-                         'size' => CRM_Utils_Type::BIG,
+                         'size' => \CRM_Utils_Type::BIG,
                            
                                     
                           ),
@@ -335,10 +337,10 @@ class PreferencesDate extends \Civi\Core\Entity {
       
         'name' => 'time_format',
         'propertyName' => 'timeFormat',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Time Format'),
                                  'maxlength' => 64,
-                         'size' => CRM_Utils_Type::BIG,
+                         'size' => \CRM_Utils_Type::BIG,
                            
                                     
                           ),

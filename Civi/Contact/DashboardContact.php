@@ -348,6 +348,8 @@ class DashboardContact extends \Civi\Core\Entity {
    * @access public
    * @return array
    */
+  public static $_fields = NULL;
+
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
@@ -356,7 +358,7 @@ class DashboardContact extends \Civi\Core\Entity {
       
         'name' => 'id',
         'propertyName' => 'id',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
                                     
@@ -366,29 +368,29 @@ class DashboardContact extends \Civi\Core\Entity {
       
         'name' => 'dashboard_id',
         'propertyName' => 'dashboard',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
                                     
-                'FKClassName' => 'CRM_Core_Dashboard',
+                'FKClassName' => 'Civi_Core_Dashboard',
                           ),
       
               'contact_id' => array(
       
         'name' => 'contact_id',
         'propertyName' => 'contact',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
                                     
-                'FKClassName' => 'CRM_Contact_Contact',
+                'FKClassName' => 'Civi_Contact_Contact',
                           ),
       
               'column_no' => array(
       
         'name' => 'column_no',
         'propertyName' => 'columnNo',
-        'type' => CRM_Utils_Type::T_BOOLEAN,
+        'type' => \CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('Column No'),
                                                      
                                     
@@ -398,7 +400,7 @@ class DashboardContact extends \Civi\Core\Entity {
       
         'name' => 'is_minimized',
         'propertyName' => 'isMinimized',
-        'type' => CRM_Utils_Type::T_BOOLEAN,
+        'type' => \CRM_Utils_Type::T_BOOLEAN,
                                                      
                                     
                           ),
@@ -407,7 +409,7 @@ class DashboardContact extends \Civi\Core\Entity {
       
         'name' => 'is_fullscreen',
         'propertyName' => 'isFullscreen',
-        'type' => CRM_Utils_Type::T_BOOLEAN,
+        'type' => \CRM_Utils_Type::T_BOOLEAN,
                                                      
                                            'default' => '1',
          
@@ -417,7 +419,7 @@ class DashboardContact extends \Civi\Core\Entity {
       
         'name' => 'is_active',
         'propertyName' => 'isActive',
-        'type' => CRM_Utils_Type::T_BOOLEAN,
+        'type' => \CRM_Utils_Type::T_BOOLEAN,
                                                      
                                     
                           ),
@@ -426,7 +428,7 @@ class DashboardContact extends \Civi\Core\Entity {
       
         'name' => 'weight',
         'propertyName' => 'weight',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Weight'),
                                                      
                                     
@@ -436,7 +438,7 @@ class DashboardContact extends \Civi\Core\Entity {
       
         'name' => 'content',
         'propertyName' => 'content',
-        'type' => CRM_Utils_Type::T_LONGTEXT,
+        'type' => \CRM_Utils_Type::T_LONGTEXT,
                 'title' => ts('Content'),
                                                      
                                     
@@ -446,7 +448,7 @@ class DashboardContact extends \Civi\Core\Entity {
       
         'name' => 'created_date',
         'propertyName' => 'createdDate',
-        'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
+        'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
                 'title' => ts('Created Date'),
                                                      
                                     

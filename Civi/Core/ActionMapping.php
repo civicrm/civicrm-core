@@ -318,6 +318,8 @@ class ActionMapping extends \Civi\Core\Entity {
    * @access public
    * @return array
    */
+  public static $_fields = NULL;
+
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
@@ -326,7 +328,7 @@ class ActionMapping extends \Civi\Core\Entity {
       
         'name' => 'id',
         'propertyName' => 'id',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
                                     
@@ -336,10 +338,10 @@ class ActionMapping extends \Civi\Core\Entity {
       
         'name' => 'entity',
         'propertyName' => 'entity',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Entity'),
                                  'maxlength' => 64,
-                         'size' => CRM_Utils_Type::BIG,
+                         'size' => \CRM_Utils_Type::BIG,
                            
                                     
                           ),
@@ -348,10 +350,10 @@ class ActionMapping extends \Civi\Core\Entity {
       
         'name' => 'entity_value',
         'propertyName' => 'entityValue',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Entity Value'),
                                  'maxlength' => 64,
-                         'size' => CRM_Utils_Type::BIG,
+                         'size' => \CRM_Utils_Type::BIG,
                            
                                     
                           ),
@@ -360,10 +362,10 @@ class ActionMapping extends \Civi\Core\Entity {
       
         'name' => 'entity_value_label',
         'propertyName' => 'entityValueLabel',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Entity Value Label'),
                                  'maxlength' => 64,
-                         'size' => CRM_Utils_Type::BIG,
+                         'size' => \CRM_Utils_Type::BIG,
                            
                                     
                           ),
@@ -372,10 +374,10 @@ class ActionMapping extends \Civi\Core\Entity {
       
         'name' => 'entity_status',
         'propertyName' => 'entityStatus',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Entity Status'),
                                  'maxlength' => 64,
-                         'size' => CRM_Utils_Type::BIG,
+                         'size' => \CRM_Utils_Type::BIG,
                            
                                     
                           ),
@@ -384,10 +386,10 @@ class ActionMapping extends \Civi\Core\Entity {
       
         'name' => 'entity_status_label',
         'propertyName' => 'entityStatusLabel',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Entity Status Label'),
                                  'maxlength' => 64,
-                         'size' => CRM_Utils_Type::BIG,
+                         'size' => \CRM_Utils_Type::BIG,
                            
                                     
                           ),
@@ -396,10 +398,10 @@ class ActionMapping extends \Civi\Core\Entity {
       
         'name' => 'entity_date_start',
         'propertyName' => 'entityDateStart',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Entity Date Start'),
                                  'maxlength' => 64,
-                         'size' => CRM_Utils_Type::BIG,
+                         'size' => \CRM_Utils_Type::BIG,
                            
                                     
                           ),
@@ -408,10 +410,10 @@ class ActionMapping extends \Civi\Core\Entity {
       
         'name' => 'entity_date_end',
         'propertyName' => 'entityDateEnd',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Entity Date End'),
                                  'maxlength' => 64,
-                         'size' => CRM_Utils_Type::BIG,
+                         'size' => \CRM_Utils_Type::BIG,
                            
                                     
                           ),
@@ -420,10 +422,10 @@ class ActionMapping extends \Civi\Core\Entity {
       
         'name' => 'entity_recipient',
         'propertyName' => 'entityRecipient',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Entity Recipient'),
                                  'maxlength' => 64,
-                         'size' => CRM_Utils_Type::BIG,
+                         'size' => \CRM_Utils_Type::BIG,
                            
                                     
                           ),

@@ -378,6 +378,8 @@ class Navigation extends \Civi\Core\Entity {
    * @access public
    * @return array
    */
+  public static $_fields = NULL;
+
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
@@ -386,7 +388,7 @@ class Navigation extends \Civi\Core\Entity {
       
         'name' => 'id',
         'propertyName' => 'id',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
                                     
@@ -396,21 +398,21 @@ class Navigation extends \Civi\Core\Entity {
       
         'name' => 'domain_id',
         'propertyName' => 'domain',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
                                     
-                'FKClassName' => 'CRM_Core_Domain',
+                'FKClassName' => 'Civi_Core_Domain',
                           ),
       
               'label' => array(
       
         'name' => 'label',
         'propertyName' => 'label',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Label'),
                                  'maxlength' => 255,
-                         'size' => CRM_Utils_Type::HUGE,
+                         'size' => \CRM_Utils_Type::HUGE,
                            
                                     
                           ),
@@ -419,10 +421,10 @@ class Navigation extends \Civi\Core\Entity {
       
         'name' => 'name',
         'propertyName' => 'name',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Name'),
                                  'maxlength' => 255,
-                         'size' => CRM_Utils_Type::HUGE,
+                         'size' => \CRM_Utils_Type::HUGE,
                            
                                     
                           ),
@@ -431,10 +433,10 @@ class Navigation extends \Civi\Core\Entity {
       
         'name' => 'url',
         'propertyName' => 'url',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Url'),
                                  'maxlength' => 255,
-                         'size' => CRM_Utils_Type::HUGE,
+                         'size' => \CRM_Utils_Type::HUGE,
                            
                                     
                           ),
@@ -443,10 +445,10 @@ class Navigation extends \Civi\Core\Entity {
       
         'name' => 'permission',
         'propertyName' => 'permission',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Permission'),
                                  'maxlength' => 255,
-                         'size' => CRM_Utils_Type::HUGE,
+                         'size' => \CRM_Utils_Type::HUGE,
                            
                                     
                           ),
@@ -455,10 +457,10 @@ class Navigation extends \Civi\Core\Entity {
       
         'name' => 'permission_operator',
         'propertyName' => 'permissionOperator',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Permission Operator'),
                                  'maxlength' => 3,
-                         'size' => CRM_Utils_Type::FOUR,
+                         'size' => \CRM_Utils_Type::FOUR,
                            
                                     
                           ),
@@ -467,17 +469,17 @@ class Navigation extends \Civi\Core\Entity {
       
         'name' => 'parent_id',
         'propertyName' => 'parent',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                                                      
                                     
-                'FKClassName' => 'CRM_Core_Navigation',
+                'FKClassName' => 'Civi_Core_Navigation',
                           ),
       
               'is_active' => array(
       
         'name' => 'is_active',
         'propertyName' => 'isActive',
-        'type' => CRM_Utils_Type::T_BOOLEAN,
+        'type' => \CRM_Utils_Type::T_BOOLEAN,
                                                      
                                     
                           ),
@@ -486,7 +488,7 @@ class Navigation extends \Civi\Core\Entity {
       
         'name' => 'has_separator',
         'propertyName' => 'hasSeparator',
-        'type' => CRM_Utils_Type::T_BOOLEAN,
+        'type' => \CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('Has Separator'),
                                                      
                                     
@@ -496,7 +498,7 @@ class Navigation extends \Civi\Core\Entity {
       
         'name' => 'weight',
         'propertyName' => 'weight',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Weight'),
                                                      
                                     

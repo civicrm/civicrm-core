@@ -138,6 +138,8 @@ class MembershipPayment extends \Civi\Core\Entity {
    * @access public
    * @return array
    */
+  public static $_fields = NULL;
+
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
@@ -146,7 +148,7 @@ class MembershipPayment extends \Civi\Core\Entity {
       
         'name' => 'id',
         'propertyName' => 'id',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
                                     
@@ -156,21 +158,21 @@ class MembershipPayment extends \Civi\Core\Entity {
       
         'name' => 'membership_id',
         'propertyName' => 'membership',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
                                     
-                'FKClassName' => 'CRM_Member_Membership',
+                'FKClassName' => 'Civi_Member_Membership',
                           ),
       
               'contribution_id' => array(
       
         'name' => 'contribution_id',
         'propertyName' => 'contribution',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                                                      
                                     
-                'FKClassName' => 'CRM_Contribute_Contribution',
+                'FKClassName' => 'Civi_Contribute_Contribution',
                           ),
              );
     }

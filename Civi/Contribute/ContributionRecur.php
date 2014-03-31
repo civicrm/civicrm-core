@@ -858,6 +858,8 @@ class ContributionRecur extends \Civi\Core\Entity {
    * @access public
    * @return array
    */
+  public static $_fields = NULL;
+
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
@@ -866,7 +868,7 @@ class ContributionRecur extends \Civi\Core\Entity {
       
         'name' => 'id',
         'propertyName' => 'id',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Recurring Contribution ID'),
                         'required' => true,
                                              
@@ -877,19 +879,19 @@ class ContributionRecur extends \Civi\Core\Entity {
       
         'name' => 'contact_id',
         'propertyName' => 'contact',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Contact ID'),
                         'required' => true,
                                              
                                     
-                'FKClassName' => 'CRM_Contact_Contact',
+                'FKClassName' => 'Civi_Contact_Contact',
                           ),
       
               'amount' => array(
       
         'name' => 'amount',
         'propertyName' => 'amount',
-        'type' => CRM_Utils_Type::T_MONEY,
+        'type' => \CRM_Utils_Type::T_MONEY,
                 'title' => ts('Amount'),
                         'required' => true,
                                              
@@ -900,10 +902,10 @@ class ContributionRecur extends \Civi\Core\Entity {
       
         'name' => 'currency',
         'propertyName' => 'currency',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Currency'),
                                  'maxlength' => 3,
-                         'size' => CRM_Utils_Type::FOUR,
+                         'size' => \CRM_Utils_Type::FOUR,
                            
                                            'default' => 'NULL',
          
@@ -919,10 +921,10 @@ class ContributionRecur extends \Civi\Core\Entity {
       
         'name' => 'frequency_unit',
         'propertyName' => 'frequencyUnit',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Frequency Unit'),
                                  'maxlength' => 8,
-                         'size' => CRM_Utils_Type::EIGHT,
+                         'size' => \CRM_Utils_Type::EIGHT,
                            
                                            'default' => 'month',
          
@@ -936,7 +938,7 @@ class ContributionRecur extends \Civi\Core\Entity {
       
         'name' => 'frequency_interval',
         'propertyName' => 'frequencyInterval',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Interval (number of units)'),
                         'required' => true,
                                              
@@ -947,7 +949,7 @@ class ContributionRecur extends \Civi\Core\Entity {
       
         'name' => 'installments',
         'propertyName' => 'installments',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Number of Installments'),
                                                      
                                     
@@ -957,7 +959,7 @@ class ContributionRecur extends \Civi\Core\Entity {
       
         'name' => 'start_date',
         'propertyName' => 'startDate',
-        'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
+        'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
                 'title' => ts('Recurring Contribution Started Date'),
                         'required' => true,
                                              
@@ -968,7 +970,7 @@ class ContributionRecur extends \Civi\Core\Entity {
       
         'name' => 'create_date',
         'propertyName' => 'createDate',
-        'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
+        'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
                 'title' => ts('Recurring Contribution Created Date'),
                         'required' => true,
                                              
@@ -979,7 +981,7 @@ class ContributionRecur extends \Civi\Core\Entity {
       
         'name' => 'modified_date',
         'propertyName' => 'modifiedDate',
-        'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
+        'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
                 'title' => ts('Recurring Contribution Modified Date'),
                                                      
                                     
@@ -989,7 +991,7 @@ class ContributionRecur extends \Civi\Core\Entity {
       
         'name' => 'cancel_date',
         'propertyName' => 'cancelDate',
-        'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
+        'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
                 'title' => ts('Recurring Contribution Cancel Date'),
                                                      
                                     
@@ -999,7 +1001,7 @@ class ContributionRecur extends \Civi\Core\Entity {
       
         'name' => 'end_date',
         'propertyName' => 'endDate',
-        'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
+        'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
                 'title' => ts('Recurring Contribution End Date'),
                                                      
                                     
@@ -1009,10 +1011,10 @@ class ContributionRecur extends \Civi\Core\Entity {
       
         'name' => 'processor_id',
         'propertyName' => 'processorId',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Payment Processor'),
                                  'maxlength' => 255,
-                         'size' => CRM_Utils_Type::HUGE,
+                         'size' => \CRM_Utils_Type::HUGE,
                            
                                     
                           ),
@@ -1021,10 +1023,10 @@ class ContributionRecur extends \Civi\Core\Entity {
       
         'name' => 'trxn_id',
         'propertyName' => 'trxnId',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Transaction ID'),
                                  'maxlength' => 255,
-                         'size' => CRM_Utils_Type::HUGE,
+                         'size' => \CRM_Utils_Type::HUGE,
                            
                                     
                           ),
@@ -1033,10 +1035,10 @@ class ContributionRecur extends \Civi\Core\Entity {
       
         'name' => 'invoice_id',
         'propertyName' => 'invoiceId',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Invoice ID'),
                                  'maxlength' => 255,
-                         'size' => CRM_Utils_Type::HUGE,
+                         'size' => \CRM_Utils_Type::HUGE,
                            
                                     
                           ),
@@ -1045,7 +1047,7 @@ class ContributionRecur extends \Civi\Core\Entity {
       
         'name' => 'contribution_status_id',
         'propertyName' => 'contributionStatusId',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Recurring Contribution Status'),
                                                      
                 'import' => true,
@@ -1064,7 +1066,7 @@ class ContributionRecur extends \Civi\Core\Entity {
       
         'name' => 'is_test',
         'propertyName' => 'isTest',
-        'type' => CRM_Utils_Type::T_BOOLEAN,
+        'type' => \CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('Test'),
                                                      
                 'import' => true,
@@ -1079,7 +1081,7 @@ class ContributionRecur extends \Civi\Core\Entity {
       
         'name' => 'cycle_day',
         'propertyName' => 'cycleDay',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Number of Cycle Day'),
                         'required' => true,
                                              
@@ -1091,7 +1093,7 @@ class ContributionRecur extends \Civi\Core\Entity {
       
         'name' => 'next_sched_contribution_date',
         'propertyName' => 'nextSchedContributionDate',
-        'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
+        'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
                 'title' => ts('Next Scheduled Contribution Date'),
                                                      
                                     
@@ -1101,7 +1103,7 @@ class ContributionRecur extends \Civi\Core\Entity {
       
         'name' => 'failure_count',
         'propertyName' => 'failureCount',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Number of Failures'),
                                                      
                                     
@@ -1111,7 +1113,7 @@ class ContributionRecur extends \Civi\Core\Entity {
       
         'name' => 'failure_retry_date',
         'propertyName' => 'failureRetryDate',
-        'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
+        'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
                 'title' => ts('Retry Failed Attempt Date'),
                                                      
                                     
@@ -1121,7 +1123,7 @@ class ContributionRecur extends \Civi\Core\Entity {
       
         'name' => 'auto_renew',
         'propertyName' => 'autoRenew',
-        'type' => CRM_Utils_Type::T_BOOLEAN,
+        'type' => \CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('Auto Renew'),
                         'required' => true,
                                              
@@ -1132,18 +1134,18 @@ class ContributionRecur extends \Civi\Core\Entity {
       
         'name' => 'payment_processor_id',
         'propertyName' => 'paymentProcessor',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Payment Processor'),
                                                      
                                     
-                'FKClassName' => 'CRM_Financial_PaymentProcessor',
+                'FKClassName' => 'Civi_Financial_PaymentProcessor',
                           ),
       
               'financial_type_id' => array(
       
         'name' => 'financial_type_id',
         'propertyName' => 'financialType',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Financial Type'),
                                                      
                          'export' => false,
@@ -1151,7 +1153,7 @@ class ContributionRecur extends \Civi\Core\Entity {
         'headerPattern' => '',
         'dataPattern' => '',
                                    
-                'FKClassName' => 'CRM_Financial_FinancialType',
+                'FKClassName' => 'Civi_Financial_FinancialType',
                                      'pseudoconstant' => array(
                                 'table' => 'civicrm_financial_type',
                       'keyColumn' => 'id',
@@ -1163,7 +1165,7 @@ class ContributionRecur extends \Civi\Core\Entity {
       
         'name' => 'payment_instrument_id',
         'propertyName' => 'paymentInstrumentId',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Payment Instrument'),
                                                      
                                     
@@ -1176,7 +1178,7 @@ class ContributionRecur extends \Civi\Core\Entity {
       
         'name' => 'campaign_id',
         'propertyName' => 'campaign',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Campaign'),
                                                      
                 'import' => true,
@@ -1185,7 +1187,7 @@ class ContributionRecur extends \Civi\Core\Entity {
         'dataPattern' => '',
                          'export' => true,
                                    
-                'FKClassName' => 'CRM_Campaign_Campaign',
+                'FKClassName' => 'Civi_Campaign_Campaign',
                                      'pseudoconstant' => array(
                                 'table' => 'civicrm_campaign',
                       'keyColumn' => 'id',
@@ -1197,7 +1199,7 @@ class ContributionRecur extends \Civi\Core\Entity {
       
         'name' => 'is_email_receipt',
         'propertyName' => 'isEmailReceipt',
-        'type' => CRM_Utils_Type::T_BOOLEAN,
+        'type' => \CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('Send email Receipt?'),
                                                      
                                            'default' => '1',

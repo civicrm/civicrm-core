@@ -198,6 +198,8 @@ class Currency extends \Civi\Core\Entity {
    * @access public
    * @return array
    */
+  public static $_fields = NULL;
+
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
@@ -206,7 +208,7 @@ class Currency extends \Civi\Core\Entity {
       
         'name' => 'id',
         'propertyName' => 'id',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
                                     
@@ -216,10 +218,10 @@ class Currency extends \Civi\Core\Entity {
       
         'name' => 'name',
         'propertyName' => 'name',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Currency'),
                                  'maxlength' => 64,
-                         'size' => CRM_Utils_Type::BIG,
+                         'size' => \CRM_Utils_Type::BIG,
                            
                 'import' => true,
         'where' => 'civicrm_currency.name',
@@ -233,10 +235,10 @@ class Currency extends \Civi\Core\Entity {
       
         'name' => 'symbol',
         'propertyName' => 'symbol',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Symbol'),
                                  'maxlength' => 8,
-                         'size' => CRM_Utils_Type::EIGHT,
+                         'size' => \CRM_Utils_Type::EIGHT,
                            
                                     
                           ),
@@ -245,10 +247,10 @@ class Currency extends \Civi\Core\Entity {
       
         'name' => 'numeric_code',
         'propertyName' => 'numericCode',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Numeric Code'),
                                  'maxlength' => 3,
-                         'size' => CRM_Utils_Type::FOUR,
+                         'size' => \CRM_Utils_Type::FOUR,
                            
                 'import' => true,
         'where' => 'civicrm_currency.numeric_code',
@@ -262,10 +264,10 @@ class Currency extends \Civi\Core\Entity {
       
         'name' => 'full_name',
         'propertyName' => 'fullName',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Full Name'),
                                  'maxlength' => 64,
-                         'size' => CRM_Utils_Type::BIG,
+                         'size' => \CRM_Utils_Type::BIG,
                            
                                     
                           ),

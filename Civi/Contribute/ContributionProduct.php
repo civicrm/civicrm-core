@@ -348,6 +348,8 @@ class ContributionProduct extends \Civi\Core\Entity {
    * @access public
    * @return array
    */
+  public static $_fields = NULL;
+
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
@@ -356,7 +358,7 @@ class ContributionProduct extends \Civi\Core\Entity {
       
         'name' => 'id',
         'propertyName' => 'id',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
                                     
@@ -366,7 +368,7 @@ class ContributionProduct extends \Civi\Core\Entity {
       
         'name' => 'product_id',
         'propertyName' => 'productId',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
                                     
@@ -376,21 +378,21 @@ class ContributionProduct extends \Civi\Core\Entity {
       
         'name' => 'contribution_id',
         'propertyName' => 'contribution',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
                                     
-                'FKClassName' => 'CRM_Contribute_Contribution',
+                'FKClassName' => 'Civi_Contribute_Contribution',
                           ),
       
               'product_option' => array(
       
         'name' => 'product_option',
         'propertyName' => 'productOption',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Product Option'),
                                  'maxlength' => 255,
-                         'size' => CRM_Utils_Type::HUGE,
+                         'size' => \CRM_Utils_Type::HUGE,
                            
                          'export' => true,
                 'where' => 'civicrm_contribution_product.product_option',
@@ -403,7 +405,7 @@ class ContributionProduct extends \Civi\Core\Entity {
       
         'name' => 'quantity',
         'propertyName' => 'quantity',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Quantity'),
                                                      
                          'export' => true,
@@ -417,7 +419,7 @@ class ContributionProduct extends \Civi\Core\Entity {
       
         'name' => 'fulfilled_date',
         'propertyName' => 'fulfilledDate',
-        'type' => CRM_Utils_Type::T_DATE,
+        'type' => \CRM_Utils_Type::T_DATE,
                 'title' => ts('Fulfilled Date'),
                                                      
                          'export' => true,
@@ -431,7 +433,7 @@ class ContributionProduct extends \Civi\Core\Entity {
       
         'name' => 'start_date',
         'propertyName' => 'startDate',
-        'type' => CRM_Utils_Type::T_DATE,
+        'type' => \CRM_Utils_Type::T_DATE,
                 'title' => ts('Start Date'),
                                                      
                          'export' => true,
@@ -445,7 +447,7 @@ class ContributionProduct extends \Civi\Core\Entity {
       
         'name' => 'end_date',
         'propertyName' => 'endDate',
-        'type' => CRM_Utils_Type::T_DATE,
+        'type' => \CRM_Utils_Type::T_DATE,
                 'title' => ts('End Date'),
                                                      
                          'export' => true,
@@ -459,7 +461,7 @@ class ContributionProduct extends \Civi\Core\Entity {
       
         'name' => 'comment',
         'propertyName' => 'comment',
-        'type' => CRM_Utils_Type::T_TEXT,
+        'type' => \CRM_Utils_Type::T_TEXT,
                 'title' => ts('Comment'),
                                  'maxlength' => 65535,
                                     
@@ -470,12 +472,12 @@ class ContributionProduct extends \Civi\Core\Entity {
       
         'name' => 'financial_type_id',
         'propertyName' => 'financialType',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Financial Type'),
                                                      
                                            'default' => 'NULL',
          
-                'FKClassName' => 'CRM_Financial_FinancialType',
+                'FKClassName' => 'Civi_Financial_FinancialType',
                           ),
              );
     }

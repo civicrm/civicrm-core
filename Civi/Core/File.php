@@ -258,6 +258,8 @@ class File extends \Civi\Core\Entity {
    * @access public
    * @return array
    */
+  public static $_fields = NULL;
+
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
@@ -266,7 +268,7 @@ class File extends \Civi\Core\Entity {
       
         'name' => 'id',
         'propertyName' => 'id',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
                                     
@@ -276,7 +278,7 @@ class File extends \Civi\Core\Entity {
       
         'name' => 'file_type_id',
         'propertyName' => 'fileTypeId',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                                                      
                                     
                           ),
@@ -285,10 +287,10 @@ class File extends \Civi\Core\Entity {
       
         'name' => 'mime_type',
         'propertyName' => 'mimeType',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Mime Type'),
                                  'maxlength' => 255,
-                         'size' => CRM_Utils_Type::HUGE,
+                         'size' => \CRM_Utils_Type::HUGE,
                            
                                     
                           ),
@@ -297,10 +299,10 @@ class File extends \Civi\Core\Entity {
       
         'name' => 'uri',
         'propertyName' => 'uri',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Uri'),
                                  'maxlength' => 255,
-                         'size' => CRM_Utils_Type::HUGE,
+                         'size' => \CRM_Utils_Type::HUGE,
                            
                                     
                           ),
@@ -309,7 +311,7 @@ class File extends \Civi\Core\Entity {
       
         'name' => 'document',
         'propertyName' => 'document',
-        'type' => CRM_Utils_Type::T_MEDIUMBLOB,
+        'type' => \CRM_Utils_Type::T_MEDIUMBLOB,
                 'title' => ts('Document'),
                                  'maxlength' => 16777215,
                                     
@@ -320,10 +322,10 @@ class File extends \Civi\Core\Entity {
       
         'name' => 'description',
         'propertyName' => 'description',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Description'),
                                  'maxlength' => 255,
-                         'size' => CRM_Utils_Type::HUGE,
+                         'size' => \CRM_Utils_Type::HUGE,
                            
                                     
                           ),
@@ -332,7 +334,7 @@ class File extends \Civi\Core\Entity {
       
         'name' => 'upload_date',
         'propertyName' => 'uploadDate',
-        'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
+        'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
                 'title' => ts('Upload Date'),
                                                      
                                     

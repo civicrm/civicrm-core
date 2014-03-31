@@ -408,6 +408,8 @@ class LineItem extends \Civi\Core\Entity {
    * @access public
    * @return array
    */
+  public static $_fields = NULL;
+
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
@@ -416,7 +418,7 @@ class LineItem extends \Civi\Core\Entity {
       
         'name' => 'id',
         'propertyName' => 'id',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
                                     
@@ -426,11 +428,11 @@ class LineItem extends \Civi\Core\Entity {
       
         'name' => 'entity_table',
         'propertyName' => 'entityTable',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Entity Table'),
                         'required' => true,
                          'maxlength' => 64,
-                         'size' => CRM_Utils_Type::BIG,
+                         'size' => \CRM_Utils_Type::BIG,
                            
                                     
                           ),
@@ -439,7 +441,7 @@ class LineItem extends \Civi\Core\Entity {
       
         'name' => 'entity_id',
         'propertyName' => 'entityId',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
                                     
@@ -449,20 +451,20 @@ class LineItem extends \Civi\Core\Entity {
       
         'name' => 'price_field_id',
         'propertyName' => 'priceField',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                                                      
                                     
-                'FKClassName' => 'CRM_Price_PriceField',
+                'FKClassName' => 'Civi_Price_PriceField',
                           ),
       
               'label' => array(
       
         'name' => 'label',
         'propertyName' => 'label',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Label'),
                                  'maxlength' => 255,
-                         'size' => CRM_Utils_Type::HUGE,
+                         'size' => \CRM_Utils_Type::HUGE,
                            
                                            'default' => 'NULL',
          
@@ -472,7 +474,7 @@ class LineItem extends \Civi\Core\Entity {
       
         'name' => 'qty',
         'propertyName' => 'qty',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Qty'),
                         'required' => true,
                                              
@@ -483,7 +485,7 @@ class LineItem extends \Civi\Core\Entity {
       
         'name' => 'unit_price',
         'propertyName' => 'unitPrice',
-        'type' => CRM_Utils_Type::T_MONEY,
+        'type' => \CRM_Utils_Type::T_MONEY,
                 'title' => ts('Unit Price'),
                         'required' => true,
                                              
@@ -494,7 +496,7 @@ class LineItem extends \Civi\Core\Entity {
       
         'name' => 'line_total',
         'propertyName' => 'lineTotal',
-        'type' => CRM_Utils_Type::T_MONEY,
+        'type' => \CRM_Utils_Type::T_MONEY,
                 'title' => ts('Line Total'),
                         'required' => true,
                                              
@@ -505,7 +507,7 @@ class LineItem extends \Civi\Core\Entity {
       
         'name' => 'participant_count',
         'propertyName' => 'participantCount',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Participant Count'),
                                                      
                                            'default' => 'NULL',
@@ -516,30 +518,30 @@ class LineItem extends \Civi\Core\Entity {
       
         'name' => 'price_field_value_id',
         'propertyName' => 'priceFieldValue',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                                                      
                                            'default' => 'NULL',
          
-                'FKClassName' => 'CRM_Price_PriceFieldValue',
+                'FKClassName' => 'Civi_Price_PriceFieldValue',
                           ),
       
               'financial_type_id' => array(
       
         'name' => 'financial_type_id',
         'propertyName' => 'financialType',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Financial Type'),
                                                      
                                            'default' => 'NULL',
          
-                'FKClassName' => 'CRM_Financial_FinancialType',
+                'FKClassName' => 'Civi_Financial_FinancialType',
                           ),
       
               'deductible_amount' => array(
       
         'name' => 'deductible_amount',
         'propertyName' => 'deductibleAmount',
-        'type' => CRM_Utils_Type::T_MONEY,
+        'type' => \CRM_Utils_Type::T_MONEY,
                 'title' => ts('Deductible Amount'),
                         'required' => true,
                                              

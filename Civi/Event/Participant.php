@@ -588,6 +588,8 @@ class Participant extends \Civi\Core\Entity {
    * @access public
    * @return array
    */
+  public static $_fields = NULL;
+
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
@@ -596,7 +598,7 @@ class Participant extends \Civi\Core\Entity {
       
         'name' => 'id',
         'propertyName' => 'id',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Participant ID'),
                         'required' => true,
                                              
@@ -612,7 +614,7 @@ class Participant extends \Civi\Core\Entity {
       
         'name' => 'contact_id',
         'propertyName' => 'contact',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Contact ID'),
                         'required' => true,
                                              
@@ -622,14 +624,14 @@ class Participant extends \Civi\Core\Entity {
         'dataPattern' => '',
                          'export' => true,
                                    
-                'FKClassName' => 'CRM_Contact_Contact',
+                'FKClassName' => 'Civi_Contact_Contact',
                           ),
       
               'event_id' => array(
       
         'name' => 'event_id',
         'propertyName' => 'event',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Event'),
                         'required' => true,
                                              
@@ -639,14 +641,14 @@ class Participant extends \Civi\Core\Entity {
         'dataPattern' => '',
                          'export' => true,
                                    
-                'FKClassName' => 'CRM_Event_Event',
+                'FKClassName' => 'Civi_Event_Event',
                           ),
       
               'participant_status_id' => array(
       
         'name' => 'status_id',
         'propertyName' => 'status',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Participant Status'),
                         'required' => true,
                                              
@@ -657,7 +659,7 @@ class Participant extends \Civi\Core\Entity {
                          'export' => false,
                                           'default' => '1',
          
-                'FKClassName' => 'CRM_Event_ParticipantStatusType',
+                'FKClassName' => 'Civi_Event_ParticipantStatusType',
                                      'pseudoconstant' => array(
                                 'table' => 'civicrm_participant_status_type',
                       'keyColumn' => 'id',
@@ -669,10 +671,10 @@ class Participant extends \Civi\Core\Entity {
       
         'name' => 'role_id',
         'propertyName' => 'roleId',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Participant Role Id'),
                                  'maxlength' => 128,
-                         'size' => CRM_Utils_Type::HUGE,
+                         'size' => \CRM_Utils_Type::HUGE,
                            
                 'import' => true,
         'where' => 'civicrm_participant.role_id',
@@ -690,7 +692,7 @@ class Participant extends \Civi\Core\Entity {
       
         'name' => 'register_date',
         'propertyName' => 'registerDate',
-        'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
+        'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
                 'title' => ts('Register date'),
                                                      
                 'import' => true,
@@ -705,10 +707,10 @@ class Participant extends \Civi\Core\Entity {
       
         'name' => 'source',
         'propertyName' => 'source',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Participant Source'),
                                  'maxlength' => 128,
-                         'size' => CRM_Utils_Type::HUGE,
+                         'size' => \CRM_Utils_Type::HUGE,
                            
                 'import' => true,
         'where' => 'civicrm_participant.source',
@@ -722,7 +724,7 @@ class Participant extends \Civi\Core\Entity {
       
         'name' => 'fee_level',
         'propertyName' => 'feeLevel',
-        'type' => CRM_Utils_Type::T_TEXT,
+        'type' => \CRM_Utils_Type::T_TEXT,
                 'title' => ts('Fee level'),
                                  'maxlength' => 65535,
                                     
@@ -738,7 +740,7 @@ class Participant extends \Civi\Core\Entity {
       
         'name' => 'is_test',
         'propertyName' => 'isTest',
-        'type' => CRM_Utils_Type::T_BOOLEAN,
+        'type' => \CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('Test'),
                                                      
                 'import' => true,
@@ -753,7 +755,7 @@ class Participant extends \Civi\Core\Entity {
       
         'name' => 'is_pay_later',
         'propertyName' => 'isPayLater',
-        'type' => CRM_Utils_Type::T_BOOLEAN,
+        'type' => \CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('Is Pay Later'),
                                                      
                 'import' => true,
@@ -768,7 +770,7 @@ class Participant extends \Civi\Core\Entity {
       
         'name' => 'fee_amount',
         'propertyName' => 'feeAmount',
-        'type' => CRM_Utils_Type::T_MONEY,
+        'type' => \CRM_Utils_Type::T_MONEY,
                 'title' => ts('Fee Amount'),
                                                      
                 'import' => true,
@@ -783,7 +785,7 @@ class Participant extends \Civi\Core\Entity {
       
         'name' => 'registered_by_id',
         'propertyName' => 'registeredBy',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Registered By ID'),
                                                      
                 'import' => true,
@@ -793,29 +795,29 @@ class Participant extends \Civi\Core\Entity {
                          'export' => true,
                                           'default' => 'NULL',
          
-                'FKClassName' => 'CRM_Event_Participant',
+                'FKClassName' => 'Civi_Event_Participant',
                           ),
       
               'participant_discount_id' => array(
       
         'name' => 'discount_id',
         'propertyName' => 'discount',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Discount ID'),
                                                      
                                            'default' => 'NULL',
          
-                'FKClassName' => 'CRM_Core_Discount',
+                'FKClassName' => 'Civi_Core_Discount',
                           ),
       
               'participant_fee_currency' => array(
       
         'name' => 'fee_currency',
         'propertyName' => 'feeCurrency',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Fee Currency'),
                                  'maxlength' => 3,
-                         'size' => CRM_Utils_Type::FOUR,
+                         'size' => \CRM_Utils_Type::FOUR,
                            
                 'import' => true,
         'where' => 'civicrm_participant.fee_currency',
@@ -836,7 +838,7 @@ class Participant extends \Civi\Core\Entity {
       
         'name' => 'campaign_id',
         'propertyName' => 'campaign',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Campaign'),
                                                      
                 'import' => true,
@@ -845,7 +847,7 @@ class Participant extends \Civi\Core\Entity {
         'dataPattern' => '',
                          'export' => true,
                                    
-                'FKClassName' => 'CRM_Campaign_Campaign',
+                'FKClassName' => 'Civi_Campaign_Campaign',
                                      'pseudoconstant' => array(
                                 'table' => 'civicrm_campaign',
                       'keyColumn' => 'id',
@@ -857,7 +859,7 @@ class Participant extends \Civi\Core\Entity {
       
         'name' => 'discount_amount',
         'propertyName' => 'discountAmount',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Discount Amount'),
                                                      
                                     
@@ -867,18 +869,18 @@ class Participant extends \Civi\Core\Entity {
       
         'name' => 'cart_id',
         'propertyName' => 'cart',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Event Cart ID'),
                                                      
                                     
-                'FKClassName' => 'CRM_Event_Cart_Cart',
+                'FKClassName' => 'Civi_Event_Cart_Cart',
                           ),
       
               'must_wait' => array(
       
         'name' => 'must_wait',
         'propertyName' => 'mustWait',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Must Wait on List'),
                                                      
                                     

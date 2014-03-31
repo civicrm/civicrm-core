@@ -198,6 +198,8 @@ class Subscribe extends \Civi\Core\Entity {
    * @access public
    * @return array
    */
+  public static $_fields = NULL;
+
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
@@ -206,7 +208,7 @@ class Subscribe extends \Civi\Core\Entity {
       
         'name' => 'id',
         'propertyName' => 'id',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
                                     
@@ -216,11 +218,11 @@ class Subscribe extends \Civi\Core\Entity {
       
         'name' => 'group_id',
         'propertyName' => 'group',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
                                     
-                'FKClassName' => 'CRM_Contact_Group',
+                'FKClassName' => 'Civi_Contact_Group',
                                      'pseudoconstant' => array(
                                 'table' => 'civicrm_group',
                       'keyColumn' => 'id',
@@ -232,22 +234,22 @@ class Subscribe extends \Civi\Core\Entity {
       
         'name' => 'contact_id',
         'propertyName' => 'contact',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
                                     
-                'FKClassName' => 'CRM_Contact_Contact',
+                'FKClassName' => 'Civi_Contact_Contact',
                           ),
       
               'hash' => array(
       
         'name' => 'hash',
         'propertyName' => 'hash',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Hash'),
                         'required' => true,
                          'maxlength' => 255,
-                         'size' => CRM_Utils_Type::HUGE,
+                         'size' => \CRM_Utils_Type::HUGE,
                            
                                     
                           ),
@@ -256,7 +258,7 @@ class Subscribe extends \Civi\Core\Entity {
       
         'name' => 'time_stamp',
         'propertyName' => 'timeStamp',
-        'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
+        'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
                 'title' => ts('Time Stamp'),
                         'required' => true,
                                              

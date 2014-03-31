@@ -648,6 +648,8 @@ class PaymentProcessor extends \Civi\Core\Entity {
    * @access public
    * @return array
    */
+  public static $_fields = NULL;
+
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
@@ -656,7 +658,7 @@ class PaymentProcessor extends \Civi\Core\Entity {
       
         'name' => 'id',
         'propertyName' => 'id',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
                                     
@@ -666,21 +668,21 @@ class PaymentProcessor extends \Civi\Core\Entity {
       
         'name' => 'domain_id',
         'propertyName' => 'domain',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
                                     
-                'FKClassName' => 'CRM_Core_Domain',
+                'FKClassName' => 'Civi_Core_Domain',
                           ),
       
               'name' => array(
       
         'name' => 'name',
         'propertyName' => 'name',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Payment Processor'),
                                  'maxlength' => 64,
-                         'size' => CRM_Utils_Type::BIG,
+                         'size' => \CRM_Utils_Type::BIG,
                            
                                     
                           ),
@@ -689,10 +691,10 @@ class PaymentProcessor extends \Civi\Core\Entity {
       
         'name' => 'description',
         'propertyName' => 'description',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Description'),
                                  'maxlength' => 255,
-                         'size' => CRM_Utils_Type::HUGE,
+                         'size' => \CRM_Utils_Type::HUGE,
                            
                                     
                           ),
@@ -701,17 +703,17 @@ class PaymentProcessor extends \Civi\Core\Entity {
       
         'name' => 'payment_processor_type_id',
         'propertyName' => 'paymentProcessorType',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                                                      
                                     
-                'FKClassName' => 'CRM_Financial_PaymentProcessorType',
+                'FKClassName' => 'Civi_Financial_PaymentProcessorType',
                           ),
       
               'is_active' => array(
       
         'name' => 'is_active',
         'propertyName' => 'isActive',
-        'type' => CRM_Utils_Type::T_BOOLEAN,
+        'type' => \CRM_Utils_Type::T_BOOLEAN,
                                                      
                                     
                           ),
@@ -720,7 +722,7 @@ class PaymentProcessor extends \Civi\Core\Entity {
       
         'name' => 'is_default',
         'propertyName' => 'isDefault',
-        'type' => CRM_Utils_Type::T_BOOLEAN,
+        'type' => \CRM_Utils_Type::T_BOOLEAN,
                                                      
                                     
                           ),
@@ -729,7 +731,7 @@ class PaymentProcessor extends \Civi\Core\Entity {
       
         'name' => 'is_test',
         'propertyName' => 'isTest',
-        'type' => CRM_Utils_Type::T_BOOLEAN,
+        'type' => \CRM_Utils_Type::T_BOOLEAN,
                                                      
                                     
                           ),
@@ -738,10 +740,10 @@ class PaymentProcessor extends \Civi\Core\Entity {
       
         'name' => 'user_name',
         'propertyName' => 'userName',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('User Name'),
                                  'maxlength' => 255,
-                         'size' => CRM_Utils_Type::HUGE,
+                         'size' => \CRM_Utils_Type::HUGE,
                            
                                     
                           ),
@@ -750,10 +752,10 @@ class PaymentProcessor extends \Civi\Core\Entity {
       
         'name' => 'password',
         'propertyName' => 'password',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Password'),
                                  'maxlength' => 255,
-                         'size' => CRM_Utils_Type::HUGE,
+                         'size' => \CRM_Utils_Type::HUGE,
                            
                                     
                           ),
@@ -762,10 +764,10 @@ class PaymentProcessor extends \Civi\Core\Entity {
       
         'name' => 'signature',
         'propertyName' => 'signature',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Signature'),
                                  'maxlength' => 255,
-                         'size' => CRM_Utils_Type::HUGE,
+                         'size' => \CRM_Utils_Type::HUGE,
                            
                                     
                           ),
@@ -774,10 +776,10 @@ class PaymentProcessor extends \Civi\Core\Entity {
       
         'name' => 'url_site',
         'propertyName' => 'urlSite',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Site URL'),
                                  'maxlength' => 255,
-                         'size' => CRM_Utils_Type::HUGE,
+                         'size' => \CRM_Utils_Type::HUGE,
                            
                                     
                           ),
@@ -786,10 +788,10 @@ class PaymentProcessor extends \Civi\Core\Entity {
       
         'name' => 'url_api',
         'propertyName' => 'urlApi',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('API URL'),
                                  'maxlength' => 255,
-                         'size' => CRM_Utils_Type::HUGE,
+                         'size' => \CRM_Utils_Type::HUGE,
                            
                                     
                           ),
@@ -798,10 +800,10 @@ class PaymentProcessor extends \Civi\Core\Entity {
       
         'name' => 'url_recur',
         'propertyName' => 'urlRecur',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Recurring Payments URL'),
                                  'maxlength' => 255,
-                         'size' => CRM_Utils_Type::HUGE,
+                         'size' => \CRM_Utils_Type::HUGE,
                            
                                     
                           ),
@@ -810,10 +812,10 @@ class PaymentProcessor extends \Civi\Core\Entity {
       
         'name' => 'url_button',
         'propertyName' => 'urlButton',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Button URL'),
                                  'maxlength' => 255,
-                         'size' => CRM_Utils_Type::HUGE,
+                         'size' => \CRM_Utils_Type::HUGE,
                            
                                     
                           ),
@@ -822,10 +824,10 @@ class PaymentProcessor extends \Civi\Core\Entity {
       
         'name' => 'subject',
         'propertyName' => 'subject',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Subject'),
                                  'maxlength' => 255,
-                         'size' => CRM_Utils_Type::HUGE,
+                         'size' => \CRM_Utils_Type::HUGE,
                            
                                     
                           ),
@@ -834,10 +836,10 @@ class PaymentProcessor extends \Civi\Core\Entity {
       
         'name' => 'class_name',
         'propertyName' => 'className',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Suffix for PHP clas name implementation'),
                                  'maxlength' => 255,
-                         'size' => CRM_Utils_Type::HUGE,
+                         'size' => \CRM_Utils_Type::HUGE,
                            
                                     
                           ),
@@ -846,7 +848,7 @@ class PaymentProcessor extends \Civi\Core\Entity {
       
         'name' => 'billing_mode',
         'propertyName' => 'billingMode',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Billing Mode'),
                         'required' => true,
                                              
@@ -857,7 +859,7 @@ class PaymentProcessor extends \Civi\Core\Entity {
       
         'name' => 'is_recur',
         'propertyName' => 'isRecur',
-        'type' => CRM_Utils_Type::T_BOOLEAN,
+        'type' => \CRM_Utils_Type::T_BOOLEAN,
                                                      
                                     
                           ),
@@ -866,7 +868,7 @@ class PaymentProcessor extends \Civi\Core\Entity {
       
         'name' => 'payment_type',
         'propertyName' => 'paymentType',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Payment Type'),
                                                      
                                            'default' => '1',

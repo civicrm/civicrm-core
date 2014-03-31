@@ -558,6 +558,8 @@ class Batch extends \Civi\Core\Entity {
    * @access public
    * @return array
    */
+  public static $_fields = NULL;
+
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
@@ -566,7 +568,7 @@ class Batch extends \Civi\Core\Entity {
       
         'name' => 'id',
         'propertyName' => 'id',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
                                     
@@ -576,10 +578,10 @@ class Batch extends \Civi\Core\Entity {
       
         'name' => 'name',
         'propertyName' => 'name',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Name'),
                                  'maxlength' => 64,
-                         'size' => CRM_Utils_Type::BIG,
+                         'size' => \CRM_Utils_Type::BIG,
                            
                                     
                           ),
@@ -588,10 +590,10 @@ class Batch extends \Civi\Core\Entity {
       
         'name' => 'title',
         'propertyName' => 'title',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Title'),
                                  'maxlength' => 64,
-                         'size' => CRM_Utils_Type::BIG,
+                         'size' => \CRM_Utils_Type::BIG,
                            
                                     
                           ),
@@ -600,7 +602,7 @@ class Batch extends \Civi\Core\Entity {
       
         'name' => 'description',
         'propertyName' => 'description',
-        'type' => CRM_Utils_Type::T_TEXT,
+        'type' => \CRM_Utils_Type::T_TEXT,
                 'title' => ts('Description'),
                                  'maxlength' => 65535,
                                   'rows' => 4,
@@ -613,17 +615,17 @@ class Batch extends \Civi\Core\Entity {
       
         'name' => 'created_id',
         'propertyName' => 'created',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                                                      
                                     
-                'FKClassName' => 'CRM_Contact_Contact',
+                'FKClassName' => 'Civi_Contact_Contact',
                           ),
       
               'created_date' => array(
       
         'name' => 'created_date',
         'propertyName' => 'createdDate',
-        'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
+        'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
                 'title' => ts('Created Date'),
                                                      
                                     
@@ -633,17 +635,17 @@ class Batch extends \Civi\Core\Entity {
       
         'name' => 'modified_id',
         'propertyName' => 'modified',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                                                      
                                     
-                'FKClassName' => 'CRM_Contact_Contact',
+                'FKClassName' => 'Civi_Contact_Contact',
                           ),
       
               'modified_date' => array(
       
         'name' => 'modified_date',
         'propertyName' => 'modifiedDate',
-        'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
+        'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
                 'title' => ts('Modified Date'),
                                                      
                                     
@@ -653,17 +655,17 @@ class Batch extends \Civi\Core\Entity {
       
         'name' => 'saved_search_id',
         'propertyName' => 'savedSearch',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                                                      
                                     
-                'FKClassName' => 'CRM_Contact_SavedSearch',
+                'FKClassName' => 'Civi_Contact_SavedSearch',
                           ),
       
               'status_id' => array(
       
         'name' => 'status_id',
         'propertyName' => 'statusId',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
                                     
@@ -676,7 +678,7 @@ class Batch extends \Civi\Core\Entity {
       
         'name' => 'type_id',
         'propertyName' => 'typeId',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                                                      
                                     
                                      'pseudoconstant' => array(
@@ -688,7 +690,7 @@ class Batch extends \Civi\Core\Entity {
       
         'name' => 'mode_id',
         'propertyName' => 'modeId',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                                                      
                                     
                                      'pseudoconstant' => array(
@@ -700,7 +702,7 @@ class Batch extends \Civi\Core\Entity {
       
         'name' => 'total',
         'propertyName' => 'total',
-        'type' => CRM_Utils_Type::T_MONEY,
+        'type' => \CRM_Utils_Type::T_MONEY,
                 'title' => ts('Total'),
                                                      
                                     
@@ -710,7 +712,7 @@ class Batch extends \Civi\Core\Entity {
       
         'name' => 'item_count',
         'propertyName' => 'itemCount',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Item Count'),
                                                      
                                     
@@ -720,7 +722,7 @@ class Batch extends \Civi\Core\Entity {
       
         'name' => 'payment_instrument_id',
         'propertyName' => 'paymentInstrumentId',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                                                      
                                     
                                      'pseudoconstant' => array(
@@ -732,7 +734,7 @@ class Batch extends \Civi\Core\Entity {
       
         'name' => 'exported_date',
         'propertyName' => 'exportedDate',
-        'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
+        'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
                 'title' => ts('Exported Date'),
                                                      
                                     
@@ -742,7 +744,7 @@ class Batch extends \Civi\Core\Entity {
       
         'name' => 'data',
         'propertyName' => 'data',
-        'type' => CRM_Utils_Type::T_LONGTEXT,
+        'type' => \CRM_Utils_Type::T_LONGTEXT,
                 'title' => ts('Data'),
                                                      
                                     

@@ -648,6 +648,8 @@ class CustomGroup extends \Civi\Core\Entity {
    * @access public
    * @return array
    */
+  public static $_fields = NULL;
+
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
@@ -656,7 +658,7 @@ class CustomGroup extends \Civi\Core\Entity {
       
         'name' => 'id',
         'propertyName' => 'id',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
                                     
@@ -666,10 +668,10 @@ class CustomGroup extends \Civi\Core\Entity {
       
         'name' => 'name',
         'propertyName' => 'name',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Name'),
                                  'maxlength' => 64,
-                         'size' => CRM_Utils_Type::BIG,
+                         'size' => \CRM_Utils_Type::BIG,
                            
                                     
                           ),
@@ -678,11 +680,11 @@ class CustomGroup extends \Civi\Core\Entity {
       
         'name' => 'title',
         'propertyName' => 'title',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Title'),
                         'required' => true,
                          'maxlength' => 64,
-                         'size' => CRM_Utils_Type::BIG,
+                         'size' => \CRM_Utils_Type::BIG,
                            
                                     
                           ),
@@ -691,10 +693,10 @@ class CustomGroup extends \Civi\Core\Entity {
       
         'name' => 'extends',
         'propertyName' => 'extends',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Extends'),
                                  'maxlength' => 255,
-                         'size' => CRM_Utils_Type::HUGE,
+                         'size' => \CRM_Utils_Type::HUGE,
                            
                                            'default' => 'Contact',
          
@@ -704,7 +706,7 @@ class CustomGroup extends \Civi\Core\Entity {
       
         'name' => 'extends_entity_column_id',
         'propertyName' => 'extendsEntityColumnId',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                                                      
                                            'default' => 'NULL',
          
@@ -714,10 +716,10 @@ class CustomGroup extends \Civi\Core\Entity {
       
         'name' => 'extends_entity_column_value',
         'propertyName' => 'extendsEntityColumnValue',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Extends Entity Column Value'),
                                  'maxlength' => 255,
-                         'size' => CRM_Utils_Type::HUGE,
+                         'size' => \CRM_Utils_Type::HUGE,
                            
                                     
                           ),
@@ -726,10 +728,10 @@ class CustomGroup extends \Civi\Core\Entity {
       
         'name' => 'style',
         'propertyName' => 'style',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Style'),
                                  'maxlength' => 15,
-                         'size' => CRM_Utils_Type::TWELVE,
+                         'size' => \CRM_Utils_Type::TWELVE,
                            
                                     
                                      'pseudoconstant' => array(
@@ -741,7 +743,7 @@ class CustomGroup extends \Civi\Core\Entity {
       
         'name' => 'collapse_display',
         'propertyName' => 'collapseDisplay',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Collapse Display'),
                                                      
                                     
@@ -751,7 +753,7 @@ class CustomGroup extends \Civi\Core\Entity {
       
         'name' => 'help_pre',
         'propertyName' => 'helpPre',
-        'type' => CRM_Utils_Type::T_TEXT,
+        'type' => \CRM_Utils_Type::T_TEXT,
                 'title' => ts('Help Pre'),
                                  'maxlength' => 65535,
                                   'rows' => 4,
@@ -764,7 +766,7 @@ class CustomGroup extends \Civi\Core\Entity {
       
         'name' => 'help_post',
         'propertyName' => 'helpPost',
-        'type' => CRM_Utils_Type::T_TEXT,
+        'type' => \CRM_Utils_Type::T_TEXT,
                 'title' => ts('Help Post'),
                                  'maxlength' => 65535,
                                   'rows' => 4,
@@ -777,7 +779,7 @@ class CustomGroup extends \Civi\Core\Entity {
       
         'name' => 'weight',
         'propertyName' => 'weight',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Weight'),
                         'required' => true,
                                              
@@ -789,7 +791,7 @@ class CustomGroup extends \Civi\Core\Entity {
       
         'name' => 'is_active',
         'propertyName' => 'isActive',
-        'type' => CRM_Utils_Type::T_BOOLEAN,
+        'type' => \CRM_Utils_Type::T_BOOLEAN,
                                                      
                                     
                           ),
@@ -798,10 +800,10 @@ class CustomGroup extends \Civi\Core\Entity {
       
         'name' => 'table_name',
         'propertyName' => 'tableName',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Table Name'),
                                  'maxlength' => 255,
-                         'size' => CRM_Utils_Type::HUGE,
+                         'size' => \CRM_Utils_Type::HUGE,
                            
                                     
                           ),
@@ -810,7 +812,7 @@ class CustomGroup extends \Civi\Core\Entity {
       
         'name' => 'is_multiple',
         'propertyName' => 'isMultiple',
-        'type' => CRM_Utils_Type::T_BOOLEAN,
+        'type' => \CRM_Utils_Type::T_BOOLEAN,
                                                      
                                     
                           ),
@@ -819,7 +821,7 @@ class CustomGroup extends \Civi\Core\Entity {
       
         'name' => 'min_multiple',
         'propertyName' => 'minMultiple',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Min Multiple'),
                                                      
                                     
@@ -829,7 +831,7 @@ class CustomGroup extends \Civi\Core\Entity {
       
         'name' => 'max_multiple',
         'propertyName' => 'maxMultiple',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Max Multiple'),
                                                      
                                     
@@ -839,7 +841,7 @@ class CustomGroup extends \Civi\Core\Entity {
       
         'name' => 'collapse_adv_display',
         'propertyName' => 'collapseAdvDisplay',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Collapse Adv Display'),
                                                      
                                     
@@ -849,17 +851,17 @@ class CustomGroup extends \Civi\Core\Entity {
       
         'name' => 'created_id',
         'propertyName' => 'created',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                                                      
                                     
-                'FKClassName' => 'CRM_Contact_Contact',
+                'FKClassName' => 'Civi_Contact_Contact',
                           ),
       
               'created_date' => array(
       
         'name' => 'created_date',
         'propertyName' => 'createdDate',
-        'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
+        'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
                 'title' => ts('Custom Group Created Date'),
                                                      
                                     
@@ -869,7 +871,7 @@ class CustomGroup extends \Civi\Core\Entity {
       
         'name' => 'is_reserved',
         'propertyName' => 'isReserved',
-        'type' => CRM_Utils_Type::T_BOOLEAN,
+        'type' => \CRM_Utils_Type::T_BOOLEAN,
                                                      
                                     
                           ),

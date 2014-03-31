@@ -498,6 +498,8 @@ class PriceFieldValue extends \Civi\Core\Entity {
    * @access public
    * @return array
    */
+  public static $_fields = NULL;
+
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
@@ -506,7 +508,7 @@ class PriceFieldValue extends \Civi\Core\Entity {
       
         'name' => 'id',
         'propertyName' => 'id',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
                                     
@@ -516,21 +518,21 @@ class PriceFieldValue extends \Civi\Core\Entity {
       
         'name' => 'price_field_id',
         'propertyName' => 'priceField',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
                                     
-                'FKClassName' => 'CRM_Price_PriceField',
+                'FKClassName' => 'Civi_Price_PriceField',
                           ),
       
               'name' => array(
       
         'name' => 'name',
         'propertyName' => 'name',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Name'),
                                  'maxlength' => 255,
-                         'size' => CRM_Utils_Type::HUGE,
+                         'size' => \CRM_Utils_Type::HUGE,
                            
                                     
                           ),
@@ -539,10 +541,10 @@ class PriceFieldValue extends \Civi\Core\Entity {
       
         'name' => 'label',
         'propertyName' => 'label',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Label'),
                                  'maxlength' => 255,
-                         'size' => CRM_Utils_Type::HUGE,
+                         'size' => \CRM_Utils_Type::HUGE,
                            
                                     
                           ),
@@ -551,7 +553,7 @@ class PriceFieldValue extends \Civi\Core\Entity {
       
         'name' => 'description',
         'propertyName' => 'description',
-        'type' => CRM_Utils_Type::T_TEXT,
+        'type' => \CRM_Utils_Type::T_TEXT,
                 'title' => ts('Description'),
                                  'maxlength' => 65535,
                                   'rows' => 2,
@@ -565,11 +567,11 @@ class PriceFieldValue extends \Civi\Core\Entity {
       
         'name' => 'amount',
         'propertyName' => 'amount',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Amount'),
                         'required' => true,
                          'maxlength' => 512,
-                         'size' => CRM_Utils_Type::EIGHT,
+                         'size' => \CRM_Utils_Type::EIGHT,
                            
                                     
                           ),
@@ -578,7 +580,7 @@ class PriceFieldValue extends \Civi\Core\Entity {
       
         'name' => 'count',
         'propertyName' => 'count',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Count'),
                                                      
                                            'default' => 'NULL',
@@ -589,7 +591,7 @@ class PriceFieldValue extends \Civi\Core\Entity {
       
         'name' => 'max_value',
         'propertyName' => 'maxValue',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Max Value'),
                                                      
                                            'default' => 'NULL',
@@ -600,7 +602,7 @@ class PriceFieldValue extends \Civi\Core\Entity {
       
         'name' => 'weight',
         'propertyName' => 'weight',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Weight'),
                                                      
                                            'default' => '1',
@@ -611,18 +613,18 @@ class PriceFieldValue extends \Civi\Core\Entity {
       
         'name' => 'membership_type_id',
         'propertyName' => 'membershipType',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                                                      
                                            'default' => 'NULL',
          
-                'FKClassName' => 'CRM_Member_MembershipType',
+                'FKClassName' => 'Civi_Member_MembershipType',
                           ),
       
               'membership_num_terms' => array(
       
         'name' => 'membership_num_terms',
         'propertyName' => 'membershipNumTerms',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Membership Num Terms'),
                                                      
                                            'default' => 'NULL',
@@ -633,7 +635,7 @@ class PriceFieldValue extends \Civi\Core\Entity {
       
         'name' => 'is_default',
         'propertyName' => 'isDefault',
-        'type' => CRM_Utils_Type::T_BOOLEAN,
+        'type' => \CRM_Utils_Type::T_BOOLEAN,
                                                      
                                     
                           ),
@@ -642,7 +644,7 @@ class PriceFieldValue extends \Civi\Core\Entity {
       
         'name' => 'is_active',
         'propertyName' => 'isActive',
-        'type' => CRM_Utils_Type::T_BOOLEAN,
+        'type' => \CRM_Utils_Type::T_BOOLEAN,
                                                      
                                            'default' => '1',
          
@@ -652,19 +654,19 @@ class PriceFieldValue extends \Civi\Core\Entity {
       
         'name' => 'financial_type_id',
         'propertyName' => 'financialType',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Financial Type'),
                                                      
                                            'default' => 'NULL',
          
-                'FKClassName' => 'CRM_Financial_FinancialType',
+                'FKClassName' => 'Civi_Financial_FinancialType',
                           ),
       
               'deductible_amount' => array(
       
         'name' => 'deductible_amount',
         'propertyName' => 'deductibleAmount',
-        'type' => CRM_Utils_Type::T_MONEY,
+        'type' => \CRM_Utils_Type::T_MONEY,
                 'title' => ts('Deductible Amount'),
                         'required' => true,
                                              

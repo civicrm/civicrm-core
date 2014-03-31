@@ -138,6 +138,8 @@ class Reply extends \Civi\Core\Entity {
    * @access public
    * @return array
    */
+  public static $_fields = NULL;
+
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
@@ -146,7 +148,7 @@ class Reply extends \Civi\Core\Entity {
       
         'name' => 'id',
         'propertyName' => 'id',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
                                     
@@ -156,18 +158,18 @@ class Reply extends \Civi\Core\Entity {
       
         'name' => 'event_queue_id',
         'propertyName' => 'eventQueue',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
                                     
-                'FKClassName' => 'CRM_Mailing_Event_Queue',
+                'FKClassName' => 'Civi_Mailing_Event_Queue',
                           ),
       
               'time_stamp' => array(
       
         'name' => 'time_stamp',
         'propertyName' => 'timeStamp',
-        'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
+        'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
                 'title' => ts('Time Stamp'),
                         'required' => true,
                                              

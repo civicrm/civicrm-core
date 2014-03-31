@@ -198,6 +198,8 @@ class PremiumsProduct extends \Civi\Core\Entity {
    * @access public
    * @return array
    */
+  public static $_fields = NULL;
+
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
@@ -206,7 +208,7 @@ class PremiumsProduct extends \Civi\Core\Entity {
       
         'name' => 'id',
         'propertyName' => 'id',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
                                     
@@ -216,29 +218,29 @@ class PremiumsProduct extends \Civi\Core\Entity {
       
         'name' => 'premiums_id',
         'propertyName' => 'premiums',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
                                     
-                'FKClassName' => 'CRM_Contribute_Premium',
+                'FKClassName' => 'Civi_Contribute_Premium',
                           ),
       
               'product_id' => array(
       
         'name' => 'product_id',
         'propertyName' => 'product',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
                                     
-                'FKClassName' => 'CRM_Contribute_Product',
+                'FKClassName' => 'Civi_Contribute_Product',
                           ),
       
               'weight' => array(
       
         'name' => 'weight',
         'propertyName' => 'weight',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Weight'),
                         'required' => true,
                                              
@@ -249,12 +251,12 @@ class PremiumsProduct extends \Civi\Core\Entity {
       
         'name' => 'financial_type_id',
         'propertyName' => 'financialType',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Financial Type'),
                                                      
                                            'default' => 'NULL',
          
-                'FKClassName' => 'CRM_Financial_FinancialType',
+                'FKClassName' => 'Civi_Financial_FinancialType',
                           ),
              );
     }

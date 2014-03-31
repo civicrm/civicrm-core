@@ -168,6 +168,8 @@ class ActivityContact extends \Civi\Core\Entity {
    * @access public
    * @return array
    */
+  public static $_fields = NULL;
+
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
@@ -176,7 +178,7 @@ class ActivityContact extends \Civi\Core\Entity {
       
         'name' => 'id',
         'propertyName' => 'id',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Activity Contact ID'),
                         'required' => true,
                                              
@@ -187,19 +189,19 @@ class ActivityContact extends \Civi\Core\Entity {
       
         'name' => 'activity_id',
         'propertyName' => 'activity',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Activity ID'),
                         'required' => true,
                                              
                                     
-                'FKClassName' => 'CRM_Activity_Activity',
+                'FKClassName' => 'Civi_Activity_Activity',
                           ),
       
               'contact_id' => array(
       
         'name' => 'contact_id',
         'propertyName' => 'contact',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Contact ID (match to contact)'),
                         'required' => true,
                                              
@@ -209,14 +211,14 @@ class ActivityContact extends \Civi\Core\Entity {
         'dataPattern' => '',
                          'export' => true,
                                    
-                'FKClassName' => 'CRM_Contact_Contact',
+                'FKClassName' => 'Civi_Contact_Contact',
                           ),
       
               'record_type_id' => array(
       
         'name' => 'record_type_id',
         'propertyName' => 'recordTypeId',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Record Type ID'),
                                                      
                                     

@@ -198,6 +198,8 @@ class EntityFinancialTrxn extends \Civi\Core\Entity {
    * @access public
    * @return array
    */
+  public static $_fields = NULL;
+
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
@@ -206,7 +208,7 @@ class EntityFinancialTrxn extends \Civi\Core\Entity {
       
         'name' => 'id',
         'propertyName' => 'id',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
                                     
@@ -216,11 +218,11 @@ class EntityFinancialTrxn extends \Civi\Core\Entity {
       
         'name' => 'entity_table',
         'propertyName' => 'entityTable',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Entity Table'),
                         'required' => true,
                          'maxlength' => 64,
-                         'size' => CRM_Utils_Type::BIG,
+                         'size' => \CRM_Utils_Type::BIG,
                            
                 'import' => true,
         'where' => 'civicrm_entity_financial_trxn.entity_table',
@@ -234,7 +236,7 @@ class EntityFinancialTrxn extends \Civi\Core\Entity {
       
         'name' => 'entity_id',
         'propertyName' => 'entityId',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
                                     
@@ -244,17 +246,17 @@ class EntityFinancialTrxn extends \Civi\Core\Entity {
       
         'name' => 'financial_trxn_id',
         'propertyName' => 'financialTrxn',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                                                      
                                     
-                'FKClassName' => 'CRM_Financial_FinancialTrxn',
+                'FKClassName' => 'Civi_Financial_FinancialTrxn',
                           ),
       
               'amount' => array(
       
         'name' => 'amount',
         'propertyName' => 'amount',
-        'type' => CRM_Utils_Type::T_MONEY,
+        'type' => \CRM_Utils_Type::T_MONEY,
                 'title' => ts('Amount'),
                         'required' => true,
                                              

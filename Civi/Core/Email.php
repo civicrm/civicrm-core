@@ -408,6 +408,8 @@ class Email extends \Civi\Core\Entity {
    * @access public
    * @return array
    */
+  public static $_fields = NULL;
+
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
@@ -416,7 +418,7 @@ class Email extends \Civi\Core\Entity {
       
         'name' => 'id',
         'propertyName' => 'id',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
                                     
@@ -426,17 +428,17 @@ class Email extends \Civi\Core\Entity {
       
         'name' => 'contact_id',
         'propertyName' => 'contact',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                                                      
                                     
-                'FKClassName' => 'CRM_Contact_Contact',
+                'FKClassName' => 'Civi_Contact_Contact',
                           ),
       
               'location_type_id' => array(
       
         'name' => 'location_type_id',
         'propertyName' => 'locationTypeId',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Email Location Type'),
                                                      
                                     
@@ -451,10 +453,10 @@ class Email extends \Civi\Core\Entity {
       
         'name' => 'email',
         'propertyName' => 'email',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Email'),
                                  'maxlength' => 254,
-                         'size' => CRM_Utils_Type::MEDIUM,
+                         'size' => \CRM_Utils_Type::MEDIUM,
                            
                 'import' => true,
         'where' => 'civicrm_email.email',
@@ -469,7 +471,7 @@ class Email extends \Civi\Core\Entity {
       
         'name' => 'is_primary',
         'propertyName' => 'isPrimary',
-        'type' => CRM_Utils_Type::T_BOOLEAN,
+        'type' => \CRM_Utils_Type::T_BOOLEAN,
                                                      
                                     
                           ),
@@ -478,7 +480,7 @@ class Email extends \Civi\Core\Entity {
       
         'name' => 'is_billing',
         'propertyName' => 'isBilling',
-        'type' => CRM_Utils_Type::T_BOOLEAN,
+        'type' => \CRM_Utils_Type::T_BOOLEAN,
                                                      
                                     
                           ),
@@ -487,7 +489,7 @@ class Email extends \Civi\Core\Entity {
       
         'name' => 'on_hold',
         'propertyName' => 'onHold',
-        'type' => CRM_Utils_Type::T_BOOLEAN,
+        'type' => \CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('On Hold'),
                         'required' => true,
                                              
@@ -502,7 +504,7 @@ class Email extends \Civi\Core\Entity {
       
         'name' => 'is_bulkmail',
         'propertyName' => 'isBulkmail',
-        'type' => CRM_Utils_Type::T_BOOLEAN,
+        'type' => \CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('Use for Bulk Mail'),
                         'required' => true,
                                              
@@ -517,7 +519,7 @@ class Email extends \Civi\Core\Entity {
       
         'name' => 'hold_date',
         'propertyName' => 'holdDate',
-        'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
+        'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
                 'title' => ts('Hold Date'),
                                                      
                                     
@@ -527,7 +529,7 @@ class Email extends \Civi\Core\Entity {
       
         'name' => 'reset_date',
         'propertyName' => 'resetDate',
-        'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
+        'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
                 'title' => ts('Reset Date'),
                                                      
                                     
@@ -537,7 +539,7 @@ class Email extends \Civi\Core\Entity {
       
         'name' => 'signature_text',
         'propertyName' => 'signatureText',
-        'type' => CRM_Utils_Type::T_TEXT,
+        'type' => \CRM_Utils_Type::T_TEXT,
                 'title' => ts('Signature Text'),
                                  'maxlength' => 65535,
                                     
@@ -554,7 +556,7 @@ class Email extends \Civi\Core\Entity {
       
         'name' => 'signature_html',
         'propertyName' => 'signatureHtml',
-        'type' => CRM_Utils_Type::T_TEXT,
+        'type' => \CRM_Utils_Type::T_TEXT,
                 'title' => ts('Signature Html'),
                                  'maxlength' => 65535,
                                     

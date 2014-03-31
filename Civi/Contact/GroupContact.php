@@ -228,6 +228,8 @@ class GroupContact extends \Civi\Core\Entity {
    * @access public
    * @return array
    */
+  public static $_fields = NULL;
+
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
@@ -236,7 +238,7 @@ class GroupContact extends \Civi\Core\Entity {
       
         'name' => 'id',
         'propertyName' => 'id',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Group Contact ID'),
                         'required' => true,
                                              
@@ -247,12 +249,12 @@ class GroupContact extends \Civi\Core\Entity {
       
         'name' => 'group_id',
         'propertyName' => 'group',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Group ID'),
                         'required' => true,
                                              
                                     
-                'FKClassName' => 'CRM_Contact_Group',
+                'FKClassName' => 'Civi_Contact_Group',
                                      'pseudoconstant' => array(
                                 'table' => 'civicrm_group',
                       'keyColumn' => 'id',
@@ -264,22 +266,22 @@ class GroupContact extends \Civi\Core\Entity {
       
         'name' => 'contact_id',
         'propertyName' => 'contact',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Contact ID'),
                         'required' => true,
                                              
                                     
-                'FKClassName' => 'CRM_Contact_Contact',
+                'FKClassName' => 'Civi_Contact_Contact',
                           ),
       
               'status' => array(
       
         'name' => 'status',
         'propertyName' => 'status',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Group Contact Status'),
                                  'maxlength' => 8,
-                         'size' => CRM_Utils_Type::EIGHT,
+                         'size' => \CRM_Utils_Type::EIGHT,
                            
                                     
                                      'pseudoconstant' => array(
@@ -291,22 +293,22 @@ class GroupContact extends \Civi\Core\Entity {
       
         'name' => 'location_id',
         'propertyName' => 'location',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Group Contact Location'),
                                                      
                                     
-                'FKClassName' => 'CRM_Core_LocBlock',
+                'FKClassName' => 'Civi_Core_LocBlock',
                           ),
       
               'email_id' => array(
       
         'name' => 'email_id',
         'propertyName' => 'email',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Group Contact Email'),
                                                      
                                     
-                'FKClassName' => 'CRM_Core_Email',
+                'FKClassName' => 'Civi_Core_Email',
                           ),
              );
     }

@@ -378,6 +378,8 @@ class MailingJob extends \Civi\Core\Entity {
    * @access public
    * @return array
    */
+  public static $_fields = NULL;
+
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
@@ -386,7 +388,7 @@ class MailingJob extends \Civi\Core\Entity {
       
         'name' => 'id',
         'propertyName' => 'id',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
                                     
@@ -396,18 +398,18 @@ class MailingJob extends \Civi\Core\Entity {
       
         'name' => 'mailing_id',
         'propertyName' => 'mailing',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
                                     
-                'FKClassName' => 'CRM_Mailing_Mailing',
+                'FKClassName' => 'Civi_Mailing_Mailing',
                           ),
       
               'scheduled_date' => array(
       
         'name' => 'scheduled_date',
         'propertyName' => 'scheduledDate',
-        'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
+        'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
                 'title' => ts('Scheduled Date'),
                                                      
                                     
@@ -417,7 +419,7 @@ class MailingJob extends \Civi\Core\Entity {
       
         'name' => 'start_date',
         'propertyName' => 'startDate',
-        'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
+        'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
                 'title' => ts('Start Date'),
                                                      
                                     
@@ -427,7 +429,7 @@ class MailingJob extends \Civi\Core\Entity {
       
         'name' => 'end_date',
         'propertyName' => 'endDate',
-        'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
+        'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
                 'title' => ts('End Date'),
                                                      
                                     
@@ -437,10 +439,10 @@ class MailingJob extends \Civi\Core\Entity {
       
         'name' => 'status',
         'propertyName' => 'status',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Status'),
                                  'maxlength' => 12,
-                         'size' => CRM_Utils_Type::TWELVE,
+                         'size' => \CRM_Utils_Type::TWELVE,
                            
                                     
                                      'pseudoconstant' => array(
@@ -452,7 +454,7 @@ class MailingJob extends \Civi\Core\Entity {
       
         'name' => 'is_test',
         'propertyName' => 'isTest',
-        'type' => CRM_Utils_Type::T_BOOLEAN,
+        'type' => \CRM_Utils_Type::T_BOOLEAN,
                                                      
                                     
                           ),
@@ -461,10 +463,10 @@ class MailingJob extends \Civi\Core\Entity {
       
         'name' => 'job_type',
         'propertyName' => 'jobType',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Job Type'),
                                  'maxlength' => 255,
-                         'size' => CRM_Utils_Type::HUGE,
+                         'size' => \CRM_Utils_Type::HUGE,
                            
                                     
                           ),
@@ -473,18 +475,18 @@ class MailingJob extends \Civi\Core\Entity {
       
         'name' => 'parent_id',
         'propertyName' => 'parent',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                                                      
                                            'default' => 'NULL',
          
-                'FKClassName' => 'CRM_Mailing_MailingJob',
+                'FKClassName' => 'Civi_Mailing_MailingJob',
                           ),
       
               'job_offset' => array(
       
         'name' => 'job_offset',
         'propertyName' => 'jobOffset',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Job Offset'),
                                                      
                                     
@@ -494,7 +496,7 @@ class MailingJob extends \Civi\Core\Entity {
       
         'name' => 'job_limit',
         'propertyName' => 'jobLimit',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Job Limit'),
                                                      
                                     

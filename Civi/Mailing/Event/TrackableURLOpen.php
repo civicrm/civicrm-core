@@ -168,6 +168,8 @@ class TrackableURLOpen extends \Civi\Core\Entity {
    * @access public
    * @return array
    */
+  public static $_fields = NULL;
+
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
@@ -176,7 +178,7 @@ class TrackableURLOpen extends \Civi\Core\Entity {
       
         'name' => 'id',
         'propertyName' => 'id',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
                                     
@@ -186,29 +188,29 @@ class TrackableURLOpen extends \Civi\Core\Entity {
       
         'name' => 'event_queue_id',
         'propertyName' => 'eventQueue',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
                                     
-                'FKClassName' => 'CRM_Mailing_Event_Queue',
+                'FKClassName' => 'Civi_Mailing_Event_Queue',
                           ),
       
               'trackable_url_id' => array(
       
         'name' => 'trackable_url_id',
         'propertyName' => 'trackableUrl',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
                                     
-                'FKClassName' => 'CRM_Mailing_TrackableURL',
+                'FKClassName' => 'Civi_Mailing_TrackableURL',
                           ),
       
               'time_stamp' => array(
       
         'name' => 'time_stamp',
         'propertyName' => 'timeStamp',
-        'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
+        'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
                 'title' => ts('Time Stamp'),
                         'required' => true,
                                              

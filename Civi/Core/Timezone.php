@@ -228,6 +228,8 @@ class Timezone extends \Civi\Core\Entity {
    * @access public
    * @return array
    */
+  public static $_fields = NULL;
+
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
@@ -236,7 +238,7 @@ class Timezone extends \Civi\Core\Entity {
       
         'name' => 'id',
         'propertyName' => 'id',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
                                     
@@ -246,10 +248,10 @@ class Timezone extends \Civi\Core\Entity {
       
         'name' => 'name',
         'propertyName' => 'name',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Name'),
                                  'maxlength' => 64,
-                         'size' => CRM_Utils_Type::BIG,
+                         'size' => \CRM_Utils_Type::BIG,
                            
                                     
                           ),
@@ -258,10 +260,10 @@ class Timezone extends \Civi\Core\Entity {
       
         'name' => 'abbreviation',
         'propertyName' => 'abbreviation',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Abbreviation'),
                                  'maxlength' => 3,
-                         'size' => CRM_Utils_Type::FOUR,
+                         'size' => \CRM_Utils_Type::FOUR,
                            
                                     
                           ),
@@ -270,10 +272,10 @@ class Timezone extends \Civi\Core\Entity {
       
         'name' => 'gmt',
         'propertyName' => 'gmt',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Gmt'),
                                  'maxlength' => 64,
-                         'size' => CRM_Utils_Type::BIG,
+                         'size' => \CRM_Utils_Type::BIG,
                            
                                     
                           ),
@@ -282,7 +284,7 @@ class Timezone extends \Civi\Core\Entity {
       
         'name' => 'offset',
         'propertyName' => 'offset',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Offset'),
                                                      
                                     
@@ -292,11 +294,11 @@ class Timezone extends \Civi\Core\Entity {
       
         'name' => 'country_id',
         'propertyName' => 'country',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
                                     
-                'FKClassName' => 'CRM_Core_Country',
+                'FKClassName' => 'Civi_Core_Country',
                           ),
              );
     }

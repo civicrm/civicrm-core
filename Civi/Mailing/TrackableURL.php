@@ -138,6 +138,8 @@ class TrackableURL extends \Civi\Core\Entity {
    * @access public
    * @return array
    */
+  public static $_fields = NULL;
+
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
@@ -146,7 +148,7 @@ class TrackableURL extends \Civi\Core\Entity {
       
         'name' => 'id',
         'propertyName' => 'id',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
                                     
@@ -156,11 +158,11 @@ class TrackableURL extends \Civi\Core\Entity {
       
         'name' => 'url',
         'propertyName' => 'url',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Url'),
                         'required' => true,
                          'maxlength' => 255,
-                         'size' => CRM_Utils_Type::HUGE,
+                         'size' => \CRM_Utils_Type::HUGE,
                            
                                     
                           ),
@@ -169,11 +171,11 @@ class TrackableURL extends \Civi\Core\Entity {
       
         'name' => 'mailing_id',
         'propertyName' => 'mailing',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
                                     
-                'FKClassName' => 'CRM_Mailing_Mailing',
+                'FKClassName' => 'Civi_Mailing_Mailing',
                           ),
              );
     }

@@ -438,6 +438,8 @@ class MembershipBlock extends \Civi\Core\Entity {
    * @access public
    * @return array
    */
+  public static $_fields = NULL;
+
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
@@ -446,7 +448,7 @@ class MembershipBlock extends \Civi\Core\Entity {
       
         'name' => 'id',
         'propertyName' => 'id',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
                                     
@@ -456,10 +458,10 @@ class MembershipBlock extends \Civi\Core\Entity {
       
         'name' => 'entity_table',
         'propertyName' => 'entityTable',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Entity Table'),
                                  'maxlength' => 64,
-                         'size' => CRM_Utils_Type::BIG,
+                         'size' => \CRM_Utils_Type::BIG,
                            
                                     
                           ),
@@ -468,21 +470,21 @@ class MembershipBlock extends \Civi\Core\Entity {
       
         'name' => 'entity_id',
         'propertyName' => 'entity',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
                                     
-                'FKClassName' => 'CRM_Contribute_ContributionPage',
+                'FKClassName' => 'Civi_Contribute_ContributionPage',
                           ),
       
               'membership_types' => array(
       
         'name' => 'membership_types',
         'propertyName' => 'membershipTypes',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Membership Types'),
                                  'maxlength' => 255,
-                         'size' => CRM_Utils_Type::HUGE,
+                         'size' => \CRM_Utils_Type::HUGE,
                            
                                     
                           ),
@@ -491,18 +493,18 @@ class MembershipBlock extends \Civi\Core\Entity {
       
         'name' => 'membership_type_default',
         'propertyName' => 'membershipTypeDefault',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Membership Type Default'),
                                                      
                                     
-                'FKClassName' => 'CRM_Member_MembershipType',
+                'FKClassName' => 'Civi_Member_MembershipType',
                           ),
       
               'display_min_fee' => array(
       
         'name' => 'display_min_fee',
         'propertyName' => 'displayMinFee',
-        'type' => CRM_Utils_Type::T_BOOLEAN,
+        'type' => \CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('Display Min Fee'),
                                                      
                                            'default' => '1',
@@ -513,7 +515,7 @@ class MembershipBlock extends \Civi\Core\Entity {
       
         'name' => 'is_separate_payment',
         'propertyName' => 'isSeparatePayment',
-        'type' => CRM_Utils_Type::T_BOOLEAN,
+        'type' => \CRM_Utils_Type::T_BOOLEAN,
                                                      
                                            'default' => '1',
          
@@ -523,10 +525,10 @@ class MembershipBlock extends \Civi\Core\Entity {
       
         'name' => 'new_title',
         'propertyName' => 'newTitle',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('New Title'),
                                  'maxlength' => 255,
-                         'size' => CRM_Utils_Type::HUGE,
+                         'size' => \CRM_Utils_Type::HUGE,
                            
                                     
                           ),
@@ -535,7 +537,7 @@ class MembershipBlock extends \Civi\Core\Entity {
       
         'name' => 'new_text',
         'propertyName' => 'newText',
-        'type' => CRM_Utils_Type::T_TEXT,
+        'type' => \CRM_Utils_Type::T_TEXT,
                 'title' => ts('New Text'),
                                  'maxlength' => 65535,
                                     
@@ -546,10 +548,10 @@ class MembershipBlock extends \Civi\Core\Entity {
       
         'name' => 'renewal_title',
         'propertyName' => 'renewalTitle',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Renewal Title'),
                                  'maxlength' => 255,
-                         'size' => CRM_Utils_Type::HUGE,
+                         'size' => \CRM_Utils_Type::HUGE,
                            
                                     
                           ),
@@ -558,7 +560,7 @@ class MembershipBlock extends \Civi\Core\Entity {
       
         'name' => 'renewal_text',
         'propertyName' => 'renewalText',
-        'type' => CRM_Utils_Type::T_TEXT,
+        'type' => \CRM_Utils_Type::T_TEXT,
                 'title' => ts('Renewal Text'),
                                  'maxlength' => 65535,
                                     
@@ -569,7 +571,7 @@ class MembershipBlock extends \Civi\Core\Entity {
       
         'name' => 'is_required',
         'propertyName' => 'isRequired',
-        'type' => CRM_Utils_Type::T_BOOLEAN,
+        'type' => \CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('Is Required'),
                                                      
                                     
@@ -579,7 +581,7 @@ class MembershipBlock extends \Civi\Core\Entity {
       
         'name' => 'is_active',
         'propertyName' => 'isActive',
-        'type' => CRM_Utils_Type::T_BOOLEAN,
+        'type' => \CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('Is Active'),
                                                      
                                            'default' => '1',

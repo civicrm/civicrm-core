@@ -138,6 +138,8 @@ class CaseActivity extends \Civi\Core\Entity {
    * @access public
    * @return array
    */
+  public static $_fields = NULL;
+
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
@@ -146,7 +148,7 @@ class CaseActivity extends \Civi\Core\Entity {
       
         'name' => 'id',
         'propertyName' => 'id',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
                                     
@@ -156,22 +158,22 @@ class CaseActivity extends \Civi\Core\Entity {
       
         'name' => 'case_id',
         'propertyName' => 'case',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
                                     
-                'FKClassName' => 'CRM_Case_Case',
+                'FKClassName' => 'Civi_CCase_CCase',
                           ),
       
               'activity_id' => array(
       
         'name' => 'activity_id',
         'propertyName' => 'activity',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
                                     
-                'FKClassName' => 'CRM_Activity_Activity',
+                'FKClassName' => 'Civi_Activity_Activity',
                           ),
              );
     }

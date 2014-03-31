@@ -828,6 +828,8 @@ class Contribution extends \Civi\Core\Entity {
    * @access public
    * @return array
    */
+  public static $_fields = NULL;
+
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
@@ -836,7 +838,7 @@ class Contribution extends \Civi\Core\Entity {
       
         'name' => 'id',
         'propertyName' => 'id',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Contribution ID'),
                         'required' => true,
                                              
@@ -852,7 +854,7 @@ class Contribution extends \Civi\Core\Entity {
       
         'name' => 'contact_id',
         'propertyName' => 'contact',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Contact ID'),
                         'required' => true,
                                              
@@ -862,14 +864,14 @@ class Contribution extends \Civi\Core\Entity {
         'dataPattern' => '/^\d+$/',
                          'export' => true,
                                    
-                'FKClassName' => 'CRM_Contact_Contact',
+                'FKClassName' => 'Civi_Contact_Contact',
                           ),
       
               'financial_type_id' => array(
       
         'name' => 'financial_type_id',
         'propertyName' => 'financialType',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Financial Type'),
                                                      
                          'export' => false,
@@ -877,7 +879,7 @@ class Contribution extends \Civi\Core\Entity {
         'headerPattern' => '',
         'dataPattern' => '',
                                    
-                'FKClassName' => 'CRM_Financial_FinancialType',
+                'FKClassName' => 'Civi_Financial_FinancialType',
                                      'pseudoconstant' => array(
                                 'table' => 'civicrm_financial_type',
                       'keyColumn' => 'id',
@@ -889,7 +891,7 @@ class Contribution extends \Civi\Core\Entity {
       
         'name' => 'contribution_page_id',
         'propertyName' => 'contributionPage',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Contribution Page'),
                                                      
                 'import' => true,
@@ -898,7 +900,7 @@ class Contribution extends \Civi\Core\Entity {
         'dataPattern' => '',
                          'export' => true,
                                    
-                'FKClassName' => 'CRM_Contribute_ContributionPage',
+                'FKClassName' => 'Civi_Contribute_ContributionPage',
                                      'pseudoconstant' => array(
                                 'table' => 'civicrm_contribution_page',
                       'keyColumn' => 'id',
@@ -910,7 +912,7 @@ class Contribution extends \Civi\Core\Entity {
       
         'name' => 'payment_instrument_id',
         'propertyName' => 'paymentInstrumentId',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Payment Instrument'),
                                                      
                                     
@@ -923,7 +925,7 @@ class Contribution extends \Civi\Core\Entity {
       
         'name' => 'receive_date',
         'propertyName' => 'receiveDate',
-        'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
+        'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
                 'title' => ts('Receive Date'),
                                                      
                 'import' => true,
@@ -938,7 +940,7 @@ class Contribution extends \Civi\Core\Entity {
       
         'name' => 'non_deductible_amount',
         'propertyName' => 'nonDeductibleAmount',
-        'type' => CRM_Utils_Type::T_MONEY,
+        'type' => \CRM_Utils_Type::T_MONEY,
                 'title' => ts('Non-deductible Amount'),
                                                      
                 'import' => true,
@@ -953,7 +955,7 @@ class Contribution extends \Civi\Core\Entity {
       
         'name' => 'total_amount',
         'propertyName' => 'totalAmount',
-        'type' => CRM_Utils_Type::T_MONEY,
+        'type' => \CRM_Utils_Type::T_MONEY,
                 'title' => ts('Total Amount'),
                         'required' => true,
                                              
@@ -969,7 +971,7 @@ class Contribution extends \Civi\Core\Entity {
       
         'name' => 'fee_amount',
         'propertyName' => 'feeAmount',
-        'type' => CRM_Utils_Type::T_MONEY,
+        'type' => \CRM_Utils_Type::T_MONEY,
                 'title' => ts('Fee Amount'),
                                                      
                 'import' => true,
@@ -984,7 +986,7 @@ class Contribution extends \Civi\Core\Entity {
       
         'name' => 'net_amount',
         'propertyName' => 'netAmount',
-        'type' => CRM_Utils_Type::T_MONEY,
+        'type' => \CRM_Utils_Type::T_MONEY,
                 'title' => ts('Net Amount'),
                                                      
                 'import' => true,
@@ -999,10 +1001,10 @@ class Contribution extends \Civi\Core\Entity {
       
         'name' => 'trxn_id',
         'propertyName' => 'trxnId',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Transaction ID'),
                                  'maxlength' => 255,
-                         'size' => CRM_Utils_Type::HUGE,
+                         'size' => \CRM_Utils_Type::HUGE,
                            
                 'import' => true,
         'where' => 'civicrm_contribution.trxn_id',
@@ -1016,10 +1018,10 @@ class Contribution extends \Civi\Core\Entity {
       
         'name' => 'invoice_id',
         'propertyName' => 'invoiceId',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Invoice ID'),
                                  'maxlength' => 255,
-                         'size' => CRM_Utils_Type::HUGE,
+                         'size' => \CRM_Utils_Type::HUGE,
                            
                 'import' => true,
         'where' => 'civicrm_contribution.invoice_id',
@@ -1033,10 +1035,10 @@ class Contribution extends \Civi\Core\Entity {
       
         'name' => 'currency',
         'propertyName' => 'currency',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Currency'),
                                  'maxlength' => 3,
-                         'size' => CRM_Utils_Type::FOUR,
+                         'size' => \CRM_Utils_Type::FOUR,
                            
                 'import' => true,
         'where' => 'civicrm_contribution.currency',
@@ -1057,7 +1059,7 @@ class Contribution extends \Civi\Core\Entity {
       
         'name' => 'cancel_date',
         'propertyName' => 'cancelDate',
-        'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
+        'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
                 'title' => ts('Cancel Date'),
                                                      
                 'import' => true,
@@ -1072,7 +1074,7 @@ class Contribution extends \Civi\Core\Entity {
       
         'name' => 'cancel_reason',
         'propertyName' => 'cancelReason',
-        'type' => CRM_Utils_Type::T_TEXT,
+        'type' => \CRM_Utils_Type::T_TEXT,
                 'title' => ts('Cancel Reason'),
                                  'maxlength' => 65535,
                                     
@@ -1088,7 +1090,7 @@ class Contribution extends \Civi\Core\Entity {
       
         'name' => 'receipt_date',
         'propertyName' => 'receiptDate',
-        'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
+        'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
                 'title' => ts('Receipt Date'),
                                                      
                 'import' => true,
@@ -1103,7 +1105,7 @@ class Contribution extends \Civi\Core\Entity {
       
         'name' => 'thankyou_date',
         'propertyName' => 'thankyouDate',
-        'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
+        'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
                 'title' => ts('Thank-you Date'),
                                                      
                 'import' => true,
@@ -1118,10 +1120,10 @@ class Contribution extends \Civi\Core\Entity {
       
         'name' => 'source',
         'propertyName' => 'source',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Contribution Source'),
                                  'maxlength' => 255,
-                         'size' => CRM_Utils_Type::HUGE,
+                         'size' => \CRM_Utils_Type::HUGE,
                            
                 'import' => true,
         'where' => 'civicrm_contribution.source',
@@ -1135,7 +1137,7 @@ class Contribution extends \Civi\Core\Entity {
       
         'name' => 'amount_level',
         'propertyName' => 'amountLevel',
-        'type' => CRM_Utils_Type::T_TEXT,
+        'type' => \CRM_Utils_Type::T_TEXT,
                 'title' => ts('Amount Label'),
                                  'maxlength' => 65535,
                                     
@@ -1151,17 +1153,17 @@ class Contribution extends \Civi\Core\Entity {
       
         'name' => 'contribution_recur_id',
         'propertyName' => 'contributionRecur',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                                                      
                                     
-                'FKClassName' => 'CRM_Contribute_ContributionRecur',
+                'FKClassName' => 'Civi_Contribute_ContributionRecur',
                           ),
       
               'is_test' => array(
       
         'name' => 'is_test',
         'propertyName' => 'isTest',
-        'type' => CRM_Utils_Type::T_BOOLEAN,
+        'type' => \CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('Test'),
                                                      
                 'import' => true,
@@ -1176,7 +1178,7 @@ class Contribution extends \Civi\Core\Entity {
       
         'name' => 'is_pay_later',
         'propertyName' => 'isPayLater',
-        'type' => CRM_Utils_Type::T_BOOLEAN,
+        'type' => \CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('Is Pay Later'),
                                                      
                 'import' => true,
@@ -1191,7 +1193,7 @@ class Contribution extends \Civi\Core\Entity {
       
         'name' => 'contribution_status_id',
         'propertyName' => 'contributionStatusId',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Contribution Status'),
                                                      
                 'import' => true,
@@ -1210,20 +1212,20 @@ class Contribution extends \Civi\Core\Entity {
       
         'name' => 'address_id',
         'propertyName' => 'address',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                                                      
                                     
-                'FKClassName' => 'CRM_Core_Address',
+                'FKClassName' => 'Civi_Core_Address',
                           ),
       
               'check_number' => array(
       
         'name' => 'check_number',
         'propertyName' => 'checkNumber',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Check Number'),
                                  'maxlength' => 255,
-                         'size' => CRM_Utils_Type::SIX,
+                         'size' => \CRM_Utils_Type::SIX,
                            
                 'import' => true,
         'where' => 'civicrm_contribution.check_number',
@@ -1237,7 +1239,7 @@ class Contribution extends \Civi\Core\Entity {
       
         'name' => 'campaign_id',
         'propertyName' => 'campaign',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Campaign'),
                                                      
                 'import' => true,
@@ -1246,7 +1248,7 @@ class Contribution extends \Civi\Core\Entity {
         'dataPattern' => '',
                          'export' => true,
                                    
-                'FKClassName' => 'CRM_Campaign_Campaign',
+                'FKClassName' => 'Civi_Campaign_Campaign',
                                      'pseudoconstant' => array(
                                 'table' => 'civicrm_campaign',
                       'keyColumn' => 'id',

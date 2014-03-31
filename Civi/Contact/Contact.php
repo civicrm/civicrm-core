@@ -1608,6 +1608,8 @@ class Contact extends \Civi\Core\Entity {
    * @access public
    * @return array
    */
+  public static $_fields = NULL;
+
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
@@ -1616,7 +1618,7 @@ class Contact extends \Civi\Core\Entity {
       
         'name' => 'id',
         'propertyName' => 'id',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Internal Contact ID'),
                         'required' => true,
                                              
@@ -1632,10 +1634,10 @@ class Contact extends \Civi\Core\Entity {
       
         'name' => 'contact_type',
         'propertyName' => 'contactType',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Contact Type'),
                                  'maxlength' => 64,
-                         'size' => CRM_Utils_Type::BIG,
+                         'size' => \CRM_Utils_Type::BIG,
                            
                          'export' => true,
                 'where' => 'civicrm_contact.contact_type',
@@ -1654,10 +1656,10 @@ class Contact extends \Civi\Core\Entity {
       
         'name' => 'contact_sub_type',
         'propertyName' => 'contactSubType',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Contact Subtype'),
                                  'maxlength' => 255,
-                         'size' => CRM_Utils_Type::HUGE,
+                         'size' => \CRM_Utils_Type::HUGE,
                            
                 'import' => true,
         'where' => 'civicrm_contact.contact_sub_type',
@@ -1677,7 +1679,7 @@ class Contact extends \Civi\Core\Entity {
       
         'name' => 'do_not_email',
         'propertyName' => 'doNotEmail',
-        'type' => CRM_Utils_Type::T_BOOLEAN,
+        'type' => \CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('Do Not Email'),
                                                      
                 'import' => true,
@@ -1692,7 +1694,7 @@ class Contact extends \Civi\Core\Entity {
       
         'name' => 'do_not_phone',
         'propertyName' => 'doNotPhone',
-        'type' => CRM_Utils_Type::T_BOOLEAN,
+        'type' => \CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('Do Not Phone'),
                                                      
                 'import' => true,
@@ -1707,7 +1709,7 @@ class Contact extends \Civi\Core\Entity {
       
         'name' => 'do_not_mail',
         'propertyName' => 'doNotMail',
-        'type' => CRM_Utils_Type::T_BOOLEAN,
+        'type' => \CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('Do Not Mail'),
                                                      
                 'import' => true,
@@ -1722,7 +1724,7 @@ class Contact extends \Civi\Core\Entity {
       
         'name' => 'do_not_sms',
         'propertyName' => 'doNotSms',
-        'type' => CRM_Utils_Type::T_BOOLEAN,
+        'type' => \CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('Do Not Sms'),
                                                      
                 'import' => true,
@@ -1737,7 +1739,7 @@ class Contact extends \Civi\Core\Entity {
       
         'name' => 'do_not_trade',
         'propertyName' => 'doNotTrade',
-        'type' => CRM_Utils_Type::T_BOOLEAN,
+        'type' => \CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('Do Not Trade'),
                                                      
                 'import' => true,
@@ -1752,7 +1754,7 @@ class Contact extends \Civi\Core\Entity {
       
         'name' => 'is_opt_out',
         'propertyName' => 'isOptOut',
-        'type' => CRM_Utils_Type::T_BOOLEAN,
+        'type' => \CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('No Bulk Emails (User Opt Out)'),
                         'required' => true,
                                              
@@ -1768,10 +1770,10 @@ class Contact extends \Civi\Core\Entity {
       
         'name' => 'legal_identifier',
         'propertyName' => 'legalIdentifier',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Legal Identifier'),
                                  'maxlength' => 32,
-                         'size' => CRM_Utils_Type::MEDIUM,
+                         'size' => \CRM_Utils_Type::MEDIUM,
                            
                 'import' => true,
         'where' => 'civicrm_contact.legal_identifier',
@@ -1785,10 +1787,10 @@ class Contact extends \Civi\Core\Entity {
       
         'name' => 'external_identifier',
         'propertyName' => 'externalIdentifier',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('External Identifier'),
                                  'maxlength' => 32,
-                         'size' => CRM_Utils_Type::EIGHT,
+                         'size' => \CRM_Utils_Type::EIGHT,
                            
                 'import' => true,
         'where' => 'civicrm_contact.external_identifier',
@@ -1802,10 +1804,10 @@ class Contact extends \Civi\Core\Entity {
       
         'name' => 'sort_name',
         'propertyName' => 'sortName',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Sort Name'),
                                  'maxlength' => 128,
-                         'size' => CRM_Utils_Type::BIG,
+                         'size' => \CRM_Utils_Type::BIG,
                            
                          'export' => true,
                 'where' => 'civicrm_contact.sort_name',
@@ -1818,10 +1820,10 @@ class Contact extends \Civi\Core\Entity {
       
         'name' => 'display_name',
         'propertyName' => 'displayName',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Display Name'),
                                  'maxlength' => 128,
-                         'size' => CRM_Utils_Type::BIG,
+                         'size' => \CRM_Utils_Type::BIG,
                            
                          'export' => true,
                 'where' => 'civicrm_contact.display_name',
@@ -1834,10 +1836,10 @@ class Contact extends \Civi\Core\Entity {
       
         'name' => 'nick_name',
         'propertyName' => 'nickName',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Nickname'),
                                  'maxlength' => 128,
-                         'size' => CRM_Utils_Type::BIG,
+                         'size' => \CRM_Utils_Type::BIG,
                            
                 'import' => true,
         'where' => 'civicrm_contact.nick_name',
@@ -1851,10 +1853,10 @@ class Contact extends \Civi\Core\Entity {
       
         'name' => 'legal_name',
         'propertyName' => 'legalName',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Legal Name'),
                                  'maxlength' => 128,
-                         'size' => CRM_Utils_Type::BIG,
+                         'size' => \CRM_Utils_Type::BIG,
                            
                 'import' => true,
         'where' => 'civicrm_contact.legal_name',
@@ -1868,10 +1870,10 @@ class Contact extends \Civi\Core\Entity {
       
         'name' => 'image_URL',
         'propertyName' => 'imageURL',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Image Url'),
                                  'maxlength' => 255,
-                         'size' => CRM_Utils_Type::HUGE,
+                         'size' => \CRM_Utils_Type::HUGE,
                            
                 'import' => true,
         'where' => 'civicrm_contact.image_URL',
@@ -1885,10 +1887,10 @@ class Contact extends \Civi\Core\Entity {
       
         'name' => 'preferred_communication_method',
         'propertyName' => 'preferredCommunicationMethod',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Preferred Communication Method'),
                                  'maxlength' => 255,
-                         'size' => CRM_Utils_Type::HUGE,
+                         'size' => \CRM_Utils_Type::HUGE,
                            
                 'import' => true,
         'where' => 'civicrm_contact.preferred_communication_method',
@@ -1905,10 +1907,10 @@ class Contact extends \Civi\Core\Entity {
       
         'name' => 'preferred_language',
         'propertyName' => 'preferredLanguage',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Preferred Language'),
                                  'maxlength' => 5,
-                         'size' => CRM_Utils_Type::SIX,
+                         'size' => \CRM_Utils_Type::SIX,
                            
                 'import' => true,
         'where' => 'civicrm_contact.preferred_language',
@@ -1926,10 +1928,10 @@ class Contact extends \Civi\Core\Entity {
       
         'name' => 'preferred_mail_format',
         'propertyName' => 'preferredMailFormat',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Preferred Mail Format'),
                                  'maxlength' => 8,
-                         'size' => CRM_Utils_Type::EIGHT,
+                         'size' => \CRM_Utils_Type::EIGHT,
                            
                 'import' => true,
         'where' => 'civicrm_contact.preferred_mail_format',
@@ -1947,10 +1949,10 @@ class Contact extends \Civi\Core\Entity {
       
         'name' => 'hash',
         'propertyName' => 'hash',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Contact Hash'),
                                  'maxlength' => 32,
-                         'size' => CRM_Utils_Type::MEDIUM,
+                         'size' => \CRM_Utils_Type::MEDIUM,
                            
                          'export' => true,
                 'where' => 'civicrm_contact.hash',
@@ -1963,10 +1965,10 @@ class Contact extends \Civi\Core\Entity {
       
         'name' => 'api_key',
         'propertyName' => 'apiKey',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Api Key'),
                                  'maxlength' => 32,
-                         'size' => CRM_Utils_Type::MEDIUM,
+                         'size' => \CRM_Utils_Type::MEDIUM,
                            
                                     
                           ),
@@ -1975,10 +1977,10 @@ class Contact extends \Civi\Core\Entity {
       
         'name' => 'source',
         'propertyName' => 'source',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Source of Contact Data'),
                                  'maxlength' => 255,
-                         'size' => CRM_Utils_Type::BIG,
+                         'size' => \CRM_Utils_Type::BIG,
                            
                 'import' => true,
         'where' => 'civicrm_contact.source',
@@ -1992,10 +1994,10 @@ class Contact extends \Civi\Core\Entity {
       
         'name' => 'first_name',
         'propertyName' => 'firstName',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('First Name'),
                                  'maxlength' => 64,
-                         'size' => CRM_Utils_Type::BIG,
+                         'size' => \CRM_Utils_Type::BIG,
                            
                 'import' => true,
         'where' => 'civicrm_contact.first_name',
@@ -2009,10 +2011,10 @@ class Contact extends \Civi\Core\Entity {
       
         'name' => 'middle_name',
         'propertyName' => 'middleName',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Middle Name'),
                                  'maxlength' => 64,
-                         'size' => CRM_Utils_Type::MEDIUM,
+                         'size' => \CRM_Utils_Type::MEDIUM,
                            
                 'import' => true,
         'where' => 'civicrm_contact.middle_name',
@@ -2026,10 +2028,10 @@ class Contact extends \Civi\Core\Entity {
       
         'name' => 'last_name',
         'propertyName' => 'lastName',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Last Name'),
                                  'maxlength' => 64,
-                         'size' => CRM_Utils_Type::BIG,
+                         'size' => \CRM_Utils_Type::BIG,
                            
                 'import' => true,
         'where' => 'civicrm_contact.last_name',
@@ -2043,7 +2045,7 @@ class Contact extends \Civi\Core\Entity {
       
         'name' => 'prefix_id',
         'propertyName' => 'prefixId',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Individual Prefix'),
                                                      
                 'import' => true,
@@ -2061,7 +2063,7 @@ class Contact extends \Civi\Core\Entity {
       
         'name' => 'suffix_id',
         'propertyName' => 'suffixId',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Individual Suffix'),
                                                      
                 'import' => true,
@@ -2079,10 +2081,10 @@ class Contact extends \Civi\Core\Entity {
       
         'name' => 'formal_title',
         'propertyName' => 'formalTitle',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Formal Title'),
                                  'maxlength' => 64,
-                         'size' => CRM_Utils_Type::BIG,
+                         'size' => \CRM_Utils_Type::BIG,
                            
                 'import' => true,
         'where' => 'civicrm_contact.formal_title',
@@ -2096,7 +2098,7 @@ class Contact extends \Civi\Core\Entity {
       
         'name' => 'communication_style_id',
         'propertyName' => 'communicationStyleId',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Communication Style'),
                                                      
                          'export' => true,
@@ -2113,7 +2115,7 @@ class Contact extends \Civi\Core\Entity {
       
         'name' => 'email_greeting_id',
         'propertyName' => 'emailGreetingId',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Email Greeting ID'),
                                                      
                                     
@@ -2123,10 +2125,10 @@ class Contact extends \Civi\Core\Entity {
       
         'name' => 'email_greeting_custom',
         'propertyName' => 'emailGreetingCustom',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Email Greeting Custom'),
                                  'maxlength' => 128,
-                         'size' => CRM_Utils_Type::HUGE,
+                         'size' => \CRM_Utils_Type::HUGE,
                            
                 'import' => true,
         'where' => 'civicrm_contact.email_greeting_custom',
@@ -2140,10 +2142,10 @@ class Contact extends \Civi\Core\Entity {
       
         'name' => 'email_greeting_display',
         'propertyName' => 'emailGreetingDisplay',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Email Greeting'),
                                  'maxlength' => 255,
-                         'size' => CRM_Utils_Type::HUGE,
+                         'size' => \CRM_Utils_Type::HUGE,
                            
                                     
                           ),
@@ -2152,7 +2154,7 @@ class Contact extends \Civi\Core\Entity {
       
         'name' => 'postal_greeting_id',
         'propertyName' => 'postalGreetingId',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Postal Greeting ID'),
                                                      
                                     
@@ -2162,10 +2164,10 @@ class Contact extends \Civi\Core\Entity {
       
         'name' => 'postal_greeting_custom',
         'propertyName' => 'postalGreetingCustom',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Postal Greeting Custom'),
                                  'maxlength' => 128,
-                         'size' => CRM_Utils_Type::HUGE,
+                         'size' => \CRM_Utils_Type::HUGE,
                            
                 'import' => true,
         'where' => 'civicrm_contact.postal_greeting_custom',
@@ -2179,10 +2181,10 @@ class Contact extends \Civi\Core\Entity {
       
         'name' => 'postal_greeting_display',
         'propertyName' => 'postalGreetingDisplay',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Postal Greeting'),
                                  'maxlength' => 255,
-                         'size' => CRM_Utils_Type::HUGE,
+                         'size' => \CRM_Utils_Type::HUGE,
                            
                                     
                           ),
@@ -2191,7 +2193,7 @@ class Contact extends \Civi\Core\Entity {
       
         'name' => 'addressee_id',
         'propertyName' => 'addresseeId',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Addressee ID'),
                                                      
                                     
@@ -2201,10 +2203,10 @@ class Contact extends \Civi\Core\Entity {
       
         'name' => 'addressee_custom',
         'propertyName' => 'addresseeCustom',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Addressee Custom'),
                                  'maxlength' => 128,
-                         'size' => CRM_Utils_Type::HUGE,
+                         'size' => \CRM_Utils_Type::HUGE,
                            
                 'import' => true,
         'where' => 'civicrm_contact.addressee_custom',
@@ -2218,10 +2220,10 @@ class Contact extends \Civi\Core\Entity {
       
         'name' => 'addressee_display',
         'propertyName' => 'addresseeDisplay',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Addressee'),
                                  'maxlength' => 255,
-                         'size' => CRM_Utils_Type::HUGE,
+                         'size' => \CRM_Utils_Type::HUGE,
                            
                                     
                           ),
@@ -2230,10 +2232,10 @@ class Contact extends \Civi\Core\Entity {
       
         'name' => 'job_title',
         'propertyName' => 'jobTitle',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Job Title'),
                                  'maxlength' => 255,
-                         'size' => CRM_Utils_Type::MEDIUM,
+                         'size' => \CRM_Utils_Type::MEDIUM,
                            
                 'import' => true,
         'where' => 'civicrm_contact.job_title',
@@ -2247,7 +2249,7 @@ class Contact extends \Civi\Core\Entity {
       
         'name' => 'gender_id',
         'propertyName' => 'genderId',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Gender'),
                                                      
                 'import' => true,
@@ -2265,7 +2267,7 @@ class Contact extends \Civi\Core\Entity {
       
         'name' => 'birth_date',
         'propertyName' => 'birthDate',
-        'type' => CRM_Utils_Type::T_DATE,
+        'type' => \CRM_Utils_Type::T_DATE,
                 'title' => ts('Birth Date'),
                                                      
                 'import' => true,
@@ -2280,7 +2282,7 @@ class Contact extends \Civi\Core\Entity {
       
         'name' => 'is_deceased',
         'propertyName' => 'isDeceased',
-        'type' => CRM_Utils_Type::T_BOOLEAN,
+        'type' => \CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('Is Deceased'),
                                                      
                 'import' => true,
@@ -2295,7 +2297,7 @@ class Contact extends \Civi\Core\Entity {
       
         'name' => 'deceased_date',
         'propertyName' => 'deceasedDate',
-        'type' => CRM_Utils_Type::T_DATE,
+        'type' => \CRM_Utils_Type::T_DATE,
                 'title' => ts('Deceased Date'),
                                                      
                 'import' => true,
@@ -2310,10 +2312,10 @@ class Contact extends \Civi\Core\Entity {
       
         'name' => 'household_name',
         'propertyName' => 'householdName',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Household Name'),
                                  'maxlength' => 128,
-                         'size' => CRM_Utils_Type::BIG,
+                         'size' => \CRM_Utils_Type::BIG,
                            
                 'import' => true,
         'where' => 'civicrm_contact.household_name',
@@ -2327,21 +2329,21 @@ class Contact extends \Civi\Core\Entity {
       
         'name' => 'primary_contact_id',
         'propertyName' => 'primaryContact',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Household Primary Contact ID'),
                                                      
                                     
-                'FKClassName' => 'CRM_Contact_Contact',
+                'FKClassName' => 'Civi_Contact_Contact',
                           ),
       
               'organization_name' => array(
       
         'name' => 'organization_name',
         'propertyName' => 'organizationName',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Organization Name'),
                                  'maxlength' => 128,
-                         'size' => CRM_Utils_Type::BIG,
+                         'size' => \CRM_Utils_Type::BIG,
                            
                 'import' => true,
         'where' => 'civicrm_contact.organization_name',
@@ -2355,10 +2357,10 @@ class Contact extends \Civi\Core\Entity {
       
         'name' => 'sic_code',
         'propertyName' => 'sicCode',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Sic Code'),
                                  'maxlength' => 8,
-                         'size' => CRM_Utils_Type::EIGHT,
+                         'size' => \CRM_Utils_Type::EIGHT,
                            
                 'import' => true,
         'where' => 'civicrm_contact.sic_code',
@@ -2372,10 +2374,10 @@ class Contact extends \Civi\Core\Entity {
       
         'name' => 'user_unique_id',
         'propertyName' => 'userUniqueId',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Unique ID (OpenID)'),
                                  'maxlength' => 255,
-                         'size' => CRM_Utils_Type::HUGE,
+                         'size' => \CRM_Utils_Type::HUGE,
                            
                 'import' => true,
         'where' => 'civicrm_contact.user_unique_id',
@@ -2390,7 +2392,7 @@ class Contact extends \Civi\Core\Entity {
       
         'name' => 'employer_id',
         'propertyName' => 'employer',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Current Employer ID'),
                                                      
                          'export' => true,
@@ -2398,14 +2400,14 @@ class Contact extends \Civi\Core\Entity {
         'headerPattern' => '',
         'dataPattern' => '',
                                    
-                'FKClassName' => 'CRM_Contact_Contact',
+                'FKClassName' => 'Civi_Contact_Contact',
                           ),
       
               'contact_is_deleted' => array(
       
         'name' => 'is_deleted',
         'propertyName' => 'isDeleted',
-        'type' => CRM_Utils_Type::T_BOOLEAN,
+        'type' => \CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('Contact is in Trash'),
                         'required' => true,
                                              
@@ -2420,7 +2422,7 @@ class Contact extends \Civi\Core\Entity {
       
         'name' => 'created_date',
         'propertyName' => 'createdDate',
-        'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
+        'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
                 'title' => ts('Created Date'),
                         'required' => false,
                                              
@@ -2432,7 +2434,7 @@ class Contact extends \Civi\Core\Entity {
       
         'name' => 'modified_date',
         'propertyName' => 'modifiedDate',
-        'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
+        'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
                 'title' => ts('Modified Date'),
                         'required' => false,
                                              

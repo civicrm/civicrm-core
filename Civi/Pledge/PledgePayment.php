@@ -348,6 +348,8 @@ class PledgePayment extends \Civi\Core\Entity {
    * @access public
    * @return array
    */
+  public static $_fields = NULL;
+
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
@@ -356,7 +358,7 @@ class PledgePayment extends \Civi\Core\Entity {
       
         'name' => 'id',
         'propertyName' => 'id',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Payment ID'),
                         'required' => true,
                                              
@@ -372,28 +374,28 @@ class PledgePayment extends \Civi\Core\Entity {
       
         'name' => 'pledge_id',
         'propertyName' => 'pledge',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
                                     
-                'FKClassName' => 'CRM_Pledge_Pledge',
+                'FKClassName' => 'Civi_Pledge_Pledge',
                           ),
       
               'contribution_id' => array(
       
         'name' => 'contribution_id',
         'propertyName' => 'contribution',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                                                      
                                     
-                'FKClassName' => 'CRM_Contribute_Contribution',
+                'FKClassName' => 'Civi_Contribute_Contribution',
                           ),
       
               'pledge_payment_scheduled_amount' => array(
       
         'name' => 'scheduled_amount',
         'propertyName' => 'scheduledAmount',
-        'type' => CRM_Utils_Type::T_MONEY,
+        'type' => \CRM_Utils_Type::T_MONEY,
                 'title' => ts('Scheduled Amount'),
                         'required' => true,
                                              
@@ -409,7 +411,7 @@ class PledgePayment extends \Civi\Core\Entity {
       
         'name' => 'actual_amount',
         'propertyName' => 'actualAmount',
-        'type' => CRM_Utils_Type::T_MONEY,
+        'type' => \CRM_Utils_Type::T_MONEY,
                 'title' => ts('Actual Amount'),
                                                      
                 'import' => true,
@@ -424,10 +426,10 @@ class PledgePayment extends \Civi\Core\Entity {
       
         'name' => 'currency',
         'propertyName' => 'currency',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Currency'),
                                  'maxlength' => 3,
-                         'size' => CRM_Utils_Type::FOUR,
+                         'size' => \CRM_Utils_Type::FOUR,
                            
                                            'default' => 'NULL',
          
@@ -443,7 +445,7 @@ class PledgePayment extends \Civi\Core\Entity {
       
         'name' => 'scheduled_date',
         'propertyName' => 'scheduledDate',
-        'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
+        'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
                 'title' => ts('Scheduled Date'),
                         'required' => true,
                                              
@@ -459,7 +461,7 @@ class PledgePayment extends \Civi\Core\Entity {
       
         'name' => 'reminder_date',
         'propertyName' => 'reminderDate',
-        'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
+        'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
                 'title' => ts('Last Reminder'),
                                                      
                 'import' => true,
@@ -474,7 +476,7 @@ class PledgePayment extends \Civi\Core\Entity {
       
         'name' => 'reminder_count',
         'propertyName' => 'reminderCount',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Reminders Sent'),
                                                      
                 'import' => true,
@@ -489,7 +491,7 @@ class PledgePayment extends \Civi\Core\Entity {
       
         'name' => 'status_id',
         'propertyName' => 'statusId',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Payment Status'),
                                                      
                 'import' => true,

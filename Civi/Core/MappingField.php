@@ -468,6 +468,8 @@ class MappingField extends \Civi\Core\Entity {
    * @access public
    * @return array
    */
+  public static $_fields = NULL;
+
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
@@ -476,7 +478,7 @@ class MappingField extends \Civi\Core\Entity {
       
         'name' => 'id',
         'propertyName' => 'id',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
                                     
@@ -486,21 +488,21 @@ class MappingField extends \Civi\Core\Entity {
       
         'name' => 'mapping_id',
         'propertyName' => 'mapping',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
                                     
-                'FKClassName' => 'CRM_Core_Mapping',
+                'FKClassName' => 'Civi_Core_Mapping',
                           ),
       
               'name' => array(
       
         'name' => 'name',
         'propertyName' => 'name',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Name'),
                                  'maxlength' => 255,
-                         'size' => CRM_Utils_Type::HUGE,
+                         'size' => \CRM_Utils_Type::HUGE,
                            
                                     
                           ),
@@ -509,10 +511,10 @@ class MappingField extends \Civi\Core\Entity {
       
         'name' => 'contact_type',
         'propertyName' => 'contactType',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Contact Type'),
                                  'maxlength' => 64,
-                         'size' => CRM_Utils_Type::BIG,
+                         'size' => \CRM_Utils_Type::BIG,
                            
                                     
                                      'pseudoconstant' => array(
@@ -526,7 +528,7 @@ class MappingField extends \Civi\Core\Entity {
       
         'name' => 'column_number',
         'propertyName' => 'columnNumber',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Column Number'),
                         'required' => true,
                                              
@@ -537,17 +539,17 @@ class MappingField extends \Civi\Core\Entity {
       
         'name' => 'location_type_id',
         'propertyName' => 'locationType',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                                                      
                                     
-                'FKClassName' => 'CRM_Core_LocationType',
+                'FKClassName' => 'Civi_Core_LocationType',
                           ),
       
               'phone_type_id' => array(
       
         'name' => 'phone_type_id',
         'propertyName' => 'phoneTypeId',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                                                      
                                     
                           ),
@@ -556,7 +558,7 @@ class MappingField extends \Civi\Core\Entity {
       
         'name' => 'im_provider_id',
         'propertyName' => 'imProviderId',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                                                      
                                     
                                      'pseudoconstant' => array(
@@ -568,7 +570,7 @@ class MappingField extends \Civi\Core\Entity {
       
         'name' => 'website_type_id',
         'propertyName' => 'websiteTypeId',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                                                      
                                     
                                      'pseudoconstant' => array(
@@ -580,20 +582,20 @@ class MappingField extends \Civi\Core\Entity {
       
         'name' => 'relationship_type_id',
         'propertyName' => 'relationshipType',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                                                      
                                     
-                'FKClassName' => 'CRM_Contact_RelationshipType',
+                'FKClassName' => 'Civi_Contact_RelationshipType',
                           ),
       
               'relationship_direction' => array(
       
         'name' => 'relationship_direction',
         'propertyName' => 'relationshipDirection',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Relationship Direction'),
                                  'maxlength' => 6,
-                         'size' => CRM_Utils_Type::SIX,
+                         'size' => \CRM_Utils_Type::SIX,
                            
                                     
                           ),
@@ -602,7 +604,7 @@ class MappingField extends \Civi\Core\Entity {
       
         'name' => 'grouping',
         'propertyName' => 'grouping',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Grouping'),
                                                      
                                            'default' => '1',
@@ -613,10 +615,10 @@ class MappingField extends \Civi\Core\Entity {
       
         'name' => 'operator',
         'propertyName' => 'operator',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Operator'),
                                  'maxlength' => 16,
-                         'size' => CRM_Utils_Type::TWELVE,
+                         'size' => \CRM_Utils_Type::TWELVE,
                            
                                     
                                      'pseudoconstant' => array(
@@ -628,10 +630,10 @@ class MappingField extends \Civi\Core\Entity {
       
         'name' => 'value',
         'propertyName' => 'value',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Value'),
                                  'maxlength' => 255,
-                         'size' => CRM_Utils_Type::HUGE,
+                         'size' => \CRM_Utils_Type::HUGE,
                            
                                     
                           ),

@@ -618,6 +618,8 @@ class ReportInstance extends \Civi\Core\Entity {
    * @access public
    * @return array
    */
+  public static $_fields = NULL;
+
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
@@ -626,7 +628,7 @@ class ReportInstance extends \Civi\Core\Entity {
       
         'name' => 'id',
         'propertyName' => 'id',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Report Instance ID'),
                         'required' => true,
                                              
@@ -637,22 +639,22 @@ class ReportInstance extends \Civi\Core\Entity {
       
         'name' => 'domain_id',
         'propertyName' => 'domain',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Report Instance Domain ID'),
                         'required' => true,
                                              
                                     
-                'FKClassName' => 'CRM_Core_Domain',
+                'FKClassName' => 'Civi_Core_Domain',
                           ),
       
               'title' => array(
       
         'name' => 'title',
         'propertyName' => 'title',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Report Instance Title'),
                                  'maxlength' => 255,
-                         'size' => CRM_Utils_Type::HUGE,
+                         'size' => \CRM_Utils_Type::HUGE,
                            
                                     
                           ),
@@ -661,11 +663,11 @@ class ReportInstance extends \Civi\Core\Entity {
       
         'name' => 'report_id',
         'propertyName' => 'reportId',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Report template ID'),
                         'required' => true,
                          'maxlength' => 64,
-                         'size' => CRM_Utils_Type::BIG,
+                         'size' => \CRM_Utils_Type::BIG,
                            
                                     
                           ),
@@ -674,10 +676,10 @@ class ReportInstance extends \Civi\Core\Entity {
       
         'name' => 'name',
         'propertyName' => 'name',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Report instance Name'),
                                  'maxlength' => 255,
-                         'size' => CRM_Utils_Type::HUGE,
+                         'size' => \CRM_Utils_Type::HUGE,
                            
                                     
                           ),
@@ -686,10 +688,10 @@ class ReportInstance extends \Civi\Core\Entity {
       
         'name' => 'args',
         'propertyName' => 'args',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Report Instance Arguments'),
                                  'maxlength' => 255,
-                         'size' => CRM_Utils_Type::HUGE,
+                         'size' => \CRM_Utils_Type::HUGE,
                            
                                     
                           ),
@@ -698,10 +700,10 @@ class ReportInstance extends \Civi\Core\Entity {
       
         'name' => 'description',
         'propertyName' => 'description',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Report Instance description'),
                                  'maxlength' => 255,
-                         'size' => CRM_Utils_Type::HUGE,
+                         'size' => \CRM_Utils_Type::HUGE,
                            
                                     
                           ),
@@ -710,10 +712,10 @@ class ReportInstance extends \Civi\Core\Entity {
       
         'name' => 'permission',
         'propertyName' => 'permission',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Report Instance Permissions'),
                                  'maxlength' => 255,
-                         'size' => CRM_Utils_Type::HUGE,
+                         'size' => \CRM_Utils_Type::HUGE,
                            
                                     
                           ),
@@ -722,10 +724,10 @@ class ReportInstance extends \Civi\Core\Entity {
       
         'name' => 'grouprole',
         'propertyName' => 'grouprole',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Report Instance Assigned to Roles'),
                                  'maxlength' => 1024,
-                         'size' => CRM_Utils_Type::HUGE,
+                         'size' => \CRM_Utils_Type::HUGE,
                            
                                     
                           ),
@@ -734,7 +736,7 @@ class ReportInstance extends \Civi\Core\Entity {
       
         'name' => 'form_values',
         'propertyName' => 'formValues',
-        'type' => CRM_Utils_Type::T_TEXT,
+        'type' => \CRM_Utils_Type::T_TEXT,
                 'title' => ts('Submitted Form Values'),
                                  'maxlength' => 65535,
                                     
@@ -750,7 +752,7 @@ class ReportInstance extends \Civi\Core\Entity {
       
         'name' => 'is_active',
         'propertyName' => 'isActive',
-        'type' => CRM_Utils_Type::T_BOOLEAN,
+        'type' => \CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('Report Instance is Active'),
                                                      
                                     
@@ -760,10 +762,10 @@ class ReportInstance extends \Civi\Core\Entity {
       
         'name' => 'email_subject',
         'propertyName' => 'emailSubject',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Report Instance email Subject'),
                                  'maxlength' => 255,
-                         'size' => CRM_Utils_Type::HUGE,
+                         'size' => \CRM_Utils_Type::HUGE,
                            
                                     
                           ),
@@ -772,7 +774,7 @@ class ReportInstance extends \Civi\Core\Entity {
       
         'name' => 'email_to',
         'propertyName' => 'emailTo',
-        'type' => CRM_Utils_Type::T_TEXT,
+        'type' => \CRM_Utils_Type::T_TEXT,
                 'title' => ts('Email Report Instance To'),
                                  'maxlength' => 65535,
                                     
@@ -783,7 +785,7 @@ class ReportInstance extends \Civi\Core\Entity {
       
         'name' => 'email_cc',
         'propertyName' => 'emailCc',
-        'type' => CRM_Utils_Type::T_TEXT,
+        'type' => \CRM_Utils_Type::T_TEXT,
                 'title' => ts('cc Email Report Instance To'),
                                  'maxlength' => 65535,
                                     
@@ -794,7 +796,7 @@ class ReportInstance extends \Civi\Core\Entity {
       
         'name' => 'header',
         'propertyName' => 'header',
-        'type' => CRM_Utils_Type::T_TEXT,
+        'type' => \CRM_Utils_Type::T_TEXT,
                 'title' => ts('Report Instance Header'),
                                  'maxlength' => 65535,
                                   'rows' => 4,
@@ -807,7 +809,7 @@ class ReportInstance extends \Civi\Core\Entity {
       
         'name' => 'footer',
         'propertyName' => 'footer',
-        'type' => CRM_Utils_Type::T_TEXT,
+        'type' => \CRM_Utils_Type::T_TEXT,
                 'title' => ts('Report Instance Footer'),
                                  'maxlength' => 65535,
                                   'rows' => 4,
@@ -820,7 +822,7 @@ class ReportInstance extends \Civi\Core\Entity {
       
         'name' => 'navigation_id',
         'propertyName' => 'navigation',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Navigation ID'),
                                                      
                 'import' => true,
@@ -829,14 +831,14 @@ class ReportInstance extends \Civi\Core\Entity {
         'dataPattern' => '',
                          'export' => true,
                                    
-                'FKClassName' => 'CRM_Core_Navigation',
+                'FKClassName' => 'Civi_Core_Navigation',
                           ),
       
               'drilldown_id' => array(
       
         'name' => 'drilldown_id',
         'propertyName' => 'drilldown',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Drilldown Report ID'),
                                                      
                 'import' => true,
@@ -845,14 +847,14 @@ class ReportInstance extends \Civi\Core\Entity {
         'dataPattern' => '',
                          'export' => true,
                                    
-                'FKClassName' => 'CRM_Report_ReportInstance',
+                'FKClassName' => 'Civi_Report_ReportInstance',
                           ),
       
               'is_reserved' => array(
       
         'name' => 'is_reserved',
         'propertyName' => 'isReserved',
-        'type' => CRM_Utils_Type::T_BOOLEAN,
+        'type' => \CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('Instance is Reserved'),
                                                      
                                     

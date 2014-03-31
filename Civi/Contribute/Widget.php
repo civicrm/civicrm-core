@@ -558,6 +558,8 @@ class Widget extends \Civi\Core\Entity {
    * @access public
    * @return array
    */
+  public static $_fields = NULL;
+
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
@@ -566,7 +568,7 @@ class Widget extends \Civi\Core\Entity {
       
         'name' => 'id',
         'propertyName' => 'id',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
                                     
@@ -576,17 +578,17 @@ class Widget extends \Civi\Core\Entity {
       
         'name' => 'contribution_page_id',
         'propertyName' => 'contributionPage',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                                                      
                                     
-                'FKClassName' => 'CRM_Contribute_ContributionPage',
+                'FKClassName' => 'Civi_Contribute_ContributionPage',
                           ),
       
               'is_active' => array(
       
         'name' => 'is_active',
         'propertyName' => 'isActive',
-        'type' => CRM_Utils_Type::T_BOOLEAN,
+        'type' => \CRM_Utils_Type::T_BOOLEAN,
                                                      
                                     
                           ),
@@ -595,10 +597,10 @@ class Widget extends \Civi\Core\Entity {
       
         'name' => 'title',
         'propertyName' => 'title',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Title'),
                                  'maxlength' => 255,
-                         'size' => CRM_Utils_Type::HUGE,
+                         'size' => \CRM_Utils_Type::HUGE,
                            
                                     
                           ),
@@ -607,10 +609,10 @@ class Widget extends \Civi\Core\Entity {
       
         'name' => 'url_logo',
         'propertyName' => 'urlLogo',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Url Logo'),
                                  'maxlength' => 255,
-                         'size' => CRM_Utils_Type::HUGE,
+                         'size' => \CRM_Utils_Type::HUGE,
                            
                                     
                           ),
@@ -619,10 +621,10 @@ class Widget extends \Civi\Core\Entity {
       
         'name' => 'button_title',
         'propertyName' => 'buttonTitle',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Button Title'),
                                  'maxlength' => 255,
-                         'size' => CRM_Utils_Type::HUGE,
+                         'size' => \CRM_Utils_Type::HUGE,
                            
                                     
                           ),
@@ -631,7 +633,7 @@ class Widget extends \Civi\Core\Entity {
       
         'name' => 'about',
         'propertyName' => 'about',
-        'type' => CRM_Utils_Type::T_TEXT,
+        'type' => \CRM_Utils_Type::T_TEXT,
                 'title' => ts('About'),
                                  'maxlength' => 65535,
                                     
@@ -642,10 +644,10 @@ class Widget extends \Civi\Core\Entity {
       
         'name' => 'url_homepage',
         'propertyName' => 'urlHomepage',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Url Homepage'),
                                  'maxlength' => 255,
-                         'size' => CRM_Utils_Type::HUGE,
+                         'size' => \CRM_Utils_Type::HUGE,
                            
                                     
                           ),
@@ -654,10 +656,10 @@ class Widget extends \Civi\Core\Entity {
       
         'name' => 'color_title',
         'propertyName' => 'colorTitle',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Color Title'),
                                  'maxlength' => 10,
-                         'size' => CRM_Utils_Type::TWELVE,
+                         'size' => \CRM_Utils_Type::TWELVE,
                            
                                     
                           ),
@@ -666,10 +668,10 @@ class Widget extends \Civi\Core\Entity {
       
         'name' => 'color_button',
         'propertyName' => 'colorButton',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Color Button'),
                                  'maxlength' => 10,
-                         'size' => CRM_Utils_Type::TWELVE,
+                         'size' => \CRM_Utils_Type::TWELVE,
                            
                                     
                           ),
@@ -678,10 +680,10 @@ class Widget extends \Civi\Core\Entity {
       
         'name' => 'color_bar',
         'propertyName' => 'colorBar',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Color Bar'),
                                  'maxlength' => 10,
-                         'size' => CRM_Utils_Type::TWELVE,
+                         'size' => \CRM_Utils_Type::TWELVE,
                            
                                     
                           ),
@@ -690,10 +692,10 @@ class Widget extends \Civi\Core\Entity {
       
         'name' => 'color_main_text',
         'propertyName' => 'colorMainText',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Color Main Text'),
                                  'maxlength' => 10,
-                         'size' => CRM_Utils_Type::TWELVE,
+                         'size' => \CRM_Utils_Type::TWELVE,
                            
                                     
                           ),
@@ -702,10 +704,10 @@ class Widget extends \Civi\Core\Entity {
       
         'name' => 'color_main',
         'propertyName' => 'colorMain',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Color Main'),
                                  'maxlength' => 10,
-                         'size' => CRM_Utils_Type::TWELVE,
+                         'size' => \CRM_Utils_Type::TWELVE,
                            
                                     
                           ),
@@ -714,10 +716,10 @@ class Widget extends \Civi\Core\Entity {
       
         'name' => 'color_main_bg',
         'propertyName' => 'colorMainBg',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Color Main Bg'),
                                  'maxlength' => 10,
-                         'size' => CRM_Utils_Type::TWELVE,
+                         'size' => \CRM_Utils_Type::TWELVE,
                            
                                     
                           ),
@@ -726,10 +728,10 @@ class Widget extends \Civi\Core\Entity {
       
         'name' => 'color_bg',
         'propertyName' => 'colorBg',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Color Bg'),
                                  'maxlength' => 10,
-                         'size' => CRM_Utils_Type::TWELVE,
+                         'size' => \CRM_Utils_Type::TWELVE,
                            
                                     
                           ),
@@ -738,10 +740,10 @@ class Widget extends \Civi\Core\Entity {
       
         'name' => 'color_about_link',
         'propertyName' => 'colorAboutLink',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Color About Link'),
                                  'maxlength' => 10,
-                         'size' => CRM_Utils_Type::TWELVE,
+                         'size' => \CRM_Utils_Type::TWELVE,
                            
                                     
                           ),
@@ -750,10 +752,10 @@ class Widget extends \Civi\Core\Entity {
       
         'name' => 'color_homepage_link',
         'propertyName' => 'colorHomepageLink',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Color Homepage Link'),
                                  'maxlength' => 10,
-                         'size' => CRM_Utils_Type::TWELVE,
+                         'size' => \CRM_Utils_Type::TWELVE,
                            
                                     
                           ),

@@ -498,6 +498,8 @@ class Membership extends \Civi\Core\Entity {
    * @access public
    * @return array
    */
+  public static $_fields = NULL;
+
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
@@ -506,7 +508,7 @@ class Membership extends \Civi\Core\Entity {
       
         'name' => 'id',
         'propertyName' => 'id',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Membership ID'),
                         'required' => true,
                                              
@@ -522,7 +524,7 @@ class Membership extends \Civi\Core\Entity {
       
         'name' => 'contact_id',
         'propertyName' => 'contact',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Contact ID'),
                         'required' => true,
                                              
@@ -532,14 +534,14 @@ class Membership extends \Civi\Core\Entity {
         'dataPattern' => '/^\d+$/',
                          'export' => true,
                                    
-                'FKClassName' => 'CRM_Contact_Contact',
+                'FKClassName' => 'Civi_Contact_Contact',
                           ),
       
               'membership_type_id' => array(
       
         'name' => 'membership_type_id',
         'propertyName' => 'membershipType',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Membership Type Id'),
                         'required' => true,
                                              
@@ -549,7 +551,7 @@ class Membership extends \Civi\Core\Entity {
         'dataPattern' => '',
                          'export' => false,
                                    
-                'FKClassName' => 'CRM_Member_MembershipType',
+                'FKClassName' => 'Civi_Member_MembershipType',
                                      'pseudoconstant' => array(
                                 'table' => 'civicrm_membership_type',
                       'keyColumn' => 'id',
@@ -561,7 +563,7 @@ class Membership extends \Civi\Core\Entity {
       
         'name' => 'join_date',
         'propertyName' => 'joinDate',
-        'type' => CRM_Utils_Type::T_DATE,
+        'type' => \CRM_Utils_Type::T_DATE,
                 'title' => ts('Member Since'),
                                                      
                 'import' => true,
@@ -576,7 +578,7 @@ class Membership extends \Civi\Core\Entity {
       
         'name' => 'start_date',
         'propertyName' => 'startDate',
-        'type' => CRM_Utils_Type::T_DATE,
+        'type' => \CRM_Utils_Type::T_DATE,
                 'title' => ts('Membership Start Date'),
                                                      
                 'import' => true,
@@ -591,7 +593,7 @@ class Membership extends \Civi\Core\Entity {
       
         'name' => 'end_date',
         'propertyName' => 'endDate',
-        'type' => CRM_Utils_Type::T_DATE,
+        'type' => \CRM_Utils_Type::T_DATE,
                 'title' => ts('Membership Expiration Date'),
                                                      
                 'import' => true,
@@ -606,10 +608,10 @@ class Membership extends \Civi\Core\Entity {
       
         'name' => 'source',
         'propertyName' => 'source',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Source'),
                                  'maxlength' => 128,
-                         'size' => CRM_Utils_Type::HUGE,
+                         'size' => \CRM_Utils_Type::HUGE,
                            
                 'import' => true,
         'where' => 'civicrm_membership.source',
@@ -623,7 +625,7 @@ class Membership extends \Civi\Core\Entity {
       
         'name' => 'status_id',
         'propertyName' => 'status',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Membership Status Id'),
                         'required' => true,
                                              
@@ -633,7 +635,7 @@ class Membership extends \Civi\Core\Entity {
         'dataPattern' => '',
                          'export' => false,
                                    
-                'FKClassName' => 'CRM_Member_MembershipStatus',
+                'FKClassName' => 'Civi_Member_MembershipStatus',
                                      'pseudoconstant' => array(
                                 'table' => 'civicrm_membership_status',
                       'keyColumn' => 'id',
@@ -645,7 +647,7 @@ class Membership extends \Civi\Core\Entity {
       
         'name' => 'is_override',
         'propertyName' => 'isOverride',
-        'type' => CRM_Utils_Type::T_BOOLEAN,
+        'type' => \CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('Status Override'),
                                                      
                 'import' => true,
@@ -660,7 +662,7 @@ class Membership extends \Civi\Core\Entity {
       
         'name' => 'owner_membership_id',
         'propertyName' => 'ownerMembership',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Primary Member ID'),
                                                      
                          'export' => true,
@@ -668,14 +670,14 @@ class Membership extends \Civi\Core\Entity {
         'headerPattern' => '',
         'dataPattern' => '',
                                    
-                'FKClassName' => 'CRM_Member_Membership',
+                'FKClassName' => 'Civi_Member_Membership',
                           ),
       
               'max_related' => array(
       
         'name' => 'max_related',
         'propertyName' => 'maxRelated',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Max Related'),
                                                      
                                     
@@ -685,7 +687,7 @@ class Membership extends \Civi\Core\Entity {
       
         'name' => 'is_test',
         'propertyName' => 'isTest',
-        'type' => CRM_Utils_Type::T_BOOLEAN,
+        'type' => \CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('Test'),
                                                      
                 'import' => true,
@@ -700,7 +702,7 @@ class Membership extends \Civi\Core\Entity {
       
         'name' => 'is_pay_later',
         'propertyName' => 'isPayLater',
-        'type' => CRM_Utils_Type::T_BOOLEAN,
+        'type' => \CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('Is Pay Later'),
                                                      
                 'import' => true,
@@ -715,17 +717,17 @@ class Membership extends \Civi\Core\Entity {
       
         'name' => 'contribution_recur_id',
         'propertyName' => 'contributionRecur',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                                                      
                                     
-                'FKClassName' => 'CRM_Contribute_ContributionRecur',
+                'FKClassName' => 'Civi_Contribute_ContributionRecur',
                           ),
       
               'member_campaign_id' => array(
       
         'name' => 'campaign_id',
         'propertyName' => 'campaign',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Campaign'),
                                                      
                 'import' => true,
@@ -734,7 +736,7 @@ class Membership extends \Civi\Core\Entity {
         'dataPattern' => '',
                          'export' => true,
                                    
-                'FKClassName' => 'CRM_Campaign_Campaign',
+                'FKClassName' => 'Civi_Campaign_Campaign',
                                      'pseudoconstant' => array(
                                 'table' => 'civicrm_campaign',
                       'keyColumn' => 'id',

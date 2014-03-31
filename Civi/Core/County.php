@@ -168,6 +168,8 @@ class County extends \Civi\Core\Entity {
    * @access public
    * @return array
    */
+  public static $_fields = NULL;
+
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
@@ -176,7 +178,7 @@ class County extends \Civi\Core\Entity {
       
         'name' => 'id',
         'propertyName' => 'id',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
                                     
@@ -186,10 +188,10 @@ class County extends \Civi\Core\Entity {
       
         'name' => 'name',
         'propertyName' => 'name',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('County'),
                                  'maxlength' => 64,
-                         'size' => CRM_Utils_Type::BIG,
+                         'size' => \CRM_Utils_Type::BIG,
                            
                 'import' => true,
         'where' => 'civicrm_county.name',
@@ -203,10 +205,10 @@ class County extends \Civi\Core\Entity {
       
         'name' => 'abbreviation',
         'propertyName' => 'abbreviation',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('County Abbreviation'),
                                  'maxlength' => 4,
-                         'size' => CRM_Utils_Type::FOUR,
+                         'size' => \CRM_Utils_Type::FOUR,
                            
                                     
                           ),
@@ -215,11 +217,11 @@ class County extends \Civi\Core\Entity {
       
         'name' => 'state_province_id',
         'propertyName' => 'stateProvince',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
                                     
-                'FKClassName' => 'CRM_Core_StateProvince',
+                'FKClassName' => 'Civi_Core_StateProvince',
                           ),
              );
     }

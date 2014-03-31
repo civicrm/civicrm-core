@@ -378,6 +378,8 @@ class Relationship extends \Civi\Core\Entity {
    * @access public
    * @return array
    */
+  public static $_fields = NULL;
+
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
@@ -386,7 +388,7 @@ class Relationship extends \Civi\Core\Entity {
       
         'name' => 'id',
         'propertyName' => 'id',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Relationship ID'),
                         'required' => true,
                                              
@@ -397,43 +399,43 @@ class Relationship extends \Civi\Core\Entity {
       
         'name' => 'contact_id_a',
         'propertyName' => 'contactA',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Contact A'),
                         'required' => true,
                                              
                                     
-                'FKClassName' => 'CRM_Contact_Contact',
+                'FKClassName' => 'Civi_Contact_Contact',
                           ),
       
               'contact_id_b' => array(
       
         'name' => 'contact_id_b',
         'propertyName' => 'contactB',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Contact B'),
                         'required' => true,
                                              
                                     
-                'FKClassName' => 'CRM_Contact_Contact',
+                'FKClassName' => 'Civi_Contact_Contact',
                           ),
       
               'relationship_type_id' => array(
       
         'name' => 'relationship_type_id',
         'propertyName' => 'relationshipType',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Relationship Type'),
                         'required' => true,
                                              
                                     
-                'FKClassName' => 'CRM_Contact_RelationshipType',
+                'FKClassName' => 'Civi_Contact_RelationshipType',
                           ),
       
               'start_date' => array(
       
         'name' => 'start_date',
         'propertyName' => 'startDate',
-        'type' => CRM_Utils_Type::T_DATE,
+        'type' => \CRM_Utils_Type::T_DATE,
                 'title' => ts('Relationship Start Date'),
                                                      
                                     
@@ -443,7 +445,7 @@ class Relationship extends \Civi\Core\Entity {
       
         'name' => 'end_date',
         'propertyName' => 'endDate',
-        'type' => CRM_Utils_Type::T_DATE,
+        'type' => \CRM_Utils_Type::T_DATE,
                 'title' => ts('Relationship End Date'),
                                                      
                                     
@@ -453,7 +455,7 @@ class Relationship extends \Civi\Core\Entity {
       
         'name' => 'is_active',
         'propertyName' => 'isActive',
-        'type' => CRM_Utils_Type::T_BOOLEAN,
+        'type' => \CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('Relationship Is Active'),
                                                      
                                            'default' => '1',
@@ -464,10 +466,10 @@ class Relationship extends \Civi\Core\Entity {
       
         'name' => 'description',
         'propertyName' => 'description',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Relationship Description'),
                                  'maxlength' => 255,
-                         'size' => CRM_Utils_Type::HUGE,
+                         'size' => \CRM_Utils_Type::HUGE,
                            
                                     
                           ),
@@ -476,7 +478,7 @@ class Relationship extends \Civi\Core\Entity {
       
         'name' => 'is_permission_a_b',
         'propertyName' => 'isPermissionAB',
-        'type' => CRM_Utils_Type::T_BOOLEAN,
+        'type' => \CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('Contact A has Permission Over Contact B'),
                                                      
                                     
@@ -486,7 +488,7 @@ class Relationship extends \Civi\Core\Entity {
       
         'name' => 'is_permission_b_a',
         'propertyName' => 'isPermissionBA',
-        'type' => CRM_Utils_Type::T_BOOLEAN,
+        'type' => \CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('Contact B has Permission Over Contact A'),
                                                      
                                     
@@ -496,12 +498,12 @@ class Relationship extends \Civi\Core\Entity {
       
         'name' => 'case_id',
         'propertyName' => 'case',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Relationship Case'),
                                                      
                                            'default' => 'NULL',
          
-                'FKClassName' => 'CRM_Case_Case',
+                'FKClassName' => 'Civi_CCase_CCase',
                           ),
              );
     }

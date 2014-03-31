@@ -258,6 +258,8 @@ class Spool extends \Civi\Core\Entity {
    * @access public
    * @return array
    */
+  public static $_fields = NULL;
+
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
@@ -266,7 +268,7 @@ class Spool extends \Civi\Core\Entity {
       
         'name' => 'id',
         'propertyName' => 'id',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
                                     
@@ -276,18 +278,18 @@ class Spool extends \Civi\Core\Entity {
       
         'name' => 'job_id',
         'propertyName' => 'job',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
                                     
-                'FKClassName' => 'CRM_Mailing_MailingJob',
+                'FKClassName' => 'Civi_Mailing_MailingJob',
                           ),
       
               'recipient_email' => array(
       
         'name' => 'recipient_email',
         'propertyName' => 'recipientEmail',
-        'type' => CRM_Utils_Type::T_TEXT,
+        'type' => \CRM_Utils_Type::T_TEXT,
                 'title' => ts('Recipient Email'),
                                  'maxlength' => 65535,
                                     
@@ -298,7 +300,7 @@ class Spool extends \Civi\Core\Entity {
       
         'name' => 'headers',
         'propertyName' => 'headers',
-        'type' => CRM_Utils_Type::T_TEXT,
+        'type' => \CRM_Utils_Type::T_TEXT,
                 'title' => ts('Headers'),
                                  'maxlength' => 65535,
                                     
@@ -309,7 +311,7 @@ class Spool extends \Civi\Core\Entity {
       
         'name' => 'body',
         'propertyName' => 'body',
-        'type' => CRM_Utils_Type::T_TEXT,
+        'type' => \CRM_Utils_Type::T_TEXT,
                 'title' => ts('Body'),
                                  'maxlength' => 65535,
                                     
@@ -320,7 +322,7 @@ class Spool extends \Civi\Core\Entity {
       
         'name' => 'added_at',
         'propertyName' => 'addedAt',
-        'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
+        'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
                 'title' => ts('Added At'),
                                                      
                                     
@@ -330,7 +332,7 @@ class Spool extends \Civi\Core\Entity {
       
         'name' => 'removed_at',
         'propertyName' => 'removedAt',
-        'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
+        'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
                 'title' => ts('Removed At'),
                                                      
                                     

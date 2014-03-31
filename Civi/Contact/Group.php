@@ -648,6 +648,8 @@ class Group extends \Civi\Core\Entity {
    * @access public
    * @return array
    */
+  public static $_fields = NULL;
+
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
@@ -656,7 +658,7 @@ class Group extends \Civi\Core\Entity {
       
         'name' => 'id',
         'propertyName' => 'id',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Group ID'),
                         'required' => true,
                                              
@@ -667,10 +669,10 @@ class Group extends \Civi\Core\Entity {
       
         'name' => 'name',
         'propertyName' => 'name',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Group Name'),
                                  'maxlength' => 64,
-                         'size' => CRM_Utils_Type::BIG,
+                         'size' => \CRM_Utils_Type::BIG,
                            
                                     
                           ),
@@ -679,10 +681,10 @@ class Group extends \Civi\Core\Entity {
       
         'name' => 'title',
         'propertyName' => 'title',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Group Title'),
                                  'maxlength' => 64,
-                         'size' => CRM_Utils_Type::BIG,
+                         'size' => \CRM_Utils_Type::BIG,
                            
                                     
                           ),
@@ -691,7 +693,7 @@ class Group extends \Civi\Core\Entity {
       
         'name' => 'description',
         'propertyName' => 'description',
-        'type' => CRM_Utils_Type::T_TEXT,
+        'type' => \CRM_Utils_Type::T_TEXT,
                 'title' => ts('Group Description'),
                                  'maxlength' => 65535,
                                   'rows' => 2,
@@ -704,10 +706,10 @@ class Group extends \Civi\Core\Entity {
       
         'name' => 'source',
         'propertyName' => 'source',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Group Source'),
                                  'maxlength' => 64,
-                         'size' => CRM_Utils_Type::BIG,
+                         'size' => \CRM_Utils_Type::BIG,
                            
                                     
                           ),
@@ -716,18 +718,18 @@ class Group extends \Civi\Core\Entity {
       
         'name' => 'saved_search_id',
         'propertyName' => 'savedSearch',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Saved Search ID'),
                                                      
                                     
-                'FKClassName' => 'CRM_Contact_SavedSearch',
+                'FKClassName' => 'Civi_Contact_SavedSearch',
                           ),
       
               'is_active' => array(
       
         'name' => 'is_active',
         'propertyName' => 'isActive',
-        'type' => CRM_Utils_Type::T_BOOLEAN,
+        'type' => \CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('Group Enabled'),
                                                      
                                     
@@ -737,10 +739,10 @@ class Group extends \Civi\Core\Entity {
       
         'name' => 'visibility',
         'propertyName' => 'visibility',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Group Visibility Setting'),
                                  'maxlength' => 24,
-                         'size' => CRM_Utils_Type::MEDIUM,
+                         'size' => \CRM_Utils_Type::MEDIUM,
                            
                                            'default' => 'User and User Admin Only',
          
@@ -753,7 +755,7 @@ class Group extends \Civi\Core\Entity {
       
         'name' => 'where_clause',
         'propertyName' => 'whereClause',
-        'type' => CRM_Utils_Type::T_TEXT,
+        'type' => \CRM_Utils_Type::T_TEXT,
                 'title' => ts('Group Where Clause'),
                                  'maxlength' => 65535,
                                     
@@ -764,7 +766,7 @@ class Group extends \Civi\Core\Entity {
       
         'name' => 'select_tables',
         'propertyName' => 'selectTables',
-        'type' => CRM_Utils_Type::T_TEXT,
+        'type' => \CRM_Utils_Type::T_TEXT,
                 'title' => ts('Tables For Select Clause'),
                                  'maxlength' => 65535,
                                     
@@ -775,7 +777,7 @@ class Group extends \Civi\Core\Entity {
       
         'name' => 'where_tables',
         'propertyName' => 'whereTables',
-        'type' => CRM_Utils_Type::T_TEXT,
+        'type' => \CRM_Utils_Type::T_TEXT,
                 'title' => ts('Tables For Where Clause'),
                                  'maxlength' => 65535,
                                     
@@ -786,10 +788,10 @@ class Group extends \Civi\Core\Entity {
       
         'name' => 'group_type',
         'propertyName' => 'groupType',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Group Type'),
                                  'maxlength' => 128,
-                         'size' => CRM_Utils_Type::HUGE,
+                         'size' => \CRM_Utils_Type::HUGE,
                            
                                     
                           ),
@@ -798,7 +800,7 @@ class Group extends \Civi\Core\Entity {
       
         'name' => 'cache_date',
         'propertyName' => 'cacheDate',
-        'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
+        'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
                 'title' => ts('Group Cache Date'),
                                                      
                                     
@@ -808,7 +810,7 @@ class Group extends \Civi\Core\Entity {
       
         'name' => 'refresh_date',
         'propertyName' => 'refreshDate',
-        'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
+        'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
                 'title' => ts('Next Group Refresh Time'),
                                                      
                                     
@@ -818,7 +820,7 @@ class Group extends \Civi\Core\Entity {
       
         'name' => 'parents',
         'propertyName' => 'parents',
-        'type' => CRM_Utils_Type::T_TEXT,
+        'type' => \CRM_Utils_Type::T_TEXT,
                 'title' => ts('Group Parents'),
                                  'maxlength' => 65535,
                                     
@@ -829,7 +831,7 @@ class Group extends \Civi\Core\Entity {
       
         'name' => 'children',
         'propertyName' => 'children',
-        'type' => CRM_Utils_Type::T_TEXT,
+        'type' => \CRM_Utils_Type::T_TEXT,
                 'title' => ts('Group Children'),
                                  'maxlength' => 65535,
                                     
@@ -840,7 +842,7 @@ class Group extends \Civi\Core\Entity {
       
         'name' => 'is_hidden',
         'propertyName' => 'isHidden',
-        'type' => CRM_Utils_Type::T_BOOLEAN,
+        'type' => \CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('Group is Hidden'),
                                                      
                                     
@@ -850,7 +852,7 @@ class Group extends \Civi\Core\Entity {
       
         'name' => 'is_reserved',
         'propertyName' => 'isReserved',
-        'type' => CRM_Utils_Type::T_BOOLEAN,
+        'type' => \CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('Group is Reserved'),
                                                      
                                     
@@ -860,22 +862,22 @@ class Group extends \Civi\Core\Entity {
       
         'name' => 'created_id',
         'propertyName' => 'created',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Group Created By'),
                                                      
                                     
-                'FKClassName' => 'CRM_Contact_Contact',
+                'FKClassName' => 'Civi_Contact_Contact',
                           ),
       
               'modified_id' => array(
       
         'name' => 'modified_id',
         'propertyName' => 'modified',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Group Modified By'),
                                                      
                                     
-                'FKClassName' => 'CRM_Contact_Contact',
+                'FKClassName' => 'Civi_Contact_Contact',
                           ),
              );
     }

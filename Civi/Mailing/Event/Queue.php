@@ -228,6 +228,8 @@ class Queue extends \Civi\Core\Entity {
    * @access public
    * @return array
    */
+  public static $_fields = NULL;
+
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
@@ -236,7 +238,7 @@ class Queue extends \Civi\Core\Entity {
       
         'name' => 'id',
         'propertyName' => 'id',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
                                     
@@ -246,44 +248,44 @@ class Queue extends \Civi\Core\Entity {
       
         'name' => 'job_id',
         'propertyName' => 'job',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
                                     
-                'FKClassName' => 'CRM_Mailing_MailingJob',
+                'FKClassName' => 'Civi_Mailing_MailingJob',
                           ),
       
               'email_id' => array(
       
         'name' => 'email_id',
         'propertyName' => 'email',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                                                      
                                            'default' => 'NULL',
          
-                'FKClassName' => 'CRM_Core_Email',
+                'FKClassName' => 'Civi_Core_Email',
                           ),
       
               'contact_id' => array(
       
         'name' => 'contact_id',
         'propertyName' => 'contact',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
                                     
-                'FKClassName' => 'CRM_Contact_Contact',
+                'FKClassName' => 'Civi_Contact_Contact',
                           ),
       
               'hash' => array(
       
         'name' => 'hash',
         'propertyName' => 'hash',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Hash'),
                         'required' => true,
                          'maxlength' => 255,
-                         'size' => CRM_Utils_Type::HUGE,
+                         'size' => \CRM_Utils_Type::HUGE,
                            
                                     
                           ),
@@ -292,11 +294,11 @@ class Queue extends \Civi\Core\Entity {
       
         'name' => 'phone_id',
         'propertyName' => 'phone',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                                                      
                                            'default' => 'NULL',
          
-                'FKClassName' => 'CRM_Core_Phone',
+                'FKClassName' => 'Civi_Core_Phone',
                           ),
              );
     }

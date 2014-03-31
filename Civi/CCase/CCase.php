@@ -43,9 +43,9 @@ use Civi\API\Annotation as CiviAPI;
 use JMS\Serializer\Annotation as JMS;
 
 /**
- * Case
+ * CCase
  *
- * @CiviAPI\Entity("Case")
+ * @CiviAPI\Entity("CCase")
  * @CiviAPI\Permission()
  * @ORM\Table(name="civicrm_case", indexes={@ORM\Index(name="index_case_type_id", columns={"case_type_id"}),@ORM\Index(name="index_is_deleted", columns={"is_deleted"})})
  * @ORM\Entity
@@ -146,7 +146,7 @@ class CCase extends \Civi\Core\Entity {
    * Set caseTypeId
    *
    * @param string $caseTypeId
-   * @return Case
+   * @return CCase
    */
   public function setCaseTypeId($caseTypeId) {
     $this->caseTypeId = $caseTypeId;
@@ -166,7 +166,7 @@ class CCase extends \Civi\Core\Entity {
    * Set subject
    *
    * @param string $subject
-   * @return Case
+   * @return CCase
    */
   public function setSubject($subject) {
     $this->subject = $subject;
@@ -186,7 +186,7 @@ class CCase extends \Civi\Core\Entity {
    * Set startDate
    *
    * @param date $startDate
-   * @return Case
+   * @return CCase
    */
   public function setStartDate($startDate) {
     $this->startDate = $startDate;
@@ -206,7 +206,7 @@ class CCase extends \Civi\Core\Entity {
    * Set endDate
    *
    * @param date $endDate
-   * @return Case
+   * @return CCase
    */
   public function setEndDate($endDate) {
     $this->endDate = $endDate;
@@ -226,7 +226,7 @@ class CCase extends \Civi\Core\Entity {
    * Set details
    *
    * @param text $details
-   * @return Case
+   * @return CCase
    */
   public function setDetails($details) {
     $this->details = $details;
@@ -246,7 +246,7 @@ class CCase extends \Civi\Core\Entity {
    * Set statusId
    *
    * @param integer $statusId
-   * @return Case
+   * @return CCase
    */
   public function setStatusId($statusId) {
     $this->statusId = $statusId;
@@ -266,7 +266,7 @@ class CCase extends \Civi\Core\Entity {
    * Set isDeleted
    *
    * @param boolean $isDeleted
-   * @return Case
+   * @return CCase
    */
   public function setIsDeleted($isDeleted) {
     $this->isDeleted = $isDeleted;
@@ -288,6 +288,8 @@ class CCase extends \Civi\Core\Entity {
    * @access public
    * @return array
    */
+  public static $_fields = NULL;
+
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
@@ -296,7 +298,7 @@ class CCase extends \Civi\Core\Entity {
       
         'name' => 'id',
         'propertyName' => 'id',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Case ID'),
                         'required' => true,
                                              
@@ -312,11 +314,11 @@ class CCase extends \Civi\Core\Entity {
       
         'name' => 'case_type_id',
         'propertyName' => 'caseTypeId',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Case Type'),
                         'required' => true,
                          'maxlength' => 128,
-                         'size' => CRM_Utils_Type::HUGE,
+                         'size' => \CRM_Utils_Type::HUGE,
                            
                 'import' => true,
         'where' => 'civicrm_case.case_type_id',
@@ -333,10 +335,10 @@ class CCase extends \Civi\Core\Entity {
       
         'name' => 'subject',
         'propertyName' => 'subject',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Case Subject'),
                                  'maxlength' => 128,
-                         'size' => CRM_Utils_Type::HUGE,
+                         'size' => \CRM_Utils_Type::HUGE,
                            
                 'import' => true,
         'where' => 'civicrm_case.subject',
@@ -350,7 +352,7 @@ class CCase extends \Civi\Core\Entity {
       
         'name' => 'start_date',
         'propertyName' => 'startDate',
-        'type' => CRM_Utils_Type::T_DATE,
+        'type' => \CRM_Utils_Type::T_DATE,
                 'title' => ts('Case Start Date'),
                                                      
                 'import' => true,
@@ -365,7 +367,7 @@ class CCase extends \Civi\Core\Entity {
       
         'name' => 'end_date',
         'propertyName' => 'endDate',
-        'type' => CRM_Utils_Type::T_DATE,
+        'type' => \CRM_Utils_Type::T_DATE,
                 'title' => ts('Case End Date'),
                                                      
                 'import' => true,
@@ -380,7 +382,7 @@ class CCase extends \Civi\Core\Entity {
       
         'name' => 'details',
         'propertyName' => 'details',
-        'type' => CRM_Utils_Type::T_TEXT,
+        'type' => \CRM_Utils_Type::T_TEXT,
                 'title' => ts('Details'),
                                  'maxlength' => 65535,
                                   'rows' => 8,
@@ -393,7 +395,7 @@ class CCase extends \Civi\Core\Entity {
       
         'name' => 'status_id',
         'propertyName' => 'statusId',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Case Status'),
                         'required' => true,
                                              
@@ -412,7 +414,7 @@ class CCase extends \Civi\Core\Entity {
       
         'name' => 'is_deleted',
         'propertyName' => 'isDeleted',
-        'type' => CRM_Utils_Type::T_BOOLEAN,
+        'type' => \CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('Case is in the Trash'),
                                                      
                 'import' => true,

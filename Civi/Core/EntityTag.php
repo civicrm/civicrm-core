@@ -168,6 +168,8 @@ class EntityTag extends \Civi\Core\Entity {
    * @access public
    * @return array
    */
+  public static $_fields = NULL;
+
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
@@ -176,7 +178,7 @@ class EntityTag extends \Civi\Core\Entity {
       
         'name' => 'id',
         'propertyName' => 'id',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Entity Tag ID'),
                         'required' => true,
                                              
@@ -187,10 +189,10 @@ class EntityTag extends \Civi\Core\Entity {
       
         'name' => 'entity_table',
         'propertyName' => 'entityTable',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Entity Table'),
                                  'maxlength' => 64,
-                         'size' => CRM_Utils_Type::BIG,
+                         'size' => \CRM_Utils_Type::BIG,
                            
                                     
                           ),
@@ -199,7 +201,7 @@ class EntityTag extends \Civi\Core\Entity {
       
         'name' => 'entity_id',
         'propertyName' => 'entityId',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Entity ID'),
                         'required' => true,
                                              
@@ -210,12 +212,12 @@ class EntityTag extends \Civi\Core\Entity {
       
         'name' => 'tag_id',
         'propertyName' => 'tag',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Tag ID'),
                         'required' => true,
                                              
                                     
-                'FKClassName' => 'CRM_Core_Tag',
+                'FKClassName' => 'Civi_Core_Tag',
                                      'pseudoconstant' => array(
                                 'table' => 'civicrm_tag',
                       'keyColumn' => 'id',

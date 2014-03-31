@@ -348,6 +348,8 @@ class ContributionSoft extends \Civi\Core\Entity {
    * @access public
    * @return array
    */
+  public static $_fields = NULL;
+
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
@@ -356,7 +358,7 @@ class ContributionSoft extends \Civi\Core\Entity {
       
         'name' => 'id',
         'propertyName' => 'id',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Soft Contribution ID'),
                         'required' => true,
                                              
@@ -372,18 +374,18 @@ class ContributionSoft extends \Civi\Core\Entity {
       
         'name' => 'contribution_id',
         'propertyName' => 'contribution',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
                                     
-                'FKClassName' => 'CRM_Contribute_Contribution',
+                'FKClassName' => 'Civi_Contribute_Contribution',
                           ),
       
               'contribution_soft_contact_id' => array(
       
         'name' => 'contact_id',
         'propertyName' => 'contact',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Contact ID'),
                         'required' => true,
                                              
@@ -393,14 +395,14 @@ class ContributionSoft extends \Civi\Core\Entity {
         'dataPattern' => '/^\d+$/',
                          'export' => true,
                                    
-                'FKClassName' => 'CRM_Contact_Contact',
+                'FKClassName' => 'Civi_Contact_Contact',
                           ),
       
               'amount' => array(
       
         'name' => 'amount',
         'propertyName' => 'amount',
-        'type' => CRM_Utils_Type::T_MONEY,
+        'type' => \CRM_Utils_Type::T_MONEY,
                 'title' => ts('Amount'),
                         'required' => true,
                                              
@@ -416,10 +418,10 @@ class ContributionSoft extends \Civi\Core\Entity {
       
         'name' => 'currency',
         'propertyName' => 'currency',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Currency'),
                                  'maxlength' => 3,
-                         'size' => CRM_Utils_Type::FOUR,
+                         'size' => \CRM_Utils_Type::FOUR,
                            
                                            'default' => 'NULL',
          
@@ -435,18 +437,18 @@ class ContributionSoft extends \Civi\Core\Entity {
       
         'name' => 'pcp_id',
         'propertyName' => 'pcp',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                                                      
                                            'default' => 'NULL',
          
-                'FKClassName' => 'CRM_PCP_PCP',
+                'FKClassName' => 'Civi_PCP_PCP',
                           ),
       
               'pcp_display_in_roll' => array(
       
         'name' => 'pcp_display_in_roll',
         'propertyName' => 'pcpDisplayInRoll',
-        'type' => CRM_Utils_Type::T_BOOLEAN,
+        'type' => \CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('Pcp Display In Roll'),
                                                      
                                     
@@ -456,10 +458,10 @@ class ContributionSoft extends \Civi\Core\Entity {
       
         'name' => 'pcp_roll_nickname',
         'propertyName' => 'pcpRollNickname',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Pcp Roll Nickname'),
                                  'maxlength' => 255,
-                         'size' => CRM_Utils_Type::HUGE,
+                         'size' => \CRM_Utils_Type::HUGE,
                            
                                            'default' => 'NULL',
          
@@ -469,10 +471,10 @@ class ContributionSoft extends \Civi\Core\Entity {
       
         'name' => 'pcp_personal_note',
         'propertyName' => 'pcpPersonalNote',
-        'type' => CRM_Utils_Type::T_STRING,
+        'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Pcp Personal Note'),
                                  'maxlength' => 255,
-                         'size' => CRM_Utils_Type::HUGE,
+                         'size' => \CRM_Utils_Type::HUGE,
                            
                                            'default' => 'NULL',
          
@@ -482,7 +484,7 @@ class ContributionSoft extends \Civi\Core\Entity {
       
         'name' => 'soft_credit_type_id',
         'propertyName' => 'softCreditTypeId',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Soft Credit Type'),
                                                      
                                            'default' => 'NULL',

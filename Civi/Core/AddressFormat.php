@@ -108,6 +108,8 @@ class AddressFormat extends \Civi\Core\Entity {
    * @access public
    * @return array
    */
+  public static $_fields = NULL;
+
   static function &fields( ) {
     if ( !self::$_fields) {
       self::$_fields = array (
@@ -116,7 +118,7 @@ class AddressFormat extends \Civi\Core\Entity {
       
         'name' => 'id',
         'propertyName' => 'id',
-        'type' => CRM_Utils_Type::T_INT,
+        'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
                                              
                                     
@@ -126,7 +128,7 @@ class AddressFormat extends \Civi\Core\Entity {
       
         'name' => 'format',
         'propertyName' => 'format',
-        'type' => CRM_Utils_Type::T_TEXT,
+        'type' => \CRM_Utils_Type::T_TEXT,
                 'title' => ts('Address Format'),
                                  'maxlength' => 65535,
                                     
