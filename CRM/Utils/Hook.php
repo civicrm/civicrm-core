@@ -1497,4 +1497,32 @@ abstract class CRM_Utils_Hook {
   static function dashboard_defaults($availableDashlets, &$defaultDashlets) {
     return self::singleton()->invoke(2, $availableDashlets, $defaultDashlets, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, 'civicrm_dashboard_defaults');
   }
+
+  /**
+   * This hook is called before a case merge (or a case reassign)
+   * 
+   * @param type $mainContactId
+   * @param type $mainCaseId
+   * @param type $otherContactId
+   * @param type $otherCaseId
+   * @param type $changeClient
+   * @return void
+   */
+  static function pre_case_merge($mainContactId, $mainCaseId = NULL, $otherContactId = NULL, $otherCaseId = NULL, $changeClient = FALSE) {
+    return self::singleton()->invoke(5, $mainContactId, $mainCaseId, $otherContactId, $otherCaseId, $changeClient, 'civicrm_pre_case_merge');
+  }
+  
+  /**
+   * This hook is called after a case merge (or a case reassign)
+   * 
+   * @param type $mainContactId
+   * @param type $mainCaseId
+   * @param type $otherContactId
+   * @param type $otherCaseId
+   * @param type $changeClient
+   * @return void
+   */
+  static function post_case_merge($mainContactId, $mainCaseId = NULL, $otherContactId = NULL, $otherCaseId = NULL, $changeClient = FALSE) {
+    return self::singleton()->invoke(5, $mainContactId, $mainCaseId, $otherContactId, $otherCaseId, $changeClient, 'civicrm_post_case_merge');
+  }
 }
