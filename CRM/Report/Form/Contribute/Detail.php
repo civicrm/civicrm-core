@@ -45,11 +45,12 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
 
   protected $_softFrom = NULL;
 
-  protected $_customGroupExtends = array( 'Contribution');
+  protected $_customGroupExtends = array(
+    'Contribution', 'Individual', 'Contact', 'Organization', 'Household');
 
-  function __construct() {
+    function __construct() {
+     // Check if CiviCampaign is a) enabled and b) has active campaigns
 
-    // Check if CiviCampaign is a) enabled and b) has active campaigns
     $config = CRM_Core_Config::singleton();
     $campaignEnabled = in_array("CiviCampaign", $config->enableComponents);
     if ($campaignEnabled) {
@@ -70,6 +71,12 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
       'first_name' => array('title' => ts('First Name'),
           ),
       'last_name' => array('title' => ts('Last Name'),
+          ),
+          'first_name' => array(
+            'title' => ts('Donor First Name')
+          ),
+          'last_name' => array(
+            'title' => ts('Donor Last Name')
           ),
           'id' =>
           array(
@@ -264,6 +271,11 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Contribute_PseudoConstant::paymentInstrument(),
             'type' => CRM_Utils_Type::T_INT,
+          ),
+          'contribution_source' => array(
+            'title' => 'Contribution Source',
+            'name' => 'source',
+            'type' => CRM_Utils_Type::T_STRING,
           ),
           'contribution_status_id' =>
           array('title' => ts('Contribution Status'),
