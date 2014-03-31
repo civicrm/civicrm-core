@@ -44,11 +44,11 @@ class CRM_Core_DAO_AllCoreTables {ldelim}
     if ($init && !$fresh) return;
 
     $entityTypes = array(
-{foreach from=$metadata key=index item=class_metadata}
-      '{$class_metadata->dao_full_class_name}' => array(
-        'name' => '{$class_metadata->dao_class_name}',
-        'class' => '{$class_metadata->dao_full_class_name}',
-        'table' => '{$class_metadata->getTableName()}',
+{foreach from=$tables key=index item=table}
+      '{$table.className}' => array(
+        'name' => '{$table.objectName}',
+        'class' => '{$table.className}',
+        'table' => '{$table.name}',
       ),
 {/foreach}
     );

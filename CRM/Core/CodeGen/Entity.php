@@ -9,21 +9,21 @@ class CRM_Core_CodeGen_Entity extends CRM_Core_CodeGen_BaseTask {
   }
 
   function generateEntitys() {
-    foreach (array_keys($this->tables) as $name) {
-      echo "Generating entity " . $this->tables[$name]['fileName'] ." for $name \n";
+    foreach ($this->config->tables as $table) {
+      echo "Generating entity {$table['fileName']} for {$table['name']} \n";
 
-      if (empty($this->tables[$name]['base'])) {
-        echo "No base defined for $name, skipping output generation\n";
+      if (empty($table['base'])) {
+        echo "No base defined for {$table['name']}, skipping output generation\n";
         continue;
       }
 
-      $template = new CRM_Core_CodeGen_Util_Template('');
-      $template->assign('table', $this->tables[$name]);
+      $template = new CRM_Core_CodeGen_Util_Template($this->config, '');
+      $template->assign('table', $table);
 
-      $directory = $this->config->phpCodePath . $this->tables[$name]['base'];
-      CRM_Core_CodeGen_Util_File::createDir($directory);
-
-      $template->run('entity.tpl', $directory . $this->tables[$name]['fileName']);
+      $directory_path = CRM_Utils_Path::join($this->config->phpCodePath, $table['base']);
+      CRM_Core_CodeGen_Util_File::createDir($directory_path);
+      $file_path = CRM_Utils_Path::join($directory_path, $table['fileName']);
+      $template->run('entity.tpl', $file_path);
     }
   }
 }

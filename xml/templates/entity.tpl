@@ -114,6 +114,8 @@ class {$table.className} extends \Civi\Core\Entity {ldelim}
    * @access public
    * @return array
    */
+  public static $_fields = NULL;
+
   static function &fields( ) {ldelim}
     if ( !self::$_fields) {ldelim}
       self::$_fields = array (

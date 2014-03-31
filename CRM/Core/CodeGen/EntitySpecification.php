@@ -75,50 +75,14 @@ class CRM_Core_CodeGen_EntitySpecification {
   }
 
   function getTables($dbXML, &$database) {
-    // skip entity generation for tables where manual changes are needed.
-    $skipTables = array(
-      // these tables needs special handling for entity_table, entity_id
-      'civicrm_acl_entity_role',
-      'civicrm_action_log',
-      'civicrm_campaign_group',
-      'civicrm_entity_batch',
-      'civicrm_entity_file',
-      'civicrm_entity_financial_account',
-      'civicrm_entity_financial_trxn',
-      'civicrm_entity_tag',
-      'civicrm_line_item',
-      'civicrm_log',
-      'civicrm_mailing_group',
-      'civicrm_note',
-      'civicrm_pcp_block',
-      'civicrm_pledge_block',
-      'civicrm_prevnext_cache',
-      'civicrm_price_set_entity',
-      'civicrm_tell_friend',
-      'civicrm_uf_join',
-      // case table's are skipped to prevent syntax error generated due "Case" reserved word
-      'civicrm_case',
-      'civicrm_case_activity',
-      'civicrm_case_contact',
-      'civicrm_relationship',
-    );
-    //$skipTables = array();
     $tables = array();
     foreach ($dbXML->tables as $tablesXML) {
       foreach ($tablesXML->table as $tableXML) {
-        if (($this->value('drop', $tableXML, 0) > 0 AND $this->value('drop', $tableXML, 0) <= $this->buildVersion)
-          OR in_array($tableXML->name, $skipTables)
-        ) {
-          echo "Skipping entity generation for " .$tableXML->name . "\n";
-          continue;
-        }
-
         if ($this->value('add', $tableXML, 0) <= $this->buildVersion) {
           $this->getTable($tableXML, $database, $tables);
         }
       }
     }
-
     return $tables;
   }
 
@@ -192,12 +156,19 @@ class CRM_Core_CodeGen_EntitySpecification {
 
   function getTable($tableXML, &$database, &$tables) {
     $name = trim((string ) $tableXML->name);
-    $klass = trim((string ) $tableXML->class);
+    $dao_class = trim((string ) $tableXML->class);
     $base = $this->value('base', $tableXML);
-    $sourceFile = "xml/schema/{$base}/{$klass}.xml";
-    $daoPath = "{$base}" . DIRECTORY_SEPARATOR;
-    $pre = str_replace('/', '_', $daoPath);
-    $this->classNames[$name] = $pre . $klass;
+    $sourceFile = "xml/schema/{$base}/{$dao_class}.xml";
+    $entity_class = $dao_class;
+    if ($entity_class == 'Case') {
+      $entity_class = 'CCase';
+    }
+    $entity_base = str_replace('CRM', 'Civi', $base);
+    if ($entity_base == 'Civi/Case') {
+      $entity_base = 'Civi/CCase';
+    }
+    $pre = str_replace('/', '_', $entity_base);
+    $this->classNames[$name] = "{$pre}_{$entity_class}";
 
     $localizable = FALSE;
     foreach ($tableXML->field as $fieldXML) {
@@ -209,13 +180,13 @@ class CRM_Core_CodeGen_EntitySpecification {
 
     $table = array(
       'name' => $name,
-      'base' => str_replace('CRM', 'Civi', $daoPath),
-      'namespace' => str_replace('/', '\\', str_replace('CRM', 'Civi', $base)),
+      'base' => $entity_base,
+      'namespace' => str_replace('/', '\\', $entity_base),
       'sourceFile' => $sourceFile,
-      'fileName' => $klass . '.php',
-      'objectName' => $klass,
+      'fileName' => $entity_class . '.php',
+      'objectName' => $entity_class,
       'labelName' => substr($name, 8),
-      'className' => $klass,
+      'className' => $entity_class,
       'attributes_simple' => trim($database['tableAttributes_simple']),
       'attributes_modern' => trim($database['tableAttributes_modern']),
       'comment' => $this->value('comment', $tableXML),
@@ -379,24 +350,24 @@ class CRM_Core_CodeGen_EntitySpecification {
         $field['length'] = (int) $fieldXML->length;
         $field['sqlType'] = "$type({$field['length']})";
         $field['phpType'] = 'string';
-        $field['crmType'] = 'CRM_Utils_Type::T_STRING';
+        $field['crmType'] = '\\CRM_Utils_Type::T_STRING';
         $field['size'] = $this->getSize($fieldXML);
         break;
 
       case 'mediumblob':
         $field['sqlType'] = $field['phpType'] = 'blob';
-        $field['crmType'] = 'CRM_Utils_Type::T_' . strtoupper($type);
+        $field['crmType'] = '\\CRM_Utils_Type::T_' . strtoupper($type);
         $field['length']  = '16777215';
         break;
 
       case 'longtext':
         $field['sqlType'] = $field['phpType'] = 'text';
-        $field['crmType'] = 'CRM_Utils_Type::T_' . strtoupper($type);
+        $field['crmType'] = '\\CRM_Utils_Type::T_' . strtoupper($type);
         break;
 
       case 'text':
         $field['sqlType'] = $field['phpType'] = $type;
-        $field['crmType'] = 'CRM_Utils_Type::T_' . strtoupper($type);
+        $field['crmType'] = '\\CRM_Utils_Type::T_' . strtoupper($type);
         $field['length']  = '65535';
         // CRM-13497 see fixme below
         $field['rows'] = isset($fieldXML->html) ? $this->value('rows', $fieldXML->html) : NULL;
@@ -407,7 +378,7 @@ class CRM_Core_CodeGen_EntitySpecification {
         $field['version'] = true;
       case 'datetime':
         $field['sqlType'] = $field['phpType'] = 'datetime';
-        $field['crmType'] = 'CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME';
+        $field['crmType'] = '\\CRM_Utils_Type::T_DATE + \\CRM_Utils_Type::T_TIME';
         break;
 
       case 'boolean':
@@ -415,30 +386,30 @@ class CRM_Core_CodeGen_EntitySpecification {
         // is changed to tinyint. hopefully after 2 yrs this case can be removed.
         $field['sqlType'] = 'tinyint';
         $field['phpType'] = $type;
-        $field['crmType'] = 'CRM_Utils_Type::T_' . strtoupper($type);
+        $field['crmType'] = '\\CRM_Utils_Type::T_' . strtoupper($type);
         break;
 
       case 'decimal':
         $length = $fieldXML->length ? $fieldXML->length : '20,2';
         $field['sqlType'] = 'decimal(' . $length . ')';
         $field['phpType'] = 'float';
-        $field['crmType'] = 'CRM_Utils_Type::T_MONEY';
+        $field['crmType'] = '\\CRM_Utils_Type::T_MONEY';
         break;
 
       case 'float':
         $field['sqlType'] = 'double';
         $field['phpType'] = 'float';
-        $field['crmType'] = 'CRM_Utils_Type::T_FLOAT';
+        $field['crmType'] = '\\CRM_Utils_Type::T_FLOAT';
         break;
 
       default:
         $field['sqlType'] = $field['phpType'] = $type;
         if (in_array($type, array('int unsigned', 'int'))) {
           $field['phpType'] = 'integer';
-          $field['crmType'] = 'CRM_Utils_Type::T_INT';
+          $field['crmType'] = '\\CRM_Utils_Type::T_INT';
         }
         else {
-          $field['crmType'] = 'CRM_Utils_Type::T_' . strtoupper($type);
+          $field['crmType'] = '\\CRM_Utils_Type::T_' . strtoupper($type);
         }
         break;
     }
@@ -700,7 +671,7 @@ class CRM_Core_CodeGen_EntitySpecification {
   protected function getSize($fieldXML) {
     // Extract from <size> tag if supplied
     if (!empty($fieldXML->html) && $this->value('size', $fieldXML->html)) {
-      $const = 'CRM_Utils_Type::' . strtoupper($fieldXML->html->size);
+      $const = '\\CRM_Utils_Type::' . strtoupper($fieldXML->html->size);
       if (defined($const)) {
         return $const;
       }
@@ -720,9 +691,9 @@ class CRM_Core_CodeGen_EntitySpecification {
     );
     foreach ($sizes as $length => $name) {
       if ($fieldXML->length <= $length) {
-        return "CRM_Utils_Type::$name";
+        return "\\CRM_Utils_Type::$name";
       }
     }
-    return 'CRM_Utils_Type::HUGE';
+    return '\\CRM_Utils_Type::HUGE';
   }
 }

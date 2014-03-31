@@ -167,7 +167,7 @@ class {$table.className} extends CRM_Core_DAO {ldelim}
       static function &fieldKeys( ) {ldelim}
         if (!(self::$_fieldKeys)) {ldelim}
           self::$_fieldKeys = array();
-          foreach (self::$_fields as $unique_name => $field) {ldelim}
+          foreach (self::fields() as $unique_name => $field) {ldelim}
             self::$_fieldKeys[$field['name']] = $unique_name;
           {rdelim}
         {rdelim}
