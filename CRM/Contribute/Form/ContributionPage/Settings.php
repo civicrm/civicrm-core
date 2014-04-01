@@ -81,12 +81,9 @@ class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_
       $ufJoinDAO->entity_id = $this->_id;
       if ($ufJoinDAO->find(TRUE)) {
         $defaults['honoree_profile'] = $ufJoinDAO->uf_group_id;
-        $jsonData = json_decode($ufJoinDAO->module_data);
-        if ($jsonData) {
-          foreach ($jsonData->soft_credit as $index => $value){
-            $defaults[$index] = $value;
-          }
-        }
+        $jsonData = CRM_Contribute_BAO_ContributionPage::formatMultilingualHonorParams($ufJoinDAO->module_data, TRUE);
+        $defaults = array_merge($defaults, $jsonData);
+        $defaults['honor_block_is_active'] = $ufJoinDAO->is_active;
       }
       else {
         $ufGroupDAO = new CRM_Core_DAO_UFGroup();
@@ -345,14 +342,7 @@ class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_
       $params['honor_block_text'] = NULL;
     }
     else {
-      $sctJSON = json_encode(array(
-        'soft_credit' => array(
-          'soft_credit_types' => $params['soft_credit_types'],
-          'honor_block_title' => $params['honor_block_title'],
-          'honor_block_text' => $params['honor_block_text']
-          )
-        )
-      );
+      $sctJSON = CRM_Contribute_BAO_ContributionPage::formatMultilingualHonorParams($params);
     }
 
     $dao = CRM_Contribute_BAO_ContributionPage::create($params);
@@ -379,6 +369,7 @@ class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_
           $ufJoinParam['weight'] = 1;
           if ($index == 'honor_block_is_active') {
             $ufJoinParam['is_active'] = 1;
+            $ufJoinParam['module'] = 'soft_credit';
             $ufJoinParam['uf_group_id'] = $params['honoree_profile'];
             $ufJoinParam['module_data'] = $sctJSON;
           }
