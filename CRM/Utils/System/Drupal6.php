@@ -956,7 +956,7 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
       return false;
     }
     $hour = $user->timezone / 3600;
-    $timeZoneOffset = sprintf("%02d:%02d", $timezone / 3600, ($timezone/60)%60 );
+    $timeZoneOffset = sprintf("%02d:%02d", $timezone / 3600, abs(($timeZoneOffset/60)%60));
     if($timeZoneOffset > 0){
       $timeZoneOffset = '+' . $timeZoneOffset;
     }

@@ -982,7 +982,7 @@ AND    u.status = 1
       return false;
     }
 
-    $timeZoneOffset = sprintf("%02d:%02d", $tz / 3600, ($tz/60)%60 );
+    $timeZoneOffset = sprintf("%02d:%02d", $tz / 3600, abs(($tz/60)%60));
 
     if($timeZoneOffset > 0){
       $timeZoneOffset = '+' . $timeZoneOffset;
