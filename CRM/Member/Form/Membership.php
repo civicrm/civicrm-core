@@ -1010,7 +1010,9 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
             $endDate,
             $joinDate,
             'today',
-            TRUE
+            TRUE,
+            $memType,
+            $params
           );
           if (empty($calcStatus)) {
             $url = CRM_Utils_System::url('civicrm/admin/member/membershipStatus', 'reset=1&action=browse');
