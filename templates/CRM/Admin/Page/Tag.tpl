@@ -117,7 +117,7 @@ CRM.$(function($) {
       open: function() {
         var dialog = this;
         $('input[name=select_merge_tag]', dialog)
-          .select2({
+          .crmSelect2({
             placeholder: {/literal}'{ts escape="js"}- select tag -{/ts}'{literal},
             minimumInputLength: 1,
             ajax: {

@@ -246,7 +246,7 @@ CRM.validate = CRM.validate || {
     return $(this).each(function () {
       var
         $el = $(this),
-        defaults = {allowClear: !$el.hasClass('required')};
+        settings = {allowClear: !$el.hasClass('required')};
       // quickform doesn't support optgroups so here's a hack :(
       $('option[value^=crm_optgroup]', this).each(function () {
         $(this).nextUntil('option[value^=crm_optgroup]').wrapAll('<optgroup label="' + $(this).text() + '" />');
@@ -254,12 +254,16 @@ CRM.validate = CRM.validate || {
       });
       // Defaults for single-selects
       if ($el.is('select:not([multiple])')) {
-        defaults.minimumResultsForSearch = 10;
+        settings.minimumResultsForSearch = 10;
         if ($('option:first', this).val() === '') {
-          defaults.placeholderOption = 'first';
+          settings.placeholderOption = 'first';
         }
       }
-      $el.select2($.extend(defaults, $el.data('select-params') || {}, options || {}));
+      $.extend(settings, $el.data('select-params') || {}, options || {});
+      if (settings.ajax) {
+        $el.addClass('crm-ajax-select');
+      }
+      $el.select2(settings);
     });
   };
 
@@ -279,7 +283,7 @@ CRM.validate = CRM.validate || {
       $el.data('select-params', $.extend({}, $el.data('select-params') || {}, options.select));
       $el.data('api-params', $.extend({}, $el.data('api-params') || {}, options.api));
       $el.data('create-links', options.create || $el.data('create-links'));
-      $el.addClass('crm-ajax-select crm-' + entity + '-ref');
+      $el.addClass('crm-form-entityref crm-' + entity + '-ref');
       var settings = {
         // Use select2 ajax helper instead of CRM.api because it provides more value
         ajax: {
@@ -427,7 +431,7 @@ CRM.validate = CRM.validate || {
       }
       $el.parent().find('.ui-dialog-titlebar-close').attr('title', ts('Close'));
       // Add resize button
-      if ($el.parent().hasClass('crm-container')) {
+      if ($el.parent().hasClass('crm-container') && $el.dialog('option', 'resizable')) {
         $el.parent().find('.ui-dialog-titlebar').append($('<button class="crm-dialog-titlebar-resize ui-dialog-titlebar-close" title="'+ts('Resize')+'" style="right:2em;"/>').button({icons: {primary: 'ui-icon-newwin'}, text: false}));
         $('.crm-dialog-titlebar-resize', $el.parent()).click(function(e) {
           if ($el.data('origSize')) {
@@ -660,6 +664,7 @@ CRM.validate = CRM.validate || {
       message: ts('Are you sure you want to continue?'),
       width: 'auto',
       modal: true,
+      resizable: false,
       dialogClass: 'crm-container crm-confirm',
       close: function () {
         $(this).dialog('destroy').remove();
@@ -803,6 +808,7 @@ CRM.validate = CRM.validate || {
       .on('click', 'a.crm-image-popup', function(e) {
         CRM.confirm({
           title: ts('Preview'),
+          resizable: true,
           message: '<div class="crm-custom-image-popup"><img src=' + $(this).attr('href') + '></div>',
           options: null
         });

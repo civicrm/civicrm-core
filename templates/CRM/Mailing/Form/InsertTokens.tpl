@@ -356,7 +356,7 @@ CRM.$(function($) {
   $('input.crm-token-selector', form)
     .addClass('crm-action-menu')
     .change(insertToken)
-    .select2({
+    .crmSelect2({
       data: form.data('tokens'),
       placeholder: '{/literal}{ts escape='js'}Insert Token{/ts}{literal}'
     });
