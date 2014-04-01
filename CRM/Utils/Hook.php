@@ -816,7 +816,7 @@ abstract class CRM_Utils_Hook {
    */
   static function alterCalculatedMembershipStatus(&$membershipStatus, $arguments, $membership) {
     return self::singleton()->invoke(3, $membershipStatus, $arguments,
-      $membership, self::$_nullObject, self::$_nullObject,
+      $membership, self::$_nullObject, self::$_nullObject, self::$_nullObject,
       'civicrm_alterCalculatedMembershipStatus'
     );
   }
