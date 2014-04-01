@@ -125,7 +125,7 @@ class CRM_Member_BAO_MembershipStatusTest extends CiviUnitTestCase {
     $membershipStatus = CRM_Member_BAO_MembershipStatus::add($params);
     $toDate = date('Ymd');
 
-    $result = CRM_Member_BAO_MembershipStatus::getMembershipStatusByDate($toDate, $toDate, $toDate, NULL, $params);
+    $result = CRM_Member_BAO_MembershipStatus::getMembershipStatusByDate($toDate, $toDate, $toDate, 'today', TRUE, NULL, $params);
     $this->assertEquals($result['name'], 'Current', 'Verify membership status record.');
   }
 
