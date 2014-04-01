@@ -802,6 +802,26 @@ abstract class CRM_Utils_Hook {
   }
 
   /**
+   * This hook is called when membership status is being calculated
+   *
+   * @param array $membershipStatus membership status details as determined - alter if required
+   * @param array $arguments arguments passed in to calculate date
+   * - 'start_date'
+   * - 'end_date'
+   * - 'status_date'
+   * - 'join_date'
+   * - 'exclude_is_admin'
+   * - 'membership_type_id'
+   * @param array $membership membership details from the calling function
+   */
+  static function alterCalculatedMembershipStatus(&$membershipStatus, $arguments, $membership) {
+    return self::singleton()->invoke(3, $membershipStatus, $arguments,
+      $membership, self::$_nullObject, self::$_nullObject,
+      'civicrm_alterCalculatedMembershipStatus'
+    );
+  }
+
+  /**
    * This hook is called when rendering the Manage Case screen
    *
    * @param int $caseID - the case ID
