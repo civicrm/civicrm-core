@@ -432,7 +432,7 @@ CRM.validate = CRM.validate || {
       $el.parent().find('.ui-dialog-titlebar-close').attr('title', ts('Close'));
       // Add resize button
       if ($el.parent().hasClass('crm-container') && $el.dialog('option', 'resizable')) {
-        $el.parent().find('.ui-dialog-titlebar').append($('<button class="crm-dialog-titlebar-resize ui-dialog-titlebar-close" title="'+ts('Resize')+'" style="right:2em;"/>').button({icons: {primary: 'ui-icon-newwin'}, text: false}));
+        $el.parent().find('.ui-dialog-titlebar').append($('<button class="crm-dialog-titlebar-resize ui-dialog-titlebar-close" title="'+ts('Toggle fullscreen')+'" style="right:2em;"/>').button({icons: {primary: 'ui-icon-newwin'}, text: false}));
         $('.crm-dialog-titlebar-resize', $el.parent()).click(function(e) {
           if ($el.data('origSize')) {
             $el.dialog('option', $el.data('origSize'));
