@@ -623,10 +623,11 @@ abstract class CRM_Utils_Hook {
    *   Only add/edit/remove the specific field options you intend to affect.
    * @param boolean $detailedFormat - if true,
    *                the options are in an ID => array ( 'id' => ID, 'label' => label, 'value' => value ) format
+   * @param array $selectAttributes contain select attribute(s) if any
    *
    * @return mixed
    */
-  static function customFieldOptions($customFieldID, &$options, $detailedFormat = FALSE) {
+  static function customFieldOptions($customFieldID, &$options, $detailedFormat = FALSE, $selectAttributes = array()) {
     return self::singleton()->invoke(3, $customFieldID, $options, $detailedFormat,
       self::$_nullObject, self::$_nullObject, self::$_nullObject,
       'civicrm_customFieldOptions'
