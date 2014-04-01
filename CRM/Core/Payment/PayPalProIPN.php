@@ -471,15 +471,6 @@ INNER JOIN civicrm_membership_payment mp ON m.id = mp.membership_id AND mp.contr
    * Handle payment express IPNs
    * For one off IPNS no actual response is required
    * Recurring is more difficult as we have limited confirmation material
-   */
-  function handlePaymentExpress() {
-    throw new CRM_Core_Exception('Payment Express IPNS not currently handled');
-  }
-
-  /**
-   * Handle payment express IPNs
-   * For one off IPNS no actual response is required
-   * Recurring is more difficult as we have limited confirmation material
    * lets look up invoice id in recur_contribution & rely on the unique transaction id to ensure no
    * duplicated
    * this may not be acceptable to all sites - e.g. if they are shipping or delivering something in return
