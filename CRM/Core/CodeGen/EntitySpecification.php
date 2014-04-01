@@ -218,7 +218,7 @@ class CRM_Core_CodeGen_EntitySpecification {
         $field['columnInfo'] .= ', length=' . $field['length'];
       }
 
-      if (isset($field['default'])) {
+      if (isset($field['required']) && $field['required'] != "false") {
         $field['columnInfo'] .= ', nullable=false';
       }
       else {
