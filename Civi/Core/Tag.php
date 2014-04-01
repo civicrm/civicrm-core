@@ -67,7 +67,7 @@ class Tag extends \Civi\Core\Entity {
    * @var string
    *
    * @JMS\Type("string")
-   * @ORM\Column(name="name", type="string", length=64, nullable=true)
+   * @ORM\Column(name="name", type="string", length=64, nullable=false)
    * 
    * 
    */
@@ -97,7 +97,7 @@ class Tag extends \Civi\Core\Entity {
    * @var boolean
    *
    * @JMS\Type("boolean")
-   * @ORM\Column(name="is_selectable", type="boolean", nullable=false)
+   * @ORM\Column(name="is_selectable", type="boolean", nullable=true, options={"default": 1})
    * 
    * 
    */
@@ -107,7 +107,7 @@ class Tag extends \Civi\Core\Entity {
    * @var boolean
    *
    * @JMS\Type("boolean")
-   * @ORM\Column(name="is_reserved", type="boolean", nullable=false)
+   * @ORM\Column(name="is_reserved", type="boolean", nullable=true, options={"default": 0})
    * 
    * 
    */
@@ -117,7 +117,7 @@ class Tag extends \Civi\Core\Entity {
    * @var boolean
    *
    * @JMS\Type("boolean")
-   * @ORM\Column(name="is_tagset", type="boolean", nullable=false)
+   * @ORM\Column(name="is_tagset", type="boolean", nullable=true, options={"default": 0})
    * 
    * 
    */
@@ -127,7 +127,7 @@ class Tag extends \Civi\Core\Entity {
    * @var string
    *
    * @JMS\Type("string")
-   * @ORM\Column(name="used_for", type="string", length=64, nullable=false)
+   * @ORM\Column(name="used_for", type="string", length=64, nullable=true)
    * 
    * 
    */

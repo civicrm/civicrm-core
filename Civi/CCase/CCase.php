@@ -67,7 +67,7 @@ class CCase extends \Civi\Core\Entity {
    * @var string
    *
    * @JMS\Type("string")
-   * @ORM\Column(name="case_type_id", type="string", length=128, nullable=true)
+   * @ORM\Column(name="case_type_id", type="string", length=128, nullable=false)
    * 
    * 
    */
@@ -117,7 +117,7 @@ class CCase extends \Civi\Core\Entity {
    * @var integer
    *
    * @JMS\Type("integer")
-   * @ORM\Column(name="status_id", type="integer", nullable=true, options={"unsigned":true})
+   * @ORM\Column(name="status_id", type="integer", nullable=false, options={"unsigned":true})
    * 
    * 
    */
@@ -127,7 +127,7 @@ class CCase extends \Civi\Core\Entity {
    * @var boolean
    *
    * @JMS\Type("boolean")
-   * @ORM\Column(name="is_deleted", type="boolean", nullable=false)
+   * @ORM\Column(name="is_deleted", type="boolean", nullable=true, options={"default": 0})
    * 
    * 
    */

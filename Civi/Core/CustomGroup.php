@@ -77,7 +77,7 @@ class CustomGroup extends \Civi\Core\Entity {
    * @var string
    *
    * @JMS\Type("string")
-   * @ORM\Column(name="title", type="string", length=64, nullable=true)
+   * @ORM\Column(name="title", type="string", length=64, nullable=false)
    * 
    * 
    */
@@ -87,7 +87,7 @@ class CustomGroup extends \Civi\Core\Entity {
    * @var string
    *
    * @JMS\Type("string")
-   * @ORM\Column(name="extends", type="string", length=255, nullable=false)
+   * @ORM\Column(name="extends", type="string", length=255, nullable=true, options={"default": "Contact"})
    * 
    * 
    */
@@ -97,7 +97,7 @@ class CustomGroup extends \Civi\Core\Entity {
    * @var integer
    *
    * @JMS\Type("integer")
-   * @ORM\Column(name="extends_entity_column_id", type="integer", nullable=false, options={"unsigned":true})
+   * @ORM\Column(name="extends_entity_column_id", type="integer", nullable=true, options={"unsigned":true})
    * 
    * 
    */
@@ -127,7 +127,7 @@ class CustomGroup extends \Civi\Core\Entity {
    * @var integer
    *
    * @JMS\Type("integer")
-   * @ORM\Column(name="collapse_display", type="integer", nullable=false, options={"unsigned":true})
+   * @ORM\Column(name="collapse_display", type="integer", nullable=true, options={"unsigned":true, "default": 0})
    * 
    * 
    */
@@ -157,7 +157,7 @@ class CustomGroup extends \Civi\Core\Entity {
    * @var integer
    *
    * @JMS\Type("integer")
-   * @ORM\Column(name="weight", type="integer", nullable=false, options={"unsigned":true})
+   * @ORM\Column(name="weight", type="integer", nullable=false, options={"unsigned":true, "default": 1})
    * 
    * 
    */
@@ -217,7 +217,7 @@ class CustomGroup extends \Civi\Core\Entity {
    * @var integer
    *
    * @JMS\Type("integer")
-   * @ORM\Column(name="collapse_adv_display", type="integer", nullable=false, options={"unsigned":true})
+   * @ORM\Column(name="collapse_adv_display", type="integer", nullable=true, options={"unsigned":true, "default": 0})
    * 
    * 
    */
@@ -247,7 +247,7 @@ class CustomGroup extends \Civi\Core\Entity {
    * @var boolean
    *
    * @JMS\Type("boolean")
-   * @ORM\Column(name="is_reserved", type="boolean", nullable=false)
+   * @ORM\Column(name="is_reserved", type="boolean", nullable=true, options={"default": 0})
    * 
    * 
    */

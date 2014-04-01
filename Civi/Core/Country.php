@@ -137,7 +137,7 @@ class Country extends \Civi\Core\Entity {
    * @var boolean
    *
    * @JMS\Type("boolean")
-   * @ORM\Column(name="is_province_abbreviated", type="boolean", nullable=false)
+   * @ORM\Column(name="is_province_abbreviated", type="boolean", nullable=true, options={"default": 0})
    * 
    * 
    */

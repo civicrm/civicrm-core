@@ -67,7 +67,7 @@ class FinancialAccount extends \Civi\Core\Entity {
    * @var string
    *
    * @JMS\Type("string")
-   * @ORM\Column(name="name", type="string", length=255, nullable=true)
+   * @ORM\Column(name="name", type="string", length=255, nullable=false)
    * 
    * 
    */
@@ -87,7 +87,7 @@ class FinancialAccount extends \Civi\Core\Entity {
    * @var integer
    *
    * @JMS\Type("integer")
-   * @ORM\Column(name="financial_account_type_id", type="integer", nullable=false, options={"unsigned":true})
+   * @ORM\Column(name="financial_account_type_id", type="integer", nullable=false, options={"unsigned":true, "default": 3})
    * 
    * 
    */
@@ -137,7 +137,7 @@ class FinancialAccount extends \Civi\Core\Entity {
    * @var boolean
    *
    * @JMS\Type("boolean")
-   * @ORM\Column(name="is_header_account", type="boolean", nullable=false)
+   * @ORM\Column(name="is_header_account", type="boolean", nullable=true, options={"default": 0})
    * 
    * 
    */
@@ -147,7 +147,7 @@ class FinancialAccount extends \Civi\Core\Entity {
    * @var boolean
    *
    * @JMS\Type("boolean")
-   * @ORM\Column(name="is_deductible", type="boolean", nullable=false)
+   * @ORM\Column(name="is_deductible", type="boolean", nullable=true, options={"default": 1})
    * 
    * 
    */
@@ -157,7 +157,7 @@ class FinancialAccount extends \Civi\Core\Entity {
    * @var boolean
    *
    * @JMS\Type("boolean")
-   * @ORM\Column(name="is_tax", type="boolean", nullable=false)
+   * @ORM\Column(name="is_tax", type="boolean", nullable=true, options={"default": 0})
    * 
    * 
    */

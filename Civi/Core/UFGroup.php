@@ -67,7 +67,7 @@ class UFGroup extends \Civi\Core\Entity {
    * @var boolean
    *
    * @JMS\Type("boolean")
-   * @ORM\Column(name="is_active", type="boolean", nullable=false)
+   * @ORM\Column(name="is_active", type="boolean", nullable=true, options={"default": 1})
    * 
    * 
    */
@@ -87,7 +87,7 @@ class UFGroup extends \Civi\Core\Entity {
    * @var string
    *
    * @JMS\Type("string")
-   * @ORM\Column(name="title", type="string", length=64, nullable=true)
+   * @ORM\Column(name="title", type="string", length=64, nullable=false)
    * 
    * 
    */
@@ -157,7 +157,7 @@ class UFGroup extends \Civi\Core\Entity {
    * @var boolean
    *
    * @JMS\Type("boolean")
-   * @ORM\Column(name="add_captcha", type="boolean", nullable=false)
+   * @ORM\Column(name="add_captcha", type="boolean", nullable=true, options={"default": 0})
    * 
    * 
    */
@@ -167,7 +167,7 @@ class UFGroup extends \Civi\Core\Entity {
    * @var boolean
    *
    * @JMS\Type("boolean")
-   * @ORM\Column(name="is_map", type="boolean", nullable=false)
+   * @ORM\Column(name="is_map", type="boolean", nullable=true, options={"default": 0})
    * 
    * 
    */
@@ -177,7 +177,7 @@ class UFGroup extends \Civi\Core\Entity {
    * @var boolean
    *
    * @JMS\Type("boolean")
-   * @ORM\Column(name="is_edit_link", type="boolean", nullable=false)
+   * @ORM\Column(name="is_edit_link", type="boolean", nullable=true, options={"default": 0})
    * 
    * 
    */
@@ -187,7 +187,7 @@ class UFGroup extends \Civi\Core\Entity {
    * @var boolean
    *
    * @JMS\Type("boolean")
-   * @ORM\Column(name="is_uf_link", type="boolean", nullable=false)
+   * @ORM\Column(name="is_uf_link", type="boolean", nullable=true, options={"default": 0})
    * 
    * 
    */
@@ -197,7 +197,7 @@ class UFGroup extends \Civi\Core\Entity {
    * @var boolean
    *
    * @JMS\Type("boolean")
-   * @ORM\Column(name="is_update_dupe", type="boolean", nullable=false)
+   * @ORM\Column(name="is_update_dupe", type="boolean", nullable=true, options={"default": 0})
    * 
    * 
    */
@@ -217,7 +217,7 @@ class UFGroup extends \Civi\Core\Entity {
    * @var boolean
    *
    * @JMS\Type("boolean")
-   * @ORM\Column(name="is_cms_user", type="boolean", nullable=false)
+   * @ORM\Column(name="is_cms_user", type="boolean", nullable=true, options={"default": 0})
    * 
    * 
    */
@@ -277,7 +277,7 @@ class UFGroup extends \Civi\Core\Entity {
    * @var boolean
    *
    * @JMS\Type("boolean")
-   * @ORM\Column(name="is_proximity_search", type="boolean", nullable=false)
+   * @ORM\Column(name="is_proximity_search", type="boolean", nullable=true, options={"default": 0})
    * 
    * 
    */

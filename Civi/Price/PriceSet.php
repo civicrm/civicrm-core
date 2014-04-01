@@ -77,7 +77,7 @@ class PriceSet extends \Civi\Core\Entity {
    * @var string
    *
    * @JMS\Type("string")
-   * @ORM\Column(name="name", type="string", length=255, nullable=true)
+   * @ORM\Column(name="name", type="string", length=255, nullable=false)
    * 
    * 
    */
@@ -87,7 +87,7 @@ class PriceSet extends \Civi\Core\Entity {
    * @var string
    *
    * @JMS\Type("string")
-   * @ORM\Column(name="title", type="string", length=255, nullable=true)
+   * @ORM\Column(name="title", type="string", length=255, nullable=false)
    * 
    * 
    */
@@ -97,7 +97,7 @@ class PriceSet extends \Civi\Core\Entity {
    * @var boolean
    *
    * @JMS\Type("boolean")
-   * @ORM\Column(name="is_active", type="boolean", nullable=false)
+   * @ORM\Column(name="is_active", type="boolean", nullable=true, options={"default": 1})
    * 
    * 
    */
@@ -137,7 +137,7 @@ class PriceSet extends \Civi\Core\Entity {
    * @var string
    *
    * @JMS\Type("string")
-   * @ORM\Column(name="extends", type="string", length=255, nullable=true)
+   * @ORM\Column(name="extends", type="string", length=255, nullable=false)
    * 
    * 
    */
@@ -157,7 +157,7 @@ class PriceSet extends \Civi\Core\Entity {
    * @var boolean
    *
    * @JMS\Type("boolean")
-   * @ORM\Column(name="is_quick_config", type="boolean", nullable=false)
+   * @ORM\Column(name="is_quick_config", type="boolean", nullable=true, options={"default": 0})
    * 
    * 
    */
@@ -167,7 +167,7 @@ class PriceSet extends \Civi\Core\Entity {
    * @var boolean
    *
    * @JMS\Type("boolean")
-   * @ORM\Column(name="is_reserved", type="boolean", nullable=false)
+   * @ORM\Column(name="is_reserved", type="boolean", nullable=true, options={"default": 0})
    * 
    * 
    */

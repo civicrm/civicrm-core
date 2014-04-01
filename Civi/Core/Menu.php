@@ -227,7 +227,7 @@ class Menu extends \Civi\Core\Entity {
    * @var integer
    *
    * @JMS\Type("integer")
-   * @ORM\Column(name="weight", type="integer", nullable=false, options={"unsigned":true})
+   * @ORM\Column(name="weight", type="integer", nullable=false, options={"unsigned":true, "default": 1})
    * 
    * 
    */
@@ -237,7 +237,7 @@ class Menu extends \Civi\Core\Entity {
    * @var integer
    *
    * @JMS\Type("integer")
-   * @ORM\Column(name="type", type="integer", nullable=false, options={"unsigned":true})
+   * @ORM\Column(name="type", type="integer", nullable=false, options={"unsigned":true, "default": 1})
    * 
    * 
    */
@@ -247,7 +247,7 @@ class Menu extends \Civi\Core\Entity {
    * @var integer
    *
    * @JMS\Type("integer")
-   * @ORM\Column(name="page_type", type="integer", nullable=false, options={"unsigned":true})
+   * @ORM\Column(name="page_type", type="integer", nullable=false, options={"unsigned":true, "default": 1})
    * 
    * 
    */

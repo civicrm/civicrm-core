@@ -67,7 +67,7 @@ class Component extends \Civi\Core\Entity {
    * @var string
    *
    * @JMS\Type("string")
-   * @ORM\Column(name="name", type="string", length=64, nullable=true)
+   * @ORM\Column(name="name", type="string", length=64, nullable=false)
    * 
    * 
    */

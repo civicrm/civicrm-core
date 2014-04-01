@@ -147,7 +147,7 @@ class Batch extends \Civi\Core\Entity {
    * @var integer
    *
    * @JMS\Type("integer")
-   * @ORM\Column(name="status_id", type="integer", nullable=true, options={"unsigned":true})
+   * @ORM\Column(name="status_id", type="integer", nullable=false, options={"unsigned":true})
    * 
    * 
    */

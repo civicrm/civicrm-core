@@ -67,7 +67,7 @@ class LineItem extends \Civi\Core\Entity {
    * @var string
    *
    * @JMS\Type("string")
-   * @ORM\Column(name="entity_table", type="string", length=64, nullable=true)
+   * @ORM\Column(name="entity_table", type="string", length=64, nullable=false)
    * 
    * 
    */
@@ -77,7 +77,7 @@ class LineItem extends \Civi\Core\Entity {
    * @var integer
    *
    * @JMS\Type("integer")
-   * @ORM\Column(name="entity_id", type="integer", nullable=true, options={"unsigned":true})
+   * @ORM\Column(name="entity_id", type="integer", nullable=false, options={"unsigned":true})
    * 
    * 
    */
@@ -97,7 +97,7 @@ class LineItem extends \Civi\Core\Entity {
    * @var string
    *
    * @JMS\Type("string")
-   * @ORM\Column(name="label", type="string", length=255, nullable=false)
+   * @ORM\Column(name="label", type="string", length=255, nullable=true)
    * 
    * 
    */
@@ -107,7 +107,7 @@ class LineItem extends \Civi\Core\Entity {
    * @var integer
    *
    * @JMS\Type("integer")
-   * @ORM\Column(name="qty", type="integer", nullable=true, options={"unsigned":true})
+   * @ORM\Column(name="qty", type="integer", nullable=false, options={"unsigned":true})
    * 
    * 
    */
@@ -117,7 +117,7 @@ class LineItem extends \Civi\Core\Entity {
    * @var float
    *
    * @JMS\Type("float")
-   * @ORM\Column(name="unit_price", type="float", nullable=true)
+   * @ORM\Column(name="unit_price", type="float", nullable=false)
    * 
    * 
    */
@@ -127,7 +127,7 @@ class LineItem extends \Civi\Core\Entity {
    * @var float
    *
    * @JMS\Type("float")
-   * @ORM\Column(name="line_total", type="float", nullable=true)
+   * @ORM\Column(name="line_total", type="float", nullable=false)
    * 
    * 
    */
@@ -137,7 +137,7 @@ class LineItem extends \Civi\Core\Entity {
    * @var integer
    *
    * @JMS\Type("integer")
-   * @ORM\Column(name="participant_count", type="integer", nullable=false, options={"unsigned":true})
+   * @ORM\Column(name="participant_count", type="integer", nullable=true, options={"unsigned":true})
    * 
    * 
    */
@@ -167,7 +167,7 @@ class LineItem extends \Civi\Core\Entity {
    * @var float
    *
    * @JMS\Type("float")
-   * @ORM\Column(name="deductible_amount", type="float", nullable=false)
+   * @ORM\Column(name="deductible_amount", type="float", nullable=false, options={"default": 0.0})
    * 
    * 
    */

@@ -77,7 +77,7 @@ class Job extends \Civi\Core\Entity {
    * @var string
    *
    * @JMS\Type("string")
-   * @ORM\Column(name="run_frequency", type="string", length=8, nullable=false)
+   * @ORM\Column(name="run_frequency", type="string", length=8, nullable=true, options={"default": "Daily"})
    * 
    * 
    */
@@ -87,7 +87,7 @@ class Job extends \Civi\Core\Entity {
    * @var datetime
    *
    * @JMS\Type("datetime")
-   * @ORM\Column(name="last_run", type="datetime", nullable=false)
+   * @ORM\Column(name="last_run", type="datetime", nullable=true)
    * 
    * 
    */

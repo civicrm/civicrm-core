@@ -267,7 +267,7 @@ class Mailing extends \Civi\Core\Entity {
    * @var boolean
    *
    * @JMS\Type("boolean")
-   * @ORM\Column(name="override_verp", type="boolean", nullable=false)
+   * @ORM\Column(name="override_verp", type="boolean", nullable=true, options={"default": 0})
    * 
    * 
    */
@@ -357,7 +357,7 @@ class Mailing extends \Civi\Core\Entity {
    * @var boolean
    *
    * @JMS\Type("boolean")
-   * @ORM\Column(name="is_archived", type="boolean", nullable=false)
+   * @ORM\Column(name="is_archived", type="boolean", nullable=true, options={"default": 0})
    * 
    * 
    */
@@ -367,7 +367,7 @@ class Mailing extends \Civi\Core\Entity {
    * @var string
    *
    * @JMS\Type("string")
-   * @ORM\Column(name="visibility", type="string", length=40, nullable=false)
+   * @ORM\Column(name="visibility", type="string", length=40, nullable=true, options={"default": "User and User Admin Only"})
    * 
    * 
    */
@@ -387,7 +387,7 @@ class Mailing extends \Civi\Core\Entity {
    * @var boolean
    *
    * @JMS\Type("boolean")
-   * @ORM\Column(name="dedupe_email", type="boolean", nullable=false)
+   * @ORM\Column(name="dedupe_email", type="boolean", nullable=true, options={"default": 0})
    * 
    * 
    */

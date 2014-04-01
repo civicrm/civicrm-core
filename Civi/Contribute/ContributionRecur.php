@@ -77,7 +77,7 @@ class ContributionRecur extends \Civi\Core\Entity {
    * @var float
    *
    * @JMS\Type("float")
-   * @ORM\Column(name="amount", type="float", nullable=true)
+   * @ORM\Column(name="amount", type="float", nullable=false)
    * 
    * 
    */
@@ -87,7 +87,7 @@ class ContributionRecur extends \Civi\Core\Entity {
    * @var string
    *
    * @JMS\Type("string")
-   * @ORM\Column(name="currency", type="string", length=3, nullable=false)
+   * @ORM\Column(name="currency", type="string", length=3, nullable=true)
    * 
    * 
    */
@@ -97,7 +97,7 @@ class ContributionRecur extends \Civi\Core\Entity {
    * @var string
    *
    * @JMS\Type("string")
-   * @ORM\Column(name="frequency_unit", type="string", length=8, nullable=false)
+   * @ORM\Column(name="frequency_unit", type="string", length=8, nullable=true, options={"default": "month"})
    * 
    * 
    */
@@ -107,7 +107,7 @@ class ContributionRecur extends \Civi\Core\Entity {
    * @var integer
    *
    * @JMS\Type("integer")
-   * @ORM\Column(name="frequency_interval", type="integer", nullable=true, options={"unsigned":true})
+   * @ORM\Column(name="frequency_interval", type="integer", nullable=false, options={"unsigned":true})
    * 
    * 
    */
@@ -127,7 +127,7 @@ class ContributionRecur extends \Civi\Core\Entity {
    * @var datetime
    *
    * @JMS\Type("datetime")
-   * @ORM\Column(name="start_date", type="datetime", nullable=true)
+   * @ORM\Column(name="start_date", type="datetime", nullable=false)
    * 
    * 
    */
@@ -137,7 +137,7 @@ class ContributionRecur extends \Civi\Core\Entity {
    * @var datetime
    *
    * @JMS\Type("datetime")
-   * @ORM\Column(name="create_date", type="datetime", nullable=true)
+   * @ORM\Column(name="create_date", type="datetime", nullable=false)
    * 
    * 
    */
@@ -207,7 +207,7 @@ class ContributionRecur extends \Civi\Core\Entity {
    * @var integer
    *
    * @JMS\Type("integer")
-   * @ORM\Column(name="contribution_status_id", type="integer", nullable=false, options={"unsigned":true})
+   * @ORM\Column(name="contribution_status_id", type="integer", nullable=true, options={"unsigned":true, "default": 1})
    * 
    * 
    */
@@ -217,7 +217,7 @@ class ContributionRecur extends \Civi\Core\Entity {
    * @var boolean
    *
    * @JMS\Type("boolean")
-   * @ORM\Column(name="is_test", type="boolean", nullable=false)
+   * @ORM\Column(name="is_test", type="boolean", nullable=true, options={"default": 0})
    * 
    * 
    */
@@ -227,7 +227,7 @@ class ContributionRecur extends \Civi\Core\Entity {
    * @var integer
    *
    * @JMS\Type("integer")
-   * @ORM\Column(name="cycle_day", type="integer", nullable=false, options={"unsigned":true})
+   * @ORM\Column(name="cycle_day", type="integer", nullable=false, options={"unsigned":true, "default": 1})
    * 
    * 
    */
@@ -247,7 +247,7 @@ class ContributionRecur extends \Civi\Core\Entity {
    * @var integer
    *
    * @JMS\Type("integer")
-   * @ORM\Column(name="failure_count", type="integer", nullable=false, options={"unsigned":true})
+   * @ORM\Column(name="failure_count", type="integer", nullable=true, options={"unsigned":true, "default": 0})
    * 
    * 
    */
@@ -267,7 +267,7 @@ class ContributionRecur extends \Civi\Core\Entity {
    * @var boolean
    *
    * @JMS\Type("boolean")
-   * @ORM\Column(name="auto_renew", type="boolean", nullable=false)
+   * @ORM\Column(name="auto_renew", type="boolean", nullable=false, options={"default": 0})
    * 
    * 
    */
@@ -317,7 +317,7 @@ class ContributionRecur extends \Civi\Core\Entity {
    * @var boolean
    *
    * @JMS\Type("boolean")
-   * @ORM\Column(name="is_email_receipt", type="boolean", nullable=false)
+   * @ORM\Column(name="is_email_receipt", type="boolean", nullable=true, options={"default": 1})
    * 
    * 
    */

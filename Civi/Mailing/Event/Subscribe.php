@@ -87,7 +87,7 @@ class Subscribe extends \Civi\Core\Entity {
    * @var string
    *
    * @JMS\Type("string")
-   * @ORM\Column(name="hash", type="string", length=255, nullable=true)
+   * @ORM\Column(name="hash", type="string", length=255, nullable=false)
    * 
    * 
    */
@@ -97,7 +97,7 @@ class Subscribe extends \Civi\Core\Entity {
    * @var datetime
    *
    * @JMS\Type("datetime")
-   * @ORM\Column(name="time_stamp", type="datetime", nullable=true)
+   * @ORM\Column(name="time_stamp", type="datetime", nullable=false)
    * 
    * 
    */

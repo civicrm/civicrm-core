@@ -77,7 +77,7 @@ class PCPBlock extends \Civi\Core\Entity {
    * @var integer
    *
    * @JMS\Type("integer")
-   * @ORM\Column(name="entity_id", type="integer", nullable=true, options={"unsigned":true})
+   * @ORM\Column(name="entity_id", type="integer", nullable=false, options={"unsigned":true})
    * 
    * 
    */
@@ -87,7 +87,7 @@ class PCPBlock extends \Civi\Core\Entity {
    * @var string
    *
    * @JMS\Type("string")
-   * @ORM\Column(name="target_entity_type", type="string", length=255, nullable=false)
+   * @ORM\Column(name="target_entity_type", type="string", length=255, nullable=false, options={"default": "contribute"})
    * 
    * 
    */
@@ -97,7 +97,7 @@ class PCPBlock extends \Civi\Core\Entity {
    * @var integer
    *
    * @JMS\Type("integer")
-   * @ORM\Column(name="target_entity_id", type="integer", nullable=true, options={"unsigned":true})
+   * @ORM\Column(name="target_entity_id", type="integer", nullable=false, options={"unsigned":true})
    * 
    * 
    */
@@ -117,7 +117,7 @@ class PCPBlock extends \Civi\Core\Entity {
    * @var boolean
    *
    * @JMS\Type("boolean")
-   * @ORM\Column(name="is_approval_needed", type="boolean", nullable=false)
+   * @ORM\Column(name="is_approval_needed", type="boolean", nullable=true)
    * 
    * 
    */
@@ -127,7 +127,7 @@ class PCPBlock extends \Civi\Core\Entity {
    * @var boolean
    *
    * @JMS\Type("boolean")
-   * @ORM\Column(name="is_tellfriend_enabled", type="boolean", nullable=false)
+   * @ORM\Column(name="is_tellfriend_enabled", type="boolean", nullable=true)
    * 
    * 
    */
@@ -137,7 +137,7 @@ class PCPBlock extends \Civi\Core\Entity {
    * @var integer
    *
    * @JMS\Type("integer")
-   * @ORM\Column(name="tellfriend_limit", type="integer", nullable=false, options={"unsigned":true})
+   * @ORM\Column(name="tellfriend_limit", type="integer", nullable=true, options={"unsigned":true})
    * 
    * 
    */
@@ -147,7 +147,7 @@ class PCPBlock extends \Civi\Core\Entity {
    * @var string
    *
    * @JMS\Type("string")
-   * @ORM\Column(name="link_text", type="string", length=255, nullable=false)
+   * @ORM\Column(name="link_text", type="string", length=255, nullable=true)
    * 
    * 
    */
@@ -157,7 +157,7 @@ class PCPBlock extends \Civi\Core\Entity {
    * @var boolean
    *
    * @JMS\Type("boolean")
-   * @ORM\Column(name="is_active", type="boolean", nullable=false)
+   * @ORM\Column(name="is_active", type="boolean", nullable=true, options={"default": 1})
    * 
    * 
    */
@@ -167,7 +167,7 @@ class PCPBlock extends \Civi\Core\Entity {
    * @var string
    *
    * @JMS\Type("string")
-   * @ORM\Column(name="notify_email", type="string", length=255, nullable=false)
+   * @ORM\Column(name="notify_email", type="string", length=255, nullable=true)
    * 
    * 
    */

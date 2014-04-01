@@ -77,7 +77,7 @@ class Opened extends \Civi\Core\Entity {
    * @var datetime
    *
    * @JMS\Type("datetime")
-   * @ORM\Column(name="time_stamp", type="datetime", nullable=true)
+   * @ORM\Column(name="time_stamp", type="datetime", nullable=false)
    * 
    * 
    */

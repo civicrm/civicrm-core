@@ -77,7 +77,7 @@ class Unsubscribe extends \Civi\Core\Entity {
    * @var boolean
    *
    * @JMS\Type("boolean")
-   * @ORM\Column(name="org_unsubscribe", type="boolean", nullable=true)
+   * @ORM\Column(name="org_unsubscribe", type="boolean", nullable=false)
    * 
    * 
    */
@@ -87,7 +87,7 @@ class Unsubscribe extends \Civi\Core\Entity {
    * @var datetime
    *
    * @JMS\Type("datetime")
-   * @ORM\Column(name="time_stamp", type="datetime", nullable=true)
+   * @ORM\Column(name="time_stamp", type="datetime", nullable=false)
    * 
    * 
    */

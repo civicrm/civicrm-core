@@ -87,7 +87,7 @@ class ACLContactCache extends \Civi\Core\Entity {
    * @var string
    *
    * @JMS\Type("string")
-   * @ORM\Column(name="operation", type="string", length=8, nullable=true)
+   * @ORM\Column(name="operation", type="string", length=8, nullable=false)
    * 
    * 
    */

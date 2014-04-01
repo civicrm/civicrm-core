@@ -117,7 +117,7 @@ class MailingJob extends \Civi\Core\Entity {
    * @var boolean
    *
    * @JMS\Type("boolean")
-   * @ORM\Column(name="is_test", type="boolean", nullable=false)
+   * @ORM\Column(name="is_test", type="boolean", nullable=true, options={"default": 0})
    * 
    * 
    */
@@ -147,7 +147,7 @@ class MailingJob extends \Civi\Core\Entity {
    * @var integer
    *
    * @JMS\Type("integer")
-   * @ORM\Column(name="job_offset", type="integer", nullable=false, options={"unsigned":true})
+   * @ORM\Column(name="job_offset", type="integer", nullable=true, options={"unsigned":true, "default": 0})
    * 
    * 
    */
@@ -157,7 +157,7 @@ class MailingJob extends \Civi\Core\Entity {
    * @var integer
    *
    * @JMS\Type("integer")
-   * @ORM\Column(name="job_limit", type="integer", nullable=false, options={"unsigned":true})
+   * @ORM\Column(name="job_limit", type="integer", nullable=true, options={"unsigned":true, "default": 0})
    * 
    * 
    */

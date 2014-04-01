@@ -77,7 +77,7 @@ class ACL extends \Civi\Core\Entity {
    * @var boolean
    *
    * @JMS\Type("boolean")
-   * @ORM\Column(name="deny", type="boolean", nullable=false)
+   * @ORM\Column(name="deny", type="boolean", nullable=false, options={"default": 0})
    * 
    * 
    */
@@ -87,7 +87,7 @@ class ACL extends \Civi\Core\Entity {
    * @var string
    *
    * @JMS\Type("string")
-   * @ORM\Column(name="entity_table", type="string", length=64, nullable=true)
+   * @ORM\Column(name="entity_table", type="string", length=64, nullable=false)
    * 
    * 
    */
@@ -107,7 +107,7 @@ class ACL extends \Civi\Core\Entity {
    * @var string
    *
    * @JMS\Type("string")
-   * @ORM\Column(name="operation", type="string", length=8, nullable=true)
+   * @ORM\Column(name="operation", type="string", length=8, nullable=false)
    * 
    * 
    */

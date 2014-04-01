@@ -77,7 +77,7 @@ class PCP extends \Civi\Core\Entity {
    * @var integer
    *
    * @JMS\Type("integer")
-   * @ORM\Column(name="status_id", type="integer", nullable=true, options={"unsigned":true})
+   * @ORM\Column(name="status_id", type="integer", nullable=false, options={"unsigned":true})
    * 
    * 
    */
@@ -87,7 +87,7 @@ class PCP extends \Civi\Core\Entity {
    * @var string
    *
    * @JMS\Type("string")
-   * @ORM\Column(name="title", type="string", length=255, nullable=false)
+   * @ORM\Column(name="title", type="string", length=255, nullable=true)
    * 
    * 
    */
@@ -97,7 +97,7 @@ class PCP extends \Civi\Core\Entity {
    * @var text
    *
    * @JMS\Type("text")
-   * @ORM\Column(name="intro_text", type="text", length=65535, nullable=false)
+   * @ORM\Column(name="intro_text", type="text", length=65535, nullable=true)
    * 
    * 
    */
@@ -107,7 +107,7 @@ class PCP extends \Civi\Core\Entity {
    * @var text
    *
    * @JMS\Type("text")
-   * @ORM\Column(name="page_text", type="text", length=65535, nullable=false)
+   * @ORM\Column(name="page_text", type="text", length=65535, nullable=true)
    * 
    * 
    */
@@ -117,7 +117,7 @@ class PCP extends \Civi\Core\Entity {
    * @var string
    *
    * @JMS\Type("string")
-   * @ORM\Column(name="donate_link_text", type="string", length=255, nullable=false)
+   * @ORM\Column(name="donate_link_text", type="string", length=255, nullable=true)
    * 
    * 
    */
@@ -127,7 +127,7 @@ class PCP extends \Civi\Core\Entity {
    * @var integer
    *
    * @JMS\Type("integer")
-   * @ORM\Column(name="page_id", type="integer", nullable=true, options={"unsigned":true})
+   * @ORM\Column(name="page_id", type="integer", nullable=false, options={"unsigned":true})
    * 
    * 
    */
@@ -137,7 +137,7 @@ class PCP extends \Civi\Core\Entity {
    * @var string
    *
    * @JMS\Type("string")
-   * @ORM\Column(name="page_type", type="string", length=64, nullable=false)
+   * @ORM\Column(name="page_type", type="string", length=64, nullable=true, options={"default": "contribute"})
    * 
    * 
    */
@@ -147,7 +147,7 @@ class PCP extends \Civi\Core\Entity {
    * @var integer
    *
    * @JMS\Type("integer")
-   * @ORM\Column(name="pcp_block_id", type="integer", nullable=true, options={"unsigned":true})
+   * @ORM\Column(name="pcp_block_id", type="integer", nullable=false, options={"unsigned":true})
    * 
    * 
    */
@@ -157,7 +157,7 @@ class PCP extends \Civi\Core\Entity {
    * @var integer
    *
    * @JMS\Type("integer")
-   * @ORM\Column(name="is_thermometer", type="integer", nullable=false, options={"unsigned":true})
+   * @ORM\Column(name="is_thermometer", type="integer", nullable=true, options={"unsigned":true, "default": 0})
    * 
    * 
    */
@@ -167,7 +167,7 @@ class PCP extends \Civi\Core\Entity {
    * @var integer
    *
    * @JMS\Type("integer")
-   * @ORM\Column(name="is_honor_roll", type="integer", nullable=false, options={"unsigned":true})
+   * @ORM\Column(name="is_honor_roll", type="integer", nullable=true, options={"unsigned":true, "default": 0})
    * 
    * 
    */
@@ -187,7 +187,7 @@ class PCP extends \Civi\Core\Entity {
    * @var string
    *
    * @JMS\Type("string")
-   * @ORM\Column(name="currency", type="string", length=3, nullable=false)
+   * @ORM\Column(name="currency", type="string", length=3, nullable=true)
    * 
    * 
    */
@@ -197,7 +197,7 @@ class PCP extends \Civi\Core\Entity {
    * @var boolean
    *
    * @JMS\Type("boolean")
-   * @ORM\Column(name="is_active", type="boolean", nullable=false)
+   * @ORM\Column(name="is_active", type="boolean", nullable=true, options={"default": 0})
    * 
    * 
    */

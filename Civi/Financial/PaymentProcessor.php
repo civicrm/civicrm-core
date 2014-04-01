@@ -227,7 +227,7 @@ class PaymentProcessor extends \Civi\Core\Entity {
    * @var integer
    *
    * @JMS\Type("integer")
-   * @ORM\Column(name="billing_mode", type="integer", nullable=true, options={"unsigned":true})
+   * @ORM\Column(name="billing_mode", type="integer", nullable=false, options={"unsigned":true})
    * 
    * 
    */
@@ -247,7 +247,7 @@ class PaymentProcessor extends \Civi\Core\Entity {
    * @var integer
    *
    * @JMS\Type("integer")
-   * @ORM\Column(name="payment_type", type="integer", nullable=false, options={"unsigned":true})
+   * @ORM\Column(name="payment_type", type="integer", nullable=true, options={"unsigned":true, "default": 1})
    * 
    * 
    */

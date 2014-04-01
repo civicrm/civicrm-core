@@ -117,7 +117,7 @@ class MembershipType extends \Civi\Core\Entity {
    * @var float
    *
    * @JMS\Type("float")
-   * @ORM\Column(name="minimum_fee", type="float", nullable=false)
+   * @ORM\Column(name="minimum_fee", type="float", nullable=true, options={"default": 0})
    * 
    * 
    */
@@ -247,7 +247,7 @@ class MembershipType extends \Civi\Core\Entity {
    * @var boolean
    *
    * @JMS\Type("boolean")
-   * @ORM\Column(name="auto_renew", type="boolean", nullable=false)
+   * @ORM\Column(name="auto_renew", type="boolean", nullable=true, options={"default": 0})
    * 
    * 
    */
@@ -257,7 +257,7 @@ class MembershipType extends \Civi\Core\Entity {
    * @var boolean
    *
    * @JMS\Type("boolean")
-   * @ORM\Column(name="is_active", type="boolean", nullable=false)
+   * @ORM\Column(name="is_active", type="boolean", nullable=true, options={"default": 1})
    * 
    * 
    */

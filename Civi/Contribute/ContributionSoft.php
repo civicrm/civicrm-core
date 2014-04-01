@@ -87,7 +87,7 @@ class ContributionSoft extends \Civi\Core\Entity {
    * @var float
    *
    * @JMS\Type("float")
-   * @ORM\Column(name="amount", type="float", nullable=true)
+   * @ORM\Column(name="amount", type="float", nullable=false)
    * 
    * 
    */
@@ -97,7 +97,7 @@ class ContributionSoft extends \Civi\Core\Entity {
    * @var string
    *
    * @JMS\Type("string")
-   * @ORM\Column(name="currency", type="string", length=3, nullable=false)
+   * @ORM\Column(name="currency", type="string", length=3, nullable=true)
    * 
    * 
    */
@@ -117,7 +117,7 @@ class ContributionSoft extends \Civi\Core\Entity {
    * @var boolean
    *
    * @JMS\Type("boolean")
-   * @ORM\Column(name="pcp_display_in_roll", type="boolean", nullable=false)
+   * @ORM\Column(name="pcp_display_in_roll", type="boolean", nullable=true, options={"default": 0})
    * 
    * 
    */
@@ -127,7 +127,7 @@ class ContributionSoft extends \Civi\Core\Entity {
    * @var string
    *
    * @JMS\Type("string")
-   * @ORM\Column(name="pcp_roll_nickname", type="string", length=255, nullable=false)
+   * @ORM\Column(name="pcp_roll_nickname", type="string", length=255, nullable=true)
    * 
    * 
    */
@@ -137,7 +137,7 @@ class ContributionSoft extends \Civi\Core\Entity {
    * @var string
    *
    * @JMS\Type("string")
-   * @ORM\Column(name="pcp_personal_note", type="string", length=255, nullable=false)
+   * @ORM\Column(name="pcp_personal_note", type="string", length=255, nullable=true)
    * 
    * 
    */
@@ -147,7 +147,7 @@ class ContributionSoft extends \Civi\Core\Entity {
    * @var integer
    *
    * @JMS\Type("integer")
-   * @ORM\Column(name="soft_credit_type_id", type="integer", nullable=false, options={"unsigned":true})
+   * @ORM\Column(name="soft_credit_type_id", type="integer", nullable=true, options={"unsigned":true})
    * 
    * 
    */

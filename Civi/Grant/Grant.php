@@ -127,7 +127,7 @@ class Grant extends \Civi\Core\Entity {
    * @var integer
    *
    * @JMS\Type("integer")
-   * @ORM\Column(name="grant_type_id", type="integer", nullable=true, options={"unsigned":true})
+   * @ORM\Column(name="grant_type_id", type="integer", nullable=false, options={"unsigned":true})
    * 
    * 
    */
@@ -137,7 +137,7 @@ class Grant extends \Civi\Core\Entity {
    * @var float
    *
    * @JMS\Type("float")
-   * @ORM\Column(name="amount_total", type="float", nullable=true)
+   * @ORM\Column(name="amount_total", type="float", nullable=false)
    * 
    * 
    */
@@ -167,7 +167,7 @@ class Grant extends \Civi\Core\Entity {
    * @var string
    *
    * @JMS\Type("string")
-   * @ORM\Column(name="currency", type="string", length=3, nullable=true)
+   * @ORM\Column(name="currency", type="string", length=3, nullable=false)
    * 
    * 
    */
@@ -187,7 +187,7 @@ class Grant extends \Civi\Core\Entity {
    * @var integer
    *
    * @JMS\Type("integer")
-   * @ORM\Column(name="status_id", type="integer", nullable=true, options={"unsigned":true})
+   * @ORM\Column(name="status_id", type="integer", nullable=false, options={"unsigned":true})
    * 
    * 
    */

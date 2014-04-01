@@ -67,7 +67,7 @@ class FinancialType extends \Civi\Core\Entity {
    * @var string
    *
    * @JMS\Type("string")
-   * @ORM\Column(name="name", type="string", length=64, nullable=true)
+   * @ORM\Column(name="name", type="string", length=64, nullable=false)
    * 
    * 
    */
@@ -87,7 +87,7 @@ class FinancialType extends \Civi\Core\Entity {
    * @var boolean
    *
    * @JMS\Type("boolean")
-   * @ORM\Column(name="is_deductible", type="boolean", nullable=false)
+   * @ORM\Column(name="is_deductible", type="boolean", nullable=true, options={"default": 1})
    * 
    * 
    */

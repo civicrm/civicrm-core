@@ -67,7 +67,7 @@ class Cache extends \Civi\Core\Entity {
    * @var string
    *
    * @JMS\Type("string")
-   * @ORM\Column(name="group_name", type="string", length=32, nullable=true)
+   * @ORM\Column(name="group_name", type="string", length=32, nullable=false)
    * 
    * 
    */

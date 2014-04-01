@@ -77,7 +77,7 @@ class Cart extends \Civi\Core\Entity {
    * @var boolean
    *
    * @JMS\Type("boolean")
-   * @ORM\Column(name="completed", type="boolean", nullable=false)
+   * @ORM\Column(name="completed", type="boolean", nullable=true, options={"default": 0})
    * 
    * 
    */

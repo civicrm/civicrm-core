@@ -87,7 +87,7 @@ class PledgePayment extends \Civi\Core\Entity {
    * @var float
    *
    * @JMS\Type("float")
-   * @ORM\Column(name="scheduled_amount", type="float", nullable=true)
+   * @ORM\Column(name="scheduled_amount", type="float", nullable=false)
    * 
    * 
    */
@@ -107,7 +107,7 @@ class PledgePayment extends \Civi\Core\Entity {
    * @var string
    *
    * @JMS\Type("string")
-   * @ORM\Column(name="currency", type="string", length=3, nullable=false)
+   * @ORM\Column(name="currency", type="string", length=3, nullable=true)
    * 
    * 
    */
@@ -117,7 +117,7 @@ class PledgePayment extends \Civi\Core\Entity {
    * @var datetime
    *
    * @JMS\Type("datetime")
-   * @ORM\Column(name="scheduled_date", type="datetime", nullable=true)
+   * @ORM\Column(name="scheduled_date", type="datetime", nullable=false)
    * 
    * 
    */
@@ -137,7 +137,7 @@ class PledgePayment extends \Civi\Core\Entity {
    * @var integer
    *
    * @JMS\Type("integer")
-   * @ORM\Column(name="reminder_count", type="integer", nullable=false, options={"unsigned":true})
+   * @ORM\Column(name="reminder_count", type="integer", nullable=true, options={"unsigned":true, "default": 0})
    * 
    * 
    */

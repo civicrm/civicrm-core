@@ -87,7 +87,7 @@ class CustomField extends \Civi\Core\Entity {
    * @var string
    *
    * @JMS\Type("string")
-   * @ORM\Column(name="label", type="string", length=255, nullable=true)
+   * @ORM\Column(name="label", type="string", length=255, nullable=false)
    * 
    * 
    */
@@ -97,7 +97,7 @@ class CustomField extends \Civi\Core\Entity {
    * @var string
    *
    * @JMS\Type("string")
-   * @ORM\Column(name="data_type", type="string", length=16, nullable=true)
+   * @ORM\Column(name="data_type", type="string", length=16, nullable=false)
    * 
    * 
    */
@@ -107,7 +107,7 @@ class CustomField extends \Civi\Core\Entity {
    * @var string
    *
    * @JMS\Type("string")
-   * @ORM\Column(name="html_type", type="string", length=32, nullable=true)
+   * @ORM\Column(name="html_type", type="string", length=32, nullable=false)
    * 
    * 
    */
@@ -147,7 +147,7 @@ class CustomField extends \Civi\Core\Entity {
    * @var boolean
    *
    * @JMS\Type("boolean")
-   * @ORM\Column(name="is_search_range", type="boolean", nullable=false)
+   * @ORM\Column(name="is_search_range", type="boolean", nullable=true, options={"default": 0})
    * 
    * 
    */
@@ -157,7 +157,7 @@ class CustomField extends \Civi\Core\Entity {
    * @var integer
    *
    * @JMS\Type("integer")
-   * @ORM\Column(name="weight", type="integer", nullable=false, options={"unsigned":true})
+   * @ORM\Column(name="weight", type="integer", nullable=false, options={"unsigned":true, "default": 1})
    * 
    * 
    */
@@ -347,7 +347,7 @@ class CustomField extends \Civi\Core\Entity {
    * @var boolean
    *
    * @JMS\Type("boolean")
-   * @ORM\Column(name="in_selector", type="boolean", nullable=false)
+   * @ORM\Column(name="in_selector", type="boolean", nullable=true, options={"default": 0})
    * 
    * 
    */

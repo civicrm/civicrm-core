@@ -67,7 +67,7 @@ class UFJoin extends \Civi\Core\Entity {
    * @var boolean
    *
    * @JMS\Type("boolean")
-   * @ORM\Column(name="is_active", type="boolean", nullable=false)
+   * @ORM\Column(name="is_active", type="boolean", nullable=true, options={"default": 1})
    * 
    * 
    */
@@ -77,7 +77,7 @@ class UFJoin extends \Civi\Core\Entity {
    * @var string
    *
    * @JMS\Type("string")
-   * @ORM\Column(name="module", type="string", length=64, nullable=true)
+   * @ORM\Column(name="module", type="string", length=64, nullable=false)
    * 
    * 
    */
@@ -107,7 +107,7 @@ class UFJoin extends \Civi\Core\Entity {
    * @var integer
    *
    * @JMS\Type("integer")
-   * @ORM\Column(name="weight", type="integer", nullable=false, options={"unsigned":true})
+   * @ORM\Column(name="weight", type="integer", nullable=false, options={"unsigned":true, "default": 1})
    * 
    * 
    */

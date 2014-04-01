@@ -87,7 +87,7 @@ class Phone extends \Civi\Core\Entity {
    * @var boolean
    *
    * @JMS\Type("boolean")
-   * @ORM\Column(name="is_primary", type="boolean", nullable=false)
+   * @ORM\Column(name="is_primary", type="boolean", nullable=true, options={"default": 0})
    * 
    * 
    */
@@ -97,7 +97,7 @@ class Phone extends \Civi\Core\Entity {
    * @var boolean
    *
    * @JMS\Type("boolean")
-   * @ORM\Column(name="is_billing", type="boolean", nullable=false)
+   * @ORM\Column(name="is_billing", type="boolean", nullable=true, options={"default": 0})
    * 
    * 
    */
