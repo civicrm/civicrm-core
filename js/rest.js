@@ -84,6 +84,32 @@ var CRM = CRM || {};
   /**
    * AJAX api
    */
+  CRM.api3 = function(entity, action, params) {
+    if (typeof(entity) === 'string') {
+      params = {
+        entity: entity,
+        action: action.toLowerCase(),
+        json: JSON.stringify(params || {})
+      };
+    } else {
+      params = {
+        entity: 'api3',
+        action: 'call',
+        json: JSON.stringify(entity)
+      }
+    }
+    return $.ajax({
+      url: CRM.url('civicrm/ajax/rest'),
+      dataType: 'json',
+      data: params,
+      type: params.action.indexOf('get') < 0 ? 'POST' : 'GET'
+    });
+  };
+
+  /**
+   * @deprecated
+   * AJAX api
+   */
   CRM.api = function(entity, action, params, options) {
     // Default settings
     var settings = {
