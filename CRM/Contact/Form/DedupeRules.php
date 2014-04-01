@@ -288,6 +288,7 @@ UPDATE civicrm_dedupe_rule_group
 
     // also create an index for this dedupe rule
     // CRM-3837
+    CRM_Utils_Hook::dupeQuery($ruleDao, 'dedupeIndexes', $tables);
     CRM_Core_BAO_SchemaHandler::createIndexes($tables, 'dedupe_index', $substrLenghts);
 
     //need to clear cache of deduped contacts

@@ -108,6 +108,7 @@ class CRM_Dedupe_BAO_RuleGroup extends CRM_Dedupe_DAO_RuleGroup {
         }
       }
     }
+    CRM_Utils_Hook::dupeQuery(CRM_Core_DAO::$_nullObject, 'supportedFields', $fields);
     return $fields[$requestedType];
   }
 
