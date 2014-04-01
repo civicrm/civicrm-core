@@ -1065,8 +1065,8 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       'field' => 'description',
       'value' => 'setValueDescription: TheRest <> CiviCRM',
     ));
-    $this->assertTrue((bool)$setValueDescriptionResult['is_error']); // not supported by setValue
-    //$this->assertEquals('setValueDescription: TheRest <> CiviCRM', $setValueDescriptionResult['values']['description']);
+    //$this->assertTrue((bool)$setValueDescriptionResult['is_error']); // not supported by setValue
+    $this->assertEquals('setValueDescription: TheRest <> CiviCRM', $setValueDescriptionResult['values']['description']);
 }
 
   /**
@@ -1126,11 +1126,11 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       'field' => 'description',
       'value' => 'setValueDescription: TheRest <> CiviCRM',
     ));
-    $this->assertTrue((bool)$setValueDescriptionResult['is_error']); // not supported by setValue
-    //$this->assertAPISuccess($setValueDescriptionResult);
-    //$this->assertDBQuery('setValueDescription: TheRest <> CiviCRM', 'SELECT description FROM civicrm_event WHERE id = %1', array(
-    //  1 => array($eventId, 'Integer')
-    //));
+    //$this->assertTrue((bool)$setValueDescriptionResult['is_error']); // not supported by setValue
+    $this->assertAPISuccess($setValueDescriptionResult);
+    $this->assertDBQuery('setValueDescription: TheRest <> CiviCRM', 'SELECT description FROM civicrm_event WHERE id = %1', array(
+      1 => array($eventId, 'Integer')
+    ));
   }
 
 }

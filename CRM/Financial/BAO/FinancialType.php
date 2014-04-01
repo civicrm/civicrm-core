@@ -96,9 +96,11 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
    * @return object
    */
   static function add(&$params, &$ids = array()) {
-    $params['is_active'] = CRM_Utils_Array::value('is_active', $params, false);
-    $params['is_deductible'] = CRM_Utils_Array::value('is_deductible', $params, false);
-    $params['is_reserved'] = CRM_Utils_Array::value('is_reserved', $params, false);
+    if(empty($params['id'])) {
+      $params['is_active'] = CRM_Utils_Array::value('is_active', $params, false);
+      $params['is_deductible'] = CRM_Utils_Array::value('is_deductible', $params, false);
+      $params['is_reserved'] = CRM_Utils_Array::value('is_reserved', $params, false);
+    }
 
     // action is taken depending upon the mode
     $financialType = new CRM_Financial_DAO_FinancialType();
@@ -108,7 +110,7 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
     }
     $financialType->save();
     // CRM-12470
-    if (empty($ids['financialType'])) {
+    if (empty($ids['financialType']) && empty($params['id'])) {
       $titles = CRM_Financial_BAO_FinancialTypeAccount::createDefaultFinancialAccounts($financialType);
       $financialType->titles = $titles;
     }
