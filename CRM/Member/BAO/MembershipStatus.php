@@ -112,14 +112,14 @@ class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus {
    * function to add the membership types
    *
    * @param array $params reference array contains the values submitted by the form
-   * @param array $ids    reference array contains the id
+   * @param array $ids array contains the id - this param is deprecated
    *
    * @access public
    * @static
    *
    * @return object
    */
-  static function add(&$params, &$ids) {
+  static function add(&$params, $ids = array()) {
     $params['is_active'] = CRM_Utils_Array::value('is_active', $params, FALSE);
     $params['is_current_member'] = CRM_Utils_Array::value('is_current_member', $params, FALSE);
     $params['is_admin'] = CRM_Utils_Array::value('is_admin', $params, FALSE);
@@ -139,7 +139,7 @@ class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus {
     }
 
     //for add mode, copy label to name.
-    $statusId = CRM_Utils_Array::value('membershipStatus', $ids);
+    $statusId = CRM_Utils_Array::value('id', $params, CRM_Utils_Array::value('membershipStatus', $ids));
     if (!$statusId && !empty($params['label']) && empty($params['name'])) {
       $params['name'] = $params['label'];
     }
