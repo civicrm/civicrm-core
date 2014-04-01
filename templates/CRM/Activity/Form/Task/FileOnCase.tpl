@@ -47,7 +47,7 @@
 <script type="text/javascript">
 CRM.$(function($) {
   var $form = $("#{/literal}{$form.formName}{literal}");
-  $('input[name=unclosed_case_id]', $form).select2({
+  $('input[name=unclosed_case_id]', $form).crmSelect2({
     placeholder: {/literal}'{ts escape="js"}- select case -{/ts}'{literal},
     minimumInputLength: 1,
     ajax: {
