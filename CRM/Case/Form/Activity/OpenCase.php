@@ -74,6 +74,11 @@ class CRM_Case_Form_Activity_OpenCase {
     $caseTypes = CRM_Case_PseudoConstant::caseType();
     $form->_caseTypeId = array_key_exists($caseTypeId, $caseTypes) ? $caseTypeId : NULL;
 
+    // check if the case status id passed in url is a valid one
+    $caseStatusId = CRM_Utils_Request::retrieve('cStatus', 'Positive', $form);
+    $caseStatus = CRM_Case_PseudoConstant::caseStatus();
+    $form->_caseStatusId = array_key_exists($caseStatusId, $caseStatus) ? $caseStatusId : NULL;
+
     // Add attachments
     CRM_Core_BAO_File::buildAttachment( $form, 'civicrm_activity', $form->_activityId );
   }
@@ -95,10 +100,16 @@ class CRM_Case_Form_Activity_OpenCase {
     list($defaults['start_date'], $defaults['start_date_time']) = CRM_Utils_Date::setDateDefaults(NULL, 'activityDateTime');
 
     // set default case status, case type, encounter medium, location type and phone type defaults are set in DB
-    $caseStatus = CRM_Core_OptionGroup::values('case_status', FALSE, FALSE, FALSE, 'AND is_default = 1');
-    if (count($caseStatus) == 1) {
-      $defaults['status_id'] = key($caseStatus);
+    if ($form->_caseStatusId) {
+      $caseStatus = $form->_caseStatusId;
     }
+    else {
+      $caseStatus = CRM_Core_OptionGroup::values('case_status', FALSE, FALSE, FALSE, 'AND is_default = 1');
+      if (count($caseStatus) == 1) {
+        $caseStatus = key($caseStatus); //$defaults['status_id'] = key($caseStatus);
+      }
+    }
+    $defaults['status_id'] = $caseStatus;
 
     // set default case type passed in url
     if ($form->_caseTypeId) {
@@ -152,7 +163,10 @@ class CRM_Case_Form_Activity_OpenCase {
       $element->freeze();
     }
 
-    $form->addSelect('status_id', array(), TRUE);
+    $csElement = $form->addSelect('status_id', array(), TRUE);
+    if ($form->_caseStatusId) {
+      $csElement->freeze();
+    }
 
     $form->add('text', 'duration', ts('Activity Duration'), array('size' => 4, 'maxlength' => 8));
     $form->addRule('duration', ts('Please enter the duration as number of minutes (integers only).'), 'positiveInteger');
