@@ -152,7 +152,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
       ),
       'details' => array(
         'type' => 'wysiwyg',
-        'label' => ts('Details'),
+        'label' => ts('Notes'),
         // forces a smaller edit window
         'attributes' => array('rows' => 4, 'cols' => 60),
         'required' => FALSE
