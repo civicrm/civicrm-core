@@ -50,7 +50,7 @@
     var selectedCaseId = '';
     var contactId = '';
     CRM.$(function($) {
-      $('input[name=unclosed_case_id]', '#fileOnCaseDialog').select2({
+      $('input[name=unclosed_case_id]', '#fileOnCaseDialog').crmSelect2({
         placeholder: {/literal}'{ts escape="js"}- select case -{/ts}'{literal},
         minimumInputLength: 1,
         ajax: {
@@ -128,7 +128,7 @@
           title: dialogTitle,
           modal: true,
           width: 600,
-          height: 270,
+          height: 'auto',
           close: function( event, ui ) {
             cj('input[name=unclosed_case_id]', '#fileOnCaseDialog').select2('destroy');
             cj(this).hide().dialog("destroy");
@@ -138,7 +138,7 @@
           },
 
           buttons: {
-            "{/literal}{ts escape='js'}Ok{/ts}{literal}": function() {
+            "{/literal}{ts escape='js'}Save{/ts}{literal}": function() {
               var subject         = cj("#case_activity_subject").val( );
               var targetContactId = cj("#target_contact_id").val( );
 
@@ -147,7 +147,7 @@
                 return false;
               }
 
-              cj(this).dialog("destroy");
+              cj(this).dialog("close");
 
               var postUrl = {/literal}"{crmURL p='civicrm/ajax/activity/convert' h=0 }"{literal};
               cj.post( postUrl, { activityID: activityID, caseID: selectedCaseId, contactID: contactId, newSubject: subject, targetContactIds: targetContactId, mode: action, key: {/literal}"{crmKey name='civicrm/ajax/activity/convert'}"{literal} },
@@ -200,7 +200,6 @@
             },
             "{/literal}{ts escape='js'}Cancel{/ts}{literal}": function() {
               cj(this).dialog("close");
-              cj(this).dialog("destroy");
             }
           }
 

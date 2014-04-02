@@ -794,5 +794,72 @@ LEFT JOIN  civicrm_premiums            ON ( civicrm_premiums.entity_id = civicrm
     }
     return CRM_Core_PseudoConstant::get(__CLASS__, $fieldName, $params, $context);
   }
+
+  /**
+   * Get or Set multilingually affected honor params for processing module_data or setting default values.
+   *
+   * @param Array|String $params: Array when we need to format it according to language state or String as a json encode
+   * @param Boolean      $setDefault: If yes then returns array to used for setting default value afterward
+   *
+   * @return array|string
+   */
+  public static function formatMultilingualHonorParams($params, $setDefault = FALSE) {
+    $config = CRM_Core_Config::singleton();
+    $sctJson = $sctJsonDecode = NULL;
+    $domain = new CRM_Core_DAO_Domain();
+    $domain->find(TRUE);
+
+    //When we are fetching the honor params respecting both multi and single lingual state
+    //and setting it to default param of Contribution Page's Main and Setting form
+    if ($setDefault) {
+      $sctJsonDecode = json_decode($params);
+      $sctJsonDecode = (array) $sctJsonDecode->soft_credit;
+      if (!empty($sctJsonDecode[$config->lcMessages])) {
+        foreach ($sctJsonDecode[$config->lcMessages] as $column => $value) {
+          $sctJsonDecode[$column] = $value;
+        }
+        unset($sctJsonDecode[$config->lcMessages]);
+      }
+      return $sctJsonDecode;
+    }
+
+    //check and handle multilingual honoree params
+    if (!$domain->locales) {
+      //if in singlelingual state simply return the array format
+      $sctJson = json_encode(
+        array(
+          'soft_credit' => array(
+            'soft_credit_types' => $params['soft_credit_types'],
+            'honor_block_title' => $params['honor_block_title'],
+            'honor_block_text' => $params['honor_block_text']
+          )
+        )
+      );
+    }
+    else {
+      //if in multilingual state then retrieve the module_data against this contribution and
+      //merge with earlier module_data json data to current so not to lose earlier multilingual module_data information
+      $sctJson =  array(
+        'soft_credit' => array(
+          'soft_credit_types' => $params['soft_credit_types'],
+          $config->lcMessages => array (
+            'honor_block_title' => $params['honor_block_title'],
+            'honor_block_text' => $params['honor_block_text']
+          )
+        )
+      );
+
+      $ufJoinDAO = new CRM_Core_DAO_UFJoin();
+      $ufJoinDAO->module = 'soft_credit';
+      $ufJoinDAO->entity_id = $params['id'];
+      $ufJoinDAO->find(TRUE);
+      $jsonData = json_decode($ufJoinDAO->module_data);
+      if ($jsonData) {
+        $sctJson['soft_credit'] = array_merge((array)$jsonData->soft_credit, $sctJson['soft_credit']);
+      }
+      $sctJson = json_encode($sctJson);
+    }
+    return $sctJson;
+  }
 }
 
