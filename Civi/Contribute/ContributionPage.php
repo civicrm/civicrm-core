@@ -1410,7 +1410,7 @@ class ContributionPage extends \Civi\Core\Entity {
         'propertyName' => 'id',
         'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
-                                             
+                                                     
                                     
                           ),
       
@@ -1421,7 +1421,7 @@ class ContributionPage extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Contribution Page Title'),
                                  'maxlength' => 255,
-                         'size' => \CRM_Utils_Type::HUGE,
+                                 'size' => \CRM_Utils_Type::HUGE,
                            
                                     
                           ),
@@ -1433,7 +1433,7 @@ class ContributionPage extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_TEXT,
                 'title' => ts('Contribution Page Introduction Text'),
                                  'maxlength' => 65535,
-                                  'rows' => 6,
+                                          'rows' => 6,
                          'cols' => 50,
          
                                     
@@ -1445,9 +1445,9 @@ class ContributionPage extends \Civi\Core\Entity {
         'propertyName' => 'financialType',
         'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Financial Type'),
-                                                     
+                                                             
                                     
-                'FKClassName' => 'Civi_Financial_FinancialType',
+                'FKClassName' => 'CRM_Financial_DAO_FinancialType',
                                      'pseudoconstant' => array(
                                 'table' => 'civicrm_financial_type',
                       'keyColumn' => 'id',
@@ -1462,7 +1462,7 @@ class ContributionPage extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Payment Processor'),
                                  'maxlength' => 128,
-                         'size' => \CRM_Utils_Type::HUGE,
+                                 'size' => \CRM_Utils_Type::HUGE,
                            
                                     
                                      'pseudoconstant' => array(
@@ -1477,7 +1477,7 @@ class ContributionPage extends \Civi\Core\Entity {
         'name' => 'is_credit_card_only',
         'propertyName' => 'isCreditCardOnly',
         'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                     
+                                                             
                                     
                           ),
       
@@ -1486,7 +1486,7 @@ class ContributionPage extends \Civi\Core\Entity {
         'name' => 'is_monetary',
         'propertyName' => 'isMonetary',
         'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                     
+                                                             
                                            'default' => '1',
          
                           ),
@@ -1496,7 +1496,7 @@ class ContributionPage extends \Civi\Core\Entity {
         'name' => 'is_recur',
         'propertyName' => 'isRecur',
         'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                     
+                                                             
                                     
                           ),
       
@@ -1505,7 +1505,7 @@ class ContributionPage extends \Civi\Core\Entity {
         'name' => 'is_confirm_enabled',
         'propertyName' => 'isConfirmEnabled',
         'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                     
+                                                             
                                            'default' => '1',
          
                           ),
@@ -1517,7 +1517,7 @@ class ContributionPage extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Recur Frequency Unit'),
                                  'maxlength' => 128,
-                         'size' => \CRM_Utils_Type::HUGE,
+                                 'size' => \CRM_Utils_Type::HUGE,
                            
                                     
                           ),
@@ -1527,7 +1527,7 @@ class ContributionPage extends \Civi\Core\Entity {
         'name' => 'is_recur_interval',
         'propertyName' => 'isRecurInterval',
         'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                     
+                                                             
                                     
                           ),
       
@@ -1536,7 +1536,7 @@ class ContributionPage extends \Civi\Core\Entity {
         'name' => 'is_recur_installments',
         'propertyName' => 'isRecurInstallments',
         'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                     
+                                                             
                                     
                           ),
       
@@ -1545,7 +1545,7 @@ class ContributionPage extends \Civi\Core\Entity {
         'name' => 'is_pay_later',
         'propertyName' => 'isPayLater',
         'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                     
+                                                             
                                     
                           ),
       
@@ -1556,7 +1556,7 @@ class ContributionPage extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_TEXT,
                 'title' => ts('Pay Later Text'),
                                  'maxlength' => 65535,
-                                    
+                                            
                                     
                           ),
       
@@ -1567,7 +1567,7 @@ class ContributionPage extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_TEXT,
                 'title' => ts('Pay Later Receipt'),
                                  'maxlength' => 65535,
-                                    
+                                            
                                     
                           ),
       
@@ -1576,7 +1576,7 @@ class ContributionPage extends \Civi\Core\Entity {
         'name' => 'is_partial_payment',
         'propertyName' => 'isPartialPayment',
         'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                     
+                                                             
                                     
                           ),
       
@@ -1587,7 +1587,7 @@ class ContributionPage extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Initial Amount Label'),
                                  'maxlength' => 255,
-                         'size' => \CRM_Utils_Type::HUGE,
+                                 'size' => \CRM_Utils_Type::HUGE,
                            
                                     
                           ),
@@ -1599,7 +1599,7 @@ class ContributionPage extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_TEXT,
                 'title' => ts('Initial Amount Help Text'),
                                  'maxlength' => 65535,
-                                    
+                                            
                                     
                           ),
       
@@ -1609,7 +1609,8 @@ class ContributionPage extends \Civi\Core\Entity {
         'propertyName' => 'minInitialAmount',
         'type' => \CRM_Utils_Type::T_MONEY,
                 'title' => ts('Min Initial Amount'),
-                                                     
+                                          'precision'      => array(20,2),
+                                   
                                     
                           ),
       
@@ -1618,7 +1619,7 @@ class ContributionPage extends \Civi\Core\Entity {
         'name' => 'is_allow_other_amount',
         'propertyName' => 'isAllowOtherAmount',
         'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                     
+                                                             
                                     
                           ),
       
@@ -1627,7 +1628,7 @@ class ContributionPage extends \Civi\Core\Entity {
         'name' => 'default_amount_id',
         'propertyName' => 'defaultAmountId',
         'type' => \CRM_Utils_Type::T_INT,
-                                                     
+                                                             
                                     
                           ),
       
@@ -1637,7 +1638,8 @@ class ContributionPage extends \Civi\Core\Entity {
         'propertyName' => 'minAmount',
         'type' => \CRM_Utils_Type::T_MONEY,
                 'title' => ts('Min Amount'),
-                                                     
+                                          'precision'      => array(20,2),
+                                   
                                     
                           ),
       
@@ -1647,7 +1649,8 @@ class ContributionPage extends \Civi\Core\Entity {
         'propertyName' => 'maxAmount',
         'type' => \CRM_Utils_Type::T_MONEY,
                 'title' => ts('Max Amount'),
-                                                     
+                                          'precision'      => array(20,2),
+                                   
                                     
                           ),
       
@@ -1657,7 +1660,8 @@ class ContributionPage extends \Civi\Core\Entity {
         'propertyName' => 'goalAmount',
         'type' => \CRM_Utils_Type::T_MONEY,
                 'title' => ts('Goal Amount'),
-                                                     
+                                          'precision'      => array(20,2),
+                                   
                                     
                           ),
       
@@ -1668,7 +1672,7 @@ class ContributionPage extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Thank-you Title'),
                                  'maxlength' => 255,
-                         'size' => \CRM_Utils_Type::HUGE,
+                                 'size' => \CRM_Utils_Type::HUGE,
                            
                                     
                           ),
@@ -1680,7 +1684,7 @@ class ContributionPage extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_TEXT,
                 'title' => ts('Thank-you Text'),
                                  'maxlength' => 65535,
-                                  'rows' => 8,
+                                          'rows' => 8,
                          'cols' => 60,
          
                                     
@@ -1693,7 +1697,7 @@ class ContributionPage extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_TEXT,
                 'title' => ts('Thank-you Footer'),
                                  'maxlength' => 65535,
-                                  'rows' => 8,
+                                          'rows' => 8,
                          'cols' => 60,
          
                                     
@@ -1704,7 +1708,7 @@ class ContributionPage extends \Civi\Core\Entity {
         'name' => 'is_for_organization',
         'propertyName' => 'isForOrganization',
         'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                     
+                                                             
                                     
                           ),
       
@@ -1715,7 +1719,7 @@ class ContributionPage extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_TEXT,
                 'title' => ts('On Behalf Of Organization'),
                                  'maxlength' => 65535,
-                                  'rows' => 2,
+                                          'rows' => 2,
                          'cols' => 50,
          
                                     
@@ -1726,7 +1730,7 @@ class ContributionPage extends \Civi\Core\Entity {
         'name' => 'is_email_receipt',
         'propertyName' => 'isEmailReceipt',
         'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                     
+                                                             
                                     
                           ),
       
@@ -1737,7 +1741,7 @@ class ContributionPage extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Receipt From Name'),
                                  'maxlength' => 255,
-                         'size' => \CRM_Utils_Type::HUGE,
+                                 'size' => \CRM_Utils_Type::HUGE,
                            
                                     
                           ),
@@ -1749,7 +1753,7 @@ class ContributionPage extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Receipt From Email'),
                                  'maxlength' => 255,
-                         'size' => \CRM_Utils_Type::HUGE,
+                                 'size' => \CRM_Utils_Type::HUGE,
                            
                                     
                           ),
@@ -1761,7 +1765,7 @@ class ContributionPage extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Cc Receipt'),
                                  'maxlength' => 255,
-                         'size' => \CRM_Utils_Type::HUGE,
+                                 'size' => \CRM_Utils_Type::HUGE,
                            
                                     
                           ),
@@ -1773,7 +1777,7 @@ class ContributionPage extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Bcc Receipt'),
                                  'maxlength' => 255,
-                         'size' => \CRM_Utils_Type::HUGE,
+                                 'size' => \CRM_Utils_Type::HUGE,
                            
                                     
                           ),
@@ -1785,7 +1789,7 @@ class ContributionPage extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_TEXT,
                 'title' => ts('Receipt Text'),
                                  'maxlength' => 65535,
-                                  'rows' => 6,
+                                          'rows' => 6,
                          'cols' => 50,
          
                                     
@@ -1796,7 +1800,7 @@ class ContributionPage extends \Civi\Core\Entity {
         'name' => 'is_active',
         'propertyName' => 'isActive',
         'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                     
+                                                             
                                     
                           ),
       
@@ -1807,7 +1811,7 @@ class ContributionPage extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_TEXT,
                 'title' => ts('Footer Text'),
                                  'maxlength' => 65535,
-                                  'rows' => 6,
+                                          'rows' => 6,
                          'cols' => 50,
          
                                     
@@ -1818,7 +1822,7 @@ class ContributionPage extends \Civi\Core\Entity {
         'name' => 'amount_block_is_active',
         'propertyName' => 'amountBlockIsActive',
         'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                     
+                                                             
                                            'default' => '1',
          
                           ),
@@ -1829,7 +1833,7 @@ class ContributionPage extends \Civi\Core\Entity {
         'propertyName' => 'startDate',
         'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
                 'title' => ts('Contribution Page Start Date'),
-                                                     
+                                                             
                                     
                           ),
       
@@ -1839,7 +1843,7 @@ class ContributionPage extends \Civi\Core\Entity {
         'propertyName' => 'endDate',
         'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
                 'title' => ts('Contribution Page End Date'),
-                                                     
+                                                             
                                     
                           ),
       
@@ -1849,9 +1853,9 @@ class ContributionPage extends \Civi\Core\Entity {
         'propertyName' => 'created',
         'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Contribution Page Created By'),
-                                                     
+                                                             
                                     
-                'FKClassName' => 'Civi_Contact_Contact',
+                'FKClassName' => 'CRM_Contact_DAO_Contact',
                           ),
       
               'created_date' => array(
@@ -1860,7 +1864,7 @@ class ContributionPage extends \Civi\Core\Entity {
         'propertyName' => 'createdDate',
         'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
                 'title' => ts('Contribution Page Created Date'),
-                                                     
+                                                             
                                     
                           ),
       
@@ -1871,7 +1875,7 @@ class ContributionPage extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Contribution Page Currency'),
                                  'maxlength' => 3,
-                         'size' => \CRM_Utils_Type::FOUR,
+                                 'size' => \CRM_Utils_Type::FOUR,
                            
                                            'default' => 'NULL',
          
@@ -1889,9 +1893,9 @@ class ContributionPage extends \Civi\Core\Entity {
         'propertyName' => 'campaign',
         'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Contribution Page Campaign ID'),
-                                                     
+                                                             
                                     
-                'FKClassName' => 'Civi_Campaign_Campaign',
+                'FKClassName' => 'CRM_Campaign_DAO_Campaign',
                                      'pseudoconstant' => array(
                                 'table' => 'civicrm_campaign',
                       'keyColumn' => 'id',
@@ -1905,7 +1909,7 @@ class ContributionPage extends \Civi\Core\Entity {
         'propertyName' => 'isShare',
         'type' => \CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('Is Contribution Page Shared?'),
-                                                     
+                                                             
                                            'default' => '1',
          
                           ),

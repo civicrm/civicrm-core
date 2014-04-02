@@ -180,7 +180,7 @@ class PriceSetEntity extends \Civi\Core\Entity {
         'propertyName' => 'id',
         'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
-                                             
+                                                     
                                     
                           ),
       
@@ -192,7 +192,7 @@ class PriceSetEntity extends \Civi\Core\Entity {
                 'title' => ts('Entity Table'),
                         'required' => true,
                          'maxlength' => 64,
-                         'size' => \CRM_Utils_Type::BIG,
+                                 'size' => \CRM_Utils_Type::BIG,
                            
                                     
                           ),
@@ -203,7 +203,7 @@ class PriceSetEntity extends \Civi\Core\Entity {
         'propertyName' => 'entityId',
         'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
-                                             
+                                                     
                                     
                           ),
       
@@ -213,9 +213,9 @@ class PriceSetEntity extends \Civi\Core\Entity {
         'propertyName' => 'priceSet',
         'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
-                                             
+                                                     
                                     
-                'FKClassName' => 'Civi_Price_PriceSet',
+                'FKClassName' => 'CRM_Price_DAO_PriceSet',
                           ),
              );
     }

@@ -330,7 +330,7 @@ class Country extends \Civi\Core\Entity {
         'propertyName' => 'id',
         'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
-                                             
+                                                     
                                     
                           ),
       
@@ -341,7 +341,7 @@ class Country extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Country'),
                                  'maxlength' => 64,
-                         'size' => \CRM_Utils_Type::BIG,
+                                 'size' => \CRM_Utils_Type::BIG,
                            
                 'import' => true,
         'where' => 'civicrm_country.name',
@@ -358,7 +358,7 @@ class Country extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Iso Code'),
                                  'maxlength' => 2,
-                         'size' => \CRM_Utils_Type::TWO,
+                                 'size' => \CRM_Utils_Type::TWO,
                            
                                     
                           ),
@@ -370,7 +370,7 @@ class Country extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Country Code'),
                                  'maxlength' => 4,
-                         'size' => \CRM_Utils_Type::FOUR,
+                                 'size' => \CRM_Utils_Type::FOUR,
                            
                                     
                           ),
@@ -380,9 +380,9 @@ class Country extends \Civi\Core\Entity {
         'name' => 'address_format_id',
         'propertyName' => 'addressFormat',
         'type' => \CRM_Utils_Type::T_INT,
-                                                     
+                                                             
                                     
-                'FKClassName' => 'Civi_Core_AddressFormat',
+                'FKClassName' => 'CRM_Core_DAO_AddressFormat',
                           ),
       
               'idd_prefix' => array(
@@ -392,7 +392,7 @@ class Country extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Idd Prefix'),
                                  'maxlength' => 4,
-                         'size' => \CRM_Utils_Type::FOUR,
+                                 'size' => \CRM_Utils_Type::FOUR,
                            
                                     
                           ),
@@ -404,7 +404,7 @@ class Country extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Ndd Prefix'),
                                  'maxlength' => 4,
-                         'size' => \CRM_Utils_Type::FOUR,
+                                 'size' => \CRM_Utils_Type::FOUR,
                            
                                     
                           ),
@@ -415,9 +415,9 @@ class Country extends \Civi\Core\Entity {
         'propertyName' => 'region',
         'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
-                                             
+                                                     
                                     
-                'FKClassName' => 'Civi_Core_Worldregion',
+                'FKClassName' => 'CRM_Core_DAO_Worldregion',
                           ),
       
               'is_province_abbreviated' => array(
@@ -425,7 +425,7 @@ class Country extends \Civi\Core\Entity {
         'name' => 'is_province_abbreviated',
         'propertyName' => 'isProvinceAbbreviated',
         'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                     
+                                                             
                                     
                           ),
              );

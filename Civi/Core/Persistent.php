@@ -210,7 +210,7 @@ class Persistent extends \Civi\Core\Entity {
         'propertyName' => 'id',
         'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
-                                             
+                                                     
                                     
                           ),
       
@@ -222,7 +222,7 @@ class Persistent extends \Civi\Core\Entity {
                 'title' => ts('Context'),
                         'required' => true,
                          'maxlength' => 255,
-                         'size' => \CRM_Utils_Type::HUGE,
+                                 'size' => \CRM_Utils_Type::HUGE,
                            
                                     
                           ),
@@ -235,7 +235,7 @@ class Persistent extends \Civi\Core\Entity {
                 'title' => ts('Name'),
                         'required' => true,
                          'maxlength' => 255,
-                         'size' => \CRM_Utils_Type::HUGE,
+                                 'size' => \CRM_Utils_Type::HUGE,
                            
                                     
                           ),
@@ -246,7 +246,7 @@ class Persistent extends \Civi\Core\Entity {
         'propertyName' => 'data',
         'type' => \CRM_Utils_Type::T_LONGTEXT,
                 'title' => ts('Data'),
-                                                     
+                                                             
                                     
                           ),
       
@@ -256,7 +256,7 @@ class Persistent extends \Civi\Core\Entity {
         'propertyName' => 'isConfig',
         'type' => \CRM_Utils_Type::T_BOOLEAN,
                         'required' => true,
-                                             
+                                                     
                                     
                           ),
              );

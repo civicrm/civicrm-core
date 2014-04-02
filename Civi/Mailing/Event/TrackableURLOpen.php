@@ -180,7 +180,7 @@ class TrackableURLOpen extends \Civi\Core\Entity {
         'propertyName' => 'id',
         'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
-                                             
+                                                     
                                     
                           ),
       
@@ -190,9 +190,9 @@ class TrackableURLOpen extends \Civi\Core\Entity {
         'propertyName' => 'eventQueue',
         'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
-                                             
+                                                     
                                     
-                'FKClassName' => 'Civi_Mailing_Event_Queue',
+                'FKClassName' => 'CRM_Mailing_Event_DAO_Queue',
                           ),
       
               'trackable_url_id' => array(
@@ -201,9 +201,9 @@ class TrackableURLOpen extends \Civi\Core\Entity {
         'propertyName' => 'trackableUrl',
         'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
-                                             
+                                                     
                                     
-                'FKClassName' => 'Civi_Mailing_TrackableURL',
+                'FKClassName' => 'CRM_Mailing_DAO_TrackableURL',
                           ),
       
               'time_stamp' => array(
@@ -213,7 +213,7 @@ class TrackableURLOpen extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
                 'title' => ts('Time Stamp'),
                         'required' => true,
-                                             
+                                                     
                                     
                           ),
              );

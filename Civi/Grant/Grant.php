@@ -511,7 +511,7 @@ class Grant extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Grant ID'),
                         'required' => true,
-                                             
+                                                     
                 'import' => true,
         'where' => 'civicrm_grant.id',
         'headerPattern' => '',
@@ -527,13 +527,13 @@ class Grant extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Contact ID'),
                         'required' => true,
-                                             
+                                                     
                          'export' => true,
                 'where' => 'civicrm_grant.contact_id',
         'headerPattern' => '',
         'dataPattern' => '',
                                    
-                'FKClassName' => 'Civi_Contact_Contact',
+                'FKClassName' => 'CRM_Contact_DAO_Contact',
                           ),
       
               'application_received_date' => array(
@@ -542,7 +542,7 @@ class Grant extends \Civi\Core\Entity {
         'propertyName' => 'applicationReceivedDate',
         'type' => \CRM_Utils_Type::T_DATE,
                 'title' => ts('Application received date'),
-                                                     
+                                                             
                          'export' => true,
                 'where' => 'civicrm_grant.application_received_date',
         'headerPattern' => '',
@@ -556,7 +556,7 @@ class Grant extends \Civi\Core\Entity {
         'propertyName' => 'decisionDate',
         'type' => \CRM_Utils_Type::T_DATE,
                 'title' => ts('Decision date'),
-                                                     
+                                                             
                 'import' => true,
         'where' => 'civicrm_grant.decision_date',
         'headerPattern' => '',
@@ -571,7 +571,7 @@ class Grant extends \Civi\Core\Entity {
         'propertyName' => 'moneyTransferDate',
         'type' => \CRM_Utils_Type::T_DATE,
                 'title' => ts('Grant Money transfer date'),
-                                                     
+                                                             
                 'import' => true,
         'where' => 'civicrm_grant.money_transfer_date',
         'headerPattern' => '',
@@ -586,7 +586,7 @@ class Grant extends \Civi\Core\Entity {
         'propertyName' => 'grantDueDate',
         'type' => \CRM_Utils_Type::T_DATE,
                 'title' => ts('Grant Due Date'),
-                                                     
+                                                             
                                     
                           ),
       
@@ -596,7 +596,7 @@ class Grant extends \Civi\Core\Entity {
         'propertyName' => 'grantReportReceived',
         'type' => \CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('Grant report received'),
-                                                     
+                                                             
                 'import' => true,
         'where' => 'civicrm_grant.grant_report_received',
         'headerPattern' => '',
@@ -612,7 +612,7 @@ class Grant extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Grant Type'),
                         'required' => true,
-                                             
+                                                     
                          'export' => false,
                 'where' => 'civicrm_grant.grant_type_id',
         'headerPattern' => '',
@@ -630,7 +630,8 @@ class Grant extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_MONEY,
                 'title' => ts('Total Amount'),
                         'required' => true,
-                                             
+                                  'precision'      => array(20,2),
+                                   
                 'import' => true,
         'where' => 'civicrm_grant.amount_total',
         'headerPattern' => '',
@@ -645,7 +646,8 @@ class Grant extends \Civi\Core\Entity {
         'propertyName' => 'amountRequested',
         'type' => \CRM_Utils_Type::T_MONEY,
                 'title' => ts('Amount Requested'),
-                                                     
+                                          'precision'      => array(20,2),
+                                   
                                     
                           ),
       
@@ -655,7 +657,8 @@ class Grant extends \Civi\Core\Entity {
         'propertyName' => 'amountGranted',
         'type' => \CRM_Utils_Type::T_MONEY,
                 'title' => ts('Amount granted'),
-                                                     
+                                          'precision'      => array(20,2),
+                                   
                 'import' => true,
         'where' => 'civicrm_grant.amount_granted',
         'headerPattern' => '',
@@ -672,7 +675,7 @@ class Grant extends \Civi\Core\Entity {
                 'title' => ts('Grant Currency'),
                         'required' => true,
                          'maxlength' => 3,
-                         'size' => \CRM_Utils_Type::FOUR,
+                                 'size' => \CRM_Utils_Type::FOUR,
                            
                                     
                                      'pseudoconstant' => array(
@@ -690,7 +693,7 @@ class Grant extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_TEXT,
                 'title' => ts('Grant Rationale'),
                                  'maxlength' => 65535,
-                                  'rows' => 4,
+                                          'rows' => 4,
                          'cols' => 60,
          
                 'import' => true,
@@ -708,7 +711,7 @@ class Grant extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Grant Status'),
                         'required' => true,
-                                             
+                                                     
                 'import' => true,
         'where' => 'civicrm_grant.status_id',
         'headerPattern' => '',
@@ -726,10 +729,10 @@ class Grant extends \Civi\Core\Entity {
         'propertyName' => 'financialType',
         'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Financial Type'),
-                                                     
+                                                             
                                            'default' => 'NULL',
          
-                'FKClassName' => 'Civi_Financial_FinancialType',
+                'FKClassName' => 'CRM_Financial_DAO_FinancialType',
                           ),
              );
     }

@@ -270,7 +270,7 @@ class Spool extends \Civi\Core\Entity {
         'propertyName' => 'id',
         'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
-                                             
+                                                     
                                     
                           ),
       
@@ -280,9 +280,9 @@ class Spool extends \Civi\Core\Entity {
         'propertyName' => 'job',
         'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
-                                             
+                                                     
                                     
-                'FKClassName' => 'Civi_Mailing_MailingJob',
+                'FKClassName' => 'CRM_Mailing_DAO_MailingJob',
                           ),
       
               'recipient_email' => array(
@@ -292,7 +292,7 @@ class Spool extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_TEXT,
                 'title' => ts('Recipient Email'),
                                  'maxlength' => 65535,
-                                    
+                                            
                                     
                           ),
       
@@ -303,7 +303,7 @@ class Spool extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_TEXT,
                 'title' => ts('Headers'),
                                  'maxlength' => 65535,
-                                    
+                                            
                                     
                           ),
       
@@ -314,7 +314,7 @@ class Spool extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_TEXT,
                 'title' => ts('Body'),
                                  'maxlength' => 65535,
-                                    
+                                            
                                     
                           ),
       
@@ -324,7 +324,7 @@ class Spool extends \Civi\Core\Entity {
         'propertyName' => 'addedAt',
         'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
                 'title' => ts('Added At'),
-                                                     
+                                                             
                                     
                           ),
       
@@ -334,7 +334,7 @@ class Spool extends \Civi\Core\Entity {
         'propertyName' => 'removedAt',
         'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
                 'title' => ts('Removed At'),
-                                                     
+                                                             
                                     
                           ),
              );

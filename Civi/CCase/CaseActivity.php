@@ -150,7 +150,7 @@ class CaseActivity extends \Civi\Core\Entity {
         'propertyName' => 'id',
         'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
-                                             
+                                                     
                                     
                           ),
       
@@ -160,9 +160,9 @@ class CaseActivity extends \Civi\Core\Entity {
         'propertyName' => 'case',
         'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
-                                             
+                                                     
                                     
-                'FKClassName' => 'Civi_CCase_CCase',
+                'FKClassName' => 'CRM_Case_DAO_Case',
                           ),
       
               'activity_id' => array(
@@ -171,9 +171,9 @@ class CaseActivity extends \Civi\Core\Entity {
         'propertyName' => 'activity',
         'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
-                                             
+                                                     
                                     
-                'FKClassName' => 'Civi_Activity_Activity',
+                'FKClassName' => 'CRM_Activity_DAO_Activity',
                           ),
              );
     }

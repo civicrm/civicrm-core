@@ -120,7 +120,7 @@ class AddressFormat extends \Civi\Core\Entity {
         'propertyName' => 'id',
         'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
-                                             
+                                                     
                                     
                           ),
       
@@ -131,7 +131,7 @@ class AddressFormat extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_TEXT,
                 'title' => ts('Address Format'),
                                  'maxlength' => 65535,
-                                    
+                                            
                                     
                           ),
              );

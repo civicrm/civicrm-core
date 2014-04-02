@@ -150,7 +150,7 @@ class TrackableURL extends \Civi\Core\Entity {
         'propertyName' => 'id',
         'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
-                                             
+                                                     
                                     
                           ),
       
@@ -162,7 +162,7 @@ class TrackableURL extends \Civi\Core\Entity {
                 'title' => ts('Url'),
                         'required' => true,
                          'maxlength' => 255,
-                         'size' => \CRM_Utils_Type::HUGE,
+                                 'size' => \CRM_Utils_Type::HUGE,
                            
                                     
                           ),
@@ -173,9 +173,9 @@ class TrackableURL extends \Civi\Core\Entity {
         'propertyName' => 'mailing',
         'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
-                                             
+                                                     
                                     
-                'FKClassName' => 'Civi_Mailing_Mailing',
+                'FKClassName' => 'CRM_Mailing_DAO_Mailing',
                           ),
              );
     }

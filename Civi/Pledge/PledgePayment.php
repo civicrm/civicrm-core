@@ -361,7 +361,7 @@ class PledgePayment extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Payment ID'),
                         'required' => true,
-                                             
+                                                     
                 'import' => true,
         'where' => 'civicrm_pledge_payment.id',
         'headerPattern' => '',
@@ -376,9 +376,9 @@ class PledgePayment extends \Civi\Core\Entity {
         'propertyName' => 'pledge',
         'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
-                                             
+                                                     
                                     
-                'FKClassName' => 'Civi_Pledge_Pledge',
+                'FKClassName' => 'CRM_Pledge_DAO_Pledge',
                           ),
       
               'contribution_id' => array(
@@ -386,9 +386,9 @@ class PledgePayment extends \Civi\Core\Entity {
         'name' => 'contribution_id',
         'propertyName' => 'contribution',
         'type' => \CRM_Utils_Type::T_INT,
-                                                     
+                                                             
                                     
-                'FKClassName' => 'Civi_Contribute_Contribution',
+                'FKClassName' => 'CRM_Contribute_DAO_Contribution',
                           ),
       
               'pledge_payment_scheduled_amount' => array(
@@ -398,7 +398,8 @@ class PledgePayment extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_MONEY,
                 'title' => ts('Scheduled Amount'),
                         'required' => true,
-                                             
+                                  'precision'      => array(20,2),
+                                   
                 'import' => true,
         'where' => 'civicrm_pledge_payment.scheduled_amount',
         'headerPattern' => '',
@@ -413,7 +414,8 @@ class PledgePayment extends \Civi\Core\Entity {
         'propertyName' => 'actualAmount',
         'type' => \CRM_Utils_Type::T_MONEY,
                 'title' => ts('Actual Amount'),
-                                                     
+                                          'precision'      => array(20,2),
+                                   
                 'import' => true,
         'where' => 'civicrm_pledge_payment.actual_amount',
         'headerPattern' => '',
@@ -429,7 +431,7 @@ class PledgePayment extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Currency'),
                                  'maxlength' => 3,
-                         'size' => \CRM_Utils_Type::FOUR,
+                                 'size' => \CRM_Utils_Type::FOUR,
                            
                                            'default' => 'NULL',
          
@@ -448,7 +450,7 @@ class PledgePayment extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
                 'title' => ts('Scheduled Date'),
                         'required' => true,
-                                             
+                                                     
                 'import' => true,
         'where' => 'civicrm_pledge_payment.scheduled_date',
         'headerPattern' => '',
@@ -463,7 +465,7 @@ class PledgePayment extends \Civi\Core\Entity {
         'propertyName' => 'reminderDate',
         'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
                 'title' => ts('Last Reminder'),
-                                                     
+                                                             
                 'import' => true,
         'where' => 'civicrm_pledge_payment.reminder_date',
         'headerPattern' => '',
@@ -478,7 +480,7 @@ class PledgePayment extends \Civi\Core\Entity {
         'propertyName' => 'reminderCount',
         'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Reminders Sent'),
-                                                     
+                                                             
                 'import' => true,
         'where' => 'civicrm_pledge_payment.reminder_count',
         'headerPattern' => '',
@@ -493,7 +495,7 @@ class PledgePayment extends \Civi\Core\Entity {
         'propertyName' => 'statusId',
         'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Payment Status'),
-                                                     
+                                                             
                 'import' => true,
         'where' => 'civicrm_pledge_payment.status_id',
         'headerPattern' => '',

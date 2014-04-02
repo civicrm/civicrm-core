@@ -511,7 +511,7 @@ class Membership extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Membership ID'),
                         'required' => true,
-                                             
+                                                     
                 'import' => true,
         'where' => 'civicrm_membership.id',
         'headerPattern' => '/^(m(embership\s)?id)$/i',
@@ -527,14 +527,14 @@ class Membership extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Contact ID'),
                         'required' => true,
-                                             
+                                                     
                 'import' => true,
         'where' => 'civicrm_membership.contact_id',
         'headerPattern' => '/contact(.?id)?/i',
         'dataPattern' => '/^\d+$/',
                          'export' => true,
                                    
-                'FKClassName' => 'Civi_Contact_Contact',
+                'FKClassName' => 'CRM_Contact_DAO_Contact',
                           ),
       
               'membership_type_id' => array(
@@ -544,14 +544,14 @@ class Membership extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Membership Type Id'),
                         'required' => true,
-                                             
+                                                     
                 'import' => true,
         'where' => 'civicrm_membership.membership_type_id',
         'headerPattern' => '/^(m(embership\s)?type)$/i',
         'dataPattern' => '',
                          'export' => false,
                                    
-                'FKClassName' => 'Civi_Member_MembershipType',
+                'FKClassName' => 'CRM_Member_DAO_MembershipType',
                                      'pseudoconstant' => array(
                                 'table' => 'civicrm_membership_type',
                       'keyColumn' => 'id',
@@ -565,7 +565,7 @@ class Membership extends \Civi\Core\Entity {
         'propertyName' => 'joinDate',
         'type' => \CRM_Utils_Type::T_DATE,
                 'title' => ts('Member Since'),
-                                                     
+                                                             
                 'import' => true,
         'where' => 'civicrm_membership.join_date',
         'headerPattern' => '/^join|(j(oin\s)?date)$/i',
@@ -580,7 +580,7 @@ class Membership extends \Civi\Core\Entity {
         'propertyName' => 'startDate',
         'type' => \CRM_Utils_Type::T_DATE,
                 'title' => ts('Membership Start Date'),
-                                                     
+                                                             
                 'import' => true,
         'where' => 'civicrm_membership.start_date',
         'headerPattern' => '/(member(ship)?.)?start(s)?(.date$)?/i',
@@ -595,7 +595,7 @@ class Membership extends \Civi\Core\Entity {
         'propertyName' => 'endDate',
         'type' => \CRM_Utils_Type::T_DATE,
                 'title' => ts('Membership Expiration Date'),
-                                                     
+                                                             
                 'import' => true,
         'where' => 'civicrm_membership.end_date',
         'headerPattern' => '/(member(ship)?.)?end(s)?(.date$)?/i',
@@ -611,7 +611,7 @@ class Membership extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Source'),
                                  'maxlength' => 128,
-                         'size' => \CRM_Utils_Type::HUGE,
+                                 'size' => \CRM_Utils_Type::HUGE,
                            
                 'import' => true,
         'where' => 'civicrm_membership.source',
@@ -628,14 +628,14 @@ class Membership extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Membership Status Id'),
                         'required' => true,
-                                             
+                                                     
                 'import' => true,
         'where' => 'civicrm_membership.status_id',
         'headerPattern' => '/(member(ship|).)?(status)$/i',
         'dataPattern' => '',
                          'export' => false,
                                    
-                'FKClassName' => 'Civi_Member_MembershipStatus',
+                'FKClassName' => 'CRM_Member_DAO_MembershipStatus',
                                      'pseudoconstant' => array(
                                 'table' => 'civicrm_membership_status',
                       'keyColumn' => 'id',
@@ -649,7 +649,7 @@ class Membership extends \Civi\Core\Entity {
         'propertyName' => 'isOverride',
         'type' => \CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('Status Override'),
-                                                     
+                                                             
                 'import' => true,
         'where' => 'civicrm_membership.is_override',
         'headerPattern' => '/override$/i',
@@ -664,13 +664,13 @@ class Membership extends \Civi\Core\Entity {
         'propertyName' => 'ownerMembership',
         'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Primary Member ID'),
-                                                     
+                                                             
                          'export' => true,
                 'where' => 'civicrm_membership.owner_membership_id',
         'headerPattern' => '',
         'dataPattern' => '',
                                    
-                'FKClassName' => 'Civi_Member_Membership',
+                'FKClassName' => 'CRM_Member_DAO_Membership',
                           ),
       
               'max_related' => array(
@@ -679,7 +679,7 @@ class Membership extends \Civi\Core\Entity {
         'propertyName' => 'maxRelated',
         'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Max Related'),
-                                                     
+                                                             
                                     
                           ),
       
@@ -689,7 +689,7 @@ class Membership extends \Civi\Core\Entity {
         'propertyName' => 'isTest',
         'type' => \CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('Test'),
-                                                     
+                                                             
                 'import' => true,
         'where' => 'civicrm_membership.is_test',
         'headerPattern' => '/(is.)?test(.member(ship)?)?/i',
@@ -704,7 +704,7 @@ class Membership extends \Civi\Core\Entity {
         'propertyName' => 'isPayLater',
         'type' => \CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('Is Pay Later'),
-                                                     
+                                                             
                 'import' => true,
         'where' => 'civicrm_membership.is_pay_later',
         'headerPattern' => '/(is.)?(pay(.)?later)$/i',
@@ -718,9 +718,9 @@ class Membership extends \Civi\Core\Entity {
         'name' => 'contribution_recur_id',
         'propertyName' => 'contributionRecur',
         'type' => \CRM_Utils_Type::T_INT,
-                                                     
+                                                             
                                     
-                'FKClassName' => 'Civi_Contribute_ContributionRecur',
+                'FKClassName' => 'CRM_Contribute_DAO_ContributionRecur',
                           ),
       
               'member_campaign_id' => array(
@@ -729,14 +729,14 @@ class Membership extends \Civi\Core\Entity {
         'propertyName' => 'campaign',
         'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Campaign'),
-                                                     
+                                                             
                 'import' => true,
         'where' => 'civicrm_membership.campaign_id',
         'headerPattern' => '',
         'dataPattern' => '',
                          'export' => true,
                                    
-                'FKClassName' => 'Civi_Campaign_Campaign',
+                'FKClassName' => 'CRM_Campaign_DAO_Campaign',
                                      'pseudoconstant' => array(
                                 'table' => 'civicrm_campaign',
                       'keyColumn' => 'id',

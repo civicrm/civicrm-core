@@ -210,7 +210,7 @@ class Bounce extends \Civi\Core\Entity {
         'propertyName' => 'id',
         'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
-                                             
+                                                     
                                     
                           ),
       
@@ -220,9 +220,9 @@ class Bounce extends \Civi\Core\Entity {
         'propertyName' => 'eventQueue',
         'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
-                                             
+                                                     
                                     
-                'FKClassName' => 'Civi_Mailing_Event_Queue',
+                'FKClassName' => 'CRM_Mailing_Event_DAO_Queue',
                           ),
       
               'bounce_type_id' => array(
@@ -230,7 +230,7 @@ class Bounce extends \Civi\Core\Entity {
         'name' => 'bounce_type_id',
         'propertyName' => 'bounceTypeId',
         'type' => \CRM_Utils_Type::T_INT,
-                                                     
+                                                             
                                     
                                      'pseudoconstant' => array(
                                 'table' => 'civicrm_mailing_bounce_type',
@@ -246,7 +246,7 @@ class Bounce extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Bounce Reason'),
                                  'maxlength' => 255,
-                         'size' => \CRM_Utils_Type::HUGE,
+                                 'size' => \CRM_Utils_Type::HUGE,
                            
                                     
                           ),
@@ -258,7 +258,7 @@ class Bounce extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
                 'title' => ts('Time Stamp'),
                         'required' => true,
-                                             
+                                                     
                                     
                           ),
              );

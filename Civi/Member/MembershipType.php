@@ -690,7 +690,7 @@ class MembershipType extends \Civi\Core\Entity {
         'propertyName' => 'id',
         'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
-                                             
+                                                     
                                     
                           ),
       
@@ -700,9 +700,9 @@ class MembershipType extends \Civi\Core\Entity {
         'propertyName' => 'domain',
         'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
-                                             
+                                                     
                                     
-                'FKClassName' => 'Civi_Core_Domain',
+                'FKClassName' => 'CRM_Core_DAO_Domain',
                           ),
       
               'membership_type' => array(
@@ -712,7 +712,7 @@ class MembershipType extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Membership Type'),
                                  'maxlength' => 128,
-                         'size' => \CRM_Utils_Type::HUGE,
+                                 'size' => \CRM_Utils_Type::HUGE,
                            
                 'import' => true,
         'where' => 'civicrm_membership_type.name',
@@ -729,7 +729,7 @@ class MembershipType extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Description'),
                                  'maxlength' => 255,
-                         'size' => \CRM_Utils_Type::HUGE,
+                                 'size' => \CRM_Utils_Type::HUGE,
                            
                                     
                           ),
@@ -740,9 +740,9 @@ class MembershipType extends \Civi\Core\Entity {
         'propertyName' => 'memberOfContact',
         'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
-                                             
+                                                     
                                     
-                'FKClassName' => 'Civi_Contact_Contact',
+                'FKClassName' => 'CRM_Contact_DAO_Contact',
                           ),
       
               'financial_type_id' => array(
@@ -751,9 +751,9 @@ class MembershipType extends \Civi\Core\Entity {
         'propertyName' => 'financialType',
         'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
-                                             
+                                                     
                                     
-                'FKClassName' => 'Civi_Financial_FinancialType',
+                'FKClassName' => 'CRM_Financial_DAO_FinancialType',
                           ),
       
               'minimum_fee' => array(
@@ -762,7 +762,8 @@ class MembershipType extends \Civi\Core\Entity {
         'propertyName' => 'minimumFee',
         'type' => \CRM_Utils_Type::T_MONEY,
                 'title' => ts('Minimum Fee'),
-                                                     
+                                          'precision'      => array(20,2),
+                                   
                                     
                           ),
       
@@ -773,11 +774,11 @@ class MembershipType extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Duration Unit'),
                                  'maxlength' => 8,
-                         'size' => \CRM_Utils_Type::EIGHT,
+                                 'size' => \CRM_Utils_Type::EIGHT,
                            
                                     
                                      'pseudoconstant' => array(
-                                '0' => 'not in database',
+                                'callback' => 'CRM_Core_SelectValues::membershipTypeUnitList',
                     )
                  ),
       
@@ -787,7 +788,7 @@ class MembershipType extends \Civi\Core\Entity {
         'propertyName' => 'durationInterval',
         'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Duration Interval'),
-                                                     
+                                                             
                                     
                           ),
       
@@ -798,11 +799,11 @@ class MembershipType extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Period Type'),
                                  'maxlength' => 8,
-                         'size' => \CRM_Utils_Type::EIGHT,
+                                 'size' => \CRM_Utils_Type::EIGHT,
                            
                                     
                                      'pseudoconstant' => array(
-                                '0' => 'not in database',
+                                'callback' => 'CRM_Core_SelectValues::periodType',
                     )
                  ),
       
@@ -812,7 +813,7 @@ class MembershipType extends \Civi\Core\Entity {
         'propertyName' => 'fixedPeriodStartDay',
         'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Fixed Period Start Day'),
-                                                     
+                                                             
                                     
                           ),
       
@@ -822,7 +823,7 @@ class MembershipType extends \Civi\Core\Entity {
         'propertyName' => 'fixedPeriodRolloverDay',
         'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Fixed Period Rollover Day'),
-                                                     
+                                                             
                                     
                           ),
       
@@ -832,7 +833,7 @@ class MembershipType extends \Civi\Core\Entity {
         'propertyName' => 'relationshipTypeId',
         'type' => \CRM_Utils_Type::T_STRING,
                                  'maxlength' => 64,
-                         'size' => \CRM_Utils_Type::BIG,
+                                 'size' => \CRM_Utils_Type::BIG,
                            
                                     
                           ),
@@ -844,7 +845,7 @@ class MembershipType extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Relationship Direction'),
                                  'maxlength' => 128,
-                         'size' => \CRM_Utils_Type::HUGE,
+                                 'size' => \CRM_Utils_Type::HUGE,
                            
                                     
                           ),
@@ -855,7 +856,7 @@ class MembershipType extends \Civi\Core\Entity {
         'propertyName' => 'maxRelated',
         'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Max Related'),
-                                                     
+                                                             
                                     
                           ),
       
@@ -866,7 +867,7 @@ class MembershipType extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Visible'),
                                  'maxlength' => 64,
-                         'size' => \CRM_Utils_Type::BIG,
+                                 'size' => \CRM_Utils_Type::BIG,
                            
                                     
                                      'pseudoconstant' => array(
@@ -880,7 +881,7 @@ class MembershipType extends \Civi\Core\Entity {
         'propertyName' => 'weight',
         'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Weight'),
-                                                     
+                                                             
                                     
                           ),
       
@@ -891,7 +892,7 @@ class MembershipType extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Receipt Text Signup'),
                                  'maxlength' => 255,
-                         'size' => \CRM_Utils_Type::HUGE,
+                                 'size' => \CRM_Utils_Type::HUGE,
                            
                                     
                           ),
@@ -903,7 +904,7 @@ class MembershipType extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Receipt Text Renewal'),
                                  'maxlength' => 255,
-                         'size' => \CRM_Utils_Type::HUGE,
+                                 'size' => \CRM_Utils_Type::HUGE,
                            
                                     
                           ),
@@ -914,7 +915,7 @@ class MembershipType extends \Civi\Core\Entity {
         'propertyName' => 'autoRenew',
         'type' => \CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('Auto Renew'),
-                                                     
+                                                             
                                     
                           ),
       
@@ -924,7 +925,7 @@ class MembershipType extends \Civi\Core\Entity {
         'propertyName' => 'isActive',
         'type' => \CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('Is Active'),
-                                                     
+                                                             
                                            'default' => '1',
          
                           ),

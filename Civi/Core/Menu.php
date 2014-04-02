@@ -690,7 +690,7 @@ class Menu extends \Civi\Core\Entity {
         'propertyName' => 'id',
         'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
-                                             
+                                                     
                                     
                           ),
       
@@ -700,9 +700,9 @@ class Menu extends \Civi\Core\Entity {
         'propertyName' => 'domain',
         'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
-                                             
+                                                     
                                     
-                'FKClassName' => 'Civi_Core_Domain',
+                'FKClassName' => 'CRM_Core_DAO_Domain',
                           ),
       
               'path' => array(
@@ -712,7 +712,7 @@ class Menu extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Path'),
                                  'maxlength' => 255,
-                         'size' => \CRM_Utils_Type::HUGE,
+                                 'size' => \CRM_Utils_Type::HUGE,
                            
                                     
                           ),
@@ -724,7 +724,7 @@ class Menu extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_TEXT,
                 'title' => ts('Path Arguments'),
                                  'maxlength' => 65535,
-                                    
+                                            
                                     
                           ),
       
@@ -735,7 +735,7 @@ class Menu extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Title'),
                                  'maxlength' => 255,
-                         'size' => \CRM_Utils_Type::HUGE,
+                                 'size' => \CRM_Utils_Type::HUGE,
                            
                                     
                           ),
@@ -747,7 +747,7 @@ class Menu extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Access Callback'),
                                  'maxlength' => 255,
-                         'size' => \CRM_Utils_Type::HUGE,
+                                 'size' => \CRM_Utils_Type::HUGE,
                            
                                     
                           ),
@@ -759,7 +759,7 @@ class Menu extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_TEXT,
                 'title' => ts('Access Arguments'),
                                  'maxlength' => 65535,
-                                    
+                                            
                                     
                           ),
       
@@ -770,7 +770,7 @@ class Menu extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Page Callback'),
                                  'maxlength' => 255,
-                         'size' => \CRM_Utils_Type::HUGE,
+                                 'size' => \CRM_Utils_Type::HUGE,
                            
                                     
                           ),
@@ -782,7 +782,7 @@ class Menu extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_TEXT,
                 'title' => ts('Page Arguments'),
                                  'maxlength' => 65535,
-                                    
+                                            
                                     
                           ),
       
@@ -793,7 +793,7 @@ class Menu extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_TEXT,
                 'title' => ts('Breadcrumb'),
                                  'maxlength' => 65535,
-                                    
+                                            
                                     
                           ),
       
@@ -804,7 +804,7 @@ class Menu extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Return Url'),
                                  'maxlength' => 255,
-                         'size' => \CRM_Utils_Type::HUGE,
+                                 'size' => \CRM_Utils_Type::HUGE,
                            
                                     
                           ),
@@ -816,7 +816,7 @@ class Menu extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Return Url Args'),
                                  'maxlength' => 255,
-                         'size' => \CRM_Utils_Type::HUGE,
+                                 'size' => \CRM_Utils_Type::HUGE,
                            
                                     
                           ),
@@ -826,9 +826,9 @@ class Menu extends \Civi\Core\Entity {
         'name' => 'component_id',
         'propertyName' => 'component',
         'type' => \CRM_Utils_Type::T_INT,
-                                                     
+                                                             
                                     
-                'FKClassName' => 'Civi_Core_Component',
+                'FKClassName' => 'CRM_Core_DAO_Component',
                                      'pseudoconstant' => array(
                                 'table' => 'civicrm_component',
                       'keyColumn' => 'id',
@@ -841,7 +841,7 @@ class Menu extends \Civi\Core\Entity {
         'name' => 'is_active',
         'propertyName' => 'isActive',
         'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                     
+                                                             
                                     
                           ),
       
@@ -850,7 +850,7 @@ class Menu extends \Civi\Core\Entity {
         'name' => 'is_public',
         'propertyName' => 'isPublic',
         'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                     
+                                                             
                                     
                           ),
       
@@ -859,7 +859,7 @@ class Menu extends \Civi\Core\Entity {
         'name' => 'is_exposed',
         'propertyName' => 'isExposed',
         'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                     
+                                                             
                                     
                           ),
       
@@ -868,7 +868,7 @@ class Menu extends \Civi\Core\Entity {
         'name' => 'is_ssl',
         'propertyName' => 'isSsl',
         'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                     
+                                                             
                                     
                           ),
       
@@ -879,7 +879,7 @@ class Menu extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Weight'),
                         'required' => true,
-                                             
+                                                     
                                            'default' => '1',
          
                           ),
@@ -891,7 +891,7 @@ class Menu extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Type'),
                         'required' => true,
-                                             
+                                                     
                                            'default' => '1',
          
                           ),
@@ -903,7 +903,7 @@ class Menu extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Page Type'),
                         'required' => true,
-                                             
+                                                     
                                            'default' => '1',
          
                           ),
@@ -914,7 +914,7 @@ class Menu extends \Civi\Core\Entity {
         'propertyName' => 'skipBreadcrumb',
         'type' => \CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('Skipbreadcrumb'),
-                                                     
+                                                             
                                     
                           ),
              );

@@ -360,7 +360,7 @@ class DashboardContact extends \Civi\Core\Entity {
         'propertyName' => 'id',
         'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
-                                             
+                                                     
                                     
                           ),
       
@@ -370,9 +370,9 @@ class DashboardContact extends \Civi\Core\Entity {
         'propertyName' => 'dashboard',
         'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
-                                             
+                                                     
                                     
-                'FKClassName' => 'Civi_Core_Dashboard',
+                'FKClassName' => 'CRM_Core_DAO_Dashboard',
                           ),
       
               'contact_id' => array(
@@ -381,9 +381,9 @@ class DashboardContact extends \Civi\Core\Entity {
         'propertyName' => 'contact',
         'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
-                                             
+                                                     
                                     
-                'FKClassName' => 'Civi_Contact_Contact',
+                'FKClassName' => 'CRM_Contact_DAO_Contact',
                           ),
       
               'column_no' => array(
@@ -392,7 +392,7 @@ class DashboardContact extends \Civi\Core\Entity {
         'propertyName' => 'columnNo',
         'type' => \CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('Column No'),
-                                                     
+                                                             
                                     
                           ),
       
@@ -401,7 +401,7 @@ class DashboardContact extends \Civi\Core\Entity {
         'name' => 'is_minimized',
         'propertyName' => 'isMinimized',
         'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                     
+                                                             
                                     
                           ),
       
@@ -410,7 +410,7 @@ class DashboardContact extends \Civi\Core\Entity {
         'name' => 'is_fullscreen',
         'propertyName' => 'isFullscreen',
         'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                     
+                                                             
                                            'default' => '1',
          
                           ),
@@ -420,7 +420,7 @@ class DashboardContact extends \Civi\Core\Entity {
         'name' => 'is_active',
         'propertyName' => 'isActive',
         'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                     
+                                                             
                                     
                           ),
       
@@ -430,7 +430,7 @@ class DashboardContact extends \Civi\Core\Entity {
         'propertyName' => 'weight',
         'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Weight'),
-                                                     
+                                                             
                                     
                           ),
       
@@ -440,7 +440,7 @@ class DashboardContact extends \Civi\Core\Entity {
         'propertyName' => 'content',
         'type' => \CRM_Utils_Type::T_LONGTEXT,
                 'title' => ts('Content'),
-                                                     
+                                                             
                                     
                           ),
       
@@ -450,7 +450,7 @@ class DashboardContact extends \Civi\Core\Entity {
         'propertyName' => 'createdDate',
         'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
                 'title' => ts('Created Date'),
-                                                     
+                                                             
                                     
                           ),
              );

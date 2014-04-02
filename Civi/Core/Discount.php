@@ -240,7 +240,7 @@ class Discount extends \Civi\Core\Entity {
         'propertyName' => 'id',
         'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
-                                             
+                                                     
                                     
                           ),
       
@@ -251,7 +251,7 @@ class Discount extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Entity Table'),
                                  'maxlength' => 64,
-                         'size' => \CRM_Utils_Type::BIG,
+                                 'size' => \CRM_Utils_Type::BIG,
                            
                                     
                           ),
@@ -262,7 +262,7 @@ class Discount extends \Civi\Core\Entity {
         'propertyName' => 'entityId',
         'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
-                                             
+                                                     
                                     
                           ),
       
@@ -273,13 +273,13 @@ class Discount extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Discount Name'),
                         'required' => true,
-                                             
+                                                     
                          'export' => true,
                 'where' => 'civicrm_discount.price_set_id',
         'headerPattern' => '',
         'dataPattern' => '',
                                    
-                'FKClassName' => 'Civi_Price_PriceSet',
+                'FKClassName' => 'CRM_Price_DAO_PriceSet',
                           ),
       
               'start_date' => array(
@@ -288,7 +288,7 @@ class Discount extends \Civi\Core\Entity {
         'propertyName' => 'startDate',
         'type' => \CRM_Utils_Type::T_DATE,
                 'title' => ts('Start Date'),
-                                                     
+                                                             
                                     
                           ),
       
@@ -298,7 +298,7 @@ class Discount extends \Civi\Core\Entity {
         'propertyName' => 'endDate',
         'type' => \CRM_Utils_Type::T_DATE,
                 'title' => ts('End Date'),
-                                                     
+                                                             
                                     
                           ),
              );

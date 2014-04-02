@@ -330,7 +330,7 @@ class ParticipantStatusType extends \Civi\Core\Entity {
         'propertyName' => 'id',
         'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
-                                             
+                                                     
                                     
                           ),
       
@@ -341,7 +341,7 @@ class ParticipantStatusType extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Participant Status'),
                                  'maxlength' => 64,
-                         'size' => \CRM_Utils_Type::BIG,
+                                 'size' => \CRM_Utils_Type::BIG,
                            
                 'import' => true,
         'where' => 'civicrm_participant_status_type.name',
@@ -358,7 +358,7 @@ class ParticipantStatusType extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Label'),
                                  'maxlength' => 255,
-                         'size' => \CRM_Utils_Type::HUGE,
+                                 'size' => \CRM_Utils_Type::HUGE,
                            
                                     
                           ),
@@ -370,11 +370,11 @@ class ParticipantStatusType extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Class'),
                                  'maxlength' => 8,
-                         'size' => \CRM_Utils_Type::EIGHT,
+                                 'size' => \CRM_Utils_Type::EIGHT,
                            
                                     
                                      'pseudoconstant' => array(
-                                '0' => 'not in database',
+                                'callback' => 'CRM_Event_PseudoConstant::participantStatusClass',
                     )
                  ),
       
@@ -383,7 +383,7 @@ class ParticipantStatusType extends \Civi\Core\Entity {
         'name' => 'is_reserved',
         'propertyName' => 'isReserved',
         'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                     
+                                                             
                                     
                           ),
       
@@ -392,7 +392,7 @@ class ParticipantStatusType extends \Civi\Core\Entity {
         'name' => 'is_active',
         'propertyName' => 'isActive',
         'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                     
+                                                             
                                            'default' => '1',
          
                           ),
@@ -402,7 +402,7 @@ class ParticipantStatusType extends \Civi\Core\Entity {
         'name' => 'is_counted',
         'propertyName' => 'isCounted',
         'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                     
+                                                             
                                     
                           ),
       
@@ -413,7 +413,7 @@ class ParticipantStatusType extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Weight'),
                         'required' => true,
-                                             
+                                                     
                                     
                           ),
       
@@ -422,7 +422,7 @@ class ParticipantStatusType extends \Civi\Core\Entity {
         'name' => 'visibility_id',
         'propertyName' => 'visibilityId',
         'type' => \CRM_Utils_Type::T_INT,
-                                                     
+                                                             
                                     
                                      'pseudoconstant' => array(
                                 'optionGroupName' => 'visibility',

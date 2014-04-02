@@ -181,7 +181,7 @@ class EntityTag extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Entity Tag ID'),
                         'required' => true,
-                                             
+                                                     
                                     
                           ),
       
@@ -192,7 +192,7 @@ class EntityTag extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Entity Table'),
                                  'maxlength' => 64,
-                         'size' => \CRM_Utils_Type::BIG,
+                                 'size' => \CRM_Utils_Type::BIG,
                            
                                     
                           ),
@@ -204,7 +204,7 @@ class EntityTag extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Entity ID'),
                         'required' => true,
-                                             
+                                                     
                                     
                           ),
       
@@ -215,9 +215,9 @@ class EntityTag extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Tag ID'),
                         'required' => true,
-                                             
+                                                     
                                     
-                'FKClassName' => 'Civi_Core_Tag',
+                'FKClassName' => 'CRM_Core_DAO_Tag',
                                      'pseudoconstant' => array(
                                 'table' => 'civicrm_tag',
                       'keyColumn' => 'id',

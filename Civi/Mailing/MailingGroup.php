@@ -270,7 +270,7 @@ class MailingGroup extends \Civi\Core\Entity {
         'propertyName' => 'id',
         'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
-                                             
+                                                     
                                     
                           ),
       
@@ -280,9 +280,9 @@ class MailingGroup extends \Civi\Core\Entity {
         'propertyName' => 'mailing',
         'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
-                                             
+                                                     
                                     
-                'FKClassName' => 'Civi_Mailing_Mailing',
+                'FKClassName' => 'CRM_Mailing_DAO_Mailing',
                           ),
       
               'group_type' => array(
@@ -292,11 +292,11 @@ class MailingGroup extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Group Type'),
                                  'maxlength' => 8,
-                         'size' => \CRM_Utils_Type::EIGHT,
+                                 'size' => \CRM_Utils_Type::EIGHT,
                            
                                     
                                      'pseudoconstant' => array(
-                                '0' => 'not in database',
+                                'callback' => 'CRM_Core_SelectValues::getMailingGroupTypes',
                     )
                  ),
       
@@ -308,7 +308,7 @@ class MailingGroup extends \Civi\Core\Entity {
                 'title' => ts('Entity Table'),
                         'required' => true,
                          'maxlength' => 64,
-                         'size' => \CRM_Utils_Type::BIG,
+                                 'size' => \CRM_Utils_Type::BIG,
                            
                                     
                           ),
@@ -319,7 +319,7 @@ class MailingGroup extends \Civi\Core\Entity {
         'propertyName' => 'entityId',
         'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
-                                             
+                                                     
                                     
                           ),
       
@@ -328,7 +328,7 @@ class MailingGroup extends \Civi\Core\Entity {
         'name' => 'search_id',
         'propertyName' => 'searchId',
         'type' => \CRM_Utils_Type::T_INT,
-                                                     
+                                                             
                                     
                           ),
       
@@ -339,7 +339,7 @@ class MailingGroup extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_TEXT,
                 'title' => ts('Search Args'),
                                  'maxlength' => 65535,
-                                    
+                                            
                                     
                           ),
              );

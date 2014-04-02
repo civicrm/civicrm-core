@@ -360,7 +360,7 @@ class Tag extends \Civi\Core\Entity {
         'propertyName' => 'id',
         'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
-                                             
+                                                     
                                     
                           ),
       
@@ -372,7 +372,7 @@ class Tag extends \Civi\Core\Entity {
                 'title' => ts('Tag Name'),
                         'required' => true,
                          'maxlength' => 64,
-                         'size' => \CRM_Utils_Type::BIG,
+                                 'size' => \CRM_Utils_Type::BIG,
                            
                                     
                           ),
@@ -384,7 +384,7 @@ class Tag extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Description'),
                                  'maxlength' => 255,
-                         'size' => \CRM_Utils_Type::HUGE,
+                                 'size' => \CRM_Utils_Type::HUGE,
                            
                                     
                           ),
@@ -395,10 +395,10 @@ class Tag extends \Civi\Core\Entity {
         'propertyName' => 'parent',
         'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Parent Tag'),
-                                                     
+                                                             
                                            'default' => 'NULL',
          
-                'FKClassName' => 'Civi_Core_Tag',
+                'FKClassName' => 'CRM_Core_DAO_Tag',
                           ),
       
               'is_selectable' => array(
@@ -406,7 +406,7 @@ class Tag extends \Civi\Core\Entity {
         'name' => 'is_selectable',
         'propertyName' => 'isSelectable',
         'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                     
+                                                             
                                            'default' => '1',
          
                           ),
@@ -417,7 +417,7 @@ class Tag extends \Civi\Core\Entity {
         'propertyName' => 'isReserved',
         'type' => \CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('Reserved'),
-                                                     
+                                                             
                                     
                           ),
       
@@ -427,7 +427,7 @@ class Tag extends \Civi\Core\Entity {
         'propertyName' => 'isTagset',
         'type' => \CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('Tagset'),
-                                                     
+                                                             
                                     
                           ),
       
@@ -438,7 +438,7 @@ class Tag extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Used For'),
                                  'maxlength' => 64,
-                         'size' => \CRM_Utils_Type::BIG,
+                                 'size' => \CRM_Utils_Type::BIG,
                            
                                            'default' => 'NULL',
          
@@ -452,9 +452,9 @@ class Tag extends \Civi\Core\Entity {
         'name' => 'created_id',
         'propertyName' => 'created',
         'type' => \CRM_Utils_Type::T_INT,
-                                                     
+                                                             
                                     
-                'FKClassName' => 'Civi_Contact_Contact',
+                'FKClassName' => 'CRM_Contact_DAO_Contact',
                           ),
       
               'created_date' => array(
@@ -463,7 +463,7 @@ class Tag extends \Civi\Core\Entity {
         'propertyName' => 'createdDate',
         'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
                 'title' => ts('Tag Created Date'),
-                                                     
+                                                             
                                     
                           ),
              );

@@ -150,7 +150,7 @@ class MembershipPayment extends \Civi\Core\Entity {
         'propertyName' => 'id',
         'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
-                                             
+                                                     
                                     
                           ),
       
@@ -160,9 +160,9 @@ class MembershipPayment extends \Civi\Core\Entity {
         'propertyName' => 'membership',
         'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
-                                             
+                                                     
                                     
-                'FKClassName' => 'Civi_Member_Membership',
+                'FKClassName' => 'CRM_Member_DAO_Membership',
                           ),
       
               'contribution_id' => array(
@@ -170,9 +170,9 @@ class MembershipPayment extends \Civi\Core\Entity {
         'name' => 'contribution_id',
         'propertyName' => 'contribution',
         'type' => \CRM_Utils_Type::T_INT,
-                                                     
+                                                             
                                     
-                'FKClassName' => 'Civi_Contribute_Contribution',
+                'FKClassName' => 'CRM_Contribute_DAO_Contribution',
                           ),
              );
     }

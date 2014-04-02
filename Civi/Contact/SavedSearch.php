@@ -270,7 +270,7 @@ class SavedSearch extends \Civi\Core\Entity {
         'propertyName' => 'id',
         'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
-                                             
+                                                     
                                     
                           ),
       
@@ -281,7 +281,7 @@ class SavedSearch extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_TEXT,
                 'title' => ts('Submitted Form Values'),
                                  'maxlength' => 65535,
-                                    
+                                            
                 'import' => true,
         'where' => 'civicrm_saved_search.form_values',
         'headerPattern' => '',
@@ -295,9 +295,9 @@ class SavedSearch extends \Civi\Core\Entity {
         'name' => 'mapping_id',
         'propertyName' => 'mapping',
         'type' => \CRM_Utils_Type::T_INT,
-                                                     
+                                                             
                                     
-                'FKClassName' => 'Civi_Core_Mapping',
+                'FKClassName' => 'CRM_Core_DAO_Mapping',
                           ),
       
               'search_custom_id' => array(
@@ -305,7 +305,7 @@ class SavedSearch extends \Civi\Core\Entity {
         'name' => 'search_custom_id',
         'propertyName' => 'searchCustomId',
         'type' => \CRM_Utils_Type::T_INT,
-                                                     
+                                                             
                                     
                           ),
       
@@ -316,7 +316,7 @@ class SavedSearch extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_TEXT,
                 'title' => ts('Where Clause'),
                                  'maxlength' => 65535,
-                                    
+                                            
                                     
                           ),
       
@@ -327,7 +327,7 @@ class SavedSearch extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_TEXT,
                 'title' => ts('Select Tables'),
                                  'maxlength' => 65535,
-                                    
+                                            
                                     
                           ),
       
@@ -338,7 +338,7 @@ class SavedSearch extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_TEXT,
                 'title' => ts('Where Tables'),
                                  'maxlength' => 65535,
-                                    
+                                            
                                     
                           ),
              );

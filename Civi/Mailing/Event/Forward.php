@@ -180,7 +180,7 @@ class Forward extends \Civi\Core\Entity {
         'propertyName' => 'id',
         'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
-                                             
+                                                     
                                     
                           ),
       
@@ -190,9 +190,9 @@ class Forward extends \Civi\Core\Entity {
         'propertyName' => 'eventQueue',
         'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
-                                             
+                                                     
                                     
-                'FKClassName' => 'Civi_Mailing_Event_Queue',
+                'FKClassName' => 'CRM_Mailing_Event_DAO_Queue',
                           ),
       
               'dest_queue_id' => array(
@@ -200,9 +200,9 @@ class Forward extends \Civi\Core\Entity {
         'name' => 'dest_queue_id',
         'propertyName' => 'destQueue',
         'type' => \CRM_Utils_Type::T_INT,
-                                                     
+                                                             
                                     
-                'FKClassName' => 'Civi_Mailing_Event_Queue',
+                'FKClassName' => 'CRM_Mailing_Event_DAO_Queue',
                           ),
       
               'time_stamp' => array(
@@ -212,7 +212,7 @@ class Forward extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
                 'title' => ts('Time Stamp'),
                         'required' => true,
-                                             
+                                                     
                                     
                           ),
              );

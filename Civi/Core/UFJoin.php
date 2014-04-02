@@ -300,7 +300,7 @@ class UFJoin extends \Civi\Core\Entity {
         'propertyName' => 'id',
         'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
-                                             
+                                                     
                                     
                           ),
       
@@ -309,7 +309,7 @@ class UFJoin extends \Civi\Core\Entity {
         'name' => 'is_active',
         'propertyName' => 'isActive',
         'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                     
+                                                             
                                            'default' => '1',
          
                           ),
@@ -322,7 +322,7 @@ class UFJoin extends \Civi\Core\Entity {
                 'title' => ts('Module'),
                         'required' => true,
                          'maxlength' => 64,
-                         'size' => \CRM_Utils_Type::BIG,
+                                 'size' => \CRM_Utils_Type::BIG,
                            
                                     
                           ),
@@ -334,7 +334,7 @@ class UFJoin extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Entity Table'),
                                  'maxlength' => 64,
-                         'size' => \CRM_Utils_Type::BIG,
+                                 'size' => \CRM_Utils_Type::BIG,
                            
                                     
                           ),
@@ -344,7 +344,7 @@ class UFJoin extends \Civi\Core\Entity {
         'name' => 'entity_id',
         'propertyName' => 'entityId',
         'type' => \CRM_Utils_Type::T_INT,
-                                                     
+                                                             
                                     
                           ),
       
@@ -355,7 +355,7 @@ class UFJoin extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Weight'),
                         'required' => true,
-                                             
+                                                     
                                            'default' => '1',
          
                           ),
@@ -366,9 +366,9 @@ class UFJoin extends \Civi\Core\Entity {
         'propertyName' => 'ufGroup',
         'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
-                                             
+                                                     
                                     
-                'FKClassName' => 'Civi_Core_UFGroup',
+                'FKClassName' => 'CRM_Core_DAO_UFGroup',
                                      'pseudoconstant' => array(
                                 'table' => 'civicrm_uf_group',
                       'keyColumn' => 'id',
@@ -383,7 +383,7 @@ class UFJoin extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Module Data'),
                                  'maxlength' => 255,
-                         'size' => \CRM_Utils_Type::HUGE,
+                                 'size' => \CRM_Utils_Type::HUGE,
                            
                                     
                           ),

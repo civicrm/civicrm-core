@@ -390,7 +390,7 @@ class FinancialItem extends \Civi\Core\Entity {
         'propertyName' => 'id',
         'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
-                                             
+                                                     
                                     
                           ),
       
@@ -401,7 +401,7 @@ class FinancialItem extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
                 'title' => ts('Created Date'),
                         'required' => true,
-                                             
+                                                     
                                     
                           ),
       
@@ -412,7 +412,7 @@ class FinancialItem extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
                 'title' => ts('Transaction Date'),
                         'required' => true,
-                                             
+                                                     
                                     
                           ),
       
@@ -422,13 +422,13 @@ class FinancialItem extends \Civi\Core\Entity {
         'propertyName' => 'contact',
         'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
-                                             
+                                                     
                          'export' => true,
                 'where' => 'civicrm_financial_item.contact_id',
         'headerPattern' => '',
         'dataPattern' => '',
                                    
-                'FKClassName' => 'Civi_Contact_Contact',
+                'FKClassName' => 'CRM_Contact_DAO_Contact',
                           ),
       
               'description' => array(
@@ -438,7 +438,7 @@ class FinancialItem extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Description'),
                                  'maxlength' => 255,
-                         'size' => \CRM_Utils_Type::HUGE,
+                                 'size' => \CRM_Utils_Type::HUGE,
                            
                                     
                           ),
@@ -450,7 +450,8 @@ class FinancialItem extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_MONEY,
                 'title' => ts('Amount'),
                         'required' => true,
-                                             
+                                  'precision'      => array(20,2),
+                                   
                                     
                           ),
       
@@ -461,7 +462,7 @@ class FinancialItem extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Currency'),
                                  'maxlength' => 3,
-                         'size' => \CRM_Utils_Type::FOUR,
+                                 'size' => \CRM_Utils_Type::FOUR,
                            
                          'export' => true,
                 'where' => 'civicrm_financial_item.currency',
@@ -481,9 +482,9 @@ class FinancialItem extends \Civi\Core\Entity {
         'name' => 'financial_account_id',
         'propertyName' => 'financialAccount',
         'type' => \CRM_Utils_Type::T_INT,
-                                                     
+                                                             
                                     
-                'FKClassName' => 'Civi_Financial_FinancialAccount',
+                'FKClassName' => 'CRM_Financial_DAO_FinancialAccount',
                                      'pseudoconstant' => array(
                                 'table' => 'civicrm_financial_account',
                       'keyColumn' => 'id',
@@ -496,7 +497,7 @@ class FinancialItem extends \Civi\Core\Entity {
         'name' => 'status_id',
         'propertyName' => 'statusId',
         'type' => \CRM_Utils_Type::T_INT,
-                                                     
+                                                             
                          'export' => true,
                 'where' => 'civicrm_financial_item.status_id',
         'headerPattern' => '',
@@ -514,7 +515,7 @@ class FinancialItem extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Entity Table'),
                                  'maxlength' => 64,
-                         'size' => \CRM_Utils_Type::BIG,
+                                 'size' => \CRM_Utils_Type::BIG,
                            
                                     
                           ),
@@ -524,7 +525,7 @@ class FinancialItem extends \Civi\Core\Entity {
         'name' => 'entity_id',
         'propertyName' => 'entityId',
         'type' => \CRM_Utils_Type::T_INT,
-                                                     
+                                                             
                                     
                           ),
              );

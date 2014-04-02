@@ -180,7 +180,7 @@ class BounceType extends \Civi\Core\Entity {
         'propertyName' => 'id',
         'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
-                                             
+                                                     
                                     
                           ),
       
@@ -192,7 +192,7 @@ class BounceType extends \Civi\Core\Entity {
                 'title' => ts('Name'),
                         'required' => true,
                          'maxlength' => 8,
-                         'size' => \CRM_Utils_Type::EIGHT,
+                                 'size' => \CRM_Utils_Type::EIGHT,
                            
                                     
                           ),
@@ -204,7 +204,7 @@ class BounceType extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Description'),
                                  'maxlength' => 255,
-                         'size' => \CRM_Utils_Type::HUGE,
+                                 'size' => \CRM_Utils_Type::HUGE,
                            
                                     
                           ),
@@ -216,7 +216,7 @@ class BounceType extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Hold Threshold'),
                         'required' => true,
-                                             
+                                                     
                                     
                           ),
              );

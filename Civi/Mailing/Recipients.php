@@ -210,7 +210,7 @@ class Recipients extends \Civi\Core\Entity {
         'propertyName' => 'id',
         'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
-                                             
+                                                     
                                     
                           ),
       
@@ -220,9 +220,9 @@ class Recipients extends \Civi\Core\Entity {
         'propertyName' => 'mailing',
         'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
-                                             
+                                                     
                                     
-                'FKClassName' => 'Civi_Mailing_Mailing',
+                'FKClassName' => 'CRM_Mailing_DAO_Mailing',
                           ),
       
               'contact_id' => array(
@@ -231,9 +231,9 @@ class Recipients extends \Civi\Core\Entity {
         'propertyName' => 'contact',
         'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
-                                             
+                                                     
                                     
-                'FKClassName' => 'Civi_Contact_Contact',
+                'FKClassName' => 'CRM_Contact_DAO_Contact',
                           ),
       
               'email_id' => array(
@@ -241,10 +241,10 @@ class Recipients extends \Civi\Core\Entity {
         'name' => 'email_id',
         'propertyName' => 'email',
         'type' => \CRM_Utils_Type::T_INT,
-                                                     
+                                                             
                                            'default' => 'NULL',
          
-                'FKClassName' => 'Civi_Core_Email',
+                'FKClassName' => 'CRM_Core_DAO_Email',
                           ),
       
               'phone_id' => array(
@@ -252,10 +252,10 @@ class Recipients extends \Civi\Core\Entity {
         'name' => 'phone_id',
         'propertyName' => 'phone',
         'type' => \CRM_Utils_Type::T_INT,
-                                                     
+                                                             
                                            'default' => 'NULL',
          
-                'FKClassName' => 'Civi_Core_Phone',
+                'FKClassName' => 'CRM_Core_DAO_Phone',
                           ),
              );
     }

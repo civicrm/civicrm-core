@@ -391,7 +391,7 @@ class ACL extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('ACL ID'),
                         'required' => true,
-                                             
+                                                     
                                     
                           ),
       
@@ -402,7 +402,7 @@ class ACL extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('ACL Name'),
                                  'maxlength' => 64,
-                         'size' => \CRM_Utils_Type::BIG,
+                                 'size' => \CRM_Utils_Type::BIG,
                            
                                     
                           ),
@@ -414,7 +414,7 @@ class ACL extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('Deny'),
                         'required' => true,
-                                             
+                                                     
                                     
                           ),
       
@@ -426,7 +426,7 @@ class ACL extends \Civi\Core\Entity {
                 'title' => ts('Entity Table'),
                         'required' => true,
                          'maxlength' => 64,
-                         'size' => \CRM_Utils_Type::BIG,
+                                 'size' => \CRM_Utils_Type::BIG,
                            
                                     
                           ),
@@ -436,7 +436,7 @@ class ACL extends \Civi\Core\Entity {
         'name' => 'entity_id',
         'propertyName' => 'entityId',
         'type' => \CRM_Utils_Type::T_INT,
-                                                     
+                                                             
                                     
                           ),
       
@@ -448,11 +448,11 @@ class ACL extends \Civi\Core\Entity {
                 'title' => ts('Operation'),
                         'required' => true,
                          'maxlength' => 8,
-                         'size' => \CRM_Utils_Type::EIGHT,
+                                 'size' => \CRM_Utils_Type::EIGHT,
                            
                                     
                                      'pseudoconstant' => array(
-                                '0' => 'not in database',
+                                'callback' => 'CRM_ACL_BAO_ACL::operation',
                     )
                  ),
       
@@ -463,7 +463,7 @@ class ACL extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Object Table'),
                                  'maxlength' => 64,
-                         'size' => \CRM_Utils_Type::BIG,
+                                 'size' => \CRM_Utils_Type::BIG,
                            
                                     
                           ),
@@ -473,7 +473,7 @@ class ACL extends \Civi\Core\Entity {
         'name' => 'object_id',
         'propertyName' => 'objectId',
         'type' => \CRM_Utils_Type::T_INT,
-                                                     
+                                                             
                                     
                           ),
       
@@ -484,7 +484,7 @@ class ACL extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Acl Table'),
                                  'maxlength' => 64,
-                         'size' => \CRM_Utils_Type::BIG,
+                                 'size' => \CRM_Utils_Type::BIG,
                            
                                     
                           ),
@@ -494,7 +494,7 @@ class ACL extends \Civi\Core\Entity {
         'name' => 'acl_id',
         'propertyName' => 'aclId',
         'type' => \CRM_Utils_Type::T_INT,
-                                                     
+                                                             
                                     
                           ),
       
@@ -503,7 +503,7 @@ class ACL extends \Civi\Core\Entity {
         'name' => 'is_active',
         'propertyName' => 'isActive',
         'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                     
+                                                             
                                     
                           ),
              );

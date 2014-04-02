@@ -360,7 +360,7 @@ class Phone extends \Civi\Core\Entity {
         'propertyName' => 'id',
         'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
-                                             
+                                                     
                                     
                           ),
       
@@ -369,9 +369,9 @@ class Phone extends \Civi\Core\Entity {
         'name' => 'contact_id',
         'propertyName' => 'contact',
         'type' => \CRM_Utils_Type::T_INT,
-                                                     
+                                                             
                                     
-                'FKClassName' => 'Civi_Contact_Contact',
+                'FKClassName' => 'CRM_Contact_DAO_Contact',
                           ),
       
               'location_type_id' => array(
@@ -380,7 +380,7 @@ class Phone extends \Civi\Core\Entity {
         'propertyName' => 'locationTypeId',
         'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Phone Location Type'),
-                                                     
+                                                             
                                     
                                      'pseudoconstant' => array(
                                 'table' => 'civicrm_location_type',
@@ -395,7 +395,7 @@ class Phone extends \Civi\Core\Entity {
         'propertyName' => 'isPrimary',
         'type' => \CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('Is Phone Primary?'),
-                                                     
+                                                             
                                     
                           ),
       
@@ -404,7 +404,7 @@ class Phone extends \Civi\Core\Entity {
         'name' => 'is_billing',
         'propertyName' => 'isBilling',
         'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                     
+                                                             
                                     
                           ),
       
@@ -413,7 +413,7 @@ class Phone extends \Civi\Core\Entity {
         'name' => 'mobile_provider_id',
         'propertyName' => 'mobileProviderId',
         'type' => \CRM_Utils_Type::T_INT,
-                                                     
+                                                             
                                     
                           ),
       
@@ -424,7 +424,7 @@ class Phone extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Phone'),
                                  'maxlength' => 32,
-                         'size' => \CRM_Utils_Type::MEDIUM,
+                                 'size' => \CRM_Utils_Type::MEDIUM,
                            
                 'import' => true,
         'where' => 'civicrm_phone.phone',
@@ -441,7 +441,7 @@ class Phone extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Phone Extension'),
                                  'maxlength' => 16,
-                         'size' => \CRM_Utils_Type::FOUR,
+                                 'size' => \CRM_Utils_Type::FOUR,
                            
                 'import' => true,
         'where' => 'civicrm_phone.phone_ext',
@@ -458,7 +458,7 @@ class Phone extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Phone Numeric'),
                                  'maxlength' => 32,
-                         'size' => \CRM_Utils_Type::MEDIUM,
+                                 'size' => \CRM_Utils_Type::MEDIUM,
                            
                                     
                           ),
@@ -469,7 +469,7 @@ class Phone extends \Civi\Core\Entity {
         'propertyName' => 'phoneTypeId',
         'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Phone Type'),
-                                                     
+                                                             
                                     
                                      'pseudoconstant' => array(
                                 'optionGroupName' => 'phone_type',

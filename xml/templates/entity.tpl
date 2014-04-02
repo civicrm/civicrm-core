@@ -139,6 +139,9 @@ class {$table.className} extends \Civi\Core\Entity {ldelim}
         {if $field.length}
         'maxlength' => {$field.length},
         {/if} {* field.length *}
+        {if $field.precision}
+        'precision'      => array({$field.precision}),
+        {/if}
         {if $field.size}
         'size' => {$field.size},
         {/if} {* field.size *}

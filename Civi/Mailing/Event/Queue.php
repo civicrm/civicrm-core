@@ -240,7 +240,7 @@ class Queue extends \Civi\Core\Entity {
         'propertyName' => 'id',
         'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
-                                             
+                                                     
                                     
                           ),
       
@@ -250,9 +250,9 @@ class Queue extends \Civi\Core\Entity {
         'propertyName' => 'job',
         'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
-                                             
+                                                     
                                     
-                'FKClassName' => 'Civi_Mailing_MailingJob',
+                'FKClassName' => 'CRM_Mailing_DAO_MailingJob',
                           ),
       
               'email_id' => array(
@@ -260,10 +260,10 @@ class Queue extends \Civi\Core\Entity {
         'name' => 'email_id',
         'propertyName' => 'email',
         'type' => \CRM_Utils_Type::T_INT,
-                                                     
+                                                             
                                            'default' => 'NULL',
          
-                'FKClassName' => 'Civi_Core_Email',
+                'FKClassName' => 'CRM_Core_DAO_Email',
                           ),
       
               'contact_id' => array(
@@ -272,9 +272,9 @@ class Queue extends \Civi\Core\Entity {
         'propertyName' => 'contact',
         'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
-                                             
+                                                     
                                     
-                'FKClassName' => 'Civi_Contact_Contact',
+                'FKClassName' => 'CRM_Contact_DAO_Contact',
                           ),
       
               'hash' => array(
@@ -285,7 +285,7 @@ class Queue extends \Civi\Core\Entity {
                 'title' => ts('Hash'),
                         'required' => true,
                          'maxlength' => 255,
-                         'size' => \CRM_Utils_Type::HUGE,
+                                 'size' => \CRM_Utils_Type::HUGE,
                            
                                     
                           ),
@@ -295,10 +295,10 @@ class Queue extends \Civi\Core\Entity {
         'name' => 'phone_id',
         'propertyName' => 'phone',
         'type' => \CRM_Utils_Type::T_INT,
-                                                     
+                                                             
                                            'default' => 'NULL',
          
-                'FKClassName' => 'Civi_Core_Phone',
+                'FKClassName' => 'CRM_Core_DAO_Phone',
                           ),
              );
     }

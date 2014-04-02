@@ -210,7 +210,7 @@ class EntityFinancialTrxn extends \Civi\Core\Entity {
         'propertyName' => 'id',
         'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
-                                             
+                                                     
                                     
                           ),
       
@@ -222,7 +222,7 @@ class EntityFinancialTrxn extends \Civi\Core\Entity {
                 'title' => ts('Entity Table'),
                         'required' => true,
                          'maxlength' => 64,
-                         'size' => \CRM_Utils_Type::BIG,
+                                 'size' => \CRM_Utils_Type::BIG,
                            
                 'import' => true,
         'where' => 'civicrm_entity_financial_trxn.entity_table',
@@ -238,7 +238,7 @@ class EntityFinancialTrxn extends \Civi\Core\Entity {
         'propertyName' => 'entityId',
         'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
-                                             
+                                                     
                                     
                           ),
       
@@ -247,9 +247,9 @@ class EntityFinancialTrxn extends \Civi\Core\Entity {
         'name' => 'financial_trxn_id',
         'propertyName' => 'financialTrxn',
         'type' => \CRM_Utils_Type::T_INT,
-                                                     
+                                                             
                                     
-                'FKClassName' => 'Civi_Financial_FinancialTrxn',
+                'FKClassName' => 'CRM_Financial_DAO_FinancialTrxn',
                           ),
       
               'amount' => array(
@@ -259,7 +259,8 @@ class EntityFinancialTrxn extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_MONEY,
                 'title' => ts('Amount'),
                         'required' => true,
-                                             
+                                  'precision'      => array(20,2),
+                                   
                 'import' => true,
         'where' => 'civicrm_entity_financial_trxn.amount',
         'headerPattern' => '/amount/i',

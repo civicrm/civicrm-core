@@ -181,7 +181,7 @@ class ActivityContact extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Activity Contact ID'),
                         'required' => true,
-                                             
+                                                     
                                     
                           ),
       
@@ -192,9 +192,9 @@ class ActivityContact extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Activity ID'),
                         'required' => true,
-                                             
+                                                     
                                     
-                'FKClassName' => 'Civi_Activity_Activity',
+                'FKClassName' => 'CRM_Activity_DAO_Activity',
                           ),
       
               'contact_id' => array(
@@ -204,14 +204,14 @@ class ActivityContact extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Contact ID (match to contact)'),
                         'required' => true,
-                                             
+                                                     
                 'import' => true,
         'where' => 'civicrm_activity_contact.contact_id',
         'headerPattern' => '',
         'dataPattern' => '',
                          'export' => true,
                                    
-                'FKClassName' => 'Civi_Contact_Contact',
+                'FKClassName' => 'CRM_Contact_DAO_Contact',
                           ),
       
               'record_type_id' => array(
@@ -220,7 +220,7 @@ class ActivityContact extends \Civi\Core\Entity {
         'propertyName' => 'recordTypeId',
         'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Record Type ID'),
-                                                     
+                                                             
                                     
                                      'pseudoconstant' => array(
                                 'optionGroupName' => 'activity_contacts',

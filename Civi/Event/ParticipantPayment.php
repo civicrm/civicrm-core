@@ -151,7 +151,7 @@ class ParticipantPayment extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Payment ID'),
                         'required' => true,
-                                             
+                                                     
                                     
                           ),
       
@@ -162,9 +162,9 @@ class ParticipantPayment extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Participant ID'),
                         'required' => true,
-                                             
+                                                     
                                     
-                'FKClassName' => 'Civi_Event_Participant',
+                'FKClassName' => 'CRM_Event_DAO_Participant',
                           ),
       
               'contribution_id' => array(
@@ -173,9 +173,9 @@ class ParticipantPayment extends \Civi\Core\Entity {
         'propertyName' => 'contribution',
         'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
-                                             
+                                                     
                                     
-                'FKClassName' => 'Civi_Contribute_Contribution',
+                'FKClassName' => 'CRM_Contribute_DAO_Contribution',
                           ),
              );
     }
