@@ -849,7 +849,7 @@
     <type>timestamp</type>
     <comment>When was the contact (or closely related entity) was created or modified or deleted.</comment>
     <required>false</required>
-    <default>CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP</default>
+    <defaultTs>CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP</defaultTs>
     <add>4.3</add>
   </field>
 </table>

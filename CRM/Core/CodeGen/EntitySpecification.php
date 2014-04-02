@@ -213,6 +213,7 @@ class CRM_Core_CodeGen_EntitySpecification {
       $field['propertyName'] = lcfirst(str_replace(' ', '', ucwords(str_replace('_', ' ', $propertyName))));
 
       $field['columnInfo'] = '@ORM\Column(name="' . $field['name'] . '", type="' . $field['phpType'] . '"';
+      $columnInfoOptions = array();
 
       if (!empty($field['length']) && in_array($field['phpType'], array('string', 'blob', 'text'))) {
         $field['columnInfo'] .= ', length=' . $field['length'];
@@ -226,13 +227,22 @@ class CRM_Core_CodeGen_EntitySpecification {
       }
 
       if ($field['phpType'] == 'integer') {
-        $field['columnInfo'] .= ', options={"unsigned":true}';
+        $columnInfoOptions[] = '"unsigned":true';
       }
 
+      if (array_key_exists('default_ts', $field)) {
+        $field['columnInfo'] .= ', columnDefinition="TIMESTAMP DEFAULT ' . $field['default_ts'] .'"';
+      }
+      if (array_key_exists('default', $field) && $field['default'] !== NULL && $field['default'] !== 'NULL') {
+        $columnInfoOptions[] = '"default": ' . str_replace("'", '"', $field['default']);
+      }
       if (!empty($field['default'])) {
         $field['default'] = str_replace("'", "", $field['default']);
       }
 
+      if (!empty($columnInfoOptions)) {
+        $field['columnInfo'] .= ', options={' . implode(', ', $columnInfoOptions) . '}';
+      }
       $field['columnInfo'] .= ')';
 
       $field['columnType'] = $field['phpType'];
@@ -418,6 +428,9 @@ class CRM_Core_CodeGen_EntitySpecification {
     $field['collate']  = $this->value('collate', $fieldXML);
     $field['comment']  = $this->value('comment', $fieldXML);
     $field['default']  = $this->value('default', $fieldXML);
+    if ($this->value('defaultTs', $fieldXML)) {
+      $field['default_ts']  = $this->value('defaultTs', $fieldXML);
+    }
     $field['import']   = $this->value('import', $fieldXML);
     if ($this->value('export', $fieldXML)) {
       $field['export'] = $this->value('export', $fieldXML);
