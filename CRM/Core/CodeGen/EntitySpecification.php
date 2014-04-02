@@ -26,12 +26,13 @@ class CRM_Core_CodeGen_EntitySpecification {
     // print_r( $this->database );
 
     $this->classNames = array();
+    $this->fkClassNames = array();
 
     # TODO: peel DAO-specific stuff out of getTables, and spec reading into its own class
     echo "Extracting table information\n";
     $this->tables = $this->getTables($dbXML, $this->database);
 
-    $this->resolveForeignKeys($this->tables, $this->classNames);
+    $this->resolveForeignKeys($this->tables, $this->classNames, $this->fkClassNames);
     $this->tables = $this->orderTables($this->tables);
 
     // add archive tables here
@@ -86,13 +87,13 @@ class CRM_Core_CodeGen_EntitySpecification {
     return $tables;
   }
 
-  function resolveForeignKeys(&$tables, &$classNames) {
+  function resolveForeignKeys(&$tables, &$classNames, &$fkClassNames) {
     foreach (array_keys($tables) as $name) {
-      $this->resolveForeignKey($tables, $classNames, $name);
+      $this->resolveForeignKey($tables, $classNames, $fkClassNames, $name);
     }
   }
 
-  function resolveForeignKey(&$tables, &$classNames, $name) {
+  function resolveForeignKey(&$tables, &$classNames, &$fkClassNames, $name) {
     if (!array_key_exists('foreignKey', $tables[$name])) {
       return;
     }
@@ -108,7 +109,7 @@ class CRM_Core_CodeGen_EntitySpecification {
       $tables[$name]['fields'][$fkey]['functionName'] = str_replace('Id', '', $tables[$name]['fields'][$fkey]['functionName']);
       $tables[$name]['foreignKey'][$fkey]['className'] = $classNames[$ftable];
       $tables[$name]['foreignKey'][$fkey]['fileName'] = str_replace('_', '/', $classNames[$ftable]) . '.php';
-      $tables[$name]['fields'][$fkey]['FKClassName'] = $classNames[$ftable];
+      $tables[$name]['fields'][$fkey]['FKClassName'] = $fkClassNames[$ftable];
 
       $targetEntity = str_replace('CRM', 'Civi', str_replace('_', '\\', $classNames[$ftable]));
       $tables[$name]['fields'][$fkey]['columnType'] = '\\' . $targetEntity;
@@ -169,6 +170,8 @@ class CRM_Core_CodeGen_EntitySpecification {
     }
     $pre = str_replace('/', '_', $entity_base);
     $this->classNames[$name] = "{$pre}_{$entity_class}";
+    $pre = str_replace('/', '_', $base);
+    $this->fkClassNames[$name] = "{$pre}_DAO_{$dao_class}";
 
     $localizable = FALSE;
     foreach ($tableXML->field as $fieldXML) {
