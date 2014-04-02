@@ -407,6 +407,7 @@ class CRM_Core_CodeGen_EntitySpecification {
         $field['sqlType'] = 'decimal(' . $length . ')';
         $field['phpType'] = 'float';
         $field['crmType'] = '\\CRM_Utils_Type::T_MONEY';
+        $field['precision'] = $length;
         break;
 
       case 'float':
@@ -485,6 +486,8 @@ class CRM_Core_CodeGen_EntitySpecification {
         'nameColumn',
         // Where clause snippet (will be joined to the rest of the query with AND operator)
         'condition',
+        // callback function; useful for hard-coded arrays
+        'callback',
       );
       foreach ($validOptions as $pseudoOption) {
         if(!empty($fieldXML->pseudoconstant->$pseudoOption)){
