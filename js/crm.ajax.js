@@ -413,7 +413,7 @@
       url = $el.attr('href'),
       popup = $el.data('popup-type') === 'page' ? CRM.loadPage : CRM.loadForm,
       settings = $el.data('popup-settings') || {},
-      triggers = {dialogclose: 'crmPopupClose', crmLoad: 'crmPopupLoad', crmFormSuccess: 'crmPopupFormSuccess'};
+      formSuccess = false;
     settings.dialog = settings.dialog || {};
     if (e.isDefaultPrevented() || !CRM.config.ajaxPopupsEnabled || !url || $el.is(exclude)) {
       return;
@@ -432,10 +432,15 @@
     var dialog = popup(url, settings);
     // Trigger events from the dialog on the original link element
     $el.trigger('crmPopupOpen', [dialog]);
-    $.each(triggers, function(event, target) {
-      dialog.on(event, function(e, data) {
-        $el.trigger(target, [dialog, data]);
-      });
+    // Buffer this event so it only fires once
+    dialog.on('crmFormSuccess.crmPopup', function(e, data) {
+      formSuccess = true;
+    });
+    dialog.on('dialogclose.crmPopup', function(e, data) {
+      if (formSuccess) {
+        $el.trigger('crmPopupFormSuccess', [dialog, data]);
+      }
+      $el.trigger('crmPopupClose', [dialog, data]);
     });
     e.preventDefault();
   };
