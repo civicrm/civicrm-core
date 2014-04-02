@@ -51,10 +51,6 @@ VALUES
   (@option_group_id_contact_edit_options, {localize}'{ts escape="sql"}Last Name{/ts}'{/localize}   , 16, 'Last Name'   , NULL, 2, NULL, 16, NULL, 0, 0, 1, NULL, NULL),
   (@option_group_id_contact_edit_options, {localize}'{ts escape="sql"}Suffix{/ts}'{/localize}      , 17, 'Suffix'      , NULL, 2, NULL, 17, NULL, 0, 0, 1, NULL, NULL);
 
--- CRM-13712 Include IS NOT EMPTY and IS EMPTY operators in operator column of civicrm_mapping_field table
-ALTER TABLE `civicrm_mapping_field`
-  MODIFY `operator` ENUM('=','!=','>','<','>=','<=','IN','NOT IN','LIKE','NOT LIKE', 'IS NOT EMPTY', 'IS EMPTY') DEFAULT NULL COMMENT 'SQL WHERE operator for search-builder mapping fields (search criteria).';
-
 -- CRM-13857
 ALTER TABLE civicrm_group
   ADD COLUMN `modified_id` INT(10) unsigned DEFAULT NULL COMMENT 'FK to contact table, modifier of the group.',
