@@ -421,7 +421,7 @@ class RelationshipType extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Relationship Type ID'),
                         'required' => true,
-                                             
+                                                     
                                     
                           ),
       
@@ -432,7 +432,7 @@ class RelationshipType extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Relationship Type Name A to B'),
                                  'maxlength' => 64,
-                         'size' => \CRM_Utils_Type::BIG,
+                                 'size' => \CRM_Utils_Type::BIG,
                            
                                     
                           ),
@@ -444,7 +444,7 @@ class RelationshipType extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Relationship Type Label A to B'),
                                  'maxlength' => 64,
-                         'size' => \CRM_Utils_Type::BIG,
+                                 'size' => \CRM_Utils_Type::BIG,
                            
                                     
                           ),
@@ -456,7 +456,7 @@ class RelationshipType extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Relationship Type Name B to A'),
                                  'maxlength' => 64,
-                         'size' => \CRM_Utils_Type::BIG,
+                                 'size' => \CRM_Utils_Type::BIG,
                            
                                     
                           ),
@@ -468,7 +468,7 @@ class RelationshipType extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Relationship Type Label B to A'),
                                  'maxlength' => 64,
-                         'size' => \CRM_Utils_Type::BIG,
+                                 'size' => \CRM_Utils_Type::BIG,
                            
                                     
                           ),
@@ -480,7 +480,7 @@ class RelationshipType extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Relationship Description'),
                                  'maxlength' => 255,
-                         'size' => \CRM_Utils_Type::HUGE,
+                                 'size' => \CRM_Utils_Type::HUGE,
                            
                                     
                           ),
@@ -492,11 +492,11 @@ class RelationshipType extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Contact Type for Contact A'),
                                  'maxlength' => 12,
-                         'size' => \CRM_Utils_Type::TWELVE,
+                                 'size' => \CRM_Utils_Type::TWELVE,
                            
                                     
                                      'pseudoconstant' => array(
-                                '0' => 'not in database',
+                                'callback' => 'CRM_Contact_BAO_ContactType::getSelectElements',
                     )
                  ),
       
@@ -507,11 +507,11 @@ class RelationshipType extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Contact Type for Contact B'),
                                  'maxlength' => 12,
-                         'size' => \CRM_Utils_Type::TWELVE,
+                                 'size' => \CRM_Utils_Type::TWELVE,
                            
                                     
                                      'pseudoconstant' => array(
-                                '0' => 'not in database',
+                                'callback' => 'CRM_Contact_BAO_ContactType::getSelectElements',
                     )
                  ),
       
@@ -522,7 +522,7 @@ class RelationshipType extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Contact Subtype A'),
                                  'maxlength' => 64,
-                         'size' => \CRM_Utils_Type::BIG,
+                                 'size' => \CRM_Utils_Type::BIG,
                            
                                     
                           ),
@@ -534,7 +534,7 @@ class RelationshipType extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Contact Subtype B'),
                                  'maxlength' => 64,
-                         'size' => \CRM_Utils_Type::BIG,
+                                 'size' => \CRM_Utils_Type::BIG,
                            
                                     
                           ),
@@ -545,7 +545,7 @@ class RelationshipType extends \Civi\Core\Entity {
         'propertyName' => 'isReserved',
         'type' => \CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('Relationship Type is Reserved'),
-                                                     
+                                                             
                                     
                           ),
       
@@ -555,7 +555,7 @@ class RelationshipType extends \Civi\Core\Entity {
         'propertyName' => 'isActive',
         'type' => \CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('Relationship Type is Active'),
-                                                     
+                                                             
                                            'default' => '1',
          
                           ),

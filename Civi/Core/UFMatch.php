@@ -240,7 +240,7 @@ class UFMatch extends \Civi\Core\Entity {
         'propertyName' => 'id',
         'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
-                                             
+                                                     
                                     
                           ),
       
@@ -250,9 +250,9 @@ class UFMatch extends \Civi\Core\Entity {
         'propertyName' => 'domain',
         'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
-                                             
+                                                     
                                     
-                'FKClassName' => 'Civi_Core_Domain',
+                'FKClassName' => 'CRM_Core_DAO_Domain',
                           ),
       
               'uf_id' => array(
@@ -261,7 +261,7 @@ class UFMatch extends \Civi\Core\Entity {
         'propertyName' => 'ufId',
         'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
-                                             
+                                                     
                                     
                           ),
       
@@ -272,7 +272,7 @@ class UFMatch extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Uf Name'),
                                  'maxlength' => 128,
-                         'size' => \CRM_Utils_Type::HUGE,
+                                 'size' => \CRM_Utils_Type::HUGE,
                            
                                     
                           ),
@@ -282,9 +282,9 @@ class UFMatch extends \Civi\Core\Entity {
         'name' => 'contact_id',
         'propertyName' => 'contact',
         'type' => \CRM_Utils_Type::T_INT,
-                                                     
+                                                             
                                     
-                'FKClassName' => 'Civi_Contact_Contact',
+                'FKClassName' => 'CRM_Contact_DAO_Contact',
                           ),
       
               'language' => array(
@@ -294,7 +294,7 @@ class UFMatch extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Language'),
                                  'maxlength' => 5,
-                         'size' => \CRM_Utils_Type::SIX,
+                                 'size' => \CRM_Utils_Type::SIX,
                            
                                     
                           ),

@@ -301,7 +301,7 @@ class CCase extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Case ID'),
                         'required' => true,
-                                             
+                                                     
                 'import' => true,
         'where' => 'civicrm_case.id',
         'headerPattern' => '',
@@ -318,7 +318,7 @@ class CCase extends \Civi\Core\Entity {
                 'title' => ts('Case Type'),
                         'required' => true,
                          'maxlength' => 128,
-                         'size' => \CRM_Utils_Type::HUGE,
+                                 'size' => \CRM_Utils_Type::HUGE,
                            
                 'import' => true,
         'where' => 'civicrm_case.case_type_id',
@@ -338,7 +338,7 @@ class CCase extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Case Subject'),
                                  'maxlength' => 128,
-                         'size' => \CRM_Utils_Type::HUGE,
+                                 'size' => \CRM_Utils_Type::HUGE,
                            
                 'import' => true,
         'where' => 'civicrm_case.subject',
@@ -354,7 +354,7 @@ class CCase extends \Civi\Core\Entity {
         'propertyName' => 'startDate',
         'type' => \CRM_Utils_Type::T_DATE,
                 'title' => ts('Case Start Date'),
-                                                     
+                                                             
                 'import' => true,
         'where' => 'civicrm_case.start_date',
         'headerPattern' => '',
@@ -369,7 +369,7 @@ class CCase extends \Civi\Core\Entity {
         'propertyName' => 'endDate',
         'type' => \CRM_Utils_Type::T_DATE,
                 'title' => ts('Case End Date'),
-                                                     
+                                                             
                 'import' => true,
         'where' => 'civicrm_case.end_date',
         'headerPattern' => '',
@@ -385,7 +385,7 @@ class CCase extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_TEXT,
                 'title' => ts('Details'),
                                  'maxlength' => 65535,
-                                  'rows' => 8,
+                                          'rows' => 8,
                          'cols' => 60,
          
                                     
@@ -398,7 +398,7 @@ class CCase extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Case Status'),
                         'required' => true,
-                                             
+                                                     
                 'import' => true,
         'where' => 'civicrm_case.status_id',
         'headerPattern' => '',
@@ -416,7 +416,7 @@ class CCase extends \Civi\Core\Entity {
         'propertyName' => 'isDeleted',
         'type' => \CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('Case is in the Trash'),
-                                                     
+                                                             
                 'import' => true,
         'where' => 'civicrm_case.is_deleted',
         'headerPattern' => '',

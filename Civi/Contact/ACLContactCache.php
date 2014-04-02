@@ -180,7 +180,7 @@ class ACLContactCache extends \Civi\Core\Entity {
         'propertyName' => 'id',
         'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
-                                             
+                                                     
                                     
                           ),
       
@@ -189,9 +189,9 @@ class ACLContactCache extends \Civi\Core\Entity {
         'name' => 'user_id',
         'propertyName' => 'user',
         'type' => \CRM_Utils_Type::T_INT,
-                                                     
+                                                             
                                     
-                'FKClassName' => 'Civi_Contact_Contact',
+                'FKClassName' => 'CRM_Contact_DAO_Contact',
                           ),
       
               'contact_id' => array(
@@ -200,9 +200,9 @@ class ACLContactCache extends \Civi\Core\Entity {
         'propertyName' => 'contact',
         'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
-                                             
+                                                     
                                     
-                'FKClassName' => 'Civi_Contact_Contact',
+                'FKClassName' => 'CRM_Contact_DAO_Contact',
                           ),
       
               'operation' => array(
@@ -213,11 +213,11 @@ class ACLContactCache extends \Civi\Core\Entity {
                 'title' => ts('Operation'),
                         'required' => true,
                          'maxlength' => 8,
-                         'size' => \CRM_Utils_Type::EIGHT,
+                                 'size' => \CRM_Utils_Type::EIGHT,
                            
                                     
                                      'pseudoconstant' => array(
-                                '0' => 'not in database',
+                                'callback' => 'CRM_ACL_BAO_ACL::operation',
                     )
                  ),
              );

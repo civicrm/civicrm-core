@@ -180,7 +180,7 @@ class History extends \Civi\Core\Entity {
         'propertyName' => 'id',
         'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
-                                             
+                                                     
                                     
                           ),
       
@@ -191,7 +191,7 @@ class History extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_TEXT,
                 'title' => ts('Message'),
                                  'maxlength' => 65535,
-                                  'rows' => 5,
+                                          'rows' => 5,
                          'cols' => 80,
          
                                     
@@ -203,9 +203,9 @@ class History extends \Civi\Core\Entity {
         'propertyName' => 'contact',
         'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
-                                             
+                                                     
                                     
-                'FKClassName' => 'Civi_Contact_Contact',
+                'FKClassName' => 'CRM_Contact_DAO_Contact',
                           ),
       
               'sent_date' => array(
@@ -214,7 +214,7 @@ class History extends \Civi\Core\Entity {
         'propertyName' => 'sentDate',
         'type' => \CRM_Utils_Type::T_DATE,
                 'title' => ts('Sent Date'),
-                                                     
+                                                             
                                     
                           ),
              );

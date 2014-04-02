@@ -210,7 +210,7 @@ class EntityFinancialAccount extends \Civi\Core\Entity {
         'propertyName' => 'id',
         'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
-                                             
+                                                     
                                     
                           ),
       
@@ -222,7 +222,7 @@ class EntityFinancialAccount extends \Civi\Core\Entity {
                 'title' => ts('Entity Table'),
                         'required' => true,
                          'maxlength' => 64,
-                         'size' => \CRM_Utils_Type::BIG,
+                                 'size' => \CRM_Utils_Type::BIG,
                            
                 'import' => true,
         'where' => 'civicrm_entity_financial_account.entity_table',
@@ -238,7 +238,7 @@ class EntityFinancialAccount extends \Civi\Core\Entity {
         'propertyName' => 'entityId',
         'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
-                                             
+                                                     
                                     
                           ),
       
@@ -249,7 +249,7 @@ class EntityFinancialAccount extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Account Relationship'),
                         'required' => true,
-                                             
+                                                     
                                     
                                      'pseudoconstant' => array(
                                 'optionGroupName' => 'account_relationship',
@@ -262,9 +262,9 @@ class EntityFinancialAccount extends \Civi\Core\Entity {
         'propertyName' => 'financialAccount',
         'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
-                                             
+                                                     
                                     
-                'FKClassName' => 'Civi_Financial_FinancialAccount',
+                'FKClassName' => 'CRM_Financial_DAO_FinancialAccount',
                                      'pseudoconstant' => array(
                                 'table' => 'civicrm_financial_account',
                       'keyColumn' => 'id',

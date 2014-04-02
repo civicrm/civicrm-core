@@ -150,7 +150,7 @@ class Cart extends \Civi\Core\Entity {
         'propertyName' => 'id',
         'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
-                                             
+                                                     
                                     
                           ),
       
@@ -159,9 +159,9 @@ class Cart extends \Civi\Core\Entity {
         'name' => 'user_id',
         'propertyName' => 'user',
         'type' => \CRM_Utils_Type::T_INT,
-                                                     
+                                                             
                                     
-                'FKClassName' => 'Civi_Contact_Contact',
+                'FKClassName' => 'CRM_Contact_DAO_Contact',
                           ),
       
               'completed' => array(
@@ -170,7 +170,7 @@ class Cart extends \Civi\Core\Entity {
         'propertyName' => 'completed',
         'type' => \CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('Completed'),
-                                                     
+                                                             
                                     
                           ),
              );

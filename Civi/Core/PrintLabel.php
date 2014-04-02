@@ -390,7 +390,7 @@ class PrintLabel extends \Civi\Core\Entity {
         'propertyName' => 'id',
         'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
-                                             
+                                                     
                                     
                           ),
       
@@ -401,7 +401,7 @@ class PrintLabel extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Title'),
                                  'maxlength' => 255,
-                         'size' => \CRM_Utils_Type::HUGE,
+                                 'size' => \CRM_Utils_Type::HUGE,
                            
                                     
                           ),
@@ -413,7 +413,7 @@ class PrintLabel extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Name'),
                                  'maxlength' => 255,
-                         'size' => \CRM_Utils_Type::HUGE,
+                                 'size' => \CRM_Utils_Type::HUGE,
                            
                                     
                           ),
@@ -425,7 +425,7 @@ class PrintLabel extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_TEXT,
                 'title' => ts('Description'),
                                  'maxlength' => 65535,
-                                    
+                                            
                                     
                           ),
       
@@ -436,7 +436,7 @@ class PrintLabel extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Label Format Name'),
                                  'maxlength' => 255,
-                         'size' => \CRM_Utils_Type::HUGE,
+                                 'size' => \CRM_Utils_Type::HUGE,
                            
                                     
                                      'pseudoconstant' => array(
@@ -449,7 +449,7 @@ class PrintLabel extends \Civi\Core\Entity {
         'name' => 'label_type_id',
         'propertyName' => 'labelTypeId',
         'type' => \CRM_Utils_Type::T_INT,
-                                                     
+                                                             
                                     
                                      'pseudoconstant' => array(
                                 'optionGroupName' => 'label_type',
@@ -462,7 +462,7 @@ class PrintLabel extends \Civi\Core\Entity {
         'propertyName' => 'data',
         'type' => \CRM_Utils_Type::T_LONGTEXT,
                 'title' => ts('Data'),
-                                                     
+                                                             
                                     
                           ),
       
@@ -471,7 +471,7 @@ class PrintLabel extends \Civi\Core\Entity {
         'name' => 'is_default',
         'propertyName' => 'isDefault',
         'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                     
+                                                             
                                            'default' => '1',
          
                           ),
@@ -481,7 +481,7 @@ class PrintLabel extends \Civi\Core\Entity {
         'name' => 'is_active',
         'propertyName' => 'isActive',
         'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                     
+                                                             
                                            'default' => '1',
          
                           ),
@@ -491,7 +491,7 @@ class PrintLabel extends \Civi\Core\Entity {
         'name' => 'is_reserved',
         'propertyName' => 'isReserved',
         'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                     
+                                                             
                                            'default' => '1',
          
                           ),
@@ -502,9 +502,9 @@ class PrintLabel extends \Civi\Core\Entity {
         'propertyName' => 'created',
         'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Created By Contact ID'),
-                                                     
+                                                             
                                     
-                'FKClassName' => 'Civi_Contact_Contact',
+                'FKClassName' => 'CRM_Contact_DAO_Contact',
                           ),
              );
     }

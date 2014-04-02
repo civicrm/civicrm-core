@@ -540,7 +540,7 @@ class OptionValue extends \Civi\Core\Entity {
         'propertyName' => 'id',
         'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
-                                             
+                                                     
                                     
                           ),
       
@@ -550,9 +550,9 @@ class OptionValue extends \Civi\Core\Entity {
         'propertyName' => 'optionGroup',
         'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
-                                             
+                                                     
                                     
-                'FKClassName' => 'Civi_Core_OptionGroup',
+                'FKClassName' => 'CRM_Core_DAO_OptionGroup',
                                      'pseudoconstant' => array(
                                 'table' => 'civicrm_option_group',
                       'keyColumn' => 'id',
@@ -568,7 +568,7 @@ class OptionValue extends \Civi\Core\Entity {
                 'title' => ts('Option Label'),
                         'required' => true,
                          'maxlength' => 255,
-                         'size' => \CRM_Utils_Type::HUGE,
+                                 'size' => \CRM_Utils_Type::HUGE,
                            
                                     
                           ),
@@ -581,7 +581,7 @@ class OptionValue extends \Civi\Core\Entity {
                 'title' => ts('Option Value'),
                         'required' => true,
                          'maxlength' => 512,
-                         'size' => \CRM_Utils_Type::HUGE,
+                                 'size' => \CRM_Utils_Type::HUGE,
                            
                                     
                           ),
@@ -593,7 +593,7 @@ class OptionValue extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Option Name'),
                                  'maxlength' => 255,
-                         'size' => \CRM_Utils_Type::HUGE,
+                                 'size' => \CRM_Utils_Type::HUGE,
                            
                 'import' => true,
         'where' => 'civicrm_option_value.name',
@@ -610,7 +610,7 @@ class OptionValue extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Option Grouping Name'),
                                  'maxlength' => 255,
-                         'size' => \CRM_Utils_Type::HUGE,
+                                 'size' => \CRM_Utils_Type::HUGE,
                            
                                     
                           ),
@@ -621,7 +621,7 @@ class OptionValue extends \Civi\Core\Entity {
         'propertyName' => 'filter',
         'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Filter'),
-                                                     
+                                                             
                                     
                           ),
       
@@ -630,7 +630,7 @@ class OptionValue extends \Civi\Core\Entity {
         'name' => 'is_default',
         'propertyName' => 'isDefault',
         'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                     
+                                                             
                                     
                           ),
       
@@ -641,7 +641,7 @@ class OptionValue extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Weight'),
                         'required' => true,
-                                             
+                                                     
                                     
                           ),
       
@@ -652,7 +652,7 @@ class OptionValue extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_TEXT,
                 'title' => ts('Description'),
                                  'maxlength' => 65535,
-                                  'rows' => 8,
+                                          'rows' => 8,
                          'cols' => 60,
          
                                     
@@ -663,7 +663,7 @@ class OptionValue extends \Civi\Core\Entity {
         'name' => 'is_optgroup',
         'propertyName' => 'isOptgroup',
         'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                     
+                                                             
                                     
                           ),
       
@@ -672,7 +672,7 @@ class OptionValue extends \Civi\Core\Entity {
         'name' => 'is_reserved',
         'propertyName' => 'isReserved',
         'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                     
+                                                             
                                     
                           ),
       
@@ -681,7 +681,7 @@ class OptionValue extends \Civi\Core\Entity {
         'name' => 'is_active',
         'propertyName' => 'isActive',
         'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                     
+                                                             
                                            'default' => '1',
          
                           ),
@@ -691,9 +691,9 @@ class OptionValue extends \Civi\Core\Entity {
         'name' => 'component_id',
         'propertyName' => 'component',
         'type' => \CRM_Utils_Type::T_INT,
-                                                     
+                                                             
                                     
-                'FKClassName' => 'Civi_Core_Component',
+                'FKClassName' => 'CRM_Core_DAO_Component',
                                      'pseudoconstant' => array(
                                 'table' => 'civicrm_component',
                       'keyColumn' => 'id',
@@ -706,9 +706,9 @@ class OptionValue extends \Civi\Core\Entity {
         'name' => 'domain_id',
         'propertyName' => 'domain',
         'type' => \CRM_Utils_Type::T_INT,
-                                                     
+                                                             
                                     
-                'FKClassName' => 'Civi_Core_Domain',
+                'FKClassName' => 'CRM_Core_DAO_Domain',
                           ),
       
               'visibility_id' => array(
@@ -716,7 +716,7 @@ class OptionValue extends \Civi\Core\Entity {
         'name' => 'visibility_id',
         'propertyName' => 'visibilityId',
         'type' => \CRM_Utils_Type::T_INT,
-                                                     
+                                                             
                                            'default' => 'NULL',
          
                           ),

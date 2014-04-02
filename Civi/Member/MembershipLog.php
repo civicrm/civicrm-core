@@ -330,7 +330,7 @@ class MembershipLog extends \Civi\Core\Entity {
         'propertyName' => 'id',
         'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
-                                             
+                                                     
                                     
                           ),
       
@@ -340,9 +340,9 @@ class MembershipLog extends \Civi\Core\Entity {
         'propertyName' => 'membership',
         'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
-                                             
+                                                     
                                     
-                'FKClassName' => 'Civi_Member_Membership',
+                'FKClassName' => 'CRM_Member_DAO_Membership',
                           ),
       
               'status_id' => array(
@@ -352,9 +352,9 @@ class MembershipLog extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Membership Status'),
                         'required' => true,
-                                             
+                                                     
                                     
-                'FKClassName' => 'Civi_Member_MembershipStatus',
+                'FKClassName' => 'CRM_Member_DAO_MembershipStatus',
                           ),
       
               'start_date' => array(
@@ -363,7 +363,7 @@ class MembershipLog extends \Civi\Core\Entity {
         'propertyName' => 'startDate',
         'type' => \CRM_Utils_Type::T_DATE,
                 'title' => ts('Start Date'),
-                                                     
+                                                             
                                     
                           ),
       
@@ -373,7 +373,7 @@ class MembershipLog extends \Civi\Core\Entity {
         'propertyName' => 'endDate',
         'type' => \CRM_Utils_Type::T_DATE,
                 'title' => ts('End Date'),
-                                                     
+                                                             
                                     
                           ),
       
@@ -382,9 +382,9 @@ class MembershipLog extends \Civi\Core\Entity {
         'name' => 'modified_id',
         'propertyName' => 'modified',
         'type' => \CRM_Utils_Type::T_INT,
-                                                     
+                                                             
                                     
-                'FKClassName' => 'Civi_Contact_Contact',
+                'FKClassName' => 'CRM_Contact_DAO_Contact',
                           ),
       
               'modified_date' => array(
@@ -393,7 +393,7 @@ class MembershipLog extends \Civi\Core\Entity {
         'propertyName' => 'modifiedDate',
         'type' => \CRM_Utils_Type::T_DATE,
                 'title' => ts('Membership Change Date'),
-                                                     
+                                                             
                                     
                           ),
       
@@ -402,9 +402,9 @@ class MembershipLog extends \Civi\Core\Entity {
         'name' => 'membership_type_id',
         'propertyName' => 'membershipType',
         'type' => \CRM_Utils_Type::T_INT,
-                                                     
+                                                             
                                     
-                'FKClassName' => 'Civi_Member_MembershipType',
+                'FKClassName' => 'CRM_Member_DAO_MembershipType',
                           ),
       
               'max_related' => array(
@@ -413,7 +413,7 @@ class MembershipLog extends \Civi\Core\Entity {
         'propertyName' => 'maxRelated',
         'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Max Related'),
-                                                     
+                                                             
                                     
                           ),
              );

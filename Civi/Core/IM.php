@@ -270,7 +270,7 @@ class IM extends \Civi\Core\Entity {
         'propertyName' => 'id',
         'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
-                                             
+                                                     
                                     
                           ),
       
@@ -279,9 +279,9 @@ class IM extends \Civi\Core\Entity {
         'name' => 'contact_id',
         'propertyName' => 'contact',
         'type' => \CRM_Utils_Type::T_INT,
-                                                     
+                                                             
                                     
-                'FKClassName' => 'Civi_Contact_Contact',
+                'FKClassName' => 'CRM_Contact_DAO_Contact',
                           ),
       
               'location_type_id' => array(
@@ -290,7 +290,7 @@ class IM extends \Civi\Core\Entity {
         'propertyName' => 'locationTypeId',
         'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('IM Location Type'),
-                                                     
+                                                             
                                     
                                      'pseudoconstant' => array(
                                 'table' => 'civicrm_location_type',
@@ -306,7 +306,7 @@ class IM extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('IM Screen Name'),
                                  'maxlength' => 64,
-                         'size' => \CRM_Utils_Type::BIG,
+                                 'size' => \CRM_Utils_Type::BIG,
                            
                 'import' => true,
         'where' => 'civicrm_im.name',
@@ -322,7 +322,7 @@ class IM extends \Civi\Core\Entity {
         'propertyName' => 'providerId',
         'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('IM Provider'),
-                                                     
+                                                             
                                     
                                      'pseudoconstant' => array(
                                 'optionGroupName' => 'instant_messenger_service',
@@ -335,7 +335,7 @@ class IM extends \Civi\Core\Entity {
         'propertyName' => 'isPrimary',
         'type' => \CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('Is IM Primary?'),
-                                                     
+                                                             
                                     
                           ),
       
@@ -344,7 +344,7 @@ class IM extends \Civi\Core\Entity {
         'name' => 'is_billing',
         'propertyName' => 'isBilling',
         'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                     
+                                                             
                                     
                           ),
              );

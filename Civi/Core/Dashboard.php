@@ -480,7 +480,7 @@ class Dashboard extends \Civi\Core\Entity {
         'propertyName' => 'id',
         'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
-                                             
+                                                     
                                     
                           ),
       
@@ -490,9 +490,9 @@ class Dashboard extends \Civi\Core\Entity {
         'propertyName' => 'domain',
         'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
-                                             
+                                                     
                                     
-                'FKClassName' => 'Civi_Core_Domain',
+                'FKClassName' => 'CRM_Core_DAO_Domain',
                           ),
       
               'name' => array(
@@ -502,7 +502,7 @@ class Dashboard extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Dashlet Name'),
                                  'maxlength' => 64,
-                         'size' => \CRM_Utils_Type::BIG,
+                                 'size' => \CRM_Utils_Type::BIG,
                            
                                     
                           ),
@@ -514,7 +514,7 @@ class Dashboard extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Label'),
                                  'maxlength' => 255,
-                         'size' => \CRM_Utils_Type::HUGE,
+                                 'size' => \CRM_Utils_Type::HUGE,
                            
                                     
                           ),
@@ -526,7 +526,7 @@ class Dashboard extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Url'),
                                  'maxlength' => 255,
-                         'size' => \CRM_Utils_Type::HUGE,
+                                 'size' => \CRM_Utils_Type::HUGE,
                            
                                     
                           ),
@@ -538,7 +538,7 @@ class Dashboard extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Permission'),
                                  'maxlength' => 255,
-                         'size' => \CRM_Utils_Type::HUGE,
+                                 'size' => \CRM_Utils_Type::HUGE,
                            
                                     
                           ),
@@ -550,7 +550,7 @@ class Dashboard extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Permission Operator'),
                                  'maxlength' => 3,
-                         'size' => \CRM_Utils_Type::FOUR,
+                                 'size' => \CRM_Utils_Type::FOUR,
                            
                                     
                           ),
@@ -561,7 +561,7 @@ class Dashboard extends \Civi\Core\Entity {
         'propertyName' => 'columnNo',
         'type' => \CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('Column No'),
-                                                     
+                                                             
                                     
                           ),
       
@@ -570,7 +570,7 @@ class Dashboard extends \Civi\Core\Entity {
         'name' => 'is_minimized',
         'propertyName' => 'isMinimized',
         'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                     
+                                                             
                                     
                           ),
       
@@ -581,7 +581,7 @@ class Dashboard extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Fullscreen Url'),
                                  'maxlength' => 255,
-                         'size' => \CRM_Utils_Type::HUGE,
+                                 'size' => \CRM_Utils_Type::HUGE,
                            
                                     
                           ),
@@ -591,7 +591,7 @@ class Dashboard extends \Civi\Core\Entity {
         'name' => 'is_fullscreen',
         'propertyName' => 'isFullscreen',
         'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                     
+                                                             
                                            'default' => '1',
          
                           ),
@@ -601,7 +601,7 @@ class Dashboard extends \Civi\Core\Entity {
         'name' => 'is_active',
         'propertyName' => 'isActive',
         'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                     
+                                                             
                                     
                           ),
       
@@ -610,7 +610,7 @@ class Dashboard extends \Civi\Core\Entity {
         'name' => 'is_reserved',
         'propertyName' => 'isReserved',
         'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                     
+                                                             
                                     
                           ),
       
@@ -620,7 +620,7 @@ class Dashboard extends \Civi\Core\Entity {
         'propertyName' => 'weight',
         'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Weight'),
-                                                     
+                                                             
                                     
                           ),
              );

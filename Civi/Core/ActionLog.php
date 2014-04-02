@@ -330,7 +330,7 @@ class ActionLog extends \Civi\Core\Entity {
         'propertyName' => 'id',
         'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
-                                             
+                                                     
                                     
                           ),
       
@@ -339,9 +339,9 @@ class ActionLog extends \Civi\Core\Entity {
         'name' => 'contact_id',
         'propertyName' => 'contact',
         'type' => \CRM_Utils_Type::T_INT,
-                                                     
+                                                             
                                     
-                'FKClassName' => 'Civi_Contact_Contact',
+                'FKClassName' => 'CRM_Contact_DAO_Contact',
                           ),
       
               'entity_id' => array(
@@ -350,7 +350,7 @@ class ActionLog extends \Civi\Core\Entity {
         'propertyName' => 'entityId',
         'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
-                                             
+                                                     
                                     
                           ),
       
@@ -361,7 +361,7 @@ class ActionLog extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Entity Table'),
                                  'maxlength' => 255,
-                         'size' => \CRM_Utils_Type::HUGE,
+                                 'size' => \CRM_Utils_Type::HUGE,
                            
                                     
                           ),
@@ -372,9 +372,9 @@ class ActionLog extends \Civi\Core\Entity {
         'propertyName' => 'actionSchedule',
         'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
-                                             
+                                                     
                                     
-                'FKClassName' => 'Civi_Core_ActionSchedule',
+                'FKClassName' => 'CRM_Core_DAO_ActionSchedule',
                           ),
       
               'action_date_time' => array(
@@ -383,7 +383,7 @@ class ActionLog extends \Civi\Core\Entity {
         'propertyName' => 'actionDateTime',
         'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
                 'title' => ts('Action Date Time'),
-                                                     
+                                                             
                                     
                           ),
       
@@ -392,7 +392,7 @@ class ActionLog extends \Civi\Core\Entity {
         'name' => 'is_error',
         'propertyName' => 'isError',
         'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                     
+                                                             
                                     
                           ),
       
@@ -403,7 +403,7 @@ class ActionLog extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_TEXT,
                 'title' => ts('Message'),
                                  'maxlength' => 65535,
-                                    
+                                            
                                     
                           ),
       
@@ -413,7 +413,7 @@ class ActionLog extends \Civi\Core\Entity {
         'propertyName' => 'repetitionNumber',
         'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Repetition Number'),
-                                                     
+                                                             
                                     
                           ),
              );

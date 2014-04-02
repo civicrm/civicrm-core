@@ -150,7 +150,7 @@ class BouncePattern extends \Civi\Core\Entity {
         'propertyName' => 'id',
         'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
-                                             
+                                                     
                                     
                           ),
       
@@ -160,9 +160,9 @@ class BouncePattern extends \Civi\Core\Entity {
         'propertyName' => 'bounceType',
         'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
-                                             
+                                                     
                                     
-                'FKClassName' => 'Civi_Mailing_BounceType',
+                'FKClassName' => 'CRM_Mailing_DAO_BounceType',
                           ),
       
               'pattern' => array(
@@ -172,7 +172,7 @@ class BouncePattern extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Pattern'),
                                  'maxlength' => 255,
-                         'size' => \CRM_Utils_Type::HUGE,
+                                 'size' => \CRM_Utils_Type::HUGE,
                            
                                     
                           ),

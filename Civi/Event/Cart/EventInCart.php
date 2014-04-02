@@ -150,7 +150,7 @@ class EventInCart extends \Civi\Core\Entity {
         'propertyName' => 'id',
         'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
-                                             
+                                                     
                                     
                           ),
       
@@ -159,9 +159,9 @@ class EventInCart extends \Civi\Core\Entity {
         'name' => 'event_id',
         'propertyName' => 'event',
         'type' => \CRM_Utils_Type::T_INT,
-                                                     
+                                                             
                                     
-                'FKClassName' => 'Civi_Event_Event',
+                'FKClassName' => 'CRM_Event_DAO_Event',
                           ),
       
               'event_cart_id' => array(
@@ -169,9 +169,9 @@ class EventInCart extends \Civi\Core\Entity {
         'name' => 'event_cart_id',
         'propertyName' => 'eventCart',
         'type' => \CRM_Utils_Type::T_INT,
-                                                     
+                                                             
                                     
-                'FKClassName' => 'Civi_Event_Cart_Cart',
+                'FKClassName' => 'CRM_Event_Cart_DAO_Cart',
                           ),
              );
     }

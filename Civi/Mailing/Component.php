@@ -300,7 +300,7 @@ class Component extends \Civi\Core\Entity {
         'propertyName' => 'id',
         'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
-                                             
+                                                     
                                     
                           ),
       
@@ -311,7 +311,7 @@ class Component extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Component Name'),
                                  'maxlength' => 64,
-                         'size' => \CRM_Utils_Type::BIG,
+                                 'size' => \CRM_Utils_Type::BIG,
                            
                                     
                           ),
@@ -323,11 +323,11 @@ class Component extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Component Type'),
                                  'maxlength' => 12,
-                         'size' => \CRM_Utils_Type::TWELVE,
+                                 'size' => \CRM_Utils_Type::TWELVE,
                            
                                     
                                      'pseudoconstant' => array(
-                                '0' => 'not in database',
+                                'callback' => 'CRM_Core_SelectValues::mailingComponents',
                     )
                  ),
       
@@ -338,7 +338,7 @@ class Component extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Subject'),
                                  'maxlength' => 255,
-                         'size' => \CRM_Utils_Type::HUGE,
+                                 'size' => \CRM_Utils_Type::HUGE,
                            
                                     
                           ),
@@ -350,7 +350,7 @@ class Component extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_TEXT,
                 'title' => ts('Body Html'),
                                  'maxlength' => 65535,
-                                  'rows' => 8,
+                                          'rows' => 8,
                          'cols' => 80,
          
                                     
@@ -363,7 +363,7 @@ class Component extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_TEXT,
                 'title' => ts('Body Text'),
                                  'maxlength' => 65535,
-                                  'rows' => 8,
+                                          'rows' => 8,
                          'cols' => 80,
          
                                     
@@ -374,7 +374,7 @@ class Component extends \Civi\Core\Entity {
         'name' => 'is_default',
         'propertyName' => 'isDefault',
         'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                     
+                                                             
                                     
                           ),
       
@@ -383,7 +383,7 @@ class Component extends \Civi\Core\Entity {
         'name' => 'is_active',
         'propertyName' => 'isActive',
         'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                     
+                                                             
                                     
                           ),
              );

@@ -150,7 +150,7 @@ class GroupContactCache extends \Civi\Core\Entity {
         'propertyName' => 'id',
         'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
-                                             
+                                                     
                                     
                           ),
       
@@ -160,9 +160,9 @@ class GroupContactCache extends \Civi\Core\Entity {
         'propertyName' => 'group',
         'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
-                                             
+                                                     
                                     
-                'FKClassName' => 'Civi_Contact_Group',
+                'FKClassName' => 'CRM_Contact_DAO_Group',
                                      'pseudoconstant' => array(
                                 'table' => 'civicrm_group',
                       'keyColumn' => 'id',
@@ -176,9 +176,9 @@ class GroupContactCache extends \Civi\Core\Entity {
         'propertyName' => 'contact',
         'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
-                                             
+                                                     
                                     
-                'FKClassName' => 'Civi_Contact_Contact',
+                'FKClassName' => 'CRM_Contact_DAO_Contact',
                           ),
              );
     }

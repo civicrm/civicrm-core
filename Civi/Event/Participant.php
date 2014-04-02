@@ -601,7 +601,7 @@ class Participant extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Participant ID'),
                         'required' => true,
-                                             
+                                                     
                 'import' => true,
         'where' => 'civicrm_participant.id',
         'headerPattern' => '/(^(participant(.)?)?id$)/i',
@@ -617,14 +617,14 @@ class Participant extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Contact ID'),
                         'required' => true,
-                                             
+                                                     
                 'import' => true,
         'where' => 'civicrm_participant.contact_id',
         'headerPattern' => '/contact(.?id)?/i',
         'dataPattern' => '',
                          'export' => true,
                                    
-                'FKClassName' => 'Civi_Contact_Contact',
+                'FKClassName' => 'CRM_Contact_DAO_Contact',
                           ),
       
               'event_id' => array(
@@ -634,14 +634,14 @@ class Participant extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Event'),
                         'required' => true,
-                                             
+                                                     
                 'import' => true,
         'where' => 'civicrm_participant.event_id',
         'headerPattern' => '/event id$/i',
         'dataPattern' => '',
                          'export' => true,
                                    
-                'FKClassName' => 'Civi_Event_Event',
+                'FKClassName' => 'CRM_Event_DAO_Event',
                           ),
       
               'participant_status_id' => array(
@@ -651,7 +651,7 @@ class Participant extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Participant Status'),
                         'required' => true,
-                                             
+                                                     
                 'import' => true,
         'where' => 'civicrm_participant.status_id',
         'headerPattern' => '/(participant.)?(status)$/i',
@@ -659,7 +659,7 @@ class Participant extends \Civi\Core\Entity {
                          'export' => false,
                                           'default' => '1',
          
-                'FKClassName' => 'Civi_Event_ParticipantStatusType',
+                'FKClassName' => 'CRM_Event_DAO_ParticipantStatusType',
                                      'pseudoconstant' => array(
                                 'table' => 'civicrm_participant_status_type',
                       'keyColumn' => 'id',
@@ -674,7 +674,7 @@ class Participant extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Participant Role Id'),
                                  'maxlength' => 128,
-                         'size' => \CRM_Utils_Type::HUGE,
+                                 'size' => \CRM_Utils_Type::HUGE,
                            
                 'import' => true,
         'where' => 'civicrm_participant.role_id',
@@ -694,7 +694,7 @@ class Participant extends \Civi\Core\Entity {
         'propertyName' => 'registerDate',
         'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
                 'title' => ts('Register date'),
-                                                     
+                                                             
                 'import' => true,
         'where' => 'civicrm_participant.register_date',
         'headerPattern' => '/^(r(egister\s)?date)$/i',
@@ -710,7 +710,7 @@ class Participant extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Participant Source'),
                                  'maxlength' => 128,
-                         'size' => \CRM_Utils_Type::HUGE,
+                                 'size' => \CRM_Utils_Type::HUGE,
                            
                 'import' => true,
         'where' => 'civicrm_participant.source',
@@ -727,7 +727,7 @@ class Participant extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_TEXT,
                 'title' => ts('Fee level'),
                                  'maxlength' => 65535,
-                                    
+                                            
                 'import' => true,
         'where' => 'civicrm_participant.fee_level',
         'headerPattern' => '/^(f(ee\s)?level)$/i',
@@ -742,7 +742,7 @@ class Participant extends \Civi\Core\Entity {
         'propertyName' => 'isTest',
         'type' => \CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('Test'),
-                                                     
+                                                             
                 'import' => true,
         'where' => 'civicrm_participant.is_test',
         'headerPattern' => '',
@@ -757,7 +757,7 @@ class Participant extends \Civi\Core\Entity {
         'propertyName' => 'isPayLater',
         'type' => \CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('Is Pay Later'),
-                                                     
+                                                             
                 'import' => true,
         'where' => 'civicrm_participant.is_pay_later',
         'headerPattern' => '/(is.)?(pay(.)?later)$/i',
@@ -772,7 +772,8 @@ class Participant extends \Civi\Core\Entity {
         'propertyName' => 'feeAmount',
         'type' => \CRM_Utils_Type::T_MONEY,
                 'title' => ts('Fee Amount'),
-                                                     
+                                          'precision'      => array(20,2),
+                                   
                 'import' => true,
         'where' => 'civicrm_participant.fee_amount',
         'headerPattern' => '/fee(.?am(ou)?nt)?/i',
@@ -787,7 +788,7 @@ class Participant extends \Civi\Core\Entity {
         'propertyName' => 'registeredBy',
         'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Registered By ID'),
-                                                     
+                                                             
                 'import' => true,
         'where' => 'civicrm_participant.registered_by_id',
         'headerPattern' => '',
@@ -795,7 +796,7 @@ class Participant extends \Civi\Core\Entity {
                          'export' => true,
                                           'default' => 'NULL',
          
-                'FKClassName' => 'Civi_Event_Participant',
+                'FKClassName' => 'CRM_Event_DAO_Participant',
                           ),
       
               'participant_discount_id' => array(
@@ -804,10 +805,10 @@ class Participant extends \Civi\Core\Entity {
         'propertyName' => 'discount',
         'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Discount ID'),
-                                                     
+                                                             
                                            'default' => 'NULL',
          
-                'FKClassName' => 'Civi_Core_Discount',
+                'FKClassName' => 'CRM_Core_DAO_Discount',
                           ),
       
               'participant_fee_currency' => array(
@@ -817,7 +818,7 @@ class Participant extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Fee Currency'),
                                  'maxlength' => 3,
-                         'size' => \CRM_Utils_Type::FOUR,
+                                 'size' => \CRM_Utils_Type::FOUR,
                            
                 'import' => true,
         'where' => 'civicrm_participant.fee_currency',
@@ -840,14 +841,14 @@ class Participant extends \Civi\Core\Entity {
         'propertyName' => 'campaign',
         'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Campaign'),
-                                                     
+                                                             
                 'import' => true,
         'where' => 'civicrm_participant.campaign_id',
         'headerPattern' => '',
         'dataPattern' => '',
                          'export' => true,
                                    
-                'FKClassName' => 'Civi_Campaign_Campaign',
+                'FKClassName' => 'CRM_Campaign_DAO_Campaign',
                                      'pseudoconstant' => array(
                                 'table' => 'civicrm_campaign',
                       'keyColumn' => 'id',
@@ -861,7 +862,7 @@ class Participant extends \Civi\Core\Entity {
         'propertyName' => 'discountAmount',
         'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Discount Amount'),
-                                                     
+                                                             
                                     
                           ),
       
@@ -871,9 +872,9 @@ class Participant extends \Civi\Core\Entity {
         'propertyName' => 'cart',
         'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Event Cart ID'),
-                                                     
+                                                             
                                     
-                'FKClassName' => 'Civi_Event_Cart_Cart',
+                'FKClassName' => 'CRM_Event_Cart_DAO_Cart',
                           ),
       
               'must_wait' => array(
@@ -882,7 +883,7 @@ class Participant extends \Civi\Core\Entity {
         'propertyName' => 'mustWait',
         'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Must Wait on List'),
-                                                     
+                                                             
                                     
                           ),
              );

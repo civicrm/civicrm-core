@@ -150,7 +150,7 @@ class CaseContact extends \Civi\Core\Entity {
         'propertyName' => 'id',
         'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
-                                             
+                                                     
                                     
                           ),
       
@@ -160,9 +160,9 @@ class CaseContact extends \Civi\Core\Entity {
         'propertyName' => 'case',
         'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
-                                             
+                                                     
                                     
-                'FKClassName' => 'Civi_CCase_CCase',
+                'FKClassName' => 'CRM_Case_DAO_Case',
                           ),
       
               'case_contact_id' => array(
@@ -171,9 +171,9 @@ class CaseContact extends \Civi\Core\Entity {
         'propertyName' => 'contact',
         'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
-                                             
+                                                     
                                     
-                'FKClassName' => 'Civi_Contact_Contact',
+                'FKClassName' => 'CRM_Contact_DAO_Contact',
                           ),
              );
     }

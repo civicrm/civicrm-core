@@ -181,7 +181,7 @@ class Website extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Website ID'),
                         'required' => true,
-                                             
+                                                     
                                     
                           ),
       
@@ -191,9 +191,9 @@ class Website extends \Civi\Core\Entity {
         'propertyName' => 'contact',
         'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Contact'),
-                                                     
+                                                             
                                     
-                'FKClassName' => 'Civi_Contact_Contact',
+                'FKClassName' => 'CRM_Contact_DAO_Contact',
                           ),
       
               'url' => array(
@@ -203,7 +203,7 @@ class Website extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Website'),
                                  'maxlength' => 128,
-                         'size' => \CRM_Utils_Type::BIG,
+                                 'size' => \CRM_Utils_Type::BIG,
                            
                 'import' => true,
         'where' => 'civicrm_website.url',
@@ -219,7 +219,7 @@ class Website extends \Civi\Core\Entity {
         'propertyName' => 'websiteTypeId',
         'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Website Type'),
-                                                     
+                                                             
                                     
                                      'pseudoconstant' => array(
                                 'optionGroupName' => 'website_type',

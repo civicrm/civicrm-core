@@ -240,7 +240,7 @@ class OpenID extends \Civi\Core\Entity {
         'propertyName' => 'id',
         'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
-                                             
+                                                     
                                     
                           ),
       
@@ -249,9 +249,9 @@ class OpenID extends \Civi\Core\Entity {
         'name' => 'contact_id',
         'propertyName' => 'contact',
         'type' => \CRM_Utils_Type::T_INT,
-                                                     
+                                                             
                                     
-                'FKClassName' => 'Civi_Contact_Contact',
+                'FKClassName' => 'CRM_Contact_DAO_Contact',
                           ),
       
               'location_type_id' => array(
@@ -260,7 +260,7 @@ class OpenID extends \Civi\Core\Entity {
         'propertyName' => 'locationTypeId',
         'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('OpenID Location Type'),
-                                                     
+                                                             
                                     
                           ),
       
@@ -271,7 +271,7 @@ class OpenID extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('OpenID'),
                                  'maxlength' => 255,
-                         'size' => \CRM_Utils_Type::HUGE,
+                                 'size' => \CRM_Utils_Type::HUGE,
                            
                 'import' => true,
         'where' => 'civicrm_openid.openid',
@@ -289,7 +289,7 @@ class OpenID extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('Allowed To Login'),
                         'required' => true,
-                                             
+                                                     
                                     
                           ),
       
@@ -299,7 +299,7 @@ class OpenID extends \Civi\Core\Entity {
         'propertyName' => 'isPrimary',
         'type' => \CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('Is OpenID Primary?'),
-                                                     
+                                                             
                                     
                           ),
              );

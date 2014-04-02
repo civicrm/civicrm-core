@@ -330,7 +330,7 @@ class LocBlock extends \Civi\Core\Entity {
         'propertyName' => 'id',
         'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
-                                             
+                                                     
                                     
                           ),
       
@@ -339,9 +339,9 @@ class LocBlock extends \Civi\Core\Entity {
         'name' => 'address_id',
         'propertyName' => 'address',
         'type' => \CRM_Utils_Type::T_INT,
-                                                     
+                                                             
                                     
-                'FKClassName' => 'Civi_Core_Address',
+                'FKClassName' => 'CRM_Core_DAO_Address',
                           ),
       
               'email_id' => array(
@@ -349,9 +349,9 @@ class LocBlock extends \Civi\Core\Entity {
         'name' => 'email_id',
         'propertyName' => 'email',
         'type' => \CRM_Utils_Type::T_INT,
-                                                     
+                                                             
                                     
-                'FKClassName' => 'Civi_Core_Email',
+                'FKClassName' => 'CRM_Core_DAO_Email',
                           ),
       
               'phone_id' => array(
@@ -359,9 +359,9 @@ class LocBlock extends \Civi\Core\Entity {
         'name' => 'phone_id',
         'propertyName' => 'phone',
         'type' => \CRM_Utils_Type::T_INT,
-                                                     
+                                                             
                                     
-                'FKClassName' => 'Civi_Core_Phone',
+                'FKClassName' => 'CRM_Core_DAO_Phone',
                           ),
       
               'im_id' => array(
@@ -369,9 +369,9 @@ class LocBlock extends \Civi\Core\Entity {
         'name' => 'im_id',
         'propertyName' => 'im',
         'type' => \CRM_Utils_Type::T_INT,
-                                                     
+                                                             
                                     
-                'FKClassName' => 'Civi_Core_IM',
+                'FKClassName' => 'CRM_Core_DAO_IM',
                           ),
       
               'address_2_id' => array(
@@ -379,9 +379,9 @@ class LocBlock extends \Civi\Core\Entity {
         'name' => 'address_2_id',
         'propertyName' => 'address2',
         'type' => \CRM_Utils_Type::T_INT,
-                                                     
+                                                             
                                     
-                'FKClassName' => 'Civi_Core_Address',
+                'FKClassName' => 'CRM_Core_DAO_Address',
                           ),
       
               'email_2_id' => array(
@@ -389,9 +389,9 @@ class LocBlock extends \Civi\Core\Entity {
         'name' => 'email_2_id',
         'propertyName' => 'email2',
         'type' => \CRM_Utils_Type::T_INT,
-                                                     
+                                                             
                                     
-                'FKClassName' => 'Civi_Core_Email',
+                'FKClassName' => 'CRM_Core_DAO_Email',
                           ),
       
               'phone_2_id' => array(
@@ -399,9 +399,9 @@ class LocBlock extends \Civi\Core\Entity {
         'name' => 'phone_2_id',
         'propertyName' => 'phone2',
         'type' => \CRM_Utils_Type::T_INT,
-                                                     
+                                                             
                                     
-                'FKClassName' => 'Civi_Core_Phone',
+                'FKClassName' => 'CRM_Core_DAO_Phone',
                           ),
       
               'im_2_id' => array(
@@ -409,9 +409,9 @@ class LocBlock extends \Civi\Core\Entity {
         'name' => 'im_2_id',
         'propertyName' => 'im2',
         'type' => \CRM_Utils_Type::T_INT,
-                                                     
+                                                             
                                     
-                'FKClassName' => 'Civi_Core_IM',
+                'FKClassName' => 'CRM_Core_DAO_IM',
                           ),
              );
     }

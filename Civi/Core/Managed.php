@@ -210,7 +210,7 @@ class Managed extends \Civi\Core\Entity {
         'propertyName' => 'id',
         'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
-                                             
+                                                     
                                     
                           ),
       
@@ -222,7 +222,7 @@ class Managed extends \Civi\Core\Entity {
                 'title' => ts('Module'),
                         'required' => true,
                          'maxlength' => 127,
-                         'size' => \CRM_Utils_Type::HUGE,
+                                 'size' => \CRM_Utils_Type::HUGE,
                            
                                     
                           ),
@@ -234,7 +234,7 @@ class Managed extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Name'),
                                  'maxlength' => 127,
-                         'size' => \CRM_Utils_Type::HUGE,
+                                 'size' => \CRM_Utils_Type::HUGE,
                            
                                     
                           ),
@@ -247,7 +247,7 @@ class Managed extends \Civi\Core\Entity {
                 'title' => ts('Entity Type'),
                         'required' => true,
                          'maxlength' => 64,
-                         'size' => \CRM_Utils_Type::BIG,
+                                 'size' => \CRM_Utils_Type::BIG,
                            
                                     
                           ),
@@ -258,7 +258,7 @@ class Managed extends \Civi\Core\Entity {
         'propertyName' => 'entityId',
         'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
-                                             
+                                                     
                                     
                           ),
              );

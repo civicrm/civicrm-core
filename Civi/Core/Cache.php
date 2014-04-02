@@ -270,7 +270,7 @@ class Cache extends \Civi\Core\Entity {
         'propertyName' => 'id',
         'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
-                                             
+                                                     
                                     
                           ),
       
@@ -282,7 +282,7 @@ class Cache extends \Civi\Core\Entity {
                 'title' => ts('Group Name'),
                         'required' => true,
                          'maxlength' => 32,
-                         'size' => \CRM_Utils_Type::MEDIUM,
+                                 'size' => \CRM_Utils_Type::MEDIUM,
                            
                                     
                           ),
@@ -294,7 +294,7 @@ class Cache extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Path'),
                                  'maxlength' => 255,
-                         'size' => \CRM_Utils_Type::HUGE,
+                                 'size' => \CRM_Utils_Type::HUGE,
                            
                                     
                           ),
@@ -305,7 +305,7 @@ class Cache extends \Civi\Core\Entity {
         'propertyName' => 'data',
         'type' => \CRM_Utils_Type::T_LONGTEXT,
                 'title' => ts('Data'),
-                                                     
+                                                             
                                     
                           ),
       
@@ -314,9 +314,9 @@ class Cache extends \Civi\Core\Entity {
         'name' => 'component_id',
         'propertyName' => 'component',
         'type' => \CRM_Utils_Type::T_INT,
-                                                     
+                                                             
                                     
-                'FKClassName' => 'Civi_Core_Component',
+                'FKClassName' => 'CRM_Core_DAO_Component',
                                      'pseudoconstant' => array(
                                 'table' => 'civicrm_component',
                       'keyColumn' => 'id',
@@ -330,7 +330,7 @@ class Cache extends \Civi\Core\Entity {
         'propertyName' => 'createdDate',
         'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
                 'title' => ts('Created Date'),
-                                                     
+                                                             
                                     
                           ),
       
@@ -340,7 +340,7 @@ class Cache extends \Civi\Core\Entity {
         'propertyName' => 'expiredDate',
         'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
                 'title' => ts('Expired Date'),
-                                                     
+                                                             
                                     
                           ),
              );

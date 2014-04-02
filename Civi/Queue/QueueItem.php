@@ -240,7 +240,7 @@ class QueueItem extends \Civi\Core\Entity {
         'propertyName' => 'id',
         'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
-                                             
+                                                     
                                     
                           ),
       
@@ -252,7 +252,7 @@ class QueueItem extends \Civi\Core\Entity {
                 'title' => ts('Queue Name'),
                         'required' => true,
                          'maxlength' => 64,
-                         'size' => \CRM_Utils_Type::BIG,
+                                 'size' => \CRM_Utils_Type::BIG,
                            
                                     
                           ),
@@ -264,7 +264,7 @@ class QueueItem extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Weight'),
                         'required' => true,
-                                             
+                                                     
                                     
                           ),
       
@@ -275,7 +275,7 @@ class QueueItem extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
                 'title' => ts('Submit Time'),
                         'required' => true,
-                                             
+                                                     
                                     
                           ),
       
@@ -285,7 +285,7 @@ class QueueItem extends \Civi\Core\Entity {
         'propertyName' => 'releaseTime',
         'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
                 'title' => ts('Release Time'),
-                                                     
+                                                             
                                     
                           ),
       
@@ -296,7 +296,7 @@ class QueueItem extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_TEXT,
                 'title' => ts('Queue item datas'),
                                  'maxlength' => 65535,
-                                    
+                                            
                                     
                           ),
              );

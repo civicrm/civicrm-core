@@ -660,7 +660,7 @@ class Survey extends \Civi\Core\Entity {
         'propertyName' => 'id',
         'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
-                                             
+                                                     
                                     
                           ),
       
@@ -672,7 +672,7 @@ class Survey extends \Civi\Core\Entity {
                 'title' => ts('Survey Title'),
                         'required' => true,
                          'maxlength' => 255,
-                         'size' => \CRM_Utils_Type::HUGE,
+                                 'size' => \CRM_Utils_Type::HUGE,
                            
                 'import' => true,
         'where' => 'civicrm_survey.title',
@@ -687,10 +687,10 @@ class Survey extends \Civi\Core\Entity {
         'name' => 'campaign_id',
         'propertyName' => 'campaign',
         'type' => \CRM_Utils_Type::T_INT,
-                                                     
+                                                             
                                            'default' => 'NULL',
          
-                'FKClassName' => 'Civi_Campaign_Campaign',
+                'FKClassName' => 'CRM_Campaign_DAO_Campaign',
                                      'pseudoconstant' => array(
                                 'table' => 'civicrm_campaign',
                       'keyColumn' => 'id',
@@ -704,7 +704,7 @@ class Survey extends \Civi\Core\Entity {
         'propertyName' => 'activityTypeId',
         'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Activity Type ID'),
-                                                     
+                                                             
                 'import' => true,
         'where' => 'civicrm_survey.activity_type_id',
         'headerPattern' => '',
@@ -724,7 +724,7 @@ class Survey extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_TEXT,
                 'title' => ts('Recontact Interval'),
                                  'maxlength' => 65535,
-                                  'rows' => 20,
+                                          'rows' => 20,
                          'cols' => 80,
          
                                     
@@ -737,7 +737,7 @@ class Survey extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_TEXT,
                 'title' => ts('Instructions'),
                                  'maxlength' => 65535,
-                                  'rows' => 20,
+                                          'rows' => 20,
                          'cols' => 80,
          
                                     
@@ -749,7 +749,7 @@ class Survey extends \Civi\Core\Entity {
         'propertyName' => 'releaseFrequency',
         'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Release Frequency'),
-                                                     
+                                                             
                                            'default' => 'NULL',
          
                           ),
@@ -760,7 +760,7 @@ class Survey extends \Civi\Core\Entity {
         'propertyName' => 'maxNumberOfContacts',
         'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Maximum number of contacts'),
-                                                     
+                                                             
                                            'default' => 'NULL',
          
                           ),
@@ -771,7 +771,7 @@ class Survey extends \Civi\Core\Entity {
         'propertyName' => 'defaultNumberOfContacts',
         'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Default number of contacts'),
-                                                     
+                                                             
                                            'default' => 'NULL',
          
                           ),
@@ -781,7 +781,7 @@ class Survey extends \Civi\Core\Entity {
         'name' => 'is_active',
         'propertyName' => 'isActive',
         'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                     
+                                                             
                                            'default' => '1',
          
                           ),
@@ -791,7 +791,7 @@ class Survey extends \Civi\Core\Entity {
         'name' => 'is_default',
         'propertyName' => 'isDefault',
         'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                     
+                                                             
                                     
                           ),
       
@@ -800,9 +800,9 @@ class Survey extends \Civi\Core\Entity {
         'name' => 'created_id',
         'propertyName' => 'created',
         'type' => \CRM_Utils_Type::T_INT,
-                                                     
+                                                             
                                     
-                'FKClassName' => 'Civi_Contact_Contact',
+                'FKClassName' => 'CRM_Contact_DAO_Contact',
                           ),
       
               'created_date' => array(
@@ -811,7 +811,7 @@ class Survey extends \Civi\Core\Entity {
         'propertyName' => 'createdDate',
         'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
                 'title' => ts('Campaign Created Date'),
-                                                     
+                                                             
                                     
                           ),
       
@@ -820,9 +820,9 @@ class Survey extends \Civi\Core\Entity {
         'name' => 'last_modified_id',
         'propertyName' => 'lastModified',
         'type' => \CRM_Utils_Type::T_INT,
-                                                     
+                                                             
                                     
-                'FKClassName' => 'Civi_Contact_Contact',
+                'FKClassName' => 'CRM_Contact_DAO_Contact',
                           ),
       
               'last_modified_date' => array(
@@ -831,7 +831,7 @@ class Survey extends \Civi\Core\Entity {
         'propertyName' => 'lastModifiedDate',
         'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
                 'title' => ts('Last Modified Date'),
-                                                     
+                                                             
                                     
                           ),
       
@@ -840,7 +840,7 @@ class Survey extends \Civi\Core\Entity {
         'name' => 'result_id',
         'propertyName' => 'resultId',
         'type' => \CRM_Utils_Type::T_INT,
-                                                     
+                                                             
                                            'default' => 'NULL',
          
                           ),
@@ -851,7 +851,7 @@ class Survey extends \Civi\Core\Entity {
         'propertyName' => 'bypassConfirm',
         'type' => \CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('Bypass Confirm'),
-                                                     
+                                                             
                                     
                           ),
       
@@ -862,7 +862,7 @@ class Survey extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Thank-you Title'),
                                  'maxlength' => 255,
-                         'size' => \CRM_Utils_Type::HUGE,
+                                 'size' => \CRM_Utils_Type::HUGE,
                            
                                     
                           ),
@@ -874,7 +874,7 @@ class Survey extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_TEXT,
                 'title' => ts('Thank-you Text'),
                                  'maxlength' => 65535,
-                                  'rows' => 8,
+                                          'rows' => 8,
                          'cols' => 60,
          
                                     
@@ -886,7 +886,7 @@ class Survey extends \Civi\Core\Entity {
         'propertyName' => 'isShare',
         'type' => \CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('Is shared through social media'),
-                                                     
+                                                             
                                            'default' => '1',
          
                           ),

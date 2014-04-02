@@ -270,7 +270,7 @@ class SubscriptionHistory extends \Civi\Core\Entity {
         'propertyName' => 'id',
         'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
-                                             
+                                                     
                                     
                           ),
       
@@ -280,9 +280,9 @@ class SubscriptionHistory extends \Civi\Core\Entity {
         'propertyName' => 'contact',
         'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
-                                             
+                                                     
                                     
-                'FKClassName' => 'Civi_Contact_Contact',
+                'FKClassName' => 'CRM_Contact_DAO_Contact',
                           ),
       
               'group_id' => array(
@@ -290,9 +290,9 @@ class SubscriptionHistory extends \Civi\Core\Entity {
         'name' => 'group_id',
         'propertyName' => 'group',
         'type' => \CRM_Utils_Type::T_INT,
-                                                     
+                                                             
                                     
-                'FKClassName' => 'Civi_Contact_Group',
+                'FKClassName' => 'CRM_Contact_DAO_Group',
                                      'pseudoconstant' => array(
                                 'table' => 'civicrm_group',
                       'keyColumn' => 'id',
@@ -307,7 +307,7 @@ class SubscriptionHistory extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
                 'title' => ts('Date'),
                         'required' => true,
-                                             
+                                                     
                                     
                           ),
       
@@ -318,11 +318,11 @@ class SubscriptionHistory extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Method'),
                                  'maxlength' => 8,
-                         'size' => \CRM_Utils_Type::EIGHT,
+                                 'size' => \CRM_Utils_Type::EIGHT,
                            
                                     
                                      'pseudoconstant' => array(
-                                '0' => 'not in database',
+                                'callback' => 'CRM_Core_SelectValues::getSubscriptionHistoryMethods',
                     )
                  ),
       
@@ -333,11 +333,11 @@ class SubscriptionHistory extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Status'),
                                  'maxlength' => 8,
-                         'size' => \CRM_Utils_Type::EIGHT,
+                                 'size' => \CRM_Utils_Type::EIGHT,
                            
                                     
                                      'pseudoconstant' => array(
-                                '0' => 'not in database',
+                                'callback' => 'CRM_Core_SelectValues::groupContactStatus',
                     )
                  ),
       
@@ -348,7 +348,7 @@ class SubscriptionHistory extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Tracking'),
                                  'maxlength' => 255,
-                         'size' => \CRM_Utils_Type::HUGE,
+                                 'size' => \CRM_Utils_Type::HUGE,
                            
                                     
                           ),

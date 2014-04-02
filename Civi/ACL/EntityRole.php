@@ -210,7 +210,7 @@ class EntityRole extends \Civi\Core\Entity {
         'propertyName' => 'id',
         'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
-                                             
+                                                     
                                     
                           ),
       
@@ -220,7 +220,7 @@ class EntityRole extends \Civi\Core\Entity {
         'propertyName' => 'aclRoleId',
         'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
-                                             
+                                                     
                                     
                           ),
       
@@ -232,7 +232,7 @@ class EntityRole extends \Civi\Core\Entity {
                 'title' => ts('Entity Table'),
                         'required' => true,
                          'maxlength' => 64,
-                         'size' => \CRM_Utils_Type::BIG,
+                                 'size' => \CRM_Utils_Type::BIG,
                            
                                     
                           ),
@@ -243,7 +243,7 @@ class EntityRole extends \Civi\Core\Entity {
         'propertyName' => 'entityId',
         'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
-                                             
+                                                     
                                     
                           ),
       
@@ -252,7 +252,7 @@ class EntityRole extends \Civi\Core\Entity {
         'name' => 'is_active',
         'propertyName' => 'isActive',
         'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                     
+                                                             
                                     
                           ),
              );

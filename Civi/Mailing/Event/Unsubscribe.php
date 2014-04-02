@@ -180,7 +180,7 @@ class Unsubscribe extends \Civi\Core\Entity {
         'propertyName' => 'id',
         'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
-                                             
+                                                     
                                     
                           ),
       
@@ -190,9 +190,9 @@ class Unsubscribe extends \Civi\Core\Entity {
         'propertyName' => 'eventQueue',
         'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
-                                             
+                                                     
                                     
-                'FKClassName' => 'Civi_Mailing_Event_Queue',
+                'FKClassName' => 'CRM_Mailing_Event_DAO_Queue',
                           ),
       
               'org_unsubscribe' => array(
@@ -202,7 +202,7 @@ class Unsubscribe extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('Org Unsubscribe'),
                         'required' => true,
-                                             
+                                                     
                                     
                           ),
       
@@ -213,7 +213,7 @@ class Unsubscribe extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
                 'title' => ts('Time Stamp'),
                         'required' => true,
-                                             
+                                                     
                                     
                           ),
              );

@@ -751,7 +751,7 @@ class Pledge extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Pledge ID'),
                         'required' => true,
-                                             
+                                                     
                 'import' => true,
         'where' => 'civicrm_pledge.id',
         'headerPattern' => '',
@@ -767,14 +767,14 @@ class Pledge extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Contact ID'),
                         'required' => true,
-                                             
+                                                     
                 'import' => true,
         'where' => 'civicrm_pledge.contact_id',
         'headerPattern' => '',
         'dataPattern' => '',
                          'export' => true,
                                    
-                'FKClassName' => 'Civi_Contact_Contact',
+                'FKClassName' => 'CRM_Contact_DAO_Contact',
                           ),
       
               'pledge_financial_type_id' => array(
@@ -783,9 +783,9 @@ class Pledge extends \Civi\Core\Entity {
         'propertyName' => 'financialType',
         'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Type'),
-                                                     
+                                                             
                                     
-                'FKClassName' => 'Civi_Financial_FinancialType',
+                'FKClassName' => 'CRM_Financial_DAO_FinancialType',
                           ),
       
               'pledge_contribution_page_id' => array(
@@ -794,9 +794,9 @@ class Pledge extends \Civi\Core\Entity {
         'propertyName' => 'contributionPage',
         'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Pledge Contribution Page'),
-                                                     
+                                                             
                                     
-                'FKClassName' => 'Civi_Contribute_ContributionPage',
+                'FKClassName' => 'CRM_Contribute_DAO_ContributionPage',
                           ),
       
               'pledge_amount' => array(
@@ -806,7 +806,8 @@ class Pledge extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_MONEY,
                 'title' => ts('Total Pledged'),
                         'required' => true,
-                                             
+                                  'precision'      => array(20,2),
+                                   
                 'import' => true,
         'where' => 'civicrm_pledge.amount',
         'headerPattern' => '',
@@ -822,7 +823,8 @@ class Pledge extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_MONEY,
                 'title' => ts('Original Installment Amount'),
                         'required' => true,
-                                             
+                                  'precision'      => array(20,2),
+                                   
                                     
                           ),
       
@@ -833,7 +835,7 @@ class Pledge extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Pledge Currency'),
                                  'maxlength' => 3,
-                         'size' => \CRM_Utils_Type::FOUR,
+                                 'size' => \CRM_Utils_Type::FOUR,
                            
                                            'default' => 'NULL',
          
@@ -852,7 +854,7 @@ class Pledge extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Pledge Frequency Unit'),
                                  'maxlength' => 8,
-                         'size' => \CRM_Utils_Type::EIGHT,
+                                 'size' => \CRM_Utils_Type::EIGHT,
                            
                                            'default' => 'month',
          
@@ -869,7 +871,7 @@ class Pledge extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Pledge Frequency Interval'),
                         'required' => true,
-                                             
+                                                     
                                            'default' => '1',
          
                           ),
@@ -881,7 +883,7 @@ class Pledge extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Pledge day'),
                         'required' => true,
-                                             
+                                                     
                                            'default' => '3',
          
                           ),
@@ -892,7 +894,7 @@ class Pledge extends \Civi\Core\Entity {
         'propertyName' => 'installments',
         'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Pledge Number of Installments'),
-                                                     
+                                                             
                                            'default' => '1',
          
                           ),
@@ -904,7 +906,7 @@ class Pledge extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
                 'title' => ts('Pledge Start Date'),
                         'required' => true,
-                                             
+                                                     
                                     
                           ),
       
@@ -915,7 +917,7 @@ class Pledge extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
                 'title' => ts('Pledge Made'),
                         'required' => true,
-                                             
+                                                     
                 'import' => true,
         'where' => 'civicrm_pledge.create_date',
         'headerPattern' => '',
@@ -930,7 +932,7 @@ class Pledge extends \Civi\Core\Entity {
         'propertyName' => 'acknowledgeDate',
         'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
                 'title' => ts('Pledge Acknowledged'),
-                                                     
+                                                             
                                     
                           ),
       
@@ -940,7 +942,7 @@ class Pledge extends \Civi\Core\Entity {
         'propertyName' => 'modifiedDate',
         'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
                 'title' => ts('Pledge Modified Date'),
-                                                     
+                                                             
                                     
                           ),
       
@@ -950,7 +952,7 @@ class Pledge extends \Civi\Core\Entity {
         'propertyName' => 'cancelDate',
         'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
                 'title' => ts('Pledge Cancelled Date'),
-                                                     
+                                                             
                                     
                           ),
       
@@ -960,7 +962,7 @@ class Pledge extends \Civi\Core\Entity {
         'propertyName' => 'endDate',
         'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
                 'title' => ts('Pledge End Date'),
-                                                     
+                                                             
                                     
                           ),
       
@@ -970,7 +972,7 @@ class Pledge extends \Civi\Core\Entity {
         'propertyName' => 'maxReminders',
         'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Maximum Number of Reminders'),
-                                                     
+                                                             
                                            'default' => '1',
          
                           ),
@@ -981,7 +983,7 @@ class Pledge extends \Civi\Core\Entity {
         'propertyName' => 'initialReminderDay',
         'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Initial Reminder Day'),
-                                                     
+                                                             
                                            'default' => '5',
          
                           ),
@@ -992,7 +994,7 @@ class Pledge extends \Civi\Core\Entity {
         'propertyName' => 'additionalReminderDay',
         'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Additional Reminder Days'),
-                                                     
+                                                             
                                            'default' => '5',
          
                           ),
@@ -1003,7 +1005,7 @@ class Pledge extends \Civi\Core\Entity {
         'propertyName' => 'statusId',
         'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Pledge Status Id'),
-                                                     
+                                                             
                 'import' => true,
         'where' => 'civicrm_pledge.status_id',
         'headerPattern' => '',
@@ -1018,7 +1020,7 @@ class Pledge extends \Civi\Core\Entity {
         'propertyName' => 'isTest',
         'type' => \CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('Test'),
-                                                     
+                                                             
                 'import' => true,
         'where' => 'civicrm_pledge.is_test',
         'headerPattern' => '',
@@ -1033,14 +1035,14 @@ class Pledge extends \Civi\Core\Entity {
         'propertyName' => 'campaign',
         'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Campaign'),
-                                                     
+                                                             
                 'import' => true,
         'where' => 'civicrm_pledge.campaign_id',
         'headerPattern' => '',
         'dataPattern' => '',
                          'export' => true,
                                    
-                'FKClassName' => 'Civi_Campaign_Campaign',
+                'FKClassName' => 'CRM_Campaign_DAO_Campaign',
                                      'pseudoconstant' => array(
                                 'table' => 'civicrm_campaign',
                       'keyColumn' => 'id',

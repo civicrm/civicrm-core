@@ -150,7 +150,7 @@ class Confirm extends \Civi\Core\Entity {
         'propertyName' => 'id',
         'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
-                                             
+                                                     
                                     
                           ),
       
@@ -160,9 +160,9 @@ class Confirm extends \Civi\Core\Entity {
         'propertyName' => 'eventSubscribe',
         'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
-                                             
+                                                     
                                     
-                'FKClassName' => 'Civi_Mailing_Event_Subscribe',
+                'FKClassName' => 'CRM_Mailing_Event_DAO_Subscribe',
                           ),
       
               'time_stamp' => array(
@@ -172,7 +172,7 @@ class Confirm extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
                 'title' => ts('Time Stamp'),
                         'required' => true,
-                                             
+                                                     
                                     
                           ),
              );

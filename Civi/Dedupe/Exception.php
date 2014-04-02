@@ -150,7 +150,7 @@ class Exception extends \Civi\Core\Entity {
         'propertyName' => 'id',
         'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
-                                             
+                                                     
                                     
                           ),
       
@@ -160,9 +160,9 @@ class Exception extends \Civi\Core\Entity {
         'propertyName' => 'contact1',
         'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('First Dupe Contact ID'),
-                                                     
+                                                             
                                     
-                'FKClassName' => 'Civi_Contact_Contact',
+                'FKClassName' => 'CRM_Contact_DAO_Contact',
                           ),
       
               'contact_id2' => array(
@@ -171,9 +171,9 @@ class Exception extends \Civi\Core\Entity {
         'propertyName' => 'contact2',
         'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Second Dupe Contact ID'),
-                                                     
+                                                             
                                     
-                'FKClassName' => 'Civi_Contact_Contact',
+                'FKClassName' => 'CRM_Contact_DAO_Contact',
                           ),
              );
     }

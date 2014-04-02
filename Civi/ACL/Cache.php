@@ -180,7 +180,7 @@ class Cache extends \Civi\Core\Entity {
         'propertyName' => 'id',
         'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
-                                             
+                                                     
                                     
                           ),
       
@@ -189,9 +189,9 @@ class Cache extends \Civi\Core\Entity {
         'name' => 'contact_id',
         'propertyName' => 'contact',
         'type' => \CRM_Utils_Type::T_INT,
-                                                     
+                                                             
                                     
-                'FKClassName' => 'Civi_Contact_Contact',
+                'FKClassName' => 'CRM_Contact_DAO_Contact',
                           ),
       
               'acl_id' => array(
@@ -200,9 +200,9 @@ class Cache extends \Civi\Core\Entity {
         'propertyName' => 'acl',
         'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
-                                             
+                                                     
                                     
-                'FKClassName' => 'Civi_ACL_ACL',
+                'FKClassName' => 'CRM_ACL_DAO_ACL',
                           ),
       
               'modified_date' => array(
@@ -211,7 +211,7 @@ class Cache extends \Civi\Core\Entity {
         'propertyName' => 'modifiedDate',
         'type' => \CRM_Utils_Type::T_DATE,
                 'title' => ts('Modified Date'),
-                                                     
+                                                             
                                     
                           ),
              );

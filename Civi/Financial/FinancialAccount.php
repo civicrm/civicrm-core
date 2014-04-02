@@ -510,7 +510,7 @@ class FinancialAccount extends \Civi\Core\Entity {
         'propertyName' => 'id',
         'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
-                                             
+                                                     
                                     
                           ),
       
@@ -522,7 +522,7 @@ class FinancialAccount extends \Civi\Core\Entity {
                 'title' => ts('Name'),
                         'required' => true,
                          'maxlength' => 255,
-                         'size' => \CRM_Utils_Type::HUGE,
+                                 'size' => \CRM_Utils_Type::HUGE,
                            
                                     
                           ),
@@ -533,9 +533,9 @@ class FinancialAccount extends \Civi\Core\Entity {
         'propertyName' => 'contact',
         'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Contact ID'),
-                                                     
+                                                             
                                     
-                'FKClassName' => 'Civi_Contact_Contact',
+                'FKClassName' => 'CRM_Contact_DAO_Contact',
                           ),
       
               'financial_account_type_id' => array(
@@ -544,7 +544,7 @@ class FinancialAccount extends \Civi\Core\Entity {
         'propertyName' => 'financialAccountTypeId',
         'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
-                                             
+                                                     
                                            'default' => '3',
          
                                      'pseudoconstant' => array(
@@ -559,7 +559,7 @@ class FinancialAccount extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Accounting Code'),
                                  'maxlength' => 64,
-                         'size' => \CRM_Utils_Type::BIG,
+                                 'size' => \CRM_Utils_Type::BIG,
                            
                          'export' => true,
                 'where' => 'civicrm_financial_account.accounting_code',
@@ -575,7 +575,7 @@ class FinancialAccount extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Account Type Code'),
                                  'maxlength' => 64,
-                         'size' => \CRM_Utils_Type::BIG,
+                                 'size' => \CRM_Utils_Type::BIG,
                            
                          'export' => true,
                 'where' => 'civicrm_financial_account.account_type_code',
@@ -591,7 +591,7 @@ class FinancialAccount extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Description'),
                                  'maxlength' => 255,
-                         'size' => \CRM_Utils_Type::HUGE,
+                                 'size' => \CRM_Utils_Type::HUGE,
                            
                                     
                           ),
@@ -601,9 +601,9 @@ class FinancialAccount extends \Civi\Core\Entity {
         'name' => 'parent_id',
         'propertyName' => 'parent',
         'type' => \CRM_Utils_Type::T_INT,
-                                                     
+                                                             
                                     
-                'FKClassName' => 'Civi_Financial_FinancialAccount',
+                'FKClassName' => 'CRM_Financial_DAO_FinancialAccount',
                           ),
       
               'is_header_account' => array(
@@ -611,7 +611,7 @@ class FinancialAccount extends \Civi\Core\Entity {
         'name' => 'is_header_account',
         'propertyName' => 'isHeaderAccount',
         'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                     
+                                                             
                                     
                           ),
       
@@ -620,7 +620,7 @@ class FinancialAccount extends \Civi\Core\Entity {
         'name' => 'is_deductible',
         'propertyName' => 'isDeductible',
         'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                     
+                                                             
                                            'default' => '1',
          
                           ),
@@ -630,7 +630,7 @@ class FinancialAccount extends \Civi\Core\Entity {
         'name' => 'is_tax',
         'propertyName' => 'isTax',
         'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                     
+                                                             
                                     
                           ),
       
@@ -640,7 +640,8 @@ class FinancialAccount extends \Civi\Core\Entity {
         'propertyName' => 'taxRate',
         'type' => \CRM_Utils_Type::T_MONEY,
                 'title' => ts('Tax Rate'),
-                                                     
+                                          'precision'      => array(10,8),
+                                   
                                     
                           ),
       
@@ -649,7 +650,7 @@ class FinancialAccount extends \Civi\Core\Entity {
         'name' => 'is_reserved',
         'propertyName' => 'isReserved',
         'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                     
+                                                             
                                     
                           ),
       
@@ -658,7 +659,7 @@ class FinancialAccount extends \Civi\Core\Entity {
         'name' => 'is_active',
         'propertyName' => 'isActive',
         'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                     
+                                                             
                                     
                           ),
       
@@ -667,7 +668,7 @@ class FinancialAccount extends \Civi\Core\Entity {
         'name' => 'is_default',
         'propertyName' => 'isDefault',
         'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                     
+                                                             
                                     
                           ),
              );

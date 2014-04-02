@@ -180,7 +180,7 @@ class StateProvince extends \Civi\Core\Entity {
         'propertyName' => 'id',
         'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
-                                             
+                                                     
                                     
                           ),
       
@@ -191,7 +191,7 @@ class StateProvince extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('State'),
                                  'maxlength' => 64,
-                         'size' => \CRM_Utils_Type::BIG,
+                                 'size' => \CRM_Utils_Type::BIG,
                            
                 'import' => true,
         'where' => 'civicrm_state_province.name',
@@ -208,7 +208,7 @@ class StateProvince extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('State Abbreviation'),
                                  'maxlength' => 4,
-                         'size' => \CRM_Utils_Type::FOUR,
+                                 'size' => \CRM_Utils_Type::FOUR,
                            
                                     
                           ),
@@ -219,9 +219,9 @@ class StateProvince extends \Civi\Core\Entity {
         'propertyName' => 'country',
         'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
-                                             
+                                                     
                                     
-                'FKClassName' => 'Civi_Core_Country',
+                'FKClassName' => 'CRM_Core_DAO_Country',
                           ),
              );
     }

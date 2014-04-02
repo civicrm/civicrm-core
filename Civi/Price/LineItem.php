@@ -420,7 +420,7 @@ class LineItem extends \Civi\Core\Entity {
         'propertyName' => 'id',
         'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
-                                             
+                                                     
                                     
                           ),
       
@@ -432,7 +432,7 @@ class LineItem extends \Civi\Core\Entity {
                 'title' => ts('Entity Table'),
                         'required' => true,
                          'maxlength' => 64,
-                         'size' => \CRM_Utils_Type::BIG,
+                                 'size' => \CRM_Utils_Type::BIG,
                            
                                     
                           ),
@@ -443,7 +443,7 @@ class LineItem extends \Civi\Core\Entity {
         'propertyName' => 'entityId',
         'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
-                                             
+                                                     
                                     
                           ),
       
@@ -452,9 +452,9 @@ class LineItem extends \Civi\Core\Entity {
         'name' => 'price_field_id',
         'propertyName' => 'priceField',
         'type' => \CRM_Utils_Type::T_INT,
-                                                     
+                                                             
                                     
-                'FKClassName' => 'Civi_Price_PriceField',
+                'FKClassName' => 'CRM_Price_DAO_PriceField',
                           ),
       
               'label' => array(
@@ -464,7 +464,7 @@ class LineItem extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Label'),
                                  'maxlength' => 255,
-                         'size' => \CRM_Utils_Type::HUGE,
+                                 'size' => \CRM_Utils_Type::HUGE,
                            
                                            'default' => 'NULL',
          
@@ -477,7 +477,7 @@ class LineItem extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Qty'),
                         'required' => true,
-                                             
+                                                     
                                     
                           ),
       
@@ -488,7 +488,8 @@ class LineItem extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_MONEY,
                 'title' => ts('Unit Price'),
                         'required' => true,
-                                             
+                                  'precision'      => array(20,2),
+                                   
                                     
                           ),
       
@@ -499,7 +500,8 @@ class LineItem extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_MONEY,
                 'title' => ts('Line Total'),
                         'required' => true,
-                                             
+                                  'precision'      => array(20,2),
+                                   
                                     
                           ),
       
@@ -509,7 +511,7 @@ class LineItem extends \Civi\Core\Entity {
         'propertyName' => 'participantCount',
         'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Participant Count'),
-                                                     
+                                                             
                                            'default' => 'NULL',
          
                           ),
@@ -519,10 +521,10 @@ class LineItem extends \Civi\Core\Entity {
         'name' => 'price_field_value_id',
         'propertyName' => 'priceFieldValue',
         'type' => \CRM_Utils_Type::T_INT,
-                                                     
+                                                             
                                            'default' => 'NULL',
          
-                'FKClassName' => 'Civi_Price_PriceFieldValue',
+                'FKClassName' => 'CRM_Price_DAO_PriceFieldValue',
                           ),
       
               'financial_type_id' => array(
@@ -531,10 +533,10 @@ class LineItem extends \Civi\Core\Entity {
         'propertyName' => 'financialType',
         'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Financial Type'),
-                                                     
+                                                             
                                            'default' => 'NULL',
          
-                'FKClassName' => 'Civi_Financial_FinancialType',
+                'FKClassName' => 'CRM_Financial_DAO_FinancialType',
                           ),
       
               'deductible_amount' => array(
@@ -544,7 +546,8 @@ class LineItem extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_MONEY,
                 'title' => ts('Deductible Amount'),
                         'required' => true,
-                                             
+                                  'precision'      => array(20,2),
+                                   
                                            'default' => '0.0',
          
                           ),

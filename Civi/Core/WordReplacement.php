@@ -240,7 +240,7 @@ class WordReplacement extends \Civi\Core\Entity {
         'propertyName' => 'id',
         'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
-                                             
+                                                     
                                     
                           ),
       
@@ -251,7 +251,7 @@ class WordReplacement extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Find Word'),
                                  'maxlength' => 255,
-                         'size' => \CRM_Utils_Type::HUGE,
+                                 'size' => \CRM_Utils_Type::HUGE,
                            
                                     
                           ),
@@ -263,7 +263,7 @@ class WordReplacement extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Replace Word'),
                                  'maxlength' => 255,
-                         'size' => \CRM_Utils_Type::HUGE,
+                                 'size' => \CRM_Utils_Type::HUGE,
                            
                                     
                           ),
@@ -274,7 +274,7 @@ class WordReplacement extends \Civi\Core\Entity {
         'propertyName' => 'isActive',
         'type' => \CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('Word Replacement is Active'),
-                                                     
+                                                             
                                            'default' => '1',
          
                           ),
@@ -286,12 +286,12 @@ class WordReplacement extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Match Type'),
                                  'maxlength' => 16,
-                         'size' => \CRM_Utils_Type::TWELVE,
+                                 'size' => \CRM_Utils_Type::TWELVE,
                            
                                            'default' => 'wildcardMatch',
          
                                      'pseudoconstant' => array(
-                                '0' => 'not in database',
+                                'callback' => 'CRM_Core_SelectValues::getWordReplacementMatchType',
                     )
                  ),
       
@@ -300,9 +300,9 @@ class WordReplacement extends \Civi\Core\Entity {
         'name' => 'domain_id',
         'propertyName' => 'domain',
         'type' => \CRM_Utils_Type::T_INT,
-                                                     
+                                                             
                                     
-                'FKClassName' => 'Civi_Core_Domain',
+                'FKClassName' => 'CRM_Core_DAO_Domain',
                           ),
              );
     }

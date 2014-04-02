@@ -210,7 +210,7 @@ class PremiumsProduct extends \Civi\Core\Entity {
         'propertyName' => 'id',
         'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
-                                             
+                                                     
                                     
                           ),
       
@@ -220,9 +220,9 @@ class PremiumsProduct extends \Civi\Core\Entity {
         'propertyName' => 'premiums',
         'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
-                                             
+                                                     
                                     
-                'FKClassName' => 'Civi_Contribute_Premium',
+                'FKClassName' => 'CRM_Contribute_DAO_Premium',
                           ),
       
               'product_id' => array(
@@ -231,9 +231,9 @@ class PremiumsProduct extends \Civi\Core\Entity {
         'propertyName' => 'product',
         'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
-                                             
+                                                     
                                     
-                'FKClassName' => 'Civi_Contribute_Product',
+                'FKClassName' => 'CRM_Contribute_DAO_Product',
                           ),
       
               'weight' => array(
@@ -243,7 +243,7 @@ class PremiumsProduct extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Weight'),
                         'required' => true,
-                                             
+                                                     
                                     
                           ),
       
@@ -253,10 +253,10 @@ class PremiumsProduct extends \Civi\Core\Entity {
         'propertyName' => 'financialType',
         'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Financial Type'),
-                                                     
+                                                             
                                            'default' => 'NULL',
          
-                'FKClassName' => 'Civi_Financial_FinancialType',
+                'FKClassName' => 'CRM_Financial_DAO_FinancialType',
                           ),
              );
     }

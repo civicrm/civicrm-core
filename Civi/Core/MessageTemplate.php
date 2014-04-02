@@ -360,7 +360,7 @@ class MessageTemplate extends \Civi\Core\Entity {
         'propertyName' => 'id',
         'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
-                                             
+                                                     
                                     
                           ),
       
@@ -371,7 +371,7 @@ class MessageTemplate extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Msg Title'),
                                  'maxlength' => 255,
-                         'size' => \CRM_Utils_Type::HUGE,
+                                 'size' => \CRM_Utils_Type::HUGE,
                            
                                     
                           ),
@@ -383,7 +383,7 @@ class MessageTemplate extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_TEXT,
                 'title' => ts('Msg Subject'),
                                  'maxlength' => 65535,
-                                    
+                                            
                                     
                           ),
       
@@ -393,7 +393,7 @@ class MessageTemplate extends \Civi\Core\Entity {
         'propertyName' => 'msgText',
         'type' => \CRM_Utils_Type::T_LONGTEXT,
                 'title' => ts('Msg Text'),
-                                                     
+                                                             
                                     
                           ),
       
@@ -403,7 +403,7 @@ class MessageTemplate extends \Civi\Core\Entity {
         'propertyName' => 'msgHtml',
         'type' => \CRM_Utils_Type::T_LONGTEXT,
                 'title' => ts('Msg Html'),
-                                                     
+                                                             
                                     
                           ),
       
@@ -413,7 +413,7 @@ class MessageTemplate extends \Civi\Core\Entity {
         'propertyName' => 'isActive',
         'type' => \CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('Is Active'),
-                                                     
+                                                             
                                            'default' => '1',
          
                           ),
@@ -423,7 +423,7 @@ class MessageTemplate extends \Civi\Core\Entity {
         'name' => 'workflow_id',
         'propertyName' => 'workflowId',
         'type' => \CRM_Utils_Type::T_INT,
-                                                     
+                                                             
                                     
                           ),
       
@@ -432,7 +432,7 @@ class MessageTemplate extends \Civi\Core\Entity {
         'name' => 'is_default',
         'propertyName' => 'isDefault',
         'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                     
+                                                             
                                            'default' => '1',
          
                           ),
@@ -442,7 +442,7 @@ class MessageTemplate extends \Civi\Core\Entity {
         'name' => 'is_reserved',
         'propertyName' => 'isReserved',
         'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                     
+                                                             
                                     
                           ),
       
@@ -451,9 +451,9 @@ class MessageTemplate extends \Civi\Core\Entity {
         'name' => 'pdf_format_id',
         'propertyName' => 'pdfFormat',
         'type' => \CRM_Utils_Type::T_INT,
-                                                     
+                                                             
                                     
-                'FKClassName' => 'Civi_Core_OptionValue',
+                'FKClassName' => 'CRM_Core_DAO_OptionValue',
                                      'pseudoconstant' => array(
                                 'optionGroupName' => 'pdf_format',
                       'keyColumn' => 'id',

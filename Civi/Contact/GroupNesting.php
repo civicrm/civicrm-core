@@ -150,7 +150,7 @@ class GroupNesting extends \Civi\Core\Entity {
         'propertyName' => 'id',
         'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
-                                             
+                                                     
                                     
                           ),
       
@@ -160,9 +160,9 @@ class GroupNesting extends \Civi\Core\Entity {
         'propertyName' => 'childGroup',
         'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
-                                             
+                                                     
                                     
-                'FKClassName' => 'Civi_Contact_Group',
+                'FKClassName' => 'CRM_Contact_DAO_Group',
                           ),
       
               'parent_group_id' => array(
@@ -171,9 +171,9 @@ class GroupNesting extends \Civi\Core\Entity {
         'propertyName' => 'parentGroup',
         'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
-                                             
+                                                     
                                     
-                'FKClassName' => 'Civi_Contact_Group',
+                'FKClassName' => 'CRM_Contact_DAO_Group',
                           ),
              );
     }

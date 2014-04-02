@@ -360,7 +360,7 @@ class ContributionProduct extends \Civi\Core\Entity {
         'propertyName' => 'id',
         'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
-                                             
+                                                     
                                     
                           ),
       
@@ -370,7 +370,7 @@ class ContributionProduct extends \Civi\Core\Entity {
         'propertyName' => 'productId',
         'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
-                                             
+                                                     
                                     
                           ),
       
@@ -380,9 +380,9 @@ class ContributionProduct extends \Civi\Core\Entity {
         'propertyName' => 'contribution',
         'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
-                                             
+                                                     
                                     
-                'FKClassName' => 'Civi_Contribute_Contribution',
+                'FKClassName' => 'CRM_Contribute_DAO_Contribution',
                           ),
       
               'product_option' => array(
@@ -392,7 +392,7 @@ class ContributionProduct extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Product Option'),
                                  'maxlength' => 255,
-                         'size' => \CRM_Utils_Type::HUGE,
+                                 'size' => \CRM_Utils_Type::HUGE,
                            
                          'export' => true,
                 'where' => 'civicrm_contribution_product.product_option',
@@ -407,7 +407,7 @@ class ContributionProduct extends \Civi\Core\Entity {
         'propertyName' => 'quantity',
         'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Quantity'),
-                                                     
+                                                             
                          'export' => true,
                 'where' => 'civicrm_contribution_product.quantity',
         'headerPattern' => '',
@@ -421,7 +421,7 @@ class ContributionProduct extends \Civi\Core\Entity {
         'propertyName' => 'fulfilledDate',
         'type' => \CRM_Utils_Type::T_DATE,
                 'title' => ts('Fulfilled Date'),
-                                                     
+                                                             
                          'export' => true,
                 'where' => 'civicrm_contribution_product.fulfilled_date',
         'headerPattern' => '',
@@ -435,7 +435,7 @@ class ContributionProduct extends \Civi\Core\Entity {
         'propertyName' => 'startDate',
         'type' => \CRM_Utils_Type::T_DATE,
                 'title' => ts('Start Date'),
-                                                     
+                                                             
                          'export' => true,
                 'where' => 'civicrm_contribution_product.start_date',
         'headerPattern' => '',
@@ -449,7 +449,7 @@ class ContributionProduct extends \Civi\Core\Entity {
         'propertyName' => 'endDate',
         'type' => \CRM_Utils_Type::T_DATE,
                 'title' => ts('End Date'),
-                                                     
+                                                             
                          'export' => true,
                 'where' => 'civicrm_contribution_product.end_date',
         'headerPattern' => '',
@@ -464,7 +464,7 @@ class ContributionProduct extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_TEXT,
                 'title' => ts('Comment'),
                                  'maxlength' => 65535,
-                                    
+                                            
                                     
                           ),
       
@@ -474,10 +474,10 @@ class ContributionProduct extends \Civi\Core\Entity {
         'propertyName' => 'financialType',
         'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Financial Type'),
-                                                     
+                                                             
                                            'default' => 'NULL',
          
-                'FKClassName' => 'Civi_Financial_FinancialType',
+                'FKClassName' => 'CRM_Financial_DAO_FinancialType',
                           ),
              );
     }

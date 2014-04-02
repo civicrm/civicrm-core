@@ -511,7 +511,7 @@ class PCP extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Personal Campaign Page ID'),
                         'required' => true,
-                                             
+                                                     
                                     
                           ),
       
@@ -522,9 +522,9 @@ class PCP extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Contact ID'),
                         'required' => true,
-                                             
+                                                     
                                     
-                'FKClassName' => 'Civi_Contact_Contact',
+                'FKClassName' => 'CRM_Contact_DAO_Contact',
                           ),
       
               'status_id' => array(
@@ -534,7 +534,7 @@ class PCP extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Personal Campaign Page Status'),
                         'required' => true,
-                                             
+                                                     
                                     
                                      'pseudoconstant' => array(
                                 'optionGroupName' => 'pcp_status',
@@ -548,7 +548,7 @@ class PCP extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Personal Campaign Page Title'),
                                  'maxlength' => 255,
-                         'size' => \CRM_Utils_Type::HUGE,
+                                 'size' => \CRM_Utils_Type::HUGE,
                            
                                            'default' => 'NULL',
          
@@ -561,7 +561,7 @@ class PCP extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_TEXT,
                 'title' => ts('Intro Text'),
                                  'maxlength' => 65535,
-                                    
+                                            
                                            'default' => 'NULL',
          
                           ),
@@ -573,7 +573,7 @@ class PCP extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_TEXT,
                 'title' => ts('Page Text'),
                                  'maxlength' => 65535,
-                                    
+                                            
                                            'default' => 'NULL',
          
                           ),
@@ -585,7 +585,7 @@ class PCP extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Donate Link Text'),
                                  'maxlength' => 255,
-                         'size' => \CRM_Utils_Type::HUGE,
+                                 'size' => \CRM_Utils_Type::HUGE,
                            
                                            'default' => 'NULL',
          
@@ -597,7 +597,7 @@ class PCP extends \Civi\Core\Entity {
         'propertyName' => 'pageId',
         'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
-                                             
+                                                     
                                     
                           ),
       
@@ -608,7 +608,7 @@ class PCP extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('PCP Page Type'),
                                  'maxlength' => 64,
-                         'size' => \CRM_Utils_Type::BIG,
+                                 'size' => \CRM_Utils_Type::BIG,
                            
                                            'default' => 'contribute',
          
@@ -620,7 +620,7 @@ class PCP extends \Civi\Core\Entity {
         'propertyName' => 'pcpBlockId',
         'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
-                                             
+                                                     
                                     
                           ),
       
@@ -629,7 +629,7 @@ class PCP extends \Civi\Core\Entity {
         'name' => 'is_thermometer',
         'propertyName' => 'isThermometer',
         'type' => \CRM_Utils_Type::T_INT,
-                                                     
+                                                             
                                     
                           ),
       
@@ -638,7 +638,7 @@ class PCP extends \Civi\Core\Entity {
         'name' => 'is_honor_roll',
         'propertyName' => 'isHonorRoll',
         'type' => \CRM_Utils_Type::T_INT,
-                                                     
+                                                             
                                     
                           ),
       
@@ -648,7 +648,8 @@ class PCP extends \Civi\Core\Entity {
         'propertyName' => 'goalAmount',
         'type' => \CRM_Utils_Type::T_MONEY,
                 'title' => ts('Goal Amount'),
-                                                     
+                                          'precision'      => array(20,2),
+                                   
                                     
                           ),
       
@@ -659,7 +660,7 @@ class PCP extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Currency'),
                                  'maxlength' => 3,
-                         'size' => \CRM_Utils_Type::FOUR,
+                                 'size' => \CRM_Utils_Type::FOUR,
                            
                                            'default' => 'NULL',
          
@@ -676,7 +677,7 @@ class PCP extends \Civi\Core\Entity {
         'name' => 'is_active',
         'propertyName' => 'isActive',
         'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                     
+                                                             
                                     
                           ),
              );

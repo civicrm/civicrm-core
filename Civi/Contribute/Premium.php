@@ -390,7 +390,7 @@ class Premium extends \Civi\Core\Entity {
         'propertyName' => 'id',
         'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
-                                             
+                                                     
                                     
                           ),
       
@@ -402,7 +402,7 @@ class Premium extends \Civi\Core\Entity {
                 'title' => ts('Entity Table'),
                         'required' => true,
                          'maxlength' => 64,
-                         'size' => \CRM_Utils_Type::BIG,
+                                 'size' => \CRM_Utils_Type::BIG,
                            
                                     
                           ),
@@ -413,7 +413,7 @@ class Premium extends \Civi\Core\Entity {
         'propertyName' => 'entityId',
         'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
-                                             
+                                                     
                                     
                           ),
       
@@ -424,7 +424,7 @@ class Premium extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('Premiums Active'),
                         'required' => true,
-                                             
+                                                     
                                     
                           ),
       
@@ -435,7 +435,7 @@ class Premium extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Title for Premiums section'),
                                  'maxlength' => 255,
-                         'size' => \CRM_Utils_Type::HUGE,
+                                 'size' => \CRM_Utils_Type::HUGE,
                            
                                     
                           ),
@@ -447,7 +447,7 @@ class Premium extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_TEXT,
                 'title' => ts('Premiums Intro Text'),
                                  'maxlength' => 65535,
-                                    
+                                            
                                     
                           ),
       
@@ -458,7 +458,7 @@ class Premium extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Premiums Contact Email'),
                                  'maxlength' => 100,
-                         'size' => \CRM_Utils_Type::HUGE,
+                                 'size' => \CRM_Utils_Type::HUGE,
                            
                                     
                           ),
@@ -470,7 +470,7 @@ class Premium extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Premiums Contact Phone'),
                                  'maxlength' => 50,
-                         'size' => \CRM_Utils_Type::BIG,
+                                 'size' => \CRM_Utils_Type::BIG,
                            
                                     
                           ),
@@ -482,7 +482,7 @@ class Premium extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('Premiums Display Min Contribution'),
                         'required' => true,
-                                             
+                                                     
                                     
                           ),
       
@@ -493,7 +493,7 @@ class Premium extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('No Thank-you Text'),
                                  'maxlength' => 255,
-                         'size' => \CRM_Utils_Type::HUGE,
+                                 'size' => \CRM_Utils_Type::HUGE,
                            
                                     
                           ),
@@ -504,7 +504,7 @@ class Premium extends \Civi\Core\Entity {
         'propertyName' => 'premiumsNothankyouPosition',
         'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('No Thank-you Position'),
-                                                     
+                                                             
                                            'default' => '1',
          
                           ),

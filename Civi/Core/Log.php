@@ -240,7 +240,7 @@ class Log extends \Civi\Core\Entity {
         'propertyName' => 'id',
         'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
-                                             
+                                                     
                                     
                           ),
       
@@ -252,7 +252,7 @@ class Log extends \Civi\Core\Entity {
                 'title' => ts('Entity Table'),
                         'required' => true,
                          'maxlength' => 64,
-                         'size' => \CRM_Utils_Type::BIG,
+                                 'size' => \CRM_Utils_Type::BIG,
                            
                                     
                           ),
@@ -263,7 +263,7 @@ class Log extends \Civi\Core\Entity {
         'propertyName' => 'entityId',
         'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
-                                             
+                                                     
                                     
                           ),
       
@@ -274,7 +274,7 @@ class Log extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_TEXT,
                 'title' => ts('Data'),
                                  'maxlength' => 65535,
-                                    
+                                            
                                     
                           ),
       
@@ -283,9 +283,9 @@ class Log extends \Civi\Core\Entity {
         'name' => 'modified_id',
         'propertyName' => 'modified',
         'type' => \CRM_Utils_Type::T_INT,
-                                                     
+                                                             
                                     
-                'FKClassName' => 'Civi_Contact_Contact',
+                'FKClassName' => 'CRM_Contact_DAO_Contact',
                           ),
       
               'modified_date' => array(
@@ -294,7 +294,7 @@ class Log extends \Civi\Core\Entity {
         'propertyName' => 'modifiedDate',
         'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
                 'title' => ts('Modified Date'),
-                                                     
+                                                             
                                     
                           ),
              );

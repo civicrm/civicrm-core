@@ -630,7 +630,7 @@ class Product extends \Civi\Core\Entity {
         'propertyName' => 'id',
         'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
-                                             
+                                                     
                                     
                           ),
       
@@ -642,7 +642,7 @@ class Product extends \Civi\Core\Entity {
                 'title' => ts('Product Name'),
                         'required' => true,
                          'maxlength' => 255,
-                         'size' => \CRM_Utils_Type::HUGE,
+                                 'size' => \CRM_Utils_Type::HUGE,
                            
                          'export' => true,
                 'where' => 'civicrm_product.name',
@@ -658,7 +658,7 @@ class Product extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_TEXT,
                 'title' => ts('Description'),
                                  'maxlength' => 65535,
-                                    
+                                            
                                     
                           ),
       
@@ -669,7 +669,7 @@ class Product extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('SKU'),
                                  'maxlength' => 50,
-                         'size' => \CRM_Utils_Type::BIG,
+                                 'size' => \CRM_Utils_Type::BIG,
                            
                          'export' => true,
                 'where' => 'civicrm_product.sku',
@@ -685,7 +685,7 @@ class Product extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_TEXT,
                 'title' => ts('Options'),
                                  'maxlength' => 65535,
-                                    
+                                            
                                     
                           ),
       
@@ -696,7 +696,7 @@ class Product extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Image'),
                                  'maxlength' => 255,
-                         'size' => \CRM_Utils_Type::HUGE,
+                                 'size' => \CRM_Utils_Type::HUGE,
                            
                                     
                           ),
@@ -708,7 +708,7 @@ class Product extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Thumbnail'),
                                  'maxlength' => 255,
-                         'size' => \CRM_Utils_Type::HUGE,
+                                 'size' => \CRM_Utils_Type::HUGE,
                            
                                     
                           ),
@@ -719,7 +719,8 @@ class Product extends \Civi\Core\Entity {
         'propertyName' => 'price',
         'type' => \CRM_Utils_Type::T_MONEY,
                 'title' => ts('Price'),
-                                                     
+                                          'precision'      => array(20,2),
+                                   
                                     
                           ),
       
@@ -730,7 +731,7 @@ class Product extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Currency'),
                                  'maxlength' => 3,
-                         'size' => \CRM_Utils_Type::FOUR,
+                                 'size' => \CRM_Utils_Type::FOUR,
                            
                                            'default' => 'NULL',
          
@@ -748,10 +749,10 @@ class Product extends \Civi\Core\Entity {
         'propertyName' => 'financialType',
         'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Financial Type'),
-                                                     
+                                                             
                                            'default' => 'NULL',
          
-                'FKClassName' => 'Civi_Financial_FinancialType',
+                'FKClassName' => 'CRM_Financial_DAO_FinancialType',
                           ),
       
               'min_contribution' => array(
@@ -760,7 +761,8 @@ class Product extends \Civi\Core\Entity {
         'propertyName' => 'minContribution',
         'type' => \CRM_Utils_Type::T_MONEY,
                 'title' => ts('Minimum Contribution'),
-                                                     
+                                          'precision'      => array(20,2),
+                                   
                                     
                           ),
       
@@ -770,7 +772,8 @@ class Product extends \Civi\Core\Entity {
         'propertyName' => 'cost',
         'type' => \CRM_Utils_Type::T_MONEY,
                 'title' => ts('Cost'),
-                                                     
+                                          'precision'      => array(20,2),
+                                   
                                     
                           ),
       
@@ -781,7 +784,7 @@ class Product extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('Is Active'),
                         'required' => true,
-                                             
+                                                     
                                     
                           ),
       
@@ -792,12 +795,12 @@ class Product extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Period Type'),
                                  'maxlength' => 8,
-                         'size' => \CRM_Utils_Type::EIGHT,
+                                 'size' => \CRM_Utils_Type::EIGHT,
                            
                                            'default' => 'rolling',
          
                                      'pseudoconstant' => array(
-                                '0' => 'not in database',
+                                'callback' => 'CRM_Core_SelectValues::periodType',
                     )
                  ),
       
@@ -807,7 +810,7 @@ class Product extends \Civi\Core\Entity {
         'propertyName' => 'fixedPeriodStartDay',
         'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Fixed Period Start Day'),
-                                                     
+                                                             
                                            'default' => '0101',
          
                           ),
@@ -819,12 +822,12 @@ class Product extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Duration Unit'),
                                  'maxlength' => 8,
-                         'size' => \CRM_Utils_Type::EIGHT,
+                                 'size' => \CRM_Utils_Type::EIGHT,
                            
                                            'default' => 'year',
          
                                      'pseudoconstant' => array(
-                                '0' => 'not in database',
+                                'callback' => 'CRM_Core_SelectValues::getPremiumUnits',
                     )
                  ),
       
@@ -834,7 +837,7 @@ class Product extends \Civi\Core\Entity {
         'propertyName' => 'durationInterval',
         'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Duration Interval'),
-                                                     
+                                                             
                                     
                           ),
       
@@ -845,12 +848,12 @@ class Product extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Frequency Unit'),
                                  'maxlength' => 8,
-                         'size' => \CRM_Utils_Type::EIGHT,
+                                 'size' => \CRM_Utils_Type::EIGHT,
                            
                                            'default' => 'month',
          
                                      'pseudoconstant' => array(
-                                '0' => 'not in database',
+                                'callback' => 'CRM_Core_SelectValues::getPremiumUnits',
                     )
                  ),
       
@@ -860,7 +863,7 @@ class Product extends \Civi\Core\Entity {
         'propertyName' => 'frequencyInterval',
         'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Frequency Interval'),
-                                                     
+                                                             
                                     
                           ),
              );

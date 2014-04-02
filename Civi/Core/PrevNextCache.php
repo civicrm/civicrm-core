@@ -270,7 +270,7 @@ class PrevNextCache extends \Civi\Core\Entity {
         'propertyName' => 'id',
         'type' => \CRM_Utils_Type::T_INT,
                         'required' => true,
-                                             
+                                                     
                                     
                           ),
       
@@ -281,7 +281,7 @@ class PrevNextCache extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Entity Table'),
                                  'maxlength' => 64,
-                         'size' => \CRM_Utils_Type::BIG,
+                                 'size' => \CRM_Utils_Type::BIG,
                            
                                     
                           ),
@@ -293,7 +293,7 @@ class PrevNextCache extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Entity Id1'),
                         'required' => true,
-                                             
+                                                     
                                     
                           ),
       
@@ -304,7 +304,7 @@ class PrevNextCache extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Entity Id2'),
                         'required' => true,
-                                             
+                                                     
                                     
                           ),
       
@@ -315,7 +315,7 @@ class PrevNextCache extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Cachekey'),
                                  'maxlength' => 255,
-                         'size' => \CRM_Utils_Type::HUGE,
+                                 'size' => \CRM_Utils_Type::HUGE,
                            
                                     
                           ),
@@ -326,7 +326,7 @@ class PrevNextCache extends \Civi\Core\Entity {
         'propertyName' => 'data',
         'type' => \CRM_Utils_Type::T_LONGTEXT,
                 'title' => ts('Data'),
-                                                     
+                                                             
                                     
                           ),
       
@@ -335,7 +335,7 @@ class PrevNextCache extends \Civi\Core\Entity {
         'name' => 'is_selected',
         'propertyName' => 'isSelected',
         'type' => \CRM_Utils_Type::T_BOOLEAN,
-                                                     
+                                                             
                                     
                           ),
              );

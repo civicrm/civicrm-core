@@ -571,7 +571,7 @@ class Campaign extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Campaign ID'),
                         'required' => true,
-                                             
+                                                     
                 'import' => true,
         'where' => 'civicrm_campaign.id',
         'headerPattern' => '',
@@ -588,7 +588,7 @@ class Campaign extends \Civi\Core\Entity {
                 'title' => ts('Campaign Name'),
                         'required' => true,
                          'maxlength' => 255,
-                         'size' => \CRM_Utils_Type::HUGE,
+                                 'size' => \CRM_Utils_Type::HUGE,
                            
                 'import' => true,
         'where' => 'civicrm_campaign.name',
@@ -605,7 +605,7 @@ class Campaign extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Campaign Title'),
                                  'maxlength' => 255,
-                         'size' => \CRM_Utils_Type::HUGE,
+                                 'size' => \CRM_Utils_Type::HUGE,
                            
                 'import' => true,
         'where' => 'civicrm_campaign.title',
@@ -622,7 +622,7 @@ class Campaign extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_TEXT,
                 'title' => ts('Campaign Description'),
                                  'maxlength' => 65535,
-                                  'rows' => 8,
+                                          'rows' => 8,
                          'cols' => 60,
          
                                     
@@ -634,7 +634,7 @@ class Campaign extends \Civi\Core\Entity {
         'propertyName' => 'startDate',
         'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
                 'title' => ts('Campaign Start Date'),
-                                                     
+                                                             
                 'import' => true,
         'where' => 'civicrm_campaign.start_date',
         'headerPattern' => '/^start|(s(tart\s)?date)$/i',
@@ -649,7 +649,7 @@ class Campaign extends \Civi\Core\Entity {
         'propertyName' => 'endDate',
         'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
                 'title' => ts('Campaign End Date'),
-                                                     
+                                                             
                 'import' => true,
         'where' => 'civicrm_campaign.end_date',
         'headerPattern' => '/^end|(e(nd\s)?date)$/i',
@@ -664,7 +664,7 @@ class Campaign extends \Civi\Core\Entity {
         'propertyName' => 'campaignTypeId',
         'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Campaign Type'),
-                                                     
+                                                             
                 'import' => true,
         'where' => 'civicrm_campaign.campaign_type_id',
         'headerPattern' => '',
@@ -683,7 +683,7 @@ class Campaign extends \Civi\Core\Entity {
         'propertyName' => 'statusId',
         'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Campaign Status'),
-                                                     
+                                                             
                 'import' => true,
         'where' => 'civicrm_campaign.status_id',
         'headerPattern' => '',
@@ -703,7 +703,7 @@ class Campaign extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_STRING,
                 'title' => ts('Campaign External Identifier'),
                                  'maxlength' => 32,
-                         'size' => \CRM_Utils_Type::MEDIUM,
+                                 'size' => \CRM_Utils_Type::MEDIUM,
                            
                 'import' => true,
         'where' => 'civicrm_campaign.external_identifier',
@@ -719,7 +719,7 @@ class Campaign extends \Civi\Core\Entity {
         'propertyName' => 'parent',
         'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Parent Campaign'),
-                                                     
+                                                             
                 'import' => true,
         'where' => 'civicrm_campaign.parent_id',
         'headerPattern' => '',
@@ -727,7 +727,7 @@ class Campaign extends \Civi\Core\Entity {
                          'export' => true,
                                           'default' => 'NULL',
          
-                'FKClassName' => 'Civi_Campaign_Campaign',
+                'FKClassName' => 'CRM_Campaign_DAO_Campaign',
                           ),
       
               'is_active' => array(
@@ -736,7 +736,7 @@ class Campaign extends \Civi\Core\Entity {
         'propertyName' => 'isActive',
         'type' => \CRM_Utils_Type::T_BOOLEAN,
                 'title' => ts('Is Campaign Active?'),
-                                                     
+                                                             
                                            'default' => '1',
          
                           ),
@@ -747,9 +747,9 @@ class Campaign extends \Civi\Core\Entity {
         'propertyName' => 'created',
         'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Campaign Created By'),
-                                                     
+                                                             
                                     
-                'FKClassName' => 'Civi_Contact_Contact',
+                'FKClassName' => 'CRM_Contact_DAO_Contact',
                           ),
       
               'created_date' => array(
@@ -758,7 +758,7 @@ class Campaign extends \Civi\Core\Entity {
         'propertyName' => 'createdDate',
         'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
                 'title' => ts('Campaign Created Date'),
-                                                     
+                                                             
                                     
                           ),
       
@@ -768,9 +768,9 @@ class Campaign extends \Civi\Core\Entity {
         'propertyName' => 'lastModified',
         'type' => \CRM_Utils_Type::T_INT,
                 'title' => ts('Campaign Modified By'),
-                                                     
+                                                             
                                     
-                'FKClassName' => 'Civi_Contact_Contact',
+                'FKClassName' => 'CRM_Contact_DAO_Contact',
                           ),
       
               'last_modified_date' => array(
@@ -779,7 +779,7 @@ class Campaign extends \Civi\Core\Entity {
         'propertyName' => 'lastModifiedDate',
         'type' => \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME,
                 'title' => ts('Campaign Modified Date'),
-                                                     
+                                                             
                                     
                           ),
       
@@ -790,7 +790,7 @@ class Campaign extends \Civi\Core\Entity {
         'type' => \CRM_Utils_Type::T_TEXT,
                 'title' => ts('Campaign Goals'),
                                  'maxlength' => 65535,
-                                    
+                                            
                                     
                           ),
       
@@ -800,7 +800,8 @@ class Campaign extends \Civi\Core\Entity {
         'propertyName' => 'goalRevenue',
         'type' => \CRM_Utils_Type::T_MONEY,
                 'title' => ts('Goal Revenue'),
-                                                     
+                                          'precision'      => array(20,2),
+                                   
                                     
                           ),
              );
