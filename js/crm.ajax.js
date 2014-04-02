@@ -364,6 +364,11 @@
           if (response.status !== 'form_error') {
             $el.crmSnippet('option', 'block') && $el.unblock();
             $el.trigger('crmFormSuccess', response);
+
+            // refresh the active tab to show effect for saved data
+            var $activeTab = $("#mainTabContainer .ui-tabs-active");
+            CRM.tabHeader.resetTab($activeTab);
+
             // Reset form for e.g. "save and new"
             if (response.userContext && settings.refreshAction && $.inArray(response.buttonName, settings.refreshAction) >= 0) {
               $el.crmSnippet('option', 'url', response.userContext).crmSnippet('refresh');
