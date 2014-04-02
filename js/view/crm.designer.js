@@ -447,7 +447,7 @@
       CRM.loadForm(url, {refreshAction: ['next']})
         .on('crmFormSuccess', function(e, data) {
           // When form switches to create custom field context, modify button behavior to only continue for "save and new"
-          data.customField && ($(this).data('crmSnippet').options.crmForm.refreshAction = ['next_new']);
+          data.customField && ($(this).data('civiCrmSnippet').options.crmForm.refreshAction = ['next_new']);
           paletteView.doRefresh(data.customField ? 'custom_' + data.id : null);
         });
       return false;
