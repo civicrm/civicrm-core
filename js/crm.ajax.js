@@ -446,6 +446,26 @@
     });
     e.preventDefault();
   };
+  /**
+   * An event callback for CRM.popup or a standalone function to refresh the content around a popup link
+   * @param e event|selector
+   */
+  CRM.refreshParent = function(e) {
+    // Use e.target if input smells like an event, otherwise assume it's a jQuery selector
+    var $el = (e.stopPropagation && e.target) ? $(e.target) : $(e),
+      $table = $el.closest('.dataTable');
+    // Call native refresh method on ajax datatables
+    if ($table && $.fn.DataTable.fnIsDataTable($table[0]) && $table.dataTable().fnSettings().sAjaxSource) {
+      // Refresh ALL datatables - needed for contact relationship tab
+      $.each($.fn.dataTable.fnTables(), function() {
+        $(this).dataTable().fnSettings().sAjaxSource && $(this).unblock().dataTable().fnDraw();
+      });
+    }
+    // Otherwise refresh the nearest crmSnippet
+    else {
+      $el.closest('.crm-ajax-container, #crm-main-content-wrapper').crmSnippet().crmSnippet('refresh');
+    }
+  };
 
   $(function($) {
     $('body').on('click', 'a.crm-popup', CRM.popup);

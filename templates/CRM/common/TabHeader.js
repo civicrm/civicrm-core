@@ -33,10 +33,7 @@ CRM.$(function($) {
           ui.panel
             .off('click.crmLivePage')
             .on('click.crmLivePage', 'a.button, a.action-item', CRM.popup)
-            .on('crmPopupFormSuccess.crmLivePage', 'a.button, a.action-item', function() {
-              // Refresh panel when form completes
-              ui.panel.crmSnippet('refresh');
-            });
+            .on('crmPopupFormSuccess.crmLivePage', 'a.button, a.action-item', CRM.refreshParent);
         }
         ui.panel
           .off('.tabInfo')
