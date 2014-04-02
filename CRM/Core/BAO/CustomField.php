@@ -889,9 +889,8 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
             $field->option_group_id
           );
         }
-        else {
-          CRM_Utils_Hook::customFieldOptions($field->id, $selectOption, FALSE, $selectAttributes);
-        }
+        //HR-322, extend Select type custom field which use customFieldOptions hook to populate its option
+        CRM_Utils_Hook::customFieldOptions($field->id, $selectOption, FALSE, $selectAttributes);
 
         $qf->add('select', $elementName, $label,
           array('' => $placeholder) + $selectOption,
