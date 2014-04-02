@@ -8,8 +8,5 @@ CRM.$(function($) {
     // Open action links in a popup
     .off('.crmLivePage')
     .on('click.crmLivePage', active, CRM.popup)
-    .on('crmPopupFormSuccess.crmLivePage', active, function() {
-      // Refresh page when form completes
-      $('#crm-main-content-wrapper').crmSnippet('refresh');
-    });
+    .on('crmPopupFormSuccess.crmLivePage', active, CRM.refreshParent);
 });

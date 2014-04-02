@@ -42,7 +42,7 @@
           var request = $.post(postUrl, $el.data('delete_params'));
           CRM.status({/literal}"{ts escape='js'}Record Deleted{/ts}"{literal}, request);
           request.done(function() {
-            $table.closest('.crm-ajax-container, #crm-main-content-wrapper').crmSnippet().crmSnippet('refresh');
+            CRM.refreshParent($el);
           });
         })
         e.preventDefault();
