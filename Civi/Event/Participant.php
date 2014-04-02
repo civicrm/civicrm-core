@@ -97,7 +97,7 @@ class Participant extends \Civi\Core\Entity {
    * @var string
    *
    * @JMS\Type("string")
-   * @ORM\Column(name="role_id", type="string", length=128, nullable=false)
+   * @ORM\Column(name="role_id", type="string", length=128, nullable=true)
    * 
    * 
    */
@@ -137,7 +137,7 @@ class Participant extends \Civi\Core\Entity {
    * @var boolean
    *
    * @JMS\Type("boolean")
-   * @ORM\Column(name="is_test", type="boolean", nullable=false)
+   * @ORM\Column(name="is_test", type="boolean", nullable=true, options={"default": 0})
    * 
    * 
    */
@@ -147,7 +147,7 @@ class Participant extends \Civi\Core\Entity {
    * @var boolean
    *
    * @JMS\Type("boolean")
-   * @ORM\Column(name="is_pay_later", type="boolean", nullable=false)
+   * @ORM\Column(name="is_pay_later", type="boolean", nullable=true, options={"default": 0})
    * 
    * 
    */
@@ -187,7 +187,7 @@ class Participant extends \Civi\Core\Entity {
    * @var string
    *
    * @JMS\Type("string")
-   * @ORM\Column(name="fee_currency", type="string", length=3, nullable=false)
+   * @ORM\Column(name="fee_currency", type="string", length=3, nullable=true)
    * 
    * 
    */

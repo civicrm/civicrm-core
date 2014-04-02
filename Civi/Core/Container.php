@@ -40,7 +40,8 @@ class Container {
     $civicrm_base_path = dirname(dirname(__DIR__));
     $container = new ContainerBuilder();
     $container->setParameter('civicrm_base_path', $civicrm_base_path);
-    $container->setParameter('cache_dir', \CRM_Utils_Path::join(dirname(CIVICRM_TEMPLATE_COMPILEDIR), 'cache'));
+//    $container->setParameter('cache_dir', \CRM_Utils_Path::join(dirname(CIVICRM_TEMPLATE_COMPILEDIR), 'cache'));
+    $container->setParameter('cache_dir', \CRM_Utils_Path::join(CIVICRM_TEMPLATE_COMPILEDIR, 'cache'));
     $container->set(self::SELF, $this);
 
 // TODO Move configuration to an external file; define caching structure

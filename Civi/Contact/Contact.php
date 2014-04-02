@@ -87,7 +87,7 @@ class Contact extends \Civi\Core\Entity {
    * @var boolean
    *
    * @JMS\Type("boolean")
-   * @ORM\Column(name="do_not_email", type="boolean", nullable=false)
+   * @ORM\Column(name="do_not_email", type="boolean", nullable=true, options={"default": 0})
    * 
    * 
    */
@@ -97,7 +97,7 @@ class Contact extends \Civi\Core\Entity {
    * @var boolean
    *
    * @JMS\Type("boolean")
-   * @ORM\Column(name="do_not_phone", type="boolean", nullable=false)
+   * @ORM\Column(name="do_not_phone", type="boolean", nullable=true, options={"default": 0})
    * 
    * 
    */
@@ -107,7 +107,7 @@ class Contact extends \Civi\Core\Entity {
    * @var boolean
    *
    * @JMS\Type("boolean")
-   * @ORM\Column(name="do_not_mail", type="boolean", nullable=false)
+   * @ORM\Column(name="do_not_mail", type="boolean", nullable=true, options={"default": 0})
    * 
    * 
    */
@@ -117,7 +117,7 @@ class Contact extends \Civi\Core\Entity {
    * @var boolean
    *
    * @JMS\Type("boolean")
-   * @ORM\Column(name="do_not_sms", type="boolean", nullable=false)
+   * @ORM\Column(name="do_not_sms", type="boolean", nullable=true, options={"default": 0})
    * 
    * 
    */
@@ -127,7 +127,7 @@ class Contact extends \Civi\Core\Entity {
    * @var boolean
    *
    * @JMS\Type("boolean")
-   * @ORM\Column(name="do_not_trade", type="boolean", nullable=false)
+   * @ORM\Column(name="do_not_trade", type="boolean", nullable=true, options={"default": 0})
    * 
    * 
    */
@@ -137,7 +137,7 @@ class Contact extends \Civi\Core\Entity {
    * @var boolean
    *
    * @JMS\Type("boolean")
-   * @ORM\Column(name="is_opt_out", type="boolean", nullable=false)
+   * @ORM\Column(name="is_opt_out", type="boolean", nullable=false, options={"default": 0})
    * 
    * 
    */
@@ -237,7 +237,7 @@ class Contact extends \Civi\Core\Entity {
    * @var string
    *
    * @JMS\Type("string")
-   * @ORM\Column(name="preferred_mail_format", type="string", length=8, nullable=false)
+   * @ORM\Column(name="preferred_mail_format", type="string", length=8, nullable=true, options={"default": "Both"})
    * 
    * 
    */
@@ -467,7 +467,7 @@ class Contact extends \Civi\Core\Entity {
    * @var boolean
    *
    * @JMS\Type("boolean")
-   * @ORM\Column(name="is_deceased", type="boolean", nullable=false)
+   * @ORM\Column(name="is_deceased", type="boolean", nullable=true, options={"default": 0})
    * 
    * 
    */
@@ -547,7 +547,7 @@ class Contact extends \Civi\Core\Entity {
    * @var boolean
    *
    * @JMS\Type("boolean")
-   * @ORM\Column(name="is_deleted", type="boolean", nullable=false)
+   * @ORM\Column(name="is_deleted", type="boolean", nullable=false, options={"default": 0})
    * 
    * 
    */
@@ -557,7 +557,7 @@ class Contact extends \Civi\Core\Entity {
    * @var datetime
    *
    * @JMS\Type("datetime")
-   * @ORM\Column(name="created_date", type="datetime", nullable=false)
+   * @ORM\Column(name="created_date", type="datetime", nullable=true)
    * 
    * 1
    */
@@ -567,11 +567,11 @@ class Contact extends \Civi\Core\Entity {
    * @var datetime
    *
    * @JMS\Type("datetime")
-   * @ORM\Column(name="modified_date", type="datetime", nullable=false)
+   * @ORM\Column(name="modified_date", type="datetime", nullable=true, columnDefinition="TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
    * 
    * 1
    */
-  private $modifiedDate = 'CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP';
+  private $modifiedDate;
 
   /**
    * Get id
@@ -2438,8 +2438,7 @@ class Contact extends \Civi\Core\Entity {
                 'title' => ts('Modified Date'),
                         'required' => false,
                                              
-                                           'default' => 'CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP',
-         
+                                    
                           ),
              );
     }

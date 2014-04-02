@@ -127,7 +127,7 @@ class Group extends \Civi\Core\Entity {
    * @var string
    *
    * @JMS\Type("string")
-   * @ORM\Column(name="visibility", type="string", length=24, nullable=false)
+   * @ORM\Column(name="visibility", type="string", length=24, nullable=true, options={"default": "User and User Admin Only"})
    * 
    * 
    */
@@ -217,7 +217,7 @@ class Group extends \Civi\Core\Entity {
    * @var boolean
    *
    * @JMS\Type("boolean")
-   * @ORM\Column(name="is_hidden", type="boolean", nullable=false)
+   * @ORM\Column(name="is_hidden", type="boolean", nullable=true, options={"default": 0})
    * 
    * 
    */
@@ -227,7 +227,7 @@ class Group extends \Civi\Core\Entity {
    * @var boolean
    *
    * @JMS\Type("boolean")
-   * @ORM\Column(name="is_reserved", type="boolean", nullable=false)
+   * @ORM\Column(name="is_reserved", type="boolean", nullable=true, options={"default": 0})
    * 
    * 
    */

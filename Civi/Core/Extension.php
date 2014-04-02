@@ -67,7 +67,7 @@ class Extension extends \Civi\Core\Entity {
    * @var string
    *
    * @JMS\Type("string")
-   * @ORM\Column(name="type", type="string", length=8, nullable=true)
+   * @ORM\Column(name="type", type="string", length=8, nullable=false)
    * 
    * 
    */
@@ -77,7 +77,7 @@ class Extension extends \Civi\Core\Entity {
    * @var string
    *
    * @JMS\Type("string")
-   * @ORM\Column(name="full_name", type="string", length=255, nullable=true)
+   * @ORM\Column(name="full_name", type="string", length=255, nullable=false)
    * 
    * 
    */
@@ -127,7 +127,7 @@ class Extension extends \Civi\Core\Entity {
    * @var boolean
    *
    * @JMS\Type("boolean")
-   * @ORM\Column(name="is_active", type="boolean", nullable=false)
+   * @ORM\Column(name="is_active", type="boolean", nullable=true, options={"default": 1})
    * 
    * 
    */

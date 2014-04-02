@@ -77,7 +77,7 @@ class UFField extends \Civi\Core\Entity {
    * @var string
    *
    * @JMS\Type("string")
-   * @ORM\Column(name="field_name", type="string", length=64, nullable=true)
+   * @ORM\Column(name="field_name", type="string", length=64, nullable=false)
    * 
    * 
    */
@@ -87,7 +87,7 @@ class UFField extends \Civi\Core\Entity {
    * @var boolean
    *
    * @JMS\Type("boolean")
-   * @ORM\Column(name="is_active", type="boolean", nullable=false)
+   * @ORM\Column(name="is_active", type="boolean", nullable=true, options={"default": 1})
    * 
    * 
    */
@@ -97,7 +97,7 @@ class UFField extends \Civi\Core\Entity {
    * @var boolean
    *
    * @JMS\Type("boolean")
-   * @ORM\Column(name="is_view", type="boolean", nullable=false)
+   * @ORM\Column(name="is_view", type="boolean", nullable=true, options={"default": 0})
    * 
    * 
    */
@@ -107,7 +107,7 @@ class UFField extends \Civi\Core\Entity {
    * @var boolean
    *
    * @JMS\Type("boolean")
-   * @ORM\Column(name="is_required", type="boolean", nullable=false)
+   * @ORM\Column(name="is_required", type="boolean", nullable=true, options={"default": 0})
    * 
    * 
    */
@@ -117,7 +117,7 @@ class UFField extends \Civi\Core\Entity {
    * @var integer
    *
    * @JMS\Type("integer")
-   * @ORM\Column(name="weight", type="integer", nullable=false, options={"unsigned":true})
+   * @ORM\Column(name="weight", type="integer", nullable=false, options={"unsigned":true, "default": 1})
    * 
    * 
    */
@@ -147,7 +147,7 @@ class UFField extends \Civi\Core\Entity {
    * @var string
    *
    * @JMS\Type("string")
-   * @ORM\Column(name="visibility", type="string", length=32, nullable=false)
+   * @ORM\Column(name="visibility", type="string", length=32, nullable=true, options={"default": "User and User Admin Only"})
    * 
    * 
    */
@@ -157,7 +157,7 @@ class UFField extends \Civi\Core\Entity {
    * @var boolean
    *
    * @JMS\Type("boolean")
-   * @ORM\Column(name="in_selector", type="boolean", nullable=false)
+   * @ORM\Column(name="in_selector", type="boolean", nullable=true, options={"default": 0})
    * 
    * 
    */
@@ -167,7 +167,7 @@ class UFField extends \Civi\Core\Entity {
    * @var boolean
    *
    * @JMS\Type("boolean")
-   * @ORM\Column(name="is_searchable", type="boolean", nullable=false)
+   * @ORM\Column(name="is_searchable", type="boolean", nullable=true, options={"default": 0})
    * 
    * 
    */
@@ -197,7 +197,7 @@ class UFField extends \Civi\Core\Entity {
    * @var string
    *
    * @JMS\Type("string")
-   * @ORM\Column(name="label", type="string", length=255, nullable=true)
+   * @ORM\Column(name="label", type="string", length=255, nullable=false)
    * 
    * 
    */
@@ -227,7 +227,7 @@ class UFField extends \Civi\Core\Entity {
    * @var boolean
    *
    * @JMS\Type("boolean")
-   * @ORM\Column(name="is_multi_summary", type="boolean", nullable=false)
+   * @ORM\Column(name="is_multi_summary", type="boolean", nullable=true, options={"default": 0})
    * 
    * 
    */

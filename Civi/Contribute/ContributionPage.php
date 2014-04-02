@@ -107,7 +107,7 @@ class ContributionPage extends \Civi\Core\Entity {
    * @var boolean
    *
    * @JMS\Type("boolean")
-   * @ORM\Column(name="is_credit_card_only", type="boolean", nullable=false)
+   * @ORM\Column(name="is_credit_card_only", type="boolean", nullable=true, options={"default": 0})
    * 
    * 
    */
@@ -117,7 +117,7 @@ class ContributionPage extends \Civi\Core\Entity {
    * @var boolean
    *
    * @JMS\Type("boolean")
-   * @ORM\Column(name="is_monetary", type="boolean", nullable=false)
+   * @ORM\Column(name="is_monetary", type="boolean", nullable=true, options={"default": 1})
    * 
    * 
    */
@@ -127,7 +127,7 @@ class ContributionPage extends \Civi\Core\Entity {
    * @var boolean
    *
    * @JMS\Type("boolean")
-   * @ORM\Column(name="is_recur", type="boolean", nullable=false)
+   * @ORM\Column(name="is_recur", type="boolean", nullable=true, options={"default": 0})
    * 
    * 
    */
@@ -137,7 +137,7 @@ class ContributionPage extends \Civi\Core\Entity {
    * @var boolean
    *
    * @JMS\Type("boolean")
-   * @ORM\Column(name="is_confirm_enabled", type="boolean", nullable=false)
+   * @ORM\Column(name="is_confirm_enabled", type="boolean", nullable=true, options={"default": 1})
    * 
    * 
    */
@@ -157,7 +157,7 @@ class ContributionPage extends \Civi\Core\Entity {
    * @var boolean
    *
    * @JMS\Type("boolean")
-   * @ORM\Column(name="is_recur_interval", type="boolean", nullable=false)
+   * @ORM\Column(name="is_recur_interval", type="boolean", nullable=true, options={"default": 0})
    * 
    * 
    */
@@ -167,7 +167,7 @@ class ContributionPage extends \Civi\Core\Entity {
    * @var boolean
    *
    * @JMS\Type("boolean")
-   * @ORM\Column(name="is_recur_installments", type="boolean", nullable=false)
+   * @ORM\Column(name="is_recur_installments", type="boolean", nullable=true, options={"default": 0})
    * 
    * 
    */
@@ -177,7 +177,7 @@ class ContributionPage extends \Civi\Core\Entity {
    * @var boolean
    *
    * @JMS\Type("boolean")
-   * @ORM\Column(name="is_pay_later", type="boolean", nullable=false)
+   * @ORM\Column(name="is_pay_later", type="boolean", nullable=true, options={"default": 0})
    * 
    * 
    */
@@ -207,7 +207,7 @@ class ContributionPage extends \Civi\Core\Entity {
    * @var boolean
    *
    * @JMS\Type("boolean")
-   * @ORM\Column(name="is_partial_payment", type="boolean", nullable=false)
+   * @ORM\Column(name="is_partial_payment", type="boolean", nullable=true, options={"default": 0})
    * 
    * 
    */
@@ -247,7 +247,7 @@ class ContributionPage extends \Civi\Core\Entity {
    * @var boolean
    *
    * @JMS\Type("boolean")
-   * @ORM\Column(name="is_allow_other_amount", type="boolean", nullable=false)
+   * @ORM\Column(name="is_allow_other_amount", type="boolean", nullable=true, options={"default": 0})
    * 
    * 
    */
@@ -327,7 +327,7 @@ class ContributionPage extends \Civi\Core\Entity {
    * @var boolean
    *
    * @JMS\Type("boolean")
-   * @ORM\Column(name="is_for_organization", type="boolean", nullable=false)
+   * @ORM\Column(name="is_for_organization", type="boolean", nullable=true, options={"default": 0})
    * 
    * 
    */
@@ -347,7 +347,7 @@ class ContributionPage extends \Civi\Core\Entity {
    * @var boolean
    *
    * @JMS\Type("boolean")
-   * @ORM\Column(name="is_email_receipt", type="boolean", nullable=false)
+   * @ORM\Column(name="is_email_receipt", type="boolean", nullable=true, options={"default": 0})
    * 
    * 
    */
@@ -427,7 +427,7 @@ class ContributionPage extends \Civi\Core\Entity {
    * @var boolean
    *
    * @JMS\Type("boolean")
-   * @ORM\Column(name="amount_block_is_active", type="boolean", nullable=false)
+   * @ORM\Column(name="amount_block_is_active", type="boolean", nullable=true, options={"default": 1})
    * 
    * 
    */
@@ -477,7 +477,7 @@ class ContributionPage extends \Civi\Core\Entity {
    * @var string
    *
    * @JMS\Type("string")
-   * @ORM\Column(name="currency", type="string", length=3, nullable=false)
+   * @ORM\Column(name="currency", type="string", length=3, nullable=true)
    * 
    * 
    */
@@ -497,7 +497,7 @@ class ContributionPage extends \Civi\Core\Entity {
    * @var boolean
    *
    * @JMS\Type("boolean")
-   * @ORM\Column(name="is_share", type="boolean", nullable=false)
+   * @ORM\Column(name="is_share", type="boolean", nullable=true, options={"default": 1})
    * 
    * 
    */

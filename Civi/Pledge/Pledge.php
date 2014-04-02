@@ -97,7 +97,7 @@ class Pledge extends \Civi\Core\Entity {
    * @var float
    *
    * @JMS\Type("float")
-   * @ORM\Column(name="amount", type="float", nullable=true)
+   * @ORM\Column(name="amount", type="float", nullable=false)
    * 
    * 
    */
@@ -107,7 +107,7 @@ class Pledge extends \Civi\Core\Entity {
    * @var float
    *
    * @JMS\Type("float")
-   * @ORM\Column(name="original_installment_amount", type="float", nullable=true)
+   * @ORM\Column(name="original_installment_amount", type="float", nullable=false)
    * 
    * 
    */
@@ -117,7 +117,7 @@ class Pledge extends \Civi\Core\Entity {
    * @var string
    *
    * @JMS\Type("string")
-   * @ORM\Column(name="currency", type="string", length=3, nullable=false)
+   * @ORM\Column(name="currency", type="string", length=3, nullable=true)
    * 
    * 
    */
@@ -127,7 +127,7 @@ class Pledge extends \Civi\Core\Entity {
    * @var string
    *
    * @JMS\Type("string")
-   * @ORM\Column(name="frequency_unit", type="string", length=8, nullable=false)
+   * @ORM\Column(name="frequency_unit", type="string", length=8, nullable=true, options={"default": "month"})
    * 
    * 
    */
@@ -137,7 +137,7 @@ class Pledge extends \Civi\Core\Entity {
    * @var integer
    *
    * @JMS\Type("integer")
-   * @ORM\Column(name="frequency_interval", type="integer", nullable=false, options={"unsigned":true})
+   * @ORM\Column(name="frequency_interval", type="integer", nullable=false, options={"unsigned":true, "default": 1})
    * 
    * 
    */
@@ -147,7 +147,7 @@ class Pledge extends \Civi\Core\Entity {
    * @var integer
    *
    * @JMS\Type("integer")
-   * @ORM\Column(name="frequency_day", type="integer", nullable=false, options={"unsigned":true})
+   * @ORM\Column(name="frequency_day", type="integer", nullable=false, options={"unsigned":true, "default": 3})
    * 
    * 
    */
@@ -157,7 +157,7 @@ class Pledge extends \Civi\Core\Entity {
    * @var integer
    *
    * @JMS\Type("integer")
-   * @ORM\Column(name="installments", type="integer", nullable=false, options={"unsigned":true})
+   * @ORM\Column(name="installments", type="integer", nullable=true, options={"unsigned":true, "default": 1})
    * 
    * 
    */
@@ -167,7 +167,7 @@ class Pledge extends \Civi\Core\Entity {
    * @var datetime
    *
    * @JMS\Type("datetime")
-   * @ORM\Column(name="start_date", type="datetime", nullable=true)
+   * @ORM\Column(name="start_date", type="datetime", nullable=false)
    * 
    * 
    */
@@ -177,7 +177,7 @@ class Pledge extends \Civi\Core\Entity {
    * @var datetime
    *
    * @JMS\Type("datetime")
-   * @ORM\Column(name="create_date", type="datetime", nullable=true)
+   * @ORM\Column(name="create_date", type="datetime", nullable=false)
    * 
    * 
    */
@@ -227,7 +227,7 @@ class Pledge extends \Civi\Core\Entity {
    * @var integer
    *
    * @JMS\Type("integer")
-   * @ORM\Column(name="max_reminders", type="integer", nullable=false, options={"unsigned":true})
+   * @ORM\Column(name="max_reminders", type="integer", nullable=true, options={"unsigned":true, "default": 1})
    * 
    * 
    */
@@ -237,7 +237,7 @@ class Pledge extends \Civi\Core\Entity {
    * @var integer
    *
    * @JMS\Type("integer")
-   * @ORM\Column(name="initial_reminder_day", type="integer", nullable=false, options={"unsigned":true})
+   * @ORM\Column(name="initial_reminder_day", type="integer", nullable=true, options={"unsigned":true, "default": 5})
    * 
    * 
    */
@@ -247,7 +247,7 @@ class Pledge extends \Civi\Core\Entity {
    * @var integer
    *
    * @JMS\Type("integer")
-   * @ORM\Column(name="additional_reminder_day", type="integer", nullable=false, options={"unsigned":true})
+   * @ORM\Column(name="additional_reminder_day", type="integer", nullable=true, options={"unsigned":true, "default": 5})
    * 
    * 
    */
@@ -267,7 +267,7 @@ class Pledge extends \Civi\Core\Entity {
    * @var boolean
    *
    * @JMS\Type("boolean")
-   * @ORM\Column(name="is_test", type="boolean", nullable=false)
+   * @ORM\Column(name="is_test", type="boolean", nullable=true, options={"default": 0})
    * 
    * 
    */

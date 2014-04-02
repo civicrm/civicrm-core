@@ -23,7 +23,7 @@
     <name>created_date</name>
     <type>timestamp</type>
     <required>true</required>
-    <default>CURRENT_TIMESTAMP</default>
+    <defaultTs>CURRENT_TIMESTAMP</defaultTs>
     <comment>Date and time the item was created</comment>
     <add>4.3</add>
   </field>

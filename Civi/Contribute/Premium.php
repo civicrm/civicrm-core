@@ -67,7 +67,7 @@ class Premium extends \Civi\Core\Entity {
    * @var string
    *
    * @JMS\Type("string")
-   * @ORM\Column(name="entity_table", type="string", length=64, nullable=true)
+   * @ORM\Column(name="entity_table", type="string", length=64, nullable=false)
    * 
    * 
    */
@@ -77,7 +77,7 @@ class Premium extends \Civi\Core\Entity {
    * @var integer
    *
    * @JMS\Type("integer")
-   * @ORM\Column(name="entity_id", type="integer", nullable=true, options={"unsigned":true})
+   * @ORM\Column(name="entity_id", type="integer", nullable=false, options={"unsigned":true})
    * 
    * 
    */
@@ -87,7 +87,7 @@ class Premium extends \Civi\Core\Entity {
    * @var boolean
    *
    * @JMS\Type("boolean")
-   * @ORM\Column(name="premiums_active", type="boolean", nullable=false)
+   * @ORM\Column(name="premiums_active", type="boolean", nullable=false, options={"default": 0})
    * 
    * 
    */
@@ -137,7 +137,7 @@ class Premium extends \Civi\Core\Entity {
    * @var boolean
    *
    * @JMS\Type("boolean")
-   * @ORM\Column(name="premiums_display_min_contribution", type="boolean", nullable=true)
+   * @ORM\Column(name="premiums_display_min_contribution", type="boolean", nullable=false)
    * 
    * 
    */
@@ -157,7 +157,7 @@ class Premium extends \Civi\Core\Entity {
    * @var integer
    *
    * @JMS\Type("integer")
-   * @ORM\Column(name="premiums_nothankyou_position", type="integer", nullable=false, options={"unsigned":true})
+   * @ORM\Column(name="premiums_nothankyou_position", type="integer", nullable=true, options={"unsigned":true, "default": 1})
    * 
    * 
    */

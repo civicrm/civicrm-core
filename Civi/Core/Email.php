@@ -97,7 +97,7 @@ class Email extends \Civi\Core\Entity {
    * @var boolean
    *
    * @JMS\Type("boolean")
-   * @ORM\Column(name="is_primary", type="boolean", nullable=false)
+   * @ORM\Column(name="is_primary", type="boolean", nullable=true, options={"default": 0})
    * 
    * 
    */
@@ -107,7 +107,7 @@ class Email extends \Civi\Core\Entity {
    * @var boolean
    *
    * @JMS\Type("boolean")
-   * @ORM\Column(name="is_billing", type="boolean", nullable=false)
+   * @ORM\Column(name="is_billing", type="boolean", nullable=true, options={"default": 0})
    * 
    * 
    */
@@ -117,7 +117,7 @@ class Email extends \Civi\Core\Entity {
    * @var boolean
    *
    * @JMS\Type("boolean")
-   * @ORM\Column(name="on_hold", type="boolean", nullable=false)
+   * @ORM\Column(name="on_hold", type="boolean", nullable=false, options={"default": 0})
    * 
    * 
    */
@@ -127,7 +127,7 @@ class Email extends \Civi\Core\Entity {
    * @var boolean
    *
    * @JMS\Type("boolean")
-   * @ORM\Column(name="is_bulkmail", type="boolean", nullable=false)
+   * @ORM\Column(name="is_bulkmail", type="boolean", nullable=false, options={"default": 0})
    * 
    * 
    */
@@ -157,7 +157,7 @@ class Email extends \Civi\Core\Entity {
    * @var text
    *
    * @JMS\Type("text")
-   * @ORM\Column(name="signature_text", type="text", length=65535, nullable=false)
+   * @ORM\Column(name="signature_text", type="text", length=65535, nullable=true)
    * 
    * 
    */
@@ -167,7 +167,7 @@ class Email extends \Civi\Core\Entity {
    * @var text
    *
    * @JMS\Type("text")
-   * @ORM\Column(name="signature_html", type="text", length=65535, nullable=false)
+   * @ORM\Column(name="signature_html", type="text", length=65535, nullable=true)
    * 
    * 
    */

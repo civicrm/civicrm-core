@@ -87,7 +87,7 @@ class FinancialTrxn extends \Civi\Core\Entity {
    * @var datetime
    *
    * @JMS\Type("datetime")
-   * @ORM\Column(name="trxn_date", type="datetime", nullable=false)
+   * @ORM\Column(name="trxn_date", type="datetime", nullable=true)
    * 
    * 
    */
@@ -97,7 +97,7 @@ class FinancialTrxn extends \Civi\Core\Entity {
    * @var float
    *
    * @JMS\Type("float")
-   * @ORM\Column(name="total_amount", type="float", nullable=true)
+   * @ORM\Column(name="total_amount", type="float", nullable=false)
    * 
    * 
    */
@@ -127,7 +127,7 @@ class FinancialTrxn extends \Civi\Core\Entity {
    * @var string
    *
    * @JMS\Type("string")
-   * @ORM\Column(name="currency", type="string", length=3, nullable=false)
+   * @ORM\Column(name="currency", type="string", length=3, nullable=true)
    * 
    * 
    */

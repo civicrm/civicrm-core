@@ -97,7 +97,7 @@ class OpenID extends \Civi\Core\Entity {
    * @var boolean
    *
    * @JMS\Type("boolean")
-   * @ORM\Column(name="allowed_to_login", type="boolean", nullable=false)
+   * @ORM\Column(name="allowed_to_login", type="boolean", nullable=false, options={"default": 0})
    * 
    * 
    */
@@ -107,7 +107,7 @@ class OpenID extends \Civi\Core\Entity {
    * @var boolean
    *
    * @JMS\Type("boolean")
-   * @ORM\Column(name="is_primary", type="boolean", nullable=false)
+   * @ORM\Column(name="is_primary", type="boolean", nullable=true, options={"default": 0})
    * 
    * 
    */

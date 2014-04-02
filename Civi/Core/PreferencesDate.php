@@ -67,7 +67,7 @@ class PreferencesDate extends \Civi\Core\Entity {
    * @var string
    *
    * @JMS\Type("string")
-   * @ORM\Column(name="name", type="string", length=64, nullable=true)
+   * @ORM\Column(name="name", type="string", length=64, nullable=false)
    * 
    * 
    */
@@ -87,7 +87,7 @@ class PreferencesDate extends \Civi\Core\Entity {
    * @var integer
    *
    * @JMS\Type("integer")
-   * @ORM\Column(name="start", type="integer", nullable=true, options={"unsigned":true})
+   * @ORM\Column(name="start", type="integer", nullable=false, options={"unsigned":true})
    * 
    * 
    */
@@ -97,7 +97,7 @@ class PreferencesDate extends \Civi\Core\Entity {
    * @var integer
    *
    * @JMS\Type("integer")
-   * @ORM\Column(name="end", type="integer", nullable=true, options={"unsigned":true})
+   * @ORM\Column(name="end", type="integer", nullable=false, options={"unsigned":true})
    * 
    * 
    */

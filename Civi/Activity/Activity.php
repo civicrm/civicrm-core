@@ -77,7 +77,7 @@ class Activity extends \Civi\Core\Entity {
    * @var integer
    *
    * @JMS\Type("integer")
-   * @ORM\Column(name="activity_type_id", type="integer", nullable=false, options={"unsigned":true})
+   * @ORM\Column(name="activity_type_id", type="integer", nullable=false, options={"unsigned":true, "default": 1})
    * 
    * 
    */
@@ -187,7 +187,7 @@ class Activity extends \Civi\Core\Entity {
    * @var boolean
    *
    * @JMS\Type("boolean")
-   * @ORM\Column(name="is_test", type="boolean", nullable=false)
+   * @ORM\Column(name="is_test", type="boolean", nullable=true, options={"default": 0})
    * 
    * 
    */
@@ -197,7 +197,7 @@ class Activity extends \Civi\Core\Entity {
    * @var integer
    *
    * @JMS\Type("integer")
-   * @ORM\Column(name="medium_id", type="integer", nullable=false, options={"unsigned":true})
+   * @ORM\Column(name="medium_id", type="integer", nullable=true, options={"unsigned":true})
    * 
    * 
    */
@@ -207,7 +207,7 @@ class Activity extends \Civi\Core\Entity {
    * @var boolean
    *
    * @JMS\Type("boolean")
-   * @ORM\Column(name="is_auto", type="boolean", nullable=false)
+   * @ORM\Column(name="is_auto", type="boolean", nullable=true, options={"default": 0})
    * 
    * 
    */
@@ -227,7 +227,7 @@ class Activity extends \Civi\Core\Entity {
    * @var boolean
    *
    * @JMS\Type("boolean")
-   * @ORM\Column(name="is_current_revision", type="boolean", nullable=false)
+   * @ORM\Column(name="is_current_revision", type="boolean", nullable=true, options={"default": 1})
    * 
    * 
    */
@@ -257,7 +257,7 @@ class Activity extends \Civi\Core\Entity {
    * @var boolean
    *
    * @JMS\Type("boolean")
-   * @ORM\Column(name="is_deleted", type="boolean", nullable=false)
+   * @ORM\Column(name="is_deleted", type="boolean", nullable=true, options={"default": 0})
    * 
    * 
    */

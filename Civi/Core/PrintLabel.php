@@ -127,7 +127,7 @@ class PrintLabel extends \Civi\Core\Entity {
    * @var boolean
    *
    * @JMS\Type("boolean")
-   * @ORM\Column(name="is_default", type="boolean", nullable=false)
+   * @ORM\Column(name="is_default", type="boolean", nullable=true, options={"default": 1})
    * 
    * 
    */
@@ -137,7 +137,7 @@ class PrintLabel extends \Civi\Core\Entity {
    * @var boolean
    *
    * @JMS\Type("boolean")
-   * @ORM\Column(name="is_active", type="boolean", nullable=false)
+   * @ORM\Column(name="is_active", type="boolean", nullable=true, options={"default": 1})
    * 
    * 
    */
@@ -147,7 +147,7 @@ class PrintLabel extends \Civi\Core\Entity {
    * @var boolean
    *
    * @JMS\Type("boolean")
-   * @ORM\Column(name="is_reserved", type="boolean", nullable=false)
+   * @ORM\Column(name="is_reserved", type="boolean", nullable=true, options={"default": 1})
    * 
    * 
    */

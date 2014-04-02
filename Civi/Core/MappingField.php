@@ -97,7 +97,7 @@ class MappingField extends \Civi\Core\Entity {
    * @var integer
    *
    * @JMS\Type("integer")
-   * @ORM\Column(name="column_number", type="integer", nullable=true, options={"unsigned":true})
+   * @ORM\Column(name="column_number", type="integer", nullable=false, options={"unsigned":true})
    * 
    * 
    */
@@ -167,7 +167,7 @@ class MappingField extends \Civi\Core\Entity {
    * @var integer
    *
    * @JMS\Type("integer")
-   * @ORM\Column(name="grouping", type="integer", nullable=false, options={"unsigned":true})
+   * @ORM\Column(name="grouping", type="integer", nullable=true, options={"unsigned":true, "default": 1})
    * 
    * 
    */

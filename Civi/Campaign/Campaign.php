@@ -67,7 +67,7 @@ class Campaign extends \Civi\Core\Entity {
    * @var string
    *
    * @JMS\Type("string")
-   * @ORM\Column(name="name", type="string", length=255, nullable=true)
+   * @ORM\Column(name="name", type="string", length=255, nullable=false)
    * 
    * 
    */
@@ -117,7 +117,7 @@ class Campaign extends \Civi\Core\Entity {
    * @var integer
    *
    * @JMS\Type("integer")
-   * @ORM\Column(name="campaign_type_id", type="integer", nullable=false, options={"unsigned":true})
+   * @ORM\Column(name="campaign_type_id", type="integer", nullable=true, options={"unsigned":true})
    * 
    * 
    */
@@ -127,7 +127,7 @@ class Campaign extends \Civi\Core\Entity {
    * @var integer
    *
    * @JMS\Type("integer")
-   * @ORM\Column(name="status_id", type="integer", nullable=false, options={"unsigned":true})
+   * @ORM\Column(name="status_id", type="integer", nullable=true, options={"unsigned":true})
    * 
    * 
    */
@@ -157,7 +157,7 @@ class Campaign extends \Civi\Core\Entity {
    * @var boolean
    *
    * @JMS\Type("boolean")
-   * @ORM\Column(name="is_active", type="boolean", nullable=false)
+   * @ORM\Column(name="is_active", type="boolean", nullable=true, options={"default": 1})
    * 
    * 
    */

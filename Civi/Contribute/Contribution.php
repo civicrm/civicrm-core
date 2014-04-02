@@ -117,7 +117,7 @@ class Contribution extends \Civi\Core\Entity {
    * @var float
    *
    * @JMS\Type("float")
-   * @ORM\Column(name="non_deductible_amount", type="float", nullable=false)
+   * @ORM\Column(name="non_deductible_amount", type="float", nullable=true, options={"default": 0})
    * 
    * 
    */
@@ -127,7 +127,7 @@ class Contribution extends \Civi\Core\Entity {
    * @var float
    *
    * @JMS\Type("float")
-   * @ORM\Column(name="total_amount", type="float", nullable=true)
+   * @ORM\Column(name="total_amount", type="float", nullable=false)
    * 
    * 
    */
@@ -177,7 +177,7 @@ class Contribution extends \Civi\Core\Entity {
    * @var string
    *
    * @JMS\Type("string")
-   * @ORM\Column(name="currency", type="string", length=3, nullable=false)
+   * @ORM\Column(name="currency", type="string", length=3, nullable=true)
    * 
    * 
    */
@@ -257,7 +257,7 @@ class Contribution extends \Civi\Core\Entity {
    * @var boolean
    *
    * @JMS\Type("boolean")
-   * @ORM\Column(name="is_test", type="boolean", nullable=false)
+   * @ORM\Column(name="is_test", type="boolean", nullable=true, options={"default": 0})
    * 
    * 
    */
@@ -267,7 +267,7 @@ class Contribution extends \Civi\Core\Entity {
    * @var boolean
    *
    * @JMS\Type("boolean")
-   * @ORM\Column(name="is_pay_later", type="boolean", nullable=false)
+   * @ORM\Column(name="is_pay_later", type="boolean", nullable=true, options={"default": 0})
    * 
    * 
    */
@@ -277,7 +277,7 @@ class Contribution extends \Civi\Core\Entity {
    * @var integer
    *
    * @JMS\Type("integer")
-   * @ORM\Column(name="contribution_status_id", type="integer", nullable=false, options={"unsigned":true})
+   * @ORM\Column(name="contribution_status_id", type="integer", nullable=true, options={"unsigned":true, "default": 1})
    * 
    * 
    */

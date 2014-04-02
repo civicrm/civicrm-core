@@ -67,7 +67,7 @@ class QueueItem extends \Civi\Core\Entity {
    * @var string
    *
    * @JMS\Type("string")
-   * @ORM\Column(name="queue_name", type="string", length=64, nullable=true)
+   * @ORM\Column(name="queue_name", type="string", length=64, nullable=false)
    * 
    * 
    */
@@ -77,7 +77,7 @@ class QueueItem extends \Civi\Core\Entity {
    * @var integer
    *
    * @JMS\Type("integer")
-   * @ORM\Column(name="weight", type="integer", nullable=true, options={"unsigned":true})
+   * @ORM\Column(name="weight", type="integer", nullable=false, options={"unsigned":true})
    * 
    * 
    */
@@ -87,7 +87,7 @@ class QueueItem extends \Civi\Core\Entity {
    * @var datetime
    *
    * @JMS\Type("datetime")
-   * @ORM\Column(name="submit_time", type="datetime", nullable=true)
+   * @ORM\Column(name="submit_time", type="datetime", nullable=false)
    * 
    * 
    */

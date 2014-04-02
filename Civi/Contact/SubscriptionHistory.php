@@ -87,7 +87,7 @@ class SubscriptionHistory extends \Civi\Core\Entity {
    * @var datetime
    *
    * @JMS\Type("datetime")
-   * @ORM\Column(name="date", type="datetime", nullable=true)
+   * @ORM\Column(name="date", type="datetime", nullable=false)
    * 
    * 
    */

@@ -97,7 +97,7 @@ class PriceFieldValue extends \Civi\Core\Entity {
    * @var text
    *
    * @JMS\Type("text")
-   * @ORM\Column(name="description", type="text", length=65535, nullable=false)
+   * @ORM\Column(name="description", type="text", length=65535, nullable=true)
    * 
    * 
    */
@@ -107,7 +107,7 @@ class PriceFieldValue extends \Civi\Core\Entity {
    * @var string
    *
    * @JMS\Type("string")
-   * @ORM\Column(name="amount", type="string", length=512, nullable=true)
+   * @ORM\Column(name="amount", type="string", length=512, nullable=false)
    * 
    * 
    */
@@ -117,7 +117,7 @@ class PriceFieldValue extends \Civi\Core\Entity {
    * @var integer
    *
    * @JMS\Type("integer")
-   * @ORM\Column(name="count", type="integer", nullable=false, options={"unsigned":true})
+   * @ORM\Column(name="count", type="integer", nullable=true, options={"unsigned":true})
    * 
    * 
    */
@@ -127,7 +127,7 @@ class PriceFieldValue extends \Civi\Core\Entity {
    * @var integer
    *
    * @JMS\Type("integer")
-   * @ORM\Column(name="max_value", type="integer", nullable=false, options={"unsigned":true})
+   * @ORM\Column(name="max_value", type="integer", nullable=true, options={"unsigned":true})
    * 
    * 
    */
@@ -137,7 +137,7 @@ class PriceFieldValue extends \Civi\Core\Entity {
    * @var integer
    *
    * @JMS\Type("integer")
-   * @ORM\Column(name="weight", type="integer", nullable=false, options={"unsigned":true})
+   * @ORM\Column(name="weight", type="integer", nullable=true, options={"unsigned":true, "default": 1})
    * 
    * 
    */
@@ -157,7 +157,7 @@ class PriceFieldValue extends \Civi\Core\Entity {
    * @var integer
    *
    * @JMS\Type("integer")
-   * @ORM\Column(name="membership_num_terms", type="integer", nullable=false, options={"unsigned":true})
+   * @ORM\Column(name="membership_num_terms", type="integer", nullable=true, options={"unsigned":true})
    * 
    * 
    */
@@ -167,7 +167,7 @@ class PriceFieldValue extends \Civi\Core\Entity {
    * @var boolean
    *
    * @JMS\Type("boolean")
-   * @ORM\Column(name="is_default", type="boolean", nullable=false)
+   * @ORM\Column(name="is_default", type="boolean", nullable=true, options={"default": 0})
    * 
    * 
    */
@@ -177,7 +177,7 @@ class PriceFieldValue extends \Civi\Core\Entity {
    * @var boolean
    *
    * @JMS\Type("boolean")
-   * @ORM\Column(name="is_active", type="boolean", nullable=false)
+   * @ORM\Column(name="is_active", type="boolean", nullable=true, options={"default": 1})
    * 
    * 
    */
@@ -197,7 +197,7 @@ class PriceFieldValue extends \Civi\Core\Entity {
    * @var float
    *
    * @JMS\Type("float")
-   * @ORM\Column(name="deductible_amount", type="float", nullable=false)
+   * @ORM\Column(name="deductible_amount", type="float", nullable=false, options={"default": 0.0})
    * 
    * 
    */

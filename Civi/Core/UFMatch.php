@@ -77,7 +77,7 @@ class UFMatch extends \Civi\Core\Entity {
    * @var integer
    *
    * @JMS\Type("integer")
-   * @ORM\Column(name="uf_id", type="integer", nullable=true, options={"unsigned":true})
+   * @ORM\Column(name="uf_id", type="integer", nullable=false, options={"unsigned":true})
    * 
    * 
    */

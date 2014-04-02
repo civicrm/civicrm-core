@@ -77,7 +77,7 @@ class ActionLog extends \Civi\Core\Entity {
    * @var integer
    *
    * @JMS\Type("integer")
-   * @ORM\Column(name="entity_id", type="integer", nullable=true, options={"unsigned":true})
+   * @ORM\Column(name="entity_id", type="integer", nullable=false, options={"unsigned":true})
    * 
    * 
    */
@@ -117,7 +117,7 @@ class ActionLog extends \Civi\Core\Entity {
    * @var boolean
    *
    * @JMS\Type("boolean")
-   * @ORM\Column(name="is_error", type="boolean", nullable=false)
+   * @ORM\Column(name="is_error", type="boolean", nullable=true, options={"default": 0})
    * 
    * 
    */

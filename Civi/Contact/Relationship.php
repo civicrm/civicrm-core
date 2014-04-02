@@ -117,7 +117,7 @@ class Relationship extends \Civi\Core\Entity {
    * @var boolean
    *
    * @JMS\Type("boolean")
-   * @ORM\Column(name="is_active", type="boolean", nullable=false)
+   * @ORM\Column(name="is_active", type="boolean", nullable=true, options={"default": 1})
    * 
    * 
    */
@@ -137,7 +137,7 @@ class Relationship extends \Civi\Core\Entity {
    * @var boolean
    *
    * @JMS\Type("boolean")
-   * @ORM\Column(name="is_permission_a_b", type="boolean", nullable=false)
+   * @ORM\Column(name="is_permission_a_b", type="boolean", nullable=true, options={"default": 0})
    * 
    * 
    */
@@ -147,7 +147,7 @@ class Relationship extends \Civi\Core\Entity {
    * @var boolean
    *
    * @JMS\Type("boolean")
-   * @ORM\Column(name="is_permission_b_a", type="boolean", nullable=false)
+   * @ORM\Column(name="is_permission_b_a", type="boolean", nullable=true, options={"default": 0})
    * 
    * 
    */

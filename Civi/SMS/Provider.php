@@ -107,7 +107,7 @@ class Provider extends \Civi\Core\Entity {
    * @var integer
    *
    * @JMS\Type("integer")
-   * @ORM\Column(name="api_type", type="integer", nullable=true, options={"unsigned":true})
+   * @ORM\Column(name="api_type", type="integer", nullable=false, options={"unsigned":true})
    * 
    * 
    */
@@ -137,7 +137,7 @@ class Provider extends \Civi\Core\Entity {
    * @var boolean
    *
    * @JMS\Type("boolean")
-   * @ORM\Column(name="is_default", type="boolean", nullable=false)
+   * @ORM\Column(name="is_default", type="boolean", nullable=true, options={"default": 0})
    * 
    * 
    */
@@ -147,7 +147,7 @@ class Provider extends \Civi\Core\Entity {
    * @var boolean
    *
    * @JMS\Type("boolean")
-   * @ORM\Column(name="is_active", type="boolean", nullable=false)
+   * @ORM\Column(name="is_active", type="boolean", nullable=true, options={"default": 0})
    * 
    * 
    */

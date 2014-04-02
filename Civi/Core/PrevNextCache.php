@@ -77,7 +77,7 @@ class PrevNextCache extends \Civi\Core\Entity {
    * @var integer
    *
    * @JMS\Type("integer")
-   * @ORM\Column(name="entity_id1", type="integer", nullable=true, options={"unsigned":true})
+   * @ORM\Column(name="entity_id1", type="integer", nullable=false, options={"unsigned":true})
    * 
    * 
    */
@@ -87,7 +87,7 @@ class PrevNextCache extends \Civi\Core\Entity {
    * @var integer
    *
    * @JMS\Type("integer")
-   * @ORM\Column(name="entity_id2", type="integer", nullable=true, options={"unsigned":true})
+   * @ORM\Column(name="entity_id2", type="integer", nullable=false, options={"unsigned":true})
    * 
    * 
    */
@@ -117,7 +117,7 @@ class PrevNextCache extends \Civi\Core\Entity {
    * @var boolean
    *
    * @JMS\Type("boolean")
-   * @ORM\Column(name="is_selected", type="boolean", nullable=false)
+   * @ORM\Column(name="is_selected", type="boolean", nullable=true, options={"default": 0})
    * 
    * 
    */

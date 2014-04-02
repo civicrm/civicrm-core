@@ -87,7 +87,7 @@ class DashboardContact extends \Civi\Core\Entity {
    * @var boolean
    *
    * @JMS\Type("boolean")
-   * @ORM\Column(name="column_no", type="boolean", nullable=false)
+   * @ORM\Column(name="column_no", type="boolean", nullable=true, options={"default": 0})
    * 
    * 
    */
@@ -97,7 +97,7 @@ class DashboardContact extends \Civi\Core\Entity {
    * @var boolean
    *
    * @JMS\Type("boolean")
-   * @ORM\Column(name="is_minimized", type="boolean", nullable=false)
+   * @ORM\Column(name="is_minimized", type="boolean", nullable=true, options={"default": 0})
    * 
    * 
    */
@@ -107,7 +107,7 @@ class DashboardContact extends \Civi\Core\Entity {
    * @var boolean
    *
    * @JMS\Type("boolean")
-   * @ORM\Column(name="is_fullscreen", type="boolean", nullable=false)
+   * @ORM\Column(name="is_fullscreen", type="boolean", nullable=true, options={"default": 1})
    * 
    * 
    */
@@ -117,7 +117,7 @@ class DashboardContact extends \Civi\Core\Entity {
    * @var boolean
    *
    * @JMS\Type("boolean")
-   * @ORM\Column(name="is_active", type="boolean", nullable=false)
+   * @ORM\Column(name="is_active", type="boolean", nullable=true, options={"default": 0})
    * 
    * 
    */
@@ -127,7 +127,7 @@ class DashboardContact extends \Civi\Core\Entity {
    * @var integer
    *
    * @JMS\Type("integer")
-   * @ORM\Column(name="weight", type="integer", nullable=false, options={"unsigned":true})
+   * @ORM\Column(name="weight", type="integer", nullable=true, options={"unsigned":true, "default": 0})
    * 
    * 
    */

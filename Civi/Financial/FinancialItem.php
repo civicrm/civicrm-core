@@ -67,17 +67,17 @@ class FinancialItem extends \Civi\Core\Entity {
    * @var datetime
    *
    * @JMS\Type("datetime")
-   * @ORM\Column(name="created_date", type="datetime", nullable=false)
+   * @ORM\Column(name="created_date", type="datetime", nullable=false, columnDefinition="TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
    * 
    * 1
    */
-  private $createdDate = 'CURRENT_TIMESTAMP';
+  private $createdDate;
   
   /**
    * @var datetime
    *
    * @JMS\Type("datetime")
-   * @ORM\Column(name="transaction_date", type="datetime", nullable=true)
+   * @ORM\Column(name="transaction_date", type="datetime", nullable=false)
    * 
    * 
    */
@@ -107,7 +107,7 @@ class FinancialItem extends \Civi\Core\Entity {
    * @var float
    *
    * @JMS\Type("float")
-   * @ORM\Column(name="amount", type="float", nullable=false)
+   * @ORM\Column(name="amount", type="float", nullable=false, options={"default": 0})
    * 
    * 
    */
@@ -402,8 +402,7 @@ class FinancialItem extends \Civi\Core\Entity {
                 'title' => ts('Created Date'),
                         'required' => true,
                                              
-                                           'default' => 'CURRENT_TIMESTAMP',
-         
+                                    
                           ),
       
               'transaction_date' => array(

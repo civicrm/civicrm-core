@@ -77,7 +77,7 @@ class OptionValue extends \Civi\Core\Entity {
    * @var string
    *
    * @JMS\Type("string")
-   * @ORM\Column(name="label", type="string", length=255, nullable=true)
+   * @ORM\Column(name="label", type="string", length=255, nullable=false)
    * 
    * 
    */
@@ -87,7 +87,7 @@ class OptionValue extends \Civi\Core\Entity {
    * @var string
    *
    * @JMS\Type("string")
-   * @ORM\Column(name="value", type="string", length=512, nullable=true)
+   * @ORM\Column(name="value", type="string", length=512, nullable=false)
    * 
    * 
    */
@@ -127,7 +127,7 @@ class OptionValue extends \Civi\Core\Entity {
    * @var boolean
    *
    * @JMS\Type("boolean")
-   * @ORM\Column(name="is_default", type="boolean", nullable=false)
+   * @ORM\Column(name="is_default", type="boolean", nullable=true, options={"default": 0})
    * 
    * 
    */
@@ -137,7 +137,7 @@ class OptionValue extends \Civi\Core\Entity {
    * @var integer
    *
    * @JMS\Type("integer")
-   * @ORM\Column(name="weight", type="integer", nullable=true, options={"unsigned":true})
+   * @ORM\Column(name="weight", type="integer", nullable=false, options={"unsigned":true})
    * 
    * 
    */
@@ -157,7 +157,7 @@ class OptionValue extends \Civi\Core\Entity {
    * @var boolean
    *
    * @JMS\Type("boolean")
-   * @ORM\Column(name="is_optgroup", type="boolean", nullable=false)
+   * @ORM\Column(name="is_optgroup", type="boolean", nullable=true, options={"default": 0})
    * 
    * 
    */
@@ -167,7 +167,7 @@ class OptionValue extends \Civi\Core\Entity {
    * @var boolean
    *
    * @JMS\Type("boolean")
-   * @ORM\Column(name="is_reserved", type="boolean", nullable=false)
+   * @ORM\Column(name="is_reserved", type="boolean", nullable=true, options={"default": 0})
    * 
    * 
    */
@@ -177,7 +177,7 @@ class OptionValue extends \Civi\Core\Entity {
    * @var boolean
    *
    * @JMS\Type("boolean")
-   * @ORM\Column(name="is_active", type="boolean", nullable=false)
+   * @ORM\Column(name="is_active", type="boolean", nullable=true, options={"default": 1})
    * 
    * 
    */
@@ -207,7 +207,7 @@ class OptionValue extends \Civi\Core\Entity {
    * @var integer
    *
    * @JMS\Type("integer")
-   * @ORM\Column(name="visibility_id", type="integer", nullable=false, options={"unsigned":true})
+   * @ORM\Column(name="visibility_id", type="integer", nullable=true, options={"unsigned":true})
    * 
    * 
    */

@@ -97,7 +97,7 @@ class ActionSchedule extends \Civi\Core\Entity {
    * @var boolean
    *
    * @JMS\Type("boolean")
-   * @ORM\Column(name="limit_to", type="boolean", nullable=false)
+   * @ORM\Column(name="limit_to", type="boolean", nullable=true, options={"default": 1})
    * 
    * 
    */
@@ -167,7 +167,7 @@ class ActionSchedule extends \Civi\Core\Entity {
    * @var boolean
    *
    * @JMS\Type("boolean")
-   * @ORM\Column(name="is_repeat", type="boolean", nullable=false)
+   * @ORM\Column(name="is_repeat", type="boolean", nullable=true, options={"default": 0})
    * 
    * 
    */
@@ -237,7 +237,7 @@ class ActionSchedule extends \Civi\Core\Entity {
    * @var boolean
    *
    * @JMS\Type("boolean")
-   * @ORM\Column(name="is_active", type="boolean", nullable=false)
+   * @ORM\Column(name="is_active", type="boolean", nullable=true, options={"default": 1})
    * 
    * 
    */
@@ -297,7 +297,7 @@ class ActionSchedule extends \Civi\Core\Entity {
    * @var boolean
    *
    * @JMS\Type("boolean")
-   * @ORM\Column(name="record_activity", type="boolean", nullable=false)
+   * @ORM\Column(name="record_activity", type="boolean", nullable=true)
    * 
    * 
    */
@@ -347,7 +347,7 @@ class ActionSchedule extends \Civi\Core\Entity {
    * @var string
    *
    * @JMS\Type("string")
-   * @ORM\Column(name="mode", type="string", length=128, nullable=false)
+   * @ORM\Column(name="mode", type="string", length=128, nullable=true, options={"default": "Email"})
    * 
    * 
    */

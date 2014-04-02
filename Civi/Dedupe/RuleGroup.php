@@ -77,7 +77,7 @@ class RuleGroup extends \Civi\Core\Entity {
    * @var integer
    *
    * @JMS\Type("integer")
-   * @ORM\Column(name="threshold", type="integer", nullable=true, options={"unsigned":true})
+   * @ORM\Column(name="threshold", type="integer", nullable=false, options={"unsigned":true})
    * 
    * 
    */
@@ -87,7 +87,7 @@ class RuleGroup extends \Civi\Core\Entity {
    * @var string
    *
    * @JMS\Type("string")
-   * @ORM\Column(name="used", type="string", length=12, nullable=true)
+   * @ORM\Column(name="used", type="string", length=12, nullable=false)
    * 
    * 
    */

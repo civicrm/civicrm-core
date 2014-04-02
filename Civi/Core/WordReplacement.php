@@ -87,7 +87,7 @@ class WordReplacement extends \Civi\Core\Entity {
    * @var boolean
    *
    * @JMS\Type("boolean")
-   * @ORM\Column(name="is_active", type="boolean", nullable=false)
+   * @ORM\Column(name="is_active", type="boolean", nullable=true, options={"default": 1})
    * 
    * 
    */
@@ -97,7 +97,7 @@ class WordReplacement extends \Civi\Core\Entity {
    * @var string
    *
    * @JMS\Type("string")
-   * @ORM\Column(name="match_type", type="string", length=16, nullable=false)
+   * @ORM\Column(name="match_type", type="string", length=16, nullable=true, options={"default": "wildcardMatch"})
    * 
    * 
    */

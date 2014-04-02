@@ -77,7 +77,7 @@ class PriceField extends \Civi\Core\Entity {
    * @var string
    *
    * @JMS\Type("string")
-   * @ORM\Column(name="name", type="string", length=255, nullable=true)
+   * @ORM\Column(name="name", type="string", length=255, nullable=false)
    * 
    * 
    */
@@ -87,7 +87,7 @@ class PriceField extends \Civi\Core\Entity {
    * @var string
    *
    * @JMS\Type("string")
-   * @ORM\Column(name="label", type="string", length=255, nullable=true)
+   * @ORM\Column(name="label", type="string", length=255, nullable=false)
    * 
    * 
    */
@@ -97,7 +97,7 @@ class PriceField extends \Civi\Core\Entity {
    * @var string
    *
    * @JMS\Type("string")
-   * @ORM\Column(name="html_type", type="string", length=12, nullable=true)
+   * @ORM\Column(name="html_type", type="string", length=12, nullable=false)
    * 
    * 
    */
@@ -107,7 +107,7 @@ class PriceField extends \Civi\Core\Entity {
    * @var boolean
    *
    * @JMS\Type("boolean")
-   * @ORM\Column(name="is_enter_qty", type="boolean", nullable=false)
+   * @ORM\Column(name="is_enter_qty", type="boolean", nullable=true, options={"default": 0})
    * 
    * 
    */
@@ -137,7 +137,7 @@ class PriceField extends \Civi\Core\Entity {
    * @var integer
    *
    * @JMS\Type("integer")
-   * @ORM\Column(name="weight", type="integer", nullable=false, options={"unsigned":true})
+   * @ORM\Column(name="weight", type="integer", nullable=true, options={"unsigned":true, "default": 1})
    * 
    * 
    */
@@ -147,7 +147,7 @@ class PriceField extends \Civi\Core\Entity {
    * @var boolean
    *
    * @JMS\Type("boolean")
-   * @ORM\Column(name="is_display_amounts", type="boolean", nullable=false)
+   * @ORM\Column(name="is_display_amounts", type="boolean", nullable=true, options={"default": 1})
    * 
    * 
    */
@@ -157,7 +157,7 @@ class PriceField extends \Civi\Core\Entity {
    * @var integer
    *
    * @JMS\Type("integer")
-   * @ORM\Column(name="options_per_line", type="integer", nullable=false, options={"unsigned":true})
+   * @ORM\Column(name="options_per_line", type="integer", nullable=true, options={"unsigned":true, "default": 1})
    * 
    * 
    */
@@ -167,7 +167,7 @@ class PriceField extends \Civi\Core\Entity {
    * @var boolean
    *
    * @JMS\Type("boolean")
-   * @ORM\Column(name="is_active", type="boolean", nullable=false)
+   * @ORM\Column(name="is_active", type="boolean", nullable=true, options={"default": 1})
    * 
    * 
    */
@@ -177,7 +177,7 @@ class PriceField extends \Civi\Core\Entity {
    * @var boolean
    *
    * @JMS\Type("boolean")
-   * @ORM\Column(name="is_required", type="boolean", nullable=false)
+   * @ORM\Column(name="is_required", type="boolean", nullable=true, options={"default": 1})
    * 
    * 
    */
@@ -187,7 +187,7 @@ class PriceField extends \Civi\Core\Entity {
    * @var datetime
    *
    * @JMS\Type("datetime")
-   * @ORM\Column(name="active_on", type="datetime", nullable=false)
+   * @ORM\Column(name="active_on", type="datetime", nullable=true)
    * 
    * 
    */
@@ -197,7 +197,7 @@ class PriceField extends \Civi\Core\Entity {
    * @var datetime
    *
    * @JMS\Type("datetime")
-   * @ORM\Column(name="expire_on", type="datetime", nullable=false)
+   * @ORM\Column(name="expire_on", type="datetime", nullable=true)
    * 
    * 
    */
@@ -217,7 +217,7 @@ class PriceField extends \Civi\Core\Entity {
    * @var integer
    *
    * @JMS\Type("integer")
-   * @ORM\Column(name="visibility_id", type="integer", nullable=false, options={"unsigned":true})
+   * @ORM\Column(name="visibility_id", type="integer", nullable=true, options={"unsigned":true, "default": 1})
    * 
    * 
    */

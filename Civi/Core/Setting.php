@@ -67,7 +67,7 @@ class Setting extends \Civi\Core\Entity {
    * @var string
    *
    * @JMS\Type("string")
-   * @ORM\Column(name="group_name", type="string", length=64, nullable=true)
+   * @ORM\Column(name="group_name", type="string", length=64, nullable=false)
    * 
    * 
    */

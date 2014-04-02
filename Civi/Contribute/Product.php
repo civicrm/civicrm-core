@@ -67,7 +67,7 @@ class Product extends \Civi\Core\Entity {
    * @var string
    *
    * @JMS\Type("string")
-   * @ORM\Column(name="name", type="string", length=255, nullable=true)
+   * @ORM\Column(name="name", type="string", length=255, nullable=false)
    * 
    * 
    */
@@ -137,7 +137,7 @@ class Product extends \Civi\Core\Entity {
    * @var string
    *
    * @JMS\Type("string")
-   * @ORM\Column(name="currency", type="string", length=3, nullable=false)
+   * @ORM\Column(name="currency", type="string", length=3, nullable=true)
    * 
    * 
    */
@@ -177,7 +177,7 @@ class Product extends \Civi\Core\Entity {
    * @var boolean
    *
    * @JMS\Type("boolean")
-   * @ORM\Column(name="is_active", type="boolean", nullable=true)
+   * @ORM\Column(name="is_active", type="boolean", nullable=false)
    * 
    * 
    */
@@ -187,7 +187,7 @@ class Product extends \Civi\Core\Entity {
    * @var string
    *
    * @JMS\Type("string")
-   * @ORM\Column(name="period_type", type="string", length=8, nullable=false)
+   * @ORM\Column(name="period_type", type="string", length=8, nullable=true, options={"default": "rolling"})
    * 
    * 
    */
@@ -197,7 +197,7 @@ class Product extends \Civi\Core\Entity {
    * @var integer
    *
    * @JMS\Type("integer")
-   * @ORM\Column(name="fixed_period_start_day", type="integer", nullable=false, options={"unsigned":true})
+   * @ORM\Column(name="fixed_period_start_day", type="integer", nullable=true, options={"unsigned":true, "default": 0101})
    * 
    * 
    */
@@ -207,7 +207,7 @@ class Product extends \Civi\Core\Entity {
    * @var string
    *
    * @JMS\Type("string")
-   * @ORM\Column(name="duration_unit", type="string", length=8, nullable=false)
+   * @ORM\Column(name="duration_unit", type="string", length=8, nullable=true, options={"default": "year"})
    * 
    * 
    */
@@ -227,7 +227,7 @@ class Product extends \Civi\Core\Entity {
    * @var string
    *
    * @JMS\Type("string")
-   * @ORM\Column(name="frequency_unit", type="string", length=8, nullable=false)
+   * @ORM\Column(name="frequency_unit", type="string", length=8, nullable=true, options={"default": "month"})
    * 
    * 
    */

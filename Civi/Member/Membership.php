@@ -167,7 +167,7 @@ class Membership extends \Civi\Core\Entity {
    * @var boolean
    *
    * @JMS\Type("boolean")
-   * @ORM\Column(name="is_test", type="boolean", nullable=false)
+   * @ORM\Column(name="is_test", type="boolean", nullable=true, options={"default": 0})
    * 
    * 
    */
@@ -177,7 +177,7 @@ class Membership extends \Civi\Core\Entity {
    * @var boolean
    *
    * @JMS\Type("boolean")
-   * @ORM\Column(name="is_pay_later", type="boolean", nullable=false)
+   * @ORM\Column(name="is_pay_later", type="boolean", nullable=true, options={"default": 0})
    * 
    * 
    */

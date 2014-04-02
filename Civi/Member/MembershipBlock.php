@@ -107,7 +107,7 @@ class MembershipBlock extends \Civi\Core\Entity {
    * @var boolean
    *
    * @JMS\Type("boolean")
-   * @ORM\Column(name="display_min_fee", type="boolean", nullable=false)
+   * @ORM\Column(name="display_min_fee", type="boolean", nullable=true, options={"default": 1})
    * 
    * 
    */
@@ -117,7 +117,7 @@ class MembershipBlock extends \Civi\Core\Entity {
    * @var boolean
    *
    * @JMS\Type("boolean")
-   * @ORM\Column(name="is_separate_payment", type="boolean", nullable=false)
+   * @ORM\Column(name="is_separate_payment", type="boolean", nullable=true, options={"default": 1})
    * 
    * 
    */
@@ -167,7 +167,7 @@ class MembershipBlock extends \Civi\Core\Entity {
    * @var boolean
    *
    * @JMS\Type("boolean")
-   * @ORM\Column(name="is_required", type="boolean", nullable=false)
+   * @ORM\Column(name="is_required", type="boolean", nullable=true, options={"default": 0})
    * 
    * 
    */
@@ -177,7 +177,7 @@ class MembershipBlock extends \Civi\Core\Entity {
    * @var boolean
    *
    * @JMS\Type("boolean")
-   * @ORM\Column(name="is_active", type="boolean", nullable=false)
+   * @ORM\Column(name="is_active", type="boolean", nullable=true, options={"default": 1})
    * 
    * 
    */

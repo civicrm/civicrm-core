@@ -97,7 +97,7 @@ class Event extends \Civi\Core\Entity {
    * @var integer
    *
    * @JMS\Type("integer")
-   * @ORM\Column(name="event_type_id", type="integer", nullable=false, options={"unsigned":true})
+   * @ORM\Column(name="event_type_id", type="integer", nullable=true, options={"unsigned":true, "default": 0})
    * 
    * 
    */
@@ -107,7 +107,7 @@ class Event extends \Civi\Core\Entity {
    * @var integer
    *
    * @JMS\Type("integer")
-   * @ORM\Column(name="participant_listing_id", type="integer", nullable=false, options={"unsigned":true})
+   * @ORM\Column(name="participant_listing_id", type="integer", nullable=true, options={"unsigned":true, "default": 0})
    * 
    * 
    */
@@ -117,7 +117,7 @@ class Event extends \Civi\Core\Entity {
    * @var boolean
    *
    * @JMS\Type("boolean")
-   * @ORM\Column(name="is_public", type="boolean", nullable=false)
+   * @ORM\Column(name="is_public", type="boolean", nullable=true, options={"default": 1})
    * 
    * 
    */
@@ -147,7 +147,7 @@ class Event extends \Civi\Core\Entity {
    * @var boolean
    *
    * @JMS\Type("boolean")
-   * @ORM\Column(name="is_online_registration", type="boolean", nullable=false)
+   * @ORM\Column(name="is_online_registration", type="boolean", nullable=true, options={"default": 0})
    * 
    * 
    */
@@ -187,7 +187,7 @@ class Event extends \Civi\Core\Entity {
    * @var integer
    *
    * @JMS\Type("integer")
-   * @ORM\Column(name="max_participants", type="integer", nullable=false, options={"unsigned":true})
+   * @ORM\Column(name="max_participants", type="integer", nullable=true, options={"unsigned":true})
    * 
    * 
    */
@@ -207,7 +207,7 @@ class Event extends \Civi\Core\Entity {
    * @var boolean
    *
    * @JMS\Type("boolean")
-   * @ORM\Column(name="is_monetary", type="boolean", nullable=false)
+   * @ORM\Column(name="is_monetary", type="boolean", nullable=true, options={"default": 0})
    * 
    * 
    */
@@ -217,7 +217,7 @@ class Event extends \Civi\Core\Entity {
    * @var integer
    *
    * @JMS\Type("integer")
-   * @ORM\Column(name="financial_type_id", type="integer", nullable=false, options={"unsigned":true})
+   * @ORM\Column(name="financial_type_id", type="integer", nullable=true, options={"unsigned":true})
    * 
    * 
    */
@@ -237,7 +237,7 @@ class Event extends \Civi\Core\Entity {
    * @var boolean
    *
    * @JMS\Type("boolean")
-   * @ORM\Column(name="is_map", type="boolean", nullable=false)
+   * @ORM\Column(name="is_map", type="boolean", nullable=true, options={"default": 0})
    * 
    * 
    */
@@ -247,7 +247,7 @@ class Event extends \Civi\Core\Entity {
    * @var boolean
    *
    * @JMS\Type("boolean")
-   * @ORM\Column(name="is_active", type="boolean", nullable=false)
+   * @ORM\Column(name="is_active", type="boolean", nullable=true, options={"default": 0})
    * 
    * 
    */
@@ -267,7 +267,7 @@ class Event extends \Civi\Core\Entity {
    * @var boolean
    *
    * @JMS\Type("boolean")
-   * @ORM\Column(name="is_show_location", type="boolean", nullable=false)
+   * @ORM\Column(name="is_show_location", type="boolean", nullable=true, options={"default": 1})
    * 
    * 
    */
@@ -287,7 +287,7 @@ class Event extends \Civi\Core\Entity {
    * @var integer
    *
    * @JMS\Type("integer")
-   * @ORM\Column(name="default_role_id", type="integer", nullable=false, options={"unsigned":true})
+   * @ORM\Column(name="default_role_id", type="integer", nullable=true, options={"unsigned":true, "default": 1})
    * 
    * 
    */
@@ -317,7 +317,7 @@ class Event extends \Civi\Core\Entity {
    * @var string
    *
    * @JMS\Type("string")
-   * @ORM\Column(name="confirm_title", type="string", length=255, nullable=false)
+   * @ORM\Column(name="confirm_title", type="string", length=255, nullable=true)
    * 
    * 
    */
@@ -347,7 +347,7 @@ class Event extends \Civi\Core\Entity {
    * @var boolean
    *
    * @JMS\Type("boolean")
-   * @ORM\Column(name="is_email_confirm", type="boolean", nullable=false)
+   * @ORM\Column(name="is_email_confirm", type="boolean", nullable=true, options={"default": 0})
    * 
    * 
    */
@@ -427,7 +427,7 @@ class Event extends \Civi\Core\Entity {
    * @var string
    *
    * @JMS\Type("string")
-   * @ORM\Column(name="thankyou_title", type="string", length=255, nullable=false)
+   * @ORM\Column(name="thankyou_title", type="string", length=255, nullable=true)
    * 
    * 
    */
@@ -457,7 +457,7 @@ class Event extends \Civi\Core\Entity {
    * @var boolean
    *
    * @JMS\Type("boolean")
-   * @ORM\Column(name="is_pay_later", type="boolean", nullable=false)
+   * @ORM\Column(name="is_pay_later", type="boolean", nullable=true, options={"default": 0})
    * 
    * 
    */
@@ -487,7 +487,7 @@ class Event extends \Civi\Core\Entity {
    * @var boolean
    *
    * @JMS\Type("boolean")
-   * @ORM\Column(name="is_partial_payment", type="boolean", nullable=false)
+   * @ORM\Column(name="is_partial_payment", type="boolean", nullable=true, options={"default": 0})
    * 
    * 
    */
@@ -527,7 +527,7 @@ class Event extends \Civi\Core\Entity {
    * @var boolean
    *
    * @JMS\Type("boolean")
-   * @ORM\Column(name="is_multiple_registrations", type="boolean", nullable=false)
+   * @ORM\Column(name="is_multiple_registrations", type="boolean", nullable=true, options={"default": 0})
    * 
    * 
    */
@@ -537,7 +537,7 @@ class Event extends \Civi\Core\Entity {
    * @var boolean
    *
    * @JMS\Type("boolean")
-   * @ORM\Column(name="allow_same_participant_emails", type="boolean", nullable=false)
+   * @ORM\Column(name="allow_same_participant_emails", type="boolean", nullable=true, options={"default": 0})
    * 
    * 
    */
@@ -597,7 +597,7 @@ class Event extends \Civi\Core\Entity {
    * @var boolean
    *
    * @JMS\Type("boolean")
-   * @ORM\Column(name="is_template", type="boolean", nullable=false)
+   * @ORM\Column(name="is_template", type="boolean", nullable=true, options={"default": 0})
    * 
    * 
    */
@@ -657,7 +657,7 @@ class Event extends \Civi\Core\Entity {
    * @var boolean
    *
    * @JMS\Type("boolean")
-   * @ORM\Column(name="is_share", type="boolean", nullable=false)
+   * @ORM\Column(name="is_share", type="boolean", nullable=true, options={"default": 1})
    * 
    * 
    */
@@ -667,7 +667,7 @@ class Event extends \Civi\Core\Entity {
    * @var integer
    *
    * @JMS\Type("integer")
-   * @ORM\Column(name="parent_event_id", type="integer", nullable=false, options={"unsigned":true})
+   * @ORM\Column(name="parent_event_id", type="integer", nullable=true, options={"unsigned":true})
    * 
    * 
    */
@@ -677,7 +677,7 @@ class Event extends \Civi\Core\Entity {
    * @var integer
    *
    * @JMS\Type("integer")
-   * @ORM\Column(name="slot_label_id", type="integer", nullable=false, options={"unsigned":true})
+   * @ORM\Column(name="slot_label_id", type="integer", nullable=true, options={"unsigned":true})
    * 
    * 
    */
