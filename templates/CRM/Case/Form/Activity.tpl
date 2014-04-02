@@ -159,6 +159,13 @@
                   </td>
                 </tr>
               {/if}
+              <tr class="crm-case-activity-form-block-duration">
+                <td class="label">{$form.duration.label}</td>
+                <td class="view-value">
+                  {$form.duration.html}
+                  <span class="description">{ts}minutes{/ts}</span>
+                </td>
+              </tr>
             </table>
           </div><!-- /.crm-accordion-body -->
         </div><!-- /.crm-accordion-wrapper -->
@@ -233,13 +240,6 @@
           </table>
         </div><!-- /.crm-accordion-body -->
       </div><!-- /.crm-accordion-wrapper -->
-    </td>
-  </tr>
-  <tr class="crm-case-activity-form-block-duration">
-    <td class="label">{$form.duration.label}</td>
-    <td class="view-value">
-      {$form.duration.html}
-      <span class="description">{ts}minutes{/ts}
     </td>
   </tr>
   {* Suppress activity status and priority for changes to status, case type and start date. PostProc will force status to completed. *}
