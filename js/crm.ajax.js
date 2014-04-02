@@ -366,7 +366,9 @@
             $el.trigger('crmFormSuccess', response);
             // Reset form for e.g. "save and new"
             if (response.userContext && settings.refreshAction && $.inArray(response.buttonName, settings.refreshAction) >= 0) {
-              $el.crmSnippet('option', 'url', response.userContext).crmSnippet('refresh');
+              // Force reset of original url
+              $el.data('civiCrmSnippet')._originalUrl = response.userContext;
+              $el.crmSnippet('resetUrl').crmSnippet('refresh');
             }
             else if ($el.data('uiDialog') && settings.autoClose) {
               $el.dialog('close');
