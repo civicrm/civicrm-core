@@ -117,7 +117,7 @@ class api_v3_UtilsTest extends CiviUnitTestCase {
     $dispatcher = new \Symfony\Component\EventDispatcher\EventDispatcher();
     $dispatcher->addSubscriber(new \Civi\API\Subscriber\PermissionCheck());
     $kernel = new \Civi\API\Kernel($dispatcher);
-    $apiRequest = $kernel->createRequest($entity, $action, $params, NULL);
+    $apiRequest = \Civi\API\Request::create($entity, $action, $params, NULL);
     try {
       $kernel->authorize(NULL, $apiRequest);
       return TRUE;
