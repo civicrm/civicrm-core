@@ -55,89 +55,120 @@
         <div id="help">{$activityTypeDescription}</div>
       </tr>
     {/if}
-    <tr id="with-clients" class="crm-case-activity-form-block-client_name">
-      <td class="label font-size12pt">{ts}Client{/ts}</td>
-      <td class="view-value">
-        <span class="font-size12pt">
-          {foreach from=$client_names item=client name=clients}
-            {$client.display_name}{if not $smarty.foreach.clients.last}; &nbsp; {/if}
-          {/foreach}
-        </span>
-
-        {if $action eq 1 or $action eq 2}
-          <br />
-          <a href="#" class="crm-with-contact">&raquo; {ts}With other contact(s){/ts}</a>
-        {/if}
-      </td>
-    </tr>
-
-    {if $action eq 1 or $action eq 2}
-      <tr class="crm-case-activity-form-block-target_contact_id hide-block" id="with-contacts-widget">
-        <td class="label font-size10pt">{ts}With Contact{/ts}</td>
-        <td class="view-value">
-          {$form.target_contact_id.html}
-          <br/>
-          <a href="#" class="crm-with-contact">
-            &raquo; {if not $multiClient}{ts}With client{/ts}{else}{ts}With client(s){/ts}{/if}
-          </a>
-        </td>
-      </tr>
-    {/if}
-
-    <tr class="crm-case-activity-form-block-activityTypeName">
-      <td class="label">{ts}Activity Type{/ts}</td>
-      <td class="view-value bold">{$activityTypeName|escape}</td>
-    </tr>
-    <tr class="crm-case-activity-form-block-source_contact_id">
-      <td class="label">{$form.source_contact_id.label}</td>
-      <td class="view-value">{$form.source_contact_id.html}</td>
-    </tr>
-    <tr class="crm-case-activity-form-block-assignee_contact_id">
-      <td class="label">
-        {$form.assignee_contact_id.label}
-        {edit}{help id="assignee_contact_id" title=$form.assignee_contact_id.label file="CRM/Activity/Form/Activity"}{/edit}
-      </td>
-      <td>{$form.assignee_contact_id.html}
-        {if $activityAssigneeNotification}
-          <br />
-          <span class="description"><span class="icon email-icon"></span>{ts}A copy of this activity will be emailed to each Assignee.{/ts}</span>
-        {/if}
-      </td>
-    </tr>
-
-  {* Include special processing fields if any are defined for this activity type (e.g. Change Case Status / Change Case Type). *}
     {if $activityTypeFile}
-    {include file="CRM/Case/Form/Activity/$activityTypeFile.tpl"}
-    {/if}
-    {if $activityTypeFile neq 'ChangeCaseStartDate'}
-      <tr class="crm-case-activity-form-block-subject">
-        <td class="label">{$form.subject.label}</td><td class="view-value">{$form.subject.html|crmAddClass:huge}</td>
+      {include file="CRM/Case/Form/Activity/$activityTypeFile.tpl"}
+      <tr class="crm-case-activity-form-block-details">
+        <td class="label">{$form.details.label}</td>
+        <td class="view-value">
+          {* If using plain textarea, assign class=huge to make input large enough. *}
+          {if $defaultWysiwygEditor eq 0}{$form.details.html|crmAddClass:huge}{else}{$form.details.html}{/if}
+        </td>
       </tr>
     {/if}
-    <tr class="crm-case-activity-form-block-medium_id">
-      <td class="label">{$form.medium_id.label}</td>
-      <td class="view-value">{$form.medium_id.html}&nbsp;&nbsp;&nbsp;{$form.location.label} &nbsp;{$form.location.html|crmAddClass:huge}</td>
-    </tr>
-    <tr class="crm-case-activity-form-block-activity_date_time">
-      <td class="label">{$form.activity_date_time.label}</td>
-      {if $action eq 2 && $activityTypeFile eq 'OpenCase'}
-        <td class="view-value">{$current_activity_date_time|crmDate}
-          <div class="description">Use a <a href="{$changeStartURL}">Change Start Date</a> activity to change the date</div>
-        {* avoid errors about missing field *}
-          <div style="display: none;">{include file="CRM/common/jcalendar.tpl" elementName=activity_date_time}</div>
-        </td>
-        {else}
-        <td class="view-value">{include file="CRM/common/jcalendar.tpl" elementName=activity_date_time}</td>
-      {/if}
-    </tr>
-    <tr>
-      <td colspan="2"><div id="customData"></div></td>
-    </tr>
-    <tr class="crm-case-activity-form-block-details">
-      <td class="label">{$form.details.label}</td>
-      <td class="view-value">
-      {* If using plain textarea, assign class=huge to make input large enough. *}
-        {if $defaultWysiwygEditor eq 0}{$form.details.html|crmAddClass:huge}{else}{$form.details.html}{/if}
+    <tr class="crm-case-activity-form-block-activity-details">
+      <td colspan="2">
+        <div id="activity-details" class="crm-accordion-wrapper collapsed">
+          <div class="crm-accordion-header">
+            {ts} Activity Details{/ts}
+          </div><!-- /.crm-accordion-header -->
+          <div class="crm-accordion-body">
+            <table class="form-layout-compressed">
+              <tbody>
+                <tr id="with-clients" class="crm-case-activity-form-block-client_name">
+                  <td class="label font-size12pt">{ts}Client{/ts}</td>
+                  <td class="view-value">
+                    <span class="font-size12pt">
+                      {foreach from=$client_names item=client name=clients}
+                        {$client.display_name}{if not $smarty.foreach.clients.last}; &nbsp; {/if}
+                      {/foreach}
+                    </span>
+
+                   {if $action eq 1 or $action eq 2}
+                      <br />
+                      <a href="#" class="crm-with-contact">&raquo; {ts}With other contact(s){/ts}</a>
+                    {/if}
+                  </td>
+                </tr>
+
+                {if $action eq 1 or $action eq 2}
+                  <tr class="crm-case-activity-form-block-target_contact_id hide-block" id="with-contacts-widget">
+                    <td class="label font-size10pt">{ts}With Contact{/ts}</td>
+                    <td class="view-value">
+                      {$form.target_contact_id.html}
+                      <br/>
+                      <a href="#" class="crm-with-contact">
+                        &raquo; {if not $multiClient}{ts}With client{/ts}{else}{ts}With client(s){/ts}{/if}
+                      </a>
+                    </td>
+                  </tr>
+                {/if}
+
+                <tr class="crm-case-activity-form-block-activityTypeName">
+                  <td class="label">{ts}Activity Type{/ts}</td>
+                  <td class="view-value bold">{$activityTypeName|escape}</td>
+                </tr>
+                <tr class="crm-case-activity-form-block-source_contact_id">
+                  <td class="label">{$form.source_contact_id.label}</td>
+                  <td class="view-value">{$form.source_contact_id.html}</td>
+                </tr>
+                <tr class="crm-case-activity-form-block-assignee_contact_id">
+                  <td class="label">
+                    {$form.assignee_contact_id.label}
+                    {edit}{help id="assignee_contact_id" title=$form.assignee_contact_id.label file="CRM/Activity/Form/Activity"}{/edit}
+                  </td>
+                  <td>{$form.assignee_contact_id.html}
+                    {if $activityAssigneeNotification}
+                      <br />
+                      <span class="description"><span class="icon email-icon"></span>{ts}A copy of this activity will be emailed to each Assignee.{/ts}</span>
+                    {/if}
+                  </td>
+                </tr>
+
+              {* Include special processing fields if any are defined for this activity type (e.g. Change Case Status / Change Case Type). *}
+    
+              {if $activityTypeFile neq 'ChangeCaseStartDate'}
+                <tr class="crm-case-activity-form-block-subject">
+                  <td class="label">{$form.subject.label}</td><td class="view-value">{$form.subject.html|crmAddClass:huge}</td>
+                </tr>
+              {/if}
+              <tr class="crm-case-activity-form-block-medium_id">
+                <td class="label">{$form.medium_id.label}</td>
+                <td class="view-value">{$form.medium_id.html}&nbsp;&nbsp;&nbsp;{$form.location.label} &nbsp;{$form.location.html|crmAddClass:huge}</td>
+              </tr>
+              <tr class="crm-case-activity-form-block-activity_date_time">
+                <td class="label">{$form.activity_date_time.label}</td>
+                {if $action eq 2 && $activityTypeFile eq 'OpenCase'}
+                  <td class="view-value">{$current_activity_date_time|crmDate}
+                    <div class="description">Use a <a href="{$changeStartURL}">Change Start Date</a> activity to change the date</div>
+                    {* avoid errors about missing field *}
+                    <div style="display: none;">{include file="CRM/common/jcalendar.tpl" elementName=activity_date_time}</div>
+                  </td>
+                {else}
+                  <td class="view-value">{include file="CRM/common/jcalendar.tpl" elementName=activity_date_time}</td>
+                {/if}
+              </tr>
+              <tr>
+                <td colspan="2"><div id="customData"></div></td>
+              </tr>
+              {if NOT $activityTypeFile}
+                <tr class="crm-case-activity-form-block-details">
+                  <td class="label">{$form.details.label}</td>
+                  <td class="view-value">
+                  {* If using plain textarea, assign class=huge to make input large enough. *}
+                    {if $defaultWysiwygEditor eq 0}{$form.details.html|crmAddClass:huge}{else}{$form.details.html}{/if}
+                  </td>
+                </tr>
+              {/if}
+              <tr class="crm-case-activity-form-block-duration">
+                <td class="label">{$form.duration.label}</td>
+                <td class="view-value">
+                  {$form.duration.html}
+                  <span class="description">{ts}minutes{/ts}</span>
+                </td>
+              </tr>
+            </table>
+          </div><!-- /.crm-accordion-body -->
+        </div><!-- /.crm-accordion-wrapper -->
       </td>
     </tr>
     <tr class="crm-case-activity-form-block-attachment">
@@ -209,13 +240,6 @@
           </table>
         </div><!-- /.crm-accordion-body -->
       </div><!-- /.crm-accordion-wrapper -->
-    </td>
-  </tr>
-  <tr class="crm-case-activity-form-block-duration">
-    <td class="label">{$form.duration.label}</td>
-    <td class="view-value">
-      {$form.duration.html}
-      <span class="description">{ts}minutes{/ts}
     </td>
   </tr>
   {* Suppress activity status and priority for changes to status, case type and start date. PostProc will force status to completed. *}
