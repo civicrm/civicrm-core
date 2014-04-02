@@ -1818,12 +1818,15 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
               $this->check($checkId);
             }
           }
+          elseif ($elementType == 'select2') {
+            $this->select2($elementName, $entityData);
+          }
         }
 
         //checking for proper custom data which is loading through ajax
         $this->waitForElementPresent("xpath=//div[contains(@class, 'custom-group-{$customData['cgtitle']}')]",
           "The on the fly custom group has not been rendered for entity : {$entity} => {$entityData}");
-        $this->assertElementPresent("xpath=//div[contains(@class, 'custom-group-{$customData['cgtitle']}')]/[contains(@class, 'crm-accordion-body')]/table/tbody/tr/td[2]/input",
+        $this->assertElementPresent("xpath=//div[contains(@class, 'custom-group-{$customData['cgtitle']}')]/div[contains(@class, 'crm-accordion-body')]/table/tbody/tr/td[2]/input",
           "The on the fly custom group field is not present for entity : {$entity} => {$entityData}");
       }
     }
