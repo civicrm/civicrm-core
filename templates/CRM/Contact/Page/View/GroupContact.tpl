@@ -185,7 +185,7 @@
     // Handle enable/delete links
     var that;
     function refresh() {
-      $(that).closest('.crm-ajax-container, #crm-main-content-wrapper').crmSnippet().crmSnippet('refresh');
+      CRM.refreshParent(that);
     }
     function enableDisableGroup() {
       var params = {
