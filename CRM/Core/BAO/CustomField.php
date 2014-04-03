@@ -732,15 +732,6 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
     $search         = FALSE,
     $label          = NULL
   ) {
-    // we use $_POST directly, since we dont want to use session memory, CRM-4677
-    if (isset($_POST['_qf_Relationship_refresh']) &&
-      ($_POST['_qf_Relationship_refresh'] == 'Search' ||
-        $_POST['_qf_Relationship_refresh'] == 'Search Again'
-      )
-    ) {
-      $useRequired = FALSE;
-    }
-
     $field = self::getFieldObject($fieldId);
 
     // Custom field HTML should indicate group+field name
