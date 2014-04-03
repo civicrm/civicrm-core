@@ -55,17 +55,14 @@ class WebTest_Member_FixedMembershipTypeTest extends CiviSeleniumTestCase {
     $this->waitForElementPresent('_qf_MembershipType_cancel-bottom');
 
     $this->type('name', "Membership Type $title");
-    $this->type('member_of_contact', $title);
-    $this->click('member_of_contact');
-    $this->waitForElementPresent("css=div.ac_results-inner li");
-    $this->click("css=div.ac_results-inner li");
+    $this->select2('member_of_contact_id',$title);
 
     $this->type('minimum_fee', '100');
     $this->select( 'financial_type_id', 'value=2' );
     $this->type('duration_interval', 1);
     $this->select('duration_unit', "label=year");
 
-    $this->select('period_type', "label=fixed");
+    $this->select('period_type', "value=fixed");
     $this->waitForElementPresent('fixed_period_rollover_day[d]');
 
     // fixed period start set to April 1
@@ -77,7 +74,7 @@ class WebTest_Member_FixedMembershipTypeTest extends CiviSeleniumTestCase {
 
     $this->click('_qf_MembershipType_upload-bottom');
     $this->waitForElementPresent('link=Add Membership Type');
-    $this->assertTrue($this->isTextPresent("The membership type 'Membership Type $title' has been saved."));
+    $this->waitForText('crm-notification-container',"The membership type 'Membership Type $title' has been saved.");
 
     $this->openCiviPage("contact/add", "reset=1&ct=Individual");
 
@@ -213,10 +210,7 @@ SELECT end_event_adjust_interval
     $this->waitForElementPresent('_qf_MembershipType_cancel-bottom');
 
     $this->type('name', "Membership Type $title");
-    $this->type('member_of_contact', $title);
-    $this->click('member_of_contact');
-    $this->waitForElementPresent("css=div.ac_results-inner li");
-    $this->click("css=div.ac_results-inner li");
+    $this->select2('member_of_contact_id',$title);
 
     $this->type('minimum_fee', '100');
     $this->select( 'financial_type_id', 'value=2' );
@@ -224,7 +218,7 @@ SELECT end_event_adjust_interval
     $this->type('duration_interval', 2);
     $this->select('duration_unit', "label=year");
 
-    $this->select('period_type', "label=fixed");
+    $this->select('period_type', "value=fixed");
     $this->waitForElementPresent('fixed_period_rollover_day[d]');
 
     $this->select('fixed_period_start_day[M]', 'value=9');
@@ -235,7 +229,7 @@ SELECT end_event_adjust_interval
 
     $this->click('_qf_MembershipType_upload-bottom');
     $this->waitForElementPresent('link=Add Membership Type');
-    $this->assertTrue($this->isTextPresent("The membership type 'Membership Type $title' has been saved."));
+    $this->waitForText('crm-notification-container',"The membership type 'Membership Type $title' has been saved.");
 
     $this->openCiviPage("contact/add", "reset=1&ct=Individual");
 
@@ -373,17 +367,14 @@ SELECT end_event_adjust_interval
     $this->waitForElementPresent('_qf_MembershipType_cancel-bottom');
 
     $this->type('name', "Membership Type $title");
-    $this->type('member_of_contact', $title);
-    $this->click('member_of_contact');
-    $this->waitForElementPresent("css=div.ac_results-inner li");
-    $this->click("css=div.ac_results-inner li");
+    $this->select2('member_of_contact_id',$title);
 
     $this->type('minimum_fee', '100');
     $this->select( 'financial_type_id', 'value=2' );
     $this->type('duration_interval', 1);
     $this->select('duration_unit', "label=year");
 
-    $this->select('period_type', "label=fixed");
+    $this->select('period_type', "value=fixed");
     $this->waitForElementPresent('fixed_period_rollover_day[d]');
 
     $this->select('fixed_period_rollover_day[M]', 'value=10');
@@ -393,8 +384,8 @@ SELECT end_event_adjust_interval
 
     $this->click('_qf_MembershipType_upload-bottom');
     $this->waitForElementPresent('link=Add Membership Type');
-    $this->assertTrue($this->isTextPresent("The membership type 'Membership Type $title' has been saved."));
 
+    $this->waitForText('crm-notification-container',"The membership type 'Membership Type $title' has been saved.");
     $this->openCiviPage("contact/add", "reset=1&ct=Individual");
 
     $firstName = "John_" . substr(sha1(rand()), 0, 7);
@@ -525,17 +516,14 @@ SELECT end_event_adjust_interval
     $this->waitForElementPresent('_qf_MembershipType_cancel-bottom');
 
     $this->type('name', "Membership Type $title");
-    $this->type('member_of_contact', $title);
-    $this->click('member_of_contact');
-    $this->waitForElementPresent("css=div.ac_results-inner li");
-    $this->click("css=div.ac_results-inner li");
+    $this->select2('member_of_contact_id',$title);
 
     $this->type('minimum_fee', '100');
     $this->select( 'financial_type_id', 'value=2' );
     $this->type('duration_interval', 1);
     $this->select('duration_unit', "label=year");
 
-    $this->select('period_type', "label=fixed");
+    $this->select('period_type', "value=fixed");
     $this->waitForElementPresent('fixed_period_rollover_day[d]');
 
     $this->select('fixed_period_start_day[M]', 'value=1');
@@ -546,7 +534,7 @@ SELECT end_event_adjust_interval
 
     $this->click('_qf_MembershipType_upload-bottom');
     $this->waitForElementPresent('link=Add Membership Type');
-    $this->assertTrue($this->isTextPresent("The membership type 'Membership Type $title' has been saved."));
+    $this->waitForText('crm-notification-container',"The membership type 'Membership Type $title' has been saved.");
 
     $this->openCiviPage("contact/add", "reset=1&ct=Individual");
 
