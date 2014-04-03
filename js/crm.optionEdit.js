@@ -1,8 +1,7 @@
 // https://civicrm.org/licensing
-// Enable administrators to edit option lists in a dialog
 jQuery(function($) {
   $('body')
-    // Edit option lists
+    // Enable administrators to edit option lists in a dialog
     .on('click', 'a.crm-option-edit-link', CRM.popup)
     .on('crmPopupFormSuccess', 'a.crm-option-edit-link', function() {
       $(this).trigger('crmOptionsEdited');
