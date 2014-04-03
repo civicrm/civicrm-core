@@ -46,7 +46,7 @@
       if (url) {
         $el.select2('val', '');
         CRM.loadForm(url).on('crmFormSuccess', function() {
-          $el.closest('.crm-ajax-container, #crm-main-content-wrapper').crmSnippet().crmSnippet('refresh');
+          CRM.refreshParent($el);
         });
       }
     });

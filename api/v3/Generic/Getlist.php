@@ -113,8 +113,8 @@ function _civicrm_api3_generic_getList_defaults($entity, &$request) {
   }
   // When looking up a field e.g. displaying existing record
   if (!empty($request['id'])) {
-    if (is_string($request['id']) && strpos(',', $request['id'])) {
-      $request['id'] = explode(',', $request['id']);
+    if (is_string($request['id']) && strpos($request['id'], ',')) {
+      $request['id'] = explode(',', trim($request['id'], ', '));
     }
     // Don't run into search limits when prefilling selection
     unset($params['options']['limit'], $params['options']['offset'], $request['params']['options']['limit'], $request['params']['options']['offset']);
