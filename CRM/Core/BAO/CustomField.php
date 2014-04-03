@@ -753,7 +753,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
     if ($field->html_type == 'TextArea' && $search) {
       $field->html_type = 'Text';
     }
-    
+
     $placeholder = $search ? ts('- any -') : ($useRequired ? ts('- select -') : ts('- none -'));
 
     // FIXME: Why are select state/country separate widget types?
@@ -767,7 +767,9 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
       }
     }
     // Add data so popup link. Normally this is handled by CRM_Core_Form->addSelect
-    if (in_array($field->html_type, array('Select', 'Multi-Select')) && !$search && CRM_Core_Permission::check('administer CiviCRM')) {
+    //HR-322, For html type Select sometime we don't rely on $field->option_group_id but
+    //use customFieldOptions hook to populate options, so we include that on condition
+    if (in_array($field->html_type, array('Select', 'Multi-Select')) && $field->option_group_id && !$search && CRM_Core_Permission::check('administer CiviCRM')) {
       $selectAttributes += array(
         'data-api-entity' => 'contact', // FIXME: This works because the getoptions api isn't picky about custom fields, but it's WRONG
         'data-api-field' => 'custom_' . $field->id,
@@ -882,9 +884,14 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
         break;
 
       case 'Select':
-        $selectOption = &CRM_Core_BAO_CustomOption::valuesByID($field->id,
-          $field->option_group_id
-        );
+        if ($field->option_group_id) {
+          $selectOption = &CRM_Core_BAO_CustomOption::valuesByID($field->id,
+            $field->option_group_id
+          );
+        }
+        //HR-322, extend Select type custom field which use customFieldOptions hook to populate its option
+        CRM_Utils_Hook::customFieldOptions($field->id, $selectOption, FALSE, $selectAttributes);
+
         $qf->add('select', $elementName, $label,
           array('' => $placeholder) + $selectOption,
           $useRequired && !$search,
