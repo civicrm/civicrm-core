@@ -758,9 +758,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
       }
     }
     // Add data so popup link. Normally this is handled by CRM_Core_Form->addSelect
-    //HR-322, For html type Select sometime we don't rely on $field->option_group_id but
-    //use customFieldOptions hook to populate options, so we include that on condition
-    if (in_array($field->html_type, array('Select', 'Multi-Select')) && $field->option_group_id && !$search && CRM_Core_Permission::check('administer CiviCRM')) {
+    if ($field->option_group_id && !$search && in_array($field->html_type, array('Select', 'Multi-Select')) && CRM_Core_Permission::check('administer CiviCRM')) {
       $selectAttributes += array(
         'data-api-entity' => 'contact', // FIXME: This works because the getoptions api isn't picky about custom fields, but it's WRONG
         'data-api-field' => 'custom_' . $field->id,
@@ -853,7 +851,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
       case 'Radio':
         $choice = array();
         if ($field->data_type != 'Boolean') {
-          $customOption = &CRM_Core_BAO_CustomOption::valuesByID($field->id,
+          $customOption = CRM_Core_BAO_CustomOption::valuesByID($field->id,
             $field->option_group_id
           );
           foreach ($customOption as $v => $l) {
@@ -875,13 +873,9 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
         break;
 
       case 'Select':
-        if ($field->option_group_id) {
-          $selectOption = &CRM_Core_BAO_CustomOption::valuesByID($field->id,
-            $field->option_group_id
-          );
-        }
-        //HR-322, extend Select type custom field which use customFieldOptions hook to populate its option
-        CRM_Utils_Hook::customFieldOptions($field->id, $selectOption, FALSE, $selectAttributes);
+        $selectOption = CRM_Core_BAO_CustomOption::valuesByID($field->id,
+          $field->option_group_id
+        );
 
         $qf->add('select', $elementName, $label,
           array('' => $placeholder) + $selectOption,
@@ -893,7 +887,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
       //added for select multiple
 
       case 'AdvMulti-Select':
-        $selectOption = &CRM_Core_BAO_CustomOption::valuesByID($field->id,
+        $selectOption = CRM_Core_BAO_CustomOption::valuesByID($field->id,
           $field->option_group_id
         );
         if ($search &&
@@ -923,7 +917,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
         break;
 
       case 'Multi-Select':
-        $selectOption = &CRM_Core_BAO_CustomOption::valuesByID($field->id,
+        $selectOption = CRM_Core_BAO_CustomOption::valuesByID($field->id,
           $field->option_group_id
         );
         if ($search &&
@@ -1044,6 +1038,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
           $qf->addRule($elementName, ts('Select a valid contact for %1.', array(1 => $label)), 'validContact', $actualElementValue);
         }
         else {
+          // FIXME: This won't work with customFieldOptions hook
           $attributes = array();
           // Fixme: why is this a string in the first place???
           if ($field->attributes) {
