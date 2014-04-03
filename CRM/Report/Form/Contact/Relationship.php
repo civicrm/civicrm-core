@@ -38,6 +38,8 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
   protected $_summary = NULL;
   protected $_emailField_a = FALSE;
   protected $_emailField_b = FALSE;
+  protected $_phoneField_a = FALSE;
+  protected $_phoneField_b = FALSE;
   protected $_customGroupExtends = array(
     'Relationship');
   public $_drilldownReport = array('contact/detail' => 'Link to Detail Report');
@@ -143,6 +145,44 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
           'email_b' =>
           array('title' => ts('Email of Contact B'),
             'name' => 'email',
+          ),
+        ),
+        'grouping' => 'conact_b_fields',
+      ),
+      'civicrm_phone' =>
+      array(
+        'dao' => 'CRM_Core_DAO_Phone',
+        'alias' => 'phone_a',
+        'fields' =>
+        array(
+          'phone_a' => 
+          array(
+            'title' => ts('Phone of Contact A'),
+            'name' => 'phone',
+          ),
+          'phone_ext_a' =>   
+          array(
+            'title' => ts('Phone Extension of Contact A'),
+            'name' => 'phone_ext',
+          ),
+        ),
+        'grouping' => 'conact_a_fields',
+      ),
+      'civicrm_phone_b' =>
+      array(
+        'dao' => 'CRM_Core_DAO_Phone',
+        'alias' => 'phone_b',
+        'fields' =>
+        array(
+          'phone_b' =>   
+          array(
+            'title' => ts('Phone of Contact B'),
+            'name' => 'phone'
+          ),
+          'phone_ext_b' =>   
+          array(
+            'title' => ts('Phone Extension of Contact B'),
+            'name' => 'phone_ext'
           ),
         ),
         'grouping' => 'conact_b_fields',
@@ -275,6 +315,12 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
             if ($fieldName == 'email_b') {
               $this->_emailField_b = TRUE;
             }
+            if ($fieldName == 'phone_a'){
+              $this->_phoneField_a = TRUE;
+            }
+            if ($fieldName == 'phone_b'){
+              $this->_phoneField_b = TRUE;
+            }
             $select[] = "{$field['dbAlias']} as {$tableName}_{$fieldName}";
             $this->_columnHeaders["{$tableName}_{$fieldName}"]['type'] = CRM_Utils_Array::value('type', $field);
             $this->_columnHeaders["{$tableName}_{$fieldName}"]['title'] = CRM_Utils_Array::value('title', $field);
@@ -331,6 +377,21 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
                        ON ( {$this->_aliases['civicrm_contact_b']}.id =
                             {$this->_aliases['civicrm_email_b']}.contact_id AND
                             {$this->_aliases['civicrm_email_b']}.is_primary = 1 )";
+    }
+    // include Phone Field
+    if ($this->_phoneField_a) {
+      $this->_from .= "
+             LEFT JOIN civicrm_phone {$this->_aliases['civicrm_phone']}
+                       ON ( {$this->_aliases['civicrm_contact']}.id =
+                            {$this->_aliases['civicrm_phone']}.contact_id AND
+                            {$this->_aliases['civicrm_phone']}.is_primary = 1 )";
+    }
+    if ($this->_phoneField_b) {
+      $this->_from .= "
+             LEFT JOIN civicrm_phone {$this->_aliases['civicrm_phone_b']}
+                       ON ( {$this->_aliases['civicrm_contact_b']}.id =
+                            {$this->_aliases['civicrm_phone_b']}.contact_id AND
+                            {$this->_aliases['civicrm_phone_b']}.is_primary = 1 )";
     }
   }
 
