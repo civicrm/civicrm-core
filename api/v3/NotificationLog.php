@@ -5,12 +5,19 @@
  */
 function civicrm_api3_notification_log_retry($params) {
   if(!empty($params['id'])) {
-    $raw = array(CRM_Core_DAO::singleValueQuery("SELECT message_raw FROM civicrm_notification_log
-      WHERE id = %1", array(1 => array($params['id'], 'Integer'))));
+    $raw = CRM_Core_DAO::executeQuery("SELECT message_raw, message_type FROM civicrm_notification_log
+      WHERE id = %1", array(1 => array($params['id'], 'Integer')));
   }
-  foreach ($raw as $ipnData) {
-    $payPal = new CRM_Core_Payment_PayPalProIPN(json_decode($ipnData, TRUE));
-    $payPal->main();
+  while ($raw->fetch()) {
+    if($raw->message_type == 'authorize.net') {
+      print_r(json_decode($raw->message_raw, TRUE));
+      $anet = new CRM_Core_Payment_AuthorizeNetIPN2(json_decode($raw->message_raw, TRUE));
+      $anet->main();
+    }
+    else {
+      $payPal = new CRM_Core_Payment_PayPalProIPN(json_decode($raw->message_raw, TRUE));
+      $payPal->main();
+    }
   }
 }
 
