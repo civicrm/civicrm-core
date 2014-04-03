@@ -105,7 +105,6 @@
       return false;
     });
   });
-  cj().crmAccordions();
 </script>
 {/literal}
 </div>

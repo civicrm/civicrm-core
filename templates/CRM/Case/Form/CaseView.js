@@ -207,6 +207,7 @@
         dialog = CRM.confirm({
           title: $(this).attr('title') || $(this).text(),
           message: detached[target],
+          resizable: true,
           open: miniForms[target].pre
         })
           .on('dialogclose', function() {
@@ -215,8 +216,6 @@
           .on('crmConfirm:yes', submit);
         e.preventDefault();
       });
-
-    $().crmAccordions();
 
     // Keep the state of accordions when refreshing
     var accordionStates = [];

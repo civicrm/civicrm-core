@@ -120,6 +120,8 @@ class WebTest_Profile_ProfileAddTest extends CiviSeleniumTestCase {
   function testProfileAddContactstoGroup() {
     $this->webtestLogin();
 
+    $permissions = array("edit-1-profile-listings-and-forms");
+    $this->changePermissions($permissions);
     // take group name and create group
     $groupName = 'group_' . substr(sha1(rand()), 0, 7);
     $this->WebtestAddGroup($groupName);
@@ -135,6 +137,7 @@ class WebTest_Profile_ProfileAddTest extends CiviSeleniumTestCase {
     $profileTitle = 'profile_' . substr(sha1(rand()), 0, 7);
     $this->type('title', $profileTitle);
 
+    $this->click('uf_group_type_Profile');
     //Profile Advance Settings
     $this->click("//form[@id='Group']/div[2]/div[2]/div[1]");
 
@@ -188,8 +191,8 @@ class WebTest_Profile_ProfileAddTest extends CiviSeleniumTestCase {
     $this->type('title', $groupName);
     $this->click('_qf_Search_refresh');
     $this->waitForVisible('crm-group-selector_processing');
-    $this->waitForElementPresent("xpath=//table[@id='crm-group-selector']/tbody/tr/td[contains(text(), '$groupName')]/following-sibling::td[@class='crm-group-group_links']/span/a");
-    $this->clickLink("xpath=//table[@id='crm-group-selector']/tbody/tr/td[1][text()= '$groupName']/following-sibling::td[@class='crm-group-group_links']/span/a");
+    $this->waitForElementPresent("xpath=//table[@id='crm-group-selector']/tbody/tr/td[contains(., '$groupName')]/following-sibling::td[@class='crm-group-group_links']/span/a");
+    $this->clickLink("xpath=//table[@id='crm-group-selector']/tbody/tr/td[1][contains(., '$groupName')]/following-sibling::td[@class='crm-group-group_links']/span/a");
     $contactEmails = array(
       1 => "$lastName1, $firstName1",
       2 => "$lastName2, $firstName2"

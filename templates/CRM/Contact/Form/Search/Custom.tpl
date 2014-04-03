@@ -132,9 +132,6 @@
 {/if}
 {literal}
 <script type="text/javascript">
-CRM.$(function($) {
-   cj().crmAccordions();
-});
 
 function toggleContactSelection( name, qfKey, selection ){
   var Url  = "{/literal}{crmURL p='civicrm/ajax/markSelection' h=0}{literal}";

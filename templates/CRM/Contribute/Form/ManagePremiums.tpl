@@ -172,8 +172,6 @@ function add_upload_file_block(parms) {
   }
 }
 
-cj().crmAccordions();
-
 {/literal}
 </script>
 

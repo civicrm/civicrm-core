@@ -246,7 +246,7 @@ CRM.validate = CRM.validate || {
     return $(this).each(function () {
       var
         $el = $(this),
-        defaults = {allowClear: !$el.hasClass('required')};
+        settings = {allowClear: !$el.hasClass('required')};
       // quickform doesn't support optgroups so here's a hack :(
       $('option[value^=crm_optgroup]', this).each(function () {
         $(this).nextUntil('option[value^=crm_optgroup]').wrapAll('<optgroup label="' + $(this).text() + '" />');
@@ -254,12 +254,16 @@ CRM.validate = CRM.validate || {
       });
       // Defaults for single-selects
       if ($el.is('select:not([multiple])')) {
-        defaults.minimumResultsForSearch = 10;
+        settings.minimumResultsForSearch = 10;
         if ($('option:first', this).val() === '') {
-          defaults.placeholderOption = 'first';
+          settings.placeholderOption = 'first';
         }
       }
-      $el.select2($.extend(defaults, $el.data('select-params') || {}, options || {}));
+      $.extend(settings, $el.data('select-params') || {}, options || {});
+      if (settings.ajax) {
+        $el.addClass('crm-ajax-select');
+      }
+      $el.select2(settings);
     });
   };
 
@@ -279,7 +283,7 @@ CRM.validate = CRM.validate || {
       $el.data('select-params', $.extend({}, $el.data('select-params') || {}, options.select));
       $el.data('api-params', $.extend({}, $el.data('api-params') || {}, options.api));
       $el.data('create-links', options.create || $el.data('create-links'));
-      $el.addClass('crm-ajax-select crm-' + entity + '-ref');
+      $el.addClass('crm-form-entityref crm-' + entity + '-ref');
       var settings = {
         // Use select2 ajax helper instead of CRM.api because it provides more value
         ajax: {
@@ -418,14 +422,36 @@ CRM.validate = CRM.validate || {
       $('.crm-select2:not(.select2-offscreen, .select2-container)', e.target).crmSelect2();
       $('.crm-form-entityref:not(.select2-offscreen, .select2-container)', e.target).crmEntityRef();
     })
-    // Modal dialogs should disable scrollbars
     .on('dialogopen', function(e) {
-      if ($(e.target).dialog('option', 'modal')) {
-        $(e.target).addClass('modal-dialog');
+      var $el = $(e.target);
+      // Modal dialogs should disable scrollbars
+      if ($el.dialog('option', 'modal')) {
+        $el.addClass('modal-dialog');
         $('body').css({overflow: 'hidden'});
+      }
+      $el.parent().find('.ui-dialog-titlebar-close').attr('title', ts('Close'));
+      // Add resize button
+      if ($el.parent().hasClass('crm-container') && $el.dialog('option', 'resizable')) {
+        $el.parent().find('.ui-dialog-titlebar').append($('<button class="crm-dialog-titlebar-resize ui-dialog-titlebar-close" title="'+ts('Toggle fullscreen')+'" style="right:2em;"/>').button({icons: {primary: 'ui-icon-newwin'}, text: false}));
+        $('.crm-dialog-titlebar-resize', $el.parent()).click(function(e) {
+          if ($el.data('origSize')) {
+            $el.dialog('option', $el.data('origSize'));
+            $el.data('origSize', null);
+          } else {
+            $el.data('origSize', {
+              position: 'center',
+              width: $el.dialog('option', 'width'),
+              height: $el.dialog('option', 'height')
+            });
+            var menuHeight = $('#civicrm-menu').height();
+            $el.dialog('option', {width: '100%', height: ($(window).height() - menuHeight), position: [0, menuHeight]});
+          }
+          e.preventDefault();
+        });
       }
     })
     .on('dialogclose', function(e) {
+      // Restore scrollbars when closing modal
       if ($('.ui-dialog .modal-dialog').not(e.target).length < 1) {
         $('body').css({overflow: ''});
       }
@@ -638,6 +664,7 @@ CRM.validate = CRM.validate || {
       message: ts('Are you sure you want to continue?'),
       width: 'auto',
       modal: true,
+      resizable: false,
       dialogClass: 'crm-container crm-confirm',
       close: function () {
         $(this).dialog('destroy').remove();
@@ -781,6 +808,7 @@ CRM.validate = CRM.validate || {
       .on('click', 'a.crm-image-popup', function(e) {
         CRM.confirm({
           title: ts('Preview'),
+          resizable: true,
           message: '<div class="crm-custom-image-popup"><img src=' + $(this).attr('href') + '></div>',
           options: null
         });
@@ -802,31 +830,34 @@ CRM.validate = CRM.validate || {
       })
       .on('change', 'input.crm-form-radio:checked', function() {
         $(this).siblings('.crm-clear-link').css({visibility: ''});
+      })
+
+      // Allow normal clicking of links within accordions
+      .on('click.crmAccordions', 'div.crm-accordion-header a', function (e) {
+        e.stopPropagation();
+      })
+      // Handle accordions
+      .on('click.crmAccordions', '.crm-accordion-header, .crm-collapsible .collapsible-title', function (e) {
+        if ($(this).parent().hasClass('collapsed')) {
+          $(this).next().css('display', 'none').slideDown(200);
+        }
+        else {
+          $(this).next().css('display', 'block').slideUp(200);
+        }
+        $(this).parent().toggleClass('collapsed');
+        e.preventDefault();
       });
 
     $().crmtooltip();
   });
-
-  $.fn.crmAccordions = function (speed) {
-    var container = $(this).length > 0 ? $(this) : $('.crm-container');
-    speed = speed === undefined ? 200 : speed;
-    container
-      .off('click.crmAccordions')
-      // Allow normal clicking of links
-      .on('click.crmAccordions', 'div.crm-accordion-header a', function (e) {
-        e.stopPropagation && e.stopPropagation();
-      })
-      .on('click.crmAccordions', '.crm-accordion-header, .crm-collapsible .collapsible-title', function () {
-        if ($(this).parent().hasClass('collapsed')) {
-          $(this).next().css('display', 'none').slideDown(speed);
-        }
-        else {
-          $(this).next().css('display', 'block').slideUp(speed);
-        }
-        $(this).parent().toggleClass('collapsed');
-        return false;
-      });
-  };
+  /**
+   * @deprecated
+   */
+  $.fn.crmAccordions = function () {};
+  /**
+   * Collapse or expand an accordion
+   * @param speed
+   */
   $.fn.crmAccordionToggle = function (speed) {
     $(this).each(function () {
       if ($(this).hasClass('collapsed')) {

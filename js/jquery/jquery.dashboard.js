@@ -411,7 +411,7 @@
         if (!widget.fullscreenUrl) {
           return;
         }
-        CRM.loadPage(widget.fullscreenUrl).crmAccordions();
+        CRM.loadPage(widget.fullscreenUrl);
       };
       
       // Exit fullscreen mode.
@@ -452,19 +452,19 @@
       // Default controls.  External script can add more with widget.addControls()
       widget.controls = {
         settings: {
-          description: 'Configure this dashlet',
+          description: ts('Configure this dashlet'),
           callback: widget.toggleSettings
         },
         minimize: {
-          description: 'Collapse or expand this dashlet',
+          description: ts('Collapse or expand'),
           callback: widget.toggleMinimize
         },
         fullscreen: {
-          description: 'View this dashlet in full screen mode',
+          description: ts('View fullscreen'),
           callback: widget.enterFullscreen
         },
         close: {
-          description: 'Remove this dashlet from your dashboard',
+          description: ts('Remove from dashboard'),
           callback: widget.remove
         }
       };
@@ -600,9 +600,9 @@
   // Public static properties of dashboard.  Default settings.
   $.fn.dashboard.defaults = {
     columns: 2,
-    emptyPlaceholderInner: 'There are no dashlets in this column of your dashboard.',
-    fullscreenHeaderInner: 'Back to dashboard mode',
-    throbberMarkup: '<div class="crm-loading-element">Loading...</div>',
+    emptyPlaceholderInner: ts('There are no dashlets in this column of your dashboard.'),
+    fullscreenHeaderInner: ts('Back to dashboard mode'),
+    throbberMarkup: '<div class="crm-loading-element">' + ts('Loading') + '...</div>',
     animationSpeed: 200,
     callbacks: {},
     widgetCallbacks: {}

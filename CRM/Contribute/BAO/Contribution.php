@@ -318,10 +318,10 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
     }
 
     // Handle soft credit and / or link to personal campaign page
-    list($type, $softIDs) = CRM_Contribute_BAO_ContributionSoft::getSoftCreditType($contribution->id);
+    $softIDs = CRM_Contribute_BAO_ContributionSoft::getSoftCreditIds($contribution->id);
     if ($pcp = CRM_Utils_Array::value('pcp', $params)) {
-      if (!empty($type) && $type == 'soft') {
-        $deleteParams = array('contribution_id' => $contribution->id);
+      if ($pcpId = CRM_Contribute_BAO_ContributionSoft::getSoftCreditIds($contribution->id, TRUE)) {
+        $deleteParams = array('id' => $pcpId);
         CRM_Contribute_BAO_ContributionSoft::del($deleteParams);
       }
       $softParams = array();
@@ -338,7 +338,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
       $softParams['soft_credit_type_id'] = CRM_Core_OptionGroup::getValue('soft_credit_type', 'pcp', 'name');
       CRM_Contribute_BAO_ContributionSoft::add($softParams);
     }
-    elseif (isset($params['soft_credit'])) {
+    if (isset($params['soft_credit'])) {
       $softParams = $params['soft_credit'];
 
       if (!empty($softIDs)) {
@@ -1548,7 +1548,9 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
               $dates['end_date'],
               $dates['join_date'],
               'today',
-              TRUE
+              TRUE,
+              $membership->membership_type_id,
+              (array) $membership
             );
 
             $formattedParams = array(

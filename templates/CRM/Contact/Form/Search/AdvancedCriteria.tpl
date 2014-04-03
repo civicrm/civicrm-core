@@ -27,7 +27,6 @@
 {literal}
 <script type="text/javascript">
 CRM.$(function($) {
-  $().crmAccordions();
   // Bind first click of accordion header to load crm-accordion-body with snippet
   // everything else is taken care of by crmAccordions()
   $('.crm-search_criteria_basic-accordion .crm-accordion-header').addClass('active');

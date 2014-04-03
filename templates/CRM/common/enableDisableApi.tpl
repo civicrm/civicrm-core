@@ -27,7 +27,7 @@
 {literal}
 <script type="text/javascript">
   CRM.$(function($) {
-    var $row, $table, info, enabled, fieldLabel;
+    var $row, info, enabled, fieldLabel;
 
     function successMsg() {
       {/literal} {* client-side variable substitutions in smarty are AWKWARD! *}
@@ -36,21 +36,11 @@
     }
 
     function refresh() {
-      // Call native refresh method on ajax datatables
-      if ($.fn.DataTable.fnIsDataTable($table[0]) && $table.dataTable().fnSettings().sAjaxSource) {
-        $.each($.fn.dataTable.fnTables(), function() {
-          $(this).dataTable().fnSettings().sAjaxSource && $(this).unblock().dataTable().fnDraw();
-        });
-      }
-      // Otherwise refresh the content area using crmSnippet
-      else {
-        $row.closest('.crm-ajax-container, #crm-main-content-wrapper').crmSnippet().crmSnippet('refresh');
-      }
+      CRM.refreshParent($row);
     }
 
     function save() {
-      $table = $row.closest('table');
-      $table.block();
+      $row.closest('table').block();
       CRM.api3(info.entity, 'setvalue', {id: info.id, field: 'is_active', value: enabled ? 0 : 1}, {success: successMsg}).done(refresh);
       if (enabled) {
         $(this).dialog('close');

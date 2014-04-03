@@ -366,7 +366,9 @@
             $el.trigger('crmFormSuccess', response);
             // Reset form for e.g. "save and new"
             if (response.userContext && settings.refreshAction && $.inArray(response.buttonName, settings.refreshAction) >= 0) {
-              $el.crmSnippet('option', 'url', response.userContext).crmSnippet('refresh');
+              // Force reset of original url
+              $el.data('civiCrmSnippet')._originalUrl = response.userContext;
+              $el.crmSnippet('resetUrl').crmSnippet('refresh');
             }
             else if ($el.data('uiDialog') && settings.autoClose) {
               $el.dialog('close');
@@ -408,14 +410,14 @@
    * Handler for jQuery click event e.g. $('a').click(CRM.popup)
    * @returns {boolean}
    */
-  CRM.popup = function() {
+  CRM.popup = function(e) {
     var $el = $(this).first(),
       url = $el.attr('href'),
       popup = $el.data('popup-type') === 'page' ? CRM.loadPage : CRM.loadForm,
       settings = $el.data('popup-settings') || {},
-      triggers = {dialogclose: 'crmPopupClose', crmLoad: 'crmPopupLoad', crmFormSuccess: 'crmPopupFormSuccess'};
+      formSuccess = false;
     settings.dialog = settings.dialog || {};
-    if (!CRM.config.ajaxPopupsEnabled || !url || $el.is(exclude)) {
+    if (e.isDefaultPrevented() || !CRM.config.ajaxPopupsEnabled || !url || $el.is(exclude)) {
       return;
     }
     // Sized based on css class
@@ -432,12 +434,37 @@
     var dialog = popup(url, settings);
     // Trigger events from the dialog on the original link element
     $el.trigger('crmPopupOpen', [dialog]);
-    $.each(triggers, function(event, target) {
-      dialog.on(event, function(e, data) {
-        $el.trigger(target, [dialog, data]);
-      });
+    // Listen for success events and buffer them so we only trigger once
+    dialog.on('crmFormSuccess.crmPopup crmPopupFormSuccess.crmPopup', function() {
+      formSuccess = true;
     });
-    return false;
+    dialog.on('dialogclose.crmPopup', function(e, data) {
+      if (formSuccess) {
+        $el.trigger('crmPopupFormSuccess', [dialog, data]);
+      }
+      $el.trigger('crmPopupClose', [dialog, data]);
+    });
+    e.preventDefault();
+  };
+  /**
+   * An event callback for CRM.popup or a standalone function to refresh the content around a popup link
+   * @param e event|selector
+   */
+  CRM.refreshParent = function(e) {
+    // Use e.target if input smells like an event, otherwise assume it's a jQuery selector
+    var $el = (e.stopPropagation && e.target) ? $(e.target) : $(e),
+      $table = $el.closest('.dataTable');
+    // Call native refresh method on ajax datatables
+    if ($table && $.fn.DataTable.fnIsDataTable($table[0]) && $table.dataTable().fnSettings().sAjaxSource) {
+      // Refresh ALL datatables - needed for contact relationship tab
+      $.each($.fn.dataTable.fnTables(), function() {
+        $(this).dataTable().fnSettings().sAjaxSource && $(this).unblock().dataTable().fnDraw();
+      });
+    }
+    // Otherwise refresh the nearest crmSnippet
+    else {
+      $el.closest('.crm-ajax-container, #crm-main-content-wrapper').crmSnippet().crmSnippet('refresh');
+    }
   };
 
   $(function($) {

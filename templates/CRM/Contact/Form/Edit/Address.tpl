@@ -109,11 +109,3 @@ function checkLocation( object, noAlert ) {
 }
 </script>
 {/literal}
-{literal}
-<script type="text/javascript">
-CRM.$(function($) {
-   cj().crmAccordions();
-});
-</script>
-{/literal}
-

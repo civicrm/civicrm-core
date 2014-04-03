@@ -317,10 +317,15 @@ class CRM_Profile_Page_MultipleRecordFieldsListing extends CRM_Core_Page_Basic {
                 $actionParams['newCgCount'] = $newCgCount;
 
                 // DELETE action links
-                $redirectUrl = CRM_Core_Session::singleton()->readUserContext();
+                $deleteData = array(
+                  'valueID' => $recId,
+                  'groupID' => $this->_customGroupId,
+                  'contactId' => $this->_contactId,
+                  'key' => CRM_Core_Key::get('civicrm/ajax/customvalue'),
+                );
                 $links[CRM_Core_Action::DELETE]['url'] = '#';
-                $links[CRM_Core_Action::DELETE]['extra'] = " onclick=' var ru = \"{$redirectUrl}\"; showDeleteInDialog({$recId}, {$this->_customGroupId}, {$this->_contactId}, ru)' ";
-                $links[CRM_Core_Action::DELETE]['class'] = 'ignore-jshref';
+                $links[CRM_Core_Action::DELETE]['extra'] = ' data-delete_params="'. htmlspecialchars(json_encode($deleteData)) .'"';
+                $links[CRM_Core_Action::DELETE]['class'] = 'delete-custom-row';
               }
               if (!empty($pageCheckSum)) {
                 $actionParams['cs'] = $pageCheckSum;
