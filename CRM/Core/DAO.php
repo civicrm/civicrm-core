@@ -1361,12 +1361,18 @@ SELECT contact_id
               break;
 
             case CRM_Utils_Type::T_DATE:
-            case CRM_Utils_Type::T_TIMESTAMP:
-            case CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME:
               $object->$dbName = '19700101';
               if($dbName == 'end_date') {
                 // put this in the future
                 $object->$dbName = '20200101';
+              }
+              break;
+            case CRM_Utils_Type::T_TIMESTAMP:
+            case CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME:
+              $object->$dbName = '19700101010101';
+              if($dbName == 'end_date') {
+                // put this in the future
+                $object->$dbName = '20200101010101';
               }
               break;
 
