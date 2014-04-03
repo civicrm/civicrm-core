@@ -437,6 +437,7 @@ class CRM_Contribute_DAO_ContributionPage extends CRM_Core_DAO
         'financial_type_id' => array(
           'name' => 'financial_type_id',
           'type' => CRM_Utils_Type::T_INT,
+          'title' => ts('Financial Type') ,
           'FKClassName' => 'CRM_Financial_DAO_FinancialType',
           'pseudoconstant' => array(
             'table' => 'civicrm_financial_type',
