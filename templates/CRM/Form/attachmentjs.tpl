@@ -1,7 +1,7 @@
 <script type="text/javascript">
 {literal}
   CRM.$(function($) {
-    $('a.delete-attachment').click(function() {
+    $('a.delete-attachment').click(function(e) {
       var $el = $(this),
         $row = $el.closest('.crm-attachment-wrapper'),
         msg = '{/literal}{ts escape="js" 1="%1"}This will immediately delete the file %1. This action cannot be undone.{/ts}{literal}';
@@ -13,10 +13,11 @@
         var request = $.post(postUrl, $el.data('args'));
         CRM.status({success: '{/literal}{ts escape="js"}Removed{/ts}{literal}'}, request);
         request.done(function() {
+          $el.trigger('crmPopupFormSuccess');
           $row.remove();
         });
       });
-      return false;
+      e.preventDefault();
     });
   });
 {/literal}
