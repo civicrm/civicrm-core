@@ -105,6 +105,7 @@ class CRM_Core_BAO_CustomQuery {
   /**
    * This stores custom data group types and tables that it extends
    *
+   * @todo add comments explaining why survey & campaign are missing from this
    * @var array
    * @static
    */
@@ -135,7 +136,8 @@ class CRM_Core_BAO_CustomQuery {
    * @param  array  $ids     the set of custom field ids
    *
    * @access public
-   */ function __construct($ids, $contactSearch = FALSE) {
+   */
+  function __construct($ids, $contactSearch = FALSE) {
     $this->_ids = &$ids;
 
     $this->_select      = array();
@@ -268,48 +270,32 @@ SELECT label, value
       $this->_select[$fieldName] = "{$field['table_name']}.{$field['column_name']} as $fieldName";
       $this->_element[$fieldName] = 1;
       $joinTable = NULL;
-      if ($field['extends'] == 'civicrm_contact') {
+      // CRM-14265
+      if ($field['extends'] == 'civicrm_group') {
+        return;
+      }
+      elseif ($field['extends'] == 'civicrm_contact') {
         $joinTable = 'contact_a';
       }
       elseif ($field['extends'] == 'civicrm_contribution') {
-        $joinTable = 'civicrm_contribution';
+        $joinTable = $field['extends'];
       }
-      elseif ($field['extends'] == 'civicrm_participant') {
-        $joinTable = 'civicrm_participant';
+      elseif (in_array($field['extends'], self::$extendsMap)) {
+        $joinTable = $field['extends'];
       }
-      elseif ($field['extends'] == 'civicrm_membership') {
-        $joinTable = 'civicrm_membership';
-      }
-      elseif ($field['extends'] == 'civicrm_pledge') {
-        $joinTable = 'civicrm_pledge';
-      }
-      elseif ($field['extends'] == 'civicrm_activity') {
-        $joinTable = 'civicrm_activity';
-      }
-      elseif ($field['extends'] == 'civicrm_relationship') {
-        $joinTable = 'civicrm_relationship';
-      }
-      elseif ($field['extends'] == 'civicrm_grant') {
-        $joinTable = 'civicrm_grant';
-      }
-      elseif ($field['extends'] == 'civicrm_address') {
-        $joinTable = 'civicrm_address';
-      }
-      elseif ($field['extends'] == 'civicrm_case') {
-        $joinTable = 'civicrm_case';
+      else {
+        return;
       }
 
-      if ($joinTable) {
-        $this->_tables[$name] = "\nLEFT JOIN $name ON $name.entity_id = $joinTable.id";
-        if ($this->_ids[$id]) {
-          $this->_whereTables[$name] = $this->_tables[$name];
-        }
-        if ($joinTable != 'contact_a') {
-          $this->_whereTables[$joinTable] = $this->_tables[$joinTable] = 1;
-        }
-        elseif ($this->_contactSearch) {
-          CRM_Contact_BAO_Query::$_openedPanes[ts('Custom Fields')] = TRUE;
-        }
+      $this->_tables[$name] = "\nLEFT JOIN $name ON $name.entity_id = $joinTable.id";
+      if ($this->_ids[$id]) {
+        $this->_whereTables[$name] = $this->_tables[$name];
+      }
+      if ($joinTable != 'contact_a') {
+        $this->_whereTables[$joinTable] = $this->_tables[$joinTable] = 1;
+      }
+      elseif ($this->_contactSearch) {
+        CRM_Contact_BAO_Query::$_openedPanes[ts('Custom Fields')] = TRUE;
       }
     }
   }
