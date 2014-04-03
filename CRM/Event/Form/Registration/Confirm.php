@@ -288,73 +288,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
     }
 
     //display additional participants profile.
-    $participantParams = $this->_params;
-    $formattedValues = $profileFields = array();
-    $count             = 1;
-    foreach ($participantParams as $participantNum => $participantValue) {
-      if ($participantNum) {
-          $prefix1 = 'additional';
-          $prefix2 = 'additional_';
-      } else {
-          $prefix1 = '';
-          $prefix2 = '';
-      }
-      if ($participantValue != 'skip') {
-        //get the customPre profile info
-        if (!empty($this->_values[$prefix2 . 'custom_pre_id'])) {
-          $values = $groupName = array();
-          CRM_Event_BAO_Event::displayProfile($participantValue,
-            $this->_values[ $prefix2 . 'custom_pre_id'],
-            $groupName,
-            $values,
-            $profileFields
-          );
-
-          if (count($values)) {
-            $formattedValues[$count][$prefix1 . 'CustomPre'] = $values;
-          }
-          $formattedValues[$count][$prefix1 . 'CustomPreGroupTitle'] = CRM_Utils_Array::value('groupTitle', $groupName);
-        }
-        //get the customPost profile info
-        if (!empty($this->_values[$prefix2 . 'custom_post_id'])) {
-          $values = $groupName = array();
-          foreach ($this->_values[$prefix2 . 'custom_post_id'] as $gids) {
-            $val = array();
-            CRM_Event_BAO_Event::displayProfile($participantValue,
-              $gids,
-              $group,
-              $val,
-              $profileFields
-            );
-            $values[$gids] = $val;
-            $groupName[$gids] = $group;
-          }
-
-          if (count($values)) {
-            $formattedValues[$count][$prefix1 . 'CustomPost'] = $values;
-          }
-
-          if (isset($formattedValues[$count][$prefix1 . 'CustomPre'])) {
-            $formattedValues[$count][$prefix1 . 'CustomPost'] = array_diff_assoc($formattedValues[$count][$prefix1 . 'CustomPost'],
-              $formattedValues[$count][$prefix1 . 'CustomPre']
-            );
-          }
-
-          $formattedValues[$count][$prefix1 . 'CustomPostGroupTitle'] = $groupName;
-        }
-        $count++;
-      }
-      $this->_fields = $profileFields;
-    }
-    if (!empty($formattedValues) ) {
-      $this->assign('primaryParticipantProfile', $formattedValues[1]);
-      $this->set('primaryParticipantProfile',    $formattedValues[1]);
-      if ($count > 2) {
-        unset($formattedValues[1]);
-        $this->assign('addParticipantProfile', $formattedValues);
-        $this->set('addParticipantProfile',    $formattedValues);
-      }
-    }
+    self::assignProfiles($this);
 
     //consider total amount.
     $this->assign('isAmountzero', ($this->_totalAmount <= 0) ? TRUE : FALSE);
@@ -1126,5 +1060,83 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
     }
 
     return $contactID;
+  }
+
+  public static function assignProfiles(&$form) {
+    $addParticipantProfile = $form->get('addParticipantProfile');
+    $primaryParticipantProfile = $form->get('primaryParticipantProfile');
+    if (!empty($addParticipantProfile) || !empty($primaryParticipantProfile)) {
+      $form->assign('addParticipantProfile', $addParticipantProfile);
+      $form->assign('primaryParticipantProfile', $primaryParticipantProfile);
+      return;
+    }
+
+    $participantParams = $form->_params;
+    $formattedValues = $profileFields = array();
+    $count             = 1;
+    foreach ($participantParams as $participantNum => $participantValue) {
+      if ($participantNum) {
+          $prefix1 = 'additional';
+          $prefix2 = 'additional_';
+      } else {
+          $prefix1 = '';
+          $prefix2 = '';
+      }
+      if ($participantValue != 'skip') {
+        //get the customPre profile info
+        if (!empty($form->_values[$prefix2 . 'custom_pre_id'])) {
+          $values = $groupName = array();
+          CRM_Event_BAO_Event::displayProfile($participantValue,
+            $form->_values[ $prefix2 . 'custom_pre_id'],
+            $groupName,
+            $values,
+            $profileFields
+          );
+
+          if (count($values)) {
+            $formattedValues[$count][$prefix1 . 'CustomPre'] = $values;
+          }
+          $formattedValues[$count][$prefix1 . 'CustomPreGroupTitle'] = CRM_Utils_Array::value('groupTitle', $groupName);
+        }
+        //get the customPost profile info
+        if (!empty($form->_values[$prefix2 . 'custom_post_id'])) {
+          $values = $groupName = array();
+          foreach ($form->_values[$prefix2 . 'custom_post_id'] as $gids) {
+            $val = array();
+            CRM_Event_BAO_Event::displayProfile($participantValue,
+              $gids,
+              $group,
+              $val,
+              $profileFields
+            );
+            $values[$gids] = $val;
+            $groupName[$gids] = $group;
+          }
+
+          if (count($values)) {
+            $formattedValues[$count][$prefix1 . 'CustomPost'] = $values;
+          }
+
+          if (isset($formattedValues[$count][$prefix1 . 'CustomPre'])) {
+            $formattedValues[$count][$prefix1 . 'CustomPost'] = array_diff_assoc($formattedValues[$count][$prefix1 . 'CustomPost'],
+              $formattedValues[$count][$prefix1 . 'CustomPre']
+            );
+          }
+
+          $formattedValues[$count][$prefix1 . 'CustomPostGroupTitle'] = $groupName;
+        }
+        $count++;
+      }
+      $form->_fields = $profileFields;
+    }
+    if (!empty($formattedValues) ) {
+      $form->assign('primaryParticipantProfile', $formattedValues[1]);
+      $form->set('primaryParticipantProfile',    $formattedValues[1]);
+      if ($count > 2) {
+        unset($formattedValues[1]);
+        $form->assign('addParticipantProfile', $formattedValues);
+        $form->set('addParticipantProfile',    $formattedValues);
+      }
+    }
   }
 }
