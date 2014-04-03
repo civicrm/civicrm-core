@@ -181,6 +181,11 @@ class CRM_Core_DAO_IM extends CRM_Core_DAO
           'name' => 'location_type_id',
           'type' => CRM_Utils_Type::T_INT,
           'title' => ts('IM Location Type') ,
+          'pseudoconstant' => array(
+            'table' => 'civicrm_location_type',
+            'keyColumn' => 'id',
+            'labelColumn' => 'display_name',
+          )
         ) ,
         'name' => array(
           'name' => 'name',

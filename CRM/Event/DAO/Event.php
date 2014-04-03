@@ -507,7 +507,7 @@ class CRM_Event_DAO_Event extends CRM_Core_DAO
         'id' => array(
           'name' => 'id',
           'type' => CRM_Utils_Type::T_INT,
-          'title' => ts('Event ID') ,
+          'title' => ts('Event') ,
           'required' => true,
         ) ,
         'event_title' => array(
@@ -539,7 +539,7 @@ class CRM_Event_DAO_Event extends CRM_Core_DAO
         'event_type_id' => array(
           'name' => 'event_type_id',
           'type' => CRM_Utils_Type::T_INT,
-          'title' => ts('Event Type ID') ,
+          'title' => ts('Event Type') ,
           'pseudoconstant' => array(
             'optionGroupName' => 'event_type',
           )
@@ -547,7 +547,10 @@ class CRM_Event_DAO_Event extends CRM_Core_DAO
         'participant_listing_id' => array(
           'name' => 'participant_listing_id',
           'type' => CRM_Utils_Type::T_INT,
-          'title' => ts('Participant Listing ID') ,
+          'title' => ts('Participant Listing') ,
+          'pseudoconstant' => array(
+            'optionGroupName' => 'participant_listing',
+          )
         ) ,
         'is_public' => array(
           'name' => 'is_public',
@@ -618,7 +621,7 @@ class CRM_Event_DAO_Event extends CRM_Core_DAO
         'financial_type_id' => array(
           'name' => 'financial_type_id',
           'type' => CRM_Utils_Type::T_INT,
-          'title' => ts('Financial Type ID') ,
+          'title' => ts('Financial Type') ,
           'default' => 'NULL',
           'pseudoconstant' => array(
             'table' => 'civicrm_financial_type',
@@ -682,6 +685,9 @@ class CRM_Event_DAO_Event extends CRM_Core_DAO
           'dataPattern' => '',
           'export' => true,
           'default' => '1',
+          'pseudoconstant' => array(
+            'optionGroupName' => 'participant_role',
+          )
         ) ,
         'intro_text' => array(
           'name' => 'intro_text',
