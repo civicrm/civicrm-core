@@ -294,14 +294,14 @@
         return false;
       })
       // Handle action links in popup
-      .on('click', '.crm-contact_actions-list a, .crm-contact_activities-list a', function() {
+      .on('click', '.crm-contact_actions-list a, .crm-contact_activities-list a', function(e) {
         $('#crm-contact-actions-list').hide();
         if ($(this).attr('href') === '#') {
           var $tab = $('#tab_' + ($(this).data('tab') || 'summary'));
           CRM.tabHeader.focus($tab);
-          return false;
+          e.preventDefault();
         } else {
-          return CRM.popup.call(this);
+          CRM.popup.call(this, e);
         }
       })
       .on('crmPopupFormSuccess',  '.crm-contact_actions-list a, .crm-contact_activities-list a', function() {
