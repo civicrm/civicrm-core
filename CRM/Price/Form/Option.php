@@ -82,6 +82,9 @@ class CRM_Price_Form_Option extends CRM_Core_Form {
    * @access public
    */
   function setDefaultValues() {
+    if ($this->_action == CRM_Core_Action::DELETE) {
+      return;
+    }
     $defaults = array();
 
     if (isset($this->_oid)) {
