@@ -434,8 +434,8 @@
     var dialog = popup(url, settings);
     // Trigger events from the dialog on the original link element
     $el.trigger('crmPopupOpen', [dialog]);
-    // Buffer this event so it only fires once
-    dialog.on('crmFormSuccess.crmPopup', function(e, data) {
+    // Listen for success events and buffer them so we only trigger once
+    dialog.on('crmFormSuccess.crmPopup crmPopupFormSuccess.crmPopup', function() {
       formSuccess = true;
     });
     dialog.on('dialogclose.crmPopup', function(e, data) {
