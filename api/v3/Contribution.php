@@ -380,7 +380,7 @@ function civicrm_api3_contribution_completetransaction(&$params) {
     $objects['contribution'] = &$contribution;
     $input['component'] = $contribution->_component;
     $input['is_test'] = $contribution->is_test;
-    $input['trxn_id']= $contribution->trxn_id;
+    $input['trxn_id']= !empty($params['trxn_id']) ? $params['trxn_id'] : $contribution->trxn_id;
     $input['amount'] = $contribution->total_amount;
     if(isset($params['is_email_receipt'])){
       $input['is_email_receipt'] = $params['is_email_receipt'];
@@ -396,5 +396,17 @@ function civicrm_api3_contribution_completetransaction(&$params) {
 }
 
 function _civicrm_api3_contribution_completetransaction(&$params) {
-
+  $params['id'] = array(
+    'title' => 'Contribution ID',
+    'type' => CRM_Utils_Type::T_INT,
+    'api.required' => TRUE,
+  );
+  $params['trxn_id'] = array(
+    'title' => 'Transaction ID',
+    'type' => CRM_Utils_Type::T_STRING,
+  );
+  $params['is_email_receipt'] = array(
+    'title' => 'Send email Receipt?',
+    'type' => CRM_Utils_Type::T_BOOLEAN,
+  );
 }

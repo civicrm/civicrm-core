@@ -606,19 +606,18 @@ SELECT @weight                 := MAX(value) FROM civicrm_option_value WHERE opt
 INSERT INTO
    `civicrm_option_value` (`option_group_id`, {localize field='label'}label{/localize}, `value`, `name`, `grouping`, `filter`, `is_default`, `weight`)
 VALUES
-   (@option_group_id_batch_status, {localize}'Data Entry'{/localize}, @weight = @weight + 1, 'Data Entry', NULL, 0, 0, @weight = @weight + 1),
-   (@option_group_id_batch_status, {localize}'Reopened'{/localize}, @weight = @weight + 1, 'Reopened', NULL, 0, 0, @weight = @weight + 1),
-   (@option_group_id_batch_status, {localize}'Exported'{/localize}, @weight = @weight + 1, 'Exported' , NULL, 0, 0, @weight = @weight + 1);
+   (@option_group_id_batch_status, {localize}'Data Entry'{/localize}, @weight + 1, 'Data Entry', NULL, 0, 0, @weight + 1),
+   (@option_group_id_batch_status, {localize}'Reopened'{/localize}, @weight + 2, 'Reopened', NULL, 0, 0, @weight + 2),
+   (@option_group_id_batch_status, {localize}'Exported'{/localize}, @weight + 3, 'Exported' , NULL, 0, 0, @weight + 3);
 
 -- Insert Batch Modes.
+SELECT @option_group_id_batch_modes := max(id) from civicrm_option_group where name = 'batch_mode';
 
-SELECT @option_group_id_batch_modes   := max(id) from civicrm_option_group where name = 'batch_mode';
-SELECT @weight := MAX(value) FROM civicrm_option_value WHERE option_group_id = @option_group_id_batch_status;
 INSERT INTO
    `civicrm_option_value` (`option_group_id`, {localize field='label'}label{/localize}, `value`, `name`, `grouping`, `filter`, `is_default`, `weight`)
 VALUES
-   (@option_group_id_batch_modes, {localize}'Manual Batch'{/localize}, @weight = @weight + 1, 'Manual Batch', NULL, 0, 0, @weight = @weight + 1),
-   (@option_group_id_batch_modes, {localize}'Automatic Batch'{/localize}, @weight = @weight + 1, 'Automatic Batch' , NULL, 0, 0, @weight = @weight + 1);
+   (@option_group_id_batch_modes, {localize}'Manual Batch'{/localize}, 1, 'Manual Batch', NULL, 0, 0, 1),
+   (@option_group_id_batch_modes, {localize}'Automatic Batch'{/localize}, 2, 'Automatic Batch' , NULL, 0, 0, 2);
 
 -- End of civiaccounts upgrade
 

@@ -434,7 +434,7 @@ function civicrm_api3_job_process_participant($params) {
 function civicrm_api3_job_process_membership($params) {
   $lock = new CRM_Core_Lock('civimail.job.updateMembership');
   if (!$lock->isAcquired()) {
-    return civicrm_api3_create_error('Could not acquire lock, another EmailProcessor process is running');
+    return civicrm_api3_create_error('Could not acquire lock, another Membership Processing process is running');
   }
 
   $result = CRM_Member_BAO_Membership::updateAllMembershipStatus();
