@@ -80,6 +80,20 @@ class CRM_Utils_Check {
   }
 
   /**
+   * Throw an exception if any of the checks fail
+   */
+  public function assertValid() {
+    $messages = $this->checkAll();
+    if (!empty($messages)) {
+      $messagesAsArray = array();
+      foreach ($messages as $message) {
+        $messagesAsArray[] = $message->toArray();
+      }
+      throw new Exception('There are configuration problems with this installation: ' . print_r($messagesAsArray, TRUE));
+    }
+  }
+
+  /**
    * Run some sanity checks.
    *
    * This could become a hook so that CiviCRM can run both built-in
