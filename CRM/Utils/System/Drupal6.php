@@ -938,25 +938,20 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
   }
 
   /**
-   * Get timezone from Drupal
-   * @return boolean|string
+   * Over-ridable function to get timezone as a string eg.
+   * @return string Timezone e.g. 'America/Los_Angeles'
    */
-  function getTimeZoneOffset(){
+  function getTimeZoneString() {
     global $user;
     if (variable_get('configurable_timezones', 1) && $user->uid && strlen($user->timezone)) {
       $timezone = $user->timezone;
     } else {
       $timezone = variable_get('date_default_timezone', null);
     }
-    if(empty($timezone)){
-      return false;
+    if (!$timezone) {
+      $timezone = parent::getTimeZoneString();
     }
-    $hour = $user->timezone / 3600;
-    $timeZoneOffset = sprintf("%02d:%02d", $timezone / 3600, abs(($timeZoneOffset/60)%60));
-    if($timeZoneOffset > 0){
-      $timeZoneOffset = '+' . $timeZoneOffset;
-    }
-    return $timeZoneOffset;
+    return $timezone;
   }
 
 
