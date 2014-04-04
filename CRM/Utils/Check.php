@@ -60,8 +60,10 @@ class CRM_Utils_Check {
 
   /**
    * Execute "checkAll"
+   *
+   * @param array|NULL $messages list of CRM_Utils_Check_Message; or NULL if the default list should be fetched
    */
-  public function showPeriodicAlerts() {
+  public function showPeriodicAlerts($messages = NULL) {
     if (CRM_Core_Permission::check('administer CiviCRM')
       && CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'securityAlert', NULL, TRUE)
     ) {
@@ -72,7 +74,10 @@ class CRM_Utils_Check {
         $config = CRM_Core_Config::singleton();
         $config->cleanup(0, FALSE);
 
-        foreach ($this->checkAll() as $message) {
+        if ($messages === NULL) {
+          $messages = $this->checkAll();
+        }
+        foreach ($messages as $message) {
           CRM_Core_Session::setStatus($message->getMessage(), $message->getTitle());
         }
       }
@@ -81,9 +86,13 @@ class CRM_Utils_Check {
 
   /**
    * Throw an exception if any of the checks fail
+   *
+   * @param array|NULL $messages list of CRM_Utils_Check_Message; or NULL if the default list should be fetched
    */
-  public function assertValid() {
-    $messages = $this->checkAll();
+  public function assertValid($messages = NULL) {
+    if ($messages === NULL) {
+      $messages = $this->checkAll();
+    }
     if (!empty($messages)) {
       $messagesAsArray = array();
       foreach ($messages as $message) {
