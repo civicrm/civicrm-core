@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -32,57 +32,37 @@
  * $Id: $
  *
  */
-class CRM_Utils_Check_Message {
-  /**
-   * @var string
-   */
-  private $name;
+class CRM_Utils_Check_Env {
 
   /**
-   * @var string
+   * Run some sanity checks.
+   *
+   * @return array<CRM_Utils_Check_Message>
    */
-  private $message;
-
-  /**
-   * @var string
-   */
-  private $title;
-
-  function __construct($name, $message, $title) {
-    $this->name = $name;
-    $this->message = $message;
-    $this->title = $title;
-  }
-
-  /**
-   * @return string
-   */
-  function getName() {
-    return $this->name;
-  }
-
-  /**
-   * @return string
-   */
-  function getMessage() {
-    return $this->message;
-  }
-
-  /**
-   * @return string
-   */
-  public function getTitle() {
-    return $this->title;
-  }
-
-  /**
-   * @return array
-   */
-  function toArray() {
-    return array(
-      'name' => $this->name,
-      'message' => $this->message,
-      'title' => $this->title,
+  public function checkAll() {
+    $messages = array_merge(
+      $this->checkMysqlTime()
     );
+    return $messages;
+  }
+
+  public function checkMysqlTime() {
+    $messages = array();
+
+    $phpNow = date('Y-m-d H:i');
+    $sqlNow = CRM_Core_DAO::singleValueQuery("SELECT date_format(now(), '%Y-%m-%d %H:%i')");
+    if ($phpNow != $sqlNow) {
+      $messages[] = new CRM_Utils_Check_Message(
+        'checkMysqlTime',
+        ts('Timestamps reported by MySQL (eg "%2") and PHP (eg "%3" ) are mismatched.<br /><a href="%1">Read more about this warning</a>', array(
+          1 => CRM_Utils_System::getWikiBaseURL()  . 'checkMysqlTime',
+          2 => $sqlNow,
+          3 => $phpNow,
+        )),
+        ts('Environment Settings')
+      );
+    }
+
+    return $messages;
   }
 }

@@ -92,7 +92,7 @@ function _civicrm_api3_system_check_spec(&$spec) {
  */
 function civicrm_api3_system_check($params) {
   $returnValues = array();
-  foreach (CRM_Utils_Check_Security::singleton()->checkAll() as $message) {
+  foreach (CRM_Utils_Check::singleton()->checkAll() as $message) {
     $returnValues[] = $message->toArray();
   }
 
