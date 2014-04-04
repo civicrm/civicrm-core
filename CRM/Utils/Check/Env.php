@@ -32,75 +32,37 @@
  * $Id: $
  *
  */
-class CRM_Utils_Check {
-  CONST
-    // How often to run checks and notify admins about issues.
-    CHECK_TIMER = 86400;
-
-  /**
-   * We only need one instance of this object, so we use the
-   * singleton pattern and cache the instance in this variable
-   *
-   * @var object
-   * @static
-   */
-  static private $_singleton = NULL;
-
-  /**
-   * Provide static instance of CRM_Utils_Check.
-   *
-   * @return CRM_Utils_Check
-   */
-  static function &singleton() {
-    if (!isset(self::$_singleton)) {
-      self::$_singleton = new CRM_Utils_Check();
-    }
-    return self::$_singleton;
-  }
-
-  /**
-   * Execute "checkAll"
-   */
-  public function showPeriodicAlerts() {
-    if (CRM_Core_Permission::check('administer CiviCRM')
-      && CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'securityAlert', NULL, TRUE)
-    ) {
-      $session = CRM_Core_Session::singleton();
-      if ($session->timer('check_' . __CLASS__, self::CHECK_TIMER)) {
-
-        // Best attempt at re-securing folders
-        $config = CRM_Core_Config::singleton();
-        $config->cleanup(0, FALSE);
-
-        foreach ($this->checkAll() as $message) {
-          CRM_Core_Session::setStatus($message->getMessage(), $message->getTitle());
-        }
-      }
-    }
-  }
+class CRM_Utils_Check_Env {
 
   /**
    * Run some sanity checks.
    *
-   * This could become a hook so that CiviCRM can run both built-in
-   * configuration & sanity checks, and modules/extensions can add
-   * their own checks.
-   *
-   * We might even expose the results of these checks on the Wordpress
-   * plugin status page or the Drupal admin/reports/status path.
-   *
-   * @return array of messages
-   * @see Drupal's hook_requirements() -
-   * https://api.drupal.org/api/drupal/modules%21system%21system.api.php/function/hook_requirements
+   * @return array<CRM_Utils_Check_Message>
    */
   public function checkAll() {
-    $security = new CRM_Utils_Check_Security();
-    $env = new CRM_Utils_Check_Env();
     $messages = array_merge(
-      $security->checkAll(),
-      $env->checkAll()
+      $this->checkMysqlTime()
     );
     return $messages;
   }
 
+  public function checkMysqlTime() {
+    $messages = array();
+
+    $phpNow = date('Y-m-d H:i');
+    $sqlNow = CRM_Core_DAO::singleValueQuery("SELECT date_format(now(), '%Y-%m-%d %H:%i')");
+    if ($phpNow != $sqlNow) {
+      $messages[] = new CRM_Utils_Check_Message(
+        'checkMysqlTime',
+        ts('Timestamps reported by MySQL (eg "%2") and PHP (eg "%3" ) are mismatched.<br /><a href="%1">Read more about this warning</a>', array(
+          1 => CRM_Utils_System::getWikiBaseURL()  . 'checkMysqlTime',
+          2 => $sqlNow,
+          3 => $phpNow,
+        )),
+        ts('Environment Settings')
+      );
+    }
+
+    return $messages;
+  }
 }
