@@ -51,13 +51,13 @@ class WebTest_Member_OnlineAutoRenewMembershipTest extends CiviSeleniumTestCase 
     $this->clickLink("_qf_Main_upload-bottom", "_qf_Confirm_next-bottom");
 
     $text = 'I want this membership to be renewed automatically every 1 year(s).';
-    $this->assertElementContainsText('css=div.display-block', $text, 'Missing text: ' . $text);
+    $this->assertElementContainsText("xpath=//div[@class='crm-group amount_display-group']/div[2]", $text, 'Missing text: ' . $text);
 
     $this->click("_qf_Confirm_next-bottom");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     $text = 'This membership will be renewed automatically every 1 year(s).';
-    $this->assertElementContainsText('css=div.display-block', $text, 'Missing text: ' . $text);
+    $this->assertElementContainsText("xpath=//div[@class='crm-group amount_display-group']/div[2]", $text, 'Missing text: ' . $text);
   }
 
   function testOnlineAutoRenewMembershipAuthenticated() {
@@ -84,13 +84,13 @@ class WebTest_Member_OnlineAutoRenewMembershipTest extends CiviSeleniumTestCase 
     $this->waitForElementPresent("_qf_Confirm_next-bottom");
 
     $text = 'I want this membership to be renewed automatically every 1 year(s).';
-    $this->assertElementContainsText('css=div.display-block', $text, 'Missing text: ' . $text);
+    $this->assertElementContainsText("xpath=//div[@class='crm-group amount_display-group']/div[2]", $text, 'Missing text: ' . $text);
 
     $this->click("_qf_Confirm_next-bottom");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     $text = 'This membership will be renewed automatically every 1 year(s).';
-    $this->assertElementContainsText('css=div.display-block', $text, 'Missing text: ' . $text);
+    $this->assertElementContainsText("xpath=//div[@class='crm-group amount_display-group']/div[2]", $text, 'Missing text: ' . $text);
   }
 
   function testOnlinePendingAutoRenewMembershipAnonymous() {
@@ -112,13 +112,13 @@ class WebTest_Member_OnlineAutoRenewMembershipTest extends CiviSeleniumTestCase 
     $this->waitForElementPresent("_qf_Confirm_next-bottom");
 
     $text = 'I want this membership to be renewed automatically every 1 year(s).';
-    $this->assertElementContainsText('css=div.display-block', $text, 'Missing text: ' . $text);
+    $this->assertElementContainsText("xpath=//div[@class='crm-group amount_display-group']/div[2]", $text, 'Missing text: ' . $text);
 
     $this->click("_qf_Confirm_next-bottom");
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     $text = 'This membership will be renewed automatically every 1 year(s).';
-    $this->assertElementContainsText('css=div.display-block', $text, 'Missing text: ' . $text);
+    $this->assertElementContainsText("xpath=//div[@class='crm-group amount_display-group']/div[2]", $text, 'Missing text: ' . $text);
   }
 
   function _configureMembershipPage() {
@@ -141,8 +141,6 @@ class WebTest_Member_OnlineAutoRenewMembershipTest extends CiviSeleniumTestCase 
       $this->type("duration_interval", "1");
       $this->select("duration_unit", "label=year");
 
-      // wait for the auto-complete member_of_contact to populate
-      $this->waitForValue('member_of_contact', '::');
 
       $this->click("_qf_MembershipType_upload-bottom");
       $this->waitForPageToLoad($this->getTimeoutMsec());
@@ -154,8 +152,6 @@ class WebTest_Member_OnlineAutoRenewMembershipTest extends CiviSeleniumTestCase 
       $this->type("duration_interval", "1");
       $this->select("duration_unit", "label=year");
 
-      //wait for the auto-complete member_of_contact to populate
-      $this->waitForValue('member_of_contact', '::');
 
       $this->click("_qf_MembershipType_upload-bottom");
       $this->waitForPageToLoad($this->getTimeoutMsec());
@@ -199,7 +195,7 @@ class WebTest_Member_OnlineAutoRenewMembershipTest extends CiviSeleniumTestCase 
       );
 
       //make sure we do have required permissions.
-      $permissions = array("edit-1-make-online-contributions");
+      $permissions = array("edit-1-make-online-contributions",  "edit-1-profile-listings-and-forms");
       $this->changePermissions($permissions);
 
       // now logout and do membership test that way
