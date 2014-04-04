@@ -34,31 +34,6 @@
  */
 class CRM_Utils_Check_Security {
 
-  CONST
-    // How often to run checks and notify admins about issues.
-    CHECK_TIMER = 86400;
-
-  /**
-   * We only need one instance of this object, so we use the
-   * singleton pattern and cache the instance in this variable
-   *
-   * @var object
-   * @static
-   */
-  static private $_singleton = NULL;
-
-  /**
-   * Provide static instance of CRM_Utils_Check_Security.
-   *
-   * @return CRM_Utils_Check_Security
-   */
-  static function &singleton() {
-    if (!isset(self::$_singleton)) {
-      self::$_singleton = new CRM_Utils_Check_Security();
-    }
-    return self::$_singleton;
-  }
-
   /**
    * CMS have a different pattern to their default file path and URL.
    *
@@ -76,45 +51,15 @@ class CRM_Utils_Check_Security {
   }
 
   /**
-   * Execute "checkAll"
-   */
-  public function showPeriodicAlerts() {
-    if (CRM_Core_Permission::check('administer CiviCRM')
-      && CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'securityAlert', NULL, TRUE)
-    ) {
-      $session = CRM_Core_Session::singleton();
-      if ($session->timer('check_' . __CLASS__, self::CHECK_TIMER)) {
-
-        // Best attempt at re-securing folders
-        $config = CRM_Core_Config::singleton();
-        $config->cleanup(0, FALSE);
-
-        foreach ($this->checkAll() as $message) {
-          CRM_Core_Session::setStatus($message->getMessage(), ts('Security Warning'));
-        }
-      }
-    }
-  }
-
-  /**
    * Run some sanity checks.
    *
-   * This could become a hook so that CiviCRM can run both built-in
-   * configuration & sanity checks, and modules/extensions can add
-   * their own checks.
-   *
-   * We might even expose the results of these checks on the Wordpress
-   * plugin status page or the Drupal admin/reports/status path.
-   *
-   * @return array of messages
-   * @see Drupal's hook_requirements() -
-   * https://api.drupal.org/api/drupal/modules%21system%21system.api.php/function/hook_requirements
+   * @return array<CRM_Utils_Check_Message>
    */
   public function checkAll() {
     $messages = array_merge(
-      CRM_Utils_Check_Security::singleton()->checkLogFileIsNotAccessible(),
-      CRM_Utils_Check_Security::singleton()->checkUploadsAreNotAccessible(),
-      CRM_Utils_Check_Security::singleton()->checkDirectoriesAreNotBrowseable()
+      $this->checkLogFileIsNotAccessible(),
+      $this->checkUploadsAreNotAccessible(),
+      $this->checkDirectoriesAreNotBrowseable()
     );
     return $messages;
   }
@@ -162,7 +107,8 @@ class CRM_Utils_Check_Security {
             '<a href="%2">Read more about this warning</a>';
           $messages[] = new CRM_Utils_Check_Message(
             'checkLogFileIsNotAccessible',
-            ts($msg, array(1 => $log_url, 2 => $docs_url))
+            ts($msg, array(1 => $log_url, 2 => $docs_url)),
+            ts('Security Warning')
           );
         }
       }
@@ -206,7 +152,8 @@ class CRM_Utils_Check_Security {
               $docs_url = $this->createDocUrl('checkUploadsAreNotAccessible');
               $messages[] = new CRM_Utils_Check_Message(
                 'checkUploadsAreNotAccessible',
-                ts($msg, array(1 => $docs_url))
+                ts($msg, array(1 => $docs_url)),
+                ts('Security Warning')
               );
             }
           }
@@ -253,7 +200,8 @@ class CRM_Utils_Check_Security {
         $docs_url = $this->createDocUrl('checkDirectoriesAreNotBrowseable');
         $messages[] = new CRM_Utils_Check_Message(
           'checkDirectoriesAreNotBrowseable',
-          ts($msg, array(1 => $publicDir, 2 => $publicDir, 3 => $docs_url))
+          ts($msg, array(1 => $publicDir, 2 => $publicDir, 3 => $docs_url)),
+          ts('Security Warning')
         );
       }
     }
