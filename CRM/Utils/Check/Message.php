@@ -43,9 +43,15 @@ class CRM_Utils_Check_Message {
    */
   private $message;
 
-  function __construct($name, $message) {
+  /**
+   * @var string
+   */
+  private $title;
+
+  function __construct($name, $message, $title) {
     $this->name = $name;
     $this->message = $message;
+    $this->title = $title;
   }
 
   /**
@@ -63,12 +69,20 @@ class CRM_Utils_Check_Message {
   }
 
   /**
+   * @return string
+   */
+  public function getTitle() {
+    return $this->title;
+  }
+
+  /**
    * @return array
    */
   function toArray() {
     return array(
       'name' => $this->name,
       'message' => $this->message,
+      'title' => $this->title,
     );
   }
 }
