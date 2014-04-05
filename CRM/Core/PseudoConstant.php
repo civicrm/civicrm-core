@@ -247,7 +247,7 @@ class CRM_Core_PseudoConstant {
 
       if (!empty($customField->option_group_id)) {
         $options = CRM_Core_OptionGroup::valuesByID($customField->option_group_id,
-          $flip,
+          FALSE,
           $params['grouping'],
           $params['localize'],
           // Note: for custom fields the 'name' column is NULL
@@ -266,10 +266,10 @@ class CRM_Core_PseudoConstant {
         elseif ($customField->data_type === 'Boolean') {
           $options = $context == 'validate' ? array(0, 1) : array(1 => ts('Yes'), 0 => ts('No'));
         }
-        $options = $options && $flip ? array_flip($options) : $options;
       }
-      if ($options !== FALSE) {
-        CRM_Utils_Hook::customFieldOptions($customField->id, $options, FALSE);
+      CRM_Utils_Hook::customFieldOptions($customField->id, $options, FALSE);
+      if ($options && $flip) {
+        $options = array_flip($options);
       }
       $customField->free();
       return $options;

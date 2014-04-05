@@ -424,23 +424,23 @@ SELECT  id, html_type
           $form->assign('showTransactionId', TRUE);
         }
 
-        $allowStatuses = array();
-        $statuses = CRM_Contribute_PseudoConstant::contributionStatus();
-        if ($form->get('onlinePendingContributionId')) {
-          $statusNames = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
-          foreach ($statusNames as $val => $name) {
-            if (in_array($name, array(
-              'In Progress', 'Overdue'))) {
-              continue;
-            }
-            $allowStatuses[$val] = $statuses[$val];
-          }
+        $status = CRM_Contribute_PseudoConstant::contributionStatus();
+
+        // CRM-14417 suppressing contribution statuses that are NOT relevant to new participant registrations
+        $statusName = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
+        foreach (array(
+                   'Cancelled',
+                   'Failed',
+                   'In Progress',
+                   'Overdue',
+                   'Refunded',
+                   'Pending refund',
+                 ) as $suppress) {
+          unset($status[CRM_Utils_Array::key($suppress, $statusName)]);
         }
-        else {
-          $allowStatuses = $statuses;
-        }
+
         $form->add('select', 'contribution_status_id',
-          ts('Payment Status'), $allowStatuses
+          ts('Payment Status'), $status
         );
 
         $form->add('text', 'check_number', ts('Check Number'),

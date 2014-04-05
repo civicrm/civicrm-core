@@ -469,7 +469,7 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
     if ($this->_multiRecordTableName) {
       $returnQuery = TRUE;
     }
-
+    $this->_query->_useGroupBy = TRUE;
     $result = $this->_query->searchQuery($offset, $rowCount, $sort, NULL, NULL,
       NULL, NULL, $returnQuery, $additionalWhereClause
     );
