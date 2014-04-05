@@ -118,8 +118,10 @@ class CRM_Contribute_Form_ContributionView extends CRM_Core_Form {
 
     //assign soft credit record if exists.
     $SCRecords = CRM_Contribute_BAO_ContributionSoft::getSoftContribution($values['contribution_id'], TRUE);
-    $this->assign('softContributions', $SCRecords['soft_credit']);
-    unset($SCRecords['soft_credit']);
+    if (!empty($SCRecords['soft_credit'])) {
+      $this->assign('softContributions', $SCRecords['soft_credit']);
+      unset($SCRecords['soft_credit']);
+    }
 
     //assign pcp record if exists
     foreach ($SCRecords as $name => $value) {
