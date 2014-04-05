@@ -89,8 +89,7 @@
   </foreignKey>
   <field>
        <name>module_data</name>
-       <type>varchar</type>
-       <length>255</length>
+       <type>longtext</type>
        <comment>Json serialized array of data used by the ufjoin.module</comment>
        <add>4.5</add>
   </field>
