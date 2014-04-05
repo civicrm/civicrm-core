@@ -217,7 +217,7 @@ function _civicrm_api3_deprecated_participant_formatted_param($params, &$values,
  * @return array|CRM_Error
  * @access public
  */
-function _civicrm_api3_deprecated_formatted_param($params, &$values, $create = FALSE) {
+function _civicrm_api3_deprecated_formatted_param($params, &$values, $create = FALSE, $onDuplicate = Null) {
   // copy all the contribution fields as is
 
   $fields = CRM_Contribute_DAO_Contribution::fields();
@@ -388,60 +388,73 @@ function _civicrm_api3_deprecated_formatted_param($params, &$values, $create = F
         }
         break;
 
-      case 'honor_type_id':
-        require_once 'CRM/Core/OptionGroup.php';
-        $values['honor_type_id'] = CRM_Core_OptionGroup::getValue('honor_type', $value);
-        if (empty($values['honor_type_id'])) {
-          return civicrm_api3_create_error("Honor Type is not valid: $value");
-        }
-        break;
-
       case 'soft_credit':
         //import contribution record according to select contact type
-
         // validate contact id and external identifier.
-        $contactId = CRM_Utils_Array::value('contact_id', $params['soft_credit']);
-        $externalId = CRM_Utils_Array::value('external_identifier', $params['soft_credit']);
-        if ($contactId || $externalId) {
-          require_once 'CRM/Contact/DAO/Contact.php';
-          $contact = new CRM_Contact_DAO_Contact();
-          $contact->id = $contactId;
-          $contact->external_identifier = $externalId;
-
-          $errorMsg = NULL;
-          if (!$contact->find(TRUE)) {
-            $errorMsg = ts("No match found for specified Soft Credit contact data. Row was skipped.");
-          }
-
-          if ($errorMsg) {
-            return civicrm_api3_create_error($errorMsg, 'soft_credit');
-          }
-
-          // finally get soft credit contact id.
-          $values['soft_credit_to'] = $contact->id;
+        $value[$key] = '';
+        if (!isset($params['contribution_id']) && empty($params['contribution_id']) && $onDuplicate == CRM_Import_Parser::DUPLICATE_UPDATE) {
+          $errorMsg = ts("Empty Contribution Id. Row was skipped.");
+          return civicrm_api3_create_error($errorMsg, $value[$key]);
         }
-        else {
-          // get the contact id from duplicate contact rule, if more than one contact is returned
-          // we should return error, since current interface allows only one-one mapping
-
-          $softParams = $params['soft_credit'];
-          $softParams['contact_type'] = $params['contact_type'];
-
-          $error = _civicrm_api3_deprecated_duplicate_formatted_contact($softParams);
-
-          if (isset($error['error_message']['params'][0])) {
-            $matchedIDs = explode(',', $error['error_message']['params'][0]);
-
-            // check if only one contact is found
-            if (count($matchedIDs) > 1) {
-              return civicrm_api3_create_error($error['error_message']['message'], 'soft_credit');
+        elseif (!isset($params['contribution_contact_id']) && empty($params['contribution_contact_id']) && $onDuplicate != CRM_Import_Parser::DUPLICATE_UPDATE) {
+          $errorMsg = ts("Empty Contact Id. Row was skipped.");
+          return civicrm_api3_create_error($errorMsg, $value[$key]);
+        }
+        if (isset($params[$key]) && is_array($params[$key])) {
+          foreach ($params[$key] as $softKey => $softParam) {
+            $contactId = CRM_Utils_Array::value('contact_id', $softParam);
+            $externalId = CRM_Utils_Array::value('external_identifier', $softParam);
+            if (isset($softParam['contact_id']) && !empty($softParam['contact_id'])) {
+              $softCreditContactIds = implode(', ', array_map(function ($entry) {
+                  return $entry['contact_id'];
+              }, $params[$key]));
             }
             else {
-              $values['soft_credit_to'] = $matchedIDs[0];
+              $softCreditContactIds='';
             }
-          }
-          else {
-            return civicrm_api3_create_error('No match found for specified Soft Credit contact data. Row was skipped.', 'soft_credit');
+            if ($contactId || $externalId) {
+              require_once 'CRM/Contact/DAO/Contact.php';
+              $contact = new CRM_Contact_DAO_Contact();
+              $contact->id = $contactId;
+              $contact->external_identifier = $externalId;
+
+              $errorMsg = NULL;
+              if (!$contact->find(TRUE)) {
+                $errorMsg = (isset($softCreditContactIds) && $softCreditContactIds) ? ts("Invalid ContactId ($softCreditContactIds) specified for Soft Credit contact data. Row was skipped.") : ts("Empty ContactId specified for Soft Credit contact data. Row was skipped.");
+              }
+
+              if ($errorMsg) {
+                return civicrm_api3_create_error($errorMsg, $value[$key]);
+              }
+
+              // finally get soft credit contact id.
+              $values[$key][$softKey] = $softParam;
+              $values[$key][$softKey]['contact_id'] = $contact->id;
+            }
+            else {
+              // get the contact id from duplicate contact rule, if more than one contact is returned
+              // we should return error, since current interface allows only one-one mapping
+              $softParams = $params['soft_credit'];
+              $softParams['contact_type'] = $params['contact_type'];
+
+              $error = _civicrm_api3_deprecated_duplicate_formatted_contact($softParams);
+
+              if (isset($error['error_message']['params'][0])) {
+                $matchedIDs = explode(',', $error['error_message']['params'][0]);
+
+                // check if only one contact is found
+                if (count($matchedIDs) > 1) {
+                  return civicrm_api3_create_error($error['error_message']['message'], $value[$key]);
+                }
+                else {
+                  $values['soft_credit'] = $matchedIDs[0];
+                }
+              }
+              else {
+                $errorMsg = (isset($softCreditContactIds) && $softCreditContactIds) ? ts("Invalid ContactId ($softCreditContactIds) specified for Soft Credit contact data. Row was skipped.") : ts("Empty ContactId specified for Soft Credit contact data. Row was skipped.");
+                return civicrm_api3_create_error($errorMsg, $value[$key]);
+              }
+            }
           }
         }
         break;
