@@ -33,6 +33,7 @@
       <name>weight</name>
       <type>int</type>
       <required>true</required>
+      <signed>true</signed>
       <html>
         <type>Text</type>
       </html>

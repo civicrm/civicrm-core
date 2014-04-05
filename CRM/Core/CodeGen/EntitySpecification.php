@@ -229,7 +229,7 @@ class CRM_Core_CodeGen_EntitySpecification {
         $field['columnInfo'] .= ', nullable=true';
       }
 
-      if ($field['phpType'] == 'integer') {
+      if ($field['phpType'] == 'integer' && (empty($field['signed']) || $field['signed'] == 'false')) {
         $columnInfoOptions[] = '"unsigned":true';
       }
 
@@ -434,6 +434,9 @@ class CRM_Core_CodeGen_EntitySpecification {
     $field['default']  = $this->value('default', $fieldXML);
     if ($this->value('defaultTs', $fieldXML)) {
       $field['default_ts']  = $this->value('defaultTs', $fieldXML);
+    }
+    if ($this->value('signed', $fieldXML)) {
+      $field['signed'] = $this->value('signed', $fieldXML);
     }
     $field['import']   = $this->value('import', $fieldXML);
     if ($this->value('export', $fieldXML)) {
