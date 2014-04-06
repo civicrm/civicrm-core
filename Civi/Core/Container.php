@@ -1,0 +1,77 @@
+<?php
+namespace Civi\Core;
+use Doctrine\Common\Annotations\AnnotationReader;
+use Doctrine\Common\Annotations\AnnotationRegistry;
+use Doctrine\Common\Annotations\FileCacheReader;
+use Doctrine\Common\Cache\FilesystemCache;
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
+use Doctrine\ORM\Tools\Setup;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Reference;
+
+// TODO use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
+
+class Container {
+
+  const SELF = 'civi_container_factory';
+
+  /**
+   * @var ContainerBuilder
+   */
+  private static $singleton;
+
+  /**
+   * @return \Symfony\Component\DependencyInjection\TaggedContainerInterface
+   */
+  public static function singleton() {
+    if (self::$singleton === NULL) {
+      $c = new self();
+      self::$singleton = $c->createContainer();
+    }
+    return self::$singleton;
+  }
+
+  /**
+   * @var ContainerBuilder
+   */
+  public function createContainer() {
+    $civicrm_base_path = dirname(dirname(__DIR__));
+    $container = new ContainerBuilder();
+    $container->setParameter('civicrm_base_path', $civicrm_base_path);
+    $container->set(self::SELF, $this);
+
+// TODO Move configuration to an external file; define caching structure
+//    if (empty($configDirectories)) {
+//      throw new \Exception(__CLASS__ . ': Missing required properties (civicrmRoot, configDirectories)');
+//    }
+//    $locator = new FileLocator($configDirectories);
+//    $loaderResolver = new LoaderResolver(array(
+//      new YamlFileLoader($container, $locator)
+//    ));
+//    $delegatingLoader = new DelegatingLoader($loaderResolver);
+//    foreach (array('services.yml') as $file) {
+//      $yamlUserFiles = $locator->locate($file, NULL, FALSE);
+//      foreach ($yamlUserFiles as $file) {
+//        $delegatingLoader->load($file);
+//      }
+//    }
+
+    $container->setDefinition('dispatcher', new Definition(
+      '\Symfony\Component\EventDispatcher\EventDispatcher',
+      array()
+    ))
+      ->setFactoryService(self::SELF)->setFactoryMethod('createEventDispatcher');
+
+    return $container;
+  }
+
+  /**
+   * @return \Symfony\Component\EventDispatcher\EventDispatcher
+   */
+  public function createEventDispatcher() {
+    $dispatcher = new \Symfony\Component\EventDispatcher\EventDispatcher();
+    return $dispatcher;
+  }
+}

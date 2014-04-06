@@ -70,6 +70,9 @@ class CRM_Core_ClassLoader {
     if ($this->_registered) {
       return;
     }
+    $civicrm_base_path = dirname(dirname(__DIR__));
+
+    require_once dirname(dirname(__DIR__)) . '/packages/vendor/autoload.php';
 
     // we do this to prevent a autoloader errors with joomla / 3rd party packages
     // use absolute path since we dont know the content of include_path as yet
@@ -81,7 +84,7 @@ class CRM_Core_ClassLoader {
     // the files might not exists, in which case we skip loading the file
     // if you change the below, please test on Joomla and also PCP pages
     $includeHTMLPurifier = TRUE;
-    $htmlPurifierPath = dirname(__FILE__) . '/../../packages/IDS/vendors/htmlpurifier/HTMLPurifier/Bootstrap.php';
+    $htmlPurifierPath = "$civicrm_base_path/packages/IDS/vendors/htmlpurifier/HTMLPurifier/Bootstrap.php";
     if (
       class_exists('HTMLPurifier_Bootstrap') ||
       !file_exists($htmlPurifierPath)
@@ -92,22 +95,23 @@ class CRM_Core_ClassLoader {
       require_once $htmlPurifierPath;
     }
 
-    if (version_compare(PHP_VERSION, '5.3.0') >= 0) {
-      spl_autoload_register(array($this, 'loadClass'), TRUE, $prepend);
-      if ($includeHTMLPurifier) {
-        spl_autoload_register(array('HTMLPurifier_Bootstrap', 'autoload'), TRUE, $prepend);
-      }
-    }
-    else {
-      // http://www.php.net/manual/de/function.spl-autoload-register.php#107362
-      // "when specifying the third parameter (prepend), the function will fail badly in PHP 5.2"
-      spl_autoload_register(array($this, 'loadClass'), TRUE);
-      if ($includeHTMLPurifier) {
-        spl_autoload_register(array('HTMLPurifier_Bootstrap', 'autoload'), TRUE);
-      }
+    // TODO Remove this autoloader. For civicrm-core and civicrm-packages, the composer autoloader works fine.
+    // Extensions rely on include_path-based autoloading
+    spl_autoload_register(array($this, 'loadClass'), TRUE, $prepend);
+    if ($includeHTMLPurifier) {
+      spl_autoload_register(array('HTMLPurifier_Bootstrap', 'autoload'), TRUE, $prepend);
     }
 
     $this->_registered = TRUE;
+    $packages_path = implode(DIRECTORY_SEPARATOR, array($civicrm_base_path, 'packages'));
+    $include_paths = array(
+      '.',
+      $civicrm_base_path,
+      $packages_path
+    );
+    $include_paths = implode(PATH_SEPARATOR, $include_paths);
+    set_include_path($include_paths . PATH_SEPARATOR . get_include_path());
+    require_once "$civicrm_base_path/packages/vendor/autoload.php";
   }
 
   function loadClass($class) {
@@ -127,4 +131,3 @@ class CRM_Core_ClassLoader {
     }
   }
 }
-
