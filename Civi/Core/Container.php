@@ -88,12 +88,6 @@ class Container {
       array(new Reference('annotation_reader'))
     ));
 
-    $container->setDefinition('hateoas', new Definition(
-      '\Hateoas\Hateoas',
-      array('%cache_dir%/cache/hateoas')
-    ))
-      ->setFactoryService(self::SELF)->setFactoryMethod('createHateoas');
-
     return $container;
   }
 
@@ -107,9 +101,6 @@ class Container {
 
     AnnotationRegistry::registerFile(
       \CRM_Utils_Path::join($civicrm_base_path, 'vendor', 'doctrine', 'orm', 'lib', 'Doctrine', 'ORM', 'Mapping', 'Driver', 'DoctrineAnnotations.php')
-    );
-    AnnotationRegistry::registerAutoloadNamespace('Hateoas\Configuration\Annotation',
-      \CRM_Utils_Path::join($civicrm_base_path, 'vendor', 'willdurand', 'hateoas', 'src')
     );
     AnnotationRegistry::registerAutoloadNamespace('Civi',
       \CRM_Utils_Path::join($civicrm_base_path)
@@ -152,17 +143,5 @@ class Container {
     $dbSettings = new \CRM_DB_Settings();
     $em = EntityManager::create($dbSettings->toDoctrineArray(), $config);
     return $em;
-  }
-
-  /**
-   * @param string $cacheDir
-   * @return \Hateoas\Hateoas
-   */
-  public function createHateoas($cacheDir) {
-    return \Hateoas\HateoasBuilder::create()
-      ->setCacheDir($cacheDir)
-      ->setDebug(TRUE)
-      ->setUrlGenerator('civi', new \Civi\API\RestUrlGenerator())
-      ->build();
   }
 }
