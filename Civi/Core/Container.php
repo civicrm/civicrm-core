@@ -179,6 +179,7 @@ class Container {
   public function createApiKernel($dispatcher, $apiRegistry, $annotationReader, $magicFunctionProvider) {
     $doctrineCrudProvider = new \Civi\API\Provider\DoctrineCrudProvider($apiRegistry);
 
+    $dispatcher->addSubscriber(new \Civi\API\Subscriber\ChainSubscriber());
     $dispatcher->addSubscriber(new \Civi\API\Subscriber\TransactionSubscriber());
     $dispatcher->addSubscriber(new \Civi\API\Subscriber\I18nSubscriber());
     $dispatcher->addSubscriber($magicFunctionProvider);
