@@ -3,7 +3,7 @@
         "This file locks the dependencies of your project to a known state",
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
     ],
-    "hash": "7ef94c70b08e0de2aca9331d7c624ec6",
+    "hash": "da9c5360c513c5808fac32f0e966a431",
     "packages": [
         {
             "name": "doctrine/annotations",
@@ -660,12 +660,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/schmittjoh/serializer.git",
-                "reference": "d980279bba4b76ab927f67a61f63a6932220aa13"
+                "reference": "c8a171357ca92b6706e395c757f334902d430ea9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/schmittjoh/serializer/zipball/d980279bba4b76ab927f67a61f63a6932220aa13",
-                "reference": "d980279bba4b76ab927f67a61f63a6932220aa13",
+                "url": "https://api.github.com/repos/schmittjoh/serializer/zipball/c8a171357ca92b6706e395c757f334902d430ea9",
+                "reference": "c8a171357ca92b6706e395c757f334902d430ea9",
                 "shasum": ""
             },
             "require": {
@@ -673,17 +673,17 @@
                 "jms/metadata": "~1.1",
                 "jms/parser-lib": "1.*",
                 "php": ">=5.3.2",
-                "phpcollection/phpcollection": ">=0.1,<0.3-dev"
+                "phpcollection/phpcollection": "~0.1"
             },
             "require-dev": {
-                "doctrine/orm": ">=2.1,<2.4-dev",
+                "doctrine/orm": "~2.1",
                 "doctrine/phpcr-odm": "~1.0.1",
                 "jackalope/jackalope-doctrine-dbal": "1.0.*",
                 "propel/propel1": "~1.7",
                 "symfony/filesystem": "2.*",
-                "symfony/form": ">=2.1,<=2.4-dev",
-                "symfony/translation": ">=2.0,<2.2-dev",
-                "symfony/validator": ">=2.0,<2.2-dev",
+                "symfony/form": "~2.1",
+                "symfony/translation": "~2.0",
+                "symfony/validator": "~2.0",
                 "symfony/yaml": "2.*",
                 "twig/twig": ">=1.8,<2.0-dev"
             },
@@ -722,7 +722,7 @@
                 "serialization",
                 "xml"
             ],
-            "time": "2014-03-04 10:46:39"
+            "time": "2014-03-18 08:39:00"
         },
         {
             "name": "phpcollection/phpcollection",
@@ -730,12 +730,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/schmittjoh/php-collection.git",
-                "reference": "cad39389bb3134aca06b1b7fad5d3ecf7c3b7d74"
+                "reference": "8ecd043d427706ead32abfc76ca672c8a4efad43"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/schmittjoh/php-collection/zipball/cad39389bb3134aca06b1b7fad5d3ecf7c3b7d74",
-                "reference": "cad39389bb3134aca06b1b7fad5d3ecf7c3b7d74",
+                "url": "https://api.github.com/repos/schmittjoh/php-collection/zipball/8ecd043d427706ead32abfc76ca672c8a4efad43",
+                "reference": "8ecd043d427706ead32abfc76ca672c8a4efad43",
                 "shasum": ""
             },
             "require": {
@@ -744,7 +744,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "0.2-dev"
+                    "dev-master": "0.4-dev"
                 }
             },
             "autoload": {
@@ -772,7 +772,7 @@
                 "sequence",
                 "set"
             ],
-            "time": "2014-01-26 10:18:52"
+            "time": "2014-04-04 12:06:15"
         },
         {
             "name": "phpoption/phpoption",
@@ -937,67 +937,18 @@
             "time": "2014-03-01 17:25:29"
         },
         {
-            "name": "symfony/expression-language",
-            "version": "dev-master",
-            "target-dir": "Symfony/Component/ExpressionLanguage",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/symfony/expression-language.git",
-                "reference": "d955750d9c7bf5b1c32629333e973de0c583d70b"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/symfony/expression-language/zipball/d955750d9c7bf5b1c32629333e973de0c583d70b",
-                "reference": "d955750d9c7bf5b1c32629333e973de0c583d70b",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.3.3"
-            },
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "2.5-dev"
-                }
-            },
-            "autoload": {
-                "psr-0": {
-                    "Symfony\\Component\\ExpressionLanguage\\": ""
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Fabien Potencier",
-                    "email": "fabien@symfony.com",
-                    "homepage": "http://fabien.potencier.org",
-                    "role": "Lead Developer"
-                },
-                {
-                    "name": "Symfony Community",
-                    "homepage": "http://symfony.com/contributors"
-                }
-            ],
-            "description": "Symfony ExpressionLanguage Component",
-            "homepage": "http://symfony.com",
-            "time": "2014-03-03 12:53:01"
-        },
-        {
             "name": "symfony/http-foundation",
             "version": "2.3.x-dev",
             "target-dir": "Symfony/Component/HttpFoundation",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/HttpFoundation.git",
-                "reference": "7432d14a05f627371cce49ade94e79761e757b2f"
+                "reference": "1140af76b82c45e97ecc56be6089710837620b93"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/HttpFoundation/zipball/7432d14a05f627371cce49ade94e79761e757b2f",
-                "reference": "7432d14a05f627371cce49ade94e79761e757b2f",
+                "url": "https://api.github.com/repos/symfony/HttpFoundation/zipball/1140af76b82c45e97ecc56be6089710837620b93",
+                "reference": "1140af76b82c45e97ecc56be6089710837620b93",
                 "shasum": ""
             },
             "require": {
@@ -1035,72 +986,7 @@
             ],
             "description": "Symfony HttpFoundation Component",
             "homepage": "http://symfony.com",
-            "time": "2014-03-04 07:33:02"
-        },
-        {
-            "name": "willdurand/hateoas",
-            "version": "v2.1.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/willdurand/Hateoas.git",
-                "reference": "fd370ba36490784d8eb28282bd88a6cda1437ec3"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/willdurand/Hateoas/zipball/fd370ba36490784d8eb28282bd88a6cda1437ec3",
-                "reference": "fd370ba36490784d8eb28282bd88a6cda1437ec3",
-                "shasum": ""
-            },
-            "require": {
-                "doctrine/annotations": "~1.0",
-                "doctrine/common": "~2.0",
-                "jms/metadata": "~1.1",
-                "jms/serializer": "~0.13@dev",
-                "symfony/expression-language": "~2.4"
-            },
-            "require-dev": {
-                "atoum/atoum": "dev-master",
-                "hautelook/frankenstein": "~0.1",
-                "pagerfanta/pagerfanta": "~1.0",
-                "phpunit/phpunit": "~3.7",
-                "symfony/dependency-injection": "~2.0",
-                "symfony/routing": "~2.0",
-                "symfony/yaml": "~2.0",
-                "twig/twig": "~1.12"
-            },
-            "suggest": {
-                "symfony/routing": "To use the SymfonyRouteFactory.",
-                "symfony/yaml": "To use yaml based configuration.",
-                "twig/twig": "To use the Twig extensions."
-            },
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "2.0-dev"
-                }
-            },
-            "autoload": {
-                "psr-0": {
-                    "Hateoas": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "William Durand",
-                    "email": "william.durand1@gmail.com",
-                    "homepage": "http://www.willdurand.fr"
-                },
-                {
-                    "name": "Adrien Brault",
-                    "email": "adrien.brault@gmail.com"
-                }
-            ],
-            "description": "A PHP library to support implementing representations for HATEOAS REST web services",
-            "time": "2014-01-13 11:24:15"
+            "time": "2014-03-25 16:54:15"
         }
     ],
     "packages-dev": [
@@ -1110,9 +996,9 @@
 
     ],
     "minimum-stability": "dev",
-    "stability-flags": [
-
-    ],
+    "stability-flags": {
+        "jms/serializer": 20
+    },
     "platform": [
 
     ],
