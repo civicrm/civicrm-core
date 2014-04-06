@@ -223,7 +223,7 @@
 
   </table>
     <!-- start of soft credit -->
-    <div class="crm-accordion-wrapper crm-accordion_title-accordion crm-accordion-processed" id="softCredit">
+    <div class="crm-accordion-wrapper crm-accordion_title-accordion crm-accordion-processed {if $noSoftCredit}collapsed{/if}" id="softCredit">
       <div class="crm-accordion-header">
         {ts}Soft Credit{/ts}&nbsp;{help id="id-soft_credit"}
       </div>
@@ -241,7 +241,7 @@
 
     <!-- start of PCP -->
     {if $siteHasPCPs}
-      <div class="crm-accordion-wrapper crm-accordion_title-accordion crm-accordion-processed" id="softCredit">
+      <div class="crm-accordion-wrapper crm-accordion_title-accordion crm-accordion-processed {if $noPCP}collapsed{/if}" id="softCredit">
         <div class="crm-accordion-header">
           {ts}Personal Campaign Page{/ts}&nbsp;{help id="id-pcp"}
         </div>
