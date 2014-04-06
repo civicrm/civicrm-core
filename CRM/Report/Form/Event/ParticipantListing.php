@@ -311,7 +311,6 @@ class CRM_Report_Form_Event_ParticipantListing extends CRM_Report_Form_Event {
             'no_display' => TRUE
           ),
           'trxn_id' => NULL,
-          'honor_type_id' => array('title' => ts('Honor Type')),
           'fee_amount' => array('title' => ts('Transaction Fee')),
           'net_amount' => NULL
         ),
@@ -595,7 +594,6 @@ GROUP BY  cv.label
     $financialTypes  = CRM_Contribute_PseudoConstant::financialType();
     $contributionStatus = CRM_Contribute_PseudoConstant::contributionStatus();
     $paymentInstruments = CRM_Contribute_PseudoConstant::paymentInstrument();
-    $honorTypes = CRM_Core_OptionGroup::values('honor_type', FALSE, FALSE, FALSE, NULL, 'label');
     $genders = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'gender_id', array('localize' => TRUE));
 
     foreach ($rows as $rowNum => $row) {
@@ -733,13 +731,6 @@ GROUP BY  cv.label
       if (array_key_exists('civicrm_contribution_financial_type_id', $row)) {
         if ($value = $row['civicrm_contribution_financial_type_id']) {
           $rows[$rowNum]['civicrm_contribution_financial_type_id'] = $financialTypes[$value];
-        }
-        $entryFound = TRUE;
-      }
-
-      if (array_key_exists('civicrm_contribution_honor_type_id', $row)) {
-        if ($value = $row['civicrm_contribution_honor_type_id']) {
-          $rows[$rowNum]['civicrm_contribution_honor_type_id'] = $honorTypes[$value];
         }
         $entryFound = TRUE;
       }
