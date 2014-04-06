@@ -155,7 +155,6 @@ VALUES
    ('group_type'                    , '{ts escape="sql"}Group Type{/ts}'                         , 1, 1),
    ('grant_status'                  , '{ts escape="sql"}Grant status{/ts}'                       , 1, 1),
    ('grant_type'                    , '{ts escape="sql"}Grant Type{/ts}'                         , 1, 1),
-   ('honor_type'                    , '{ts escape="sql"}Honor Type{/ts}'                         , 1, 1),
    ('custom_search'                 , '{ts escape="sql"}Custom Search{/ts}'                      , 1, 1),
    ('activity_status'               , '{ts escape="sql"}Activity Status{/ts}'                    , 1, 1),
    ('case_type'                     , '{ts escape="sql"}Case Type{/ts}'                          , 1, 1),
@@ -232,7 +231,6 @@ SELECT @option_group_id_adOpt          := max(id) from civicrm_option_group wher
 SELECT @option_group_id_gType          := max(id) from civicrm_option_group where name = 'group_type';
 SELECT @option_group_id_grantSt        := max(id) from civicrm_option_group where name = 'grant_status';
 SELECT @option_group_id_grantTyp       := max(id) from civicrm_option_group where name = 'grant_type';
-SELECT @option_group_id_honorTyp       := max(id) from civicrm_option_group where name = 'honor_type';
 SELECT @option_group_id_csearch        := max(id) from civicrm_option_group where name = 'custom_search';
 SELECT @option_group_id_acs            := max(id) from civicrm_option_group where name = 'activity_status';
 SELECT @option_group_id_ct             := max(id) from civicrm_option_group where name = 'case_type';
@@ -547,8 +545,6 @@ VALUES
   (@option_group_id_grantSt, '{ts escape="sql"}Paid{/ts}',                  4, 'Paid',     NULL, 0, NULL, 4, NULL, 0, 0, 1, NULL, NULL),
   (@option_group_id_grantSt, '{ts escape="sql"}Awaiting Information'{/ts}', 5, 'Awaiting Information', NULL, 0, NULL, 5, NULL, 0, 0, 1, NULL, NULL),
   (@option_group_id_grantSt, '{ts escape="sql"}Withdrawn{/ts}',             6, 'Withdrawn',     NULL, 0, NULL, 6, NULL, 0, 0, 1, NULL, NULL),
-  (@option_group_id_honorTyp, '{ts escape="sql"}In Honor of{/ts}'        , 1, 'In Honor of'       , NULL, 0, 1,    1, NULL, 0, 1, 1, NULL, NULL),
-  (@option_group_id_honorTyp, '{ts escape="sql"}In Memory of{/ts}'       , 2, 'In Memory of'      , NULL, 0, NULL, 2, NULL, 0, 1, 1, NULL, NULL),
 
   (@option_group_id_csearch , 'CRM_Contact_Form_Search_Custom_Sample'               , 1, 'CRM_Contact_Form_Search_Custom_Sample'      , NULL, 0, NULL, 1, '{ts escape="sql"}Household Name and State{/ts}', 0, 0, 1, NULL, NULL),
   (@option_group_id_csearch , 'CRM_Contact_Form_Search_Custom_ContributionAggregate', 2, 'CRM_Contact_Form_Search_Custom_ContributionAggregate', NULL, 0, NULL, 2, '{ts escape="sql"}Contribution Aggregate{/ts}', 0, 0, 1, NULL, NULL),
@@ -1613,4 +1609,6 @@ VALUES
   (@option_group_id_soft_credit_type   , {localize}'{ts escape="sql"}3rd-party Service{/ts}'{/localize}, 7, '3rd-party_service', 7, 0, 1, 0),
   (@option_group_id_soft_credit_type   , {localize}'{ts escape="sql"}Donor-advised Fund{/ts}'{/localize}, 8, 'donor-advised_fund', 8, 0, 1, 0),
   (@option_group_id_soft_credit_type   , {localize}'{ts escape="sql"}Matched Gift{/ts}'{/localize}, 9, 'matched_gift', 9, 0, 1, 0),
-  (@option_group_id_soft_credit_type   , {localize}'{ts escape="sql"}Personal Campaign Page{/ts}'{/localize}, 10, 'pcp', 10, 0, 1, 1);
+  (@option_group_id_soft_credit_type   , {localize}'{ts escape="sql"}Personal Campaign Page{/ts}'{/localize}, 10, 'pcp', 10, 0, 1, 1),
+  (@option_group_id_soft_credit_type   , {localize}'{ts escape="sql"}Gift{/ts}'{/localize}, 11, 'gift', 11, 0, 1, 1);
+

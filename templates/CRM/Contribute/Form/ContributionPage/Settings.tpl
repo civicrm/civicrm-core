@@ -111,9 +111,6 @@
     <tr class="crm-contribution-contributionpage-settings-form-block-honor_block_title">
         <td class="label">
             {$form.honor_block_title.label}
-            {if $action == 2}
-                {include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_contribution_page' field='honor_block_title' id=$contributionPageID}
-            {/if}
        </td>
        <td>
            {$form.honor_block_title.html}<br />
@@ -124,9 +121,6 @@
        <td class="label">
            {crmAPI var='result' entity='OptionGroup' action='get' sequential=1 name='soft_credit_type'}
            {$form.honor_block_text.label}
-           {if $action == 2}
-               {include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_contribution_page' field='honor_block_text' id=$contributionPageID}
-           {/if}
        </td>
        <td>
            {$form.honor_block_text.html}<br />
