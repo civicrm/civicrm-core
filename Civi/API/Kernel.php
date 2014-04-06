@@ -121,11 +121,12 @@ class Kernel {
   /**
    * Determine which, if any, service will execute the API request.
    *
-   * @param $apiRequest
+   * @param array $apiRequest
+   * @throws Exception\NotImplementedException
    * @return array
-   * @throws \API_Exception
    */
   public function resolve($apiRequest) {
+    /** @var ResolveEvent $resolveEvent */
     $resolveEvent = $this->dispatcher->dispatch(Events::RESOLVE, new ResolveEvent($apiRequest));
     $apiRequest = $resolveEvent->getApiRequest();
     if (!$resolveEvent->getApiProvider()) {
@@ -139,9 +140,10 @@ class Kernel {
    *
    * @param ProviderInterface $apiProvider
    * @param array $apiRequest
-   * @throws \API_Exception
+   * @throws Exception\UnauthorizedException
    */
   public function authorize($apiProvider, $apiRequest) {
+    /** @var AuthorizeEvent $event */
     $event = $this->dispatcher->dispatch(Events::AUTHORIZE, new AuthorizeEvent($apiProvider, $apiRequest));
     if (!$event->isAuthorized()) {
       throw new \Civi\API\Exception\UnauthorizedException("Authorization failed");
@@ -156,6 +158,7 @@ class Kernel {
    * @return mixed
    */
   public function prepare($apiProvider, $apiRequest) {
+    /** @var PrepareEvent $event */
     $event = $this->dispatcher->dispatch(Events::PREPARE, new PrepareEvent($apiProvider, $apiRequest));
     return $event->getApiRequest();
   }
@@ -169,6 +172,7 @@ class Kernel {
    * @return mixed
    */
   public function respond($apiProvider, $apiRequest, $result) {
+    /** @var RespondEvent $event */
     $event = $this->dispatcher->dispatch(Events::RESPOND, new RespondEvent($apiProvider, $apiRequest, $result));
     return $event->getResponse();
   }
@@ -181,6 +185,7 @@ class Kernel {
     // Question: Would it better to eliminate $this->apiProviders and just use $this->dispatcher?
     $entityNames = array();
     foreach ($this->getApiProviders() as $provider) {
+      /** @var ProviderInterface $provider */
       $entityNames = array_merge($entityNames, $provider->getEntityNames($version));
     }
     $entityNames = array_unique($entityNames);
@@ -197,6 +202,7 @@ class Kernel {
     // Question: Would it better to eliminate $this->apiProviders and just use $this->dispatcher?
     $actionNames = array();
     foreach ($this->getApiProviders() as $provider) {
+      /** @var ProviderInterface $provider */
       $actionNames = array_merge($actionNames, $provider->getActionNames($version, $entity));
     }
     $actionNames = array_unique($actionNames);
@@ -266,11 +272,12 @@ class Kernel {
 
   /**
    *
-   * @param <type> $data
+   * @param string $msg
    * @param array $data
-   * @param object $apiRequest DAO / BAO object to be freed here
+   * @param array $apiRequest
+   * @param mixed $code doesn't appear to be used
    *
-   * @throws API_Exception
+   * @throws \API_Exception
    * @return array <type>
    */
   function createError($msg, $data, $apiRequest, $code = NULL) {
@@ -279,7 +286,7 @@ class Kernel {
       try {
         $fields = _civicrm_api3_api_getfields($apiRequest);
         _civicrm_api3_validate_fields($apiRequest['entity'], $apiRequest['action'], $apiRequest['params'], $fields, TRUE);
-      } catch (Exception $e) {
+      } catch (\Exception $e) {
         $msg = $e->getMessage();
       }
     }
@@ -295,6 +302,8 @@ class Kernel {
   }
 
   /**
+   * @param array $apiRequest
+   * @param array $result
    * @return mixed
    */
   public function formatResult($apiRequest, $result) {
