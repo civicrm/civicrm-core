@@ -91,6 +91,7 @@ class Container {
    * @return \Civi\API\Kernel
    */
   public function createApiKernel($dispatcher, $magicFunctionProvider) {
+    $dispatcher->addSubscriber(new \Civi\API\Subscriber\ChainSubscriber());
     $dispatcher->addSubscriber(new \Civi\API\Subscriber\TransactionSubscriber());
     $dispatcher->addSubscriber(new \Civi\API\Subscriber\I18nSubscriber());
     $dispatcher->addSubscriber($magicFunctionProvider);

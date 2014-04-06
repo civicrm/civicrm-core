@@ -90,10 +90,6 @@ class Kernel {
       $apiRequest = $this->prepare($apiProvider, $apiRequest);
       $result = $apiProvider->invoke($apiRequest);
 
-      if (\CRM_Utils_Array::value('is_error', $result, 0) == 0) {
-        _civicrm_api_call_nested_api($apiRequest['params'], $result, $apiRequest['action'], $apiRequest['entity'], $apiRequest['version']);
-      }
-
       $apiResponse = $this->respond($apiProvider, $apiRequest, $result);
       return $this->formatResult($apiRequest, $apiResponse);
     }
