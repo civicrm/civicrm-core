@@ -1285,7 +1285,7 @@ function _civicrm_api3_validate_uniquekey(&$params, &$fieldName, &$fieldInfo) {
   // an entry already exists for this unique field
   if ($existing['count'] == 1) {
     // question - could this ever be a security issue?
-    throw new Exception("Field: `$fieldName` must be unique. An conflicting entity already exists - id: " . $existing['id']);
+    throw new API_Exception("Field: `$fieldName` must be unique. An conflicting entity already exists - id: " . $existing['id']);
   }
 }
 
