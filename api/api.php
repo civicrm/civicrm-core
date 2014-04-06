@@ -54,7 +54,7 @@ function civicrm_api3($entity, $action, $params = array()) {
  * @todo other output modifiers include contact_type
  *
  * @param array $apiRequest
- * @return getfields output
+ * @return array getfields output
  */
 function _civicrm_api3_api_getfields(&$apiRequest) {
   if (strtolower($apiRequest['action'] == 'getfields')) {
