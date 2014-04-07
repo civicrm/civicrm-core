@@ -203,6 +203,9 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
     if ($isPCP) {
       $query .= " AND pcp_id IS NOT NULL";
     }
+    else {
+      $query .= " AND pcp_id IS NULL";
+    }
     $params = array(1 => array($contributionID, 'Integer'));
 
     $dao = CRM_Core_DAO::executeQuery($query, $params);

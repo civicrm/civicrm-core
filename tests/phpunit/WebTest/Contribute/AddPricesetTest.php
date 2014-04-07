@@ -230,9 +230,9 @@ class WebTest_Contribute_AddPricesetTest extends CiviSeleniumTestCase {
 
     // select price set items
     $this->select('price_set_id', "label=$setTitle");
-    $this->type("xpath=//input[@class='form-text four required']", "1");
-    $this->click("xpath=//input[@class='form-radio']");
-    $this->click("xpath=//input[@class='form-checkbox']");
+    $this->type("xpath=//input[@class='four crm-form-text required']", "1");
+    $this->click("xpath=//input[@class='crm-form-radio']");
+    $this->click("xpath=//input[@class='crm-form-checkbox']");
     // select payment instrument type = Check and enter chk number
     $this->select('payment_instrument_id', 'value=4');
     $this->waitForElementPresent('check_number');
@@ -258,10 +258,10 @@ class WebTest_Contribute_AddPricesetTest extends CiviSeleniumTestCase {
     // Is status message correct?
     $this->assertTrue($this->isTextPresent('The contribution record has been saved.'), "Status message didn't show up after saving!");
 
-    $this->waitForElementPresent("xpath=//div[@id='Contributions']//table//tbody/tr[1]/td[8]/span/a[text()='View']");
+    $this->waitForElementPresent("xpath=//div[@class='view-content']//table[@class='selector row-highlight']//tbody/tr[1]/td[8]/span/a[text()='View']");
 
     //click through to the Membership view screen
-    $this->click("xpath=//div[@id='Contributions']//table/tbody/tr[1]/td[8]/span/a[text()='View']");
+    $this->click("xpath=//div[@class='view-content']//table[@class='selector row-highlight']//tbody/tr[1]/td[8]/span/a[text()='View']");
     $this->waitForElementPresent('_qf_ContributionView_cancel-bottom');
     $expected = array(
       2 => $financialType,
@@ -355,9 +355,9 @@ class WebTest_Contribute_AddPricesetTest extends CiviSeleniumTestCase {
     $lastName = 'An' . substr(sha1(rand()), 0, 7);
     $this->waitForElementPresent('_qf_Main_upload-bottom');
     $this->type('email-5', $firstName . '@example.com');
-    $this->type("xpath=//input[@class='form-text four required']", "1");
-    $this->click("xpath=//input[@class='form-radio']");
-    $this->click("xpath=//input[@class='form-checkbox']");
+    $this->type("xpath=//input[@class='four crm-form-text required']", "1");
+    $this->click("xpath=//input[@class='crm-form-radio']");
+    $this->click("xpath=//input[@class='crm-form-checkbox']");
 
     $streetAddress = '100 Main Street';
     $this->type('billing_street_address-5', $streetAddress);
@@ -396,7 +396,7 @@ class WebTest_Contribute_AddPricesetTest extends CiviSeleniumTestCase {
 
     $this->type('sort_name', "$firstName $lastName");
     $this->clickLink('_qf_Search_refresh', "xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']");
-    $this->clickLink("xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']", "_qf_ContributionView_cancel-bottom");
+    $this->clickLink("xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']", "_qf_ContributionView_cancel-bottom", FALSE);
 
     // View Contribution Record and test for expected values
     $expected = array(
@@ -474,8 +474,8 @@ class WebTest_Contribute_AddPricesetTest extends CiviSeleniumTestCase {
     $lastName = 'An' . substr(sha1(rand()), 0, 7);
     $this->waitForElementPresent('_qf_Main_upload-bottom');
     $this->type('email-5', $firstName . '@example.com');
-    $this->click("xpath=//input[@class='form-radio']");
-    $this->click("xpath=//input[@class='form-checkbox']");
+    $this->click("xpath=//input[@class='crm-form-radio']");
+    $this->click("xpath=//input[@class='crm-form-checkbox']");
 
     $streetAddress = '100 Main Street';
     $this->type('billing_street_address-5', $streetAddress);
@@ -511,8 +511,8 @@ class WebTest_Contribute_AddPricesetTest extends CiviSeleniumTestCase {
     $this->openCiviPage("contribute/search", "reset=1", 'contribution_date_low');
 
     $this->type('sort_name', "$firstName $lastName");
-    $this->clickLink('_qf_Search_refresh', "xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']");
-    $this->clickLink("xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']", '_qf_ContributionView_cancel-bottom');
+    $this->clickLink('_qf_Search_refresh', "xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']", FALSE);
+    $this->clickLink("xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']", '_qf_ContributionView_cancel-bottom', FALSE);
 
     // View Contribution Record and test for expected values
     $expected = array(
@@ -576,9 +576,9 @@ class WebTest_Contribute_AddPricesetTest extends CiviSeleniumTestCase {
 
     // select price set items
     $this->select('price_set_id', "label=$setTitle");
-    $this->type("xpath=//input[@class='form-text four required']", "1");
-    $this->click("xpath=//input[@class='form-radio']");
-    $this->click("xpath=//input[@class='form-checkbox']");
+    $this->type("xpath=//input[@class='four crm-form-text required']", "2");
+    $this->click("xpath=//input[@class='crm-form-radio']");
+    $this->click("xpath=//input[@class='crm-form-checkbox']");
     // select payment instrument type = Check and enter chk number
     $this->select('payment_instrument_id', 'value=4');
     $this->waitForElementPresent('check_number');
@@ -586,8 +586,9 @@ class WebTest_Contribute_AddPricesetTest extends CiviSeleniumTestCase {
 
     $this->type('trxn_id', 'P20901X1' . rand(100, 10000));
 
-    $this->webtestFillAutocomplete("{$lastNameSoft}, {$firstNameSoft}", 'soft_credit_contact_1');
+    $this->webtestFillAutocomplete("{$lastNameSoft}, {$firstNameSoft}", 'soft_credit_contact_id_1');
 
+    $this->type('soft_credit_amount_1', "1");
     //Additional Detail section
     $this->click('AdditionalDetail');
     $this->waitForElementPresent('thankyou_date');
@@ -597,11 +598,11 @@ class WebTest_Contribute_AddPricesetTest extends CiviSeleniumTestCase {
     $this->webtestFillDate('thankyou_date');
 
     // Clicking save.
-    $this->clickLink('_qf_Contribution_upload', "xpath=//div[@id='Contributions']//table//tbody/tr[1]/td[8]/span/a[text()='View']");
+    $this->clickLink('_qf_Contribution_upload', "xpath=//div[@class='view-content']//table[@class='selector row-highlight']//tbody/tr[1]/td[8]/span/a[text()='View']", FALSE);
     $this->assertTrue($this->isTextPresent('The contribution record has been saved.'), "Status message didn't show up after saving!");
 
     //click through to the Contribution view screen
-    $this->click("xpath=//div[@id='Contributions']//table/tbody/tr[1]/td[8]/span/a[text()='View']");
+    $this->click("xpath=//table[@class='selector row-highlight']/tbody/tr[1]/td[8]/span/a[text()='View']");
     $this->waitForElementPresent('_qf_ContributionView_cancel-bottom');
 
     // View Contribution Record and test for expected values
@@ -642,17 +643,17 @@ class WebTest_Contribute_AddPricesetTest extends CiviSeleniumTestCase {
     $this->type("css=input#sort_name_navigation", "$lastNameSoft, $firstNameSoft");
     $this->typeKeys("css=input#sort_name_navigation", "$lastNameSoft, $firstNameSoft");
     // wait for result list
-    $this->waitForElementPresent("css=div.ac_results-inner li");
+    $this->waitForElementPresent("css=ul.ui-autocomplete li");
 
     // visit contact summary page
-    $this->click("css=div.ac_results-inner li");
+    $this->click("css=ul.ui-autocomplete li");
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->click('css=li#tab_contribute a');
     $this->waitForElementPresent('link=Record Contribution (Check, Cash, EFT ...)');
 
-    $id = explode('id=', $this->getAttribute("xpath=id('rowid')/td[7]/a[text()='View']@href"));
+    $id = explode('id=', $this->getAttribute("xpath=//table[@class='selector row-highlight']/tbody//tr[@id='rowid']/td[8]/a[text()='View']@href"));
     $id = substr($id[1], 0, strpos($id[1], '&'));
-    $this->click("xpath=id('rowid')/td[7]/a");
+    $this->click("xpath=//table[@class='selector row-highlight']/tbody//tr[@id='rowid']/td[8]/a");
     $this->waitForElementPresent('_qf_ContributionView_cancel-bottom');
 
     $this->webtestVerifyTabularData($expected);

@@ -809,12 +809,17 @@ LEFT JOIN  civicrm_premiums            ON ( civicrm_premiums.entity_id = civicrm
     $domain = new CRM_Core_DAO_Domain();
     $domain->find(TRUE);
 
-    //When we are fetching the honor params respecting both multi and single lingual state
+    //When we are fetching the honor params respecting both multi and mono lingual state
     //and setting it to default param of Contribution Page's Main and Setting form
     if ($setDefault) {
       $sctJsonDecode = json_decode($params);
       $sctJsonDecode = (array) $sctJsonDecode->soft_credit;
-      if (!empty($sctJsonDecode[$config->lcMessages])) {
+      if (!$domain->locales && !empty($sctJsonDecode['default'])) {
+        //monolingual state
+        $sctJsonDecode += (array) $sctJsonDecode['default'];
+      }
+      elseif (!empty($sctJsonDecode[$config->lcMessages])) {
+        //multilingual state
         foreach ($sctJsonDecode[$config->lcMessages] as $column => $value) {
           $sctJsonDecode[$column] = $value;
         }
@@ -830,8 +835,10 @@ LEFT JOIN  civicrm_premiums            ON ( civicrm_premiums.entity_id = civicrm
         array(
           'soft_credit' => array(
             'soft_credit_types' => $params['soft_credit_types'],
-            'honor_block_title' => $params['honor_block_title'],
-            'honor_block_text' => $params['honor_block_text']
+            'default' => array(
+              'honor_block_title' => $params['honor_block_title'],
+              'honor_block_text' => $params['honor_block_text']
+            )
           )
         )
       );

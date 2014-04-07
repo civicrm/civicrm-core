@@ -319,11 +319,14 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
 
     // Handle soft credit and / or link to personal campaign page
     $softIDs = CRM_Contribute_BAO_ContributionSoft::getSoftCreditIds($contribution->id);
+
+    //Delete PCP against this contribution and create new on submitted PCP information
+    $pcpId = CRM_Contribute_BAO_ContributionSoft::getSoftCreditIds($contribution->id, TRUE);
+    if ($pcpId) {
+      $deleteParams = array('id' => $pcpId);
+      CRM_Contribute_BAO_ContributionSoft::del($deleteParams);
+    }
     if ($pcp = CRM_Utils_Array::value('pcp', $params)) {
-      if ($pcpId = CRM_Contribute_BAO_ContributionSoft::getSoftCreditIds($contribution->id, TRUE)) {
-        $deleteParams = array('id' => $pcpId);
-        CRM_Contribute_BAO_ContributionSoft::del($deleteParams);
-      }
       $softParams = array();
       $softParams['contribution_id'] = $contribution->id;
       $softParams['pcp_id'] = $pcp['pcp_made_through_id'];
@@ -877,18 +880,6 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = civicrm_contribution.conta
         'title' => 'Honor Contact Email',
         'headerPattern' => '/^honor_contact_email$/i',
         'where' => 'honor_email.email',
-      ),
-      'honor_contact_id' => array(
-        'name' => 'honor_contact_id',
-        'title' => 'Honor Contact ID',
-        'headerPattern' => '/^honor_contact_id$/i',
-        'where' => 'civicrm_contribution.honor_contact_id',
-      ),
-      'honor_type_label' => array(
-        'name' => 'honor_type_label',
-        'title' => 'Honor Type Label',
-        'headerPattern' => '/^honor_type_label$/i',
-        'where' => 'honor_type.label',
       ),
       'contribution_soft_credit_name' => array(
         'name' => 'contribution_soft_credit_name',
