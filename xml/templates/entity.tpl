@@ -59,7 +59,7 @@ class {$table.className} extends \Civi\Core\Entity {ldelim}
    * @JMS\Type("integer")
    * @ORM\Column(name="id", type="integer", nullable=false, options={ldelim}"unsigned":true{rdelim} )
    * @ORM\Id
-   * @ORM\GeneratedValue(strategy="IDENTITY")
+   * @ORM\GeneratedValue(strategy="AUTO")
    */
   private $id;
 {foreach from=$table.fields item=field}
