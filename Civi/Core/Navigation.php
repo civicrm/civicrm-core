@@ -69,7 +69,6 @@ class Navigation extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\Domain")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="domain_id", referencedColumnName="id")})
-   * 
    */
   private $domain;
   
@@ -78,7 +77,6 @@ class Navigation extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="label", type="string", length=255, nullable=true)
-   * 
    * 
    */
   private $label;
@@ -89,7 +87,6 @@ class Navigation extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="name", type="string", length=255, nullable=true)
    * 
-   * 
    */
   private $name;
   
@@ -98,7 +95,6 @@ class Navigation extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="url", type="string", length=255, nullable=true)
-   * 
    * 
    */
   private $url;
@@ -109,7 +105,6 @@ class Navigation extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="permission", type="string", length=255, nullable=true)
    * 
-   * 
    */
   private $permission;
   
@@ -118,7 +113,6 @@ class Navigation extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="permission_operator", type="string", length=3, nullable=true)
-   * 
    * 
    */
   private $permissionOperator;
@@ -129,7 +123,6 @@ class Navigation extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\Navigation")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="parent_id", referencedColumnName="id", onDelete="CASCADE")})
-   * 
    */
   private $parent;
   
@@ -138,7 +131,6 @@ class Navigation extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_active", type="boolean", nullable=true)
-   * 
    * 
    */
   private $isActive;
@@ -149,7 +141,6 @@ class Navigation extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="has_separator", type="boolean", nullable=true)
    * 
-   * 
    */
   private $hasSeparator;
   
@@ -158,7 +149,6 @@ class Navigation extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="weight", type="integer", nullable=true, options={"unsigned":true})
-   * 
    * 
    */
   private $weight;

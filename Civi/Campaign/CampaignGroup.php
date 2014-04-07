@@ -69,7 +69,6 @@ class CampaignGroup extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Campaign\Campaign")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="campaign_id", referencedColumnName="id", onDelete="CASCADE")})
-   * 
    */
   private $campaign;
   
@@ -78,7 +77,6 @@ class CampaignGroup extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="group_type", type="string", length=8, nullable=true)
-   * 
    * 
    */
   private $groupType = 'NULL';
@@ -89,7 +87,6 @@ class CampaignGroup extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="entity_table", type="string", length=64, nullable=true)
    * 
-   * 
    */
   private $entityTable = 'NULL';
   
@@ -98,7 +95,6 @@ class CampaignGroup extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="entity_id", type="integer", nullable=true, options={"unsigned":true})
-   * 
    * 
    */
   private $entityId = 'NULL';

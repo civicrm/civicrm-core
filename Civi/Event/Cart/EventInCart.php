@@ -69,7 +69,6 @@ class EventInCart extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Event\Event")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="event_id", referencedColumnName="id", onDelete="CASCADE")})
-   * 
    */
   private $event;
   
@@ -79,7 +78,6 @@ class EventInCart extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Event\Cart\Cart")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="event_cart_id", referencedColumnName="id", onDelete="CASCADE")})
-   * 
    */
   private $eventCart;
 

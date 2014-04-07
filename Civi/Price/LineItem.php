@@ -69,7 +69,6 @@ class LineItem extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="entity_table", type="string", length=64, nullable=false)
    * 
-   * 
    */
   private $entityTable;
   
@@ -78,7 +77,6 @@ class LineItem extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="entity_id", type="integer", nullable=false, options={"unsigned":true})
-   * 
    * 
    */
   private $entityId;
@@ -89,7 +87,6 @@ class LineItem extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Price\PriceField")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="price_field_id", referencedColumnName="id", onDelete="SET NULL")})
-   * 
    */
   private $priceField;
   
@@ -98,7 +95,6 @@ class LineItem extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="label", type="string", length=255, nullable=true)
-   * 
    * 
    */
   private $label = 'NULL';
@@ -109,7 +105,6 @@ class LineItem extends \Civi\Core\Entity {
    * @JMS\Type("integer")
    * @ORM\Column(name="qty", type="integer", nullable=false, options={"unsigned":true})
    * 
-   * 
    */
   private $qty;
   
@@ -118,7 +113,6 @@ class LineItem extends \Civi\Core\Entity {
    *
    * @JMS\Type("float")
    * @ORM\Column(name="unit_price", type="float", nullable=false)
-   * 
    * 
    */
   private $unitPrice;
@@ -129,7 +123,6 @@ class LineItem extends \Civi\Core\Entity {
    * @JMS\Type("float")
    * @ORM\Column(name="line_total", type="float", nullable=false)
    * 
-   * 
    */
   private $lineTotal;
   
@@ -138,7 +131,6 @@ class LineItem extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="participant_count", type="integer", nullable=true, options={"unsigned":true})
-   * 
    * 
    */
   private $participantCount = 'NULL';
@@ -149,7 +141,6 @@ class LineItem extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Price\PriceFieldValue")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="price_field_value_id", referencedColumnName="id", onDelete="SET NULL")})
-   * 
    */
   private $priceFieldValue = 'NULL';
   
@@ -159,7 +150,6 @@ class LineItem extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Financial\FinancialType")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="financial_type_id", referencedColumnName="id", onDelete="SET NULL")})
-   * 
    */
   private $financialType = 'NULL';
   
@@ -168,7 +158,6 @@ class LineItem extends \Civi\Core\Entity {
    *
    * @JMS\Type("float")
    * @ORM\Column(name="deductible_amount", type="float", nullable=false, options={"default": 0.0})
-   * 
    * 
    */
   private $deductibleAmount = '0.0';

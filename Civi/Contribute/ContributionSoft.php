@@ -69,7 +69,6 @@ class ContributionSoft extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Contribute\Contribution")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="contribution_id", referencedColumnName="id", onDelete="CASCADE")})
-   * 
    */
   private $contribution;
   
@@ -79,7 +78,6 @@ class ContributionSoft extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Contact")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="contact_id", referencedColumnName="id", onDelete="CASCADE")})
-   * 
    */
   private $contact;
   
@@ -88,7 +86,6 @@ class ContributionSoft extends \Civi\Core\Entity {
    *
    * @JMS\Type("float")
    * @ORM\Column(name="amount", type="float", nullable=false)
-   * 
    * 
    */
   private $amount;
@@ -99,7 +96,6 @@ class ContributionSoft extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="currency", type="string", length=3, nullable=true)
    * 
-   * 
    */
   private $currency = 'NULL';
   
@@ -109,7 +105,6 @@ class ContributionSoft extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\PCP\PCP")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="pcp_id", referencedColumnName="id", onDelete="SET NULL")})
-   * 
    */
   private $pcp = 'NULL';
   
@@ -118,7 +113,6 @@ class ContributionSoft extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="pcp_display_in_roll", type="boolean", nullable=true, options={"default": 0})
-   * 
    * 
    */
   private $pcpDisplayInRoll = '0';
@@ -129,7 +123,6 @@ class ContributionSoft extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="pcp_roll_nickname", type="string", length=255, nullable=true)
    * 
-   * 
    */
   private $pcpRollNickname = 'NULL';
   
@@ -139,7 +132,6 @@ class ContributionSoft extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="pcp_personal_note", type="string", length=255, nullable=true)
    * 
-   * 
    */
   private $pcpPersonalNote = 'NULL';
   
@@ -148,7 +140,6 @@ class ContributionSoft extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="soft_credit_type_id", type="integer", nullable=true, options={"unsigned":true})
-   * 
    * 
    */
   private $softCreditTypeId = 'NULL';

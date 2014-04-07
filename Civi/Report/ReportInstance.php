@@ -69,7 +69,6 @@ class ReportInstance extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\Domain")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="domain_id", referencedColumnName="id")})
-   * 
    */
   private $domain;
   
@@ -78,7 +77,6 @@ class ReportInstance extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="title", type="string", length=255, nullable=true)
-   * 
    * 
    */
   private $title;
@@ -89,7 +87,6 @@ class ReportInstance extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="report_id", type="string", length=64, nullable=false)
    * 
-   * 
    */
   private $reportId;
   
@@ -98,7 +95,6 @@ class ReportInstance extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="name", type="string", length=255, nullable=true)
-   * 
    * 
    */
   private $name;
@@ -109,7 +105,6 @@ class ReportInstance extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="args", type="string", length=255, nullable=true)
    * 
-   * 
    */
   private $args;
   
@@ -118,7 +113,6 @@ class ReportInstance extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="description", type="string", length=255, nullable=true)
-   * 
    * 
    */
   private $description;
@@ -129,7 +123,6 @@ class ReportInstance extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="permission", type="string", length=255, nullable=true)
    * 
-   * 
    */
   private $permission;
   
@@ -138,7 +131,6 @@ class ReportInstance extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="grouprole", type="string", length=1024, nullable=true)
-   * 
    * 
    */
   private $grouprole;
@@ -149,7 +141,6 @@ class ReportInstance extends \Civi\Core\Entity {
    * @JMS\Type("text")
    * @ORM\Column(name="form_values", type="text", length=65535, nullable=true)
    * 
-   * 
    */
   private $formValues;
   
@@ -158,7 +149,6 @@ class ReportInstance extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_active", type="boolean", nullable=true)
-   * 
    * 
    */
   private $isActive;
@@ -169,7 +159,6 @@ class ReportInstance extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="email_subject", type="string", length=255, nullable=true)
    * 
-   * 
    */
   private $emailSubject;
   
@@ -178,7 +167,6 @@ class ReportInstance extends \Civi\Core\Entity {
    *
    * @JMS\Type("text")
    * @ORM\Column(name="email_to", type="text", length=65535, nullable=true)
-   * 
    * 
    */
   private $emailTo;
@@ -189,7 +177,6 @@ class ReportInstance extends \Civi\Core\Entity {
    * @JMS\Type("text")
    * @ORM\Column(name="email_cc", type="text", length=65535, nullable=true)
    * 
-   * 
    */
   private $emailCc;
   
@@ -198,7 +185,6 @@ class ReportInstance extends \Civi\Core\Entity {
    *
    * @JMS\Type("text")
    * @ORM\Column(name="header", type="text", length=65535, nullable=true)
-   * 
    * 
    */
   private $header;
@@ -209,7 +195,6 @@ class ReportInstance extends \Civi\Core\Entity {
    * @JMS\Type("text")
    * @ORM\Column(name="footer", type="text", length=65535, nullable=true)
    * 
-   * 
    */
   private $footer;
   
@@ -219,7 +204,6 @@ class ReportInstance extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\Navigation")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="navigation_id", referencedColumnName="id", onDelete="SET NULL")})
-   * 
    */
   private $navigation;
   
@@ -229,7 +213,6 @@ class ReportInstance extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Report\ReportInstance")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="drilldown_id", referencedColumnName="id", onDelete="SET NULL")})
-   * 
    */
   private $drilldown;
   
@@ -238,7 +221,6 @@ class ReportInstance extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_reserved", type="boolean", nullable=true, options={"default": 0})
-   * 
    * 
    */
   private $isReserved = '0';

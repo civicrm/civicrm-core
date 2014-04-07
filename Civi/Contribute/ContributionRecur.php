@@ -69,7 +69,6 @@ class ContributionRecur extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Contact")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="contact_id", referencedColumnName="id", onDelete="CASCADE")})
-   * 
    */
   private $contact;
   
@@ -78,7 +77,6 @@ class ContributionRecur extends \Civi\Core\Entity {
    *
    * @JMS\Type("float")
    * @ORM\Column(name="amount", type="float", nullable=false)
-   * 
    * 
    */
   private $amount;
@@ -89,7 +87,6 @@ class ContributionRecur extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="currency", type="string", length=3, nullable=true)
    * 
-   * 
    */
   private $currency = 'NULL';
   
@@ -98,7 +95,6 @@ class ContributionRecur extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="frequency_unit", type="string", length=8, nullable=true, options={"default": "month"})
-   * 
    * 
    */
   private $frequencyUnit = 'month';
@@ -109,7 +105,6 @@ class ContributionRecur extends \Civi\Core\Entity {
    * @JMS\Type("integer")
    * @ORM\Column(name="frequency_interval", type="integer", nullable=false, options={"unsigned":true})
    * 
-   * 
    */
   private $frequencyInterval;
   
@@ -118,7 +113,6 @@ class ContributionRecur extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="installments", type="integer", nullable=true, options={"unsigned":true})
-   * 
    * 
    */
   private $installments;
@@ -129,7 +123,6 @@ class ContributionRecur extends \Civi\Core\Entity {
    * @JMS\Type("datetime")
    * @ORM\Column(name="start_date", type="datetime", nullable=false)
    * 
-   * 
    */
   private $startDate;
   
@@ -138,7 +131,6 @@ class ContributionRecur extends \Civi\Core\Entity {
    *
    * @JMS\Type("datetime")
    * @ORM\Column(name="create_date", type="datetime", nullable=false)
-   * 
    * 
    */
   private $createDate;
@@ -149,7 +141,6 @@ class ContributionRecur extends \Civi\Core\Entity {
    * @JMS\Type("datetime")
    * @ORM\Column(name="modified_date", type="datetime", nullable=true)
    * 
-   * 
    */
   private $modifiedDate;
   
@@ -158,7 +149,6 @@ class ContributionRecur extends \Civi\Core\Entity {
    *
    * @JMS\Type("datetime")
    * @ORM\Column(name="cancel_date", type="datetime", nullable=true)
-   * 
    * 
    */
   private $cancelDate;
@@ -169,7 +159,6 @@ class ContributionRecur extends \Civi\Core\Entity {
    * @JMS\Type("datetime")
    * @ORM\Column(name="end_date", type="datetime", nullable=true)
    * 
-   * 
    */
   private $endDate;
   
@@ -178,7 +167,6 @@ class ContributionRecur extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="processor_id", type="string", length=255, nullable=true)
-   * 
    * 
    */
   private $processorId;
@@ -189,7 +177,6 @@ class ContributionRecur extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="trxn_id", type="string", length=255, nullable=true)
    * 
-   * 
    */
   private $trxnId;
   
@@ -198,7 +185,6 @@ class ContributionRecur extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="invoice_id", type="string", length=255, nullable=true)
-   * 
    * 
    */
   private $invoiceId;
@@ -209,7 +195,6 @@ class ContributionRecur extends \Civi\Core\Entity {
    * @JMS\Type("integer")
    * @ORM\Column(name="contribution_status_id", type="integer", nullable=true, options={"unsigned":true, "default": 1})
    * 
-   * 
    */
   private $contributionStatusId = '1';
   
@@ -218,7 +203,6 @@ class ContributionRecur extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_test", type="boolean", nullable=true, options={"default": 0})
-   * 
    * 
    */
   private $isTest = '0';
@@ -229,7 +213,6 @@ class ContributionRecur extends \Civi\Core\Entity {
    * @JMS\Type("integer")
    * @ORM\Column(name="cycle_day", type="integer", nullable=false, options={"unsigned":true, "default": 1})
    * 
-   * 
    */
   private $cycleDay = '1';
   
@@ -238,7 +221,6 @@ class ContributionRecur extends \Civi\Core\Entity {
    *
    * @JMS\Type("datetime")
    * @ORM\Column(name="next_sched_contribution_date", type="datetime", nullable=true)
-   * 
    * 
    */
   private $nextSchedContributionDate;
@@ -249,7 +231,6 @@ class ContributionRecur extends \Civi\Core\Entity {
    * @JMS\Type("integer")
    * @ORM\Column(name="failure_count", type="integer", nullable=true, options={"unsigned":true, "default": 0})
    * 
-   * 
    */
   private $failureCount = '0';
   
@@ -258,7 +239,6 @@ class ContributionRecur extends \Civi\Core\Entity {
    *
    * @JMS\Type("datetime")
    * @ORM\Column(name="failure_retry_date", type="datetime", nullable=true)
-   * 
    * 
    */
   private $failureRetryDate;
@@ -269,7 +249,6 @@ class ContributionRecur extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="auto_renew", type="boolean", nullable=false, options={"default": 0})
    * 
-   * 
    */
   private $autoRenew = '0';
   
@@ -279,7 +258,6 @@ class ContributionRecur extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Financial\PaymentProcessor")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="payment_processor_id", referencedColumnName="id", onDelete="SET NULL")})
-   * 
    */
   private $paymentProcessor;
   
@@ -289,7 +267,6 @@ class ContributionRecur extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Financial\FinancialType")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="financial_type_id", referencedColumnName="id", onDelete="SET NULL")})
-   * 
    */
   private $financialType;
   
@@ -298,7 +275,6 @@ class ContributionRecur extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="payment_instrument_id", type="integer", nullable=true, options={"unsigned":true})
-   * 
    * 
    */
   private $paymentInstrumentId;
@@ -309,7 +285,6 @@ class ContributionRecur extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Campaign\Campaign")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="campaign_id", referencedColumnName="id", onDelete="SET NULL")})
-   * 
    */
   private $campaign;
   
@@ -318,7 +293,6 @@ class ContributionRecur extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_email_receipt", type="boolean", nullable=true, options={"default": 1})
-   * 
    * 
    */
   private $isEmailReceipt = '1';

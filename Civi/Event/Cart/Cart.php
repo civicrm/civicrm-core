@@ -69,7 +69,6 @@ class Cart extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Contact")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="user_id", referencedColumnName="id", onDelete="SET NULL")})
-   * 
    */
   private $user;
   
@@ -78,7 +77,6 @@ class Cart extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="completed", type="boolean", nullable=true, options={"default": 0})
-   * 
    * 
    */
   private $completed = '0';

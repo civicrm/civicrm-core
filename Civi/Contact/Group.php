@@ -69,7 +69,6 @@ class Group extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="name", type="string", length=64, nullable=true)
    * 
-   * 
    */
   private $name;
   
@@ -78,7 +77,6 @@ class Group extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="title", type="string", length=64, nullable=true)
-   * 
    * 
    */
   private $title;
@@ -89,7 +87,6 @@ class Group extends \Civi\Core\Entity {
    * @JMS\Type("text")
    * @ORM\Column(name="description", type="text", length=65535, nullable=true)
    * 
-   * 
    */
   private $description;
   
@@ -98,7 +95,6 @@ class Group extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="source", type="string", length=64, nullable=true)
-   * 
    * 
    */
   private $source;
@@ -109,7 +105,6 @@ class Group extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\SavedSearch")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="saved_search_id", referencedColumnName="id", onDelete="SET NULL")})
-   * 
    */
   private $savedSearch;
   
@@ -118,7 +113,6 @@ class Group extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_active", type="boolean", nullable=true)
-   * 
    * 
    */
   private $isActive;
@@ -129,7 +123,6 @@ class Group extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="visibility", type="string", length=24, nullable=true, options={"default": "User and User Admin Only"})
    * 
-   * 
    */
   private $visibility = 'User and User Admin Only';
   
@@ -138,7 +131,6 @@ class Group extends \Civi\Core\Entity {
    *
    * @JMS\Type("text")
    * @ORM\Column(name="where_clause", type="text", length=65535, nullable=true)
-   * 
    * 
    */
   private $whereClause;
@@ -149,7 +141,6 @@ class Group extends \Civi\Core\Entity {
    * @JMS\Type("text")
    * @ORM\Column(name="select_tables", type="text", length=65535, nullable=true)
    * 
-   * 
    */
   private $selectTables;
   
@@ -158,7 +149,6 @@ class Group extends \Civi\Core\Entity {
    *
    * @JMS\Type("text")
    * @ORM\Column(name="where_tables", type="text", length=65535, nullable=true)
-   * 
    * 
    */
   private $whereTables;
@@ -169,7 +159,6 @@ class Group extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="group_type", type="string", length=128, nullable=true)
    * 
-   * 
    */
   private $groupType;
   
@@ -178,7 +167,6 @@ class Group extends \Civi\Core\Entity {
    *
    * @JMS\Type("datetime")
    * @ORM\Column(name="cache_date", type="datetime", nullable=true)
-   * 
    * 
    */
   private $cacheDate;
@@ -189,7 +177,6 @@ class Group extends \Civi\Core\Entity {
    * @JMS\Type("datetime")
    * @ORM\Column(name="refresh_date", type="datetime", nullable=true)
    * 
-   * 
    */
   private $refreshDate;
   
@@ -198,7 +185,6 @@ class Group extends \Civi\Core\Entity {
    *
    * @JMS\Type("text")
    * @ORM\Column(name="parents", type="text", length=65535, nullable=true)
-   * 
    * 
    */
   private $parents;
@@ -209,7 +195,6 @@ class Group extends \Civi\Core\Entity {
    * @JMS\Type("text")
    * @ORM\Column(name="children", type="text", length=65535, nullable=true)
    * 
-   * 
    */
   private $children;
   
@@ -218,7 +203,6 @@ class Group extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_hidden", type="boolean", nullable=true, options={"default": 0})
-   * 
    * 
    */
   private $isHidden = '0';
@@ -229,7 +213,6 @@ class Group extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_reserved", type="boolean", nullable=true, options={"default": 0})
    * 
-   * 
    */
   private $isReserved = '0';
   
@@ -239,7 +222,6 @@ class Group extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Contact")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="created_id", referencedColumnName="id", onDelete="SET NULL")})
-   * 
    */
   private $created;
   
@@ -249,7 +231,6 @@ class Group extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Contact")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="modified_id", referencedColumnName="id", onDelete="SET NULL")})
-   * 
    */
   private $modified;
 

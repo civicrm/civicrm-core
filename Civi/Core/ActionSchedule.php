@@ -69,7 +69,6 @@ class ActionSchedule extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="name", type="string", length=64, nullable=true)
    * 
-   * 
    */
   private $name;
   
@@ -78,7 +77,6 @@ class ActionSchedule extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="title", type="string", length=64, nullable=true)
-   * 
    * 
    */
   private $title;
@@ -89,7 +87,6 @@ class ActionSchedule extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="recipient", type="string", length=64, nullable=true)
    * 
-   * 
    */
   private $recipient;
   
@@ -98,7 +95,6 @@ class ActionSchedule extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="limit_to", type="boolean", nullable=true, options={"default": 1})
-   * 
    * 
    */
   private $limitTo = '1';
@@ -109,7 +105,6 @@ class ActionSchedule extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="entity_value", type="string", length=64, nullable=true)
    * 
-   * 
    */
   private $entityValue;
   
@@ -118,7 +113,6 @@ class ActionSchedule extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="entity_status", type="string", length=64, nullable=true)
-   * 
    * 
    */
   private $entityStatus;
@@ -129,7 +123,6 @@ class ActionSchedule extends \Civi\Core\Entity {
    * @JMS\Type("integer")
    * @ORM\Column(name="start_action_offset", type="integer", nullable=true, options={"unsigned":true})
    * 
-   * 
    */
   private $startActionOffset;
   
@@ -138,7 +131,6 @@ class ActionSchedule extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="start_action_unit", type="string", length=8, nullable=true)
-   * 
    * 
    */
   private $startActionUnit;
@@ -149,7 +141,6 @@ class ActionSchedule extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="start_action_condition", type="string", length=32, nullable=true)
    * 
-   * 
    */
   private $startActionCondition;
   
@@ -158,7 +149,6 @@ class ActionSchedule extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="start_action_date", type="string", length=64, nullable=true)
-   * 
    * 
    */
   private $startActionDate;
@@ -169,7 +159,6 @@ class ActionSchedule extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_repeat", type="boolean", nullable=true, options={"default": 0})
    * 
-   * 
    */
   private $isRepeat = '0';
   
@@ -178,7 +167,6 @@ class ActionSchedule extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="repetition_frequency_unit", type="string", length=8, nullable=true)
-   * 
    * 
    */
   private $repetitionFrequencyUnit;
@@ -189,7 +177,6 @@ class ActionSchedule extends \Civi\Core\Entity {
    * @JMS\Type("integer")
    * @ORM\Column(name="repetition_frequency_interval", type="integer", nullable=true, options={"unsigned":true})
    * 
-   * 
    */
   private $repetitionFrequencyInterval;
   
@@ -198,7 +185,6 @@ class ActionSchedule extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="end_frequency_unit", type="string", length=8, nullable=true)
-   * 
    * 
    */
   private $endFrequencyUnit;
@@ -209,7 +195,6 @@ class ActionSchedule extends \Civi\Core\Entity {
    * @JMS\Type("integer")
    * @ORM\Column(name="end_frequency_interval", type="integer", nullable=true, options={"unsigned":true})
    * 
-   * 
    */
   private $endFrequencyInterval;
   
@@ -218,7 +203,6 @@ class ActionSchedule extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="end_action", type="string", length=32, nullable=true)
-   * 
    * 
    */
   private $endAction;
@@ -229,7 +213,6 @@ class ActionSchedule extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="end_date", type="string", length=64, nullable=true)
    * 
-   * 
    */
   private $endDate;
   
@@ -238,7 +221,6 @@ class ActionSchedule extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_active", type="boolean", nullable=true, options={"default": 1})
-   * 
    * 
    */
   private $isActive = '1';
@@ -249,7 +231,6 @@ class ActionSchedule extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="recipient_manual", type="string", length=128, nullable=true)
    * 
-   * 
    */
   private $recipientManual;
   
@@ -258,7 +239,6 @@ class ActionSchedule extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="recipient_listing", type="string", length=128, nullable=true)
-   * 
    * 
    */
   private $recipientListing;
@@ -269,7 +249,6 @@ class ActionSchedule extends \Civi\Core\Entity {
    * @JMS\Type("text")
    * @ORM\Column(name="body_text", type="text", nullable=true)
    * 
-   * 
    */
   private $bodyText;
   
@@ -278,7 +257,6 @@ class ActionSchedule extends \Civi\Core\Entity {
    *
    * @JMS\Type("text")
    * @ORM\Column(name="body_html", type="text", nullable=true)
-   * 
    * 
    */
   private $bodyHtml;
@@ -289,7 +267,6 @@ class ActionSchedule extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="subject", type="string", length=128, nullable=true)
    * 
-   * 
    */
   private $subject;
   
@@ -298,7 +275,6 @@ class ActionSchedule extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="record_activity", type="boolean", nullable=true)
-   * 
    * 
    */
   private $recordActivity = 'NULL';
@@ -309,7 +285,6 @@ class ActionSchedule extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\ActionMapping")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="mapping_id", referencedColumnName="id", onDelete="SET NULL")})
-   * 
    */
   private $mapping;
   
@@ -319,7 +294,6 @@ class ActionSchedule extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Group")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="group_id", referencedColumnName="id", onDelete="SET NULL")})
-   * 
    */
   private $group;
   
@@ -329,7 +303,6 @@ class ActionSchedule extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\MessageTemplate")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="msg_template_id", referencedColumnName="id", onDelete="SET NULL")})
-   * 
    */
   private $msgTemplate;
   
@@ -338,7 +311,6 @@ class ActionSchedule extends \Civi\Core\Entity {
    *
    * @JMS\Type("date")
    * @ORM\Column(name="absolute_date", type="date", nullable=true)
-   * 
    * 
    */
   private $absoluteDate;
@@ -349,7 +321,6 @@ class ActionSchedule extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="mode", type="string", length=128, nullable=true, options={"default": "Email"})
    * 
-   * 
    */
   private $mode = '"Email"';
   
@@ -359,7 +330,6 @@ class ActionSchedule extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\SMS\Provider")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="sms_provider_id", referencedColumnName="id", onDelete="SET NULL")})
-   * 
    */
   private $smsProvider;
 

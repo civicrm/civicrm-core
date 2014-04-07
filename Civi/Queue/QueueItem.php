@@ -69,7 +69,6 @@ class QueueItem extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="queue_name", type="string", length=64, nullable=false)
    * 
-   * 
    */
   private $queueName;
   
@@ -78,7 +77,6 @@ class QueueItem extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="weight", type="integer", nullable=false)
-   * 
    * 
    */
   private $weight;
@@ -89,7 +87,6 @@ class QueueItem extends \Civi\Core\Entity {
    * @JMS\Type("datetime")
    * @ORM\Column(name="submit_time", type="datetime", nullable=false)
    * 
-   * 
    */
   private $submitTime;
   
@@ -99,7 +96,6 @@ class QueueItem extends \Civi\Core\Entity {
    * @JMS\Type("datetime")
    * @ORM\Column(name="release_time", type="datetime", nullable=true)
    * 
-   * 
    */
   private $releaseTime;
   
@@ -108,7 +104,6 @@ class QueueItem extends \Civi\Core\Entity {
    *
    * @JMS\Type("text")
    * @ORM\Column(name="data", type="text", length=65535, nullable=true)
-   * 
    * 
    */
   private $data;

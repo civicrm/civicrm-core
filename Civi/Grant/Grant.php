@@ -69,7 +69,6 @@ class Grant extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Contact")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="contact_id", referencedColumnName="id", onDelete="CASCADE")})
-   * 
    */
   private $contact;
   
@@ -78,7 +77,6 @@ class Grant extends \Civi\Core\Entity {
    *
    * @JMS\Type("date")
    * @ORM\Column(name="application_received_date", type="date", nullable=true)
-   * 
    * 
    */
   private $applicationReceivedDate;
@@ -89,7 +87,6 @@ class Grant extends \Civi\Core\Entity {
    * @JMS\Type("date")
    * @ORM\Column(name="decision_date", type="date", nullable=true)
    * 
-   * 
    */
   private $decisionDate;
   
@@ -98,7 +95,6 @@ class Grant extends \Civi\Core\Entity {
    *
    * @JMS\Type("date")
    * @ORM\Column(name="money_transfer_date", type="date", nullable=true)
-   * 
    * 
    */
   private $moneyTransferDate;
@@ -109,7 +105,6 @@ class Grant extends \Civi\Core\Entity {
    * @JMS\Type("date")
    * @ORM\Column(name="grant_due_date", type="date", nullable=true)
    * 
-   * 
    */
   private $grantDueDate;
   
@@ -118,7 +113,6 @@ class Grant extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="grant_report_received", type="boolean", nullable=true)
-   * 
    * 
    */
   private $grantReportReceived;
@@ -129,7 +123,6 @@ class Grant extends \Civi\Core\Entity {
    * @JMS\Type("integer")
    * @ORM\Column(name="grant_type_id", type="integer", nullable=false, options={"unsigned":true})
    * 
-   * 
    */
   private $grantTypeId;
   
@@ -138,7 +131,6 @@ class Grant extends \Civi\Core\Entity {
    *
    * @JMS\Type("float")
    * @ORM\Column(name="amount_total", type="float", nullable=false)
-   * 
    * 
    */
   private $amountTotal;
@@ -149,7 +141,6 @@ class Grant extends \Civi\Core\Entity {
    * @JMS\Type("float")
    * @ORM\Column(name="amount_requested", type="float", nullable=true)
    * 
-   * 
    */
   private $amountRequested;
   
@@ -158,7 +149,6 @@ class Grant extends \Civi\Core\Entity {
    *
    * @JMS\Type("float")
    * @ORM\Column(name="amount_granted", type="float", nullable=true)
-   * 
    * 
    */
   private $amountGranted;
@@ -169,7 +159,6 @@ class Grant extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="currency", type="string", length=3, nullable=false)
    * 
-   * 
    */
   private $currency;
   
@@ -178,7 +167,6 @@ class Grant extends \Civi\Core\Entity {
    *
    * @JMS\Type("text")
    * @ORM\Column(name="rationale", type="text", length=65535, nullable=true)
-   * 
    * 
    */
   private $rationale;
@@ -189,7 +177,6 @@ class Grant extends \Civi\Core\Entity {
    * @JMS\Type("integer")
    * @ORM\Column(name="status_id", type="integer", nullable=false, options={"unsigned":true})
    * 
-   * 
    */
   private $statusId;
   
@@ -199,7 +186,6 @@ class Grant extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Financial\FinancialType")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="financial_type_id", referencedColumnName="id", onDelete="SET NULL")})
-   * 
    */
   private $financialType = 'NULL';
 

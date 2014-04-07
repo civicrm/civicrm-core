@@ -255,14 +255,6 @@ class CRM_Core_CodeGen_EntitySpecification {
       $field['columnJoin'] = '';
 
       $field['setFunctionInput'] = '$' . $field['propertyName'];
-
-      //special handling for timestamp column type
-//      if (empty($field['version'])) {
-//        $field['version'] = '';
-//      }
-//      else {
-//        $field['version'] = '@ORM\Version';
-//      }
     }
 
     if ($this->value('primaryKey', $tableXML)) {

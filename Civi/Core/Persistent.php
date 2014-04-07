@@ -69,7 +69,6 @@ class Persistent extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="context", type="string", length=255, nullable=false)
    * 
-   * 
    */
   private $context;
   
@@ -78,7 +77,6 @@ class Persistent extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="name", type="string", length=255, nullable=false)
-   * 
    * 
    */
   private $name;
@@ -89,7 +87,6 @@ class Persistent extends \Civi\Core\Entity {
    * @JMS\Type("text")
    * @ORM\Column(name="data", type="text", nullable=true)
    * 
-   * 
    */
   private $data;
   
@@ -98,7 +95,6 @@ class Persistent extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_config", type="boolean", nullable=false, options={"default": 0})
-   * 
    * 
    */
   private $isConfig = '0';

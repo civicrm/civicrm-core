@@ -69,7 +69,6 @@ class PaymentProcessorType extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="name", type="string", length=64, nullable=true)
    * 
-   * 
    */
   private $name;
   
@@ -78,7 +77,6 @@ class PaymentProcessorType extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="title", type="string", length=127, nullable=true)
-   * 
    * 
    */
   private $title;
@@ -89,7 +87,6 @@ class PaymentProcessorType extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="description", type="string", length=255, nullable=true)
    * 
-   * 
    */
   private $description;
   
@@ -98,7 +95,6 @@ class PaymentProcessorType extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_active", type="boolean", nullable=true)
-   * 
    * 
    */
   private $isActive;
@@ -109,7 +105,6 @@ class PaymentProcessorType extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_default", type="boolean", nullable=true)
    * 
-   * 
    */
   private $isDefault;
   
@@ -118,7 +113,6 @@ class PaymentProcessorType extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="user_name_label", type="string", length=255, nullable=true)
-   * 
    * 
    */
   private $userNameLabel;
@@ -129,7 +123,6 @@ class PaymentProcessorType extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="password_label", type="string", length=255, nullable=true)
    * 
-   * 
    */
   private $passwordLabel;
   
@@ -138,7 +131,6 @@ class PaymentProcessorType extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="signature_label", type="string", length=255, nullable=true)
-   * 
    * 
    */
   private $signatureLabel;
@@ -149,7 +141,6 @@ class PaymentProcessorType extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="subject_label", type="string", length=255, nullable=true)
    * 
-   * 
    */
   private $subjectLabel;
   
@@ -158,7 +149,6 @@ class PaymentProcessorType extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="class_name", type="string", length=255, nullable=true)
-   * 
    * 
    */
   private $className;
@@ -169,7 +159,6 @@ class PaymentProcessorType extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="url_site_default", type="string", length=255, nullable=true)
    * 
-   * 
    */
   private $urlSiteDefault;
   
@@ -178,7 +167,6 @@ class PaymentProcessorType extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="url_api_default", type="string", length=255, nullable=true)
-   * 
    * 
    */
   private $urlApiDefault;
@@ -189,7 +177,6 @@ class PaymentProcessorType extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="url_recur_default", type="string", length=255, nullable=true)
    * 
-   * 
    */
   private $urlRecurDefault;
   
@@ -198,7 +185,6 @@ class PaymentProcessorType extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="url_button_default", type="string", length=255, nullable=true)
-   * 
    * 
    */
   private $urlButtonDefault;
@@ -209,7 +195,6 @@ class PaymentProcessorType extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="url_site_test_default", type="string", length=255, nullable=true)
    * 
-   * 
    */
   private $urlSiteTestDefault;
   
@@ -218,7 +203,6 @@ class PaymentProcessorType extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="url_api_test_default", type="string", length=255, nullable=true)
-   * 
    * 
    */
   private $urlApiTestDefault;
@@ -229,7 +213,6 @@ class PaymentProcessorType extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="url_recur_test_default", type="string", length=255, nullable=true)
    * 
-   * 
    */
   private $urlRecurTestDefault;
   
@@ -238,7 +221,6 @@ class PaymentProcessorType extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="url_button_test_default", type="string", length=255, nullable=true)
-   * 
    * 
    */
   private $urlButtonTestDefault;
@@ -249,7 +231,6 @@ class PaymentProcessorType extends \Civi\Core\Entity {
    * @JMS\Type("integer")
    * @ORM\Column(name="billing_mode", type="integer", nullable=false, options={"unsigned":true})
    * 
-   * 
    */
   private $billingMode;
   
@@ -259,7 +240,6 @@ class PaymentProcessorType extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_recur", type="boolean", nullable=true)
    * 
-   * 
    */
   private $isRecur;
   
@@ -268,7 +248,6 @@ class PaymentProcessorType extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="payment_type", type="integer", nullable=true, options={"unsigned":true, "default": 1})
-   * 
    * 
    */
   private $paymentType = '1';

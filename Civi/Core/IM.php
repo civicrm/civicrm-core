@@ -69,7 +69,6 @@ class IM extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Contact")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="contact_id", referencedColumnName="id", onDelete="CASCADE")})
-   * 
    */
   private $contact;
   
@@ -78,7 +77,6 @@ class IM extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="location_type_id", type="integer", nullable=true, options={"unsigned":true})
-   * 
    * 
    */
   private $locationTypeId;
@@ -89,7 +87,6 @@ class IM extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="name", type="string", length=64, nullable=true)
    * 
-   * 
    */
   private $name;
   
@@ -98,7 +95,6 @@ class IM extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="provider_id", type="integer", nullable=true, options={"unsigned":true})
-   * 
    * 
    */
   private $providerId;
@@ -109,7 +105,6 @@ class IM extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_primary", type="boolean", nullable=true, options={"default": 0})
    * 
-   * 
    */
   private $isPrimary = '0';
   
@@ -118,7 +113,6 @@ class IM extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_billing", type="boolean", nullable=true, options={"default": 0})
-   * 
    * 
    */
   private $isBilling = '0';

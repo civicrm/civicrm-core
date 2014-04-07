@@ -69,7 +69,6 @@ class JobLog extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\Domain")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="domain_id", referencedColumnName="id")})
-   * 
    */
   private $domain;
   
@@ -79,7 +78,6 @@ class JobLog extends \Civi\Core\Entity {
    * @JMS\Type("datetime")
    * @ORM\Column(name="run_time", type="datetime", nullable=true)
    * 
-   * 1
    */
   private $runTime;
   
@@ -88,7 +86,6 @@ class JobLog extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="job_id", type="integer", nullable=true, options={"unsigned":true})
-   * 
    * 
    */
   private $jobId;
@@ -99,7 +96,6 @@ class JobLog extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="name", type="string", length=255, nullable=true)
    * 
-   * 
    */
   private $name;
   
@@ -108,7 +104,6 @@ class JobLog extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="command", type="string", length=255, nullable=true)
-   * 
    * 
    */
   private $command;
@@ -119,7 +114,6 @@ class JobLog extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="description", type="string", length=255, nullable=true)
    * 
-   * 
    */
   private $description;
   
@@ -128,7 +122,6 @@ class JobLog extends \Civi\Core\Entity {
    *
    * @JMS\Type("text")
    * @ORM\Column(name="data", type="text", length=65535, nullable=true)
-   * 
    * 
    */
   private $data;

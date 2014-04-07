@@ -69,7 +69,6 @@ class Queue extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Mailing\MailingJob")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="job_id", referencedColumnName="id", onDelete="CASCADE")})
-   * 
    */
   private $job;
   
@@ -79,7 +78,6 @@ class Queue extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\Email")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="email_id", referencedColumnName="id", onDelete="CASCADE")})
-   * 
    */
   private $email = 'NULL';
   
@@ -89,7 +87,6 @@ class Queue extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Contact")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="contact_id", referencedColumnName="id", onDelete="CASCADE")})
-   * 
    */
   private $contact;
   
@@ -98,7 +95,6 @@ class Queue extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="hash", type="string", length=255, nullable=false)
-   * 
    * 
    */
   private $hash;
@@ -109,7 +105,6 @@ class Queue extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\Phone")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="phone_id", referencedColumnName="id", onDelete="CASCADE")})
-   * 
    */
   private $phone = 'NULL';
 

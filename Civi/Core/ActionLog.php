@@ -69,7 +69,6 @@ class ActionLog extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Contact")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="contact_id", referencedColumnName="id", onDelete="CASCADE")})
-   * 
    */
   private $contact;
   
@@ -78,7 +77,6 @@ class ActionLog extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="entity_id", type="integer", nullable=false, options={"unsigned":true})
-   * 
    * 
    */
   private $entityId;
@@ -89,7 +87,6 @@ class ActionLog extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="entity_table", type="string", length=255, nullable=true)
    * 
-   * 
    */
   private $entityTable;
   
@@ -99,7 +96,6 @@ class ActionLog extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\ActionSchedule")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="action_schedule_id", referencedColumnName="id", onDelete="CASCADE")})
-   * 
    */
   private $actionSchedule;
   
@@ -108,7 +104,6 @@ class ActionLog extends \Civi\Core\Entity {
    *
    * @JMS\Type("datetime")
    * @ORM\Column(name="action_date_time", type="datetime", nullable=true)
-   * 
    * 
    */
   private $actionDateTime;
@@ -119,7 +114,6 @@ class ActionLog extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_error", type="boolean", nullable=true, options={"default": 0})
    * 
-   * 
    */
   private $isError = '0';
   
@@ -129,7 +123,6 @@ class ActionLog extends \Civi\Core\Entity {
    * @JMS\Type("text")
    * @ORM\Column(name="message", type="text", length=65535, nullable=true)
    * 
-   * 
    */
   private $message;
   
@@ -138,7 +131,6 @@ class ActionLog extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="repetition_number", type="integer", nullable=true, options={"unsigned":true})
-   * 
    * 
    */
   private $repetitionNumber;

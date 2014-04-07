@@ -69,7 +69,6 @@ class Address extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Contact")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="contact_id", referencedColumnName="id", onDelete="CASCADE")})
-   * 
    */
   private $contact;
   
@@ -78,7 +77,6 @@ class Address extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="location_type_id", type="integer", nullable=true, options={"unsigned":true})
-   * 
    * 
    */
   private $locationTypeId;
@@ -89,7 +87,6 @@ class Address extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_primary", type="boolean", nullable=true, options={"default": 0})
    * 
-   * 
    */
   private $isPrimary = '0';
   
@@ -98,7 +95,6 @@ class Address extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_billing", type="boolean", nullable=true, options={"default": 0})
-   * 
    * 
    */
   private $isBilling = '0';
@@ -109,7 +105,6 @@ class Address extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="street_address", type="string", length=96, nullable=true)
    * 
-   * 
    */
   private $streetAddress;
   
@@ -118,7 +113,6 @@ class Address extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="street_number", type="integer", nullable=true, options={"unsigned":true})
-   * 
    * 
    */
   private $streetNumber;
@@ -129,7 +123,6 @@ class Address extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="street_number_suffix", type="string", length=8, nullable=true)
    * 
-   * 
    */
   private $streetNumberSuffix;
   
@@ -138,7 +131,6 @@ class Address extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="street_number_predirectional", type="string", length=8, nullable=true)
-   * 
    * 
    */
   private $streetNumberPredirectional;
@@ -149,7 +141,6 @@ class Address extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="street_name", type="string", length=64, nullable=true)
    * 
-   * 
    */
   private $streetName;
   
@@ -158,7 +149,6 @@ class Address extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="street_type", type="string", length=8, nullable=true)
-   * 
    * 
    */
   private $streetType;
@@ -169,7 +159,6 @@ class Address extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="street_number_postdirectional", type="string", length=8, nullable=true)
    * 
-   * 
    */
   private $streetNumberPostdirectional;
   
@@ -178,7 +167,6 @@ class Address extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="street_unit", type="string", length=16, nullable=true)
-   * 
    * 
    */
   private $streetUnit;
@@ -189,7 +177,6 @@ class Address extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="supplemental_address_1", type="string", length=96, nullable=true)
    * 
-   * 
    */
   private $supplementalAddress1;
   
@@ -198,7 +185,6 @@ class Address extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="supplemental_address_2", type="string", length=96, nullable=true)
-   * 
    * 
    */
   private $supplementalAddress2;
@@ -209,7 +195,6 @@ class Address extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="supplemental_address_3", type="string", length=96, nullable=true)
    * 
-   * 
    */
   private $supplementalAddress3;
   
@@ -218,7 +203,6 @@ class Address extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="city", type="string", length=64, nullable=true)
-   * 
    * 
    */
   private $city;
@@ -229,7 +213,6 @@ class Address extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\County")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="county_id", referencedColumnName="id", onDelete="SET NULL")})
-   * 
    */
   private $county;
   
@@ -239,7 +222,6 @@ class Address extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\StateProvince")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="state_province_id", referencedColumnName="id", onDelete="SET NULL")})
-   * 
    */
   private $stateProvince;
   
@@ -248,7 +230,6 @@ class Address extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="postal_code_suffix", type="string", length=12, nullable=true)
-   * 
    * 
    */
   private $postalCodeSuffix;
@@ -259,7 +240,6 @@ class Address extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="postal_code", type="string", length=12, nullable=true)
    * 
-   * 
    */
   private $postalCode;
   
@@ -268,7 +248,6 @@ class Address extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="usps_adc", type="string", length=32, nullable=true)
-   * 
    * 
    */
   private $uspsAdc;
@@ -279,7 +258,6 @@ class Address extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\Country")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="country_id", referencedColumnName="id", onDelete="SET NULL")})
-   * 
    */
   private $country;
   
@@ -288,7 +266,6 @@ class Address extends \Civi\Core\Entity {
    *
    * @JMS\Type("float")
    * @ORM\Column(name="geo_code_1", type="float", nullable=true)
-   * 
    * 
    */
   private $geoCode1;
@@ -299,7 +276,6 @@ class Address extends \Civi\Core\Entity {
    * @JMS\Type("float")
    * @ORM\Column(name="geo_code_2", type="float", nullable=true)
    * 
-   * 
    */
   private $geoCode2;
   
@@ -308,7 +284,6 @@ class Address extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="manual_geo_code", type="boolean", nullable=true, options={"default": 0})
-   * 
    * 
    */
   private $manualGeoCode = '0';
@@ -319,7 +294,6 @@ class Address extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="timezone", type="string", length=8, nullable=true)
    * 
-   * 
    */
   private $timezone;
   
@@ -328,7 +302,6 @@ class Address extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="name", type="string", length=255, nullable=true)
-   * 
    * 
    */
   private $name;
@@ -339,7 +312,6 @@ class Address extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\Address")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="master_id", referencedColumnName="id", onDelete="SET NULL")})
-   * 
    */
   private $master;
 

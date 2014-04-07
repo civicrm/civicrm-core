@@ -69,7 +69,6 @@ class PremiumsProduct extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Contribute\Premium")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="premiums_id", referencedColumnName="id")})
-   * 
    */
   private $premiums;
   
@@ -79,7 +78,6 @@ class PremiumsProduct extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Contribute\Product")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="product_id", referencedColumnName="id")})
-   * 
    */
   private $product;
   
@@ -88,7 +86,6 @@ class PremiumsProduct extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="weight", type="integer", nullable=false, options={"unsigned":true})
-   * 
    * 
    */
   private $weight;
@@ -99,7 +96,6 @@ class PremiumsProduct extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Financial\FinancialType")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="financial_type_id", referencedColumnName="id", onDelete="SET NULL")})
-   * 
    */
   private $financialType = 'NULL';
 

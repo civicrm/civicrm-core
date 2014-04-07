@@ -69,7 +69,6 @@ class Website extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Contact")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="contact_id", referencedColumnName="id", onDelete="CASCADE")})
-   * 
    */
   private $contact;
   
@@ -79,7 +78,6 @@ class Website extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="url", type="string", length=128, nullable=true)
    * 
-   * 
    */
   private $url;
   
@@ -88,7 +86,6 @@ class Website extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="website_type_id", type="integer", nullable=true, options={"unsigned":true})
-   * 
    * 
    */
   private $websiteTypeId;

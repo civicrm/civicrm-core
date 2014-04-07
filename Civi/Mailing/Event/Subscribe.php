@@ -69,7 +69,6 @@ class Subscribe extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Group")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="group_id", referencedColumnName="id", onDelete="CASCADE")})
-   * 
    */
   private $group;
   
@@ -79,7 +78,6 @@ class Subscribe extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Contact")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="contact_id", referencedColumnName="id", onDelete="CASCADE")})
-   * 
    */
   private $contact;
   
@@ -89,7 +87,6 @@ class Subscribe extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="hash", type="string", length=255, nullable=false)
    * 
-   * 
    */
   private $hash;
   
@@ -98,7 +95,6 @@ class Subscribe extends \Civi\Core\Entity {
    *
    * @JMS\Type("datetime")
    * @ORM\Column(name="time_stamp", type="datetime", nullable=false)
-   * 
    * 
    */
   private $timeStamp;

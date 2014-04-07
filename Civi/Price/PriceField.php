@@ -69,7 +69,6 @@ class PriceField extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Price\PriceSet")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="price_set_id", referencedColumnName="id")})
-   * 
    */
   private $priceSet;
   
@@ -78,7 +77,6 @@ class PriceField extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="name", type="string", length=255, nullable=false)
-   * 
    * 
    */
   private $name;
@@ -89,7 +87,6 @@ class PriceField extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="label", type="string", length=255, nullable=false)
    * 
-   * 
    */
   private $label;
   
@@ -98,7 +95,6 @@ class PriceField extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="html_type", type="string", length=12, nullable=false)
-   * 
    * 
    */
   private $htmlType;
@@ -109,7 +105,6 @@ class PriceField extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_enter_qty", type="boolean", nullable=true, options={"default": 0})
    * 
-   * 
    */
   private $isEnterQty = '0';
   
@@ -118,7 +113,6 @@ class PriceField extends \Civi\Core\Entity {
    *
    * @JMS\Type("text")
    * @ORM\Column(name="help_pre", type="text", length=65535, nullable=true)
-   * 
    * 
    */
   private $helpPre;
@@ -129,7 +123,6 @@ class PriceField extends \Civi\Core\Entity {
    * @JMS\Type("text")
    * @ORM\Column(name="help_post", type="text", length=65535, nullable=true)
    * 
-   * 
    */
   private $helpPost;
   
@@ -138,7 +131,6 @@ class PriceField extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="weight", type="integer", nullable=true, options={"unsigned":true, "default": 1})
-   * 
    * 
    */
   private $weight = '1';
@@ -149,7 +141,6 @@ class PriceField extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_display_amounts", type="boolean", nullable=true, options={"default": 1})
    * 
-   * 
    */
   private $isDisplayAmounts = '1';
   
@@ -158,7 +149,6 @@ class PriceField extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="options_per_line", type="integer", nullable=true, options={"unsigned":true, "default": 1})
-   * 
    * 
    */
   private $optionsPerLine = '1';
@@ -169,7 +159,6 @@ class PriceField extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_active", type="boolean", nullable=true, options={"default": 1})
    * 
-   * 
    */
   private $isActive = '1';
   
@@ -178,7 +167,6 @@ class PriceField extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_required", type="boolean", nullable=true, options={"default": 1})
-   * 
    * 
    */
   private $isRequired = '1';
@@ -189,7 +177,6 @@ class PriceField extends \Civi\Core\Entity {
    * @JMS\Type("datetime")
    * @ORM\Column(name="active_on", type="datetime", nullable=true)
    * 
-   * 
    */
   private $activeOn = 'NULL';
   
@@ -198,7 +185,6 @@ class PriceField extends \Civi\Core\Entity {
    *
    * @JMS\Type("datetime")
    * @ORM\Column(name="expire_on", type="datetime", nullable=true)
-   * 
    * 
    */
   private $expireOn = 'NULL';
@@ -209,7 +195,6 @@ class PriceField extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="javascript", type="string", length=255, nullable=true)
    * 
-   * 
    */
   private $javascript;
   
@@ -218,7 +203,6 @@ class PriceField extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="visibility_id", type="integer", nullable=true, options={"unsigned":true, "default": 1})
-   * 
    * 
    */
   private $visibilityId = '1';

@@ -69,7 +69,6 @@ class EntityFinancialTrxn extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="entity_table", type="string", length=64, nullable=false)
    * 
-   * 
    */
   private $entityTable;
   
@@ -78,7 +77,6 @@ class EntityFinancialTrxn extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="entity_id", type="integer", nullable=false, options={"unsigned":true})
-   * 
    * 
    */
   private $entityId;
@@ -89,7 +87,6 @@ class EntityFinancialTrxn extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Financial\FinancialTrxn")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="financial_trxn_id", referencedColumnName="id", onDelete="SET NULL")})
-   * 
    */
   private $financialTrxn;
   
@@ -98,7 +95,6 @@ class EntityFinancialTrxn extends \Civi\Core\Entity {
    *
    * @JMS\Type("float")
    * @ORM\Column(name="amount", type="float", nullable=false)
-   * 
    * 
    */
   private $amount;

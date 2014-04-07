@@ -69,7 +69,6 @@ class GroupContact extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Group")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="group_id", referencedColumnName="id", onDelete="CASCADE")})
-   * 
    */
   private $group;
   
@@ -79,7 +78,6 @@ class GroupContact extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Contact")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="contact_id", referencedColumnName="id", onDelete="CASCADE")})
-   * 
    */
   private $contact;
   
@@ -88,7 +86,6 @@ class GroupContact extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="status", type="string", length=8, nullable=true)
-   * 
    * 
    */
   private $status;
@@ -99,7 +96,6 @@ class GroupContact extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\LocBlock")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="location_id", referencedColumnName="id", onDelete="SET NULL")})
-   * 
    */
   private $location;
   
@@ -109,7 +105,6 @@ class GroupContact extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\Email")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="email_id", referencedColumnName="id")})
-   * 
    */
   private $email;
 

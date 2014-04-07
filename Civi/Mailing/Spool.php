@@ -69,7 +69,6 @@ class Spool extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Mailing\MailingJob")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="job_id", referencedColumnName="id", onDelete="CASCADE")})
-   * 
    */
   private $job;
   
@@ -78,7 +77,6 @@ class Spool extends \Civi\Core\Entity {
    *
    * @JMS\Type("text")
    * @ORM\Column(name="recipient_email", type="text", length=65535, nullable=true)
-   * 
    * 
    */
   private $recipientEmail;
@@ -89,7 +87,6 @@ class Spool extends \Civi\Core\Entity {
    * @JMS\Type("text")
    * @ORM\Column(name="headers", type="text", length=65535, nullable=true)
    * 
-   * 
    */
   private $headers;
   
@@ -98,7 +95,6 @@ class Spool extends \Civi\Core\Entity {
    *
    * @JMS\Type("text")
    * @ORM\Column(name="body", type="text", length=65535, nullable=true)
-   * 
    * 
    */
   private $body;
@@ -109,7 +105,6 @@ class Spool extends \Civi\Core\Entity {
    * @JMS\Type("datetime")
    * @ORM\Column(name="added_at", type="datetime", nullable=true)
    * 
-   * 
    */
   private $addedAt;
   
@@ -118,7 +113,6 @@ class Spool extends \Civi\Core\Entity {
    *
    * @JMS\Type("datetime")
    * @ORM\Column(name="removed_at", type="datetime", nullable=true)
-   * 
    * 
    */
   private $removedAt;

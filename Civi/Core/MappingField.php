@@ -69,7 +69,6 @@ class MappingField extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\Mapping")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="mapping_id", referencedColumnName="id")})
-   * 
    */
   private $mapping;
   
@@ -78,7 +77,6 @@ class MappingField extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="name", type="string", length=255, nullable=true)
-   * 
    * 
    */
   private $name;
@@ -89,7 +87,6 @@ class MappingField extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="contact_type", type="string", length=64, nullable=true)
    * 
-   * 
    */
   private $contactType;
   
@@ -98,7 +95,6 @@ class MappingField extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="column_number", type="integer", nullable=false, options={"unsigned":true})
-   * 
    * 
    */
   private $columnNumber;
@@ -109,7 +105,6 @@ class MappingField extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\LocationType")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="location_type_id", referencedColumnName="id")})
-   * 
    */
   private $locationType;
   
@@ -118,7 +113,6 @@ class MappingField extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="phone_type_id", type="integer", nullable=true, options={"unsigned":true})
-   * 
    * 
    */
   private $phoneTypeId;
@@ -129,7 +123,6 @@ class MappingField extends \Civi\Core\Entity {
    * @JMS\Type("integer")
    * @ORM\Column(name="im_provider_id", type="integer", nullable=true, options={"unsigned":true})
    * 
-   * 
    */
   private $imProviderId;
   
@@ -138,7 +131,6 @@ class MappingField extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="website_type_id", type="integer", nullable=true, options={"unsigned":true})
-   * 
    * 
    */
   private $websiteTypeId;
@@ -149,7 +141,6 @@ class MappingField extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\RelationshipType")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="relationship_type_id", referencedColumnName="id")})
-   * 
    */
   private $relationshipType;
   
@@ -158,7 +149,6 @@ class MappingField extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="relationship_direction", type="string", length=6, nullable=true)
-   * 
    * 
    */
   private $relationshipDirection;
@@ -169,7 +159,6 @@ class MappingField extends \Civi\Core\Entity {
    * @JMS\Type("integer")
    * @ORM\Column(name="grouping", type="integer", nullable=true, options={"unsigned":true, "default": 1})
    * 
-   * 
    */
   private $grouping = '1';
   
@@ -179,7 +168,6 @@ class MappingField extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="operator", type="string", length=16, nullable=true)
    * 
-   * 
    */
   private $operator;
   
@@ -188,7 +176,6 @@ class MappingField extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="value", type="string", length=255, nullable=true)
-   * 
    * 
    */
   private $value;

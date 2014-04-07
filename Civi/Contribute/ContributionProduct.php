@@ -69,7 +69,6 @@ class ContributionProduct extends \Civi\Core\Entity {
    * @JMS\Type("integer")
    * @ORM\Column(name="product_id", type="integer", nullable=false, options={"unsigned":true})
    * 
-   * 
    */
   private $productId;
   
@@ -79,7 +78,6 @@ class ContributionProduct extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Contribute\Contribution")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="contribution_id", referencedColumnName="id", onDelete="CASCADE")})
-   * 
    */
   private $contribution;
   
@@ -88,7 +86,6 @@ class ContributionProduct extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="product_option", type="string", length=255, nullable=true)
-   * 
    * 
    */
   private $productOption;
@@ -99,7 +96,6 @@ class ContributionProduct extends \Civi\Core\Entity {
    * @JMS\Type("integer")
    * @ORM\Column(name="quantity", type="integer", nullable=true, options={"unsigned":true})
    * 
-   * 
    */
   private $quantity;
   
@@ -108,7 +104,6 @@ class ContributionProduct extends \Civi\Core\Entity {
    *
    * @JMS\Type("date")
    * @ORM\Column(name="fulfilled_date", type="date", nullable=true)
-   * 
    * 
    */
   private $fulfilledDate;
@@ -119,7 +114,6 @@ class ContributionProduct extends \Civi\Core\Entity {
    * @JMS\Type("date")
    * @ORM\Column(name="start_date", type="date", nullable=true)
    * 
-   * 
    */
   private $startDate;
   
@@ -128,7 +122,6 @@ class ContributionProduct extends \Civi\Core\Entity {
    *
    * @JMS\Type("date")
    * @ORM\Column(name="end_date", type="date", nullable=true)
-   * 
    * 
    */
   private $endDate;
@@ -139,7 +132,6 @@ class ContributionProduct extends \Civi\Core\Entity {
    * @JMS\Type("text")
    * @ORM\Column(name="comment", type="text", length=65535, nullable=true)
    * 
-   * 
    */
   private $comment;
   
@@ -149,7 +141,6 @@ class ContributionProduct extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Financial\FinancialType")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="financial_type_id", referencedColumnName="id", onDelete="SET NULL")})
-   * 
    */
   private $financialType = 'NULL';
 

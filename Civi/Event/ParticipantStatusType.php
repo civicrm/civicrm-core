@@ -69,7 +69,6 @@ class ParticipantStatusType extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="name", type="string", length=64, nullable=true)
    * 
-   * 
    */
   private $name;
   
@@ -78,7 +77,6 @@ class ParticipantStatusType extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="label", type="string", length=255, nullable=true)
-   * 
    * 
    */
   private $label;
@@ -89,7 +87,6 @@ class ParticipantStatusType extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="class", type="string", length=8, nullable=true)
    * 
-   * 
    */
   private $class;
   
@@ -98,7 +95,6 @@ class ParticipantStatusType extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_reserved", type="boolean", nullable=true)
-   * 
    * 
    */
   private $isReserved;
@@ -109,7 +105,6 @@ class ParticipantStatusType extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_active", type="boolean", nullable=true, options={"default": 1})
    * 
-   * 
    */
   private $isActive = '1';
   
@@ -118,7 +113,6 @@ class ParticipantStatusType extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_counted", type="boolean", nullable=true)
-   * 
    * 
    */
   private $isCounted;
@@ -129,7 +123,6 @@ class ParticipantStatusType extends \Civi\Core\Entity {
    * @JMS\Type("integer")
    * @ORM\Column(name="weight", type="integer", nullable=false, options={"unsigned":true})
    * 
-   * 
    */
   private $weight;
   
@@ -138,7 +131,6 @@ class ParticipantStatusType extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="visibility_id", type="integer", nullable=true, options={"unsigned":true})
-   * 
    * 
    */
   private $visibilityId;

@@ -69,7 +69,6 @@ class SavedSearch extends \Civi\Core\Entity {
    * @JMS\Type("text")
    * @ORM\Column(name="form_values", type="text", length=65535, nullable=true)
    * 
-   * 
    */
   private $formValues;
   
@@ -79,7 +78,6 @@ class SavedSearch extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\Mapping")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="mapping_id", referencedColumnName="id")})
-   * 
    */
   private $mapping;
   
@@ -88,7 +86,6 @@ class SavedSearch extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="search_custom_id", type="integer", nullable=true, options={"unsigned":true})
-   * 
    * 
    */
   private $searchCustomId;
@@ -99,7 +96,6 @@ class SavedSearch extends \Civi\Core\Entity {
    * @JMS\Type("text")
    * @ORM\Column(name="where_clause", type="text", length=65535, nullable=true)
    * 
-   * 
    */
   private $whereClause;
   
@@ -109,7 +105,6 @@ class SavedSearch extends \Civi\Core\Entity {
    * @JMS\Type("text")
    * @ORM\Column(name="select_tables", type="text", length=65535, nullable=true)
    * 
-   * 
    */
   private $selectTables;
   
@@ -118,7 +113,6 @@ class SavedSearch extends \Civi\Core\Entity {
    *
    * @JMS\Type("text")
    * @ORM\Column(name="where_tables", type="text", length=65535, nullable=true)
-   * 
    * 
    */
   private $whereTables;

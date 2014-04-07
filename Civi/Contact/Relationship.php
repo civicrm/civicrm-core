@@ -69,7 +69,6 @@ class Relationship extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Contact")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="contact_id_a", referencedColumnName="id", onDelete="CASCADE")})
-   * 
    */
   private $contactA;
   
@@ -79,7 +78,6 @@ class Relationship extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Contact")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="contact_id_b", referencedColumnName="id", onDelete="CASCADE")})
-   * 
    */
   private $contactB;
   
@@ -89,7 +87,6 @@ class Relationship extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\RelationshipType")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="relationship_type_id", referencedColumnName="id", onDelete="CASCADE")})
-   * 
    */
   private $relationshipType;
   
@@ -98,7 +95,6 @@ class Relationship extends \Civi\Core\Entity {
    *
    * @JMS\Type("date")
    * @ORM\Column(name="start_date", type="date", nullable=true)
-   * 
    * 
    */
   private $startDate;
@@ -109,7 +105,6 @@ class Relationship extends \Civi\Core\Entity {
    * @JMS\Type("date")
    * @ORM\Column(name="end_date", type="date", nullable=true)
    * 
-   * 
    */
   private $endDate;
   
@@ -118,7 +113,6 @@ class Relationship extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_active", type="boolean", nullable=true, options={"default": 1})
-   * 
    * 
    */
   private $isActive = '1';
@@ -129,7 +123,6 @@ class Relationship extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="description", type="string", length=255, nullable=true)
    * 
-   * 
    */
   private $description;
   
@@ -138,7 +131,6 @@ class Relationship extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_permission_a_b", type="boolean", nullable=true, options={"default": 0})
-   * 
    * 
    */
   private $isPermissionAB = '0';
@@ -149,7 +141,6 @@ class Relationship extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_permission_b_a", type="boolean", nullable=true, options={"default": 0})
    * 
-   * 
    */
   private $isPermissionBA = '0';
   
@@ -159,7 +150,6 @@ class Relationship extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\CCase\CCase")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="case_id", referencedColumnName="id", onDelete="CASCADE")})
-   * 
    */
   private $case = 'NULL';
 

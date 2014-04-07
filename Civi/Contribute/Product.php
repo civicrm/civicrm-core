@@ -69,7 +69,6 @@ class Product extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="name", type="string", length=255, nullable=false)
    * 
-   * 
    */
   private $name;
   
@@ -78,7 +77,6 @@ class Product extends \Civi\Core\Entity {
    *
    * @JMS\Type("text")
    * @ORM\Column(name="description", type="text", length=65535, nullable=true)
-   * 
    * 
    */
   private $description;
@@ -89,7 +87,6 @@ class Product extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="sku", type="string", length=50, nullable=true)
    * 
-   * 
    */
   private $sku;
   
@@ -98,7 +95,6 @@ class Product extends \Civi\Core\Entity {
    *
    * @JMS\Type("text")
    * @ORM\Column(name="options", type="text", length=65535, nullable=true)
-   * 
    * 
    */
   private $options;
@@ -109,7 +105,6 @@ class Product extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="image", type="string", length=255, nullable=true)
    * 
-   * 
    */
   private $image;
   
@@ -118,7 +113,6 @@ class Product extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="thumbnail", type="string", length=255, nullable=true)
-   * 
    * 
    */
   private $thumbnail;
@@ -129,7 +123,6 @@ class Product extends \Civi\Core\Entity {
    * @JMS\Type("float")
    * @ORM\Column(name="price", type="float", nullable=true)
    * 
-   * 
    */
   private $price;
   
@@ -138,7 +131,6 @@ class Product extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="currency", type="string", length=3, nullable=true)
-   * 
    * 
    */
   private $currency = 'NULL';
@@ -149,7 +141,6 @@ class Product extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Financial\FinancialType")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="financial_type_id", referencedColumnName="id", onDelete="SET NULL")})
-   * 
    */
   private $financialType = 'NULL';
   
@@ -158,7 +149,6 @@ class Product extends \Civi\Core\Entity {
    *
    * @JMS\Type("float")
    * @ORM\Column(name="min_contribution", type="float", nullable=true)
-   * 
    * 
    */
   private $minContribution;
@@ -169,7 +159,6 @@ class Product extends \Civi\Core\Entity {
    * @JMS\Type("float")
    * @ORM\Column(name="cost", type="float", nullable=true)
    * 
-   * 
    */
   private $cost;
   
@@ -178,7 +167,6 @@ class Product extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_active", type="boolean", nullable=false)
-   * 
    * 
    */
   private $isActive;
@@ -189,7 +177,6 @@ class Product extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="period_type", type="string", length=8, nullable=true, options={"default": "rolling"})
    * 
-   * 
    */
   private $periodType = 'rolling';
   
@@ -198,7 +185,6 @@ class Product extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="fixed_period_start_day", type="integer", nullable=true, options={"unsigned":true, "default": 0101})
-   * 
    * 
    */
   private $fixedPeriodStartDay = '0101';
@@ -209,7 +195,6 @@ class Product extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="duration_unit", type="string", length=8, nullable=true, options={"default": "year"})
    * 
-   * 
    */
   private $durationUnit = 'year';
   
@@ -218,7 +203,6 @@ class Product extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="duration_interval", type="integer", nullable=true, options={"unsigned":true})
-   * 
    * 
    */
   private $durationInterval;
@@ -229,7 +213,6 @@ class Product extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="frequency_unit", type="string", length=8, nullable=true, options={"default": "month"})
    * 
-   * 
    */
   private $frequencyUnit = 'month';
   
@@ -238,7 +221,6 @@ class Product extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="frequency_interval", type="integer", nullable=true, options={"unsigned":true})
-   * 
    * 
    */
   private $frequencyInterval;

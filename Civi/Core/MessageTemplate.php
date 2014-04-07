@@ -69,7 +69,6 @@ class MessageTemplate extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="msg_title", type="string", length=255, nullable=true)
    * 
-   * 
    */
   private $msgTitle;
   
@@ -78,7 +77,6 @@ class MessageTemplate extends \Civi\Core\Entity {
    *
    * @JMS\Type("text")
    * @ORM\Column(name="msg_subject", type="text", length=65535, nullable=true)
-   * 
    * 
    */
   private $msgSubject;
@@ -89,7 +87,6 @@ class MessageTemplate extends \Civi\Core\Entity {
    * @JMS\Type("text")
    * @ORM\Column(name="msg_text", type="text", nullable=true)
    * 
-   * 
    */
   private $msgText;
   
@@ -98,7 +95,6 @@ class MessageTemplate extends \Civi\Core\Entity {
    *
    * @JMS\Type("text")
    * @ORM\Column(name="msg_html", type="text", nullable=true)
-   * 
    * 
    */
   private $msgHtml;
@@ -109,7 +105,6 @@ class MessageTemplate extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_active", type="boolean", nullable=true, options={"default": 1})
    * 
-   * 
    */
   private $isActive = '1';
   
@@ -118,7 +113,6 @@ class MessageTemplate extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="workflow_id", type="integer", nullable=true, options={"unsigned":true})
-   * 
    * 
    */
   private $workflowId;
@@ -129,7 +123,6 @@ class MessageTemplate extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_default", type="boolean", nullable=true, options={"default": 1})
    * 
-   * 
    */
   private $isDefault = '1';
   
@@ -138,7 +131,6 @@ class MessageTemplate extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_reserved", type="boolean", nullable=true)
-   * 
    * 
    */
   private $isReserved;
@@ -149,7 +141,6 @@ class MessageTemplate extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\OptionValue")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="pdf_format_id", referencedColumnName="id", onDelete="SET NULL")})
-   * 
    */
   private $pdfFormat;
 

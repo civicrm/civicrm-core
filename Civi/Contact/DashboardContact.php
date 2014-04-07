@@ -69,7 +69,6 @@ class DashboardContact extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\Dashboard")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="dashboard_id", referencedColumnName="id", onDelete="CASCADE")})
-   * 
    */
   private $dashboard;
   
@@ -79,7 +78,6 @@ class DashboardContact extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Contact")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="contact_id", referencedColumnName="id", onDelete="CASCADE")})
-   * 
    */
   private $contact;
   
@@ -88,7 +86,6 @@ class DashboardContact extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="column_no", type="boolean", nullable=true, options={"default": 0})
-   * 
    * 
    */
   private $columnNo = '0';
@@ -99,7 +96,6 @@ class DashboardContact extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_minimized", type="boolean", nullable=true, options={"default": 0})
    * 
-   * 
    */
   private $isMinimized = '0';
   
@@ -108,7 +104,6 @@ class DashboardContact extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_fullscreen", type="boolean", nullable=true, options={"default": 1})
-   * 
    * 
    */
   private $isFullscreen = '1';
@@ -119,7 +114,6 @@ class DashboardContact extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_active", type="boolean", nullable=true, options={"default": 0})
    * 
-   * 
    */
   private $isActive = '0';
   
@@ -128,7 +122,6 @@ class DashboardContact extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="weight", type="integer", nullable=true, options={"unsigned":true, "default": 0})
-   * 
    * 
    */
   private $weight = '0';
@@ -139,7 +132,6 @@ class DashboardContact extends \Civi\Core\Entity {
    * @JMS\Type("text")
    * @ORM\Column(name="content", type="text", nullable=true)
    * 
-   * 
    */
   private $content;
   
@@ -148,7 +140,6 @@ class DashboardContact extends \Civi\Core\Entity {
    *
    * @JMS\Type("datetime")
    * @ORM\Column(name="created_date", type="datetime", nullable=true)
-   * 
    * 
    */
   private $createdDate;

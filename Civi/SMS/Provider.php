@@ -69,7 +69,6 @@ class Provider extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="name", type="string", length=64, nullable=true)
    * 
-   * 
    */
   private $name;
   
@@ -78,7 +77,6 @@ class Provider extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="title", type="string", length=64, nullable=true)
-   * 
    * 
    */
   private $title;
@@ -89,7 +87,6 @@ class Provider extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="username", type="string", length=255, nullable=true)
    * 
-   * 
    */
   private $username;
   
@@ -98,7 +95,6 @@ class Provider extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="password", type="string", length=255, nullable=true)
-   * 
    * 
    */
   private $password;
@@ -109,7 +105,6 @@ class Provider extends \Civi\Core\Entity {
    * @JMS\Type("integer")
    * @ORM\Column(name="api_type", type="integer", nullable=false, options={"unsigned":true})
    * 
-   * 
    */
   private $apiType;
   
@@ -118,7 +113,6 @@ class Provider extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="api_url", type="string", length=128, nullable=true)
-   * 
    * 
    */
   private $apiUrl;
@@ -129,7 +123,6 @@ class Provider extends \Civi\Core\Entity {
    * @JMS\Type("text")
    * @ORM\Column(name="api_params", type="text", length=65535, nullable=true)
    * 
-   * 
    */
   private $apiParams;
   
@@ -139,7 +132,6 @@ class Provider extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_default", type="boolean", nullable=true, options={"default": 0})
    * 
-   * 
    */
   private $isDefault = '0';
   
@@ -148,7 +140,6 @@ class Provider extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_active", type="boolean", nullable=true, options={"default": 0})
-   * 
    * 
    */
   private $isActive = '0';

@@ -69,7 +69,6 @@ class PCP extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Contact")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="contact_id", referencedColumnName="id", onDelete="CASCADE")})
-   * 
    */
   private $contact;
   
@@ -78,7 +77,6 @@ class PCP extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="status_id", type="integer", nullable=false, options={"unsigned":true})
-   * 
    * 
    */
   private $statusId;
@@ -89,7 +87,6 @@ class PCP extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="title", type="string", length=255, nullable=true)
    * 
-   * 
    */
   private $title = 'NULL';
   
@@ -98,7 +95,6 @@ class PCP extends \Civi\Core\Entity {
    *
    * @JMS\Type("text")
    * @ORM\Column(name="intro_text", type="text", length=65535, nullable=true)
-   * 
    * 
    */
   private $introText = 'NULL';
@@ -109,7 +105,6 @@ class PCP extends \Civi\Core\Entity {
    * @JMS\Type("text")
    * @ORM\Column(name="page_text", type="text", length=65535, nullable=true)
    * 
-   * 
    */
   private $pageText = 'NULL';
   
@@ -118,7 +113,6 @@ class PCP extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="donate_link_text", type="string", length=255, nullable=true)
-   * 
    * 
    */
   private $donateLinkText = 'NULL';
@@ -129,7 +123,6 @@ class PCP extends \Civi\Core\Entity {
    * @JMS\Type("integer")
    * @ORM\Column(name="page_id", type="integer", nullable=false, options={"unsigned":true})
    * 
-   * 
    */
   private $pageId;
   
@@ -138,7 +131,6 @@ class PCP extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="page_type", type="string", length=64, nullable=true, options={"default": "contribute"})
-   * 
    * 
    */
   private $pageType = 'contribute';
@@ -149,7 +141,6 @@ class PCP extends \Civi\Core\Entity {
    * @JMS\Type("integer")
    * @ORM\Column(name="pcp_block_id", type="integer", nullable=false, options={"unsigned":true})
    * 
-   * 
    */
   private $pcpBlockId;
   
@@ -158,7 +149,6 @@ class PCP extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="is_thermometer", type="integer", nullable=true, options={"unsigned":true, "default": 0})
-   * 
    * 
    */
   private $isThermometer = '0';
@@ -169,7 +159,6 @@ class PCP extends \Civi\Core\Entity {
    * @JMS\Type("integer")
    * @ORM\Column(name="is_honor_roll", type="integer", nullable=true, options={"unsigned":true, "default": 0})
    * 
-   * 
    */
   private $isHonorRoll = '0';
   
@@ -178,7 +167,6 @@ class PCP extends \Civi\Core\Entity {
    *
    * @JMS\Type("float")
    * @ORM\Column(name="goal_amount", type="float", nullable=true)
-   * 
    * 
    */
   private $goalAmount;
@@ -189,7 +177,6 @@ class PCP extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="currency", type="string", length=3, nullable=true)
    * 
-   * 
    */
   private $currency = 'NULL';
   
@@ -198,7 +185,6 @@ class PCP extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_active", type="boolean", nullable=true, options={"default": 0})
-   * 
    * 
    */
   private $isActive = '0';

@@ -69,7 +69,6 @@ class Contact extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="contact_type", type="string", length=64, nullable=true)
    * 
-   * 
    */
   private $contactType;
   
@@ -78,7 +77,6 @@ class Contact extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="contact_sub_type", type="string", length=255, nullable=true)
-   * 
    * 
    */
   private $contactSubType;
@@ -89,7 +87,6 @@ class Contact extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="do_not_email", type="boolean", nullable=true, options={"default": 0})
    * 
-   * 
    */
   private $doNotEmail = '0';
   
@@ -98,7 +95,6 @@ class Contact extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="do_not_phone", type="boolean", nullable=true, options={"default": 0})
-   * 
    * 
    */
   private $doNotPhone = '0';
@@ -109,7 +105,6 @@ class Contact extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="do_not_mail", type="boolean", nullable=true, options={"default": 0})
    * 
-   * 
    */
   private $doNotMail = '0';
   
@@ -118,7 +113,6 @@ class Contact extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="do_not_sms", type="boolean", nullable=true, options={"default": 0})
-   * 
    * 
    */
   private $doNotSms = '0';
@@ -129,7 +123,6 @@ class Contact extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="do_not_trade", type="boolean", nullable=true, options={"default": 0})
    * 
-   * 
    */
   private $doNotTrade = '0';
   
@@ -138,7 +131,6 @@ class Contact extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_opt_out", type="boolean", nullable=false, options={"default": 0})
-   * 
    * 
    */
   private $isOptOut = '0';
@@ -149,7 +141,6 @@ class Contact extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="legal_identifier", type="string", length=32, nullable=true)
    * 
-   * 
    */
   private $legalIdentifier;
   
@@ -158,7 +149,6 @@ class Contact extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="external_identifier", type="string", length=32, nullable=true)
-   * 
    * 
    */
   private $externalIdentifier;
@@ -169,7 +159,6 @@ class Contact extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="sort_name", type="string", length=128, nullable=true)
    * 
-   * 
    */
   private $sortName;
   
@@ -178,7 +167,6 @@ class Contact extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="display_name", type="string", length=128, nullable=true)
-   * 
    * 
    */
   private $displayName;
@@ -189,7 +177,6 @@ class Contact extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="nick_name", type="string", length=128, nullable=true)
    * 
-   * 
    */
   private $nickName;
   
@@ -198,7 +185,6 @@ class Contact extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="legal_name", type="string", length=128, nullable=true)
-   * 
    * 
    */
   private $legalName;
@@ -209,7 +195,6 @@ class Contact extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="image_URL", type="string", length=255, nullable=true)
    * 
-   * 
    */
   private $imageURL;
   
@@ -218,7 +203,6 @@ class Contact extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="preferred_communication_method", type="string", length=255, nullable=true)
-   * 
    * 
    */
   private $preferredCommunicationMethod;
@@ -229,7 +213,6 @@ class Contact extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="preferred_language", type="string", length=5, nullable=true)
    * 
-   * 
    */
   private $preferredLanguage;
   
@@ -238,7 +221,6 @@ class Contact extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="preferred_mail_format", type="string", length=8, nullable=true, options={"default": "Both"})
-   * 
    * 
    */
   private $preferredMailFormat = '"Both"';
@@ -249,7 +231,6 @@ class Contact extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="hash", type="string", length=32, nullable=true)
    * 
-   * 
    */
   private $hash;
   
@@ -258,7 +239,6 @@ class Contact extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="api_key", type="string", length=32, nullable=true)
-   * 
    * 
    */
   private $apiKey;
@@ -269,7 +249,6 @@ class Contact extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="source", type="string", length=255, nullable=true)
    * 
-   * 
    */
   private $source;
   
@@ -278,7 +257,6 @@ class Contact extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="first_name", type="string", length=64, nullable=true)
-   * 
    * 
    */
   private $firstName;
@@ -289,7 +267,6 @@ class Contact extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="middle_name", type="string", length=64, nullable=true)
    * 
-   * 
    */
   private $middleName;
   
@@ -298,7 +275,6 @@ class Contact extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="last_name", type="string", length=64, nullable=true)
-   * 
    * 
    */
   private $lastName;
@@ -309,7 +285,6 @@ class Contact extends \Civi\Core\Entity {
    * @JMS\Type("integer")
    * @ORM\Column(name="prefix_id", type="integer", nullable=true, options={"unsigned":true})
    * 
-   * 
    */
   private $prefixId;
   
@@ -318,7 +293,6 @@ class Contact extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="suffix_id", type="integer", nullable=true, options={"unsigned":true})
-   * 
    * 
    */
   private $suffixId;
@@ -329,7 +303,6 @@ class Contact extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="formal_title", type="string", length=64, nullable=true)
    * 
-   * 
    */
   private $formalTitle;
   
@@ -338,7 +311,6 @@ class Contact extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="communication_style_id", type="integer", nullable=true, options={"unsigned":true})
-   * 
    * 
    */
   private $communicationStyleId;
@@ -349,7 +321,6 @@ class Contact extends \Civi\Core\Entity {
    * @JMS\Type("integer")
    * @ORM\Column(name="email_greeting_id", type="integer", nullable=true, options={"unsigned":true})
    * 
-   * 
    */
   private $emailGreetingId;
   
@@ -358,7 +329,6 @@ class Contact extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="email_greeting_custom", type="string", length=128, nullable=true)
-   * 
    * 
    */
   private $emailGreetingCustom;
@@ -369,7 +339,6 @@ class Contact extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="email_greeting_display", type="string", length=255, nullable=true)
    * 
-   * 
    */
   private $emailGreetingDisplay;
   
@@ -378,7 +347,6 @@ class Contact extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="postal_greeting_id", type="integer", nullable=true, options={"unsigned":true})
-   * 
    * 
    */
   private $postalGreetingId;
@@ -389,7 +357,6 @@ class Contact extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="postal_greeting_custom", type="string", length=128, nullable=true)
    * 
-   * 
    */
   private $postalGreetingCustom;
   
@@ -398,7 +365,6 @@ class Contact extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="postal_greeting_display", type="string", length=255, nullable=true)
-   * 
    * 
    */
   private $postalGreetingDisplay;
@@ -409,7 +375,6 @@ class Contact extends \Civi\Core\Entity {
    * @JMS\Type("integer")
    * @ORM\Column(name="addressee_id", type="integer", nullable=true, options={"unsigned":true})
    * 
-   * 
    */
   private $addresseeId;
   
@@ -418,7 +383,6 @@ class Contact extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="addressee_custom", type="string", length=128, nullable=true)
-   * 
    * 
    */
   private $addresseeCustom;
@@ -429,7 +393,6 @@ class Contact extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="addressee_display", type="string", length=255, nullable=true)
    * 
-   * 
    */
   private $addresseeDisplay;
   
@@ -438,7 +401,6 @@ class Contact extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="job_title", type="string", length=255, nullable=true)
-   * 
    * 
    */
   private $jobTitle;
@@ -449,7 +411,6 @@ class Contact extends \Civi\Core\Entity {
    * @JMS\Type("integer")
    * @ORM\Column(name="gender_id", type="integer", nullable=true, options={"unsigned":true})
    * 
-   * 
    */
   private $genderId;
   
@@ -458,7 +419,6 @@ class Contact extends \Civi\Core\Entity {
    *
    * @JMS\Type("date")
    * @ORM\Column(name="birth_date", type="date", nullable=true)
-   * 
    * 
    */
   private $birthDate;
@@ -469,7 +429,6 @@ class Contact extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_deceased", type="boolean", nullable=true, options={"default": 0})
    * 
-   * 
    */
   private $isDeceased = '0';
   
@@ -478,7 +437,6 @@ class Contact extends \Civi\Core\Entity {
    *
    * @JMS\Type("date")
    * @ORM\Column(name="deceased_date", type="date", nullable=true)
-   * 
    * 
    */
   private $deceasedDate;
@@ -489,7 +447,6 @@ class Contact extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="household_name", type="string", length=128, nullable=true)
    * 
-   * 
    */
   private $householdName;
   
@@ -499,7 +456,6 @@ class Contact extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Contact")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="primary_contact_id", referencedColumnName="id", onDelete="SET NULL")})
-   * 
    */
   private $primaryContact;
   
@@ -508,7 +464,6 @@ class Contact extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="organization_name", type="string", length=128, nullable=true)
-   * 
    * 
    */
   private $organizationName;
@@ -519,7 +474,6 @@ class Contact extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="sic_code", type="string", length=8, nullable=true)
    * 
-   * 
    */
   private $sicCode;
   
@@ -528,7 +482,6 @@ class Contact extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="user_unique_id", type="string", length=255, nullable=true)
-   * 
    * 
    */
   private $userUniqueId;
@@ -539,7 +492,6 @@ class Contact extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Contact")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="employer_id", referencedColumnName="id", onDelete="SET NULL")})
-   * 
    */
   private $employer;
   
@@ -548,7 +500,6 @@ class Contact extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_deleted", type="boolean", nullable=false, options={"default": 0})
-   * 
    * 
    */
   private $isDeleted = '0';
@@ -559,7 +510,6 @@ class Contact extends \Civi\Core\Entity {
    * @JMS\Type("datetime")
    * @ORM\Column(name="created_date", type="datetime", nullable=true)
    * 
-   * 1
    */
   private $createdDate = 'NULL';
   
@@ -569,7 +519,6 @@ class Contact extends \Civi\Core\Entity {
    * @JMS\Type("datetime")
    * @ORM\Column(name="modified_date", type="datetime", nullable=true, columnDefinition="TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
    * 
-   * 1
    */
   private $modifiedDate;
 

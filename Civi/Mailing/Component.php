@@ -69,7 +69,6 @@ class Component extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="name", type="string", length=64, nullable=true)
    * 
-   * 
    */
   private $name;
   
@@ -78,7 +77,6 @@ class Component extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="component_type", type="string", length=12, nullable=true)
-   * 
    * 
    */
   private $componentType;
@@ -89,7 +87,6 @@ class Component extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="subject", type="string", length=255, nullable=true)
    * 
-   * 
    */
   private $subject;
   
@@ -98,7 +95,6 @@ class Component extends \Civi\Core\Entity {
    *
    * @JMS\Type("text")
    * @ORM\Column(name="body_html", type="text", length=65535, nullable=true)
-   * 
    * 
    */
   private $bodyHtml;
@@ -109,7 +105,6 @@ class Component extends \Civi\Core\Entity {
    * @JMS\Type("text")
    * @ORM\Column(name="body_text", type="text", length=65535, nullable=true)
    * 
-   * 
    */
   private $bodyText;
   
@@ -119,7 +114,6 @@ class Component extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_default", type="boolean", nullable=true, options={"default": 0})
    * 
-   * 
    */
   private $isDefault = '0';
   
@@ -128,7 +122,6 @@ class Component extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_active", type="boolean", nullable=true)
-   * 
    * 
    */
   private $isActive;

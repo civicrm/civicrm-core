@@ -69,7 +69,6 @@ class History extends \Civi\Core\Entity {
    * @JMS\Type("text")
    * @ORM\Column(name="message", type="text", length=65535, nullable=true)
    * 
-   * 
    */
   private $message;
   
@@ -79,7 +78,6 @@ class History extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Contact")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="contact_id", referencedColumnName="id")})
-   * 
    */
   private $contact;
   
@@ -88,7 +86,6 @@ class History extends \Civi\Core\Entity {
    *
    * @JMS\Type("date")
    * @ORM\Column(name="sent_date", type="date", nullable=true)
-   * 
    * 
    */
   private $sentDate;

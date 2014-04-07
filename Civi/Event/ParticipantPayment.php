@@ -69,7 +69,6 @@ class ParticipantPayment extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Event\Participant")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="participant_id", referencedColumnName="id", onDelete="CASCADE")})
-   * 
    */
   private $participant;
   
@@ -79,7 +78,6 @@ class ParticipantPayment extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Contribute\Contribution")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="contribution_id", referencedColumnName="id", onDelete="CASCADE")})
-   * 
    */
   private $contribution;
 

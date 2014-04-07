@@ -69,7 +69,6 @@ class LocationType extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="name", type="string", length=64, nullable=true)
    * 
-   * 
    */
   private $name;
   
@@ -78,7 +77,6 @@ class LocationType extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="display_name", type="string", length=64, nullable=true)
-   * 
    * 
    */
   private $displayName;
@@ -89,7 +87,6 @@ class LocationType extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="vcard_name", type="string", length=64, nullable=true)
    * 
-   * 
    */
   private $vcardName;
   
@@ -98,7 +95,6 @@ class LocationType extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="description", type="string", length=255, nullable=true)
-   * 
    * 
    */
   private $description;
@@ -109,7 +105,6 @@ class LocationType extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_reserved", type="boolean", nullable=true)
    * 
-   * 
    */
   private $isReserved;
   
@@ -119,7 +114,6 @@ class LocationType extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_active", type="boolean", nullable=true)
    * 
-   * 
    */
   private $isActive;
   
@@ -128,7 +122,6 @@ class LocationType extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_default", type="boolean", nullable=true)
-   * 
    * 
    */
   private $isDefault;

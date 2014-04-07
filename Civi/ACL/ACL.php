@@ -69,7 +69,6 @@ class ACL extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="name", type="string", length=64, nullable=true)
    * 
-   * 
    */
   private $name;
   
@@ -78,7 +77,6 @@ class ACL extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="deny", type="boolean", nullable=false, options={"default": 0})
-   * 
    * 
    */
   private $deny = '0';
@@ -89,7 +87,6 @@ class ACL extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="entity_table", type="string", length=64, nullable=false)
    * 
-   * 
    */
   private $entityTable;
   
@@ -98,7 +95,6 @@ class ACL extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="entity_id", type="integer", nullable=true, options={"unsigned":true})
-   * 
    * 
    */
   private $entityId;
@@ -109,7 +105,6 @@ class ACL extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="operation", type="string", length=8, nullable=false)
    * 
-   * 
    */
   private $operation;
   
@@ -118,7 +113,6 @@ class ACL extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="object_table", type="string", length=64, nullable=true)
-   * 
    * 
    */
   private $objectTable;
@@ -129,7 +123,6 @@ class ACL extends \Civi\Core\Entity {
    * @JMS\Type("integer")
    * @ORM\Column(name="object_id", type="integer", nullable=true, options={"unsigned":true})
    * 
-   * 
    */
   private $objectId;
   
@@ -138,7 +131,6 @@ class ACL extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="acl_table", type="string", length=64, nullable=true)
-   * 
    * 
    */
   private $aclTable;
@@ -149,7 +141,6 @@ class ACL extends \Civi\Core\Entity {
    * @JMS\Type("integer")
    * @ORM\Column(name="acl_id", type="integer", nullable=true, options={"unsigned":true})
    * 
-   * 
    */
   private $aclId;
   
@@ -158,7 +149,6 @@ class ACL extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_active", type="boolean", nullable=true)
-   * 
    * 
    */
   private $isActive;

@@ -69,7 +69,6 @@ class AddressFormat extends \Civi\Core\Entity {
    * @JMS\Type("text")
    * @ORM\Column(name="format", type="text", length=65535, nullable=true)
    * 
-   * 
    */
   private $format;
 

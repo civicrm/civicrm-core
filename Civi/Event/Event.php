@@ -69,7 +69,6 @@ class Event extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="title", type="string", length=255, nullable=true)
    * 
-   * 
    */
   private $title;
   
@@ -78,7 +77,6 @@ class Event extends \Civi\Core\Entity {
    *
    * @JMS\Type("text")
    * @ORM\Column(name="summary", type="text", length=65535, nullable=true)
-   * 
    * 
    */
   private $summary;
@@ -89,7 +87,6 @@ class Event extends \Civi\Core\Entity {
    * @JMS\Type("text")
    * @ORM\Column(name="description", type="text", length=65535, nullable=true)
    * 
-   * 
    */
   private $description;
   
@@ -98,7 +95,6 @@ class Event extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="event_type_id", type="integer", nullable=true, options={"unsigned":true, "default": 0})
-   * 
    * 
    */
   private $eventTypeId = '0';
@@ -109,7 +105,6 @@ class Event extends \Civi\Core\Entity {
    * @JMS\Type("integer")
    * @ORM\Column(name="participant_listing_id", type="integer", nullable=true, options={"unsigned":true, "default": 0})
    * 
-   * 
    */
   private $participantListingId = '0';
   
@@ -118,7 +113,6 @@ class Event extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_public", type="boolean", nullable=true, options={"default": 1})
-   * 
    * 
    */
   private $isPublic = '1';
@@ -129,7 +123,6 @@ class Event extends \Civi\Core\Entity {
    * @JMS\Type("datetime")
    * @ORM\Column(name="start_date", type="datetime", nullable=true)
    * 
-   * 
    */
   private $startDate;
   
@@ -138,7 +131,6 @@ class Event extends \Civi\Core\Entity {
    *
    * @JMS\Type("datetime")
    * @ORM\Column(name="end_date", type="datetime", nullable=true)
-   * 
    * 
    */
   private $endDate;
@@ -149,7 +141,6 @@ class Event extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_online_registration", type="boolean", nullable=true, options={"default": 0})
    * 
-   * 
    */
   private $isOnlineRegistration = '0';
   
@@ -158,7 +149,6 @@ class Event extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="registration_link_text", type="string", length=255, nullable=true)
-   * 
    * 
    */
   private $registrationLinkText;
@@ -169,7 +159,6 @@ class Event extends \Civi\Core\Entity {
    * @JMS\Type("datetime")
    * @ORM\Column(name="registration_start_date", type="datetime", nullable=true)
    * 
-   * 
    */
   private $registrationStartDate;
   
@@ -178,7 +167,6 @@ class Event extends \Civi\Core\Entity {
    *
    * @JMS\Type("datetime")
    * @ORM\Column(name="registration_end_date", type="datetime", nullable=true)
-   * 
    * 
    */
   private $registrationEndDate;
@@ -189,7 +177,6 @@ class Event extends \Civi\Core\Entity {
    * @JMS\Type("integer")
    * @ORM\Column(name="max_participants", type="integer", nullable=true, options={"unsigned":true})
    * 
-   * 
    */
   private $maxParticipants = 'NULL';
   
@@ -198,7 +185,6 @@ class Event extends \Civi\Core\Entity {
    *
    * @JMS\Type("text")
    * @ORM\Column(name="event_full_text", type="text", length=65535, nullable=true)
-   * 
    * 
    */
   private $eventFullText;
@@ -209,7 +195,6 @@ class Event extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_monetary", type="boolean", nullable=true, options={"default": 0})
    * 
-   * 
    */
   private $isMonetary = '0';
   
@@ -218,7 +203,6 @@ class Event extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="financial_type_id", type="integer", nullable=true, options={"unsigned":true})
-   * 
    * 
    */
   private $financialTypeId = 'NULL';
@@ -229,7 +213,6 @@ class Event extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="payment_processor", type="string", length=128, nullable=true)
    * 
-   * 
    */
   private $paymentProcessor;
   
@@ -238,7 +221,6 @@ class Event extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_map", type="boolean", nullable=true, options={"default": 0})
-   * 
    * 
    */
   private $isMap = '0';
@@ -249,7 +231,6 @@ class Event extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_active", type="boolean", nullable=true, options={"default": 0})
    * 
-   * 
    */
   private $isActive = '0';
   
@@ -258,7 +239,6 @@ class Event extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="fee_label", type="string", length=255, nullable=true)
-   * 
    * 
    */
   private $feeLabel;
@@ -269,7 +249,6 @@ class Event extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_show_location", type="boolean", nullable=true, options={"default": 1})
    * 
-   * 
    */
   private $isShowLocation = '1';
   
@@ -279,7 +258,6 @@ class Event extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\LocBlock")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="loc_block_id", referencedColumnName="id", onDelete="SET NULL")})
-   * 
    */
   private $locBlock;
   
@@ -288,7 +266,6 @@ class Event extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="default_role_id", type="integer", nullable=true, options={"unsigned":true, "default": 1})
-   * 
    * 
    */
   private $defaultRoleId = '1';
@@ -299,7 +276,6 @@ class Event extends \Civi\Core\Entity {
    * @JMS\Type("text")
    * @ORM\Column(name="intro_text", type="text", length=65535, nullable=true)
    * 
-   * 
    */
   private $introText;
   
@@ -308,7 +284,6 @@ class Event extends \Civi\Core\Entity {
    *
    * @JMS\Type("text")
    * @ORM\Column(name="footer_text", type="text", length=65535, nullable=true)
-   * 
    * 
    */
   private $footerText;
@@ -319,7 +294,6 @@ class Event extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="confirm_title", type="string", length=255, nullable=true)
    * 
-   * 
    */
   private $confirmTitle = 'NULL';
   
@@ -328,7 +302,6 @@ class Event extends \Civi\Core\Entity {
    *
    * @JMS\Type("text")
    * @ORM\Column(name="confirm_text", type="text", length=65535, nullable=true)
-   * 
    * 
    */
   private $confirmText;
@@ -339,7 +312,6 @@ class Event extends \Civi\Core\Entity {
    * @JMS\Type("text")
    * @ORM\Column(name="confirm_footer_text", type="text", length=65535, nullable=true)
    * 
-   * 
    */
   private $confirmFooterText;
   
@@ -348,7 +320,6 @@ class Event extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_email_confirm", type="boolean", nullable=true, options={"default": 0})
-   * 
    * 
    */
   private $isEmailConfirm = '0';
@@ -359,7 +330,6 @@ class Event extends \Civi\Core\Entity {
    * @JMS\Type("text")
    * @ORM\Column(name="confirm_email_text", type="text", length=65535, nullable=true)
    * 
-   * 
    */
   private $confirmEmailText;
   
@@ -368,7 +338,6 @@ class Event extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="confirm_from_name", type="string", length=255, nullable=true)
-   * 
    * 
    */
   private $confirmFromName;
@@ -379,7 +348,6 @@ class Event extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="confirm_from_email", type="string", length=255, nullable=true)
    * 
-   * 
    */
   private $confirmFromEmail;
   
@@ -388,7 +356,6 @@ class Event extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="cc_confirm", type="string", length=255, nullable=true)
-   * 
    * 
    */
   private $ccConfirm;
@@ -399,7 +366,6 @@ class Event extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="bcc_confirm", type="string", length=255, nullable=true)
    * 
-   * 
    */
   private $bccConfirm;
   
@@ -408,7 +374,6 @@ class Event extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="default_fee_id", type="integer", nullable=true, options={"unsigned":true})
-   * 
    * 
    */
   private $defaultFeeId;
@@ -419,7 +384,6 @@ class Event extends \Civi\Core\Entity {
    * @JMS\Type("integer")
    * @ORM\Column(name="default_discount_fee_id", type="integer", nullable=true, options={"unsigned":true})
    * 
-   * 
    */
   private $defaultDiscountFeeId;
   
@@ -428,7 +392,6 @@ class Event extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="thankyou_title", type="string", length=255, nullable=true)
-   * 
    * 
    */
   private $thankyouTitle = 'NULL';
@@ -439,7 +402,6 @@ class Event extends \Civi\Core\Entity {
    * @JMS\Type("text")
    * @ORM\Column(name="thankyou_text", type="text", length=65535, nullable=true)
    * 
-   * 
    */
   private $thankyouText;
   
@@ -448,7 +410,6 @@ class Event extends \Civi\Core\Entity {
    *
    * @JMS\Type("text")
    * @ORM\Column(name="thankyou_footer_text", type="text", length=65535, nullable=true)
-   * 
    * 
    */
   private $thankyouFooterText;
@@ -459,7 +420,6 @@ class Event extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_pay_later", type="boolean", nullable=true, options={"default": 0})
    * 
-   * 
    */
   private $isPayLater = '0';
   
@@ -468,7 +428,6 @@ class Event extends \Civi\Core\Entity {
    *
    * @JMS\Type("text")
    * @ORM\Column(name="pay_later_text", type="text", length=65535, nullable=true)
-   * 
    * 
    */
   private $payLaterText;
@@ -479,7 +438,6 @@ class Event extends \Civi\Core\Entity {
    * @JMS\Type("text")
    * @ORM\Column(name="pay_later_receipt", type="text", length=65535, nullable=true)
    * 
-   * 
    */
   private $payLaterReceipt;
   
@@ -488,7 +446,6 @@ class Event extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_partial_payment", type="boolean", nullable=true, options={"default": 0})
-   * 
    * 
    */
   private $isPartialPayment = '0';
@@ -499,7 +456,6 @@ class Event extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="initial_amount_label", type="string", length=255, nullable=true)
    * 
-   * 
    */
   private $initialAmountLabel;
   
@@ -508,7 +464,6 @@ class Event extends \Civi\Core\Entity {
    *
    * @JMS\Type("text")
    * @ORM\Column(name="initial_amount_help_text", type="text", length=65535, nullable=true)
-   * 
    * 
    */
   private $initialAmountHelpText;
@@ -519,7 +474,6 @@ class Event extends \Civi\Core\Entity {
    * @JMS\Type("float")
    * @ORM\Column(name="min_initial_amount", type="float", nullable=true)
    * 
-   * 
    */
   private $minInitialAmount;
   
@@ -528,7 +482,6 @@ class Event extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_multiple_registrations", type="boolean", nullable=true, options={"default": 0})
-   * 
    * 
    */
   private $isMultipleRegistrations = '0';
@@ -539,7 +492,6 @@ class Event extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="allow_same_participant_emails", type="boolean", nullable=true, options={"default": 0})
    * 
-   * 
    */
   private $allowSameParticipantEmails = '0';
   
@@ -548,7 +500,6 @@ class Event extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="has_waitlist", type="boolean", nullable=true)
-   * 
    * 
    */
   private $hasWaitlist;
@@ -559,7 +510,6 @@ class Event extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="requires_approval", type="boolean", nullable=true)
    * 
-   * 
    */
   private $requiresApproval;
   
@@ -568,7 +518,6 @@ class Event extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="expiration_time", type="integer", nullable=true, options={"unsigned":true})
-   * 
    * 
    */
   private $expirationTime;
@@ -579,7 +528,6 @@ class Event extends \Civi\Core\Entity {
    * @JMS\Type("text")
    * @ORM\Column(name="waitlist_text", type="text", length=65535, nullable=true)
    * 
-   * 
    */
   private $waitlistText;
   
@@ -588,7 +536,6 @@ class Event extends \Civi\Core\Entity {
    *
    * @JMS\Type("text")
    * @ORM\Column(name="approval_req_text", type="text", length=65535, nullable=true)
-   * 
    * 
    */
   private $approvalReqText;
@@ -599,7 +546,6 @@ class Event extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_template", type="boolean", nullable=true, options={"default": 0})
    * 
-   * 
    */
   private $isTemplate = '0';
   
@@ -608,7 +554,6 @@ class Event extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="template_title", type="string", length=255, nullable=true)
-   * 
    * 
    */
   private $templateTitle;
@@ -619,7 +564,6 @@ class Event extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Contact")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="created_id", referencedColumnName="id", onDelete="SET NULL")})
-   * 
    */
   private $created;
   
@@ -628,7 +572,6 @@ class Event extends \Civi\Core\Entity {
    *
    * @JMS\Type("datetime")
    * @ORM\Column(name="created_date", type="datetime", nullable=true)
-   * 
    * 
    */
   private $createdDate;
@@ -639,7 +582,6 @@ class Event extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="currency", type="string", length=3, nullable=true)
    * 
-   * 
    */
   private $currency;
   
@@ -649,7 +591,6 @@ class Event extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Campaign\Campaign")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="campaign_id", referencedColumnName="id", onDelete="SET NULL")})
-   * 
    */
   private $campaign;
   
@@ -658,7 +599,6 @@ class Event extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_share", type="boolean", nullable=true, options={"default": 1})
-   * 
    * 
    */
   private $isShare = '1';
@@ -669,7 +609,6 @@ class Event extends \Civi\Core\Entity {
    * @JMS\Type("integer")
    * @ORM\Column(name="parent_event_id", type="integer", nullable=true, options={"unsigned":true})
    * 
-   * 
    */
   private $parentEventId = 'NULL';
   
@@ -678,7 +617,6 @@ class Event extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="slot_label_id", type="integer", nullable=true, options={"unsigned":true})
-   * 
    * 
    */
   private $slotLabelId = 'NULL';

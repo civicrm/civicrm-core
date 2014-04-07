@@ -69,7 +69,6 @@ class Tag extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="name", type="string", length=64, nullable=false)
    * 
-   * 
    */
   private $name;
   
@@ -78,7 +77,6 @@ class Tag extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="description", type="string", length=255, nullable=true)
-   * 
    * 
    */
   private $description;
@@ -89,7 +87,6 @@ class Tag extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\Tag")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="parent_id", referencedColumnName="id")})
-   * 
    */
   private $parent = 'NULL';
   
@@ -98,7 +95,6 @@ class Tag extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_selectable", type="boolean", nullable=true, options={"default": 1})
-   * 
    * 
    */
   private $isSelectable = '1';
@@ -109,7 +105,6 @@ class Tag extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_reserved", type="boolean", nullable=true, options={"default": 0})
    * 
-   * 
    */
   private $isReserved = '0';
   
@@ -118,7 +113,6 @@ class Tag extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_tagset", type="boolean", nullable=true, options={"default": 0})
-   * 
    * 
    */
   private $isTagset = '0';
@@ -129,7 +123,6 @@ class Tag extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="used_for", type="string", length=64, nullable=true)
    * 
-   * 
    */
   private $usedFor = 'NULL';
   
@@ -139,7 +132,6 @@ class Tag extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Contact")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="created_id", referencedColumnName="id", onDelete="SET NULL")})
-   * 
    */
   private $created;
   
@@ -148,7 +140,6 @@ class Tag extends \Civi\Core\Entity {
    *
    * @JMS\Type("datetime")
    * @ORM\Column(name="created_date", type="datetime", nullable=true)
-   * 
    * 
    */
   private $createdDate;

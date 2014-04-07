@@ -69,7 +69,6 @@ class TrackableURL extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="url", type="string", length=255, nullable=false)
    * 
-   * 
    */
   private $url;
   
@@ -79,7 +78,6 @@ class TrackableURL extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Mailing\Mailing")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="mailing_id", referencedColumnName="id", onDelete="CASCADE")})
-   * 
    */
   private $mailing;
 

@@ -69,7 +69,6 @@ class Discount extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="entity_table", type="string", length=64, nullable=true)
    * 
-   * 
    */
   private $entityTable;
   
@@ -78,7 +77,6 @@ class Discount extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="entity_id", type="integer", nullable=false, options={"unsigned":true})
-   * 
    * 
    */
   private $entityId;
@@ -89,7 +87,6 @@ class Discount extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Price\PriceSet")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="price_set_id", referencedColumnName="id", onDelete="CASCADE")})
-   * 
    */
   private $priceSet;
   
@@ -99,7 +96,6 @@ class Discount extends \Civi\Core\Entity {
    * @JMS\Type("date")
    * @ORM\Column(name="start_date", type="date", nullable=true)
    * 
-   * 
    */
   private $startDate;
   
@@ -108,7 +104,6 @@ class Discount extends \Civi\Core\Entity {
    *
    * @JMS\Type("date")
    * @ORM\Column(name="end_date", type="date", nullable=true)
-   * 
    * 
    */
   private $endDate;

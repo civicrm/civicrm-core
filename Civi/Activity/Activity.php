@@ -69,7 +69,6 @@ class Activity extends \Civi\Core\Entity {
    * @JMS\Type("integer")
    * @ORM\Column(name="source_record_id", type="integer", nullable=true, options={"unsigned":true})
    * 
-   * 
    */
   private $sourceRecordId;
   
@@ -78,7 +77,6 @@ class Activity extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="activity_type_id", type="integer", nullable=false, options={"unsigned":true, "default": 1})
-   * 
    * 
    */
   private $activityTypeId = '1';
@@ -89,7 +87,6 @@ class Activity extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="subject", type="string", length=255, nullable=true)
    * 
-   * 
    */
   private $subject;
   
@@ -98,7 +95,6 @@ class Activity extends \Civi\Core\Entity {
    *
    * @JMS\Type("datetime")
    * @ORM\Column(name="activity_date_time", type="datetime", nullable=true)
-   * 
    * 
    */
   private $activityDateTime;
@@ -109,7 +105,6 @@ class Activity extends \Civi\Core\Entity {
    * @JMS\Type("integer")
    * @ORM\Column(name="duration", type="integer", nullable=true, options={"unsigned":true})
    * 
-   * 
    */
   private $duration;
   
@@ -118,7 +113,6 @@ class Activity extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="location", type="string", length=255, nullable=true)
-   * 
    * 
    */
   private $location;
@@ -129,7 +123,6 @@ class Activity extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\Phone")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="phone_id", referencedColumnName="id", onDelete="SET NULL")})
-   * 
    */
   private $phone;
   
@@ -138,7 +131,6 @@ class Activity extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="phone_number", type="string", length=64, nullable=true)
-   * 
    * 
    */
   private $phoneNumber;
@@ -149,7 +141,6 @@ class Activity extends \Civi\Core\Entity {
    * @JMS\Type("text")
    * @ORM\Column(name="details", type="text", length=65535, nullable=true)
    * 
-   * 
    */
   private $details;
   
@@ -158,7 +149,6 @@ class Activity extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="status_id", type="integer", nullable=true, options={"unsigned":true})
-   * 
    * 
    */
   private $statusId;
@@ -169,7 +159,6 @@ class Activity extends \Civi\Core\Entity {
    * @JMS\Type("integer")
    * @ORM\Column(name="priority_id", type="integer", nullable=true, options={"unsigned":true})
    * 
-   * 
    */
   private $priorityId;
   
@@ -179,7 +168,6 @@ class Activity extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Activity\Activity")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="parent_id", referencedColumnName="id", onDelete="CASCADE")})
-   * 
    */
   private $parent;
   
@@ -188,7 +176,6 @@ class Activity extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_test", type="boolean", nullable=true, options={"default": 0})
-   * 
    * 
    */
   private $isTest = '0';
@@ -199,7 +186,6 @@ class Activity extends \Civi\Core\Entity {
    * @JMS\Type("integer")
    * @ORM\Column(name="medium_id", type="integer", nullable=true, options={"unsigned":true})
    * 
-   * 
    */
   private $mediumId = 'NULL';
   
@@ -208,7 +194,6 @@ class Activity extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_auto", type="boolean", nullable=true, options={"default": 0})
-   * 
    * 
    */
   private $isAuto = '0';
@@ -219,7 +204,6 @@ class Activity extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Relationship")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="relationship_id", referencedColumnName="id", onDelete="SET NULL")})
-   * 
    */
   private $relationship = 'NULL';
   
@@ -228,7 +212,6 @@ class Activity extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_current_revision", type="boolean", nullable=true, options={"default": 1})
-   * 
    * 
    */
   private $isCurrentRevision = '1';
@@ -239,7 +222,6 @@ class Activity extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Activity\Activity")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="original_id", referencedColumnName="id", onDelete="CASCADE")})
-   * 
    */
   private $original;
   
@@ -248,7 +230,6 @@ class Activity extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="result", type="string", length=255, nullable=true)
-   * 
    * 
    */
   private $result;
@@ -259,7 +240,6 @@ class Activity extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_deleted", type="boolean", nullable=true, options={"default": 0})
    * 
-   * 
    */
   private $isDeleted = '0';
   
@@ -269,7 +249,6 @@ class Activity extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Campaign\Campaign")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="campaign_id", referencedColumnName="id", onDelete="SET NULL")})
-   * 
    */
   private $campaign;
   
@@ -279,7 +258,6 @@ class Activity extends \Civi\Core\Entity {
    * @JMS\Type("integer")
    * @ORM\Column(name="engagement_level", type="integer", nullable=true, options={"unsigned":true})
    * 
-   * 
    */
   private $engagementLevel;
   
@@ -288,7 +266,6 @@ class Activity extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="weight", type="integer", nullable=true, options={"unsigned":true})
-   * 
    * 
    */
   private $weight;

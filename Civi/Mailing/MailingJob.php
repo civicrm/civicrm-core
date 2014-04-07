@@ -69,7 +69,6 @@ class MailingJob extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Mailing\Mailing")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="mailing_id", referencedColumnName="id", onDelete="CASCADE")})
-   * 
    */
   private $mailing;
   
@@ -78,7 +77,6 @@ class MailingJob extends \Civi\Core\Entity {
    *
    * @JMS\Type("datetime")
    * @ORM\Column(name="scheduled_date", type="datetime", nullable=true)
-   * 
    * 
    */
   private $scheduledDate;
@@ -89,7 +87,6 @@ class MailingJob extends \Civi\Core\Entity {
    * @JMS\Type("datetime")
    * @ORM\Column(name="start_date", type="datetime", nullable=true)
    * 
-   * 
    */
   private $startDate;
   
@@ -98,7 +95,6 @@ class MailingJob extends \Civi\Core\Entity {
    *
    * @JMS\Type("datetime")
    * @ORM\Column(name="end_date", type="datetime", nullable=true)
-   * 
    * 
    */
   private $endDate;
@@ -109,7 +105,6 @@ class MailingJob extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="status", type="string", length=12, nullable=true)
    * 
-   * 
    */
   private $status;
   
@@ -118,7 +113,6 @@ class MailingJob extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_test", type="boolean", nullable=true, options={"default": 0})
-   * 
    * 
    */
   private $isTest = '0';
@@ -129,7 +123,6 @@ class MailingJob extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="job_type", type="string", length=255, nullable=true)
    * 
-   * 
    */
   private $jobType;
   
@@ -139,7 +132,6 @@ class MailingJob extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Mailing\MailingJob")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="parent_id", referencedColumnName="id", onDelete="CASCADE")})
-   * 
    */
   private $parent = 'NULL';
   
@@ -149,7 +141,6 @@ class MailingJob extends \Civi\Core\Entity {
    * @JMS\Type("integer")
    * @ORM\Column(name="job_offset", type="integer", nullable=true, options={"unsigned":true, "default": 0})
    * 
-   * 
    */
   private $jobOffset = '0';
   
@@ -158,7 +149,6 @@ class MailingJob extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="job_limit", type="integer", nullable=true, options={"unsigned":true, "default": 0})
-   * 
    * 
    */
   private $jobLimit = '0';

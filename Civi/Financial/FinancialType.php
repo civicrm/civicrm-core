@@ -69,7 +69,6 @@ class FinancialType extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="name", type="string", length=64, nullable=false)
    * 
-   * 
    */
   private $name;
   
@@ -78,7 +77,6 @@ class FinancialType extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="description", type="string", length=255, nullable=true)
-   * 
    * 
    */
   private $description;
@@ -89,7 +87,6 @@ class FinancialType extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_deductible", type="boolean", nullable=true, options={"default": 1})
    * 
-   * 
    */
   private $isDeductible = '1';
   
@@ -99,7 +96,6 @@ class FinancialType extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_reserved", type="boolean", nullable=true)
    * 
-   * 
    */
   private $isReserved;
   
@@ -108,7 +104,6 @@ class FinancialType extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_active", type="boolean", nullable=true)
-   * 
    * 
    */
   private $isActive;

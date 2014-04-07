@@ -69,7 +69,6 @@ class ContactType extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="name", type="string", length=64, nullable=true)
    * 
-   * 
    */
   private $name;
   
@@ -78,7 +77,6 @@ class ContactType extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="label", type="string", length=64, nullable=true)
-   * 
    * 
    */
   private $label;
@@ -89,7 +87,6 @@ class ContactType extends \Civi\Core\Entity {
    * @JMS\Type("text")
    * @ORM\Column(name="description", type="text", length=65535, nullable=true)
    * 
-   * 
    */
   private $description;
   
@@ -98,7 +95,6 @@ class ContactType extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="image_URL", type="string", length=255, nullable=true)
-   * 
    * 
    */
   private $imageURL;
@@ -109,7 +105,6 @@ class ContactType extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\ContactType")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="parent_id", referencedColumnName="id")})
-   * 
    */
   private $parent;
   
@@ -119,7 +114,6 @@ class ContactType extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_active", type="boolean", nullable=true)
    * 
-   * 
    */
   private $isActive;
   
@@ -128,7 +122,6 @@ class ContactType extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_reserved", type="boolean", nullable=true)
-   * 
    * 
    */
   private $isReserved;

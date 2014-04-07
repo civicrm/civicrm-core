@@ -69,7 +69,6 @@ class UFMatch extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\Domain")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="domain_id", referencedColumnName="id")})
-   * 
    */
   private $domain;
   
@@ -78,7 +77,6 @@ class UFMatch extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="uf_id", type="integer", nullable=false, options={"unsigned":true})
-   * 
    * 
    */
   private $ufId;
@@ -89,7 +87,6 @@ class UFMatch extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="uf_name", type="string", length=128, nullable=true)
    * 
-   * 
    */
   private $ufName;
   
@@ -99,7 +96,6 @@ class UFMatch extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Contact")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="contact_id", referencedColumnName="id", onDelete="CASCADE")})
-   * 
    */
   private $contact;
   
@@ -108,7 +104,6 @@ class UFMatch extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="language", type="string", length=5, nullable=true)
-   * 
    * 
    */
   private $language;

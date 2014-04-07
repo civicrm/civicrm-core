@@ -69,7 +69,6 @@ class Participant extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Contact")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="contact_id", referencedColumnName="id", onDelete="CASCADE")})
-   * 
    */
   private $contact;
   
@@ -79,7 +78,6 @@ class Participant extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Event\Event")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="event_id", referencedColumnName="id", onDelete="CASCADE")})
-   * 
    */
   private $event;
   
@@ -89,7 +87,6 @@ class Participant extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Event\ParticipantStatusType")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="status_id", referencedColumnName="id")})
-   * 
    */
   private $status = '1';
   
@@ -98,7 +95,6 @@ class Participant extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="role_id", type="string", length=128, nullable=true)
-   * 
    * 
    */
   private $roleId = 'NULL';
@@ -109,7 +105,6 @@ class Participant extends \Civi\Core\Entity {
    * @JMS\Type("datetime")
    * @ORM\Column(name="register_date", type="datetime", nullable=true)
    * 
-   * 
    */
   private $registerDate;
   
@@ -118,7 +113,6 @@ class Participant extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="source", type="string", length=128, nullable=true)
-   * 
    * 
    */
   private $source;
@@ -129,7 +123,6 @@ class Participant extends \Civi\Core\Entity {
    * @JMS\Type("text")
    * @ORM\Column(name="fee_level", type="text", length=65535, nullable=true)
    * 
-   * 
    */
   private $feeLevel;
   
@@ -138,7 +131,6 @@ class Participant extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_test", type="boolean", nullable=true, options={"default": 0})
-   * 
    * 
    */
   private $isTest = '0';
@@ -149,7 +141,6 @@ class Participant extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_pay_later", type="boolean", nullable=true, options={"default": 0})
    * 
-   * 
    */
   private $isPayLater = '0';
   
@@ -158,7 +149,6 @@ class Participant extends \Civi\Core\Entity {
    *
    * @JMS\Type("float")
    * @ORM\Column(name="fee_amount", type="float", nullable=true)
-   * 
    * 
    */
   private $feeAmount;
@@ -169,7 +159,6 @@ class Participant extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Event\Participant")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="registered_by_id", referencedColumnName="id", onDelete="SET NULL")})
-   * 
    */
   private $registeredBy = 'NULL';
   
@@ -179,7 +168,6 @@ class Participant extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\Discount")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="discount_id", referencedColumnName="id", onDelete="SET NULL")})
-   * 
    */
   private $discount = 'NULL';
   
@@ -188,7 +176,6 @@ class Participant extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="fee_currency", type="string", length=3, nullable=true)
-   * 
    * 
    */
   private $feeCurrency = 'NULL';
@@ -199,7 +186,6 @@ class Participant extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Campaign\Campaign")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="campaign_id", referencedColumnName="id", onDelete="SET NULL")})
-   * 
    */
   private $campaign;
   
@@ -208,7 +194,6 @@ class Participant extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="discount_amount", type="integer", nullable=true, options={"unsigned":true})
-   * 
    * 
    */
   private $discountAmount;
@@ -219,7 +204,6 @@ class Participant extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Event\Cart\Cart")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="cart_id", referencedColumnName="id", onDelete="SET NULL")})
-   * 
    */
   private $cart;
   
@@ -228,7 +212,6 @@ class Participant extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="must_wait", type="integer", nullable=true, options={"unsigned":true})
-   * 
    * 
    */
   private $mustWait;
