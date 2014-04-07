@@ -71,7 +71,12 @@ class TransactionSubscriber implements EventSubscriberInterface {
    */
   function onApiRespond(\Civi\API\Event\RespondEvent $event) {
     $apiRequest = $event->getApiRequest();
-    unset($this->transactions[$apiRequest['id']]);
+    if (isset($this->transactions[$apiRequest['id']])) {
+      if (civicrm_error($event->getResponse())) {
+        $this->transactions[$apiRequest['id']]->rollback();
+      }
+      unset($this->transactions[$apiRequest['id']]);
+    }
   }
 
   /**
