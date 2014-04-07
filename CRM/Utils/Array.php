@@ -355,6 +355,20 @@ class CRM_Utils_Array {
   }
 
   /**
+   * @param $subset
+   * @param $superset
+   * @return bool TRUE if $subset is a subset of $superset
+   */
+  static function isSubset($subset, $superset) {
+    foreach ($subset as $expected) {
+      if (!in_array($expected, $superset)) {
+        return FALSE;
+      }
+    }
+    return TRUE;
+  }
+
+  /**
    * Recursively copies all values of an array into a new array.
    *
    * If the recursion depth limit is exceeded, the deep copy appears to
