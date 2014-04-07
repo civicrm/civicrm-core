@@ -153,7 +153,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
   }
 
   public static function toBeSkipped_delete($sequential = FALSE) {
-    $entitiesWithout = array('MailingGroup', 'Constant', 'Entity', 'Location', 'Domain', 'Profile', 'CustomValue');
+    $entitiesWithout = array('MailingContact', 'MailingEventConfirm', 'MailingEventResubscribe', 'MailingEventSubscribe', 'MailingEventUnsubscribe', 'MailingGroup', 'MailingRecipients', 'Constant', 'Entity', 'Location', 'Domain', 'Profile', 'CustomValue', 'Setting');
     if ($sequential === TRUE) {
       return $entitiesWithout;
     }
@@ -360,7 +360,8 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
   public function testNotImplemented_get($Entity) {
     $result = civicrm_api($Entity, 'Get', array('version' => 3));
     $this->assertEquals(1, $result['is_error'], 'In line ' . __LINE__);
-    $this->assertContains("API ($Entity, Get) does not exist", $result['error_message']);
+    // $this->assertContains("API ($Entity, Get) does not exist", $result['error_message']);
+    $this->assertRegExp('/API (.*) does not exist/',  $result['error_message']);
   }
 
   /**
@@ -674,7 +675,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
   public function testNotImplemented_create($Entity) {
     $result = civicrm_api($Entity, 'Create', array('version' => 3));
     $this->assertEquals(1, $result['is_error'], 'In line ' . __LINE__);
-    $this->assertContains("API ($Entity, Create) does not exist", $result['error_message']);
+    $this->assertContains(strtolower("API ($Entity, Create) does not exist"), strtolower($result['error_message']));
   }
 
   /**
@@ -874,7 +875,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     $nonExistantID = 151416349;
     $result = civicrm_api($Entity, 'Delete', array('version' => 3, 'id' => $nonExistantID));
     $this->assertEquals(1, $result['is_error'], 'In line ' . __LINE__);
-    $this->assertContains("API ($Entity, Delete) does not exist", $result['error_message']);
+    $this->assertContains(strtolower("API ($Entity, Delete) does not exist"), strtolower($result['error_message']));
   }
 
   /**

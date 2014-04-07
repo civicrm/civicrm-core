@@ -88,6 +88,23 @@ class Container {
       array(new Reference('annotation_reader'))
     ));
 
+    $container->setDefinition('dispatcher', new Definition(
+      '\Symfony\Component\EventDispatcher\EventDispatcher',
+      array()
+    ))
+      ->setFactoryService(self::SELF)->setFactoryMethod('createEventDispatcher');
+
+    $container->setDefinition('magic_function_provider', new Definition(
+      '\Civi\API\Provider\MagicFunctionProvider',
+      array()
+    ));
+
+    $container->setDefinition('civi_api_kernel', new Definition(
+      '\Civi\API\Kernel',
+      array(new Reference('dispatcher'), new Reference('magic_function_provider'))
+    ))
+      ->setFactoryService(self::SELF)->setFactoryMethod('createApiKernel');
+
     return $container;
   }
 
@@ -143,5 +160,44 @@ class Container {
     $dbSettings = new \CRM_DB_Settings();
     $em = EntityManager::create($dbSettings->toDoctrineArray(), $config);
     return $em;
+  }
+
+  /**
+   * @return \Symfony\Component\EventDispatcher\EventDispatcher
+   */
+  public function createEventDispatcher() {
+    $dispatcher = new \Symfony\Component\EventDispatcher\EventDispatcher();
+    return $dispatcher;
+  }
+
+  /**
+   * @param \Symfony\Component\EventDispatcher\EventDispatcher $dispatcher
+   * @return \Civi\API\Kernel
+   */
+  public function createApiKernel($dispatcher, $magicFunctionProvider) {
+    $dispatcher->addSubscriber(new \Civi\API\Subscriber\ChainSubscriber());
+    $dispatcher->addSubscriber(new \Civi\API\Subscriber\TransactionSubscriber());
+    $dispatcher->addSubscriber(new \Civi\API\Subscriber\I18nSubscriber());
+    $dispatcher->addSubscriber($magicFunctionProvider);
+    $dispatcher->addSubscriber(new \Civi\API\Subscriber\PermissionCheck());
+    $dispatcher->addSubscriber(new \Civi\API\Subscriber\APIv3SchemaAdapter());
+    $dispatcher->addSubscriber(new \Civi\API\Subscriber\WrapperAdapter(array(
+      \CRM_Utils_API_HTMLInputCoder::singleton(),
+      \CRM_Utils_API_NullOutputCoder::singleton(),
+      \CRM_Utils_API_ReloadOption::singleton(),
+      \CRM_Utils_API_MatchOption::singleton(),
+    )));
+    $dispatcher->addSubscriber(new \Civi\API\Subscriber\XDebugSubscriber());
+    $kernel = new \Civi\API\Kernel($dispatcher);
+
+    $reflectionProvider = new \Civi\API\Provider\ReflectionProvider($kernel);
+    $dispatcher->addSubscriber($reflectionProvider);
+
+    $kernel->setApiProviders(array(
+      $reflectionProvider,
+      $magicFunctionProvider,
+    ));
+
+    return $kernel;
   }
 }
