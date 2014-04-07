@@ -890,7 +890,8 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
         }
         $rows["move_$field"][$moniker] = $label;
         if ($moniker == 'other') {
-          if ($value === NULL) {
+          //CRM-14334
+          if ($value === NULL || $value == '') {
             $value = 'null';
           }
           if ($value === 0 or $value === '0') {
@@ -1185,9 +1186,10 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
       if ($value == $qfZeroBug) {
         $value = '0';
       }
-      if ((in_array(substr($key, 5), CRM_Dedupe_Merger::getContactFields()) or
-          substr($key, 0, 12) == 'move_custom_'
-        ) and $value != NULL) {
+      if ((in_array(substr($key, 5), CRM_Dedupe_Merger::getContactFields()) ||
+        substr($key, 0, 12) == 'move_custom_') &&
+        $value != NULL
+      ) {
         $submitted[substr($key, 5)] = $value;
       }
       elseif (substr($key, 0, 14) == 'move_location_' and $value != NULL) {
