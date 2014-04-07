@@ -508,10 +508,10 @@ class Contact extends \Civi\Core\Entity {
    * @var datetime
    *
    * @JMS\Type("datetime")
-   * @ORM\Column(name="created_date", type="datetime", nullable=true)
+   * @ORM\Column(name="created_date", type="datetime", nullable=true, columnDefinition="TIMESTAMP NULL DEFAULT NULL")
    * 
    */
-  private $createdDate = 'NULL';
+  private $createdDate;
   
   /**
    * @var datetime
@@ -2375,8 +2375,7 @@ class Contact extends \Civi\Core\Entity {
                 'title' => ts('Created Date'),
                         'required' => false,
                                                      
-                                           'default' => 'NULL',
-         
+                                    
                           ),
       
               'modified_date' => array(
