@@ -25,7 +25,7 @@ class api_v3_CustomSearchTest extends CiviUnitTestCase {
     $this->assertDBQuery(1, 'SELECT count(*) FROM civicrm_option_value
       WHERE name = "CRM_Contact_Form_Search_Custom_Examplez"
       AND label = "CRM_Contact_Form_Search_Custom_Examplez"
-      AND option_group_id = 25');
+      AND option_group_id IN (SELECT id from civicrm_option_group WHERE name = "custom_search") ');
     $this->assertDBQuery(1, 'SELECT is_active FROM civicrm_option_value
       WHERE name = "CRM_Contact_Form_Search_Custom_Examplez"');
 
@@ -39,7 +39,7 @@ class api_v3_CustomSearchTest extends CiviUnitTestCase {
     $this->assertDBQuery(1, 'SELECT count(*) FROM civicrm_option_value
       WHERE name = "CRM_Contact_Form_Search_Custom_Examplez"
       AND label = "CRM_Contact_Form_Search_Custom_Examplez"
-      AND option_group_id = 25');
+      AND option_group_id IN (SELECT id from civicrm_option_group WHERE name = "custom_search") ');
     $this->assertDBQuery(0, 'SELECT is_active FROM civicrm_option_value
       WHERE name = "CRM_Contact_Form_Search_Custom_Examplez"');
 
@@ -53,7 +53,7 @@ class api_v3_CustomSearchTest extends CiviUnitTestCase {
     $this->assertDBQuery(1, 'SELECT count(*) FROM civicrm_option_value
       WHERE name = "CRM_Contact_Form_Search_Custom_Examplez"
       AND label = "CRM_Contact_Form_Search_Custom_Examplez"
-      AND option_group_id = 25');
+      AND option_group_id IN (SELECT id from civicrm_option_group WHERE name = "custom_search") ');
     $this->assertDBQuery(1, 'SELECT is_active FROM civicrm_option_value
       WHERE name = "CRM_Contact_Form_Search_Custom_Examplez"');
 
