@@ -112,13 +112,12 @@ class CRM_Admin_Form_Job extends CRM_Admin_Form {
 
     require_once 'api/api.php';
 
-    $apiRequest = array();
-    $apiRequest['entity']  = CRM_Utils_String::munge($fields['api_entity']);
-    $apiRequest['action']  = CRM_Utils_String::munge($fields['api_action']);
-    $apiRequest['version'] = 3;
-    $apiRequest += _civicrm_api_resolve($apiRequest);    // look up function, file, is_generic
-
-    if( !$apiRequest['function'] ) {
+    /** @var \Civi\API\Kernel $apiKernel */
+    $apiKernel = \Civi\Core\Container::singleton()->get('civi_api_kernel');
+    $apiRequest = $apiKernel->createRequest($fields['api_entity'], $fields['api_action'], array('version' => 3), NULL);
+    try {
+      $apiKernel->resolve($apiRequest);
+    } catch (\Civi\API\Exception\NotImplementedException $e) {
       $errors['api_action'] = ts('Given API command is not defined.');
     }
 

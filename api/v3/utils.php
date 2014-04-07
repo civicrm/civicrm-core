@@ -131,35 +131,19 @@ function civicrm_api3_verify_mandatory($params, $daoName = NULL, $keys = array()
  *
  * @param <type> $data
  * @param array $data
- * @param array $dao (misnomer) apiRequest which led to this error (with keys "entity", "action", etc)
  *
  * @throws API_Exception
  * @return array <type>
  */
-function civicrm_api3_create_error($msg, $data = array(), &$dao = NULL) {
-  if (is_array($dao)) {
-    if ($msg == 'DB Error: constraint violation' || substr($msg, 0,9)  == 'DB Error:' || $msg == 'DB Error: already exists') {
-      try {
-        $fields = _civicrm_api3_api_getfields($dao);
-        _civicrm_api3_validate_fields($dao['entity'], $dao['action'], $dao['params'], $fields, TRUE);
-      }
-      catch(Exception $e) {
-        $msg = $e->getMessage();
-      }
-    }
-  }
+function civicrm_api3_create_error($msg, $data = array()) {
   $data['is_error'] = 1;
   $data['error_message'] = $msg;
-  // we will show sql to privelledged user only (not sure of a specific
-  // security hole here but seems sensible - perhaps should apply to the trace as well?
+  // we will show sql to privileged user only (not sure of a specific
+  // security hole here but seems sensible - perhaps should apply to the trace as well?)
   if(isset($data['sql']) && CRM_Core_Permission::check('Administer CiviCRM')) {
     $data['debug_information'] = $data['sql']; // Isn't this redundant?
   } else {
     unset($data['sql']);
-  }
-  if (is_array($dao) && isset($dao['params']) && is_array($dao['params']) && !empty($dao['params']['api.has_parent'])) {
-    $errorCode = empty($data['error_code']) ? 'chained_api_failed' : $data['error_code'];
-    throw new API_Exception('Error in call to ' . $dao['entity'] . '_' . $dao['action'] . ' : ' . $msg, $errorCode, $data);
   }
   return $data;
 }
@@ -995,48 +979,6 @@ function _civicrm_api3_check_required_fields($params, $daoName, $return = FALSE)
 }
 
 /**
- * Check permissions for a given API call.
- *
- * @param $entity string API entity being accessed
- * @param $action string API action being performed
- * @param $params array  params of the API call
- * @param $throw deprecated bool    whether to throw exception instead of returning false
- *
- * @throws Exception
- * @return bool whether the current API user has the permission to make the call
- */
-function _civicrm_api3_api_check_permission($entity, $action, &$params, $throw = TRUE) {
-  // return early unless we’re told explicitly to do the permission check
-  if (empty($params['check_permissions']) or $params['check_permissions'] == FALSE) {
-    return TRUE;
-  }
-
-  require_once 'CRM/Core/DAO/permissions.php';
-  $permissions = _civicrm_api3_permissions($entity, $action, $params);
-
-  // $params might’ve been reset by the alterAPIPermissions() hook
-  if (isset($params['check_permissions']) and $params['check_permissions'] == FALSE) {
-    return TRUE;
-  }
-
-  if (!CRM_Core_Permission::check($permissions)) {
-    if ($throw) {
-      if(is_array($permissions)) {
-        $permissions = implode(' and ', $permissions);
-      }
-      throw new Exception("API permission check failed for $entity/$action call; insufficient permission: require $permissions");
-    }
-    else {
-      //@todo remove this - this is an internal api function called with $throw set to TRUE. It is only called with false
-      // in tests & that should be tidied up
-      return FALSE;
-    }
-  }
-
-  return TRUE;
-}
-
-/**
  * Function to do a 'standard' api get - when the api is only doing a $bao->find then use this
  *
  * @param string $bao_name name of BAO
@@ -1343,7 +1285,7 @@ function _civicrm_api3_validate_uniquekey(&$params, &$fieldName, &$fieldInfo) {
   // an entry already exists for this unique field
   if ($existing['count'] == 1) {
     // question - could this ever be a security issue?
-    throw new Exception("Field: `$fieldName` must be unique. An conflicting entity already exists - id: " . $existing['id']);
+    throw new API_Exception("Field: `$fieldName` must be unique. An conflicting entity already exists - id: " . $existing['id']);
   }
 }
 
@@ -1543,33 +1485,7 @@ function _getStandardTypeFromCustomDataType($dataType) {
   );
   return $mapping[$dataType];
 }
-/**
- * Return array of defaults for the given API (function is a wrapper on getfields)
- */
-function _civicrm_api3_getdefaults($apiRequest, $fields) {
-  $defaults = array();
 
-  foreach ($fields as $field => $values) {
-    if (isset($values['api.default'])) {
-      $defaults[$field] = $values['api.default'];
-    }
-  }
-  return $defaults;
-}
-
-/**
- * Return array of defaults for the given API (function is a wrapper on getfields)
- */
-function _civicrm_api3_getrequired($apiRequest, $fields) {
-  $required = array('version');
-
-  foreach ($fields as $field => $values) {
-    if (!empty($values['api.required'])) {
-      $required[] = $field;
-    }
-  }
-  return $required;
-}
 
 /**
  * Fill params array with alternate (alias) values where a field has an alias and that is filled & the main field isn't

@@ -68,17 +68,17 @@ class api_v3_UtilsTest extends CiviUnitTestCase {
     $check = array('check_permissions' => TRUE);
     $config = CRM_Core_Config::singleton();
     $config->userPermissionClass->permissions = array();
-    $this->assertFalse(_civicrm_api3_api_check_permission('contact', 'create', $check, FALSE), 'empty permissions should not be enough');
+    $this->assertFalse($this->runPermissionCheck('contact', 'create', $check), 'empty permissions should not be enough');
     $config->userPermissionClass->permissions = array('access CiviCRM');
-    $this->assertFalse(_civicrm_api3_api_check_permission('contact', 'create', $check, FALSE), 'lacking permissions should not be enough');
+    $this->assertFalse($this->runPermissionCheck('contact', 'create', $check), 'lacking permissions should not be enough');
     $config->userPermissionClass->permissions = array('add contacts');
-    $this->assertFalse(_civicrm_api3_api_check_permission('contact', 'create', $check, FALSE), 'lacking permissions should not be enough');
+    $this->assertFalse($this->runPermissionCheck('contact', 'create', $check), 'lacking permissions should not be enough');
 
     $config->userPermissionClass->permissions = array('access CiviCRM', 'add contacts');
-    $this->assertTrue(_civicrm_api3_api_check_permission('contact', 'create', $check, FALSE), 'exact permissions should be enough');
+    $this->assertTrue($this->runPermissionCheck('contact', 'create', $check), 'exact permissions should be enough');
 
     $config->userPermissionClass->permissions = array('access CiviCRM', 'add contacts', 'import contacts');
-    $this->assertTrue(_civicrm_api3_api_check_permission('contact', 'create', $check, FALSE), 'overfluous permissions should be enough');
+    $this->assertTrue($this->runPermissionCheck('contact', 'create', $check), 'overfluous permissions should be enough');
   }
 
   function testCheckPermissionThrow() {
@@ -86,7 +86,7 @@ class api_v3_UtilsTest extends CiviUnitTestCase {
     $config = CRM_Core_Config::singleton();
     try {
       $config->userPermissionClass->permissions = array('access CiviCRM');
-      _civicrm_api3_api_check_permission('contact', 'create', $check);
+      $this->runPermissionCheck('contact', 'create', $check, TRUE);
     }
     catch(Exception $e) {
       $message = $e->getMessage();
@@ -94,16 +94,41 @@ class api_v3_UtilsTest extends CiviUnitTestCase {
     $this->assertEquals($message, 'API permission check failed for contact/create call; insufficient permission: require access CiviCRM and add contacts', 'lacking permissions should throw an exception');
 
     $config->userPermissionClass->permissions = array('access CiviCRM', 'add contacts', 'import contacts');
-    $this->assertTrue(_civicrm_api3_api_check_permission('contact', 'create', $check), 'overfluous permissions should return true');
+    $this->assertTrue($this->runPermissionCheck('contact', 'create', $check), 'overfluous permissions should return true');
   }
 
   function testCheckPermissionSkip() {
     $config = CRM_Core_Config::singleton();
     $config->userPermissionClass->permissions = array('access CiviCRM');
     $params = array('check_permissions' => TRUE);
-    $this->assertFalse(_civicrm_api3_api_check_permission('contact', 'create', $params, FALSE), 'lacking permissions should not be enough');
+    $this->assertFalse($this->runPermissionCheck('contact', 'create', $params), 'lacking permissions should not be enough');
     $params = array('check_permissions' => FALSE);
-    $this->assertTrue(_civicrm_api3_api_check_permission('contact', 'create', $params, FALSE), 'permission check should be skippable');
+    $this->assertTrue($this->runPermissionCheck('contact', 'create', $params), 'permission check should be skippable');
+  }
+
+  /**
+   * @param string $entity
+   * @param string $action
+   * @param array $params
+   * @param bool $throws whether we should pass any exceptions for authorization failures
+   * @return bool TRUE or FALSE depending on the outcome of the authorization check
+   */
+  function runPermissionCheck($entity, $action, $params, $throws = FALSE) {
+    $dispatcher = new \Symfony\Component\EventDispatcher\EventDispatcher();
+    $dispatcher->addSubscriber(new \Civi\API\Subscriber\PermissionCheck());
+    $kernel = new \Civi\API\Kernel($dispatcher);
+    $apiRequest = \Civi\API\Request::create($entity, $action, $params, NULL);
+    try {
+      $kernel->authorize(NULL, $apiRequest);
+      return TRUE;
+    } catch (\API_Exception $e) {
+      $extra = $e->getExtraParams();
+      if (!$throws && $extra['error_code'] == API_Exception::UNAUTHORIZED) {
+        return FALSE;
+      } else {
+        throw $e;
+      }
+    }
   }
 
   /*

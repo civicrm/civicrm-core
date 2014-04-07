@@ -119,4 +119,14 @@ class CRM_Utils_ArrayTest extends CiviUnitTestCase {
       array('base data' => 1, 'dim1' => 'b', 'dim2' => 'beta', 'dim3' => 'two'),
     ), $actual);
   }
+
+  function testIsSubset() {
+    $this->assertTrue(CRM_Utils_Array::isSubset(array(), array()));
+    $this->assertTrue(CRM_Utils_Array::isSubset(array('a'), array('a')));
+    $this->assertTrue(CRM_Utils_Array::isSubset(array('a'), array('b','a','c')));
+    $this->assertTrue(CRM_Utils_Array::isSubset(array('b','d'), array('a','b','c','d')));
+    $this->assertFalse(CRM_Utils_Array::isSubset(array('a'), array()));
+    $this->assertFalse(CRM_Utils_Array::isSubset(array('a'), array('b')));
+    $this->assertFalse(CRM_Utils_Array::isSubset(array('a'), array('b','c','d')));
+  }
 }
