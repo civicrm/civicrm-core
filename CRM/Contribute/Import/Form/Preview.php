@@ -49,12 +49,13 @@ class CRM_Contribute_Import_Form_Preview extends CRM_Import_Form_Preview {
     $skipColumnHeader = $this->controller->exportValue('DataSource', 'skipColumnHeader');
 
     //get the data from the session
-    $dataValues       = $this->get('dataValues');
-    $mapper           = $this->get('mapper');
-    $softCreditFields = $this->get('softCreditFields');
-    $invalidRowCount  = $this->get('invalidRowCount');
-    $conflictRowCount = $this->get('conflictRowCount');
-    $mismatchCount    = $this->get('unMatchCount');
+    $dataValues           = $this->get('dataValues');
+    $mapper               = $this->get('mapper');
+    $softCreditFields     = $this->get('softCreditFields');
+    $mapperSoftCreditType = $this->get('mapperSoftCreditType');
+    $invalidRowCount      = $this->get('invalidRowCount');
+    $conflictRowCount     = $this->get('conflictRowCount');
+    $mismatchCount        = $this->get('unMatchCount');
 
     //get the mapping name displayed if the mappingId is set
     $mappingId = $this->get('loadMappingId');
@@ -91,6 +92,7 @@ class CRM_Contribute_Import_Form_Preview extends CRM_Import_Form_Preview {
 
     $properties = array(
       'mapper', 'softCreditFields',
+      'mapperSoftCreditType',
       'dataValues', 'columnCount',
       'totalRowCount', 'validRowCount',
       'invalidRowCount', 'conflictRowCount',
@@ -117,6 +119,7 @@ class CRM_Contribute_Import_Form_Preview extends CRM_Import_Form_Preview {
     $invalidRowCount  = $this->get('invalidRowCount');
     $conflictRowCount = $this->get('conflictRowCount');
     $onDuplicate      = $this->get('onDuplicate');
+    $mapperSoftCreditType = $this->get('mapperSoftCreditType');
 
     $config = CRM_Core_Config::singleton();
     $seperator = $config->fieldSeparator;
@@ -128,15 +131,16 @@ class CRM_Contribute_Import_Form_Preview extends CRM_Import_Form_Preview {
 
     foreach ($mapper as $key => $value) {
       $mapperKeys[$key] = $mapper[$key][0];
-      if (isset($mapper[$key][0]) && $mapper[$key][0] == 'soft_credit') {
-        $mapperSoftCredit[$key] = $mapper[$key][1];
+      if (isset($mapper[$key][0]) && $mapper[$key][0] == 'soft_credit' && isset($mapper[$key])) {
+        $mapperSoftCredit[$key] = isset($mapper[$key][1]) ? $mapper[$key][1] : '';
+        $mapperSoftCreditType[$key] = $mapperSoftCreditType[$key]['value'];
       }
       else {
-        $mapperSoftCredit[$key] = NULL;
+        $mapperSoftCredit[$key] = $mapperSoftCreditType[$key] =  NULL;
       }
     }
 
-    $parser = new CRM_Contribute_Import_Parser_Contribution($mapperKeys, $mapperSoftCredit, $mapperPhoneType);
+    $parser = new CRM_Contribute_Import_Parser_Contribution($mapperKeys, $mapperSoftCredit, $mapperPhoneType, $mapperSoftCreditType);
 
     $mapFields = $this->get('fields');
 
