@@ -192,6 +192,18 @@ function civicrm_api3_membership_get($params) {
   }
   $activeOnly = CRM_Utils_Array::value('active_only', $params, $activeOnly);
 
+  //@todo replace this by handling in API layer - we should have enough info to do this
+  // between pseudoconstant & fk - see comments in format_params
+  $membershipTypeId = CRM_Utils_Array::value('membership_type_id', $params);
+  if (!$membershipTypeId) {
+    $membershipType = CRM_Utils_Array::value('membership_type', $params);
+    if ($membershipType) {
+      $membershipTypeId = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType',
+          $membershipType, 'id', 'name'
+      );
+    }
+  }
+
   if (!empty($params['contact_id']) && !is_array($params['contact_id'])) {
     $membershipValues = _civicrm_api3_membership_get_customv2behaviour($params, $membershipTypeId, $activeOnly );
   }
