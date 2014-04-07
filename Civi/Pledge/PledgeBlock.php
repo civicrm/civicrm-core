@@ -69,7 +69,6 @@ class PledgeBlock extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="entity_table", type="string", length=64, nullable=true)
    * 
-   * 
    */
   private $entityTable;
   
@@ -78,7 +77,6 @@ class PledgeBlock extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="entity_id", type="integer", nullable=false, options={"unsigned":true})
-   * 
    * 
    */
   private $entityId;
@@ -89,7 +87,6 @@ class PledgeBlock extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="pledge_frequency_unit", type="string", length=128, nullable=true)
    * 
-   * 
    */
   private $pledgeFrequencyUnit;
   
@@ -98,7 +95,6 @@ class PledgeBlock extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_pledge_interval", type="boolean", nullable=true, options={"default": 0})
-   * 
    * 
    */
   private $isPledgeInterval = '0';
@@ -109,7 +105,6 @@ class PledgeBlock extends \Civi\Core\Entity {
    * @JMS\Type("integer")
    * @ORM\Column(name="max_reminders", type="integer", nullable=true, options={"unsigned":true, "default": 1})
    * 
-   * 
    */
   private $maxReminders = '1';
   
@@ -119,7 +114,6 @@ class PledgeBlock extends \Civi\Core\Entity {
    * @JMS\Type("integer")
    * @ORM\Column(name="initial_reminder_day", type="integer", nullable=true, options={"unsigned":true, "default": 5})
    * 
-   * 
    */
   private $initialReminderDay = '5';
   
@@ -128,7 +122,6 @@ class PledgeBlock extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="additional_reminder_day", type="integer", nullable=true, options={"unsigned":true, "default": 5})
-   * 
    * 
    */
   private $additionalReminderDay = '5';

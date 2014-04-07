@@ -69,7 +69,6 @@ class PledgePayment extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Pledge\Pledge")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="pledge_id", referencedColumnName="id", onDelete="CASCADE")})
-   * 
    */
   private $pledge;
   
@@ -79,7 +78,6 @@ class PledgePayment extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Contribute\Contribution")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="contribution_id", referencedColumnName="id", onDelete="CASCADE")})
-   * 
    */
   private $contribution;
   
@@ -88,7 +86,6 @@ class PledgePayment extends \Civi\Core\Entity {
    *
    * @JMS\Type("float")
    * @ORM\Column(name="scheduled_amount", type="float", nullable=false)
-   * 
    * 
    */
   private $scheduledAmount;
@@ -99,7 +96,6 @@ class PledgePayment extends \Civi\Core\Entity {
    * @JMS\Type("float")
    * @ORM\Column(name="actual_amount", type="float", nullable=true)
    * 
-   * 
    */
   private $actualAmount;
   
@@ -108,7 +104,6 @@ class PledgePayment extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="currency", type="string", length=3, nullable=true)
-   * 
    * 
    */
   private $currency = 'NULL';
@@ -119,7 +114,6 @@ class PledgePayment extends \Civi\Core\Entity {
    * @JMS\Type("datetime")
    * @ORM\Column(name="scheduled_date", type="datetime", nullable=false)
    * 
-   * 
    */
   private $scheduledDate;
   
@@ -128,7 +122,6 @@ class PledgePayment extends \Civi\Core\Entity {
    *
    * @JMS\Type("datetime")
    * @ORM\Column(name="reminder_date", type="datetime", nullable=true)
-   * 
    * 
    */
   private $reminderDate;
@@ -139,7 +132,6 @@ class PledgePayment extends \Civi\Core\Entity {
    * @JMS\Type("integer")
    * @ORM\Column(name="reminder_count", type="integer", nullable=true, options={"unsigned":true, "default": 0})
    * 
-   * 
    */
   private $reminderCount = '0';
   
@@ -148,7 +140,6 @@ class PledgePayment extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="status_id", type="integer", nullable=true, options={"unsigned":true})
-   * 
    * 
    */
   private $statusId;

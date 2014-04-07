@@ -69,7 +69,6 @@ class WordReplacement extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="find_word", type="string", length=255, nullable=true)
    * 
-   * 
    */
   private $findWord;
   
@@ -78,7 +77,6 @@ class WordReplacement extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="replace_word", type="string", length=255, nullable=true)
-   * 
    * 
    */
   private $replaceWord;
@@ -89,7 +87,6 @@ class WordReplacement extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_active", type="boolean", nullable=true, options={"default": 1})
    * 
-   * 
    */
   private $isActive = '1';
   
@@ -98,7 +95,6 @@ class WordReplacement extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="match_type", type="string", length=16, nullable=true, options={"default": "wildcardMatch"})
-   * 
    * 
    */
   private $matchType = '"wildcardMatch"';
@@ -109,7 +105,6 @@ class WordReplacement extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\Domain")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="domain_id", referencedColumnName="id")})
-   * 
    */
   private $domain;
 

@@ -69,7 +69,6 @@ class Cache extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Contact")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="contact_id", referencedColumnName="id", onDelete="CASCADE")})
-   * 
    */
   private $contact;
   
@@ -79,7 +78,6 @@ class Cache extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\ACL\ACL")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="acl_id", referencedColumnName="id", onDelete="CASCADE")})
-   * 
    */
   private $acl;
   
@@ -88,7 +86,6 @@ class Cache extends \Civi\Core\Entity {
    *
    * @JMS\Type("date")
    * @ORM\Column(name="modified_date", type="date", nullable=true)
-   * 
    * 
    */
   private $modifiedDate;

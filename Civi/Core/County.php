@@ -69,7 +69,6 @@ class County extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="name", type="string", length=64, nullable=true)
    * 
-   * 
    */
   private $name;
   
@@ -78,7 +77,6 @@ class County extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="abbreviation", type="string", length=4, nullable=true)
-   * 
    * 
    */
   private $abbreviation;
@@ -89,7 +87,6 @@ class County extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\StateProvince")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="state_province_id", referencedColumnName="id")})
-   * 
    */
   private $stateProvince;
 

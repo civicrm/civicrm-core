@@ -69,7 +69,6 @@ class ACLContactCache extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Contact")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="user_id", referencedColumnName="id", onDelete="CASCADE")})
-   * 
    */
   private $user;
   
@@ -79,7 +78,6 @@ class ACLContactCache extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Contact")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="contact_id", referencedColumnName="id", onDelete="CASCADE")})
-   * 
    */
   private $contact;
   
@@ -88,7 +86,6 @@ class ACLContactCache extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="operation", type="string", length=8, nullable=false)
-   * 
    * 
    */
   private $operation;

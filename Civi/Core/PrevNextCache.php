@@ -69,7 +69,6 @@ class PrevNextCache extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="entity_table", type="string", length=64, nullable=true)
    * 
-   * 
    */
   private $entityTable;
   
@@ -78,7 +77,6 @@ class PrevNextCache extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="entity_id1", type="integer", nullable=false, options={"unsigned":true})
-   * 
    * 
    */
   private $entityId1;
@@ -89,7 +87,6 @@ class PrevNextCache extends \Civi\Core\Entity {
    * @JMS\Type("integer")
    * @ORM\Column(name="entity_id2", type="integer", nullable=false, options={"unsigned":true})
    * 
-   * 
    */
   private $entityId2;
   
@@ -98,7 +95,6 @@ class PrevNextCache extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="cacheKey", type="string", length=255, nullable=true)
-   * 
    * 
    */
   private $cacheKey;
@@ -109,7 +105,6 @@ class PrevNextCache extends \Civi\Core\Entity {
    * @JMS\Type("text")
    * @ORM\Column(name="data", type="text", nullable=true)
    * 
-   * 
    */
   private $data;
   
@@ -118,7 +113,6 @@ class PrevNextCache extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_selected", type="boolean", nullable=true, options={"default": 0})
-   * 
    * 
    */
   private $isSelected = '0';

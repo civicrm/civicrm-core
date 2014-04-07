@@ -69,7 +69,6 @@ class Bounce extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Mailing\Event\Queue")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="event_queue_id", referencedColumnName="id", onDelete="CASCADE")})
-   * 
    */
   private $eventQueue;
   
@@ -78,7 +77,6 @@ class Bounce extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="bounce_type_id", type="integer", nullable=true, options={"unsigned":true})
-   * 
    * 
    */
   private $bounceTypeId;
@@ -89,7 +87,6 @@ class Bounce extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="bounce_reason", type="string", length=255, nullable=true)
    * 
-   * 
    */
   private $bounceReason;
   
@@ -98,7 +95,6 @@ class Bounce extends \Civi\Core\Entity {
    *
    * @JMS\Type("datetime")
    * @ORM\Column(name="time_stamp", type="datetime", nullable=false)
-   * 
    * 
    */
   private $timeStamp;

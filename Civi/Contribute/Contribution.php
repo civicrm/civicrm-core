@@ -69,7 +69,6 @@ class Contribution extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Contact")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="contact_id", referencedColumnName="id", onDelete="CASCADE")})
-   * 
    */
   private $contact;
   
@@ -79,7 +78,6 @@ class Contribution extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Financial\FinancialType")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="financial_type_id", referencedColumnName="id")})
-   * 
    */
   private $financialType;
   
@@ -89,7 +87,6 @@ class Contribution extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Contribute\ContributionPage")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="contribution_page_id", referencedColumnName="id", onDelete="SET NULL")})
-   * 
    */
   private $contributionPage;
   
@@ -98,7 +95,6 @@ class Contribution extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="payment_instrument_id", type="integer", nullable=true, options={"unsigned":true})
-   * 
    * 
    */
   private $paymentInstrumentId;
@@ -109,7 +105,6 @@ class Contribution extends \Civi\Core\Entity {
    * @JMS\Type("datetime")
    * @ORM\Column(name="receive_date", type="datetime", nullable=true)
    * 
-   * 
    */
   private $receiveDate;
   
@@ -118,7 +113,6 @@ class Contribution extends \Civi\Core\Entity {
    *
    * @JMS\Type("float")
    * @ORM\Column(name="non_deductible_amount", type="float", nullable=true, options={"default": 0})
-   * 
    * 
    */
   private $nonDeductibleAmount = '0';
@@ -129,7 +123,6 @@ class Contribution extends \Civi\Core\Entity {
    * @JMS\Type("float")
    * @ORM\Column(name="total_amount", type="float", nullable=false)
    * 
-   * 
    */
   private $totalAmount;
   
@@ -138,7 +131,6 @@ class Contribution extends \Civi\Core\Entity {
    *
    * @JMS\Type("float")
    * @ORM\Column(name="fee_amount", type="float", nullable=true)
-   * 
    * 
    */
   private $feeAmount;
@@ -149,7 +141,6 @@ class Contribution extends \Civi\Core\Entity {
    * @JMS\Type("float")
    * @ORM\Column(name="net_amount", type="float", nullable=true)
    * 
-   * 
    */
   private $netAmount;
   
@@ -158,7 +149,6 @@ class Contribution extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="trxn_id", type="string", length=255, nullable=true)
-   * 
    * 
    */
   private $trxnId;
@@ -169,7 +159,6 @@ class Contribution extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="invoice_id", type="string", length=255, nullable=true)
    * 
-   * 
    */
   private $invoiceId;
   
@@ -178,7 +167,6 @@ class Contribution extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="currency", type="string", length=3, nullable=true)
-   * 
    * 
    */
   private $currency = 'NULL';
@@ -189,7 +177,6 @@ class Contribution extends \Civi\Core\Entity {
    * @JMS\Type("datetime")
    * @ORM\Column(name="cancel_date", type="datetime", nullable=true)
    * 
-   * 
    */
   private $cancelDate;
   
@@ -198,7 +185,6 @@ class Contribution extends \Civi\Core\Entity {
    *
    * @JMS\Type("text")
    * @ORM\Column(name="cancel_reason", type="text", length=65535, nullable=true)
-   * 
    * 
    */
   private $cancelReason;
@@ -209,7 +195,6 @@ class Contribution extends \Civi\Core\Entity {
    * @JMS\Type("datetime")
    * @ORM\Column(name="receipt_date", type="datetime", nullable=true)
    * 
-   * 
    */
   private $receiptDate;
   
@@ -218,7 +203,6 @@ class Contribution extends \Civi\Core\Entity {
    *
    * @JMS\Type("datetime")
    * @ORM\Column(name="thankyou_date", type="datetime", nullable=true)
-   * 
    * 
    */
   private $thankyouDate;
@@ -229,7 +213,6 @@ class Contribution extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="source", type="string", length=255, nullable=true)
    * 
-   * 
    */
   private $source;
   
@@ -238,7 +221,6 @@ class Contribution extends \Civi\Core\Entity {
    *
    * @JMS\Type("text")
    * @ORM\Column(name="amount_level", type="text", length=65535, nullable=true)
-   * 
    * 
    */
   private $amountLevel;
@@ -249,7 +231,6 @@ class Contribution extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Contribute\ContributionRecur")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="contribution_recur_id", referencedColumnName="id", onDelete="SET NULL")})
-   * 
    */
   private $contributionRecur;
   
@@ -258,7 +239,6 @@ class Contribution extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_test", type="boolean", nullable=true, options={"default": 0})
-   * 
    * 
    */
   private $isTest = '0';
@@ -269,7 +249,6 @@ class Contribution extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_pay_later", type="boolean", nullable=true, options={"default": 0})
    * 
-   * 
    */
   private $isPayLater = '0';
   
@@ -278,7 +257,6 @@ class Contribution extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="contribution_status_id", type="integer", nullable=true, options={"unsigned":true, "default": 1})
-   * 
    * 
    */
   private $contributionStatusId = '1';
@@ -289,7 +267,6 @@ class Contribution extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\Address")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="address_id", referencedColumnName="id", onDelete="SET NULL")})
-   * 
    */
   private $address;
   
@@ -298,7 +275,6 @@ class Contribution extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="check_number", type="string", length=255, nullable=true)
-   * 
    * 
    */
   private $checkNumber;
@@ -309,7 +285,6 @@ class Contribution extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Campaign\Campaign")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="campaign_id", referencedColumnName="id", onDelete="SET NULL")})
-   * 
    */
   private $campaign;
 

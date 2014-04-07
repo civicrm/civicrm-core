@@ -15,17 +15,17 @@
 
   <civicrm_entity_batch />
 
-  <civicrm_case />
-
-  <civicrm_case_activity />
-
-  <civicrm_case_contact />
-
   <civicrm_campaign />
 
   <civicrm_campaign_group />
 
   <civicrm_survey />
+
+  <civicrm_case_activity />
+
+  <civicrm_case_contact />
+
+  <civicrm_case />
 
   <civicrm_acl_contact_cache />
 
@@ -115,9 +115,9 @@
 
   <civicrm_job_log />
 
-  <civicrm_loc_block />
-
   <civicrm_location_type />
+
+  <civicrm_loc_block />
 
   <civicrm_log />
 

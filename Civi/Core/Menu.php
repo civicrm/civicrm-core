@@ -69,7 +69,6 @@ class Menu extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\Domain")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="domain_id", referencedColumnName="id")})
-   * 
    */
   private $domain;
   
@@ -78,7 +77,6 @@ class Menu extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="path", type="string", length=255, nullable=true)
-   * 
    * 
    */
   private $path;
@@ -89,7 +87,6 @@ class Menu extends \Civi\Core\Entity {
    * @JMS\Type("text")
    * @ORM\Column(name="path_arguments", type="text", length=65535, nullable=true)
    * 
-   * 
    */
   private $pathArguments;
   
@@ -98,7 +95,6 @@ class Menu extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="title", type="string", length=255, nullable=true)
-   * 
    * 
    */
   private $title;
@@ -109,7 +105,6 @@ class Menu extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="access_callback", type="string", length=255, nullable=true)
    * 
-   * 
    */
   private $accessCallback;
   
@@ -118,7 +113,6 @@ class Menu extends \Civi\Core\Entity {
    *
    * @JMS\Type("text")
    * @ORM\Column(name="access_arguments", type="text", length=65535, nullable=true)
-   * 
    * 
    */
   private $accessArguments;
@@ -129,7 +123,6 @@ class Menu extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="page_callback", type="string", length=255, nullable=true)
    * 
-   * 
    */
   private $pageCallback;
   
@@ -138,7 +131,6 @@ class Menu extends \Civi\Core\Entity {
    *
    * @JMS\Type("text")
    * @ORM\Column(name="page_arguments", type="text", length=65535, nullable=true)
-   * 
    * 
    */
   private $pageArguments;
@@ -149,7 +141,6 @@ class Menu extends \Civi\Core\Entity {
    * @JMS\Type("text")
    * @ORM\Column(name="breadcrumb", type="text", length=65535, nullable=true)
    * 
-   * 
    */
   private $breadcrumb;
   
@@ -158,7 +149,6 @@ class Menu extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="return_url", type="string", length=255, nullable=true)
-   * 
    * 
    */
   private $returnUrl;
@@ -169,7 +159,6 @@ class Menu extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="return_url_args", type="string", length=255, nullable=true)
    * 
-   * 
    */
   private $returnUrlArgs;
   
@@ -179,7 +168,6 @@ class Menu extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\Component")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="component_id", referencedColumnName="id")})
-   * 
    */
   private $component;
   
@@ -188,7 +176,6 @@ class Menu extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_active", type="boolean", nullable=true)
-   * 
    * 
    */
   private $isActive;
@@ -199,7 +186,6 @@ class Menu extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_public", type="boolean", nullable=true)
    * 
-   * 
    */
   private $isPublic;
   
@@ -208,7 +194,6 @@ class Menu extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_exposed", type="boolean", nullable=true)
-   * 
    * 
    */
   private $isExposed;
@@ -219,7 +204,6 @@ class Menu extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_ssl", type="boolean", nullable=true)
    * 
-   * 
    */
   private $isSsl;
   
@@ -228,7 +212,6 @@ class Menu extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="weight", type="integer", nullable=false, options={"unsigned":true, "default": 1})
-   * 
    * 
    */
   private $weight = '1';
@@ -239,7 +222,6 @@ class Menu extends \Civi\Core\Entity {
    * @JMS\Type("integer")
    * @ORM\Column(name="type", type="integer", nullable=false, options={"unsigned":true, "default": 1})
    * 
-   * 
    */
   private $type = '1';
   
@@ -249,7 +231,6 @@ class Menu extends \Civi\Core\Entity {
    * @JMS\Type("integer")
    * @ORM\Column(name="page_type", type="integer", nullable=false, options={"unsigned":true, "default": 1})
    * 
-   * 
    */
   private $pageType = '1';
   
@@ -258,7 +239,6 @@ class Menu extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="skipBreadcrumb", type="boolean", nullable=true)
-   * 
    * 
    */
   private $skipBreadcrumb;

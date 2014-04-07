@@ -69,7 +69,6 @@ class Survey extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="title", type="string", length=255, nullable=false)
    * 
-   * 
    */
   private $title;
   
@@ -79,7 +78,6 @@ class Survey extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Campaign\Campaign")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="campaign_id", referencedColumnName="id", onDelete="SET NULL")})
-   * 
    */
   private $campaign = 'NULL';
   
@@ -88,7 +86,6 @@ class Survey extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="activity_type_id", type="integer", nullable=true, options={"unsigned":true})
-   * 
    * 
    */
   private $activityTypeId = 'NULL';
@@ -99,7 +96,6 @@ class Survey extends \Civi\Core\Entity {
    * @JMS\Type("text")
    * @ORM\Column(name="recontact_interval", type="text", length=65535, nullable=true)
    * 
-   * 
    */
   private $recontactInterval;
   
@@ -108,7 +104,6 @@ class Survey extends \Civi\Core\Entity {
    *
    * @JMS\Type("text")
    * @ORM\Column(name="instructions", type="text", length=65535, nullable=true)
-   * 
    * 
    */
   private $instructions;
@@ -119,7 +114,6 @@ class Survey extends \Civi\Core\Entity {
    * @JMS\Type("integer")
    * @ORM\Column(name="release_frequency", type="integer", nullable=true, options={"unsigned":true})
    * 
-   * 
    */
   private $releaseFrequency = 'NULL';
   
@@ -128,7 +122,6 @@ class Survey extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="max_number_of_contacts", type="integer", nullable=true, options={"unsigned":true})
-   * 
    * 
    */
   private $maxNumberOfContacts = 'NULL';
@@ -139,7 +132,6 @@ class Survey extends \Civi\Core\Entity {
    * @JMS\Type("integer")
    * @ORM\Column(name="default_number_of_contacts", type="integer", nullable=true, options={"unsigned":true})
    * 
-   * 
    */
   private $defaultNumberOfContacts = 'NULL';
   
@@ -148,7 +140,6 @@ class Survey extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_active", type="boolean", nullable=true, options={"default": 1})
-   * 
    * 
    */
   private $isActive = '1';
@@ -159,7 +150,6 @@ class Survey extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_default", type="boolean", nullable=true, options={"default": 0})
    * 
-   * 
    */
   private $isDefault = '0';
   
@@ -169,7 +159,6 @@ class Survey extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Contact")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="created_id", referencedColumnName="id", onDelete="SET NULL")})
-   * 
    */
   private $created;
   
@@ -178,7 +167,6 @@ class Survey extends \Civi\Core\Entity {
    *
    * @JMS\Type("datetime")
    * @ORM\Column(name="created_date", type="datetime", nullable=true)
-   * 
    * 
    */
   private $createdDate;
@@ -189,7 +177,6 @@ class Survey extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Contact")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="last_modified_id", referencedColumnName="id", onDelete="SET NULL")})
-   * 
    */
   private $lastModified;
   
@@ -198,7 +185,6 @@ class Survey extends \Civi\Core\Entity {
    *
    * @JMS\Type("datetime")
    * @ORM\Column(name="last_modified_date", type="datetime", nullable=true)
-   * 
    * 
    */
   private $lastModifiedDate;
@@ -209,7 +195,6 @@ class Survey extends \Civi\Core\Entity {
    * @JMS\Type("integer")
    * @ORM\Column(name="result_id", type="integer", nullable=true, options={"unsigned":true})
    * 
-   * 
    */
   private $resultId = 'NULL';
   
@@ -218,7 +203,6 @@ class Survey extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="bypass_confirm", type="boolean", nullable=true, options={"default": 0})
-   * 
    * 
    */
   private $bypassConfirm = '0';
@@ -229,7 +213,6 @@ class Survey extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="thankyou_title", type="string", length=255, nullable=true)
    * 
-   * 
    */
   private $thankyouTitle;
   
@@ -239,7 +222,6 @@ class Survey extends \Civi\Core\Entity {
    * @JMS\Type("text")
    * @ORM\Column(name="thankyou_text", type="text", length=65535, nullable=true)
    * 
-   * 
    */
   private $thankyouText;
   
@@ -248,7 +230,6 @@ class Survey extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_share", type="boolean", nullable=true, options={"default": 1})
-   * 
    * 
    */
   private $isShare = '1';

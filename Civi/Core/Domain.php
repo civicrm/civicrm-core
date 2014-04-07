@@ -69,7 +69,6 @@ class Domain extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="name", type="string", length=64, nullable=true)
    * 
-   * 
    */
   private $name;
   
@@ -78,7 +77,6 @@ class Domain extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="description", type="string", length=255, nullable=true)
-   * 
    * 
    */
   private $description;
@@ -89,7 +87,6 @@ class Domain extends \Civi\Core\Entity {
    * @JMS\Type("text")
    * @ORM\Column(name="config_backend", type="text", length=65535, nullable=true)
    * 
-   * 
    */
   private $configBackend;
   
@@ -98,7 +95,6 @@ class Domain extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="version", type="string", length=32, nullable=true)
-   * 
    * 
    */
   private $version;
@@ -109,7 +105,6 @@ class Domain extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Contact")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="contact_id", referencedColumnName="id")})
-   * 
    */
   private $contact;
   
@@ -119,7 +114,6 @@ class Domain extends \Civi\Core\Entity {
    * @JMS\Type("text")
    * @ORM\Column(name="locales", type="text", length=65535, nullable=true)
    * 
-   * 
    */
   private $locales;
   
@@ -128,7 +122,6 @@ class Domain extends \Civi\Core\Entity {
    *
    * @JMS\Type("text")
    * @ORM\Column(name="locale_custom_strings", type="text", length=65535, nullable=true)
-   * 
    * 
    */
   private $localeCustomStrings;

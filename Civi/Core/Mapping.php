@@ -69,7 +69,6 @@ class Mapping extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="name", type="string", length=64, nullable=true)
    * 
-   * 
    */
   private $name;
   
@@ -79,7 +78,6 @@ class Mapping extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="description", type="string", length=255, nullable=true)
    * 
-   * 
    */
   private $description;
   
@@ -88,7 +86,6 @@ class Mapping extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="mapping_type_id", type="integer", nullable=true, options={"unsigned":true})
-   * 
    * 
    */
   private $mappingTypeId;

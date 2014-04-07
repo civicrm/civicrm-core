@@ -69,7 +69,6 @@ class Managed extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="module", type="string", length=127, nullable=false)
    * 
-   * 
    */
   private $module;
   
@@ -78,7 +77,6 @@ class Managed extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="name", type="string", length=127, nullable=true)
-   * 
    * 
    */
   private $name;
@@ -89,7 +87,6 @@ class Managed extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="entity_type", type="string", length=64, nullable=false)
    * 
-   * 
    */
   private $entityType;
   
@@ -98,7 +95,6 @@ class Managed extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="entity_id", type="integer", nullable=false, options={"unsigned":true})
-   * 
    * 
    */
   private $entityId;

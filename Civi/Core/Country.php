@@ -69,7 +69,6 @@ class Country extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="name", type="string", length=64, nullable=true)
    * 
-   * 
    */
   private $name;
   
@@ -78,7 +77,6 @@ class Country extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="iso_code", type="string", length=2, nullable=true)
-   * 
    * 
    */
   private $isoCode;
@@ -89,7 +87,6 @@ class Country extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="country_code", type="string", length=4, nullable=true)
    * 
-   * 
    */
   private $countryCode;
   
@@ -99,7 +96,6 @@ class Country extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\AddressFormat")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="address_format_id", referencedColumnName="id")})
-   * 
    */
   private $addressFormat;
   
@@ -108,7 +104,6 @@ class Country extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="idd_prefix", type="string", length=4, nullable=true)
-   * 
    * 
    */
   private $iddPrefix;
@@ -119,7 +114,6 @@ class Country extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="ndd_prefix", type="string", length=4, nullable=true)
    * 
-   * 
    */
   private $nddPrefix;
   
@@ -129,7 +123,6 @@ class Country extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\Worldregion")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="region_id", referencedColumnName="id")})
-   * 
    */
   private $region;
   
@@ -138,7 +131,6 @@ class Country extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_province_abbreviated", type="boolean", nullable=true, options={"default": 0})
-   * 
    * 
    */
   private $isProvinceAbbreviated = '0';

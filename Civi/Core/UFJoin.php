@@ -69,7 +69,6 @@ class UFJoin extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_active", type="boolean", nullable=true, options={"default": 1})
    * 
-   * 
    */
   private $isActive = '1';
   
@@ -78,7 +77,6 @@ class UFJoin extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="module", type="string", length=64, nullable=false)
-   * 
    * 
    */
   private $module;
@@ -89,7 +87,6 @@ class UFJoin extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="entity_table", type="string", length=64, nullable=true)
    * 
-   * 
    */
   private $entityTable;
   
@@ -98,7 +95,6 @@ class UFJoin extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="entity_id", type="integer", nullable=true, options={"unsigned":true})
-   * 
    * 
    */
   private $entityId;
@@ -109,7 +105,6 @@ class UFJoin extends \Civi\Core\Entity {
    * @JMS\Type("integer")
    * @ORM\Column(name="weight", type="integer", nullable=false, options={"unsigned":true, "default": 1})
    * 
-   * 
    */
   private $weight = '1';
   
@@ -119,7 +114,6 @@ class UFJoin extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\UFGroup")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="uf_group_id", referencedColumnName="id")})
-   * 
    */
   private $ufGroup;
   
@@ -128,7 +122,6 @@ class UFJoin extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="module_data", type="string", length=255, nullable=true)
-   * 
    * 
    */
   private $moduleData;

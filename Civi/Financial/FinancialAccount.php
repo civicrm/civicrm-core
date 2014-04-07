@@ -69,7 +69,6 @@ class FinancialAccount extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="name", type="string", length=255, nullable=false)
    * 
-   * 
    */
   private $name;
   
@@ -79,7 +78,6 @@ class FinancialAccount extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Contact")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="contact_id", referencedColumnName="id", onDelete="SET NULL")})
-   * 
    */
   private $contact;
   
@@ -88,7 +86,6 @@ class FinancialAccount extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="financial_account_type_id", type="integer", nullable=false, options={"unsigned":true, "default": 3})
-   * 
    * 
    */
   private $financialAccountTypeId = '3';
@@ -99,7 +96,6 @@ class FinancialAccount extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="accounting_code", type="string", length=64, nullable=true)
    * 
-   * 
    */
   private $accountingCode;
   
@@ -108,7 +104,6 @@ class FinancialAccount extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="account_type_code", type="string", length=64, nullable=true)
-   * 
    * 
    */
   private $accountTypeCode;
@@ -119,7 +114,6 @@ class FinancialAccount extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="description", type="string", length=255, nullable=true)
    * 
-   * 
    */
   private $description;
   
@@ -129,7 +123,6 @@ class FinancialAccount extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Financial\FinancialAccount")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="parent_id", referencedColumnName="id")})
-   * 
    */
   private $parent;
   
@@ -138,7 +131,6 @@ class FinancialAccount extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_header_account", type="boolean", nullable=true, options={"default": 0})
-   * 
    * 
    */
   private $isHeaderAccount = '0';
@@ -149,7 +141,6 @@ class FinancialAccount extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_deductible", type="boolean", nullable=true, options={"default": 1})
    * 
-   * 
    */
   private $isDeductible = '1';
   
@@ -158,7 +149,6 @@ class FinancialAccount extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_tax", type="boolean", nullable=true, options={"default": 0})
-   * 
    * 
    */
   private $isTax = '0';
@@ -169,7 +159,6 @@ class FinancialAccount extends \Civi\Core\Entity {
    * @JMS\Type("float")
    * @ORM\Column(name="tax_rate", type="float", nullable=true)
    * 
-   * 
    */
   private $taxRate;
   
@@ -178,7 +167,6 @@ class FinancialAccount extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_reserved", type="boolean", nullable=true)
-   * 
    * 
    */
   private $isReserved;
@@ -189,7 +177,6 @@ class FinancialAccount extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_active", type="boolean", nullable=true)
    * 
-   * 
    */
   private $isActive;
   
@@ -198,7 +185,6 @@ class FinancialAccount extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_default", type="boolean", nullable=true)
-   * 
    * 
    */
   private $isDefault;

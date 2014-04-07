@@ -71,7 +71,6 @@ class {$table.className} extends \Civi\Core\Entity {ldelim}
    * {$field.jmsType}
    * {$field.columnInfo}
    * {$field.columnJoin}
-   * {$field.version}
    */
   private ${$field.propertyName}{if isset($field.default)} = '{$field.default}'{/if};
 {/foreach}

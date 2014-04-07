@@ -69,7 +69,6 @@ class Friend extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="entity_table", type="string", length=64, nullable=false)
    * 
-   * 
    */
   private $entityTable;
   
@@ -78,7 +77,6 @@ class Friend extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="entity_id", type="integer", nullable=false, options={"unsigned":true})
-   * 
    * 
    */
   private $entityId;
@@ -89,7 +87,6 @@ class Friend extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="title", type="string", length=255, nullable=true)
    * 
-   * 
    */
   private $title;
   
@@ -98,7 +95,6 @@ class Friend extends \Civi\Core\Entity {
    *
    * @JMS\Type("text")
    * @ORM\Column(name="intro", type="text", length=65535, nullable=true)
-   * 
    * 
    */
   private $intro;
@@ -109,7 +105,6 @@ class Friend extends \Civi\Core\Entity {
    * @JMS\Type("text")
    * @ORM\Column(name="suggested_message", type="text", length=65535, nullable=true)
    * 
-   * 
    */
   private $suggestedMessage;
   
@@ -118,7 +113,6 @@ class Friend extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="general_link", type="string", length=255, nullable=true)
-   * 
    * 
    */
   private $generalLink;
@@ -129,7 +123,6 @@ class Friend extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="thankyou_title", type="string", length=255, nullable=true)
    * 
-   * 
    */
   private $thankyouTitle;
   
@@ -139,7 +132,6 @@ class Friend extends \Civi\Core\Entity {
    * @JMS\Type("text")
    * @ORM\Column(name="thankyou_text", type="text", length=65535, nullable=true)
    * 
-   * 
    */
   private $thankyouText;
   
@@ -148,7 +140,6 @@ class Friend extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_active", type="boolean", nullable=true)
-   * 
    * 
    */
   private $isActive;

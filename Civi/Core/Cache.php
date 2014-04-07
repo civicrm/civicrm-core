@@ -69,7 +69,6 @@ class Cache extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="group_name", type="string", length=32, nullable=false)
    * 
-   * 
    */
   private $groupName;
   
@@ -78,7 +77,6 @@ class Cache extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="path", type="string", length=255, nullable=true)
-   * 
    * 
    */
   private $path;
@@ -89,7 +87,6 @@ class Cache extends \Civi\Core\Entity {
    * @JMS\Type("text")
    * @ORM\Column(name="data", type="text", nullable=true)
    * 
-   * 
    */
   private $data;
   
@@ -99,7 +96,6 @@ class Cache extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\Component")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="component_id", referencedColumnName="id")})
-   * 
    */
   private $component;
   
@@ -109,7 +105,6 @@ class Cache extends \Civi\Core\Entity {
    * @JMS\Type("datetime")
    * @ORM\Column(name="created_date", type="datetime", nullable=true)
    * 
-   * 
    */
   private $createdDate;
   
@@ -118,7 +113,6 @@ class Cache extends \Civi\Core\Entity {
    *
    * @JMS\Type("datetime")
    * @ORM\Column(name="expired_date", type="datetime", nullable=true)
-   * 
    * 
    */
   private $expiredDate;

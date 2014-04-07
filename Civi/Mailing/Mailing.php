@@ -69,7 +69,6 @@ class Mailing extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\Domain")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="domain_id", referencedColumnName="id", onDelete="SET NULL")})
-   * 
    */
   private $domain;
   
@@ -79,7 +78,6 @@ class Mailing extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Mailing\Component")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="header_id", referencedColumnName="id", onDelete="SET NULL")})
-   * 
    */
   private $header;
   
@@ -89,7 +87,6 @@ class Mailing extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Mailing\Component")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="footer_id", referencedColumnName="id", onDelete="SET NULL")})
-   * 
    */
   private $footer;
   
@@ -99,7 +96,6 @@ class Mailing extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Mailing\Component")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="reply_id", referencedColumnName="id", onDelete="SET NULL")})
-   * 
    */
   private $reply;
   
@@ -109,7 +105,6 @@ class Mailing extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Mailing\Component")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="unsubscribe_id", referencedColumnName="id", onDelete="SET NULL")})
-   * 
    */
   private $unsubscribe;
   
@@ -118,7 +113,6 @@ class Mailing extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="resubscribe_id", type="integer", nullable=true, options={"unsigned":true})
-   * 
    * 
    */
   private $resubscribeId;
@@ -129,7 +123,6 @@ class Mailing extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Mailing\Component")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="optout_id", referencedColumnName="id", onDelete="SET NULL")})
-   * 
    */
   private $optout;
   
@@ -138,7 +131,6 @@ class Mailing extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="name", type="string", length=128, nullable=true)
-   * 
    * 
    */
   private $name;
@@ -149,7 +141,6 @@ class Mailing extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="from_name", type="string", length=128, nullable=true)
    * 
-   * 
    */
   private $fromName;
   
@@ -158,7 +149,6 @@ class Mailing extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="from_email", type="string", length=128, nullable=true)
-   * 
    * 
    */
   private $fromEmail;
@@ -169,7 +159,6 @@ class Mailing extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="replyto_email", type="string", length=128, nullable=true)
    * 
-   * 
    */
   private $replytoEmail;
   
@@ -178,7 +167,6 @@ class Mailing extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="subject", type="string", length=128, nullable=true)
-   * 
    * 
    */
   private $subject;
@@ -189,7 +177,6 @@ class Mailing extends \Civi\Core\Entity {
    * @JMS\Type("text")
    * @ORM\Column(name="body_text", type="text", nullable=true)
    * 
-   * 
    */
   private $bodyText;
   
@@ -198,7 +185,6 @@ class Mailing extends \Civi\Core\Entity {
    *
    * @JMS\Type("text")
    * @ORM\Column(name="body_html", type="text", nullable=true)
-   * 
    * 
    */
   private $bodyHtml;
@@ -209,7 +195,6 @@ class Mailing extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="url_tracking", type="boolean", nullable=true)
    * 
-   * 
    */
   private $urlTracking;
   
@@ -218,7 +203,6 @@ class Mailing extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="forward_replies", type="boolean", nullable=true)
-   * 
    * 
    */
   private $forwardReplies;
@@ -229,7 +213,6 @@ class Mailing extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="auto_responder", type="boolean", nullable=true)
    * 
-   * 
    */
   private $autoResponder;
   
@@ -238,7 +221,6 @@ class Mailing extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="open_tracking", type="boolean", nullable=true)
-   * 
    * 
    */
   private $openTracking;
@@ -249,7 +231,6 @@ class Mailing extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_completed", type="boolean", nullable=true)
    * 
-   * 
    */
   private $isCompleted;
   
@@ -259,7 +240,6 @@ class Mailing extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\MessageTemplate")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="msg_template_id", referencedColumnName="id", onDelete="SET NULL")})
-   * 
    */
   private $msgTemplate;
   
@@ -268,7 +248,6 @@ class Mailing extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="override_verp", type="boolean", nullable=true, options={"default": 0})
-   * 
    * 
    */
   private $overrideVerp = '0';
@@ -279,7 +258,6 @@ class Mailing extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Contact")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="created_id", referencedColumnName="id", onDelete="SET NULL")})
-   * 
    */
   private $created;
   
@@ -288,7 +266,6 @@ class Mailing extends \Civi\Core\Entity {
    *
    * @JMS\Type("datetime")
    * @ORM\Column(name="created_date", type="datetime", nullable=true)
-   * 
    * 
    */
   private $createdDate;
@@ -299,7 +276,6 @@ class Mailing extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Contact")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="scheduled_id", referencedColumnName="id", onDelete="SET NULL")})
-   * 
    */
   private $scheduled;
   
@@ -308,7 +284,6 @@ class Mailing extends \Civi\Core\Entity {
    *
    * @JMS\Type("datetime")
    * @ORM\Column(name="scheduled_date", type="datetime", nullable=true)
-   * 
    * 
    */
   private $scheduledDate;
@@ -319,7 +294,6 @@ class Mailing extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Contact")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="approver_id", referencedColumnName="id", onDelete="SET NULL")})
-   * 
    */
   private $approver;
   
@@ -328,7 +302,6 @@ class Mailing extends \Civi\Core\Entity {
    *
    * @JMS\Type("datetime")
    * @ORM\Column(name="approval_date", type="datetime", nullable=true)
-   * 
    * 
    */
   private $approvalDate;
@@ -339,7 +312,6 @@ class Mailing extends \Civi\Core\Entity {
    * @JMS\Type("integer")
    * @ORM\Column(name="approval_status_id", type="integer", nullable=true, options={"unsigned":true})
    * 
-   * 
    */
   private $approvalStatusId;
   
@@ -348,7 +320,6 @@ class Mailing extends \Civi\Core\Entity {
    *
    * @JMS\Type("text")
    * @ORM\Column(name="approval_note", type="text", nullable=true)
-   * 
    * 
    */
   private $approvalNote;
@@ -359,7 +330,6 @@ class Mailing extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_archived", type="boolean", nullable=true, options={"default": 0})
    * 
-   * 
    */
   private $isArchived = '0';
   
@@ -368,7 +338,6 @@ class Mailing extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="visibility", type="string", length=40, nullable=true, options={"default": "User and User Admin Only"})
-   * 
    * 
    */
   private $visibility = 'User and User Admin Only';
@@ -379,7 +348,6 @@ class Mailing extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Campaign\Campaign")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="campaign_id", referencedColumnName="id", onDelete="SET NULL")})
-   * 
    */
   private $campaign;
   
@@ -388,7 +356,6 @@ class Mailing extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="dedupe_email", type="boolean", nullable=true, options={"default": 0})
-   * 
    * 
    */
   private $dedupeEmail = '0';
@@ -399,7 +366,6 @@ class Mailing extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\SMS\Provider")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="sms_provider_id", referencedColumnName="id", onDelete="SET NULL")})
-   * 
    */
   private $smsProvider;
 

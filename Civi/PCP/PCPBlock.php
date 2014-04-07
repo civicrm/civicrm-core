@@ -69,7 +69,6 @@ class PCPBlock extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="entity_table", type="string", length=64, nullable=true)
    * 
-   * 
    */
   private $entityTable;
   
@@ -78,7 +77,6 @@ class PCPBlock extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="entity_id", type="integer", nullable=false, options={"unsigned":true})
-   * 
    * 
    */
   private $entityId;
@@ -89,7 +87,6 @@ class PCPBlock extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="target_entity_type", type="string", length=255, nullable=false, options={"default": "contribute"})
    * 
-   * 
    */
   private $targetEntityType = 'contribute';
   
@@ -98,7 +95,6 @@ class PCPBlock extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="target_entity_id", type="integer", nullable=false, options={"unsigned":true})
-   * 
    * 
    */
   private $targetEntityId;
@@ -109,7 +105,6 @@ class PCPBlock extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\UFGroup")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="supporter_profile_id", referencedColumnName="id", onDelete="SET NULL")})
-   * 
    */
   private $supporterProfile = 'NULL';
   
@@ -118,7 +113,6 @@ class PCPBlock extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_approval_needed", type="boolean", nullable=true)
-   * 
    * 
    */
   private $isApprovalNeeded = 'NULL';
@@ -129,7 +123,6 @@ class PCPBlock extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_tellfriend_enabled", type="boolean", nullable=true)
    * 
-   * 
    */
   private $isTellfriendEnabled = 'NULL';
   
@@ -138,7 +131,6 @@ class PCPBlock extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="tellfriend_limit", type="integer", nullable=true, options={"unsigned":true})
-   * 
    * 
    */
   private $tellfriendLimit = 'NULL';
@@ -149,7 +141,6 @@ class PCPBlock extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="link_text", type="string", length=255, nullable=true)
    * 
-   * 
    */
   private $linkText = 'NULL';
   
@@ -159,7 +150,6 @@ class PCPBlock extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_active", type="boolean", nullable=true, options={"default": 1})
    * 
-   * 
    */
   private $isActive = '1';
   
@@ -168,7 +158,6 @@ class PCPBlock extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="notify_email", type="string", length=255, nullable=true)
-   * 
    * 
    */
   private $notifyEmail = 'NULL';

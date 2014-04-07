@@ -69,7 +69,6 @@ class CustomGroup extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="name", type="string", length=64, nullable=true)
    * 
-   * 
    */
   private $name;
   
@@ -78,7 +77,6 @@ class CustomGroup extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="title", type="string", length=64, nullable=false)
-   * 
    * 
    */
   private $title;
@@ -89,7 +87,6 @@ class CustomGroup extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="extends", type="string", length=255, nullable=true, options={"default": "Contact"})
    * 
-   * 
    */
   private $extends = 'Contact';
   
@@ -98,7 +95,6 @@ class CustomGroup extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="extends_entity_column_id", type="integer", nullable=true, options={"unsigned":true})
-   * 
    * 
    */
   private $extendsEntityColumnId = 'NULL';
@@ -109,7 +105,6 @@ class CustomGroup extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="extends_entity_column_value", type="string", length=255, nullable=true)
    * 
-   * 
    */
   private $extendsEntityColumnValue;
   
@@ -118,7 +113,6 @@ class CustomGroup extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="style", type="string", length=15, nullable=true)
-   * 
    * 
    */
   private $style;
@@ -129,7 +123,6 @@ class CustomGroup extends \Civi\Core\Entity {
    * @JMS\Type("integer")
    * @ORM\Column(name="collapse_display", type="integer", nullable=true, options={"unsigned":true, "default": 0})
    * 
-   * 
    */
   private $collapseDisplay = '0';
   
@@ -138,7 +131,6 @@ class CustomGroup extends \Civi\Core\Entity {
    *
    * @JMS\Type("text")
    * @ORM\Column(name="help_pre", type="text", length=65535, nullable=true)
-   * 
    * 
    */
   private $helpPre;
@@ -149,7 +141,6 @@ class CustomGroup extends \Civi\Core\Entity {
    * @JMS\Type("text")
    * @ORM\Column(name="help_post", type="text", length=65535, nullable=true)
    * 
-   * 
    */
   private $helpPost;
   
@@ -158,7 +149,6 @@ class CustomGroup extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="weight", type="integer", nullable=false, options={"unsigned":true, "default": 1})
-   * 
    * 
    */
   private $weight = '1';
@@ -169,7 +159,6 @@ class CustomGroup extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_active", type="boolean", nullable=true)
    * 
-   * 
    */
   private $isActive;
   
@@ -178,7 +167,6 @@ class CustomGroup extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="table_name", type="string", length=255, nullable=true)
-   * 
    * 
    */
   private $tableName;
@@ -189,7 +177,6 @@ class CustomGroup extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_multiple", type="boolean", nullable=true)
    * 
-   * 
    */
   private $isMultiple;
   
@@ -198,7 +185,6 @@ class CustomGroup extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="min_multiple", type="integer", nullable=true, options={"unsigned":true})
-   * 
    * 
    */
   private $minMultiple;
@@ -209,7 +195,6 @@ class CustomGroup extends \Civi\Core\Entity {
    * @JMS\Type("integer")
    * @ORM\Column(name="max_multiple", type="integer", nullable=true, options={"unsigned":true})
    * 
-   * 
    */
   private $maxMultiple;
   
@@ -218,7 +203,6 @@ class CustomGroup extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="collapse_adv_display", type="integer", nullable=true, options={"unsigned":true, "default": 0})
-   * 
    * 
    */
   private $collapseAdvDisplay = '0';
@@ -229,7 +213,6 @@ class CustomGroup extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Contact")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="created_id", referencedColumnName="id", onDelete="SET NULL")})
-   * 
    */
   private $created;
   
@@ -239,7 +222,6 @@ class CustomGroup extends \Civi\Core\Entity {
    * @JMS\Type("datetime")
    * @ORM\Column(name="created_date", type="datetime", nullable=true)
    * 
-   * 
    */
   private $createdDate;
   
@@ -248,7 +230,6 @@ class CustomGroup extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_reserved", type="boolean", nullable=true, options={"default": 0})
-   * 
    * 
    */
   private $isReserved = '0';

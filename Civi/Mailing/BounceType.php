@@ -69,7 +69,6 @@ class BounceType extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="name", type="string", length=8, nullable=false)
    * 
-   * 
    */
   private $name;
   
@@ -79,7 +78,6 @@ class BounceType extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="description", type="string", length=255, nullable=true)
    * 
-   * 
    */
   private $description;
   
@@ -88,7 +86,6 @@ class BounceType extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="hold_threshold", type="integer", nullable=false, options={"unsigned":true})
-   * 
    * 
    */
   private $holdThreshold;

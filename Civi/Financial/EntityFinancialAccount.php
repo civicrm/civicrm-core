@@ -69,7 +69,6 @@ class EntityFinancialAccount extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="entity_table", type="string", length=64, nullable=false)
    * 
-   * 
    */
   private $entityTable;
   
@@ -78,7 +77,6 @@ class EntityFinancialAccount extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="entity_id", type="integer", nullable=false, options={"unsigned":true})
-   * 
    * 
    */
   private $entityId;
@@ -89,7 +87,6 @@ class EntityFinancialAccount extends \Civi\Core\Entity {
    * @JMS\Type("integer")
    * @ORM\Column(name="account_relationship", type="integer", nullable=false, options={"unsigned":true})
    * 
-   * 
    */
   private $accountRelationship;
   
@@ -99,7 +96,6 @@ class EntityFinancialAccount extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Financial\FinancialAccount")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="financial_account_id", referencedColumnName="id", onDelete="RESTRICT")})
-   * 
    */
   private $financialAccount;
 

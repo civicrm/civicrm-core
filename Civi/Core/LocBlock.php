@@ -69,7 +69,6 @@ class LocBlock extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\Address")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="address_id", referencedColumnName="id", onDelete="SET NULL")})
-   * 
    */
   private $address;
   
@@ -79,7 +78,6 @@ class LocBlock extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\Email")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="email_id", referencedColumnName="id", onDelete="SET NULL")})
-   * 
    */
   private $email;
   
@@ -89,7 +87,6 @@ class LocBlock extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\Phone")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="phone_id", referencedColumnName="id", onDelete="SET NULL")})
-   * 
    */
   private $phone;
   
@@ -99,7 +96,6 @@ class LocBlock extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\IM")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="im_id", referencedColumnName="id", onDelete="SET NULL")})
-   * 
    */
   private $im;
   
@@ -109,7 +105,6 @@ class LocBlock extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\Address")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="address_2_id", referencedColumnName="id", onDelete="SET NULL")})
-   * 
    */
   private $address2;
   
@@ -119,7 +114,6 @@ class LocBlock extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\Email")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="email_2_id", referencedColumnName="id", onDelete="SET NULL")})
-   * 
    */
   private $email2;
   
@@ -129,7 +123,6 @@ class LocBlock extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\Phone")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="phone_2_id", referencedColumnName="id", onDelete="SET NULL")})
-   * 
    */
   private $phone2;
   
@@ -139,7 +132,6 @@ class LocBlock extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\IM")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="im_2_id", referencedColumnName="id", onDelete="SET NULL")})
-   * 
    */
   private $im2;
 

@@ -69,7 +69,6 @@ class ActivityContact extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Activity\Activity")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="activity_id", referencedColumnName="id", onDelete="CASCADE")})
-   * 
    */
   private $activity;
   
@@ -79,7 +78,6 @@ class ActivityContact extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Contact")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="contact_id", referencedColumnName="id", onDelete="CASCADE")})
-   * 
    */
   private $contact;
   
@@ -88,7 +86,6 @@ class ActivityContact extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="record_type_id", type="integer", nullable=true, options={"unsigned":true})
-   * 
    * 
    */
   private $recordTypeId;

@@ -69,7 +69,6 @@ class PrintLabel extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="title", type="string", length=255, nullable=true)
    * 
-   * 
    */
   private $title;
   
@@ -78,7 +77,6 @@ class PrintLabel extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="name", type="string", length=255, nullable=true)
-   * 
    * 
    */
   private $name;
@@ -89,7 +87,6 @@ class PrintLabel extends \Civi\Core\Entity {
    * @JMS\Type("text")
    * @ORM\Column(name="description", type="text", length=65535, nullable=true)
    * 
-   * 
    */
   private $description;
   
@@ -98,7 +95,6 @@ class PrintLabel extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="label_format_name", type="string", length=255, nullable=true)
-   * 
    * 
    */
   private $labelFormatName;
@@ -109,7 +105,6 @@ class PrintLabel extends \Civi\Core\Entity {
    * @JMS\Type("integer")
    * @ORM\Column(name="label_type_id", type="integer", nullable=true, options={"unsigned":true})
    * 
-   * 
    */
   private $labelTypeId;
   
@@ -118,7 +113,6 @@ class PrintLabel extends \Civi\Core\Entity {
    *
    * @JMS\Type("text")
    * @ORM\Column(name="data", type="text", nullable=true)
-   * 
    * 
    */
   private $data;
@@ -129,7 +123,6 @@ class PrintLabel extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_default", type="boolean", nullable=true, options={"default": 1})
    * 
-   * 
    */
   private $isDefault = '1';
   
@@ -138,7 +131,6 @@ class PrintLabel extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_active", type="boolean", nullable=true, options={"default": 1})
-   * 
    * 
    */
   private $isActive = '1';
@@ -149,7 +141,6 @@ class PrintLabel extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_reserved", type="boolean", nullable=true, options={"default": 1})
    * 
-   * 
    */
   private $isReserved = '1';
   
@@ -159,7 +150,6 @@ class PrintLabel extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Contact")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="created_id", referencedColumnName="id", onDelete="SET NULL")})
-   * 
    */
   private $created;
 

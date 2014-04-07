@@ -69,7 +69,6 @@ class Opened extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Mailing\Event\Queue")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="event_queue_id", referencedColumnName="id", onDelete="CASCADE")})
-   * 
    */
   private $eventQueue;
   
@@ -78,7 +77,6 @@ class Opened extends \Civi\Core\Entity {
    *
    * @JMS\Type("datetime")
    * @ORM\Column(name="time_stamp", type="datetime", nullable=false)
-   * 
    * 
    */
   private $timeStamp;

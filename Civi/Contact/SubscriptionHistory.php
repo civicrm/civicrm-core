@@ -69,7 +69,6 @@ class SubscriptionHistory extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Contact")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="contact_id", referencedColumnName="id", onDelete="CASCADE")})
-   * 
    */
   private $contact;
   
@@ -79,7 +78,6 @@ class SubscriptionHistory extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Group")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="group_id", referencedColumnName="id", onDelete="CASCADE")})
-   * 
    */
   private $group;
   
@@ -88,7 +86,6 @@ class SubscriptionHistory extends \Civi\Core\Entity {
    *
    * @JMS\Type("datetime")
    * @ORM\Column(name="date", type="datetime", nullable=false)
-   * 
    * 
    */
   private $date;
@@ -99,7 +96,6 @@ class SubscriptionHistory extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="method", type="string", length=8, nullable=true)
    * 
-   * 
    */
   private $method;
   
@@ -109,7 +105,6 @@ class SubscriptionHistory extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="status", type="string", length=8, nullable=true)
    * 
-   * 
    */
   private $status;
   
@@ -118,7 +113,6 @@ class SubscriptionHistory extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="tracking", type="string", length=255, nullable=true)
-   * 
    * 
    */
   private $tracking;

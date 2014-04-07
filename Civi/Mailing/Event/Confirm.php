@@ -69,7 +69,6 @@ class Confirm extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Mailing\Event\Subscribe")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="event_subscribe_id", referencedColumnName="id", onDelete="CASCADE")})
-   * 
    */
   private $eventSubscribe;
   
@@ -78,7 +77,6 @@ class Confirm extends \Civi\Core\Entity {
    *
    * @JMS\Type("datetime")
    * @ORM\Column(name="time_stamp", type="datetime", nullable=false)
-   * 
    * 
    */
   private $timeStamp;

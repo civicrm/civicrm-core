@@ -69,7 +69,6 @@ class Rule extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Dedupe\RuleGroup")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="dedupe_rule_group_id", referencedColumnName="id")})
-   * 
    */
   private $dedupeRuleGroup;
   
@@ -78,7 +77,6 @@ class Rule extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="rule_table", type="string", length=64, nullable=false)
-   * 
    * 
    */
   private $ruleTable;
@@ -89,7 +87,6 @@ class Rule extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="rule_field", type="string", length=64, nullable=false)
    * 
-   * 
    */
   private $ruleField;
   
@@ -99,7 +96,6 @@ class Rule extends \Civi\Core\Entity {
    * @JMS\Type("integer")
    * @ORM\Column(name="rule_length", type="integer", nullable=true, options={"unsigned":true})
    * 
-   * 
    */
   private $ruleLength;
   
@@ -108,7 +104,6 @@ class Rule extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="rule_weight", type="integer", nullable=false, options={"unsigned":true})
-   * 
    * 
    */
   private $ruleWeight;

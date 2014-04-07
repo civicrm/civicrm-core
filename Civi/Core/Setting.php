@@ -69,7 +69,6 @@ class Setting extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="group_name", type="string", length=64, nullable=false)
    * 
-   * 
    */
   private $groupName;
   
@@ -78,7 +77,6 @@ class Setting extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="name", type="string", length=255, nullable=true)
-   * 
    * 
    */
   private $name;
@@ -89,7 +87,6 @@ class Setting extends \Civi\Core\Entity {
    * @JMS\Type("text")
    * @ORM\Column(name="value", type="text", length=65535, nullable=true)
    * 
-   * 
    */
   private $value;
   
@@ -99,7 +96,6 @@ class Setting extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\Domain")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="domain_id", referencedColumnName="id", onDelete="CASCADE")})
-   * 
    */
   private $domain;
   
@@ -109,7 +105,6 @@ class Setting extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Contact")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="contact_id", referencedColumnName="id", onDelete="CASCADE")})
-   * 
    */
   private $contact;
   
@@ -118,7 +113,6 @@ class Setting extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_domain", type="boolean", nullable=true)
-   * 
    * 
    */
   private $isDomain;
@@ -129,7 +123,6 @@ class Setting extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\Component")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="component_id", referencedColumnName="id")})
-   * 
    */
   private $component;
   
@@ -138,7 +131,6 @@ class Setting extends \Civi\Core\Entity {
    *
    * @JMS\Type("datetime")
    * @ORM\Column(name="created_date", type="datetime", nullable=true)
-   * 
    * 
    */
   private $createdDate;
@@ -149,7 +141,6 @@ class Setting extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Contact")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="created_id", referencedColumnName="id", onDelete="SET NULL")})
-   * 
    */
   private $created;
 

@@ -69,7 +69,6 @@ class BouncePattern extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Mailing\BounceType")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="bounce_type_id", referencedColumnName="id", onDelete="CASCADE")})
-   * 
    */
   private $bounceType;
   
@@ -78,7 +77,6 @@ class BouncePattern extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="pattern", type="string", length=255, nullable=true)
-   * 
    * 
    */
   private $pattern;

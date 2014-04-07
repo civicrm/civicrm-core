@@ -69,7 +69,6 @@ class Batch extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="name", type="string", length=64, nullable=true)
    * 
-   * 
    */
   private $name;
   
@@ -78,7 +77,6 @@ class Batch extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="title", type="string", length=64, nullable=true)
-   * 
    * 
    */
   private $title;
@@ -89,7 +87,6 @@ class Batch extends \Civi\Core\Entity {
    * @JMS\Type("text")
    * @ORM\Column(name="description", type="text", length=65535, nullable=true)
    * 
-   * 
    */
   private $description;
   
@@ -99,7 +96,6 @@ class Batch extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Contact")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="created_id", referencedColumnName="id", onDelete="SET NULL")})
-   * 
    */
   private $created;
   
@@ -108,7 +104,6 @@ class Batch extends \Civi\Core\Entity {
    *
    * @JMS\Type("datetime")
    * @ORM\Column(name="created_date", type="datetime", nullable=true)
-   * 
    * 
    */
   private $createdDate;
@@ -119,7 +114,6 @@ class Batch extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Contact")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="modified_id", referencedColumnName="id", onDelete="SET NULL")})
-   * 
    */
   private $modified;
   
@@ -128,7 +122,6 @@ class Batch extends \Civi\Core\Entity {
    *
    * @JMS\Type("datetime")
    * @ORM\Column(name="modified_date", type="datetime", nullable=true)
-   * 
    * 
    */
   private $modifiedDate;
@@ -139,7 +132,6 @@ class Batch extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\SavedSearch")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="saved_search_id", referencedColumnName="id", onDelete="SET NULL")})
-   * 
    */
   private $savedSearch;
   
@@ -148,7 +140,6 @@ class Batch extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="status_id", type="integer", nullable=false, options={"unsigned":true})
-   * 
    * 
    */
   private $statusId;
@@ -159,7 +150,6 @@ class Batch extends \Civi\Core\Entity {
    * @JMS\Type("integer")
    * @ORM\Column(name="type_id", type="integer", nullable=true, options={"unsigned":true})
    * 
-   * 
    */
   private $typeId;
   
@@ -168,7 +158,6 @@ class Batch extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="mode_id", type="integer", nullable=true, options={"unsigned":true})
-   * 
    * 
    */
   private $modeId;
@@ -179,7 +168,6 @@ class Batch extends \Civi\Core\Entity {
    * @JMS\Type("float")
    * @ORM\Column(name="total", type="float", nullable=true)
    * 
-   * 
    */
   private $total;
   
@@ -188,7 +176,6 @@ class Batch extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="item_count", type="integer", nullable=true, options={"unsigned":true})
-   * 
    * 
    */
   private $itemCount;
@@ -199,7 +186,6 @@ class Batch extends \Civi\Core\Entity {
    * @JMS\Type("integer")
    * @ORM\Column(name="payment_instrument_id", type="integer", nullable=true, options={"unsigned":true})
    * 
-   * 
    */
   private $paymentInstrumentId;
   
@@ -209,7 +195,6 @@ class Batch extends \Civi\Core\Entity {
    * @JMS\Type("datetime")
    * @ORM\Column(name="exported_date", type="datetime", nullable=true)
    * 
-   * 
    */
   private $exportedDate;
   
@@ -218,7 +203,6 @@ class Batch extends \Civi\Core\Entity {
    *
    * @JMS\Type("text")
    * @ORM\Column(name="data", type="text", nullable=true)
-   * 
    * 
    */
   private $data;

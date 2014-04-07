@@ -69,7 +69,6 @@ class FinancialItem extends \Civi\Core\Entity {
    * @JMS\Type("datetime")
    * @ORM\Column(name="created_date", type="datetime", nullable=false, columnDefinition="TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
    * 
-   * 1
    */
   private $createdDate;
   
@@ -78,7 +77,6 @@ class FinancialItem extends \Civi\Core\Entity {
    *
    * @JMS\Type("datetime")
    * @ORM\Column(name="transaction_date", type="datetime", nullable=false)
-   * 
    * 
    */
   private $transactionDate;
@@ -89,7 +87,6 @@ class FinancialItem extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Contact")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="contact_id", referencedColumnName="id", onDelete="CASCADE")})
-   * 
    */
   private $contact;
   
@@ -98,7 +95,6 @@ class FinancialItem extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="description", type="string", length=255, nullable=true)
-   * 
    * 
    */
   private $description;
@@ -109,7 +105,6 @@ class FinancialItem extends \Civi\Core\Entity {
    * @JMS\Type("float")
    * @ORM\Column(name="amount", type="float", nullable=false, options={"default": 0})
    * 
-   * 
    */
   private $amount = '0';
   
@@ -118,7 +113,6 @@ class FinancialItem extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="currency", type="string", length=3, nullable=true)
-   * 
    * 
    */
   private $currency;
@@ -129,7 +123,6 @@ class FinancialItem extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Financial\FinancialAccount")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="financial_account_id", referencedColumnName="id")})
-   * 
    */
   private $financialAccount;
   
@@ -138,7 +131,6 @@ class FinancialItem extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="status_id", type="integer", nullable=true, options={"unsigned":true})
-   * 
    * 
    */
   private $statusId;
@@ -149,7 +141,6 @@ class FinancialItem extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="entity_table", type="string", length=64, nullable=true)
    * 
-   * 
    */
   private $entityTable;
   
@@ -158,7 +149,6 @@ class FinancialItem extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="entity_id", type="integer", nullable=true, options={"unsigned":true})
-   * 
    * 
    */
   private $entityId;

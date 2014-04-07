@@ -69,7 +69,6 @@ class EntityBatch extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="entity_table", type="string", length=64, nullable=true)
    * 
-   * 
    */
   private $entityTable;
   
@@ -78,7 +77,6 @@ class EntityBatch extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="entity_id", type="integer", nullable=false, options={"unsigned":true})
-   * 
    * 
    */
   private $entityId;
@@ -89,7 +87,6 @@ class EntityBatch extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Batch\Batch")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="batch_id", referencedColumnName="id", onDelete="CASCADE")})
-   * 
    */
   private $batch;
 

@@ -69,7 +69,6 @@ class File extends \Civi\Core\Entity {
    * @JMS\Type("integer")
    * @ORM\Column(name="file_type_id", type="integer", nullable=true, options={"unsigned":true})
    * 
-   * 
    */
   private $fileTypeId;
   
@@ -78,7 +77,6 @@ class File extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="mime_type", type="string", length=255, nullable=true)
-   * 
    * 
    */
   private $mimeType;
@@ -89,7 +87,6 @@ class File extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="uri", type="string", length=255, nullable=true)
    * 
-   * 
    */
   private $uri;
   
@@ -98,7 +95,6 @@ class File extends \Civi\Core\Entity {
    *
    * @JMS\Type("blob")
    * @ORM\Column(name="document", type="blob", length=16777215, nullable=true)
-   * 
    * 
    */
   private $document;
@@ -109,7 +105,6 @@ class File extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="description", type="string", length=255, nullable=true)
    * 
-   * 
    */
   private $description;
   
@@ -118,7 +113,6 @@ class File extends \Civi\Core\Entity {
    *
    * @JMS\Type("datetime")
    * @ORM\Column(name="upload_date", type="datetime", nullable=true)
-   * 
    * 
    */
   private $uploadDate;

@@ -69,7 +69,6 @@ class Exception extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Contact")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="contact_id1", referencedColumnName="id", onDelete="CASCADE")})
-   * 
    */
   private $contact1;
   
@@ -79,7 +78,6 @@ class Exception extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Contact")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="contact_id2", referencedColumnName="id", onDelete="CASCADE")})
-   * 
    */
   private $contact2;
 

@@ -69,7 +69,6 @@ class Pledge extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Contact")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="contact_id", referencedColumnName="id", onDelete="CASCADE")})
-   * 
    */
   private $contact;
   
@@ -79,7 +78,6 @@ class Pledge extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Financial\FinancialType")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="financial_type_id", referencedColumnName="id")})
-   * 
    */
   private $financialType;
   
@@ -89,7 +87,6 @@ class Pledge extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Contribute\ContributionPage")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="contribution_page_id", referencedColumnName="id", onDelete="SET NULL")})
-   * 
    */
   private $contributionPage;
   
@@ -98,7 +95,6 @@ class Pledge extends \Civi\Core\Entity {
    *
    * @JMS\Type("float")
    * @ORM\Column(name="amount", type="float", nullable=false)
-   * 
    * 
    */
   private $amount;
@@ -109,7 +105,6 @@ class Pledge extends \Civi\Core\Entity {
    * @JMS\Type("float")
    * @ORM\Column(name="original_installment_amount", type="float", nullable=false)
    * 
-   * 
    */
   private $originalInstallmentAmount;
   
@@ -118,7 +113,6 @@ class Pledge extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="currency", type="string", length=3, nullable=true)
-   * 
    * 
    */
   private $currency = 'NULL';
@@ -129,7 +123,6 @@ class Pledge extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="frequency_unit", type="string", length=8, nullable=true, options={"default": "month"})
    * 
-   * 
    */
   private $frequencyUnit = 'month';
   
@@ -138,7 +131,6 @@ class Pledge extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="frequency_interval", type="integer", nullable=false, options={"unsigned":true, "default": 1})
-   * 
    * 
    */
   private $frequencyInterval = '1';
@@ -149,7 +141,6 @@ class Pledge extends \Civi\Core\Entity {
    * @JMS\Type("integer")
    * @ORM\Column(name="frequency_day", type="integer", nullable=false, options={"unsigned":true, "default": 3})
    * 
-   * 
    */
   private $frequencyDay = '3';
   
@@ -158,7 +149,6 @@ class Pledge extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="installments", type="integer", nullable=true, options={"unsigned":true, "default": 1})
-   * 
    * 
    */
   private $installments = '1';
@@ -169,7 +159,6 @@ class Pledge extends \Civi\Core\Entity {
    * @JMS\Type("datetime")
    * @ORM\Column(name="start_date", type="datetime", nullable=false)
    * 
-   * 
    */
   private $startDate;
   
@@ -178,7 +167,6 @@ class Pledge extends \Civi\Core\Entity {
    *
    * @JMS\Type("datetime")
    * @ORM\Column(name="create_date", type="datetime", nullable=false)
-   * 
    * 
    */
   private $createDate;
@@ -189,7 +177,6 @@ class Pledge extends \Civi\Core\Entity {
    * @JMS\Type("datetime")
    * @ORM\Column(name="acknowledge_date", type="datetime", nullable=true)
    * 
-   * 
    */
   private $acknowledgeDate;
   
@@ -198,7 +185,6 @@ class Pledge extends \Civi\Core\Entity {
    *
    * @JMS\Type("datetime")
    * @ORM\Column(name="modified_date", type="datetime", nullable=true)
-   * 
    * 
    */
   private $modifiedDate;
@@ -209,7 +195,6 @@ class Pledge extends \Civi\Core\Entity {
    * @JMS\Type("datetime")
    * @ORM\Column(name="cancel_date", type="datetime", nullable=true)
    * 
-   * 
    */
   private $cancelDate;
   
@@ -218,7 +203,6 @@ class Pledge extends \Civi\Core\Entity {
    *
    * @JMS\Type("datetime")
    * @ORM\Column(name="end_date", type="datetime", nullable=true)
-   * 
    * 
    */
   private $endDate;
@@ -229,7 +213,6 @@ class Pledge extends \Civi\Core\Entity {
    * @JMS\Type("integer")
    * @ORM\Column(name="max_reminders", type="integer", nullable=true, options={"unsigned":true, "default": 1})
    * 
-   * 
    */
   private $maxReminders = '1';
   
@@ -238,7 +221,6 @@ class Pledge extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="initial_reminder_day", type="integer", nullable=true, options={"unsigned":true, "default": 5})
-   * 
    * 
    */
   private $initialReminderDay = '5';
@@ -249,7 +231,6 @@ class Pledge extends \Civi\Core\Entity {
    * @JMS\Type("integer")
    * @ORM\Column(name="additional_reminder_day", type="integer", nullable=true, options={"unsigned":true, "default": 5})
    * 
-   * 
    */
   private $additionalReminderDay = '5';
   
@@ -258,7 +239,6 @@ class Pledge extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="status_id", type="integer", nullable=true, options={"unsigned":true})
-   * 
    * 
    */
   private $statusId;
@@ -269,7 +249,6 @@ class Pledge extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_test", type="boolean", nullable=true, options={"default": 0})
    * 
-   * 
    */
   private $isTest = '0';
   
@@ -279,7 +258,6 @@ class Pledge extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Campaign\Campaign")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="campaign_id", referencedColumnName="id", onDelete="SET NULL")})
-   * 
    */
   private $campaign;
 

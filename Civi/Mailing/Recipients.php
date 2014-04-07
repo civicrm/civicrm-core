@@ -69,7 +69,6 @@ class Recipients extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Mailing\Mailing")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="mailing_id", referencedColumnName="id", onDelete="CASCADE")})
-   * 
    */
   private $mailing;
   
@@ -79,7 +78,6 @@ class Recipients extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Contact")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="contact_id", referencedColumnName="id", onDelete="CASCADE")})
-   * 
    */
   private $contact;
   
@@ -89,7 +87,6 @@ class Recipients extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\Email")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="email_id", referencedColumnName="id", onDelete="CASCADE")})
-   * 
    */
   private $email = 'NULL';
   
@@ -99,7 +96,6 @@ class Recipients extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\Phone")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="phone_id", referencedColumnName="id", onDelete="CASCADE")})
-   * 
    */
   private $phone = 'NULL';
 

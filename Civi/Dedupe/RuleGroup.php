@@ -69,7 +69,6 @@ class RuleGroup extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="contact_type", type="string", length=12, nullable=true)
    * 
-   * 
    */
   private $contactType;
   
@@ -78,7 +77,6 @@ class RuleGroup extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="threshold", type="integer", nullable=false, options={"unsigned":true})
-   * 
    * 
    */
   private $threshold;
@@ -89,7 +87,6 @@ class RuleGroup extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="used", type="string", length=12, nullable=false)
    * 
-   * 
    */
   private $used;
   
@@ -98,7 +95,6 @@ class RuleGroup extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="name", type="string", length=64, nullable=true)
-   * 
    * 
    */
   private $name;
@@ -109,7 +105,6 @@ class RuleGroup extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="title", type="string", length=255, nullable=true)
    * 
-   * 
    */
   private $title;
   
@@ -118,7 +113,6 @@ class RuleGroup extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_reserved", type="boolean", nullable=true)
-   * 
    * 
    */
   private $isReserved;

@@ -69,7 +69,6 @@ class Currency extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="name", type="string", length=64, nullable=true)
    * 
-   * 
    */
   private $name;
   
@@ -78,7 +77,6 @@ class Currency extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="symbol", type="string", length=8, nullable=true)
-   * 
    * 
    */
   private $symbol;
@@ -89,7 +87,6 @@ class Currency extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="numeric_code", type="string", length=3, nullable=true)
    * 
-   * 
    */
   private $numericCode;
   
@@ -98,7 +95,6 @@ class Currency extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="full_name", type="string", length=64, nullable=true)
-   * 
    * 
    */
   private $fullName;

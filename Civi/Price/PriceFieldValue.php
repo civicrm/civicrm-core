@@ -69,7 +69,6 @@ class PriceFieldValue extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Price\PriceField")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="price_field_id", referencedColumnName="id")})
-   * 
    */
   private $priceField;
   
@@ -78,7 +77,6 @@ class PriceFieldValue extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="name", type="string", length=255, nullable=true)
-   * 
    * 
    */
   private $name;
@@ -89,7 +87,6 @@ class PriceFieldValue extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="label", type="string", length=255, nullable=true)
    * 
-   * 
    */
   private $label;
   
@@ -98,7 +95,6 @@ class PriceFieldValue extends \Civi\Core\Entity {
    *
    * @JMS\Type("text")
    * @ORM\Column(name="description", type="text", length=65535, nullable=true)
-   * 
    * 
    */
   private $description = 'NULL';
@@ -109,7 +105,6 @@ class PriceFieldValue extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="amount", type="string", length=512, nullable=false)
    * 
-   * 
    */
   private $amount;
   
@@ -118,7 +113,6 @@ class PriceFieldValue extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="count", type="integer", nullable=true, options={"unsigned":true})
-   * 
    * 
    */
   private $count = 'NULL';
@@ -129,7 +123,6 @@ class PriceFieldValue extends \Civi\Core\Entity {
    * @JMS\Type("integer")
    * @ORM\Column(name="max_value", type="integer", nullable=true, options={"unsigned":true})
    * 
-   * 
    */
   private $maxValue = 'NULL';
   
@@ -138,7 +131,6 @@ class PriceFieldValue extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="weight", type="integer", nullable=true, options={"unsigned":true, "default": 1})
-   * 
    * 
    */
   private $weight = '1';
@@ -149,7 +141,6 @@ class PriceFieldValue extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Member\MembershipType")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="membership_type_id", referencedColumnName="id", onDelete="SET NULL")})
-   * 
    */
   private $membershipType = 'NULL';
   
@@ -158,7 +149,6 @@ class PriceFieldValue extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="membership_num_terms", type="integer", nullable=true, options={"unsigned":true})
-   * 
    * 
    */
   private $membershipNumTerms = 'NULL';
@@ -169,7 +159,6 @@ class PriceFieldValue extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_default", type="boolean", nullable=true, options={"default": 0})
    * 
-   * 
    */
   private $isDefault = '0';
   
@@ -178,7 +167,6 @@ class PriceFieldValue extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_active", type="boolean", nullable=true, options={"default": 1})
-   * 
    * 
    */
   private $isActive = '1';
@@ -189,7 +177,6 @@ class PriceFieldValue extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Financial\FinancialType")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="financial_type_id", referencedColumnName="id", onDelete="SET NULL")})
-   * 
    */
   private $financialType = 'NULL';
   
@@ -198,7 +185,6 @@ class PriceFieldValue extends \Civi\Core\Entity {
    *
    * @JMS\Type("float")
    * @ORM\Column(name="deductible_amount", type="float", nullable=false, options={"default": 0.0})
-   * 
    * 
    */
   private $deductibleAmount = '0.0';

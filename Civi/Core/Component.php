@@ -69,7 +69,6 @@ class Component extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="name", type="string", length=64, nullable=false)
    * 
-   * 
    */
   private $name;
   
@@ -78,7 +77,6 @@ class Component extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="namespace", type="string", length=128, nullable=true)
-   * 
    * 
    */
   private $namespace;

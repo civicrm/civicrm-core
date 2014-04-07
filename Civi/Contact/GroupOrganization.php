@@ -69,7 +69,6 @@ class GroupOrganization extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Group")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="group_id", referencedColumnName="id", onDelete="CASCADE")})
-   * 
    */
   private $group;
   
@@ -79,7 +78,6 @@ class GroupOrganization extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Contact")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="organization_id", referencedColumnName="id", onDelete="CASCADE")})
-   * 
    */
   private $organization;
 

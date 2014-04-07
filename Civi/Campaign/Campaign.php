@@ -69,7 +69,6 @@ class Campaign extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="name", type="string", length=255, nullable=false)
    * 
-   * 
    */
   private $name;
   
@@ -78,7 +77,6 @@ class Campaign extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="title", type="string", length=255, nullable=true)
-   * 
    * 
    */
   private $title;
@@ -89,7 +87,6 @@ class Campaign extends \Civi\Core\Entity {
    * @JMS\Type("text")
    * @ORM\Column(name="description", type="text", length=65535, nullable=true)
    * 
-   * 
    */
   private $description;
   
@@ -98,7 +95,6 @@ class Campaign extends \Civi\Core\Entity {
    *
    * @JMS\Type("datetime")
    * @ORM\Column(name="start_date", type="datetime", nullable=true)
-   * 
    * 
    */
   private $startDate;
@@ -109,7 +105,6 @@ class Campaign extends \Civi\Core\Entity {
    * @JMS\Type("datetime")
    * @ORM\Column(name="end_date", type="datetime", nullable=true)
    * 
-   * 
    */
   private $endDate;
   
@@ -118,7 +113,6 @@ class Campaign extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="campaign_type_id", type="integer", nullable=true, options={"unsigned":true})
-   * 
    * 
    */
   private $campaignTypeId = 'NULL';
@@ -129,7 +123,6 @@ class Campaign extends \Civi\Core\Entity {
    * @JMS\Type("integer")
    * @ORM\Column(name="status_id", type="integer", nullable=true, options={"unsigned":true})
    * 
-   * 
    */
   private $statusId = 'NULL';
   
@@ -138,7 +131,6 @@ class Campaign extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="external_identifier", type="string", length=32, nullable=true)
-   * 
    * 
    */
   private $externalIdentifier;
@@ -149,7 +141,6 @@ class Campaign extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Campaign\Campaign")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="parent_id", referencedColumnName="id", onDelete="SET NULL")})
-   * 
    */
   private $parent = 'NULL';
   
@@ -158,7 +149,6 @@ class Campaign extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_active", type="boolean", nullable=true, options={"default": 1})
-   * 
    * 
    */
   private $isActive = '1';
@@ -169,7 +159,6 @@ class Campaign extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Contact")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="created_id", referencedColumnName="id", onDelete="SET NULL")})
-   * 
    */
   private $created;
   
@@ -178,7 +167,6 @@ class Campaign extends \Civi\Core\Entity {
    *
    * @JMS\Type("datetime")
    * @ORM\Column(name="created_date", type="datetime", nullable=true)
-   * 
    * 
    */
   private $createdDate;
@@ -189,7 +177,6 @@ class Campaign extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Contact")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="last_modified_id", referencedColumnName="id", onDelete="SET NULL")})
-   * 
    */
   private $lastModified;
   
@@ -198,7 +185,6 @@ class Campaign extends \Civi\Core\Entity {
    *
    * @JMS\Type("datetime")
    * @ORM\Column(name="last_modified_date", type="datetime", nullable=true)
-   * 
    * 
    */
   private $lastModifiedDate;
@@ -209,7 +195,6 @@ class Campaign extends \Civi\Core\Entity {
    * @JMS\Type("text")
    * @ORM\Column(name="goal_general", type="text", length=65535, nullable=true)
    * 
-   * 
    */
   private $goalGeneral;
   
@@ -218,7 +203,6 @@ class Campaign extends \Civi\Core\Entity {
    *
    * @JMS\Type("float")
    * @ORM\Column(name="goal_revenue", type="float", nullable=true)
-   * 
    * 
    */
   private $goalRevenue;

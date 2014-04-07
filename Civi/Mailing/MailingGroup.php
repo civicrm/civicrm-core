@@ -69,7 +69,6 @@ class MailingGroup extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Mailing\Mailing")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="mailing_id", referencedColumnName="id", onDelete="CASCADE")})
-   * 
    */
   private $mailing;
   
@@ -78,7 +77,6 @@ class MailingGroup extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="group_type", type="string", length=8, nullable=true)
-   * 
    * 
    */
   private $groupType;
@@ -89,7 +87,6 @@ class MailingGroup extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="entity_table", type="string", length=64, nullable=false)
    * 
-   * 
    */
   private $entityTable;
   
@@ -98,7 +95,6 @@ class MailingGroup extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="entity_id", type="integer", nullable=false, options={"unsigned":true})
-   * 
    * 
    */
   private $entityId;
@@ -109,7 +105,6 @@ class MailingGroup extends \Civi\Core\Entity {
    * @JMS\Type("integer")
    * @ORM\Column(name="search_id", type="integer", nullable=true, options={"unsigned":true})
    * 
-   * 
    */
   private $searchId;
   
@@ -118,7 +113,6 @@ class MailingGroup extends \Civi\Core\Entity {
    *
    * @JMS\Type("text")
    * @ORM\Column(name="search_args", type="text", length=65535, nullable=true)
-   * 
    * 
    */
   private $searchArgs;

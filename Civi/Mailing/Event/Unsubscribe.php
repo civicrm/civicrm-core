@@ -69,7 +69,6 @@ class Unsubscribe extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Mailing\Event\Queue")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="event_queue_id", referencedColumnName="id", onDelete="CASCADE")})
-   * 
    */
   private $eventQueue;
   
@@ -79,7 +78,6 @@ class Unsubscribe extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="org_unsubscribe", type="boolean", nullable=false)
    * 
-   * 
    */
   private $orgUnsubscribe;
   
@@ -88,7 +86,6 @@ class Unsubscribe extends \Civi\Core\Entity {
    *
    * @JMS\Type("datetime")
    * @ORM\Column(name="time_stamp", type="datetime", nullable=false)
-   * 
    * 
    */
   private $timeStamp;

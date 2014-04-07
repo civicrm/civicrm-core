@@ -69,7 +69,6 @@ class PriceSet extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\Domain")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="domain_id", referencedColumnName="id")})
-   * 
    */
   private $domain;
   
@@ -78,7 +77,6 @@ class PriceSet extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="name", type="string", length=255, nullable=false)
-   * 
    * 
    */
   private $name;
@@ -89,7 +87,6 @@ class PriceSet extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="title", type="string", length=255, nullable=false)
    * 
-   * 
    */
   private $title;
   
@@ -98,7 +95,6 @@ class PriceSet extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_active", type="boolean", nullable=true, options={"default": 1})
-   * 
    * 
    */
   private $isActive = '1';
@@ -109,7 +105,6 @@ class PriceSet extends \Civi\Core\Entity {
    * @JMS\Type("text")
    * @ORM\Column(name="help_pre", type="text", length=65535, nullable=true)
    * 
-   * 
    */
   private $helpPre;
   
@@ -118,7 +113,6 @@ class PriceSet extends \Civi\Core\Entity {
    *
    * @JMS\Type("text")
    * @ORM\Column(name="help_post", type="text", length=65535, nullable=true)
-   * 
    * 
    */
   private $helpPost;
@@ -129,7 +123,6 @@ class PriceSet extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="javascript", type="string", length=64, nullable=true)
    * 
-   * 
    */
   private $javascript;
   
@@ -138,7 +131,6 @@ class PriceSet extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="extends", type="string", length=255, nullable=false)
-   * 
    * 
    */
   private $extends;
@@ -149,7 +141,6 @@ class PriceSet extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Financial\FinancialType")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="financial_type_id", referencedColumnName="id", onDelete="SET NULL")})
-   * 
    */
   private $financialType = 'NULL';
   
@@ -159,7 +150,6 @@ class PriceSet extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_quick_config", type="boolean", nullable=true, options={"default": 0})
    * 
-   * 
    */
   private $isQuickConfig = '0';
   
@@ -168,7 +158,6 @@ class PriceSet extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_reserved", type="boolean", nullable=true, options={"default": 0})
-   * 
    * 
    */
   private $isReserved = '0';

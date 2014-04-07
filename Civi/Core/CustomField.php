@@ -69,7 +69,6 @@ class CustomField extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\CustomGroup")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="custom_group_id", referencedColumnName="id", onDelete="CASCADE")})
-   * 
    */
   private $customGroup;
   
@@ -78,7 +77,6 @@ class CustomField extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="name", type="string", length=64, nullable=true)
-   * 
    * 
    */
   private $name;
@@ -89,7 +87,6 @@ class CustomField extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="label", type="string", length=255, nullable=false)
    * 
-   * 
    */
   private $label;
   
@@ -98,7 +95,6 @@ class CustomField extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="data_type", type="string", length=16, nullable=false)
-   * 
    * 
    */
   private $dataType;
@@ -109,7 +105,6 @@ class CustomField extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="html_type", type="string", length=32, nullable=false)
    * 
-   * 
    */
   private $htmlType;
   
@@ -118,7 +113,6 @@ class CustomField extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="default_value", type="string", length=255, nullable=true)
-   * 
    * 
    */
   private $defaultValue;
@@ -129,7 +123,6 @@ class CustomField extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_required", type="boolean", nullable=true)
    * 
-   * 
    */
   private $isRequired;
   
@@ -138,7 +131,6 @@ class CustomField extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_searchable", type="boolean", nullable=true)
-   * 
    * 
    */
   private $isSearchable;
@@ -149,7 +141,6 @@ class CustomField extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_search_range", type="boolean", nullable=true, options={"default": 0})
    * 
-   * 
    */
   private $isSearchRange = '0';
   
@@ -158,7 +149,6 @@ class CustomField extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="weight", type="integer", nullable=false, options={"unsigned":true, "default": 1})
-   * 
    * 
    */
   private $weight = '1';
@@ -169,7 +159,6 @@ class CustomField extends \Civi\Core\Entity {
    * @JMS\Type("text")
    * @ORM\Column(name="help_pre", type="text", length=65535, nullable=true)
    * 
-   * 
    */
   private $helpPre;
   
@@ -178,7 +167,6 @@ class CustomField extends \Civi\Core\Entity {
    *
    * @JMS\Type("text")
    * @ORM\Column(name="help_post", type="text", length=65535, nullable=true)
-   * 
    * 
    */
   private $helpPost;
@@ -189,7 +177,6 @@ class CustomField extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="mask", type="string", length=64, nullable=true)
    * 
-   * 
    */
   private $mask;
   
@@ -198,7 +185,6 @@ class CustomField extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="attributes", type="string", length=255, nullable=true)
-   * 
    * 
    */
   private $attributes;
@@ -209,7 +195,6 @@ class CustomField extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="javascript", type="string", length=255, nullable=true)
    * 
-   * 
    */
   private $javascript;
   
@@ -218,7 +203,6 @@ class CustomField extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_active", type="boolean", nullable=true)
-   * 
    * 
    */
   private $isActive;
@@ -229,7 +213,6 @@ class CustomField extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_view", type="boolean", nullable=true)
    * 
-   * 
    */
   private $isView;
   
@@ -238,7 +221,6 @@ class CustomField extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="options_per_line", type="integer", nullable=true, options={"unsigned":true})
-   * 
    * 
    */
   private $optionsPerLine;
@@ -249,7 +231,6 @@ class CustomField extends \Civi\Core\Entity {
    * @JMS\Type("integer")
    * @ORM\Column(name="text_length", type="integer", nullable=true, options={"unsigned":true})
    * 
-   * 
    */
   private $textLength;
   
@@ -258,7 +239,6 @@ class CustomField extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="start_date_years", type="integer", nullable=true, options={"unsigned":true})
-   * 
    * 
    */
   private $startDateYears;
@@ -269,7 +249,6 @@ class CustomField extends \Civi\Core\Entity {
    * @JMS\Type("integer")
    * @ORM\Column(name="end_date_years", type="integer", nullable=true, options={"unsigned":true})
    * 
-   * 
    */
   private $endDateYears;
   
@@ -278,7 +257,6 @@ class CustomField extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="date_format", type="string", length=64, nullable=true)
-   * 
    * 
    */
   private $dateFormat;
@@ -289,7 +267,6 @@ class CustomField extends \Civi\Core\Entity {
    * @JMS\Type("integer")
    * @ORM\Column(name="time_format", type="integer", nullable=true, options={"unsigned":true})
    * 
-   * 
    */
   private $timeFormat;
   
@@ -298,7 +275,6 @@ class CustomField extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="note_columns", type="integer", nullable=true, options={"unsigned":true})
-   * 
    * 
    */
   private $noteColumns;
@@ -309,7 +285,6 @@ class CustomField extends \Civi\Core\Entity {
    * @JMS\Type("integer")
    * @ORM\Column(name="note_rows", type="integer", nullable=true, options={"unsigned":true})
    * 
-   * 
    */
   private $noteRows;
   
@@ -318,7 +293,6 @@ class CustomField extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="column_name", type="string", length=255, nullable=true)
-   * 
    * 
    */
   private $columnName;
@@ -329,7 +303,6 @@ class CustomField extends \Civi\Core\Entity {
    * @JMS\Type("integer")
    * @ORM\Column(name="option_group_id", type="integer", nullable=true, options={"unsigned":true})
    * 
-   * 
    */
   private $optionGroupId;
   
@@ -339,7 +312,6 @@ class CustomField extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="filter", type="string", length=255, nullable=true)
    * 
-   * 
    */
   private $filter;
   
@@ -348,7 +320,6 @@ class CustomField extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="in_selector", type="boolean", nullable=true, options={"default": 0})
-   * 
    * 
    */
   private $inSelector = '0';

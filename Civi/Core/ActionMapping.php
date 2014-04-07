@@ -69,7 +69,6 @@ class ActionMapping extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="entity", type="string", length=64, nullable=true)
    * 
-   * 
    */
   private $entity;
   
@@ -78,7 +77,6 @@ class ActionMapping extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="entity_value", type="string", length=64, nullable=true)
-   * 
    * 
    */
   private $entityValue;
@@ -89,7 +87,6 @@ class ActionMapping extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="entity_value_label", type="string", length=64, nullable=true)
    * 
-   * 
    */
   private $entityValueLabel;
   
@@ -98,7 +95,6 @@ class ActionMapping extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="entity_status", type="string", length=64, nullable=true)
-   * 
    * 
    */
   private $entityStatus;
@@ -109,7 +105,6 @@ class ActionMapping extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="entity_status_label", type="string", length=64, nullable=true)
    * 
-   * 
    */
   private $entityStatusLabel;
   
@@ -118,7 +113,6 @@ class ActionMapping extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="entity_date_start", type="string", length=64, nullable=true)
-   * 
    * 
    */
   private $entityDateStart;
@@ -129,7 +123,6 @@ class ActionMapping extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="entity_date_end", type="string", length=64, nullable=true)
    * 
-   * 
    */
   private $entityDateEnd;
   
@@ -138,7 +131,6 @@ class ActionMapping extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="entity_recipient", type="string", length=64, nullable=true)
-   * 
    * 
    */
   private $entityRecipient;

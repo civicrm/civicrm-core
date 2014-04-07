@@ -69,7 +69,6 @@ class EntityRole extends \Civi\Core\Entity {
    * @JMS\Type("integer")
    * @ORM\Column(name="acl_role_id", type="integer", nullable=false, options={"unsigned":true})
    * 
-   * 
    */
   private $aclRoleId;
   
@@ -78,7 +77,6 @@ class EntityRole extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="entity_table", type="string", length=64, nullable=false)
-   * 
    * 
    */
   private $entityTable;
@@ -89,7 +87,6 @@ class EntityRole extends \Civi\Core\Entity {
    * @JMS\Type("integer")
    * @ORM\Column(name="entity_id", type="integer", nullable=false, options={"unsigned":true})
    * 
-   * 
    */
   private $entityId;
   
@@ -98,7 +95,6 @@ class EntityRole extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_active", type="boolean", nullable=true)
-   * 
    * 
    */
   private $isActive;

@@ -69,7 +69,6 @@ class MembershipLog extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Member\Membership")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="membership_id", referencedColumnName="id", onDelete="CASCADE")})
-   * 
    */
   private $membership;
   
@@ -79,7 +78,6 @@ class MembershipLog extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Member\MembershipStatus")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="status_id", referencedColumnName="id", onDelete="CASCADE")})
-   * 
    */
   private $status;
   
@@ -88,7 +86,6 @@ class MembershipLog extends \Civi\Core\Entity {
    *
    * @JMS\Type("date")
    * @ORM\Column(name="start_date", type="date", nullable=true)
-   * 
    * 
    */
   private $startDate;
@@ -99,7 +96,6 @@ class MembershipLog extends \Civi\Core\Entity {
    * @JMS\Type("date")
    * @ORM\Column(name="end_date", type="date", nullable=true)
    * 
-   * 
    */
   private $endDate;
   
@@ -109,7 +105,6 @@ class MembershipLog extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Contact\Contact")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="modified_id", referencedColumnName="id", onDelete="SET NULL")})
-   * 
    */
   private $modified;
   
@@ -118,7 +113,6 @@ class MembershipLog extends \Civi\Core\Entity {
    *
    * @JMS\Type("date")
    * @ORM\Column(name="modified_date", type="date", nullable=true)
-   * 
    * 
    */
   private $modifiedDate;
@@ -129,7 +123,6 @@ class MembershipLog extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Member\MembershipType")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="membership_type_id", referencedColumnName="id", onDelete="SET NULL")})
-   * 
    */
   private $membershipType;
   
@@ -138,7 +131,6 @@ class MembershipLog extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="max_related", type="integer", nullable=true, options={"unsigned":true})
-   * 
    * 
    */
   private $maxRelated;

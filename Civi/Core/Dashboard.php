@@ -69,7 +69,6 @@ class Dashboard extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\Domain")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="domain_id", referencedColumnName="id")})
-   * 
    */
   private $domain;
   
@@ -78,7 +77,6 @@ class Dashboard extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="name", type="string", length=64, nullable=true)
-   * 
    * 
    */
   private $name;
@@ -89,7 +87,6 @@ class Dashboard extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="label", type="string", length=255, nullable=true)
    * 
-   * 
    */
   private $label;
   
@@ -98,7 +95,6 @@ class Dashboard extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="url", type="string", length=255, nullable=true)
-   * 
    * 
    */
   private $url;
@@ -109,7 +105,6 @@ class Dashboard extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="permission", type="string", length=255, nullable=true)
    * 
-   * 
    */
   private $permission;
   
@@ -118,7 +113,6 @@ class Dashboard extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="permission_operator", type="string", length=3, nullable=true)
-   * 
    * 
    */
   private $permissionOperator;
@@ -129,7 +123,6 @@ class Dashboard extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="column_no", type="boolean", nullable=true, options={"default": 0})
    * 
-   * 
    */
   private $columnNo = '0';
   
@@ -138,7 +131,6 @@ class Dashboard extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_minimized", type="boolean", nullable=true, options={"default": 0})
-   * 
    * 
    */
   private $isMinimized = '0';
@@ -149,7 +141,6 @@ class Dashboard extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="fullscreen_url", type="string", length=255, nullable=true)
    * 
-   * 
    */
   private $fullscreenUrl;
   
@@ -158,7 +149,6 @@ class Dashboard extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_fullscreen", type="boolean", nullable=true, options={"default": 1})
-   * 
    * 
    */
   private $isFullscreen = '1';
@@ -169,7 +159,6 @@ class Dashboard extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_active", type="boolean", nullable=true, options={"default": 0})
    * 
-   * 
    */
   private $isActive = '0';
   
@@ -179,7 +168,6 @@ class Dashboard extends \Civi\Core\Entity {
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_reserved", type="boolean", nullable=true, options={"default": 0})
    * 
-   * 
    */
   private $isReserved = '0';
   
@@ -188,7 +176,6 @@ class Dashboard extends \Civi\Core\Entity {
    *
    * @JMS\Type("integer")
    * @ORM\Column(name="weight", type="integer", nullable=true, options={"unsigned":true, "default": 0})
-   * 
    * 
    */
   private $weight = '0';

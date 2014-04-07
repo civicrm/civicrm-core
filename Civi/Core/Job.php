@@ -69,7 +69,6 @@ class Job extends \Civi\Core\Entity {
    * 
    * @ORM\ManyToOne(targetEntity="Civi\Core\Domain")
    * @ORM\JoinColumns({@ORM\JoinColumn(name="domain_id", referencedColumnName="id")})
-   * 
    */
   private $domain;
   
@@ -78,7 +77,6 @@ class Job extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="run_frequency", type="string", length=8, nullable=true, options={"default": "Daily"})
-   * 
    * 
    */
   private $runFrequency = '"Daily"';
@@ -89,7 +87,6 @@ class Job extends \Civi\Core\Entity {
    * @JMS\Type("datetime")
    * @ORM\Column(name="last_run", type="datetime", nullable=true)
    * 
-   * 
    */
   private $lastRun = 'NULL';
   
@@ -98,7 +95,6 @@ class Job extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="name", type="string", length=255, nullable=true)
-   * 
    * 
    */
   private $name;
@@ -109,7 +105,6 @@ class Job extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="description", type="string", length=255, nullable=true)
    * 
-   * 
    */
   private $description;
   
@@ -118,7 +113,6 @@ class Job extends \Civi\Core\Entity {
    *
    * @JMS\Type("string")
    * @ORM\Column(name="api_entity", type="string", length=255, nullable=true)
-   * 
    * 
    */
   private $apiEntity;
@@ -129,7 +123,6 @@ class Job extends \Civi\Core\Entity {
    * @JMS\Type("string")
    * @ORM\Column(name="api_action", type="string", length=255, nullable=true)
    * 
-   * 
    */
   private $apiAction;
   
@@ -139,7 +132,6 @@ class Job extends \Civi\Core\Entity {
    * @JMS\Type("text")
    * @ORM\Column(name="parameters", type="text", length=65535, nullable=true)
    * 
-   * 
    */
   private $parameters;
   
@@ -148,7 +140,6 @@ class Job extends \Civi\Core\Entity {
    *
    * @JMS\Type("boolean")
    * @ORM\Column(name="is_active", type="boolean", nullable=true)
-   * 
    * 
    */
   private $isActive;
