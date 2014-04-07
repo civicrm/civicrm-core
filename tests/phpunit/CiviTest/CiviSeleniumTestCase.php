@@ -930,7 +930,7 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
         $this->type('label_1', "Label $hash");
         $this->type('value_1', "$rand");
       }
-      $this->click('CIVICRM_QFID_1_2');
+      $this->click('CIVICRM_QFID_1_4');
     }
     else {
       $this->click('amount_block_is_active');
@@ -1509,7 +1509,6 @@ class CiviSeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
       $this->uncheck('is_default');
     }
     $this->click('_qf_FinancialAccount_next-botttom');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
   }
 
   /**
