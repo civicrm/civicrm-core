@@ -34,6 +34,7 @@
   <field>
        <name>run_time</name>
        <type>timestamp</type>
+       <defaultTs>NULL</defaultTs>
        <comment>Log entry date</comment>
        <add>4.1</add>
   </field>

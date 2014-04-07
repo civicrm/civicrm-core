@@ -234,7 +234,12 @@ class CRM_Core_CodeGen_EntitySpecification {
       }
 
       if (array_key_exists('default_ts', $field)) {
-        $field['columnInfo'] .= ', columnDefinition="TIMESTAMP DEFAULT ' . $field['default_ts'] .'"';
+        if ($field['default_ts'] == 'NULL') {
+          $field['columnInfo'] .= ', columnDefinition="TIMESTAMP NULL DEFAULT ' . $field['default_ts'] .'"';
+        }
+        else {
+          $field['columnInfo'] .= ', columnDefinition="TIMESTAMP DEFAULT ' . $field['default_ts'] .'"';
+        }
       }
       if (array_key_exists('default', $field) && $field['default'] !== NULL && $field['default'] !== 'NULL') {
         $columnInfoOptions[] = '"default": ' . str_replace("'", '"', $field['default']);
@@ -380,7 +385,6 @@ class CRM_Core_CodeGen_EntitySpecification {
         break;
 
       case 'timestamp':
-        $field['version'] = true;
       case 'datetime':
         $field['sqlType'] = $field['phpType'] = 'datetime';
         $field['crmType'] = '\\CRM_Utils_Type::T_DATE + \\CRM_Utils_Type::T_TIME';

@@ -59,7 +59,7 @@ class JobLog extends \Civi\Core\Entity {
    * @JMS\Type("integer")
    * @ORM\Column(name="id", type="integer", nullable=false, options={"unsigned":true} )
    * @ORM\Id
-   * @ORM\GeneratedValue(strategy="IDENTITY")
+   * @ORM\GeneratedValue(strategy="AUTO")
    */
   private $id;
     
@@ -76,7 +76,7 @@ class JobLog extends \Civi\Core\Entity {
    * @var datetime
    *
    * @JMS\Type("datetime")
-   * @ORM\Column(name="run_time", type="datetime", nullable=true)
+   * @ORM\Column(name="run_time", type="datetime", nullable=true, columnDefinition="TIMESTAMP NULL DEFAULT NULL")
    * 
    */
   private $runTime;

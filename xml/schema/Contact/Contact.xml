@@ -841,7 +841,7 @@
     <type>timestamp</type>
     <comment>When was the contact was created.</comment>
     <required>false</required>
-    <default>NULL</default>
+    <defaultTs>NULL</defaultTs>
     <add>4.3</add>
   </field>
   <field>
