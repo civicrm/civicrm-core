@@ -35,6 +35,7 @@ class RESTTest extends \CiviUnitTestCase {
   private $fixtures;
 
   function setUp() {
+    $this->markTestIncomplete('This test was originally written for Hateoas but then removed. Keeping around as an example for future work.');
     $this->maxWorldRegionID = \CRM_Core_DAO::singleValueQuery('SELECT max(id) FROM civicrm_worldregion');
     $this->fixtures['Middle East'] = array(
       'id' => 3,

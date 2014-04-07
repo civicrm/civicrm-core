@@ -101,7 +101,7 @@ class Container {
 
     $container->setDefinition('civi_api_kernel', new Definition(
       '\Civi\API\Kernel',
-      array(new Reference('dispatcher'), new Reference('magic_function_provider'))
+      array(new Reference('dispatcher'), new Reference('civi_api_registry'), new Reference('annotation_reader'), new Reference('magic_function_provider'))
     ))
       ->setFactoryService(self::SELF)->setFactoryMethod('createApiKernel');
 
@@ -172,13 +172,19 @@ class Container {
 
   /**
    * @param \Symfony\Component\EventDispatcher\EventDispatcher $dispatcher
+   * @param \Civi\API\Registry $apiRegistry
+   * @param \Doctrine\Common\Annotations\Reader $annotationReader
    * @return \Civi\API\Kernel
    */
-  public function createApiKernel($dispatcher, $magicFunctionProvider) {
+  public function createApiKernel($dispatcher, $apiRegistry, $annotationReader, $magicFunctionProvider) {
+    $doctrineCrudProvider = new \Civi\API\Provider\DoctrineCrudProvider($apiRegistry);
+
     $dispatcher->addSubscriber(new \Civi\API\Subscriber\ChainSubscriber());
     $dispatcher->addSubscriber(new \Civi\API\Subscriber\TransactionSubscriber());
     $dispatcher->addSubscriber(new \Civi\API\Subscriber\I18nSubscriber());
     $dispatcher->addSubscriber($magicFunctionProvider);
+    $dispatcher->addSubscriber($doctrineCrudProvider);
+    $dispatcher->addSubscriber(new \Civi\API\Subscriber\AnnotationPermissionCheck($annotationReader));
     $dispatcher->addSubscriber(new \Civi\API\Subscriber\PermissionCheck());
     $dispatcher->addSubscriber(new \Civi\API\Subscriber\APIv3SchemaAdapter());
     $dispatcher->addSubscriber(new \Civi\API\Subscriber\WrapperAdapter(array(
@@ -196,6 +202,7 @@ class Container {
     $kernel->setApiProviders(array(
       $reflectionProvider,
       $magicFunctionProvider,
+      $doctrineCrudProvider,
     ));
 
     return $kernel;
