@@ -115,8 +115,6 @@ class WebTest_Member_OnlineAutoRenewMembershipGCTest extends CiviSeleniumTestCas
       $this->type("duration_interval", "1");
       $this->select("duration_unit", "label=year");
 
-      //wait for the auto-complete member_of_contact to populate
-      $this->waitForValue('member_of_contact', '::');
 
       $this->click("_qf_MembershipType_upload-bottom");
       $this->waitForPageToLoad($this->getTimeoutMsec());
@@ -129,8 +127,6 @@ class WebTest_Member_OnlineAutoRenewMembershipGCTest extends CiviSeleniumTestCas
       $this->type("duration_interval", "1");
       $this->select("duration_unit", "label=year");
 
-      //wait for the auto-complete member_of_contact to populate
-      $this->waitForValue('member_of_contact', '::');
 
       $this->click("_qf_MembershipType_upload-bottom");
       $this->waitForPageToLoad($this->getTimeoutMsec());
@@ -174,7 +170,7 @@ class WebTest_Member_OnlineAutoRenewMembershipGCTest extends CiviSeleniumTestCas
       );
 
       //make sure we do have required permissions.
-      $permissions = array("edit-1-make-online-contributions");
+      $permissions = array("edit-1-make-online-contributions", "edit-1-profile-listings-and-forms");
       $this->changePermissions($permissions);
 
       // now logout and do membership test that way
