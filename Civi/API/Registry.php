@@ -1,6 +1,9 @@
 <?php
 namespace Civi\API;
 
+/**
+ * A registry of API-enabled Doctrine entities
+ */
 class Registry {
   /**
    * @var array (string $name => string $className)
@@ -56,6 +59,13 @@ class Registry {
       $this->names[$anno->name] = $class;
       $this->slugs[$anno->slug] = $class;
     }
+  }
+
+  /**
+   * @return array<string>
+   */
+  public function getNames() {
+    return array_keys($this->names);
   }
 
   /**

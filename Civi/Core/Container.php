@@ -78,6 +78,12 @@ class Container {
     ))
       ->setFactoryService(self::SELF)->setFactoryMethod('createEntityManager');
 
+    $container->setDefinition('dispatcher', new Definition(
+      '\Symfony\Component\EventDispatcher\EventDispatcher',
+      array()
+    ))
+      ->setFactoryService(self::SELF)->setFactoryMethod('createEventDispatcher');
+
     $container->setDefinition('civi_api_registry', new Definition(
       '\Civi\API\Registry',
       array(new Reference('doctrine_configuration'), new Reference('annotation_reader'))
@@ -87,6 +93,17 @@ class Container {
       '\Civi\API\Security',
       array(new Reference('annotation_reader'))
     ));
+
+    $container->setDefinition('magic_function_provider', new Definition(
+      '\Civi\API\Provider\MagicFunctionProvider',
+      array()
+    ));
+
+    $container->setDefinition('civi_api_kernel', new Definition(
+      '\Civi\API\Kernel',
+      array(new Reference('dispatcher'), new Reference('civi_api_registry'), new Reference('annotation_reader'), new Reference('magic_function_provider'))
+    ))
+      ->setFactoryService(self::SELF)->setFactoryMethod('createApiKernel');
 
     return $container;
   }
@@ -143,5 +160,51 @@ class Container {
     $dbSettings = new \CRM_DB_Settings();
     $em = EntityManager::create($dbSettings->toDoctrineArray(), $config);
     return $em;
+  }
+
+  /**
+   * @return \Symfony\Component\EventDispatcher\EventDispatcher
+   */
+  public function createEventDispatcher() {
+    $dispatcher = new \Symfony\Component\EventDispatcher\EventDispatcher();
+    return $dispatcher;
+  }
+
+  /**
+   * @param \Symfony\Component\EventDispatcher\EventDispatcher $dispatcher
+   * @param \Civi\API\Registry $apiRegistry
+   * @param \Doctrine\Common\Annotations\Reader $annotationReader
+   * @return \Civi\API\Kernel
+   */
+  public function createApiKernel($dispatcher, $apiRegistry, $annotationReader, $magicFunctionProvider) {
+    $doctrineCrudProvider = new \Civi\API\Provider\DoctrineCrudProvider($apiRegistry);
+
+    $dispatcher->addSubscriber(new \Civi\API\Subscriber\ChainSubscriber());
+    $dispatcher->addSubscriber(new \Civi\API\Subscriber\TransactionSubscriber());
+    $dispatcher->addSubscriber(new \Civi\API\Subscriber\I18nSubscriber());
+    $dispatcher->addSubscriber($magicFunctionProvider);
+    $dispatcher->addSubscriber($doctrineCrudProvider);
+    $dispatcher->addSubscriber(new \Civi\API\Subscriber\AnnotationPermissionCheck($annotationReader));
+    $dispatcher->addSubscriber(new \Civi\API\Subscriber\PermissionCheck());
+    $dispatcher->addSubscriber(new \Civi\API\Subscriber\APIv3SchemaAdapter());
+    $dispatcher->addSubscriber(new \Civi\API\Subscriber\WrapperAdapter(array(
+      \CRM_Utils_API_HTMLInputCoder::singleton(),
+      \CRM_Utils_API_NullOutputCoder::singleton(),
+      \CRM_Utils_API_ReloadOption::singleton(),
+      \CRM_Utils_API_MatchOption::singleton(),
+    )));
+    $dispatcher->addSubscriber(new \Civi\API\Subscriber\XDebugSubscriber());
+    $kernel = new \Civi\API\Kernel($dispatcher);
+
+    $reflectionProvider = new \Civi\API\Provider\ReflectionProvider($kernel);
+    $dispatcher->addSubscriber($reflectionProvider);
+
+    $kernel->setApiProviders(array(
+      $reflectionProvider,
+      $magicFunctionProvider,
+      $doctrineCrudProvider,
+    ));
+
+    return $kernel;
   }
 }
