@@ -596,8 +596,10 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
       $form->add('hidden', 'priceSetId', $form->_priceSetId);
 
       foreach ($form->_feeBlock as $field) {
+        // public AND admin visibility fields are included for back-office registration and back-office change selections
         if (CRM_Utils_Array::value('visibility', $field) == 'public' ||
-          $className == 'CRM_Event_Form_Participant'
+          $className == 'CRM_Event_Form_Participant' ||
+          $className == 'CRM_Event_Form_ParticipantFeeSelection'
         ) {
           $fieldId = $field['id'];
           $elementName = 'price_' . $fieldId;
