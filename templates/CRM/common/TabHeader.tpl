@@ -29,7 +29,7 @@
 
 {* enclose all tabs and its content in a block *}
 <div class="crm-block crm-content-block">
-  {if $tabHeader and count($tabHeader) gt 1}
+  {if $tabHeader and count($tabHeader)}
     <div id="mainTabContainer">
     <ul>
        {foreach from=$tabHeader key=tabName item=tabValue}
