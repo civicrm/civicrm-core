@@ -43,7 +43,10 @@
       'change .crm-profile-selector-select select': 'onChangeUfGroupId',
       'click .crm-profile-selector-edit': 'doEdit',
       'click .crm-profile-selector-copy': 'doCopy',
-      'click .crm-profile-selector-create': 'doCreate'
+      'click .crm-profile-selector-create': 'doCreate',
+      // prevent interaction with preview form
+      'click .crm-profile-selector-preview-pane': false,
+      'crmLoad .crm-profile-selector-preview-pane': 'disableForm'
     },
     /** @var Marionette.View which specifically builds on jQuery-UI's dialog */
     activeDialog: null,
@@ -79,32 +82,17 @@
     },
     doPreview: function() {
       var $pane = this.$('.crm-profile-selector-preview-pane');
-
       if (!this.hasUfGroupId()) {
         $pane.html($('#profile_selector_empty_preview_template').html());
-        return;
+      } else {
+        CRM.loadPage(CRM.url("civicrm/ajax/inline", {class_name: 'CRM_UF_Form_Inline_PreviewById', id: this.getUfGroupId()}), {target: $pane});
       }
-
-      $pane.block({message: ts('Loading...'), theme: true});
-      $.ajax({
-        url: CRM.url("civicrm/ajax/inline"),
-        type: 'GET',
-        data: {
-          class_name: 'CRM_UF_Form_Inline_PreviewById',
-          id: this.getUfGroupId(),
-          snippet: 4
-        }
-      }).done(function(data) {
-        $pane
-          .unblock()
-          .html(data)
-          .click(function() {
-            return false; // disable buttons
-          });
-      });
-      return false;
     },
-    doEdit: function() {
+    disableForm: function() {
+      this.$(':input', '.crm-profile-selector-preview-pane').prop('readOnly', true);
+    },
+    doEdit: function(e) {
+      e.preventDefault();
       var profileSelectorView = this;
       var designerDialog = new CRM.Designer.DesignerDialog({
         findCreateUfGroupModel: function(options) {
@@ -123,9 +111,9 @@
       });
       CRM.designerApp.vent.on('ufSaved', this.onSave, this);
       this.setDialog(designerDialog);
-      return false;
     },
-    doCopy: function() {
+    doCopy: function(e) {
+      e.preventDefault();
       // This is largely the same as doEdit, but we ultimately pass in a deepCopy of the ufGroupModel.
       var profileSelectorView = this;
       var designerDialog = new CRM.Designer.DesignerDialog({
@@ -145,9 +133,9 @@
       });
       CRM.designerApp.vent.on('ufSaved', this.onSave, this);
       this.setDialog(designerDialog);
-      return false;
     },
-    doCreate: function() {
+    doCreate: function(e) {
+      e.preventDefault();
       var profileSelectorView = this;
       var designerDialog = new CRM.Designer.DesignerDialog({
         findCreateUfGroupModel: function(options) {
@@ -159,7 +147,6 @@
       });
       CRM.designerApp.vent.on('ufSaved', this.onSave, this);
       this.setDialog(designerDialog);
-      return false;
     },
     onSave: function() {
       CRM.designerApp.vent.off('ufSaved', this.onSave, this);
