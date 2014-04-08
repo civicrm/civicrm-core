@@ -137,6 +137,10 @@ WHERE      e.id = %1
         $class = strtolower(basename(CRM_Utils_Array::value('action', $attributes)));
         break;
 
+      case 'EventInfo':
+        $class = 'settings';
+        break;
+
       case 'ScheduleReminders':
         $class = 'reminder';
         $new = !empty($_GET['new']) ? '&new=1' : '';
