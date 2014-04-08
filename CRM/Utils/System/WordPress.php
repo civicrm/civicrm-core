@@ -336,7 +336,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
           return $script . '?' . $query . $pageID . $fragment;
         }
         else {
-          return $base . $script . '?' . $query . $pageID . $fragment;
+          return $base . '?' . $query . $pageID . $fragment;
         }
       }
       else {
