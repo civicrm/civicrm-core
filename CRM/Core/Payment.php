@@ -367,7 +367,7 @@ INNER JOIN civicrm_contribution con ON ( con.contribution_recur_id = rec.id )
    */
   static function allowBackofficeCreditCard($template = NULL, $variableName = 'newCredit') {
     $newCredit = FALSE;
-    // restrict to type=2 (credit card) payment processor payment_types and only include billing mode types 1 and 3
+    // restrict to type=1 (credit card) payment processor payment_types and only include billing mode types 1 and 3
     $processors = CRM_Core_PseudoConstant::paymentProcessor(FALSE, FALSE,
       "billing_mode IN ( 1, 3 ) AND payment_type = 1"
     );
