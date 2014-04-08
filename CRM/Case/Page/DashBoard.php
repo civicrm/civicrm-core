@@ -98,7 +98,6 @@ class CRM_Case_Page_DashBoard extends CRM_Core_Page {
     if (!empty($recent)) {
       $this->assign('recentCases', $recent);
     }
-    $this->assign('includeWysiwygEditor', TRUE);
   }
 
   /**

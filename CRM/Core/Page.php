@@ -235,6 +235,7 @@ class CRM_Core_Page {
       CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'ajaxPopupsEnabled', NULL, TRUE))
     {
       CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'js/crm.livePage.js');
+      $this->assign('includeWysiwygEditor', TRUE);
     }
 
     $content = self::$_template->fetch('CRM/common/' . strtolower($config->userFramework) . '.tpl');
