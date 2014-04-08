@@ -54,6 +54,9 @@
             <td class="label">{$form.replyTo.label}</td><td>{$form.replyTo.html}<br />
             <span class="description">{ts}Check to enable Reply To functionality for CiviMail.{/ts}</span></td>
         </tr>
+        <tr class="crm-mail-form-block-hash">
+            <td class="label">{$form.mailerHash.label}</td><td>{$form.mailerHash.html}<br />
+        </tr>
       </table>
 <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
 <div class="spacer"></div>

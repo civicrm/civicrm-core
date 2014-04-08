@@ -432,8 +432,12 @@ class CRM_Utils_Token {
         break;
 
       case 'viewUrl':
+        $mailingKey = $mailing->id;
+        if ($hash = CRM_Mailing_BAO_Mailing::getMailingHash($mailingKey)) {
+          $mailingKey = $hash;
+        }
         $value = CRM_Utils_System::url('civicrm/mailing/view',
-          "reset=1&id={$mailing->id}",
+          "reset=1&id={$mailingKey}",
           TRUE, NULL, FALSE, TRUE
         );
         break;

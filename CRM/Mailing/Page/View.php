@@ -96,8 +96,28 @@ class CRM_Mailing_Page_View extends CRM_Core_Page {
       $this->_contactID = $session->get('userID');
     }
 
-    $this->_mailing = new CRM_Mailing_BAO_Mailing();
-    $this->_mailing->id = $this->_mailingID;
+    // mailing key check
+    $mailerHash = CRM_Core_Config::singleton()->mailerHash;
+    if ($mailerHash) {
+      $this->_mailing = new CRM_Mailing_BAO_Mailing();
+
+      if (!is_numeric($this->_mailingID)) {
+        $this->_mailing->hash = $this->_mailingID;
+      }
+      elseif (is_numeric($this->_mailingID)) {
+        $this->_mailing->id = $this->_mailingID;
+        // if mailing is present and associated hash is present
+        // while 'hash' is not been used for mailing view : throw 'permissionDenied'
+        if ($this->_mailing->find(TRUE) && $this->_mailing->hash) {
+          CRM_Utils_System::permissionDenied();
+          return;
+        }
+      }
+    }
+    else {
+      $this->_mailing = new CRM_Mailing_BAO_Mailing();
+      $this->_mailing->id = $this->_mailingID;
+    }
 
     if (!$this->_mailing->find(TRUE) ||
       !$this->checkPermission()

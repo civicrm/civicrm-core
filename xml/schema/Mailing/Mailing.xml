@@ -355,4 +355,17 @@
        <onDelete>SET NULL</onDelete>
        <add>4.2</add>
   </foreignKey>
+  <field>
+      <name>hash</name>
+      <title>Mailing Hash</title>
+      <type>varchar</type>
+      <length>16</length>
+      <comment>Key for validating requests related to this mailing.</comment>
+      <add>4.5</add>
+  </field>
+  <index>
+       <name>index_hash</name>
+       <fieldName>hash</fieldName>
+       <add>4.5</add>
+  </index>
 </table>
