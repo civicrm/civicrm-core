@@ -483,13 +483,13 @@ class CRM_Core_Invoke {
     $config = CRM_Core_Config::singleton();
     $config->clearModuleList();
 
+    // also cleanup all caches
+    $config->cleanupCaches($sessionReset || CRM_Utils_Request::retrieve('sessionReset', 'Boolean', CRM_Core_DAO::$_nullObject, FALSE, 0, 'GET'));
+
     CRM_Core_Menu::store();
 
     // also reset navigation
     CRM_Core_BAO_Navigation::resetNavigation();
-
-    // also cleanup all caches
-    $config->cleanupCaches($sessionReset || CRM_Utils_Request::retrieve('sessionReset', 'Boolean', CRM_Core_DAO::$_nullObject, FALSE, 0, 'GET'));
 
     // also cleanup module permissions
     $config->cleanupPermissions();
