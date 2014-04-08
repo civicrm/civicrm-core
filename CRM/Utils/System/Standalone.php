@@ -2,7 +2,7 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 3.1                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2010                                |
  +--------------------------------------------------------------------+
@@ -49,87 +49,87 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
     $this->is_drupal = FALSE;
   }
 
-    /**
-     * sets the title of the page
-     *
-     * @param string $title
-     * @paqram string $pageTitle
-     *
-     * @return void
-     * @access public
-     */
-    function setTitle( $title, $pageTitle = null ) {
-        if ( ! $pageTitle ) {
-            $pageTitle = $title;
-        }
-        
-        $template = CRM_Core_Smarty::singleton( );
-        $template->assign( 'pageTitle', $pageTitle );
-        $template->assign( 'docTitle',  $title );
-        // Add jQuery and other resources
-        CRM_Core_Resources::singleton()
-          ->addCoreResources();
-        return;
+  /**
+   * sets the title of the page
+   *
+   * @param string $title
+   * @paqram string $pageTitle
+   *
+   * @return void
+   * @access public
+   */
+  function setTitle( $title, $pageTitle = null ) {
+    if ( ! $pageTitle ) {
+      $pageTitle = $title;
     }
 
-    /**
-     * Append an additional breadcrumb tag to the existing breadcrumb
-     *
-     * @param string $title
-     * @param string $url   
-     *
-     * @return void
-     * @access public
-     * @static
-     */
-    static function appendBreadCrumb( $breadCrumbs ) {
-        $template = CRM_Core_Smarty::singleton( );
-        $bc = $template->get_template_vars( 'breadcrumb' );
+    $template = CRM_Core_Smarty::singleton( );
+    $template->assign( 'pageTitle', $pageTitle );
+    $template->assign( 'docTitle',  $title );
+    // Add jQuery and other resources
+    CRM_Core_Resources::singleton()
+      ->addCoreResources();
+    return;
+  }
 
-        if ( is_array( $breadCrumbs ) ) {
-            foreach ( $breadCrumbs as $crumbs ) {
-                if ( stripos($crumbs['url'], 'id%%') ) {
-                    $args = array( 'cid', 'mid' );
-                    foreach ( $args as $a ) {
-                        $val  = CRM_Utils_Request::retrieve( $a, 'Positive', CRM_Core_DAO::$_nullObject,
-                                                             false, null, $_GET );
-                        if ( $val ) {
-                            $crumbs['url'] = str_ireplace( "%%{$a}%%", $val, $crumbs['url'] );
-                        }
-                    }
-                }
-                $bc[] = $crumbs;
+  /**
+   * Append an additional breadcrumb tag to the existing breadcrumb
+   *
+   * @param string $title
+   * @param string $url   
+   *
+   * @return void
+   * @access public
+   * @static
+   */
+  static function appendBreadCrumb( $breadCrumbs ) {
+    $template = CRM_Core_Smarty::singleton( );
+    $bc = $template->get_template_vars( 'breadcrumb' );
+
+    if ( is_array( $breadCrumbs ) ) {
+      foreach ( $breadCrumbs as $crumbs ) {
+        if ( stripos($crumbs['url'], 'id%%') ) {
+          $args = array( 'cid', 'mid' );
+          foreach ( $args as $a ) {
+            $val  = CRM_Utils_Request::retrieve( $a, 'Positive', CRM_Core_DAO::$_nullObject,
+                                                 false, null, $_GET );
+            if ( $val ) {
+              $crumbs['url'] = str_ireplace( "%%{$a}%%", $val, $crumbs['url'] );
             }
+          }
         }
-        $template->assign_by_ref( 'breadcrumb', $bc );
-        return;
+        $bc[] = $crumbs;
+      }
     }
+    $template->assign_by_ref( 'breadcrumb', $bc );
+    return;
+  }
 
-    /**
-     * Reset an additional breadcrumb tag to the existing breadcrumb
-     *
-     * @return void
-     * @access public
-     * @static
-     */
-    static function resetBreadCrumb( ) {
-        return;
-    }
+  /**
+   * Reset an additional breadcrumb tag to the existing breadcrumb
+   *
+   * @return void
+   * @access public
+   * @static
+   */
+  static function resetBreadCrumb( ) {
+    return;
+  }
 
-    /**
-     * Append a string to the head of the html file
-     *
-     * @param string $head the new string to be appended
-     *
-     * @return void
-     * @access public
-     * @static
-     */
-    static function addHTMLHead( $head ) {
-        $template = CRM_Core_Smarty::singleton( );
-        $template->append( 'pageHTMLHead', $head );
-        return;
-    }
+  /**
+   * Append a string to the head of the html file
+   *
+   * @param string $head the new string to be appended
+   *
+   * @return void
+   * @access public
+   * @static
+   */
+  static function addHTMLHead( $head ) {
+    $template = CRM_Core_Smarty::singleton( );
+    $template->append( 'pageHTMLHead', $head );
+    return;
+  }
 
   /**
    * Add a script file
@@ -196,100 +196,100 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
   }
 
   /**
-     * rewrite various system urls to https 
-     *  
-     * @param null 
-     *
-     * @return void 
-     * @access public  
-     * @static  
-     */  
-    static function mapConfigToSSL( ) {
-        global $base_url;
-        $base_url = str_replace( 'http://', 'https://', $base_url );
+   * rewrite various system urls to https 
+   *  
+   * @param null 
+   *
+   * @return void 
+   * @access public  
+   * @static  
+   */  
+  static function mapConfigToSSL( ) {
+    global $base_url;
+    $base_url = str_replace( 'http://', 'https://', $base_url );
+  }
+
+  /**
+   * figure out the post url for the form
+   *
+   * @param mix $action the default action if one is pre-specified
+   *
+   * @return string the url to post the form
+   * @access public
+   * @static
+   */
+  static function postURL( $action ) {
+    if ( ! empty( $action ) ) {
+      return $action;
+    }
+    if ( isset( $_GET['q'] ) ) {
+      return self::url( $_GET['q'] );
+    } else {
+      return '';
+    }
+  }
+
+  /**
+   * Generate an internal CiviCRM URL (copied from DRUPAL/includes/common.inc#url)
+   *
+   * @param $path     string   The path being linked to, such as "civicrm/add"
+   * @param $query    string   A query string to append to the link.
+   * @param $absolute boolean  Whether to force the output to be an absolute link (beginning with http:).
+   *                           Useful for links that will be displayed outside the site, such as in an
+   *                           RSS feed.
+   * @param $fragment string   A fragment identifier (named anchor) to append to the link.
+   * @param $htmlize  boolean  whether to convert to html equivalent
+   *
+   * @return string            an HTML string containing a link to the given path.
+   * @access public
+   *
+   */
+  function url($path = null, $query = null, $absolute = true, $fragment = null, $htmlize = true ) {
+    $config = CRM_Core_Config::singleton( );
+    $script = ($config->inCiviCRM ? 'index.php' : 'embed.php');
+
+    if (isset($fragment)) {
+      $fragment = '#'. $fragment;
     }
 
-    /**
-     * figure out the post url for the form
-     *
-     * @param mix $action the default action if one is pre-specified
-     *
-     * @return string the url to post the form
-     * @access public
-     * @static
-     */
-    static function postURL( $action ) {
-        if ( ! empty( $action ) ) {
-            return $action;
-        }
-        if ( isset( $_GET['q'] ) ) {
-            return self::url( $_GET['q'] );
+    if ( ! isset( $config->useFrameworkRelativeBase ) ) {
+      $base = parse_url( $config->userFrameworkBaseURL );
+      $config->useFrameworkRelativeBase = $base['path'];
+    }
+    $base = $absolute ? $config->userFrameworkBaseURL : $config->useFrameworkRelativeBase;
+
+    $separator = $htmlize ? '&amp;' : '&';
+
+    if (! $config->cleanURL ) {
+      if ( isset( $path ) ) {
+        if ( isset( $query ) ) {
+          return $base . $script .'?q=' . $path . $separator . $query . $fragment;
         } else {
-            return '';
+          return $base . $script .'?q=' . $path . $fragment;
         }
-    }
-
-    /**
-     * Generate an internal CiviCRM URL (copied from DRUPAL/includes/common.inc#url)
-     *
-     * @param $path     string   The path being linked to, such as "civicrm/add"
-     * @param $query    string   A query string to append to the link.
-     * @param $absolute boolean  Whether to force the output to be an absolute link (beginning with http:).
-     *                           Useful for links that will be displayed outside the site, such as in an
-     *                           RSS feed.
-     * @param $fragment string   A fragment identifier (named anchor) to append to the link.
-     * @param $htmlize  boolean  whether to convert to html equivalent
-     *
-     * @return string            an HTML string containing a link to the given path.
-     * @access public
-     *
-     */
-    function url($path = null, $query = null, $absolute = true, $fragment = null, $htmlize = true ) {
-        $config = CRM_Core_Config::singleton( );
-        $script = ($config->inCiviCRM ? 'index.php' : 'embed.php');
-
-        if (isset($fragment)) {
-            $fragment = '#'. $fragment;
-        }
-
-        if ( ! isset( $config->useFrameworkRelativeBase ) ) {
-            $base = parse_url( $config->userFrameworkBaseURL );
-            $config->useFrameworkRelativeBase = $base['path'];
-        }
-        $base = $absolute ? $config->userFrameworkBaseURL : $config->useFrameworkRelativeBase;
-
-        $separator = $htmlize ? '&amp;' : '&';
-
-        if (! $config->cleanURL ) {
-            if ( isset( $path ) ) {
-                if ( isset( $query ) ) {
-                    return $base . $script .'?q=' . $path . $separator . $query . $fragment;
-                } else {
-                    return $base . $script .'?q=' . $path . $fragment;
-                }
-            } else {
-                if ( isset( $query ) ) {
-                    return $base . $script .'?'. $query . $fragment;
-                } else {
-                    return $base . $fragment;
-                }
-            }
+      } else {
+        if ( isset( $query ) ) {
+          return $base . $script .'?'. $query . $fragment;
         } else {
-            if ( isset( $path ) ) {
-                if ( isset( $query ) ) {
-                    return $base . $path .'?'. $query . $fragment;
-                } else {
-                    return $base . $path . $fragment;
-                }
-            } else {
-                if ( isset( $query ) ) {
-                    return $base . $script .'?'. $query . $fragment;
-                } else {
-                    return $base . $fragment;
-                }
-            }
+          return $base . $fragment;
         }
+      }
+    } else {
+      if ( isset( $path ) ) {
+        if ( isset( $query ) ) {
+          return $base . $path .'?'. $query . $fragment;
+        } else {
+          return $base . $path . $fragment;
+        }
+      } else {
+        if ( isset( $query ) ) {
+          return $base . $script .'?'. $query . $fragment;
+        } else {
+          return $base . $fragment;
+        }
+      }
     }
+  }
 
   /**
    * Eventually we should use OAuth here, since this is mainly
@@ -347,50 +347,50 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
   }
 
   /**
-     * Get the userID (contact_id) for an already-authorized OpenID login
-     *
-     * @param mix $user the user object holding OpenID auth info
-     *
-     * @return void
-     * @access public
-     * @static
-     */
-    static function getUserID( $user ) {
-        require_once 'CRM/Core/BAO/UFMatch.php';
-      
-        // this puts the appropriate values in the session, so
-        // no need to return anything
-        CRM_Core_BAO_UFMatch::synchronize( $user, true, 'Standalone', 'Individual' );
-    }
+   * Get the userID (contact_id) for an already-authorized OpenID login
+   *
+   * @param mix $user the user object holding OpenID auth info
+   *
+   * @return void
+   * @access public
+   * @static
+   */
+  static function getUserID( $user ) {
+    require_once 'CRM/Core/BAO/UFMatch.php';
 
-    /**
-     * Get if the user is allowed to login 
-     *
-     * @param $user the user object holding auth info
-     *
-     * @return boolean
-     * @access public
-     * @static
-     */
-    static function getAllowedToLogin( $user ) {
-        require_once 'CRM/Core/BAO/OpenID.php';
-
-        // this returns true if the user is allowed to log in, false o/w
-        $allow_login = CRM_Core_BAO_OpenID::isAllowedToLogin( $user->identity_url );
-        return $allow_login;
-    }
+    // this puts the appropriate values in the session, so
+    // no need to return anything
+    CRM_Core_BAO_UFMatch::synchronize( $user, true, 'Standalone', 'Individual' );
+  }
 
   /**
-     * Set a message in the UF to display to a user 
-     *   
-     * @param string $message the message to set 
-     *   
-     * @access public   
-     * @static   
-     */   
-    static function setMessage( $message ) {
-    	return;
-    }
+   * Get if the user is allowed to login 
+   *
+   * @param $user the user object holding auth info
+   *
+   * @return boolean
+   * @access public
+   * @static
+   */
+  static function getAllowedToLogin( $user ) {
+    require_once 'CRM/Core/BAO/OpenID.php';
+
+    // this returns true if the user is allowed to log in, false o/w
+    $allow_login = CRM_Core_BAO_OpenID::isAllowedToLogin( $user->identity_url );
+    return $allow_login;
+  }
+
+  /**
+   * Set a message in the UF to display to a user 
+   *   
+   * @param string $message the message to set 
+   *   
+   * @access public   
+   * @static   
+   */   
+  static function setMessage( $message ) {
+    return;
+  }
 
   /**
    * Function to create a user in host CMS
@@ -410,62 +410,64 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
     return TRUE;
   }
 
-  /*
- * Change user name in host CMS
- *
- * @param integer $ufID User ID in CMS
- * @param string $ufName User name
- */
+  /**
+   * Change user name in host CMS
+   *
+   * @param integer $ufID User ID in CMS
+   * @param string $ufName User name
+   */
   function updateCMSName($ufID, $ufName) {
   }
 
-    static function permissionDenied( ) {
-        CRM_Core_Error::fatal( ts( 'You do not have permission to access this page' ) );
-    }
+  static function permissionDenied( ) {
+      CRM_Core_Error::fatal( ts( 'You do not have permission to access this page' ) );
+  }
 
-    static function logout( ) {
-        session_destroy();
-        
-        if (CIVICRM_UF_AUTH == 'SAML20') {
-            require_once 'onelogin/saml.php';
-            require_once 'saml.settings.php';
-            $settings = saml_get_settings();
-            if ($settings->idp_slo_target_url)
-                header("Location:".$settings->idp_slo_target_url);
-        }
-        header("Location: " . (defined('CIVICRM_LOGO_URL')?CIVICRM_LOGO_URL:"http://www.cividesk.com/"));
-    }
+  static function logout( ) {
+    session_destroy();
 
-    /**
-     * Get the locale set in the hosting CMS
-     * @return null  as the language is set elsewhere
-     */
-    static function getUFLocale()
-    {
-        return null;
+    if (CIVICRM_UF_AUTH == 'SAML20') {
+      require_once 'onelogin/saml.php';
+      require_once 'saml.settings.php';
+      $settings = saml_get_settings();
+      if ($settings->idp_slo_target_url)
+        header("Location:".$settings->idp_slo_target_url);
     }
+    header("Location: " . (defined('CIVICRM_LOGO_URL')?CIVICRM_LOGO_URL:"http://www.cividesk.com/"));
+  }
 
-    /* 
-     * load standalone bootstrap
-     *
-     * @param $params array with uid or name and password 
-     * @param $loadUser boolean load cms user?
-     * @param $throwError throw error on failure?
-     */
-    static function loadBootStrap( $params = array( ), $loadUser = true, $throwError = true )
-    {
-        // load BootStrap here if needed
-        return true;
-    }
-    
-    /**
-     * check is user logged in.
-     *
-     * @return boolean true/false.
-     */
-    public function isUserLoggedIn( ) {
-        return false; 
-    }
+  /**
+   * Get the locale set in the hosting CMS
+   * @return null  as the language is set elsewhere
+   */
+  static function getUFLocale()
+  {
+    return null;
+  }
+
+  /**
+   * load standalone bootstrap
+   *
+   * @param $params array with uid or name and password 
+   * @param $loadUser boolean load cms user?
+   * @param $throwError throw error on failure?
+   */
+  static function loadBootStrap( $params = array( ), $loadUser = true, $throwError = true )
+  {
+    // load BootStrap here if needed
+    return true;
+  }
+
+  /**
+   * check is user logged in.
+   *
+   * @return boolean true/false.
+   */
+  public function isUserLoggedIn( ) {
+    $session = CRM_Core_Session::singleton();
+    $userID = $session->get('userID');
+    return (!empty($userID));
+  }
 
   /**
    * Get currently logged in user uf id.
@@ -473,7 +475,8 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
    * @return int logged in user uf id.
    */
   public function getLoggedInUfID() {
-    return NULL;
+    $session = CRM_Core_Session::singleton();
+    return $session->get('ufID');
   }
 
   /**
