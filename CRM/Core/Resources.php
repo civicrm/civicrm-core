@@ -159,6 +159,13 @@ class CRM_Core_Resources {
     if ($translate) {
       $this->translateScript($ext, $file);
     }
+    // Look for non-minified version if we are in debug mode
+    if (CRM_Core_Config::singleton()->debug && strpos($file, '.min.js') !== FALSE) {
+      $nonMiniFile = str_replace('.min.js', '.js', $file);
+      if ($this->getPath($ext, $nonMiniFile)) {
+        $file = $nonMiniFile;
+      }
+    }
     return $this->addScriptUrl($this->getUrl($ext, $file, TRUE), $weight, $region);
   }
 
@@ -563,6 +570,7 @@ class CRM_Core_Resources {
   public function coreResourceList() {
     $config = CRM_Core_Config::singleton();
     // Use minified files for production, uncompressed in debug mode
+    // Note, $this->addScriptFile would automatically search for the non-minified file in debug mode but this is probably faster
     $min = $config->debug ? '' : '.min';
 
     // Scripts needed by everyone, everywhere

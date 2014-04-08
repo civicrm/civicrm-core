@@ -61,9 +61,10 @@
       var designerDialog = this;
       designerDialog.$el.dialog({
         autoOpen: true, // note: affects accordion height
-        title: 'Edit Profile',
+        title: ts('Edit Profile'),
+        modal: true,
         width: '75%',
-        height: 600,
+        height: parseInt($(window).height() *.8, 10),
         minWidth: 500,
         minHeight: 600, // to allow dropping in big whitespace, coordinate with min-height of .crm-designer-fields
         open: function() {
@@ -83,7 +84,7 @@
           // Initialize new dialog if we are not re-opening unsaved changes
           if (designerDialog.undoState === false) {
             designerDialog.designerRegion && designerDialog.designerRegion.close && designerDialog.designerRegion.close();
-            designerDialog.$el.block({message: 'Loading...', theme: true});
+            designerDialog.$el.block();
             designerDialog.options.findCreateUfGroupModel({
               onLoad: function(ufGroupModel) {
                 designerDialog.model = ufGroupModel;
@@ -109,10 +110,10 @@
           designerDialog.undoAlert && designerDialog.undoAlert.close && designerDialog.undoAlert.close();
           if (designerDialog.isUfUnsaved) {
             designerDialog.undoAlert = CRM.alert('<p>' + ts('Your changes to "%1" have not been saved.', {1: designerDialog.model.get('title')}) + '</p><a href="#" class="crm-undo">' + ts('Restore unsaved changes') + '</a>', ts('Unsaved Changes'), 'alert', {expires: 60000});
-            $('.ui-notify-message a.crm-undo').click(function() {
+            $('.ui-notify-message a.crm-undo').click(function(e) {
+              e.preventDefault();
               designerDialog.undoState = true;
               designerDialog.$el.dialog('open');
-              return false;
             });
           }
           // CRM-12188
@@ -206,7 +207,8 @@
         this.$('.crm-designer-save').removeAttr('style').prop('disabled', false);
       }
     },
-    doSave: function(event) {
+    doSave: function(e) {
+      e.preentDefault();
       var ufGroupModel = this.model;
       if (ufGroupModel.getRel('ufFieldCollection').hasDuplicates()) {
         CRM.alert(ts('Please correct errors before saving.'), '', 'alert');
@@ -240,9 +242,9 @@
           }
         }
       });
-      return false;
     },
-    doPreview: function(event) {
+    doPreview: function(e) {
+      e.preventDefault();
       this.previewMode = !this.previewMode;
       if (!this.previewMode) {
         $('.crm-designer-preview-canvas').html('');
@@ -258,25 +260,20 @@
       $dialog.block({message: 'Loading...', theme: true});
       // CRM-12188
       CRM.designerApp.clearPreviewArea();
-      $.ajax({
-        url: CRM.url("civicrm/ajax/inline"),
-        type: 'POST',
-        data: {
-          'qfKey': CRM.profilePreviewKey,
-          'class_name': 'CRM_UF_Form_Inline_Preview',
-          'snippet': 1,
-          'ufData': JSON.stringify({
-            ufGroup: this.model.toStrictJSON(),
-            ufFieldCollection: this.model.getRel('ufFieldCollection').toSortedJSON()
-          })
-        }
+      $.post(CRM.url("civicrm/ajax/inline"), {
+        'qfKey': CRM.profilePreviewKey,
+        'class_name': 'CRM_UF_Form_Inline_Preview',
+        'snippet': 1,
+        'ufData': JSON.stringify({
+          ufGroup: this.model.toStrictJSON(),
+          ufFieldCollection: this.model.getRel('ufFieldCollection').toSortedJSON()
+        })
       }).done(function(data) {
         $dialog.unblock();
         $('.crm-designer-canvas > *, .crm-designer-palette-region').hide();
-        $('.crm-designer-preview-canvas').html(data).show();
+        $('.crm-designer-preview-canvas').html(data).show().trigger('crmLoad').find(':input').prop('readOnly', true);
         $('.crm-designer-preview span').html(ts('Edit'));
       });
-      return false;
     }
   });
 
@@ -403,8 +400,10 @@
       var div = this.$('.crm-designer-palette-tree').closest('.crm-container').height();
       this.$('.crm-designer-palette-tree').css({height: div - pos.top});
     },
-    doSearch: function(event) {
-      $('.crm-designer-palette-tree').jstree("search", $(event.target).val());
+    doSearch: function(e) {
+      var str = $(e.target).val();
+      this.$('.crm-designer-palette-clear-search').css('visibility', str ? 'visible' : 'hidden');
+      this.$('.crm-designer-palette-tree').jstree("search", str);
     },
     doSetPaletteEntity: function(event) {
       this.selectedContactType = $('.crm-contact-types :selected').val();
@@ -424,10 +423,11 @@
       paletteFieldModel.addToUFCollection(this.model.getRel('ufFieldCollection'));
       event.stopPropagation();
     },
-    doNewCustomFieldDialog: function(event) {
+    doNewCustomFieldDialog: function(e) {
+      e.preventDefault();
       var paletteView = this;
-      var entityKey = $(event.currentTarget).closest('.crm-designer-palette-section').attr('data-entity');
-      var sectionKey = $(event.currentTarget).closest('.crm-designer-palette-section').attr('data-section');
+      var entityKey = $(e.currentTarget).closest('.crm-designer-palette-section').attr('data-entity');
+      var sectionKey = $(e.currentTarget).closest('.crm-designer-palette-section').attr('data-section');
       var ufEntityModel = paletteView.model.getRel('ufEntityCollection').getByName(entityKey);
       var sections = ufEntityModel.getSections();
       var url = CRM.url('civicrm/admin/custom/group/field/add', {
@@ -438,9 +438,9 @@
       CRM.loadForm(url).on('crmFormSuccess', function(e, data) {
         paletteView.doRefresh('custom_' + data.id);
       });
-      return false;
     },
-    doNewCustomSetDialog: function(event) {
+    doNewCustomSetDialog: function(e) {
+      e.preventDefault();
       var paletteView = this;
       var url = CRM.url('civicrm/admin/custom/group', 'action=add&reset=1');
       // Create custom field set and automatically go to next step (create fields) after save button is clicked.
@@ -450,7 +450,6 @@
           data.customField && ($(this).data('civiCrmSnippet').options.crmForm.refreshAction = ['next_new']);
           paletteView.doRefresh(data.customField ? 'custom_' + data.id : null);
         });
-      return false;
     },
     doRefresh: function(fieldToAdd) {
       var ufGroupModel = this.model;
@@ -467,9 +466,9 @@
           CRM.alert(ts('Failed to retrieve schema'), ts('Error'), 'error');
         });
     },
-    clearSearch: function(event) {
+    clearSearch: function(e) {
+      e.preventDefault();
       $('.crm-designer-palette-search input').val('').keyup();
-      return false;
     },
     toggleActive: function(ufFieldModel, ufFieldCollection, options) {
       var paletteFieldCollection = this.model.getRel('paletteFieldCollection');
@@ -479,11 +478,11 @@
         this.$('[data-plm-cid='+paletteFieldModel.cid+']').toggleClass('disabled', !isAddable);
       }
     },
-    toggleAll: function(event) {
+    toggleAll: function(e) {
       if ($('.crm-designer-palette-search input').val() == '') {
-        $('.crm-designer-palette-tree').jstree($(event.target).attr('rel'));
+        $('.crm-designer-palette-tree').jstree($(e.target).attr('rel'));
       }
-      return false;
+      e.preventDefault();
     },
     getOpenTreeNodes: function() {
       var paletteView = this;
@@ -661,7 +660,8 @@
         }
       }
     },
-    doEditCustomField: function() {
+    doEditCustomField: function(e) {
+      e.preventDefault();
       var url = CRM.url('civicrm/admin/custom/group/field/update', {
         action: 'update',
         reset: 1,
@@ -676,17 +676,15 @@
             var buttons = {};
             buttons[$link.text()] = function() {
               var form2 = CRM.loadForm($link.attr('href'), {
-                openInline: 'a.action-item:not([href="#"])',
                 dialog: {
                   width: '60%',
                   height: '70%'
                 }
               });
-            }
+            };
             $(this).dialog('option', 'buttons', buttons);
           }
-        })
-      return false;
+        });
     },
     onChangeIsDuplicate: function(model, value, options) {
       this.$el.toggleClass('crm-designer-duplicate', value);
