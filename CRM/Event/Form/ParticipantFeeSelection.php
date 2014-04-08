@@ -54,7 +54,7 @@ class CRM_Event_Form_ParticipantFeeSelection extends CRM_Core_Form {
 
   protected $fromEmailId = NULL;
 
-  protected $_eventId = NULL;
+  public $_eventId = NULL;
 
   public $_action = NULL;
 
