@@ -247,7 +247,6 @@ class CRM_Admin_Page_Options extends CRM_Core_Page_Basic {
         $optionValue[$key]['financial_account'] = CRM_Financial_BAO_FinancialTypeAccount::getFinancialAccount($key, 'civicrm_option_value');
       }
     }
-    $this->assign('includeWysiwygEditor', TRUE);
     $this->assign('rows', $optionValue);
   }
 
