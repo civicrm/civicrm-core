@@ -45,6 +45,8 @@ class WebTest_Contribute_AddBatchesTest extends CiviSeleniumTestCase {
     $this->type("total", 500);
     $this->click("_qf_Batch_next");
     $this->waitForPageToLoad($this->getTimeoutMsec());
+    $softCreditTypes = CRM_Core_OptionGroup::values("soft_credit_type", FALSE);
+    $softCreditAmount = array(1 => 50, 2 => 60, 3 => 40, 4 => 70, 5 => 35);
     // Add Contact Details
     $data = array();
     for ($i = 1; $i <= $itemCount; $i++) {
@@ -53,6 +55,10 @@ class WebTest_Contribute_AddBatchesTest extends CiviSeleniumTestCase {
         'last_name' => 'An' . substr(sha1(rand()), 0, 7),
         'financial_type' => 'Donation',
         'amount' => 100,
+        'soft_credit_first_name' => 'Ar' . substr(sha1(rand()), 0, 7),
+        'soft_credit_last_name' => 'Ki' . substr(sha1(rand()), 0, 7),
+        'soft_credit_amount' => $softCreditAmount[$i],
+        'soft_credit_type' => $softCreditTypes[$i],
 
       );
       $this->_fillData($data[$i], $i, "Contribution");
@@ -66,6 +72,8 @@ class WebTest_Contribute_AddBatchesTest extends CiviSeleniumTestCase {
   function testBatchAddMembership() {
     $this->webtestLogin();
     $itemCount = 5;
+    $softCreditTypes = CRM_Core_OptionGroup::values("soft_credit_type", FALSE);
+    $softCreditAmount = array(1 => 50, 2 => 60, 3 => 40, 4 => 70, 5 => 35);
     // create contact
     $contact = array();
     $batchTitle = 'Batch-' . substr(sha1(rand()), 0, 7);
@@ -91,6 +99,10 @@ class WebTest_Contribute_AddBatchesTest extends CiviSeleniumTestCase {
         'membership_type' => 'General',
         'amount' => 100,
         'financial_type' => 'Member Dues',
+        'soft_credit_first_name' => 'Ar' . substr(sha1(rand()), 0, 7),
+        'soft_credit_last_name' => 'Ki' . substr(sha1(rand()), 0, 7),
+        'soft_credit_amount' => $softCreditAmount[$i],
+        'soft_credit_type' => $softCreditTypes[$i],
       );
       $this->_fillData($data[$i], $i, "Membership");
     }
@@ -103,7 +115,7 @@ class WebTest_Contribute_AddBatchesTest extends CiviSeleniumTestCase {
   function _fillData($data, $row, $type) {
     $email = $data['first_name'] . '@example.com';
     $this->webtestNewDialogContact($data['first_name'], $data['last_name'], $email, 4,
-      "primary_profiles_{$row}", $row, 'primary');
+      "s2id_primary_contact_id_{$row}", $row, 'primary');
 
     if ($type == "Contribution") {
       $this->select("field_{$row}_financial_type", $data['financial_type']);
@@ -115,6 +127,16 @@ class WebTest_Contribute_AddBatchesTest extends CiviSeleniumTestCase {
       $this->click("field[{$row}][send_receipt]");
       $this->click("field_{$row}_invoice_id");
       $this->type("field_{$row}_invoice_id", substr(sha1(rand()), 0, 10));
+      $softcreditemail = $data['soft_credit_first_name'] . '@example.com';
+      $this->webtestNewDialogContact($data['soft_credit_first_name'],
+        $data['soft_credit_last_name'],
+        $softcreditemail, 4,
+        "s2id_soft_credit_contact_id_{$row}",
+        $row,
+        'soft_credit'
+      );
+      $this->type("soft_credit_amount_{$row}", $data['soft_credit_amount']);
+      $this->select("field_{$row}_soft_credit_type", $data['soft_credit_type']);
 
     }
     elseif ($type == "Membership") {
@@ -131,6 +153,14 @@ class WebTest_Contribute_AddBatchesTest extends CiviSeleniumTestCase {
       $this->select("field_{$row}_payment_instrument", "Check");
       $this->type("field_{$row}_check_number", rand());
       $this->select("field_{$row}_contribution_status_id", "Completed");
+      $softcreditemail = $data['soft_credit_first_name'] . '@example.com';
+      $this->webtestNewDialogContact($data['soft_credit_first_name'],
+        $data['soft_credit_last_name'],
+        $softcreditemail, 4,
+        "s2id_soft_credit_contact_id_{$row}",
+        $row, 'soft_credit'
+      );
+      $this->type("soft_credit_amount_{$row}", $data['soft_credit_amount']);
     }
   }
 
@@ -139,7 +169,7 @@ class WebTest_Contribute_AddBatchesTest extends CiviSeleniumTestCase {
       $this->openCiviPage("contribute/search", "reset=1", "contribution_date_low");
       $this->type("sort_name", "{$data['first_name']} {$data['last_name']}");
       $this->clickLink("_qf_Search_refresh", "xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']");
-      $this->clickLink("xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']", "_qf_ContributionView_cancel-bottom");
+      $this->clickLink("xpath=//div[@id='contributionSearch']//table//tbody/tr[1]/td[11]/span/a[text()='View']", "_qf_ContributionView_cancel-bottom", FALSE);
       $expected = array(
         'From' => "{$data['first_name']} {$data['last_name']}",
         'Financial Type' => $data['financial_type'],
@@ -148,6 +178,14 @@ class WebTest_Contribute_AddBatchesTest extends CiviSeleniumTestCase {
       );
 
       $this->webtestVerifyTabularData($expected);
+      $expectedSoft = array(
+        'Soft Credit To' => "{$data['soft_credit_first_name']} {$data['soft_credit_last_name']}",
+        'Amount (Soft Credit Type)' => $data['soft_credit_amount'],
+        'Soft Credit Type' => $data['soft_credit_type'],
+      );
+      foreach ($expectedSoft as $value) {
+        $this->verifyText("css=table.crm-soft-credit-listing", preg_quote($value));
+      }
     }
     elseif ($type == "Membership") {
       $this->openCiviPage("member/search", "reset=1", "member_join_date_low");
@@ -176,6 +214,13 @@ class WebTest_Contribute_AddBatchesTest extends CiviSeleniumTestCase {
       );
 
       $this->webtestVerifyTabularData($expected);
+      $expectedSoft = array(
+        'Soft Credit To' => "{$data['soft_credit_first_name']} {$data['soft_credit_last_name']}",
+        'Amount (Soft Credit Type)' => $data['soft_credit_amount'],
+      );
+      foreach ($expectedSoft as $value) {
+        $this->verifyText("css=table.crm-soft-credit-listing", preg_quote($value));
+      }
     }
   }
 
