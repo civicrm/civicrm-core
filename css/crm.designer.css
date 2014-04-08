@@ -244,6 +244,6 @@ button#crm-designer-add-custom-set {
 }
 
 /* Hide annoying 'preview' message */
-.crm-profile-selector-preview-pane > div.messages.status.info {
+.crm-profile-selector-preview-pane div.profile-preview-msg {
   display: none;
 }
