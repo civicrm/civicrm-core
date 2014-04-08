@@ -655,9 +655,6 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
           $greeting = $property . '_display';
           $row[$property] = $result->$greeting;
         }
-        elseif ($property == 'state_province') {
-          $row[$property] = $result->state_province_name;
-        }
         elseif (isset($pseudoconstants[$property])) {
           $row[$property] = CRM_Utils_Array::value(
             $result->{$pseudoconstants[$property]['dbName']},
