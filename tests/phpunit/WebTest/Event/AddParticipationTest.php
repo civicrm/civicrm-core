@@ -71,7 +71,7 @@ class WebTest_Event_AddParticipationTest extends CiviSeleniumTestCase {
     // Select an event fee
     $this->waitForElementPresent('priceset');
 
-    $this->click("xpath=//input[@class='form-radio']");
+    $this->click("xpath=//input[@class='crm-form-radio']");
 
     // Enter amount to be paid (note: this should default to selected fee level amount, s/b fixed during 3.2 cycle)
     $this->type('total_amount', '800');
@@ -91,9 +91,9 @@ class WebTest_Event_AddParticipationTest extends CiviSeleniumTestCase {
     // Is status message correct?
     $this->waitForText('crm-notification-container', "Event registration for $displayName has been added");
 
-    $this->waitForElementPresent("xpath=//div[@id='Events']//table//tbody/tr[1]/td[8]/span/a[text()='View']");
+    $this->waitForElementPresent("xpath=//*[@id='Search']//table/tbody/tr[1]/td[8]/span/a[text()='View']");
     //click through to the participant view screen
-    $this->click("xpath=//div[@id='Events']//table//tbody/tr[1]/td[8]/span/a[text()='View']");
+    $this->click("xpath=//*[@id='Search']//table/tbody/tr[1]/td[8]/span/a[text()='View']");
     $this->waitForElementPresent('_qf_ParticipantView_cancel-bottom');
 
     $this->webtestVerifyTabularData(
@@ -102,12 +102,12 @@ class WebTest_Event_AddParticipationTest extends CiviSeleniumTestCase {
         'Participant Role' => 'Attendee',
         'Status' => 'Registered',
         'Event Source' => 'Event StandaloneAddTest Webtest',
-        'Event Fees' => '$ 800.00',
+        'Fees' => '$ 800.00',
       )
     );
     // check contribution record as well
     //click through to the contribution view screen
-    $this->click("xpath=id('ParticipantView')/div[2]/table[@class='selector']/tbody/tr[1]/td[8]/span/a[text()='View']");
+    $this->click("xpath=id('ParticipantView')/div[2]/table[@class='selector row-highlight']/tbody/tr[1]/td[8]/span/a[text()='View']");
     $this->waitForElementPresent('_qf_ContributionView_cancel-bottom');
 
     $this->webtestVerifyTabularData(
@@ -195,11 +195,10 @@ class WebTest_Event_AddParticipationTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     //Is custom field created?
-    $this->waitForText('crm-notification-container', "Your custom field '$checkboxFieldLabel' has been saved.");
+    $this->waitForText('crm-notification-container', "Custom field '$checkboxFieldLabel' has been saved.");
 
     //create another custom field - Integer Radio
-    $this->click("//a[@id='newCustomField']/span");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->clickLink("//a[@id='newCustomField']/span", '_qf_Field_cancel', FALSE);
     $this->click('data_type[0]');
     $this->select('data_type[0]', 'value=1');
     $this->click("//option[@value='1']");
@@ -234,7 +233,6 @@ class WebTest_Event_AddParticipationTest extends CiviSeleniumTestCase {
 
     //clicking save
     $this->click('_qf_Field_next');
-    $this->waitForPageToLoad($this->getTimeoutMsec());
 
     $this->openCiviPage("participant/add", "reset=1&action=add&context=standalone", "_qf_Participant_upload-bottom");
 
@@ -248,10 +246,10 @@ class WebTest_Event_AddParticipationTest extends CiviSeleniumTestCase {
     $this->click('role_id[2]');
     $this->click('role_id[3]');
 
-    $this->waitForElementPresent("xpath=//div[@id='$customGroupTitle']//div");
-    $this->click("xpath=//div[@id='$customGroupTitle']//div[1]");
-    $this->click("xpath=//div[@id='$customGroupTitle']//div[2]//table//tbody//tr[2]//td[2]//table//tbody//tr[1]//td[1]//label");
-    $this->click("xpath=//div[@id='$customGroupTitle']//div[2]//table//tbody//tr[4]//td[2]//table//tbody//tr[1]//td[1]//label");
+    $this->waitForElementPresent("xpath=//*[@id='2_chk']//div[@class='custom-group custom-group-$customGroupTitle crm-accordion-wrapper collapsed']");
+    $this->click("xpath=//*[@id='2_chk']/div[@class='custom-group custom-group-$customGroupTitle crm-accordion-wrapper collapsed']//div[1]");
+    $this->click("xpath=//*[@id='2_chk']/div[@class='custom-group custom-group-$customGroupTitle crm-accordion-wrapper']//div[2]//table//tbody//tr[2]//td[2]//table//tbody//tr[1]//td[1]//label");
+    $this->click("xpath=//*[@id='2_chk']/div[@class='custom-group custom-group-$customGroupTitle crm-accordion-wrapper']//div[2]//table//tbody//tr[4]//td[2]//table//tbody//tr[1]//td[1]//label");
 
     // Choose Registration Date.
     // Using helper webtestFillDate function.
@@ -271,7 +269,7 @@ class WebTest_Event_AddParticipationTest extends CiviSeleniumTestCase {
     // Select an event fee
     $this->waitForElementPresent('priceset');
 
-    $this->click("xpath=//input[@class='form-radio']");
+    $this->click("xpath=//input[@class='crm-form-radio']");
 
     // Enter amount to be paid (note: this should default to selected fee level amount, s/b fixed during 3.2 cycle)
     $this->type('total_amount', '800');
@@ -288,9 +286,9 @@ class WebTest_Event_AddParticipationTest extends CiviSeleniumTestCase {
     // Is status message correct?
     $this->waitForText('crm-notification-container', "Event registration for $displayName has been added");
 
-    $this->waitForElementPresent("xpath=//div[@id='Events']//table//tbody/tr[1]/td[8]/span/a[text()='View']");
+    $this->waitForElementPresent("xpath=//*[@id='Search']//table/tbody/tr[1]/td[8]/span/a[text()='View']");
     //click through to the participant view screen
-    $this->click("xpath=//div[@id='Events']//table//tbody/tr[1]/td[8]/span/a[text()='View']");
+    $this->click("xpath=//*[@id='Search']//table/tbody/tr[1]/td[8]/span/a[text()='View']");
     $this->waitForElementPresent('_qf_ParticipantView_cancel-bottom');
 
     $this->webtestVerifyTabularData(
@@ -299,7 +297,7 @@ class WebTest_Event_AddParticipationTest extends CiviSeleniumTestCase {
         'Participant Role' => 'Attendee, Volunteer, Host',
         'Status' => 'Registered',
         'Event Source' => 'Event StandaloneAddTest Webtest',
-        'Event Fees' => '$ 800.00',
+        'Fees' => '$ 800.00',
       )
     );
 
@@ -309,7 +307,7 @@ class WebTest_Event_AddParticipationTest extends CiviSeleniumTestCase {
 
     // check contribution record as well
     //click through to the contribution view screen
-    $this->click("xpath=id('ParticipantView')/div[2]/table[@class='selector']/tbody/tr[1]/td[8]/span/a[text()='View']");
+    $this->click("xpath=id('ParticipantView')/div[2]/table[@class='selector row-highlight']/tbody/tr[1]/td[8]/span/a[text()='View']");
     $this->waitForElementPresent('_qf_ContributionView_cancel-bottom');
 
     $this->webtestVerifyTabularData(
@@ -415,19 +413,15 @@ class WebTest_Event_AddParticipationTest extends CiviSeleniumTestCase {
     foreach($return as $values) {
       foreach ($values as $entityType => $customData) {
         //checking for duplicate custom data present or not
-        $this->assertElementPresent("xpath=//div[@id='{$customData['cgtitle']}'][@class='crm-accordion-wrapper ']");
-        $this->assertEquals(1, $this->getXpathCount("//div[@id='{$customData['cgtitle']}'][@class='crm-accordion-wrapper ']"));
+        $this->assertElementPresent("xpath=//*[@id='customData']/div[@class='custom-group custom-group-{$customData['cgtitle']} crm-accordion-wrapper ']");
+        $this->assertEquals(1, $this->getXpathCount("//*[@id='customData']/div[@class='custom-group custom-group-{$customData['cgtitle']} crm-accordion-wrapper ']"));
       }
     }
   }
 
   function _fillParticipantDetails($firstName, $lastName, $processorId) {
-    $this->select("id=profiles_1", "label=New Individual");
-    $this->waitForElementPresent('_qf_Edit_next');
+    $this->webtestNewDialogContact($firstName, $lastName);
 
-    $this->type("id=first_name", $firstName);
-    $this->type("id=last_name", $lastName);
-    $this->click("id=_qf_Edit_next");
     $this->select('payment_processor_id', "value={$processorId}");
     $this->verifySelectedValue("event_id", "3");
     $this->check("role_id[1]");
