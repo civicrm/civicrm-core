@@ -174,5 +174,13 @@ class CRM_Utils_System_UnitTests extends CRM_Utils_System_Drupal {
     throw new Exception("Method not implemented: getLoginURL");
   }
 
+  /**
+   * Over-ridable function to get timezone as a string eg.
+   * @return string Timezone e.g. 'America/Los_Angeles'
+   */
+  function getTimeZoneString() {
+    // This class extends Drupal, but we don't want Drupal's behavior; reproduce CRM_Utils_System_Base::getTimeZoneString
+    return date_default_timezone_get();
+  }
 }
 
