@@ -315,7 +315,8 @@ LEFT JOIN  civicrm_contribution on (civicrm_contribution.contact_id = civicrm_co
    */
   public function getValidProcessorsAndAssignFutureStartDate() {
     $validProcessors = array();
-    $processors = CRM_Core_PseudoConstant::paymentProcessor(FALSE, FALSE, "billing_mode IN ( 1, 3 )");
+    // restrict to payment_type = 1 (credit card only) and billing mode 1 and 3
+    $processors = CRM_Core_PseudoConstant::paymentProcessor(FALSE, FALSE, "billing_mode IN ( 1, 3 ) AND payment_type = 1");
 
     foreach ($processors as $ppID => $label) {
       $paymentProcessor = CRM_Financial_BAO_PaymentProcessor::getPayment($ppID, $this->_mode);
