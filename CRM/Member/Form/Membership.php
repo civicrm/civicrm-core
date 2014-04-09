@@ -1180,11 +1180,13 @@ WHERE   id IN ( ' . implode(' , ', array_keys($membershipType)) . ' )';
       $$dateVariable = CRM_Utils_Date::processDate($formValues[$dateField]);
     }
 
-    $num_terms = CRM_Utils_Array::value('num_terms', $formValues, 1);
+    $memTypeNumTerms = CRM_Utils_Array::value('num_terms', $formValues);
 
     $calcDates = array();
     foreach ($this->_memTypeSelected as $memType) {
-      $memTypeNumTerms = CRM_Utils_Array::value($memType, $termsByType, $num_terms);
+      if (empty($memTypeNumTerms)) {
+        $memTypeNumTerms = CRM_Utils_Array::value($memType, $termsByType, 1);
+      }
       $calcDates[$memType] = CRM_Member_BAO_MembershipType::getDatesForMembershipType($memType,
         $joinDate, $startDate, $endDate, $memTypeNumTerms
       );
