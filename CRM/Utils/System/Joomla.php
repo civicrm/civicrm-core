@@ -488,8 +488,8 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
       $row = $users[0];
     }
 
+    $joomlaBase = dirname(dirname(dirname(dirname(dirname(dirname(dirname(dirname(__FILE__))))))));
     if ( !defined('JVERSION') ) {
-      $joomlaBase = dirname(dirname(dirname(dirname(dirname(dirname(dirname(dirname(__FILE__))))))));
       require $joomlaBase . '/libraries/cms/version/version.php';
       $jversion = new JVersion;
       define('JVERSION', $jversion->getShortVersion());
