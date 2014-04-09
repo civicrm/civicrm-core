@@ -215,7 +215,7 @@ abstract class CRM_Utils_System_Base {
    * @return string Timezone e.g. 'America/Los_Angeles'
    */
   function getTimeZoneString() {
-    return NULL;
+    return date_default_timezone_get();
   }
 
   /**
