@@ -312,6 +312,13 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
       $base .= $config->wpBasePage;
     }
 
+    if (!isset($path) && !isset($query)) {
+      // This seems to have very different structure than the others. I don't know
+      // why it's so different (and I can only find two obvious use-cases, of which
+      // at least one looks gratuitous).
+      return $base . $fragment;
+    }
+
     if (isset($path)) {
       if (isset($query)) {
         if ($permlinkStructure != '' && ($pageID || $script != '')) {
@@ -338,9 +345,6 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
         else {
           return $base . '?' . $query . $pageID . $fragment;
         }
-      }
-      else {
-        return $base . $fragment;
       }
     }
   }
