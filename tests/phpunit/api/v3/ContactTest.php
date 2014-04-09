@@ -1229,6 +1229,9 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $result = $this->callAPISuccess('contact', 'get', array('birth_date_low' => date('Y-m-d', strtotime('-6 years')), 'birth_date_high' => date('Y-m-d', strtotime('- 3 years'))));
     $this->assertEquals(1, $result['count']);
     $this->assertEquals(date('Y-m-d', strtotime('first day of next month -5 years')), $result['values'][$contact2['id']]['birth_date']);
+    $result = $this->callAPISuccess('contact', 'get', array('birth_date_low' => '-6 years', 'birth_date_high' => '- 3 years'));
+    $this->assertEquals(1, $result['count']);
+    $this->assertEquals(date('Y-m-d', strtotime('first day of next month -5 years')), $result['values'][$contact2['id']]['birth_date']);
   }
 
   /**
@@ -1249,7 +1252,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $result = $this->callAPISuccess('contact', 'get', array('deceased_date_high' => date('Y-m-d', strtotime('-6 years'))));
     $this->assertEquals(1, $result['count']);
     $this->assertEquals(date('Y-m-d', strtotime('first day of next month -20 years')), $result['values'][$contact3['id']]['deceased_date']);
-    $result = $this->callAPISuccess('contact', 'get', array('deceased_date_low' => date('Y-m-d', strtotime('-6 years')), 'deceased_date_high' => date('Y-m-d', strtotime('- 3 years'))));
+    $result = $this->callAPISuccess('contact', 'get', array('deceased_date_low' => '-6 years', 'deceased_date_high' => date('Y-m-d', strtotime('- 3 years'))));
     $this->assertEquals(1, $result['count']);
     $this->assertEquals(date('Y-m-d', strtotime('first day of next month -5 years')), $result['values'][$contact2['id']]['deceased_date']);
   }
