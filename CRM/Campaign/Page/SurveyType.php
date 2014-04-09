@@ -157,8 +157,6 @@ class CRM_Campaign_Page_SurveyType extends CRM_Core_Page_Basic {
    * @static
    */
   function browse() {
-    $this->assign('includeWysiwygEditor', TRUE);
-
     $campaingCompId = CRM_Core_Component::getComponentID('CiviCampaign');
     $groupParams    = array('name' => $this->_gName);
     $optionValues   = CRM_Core_OptionValue::getRows($groupParams, $this->links(), 'component_id,weight');

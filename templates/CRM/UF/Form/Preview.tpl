@@ -23,14 +23,12 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
-{capture assign=infoTitle}{ts}Preview Mode{/ts}{/capture}
-{assign var="infoType" value="info"}
 {if $previewField}
-  {capture assign=infoMessage}<strong>{ts}Profile Field Preview{/ts}</strong>{/capture}
+  {capture assign=infoTitle}{ts}Profile Field Preview{/ts}{/capture}
 {else}
-  {capture assign=infoMessage}<strong>{ts}Profile Preview{/ts}</strong>{/capture}
+  {capture assign=infoTitle}{ts}Profile Preview{/ts}{/capture}
 {/if}
-{include file="CRM/common/info.tpl"}
+{include file="CRM/common/info.tpl" infoType="no-popup profile-preview-msg" infoMessage=" "}
 <div class="crm-form-block">
 
 {if ! empty( $fields )}

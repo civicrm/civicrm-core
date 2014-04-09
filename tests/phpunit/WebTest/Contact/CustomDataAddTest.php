@@ -86,11 +86,10 @@ class WebTest_Contact_CustomDataAddTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     //Is custom field created?
-    $this->waitForText('crm-notification-container', "Your custom field '$checkboxFieldLabel' has been saved.");
+    $this->waitForText('crm-notification-container', "Custom field '$checkboxFieldLabel' has been saved.");
 
     //create another custom field - Integer Radio
-    $this->click("//a[@id='newCustomField']/span");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
+    $this->clickLink("//a[@id='newCustomField']/span", '_qf_Field_cancel', FALSE);
     $this->click("data_type[0]");
     $this->select("data_type[0]", "value=1");
     $this->click("//option[@value='1']");
@@ -125,10 +124,9 @@ class WebTest_Contact_CustomDataAddTest extends CiviSeleniumTestCase {
 
     //clicking save
     $this->click("_qf_Field_next");
-    $this->waitForPageToLoad($this->getTimeoutMsec());
 
     //Is custom field created
-    $this->waitForText('crm-notification-container', "Your custom field '$radioFieldLabel' has been saved.");
+    $this->waitForText('crm-notification-container', "Custom field '$radioFieldLabel' has been saved.");
 
     // Go to the URL to create an Individual contact.
     $this->openCiviPage("contact/add", "reset=1&ct=Individual");
@@ -200,7 +198,7 @@ class WebTest_Contact_CustomDataAddTest extends CiviSeleniumTestCase {
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
     //Is custom field created?
-    $this->waitForText('crm-notification-container', "Your custom field '$moneyTextFieldLabel' has been saved.");
+    $this->waitForText('crm-notification-container', "Custom field '$moneyTextFieldLabel' has been saved.");
 
     //Get the customFieldsetID
     $this->openCiviPage('admin/custom/group', 'reset=1');
@@ -264,7 +262,7 @@ class WebTest_Contact_CustomDataAddTest extends CiviSeleniumTestCase {
     $this->select("id=data_type_0", "value=0");
     $this->click("id=_qf_Field_next-bottom");
     $this->waitForPageToLoad($this->getTimeoutMsec());
-    $this->waitForText('crm-notification-container', "Your custom field '$customField' has been saved.");
+    $this->waitForText('crm-notification-container', "Custom field '$customField' has been saved.");
 
     $this->openCiviPage('contact/add', 'reset=1&ct=Individual');
 
@@ -324,9 +322,9 @@ class WebTest_Contact_CustomDataAddTest extends CiviSeleniumTestCase {
     $this->click("css=#tab_log a");
 
     //check the changed log
-    $this->waitForElementPresent("xpath=//div[@id='instance_data']/div[2]/table/tbody/tr[1]/td[4]/a[contains(text(), '$firstName $lastName')]");
-    $this->waitForElementPresent("xpath=//div[@id='instance_data']/div[2]/table/tbody/tr[1]/td/a[2]");
-    $this->click("xpath=//div[@id='instance_data']/div[2]/table/tbody/tr[1]/td/a[2]");
+    $this->waitForElementPresent("xpath=//div[@id='changeLog']/div[2]/div/form/div[2]/table/tbody/tr[1]/td[4]/a[contains(text(), '$firstName $lastName')]");
+    $this->waitForElementPresent("xpath=//div[@id='changeLog']/div[2]/div/form/div[2]/table/tbody/tr[1]/td/a[2]");
+    $this->click("xpath=//div[@id='changeLog']/div[2]/div/form/div[2]/table/tbody/tr[1]/td/a[2]");
     $this->waitForPageToLoad($this->getTimeoutMsec());
     $this->assertTrue($this->isElementPresent("xpath=//form[@id='LoggingDetail']/div[2]/table/tbody/tr/td[2][contains(text(), '$value')]"));
     $this->assertTrue($this->isElementPresent("xpath=//form[@id='LoggingDetail']/div[2]/table/tbody/tr/td[3][contains(text(), '$value1')]"));

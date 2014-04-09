@@ -686,7 +686,7 @@
 
       // set proper entity model based on selected profile
       var contactTypes = ['Individual', 'Household', 'Organization'];
-      var profileType = ufGroupModel.get('group_type');
+      var profileType = ufGroupModel.get('group_type') || '';
       profileType = profileType.split(',');
       var ufEntityModel;
       _.each(profileType, function (ptype) {
