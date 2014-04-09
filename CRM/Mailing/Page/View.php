@@ -81,7 +81,7 @@ class CRM_Mailing_Page_View extends CRM_Core_Page {
     }
     else {
       $print = TRUE;
-      $this->_mailingID = CRM_Utils_Request::retrieve('id', 'Integer', CRM_Core_DAO::$_nullObject, TRUE);
+      $this->_mailingID = CRM_Utils_Request::retrieve('id', 'String', CRM_Core_DAO::$_nullObject, TRUE);
     }
 
     // # CRM-7651
@@ -97,8 +97,8 @@ class CRM_Mailing_Page_View extends CRM_Core_Page {
     }
 
     // mailing key check
-    $mailerHash = CRM_Core_Config::singleton()->mailerHash;
-    if ($mailerHash) {
+    $config = CRM_Core_Config::singleton();
+    if (!empty($config->mailerHash)) {
       $this->_mailing = new CRM_Mailing_BAO_Mailing();
 
       if (!is_numeric($this->_mailingID)) {
@@ -108,7 +108,7 @@ class CRM_Mailing_Page_View extends CRM_Core_Page {
         $this->_mailing->id = $this->_mailingID;
         // if mailing is present and associated hash is present
         // while 'hash' is not been used for mailing view : throw 'permissionDenied'
-        if ($this->_mailing->find(TRUE) && $this->_mailing->hash) {
+        if ($this->_mailing->find() && CRM_Core_DAO::getFieldValue('CRM_Mailing_BAO_Mailing', $this->_mailingID, 'hash', 'id')) {
           CRM_Utils_System::permissionDenied();
           return;
         }
