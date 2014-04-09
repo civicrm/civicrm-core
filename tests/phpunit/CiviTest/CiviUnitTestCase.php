@@ -306,6 +306,9 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
 
     // also set this global hack
     $GLOBALS['_PEAR_ERRORSTACK_OVERRIDE_CALLBACK'] = array();
+
+    $env = new CRM_Utils_Check_Env();
+    CRM_Utils_Check::singleton()->assertValid($env->checkAll());
   }
 
   /**
@@ -349,11 +352,6 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
 
     // reset all the caches
     CRM_Utils_System::flushCache();
-
-    // Make sure the DB connection is setup properly
-    $config->userSystem->setMySQLTimeZone();
-    $env = new CRM_Utils_Check_Env();
-    CRM_Utils_Check::singleton()->assertValid($env->checkAll());
 
     // clear permissions stub to not check permissions
     $config = CRM_Core_Config::singleton();

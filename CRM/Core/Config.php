@@ -257,7 +257,6 @@ class CRM_Core_Config extends CRM_Core_Config_Variables {
           array(1 => array($userID, 'Integer'))
         );
       }
-      self::$_singleton->userSystem->setMySQLTimeZone();
 
       // initialize authentication source
       self::$_singleton->initAuthSrc();
