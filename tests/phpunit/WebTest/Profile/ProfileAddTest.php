@@ -190,7 +190,6 @@ class WebTest_Profile_ProfileAddTest extends CiviSeleniumTestCase {
     $this->openCiviPage('group', 'reset=1');
     $this->type('title', $groupName);
     $this->click('_qf_Search_refresh');
-    $this->waitForVisible('crm-group-selector_processing');
     $this->waitForElementPresent("xpath=//table[@id='crm-group-selector']/tbody/tr/td[contains(., '$groupName')]/following-sibling::td[@class='crm-group-group_links']/span/a");
     $this->clickLink("xpath=//table[@id='crm-group-selector']/tbody/tr/td[1][contains(., '$groupName')]/following-sibling::td[@class='crm-group-group_links']/span/a");
     $contactEmails = array(
@@ -280,16 +279,14 @@ class WebTest_Profile_ProfileAddTest extends CiviSeleniumTestCase {
     // Wait for "saved" status msg
     $this->waitForText('crm-notification-container', "Profile Field Saved");
 
-    $this->waitForElementPresent("xpath=//div[@id='field_page']/div[4]/a[2]");
-    $this->waitForElementPresent("xpath=//div[@id='field_page']/div[4]/a[4]");
 
-    $this->waitForElementPresent("xpath=//div[@id='field_page']/div[3]/table/tbody/tr[1]/td[9]/span/a[text()='Edit']");
+    $this->waitForElementPresent("xpath=//div[@id='field_page']/div[2]/table/tbody/tr[1]/td[9]/span/a[text()='Edit']");
     // extract profile Id
-    $id = explode("gid=", $this->getAttribute("xpath=//div[@id='field_page']/div[3]/table/tbody/tr/td[9]/span/a[text()='Edit']/@href"));
+    $id = explode("gid=", $this->getAttribute("xpath=//div[@id='field_page']/div[2]/table/tbody/tr/td[9]/span/a[text()='Edit']/@href"));
     $id = $id[1];
 
     // click on Edit Settings
-    $this->clickLink("xpath=//div[@id='field_page']/div[4]/a[2]", '_qf_Group_next-bottom');
+    $this->clickLink("xpath=//div[@id='field_page']/div[3]/a[2]", '_qf_Group_next-bottom', FALSE);
 
     // check for description field
     $this->waitForElementPresent('description');
