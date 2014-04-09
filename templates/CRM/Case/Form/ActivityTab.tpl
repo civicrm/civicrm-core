@@ -37,12 +37,10 @@
         <table class="no-border form-layout-compressed" id="searchOptions">
           <tr>
             <td class="crm-case-caseview-form-block-repoter_id"colspan="2"><label for="reporter_id">{ts}Reporter/Role{/ts}</label><br />
-              {assign var=reporter value=reporter_id_$caseID}
-              {$form.$reporter.html|crmAddClass:twenty}
+              {$form.reporter_id.html|crmAddClass:twenty}
             </td>
-            <td class="crm-case-caseview-form-block-status_id"><label for="status_id">{$form.$status.label}</label><br />
-              {assign var=status value=status_id_$caseID}
-              {$form.$status.html}
+            <td class="crm-case-caseview-form-block-status_id"><label for="status_id">{$form.status_id.label}</label><br />
+              {$form.status_id.html}
             </td>
             <td style="vertical-align: bottom;">
               {assign var=caseid value=$caseID}
@@ -51,26 +49,22 @@
           </tr>
           <tr>
             <td class="crm-case-caseview-form-block-activity_date_low">
-              {assign var=activitylow  value=activity_date_low_$caseID}
-              {$form.$activitylow.label}<br />
-              {include file="CRM/common/jcalendar.tpl" elementName=$activitylow}
+              {$form.activity_date_low.label}<br />
+              {include file="CRM/common/jcalendar.tpl" elementName=activity_date_low}
             </td>
             <td class="crm-case-caseview-form-block-activity_date_high">
-              {assign var=activityhigh  value=activity_date_high_$caseID}
-              {$form.$activityhigh.label}<br />
-              {include file="CRM/common/jcalendar.tpl" elementName=$activityhigh}
+              {$form.activity_date_high.label}<br />
+              {include file="CRM/common/jcalendar.tpl" elementName=activity_date_high}
             </td>
             <td class="crm-case-caseview-form-block-activity_type_filter_id">
-              {assign var=activity value=activity_type_filter_id_$caseID}
-              {$form.$activity.label}<br />
-              {$form.$activity.html}
+              {$form.activity_type_filter_id.label}<br />
+              {$form.activity_type_filter_id.html}
             </td>
           </tr>
-          {assign var=activity_deleted value=activity_deleted_$caseID}
-          {if $form.$activity_deleted}
+          {if $form.activity_deleted}
           <tr class="crm-case-caseview-form-block-activity_deleted">
             <td>
-              {$form.$activity_deleted.html}{$form.$activity_deleted.label}
+              {$form.activity_deleted.html}{$form.activity_deleted.label}
             </td>
           </tr>
           {/if}
