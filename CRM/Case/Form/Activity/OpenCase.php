@@ -75,7 +75,7 @@ class CRM_Case_Form_Activity_OpenCase {
     $form->_caseTypeId = array_key_exists($caseTypeId, $caseTypes) ? $caseTypeId : NULL;
 
     // check if the case status id passed in url is a valid one
-    $caseStatusId = CRM_Utils_Request::retrieve('cStatus', 'Positive', $form);
+    $caseStatusId = CRM_Utils_Request::retrieve('case_status_id', 'Positive', $form);
     $caseStatus = CRM_Case_PseudoConstant::caseStatus();
     $form->_caseStatusId = array_key_exists($caseStatusId, $caseStatus) ? $caseStatusId : NULL;
 

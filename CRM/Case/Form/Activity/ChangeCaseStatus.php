@@ -74,9 +74,16 @@ class CRM_Case_Form_Activity_ChangeCaseStatus {
         FALSE
       );
     }
-    $form->add('select', 'case_status_id', ts('Case Status'),
+    $element = $form->add('select', 'case_status_id', ts('Case Status'),
       $form->_caseStatus, TRUE
     );
+    // check if the case status id passed in url is a valid one, set as default and freeze
+    if (CRM_Utils_Request::retrieve('case_status_id', 'Positive', $form)) {
+      $caseStatusId = CRM_Utils_Request::retrieve('case_status_id', 'Positive', $form);
+      $caseStatus = CRM_Case_PseudoConstant::caseStatus();
+      $form->_defaultCaseStatus = array_key_exists($caseStatusId, $caseStatus) ? $caseStatusId : NULL;
+      $element->freeze();
+    }
   }
 
   /**

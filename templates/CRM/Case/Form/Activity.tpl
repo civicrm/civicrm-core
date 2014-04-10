@@ -55,7 +55,10 @@
         <div id="help">{$activityTypeDescription}</div>
       </tr>
     {/if}
-    {if $activityTypeFile}
+    {* Block for change status, case type and start date. *}
+    {if $activityTypeFile EQ 'ChangeCaseStatus'
+    || $activityTypeFile EQ 'ChangeCaseType'
+    || $activityTypeFile EQ 'ChangeCaseStartDate'}
       {include file="CRM/Case/Form/Activity/$activityTypeFile.tpl"}
       <tr class="crm-case-activity-form-block-details">
         <td class="label">{ts}Notes{/ts}</td>
@@ -64,14 +67,16 @@
           {if $defaultWysiwygEditor eq 0}{$form.details.html|crmAddClass:huge}{else}{$form.details.html}{/if}
         </td>
       </tr>
+      {* Added Activity Details accordion tab *}
+      <tr class="crm-case-activity-form-block-activity-details">
+        <td colspan="2">
+          <div id="activity-details" class="crm-accordion-wrapper collapsed">
+            <div class="crm-accordion-header">
+              {ts} Activity Details{/ts}
+            </div><!-- /.crm-accordion-header -->
+            <div class="crm-accordion-body">
     {/if}
-    <tr class="crm-case-activity-form-block-activity-details">
-      <td colspan="2">
-        <div id="activity-details" class="crm-accordion-wrapper collapsed">
-          <div class="crm-accordion-header">
-            {ts} Activity Details{/ts}
-          </div><!-- /.crm-accordion-header -->
-          <div class="crm-accordion-body">
+    {* End block for change status, case type and start date. *}
             <table class="form-layout-compressed">
               <tbody>
                 <tr id="with-clients" class="crm-case-activity-form-block-client_name">
@@ -125,7 +130,7 @@
                 </tr>
 
               {* Include special processing fields if any are defined for this activity type (e.g. Change Case Status / Change Case Type). *}
-    
+
               {if $activityTypeFile neq 'ChangeCaseStartDate'}
                 <tr class="crm-case-activity-form-block-subject">
                   <td class="label">{$form.subject.label}</td><td class="view-value">{$form.subject.html|crmAddClass:huge}</td>
@@ -167,8 +172,13 @@
                 </td>
               </tr>
             </table>
+        {if $activityTypeFile EQ 'ChangeCaseStatus'
+        || $activityTypeFile EQ 'ChangeCaseType'
+        || $activityTypeFile EQ 'ChangeCaseStartDate'}
           </div><!-- /.crm-accordion-body -->
         </div><!-- /.crm-accordion-wrapper -->
+        {* End of Activity Details accordion tab *}
+      {/if}
       </td>
     </tr>
     <tr class="crm-case-activity-form-block-attachment">
