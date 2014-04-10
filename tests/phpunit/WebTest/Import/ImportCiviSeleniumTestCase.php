@@ -550,10 +550,11 @@ class ImportCiviSeleniumTestCase extends CiviSeleniumTestCase {
       $this->typeKeys("css=input#sort_name_navigation", $searchName);
 
       // Wait for result list.
-      $this->waitForElementPresent("css=div.ac_results-inner li");
+      $this->waitForElementPresent("css=ul.ui-autocomplete li");
 
       // Visit contact summary page.
-      $this->clickLink("css=div.ac_results-inner li");
+      $this->click("css=ul.ui-autocomplete li");
+      $this->waitForPageToLoad($this->getTimeoutMsec());
 
       // Get contact id from url.
       $contactIds[] = $this->urlArg('cid');
