@@ -52,7 +52,6 @@ class CRM_Admin_Form_Setting_Mail extends CRM_Admin_Form_Setting {
     $this->addElement('text', 'mailerJobSize', ts('Mailer Job Size'));
     $this->addElement('advcheckbox', 'replyTo', ts('Enable Custom Reply-To'));
     $this->addElement('text', 'mailerJobsMax', ts('Mailer CRON job limit'));
-    $this->addElement('advcheckbox', 'mailerHash', ts('Hashed Mailing URL\'s'));
     $check = TRUE;
 
     // redirect to Administer Section After hitting either Save or Cancel button.
