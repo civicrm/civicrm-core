@@ -747,7 +747,15 @@ WHERE  relationship_type_id = " . CRM_Utils_Type::escape($type, 'Integer');
     // however, a longer term solution would be to simplify the add, create & api functions
     // to be more standard. It is debatable @ that point whether it's better to call the BAO
     // direct as the api is more tested.
-    civicrm_api3('relationship', 'create', array('id' => $id, 'is_active' => $is_active));
+    $result = civicrm_api('relationship', 'create', array(
+      'id' => $id,
+      'is_active' => $is_active,
+      'version' => 3,
+    ));
+
+    if (is_array($result) && !empty($result['is_error']) && $result['error_message'] != 'Relationship already exists') {
+      throw new CiviCRM_API3_Exception($result['error_message'], CRM_Utils_Array::value('error_code', $result, 'undefined'), $result);
+    }
 
     // call (undocumented possibly deprecated) hook
     CRM_Utils_Hook::enableDisable('CRM_Contact_BAO_Relationship', $id, $is_active);
