@@ -2866,7 +2866,8 @@ WHERE  contribution_id = %1 ";
           }
           else {
             $diff = 1;
-            if ($context == 'changeFinancialType' || $params['contribution']->contribution_status_id == array_search('Cancelled', $contributionStatus)) {
+            if ($context == 'changeFinancialType' || $params['contribution']->contribution_status_id == array_search('Cancelled', $contributionStatus)
+              || $params['contribution']->contribution_status_id == array_search('Refunded', $contributionStatus)) {
              $diff = -1;
             }
             $amount = $diff * $fieldValues['line_total'];
