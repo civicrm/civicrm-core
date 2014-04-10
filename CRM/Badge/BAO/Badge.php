@@ -125,6 +125,18 @@ class CRM_Badge_BAO_Badge {
     if (!empty($layout['data']['height_image_2'])) {
       $formattedRow['height_image_2'] = $layout['data']['height_image_2'];
     }
+    if (!empty($row['participant_image_URL'])) {
+      $formattedRow['participant_image'] = $row['participant_image_URL'];
+    }
+    if (!empty($layout['data']['width_participant_image'])) {
+      $formattedRow['width_participant_image'] = $layout['data']['width_participant_image'];
+    }
+    if (!empty($layout['data']['height_participant_image'])) {
+      $formattedRow['height_participant_image'] = $layout['data']['height_participant_image'];
+    }
+    if (!empty($layout['data']['alignment_participant_image'])) {
+      $formattedRow['alignment_participant_image'] = $layout['data']['alignment_participant_image'];
+    }    
 
     if (!empty($layout['data']['add_barcode'])) {
       $formattedRow['barcode'] = array(
@@ -176,6 +188,27 @@ class CRM_Badge_BAO_Badge {
     }
     elseif (!empty($formattedRow['height_image_2'])) {
       $startOffset = CRM_Utils_Array::value('height_image_2', $formattedRow);
+    }
+
+    if (CRM_Utils_Array::value('participant_image', $formattedRow)){
+      $xAlign = 10;
+      switch (CRM_Utils_Array::value('alignment_participant_image', $formattedRow)){
+        case 'R':
+          $xAlign = 65;
+          break;
+        case 'L':
+          $xAlign = 10;
+          break;
+        case 'C':
+          $xAlign = 35;
+          break;
+        default:
+          break;
+      }
+      $this->pdf->Image($formattedRow['participant_image'], $x+$xAlign, $y + 18, CRM_Utils_Array::value('width_participant_image', $formattedRow), CRM_Utils_Array::value('height_participant_image', $formattedRow));
+      if ($startOffset == NULL && CRM_Utils_Array::value('height_participant_image', $formattedRow)){
+        $startOffset = CRM_Utils_Array::value('height_participant_image', $formattedRow);        
+      }
     }
 
     $this->pdf->SetLineStyle(array(
@@ -342,7 +375,16 @@ class CRM_Badge_BAO_Badge {
     // get name badge layout info
     $layoutInfo = CRM_Badge_BAO_Layout::buildLayout($params);
 
-    // spit / get actual field names from token
+    // spit / get actual field names from tokeni and individual contact image URLs
+    $participant_image_URLs = array();
+    if (CRM_Utils_Array::value('participant_image', $layoutInfo['data'])){
+      $layoutInfo['data']['participant_image_URL'] = '';
+      $queryString = "SELECT civicrm_participant.id as participant_id, civicrm_contact.image_URL FROM civicrm_contact LEFT JOIN civicrm_participant ON civicrm_contact.id = civicrm_participant.contact_id WHERE {$form->_componentClause};";
+      $dao = CRM_Core_DAO::executeQuery($queryString);
+      while ($dao->fetch()){ 
+        $participant_image_URLs[$dao->participant_id] = $dao->image_URL;
+      }
+    }
     $returnProperties = array();
     if (!empty($layoutInfo['data']['token'])) {
       foreach ($layoutInfo['data']['token'] as $index => $value) {
@@ -414,7 +456,9 @@ class CRM_Badge_BAO_Badge {
         $rows[$dao->participant_id][$key] = isset($dao->$key) ? $dao->$key : NULL;
       }
     }
-
+    foreach ($participant_image_URLs as $participantId => $participant_image_URL) {
+      $rows[$participantId]['participant_image_URL'] = $participant_image_URL;
+    }
     $eventBadgeClass = new CRM_Badge_BAO_Badge();
     $eventBadgeClass->createLabels($rows, $layoutInfo);
   }
