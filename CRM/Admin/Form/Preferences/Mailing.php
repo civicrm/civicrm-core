@@ -118,7 +118,7 @@ class CRM_Admin_Form_Preferences_Mailing extends CRM_Admin_Form_Preferences {
           'html_type' => 'checkbox',
           'title' => ts('Hashed Mailing URL\'s'),
           'weight' => 11,
-          'description' => 'Enable if want \'hash\' key to be displayed in mailing.viewUrl token url instead of mailing ID',
+          'description' => 'If enabled, a randomized hash key will be used to reference the mailing URL in the mailing.viewUrl token, instead of the mailing ID',
         ),
       ),
     );
