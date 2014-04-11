@@ -255,7 +255,6 @@ abstract class CRM_Core_Payment {
       // Check pp is extension
       $ext = CRM_Extension_System::singleton()->getMapper();
       if ($ext->isExtensionKey($dao->class_name)) {
-        $extension_instance_found = TRUE;
         $paymentClass = $ext->keyToClass($dao->class_name, 'payment');
         require_once $ext->classToPath($paymentClass);
       }
@@ -288,6 +287,7 @@ abstract class CRM_Core_Payment {
 
       // Everything, it seems, is ok - execute pp callback handler
       $processorInstance->$method();
+      $extension_instance_found = TRUE;
     }
 
     if (!$extension_instance_found) CRM_Core_Error::fatal(
