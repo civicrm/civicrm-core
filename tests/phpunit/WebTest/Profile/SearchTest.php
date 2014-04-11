@@ -50,6 +50,7 @@ class WebTest_Profile_SearchTest extends CiviSeleniumTestCase {
     $profileTitle = 'profile_' . substr(sha1(rand()), 0, 7);
     $this->type('title', $profileTitle);
 
+    $this->click('uf_group_type_Profile');
     //click on save
     $this->click('_qf_Group_next-bottom');
     $this->waitForPageToLoad($this->getTimeoutMsec());
@@ -143,8 +144,9 @@ class WebTest_Profile_SearchTest extends CiviSeleniumTestCase {
 
     // click on save
     $this->clickLink('_qf_Field_next-bottom', "xpath=//div[@id='field_page']/div[1]/a[4]/span[text()='Use (create mode)']");
-    $this->click("xpath=//div[@id='field_page']/div[1]/a[4]/span[text()='Use (create mode)']");
 
+    $uselink = explode('?', $this->getAttribute("xpath=//*[@id='field_page']/div[1]/a[4]@href"));
+    $this->openCiviPage('profile/create', "$uselink[1]", '_qf_Edit_cancel');
     $this->waitForElementPresent('_qf_Edit_next');
     $lastName = substr(sha1(rand()), 0, 7);
 
@@ -168,7 +170,7 @@ class WebTest_Profile_SearchTest extends CiviSeleniumTestCase {
     $this->click('_qf_Edit_next');
     $this->waitForPageToLoad($this->getTimeoutMsec());
 
-    $this->assertElementContainsText('css=span.msg-text', 'Your information has been saved.');
+    $this->assertElementContainsText("css=span.msg-text", 'Your information has been saved.');
 
     // Search Contact via profile.
     $this->waitForElementPresent("xpath=//div[@id='crm-container']//div/a[text()='» Back to Listings']");
@@ -210,7 +212,7 @@ class WebTest_Profile_SearchTest extends CiviSeleniumTestCase {
 
     // Edit first profile field
     $this->waitForElementPresent("xpath=//table/tbody/tr[1]/td[9]");
-    $this->clickLink("xpath=//table/tbody/tr[1]/td[9]/span[1]/a[1]", '_qf_Field_next-bottom');
+    $this->clickLink("xpath=//table/tbody/tr[1]/td[9]/span[1]/a[1]", '_qf_Field_next-bottom', FALSE);
 
     // sleep 5 to make sure jQuery is not hiding field after page load
     // Because it tends to cause problems, all uses of sleep() must be justified in comments
